@@ -47,6 +47,28 @@ const config: Config = {
         "nt-display": ["Orbitron", "ui-sans-serif", "system-ui", "sans-serif"],
         "nt-mono": ["IBM Plex Mono", "ui-monospace", "monospace"],
         "nt-read": ["Georgia", "Cambria", "Times New Roman", "serif"],
+        // Arcade (SmartRotom) — synthwave triple type system (self-hosted).
+        // Press Start 2P is the pixel display face: it ships a single 400 weight
+        // and each glyph is a full em square, so it is only ever used at small
+        // sizes for kickers, titles and score readouts — never for body copy.
+        ar: ["Space Grotesk", "ui-sans-serif", "system-ui", "sans-serif"],
+        "ar-display": ["Press Start 2P", "ui-monospace", "monospace"],
+        "ar-mono": ["JetBrains Mono", "ui-monospace", "monospace"],
+        // Taxi (SmartRotom) — mobility triple type system (self-hosted).
+        // Orbitron carries the wordmark and the rider tier only; every figure
+        // (fares, coords, distances) is JetBrains Mono with tabular numerals.
+        tx: ["Plus Jakarta Sans", "ui-sans-serif", "system-ui", "sans-serif"],
+        "tx-display": ["Orbitron", "ui-sans-serif", "system-ui", "sans-serif"],
+        "tx-mono": ["JetBrains Mono", "ui-monospace", "monospace"],
+        // Misiones (SmartRotom) — the tavern quest board. Five self-hosted
+        // faces, all serif or hand: display carves the titles, body is the
+        // manuscript, uppercase is a true small-caps face used for every label,
+        // mono carries the figures (n/total), hand is the pinned post-its.
+        ms: ["EB Garamond", "Iowan Old Style", "Georgia", "serif"],
+        "ms-display": ["Cinzel Decorative", "Cinzel", "Georgia", "serif"],
+        "ms-uppercase": ["IM Fell English SC", "Cinzel", "Georgia", "serif"],
+        "ms-mono": ["IM Fell DW Pica", "ui-monospace", "monospace"],
+        "ms-hand": ["Patrick Hand", "Segoe Print", "cursive"],
       },
       fontSize: {
         "4xl": ["2.25rem", { lineHeight: "normal" }],
@@ -91,6 +113,10 @@ const config: Config = {
         "glow-lg": "0 0 20px var(--primary-soft, rgba(249,115,22,0.4))",
       },
       boxShadow: {
+        // ── Taxi (SmartRotom) elevation — theme-dependent, see `.tx-app` ────
+        "tx-1": "var(--tx-shadow-1)",
+        "tx-2": "var(--tx-shadow-2)",
+        "tx-glow": "0 8px 22px var(--tx-accent-glow)",
         left: "-5px 0px 10px 2px rgba(33, 33, 33, 0.3)",
         right: "5px 0px 10px 2px rgba(33, 33, 33, 0.3)",
         light: "4px 4px 0px 0px #000",
@@ -300,6 +326,53 @@ const config: Config = {
           success: "rgb(var(--nt-c-success) / <alpha-value>)",
           warning: "rgb(var(--nt-c-warning) / <alpha-value>)",
           error: "rgb(var(--nt-c-error) / <alpha-value>)",
+        },
+
+        // ── Taxi (SmartRotom) · "Teras Transit" ─────────────────────────────
+        // Blue structure, yellow money: the blue ramp carries every structural
+        // affordance (pins, player, routes) and stays fixed across themes, while
+        // the amber accent is reserved for money and the one primary action per
+        // surface. Backed by `.tx-app[data-theme]` — real light + dark.
+        tx: {
+          // canvas + map field (theme-dependent)
+          bg: "rgb(var(--tx-bg-0) / <alpha-value>)",
+          "bg-1": "rgb(var(--tx-bg-1) / <alpha-value>)",
+          field: "rgb(var(--tx-field) / <alpha-value>)",
+          // surfaces — the two translucent ones are alpha-composited over the
+          // canvas, so they stay full colours rather than triplets.
+          surface: "var(--tx-surface)",
+          "surface-2": "var(--tx-surface-2)",
+          "surface-solid": "rgb(var(--tx-surface-solid) / <alpha-value>)",
+          "surface-raise": "rgb(var(--tx-surface-raise) / <alpha-value>)",
+          line: "var(--tx-line)",
+          "line-2": "var(--tx-line-2)",
+          // ink ramp
+          txt: "rgb(var(--tx-txt) / <alpha-value>)",
+          "txt-2": "var(--tx-txt-2)",
+          "txt-3": "var(--tx-txt-3)",
+          // structural blue (constant — identical in both themes)
+          "blue-300": "rgb(var(--tx-blue-300) / <alpha-value>)",
+          "blue-400": "rgb(var(--tx-blue-400) / <alpha-value>)",
+          "blue-500": "rgb(var(--tx-blue-500) / <alpha-value>)",
+          "blue-600": "rgb(var(--tx-blue-600) / <alpha-value>)",
+          "blue-700": "rgb(var(--tx-blue-700) / <alpha-value>)",
+          "blue-ink": "rgb(var(--tx-blue-ink) / <alpha-value>)",
+          // money accent (runtime-settable triplet; soft/glow follow it)
+          accent: "rgb(var(--tx-accent) / <alpha-value>)",
+          "accent-deep": "var(--tx-accent-deep)",
+          "accent-soft": "var(--tx-accent-soft)",
+          "accent-glow": "var(--tx-accent-glow)",
+          "on-accent": "rgb(var(--tx-on-accent) / <alpha-value>)",
+          money: "rgb(var(--tx-money) / <alpha-value>)",
+          // status
+          ok: "rgb(var(--tx-ok) / <alpha-value>)",
+          "ok-soft": "var(--tx-ok-soft)",
+          no: "rgb(var(--tx-no) / <alpha-value>)",
+          "no-soft": "var(--tx-no-soft)",
+          // map pin chrome (a pin sits on the field, not on a surface)
+          "pin-bg": "var(--tx-pin-bg)",
+          "pin-ink": "rgb(var(--tx-pin-ink) / <alpha-value>)",
+          scrim: "var(--tx-scrim)",
         },
 
         // ════════════════════════════════════════════════════════════════════
@@ -626,6 +699,97 @@ const config: Config = {
           error:     "rgb(var(--mw-error) / <alpha-value>)",
           info:      "rgb(var(--mw-info) / <alpha-value>)",
         },
+        // ════════════════════════════════════════════════════════════════════
+        // Arcade (SmartRotom) — `ar-*`. Synthwave, dark-only: a deep violet void
+        // lit by four neons. There is no light mode; the app ignores the theme
+        // picker's mode entirely (SMARTROTOM_V3.md §2b — a single-mode app).
+        // CSS-var backed (declared on `.ar-app`) rather than baked hex, because
+        // the effect layer below — horizon, marquee, chrom, glows — has to read
+        // the palette from inside plugin CSS. Alpha works: `bg-ar-cyan/12`.
+        // The five neons are semantic *accents*, not a ramp: cyan = system/UI,
+        // magenta = live/hot, violet = rare, amber = reward, lime = confirmed.
+        // ════════════════════════════════════════════════════════════════════
+        ar: {
+          bg:       "rgb(var(--ar-bg) / <alpha-value>)",
+          void:     "rgb(var(--ar-void) / <alpha-value>)",
+          "void-2": "rgb(var(--ar-void-2) / <alpha-value>)",
+          "void-3": "rgb(var(--ar-void-3) / <alpha-value>)",
+          ink: {
+            DEFAULT: "rgb(var(--ar-ink) / <alpha-value>)",
+            dim:     "rgb(var(--ar-ink-dim) / <alpha-value>)",
+            muted:   "rgb(var(--ar-ink-muted) / <alpha-value>)",
+          },
+          magenta: {
+            DEFAULT: "rgb(var(--ar-magenta) / <alpha-value>)",
+            2:       "rgb(var(--ar-magenta-2) / <alpha-value>)",
+          },
+          cyan: {
+            DEFAULT: "rgb(var(--ar-cyan) / <alpha-value>)",
+            2:       "rgb(var(--ar-cyan-2) / <alpha-value>)",
+          },
+          violet: {
+            DEFAULT: "rgb(var(--ar-violet) / <alpha-value>)",
+            2:       "rgb(var(--ar-violet-2) / <alpha-value>)",
+          },
+          amber:  "rgb(var(--ar-amber) / <alpha-value>)",
+          lime:   "rgb(var(--ar-lime) / <alpha-value>)",
+          danger: "rgb(var(--ar-danger) / <alpha-value>)",
+          line:          "var(--ar-line)",
+          "line-strong": "var(--ar-line-strong)",
+          panel:         "var(--ar-panel)",
+          "panel-2":     "var(--ar-panel-2)",
+        },
+        // ════════════════════════════════════════════════════════════════════
+        // MISIONES (SmartRotom) — `ms-*`. The tavern quest board: a cork+wood
+        // tablón holding parchment papers pinned with wax seals. Dark-only, one
+        // palette (Pergamino) — the app ignores the theme picker's mode, like
+        // Pokédex and Arcade (SMARTROTOM_V3.md §2b).
+        // CSS-var backed (declared on `.ms-app`) rather than baked hex so the
+        // paper/cork/wood component classes below can read the palette from
+        // inside plugin CSS — and so the handoff's four alternate palettes
+        // (Grimdark, Real, Bosque, Nocturno) are one extra addBase block, not a
+        // refactor. Alpha works: `border-ms-ink-3/30`, `bg-ms-gold-2/12`.
+        // The seal colours are STATUS-driven: they are applied through a literal
+        // class map / SVG fill in `_utils/status.ts`, never `bg-ms-seal-${s}`.
+        // ════════════════════════════════════════════════════════════════════
+        ms: {
+          board: {
+            1:         "rgb(var(--ms-board-1) / <alpha-value>)",
+            2:         "rgb(var(--ms-board-2) / <alpha-value>)",
+            3:         "rgb(var(--ms-board-3) / <alpha-value>)",
+            frame:     "rgb(var(--ms-board-frame) / <alpha-value>)",
+            "frame-hi": "rgb(var(--ms-board-frame-hi) / <alpha-value>)",
+          },
+          paper: {
+            1:    "rgb(var(--ms-paper-1) / <alpha-value>)",
+            2:    "rgb(var(--ms-paper-2) / <alpha-value>)",
+            3:    "rgb(var(--ms-paper-3) / <alpha-value>)",
+            edge: "rgb(var(--ms-paper-edge) / <alpha-value>)",
+          },
+          ink: {
+            1: "rgb(var(--ms-ink-1) / <alpha-value>)",
+            2: "rgb(var(--ms-ink-2) / <alpha-value>)",
+            3: "rgb(var(--ms-ink-3) / <alpha-value>)",
+            4: "rgb(var(--ms-ink-4) / <alpha-value>)",
+          },
+          gold: {
+            1: "rgb(var(--ms-gold-1) / <alpha-value>)",
+            2: "rgb(var(--ms-gold-2) / <alpha-value>)",
+            3: "rgb(var(--ms-gold-3) / <alpha-value>)",
+            4: "rgb(var(--ms-gold-4) / <alpha-value>)",
+          },
+          seal: {
+            active:    "rgb(var(--ms-seal-active) / <alpha-value>)",
+            available: "rgb(var(--ms-seal-available) / <alpha-value>)",
+            completed: "rgb(var(--ms-seal-completed) / <alpha-value>)",
+            failed:    "rgb(var(--ms-seal-failed) / <alpha-value>)",
+            locked:    "rgb(var(--ms-seal-locked) / <alpha-value>)",
+          },
+          stamp: {
+            red:  "rgb(var(--ms-stamp-red) / <alpha-value>)",
+            gold: "rgb(var(--ms-stamp-gold) / <alpha-value>)",
+          },
+        },
       },
       keyframes: {
         // Existing animations
@@ -728,6 +892,106 @@ const config: Config = {
           "0%, 100%": { opacity: "1", transform: "scale(1)" },
           "50%": { opacity: ".6", transform: "scale(.85)" },
         },
+        // ── Arcade (SmartRotom) ───────────────────────────────────────────
+        // Marquee wordmark: a neon gradient swept across clipped text.
+        "ar-marquee": {
+          "0%": { backgroundPosition: "0% 50%" },
+          "100%": { backgroundPosition: "200% 50%" },
+        },
+        // Attract-mode blink. `steps(1)` at the call site on purpose — a CRT
+        // cursor snaps, it does not fade.
+        "ar-blink": {
+          "0%, 55%": { opacity: "1" },
+          "60%, 100%": { opacity: ".15" },
+        },
+        // Breathing cyan halo on the primary/active control.
+        "ar-pulse": {
+          "0%, 100%": {
+            boxShadow: "0 0 0 0 rgb(var(--ar-cyan) / .35), inset 0 0 24px rgb(var(--ar-cyan) / .18)",
+          },
+          "50%": {
+            boxShadow: "0 0 0 6px rgb(var(--ar-cyan) / 0), inset 0 0 38px rgb(var(--ar-cyan) / .28)",
+          },
+        },
+        "ar-float": {
+          "0%, 100%": { transform: "translateY(0)" },
+          "50%": { transform: "translateY(-4px)" },
+        },
+        // Expanding ring marking "today" / the winning tile.
+        "ar-ring": {
+          "0%": { transform: "scale(.9)", opacity: ".5" },
+          "100%": { transform: "scale(1.6)", opacity: "0" },
+        },
+        // The reward "moment": card pop, shockwave, particle burst.
+        "ar-pop": {
+          "0%": { transform: "scale(.6)", opacity: "0" },
+          "60%": { transform: "scale(1.06)", opacity: "1" },
+          "100%": { transform: "scale(1)" },
+        },
+        "ar-celeb-ring": {
+          "0%": { transform: "scale(.5)", opacity: ".7" },
+          "100%": { transform: "scale(2.2)", opacity: "0" },
+        },
+        // `--ar-dx`/`--ar-dy` are set per particle inline — a data-driven value,
+        // the sanctioned inline-style case (SMARTROTOM_V3.md §6).
+        "ar-particle": {
+          "0%": { transform: "translate(0, 0) scale(1)", opacity: "1" },
+          "100%": { transform: "translate(var(--ar-dx, 0), var(--ar-dy, 0)) scale(0)", opacity: "0" },
+        },
+        "ar-skeleton": {
+          "0%": { backgroundPosition: "-200% 0" },
+          "100%": { backgroundPosition: "200% 0" },
+        },
+        // ── Taxi (SmartRotom) ─────────────────────────────────────────────
+        // Route beam: the dashed stroke crawls from player to destination.
+        // 13 = the dash period (2 + 11) — any other value makes it stutter.
+        "tx-beam": { to: { strokeDashoffset: "-13" } },
+        // Player marker: sonar ping expanding out of the core.
+        "tx-ping": {
+          "0%": { transform: "scale(.5)", opacity: ".5" },
+          "100%": { transform: "scale(1.7)", opacity: "0" },
+        },
+        "tx-card-in": {
+          from: { opacity: "0", transform: "translateY(14px) scale(.98)" },
+          to: { opacity: "1", transform: "none" },
+        },
+        "tx-sheet-up": {
+          from: { opacity: "0", transform: "translateY(60px)" },
+          to: { opacity: "1", transform: "none" },
+        },
+        "tx-toast-in": {
+          from: { opacity: "0", transform: "translate(-50%, -24px)" },
+          to: { opacity: "1", transform: "translate(-50%, 0)" },
+        },
+        "tx-fade": { from: { opacity: "0" }, to: { opacity: "1" } },
+        // Teleport progress bar — fills once, then holds.
+        "tx-load": { from: { width: "6%" }, to: { width: "100%" } },
+        // ── Misiones (SmartRotom) ─────────────────────────────────────────
+        // The parchment blocks are written in, not faded in: staggered delays
+        // on `ms-fade-up` read as ink appearing line by line.
+        "ms-fade-up": {
+          from: { opacity: "0", transform: "translateY(8px)" },
+          to: { opacity: "1", transform: "none" },
+        },
+        // The COMPLETADA stamp is struck: it falls from 2.4× with a blur and
+        // overshoots before settling.
+        "ms-stamp-down": {
+          "0%": { transform: "rotate(-14deg) scale(2.4)", opacity: "0", filter: "blur(2px)" },
+          "60%": { transform: "rotate(-14deg) scale(1.05)", opacity: ".9", filter: "blur(0)" },
+          "80%": { transform: "rotate(-14deg) scale(.96)", opacity: ".84" },
+          "100%": { transform: "rotate(-14deg) scale(1)", opacity: ".84" },
+        },
+        "ms-spark": {
+          "0%": { opacity: "0", transform: "scale(.4) translateY(0)" },
+          "40%": { opacity: "1", transform: "scale(1) translateY(-6px)" },
+          "100%": { opacity: "0", transform: "scale(.5) translateY(-16px)" },
+        },
+        "ms-slide-in": { from: { transform: "translateX(100%)" }, to: { transform: "none" } },
+        "ms-hourglass": {
+          "0%, 42%": { transform: "rotate(0deg)" },
+          "50%, 92%": { transform: "rotate(180deg)" },
+          "100%": { transform: "rotate(360deg)" },
+        },
       },
       animation: {
         // Existing animations
@@ -763,10 +1027,36 @@ const config: Config = {
         "mw-ping-white": "mw-ping-white 1.5s ease-in-out infinite",
         "mw-ping": "mw-ping 1.5s ease-in-out infinite",
         "mw-blink": "mw-blink 1.6s ease-in-out infinite",
+        // ── Arcade (SmartRotom) ───────────────────────────────────────────
+        "ar-marquee": "ar-marquee 6s linear infinite",
+        "ar-blink": "ar-blink 1.05s steps(1) infinite",
+        "ar-pulse": "ar-pulse 2.4s ease-in-out infinite",
+        "ar-float": "ar-float 4s ease-in-out infinite",
+        "ar-ring": "ar-ring 1.6s ease-out infinite",
+        "ar-pop": "ar-pop .5s cubic-bezier(.2,.9,.2,1)",
+        "ar-celeb-ring": "ar-celeb-ring 1.3s ease-out infinite",
+        "ar-particle": "ar-particle 1s ease-out forwards",
+        "ar-skeleton": "ar-skeleton 1.4s ease-in-out infinite",
+        // ── Taxi (SmartRotom) ─────────────────────────────────────────────
+        "tx-beam": "tx-beam 0.7s linear infinite",
+        "tx-ping": "tx-ping 1.9s cubic-bezier(.22,1,.36,1) infinite",
+        "tx-card-in": "tx-card-in 0.32s cubic-bezier(.22,1,.36,1)",
+        "tx-sheet-up": "tx-sheet-up 0.34s cubic-bezier(.22,1,.36,1)",
+        "tx-toast-in": "tx-toast-in 0.4s cubic-bezier(.22,1,.36,1)",
+        "tx-fade": "tx-fade 0.22s ease",
+        "tx-load": "tx-load 1.7s cubic-bezier(.22,1,.36,1) forwards",
+        // ── Misiones (SmartRotom) ─────────────────────────────────────────
+        "ms-fade-up": "ms-fade-up 0.35s ease both",
+        "ms-stamp-down": "ms-stamp-down 0.5s cubic-bezier(.34,1.56,.64,1) both",
+        "ms-spark": "ms-spark 3s ease-in-out infinite",
+        "ms-slide-in": "ms-slide-in 0.32s cubic-bezier(.16,1,.3,1)",
+        "ms-hourglass": "ms-hourglass 4s ease-in-out infinite",
       },
       transitionTimingFunction: {
         "pk-out": "cubic-bezier(.16, 1, .3, 1)",
         "pk-spring": "cubic-bezier(.34, 1.56, .64, 1)",
+        // The Taxi handoff's single easing curve (`--ease`).
+        tx: "cubic-bezier(.22, 1, .36, 1)",
       },
       spacing: {
         18: "4.5rem",
@@ -812,6 +1102,13 @@ const config: Config = {
         "nt-lg": "12px",
         "nt-xl": "16px",
         "nt-2xl": "22px",
+        // ── Taxi (SmartRotom) radii — handoff scale ────────────────────────
+        "tx-xs": "8px",
+        "tx-sm": "11px",
+        "tx-md": "14px",
+        "tx-lg": "18px",
+        "tx-xl": "24px",
+        "tx-pill": "999px",
       },
     },
   },
@@ -1120,6 +1417,94 @@ const config: Config = {
         ".nt-scroll::-webkit-scrollbar-thumb:hover": { background: "rgb(var(--nt-fg-subtle))", backgroundClip: "padding-box" },
       })
     }),
+    // ── Taxi (SmartRotom) theme layer ──────────────────────────────────────
+    // "Teras Transit": blue structure, yellow money. Scoped to `.tx-app`, real
+    // light + dark (the mode comes from the platform picker — SMARTROTOM_V3 §2b).
+    // The blue ramp is CONSTANT across themes: it encodes structure (pins, the
+    // player, the route beam), so it must not shift when the canvas flips. What
+    // flips is the canvas, the ink and the translucent surfaces — which are
+    // alpha-composited, hence full colours rather than triplets.
+    plugin(({ addBase }) => {
+      // Structural blue + the ink on a yellow fill — identical in both themes.
+      const constant = {
+        "--tx-blue-300": "147 197 253", "--tx-blue-400": "96 165 250",
+        "--tx-blue-500": "59 130 246", "--tx-blue-600": "37 99 235",
+        "--tx-blue-700": "29 78 216", "--tx-blue-ink": "11 28 69",
+        "--tx-on-accent": "26 18 5",
+        // Money accent. A triplet so soft/glow can derive off it — swap this one
+        // var and the whole amber layer follows.
+        "--tx-accent": "251 191 36",
+        // The far end of every accent fill's gradient: the accent burnt down toward
+        // amber-600. Derived, so it tracks the accent instead of being a second hex.
+        "--tx-accent-deep": "color-mix(in srgb, rgb(var(--tx-accent)) 72%, #d97706)",
+      }
+      const dark = {
+        "--tx-bg-0": "7 13 32", "--tx-bg-1": "10 19 48", "--tx-field": "6 14 34",
+        "--tx-surface": "rgb(150 185 255 / .045)",
+        "--tx-surface-2": "rgb(150 185 255 / .08)",
+        "--tx-surface-solid": "14 24 56", "--tx-surface-raise": "18 32 71",
+        "--tx-line": "rgb(140 175 255 / .13)",
+        "--tx-line-2": "rgb(140 175 255 / .26)",
+        "--tx-txt": "238 243 255",
+        "--tx-txt-2": "rgb(206 222 255 / .74)",
+        "--tx-txt-3": "rgb(170 194 245 / .5)",
+        "--tx-accent-soft": "rgb(var(--tx-accent) / .2)",
+        "--tx-accent-glow": "rgb(var(--tx-accent) / .42)",
+        "--tx-money": "251 191 36",
+        "--tx-ok": "52 211 153", "--tx-ok-soft": "rgb(52 211 153 / .16)",
+        "--tx-no": "251 113 133", "--tx-no-soft": "rgb(251 113 133 / .16)",
+        "--tx-pin-bg": "rgb(10 22 52 / .86)", "--tx-pin-ink": "255 255 255",
+        "--tx-shadow-1": "0 10px 30px rgb(2 8 24 / .5)",
+        "--tx-shadow-2": "0 24px 60px rgb(2 8 24 / .6)",
+        "--tx-scrim": "rgb(3 8 22 / .62)",
+        // The app canvas: a blue dawn top-left, a violet dusk bottom-right.
+        "--tx-app-bg":
+          "radial-gradient(1100px 640px at 14% -10%, rgb(37 99 235 / .34), transparent 60%)," +
+          "radial-gradient(900px 560px at 100% 112%, rgb(168 85 247 / .10), transparent 55%)," +
+          "linear-gradient(162deg, #0a1838 0%, #0a1330 48%, #060c1f 100%)",
+        // The map field's graticule — a light blue on dark, a deep blue on light.
+        "--tx-grid": "130 180 255",
+      }
+      const light = {
+        "--tx-bg-0": "233 237 247", "--tx-bg-1": "255 255 255", "--tx-field": "230 236 248",
+        "--tx-surface": "rgb(18 46 110 / .045)",
+        "--tx-surface-2": "rgb(18 46 110 / .085)",
+        "--tx-surface-solid": "255 255 255", "--tx-surface-raise": "255 255 255",
+        "--tx-line": "rgb(20 52 120 / .13)",
+        "--tx-line-2": "rgb(20 52 120 / .24)",
+        "--tx-txt": "12 26 62",
+        "--tx-txt-2": "rgb(20 42 92 / .72)",
+        "--tx-txt-3": "rgb(40 64 118 / .52)",
+        "--tx-accent-soft": "rgb(245 158 11 / .18)",
+        "--tx-accent-glow": "rgb(245 158 11 / .3)",
+        // Amber on white fails contrast, so money darkens to a burnt amber. The
+        // accent itself stays bright — it only ever appears as a FILL in light.
+        "--tx-money": "180 83 9",
+        "--tx-ok": "5 150 105", "--tx-ok-soft": "rgb(5 150 105 / .12)",
+        "--tx-no": "225 29 72", "--tx-no-soft": "rgb(225 29 72 / .12)",
+        "--tx-pin-bg": "rgb(255 255 255 / 1)", "--tx-pin-ink": "12 26 62",
+        "--tx-shadow-1": "0 8px 24px rgb(20 40 90 / .1)",
+        "--tx-shadow-2": "0 20px 50px rgb(20 40 90 / .16)",
+        "--tx-scrim": "rgb(30 50 100 / .34)",
+        "--tx-app-bg":
+          "radial-gradient(1100px 640px at 12% -12%, rgb(59 130 246 / .16), transparent 60%)," +
+          "radial-gradient(900px 560px at 100% 112%, rgb(168 85 247 / .07), transparent 55%)," +
+          "linear-gradient(162deg, #eef2fb 0%, #e9edf7 52%, #e3e9f6 100%)",
+        "--tx-grid": "40 90 180",
+      }
+      addBase({
+        // Every figure in the app is a fare, a coordinate or a distance — they
+        // must align in columns, so tabular numerals are on at the root.
+        ".tx-app": { ...constant, ...dark, colorScheme: "dark", fontVariantNumeric: "tabular-nums" },
+        '.tx-app[data-theme="light"]': { ...light, colorScheme: "light" },
+        ".tx-app ::selection": { background: "rgb(var(--tx-accent) / .3)" },
+        ".tx-scroll::-webkit-scrollbar": { width: "8px" },
+        ".tx-scroll::-webkit-scrollbar-thumb": { background: "var(--tx-line-2)", borderRadius: "4px" },
+        // Horizontal chip rails scroll but must not show a bar.
+        ".tx-rail": { scrollbarWidth: "none" },
+        ".tx-rail::-webkit-scrollbar": { display: "none" },
+      })
+    }),
     // ── Mewtube + Mewtwitch (SmartRotom) theme layer ───────────────────────
     // One system, two accents, scoped to the `.mw-app` root so nothing leaks
     // into the rest of SmartRotom. `--mw-accent` is a per-app RGB triplet
@@ -1191,6 +1576,451 @@ const config: Config = {
           background: "rgb(var(--mw-700))",
           borderRadius: "99px",
         },
+      })
+    }),
+    // ── Arcade (SmartRotom) theme layer ──────────────────────────────────────
+    // Dark-only synthwave, scoped to `.ar-app`. Two things live here that cannot
+    // be utilities: the palette (the effect classes below read it back out of the
+    // vars) and the CRT layer — scanlines, vignette and the horizon grid are all
+    // pseudo-elements with masks, which Tailwind cannot express.
+    //
+    // `data-scanlines` and `data-motion` on the `.ar-app` root are the two knobs
+    // the in-app Ajustes screen writes; both degrade to the design's defaults
+    // when absent. OS-level `prefers-reduced-motion` is handled separately, per
+    // element, with `motion-reduce:animate-none` (SMARTROTOM_V3.md §11).
+    plugin(({ addBase, addComponents }) => {
+      addBase({
+        ".ar-app": {
+          "--ar-bg": "5 2 17",
+          "--ar-void": "6 3 26",
+          "--ar-void-2": "12 7 40",
+          "--ar-void-3": "26 14 61",
+          "--ar-ink": "238 240 255",
+          "--ar-ink-dim": "188 185 220",
+          "--ar-ink-muted": "139 133 173",
+          "--ar-magenta": "255 46 147",
+          "--ar-magenta-2": "255 109 191",
+          "--ar-cyan": "0 229 255",
+          "--ar-cyan-2": "121 242 255",
+          "--ar-violet": "168 85 255",
+          "--ar-violet-2": "199 155 255",
+          "--ar-amber": "255 184 69",
+          "--ar-lime": "122 248 202",
+          "--ar-danger": "255 85 99",
+          "--ar-line": "rgb(255 255 255 / .07)",
+          "--ar-line-strong": "rgb(255 255 255 / .16)",
+          "--ar-panel": "rgb(16 9 42 / .72)",
+          "--ar-panel-2": "rgb(8 4 24 / .85)",
+          // Scanline opacity — retuned by `data-scanlines`.
+          "--ar-scan": ".045",
+          colorScheme: "dark",
+        },
+        '.ar-app[data-scanlines="off"]': { "--ar-scan": "0" },
+        '.ar-app[data-scanlines="strong"]': { "--ar-scan": ".1" },
+        // The in-app "reducir motion" switch. Kills animation only — transitions
+        // still run, so the loot reel still travels, it just does not shimmer.
+        '.ar-app[data-motion="off"] *, .ar-app[data-motion="off"] *::before, .ar-app[data-motion="off"] *::after':
+          { animation: "none !important" },
+        ".ar-app ::selection": { background: "rgb(var(--ar-magenta) / .35)" },
+        ".ar-app :focus-visible": {
+          outline: "2px solid rgb(var(--ar-cyan))",
+          outlineOffset: "2px",
+          borderRadius: "4px",
+        },
+      })
+      addComponents({
+        // The workspace canvas: two neon bloom pools over a violet gradient.
+        ".ar-canvas": {
+          background:
+            "radial-gradient(1200px 600px at 80% -10%, rgb(var(--ar-violet) / .18), transparent 60%)," +
+            "radial-gradient(900px 500px at -10% 110%, rgb(var(--ar-magenta) / .16), transparent 60%)," +
+            "linear-gradient(180deg, rgb(var(--ar-bg)) 0%, rgb(12 5 36) 100%)",
+        },
+        // CRT scanline overlay. The host must be positioned; every panel in the
+        // system already is.
+        ".ar-scanlines": { position: "relative" },
+        ".ar-scanlines::before": {
+          content: '""',
+          position: "absolute",
+          inset: "0",
+          // Follows the host's corners on its own, so the host does not need
+          // `overflow-hidden` just to keep the overlay off its rounded edges —
+          // which is what lets a panel opt out of clipping and let a dropdown
+          // escape it (see `Panel`'s `clip` prop).
+          borderRadius: "inherit",
+          backgroundImage:
+            "repeating-linear-gradient(to bottom, rgb(255 255 255 / var(--ar-scan)) 0 1px, transparent 1px 3px)",
+          mixBlendMode: "overlay",
+          pointerEvents: "none",
+          zIndex: "5",
+        },
+        ".ar-vignette::after": {
+          content: '""',
+          position: "absolute",
+          inset: "0",
+          pointerEvents: "none",
+          background: "radial-gradient(120% 90% at 50% 40%, transparent 55%, rgb(0 0 0 / .55) 100%)",
+          zIndex: "6",
+        },
+        // The synthwave road: a magenta→cyan sheet raked back in perspective and
+        // masked into a grid. `mask-composite` intersects the three masks — the
+        // fade, the horizontal rules and the vertical rules — so only the lines
+        // that survive all three are painted.
+        ".ar-horizon": {
+          position: "absolute",
+          inset: "0",
+          overflow: "hidden",
+          pointerEvents: "none",
+        },
+        ".ar-horizon::before": {
+          content: '""',
+          position: "absolute",
+          left: "50%",
+          top: "55%",
+          width: "200%",
+          height: "80%",
+          background:
+            "linear-gradient(to bottom, rgb(var(--ar-magenta) / 0) 0%, rgb(var(--ar-magenta) / .5) 50%, rgb(var(--ar-cyan) / .55) 100%)",
+          WebkitMaskImage:
+            "linear-gradient(to bottom, transparent 0%, black 35%)," +
+            "repeating-linear-gradient(to bottom, black 0 1px, transparent 1px 28px)," +
+            "repeating-linear-gradient(89deg, black 0 1px, transparent 1px 60px)",
+          maskImage:
+            "linear-gradient(to bottom, transparent 0%, black 35%)," +
+            "repeating-linear-gradient(to bottom, black 0 1px, transparent 1px 28px)," +
+            "repeating-linear-gradient(89deg, black 0 1px, transparent 1px 60px)",
+          WebkitMaskComposite: "source-in",
+          maskComposite: "intersect",
+          transformOrigin: "50% 0%",
+          transform: "translate(-50%, 0) perspective(600px) rotateX(62deg)",
+          opacity: ".35",
+        },
+        // The horizon line itself.
+        ".ar-horizon::after": {
+          content: '""',
+          position: "absolute",
+          left: "0",
+          right: "0",
+          top: "53%",
+          height: "1px",
+          background: "linear-gradient(to right, transparent, rgb(var(--ar-cyan)), transparent)",
+          opacity: ".55",
+          boxShadow: "0 0 20px rgb(var(--ar-cyan)), 0 0 60px rgb(var(--ar-cyan) / .4)",
+        },
+        // Chromatic aberration — a badly-converged CRT gun.
+        ".ar-chrom": {
+          textShadow: "1px 0 0 rgb(var(--ar-magenta) / .55), -1px 0 0 rgb(var(--ar-cyan) / .55)",
+        },
+        ".ar-glow-cyan": {
+          textShadow: "0 0 8px rgb(var(--ar-cyan) / .6), 0 0 22px rgb(var(--ar-cyan) / .25)",
+        },
+        ".ar-glow-magenta": {
+          textShadow: "0 0 8px rgb(var(--ar-magenta) / .7), 0 0 22px rgb(var(--ar-magenta) / .3)",
+        },
+        ".ar-glow-amber": {
+          textShadow: "0 0 6px rgb(var(--ar-amber) / .7), 0 0 18px rgb(var(--ar-amber) / .3)",
+        },
+        // Marquee wordmark: the gradient is clipped to the glyphs and swept.
+        ".ar-marquee-text": {
+          background:
+            "linear-gradient(90deg, rgb(var(--ar-cyan)) 0%, rgb(var(--ar-magenta)) 25%, rgb(var(--ar-amber)) 50%, rgb(var(--ar-magenta)) 75%, rgb(var(--ar-cyan)) 100%)",
+          backgroundSize: "200% auto",
+          WebkitBackgroundClip: "text",
+          backgroundClip: "text",
+          color: "transparent",
+          animation: "ar-marquee 6s linear infinite",
+        },
+        "@media (prefers-reduced-motion: reduce)": {
+          ".ar-marquee-text": { animation: "none" },
+        },
+        // Cabinet-button press feel, shared by every control in the system.
+        ".ar-lift": { transition: "transform .15s ease, box-shadow .2s ease, filter .2s ease" },
+        ".ar-lift:hover": { transform: "translateY(-1px)" },
+        ".ar-lift:active": { transform: "translateY(1px)" },
+        ".ar-skeleton": {
+          background:
+            "linear-gradient(90deg, rgb(255 255 255 / .04) 25%, rgb(255 255 255 / .1) 37%, rgb(255 255 255 / .04) 63%)",
+          backgroundSize: "200% 100%",
+          animation: "ar-skeleton 1.4s ease-in-out infinite",
+          borderRadius: "8px",
+        },
+        ".ar-scroll": {
+          scrollbarWidth: "thin",
+          scrollbarColor: "rgb(var(--ar-violet) / .35) transparent",
+        },
+        ".ar-scroll::-webkit-scrollbar": { width: "10px", height: "10px" },
+        ".ar-scroll::-webkit-scrollbar-track": { background: "transparent" },
+        ".ar-scroll::-webkit-scrollbar-thumb": {
+          background: "rgb(var(--ar-violet) / .25)",
+          borderRadius: "8px",
+        },
+        ".ar-scroll::-webkit-scrollbar-thumb:hover": { background: "rgb(var(--ar-violet) / .45)" },
+      })
+    }),
+    // ══════════════════════════════════════════════════════════════════════
+    // MISIONES (SmartRotom) — `.ms-app` base layer + the material classes.
+    // Everything here is a texture Tailwind cannot express as utilities: the
+    // cork board, the wooden frame, the parchment (stacked radial-gradients +
+    // an SVG turbulence grain + burned corners), the desk and the wax stamp.
+    // These are MATERIALS, not components — the components themselves are
+    // Tailwind on JSX in misiones/_components (SMARTROTOM_V3.md §6).
+    // ══════════════════════════════════════════════════════════════════════
+    plugin(({ addBase, addComponents }) => {
+      // Turbulence grain, inlined as a data-URI so no asset request is made.
+      const grain = (freq: number, opacity: number) =>
+        `url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='${freq}' numOctaves='2' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='100' height='100' filter='url(%23n)' opacity='${opacity}'/></svg>")`
+
+      const paperSurface =
+        "radial-gradient(ellipse at 15% 20%, rgba(120,70,30,.10), transparent 50%)," +
+        "radial-gradient(ellipse at 85% 80%, rgba(90,50,20,.12), transparent 60%)," +
+        "radial-gradient(ellipse at 50% 50%, rgb(var(--ms-paper-1)), rgb(var(--ms-paper-2)) 80%, rgb(var(--ms-paper-3)))"
+
+      addBase({
+        // Pergamino — the one shipped palette. A second palette is one more
+        // block here (`.ms-app[data-palette="grimdark"]`), nothing else.
+        ".ms-app": {
+          "--ms-board-1": "107 63 28",
+          "--ms-board-2": "74 43 18",
+          "--ms-board-3": "56 32 12",
+          "--ms-board-frame": "42 24 10",
+          "--ms-board-frame-hi": "106 69 32",
+          "--ms-paper-1": "243 226 177",
+          "--ms-paper-2": "231 208 148",
+          "--ms-paper-3": "212 182 115",
+          "--ms-paper-edge": "138 94 46",
+          "--ms-ink-1": "42 26 10",
+          "--ms-ink-2": "74 52 28",
+          "--ms-ink-3": "107 76 46",
+          "--ms-ink-4": "138 106 72",
+          "--ms-gold-1": "245 215 133",
+          "--ms-gold-2": "214 161 63",
+          "--ms-gold-3": "162 108 26",
+          "--ms-gold-4": "107 68 15",
+          "--ms-seal-active": "200 144 38", // gold wax
+          "--ms-seal-available": "179 65 26", // red wax
+          "--ms-seal-completed": "107 20 16", // dark red wax
+          "--ms-seal-failed": "42 42 42", // black wax
+          "--ms-seal-locked": "90 70 50", // brown wax
+          "--ms-stamp-red": "170 28 28",
+          "--ms-stamp-gold": "162 108 26",
+          "--ms-paper-shadow": "rgba(40, 22, 8, .45)",
+          colorScheme: "dark",
+          color: "rgb(var(--ms-ink-1))",
+        },
+        // The tavern canvas: warm light from above, dark from below, wood below
+        // that. `::before` are the cork specks, `::after` the paper grain.
+        ".ms-tavern": {
+          background:
+            "radial-gradient(ellipse at 50% 0%, rgba(255,220,140,.10), transparent 50%)," +
+            "radial-gradient(ellipse at 50% 120%, rgba(0,0,0,.7), transparent 60%)," +
+            "linear-gradient(180deg, rgb(var(--ms-board-1)), rgb(var(--ms-board-2)) 70%, rgb(var(--ms-board-3)))",
+          position: "relative",
+        },
+        ".ms-tavern::before": {
+          content: '""',
+          position: "absolute",
+          inset: "0",
+          pointerEvents: "none",
+          backgroundImage:
+            "radial-gradient(circle at 12% 22%, rgba(255,220,160,.06) 0 1.5px, transparent 2px)," +
+            "radial-gradient(circle at 78% 11%, rgba(0,0,0,.25) 0 1px, transparent 2px)," +
+            "radial-gradient(circle at 33% 76%, rgba(0,0,0,.18) 0 1.5px, transparent 2.5px)," +
+            "radial-gradient(circle at 88% 60%, rgba(255,220,160,.06) 0 1px, transparent 2px)," +
+            "radial-gradient(circle at 50% 45%, rgba(0,0,0,.18) 0 1.2px, transparent 2px)," +
+            "radial-gradient(circle at 18% 92%, rgba(255,220,160,.05) 0 1.5px, transparent 2px)",
+          backgroundSize: "280px 280px",
+          opacity: ".85",
+        },
+        ".ms-tavern::after": {
+          content: '""',
+          position: "absolute",
+          inset: "0",
+          pointerEvents: "none",
+          backgroundImage: grain(0.9, 0.55),
+          mixBlendMode: "overlay",
+          opacity: ".35",
+        },
+      })
+
+      addComponents({
+        // ── Parchment ──────────────────────────────────────────────────────
+        ".ms-paper": {
+          position: "relative",
+          background: paperSurface,
+          color: "rgb(var(--ms-ink-1))",
+          borderRadius: "2px",
+          boxShadow:
+            "inset 0 0 40px rgba(80,50,20,.16), inset 0 0 6px rgba(80,50,20,.10)," +
+            "0 1px 2px rgba(0,0,0,.3), 0 6px 16px var(--ms-paper-shadow), 0 18px 36px -8px rgba(0,0,0,.4)",
+        },
+        ".ms-paper::before": {
+          content: '""',
+          position: "absolute",
+          inset: "0",
+          borderRadius: "inherit",
+          pointerEvents: "none",
+          backgroundImage: grain(1.4, 0.5),
+          mixBlendMode: "multiply",
+          opacity: ".25",
+        },
+        // Burned, aged corners + a hairline of ink around the sheet.
+        ".ms-paper::after": {
+          content: '""',
+          position: "absolute",
+          inset: "0",
+          borderRadius: "inherit",
+          pointerEvents: "none",
+          boxShadow: "inset 0 0 0 1px rgba(80,50,20,.22)",
+          background:
+            "radial-gradient(circle at 0% 0%, rgba(60,30,10,.35), transparent 18%)," +
+            "radial-gradient(circle at 100% 0%, rgba(60,30,10,.30), transparent 16%)," +
+            "radial-gradient(circle at 0% 100%, rgba(60,30,10,.28), transparent 18%)," +
+            "radial-gradient(circle at 100% 100%, rgba(60,30,10,.32), transparent 16%)",
+        },
+        // A sheet torn out of a ledger, for the chain nodes.
+        ".ms-torn": {
+          clipPath: "polygon(2% 4%, 6% 0%, 95% 1%, 100% 5%, 99% 96%, 95% 100%, 5% 99%, 0% 95%)",
+        },
+        // ── A paper pinned to the board: straightens and lifts on hover ─────
+        ".ms-pinned": {
+          cursor: "pointer",
+          transformOrigin: "50% 0%",
+          transition: "transform .25s cubic-bezier(.34,1.56,.64,1), filter .2s ease, box-shadow .2s ease",
+        },
+        ".ms-pinned:hover": {
+          transform: "translateY(-4px) rotate(0deg)",
+          filter: "brightness(1.04)",
+          zIndex: "5",
+          boxShadow:
+            "inset 0 0 40px rgba(80,50,20,.18), 0 4px 8px rgba(0,0,0,.4)," +
+            "0 16px 32px var(--ms-paper-shadow), 0 24px 50px -10px rgba(0,0,0,.5)",
+        },
+        ".ms-pinned:focus-visible": {
+          transform: "translateY(-4px) rotate(0deg)",
+          outline: "2px solid rgb(var(--ms-gold-2))",
+          outlineOffset: "3px",
+        },
+        "@media (prefers-reduced-motion: reduce)": {
+          ".ms-pinned, .ms-pinned:hover": { transform: "none", transition: "none" },
+        },
+        // ── Cork board panel (holds the papers) ────────────────────────────
+        ".ms-cork": {
+          position: "relative",
+          borderRadius: "4px",
+          border: "1px solid rgba(0,0,0,.45)",
+          background:
+            "radial-gradient(ellipse at 30% 20%, rgba(255,220,160,.08), transparent 50%)," +
+            "linear-gradient(180deg, rgba(40,24,12,.4), rgba(20,12,6,.5))",
+          boxShadow: "inset 0 1px 0 rgba(255,200,100,.12), inset 0 0 80px rgba(0,0,0,.5)",
+        },
+        ".ms-cork::before": {
+          content: '""',
+          position: "absolute",
+          inset: "0",
+          borderRadius: "inherit",
+          pointerEvents: "none",
+          backgroundImage:
+            "radial-gradient(circle at 22% 32%, rgba(255,220,160,.05) 0 1.5px, transparent 2px)," +
+            "radial-gradient(circle at 68% 21%, rgba(0,0,0,.18) 0 1px, transparent 2px)," +
+            "radial-gradient(circle at 43% 76%, rgba(0,0,0,.12) 0 1.5px, transparent 2.5px)," +
+            "radial-gradient(circle at 78% 60%, rgba(255,220,160,.06) 0 1px, transparent 2px)",
+          backgroundSize: "240px 240px",
+        },
+        // ── Wooden plank frame (the side rail, the mobile bar) ─────────────
+        ".ms-wood": {
+          background:
+            "repeating-linear-gradient(90deg, rgb(var(--ms-board-frame)) 0px, rgb(var(--ms-board-frame-hi)) 18px," +
+            "rgb(var(--ms-board-frame)) 24px, rgb(var(--ms-board-frame-hi)) 60px, rgb(var(--ms-board-frame)) 84px)," +
+            "rgb(var(--ms-board-frame))",
+          boxShadow:
+            "inset 0 0 20px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,200,.06), inset 0 -1px 0 rgba(0,0,0,.4)",
+          color: "rgb(var(--ms-gold-1))",
+        },
+        // ── The desk the letter is read on (planks running the other way) ──
+        ".ms-desk": {
+          background:
+            "radial-gradient(ellipse at 50% 0%, rgba(255,210,150,.10), transparent 60%)," +
+            "repeating-linear-gradient(92deg, #3a2410 0px, #5a3818 18px, #2e1a0a 28px, #5a3818 50px, #3a2410 72px), #3a2410",
+          boxShadow: "inset 0 0 80px rgba(0,0,0,.65), -10px 0 30px rgba(0,0,0,.55)",
+        },
+        // ── Leather tab (side-rail nav) ────────────────────────────────────
+        ".ms-tab": {
+          display: "flex",
+          alignItems: "center",
+          gap: "10px",
+          padding: "12px 16px",
+          fontFamily: "'IM Fell English SC', Cinzel, serif",
+          fontSize: "12px",
+          letterSpacing: ".10em",
+          textTransform: "uppercase",
+          color: "#d9b673",
+          background: "linear-gradient(90deg, #3a2418, #2a1810 80%, transparent)",
+          borderLeft: "3px solid transparent",
+          cursor: "pointer",
+          transition: "all .15s",
+        },
+        ".ms-tab:hover": {
+          background: "linear-gradient(90deg, #4a2e1c, #38201a 80%, transparent)",
+          color: "rgb(var(--ms-gold-1))",
+        },
+        ".ms-tab[aria-current='page']": {
+          background: "linear-gradient(90deg, #5a3818, #38201a 80%, transparent)",
+          color: "rgb(var(--ms-gold-1))",
+          borderLeftColor: "rgb(var(--ms-gold-2))",
+          boxShadow: "inset 6px 0 18px -6px rgba(255,200,100,.25)",
+        },
+        // ── Wax stamp struck across a finished paper ───────────────────────
+        ".ms-stamp": {
+          position: "absolute",
+          pointerEvents: "none",
+          whiteSpace: "nowrap",
+          fontFamily: "'Cinzel Decorative', Cinzel, serif",
+          fontWeight: "700",
+          fontSize: "22px",
+          textTransform: "uppercase",
+          letterSpacing: ".18em",
+          padding: "6px 14px 4px",
+          color: "rgb(var(--ms-stamp-red))",
+          border: "3px double rgb(var(--ms-stamp-red))",
+          opacity: ".84",
+          transform: "rotate(-14deg)",
+          mixBlendMode: "multiply",
+          filter: "contrast(1.05)",
+          textShadow: "1px 1px 0 rgba(255,255,255,.06)",
+        },
+        ".ms-stamp-failed": {
+          color: "rgb(var(--ms-ink-1))",
+          borderColor: "rgb(var(--ms-ink-1))",
+          transform: "rotate(-8deg)",
+        },
+        // ── Gold motes over an in-progress quest ───────────────────────────
+        ".ms-sparkle": {
+          position: "absolute",
+          borderRadius: "50%",
+          pointerEvents: "none",
+          opacity: "0",
+          filter: "blur(.4px)",
+          background:
+            "radial-gradient(circle, rgb(var(--ms-gold-1)) 0%, rgb(var(--ms-gold-2)) 40%, transparent 70%)",
+        },
+        // ── Illuminated manuscript initial ─────────────────────────────────
+        ".ms-drop-cap::first-letter": {
+          float: "left",
+          fontFamily: "'Cinzel Decorative', Cinzel, serif",
+          fontSize: "3.2em",
+          lineHeight: ".85",
+          margin: ".05em .1em 0 0",
+          color: "rgb(var(--ms-gold-3))",
+          textShadow: "1px 1px 0 rgba(255,220,160,.4)",
+        },
+        ".ms-scroll": { scrollbarWidth: "thin", scrollbarColor: "rgba(150,110,60,.35) transparent" },
+        ".ms-scroll::-webkit-scrollbar": { width: "10px", height: "10px" },
+        ".ms-scroll::-webkit-scrollbar-track": { background: "transparent" },
+        ".ms-scroll::-webkit-scrollbar-thumb": {
+          background: "rgba(150,110,60,.25)",
+          borderRadius: "99px",
+        },
+        ".ms-scroll::-webkit-scrollbar-thumb:hover": { background: "rgba(150,110,60,.45)" },
       })
     }),
     // Enhanced text shadow plugin

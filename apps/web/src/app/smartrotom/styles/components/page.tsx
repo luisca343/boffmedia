@@ -19,6 +19,15 @@ import { PkPrimitivasChapter } from "./_chapters/PkPrimitivasChapter"
 import { MwBasesChapter } from "./_chapters/MwBasesChapter"
 import { MwPrimitivasChapter } from "./_chapters/MwPrimitivasChapter"
 import { MwTarjetasChapter } from "./_chapters/MwTarjetasChapter"
+import { TxBasesChapter } from "./_chapters/TxBasesChapter"
+import { TxPrimitivasChapter } from "./_chapters/TxPrimitivasChapter"
+import { TxViajeChapter } from "./_chapters/TxViajeChapter"
+import { MsBasesChapter } from "./_chapters/MsBasesChapter"
+import { MsPrimitivasChapter } from "./_chapters/MsPrimitivasChapter"
+import { MsTableroChapter } from "./_chapters/MsTableroChapter"
+import { ArBasesChapter } from "./_chapters/ArBasesChapter"
+import { ArPrimitivasChapter } from "./_chapters/ArPrimitivasChapter"
+import { ArCabinaChapter } from "./_chapters/ArCabinaChapter"
 
 // Chapter names repeat across domains ("Bases" ×6), so views are keyed by `dom/name`.
 const CHAPTER_VIEWS: Record<string, React.ComponentType> = {
@@ -37,6 +46,15 @@ const CHAPTER_VIEWS: Record<string, React.ComponentType> = {
   "Media/Bases": MwBasesChapter,
   "Media/Primitivas": MwPrimitivasChapter,
   "Media/Tarjetas": MwTarjetasChapter,
+  "Taxi/Bases": TxBasesChapter,
+  "Taxi/Primitivas": TxPrimitivasChapter,
+  "Taxi/Viaje": TxViajeChapter,
+  "Misiones/Bases": MsBasesChapter,
+  "Misiones/Primitivas": MsPrimitivasChapter,
+  "Misiones/Tablón": MsTableroChapter,
+  "Arcade/Bases": ArBasesChapter,
+  "Arcade/Primitivas": ArPrimitivasChapter,
+  "Arcade/Cabina": ArCabinaChapter,
 }
 
 export default function SmartRotomComponentsShowcase() {
@@ -168,11 +186,13 @@ export default function SmartRotomComponentsShowcase() {
           <h1 className={cn(DISPLAY, DISPLAY_EM, "text-[clamp(40px,11vw,72px)]/[0.92] mt-[14px] mb-[10px] break-words")}>
             Componentes de <em>SmartRotom</em>
           </h1>
+          {/* The count is read off DOMAINS, not written in prose — it has gone stale
+              once per migration otherwise. */}
           <p className="text-sr-txt-muted max-w-[68ch]">
-            SmartRotom no es un sistema, son <strong className="text-sr-txt">seis</strong>: el chrome{" "}
-            <code className="font-mono text-[13px] text-sr-accent">sr-*</code> y cinco vocabularios de tokens que cubren las
-            seis apps (Mewtube y Mewtwitch comparten uno). Cada espécimen se monta dentro de su propia raíz de ámbito, así
-            que se ve exactamente como en la app real.
+            SmartRotom no es un sistema, son <strong className="text-sr-txt">{DOMAINS.length}</strong>: el chrome{" "}
+            <code className="font-mono text-[13px] text-sr-accent">sr-*</code> y un vocabulario de tokens por app (Mewtube
+            y Mewtwitch comparten uno). Cada espécimen se monta dentro de su propia raíz de ámbito, así que se ve
+            exactamente como en la app real.
           </p>
           <p className={cn(MONO_LABEL, "mt-3 text-sr-txt-dim normal-case tracking-[0.1em]")}>
             {DOMAINS.length} sistemas · {chapters.length} capítulos · {totalSections} secciones — navega por sistema o pulsa{" "}
