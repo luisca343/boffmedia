@@ -3,7 +3,7 @@ import * as React from "react";
 import useStarBank from "../_hooks/useStarBank";
 import { useBoffSession } from "@/services/useBoffSession";
 import { useCreateAccount } from "@/hooks/starbank/useCreateAccount";
-import { PageHeader, Card, SectionHead, CardBody, Kpi, Button, Ico, AccountAvatar, Sheet, Label, Input, useToast } from "../_components/ui";
+import { PageHeader, Card, SectionHead, CardBody, Kpi, Button, Ico, AccountAvatar, Sheet, Label, Input, toast } from "../_components/ui";
 import { formatMoney } from "../_utils/format";
 import { displayName, accountColor } from "../_utils/account";
 import { changeActiveAccount } from "../bankUtils";
@@ -18,7 +18,6 @@ export default function Cuentas() {
   const { session } = useBoffSession();
   const { accounts, activeAccount, setActiveAccount, fetchAccounts } = useStarBank();
   const [creating, setCreating] = React.useState(false);
-  const show = useToast((s) => s.show);
 
   const list = (accounts ?? []) as SBAccount[];
   const total = list.reduce((s, a) => s + a.balance, 0);
@@ -29,7 +28,7 @@ export default function Cuentas() {
     changeActiveAccount(id);
     setActiveAccount(id);
     const a = list.find((x) => x.id === id);
-    if (a) show(`Cuenta activa: ${displayName(a.name)}`);
+    if (a) toast(`Cuenta activa: ${displayName(a.name)}`);
   }
 
   return (
@@ -138,7 +137,7 @@ export default function Cuentas() {
           onCreated={() => {
             if (session) fetchAccounts(session);
             setCreating(false);
-            show("Cuenta creada");
+            toast("Cuenta creada");
           }}
         />
       )}

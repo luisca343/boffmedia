@@ -152,7 +152,7 @@ function EditorPaneContent({
           setBaseline(form);
           toast(`Cambios guardados en «${title}».`);
         },
-        onError: () => toast("No se pudieron guardar los cambios.", "warn"),
+        onError: () => toast.error("No se pudieron guardar los cambios."),
       },
     );
   }

@@ -3,7 +3,7 @@
 import { useEffect, type ReactNode } from "react"
 import { usePokemonStore } from "@/stores/pokemonStore"
 import { useSpriteManifestStore } from "@/stores/spriteManifestStore"
-import { PasaporteQueryProvider } from "./_components/PasaporteQueryProvider"
+import { AppQueryProvider as PasaporteQueryProvider } from "@/components/smartrotom/behavior/QueryProvider"
 import { TopBar } from "./_components/TopBar"
 import { InspectOverlay, ToastHost, VerifyBadge } from "./_components/ui"
 import { usePassportStore } from "./_stores/usePassportStore"

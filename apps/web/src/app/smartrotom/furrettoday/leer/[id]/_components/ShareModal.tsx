@@ -31,14 +31,14 @@ export function ShareModal({
         setCopied(true);
         window.setTimeout(() => setCopied(false), 2000);
       })
-      .catch(() => toast("No se pudo copiar el enlace.", "warn"));
+      .catch(() => toast.error("No se pudo copiar el enlace."));
   }
 
   function copyForDiscord() {
     navigator.clipboard
       .writeText(url)
       .then(() => toast("Enlace copiado. Pégalo en tu servidor de Discord."))
-      .catch(() => toast("No se pudo copiar el enlace.", "warn"));
+      .catch(() => toast.error("No se pudo copiar el enlace."));
   }
 
   function openIntent(href: string) {

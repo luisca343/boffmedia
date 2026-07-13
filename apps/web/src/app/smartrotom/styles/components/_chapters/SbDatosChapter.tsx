@@ -18,8 +18,8 @@ import {
   Skeleton,
   Sparkline,
   Stepper,
+  toast,
   ToastHost,
-  useToast,
   type SegOption,
 } from "@/app/smartrotom/starbank/_components/ui"
 import { TxRow } from "@/app/smartrotom/starbank/_components/TxRow"
@@ -44,7 +44,6 @@ export function SbDatosChapter() {
   const [flow, setFlow] = React.useState("all")
   const [step, setStep] = React.useState(1)
   const [sheetOpen, setSheetOpen] = React.useState(false)
-  const showToast = useToast((s) => s.show)
 
   return (
     <>
@@ -276,19 +275,19 @@ export function SbDatosChapter() {
         <Sample
           app="sb"
           title="Sheet y toast"
-          code="<Sheet> · useToast()"
+          code="<Sheet> · toast()"
           note={
             <>
               El <code>Sheet</code> se monta como capa fija sobre toda la ventana (ciérralo con{" "}
               <code>Esc</code> o pulsando el velo). <code>ToastHost</code> vive una sola vez en el layout; los
-              componentes sólo llaman a <code>useToast().show()</code>.
+              componentes sólo llaman a <code>toast()</code>.
             </>
           }
         >
           <Button variant="primary" onClick={() => setSheetOpen(true)}>
             <Ico name="receipt" size={16} /> Abrir detalle
           </Button>
-          <Button variant="secondary" onClick={() => showToast("Transferencia enviada")}>
+          <Button variant="secondary" onClick={() => toast("Transferencia enviada")}>
             <Ico name="check" size={16} /> Lanzar aviso
           </Button>
 
@@ -314,7 +313,7 @@ export function SbDatosChapter() {
               </div>
               <div className="flex items-center gap-2">
                 <CategoryChip category={SB_SPEND_BY_CATEGORY[1].category} />
-                <Button variant="secondary" size="sm" onClick={() => showToast("Recibo descargado")}>
+                <Button variant="secondary" size="sm" onClick={() => toast("Recibo descargado")}>
                   <Ico name="download" size={14} /> Descargar recibo
                 </Button>
               </div>

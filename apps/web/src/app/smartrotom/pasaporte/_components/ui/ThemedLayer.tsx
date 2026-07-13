@@ -4,6 +4,10 @@
 "use client"
 
 import { useEffect, useState, type ReactNode } from "react"
+import { ThemedLayer as SharedThemedLayer } from "@/components/smartrotom/behavior/ThemedLayer"
+
+/** Pasaporte's scope-root classes — reused by the ThemedLayer below and by Modal's skin. */
+export const PS_SCOPE = "ps-app font-ps text-ps-chrome-fg"
 
 /**
  * Re-applies `.ps-app` to portaled content.
@@ -40,13 +44,10 @@ export function ThemedLayer({ children }: { children: ReactNode }) {
   }, [])
 
   return (
-    <div
-      className="ps-app contents font-ps text-ps-chrome-fg"
-      data-portal=""
-      data-ornament={ornament}
-      data-motion={motion}
-    >
-      {children}
-    </div>
+    <SharedThemedLayer scope={PS_SCOPE}>
+      <div data-portal="" data-ornament={ornament} data-motion={motion} style={{ display: "contents" }}>
+        {children}
+      </div>
+    </SharedThemedLayer>
   )
 }

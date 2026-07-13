@@ -28,7 +28,7 @@ export function ArticleFooter({ article }: { article: FtArticle }) {
         toast("Te hemos guardado en la lista. Nos vemos el viernes.");
       },
       onError: () =>
-        toast("No hemos podido suscribirte. Inténtalo otra vez.", "warn"),
+        toast.error("No hemos podido suscribirte. Inténtalo otra vez."),
     });
   }
 

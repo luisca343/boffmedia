@@ -219,7 +219,7 @@ export function TxPrimitivasChapter() {
           app="tx"
           note="Los toasts se portalan fuera de `.tx-app`, así que ToastHost los reenvuelve en un ThemedLayer — si no, saldrían sin tokens (§2)."
         >
-          <Button variant="quiet" onClick={() => toast.info("Añadido a favoritos", "star")}>
+          <Button variant="quiet" onClick={() => toast.info("Añadido a favoritos")}>
             info
           </Button>
           <Button variant="quiet" onClick={() => toast.success("¡Has llegado a Liga Teras!")}>

@@ -1,7 +1,7 @@
 import type { Metadata } from "next"
 import type { ReactNode } from "react"
 import { ArcadePrefsProvider } from "./_hooks/useArcadePrefs"
-import { ArcadeQueryProvider } from "./_components/ArcadeQueryProvider"
+import { AppQueryProvider as ArcadeQueryProvider } from "@/components/smartrotom/behavior/QueryProvider"
 import { ArcadeShell } from "./_components/ArcadeShell"
 
 export const metadata: Metadata = {

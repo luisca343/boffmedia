@@ -202,9 +202,9 @@ function useGobMutation<TArgs, TData>(
       if (opts.money) keys.push(["gob", "tesoreria"])
       keys.forEach((key) => qc.invalidateQueries({ queryKey: key }))
       const msg = opts.success?.(data, args)
-      if (msg) toast(msg, "ok", "check")
+      if (msg) toast.success(msg)
     },
-    onError: (e: unknown) => toast(userMessageFrom(e, "La solicitud al Gobierno de Teras ha fallado."), "danger", "alert"),
+    onError: (e: unknown) => toast.error(userMessageFrom(e, "La solicitud al Gobierno de Teras ha fallado.")),
   })
 }
 

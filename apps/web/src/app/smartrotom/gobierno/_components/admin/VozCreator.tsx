@@ -58,10 +58,10 @@ export function VozCreator({ onCreated, onClose }: { onCreated: (value: string) 
       if (res.success === false || (res.statusCode && res.statusCode >= 400)) {
         throw new Error(res.userMessage ?? "No se pudo crear la voz.")
       }
-      toast(`Voz «${name.trim()}» creada`, "ok", "check")
+      toast.success(`Voz «${name.trim()}» creada`)
       onCreated(value)
     } catch (e) {
-      toast(e instanceof Error ? e.message : "No se pudo crear la voz.", "danger", "alert")
+      toast.error(e instanceof Error ? e.message : "No se pudo crear la voz.")
     } finally {
       setSaving(false)
     }

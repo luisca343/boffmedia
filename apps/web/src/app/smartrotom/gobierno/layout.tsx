@@ -3,7 +3,7 @@
 import { useEffect, type ReactNode } from "react"
 import { useRouter } from "next/navigation"
 import { LoadingScreen } from "@/components/smartrotom/Loading"
-import { GobiernoQueryProvider } from "./_components/GobiernoQueryProvider"
+import { AppQueryProvider as GobiernoQueryProvider } from "@/components/smartrotom/behavior/QueryProvider"
 import { GobiernoHeader } from "./_components/chrome/GobiernoHeader"
 import { GobiernoNav } from "./_components/chrome/GobiernoNav"
 import { CommandPalette } from "./_components/chrome/CommandPalette"
