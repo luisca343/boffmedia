@@ -8,10 +8,16 @@ Apps are registered in the database (`rotom_apps` table) and assigned to players
 
 ## App Directory
 
-### Admin
-**Route:** `/smartrotom/admin`  
-**Status:** Active  
-Administration panel for server staff. Manages app visibility, player notifications, performance monitoring (rendimiento), signs/cartels, ArceuSpeak announcements, and other admin-only tools.
+### Admin (absorbed into Gobierno de Teras)
+**Route:** `/smartrotom/gobierno/admin/*` (was `/smartrotom/admin`)  
+**Status:** Active — moved, not standalone  
+The old standalone Admin panel was absorbed as the "Administración" department of the
+Gobierno de Teras app (`/smartrotom/gobierno`), gated behind `ROTOM_ADMIN` in addition to
+the base `GOBIERNO` role. Reached via the Gobierno sidebar, not a home-screen tile of its
+own — its 8 tools: Jugadores, Megafonía (ex ArceuSpeak), Notificaciones (ex NotifyBell),
+Señalización (ex carteles/OGT Explorer), Skins NPC, Apps de jugador, Rendimiento, Actividad
+(ex logs). The `rotom_apps` row that used to link a home-screen tile to `/smartrotom/admin`
+still needs a manual DB update — see the migration notes for this change.
 
 ---
 

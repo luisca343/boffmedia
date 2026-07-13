@@ -28,6 +28,14 @@ import { MsTableroChapter } from "./_chapters/MsTableroChapter"
 import { ArBasesChapter } from "./_chapters/ArBasesChapter"
 import { ArPrimitivasChapter } from "./_chapters/ArPrimitivasChapter"
 import { ArCabinaChapter } from "./_chapters/ArCabinaChapter"
+import { FtBasesChapter } from "./_chapters/FtBasesChapter"
+import { FtPrimitivasChapter } from "./_chapters/FtPrimitivasChapter"
+import { FtQuioscoChapter } from "./_chapters/FtQuioscoChapter"
+import { PcBasesChapter } from "./_chapters/PcBasesChapter"
+import { PcPrimitivasChapter } from "./_chapters/PcPrimitivasChapter"
+import { PcAlmacenChapter } from "./_chapters/PcAlmacenChapter"
+import { GtBasesChapter } from "./_chapters/GtBasesChapter"
+import { GtPrimitivasChapter } from "./_chapters/GtPrimitivasChapter"
 
 // Chapter names repeat across domains ("Bases" ×6), so views are keyed by `dom/name`.
 const CHAPTER_VIEWS: Record<string, React.ComponentType> = {
@@ -55,6 +63,14 @@ const CHAPTER_VIEWS: Record<string, React.ComponentType> = {
   "Arcade/Bases": ArBasesChapter,
   "Arcade/Primitivas": ArPrimitivasChapter,
   "Arcade/Cabina": ArCabinaChapter,
+  "Furret Today/Bases": FtBasesChapter,
+  "Furret Today/Primitivas": FtPrimitivasChapter,
+  "Furret Today/Quiosco": FtQuioscoChapter,
+  "PC/Bases": PcBasesChapter,
+  "PC/Primitivas": PcPrimitivasChapter,
+  "PC/Almacén": PcAlmacenChapter,
+  "Gobierno/Bases": GtBasesChapter,
+  "Gobierno/Primitivas": GtPrimitivasChapter,
 }
 
 export default function SmartRotomComponentsShowcase() {
