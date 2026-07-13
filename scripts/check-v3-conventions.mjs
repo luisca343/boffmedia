@@ -22,7 +22,7 @@
 // Tailwind v3 normalizes math operators inside `calc()` for both arbitrary values and
 // arbitrary properties (verified — `calc(100dvh-3rem)` and `calc(100dvh_-_3rem)` emit
 // identical CSS), so it is a spacing convention, not a correctness bug.
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { execSync } from "node:child_process";
 
 const BM_ROOTS = ["apps/web/src/components/boffmedia", "apps/web/src/app/(boffmedia)"];
@@ -43,6 +43,7 @@ const SR_ROOTS = [
   "apps/web/src/app/smartrotom/furrettoday",
   "apps/web/src/app/smartrotom/pc",
   "apps/web/src/app/smartrotom/gobierno",
+  "apps/web/src/app/smartrotom/pasaporte",
   "apps/web/src/app/smartrotom/rooker",
   "apps/web/src/app/smartrotom/wigglypop",
   "apps/web/src/app/smartrotom/styles",
@@ -57,7 +58,12 @@ function listFiles(roots) {
     try {
       res = execSync(`git ls-files -- '${root}/*.tsx' '${root}/*.ts'`, { encoding: "utf8" });
     } catch { /* root may be empty */ }
-    for (const f of res.split("\n").map((s) => s.trim()).filter(Boolean)) out.push(f);
+    for (const f of res.split("\n").map((s) => s.trim()).filter(Boolean)) {
+      // `git ls-files` reads the INDEX, so a file that is staged but has since been deleted
+      // from the working tree is still listed. Reading it throws ENOENT and takes the whole
+      // check down with it — a deleted file is not a convention violation.
+      if (existsSync(f)) out.push(f);
+    }
   }
   return out;
 }
@@ -73,6 +79,19 @@ const DYNAMIC_CLASS = /\b(?:bg|text|border|from|to|via|ring|fill|stroke|shadow)-
 // Comment lines are prose, not code — the convention docs quote the very patterns we
 // ban (`bg-${t}`), so matching them would flag the warning against the bug as the bug.
 const IS_COMMENT = /^\s*(?:\/\/|\/\*|\*)/;
+
+// Same problem, one layer up: the showcase EXPLAINS the rule, and it does so in JSX
+// prose props — `note="…nunca text-wp-rarity-${r}, que el JIT jamás compilaría"`. Those
+// are quoted strings, not comments, so IS_COMMENT never saw them and the guard flagged
+// the warning against the bug as the bug.
+//
+// The discriminator is exact rather than a heuristic: `${…}` only interpolates inside a
+// BACKTICK literal. In a '…' or "…" string it is inert text that can never become a
+// class name, so blanking those spans before testing costs the guard nothing — a real
+// `className={`bg-${t}`}` lives in backticks and still trips. Escaped quotes are skipped
+// so an apostrophe inside a double-quoted note cannot swallow the rest of the line.
+const QUOTED = /"(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'/g;
+const withoutQuotedProse = (line) => line.replace(QUOTED, '""');
 
 // Unspaced binary +/- inside a calc value. High precision: the operator must sit
 // immediately after a value terminator — `%`, `)`, or `<digit><length-unit>` — and
@@ -123,7 +142,7 @@ for (const file of listFiles(SR_ROOTS)) {
     if (CROSS_DS.test(line)) {
       violations.push(`${file}:${i + 1}  cross-design-system import — SmartRotom must not import Boffmedia primitives (SMARTROTOM_V3.md §3)`);
     }
-    if (DYNAMIC_CLASS.test(line)) {
+    if (DYNAMIC_CLASS.test(withoutQuotedProse(line))) {
       violations.push(`${file}:${i + 1}  dynamic Tailwind class — the JIT can't see \`bg-\${…}\`; use a full-class map (SMARTROTOM_V3.md §4)`);
     }
   });

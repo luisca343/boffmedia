@@ -1,0 +1,228 @@
+"use client"
+
+// PAPER — but a card ON the paper: the carné is its own pale-blue laminate, so its ink is
+// `ps-info-*` and `ps-ink`, never desk chrome.
+
+import { useState, type ReactNode } from "react"
+import { cn } from "@/lib/utils"
+import type { MinecraftStats } from "@/services/api/smartrotom/playerService"
+import type { Passport } from "../../_types"
+import { docDate, expiryDate } from "../../_utils/dates"
+import { qrMatrix, qrSeed } from "../../_utils/qr"
+import { playtime } from "../../_utils/stats"
+import { PassportPhoto } from "../PassportPhoto"
+import { Icon, PageHead, Skeleton, toast } from "../ui"
+
+/** The laminate itself: guilloché over a pale blue wash. Multi-layer, so it is an inline style (§6). */
+const LAMINATE = {
+  background: "linear-gradient(135deg, #eaf0f8, #dde8f4 48%, #cedcee)",
+}
+const GUILLOCHE = {
+  background:
+    "repeating-radial-gradient(circle at 28% 124%, transparent 0 6px, rgba(40,90,150,.055) 6px 7px), repeating-radial-gradient(circle at 82% -24%, transparent 0 5px, rgba(120,40,150,.045) 5px 6px)",
+}
+const BAND = {
+  background: "linear-gradient(90deg, rgb(var(--ps-navy-deep)), rgb(var(--ps-navy-hi)))",
+}
+const SCANLINE = {
+  background: "linear-gradient(180deg, transparent, rgb(var(--ps-teal) / .55), transparent)",
+}
+
+const QR_MODULES = 25
+const QR_CELL = 4
+const QR_QUIET = 3
+const QR_DIM = (QR_MODULES + QR_QUIET * 2) * QR_CELL
+
+function Field({ label, value, wide = false }: { label: string; value: ReactNode; wide?: boolean }) {
+  return (
+    <div className={cn("min-w-0", wide && "col-span-2")}>
+      <div className="font-ps-mono text-[8px] uppercase tracking-[.14em] text-ps-info-deep/70">{label}</div>
+      <div className="truncate font-ps-ceremony text-[16px] leading-[1.08] text-ps-ink">{value}</div>
+    </div>
+  )
+}
+
+function Code({ label, value }: { label: string; value: ReactNode }) {
+  return (
+    <div className="min-w-0">
+      <div className="font-ps-mono text-[8px] uppercase tracking-[.14em] text-ps-info-deep/70">{label}</div>
+      <div className="ps-num truncate font-ps-mono text-[12px] font-bold text-ps-ink">{value}</div>
+    </div>
+  )
+}
+
+export function Carne({
+  profile,
+  stats,
+  loading,
+  inspect,
+}: {
+  profile?: Passport | null
+  stats?: MinecraftStats | null
+  loading: boolean
+  inspect: boolean
+}) {
+  const [verified, setVerified] = useState(false)
+
+  if (loading || !profile) {
+    return (
+      <>
+        <PageHead eyebrow="Documento de Identidad · Visado" title="Carné Oficial" />
+        <Skeleton className="h-[300px] rounded-2xl" />
+      </>
+    )
+  }
+
+  const hours = playtime(stats).hours
+  const issued = profile.memberSince ?? profile.createdAt
+  const expires = expiryDate(issued)
+  const modules = qrMatrix(qrSeed(profile), QR_MODULES)
+
+  const fold = (value: string) => value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase()
+  const surname = fold(profile.username).replace(/[^A-Z]/g, "<")
+  const region3 = fold(profile.region).slice(0, 3)
+  const carneMrz = `P<TRS${region3}${surname}<<<<<<<<<<<<${profile.trainerId.replace(/-/g, "")}<<${expires?.getFullYear() ?? "----"}M`
+
+  function onScan() {
+    if (!inspect) {
+      toast("Activa el Modo Inspección (tecla I) para escanear el código")
+      return
+    }
+    setVerified(true)
+    toast("✓ Código verificado · GOB·TERAS · Entrenador en regla")
+  }
+
+  return (
+    <>
+      <PageHead eyebrow="Documento de Identidad · Visado" title="Carné Oficial" />
+
+      <div
+        style={LAMINATE}
+        className="relative overflow-hidden rounded-2xl border border-ps-info/30 shadow-[0_5px_16px_rgba(40,60,90,.2),inset_0_1px_0_rgba(255,255,255,.8)]"
+      >
+        <div aria-hidden="true" style={GUILLOCHE} className="pointer-events-none absolute inset-0 z-0 opacity-55" />
+        {/* The fold: a real carné is creased before it is carried. */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute bottom-0 left-[62%] top-0 z-[1] w-0.5 bg-gradient-to-b from-transparent via-ps-info/20 to-transparent"
+        />
+        <div
+          aria-hidden="true"
+          className="ps-holo pointer-events-none absolute left-1/2 top-[56%] z-[1] grid h-[88px] w-[88px] -translate-x-1/2 -translate-y-1/2 -rotate-12 place-items-center rounded-full font-ps-mono text-[8px] tracking-[.14em] text-ps-info-deep opacity-40 mix-blend-multiply"
+        >
+          <Icon name="shield" className="h-[22px] w-[22px]" />
+        </div>
+
+        <div style={BAND} className="relative z-[2] flex items-center gap-2.5 px-3.5 py-2.5">
+          <Icon name="globe" className="h-[26px] w-[26px] flex-none text-ps-chrome-fg/80" />
+          <div className="min-w-0 flex-1">
+            <div className="truncate font-ps-mono text-[9.5px] tracking-[.2em] text-ps-chrome-fg/70">
+              GOBIERNO DE TERAS · DIRECCIÓN DE FRONTERAS
+            </div>
+            <div className="truncate font-ps-ceremony text-[16px] tracking-[.02em] text-ps-chrome-fg">
+              CARNÉ DE ENTRENADOR · TRAINER ID
+            </div>
+          </div>
+          <span className="flex-none rounded-md border border-white/45 px-2.5 py-[3px] font-ps-mono text-[10.5px] font-bold tracking-[.08em] text-ps-chrome-fg">
+            CLASE A
+          </span>
+        </div>
+
+        <div className="relative z-[2] grid grid-cols-[92px_1fr_92px] items-start gap-3 p-3.5">
+          <div className="text-center">
+            <div className="rounded-lg border border-ps-info/30 bg-white p-[5px] shadow-[inset_0_0_8px_rgba(40,60,90,.15)]">
+              <PassportPhoto uuid={profile.uuid} />
+            </div>
+            <p className="mt-1.5 truncate border-t border-ps-info/30 pt-1 font-ps-ceremony text-[13px] text-ps-info-deep">
+              {profile.username}
+            </p>
+          </div>
+
+          <div className="grid grid-cols-2 content-start gap-x-3 gap-y-[9px]">
+            <Field label="Nombre · Name" value={profile.username} wide />
+            <Field label="N.º documento" value={profile.trainerId} />
+            <Field label="Región" value={profile.region} />
+            <Field label="Clase" value={profile.title} wide />
+            <div className="col-span-2 grid grid-cols-3 gap-2.5">
+              <Code label="Emitido" value={docDate(issued)} />
+              <Code label="Caduca" value={docDate(expires)} />
+              <Code label="Horas" value={`${hours}h`} />
+            </div>
+            <Code label="Rango" value={String(profile.rank).padStart(2, "0")} />
+          </div>
+
+          <div className="text-center">
+            <button
+              type="button"
+              onClick={onScan}
+              aria-label="Escanear el código del carné"
+              className={cn(
+                "relative block w-full overflow-hidden rounded-lg border border-ps-info/30 bg-ps-paper p-[5px]",
+                "shadow-[0_1px_3px_rgba(0,0,0,.15)] transition-shadow duration-300 motion-reduce:transition-none",
+                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ps-teal",
+                verified
+                  ? "shadow-[0_0_0_2px_rgb(var(--ps-ok)),0_0_14px_rgb(var(--ps-ok)/.55)]"
+                  : inspect
+                    ? "shadow-[0_0_0_2px_rgb(var(--ps-teal)),0_0_14px_rgb(var(--ps-teal)/.5)]"
+                    : "",
+              )}
+            >
+              <svg
+                viewBox={`0 0 ${QR_DIM} ${QR_DIM}`}
+                shapeRendering="crispEdges"
+                aria-hidden="true"
+                className="block h-20 w-20"
+              >
+                <rect width={QR_DIM} height={QR_DIM} fill="#f5efe1" />
+                <g fill="#1a1206">
+                  {modules.map((row, r) =>
+                    row.map((on, c) =>
+                      on ? (
+                        <rect
+                          key={`${r}-${c}`}
+                          x={(c + QR_QUIET) * QR_CELL}
+                          y={(r + QR_QUIET) * QR_CELL}
+                          width={QR_CELL}
+                          height={QR_CELL}
+                        />
+                      ) : null,
+                    ),
+                  )}
+                </g>
+              </svg>
+              {inspect && !verified && (
+                <span
+                  aria-hidden="true"
+                  style={SCANLINE}
+                  className="ps-loop pointer-events-none absolute left-[5px] right-[5px] h-4 shadow-[0_0_10px_rgb(var(--ps-teal)/.7)] animate-ps-qrscan motion-reduce:animate-none"
+                />
+              )}
+            </button>
+            <span
+              className={cn(
+                "mt-1.5 flex items-center justify-center gap-1 font-ps-mono text-[8px] tracking-[.1em]",
+                verified ? "text-ps-ok" : "text-ps-info-deep/70",
+              )}
+            >
+              <Icon name={verified ? "shield" : "scan"} className="h-[11px] w-[11px]" />
+              {verified ? "VERIFICADO" : "ESCANEAR"}
+            </span>
+          </div>
+        </div>
+
+        <div className="ps-num relative z-[2] mx-3.5 mb-3.5 overflow-hidden whitespace-nowrap rounded-b-md border-t border-ps-info/25 bg-white/55 px-2 py-1.5 font-ps-mono text-[11px] tracking-[.14em] text-ps-info-deep">
+          {carneMrz}
+        </div>
+      </div>
+
+      {/* Modo Inspección has no button — this line is the only place the reader is told the
+          key, now that Rotom's marginalia (which used to say it) is gone. Printed instructions
+          are what a real document carries anyway. */}
+      <p className="mt-3 px-0.5 text-[11px] leading-[1.45] text-ps-ink-soft">
+        Documento oficial del Gobierno de Teras. Pulsa{" "}
+        <b className="ps-num font-ps-mono text-ps-ink">I</b> para activar el{" "}
+        <b className="text-ps-ink">Modo Inspección</b> y escanear el código de verificación.
+      </p>
+    </>
+  )
+}

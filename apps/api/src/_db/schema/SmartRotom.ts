@@ -47,6 +47,9 @@ export const smartrotomUserApps = mysqlTable('rotom_user_apps', {
 
 export type SmartRotomUserApp = typeof smartrotomUserApps.$inferSelect;
 
+export const ACHIEVEMENT_TIERS = ['bronce', 'plata', 'oro', 'platino'] as const;
+export type AchievementTier = (typeof ACHIEVEMENT_TIERS)[number];
+
 export const smartRotomAchievements = mysqlTable('rotom_achievements', {
   id: varchar('id', { length: 32 }).primaryKey(),
   name: varchar('name', { length: 64 }).notNull(),
@@ -56,6 +59,8 @@ export const smartRotomAchievements = mysqlTable('rotom_achievements', {
   subcategory: varchar('subcategory', { length: 32 }),
   target: int('target').default(1),
   order: int('order').default(0),
+  points: int('points').default(10),
+  tier: varchar('tier', { length: 16 }).default('bronce'),
 });
 
 export type SmartRotomAchievement = typeof smartRotomAchievements.$inferSelect;
