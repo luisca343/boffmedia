@@ -1,8 +1,8 @@
-import { RotomDocument, RotomDocumentUser } from '@/_db/schema/SmartRotomDocuments';
 import {
-  DocumentShare,
-  NotePreview,
-} from '../documents.repository';
+  RotomDocument,
+  RotomDocumentUser,
+} from '@/_db/schema/SmartRotomDocuments';
+import { DocumentShare, NotePreview } from '../documents.repository';
 
 export interface DocumentMutation {
   title?: string;

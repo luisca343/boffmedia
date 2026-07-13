@@ -14,13 +14,72 @@ const logger = pino({ name: 'seed-forum' });
 // syncs label/icon/hue/position edits without duplicating rows. `locked`
 // categories are read-only to non-admins.
 const CATEGORIES = [
-  { slug: 'anuncios', name: 'Anuncios', description: 'Novedades oficiales del equipo Boffmedia.', icon: 'bell', hue: 18, locked: true, position: 0 },
-  { slug: 'general', name: 'General', description: 'Charla abierta de la comunidad sobre cualquier tema del ecosistema.', icon: 'message', hue: 28, locked: false, position: 1 },
-  { slug: 'ayuda', name: 'Ayuda y soporte', description: 'Preguntas, dudas y resolución de problemas. Marca la respuesta como resuelta.', icon: 'info', hue: 152, locked: false, position: 2 },
-  { slug: 'torneos', name: 'Torneos y eventos', description: 'Organización, resultados y debate sobre torneos y eventos.', icon: 'trophy', hue: 265, locked: false, position: 3 },
-  { slug: 'competitivo', name: 'Competitivo VGC', description: 'Equipos, metajuego y estrategia del formato competitivo.', icon: 'sword', hue: 340, locked: false, position: 4 },
-  { slug: 'herramientas', name: 'Herramientas', description: 'Sugerencias y reportes sobre las herramientas de la plataforma.', icon: 'wrench', hue: 200, locked: false, position: 5 },
-  { slug: 'off-topic', name: 'Off-topic', description: 'Todo lo demás: fuera de tema y tiempo libre.', icon: 'globe', hue: 48, locked: false, position: 6 },
+  {
+    slug: 'anuncios',
+    name: 'Anuncios',
+    description: 'Novedades oficiales del equipo Boffmedia.',
+    icon: 'bell',
+    hue: 18,
+    locked: true,
+    position: 0,
+  },
+  {
+    slug: 'general',
+    name: 'General',
+    description:
+      'Charla abierta de la comunidad sobre cualquier tema del ecosistema.',
+    icon: 'message',
+    hue: 28,
+    locked: false,
+    position: 1,
+  },
+  {
+    slug: 'ayuda',
+    name: 'Ayuda y soporte',
+    description:
+      'Preguntas, dudas y resolución de problemas. Marca la respuesta como resuelta.',
+    icon: 'info',
+    hue: 152,
+    locked: false,
+    position: 2,
+  },
+  {
+    slug: 'torneos',
+    name: 'Torneos y eventos',
+    description: 'Organización, resultados y debate sobre torneos y eventos.',
+    icon: 'trophy',
+    hue: 265,
+    locked: false,
+    position: 3,
+  },
+  {
+    slug: 'competitivo',
+    name: 'Competitivo VGC',
+    description: 'Equipos, metajuego y estrategia del formato competitivo.',
+    icon: 'sword',
+    hue: 340,
+    locked: false,
+    position: 4,
+  },
+  {
+    slug: 'herramientas',
+    name: 'Herramientas',
+    description:
+      'Sugerencias y reportes sobre las herramientas de la plataforma.',
+    icon: 'wrench',
+    hue: 200,
+    locked: false,
+    position: 5,
+  },
+  {
+    slug: 'off-topic',
+    name: 'Off-topic',
+    description: 'Todo lo demás: fuera de tema y tiempo libre.',
+    icon: 'globe',
+    hue: 48,
+    locked: false,
+    position: 6,
+  },
 ];
 
 async function main() {

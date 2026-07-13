@@ -195,7 +195,11 @@ export class MessageService {
     messageId: number,
     uuid: string,
     emoji: string,
-  ): Promise<{ chatId: number | null; reactions: { emoji: string; by: string[] }[]; added: boolean }> {
+  ): Promise<{
+    chatId: number | null;
+    reactions: { emoji: string; by: string[] }[];
+    added: boolean;
+  }> {
     const has = await this.chatMessageRepository.hasReaction(
       messageId,
       uuid,
@@ -211,7 +215,8 @@ export class MessageService {
       messageId,
     ]);
     const map = new Map<string, string[]>();
-    for (const r of rows) map.set(r.emoji, [...(map.get(r.emoji) ?? []), r.uuid]);
+    for (const r of rows)
+      map.set(r.emoji, [...(map.get(r.emoji) ?? []), r.uuid]);
     const reactions = Array.from(map.entries()).map(([e, by]) => ({
       emoji: e,
       by,

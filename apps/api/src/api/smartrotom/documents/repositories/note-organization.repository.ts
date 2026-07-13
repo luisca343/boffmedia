@@ -17,9 +17,7 @@ import {
 } from './interfaces/note-organization.repository.interface';
 
 @Injectable()
-export class NoteOrganizationRepository
-  implements INoteOrganizationRepository
-{
+export class NoteOrganizationRepository implements INoteOrganizationRepository {
   constructor(
     @Inject(DRIZZLE) private db: MySql2Database<Record<string, never>>,
   ) {}
@@ -84,9 +82,7 @@ export class NoteOrganizationRepository
   }
 
   async deleteFolder(id: number): Promise<void> {
-    await this.db
-      .delete(rotomNoteFolders)
-      .where(eq(rotomNoteFolders.id, id));
+    await this.db.delete(rotomNoteFolders).where(eq(rotomNoteFolders.id, id));
   }
 
   // ==================== TAGS ====================
@@ -142,7 +138,10 @@ export class NoteOrganizationRepository
       .where(inArray(rotomNoteTagLinks.documentId, ids));
   }
 
-  async findTagLink(documentId: number, tagId: number): Promise<TagLink | null> {
+  async findTagLink(
+    documentId: number,
+    tagId: number,
+  ): Promise<TagLink | null> {
     const rows = await this.db
       .select({
         documentId: rotomNoteTagLinks.documentId,

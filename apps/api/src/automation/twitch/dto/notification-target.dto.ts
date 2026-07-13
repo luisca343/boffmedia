@@ -6,7 +6,10 @@ class NotificationConfigDto {
   @ApiPropertyOptional() @IsString() @IsOptional() channelId?: string;
   @ApiPropertyOptional() @IsString() @IsOptional() botToken?: string;
   @ApiPropertyOptional() @IsString() @IsOptional() url?: string;
-  @ApiPropertyOptional({ type: Object }) @IsOptional() headers?: Record<string, string>;
+  @ApiPropertyOptional({ type: Object }) @IsOptional() headers?: Record<
+    string,
+    string
+  >;
   @ApiPropertyOptional() @IsString() @IsOptional() table?: string;
   @ApiPropertyOptional() @IsString() @IsOptional() message?: string;
   @ApiPropertyOptional() @IsString() @IsOptional() template?: string;

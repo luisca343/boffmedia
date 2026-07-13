@@ -1,9 +1,5 @@
 import { sql } from 'drizzle-orm';
-import {
-  mysqlTable,
-  timestamp,
-  varchar,
-} from 'drizzle-orm/mysql-core';
+import { mysqlTable, timestamp, varchar } from 'drizzle-orm/mysql-core';
 
 export const wingullInvites = mysqlTable('wingull_invites', {
   id: varchar('id', { length: 6 }).primaryKey(),

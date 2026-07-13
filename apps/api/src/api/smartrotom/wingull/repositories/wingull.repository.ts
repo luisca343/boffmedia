@@ -76,7 +76,13 @@ export class WingullRepository {
   }
 
   async getAllPlots(): Promise<
-    { town: string; type: string; number: number; ownerUuid?: string }[]
+    {
+      regionId: string;
+      town: string;
+      type: string;
+      number: number;
+      ownerUuid?: string;
+    }[]
   > {
     try {
       const query = `
@@ -97,6 +103,10 @@ export class WingullRepository {
 
           if (town && type) {
             return {
+              // The exact WorldGuard region identifier — this is the join key gobierno's
+              // parcela metadata keys off (`gobierno_parcelas.region_id`). Never rebuild it
+              // from town/type/number: zero-padding in the source string wouldn't round-trip.
+              regionId: row.id,
               town,
               type,
               number: isNaN(number) ? undefined : number,
@@ -106,6 +116,7 @@ export class WingullRepository {
           return null; // Explicitly return null for invalid entries
         })
         .filter(Boolean) as {
+        regionId: string;
         town: string;
         type: string;
         number: number;
