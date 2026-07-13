@@ -58,7 +58,7 @@ export function NotifBell() {
       await rotomPATCHOrThrow("/notifications/read-all", { uuid })
       qc.invalidateQueries({ queryKey: ["gob", "notifs", uuid] })
     } catch (e) {
-      toast(userMessageFrom(e, "No se pudieron marcar como leídas"), "danger", "alert")
+      toast.error(userMessageFrom(e, "No se pudieron marcar como leídas"))
     }
   }
 

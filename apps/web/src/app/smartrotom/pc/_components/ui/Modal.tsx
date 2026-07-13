@@ -1,8 +1,19 @@
 "use client"
 
-import { useEffect, type ReactNode } from "react"
+import type { ReactNode } from "react"
+import { cn } from "@/lib/utils"
+import { ModalShell } from "@/components/smartrotom/behavior/ModalShell"
 import { Button } from "./Button"
 import { Icon, type IconName } from "./Icon"
+
+/** The `.pc-app` scope-root classes, for the shared `ModalShell`'s portal. */
+export const PC_SCOPE = "pc-app font-pc text-pc-fg"
+
+const PLACE = {
+  center: "items-center justify-center p-5",
+  top: "items-start justify-center pt-[12vh]",
+  right: "justify-end p-0",
+} as const
 
 export interface OverlayProps {
   onClose: () => void
@@ -10,39 +21,30 @@ export interface OverlayProps {
   /** Where the sheet sits. `right` gives a full-height drawer. */
   align?: "center" | "top" | "right"
   className?: string
+  /** Accessible name. Callers that build their own inner `role="dialog"` markup
+   * (the command palette, the Pokémon detail) can leave this at its default. */
+  label?: string
 }
 
 /**
- * The scrim. Closes on backdrop click and on Escape — every overlay in the app gets
- * both for free, which is why nothing else binds Escape itself.
+ * The scrim — a skin over the shared `ModalShell`. Closes on backdrop click and on
+ * Escape — every overlay in the app gets both for free (SMARTROTOM_V3 §2), which is why
+ * nothing else binds Escape itself.
  */
-export function Overlay({ onClose, children, align = "center", className = "" }: OverlayProps) {
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        e.stopPropagation()
-        onClose()
-      }
-    }
-    window.addEventListener("keydown", onKey)
-    return () => window.removeEventListener("keydown", onKey)
-  }, [onClose])
-
-  const place =
-    align === "right"
-      ? "justify-end p-0"
-      : align === "top"
-        ? "items-start justify-center pt-[12vh]"
-        : "items-center justify-center p-5"
-
+export function Overlay({ onClose, children, align = "center", className = "", label = "Diálogo" }: OverlayProps) {
   return (
-    <div
-      role="presentation"
-      onClick={onClose}
-      className={`fixed inset-0 z-[80] flex animate-pc-fade bg-[rgb(4_7_14_/_.62)] backdrop-blur-md motion-reduce:animate-none ${place} ${className}`}
+    <ModalShell
+      onClose={onClose}
+      label={label}
+      scope={PC_SCOPE}
+      scrimClassName={cn(
+        "z-[80] flex animate-pc-fade bg-[rgb(4_7_14_/_.62)] backdrop-blur-md motion-reduce:animate-none",
+        PLACE[align],
+        className,
+      )}
     >
       {children}
-    </div>
+    </ModalShell>
   )
 }
 
@@ -73,12 +75,16 @@ export function Modal({
   headerExtra,
 }: ModalProps) {
   return (
-    <Overlay onClose={onClose} align={align}>
+    <ModalShell
+      onClose={onClose}
+      label={title}
+      scope={PC_SCOPE}
+      scrimClassName={cn(
+        "z-[80] flex animate-pc-fade bg-[rgb(4_7_14_/_.62)] backdrop-blur-md motion-reduce:animate-none",
+        PLACE[align],
+      )}
+    >
       <div
-        role="dialog"
-        aria-modal="true"
-        aria-label={title}
-        onClick={(e) => e.stopPropagation()}
         style={{ width }}
         className="pc-glass flex max-h-[90vh] w-full max-w-[96vw] animate-pc-slide-up flex-col overflow-hidden rounded-pc-lg font-pc text-pc-fg motion-reduce:animate-none"
       >
@@ -106,7 +112,7 @@ export function Modal({
           <footer className="flex flex-none items-center gap-2.5 border-t border-pc-line p-3.5">{footer}</footer>
         )}
       </div>
-    </Overlay>
+    </ModalShell>
   )
 }
 
@@ -126,17 +132,21 @@ export function Drawer({
   label: string
 }) {
   return (
-    <Overlay onClose={onClose} align="right">
+    <ModalShell
+      onClose={onClose}
+      label={label}
+      scope={PC_SCOPE}
+      scrimClassName={cn(
+        "z-[80] flex animate-pc-fade bg-[rgb(4_7_14_/_.62)] backdrop-blur-md motion-reduce:animate-none",
+        PLACE.right,
+      )}
+    >
       <div
-        role="dialog"
-        aria-modal="true"
-        aria-label={label}
-        onClick={(e) => e.stopPropagation()}
         style={{ width }}
         className="pc-glass flex h-full max-w-full animate-pc-slide-in-right flex-col rounded-none border-l border-pc-line-strong font-pc text-pc-fg shadow-[-20px_0_50px_-20px_rgb(0_0_0_/_.7)] motion-reduce:animate-none"
       >
         {children}
       </div>
-    </Overlay>
+    </ModalShell>
   )
 }

@@ -1,71 +1,47 @@
 "use client"
 
-import { useEffect, type ReactNode } from "react"
-import { createPortal } from "react-dom"
+import type { ReactNode } from "react"
 import { cn } from "@/lib/utils"
+import { ModalShell } from "@/components/smartrotom/behavior/ModalShell"
+import { ThemedLayer as SharedThemedLayer } from "@/components/smartrotom/behavior/ThemedLayer"
 import { Button } from "./Button"
 import { Icon } from "./Icon"
 
-/**
- * Re-applies the `.wp-app` scope root to portaled content.
- *
- * A portal escapes the app root, and every `wp-*` token is a CSS var declared ON
- * that root — so a modal rendered into `document.body` would come out completely
- * unthemed (SMARTROTOM_V3.md §2). `display: contents` means the wrapper re-declares
- * the vars without adding a box to the layout. Reach for this whenever you portal.
- */
+/** The `.wp-app` scope-root class, for the shared `ModalShell`'s portal. */
+export const WP_SCOPE = "wp-app"
+
+/** Thin wrapper so existing deep imports (`Toast.tsx`) keep working unchanged. */
 export function ThemedLayer({ children }: { children: ReactNode }) {
-  return (
-    <div className="wp-app" style={{ display: "contents" }}>
-      {children}
-    </div>
-  )
+  return <SharedThemedLayer scope={WP_SCOPE}>{children}</SharedThemedLayer>
 }
 
-export function Overlay({
-  onClose,
-  children,
-  className,
-}: {
+export interface OverlayProps {
   onClose: () => void
   children: ReactNode
   className?: string
-}) {
-  // Escape closes, and the body must not scroll behind the scrim.
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose()
-    document.addEventListener("keydown", onKey)
-    const prev = document.body.style.overflow
-    document.body.style.overflow = "hidden"
-    return () => {
-      document.removeEventListener("keydown", onKey)
-      document.body.style.overflow = prev
-    }
-  }, [onClose])
+  /** Accessible name — the bare scrim has no natural title of its own. */
+  label?: string
+}
 
-  if (typeof document === "undefined") return null
-
-  return createPortal(
-    <ThemedLayer>
-      <div
-        role="dialog"
-        aria-modal="true"
-        // mousedown, not click: a click that STARTS inside the card and ends on the
-        // scrim (a sloppy drag while selecting text) would otherwise close the modal.
-        onMouseDown={(e) => {
-          if (e.target === e.currentTarget) onClose()
-        }}
-        className={cn(
-          "fixed inset-0 z-[80] flex items-center justify-center p-5",
-          "bg-wp-fg/[.34] backdrop-blur-[5px]",
-          "animate-wp-fade motion-reduce:animate-none",
-          className,
-        )}
-      >
-        {children}
-      </div>
-    </ThemedLayer>,
-    document.body,
+/**
+ * The bare scrim, kept exported for parity with the barrel (unused internally beyond
+ * `Modal` below). A skin over the shared `ModalShell` (SMARTROTOM_V3 §2).
+ */
+export function Overlay({ onClose, children, className, label = "Diálogo" }: OverlayProps) {
+  return (
+    <ModalShell
+      onClose={onClose}
+      label={label}
+      scope={WP_SCOPE}
+      scrimClassName={cn(
+        "z-[80] flex items-center justify-center p-5",
+        "bg-wp-fg/[.34] backdrop-blur-[5px]",
+        "animate-wp-fade motion-reduce:animate-none",
+        className,
+      )}
+    >
+      {children}
+    </ModalShell>
   )
 }
 
@@ -74,24 +50,28 @@ export function Modal({
   onClose,
   children,
   className,
+  label = "Diálogo",
 }: {
   onClose: () => void
   children: ReactNode
   className?: string
+  label?: string
 }) {
   return (
-    <Overlay onClose={onClose}>
-      <div
-        className={cn(
-          "wp-noscroll max-h-[88vh] w-[min(520px,94vw)] overflow-y-auto",
-          "rounded-wp-lg border-wp border-wp-line/46 bg-white shadow-wp-modal",
-          "animate-wp-pop motion-reduce:animate-none",
-          className,
-        )}
-      >
-        {children}
-      </div>
-    </Overlay>
+    <ModalShell
+      onClose={onClose}
+      label={label}
+      scope={WP_SCOPE}
+      scrimClassName="z-[80] flex items-center justify-center p-5 bg-wp-fg/[.34] backdrop-blur-[5px] animate-wp-fade motion-reduce:animate-none"
+      className={cn(
+        "wp-noscroll max-h-[88vh] w-[min(520px,94vw)] overflow-y-auto",
+        "rounded-wp-lg border-wp border-wp-line/46 bg-white shadow-wp-modal",
+        "animate-wp-pop motion-reduce:animate-none",
+        className,
+      )}
+    >
+      {children}
+    </ModalShell>
   )
 }
 

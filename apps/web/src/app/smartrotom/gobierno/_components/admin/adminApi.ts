@@ -44,9 +44,9 @@ export const useAdminAddApp = () => {
       rotomPOSTOrThrow("/apps/player/add", { uuid, id }),
     onSuccess: (_d, { uuid }) => {
       qc.invalidateQueries({ queryKey: adminKeys.playerApps(uuid) })
-      toast("App añadida al dispositivo", "ok", "plus")
+      toast.success("App añadida al dispositivo")
     },
-    onError: (e: unknown) => toast(userMessageFrom(e, "No se pudo añadir la app"), "danger", "alert"),
+    onError: (e: unknown) => toast.error(userMessageFrom(e, "No se pudo añadir la app")),
   })
 }
 
@@ -57,9 +57,9 @@ export const useAdminRemoveApp = () => {
       rotomPOSTOrThrow("/apps/player/remove", { uuid, id }),
     onSuccess: (_d, { uuid }) => {
       qc.invalidateQueries({ queryKey: adminKeys.playerApps(uuid) })
-      toast("App eliminada", "default", "minus")
+      toast.info("App eliminada")
     },
-    onError: (e: unknown) => toast(userMessageFrom(e, "No se pudo eliminar la app"), "danger", "alert"),
+    onError: (e: unknown) => toast.error(userMessageFrom(e, "No se pudo eliminar la app")),
   })
 }
 
@@ -67,8 +67,8 @@ export const useSendNotification = () =>
   useMutation({
     mutationFn: (payload: SendNotificationPayload) =>
       rotomPOSTOrThrow<NotificationResponseDto>("/notifications/send", payload),
-    onSuccess: () => toast("Notificación enviada", "ok", "bell"),
-    onError: (e: unknown) => toast(userMessageFrom(e, "No se pudo enviar la notificación"), "danger", "alert"),
+    onSuccess: () => toast.success("Notificación enviada"),
+    onError: (e: unknown) => toast.error(userMessageFrom(e, "No se pudo enviar la notificación")),
   })
 
 export type { SmartRotomApp, SmartRotomUser }

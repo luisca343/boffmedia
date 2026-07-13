@@ -1,29 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { toast, useToasts, type ToastKind } from "@/components/smartrotom/behavior/toast";
 
-export type ToastKind = "success" | "info" | "warn" | "error";
-interface ToastItem {
-  id: string;
-  msg: string;
-  kind: ToastKind;
-}
-
-type Listener = (items: ToastItem[]) => void;
-let items: ToastItem[] = [];
-const listeners = new Set<Listener>();
-const emit = () => listeners.forEach((l) => l([...items]));
-
-// Module-level bus so any component can raise a toast without prop drilling.
-export function toast(msg: string, kind: ToastKind = "success") {
-  const id = Math.random().toString(36).slice(2);
-  items = [...items, { id, msg, kind }];
-  emit();
-  setTimeout(() => {
-    items = items.filter((i) => i.id !== id);
-    emit();
-  }, 2600);
-}
+export { toast };
+export type { ToastKind };
 
 const DOT: Record<ToastKind, string> = {
   success: "bg-nt-c-success",
@@ -33,13 +13,7 @@ const DOT: Record<ToastKind, string> = {
 };
 
 export function ToastHost() {
-  const [list, setList] = useState<ToastItem[]>([]);
-  useEffect(() => {
-    listeners.add(setList);
-    return () => {
-      listeners.delete(setList);
-    };
-  }, []);
+  const list = useToasts();
   return (
     <div className="fixed bottom-[18px] right-[18px] z-[200] flex flex-col items-end gap-2">
       {list.map((t) => (

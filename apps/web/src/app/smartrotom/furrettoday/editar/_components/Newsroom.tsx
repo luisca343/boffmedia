@@ -31,7 +31,7 @@ function escapeHtml(value: string): string {
  */
 function requireFeatured(featured: number | null): featured is number {
   if (featured == null) {
-    toast("Elige primero una noticia destacada.", "warn");
+    toast.error("Elige primero una noticia destacada.");
     return false;
   }
   return true;
@@ -105,7 +105,7 @@ export function Newsroom({ initialId = null }: { initialId?: number | null }) {
       { published: nextPublished, featured: nextFeatured },
       {
         onSuccess: () => toast(article.published ? "Vuelve a borrador." : "Publicada."),
-        onError: () => toast("No se pudo actualizar el estado.", "warn"),
+        onError: () => toast.error("No se pudo actualizar el estado."),
       },
     );
   }
@@ -124,7 +124,7 @@ export function Newsroom({ initialId = null }: { initialId?: number | null }) {
       { published: nextPublished, featured: nextFeatured },
       {
         onSuccess: () => toast("Ahora es la portada del número."),
-        onError: () => toast("No se pudo actualizar el estado.", "warn"),
+        onError: () => toast.error("No se pudo actualizar el estado."),
       },
     );
   }
@@ -134,13 +134,13 @@ export function Newsroom({ initialId = null }: { initialId?: number | null }) {
     const id = pendingDeleteId;
     deleteArticle.mutate(id, {
       onSuccess: () => {
-        toast("Noticia eliminada.", "warn");
+        toast.error("Noticia eliminada.");
         if (selectedId === id) {
           const remaining = sorted.filter((a) => a.id !== id);
           setSelectedId(remaining[0]?.id ?? null);
         }
       },
-      onError: () => toast("No se pudo eliminar.", "warn"),
+      onError: () => toast.error("No se pudo eliminar."),
     });
     setPendingDeleteId(null);
   }
@@ -168,7 +168,7 @@ export function Newsroom({ initialId = null }: { initialId?: number | null }) {
           setNewOpen(false);
           toast("Borrador creado. ¡A escribir!");
         },
-        onError: () => toast("No se pudo crear el borrador.", "warn"),
+        onError: () => toast.error("No se pudo crear el borrador."),
       },
     );
   }

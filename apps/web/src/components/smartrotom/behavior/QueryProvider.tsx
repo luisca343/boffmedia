@@ -4,12 +4,12 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { useState, type ReactNode } from "react"
 
 /**
- * Scoped TanStack Query client for the taxi, mirroring `MediaQueryProvider`. Kept local
- * to this route so lifting the taxi's fetching (audit gap G5 — it used to be
- * `useEffect` + `setState`, with no dedupe, abort or retry) doesn't touch the rest of
- * SmartRotom's still-imperative data layer.
+ * Scoped TanStack Query client for a SmartRotom app. Every per-app provider
+ * used these exact defaults with only the comment differing, so one shared
+ * provider replaces them all; mount it in the app's layout. Kept per-route so
+ * one app's cache never bleeds into another's.
  */
-export function TaxiQueryProvider({ children }: { children: ReactNode }) {
+export function AppQueryProvider({ children }: { children: ReactNode }) {
   const [client] = useState(
     () =>
       new QueryClient({

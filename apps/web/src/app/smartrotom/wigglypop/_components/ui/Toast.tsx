@@ -3,53 +3,28 @@
 import { useEffect, useState } from "react"
 import { createPortal } from "react-dom"
 import { cn } from "@/lib/utils"
+import { toast, useToasts, type ToastKind } from "@/components/smartrotom/behavior/toast"
 import { ThemedLayer } from "./Modal"
 
+export { toast }
+
 /**
- * Toasts. Fired imperatively from anywhere (`toast("Añadido", "success")`) via a
- * DOM CustomEvent rather than a store, so a mutation's `onSuccess` can raise one
- * without the call site needing to be inside a provider.
- *
  * The host portals to `document.body`, so it is wrapped in `ThemedLayer` — outside
  * `.wp-app` every `wp-*` var is undefined and the pill would render unthemed (§2).
  */
 
-type ToastKind = "info" | "success" | "error"
-interface ToastMsg {
-  id: string
-  msg: string
-  kind: ToastKind
-}
-
-const EVENT = "wp-toast"
-
-export function toast(msg: string, kind: ToastKind = "info", duration = 2600) {
-  window.dispatchEvent(new CustomEvent(EVENT, { detail: { msg, kind, duration } }))
-}
-
 const DOT: Record<ToastKind, string> = {
   info: "bg-wp-accent shadow-[0_0_8px_rgb(var(--wp-accent))]",
   success: "bg-wp-green shadow-[0_0_8px_rgb(var(--wp-green))]",
+  warn: "bg-wp-rose shadow-[0_0_8px_rgb(var(--wp-rose))]",
   error: "bg-wp-rose shadow-[0_0_8px_rgb(var(--wp-rose))]",
 }
 
 export function ToastHost() {
-  const [toasts, setToasts] = useState<ToastMsg[]>([])
+  const toasts = useToasts()
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => setMounted(true), [])
-
-  useEffect(() => {
-    const onToast = (e: Event) => {
-      const { msg, kind, duration } = (e as CustomEvent).detail
-      const id = Math.random().toString(36).slice(2)
-      setToasts((t) => [...t, { id, msg, kind }])
-      setTimeout(() => setToasts((t) => t.filter((x) => x.id !== id)), duration)
-    }
-    window.addEventListener(EVENT, onToast)
-    return () => window.removeEventListener(EVENT, onToast)
-  }, [])
-
   if (!mounted) return null
 
   return createPortal(

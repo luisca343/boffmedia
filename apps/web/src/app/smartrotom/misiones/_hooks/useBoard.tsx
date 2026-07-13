@@ -1,6 +1,6 @@
 "use client"
 
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
+import { AppQueryProvider } from "@/components/smartrotom/behavior/QueryProvider"
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react"
 import type { QuestData } from "../_types"
 import { normalizeStatus } from "../_utils/status"
@@ -68,20 +68,11 @@ function BoardState({ children }: { children: ReactNode }) {
   return <BoardContext.Provider value={value}>{children}</BoardContext.Provider>
 }
 
-/** Scoped query client — adopting react-query here touches no other app. */
 export function BoardProvider({ children }: { children: ReactNode }) {
-  const [client] = useState(
-    () =>
-      new QueryClient({
-        defaultOptions: {
-          queries: { staleTime: 60_000, gcTime: 5 * 60_000, refetchOnWindowFocus: false, retry: 1 },
-        },
-      }),
-  )
   return (
-    <QueryClientProvider client={client}>
+    <AppQueryProvider>
       <BoardState>{children}</BoardState>
-    </QueryClientProvider>
+    </AppQueryProvider>
   )
 }
 
