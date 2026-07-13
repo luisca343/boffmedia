@@ -20,13 +20,8 @@ export function uptimeFrom(startedAt?: string): string {
   return h > 0 ? `${h}h ${m}m` : `${m}m`
 }
 
-/** Spanish compact count: "32,4 K" · "1,2 M". */
-export function compactCount(n: number): string {
-  if (!Number.isFinite(n)) return ""
-  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1).replace(".", ",")} M`
-  if (n >= 1_000) return `${(n / 1_000).toFixed(1).replace(".", ",")} K`
-  return n.toLocaleString("es-ES")
-}
+// Spanish compact count: "32,4 K" · "1,2 M".
+export { formatCompact as compactCount } from "@/lib/format"
 
 export function toStreamCard(s: TwitchStream): StreamCardData {
   return {

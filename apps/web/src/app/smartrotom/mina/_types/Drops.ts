@@ -1,12 +1,6 @@
-export type Drop = {
-    id: number;
-    value: number;
-    name: string;
-    type: string;
-    itemId: string;
-    width: number;
-    height: number;
-}
+import type { MineReward } from "@boffmedia/shared"
+
+export type Drop = MineReward
 
 export type DropByType = {
     [key: string]: {

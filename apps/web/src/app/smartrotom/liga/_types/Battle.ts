@@ -1,15 +1,7 @@
-
-
-export interface BattleReplay {
-    id: number;
-    side1: string;
-    side2: string;
-    team1: string;
-    team2: string;
-    replay: string;
-    winner: number;
-    date: string;
-}
+// Unused today (no consumer imports it), kept as the read-side counterpart of BattleConfig.
+// Re-exported rather than hand-duplicated: the old copy typed `winner` as `number`, but the
+// wire (and `CreateReplayDto`) both send it as a `string`.
+export type { Replay as BattleReplay } from "@boffmedia/shared"
 
 export interface BattleConfig {
     nombre: string;

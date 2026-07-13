@@ -81,36 +81,5 @@ export interface Video {
     };
   }
   
-  // Utility functions for formatting
-  export const formatNumber = (num: string): string => {
-    const n = parseInt(num);
-    if (n >= 1000000) {
-      return (n / 1000000).toFixed(1) + 'M';
-    } else if (n >= 1000) {
-      return (n / 1000).toFixed(1) + 'K';
-    }
-    return n.toLocaleString();
-  };
-  
-  export const formatDate = (dateString: string): string => {
-    if (!dateString) return "";
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
-    });
-  };
-  
-  export const formatLongDate = (dateString: string): string => {
-    if (!dateString) return "";
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
-  };
-
   // YouTube calls now go through the server proxy (/api/youtube), which injects
   // YOUTUBE_API_KEY server-side — the key is never shipped to the browser.
