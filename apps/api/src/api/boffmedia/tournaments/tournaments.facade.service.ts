@@ -114,7 +114,10 @@ export class TournamentsFacadeService {
     return this.detail(id);
   }
 
-  async update(id: number, dto: UpdateTournamentDto): Promise<TournamentDetail> {
+  async update(
+    id: number,
+    dto: UpdateTournamentDto,
+  ): Promise<TournamentDetail> {
     await this.tournaments.update(id, dto);
     return this.detail(id);
   }

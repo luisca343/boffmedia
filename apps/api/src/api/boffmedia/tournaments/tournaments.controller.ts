@@ -74,7 +74,7 @@ export class TournamentsController {
   @Get('mine')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('JWT')
-  @ApiOperation({ summary: "Tournaments the caller has entered (profile)." })
+  @ApiOperation({ summary: 'Tournaments the caller has entered (profile).' })
   mine(@Req() req: AuthedRequest) {
     return this.facade.mine(req.user.userId);
   }
@@ -205,7 +205,12 @@ export class TournamentsController {
     @Param('mid', ParseIntPipe) mid: number,
     @Req() req: AuthedRequest,
   ): Promise<{ success: boolean }> {
-    return this.facade.requestJudge(id, mid, req.user.userId, this.isAdmin(req));
+    return this.facade.requestJudge(
+      id,
+      mid,
+      req.user.userId,
+      this.isAdmin(req),
+    );
   }
 
   @Put(':id/teamsheet')
@@ -308,9 +313,7 @@ export class TournamentsController {
   @Roles(USER_ROLES.BOFF_ADMIN)
   @ApiBearerAuth('JWT')
   @ApiOperation({ summary: 'Soft-delete a tournament.' })
-  remove(
-    @Param('id', ParseIntPipe) id: number,
-  ): Promise<{ success: boolean }> {
+  remove(@Param('id', ParseIntPipe) id: number): Promise<{ success: boolean }> {
     return this.facade.remove(id);
   }
 
@@ -408,7 +411,10 @@ export class TournamentsController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(USER_ROLES.BOFF_ADMIN)
   @ApiBearerAuth('JWT')
-  @ApiOperation({ summary: 'Append a phase (draft/registration, or a later pending phase while live).' })
+  @ApiOperation({
+    summary:
+      'Append a phase (draft/registration, or a later pending phase while live).',
+  })
   @ApiResponse({ status: HttpStatus.CREATED, type: TournamentDetail })
   addPhase(
     @Param('id', ParseIntPipe) id: number,

@@ -10,17 +10,27 @@ describe('effectiveBestOf', () => {
   const dbl = { format: 'double', bestOf: 3, finalsBestOf: 5 };
 
   it('uses finalsBestOf only on the last winners round of a single phase', () => {
-    expect(effectiveBestOf({ bracket: 'winners', roundNumber: 3 }, single, 1, 3)).toBe(5);
-    expect(effectiveBestOf({ bracket: 'winners', roundNumber: 2 }, single, 1, 3)).toBe(3);
+    expect(
+      effectiveBestOf({ bracket: 'winners', roundNumber: 3 }, single, 1, 3),
+    ).toBe(5);
+    expect(
+      effectiveBestOf({ bracket: 'winners', roundNumber: 2 }, single, 1, 3),
+    ).toBe(3);
   });
 
   it('double phases escalate only the grand final, never the WB final', () => {
-    expect(effectiveBestOf({ bracket: 'grand', roundNumber: 1 }, dbl, 1, 3)).toBe(5);
-    expect(effectiveBestOf({ bracket: 'winners', roundNumber: 3 }, dbl, 1, 3)).toBe(3);
+    expect(
+      effectiveBestOf({ bracket: 'grand', roundNumber: 1 }, dbl, 1, 3),
+    ).toBe(5);
+    expect(
+      effectiveBestOf({ bracket: 'winners', roundNumber: 3 }, dbl, 1, 3),
+    ).toBe(3);
   });
 
   it('third-place matches keep the base best-of', () => {
-    expect(effectiveBestOf({ bracket: 'third', roundNumber: 1 }, single, 1, 3)).toBe(3);
+    expect(
+      effectiveBestOf({ bracket: 'third', roundNumber: 1 }, single, 1, 3),
+    ).toBe(3);
   });
 
   it('falls back phase.bestOf → tournament bestOf without finalsBestOf', () => {
@@ -32,7 +42,9 @@ describe('effectiveBestOf', () => {
         3,
       ),
     ).toBe(1);
-    expect(effectiveBestOf({ bracket: 'swiss', roundNumber: 1 }, null, 3, 0)).toBe(3);
+    expect(
+      effectiveBestOf({ bracket: 'swiss', roundNumber: 1 }, null, 3, 0),
+    ).toBe(3);
   });
 });
 

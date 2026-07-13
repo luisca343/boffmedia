@@ -30,12 +30,14 @@ export class ForumCategoriesRepository {
   ) {}
 
   async findAll(): Promise<ForumCategoryRow[]> {
-    return this.db
-      .select()
-      .from(boffMediaForumCategories)
-      .where(isNull(boffMediaForumCategories.deletedAt))
-      // Curated order, then id as a deterministic tie-break.
-      .orderBy(boffMediaForumCategories.position, boffMediaForumCategories.id);
+    return (
+      this.db
+        .select()
+        .from(boffMediaForumCategories)
+        .where(isNull(boffMediaForumCategories.deletedAt))
+        // Curated order, then id as a deterministic tie-break.
+        .orderBy(boffMediaForumCategories.position, boffMediaForumCategories.id)
+    );
   }
 
   async findById(id: number): Promise<ForumCategoryRow | null> {

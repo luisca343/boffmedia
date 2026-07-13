@@ -29,7 +29,11 @@ export class PresenceService {
     // This endpoint only returns members seen in the last 15 min, so status is
     // 'online' (<=5 min) or 'idle' — never 'offline'.
     return rows.map((r) => ({
-      ...toForumAuthor({ id: r.id, username: r.username, profilePicture: r.picture }),
+      ...toForumAuthor({
+        id: r.id,
+        username: r.username,
+        profilePicture: r.picture,
+      }),
       status: Number(r.isOnline) >= 1 ? 'online' : 'idle',
     }));
   }

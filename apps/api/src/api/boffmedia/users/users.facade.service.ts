@@ -336,7 +336,10 @@ export class BoffMediaUsersFacadeService {
     try {
       return await this.usersManagementService.linkSteam(id, steamId);
     } catch (error: any) {
-      this.logger.error(`Failed to link Steam for BoffMedia user ${id}:`, error);
+      this.logger.error(
+        `Failed to link Steam for BoffMedia user ${id}:`,
+        error,
+      );
       throw error;
     }
   }

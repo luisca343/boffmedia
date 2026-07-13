@@ -63,14 +63,14 @@ export class MatchReportService {
     const cmap = new Map(participants.map((p) => [p.id, toCompetitor(p)]));
     const viewer =
       userId != null
-        ? participants.find((p) => p.userId === userId) ?? null
+        ? (participants.find((p) => p.userId === userId) ?? null)
         : null;
     const role = this.roleOf(match, viewer, isAdmin);
 
     const phases = await this.repo.listPhases(t.id);
     const phase =
       match.phaseId != null
-        ? phases.find((p) => p.id === match.phaseId) ?? null
+        ? (phases.find((p) => p.id === match.phaseId) ?? null)
         : null;
     const allMatches = await this.repo.listMatches(t.id);
     const chain = phase
@@ -111,18 +111,18 @@ export class MatchReportService {
       position: match.position,
       top:
         match.topParticipantId != null
-          ? cmap.get(match.topParticipantId) ?? null
+          ? (cmap.get(match.topParticipantId) ?? null)
           : null,
       bot:
         match.botParticipantId != null
-          ? cmap.get(match.botParticipantId) ?? null
+          ? (cmap.get(match.botParticipantId) ?? null)
           : null,
       g1: match.topScore,
       g2: match.botScore,
       status: match.status,
       winner:
         match.winnerParticipantId != null
-          ? cmap.get(match.winnerParticipantId) ?? null
+          ? (cmap.get(match.winnerParticipantId) ?? null)
           : null,
       bestOf,
       scheduledAt: match.scheduledAt ? match.scheduledAt.toISOString() : null,
@@ -141,7 +141,7 @@ export class MatchReportService {
       opponentTeamsheet,
       champion:
         t.championParticipantId != null
-          ? cmap.get(t.championParticipantId) ?? null
+          ? (cmap.get(t.championParticipantId) ?? null)
           : null,
     };
   }
@@ -212,7 +212,7 @@ export class MatchReportService {
     dto: ConfirmReportDto,
   ): Promise<{ success: boolean }> {
     const t = await this.mustFindTournament(tournamentId);
-    let match = await this.mustFindMatch(tournamentId, matchId);
+    const match = await this.mustFindMatch(tournamentId, matchId);
     if (await this.settleExpiredForMatch(t, match)) {
       // Auto-verify beat the rival to it — confirming the same result is moot.
       if (dto.accept) return { success: true };
@@ -479,7 +479,8 @@ export class MatchReportService {
     return {
       byParticipantId: String(match.proposedByParticipantId),
       mine: viewer != null && viewer.id === match.proposedByParticipantId,
-      games: role === 'bot' ? flipGames(match.proposedGames) : match.proposedGames,
+      games:
+        role === 'bot' ? flipGames(match.proposedGames) : match.proposedGames,
       topScore: match.proposedTopScore ?? 0,
       botScore: match.proposedBotScore ?? 0,
       state: match.proposalState,

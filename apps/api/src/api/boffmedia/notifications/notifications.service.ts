@@ -13,7 +13,9 @@ export class NotificationsService {
     @Inject(DRIZZLE) private db: MySql2Database<Record<string, never>>,
   ) {}
 
-  private toEntity(row: typeof boffMediaNotifications.$inferSelect): NotificationEntity {
+  private toEntity(
+    row: typeof boffMediaNotifications.$inferSelect,
+  ): NotificationEntity {
     return {
       id: row.id,
       userId: row.userId,
@@ -22,7 +24,9 @@ export class NotificationsService {
       body: row.body,
       link: row.link,
       readAt: row.readAt ? row.readAt.toISOString() : null,
-      createdAt: row.createdAt ? row.createdAt.toISOString() : new Date().toISOString(),
+      createdAt: row.createdAt
+        ? row.createdAt.toISOString()
+        : new Date().toISOString(),
     };
   }
 

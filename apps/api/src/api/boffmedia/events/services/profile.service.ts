@@ -81,10 +81,7 @@ export class ProfileService {
         .from(boffMediaParticipantProgress)
         .where(
           and(
-            inArray(
-              boffMediaParticipantProgress.participantId,
-              participantIds,
-            ),
+            inArray(boffMediaParticipantProgress.participantId, participantIds),
             eq(boffMediaParticipantProgress.isCompleted, true),
           ),
         );
@@ -142,7 +139,10 @@ export class ProfileService {
       .from(boffMediaParticipantProgress)
       .innerJoin(
         boffMediaAchievements,
-        eq(boffMediaAchievements.id, boffMediaParticipantProgress.achievementId),
+        eq(
+          boffMediaAchievements.id,
+          boffMediaParticipantProgress.achievementId,
+        ),
       )
       .where(
         and(

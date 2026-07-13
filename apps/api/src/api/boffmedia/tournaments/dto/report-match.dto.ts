@@ -20,7 +20,9 @@ export class ReportMatchDto {
   @Min(0)
   botScore: number;
 
-  @ApiPropertyOptional({ description: 'Explicit winner (overrides score-derived).' })
+  @ApiPropertyOptional({
+    description: 'Explicit winner (overrides score-derived).',
+  })
   @IsOptional()
   @Type(() => Number)
   @IsInt()
@@ -28,7 +30,7 @@ export class ReportMatchDto {
 
   @ApiPropertyOptional({
     description:
-      'Walkover: the named winner advances by the opponent\'s absence ' +
+      "Walkover: the named winner advances by the opponent's absence " +
       '(no-show / disqualification). Requires winnerParticipantId; scores and ' +
       'best-of bounds are ignored.',
   })

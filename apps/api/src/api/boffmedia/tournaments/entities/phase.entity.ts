@@ -75,7 +75,8 @@ export class PhaseView {
 
   @ApiProperty({
     nullable: true,
-    description: 'Competitors that advanced to the next phase (null on the final).',
+    description:
+      'Competitors that advanced to the next phase (null on the final).',
   })
   qualifiedCount: number | null;
 

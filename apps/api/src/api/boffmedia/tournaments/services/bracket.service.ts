@@ -1,7 +1,4 @@
-import {
-  Injectable,
-  BadRequestException,
-} from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import { TournamentsRepository } from '../repositories/tournaments.repository';
 import { MatchesService } from './matches.service';
 import {
@@ -448,7 +445,9 @@ export class BracketService {
       const ids = await this.seed(active, dto);
       const groupCount = Math.max(
         1,
-        dto.groupCount ?? t.groupCount ?? Math.max(1, Math.round(ids.length / 4)),
+        dto.groupCount ??
+          t.groupCount ??
+          Math.max(1, Math.round(ids.length / 4)),
       );
       const advance = dto.advanceCount ?? t.advanceCount ?? 2;
 
@@ -509,7 +508,9 @@ export class BracketService {
         memberIds,
         groupMatches.filter((m) => m.groupId === g.id),
       );
-      const take = standings.slice(0, g.advanceCount).map((s) => s.participantId);
+      const take = standings
+        .slice(0, g.advanceCount)
+        .map((s) => s.participantId);
       take.forEach((pid, rank) => {
         (advancersByRank[rank] ??= []).push(pid);
       });
@@ -521,7 +522,10 @@ export class BracketService {
   }
 
   // ── double elimination (winners + losers + grand final) ─────────────────────
-  private async buildDouble(tournamentId: number, ids: number[]): Promise<void> {
+  private async buildDouble(
+    tournamentId: number,
+    ids: number[],
+  ): Promise<void> {
     const wb = await this.buildSingleElim(tournamentId, ids, 'winners');
     const k = wb.length; // number of winners-bracket rounds
 

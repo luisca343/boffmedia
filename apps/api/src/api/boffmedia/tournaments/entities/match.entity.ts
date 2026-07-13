@@ -28,10 +28,16 @@ export class MatchView {
   @ApiProperty({ type: Competitor, nullable: true })
   bot: Competitor | null;
 
-  @ApiProperty({ nullable: true, description: 'Games won by top (TnMatch g1).' })
+  @ApiProperty({
+    nullable: true,
+    description: 'Games won by top (TnMatch g1).',
+  })
   g1: number | null;
 
-  @ApiProperty({ nullable: true, description: 'Games won by bot (TnMatch g2).' })
+  @ApiProperty({
+    nullable: true,
+    description: 'Games won by bot (TnMatch g2).',
+  })
   g2: number | null;
 
   @ApiProperty({ enum: ['pending', 'ready', 'live', 'completed', 'bye'] })
