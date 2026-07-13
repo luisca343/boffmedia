@@ -2,7 +2,7 @@
 import { BattleStats, Pokemon } from "@/types/Pokemon"
 import { useState } from "react"
 import { statColor, totalStatColor, getContrastingTextColor } from "../../../_utils/dexMeta"
-import { ChevronDownIcon, Cog6ToothIcon } from "@heroicons/react/24/outline"
+import { ChevronDownIcon, SettingsIcon } from "lucide-react"
 
 const STAT_LABELS: Record<string, { es: string; color: string }> = {
   hp: { es: "PS", color: "#34d399" },
@@ -95,7 +95,7 @@ export function StatsTable({ pokemon, formIndex }: { pokemon: Pokemon; formIndex
           aria-expanded={calcOpen}
         >
           <span className="inline-flex items-center gap-2">
-            <Cog6ToothIcon className="w-3.5 h-3.5" />
+            <SettingsIcon className="w-3.5 h-3.5" />
             Calculadora de stats (IVs, EVs, naturaleza)
           </span>
           <ChevronDownIcon className="w-3.5 h-3.5 transition-transform" style={{ transform: calcOpen ? "rotate(180deg)" : "none" }} />

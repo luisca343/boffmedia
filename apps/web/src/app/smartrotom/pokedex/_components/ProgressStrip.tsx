@@ -1,13 +1,13 @@
 "use client"
 
 import { usePokedexData } from "@/hooks/usePokedexData"
-import { useBoffSession } from "@/services/useBoffSession"
+import { useRotomUuid } from "@/components/smartrotom/behavior/useRotomUuid"
 import { useGetRegistries } from "@/hooks/pokemon/useGetRegistries"
 
 export function ProgressStrip() {
-  const { session } = useBoffSession()
+  const uuid = useRotomUuid()
   const { pokedexData } = usePokedexData()
-  const { registries } = useGetRegistries(session.user.smartRotomUser?.uuid!)
+  const { registries } = useGetRegistries(uuid!)
 
   const caught = pokedexData?.caughtCount ?? 0
   const seen = pokedexData?.seenCount ?? 0

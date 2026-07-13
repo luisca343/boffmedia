@@ -5,7 +5,7 @@ import { TypeChip } from "../../../_components/ui"
 import { useTranslations } from "next-intl"
 import { getTranslatedMoveName } from "@/utils/pokemonTranslations"
 import { useMemo, useState } from "react"
-import { MagnifyingGlassIcon, InformationCircleIcon } from "@heroicons/react/24/outline"
+import { SearchIcon, InfoIcon } from "lucide-react"
 
 interface MoveEntry {
   key: string
@@ -123,7 +123,7 @@ export function UnifiedMovesTable({ pokemon, formIndex, moveData }: { pokemon: P
 
       <div className="flex items-center gap-2.5 mb-3">
         <div className="relative flex-1 max-w-[300px]">
-          <MagnifyingGlassIcon className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-pk-surface-500" />
+          <SearchIcon className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-pk-surface-500" />
           <input
             type="search"
             placeholder="Filtrar movimientos…"
@@ -184,7 +184,7 @@ export function UnifiedMovesTable({ pokemon, formIndex, moveData }: { pokemon: P
                 <span className="text-center font-pk-mono text-xs tabular-nums text-pk-surface-300">{move.pp}</span>
                 <span className="text-center">
                   <span className="w-[26px] h-[26px] inline-grid place-items-center rounded text-pk-surface-400">
-                    <InformationCircleIcon className="w-3 h-3" />
+                    <InfoIcon className="w-3 h-3" />
                   </span>
                 </span>
               </Link>

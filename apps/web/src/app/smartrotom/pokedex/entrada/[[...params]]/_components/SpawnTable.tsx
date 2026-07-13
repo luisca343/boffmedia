@@ -1,7 +1,7 @@
 "use client"
 import { SpawnInfo } from "../../../_types/spawnInfo"
 import { useTranslations } from "next-intl"
-import { MapPinIcon } from "@heroicons/react/24/outline"
+import { MapPinIcon } from "lucide-react"
 import { RARITY_META } from "../../../_utils/dexMeta"
 
 export function SpawnTable({ spawns }: { spawns: SpawnInfo[] }) {
@@ -36,7 +36,6 @@ export function SpawnTable({ spawns }: { spawns: SpawnInfo[] }) {
         const times = spawn.condition?.times?.map((time) => t(`${time.toLowerCase()}`)) || ["Cualquier momento"]
         const method = spawn.stringLocationTypes?.[0] || "Tierra"
         const levels = `${spawn.minLevel}-${spawn.maxLevel}`
-        const height = spawn.condition?.minY ? `y > ${spawn.condition.minY}` : null
 
         return (
           <div
@@ -56,9 +55,6 @@ export function SpawnTable({ spawns }: { spawns: SpawnInfo[] }) {
                 <span className="inline-flex items-center gap-1 text-[11px] text-pk-surface-300 bg-white/[0.04] px-2 py-0.5 rounded">{method}</span>
                 <span className="inline-flex items-center gap-1 text-[11px] text-pk-surface-300 bg-white/[0.04] px-2 py-0.5 rounded">Nv. {levels}</span>
                 <span className="inline-flex items-center gap-1 text-[11px] text-pk-surface-300 bg-white/[0.04] px-2 py-0.5 rounded">{times.join(", ")}</span>
-                {height && (
-                  <span className="inline-flex items-center gap-1 text-[11px] text-pk-surface-300 bg-white/[0.04] px-2 py-0.5 rounded">{height}</span>
-                )}
               </div>
             </div>
 

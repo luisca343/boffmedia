@@ -105,21 +105,21 @@ export default function SkinsPage() {
                 <TR key={x.id}>
                   <TD>
                     <div className="font-gt-mono text-[12.5px] font-bold text-gt-ink-900">{x.skin}</div>
-                    <div className="text-[11px] text-gt-ink-400">{x.npcs.join(" · ") || "—"}</div>
+                    <div className="text-[11px] text-gt-ink-400">{(x.npcs ?? []).join(" · ") || "—"}</div>
                   </TD>
                   <TD>
                     <div className="grid place-items-center">
-                      <RenderThumb skin={x.skin} kind="face" ok={x.face} size={28} />
+                      <RenderThumb skin={x.skin} kind="face" ok={!!x.face} size={28} />
                     </div>
                   </TD>
                   <TD>
                     <div className="grid place-items-center">
-                      <RenderThumb skin={x.skin} kind="head" ok={x.head} size={36} />
+                      <RenderThumb skin={x.skin} kind="head" ok={!!x.head} size={36} />
                     </div>
                   </TD>
                   <TD>
                     <div className="grid place-items-center">
-                      <RenderThumb skin={x.skin} kind="body" ok={x.body} size={44} />
+                      <RenderThumb skin={x.skin} kind="body" ok={!!x.body} size={44} />
                     </div>
                   </TD>
                   <TD>

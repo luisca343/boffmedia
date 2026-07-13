@@ -1,4 +1,4 @@
-import { PhoneIcon, ArrowsPointingOutIcon, MicrophoneIcon } from "@heroicons/react/24/outline"
+import { PhoneIcon, Maximize2Icon, MicIcon } from "lucide-react"
 import { type CallData, UserStatus } from "../types/call"
 import { useState, useEffect } from "react"
 
@@ -62,7 +62,7 @@ export function CollapsedView({
         title="Silenciar"
         className={`grid h-9 w-9 flex-none place-items-center rounded-full transition-colors ${muted ? "bg-[#00a884] text-white" : "bg-white/[0.14] text-[#e9edef] hover:bg-white/[0.24]"}`}
       >
-        <MicrophoneIcon className="h-[18px] w-[18px]" strokeWidth={2} />
+        <MicIcon className="h-[18px] w-[18px]" strokeWidth={2} />
       </button>
 
       {isUserRinging && (
@@ -76,7 +76,7 @@ export function CollapsedView({
       </button>
 
       <button onClick={onExpand} title="Ampliar" className="grid h-9 w-9 flex-none place-items-center rounded-full bg-white/[0.14] text-[#e9edef] transition-colors hover:bg-white/[0.24]">
-        <ArrowsPointingOutIcon className="h-[18px] w-[18px]" strokeWidth={2} />
+        <Maximize2Icon className="h-[18px] w-[18px]" strokeWidth={2} />
       </button>
     </div>
   )

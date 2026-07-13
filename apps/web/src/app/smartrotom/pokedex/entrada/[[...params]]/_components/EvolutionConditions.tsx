@@ -1,6 +1,6 @@
 import React from "react"
 import { Evolution } from "@/types/Pokemon"
-import { InformationCircleIcon } from "@heroicons/react/24/outline"
+import { InfoIcon } from "lucide-react"
 import { ItemSprite } from "../../../_components/PokemonSprite"
 
 export function getEvolutionMethod(evolution: Evolution, t: any) {
@@ -87,7 +87,7 @@ function addConditionByType(condition: any, conditionKey: string, conditions: Re
           className="underline decoration-dotted cursor-help inline-flex items-center gap-1"
         >
           <span>En biomas específicos</span>
-          <InformationCircleIcon className="h-4 w-4 text-pk-primary-300" />
+          <InfoIcon className="h-4 w-4 text-pk-primary-300" />
         </span>
       )
       break

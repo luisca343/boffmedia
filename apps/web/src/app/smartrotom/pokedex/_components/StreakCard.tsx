@@ -1,15 +1,15 @@
 "use client"
 
 import { useMemo } from "react"
-import { TrophyIcon } from "@heroicons/react/24/outline"
-import { useBoffSession } from "@/services/useBoffSession"
+import { TrophyIcon } from "lucide-react"
+import { useRotomUuid } from "@/components/smartrotom/behavior/useRotomUuid"
 import { useGetRegistries } from "@/hooks/pokemon/useGetRegistries"
 
 const DAY_LABELS = ["L", "M", "X", "J", "V", "S", "D"]
 
 export function StreakCard() {
-  const { session } = useBoffSession()
-  const { registries } = useGetRegistries(session.user.smartRotomUser?.uuid!)
+  const uuid = useRotomUuid()
+  const { registries } = useGetRegistries(uuid!)
 
   const { dailyCounts, total, max } = useMemo(() => {
     const now = new Date()

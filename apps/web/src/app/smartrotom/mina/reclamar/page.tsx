@@ -5,7 +5,7 @@ import Image from "next/image";
 import { toast } from "react-toastify";
 import { SmartRotomButton } from "@/components/smartrotom/ui";
 import { isMinecraft, mcefQuery } from "@/services/mcef/mcefHelper";
-import { useBoffSession } from "@/services/useBoffSession";
+import { useRotomUuid } from "@/components/smartrotom/behavior/useRotomUuid";
 import { useGetUnclaimed } from "@/hooks/mina/useGetUnclaimed";
 import { MinaService } from "@/services/api/smartrotom/minaService";
 import { darCaja } from "@/services/mcef/mcefApi";
@@ -13,8 +13,8 @@ import { ItemImage } from "@/lib/ItemImage";
 import { UnclaimedItem } from "@boffmedia/shared";
 
 export default function Reclamar() {
-  const { session } = useBoffSession();
-  const { unclaimed, setUnclaimed, boxes, isLoading } = useGetUnclaimed(session.user.smartRotomUser?.uuid!);
+  const uuid = useRotomUuid();
+  const { unclaimed, setUnclaimed, boxes, isLoading } = useGetUnclaimed(uuid!);
 
   async function claimReward() {
     if (!unclaimed) return;
@@ -23,7 +23,7 @@ export default function Reclamar() {
       return;
     }
 
-    const response = await MinaService.claimRewards({ uuid: session.user.smartRotomUser?.uuid! });
+    const response = await MinaService.claimRewards({ uuid: uuid! });
     if (response) {  
       const objetosMC = unclaimed.map(reward => ({
         id: reward.itemId,

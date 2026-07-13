@@ -1,12 +1,12 @@
 "use client";
 import React, { useState, useRef, useCallback } from 'react';
 import { Button } from '@/components/ui/primitives/button';
-import { 
-  PhotoIcon, 
-  XMarkIcon, 
-  CloudArrowUpIcon,
-  ExclamationTriangleIcon 
-} from '@heroicons/react/24/outline';
+import {
+  ImageIcon,
+  XIcon,
+  CloudUploadIcon,
+  TriangleAlertIcon
+} from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export interface ImageUploadProps {
@@ -178,7 +178,7 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
                 className="opacity-0 group-hover:opacity-100 transition-opacity duration-200"
                 disabled={disabled}
               >
-                <XMarkIcon className="h-4 w-4 mr-1" />
+                <XIcon className="h-4 w-4 mr-1" />
                 Eliminar
               </Button>
             </div>
@@ -213,9 +213,9 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
               <>
                 <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-blue-100">
                   {error ? (
-                    <ExclamationTriangleIcon className="h-6 w-6 text-red-500" />
+                    <TriangleAlertIcon className="h-6 w-6 text-red-500" />
                   ) : (
-                    <CloudArrowUpIcon className="h-6 w-6 text-blue-600" />
+                    <CloudUploadIcon className="h-6 w-6 text-blue-600" />
                   )}
                 </div>
                 
@@ -241,7 +241,7 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
           {dragActive && (
             <div className="absolute inset-0 bg-blue-500 bg-opacity-10 rounded-lg flex items-center justify-center">
               <div className="bg-white rounded-lg p-4 shadow-lg border border-blue-200">
-                <PhotoIcon className="h-8 w-8 text-blue-600 mx-auto mb-2" />
+                <ImageIcon className="h-8 w-8 text-blue-600 mx-auto mb-2" />
                 <p className="text-sm font-medium text-blue-800">Suelta la imagen aquí</p>
               </div>
             </div>
@@ -252,7 +252,7 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
       {/* Error Message */}
       {error && (
         <div className="mt-2 flex items-center text-sm text-red-600">
-          <ExclamationTriangleIcon className="h-4 w-4 mr-1 flex-shrink-0" />
+          <TriangleAlertIcon className="h-4 w-4 mr-1 flex-shrink-0" />
           <span>{error}</span>
         </div>
       )}

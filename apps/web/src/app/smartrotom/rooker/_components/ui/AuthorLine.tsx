@@ -15,7 +15,7 @@ import type { RookerAuthor } from "../../_types"
  */
 export interface AuthorLineProps {
   author: RookerAuthor
-  createdAt: string
+  createdAt: string | null
   compact?: boolean
   className?: string
 }
@@ -55,7 +55,7 @@ export function AuthorLine({ author, createdAt, compact = false, className }: Au
         ·
       </span>
       <time
-        dateTime={createdAt}
+        dateTime={createdAt ?? undefined}
         className={cn("whitespace-nowrap text-rk-fg-subtle", compact ? "text-[13px]" : "text-[14px]")}
       >
         {relTime(createdAt)}

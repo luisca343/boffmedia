@@ -6,7 +6,7 @@ import { ScreenShell } from "../_components/ScreenShell"
 import { PageHead, MetaStat } from "../_components/PageHead"
 import { MoveDetailPane } from "./_components/MoveDetailPane"
 import { getTranslatedMoveName } from "@/utils/pokemonTranslations"
-import { BoltIcon, MagnifyingGlassIcon } from "@heroicons/react/24/outline"
+import { ZapIcon, SearchIcon } from "lucide-react"
 
 export default function MovimientosPage() {
   const t = useTranslations("pokedex")
@@ -28,7 +28,7 @@ export default function MovimientosPage() {
   return (
     <ScreenShell>
       <PageHead
-        icon={BoltIcon}
+        icon={ZapIcon}
         eyebrow="Referencia"
         title="Movimientos"
         desc="Ordenados por popularidad. Busca por nombre y abre cualquier movimiento para ver poder, precisión, efecto y los Pokémon que lo aprenden."
@@ -41,7 +41,7 @@ export default function MovimientosPage() {
       />
 
       <div className="relative">
-        <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-pk-surface-400" />
+        <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-pk-surface-400" />
         <input
           value={q}
           onChange={(e) => setQ(e.target.value)}
@@ -65,7 +65,7 @@ export default function MovimientosPage() {
                   style={{ gridTemplateColumns: "36px 1fr 120px", ...(active ? { background: "rgba(249,115,22,.08)", boxShadow: "inset 0 0 0 1px rgba(249,115,22,.25)" } : {}) }}
                 >
                   <span className="w-8 h-8 grid place-items-center rounded-lg bg-white/[0.04] text-pk-surface-300">
-                    <BoltIcon className="w-3.5 h-3.5" />
+                    <ZapIcon className="w-3.5 h-3.5" />
                   </span>
                   <span className="flex flex-col gap-[3px] min-w-0">
                     <span className="text-sm font-semibold text-pk-surface-50 truncate">{getTranslatedMoveName(m.name, t)}</span>

@@ -50,9 +50,9 @@ export function CrearWizard() {
   const [closesAt, setClosesAt] = useState(() => toLocalInput(plus(DAY + 6 * HOUR)))
   const [weights, setWeights] = useState<EventoWeights>(DEFAULT_WEIGHTS)
   const [rules, setRules] = useState(DEFAULT_RULES)
-  const [especies, setEspeciesList] = useState<Omit<Especie, "id">[]>([])
+  const [especies, setEspeciesList] = useState<Omit<Especie, "id" | "eventoId">[]>([])
 
-  const addEspecie = (sp: Omit<Especie, "id">) =>
+  const addEspecie = (sp: Omit<Especie, "id" | "eventoId">) =>
     setEspeciesList((arr) => (arr.find((x) => x.name === sp.name) ? arr : [...arr, sp]))
   const removeEspecie = (name: string) => setEspeciesList((arr) => arr.filter((x) => x.name !== name))
 
@@ -134,8 +134,13 @@ export function CrearWizard() {
       closesAt: closesAt ? new Date(closesAt).toISOString() : null,
       rules: rules || null,
       weights: type === "caza" ? weights : null,
+      // Never sent anywhere — `EventoCard` doesn't render any of these, they only exist to
+      // satisfy `Evento`'s shape for this local-only preview.
+      createdBy: officer.uuid,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
     }),
-    [type, title, brief, prize, crew, buildClosedAt, ratingClosesAt, zone, coordsX, coordsZ, radius, opensAt, closesAt, rules, weights],
+    [type, title, brief, prize, crew, buildClosedAt, ratingClosesAt, zone, coordsX, coordsZ, radius, opensAt, closesAt, rules, weights, officer.uuid],
   )
 
   return (

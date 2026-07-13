@@ -24,6 +24,7 @@ import {
   type TrophyData,
 } from "@/components/boffmedia/ui/profile"
 import { useBoffSession } from "@/services/useBoffSession"
+import { useRotomUuid } from "@/components/smartrotom/behavior/useRotomUuid"
 import { useGetLeaderboards } from "@/hooks/events/useGetLeaderboards"
 import { useUserActivity, useUserTrophies } from "@/hooks/profile/useProfileStats"
 import { useProfileEditor } from "./useProfileEditor"
@@ -49,6 +50,7 @@ export function ProfileView({
   const locale = useLocale()
   const { session, status, update } = useBoffSession()
   const user = session?.user
+  const rotomUuid = useRotomUuid()
 
   const userId = user?.id ? Number(user.id) : null
   const { leaderboards } = useGetLeaderboards()
@@ -134,7 +136,7 @@ export function ProfileView({
 
   const initial = (user.name || "U").charAt(0).toUpperCase()
   const year = full?.createdAt ? new Date(full.createdAt).getFullYear() : null
-  const mcLinked = !!user.smartRotomUser?.uuid
+  const mcLinked = !!rotomUuid
   const steamLinked = Boolean(full?.steamId)
   const twitchLinked = Boolean(full?.twitchId)
 

@@ -3,7 +3,7 @@
 import { usePathname } from "next/navigation"
 import Link from "next/link"
 import { PokeballIcon } from "./ui"
-import { HomeIcon, BookOpenIcon, MapIcon, BoltIcon, SparklesIcon, Cog6ToothIcon } from "@heroicons/react/24/outline"
+import { HomeIcon, BookOpenIcon, MapIcon, ZapIcon, SparklesIcon, SettingsIcon } from "lucide-react"
 import { useBoffSession } from "@/services/useBoffSession"
 
 type NavItem = { href: string; label: string; icon: typeof HomeIcon; tail?: string }
@@ -17,7 +17,7 @@ const NAV_DATA: NavItem[] = [
 ]
 
 const NAV_REF: NavItem[] = [
-  { href: "/smartrotom/pokedex/movimientos", label: "Movimientos", icon: BoltIcon, tail: "924" },
+  { href: "/smartrotom/pokedex/movimientos", label: "Movimientos", icon: ZapIcon, tail: "924" },
   { href: "/smartrotom/pokedex/habilidades", label: "Habilidades", icon: SparklesIcon, tail: "298" },
   { href: "/smartrotom/pokedex/tipos", label: "Tipos", icon: BookOpenIcon },
 ]
@@ -52,7 +52,7 @@ export function HubSidebar() {
           </div>
         </div>
         <button className="flex items-center gap-[11px] px-2 py-1.5 rounded-md text-xs text-pk-surface-300 hover:text-pk-surface-100 hover:bg-white/[0.04] transition-colors">
-          <Cog6ToothIcon className="w-3.5 h-3.5" />
+          <SettingsIcon className="w-3.5 h-3.5" />
           Ajustes
         </button>
       </div>

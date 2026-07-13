@@ -7,6 +7,7 @@ export function ContactForm() {
     email: "",
     message: "",
   });
+  const [sent, setSent] = useState(false);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -24,7 +25,7 @@ export function ContactForm() {
     console.log("Form submitted:", formData);
     // Reset form after submission
     setFormData({ name: "", email: "", message: "" });
-    alert("Mensaje enviado. ¡Gracias por contactarnos!");
+    setSent(true);
   };
 
   return (
@@ -74,6 +75,11 @@ export function ContactForm() {
           required
         ></textarea>
       </div>
+      {sent && (
+        <p className="mb-4 text-accent-bright">
+          Mensaje enviado. ¡Gracias por contactarnos!
+        </p>
+      )}
       <button
         type="submit"
         className="bg-gradient-to-r from-accent to-accent-bright px-6 py-2 rounded-full text-white font-bold hover:from-accent-bright hover:to-accent-soft transition duration-300 shadow-neon"

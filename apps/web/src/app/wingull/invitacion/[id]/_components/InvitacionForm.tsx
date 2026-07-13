@@ -31,6 +31,7 @@ const formSchema = z.object({
 export default function InvitacionForm({ invitacion }: { invitacion: Invitacion }) {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formError, setFormError] = useState<string | null>(null);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -44,6 +45,7 @@ export default function InvitacionForm({ invitacion }: { invitacion: Invitacion 
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsSubmitting(true);
+    setFormError(null);
     try {
       const res = await wingullPOST(`/invites/${invitacion.id}/register`, {
         values,
@@ -54,7 +56,7 @@ export default function InvitacionForm({ invitacion }: { invitacion: Invitacion 
       }
       router.push('/registro-exitoso');
     } catch (error) {
-      alert(error instanceof Error ? error.message : "¡Vaya! Algo salió mal durante el registro. ¿Podrías intentarlo de nuevo?");
+      setFormError(error instanceof Error ? error.message : "¡Vaya! Algo salió mal durante el registro. ¿Podrías intentarlo de nuevo?");
     } finally {
       setIsSubmitting(false);
     }
@@ -181,10 +183,11 @@ export default function InvitacionForm({ invitacion }: { invitacion: Invitacion 
                     </FormItem>
                   )}
                 />
+                {formError && <p className="text-red-300 text-sm text-right">{formError}</p>}
                 <div className="flex justify-end">
-                  <Button 
-                    type="submit" 
-                    disabled={isSubmitting} 
+                  <Button
+                    type="submit"
+                    disabled={isSubmitting}
                     className="bg-yellow-300 text-secondary-active hover:bg-yellow-400 disabled:opacity-50 px-6 py-3 rounded-lg text-lg font-semibold transition-all duration-300 transform hover:scale-105 hover:shadow-lg"
                   >
                     {isSubmitting ? '¡Embarcando..!' : '¡Comenzar la aventura!'}

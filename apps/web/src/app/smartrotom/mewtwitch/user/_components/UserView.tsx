@@ -4,7 +4,7 @@ import { useState } from "react"
 import { Avatar, Check, CardSkeleton } from "@/components/smartrotom/media/ui"
 import { useUser, useUserClips, useUserVideos } from "../../_hooks/useTwitch"
 import { MEWTWITCH_BASE, compactCount, twitchThumb } from "../../_utils/twitch"
-import { formatDuration, getTimeSince } from "../../types"
+import { formatDuration, getTimeSince } from "../../_utils/format"
 import { VodCard, type VodCardData } from "../../_components/VodCard"
 
 export function UserView({ username }: { username: string }) {

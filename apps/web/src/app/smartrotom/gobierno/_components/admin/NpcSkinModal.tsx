@@ -21,8 +21,8 @@ export function NpcSkinModal({ open, onClose, skin }: { open: boolean; onClose: 
   useEffect(() => {
     if (!open) return
     setName(skin?.skin ?? "")
-    setNpcs(skin?.npcs.join(", ") ?? "")
-    setFlags({ src: skin?.src ?? false, face: skin?.face ?? false, head: skin?.head ?? false, body: skin?.body ?? false })
+    setNpcs(skin?.npcs?.join(", ") ?? "")
+    setFlags({ src: !!skin?.src, face: !!skin?.face, head: !!skin?.head, body: !!skin?.body })
   }, [open, skin])
 
   const canSave = name.trim().length > 0

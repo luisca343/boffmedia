@@ -3,7 +3,7 @@
 import type { Abilities, Pokemon } from "@/types/Pokemon"
 import Link from "next/link"
 import { useTranslations } from "next-intl"
-import { StarIcon, SparklesIcon } from "@heroicons/react/24/outline"
+import { StarIcon, SparklesIcon } from "lucide-react"
 import { getDisplayStatus } from "../../../dexUtils"
 
 function SubHead({ num, title }: { num: string; title: string }) {

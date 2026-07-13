@@ -232,7 +232,7 @@ function WeightRow({
   )
 }
 
-function EspecieForm({ onAdd }: { onAdd: (sp: Omit<Especie, "id">) => void }) {
+function EspecieForm({ onAdd }: { onAdd: (sp: Omit<Especie, "id" | "eventoId">) => void }) {
   const [name, setName] = useState("")
   const [rarity, setRarity] = useState<string>(RARITY_TIERS[0])
   const [spawnPct, setSpawnPct] = useState("10")
@@ -311,8 +311,8 @@ export function CazaReglas({
   setWeights: (w: EventoWeights) => void
   rules: string
   setRules: (v: string) => void
-  especies: Omit<Especie, "id">[]
-  addEspecie: (sp: Omit<Especie, "id">) => void
+  especies: Omit<Especie, "id" | "eventoId">[]
+  addEspecie: (sp: Omit<Especie, "id" | "eventoId">) => void
   removeEspecie: (name: string) => void
 }) {
   const badDates = opensAt && closesAt && !(new Date(closesAt) > new Date(opensAt))
@@ -442,7 +442,7 @@ export function StepRevisar({
   opensAt: string
   closesAt: string
   weightSum: number
-  especies: Omit<Especie, "id">[]
+  especies: Omit<Especie, "id" | "eventoId">[]
 }) {
   return (
     <div>
