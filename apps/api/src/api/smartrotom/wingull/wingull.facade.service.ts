@@ -163,6 +163,39 @@ export class WingullFacadeService {
     }
   }
 
+  // The take-side of the bridge. Not shipped by the plugin yet: these throw, and the only
+  // caller (WigglypopCustodyService, ATOMIC path) treats the throw as "roll back, charge nothing".
+  async takePokemon(
+    uuid: string,
+    box: number,
+    index: number,
+    expectedKey: string,
+  ): Promise<{ pokespec: string }> {
+    try {
+      return await this.wingullPlayerService.takePokemon(
+        uuid,
+        box,
+        index,
+        expectedKey,
+      );
+    } catch (error: any) {
+      this.logger.error(`Error taking Pokémon from ${uuid}:`, error);
+      throw new Error(`Failed to take Pokémon: ${error.message}`);
+    }
+  }
+
+  async takeItems(
+    uuid: string,
+    items: Array<{ id: string; amount: number }>,
+  ): Promise<{ taken: Array<{ id: string; amount: number }> }> {
+    try {
+      return await this.wingullPlayerService.takeItems(uuid, items);
+    } catch (error: any) {
+      this.logger.error(`Error taking items from ${uuid}:`, error);
+      throw new Error(`Failed to take items: ${error.message}`);
+    }
+  }
+
   async getBattleTeams(uuid: string): Promise<any> {
     try {
       const data = await this.wingullPlayerService.getBattleTeams(uuid);
