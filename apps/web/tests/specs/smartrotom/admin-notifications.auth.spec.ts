@@ -23,7 +23,7 @@ const mockNotificationResponse = {
   createdAt: "2025-01-01T12:00:00.000Z",
 }
 
-test.describe("Admin — Send Notification page", () => {
+test.describe("Admin — Send Notification page (Gobierno de Teras)", () => {
   test(
     "renders the page with all form fields",
     { tag: "@smoke" },
@@ -31,7 +31,7 @@ test.describe("Admin — Send Notification page", () => {
       await mockGet(page, USERS_URL, apiOk([mockUser]))
       await adminNotificationsPage.goto()
 
-      await expect(adminNotificationsPage.uuidInput).toBeVisible()
+      await expect(adminNotificationsPage.userSearchInput).toBeVisible()
       await expect(adminNotificationsPage.titleInput).toBeVisible()
       await expect(adminNotificationsPage.bodyTextarea).toBeVisible()
       await expect(adminNotificationsPage.linkInput).toBeVisible()
@@ -77,20 +77,22 @@ test.describe("Admin — Send Notification page", () => {
   )
 
   test(
-    "clicking a user result populates the UUID field",
+    "clicking a user result selects them as the recipient",
     async ({ adminNotificationsPage, page }) => {
       await mockGet(page, USERS_URL, apiOk([mockUser]))
       await adminNotificationsPage.goto()
 
-      await adminNotificationsPage.userSearchInput.fill("Profesor")
-      await page.getByText("ProfesorFicus").first().click()
+      await adminNotificationsPage.selectRecipient(mockUser.uuid)
 
-      await expect(adminNotificationsPage.uuidInput).toHaveValue(mockUser.uuid)
+      // Search results are replaced by the selected-recipient chip, which is the
+      // only place the FULL (untruncated) uuid is rendered as text.
+      await expect(adminNotificationsPage.userSearchResults).toBeHidden()
+      await expect(page.getByText(mockUser.uuid, { exact: true })).toBeVisible()
     }
   )
 
   test(
-    "shows success message after sending notification",
+    "shows a toast after sending a notification",
     async ({ adminNotificationsPage, page }) => {
       await mockGet(page, USERS_URL, apiOk([mockUser]))
       await mockPost(page, SEND_URL, { success: true, statusCode: 201, message: "ok", data: mockNotificationResponse })
@@ -103,12 +105,12 @@ test.describe("Admin — Send Notification page", () => {
       })
 
       await adminNotificationsPage.sendButton.click()
-      await expect(adminNotificationsPage.successMessage).toBeVisible()
+      await expect(adminNotificationsPage.toast).toContainText("Notificación enviada")
     }
   )
 
   test(
-    "shows error message when API returns failure",
+    "shows an error toast when the API returns a failure",
     async ({ adminNotificationsPage, page }) => {
       await mockGet(page, USERS_URL, apiOk([mockUser]))
       await page.route(SEND_URL, (route) =>
@@ -127,12 +129,12 @@ test.describe("Admin — Send Notification page", () => {
       })
 
       await adminNotificationsPage.sendButton.click()
-      await expect(adminNotificationsPage.errorMessage).toBeVisible()
+      await expect(adminNotificationsPage.toast).toContainText("Bad Request")
     }
   )
 
   test(
-    "clears title and body fields after successful send",
+    "clears title and body fields after a successful send",
     async ({ adminNotificationsPage, page }) => {
       await mockGet(page, USERS_URL, apiOk([mockUser]))
       await mockPost(page, SEND_URL, { success: true, statusCode: 201, message: "ok", data: mockNotificationResponse })
@@ -145,7 +147,7 @@ test.describe("Admin — Send Notification page", () => {
       })
 
       await adminNotificationsPage.sendButton.click()
-      await expect(adminNotificationsPage.successMessage).toBeVisible()
+      await expect(adminNotificationsPage.toast).toContainText("Notificación enviada")
       await expect(adminNotificationsPage.titleInput).toHaveValue("")
       await expect(adminNotificationsPage.bodyTextarea).toHaveValue("")
     }
