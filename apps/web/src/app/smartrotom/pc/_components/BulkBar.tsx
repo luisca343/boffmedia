@@ -1,0 +1,188 @@
+"use client"
+
+import { useMemo, useState } from "react"
+import { useBulkMark, useBoxGrid, useMons } from "../_hooks/queries"
+import { planBulkMove, useMoveQueue } from "../_hooks/useMoveQueue"
+import { locId, usePcUi } from "../_stores/pcUiStore"
+import type { Mon } from "../_types/pc.types"
+import { boxName } from "../_utils/boxMeta"
+import { POKEMON_PER_BOX, TOTAL_BOXES } from "../_utils/constants"
+import { SUGGESTED_TAGS } from "../_utils/marks"
+import { Button, ChipButton, Icon, Input, toast } from "./ui"
+
+/**
+ * The bulk bar. Every action here is one the server actually supports: favourite and
+ * tag are our own marks table, and "Mover a…" is a *sequence* of real `/pc/move`
+ * swaps. There is no release endpoint, so there is no Liberar button.
+ */
+export function BulkBar() {
+  const multiMode = usePcUi((s) => s.multiMode)
+  const selected = usePcUi((s) => s.selected)
+  const clearSelection = usePcUi((s) => s.clearSelection)
+  const setMultiMode = usePcUi((s) => s.setMultiMode)
+  const boxMeta = usePcUi((s) => s.boxMeta)
+
+  const { mons } = useMons()
+  const boxes = useBoxGrid(mons)
+  const bulkMark = useBulkMark()
+  const { run, progress, isRunning } = useMoveQueue()
+
+  const [menu, setMenu] = useState<"move" | "tag" | null>(null)
+  const [tag, setTag] = useState("")
+
+  /** The selection is a set of *positions*; resolve them back to Pokémon. */
+  const picked = useMemo<Mon[]>(() => {
+    const byLoc = new Map(mons.map((m) => [locId(m.loc), m]))
+    return [...selected].map((id) => byLoc.get(id)).filter((m): m is Mon => !!m)
+  }, [mons, selected])
+
+  if (!multiMode) return null
+
+  const n = picked.length
+  const keys = picked.map((m) => m.key)
+  const none = n === 0 || isRunning
+
+  const exit = () => {
+    setMenu(null)
+    setMultiMode(false)
+  }
+
+  const favorite = () => {
+    bulkMark.mutate({ keys, favorite: true })
+    toast(`${n} marcados como favoritos`, "success")
+    setMenu(null)
+  }
+
+  const addTag = (t: string) => {
+    const clean = t.trim()
+    if (!clean) return
+    bulkMark.mutate({ keys, addTags: [clean] })
+    toast(`Etiqueta «${clean}» añadida a ${n}`, "success")
+    setTag("")
+    setMenu(null)
+  }
+
+  const moveTo = async (box: number) => {
+    setMenu(null)
+    const { moves, placed, overflow } = planBulkMove(picked, box, boxes[box])
+    if (!moves.length) {
+      toast("No hay hueco en esa caja", "error")
+      return
+    }
+    const ok = await run(moves, `Mover a ${boxName(boxMeta, box)}`)
+    if (!ok) return
+    toast(
+      overflow > 0
+        ? `${placed} movidos a ${boxName(boxMeta, box)} — ${overflow} no cabían`
+        : `${placed} movidos a ${boxName(boxMeta, box)}`,
+      overflow > 0 ? "info" : "success",
+    )
+    exit()
+  }
+
+  return (
+    <div className="pc-glass fixed bottom-[18px] left-1/2 z-[75] flex max-w-[94vw] -translate-x-1/2 animate-pc-slide-up items-center gap-2 rounded-2xl border-pc-line-strong p-[9px] font-pc text-pc-fg shadow-[0_18px_40px_-18px_rgb(0_0_0_/_.7)] motion-reduce:animate-none">
+      <span className="flex items-center gap-2 pl-1.5 pr-2">
+        <span className="flex h-[26px] min-w-[26px] items-center justify-center rounded-lg bg-pc-cyan px-1.5 font-pc-mono text-[13px] font-extrabold text-[#06222a]">
+          {n}
+        </span>
+        <span className="whitespace-nowrap text-[12.5px] text-pc-fg-muted">seleccionados</span>
+      </span>
+
+      <span className="h-6 w-px bg-pc-line" />
+
+      {isRunning && progress ? (
+        <span className="px-2 font-pc-mono text-[12.5px] text-pc-fg-muted">
+          {progress.label} — {progress.done}/{progress.total}
+        </span>
+      ) : (
+        <>
+          <Button variant="ghost" icon disabled={none} onClick={favorite} aria-label="Marcar como favoritos" title="Favorito">
+            <Icon name="heart" size={16} />
+          </Button>
+
+          <div className="relative">
+            <Button
+              variant="ghost"
+              icon
+              disabled={none}
+              onClick={() => setMenu(menu === "tag" ? null : "tag")}
+              aria-label="Etiquetar selección"
+              title="Etiquetar"
+            >
+              <Icon name="tag" size={16} />
+            </Button>
+            {menu === "tag" && (
+              <div className="pc-glass absolute bottom-[46px] left-1/2 w-[220px] -translate-x-1/2 rounded-xl p-2.5 shadow-[0_18px_40px_-18px_rgb(0_0_0_/_.7)]">
+                <Input
+                  value={tag}
+                  onChange={(e) => setTag(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") addTag(tag)
+                  }}
+                  aria-label="Nueva etiqueta"
+                  placeholder="Etiqueta…"
+                  className="mb-2"
+                  autoFocus
+                />
+                <div className="flex flex-wrap gap-1.5">
+                  {SUGGESTED_TAGS.map((t) => (
+                    <ChipButton key={t} onClick={() => addTag(t)}>
+                      {t}
+                    </ChipButton>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
+          <div className="relative">
+            <Button disabled={none} onClick={() => setMenu(menu === "move" ? null : "move")}>
+              <Icon name="boxes" size={15} />
+              Mover a…
+            </Button>
+            {menu === "move" && (
+              <div className="pc-glass absolute bottom-[46px] left-0 max-h-[300px] w-[240px] overflow-auto rounded-xl p-[7px] shadow-[0_18px_40px_-18px_rgb(0_0_0_/_.7)]">
+                {Array.from({ length: TOTAL_BOXES }, (_, i) => {
+                  const filled = boxes[i].filter(Boolean).length
+                  const free = POKEMON_PER_BOX - filled
+                  return (
+                    <Button
+                      key={i}
+                      variant="ghost"
+                      disabled={free === 0}
+                      onClick={() => void moveTo(i)}
+                      className="w-full justify-between"
+                    >
+                      <span className="flex items-center gap-2">
+                        <span className="font-pc-mono text-[11px] text-pc-fg-subtle">{i + 1}</span>
+                        {boxName(boxMeta, i)}
+                      </span>
+                      <span className="text-[10.5px] text-pc-fg-subtle">{free} libres</span>
+                    </Button>
+                  )
+                })}
+              </div>
+            )}
+          </div>
+
+          <span className="h-6 w-px bg-pc-line" />
+
+          <Button
+            variant="ghost"
+            onClick={() => {
+              if (n) {
+                clearSelection()
+                setMenu(null)
+              } else {
+                exit()
+              }
+            }}
+          >
+            {n ? "Deseleccionar" : "Salir"}
+          </Button>
+        </>
+      )}
+    </div>
+  )
+}
