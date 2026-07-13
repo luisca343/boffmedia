@@ -2,6 +2,14 @@ import { Injectable } from '@nestjs/common';
 import axios, { AxiosResponse } from 'axios';
 import { IWingullPlayerRepository } from './interfaces/wingull-player.repository.interface';
 import { PokemonGiveRequestDto } from '../dto/pokemon-give-request.dto';
+import {
+  PokemonTakeRequestDto,
+  PokemonTakeResponse,
+} from '../dto/pokemon-take-request.dto';
+import {
+  ItemsTakeRequestDto,
+  ItemsTakeResponse,
+} from '../dto/items-take-request.dto';
 import { MessageRequestDto } from '../dto/message-request.dto';
 import { UpdateBattleTeamDto } from '../dto/battle-team.dto';
 import { PlayerStats } from '../entities/player-stats.entity';
@@ -319,6 +327,77 @@ export class WingullPlayerRepository implements IWingullPlayerRepository {
     } catch (error: any) {
       this.logger.error(`Failed to give items to UUID ${uuid}:`, error);
       throw new Error(`Items giving failed: ${error.message}`);
+    }
+  }
+
+  // ─── Take-side ──────────────────────────────────────────────────────────────
+  // Mirrors givePokemonInAPI/giveItemsInAPI against the two routes the plugin has agreed to
+  // but not yet shipped. Until it does, both 404 and the axios call throws — which is exactly
+  // what WigglypopCustodyService's ATOMIC path relies on to roll the order back and charge
+  // nothing. See the DTOs for the contract.
+
+  async takePokemonInAPI(
+    request: PokemonTakeRequestDto,
+  ): Promise<PokemonTakeResponse> {
+    if (!request?.uuid || request.uuid.trim() === '') {
+      throw new Error('UUID is required for taking a Pokémon');
+    }
+    if (!request.expectedKey || request.expectedKey.trim() === '') {
+      throw new Error('expectedKey is required for taking a Pokémon');
+    }
+    if (!this.WINGULL_API_BASE_URL) {
+      throw new Error('WINGULL_API environment variable is not configured');
+    }
+    try {
+      const response: AxiosResponse = await axios.post(
+        `${this.WINGULL_API_BASE_URL}/takepokemon`,
+        request,
+        {
+          timeout: this.DEFAULT_TIMEOUT,
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        },
+      );
+      return response.data.data;
+    } catch (error: any) {
+      this.logger.error(
+        `Failed to take Pokémon from UUID ${request.uuid} at box ${request.box}/${request.index}:`,
+        error,
+      );
+      throw new Error(`Pokémon taking failed: ${error.message}`);
+    }
+  }
+
+  async takeItemsInAPI(request: ItemsTakeRequestDto): Promise<ItemsTakeResponse> {
+    if (!request?.uuid || request.uuid.trim() === '') {
+      throw new Error('UUID is required for taking items');
+    }
+    if (
+      !request.items ||
+      !Array.isArray(request.items) ||
+      request.items.length === 0
+    ) {
+      throw new Error('Items array is required and cannot be empty');
+    }
+    if (!this.WINGULL_API_BASE_URL) {
+      throw new Error('WINGULL_API environment variable is not configured');
+    }
+    try {
+      const response: AxiosResponse = await axios.post(
+        `${this.WINGULL_API_BASE_URL}/takeitems`,
+        { uuid: request.uuid, items: this.splitItemsForApi(request.items, 64) },
+        {
+          timeout: this.DEFAULT_TIMEOUT,
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        },
+      );
+      return response.data.data;
+    } catch (error: any) {
+      this.logger.error(`Failed to take items from UUID ${request.uuid}:`, error);
+      throw new Error(`Items taking failed: ${error.message}`);
     }
   }
 
