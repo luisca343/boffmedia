@@ -1,9 +1,9 @@
 import { rotomGET } from "@/services/boffAPI";
 import { useBoffSession } from "@/services/useBoffSession";
 import { useTranslations } from "next-intl";
-import { useEffect, useState, useMemo } from "react";
+import { useCallback, useEffect, useState } from "react";
 
-interface WordlePokemon {
+export interface WordlePokemon {
     name: string;
     transName?: string; // Added translated name field
     gen: number;
@@ -12,6 +12,9 @@ interface WordlePokemon {
     weight: number;
     height: number;
 }
+
+const pickRandom = (list: WordlePokemon[]): WordlePokemon | null =>
+    list.length === 0 ? null : list[Math.floor(Math.random() * list.length)];
 
 export function useGetWordlePokemon() {
     const t = useTranslations('pokedex');
@@ -39,20 +42,26 @@ export function useGetWordlePokemon() {
                 ...p,
                 transName: getPokemonTranslatedName(p.name)
             }));
-            
+
             setPokemon(pokemonWithNames);
-            const randomIndex = Math.floor(Math.random() * pokemonWithNames.length);
-            setTargetPokemon(pokemonWithNames[randomIndex]);
+            setTargetPokemon(pickRandom(pokemonWithNames));
         });
     }, []);
 
+    /** Re-rolls the hidden creature. The target has always been picked client-side. */
+    const pickTarget = useCallback(() => {
+        setTargetPokemon((current) => {
+            if (pokemon.length < 2) return pickRandom(pokemon);
+            let next = pickRandom(pokemon);
+            while (next && current && next.name === current.name) next = pickRandom(pokemon);
+            return next;
+        });
+    }, [pokemon]);
+
     return {
-        pokemonData: pokemon, 
-        allTypes: types, 
-        targetPokemon
-    } as {
-        pokemonData: WordlePokemon[], 
-        allTypes: string[], 
-        targetPokemon: WordlePokemon
+        pokemonData: pokemon,
+        allTypes: types,
+        targetPokemon,
+        pickTarget,
     };
 }

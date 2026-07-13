@@ -1,5 +1,7 @@
-import { Award, AlertCircle, ChevronRight, LogOut } from "lucide-react";
-import { motion } from "framer-motion";
+"use client"
+
+import { Button, Icon, Panel } from "../../_components/ui"
+import VoltorbImage from "./VoltorbIcon"
 
 interface MessagesProps {
   gameOver: boolean
@@ -10,60 +12,61 @@ interface MessagesProps {
   lostCoins: number
 }
 
+/** The two moments the cabinet shouts about: the bomb, and the clear. */
 export default function Messages({
   gameOver,
-  gameWon,
   showLevelComplete,
   onNextLevel,
   onQuit,
-  lostCoins
+  lostCoins,
 }: MessagesProps) {
   if (gameOver) {
     return (
-      <motion.div 
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        className="text-center"
+      <Panel
+        tone="magenta"
+        className="w-full max-w-[560px] animate-ar-pop motion-reduce:animate-none"
       >
-        <div className="flex items-center justify-center mb-3">
-          <AlertCircle className="h-6 w-6 text-red-500 mr-2" />
-          <p className="text-xl font-bold text-red-400">¡Game Over!</p>
+        <div className="flex items-center justify-center gap-2.5">
+          <VoltorbImage size="md" glow />
+          <p className="ar-chrom m-0 font-ar-display text-[14px] text-ar-magenta-2">GAME OVER</p>
         </div>
-        <p className="text-ink mb-3">Has encontrado un Voltorb y perdido {lostCoins} monedas.</p>
-        <p className="text-cyan-400 text-sm">Inicia una nueva partida para seguir jugando.</p>
-      </motion.div>
-    );
+        <p className="mt-3 text-center font-ar text-[13px] leading-relaxed text-ar-ink-dim">
+          Has encontrado un Voltorb y perdido{" "}
+          <b className="tabular-nums text-ar-amber">{lostCoins}</b> monedas.
+        </p>
+        <p className="mt-1.5 text-center font-ar-mono text-[11px] text-ar-cyan">
+          Inicia una nueva partida para seguir jugando.
+        </p>
+      </Panel>
+    )
   }
 
   if (showLevelComplete) {
     return (
-      <motion.div 
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="text-center"
-      >
-        <div className="flex items-center justify-center mb-3">
-          <Award className="h-6 w-6 text-yellow-500 mr-2" />
-          <p className="text-xl font-bold text-yellow-300">¡Nivel Completado!</p>
+      <Panel tone="cyan" className="w-full max-w-[560px] animate-ar-pop motion-reduce:animate-none">
+        <div className="flex items-center justify-center gap-2.5 text-ar-amber">
+          <Icon.Trophy s={20} />
+          <p className="ar-glow-amber m-0 font-ar-display text-[13px]">¡NIVEL COMPLETADO!</p>
         </div>
-        <p className="text-ink mb-4">¡Encontraste todos los multiplicadores sin activar ningún Voltorb!</p>
-        <div className="flex justify-center space-x-4 mt-4">
-          <button
-            className="bg-gradient-to-r from-cyan-500 to-secondary-active hover:from-cyan-600 hover:to-secondary-active text-white py-2 px-4 rounded-md border border-cyan-500/50 flex items-center"
+        <p className="mt-3 text-center font-ar text-[13px] leading-relaxed text-ar-ink-dim">
+          ¡Encontraste todos los multiplicadores sin activar ningún Voltorb!
+        </p>
+        <div className="mt-4 flex flex-wrap justify-center gap-2.5">
+          <Button
+            variant="cyan"
+            size="md"
+            iconRight={<Icon.Chevron s={14} />}
             onClick={onNextLevel}
           >
-            Siguiente nivel <ChevronRight className="h-4 w-4 ml-1" />
-          </button>
-          <button
-            className="bg-indigo-700 hover:bg-indigo-600 text-white py-2 px-4 rounded-md border border-indigo-600/50 flex items-center"
-            onClick={onQuit}
-          >
-            Guardar y salir <LogOut className="h-4 w-4 ml-1" />
-          </button>
+            Siguiente nivel
+          </Button>
+          <Button variant="ghost" size="md" icon={<Icon.Coin s={16} />} onClick={onQuit}>
+            Guardar y salir
+          </Button>
         </div>
-      </motion.div>
-    );
+      </Panel>
+    )
   }
 
-  return null;
+  return null
 }
