@@ -31,14 +31,14 @@ export function CreateGroupModal({ session, onClose, onCreated }: { session: unk
     try {
       const res = (await createChat({ player: myUuid, users: sel.map((u) => u.uuid), name: name.trim() || placeholder })) as {
         success?: boolean;
-        message?: string;
+        userMessage?: string;
         data?: { chatId?: number; id?: number };
       };
       // An HTTP failure resolves rather than throws, so without this the modal would close
       // as if the chat had been created.
       const id = res.success ? res.data?.chatId ?? res.data?.id : undefined;
       if (id == null) {
-        toast.error(res.message || "No se pudo crear el chat");
+        toast.error(res.userMessage ?? "No se pudo crear el chat");
         return;
       }
       onCreated(id);

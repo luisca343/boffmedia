@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation"
 import { useMemo, useState } from "react"
 import { cn } from "@/lib/utils"
+import { userMessageFrom } from "@/services/boffAPI"
 import { fmt } from "../_utils/format"
 import { useListings, useWpUuid } from "../_hooks/queries"
 import { useCartStore } from "../_stores/cartStore"
@@ -82,7 +83,7 @@ export default function ItemsPage() {
 
       <div className="wp-scroll min-h-0 flex-1 overflow-y-auto">
         {error ? (
-          <EmptyState icon="alert" title="No se pudieron cargar los objetos" body={error.message} />
+          <EmptyState icon="alert" title="No se pudieron cargar los objetos" body={userMessageFrom(error, "Inténtalo de nuevo en unos segundos.")} />
         ) : isLoading ? (
           <div className="grid grid-cols-[repeat(auto-fill,minmax(236px,1fr))] gap-[18px] px-[26px] pb-11 pt-5">
             {Array.from({ length: 8 }).map((_, i) => (

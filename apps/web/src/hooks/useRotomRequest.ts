@@ -50,8 +50,8 @@ export function useRotomRequest<T>(
       const response = await apiFunction(...paramsRef.current)
       if (!isCurrent()) return
 
-      if (!response.success) {
-        setError(response.message || response.error || 'La petición ha fallado')
+      if (response.success !== true) {
+        setError(response.userMessage ?? 'La petición ha fallado')
         setData(undefined)
       } else {
         setData(response.data)

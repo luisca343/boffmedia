@@ -2,10 +2,37 @@ import { env } from "@/config/env.public";
 
 export interface ApiResponse<T = any> {
   statusCode: number;
-  message: string;
+  // Machine text (English) for logs/debugging — never render it to users.
+  message?: string;
+  // Spanish, explicitly user-facing — only present when a service set it on
+  // purpose (via `userMessage` on the thrown exception body). Safe to render.
+  userMessage?: string;
   data?: T;
   error?: string;
   success: boolean;
+}
+
+// Thrown by the *OrThrow helpers when the envelope reports failure. `message`
+// carries the server's machine text for logs; UI code must render its own
+// Spanish copy or `userMessage` — see userMessageFrom().
+export class ApiError extends Error {
+  readonly statusCode: number;
+  readonly userMessage?: string;
+  readonly envelope: ApiResponse<unknown>;
+
+  constructor(envelope: ApiResponse<unknown>) {
+    super(envelope.message || envelope.error || `HTTP ${envelope.statusCode}`);
+    this.name = "ApiError";
+    this.statusCode = envelope.statusCode;
+    this.userMessage = envelope.userMessage;
+    this.envelope = envelope;
+  }
+}
+
+// Spanish-safe error text: the server's explicit user-facing message when one
+// was sent, the caller's fallback otherwise. Never returns machine English.
+export function userMessageFrom(error: unknown, fallback: string): string {
+  return error instanceof ApiError && error.userMessage ? error.userMessage : fallback;
 }
 
 interface Options extends RequestInit {
@@ -62,7 +89,9 @@ async function parseErrorEnvelope<T>(res: Response): Promise<ApiResponse<T>> {
   try {
     const parsed = JSON.parse(bodyText);
     if (parsed && typeof parsed === "object") {
-      return { ...parsed, success: false } as ApiResponse<T>;
+      // statusCode first so the body's own value wins when present — some
+      // error bodies (e.g. MinecraftMiddleware's) don't include one.
+      return { statusCode: res.status, ...parsed, success: false } as ApiResponse<T>;
     }
   } catch {
     // body wasn't JSON, fall through to synthesized envelope
@@ -276,8 +305,7 @@ export async function wingullGET<T>(url: string): Promise<ApiResponse<T>> {
 }
 
 export async function rotomPOST<T>(url: string, data: any): Promise<ApiResponse<T>> {
-  data.server = getServer();
-  return apiPOST<T>(`/smartrotom${url}`, data);
+  return apiPOST<T>(`/smartrotom${url}`, { ...data, server: getServer() });
 }
 
 export async function rotomMultipartPOST<T>(
@@ -285,8 +313,7 @@ export async function rotomMultipartPOST<T>(
   fields: Record<string, any> = {},
   files: Record<string, File | Blob> = {}
 ): Promise<ApiResponse<T>> {
-  fields.server = getServer();
-  return multipartPOST<T>(`/smartrotom${url}`, fields, files);
+  return multipartPOST<T>(`/smartrotom${url}`, { ...fields, server: getServer() }, files);
 }
 
 export async function apiMultipartPOST<T>(
@@ -298,13 +325,11 @@ export async function apiMultipartPOST<T>(
 }
 
 export async function rotomPUT<T>(url: string, data: any): Promise<ApiResponse<T>> {
-  data.server = getServer();
-  return apiPUT<T>(`/smartrotom${url}`, data);
+  return apiPUT<T>(`/smartrotom${url}`, { ...data, server: getServer() });
 }
 
 export async function rotomPATCH<T>(url: string, data: any): Promise<ApiResponse<T>> {
-  data.server = getServer();
-  return apiPATCH<T>(`/smartrotom${url}`, data);
+  return apiPATCH<T>(`/smartrotom${url}`, { ...data, server: getServer() });
 }
 
 export async function rotomDELETE<T>(url: string, data?: any): Promise<ApiResponse<T>> {
@@ -319,6 +344,64 @@ export async function rotomDELETE<T>(url: string, data?: any): Promise<ApiRespon
 
 export async function wingullPOST<T>(url: string, data: any): Promise<ApiResponse<T>> {
   return apiPOST<T>(`/wingull${url}`, data);
+}
+
+// Throwing variants. The base helpers have a dual failure mode (network errors
+// throw, HTTP errors resolve { success: false }); these unify both into a
+// thrown ApiError so callers — TanStack queryFn/mutationFn especially — can
+// never mistake a failed envelope for an empty success.
+async function orThrow<T>(pending: Promise<ApiResponse<T>>): Promise<T> {
+  const res = await pending;
+  if (!res.success) throw new ApiError(res);
+  return res.data as T;
+}
+
+export async function rotomGETOrThrow<T>(url: string): Promise<T> {
+  return orThrow(rotomGET<T>(url));
+}
+
+export async function rotomPOSTOrThrow<T>(url: string, data: any): Promise<T> {
+  return orThrow(rotomPOST<T>(url, data));
+}
+
+export async function rotomPUTOrThrow<T>(url: string, data: any): Promise<T> {
+  return orThrow(rotomPUT<T>(url, data));
+}
+
+export async function rotomPATCHOrThrow<T>(url: string, data: any): Promise<T> {
+  return orThrow(rotomPATCH<T>(url, data));
+}
+
+export async function rotomDELETEOrThrow<T = void>(url: string, data?: any): Promise<T> {
+  return orThrow(rotomDELETE<T>(url, data));
+}
+
+export async function rotomMultipartPOSTOrThrow<T>(
+  url: string,
+  fields: Record<string, any> = {},
+  files: Record<string, File | Blob> = {}
+): Promise<T> {
+  return orThrow(rotomMultipartPOST<T>(url, fields, files));
+}
+
+export async function wingullGETOrThrow<T>(url: string): Promise<T> {
+  return orThrow(wingullGET<T>(url));
+}
+
+export async function wingullPOSTOrThrow<T>(url: string, data: any): Promise<T> {
+  return orThrow(wingullPOST<T>(url, data));
+}
+
+export async function apiAuthedPOSTOrThrow<T>(url: string, data: any, token: string): Promise<T> {
+  return orThrow(apiAuthedPOST<T>(url, data, token));
+}
+
+export async function apiAuthedPUTOrThrow<T>(url: string, data: any, token: string): Promise<T> {
+  return orThrow(apiAuthedPUT<T>(url, data, token));
+}
+
+export async function apiAuthedDELETEOrThrow<T = void>(url: string, token: string): Promise<T> {
+  return orThrow(apiAuthedDELETE<T>(url, token));
 }
 
 export async function boffGET<T>(url: string): Promise<ApiResponse<T>> {

@@ -18,7 +18,7 @@ export function useGobRegions() {
     queryFn: async () => {
       const res = await WingullService.getRegions()
       if (!res.success || res.data === undefined) {
-        throw new Error(res.message || "No se pudieron cargar las regiones del mundo.")
+        throw new Error(res.userMessage ?? "No se pudieron cargar las regiones del mundo.")
       }
       return res.data as Region[]
     },

@@ -29,7 +29,7 @@ export function useVitrina(uuid: string | null | undefined) {
     queryFn: async () => {
       const res = await PokemonService.getPokedexRegistries(uuid!)
       if (!res.success || !res.data) {
-        throw new Error(res.message || "No se pudo cargar la vitrina")
+        throw new Error(res.userMessage ?? "No se pudo cargar la vitrina")
       }
       const entries: VitrinaEntry[] = (res.data as Registry[])
         .filter((r) => Boolean(r.caughtAt))

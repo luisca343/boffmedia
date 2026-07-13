@@ -169,7 +169,7 @@ export function useArcadeStreak(): UseArcadeStreakReturn {
         
         return result.data;
       } else {
-        toast.error(result.message || "No se pudo procesar tu recompensa", {
+        toast.error(result.userMessage ?? "No se pudo procesar tu recompensa", {
           position: "top-right",
           autoClose: 4000,
           hideProgressBar: false,

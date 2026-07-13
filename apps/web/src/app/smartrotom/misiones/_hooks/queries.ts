@@ -26,9 +26,7 @@ export function useQuestSystem() {
       // pattern the audit flagged.
       const response = await MisionesService.getQuestsForUser(uuid!)
       if (!response.success || !response.data) {
-        // `message` is the human sentence ("Failed to fetch quest data: timeout…");
-        // `error` is only the code (`HTTP_EXCEPTION`), which tells the player nothing.
-        throw new Error(response.message || response.error || "No se pudo leer el tablón de misiones.")
+        throw new Error(response.userMessage ?? "No se pudo leer el tablón de misiones.")
       }
       return response.data
     },

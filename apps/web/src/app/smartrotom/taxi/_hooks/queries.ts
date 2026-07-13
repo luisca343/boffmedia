@@ -1,25 +1,14 @@
 "use client"
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import type { TaxiStop } from "@boffmedia/shared"
+import type { Region, StarBankAccount, StarBankTransaction, TaxiStop } from "@boffmedia/shared"
 import { StarbankService } from "@/services/api/smartrotom/starbankService"
 import { WingullService } from "@/services/api/smartrotom/wingullService"
+import { rotomGETOrThrow, wingullGETOrThrow } from "@/services/boffAPI"
 import { getMcUserData } from "@/services/mcef/mcefApi"
 import { POSITION_REFRESH_INTERVAL, TAXI_SERVICE_ACCOUNT } from "../_utils/constants"
 import { TRIP_CONCEPT_PREFIX } from "../_utils/trips"
 import type { Position } from "../_types"
-
-/**
- * `boffAPI` has two failure modes: network errors throw, HTTP errors resolve to
- * `{ success: false }` (SMARTROTOM_V3 §8). Reading `.data` without checking `.success`
- * is the silent-failure pattern the audit flagged, so every read goes through here and
- * turns a failed envelope into a thrown error react-query can see and retry.
- */
-async function unwrap<T>(promise: Promise<{ success: boolean; data?: T; message?: string }>, what: string): Promise<T> {
-  const res = await promise
-  if (!res.success || res.data === undefined) throw new Error(res.message || `No se pudo cargar ${what}`)
-  return res.data
-}
 
 export const taxiKeys = {
   stops: ["taxi", "stops"] as const,
@@ -49,11 +38,13 @@ export function useLedger(uuid?: string) {
   return useQuery({
     queryKey: taxiKeys.accounts(uuid),
     queryFn: async () => {
-      const accounts = await unwrap(StarbankService.getUserAccounts(uuid!), "tus cuentas")
+      const accounts = await rotomGETOrThrow<StarBankAccount[]>(`/starbank/accounts/${uuid}`)
       const accountIds = accounts.map((a) => a.id)
 
       const perAccount = await Promise.all(
-        accountIds.map((id) => unwrap(StarbankService.getAccountTransactions(id, 100), "tus movimientos")),
+        accountIds.map((id) =>
+          rotomGETOrThrow<StarBankTransaction[]>(`/starbank/transactions/${id}?limit=100`),
+        ),
       )
 
       // A transfer between two of the player's own accounts is returned by both, so the
@@ -81,9 +72,9 @@ export function useStops() {
   return useQuery({
     queryKey: taxiKeys.stops,
     queryFn: async () => {
-      const stops = await unwrap(WingullService.getTaxiStops(), "las paradas")
+      const stops = await wingullGETOrThrow<TaxiStop[] | Record<string, TaxiStop>>("/taxi/stops")
       // The upstream game API has historically returned a map rather than an array.
-      return (Array.isArray(stops) ? stops : Object.values(stops as Record<string, TaxiStop>)) as TaxiStop[]
+      return (Array.isArray(stops) ? stops : Object.values(stops)) as TaxiStop[]
     },
     staleTime: Infinity,
   })
@@ -97,7 +88,7 @@ export function useStops() {
 export function useRegions() {
   return useQuery({
     queryKey: taxiKeys.regions,
-    queryFn: () => unwrap(WingullService.getRegions(), "las regiones"),
+    queryFn: () => wingullGETOrThrow<Region[]>("/regions"),
     staleTime: Infinity,
     retry: false,
   })
@@ -124,7 +115,7 @@ export function usePlayerPosition() {
 export function useBalance(uuid?: string) {
   return useQuery({
     queryKey: taxiKeys.balance(uuid),
-    queryFn: async () => (await unwrap(StarbankService.getUserBalance(uuid!), "tu saldo")).balance,
+    queryFn: async () => (await rotomGETOrThrow<{ balance: number }>(`/starbank/balance/${uuid}`)).balance,
     enabled: Boolean(uuid),
     staleTime: 15_000,
   })

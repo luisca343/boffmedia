@@ -6,6 +6,7 @@ import type { ArcadeInventoryItem } from "@boffmedia/shared"
 import { getItemName } from "@/lib/intlUtils"
 import { ItemImage } from "@/lib/ItemImage"
 import { isMinecraft } from "@/services/mcef/mcefHelper"
+import { userMessageFrom } from "@/services/boffAPI"
 import { cn } from "@/lib/utils"
 import { useClaimItems } from "../../_hooks/queries"
 import { remaining } from "../../_utils/inventory"
@@ -241,9 +242,7 @@ export function ClaimModal({ open, onClose, items }: ClaimModalProps) {
               role="alert"
               className="rounded-[10px] border border-ar-danger/40 bg-ar-danger/[.08] p-3 font-ar-mono text-[11px] text-ar-danger"
             >
-              {claim.error instanceof Error
-                ? claim.error.message
-                : "Ocurrió un error al reclamar los objetos."}
+              {userMessageFrom(claim.error, "Ocurrió un error al reclamar los objetos.")}
             </p>
           )}
 

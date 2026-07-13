@@ -55,7 +55,7 @@ export function SellItem() {
     queryKey: ["wigglypop", "item-catalog"],
     queryFn: async () => {
       const res = await WigglypopService.getItemCatalog<CatalogItem[]>()
-      if (!res.success || !res.data) throw new Error(res.message || "Sin catálogo")
+      if (!res.success || !res.data) throw new Error(res.userMessage ?? "Sin catálogo")
       return res.data
     },
     staleTime: 30 * 60_000,

@@ -421,7 +421,7 @@ function OfferRow({
       : await WigglypopService.rejectOffer(id, uuid)
     setBusy(false)
     if (!res.success) {
-      toast(res.message || "No se pudo responder a la oferta", "error")
+      toast(res.userMessage ?? "No se pudo responder a la oferta", "error")
       return
     }
     toast(accept ? "Oferta aceptada · pedido creado" : "Oferta rechazada", "success")

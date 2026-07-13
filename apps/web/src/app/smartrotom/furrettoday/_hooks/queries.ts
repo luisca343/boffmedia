@@ -13,26 +13,17 @@ import type {
   UpdateNewsDto,
 } from "@boffmedia/shared";
 
-import { DocumentsService } from "@/services/api/smartrotom/documentsService";
+import {
+  apiAuthedDELETEOrThrow,
+  apiAuthedPOSTOrThrow,
+  apiAuthedPUTOrThrow,
+  rotomDELETEOrThrow,
+  rotomGETOrThrow,
+  rotomPOSTOrThrow,
+} from "@/services/boffAPI";
 import { useBoffSession } from "@/services/useBoffSession";
 
 import { toArticle, type FtArticle } from "../_utils/article";
-
-/**
- * `boffAPI` has two failure modes: network errors throw, HTTP errors resolve to
- * `{ success: false }`. Reading `.data` off an unchecked response is the
- * silent-failure pattern the audit flagged, so every call funnels through here
- * and turns a failed envelope into a thrown error React Query can see (§8).
- */
-async function unwrap<T>(
-  call: Promise<{ success: boolean; data?: T; message?: string }>,
-): Promise<T> {
-  const res = await call;
-  if (!res.success || res.data === undefined) {
-    throw new Error(res.message || "La redacción no responde");
-  }
-  return res.data;
-}
 
 export const furretKeys = {
   all: () => ["furret", "news"] as const,
@@ -51,7 +42,7 @@ export const furretKeys = {
 export function useNewsroom() {
   const query = useQuery({
     queryKey: furretKeys.all(),
-    queryFn: () => unwrap<NewsResponse>(DocumentsService.getAllNews()),
+    queryFn: () => rotomGETOrThrow<NewsResponse>("/documents/news"),
   });
 
   const articles = useMemo<FtArticle[]>(
@@ -81,7 +72,7 @@ export function useArticle(id: number) {
 
   return useQuery({
     queryKey: furretKeys.article(id),
-    queryFn: () => unwrap<News>(DocumentsService.getNewsById(id)),
+    queryFn: () => rotomGETOrThrow<News>(`/documents/news/${id}`),
     enabled: Number.isFinite(id) && id > 0,
     select: toArticle,
     initialData: () => {
@@ -94,7 +85,7 @@ export function useArticle(id: number) {
 export function useComments(newsId: number) {
   return useQuery({
     queryKey: furretKeys.comments(newsId),
-    queryFn: () => unwrap<NewsComment[]>(DocumentsService.getNewsComments(newsId)),
+    queryFn: () => rotomGETOrThrow<NewsComment[]>(`/documents/news/${newsId}/comments`),
     enabled: Number.isFinite(newsId) && newsId > 0,
   });
 }
@@ -103,8 +94,7 @@ export function useComments(newsId: number) {
 export function useEditorialBoard() {
   return useQuery({
     queryKey: furretKeys.board(),
-    queryFn: () =>
-      unwrap<EditorialBoardMember[]>(DocumentsService.getEditorialBoard()),
+    queryFn: () => rotomGETOrThrow<EditorialBoardMember[]>("/documents/news/board"),
     staleTime: 10 * 60_000,
   });
 }
@@ -113,7 +103,7 @@ export function useEditorialBoard() {
 export function useIssues() {
   return useQuery({
     queryKey: furretKeys.issues(),
-    queryFn: () => unwrap<NewsIssue[]>(DocumentsService.getNewsIssues()),
+    queryFn: () => rotomGETOrThrow<NewsIssue[]>("/documents/news/issues"),
     staleTime: 10 * 60_000,
   });
 }
@@ -125,9 +115,7 @@ export function usePostComment(newsId: number) {
 
   const mutation = useMutation({
     mutationFn: (body: string) =>
-      unwrap<NewsComment>(
-        DocumentsService.createNewsComment(newsId, { uuid: uuid!, body }),
-      ),
+      rotomPOSTOrThrow<NewsComment>(`/documents/news/${newsId}/comments`, { uuid: uuid!, body }),
     onSuccess: () => {
       void client.invalidateQueries({ queryKey: furretKeys.comments(newsId) });
     },
@@ -140,8 +128,7 @@ export function usePostComment(newsId: number) {
 export function useDeleteComment(newsId: number) {
   const client = useQueryClient();
   return useMutation({
-    mutationFn: (commentId: number) =>
-      unwrap(DocumentsService.deleteNewsComment(commentId)),
+    mutationFn: (commentId: number) => rotomDELETEOrThrow(`/documents/news/comments/${commentId}`),
     onSuccess: () => {
       void client.invalidateQueries({ queryKey: furretKeys.comments(newsId) });
     },
@@ -157,7 +144,7 @@ export function useClap(newsId: number) {
   const client = useQueryClient();
 
   return useMutation({
-    mutationFn: () => unwrap<ClapResponse>(DocumentsService.clapNews(newsId)),
+    mutationFn: () => rotomPOSTOrThrow<ClapResponse>(`/documents/news/${newsId}/clap`, {}),
     onMutate: async () => {
       await client.cancelQueries({ queryKey: furretKeys.article(newsId) });
       const previous = client.getQueryData<News>(furretKeys.article(newsId));
@@ -182,8 +169,7 @@ export function useClap(newsId: number) {
 
 export function useSubscribeNewsletter() {
   return useMutation({
-    mutationFn: (email: string) =>
-      unwrap(DocumentsService.subscribeNewsletter({ email })),
+    mutationFn: (email: string) => rotomPOSTOrThrow("/documents/newsletter", { email }),
   });
 }
 
@@ -196,7 +182,7 @@ export function useUpdateNewsStatus() {
   const client = useQueryClient();
   return useMutation({
     mutationFn: (data: { published: number[]; featured: number }) =>
-      unwrap(DocumentsService.updateNewsStatus(data)),
+      rotomPOSTOrThrow("/documents/newsstatus", data),
     onSuccess: () => {
       void client.invalidateQueries({ queryKey: furretKeys.all() });
     },
@@ -211,11 +197,9 @@ export function useSaveArticle() {
 
   return useMutation({
     mutationFn: ({ id, data }: { id: number | null; data: UpdateNewsDto }) =>
-      unwrap<News>(
-        id === null
-          ? DocumentsService.createNews(data as CreateNewsDto, token)
-          : DocumentsService.updateNews(id, data, token),
-      ),
+      id === null
+        ? apiAuthedPOSTOrThrow<News>("/smartrotom/documents/news", data as CreateNewsDto, token)
+        : apiAuthedPUTOrThrow<News>(`/smartrotom/documents/news/${id}`, data, token),
     onSuccess: (saved) => {
       void client.invalidateQueries({ queryKey: furretKeys.all() });
       void client.invalidateQueries({ queryKey: furretKeys.article(saved.id) });
@@ -229,7 +213,7 @@ export function useDeleteArticle() {
   const token = session?.user?.accessToken ?? "";
 
   return useMutation({
-    mutationFn: (id: number) => unwrap(DocumentsService.deleteNews(id, token)),
+    mutationFn: (id: number) => apiAuthedDELETEOrThrow(`/smartrotom/documents/news/${id}`, token),
     onSuccess: () => {
       void client.invalidateQueries({ queryKey: furretKeys.all() });
     },

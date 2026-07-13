@@ -40,7 +40,7 @@ export const useStarBankStore = create<StarBankState>((set, get) => ({
         // `.find()` threw as an unhandled rejection, with no error state anywhere.
         const res = await StarbankService.getUserAccounts(uuid);
         if (!res.success || !res.data) {
-          set({ error: res.message || res.error || "No se pudieron cargar las cuentas" });
+          set({ error: res.userMessage ?? "No se pudieron cargar las cuentas" });
           return;
         }
         const accounts = res.data;
