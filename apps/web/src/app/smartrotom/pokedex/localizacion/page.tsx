@@ -11,7 +11,7 @@ import { MapIcon } from "@heroicons/react/24/outline"
 export default async function LocalizacionPage() {
   const t = await getTranslations("pokedex")
   const res = await PokemonService.getBiomes()
-  const raw = (res.data as { name: string; count: number }[]) ?? []
+  const raw = (res.success ? res.data : undefined) ?? []
   const biomes = raw
     .filter((b) => !b.name.includes("biomesoplenty") && !b.name.includes("terraforged"))
     .sort((a, b) => b.count - a.count)

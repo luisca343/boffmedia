@@ -57,8 +57,8 @@ export default function Enviar() {
     try {
       await transfer({ from: fromAcc.id, to: recipient.id, amount, concept: concept || "Transferencia" } as any);
       setDone(true);
-    } catch {
-      setError("No se pudo completar la transferencia");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "No se pudo completar la transferencia");
     }
   }
 

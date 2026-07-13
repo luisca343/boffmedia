@@ -6,8 +6,20 @@ import { PokemonSpriteLink } from "../../../_components/PokemonSprite"
 
 export async function EvoTree({ params }: { params: { id: string } }) {
   const currentDex = parseInt(params.id)
-  const { tree, depth } = (await PokemonService.getEvoTree(currentDex)).data!
   const t = await getTranslations("pokedex")
+
+  // An HTTP error resolves to `{ success: false }`; destructuring `.data!` off it throws
+  // and takes the whole entry route down with it.
+  const res = await PokemonService.getEvoTree(currentDex)
+  if (!res.success || !res.data) {
+    return (
+      <div className="flex items-center justify-center gap-2 rounded-xl bg-white/[0.02] p-6 border border-white/[0.05] text-base text-pk-surface-300">
+        <InformationCircleIcon className="h-5 w-5" />
+        <span>No se pudo cargar la línea evolutiva</span>
+      </div>
+    )
+  }
+  const { tree, depth } = res.data
 
   let baseForm = null
   const firstKey = Object.keys(tree)[0]

@@ -13,8 +13,15 @@ export default function useGetWeather() {
 
   const fetchWeatherData = useCallback(async () => {
     try {
-      const data = await (await WingullService.getWeather()).data!
-      
+      // Only a network error throws; an HTTP error resolves to `{ success: false }` and
+      // `data!` would then hand `undefined` to the setters as if it were a Weather.
+      const res = await WingullService.getWeather();
+      if (!res.success || !res.data) {
+        console.error("Error fetching weather data:", res.message || res.error);
+        return;
+      }
+      const data = res.data;
+
       setWeatherData(data);
       setChangeTime(data.changeTime);
       setMinecraftTime(data.minecraftTime);

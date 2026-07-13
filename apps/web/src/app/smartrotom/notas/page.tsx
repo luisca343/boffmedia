@@ -148,9 +148,15 @@ export default function NotesPage() {
             label: "Duplicar",
             onClick: async () => {
               const res = await DocumentsService.getDocument(n.id);
+              // Falling back to an empty template here would duplicate the note with its
+              // body silently dropped, so a failed read must abort the copy outright.
+              if (!res.success || !res.data) {
+                toast(res.message || "No se pudo leer la nota para duplicarla", "error");
+                return;
+              }
               await actions.newNote({
                 title: `${n.title} (copia)`,
-                content: res.data?.content ?? `<h1>${n.title}</h1><p><br></p>`,
+                content: res.data.content ?? `<h1>${n.title}</h1><p><br></p>`,
               });
             },
           },

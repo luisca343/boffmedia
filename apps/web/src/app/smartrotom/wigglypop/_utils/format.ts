@@ -30,7 +30,7 @@ export const LISTING_STATUS: Record<
 > = {
   activo: { label: "Activo", text: "text-wp-green", bg: "bg-wp-green/15" },
   pausado: { label: "Pausado", text: "text-wp-amber", bg: "bg-wp-amber/15" },
-  vendido: { label: "Vendido", text: "text-wp-accent", bg: "bg-wp-accent/13" },
+  vendido: { label: "Vendido", text: "text-wp-accent", bg: "bg-wp-accent/[.13]" },
   cancelado: { label: "Cancelado", text: "text-wp-rose", bg: "bg-wp-rose/12" },
 }
 
@@ -46,7 +46,7 @@ export const ORDER_STATUS: Record<
   { label: string; text: string; bg: string }
 > = {
   escrow: { label: "Pago en depósito", text: "text-wp-teal", bg: "bg-wp-teal/14" },
-  transferido: { label: "Confirma recepción", text: "text-wp-gold", bg: "bg-wp-gold/16" },
+  transferido: { label: "Confirma recepción", text: "text-wp-gold", bg: "bg-wp-gold/[.16]" },
   completado: { label: "Completado", text: "text-wp-green", bg: "bg-wp-green/14" },
   cancelado: { label: "Cancelado", text: "text-wp-rose", bg: "bg-wp-rose/12" },
   reembolsado: { label: "Reembolsado", text: "text-wp-rose", bg: "bg-wp-rose/12" },

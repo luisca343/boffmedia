@@ -3,7 +3,8 @@ import MenuWrapper from "../_components/MenuWrapper";
 import { MinaService } from "@/services/api/smartrotom/minaService";
 
 export default async function Ranking() {
-  const ranking = (await MinaService.getPlayerRanking()).data;
+  const res = await MinaService.getPlayerRanking();
+  const ranking = res.success ? res.data : undefined;
 
   if(!ranking) return <></>
   return (
