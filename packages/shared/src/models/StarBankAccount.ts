@@ -35,6 +35,7 @@ export namespace StarBankAccount {
     export enum type {
         MAIN = 'MAIN',
         SECONDARY = 'SECONDARY',
+        GOVERNMENT = 'GOVERNMENT',
     }
 }
 
