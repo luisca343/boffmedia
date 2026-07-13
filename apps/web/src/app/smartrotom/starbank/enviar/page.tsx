@@ -1,9 +1,9 @@
 "use client";
 import * as React from "react";
-import { useBoffSession } from "@/services/useBoffSession";
-import { useGetAccounts } from "@/hooks/starbank/useGetAccounts";
-import { useGetAllAccounts } from "@/hooks/starbank/useGetAllAccounts";
-import { useTransfer } from "@/hooks/starbank/useTransfer";
+import type { CreateTransferDto } from "@boffmedia/shared";
+import { useRotomUuid } from "@/components/smartrotom/behavior/useRotomUuid";
+import { useAccounts, useAllAccounts, useTransferMutation } from "../_hooks/queries";
+import { userMessageFrom } from "@/services/boffAPI";
 import { PageHeader, Card, Button, Ico, Stepper, Label, Input, Select, ContactAvatar, AccountAvatar } from "../_components/ui";
 import { formatMoney } from "../_utils/format";
 import { displayName } from "../_utils/account";
@@ -15,10 +15,10 @@ const PRESETS = [1000, 5000, 10000, 25000, 50000];
 const STEPS = ["Destinatario", "Importe", "Revisar"];
 
 export default function Enviar() {
-  const { session } = useBoffSession();
-  const { accounts: myAccounts } = useGetAccounts(session?.user?.smartRotomUser?.uuid!);
-  const { accounts: allAccounts } = useGetAllAccounts();
-  const { transfer, isLoading } = useTransfer();
+  const uuid = useRotomUuid();
+  const { data: myAccounts } = useAccounts(uuid);
+  const { data: allAccounts } = useAllAccounts();
+  const transferMutation = useTransferMutation(uuid);
 
   const [step, setStep] = React.useState(0);
   const [recipient, setRecipient] = React.useState<SBAccount | null>(null);
@@ -51,15 +51,23 @@ export default function Enviar() {
   const canNext1 = !!recipient;
   const canNext2 = amount > 0 && !!fromAcc && amount <= fromAcc.balance && recipient?.id !== from;
 
-  async function finish() {
+  function finish() {
     if (!recipient || !fromAcc) return;
     setError("");
-    try {
-      await transfer({ from: fromAcc.id, to: recipient.id, amount, concept: concept || "Transferencia" } as any);
-      setDone(true);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "No se pudo completar la transferencia");
-    }
+    // `done` (the "¡Transferencia enviada!" screen) must only ever be set from
+    // `onSuccess` — that fires exclusively when `rotomPOSTOrThrow` resolved, i.e. the
+    // server's envelope really reported success. A rejected mutation calls `onError`
+    // instead, so a failed transfer can never reach the success screen.
+    const body: CreateTransferDto = {
+      from: fromAcc.id,
+      to: recipient.id,
+      amount,
+      concept: concept || "Transferencia",
+    };
+    transferMutation.mutate(body, {
+      onSuccess: () => setDone(true),
+      onError: (err) => setError(userMessageFrom(err, "No se pudo completar la transferencia")),
+    });
   }
 
   if (done && recipient && fromAcc) {
@@ -80,7 +88,7 @@ export default function Enviar() {
             <div className="mt-1.5 flex justify-between"><span className="text-sb-fg-muted">Referencia</span><span className="font-mono">SR-{Date.now().toString().slice(-8)}</span></div>
           </div>
           <div className="mt-5 flex justify-center gap-2">
-            <Button variant="secondary" onClick={() => { setDone(false); setStep(0); setRecipient(null); setAmountStr(""); setConcept(""); }}>Nueva transferencia</Button>
+            <Button variant="secondary" onClick={() => { transferMutation.reset(); setDone(false); setStep(0); setRecipient(null); setAmountStr(""); setConcept(""); }}>Nueva transferencia</Button>
             <Button variant="primary" href={`${BASE}/transacciones`}>Ver movimientos</Button>
           </div>
         </Card>
@@ -213,7 +221,7 @@ export default function Enviar() {
 
             <div className="flex items-center justify-between">
               <Button variant="ghost" onClick={() => setStep(1)}><Ico name="arrL" size={14} /> Atrás</Button>
-              <Button variant="primary" size="lg" onClick={finish} disabled={isLoading}><Ico name="send" size={16} /> {isLoading ? "Enviando…" : "Confirmar y enviar"}</Button>
+              <Button variant="primary" size="lg" onClick={finish} disabled={transferMutation.isPending}><Ico name="send" size={16} /> {transferMutation.isPending ? "Enviando…" : "Confirmar y enviar"}</Button>
             </div>
           </div>
         )}
