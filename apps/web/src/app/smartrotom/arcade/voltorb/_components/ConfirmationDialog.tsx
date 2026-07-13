@@ -1,14 +1,6 @@
-import { useState, useEffect } from 'react'
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/primitives/alert-dialog"
+"use client"
+
+import { Button, Icon, Modal } from "../../_components/ui"
 
 interface ConfirmationDialogProps {
   isOpen: boolean
@@ -18,8 +10,14 @@ interface ConfirmationDialogProps {
   description: string
   confirmText: string
   cancelText: string
-  variant: 'quit' | 'new'
+  variant: "quit" | "new"
 }
+
+// Leaving the cabinet is the destructive one; starting a round is not.
+const VARIANT = {
+  quit: { tone: "danger", button: "danger" },
+  new: { tone: "cyan", button: "amber" },
+} as const
 
 export default function ConfirmationDialog({
   isOpen,
@@ -29,52 +27,36 @@ export default function ConfirmationDialog({
   description,
   confirmText,
   cancelText,
-  variant
+  variant,
 }: ConfirmationDialogProps) {
-  const [animationClass, setAnimationClass] = useState('')
-
-  useEffect(() => {
-    if (isOpen) {
-      setAnimationClass('animate-appear')
-    } else {
-      setAnimationClass('')
-    }
-  }, [isOpen])
-
+  const skin = VARIANT[variant]
   return (
-    <AlertDialog open={isOpen} onOpenChange={onClose}>
-      <AlertDialogContent className={`bg-layer-1 border-4 ${variant === 'quit' ? 'border-red-500' : 'border-yellow-500'} rounded-lg p-0 max-w-md w-full ${animationClass}`}>
-        <div className="pixel-corners p-8">
-          <AlertDialogHeader>
-            <AlertDialogTitle className="text-2xl font-bold text-center mb-6 text-white">
-              {title}
-            </AlertDialogTitle>
-            <AlertDialogDescription className="text-lg text-center text-ink">
-              {description}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter className="flex flex-col space-y-4 mt-8">
-            <div className="grid grid-cols-2 gap-6 w-full">
-              <AlertDialogAction
-                onClick={onConfirm}
-                className={`py-3 px-6 rounded-lg font-bold text-white ${
-                  variant === 'quit' 
-                    ? 'bg-red-500 hover:bg-red-600 active:bg-red-700' 
-                    : 'bg-yellow-500 hover:bg-yellow-600 active:bg-yellow-700'
-                } transition-colors duration-200 pixel-corners`}
-              >
-                {confirmText}
-              </AlertDialogAction>
-              <AlertDialogCancel 
-                onClick={onClose}
-                className="py-3 px-6 rounded-lg font-bold text-white bg-secondary hover:bg-secondary-active active:bg-secondary-active transition-colors duration-200 pixel-corners"
-              >
-                {cancelText}
-              </AlertDialogCancel>
-            </div>
-          </AlertDialogFooter>
-        </div>
-      </AlertDialogContent>
-    </AlertDialog>
+    <Modal
+      open={isOpen}
+      onClose={onClose}
+      size="sm"
+      tone={skin.tone}
+      kicker="Confirmar"
+      title={title}
+      footer={
+        <>
+          <Button variant="ghost" size="sm" onClick={onClose}>
+            {cancelText}
+          </Button>
+          <Button
+            variant={skin.button}
+            size="sm"
+            icon={variant === "quit" ? <Icon.X s={12} /> : <Icon.Coin s={14} />}
+            onClick={onConfirm}
+          >
+            {confirmText}
+          </Button>
+        </>
+      }
+    >
+      <p className="text-center font-ar text-[13px] leading-relaxed text-ar-ink-dim">
+        {description}
+      </p>
+    </Modal>
   )
 }

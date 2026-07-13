@@ -1,4 +1,7 @@
-import Image from 'next/image'
+"use client"
+
+import { cn } from "@/lib/utils"
+import { Panel } from "../../_components/ui"
 
 interface MemoPanelProps {
   memoMode: boolean
@@ -7,51 +10,70 @@ interface MemoPanelProps {
   onSelectMark: (mark: number) => void
 }
 
-function MemoPanel({ memoMode, selectedMark, onToggleMemoMode, onSelectMark }: MemoPanelProps) {
+// The pad, left to right: the three multipliers, then the bomb (mark 0).
+const KEYS: { mark: number; glyph: string }[] = [
+  { mark: 1, glyph: "1" },
+  { mark: 2, glyph: "2" },
+  { mark: 3, glyph: "3" },
+  { mark: 0, glyph: "⚡" },
+]
+
+const KEY_STATE = {
+  active: "border-ar-magenta/50 bg-ar-magenta/[.18] text-ar-magenta-2",
+  idle: "border-white/10 bg-white/[.04] text-ar-ink-dim",
+} as const
+
+export default function MemoPanel({
+  memoMode,
+  selectedMark,
+  onToggleMemoMode,
+  onSelectMark,
+}: MemoPanelProps) {
   return (
-    <div className="w-full">
-      <button
-        className={`w-full mb-3 py-2 px-4 rounded-md border-2 transition-all duration-200 ${
-          memoMode 
-            ? 'bg-yellow-500/80 hover:bg-yellow-400 border-yellow-400' 
-            : 'bg-indigo-700/80 hover:bg-indigo-600 border-indigo-600'
-        } text-white font-bold`}
-        onClick={onToggleMemoMode}
-      >
-        {memoMode ? '🎮 Modo Jugar' : '✏️ Modo Notas'}
-      </button>
-      
-      <div className="grid grid-cols-2 gap-2">
-        {[0, 1, 2, 3].map(mark => (
+    <Panel tone="void" tight>
+      <div className="mb-2.5 flex items-center justify-between gap-2">
+        <span className="font-ar-display text-[9px] uppercase tracking-[0.18em] text-ar-magenta-2">
+          MEMO
+        </span>
+        <button
+          type="button"
+          onClick={onToggleMemoMode}
+          aria-pressed={memoMode}
+          className={cn(
+            "ar-lift rounded-md border px-2 py-1 font-ar-mono text-[10px] font-bold uppercase tracking-[0.08em]",
+            memoMode
+              ? "border-ar-lime/50 bg-ar-lime/[.14] text-ar-lime"
+              : "border-white/10 bg-white/[.04] text-ar-ink-muted",
+          )}
+        >
+          {memoMode ? "Notas ON" : "Notas OFF"}
+        </button>
+      </div>
+
+      <div className="flex gap-1.5">
+        {KEYS.map(({ mark, glyph }) => (
           <button
             key={mark}
-            className={`relative w-full h-12 py-2 px-4 rounded-md transition-all duration-200 ${
-              selectedMark === mark && memoMode 
-                ? 'bg-cyan-700 border-2 border-cyan-400' 
-                : 'bg-indigo-900/60 border-2 border-indigo-700/50'
-            } text-white font-bold ${!memoMode && 'opacity-50 cursor-not-allowed'} flex items-center justify-center`}
+            type="button"
             onClick={() => onSelectMark(mark)}
             disabled={!memoMode}
+            aria-pressed={memoMode && selectedMark === mark}
+            aria-label={mark === 0 ? "Marcar Voltorb" : `Marcar x${mark}`}
+            className={cn(
+              "ar-lift h-[38px] flex-1 rounded-md border font-ar-display text-[13px]",
+              "disabled:pointer-events-none disabled:opacity-45",
+              memoMode && selectedMark === mark ? KEY_STATE.active : KEY_STATE.idle,
+            )}
           >
-            {selectedMark === mark && memoMode && (
-              <div className="absolute inset-0 bg-cyan-500/20 rounded-md animate-pulse"></div>
-            )}
-            
-            {mark === 0 ? (
-              <Image
-                src="/smartrotom/img/apps/arcade/voltorb.png"
-                alt="Voltorb"
-                width={24}
-                height={24}
-              />
-            ) : (
-              <span>x{mark}</span>
-            )}
+            {glyph}
           </button>
         ))}
       </div>
-    </div>
+
+      <p className="mt-2 font-ar-mono text-[10px] leading-relaxed text-ar-ink-muted">
+        Activa <b className="text-ar-ink-dim">Notas</b> y haz clic en una casilla para marcarla sin
+        voltearla.
+      </p>
+    </Panel>
   )
 }
-
-export default MemoPanel

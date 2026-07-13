@@ -1,185 +1,90 @@
 "use client"
 
-import React, { useState, useEffect } from 'react'
-import { Puzzle } from 'lucide-react'
-import { motion, AnimatePresence } from 'framer-motion'
-import StarsBackground from '../_components/StarsBackground'
-import {RainbowText} from '../_components/RainbowText'
+import { useState } from "react"
+import { GameStage } from "../_components/GameStage"
+import { GameTopBar } from "../_components/GameTopBar"
+import { Button, Icon, Modal, Panel, Skeleton, StatCard, Tag } from "../_components/ui"
+import { PuzzleBoard } from "./_components/PuzzleBoard"
+import { useSlidingPuzzle } from "./_hooks/useSlidingPuzzle"
 
-interface PuzzlePiece {
-  id: number
-  src: string
-  position: number
-}
-
-interface Star {
-  x: number
-  y: number
-  size: number
-}
-
-export default function FramerMotionSteamLogoPuzzle() {
-  const [imageLoaded, setImageLoaded] = useState(false)
-  const [pieces, setPieces] = useState<PuzzlePiece[]>([])
-  const [emptyIndex, setEmptyIndex] = useState<number>(8)
-  const [isComplete, setIsComplete] = useState<boolean>(false)
-  const [stars, setStars] = useState<Star[]>([])
-  const width = 3
-  const height = 3
-
-  useEffect(() => {
-    const img = new Image()
-    img.src = "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/steam-Ll038vGbTpPrpTm9AiPMgZqMvg3FHF.png"
-    img.crossOrigin = "anonymous"
-    img.onload = () => {
-      setImageLoaded(true)
-      createPuzzlePieces(img)
-    }
-  }, [])
-
-  const createPuzzlePieces = (img: HTMLImageElement) => {
-    const pieceWidth = Math.floor(img.width / width)
-    const pieceHeight = Math.floor(img.height / height)
-    const canvas = document.createElement('canvas')
-    canvas.width = pieceWidth
-    canvas.height = pieceHeight
-    const ctx = canvas.getContext('2d')
-    if (!ctx) return
-
-    const newPieces: PuzzlePiece[] = []
-
-    for (let y = 0; y < height; y++) {
-      for (let x = 0; x < width; x++) {
-        ctx.clearRect(0, 0, pieceWidth, pieceHeight)
-        ctx.drawImage(
-          img,
-          x * pieceWidth, y * pieceHeight, pieceWidth, pieceHeight,
-          0, 0, pieceWidth, pieceHeight
-        )
-        newPieces.push({
-          id: y * width + x,
-          src: canvas.toDataURL(),
-          position: y * width + x
-        })
-      }
-    }
-
-    shufflePieces(newPieces)
-  }
-
-  const shufflePieces = (piecesToShuffle: PuzzlePiece[]) => {
-    let shuffled = [...piecesToShuffle]
-    let emptyPos = shuffled.length - 1
-    
-    for (let i = 0; i < 1000; i++) {
-      const possibleMoves = []
-      if (emptyPos % width > 0) possibleMoves.push(-1)
-      if (emptyPos % width < width - 1) possibleMoves.push(1)
-      if (emptyPos - width >= 0) possibleMoves.push(-width)
-      if (emptyPos + width < shuffled.length) possibleMoves.push(width)
-
-      const move = possibleMoves[Math.floor(Math.random() * possibleMoves.length)]
-      const newEmptyPos = emptyPos + move
-      
-      shuffled[emptyPos].position = newEmptyPos
-      shuffled[newEmptyPos].position = emptyPos
-      ;[shuffled[emptyPos], shuffled[newEmptyPos]] = [shuffled[newEmptyPos], shuffled[emptyPos]]
-      emptyPos = newEmptyPos
-    }
-
-    setPieces(shuffled.filter(piece => piece.id !== 8))
-    setEmptyIndex(emptyPos)
-  }
-
-  const handlePieceClick = (clickedPiece: PuzzlePiece) => {
-    if (isAdjacent(clickedPiece.position, emptyIndex)) {
-      const newPieces = pieces.map(piece => 
-        piece.id === clickedPiece.id 
-          ? { ...piece, position: emptyIndex }
-          : piece
-      )
-      setPieces(newPieces)
-      setEmptyIndex(clickedPiece.position)
-      checkCompletion(newPieces)
-    }
-  }
-
-  const isAdjacent = (index1: number, index2: number) => {
-    const row1 = Math.floor(index1 / width)
-    const col1 = index1 % width
-    const row2 = Math.floor(index2 / width)
-    const col2 = index2 % width
-    return Math.abs(row1 - row2) + Math.abs(col1 - col2) === 1
-  }
-
-  const checkCompletion = (currentPieces: PuzzlePiece[]) => {
-    setIsComplete(currentPieces.every((piece) => piece.id === piece.position))
-  }
+export default function PuzlePage() {
+  const game = useSlidingPuzzle()
+  const [help, setHelp] = useState(false)
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-secondary-soft p-4 font-mono relative overflow-hidden">
-      <StarsBackground />
-      <RainbowText text="Puzles Arcade Temáticos y Originales" />
-      {imageLoaded ? (
-        <>
-          <div 
-            className="relative bg-layer-2 bg-opacity-80 rounded-lg p-1 z-10"
-            style={{
-              width: '300px',
-              height: '300px',
-            }}
-          >
-            <AnimatePresence>
-              {pieces.map((piece) => (
-                <motion.div
-                  key={piece.id}
-                  className="absolute w-[98px] h-[98px] cursor-pointer hover:opacity-80"
-                  initial={false}
-                  animate={{
-                    x: (piece.position % width) * 100,
-                    y: Math.floor(piece.position / width) * 100,
-                  }}
-                  transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                  onClick={() => handlePieceClick(piece)}
-                >
-                  <img
-                    src={piece.src}
-                    alt={`Puzzle piece ${piece.id}`}
-                    className="w-full h-full object-cover"
-                  />
-                </motion.div>
-              ))}
-            </AnimatePresence>
+    <div className="mt-4">
+      <GameTopBar title="PUZLE" accent="lime" onHelp={() => setHelp(true)} onReset={game.shuffle} />
+
+      <GameStage accent="lime">
+        <div className="mx-auto flex max-w-[560px] flex-col gap-4">
+          <Panel tone="deep" innerClassName="p-4 md:p-[18px]">
+            <div className="mb-4 flex flex-wrap items-center justify-between gap-2 border-b border-dashed border-white/10 px-1.5 pb-3.5">
+              <span className="font-ar-display text-[11px] text-ar-lime">▸ Puzle deslizante</span>
+              <span className="font-ar-mono text-[11px] uppercase text-ar-ink-dim">3 × 3</span>
+              {game.isComplete ? (
+                <Tag tone="lime">Resuelto</Tag>
+              ) : (
+                <Tag tone="ghost">En curso</Tag>
+              )}
+            </div>
+
+            {game.imageLoaded ? (
+              <PuzzleBoard
+                pieces={game.pieces}
+                columns={game.columns}
+                isComplete={game.isComplete}
+                onMove={game.movePiece}
+              />
+            ) : (
+              <Skeleton className="mx-auto h-[308px] w-[308px] rounded-[14px]" />
+            )}
+
+            {game.isComplete && (
+              <div className="mt-4 animate-ar-pop rounded-xl border border-ar-lime/50 bg-ar-lime/[.12] p-4 text-center">
+                <p className="m-0 inline-flex items-center gap-2 font-ar text-[15px] font-semibold text-ar-lime">
+                  <Icon.Trophy s={18} />
+                  ¡Puzle completado en {game.moves} movimientos!
+                </p>
+              </div>
+            )}
+          </Panel>
+
+          <div className="grid grid-cols-2 gap-3">
+            <StatCard
+              kicker="Movimientos"
+              value={String(game.moves)}
+              icon={<Icon.Joystick s={16} />}
+              tone="lime"
+            />
+            <StatCard
+              kicker="Piezas"
+              value={`${game.pieces.filter((p) => p.id === p.position).length}/${game.pieces.length}`}
+              sub="En su sitio"
+              icon={<Icon.Grid s={16} />}
+              tone="cyan"
+            />
           </div>
-          {isComplete && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              className="mt-4 text-2xl font-bold text-warning-hover z-10"
-            >
-              Puzzle Completed!
-            </motion.div>
-          )}
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => shufflePieces(pieces)}
-            className="mt-4 bg-secondary hover:bg-secondary-active text-white font-bold py-2 px-4 rounded transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-secondary focus:ring-opacity-50 z-10"
+
+          <Button
+            variant="primary"
+            size="md"
+            full
+            icon={<Icon.Reset s={14} />}
+            onClick={game.shuffle}
+            disabled={!game.imageLoaded}
           >
-            Shuffle
-          </motion.button>
-          <div className="mt-8 flex items-center justify-center space-x-4 z-10">
-            <Puzzle className="w-8 h-8 text-secondary animate-bounce" />
-            <p className="text-lg text-white">Slide the pieces to solve the puzzle!</p>
-            <Puzzle className="w-8 h-8 text-secondary animate-bounce" />
-          </div>
-        </>
-      ) : (
-        <div className="w-64 h-64 rounded-full border-4 border-secondary flex items-center justify-center z-10">
-          <p className="text-white">Loading...</p>
+            Barajar
+          </Button>
         </div>
-      )}
+      </GameStage>
+
+      <Modal open={help} onClose={() => setHelp(false)} kicker="Puzle" title="¿Cómo jugar?">
+        <ul className="m-0 list-disc space-y-2 pl-5">
+          <li>Haz clic en una pieza contigua al hueco para deslizarla.</li>
+          <li>Recompón la imagen original en los menos movimientos posibles.</li>
+          <li>«Barajar» reparte un tablero nuevo, siempre resoluble.</li>
+        </ul>
+      </Modal>
     </div>
   )
 }
