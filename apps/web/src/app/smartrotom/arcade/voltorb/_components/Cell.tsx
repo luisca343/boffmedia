@@ -1,6 +1,8 @@
-import { motion } from 'framer-motion'
-import { Cell } from '../types'
-import Image from 'next/image'
+"use client"
+
+import { cn } from "@/lib/utils"
+import type { Cell } from "../types"
+import VoltorbImage from "./VoltorbIcon"
 
 interface CellProps {
   cell: Cell
@@ -9,76 +11,125 @@ interface CellProps {
   colIndex: number
 }
 
-function CellComponent({ cell, onClick }: CellProps) {
+// The lit face, by multiplier. Full literal classes — `text-${…}` never compiles
+// (SMARTROTOM_V3.md §4).
+const FACE: Record<number, string> = {
+  1: "border-white/20 bg-[radial-gradient(80%_80%_at_50%_30%,rgb(var(--ar-ink-dim)/.2),#06031a)] shadow-[inset_0_0_18px_rgb(var(--ar-ink-dim)/.13),0_2px_0_rgb(0_0_0/.4)] text-ar-ink-dim",
+  2: "border-ar-cyan/35 bg-[radial-gradient(80%_80%_at_50%_30%,rgb(var(--ar-cyan)/.2),#06031a)] shadow-[inset_0_0_18px_rgb(var(--ar-cyan)/.13),0_2px_0_rgb(0_0_0/.4)] text-ar-cyan ar-glow-cyan",
+  3: "border-ar-amber/35 bg-[radial-gradient(80%_80%_at_50%_30%,rgb(var(--ar-amber)/.2),#06031a)] shadow-[inset_0_0_18px_rgb(var(--ar-amber)/.13),0_2px_0_rgb(0_0_0/.4)] text-ar-amber ar-glow-amber",
+}
+
+const BOMB_FACE =
+  "border-ar-magenta/45 bg-[radial-gradient(80%_80%_at_50%_30%,rgb(var(--ar-magenta)/.3),#1a0e3d)] shadow-[inset_0_0_22px_rgb(var(--ar-magenta)/.25),0_2px_0_rgb(0_0_0/.4)]"
+
+const MARK_TONE: Record<number, string> = {
+  0: "text-ar-magenta-2",
+  1: "text-ar-ink-dim",
+  2: "text-ar-cyan",
+  3: "text-ar-amber",
+}
+
+// Memo keys, in the order they sit on the memo pad: the three multipliers, then
+// the bomb (mark 0).
+const MARKS = [1, 2, 3, 0]
+
+function markLabel(cell: Cell) {
+  if (cell.marks.length === 0) return ""
+  const marks = MARKS.filter((m) => cell.marks.includes(m)).map((m) => (m === 0 ? "voltorb" : `x${m}`))
+  return `, marcada: ${marks.join(", ")}`
+}
+
+/**
+ * One tile of the board. Three faces — hidden (hatched, with the memo marks the
+ * player wrote on it), a lit multiplier, or the Voltorb that ends the run — with
+ * a CSS 3D flip between them.
+ */
+function CellComponent({ cell, onClick, rowIndex, colIndex }: CellProps) {
+  const position = `Casilla fila ${rowIndex + 1}, columna ${colIndex + 1}`
   return (
-    <motion.div
-      className="w-20 h-20 rounded-md cursor-pointer perspective-500"
-      initial={false}
-      animate={{ rotateY: cell.revealed ? 180 : 0 }}
-      transition={{ duration: 0.6, type: "spring", stiffness: 300, damping: 20 }}
+    <button
+      type="button"
       onClick={onClick}
-      whileHover={!cell.revealed ? { scale: 1.05 } : {}}
+      aria-label={
+        cell.revealed
+          ? `${position}: ${cell.value === 0 ? "Voltorb" : `x${cell.value}`}`
+          : `${position}, sin voltear${markLabel(cell)}`
+      }
+      className={cn(
+        "relative aspect-square w-full select-none [perspective:600px]",
+        "transition-transform duration-150 motion-reduce:transition-none",
+        !cell.revealed && "hover:-translate-y-0.5 active:translate-y-px",
+      )}
     >
-      <div className="w-full h-full relative preserve-3d">
-        <div
-          className={`absolute w-full h-full flex items-center justify-center backface-hidden rounded-md border-2 ${
-            cell.revealed ? 'hidden' : 'bg-gradient-to-br from-secondary-active to-secondary-active border-secondary/70 hover:shadow-lg hover:shadow-secondary/20'
-          }`}
-        >
-          {/* Card back with arcade style pattern */}
-          <div className="absolute inset-0 bg-[url('/smartrotom/img/apps/arcade/card-pattern.png')] bg-opacity-10 rounded-md"></div>
-          
-          {/* Marks grid */}
-          <div className="grid grid-cols-2 gap-1 p-1 bg-indigo-900/50 rounded-sm">
-            {[0, 1, 2, 3].map(mark => (
-              <div key={mark} className="w-6 h-6 flex items-center justify-center">
-                {cell.marks.includes(mark) && (
-                  mark === 0 ? (
-                    <Image
-                      src="/smartrotom/img/apps/arcade/voltorb.png"
-                      alt="Voltorb"
-                      width={18}
-                      height={18}
-                      className="drop-shadow-md"
-                    />
-                  ) : (
-                    <span className="text-xs font-bold text-white drop-shadow-md">x{mark}</span>
-                  )
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-        
-        {/* Card front */}
-        <div
-          className={`absolute w-full h-full flex items-center justify-center backface-hidden rounded-md border-2 ${
-            cell.revealed
-              ? cell.value === 0
-                ? 'bg-gradient-to-br from-red-600 to-red-700 border-red-500/70'
-                : 'bg-gradient-to-br from-emerald-600 to-emerald-700 border-emerald-500/70'
-              : 'hidden'
-          }`}
-          style={{ transform: 'rotateY(180deg)' }}
-        >
-          {/* Card front content */}
-          {cell.value === 0 ? (
-            <div className="relative">
-              <div className="absolute inset-0 rounded-full bg-red-400 opacity-50 blur-md"></div>
-              <Image
-                src="/smartrotom/img/apps/arcade/voltorb.png"
-                alt="Voltorb"
-                width={40}
-                height={40}
-                className="relative z-10"
-              />
-            </div>
-          ) : (
-            <span className="text-3xl font-bold text-white drop-shadow-md">×{cell.value}</span>
+      <span
+        className={cn(
+          "relative block h-full w-full transition-transform duration-500 [transform-style:preserve-3d]",
+          "motion-reduce:transition-none",
+          cell.revealed && "[transform:rotateY(180deg)]",
+        )}
+      >
+        <span
+          className={cn(
+            "absolute inset-0 grid place-items-center overflow-hidden rounded-[10px] border border-ar-violet/35",
+            "bg-[linear-gradient(180deg,#2a165c_0%,#14082e_100%)]",
+            "shadow-[inset_0_1px_0_rgb(255_255_255/.06),0_2px_0_rgb(0_0_0/.45)]",
+            "[backface-visibility:hidden]",
           )}
-        </div>
-      </div>
-    </motion.div>
+        >
+          <span
+            aria-hidden
+            className="absolute inset-0 bg-[repeating-linear-gradient(45deg,rgb(255_255_255/.025)_0_4px,transparent_4px_8px)]"
+          />
+          {cell.marks.length > 0 ? (
+            <span className="relative grid grid-cols-2 gap-0.5 rounded-md bg-black/40 p-1">
+              {MARKS.map((mark) => (
+                <span key={mark} className="grid h-[18px] w-[18px] place-items-center">
+                  {cell.marks.includes(mark) &&
+                    (mark === 0 ? (
+                      <span
+                        aria-hidden
+                        className="ar-glow-magenta text-[13px] leading-none text-ar-magenta-2"
+                      >
+                        ⚡
+                      </span>
+                    ) : (
+                      <span
+                        aria-hidden
+                        className={cn(
+                          "font-ar-mono text-[11px] font-bold leading-none",
+                          MARK_TONE[mark],
+                        )}
+                      >
+                        {mark}
+                      </span>
+                    ))}
+                </span>
+              ))}
+            </span>
+          ) : (
+            <span aria-hidden className="relative font-ar-display text-[10px] text-ar-ink-muted">
+              ?
+            </span>
+          )}
+        </span>
+
+        <span
+          className={cn(
+            "absolute inset-0 grid place-items-center rounded-[10px] border",
+            "[backface-visibility:hidden] [transform:rotateY(180deg)]",
+            cell.value === 0 ? BOMB_FACE : FACE[cell.value],
+          )}
+        >
+          {cell.value === 0 ? (
+            <VoltorbImage size="lg" glow />
+          ) : (
+            <span aria-hidden className="font-ar-display text-[18px] sm:text-[22px]">
+              {cell.value}
+            </span>
+          )}
+        </span>
+      </span>
+    </button>
   )
 }
 
