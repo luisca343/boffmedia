@@ -2,6 +2,7 @@
 
 import type { ArcadeStreak } from "@boffmedia/shared"
 import { useBoffSession } from "@/services/useBoffSession"
+import { useRotomUsername } from "@/components/smartrotom/behavior/useRotomUuid"
 import { useCountdown } from "../_hooks/useCountdown"
 import { Icon, ProgressBar, Ring, Skeleton, Tag } from "./ui"
 
@@ -26,7 +27,7 @@ export function ArcadeHud({ streak, boxesOwned, loading, syncing }: ArcadeHudPro
   const { session } = useBoffSession()
   const resetIn = useCountdown(streak?.nextResetTime)
 
-  const name = session?.user?.smartRotomUser?.username ?? session?.user?.username ?? "Entrenador"
+  const name = useRotomUsername() ?? session?.user?.username ?? "Entrenador"
   const currentDay = streak?.currentDay ?? 0
   const totalDays = streak?.totalDays ?? 7
 

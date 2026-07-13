@@ -50,13 +50,13 @@ export type Paged<T> = { items: T[]; total: number; page: number; pageSize: numb
 /**
  * Attached wherever a uuid is shown as a person.
  *
- * TODO(P9): shadows shared `PersonRefEntity`, which has `username?: string | null` — the real
- * enrichment (`toPersonRef` in `apps/api/.../person-ref.entity.ts`) sends `username: null` for any
- * uuid it can't resolve a name for. This type claims `username` is always a string, and ~90 call
- * sites across ~30 files (every `PlayerLink`, `OficialCard`, `CiudadanoCard`, `AuditoriaBoard`…)
- * read `.username` assuming that. Drift is real but aligning it cascades far past a mechanical
- * fix — left unlinked; if a name genuinely fails to resolve today it renders blank rather than a
- * fallback, it does not crash.
+ * Shadows shared `PersonRefEntity`, whose `username` may be missing/null — the real enrichment
+ * (`toPersonRef` in `apps/api/.../person-ref.entity.ts`) sends `username: null` for any uuid it
+ * can't resolve a name for. Rather than pushing that null through ~90 call sites across ~30
+ * files (every `PlayerLink`, `OficialCard`, `CiudadanoCard`, `AuditoriaBoard`…), it is normalized
+ * at the query boundary: every `_hooks/queries.ts` read and mutation runs the wire payload through
+ * `_utils/personRef.ts`'s `toPlayerRef`/`normalize*` helpers, which coalesce a missing username to
+ * "—" before the data ever reaches a component. `username` stays a plain `string` here.
  */
 export type PlayerRef = { uuid: Uuid; username: string }
 
@@ -325,15 +325,11 @@ export interface MegafoniaEntry extends Omit<GobiernoMegafoniaEntity, "by"> {
 }
 
 /**
- * TODO(P9): shadows shared `CartelDestinationDto`, whose `dist` is `number` — this type has
- * always said `string`. In practice this is inert: the one read site (`HighwaySign.tsx`) renders
- * it straight into a template literal and the one write site (`admin/senalizacion/page.tsx`)
- * builds its own `CartelDestinationInput` (string, bound to a live `<Field>`) rather than this
- * type. Aligning `dist` to `number` here would require splitting that component's edit-time
- * string state from its read-time wire value, which is a bigger change than this pass — left
- * unlinked.
+ * Matches shared `CartelDestinationDto` (`dist` is a number on the wire). Edit-time string
+ * state lives in `HighwaySign.tsx`'s `CartelDestinationInput` and is converted on save in
+ * `admin/senalizacion/page.tsx`.
  */
-export type CartelDestino = { dest: string; dist: string; dir: string }
+export type CartelDestino = { dest: string; dist: number; dir: string }
 
 export interface Cartel extends Omit<GobiernoCartelEntity, "destinations" | "createdBy"> {
   destinations: CartelDestino[]

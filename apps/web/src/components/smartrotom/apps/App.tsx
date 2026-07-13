@@ -1,5 +1,6 @@
 "use client"
 import Image from "next/image"
+import { useState } from "react"
 import { motion } from "framer-motion"
 import { CSS } from "@dnd-kit/utilities"
 import { InternalLink } from "../../ui/navigation/Link"
@@ -14,17 +15,26 @@ interface AppIconProps {
 function AppIcon({ app, size, withLink = true }: AppIconProps) {
   const estilos = size === "small" ? "w-16 h-16 sm:w-20 sm:h-20" : "w-24 h-24 sm:w-36 sm:h-36"
   const textSize = size === "small" ? "text-xs sm:text-sm" : "text-base sm:text-lg lg:text-xl"
+  // A missing icon file degrades to a letter tile instead of a broken image.
+  const [failed, setFailed] = useState(false)
 
   const icon = (
     <>
       <div className={estilos}>
-        <Image
-          src={`/smartrotom/img/apps/${app.url}.webp`}
-          alt={app.name}
-          width={150}
-          height={150}
-          className="w-full h-full"
-        />
+        {failed ? (
+          <div className="flex h-full w-full items-center justify-center rounded-3xl bg-white/25 text-4xl font-bold text-ink text-shadow-border2">
+            {app.name.charAt(0).toUpperCase()}
+          </div>
+        ) : (
+          <Image
+            src={`/smartrotom/img/apps/${app.url}.webp`}
+            alt={app.name}
+            width={150}
+            height={150}
+            className="w-full h-full"
+            onError={() => setFailed(true)}
+          />
+        )}
       </div>
       <p className={`text-ink text-center ${textSize} mt-2 text-shadow-border2`}>
         {app.name}
