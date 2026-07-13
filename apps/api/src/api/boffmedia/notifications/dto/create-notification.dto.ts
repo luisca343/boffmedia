@@ -32,7 +32,9 @@ export class CreateNotificationDto {
   @MaxLength(255)
   title: string;
 
-  @ApiPropertyOptional({ example: 'La plataforma estará en mantenimiento a las 22:00.' })
+  @ApiPropertyOptional({
+    example: 'La plataforma estará en mantenimiento a las 22:00.',
+  })
   @IsOptional()
   @IsString()
   body?: string;

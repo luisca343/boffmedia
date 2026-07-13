@@ -113,10 +113,7 @@ export class CommunityService {
       )
       .innerJoin(
         boffMediaParticipants,
-        eq(
-          boffMediaParticipants.id,
-          boffMediaEventParticipants.participantId,
-        ),
+        eq(boffMediaParticipants.id, boffMediaEventParticipants.participantId),
       )
       .orderBy(desc(boffMediaEventParticipants.createdAt))
       .limit(limit);

@@ -449,7 +449,9 @@ export class BoffMediaUsersController {
   @Post(':id/password')
   @UseGuards(JwtAuthGuard, OwnerOrAdminGuard)
   @ApiBearerAuth('JWT')
-  @ApiOperation({ summary: 'Change a user password (verifies current password)' })
+  @ApiOperation({
+    summary: 'Change a user password (verifies current password)',
+  })
   @ApiResponse({ status: 200, description: 'Password changed successfully' })
   @ApiResponse({ status: 401, description: 'Current password is incorrect' })
   @ApiBody({ type: ChangePasswordDto })
@@ -491,7 +493,8 @@ export class BoffMediaUsersController {
   @UseGuards(JwtAuthGuard, OwnerOrAdminGuard)
   @ApiBearerAuth('JWT')
   @ApiOperation({
-    summary: 'Link a verified Discord id to a user (session-preserving linking)',
+    summary:
+      'Link a verified Discord id to a user (session-preserving linking)',
   })
   @ApiParam({ name: 'id', type: 'number', description: 'User ID' })
   @ApiResponse({

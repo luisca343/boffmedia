@@ -465,7 +465,9 @@ export class LeaderboardsService {
       completedAt: Date;
     }[]
   > {
-    const whereConditions = [eq(boffMediaParticipantProgress.isCompleted, true)];
+    const whereConditions = [
+      eq(boffMediaParticipantProgress.isCompleted, true),
+    ];
 
     if (eventId) {
       whereConditions.push(eq(boffMediaAchievements.eventId, eventId));

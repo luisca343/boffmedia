@@ -23,7 +23,10 @@ export class ForumCategory {
   @ApiProperty({ example: 28, description: 'Display hue (0-360)' })
   hue: number;
 
-  @ApiProperty({ example: false, description: 'Whether the category is locked' })
+  @ApiProperty({
+    example: false,
+    description: 'Whether the category is locked',
+  })
   locked: boolean;
 
   @ApiProperty({ example: 12, description: 'Non-deleted thread count' })

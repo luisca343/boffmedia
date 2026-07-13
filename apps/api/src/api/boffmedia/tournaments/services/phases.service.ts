@@ -90,7 +90,10 @@ export class PhasesService {
         'endDate',
       ] as (keyof UpdatePhaseDto)[]
     ).forEach(set);
-    if ((patch.format ?? ph.format) === 'groups' && (patch.carryStandings ?? ph.carryStandings)) {
+    if (
+      (patch.format ?? ph.format) === 'groups' &&
+      (patch.carryStandings ?? ph.carryStandings)
+    ) {
       throw new BadRequestException(
         'A groups phase cannot carry standings — records are per group',
       );

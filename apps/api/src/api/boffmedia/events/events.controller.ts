@@ -66,7 +66,8 @@ export class EventsController {
   @OptionalAuth()
   @Get()
   @ApiOperation({
-    summary: 'Get all events (optional status/gameId/type filters + pagination)',
+    summary:
+      'Get all events (optional status/gameId/type filters + pagination)',
   })
   @ApiResponse({
     status: HttpStatus.OK,
@@ -360,7 +361,10 @@ export class EventsController {
   ): Promise<Team[]> {
     const includePrivate =
       req.user?.roles?.includes(USER_ROLES.BOFF_ADMIN) ?? false;
-    return await this.eventsFacadeService.getEventTeams(eventId, includePrivate);
+    return await this.eventsFacadeService.getEventTeams(
+      eventId,
+      includePrivate,
+    );
   }
 
   @Public()
@@ -579,7 +583,11 @@ export class EventsController {
   @Public()
   @Get('users/:userId/trophies')
   @ApiOperation({ summary: "Get a user's trophy case (earned + locked)" })
-  @ApiParam({ name: 'userId', type: 'number', description: 'BoffMedia user ID' })
+  @ApiParam({
+    name: 'userId',
+    type: 'number',
+    description: 'BoffMedia user ID',
+  })
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Trophy case retrieved successfully.',
@@ -592,7 +600,11 @@ export class EventsController {
   @Public()
   @Get('users/:userId/activity')
   @ApiOperation({ summary: "Get a user's activity timeline" })
-  @ApiParam({ name: 'userId', type: 'number', description: 'BoffMedia user ID' })
+  @ApiParam({
+    name: 'userId',
+    type: 'number',
+    description: 'BoffMedia user ID',
+  })
   @ApiQuery({ name: 'limit', required: false, type: Number })
   @ApiResponse({
     status: HttpStatus.OK,

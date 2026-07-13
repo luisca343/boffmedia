@@ -60,7 +60,10 @@ export class EventsFacadeService {
     id: number,
     includePrivate = false,
   ): Promise<Event & { childEvents?: Event[] }> {
-    return this.eventsService.getEventById(id, includePrivate) as unknown as Event & {
+    return this.eventsService.getEventById(
+      id,
+      includePrivate,
+    ) as unknown as Event & {
       childEvents?: Event[];
     };
   }

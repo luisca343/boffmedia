@@ -24,7 +24,10 @@ export class ActivityItemEntity {
   @ApiProperty({ example: 'Ash', description: 'Actor nickname' })
   actor: string;
 
-  @ApiProperty({ example: 'Campeón regional', description: 'Achievement or event name' })
+  @ApiProperty({
+    example: 'Campeón regional',
+    description: 'Achievement or event name',
+  })
   name: string;
 
   @ApiProperty({ example: '/icons/trophy.png' })

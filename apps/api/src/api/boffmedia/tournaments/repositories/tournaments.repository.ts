@@ -91,10 +91,7 @@ export class TournamentsRepository {
         boffMediaGames,
         eq(boffMediaTournaments.gameId, boffMediaGames.id),
       )
-      .leftJoin(
-        champ,
-        eq(boffMediaTournaments.championParticipantId, champ.id),
-      )
+      .leftJoin(champ, eq(boffMediaTournaments.championParticipantId, champ.id))
       .where(
         and(
           eq(boffMediaTournaments.slug, slug),
@@ -102,7 +99,11 @@ export class TournamentsRepository {
         ),
       );
     if (!row) return undefined;
-    return { ...row.t, gameTitle: row.gameTitle, championName: row.championName };
+    return {
+      ...row.t,
+      gameTitle: row.gameTitle,
+      championName: row.championName,
+    };
   }
 
   async findByIdRow(id: number): Promise<TournamentListRow | undefined> {
@@ -126,7 +127,11 @@ export class TournamentsRepository {
         ),
       );
     if (!row) return undefined;
-    return { ...row.t, gameTitle: row.gameTitle, championName: row.championName };
+    return {
+      ...row.t,
+      gameTitle: row.gameTitle,
+      championName: row.championName,
+    };
   }
 
   async slugExists(slug: string): Promise<boolean> {
@@ -147,11 +152,14 @@ export class TournamentsRepository {
   }): Promise<TournamentListRow[]> {
     const champ = alias(boffMediaTournamentParticipants, 'champ');
     const where = [isNull(boffMediaTournaments.deletedAt)];
-    if (filters.status) where.push(eq(boffMediaTournaments.status, filters.status));
-    if (filters.format) where.push(eq(boffMediaTournaments.format, filters.format));
+    if (filters.status)
+      where.push(eq(boffMediaTournaments.status, filters.status));
+    if (filters.format)
+      where.push(eq(boffMediaTournaments.format, filters.format));
     if (filters.gameId != null)
       where.push(eq(boffMediaTournaments.gameId, filters.gameId));
-    if (filters.q) where.push(like(boffMediaTournaments.name, `%${filters.q}%`));
+    if (filters.q)
+      where.push(like(boffMediaTournaments.name, `%${filters.q}%`));
 
     const rows = await this.db
       .select({
@@ -187,7 +195,9 @@ export class TournamentsRepository {
         count: sql<number>`COUNT(*)`,
       })
       .from(boffMediaTournamentParticipants)
-      .where(inArray(boffMediaTournamentParticipants.tournamentId, tournamentIds))
+      .where(
+        inArray(boffMediaTournamentParticipants.tournamentId, tournamentIds),
+      )
       .groupBy(boffMediaTournamentParticipants.tournamentId);
     return new Map(rows.map((r) => [r.tournamentId, Number(r.count)]));
   }
@@ -639,9 +649,7 @@ export class TournamentsRepository {
       .where(eq(boffMediaTournamentPhaseEntrants.phaseId, phaseId));
   }
 
-  async listPhaseEntrants(
-    phaseId: number,
-  ): Promise<TournamentPhaseEntrant[]> {
+  async listPhaseEntrants(phaseId: number): Promise<TournamentPhaseEntrant[]> {
     return this.db
       .select()
       .from(boffMediaTournamentPhaseEntrants)

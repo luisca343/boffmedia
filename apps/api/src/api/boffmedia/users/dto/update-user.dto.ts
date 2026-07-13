@@ -11,7 +11,10 @@ import { IsEmail, IsOptional, IsString, Length } from 'class-validator';
  * authenticated, owner-checked endpoints.
  */
 export class UpdateUserDto {
-  @ApiPropertyOptional({ description: 'Username for the user', example: 'johndoe' })
+  @ApiPropertyOptional({
+    description: 'Username for the user',
+    example: 'johndoe',
+  })
   @IsOptional()
   @IsString()
   @Length(3, 32)
