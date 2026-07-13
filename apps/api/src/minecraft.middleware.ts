@@ -4,6 +4,10 @@ import { LoggingUtil } from './_utils/LoggingUtils';
 import { Logger } from 'nestjs-pino';
 import { env } from '@/config/env';
 
+// NOT a security boundary. The required `server` value is NEXT_PUBLIC_MC_WORLD,
+// which ships in the client bundle — anyone reading the JS can extract it. This
+// is a tripwire against casual/accidental cross-environment writes; real
+// authorization on /smartrotom routes is the JWT + roles guards.
 @Injectable()
 export class MinecraftMiddleware implements NestMiddleware {
   constructor(private readonly logger: Logger) {}
