@@ -1,0 +1,237 @@
+"use client";
+
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMemo } from "react";
+import type {
+  ClapResponse,
+  CreateNewsDto,
+  EditorialBoardMember,
+  News,
+  NewsComment,
+  NewsIssue,
+  NewsResponse,
+  UpdateNewsDto,
+} from "@boffmedia/shared";
+
+import { DocumentsService } from "@/services/api/smartrotom/documentsService";
+import { useBoffSession } from "@/services/useBoffSession";
+
+import { toArticle, type FtArticle } from "../_utils/article";
+
+/**
+ * `boffAPI` has two failure modes: network errors throw, HTTP errors resolve to
+ * `{ success: false }`. Reading `.data` off an unchecked response is the
+ * silent-failure pattern the audit flagged, so every call funnels through here
+ * and turns a failed envelope into a thrown error React Query can see (§8).
+ */
+async function unwrap<T>(
+  call: Promise<{ success: boolean; data?: T; message?: string }>,
+): Promise<T> {
+  const res = await call;
+  if (!res.success || res.data === undefined) {
+    throw new Error(res.message || "La redacción no responde");
+  }
+  return res.data;
+}
+
+export const furretKeys = {
+  all: () => ["furret", "news"] as const,
+  article: (id: number) => ["furret", "news", id] as const,
+  comments: (id: number) => ["furret", "news", id, "comments"] as const,
+  board: () => ["furret", "board"] as const,
+  issues: () => ["furret", "issues"] as const,
+};
+
+/**
+ * The whole issue, in one request. Every screen reads from this: the API has no
+ * pagination and the newsroom holds tens of rows, not thousands, so slicing it
+ * client-side is cheaper than six endpoints — and it means the home, browse and
+ * article screens all share one cache entry.
+ */
+export function useNewsroom() {
+  const query = useQuery({
+    queryKey: furretKeys.all(),
+    queryFn: () => unwrap<NewsResponse>(DocumentsService.getAllNews()),
+  });
+
+  const articles = useMemo<FtArticle[]>(
+    () => (query.data?.news ?? []).map(toArticle),
+    [query.data],
+  );
+
+  // The API's `featured` is the cover. It can be absent (nothing featured yet),
+  // in which case the newest published article carries the cover.
+  const cover = useMemo<FtArticle | null>(() => {
+    const flagged = query.data?.featured;
+    if (flagged) return toArticle(flagged);
+    return articles.find((a) => a.published) ?? null;
+  }, [query.data, articles]);
+
+  const published = useMemo(
+    () => articles.filter((a) => a.published && a.id !== cover?.id),
+    [articles, cover],
+  );
+
+  return { ...query, articles, cover, published };
+}
+
+/** A single article. Seeded from the newsroom cache so a click paints instantly. */
+export function useArticle(id: number) {
+  const client = useQueryClient();
+
+  return useQuery({
+    queryKey: furretKeys.article(id),
+    queryFn: () => unwrap<News>(DocumentsService.getNewsById(id)),
+    enabled: Number.isFinite(id) && id > 0,
+    select: toArticle,
+    initialData: () => {
+      const cached = client.getQueryData<NewsResponse>(furretKeys.all());
+      return cached?.news.find((n) => n.id === id);
+    },
+  });
+}
+
+export function useComments(newsId: number) {
+  return useQuery({
+    queryKey: furretKeys.comments(newsId),
+    queryFn: () => unwrap<NewsComment[]>(DocumentsService.getNewsComments(newsId)),
+    enabled: Number.isFinite(newsId) && newsId > 0,
+  });
+}
+
+/** The masthead — derived server-side by grouping news on (author, authorRole). */
+export function useEditorialBoard() {
+  return useQuery({
+    queryKey: furretKeys.board(),
+    queryFn: () =>
+      unwrap<EditorialBoardMember[]>(DocumentsService.getEditorialBoard()),
+    staleTime: 10 * 60_000,
+  });
+}
+
+/** The back-issue archive — derived server-side by grouping news on `issue`. */
+export function useIssues() {
+  return useQuery({
+    queryKey: furretKeys.issues(),
+    queryFn: () => unwrap<NewsIssue[]>(DocumentsService.getNewsIssues()),
+    staleTime: 10 * 60_000,
+  });
+}
+
+export function usePostComment(newsId: number) {
+  const client = useQueryClient();
+  const { session } = useBoffSession();
+  const uuid = session?.user?.smartRotomUser?.uuid ?? null;
+
+  const mutation = useMutation({
+    mutationFn: (body: string) =>
+      unwrap<NewsComment>(
+        DocumentsService.createNewsComment(newsId, { uuid: uuid!, body }),
+      ),
+    onSuccess: () => {
+      void client.invalidateQueries({ queryKey: furretKeys.comments(newsId) });
+    },
+  });
+
+  // Commenting is gated on being signed in — the comment is keyed by uuid.
+  return { ...mutation, canComment: Boolean(uuid) };
+}
+
+export function useDeleteComment(newsId: number) {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: (commentId: number) =>
+      unwrap(DocumentsService.deleteNewsComment(commentId)),
+    onSuccess: () => {
+      void client.invalidateQueries({ queryKey: furretKeys.comments(newsId) });
+    },
+  });
+}
+
+/**
+ * Applause. Optimistic: the counter is a vanity figure, so a reader should see
+ * their clap land immediately rather than wait for a round trip — and a failure
+ * simply rolls the number back.
+ */
+export function useClap(newsId: number) {
+  const client = useQueryClient();
+
+  return useMutation({
+    mutationFn: () => unwrap<ClapResponse>(DocumentsService.clapNews(newsId)),
+    onMutate: async () => {
+      await client.cancelQueries({ queryKey: furretKeys.article(newsId) });
+      const previous = client.getQueryData<News>(furretKeys.article(newsId));
+      if (previous) {
+        client.setQueryData<News>(furretKeys.article(newsId), {
+          ...previous,
+          claps: (previous.claps ?? 0) + 1,
+        });
+      }
+      return { previous };
+    },
+    onError: (_err, _vars, context) => {
+      if (context?.previous) {
+        client.setQueryData(furretKeys.article(newsId), context.previous);
+      }
+    },
+    onSettled: () => {
+      void client.invalidateQueries({ queryKey: furretKeys.article(newsId) });
+    },
+  });
+}
+
+export function useSubscribeNewsletter() {
+  return useMutation({
+    mutationFn: (email: string) =>
+      unwrap(DocumentsService.subscribeNewsletter({ email })),
+  });
+}
+
+/**
+ * Publish/feature flags. The API takes the whole set at once (the full list of
+ * published ids + the single featured id), so a toggle sends the resulting
+ * state, not a delta.
+ */
+export function useUpdateNewsStatus() {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: (data: { published: number[]; featured: number }) =>
+      unwrap(DocumentsService.updateNewsStatus(data)),
+    onSuccess: () => {
+      void client.invalidateQueries({ queryKey: furretKeys.all() });
+    },
+  });
+}
+
+/** Create/update/delete are token-authed (they are not rotom* calls). */
+export function useSaveArticle() {
+  const client = useQueryClient();
+  const { session } = useBoffSession();
+  const token = session?.user?.accessToken ?? "";
+
+  return useMutation({
+    mutationFn: ({ id, data }: { id: number | null; data: UpdateNewsDto }) =>
+      unwrap<News>(
+        id === null
+          ? DocumentsService.createNews(data as CreateNewsDto, token)
+          : DocumentsService.updateNews(id, data, token),
+      ),
+    onSuccess: (saved) => {
+      void client.invalidateQueries({ queryKey: furretKeys.all() });
+      void client.invalidateQueries({ queryKey: furretKeys.article(saved.id) });
+    },
+  });
+}
+
+export function useDeleteArticle() {
+  const client = useQueryClient();
+  const { session } = useBoffSession();
+  const token = session?.user?.accessToken ?? "";
+
+  return useMutation({
+    mutationFn: (id: number) => unwrap(DocumentsService.deleteNews(id, token)),
+    onSuccess: () => {
+      void client.invalidateQueries({ queryKey: furretKeys.all() });
+    },
+  });
+}
