@@ -1,0 +1,63 @@
+"use client"
+
+import { useMemo } from "react"
+import { useBoard } from "../_hooks/useBoard"
+import { buildSatchel } from "../_utils/items"
+import { Divider, EmptyBoard, Label } from "../_components/ui"
+import { BoardError, BoardLoading } from "../_components/BoardStatus"
+import { SatchelSlot } from "../_components/SatchelSlot"
+
+/**
+ * La Mochila — every reward any quest hands out, aggregated into one ledger.
+ * No rarity tally here: the API has no rarity, so the only split that means
+ * anything is reclaimed vs. still out there (SMARTROTOM_V3.md brief, §"defer
+ * non-API fields").
+ */
+export default function MochilaPage() {
+  const { quests, isLoading, error } = useBoard()
+  const satchel = useMemo(() => buildSatchel(quests), [quests])
+  const ownedItems = useMemo(() => satchel.filter((item) => item.owned), [satchel])
+  const lockedItems = useMemo(() => satchel.filter((item) => !item.owned), [satchel])
+
+  if (isLoading) return <BoardLoading>Reuniendo el inventario…</BoardLoading>
+  if (error) return <BoardError message={error} />
+
+  return (
+    <div className="flex min-h-full flex-col">
+      <div className="mb-6 mt-2.5 text-center">
+        <Label className="text-ms-gold-1">Pertenencias</Label>
+        <h1 className="mb-1.5 mt-1 font-ms-display text-[38px] text-ms-paper-1 [text-shadow:0_2px_12px_rgba(0,0,0,.6)]">
+          La Mochila
+        </h1>
+        <div className="font-ms text-sm italic text-ms-paper-3">
+          {ownedItems.length} tesoros reclamados · {lockedItems.length} por ganar
+        </div>
+        <div className="mt-3.5">
+          <Divider glyph="❖" className="text-ms-gold-2" />
+        </div>
+      </div>
+
+      <Label className="mb-2.5 text-ms-gold-1">◆ En la mochila</Label>
+      <div className="mb-[30px] grid grid-cols-[repeat(auto-fill,minmax(96px,1fr))] gap-3">
+        {ownedItems.length === 0 ? (
+          <p className="col-span-full py-8 text-center font-ms italic text-ms-paper-3">
+            Tu mochila está vacía. Completa misiones para llenarla.
+          </p>
+        ) : (
+          ownedItems.map((item) => <SatchelSlot key={item.item} item={item} />)
+        )}
+      </div>
+
+      <Label className="mb-2.5 text-ms-paper-3">◇ Botín por reclamar</Label>
+      <div className="grid grid-cols-[repeat(auto-fill,minmax(96px,1fr))] gap-3">
+        {lockedItems.length === 0 ? (
+          <p className="col-span-full py-8 text-center font-ms italic text-ms-paper-3">
+            Has reclamado todo el botín disponible.
+          </p>
+        ) : (
+          lockedItems.map((item) => <SatchelSlot key={item.item} item={item} />)
+        )}
+      </div>
+    </div>
+  )
+}
