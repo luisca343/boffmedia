@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 
-import { FurretQueryProvider } from "./_components/FurretQueryProvider";
+import { AppQueryProvider as FurretQueryProvider } from "@/components/smartrotom/behavior/QueryProvider";
 import { FurretNav } from "./_components/FurretNav";
 import { FurretFooter } from "./_components/FurretFooter";
 import { ToastHost } from "./_components/ui";

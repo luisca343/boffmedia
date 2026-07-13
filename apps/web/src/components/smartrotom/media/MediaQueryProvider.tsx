@@ -1,29 +1,9 @@
 "use client"
 
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
-import { useState, type ReactNode } from "react"
-
-/**
- * Scoped TanStack Query client for the media apps (Mewtube + Mewtwitch). Kept
- * local to these routes so adopting react-query here doesn't touch the rest of
- * SmartRotom's still-imperative data layer.
- */
-export function MediaQueryProvider({ children }: { children: ReactNode }) {
-  const [client] = useState(
-    () =>
-      new QueryClient({
-        defaultOptions: {
-          queries: {
-            staleTime: 60_000,
-            gcTime: 5 * 60_000,
-            refetchOnWindowFocus: false,
-            retry: 1,
-          },
-        },
-      }),
-  )
-  return <QueryClientProvider client={client}>{children}</QueryClientProvider>
-}
+// The media apps (Mewtube + Mewtwitch) used the same defaults as every other
+// SmartRotom app's scoped query client, just under a local name — this re-exports
+// the shared one so `mewtube`/`mewtwitch`'s layout imports don't have to change.
+export { AppQueryProvider as MediaQueryProvider } from "@/components/smartrotom/behavior/QueryProvider"
 
 /** fetch that throws uniformly on a non-2xx (so react-query sees the error). */
 export async function mediaFetch<T>(url: string, init?: RequestInit): Promise<T> {

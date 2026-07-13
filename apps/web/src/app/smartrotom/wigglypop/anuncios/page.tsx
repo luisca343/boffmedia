@@ -269,7 +269,7 @@ export default function SellerDashboardPage() {
                             onClick={() =>
                               update.mutate(
                                 { id: L.id, patch: { status: "pausado" as WpListingStatus } },
-                                { onSuccess: () => toast("Anuncio pausado") },
+                                { onSuccess: () => toast("Anuncio pausado", "info") },
                               )
                             }
                           >

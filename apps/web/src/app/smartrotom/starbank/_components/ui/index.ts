@@ -14,4 +14,4 @@ export { Seg, type SegOption } from "./Seg";
 export { Stepper } from "./Stepper";
 export { Sheet } from "./Sheet";
 export { Skeleton } from "./Skeleton";
-export { ToastHost, useToast } from "./Toast";
+export { ToastHost, toast } from "./Toast";

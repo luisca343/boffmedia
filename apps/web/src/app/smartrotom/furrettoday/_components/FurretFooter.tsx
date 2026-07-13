@@ -35,7 +35,7 @@ export function FurretFooter() {
         setEmail("");
         toast("Te hemos guardado en la lista. Nos vemos el viernes.");
       },
-      onError: () => toast("No hemos podido suscribirte. Inténtalo otra vez.", "warn"),
+      onError: () => toast.error("No hemos podido suscribirte. Inténtalo otra vez."),
     });
   }
 

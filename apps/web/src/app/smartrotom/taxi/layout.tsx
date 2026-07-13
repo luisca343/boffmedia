@@ -2,7 +2,7 @@
 
 import type { ReactNode } from "react"
 import { useRotomMode } from "@/components/smartrotom/theme/useRotomTheme"
-import { TaxiQueryProvider } from "./_components/TaxiQueryProvider"
+import { AppQueryProvider as TaxiQueryProvider } from "@/components/smartrotom/behavior/QueryProvider"
 
 /**
  * The taxi's scope root (SMARTROTOM_V3 §2). Every `tx-*` token resolves off `.tx-app`,

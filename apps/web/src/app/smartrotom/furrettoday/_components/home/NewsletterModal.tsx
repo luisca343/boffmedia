@@ -30,7 +30,7 @@ export function NewsletterModal({
     e.preventDefault();
     mutate(email, {
       onSuccess: () => setSent(true),
-      onError: () => toast("No hemos podido apuntarte. Prueba de nuevo.", "warn"),
+      onError: () => toast.error("No hemos podido apuntarte. Prueba de nuevo."),
     });
   }
 

@@ -4,43 +4,21 @@
 
 import { useEffect, useState } from "react"
 import { createPortal } from "react-dom"
+import { toast, useToasts } from "@/components/smartrotom/behavior/toast"
 import { ThemedLayer } from "./ThemedLayer"
 
+export { toast }
+
 /**
- * Fired imperatively from anywhere (`toast("Sellado")`) through a DOM CustomEvent rather
- * than a store, so any handler can raise one without being inside a provider.
- *
- * The host portals to `document.body` and is therefore wrapped in `ThemedLayer` — outside
- * `.ps-app` every `ps-*` var is undefined and the card renders unthemed (§2).
+ * The card only ever had one visual style, regardless of kind, so `t.kind` is not
+ * consulted here — every call site (all of them plain single-argument `toast(msg)`)
+ * renders pixel-identical to before.
  */
-const EVENT = "ps-toast"
-
-interface ToastMsg {
-  id: string
-  msg: string
-}
-
-export function toast(msg: string, duration = 2600) {
-  window.dispatchEvent(new CustomEvent(EVENT, { detail: { msg, duration } }))
-}
-
 export function ToastHost() {
-  const [toasts, setToasts] = useState<ToastMsg[]>([])
+  const toasts = useToasts()
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => setMounted(true), [])
-
-  useEffect(() => {
-    const onToast = (e: Event) => {
-      const { msg, duration } = (e as CustomEvent).detail as { msg: string; duration: number }
-      const id = Math.random().toString(36).slice(2)
-      setToasts((t) => [...t, { id, msg }])
-      setTimeout(() => setToasts((t) => t.filter((x) => x.id !== id)), duration)
-    }
-    window.addEventListener(EVENT, onToast)
-    return () => window.removeEventListener(EVENT, onToast)
-  }, [])
-
   if (!mounted) return null
 
   return createPortal(

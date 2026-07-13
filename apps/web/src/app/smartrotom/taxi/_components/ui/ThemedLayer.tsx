@@ -1,19 +1,15 @@
 "use client"
 
 import type { ReactNode } from "react"
-import { useRotomMode } from "@/components/smartrotom/theme/useRotomTheme"
+import { ThemedLayer as SharedThemedLayer } from "@/components/smartrotom/behavior/ThemedLayer"
+
+/** The taxi's scope-root classes — reused by the ThemedLayer below and by Modal's skin. */
+export const TX_SCOPE = "tx-app font-tx text-tx-txt"
 
 /**
  * Wraps portaled content — which escapes the `.tx-app` root and would otherwise render
- * with every `tx-*` var unresolved — in a themed layer (SMARTROTOM_V3 §2). The same
- * trick Notas and ChatApp use: `display: contents` re-applies the scope without adding
- * a box, so custom properties inherit but layout is untouched.
+ * with every `tx-*` var unresolved — in a themed layer (SMARTROTOM_V3 §2).
  */
 export function ThemedLayer({ children }: { children: ReactNode }) {
-  const mode = useRotomMode()
-  return (
-    <div className="tx-app font-tx text-tx-txt" data-theme={mode} style={{ display: "contents" }}>
-      {children}
-    </div>
-  )
+  return <SharedThemedLayer scope={TX_SCOPE}>{children}</SharedThemedLayer>
 }

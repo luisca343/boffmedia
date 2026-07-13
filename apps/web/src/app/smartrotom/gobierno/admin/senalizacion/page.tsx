@@ -54,10 +54,10 @@ export default function SenalizacionPage() {
     try {
       await navigator.clipboard.writeText(link)
       setCopiedKey(key)
-      toast("Enlace copiado", "ok", "check")
+      toast.success("Enlace copiado")
       setTimeout(() => setCopiedKey((k) => (k === key ? null : k)), 1800)
     } catch {
-      toast("No se pudo copiar el enlace", "danger", "alert")
+      toast.error("No se pudo copiar el enlace")
     }
   }
 

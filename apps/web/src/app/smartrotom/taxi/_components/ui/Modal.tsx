@@ -1,15 +1,15 @@
 "use client"
 
-import { useEffect, type ReactNode } from "react"
-import { createPortal } from "react-dom"
+import type { ReactNode } from "react"
 import { cn } from "@/lib/utils"
+import { ModalShell } from "@/components/smartrotom/behavior/ModalShell"
 import { Icon, type IconName } from "./Icon"
-import { ThemedLayer } from "./ThemedLayer"
+import { TX_SCOPE } from "./ThemedLayer"
 
 /**
  * The taxi's one overlay shape: a bottom sheet on a phone, a centred dialog from 700px.
- * Portaled to the body (so no ancestor's `overflow` or stacking context can clip it),
- * which means it must carry its own theme — hence `ThemedLayer`.
+ * A skin over the shared `ModalShell` — portal, Escape, scrim dismiss, scroll lock,
+ * focus trap/restore and dialog semantics all come from there (SMARTROTOM_V3 §2).
  */
 export function Modal({
   onClose,
@@ -22,46 +22,25 @@ export function Modal({
   className?: string
   children: ReactNode
 }) {
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose()
-    }
-    window.addEventListener("keydown", onKey)
-    return () => window.removeEventListener("keydown", onKey)
-  }, [onClose])
-
-  if (typeof document === "undefined") return null
-
-  return createPortal(
-    <ThemedLayer>
-      <div
-        className={cn(
-          "fixed inset-0 z-[60] flex items-end justify-center animate-tx-fade motion-reduce:animate-none",
-          "bg-tx-scrim backdrop-blur-[7px] min-[700px]:items-center min-[700px]:p-6",
-        )}
-        onClick={onClose}
-      >
-        <div
-          role="dialog"
-          aria-modal="true"
-          aria-label={label}
-          onClick={(e) => e.stopPropagation()}
-          className={cn(
-            "w-full max-w-[460px] max-h-[92vh] overflow-y-auto tx-scroll",
-            "rounded-t-[24px] px-5 pb-[22px] pt-3.5",
-            "bg-tx-surface-solid border border-solid border-tx-line-2 shadow-tx-2 text-tx-txt",
-            "animate-tx-sheet-up motion-reduce:animate-none",
-            "min-[700px]:rounded-tx-xl min-[700px]:animate-tx-card-in",
-            className,
-          )}
-        >
-          {/* Grab handle — the sheet affordance on a phone, meaningless on desktop. */}
-          <div className="mx-auto mb-4 h-[5px] w-[42px] rounded-[3px] bg-tx-line-2 min-[700px]:hidden" />
-          {children}
-        </div>
-      </div>
-    </ThemedLayer>,
-    document.body,
+  return (
+    <ModalShell
+      onClose={onClose}
+      label={label}
+      scope={TX_SCOPE}
+      scrimClassName="z-[60] flex items-end justify-center animate-tx-fade motion-reduce:animate-none bg-tx-scrim backdrop-blur-[7px] min-[700px]:items-center min-[700px]:p-6"
+      className={cn(
+        "w-full max-w-[460px] max-h-[92vh] overflow-y-auto tx-scroll",
+        "rounded-t-[24px] px-5 pb-[22px] pt-3.5",
+        "bg-tx-surface-solid border border-solid border-tx-line-2 shadow-tx-2 text-tx-txt",
+        "animate-tx-sheet-up motion-reduce:animate-none",
+        "min-[700px]:rounded-tx-xl min-[700px]:animate-tx-card-in",
+        className,
+      )}
+    >
+      {/* Grab handle — the sheet affordance on a phone, meaningless on desktop. */}
+      <div className="mx-auto mb-4 h-[5px] w-[42px] rounded-[3px] bg-tx-line-2 min-[700px]:hidden" />
+      {children}
+    </ModalShell>
   )
 }
 
@@ -86,13 +65,16 @@ export function ModalTitle({ icon, title, onClose }: { icon: IconName; title: st
 
 /** A full-screen blocking overlay — the teleport. No dismiss: the trip is already paid. */
 export function Overlay({ children }: { children: ReactNode }) {
-  if (typeof document === "undefined") return null
-  return createPortal(
-    <ThemedLayer>
-      <div className="fixed inset-0 z-[70] grid place-items-center bg-tx-bg/80 backdrop-blur-[10px] animate-tx-fade motion-reduce:animate-none">
-        {children}
-      </div>
-    </ThemedLayer>,
-    document.body,
+  return (
+    <ModalShell
+      onClose={() => {}}
+      label="Cargando"
+      scope={TX_SCOPE}
+      closeOnEscape={false}
+      closeOnScrim={false}
+      scrimClassName="z-[70] grid place-items-center bg-tx-bg/80 backdrop-blur-[10px] animate-tx-fade motion-reduce:animate-none"
+    >
+      {children}
+    </ModalShell>
   )
 }
