@@ -1,11 +1,11 @@
 import {
   PhoneIcon,
-  ArrowsPointingInIcon,
-  MicrophoneIcon,
-  VideoCameraIcon,
-  SpeakerWaveIcon,
-  LockClosedIcon,
-} from "@heroicons/react/24/outline"
+  Minimize2Icon,
+  MicIcon,
+  VideoIcon,
+  Volume2Icon,
+  LockIcon,
+} from "lucide-react"
 import { type CallData, UserStatus } from "../types/call"
 import { useEffect, useState, type ReactNode } from "react"
 
@@ -63,11 +63,11 @@ export function ExpandedView({
           title="Minimizar"
           className="grid h-10 w-10 place-items-center rounded-full bg-white/10 text-white backdrop-blur-sm transition-colors hover:bg-white/[0.18]"
         >
-          <ArrowsPointingInIcon className="h-[18px] w-[18px]" strokeWidth={2} />
+          <Minimize2Icon className="h-[18px] w-[18px]" strokeWidth={2} />
         </button>
         <div className="flex-1" />
         <div className="inline-flex items-center gap-2 rounded-full bg-white/[0.08] px-3 py-1.5 text-xs font-medium text-[#c9d2d6] backdrop-blur-sm">
-          <LockClosedIcon className="h-3.5 w-3.5" strokeWidth={2} /> Llamada cifrada de extremo a extremo
+          <LockIcon className="h-3.5 w-3.5" strokeWidth={2} /> Llamada cifrada de extremo a extremo
         </div>
         <div className="flex-1" />
       </div>
@@ -117,9 +117,9 @@ export function ExpandedView({
 
       {/* Control dock */}
       <div className="relative z-10 flex flex-wrap items-start justify-center gap-3.5 px-5 pb-8 pt-4">
-        <DockButton icon={<MicrophoneIcon className="h-[22px] w-[22px]" strokeWidth={2} />} label={muted ? "Silenciado" : "Silenciar"} on={muted} onClick={() => setMuted((v) => !v)} />
-        <DockButton icon={<VideoCameraIcon className="h-[22px] w-[22px]" strokeWidth={2} />} label={camOff ? "Sin cámara" : "Cámara"} on={camOff} onClick={() => setCamOff((v) => !v)} />
-        <DockButton icon={<SpeakerWaveIcon className="h-[22px] w-[22px]" strokeWidth={2} />} label="Altavoz" on={!speaker} onClick={() => setSpeaker((v) => !v)} />
+        <DockButton icon={<MicIcon className="h-[22px] w-[22px]" strokeWidth={2} />} label={muted ? "Silenciado" : "Silenciar"} on={muted} onClick={() => setMuted((v) => !v)} />
+        <DockButton icon={<VideoIcon className="h-[22px] w-[22px]" strokeWidth={2} />} label={camOff ? "Sin cámara" : "Cámara"} on={camOff} onClick={() => setCamOff((v) => !v)} />
+        <DockButton icon={<Volume2Icon className="h-[22px] w-[22px]" strokeWidth={2} />} label="Altavoz" on={!speaker} onClick={() => setSpeaker((v) => !v)} />
         {currentUser?.status === UserStatus.RINGING && (
           <DockButton icon={<PhoneIcon className="h-[22px] w-[22px]" strokeWidth={2} />} label="Aceptar" variant="accept" onClick={onJoinCall} />
         )}

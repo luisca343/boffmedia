@@ -5,7 +5,7 @@ import { useGetAllAbilities } from "@/hooks/pokemon/useGetAllAbilities"
 import { ScreenShell } from "../_components/ScreenShell"
 import { PageHead, MetaStat } from "../_components/PageHead"
 import { AbilityDetailPane } from "./_components/AbilityDetailPane"
-import { SparklesIcon, MagnifyingGlassIcon, StarIcon } from "@heroicons/react/24/outline"
+import { SparklesIcon, SearchIcon, StarIcon } from "lucide-react"
 
 export default function HabilidadesPage() {
   const t = useTranslations("pokedex")
@@ -44,7 +44,7 @@ export default function HabilidadesPage() {
       />
 
       <div className="relative">
-        <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-pk-surface-400" />
+        <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-pk-surface-400" />
         <input
           value={q}
           onChange={(e) => setQ(e.target.value)}

@@ -1,7 +1,7 @@
 "use client"
 
 import { useMemo } from "react"
-import { BookmarkIcon } from "@heroicons/react/24/outline"
+import { BookmarkIcon } from "lucide-react"
 import { usePokedexData } from "@/hooks/usePokedexData"
 import { usePokemonStore } from "@/stores/pokemonStore"
 

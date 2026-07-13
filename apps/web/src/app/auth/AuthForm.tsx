@@ -28,6 +28,7 @@ const registerSchema = loginSchema.extend({
 export function AuthForm({ redirect = '/', url = 'boffmedia', message= ''}: { url?: string, redirect?: string, message?: string }) {
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
+  const [formError, setFormError] = useState<string | null>(null)
   const searchParams = useSearchParams()
   const mode = searchParams.get('mode')
   const isRegister = mode === 'register'
@@ -44,6 +45,7 @@ export function AuthForm({ redirect = '/', url = 'boffmedia', message= ''}: { ur
 
   async function onSubmit(values: z.infer<typeof registerSchema>) {
     setIsLoading(true)
+    setFormError(null)
     if (isRegister) {
       try {
         const response = await UsersService.createUser({
@@ -55,11 +57,11 @@ export function AuthForm({ redirect = '/', url = 'boffmedia', message= ''}: { ur
         if (response.statusCode === 200) {
           router.push('/auth?mode=login&message=Registration successful. Please log in.')
         } else {
-          alert(response.error || 'Registration failed')
+          setFormError(response.error || 'No se pudo completar el registro')
         }
       } catch (error) {
         console.error(error)
-        alert('An error occurred during registration')
+        setFormError('Ocurrió un error durante el registro')
       }
     } else {
       const { username, password } = values
@@ -70,7 +72,7 @@ export function AuthForm({ redirect = '/', url = 'boffmedia', message= ''}: { ur
       })
 
       if (response?.error) {
-        alert(response.error)
+        setFormError(response.error)
       } else {
         router.replace(redirect)
       }
@@ -162,6 +164,8 @@ export function AuthForm({ redirect = '/', url = 'boffmedia', message= ''}: { ur
                 )}
               />
             )}
+
+            {formError && <p className="text-red-400 text-sm text-center">{formError}</p>}
 
             <Button type="submit" className="w-full bg-gradient-to-r from-primary to-primary-active text-white hover:from-primary-active hover:to-primary-active transition-all duration-200 font-semibold py-2 rounded-md" disabled={isLoading}>
               {isLoading ? 'Processing...' : isRegister ? 'Register' : 'Sign In'}

@@ -3,11 +3,11 @@ import "../mina.css";
 import Image from "next/image";
 import MenuWrapper from "../_components/MenuWrapper";
 import { useGetHistory } from "@/hooks/mina/useGetHistory";
-import { useBoffSession } from "@/services/useBoffSession";
+import { useRotomUuid } from "@/components/smartrotom/behavior/useRotomUuid";
 
 export default function History() {
-  const { session } = useBoffSession();
-  const { history } = useGetHistory(session?.user?.smartRotomUser?.uuid!);
+  const uuid = useRotomUuid();
+  const { history } = useGetHistory(uuid!);
 
   return (
     <MenuWrapper className="w-full min-h-full  bg-layer-1 text-white flex flex-col items-center">

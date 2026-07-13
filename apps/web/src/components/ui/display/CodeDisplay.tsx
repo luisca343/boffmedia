@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { Card } from "@/components/ui/primitives/card";
 import { Badge } from "@/components/ui/primitives/badge";
-import { HiCheckCircle, HiClipboardCopy, HiInformationCircle } from "react-icons/hi";
+import { CircleCheck, ClipboardCopy, Info } from "lucide-react";
 
 interface CodeDisplayProps {
   code: string;
@@ -74,9 +74,9 @@ export function CodeDisplay({
             className="absolute top-3 right-3 p-2 rounded-lg bg-layer-3/50 hover:bg-layer-3/50 border border-edge/30 transition-colors"
           >
             {copied ? (
-              <HiCheckCircle className="w-5 h-5 text-warning-hover" />
+              <CircleCheck className="w-5 h-5 text-warning-hover" />
             ) : (
-              <HiClipboardCopy className="w-5 h-5 text-ink" />
+              <ClipboardCopy className="w-5 h-5 text-ink" />
             )}
           </motion.button>
         )}
@@ -84,7 +84,7 @@ export function CodeDisplay({
       
       {copyable && (
         <p className="text-center text-ink-muted text-sm mt-4 flex items-center justify-center gap-2">
-          <HiInformationCircle className="w-4 h-4" />
+          <Info className="w-4 h-4" />
           Click the copy button above to copy to your clipboard
         </p>
       )}

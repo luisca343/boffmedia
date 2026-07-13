@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { useEffect, useRef, useState } from "react"
 import { PokemonSprite } from "../../../_components/PokemonSprite"
-import { ChevronLeftIcon, ChevronRightIcon, ArrowUpRightIcon, BookmarkIcon } from "@heroicons/react/24/outline"
+import { ChevronLeftIcon, ChevronRightIcon, ArrowUpRightIcon, BookmarkIcon } from "lucide-react"
 import { getDisplayStatus, getPokemonNameAndForm } from "../../../dexUtils"
 import type { Pokemon } from "@/types/Pokemon"
 import { useTranslations } from "next-intl"

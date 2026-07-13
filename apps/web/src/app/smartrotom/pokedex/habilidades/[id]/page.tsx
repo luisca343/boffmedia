@@ -1,7 +1,7 @@
 import { ScreenShell } from "../../_components/ScreenShell"
 import { PageHead } from "../../_components/PageHead"
 import { AbilityDetailPane } from "../_components/AbilityDetailPane"
-import { SparklesIcon } from "@heroicons/react/24/outline"
+import { SparklesIcon } from "lucide-react"
 
 export default async function AbilityDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params

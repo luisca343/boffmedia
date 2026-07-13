@@ -2,7 +2,7 @@
 import { useCallback } from "react"
 import { motion } from "framer-motion"
 import { useOrderApps } from "@/hooks/apps/useOrderApps"
-import { useBoffSession } from "@/services/useBoffSession"
+import { useRotomUuid } from "@/components/smartrotom/behavior/useRotomUuid"
 import { SortableContext } from "@dnd-kit/sortable"
 import { DndContext, type DragEndEvent, DragOverlay } from "@dnd-kit/core"
 import { SmartRotomAppExtended } from "@/types"
@@ -23,7 +23,7 @@ interface AppGridProps {
 }
 
 export default function AppGrid({ apps, setApps, className }: AppGridProps) {
-  const { session } = useBoffSession()
+  const uuid = useRotomUuid()
   const { orderApps, isLoading } = useOrderApps()
   
   // Use the same drag and drop setup as PC page
@@ -90,11 +90,11 @@ export default function AppGrid({ apps, setApps, className }: AppGridProps) {
     
     orderApps({ 
       order: orderUpdates, 
-      uuid: session?.user?.smartRotomUser?.uuid! 
+      uuid: uuid!
     })
 
     setApps(updatedApps)
-  }, [apps, setApps, session, orderApps])
+  }, [apps, setApps, uuid, orderApps])
 
   if (isLoading) {
     return (

@@ -1,11 +1,11 @@
 "use client"
 import { useGetEnergy } from '@/hooks/mina/useGetEnergy';
-import { useBoffSession } from '@/services/useBoffSession';
+import { useRotomUuid } from '@/components/smartrotom/behavior/useRotomUuid';
 import { AnimatePresence, motion } from 'framer-motion';
 
 export function BarraEnergia() {
-    const { session } = useBoffSession();
-    const { energy, maxEnergy, diff } = useGetEnergy(session.user?.smartRotomUser?.uuid!)
+    const uuid = useRotomUuid();
+    const { energy, maxEnergy, diff } = useGetEnergy(uuid!)
     
     function getHour() {
         const hours = Math.floor(diff / 3600000);

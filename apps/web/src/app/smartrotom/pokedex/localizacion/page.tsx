@@ -6,7 +6,7 @@ import { PageHead, MetaStat } from "../_components/PageHead"
 import { TypeChip } from "../_components/ui"
 import { resolveBiome } from "../_data/biomes"
 import { getTranslatedBiomeName } from "@/utils/pokemonTranslations"
-import { MapIcon } from "@heroicons/react/24/outline"
+import { MapIcon } from "lucide-react"
 
 export default async function LocalizacionPage() {
   const t = await getTranslations("pokedex")

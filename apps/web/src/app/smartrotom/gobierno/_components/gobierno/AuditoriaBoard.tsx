@@ -45,7 +45,7 @@ export function AuditoriaBoard() {
   const handleExport = () => {
     const header = "fecha,funcionario,accion,objeto,departamento"
     const rows = items.map((a) =>
-      [fmtDateTime(a.createdAt), a.actor.username, a.action, a.target, a.dep]
+      [fmtDateTime(a.createdAt), a.actor?.username ?? "Sistema", a.action, a.target, a.dep]
         .map((v) => `"${String(v).replace(/"/g, '""')}"`)
         .join(","),
     )
@@ -129,11 +129,12 @@ export function AuditoriaBoard() {
                     <TD>
                       <button
                         type="button"
-                        onClick={() => openDossier(a.actor.uuid)}
-                        className="flex items-center gap-2 font-semibold text-gt-ink-900"
+                        onClick={() => a.actor && openDossier(a.actor.uuid)}
+                        disabled={!a.actor}
+                        className="flex items-center gap-2 font-semibold text-gt-ink-900 disabled:cursor-default"
                       >
-                        <Avatar user={a.actor.username} size={24} />
-                        {a.actor.username}
+                        <Avatar user={a.actor?.username} size={24} />
+                        {a.actor?.username ?? "Sistema"}
                       </button>
                     </TD>
                     <TD>

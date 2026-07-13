@@ -9,6 +9,7 @@ import { BarraEnergia } from "../_components/BarraEnergia"
 import { useRouter } from 'next/navigation';
 import { Button } from "@/components/ui/primitives/button"
 import { useBoffSession } from "@/services/useBoffSession"
+import { useRotomUuid } from "@/components/smartrotom/behavior/useRotomUuid"
 import { RewardEntry } from "@/types/mina"
 import { MinaService } from "@/services/api/smartrotom/minaService"
 
@@ -19,6 +20,7 @@ enum Tool {
 
 export default function Jugar(){
     const { session } = useBoffSession();
+    const uuid = useRotomUuid();
     const [index, setIndex] = useState(0)
     const [mineMap, setMap] = useState<Array<Array<any>>>([])
     const [rewards, setRewards] = useState<{ reward: RewardEntry; x: number; y: number; }[]>([]) 
@@ -160,7 +162,7 @@ export default function Jugar(){
         if(open) return
         setOpen(true)
         let obtained = obtainedRewards.map(reward => ({id: reward.reward.id, value: reward.reward.value}))
-        await MinaService.endGame({uuid: session?.user.smartRotomUser?.uuid!, rewards: obtained})
+        await MinaService.endGame({uuid: uuid!, rewards: obtained})
         await setIndex(index + 1)
     }
 

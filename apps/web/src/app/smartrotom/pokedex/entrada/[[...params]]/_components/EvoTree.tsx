@@ -1,6 +1,6 @@
 import { getTranslations } from "next-intl/server"
 import { PokemonService } from "@/services/api/smartrotom/pokemonService"
-import { InformationCircleIcon } from "@heroicons/react/24/outline"
+import { InfoIcon } from "lucide-react"
 import { TreeRenderer } from "./TreeRenderer"
 import { PokemonSpriteLink } from "../../../_components/PokemonSprite"
 
@@ -14,7 +14,7 @@ export async function EvoTree({ params }: { params: { id: string } }) {
   if (!res.success || !res.data) {
     return (
       <div className="flex items-center justify-center gap-2 rounded-xl bg-white/[0.02] p-6 border border-white/[0.05] text-base text-pk-surface-300">
-        <InformationCircleIcon className="h-5 w-5" />
+        <InfoIcon className="h-5 w-5" />
         <span>No se pudo cargar la línea evolutiva</span>
       </div>
     )
@@ -39,7 +39,7 @@ export async function EvoTree({ params }: { params: { id: string } }) {
           </div>
         )}
         <div className="flex items-center justify-center gap-2 text-base text-pk-surface-300">
-          <InformationCircleIcon className="h-5 w-5" />
+          <InfoIcon className="h-5 w-5" />
           <span>Este Pokémon no evoluciona</span>
         </div>
       </div>

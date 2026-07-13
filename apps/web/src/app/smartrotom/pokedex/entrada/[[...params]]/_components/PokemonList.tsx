@@ -3,7 +3,7 @@ import { useState, useEffect } from "react"
 import { PokemonService } from "@/services/api/smartrotom/pokemonService"
 import Link from "next/link"
 import { useTranslations } from "next-intl"
-import { MagnifyingGlassIcon, BookOpenIcon } from "@heroicons/react/24/outline"
+import { SearchIcon, BookOpenIcon } from "lucide-react"
 import { getDisplayStatus } from "../../../dexUtils"
 import { PokemonSprite } from "../../../_components/PokemonSprite"
 import { HubSidebar } from "../../../_components/HubSidebar"
@@ -87,7 +87,7 @@ export default function PokemonList() {
 
         <div className="p-6 pb-0">
           <div className="relative">
-            <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-pk-surface-500" />
+            <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-pk-surface-500" />
             <input
               type="search"
               placeholder="Buscar por nombre o número…"

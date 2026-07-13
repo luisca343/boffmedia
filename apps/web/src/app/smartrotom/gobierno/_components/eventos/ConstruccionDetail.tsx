@@ -7,11 +7,14 @@ import { fmtDateTime } from "../../_utils/format"
 import type { Evento, Obra } from "../../_types"
 import { BackToEventos, BuildSlot, Countdown, RankMark, ScoreDisplay, eventoStatusMeta } from "./shared"
 
-const CAT_LABELS: Record<keyof Obra["cats"], string> = {
+const CAT_LABELS: Record<"diseno" | "ambicion" | "fidelidad", string> = {
   diseno: "Diseño",
   ambicion: "Ambición",
   fidelidad: "Fidelidad al tema",
 }
+
+/** The wire has no combined score — it's the simple average of the three vote categories. */
+const score10 = (o: Obra) => (o.diseno + o.ambicion + o.fidelidad) / 3
 
 export function ConstruccionDetail({ ev }: { ev: Evento }) {
   const status = eventoStatusMeta(ev.status)
@@ -23,7 +26,7 @@ export function ConstruccionDetail({ ev }: { ev: Evento }) {
   const [confirmClose, setConfirmClose] = useState(false)
   const updateEvento = useUpdateEvento()
 
-  const ranked = useMemo(() => [...(ev.obras ?? [])].sort((a, b) => b.score10 - a.score10), [ev.obras])
+  const ranked = useMemo(() => [...(ev.obras ?? [])].sort((a, b) => score10(b) - score10(a)), [ev.obras])
 
   const closeEvento = () => {
     updateEvento.mutate({ id: ev.id, status: "closed" })
@@ -154,11 +157,11 @@ export function ConstruccionDetail({ ev }: { ev: Evento }) {
                         <div className="flex items-center">
                           {r.builders.slice(0, 4).map((b, bi) => (
                             <span
-                              key={b}
+                              key={b.uuid}
                               className="rounded-[5px] border-2 border-gt-paper-0"
                               style={bi ? { marginLeft: -8 } : undefined}
                             >
-                              <Avatar user={b} size={26} />
+                              <Avatar user={b.username} size={26} />
                             </span>
                           ))}
                         </div>
@@ -168,7 +171,7 @@ export function ConstruccionDetail({ ev }: { ev: Evento }) {
                       </TD>
                       <TD className="text-right">
                         <div className="flex justify-end">
-                          <ScoreDisplay score10={r.score10} />
+                          <ScoreDisplay score10={score10(r)} />
                         </div>
                       </TD>
                     </TR>
@@ -195,18 +198,18 @@ export function ConstruccionDetail({ ev }: { ev: Evento }) {
                     <p className="mb-3 text-xs leading-relaxed text-gt-ink-600">{r.description}</p>
                   )}
                   <Sunken className="grid gap-1.5 p-2.5">
-                    {(Object.keys(CAT_LABELS) as (keyof Obra["cats"])[]).map((k) => (
+                    {(Object.keys(CAT_LABELS) as (keyof typeof CAT_LABELS)[]).map((k) => (
                       <div key={k}>
                         <div className="mb-0.5 flex items-center justify-between">
                           <span className="text-[10.5px] text-gt-ink-500">{CAT_LABELS[k]}</span>
                           <span className="font-gt-mono text-[10px] tabular-nums text-gt-ink-600">
-                            {r.votes > 0 ? r.cats[k].toFixed(1) : "—"}
+                            {r.votes > 0 ? r[k].toFixed(1) : "—"}
                           </span>
                         </div>
                         <div className="h-[5px] overflow-hidden rounded-full bg-gt-paper-3">
                           <div
                             className="h-full bg-gt-dep-urbanismo"
-                            style={{ width: `${Math.min(100, (r.cats[k] / 10) * 100)}%` }}
+                            style={{ width: `${Math.min(100, (r[k] / 10) * 100)}%` }}
                           />
                         </div>
                       </div>

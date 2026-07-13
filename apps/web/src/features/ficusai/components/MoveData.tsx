@@ -2,7 +2,7 @@
 import TypeBadge from "@/components/shared/pokemon/TypeBadge";
 import { MoveEffect } from "./MoveEffect";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/primitives/hover-card";
-import { InformationCircleIcon } from "@heroicons/react/24/outline";
+import { InfoIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useGetMove } from "@/hooks/pokemon/useGetMove";
 import { getTranslatedMoveName } from "@/utils/pokemonTranslations";
@@ -115,7 +115,7 @@ export default function MoveDataElement({id, isFullPage = false} : {id: string, 
                     <HoverCard>
                         <HoverCardTrigger>
                             <div className="flex items-center">
-                                <InformationCircleIcon className="w-4 h-4 mr-1 text-ink" />
+                                <InfoIcon className="w-4 h-4 mr-1 text-ink" />
                                 <span className="text-ink text-sm">Información de alcance</span>
                             </div>
                         </HoverCardTrigger>
