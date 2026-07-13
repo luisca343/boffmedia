@@ -62,21 +62,8 @@ export function escrowStep(status: WpOrderStatus): number {
   return 0
 }
 
-/** ₽ with es-ES grouping. Every figure in the app goes through this. */
-export const fmt = (n: number): string =>
-  new Intl.NumberFormat("es-ES").format(Math.round(n))
-
-/** "hace 4 min" / "hace 3 h" / "hace 2 d". */
-export function timeAgo(iso: string | number | Date): string {
-  const secs = Math.floor((Date.now() - new Date(iso).getTime()) / 1000)
-  if (secs < 60) return "ahora"
-  const min = Math.floor(secs / 60)
-  if (min < 60) return `hace ${min} min`
-  const h = Math.floor(min / 60)
-  if (h < 24) return `hace ${h} h`
-  const d = Math.floor(h / 24)
-  return `hace ${d} d`
-}
+// Every figure in the app goes through `fmt` (es-ES grouping, no symbol).
+export { formatNumber as fmt, timeAgo } from "@/lib/format"
 
 /** An auction's remaining time. Under an hour it counts seconds and turns urgent. */
 export function countdown(endsAt: string | Date): { text: string; urgent: boolean; over: boolean } {

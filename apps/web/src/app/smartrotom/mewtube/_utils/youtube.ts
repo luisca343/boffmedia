@@ -1,5 +1,6 @@
 import type { Video } from "../types"
 import type { VideoCardData } from "@/components/smartrotom/media/ui"
+import { timeAgoLong as relativeTime } from "@/lib/format"
 
 export const MEWTUBE_BASE = "/smartrotom/mewtube"
 
@@ -35,32 +36,8 @@ export function formatDuration(iso?: string): string | undefined {
   return h > 0 ? `${h}:${pad(min)}:${pad(s)}` : `${min}:${pad(s)}`
 }
 
-/** Spanish relative time: "hace 3 días". */
-export function relativeTime(iso?: string): string {
-  if (!iso) return ""
-  const then = new Date(iso).getTime()
-  if (Number.isNaN(then)) return ""
-  const secs = Math.max(0, Math.floor((Date.now() - then) / 1000))
-  const steps: [number, string, string][] = [
-    [60, "segundo", "segundos"],
-    [3600, "minuto", "minutos"],
-    [86400, "hora", "horas"],
-    [604800, "día", "días"],
-    [2592000, "semana", "semanas"],
-    [31536000, "mes", "meses"],
-    [Infinity, "año", "años"],
-  ]
-  let unit = 1
-  for (let i = 0; i < steps.length; i++) {
-    const [limit, sing, plur] = steps[i]
-    if (secs < limit) {
-      const value = Math.max(1, Math.floor(secs / unit))
-      return `hace ${value} ${value === 1 ? sing : plur}`
-    }
-    unit = limit
-  }
-  return ""
-}
+// Long-form Spanish relative time: "hace 3 días".
+export { relativeTime }
 
 /** Map a YouTube video to VideoCard props. Duration/views present only when the
  *  source part was requested (search results are enriched separately). */

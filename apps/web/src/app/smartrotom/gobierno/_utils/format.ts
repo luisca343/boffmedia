@@ -1,15 +1,6 @@
-export const money = (n: number | null | undefined): string => Number(n ?? 0).toLocaleString("es-ES")
+export { timeAgo } from "@/lib/format"
 
-export const timeAgo = (iso: string | Date | null | undefined): string => {
-  if (!iso) return "—"
-  const d = new Date(iso)
-  if (Number.isNaN(d.getTime())) return "—"
-  const diff = (Date.now() - d.getTime()) / 1000
-  if (diff < 60) return "hace un momento"
-  if (diff < 3600) return `hace ${Math.floor(diff / 60)} min`
-  if (diff < 86400) return `hace ${Math.floor(diff / 3600)} h`
-  return `hace ${Math.floor(diff / 86400)} d`
-}
+export const money = (n: number | null | undefined): string => Number(n ?? 0).toLocaleString("es-ES")
 
 export const fmtDate = (iso: string | Date | null | undefined): string => {
   if (!iso) return "—"

@@ -1,6 +1,4 @@
-import { formatMoney } from "../bankUtils";
-
-export { formatMoney };
+export { formatMoney } from "@/lib/format";
 
 /** Plain integer with es-ES grouping, no currency (for the hero split ¥). */
 export function fmtInt(n: number): string {
