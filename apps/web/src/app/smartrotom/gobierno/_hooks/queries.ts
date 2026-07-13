@@ -2,6 +2,7 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { GobiernoService } from "@/services/api/smartrotom/gobiernoService"
+import { userMessageFrom } from "@/services/boffAPI"
 import { toast } from "../_components/ui"
 import type {
   Anuncio,
@@ -27,20 +28,6 @@ import type {
   Tesoreria,
   Zona,
 } from "../_types"
-
-/**
- * `boffAPI` has two failure modes: network errors THROW, but HTTP errors RESOLVE to
- * `{ success: false }`. Reading `.data` off a failed response is the silent-failure the
- * audit flagged, so every call in this app funnels through here and a failed envelope
- * becomes a thrown error that TanStack Query can actually see (SMARTROTOM_V3 §8).
- */
-export async function unwrap<T>(p: Promise<unknown>): Promise<T> {
-  const res = (await p) as { success?: boolean; statusCode?: number; data?: unknown; message?: string }
-  if (res?.success === false || (res?.statusCode && res.statusCode >= 400)) {
-    throw new Error(res?.message || "La solicitud al Gobierno de Teras ha fallado.")
-  }
-  return res?.data as T
-}
 
 type Query = Record<string, string | number | boolean | undefined | null>
 
@@ -77,102 +64,123 @@ export const gobKeys = {
 export const useCounters = () =>
   useQuery({
     queryKey: gobKeys.counters,
-    queryFn: () => unwrap<Counters>(GobiernoService.counters()),
+    queryFn: () => GobiernoService.counters() as Promise<Counters>,
     staleTime: 30_000,
   })
 
 export const useZonas = (q?: Query) =>
-  useQuery({ queryKey: gobKeys.zonas(q), queryFn: () => unwrap<Zona[]>(GobiernoService.zonas(q)) })
+  useQuery({ queryKey: gobKeys.zonas(q), queryFn: () => GobiernoService.zonas(q) as Promise<Zona[]> })
 
 export const useParcelas = (q?: Query) =>
-  useQuery({ queryKey: gobKeys.parcelas(q), queryFn: () => unwrap<Paged<Parcela>>(GobiernoService.parcelas(q)) })
+  useQuery({
+    queryKey: gobKeys.parcelas(q),
+    queryFn: () => GobiernoService.parcelas(q) as Promise<Paged<Parcela>>,
+  })
 
 export const useHistorial = (q?: Query) =>
   useQuery({
     queryKey: gobKeys.historial(q),
-    queryFn: () => unwrap<Paged<ParcelaHistorial>>(GobiernoService.historial(q)),
+    queryFn: () => GobiernoService.historial(q) as Promise<Paged<ParcelaHistorial>>,
   })
 
 export const useSubastas = (q?: Query) =>
-  useQuery({ queryKey: gobKeys.subastas(q), queryFn: () => unwrap<Paged<Subasta>>(GobiernoService.subastas(q)) })
+  useQuery({
+    queryKey: gobKeys.subastas(q),
+    queryFn: () => GobiernoService.subastas(q) as Promise<Paged<Subasta>>,
+  })
 
 export const useDenuncias = (q?: Query) =>
-  useQuery({ queryKey: gobKeys.denuncias(q), queryFn: () => unwrap<Paged<Denuncia>>(GobiernoService.denuncias(q)) })
+  useQuery({
+    queryKey: gobKeys.denuncias(q),
+    queryFn: () => GobiernoService.denuncias(q) as Promise<Paged<Denuncia>>,
+  })
 
 export const useBuscados = (q?: Query) =>
-  useQuery({ queryKey: gobKeys.buscados(q), queryFn: () => unwrap<Paged<Buscado>>(GobiernoService.buscados(q)) })
+  useQuery({
+    queryKey: gobKeys.buscados(q),
+    queryFn: () => GobiernoService.buscados(q) as Promise<Paged<Buscado>>,
+  })
 
 export const usePatrullas = () =>
-  useQuery({ queryKey: gobKeys.patrullas, queryFn: () => unwrap<Patrulla[]>(GobiernoService.patrullas()) })
+  useQuery({ queryKey: gobKeys.patrullas, queryFn: () => GobiernoService.patrullas() as Promise<Patrulla[]> })
 
 export const useBitacora = (q?: Query) =>
-  useQuery({ queryKey: gobKeys.bitacora(q), queryFn: () => unwrap<BitacoraEntry[]>(GobiernoService.bitacora(q)) })
+  useQuery({
+    queryKey: gobKeys.bitacora(q),
+    queryFn: () => GobiernoService.bitacora(q) as Promise<BitacoraEntry[]>,
+  })
 
 export const useMultas = (q?: Query) =>
-  useQuery({ queryKey: gobKeys.multas(q), queryFn: () => unwrap<Paged<Multa>>(GobiernoService.multas(q)) })
+  useQuery({ queryKey: gobKeys.multas(q), queryFn: () => GobiernoService.multas(q) as Promise<Paged<Multa>> })
 
 export const useTesoreria = () =>
-  useQuery({ queryKey: gobKeys.tesoreria, queryFn: () => unwrap<Tesoreria>(GobiernoService.tesoreria()) })
+  useQuery({ queryKey: gobKeys.tesoreria, queryFn: () => GobiernoService.tesoreria() as Promise<Tesoreria> })
 
 export const useExpedientes = (q?: Query) =>
   useQuery({
     queryKey: gobKeys.expedientes(q),
-    queryFn: () => unwrap<Paged<Expediente>>(GobiernoService.expedientes(q)),
+    queryFn: () => GobiernoService.expedientes(q) as Promise<Paged<Expediente>>,
   })
 
 export const useExpediente = (id: number | null) =>
   useQuery({
     queryKey: gobKeys.expediente(id ?? 0),
-    queryFn: () => unwrap<Expediente>(GobiernoService.expediente(id as number)),
+    queryFn: () => GobiernoService.expediente(id as number) as Promise<Expediente>,
     enabled: id != null,
   })
 
 export const useApelaciones = (q?: Query) =>
   useQuery({
     queryKey: gobKeys.apelaciones(q),
-    queryFn: () => unwrap<Paged<Apelacion>>(GobiernoService.apelaciones(q)),
+    queryFn: () => GobiernoService.apelaciones(q) as Promise<Paged<Apelacion>>,
   })
 
 export const useCenso = (q?: Query) =>
-  useQuery({ queryKey: gobKeys.censo(q), queryFn: () => unwrap<Paged<Ciudadano>>(GobiernoService.censo(q)) })
+  useQuery({ queryKey: gobKeys.censo(q), queryFn: () => GobiernoService.censo(q) as Promise<Paged<Ciudadano>> })
 
 export const useCiudadano = (uuid: string | null) =>
   useQuery({
     queryKey: gobKeys.ciudadano(uuid ?? ""),
-    queryFn: () => unwrap<Ciudadano>(GobiernoService.ciudadano(uuid as string)),
+    queryFn: () => GobiernoService.ciudadano(uuid as string) as Promise<Ciudadano>,
     enabled: !!uuid,
   })
 
 export const useOficiales = () =>
-  useQuery({ queryKey: gobKeys.oficiales, queryFn: () => unwrap<Oficial[]>(GobiernoService.oficiales()) })
+  useQuery({ queryKey: gobKeys.oficiales, queryFn: () => GobiernoService.oficiales() as Promise<Oficial[]> })
 
 export const useAnuncios = (q?: Query) =>
-  useQuery({ queryKey: gobKeys.anuncios(q), queryFn: () => unwrap<Paged<Anuncio>>(GobiernoService.anuncios(q)) })
+  useQuery({
+    queryKey: gobKeys.anuncios(q),
+    queryFn: () => GobiernoService.anuncios(q) as Promise<Paged<Anuncio>>,
+  })
 
 export const useAuditoria = (q?: Query) =>
-  useQuery({ queryKey: gobKeys.auditoria(q), queryFn: () => unwrap<Paged<AuditEntry>>(GobiernoService.auditoria(q)) })
+  useQuery({
+    queryKey: gobKeys.auditoria(q),
+    queryFn: () => GobiernoService.auditoria(q) as Promise<Paged<AuditEntry>>,
+  })
 
 export const useEventos = (q?: Query) =>
-  useQuery({ queryKey: gobKeys.eventos(q), queryFn: () => unwrap<Evento[]>(GobiernoService.eventos(q)) })
+  useQuery({ queryKey: gobKeys.eventos(q), queryFn: () => GobiernoService.eventos(q) as Promise<Evento[]> })
 
 export const useEvento = (id: number | null) =>
   useQuery({
     queryKey: gobKeys.evento(id ?? 0),
-    queryFn: () => unwrap<Evento>(GobiernoService.evento(id as number)),
+    queryFn: () => GobiernoService.evento(id as number) as Promise<Evento>,
     enabled: id != null,
   })
 
 export const useNpcSkins = () =>
-  useQuery({ queryKey: gobKeys.npcSkins, queryFn: () => unwrap<NpcSkin[]>(GobiernoService.npcSkins()) })
+  useQuery({ queryKey: gobKeys.npcSkins, queryFn: () => GobiernoService.npcSkins() as Promise<NpcSkin[]> })
 
 export const useMegafonia = (q?: Query) =>
   useQuery({
     queryKey: gobKeys.megafonia(q),
-    queryFn: () => unwrap<MegafoniaEntry[]>(GobiernoService.megafonia(q)),
+    queryFn: () => GobiernoService.megafonia(q) as Promise<MegafoniaEntry[]>,
   })
 
 export const useCarteles = () =>
-  useQuery({ queryKey: gobKeys.carteles, queryFn: () => unwrap<Cartel[]>(GobiernoService.carteles()) })
+  useQuery({ queryKey: gobKeys.carteles, queryFn: () => GobiernoService.carteles() as Promise<Cartel[]> })
 
 // ─── Mutations ────────────────────────────────────────────────────────────────
 
@@ -188,7 +196,7 @@ function useGobMutation<TArgs, TData>(
 ) {
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: (args: TArgs) => unwrap<TData>(fn(args)),
+    mutationFn: (args: TArgs) => fn(args) as Promise<TData>,
     onSuccess: (data, args) => {
       const keys = [...opts.keys, ["gob", "auditoria"], ["gob", "counters"]]
       if (opts.money) keys.push(["gob", "tesoreria"])
@@ -196,7 +204,7 @@ function useGobMutation<TArgs, TData>(
       const msg = opts.success?.(data, args)
       if (msg) toast(msg, "ok", "check")
     },
-    onError: (e: Error) => toast(e.message, "danger", "alert"),
+    onError: (e: unknown) => toast(userMessageFrom(e, "La solicitud al Gobierno de Teras ha fallado."), "danger", "alert"),
   })
 }
 

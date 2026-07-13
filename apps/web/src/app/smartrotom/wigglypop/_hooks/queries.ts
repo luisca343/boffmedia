@@ -4,8 +4,8 @@ import { useMemo } from "react"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { useBoffSession } from "@/services/useBoffSession"
 import { usePokemonStore } from "@/stores/pokemonStore"
-import { StarbankService } from "@/services/api/smartrotom/starbankService"
 import { WigglypopService, type ListingQuery } from "@/services/api/smartrotom/wigglypopService"
+import { rotomGETOrThrow, userMessageFrom } from "@/services/boffAPI"
 import type { Pokemon } from "@/types/Pokemon"
 import type {
   WpBid,
@@ -23,22 +23,6 @@ import { toast } from "../_components/ui"
 export function useWpUuid(): string | null {
   const { session } = useBoffSession()
   return session?.user?.smartRotomUser?.uuid ?? null
-}
-
-/**
- * `boffAPI` has two failure modes: network errors throw, HTTP errors resolve to
- * `{ success: false }`. Reading `.data` off an unchecked response is the
- * silent-failure pattern the audit flagged (§8), so every call funnels through here
- * and turns a failed envelope into a thrown error React Query can actually see.
- */
-async function unwrap<T>(
-  call: Promise<{ success: boolean; data?: T; message?: string }>,
-): Promise<T> {
-  const res = await call
-  if (!res.success || res.data === undefined) {
-    throw new Error(res.message || "El mercado no responde")
-  }
-  return res.data
 }
 
 export const wpKeys = {
@@ -199,7 +183,7 @@ export function useListings(q: ListingQuery) {
   const byDex = useSpeciesByDex()
   return useQuery({
     queryKey: wpKeys.listings(q),
-    queryFn: () => unwrap<any>(WigglypopService.getListings(q)),
+    queryFn: () => WigglypopService.getListings<any>(q),
     select: (data): { total: number; items: WpListing[] } => ({
       total: data.total as number,
       items: (data.items ?? []).map((l: any) => toListing(l, byDex)),
@@ -211,7 +195,7 @@ export function useListing(id: number | null) {
   const byDex = useSpeciesByDex()
   return useQuery({
     queryKey: wpKeys.listing(id ?? 0),
-    queryFn: () => unwrap<any>(WigglypopService.getListing(id!)),
+    queryFn: () => WigglypopService.getListing<any>(id!),
     select: (raw) => toListing(raw, byDex),
     enabled: id !== null,
   })
@@ -220,7 +204,7 @@ export function useListing(id: number | null) {
 export function useBids(listingId: number | null) {
   return useQuery({
     queryKey: wpKeys.bids(listingId ?? 0),
-    queryFn: () => unwrap<any[]>(WigglypopService.getBids(listingId!)),
+    queryFn: () => WigglypopService.getBids<any[]>(listingId!),
     select: (rows): WpBid[] =>
       rows.map((b) => ({
         id: b.id,
@@ -237,7 +221,7 @@ export function useBids(listingId: number | null) {
 export function usePriceHistory(dex: number | null) {
   return useQuery({
     queryKey: wpKeys.priceHistory(dex ?? 0),
-    queryFn: () => unwrap<number[]>(WigglypopService.getPriceHistory(dex!)),
+    queryFn: () => WigglypopService.getPriceHistory<number[]>(dex!),
     enabled: dex !== null,
     staleTime: 5 * 60_000,
   })
@@ -248,7 +232,7 @@ export function useWatchlist() {
   const byDex = useSpeciesByDex()
   return useQuery({
     queryKey: wpKeys.watchlist(uuid ?? ""),
-    queryFn: () => unwrap<any>(WigglypopService.getWatchlist(uuid!)),
+    queryFn: () => WigglypopService.getWatchlist<any>(uuid!),
     select: (data) => (data.items ?? []).map((l: any) => toListing(l, byDex)) as WpListing[],
     enabled: Boolean(uuid),
   })
@@ -259,7 +243,7 @@ export function useOrders() {
   const byDex = useSpeciesByDex()
   return useQuery({
     queryKey: wpKeys.orders(uuid ?? ""),
-    queryFn: () => unwrap<any[]>(WigglypopService.getOrders(uuid!)),
+    queryFn: () => WigglypopService.getOrders<any[]>(uuid!),
     select: (rows): WpOrder[] => rows.map((o) => toOrder(o, byDex)),
     enabled: Boolean(uuid),
   })
@@ -269,7 +253,7 @@ export function useSellerOffers() {
   const uuid = useWpUuid()
   return useQuery({
     queryKey: wpKeys.offers(uuid ?? ""),
-    queryFn: () => unwrap<any[]>(WigglypopService.getSellerOffers(uuid!)),
+    queryFn: () => WigglypopService.getSellerOffers<any[]>(uuid!),
     select: (rows): WpOffer[] =>
       rows.map((o) => ({
         id: o.id,
@@ -291,7 +275,7 @@ export function useSellerTrades() {
   const byDex = useSpeciesByDex()
   return useQuery({
     queryKey: wpKeys.trades(uuid ?? ""),
-    queryFn: () => unwrap<any[]>(WigglypopService.getSellerTrades(uuid!)),
+    queryFn: () => WigglypopService.getSellerTrades<any[]>(uuid!),
     select: (rows): WpTradeOffer[] =>
       rows.map((t) => ({
         id: t.id,
@@ -311,7 +295,7 @@ export function useSeller(uuid: string | null) {
   const byDex = useSpeciesByDex()
   return useQuery({
     queryKey: wpKeys.seller(uuid ?? ""),
-    queryFn: () => unwrap<any>(WigglypopService.getSeller(uuid!)),
+    queryFn: () => WigglypopService.getSeller<any>(uuid!),
     select: (raw) => ({
       seller: toSeller(raw),
       activeListings: raw.activeListings ?? 0,
@@ -329,7 +313,7 @@ export function useBalance() {
   const uuid = useWpUuid()
   return useQuery({
     queryKey: wpKeys.balance(uuid ?? ""),
-    queryFn: () => unwrap<{ balance: number }>(StarbankService.getUserBalance(uuid!)),
+    queryFn: () => rotomGETOrThrow<{ balance: number }>(`/starbank/balance/${uuid}`),
     select: (d) => d.balance,
     enabled: Boolean(uuid),
   })
@@ -355,14 +339,14 @@ export function useToggleWatch() {
   return useMutation({
     mutationFn: (listingId: number) => {
       if (!uuid) throw new Error("Sesión no iniciada")
-      return unwrap<{ watching: boolean }>(WigglypopService.toggleWatch(uuid, listingId))
+      return WigglypopService.toggleWatch<{ watching: boolean }>(uuid, listingId)
     },
     onSuccess: (res) => {
       toast(res.watching ? "Añadido a seguimiento" : "Quitado de seguimiento", "success")
       if (uuid) void qc.invalidateQueries({ queryKey: wpKeys.watchlist(uuid) })
       void qc.invalidateQueries({ queryKey: ["wigglypop", "listings"] })
     },
-    onError: (e: Error) => toast(e.message, "error"),
+    onError: (e: unknown) => toast(userMessageFrom(e, "No se pudo actualizar el seguimiento"), "error"),
   })
 }
 
@@ -374,13 +358,13 @@ export function useCreateOrder() {
   return useMutation({
     mutationFn: (lines: Array<{ listingId: number; qty: number }>) => {
       if (!uuid) throw new Error("Sesión no iniciada")
-      return unwrap<any>(WigglypopService.createOrder({ buyerUuid: uuid, lines }))
+      return WigglypopService.createOrder<any>({ buyerUuid: uuid, lines })
     },
     onSuccess: (raw) => {
       invalidate()
       return toOrder(raw, byDex)
     },
-    onError: (e: Error) => toast(e.message, "error"),
+    onError: (e: unknown) => toast(userMessageFrom(e, "No se pudo completar la compra"), "error"),
   })
 }
 
@@ -391,13 +375,13 @@ export function useConfirmOrder() {
   return useMutation({
     mutationFn: (orderId: number) => {
       if (!uuid) throw new Error("Sesión no iniciada")
-      return unwrap(WigglypopService.confirmOrder(orderId, uuid))
+      return WigglypopService.confirmOrder(orderId, uuid)
     },
     onSuccess: () => {
       toast("Pago liberado · ¡gracias por confirmar!", "success")
       invalidate()
     },
-    onError: (e: Error) => toast(e.message, "error"),
+    onError: (e: unknown) => toast(userMessageFrom(e, "No se pudo confirmar el pedido"), "error"),
   })
 }
 
@@ -408,13 +392,13 @@ export function useMarkTransferred() {
   return useMutation({
     mutationFn: (orderId: number) => {
       if (!uuid) throw new Error("Sesión no iniciada")
-      return unwrap(WigglypopService.markTransferred(orderId, uuid))
+      return WigglypopService.markTransferred(orderId, uuid)
     },
     onSuccess: () => {
       toast("Marcado como transferido", "success")
       invalidate()
     },
-    onError: (e: Error) => toast(e.message, "error"),
+    onError: (e: unknown) => toast(userMessageFrom(e, "No se pudo marcar como transferido"), "error"),
   })
 }
 
@@ -424,13 +408,13 @@ export function useCancelOrder() {
   return useMutation({
     mutationFn: (orderId: number) => {
       if (!uuid) throw new Error("Sesión no iniciada")
-      return unwrap(WigglypopService.cancelOrder(orderId, uuid))
+      return WigglypopService.cancelOrder(orderId, uuid)
     },
     onSuccess: () => {
       toast("Depósito reembolsado a tu monedero", "success")
       invalidate()
     },
-    onError: (e: Error) => toast(e.message, "error"),
+    onError: (e: unknown) => toast(userMessageFrom(e, "No se pudo cancelar el pedido"), "error"),
   })
 }
 
@@ -441,7 +425,7 @@ export function usePlaceBid() {
   return useMutation({
     mutationFn: ({ listingId, amount }: { listingId: number; amount: number }) => {
       if (!uuid) throw new Error("Sesión no iniciada")
-      return unwrap(WigglypopService.placeBid({ listingId, bidderUuid: uuid, amount }))
+      return WigglypopService.placeBid({ listingId, bidderUuid: uuid, amount })
     },
     onSuccess: (_d, { listingId }) => {
       toast("Puja registrada", "success")
@@ -449,7 +433,7 @@ export function usePlaceBid() {
       void qc.invalidateQueries({ queryKey: wpKeys.listing(listingId) })
       void qc.invalidateQueries({ queryKey: wpKeys.bids(listingId) })
     },
-    onError: (e: Error) => toast(e.message, "error"),
+    onError: (e: unknown) => toast(userMessageFrom(e, "No se pudo registrar la puja"), "error"),
   })
 }
 
@@ -467,13 +451,13 @@ export function useCreateOffer() {
       qty?: number
     }) => {
       if (!uuid) throw new Error("Sesión no iniciada")
-      return unwrap(WigglypopService.createOffer({ listingId, buyerUuid: uuid, amount, qty }))
+      return WigglypopService.createOffer({ listingId, buyerUuid: uuid, amount, qty })
     },
     onSuccess: (_d, { listingId }) => {
       toast("Oferta enviada", "success")
       void qc.invalidateQueries({ queryKey: wpKeys.listing(listingId) })
     },
-    onError: (e: Error) => toast(e.message, "error"),
+    onError: (e: unknown) => toast(userMessageFrom(e, "No se pudo enviar la oferta"), "error"),
   })
 }
 
@@ -481,13 +465,13 @@ export function useCreateListing() {
   const qc = useQueryClient()
   const uuid = useWpUuid()
   return useMutation({
-    mutationFn: (body: unknown) => unwrap<any>(WigglypopService.createListing(body)),
+    mutationFn: (body: unknown) => WigglypopService.createListing<any>(body),
     onSuccess: () => {
       toast("¡Anuncio publicado!", "success")
       void qc.invalidateQueries({ queryKey: ["wigglypop", "listings"] })
       if (uuid) void qc.invalidateQueries({ queryKey: wpKeys.seller(uuid) })
     },
-    onError: (e: Error) => toast(e.message, "error"),
+    onError: (e: unknown) => toast(userMessageFrom(e, "No se pudo publicar el anuncio"), "error"),
   })
 }
 
@@ -497,13 +481,13 @@ export function useUpdateListing() {
   return useMutation({
     mutationFn: ({ id, patch }: { id: number; patch: Record<string, unknown> }) => {
       if (!uuid) throw new Error("Sesión no iniciada")
-      return unwrap<any>(WigglypopService.updateListing(id, { ...patch, actorUuid: uuid }))
+      return WigglypopService.updateListing<any>(id, { ...patch, actorUuid: uuid })
     },
     onSuccess: (_d, { id }) => {
       void qc.invalidateQueries({ queryKey: ["wigglypop", "listings"] })
       void qc.invalidateQueries({ queryKey: wpKeys.listing(id) })
       if (uuid) void qc.invalidateQueries({ queryKey: wpKeys.seller(uuid) })
     },
-    onError: (e: Error) => toast(e.message, "error"),
+    onError: (e: unknown) => toast(userMessageFrom(e, "No se pudo actualizar el anuncio"), "error"),
   })
 }

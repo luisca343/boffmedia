@@ -1,4 +1,4 @@
-import { rotomGET, type ApiResponse } from "@/services/boffAPI"
+import { rotomGETOrThrow } from "@/services/boffAPI"
 import type {
   PasaporteLogroEntity,
   PasaporteProfileEntity,
@@ -15,13 +15,13 @@ import type {
  */
 export class PasaporteService {
   /** Identity + the derived rank/title/completion the carné and the MRZ are printed from. */
-  static getProfile(uuid: string): Promise<ApiResponse<PasaporteProfileEntity>> {
-    return rotomGET<PasaporteProfileEntity>(`/pasaporte/profile/${uuid}`)
+  static getProfile(uuid: string): Promise<PasaporteProfileEntity> {
+    return rotomGETOrThrow<PasaporteProfileEntity>(`/pasaporte/profile/${uuid}`)
   }
 
   /** Every logro with the trainer's progress on it — completed or not. */
-  static getLogros(uuid: string): Promise<ApiResponse<PasaporteLogroEntity[]>> {
-    return rotomGET<PasaporteLogroEntity[]>(`/pasaporte/logros/${uuid}`)
+  static getLogros(uuid: string): Promise<PasaporteLogroEntity[]> {
+    return rotomGETOrThrow<PasaporteLogroEntity[]>(`/pasaporte/logros/${uuid}`)
   }
 
   /**
@@ -29,7 +29,7 @@ export class PasaporteService {
    * zeroed — that is a valid answer, not an error, so the chapter renders an interlude
    * rather than a failure.
    */
-  static getSeason(uuid: string): Promise<ApiResponse<PasaporteSeasonEntity>> {
-    return rotomGET<PasaporteSeasonEntity>(`/pasaporte/season/${uuid}`)
+  static getSeason(uuid: string): Promise<PasaporteSeasonEntity> {
+    return rotomGETOrThrow<PasaporteSeasonEntity>(`/pasaporte/season/${uuid}`)
   }
 }

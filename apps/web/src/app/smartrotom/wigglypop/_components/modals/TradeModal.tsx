@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import type { WpListing } from "../../_types/market.types"
+import { userMessageFrom } from "@/services/boffAPI"
 import { WigglypopService } from "@/services/api/smartrotom/wigglypopService"
 import { usePcMons } from "../../_hooks/usePcMons"
 import { useWpUuid } from "../../_hooks/queries"
@@ -36,7 +37,7 @@ export function TradeModal({ listing: L, onClose }: { listing: WpListing; onClos
     })
     setSending(false)
     if (!res.success) {
-      toast(res.message || "No se pudo enviar la propuesta", "error")
+      toast(res.userMessage ?? "No se pudo enviar la propuesta", "error")
       return
     }
     toast("Propuesta de intercambio enviada", "success")
@@ -60,7 +61,7 @@ export function TradeModal({ listing: L, onClose }: { listing: WpListing; onClos
         <DividerLabel className="my-4">Ofreces de tu PC</DividerLabel>
 
         {error ? (
-          <EmptyState icon="alert" title="No se pudo leer tu PC" body={error.message} />
+          <EmptyState icon="alert" title="No se pudo leer tu PC" body={userMessageFrom(error, "Inténtalo de nuevo en unos segundos.")} />
         ) : isLoading ? (
           <div className="grid grid-cols-6 gap-2">
             {Array.from({ length: 12 }).map((_, i) => (

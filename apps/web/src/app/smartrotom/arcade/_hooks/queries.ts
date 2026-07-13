@@ -5,31 +5,18 @@ import type {
   ArcadeInventoryItem,
   ArcadeInventoryResponse,
   ArcadeStreak,
+  ClaimItemsResponseDto,
   DailyRewardsConfig,
   LootboxConfigEntity,
   OpenLootBoxResponseDto,
 } from "@boffmedia/shared"
-import { ArcadeService } from "@/services/api/smartrotom/arcadeService"
+import { rotomGETOrThrow, rotomPOSTOrThrow } from "@/services/boffAPI"
 import { useBoffSession } from "@/services/useBoffSession"
 
 /** The SmartRotom uuid every arcade endpoint is keyed by. `null` until signed in. */
 export function useArcadeUuid(): string | null {
   const { session } = useBoffSession()
   return session?.user?.smartRotomUser?.uuid ?? null
-}
-
-/**
- * `boffAPI` has two failure modes: network errors throw, HTTP errors resolve to
- * `{ success: false }`. Reading `.data` off an unchecked response is the silent-
- * failure pattern the audit flagged, so every query funnels through here and
- * turns a failed envelope into a thrown error React Query can see (§8).
- */
-async function unwrap<T>(call: Promise<{ success: boolean; data?: T; message?: string }>): Promise<T> {
-  const res = await call
-  if (!res.success || res.data === undefined) {
-    throw new Error(res.message || "La petición al arcade falló")
-  }
-  return res.data
 }
 
 export const arcadeKeys = {
@@ -43,7 +30,7 @@ export function useArcadeStreak() {
   const uuid = useArcadeUuid()
   return useQuery({
     queryKey: arcadeKeys.streak(uuid ?? ""),
-    queryFn: () => unwrap<ArcadeStreak>(ArcadeService.getStreak(uuid!)),
+    queryFn: () => rotomGETOrThrow<ArcadeStreak>(`/arcade/streak/${uuid}`),
     enabled: Boolean(uuid),
   })
 }
@@ -52,7 +39,7 @@ export function useArcadeStreak() {
 export function useRewardsBanner() {
   return useQuery({
     queryKey: arcadeKeys.banner(),
-    queryFn: () => unwrap<DailyRewardsConfig>(ArcadeService.getRewardsBanner()),
+    queryFn: () => rotomGETOrThrow<DailyRewardsConfig>("/arcade/banner"),
     // The banner is a static config file server-side; it does not move.
     staleTime: 30 * 60_000,
   })
@@ -62,7 +49,7 @@ export function useArcadeInventory() {
   const uuid = useArcadeUuid()
   return useQuery({
     queryKey: arcadeKeys.inventory(uuid ?? ""),
-    queryFn: () => unwrap<ArcadeInventoryResponse>(ArcadeService.getInventory(uuid!)),
+    queryFn: () => rotomGETOrThrow<ArcadeInventoryResponse>(`/arcade/inventory/${uuid}`),
     enabled: Boolean(uuid),
   })
 }
@@ -70,7 +57,7 @@ export function useArcadeInventory() {
 export function useLootboxConfig() {
   return useQuery({
     queryKey: arcadeKeys.lootboxConfig(),
-    queryFn: () => unwrap<LootboxConfigEntity>(ArcadeService.getLootboxConfig()),
+    queryFn: () => rotomGETOrThrow<LootboxConfigEntity>("/arcade/lootbox/config"),
     staleTime: 30 * 60_000,
   })
 }
@@ -79,7 +66,11 @@ export function useClaimDailyReward() {
   const uuid = useArcadeUuid()
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: () => unwrap(ArcadeService.claimDailyReward({ uuid: uuid! })),
+    mutationFn: () =>
+      rotomPOSTOrThrow<{ streak: ArcadeStreak; reward: any; inventoryItems?: ArcadeInventoryItem[] }>(
+        "/arcade/streak/claim",
+        { uuid: uuid! },
+      ),
     onSuccess: () => {
       // A claim moves the streak AND can drop a box into the inventory.
       qc.invalidateQueries({ queryKey: arcadeKeys.streak(uuid ?? "") })
@@ -93,7 +84,7 @@ export function useOpenLootbox() {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: (boxId: string) =>
-      unwrap<OpenLootBoxResponseDto>(ArcadeService.openLootbox({ uuid: uuid!, boxId })),
+      rotomPOSTOrThrow<OpenLootBoxResponseDto>("/arcade/lootbox/open", { uuid: uuid!, boxId }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: arcadeKeys.inventory(uuid ?? "") })
     },
@@ -105,7 +96,7 @@ export function useClaimItems() {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: (items: ArcadeInventoryItem[]) =>
-      unwrap(ArcadeService.claimItems({ uuid: uuid!, items })),
+      rotomPOSTOrThrow<ClaimItemsResponseDto>("/arcade/claim-items", { uuid: uuid!, items }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: arcadeKeys.inventory(uuid ?? "") })
     },

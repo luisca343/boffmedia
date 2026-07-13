@@ -1,27 +1,17 @@
 "use client"
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { AppsService } from "@/services/api/smartrotom/appsService"
-import { UsersService } from "@/services/api/smartrotom/usersService"
-import { NotificationsService, type SendNotificationPayload } from "@/services/api/smartrotom/notificationsService"
-import type { ApiResponse } from "@/services/boffAPI"
+import { rotomGETOrThrow, rotomPOSTOrThrow, userMessageFrom } from "@/services/boffAPI"
+import type { SendNotificationPayload } from "@/services/api/smartrotom/notificationsService"
+import type { NotificationResponseDto } from "@boffmedia/shared"
 import type { SmartRotomApp, SmartRotomUser } from "@boffmedia/shared"
 import { toast } from "../ui"
 
 /**
  * Jugadores, Apps de jugador and Notificaciones predate the Gobierno API and still talk
- * to the original SmartRotom services directly — there is no /gobierno endpoint for the
- * player/app/notification catalog. `ApiResponse` fails the same way `unwrap` in
- * `_hooks/queries.ts` guards against: a `success: false` envelope must throw, or
- * TanStack Query would treat a failed call as a quietly-empty success.
+ * to the original SmartRotom endpoints directly — there is no /gobierno endpoint for the
+ * player/app/notification catalog.
  */
-function unwrapAdmin<T>(res: ApiResponse<T>): T {
-  if (res?.success === false || (res?.statusCode && res.statusCode >= 400)) {
-    throw new Error(res?.error || res?.message || "La solicitud ha fallado.")
-  }
-  return res.data as T
-}
-
 export const adminKeys = {
   users: ["admin", "users"] as const,
   apps: ["admin", "apps"] as const,
@@ -31,54 +21,54 @@ export const adminKeys = {
 export const useAdminUsers = () =>
   useQuery({
     queryKey: adminKeys.users,
-    queryFn: async () => unwrapAdmin(await UsersService.findAll()),
+    queryFn: () => rotomGETOrThrow<SmartRotomUser[]>("/users"),
   })
 
 export const useAdminApps = () =>
   useQuery({
     queryKey: adminKeys.apps,
-    queryFn: async () => unwrapAdmin(await AppsService.findAll()),
+    queryFn: () => rotomGETOrThrow<SmartRotomApp[]>("/apps"),
   })
 
 export const useAdminPlayerApps = (uuid: string | null) =>
   useQuery({
     queryKey: adminKeys.playerApps(uuid ?? ""),
-    queryFn: async () => unwrapAdmin(await AppsService.getForPlayer(uuid as string)),
+    queryFn: () => rotomPOSTOrThrow<SmartRotomApp[]>("/apps/player", { uuid }),
     enabled: !!uuid,
   })
 
 export const useAdminAddApp = () => {
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: async ({ uuid, id }: { uuid: string; id: number }) =>
-      unwrapAdmin(await AppsService.addAppToPlayer(uuid, id)),
+    mutationFn: ({ uuid, id }: { uuid: string; id: number }) =>
+      rotomPOSTOrThrow("/apps/player/add", { uuid, id }),
     onSuccess: (_d, { uuid }) => {
       qc.invalidateQueries({ queryKey: adminKeys.playerApps(uuid) })
       toast("App añadida al dispositivo", "ok", "plus")
     },
-    onError: (e: Error) => toast(e.message, "danger", "alert"),
+    onError: (e: unknown) => toast(userMessageFrom(e, "No se pudo añadir la app"), "danger", "alert"),
   })
 }
 
 export const useAdminRemoveApp = () => {
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: async ({ uuid, id }: { uuid: string; id: number }) =>
-      unwrapAdmin(await AppsService.removeAppFromPlayer(uuid, id)),
+    mutationFn: ({ uuid, id }: { uuid: string; id: number }) =>
+      rotomPOSTOrThrow("/apps/player/remove", { uuid, id }),
     onSuccess: (_d, { uuid }) => {
       qc.invalidateQueries({ queryKey: adminKeys.playerApps(uuid) })
       toast("App eliminada", "default", "minus")
     },
-    onError: (e: Error) => toast(e.message, "danger", "alert"),
+    onError: (e: unknown) => toast(userMessageFrom(e, "No se pudo eliminar la app"), "danger", "alert"),
   })
 }
 
 export const useSendNotification = () =>
   useMutation({
-    mutationFn: async (payload: SendNotificationPayload) =>
-      unwrapAdmin(await NotificationsService.sendNotification(payload)),
+    mutationFn: (payload: SendNotificationPayload) =>
+      rotomPOSTOrThrow<NotificationResponseDto>("/notifications/send", payload),
     onSuccess: () => toast("Notificación enviada", "ok", "bell"),
-    onError: (e: Error) => toast(e.message, "danger", "alert"),
+    onError: (e: unknown) => toast(userMessageFrom(e, "No se pudo enviar la notificación"), "danger", "alert"),
   })
 
 export type { SmartRotomApp, SmartRotomUser }

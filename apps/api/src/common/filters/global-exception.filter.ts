@@ -11,7 +11,11 @@ import { Logger } from 'nestjs-pino';
 interface ErrorResponse {
   statusCode: number;
   error: string;
+  // Machine text for logs/debugging; clients must not render it to users.
   message: string;
+  // Spanish, user-facing — only present when the throw site set `userMessage`
+  // on the exception body on purpose. Clients may render it verbatim.
+  userMessage?: string;
   timestamp: string;
   path: string;
 }
@@ -81,6 +85,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
 
       let errorCode = 'HTTP_EXCEPTION';
       let message = exception.message;
+      let userMessage: string | undefined;
 
       if (typeof raw === 'object' && raw !== null) {
         const body = raw as Record<string, unknown>;
@@ -92,11 +97,21 @@ export class GlobalExceptionFilter implements ExceptionFilter {
         } else if (typeof body['message'] === 'string') {
           message = body['message'];
         }
+        if (typeof body['userMessage'] === 'string') {
+          userMessage = body['userMessage'];
+        }
       } else if (typeof raw === 'string') {
         message = raw;
       }
 
-      return { statusCode: status, error: errorCode, message, timestamp, path };
+      return {
+        statusCode: status,
+        error: errorCode,
+        message,
+        userMessage,
+        timestamp,
+        path,
+      };
     }
 
     return {

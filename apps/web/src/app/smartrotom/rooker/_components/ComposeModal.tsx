@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react"
 import { cn } from "@/lib/utils"
+import { userMessageFrom } from "@/services/boffAPI"
 import { Avatar, Button, CharRing, Icon, MAX_CHARS, Modal, toast } from "./ui"
 import { useComposeStore } from "../_stores/composeStore"
 import { useCreatePost, useMe } from "../_hooks/queries"
@@ -59,7 +60,7 @@ export function ComposeModal() {
           close()
           toast(replyTo ? "Tu respuesta se publicó." : "Tu trino se publicó en el nido.")
         },
-        onError: (err) => toast(err instanceof Error ? err.message : "No se pudo publicar."),
+        onError: (err) => toast(userMessageFrom(err, "No se pudo publicar.")),
       },
     )
   }

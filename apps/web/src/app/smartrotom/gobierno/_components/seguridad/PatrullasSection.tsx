@@ -1,6 +1,7 @@
 "use client"
 
 import { useMemo, useState } from "react"
+import { userMessageFrom } from "@/services/boffAPI"
 import { Badge, Bar, Button, Card, Empty, PageHead, Skeleton, TextArea } from "../ui"
 import { PlayerLink } from "./PlayerLink"
 import { NuevaPatrullaModal } from "./NuevaPatrullaModal"
@@ -81,7 +82,11 @@ export function PatrullasSection() {
           ))}
         </div>
       ) : isError ? (
-        <Empty icon="alert" title="No se ha podido cargar el registro" sub={error instanceof Error ? error.message : undefined} />
+        <Empty
+          icon="alert"
+          title="No se ha podido cargar el registro"
+          sub={error ? userMessageFrom(error, "Inténtalo de nuevo en unos segundos.") : undefined}
+        />
       ) : !patrullas || patrullas.length === 0 ? (
         <div className="mb-5">
           <Empty icon="shield" title="Sin turnos registrados" sub="Crea el primer turno para empezar a organizar la vigilancia." />

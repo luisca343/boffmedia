@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation"
 import { useState } from "react"
 import { cn } from "@/lib/utils"
+import { userMessageFrom } from "@/services/boffAPI"
 import type { WpOrder } from "../_types/market.types"
 import { ESCROW_STEPS, ORDER_STATUS, escrowStep, fmt, timeAgo } from "../_utils/format"
 import { useConfirmOrder, useOrders } from "../_hooks/queries"
@@ -69,7 +70,7 @@ export default function OrdersPage() {
 
       <div className="wp-scroll min-h-0 flex-1 overflow-y-auto px-[30px] pb-10 pt-5">
         {error ? (
-          <EmptyState icon="alert" title="No se pudieron cargar tus pedidos" body={error.message} />
+          <EmptyState icon="alert" title="No se pudieron cargar tus pedidos" body={userMessageFrom(error, "Inténtalo de nuevo en unos segundos.")} />
         ) : isLoading ? (
           <div className="grid max-w-[880px] gap-3.5">
             {Array.from({ length: 3 }).map((_, i) => (

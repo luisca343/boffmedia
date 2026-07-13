@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation"
 import { useMemo, useState } from "react"
 import { cn } from "@/lib/utils"
+import { userMessageFrom } from "@/services/boffAPI"
 import type { WpFormat } from "../../_types/market.types"
 import { FORMAT_HINT, FORMAT_ICON, FORMAT_LABEL, fmt } from "../../_utils/format"
 import { useCreateListing, useWpUuid } from "../../_hooks/queries"
@@ -144,7 +145,14 @@ export function SellMon() {
 
   // ── step 0: pick ───────────────────────────────────────────────────────────
   if (step === 0 || !picked) {
-    if (error) return <EmptyState icon="alert" title="No se pudo leer tu PC" body={error.message} />
+    if (error)
+      return (
+        <EmptyState
+          icon="alert"
+          title="No se pudo leer tu PC"
+          body={userMessageFrom(error, "Inténtalo de nuevo en unos segundos.")}
+        />
+      )
     if (isLoading) {
       return (
         <div className="mx-auto max-w-[920px]">

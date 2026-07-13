@@ -79,7 +79,6 @@ import { WigglypopModule } from '@api/smartrotom/wigglypop/wigglypop.module';
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'public'),
       serveRoot: '/public',
-      exclude: ['/api*'],
     }),
     SmartRotomAppsModule,
     SmartRotomUsersModule,

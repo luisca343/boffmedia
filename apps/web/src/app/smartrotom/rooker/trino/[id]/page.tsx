@@ -2,6 +2,7 @@
 
 import { useParams } from "next/navigation"
 import Link from "next/link"
+import { userMessageFrom } from "@/services/boffAPI"
 import {
   ActionBtn,
   Avatar,
@@ -59,7 +60,7 @@ export default function TrinoPage() {
         <EmptyState
           icon="close"
           title="Este trino ya no está"
-          body={error instanceof Error ? error.message : "Puede que su autor lo haya borrado."}
+          body={userMessageFrom(error, "Puede que su autor lo haya borrado.")}
         />
       </div>
     )

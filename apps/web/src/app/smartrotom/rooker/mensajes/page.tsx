@@ -31,7 +31,7 @@ export default function MensajesPage() {
     queryKey: ["rooker", "dms", uuid],
     queryFn: async () => {
       const res = await ChatAppService.getChats(uuid!)
-      if (!res.success || !res.data) throw new Error(res.message || "No se pudieron cargar los mensajes")
+      if (!res.success || !res.data) throw new Error(res.userMessage ?? "No se pudieron cargar los mensajes")
       return res.data.filter((c) => c.type === DIRECT)
     },
     enabled: Boolean(uuid),

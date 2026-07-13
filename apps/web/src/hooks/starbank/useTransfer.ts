@@ -18,7 +18,7 @@ export function useTransfer() {
       // caller's catch instead of the success screen.
       const result = await StarbankService.transfer(transferData);
       if (!result.success) {
-        throw new Error(result.message || result.error || "No se pudo completar la transferencia");
+        throw new Error(result.userMessage ?? "No se pudo completar la transferencia");
       }
       setData(result.data ?? null);
       return result;
