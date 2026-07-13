@@ -47,9 +47,15 @@ export default async function EntradaPokedex({ params }: any) {
 
   let [pokemonIndex, formIndex] = resolvedParams.params as [number, number | string]
 
-  const pokemon = (await PokemonService.getPokemonByDex(pokemonIndex)).data as Pokemon
+  // Every read below resolves to `{ success: false }` on an HTTP error instead of throwing.
+  // Reading `.data` off that gives `undefined`, and the destructuring/`.forms` access that
+  // follows would crash the route into the error boundary rather than show "no encontrado".
+  const pokemonRes = await PokemonService.getPokemonByDex(pokemonIndex)
+  const pokemon = (pokemonRes.success ? pokemonRes.data : undefined) as Pokemon | undefined
 
   if (pokemonIndex === undefined) pokemonIndex = 0
+
+  if (!pokemon?.forms) return <h1 className="p-6 text-pk-surface-100">Pokémon no encontrado {pokemonIndex}</h1>
 
   if (formIndex === undefined) {
     formIndex = 0
@@ -60,14 +66,17 @@ export default async function EntradaPokedex({ params }: any) {
     formIndex = parseInt(formIndex + "") - 1
   }
 
-  const { next, prev } = (await PokemonService.getNextPrev(pokemonIndex)).data!
-  const moves = await (await PokemonService.getMoves(pokemonIndex, formIndex)).data
+  const nextPrevRes = await PokemonService.getNextPrev(pokemonIndex)
+  const { next, prev } = (nextPrevRes.success ? nextPrevRes.data : undefined) ?? { next: null, prev: null }
 
-  if (!pokemon) return <h1 className="p-6 text-pk-surface-100">Pokémon no encontrado {pokemonIndex}</h1>
+  const movesRes = await PokemonService.getMoves(pokemonIndex, formIndex)
+  const moves = movesRes.success ? movesRes.data : undefined
+
   if (!pokemon.forms[formIndex]) return <h1 className="p-6 text-pk-surface-100">Forma no encontrada {formIndex}</h1>
 
   const formName = getFormName(pokemon, formIndex)
-  const spawns = (await PokemonService.getSpawns(getPokemonId(pokemon.name, formName))).data as SpawnInfo[]
+  const spawnsRes = await PokemonService.getSpawns(getPokemonId(pokemon.name, formName))
+  const spawns = ((spawnsRes.success ? spawnsRes.data : undefined) ?? []) as SpawnInfo[]
 
   const type1 = (pokemon.forms[formIndex]?.types?.[0] ?? pokemon.forms[0]?.types?.[0]) as string
   const type2 = (pokemon.forms[formIndex]?.types?.[1] ?? pokemon.forms[0]?.types?.[1]) as string

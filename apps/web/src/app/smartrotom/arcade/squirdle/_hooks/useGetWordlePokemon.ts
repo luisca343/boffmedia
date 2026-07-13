@@ -36,16 +36,24 @@ export function useGetWordlePokemon() {
 
     useEffect(() => {
         if(!getMinecraftUUID()) return;
-        rotomGET(`/pokemon/wordle`).then((res:any) => {
-            // Add translated name to each Pokemon
-            const pokemonWithNames = res.data.map((p: WordlePokemon) => ({
-                ...p,
-                transName: getPokemonTranslatedName(p.name)
-            }));
+        rotomGET<WordlePokemon[]>(`/pokemon/wordle`)
+            .then((res) => {
+                // A failed request resolves to `{ success: false }` with no `data`, so
+                // `res.data.map` would throw inside the promise and go unhandled.
+                if (!res.success || !Array.isArray(res.data)) {
+                    console.error("Error fetching wordle pokemon:", res.message || res.error);
+                    return;
+                }
 
-            setPokemon(pokemonWithNames);
-            setTargetPokemon(pickRandom(pokemonWithNames));
-        });
+                const pokemonWithNames = res.data.map((p) => ({
+                    ...p,
+                    transName: getPokemonTranslatedName(p.name)
+                }));
+
+                setPokemon(pokemonWithNames);
+                setTargetPokemon(pickRandom(pokemonWithNames));
+            })
+            .catch((e) => console.error("Error fetching wordle pokemon:", e));
     }, []);
 
     /** Re-rolls the hidden creature. The target has always been picked client-side. */

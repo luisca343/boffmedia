@@ -59,7 +59,7 @@ export function BattleCard({ data, author }: { data: RookerBattle; author: Rooke
 
       <div className="px-3.5 pb-3.5">
         <Link
-          href={`/smartrotom/liga/replay/${data.replayId}`}
+          href={`/smartrotom/liga/camaralucha/ver/${data.replayId}`}
           onClick={(e) => e.stopPropagation()}
           className={cn(
             "inline-flex items-center gap-1.5 rounded-rk-pill border bg-rk-fg/5 px-3.5 py-1.5 text-[12.5px] font-bold transition-colors hover:bg-rk-hover",

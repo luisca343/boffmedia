@@ -31,8 +31,9 @@ export function EntryHeader({
 }: {
   pokemon: Pokemon
   formName: string
-  prev: { dex: number; name: string; spriteUrl: string }
-  next: { dex: number; name: string; spriteUrl: string }
+  // Null when the nextprev lookup failed — the entry still renders, just without the pager.
+  prev: { dex: number; name: string; spriteUrl: string } | null
+  next: { dex: number; name: string; spriteUrl: string } | null
   children?: React.ReactNode
 }) {
   const t = useTranslations("pokedex")
@@ -101,25 +102,31 @@ export function EntryHeader({
               <span className="w-9 h-9 bg-white/[0.04] border border-white/[0.08] rounded-[9px] grid place-items-center text-pk-surface-300">
                 <BookmarkIcon className="w-4 h-4" />
               </span>
-              <div className="flex items-center gap-px bg-white/[0.04] border border-white/[0.06] rounded-[10px] p-[3px]">
-                <Link
-                  href={`/smartrotom/pokedex/entrada/${prev.dex}`}
-                  title={`#${prev.dex} ${prev.name}`}
-                  className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-[7px] text-pk-surface-300 hover:text-pk-surface-50 hover:bg-white/[0.05] transition-colors text-xs"
-                >
-                  <ChevronLeftIcon className="w-3.5 h-3.5" />
-                  <span className="font-pk-mono text-[11px] text-pk-surface-500">#{String(prev.dex).padStart(3, "0")}</span>
-                </Link>
-                <span className="w-px h-[18px] bg-white/[0.08]" />
-                <Link
-                  href={`/smartrotom/pokedex/entrada/${next.dex}`}
-                  title={`#${next.dex} ${next.name}`}
-                  className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-[7px] text-pk-surface-300 hover:text-pk-surface-50 hover:bg-white/[0.05] transition-colors text-xs"
-                >
-                  <span className="font-pk-mono text-[11px] text-pk-surface-500">#{String(next.dex).padStart(3, "0")}</span>
-                  <ChevronRightIcon className="w-3.5 h-3.5" />
-                </Link>
-              </div>
+              {(prev || next) && (
+                <div className="flex items-center gap-px bg-white/[0.04] border border-white/[0.06] rounded-[10px] p-[3px]">
+                  {prev && (
+                    <Link
+                      href={`/smartrotom/pokedex/entrada/${prev.dex}`}
+                      title={`#${prev.dex} ${prev.name}`}
+                      className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-[7px] text-pk-surface-300 hover:text-pk-surface-50 hover:bg-white/[0.05] transition-colors text-xs"
+                    >
+                      <ChevronLeftIcon className="w-3.5 h-3.5" />
+                      <span className="font-pk-mono text-[11px] text-pk-surface-500">#{String(prev.dex).padStart(3, "0")}</span>
+                    </Link>
+                  )}
+                  {prev && next && <span className="w-px h-[18px] bg-white/[0.08]" />}
+                  {next && (
+                    <Link
+                      href={`/smartrotom/pokedex/entrada/${next.dex}`}
+                      title={`#${next.dex} ${next.name}`}
+                      className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-[7px] text-pk-surface-300 hover:text-pk-surface-50 hover:bg-white/[0.05] transition-colors text-xs"
+                    >
+                      <span className="font-pk-mono text-[11px] text-pk-surface-500">#{String(next.dex).padStart(3, "0")}</span>
+                      <ChevronRightIcon className="w-3.5 h-3.5" />
+                    </Link>
+                  )}
+                </div>
+              )}
             </div>
           </div>
 

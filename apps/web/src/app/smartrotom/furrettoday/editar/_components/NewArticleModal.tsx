@@ -66,7 +66,7 @@ export function NewArticleModal({
           NUEVA NOTICIA
         </div>
         <h3 className="font-ft-display mt-1 text-4xl leading-none">Empieza un borrador</h3>
-        <p className="font-ft-body mb-4 mt-1.5 text-ft-body">
+        <p className="mb-4 mt-1.5 text-ft-body">
           Crea el borrador y rellena el cuerpo después en el editor. Puedes despublicarlo cuando
           quieras.
         </p>

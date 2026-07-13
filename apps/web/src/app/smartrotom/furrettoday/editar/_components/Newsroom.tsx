@@ -232,7 +232,7 @@ export function Newsroom({ initialId = null }: { initialId?: number | null }) {
         <div className="p-6">
           <Eyebrow className="text-ft-pink">ELIMINAR NOTICIA</Eyebrow>
           <h3 className="font-ft-display mt-1 text-3xl">¿Seguro?</h3>
-          <p className="font-ft-body mt-2 text-ft-body">
+          <p className="mt-2 text-ft-body">
             Esto borra «{pendingArticle?.title ?? "esta noticia"}» para siempre. No hay deshacer.
           </p>
           <div className="mt-5 flex justify-end gap-2.5">

@@ -83,7 +83,7 @@ export function NewsSidebar({
           <div className="p-6 text-center">
             <FurretMascot size={80} className="mx-auto" />
             <div className="font-ft-display mt-1.5 text-xl">NADA POR AQUÍ</div>
-            <p className="font-ft-body text-sm">Prueba a cambiar el filtro o la búsqueda.</p>
+            <p className="text-sm">Prueba a cambiar el filtro o la búsqueda.</p>
           </div>
         ) : (
           <ul className="flex flex-col gap-2 p-2">

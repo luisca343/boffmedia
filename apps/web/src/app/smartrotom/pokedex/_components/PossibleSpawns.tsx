@@ -65,7 +65,7 @@ export function PossibleSpawns({ pokemonSpawns, hideCaught = true, hideSeen = tr
       setIsLoading(true);
       try {
         const result = await getSpawns();
-        const res = result.data!;
+        const res = [...(result.data ?? [])];
         res.sort((a, b) => b.rarity - a.rarity);
         setSpawns(res);
       } catch (error) {

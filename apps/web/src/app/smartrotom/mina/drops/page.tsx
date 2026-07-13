@@ -8,8 +8,14 @@ import { Drop, DropByType } from "../_types/Drops";
 import { MinaService } from "@/services/api/smartrotom/minaService";
 
 export default async function Drops() {
-  const { drops, totalValue } = (await MinaService.getRewardsByType()).data as {drops: DropByType, totalValue: number};
-  if(!drops) return <></>
+  // An HTTP failure resolves to `{ success: false }` with no `data`; destructuring it
+  // would throw and take the whole route to the error boundary.
+  const res = await MinaService.getRewardsByType();
+  const payload = res.success
+    ? (res.data as { drops: DropByType; totalValue: number } | undefined)
+    : undefined;
+  if (!payload?.drops) return <></>
+  const { drops, totalValue } = payload;
   return (
     <MenuWrapper className="w-full min-h-full overflow-hidden bg-layer-1 text-white pt-4   flex flex-col items-center">
       <div className="bg-black bg-opacity-70 p-6 rounded-lg w-3/4 max-w-full">

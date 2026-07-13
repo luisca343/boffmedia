@@ -24,32 +24,47 @@
 // identical CSS), so it is a spacing convention, not a correctness bug.
 import { existsSync, readFileSync } from "node:fs";
 import { execSync } from "node:child_process";
+import { posix } from "node:path";
 
 const BM_ROOTS = ["apps/web/src/components/boffmedia", "apps/web/src/app/(boffmedia)"];
 
 // Only the surfaces that have actually been migrated to the SmartRotom v3 system.
 // Add a root here as each remaining app is migrated — that is what makes the guard
 // ratchet forward instead of being disabled by the legacy tree's 85 violations.
+// The guard used to list only the migrated app dirs, which left `app/smartrotom` and
+// `components/smartrotom` themselves OUTSIDE every root — so the shell and the chrome
+// (RotomNav, the main nav) were never scanned, and SMARTROTOM_V3.md §3's claim that the
+// chrome is "clean (0 imports)" passed CI while being false. The roots are now the two
+// trees, with the remaining debt pinned in CROSS_DS_BASELINE below.
 const SR_ROOTS = [
-  "apps/web/src/app/smartrotom/starbank",
-  "apps/web/src/app/smartrotom/chatapp",
-  "apps/web/src/app/smartrotom/notas",
-  "apps/web/src/app/smartrotom/pokedex",
-  "apps/web/src/app/smartrotom/mewtube",
-  "apps/web/src/app/smartrotom/mewtwitch",
-  "apps/web/src/app/smartrotom/misiones",
-  "apps/web/src/app/smartrotom/taxi",
-  "apps/web/src/app/smartrotom/arcade",
-  "apps/web/src/app/smartrotom/furrettoday",
-  "apps/web/src/app/smartrotom/pc",
-  "apps/web/src/app/smartrotom/gobierno",
-  "apps/web/src/app/smartrotom/pasaporte",
-  "apps/web/src/app/smartrotom/rooker",
-  "apps/web/src/app/smartrotom/wigglypop",
-  "apps/web/src/app/smartrotom/styles",
-  "apps/web/src/components/smartrotom/ui",
-  "apps/web/src/components/smartrotom/media",
+  "apps/web/src/app/smartrotom",
+  "apps/web/src/components/smartrotom",
 ];
+
+// Known cross-design-system imports, per file. This is a RATCHET, not an exemption: the
+// count may only go DOWN. Adding an import to a listed file fails the build, and so does
+// the first one in any file not listed. When a file is cleaned, drop its entry.
+//
+// Everything here is legacy (camara/liga/mina/bidkea) or the not-actually-migrated chrome
+// (RotomNav still pulls 6 Boffmedia primitives — the `sr-*` migration painted tokens onto
+// the surface without replacing what is underneath). See docs/smartrotom/AUDIT_2026-07-13.md.
+const CROSS_DS_BASELINE = {
+  "apps/web/src/app/smartrotom/layout.tsx": 1,
+  "apps/web/src/app/smartrotom/SmartRotomProviders.tsx": 1,
+  "apps/web/src/components/smartrotom/RotomNav.tsx": 6,
+  "apps/web/src/components/smartrotom/apps/App.tsx": 1,
+  "apps/web/src/app/smartrotom/bidkea/page.tsx": 2,
+  "apps/web/src/app/smartrotom/camara/_components/CameraBottomControls.tsx": 1,
+  "apps/web/src/app/smartrotom/camara/_components/CameraControls.tsx": 1,
+  "apps/web/src/app/smartrotom/camara/_components/CameraZoomSlider.tsx": 1,
+  "apps/web/src/app/smartrotom/camara/_components/GalleryView.tsx": 1,
+  "apps/web/src/app/smartrotom/camara/_components/ScreenshotPreviewDialog.tsx": 2,
+  "apps/web/src/app/smartrotom/liga/page.tsx": 1,
+  "apps/web/src/app/smartrotom/liga/camaralucha/page.tsx": 1,
+  "apps/web/src/app/smartrotom/mina/_components/LinkMina.tsx": 1,
+  "apps/web/src/app/smartrotom/mina/drops/page.tsx": 1,
+  "apps/web/src/app/smartrotom/mina/jugar/page.tsx": 2,
+};
 
 function listFiles(roots) {
   const out = [];
@@ -68,8 +83,30 @@ function listFiles(roots) {
   return out;
 }
 
-// A SmartRotom file must not import a Boffmedia-owned primitive.
-const CROSS_DS = /from\s+["']@\/components\/(ui|boffmedia)\//;
+// A SmartRotom file must not import a Boffmedia-owned primitive. The rule is about the
+// DEPENDENCY, not how it is spelled: matching only `@/components/…` let a relative
+// `../../ui/navigation/Link` through (components/smartrotom/apps/App.tsx did exactly that).
+//
+// A relative specifier cannot be matched textually — from `notas/_components/overlays/`,
+// `../ui/ThemedLayer` is the app's OWN barrel, while from `components/smartrotom/apps/`,
+// `../../ui/navigation/Link` is Boffmedia. Same text, opposite verdicts. So resolve it
+// against the importing file's directory and ask where it actually lands.
+const BM_OWNED = ["apps/web/src/components/ui/", "apps/web/src/components/boffmedia/"];
+const IMPORT_FROM = /(?:from|import)\s+["']([^"']+)["']/;
+
+function isCrossDs(file, line) {
+  const m = line.match(IMPORT_FROM);
+  if (!m) return false;
+  const spec = m[1];
+
+  const target = spec.startsWith("@/")
+    ? posix.join("apps/web/src", spec.slice(2))
+    : spec.startsWith(".")
+      ? posix.normalize(posix.join(posix.dirname(file), spec))
+      : null; // a bare package name is never a local primitive
+
+  return target !== null && BM_OWNED.some((root) => (target + "/").startsWith(root));
+}
 
 // `bg-${tone}`, `text-${c}-300`, `border-${x}` … inside a template literal. The JIT
 // only sees literal class strings, so these silently never compile. Full-class maps
@@ -135,17 +172,43 @@ for (const file of listFiles(BM_ROOTS)) {
   });
 }
 
+const crossDsSeen = {};
+
 for (const file of listFiles(SR_ROOTS)) {
   const lines = readFileSync(file, "utf8").split("\n");
   lines.forEach((line, i) => {
     if (IS_COMMENT.test(line)) return;
-    if (CROSS_DS.test(line)) {
-      violations.push(`${file}:${i + 1}  cross-design-system import — SmartRotom must not import Boffmedia primitives (SMARTROTOM_V3.md §3)`);
+    if (isCrossDs(file, line)) {
+      (crossDsSeen[file] ??= []).push(i + 1);
     }
     if (DYNAMIC_CLASS.test(withoutQuotedProse(line))) {
       violations.push(`${file}:${i + 1}  dynamic Tailwind class — the JIT can't see \`bg-\${…}\`; use a full-class map (SMARTROTOM_V3.md §4)`);
     }
   });
+}
+
+// Cross-DS is ratcheted rather than absolute: the baseline pins the known legacy debt, and
+// only a count that GREW is a violation. A count that shrank is progress — the guard says so
+// and asks for the baseline to be lowered, which is what stops the debt creeping back.
+for (const [file, lines] of Object.entries(crossDsSeen)) {
+  const allowed = CROSS_DS_BASELINE[file] ?? 0;
+  if (lines.length > allowed) {
+    const where = lines.join(", ");
+    violations.push(
+      allowed === 0
+        ? `${file}:${lines[0]}  cross-design-system import — SmartRotom must not import Boffmedia primitives (SMARTROTOM_V3.md §3)`
+        : `${file}  cross-design-system imports grew ${allowed} → ${lines.length} (lines ${where}) — SMARTROTOM_V3.md §3`,
+    );
+  }
+}
+
+for (const [file, allowed] of Object.entries(CROSS_DS_BASELINE)) {
+  const actual = crossDsSeen[file]?.length ?? 0;
+  if (actual < allowed && existsSync(file)) {
+    violations.push(
+      `${file}  cross-DS imports are down to ${actual} (baseline says ${allowed}) — lower it to ${actual} in CROSS_DS_BASELINE so the guard ratchets forward`,
+    );
+  }
 }
 
 if (violations.length) {
