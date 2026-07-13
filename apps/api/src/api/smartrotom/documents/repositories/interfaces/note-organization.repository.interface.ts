@@ -49,7 +49,10 @@ export interface INoteOrganizationRepository {
     label: string;
     color: string;
   }): Promise<{ insertId: number }>;
-  updateTag(id: number, data: { label?: string; color?: string }): Promise<void>;
+  updateTag(
+    id: number,
+    data: { label?: string; color?: string },
+  ): Promise<void>;
   deleteTag(id: number): Promise<void>;
 
   findTagIdsByDocumentIds(ids: number[]): Promise<TagLink[]>;

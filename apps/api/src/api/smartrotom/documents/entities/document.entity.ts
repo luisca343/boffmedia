@@ -186,7 +186,10 @@ export class NoteVersion {
   @ApiProperty({ example: 45, description: 'Version ID' })
   id: number;
 
-  @ApiProperty({ example: 123, description: 'Document ID this version belongs to' })
+  @ApiProperty({
+    example: 123,
+    description: 'Document ID this version belongs to',
+  })
   documentId: number;
 
   @ApiProperty({
@@ -217,7 +220,6 @@ export class NoteVersion {
   @ApiProperty({ example: '2025-06-14T12:00:00.000Z' })
   createdAt: Date;
 }
-
 
 export class CreateDocumentResponse {
   @ApiProperty({

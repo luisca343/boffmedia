@@ -67,5 +67,4 @@ export const boffMediaEmailVerifications = mysqlTable(
   }),
 );
 
-export type EmailVerification =
-  typeof boffMediaEmailVerifications.$inferSelect;
+export type EmailVerification = typeof boffMediaEmailVerifications.$inferSelect;

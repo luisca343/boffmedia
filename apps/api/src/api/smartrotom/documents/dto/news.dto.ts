@@ -7,16 +7,21 @@ import {
   IsOptional,
   Min,
   Max,
+  IsEmail,
+  MaxLength,
 } from 'class-validator';
 
 export class CreateNewsDto extends BaseDto {
   @ApiProperty({
-    description: 'Unique identifier for the news article',
+    description:
+      'News ID. Ignored on create — the database assigns it, and the update ' +
+      'route takes it from the URL. Optional so a client never has to invent one.',
     example: 1,
+    required: false,
   })
-  @IsNotEmpty()
+  @IsOptional()
   @IsInt()
-  id: number;
+  id?: number;
 
   @ApiProperty({
     description: 'News title',
@@ -99,6 +104,34 @@ export class CreateNewsDto extends BaseDto {
   @IsOptional()
   @IsString()
   imageUrl?: string;
+
+  @ApiProperty({
+    description: 'Byline author name',
+    example: 'Ada Furret',
+    required: false,
+  })
+  @IsOptional()
+  @IsString()
+  author?: string;
+
+  @ApiProperty({
+    description: 'Author masthead role',
+    example: 'Editora de comunidad',
+    required: false,
+  })
+  @IsOptional()
+  @IsString()
+  authorRole?: string;
+
+  @ApiProperty({
+    description: 'Magazine issue number',
+    example: 12,
+    required: false,
+  })
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  issue?: number;
 }
 
 export class UpdateNewsDto extends CreateNewsDto {}
@@ -133,4 +166,33 @@ export class GetNewsDto {
   @IsOptional()
   @IsString()
   published?: string;
+}
+
+export class CreateNewsCommentDto extends BaseDto {
+  @ApiProperty({
+    description: 'Comment author UUID',
+    example: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4',
+  })
+  @IsNotEmpty()
+  @IsString()
+  uuid: string;
+
+  @ApiProperty({
+    description: 'Comment body',
+    example: 'Great update!',
+  })
+  @IsNotEmpty()
+  @IsString()
+  @MaxLength(500)
+  body: string;
+}
+
+export class NewsletterSubscribeDto extends BaseDto {
+  @ApiProperty({
+    description: 'Subscriber email address',
+    example: 'reader@example.com',
+  })
+  @IsNotEmpty()
+  @IsEmail()
+  email: string;
 }
