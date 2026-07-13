@@ -43,6 +43,8 @@ const SR_ROOTS = [
   "apps/web/src/app/smartrotom/furrettoday",
   "apps/web/src/app/smartrotom/pc",
   "apps/web/src/app/smartrotom/gobierno",
+  "apps/web/src/app/smartrotom/rooker",
+  "apps/web/src/app/smartrotom/wigglypop",
   "apps/web/src/app/smartrotom/styles",
   "apps/web/src/components/smartrotom/ui",
   "apps/web/src/components/smartrotom/media",

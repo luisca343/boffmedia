@@ -80,6 +80,8 @@ export namespace StarBankTransaction {
         TASA = 'TASA',
         SUBASTA = 'SUBASTA',
         RECOMPENSA = 'RECOMPENSA',
+        MERCADO = 'MERCADO',
+        VENTA_P2P = 'VENTA_P2P',
     }
 }
 
