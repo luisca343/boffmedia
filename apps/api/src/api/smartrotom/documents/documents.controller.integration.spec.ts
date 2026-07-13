@@ -8,7 +8,8 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { Reflector } from '@nestjs/core';
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const request = require('supertest') as typeof import('supertest');
-import { DocumentsController } from './documents.controller';
+import { NotesController } from './notes.controller';
+import { NewsController } from './news.controller';
 import { DocumentsFacadeService } from './documents.facade.service';
 import { GlobalExceptionFilter } from '@/common/filters/global-exception.filter';
 import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
@@ -56,7 +57,7 @@ describe('DocumentsController — integration (ValidationPipe + GlobalExceptionF
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      controllers: [DocumentsController],
+      controllers: [NotesController, NewsController],
       providers: [
         { provide: DocumentsFacadeService, useValue: mockFacade },
         { provide: Reflector, useValue: new Reflector() },

@@ -23,12 +23,20 @@ import { NewsService } from './services/news.service';
 // Import facade service
 import { DocumentsFacadeService } from './documents.facade.service';
 
-// Import controller
-import { DocumentsController } from './documents.controller';
+// Import controllers
+import { NotesController } from './notes.controller';
+import { FoldersTagsController } from './folders-tags.controller';
+import { VersionsController } from './versions.controller';
+import { NewsController } from './news.controller';
 
 @Module({
   imports: [LoggerModule, ResponseModule, DrizzleModule],
-  controllers: [DocumentsController],
+  controllers: [
+    NotesController,
+    FoldersTagsController,
+    VersionsController,
+    NewsController,
+  ],
   providers: [
     RolesGuard,
     // Provide repositories via tokens
