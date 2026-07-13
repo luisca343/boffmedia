@@ -46,14 +46,14 @@ export type PokemonW = {
     /**
      * IVs (HP, Atk, Def, SpA, SpD, Spe)
      */
-    ivs: Array<string>;
+    ivs: Array<number>;
     /**
      * EVs (HP, Atk, Def, SpA, SpD, Spe)
      */
-    evs: Array<string>;
+    evs: Array<number>;
     /**
      * Stats (HP, Atk, Def, SpA, SpD, Spe)
      */
-    stats: Array<string>;
+    stats: Array<number>;
 };
 

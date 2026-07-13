@@ -8,9 +8,9 @@ export type UpdateNewsDto = {
      */
     server?: string;
     /**
-     * Unique identifier for the news article
+     * News ID. Ignored on create — the database assigns it, and the update route takes it from the URL. Optional so a client never has to invent one.
      */
-    id: number;
+    id?: number;
     /**
      * News title
      */
@@ -47,5 +47,17 @@ export type UpdateNewsDto = {
      * Image URL for the news
      */
     imageUrl?: string;
+    /**
+     * Byline author name
+     */
+    author?: string;
+    /**
+     * Author masthead role
+     */
+    authorRole?: string;
+    /**
+     * Magazine issue number
+     */
+    issue?: number;
 };
 
