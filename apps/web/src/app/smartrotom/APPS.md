@@ -257,27 +257,25 @@ Full Pokédex browser. Features quick search, localization by biome, move lists,
 
 ---
 
-### Rooker ⭐ New
+### Rooker
 **Route:** `/smartrotom/rooker`  
-**Status:** Scaffold (in development)  
-Twitter/X-inspired social network for server players. Will allow posting short updates, following other trainers, liking and commenting on posts, and building a community feed.
+**Status:** **Active** — built on the v3 system (`rk-*`, the 13th design system). See [docs/smartrotom/apps/ROOKER_V3.md](../../../../docs/smartrotom/apps/ROOKER_V3.md).  
+Twitter/X-inspired social network for server players — "el nido". Post trinos, follow trainers, react, retrino, reply, and build a community feed.
 
-**Technical note:** Rooker is also the natural home for the **shared notification layer** — multiple apps need push notifications (Wigglypop sold, new ChatApp message, Karts race starting, FurretToday event reminder). Building this infra as part of Rooker's backend means other apps can tap into it without duplicating notification plumbing. Socket.io is already present in the stack.
+**Technical note:** the notification layer did **not** need building here. `rotom_notifications` was already generic (free-form `type`, title, body, deep `link`), so Rooker writes `type = 'rooker'` rows into it and reads them back filtered. Any other app can do the same — there is nothing to duplicate.
 
-**Planned features:**
-- Feed: follows-based chronological, with staff-pinned posts anchored at top
-- Post composer with attachments:
-  - Screenshot from Cámara gallery
-  - Wigglypop listing link ("WTS Shiny Charizard — see listing")
-  - Trainer card preview (from Pasaporte data)
-  - Liga rank badge
-- Profile page: trainer card header pulled from Pasaporte, post history, follower/following count
-- Hashtag/topic system: `#breeding`, `#trades`, `#shiny`, `#eventos`, `#liga`
-- Like, reply, repost
-- Follow system — mutual follow unlocks DM (or routes to ChatApp conversation)
-- Staff-verified badge for gym leaders / server staff
-- Notification inbox: likes, replies, new followers, mentions
-- Report system for moderation (staff acts from Admin app)
+**Built:**
+- Feed: "Para ti" + "Siguiendo", staff-pinned posts anchored at top
+- Composer: text + image URL, 280 chars. Capture/battle attachment is accepted by the API (`captureId` / `replayId`) but has no picker screen yet
+- Profile: partner Pokémon banner, bio/link, **derived** trainer stats (captures, shinies, battles, Pokédex %) — all read from the Pokédex registry and the replay log, never stored
+- Hashtags → trends (a GROUP BY over the last 7 days, not a curated table)
+- Five reactions (❤ / Poké Ball / Choque / Shiny / Fueguito), retrino, reply, bookmark
+- Follow system. **DMs route to ChatApp** (`/mensajes` reads its real direct chats and deep-links out) — one messaging backend, two front doors
+- Notification inbox: replies, reactions, follows
+- Vitrina: the trainer's real Pokédex collection
+- Pantalla: 3 canvases × 6 accents, density, card style, reaction mode
+
+**Not built** (the server has no such system — see [deferred/rooker.md](../../../../docs/smartrotom/deferred/rooker.md)): trainer levels, teams, guilds, polls, view counts, staff-verified badge (gated, pinned `false`), report/moderation.
 
 ---
 

@@ -26,7 +26,8 @@ export const sideLink =
 // bare would show unresolved CSS vars. `Scope` reproduces the real root from each
 // app's layout — the same classes, so a primitive looks here exactly as it does in
 // the app. `sr` is deliberately a no-op: the chrome has no scope root, it's global.
-export type AppKey = "sr" | "sb" | "ca" | "nt" | "pk" | "mw" | "tx" | "ms" | "ar" | "ft" | "pc" | "gt"
+export type AppKey =
+  | "sr" | "sb" | "ca" | "nt" | "pk" | "mw" | "tx" | "ms" | "ar" | "ft" | "pc" | "gt" | "rk" | "wp"
 
 // The scope CLASS is what makes an app's tokens resolve: `ca`/`nt`/`mw` are CSS-var
 // backed and their vars are declared on `.ca-app`/`.nt-app`/`.mw-app` base layers, so
@@ -45,6 +46,8 @@ const SCOPE_VARS: Record<AppKey, string> = {
   ft: "ft-app",
   pc: "pc-app",
   gt: "gt-app",
+  rk: "rk-app",
+  wp: "wp-app",
 }
 
 // The SKIN is the app's canvas + fonts + ink, lifted from its real layout root. Kept
@@ -70,6 +73,13 @@ const SCOPE_SKIN: Record<AppKey, string> = {
   // The Gobierno's canvas is warm paper: `gt-paper` lays the grain and the engraved
   // guilloché over it, the way an official document is printed on stock, not on white.
   gt: "gt-paper bg-gt-paper-bg font-gt text-gt-ink-800 antialiased",
+  // Rooker's canvas is the timeline itself. With no `data-theme` it paints Tenue, the
+  // default of its three.
+  rk: "bg-rk-bg font-rk text-rk-fg antialiased",
+  // Wigglypop's canvas is the pink-cream page: the `.wp-app` base layer already
+  // paints the two corner glows over the wash, so the skin only adds type and ink.
+  // Note the 600 weight — Nunito at 400 looks anaemic here, so the app rests semibold.
+  wp: "font-wp text-wp-fg antialiased",
 }
 
 export function Scope({
@@ -81,8 +91,12 @@ export function Scope({
   children,
 }: {
   app: AppKey
-  /** ca / nt / tx only — drives the real light/dark token swap. */
-  theme?: "light" | "dark"
+  /**
+   * ca / nt / tx — the real light/dark token swap. Rooker takes the same attribute but
+   * has THREE canvases (`light` | `dim` | `lightsout`), because the reader picks which
+   * dark; omit it there to get Tenue, its default.
+   */
+  theme?: "light" | "dark" | "dim" | "lightsout"
   /** mw only — picks the accent (Mewtube pink / Mewtwitch purple). */
   media?: "mewtube" | "mewtwitch"
   /** Paint the app's canvas/fonts/ink. Off = tokens resolve, chrome surface shows through. */
@@ -120,7 +134,8 @@ export function Sample({
   note?: React.ReactNode
   /** Which design system the specimen belongs to — sets its scope root. */
   app?: AppKey
-  theme?: "light" | "dark"
+  /** Rooker takes three canvases here, not two — see `Scope`. */
+  theme?: "light" | "dark" | "dim" | "lightsout"
   media?: "mewtube" | "mewtwitch"
   col?: boolean
   grid?: boolean

@@ -39,6 +39,16 @@ export const env = z
     // Public base URL of the web app — used to build reset/verify links.
     WEB_URL: z.string().default('http://localhost:3000'),
 
+    // Wigglypop marketplace. OFF until the game server ships /takepokemon + /takeitems.
+    // While it is off, a sale only moves money (buyer → escrow → seller) and the two players
+    // hand the Pokémon over in-game themselves; the API never calls givePokemon, because
+    // without a matching take that would DUPLICATE the mon. Flip it on only once both
+    // plugin routes exist — see WigglypopCustodyService.
+    WIGGLYPOP_ATOMIC_CUSTODY: z
+      .enum(['true', 'false'])
+      .default('false')
+      .transform((v) => v === 'true'),
+
     // AI
     GEMINI_API_KEY: z.string().optional(),
 

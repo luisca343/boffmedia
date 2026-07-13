@@ -36,6 +36,11 @@ import { PcPrimitivasChapter } from "./_chapters/PcPrimitivasChapter"
 import { PcAlmacenChapter } from "./_chapters/PcAlmacenChapter"
 import { GtBasesChapter } from "./_chapters/GtBasesChapter"
 import { GtPrimitivasChapter } from "./_chapters/GtPrimitivasChapter"
+import { RkBasesChapter } from "./_chapters/RkBasesChapter"
+import { RkPrimitivasChapter } from "./_chapters/RkPrimitivasChapter"
+import { WpBasesChapter } from "./_chapters/WpBasesChapter"
+import { WpPrimitivasChapter } from "./_chapters/WpPrimitivasChapter"
+import { RkNidoChapter } from "./_chapters/RkNidoChapter"
 
 // Chapter names repeat across domains ("Bases" ×6), so views are keyed by `dom/name`.
 const CHAPTER_VIEWS: Record<string, React.ComponentType> = {
@@ -71,6 +76,11 @@ const CHAPTER_VIEWS: Record<string, React.ComponentType> = {
   "PC/Almacén": PcAlmacenChapter,
   "Gobierno/Bases": GtBasesChapter,
   "Gobierno/Primitivas": GtPrimitivasChapter,
+  "Rooker/Bases": RkBasesChapter,
+  "Rooker/Primitivas": RkPrimitivasChapter,
+  "Rooker/Nido": RkNidoChapter,
+  "Wigglypop/Bases": WpBasesChapter,
+  "Wigglypop/Primitivas": WpPrimitivasChapter,
 }
 
 export default function SmartRotomComponentsShowcase() {

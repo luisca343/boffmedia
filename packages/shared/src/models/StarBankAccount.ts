@@ -36,6 +36,7 @@ export namespace StarBankAccount {
         MAIN = 'MAIN',
         SECONDARY = 'SECONDARY',
         GOVERNMENT = 'GOVERNMENT',
+        MARKET = 'MARKET',
     }
 }
 

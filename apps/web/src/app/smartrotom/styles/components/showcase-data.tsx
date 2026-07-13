@@ -377,7 +377,66 @@ export const CHAPTERS: Chapter[] = [
       { id: "gt-estados", label: "Vacíos y carga" },
     ],
   },
+  // ── Rooker · rk-* ──────────────────────────────────────────────────────────
+  {
+    name: "Bases",
+    dom: "Rooker",
+    app: "rk",
+    sections: [
+      { id: "rk-color", label: "Color y lienzos" },
+      { id: "rk-acento", label: "Acento" },
+      { id: "rk-tipografia", label: "Tipografía" },
+      { id: "rk-geometria", label: "Geometría" },
+    ],
+  },
+  {
+    name: "Primitivas",
+    dom: "Rooker",
+    app: "rk",
+    sections: [
+      { id: "rk-botones", label: "Botones" },
+      { id: "rk-identidad", label: "Identidad" },
+      { id: "rk-navegacion", label: "Cabeceras y pestañas" },
+      { id: "rk-formularios", label: "Búsqueda y contador" },
+      { id: "rk-estados", label: "Vacíos y carga" },
+    ],
+  },
+  {
+    name: "Nido",
+    dom: "Rooker",
+    app: "rk",
+    sections: [
+      { id: "rk-reacciones", label: "Reacciones" },
+      { id: "rk-acciones", label: "Barra de acciones" },
+      { id: "rk-datos", label: "Datos del entrenador" },
+    ],
+  },
 
+  // ── Wigglypop · wp-* ───────────────────────────────────────────────────────
+  {
+    name: "Bases",
+    dom: "Wigglypop",
+    app: "wp",
+    sections: [
+      { id: "wp-color", label: "Color" },
+      { id: "wp-tipografia", label: "Tipografía" },
+      { id: "wp-geometria", label: "Geometría" },
+    ],
+  },
+  {
+    name: "Primitivas",
+    dom: "Wigglypop",
+    app: "wp",
+    sections: [
+      { id: "wp-botones", label: "Botones" },
+      { id: "wp-dinero", label: "Dinero" },
+      { id: "wp-rareza", label: "Rareza" },
+      { id: "wp-confianza", label: "Confianza" },
+      { id: "wp-navegacion", label: "Navegación" },
+      { id: "wp-formularios", label: "Formularios" },
+      { id: "wp-estados", label: "Estados" },
+    ],
+  },
 ]
 
 export const DOMAIN_ORDER = [
@@ -393,6 +452,8 @@ export const DOMAIN_ORDER = [
   "Furret Today",
   "PC",
   "Gobierno",
+  "Rooker",
+  "Wigglypop",
 ]
 
 // Chapter names repeat across domains ("Bases" exists six times), so a chapter's
@@ -418,4 +479,6 @@ export const DOMAIN_META: Record<string, { ns: string; note: string }> = {
   "Furret Today": { ns: "ft-*", note: "Revista pop · papel de periódico, claro" },
   PC: { ns: "pc-*", note: "Consola de almacenamiento · pizarra y cristal, oscuro" },
   Gobierno: { ns: "gt-*", note: "Institución cívica · papel y sello grabado, claro" },
+  Rooker: { ns: "rk-*", note: "El nido social · tres lienzos, seis acentos" },
+  Wigglypop: { ns: "wp-*", note: "Mercado burbuja · rosa globo y verde azulado dinero, claro" },
 }
