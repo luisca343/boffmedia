@@ -1,7 +1,14 @@
-export default function Wigglypop() {
+"use client"
+
+import { Feed } from "./_components/Feed"
+import { FilterRail } from "./_components/FilterRail"
+
+/** The market. A thin orchestrator (§12): the rail filters, the feed renders. */
+export default function WigglypopPage() {
   return (
-    <div className="bg-layer-2 min-h-full overflow-auto p-4">
-      <h1 className="text-white text-2xl font-bold">Wigglypop</h1>
-    </div>
-  );
+    <>
+      <FilterRail />
+      <Feed />
+    </>
+  )
 }
