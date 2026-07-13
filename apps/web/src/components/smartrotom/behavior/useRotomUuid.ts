@@ -11,3 +11,9 @@ export function useRotomUuid(): string | null {
   const { session } = useBoffSession()
   return session?.user?.smartRotomUser?.uuid ?? null
 }
+
+/** The linked SmartRotom username; `null` until signed in. Apps add their own fallback copy. */
+export function useRotomUsername(): string | null {
+  const { session } = useBoffSession()
+  return session?.user?.smartRotomUser?.username ?? null
+}

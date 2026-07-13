@@ -1,6 +1,7 @@
 "use client"
 
 import { useBoffSession } from "@/services/useBoffSession"
+import { useRotomUsername } from "@/components/smartrotom/behavior/useRotomUuid"
 import type { QuestData, Region } from "../_types"
 import { questCounts } from "../_utils/quests"
 import { Bar, FlourishCorners, Label, Nail, Paper, Shield } from "./ui"
@@ -17,7 +18,7 @@ import { Bar, FlourishCorners, Label, Nail, Paper, Shield } from "./ui"
 export function PlayerHeader({ quests, regions }: { quests: QuestData[]; regions: Region[] }) {
   const { session } = useBoffSession()
   const user = session?.user
-  const name = user?.smartRotomUser?.username || user?.username || "Aventurero"
+  const name = useRotomUsername() || user?.username || "Aventurero"
   const avatar = user?.profilePicture || user?.image
 
   const counts = questCounts(quests)
