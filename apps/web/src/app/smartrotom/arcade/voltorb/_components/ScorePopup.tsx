@@ -1,36 +1,34 @@
-import { motion, AnimatePresence } from "framer-motion";
-import { useEffect, useState } from "react";
+"use client"
+
+import { useEffect, useState } from "react"
+import { Icon } from "../../_components/ui"
 
 interface ScorePopupProps {
-  scoreIncrease: number;
+  scoreIncrease: number
 }
 
-function ScorePopup({ scoreIncrease }: ScorePopupProps) {
-  const [show, setShow] = useState(false);
+/** The coins a flip just added, floating over the cabinet for a second. */
+export default function ScorePopup({ scoreIncrease }: ScorePopupProps) {
+  const [show, setShow] = useState(false)
 
   useEffect(() => {
     if (scoreIncrease > 0) {
-      setShow(true);
-      const timer = setTimeout(() => setShow(false), 1000);
-      return () => clearTimeout(timer);
+      setShow(true)
+      const timer = setTimeout(() => setShow(false), 1000)
+      return () => clearTimeout(timer)
     }
-  }, [scoreIncrease]);
+  }, [scoreIncrease])
+
+  if (!show) return null
 
   return (
-    <AnimatePresence>
-      {show && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -20 }}
-          transition={{ duration: 0.3 }}
-          className="fixed bottom-10 left-0 right-0 mx-auto bg-warning text-white font-bold py-2 px-4 rounded-full shadow-lg whitespace-nowrap w-max"
-        >
-          +{scoreIncrease} monedas!
-        </motion.div>
-      )}
-    </AnimatePresence>
-  );
+    <div
+      role="status"
+      className="pointer-events-none fixed inset-x-0 bottom-10 z-[150] mx-auto w-max animate-ar-pop rounded-full border border-ar-amber/50 bg-black/75 px-4 py-2 shadow-[0_0_30px_-6px_rgb(var(--ar-amber)/.6)] motion-reduce:animate-none"
+    >
+      <span className="inline-flex animate-ar-float items-center gap-2 font-ar-mono text-[13px] font-bold tabular-nums text-ar-amber motion-reduce:animate-none">
+        <Icon.Coin s={16} />+{scoreIncrease} monedas
+      </span>
+    </div>
+  )
 }
-
-export default ScorePopup;
