@@ -2,8 +2,9 @@ import type { AppKey } from "./showcase-shared"
 
 // Index model for the SmartRotom showcase. Mirrors the Boffmedia showcase's
 // `showcase-data.tsx`, with one addition: a chapter carries the `app` whose design
-// system it documents, because SmartRotom is six systems rather than one
-// (SMARTROTOM_V3.md §0). Domains ARE the systems.
+// system it documents, because SmartRotom is many systems rather than one
+// (SMARTROTOM_V3.md §0). Domains ARE the systems, so `DOMAINS.length` IS the count —
+// the page reads it from here rather than restating it in prose.
 
 export interface SecMeta {
   id: string
@@ -437,6 +438,39 @@ export const CHAPTERS: Chapter[] = [
       { id: "wp-estados", label: "Estados" },
     ],
   },
+
+  // ── Pasaporte · ps-* ───────────────────────────────────────────────────────
+  {
+    name: "Bases",
+    dom: "Pasaporte",
+    app: "ps",
+    sections: [
+      { id: "ps-superficies", label: "Dos superficies" },
+      { id: "ps-tintas", label: "Tintas de seguridad" },
+      { id: "ps-tipografia", label: "Tipografía" },
+      { id: "ps-materiales", label: "Materiales y ornamento" },
+    ],
+  },
+  {
+    name: "Primitivas",
+    dom: "Pasaporte",
+    app: "ps",
+    sections: [
+      { id: "ps-escritorio", label: "El escritorio" },
+      { id: "ps-pagina", label: "La página" },
+      { id: "ps-etiquetas", label: "Etiquetas y retratos" },
+    ],
+  },
+  {
+    name: "Documento",
+    dom: "Pasaporte",
+    app: "ps",
+    sections: [
+      { id: "ps-lacres", label: "Lacres y medallas" },
+      { id: "ps-visados", label: "Visados y marginalia" },
+      { id: "ps-acento", label: "Acento en ejecución" },
+    ],
+  },
 ]
 
 export const DOMAIN_ORDER = [
@@ -454,9 +488,10 @@ export const DOMAIN_ORDER = [
   "Gobierno",
   "Rooker",
   "Wigglypop",
+  "Pasaporte",
 ]
 
-// Chapter names repeat across domains ("Bases" exists six times), so a chapter's
+// Chapter names repeat across domains ("Bases" exists once per system), so a chapter's
 // identity is domain + name — not name alone.
 export const chapterKey = (c: Pick<Chapter, "dom" | "name">) => `${c.dom}/${c.name}`
 
@@ -481,4 +516,5 @@ export const DOMAIN_META: Record<string, { ns: string; note: string }> = {
   Gobierno: { ns: "gt-*", note: "Institución cívica · papel y sello grabado, claro" },
   Rooker: { ns: "rk-*", note: "El nido social · tres lienzos, seis acentos" },
   Wigglypop: { ns: "wp-*", note: "Mercado burbuja · rosa globo y verde azulado dinero, claro" },
+  Pasaporte: { ns: "ps-*", note: "Documento de estado · lienzo fijo: nogal y papel crema en una raíz" },
 }

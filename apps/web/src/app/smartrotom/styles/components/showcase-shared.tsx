@@ -4,9 +4,10 @@ import { cn } from "@/lib/utils"
 // Shared class fragments + specimen wrappers for the SmartRotom showcase.
 // Mirrors the Boffmedia showcase's `showcase-shared.tsx` (BOFFMEDIA_V3.md §12).
 //
-// The one structural difference: SmartRotom is six design systems, not one
-// (SMARTROTOM_V3.md §0). A primitive only resolves its tokens inside its own scope
-// root, so every specimen renders inside `<Scope>` — see below.
+// The one structural difference: SmartRotom is MANY design systems, not one
+// (SMARTROTOM_V3.md §0 — count the namespaces in `tailwind.config.ts`, never trust a
+// number written down). A primitive only resolves its tokens inside its own scope root,
+// so every specimen renders inside `<Scope>` — see below.
 
 export const MONO_LABEL = "font-mono text-[11px] font-medium uppercase tracking-[0.14em] text-sr-txt-muted"
 
@@ -27,7 +28,7 @@ export const sideLink =
 // app's layout — the same classes, so a primitive looks here exactly as it does in
 // the app. `sr` is deliberately a no-op: the chrome has no scope root, it's global.
 export type AppKey =
-  | "sr" | "sb" | "ca" | "nt" | "pk" | "mw" | "tx" | "ms" | "ar" | "ft" | "pc" | "gt" | "rk" | "wp"
+  | "sr" | "sb" | "ca" | "nt" | "pk" | "mw" | "tx" | "ms" | "ar" | "ft" | "pc" | "gt" | "rk" | "wp" | "ps"
 
 // The scope CLASS is what makes an app's tokens resolve: `ca`/`nt`/`mw` are CSS-var
 // backed and their vars are declared on `.ca-app`/`.nt-app`/`.mw-app` base layers, so
@@ -48,6 +49,7 @@ const SCOPE_VARS: Record<AppKey, string> = {
   gt: "gt-app",
   rk: "rk-app",
   wp: "wp-app",
+  ps: "ps-app",
 }
 
 // The SKIN is the app's canvas + fonts + ink, lifted from its real layout root. Kept
@@ -80,12 +82,19 @@ const SCOPE_SKIN: Record<AppKey, string> = {
   // paints the two corner glows over the wash, so the skin only adds type and ink.
   // Note the 600 weight — Nunito at 400 looks anaemic here, so the app rests semibold.
   wp: "font-wp text-wp-fg antialiased",
+  // Pasaporte's canvas is the DESK — the walnut counter the book lies on. The `.ps-app`
+  // base layer already paints the lamp pool and the plank seams, so the skin only adds
+  // type and chrome ink. The app's OTHER material, the cream page, is not a canvas: it is
+  // a surface INSIDE this one, and a paper specimen must be laid on a `<Leaf>` (below).
+  ps: "font-ps text-ps-chrome-fg antialiased",
 }
 
 export function Scope({
   app,
   theme,
   media,
+  ornament,
+  motion,
   skin = true,
   className,
   children,
@@ -99,6 +108,13 @@ export function Scope({
   theme?: "light" | "dark" | "dim" | "lightsout"
   /** mw only — picks the accent (Mewtube pink / Mewtwitch purple). */
   media?: "mewtube" | "mewtwitch"
+  /**
+   * ps only — the passport's DOCUMENT properties, not themes. `ornament` scales the
+   * guilloché, the paper grain and the gold tooling together; `motion` parks the looping
+   * ambience. Pasaporte is fixed-canvas and takes no `data-theme` at all.
+   */
+  ornament?: "minimal" | "tasteful" | "maximal"
+  motion?: "on" | "off"
   /** Paint the app's canvas/fonts/ink. Off = tokens resolve, chrome surface shows through. */
   skin?: boolean
   className?: string
@@ -109,6 +125,8 @@ export function Scope({
       className={cn(SCOPE_VARS[app], skin && SCOPE_SKIN[app], className)}
       data-theme={theme}
       data-app={app === "mw" ? (media ?? "mewtube") : undefined}
+      data-ornament={app === "ps" ? (ornament ?? "tasteful") : undefined}
+      data-motion={app === "ps" ? (motion ?? "on") : undefined}
     >
       {children}
     </div>
@@ -123,6 +141,8 @@ export function Sample({
   app = "sr",
   theme,
   media,
+  ornament,
+  motion,
   col,
   grid,
   padded = true,
@@ -137,6 +157,9 @@ export function Sample({
   /** Rooker takes three canvases here, not two — see `Scope`. */
   theme?: "light" | "dark" | "dim" | "lightsout"
   media?: "mewtube" | "mewtwitch"
+  /** ps only — document properties, not themes. See `Scope`. */
+  ornament?: "minimal" | "tasteful" | "maximal"
+  motion?: "on" | "off"
   col?: boolean
   grid?: boolean
   /** Off for specimens that supply their own padding (full-bleed chrome, shells). */
@@ -156,6 +179,8 @@ export function Sample({
       app={app}
       theme={theme}
       media={media}
+      ornament={ornament}
+      motion={motion}
       skin={canvas}
       className={cn(
         padded && "p-[26px]",

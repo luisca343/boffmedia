@@ -63,6 +63,7 @@ import { MangaModule } from '@api/boffmedia/herramientas/manga/manga.module';
 import { VgcModule } from '@api/boffmedia/herramientas/pokemon/vgc/vgc.module';
 import { GobiernoModule } from '@api/smartrotom/gobierno/gobierno.module';
 import { RookerModule } from '@api/smartrotom/rooker/rooker.module';
+import { PasaporteModule } from '@api/smartrotom/pasaporte/pasaporte.module';
 import { WigglypopModule } from '@api/smartrotom/wigglypop/wigglypop.module';
 
 @Module({
@@ -126,6 +127,7 @@ import { WigglypopModule } from '@api/smartrotom/wigglypop/wigglypop.module';
     VgcModule,
     GobiernoModule,
     RookerModule,
+    PasaporteModule,
     WigglypopModule,
   ],
   controllers: [AppController],

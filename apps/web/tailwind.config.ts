@@ -114,6 +114,20 @@ const config: Config = {
         rk: ["var(--rk-font)", "ui-sans-serif", "system-ui", "sans-serif"],
         "rk-chirp": ["Hanken Grotesk", "ui-sans-serif", "system-ui", "sans-serif"],
         "rk-mono": ["IBM Plex Mono", "Roboto Mono", "ui-monospace", "monospace"],
+        // Pasaporte (SmartRotom) — a state-issued travel document, so the type is
+        // the type of officialdom. Four faces, each with one job and no overlap:
+        // `ps-display` (Cinzel) is INSCRIPTIONAL — engraved caps, used only where a
+        // real passport engraves: the cover word PASAPORTE, the seal's roman
+        // numeral, folio numerals. `ps-ceremony` (Marcellus) is the Roman serif
+        // that carries every heading and every *value* on the paper. `ps` (Public
+        // Sans) is the civic grotesque for field labels and prose. `ps-mono`
+        // (Spline Sans Mono) is the OCR voice — the MRZ strip, record codes,
+        // dates, captions. Setting a value in the wrong one is the fastest way to
+        // make the document read like an app instead of a passport.
+        ps: ["Public Sans", "ui-sans-serif", "system-ui", "sans-serif"],
+        "ps-display": ["Cinzel", "Playfair Display", "serif"],
+        "ps-ceremony": ["Marcellus", "Cormorant Garamond", "serif"],
+        "ps-mono": ["Spline Sans Mono", "ui-monospace", "monospace"],
       },
       fontSize: {
         "4xl": ["2.25rem", { lineHeight: "normal" }],
@@ -1137,6 +1151,132 @@ const config: Config = {
           live:     "rgb(var(--rk-live) / <alpha-value>)",
           verified: "rgb(var(--rk-verified) / <alpha-value>)",
         },
+        // ════════════════════════════════════════════════════════════════════
+        // PASAPORTE (SmartRotom) — `ps-*`. The one app with TWO surfaces, and
+        // the split is the whole design:
+        //
+        //   the DESK  — walnut, oxblood leather, gold foil, navy. Dark. It is
+        //               the immigration counter the book lies on: topbar, page
+        //               controls, inspection chrome, the replay modal.
+        //   the PAPER — cream security stock, brown-black ink. Light. Everything
+        //               INSIDE the book.
+        //
+        // Both live in one scope root, always, in both platform modes: a passport
+        // is a physical object and its paper does not turn dark because the OS
+        // did. So `ps-*` is FIXED-CANVAS, like Furret Today's newsprint — the app
+        // never reads `useRotomMode()` (SMARTROTOM_V3.md §2b).
+        //
+        // Never put desk ink on paper or paper ink on the desk: `text-ps-ink` on
+        // the topbar is invisible, `text-ps-chrome-fg` on a page is invisible.
+        ps: {
+          // ── The desk ──────────────────────────────────────────────────────
+          desk: {
+            DEFAULT: "rgb(var(--ps-desk) / <alpha-value>)",
+            hi: "rgb(var(--ps-desk-hi) / <alpha-value>)",
+            lo: "rgb(var(--ps-desk-lo) / <alpha-value>)",
+          },
+          // The blotter the book rests on — oxblood leather, not brown.
+          leather: {
+            DEFAULT: "rgb(var(--ps-leather) / <alpha-value>)",
+            deep: "rgb(var(--ps-leather-deep) / <alpha-value>)",
+          },
+          // Type on the desk.
+          chrome: {
+            fg: "rgb(var(--ps-chrome-fg) / <alpha-value>)",
+            muted: "rgb(var(--ps-chrome-muted) / <alpha-value>)",
+            subtle: "rgb(var(--ps-chrome-subtle) / <alpha-value>)",
+          },
+          // Navy buckram — the cover cloth, the emblem, the nav buttons, and the
+          // carné's header band. The document's institutional colour.
+          navy: {
+            DEFAULT: "rgb(var(--ps-navy) / <alpha-value>)",
+            deep: "rgb(var(--ps-navy-deep) / <alpha-value>)",
+            hi: "rgb(var(--ps-navy-hi) / <alpha-value>)",
+          },
+          // Gold foil. `gild` is the leaf, `hi` its lit edge, `lo` its shadow —
+          // all three are needed or the foil reads as flat yellow. Hairlines on
+          // the desk are this colour at low alpha: `border-ps-gild/18`.
+          gild: {
+            DEFAULT: "rgb(var(--ps-gild) / <alpha-value>)",
+            hi: "rgb(var(--ps-gild-hi) / <alpha-value>)",
+            lo: "rgb(var(--ps-gild-lo) / <alpha-value>)",
+          },
+          // The satin bookmark.
+          ribbon: {
+            DEFAULT: "rgb(var(--ps-ribbon) / <alpha-value>)",
+            hi: "rgb(var(--ps-ribbon-hi) / <alpha-value>)",
+          },
+
+          // ── The paper ─────────────────────────────────────────────────────
+          paper: {
+            DEFAULT: "rgb(var(--ps-paper) / <alpha-value>)",
+            "2": "rgb(var(--ps-paper-2) / <alpha-value>)",
+            edge: "rgb(var(--ps-paper-edge) / <alpha-value>)",
+          },
+          // Ink is a warm brown-black, never #000 — pure black on cream reads as
+          // a printing error. `ink` at low alpha IS the ruled line: the handoff's
+          // `--rule` is nothing but `rgb(var(--ps-ink) / .22)`, so use
+          // `border-ps-ink/22` rather than inventing a rule token.
+          ink: {
+            DEFAULT: "rgb(var(--ps-ink) / <alpha-value>)",
+            soft: "rgb(var(--ps-ink-soft) / <alpha-value>)",
+            faint: "rgb(var(--ps-ink-faint) / <alpha-value>)",
+          },
+
+          // ── The security inks ─────────────────────────────────────────────
+          // The chapter accents. Desaturated on purpose: these are intaglio inks
+          // sharing one low chroma, which is what makes twelve differently
+          // coloured chapters still look like one document. A chapter picks a
+          // pair and passes it down as `--ps-chapter` / `--ps-chapter-deep`
+          // (see `chapter` below) — it does NOT reach for these directly, so the
+          // primitives stay chapter-agnostic.
+          oxblood: {
+            DEFAULT: "rgb(var(--ps-oxblood) / <alpha-value>)",
+            deep: "rgb(var(--ps-oxblood-deep) / <alpha-value>)",
+          },
+          teal: {
+            DEFAULT: "rgb(var(--ps-teal) / <alpha-value>)",
+            deep: "rgb(var(--ps-teal-deep) / <alpha-value>)",
+          },
+          plum: {
+            DEFAULT: "rgb(var(--ps-plum) / <alpha-value>)",
+            deep: "rgb(var(--ps-plum-deep) / <alpha-value>)",
+          },
+          olive: {
+            DEFAULT: "rgb(var(--ps-olive) / <alpha-value>)",
+            deep: "rgb(var(--ps-olive-deep) / <alpha-value>)",
+          },
+          info: {
+            DEFAULT: "rgb(var(--ps-info) / <alpha-value>)",
+            deep: "rgb(var(--ps-info-deep) / <alpha-value>)",
+          },
+          ok: "rgb(var(--ps-ok) / <alpha-value>)",
+          warn: "rgb(var(--ps-warn) / <alpha-value>)",
+          bad: "rgb(var(--ps-bad) / <alpha-value>)",
+
+          // The RUNTIME chapter accent. Every page sets these two on its own root
+          // (`style={chapterVars(accent)}`), so `text-ps-chapter-deep` means
+          // "this chapter's ink" wherever it is used and no primitive ever needs
+          // to know which chapter it is inside. This is the one pair whose value
+          // is data-driven — §4's sanctioned inline-style case, not a dynamic
+          // class name.
+          chapter: {
+            DEFAULT: "rgb(var(--ps-chapter) / <alpha-value>)",
+            deep: "rgb(var(--ps-chapter-deep) / <alpha-value>)",
+          },
+
+          // Medal + ladder tiers. Fixed, and shared by the Logros coins and the
+          // Temporada ladder — one metal ramp, used twice, so a gold logro and a
+          // gold rung are the same gold.
+          tier: {
+            bronce: "rgb(var(--ps-tier-bronce) / <alpha-value>)",
+            plata: "rgb(var(--ps-tier-plata) / <alpha-value>)",
+            oro: "rgb(var(--ps-tier-oro) / <alpha-value>)",
+            platino: "rgb(var(--ps-tier-platino) / <alpha-value>)",
+            diamante: "rgb(var(--ps-tier-diamante) / <alpha-value>)",
+            maestro: "rgb(var(--ps-tier-maestro) / <alpha-value>)",
+          },
+        },
       },
       keyframes: {
         // Existing animations
@@ -1457,6 +1597,36 @@ const config: Config = {
           "0%, 100%": { boxShadow: "0 0 0 0 rgb(var(--rk-live) / .5)" },
           "50%":      { boxShadow: "0 0 0 5px rgb(var(--rk-live) / 0)" },
         },
+        // ── Pasaporte (SmartRotom) ────────────────────────────────────────
+        // A rubber stamp being brought down on the page: it arrives oversized and
+        // rotated, overshoots, and settles a few degrees off-square. The final
+        // -4deg is the point — a stamp that lands perfectly straight looks
+        // printed, not struck.
+        "ps-stamp": {
+          "0%":   { transform: "scale(2.6) rotate(-18deg)", opacity: "0" },
+          "60%":  { opacity: "1" },
+          "72%":  { transform: "scale(.9) rotate(2deg)" },
+          "100%": { transform: "scale(1) rotate(-4deg)", opacity: "1" },
+        },
+        // The inspection beam sweeping down the whole viewport.
+        "ps-scan": { "0%": { top: "-180px" }, "100%": { top: "100%" } },
+        // The narrower beam that runs inside the carné's QR box.
+        "ps-qrscan": { "0%, 100%": { top: "5px" }, "50%": { top: "64px" } },
+        "ps-spin": { to: { transform: "rotate(360deg)" } },
+        "ps-shimmer": {
+          "0%": { backgroundPosition: "200% 0" },
+          "100%": { backgroundPosition: "-200% 0" },
+        },
+        // The "drag the corner" hint on the closed cover.
+        "ps-hint": { "0%, 100%": { opacity: ".35" }, "50%": { opacity: ".85" } },
+        "ps-fade": { from: { opacity: "0" } },
+        "ps-sheet-in": {
+          from: { opacity: "0", transform: "translateY(14px) scale(.98)" },
+        },
+        "ps-toast-in": {
+          from: { opacity: "0", transform: "translate(-50%, 20px)" },
+          to: { opacity: "1", transform: "translate(-50%, 0)" },
+        },
       },
       animation: {
         // Existing animations
@@ -1555,6 +1725,17 @@ const config: Config = {
         "rk-fadeup": "rk-fadeup .28s ease-out both",
         "rk-shimmer": "rk-shimmer 3.4s linear infinite",
         "rk-live": "rk-live 2s ease-in-out infinite",
+        // ── Pasaporte (SmartRotom) ──────────────────────────────────────────
+        "ps-stamp": "ps-stamp .62s cubic-bezier(.3,1.4,.4,1) both",
+        "ps-scan": "ps-scan 3.4s linear infinite",
+        "ps-qrscan": "ps-qrscan 1.9s ease-in-out infinite",
+        "ps-spin": "ps-spin 6s linear infinite",
+        "ps-spin-slow": "ps-spin 16s linear infinite",
+        "ps-shimmer": "ps-shimmer 1.4s linear infinite",
+        "ps-hint": "ps-hint 2.4s ease-in-out infinite",
+        "ps-fade": "ps-fade .3s ease-out both",
+        "ps-sheet-in": "ps-sheet-in .32s cubic-bezier(.22,.9,.31,1) both",
+        "ps-toast-in": "ps-toast-in .32s cubic-bezier(.22,.9,.31,1) both",
       },
       transitionTimingFunction: {
         "pk-out": "cubic-bezier(.16, 1, .3, 1)",
@@ -1575,6 +1756,30 @@ const config: Config = {
         18: "4.5rem",
         88: "22rem",
         128: "32rem",
+      },
+      // Alpha steps the default scale does not have. Tailwind's built-in `opacity`
+      // scale steps in 5s, so a modifier like `/24` matches no utility and emits
+      // NOTHING — the border simply does not exist, with no error and no warning.
+      // This is §4's silent-failure mode reached through the alpha modifier instead
+      // of through an interpolated class name, and it had already bitten four apps:
+      //
+      //   /12  gobierno (dept tints, `bg-gt-ok/12`), rooker (`bg-rk-accent/12`)
+      //   /14  mewtube  (`bg-mw-accent/14`)
+      //   /18  pasaporte — the desk hairline (`border-ps-gild/18`)
+      //   /22  pasaporte — the rule on the paper (`border-ps-ink/22`)
+      //   /24  wigglypop — its default hairline, `border-wp-line/24`, 60 call sites
+      //   /46  wigglypop — its strong hairline
+      //
+      // These are measured values, not roundable to the nearest 5 without changing
+      // the design, so the scale grows to fit them. Anything added here must be a
+      // value some app actually uses — this is not a dumping ground.
+      opacity: {
+        12: "0.12",
+        14: "0.14",
+        18: "0.18",
+        22: "0.22",
+        24: "0.24",
+        46: "0.46",
       },
       borderWidth: {
         // ── Furret Today (SmartRotom) — the comic ink outline ───────────────
@@ -3449,6 +3654,352 @@ const config: Config = {
         },
         ".wp-noscroll": { scrollbarWidth: "none" },
         ".wp-noscroll::-webkit-scrollbar": { display: "none" },
+      })
+    }),
+
+    // ══════════════════════════════════════════════════════════════════════
+    // PASAPORTE (SmartRotom) — `.ps-app`
+    // A state-issued travel document lying open on an immigration counter.
+    //
+    // FIXED CANVAS, and this is a design decision, not an omission: the desk is
+    // always dark and the paper is always cream, in every platform theme. A
+    // passport is a physical object — its pages do not turn dark because the OS
+    // did. So the app never reads `useRotomMode()` (SMARTROTOM_V3.md §2b, same
+    // stance as Furret Today's newsprint and Gobierno's warm paper).
+    //
+    // The `data-*` attributes on the root are DOCUMENT properties, not themes:
+    //   data-ornament  minimal | tasteful | maximal  — how loud the security
+    //                  print is. Scales the guilloché line-work, the paper grain
+    //                  and the gold tooling on the blotter through three
+    //                  multipliers, so one reader control retunes the whole book.
+    //   data-motion    on | off — parks the looping ambience (scan beam, holo
+    //                  spin, hint pulse) for readers who want the book still.
+    //
+    // Everything below that Tailwind cannot express — multi-layer security
+    // print, the scalloped wax edge, buckram weave, holographic conic foil — is
+    // a component class here rather than an inline style, so the pages stay
+    // readable JSX. (§6: Tailwind-only; the plugin IS the escape hatch.)
+    // ══════════════════════════════════════════════════════════════════════
+    plugin(({ addBase, addComponents }) => {
+      addBase({
+        ".ps-app": {
+          // ── The desk ────────────────────────────────────────────────────
+          "--ps-desk": "42 29 18",
+          "--ps-desk-hi": "58 42 28",
+          "--ps-desk-lo": "25 15 8",
+          "--ps-leather": "60 26 23",
+          "--ps-leather-deep": "27 10 9",
+          "--ps-chrome-fg": "246 244 240",
+          "--ps-chrome-muted": "183 175 160",
+          "--ps-chrome-subtle": "140 133 118",
+          "--ps-navy": "42 60 99",
+          "--ps-navy-deep": "20 34 59",
+          "--ps-navy-hi": "47 95 153",
+          "--ps-gild": "200 162 75",
+          "--ps-gild-hi": "244 227 161",
+          "--ps-gild-lo": "138 106 35",
+          "--ps-ribbon": "156 43 43",
+          "--ps-ribbon-hi": "196 69 69",
+
+          // ── The paper ───────────────────────────────────────────────────
+          "--ps-paper": "239 230 214",
+          "--ps-paper-2": "231 220 200",
+          "--ps-paper-edge": "216 202 176",
+          // The block of leaves seen edge-on. `leaf` is the lit top of a sheet, `leaf-shade`
+          // the gap between two — alternating them is what reads as a *stack* rather than a
+          // thick border, and `board` is the cover the stack sits on. See `.ps-leaves-*`.
+          "--ps-leaf": "233 219 207",
+          "--ps-leaf-shade": "170 158 148",
+          "--ps-board": "8 41 84",
+          "--ps-ink": "44 36 25",
+          "--ps-ink-soft": "92 81 66",
+          "--ps-ink-faint": "138 125 104",
+
+          // ── Security inks (the chapter accents) ─────────────────────────
+          "--ps-oxblood": "156 59 54",
+          "--ps-oxblood-deep": "110 39 35",
+          "--ps-teal": "47 111 126",
+          "--ps-teal-deep": "36 75 86",
+          "--ps-plum": "110 74 134",
+          "--ps-plum-deep": "75 51 91",
+          "--ps-olive": "106 120 56",
+          "--ps-olive-deep": "68 75 39",
+          "--ps-info": "43 74 114",
+          "--ps-info-deep": "36 63 99",
+          "--ps-ok": "63 125 84",
+          "--ps-warn": "176 132 35",
+          "--ps-bad": "162 58 50",
+
+          // Default chapter accent. Every page overwrites this pair on its own
+          // root — see `chapterVars()` in `_utils/chapters.ts`.
+          "--ps-chapter": "156 59 54",
+          "--ps-chapter-deep": "110 39 35",
+
+          // ── Tiers ───────────────────────────────────────────────────────
+          "--ps-tier-bronce": "196 126 58",
+          "--ps-tier-plata": "159 176 189",
+          "--ps-tier-oro": "227 169 43",
+          "--ps-tier-platino": "111 202 214",
+          "--ps-tier-diamante": "94 200 224",
+          "--ps-tier-maestro": "154 106 214",
+
+          // ── Ornament multipliers ────────────────────────────────────────
+          // One property, two surfaces: `--ps-guilloche` scales the security
+          // line-work and `--ps-grain` the paper fibre. `data-ornament` moves
+          // both together, which is why the setting reads as one physical
+          // property of the document rather than two checkboxes.
+          "--ps-guilloche": ".5",
+          "--ps-grain": ".07",
+
+          // The fibre. One SVG turbulence, reused by the paper, the buckram and
+          // the leather — the same noise at three scales and blend modes is what
+          // makes them read as three materials rather than three gradients.
+          "--ps-noise":
+            "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")",
+
+          color: "rgb(var(--ps-chrome-fg))",
+          // The counter: a warm lamp pool from above, plank seams, and walnut.
+          background:
+            "radial-gradient(130% 85% at 50% -12%, rgba(255,224,165,.12), transparent 55%), repeating-linear-gradient(90deg, rgba(0,0,0,.22) 0 1.5px, transparent 1.5px 240px), repeating-linear-gradient(90deg, rgba(255,236,200,.014) 0 2px, transparent 2px 11px), linear-gradient(180deg, rgb(var(--ps-desk-hi)), rgb(var(--ps-desk)) 58%, rgb(var(--ps-desk-lo)))",
+          "-webkit-font-smoothing": "antialiased",
+        },
+
+        ".ps-app[data-ornament='minimal']": {
+          "--ps-guilloche": "0",
+          "--ps-grain": ".03",
+        },
+        ".ps-app[data-ornament='maximal']": {
+          "--ps-guilloche": "1",
+          "--ps-grain": ".12",
+        },
+        // Motion off parks the ambience only. Entrances still run — a stamp that
+        // never lands would leave the page looking broken, so `motion-reduce:`
+        // handles those per-component and this handles the loops.
+        ".ps-app[data-motion='off'] .ps-loop": {
+          animation: "none !important",
+        },
+      })
+
+      addComponents({
+        // ── The paper ─────────────────────────────────────────────────────
+        // A soft page's surface: guilloché security print, the sheen off the top
+        // edge, then the cream stock itself. The line-work is three repeating
+        // gradients at different angles and centres — one alone reads as a
+        // pattern, three reads as engraving.
+        ".ps-paper-surface": {
+          background:
+            "repeating-radial-gradient(circle at 20% 14%, transparent 0 7px, rgb(70 52 30 / calc(.05 * var(--ps-guilloche))) 7px 8px), repeating-radial-gradient(circle at 84% 90%, transparent 0 6px, rgb(40 58 80 / calc(.045 * var(--ps-guilloche))) 6px 7px), repeating-linear-gradient(68deg, transparent 0 13px, rgb(60 46 28 / calc(.03 * var(--ps-guilloche))) 13px 14px), radial-gradient(120% 90% at 50% 0%, rgba(255,255,255,.5), transparent 55%), linear-gradient(180deg, rgb(var(--ps-paper)), rgb(var(--ps-paper-2)))",
+        },
+        // Fibre, multiplied into the stock.
+        ".ps-paper-surface::after": {
+          content: '""',
+          position: "absolute",
+          inset: "0",
+          pointerEvents: "none",
+          backgroundImage: "var(--ps-noise)",
+          backgroundSize: "200px",
+          mixBlendMode: "multiply",
+          opacity: "var(--ps-grain)",
+        },
+        // Foxing at the edges — the faint browning of stored paper.
+        ".ps-paper-surface::before": {
+          content: '""',
+          position: "absolute",
+          inset: "0",
+          pointerEvents: "none",
+          boxShadow:
+            "inset 0 0 60px rgba(120,90,40,.18), inset 0 0 12px rgba(80,60,20,.25)",
+        },
+        // Gutter shade. A bound book is darker where it folds; without this the
+        // spread reads as two flat rectangles instead of one open book.
+        ".ps-gutter-l": {
+          boxShadow: "inset -34px 0 46px -30px rgba(74,56,30,.6)",
+        },
+        ".ps-gutter-r": {
+          boxShadow: "inset 34px 0 46px -30px rgba(74,56,30,.6)",
+        },
+
+        // ── Thickness ─────────────────────────────────────────────────────
+        // The passport is a BLOCK, not a sheet. A single shadow under a leaf reads as
+        // paper; what reads as a bound book is the stack seen edge-on — so this is
+        // twelve hard 1px shadow steps ALTERNATING lit-leaf / shade, each offset one
+        // more pixel diagonally, and then a 16px slab of the cover board underneath.
+        // Hard 0-blur steps are the whole trick: blur them and it collapses back into a
+        // smudge. The steps run away from the spine, so the two sides mirror — a right
+        // leaf stacks to the right, a left leaf to the left, and the gutter stays clean.
+        ".ps-leaves-r": {
+          boxShadow: [
+            "1px 1px 0 0 rgb(var(--ps-leaf))",
+            "2px 2px 0 0 rgb(var(--ps-leaf-shade))",
+            "3px 3px 0 0 rgb(var(--ps-leaf))",
+            "4px 4px 0 0 rgb(var(--ps-leaf-shade))",
+            "5px 5px 0 0 rgb(var(--ps-leaf))",
+            "6px 6px 0 0 rgb(var(--ps-leaf-shade))",
+            "7px 7px 0 0 rgb(var(--ps-leaf))",
+            "8px 8px 0 0 rgb(var(--ps-leaf-shade))",
+            "9px 9px 0 0 rgb(var(--ps-leaf))",
+            "10px 10px 0 0 rgb(var(--ps-leaf-shade))",
+            "11px 11px 0 0 rgb(var(--ps-leaf))",
+            "12px 12px 0 0 rgb(var(--ps-leaf-shade))",
+            "16px 16px 0 0 rgb(var(--ps-board))",
+          ].join(", "),
+        },
+        ".ps-leaves-l": {
+          boxShadow: [
+            "-1px 1px 0 0 rgb(var(--ps-leaf))",
+            "-2px 2px 0 0 rgb(var(--ps-leaf-shade))",
+            "-3px 3px 0 0 rgb(var(--ps-leaf))",
+            "-4px 4px 0 0 rgb(var(--ps-leaf-shade))",
+            "-5px 5px 0 0 rgb(var(--ps-leaf))",
+            "-6px 6px 0 0 rgb(var(--ps-leaf-shade))",
+            "-7px 7px 0 0 rgb(var(--ps-leaf))",
+            "-8px 8px 0 0 rgb(var(--ps-leaf-shade))",
+            "-9px 9px 0 0 rgb(var(--ps-leaf))",
+            "-10px 10px 0 0 rgb(var(--ps-leaf-shade))",
+            "-11px 11px 0 0 rgb(var(--ps-leaf))",
+            "-12px 12px 0 0 rgb(var(--ps-leaf-shade))",
+            "-16px 16px 0 0 rgb(var(--ps-board))",
+          ].join(", "),
+        },
+
+        // ── The cover ─────────────────────────────────────────────────────
+        // Navy buckram: a woven cloth, so the noise is crossed with a fine warp
+        // and weft rather than used alone.
+        ".ps-buckram::after": {
+          content: '""',
+          position: "absolute",
+          inset: "0",
+          pointerEvents: "none",
+          mixBlendMode: "overlay",
+          opacity: ".55",
+          backgroundImage:
+            "repeating-linear-gradient(0deg, rgba(255,255,255,.05) 0 1px, transparent 1px 3px), repeating-linear-gradient(90deg, rgba(0,0,0,.07) 0 1px, transparent 1px 3px), var(--ps-noise)",
+          backgroundSize: "auto, auto, 240px",
+        },
+        // The embossed double gold rule stamped into the cloth.
+        ".ps-emboss::before": {
+          content: '""',
+          position: "absolute",
+          inset: "18px",
+          borderRadius: "3px",
+          border: "1px solid rgb(var(--ps-gild) / .5)",
+          boxShadow:
+            "inset 0 0 0 5px rgb(var(--ps-gild) / .22), inset 0 1px 0 rgba(255,255,255,.06), inset 0 0 38px rgba(0,0,0,.5)",
+          pointerEvents: "none",
+        },
+
+        // ── Gold foil type ────────────────────────────────────────────────
+        // Hot-stamped lettering. The gradient runs light→leaf→shadow→light so
+        // the glyph has a lit top edge and a lit bottom edge, like real foil
+        // catching the lamp twice.
+        ".ps-foil": {
+          background:
+            "linear-gradient(180deg, rgb(var(--ps-gild-hi)), rgb(var(--ps-gild)) 45%, rgb(var(--ps-gild-lo)) 75%, rgb(var(--ps-gild-hi)))",
+          "-webkit-background-clip": "text",
+          backgroundClip: "text",
+          "-webkit-text-fill-color": "transparent",
+          filter:
+            "drop-shadow(0 1px 0 rgba(0,0,0,.45)) drop-shadow(0 0 8px rgba(244,227,161,.25))",
+        },
+
+        // ── The wax seal ──────────────────────────────────────────────────
+        // The scalloped edge of a struck seal. This clip-path is the shape of
+        // the whole Medallas chapter, so it lives here once rather than being
+        // pasted into each component.
+        ".ps-wax": {
+          clipPath:
+            "polygon(50% 0,61% 6%,72% 3%,78% 14%,90% 16%,90% 28%,99% 36%,93% 47%,100% 57%,90% 64%,93% 76%,81% 80%,79% 92%,67% 90%,58% 99%,48% 91%,37% 97%,30% 86%,18% 86%,18% 74%,8% 67%,15% 57%,7% 46%,16% 38%,12% 26%,24% 23%,27% 11%,39% 14%,46% 4%)",
+          background:
+            "radial-gradient(circle at 38% 32%, rgba(255,255,255,.35), transparent 45%), radial-gradient(circle at 50% 50%, color-mix(in srgb, rgb(var(--ps-seal)) 88%, #fff), rgb(var(--ps-seal)) 60%, color-mix(in srgb, rgb(var(--ps-seal)) 70%, #000))",
+          boxShadow:
+            "0 2px 4px rgba(0,0,0,.35), inset 0 0 0 2px rgba(255,255,255,.25), inset 0 -4px 10px rgba(0,0,0,.35)",
+        },
+        // An unstruck seal: a blind-embossed depression in the paper, not a
+        // greyed-out disc. It is pressed IN (light from below, shadow above),
+        // which is the opposite of every other lit surface here.
+        ".ps-wax-blank": {
+          clipPath: "circle(46%)",
+          background:
+            "radial-gradient(circle at 50% 38%, rgba(255,255,255,.4), rgba(120,104,78,.16))",
+          boxShadow:
+            "inset 0 2px 5px rgba(80,62,30,.4), inset 0 -2px 4px rgba(255,255,255,.5)",
+        },
+
+        // ── Metal ─────────────────────────────────────────────────────────
+        // A struck coin, for logro medals and ladder pips. Reads `--ps-metal`.
+        ".ps-coin": {
+          background:
+            "radial-gradient(circle at 38% 30%, rgba(255,255,255,.55), transparent 46%), radial-gradient(circle at 50% 52%, color-mix(in srgb, rgb(var(--ps-metal)) 82%, #fff), rgb(var(--ps-metal)) 58%, color-mix(in srgb, rgb(var(--ps-metal)) 68%, #000))",
+          boxShadow:
+            "0 2px 4px rgba(0,0,0,.32), inset 0 0 0 2px rgba(255,255,255,.28), inset 0 -3px 7px rgba(0,0,0,.34)",
+        },
+        ".ps-coin-blank": {
+          background:
+            "radial-gradient(circle at 50% 38%, rgba(255,255,255,.45), rgba(150,135,105,.18))",
+          boxShadow:
+            "inset 0 2px 5px rgba(80,62,30,.38), inset 0 -2px 4px rgba(255,255,255,.55)",
+        },
+
+        // ── Holography ────────────────────────────────────────────────────
+        // The one place the document is allowed a saturated rainbow: a hologram
+        // is *supposed* to look out of place on paper. That is what makes it
+        // read as a security feature and not as decoration.
+        ".ps-holo": {
+          background:
+            "conic-gradient(from 0deg, #06b6d4, #a855f7, #84cc16, #f97316, #06b6d4)",
+        },
+        // The season seal's foil: the same trick in gold, so it reads as struck
+        // metal rather than as a hologram.
+        ".ps-holo-gold": {
+          background:
+            "conic-gradient(from 0deg, rgb(var(--ps-gild)), #fff6d8, rgb(var(--ps-gild-lo)), rgb(var(--ps-gild)), #fff6d8, rgb(var(--ps-gild-lo)), rgb(var(--ps-gild)))",
+        },
+        // A holographic border with a transparent core — used for the overprint
+        // that appears on the pages during inspection.
+        ".ps-holo-ring": {
+          background:
+            "linear-gradient(#0000,#0000) padding-box, conic-gradient(from 0deg, #06b6d4, #a855f7, #84cc16, #06b6d4) border-box",
+          border: "3px solid transparent",
+          mixBlendMode: "multiply",
+        },
+
+        // ── Inspection ────────────────────────────────────────────────────
+        ".ps-grid-glow": {
+          backgroundImage:
+            "linear-gradient(rgb(var(--ps-teal) / .06) 1px, transparent 1px), linear-gradient(90deg, rgb(var(--ps-teal) / .06) 1px, transparent 1px)",
+          backgroundSize: "40px 40px",
+        },
+        ".ps-beam": {
+          background:
+            "linear-gradient(180deg, transparent, rgb(var(--ps-teal) / .22), transparent)",
+          mixBlendMode: "screen",
+        },
+
+        // ── Figures ───────────────────────────────────────────────────────
+        // Every number on the document is tabular. A passport whose digits
+        // shift width between two rows is not a passport.
+        ".ps-num": { fontVariantNumeric: "tabular-nums" },
+
+        // ── Loading ───────────────────────────────────────────────────────
+        ".ps-skeleton": {
+          background:
+            "linear-gradient(90deg, rgb(var(--ps-ink) / .07), rgb(var(--ps-ink) / .16), rgb(var(--ps-ink) / .07))",
+          backgroundSize: "200% 100%",
+        },
+
+        // ── Scrollbars ────────────────────────────────────────────────────
+        ".ps-scroll::-webkit-scrollbar": { width: "10px", height: "10px" },
+        ".ps-scroll::-webkit-scrollbar-track": { background: "transparent" },
+        ".ps-scroll::-webkit-scrollbar-thumb": {
+          background: "rgb(var(--ps-ink) / .22)",
+          borderRadius: "999px",
+          border: "3px solid transparent",
+          backgroundClip: "content-box",
+        },
+        ".ps-scroll::-webkit-scrollbar-thumb:hover": {
+          background: "rgb(var(--ps-ink) / .4)",
+          backgroundClip: "content-box",
+        },
       })
     }),
   ],

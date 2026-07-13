@@ -1,0 +1,112 @@
+import * as dotenv from 'dotenv';
+dotenv.config();
+
+import { and, eq } from 'drizzle-orm';
+import { drizzle } from 'drizzle-orm/mysql2';
+import * as mysql from 'mysql2/promise';
+import { env } from '@/config/env';
+
+import { smartRotomAchievements } from '../_db/schema/SmartRotom';
+import { pasaporteSeasons } from '../_db/schema/SmartRotomPasaporte';
+import pino from 'pino';
+
+const logger = pino({ name: 'pasaporte-seed' });
+
+// Passports are NOT seeded: the API provisions one on first read, so a trainer who
+// never opens the app never gets a row. What has to exist up front is the cycle the
+// standings are measured inside, and the weight/tier of each achievement.
+
+const SEASON_NUMBER = 7;
+const SEASON_NAME = 'Ciclo de Otoño';
+const SEASON_DAYS = 90;
+
+// Game-design data: what an achievement is WORTH, by category. The columns default to
+// (10, 'bronce'), so the backfill only touches rows still sitting at that default —
+// re-running this never overwrites a value someone tuned by hand.
+const CATEGORY_WEIGHTS: Record<string, { tier: string; points: number }> = {
+  Gimnasios: { tier: 'plata', points: 25 },
+  Ligas: { tier: 'oro', points: 50 },
+  'Frente Batalla': { tier: 'platino', points: 100 },
+};
+const DEFAULT_WEIGHT = { tier: 'bronce', points: 10 };
+
+const DEFAULT_POINTS = 10;
+const DEFAULT_TIER = 'bronce';
+
+async function main() {
+  const DATABASE_URL = env.DATABASE_URL;
+  if (!DATABASE_URL) throw new Error('DATABASE_URL env var is required');
+
+  const connection = await mysql.createConnection(DATABASE_URL);
+  const db = drizzle(connection);
+
+  // ---- the active cycle ----
+  const active = await db
+    .select({ id: pasaporteSeasons.id, name: pasaporteSeasons.name })
+    .from(pasaporteSeasons)
+    .where(eq(pasaporteSeasons.active, 1))
+    .limit(1);
+
+  if (active.length > 0) {
+    logger.info(
+      `season already active (#${active[0].id} "${active[0].name}") — leaving it alone`,
+    );
+  } else {
+    const day = 24 * 60 * 60 * 1000;
+    const now = Date.now();
+
+    await db.insert(pasaporteSeasons).values({
+      number: SEASON_NUMBER,
+      name: SEASON_NAME,
+      startsAt: new Date(now - SEASON_DAYS * day),
+      endsAt: new Date(now + SEASON_DAYS * day),
+      active: 1,
+    });
+    logger.info(
+      `✓ season ${SEASON_NUMBER} "${SEASON_NAME}" created — a ${SEASON_DAYS * 2}-day window around today`,
+    );
+  }
+
+  // ---- points / tier backfill ----
+  const pending = await db
+    .select({
+      id: smartRotomAchievements.id,
+      category: smartRotomAchievements.category,
+    })
+    .from(smartRotomAchievements)
+    .where(
+      and(
+        eq(smartRotomAchievements.points, DEFAULT_POINTS),
+        eq(smartRotomAchievements.tier, DEFAULT_TIER),
+      ),
+    );
+
+  logger.info(`${pending.length} achievement(s) still at the default weight`);
+
+  let updated = 0;
+  for (const achievement of pending) {
+    const weight = CATEGORY_WEIGHTS[achievement.category] ?? DEFAULT_WEIGHT;
+
+    // "anything else → bronce/10" is already the default — skip the write.
+    if (
+      weight.points === DEFAULT_POINTS &&
+      weight.tier === DEFAULT_TIER
+    ) {
+      continue;
+    }
+
+    await db
+      .update(smartRotomAchievements)
+      .set({ points: weight.points, tier: weight.tier })
+      .where(eq(smartRotomAchievements.id, achievement.id));
+    updated++;
+  }
+
+  await connection.end();
+  logger.info(`✓ Pasaporte seed complete — ${updated} achievement(s) weighted`);
+}
+
+main().catch((err) => {
+  logger.error(err);
+  process.exit(1);
+});
