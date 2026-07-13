@@ -1,13 +1,7 @@
 import { SmartrotomService } from './smartrotom.service';
 import { Public } from '@api/_utils/decorators/public.decorator';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
-import {
-  Body,
-  Controller,
-  Get,
-  Post,
-  HttpStatus,
-} from '@nestjs/common';
+import { Body, Controller, Get, Post, HttpStatus } from '@nestjs/common';
 import { TeleportPlayerDto } from '../_dto/teleport-player.dto';
 import { WingullFacadeService } from '../wingull/wingull.facade.service';
 import { ArceuSpeakEntity } from './entities/arceuspeak.entity';

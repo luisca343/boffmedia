@@ -36,6 +36,10 @@ export interface NewsDetails {
   imageUrl: string;
   createdAt: Date;
   updatedAt: Date;
+  author: string | null;
+  authorRole: string | null;
+  issue: number | null;
+  claps: number;
 }
 
 export interface NotePreview {

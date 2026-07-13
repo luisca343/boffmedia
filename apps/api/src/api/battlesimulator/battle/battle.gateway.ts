@@ -487,7 +487,10 @@ export class BattleGateway implements OnGatewayConnection, OnGatewayDisconnect {
       });
       const pendingRequest = room.getCurrentRequest(existingSide);
       if (pendingRequest) {
-        client.emit('request', { roomId: payload.roomId, request: pendingRequest });
+        client.emit('request', {
+          roomId: payload.roomId,
+          request: pendingRequest,
+        });
       }
     }
   }

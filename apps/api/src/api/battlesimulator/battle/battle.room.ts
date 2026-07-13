@@ -158,7 +158,9 @@ export class BattleRoom {
                 (this.mode === 'pvp' ? 'Player 2' : 'Bot'),
             };
             this.callbacks.onBattleEnd(result);
-            try { this.streams.omniscient.destroy(); } catch {}
+            try {
+              this.streams.omniscient.destroy();
+            } catch {}
             return;
           }
 
@@ -176,7 +178,9 @@ export class BattleRoom {
                 (this.mode === 'pvp' ? 'Player 2' : 'Bot'),
             };
             this.callbacks.onBattleEnd(result);
-            try { this.streams.omniscient.destroy(); } catch {}
+            try {
+              this.streams.omniscient.destroy();
+            } catch {}
             return;
           }
         }

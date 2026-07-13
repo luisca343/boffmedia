@@ -1,5 +1,27 @@
 import { NewsDetails } from '../documents.repository';
 
+export interface NewsCommentRow {
+  id: number;
+  newsId: number;
+  uuid: string;
+  username: string;
+  body: string;
+  createdAt: Date;
+}
+
+export interface EditorialBoardRow {
+  author: string;
+  authorRole: string | null;
+  articles: number;
+}
+
+export interface NewsIssueRow {
+  issue: number;
+  articles: number;
+  headline: string;
+  publishedAt: Date;
+}
+
 export interface INewsRepository {
   findAllNews(): Promise<NewsDetails[]>;
   findPublishedNews(): Promise<NewsDetails[]>;
@@ -15,6 +37,9 @@ export interface INewsRepository {
     content: string;
     buttonText?: string;
     imageUrl?: string;
+    author?: string;
+    authorRole?: string;
+    issue?: number;
   }): Promise<{ insertId: number }>;
   updateNews(
     newsId: number,
@@ -28,6 +53,9 @@ export interface INewsRepository {
       content?: string;
       buttonText?: string;
       imageUrl?: string;
+      author?: string;
+      authorRole?: string;
+      issue?: number;
     },
   ): Promise<void>;
   deleteNews(newsId: number): Promise<void>;
@@ -38,4 +66,19 @@ export interface INewsRepository {
   ): Promise<void>;
   updateAllNewsFeaturedStatus(featured: number): Promise<void>;
   updateNewsFeaturedStatus(newsId: number, featured: number): Promise<void>;
+
+  findCommentsByNewsId(newsId: number): Promise<NewsCommentRow[]>;
+  createComment(
+    newsId: number,
+    uuid: string,
+    body: string,
+  ): Promise<NewsCommentRow>;
+  deleteComment(commentId: number): Promise<void>;
+
+  incrementClaps(newsId: number): Promise<number>;
+
+  findEditorialBoard(): Promise<EditorialBoardRow[]>;
+  findIssues(): Promise<NewsIssueRow[]>;
+
+  subscribeNewsletter(email: string): Promise<{ success: boolean }>;
 }

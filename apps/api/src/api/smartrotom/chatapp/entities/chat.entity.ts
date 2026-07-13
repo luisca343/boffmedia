@@ -53,7 +53,11 @@ export class ChatMessage {
   })
   uuid?: string;
 
-  @ApiProperty({ example: 'text', description: 'Message type', required: false })
+  @ApiProperty({
+    example: 'text',
+    description: 'Message type',
+    required: false,
+  })
   type?: string | null;
 
   @ApiProperty({

@@ -5,7 +5,12 @@ function mockSocket() {
 }
 
 function mockLogger() {
-  return { log: jest.fn(), error: jest.fn(), warn: jest.fn(), debug: jest.fn() } as any;
+  return {
+    log: jest.fn(),
+    error: jest.fn(),
+    warn: jest.fn(),
+    debug: jest.fn(),
+  } as any;
 }
 
 describe('BattleGateway — chatMessage', () => {
@@ -52,18 +57,30 @@ describe('BattleGateway — chatMessage', () => {
         }),
       );
     }
-    expect(strangerSocket.emit).not.toHaveBeenCalledWith('chatMessage', expect.anything());
+    expect(strangerSocket.emit).not.toHaveBeenCalledWith(
+      'chatMessage',
+      expect.anything(),
+    );
   });
 
   it('rejects messages from clients outside the room', () => {
-    gateway.handleChatMessage(strangerSocket, { roomId: ROOM, message: 'intrusión' });
+    gateway.handleChatMessage(strangerSocket, {
+      roomId: ROOM,
+      message: 'intrusión',
+    });
 
     expect(strangerSocket.emit).toHaveBeenCalledWith(
       'error',
       expect.objectContaining({ roomId: ROOM, message: 'Not in this battle' }),
     );
-    expect(p1Socket.emit).not.toHaveBeenCalledWith('chatMessage', expect.anything());
-    expect(p2Socket.emit).not.toHaveBeenCalledWith('chatMessage', expect.anything());
+    expect(p1Socket.emit).not.toHaveBeenCalledWith(
+      'chatMessage',
+      expect.anything(),
+    );
+    expect(p2Socket.emit).not.toHaveBeenCalledWith(
+      'chatMessage',
+      expect.anything(),
+    );
   });
 
   it('ignores empty messages and truncates messages over 300 chars', () => {
@@ -83,12 +100,18 @@ describe('BattleGateway — chatMessage', () => {
     gateway.handleRegister(newP2Socket, { clientId: 'bob' });
     newP2Socket.emit.mockClear();
 
-    gateway.handleChatMessage(p1Socket, { roomId: ROOM, message: 'sigues ahí?' });
+    gateway.handleChatMessage(p1Socket, {
+      roomId: ROOM,
+      message: 'sigues ahí?',
+    });
 
     expect(newP2Socket.emit).toHaveBeenCalledWith(
       'chatMessage',
       expect.objectContaining({ message: 'sigues ahí?' }),
     );
-    expect(p2Socket.emit).not.toHaveBeenCalledWith('chatMessage', expect.anything());
+    expect(p2Socket.emit).not.toHaveBeenCalledWith(
+      'chatMessage',
+      expect.anything(),
+    );
   });
 });

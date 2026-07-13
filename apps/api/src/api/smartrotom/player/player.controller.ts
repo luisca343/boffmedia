@@ -1,9 +1,4 @@
-import {
-  Body,
-  Controller,
-  Post,
-  HttpStatus,
-} from '@nestjs/common';
+import { Body, Controller, Post, HttpStatus } from '@nestjs/common';
 import { Public } from '@api/_utils/decorators/public.decorator';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
 import { UuidDto } from '../_dto/smartrotom-request-dto';
