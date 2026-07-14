@@ -133,21 +133,5 @@
     "typescript": "^5",
     "vite-tsconfig-paths": "^6.1.1",
     "vitest": "^4.1.10"
-  },
-  "pnpm": {
-    "overrides": {
-      "next": "16.0.7",
-      "react": "19.2.1",
-      "react-dom": "19.2.1",
-      "@types/react": "19.2.7",
-      "@types/react-dom": "19.2.3"
-    }
-  },
-  "overrides": {
-    "next": "16.0.7",
-    "react": "19.2.3",
-    "react-dom": "19.2.3",
-    "@types/react": "19.2.7",
-    "@types/react-dom": "19.2.3"
   }
 }

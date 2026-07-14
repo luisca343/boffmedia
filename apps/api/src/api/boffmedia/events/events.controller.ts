@@ -14,6 +14,7 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { Public } from '@api/_utils/decorators/public.decorator';
+import { PaginationQueryDto } from '@api/_utils/dto/pagination.dto';
 import { OptionalAuth } from '@api/_utils/decorators/optional-auth.decorator';
 import {
   ApiTags,
@@ -613,11 +614,8 @@ export class EventsController {
   })
   async getUserActivity(
     @Param('userId', ParseIntPipe) userId: number,
-    @Query('limit') limit?: number,
+    @Query() q: PaginationQueryDto,
   ) {
-    return await this.eventsFacadeService.getUserActivity(
-      userId,
-      limit ? Number(limit) : undefined,
-    );
+    return await this.eventsFacadeService.getUserActivity(userId, q.limit);
   }
 }

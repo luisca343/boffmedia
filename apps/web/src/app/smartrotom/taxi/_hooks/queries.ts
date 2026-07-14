@@ -2,9 +2,7 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import type { Region, StarBankAccount, StarBankTransaction, TaxiStop } from "@boffmedia/shared"
-import { StarbankService } from "@/services/api/smartrotom/starbankService"
-import { WingullService } from "@/services/api/smartrotom/wingullService"
-import { rotomGETOrThrow, wingullGETOrThrow } from "@/services/boffAPI"
+import { rotomGETOrThrow, rotomPOSTOrThrow, wingullGETOrThrow } from "@/services/boffAPI"
 import { getMcUserData } from "@/services/mcef/mcefApi"
 import { POSITION_REFRESH_INTERVAL, TAXI_SERVICE_ACCOUNT } from "../_utils/constants"
 import { TRIP_CONCEPT_PREFIX } from "../_utils/trips"
@@ -133,16 +131,22 @@ export function useTeleport(uuid?: string) {
     mutationFn: async ({ stop, price }: { stop: TaxiStop; price: number }) => {
       if (!uuid) throw new Error("Necesitas iniciar sesión para viajar")
 
-      const payment = await StarbankService.transferFromMain({
-        uuid,
-        to: TAXI_SERVICE_ACCOUNT,
-        amount: price,
-        concept: `${TRIP_CONCEPT_PREFIX}${stop.id}`,
-      })
-      if (!payment.success) throw new Error("No se pudo cobrar el viaje")
+      try {
+        await rotomPOSTOrThrow<void>("/starbank/transfer/from-main", {
+          uuid,
+          to: TAXI_SERVICE_ACCOUNT,
+          amount: price,
+          concept: `${TRIP_CONCEPT_PREFIX}${stop.id}`,
+        })
+      } catch {
+        throw new Error("No se pudo cobrar el viaje")
+      }
 
-      const trip = await WingullService.teleportPlayer({ id: stop.id, uuid })
-      if (!trip.success) throw new Error("Se cobró el viaje pero el teletransporte falló. Contacta con soporte.")
+      try {
+        await rotomPOSTOrThrow("/taxi/teleport", { id: stop.id, uuid })
+      } catch {
+        throw new Error("Se cobró el viaje pero el teletransporte falló. Contacta con soporte.")
+      }
 
       return stop
     },

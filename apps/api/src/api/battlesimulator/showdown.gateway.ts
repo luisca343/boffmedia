@@ -10,6 +10,7 @@ import WebSocket from 'ws';
 import axios from 'axios';
 import { Actions } from '@pkmn/login';
 import { Logger } from 'nestjs-pino';
+import { env } from '@/config/env';
 
 interface ShowdownClientEntry {
   socket: Socket;
@@ -31,8 +32,7 @@ export class ShowdownGateway
   @WebSocketServer() server: Server;
 
   private clients: Map<string, ShowdownClientEntry> = new Map();
-  private showdownServer =
-    process.env.SHOWDOWN_SERVER_URL || 'wss://sim3.psim.us/showdown/websocket';
+  private showdownServer = env.SHOWDOWN_SERVER_URL;
 
   handleConnection(client: Socket) {
     const clientId = crypto.randomUUID();

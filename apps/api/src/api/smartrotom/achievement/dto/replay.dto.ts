@@ -7,8 +7,9 @@ import {
   Min,
   IsUUID,
 } from 'class-validator';
+import { BaseDto } from '@api/_utils/dto/base.dto';
 
-export class CreateReplayDto {
+export class CreateReplayDto extends BaseDto {
   @ApiProperty({
     description: 'Player 1 name',
     example: 'Luisca343',
@@ -60,7 +61,7 @@ export class CreateReplayDto {
   @IsString()
   winner: string;
 }
-export class CreateUserReplayDto {
+export class CreateUserReplayDto extends BaseDto {
   @ApiProperty({
     description: 'Replay ID',
     example: 123,

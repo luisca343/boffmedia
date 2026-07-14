@@ -58,6 +58,18 @@ describe('BattleRoom — diagnostic', () => {
               requestCount++;
               const request = JSON.parse(args[1] as string);
 
+              // The raw sim request has no `requestType` field — derive it the
+              // same way production (battle.room.ts) does.
+              if (!request.requestType) {
+                if (request.active) {
+                  request.requestType = 'move';
+                } else if (request.teamPreview) {
+                  request.requestType = 'team';
+                } else if (request.side) {
+                  request.requestType = 'switch';
+                }
+              }
+
               // Auto-play: choose first available move or switch
               setTimeout(() => {
                 if (request.requestType === 'move' && request.active) {

@@ -268,10 +268,9 @@ export class WigglypopListingsService {
   async toEntities(
     listings: ListingWithContents[],
   ): Promise<WigglypopListingEntity[]> {
-    const names = new Map<string, string | null>();
-    for (const uuid of new Set(listings.map((l) => l.sellerUuid))) {
-      names.set(uuid, await this.listingsRepository.findSellerUsername(uuid));
-    }
+    const names = await this.listingsRepository.findUsernamesByUuids([
+      ...new Set(listings.map((l) => l.sellerUuid)),
+    ]);
     return listings.map((l) =>
       this.toEntitySync(l, names.get(l.sellerUuid) ?? null),
     );
@@ -532,10 +531,9 @@ export class WigglypopListingsService {
         this.tradingRepository.findReviewsForSeller(uuid),
       ]);
 
-    const reviewerNames = new Map<string, string | null>();
-    for (const r of new Set(reviews.map((r) => r.reviewerUuid))) {
-      reviewerNames.set(r, await this.listingsRepository.findSellerUsername(r));
-    }
+    const reviewerNames = await this.listingsRepository.findUsernamesByUuids([
+      ...new Set(reviews.map((r) => r.reviewerUuid)),
+    ]);
 
     return {
       seller: { uuid, username },

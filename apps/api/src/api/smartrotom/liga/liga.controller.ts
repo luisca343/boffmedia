@@ -21,6 +21,7 @@ import {
   CreateTournamentDto,
   TournamentRegistrationDto,
 } from './dto/tournament.dto';
+import { PaginationQueryDto } from '@api/_utils/dto/pagination.dto';
 
 @ApiTags('SmartRotom | Liga')
 @Public()
@@ -60,12 +61,8 @@ export class LigaController {
     description: 'Number of replays to retrieve',
     required: false,
   })
-  async getRecentReplays(@Query('limit') limit?: string) {
-    const limitNum = limit ? parseInt(limit, 10) : 10;
-    if (isNaN(limitNum) || limitNum <= 0) {
-      throw new Error('Invalid limit parameter');
-    }
-    return await this.ligaFacadeService.getRecentReplays(limitNum);
+  async getRecentReplays(@Query() q: PaginationQueryDto) {
+    return await this.ligaFacadeService.getRecentReplays(q.limit ?? 10);
   }
 
   @Get('replays/player/:uuid')
@@ -118,12 +115,8 @@ export class LigaController {
     description: 'Number of players to retrieve',
     required: false,
   })
-  async getLeaderboard(@Query('limit') limit?: string) {
-    const limitNum = limit ? parseInt(limit, 10) : 20;
-    if (isNaN(limitNum) || limitNum <= 0) {
-      throw new Error('Invalid limit parameter');
-    }
-    return await this.ligaFacadeService.getLeaderboard(limitNum);
+  async getLeaderboard(@Query() q: PaginationQueryDto) {
+    return await this.ligaFacadeService.getLeaderboard(q.limit ?? 20);
   }
 
   @Get('ranking/:uuid')

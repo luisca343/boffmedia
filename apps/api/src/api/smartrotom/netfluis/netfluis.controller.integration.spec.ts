@@ -41,6 +41,7 @@ describe('NetfluisController — integration (ValidationPipe + GlobalExceptionFi
       }),
     );
     app.useGlobalFilters(new GlobalExceptionFilter(mockLogger as any));
+    app.useGlobalInterceptors(new ResponseInterceptor(new Reflector()));
     await app.init();
   });
 

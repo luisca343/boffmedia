@@ -1,4 +1,12 @@
-import { Injectable, Inject } from '@nestjs/common';
+import {
+  Injectable,
+  Inject,
+  BadRequestException,
+  ConflictException,
+  NotFoundException,
+  ForbiddenException,
+} from '@nestjs/common';
+import { ActorContext } from '@api/_utils/auth/actor';
 import {
   STARBANK_ACCOUNT_REPOSITORY_TOKEN,
   STARBANK_TRANSACTION_REPOSITORY_TOKEN,
@@ -24,13 +32,43 @@ export class StarbankTransactionService {
     private readonly transactionRepository: IStarbankTransactionRepository,
   ) {}
 
-  async transfer(transferDto: CreateTransferDto): Promise<void> {
+  /**
+   * A user (non-server actor with a known mcUuid) may only move money out of an
+   * account they own. Skipped for the trusted game server, and skipped on the
+   * transitional tripwire path where no user identity is available yet.
+   */
+  private async assertOwnsAccount(
+    accountId: number,
+    actor?: ActorContext,
+  ): Promise<void> {
+    if (!actor || actor.serverAuthed || !actor.mcUuid) return;
+    const owned = await this.accountRepository.findByUuid(actor.mcUuid);
+    if (!owned.some((account) => account.id === accountId)) {
+      throw new ForbiddenException({
+        message: 'Actor does not own the source account',
+        userMessage: 'No puedes transferir desde una cuenta que no es tuya.',
+      });
+    }
+  }
+
+  async transfer(
+    transferDto: CreateTransferDto,
+    actor?: ActorContext,
+  ): Promise<void> {
+    await this.assertOwnsAccount(transferDto.from, actor);
+
     // Validate transfer data
     if (transferDto.amount <= 0) {
-      throw new Error('Transfer amount must be positive');
+      throw new BadRequestException({
+        message: 'Transfer amount must be positive',
+        userMessage: 'El importe debe ser mayor que cero.',
+      });
     }
     if (transferDto.from === transferDto.to) {
-      throw new Error('Source and destination accounts must be different');
+      throw new BadRequestException({
+        message: 'Source and destination accounts must be different',
+        userMessage: 'No puedes transferir a la misma cuenta.',
+      });
     }
 
     // Validate accounts exist
@@ -38,15 +76,24 @@ export class StarbankTransactionService {
     const toAccount = await this.accountRepository.findById(transferDto.to);
 
     if (!fromAccount) {
-      throw new Error('Source account not found');
+      throw new NotFoundException({
+        message: 'Source account not found',
+        userMessage: 'La cuenta de origen no existe.',
+      });
     }
     if (!toAccount) {
-      throw new Error('Destination account not found');
+      throw new NotFoundException({
+        message: 'Destination account not found',
+        userMessage: 'La cuenta de destino no existe.',
+      });
     }
 
     // Check sufficient balance
     if (fromAccount.balance < transferDto.amount) {
-      throw new Error('Insufficient balance');
+      throw new ConflictException({
+        message: 'Insufficient balance',
+        userMessage: 'Saldo insuficiente.',
+      });
     }
 
     const transactionData = {
@@ -60,16 +107,34 @@ export class StarbankTransactionService {
     const result = await this.transactionRepository.create(transactionData);
 
     if (!result.success) {
-      throw new Error(result.message || 'Transfer failed');
+      // The repository re-checks under a row lock (authoritative against races);
+      // surface its business message rather than a generic 500.
+      throw new ConflictException({
+        message: result.message || 'Transfer failed',
+        userMessage: 'No se pudo completar la transferencia.',
+      });
     }
   }
 
-  async transferFromMain(transferDto: TransferFromMainDto): Promise<void> {
+  async transferFromMain(
+    transferDto: TransferFromMainDto,
+    actor?: ActorContext,
+  ): Promise<void> {
+    // A user may only spend from their own main account.
+    if (actor && !actor.serverAuthed && actor.mcUuid) {
+      if (actor.mcUuid !== transferDto.uuid) {
+        throw new ForbiddenException({
+          message: 'Actor does not own the main account',
+          userMessage: 'No puedes transferir desde una cuenta que no es tuya.',
+        });
+      }
+    }
+
     const mainAccount = await this.accountRepository.findUserMainAccount(
       transferDto.uuid,
     );
     if (!mainAccount) {
-      throw new Error('Main account not found');
+      throw new NotFoundException('Main account not found');
     }
 
     const createTransferDto: CreateTransferDto = {
@@ -79,7 +144,7 @@ export class StarbankTransactionService {
       concept: transferDto.concept,
     };
 
-    return await this.transfer(createTransferDto);
+    return await this.transfer(createTransferDto, actor);
   }
 
   async transferFromSystem(
@@ -89,13 +154,13 @@ export class StarbankTransactionService {
   ): Promise<void> {
     // Validate transfer data
     if (amount <= 0) {
-      throw new Error('Transfer amount must be positive');
+      throw new BadRequestException('Transfer amount must be positive');
     }
 
     // Validate account exists
     const toAccount = await this.accountRepository.findById(accountId);
     if (!toAccount) {
-      throw new Error('Destination account not found');
+      throw new NotFoundException('Destination account not found');
     }
 
     const transactionData = {
@@ -109,7 +174,7 @@ export class StarbankTransactionService {
     const result = await this.transactionRepository.create(transactionData);
 
     if (!result.success) {
-      throw new Error(result.message || 'System transfer failed');
+      throw new ConflictException(result.message || 'System transfer failed');
     }
   }
 
@@ -120,7 +185,7 @@ export class StarbankTransactionService {
       shopDto.uuid,
     );
     if (!mainAccount) {
-      throw new Error('Main account not found');
+      throw new NotFoundException('Main account not found');
     }
 
     const total = shopDto.unitPrice * shopDto.count;
@@ -128,7 +193,10 @@ export class StarbankTransactionService {
     if (shopDto.operation === TransactionType.COMPRA) {
       // Check sufficient balance for purchase
       if (mainAccount.balance < total) {
-        throw new Error('Insufficient balance for purchase');
+        throw new ConflictException({
+          message: 'Insufficient balance for purchase',
+          userMessage: 'Saldo insuficiente para la compra.',
+        });
       }
 
       this.logger.log(
@@ -145,7 +213,7 @@ export class StarbankTransactionService {
 
       const result = await this.transactionRepository.create(transactionData);
       if (!result.success) {
-        throw new Error(result.message || 'Purchase failed');
+        throw new ConflictException(result.message || 'Purchase failed');
       }
     } else {
       // VENTA
@@ -163,7 +231,7 @@ export class StarbankTransactionService {
 
       const result = await this.transactionRepository.create(transactionData);
       if (!result.success) {
-        throw new Error(result.message || 'Sale failed');
+        throw new ConflictException(result.message || 'Sale failed');
       }
     }
   }
@@ -176,7 +244,7 @@ export class StarbankTransactionService {
       trainerDto.uuid,
     );
     if (!mainAccount) {
-      throw new Error('Main account not found');
+      throw new NotFoundException('Main account not found');
     }
 
     const prevBalance = mainAccount.balance;
@@ -196,7 +264,9 @@ export class StarbankTransactionService {
 
     const result = await this.transactionRepository.create(transactionData);
     if (!result.success) {
-      throw new Error(result.message || 'Trainer defeat processing failed');
+      throw new ConflictException(
+        result.message || 'Trainer defeat processing failed',
+      );
     }
   }
 

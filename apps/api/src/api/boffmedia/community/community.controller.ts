@@ -1,5 +1,6 @@
 import { Controller, Get, Query } from '@nestjs/common';
 import { Public } from '@api/_utils/decorators/public.decorator';
+import { PaginationQueryDto } from '@api/_utils/dto/pagination.dto';
 import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CommunityService } from './community.service';
 import {
@@ -26,7 +27,7 @@ export class CommunityController {
   @ApiOperation({ summary: 'Site-wide recent activity feed (public)' })
   @ApiQuery({ name: 'limit', required: false, type: Number })
   @ApiResponse({ status: 200, type: [ActivityItemEntity] })
-  getActivity(@Query('limit') limit?: number) {
-    return this.service.getActivity(limit ? Number(limit) : undefined);
+  getActivity(@Query() q: PaginationQueryDto) {
+    return this.service.getActivity(q.limit);
   }
 }

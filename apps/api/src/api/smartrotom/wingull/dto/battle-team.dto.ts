@@ -1,8 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsString, IsOptional, IsNumber, Min, Max } from 'class-validator';
 import { PokemonW } from '../entities/pokemon-w-.entity';
+import { BaseDto } from '@api/_utils/dto/base.dto';
 
-export class CreateBattleTeamDto {
+export class CreateBattleTeamDto extends BaseDto {
   @ApiProperty({
     example: 'My Champion Team',
     description: 'Name of the battle team',
@@ -20,7 +21,7 @@ export class CreateBattleTeamDto {
   description?: string;
 }
 
-export class UpdateBattleTeamDto {
+export class UpdateBattleTeamDto extends BaseDto {
   @ApiProperty({
     example: 'b8c3f2a1-4d5e-6f7g-8h9i-0j1k2l3m4n5o',
     description: 'Battle team UUID',

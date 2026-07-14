@@ -19,6 +19,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { JwtAuthGuard } from '@api/auth/jwt-auth.guard';
+import { PaginationQueryDto } from '@api/_utils/dto/pagination.dto';
 import { RolesGuard } from '@api/_utils/guards/roles.guard';
 import { Roles } from '@api/_utils/decorators/roles.decorator';
 import { USER_ROLES } from '@api/_utils/auth/roles.constants';
@@ -40,11 +41,8 @@ export class NotificationsController {
   @ApiOperation({ summary: "List the current user's notifications" })
   @ApiQuery({ name: 'limit', required: false, type: Number })
   @ApiResponse({ status: 200, type: [NotificationEntity] })
-  list(@Req() req: any, @Query('limit') limit?: number) {
-    return this.service.list(
-      req.user.userId,
-      limit ? Number(limit) : undefined,
-    );
+  list(@Req() req: any, @Query() q: PaginationQueryDto) {
+    return this.service.list(req.user.userId, q.limit);
   }
 
   @Get('unread-count')

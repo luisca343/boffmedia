@@ -8,8 +8,9 @@ import {
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { BaseDto } from '@api/_utils/dto/base.dto';
 
-export class CreateTournamentDto {
+export class CreateTournamentDto extends BaseDto {
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
@@ -32,7 +33,7 @@ export class CreateTournamentDto {
   description?: string;
 }
 
-export class TournamentRegistrationDto {
+export class TournamentRegistrationDto extends BaseDto {
   @ApiProperty()
   @IsInt()
   @Min(1)

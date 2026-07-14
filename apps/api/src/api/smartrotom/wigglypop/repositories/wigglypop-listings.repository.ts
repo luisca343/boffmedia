@@ -458,4 +458,22 @@ export class WigglypopListingsRepository {
       .where(eq(smartrotomUsers.uuid, uuid));
     return rows[0]?.username ?? null;
   }
+
+  /**
+   * Batched form of `findSellerUsername`: one `inArray` query for a whole page of
+   * sellers/reviewers instead of one round-trip each. A uuid with no matching user is
+   * simply absent from the map — callers resolve that to `null`.
+   */
+  async findUsernamesByUuids(
+    uuids: string[],
+  ): Promise<Map<string, string | null>> {
+    const names = new Map<string, string | null>();
+    if (uuids.length === 0) return names;
+    const rows = await this.db
+      .select({ uuid: smartrotomUsers.uuid, username: smartrotomUsers.username })
+      .from(smartrotomUsers)
+      .where(inArray(smartrotomUsers.uuid, uuids));
+    for (const r of rows) names.set(r.uuid, r.username ?? null);
+    return names;
+  }
 }

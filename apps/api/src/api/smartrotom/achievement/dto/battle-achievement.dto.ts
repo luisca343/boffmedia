@@ -6,7 +6,8 @@ import {
   IsBoolean,
   IsArray,
 } from 'class-validator';
-export class BattleAchievementDto {
+import { BaseDto } from '@api/_utils/dto/base.dto';
+export class BattleAchievementDto extends BaseDto {
   @ApiProperty({
     description: 'Player UUID',
     example: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4',

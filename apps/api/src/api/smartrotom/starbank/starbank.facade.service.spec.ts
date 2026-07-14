@@ -265,12 +265,15 @@ describe('StarbankFacadeService', () => {
 
       await service.transfer(1, 2, 100, 'test transfer');
 
-      expect(transactionService.transfer).toHaveBeenCalledWith({
-        from: 1,
-        to: 2,
-        amount: 100,
-        concept: 'test transfer',
-      });
+      expect(transactionService.transfer).toHaveBeenCalledWith(
+        {
+          from: 1,
+          to: 2,
+          amount: 100,
+          concept: 'test transfer',
+        },
+        undefined,
+      );
       // Only MAIN account should trigger balance sync
       expect(wingullFacadeService.updateBalance).toHaveBeenCalledTimes(1);
     });
@@ -297,12 +300,15 @@ describe('StarbankFacadeService', () => {
 
       await service.transferFromMain('test-uuid-1234', 2, 100, 'rent');
 
-      expect(transactionService.transferFromMain).toHaveBeenCalledWith({
-        uuid: 'test-uuid-1234',
-        to: 2,
-        amount: 100,
-        concept: 'rent',
-      });
+      expect(transactionService.transferFromMain).toHaveBeenCalledWith(
+        {
+          uuid: 'test-uuid-1234',
+          to: 2,
+          amount: 100,
+          concept: 'rent',
+        },
+        undefined,
+      );
       expect(wingullFacadeService.updateBalance).toHaveBeenCalled();
     });
 
