@@ -43,11 +43,12 @@ import {
   Clock,
   type LucideIcon,
 } from "lucide-react"
+import { Gif } from "@/lib/smartrotom/customIcons"
 
 /**
  * Rooker's icon set — lucide-react placeholders standing in for the hand-drawn
- * glyphs this replaced. See the migration ledger for fidelity notes (`gif` in
- * particular has no lucide equivalent and reuses `image`).
+ * glyphs this replaced, plus the hand-drawn `gif` (lucide ships no GIF glyph).
+ * See the migration ledger for fidelity notes.
  */
 const MAP = {
   home: Home,
@@ -75,7 +76,7 @@ const MAP = {
   flame: Flame,
   image: Image,
   poll: BarChart3,
-  gif: Image,
+  gif: Gif,
   smile: Smile,
   globe: Globe,
   settings: Settings,

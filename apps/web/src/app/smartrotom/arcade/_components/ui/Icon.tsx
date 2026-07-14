@@ -2,7 +2,6 @@ import type { SVGProps } from "react"
 import {
   Joystick,
   ChevronRight,
-  Coins,
   Heart,
   Trophy,
   Box,
@@ -22,6 +21,7 @@ import {
   ShieldCheck,
   type LucideIcon,
 } from "lucide-react"
+import { GoldCoin } from "@/lib/smartrotom/customIcons"
 
 export interface IconProps extends Omit<SVGProps<SVGSVGElement>, "width" | "height"> {
   /** Pixel size — both axes. */
@@ -47,12 +47,9 @@ const ChevronIcon = ({ s, dir = "right", style, ...p }: IconProps & { dir?: keyo
   />
 )
 
-// The only icon in the set that used to have its own palette (a gold radial gradient).
-// Lucide has no gradient fills, so the gold treatment is lost here — flagged poor
-// fidelity in the migration ledger.
-const CoinIcon = ({ s = 18, ...p }: IconProps) => (
-  <Coins size={s} strokeWidth={1.8} aria-hidden focusable="false" {...p} />
-)
+// The only icon in the set with its own palette: the hand-drawn gold coin
+// (radial gradient + ★), shared from the custom-icon module.
+const CoinIcon = ({ s = 18, ...p }: IconProps) => <GoldCoin size={s} {...p} />
 
 const HeartIcon = ({ s = 18, ...p }: IconProps) => (
   <Heart size={s} fill="currentColor" stroke="none" aria-hidden focusable="false" {...p} />

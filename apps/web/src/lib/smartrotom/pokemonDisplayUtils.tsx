@@ -7,7 +7,7 @@ import {
   Snowflake,
   Bed,
 } from "lucide-react";
-import { Mars, Venus, Neuter } from "./genderIcons";
+import { Mars, Venus, Neuter } from "./customIcons";
 
 // Shared hand-drawn gender glyphs (lucide ships none). Sized "1em" so the
 // existing text-sm/text-[8px] em-based sizing keeps working.
