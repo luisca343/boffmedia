@@ -37,7 +37,7 @@ export function TopBar({ currentPage, account, accounts, onSelectAccount, onOpen
   }, [open]);
 
   return (
-    <header className="sticky top-0 z-30 flex items-center gap-4 border-b border-sb-border bg-white/85 px-4 py-3 backdrop-blur-[10px] backdrop-saturate-[1.4] md:px-7 md:py-3.5">
+    <header className="sticky top-0 z-30 flex items-center gap-4 border-b border-sb-border bg-sb-surface/85 px-4 py-3 backdrop-blur-[10px] backdrop-saturate-[1.4] md:px-7 md:py-3.5">
       <div>
         <div className="text-[12px] text-sb-fg-muted">
           {info.c.map((c, i) => (

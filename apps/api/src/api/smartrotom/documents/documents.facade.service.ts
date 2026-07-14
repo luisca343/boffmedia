@@ -55,7 +55,15 @@ export class DocumentsFacadeService {
   // Merge folder/pin metadata from rotom_documents with tag links and shares
   // into the enriched NotePreview the client renders (sidebar + list) with no
   // per-note round-trips.
-  private async enrichNotes(rows: NotePreviewRow[]): Promise<NotePreview[]> {
+  //
+  // `rotom_documents_users` is the ACCESS list, and the author's own row lives
+  // in it too (createNoteWithUser writes it). `sharedWith` means "shared with
+  // OTHERS", so the viewer's own row is dropped here — otherwise every note the
+  // viewer owns looks shared with themselves.
+  private async enrichNotes(
+    rows: NotePreviewRow[],
+    viewerUuid: string,
+  ): Promise<NotePreview[]> {
     const ids = rows.map((r) => r.id);
     const [tagLinks, shares] = await Promise.all([
       this.noteOrganizationService.getTagLinksForDocuments(ids),
@@ -71,6 +79,7 @@ export class DocumentsFacadeService {
 
     const sharesByDoc = new Map<number, string[]>();
     for (const share of shares) {
+      if (share.uuid === viewerUuid) continue;
       const list = sharesByDoc.get(share.documentId) ?? [];
       list.push(share.uuid);
       sharesByDoc.set(share.documentId, list);
@@ -154,7 +163,7 @@ export class DocumentsFacadeService {
   async getUserNotes(uuid: string): Promise<NotePreview[]> {
     try {
       const rows = await this.documentService.getUserDocuments(uuid);
-      return await this.enrichNotes(rows);
+      return await this.enrichNotes(rows, uuid);
     } catch (error: any) {
       this.logger.error(`Error getting notes for user ${uuid}:`, error);
       throw new Error(`Failed to retrieve notes: ${error.message}`);
@@ -164,7 +173,7 @@ export class DocumentsFacadeService {
   async getTrashedNotes(uuid: string): Promise<NotePreview[]> {
     try {
       const rows = await this.documentService.getTrashedDocuments(uuid);
-      return await this.enrichNotes(rows);
+      return await this.enrichNotes(rows, uuid);
     } catch (error: any) {
       this.logger.error(`Error getting trash for user ${uuid}:`, error);
       throw new Error(`Failed to retrieve trash: ${error.message}`);
