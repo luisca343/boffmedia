@@ -22,11 +22,11 @@ export function TvSmartRotom() {
           muted
           loop
           playsInline
-          poster="/img/smartrotom.png"
+          poster="/assets/img/smartrotom.png"
           aria-label="Demo de SmartRotom"
           className="relative z-[2] aspect-square w-full max-w-[540px] object-cover"
         >
-          <source src="/img/rotom_demo3.webm" type="video/webm" />
+          <source src="/assets/img/rotom_demo3.webm" type="video/webm" />
         </video>
         <div className="relative z-[2] flex flex-wrap gap-x-[18px] gap-y-2.5 max-[980px]:justify-center">
           {TV3_FEATS.map((f) => (

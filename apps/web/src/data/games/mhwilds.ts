@@ -5,13 +5,13 @@ export const mhwilds: GameEntry = {
   nameKey: "games.mhwilds.name",
 
   // Sidebar
-  icon: "/img/games/mhwilds/icon.webp",
+  icon: "/assets/img/games/mhwilds/icon.webp",
   color: "from-warning-hover to-warning",
   bg: "bg-warning-soft",
 
   // Landing page
-  logo: "/img/games/mhwilds/icon.webp",
-  bannerImage: "/img/games/mhwilds/banner.webp",
+  logo: "/assets/img/games/mhwilds/icon.webp",
+  bannerImage: "/assets/img/games/mhwilds/banner.webp",
   navHref: "/mhwilds",
 
   externalLinks: [
@@ -34,7 +34,7 @@ export const mhwilds: GameEntry = {
           sidebarIcon: "sword",
           bleed: true,
           landing: {
-            icon: "/img/games/mhwilds/long-sword.webp",
+            icon: "/assets/img/games/mhwilds/long-sword.webp",
             fallbackIcon: "shield",
             fallbackIconColor: "text-warning-hover",
             color: "from-warning-hover to-emerald-600",
@@ -42,7 +42,7 @@ export const mhwilds: GameEntry = {
             featured: true,
             isNew: true,
             popularity: "high",
-            heroImage: "/img/games/mhwilds/gemma.webp",
+            heroImage: "/assets/img/games/mhwilds/gemma.webp",
           },
         },
         {
@@ -52,7 +52,7 @@ export const mhwilds: GameEntry = {
           sidebarIcon: "tree",
           bleed: true,
           landing: {
-            icon: "/img/games/mhwilds/charge-blade.webp",
+            icon: "/assets/img/games/mhwilds/charge-blade.webp",
             fallbackIcon: "sword",
             fallbackIconColor: "text-secondary-hover",
             color: "from-secondary-hover to-indigo-600",
@@ -69,7 +69,7 @@ export const mhwilds: GameEntry = {
           sidebarIcon: "paw",
           bleed: true,
           landing: {
-            icon: "/img/games/mhwilds/icon.webp",
+            icon: "/assets/img/games/mhwilds/icon.webp",
             fallbackIcon: "paw",
             fallbackIconColor: "text-warning-hover",
             color: "from-warning-hover to-rose-600",

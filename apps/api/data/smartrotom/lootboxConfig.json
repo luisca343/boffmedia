@@ -1,0 +1,83 @@
+{
+  "boxes": [
+    {
+      "id": "trainer_box",
+      "name": "Caja de Entrenador",
+      "image": "/smartrotom/img/apps/arcade/lootbox/trainer_box.png",
+      "description": "Una caja básica con objetos esenciales para entrenadores principiantes.",
+      "items": [
+        {
+          "id": "Incineroar de Wolfey",
+          "weight": 90,
+          "type": "pokemon",
+          "data": "Incineroar lvl:50 otn:Wolfey ivhp:31 ivatk:31 ivdef:31 ivspatk:31 ivspdef:31 ivspd:31 evhp:252 evatk:252 move1:fake_out move2:flare_blitz move3:parting_shot move4:protect n:careful hi:safety_goggles ability:intimidate"
+        },
+    { "id": "pixelmon:potion", "type": "item", "weight": 90, "amount": 10 },
+    { "id": "pixelmon:antidote", "type": "item", "weight": 85, "amount": 5 },
+    { "id": "pixelmon:paralyze_heal", "type": "item", "weight": 80, "amount": 5 },
+    { "id": "pixelmon:awakening", "type": "item", "weight": 80, "amount": 5 },
+    { "id": "pixelmon:great_ball", "type": "item", "weight": 45, "amount": 3 },
+    { "id": "pixelmon:super_potion", "type": "item", "weight": 40, "amount": 3 },
+    { "id": "pixelmon:repel", "type": "item", "weight": 35, "amount": 3 },
+    { "id": "pixelmon:escape_rope", "type": "item", "weight": 30, "amount": 2 },
+    { "id": "pixelmon:ultra_ball", "type": "item", "weight": 18, "amount": 1 },
+    { "id": "pixelmon:hyper_potion", "type": "item", "weight": 15, "amount": 1 },
+    { "id": "pixelmon:revive", "type": "item", "weight": 12, "amount": 1 },
+    { "id": "pixelmon:max_revive", "type": "item", "weight": 8, "amount": 1 },
+    { "id": "pixelmon:max_potion", "type": "item", "weight": 6, "amount": 1 },
+    { "id": "pixelmon:full_restore", "type": "item", "weight": 4, "amount": 1 },
+    { "id": "pixelmon:master_ball", "type": "item", "weight": 2, "amount": 1 },
+    { "id": "pixelmon:sacred_ash", "type": "item", "weight": 1, "amount": 1 }
+      ],
+      "theme": "blue"
+    },
+    {
+      "id": "evolution_box",
+      "name": "Caja de Evolución",
+      "image": "/smartrotom/img/apps/arcade/lootbox/evolution_box.png",
+      "description": "Contiene objetos que ayudan a tus Pokémon a evolucionar.",
+      "items": [
+        { "id": "leaf_stone", "type": "item", "weight": 100, "amount": 1 },
+        { "id": "fire_stone", "type": "item", "weight": 90, "amount": 1 },
+        { "id": "water_stone", "type": "item", "weight": 90, "amount": 1 },
+        { "id": "thunder_stone", "type": "item", "weight": 80, "amount": 1 },
+        { "id": "moon_stone", "type": "item", "weight": 45, "amount": 1 },
+        { "id": "sun_stone", "type": "item", "weight": 40, "amount": 1 },
+        { "id": "kings_rock", "type": "item", "weight": 35, "amount": 1 },
+        { "id": "metal_coat", "type": "item", "weight": 18, "amount": 1 },
+        { "id": "dragon_scale", "type": "item", "weight": 15, "amount": 1 },
+        { "id": "upgrade", "type": "item", "weight": 12, "amount": 1 },
+        { "id": "dawn_stone", "type": "item", "weight": 8, "amount": 1 },
+        { "id": "dusk_stone", "type": "item", "weight": 6, "amount": 1 },
+        { "id": "shiny_stone", "type": "item", "weight": 4, "amount": 1 },
+        { "id": "dubious_disc", "type": "item", "weight": 2, "amount": 1 },
+        { "id": "prism_scale", "type": "item", "weight": 1, "amount": 1 }
+      ],
+      "theme": "green"
+    },
+    {
+      "id": "battle_box",
+      "name": "Caja de Combate",
+      "image": "/smartrotom/img/apps/arcade/lootbox/battle_box.png",
+      "description": "Objetos avanzados para dar ventaja a tus Pokémon en combates competitivos.",
+      "items": [
+        { "id": "x_attack", "type": "item", "weight": 100, "amount": 1 },
+        { "id": "x_defend", "type": "item", "weight": 95, "amount": 1 },
+        { "id": "x_speed", "type": "item", "weight": 90, "amount": 1 },
+        { "id": "x_accuracy", "type": "item", "weight": 85, "amount": 1 },
+        { "id": "dire_hit", "type": "item", "weight": 45, "amount": 1 },
+        { "id": "guard_spec", "type": "item", "weight": 40, "amount": 1 },
+        { "id": "calcium", "type": "item", "weight": 35, "amount": 1 },
+        { "id": "choice_band", "type": "item", "weight": 18, "amount": 1 },
+        { "id": "leftovers", "type": "item", "weight": 16, "amount": 1 },
+        { "id": "focus_sash", "type": "item", "weight": 14, "amount": 1 },
+        { "id": "life_orb", "type": "item", "weight": 8, "amount": 1 },
+        { "id": "assault_vest", "type": "item", "weight": 6, "amount": 1 },
+        { "id": "mega_stone", "type": "item", "weight": 4, "amount": 1 },
+        { "id": "z_crystal", "type": "item", "weight": 2, "amount": 1 },
+        { "id": "dynamax_band", "type": "item", "weight": 1, "amount": 1 }
+      ],
+      "theme": "red"
+    }
+  ]
+}

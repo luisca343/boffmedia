@@ -40,5 +40,5 @@ export interface LootBoxConfig {
 }
 
 export const lootboxConfig: LootBoxConfig = FileUtils.readJsonFile(
-  '/public/smartrotom/data/lootboxConfig.json',
+  'data/smartrotom/lootboxConfig.json',
 );

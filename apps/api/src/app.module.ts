@@ -76,9 +76,11 @@ import { WigglypopModule } from '@api/smartrotom/wigglypop/wigglypop.module';
     // applied (auth routes) — a global guard would throttle SSE/tool streams too.
     ThrottlerModule.forRoot([{ ttl: 60_000, limit: 120 }]),
     ConfigModule.forRoot(),
+    // Kept because PUBLIC_DIR-built URLs (sharex) may point at /public/*.
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'public'),
       serveRoot: '/public',
+      serveStaticOptions: { index: false, maxAge: '1h' },
     }),
     SmartRotomAppsModule,
     SmartRotomUsersModule,

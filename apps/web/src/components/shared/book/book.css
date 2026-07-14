@@ -1,7 +1,7 @@
 @font-face {
     font-family: 'Vinque';
-    src: url('/fonts/vinque-rg.woff2') format('woff2'),
-         url('/fonts/vinque-rg.woff') format('woff');
+    src: url('/assets/fonts/vinque/vinque-rg.woff2') format('woff2'),
+         url('/assets/fonts/vinque/vinque-rg.woff') format('woff');
   }
   
   .page {

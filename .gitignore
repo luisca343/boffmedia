@@ -17,8 +17,12 @@ apps/api/*.json
 !apps/api/nest-cli.json
 !apps/api/tsconfig.spec.json
 
-public/
+/public/
+apps/*/public/
 laboon/
+
+# API runtime cache (imageCache.json etc.) — regenerable, never commit
+apps/api/var/
 
 docs/handoffs/**
 

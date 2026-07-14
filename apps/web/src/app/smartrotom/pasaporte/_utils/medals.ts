@@ -1,9 +1,10 @@
 import type { UserAchievement } from "@boffmedia/shared"
 import type { ExtendedPokemonW } from "@/types/dto/pc-pokemon.dto"
+import { apiAsset } from "@/lib/assets"
 
 /** The real badge artwork, served by the API next to the game's own icons. */
 export function badgeArt(icon: string | null | undefined): string | undefined {
-  return icon ? `https://api.boffmedia.es/smartrotom/img/logros/${icon}.webp` : undefined
+  return icon ? apiAsset(`/smartrotom/img/logros/${icon}.webp`) : undefined
 }
 
 /** Categories arrive accented and mixed-case; compare on a folded form, never on the raw string. */

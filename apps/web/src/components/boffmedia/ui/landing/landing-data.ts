@@ -66,7 +66,7 @@ export const TV3_EVENT_TS = new Date("2026-07-14T18:00:00").getTime()
 // fallback for `TvComunidad`'s activity ticker, which renders real activity from
 // `useSiteActivity` (GET /activity) when available.
 export const TV3_GAMES = [
-  { n: "Pixelmon Wingull 2", d: "La aventura Pokémon definitiva dentro de Minecraft.", tag: "Insignia — Temporada 04", img: "/img/personajes.webp" },
+  { n: "Pixelmon Wingull 2", d: "La aventura Pokémon definitiva dentro de Minecraft.", tag: "Insignia — Temporada 04", img: "/assets/img/personajes.webp" },
   { n: "Minecraft Bingo", d: "Carreras de objetivos por equipos, ediciones rápidas.", tag: "Competitivo — Semanal", ph: "Minecraft Bingo" },
   { n: "Project ZomBOFF", d: "Supervivencia cooperativa en un mundo infectado.", tag: "Survival — Noches especiales", ph: "Project ZomBOFF" },
 ]

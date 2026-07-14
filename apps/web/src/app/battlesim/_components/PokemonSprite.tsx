@@ -5,26 +5,26 @@ import { getScaleMultiplier } from "../_utils/viewUtils";
 import { usePokemonStore } from "@/stores/pokemonStore";
 
 export function PokemonSprite({ pokemon, className, scale = 1 }: { pokemon: Pokemon, className?: string, props?: any, scale?: number }) {
-    const [url, setUrl] = useState<string>('/battlesim/pokeball.png');
+    const [url, setUrl] = useState<string>('/battlesim/img/pokeball.png');
     
 
     useEffect(() => {
         if(!pokemon) {
-            setUrl('/battlesim/pokeball.png');
+            setUrl('/battlesim/img/pokeball.png');
             return;
         }
         const speciesNum = pokemon?.species?.num;
         const form = getFormName(pokemon?.species?.forme);
         if (speciesNum) {
             getPokemonSprite(speciesNum, form, 'none', false).then((res) => {
-                setUrl(res.url ?? '/battlesim/pokeball.png');
+                setUrl(res.url ?? '/battlesim/img/pokeball.png');
             });
         } else {
-            setUrl('/battlesim/pokeball.png');
+            setUrl('/battlesim/img/pokeball.png');
         }
     }, [pokemon?.species?.num]);
 
-    const size = url === '/battlesim/pokeball.png' ? 12 * scale : 24 * scale;
+    const size = url === '/battlesim/img/pokeball.png' ? 12 * scale : 24 * scale;
 
     return (
         <div className="flex justify-center items-center" style={{ 

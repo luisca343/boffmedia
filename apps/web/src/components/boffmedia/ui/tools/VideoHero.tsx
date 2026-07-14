@@ -11,7 +11,7 @@ export interface VideoHeroProps {
 }
 
 /** Hub hero with a looping background video, broadcast scanlines and a scrim. */
-export function VideoHero({ src = "/uploads/looptest.mp4", poster = "/uploads/looptest.jpg", scrim = 0.7, children }: VideoHeroProps) {
+export function VideoHero({ src = "/assets/img/tools/looptest.mp4", poster = "/assets/img/tools/looptest.jpg", scrim = 0.7, children }: VideoHeroProps) {
   return (
     <section className="relative overflow-hidden border-b border-solid border-line bg-base-2">
       <div className="absolute inset-0 z-0" aria-hidden="true">

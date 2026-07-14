@@ -1,4 +1,4 @@
 @font-face {
     font-family: 'Minecrafter';
-    src: url('/fonts/minecrafter.woff') format('woff');
+    src: url('/assets/fonts/minecrafter/minecrafter.woff2') format('woff2'), url('/assets/fonts/minecrafter/minecrafter.woff') format('woff');
   }
