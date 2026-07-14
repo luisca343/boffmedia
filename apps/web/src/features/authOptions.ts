@@ -80,12 +80,20 @@ export const authOptions: NextAuthOptions = {
           if (!credentials?.username || !credentials?.uuid || !credentials?.world) {
             throw new AuthError("Missing required Minecraft credentials", AUTH_ERROR_CODES.MISSING_CREDENTIALS);
           }
-          const response = (await boffPOST<AuthLoginResponseEntity | { error: string }>(`/auth/loginmc`, credentials)).data;
+          // Only the declared fields: NextAuth folds csrfToken/callbackUrl/json into
+          // `credentials`, and the API's strict DTOs reject unknown properties.
+          const response = (await boffPOST<AuthLoginResponseEntity | { error: string }>(`/auth/loginmc`, {
+            username: credentials.username,
+            uuid: credentials.uuid,
+            world: credentials.world,
+          })).data;
           if (response && !('error' in response)) {
             const responseData = response.user as any;
             const user: any = {
               id: responseData.id,
-              name: responseData.name,
+              // The API names this field `username`; without it token.name stays
+              // empty and AppWrapper's boffMediaLinked() gate rejects the session.
+              name: responseData.username ?? responseData.name,
               email: responseData.email,
               image: responseData.image,
               accessToken: response.access_token,
