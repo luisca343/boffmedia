@@ -41,6 +41,20 @@ export const CHAPTERS: Chapter[] = [
       { id: "sr-carga", label: "Carga" },
     ],
   },
+  // The hand-drawn glyphs (lib/smartrotom/customIcons/) — cross-app, so the
+  // chapter hangs off Sistema even though each specimen stages in its app's scope.
+  {
+    name: "Iconos",
+    dom: "Sistema",
+    app: "sr",
+    sections: [
+      { id: "sr-iconos-inventario", label: "Inventario" },
+      { id: "sr-iconos-rotom", label: "Rotom" },
+      { id: "sr-iconos-rookidee", label: "Rookidee" },
+      { id: "sr-iconos-genero", label: "Género" },
+      { id: "sr-iconos-economia", label: "Moneda y GIF" },
+    ],
+  },
 
   // ── Starbank · sb-* ────────────────────────────────────────────────────────
   {

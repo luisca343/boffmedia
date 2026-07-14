@@ -44,7 +44,7 @@ import {
   VolumeX,
   type LucideIcon,
 } from "lucide-react"
-import { Mars, Venus } from "@/lib/smartrotom/genderIcons"
+import { Mars, Venus } from "@/lib/smartrotom/customIcons"
 
 /**
  * Wigglypop's icon set — lucide-react placeholders standing in for the hand-drawn

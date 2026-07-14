@@ -28,9 +28,9 @@ import {
   Sparkles,
   Bookmark,
   Eye,
-  Ghost,
   type LucideIcon,
 } from "lucide-react"
+import { Rotom } from "@/lib/smartrotom/customIcons"
 
 export interface IconProps {
   size?: number
@@ -79,14 +79,15 @@ function make(Glyph: LucideIcon, opts: { filled?: boolean } = {}) {
 }
 
 const IcRotom = ({ size = 20, className }: IconProps) => (
-  <Ghost size={size} strokeWidth={1.5} className={className} aria-hidden="true" focusable="false" />
+  <Rotom size={size} strokeWidth={1.5} className={className} aria-hidden="true" focusable="false" />
 )
 
 /**
  * Icon registry — lucide-react placeholders standing in for the hand-drawn glyphs
- * this replaced. `rotom` (the mascot) has no lucide equivalent; see the migration
- * ledger for fidelity notes. Reference by literal key (`<I.home />`) or drive a nav
- * config with a string key (`const Glyph = I[item.icon]`) — never a dynamic class.
+ * this replaced, plus the hand-drawn `rotom` mascot (lucide has no equivalent); see
+ * the migration ledger for fidelity notes. Reference by literal key (`<I.home />`) or
+ * drive a nav config with a string key (`const Glyph = I[item.icon]`) — never a
+ * dynamic class.
  */
 export const I = {
   home: make(Home),

@@ -43,7 +43,7 @@ import {
   VolumeX,
   type LucideIcon,
 } from "lucide-react"
-import { Mars, Venus, Neuter } from "@/lib/smartrotom/genderIcons"
+import { Mars, Venus, Neuter } from "@/lib/smartrotom/customIcons"
 
 /**
  * The PC's icon set — lucide-react placeholders standing in for the hand-drawn set
