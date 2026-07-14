@@ -12,7 +12,7 @@ export function ProfileImage({ userId, size }: { userId: number, size?: number }
             className="rounded-full overflow-hidden aspect-square flex items-center justify-center bg-layer-3"
         >
             <Image
-                src={errored ? '/profile.png' : imagePath}
+                src={errored ? '/assets/img/profile.png' : imagePath}
                 alt="profile"
                 className="w-full h-full object-cover rounded-full"
                 width={dimension}

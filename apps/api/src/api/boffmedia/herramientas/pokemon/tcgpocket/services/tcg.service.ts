@@ -480,7 +480,7 @@ export class TcgService {
   // ==================== MIGRATION ====================
   async migrateOldUserCards() {
     try {
-      const filePath = path.join(process.cwd(), 'public/CARTAS.json');
+      const filePath = path.join(process.cwd(), 'data/tcgpocket/cartas.json');
       const data = await fsPromises.readFile(filePath, 'utf-8');
       const jsonData = JSON.parse(data);
 

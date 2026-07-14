@@ -19,7 +19,7 @@ export class AppService {
   private readonly RATE_LIMIT_DELAY = 1000; // 1 second delay between requests
   private readonly CACHE_FILE_PATH = path.join(
     process.cwd(),
-    'public/data/imageCache.json',
+    'var/cache/imageCache.json',
   );
 
   constructor(
@@ -153,6 +153,7 @@ export class AppService {
 
   private async saveCache() {
     try {
+      await fs.mkdir(path.dirname(this.CACHE_FILE_PATH), { recursive: true });
       await fs.writeFile(
         this.CACHE_FILE_PATH,
         JSON.stringify(this.imageCache, null, 2),
@@ -202,7 +203,7 @@ export class AppService {
         if (steamID) {
           imageUrl = `https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/${steamID}/header.jpg`;
         } else {
-          imageUrl = '/img/steam.webp';
+          imageUrl = '/assets/img/steam.webp';
         }
 
         return {

@@ -7,7 +7,7 @@ import { Protocol } from '@pkmn/protocol';
 import { Scene } from '../_utils/Scene';
 import { ReplayData } from '../types';
 import { countActions } from '../_utils/replayUtils';
-import { env } from '@/config/env.public';
+import { apiAsset } from '@/lib/assets';
 
 // Battle Store Types and Implementation
 interface BattleStore {
@@ -87,7 +87,7 @@ export function useGameState(replayData?: ReplayData) {
         }
         
         
-        fetch(`${env.NEXT_PUBLIC_API}/smartrotom/combates/booststera.txt`)
+        fetch(apiAsset('/smartrotom/combates/booststera.txt'))
         .then(response => response.text())
         .then(text => {
             setBattleLog(text);

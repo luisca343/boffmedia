@@ -124,5 +124,5 @@ export function timeAgo(iso: string, locale: string): string {
 // Local self-hosted art path (falls back to the API `image` URL, then a CSS
 // placeholder) — see TcgCardArt in the kit.
 export function localCardArt(setId: string, id: string): string {
-  return `/img/games/tcgpocket/cards/${setId}/${id}.jpg`
+  return `/assets/img/games/tcgpocket/cards/${setId}/${id}.jpg`
 }

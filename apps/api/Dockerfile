@@ -49,7 +49,10 @@ COPY --from=builder /app/deploy/node_modules ./node_modules
     RUN node node_modules/playwright/cli.js install --with-deps chromium
 # Copy runtime assets
 COPY --from=builder /app/apps/api/drizzle ./drizzle
+COPY --from=builder /app/apps/api/data ./data
 COPY --from=builder /app/apps/api/package.json ./
+# Writable runtime cache (imageCache.json lives here, not in public/)
+RUN mkdir -p var/cache
 
 # NOTE: mount your Google service-account JSON at runtime, e.g.:
 #   docker run -v /etc/boffmedia/boffmedia-b6e4f721c326.json:/app/boffmedia-b6e4f721c326.json ...

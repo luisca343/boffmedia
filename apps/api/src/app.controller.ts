@@ -28,14 +28,7 @@ export class AppController {
 
   @Get('zomboid')
   async zomboid() {
-    const filePath = join(
-      __dirname,
-      '..',
-      'public',
-      'data',
-      'zomboid',
-      'data.txt',
-    );
+    const filePath = join(process.cwd(), 'data', 'zomboid', 'data.txt');
     try {
       const data = await fs.readFile(filePath, 'utf8');
       const lines = data.split('\n');

@@ -53,8 +53,8 @@ export function useReelSpin({ winningPosition, tileCount, sound, reduceMotion }:
   const [settled, setSettled] = useState(false)
   const [revealed, setRevealed] = useState(false)
 
-  const tick = useAudio("/audio/spinner-tick.wav", 0.25)
-  const win = useAudio("/audio/spinner-win.wav", 0.8)
+  const tick = useAudio("/assets/audio/spinner-tick.wav", 0.25)
+  const win = useAudio("/assets/audio/spinner-win.wav", 0.8)
 
   // `useAudio` hands back a fresh object every render, and `sound` can flip
   // mid-spin; both are read through refs so neither restarts the animation.
