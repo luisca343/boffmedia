@@ -92,6 +92,7 @@ export function EditorColumn(props: EditorColumnProps) {
 
   const paneHandlers: PaneHandlers = {
     onCommit: props.onCommit,
+    onCreateLinked: props.onCreateLinked,
     onTogglePin: props.onTogglePin,
     onShare: props.onShare,
     onHistory: props.onHistory,
@@ -143,6 +144,7 @@ export function EditorColumn(props: EditorColumnProps) {
           <NotePane
             {...paneHandlers}
             note={active}
+            notes={props.notes}
             tags={props.tags}
             folders={props.folders}
             reading={props.reading}
@@ -158,6 +160,7 @@ export function EditorColumn(props: EditorColumnProps) {
             <NotePane
               {...paneHandlers}
               note={splitNote}
+              notes={props.notes}
               tags={props.tags}
               folders={props.folders}
               reading={props.reading}

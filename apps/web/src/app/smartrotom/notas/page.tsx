@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState, type MouseEvent } from "react";
 import { useNotesData } from "./_hooks/useNotesData";
+import { useNoteContents } from "./_hooks/useNoteContents";
 import { useNotesTheme } from "./_hooks/useNotesTheme";
 import { descendants } from "./_utils/tree";
 import { DocumentsService } from "@/services/api/smartrotom/documentsService";
@@ -22,6 +23,7 @@ import type { NoteVM, View, SortKey, ModalKind } from "./_types";
 
 export default function NotesPage() {
   const { notes, trash, folders, tags, actions } = useNotesData();
+  const { contentById, cacheContent } = useNoteContents(notes);
   const theme = useNotesTheme();
 
   const [view, setView] = useState<View>({ type: "smart", id: "all" });
@@ -37,7 +39,6 @@ export default function NotesPage() {
   const [modalNote, setModalNote] = useState<NoteVM | null>(null);
   const [menu, setMenu] = useState<MenuState | null>(null);
   const [tagPick, setTagPick] = useState<{ note: NoteVM; x: number; y: number } | null>(null);
-  const [contentById, setContentById] = useState<Record<number, string>>({});
   const [dropTarget, setDropTarget] = useState<number | null>(null);
 
   const allNotes = view.type === "trash" ? trash : notes;
@@ -115,9 +116,15 @@ export default function NotesPage() {
     [notes, actions, openNote],
   );
 
-  const cacheContent = useCallback((id: number, content: string) => {
-    setContentById((prev) => (prev[id] === content ? prev : { ...prev, [id]: content }));
-  }, []);
+  // Creating from the link picker must not steal the writer's cursor, so the new
+  // note is created in the background instead of being opened like `openTitle` does.
+  const createLinked = useCallback(
+    async (title: string) => {
+      const id = await actions.newNote({ title, content: `<h1>${title}</h1><p><br></p>` });
+      if (id != null) toast(`Nota «${title}» creada`);
+    },
+    [actions],
+  );
 
   // ---- pane handlers ----
   const onCommit = useCallback(
@@ -186,6 +193,7 @@ export default function NotesPage() {
     onHistory: (n: NoteVM) => { setModalNote(n); setModal("history"); },
     onMore: noteMenu,
     onOpenTitle: openTitle,
+    onCreateLinked: createLinked,
     onAddTag: (n: NoteVM, e: MouseEvent) => setTagPick({ note: n, x: e.clientX, y: e.clientY }),
     onRemoveTag: (id: number, tagId: number) => actions.toggleTag(id, tagId),
   };

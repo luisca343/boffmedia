@@ -4,7 +4,6 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Portal } from "../ui";
 import { ThemedLayer } from "../ui/ThemedLayer";
 import { Icon } from "../ui";
-import { DocumentsService } from "@/services/api/smartrotom/documentsService";
 import { buildGraph } from "../../_utils/wikilinks";
 import type { NoteVM } from "../../_types";
 
@@ -21,36 +20,8 @@ export function GraphView({
   onClose: () => void;
   onOpenNote: (id: number) => void;
 }) {
-  const [content, setContent] = useState<Record<number, string>>(contentById);
   const boxRef = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState({ w: 1000, h: 700 });
-
-  // Pull every note's content so the graph is complete (cache-seeded).
-  useEffect(() => {
-    let cancelled = false;
-    const missing = notes.filter((n) => content[n.id] == null);
-    if (missing.length === 0) return;
-    Promise.all(
-      missing.map((n) =>
-        DocumentsService.getDocument(n.id)
-          // A failed read resolves to `{ success: false }`; caching "" for it would draw the
-          // note as an isolated node, so leave it unresolved and let the next open retry.
-          .then((r) => [n.id, r.success ? r.data?.content ?? "" : null] as const)
-          .catch(() => [n.id, null] as const),
-      ),
-    ).then((pairs) => {
-      if (cancelled) return;
-      setContent((prev) => {
-        const next = { ...prev };
-        for (const [id, c] of pairs) if (c != null) next[id] = c;
-        return next;
-      });
-    });
-    return () => {
-      cancelled = true;
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [notes]);
 
   useEffect(() => {
     if (!boxRef.current) return;
@@ -63,7 +34,11 @@ export function GraphView({
   }, []);
 
   const { nodes, edges, degree, positions } = useMemo(() => {
-    const withContent = notes.map((n) => ({ id: n.id, title: n.title, content: content[n.id] ?? "" }));
+    const withContent = notes.map((n) => ({
+      id: n.id,
+      title: n.title,
+      content: contentById[n.id] ?? "",
+    }));
     const g = buildGraph(withContent);
     const deg = new Map<number, number>();
     for (const e of g.edges) {
@@ -79,7 +54,7 @@ export function GraphView({
       pos.set(n.id, { x: cx + Math.cos(a) * radius, y: cy + Math.sin(a) * radius });
     });
     return { nodes: g.nodes, edges: g.edges, degree: deg, positions: pos };
-  }, [notes, content, size]);
+  }, [notes, contentById, size]);
 
   return (
     <Portal>
