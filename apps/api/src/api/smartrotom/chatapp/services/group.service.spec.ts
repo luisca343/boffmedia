@@ -6,6 +6,7 @@ import {
   CHAT_MESSAGE_REPOSITORY_TOKEN,
   CHAT_USER_REPOSITORY_TOKEN,
 } from '@api/_utils/repositories/interfaces/chatapp.repository.token';
+import { PresenceService } from '@api/_utils/sockets/presence.service';
 
 const mockChatRepo = {
   findUserChats: jest.fn(),
@@ -17,14 +18,22 @@ const mockMemberRepo = {
   findChatMembers: jest.fn(),
   addChatMember: jest.fn(),
   removeChatMember: jest.fn(),
+  findMemberFlags: jest.fn(),
 };
 
 const mockMessageRepo = {
   findChatMessages: jest.fn(),
+  findReactionsForMessages: jest.fn(),
+  findReadsForMessages: jest.fn(),
 };
 
 const mockUserRepo = {
   findUserByUuid: jest.fn(),
+};
+
+const mockPresence = {
+  isOnline: jest.fn(),
+  get: jest.fn(),
 };
 
 const makeChat = (id: number, type: number, name = 'chat') =>
@@ -51,6 +60,12 @@ describe('GroupService', () => {
     // Default: empty messages and members
     mockMessageRepo.findChatMessages.mockResolvedValue([]);
     mockMemberRepo.findChatMembers.mockResolvedValue([]);
+    mockMessageRepo.findReactionsForMessages.mockResolvedValue([]);
+    mockMessageRepo.findReadsForMessages.mockResolvedValue([]);
+    mockMemberRepo.findMemberFlags.mockResolvedValue({
+      pinned: false,
+      muted: false,
+    });
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -59,6 +74,7 @@ describe('GroupService', () => {
         { provide: CHAT_MEMBER_REPOSITORY_TOKEN, useValue: mockMemberRepo },
         { provide: CHAT_MESSAGE_REPOSITORY_TOKEN, useValue: mockMessageRepo },
         { provide: CHAT_USER_REPOSITORY_TOKEN, useValue: mockUserRepo },
+        { provide: PresenceService, useValue: mockPresence },
       ],
     }).compile();
 

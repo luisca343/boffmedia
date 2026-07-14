@@ -229,7 +229,7 @@ describe('WingullController — integration (ValidationPipe + GlobalExceptionFil
     });
   });
 
-  // ── POST /wingull/pc/move — untyped body (no validation) ─────────────────
+  // ── POST /wingull/pc/move — MovePokemonDto ───────────────────────────────
 
   describe('POST /wingull/pc/move', () => {
     it('returns 201 and delegates to facade.movePokemon', async () => {
@@ -237,7 +237,13 @@ describe('WingullController — integration (ValidationPipe + GlobalExceptionFil
 
       const res = await request(app.getHttpServer())
         .post('/wingull/pc/move')
-        .send({ from: 0, to: 1, box: 1 });
+        .send({
+          uuid: VALID_UUID,
+          sourceBox: 1,
+          sourceIndex: 0,
+          destinationBox: -1,
+          destinationIndex: 1,
+        });
 
       expect(res.status).toBe(201);
       expect(mockFacade.movePokemon).toHaveBeenCalledTimes(1);

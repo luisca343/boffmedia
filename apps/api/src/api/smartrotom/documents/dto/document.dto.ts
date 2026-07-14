@@ -214,7 +214,7 @@ export class GetUserDocumentsDto {
   uuid: string;
 }
 
-export class AddNoteToUserDto {
+export class AddNoteToUserDto extends BaseDto {
   @ApiProperty({
     description: 'Document ID',
     example: 123,

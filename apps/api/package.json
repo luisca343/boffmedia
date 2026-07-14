@@ -35,7 +35,6 @@
     "convert-mod": "node ../../node_modules/ts-node/dist/bin.js -P scripts/convert-showdown-mod/tsconfig.json scripts/convert-showdown-mod/index.ts"
   },
   "dependencies": {
-    "@boffmedia/shared": "workspace:*",
     "@discordjs/builders": "^1.14.0",
     "@discordjs/voice": "^0.19.2",
     "@google/genai": "^1.13.0",
@@ -83,7 +82,7 @@
     "googleapis": "^155.0.1",
     "helmet": "^8.2.0",
     "libsodium-wrappers": "^0.7.15",
-    "multer": "^1.4.5-lts.2",
+    "multer": "^2.0.2",
     "mysql2": "^3.14.3",
     "necord": "^6.9.1",
     "nestjs-i18n": "^10.5.1",

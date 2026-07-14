@@ -44,6 +44,7 @@ describe('MangaController — integration (ValidationPipe + GlobalExceptionFilte
       }),
     );
     app.useGlobalFilters(new GlobalExceptionFilter(mockLogger as any));
+    app.useGlobalInterceptors(new ResponseInterceptor(new Reflector()));
     await app.init();
   });
 

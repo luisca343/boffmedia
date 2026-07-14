@@ -295,8 +295,18 @@ export function useSeller(uuid: string | null) {
   return useQuery({
     queryKey: wpKeys.seller(uuid ?? ""),
     queryFn: () => WigglypopService.getSeller<any>(uuid!),
+    // The seller endpoint returns WigglypopSellerEntity: the person ref is NESTED under
+    // `seller`, the review COUNT is `reviewCount`, and `reviews` is the review ARRAY.
+    // Feeding the whole entity to toSeller (which reads flat uuid/username/reviews) drops
+    // the name to "Entrenador" and the count to an array — so flatten it here.
     select: (raw) => ({
-      seller: toSeller(raw),
+      seller: toSeller({
+        uuid: raw.seller?.uuid ?? uuid,
+        username: raw.seller?.username,
+        rating: raw.rating,
+        reviews: raw.reviewCount,
+        sales: raw.sales,
+      }),
       activeListings: raw.activeListings ?? 0,
       reviews: raw.reviews ?? [],
     }),

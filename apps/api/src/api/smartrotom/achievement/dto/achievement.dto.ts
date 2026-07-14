@@ -32,7 +32,7 @@ export class GetAchievementByIdDto {
   achievementId: string;
 }
 
-export class CheckAchievementDto {
+export class CheckAchievementDto extends BaseDto {
   @ApiProperty({
     description: 'Player UUID',
     example: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4',

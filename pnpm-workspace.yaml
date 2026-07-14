@@ -9,6 +9,13 @@ overrides:
   postcss@<7.0.36: '>=7.0.36'
   postcss@<8.4.31: '>=8.4.31'
   postcss@>=7.0.0 <7.0.36: '>=7.0.36'
+  # React/Next pins for the web app. A non-root package's `pnpm.overrides` is
+  # ignored by pnpm, so these must live here to take effect (see apps/web).
+  next: 16.0.7
+  react: 19.2.3
+  react-dom: 19.2.3
+  '@types/react': 19.2.7
+  '@types/react-dom': 19.2.3
 
 packageExtensions:
   '@hookform/resolvers@*':

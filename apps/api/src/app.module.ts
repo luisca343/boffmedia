@@ -158,6 +158,14 @@ export class AppModule implements NestModule {
       .apply(MinecraftMiddleware)
       .exclude(
         { path: 'smartrotom/starbank/accounts', method: RequestMethod.POST },
+        // Money routes guarded by GameOrUserAuthGuard own their own auth (JWT,
+        // server key, or transitional tripwire) — the middleware would 403 the
+        // JWT-only path that has no `server` in the body.
+        { path: 'smartrotom/starbank/transfer', method: RequestMethod.POST },
+        {
+          path: 'smartrotom/starbank/transfer/from-main',
+          method: RequestMethod.POST,
+        },
         { path: 'smartrotom/documents/news', method: RequestMethod.POST },
         { path: 'smartrotom/documents/news/(.*)', method: RequestMethod.PUT },
         {

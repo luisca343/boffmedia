@@ -1,8 +1,9 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Tournament } from '@/_db/schema/Tournaments';
 import { TournamentsRepository } from '../repositories/tournaments.repository';
+import { env } from '@/config/env';
 
-const SITE_URL = process.env.NEXTAUTH_URL ?? 'https://ficuslab.es';
+const SITE_URL = env.NEXTAUTH_URL ?? 'https://ficuslab.es';
 
 /**
  * Discord webhook announcements (registration open · start · champion).
@@ -17,10 +18,7 @@ export class TournamentAnnouncerService {
   constructor(private readonly repo: TournamentsRepository) {}
 
   private get webhookUrl(): string | undefined {
-    return (
-      process.env.TOURNAMENTS_DISCORD_WEBHOOK_URL ??
-      process.env.DISCORD_WEBHOOK_URL
-    );
+    return env.TOURNAMENTS_DISCORD_WEBHOOK_URL ?? env.DISCORD_WEBHOOK_URL;
   }
 
   private async post(embed: {

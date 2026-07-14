@@ -116,12 +116,12 @@ describe('LigaController — integration (ValidationPipe + GlobalExceptionFilter
       expect(mockFacade.getRecentReplays).toHaveBeenCalledWith(5);
     });
 
-    it('returns 500 when limit is non-numeric', async () => {
+    it('returns 400 when limit is non-numeric', async () => {
       const res = await request(app.getHttpServer()).get(
         '/smartrotom/liga/replays/recent?limit=abc',
       );
 
-      expect(res.status).toBe(500);
+      expect(res.status).toBe(400);
     });
   });
 

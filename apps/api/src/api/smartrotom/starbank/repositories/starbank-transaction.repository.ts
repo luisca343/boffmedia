@@ -33,69 +33,72 @@ export class StarbankTransactionRepository implements IStarbankTransactionReposi
   async create(
     transactionData: CreateTransactionData,
   ): Promise<{ success: boolean; message?: string; transactionId?: number }> {
+    const { from: fromId, to: toId, amount } = transactionData;
     try {
-      // Get current balances
-      const fromAccount =
-        transactionData.from === 0
-          ? null
-          : await this.accountRepository.findById(transactionData.from);
-      const toAccount =
-        transactionData.to === 0
-          ? null
-          : await this.accountRepository.findById(transactionData.to);
+      // The debit, credit and ledger insert must be one atomic unit, and the
+      // balance read must hold a row lock until the write commits — otherwise
+      // two concurrent transfers both read the same balance and the second
+      // overwrite silently loses money. Everything runs on `tx`; `SELECT … FOR
+      // UPDATE` serialises transfers touching the same account. System account
+      // 0 is virtual (no row), so it is neither locked nor balance-checked.
+      return await this.db.transaction(async (tx) => {
+        const lockAccount = async (id: number) => {
+          if (id === 0) return null;
+          const rows = await tx
+            .select({ id: starBankAccounts.id, balance: starBankAccounts.balance })
+            .from(starBankAccounts)
+            .where(eq(starBankAccounts.id, id))
+            .for('update');
+          return rows[0] ?? null;
+        };
 
-      // Validate accounts exist (except system account 0)
-      if (transactionData.from !== 0 && !fromAccount) {
-        return { success: false, message: 'Source account not found' };
-      }
-      if (transactionData.to !== 0 && !toAccount) {
-        return { success: false, message: 'Destination account not found' };
-      }
+        const fromAccount = await lockAccount(fromId);
+        const toAccount = await lockAccount(toId);
 
-      // Check sufficient balance
-      if (fromAccount && fromAccount.balance < transactionData.amount) {
-        return { success: false, message: 'Insufficient balance' };
-      }
+        if (fromId !== 0 && !fromAccount) {
+          return { success: false, message: 'Source account not found' };
+        }
+        if (toId !== 0 && !toAccount) {
+          return { success: false, message: 'Destination account not found' };
+        }
+        if (fromAccount && (fromAccount.balance ?? 0) < amount) {
+          return { success: false, message: 'Insufficient balance' };
+        }
 
-      // Calculate new balances
-      const fromBalance = fromAccount
-        ? fromAccount.balance - transactionData.amount
-        : 0;
-      const toBalance = toAccount
-        ? toAccount.balance + transactionData.amount
-        : 0;
+        const fromBalance = fromAccount ? (fromAccount.balance ?? 0) - amount : 0;
+        const toBalance = toAccount ? (toAccount.balance ?? 0) + amount : 0;
 
-      // Update balances
-      if (fromAccount) {
-        await this.accountRepository.updateBalance(
-          transactionData.from,
-          fromBalance,
-        );
-      }
-      if (toAccount) {
-        await this.accountRepository.updateBalance(
-          transactionData.to,
-          toBalance,
-        );
-      }
+        if (fromAccount) {
+          await tx
+            .update(starBankAccounts)
+            .set({ balance: fromBalance })
+            .where(eq(starBankAccounts.id, fromId));
+        }
+        if (toAccount) {
+          await tx
+            .update(starBankAccounts)
+            .set({ balance: toBalance })
+            .where(eq(starBankAccounts.id, toId));
+        }
 
-      // Record transaction
-      const inserted = await this.db
-        .insert(starBankTransactions)
-        .values({
-          from: transactionData.from,
-          to: transactionData.to,
-          amount: transactionData.amount,
-          fromBalance,
-          toBalance,
-          reason: transactionData.reason,
-          type: transactionData.type,
-          date: new Date().toISOString(),
-        })
-        .execute();
+        const inserted = await tx
+          .insert(starBankTransactions)
+          .values({
+            from: fromId,
+            to: toId,
+            amount,
+            fromBalance,
+            toBalance,
+            reason: transactionData.reason,
+            type: transactionData.type,
+            date: new Date().toISOString(),
+          })
+          .execute();
 
-      return { success: true, transactionId: inserted[0].insertId };
+        return { success: true, transactionId: inserted[0].insertId };
+      });
     } catch (error: any) {
+      // The transaction has rolled back — no partial balance change persisted.
       this.logger.error('Failed to create transaction:', error);
       return {
         success: false,
