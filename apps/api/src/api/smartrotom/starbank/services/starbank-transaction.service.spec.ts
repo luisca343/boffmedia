@@ -177,6 +177,94 @@ describe('StarbankTransactionService', () => {
     });
   });
 
+  describe('transfer() ownership', () => {
+    const transferDto: CreateTransferDto = {
+      from: 1,
+      to: 2,
+      amount: 100,
+      concept: 'Test transfer',
+    };
+
+    const proceed = () => {
+      accountRepository.findById
+        .mockResolvedValueOnce(mockAccount(1, 500))
+        .mockResolvedValueOnce(mockAccount(2, 100));
+      transactionRepository.create.mockResolvedValue({ success: true });
+    };
+
+    it('lets the trusted game server move any account (ownership skipped)', async () => {
+      proceed();
+      await expect(
+        service.transfer(transferDto, { serverAuthed: true }),
+      ).resolves.toBeUndefined();
+      expect(accountRepository.findByUuid).not.toHaveBeenCalled();
+      expect(transactionRepository.create).toHaveBeenCalled();
+    });
+
+    it('allows a user to transfer from an account they own', async () => {
+      accountRepository.findByUuid.mockResolvedValue([mockAccount(1, 500)]);
+      proceed();
+      await expect(
+        service.transfer(transferDto, {
+          serverAuthed: false,
+          mcUuid: 'owner-uuid',
+        }),
+      ).resolves.toBeUndefined();
+      expect(accountRepository.findByUuid).toHaveBeenCalledWith('owner-uuid');
+      expect(transactionRepository.create).toHaveBeenCalled();
+    });
+
+    it('forbids a user from transferring out of an account they do not own', async () => {
+      accountRepository.findByUuid.mockResolvedValue([mockAccount(99, 500)]);
+      await expect(
+        service.transfer(transferDto, {
+          serverAuthed: false,
+          mcUuid: 'attacker-uuid',
+        }),
+      ).rejects.toThrow('does not own the source account');
+      expect(transactionRepository.create).not.toHaveBeenCalled();
+    });
+
+    it('skips ownership on the transitional path (no mcUuid)', async () => {
+      proceed();
+      await expect(
+        service.transfer(transferDto, { serverAuthed: false }),
+      ).resolves.toBeUndefined();
+      expect(accountRepository.findByUuid).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('transferFromMain() ownership', () => {
+    it('forbids spending from a main account the user does not own', async () => {
+      await expect(
+        service.transferFromMain(
+          { uuid: 'victim-uuid', to: 2, amount: 100, concept: 'x' },
+          { serverAuthed: false, mcUuid: 'attacker-uuid' },
+        ),
+      ).rejects.toThrow('does not own the main account');
+      expect(accountRepository.findUserMainAccount).not.toHaveBeenCalled();
+    });
+
+    it('allows spending from the user own main account', async () => {
+      accountRepository.findUserMainAccount.mockResolvedValue(
+        mockAccount(1, 500),
+      );
+      accountRepository.findByUuid.mockResolvedValue([mockAccount(1, 500)]);
+      accountRepository.findById
+        .mockResolvedValueOnce(mockAccount(1, 500))
+        .mockResolvedValueOnce(mockAccount(2, 100));
+      transactionRepository.create.mockResolvedValue({ success: true });
+
+      await expect(
+        service.transferFromMain(
+          { uuid: 'owner-uuid', to: 2, amount: 100, concept: 'x' },
+          { serverAuthed: false, mcUuid: 'owner-uuid' },
+        ),
+      ).resolves.toBeUndefined();
+      expect(transactionRepository.create).toHaveBeenCalled();
+    });
+  });
+
   describe('processShopTransaction()', () => {
     const mainAccount = { id: 10, balance: 1000 };
     const buyDto: CreateShopTransactionDto = {

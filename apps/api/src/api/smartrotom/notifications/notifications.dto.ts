@@ -1,3 +1,4 @@
+import { BaseDto } from '@api/_utils/dto/base.dto';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsString, IsNotEmpty, IsOptional, MaxLength } from 'class-validator';
 
@@ -79,14 +80,14 @@ export class GetInboxQueryDto {
   offset?: number;
 }
 
-export class MarkReadBodyDto {
+export class MarkReadBodyDto extends BaseDto {
   @ApiProperty({ description: 'User UUID' })
   @IsString()
   @IsNotEmpty()
   uuid: string;
 }
 
-export class SendNotificationDto {
+export class SendNotificationDto extends BaseDto {
   @ApiProperty({ description: 'Recipient user UUID' })
   @IsString()
   @IsNotEmpty()
@@ -124,14 +125,4 @@ export class SendNotificationDto {
   @IsString()
   @MaxLength(512)
   link?: string;
-
-  @ApiProperty({
-    description: 'SmartRotom server name (injected by client)',
-    required: false,
-    nullable: true,
-  })
-  @IsOptional()
-  @IsString()
-  @MaxLength(64)
-  server?: string;
 }

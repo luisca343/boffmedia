@@ -10,6 +10,7 @@ import { TrainerDefeatMoneyDto } from './dto/trainer-defeat-money.dto';
 import { StarBankAccount } from './entities/starbank-account.entity';
 import { StarBankTransaction } from './entities/starbank-transaction.entity';
 import { AccountType } from './enums/account-type.enum';
+import { ActorContext } from '@api/_utils/auth/actor';
 import { Logger } from 'nestjs-pino';
 
 @Injectable()
@@ -79,6 +80,7 @@ export class StarbankFacadeService {
     to: number,
     amount: number,
     concept: string,
+    actor?: ActorContext,
   ): Promise<void> {
     const transferDto: CreateTransferDto = {
       from,
@@ -87,7 +89,7 @@ export class StarbankFacadeService {
       concept,
     };
 
-    await this.transactionService.transfer(transferDto);
+    await this.transactionService.transfer(transferDto, actor);
 
     // Update balance in game after successful transfer (non-blocking)
     try {
@@ -120,6 +122,7 @@ export class StarbankFacadeService {
     to: number,
     amount: number,
     concept: string,
+    actor?: ActorContext,
   ): Promise<void> {
     const transferDto: TransferFromMainDto = {
       uuid,
@@ -128,7 +131,7 @@ export class StarbankFacadeService {
       concept,
     };
 
-    await this.transactionService.transferFromMain(transferDto);
+    await this.transactionService.transferFromMain(transferDto, actor);
 
     // Update balance in game after successful transfer (non-blocking)
     try {

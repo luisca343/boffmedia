@@ -261,7 +261,11 @@ export class WigglypopReviewEntity {
 export class WigglypopSellerEntity {
   @ApiProperty({ type: WigglypopPersonRef }) seller: WigglypopPersonRef;
 
+  // `type: Number` is load-bearing: a nullable @ApiProperty with only an `example` gives the
+  // OpenAPI generator nothing to infer from, so it ships this as `Record<string, any> | null`
+  // — the web then can't call `.toFixed()` on a rating. Same trap as the `[Number]` arrays above.
   @ApiProperty({
+    type: Number,
     nullable: true,
     example: 4.6,
     description: 'Mean of real reviews, 1 decimal. null when there are none.',

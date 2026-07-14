@@ -5,12 +5,17 @@ import {
   Param,
   Post,
   Query,
+  Req,
   HttpStatus,
+  UseGuards,
   UseInterceptors,
   ValidationPipe,
   UploadedFile,
 } from '@nestjs/common';
+import { Request } from 'express';
 import { Public } from '@api/_utils/decorators/public.decorator';
+import { GameOrUserAuthGuard } from '@api/_utils/guards/game-or-user-auth.guard';
+import { resolveActor } from '@api/_utils/auth/actor';
 import {
   ApiTags,
   ApiOperation,
@@ -275,6 +280,7 @@ export class StarbankController {
   // ==================== TRANSACTION OPERATIONS ====================
 
   @Post('transfer')
+  @UseGuards(GameOrUserAuthGuard)
   @ApiOperation({
     summary: 'Transfer money between accounts',
     description:
@@ -295,16 +301,19 @@ export class StarbankController {
   })
   async transfer(
     @Body(ValidationPipe) transferDto: CreateTransferDto,
+    @Req() req: Request,
   ): Promise<void> {
     return await this.starbankFacadeService.transfer(
       transferDto.from,
       transferDto.to,
       transferDto.amount,
       transferDto.concept,
+      resolveActor(req),
     );
   }
 
   @Post('transfer/from-main')
+  @UseGuards(GameOrUserAuthGuard)
   @ApiOperation({
     summary: 'Transfer money from user main account',
     description:
@@ -329,12 +338,14 @@ export class StarbankController {
   })
   async transferFromMain(
     @Body(ValidationPipe) transferDto: TransferFromMainDto,
+    @Req() req: Request,
   ): Promise<void> {
     return await this.starbankFacadeService.transferFromMain(
       transferDto.uuid,
       transferDto.to,
       transferDto.amount,
       transferDto.concept,
+      resolveActor(req),
     );
   }
 

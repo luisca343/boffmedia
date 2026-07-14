@@ -53,6 +53,7 @@ describe('SmartrotomController — integration (ValidationPipe + GlobalException
       }),
     );
     app.useGlobalFilters(new GlobalExceptionFilter(mockLogger as any));
+    app.useGlobalInterceptors(new ResponseInterceptor(new Reflector()));
     await app.init();
   });
 

@@ -24,6 +24,10 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       username: payload.username,
       email: payload.email,
       roles: payload.roles,
+      // Minecraft account uuid — the key StarBank/SmartRotom accounts are owned
+      // by. Needed for money-route ownership checks (a user may only move their
+      // own account's balance).
+      mcUuid: payload.mcUuid,
     };
   }
 }

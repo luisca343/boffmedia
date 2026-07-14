@@ -5,6 +5,7 @@ const request = require('supertest') as typeof import('supertest');
 import { UploadController } from './upload.controller';
 import { UploadFacadeService } from './upload.facade.service';
 import { GlobalExceptionFilter } from '@/common/filters/global-exception.filter';
+import { JwtAuthGuard } from '@api/auth/jwt-auth.guard';
 
 const mockFacade: jest.Mocked<Partial<UploadFacadeService>> = {
   uploadImage: jest.fn(),
@@ -29,7 +30,13 @@ describe('UploadController — integration (ValidationPipe + GlobalExceptionFilt
     const module: TestingModule = await Test.createTestingModule({
       controllers: [UploadController],
       providers: [{ provide: UploadFacadeService, useValue: mockFacade }],
-    }).compile();
+    })
+      // These specs cover ValidationPipe + routing + facade delegation, not auth.
+      // Pass-through the controller guard so the test module needn't wire up
+      // passport infrastructure (auth is exercised in live-verify).
+      .overrideGuard(JwtAuthGuard)
+      .useValue({ canActivate: () => true })
+      .compile();
 
     app = module.createNestApplication();
     app.useGlobalPipes(

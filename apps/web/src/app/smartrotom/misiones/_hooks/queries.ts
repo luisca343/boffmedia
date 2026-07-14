@@ -2,7 +2,8 @@
 
 import { useQuery } from "@tanstack/react-query"
 import { useMemo } from "react"
-import { MisionesService } from "@/services/api/smartrotom/misionesService"
+import { rotomPOSTOrThrow, userMessageFrom } from "@/services/boffAPI"
+import type { QuestSystemData } from "@/types/misiones"
 import { useRotomUuid } from "@/components/smartrotom/behavior/useRotomUuid"
 import type { IDialogue, NPC, QuestData } from "../_types"
 import { buildRegions } from "../_utils/regions"
@@ -19,16 +20,7 @@ export function useQuestSystem() {
     queryKey: ["misiones", "user", uuid],
     enabled: Boolean(uuid),
     staleTime: 60_000,
-    queryFn: async () => {
-      // `boffAPI` resolves (not throws) on an HTTP error, so `.success` is the
-      // only honest check — reading `.data` optimistically is the silent-failure
-      // pattern the audit flagged.
-      const response = await MisionesService.getQuestsForUser(uuid!)
-      if (!response.success || !response.data) {
-        throw new Error(response.userMessage ?? "No se pudo leer el tablón de misiones.")
-      }
-      return response.data
-    },
+    queryFn: () => rotomPOSTOrThrow<QuestSystemData>("/misiones/user", { uuid: uuid! }),
   })
 
   const quests = useMemo<QuestData[]>(() => query.data?.quests ?? [], [query.data])
@@ -42,7 +34,7 @@ export function useQuestSystem() {
     dialogs,
     regions,
     isLoading: query.isLoading,
-    error: query.error instanceof Error ? query.error.message : null,
+    error: query.error ? userMessageFrom(query.error, "No se pudo leer el tablón de misiones.") : null,
     refetch: query.refetch,
   }
 }

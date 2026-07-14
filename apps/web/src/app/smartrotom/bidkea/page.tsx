@@ -19,6 +19,7 @@ import { Button } from "@/components/ui/primitives/button";
 import { Card, CardContent } from "@/components/ui/primitives/card";
 import { OBJLoader } from "three/addons/loaders/OBJLoader.js";
 import { MTLLoader } from "three/addons/loaders/MTLLoader.js";
+import { apiAsset } from "@/lib/assets";
 
 const furnitureItems = [
   {
@@ -146,7 +147,7 @@ function ModelView({ name, color = "" }: { name: string; color?: string }) {
   const [fov, setFov] = useState(0);
 
   useEffect(() => {
-    fetch(`/smartrotom/armourers/model-exports/${name}.obj`)
+    fetch(apiAsset(`/smartrotom/armourers/model-exports/${name}.obj`))
       .then((response) => {
         const size = parseInt(response.headers.get("Content-Length") as string);
         setSize(size / 1024);

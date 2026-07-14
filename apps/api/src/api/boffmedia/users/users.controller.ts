@@ -13,6 +13,7 @@ import {
   HttpException,
 } from '@nestjs/common';
 import { Public } from '@api/_utils/decorators/public.decorator';
+import { PaginationQueryDto } from '@api/_utils/dto/pagination.dto';
 import {
   ApiTags,
   ApiOperation,
@@ -209,10 +210,8 @@ export class BoffMediaUsersController {
     type: Number,
     description: 'Offset for pagination',
   })
-  async findAll(
-    @Query('limit') limit?: number,
-    @Query('offset') offset?: number,
-  ) {
+  async findAll(@Query() q: PaginationQueryDto) {
+    const { limit, offset } = q;
     try {
       const users = await this.usersFacadeService.getAllUsers();
 

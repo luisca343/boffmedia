@@ -52,6 +52,7 @@ describe('FicusAIController — integration (ValidationPipe + GlobalExceptionFil
       }),
     );
     app.useGlobalFilters(new GlobalExceptionFilter(mockLogger as any));
+    app.useGlobalInterceptors(new ResponseInterceptor(new Reflector()));
     await app.init();
   });
 

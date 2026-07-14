@@ -7,6 +7,7 @@ import { StarbankController } from './starbank.controller';
 import { StarbankFacadeService } from './starbank.facade.service';
 import { GlobalExceptionFilter } from '@/common/filters/global-exception.filter';
 import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
+import { GameOrUserAuthGuard } from '@api/_utils/guards/game-or-user-auth.guard';
 import { Reflector } from '@nestjs/core';
 
 const mockLogger = {
@@ -44,7 +45,12 @@ describe('StarbankController — integration (ValidationPipe + GlobalExceptionFi
         ResponseInterceptor,
         Reflector,
       ],
-    }).compile();
+    })
+      // The transfer routes are guarded by GameOrUserAuthGuard (JWT/server-key);
+      // this suite exercises validation + envelope, so let the guard through.
+      .overrideGuard(GameOrUserAuthGuard)
+      .useValue({ canActivate: () => true })
+      .compile();
 
     app = moduleRef.createNestApplication();
     app.useGlobalPipes(
@@ -134,7 +140,10 @@ describe('StarbankController — integration (ValidationPipe + GlobalExceptionFi
         .send(validBody);
 
       expect(res.status).toBeLessThan(300);
-      expect(mockFacade.transfer).toHaveBeenCalledWith(1, 2, 100, 'payment');
+      expect(mockFacade.transfer).toHaveBeenCalledWith(1, 2, 100, 'payment', {
+        mcUuid: undefined,
+        serverAuthed: false,
+      });
     });
   });
 
@@ -245,6 +254,7 @@ describe('StarbankController — integration (ValidationPipe + GlobalExceptionFi
         2,
         100,
         'payment',
+        { mcUuid: undefined, serverAuthed: false },
       );
     });
   });
