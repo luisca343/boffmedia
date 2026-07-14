@@ -27,6 +27,26 @@ const nextConfig = {
         ];
     },
     
+    // Cache policy for the public/ trees this app serves. Sprites, packs,
+    // fonts and datasets never change in place → immutable. Curated assets/
+    // are hand-replaced under the same name → short TTL.
+    async headers() {
+        const immutable = [
+            { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' },
+        ];
+        return [
+            { source: '/fonts/:path*', headers: immutable },
+            { source: '/smartrotom/img/:path*', headers: immutable },
+            { source: '/smartrotom/packs/:path*', headers: immutable },
+            { source: '/battlesim/:path*', headers: immutable },
+            { source: '/data/:path*', headers: immutable },
+            {
+                source: '/assets/:path*',
+                headers: [{ key: 'Cache-Control', value: 'public, max-age=3600' }],
+            },
+        ];
+    },
+
     // Production optimizations
     compress: true,
     poweredByHeader: false,
@@ -75,26 +95,6 @@ const nextConfig = {
                 port: ''
             }
         ]
-    },
-    webpack: (config, { isServer, dev }) => {
-        if (!isServer && !dev) {
-            // Only inline large assets in production
-            config.module.rules.push({
-                test: /\.(png|jpe?g|gif|svg|eot|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$/,
-                use: {
-                    loader: 'url-loader',
-                    options: {
-                        limit: 300 * 1024, // Convert files > 300kiB into Buffers
-                        fallback: 'file-loader', // Use 'file-loader' for files > limit
-                        encoding: true, // Encode the Buffer as base64
-                    },
-                },
-            });
-        }
-
-        // Add more custom webpack config here
-
-        return config;
     },
 };
 

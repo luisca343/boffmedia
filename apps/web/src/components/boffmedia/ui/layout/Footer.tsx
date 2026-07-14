@@ -98,7 +98,7 @@ export function Footer() {
         <div className="grid grid-cols-1 gap-[34px] pb-10 pt-[52px] min-[620px]:grid-cols-2 min-[900px]:grid-cols-[1.5fr_1fr_1fr_1fr] min-[900px]:gap-11">
           <div className="max-[899px]:col-span-full">
             <Link href="/" className="mb-[15px] inline-flex items-center gap-[11px] font-display text-[21px] font-extrabold italic uppercase leading-none text-txt no-underline">
-              <Image src="/img/boff-logo.webp" alt="" width={26} height={26} className="h-[26px] w-[26px] object-contain" />
+              <Image src="/assets/brand/boff-logo.webp" alt="" width={26} height={26} className="h-[26px] w-[26px] object-contain" />
               <span>Boff<b className="text-accent">media</b></span>
             </Link>
             <p className="mb-5 max-w-[36ch] font-body text-[14px] leading-[1.65] text-txt-muted">{t("tagline")}</p>

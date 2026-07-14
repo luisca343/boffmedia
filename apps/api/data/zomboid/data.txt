@@ -1,0 +1,8 @@
+mataZombies1=1
+mataZombies1Date=1731950177
+mataZombies10=6
+mataZombies10Date=1731950327
+mataZombies50=6
+mataZombies50Date=1731950327
+mataZombies100=6
+mataZombies100Date=1731950327

@@ -17,7 +17,7 @@ export default function Page() {
           <div className="relative mb-8">
             <div className="absolute inset-0 bg-gradient-to-r from-yellow-400/20 to-secondary-hover/20 rounded-lg blur-3xl"></div>
             <Image
-              src="/img/win-full.png"
+              src="/assets/img/win-full.png"
               alt="Logo de Pixelmon Wingull"
               width={350}
               height={175}

@@ -1,0 +1,13 @@
+{
+    "totalDays": 7,
+    "name": "Recompensas de Bienvenida",
+    "rewards": [
+      { "day": 1, "type": "pokemon", "amount": 1, "description": "Vulpix form:alolan" },
+      { "day": 2, "type": "box", "amount": 1, "description": "trainer_box" },
+      { "day": 3, "type": "box", "amount": 1, "description": "trainer_box" },
+      { "day": 4, "type": "coins", "amount": 500, "description": "coins" },
+      { "day": 5, "type": "money", "amount": 1000, "description": "money" },
+      { "day": 6, "type": "box", "amount": 1, "description": "trainer_box" },
+      { "day": 7, "type": "box", "amount": 1, "description": "trainer_box" }
+    ]
+  }

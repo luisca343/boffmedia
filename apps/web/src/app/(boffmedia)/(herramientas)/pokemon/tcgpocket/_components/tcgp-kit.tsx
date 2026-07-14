@@ -291,7 +291,7 @@ export function TcgSetProgress({ label, sub, have, total }: { label: string; sub
 
 // ── Pack tile (real pack art with CSS booster fallback) ──────────────────────
 function packArt(setId: string, name: string): string {
-  return `/img/games/tcgpocket/packs/${setId}/${name.toLowerCase()}.png`
+  return `/assets/img/games/tcgpocket/packs/${setId}/${name.toLowerCase()}.png`
 }
 export function TcgPackTile({ setId, name, meta, hue, onOpen }: { setId: string; name: string; meta?: string; hue?: string; onOpen?: () => void }) {
   const c = hue || typeColor("fire")

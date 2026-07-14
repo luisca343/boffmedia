@@ -4,11 +4,11 @@ export const minecraft: GameEntry = {
   slug: "minecraft",
   nameKey: "games.minecraft.name",
 
-  icon: "/img/games/minecraft/icon.webp",
+  icon: "/assets/img/games/minecraft/icon.webp",
   color: "from-green-700 to-emerald-500",
   bg: "bg-green-950",
 
-  logo: "/img/games/minecraft/logo.webp",
+  logo: "/assets/img/games/minecraft/logo.webp",
   navHref: "/minecraft",
 
   externalLinks: [],
@@ -25,7 +25,7 @@ export const minecraft: GameEntry = {
           sidebarIcon: "grid",
           bleed: true,
           landing: {
-            icon: "/img/games/minecraft/schematic-icon.webp",
+            icon: "/assets/img/games/minecraft/schematic-icon.webp",
             fallbackIcon: "grid",
             fallbackIconColor: "text-green-500",
             color: "from-green-700 to-emerald-500",

@@ -35,6 +35,16 @@ export default async function RootLayout({
 
   return (
     <html lang={locale} suppressHydrationWarning>
+      <head>
+        {/* The body font on every page — fetch it before CSS discovers it. */}
+        <link
+          rel="preload"
+          href="/assets/fonts/Saira/Saira-VariableFont_wdth,wght.woff2"
+          as="font"
+          type="font/woff2"
+          crossOrigin="anonymous"
+        />
+      </head>
       <body className="flex flex-col min-h-screen bg-transparent">
         <NextIntlClientProvider messages={messages} locale={locale}>
           {children}

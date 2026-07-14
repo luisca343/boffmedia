@@ -59,7 +59,39 @@ async function bootstrap() {
   const configService = app.get(ConfigService);
   app.useGlobalFilters(new GlobalExceptionFilter(app.get(Logger)));
 
-  app.use('/', express.static(join(__dirname, '..', 'public')));
+  // Static assets are served only under the prefixes external consumers rely on
+  // (DB-stored URLs, Minecraft clients, the external blog) — not the whole folder
+  // at the root, so API routes no longer pay a filesystem probe per request.
+  // sprites/packs/jcef are content-addressed or append-only → immutable; uploads
+  // are overwritten in place (profile pics keyed by userId) → short TTL.
+  const publicDir = join(__dirname, '..', 'public');
+  const staticOpts = (maxAge: string): Parameters<typeof express.static>[1] => ({
+    index: false,
+    maxAge,
+  });
+  app.use('/uploads', express.static(join(publicDir, 'uploads'), staticOpts('5m')));
+  app.use(
+    '/jcef',
+    express.static(join(publicDir, 'jcef'), {
+      ...staticOpts('365d'),
+      immutable: true,
+    }),
+  );
+  app.use('/blog', express.static(join(publicDir, 'blog'), staticOpts('1h')));
+  app.use(
+    '/smartrotom',
+    express.static(join(publicDir, 'smartrotom'), {
+      ...staticOpts('1h'),
+      setHeaders: (res, filePath) => {
+        if (/[/\\]smartrotom[/\\](img|packs)[/\\]/.test(filePath)) {
+          res.setHeader(
+            'Cache-Control',
+            'public, max-age=31536000, immutable',
+          );
+        }
+      },
+    }),
+  );
 
   const port = configService.get<number>('PORT') ?? 34301;
 
