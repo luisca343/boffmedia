@@ -71,7 +71,7 @@ export function RookerShell({ children }: { children: ReactNode }) {
             aria-label="Rooker · Inicio"
             className="mb-0.5 grid h-[52px] w-[52px] place-items-center rounded-full text-rk-accent transition-colors hover:bg-rk-hover"
           >
-            <RookerMark size={30} />
+            <RookerMark size={48} />
           </Link>
 
           <div className="flex w-full flex-col items-center gap-0.5 xl:items-start">
@@ -154,7 +154,7 @@ export function RookerShell({ children }: { children: ReactNode }) {
               <span className="h-8 w-8" />
             )}
             <div className="flex items-center gap-1.5 text-rk-accent">
-              <RookerMark size={26} />
+              <RookerMark size={32} />
               <span className="text-[19px] font-extrabold tracking-[-.02em] text-rk-fg">Rooker</span>
             </div>
             <DisplayPanel compact />

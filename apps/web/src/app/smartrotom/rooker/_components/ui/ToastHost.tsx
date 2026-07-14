@@ -4,7 +4,7 @@ import { useEffect, useState } from "react"
 import { createPortal } from "react-dom"
 import { toast, useToasts } from "@/components/smartrotom/behavior/toast"
 import { ThemedLayer } from "./ThemedLayer"
-import { RookerMark } from "./RookerMark"
+import { RookerMark } from "@/lib/smartrotom/customIcons"
 
 export { toast }
 

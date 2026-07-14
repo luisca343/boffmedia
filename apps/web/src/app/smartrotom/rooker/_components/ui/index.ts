@@ -6,7 +6,9 @@
  * `/smartrotom/styles/components` (§14).
  */
 export { Icon, type IconName, type IconProps } from "./Icon"
-export { RookerMark, type RookerMarkProps } from "./RookerMark"
+// The wordmark's art lives with the rest of the hand-drawn glyphs; re-exported
+// here so rooker code keeps importing it from the barrel like any primitive.
+export { RookerMark, type RookerMarkProps } from "@/lib/smartrotom/customIcons"
 export { PokeBall, BALL_NAME, type BallVariant, type PokeBallProps } from "./PokeBall"
 export { ReactionGlyph, type ReactionGlyphProps } from "./ReactionGlyph"
 export { Sprite, type SpriteProps } from "./Sprite"

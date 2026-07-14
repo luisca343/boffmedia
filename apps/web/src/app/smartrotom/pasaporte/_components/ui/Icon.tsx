@@ -22,7 +22,6 @@ import {
   Sparkle,
   ShieldCheck,
   ScanLine,
-  Ghost,
   Type,
   FileText,
   Sun,
@@ -37,11 +36,12 @@ import {
   Star,
   type LucideIcon,
 } from "lucide-react"
+import { Rotom } from "@/lib/smartrotom/customIcons"
 
 /**
  * Pasaporte's icon set — lucide-react placeholders standing in for the hand-drawn
- * engraved glyphs this replaced. `rotom` (the mascot) has no lucide equivalent; see
- * the migration ledger for fidelity notes on every entry.
+ * engraved glyphs this replaced, plus the hand-drawn `rotom` mascot (lucide has no
+ * equivalent); see the migration ledger for fidelity notes on every entry.
  */
 const MAP = {
   clock: Clock,
@@ -63,7 +63,7 @@ const MAP = {
   sparkle: Sparkle,
   shield: ShieldCheck,
   scan: ScanLine,
-  rotom: Ghost,
+  rotom: Rotom,
   type: Type,
   contract: FileText,
   sun: Sun,

@@ -6,6 +6,7 @@ import { CHAPTERS, DOMAINS, DOMAIN_META, chapterKey } from "./showcase-data"
 import { DISPLAY, DISPLAY_EM, GRP_KEY, Kicker, MONO_LABEL, norm, sideLink } from "./showcase-shared"
 import { SrBasesChapter } from "./_chapters/SrBasesChapter"
 import { SrPrimitivasChapter } from "./_chapters/SrPrimitivasChapter"
+import { SrIconosChapter } from "./_chapters/SrIconosChapter"
 import { SbBasesChapter } from "./_chapters/SbBasesChapter"
 import { SbPrimitivasChapter } from "./_chapters/SbPrimitivasChapter"
 import { SbDatosChapter } from "./_chapters/SbDatosChapter"
@@ -49,6 +50,7 @@ import { PsDocumentoChapter } from "./_chapters/PsDocumentoChapter"
 const CHAPTER_VIEWS: Record<string, React.ComponentType> = {
   "Sistema/Bases": SrBasesChapter,
   "Sistema/Primitivas": SrPrimitivasChapter,
+  "Sistema/Iconos": SrIconosChapter,
   "Starbank/Bases": SbBasesChapter,
   "Starbank/Primitivas": SbPrimitivasChapter,
   "Starbank/Datos": SbDatosChapter,
