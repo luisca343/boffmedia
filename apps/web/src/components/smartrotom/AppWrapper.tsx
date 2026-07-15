@@ -13,7 +13,7 @@ import { ToastContainer } from "react-toastify"
 import { getMcUserData } from "@/services/mcef/mcefApi"
 import { isMinecraft } from "@/services/mcef/mcefHelper"
 import { MinecraftAuthForm } from "./MinecraftAuthForm"
-import { RotomError, RotomErrorPage } from "./RotomError"
+import { RotomErrorPage } from "./RotomError"
 import { RotomErrorCodeKey } from "./RotomErrorSystem"
 import { useRotomThemeClass } from "./theme/useRotomTheme"
 
@@ -33,6 +33,18 @@ export default function AppWrapper({
   // The theme lives in a persisted store, not local state — it used to reset on every
   // reload. `RotomNav`/`Settings` write to the same store, so no setter is threaded down.
   const tema = useRotomThemeClass()
+
+  // Pre-authenticated screens (loading, auth, link errors) render OUTSIDE the
+  // `h-screen` app shell below, as direct flex children of the `min-h-screen`
+  // <body>. `min-h-screen` is not a definite height, so their `h-full` roots
+  // (LoadingScreen, MinecraftAuthForm, RotomErrorPage…) collapse to content
+  // height. This shell bounds them at the viewport so they fill it, and scrolls
+  // if a tall form (register) exceeds it.
+  const AuthScreen = ({ children }: { children: React.ReactNode }) => (
+    <div className={`roboto h-screen w-full overflow-y-auto ${tema}`}>
+      {children}
+    </div>
+  )
 
   /*
     if ('speechSynthesis' in window) {
@@ -82,15 +94,27 @@ export default function AppWrapper({
   }, [])
 
   if (status === "loading") {
-    return <LoadingScreen />
+    return (
+      <AuthScreen>
+        <LoadingScreen />
+      </AuthScreen>
+    )
   }
 
   if (status === "unauthenticated" && isMC) {
-    return <MinecraftAuthForm mcUserData={datosUsuario} />
+    return (
+      <AuthScreen>
+        <MinecraftAuthForm mcUserData={datosUsuario} />
+      </AuthScreen>
+    )
   }
 
   if (status === "unauthenticated" && !isMC) {
-    return <AuthForm url="boffmedia" redirect="/smartrotom" />
+    return (
+      <AuthScreen>
+        <AuthForm url="boffmedia" redirect="/smartrotom" />
+      </AuthScreen>
+    )
   }
 
   function boffMediaLinked(): boolean {
@@ -104,45 +128,57 @@ export default function AppWrapper({
   if (status === "authenticated" && !smartRotomLinked()) {
     if (!isMC)
       return (
-        <RotomErrorPage 
-          errorCode={"SMARTROTOM_NOT_LINKED" as RotomErrorCodeKey}
-          context={{ 
-            userId: session?.user?.id,
-            hasMinecraft: isMC
-          }}
-          onAction={() => signOut({ callbackUrl: "/" })} 
-          actionText="Cerrar sesión"
-          showHelp={true}
-        />
+        <AuthScreen>
+          <RotomErrorPage
+            errorCode={"SMARTROTOM_NOT_LINKED" as RotomErrorCodeKey}
+            context={{
+              userId: session?.user?.id,
+              hasMinecraft: isMC
+            }}
+            onAction={() => signOut({ callbackUrl: "/" })}
+            actionText="Cerrar sesión"
+            showHelp={true}
+          />
+        </AuthScreen>
       )
-    return <div>
-      <button
-        className="bg-red-500 text-white px-4 py-2 rounded"
-        onClick={() => signOut({ callbackUrl: "/" })}
-      >
-        Cerrar sesión
-      </button>
-    </div>
+    return (
+      <AuthScreen>
+        <div className="flex h-full items-center justify-center">
+          <button
+            className="bg-red-500 text-white px-4 py-2 rounded"
+            onClick={() => signOut({ callbackUrl: "/" })}
+          >
+            Cerrar sesión
+          </button>
+        </div>
+      </AuthScreen>
+    )
   }
 
   if (status === "authenticated" && !boffMediaLinked()) {
     return (
-      <RotomError 
-        errorCode={"BOFFMEDIA_NOT_LINKED" as RotomErrorCodeKey}
-        context={{ userId: session?.user?.id }}
-        showHelp={true}
-      />
+      <AuthScreen>
+        <RotomErrorPage
+          errorCode={"BOFFMEDIA_NOT_LINKED" as RotomErrorCodeKey}
+          context={{ userId: session?.user?.id }}
+          showHelp={true}
+        />
+      </AuthScreen>
     )
   }
 
   return (
     <section
       id="smartrotom"
-      className={`roboto flex flex-col min-h-screen ${tema} text-black bg-transparent`}
+      // h-screen (not min-h-screen): the shell must BOUND the app, or per-app
+      // scroll roots (e.g. Furret Today's `.ft-app` overflow-auto) stretch to
+      // content height and can never scroll — and window scroll is dead anyway
+      // because the overflow-hidden <main> stops wheel chaining.
+      className={`roboto flex h-screen flex-col ${tema} text-black bg-transparent`}
     >
       <RotomNav />
       <ToastContainer position="bottom-right" theme="dark" />
-      <main className="relative flex-1 pt-12 flex overflow-hidden">
+      <main className="relative flex-1 min-h-0 pt-12 flex overflow-hidden">
         <CallStatus />
         <div className="h-full w-full [&>*]:w-full flex overflow-hidden">{children}</div>
       </main>
