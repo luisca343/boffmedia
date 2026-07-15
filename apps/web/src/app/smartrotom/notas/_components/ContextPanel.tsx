@@ -35,6 +35,17 @@ export function ContextPanel(props: ContextPanelProps) {
       .map((n) => ({ id: n.id, title: n.title, ctx: stripHtml(contentById[n.id] ?? "").slice(0, 90) }));
   }, [notes, contentById, note.id, note.title]);
 
+  // Links this note makes. A title with no matching note is still shown (dimmed)
+  // — the target is created the moment the writer picks «Crear …».
+  const outgoing = useMemo(() => {
+    return extractLinks(activeContent).map((title) => ({
+      title,
+      target: notes.find((n) => n.title === title) ?? null,
+    }));
+  }, [activeContent, notes]);
+
+  const linkCount = outgoing.length + backlinks.length;
+
   const tabCls = (t: Tab) =>
     `inline-flex cursor-pointer items-center gap-1.5 rounded-t-nt-sm border-b-2 px-2.5 py-[7px] text-[12px] ${
       tab === t ? "border-nt-accent text-nt-fg" : "border-transparent text-nt-fg-muted"
@@ -50,7 +61,7 @@ export function ContextPanel(props: ContextPanelProps) {
           <Icon name="list" size={14} /> Esquema
         </div>
         <div className={tabCls("backlinks")} onClick={() => setTab("backlinks")}>
-          <Icon name="link" size={14} /> Enlaces{backlinks.length ? ` ${backlinks.length}` : ""}
+          <Icon name="link" size={14} /> Enlaces{linkCount ? ` ${linkCount}` : ""}
         </div>
         <div className={tabCls("info")} onClick={() => setTab("info")}>
           <Icon name="settings" size={14} />
@@ -78,20 +89,46 @@ export function ContextPanel(props: ContextPanelProps) {
           ))}
 
         {tab === "backlinks" &&
-          (backlinks.length ? (
-            backlinks.map((b) => (
-              <div
-                key={b.id}
-                onClick={() => props.onOpenNote(b.id)}
-                className="mb-2 cursor-pointer rounded-nt-md border border-nt-border bg-nt-bg-1 px-[11px] py-2.5 transition-colors hover:border-nt-border-2 hover:bg-nt-hover"
-              >
-                <div className="mb-[3px] flex items-center gap-1.5 text-[13px] font-semibold text-nt-fg">
-                  <Icon name="pencil" size={13} className="text-nt-accent-fg" />
-                  {b.title}
-                </div>
-                {b.ctx && <div className="text-[12px] leading-[1.5] text-nt-fg-muted">…{b.ctx}…</div>}
-              </div>
-            ))
+          (linkCount ? (
+            <>
+              {outgoing.length > 0 && (
+                <>
+                  <SectionLabel>Enlaces salientes</SectionLabel>
+                  {outgoing.map((o, i) => (
+                    <button
+                      key={i}
+                      disabled={!o.target}
+                      onClick={() => o.target && props.onOpenNote(o.target.id)}
+                      className="mb-1.5 flex w-full items-center gap-1.5 rounded-nt-md border border-nt-border bg-nt-bg-1 px-[11px] py-2 text-left text-[13px] transition-colors enabled:cursor-pointer enabled:hover:border-nt-border-2 enabled:hover:bg-nt-hover disabled:opacity-55"
+                    >
+                      <Icon name="link" size={13} className="flex-none text-nt-accent-fg" />
+                      <span className="min-w-0 flex-1 truncate font-medium text-nt-fg">{o.title}</span>
+                      {!o.target && (
+                        <span className="flex-none text-[10.5px] text-nt-fg-subtle">sin crear</span>
+                      )}
+                    </button>
+                  ))}
+                </>
+              )}
+              {backlinks.length > 0 && (
+                <>
+                  <SectionLabel>Enlaces entrantes</SectionLabel>
+                  {backlinks.map((b) => (
+                    <div
+                      key={b.id}
+                      onClick={() => props.onOpenNote(b.id)}
+                      className="mb-2 cursor-pointer rounded-nt-md border border-nt-border bg-nt-bg-1 px-[11px] py-2.5 transition-colors hover:border-nt-border-2 hover:bg-nt-hover"
+                    >
+                      <div className="mb-[3px] flex items-center gap-1.5 text-[13px] font-semibold text-nt-fg">
+                        <Icon name="pencil" size={13} className="text-nt-accent-fg" />
+                        {b.title}
+                      </div>
+                      {b.ctx && <div className="text-[12px] leading-[1.5] text-nt-fg-muted">…{b.ctx}…</div>}
+                    </div>
+                  ))}
+                </>
+              )}
+            </>
           ) : (
             <div className="px-2.5 py-[30px] text-center text-[12.5px] leading-[1.6] text-nt-fg-subtle">
               Ninguna nota enlaza aquí todavía.
@@ -139,6 +176,14 @@ export function ContextPanel(props: ContextPanelProps) {
         )}
       </div>
     </aside>
+  );
+}
+
+function SectionLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="mb-2 mt-1 px-0.5 font-nt-display text-[10px] font-semibold uppercase tracking-[.12em] text-nt-fg-subtle first:mt-0">
+      {children}
+    </div>
   );
 }
 
