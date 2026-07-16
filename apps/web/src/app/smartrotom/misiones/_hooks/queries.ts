@@ -2,31 +2,51 @@
 
 import { useQuery } from "@tanstack/react-query"
 import { useMemo } from "react"
-import { rotomPOSTOrThrow, userMessageFrom } from "@/services/boffAPI"
-import type { QuestSystemData } from "@/types/misiones"
-import { useRotomUuid } from "@/components/smartrotom/behavior/useRotomUuid"
+import { getMisiones } from "@/services/mcef/mcefApi"
+import { isMinecraft } from "@/services/mcef/mcefHelper"
 import type { IDialogue, NPC, QuestData } from "../_types"
 import { buildRegions } from "../_utils/regions"
 
+const OUTSIDE_GAME = "El tablón de misiones sólo puede leerse desde el juego."
+const UNREADABLE = "No se pudo leer el tablón de misiones."
+
 /**
- * The board's single fetch. Everything on every screen — papers, reinos, the
- * atlas, the satchel, the journal — is derived from this one response
- * (SMARTROTOM_V3.md §8: TanStack Query, not `useEffect` + `setState`).
+ * The board's single fetch. The mod answers for whoever's client is asking, so
+ * status and progress arrive already resolved — hence no uuid here.
  */
 export function useQuestSystem() {
-  const uuid = useRotomUuid()
-
   const query = useQuery({
-    queryKey: ["misiones", "user", uuid],
-    enabled: Boolean(uuid),
+    queryKey: ["misiones"],
     staleTime: 60_000,
-    queryFn: () => rotomPOSTOrThrow<QuestSystemData>("/misiones/user", { uuid: uuid! }),
+    queryFn: async () => {
+      const result = await getMisiones()
+      if (!result.data) throw new Error(result.error ?? UNREADABLE)
+      return result.data
+    },
   })
 
   const quests = useMemo<QuestData[]>(() => query.data?.quests ?? [], [query.data])
-  const npcs = useMemo<NPC[]>(() => query.data?.npcs ?? [], [query.data])
   const dialogs = useMemo<IDialogue[]>(() => query.data?.dialogs ?? [], [query.data])
+
+  /** The givers, deduped by dialog — the key `npcForQuest` looks up. */
+  const npcs = useMemo<NPC[]>(() => {
+    const byDialog = new Map<number, NPC>()
+    for (const dialog of query.data?.dialogs ?? []) {
+      for (const loc of dialog.npcLocations ?? []) {
+        if (byDialog.has(dialog.id)) continue
+        byDialog.set(dialog.id, { name: loc.name, skin: loc.skin, dialogId: dialog.id })
+      }
+    }
+    return [...byDialog.values()]
+  }, [query.data])
+
   const regions = useMemo(() => buildRegions(quests), [quests])
+
+  const error = query.error
+    ? isMinecraft()
+      ? UNREADABLE
+      : OUTSIDE_GAME
+    : null
 
   return {
     quests,
@@ -34,7 +54,7 @@ export function useQuestSystem() {
     dialogs,
     regions,
     isLoading: query.isLoading,
-    error: query.error ? userMessageFrom(query.error, "No se pudo leer el tablón de misiones.") : null,
+    error,
     refetch: query.refetch,
   }
 }
