@@ -207,8 +207,26 @@ export class StarbankFacadeService {
       money: amount,
     };
 
-    const currentGameBalance =
-      await this.wingullFacadeService.getCurrentBalance(uuid, amount);
+    let currentGameBalance: number;
+    try {
+      currentGameBalance = await this.wingullFacadeService.getCurrentBalance(
+        uuid,
+        amount,
+      );
+    } catch (error: any) {
+      // Game economy server unreachable/erroring: fall back to the player's
+      // stored main-account balance plus the reward, mirroring what the game
+      // would report post-credit, so the reward still lands (diff === amount)
+      // instead of 500ing.
+      const mainAccount = await this.getMainAccount(uuid);
+      if (!mainAccount) {
+        throw error;
+      }
+      this.logger.warn(
+        `Game balance lookup failed for ${uuid}, falling back to stored main-account balance + reward: ${error.message}`,
+      );
+      currentGameBalance = mainAccount.balance + amount;
+    }
 
     await this.transactionService.processTrainerDefeat(
       trainerDto,
