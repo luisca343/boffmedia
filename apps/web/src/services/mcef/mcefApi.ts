@@ -2,6 +2,7 @@ import { PossibleSpawn } from '@/app/smartrotom/pokedex/_components/PossibleSpaw
 import { QueryResult, mcefQuery } from './mcefHelper';
 import { getSpawnsPlaceholder } from './mcefPlaceholders';
 import { CallData } from '@/components/smartrotom/types/call';
+import { UserQuestData } from '@/types/misiones';
 
 export async function getMcUserData(): Promise<QueryResult<{ username: string; uuid: string; world: string, x: number, y: number, z: number }>> {
     const result = await mcefQuery<{ username: string; uuid: string; world: string, x: number, y: number, z: number }>('GET_USER_DATA');
@@ -10,6 +11,15 @@ export async function getMcUserData(): Promise<QueryResult<{ username: string; u
         return { data: { username: '', uuid: '', world: '', x: 0, y: 0, z: 0 }, status: 500 };
     } else {
         console.log('getDatosUsuarioMC', result.data);
+    }
+    return result;
+}
+
+/** Lowercase unlike every other query here: the mod registered it as `getMisiones`. */
+export async function getMisiones(): Promise<QueryResult<UserQuestData>> {
+    const result = await mcefQuery<UserQuestData>('getMisiones');
+    if (result.error) {
+        console.error('Error fetching misiones:', result.error);
     }
     return result;
 }

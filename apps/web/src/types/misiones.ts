@@ -11,7 +11,6 @@ import type {
 export type { FactionRequirements, ScoreboardRequirements };
 
 // Backward-compatible I-prefix aliases for shared types
-export type IDialogue          = Dialogue;
 export type IQuestCategory     = QuestCategory;
 export type IQuestObjective    = QuestObjective;
 export type IQuestReward       = QuestReward;
@@ -53,6 +52,35 @@ export interface NPC {
   requirements: IQuestRequirements;
   skin: string;
   dialogId: number;
+}
+
+/** An NPC that speaks a dialog. The only place a giver's skin and coords exist. */
+export interface NpcLocation {
+  name: string;
+  dialogId: number;
+  skin: string;
+  x: number;
+  y: number;
+  z: number;
+  world: string;
+  uuid: string;
+}
+
+// Kept local: the shared Dialogue has no npcLocations — only the mod sends them
+export interface IDialogue extends Dialogue {
+  npcLocations: NpcLocation[];
+}
+
+/**
+ * What the mod's `getMisiones` returns: definitions and progress already merged,
+ * the same shape the API's `/misiones/user` serves. `npcs` is always empty — the
+ * givers ride on `dialogs[].npcLocations`.
+ */
+export interface UserQuestData {
+  quests: QuestData[];
+  categories: Record<string, number[]>;
+  dialogs: IDialogue[];
+  npcs: NPC[];
 }
 
 // Kept local: references local QuestData[] and extended NPC[]

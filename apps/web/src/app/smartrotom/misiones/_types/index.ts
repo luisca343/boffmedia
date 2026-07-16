@@ -1,6 +1,17 @@
-import type { IDialogue, IQuestObjective, IQuestReward, NPC, QuestData } from "@/types/misiones"
+import type { IDialogue, IQuestObjective, IQuestReward, QuestData } from "@/types/misiones"
 
-export type { IDialogue, IQuestObjective, IQuestReward, NPC, QuestData }
+export type { IDialogue, IQuestObjective, IQuestReward, QuestData }
+
+/**
+ * A quest giver. Narrower than the quest API's `NPC` because the board builds it
+ * from `dialogs[].npcLocations` — `id`/`text`/`questId`/`requirements` have no
+ * source there, and nothing rendered them.
+ */
+export interface NPC {
+  name: string
+  skin: string
+  dialogId: number
+}
 
 /**
  * The five wax seals the board knows about. The API's `QuestStatus` also has

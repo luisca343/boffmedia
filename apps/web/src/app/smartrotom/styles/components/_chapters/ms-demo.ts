@@ -19,8 +19,8 @@ const requirements = (level = 0, requiredQuests: number[] = []) => ({
 })
 
 export const MS_NPCS: NPC[] = [
-  { id: 1, name: "Prof. Oak", skin: "oak", dialogId: 100, text: "", questId: 2, requirements: requirements() },
-  { id: 2, name: "Brock", skin: "brock", dialogId: 101, text: "", questId: 11, requirements: requirements() },
+  { name: "Prof. Oak", skin: "oak", dialogId: 100 },
+  { name: "Brock", skin: "brock", dialogId: 101 },
 ]
 
 export const MS_QUESTS: QuestData[] = [
@@ -85,5 +85,8 @@ export const MS_DIALOGS: IDialogue[] = [
     text: "¡Por fin llegas! Toma estas Poké Ball. La Ruta 1 está justo al norte; verás Pidgey y Rattata salvajes.",
     questId: 2,
     requirements: requirements(),
+    npcLocations: [
+      { name: "Prof. Oak", dialogId: 100, skin: "oak", x: 12, y: 64, z: -48, world: "minecraft:overworld", uuid: "" },
+    ],
   },
 ]
