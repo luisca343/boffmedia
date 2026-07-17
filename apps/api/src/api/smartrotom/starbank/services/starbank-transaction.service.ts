@@ -179,10 +179,9 @@ export class StarbankTransactionService {
   }
 
   /**
-   * Set a user's main-account balance to an absolute target, ledgering the delta
-   * as an AJUSTE. Server-only (the mod's `setBalance`); the atomicity lives in
-   * the repository. Throws NotFound if the user has no main account, Conflict if
-   * the locked write fails.
+   * Set a user's main-account balance to an absolute target, ledgering the delta as an
+   * AJUSTE. Server-only (the mod's `setBalance`); atomicity lives in the repository.
+   * Throws NotFound if there is no main account, Conflict if the locked write fails.
    */
   async setBalance(
     uuid: string,

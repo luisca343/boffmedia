@@ -10,10 +10,10 @@ import {
 } from 'class-validator';
 
 /**
- * Absolute balance set (mod-only). Deliberately NOT a `BaseDto`: like the caja
- * routes, this is authenticated by the mod's Bearer via `GameServerAuthGuard`
- * and is on the `MinecraftMiddleware` exclude list, so it sends no `server`
- * field. A mint route must never inherit the public MC_WORLD tripwire.
+ * Absolute balance set (mod-only). NOT a `BaseDto`: like the caja routes it is
+ * authed by the mod's Bearer via `GameServerAuthGuard` and is on the
+ * `MinecraftMiddleware` exclude list, so it sends no `server` field — a mint route
+ * must never inherit the public MC_WORLD tripwire.
  */
 export class SetBalanceDto {
   @ApiProperty({

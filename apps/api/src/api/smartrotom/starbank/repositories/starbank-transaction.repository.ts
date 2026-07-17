@@ -124,9 +124,8 @@ export class StarbankTransactionRepository implements IStarbankTransactionReposi
       return { success: false, message: 'Target balance must be non-negative' };
     }
     try {
-      // Read-under-lock and write in one transaction: the FOR UPDATE row lock is
-      // held until commit, so a concurrent transfer cannot land between the read
-      // and the set and leave the balance off target. Mirrors `create`.
+      // FOR UPDATE holds the row lock until commit, so a concurrent transfer cannot
+      // land between the read and the set and leave the balance off target. Mirrors `create`.
       return await this.db.transaction(async (tx) => {
         const rows = await tx
           .select({
@@ -153,9 +152,8 @@ export class StarbankTransactionRepository implements IStarbankTransactionReposi
           .set({ balance: targetBalance })
           .where(eq(starBankAccounts.id, accountId));
 
-        // Ledger the correction as a system mint/burn. delta>0: the system (0)
-        // credits the account; delta<0: the account debits to the system. The
-        // account side records the post-set balance; the virtual system side 0.
+        // Ledger the correction as a system (0) mint/burn: delta>0 credits the account,
+        // delta<0 debits it. The account side records the post-set balance, the system side 0.
         const isMint = delta > 0;
         await tx
           .insert(starBankTransactions)

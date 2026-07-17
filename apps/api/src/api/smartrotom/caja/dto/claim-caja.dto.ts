@@ -14,9 +14,8 @@ export const CAJA_SOURCES = ['mine', 'arcade', 'daily_reward'] as const;
 export type CajaSource = (typeof CAJA_SOURCES)[number];
 
 /**
- * The mod's claim body. Deliberately NOT a `BaseDto`: the mod sends no `server`
- * field, and this route is on the `MinecraftMiddleware` exclude list for that
- * reason. Adding `server` here would be a lie about who calls it.
+ * The mod's claim body. NOT a `BaseDto`: the mod sends no `server` field, and this
+ * route is on the `MinecraftMiddleware` exclude list.
  */
 export class ClaimCajaDto {
   @ApiProperty({
@@ -29,9 +28,7 @@ export class ClaimCajaDto {
   uuid: string;
 
   @ApiProperty({
-    description:
-      'Which ledger source to redeem. Mandatory: there is no "everything owed" — ' +
-      'the phrase is not well-defined across sources (see CajaRepository).',
+    description: 'Which ledger source to redeem. Mandatory — see CajaRepository.',
     enum: CAJA_SOURCES,
     example: 'mine',
   })
@@ -41,9 +38,8 @@ export class ClaimCajaDto {
 
   @ApiProperty({
     description:
-      'Optional selector: redeem only these rows of the source. Omit to redeem ' +
-      'the whole source (mine). Rows not owned or of another source are ignored — ' +
-      'it selects, it never describes the reward.',
+      'Optional selector: redeem only these rows. Omit to redeem the whole source. ' +
+      'Rows not owned or of another source are ignored — it selects, never describes the reward.',
     required: false,
     type: [Number],
     example: [12, 13],
@@ -55,11 +51,7 @@ export class ClaimCajaDto {
   ids?: number[];
 }
 
-/**
- * Finalizes a reservation after its items were delivered. Like `ClaimCajaDto`,
- * deliberately not a `BaseDto` — the mod sends no `server` field and this route is
- * on the `MinecraftMiddleware` exclude list.
- */
+/** Finalizes a delivered reservation. Not a `BaseDto`, like `ClaimCajaDto`. */
 export class ConfirmCajaDto {
   @ApiProperty({
     description: 'The player, read by the mod off the connection — never supplied by the page.',

@@ -141,8 +141,8 @@ export class WigglypopEscrowService {
     return result.transactionId;
   }
 
-  // Mirrors the player's new balance to the game server so the in-game counter updates without a
-  // relogin. The transaction is already committed, so a push failure only logs.
+  // Mirror the new balance to the game so the in-game counter updates without a relogin.
+  // The transaction is already committed, so a push failure only logs.
   private async pushGameBalance(uuid: string): Promise<void> {
     try {
       const account = await this.accountRepository.findUserMainAccount(uuid);
