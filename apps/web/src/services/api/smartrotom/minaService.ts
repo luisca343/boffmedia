@@ -1,4 +1,4 @@
-import { rotomGET, rotomPOST } from '@/services/boffAPI';
+import { rotomGET, rotomPOST, rotomPOSTOrThrow } from '@/services/boffAPI';
 import type {
   PlayGameDto,
   ClaimRewardsDto,
@@ -99,7 +99,9 @@ export class MinaService {
    * Claim all unclaimed rewards for a player
    */
   static claimRewards(data: ClaimRewardsDto) {
-    return rotomPOST<ClaimResponse>('/mine/claim', data);
+    // OrThrow: rotomPOST resolves {success:false} on an HTTP error, so a plain
+    // truthiness check treats a failed claim as a successful one.
+    return rotomPOSTOrThrow<ClaimResponse>('/mine/claim', data);
   }
   
   /**

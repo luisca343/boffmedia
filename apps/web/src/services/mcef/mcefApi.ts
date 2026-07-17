@@ -4,8 +4,25 @@ import { getSpawnsPlaceholder } from './mcefPlaceholders';
 import { CallData } from '@/components/smartrotom/types/call';
 import { UserQuestData } from '@/types/misiones';
 
-export async function getMcUserData(): Promise<QueryResult<{ username: string; uuid: string; world: string, x: number, y: number, z: number }>> {
-    const result = await mcefQuery<{ username: string; uuid: string; world: string, x: number, y: number, z: number }>('GET_USER_DATA');
+export type McUserData = {
+    username: string;
+    uuid: string;
+    world: string;
+    x: number;
+    y: number;
+    z: number;
+    /**
+     * Which grant contract this jar speaks. `"source"` = the backend decides the
+     * items; **absent means legacy** (the page names them), because 1.16.5 has no
+     * such field. Never default this to the new contract: jars update whenever a
+     * player gets one and the page redeploys instantly, so the two are never in
+     * step and a build-time flag could only ever be right for one of them.
+     */
+    cajaProtocol?: 'source';
+};
+
+export async function getMcUserData(): Promise<QueryResult<McUserData>> {
+    const result = await mcefQuery<McUserData>('GET_USER_DATA');
     if (result.error) {
         console.error('Error fetching user data:', result.error);
         return { data: { username: '', uuid: '', world: '', x: 0, y: 0, z: 0 }, status: 500 };
@@ -91,10 +108,32 @@ type ObjetoMC = {
     cantidad: number;
 }
 
-export async function darCaja(objetos: ObjetoMC[]): Promise<QueryResult<any>> {
-    const result = await mcefQuery<any>('DAR_CAJA', { objetos });
+/**
+ * Grant a box by naming a **source**. The backend picks the items, so a modified
+ * client cannot mint its own. Only jars advertising `cajaProtocol: "source"` on
+ * `getUserData` understand this — check first, and fall back to `darCajaLegacy`.
+ */
+export async function darCaja(source: string): Promise<QueryResult<any>> {
+    const result = await mcefQuery<any>('DAR_CAJA', { source });
     if (result.error) {
         console.error('Error giving box:', result.error);
+    }
+    return result;
+}
+
+/**
+ * The 1.16.5 contract: the page names the items and the mod grants them, with no
+ * backend call at all — so a modified client can mint anything. That hole cannot
+ * be closed from here; only the 1.21.1 port can close it. Kept because it is what
+ * every jar in the wild currently speaks.
+ *
+ * Retire this, and the `cajaProtocol` branch in `claimReward`, once no jar without
+ * that field is left.
+ */
+export async function darCajaLegacy(objetos: ObjetoMC[]): Promise<QueryResult<any>> {
+    const result = await mcefQuery<any>('DAR_CAJA', { objetos });
+    if (result.error) {
+        console.error('Error giving box (legacy):', result.error);
     }
     return result;
 }
