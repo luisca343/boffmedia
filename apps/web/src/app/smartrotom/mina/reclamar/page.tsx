@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import MenuWrapper from "../_components/MenuWrapper";
 import Image from "next/image";
 import { toast } from "react-toastify";
@@ -8,7 +9,7 @@ import { isMinecraft, mcefQuery } from "@/services/mcef/mcefHelper";
 import { useRotomUuid } from "@/components/smartrotom/behavior/useRotomUuid";
 import { useGetUnclaimed } from "@/hooks/mina/useGetUnclaimed";
 import { MinaService } from "@/services/api/smartrotom/minaService";
-import { darCaja } from "@/services/mcef/mcefApi";
+import { darCaja, darCajaLegacy, getMcUserData } from "@/services/mcef/mcefApi";
 import { ItemImage } from "@/lib/ItemImage";
 import { UnclaimedItem } from "@boffmedia/shared";
 
@@ -16,32 +17,79 @@ export default function Reclamar() {
   const uuid = useRotomUuid();
   const { unclaimed, setUnclaimed, boxes, isLoading } = useGetUnclaimed(uuid!);
 
+  const [claiming, setClaiming] = useState(false);
+
   async function claimReward() {
-    if (!unclaimed) return;
+    if (!unclaimed || claiming) return;
     if (!isMinecraft()) {
       toast.error("No estas en Minecraft");
       return;
     }
 
-    const response = await MinaService.claimRewards({ uuid: uuid! });
-    if (response) {  
-      const objetosMC = unclaimed.map(reward => ({
-        id: reward.itemId,
-        cantidad: reward.amount ?? 0
-      }));
-      const cajaResult = await darCaja(objetosMC);
-      
+    setClaiming(true);
+    try {
+      const mc = await getMcUserData();
+
+      const cajaResult =
+        mc.data?.cajaProtocol === "source"
+          ? await claimServerGranted()
+          : await claimLegacy();
+
+      if (!cajaResult) return;
+
       if (cajaResult.error) {
         toast.error("Error al dar la caja");
         return;
       }
-  
+
       toast.success("Recompensas reclamadas correctamente");
       setUnclaimed([]);
-    }
-    else {
+    } catch {
       toast.error("Error al reclamar las recompensas");
+    } finally {
+      setClaiming(false);
     }
+  }
+
+  /**
+   * The jar asks the backend what this player is owed and grants that. The page
+   * never names an item, so it does not spend anything itself either.
+   */
+  async function claimServerGranted() {
+    const result = await darCaja("mine");
+    if (result.error) return result;
+
+    // The jar reports how many it actually granted. Zero is a success at the
+    // transport level but not a claim, and reporting it as one would be the same
+    // lie this whole path exists to remove — just a smaller one.
+    if (!result.data?.objetos) {
+      toast.info("No hay recompensas que reclamar");
+      setUnclaimed([]);
+      return null;
+    }
+    return result;
+  }
+
+  /**
+   * 1.16.5: the page spends, then tells the jar what to grant. Grant strictly from
+   * what the server says THIS call claimed — granting from `unclaimed` would
+   * re-grant on every extra submit, because the claim succeeds even when it took
+   * nothing.
+   */
+  async function claimLegacy() {
+    const { claimedItems } = await MinaService.claimRewards({ uuid: uuid! });
+
+    if (!claimedItems?.length) {
+      toast.info("No hay recompensas que reclamar");
+      setUnclaimed([]);
+      return null;
+    }
+
+    const objetosMC = claimedItems.map(item => ({
+      id: item.itemId,
+      cantidad: item.amount ?? 1
+    }));
+    return await darCajaLegacy(objetosMC);
   }
 
   function groupRewardsByType(rewards: UnclaimedItem[]) {
@@ -82,10 +130,11 @@ export default function Reclamar() {
         <div className="mt-6 flex justify-center">
           <SmartRotomButton
             onClick={claimReward}
+            disabled={claiming}
             size="lg"
             className="text-base"
           >
-            RECLAMAR TODO ({boxes} CAJAS)
+            {claiming ? "RECLAMANDO…" : `RECLAMAR TODO (${boxes} CAJAS)`}
           </SmartRotomButton>
         </div>
       </div>

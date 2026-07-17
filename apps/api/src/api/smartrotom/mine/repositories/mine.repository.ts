@@ -320,13 +320,60 @@ export class MineRepository {
       );
   }
 
-  async claimInventoryItems(ids: number[]): Promise<void> {
-    if (ids.length === 0) return;
+  // Return shape matches IMineRepository's UnclaimedItem, not this file's
+  // same-named local interface — that one predates `id` and is unused.
+  async claimUnclaimedFor(
+    uuid: string,
+  ): Promise<{ id: number; itemId: string; type: string; amount?: number }[]> {
+    return await this.db.transaction(async (tx) => {
+      // FOR UPDATE holds the rows across the read and the write, so a concurrent
+      // caller blocks here and then reads zero rows instead of granting the same
+      // items again. Reading first is unavoidable: the caller needs the item list,
+      // and MySQL's UPDATE cannot return the rows it touched.
+      const rows = await tx
+        .select({
+          id: smartRotomInventory.id,
+          itemId: smartRotomInventory.itemId,
+          type: smartRotomInventory.itemType,
+          // Selected so the caller grants a real quantity. `findUnclaimedItems`
+          // omits it, which left the page sending cantidad 0 and relying on the
+          // mod clamping it back up to 1.
+          amount: smartRotomInventory.amount,
+        })
+        .from(smartRotomInventory)
+        .where(
+          and(
+            eq(smartRotomInventory.uuid, uuid),
+            eq(smartRotomInventory.used, 0),
+            eq(smartRotomInventory.sourceType, 'mine'),
+          ),
+        )
+        .for('update');
 
-    await this.db
-      .update(smartRotomInventory)
-      .set({ used: 1 } as SmartRotomInventoryItem)
-      .where(inArray(smartRotomInventory.id, ids));
+      if (rows.length === 0) return [];
+
+      // `used` is read as a flag here (used = 0) but as a consumed counter by the
+      // arcade (amount > used), and arcade's consumeItem does not filter by
+      // sourceType — so it can see these rows. Writing `used = 1` on a row with
+      // amount 5 would leave the arcade offering the other 4. Setting used to the
+      // full amount is correct under both readings.
+      await tx
+        .update(smartRotomInventory)
+        .set({
+          used: sql`COALESCE(${smartRotomInventory.amount}, 1)`,
+        } as unknown as SmartRotomInventoryItem)
+        .where(
+          and(
+            inArray(
+              smartRotomInventory.id,
+              rows.map((r) => r.id),
+            ),
+            eq(smartRotomInventory.used, 0),
+          ),
+        );
+
+      return rows.map((r) => ({ ...r, amount: r.amount ?? undefined }));
+    });
   }
 
   // ==================== STATISTICS OPERATIONS ====================

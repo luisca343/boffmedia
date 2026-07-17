@@ -10,7 +10,7 @@ const mockRepo = {
   findTopPlayers: jest.fn(),
   findPlayerRanking: jest.fn(),
   findUnclaimedItems: jest.fn(),
-  claimInventoryItems: jest.fn(),
+  claimUnclaimedFor: jest.fn(),
   getPlayerStats: jest.fn(),
   findPlayerEnergy: jest.fn(),
 };
@@ -161,31 +161,43 @@ describe('PlayerService (mine)', () => {
 
   describe('claimRewards()', () => {
     it('returns empty claim response when no unclaimed items', async () => {
-      mockRepo.findUnclaimedItems.mockResolvedValue([]);
+      mockRepo.claimUnclaimedFor.mockResolvedValue([]);
 
       const result = await service.claimRewards(UUID);
 
       expect(result).toEqual({
+        claimedItems: [],
         claimedIds: [],
         totalClaimed: 0,
         success: true,
       });
-      expect(mockRepo.claimInventoryItems).not.toHaveBeenCalled();
     });
 
-    it('claims all unclaimed items and returns their ids', async () => {
-      mockRepo.findUnclaimedItems.mockResolvedValue([
-        { id: 10, itemId: 'gem' },
-        { id: 11, itemId: 'sword' },
-      ]);
-      mockRepo.claimInventoryItems.mockResolvedValue(undefined);
+    it('claims all unclaimed items and returns them', async () => {
+      const rows = [
+        { id: 10, itemId: 'gem', type: 'gema' },
+        { id: 11, itemId: 'sword', type: 'item' },
+      ];
+      mockRepo.claimUnclaimedFor.mockResolvedValue(rows);
 
       const result = await service.claimRewards(UUID);
 
+      expect(result.claimedItems).toEqual(rows);
       expect(result.claimedIds).toEqual([10, 11]);
       expect(result.totalClaimed).toBe(2);
       expect(result.success).toBe(true);
-      expect(mockRepo.claimInventoryItems).toHaveBeenCalledWith([10, 11]);
+      expect(mockRepo.claimUnclaimedFor).toHaveBeenCalledWith(UUID);
+    });
+
+    it('reports nothing claimed when a concurrent claim won the rows', async () => {
+      // The repository is the gate: it returns only the rows THIS caller won.
+      // The page grants from claimedItems, so an empty list must grant nothing.
+      mockRepo.claimUnclaimedFor.mockResolvedValue([]);
+
+      const result = await service.claimRewards(UUID);
+
+      expect(result.claimedItems).toEqual([]);
+      expect(result.totalClaimed).toBe(0);
     });
 
     it('throws BadRequestException when uuid is empty', async () => {
