@@ -164,6 +164,9 @@ export class AppModule implements NestModule {
         { path: 'smartrotom/caja/claim', method: RequestMethod.POST },
         { path: 'smartrotom/caja/reserve', method: RequestMethod.POST },
         { path: 'smartrotom/caja/confirm', method: RequestMethod.POST },
+        // Mint/burn route: server Bearer only (GameServerAuthGuard), no `server`
+        // field. Must never inherit the public MC_WORLD tripwire.
+        { path: 'smartrotom/starbank/set-balance', method: RequestMethod.POST },
         { path: 'smartrotom/starbank/accounts', method: RequestMethod.POST },
         // Money routes guarded by GameOrUserAuthGuard own their own auth (JWT,
         // server key, or transitional tripwire) — the middleware would 403 the

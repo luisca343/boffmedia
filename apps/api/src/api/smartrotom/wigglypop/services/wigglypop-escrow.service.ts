@@ -16,6 +16,7 @@ import { IStarbankAccountRepository } from '../../starbank/repositories/interfac
 import { IStarbankTransactionRepository } from '../../starbank/repositories/interfaces/starbank-transaction.repository';
 import { AccountType } from '../../starbank/enums/account-type.enum';
 import { TransactionType } from '../../starbank/enums/transaction-type.enum';
+import { WingullFacadeService } from '../../wingull/wingull.facade.service';
 
 const ESCROW_NAME = 'Wigglypop Escrow';
 
@@ -36,6 +37,7 @@ export class WigglypopEscrowService {
     private readonly accountRepository: IStarbankAccountRepository,
     @Inject(STARBANK_TRANSACTION_REPOSITORY_TOKEN)
     private readonly transactionRepository: IStarbankTransactionRepository,
+    private readonly wingullFacadeService: WingullFacadeService,
   ) {}
 
   /**
@@ -46,7 +48,9 @@ export class WigglypopEscrowService {
   async getEscrowAccountId(): Promise<number> {
     if (this.escrowAccountId) return this.escrowAccountId;
 
-    const existing = await this.accountRepository.findByType(AccountType.MARKET);
+    const existing = await this.accountRepository.findByType(
+      AccountType.MARKET,
+    );
     if (existing.length > 0) {
       this.escrowAccountId = existing[0].id;
       return this.escrowAccountId;
@@ -84,7 +88,13 @@ export class WigglypopEscrowService {
     amount: number,
     reason: string,
   ): Promise<number> {
-    return this.move(null, sellerUuid, amount, TransactionType.VENTA_P2P, reason);
+    return this.move(
+      null,
+      sellerUuid,
+      amount,
+      TransactionType.VENTA_P2P,
+      reason,
+    );
   }
 
   /** Escrow → buyer. The refund, on cancel or on a rolled-back atomic order. */
@@ -126,7 +136,28 @@ export class WigglypopEscrowService {
         result.message || 'The StarBank transfer was refused',
       );
     }
+    if (fromUuid) await this.pushGameBalance(fromUuid);
+    if (toUuid) await this.pushGameBalance(toUuid);
     return result.transactionId;
+  }
+
+  // Mirrors the player's new balance to the game server so the in-game counter updates without a
+  // relogin. The transaction is already committed, so a push failure only logs.
+  private async pushGameBalance(uuid: string): Promise<void> {
+    try {
+      const account = await this.accountRepository.findUserMainAccount(uuid);
+      if (account) {
+        await this.wingullFacadeService.updateBalance({
+          balance: account.balance,
+          type: AccountType.MAIN,
+          uuid,
+        });
+      }
+    } catch (error: any) {
+      this.logger.warn(
+        `Failed to update balance in game for ${uuid}, continuing anyway: ${error.message}`,
+      );
+    }
   }
 
   private async mainAccountId(uuid: string): Promise<number> {

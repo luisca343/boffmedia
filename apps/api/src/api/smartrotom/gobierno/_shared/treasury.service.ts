@@ -16,6 +16,7 @@ import { IStarbankAccountRepository } from '../../starbank/repositories/interfac
 import { IStarbankTransactionRepository } from '../../starbank/repositories/interfaces/starbank-transaction.repository';
 import { AccountType } from '../../starbank/enums/account-type.enum';
 import { TransactionType } from '../../starbank/enums/transaction-type.enum';
+import { WingullFacadeService } from '../../wingull/wingull.facade.service';
 
 const TREASURY_NAME = 'Tesorería de Teras';
 
@@ -34,6 +35,7 @@ export class TreasuryService {
     private readonly accountRepository: IStarbankAccountRepository,
     @Inject(STARBANK_TRANSACTION_REPOSITORY_TOKEN)
     private readonly transactionRepository: IStarbankTransactionRepository,
+    private readonly wingullFacadeService: WingullFacadeService,
   ) {}
 
   /**
@@ -101,6 +103,7 @@ export class TreasuryService {
         result.message || 'Payment to the treasury failed',
       );
     }
+    await this.pushGameBalance(fromUuid);
     return result.transactionId;
   }
 
@@ -136,6 +139,26 @@ export class TreasuryService {
         result.message || 'Payment from the treasury failed',
       );
     }
+    await this.pushGameBalance(toUuid);
     return result.transactionId;
+  }
+
+  // Mirrors the player's new balance to the game server so the in-game counter updates without a
+  // relogin. The transaction is already committed, so a push failure only logs.
+  private async pushGameBalance(uuid: string): Promise<void> {
+    try {
+      const account = await this.accountRepository.findUserMainAccount(uuid);
+      if (account) {
+        await this.wingullFacadeService.updateBalance({
+          balance: account.balance,
+          type: AccountType.MAIN,
+          uuid,
+        });
+      }
+    } catch (error: any) {
+      this.logger.warn(
+        `Failed to update balance in game for ${uuid}, continuing anyway: ${error.message}`,
+      );
+    }
   }
 }
