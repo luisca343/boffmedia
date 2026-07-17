@@ -16,19 +16,24 @@ export function usePokedexData() {
   useEffect(() => {
     async function fetchData() {
       if (fetchingPokedex) return // Don't start a new fetch if one is already in progress
-      
-      setIsLoading(true)
+
+      // The layout swaps the whole app for a spinner while this is true, so a revalidation
+      // must not set it.
+      const isFirstLoad = !usePokemonStore.getState().pokedexData
+
+      if (isFirstLoad) setIsLoading(true)
       setError(null)
       try {
         await getPokedexData(uuid!)
       } catch (err) {
         setError("Failed to fetch Pokedex data")
       } finally {
-        setIsLoading(false)
+        if (isFirstLoad) setIsLoading(false)
       }
     }
 
-    if (!pokedexData && uuid) {
+    // Runs on every mount: a capture registered in-game is only visible once this re-reads.
+    if (uuid) {
       fetchData()
     }
   }, [uuid, pokedexData, fetchingPokedex])

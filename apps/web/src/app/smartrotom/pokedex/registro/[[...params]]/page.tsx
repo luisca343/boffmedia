@@ -1,24 +1,39 @@
 "use client"
-import { useEffect, useState } from "react"
+import { use, useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { PokemonSprite } from "../../_components/PokemonSprite"
+import { usePokemonStore } from "@/stores/pokemonStore"
 
 // Cinematic capture-reveal: silhouette scan → reveal → brief flash → entrada.
-export default function Registro({ params }: { params: any }) {
+export default function Registro({ params }: { params: Promise<{ params?: string[] }> }) {
   const router = useRouter()
-  const [pokemonIndex, formIndex] = params.params as [number, string]
+  // Params arrive as a promise; reading `.params` straight off it yields undefined.
+  const { params: route } = use(params)
+  const [pokemonIndex, formIndex] = route ?? []
   const [phase, setPhase] = useState<"scan" | "reveal" | "flash">("scan")
+  const invalidatePokedex = usePokemonStore((state) => state.invalidatePokedex)
 
   useEffect(() => {
+    // The catch-all also matches a bare `/registro`, with nothing to reveal.
+    if (!pokemonIndex) {
+      router.replace("/smartrotom/pokedex")
+      return
+    }
+
     const t1 = setTimeout(() => setPhase("reveal"), 1400)
     const t2 = setTimeout(() => setPhase("flash"), 1850)
-    const t3 = setTimeout(() => router.push(`/smartrotom/pokedex/entrada/${pokemonIndex}/${formIndex}`), 2250)
+    const t3 = setTimeout(() => {
+      // `openDex` routes here once the mod has registered the encounter, and this is a
+      // client-side push — without this the dex would never re-read.
+      invalidatePokedex()
+      router.push(`/smartrotom/pokedex/entrada/${pokemonIndex}/${formIndex ?? "base"}`)
+    }, 2250)
     return () => {
       clearTimeout(t1)
       clearTimeout(t2)
       clearTimeout(t3)
     }
-  }, [])
+  }, [pokemonIndex, formIndex])
 
   const label = phase === "scan" ? "Escaneando…" : phase === "reveal" ? "Identificando…" : "Registrando…"
 
@@ -53,7 +68,7 @@ export default function Registro({ params }: { params: any }) {
           {phase === "scan" && (
             <div className="absolute left-3 right-3 h-[2px] bg-pk-primary-400 shadow-[0_0_10px_#fb923c]" style={{ animation: "pkScan 1.2s ease-in-out infinite" }} />
           )}
-          <PokemonSprite id={pokemonIndex} form={formIndex} palette="none" width={180} height={180} pixelated forceBlack={phase === "scan"} />
+          <PokemonSprite id={Number(pokemonIndex)} form={formIndex ?? "base"} palette="none" width={180} height={180} pixelated forceBlack={phase === "scan"} />
         </div>
         <div className="flex items-center gap-2 font-pk-mono text-sm text-pk-primary-300 tracking-[0.1em] uppercase">
           <span className="w-1.5 h-1.5 rounded-full bg-pk-primary-400 animate-pulse" />
