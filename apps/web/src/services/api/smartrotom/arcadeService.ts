@@ -11,9 +11,7 @@ import type {
   SuccessResponse,
   ArcadeStreak,
   ArcadeInventoryResponse,
-  LootboxConfigEntity,
-  ClaimItemsDto,
-  ClaimItemsResponseDto
+  LootboxConfigEntity
 } from '@boffmedia/shared';
 
 export class ArcadeService {
@@ -153,13 +151,7 @@ export class ArcadeService {
     return rotomGET<LootboxConfigEntity>('/arcade/lootbox/config');
   }
 
-  // ==================== COMBINED ENDPOINTS ====================
-  /**
-   * Claim multiple items from inventory and give them to player in-game
-   */
-  static claimItems(claimItemsDto: ClaimItemsDto): Promise<ApiResponse<ClaimItemsResponseDto>> {
-    return rotomPOST<ClaimItemsResponseDto>('/arcade/claim-items', claimItemsDto);
-  }
+  // Claiming moved to MCEF delivery — see useClaimItems / darCaja('arcade', ids).
 
   /**
    * Get complete user arcade data
