@@ -4,6 +4,10 @@
 /* eslint-disable */
 export type AddNoteToUserDto = {
     /**
+     * Server UUID (automatically added by middleware)
+     */
+    server?: string;
+    /**
      * Document ID
      */
     documentId: number;
