@@ -4,6 +4,10 @@
 /* eslint-disable */
 export type UpdateBattleTeamDto = {
     /**
+     * Server UUID (automatically added by middleware)
+     */
+    server?: string;
+    /**
      * Battle team UUID
      */
     uuid: string;

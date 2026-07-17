@@ -4,6 +4,10 @@
 /* eslint-disable */
 export type CreateReplayDto = {
     /**
+     * Server UUID (automatically added by middleware)
+     */
+    server?: string;
+    /**
      * Player 1 name
      */
     side1: string;
