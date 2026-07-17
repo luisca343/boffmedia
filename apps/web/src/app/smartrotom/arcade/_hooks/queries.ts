@@ -5,13 +5,13 @@ import type {
   ArcadeInventoryItem,
   ArcadeInventoryResponse,
   ArcadeStreak,
-  ClaimItemsResponseDto,
   DailyRewardsConfig,
   LootboxConfigEntity,
   OpenLootBoxResponseDto,
 } from "@boffmedia/shared"
 import { rotomGETOrThrow, rotomPOSTOrThrow } from "@/services/boffAPI"
 import { useRotomUuid } from "@/components/smartrotom/behavior/useRotomUuid"
+import { darCaja } from "@/services/mcef/mcefApi"
 
 /** The SmartRotom uuid every arcade endpoint is keyed by. `null` until signed in. */
 export function useArcadeUuid(): string | null {
@@ -94,8 +94,17 @@ export function useClaimItems() {
   const uuid = useArcadeUuid()
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: (items: ArcadeInventoryItem[]) =>
-      rotomPOSTOrThrow<ClaimItemsResponseDto>("/arcade/claim-items", { uuid: uuid!, items }),
+    // Delivery goes through the game client (MCEF): darCaja routes the selected
+    // ids to the mod, which asks the backend what they are and gives them —
+    // items to the inventory, Pokémon to the party. The page never names a reward,
+    // and only works in-game (mcefQuery errors otherwise).
+    mutationFn: async (items: ArcadeInventoryItem[]) => {
+      const res = await darCaja("arcade", items.map((i) => i.id))
+      if (res.error || res.data?.status === "error") {
+        throw new Error(res.error ?? "delivery failed")
+      }
+      return res.data
+    },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: arcadeKeys.inventory(uuid ?? "") })
     },

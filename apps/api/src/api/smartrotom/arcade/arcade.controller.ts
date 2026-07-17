@@ -27,7 +27,6 @@ import {
   ConsumeInventoryItemDto,
 } from './dto/inventory.dto';
 import { GiveLootboxDto } from './dto/lootbox-management.dto';
-import { ClaimItemsDto, ClaimItemsResponseDto } from './dto/claim-items.dto';
 
 // Import entities
 import { ArcadeStreak } from './entities/arcade-streak.entity';
@@ -316,28 +315,10 @@ export class ArcadeController {
     return this.arcadeFacadeService.getLootboxConfig();
   }
 
-  // ==================== COMBINED ENDPOINTS ====================
-
-  @Post('claim-items')
-  @ApiOperation({
-    summary:
-      'Claim multiple items from inventory and give them to player in-game',
-  })
-  @ApiResponse({
-    status: HttpStatus.OK,
-    description: 'Items claimed and distributed successfully.',
-    type: ClaimItemsResponseDto,
-  })
-  @ApiResponse({
-    status: HttpStatus.BAD_REQUEST,
-    description: 'Invalid request or missing parameters.',
-  })
-  @ApiBody({ type: ClaimItemsDto })
-  async claimItems(
-    @Body() claimData: ClaimItemsDto,
-  ): Promise<ClaimItemsResponseDto> {
-    return this.arcadeFacadeService.claimItems(claimData);
-  }
+  // Claiming moved to MCEF: the page delivers via darCaja('arcade', ids), which
+  // routes through the mod to POST /smartrotom/caja/claim. The old HTTP path
+  // (POST /arcade/claim-items -> WINGULL_API give) is gone — the mod, not this
+  // API, reaches the player now.
 
   /*
   @Post('inventory/claim-multiple')
