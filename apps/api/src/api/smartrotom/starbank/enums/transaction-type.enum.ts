@@ -8,6 +8,10 @@ export enum TransactionType {
   RETIRO = 'RETIRO',
   MULTA = 'MULTA',
   TASA = 'TASA',
+  // Absolute balance correction (admin / game-driven setBalance). The ledger row
+  // records the signed delta against the virtual system account 0, so history
+  // shows how much was minted or burned to reach the target.
+  AJUSTE = 'AJUSTE',
   SUBASTA = 'SUBASTA',
   RECOMPENSA = 'RECOMPENSA',
   // Wigglypop. MERCADO is the buyer → escrow leg (and the escrow → buyer refund);
