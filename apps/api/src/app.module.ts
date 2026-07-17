@@ -162,6 +162,8 @@ export class AppModule implements NestModule {
         // The mod authenticates with its Bearer token and sends no `server`
         // field, so the tripwire middleware would 403 it before routing.
         { path: 'smartrotom/caja/claim', method: RequestMethod.POST },
+        { path: 'smartrotom/caja/reserve', method: RequestMethod.POST },
+        { path: 'smartrotom/caja/confirm', method: RequestMethod.POST },
         { path: 'smartrotom/starbank/accounts', method: RequestMethod.POST },
         // Money routes guarded by GameOrUserAuthGuard own their own auth (JWT,
         // server key, or transitional tripwire) — the middleware would 403 the
