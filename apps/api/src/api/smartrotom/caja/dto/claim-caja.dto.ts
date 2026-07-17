@@ -1,5 +1,13 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsIn, IsNotEmpty, IsUUID } from 'class-validator';
+import {
+  IsArray,
+  IsIn,
+  IsInt,
+  IsNotEmpty,
+  IsOptional,
+  IsUUID,
+} from 'class-validator';
+import { Type } from 'class-transformer';
 
 /** The sources a ticket may redeem. See CajaRepository for why this is a closed set. */
 export const CAJA_SOURCES = ['mine', 'arcade', 'daily_reward'] as const;
@@ -30,4 +38,19 @@ export class ClaimCajaDto {
   @IsNotEmpty()
   @IsIn(CAJA_SOURCES)
   source: CajaSource;
+
+  @ApiProperty({
+    description:
+      'Optional selector: redeem only these rows of the source. Omit to redeem ' +
+      'the whole source (mine). Rows not owned or of another source are ignored — ' +
+      'it selects, it never describes the reward.',
+    required: false,
+    type: [Number],
+    example: [12, 13],
+  })
+  @IsOptional()
+  @IsArray()
+  @IsInt({ each: true })
+  @Type(() => Number)
+  ids?: number[];
 }

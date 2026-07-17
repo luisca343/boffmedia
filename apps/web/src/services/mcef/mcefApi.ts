@@ -113,8 +113,8 @@ type ObjetoMC = {
  * client cannot mint its own. Only jars advertising `cajaProtocol: "source"` on
  * `getUserData` understand this — check first, and fall back to `darCajaLegacy`.
  */
-export async function darCaja(source: string): Promise<QueryResult<any>> {
-    const result = await mcefQuery<any>('DAR_CAJA', { source });
+export async function darCaja(source: string, ids?: number[]): Promise<QueryResult<any>> {
+    const result = await mcefQuery<any>('DAR_CAJA', ids ? { source, ids } : { source });
     if (result.error) {
         console.error('Error giving box:', result.error);
     }

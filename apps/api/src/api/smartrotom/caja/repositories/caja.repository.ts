@@ -1,12 +1,11 @@
 import { Inject, Injectable, ConflictException } from '@nestjs/common';
 import { MySql2Database } from 'drizzle-orm/mysql2';
-import { and, eq, gt, sql } from 'drizzle-orm';
+import { and, eq, gt, inArray, sql, SQL } from 'drizzle-orm';
 import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
 import {
   smartRotomInventory,
   SmartRotomInventoryItem,
 } from '@/_db/schema/SmartRotom';
-import { ObjetoMC } from '../entities/objeto-mc.entity';
 import { CajaSource } from '../dto/claim-caja.dto';
 
 /**
@@ -35,22 +34,41 @@ export class CajaRepository {
   ) {}
 
   /**
-   * Atomically spends everything `uuid` is owed from `source` and returns what
-   * was spent. An empty array means nothing was owed — the caller must grant
-   * nothing rather than fall back to any other view of the player's inventory.
+   * Atomically spends everything `uuid` is owed from `source`, returning the rows
+   * as the DB has them. An empty array means nothing was owed.
    */
-  async spend(uuid: string, source: CajaSource): Promise<ObjetoMC[]> {
+  async spend(uuid: string, source: CajaSource): Promise<ClaimedRow[]> {
+    return await this.spendWhere(
+      and(
+        eq(smartRotomInventory.uuid, uuid),
+        eq(smartRotomInventory.sourceType, source),
+        gt(smartRotomInventory.amount, smartRotomInventory.used),
+      ),
+    );
+  }
+
+  /**
+   * Spends specific rows this player owns. `ids` only selects — deliver from the
+   * returned rows, never from what the client sent. Rows not owned, unknown or
+   * already spent do not come back.
+   */
+  async spendByIds(uuid: string, ids: number[]): Promise<ClaimedRow[]> {
+    if (ids.length === 0) return [];
+    return await this.spendWhere(
+      and(
+        eq(smartRotomInventory.uuid, uuid),
+        inArray(smartRotomInventory.id, ids),
+        gt(smartRotomInventory.amount, smartRotomInventory.used),
+      ),
+    );
+  }
+
+  private async spendWhere(where: SQL | undefined): Promise<ClaimedRow[]> {
     return await this.db.transaction(async (tx) => {
       const rows = await tx
         .select()
         .from(smartRotomInventory)
-        .where(
-          and(
-            eq(smartRotomInventory.uuid, uuid),
-            eq(smartRotomInventory.sourceType, source),
-            gt(smartRotomInventory.amount, smartRotomInventory.used),
-          ),
-        )
+        .where(where)
         .for('update');
 
       if (rows.length === 0) return [];
@@ -74,11 +92,21 @@ export class CajaRepository {
       }
 
       return rows.map((row) => ({
-        id: row.itemId,
-        // What is still owed on this row, not its whole amount: a partially
-        // consumed arcade row must not re-grant what was already handed over.
-        cantidad: (row.amount ?? 1) - (row.used ?? 0),
+        id: row.id,
+        itemId: row.itemId,
+        itemType: row.itemType,
+        itemData: row.itemData,
+        granted: (row.amount ?? 1) - (row.used ?? 0),
       }));
     });
   }
+}
+
+/** A row as the database has it, after it was spent. The only safe source for a payout. */
+export interface ClaimedRow {
+  id: number;
+  itemId: string;
+  itemType: string;
+  itemData: string | null;
+  granted: number;
 }
