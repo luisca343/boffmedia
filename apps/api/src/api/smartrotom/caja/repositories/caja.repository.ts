@@ -9,43 +9,19 @@ import {
 } from '@/_db/schema/SmartRotom';
 import { CajaSource } from '../dto/claim-caja.dto';
 
-/**
- * How long a reservation stays exclusive before it is reclaimable (DARCAJA.md §7).
- * The happy path clears a reservation in seconds (reserve → deliver → confirm), so
- * this only governs recovery: after a lost delivery the player waits this long,
- * then the rows free up and a re-claim redelivers them. Long enough to swallow a
- * few confirm retries; short enough that a disconnected player is not stuck.
- */
+/** How long a reservation stays exclusive before its rows become reclaimable (DARCAJA.md §7). */
 export const RESERVATION_TTL_MINUTES = 5;
 
 /**
- * The single spend path for `rotom_inventory`, in two shapes:
+ * The single spend path for `rotom_inventory`. Two shapes: one-shot (`spend`/`spendByIds`)
+ * marks `used` on read, so a failed delivery loses the reward; two-phase
+ * (`reserve` → `confirm`, the mod path) soft-locks first, and an unconfirmed reservation
+ * expires after the TTL and frees its rows, so a dropped delivery loses nothing (DARCAJA.md §7).
  *
- *  - **One-shot** (`spend`/`spendByIds`): reads and marks `used` in one step. Simple,
- *    but the caller must deliver what it gets — if delivery fails the reward is gone
- *    (the `/caja/claim` route; kept for callers that accept that).
- *  - **Two-phase** (`reserve` → `confirm`): `reserve` soft-locks the rows and returns
- *    the grant without spending; the deliverer `confirm`s only after the items are in
- *    the player's hands. A reservation that is never confirmed expires
- *    (`RESERVATION_TTL_MINUTES`) and the rows are claimable again — so a dropped
- *    connection loses nothing (DARCAJA.md §7). This is the path the mod uses.
- *
- * `used` is read two different ways in this ledger and always has been: **mine**
- * treats it as a flag (`used = 0` means unclaimed) while the **arcade** treats it
- * as a consumed counter (`amount > used`). They only agree for `amount: 1` rows,
- * and mine rows are NOT always amount 1 — the live table holds mine rows with
- * amount up to 8. Both shapes below therefore:
- *  - select on the **counter** reading (`amount > used`), correct for both — an
- *    unclaimed mine row is `1 > 0` / `5 > 0`;
- *  - spend by writing `used = COALESCE(amount, 1)`, correct under both readings and
- *    leaving nothing behind for the other reader to offer.
- *
- * `source` is mandatory for the same reason: "everything owed" is not
- * well-defined across sources that disagree about what `used` means.
- *
- * Reservation is orthogonal to `used`: `reserve` never touches `used`, only stamps
- * `reservation_id`/`reserved_at`; `confirm` is the write that spends. A row is
- * *claimable* when `amount > used` AND it is not held by a live reservation.
+ * `used` is read two ways: mine as a flag (`used = 0`), arcade as a counter (`amount > used`).
+ * They only agree at amount 1, and mine rows can be up to 8 — so both shapes select on
+ * `amount > used` and spend by writing `used = COALESCE(amount, 1)`. `source` is required
+ * because "everything owed" is undefined across the two readings.
  */
 @Injectable()
 export class CajaRepository {
@@ -55,21 +31,14 @@ export class CajaRepository {
 
   // ---- One-shot: spend on read (the /caja/claim route) --------------------
 
-  /**
-   * Atomically spends everything `uuid` is owed from `source`, returning the rows
-   * as the DB has them. An empty array means nothing was owed.
-   */
+  /** Atomically spends everything `uuid` is owed from `source`. Empty array = nothing owed. */
   async spend(uuid: string, source: CajaSource): Promise<ClaimedRow[]> {
     return await this.spendWhere(
       and(this.claimable(), eq(smartRotomInventory.uuid, uuid), eq(smartRotomInventory.sourceType, source)),
     );
   }
 
-  /**
-   * Spends specific rows this player owns. `ids` only selects — deliver from the
-   * returned rows, never from what the client sent. Rows not owned, unknown or
-   * already spent do not come back.
-   */
+  /** Spends specific rows this player owns. `ids` only selects — deliver from the returned rows, never from the client's list. */
   async spendByIds(uuid: string, ids: number[]): Promise<ClaimedRow[]> {
     if (ids.length === 0) return [];
     return await this.spendWhere(
@@ -98,10 +67,9 @@ export class CajaRepository {
   // ---- Two-phase: reserve, deliver, confirm (the mod path) ----------------
 
   /**
-   * Soft-locks everything `uuid` is owed from `source` under a fresh reservation
-   * id and returns the grant WITHOUT spending it. Rows already held by a live
-   * reservation are skipped, so a double-submit reserves nothing the second time.
-   * `reservationId` is null exactly when `rows` is empty.
+   * Soft-locks everything `uuid` is owed from `source` under a new reservation id without
+   * spending it. Rows held by a live reservation are skipped, so a double-submit reserves
+   * nothing the second time. `reservationId` is null iff `rows` is empty.
    */
   async reserve(
     uuid: string,
@@ -159,11 +127,8 @@ export class CajaRepository {
   }
 
   /**
-   * Turns a reservation into a spend: marks every still-owed row of `reservationId`
-   * as `used` and clears the reservation. Returns how many rows were spent — 0 if
-   * the reservation was already confirmed or has expired and been reclaimed, so a
-   * replay is a harmless no-op. Scoped to `uuid` as defence in depth (the id is
-   * already an unguessable UUID).
+   * Spends the still-owed rows of `reservationId` and clears the hold. Returns rows
+   * spent — 0 on replay or an expired/reclaimed reservation. `uuid` scoping is defence in depth.
    */
   async confirm(uuid: string, reservationId: string): Promise<number> {
     const [res] = await this.db
@@ -184,10 +149,8 @@ export class CajaRepository {
   }
 
   /**
-   * Clears reservation stamps that were never confirmed and are older than the TTL,
-   * returning them to the claimable pool. Correctness does not depend on this — the
-   * `claimable()` predicate already treats an expired reservation as free — it just
-   * keeps the columns tidy and observable. Returns how many rows were reclaimed.
+   * Clears stamps of unconfirmed reservations past the TTL. Housekeeping only —
+   * `claimable()` already treats an expired hold as free. Returns rows reclaimed.
    */
   async sweepExpiredReservations(): Promise<number> {
     const [res] = await this.db
@@ -246,7 +209,7 @@ export class CajaRepository {
   }
 }
 
-/** A row as the database has it, granted (or about to be). The only safe source for a payout. */
+/** A granted row as the database has it — the only safe source for a payout. */
 function toClaimedRow(row: SmartRotomInventoryItem): ClaimedRow {
   return {
     id: row.id,
@@ -257,7 +220,7 @@ function toClaimedRow(row: SmartRotomInventoryItem): ClaimedRow {
   };
 }
 
-/** A row as the database has it, after it was spent. The only safe source for a payout. */
+/** A row as the database has it, after it was spent. */
 export interface ClaimedRow {
   id: number;
   itemId: string;

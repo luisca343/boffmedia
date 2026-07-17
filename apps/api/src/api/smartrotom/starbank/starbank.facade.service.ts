@@ -133,8 +133,8 @@ export class StarbankFacadeService {
 
     await this.transactionService.transferFromMain(transferDto, actor);
 
-    // Update balance in game after successful transfer (non-blocking). The receiver can be
-    // another player's main account, so both sides are pushed.
+    // Mirror the new balance to the game (non-blocking); both sides, since the receiver
+    // can be another player's main account.
     try {
       const mainAccount = await this.getMainAccount(uuid);
       if (mainAccount) {
@@ -221,9 +221,7 @@ export class StarbankFacadeService {
       concept,
     );
 
-    // Mirror the new balance back to the game (non-blocking). Redundant when the
-    // game itself was the origin of the set, but correct when the set originated
-    // server-side; a no-op push when the values already agree.
+    // Mirror the new balance to the game (non-blocking); a no-op push when the values already agree.
     try {
       const mainAccount = await this.getMainAccount(uuid);
       if (mainAccount) {

@@ -22,11 +22,9 @@ export class PokemonMC {
 }
 
 /**
- * The claim response. Both keys sit at the ROOT — the route opts out of the
- * global `{success, statusCode, data}` envelope with `@SkipEnvelope()`.
- * `objetos` are chested; `pokemon` go to the party — the mod delivers them
- * differently, so they cannot share one list. `pokemon` is empty for item-only
- * sources (e.g. mine), so an old handler that reads only `objetos` still works.
+ * The claim response. Both keys sit at the root (the route uses `@SkipEnvelope()`).
+ * `objetos` are chested, `pokemon` go to the party — the mod delivers them differently.
+ * `pokemon` is empty for item-only sources, so an old handler reading only `objetos` still works.
  */
 export class ClaimCajaResponse {
   @ApiProperty({ type: [ObjetoMC] })
@@ -37,9 +35,8 @@ export class ClaimCajaResponse {
 }
 
 /**
- * A reservation: the same grant as a claim, plus the id the deliverer echoes back
- * to `confirm` once the items are in the player's hands. Nothing is spent yet —
- * `reservationId` is null exactly when both lists are empty (nothing was owed).
+ * A reservation: the same grant as a claim plus the id the deliverer echoes back to
+ * `confirm`. Nothing is spent yet; `reservationId` is null iff both lists are empty.
  */
 export class ReserveCajaResponse extends ClaimCajaResponse {
   @ApiProperty({

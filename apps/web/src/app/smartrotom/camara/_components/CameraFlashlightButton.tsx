@@ -40,10 +40,8 @@ export function CameraFlashlightButton() {
 
   const Icon = on ? Flashlight : FlashlightOff
 
-  // A viewfinder overlay control, not a design-system button: round and translucent
-  // over the camera feed, which neither DS's button gives (sr's is clipped and
-  // uppercase; Boffmedia's is another design system). `sr-accent-bright` is defined
-  // as `primary-hover`, so this is the same orange the sibling controls render.
+  // A viewfinder overlay control, not a DS button: round and translucent over the feed,
+  // which neither DS gives. `sr-accent-bright` = `primary-hover`, the sibling controls' orange.
   return (
     <button
       type="button"
