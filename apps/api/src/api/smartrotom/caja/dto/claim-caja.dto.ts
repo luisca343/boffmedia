@@ -54,3 +54,26 @@ export class ClaimCajaDto {
   @Type(() => Number)
   ids?: number[];
 }
+
+/**
+ * Finalizes a reservation after its items were delivered. Like `ClaimCajaDto`,
+ * deliberately not a `BaseDto` — the mod sends no `server` field and this route is
+ * on the `MinecraftMiddleware` exclude list.
+ */
+export class ConfirmCajaDto {
+  @ApiProperty({
+    description: 'The player, read by the mod off the connection — never supplied by the page.',
+    example: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4',
+  })
+  @IsNotEmpty()
+  @IsUUID()
+  uuid: string;
+
+  @ApiProperty({
+    description: 'The id returned by POST /caja/reserve for the grant that was just delivered.',
+    example: '9b7c1f2e-3d4a-4b5c-8e9f-0a1b2c3d4e5f',
+  })
+  @IsNotEmpty()
+  @IsUUID()
+  reservationId: string;
+}

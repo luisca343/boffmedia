@@ -174,6 +174,13 @@ export const smartRotomInventory = mysqlTable('rotom_inventory', {
     .$type<'common' | 'uncommon' | 'rare' | 'epic' | 'legendary'>()
     .default('common'),
   createdAt: timestamp('created_at').default(sql`CURRENT_TIMESTAMP()`),
+  // Two-phase caja delivery (DARCAJA.md §7). A row is *reserved* — soft-locked for
+  // an in-flight grant — when reservationId is set and it is not yet spent
+  // (amount > used). `confirm` turns a reservation into a spend; an unconfirmed
+  // reservation older than the TTL is reclaimable, so a lost delivery is not a lost
+  // reward. `used` alone stays the single-use gate — reservation never touches it.
+  reservationId: varchar('reservation_id', { length: 36 }),
+  reservedAt: timestamp('reserved_at'),
 });
 
 export type SmartRotomInventoryItem = typeof smartRotomInventory.$inferSelect;
