@@ -35,3 +35,27 @@ export class ClaimCajaResponse {
   @ApiProperty({ type: [PokemonMC] })
   pokemon: PokemonMC[];
 }
+
+/**
+ * A reservation: the same grant as a claim, plus the id the deliverer echoes back
+ * to `confirm` once the items are in the player's hands. Nothing is spent yet —
+ * `reservationId` is null exactly when both lists are empty (nothing was owed).
+ */
+export class ReserveCajaResponse extends ClaimCajaResponse {
+  @ApiProperty({
+    description:
+      'Opaque id to pass to POST /caja/confirm after delivery. Null when nothing was owed.',
+    nullable: true,
+    example: '9b7c1f2e-3d4a-4b5c-8e9f-0a1b2c3d4e5f',
+  })
+  reservationId: string | null;
+}
+
+/** The result of finalizing a reservation: how many ledger rows were spent (0 on replay). */
+export class ConfirmCajaResponse {
+  @ApiProperty({
+    description: 'Rows spent by this confirm. 0 means already confirmed, expired, or reclaimed.',
+    example: 2,
+  })
+  confirmed: number;
+}
