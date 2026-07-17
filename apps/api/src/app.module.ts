@@ -27,6 +27,7 @@ import { DocumentsModule } from '@api/smartrotom/documents/documents.module';
 import { ChatappModule } from '@api/smartrotom/chatapp/chatapp.module';
 import { SocketsModule } from './api/_utils/sockets/sockets.module';
 import { MisionesModule } from '@api/smartrotom/misiones/misiones.module';
+import { CajaModule } from '@api/smartrotom/caja/caja.module';
 import { SmartrotomModule } from '@api/smartrotom/_main/smartrotom.module';
 import { BattleModule } from './api/battlesimulator/battle/battle.module';
 import { SharexModule } from './api/boffmedia/util/sharex/sharex.module';
@@ -93,6 +94,7 @@ import { WigglypopModule } from '@api/smartrotom/wigglypop/wigglypop.module';
     ChatappModule,
     SocketsModule,
     MisionesModule,
+    CajaModule,
     BattleModule,
     SharexModule,
     ArcadeModule,
@@ -157,6 +159,9 @@ export class AppModule implements NestModule {
     consumer
       .apply(MinecraftMiddleware)
       .exclude(
+        // The mod authenticates with its Bearer token and sends no `server`
+        // field, so the tripwire middleware would 403 it before routing.
+        { path: 'smartrotom/caja/claim', method: RequestMethod.POST },
         { path: 'smartrotom/starbank/accounts', method: RequestMethod.POST },
         // Money routes guarded by GameOrUserAuthGuard own their own auth (JWT,
         // server key, or transitional tripwire) — the middleware would 403 the
