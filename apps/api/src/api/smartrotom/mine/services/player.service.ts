@@ -13,6 +13,10 @@ export interface PlayerHistory {
 }
 
 export interface ClaimResponse {
+  /** Only the items this call won. Grant from this, never from a client-side
+   *  view of what was unclaimed. Kept in sync with `entities/claim-response.entity.ts`,
+   *  which is what Swagger and `generate:shared` read. */
+  claimedItems: UnclaimedItem[];
   claimedIds: number[];
   totalClaimed: number;
   success: boolean;
@@ -96,22 +100,15 @@ export class PlayerService {
       throw new BadRequestException('UUID is required');
     }
 
-    const unclaimedItems = await this.mineRepository.findUnclaimedItems(uuid);
-
-    if (unclaimedItems.length === 0) {
-      return {
-        claimedIds: [],
-        totalClaimed: 0,
-        success: true,
-      };
-    }
-
-    const itemIds = unclaimedItems.map((item) => item.id);
-    await this.mineRepository.claimInventoryItems(itemIds);
+    // Claims and reports in one atomic step. Callers must grant from `claimedItems`
+    // and never from their own view of what was unclaimed: an empty list here means
+    // a concurrent claim already took the rows, and granting anyway duplicates items.
+    const claimedItems = await this.mineRepository.claimUnclaimedFor(uuid);
 
     return {
-      claimedIds: itemIds,
-      totalClaimed: unclaimedItems.length,
+      claimedItems,
+      claimedIds: claimedItems.map((item) => item.id),
+      totalClaimed: claimedItems.length,
       success: true,
     };
   }

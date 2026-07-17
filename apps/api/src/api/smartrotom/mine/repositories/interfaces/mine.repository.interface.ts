@@ -80,7 +80,9 @@ export interface IMineRepository {
   // Inventory operations
   createInventoryEntries(entries: InventoryEntry[]): Promise<void>;
   findUnclaimedItems(uuid: string): Promise<UnclaimedItem[]>;
-  claimInventoryItems(ids: number[]): Promise<void>;
+  /** Atomically claims this player's unclaimed 'mine' rows and returns only the
+   *  rows this caller actually won — an empty array means another claim took them. */
+  claimUnclaimedFor(uuid: string): Promise<UnclaimedItem[]>;
 
   // Statistics operations
   getPlayerStats(uuid: string): Promise<PlayerStatistics>;
