@@ -34,14 +34,17 @@ export const env = z
     MC_WORLD: z.string(),
     // Wingull plugin HTTP API base URL.
     WINGULL_API: z.string(),
-    // Shared secret the Minecraft plugin sends as `X-Server-Key` to authenticate
-    // server-to-server money/admin calls. Optional so dev/tests run without it;
-    // when unset, server-key auth is simply unavailable (JWT still works).
-    GAME_SERVER_SECRET: z.string().optional(),
+    // The Minecraft mod's opaque outbound token — must equal its
+    // `TerasConfig.apiToken`, which the mod sends as `Authorization: Bearer`
+    // only when that config value is non-empty (it defaults to ""). Authenticates
+    // server-to-server money/admin and item-grant calls. Optional so dev/tests run
+    // without it; when unset, server auth is unavailable and the mod is locked out
+    // (JWT still works). NOT a JWT — see GameOrUserAuthGuard.
+    TERAS_API_TOKEN: z.string().optional(),
     // Rollout flag for money/admin route auth. While false (default), the guard
-    // still accepts the legacy `body.server === MC_WORLD` tripwire so nothing
-    // breaks before the plugin ships `X-Server-Key`. Flip to true once the
-    // plugin update is deployed to require a JWT (web) or the server key (game).
+    // still accepts the legacy `body.server === MC_WORLD` tripwire so an
+    // un-migrated web keeps working. Flip to true once the web sends its JWT;
+    // the mod already sends its Bearer, so it needs no change.
     ENFORCE_MONEY_AUTH: z
       .enum(['true', 'false'])
       .default('false')
