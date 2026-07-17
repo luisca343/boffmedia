@@ -133,7 +133,8 @@ export class StarbankFacadeService {
 
     await this.transactionService.transferFromMain(transferDto, actor);
 
-    // Update balance in game after successful transfer (non-blocking)
+    // Update balance in game after successful transfer (non-blocking). The receiver can be
+    // another player's main account, so both sides are pushed.
     try {
       const mainAccount = await this.getMainAccount(uuid);
       if (mainAccount) {
@@ -141,6 +142,14 @@ export class StarbankFacadeService {
           balance: mainAccount.balance,
           type: AccountType.MAIN,
           uuid,
+        });
+      }
+      const toAccount = await this.getAccountInfo(to);
+      if (toAccount && toAccount.type === AccountType.MAIN && toAccount.uuid) {
+        await this.updateBalance({
+          balance: toAccount.balance,
+          type: toAccount.type,
+          uuid: toAccount.uuid,
         });
       }
     } catch (error: any) {
@@ -199,6 +208,39 @@ export class StarbankFacadeService {
         error.message,
       );
     }
+  }
+
+  async setBalance(
+    uuid: string,
+    balance: number,
+    concept: string,
+  ): Promise<{ balance: number; delta: number }> {
+    const result = await this.transactionService.setBalance(
+      uuid,
+      balance,
+      concept,
+    );
+
+    // Mirror the new balance back to the game (non-blocking). Redundant when the
+    // game itself was the origin of the set, but correct when the set originated
+    // server-side; a no-op push when the values already agree.
+    try {
+      const mainAccount = await this.getMainAccount(uuid);
+      if (mainAccount) {
+        await this.updateBalance({
+          balance: mainAccount.balance,
+          type: AccountType.MAIN,
+          uuid,
+        });
+      }
+    } catch (error: any) {
+      this.logger.warn(
+        `Failed to update balance in game after set for user ${uuid}, continuing anyway:`,
+        error.message,
+      );
+    }
+
+    return result;
   }
 
   async trainerDefeat(amount: number, uuid: string): Promise<void> {

@@ -178,6 +178,44 @@ export class StarbankTransactionService {
     }
   }
 
+  /**
+   * Set a user's main-account balance to an absolute target, ledgering the delta
+   * as an AJUSTE. Server-only (the mod's `setBalance`); the atomicity lives in
+   * the repository. Throws NotFound if the user has no main account, Conflict if
+   * the locked write fails.
+   */
+  async setBalance(
+    uuid: string,
+    balance: number,
+    concept: string,
+  ): Promise<{ balance: number; delta: number }> {
+    if (balance < 0) {
+      throw new BadRequestException({
+        message: 'Target balance must be non-negative',
+        userMessage: 'El saldo no puede ser negativo.',
+      });
+    }
+
+    const mainAccount = await this.accountRepository.findUserMainAccount(uuid);
+    if (!mainAccount) {
+      throw new NotFoundException('Main account not found');
+    }
+
+    const result = await this.transactionRepository.setBalance(
+      mainAccount.id,
+      balance,
+      concept,
+    );
+    if (!result.success) {
+      throw new ConflictException({
+        message: result.message || 'Set balance failed',
+        userMessage: 'No se pudo ajustar el saldo.',
+      });
+    }
+
+    return { balance: result.newBalance ?? balance, delta: result.delta ?? 0 };
+  }
+
   async processShopTransaction(
     shopDto: CreateShopTransactionDto,
   ): Promise<void> {

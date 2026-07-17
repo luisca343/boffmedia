@@ -107,6 +107,79 @@ export class StarbankTransactionRepository implements IStarbankTransactionReposi
     }
   }
 
+  async setBalance(
+    accountId: number,
+    targetBalance: number,
+    reason: string,
+  ): Promise<{
+    success: boolean;
+    message?: string;
+    delta?: number;
+    newBalance?: number;
+  }> {
+    if (accountId === 0) {
+      return { success: false, message: 'Cannot set the system account balance' };
+    }
+    if (targetBalance < 0) {
+      return { success: false, message: 'Target balance must be non-negative' };
+    }
+    try {
+      // Read-under-lock and write in one transaction: the FOR UPDATE row lock is
+      // held until commit, so a concurrent transfer cannot land between the read
+      // and the set and leave the balance off target. Mirrors `create`.
+      return await this.db.transaction(async (tx) => {
+        const rows = await tx
+          .select({
+            id: starBankAccounts.id,
+            balance: starBankAccounts.balance,
+          })
+          .from(starBankAccounts)
+          .where(eq(starBankAccounts.id, accountId))
+          .for('update');
+        const account = rows[0];
+        if (!account) {
+          return { success: false, message: 'Account not found' };
+        }
+
+        const current = account.balance ?? 0;
+        const delta = targetBalance - current;
+        if (delta === 0) {
+          // Nothing to correct — no ledger noise for a no-op set.
+          return { success: true, delta: 0, newBalance: current };
+        }
+
+        await tx
+          .update(starBankAccounts)
+          .set({ balance: targetBalance })
+          .where(eq(starBankAccounts.id, accountId));
+
+        // Ledger the correction as a system mint/burn. delta>0: the system (0)
+        // credits the account; delta<0: the account debits to the system. The
+        // account side records the post-set balance; the virtual system side 0.
+        const isMint = delta > 0;
+        await tx
+          .insert(starBankTransactions)
+          .values({
+            from: isMint ? 0 : accountId,
+            to: isMint ? accountId : 0,
+            amount: Math.abs(delta),
+            fromBalance: isMint ? 0 : targetBalance,
+            toBalance: isMint ? targetBalance : 0,
+            reason,
+            type: TransactionType.AJUSTE,
+            date: new Date().toISOString(),
+          })
+          .execute();
+
+        return { success: true, delta, newBalance: targetBalance };
+      });
+    } catch (error: any) {
+      // Rolled back — no partial change persisted.
+      this.logger.error('Failed to set balance:', error);
+      return { success: false, message: `Set balance failed: ${error.message}` };
+    }
+  }
+
   // Accounts owned by a user, as a subquery for IN (…) filters — the previous
   // implementations "filtered" by user with non-filtering joins, so the per-user
   // listings returned the whole bank's rows.

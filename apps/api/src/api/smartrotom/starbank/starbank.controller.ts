@@ -6,6 +6,7 @@ import {
   Post,
   Query,
   Req,
+  HttpCode,
   HttpStatus,
   UseGuards,
   UseInterceptors,
@@ -15,6 +16,7 @@ import {
 import { Request } from 'express';
 import { Public } from '@api/_utils/decorators/public.decorator';
 import { GameOrUserAuthGuard } from '@api/_utils/guards/game-or-user-auth.guard';
+import { GameServerAuthGuard } from '@api/_utils/guards/game-server-auth.guard';
 import { resolveActor } from '@api/_utils/auth/actor';
 import {
   ApiTags,
@@ -33,6 +35,7 @@ import { TrainerDefeatMoneyDto } from './dto/trainer-defeat-money.dto';
 import { CreateShopTransactionDto } from './dto/create-shop-transaction.dto';
 import { CreateTransferDto } from './dto/create-transfer.dto';
 import { TransferFromMainDto } from './dto/transfer-from-main.dto';
+import { SetBalanceDto } from './dto/set-balance.dto';
 
 // Import Entities
 import { StarBankAccount } from './entities/starbank-account.entity';
@@ -397,6 +400,43 @@ export class StarbankController {
     return await this.starbankFacadeService.trainerDefeat(
       trainerDto.money,
       trainerDto.uuid,
+    );
+  }
+
+  @Post('set-balance')
+  @UseGuards(GameServerAuthGuard)
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Set a user main-account balance to an absolute target (mod only)',
+    description:
+      "Sets the player's main-account balance to `balance`, atomically ledgering " +
+      'the signed delta as an AJUSTE against the system account. Mod-only: ' +
+      'authenticated by the server Bearer, no `server` field, on the middleware ' +
+      'exclude list. Mints/burns money, so it is never user-reachable.',
+  })
+  @ApiBody({ type: SetBalanceDto })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Balance set successfully.',
+    schema: {
+      type: 'object',
+      properties: {
+        balance: { type: 'number', example: 5000 },
+        delta: { type: 'number', example: -250 },
+      },
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'Main account not found.',
+  })
+  async setBalance(
+    @Body(ValidationPipe) dto: SetBalanceDto,
+  ): Promise<{ balance: number; delta: number }> {
+    return await this.starbankFacadeService.setBalance(
+      dto.uuid,
+      dto.balance,
+      dto.concept ?? '[AJUSTE] Ajuste de saldo',
     );
   }
 
