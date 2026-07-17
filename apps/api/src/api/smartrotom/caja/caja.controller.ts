@@ -38,7 +38,6 @@ export class CajaController {
   })
   @ApiResponse({ status: HttpStatus.OK, type: ClaimCajaResponse })
   async claim(@Body() body: ClaimCajaDto): Promise<ClaimCajaResponse> {
-    const objetos = await this.cajaService.claim(body.uuid, body.source);
-    return { objetos };
+    return await this.cajaService.claim(body.uuid, body.source, body.ids);
   }
 }

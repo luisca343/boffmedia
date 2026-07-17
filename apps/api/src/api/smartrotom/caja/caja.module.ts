@@ -8,6 +8,6 @@ import { CajaRepository } from './repositories/caja.repository';
   imports: [DrizzleModule],
   controllers: [CajaController],
   providers: [CajaService, CajaRepository],
-  exports: [CajaService],
+  exports: [CajaService, CajaRepository],
 })
 export class CajaModule {}

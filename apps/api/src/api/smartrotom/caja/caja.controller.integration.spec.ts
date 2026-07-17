@@ -38,37 +38,51 @@ describe('CajaController (integration)', () => {
 
   const UUID = '67d9b543-5ac9-41e1-a8a5-20d7689e24a4';
 
-  it('returns objetos at the ROOT, not under `data`', async () => {
-    // The mod parses `objetos` off the top level. If the global envelope ever
+  it('returns objetos and pokemon at the ROOT, not under `data`', async () => {
+    // The mod parses both keys off the top level. If the global envelope ever
     // reclaims this route, every claim silently grants nothing.
-    claim.mockResolvedValue([{ id: 'minecraft:diamond', cantidad: 5 }]);
+    claim.mockResolvedValue({
+      objetos: [{ id: 'minecraft:diamond', cantidad: 5 }],
+      pokemon: [{ spec: 'Incineroar lvl:50', cantidad: 1 }],
+    });
 
     const res = await request(app.getHttpServer())
       .post('/smartrotom/caja/claim')
-      .send({ uuid: UUID, source: 'mine' })
+      .send({ uuid: UUID, source: 'arcade' })
       .expect(200);
 
     expect(res.body.objetos).toEqual([{ id: 'minecraft:diamond', cantidad: 5 }]);
+    expect(res.body.pokemon).toEqual([{ spec: 'Incineroar lvl:50', cantidad: 1 }]);
     expect(res.body.data).toBeUndefined();
     expect(res.body.success).toBeUndefined();
   });
 
   it('accepts a body with no `server` field', async () => {
     // The mod sends none; the route is on the MinecraftMiddleware exclude list.
-    claim.mockResolvedValue([]);
+    claim.mockResolvedValue({ objetos: [], pokemon: [] });
     await request(app.getHttpServer())
       .post('/smartrotom/caja/claim')
       .send({ uuid: UUID, source: 'mine' })
       .expect(200);
   });
 
-  it('returns an empty list rather than an error when nothing is owed', async () => {
-    claim.mockResolvedValue([]);
+  it('passes an ids selector through to the service', async () => {
+    claim.mockResolvedValue({ objetos: [], pokemon: [] });
+    await request(app.getHttpServer())
+      .post('/smartrotom/caja/claim')
+      .send({ uuid: UUID, source: 'arcade', ids: [12, 13] })
+      .expect(200);
+    expect(claim).toHaveBeenCalledWith(UUID, 'arcade', [12, 13]);
+  });
+
+  it('returns empty channels rather than an error when nothing is owed', async () => {
+    claim.mockResolvedValue({ objetos: [], pokemon: [] });
     const res = await request(app.getHttpServer())
       .post('/smartrotom/caja/claim')
       .send({ uuid: UUID, source: 'arcade' })
       .expect(200);
     expect(res.body.objetos).toEqual([]);
+    expect(res.body.pokemon).toEqual([]);
   });
 
   it('rejects a claim with no source — there is no "everything owed"', async () => {
