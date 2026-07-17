@@ -14,7 +14,7 @@ import { WingullWorldService } from './services/wingull-world.service';
 import { UpdateDex } from './entities/update-dex.entity';
 import { UpdateBattleTeamDto } from './dto/battle-team.dto';
 import { MovePokemonDto } from './dto/move-pokemon.dto';
-import { UpdateNpcsDto } from './dto/update-npcs.dto';
+import { UpdateWingullNpcsDto } from './dto/update-npcs.dto';
 import { WingullBalanceDto } from './dto/wingull-balance.dto';
 import { GetBalanceDto } from './dto/get-balance.dto';
 import { MessageRequestDto } from './dto/message-request.dto';
@@ -370,8 +370,8 @@ export class WingullController {
     status: HttpStatus.INTERNAL_SERVER_ERROR,
     description: 'Failed to update NPCs.',
   })
-  @ApiBody({ description: 'Data to update NPCs', type: UpdateNpcsDto })
-  async updateNPCs(@Body() data: UpdateNpcsDto) {
+  @ApiBody({ description: 'Data to update NPCs', type: UpdateWingullNpcsDto })
+  async updateNPCs(@Body() data: UpdateWingullNpcsDto) {
     return await this.wingullFacadeService.updateNPCs(data);
   }
 
