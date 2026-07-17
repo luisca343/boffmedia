@@ -6,24 +6,30 @@ import {
 import { AuthGuard } from '@nestjs/passport';
 import { Request } from 'express';
 import { env } from '@/config/env';
+import { extractBearer, matchesServerToken } from '../auth/server-token';
 
 /**
  * Authenticates money/admin routes that are hit from two very different
- * callers:
+ * callers, both over `Authorization: Bearer`:
  *
- *  - The **web app** on behalf of a signed-in user → a Bearer JWT. On this path
- *    `req.user` is populated and downstream code MUST enforce ownership (a user
- *    may only move their own account's money).
- *  - The **Minecraft game server**, server-to-server → the shared secret in the
- *    `X-Server-Key` header (matched against `GAME_SERVER_SECRET`). On this path
+ *  - The **web app** on behalf of a signed-in user → a Bearer **JWT**. On this
+ *    path `req.user` is populated and downstream code MUST enforce ownership (a
+ *    user may only move their own account's money).
+ *  - The **Minecraft mod**, server-to-server → its **opaque** `apiToken`
+ *    (`TerasConfig.apiToken`), matched against `TERAS_API_TOKEN`. On this path
  *    `req.serverAuthed` is set and ownership checks are skipped (trusted).
  *
+ * The mod's token is checked *before* JWT verification because it is not a JWT:
+ * passport would reject it outright. The mod deliberately dropped the old
+ * `X-Server-Key` header in favour of this Bearer, keeping its outbound token
+ * distinct from the inbound one guarding its own HTTP API — so the API adopts
+ * the credential the mod actually sends rather than the reverse.
+ *
  * Rollout: while `ENFORCE_MONEY_AUTH` is false (default), a request carrying the
- * legacy `body.server === MC_WORLD` tripwire is still allowed, so the existing
- * (un-updated) plugin and web keep working. Flip the flag to true once the
- * plugin ships `X-Server-Key` and the web sends its JWT — then only the two
- * real credentials are accepted. See MinecraftMiddleware (not a security
- * boundary) for why the tripwire alone is insufficient.
+ * legacy `body.server === MC_WORLD` tripwire is still allowed, so an un-migrated
+ * web keeps working. Flip the flag to true once the web sends its JWT — then
+ * only the two real credentials are accepted. See MinecraftMiddleware (not a
+ * security boundary) for why the tripwire alone is insufficient.
  */
 @Injectable()
 export class GameOrUserAuthGuard extends AuthGuard('jwt') {
@@ -32,10 +38,11 @@ export class GameOrUserAuthGuard extends AuthGuard('jwt') {
       .switchToHttp()
       .getRequest<Request & { serverAuthed?: boolean }>();
 
-    // 1. Server-to-server: valid shared secret.
-    const secret = env.GAME_SERVER_SECRET;
-    const provided = req.headers['x-server-key'];
-    if (secret && typeof provided === 'string' && provided === secret) {
+    const bearer = extractBearer(req);
+
+    // 1. Server-to-server: the mod's opaque token. Must precede the JWT branch —
+    // it is not a JWT, so passport would reject it.
+    if (bearer && matchesServerToken(bearer)) {
       req.serverAuthed = true;
       return true;
     }
@@ -64,7 +71,7 @@ export class GameOrUserAuthGuard extends AuthGuard('jwt') {
 
     // 4. No credential.
     throw new UnauthorizedException(
-      'This action requires a signed-in user or a valid server key.',
+      'This action requires a signed-in user or a valid server token.',
     );
   }
 }
