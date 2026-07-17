@@ -12,11 +12,8 @@ export class CajaService {
   constructor(private readonly cajaRepository: CajaRepository) {}
 
   /**
-   * One-shot claim: spends and returns the grant in one step. The caller must
-   * deliver what it gets, because the reward is spent the moment this returns — a
-   * failed delivery is a lost reward. Prefer `reserve` + `confirm` for anything
-   * that can drop the connection mid-delivery (DARCAJA.md §7). Kept for callers
-   * that accept the one-shot contract.
+   * One-shot claim: spends and returns in one step, so the caller must deliver what it
+   * gets or the reward is lost. Prefer `reserve` + `confirm` when delivery can drop (DARCAJA.md §7).
    */
   async claim(
     uuid: string,
@@ -32,11 +29,9 @@ export class CajaService {
   }
 
   /**
-   * Phase one of a two-phase delivery: soft-locks what the player is owed and
-   * returns the grant plus a `reservationId`, WITHOUT spending it. The deliverer
-   * hands the items over, then calls `confirm(reservationId)`. If it never does,
-   * the reservation expires and the rows become claimable again — so a dropped
-   * delivery loses nothing. `reservationId` is null when nothing was owed.
+   * Phase one: soft-locks what the player is owed and returns the grant plus a
+   * `reservationId` without spending it. The deliverer then calls `confirm`; if it
+   * never does, the reservation expires and the rows free up. Null id when nothing was owed.
    */
   async reserve(
     uuid: string,
@@ -51,22 +46,13 @@ export class CajaService {
     return { reservationId, ...this.toGrant(rows) };
   }
 
-  /**
-   * Phase two: finalize a reservation once its items are delivered. Idempotent —
-   * a replay, or a confirm of an expired/already-claimed reservation, spends
-   * nothing and reports `confirmed: 0`.
-   */
+  /** Phase two: finalize a delivered reservation. Idempotent — a replay or expired reservation reports `confirmed: 0`. */
   async confirm(uuid: string, reservationId: string): Promise<ConfirmCajaResponse> {
     const confirmed = await this.cajaRepository.confirm(uuid, reservationId);
     return { confirmed };
   }
 
-  /**
-   * Splits spent/reserved rows into the two delivery channels: items go to
-   * `objetos` (chested), Pokémon to `pokemon` (party) — the deliverer handles them
-   * differently, so they cannot share one list. Both empty means nothing was owed,
-   * which is a valid outcome, not an error.
-   */
+  /** Splits rows into the two delivery channels: items → `objetos` (chested), Pokémon → `pokemon` (party). Both empty = nothing owed. */
   private toGrant(rows: ClaimedRow[]): ClaimCajaResponse {
     return {
       objetos: rows

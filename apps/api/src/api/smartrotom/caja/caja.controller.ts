@@ -17,19 +17,11 @@ export class CajaController {
   constructor(private readonly cajaService: CajaService) {}
 
   /**
-   * The mod's grant route. The backend — never the page — decides what a player
-   * receives, which is what makes a modified client unable to mint items.
-   *
-   * Three things this route depends on, each one load-bearing:
-   *  - `@Public()` bypasses the global JwtAuthGuard; `GameServerAuthGuard` then
-   *    accepts only the mod's opaque Bearer (`TERAS_API_TOKEN`). Deliberately NOT
-   *    `GameOrUserAuthGuard`: that one still honours the `body.server`/MC_WORLD
-   *    tripwire while `ENFORCE_MONEY_AUTH` is false, and MC_WORLD is public — on a
-   *    route that spends, that would let a stranger burn a player's rewards.
-   *  - `@SkipEnvelope()` keeps `objetos` at the response root. The mod parses it
-   *    from there; re-enveloping this route silently makes every claim grant nothing.
-   *  - It is on the `MinecraftMiddleware` exclude list in app.module.ts, because
-   *    the mod sends no `server` field. Without that it 403s before routing.
+   * The mod's grant route — the backend, never the page, decides what a player receives.
+   * Load-bearing decorators: `GameServerAuthGuard` accepts only the mod's Bearer (NOT
+   * `GameOrUserAuthGuard`, whose public MC_WORLD tripwire would let a stranger burn rewards);
+   * `@SkipEnvelope()` keeps `objetos` at the root the mod parses; and it is on the
+   * `MinecraftMiddleware` exclude list (app.module.ts) since the mod sends no `server` field.
    */
   @Post('claim')
   @Public()
@@ -49,11 +41,9 @@ export class CajaController {
   }
 
   /**
-   * Phase one of loss-safe delivery (DARCAJA.md §7). Soft-locks the grant and
-   * returns it with a `reservationId`, spending nothing. The mod delivers, then
-   * calls `confirm`. A reservation never confirmed expires and the rows free up, so
-   * a dropped connection between reserve and confirm loses no reward. Same auth,
-   * envelope and exclude-list rules as `claim` — see that handler.
+   * Phase one of loss-safe delivery (DARCAJA.md §7): soft-locks the grant and returns it
+   * with a `reservationId`, spending nothing. The mod delivers, then calls `confirm`; an
+   * unconfirmed reservation expires and frees up. Same auth/envelope/exclude rules as `claim`.
    */
   @Post('reserve')
   @Public()

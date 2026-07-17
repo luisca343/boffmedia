@@ -315,10 +315,7 @@ export class ArcadeController {
     return this.arcadeFacadeService.getLootboxConfig();
   }
 
-  // Claiming moved to MCEF: the page delivers via darCaja('arcade', ids), which
-  // routes through the mod to POST /smartrotom/caja/claim. The old HTTP path
-  // (POST /arcade/claim-items -> WINGULL_API give) is gone — the mod, not this
-  // API, reaches the player now.
+  // Claiming moved to MCEF: the page delivers via darCaja('arcade', ids) → mod → POST /smartrotom/caja/claim.
 
   /*
   @Post('inventory/claim-multiple')

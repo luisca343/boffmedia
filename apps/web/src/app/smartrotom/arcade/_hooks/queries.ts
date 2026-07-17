@@ -94,10 +94,8 @@ export function useClaimItems() {
   const uuid = useArcadeUuid()
   const qc = useQueryClient()
   return useMutation({
-    // Delivery goes through the game client (MCEF): darCaja routes the selected
-    // ids to the mod, which asks the backend what they are and gives them —
-    // items to the inventory, Pokémon to the party. The page never names a reward,
-    // and only works in-game (mcefQuery errors otherwise).
+    // Delivery goes through MCEF: darCaja routes the ids to the mod, which asks the
+    // backend what they are and gives them. Page never names a reward; in-game only.
     mutationFn: async (items: ArcadeInventoryItem[]) => {
       const res = await darCaja("arcade", items.map((i) => i.id))
       if (res.error || res.data?.status === "error") {
