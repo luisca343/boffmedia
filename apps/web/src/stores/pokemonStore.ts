@@ -11,8 +11,10 @@ interface PokemonState {
   error: string | null
   fetchingPokedex: boolean
   currentPokedexUuid: string | null
+  pokedexFetchedAt: number | null
   fetchPokedex: (uuid: string) => Promise<PokedexData | void>
   updatePokedexData: (newData: PokedexData) => void
+  invalidatePokedex: () => void
   fetchAllPokemon: () => Promise<void>
   getPokemonByDex: (dex: number) => Promise<Pokemon | undefined>
   getPokedexData: (uuid: string) => Promise<PokedexData | null>
@@ -20,6 +22,10 @@ interface PokemonState {
 
 // Store pending promises to avoid duplicate fetches
 const pendingFetches = new Map<string, Promise<PokedexData | void>>()
+
+// The app can stay open for hours in MCEF, so the snapshot must expire — the dex changes
+// server-side and an unbounded cache shows a caught Pokémon as a silhouette forever.
+const POKEDEX_TTL_MS = 30_000
 
 export const usePokemonStore = create<PokemonState>((set, get) => ({
   console: "PokemonStore initialized",
@@ -30,15 +36,20 @@ export const usePokemonStore = create<PokemonState>((set, get) => ({
   error: null,
   fetchingPokedex: false,
   currentPokedexUuid: null,
+  pokedexFetchedAt: null,
 
   fetchPokedex: async (uuid: string) => {
-    const { fetchingPokedex, currentPokedexUuid, pokedexData } = get()
-    
-    // If we already have data for this UUID, don't fetch again
-    if (pokedexData && currentPokedexUuid === uuid) {
-      return
+    const { fetchingPokedex, currentPokedexUuid, pokedexData, pokedexFetchedAt } = get()
+
+    if (
+      pokedexData &&
+      currentPokedexUuid === uuid &&
+      pokedexFetchedAt !== null &&
+      Date.now() - pokedexFetchedAt < POKEDEX_TTL_MS
+    ) {
+      return pokedexData
     }
-    
+
     // If there's already a fetch in progress for this UUID, wait for it
     if (pendingFetches.has(uuid)) {
       return pendingFetches.get(uuid)
@@ -63,11 +74,24 @@ export const usePokemonStore = create<PokemonState>((set, get) => ({
     
     const fetchPromise = PokemonService.getDetailedPokedexStatus(uuid)
       .then(response => {
-        set({ 
-          pokedexData: response.data, 
-          isLoading: false, 
+        // An HTTP error resolves to `{ success: false }` with no data; writing it through
+        // would blank a dex that was working.
+        if (response.success !== true || !response.data) {
+          set({
+            error: "Failed to fetch Pokedex data",
+            isLoading: false,
+            fetchingPokedex: false,
+          })
+          pendingFetches.delete(uuid)
+          return get().pokedexData ?? undefined
+        }
+
+        set({
+          pokedexData: response.data,
+          isLoading: false,
           fetchingPokedex: false,
-          currentPokedexUuid: uuid
+          currentPokedexUuid: uuid,
+          pokedexFetchedAt: Date.now()
         })
         pendingFetches.delete(uuid)
         return response.data
@@ -83,7 +107,12 @@ export const usePokemonStore = create<PokemonState>((set, get) => ({
   },
 
   updatePokedexData: (newData: PokedexData) => {
-    set({ pokedexData: newData })
+    set({ pokedexData: newData, pokedexFetchedAt: Date.now() })
+  },
+
+  // Marks the snapshot stale without clearing it, so the dex stays on screen until it reloads.
+  invalidatePokedex: () => {
+    set({ pokedexFetchedAt: null })
   },
 
   fetchAllPokemon: async () => {
@@ -129,20 +158,6 @@ export const usePokemonStore = create<PokemonState>((set, get) => ({
   },
 
   getPokedexData: async (uuid: string) => {
-    const { pokedexData, currentPokedexUuid } = get()
-    
-    // If we already have data for this UUID, return it
-    if (pokedexData && currentPokedexUuid === uuid) {
-      return pokedexData
-    }
-    
-    // If there's a pending fetch for this UUID, wait for it
-    if (pendingFetches.has(uuid)) {
-      const result = await pendingFetches.get(uuid)
-      return get().pokedexData
-    }
-    
-    // Start a new fetch
     await get().fetchPokedex(uuid)
     return get().pokedexData
   },

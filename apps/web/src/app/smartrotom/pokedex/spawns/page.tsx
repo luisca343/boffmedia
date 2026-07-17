@@ -1,15 +1,13 @@
 "use client"
 import { useEffect, useState } from "react"
-import Link from "next/link"
-import Image from "next/image"
 import { CompassIcon } from "lucide-react"
 import { getSpawns } from "@/services/mcef/mcefApi"
 import { usePokedexData } from "@/hooks/usePokedexData"
 import { PokedexStatus } from "../dexUtils"
-import { getSpriteUrl } from "@/utils/spriteUtils"
 import { ScreenShell } from "../_components/ScreenShell"
 import { PageHead, MetaStat } from "../_components/PageHead"
 import { StatusPill } from "../_components/ui"
+import { SpawnTile } from "../_components/SpawnTile"
 import { RARITY_META } from "../_utils/dexMeta"
 import type { PossibleSpawn } from "../_components/PossibleSpawns"
 
@@ -21,12 +19,6 @@ function classifyRarity(percentage: number): string {
   if (percentage <= 0.5) return "rare"
   if (percentage <= 2) return "uncommon"
   return "common"
-}
-
-function formatPercentage(pct: number): string {
-  if (pct <= 0.0009) return pct.toFixed(4)
-  if (pct <= 0.009) return pct.toFixed(3)
-  return pct.toFixed(2)
 }
 
 export default function SpawnsPage() {
@@ -136,31 +128,14 @@ export default function SpawnsPage() {
                 <span className="flex-1 h-px bg-white/[0.06]" />
               </div>
               <div className="grid grid-cols-[repeat(auto-fill,minmax(96px,1fr))] gap-2">
-                {items.map((s, i) => {
-                  const isNew = getPokemonStatus(s.dex, s.form || "base") === PokedexStatus.UNSEEN
-                  const spriteUrl = getSpriteUrl({ id: s.dex, form: s.form || "base", palette: s.palette || "none" })
-                  return (
-                    <div key={`${s.dex}-${s.form}-${i}`} className="rounded-[10px]" style={{ background: `radial-gradient(80px 60px at 50% 0%, ${meta.fg}, transparent 70%), rgba(255,255,255,0.025)` }}>
-                      <Link
-                        href={`/smartrotom/pokedex/entrada/${s.dex}/${s.form || "base"}`}
-                        className="relative border border-white/[0.06] rounded-[10px] p-2.5 flex flex-col items-center gap-1 text-pk-surface-100 hover:border-pk-primary-400/30 transition-colors"
-                      >
-                        {isNew && (
-                          <span className="absolute top-1.5 right-1.5 font-pk-mono text-[8px] font-bold tracking-widest px-1 py-px rounded" style={{ background: meta.fg, color: "#030609" }}>
-                            NUEVO
-                          </span>
-                        )}
-                        {spriteUrl && (
-                          <Image src={spriteUrl} alt={s.species} width={56} height={56} style={{ imageRendering: "pixelated", filter: "drop-shadow(0 3px 4px rgba(0,0,0,.3))" }} />
-                        )}
-                        <span className="text-[11px] font-medium text-pk-surface-200 text-center leading-tight">{s.species}</span>
-                        <span className="font-pk-mono text-[11px] tabular-nums font-semibold" style={{ color: meta.fg }}>
-                          {formatPercentage(s.percentage)}%
-                        </span>
-                      </Link>
-                    </div>
-                  )
-                })}
+                {items.map((s, i) => (
+                  <SpawnTile
+                    key={`${s.dex}-${s.form}-${i}`}
+                    spawn={s}
+                    accent={meta.fg}
+                    status={getPokemonStatus(s.dex, s.form || "base")}
+                  />
+                ))}
               </div>
             </div>
           )

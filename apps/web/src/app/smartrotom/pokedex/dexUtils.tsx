@@ -3,6 +3,7 @@ import type { Palette, Pokemon } from "@/types/Pokemon"
 import { usePokemonStore } from "@/stores/pokemonStore"
 import { PokemonService } from "@/services/api/smartrotom/pokemonService"
 import type { Pokemon as PokemonType } from "@/types/Pokemon"
+import type { DexStatus } from "./_utils/dexMeta"
 
 const SPRITES_BASE_URL = "/smartrotom/packs"
 const IMAGES_BASE_URL = "/smartrotom/img/sprites"
@@ -152,6 +153,13 @@ export enum PokedexStatus {
   SEEN = 1,
   CAUGHT = 2,
   SHINY = 3,
+}
+
+export const PILL_STATUS: Record<PokedexStatus, DexStatus> = {
+  [PokedexStatus.UNSEEN]: "unknown",
+  [PokedexStatus.SEEN]: "seen",
+  [PokedexStatus.CAUGHT]: "caught",
+  [PokedexStatus.SHINY]: "shiny",
 }
 
 export function getPokedexStatus(

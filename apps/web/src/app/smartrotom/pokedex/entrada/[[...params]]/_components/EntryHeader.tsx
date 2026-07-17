@@ -4,7 +4,8 @@ import Link from "next/link"
 import { useEffect, useRef, useState } from "react"
 import { PokemonSprite } from "../../../_components/PokemonSprite"
 import { ChevronLeftIcon, ChevronRightIcon, ArrowUpRightIcon, BookmarkIcon } from "lucide-react"
-import { getDisplayStatus, getPokemonNameAndForm } from "../../../dexUtils"
+import { getPokemonNameAndForm, PILL_STATUS, PokedexStatus } from "../../../dexUtils"
+import { usePokedexData } from "@/hooks/usePokedexData"
 import type { Pokemon } from "@/types/Pokemon"
 import { useTranslations } from "next-intl"
 import { TypeChip, StatusPill } from "../../../_components/ui"
@@ -38,7 +39,10 @@ export function EntryHeader({
 }) {
   const t = useTranslations("pokedex")
   const types = pokemon.forms[0]?.types as string[] | undefined
-  const isVisible = getDisplayStatus(pokemon.dex, formName, true)
+  // Subscribed, not read once: the dex usually lands after this renders.
+  const { getPokemonStatus } = usePokedexData()
+  const status = getPokemonStatus(pokemon.dex, formName)
+  const isVisible = status !== PokedexStatus.UNSEEN
   const [activeTab, setActiveTab] = useState<string>("info")
   const observerRef = useRef<IntersectionObserver | null>(null)
 
@@ -91,7 +95,7 @@ export function EntryHeader({
                 {types?.map((type) => (
                   <TypeChip key={type} type={type} size="md" />
                 ))}
-                <StatusPill status={isVisible ? "caught" : "unknown"} size="md" />
+                <StatusPill status={PILL_STATUS[status]} size="md" />
               </div>
             </div>
 
