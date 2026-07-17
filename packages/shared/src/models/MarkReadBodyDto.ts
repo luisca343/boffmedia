@@ -4,6 +4,10 @@
 /* eslint-disable */
 export type MarkReadBodyDto = {
     /**
+     * Server UUID (automatically added by middleware)
+     */
+    server?: string;
+    /**
      * User UUID
      */
     uuid: string;

@@ -4,6 +4,10 @@
 /* eslint-disable */
 export type AddInventoryItemDto = {
     /**
+     * Server UUID (automatically added by middleware)
+     */
+    server?: string;
+    /**
      * Player UUID
      */
     uuid: string;
