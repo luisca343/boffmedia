@@ -35,6 +35,7 @@ export function MinecraftFunctions(){
             quality: 90
         });
         if (result.success && result.image) {
+            sound('cameraShutter')
             addScreenshot(result.image, result.location, result.entities);
         } else {
             alert('Error taking screenshot: ' + result.error);
@@ -55,6 +56,7 @@ export function MinecraftFunctions(){
 
     return <>
         <audio id='dexOpen' src='/smartrotom/audio/apps/pokedex/openDex.mp3'></audio>
+        <audio id='cameraShutter' src='/smartrotom/audio/apps/camera/camera.mp3'></audio>
     </>
 }
 
