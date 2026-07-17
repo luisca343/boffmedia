@@ -1,46 +1,71 @@
 import { Minus, Plus } from "lucide-react"
 import { Button } from "@/components/ui/primitives/button"
-import { useEffect, useState } from "react"
-import { setZoomLevel, getZoomLevel } from "@/services/mcef/mcefApi"
+import { useEffect, useRef, useState } from "react"
+import { setZoomLevel, getZoomLevel, subscribeZoomChanged } from "@/services/mcef/mcefApi"
+
+// The level is the contract with the mod; the factor beside it is only the readout to
+// show before the mod answers. The mod's own factor replaces it as soon as it arrives.
+const ZOOM_LEVELS = [
+  { level: 0, factor: 1 },
+  { level: 1, factor: 1.5 },
+  { level: 2, factor: 2 },
+  { level: 3, factor: 3 },
+  { level: 4, factor: 4 },
+]
+
+const DEFAULT_LEVEL = 2
+
+const formatFactor = (factor: number) => `${Number(factor.toFixed(2))}x`
 
 interface CameraZoomSliderProps {
   onZoomChange?: (level: number) => void
 }
 
-// Zoom level presets matching Java: 0 = no zoom, 1 = 1.5x, 2 = 2x, 3 = 3x, 4 = 4x
-// Multipliers: [1.0, 0.67, 0.5, 0.33, 0.25]
-const ZOOM_LEVELS = [
-  { level: 0, label: "1x", multiplier: 1.0 },
-  { level: 1, label: "1.5x", multiplier: 0.67 },
-  { level: 2, label: "2x", multiplier: 0.5 },
-  { level: 3, label: "3x", multiplier: 0.33 },
-  { level: 4, label: "4x", multiplier: 0.25 },
-]
-
 export function CameraZoomSlider({ onZoomChange }: CameraZoomSliderProps) {
-  const [zoomLevel, setZoomLevelState] = useState(2) // Default to 2x zoom
+  const [zoomLevel, setZoomLevelState] = useState(DEFAULT_LEVEL)
+  const [factor, setFactor] = useState(ZOOM_LEVELS[DEFAULT_LEVEL].factor)
   const [isLoading, setIsLoading] = useState(false)
 
-  // Load initial zoom level from Minecraft
+  const onZoomChangeRef = useRef(onZoomChange)
+  onZoomChangeRef.current = onZoomChange
+
+  const applyLevel = (level: number, factor?: number) => {
+    setZoomLevelState(level)
+    setFactor(factor ?? ZOOM_LEVELS[level]?.factor ?? 1)
+  }
+
   useEffect(() => {
     const loadZoomLevel = async () => {
       const result = await getZoomLevel()
       if (result.success && result.level !== undefined) {
-        setZoomLevelState(result.level)
+        applyLevel(result.level, result.factor)
       }
     }
     loadZoomLevel()
   }, [])
 
+  // `+`/`-` in-game are a second source of truth; without this the readout drifts from the
+  // viewfinder the first time the player uses them. A set from this page pushes nothing,
+  // so there's no echo to guard against.
+  useEffect(() => {
+    return subscribeZoomChanged(({ level, factor }) => {
+      applyLevel(level, factor)
+      onZoomChangeRef.current?.(level)
+    })
+  }, [])
+
   const handleZoomChange = async (newLevel: number) => {
     if (isLoading) return
-    
+
     setIsLoading(true)
-    setZoomLevelState(newLevel)
-    
+    applyLevel(newLevel)
+
     // Update Minecraft zoom
-    await setZoomLevel(newLevel)
-    
+    const result = await setZoomLevel(newLevel)
+    if (result.success && result.level !== undefined) {
+      applyLevel(result.level, result.factor)
+    }
+
     onZoomChange?.(newLevel)
     setIsLoading(false)
   }
@@ -56,8 +81,6 @@ export function CameraZoomSlider({ onZoomChange }: CameraZoomSliderProps) {
       handleZoomChange(zoomLevel - 1)
     }
   }
-
-  const currentZoom = ZOOM_LEVELS[zoomLevel]
 
   return (
     <div className="flex items-center gap-2 bg-black/50 rounded-full px-3 py-2">
@@ -86,14 +109,14 @@ export function CameraZoomSlider({ onZoomChange }: CameraZoomSliderProps) {
               }`}
               onClick={() => handleZoomChange(zoom.level)}
               disabled={isLoading}
-              aria-label={`Set zoom to ${zoom.label}`}
+              aria-label={`Set zoom to ${formatFactor(zoom.factor)}`}
             />
           ))}
         </div>
 
         {/* Zoom level text */}
         <span className="text-sm font-medium text-white min-w-[32px] text-center">
-          {currentZoom.label}
+          {formatFactor(factor)}
         </span>
       </div>
 

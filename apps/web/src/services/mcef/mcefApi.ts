@@ -181,7 +181,7 @@ export async function takeScreenshot(
     image: string;
     location: LocationData;
     entities: DetectedEntity[];
-  }>('TAKE_SCREENSHOT', {
+  }>('takeScreenshot', {
     includeUI: options.includeUI ?? true,
     format: options.format ?? 'png',
     quality: options.quality ?? 90
@@ -213,16 +213,68 @@ export interface ZoomLevelResponse {
   error?: string;
 }
 
+export interface ZoomChangedDetail {
+  level: number;
+  factor: number;
+}
+
+export interface FlashlightResponse {
+  success: boolean;
+  /** The switch — what the page's button reflects. */
+  on?: boolean;
+  /** `on` AND the camera still in hand. The mod owns this; the page cannot derive it. */
+  active?: boolean;
+  error?: string;
+}
+
+export interface FlashlightChangedDetail {
+  on: boolean;
+}
+
+declare global {
+  interface WindowEventMap {
+    'teras:zoomchanged': CustomEvent<ZoomChangedDetail>;
+    'teras:flashlightchanged': CustomEvent<FlashlightChangedDetail>;
+  }
+}
+
+/**
+ * The mod pushes only for its own keybinds (`+`/`-`, `L`) — a set from this page fires
+ * nothing, since the page already knows. Without these subscriptions a keypress moves the
+ * viewfinder while the page's readout sits stale.
+ *
+ * The mod emits each change twice, as a `window.on*Changed` global AND this event. Take one
+ * or the other, never both, or every keypress lands twice.
+ */
+function subscribe<K extends 'teras:zoomchanged' | 'teras:flashlightchanged'>(
+  type: K,
+  handler: (detail: WindowEventMap[K]['detail']) => void
+): () => void {
+  const listener = (e: WindowEventMap[K]) => handler(e.detail);
+  window.addEventListener(type, listener);
+  return () => window.removeEventListener(type, listener);
+}
+
+/** @returns an unsubscribe function */
+export function subscribeZoomChanged(handler: (detail: ZoomChangedDetail) => void): () => void {
+  return subscribe('teras:zoomchanged', handler);
+}
+
+/** @returns an unsubscribe function */
+export function subscribeFlashlightChanged(handler: (detail: FlashlightChangedDetail) => void): () => void {
+  return subscribe('teras:flashlightchanged', handler);
+}
+
 /**
  * Gets the current zoom level from Minecraft
  * @returns Promise with the current zoom level (0-4)
  */
 export async function getZoomLevel(): Promise<ZoomLevelResponse> {
   const result = await mcefQuery<{
-    level: number;
-    multiplier: number;
-    factor: number;
-  }>('GET_ZOOM_LEVEL');
+    zoomLevel: number;
+    zoomMultiplier: number;
+    zoomFactor: number;
+  }>('getZoomLevel');
 
   if (result.error) {
     return {
@@ -233,9 +285,9 @@ export async function getZoomLevel(): Promise<ZoomLevelResponse> {
 
   return {
     success: true,
-    level: result.data?.level,
-    multiplier: result.data?.multiplier,
-    factor: result.data?.factor
+    level: result.data?.zoomLevel,
+    multiplier: result.data?.zoomMultiplier,
+    factor: result.data?.zoomFactor
   };
 }
 
@@ -324,11 +376,11 @@ export async function addWaypoint(params: AddWaypointParams): Promise<AddWaypoin
  * @returns Promise with the new zoom level
  */
 export async function setZoomLevel(level: number): Promise<ZoomLevelResponse> {
+  // No zoomMultiplier in this reply, unlike getZoomLevel's.
   const result = await mcefQuery<{
-    level: number;
-    multiplier: number;
-    factor: number;
-  }>('SET_ZOOM_LEVEL', { level });
+    zoomLevel: number;
+    zoomFactor: number;
+  }>('setZoomLevel', { level });
 
   if (result.error) {
     return {
@@ -339,8 +391,56 @@ export async function setZoomLevel(level: number): Promise<ZoomLevelResponse> {
 
   return {
     success: true,
-    level: result.data?.level,
-    multiplier: result.data?.multiplier,
-    factor: result.data?.factor
+    level: result.data?.zoomLevel,
+    factor: result.data?.zoomFactor
+  };
+}
+
+/**
+ * Gets the flashlight state from Minecraft
+ * @returns Promise with the switch (`on`) and whether it is actually lit (`active`)
+ */
+export async function getFlashlight(): Promise<FlashlightResponse> {
+  const result = await mcefQuery<{
+    on: boolean;
+    active: boolean;
+  }>('getFlashlight');
+
+  if (result.error) {
+    return {
+      success: false,
+      error: result.error
+    };
+  }
+
+  return {
+    success: true,
+    on: result.data?.on,
+    active: result.data?.active
+  };
+}
+
+/**
+ * Sets the flashlight switch in Minecraft
+ * @param on The switch. The light only actually lights if the camera is still in hand.
+ * @returns Promise with the resulting `on`/`active`
+ */
+export async function setFlashlight(on: boolean): Promise<FlashlightResponse> {
+  const result = await mcefQuery<{
+    on: boolean;
+    active: boolean;
+  }>('setFlashlight', { on });
+
+  if (result.error) {
+    return {
+      success: false,
+      error: result.error
+    };
+  }
+
+  return {
+    success: true,
+    on: result.data?.on,
+    active: result.data?.active
   };
 }
