@@ -3,6 +3,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import {
   IsNotEmpty,
   IsString,
+  IsUUID,
   IsArray,
   ArrayNotEmpty,
   ValidateNested,
@@ -16,7 +17,7 @@ export class ClaimItemsDto extends BaseDto {
     example: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4',
   })
   @IsNotEmpty()
-  @IsString()
+  @IsUUID()
   uuid: string;
 
   @ApiProperty({

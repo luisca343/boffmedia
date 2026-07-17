@@ -1,4 +1,9 @@
-import { Injectable, Inject } from '@nestjs/common';
+import {
+  Injectable,
+  Inject,
+  NotFoundException,
+  ConflictException,
+} from '@nestjs/common';
 import { MySql2Database } from 'drizzle-orm/mysql2';
 import { eq, and, asc, gt } from 'drizzle-orm';
 import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
@@ -151,97 +156,107 @@ export class ArcadeInventoryRepository
   ): Promise<ArcadeInventoryItem> {
     this.logger.log(`Consuming ${amount} of ${itemId} for ${uuid}`);
 
-    // Get all items matching this itemId for the user that have available quantity
-    const items = await this.db
-      .select()
-      .from(smartRotomInventory)
-      .where(
-        and(
-          eq(smartRotomInventory.uuid, uuid),
-          eq(smartRotomInventory.itemId, itemId),
-          gt(smartRotomInventory.amount, smartRotomInventory.used || 0),
-        ),
-      )
-      .orderBy(asc(smartRotomInventory.used), asc(smartRotomInventory.id));
+    return await this.db.transaction(async (tx) => {
+      // FOR UPDATE holds the rows for the whole spend: without it two concurrent
+      // claims both read used=0, both write the same total, and both deliver.
+      const items = await tx
+        .select()
+        .from(smartRotomInventory)
+        .where(
+          and(
+            eq(smartRotomInventory.uuid, uuid),
+            eq(smartRotomInventory.itemId, itemId),
+            gt(smartRotomInventory.amount, smartRotomInventory.used),
+          ),
+        )
+        .orderBy(asc(smartRotomInventory.used), asc(smartRotomInventory.id))
+        .for('update');
 
-    this.logger.log(`Found items for consumption:`, items);
+      this.logger.log(`Found items for consumption:`, items);
 
-    if (!items.length) {
-      throw new Error('Item not found or no available quantity');
-    }
+      if (!items.length) {
+        throw new NotFoundException('Item not found or no available quantity');
+      }
 
-    // Calculate total available quantity
-    const totalAvailable = items.reduce(
-      (total, item) => total + ((item.amount ?? 0) - (item.used ?? 0)),
-      0,
-    );
-
-    if (totalAvailable < amount) {
-      throw new Error(
-        `Insufficient quantity. Available: ${totalAvailable}, Requested: ${amount}`,
-      );
-    }
-
-    let remainingToConsume = amount;
-    let lastUpdatedItem: ArcadeInventoryItem | null = null;
-
-    // Consume items in order, updating multiple rows as needed
-    for (const item of items) {
-      if (remainingToConsume <= 0) break;
-
-      const availableInThisItem = (item.amount ?? 0) - (item.used ?? 0);
-      const toConsumeFromThisItem = Math.min(
-        remainingToConsume,
-        availableInThisItem,
+      const totalAvailable = items.reduce(
+        (total, item) => total + ((item.amount ?? 0) - (item.used ?? 0)),
+        0,
       );
 
-      if (toConsumeFromThisItem > 0) {
-        const newUsedCount = (item.used || 0) + toConsumeFromThisItem;
+      if (totalAvailable < amount) {
+        throw new ConflictException(
+          `Insufficient quantity. Available: ${totalAvailable}, Requested: ${amount}`,
+        );
+      }
 
-        this.logger.log(
-          `Updating item ${item.id}: used from ${item.used || 0} to ${newUsedCount}`,
+      let remainingToConsume = amount;
+      let lastUpdatedId: number | null = null;
+
+      for (const item of items) {
+        if (remainingToConsume <= 0) break;
+
+        const availableInThisItem = (item.amount ?? 0) - (item.used ?? 0);
+        const toConsumeFromThisItem = Math.min(
+          remainingToConsume,
+          availableInThisItem,
         );
 
-        // Update this specific row
-        await this.db
-          .update(smartRotomInventory)
-          .set({ used: newUsedCount } as SmartRotomInventoryItem)
-          .where(eq(smartRotomInventory.id, item.id));
+        if (toConsumeFromThisItem > 0) {
+          const newUsedCount = (item.used ?? 0) + toConsumeFromThisItem;
 
-        // Keep track of the last updated item to return
-        lastUpdatedItem = (await this.findById(item.id)) as ArcadeInventoryItem;
+          this.logger.log(
+            `Updating item ${item.id}: used from ${item.used ?? 0} to ${newUsedCount}`,
+          );
 
-        remainingToConsume -= toConsumeFromThisItem;
+          const [res] = await tx
+            .update(smartRotomInventory)
+            .set({ used: newUsedCount } as SmartRotomInventoryItem)
+            .where(
+              and(
+                eq(smartRotomInventory.id, item.id),
+                eq(smartRotomInventory.used, item.used ?? 0),
+              ),
+            );
+
+          if (res.affectedRows !== 1) {
+            throw new ConflictException(
+              'Inventory changed during the claim, please retry',
+            );
+          }
+
+          lastUpdatedId = item.id;
+          remainingToConsume -= toConsumeFromThisItem;
+        }
       }
-    }
 
-    if (!lastUpdatedItem) {
-      throw new Error('Failed to update any items');
-    }
+      if (lastUpdatedId === null) {
+        throw new ConflictException('Failed to update any items');
+      }
 
-    // Calculate total remaining after consumption
-    const updatedItems = await this.db
-      .select()
-      .from(smartRotomInventory)
-      .where(
-        and(
-          eq(smartRotomInventory.uuid, uuid),
-          eq(smartRotomInventory.itemId, itemId),
-        ),
+      const updatedItems = await tx
+        .select()
+        .from(smartRotomInventory)
+        .where(
+          and(
+            eq(smartRotomInventory.uuid, uuid),
+            eq(smartRotomInventory.itemId, itemId),
+          ),
+        );
+
+      const totalRemaining = updatedItems.reduce(
+        (total, item) => total + ((item.amount ?? 0) - (item.used ?? 0)),
+        0,
       );
 
-    const totalRemaining = updatedItems.reduce(
-      (total, item) => total + ((item.amount ?? 0) - (item.used ?? 0)),
-      0,
-    );
+      this.logger.log(
+        `Consumption complete. Total remaining: ${totalRemaining}`,
+      );
 
-    this.logger.log(`Consumption complete. Total remaining: ${totalRemaining}`);
-
-    // Return the last updated item with remaining amount information
-    return {
-      ...lastUpdatedItem,
-      remainingAmount: totalRemaining,
-    } as ArcadeInventoryItem;
+      return {
+        ...updatedItems.find((i) => i.id === lastUpdatedId),
+        remainingAmount: totalRemaining,
+      } as unknown as ArcadeInventoryItem;
+    });
   }
 
   async getTotalItems(uuid: string): Promise<number> {
