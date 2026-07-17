@@ -25,7 +25,6 @@ const mockFacade: jest.Mocked<Partial<ArcadeFacadeService>> = {
   openLootbox: jest.fn(),
   giveLootbox: jest.fn(),
   getLootboxConfig: jest.fn(),
-  claimItems: jest.fn(),
   getCompleteUserData: jest.fn(),
 };
 
@@ -403,47 +402,8 @@ describe('ArcadeController — integration (ValidationPipe + GlobalExceptionFilt
   // ==================== POST /smartrotom/arcade/claim-items ====================
 
   // ── POST /smartrotom/arcade/claim-items ────────────────────────────────
-  describe('POST /smartrotom/arcade/claim-items', () => {
-    it('returns 201 and delegates to facade.claimItems', async () => {
-      (mockFacade.claimItems! as jest.Mock).mockResolvedValue({
-        claimedItems: ['pixelmon:master_ball'],
-        failedItems: [],
-        pokemonItems: [],
-        regularItems: ['pixelmon:master_ball'],
-        success: true,
-        message: 'ok',
-      });
-
-      const res = await request(app.getHttpServer())
-        .post('/smartrotom/arcade/claim-items')
-        .send({
-          uuid: MOCK_UUID,
-          items: [
-            {
-              id: 1,
-              uuid: MOCK_UUID,
-              itemId: 'pixelmon:master_ball',
-              itemType: 'item',
-              amount: 1,
-              rarity: 'rare',
-              sourceType: 'lootbox',
-              used: 0,
-            },
-          ],
-        });
-
-      expect(res.status).toBe(201);
-      expect(mockFacade.claimItems).toHaveBeenCalled();
-    });
-
-    it('returns 400 when items array is empty', async () => {
-      const res = await request(app.getHttpServer())
-        .post('/smartrotom/arcade/claim-items')
-        .send({ uuid: MOCK_UUID, items: [] });
-
-      expect(res.status).toBe(400);
-    });
-  });
+  // POST /arcade/claim-items removed — arcade delivery now goes through MCEF
+  // (darCaja -> mod -> POST /smartrotom/caja/claim). See caja.controller spec.
 
   // ==================== GET /smartrotom/arcade/user/:uuid/complete-data ====================
 

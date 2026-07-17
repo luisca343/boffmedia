@@ -171,50 +171,13 @@ export function ClaimModal({ open, onClose, items }: ClaimModalProps) {
     >
       {result ? (
         <div className="flex flex-col gap-3">
-          <div className="flex flex-wrap gap-2">
-            <Tag tone="lime" size="lg">
-              <Icon.Shield s={14} /> {result.claimedItems.length} entregados
-            </Tag>
-            {result.pokemonItems.length > 0 && (
-              <Tag tone="violet" size="lg">
-                {result.pokemonItems.length} Pokémon
-              </Tag>
-            )}
-            {result.regularItems.length > 0 && (
-              <Tag tone="cyan" size="lg">
-                {result.regularItems.length} objetos
-              </Tag>
-            )}
-            {result.failedItems.length > 0 && (
-              <Tag tone="magenta" size="lg">
-                {result.failedItems.length} fallidos
-              </Tag>
-            )}
-          </div>
-
-          {result.message && (
-            <p className="rounded-[10px] border border-white/[.07] bg-black/40 p-3 font-ar-mono text-[11px] leading-relaxed text-ar-ink-dim">
-              {result.message}
-            </p>
-          )}
-
-          {result.failedItems.length > 0 && (
-            <div
-              role="alert"
-              className="rounded-[10px] border border-ar-danger/40 bg-ar-danger/[.08] p-3"
-            >
-              <div className="mb-1.5 font-ar-mono text-[10px] font-bold uppercase tracking-[0.18em] text-ar-danger">
-                No se pudieron entregar
-              </div>
-              <ul className="flex flex-wrap gap-1.5">
-                {result.failedItems.map((id) => (
-                  <li key={id} className="font-ar-mono text-[11px] text-ar-ink-dim">
-                    {getItemName(t, id)}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
+          <Tag tone="lime" size="lg">
+            <Icon.Shield s={14} /> Entregado en el juego
+          </Tag>
+          <p className="rounded-[10px] border border-white/[.07] bg-black/40 p-3 font-ar-mono text-[11px] leading-relaxed text-ar-ink-dim">
+            Los objetos llegaron a tu inventario y los Pokémon a tu equipo. Si tu equipo
+            estaba lleno, el Pokémon fue enviado a tu PC.
+          </p>
         </div>
       ) : claimable.length === 0 ? (
         <p className="py-8 text-center font-ar-mono text-[12px] text-ar-ink-muted">

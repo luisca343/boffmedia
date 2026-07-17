@@ -461,63 +461,6 @@ describe('ArcadeFacadeService', () => {
     });
   });
 
-  describe('claimItems', () => {
-    it('should claim valid items and return summary', async () => {
-      (inventoryService.consumeItem as jest.Mock).mockResolvedValue({
-        success: true,
-        item: mockInventoryItem,
-        consumed: 1,
-      });
-      (wingullFacadeService.giveItems as jest.Mock).mockResolvedValue(
-        undefined,
-      );
-
-      const result = await service.claimItems({
-        uuid: 'test-uuid',
-        items: [
-          {
-            id: 1,
-            uuid: 'test-uuid',
-            itemId: 'pokeball',
-            itemType: 'item',
-            amount: 1,
-            rarity: 'common' as any,
-            sourceType: 'manual',
-            used: 0,
-          },
-        ],
-      });
-
-      expect(result.success).toBe(true);
-      expect(result.claimedItems).toContain('pokeball');
-    });
-
-    it('should throw BadRequestException when uuid is missing', async () => {
-      await expect(
-        service.claimItems({
-          uuid: '',
-          items: [
-            {
-              id: 1,
-              uuid: 'u',
-              itemId: 'x',
-              itemType: 'item',
-              amount: 1,
-              rarity: 'common' as any,
-              sourceType: 'manual',
-              used: 0,
-            },
-          ],
-        }),
-      ).rejects.toThrow(BadRequestException);
-    });
-
-    it('should throw BadRequestException when items array is empty', async () => {
-      await expect(
-        service.claimItems({ uuid: 'test-uuid', items: [] }),
-      ).rejects.toThrow(BadRequestException);
-    });
-  });
 
   describe('getCompleteUserData', () => {
     it('should return streak, inventory and inventoryStats in parallel', async () => {
