@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { takeScreenshot } from "@/services/mcef/mcefApi"
+import { isMinecraft } from "@/services/mcef/mcefHelper"
 import { toast } from "react-toastify"
 import { useCameraGalleryStore } from "@/stores/cameraGalleryStore"
 import { CameraControls } from "./_components/CameraControls"
@@ -16,6 +17,15 @@ export default function CameraApp() {
   const [previewIndex, setPreviewIndex] = useState<number | null>(null)
   
   const { gallery, addScreenshot, removeScreenshot } = useCameraGalleryStore()
+
+  // Only in-game: outside MCEF there is no world to composite against, and a
+  // transparent page would leave the white controls on the browser's white canvas.
+  useEffect(() => {
+    if (!isMinecraft()) return
+    const root = document.documentElement
+    root.classList.add('mcef-transparent')
+    return () => root.classList.remove('mcef-transparent')
+  }, [])
 
   useEffect(() => {
     console.log('previewIndex changed to:', previewIndex)
@@ -107,12 +117,9 @@ export default function CameraApp() {
   }
 
   return (
-    <div className="flex flex-col h-full bg-black bg-opacity-20 text-white">
-      {/* Camera View Area */}
+    <div className="flex flex-col h-full text-white">
+      {/* Camera View Area — no paint of its own: the game shows through it */}
       <div className="flex-1 relative">
-        {/* Transparent background for camera view */}
-        <div className="absolute inset-0 bg-transparent"></div>
-
         {/* Gallery view */}
         {showGallery && (
           <GalleryView

@@ -15,7 +15,7 @@ export function CameraBottomControls({
   onCapture 
 }: CameraBottomControlsProps) {
   return (
-    <div className="h-24 bg-black flex items-center justify-between px-8">
+    <div className="h-24 bg-gradient-to-t from-black/60 to-transparent flex items-center justify-between px-8">
       <Button 
         variant="ghost" 
         size="icon" 

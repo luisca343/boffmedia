@@ -4,7 +4,8 @@ import { PokemonService } from "@/services/api/smartrotom/pokemonService"
 import Link from "next/link"
 import { useTranslations } from "next-intl"
 import { SearchIcon, BookOpenIcon } from "lucide-react"
-import { getDisplayStatus } from "../../../dexUtils"
+import { PokedexStatus } from "../../../dexUtils"
+import { usePokedexData } from "@/hooks/usePokedexData"
 import { PokemonSprite } from "../../../_components/PokemonSprite"
 import { HubSidebar } from "../../../_components/HubSidebar"
 
@@ -13,6 +14,8 @@ export default function PokemonList() {
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState("")
   const t = useTranslations("pokedex")
+  const { getPokemonStatus } = usePokedexData()
+  const isSeen = (dex: number) => getPokemonStatus(dex, "base") !== PokedexStatus.UNSEEN
 
   useEffect(() => {
     async function fetchPokemonList() {
@@ -34,7 +37,7 @@ export default function PokemonList() {
   }, [])
 
   const filteredPokemon = pokemonList.filter((pokemon) => {
-    const name = getDisplayStatus(pokemon.dex, "base", true) ? pokemon.name : "???"
+    const name = isSeen(pokemon.dex) ? pokemon.name : "???"
     return (
       name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       pokemon.dex.toString().includes(searchQuery) ||
@@ -102,7 +105,7 @@ export default function PokemonList() {
           {filteredPokemon.length > 0 ? (
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10 gap-2.5">
               {filteredPokemon.map((pokemon) => {
-                const isSeen = getDisplayStatus(pokemon.dex, "base", true)
+                const seen = isSeen(pokemon.dex)
                 return (
                   <Link href={`/smartrotom/pokedex/entrada/${pokemon.dex}`} key={pokemon.dex} className="block">
                     <div className="bg-white/[0.02] border border-white/[0.05] rounded-xl p-3 hover:bg-white/[0.04] hover:border-pk-primary-400/20 transition-all flex flex-col items-center group">
@@ -119,7 +122,7 @@ export default function PokemonList() {
                       <div className="text-center mt-1.5 w-full">
                         <div className="font-pk-mono text-[10px] text-pk-surface-500">#{pokemon.dex.toString().padStart(3, "0")}</div>
                         <div className="text-pk-surface-100 text-xs font-medium truncate w-full">
-                          {isSeen ? t(`pixelmon_${pokemon.name.toLowerCase()}`) || pokemon.name : "???"}
+                          {seen ? t(`pixelmon_${pokemon.name.toLowerCase()}`) || pokemon.name : "???"}
                         </div>
                       </div>
                     </div>

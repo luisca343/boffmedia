@@ -32,13 +32,26 @@ export async function openPC(): Promise<void> {
     }
 }
 
+/**
+ * Pixelmon's spawn specs pick the Sinistea/Polteageist variant with `palette:phony|authentic`,
+ * but the species data models it as the `phony`/`antique` forms and has no palette of either
+ * name. Passed through, the spawn reads "Sinistea Falsificado Genuino", keys the dex on the
+ * wrong form, and resolves to the phony sprite via the manifest's palette fallback.
+ */
+const SPEC_PALETTE_FORMS: Record<string, string> = { phony: 'phony', authentic: 'antique' };
+
+function normalizeSpawnVariant(spawn: PossibleSpawn): PossibleSpawn {
+    const form = SPEC_PALETTE_FORMS[spawn.palette];
+    return form ? { ...spawn, form, palette: 'none' } : spawn;
+}
+
 export async function getSpawns(): Promise<QueryResult<PossibleSpawn[]>> {
     const result = await mcefQuery<PossibleSpawn[]>('GET_SPAWNS');
     if (result.error) {
         return { data: getSpawnsPlaceholder, status: 200 } as QueryResult<PossibleSpawn[]>;
-    } 
-    
-    return result;
+    }
+
+    return { ...result, data: result.data?.map(normalizeSpawnVariant) };
 }
 
 export async function setCall(callData: CallData): Promise<QueryResult<any>> {

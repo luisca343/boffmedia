@@ -4,7 +4,8 @@ import type { Abilities, Pokemon } from "@/types/Pokemon"
 import Link from "next/link"
 import { useTranslations } from "next-intl"
 import { StarIcon, SparklesIcon } from "lucide-react"
-import { getDisplayStatus } from "../../../dexUtils"
+import { PokedexStatus } from "../../../dexUtils"
+import { usePokedexData } from "@/hooks/usePokedexData"
 
 function SubHead({ num, title }: { num: string; title: string }) {
   return (
@@ -20,7 +21,8 @@ function SubHead({ num, title }: { num: string; title: string }) {
 // The right column of the info grid: Descripción · Datos · Habilidades.
 export function BasicInfo({ pokemon, formIndex, formName }: { pokemon: Pokemon; formIndex: number; formName: string }) {
   const t = useTranslations("pokedex")
-  const isVisible = getDisplayStatus(pokemon.dex, formName, true)
+  const { getPokemonStatus } = usePokedexData()
+  const isVisible = getPokemonStatus(pokemon.dex, formName) !== PokedexStatus.UNSEEN
   const description = isVisible ? t(`pixelmon_${pokemon.name.toLowerCase()}_description`) : t("unknown_description")
   const abilities = (pokemon.forms[formIndex].abilities || pokemon.forms[0].abilities) as Abilities
 
