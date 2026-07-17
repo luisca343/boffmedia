@@ -1,7 +1,7 @@
 import { Flashlight, FlashlightOff } from "lucide-react"
-import { Button } from "@/components/ui/primitives/button"
 import { useEffect, useState } from "react"
 import { getFlashlight, setFlashlight, subscribeFlashlightChanged } from "@/services/mcef/mcefApi"
+import { cn } from "@/lib/utils"
 
 export function CameraFlashlightButton() {
   // The switch, not whether it's lit. The reply's `active` also requires the camera in
@@ -40,17 +40,26 @@ export function CameraFlashlightButton() {
 
   const Icon = on ? Flashlight : FlashlightOff
 
+  // A viewfinder overlay control, not a design-system button: round and translucent
+  // over the camera feed, which neither DS's button gives (sr's is clipped and
+  // uppercase; Boffmedia's is another design system). `sr-accent-bright` is defined
+  // as `primary-hover`, so this is the same orange the sibling controls render.
   return (
-    <Button
-      variant="ghost"
-      size="icon"
-      className={`rounded-full ${on ? 'bg-white/50' : 'bg-black/50'}`}
+    <button
+      type="button"
       onClick={toggle}
       disabled={isLoading}
       title={on ? 'Turn flashlight off' : 'Turn flashlight on'}
       aria-pressed={on}
+      className={cn(
+        "inline-flex h-10 w-10 items-center justify-center rounded-full",
+        "text-sr-accent-bright transition-colors duration-200",
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sr-accent",
+        "disabled:pointer-events-none disabled:opacity-50 disabled:cursor-not-allowed",
+        on ? 'bg-white/50' : 'bg-black/50',
+      )}
     >
       <Icon className="h-6 w-6" />
-    </Button>
+    </button>
   )
 }

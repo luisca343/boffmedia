@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import { takeScreenshot } from "@/services/mcef/mcefApi"
 import { isMinecraft } from "@/services/mcef/mcefHelper"
 import { toast } from "react-toastify"
+import { useAudio } from "@/hooks/useAudio"
 import { useCameraGalleryStore } from "@/stores/cameraGalleryStore"
 import { CameraControls } from "./_components/CameraControls"
 import { CameraBottomControls } from "./_components/CameraBottomControls"
@@ -17,6 +18,7 @@ export default function CameraApp() {
   const [previewIndex, setPreviewIndex] = useState<number | null>(null)
   
   const { gallery, addScreenshot, removeScreenshot } = useCameraGalleryStore()
+  const shutter = useAudio('/smartrotom/audio/apps/camera/camera.mp3')
 
   // Only in-game: outside MCEF there is no world to composite against, and a
   // transparent page would leave the white controls on the browser's white canvas.
@@ -66,6 +68,7 @@ export default function CameraApp() {
       })
 
       if (result.success && result.image) {
+        shutter.play()
         addScreenshot(result.image, result.location, result.entities)
         toast.success('Screenshot saved to gallery')
       } else {
