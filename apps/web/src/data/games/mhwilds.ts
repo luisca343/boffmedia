@@ -73,7 +73,7 @@ export const mhwilds: GameEntry = {
             fallbackIcon: "paw",
             fallbackIconColor: "text-warning-hover",
             color: "from-warning-hover to-rose-600",
-            features: ["weaknesses", "drops", "locations"],
+            features: ["weaknesses", "materials", "locations"],
             featured: false,
             isNew: true,
             popularity: "medium",
