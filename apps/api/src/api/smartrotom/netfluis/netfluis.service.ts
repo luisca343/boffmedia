@@ -1,16 +1,10 @@
-import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
-import { MySql2Database } from 'drizzle-orm/mysql2';
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import * as path from 'path';
 import { promises as fsPromises } from 'fs';
 
-// LEGACY_DIRECT_DB: pre-dates the repository rule; extract a repository when next touched
+// Reads the netfluis series folder from disk — no database access.
 @Injectable()
 export class NetfluisService {
-  constructor(
-    @Inject(DRIZZLE) private db: MySql2Database<Record<string, never>>,
-  ) {}
-
   async test() {
     const dir = path.join(__dirname, '../../../', 'public/netfluis/series/');
     const files = await this.readFolder(dir);

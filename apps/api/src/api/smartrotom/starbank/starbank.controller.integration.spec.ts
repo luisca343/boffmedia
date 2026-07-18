@@ -8,6 +8,7 @@ import { StarbankFacadeService } from './starbank.facade.service';
 import { GlobalExceptionFilter } from '@/common/filters/global-exception.filter';
 import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
 import { GameOrUserAuthGuard } from '@api/_utils/guards/game-or-user-auth.guard';
+import { GameServerTransitionalAuthGuard } from '@api/_utils/guards/game-server-transitional-auth.guard';
 import { Reflector } from '@nestjs/core';
 
 const mockLogger = {
@@ -46,9 +47,12 @@ describe('StarbankController — integration (ValidationPipe + GlobalExceptionFi
         Reflector,
       ],
     })
-      // The transfer routes are guarded by GameOrUserAuthGuard (JWT/server-key);
-      // this suite exercises validation + envelope, so let the guard through.
+      // The money routes are guarded (transfer/accounts by GameOrUserAuthGuard;
+      // shop/trainerdefeat by GameServerTransitionalAuthGuard). This suite
+      // exercises validation + envelope, so let both guards through.
       .overrideGuard(GameOrUserAuthGuard)
+      .useValue({ canActivate: () => true })
+      .overrideGuard(GameServerTransitionalAuthGuard)
       .useValue({ canActivate: () => true })
       .compile();
 

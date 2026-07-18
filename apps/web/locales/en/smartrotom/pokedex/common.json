@@ -156,6 +156,8 @@
         "nature_bashful": "Bashful",
         "nature_calm": "Calm",
         "nature_gentle": "Gentle",
-        "nature_careful": "Careful"
+        "nature_careful": "Careful",
+        "evolution_ticking": " ",
+        "item_amulet_coin": "Amulet Coin"
     }
 }

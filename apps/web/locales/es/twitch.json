@@ -45,6 +45,7 @@
             "createdAt": "Creado el",
             "creator": "Creador",
             "notFound": "Clip no encontrado",
+            "publishedAt": "Publicado el",
             "loading": "Cargando clip..."
         },
         "video": {
@@ -72,31 +73,5 @@
             "game": "Cargando juego...",
             "history": "Cargando historial..."
         }
-                },
-                "video": {
-                    "views": "vistas",
-                    "duration": "Duración",
-                    "publishedAt": "Publicado el",
-                    "notFound": "Video no encontrado",
-                    "loading": "Cargando video..."
-                },
-                "clip": {
-                    "views": "vistas",
-                    "duration": "Duración",
-                    "createdAt": "Creado el",
-                    "creator": "Creador",
-                    "notFound": "Clip no encontrado",
-                    "publishedAt": "Publicado el",
-                    "loading": "Cargando clip..."
-                },
-                "game": {
-                    "notFound": "Juego no encontrado",
-                    "loading": "Cargando juego..."
-                },
-                "loading": {
-                    "clip": "Cargando clip...",
-                    "game": "Cargando juego...",
-                    "stream": "Cargando stream...",
-                    "user": "Cargando usuario..."
     }
 }

@@ -10,7 +10,8 @@ const MARKER = "LEGACY_DIRECT_DB";
 const INJECT_DRIZZLE = "@Inject(DRIZZLE)";
 
 // Lower this — never raise it — as services are migrated to repositories.
-const LEGACY_BASELINE = 14;
+// 2026-07-18: player + netfluis dropped (they never used DRIZZLE), 14 → 12.
+const LEGACY_BASELINE = 12;
 
 const SKIP_DIRS = new Set(["node_modules", "dist", ".next", "generated"]);
 

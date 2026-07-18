@@ -1829,6 +1829,7 @@
     "attack_g-max_one_blow_description": "A Dark-type attack that Gigantamax Urshifu use. This single-strike move can ignore Max Guard.",
     "attack_g-max_rapid_flow": "G-Max Rapid Flow",
     "attack_g-max_rapid_flow_description": "A Water-type attack that Gigantamax Urshifu use. This rapid-strike move can ignore Max Guard.",
-    "attack_expanding_force_onpsychicterrain": "Expanding Force's range was increased due to the terrain type!"
+    "attack_expanding_force_onpsychicterrain": "Expanding Force's range was increased due to the terrain type!",
+    "levelUpMoves": "Level"
   }
 }

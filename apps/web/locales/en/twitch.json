@@ -60,13 +60,18 @@
             "loading": "Loading user..."
         },
         "history": {
+            "title": "Twitch History",
+            "empty": "No watch history yet",
+            "emptySubtext": "The streams, videos and clips you watch will appear here.",
             "loading": "Loading history..."
         },
         "loading": {
-            "clip": "Loading clip...",
-            "game": "Loading game...",
             "stream": "Loading stream...",
-            "user": "Loading user..."
+            "user": "Loading user...",
+            "clip": "Loading clip...",
+            "video": "Loading video...",
+            "game": "Loading game...",
+            "history": "Loading history..."
         }
     }
 }
