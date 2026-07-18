@@ -7,12 +7,14 @@ import { ConsolaHero } from "../../_components/admin/ConsolaHero"
 import { MCText } from "../../_components/admin/MCText"
 import { VozCreator } from "../../_components/admin/VozCreator"
 import { useMegafonia, useSendMegafonia } from "../../_hooks/queries"
+import { useOfficer } from "../../_hooks/useOfficer"
 import { fmtDateTime } from "../../_utils/format"
 
 export default function MegafoniaPage() {
   const { speakers, isLoading: speakersLoading, refetch: refetchSpeakers } = useGetArceuSpeak()
   const { data: history, isLoading: historyLoading } = useMegafonia()
   const sendMegafonia = useSendMegafonia()
+  const officer = useOfficer()
 
   const [speakerValue, setSpeakerValue] = useState("")
   const [msg, setMsg] = useState("")
@@ -27,9 +29,14 @@ export default function MegafoniaPage() {
     (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
   )
 
+  // `byUuid` is required and @IsUUID(): with no linked Minecraft account useOfficer()
+  // returns "", which the API rejects — block the send instead of round-tripping a 400.
   const send = () => {
-    if (!msg.trim() || !speakerValue || sendMegafonia.isPending) return
-    sendMegafonia.mutate({ speaker: speakerValue, text: msg.trim() }, { onSuccess: () => setMsg("") })
+    if (!msg.trim() || !speakerValue || !officer.uuid || sendMegafonia.isPending) return
+    sendMegafonia.mutate(
+      { speaker: speakerValue, text: msg.trim(), byUuid: officer.uuid },
+      { onSuccess: () => setMsg("") },
+    )
   }
 
   const handleCreated = async (value: string) => {
@@ -97,7 +104,7 @@ export default function MegafoniaPage() {
             <Button
               icon="send"
               className="w-full"
-              disabled={!msg.trim() || !speakerValue || sendMegafonia.isPending}
+              disabled={!msg.trim() || !speakerValue || !officer.uuid || sendMegafonia.isPending}
               onClick={send}
             >
               {sendMegafonia.isPending ? "Transmitiendo…" : "Enviar al servidor"}

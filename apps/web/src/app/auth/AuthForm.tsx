@@ -54,7 +54,7 @@ export function AuthForm({ redirect = '/', url = 'boffmedia', message= ''}: { ur
             password: values.password,
           }
         )
-        if (response.statusCode === 200) {
+        if (response.success) {
           router.push('/auth?mode=login&message=Registration successful. Please log in.')
         } else {
           setFormError(response.error || 'No se pudo completar el registro')

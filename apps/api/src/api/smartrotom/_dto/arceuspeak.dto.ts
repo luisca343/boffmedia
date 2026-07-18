@@ -1,7 +1,8 @@
 import { IsString, IsNotEmpty } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import { BaseDto } from '@api/_utils/dto/base.dto';
 
-export class ArceusspeakDto {
+export class ArceusspeakDto extends BaseDto {
   @ApiProperty()
   @IsString()
   @IsNotEmpty()

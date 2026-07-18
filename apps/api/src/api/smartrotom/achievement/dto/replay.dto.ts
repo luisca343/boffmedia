@@ -92,7 +92,7 @@ export class CreateUserReplayDto extends BaseDto {
   side: number;
 }
 
-export class GetReplayDto {
+export class GetReplayDto extends BaseDto {
   @ApiProperty({
     description: 'Player UUID',
     example: '007d1a64-661c-4396-8844-e27856f2ddfa',

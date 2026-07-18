@@ -4,6 +4,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { GobiernoService } from "@/services/api/smartrotom/gobiernoService"
 import { userMessageFrom } from "@/services/boffAPI"
 import { toast } from "../_components/ui"
+import { useOfficer } from "./useOfficer"
 import type {
   Anuncio,
   Apelacion,
@@ -275,11 +276,15 @@ export const usePayMulta = () =>
     success: (m) => `Multa ${m.code} pagada a la Tesorería`,
   })
 
-export const useCancelMulta = () =>
-  useGobMutation<number, Multa>((id) => GobiernoService.cancelMulta(id).then(normalizeMulta), {
-    keys: [["gob", "multas"]],
-    success: (m) => `Multa ${m.code} anulada`,
-  })
+// CancelMultaDto requires actorUuid — inject it here rather than at the call site so a
+// page can't omit it (which is exactly how this shipped 400ing).
+export const useCancelMulta = () => {
+  const officer = useOfficer()
+  return useGobMutation<number, Multa>(
+    (id) => GobiernoService.cancelMulta(id, officer.uuid).then(normalizeMulta),
+    { keys: [["gob", "multas"]], success: (m) => `Multa ${m.code} anulada` },
+  )
+}
 
 export const useCreateBuscado = () =>
   useGobMutation<unknown, Buscado>((b) => GobiernoService.createBuscado(b).then(normalizeBuscado), {
@@ -435,7 +440,7 @@ export const useUpsertNpcSkin = () =>
   })
 
 export const useSendMegafonia = () =>
-  useGobMutation<{ speaker: string; text: string }, unknown>((b) => GobiernoService.sendMegafonia(b), {
+  useGobMutation<{ speaker: string; text: string; byUuid: string }, unknown>((b) => GobiernoService.sendMegafonia(b), {
     keys: [["gob", "megafonia"]],
     success: () => "Mensaje emitido al servidor",
   })

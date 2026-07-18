@@ -347,6 +347,24 @@ export async function rotomDELETE<T>(url: string, data?: any): Promise<ApiRespon
   });
 }
 
+// Authed PUT/PATCH/DELETE mirror rotomAuthedPOST: routes carrying their own
+// JwtAuthGuard (gobierno/*, news admin) 401 without the Bearer. `server` rides
+// along so the same helper works on routes still behind MinecraftMiddleware.
+export async function rotomAuthedPUT<T>(url: string, data: any): Promise<ApiResponse<T>> {
+  return authedRequest<T>("PUT", `${getApiUrl()}/smartrotom${url}`, await sessionToken(), { ...data, server: getServer() });
+}
+
+export async function rotomAuthedPATCH<T>(url: string, data: any): Promise<ApiResponse<T>> {
+  return authedRequest<T>("PATCH", `${getApiUrl()}/smartrotom${url}`, await sessionToken(), { ...data, server: getServer() });
+}
+
+export async function rotomAuthedDELETE<T>(url: string, data?: any): Promise<ApiResponse<T>> {
+  return authedRequest<T>("DELETE", `${getApiUrl()}/smartrotom${url}`, await sessionToken(), {
+    ...(data ?? {}),
+    server: getServer(),
+  });
+}
+
 export async function wingullPOST<T>(url: string, data: any): Promise<ApiResponse<T>> {
   return apiPOST<T>(`/wingull${url}`, data);
 }
@@ -383,6 +401,18 @@ export async function rotomPATCHOrThrow<T>(url: string, data: any): Promise<T> {
 
 export async function rotomDELETEOrThrow<T = void>(url: string, data?: any): Promise<T> {
   return orThrow(rotomDELETE<T>(url, data));
+}
+
+export async function rotomAuthedPUTOrThrow<T>(url: string, data: any): Promise<T> {
+  return orThrow(rotomAuthedPUT<T>(url, data));
+}
+
+export async function rotomAuthedPATCHOrThrow<T>(url: string, data: any): Promise<T> {
+  return orThrow(rotomAuthedPATCH<T>(url, data));
+}
+
+export async function rotomAuthedDELETEOrThrow<T = void>(url: string, data?: any): Promise<T> {
+  return orThrow(rotomAuthedDELETE<T>(url, data));
 }
 
 export async function rotomMultipartPOSTOrThrow<T>(

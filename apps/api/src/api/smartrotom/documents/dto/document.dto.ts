@@ -204,7 +204,7 @@ export class CreateVersionDto extends BaseDto {
   authorUuid?: string;
 }
 
-export class GetUserDocumentsDto {
+export class GetUserDocumentsDto extends BaseDto {
   @ApiProperty({
     description: 'User UUID',
     example: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4',
