@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { userMessageFrom } from "@/services/boffAPI"
 import { Avatar, Button, CharRing, Icon, MAX_CHARS, Modal, toast } from "./ui"
@@ -22,6 +23,7 @@ import { useCreatePost, useMe } from "../_hooks/queries"
  * docs/smartrotom/deferred/README.md.
  */
 export function ComposeModal() {
+  const t = useTranslations("rooker")
   const { open, replyTo, close } = useComposeStore()
   const { data: me } = useMe()
   const create = useCreatePost()
@@ -58,27 +60,27 @@ export function ComposeModal() {
       {
         onSuccess: () => {
           close()
-          toast(replyTo ? "Tu respuesta se publicó." : "Tu trino se publicó en el nido.")
+          toast(replyTo ? t("toast.replyPublished") : t("toast.postPublished"))
         },
-        onError: (err) => toast(userMessageFrom(err, "No se pudo publicar.")),
+        onError: (err) => toast(userMessageFrom(err, t("toast.publishFailed"))),
       },
     )
   }
 
   return (
-    <Modal open={open} onClose={close} label={replyTo ? "Responder" : "Crear trino"}>
+    <Modal open={open} onClose={close} label={replyTo ? t("compose.dialogTitle.reply") : t("compose.dialogTitle.new")}>
       <div className="flex items-center justify-between border-b border-rk-line px-3.5 py-3">
         <button
           type="button"
           onClick={close}
-          aria-label="Cerrar"
+          aria-label={t("common.close")}
           className="grid h-8 w-8 place-items-center rounded-full text-rk-fg transition-colors hover:bg-rk-hover"
         >
           <Icon name="close" size={20} />
         </button>
         {replyTo?.handle && (
           <span className="text-[13.5px] text-rk-fg-subtle">
-            Respondiendo a <span className="text-rk-accent">@{replyTo.handle}</span>
+            {t("compose.replyingToPrefix")} <span className="text-rk-accent">@{replyTo.handle}</span>
           </span>
         )}
         <span className="w-8" />
@@ -103,7 +105,7 @@ export function ComposeModal() {
                 if ((e.metaKey || e.ctrlKey) && e.key === "Enter") submit()
               }}
               rows={3}
-              placeholder={replyTo ? "Trina tu respuesta…" : "¿Qué está trinando?"}
+              placeholder={replyTo ? t("compose.placeholder.reply") : t("compose.placeholder.new")}
               className="w-full resize-none bg-transparent text-[19px] leading-snug text-rk-fg outline-none placeholder:text-rk-fg-subtle"
             />
 
@@ -111,8 +113,8 @@ export function ComposeModal() {
               <input
                 value={mediaUrl}
                 onChange={(e) => setMediaUrl(e.target.value)}
-                placeholder="Pega el enlace de tu captura de pantalla…"
-                aria-label="Enlace de la imagen"
+                placeholder={t("compose.mediaPlaceholder")}
+                aria-label={t("compose.mediaAriaLabel")}
                 className="mt-2 w-full rounded-rk-md border border-rk-line-strong bg-rk-card px-3 py-2 text-[14px] text-rk-fg outline-none focus:border-rk-accent"
               />
             )}
@@ -124,7 +126,7 @@ export function ComposeModal() {
         <button
           type="button"
           onClick={() => setShowMedia((v) => !v)}
-          aria-label="Adjuntar imagen"
+          aria-label={t("compose.attachImageAriaLabel")}
           aria-pressed={showMedia}
           className={cn(
             "grid h-[34px] w-[34px] place-items-center rounded-full transition-colors hover:bg-rk-accent/12",
@@ -137,7 +139,7 @@ export function ComposeModal() {
         <div className="flex items-center gap-3">
           {text.length > 0 && <CharRing count={text.length} />}
           <Button intent="accent" onClick={submit} disabled={blocked}>
-            {create.isPending ? "Publicando…" : replyTo ? "Responder" : "Trinar"}
+            {create.isPending ? t("compose.pending") : replyTo ? t("post.actions.reply") : t("compose.submit")}
           </Button>
         </div>
       </div>

@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation"
 import { use } from "react"
+import { useTranslations } from "next-intl"
 import { userMessageFrom } from "@/services/boffAPI"
 import { fmt, timeAgo } from "../../_utils/format"
 import { useListings, useSeller, useToggleWatch, useWatchlist } from "../../_hooks/queries"
@@ -26,6 +27,7 @@ import {
  * whole point of the page: it is what makes a good rating mean something.
  */
 export default function SellerPage({ params }: { params: Promise<{ uuid: string }> }) {
+  const t = useTranslations("wigglypop")
   const { uuid } = use(params)
   const router = useRouter()
 
@@ -45,8 +47,8 @@ export default function SellerPage({ params }: { params: Promise<{ uuid: string 
     return (
       <EmptyState
         icon="alert"
-        title="Vendedor no encontrado"
-        body={userMessageFrom(error, "Inténtalo de nuevo en unos segundos.")}
+        title={t("vendedor.notFoundTitle")}
+        body={userMessageFrom(error, t("common.retryFallback"))}
       />
     )
 
@@ -55,7 +57,7 @@ export default function SellerPage({ params }: { params: Promise<{ uuid: string 
       <div className="flex-none px-[30px] pt-3.5">
         <Button variant="ghost" onClick={() => router.back()}>
           <Icon name="arrowL" size={16} />
-          Volver
+          {t("common.back")}
         </Button>
       </div>
 
@@ -74,13 +76,13 @@ export default function SellerPage({ params }: { params: Promise<{ uuid: string 
                   <Stars value={seller.rating} size={15} />
                   {seller.rating === null ? (
                     <span className="font-wp text-[13px] font-semibold text-wp-fg-subtle">
-                      Vendedor nuevo · aún sin valoraciones
+                      {t("vendedor.newSellerNoRatings")}
                     </span>
                   ) : (
                     <>
                       <span className="wp-num font-wp text-wp-fg">{seller.rating.toFixed(2)}</span>
                       <span className="font-wp text-[13px] font-semibold text-wp-fg-subtle">
-                        · <span className="wp-num">{fmt(seller.reviews)}</span> reseñas
+                        · <span className="wp-num">{fmt(seller.reviews)}</span> {t("vendedor.reviewsSuffix")}
                       </span>
                     </>
                   )}
@@ -89,17 +91,17 @@ export default function SellerPage({ params }: { params: Promise<{ uuid: string 
             </Panel>
 
             <div className="mt-4 grid grid-cols-3 gap-3">
-              <Stat k="Valoración" v={seller.rating === null ? "—" : seller.rating.toFixed(2)} icon="star" />
-              <Stat k="Ventas" v={fmt(seller.sales)} icon="cart" />
-              <Stat k="Reseñas" v={fmt(seller.reviews)} icon="users" />
+              <Stat k={t("vendedor.statRating")} v={seller.rating === null ? "—" : seller.rating.toFixed(2)} icon="star" />
+              <Stat k={t("vendedor.statSales")} v={fmt(seller.sales)} icon="cart" />
+              <Stat k={t("vendedor.statReviews")} v={fmt(seller.reviews)} icon="users" />
             </div>
 
             <DividerLabel className="my-6">
-              {listings.length} {listings.length === 1 ? "anuncio activo" : "anuncios activos"}
+              {t("vendedor.activeListingsCount", { count: listings.length })}
             </DividerLabel>
 
             {listings.length === 0 ? (
-              <EmptyState icon="tag" title="Este vendedor no tiene anuncios activos" />
+              <EmptyState icon="tag" title={t("vendedor.noActiveListings")} />
             ) : (
               <div className="grid grid-cols-[repeat(auto-fill,minmax(190px,1fr))] gap-3.5">
                 {listings.map((L) => (
@@ -115,13 +117,13 @@ export default function SellerPage({ params }: { params: Promise<{ uuid: string 
               </div>
             )}
 
-            <DividerLabel className="my-6">Reseñas</DividerLabel>
+            <DividerLabel className="my-6">{t("vendedor.reviewsHeading")}</DividerLabel>
 
             {reviews.length === 0 ? (
               <EmptyState
                 icon="users"
-                title="Todavía no hay reseñas"
-                body="Las reseñas se escriben tras completar una compra."
+                title={t("vendedor.noReviewsTitle")}
+                body={t("vendedor.noReviewsBody")}
               />
             ) : (
               <div className="grid gap-3 md:grid-cols-2">
@@ -129,7 +131,7 @@ export default function SellerPage({ params }: { params: Promise<{ uuid: string 
                   <Panel key={r.id} className="p-4">
                     <div className="mb-2 flex items-center gap-2">
                       <span className="font-wp text-[13px] font-bold text-wp-fg">
-                        {r.reviewer?.username ?? "Entrenador"}
+                        {r.reviewer?.username ?? t("common.defaultUsername")}
                       </span>
                       <span className="ml-auto">
                         <Stars value={r.rating} size={12} />

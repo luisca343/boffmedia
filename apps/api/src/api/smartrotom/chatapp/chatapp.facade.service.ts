@@ -1,4 +1,9 @@
-import { Injectable, Inject, forwardRef } from '@nestjs/common';
+import {
+  Injectable,
+  Inject,
+  forwardRef,
+  HttpException,
+} from '@nestjs/common';
 import { ChatService, CreateChatRequest } from './services/chat.service';
 import { MessageService } from './services/message.service';
 import { GroupService } from './services/group.service';
@@ -283,6 +288,7 @@ export class ChatappFacadeService {
       return callSession;
     } catch (error: any) {
       this.logger.error(`Error initiating call in chat ${chatId}:`, error);
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to initiate call: ${error.message}`);
     }
   }

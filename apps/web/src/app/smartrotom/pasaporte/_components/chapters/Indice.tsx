@@ -1,5 +1,6 @@
 // PAPER.
 
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import type { RailChapter } from "../ChapterRail"
 import { PageHead } from "../ui"
@@ -16,9 +17,10 @@ export function Indice({
   chapters: (RailChapter & { deep: string })[]
   onFlip: (page: number) => void
 }) {
+  const t = useTranslations("pasaporte")
   return (
     <>
-      <PageHead eyebrow="Contenido" title="Índice" />
+      <PageHead eyebrow={t("indice.eyebrow")} title={t("indice.title")} />
 
       <div className="flex flex-col gap-0.5">
         {chapters.map((c) => (

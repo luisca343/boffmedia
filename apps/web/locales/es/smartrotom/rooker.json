@@ -1,0 +1,273 @@
+{
+  "rooker": {
+    "common": {
+      "close": "Cerrar",
+      "back": "Volver",
+      "retry": "Reintentar",
+      "loadingPosts": "Cargando trinos",
+      "whoToFollow": "A quién seguir",
+      "followedEveryone": "Ya sigues a todo el nido.",
+      "trendingInNest": "Tendencia en el nido",
+      "postsCount": "{formatted} {count, plural, one {trino} other {trinos}}",
+      "loginRequiredTitle": "Inicia sesión",
+      "verifiedTrainer": "Entrenador verificado",
+      "follow": {
+        "follow": "Seguir",
+        "following": "Siguiendo"
+      }
+    },
+    "format": {
+      "now": "ahora",
+      "minutes": "{count} min",
+      "hours": "{count} h",
+      "days": "{count} d",
+      "thousand": "{value} mil",
+      "million": "{value} M",
+      "joined": "Se unió en {date}"
+    },
+    "reactions": {
+      "heart": "Me gusta",
+      "pokeball": "¡Captura!",
+      "choque": "Choque",
+      "shiny": "Shiny",
+      "fuego": "Fueguito",
+      "remove": "Quitar {reaction}",
+      "trayLabel": "Reacciones"
+    },
+    "avatar": {
+      "profileOfAriaLabel": "Perfil de {username}"
+    },
+    "shell": {
+      "homeAriaLabel": "Rooker · Inicio",
+      "yourProfileAriaLabel": "Tu perfil",
+      "composeFabAriaLabel": "Crear trino",
+      "nav": {
+        "inicio": "Inicio",
+        "explorar": "Explorar",
+        "notificaciones": "Notificaciones",
+        "mensajes": "Mensajes",
+        "vitrina": "Vitrina",
+        "perfil": "Perfil"
+      }
+    },
+    "display": {
+      "title": "Pantalla",
+      "modalLabel": "Ajustes de pantalla",
+      "rows": {
+        "background": "Fondo",
+        "accent": "Color de acento",
+        "font": "Tipografía",
+        "density": "Densidad",
+        "cardStyle": "Estilo de trino",
+        "reactions": "Reacciones"
+      },
+      "background": {
+        "lightHint": "Estás en modo claro. El claro y el oscuro se eligen en Ajustes → Temas, para todo SmartRotom.",
+        "darkHint": "Elige qué tan oscuro. El cambio a claro se hace en Ajustes → Temas.",
+        "options": { "dim": "Tenue", "lightsout": "Oscuro" }
+      },
+      "accents": {
+        "azul": "Azul",
+        "amarillo": "Amarillo",
+        "rosa": "Rosa",
+        "morado": "Morado",
+        "naranja": "Naranja",
+        "verde": "Verde"
+      },
+      "font": {
+        "options": { "sistema": "Sistema", "chirp": "Chirp" }
+      },
+      "density": {
+        "options": { "comodo": "Cómodo", "compacto": "Compacto" }
+      },
+      "cardStyle": {
+        "options": { "plano": "Plano", "tarjeta": "Tarjeta" }
+      },
+      "reactionsSetting": {
+        "options": { "expresivas": "Expresivas", "simple": "Solo me gusta" },
+        "hint": "Con «Solo me gusta» desaparece la bandeja de cinco reacciones y el botón se comporta como un me gusta normal."
+      }
+    },
+    "compose": {
+      "attachImageAriaLabel": "Adjuntar imagen",
+      "submit": "Trinar",
+      "pending": "Publicando…",
+      "inlinePlaceholder": "¿Qué está trinando, {name}?",
+      "dialogTitle": { "reply": "Responder", "new": "Crear trino" },
+      "replyingToPrefix": "Respondiendo a",
+      "placeholder": {
+        "reply": "Trina tu respuesta…",
+        "new": "¿Qué está trinando?"
+      },
+      "mediaPlaceholder": "Pega el enlace de tu captura de pantalla…",
+      "mediaAriaLabel": "Enlace de la imagen",
+      "charCountAriaLabel": "{count} de {max}"
+    },
+    "toast": {
+      "postPublished": "Tu trino se publicó en el nido.",
+      "replyPublished": "Tu respuesta se publicó.",
+      "publishFailed": "No se pudo publicar.",
+      "profileUpdated": "Perfil actualizado.",
+      "handleTaken": "Ese handle ya está cogido.",
+      "profileSaveFailed": "No se pudo guardar el perfil."
+    },
+    "feed": {
+      "tabs": { "paraTi": "Para ti", "siguiendo": "Siguiendo" },
+      "endOfFeed": "Has llegado al fondo del nido.",
+      "error": {
+        "title": "El nido no responde",
+        "fallbackBody": "Inténtalo de nuevo en unos segundos."
+      },
+      "emptyFollowing": {
+        "title": "Tu nido está en silencio",
+        "body": "Aquí aparecerán los trinos de los entrenadores que sigas. Todavía no sigues a nadie que haya trinado."
+      },
+      "emptyForYou": {
+        "title": "El nido está vacío",
+        "bodyLoggedIn": "Nadie ha trinado todavía. Sé el primero: cuenta una captura, reta a alguien o simplemente saluda.",
+        "bodyLoggedOut": "Todavía no hay trinos. Inicia sesión para escribir el primero.",
+        "cta": "Escribir el primer trino"
+      }
+    },
+    "search": {
+      "trendsTitle": "Tendencias en el nido",
+      "trendsEmpty": "Todavía no hay tendencias. Las #etiquetas de los trinos de los últimos siete días aparecen aquí.",
+      "resultsUsersTitle": "Entrenadores",
+      "resultsTagsTitle": "Etiquetas",
+      "resultsPostsTitle": "Trinos",
+      "noResults": {
+        "title": "Sin resultados para «{term}»",
+        "body": "Prueba con el nombre de un entrenador, una #etiqueta o una palabra suelta."
+      }
+    },
+    "searchBar": {
+      "ariaLabel": "Buscar en el nido",
+      "placeholder": "Buscar entrenadores, Pokémon, #etiquetas…",
+      "clearAriaLabel": "Limpiar"
+    },
+    "rightRail": {
+      "trendsTitle": "Tendencias",
+      "trendsEmpty": "Todavía no hay tendencias. Usa una #etiqueta en tu próximo trino y aparecerá aquí.",
+      "footer": "Rooker · parte del ecosistema BoffMedia · SmartRotom"
+    },
+    "messages": {
+      "title": "Mensajes",
+      "subtitle": "Tus conversaciones de ChatApp",
+      "openChatApp": "Abrir ChatApp",
+      "loggedOutBody": "Tus conversaciones aparecerán aquí.",
+      "fallbackUsername": "Entrenador",
+      "noMessagesYet": "Sin mensajes todavía",
+      "loadError": "No se pudieron cargar los mensajes",
+      "empty": {
+        "title": "Sin conversaciones",
+        "body": "Los mensajes directos del servidor viven en ChatApp. Empieza una conversación allí y la verás aquí."
+      }
+    },
+    "notifications": {
+      "title": "Notificaciones",
+      "loggedOutBody": "Aquí verás quién responde, reacciona y te sigue.",
+      "empty": {
+        "title": "Nada por aquí todavía",
+        "body": "Cuando alguien responda, reaccione o te siga, te avisaremos."
+      }
+    },
+    "vitrina": {
+      "title": "Vitrina Pokédex",
+      "loggedOutBody": "Tu colección aparecerá aquí.",
+      "loadError": "No se pudo cargar la vitrina",
+      "filters": { "all": "Todos", "shiny": "Shiny" },
+      "registeredCount": "{species} de {total} registrados",
+      "liveDexCount": "Pokédex viva · {count, plural, one {# shiny} other {# shinies}}",
+      "emptyShiny": {
+        "title": "Ningún shiny todavía",
+        "body": "Cuando registres tu primer shiny en el juego, brillará aquí."
+      },
+      "emptyAll": {
+        "title": "Tu vitrina está vacía",
+        "body": "Captura Pokémon en el servidor y aparecerán en tu vitrina automáticamente."
+      }
+    },
+    "profile": {
+      "title": "Perfil",
+      "notFound": {
+        "title": "@{handle} no está en el nido",
+        "body": "Puede que el nombre esté mal escrito, o que este entrenador aún no tenga perfil."
+      },
+      "sendMessageAriaLabel": "Enviar mensaje",
+      "stats": { "captures": "CAPTURAS", "battles": "COMBATES", "shinies": "SHINIES", "dex": "POKÉDEX" },
+      "vitrinaTitle": "Vitrina",
+      "viewCollection": "Ver colección →",
+      "tabs": { "trinos": "Trinos", "capturas": "Capturas", "combates": "Combates", "media": "Media" },
+      "countsFollowing": "Siguiendo",
+      "countsFollowers": "Seguidores",
+      "noPosts": {
+        "title": "Nada por aquí",
+        "bodyMe": "Todavía no has trinado en esta categoría.",
+        "bodyOther": "@{handle} todavía no ha trinado en esta categoría."
+      }
+    },
+    "editProfile": {
+      "title": "Editar perfil",
+      "saveButton": "Guardar",
+      "saving": "Guardando…",
+      "fields": {
+        "handle": {
+          "label": "Handle",
+          "error": "Entre 3 y 32 caracteres: minúsculas, números y guion bajo."
+        },
+        "displayName": { "label": "Nombre" },
+        "bio": { "label": "Bio" },
+        "link": { "label": "Enlace", "placeholder": "https://…" },
+        "partner": {
+          "label": "Pokémon compañero",
+          "hint": "Solo puedes elegir entre los que has capturado de verdad.",
+          "empty": "Todavía no has registrado ninguna captura. Captura un Pokémon en el servidor y podrás elegirlo aquí."
+        }
+      }
+    },
+    "post": {
+      "title": "Trino",
+      "notFound": {
+        "title": "Este trino ya no está",
+        "fallbackBody": "Puede que su autor lo haya borrado."
+      },
+      "pinnedBy": "Fijado por el nido",
+      "retrinoedBy": "@{handle} retrinó",
+      "actions": {
+        "reply": "Responder",
+        "retrino": "Retrinar",
+        "undoRetrino": "Deshacer retrino",
+        "save": "Guardar",
+        "unsave": "Quitar de guardados"
+      },
+      "stats": { "retrinos": "Retrinos", "replies": "Respuestas" },
+      "replyPrompt": "Responde a @{handle}…",
+      "noReplies": {
+        "title": "Sin respuestas todavía",
+        "body": "Sé quien empiece la conversación."
+      }
+    },
+    "dexTile": {
+      "notCaught": "No capturado"
+    },
+    "card": {
+      "capture": {
+        "badge": "Captura",
+        "shinyBadge": "★ Shiny",
+        "registeredOn": "Registrado el {date}"
+      },
+      "battle": {
+        "undecided": "SIN DECIDIR",
+        "victory": "VICTORIA",
+        "defeat": "DERROTA",
+        "vs": "vs",
+        "rival": "Rival",
+        "viewReplay": "Ver repetición"
+      },
+      "media": {
+        "unavailable": "La imagen ya no está disponible",
+        "alt": "Adjunto del trino"
+      }
+    }
+  }
+}

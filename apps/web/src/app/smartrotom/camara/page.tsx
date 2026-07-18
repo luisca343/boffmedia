@@ -30,12 +30,6 @@ export default function CameraApp() {
   }, [])
 
   useEffect(() => {
-    console.log('previewIndex changed to:', previewIndex)
-    console.log('Gallery length:', gallery.length)
-    console.log('Dialog should be open:', previewIndex !== null)
-  }, [previewIndex, gallery.length])
-
-  useEffect(() => {
     function onKey(e: KeyboardEvent) {
       if (e.key === 'Escape') return setPreviewIndex(null)
       if (previewIndex === null) return
@@ -83,7 +77,6 @@ export default function CameraApp() {
   }
 
   const handleImageClick = (index: number) => {
-    console.log('handleImageClick called with index:', index)
     setPreviewIndex(index)
   }
 
@@ -115,10 +108,6 @@ export default function CameraApp() {
     }
   }
 
-  const handleZoomChange = (level: number) => {
-    console.log('Zoom level changed to:', level)
-  }
-
   return (
     <div className="flex flex-col h-full text-white">
       {/* Camera View Area — no paint of its own: the game shows through it */}
@@ -137,7 +126,6 @@ export default function CameraApp() {
         <CameraControls
           includeUI={includeUI}
           onToggleUI={() => setIncludeUI(!includeUI)}
-          onZoomChange={handleZoomChange}
         />
       </div>
 

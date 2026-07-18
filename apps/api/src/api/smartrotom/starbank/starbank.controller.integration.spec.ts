@@ -266,7 +266,7 @@ describe('StarbankController — integration (ValidationPipe + GlobalExceptionFi
       uuid: 'player-uuid',
       npcName: 'ShopKeeper',
       itemName: 'Potion',
-      operation: 'buy',
+      operation: 'COMPRA',
       unitPrice: 50,
       count: 3,
     };
@@ -296,6 +296,28 @@ describe('StarbankController — integration (ValidationPipe + GlobalExceptionFi
         .send(body);
 
       expect(res.status).toBe(400);
+    });
+
+    // The service treats any non-COMPRA value as VENTA, which mints money to the player.
+    it.each(['buy', 'compra', 'SELL', ''])(
+      'returns 400 for operation %p — only COMPRA/VENTA are accepted',
+      async (operation) => {
+        const res = await request(app.getHttpServer())
+          .post('/smartrotom/starbank/shop')
+          .send({ ...validBody, operation });
+
+        expect(res.status).toBe(400);
+      },
+    );
+
+    it('accepts VENTA', async () => {
+      mockFacade.shop.mockResolvedValue(undefined);
+
+      const res = await request(app.getHttpServer())
+        .post('/smartrotom/starbank/shop')
+        .send({ ...validBody, operation: 'VENTA' });
+
+      expect(res.status).toBeLessThan(300);
     });
 
     it('calls facade.shop when body is valid', async () => {

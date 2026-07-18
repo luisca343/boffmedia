@@ -14,6 +14,14 @@ import { REACTIONS, applyReaction, type ReactionType } from "@/app/smartrotom/ro
 import { Sample, Section } from "../showcase-shared"
 import { RK_DEMO_REACTIONS } from "./rk-demo"
 
+const REACTION_LABEL: Record<ReactionType, string> = {
+  heart: "Me gusta",
+  pokeball: "¡Captura!",
+  choque: "Choque",
+  shiny: "Shiny",
+  fuego: "Fueguito",
+}
+
 /**
  * The pieces that make Rooker a *nest* rather than a Twitter clone: the five reactions,
  * the action bar they live in, and the derived trainer numbers.
@@ -63,7 +71,7 @@ export function RkNidoChapter() {
             {REACTIONS.map((r) => (
               <div key={r.type} className="flex flex-col items-center gap-1.5">
                 <ReactionGlyph type={r.type} size={28} active />
-                <span className="text-[11px] text-rk-fg-subtle">{r.label}</span>
+                <span className="text-[11px] text-rk-fg-subtle">{REACTION_LABEL[r.type]}</span>
               </div>
             ))}
           </div>

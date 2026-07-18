@@ -37,6 +37,7 @@ import {
   TeamLeaderboardEntry,
 } from './entities/leaderboard.entity';
 
+// LEGACY_DIRECT_DB: pre-dates the repository rule; extract a repository when next touched
 @Injectable()
 export class EventsFacadeService {
   constructor(

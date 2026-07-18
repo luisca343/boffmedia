@@ -1,3 +1,6 @@
+"use client"
+
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 
 /**
@@ -10,6 +13,7 @@ import { cn } from "@/lib/utils"
 export const MAX_CHARS = 280
 
 export function CharRing({ count }: { count: number }) {
+  const t = useTranslations("rooker")
   const pct = Math.min(count / MAX_CHARS, 1)
   const r = 9
   const c = 2 * Math.PI * r
@@ -23,7 +27,7 @@ export function CharRing({ count }: { count: number }) {
       {near && (
         <span className={cn("text-[12px] font-bold tabular-nums", tone)}>{MAX_CHARS - count}</span>
       )}
-      <svg width="24" height="24" viewBox="0 0 24 24" role="img" aria-label={`${count} de ${MAX_CHARS}`}>
+      <svg width="24" height="24" viewBox="0 0 24 24" role="img" aria-label={t("compose.charCountAriaLabel", { count, max: MAX_CHARS })}>
         <circle cx="12" cy="12" r={r} fill="none" strokeWidth="2.4" className="stroke-rk-line-strong" />
         <circle
           cx="12"

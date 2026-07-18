@@ -1,0 +1,273 @@
+{
+  "rooker": {
+    "common": {
+      "close": "Close",
+      "back": "Back",
+      "retry": "Retry",
+      "loadingPosts": "Loading chirps",
+      "whoToFollow": "Who to follow",
+      "followedEveryone": "You already follow the whole nest.",
+      "trendingInNest": "Trending in the nest",
+      "postsCount": "{formatted} {count, plural, one {chirp} other {chirps}}",
+      "loginRequiredTitle": "Sign in",
+      "verifiedTrainer": "Verified trainer",
+      "follow": {
+        "follow": "Follow",
+        "following": "Following"
+      }
+    },
+    "format": {
+      "now": "now",
+      "minutes": "{count}m",
+      "hours": "{count}h",
+      "days": "{count}d",
+      "thousand": "{value}K",
+      "million": "{value}M",
+      "joined": "Joined {date}"
+    },
+    "reactions": {
+      "heart": "Like",
+      "pokeball": "Catch!",
+      "choque": "Shock",
+      "shiny": "Shiny",
+      "fuego": "Fire",
+      "remove": "Remove {reaction}",
+      "trayLabel": "Reactions"
+    },
+    "avatar": {
+      "profileOfAriaLabel": "{username}'s profile"
+    },
+    "shell": {
+      "homeAriaLabel": "Rooker · Home",
+      "yourProfileAriaLabel": "Your profile",
+      "composeFabAriaLabel": "Create chirp",
+      "nav": {
+        "inicio": "Home",
+        "explorar": "Explore",
+        "notificaciones": "Notifications",
+        "mensajes": "Messages",
+        "vitrina": "Showcase",
+        "perfil": "Profile"
+      }
+    },
+    "display": {
+      "title": "Display",
+      "modalLabel": "Display settings",
+      "rows": {
+        "background": "Background",
+        "accent": "Accent color",
+        "font": "Font",
+        "density": "Density",
+        "cardStyle": "Chirp style",
+        "reactions": "Reactions"
+      },
+      "background": {
+        "lightHint": "You're in light mode. Light and dark are chosen in Settings → Themes, for all of SmartRotom.",
+        "darkHint": "Choose how dark. Switching to light is done in Settings → Themes.",
+        "options": { "dim": "Dim", "lightsout": "Lights out" }
+      },
+      "accents": {
+        "azul": "Blue",
+        "amarillo": "Yellow",
+        "rosa": "Pink",
+        "morado": "Purple",
+        "naranja": "Orange",
+        "verde": "Green"
+      },
+      "font": {
+        "options": { "sistema": "System", "chirp": "Chirp" }
+      },
+      "density": {
+        "options": { "comodo": "Comfortable", "compacto": "Compact" }
+      },
+      "cardStyle": {
+        "options": { "plano": "Flat", "tarjeta": "Card" }
+      },
+      "reactionsSetting": {
+        "options": { "expresivas": "Expressive", "simple": "Like only" },
+        "hint": "With «Like only» the five-reaction tray disappears and the button behaves like a normal like."
+      }
+    },
+    "compose": {
+      "attachImageAriaLabel": "Attach image",
+      "submit": "Chirp",
+      "pending": "Sending…",
+      "inlinePlaceholder": "What's {name} chirping about?",
+      "dialogTitle": { "reply": "Reply", "new": "Create chirp" },
+      "replyingToPrefix": "Replying to",
+      "placeholder": {
+        "reply": "Chirp your reply…",
+        "new": "What's happening?"
+      },
+      "mediaPlaceholder": "Paste your screenshot link…",
+      "mediaAriaLabel": "Image link",
+      "charCountAriaLabel": "{count} of {max}"
+    },
+    "toast": {
+      "postPublished": "Your chirp went out to the nest.",
+      "replyPublished": "Your reply went out.",
+      "publishFailed": "Couldn't send the chirp.",
+      "profileUpdated": "Profile updated.",
+      "handleTaken": "That handle is already taken.",
+      "profileSaveFailed": "Couldn't save the profile."
+    },
+    "feed": {
+      "tabs": { "paraTi": "For you", "siguiendo": "Following" },
+      "endOfFeed": "You've reached the bottom of the nest.",
+      "error": {
+        "title": "The nest isn't responding",
+        "fallbackBody": "Try again in a few seconds."
+      },
+      "emptyFollowing": {
+        "title": "Your nest is quiet",
+        "body": "Chirps from trainers you follow will show up here. You're not following anyone who has chirped yet."
+      },
+      "emptyForYou": {
+        "title": "The nest is empty",
+        "bodyLoggedIn": "Nobody has chirped yet. Be the first: tell everyone about a catch, challenge someone, or just say hi.",
+        "bodyLoggedOut": "There are no chirps yet. Sign in to write the first one.",
+        "cta": "Write the first chirp"
+      }
+    },
+    "search": {
+      "trendsTitle": "Trending in the nest",
+      "trendsEmpty": "There are no trends yet. #Tags from the last seven days of chirps show up here.",
+      "resultsUsersTitle": "Trainers",
+      "resultsTagsTitle": "Tags",
+      "resultsPostsTitle": "Chirps",
+      "noResults": {
+        "title": "No results for “{term}”",
+        "body": "Try a trainer's name, a #tag, or a single word."
+      }
+    },
+    "searchBar": {
+      "ariaLabel": "Search the nest",
+      "placeholder": "Search trainers, Pokémon, #tags…",
+      "clearAriaLabel": "Clear"
+    },
+    "rightRail": {
+      "trendsTitle": "Trends",
+      "trendsEmpty": "There are no trends yet. Use a #tag in your next chirp and it'll show up here.",
+      "footer": "Rooker · part of the BoffMedia · SmartRotom ecosystem"
+    },
+    "messages": {
+      "title": "Messages",
+      "subtitle": "Your ChatApp conversations",
+      "openChatApp": "Open ChatApp",
+      "loggedOutBody": "Your conversations will show up here.",
+      "fallbackUsername": "Trainer",
+      "noMessagesYet": "No messages yet",
+      "loadError": "Couldn't load messages",
+      "empty": {
+        "title": "No conversations",
+        "body": "The server's direct messages live in ChatApp. Start a conversation there and you'll see it here."
+      }
+    },
+    "notifications": {
+      "title": "Notifications",
+      "loggedOutBody": "You'll see who replies, reacts, and follows you here.",
+      "empty": {
+        "title": "Nothing here yet",
+        "body": "When someone replies, reacts, or follows you, we'll let you know."
+      }
+    },
+    "vitrina": {
+      "title": "Pokédex Showcase",
+      "loggedOutBody": "Your collection will show up here.",
+      "loadError": "Couldn't load the showcase",
+      "filters": { "all": "All", "shiny": "Shiny" },
+      "registeredCount": "{species} of {total} registered",
+      "liveDexCount": "Live Pokédex · {count, plural, one {# shiny} other {# shinies}}",
+      "emptyShiny": {
+        "title": "No shinies yet",
+        "body": "Once you register your first shiny in the game, it'll shine here."
+      },
+      "emptyAll": {
+        "title": "Your showcase is empty",
+        "body": "Catch Pokémon on the server and they'll show up in your showcase automatically."
+      }
+    },
+    "profile": {
+      "title": "Profile",
+      "notFound": {
+        "title": "@{handle} isn't in the nest",
+        "body": "The name might be misspelled, or this trainer might not have a profile yet."
+      },
+      "sendMessageAriaLabel": "Send message",
+      "stats": { "captures": "CATCHES", "battles": "BATTLES", "shinies": "SHINIES", "dex": "POKÉDEX" },
+      "vitrinaTitle": "Showcase",
+      "viewCollection": "View collection →",
+      "tabs": { "trinos": "Chirps", "capturas": "Catches", "combates": "Battles", "media": "Media" },
+      "countsFollowing": "Following",
+      "countsFollowers": "Followers",
+      "noPosts": {
+        "title": "Nothing here",
+        "bodyMe": "You haven't chirped in this category yet.",
+        "bodyOther": "@{handle} hasn't chirped in this category yet."
+      }
+    },
+    "editProfile": {
+      "title": "Edit profile",
+      "saveButton": "Save",
+      "saving": "Saving…",
+      "fields": {
+        "handle": {
+          "label": "Handle",
+          "error": "Between 3 and 32 characters: lowercase letters, numbers, and underscore."
+        },
+        "displayName": { "label": "Name" },
+        "bio": { "label": "Bio" },
+        "link": { "label": "Link", "placeholder": "https://…" },
+        "partner": {
+          "label": "Partner Pokémon",
+          "hint": "You can only choose from the ones you've actually caught.",
+          "empty": "You haven't registered a catch yet. Catch a Pokémon on the server and you'll be able to pick it here."
+        }
+      }
+    },
+    "post": {
+      "title": "Chirp",
+      "notFound": {
+        "title": "This chirp is no longer here",
+        "fallbackBody": "Its author may have deleted it."
+      },
+      "pinnedBy": "Pinned by the nest",
+      "retrinoedBy": "@{handle} rechirped",
+      "actions": {
+        "reply": "Reply",
+        "retrino": "Rechirp",
+        "undoRetrino": "Undo rechirp",
+        "save": "Save",
+        "unsave": "Remove from saved"
+      },
+      "stats": { "retrinos": "Rechirps", "replies": "Replies" },
+      "replyPrompt": "Reply to @{handle}…",
+      "noReplies": {
+        "title": "No replies yet",
+        "body": "Be the one who starts the conversation."
+      }
+    },
+    "dexTile": {
+      "notCaught": "Not caught"
+    },
+    "card": {
+      "capture": {
+        "badge": "Catch",
+        "shinyBadge": "★ Shiny",
+        "registeredOn": "Registered on {date}"
+      },
+      "battle": {
+        "undecided": "UNDECIDED",
+        "victory": "VICTORY",
+        "defeat": "DEFEAT",
+        "vs": "vs",
+        "rival": "Rival",
+        "viewReplay": "View replay"
+      },
+      "media": {
+        "unavailable": "This image is no longer available",
+        "alt": "Chirp attachment"
+      }
+    }
+  }
+}

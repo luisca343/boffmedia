@@ -3,6 +3,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { ActorContext, assertActsAsSelf } from '@api/_utils/auth/actor';
 import { Logger } from 'nestjs-pino';
 import { WingullFacadeService } from '../../wingull/wingull.facade.service';
 import { PeopleRepository } from '../_shared/people.repository';
@@ -448,7 +449,12 @@ export class UrbanismoService {
     return { success: true };
   }
 
-  async placeBid(id: number, dto: PlaceBidDto): Promise<GobiernoSubastaEntity> {
+  async placeBid(
+    id: number,
+    dto: PlaceBidDto,
+    actor?: ActorContext,
+  ): Promise<GobiernoSubastaEntity> {
+    assertActsAsSelf(dto.uuid, actor);
     const existing = await this.urbanismoRepository.findSubasta(id);
     if (!existing) throw new NotFoundException(`Subasta ${id} not found`);
     if (existing.status !== 'live') {

@@ -7,12 +7,7 @@ export function GlobalErrorThrower({ children }: { children: React.ReactNode }) 
 
   if (error) {
     if (error instanceof RotomAppError) {
-      return (
-        <RotomErrorPage
-          errorCode={error.errorCode as any}
-          context={error.context}
-        />
-      );
+      return <RotomErrorPage error={error.message} help={error.help} />;
     }
     return <RotomErrorPage error={error.message || "Error desconocido"} />;
   }

@@ -7,8 +7,10 @@ import {
   Param,
   Post,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import {
+  ApiBearerAuth,
   ApiBody,
   ApiOperation,
   ApiParam,
@@ -16,6 +18,10 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { Public } from '@api/_utils/decorators/public.decorator';
+import { JwtAuthGuard } from '@api/auth/jwt-auth.guard';
+import { RolesGuard } from '@api/_utils/guards/roles.guard';
+import { Roles } from '@api/_utils/decorators/roles.decorator';
+import { USER_ROLES } from '@api/_utils/auth/roles.constants';
 import { PoblacionService } from './poblacion.service';
 import {
   ListCensoQueryDto,
@@ -29,12 +35,12 @@ import {
 } from './entities/poblacion.entity';
 
 @ApiTags('SmartRotom | Gobierno | Poblacion')
-@Public()
 @Controller('smartrotom/gobierno/poblacion')
 export class PoblacionController {
   constructor(private readonly poblacionService: PoblacionService) {}
 
   @Get('censo')
+  @Public()
   @ApiOperation({
     summary:
       'Derived census: every player with their civic standing and parcelas owned',
@@ -47,6 +53,7 @@ export class PoblacionController {
   }
 
   @Get('censo/:uuid')
+  @Public()
   @ApiOperation({
     summary:
       "One citizen's derived record — what the dossier drawer opens with, from any name in the app",
@@ -60,6 +67,7 @@ export class PoblacionController {
   }
 
   @Get('oficiales')
+  @Public()
   @ApiOperation({
     summary: 'List everyone holding a gobierno role, with their highest rank',
   })
@@ -69,6 +77,9 @@ export class PoblacionController {
   }
 
   @Post('oficiales/:uuid/roles')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.GOB_ALCALDE, USER_ROLES.ROTOM_ADMIN)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Grant a gobierno role to a player' })
   @ApiParam({ name: 'uuid', type: String })
   @ApiBody({ type: GrantRoleDto })
@@ -81,6 +92,9 @@ export class PoblacionController {
   }
 
   @Delete('oficiales/:uuid/roles/:role')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.GOB_ALCALDE, USER_ROLES.ROTOM_ADMIN)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Revoke a gobierno role from a player' })
   @ApiParam({ name: 'uuid', type: String })
   @ApiParam({ name: 'role', type: String })

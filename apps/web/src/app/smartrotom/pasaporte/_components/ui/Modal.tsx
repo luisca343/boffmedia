@@ -2,6 +2,7 @@
 
 "use client"
 
+import { useTranslations } from "next-intl"
 import type { ReactNode } from "react"
 import { cn } from "@/lib/utils"
 import { ModalShell } from "@/components/smartrotom/behavior/ModalShell"
@@ -20,11 +21,12 @@ export interface OverlayProps {
  * The bare scrim, kept exported for parity with the barrel (unused internally beyond
  * `Modal` below). A skin over the shared `ModalShell` (SMARTROTOM_V3 §2).
  */
-export function Overlay({ onClose, children, className, label = "Diálogo" }: OverlayProps) {
+export function Overlay({ onClose, children, className, label }: OverlayProps) {
+  const t = useTranslations("pasaporte")
   return (
     <ModalShell
       onClose={onClose}
-      label={label}
+      label={label ?? t("modal.dialog")}
       scope={PS_SCOPE}
       scrimClassName={cn(
         "z-[80] flex items-center justify-center p-5",
@@ -54,6 +56,7 @@ export function Modal({
   children: ReactNode
   className?: string
 }) {
+  const t = useTranslations("pasaporte")
   return (
     <ModalShell
       onClose={onClose}
@@ -72,7 +75,7 @@ export function Modal({
         <button
           type="button"
           onClick={onClose}
-          aria-label="Cerrar"
+          aria-label={t("modal.close")}
           className="grid h-[30px] w-[30px] place-items-center rounded-lg text-ps-chrome-muted transition-colors hover:bg-white/[.06] hover:text-ps-chrome-fg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ps-gild"
         >
           <Icon name="x" className="h-[18px] w-[18px]" />

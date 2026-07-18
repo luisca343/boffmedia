@@ -9,8 +9,10 @@ import {
   Patch,
   Post,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import {
+  ApiBearerAuth,
   ApiBody,
   ApiOperation,
   ApiParam,
@@ -18,6 +20,10 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { Public } from '@api/_utils/decorators/public.decorator';
+import { JwtAuthGuard } from '@api/auth/jwt-auth.guard';
+import { RolesGuard } from '@api/_utils/guards/roles.guard';
+import { Roles } from '@api/_utils/decorators/roles.decorator';
+import { USER_ROLES } from '@api/_utils/auth/roles.constants';
 import { ActorBodyDto } from '../_shared/dto/actor-body.dto';
 import { ListAuditoriaQueryDto } from '../_shared/dto/list-auditoria-query.dto';
 import { GobiernoAuditoriaListEntity } from '../_shared/entities/auditoria.entity';
@@ -34,7 +40,6 @@ import {
 } from './entities/anuncio.entity';
 
 @ApiTags('SmartRotom | Gobierno')
-@Public()
 @Controller('smartrotom/gobierno')
 export class GeneralController {
   constructor(private readonly generalService: GeneralService) {}
@@ -42,6 +47,7 @@ export class GeneralController {
   // ==================== ANUNCIOS ====================
 
   @Get('anuncios')
+  @Public()
   @ApiOperation({ summary: 'List anuncios' })
   @ApiResponse({ status: HttpStatus.OK, type: GobiernoAnuncioListEntity })
   async listAnuncios(
@@ -51,6 +57,7 @@ export class GeneralController {
   }
 
   @Get('anuncios/:id')
+  @Public()
   @ApiOperation({ summary: 'Get an anuncio by id' })
   @ApiParam({ name: 'id', type: Number })
   @ApiResponse({ status: HttpStatus.OK, type: GobiernoAnuncioEntity })
@@ -61,6 +68,9 @@ export class GeneralController {
   }
 
   @Post('anuncios')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.GOBIERNO, USER_ROLES.ROTOM_ADMIN)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Publish an anuncio' })
   @ApiBody({ type: CreateAnuncioDto })
   @ApiResponse({ status: HttpStatus.CREATED, type: GobiernoAnuncioEntity })
@@ -71,6 +81,9 @@ export class GeneralController {
   }
 
   @Patch('anuncios/:id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.GOBIERNO, USER_ROLES.ROTOM_ADMIN)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Update an anuncio' })
   @ApiParam({ name: 'id', type: Number })
   @ApiBody({ type: UpdateAnuncioDto })
@@ -83,6 +96,9 @@ export class GeneralController {
   }
 
   @Delete('anuncios/:id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.GOBIERNO, USER_ROLES.ROTOM_ADMIN)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Delete an anuncio' })
   @ApiParam({ name: 'id', type: Number })
   @ApiBody({ type: ActorBodyDto })
@@ -97,6 +113,7 @@ export class GeneralController {
   // ==================== AUDITORIA ====================
 
   @Get('auditoria')
+  @Public()
   @ApiOperation({ summary: 'List the append-only audit log' })
   @ApiResponse({ status: HttpStatus.OK, type: GobiernoAuditoriaListEntity })
   async listAuditoria(
@@ -108,6 +125,7 @@ export class GeneralController {
   // ==================== COUNTERS ====================
 
   @Get('counters')
+  @Public()
   @ApiOperation({
     summary: 'Pending-work counts for the sidebar badges, in one call',
   })

@@ -16,11 +16,20 @@ import { PasaporteLogroEntity, PasaporteStandingEntity } from "@boffmedia/shared
 import { Stamp } from "@/app/smartrotom/pasaporte/_components/chapters/Bitacora"
 import { chapterVars } from "@/app/smartrotom/pasaporte/_utils/chapters"
 import { badgeArt, sealInk } from "@/app/smartrotom/pasaporte/_utils/medals"
-import { TIER_LABEL } from "@/app/smartrotom/pasaporte/_utils/tiers"
 import { roman } from "@/app/smartrotom/pasaporte/_utils/roman"
 import type { LogroTier, StandingTier } from "@/app/smartrotom/pasaporte/_types"
 import { Sample, Section } from "../showcase-shared"
 import { Leaf, PS_DEMO_SEALS, PS_DEMO_SEASON, PS_DEMO_STAMPS } from "./ps-demo"
+
+/** The showcase is a static Spanish reference doc, not part of the Pasaporte app's own i18n. */
+const TIER_LABEL: Record<LogroTier | StandingTier, string> = {
+  bronce: "Bronce",
+  plata: "Plata",
+  oro: "Oro",
+  platino: "Platino",
+  diamante: "Diamante",
+  maestro: "Maestro",
+}
 
 /**
  * Logros only reach `platino`; the season ladder carries on to `maestro`. Both come off the

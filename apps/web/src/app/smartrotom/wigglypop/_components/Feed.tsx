@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation"
 import { useMemo } from "react"
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { userMessageFrom } from "@/services/boffAPI"
 import { fmt } from "../_utils/format"
@@ -11,25 +12,26 @@ import { ListingCard } from "./ListingCard"
 import { Button, EmptyState, Icon, Seg, Skeleton, Tabs } from "./ui"
 
 const FORMAT_TABS = [
-  { key: "all", label: "Todo", icon: "grid" },
-  { key: "fixed", label: "Cómpralo ya", icon: "cart" },
-  { key: "auction", label: "Subastas", icon: "gavel" },
-  { key: "offer", label: "Ofertas", icon: "handshake" },
-  { key: "trade", label: "Intercambios", icon: "swap" },
+  { key: "all", labelKey: "feed.tabAll", icon: "grid" },
+  { key: "fixed", labelKey: "feed.tabFixed", icon: "cart" },
+  { key: "auction", labelKey: "feed.tabAuction", icon: "gavel" },
+  { key: "offer", labelKey: "feed.tabOffer", icon: "handshake" },
+  { key: "trade", labelKey: "feed.tabTrade", icon: "swap" },
 ] as const
 
 const SORTS: Array<[WpSort, string]> = [
-  ["relevance", "Relevancia"],
-  ["price-asc", "Precio: menor"],
-  ["price-desc", "Precio: mayor"],
-  ["iv", "Mejores IVs"],
-  ["recent", "Más recientes"],
-  ["ending", "Termina pronto"],
+  ["relevance", "feed.sortRelevance"],
+  ["price-asc", "feed.sortPriceAsc"],
+  ["price-desc", "feed.sortPriceDesc"],
+  ["iv", "feed.sortIv"],
+  ["recent", "feed.sortRecent"],
+  ["ending", "feed.sortEnding"],
 ]
 
 /** The discovery grid. A thin orchestrator (§12) — the filters live in the store,
  *  the fetching in `_hooks/queries`, and every card is a `ListingCard`. */
 export function Feed() {
+  const t = useTranslations("wigglypop")
   const router = useRouter()
   const f = useFeedFilters()
   const toggleWatch = useToggleWatch()
@@ -68,7 +70,7 @@ export function Feed() {
   const listings = useMemo(() => {
     const all = data?.items ?? []
     if (f.types.length === 0) return all
-    return all.filter((L) => L.mons[0]?.types.some((t) => f.types.includes(t)))
+    return all.filter((L) => L.mons[0]?.types.some((ty) => f.types.includes(ty)))
   }, [data?.items, f.types])
 
   return (
@@ -76,7 +78,7 @@ export function Feed() {
       <div className="flex-none px-[26px] pt-[18px]">
         <div className="flex flex-wrap items-center gap-3.5">
           <Tabs
-            tabs={FORMAT_TABS}
+            tabs={FORMAT_TABS.map((tb) => ({ ...tb, label: t(tb.labelKey) }))}
             value={f.format}
             onChange={(k) => f.setFormat(k as typeof f.format)}
           />
@@ -88,7 +90,7 @@ export function Feed() {
               <b className="wp-num text-wp-fg-muted">
                 {fmt(f.types.length ? listings.length : (data?.total ?? 0))}
               </b>{" "}
-              resultados
+              {t("feed.resultsLabel")}
             </span>
 
             <div className="flex items-center gap-[7px]">
@@ -96,16 +98,16 @@ export function Feed() {
               <select
                 value={f.sort}
                 onChange={(e) => f.setSort(e.target.value as WpSort)}
-                aria-label="Ordenar por"
+                aria-label={t("feed.sortAriaLabel")}
                 className={cn(
                   "cursor-pointer appearance-none rounded-wp-sm border-wp border-wp-line/24 bg-white py-2 pl-[11px] pr-8",
                   "font-wp text-[13px] font-bold text-wp-fg outline-none",
                   "focus:border-wp-accent focus:shadow-[0_0_0_4px_rgb(var(--wp-accent)/.13)]",
                 )}
               >
-                {SORTS.map(([k, label]) => (
+                {SORTS.map(([k, labelKey]) => (
                   <option key={k} value={k}>
-                    {label}
+                    {t(labelKey)}
                   </option>
                 ))}
               </select>
@@ -113,8 +115,8 @@ export function Feed() {
 
             <Seg
               options={[
-                { key: "cozy", icon: "grid", title: "Cuadrícula" },
-                { key: "list", icon: "list", title: "Lista" },
+                { key: "cozy", icon: "grid", title: t("feed.densityGrid") },
+                { key: "list", icon: "list", title: t("feed.densityList") },
               ]}
               value={f.density}
               onChange={(d) => f.setDensity(d as typeof f.density)}
@@ -127,8 +129,8 @@ export function Feed() {
         {error ? (
           <EmptyState
             icon="alert"
-            title="El mercado no responde"
-            body={userMessageFrom(error, "Inténtalo de nuevo en unos segundos.")}
+            title={t("feed.errorTitle")}
+            body={userMessageFrom(error, t("common.retryFallback"))}
           />
         ) : isLoading ? (
           <div className="grid grid-cols-[repeat(auto-fill,minmax(236px,1fr))] gap-[18px] px-[26px] pb-11 pt-5">
@@ -139,12 +141,12 @@ export function Feed() {
         ) : listings.length === 0 ? (
           <EmptyState
             icon="filter"
-            title="Sin resultados"
-            body="Prueba a ajustar los filtros o el rango de precio."
+            title={t("feed.noResultsTitle")}
+            body={t("feed.noResultsBody")}
           >
             <Button onClick={f.clear}>
               <Icon name="refresh" size={14} />
-              Restablecer
+              {t("feed.resetButton")}
             </Button>
           </EmptyState>
         ) : (

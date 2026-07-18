@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useTranslations } from "next-intl"
 import type { WpListing } from "../../_types/market.types"
 import { userMessageFrom } from "@/services/boffAPI"
 import { WigglypopService } from "@/services/api/smartrotom/wigglypopService"
@@ -18,6 +19,7 @@ import { MonRow, listingHero } from "./parts"
  * than just a species name.
  */
 export function TradeModal({ listing: L, onClose }: { listing: WpListing; onClose: () => void }) {
+  const t = useTranslations("wigglypop")
   const uuid = useWpUuid()
   const { mons, isLoading, error } = usePcMons()
   const [picked, setPicked] = useState<string | null>(null)
@@ -37,31 +39,31 @@ export function TradeModal({ listing: L, onClose }: { listing: WpListing; onClos
     })
     setSending(false)
     if (!res.success) {
-      toast(res.userMessage ?? "No se pudo enviar la propuesta", "error")
+      toast(res.userMessage ?? t("toast.tradeSendError"), "error")
       return
     }
-    toast("Propuesta de intercambio enviada", "success")
+    toast(t("toast.tradeSent"), "success")
     onClose()
   }
 
   return (
     <Modal onClose={onClose} className="w-[min(600px,94vw)]">
       <ModalHead
-        title="Proponer intercambio"
+        title={t("common.proposeTrade")}
         sub={
           L.wants?.length
-            ? `${L.seller.username} busca: ${L.wants.join(", ")}`
-            : `${L.seller.username} acepta propuestas`
+            ? t("modal.trade.sellerWants", { seller: L.seller.username, wants: L.wants.join(", ") })
+            : t("modal.trade.sellerOpenToAny", { seller: L.seller.username })
         }
         onClose={onClose}
       />
       <div className="p-5">
         {mon && <MonRow mon={mon} />}
 
-        <DividerLabel className="my-4">Ofreces de tu PC</DividerLabel>
+        <DividerLabel className="my-4">{t("modal.trade.yourOffer")}</DividerLabel>
 
         {error ? (
-          <EmptyState icon="alert" title="No se pudo leer tu PC" body={userMessageFrom(error, "Inténtalo de nuevo en unos segundos.")} />
+          <EmptyState icon="alert" title={t("common.pcReadErrorTitle")} body={userMessageFrom(error, t("common.retryFallback"))} />
         ) : isLoading ? (
           <div className="grid grid-cols-6 gap-2">
             {Array.from({ length: 12 }).map((_, i) => (
@@ -71,8 +73,8 @@ export function TradeModal({ listing: L, onClose }: { listing: WpListing; onClos
         ) : mons.length === 0 ? (
           <EmptyState
             icon="package"
-            title="Tu PC está vacío"
-            body="Necesitas al menos un Pokémon guardado en una caja para poder intercambiar."
+            title={t("common.emptyPcTitle")}
+            body={t("modal.trade.emptyPcBody")}
           />
         ) : (
           <div className="wp-scroll grid max-h-[240px] grid-cols-6 gap-2 overflow-y-auto pr-1">
@@ -95,10 +97,10 @@ export function TradeModal({ listing: L, onClose }: { listing: WpListing; onClos
         >
           <Icon name="swap" size={16} />
           {!chosen
-            ? "Elige un Pokémon"
+            ? t("modal.trade.pickPokemon")
             : sending
-              ? "Enviando…"
-              : `Proponer ${chosen.name} por ${mon?.name ?? "este Pokémon"}`}
+              ? t("common.sending")
+              : t("modal.trade.proposeButton", { chosen: chosen.name, mon: mon?.name ?? t("modal.trade.thisPokemonFallback") })}
         </Button>
       </div>
     </Modal>

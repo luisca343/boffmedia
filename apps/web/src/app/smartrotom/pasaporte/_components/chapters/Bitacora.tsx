@@ -1,5 +1,6 @@
 // PAPER. Rubber stamps, inked into the sheet.
 
+import { useTranslations } from "next-intl"
 import type { TravelStamp } from "../../_types"
 import { stampDate } from "../../_utils/dates"
 import { EmptyState, PageHead, Skeleton } from "../ui"
@@ -16,12 +17,7 @@ const INK: Record<TravelStamp["kind"], string> = {
   evento: "#6e4a86", // plum — everything else
 }
 
-const LEGEND: { kind: TravelStamp["kind"]; label: string }[] = [
-  { kind: "viaje", label: "Entrada / Visado" },
-  { kind: "gimnasio", label: "Gimnasio" },
-  { kind: "liga", label: "Liga" },
-  { kind: "evento", label: "Evento" },
-]
+const LEGEND_KINDS: TravelStamp["kind"][] = ["viaje", "gimnasio", "liga", "evento"]
 
 /**
  * One inked stamp. The `feTurbulence` + `feDisplacementMap` pair is what makes it read as
@@ -133,10 +129,12 @@ export function Stamp({ stamp, index }: { stamp: TravelStamp; index: number }) {
 }
 
 export function Bitacora({ stamps, loading }: { stamps: TravelStamp[]; loading: boolean }) {
+  const t = useTranslations("pasaporte")
+
   if (loading) {
     return (
       <>
-        <PageHead eyebrow="Sellos · Entradas y Visados" title="Bitácora de Viaje" />
+        <PageHead eyebrow={t("bitacora.eyebrow")} title={t("bitacora.title")} />
         <div className="grid grid-cols-3 justify-items-center gap-2">
           {Array.from({ length: 9 }, (_, i) => (
             <Skeleton key={i} className="h-[96px] w-[118px] rounded-full" />
@@ -149,12 +147,8 @@ export function Bitacora({ stamps, loading }: { stamps: TravelStamp[]; loading: 
   if (stamps.length === 0) {
     return (
       <>
-        <PageHead eyebrow="Sellos · Entradas y Visados" title="Bitácora de Viaje" />
-        <EmptyState
-          icon="globe"
-          title="Sin sellos todavía"
-          sub="Viaja por las regiones y gana medallas para estampar tu bitácora."
-        />
+        <PageHead eyebrow={t("bitacora.eyebrow")} title={t("bitacora.title")} />
+        <EmptyState icon="globe" title={t("bitacora.empty.title")} sub={t("bitacora.empty.sub")} />
       </>
     )
   }
@@ -166,22 +160,23 @@ export function Bitacora({ stamps, loading }: { stamps: TravelStamp[]; loading: 
 
   return (
     <>
-      <PageHead eyebrow="Sellos · Entradas y Visados" title="Bitácora de Viaje" />
+      <PageHead eyebrow={t("bitacora.eyebrow")} title={t("bitacora.title")} />
 
       <div className="mb-1 flex flex-wrap items-center gap-3.5 text-[10px] text-ps-ink-soft">
-        {LEGEND.map((entry) => (
-          <span key={entry.kind} className="flex items-center gap-1.5">
+        {LEGEND_KINDS.map((kind) => (
+          <span key={kind} className="flex items-center gap-1.5">
             <i
               aria-hidden="true"
-              style={{ background: INK[entry.kind] }}
+              style={{ background: INK[kind] }}
               className="inline-block h-2 w-2 rounded-full"
             />
-            {entry.label}
+            {t(`bitacora.legend.${kind}`)}
           </span>
         ))}
         <span className="ps-num ml-auto font-ps-mono tracking-[.04em] text-ps-ink-faint">
-          {shown.length < stamps.length && `${shown.length} de `}
-          {stamps.length} {stamps.length === 1 ? "sello" : "sellos"}
+          {shown.length < stamps.length
+            ? t("bitacora.countPartial", { shown: shown.length, count: stamps.length })
+            : t("bitacora.countFull", { count: stamps.length })}
         </span>
       </div>
 

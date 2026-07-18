@@ -1,6 +1,7 @@
 "use client"
 
 import { useQuery } from "@tanstack/react-query"
+import { useTranslations } from "next-intl"
 import { PokemonService } from "@/services/api/smartrotom/pokemonService"
 import type { Registry } from "@/types/pokedex"
 
@@ -24,12 +25,13 @@ export interface VitrinaEntry {
  * that care.
  */
 export function useVitrina(uuid: string | null | undefined) {
+  const t = useTranslations("rooker")
   return useQuery({
     queryKey: ["rooker", "vitrina", uuid],
     queryFn: async () => {
       const res = await PokemonService.getPokedexRegistries(uuid!)
       if (!res.success || !res.data) {
-        throw new Error(res.userMessage ?? "No se pudo cargar la vitrina")
+        throw new Error(res.userMessage ?? t("vitrina.loadError"))
       }
       const entries: VitrinaEntry[] = (res.data as Registry[])
         .filter((r) => Boolean(r.caughtAt))

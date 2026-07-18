@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import type { WpListing } from "../../_types/market.types"
 import { fmt } from "../../_utils/format"
@@ -17,6 +18,7 @@ import { MonRow, listingHero } from "./parts"
  * heuristic and says so — it does not predict what this particular seller will do.
  */
 export function OfferModal({ listing: L, onClose }: { listing: WpListing; onClose: () => void }) {
+  const t = useTranslations("wigglypop")
   const floor = Math.round(L.price * 0.4)
   const [amount, setAmount] = useState(Math.round((L.price * 0.85) / 50) * 50)
   const createOffer = useCreateOffer()
@@ -24,18 +26,18 @@ export function OfferModal({ listing: L, onClose }: { listing: WpListing; onClos
   const pct = L.value > 0 ? Math.round((amount / L.value) * 100) : 100
   const verdict =
     pct < 70
-      ? { label: "Probablemente rechazada", tone: "text-wp-rose" }
+      ? { label: t("modal.offer.verdictRejected"), tone: "text-wp-rose" }
       : pct < 90
-        ? { label: "Negociable", tone: "text-wp-amber" }
-        : { label: "Muy probable", tone: "text-wp-green" }
+        ? { label: t("modal.offer.verdictNegotiable"), tone: "text-wp-amber" }
+        : { label: t("modal.offer.verdictLikely"), tone: "text-wp-green" }
 
   const mon = listingHero(L)
 
   return (
     <Modal onClose={onClose}>
       <ModalHead
-        title="Hacer una oferta"
-        sub={`Precio de venta ₽${fmt(L.price)} · valoración ₽${fmt(L.value)}`}
+        title={t("modal.offer.title")}
+        sub={t("modal.offer.sub", { price: fmt(L.price), value: fmt(L.value) })}
         onClose={onClose}
       />
       <div className="p-5">
@@ -43,7 +45,7 @@ export function OfferModal({ listing: L, onClose }: { listing: WpListing; onClos
 
         <div className="mb-2 mt-5 text-center">
           <div className="font-wp text-[11px] font-bold uppercase tracking-[.06em] text-wp-fg-subtle">
-            Tu oferta
+            {t("modal.offer.yourOffer")}
           </div>
           <Price amount={amount} size={34} />
         </div>
@@ -53,14 +55,14 @@ export function OfferModal({ listing: L, onClose }: { listing: WpListing; onClos
           max={L.price}
           step={50}
           value={amount}
-          aria-label="Importe de la oferta"
+          aria-label={t("modal.offer.amountAria")}
           onChange={(e) => setAmount(Number(e.target.value))}
         />
 
         <div className="mt-1 flex justify-between font-wp text-[11.5px] font-semibold text-wp-fg-subtle">
           <span className="wp-num">₽{fmt(floor)}</span>
           <span className={cn("font-bold", verdict.tone)}>
-            {verdict.label} · {pct}% de la valoración
+            {verdict.label} · {t("modal.offer.pctOfValuation", { pct })}
           </span>
           <span className="wp-num">₽{fmt(L.price)}</span>
         </div>
@@ -86,14 +88,13 @@ export function OfferModal({ listing: L, onClose }: { listing: WpListing; onClos
           }
         >
           <Icon name="handshake" size={16} />
-          {createOffer.isPending ? "Enviando…" : `Enviar oferta de ₽${fmt(amount)}`}
+          {createOffer.isPending ? t("common.sending") : t("modal.offer.submitButton", { amount: fmt(amount) })}
         </Button>
 
         {/* Nothing is charged now. The seller has to accept, and accepting is what
             creates the order — at which point the escrow is taken. */}
         <p className="mt-3 text-center font-wp text-[11.5px] font-semibold text-wp-fg-subtle">
-          No se te cobra nada ahora. Si {L.seller.username} acepta, se creará el pedido y el pago
-          quedará en depósito.
+          {t("modal.offer.disclaimer", { seller: L.seller.username })}
         </p>
       </div>
     </Modal>

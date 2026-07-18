@@ -177,12 +177,26 @@ export class AppModule implements NestModule {
           method: RequestMethod.POST,
         },
         { path: 'smartrotom/documents/news', method: RequestMethod.POST },
-        { path: 'smartrotom/documents/news/(.*)', method: RequestMethod.PUT },
+        // `{*path}` not `(.*)`: path-to-regexp v8 throws on unnamed wildcards.
         {
-          path: 'smartrotom/documents/news/(.*)',
+          path: 'smartrotom/documents/news/{*path}',
+          method: RequestMethod.PUT,
+        },
+        {
+          path: 'smartrotom/documents/news/{*path}',
           method: RequestMethod.DELETE,
         },
         { path: 'smartrotom/documents/newsstatus', method: RequestMethod.POST },
+        // Every write under gobierno/ and wigglypop/ now carries its own guard
+        // (roles, or GameOrUserAuthGuard); a JWT caller sends no `server` field.
+        { path: 'smartrotom/gobierno/{*path}', method: RequestMethod.POST },
+        { path: 'smartrotom/gobierno/{*path}', method: RequestMethod.PATCH },
+        { path: 'smartrotom/gobierno/{*path}', method: RequestMethod.PUT },
+        { path: 'smartrotom/gobierno/{*path}', method: RequestMethod.DELETE },
+        { path: 'smartrotom/wigglypop/{*path}', method: RequestMethod.POST },
+        { path: 'smartrotom/wigglypop/{*path}', method: RequestMethod.PATCH },
+        { path: 'smartrotom/wigglypop/{*path}', method: RequestMethod.PUT },
+        { path: 'smartrotom/wigglypop/{*path}', method: RequestMethod.DELETE },
       )
       .forRoutes('/smartrotom/');
   }

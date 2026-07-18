@@ -11,6 +11,7 @@ import { MailService } from '@api/mail/mail.service';
 
 const TOKEN_TTL_MS = 60 * 60 * 1000; // 1 hour
 
+// LEGACY_DIRECT_DB: pre-dates the repository rule; extract a repository when next touched
 @Injectable()
 export class PasswordResetService {
   constructor(

@@ -13,6 +13,13 @@ export function fmtSigned(n: number): string {
   return prefix + fmtInt(abs) + " ¥";
 }
 
+/** A typed amount ("1.234,56") → whole ¥. es-ES writes "." for thousands and "," for
+ *  decimals, so both are normalised before Number() ever sees the string. */
+export function parseAmount(input: string): number {
+  const normalised = input.replace(/\./g, "").replace(",", ".");
+  return Math.round(Number(normalised) || 0);
+}
+
 export function fmtDate(iso: string | Date, mode: "short" | "long" | "rel" = "short"): string {
   const d = new Date(iso);
   if (isNaN(d.getTime())) return "";

@@ -1,5 +1,6 @@
 // DESK. The inspector's own chip — it belongs to the counter, not to the document.
 
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { Icon } from "./Icon"
 
@@ -9,6 +10,7 @@ import { Icon } from "./Icon"
  * motion guard.
  */
 export function VerifyBadge({ show, className }: { show: boolean; className?: string }) {
+  const t = useTranslations("pasaporte")
   return (
     <div
       aria-hidden={!show}
@@ -25,10 +27,8 @@ export function VerifyBadge({ show, className }: { show: boolean; className?: st
         <Icon name="shield" className="h-[18px] w-[18px] text-ps-navy-deep" />
       </span>
       <span className="font-ps-mono">
-        <b className="block text-[13px] font-bold tracking-[.18em] text-ps-gild-hi">VERIFICADO</b>
-        <span className="text-[10px] tracking-[.08em] text-ps-chrome-subtle">
-          Gobierno de Teras · Control de Fronteras
-        </span>
+        <b className="block text-[13px] font-bold tracking-[.18em] text-ps-gild-hi">{t("verifyBadge.verified")}</b>
+        <span className="text-[10px] tracking-[.08em] text-ps-chrome-subtle">{t("verifyBadge.subtitle")}</span>
       </span>
     </div>
   )

@@ -1,3 +1,4 @@
+import { ForbiddenException } from '@nestjs/common';
 import { Request } from 'express';
 
 /**
@@ -17,4 +18,27 @@ export function resolveActor(
 ): ActorContext {
   if (req.serverAuthed) return { serverAuthed: true };
   return { serverAuthed: false, mcUuid: req.user?.mcUuid };
+}
+
+// The trusted server and the transitional tripwire path carry no identity, so there is
+// nothing to compare against and ownership cannot be enforced on them.
+export function assertActsAsSelf(claimed: string, actor?: ActorContext): void {
+  if (!actor || actor.serverAuthed || !actor.mcUuid) return;
+  if (claimed !== actor.mcUuid) {
+    throw new ForbiddenException({
+      message: 'Actor may only act on their own behalf',
+      userMessage: 'No puedes actuar en nombre de otro jugador.',
+    });
+  }
+}
+
+// For bodies whose actor uuid is optional: a signed-in caller may omit it and is
+// then resolved to their own uuid, never to somebody else's.
+export function actingUuid(
+  claimed: string | undefined,
+  actor?: ActorContext,
+): string | undefined {
+  if (!actor || actor.serverAuthed || !actor.mcUuid) return claimed;
+  if (claimed) assertActsAsSelf(claimed, actor);
+  return actor.mcUuid;
 }

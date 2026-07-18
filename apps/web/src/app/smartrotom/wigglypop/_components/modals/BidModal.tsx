@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useTranslations } from "next-intl"
 import type { WpListing } from "../../_types/market.types"
 import { fmt } from "../../_utils/format"
 import { useBalance, usePlaceBid } from "../../_hooks/queries"
@@ -16,6 +17,7 @@ import { MonRow, listingHero } from "./parts"
  * against bidding what you cannot pay, not a charge.
  */
 export function BidModal({ listing: L, onClose }: { listing: WpListing; onClose: () => void }) {
+  const t = useTranslations("wigglypop")
   const current = L.currentBid ?? L.price
   const step = L.minIncrement ?? 50
   const min = current + step
@@ -31,8 +33,13 @@ export function BidModal({ listing: L, onClose }: { listing: WpListing; onClose:
   return (
     <Modal onClose={onClose}>
       <ModalHead
-        title="Pujar en subasta"
-        sub={`Puja actual ₽${fmt(current)} · ${L.bids ?? 0} ${L.bids === 1 ? "puja" : "pujas"}`}
+        title={t("modal.bid.title")}
+        sub={
+          <>
+            {t("modal.bid.currentBidPrefix", { amount: fmt(current) })} ·{" "}
+            {t("common.bidsCount", { count: L.bids ?? 0 })}
+          </>
+        }
         onClose={onClose}
       />
       <div className="p-5">
@@ -40,7 +47,7 @@ export function BidModal({ listing: L, onClose }: { listing: WpListing; onClose:
 
         <div className="my-5 text-center">
           <div className="font-wp text-[11px] font-bold uppercase tracking-[.06em] text-wp-fg-subtle">
-            Tu puja
+            {t("modal.bid.yourBid")}
           </div>
           <Price amount={amount} size={34} />
         </div>
@@ -48,7 +55,7 @@ export function BidModal({ listing: L, onClose }: { listing: WpListing; onClose:
         <div className="flex items-center gap-2">
           <Button
             iconOnly
-            aria-label="Bajar la puja"
+            aria-label={t("modal.bid.decreaseAria")}
             disabled={amount <= min}
             onClick={() => setAmount((a) => Math.max(min, a - step))}
           >
@@ -59,7 +66,7 @@ export function BidModal({ listing: L, onClose }: { listing: WpListing; onClose:
           </div>
           <Button
             iconOnly
-            aria-label="Subir la puja"
+            aria-label={t("modal.bid.increaseAria")}
             onClick={() => setAmount((a) => a + step)}
           >
             <Icon name="plus" size={16} />
@@ -67,7 +74,7 @@ export function BidModal({ listing: L, onClose }: { listing: WpListing; onClose:
         </div>
 
         <div className="mt-2 text-center font-wp text-[11.5px] font-semibold text-wp-fg-subtle">
-          Incremento mínimo ₽{fmt(step)} · sólo se te cobra si ganas
+          {t("modal.bid.minIncrementNote", { step: fmt(step) })}
         </div>
 
         <Button
@@ -80,10 +87,10 @@ export function BidModal({ listing: L, onClose }: { listing: WpListing; onClose:
         >
           <Icon name="gavel" size={16} />
           {insufficient
-            ? "Saldo insuficiente"
+            ? t("common.insufficientBalance")
             : placeBid.isPending
-              ? "Pujando…"
-              : `Confirmar puja ₽${fmt(amount)}`}
+              ? t("modal.bid.submitting")
+              : t("modal.bid.confirmButton", { amount: fmt(amount) })}
         </Button>
       </div>
     </Modal>

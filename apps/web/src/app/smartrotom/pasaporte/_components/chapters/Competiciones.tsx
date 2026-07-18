@@ -1,5 +1,6 @@
 // PAPER.
 
+import { useTranslations } from "next-intl"
 import type { UserAchievement } from "@boffmedia/shared"
 import { cn } from "@/lib/utils"
 import { docDate } from "../../_utils/dates"
@@ -13,10 +14,12 @@ export function Competiciones({
   achievements?: UserAchievement[] | null
   loading: boolean
 }) {
+  const t = useTranslations("pasaporte")
+
   if (loading) {
     return (
       <>
-        <PageHead eyebrow="Ligas & Frente Batalla" title="Competiciones" />
+        <PageHead eyebrow={t("competiciones.eyebrow")} title={t("competiciones.title")} />
         <div className="grid grid-cols-4 gap-[18px]">
           {Array.from({ length: 8 }, (_, i) => (
             <Skeleton key={i} className="h-[96px] rounded-full" />
@@ -31,23 +34,17 @@ export function Competiciones({
   if (events.length === 0) {
     return (
       <>
-        <PageHead eyebrow="Ligas & Frente Batalla" title="Competiciones" />
-        <EmptyState
-          icon="trophy"
-          title="Sin competiciones"
-          sub="El circuito competitivo de Teras aún no ha abierto sus puertas."
-        />
+        <PageHead eyebrow={t("competiciones.eyebrow")} title={t("competiciones.title")} />
+        <EmptyState icon="trophy" title={t("competiciones.empty.title")} sub={t("competiciones.empty.sub")} />
       </>
     )
   }
 
   return (
     <>
-      <PageHead eyebrow="Ligas & Frente Batalla" title="Competiciones" />
+      <PageHead eyebrow={t("competiciones.eyebrow")} title={t("competiciones.title")} />
 
-      <p className="mb-3 text-[12px] text-ps-ink-soft">
-        Los grandes desafíos del circuito competitivo de Teras. Cada victoria deja su sello.
-      </p>
+      <p className="mb-3 text-[12px] text-ps-ink-soft">{t("competiciones.intro")}</p>
 
       <div className="grid grid-cols-4 justify-items-center gap-[18px]">
         {events.map((event) => {
@@ -70,7 +67,7 @@ export function Competiciones({
                 {event.name}
               </span>
               <span className="ps-num font-ps-mono text-[9px] text-ps-ink-faint">
-                {earned ? docDate(event.completedAt) : "Bloqueado"}
+                {earned ? docDate(event.completedAt) : t("competiciones.locked")}
               </span>
             </div>
           )

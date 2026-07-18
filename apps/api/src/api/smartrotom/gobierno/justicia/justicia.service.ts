@@ -3,6 +3,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { ActorContext, assertActsAsSelf } from '@api/_utils/auth/actor';
 import { Logger } from 'nestjs-pino';
 import { PeopleRepository } from '../_shared/people.repository';
 import { AuditoriaService } from '../_shared/auditoria.service';
@@ -241,7 +242,9 @@ export class JusticiaService {
 
   async createApelacion(
     dto: CreateApelacionDto,
+    actor?: ActorContext,
   ): Promise<GobiernoApelacionEntity> {
+    assertActsAsSelf(dto.playerUuid, actor);
     const multa = await this.haciendaRepository.findMulta(dto.multaId);
     if (!multa) throw new BadRequestException(`Multa ${dto.multaId} not found`);
 

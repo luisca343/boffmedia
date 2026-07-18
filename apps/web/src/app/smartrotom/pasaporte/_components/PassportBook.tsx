@@ -1,6 +1,7 @@
 "use client"
 
 import dynamic from "next/dynamic"
+import { useTranslations } from "next-intl"
 import { useCallback, useEffect, useMemo, useRef, useState, type ComponentProps, type ComponentType } from "react"
 import type FlipBook from "react-pageflip"
 import type { UserAchievement } from "@boffmedia/shared"
@@ -72,6 +73,7 @@ const SILK = {
 }
 
 export function PassportBook() {
+  const t = useTranslations("pasaporte")
   const uuid = usePasaporteUuid()
 
   const profile = usePassportProfile(uuid)
@@ -167,13 +169,13 @@ export function PassportBook() {
     const entries = CHAPTERS.filter((c) => c.key !== "insignias" || badges.length > 0)
     return entries.map((c, i) => ({
       key: c.key,
-      label: c.label,
+      label: t(`chapters.${c.key}`),
       no: String(i + 1).padStart(2, "0"),
       page: pages.findIndex((p) => p.chapter === c.key),
       tab: c.tab,
       deep: c.deep,
     }))
-  }, [badges.length, pages])
+  }, [badges.length, pages, t])
 
   const activeChapter = useMemo(() => {
     let active = -1
@@ -242,18 +244,18 @@ export function PassportBook() {
   // see even if their eyes are on the paper, not on the button.
   const announced = useRef(inspect)
   useEffect(() => {
-    if (inspect && !announced.current) toast("Modo Inspección activado · documento verificado")
+    if (inspect && !announced.current) toast(t("book.inspectToast"))
     announced.current = inspect
-  }, [inspect])
+  }, [inspect, t])
 
   const stamps = useMemo(
-    () => stampsFromHistory(achievements.data ?? [], ledger.data?.transactions ?? []),
-    [achievements.data, ledger.data],
+    () => stampsFromHistory(achievements.data ?? [], ledger.data?.transactions ?? [], t),
+    [achievements.data, ledger.data, t],
   )
 
   const milestones = useMemo(
-    () => milestonesFromHistory(achievements.data ?? [], logros.data ?? [], profile.data),
-    [achievements.data, logros.data, profile.data],
+    () => milestonesFromHistory(achievements.data ?? [], logros.data ?? [], profile.data, t),
+    [achievements.data, logros.data, profile.data, t],
   )
 
   if (!uuid) {
@@ -262,8 +264,8 @@ export function PassportBook() {
         <div className="w-[min(420px,92vw)] rounded-2xl border border-ps-gild/18 bg-ps-desk-lo/60 p-8">
           <EmptyState
             icon="idcard"
-            title="Sin pasaporte"
-            sub="Vincula tu cuenta de Minecraft para que el Gobierno de Teras emita tu documento."
+            title={t("book.emptyTitle")}
+            sub={t("book.emptySub")}
             className="text-ps-chrome-muted [&_p]:text-ps-chrome-muted"
           />
         </div>

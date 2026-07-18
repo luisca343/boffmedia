@@ -1,6 +1,11 @@
 declare global {
     interface Window {
-        mcefQuery?: (options: { request: string; onSuccess: (response: string) => void; onFailure: (error: string) => void }) => void;
+        /** JCEF calls `onFailure` with TWO args — `(error_code, error_message)` — not one. */
+        mcefQuery?: (options: {
+            request: string;
+            onSuccess: (response: string) => void;
+            onFailure: (errorCode: number, errorMessage: string) => void;
+        }) => void;
     }
 }
 
@@ -32,8 +37,9 @@ export async function mcefQuery<T>(query: string, data: Record<string, unknown> 
                         resolve({ error: 'Error parsing response: ' + error, status: 500 });
                     }
                 },
-                onFailure: (error: string) => {
-                    console.error('Query failed:', error);
+                onFailure: (errorCode: number, errorMessage: string) => {
+                    const error = errorMessage || `mcefQuery failed with code ${errorCode}`;
+                    console.error('Query failed:', query, errorCode, errorMessage);
                     resolve({ error, status: 400 });
                 }
             });

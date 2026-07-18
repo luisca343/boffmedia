@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { userMessageFrom } from "@/services/boffAPI"
 import { EmptyState, FeedSkeleton, Icon, SegTabs } from "./_components/ui"
@@ -22,6 +23,7 @@ import type { FeedTab } from "./_types"
  * apologising for having nothing.
  */
 export default function RookerFeedPage() {
+  const t = useTranslations("rooker")
   const [tab, setTab] = useState<FeedTab>("parati")
   const uuid = useRookerUuid()
   const { data: posts, isLoading, isError, error, refetch } = useFeed(tab)
@@ -34,8 +36,8 @@ export default function RookerFeedPage() {
         active={tab}
         onChange={setTab}
         tabs={[
-          { key: "parati", label: "Para ti" },
-          { key: "siguiendo", label: "Siguiendo" },
+          { key: "parati", label: t("feed.tabs.paraTi") },
+          { key: "siguiendo", label: t("feed.tabs.siguiendo") },
         ]}
       />
 
@@ -46,11 +48,11 @@ export default function RookerFeedPage() {
       ) : isError ? (
         <EmptyState
           icon="close"
-          title="El nido no responde"
-          body={error ? userMessageFrom(error, "Inténtalo de nuevo en unos segundos.") : undefined}
+          title={t("feed.error.title")}
+          body={error ? userMessageFrom(error, t("feed.error.fallbackBody")) : undefined}
           action={
             <Button intent="ghost" onClick={() => refetch()}>
-              Reintentar
+              {t("common.retry")}
             </Button>
           }
         />
@@ -63,27 +65,23 @@ export default function RookerFeedPage() {
           </div>
           <p className="flex items-center justify-center gap-2 py-6 text-center text-[13px] text-rk-fg-subtle">
             <Icon name="feather" size={14} />
-            Has llegado al fondo del nido.
+            {t("feed.endOfFeed")}
           </p>
         </>
       ) : tab === "siguiendo" ? (
         <EmptyState
           icon="users"
-          title="Tu nido está en silencio"
-          body="Aquí aparecerán los trinos de los entrenadores que sigas. Todavía no sigues a nadie que haya trinado."
+          title={t("feed.emptyFollowing.title")}
+          body={t("feed.emptyFollowing.body")}
         />
       ) : (
         <EmptyState
-          title="El nido está vacío"
-          body={
-            uuid
-              ? "Nadie ha trinado todavía. Sé el primero: cuenta una captura, reta a alguien o simplemente saluda."
-              : "Todavía no hay trinos. Inicia sesión para escribir el primero."
-          }
+          title={t("feed.emptyForYou.title")}
+          body={uuid ? t("feed.emptyForYou.bodyLoggedIn") : t("feed.emptyForYou.bodyLoggedOut")}
           action={
             uuid ? (
               <Button intent="accent" onClick={() => openCompose("text")}>
-                Escribir el primer trino
+                {t("feed.emptyForYou.cta")}
               </Button>
             ) : undefined
           }

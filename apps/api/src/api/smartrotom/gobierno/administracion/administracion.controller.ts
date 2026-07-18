@@ -9,8 +9,10 @@ import {
   Patch,
   Post,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import {
+  ApiBearerAuth,
   ApiBody,
   ApiOperation,
   ApiParam,
@@ -18,6 +20,10 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { Public } from '@api/_utils/decorators/public.decorator';
+import { JwtAuthGuard } from '@api/auth/jwt-auth.guard';
+import { RolesGuard } from '@api/_utils/guards/roles.guard';
+import { Roles } from '@api/_utils/decorators/roles.decorator';
+import { USER_ROLES } from '@api/_utils/auth/roles.constants';
 import { ActorBodyDto } from '../_shared/dto/actor-body.dto';
 import { AdministracionService } from './administracion.service';
 import {
@@ -36,7 +42,6 @@ import {
 } from './entities/administracion.entity';
 
 @ApiTags('SmartRotom | Gobierno | Administracion')
-@Public()
 @Controller('smartrotom/gobierno/administracion')
 export class AdministracionController {
   constructor(private readonly administracionService: AdministracionService) {}
@@ -44,6 +49,7 @@ export class AdministracionController {
   // ==================== NPC SKINS ====================
 
   @Get('npc-skins')
+  @Public()
   @ApiOperation({ summary: 'List NPC skin configs' })
   @ApiResponse({ status: HttpStatus.OK, type: [GobiernoNpcSkinEntity] })
   async listNpcSkins(): Promise<GobiernoNpcSkinEntity[]> {
@@ -51,6 +57,7 @@ export class AdministracionController {
   }
 
   @Get('npc-skins/:skin')
+  @Public()
   @ApiOperation({ summary: 'Get an NPC skin config' })
   @ApiParam({ name: 'skin', type: String })
   @ApiResponse({ status: HttpStatus.OK, type: GobiernoNpcSkinEntity })
@@ -61,6 +68,9 @@ export class AdministracionController {
   }
 
   @Post('npc-skins')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.GOBIERNO, USER_ROLES.ROTOM_ADMIN)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Create an NPC skin config' })
   @ApiBody({ type: CreateNpcSkinDto })
   @ApiResponse({ status: HttpStatus.CREATED, type: GobiernoNpcSkinEntity })
@@ -71,6 +81,9 @@ export class AdministracionController {
   }
 
   @Patch('npc-skins/:skin')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.GOBIERNO, USER_ROLES.ROTOM_ADMIN)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Update an NPC skin config' })
   @ApiParam({ name: 'skin', type: String })
   @ApiBody({ type: UpdateNpcSkinDto })
@@ -83,6 +96,9 @@ export class AdministracionController {
   }
 
   @Delete('npc-skins/:skin')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.GOBIERNO, USER_ROLES.ROTOM_ADMIN)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Delete an NPC skin config' })
   @ApiParam({ name: 'skin', type: String })
   @ApiBody({ type: ActorBodyDto })
@@ -97,6 +113,7 @@ export class AdministracionController {
   // ==================== MEGAFONIA ====================
 
   @Get('megafonia')
+  @Public()
   @ApiOperation({ summary: 'List broadcast history' })
   @ApiResponse({ status: HttpStatus.OK, type: [GobiernoMegafoniaEntity] })
   async listMegafonia(
@@ -106,6 +123,9 @@ export class AdministracionController {
   }
 
   @Post('megafonia/send')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.GOBIERNO, USER_ROLES.ROTOM_ADMIN)
+  @ApiBearerAuth()
   @ApiOperation({
     summary: 'Broadcast a message to the in-game global chat and record it',
   })
@@ -120,6 +140,7 @@ export class AdministracionController {
   // ==================== CARTELES ====================
 
   @Get('carteles')
+  @Public()
   @ApiOperation({ summary: 'List saved sign configs' })
   @ApiResponse({ status: HttpStatus.OK, type: [GobiernoCartelEntity] })
   async listCarteles(
@@ -129,6 +150,7 @@ export class AdministracionController {
   }
 
   @Get('carteles/:id')
+  @Public()
   @ApiOperation({ summary: 'Get a cartel by id' })
   @ApiParam({ name: 'id', type: Number })
   @ApiResponse({ status: HttpStatus.OK, type: GobiernoCartelEntity })
@@ -139,6 +161,9 @@ export class AdministracionController {
   }
 
   @Post('carteles')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.GOBIERNO, USER_ROLES.ROTOM_ADMIN)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Save a sign config' })
   @ApiBody({ type: CreateCartelDto })
   @ApiResponse({ status: HttpStatus.CREATED, type: GobiernoCartelEntity })
@@ -149,6 +174,9 @@ export class AdministracionController {
   }
 
   @Patch('carteles/:id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.GOBIERNO, USER_ROLES.ROTOM_ADMIN)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Update a cartel' })
   @ApiParam({ name: 'id', type: Number })
   @ApiBody({ type: UpdateCartelDto })
@@ -161,6 +189,9 @@ export class AdministracionController {
   }
 
   @Delete('carteles/:id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.GOBIERNO, USER_ROLES.ROTOM_ADMIN)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Delete a cartel' })
   @ApiParam({ name: 'id', type: Number })
   @ApiBody({ type: ActorBodyDto })

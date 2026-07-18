@@ -7,8 +7,10 @@ import { IS_OPTIONAL_AUTH_KEY } from '@api/_utils/decorators/optional-auth.decor
 /**
  * JWT auth guard. Registered as the global `APP_GUARD` (secure-by-default), so
  * it also honours the `@Public()` decorator: a route/controller marked public
- * skips authentication. Still usable per-route via `@UseGuards(JwtAuthGuard)` —
- * an explicitly-guarded route is never public.
+ * skips authentication. Also usable per-route via `@UseGuards(JwtAuthGuard)`, but
+ * `@Public()` still wins — including a CLASS-level one, which silently turns a
+ * route-level `@UseGuards(JwtAuthGuard)` into a no-op. Mark the public GETs
+ * individually instead of the controller (see the gobierno controllers).
  *
  * `@OptionalAuth()` routes run passport but never reject: a valid token
  * populates `req.user`, a missing/invalid one leaves it `undefined`.

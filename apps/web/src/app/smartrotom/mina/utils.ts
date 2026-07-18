@@ -13,10 +13,6 @@ export async function generateGame(numFilas: number, numColumnas: number){
     const positions = await generatePositions(numFilas, numColumnas, rewards);
     const map = await getMineMap(numFilas, numColumnas);
 
-    console.log('Mapa generado');
-    console.log(map);
-    console.log('Posiciones generadas');
-    console.log(positions);
 
     return {map, positions};
 }
@@ -37,7 +33,6 @@ export async function getMineMap(numFilas: number, numColumnas: number) {
 async function getRewards(cantidad: number = 5) {
     const {data: rewards} = await MinaService.getAllRewards();
     const rewardsTmp = []
-    console.log(rewards);
     
     if (!rewards) {
         console.error('No rewards found');
@@ -53,7 +48,6 @@ async function getRewards(cantidad: number = 5) {
         rewardsTmp.push(reward);
     }
 
-    console.log(rewardsTmp);
     return rewardsTmp;
 }
 
@@ -84,19 +78,16 @@ async function generatePositions(rowNum: number, colNum: number, rewards: MineRe
     let errors = 0;
 
     for(let i = 0; i < rewards.length; i++) {
-        console.log('Generando posición válida ' + i + ' de ' + rewards.length + ' recompensas');
         const reward = rewards[i];
         let x = Math.floor(Math.random() * (colNum - reward.width));
         let y = Math.floor(Math.random() * (rowNum - reward.height));
 
         let overlaps = false;
         for(let j = 0; j < positions.length; j++) {
-            console.log('Comparando con posición ' + j);
             if(!overlaps){
                 const comparing = positions[j];
                 overlaps = validPosition({reward, x, y}, comparing)
             } else {
-                console.log('Posición inválida');
                 break;
             }
         }
@@ -109,14 +100,12 @@ async function generatePositions(rowNum: number, colNum: number, rewards: MineRe
             }
             i--;
         } else {
-            console.log('Posición válida');
             positions.push({reward, x, y});
         }
 
         
     }
 
-    console.log(positions);
     return positions;
 }
 

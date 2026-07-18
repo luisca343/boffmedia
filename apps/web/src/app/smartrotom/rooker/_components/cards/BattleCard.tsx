@@ -1,9 +1,10 @@
 "use client"
 
 import Link from "next/link"
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { Avatar, Icon } from "../ui"
-import { relTime } from "../../_utils/format"
+import { useFormat } from "../../_hooks/useFormat"
 import type { RookerAuthor, RookerBattle } from "../../_types"
 
 /**
@@ -21,6 +22,9 @@ import type { RookerAuthor, RookerBattle } from "../../_types"
  * already exists.
  */
 export function BattleCard({ data, author }: { data: RookerBattle; author: RookerAuthor }) {
+  const t = useTranslations("rooker")
+  const { relTime } = useFormat()
+  const rival = t("card.battle.rival")
   const mine = data.side1 === author.uuid ? data.side1 : data.side2
   const theirs = mine === data.side1 ? data.side2 : data.side1
 
@@ -36,7 +40,7 @@ export function BattleCard({ data, author }: { data: RookerBattle; author: Rooke
       <div className="flex items-center justify-between border-b border-rk-line px-3.5 py-2.5">
         <span className={cn("inline-flex items-center gap-1.5 text-[15px] font-extrabold tracking-[.02em]", tone)}>
           <Icon name="sword" size={16} />
-          {!decided ? "SIN DECIDIR" : won ? "VICTORIA" : "DERROTA"}
+          {!decided ? t("card.battle.undecided") : won ? t("card.battle.victory") : t("card.battle.defeat")}
         </span>
         <span className="text-[11.5px] font-semibold text-rk-fg-muted">{relTime(data.createdAt)}</span>
       </div>
@@ -49,11 +53,11 @@ export function BattleCard({ data, author }: { data: RookerBattle; author: Rooke
           </span>
         </div>
 
-        <span className="text-[13px] font-extrabold uppercase tracking-widest text-rk-fg-subtle">vs</span>
+        <span className="text-[13px] font-extrabold uppercase tracking-widest text-rk-fg-subtle">{t("card.battle.vs")}</span>
 
         <div className="flex flex-1 flex-col items-center gap-1.5">
-          <Avatar user={{ uuid: theirs, username: "Rival", partnerPokemonId: null }} size={42} />
-          <span className="max-w-full truncate text-[12px] font-bold text-rk-fg">Rival</span>
+          <Avatar user={{ uuid: theirs, username: rival, partnerPokemonId: null }} size={42} />
+          <span className="max-w-full truncate text-[12px] font-bold text-rk-fg">{rival}</span>
         </div>
       </div>
 
@@ -67,7 +71,7 @@ export function BattleCard({ data, author }: { data: RookerBattle; author: Rooke
           )}
         >
           <Icon name="play" size={12} fill />
-          Ver repetición
+          {t("card.battle.viewReplay")}
         </Link>
       </div>
     </div>

@@ -1,6 +1,7 @@
 "use client"
 
 import { useMemo } from "react"
+import { useTranslations } from "next-intl"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { useRotomUuid } from "@/components/smartrotom/behavior/useRotomUuid"
 import { usePokemonStore } from "@/stores/pokemonStore"
@@ -343,110 +344,117 @@ function useInvalidateAfterMoney() {
 }
 
 export function useToggleWatch() {
+  const t = useTranslations("wigglypop")
   const uuid = useWpUuid()
   const qc = useQueryClient()
   return useMutation({
     mutationFn: (listingId: number) => {
-      if (!uuid) throw new Error("Sesión no iniciada")
+      if (!uuid) throw new Error(t("toast.sessionNotStarted"))
       return WigglypopService.toggleWatch<{ watching: boolean }>(uuid, listingId)
     },
     onSuccess: (res) => {
-      toast(res.watching ? "Añadido a seguimiento" : "Quitado de seguimiento", "success")
+      toast(res.watching ? t("toast.watchAdded") : t("toast.watchRemoved"), "success")
       if (uuid) void qc.invalidateQueries({ queryKey: wpKeys.watchlist(uuid) })
       void qc.invalidateQueries({ queryKey: ["wigglypop", "listings"] })
     },
-    onError: (e: unknown) => toast(userMessageFrom(e, "No se pudo actualizar el seguimiento"), "error"),
+    onError: (e: unknown) => toast(userMessageFrom(e, t("toast.watchUpdateError")), "error"),
   })
 }
 
 /** THE buy. One escrow payment for the whole basket. */
 export function useCreateOrder() {
+  const t = useTranslations("wigglypop")
   const uuid = useWpUuid()
   const invalidate = useInvalidateAfterMoney()
   const byDex = useSpeciesByDex()
   return useMutation({
     mutationFn: (lines: Array<{ listingId: number; qty: number }>) => {
-      if (!uuid) throw new Error("Sesión no iniciada")
+      if (!uuid) throw new Error(t("toast.sessionNotStarted"))
       return WigglypopService.createOrder<any>({ buyerUuid: uuid, lines })
     },
     onSuccess: (raw) => {
       invalidate()
       return toOrder(raw, byDex)
     },
-    onError: (e: unknown) => toast(userMessageFrom(e, "No se pudo completar la compra"), "error"),
+    onError: (e: unknown) => toast(userMessageFrom(e, t("toast.orderCreateError")), "error"),
   })
 }
 
 /** Buyer confirms receipt — this is what actually releases the money to the seller. */
 export function useConfirmOrder() {
+  const t = useTranslations("wigglypop")
   const uuid = useWpUuid()
   const invalidate = useInvalidateAfterMoney()
   return useMutation({
     mutationFn: (orderId: number) => {
-      if (!uuid) throw new Error("Sesión no iniciada")
+      if (!uuid) throw new Error(t("toast.sessionNotStarted"))
       return WigglypopService.confirmOrder(orderId, uuid)
     },
     onSuccess: () => {
-      toast("Pago liberado · ¡gracias por confirmar!", "success")
+      toast(t("toast.orderConfirmed"), "success")
       invalidate()
     },
-    onError: (e: unknown) => toast(userMessageFrom(e, "No se pudo confirmar el pedido"), "error"),
+    onError: (e: unknown) => toast(userMessageFrom(e, t("toast.orderConfirmError")), "error"),
   })
 }
 
 /** Seller says they handed it over in-game. Manual-custody path only. */
 export function useMarkTransferred() {
+  const t = useTranslations("wigglypop")
   const uuid = useWpUuid()
   const invalidate = useInvalidateAfterMoney()
   return useMutation({
     mutationFn: (orderId: number) => {
-      if (!uuid) throw new Error("Sesión no iniciada")
+      if (!uuid) throw new Error(t("toast.sessionNotStarted"))
       return WigglypopService.markTransferred(orderId, uuid)
     },
     onSuccess: () => {
-      toast("Marcado como transferido", "success")
+      toast(t("toast.markTransferred"), "success")
       invalidate()
     },
-    onError: (e: unknown) => toast(userMessageFrom(e, "No se pudo marcar como transferido"), "error"),
+    onError: (e: unknown) => toast(userMessageFrom(e, t("toast.markTransferredError")), "error"),
   })
 }
 
 export function useCancelOrder() {
+  const t = useTranslations("wigglypop")
   const uuid = useWpUuid()
   const invalidate = useInvalidateAfterMoney()
   return useMutation({
     mutationFn: (orderId: number) => {
-      if (!uuid) throw new Error("Sesión no iniciada")
+      if (!uuid) throw new Error(t("toast.sessionNotStarted"))
       return WigglypopService.cancelOrder(orderId, uuid)
     },
     onSuccess: () => {
-      toast("Depósito reembolsado a tu monedero", "success")
+      toast(t("toast.orderCancelled"), "success")
       invalidate()
     },
-    onError: (e: unknown) => toast(userMessageFrom(e, "No se pudo cancelar el pedido"), "error"),
+    onError: (e: unknown) => toast(userMessageFrom(e, t("toast.orderCancelError")), "error"),
   })
 }
 
 export function usePlaceBid() {
+  const t = useTranslations("wigglypop")
   const uuid = useWpUuid()
   const invalidate = useInvalidateAfterMoney()
   const qc = useQueryClient()
   return useMutation({
     mutationFn: ({ listingId, amount }: { listingId: number; amount: number }) => {
-      if (!uuid) throw new Error("Sesión no iniciada")
+      if (!uuid) throw new Error(t("toast.sessionNotStarted"))
       return WigglypopService.placeBid({ listingId, bidderUuid: uuid, amount })
     },
     onSuccess: (_d, { listingId }) => {
-      toast("Puja registrada", "success")
+      toast(t("toast.bidPlaced"), "success")
       invalidate()
       void qc.invalidateQueries({ queryKey: wpKeys.listing(listingId) })
       void qc.invalidateQueries({ queryKey: wpKeys.bids(listingId) })
     },
-    onError: (e: unknown) => toast(userMessageFrom(e, "No se pudo registrar la puja"), "error"),
+    onError: (e: unknown) => toast(userMessageFrom(e, t("toast.bidError")), "error"),
   })
 }
 
 export function useCreateOffer() {
+  const t = useTranslations("wigglypop")
   const uuid = useWpUuid()
   const qc = useQueryClient()
   return useMutation({
@@ -459,37 +467,39 @@ export function useCreateOffer() {
       amount: number
       qty?: number
     }) => {
-      if (!uuid) throw new Error("Sesión no iniciada")
+      if (!uuid) throw new Error(t("toast.sessionNotStarted"))
       return WigglypopService.createOffer({ listingId, buyerUuid: uuid, amount, qty })
     },
     onSuccess: (_d, { listingId }) => {
-      toast("Oferta enviada", "success")
+      toast(t("toast.offerSent"), "success")
       void qc.invalidateQueries({ queryKey: wpKeys.listing(listingId) })
     },
-    onError: (e: unknown) => toast(userMessageFrom(e, "No se pudo enviar la oferta"), "error"),
+    onError: (e: unknown) => toast(userMessageFrom(e, t("toast.offerSendError")), "error"),
   })
 }
 
 export function useCreateListing() {
+  const t = useTranslations("wigglypop")
   const qc = useQueryClient()
   const uuid = useWpUuid()
   return useMutation({
     mutationFn: (body: unknown) => WigglypopService.createListing<any>(body),
     onSuccess: () => {
-      toast("¡Anuncio publicado!", "success")
+      toast(t("toast.listingPublished"), "success")
       void qc.invalidateQueries({ queryKey: ["wigglypop", "listings"] })
       if (uuid) void qc.invalidateQueries({ queryKey: wpKeys.seller(uuid) })
     },
-    onError: (e: unknown) => toast(userMessageFrom(e, "No se pudo publicar el anuncio"), "error"),
+    onError: (e: unknown) => toast(userMessageFrom(e, t("toast.listingPublishError")), "error"),
   })
 }
 
 export function useUpdateListing() {
+  const t = useTranslations("wigglypop")
   const qc = useQueryClient()
   const uuid = useWpUuid()
   return useMutation({
     mutationFn: ({ id, patch }: { id: number; patch: Record<string, unknown> }) => {
-      if (!uuid) throw new Error("Sesión no iniciada")
+      if (!uuid) throw new Error(t("toast.sessionNotStarted"))
       return WigglypopService.updateListing<any>(id, { ...patch, actorUuid: uuid })
     },
     onSuccess: (_d, { id }) => {
@@ -497,6 +507,6 @@ export function useUpdateListing() {
       void qc.invalidateQueries({ queryKey: wpKeys.listing(id) })
       if (uuid) void qc.invalidateQueries({ queryKey: wpKeys.seller(uuid) })
     },
-    onError: (e: unknown) => toast(userMessageFrom(e, "No se pudo actualizar el anuncio"), "error"),
+    onError: (e: unknown) => toast(userMessageFrom(e, t("toast.listingUpdateError")), "error"),
   })
 }

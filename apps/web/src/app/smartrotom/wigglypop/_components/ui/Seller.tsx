@@ -1,3 +1,6 @@
+"use client"
+
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import type { WpListing, WpSeller } from "../../_types/market.types"
 import { Icon } from "./Icon"
@@ -65,6 +68,7 @@ export function TrustBadges({
   listing: Pick<WpListing, "escrow" | "kind">
   className?: string
 }) {
+  const t = useTranslations("wigglypop")
   const badges: Array<{
     icon: "shieldCheck" | "lock" | "history" | "info"
     label: string
@@ -73,13 +77,13 @@ export function TrustBadges({
   }> = []
 
   if (listing.kind === "item") {
-    badges.push({ icon: "info", label: "Objeto declarado por el vendedor", amber: true })
+    badges.push({ icon: "info", label: t("trust.itemDeclared"), amber: true })
   } else {
-    badges.push({ icon: "shieldCheck", label: "Propiedad verificada (PC)" })
+    badges.push({ icon: "shieldCheck", label: t("trust.ownerVerified") })
   }
-  if (listing.escrow) badges.push({ icon: "lock", label: "Pago en depósito (escrow)" })
+  if (listing.escrow) badges.push({ icon: "lock", label: t("trust.escrowHeld") })
   if (listing.kind !== "item") {
-    badges.push({ icon: "history", label: "Historial de precios", pink: true })
+    badges.push({ icon: "history", label: t("trust.priceHistory"), pink: true })
   }
 
   return (

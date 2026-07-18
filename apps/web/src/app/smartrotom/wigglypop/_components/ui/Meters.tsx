@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { STAT_COLORS } from "../../_utils/typeColors"
 import { countdown } from "../../_utils/format"
@@ -20,13 +21,14 @@ export function Stars({
   size?: number
   className?: string
 }) {
+  const t = useTranslations("wigglypop")
   if (value === null) return null
   const full = Math.floor(value)
   return (
     <span
       className={cn("inline-flex gap-px text-wp-gold", className)}
       role="img"
-      aria-label={`${value.toFixed(1)} de 5`}
+      aria-label={t("common.starsAriaLabel", { value: value.toFixed(1) })}
     >
       {[0, 1, 2, 3, 4].map((i) => (
         <Icon
@@ -48,9 +50,10 @@ export function Stars({
  * a buyer scanning a grid can spot a 6IV mon without reading a single number.
  */
 export function IVMeter({ ivs, className }: { ivs: number[]; className?: string }) {
+  const t = useTranslations("wigglypop")
   const keys = ["hp", "atk", "def", "spa", "spd", "spe"]
   return (
-    <span className={cn("inline-flex items-center gap-0.5", className)} title="IVs">
+    <span className={cn("inline-flex items-center gap-0.5", className)} title={t("common.ivsLabel")}>
       {keys.map((k, i) => {
         const v = ivs[i] ?? 0
         const c = STAT_COLORS[k]
@@ -89,13 +92,15 @@ export function StatBar({ statKey, value, max }: { statKey: string; value: numbe
  * component rather than a formatted string.
  */
 export function Countdown({ endsAt, className }: { endsAt: string; className?: string }) {
-  const [now, setNow] = useState(() => countdown(endsAt))
+  const t = useTranslations("wigglypop")
+  const overLabel = t("status.auctionEnded")
+  const [now, setNow] = useState(() => countdown(endsAt, overLabel))
 
   useEffect(() => {
-    setNow(countdown(endsAt))
-    const t = setInterval(() => setNow(countdown(endsAt)), 1000)
-    return () => clearInterval(t)
-  }, [endsAt])
+    setNow(countdown(endsAt, overLabel))
+    const timer = setInterval(() => setNow(countdown(endsAt, overLabel)), 1000)
+    return () => clearInterval(timer)
+  }, [endsAt, overLabel])
 
   return (
     <span

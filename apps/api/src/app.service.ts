@@ -13,6 +13,7 @@ import { MySql2Database } from 'drizzle-orm/mysql2';
 import { Logger } from 'nestjs-pino';
 import { env } from '@/config/env';
 
+// LEGACY_DIRECT_DB: pre-dates the repository rule; extract a repository when next touched
 @Injectable()
 export class AppService {
   private imageCache: { [key: string]: string } = {};

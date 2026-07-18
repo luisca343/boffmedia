@@ -1,6 +1,7 @@
 "use client"
 
 import { useRouter } from "next/navigation"
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { ActionBtn, AuthorLine, Avatar, Icon, ReactionControl, RichText } from "./ui"
 import { CaptureCard } from "./cards/CaptureCard"
@@ -31,6 +32,7 @@ export interface PostCardProps {
 
 export function PostCard({ post, last = false }: PostCardProps) {
   const router = useRouter()
+  const t = useTranslations("rooker")
   const uuid = useRookerUuid()
   const react = useReact()
   const retrino = useRetrino()
@@ -74,7 +76,7 @@ export function PostCard({ post, last = false }: PostCardProps) {
             style={{ marginLeft: avatar + 12 }}
           >
             <Icon name="pin" size={13} fill className="text-rk-accent" />
-            Fijado por el nido
+            {t("post.pinnedBy")}
           </div>
         )}
         {post.retrinoBy && (
@@ -82,7 +84,7 @@ export function PostCard({ post, last = false }: PostCardProps) {
             className="mb-1 flex items-center gap-1.5 text-[12.5px] font-semibold text-rk-fg-subtle"
             style={{ marginLeft: avatar + 12 }}
           >
-            <Icon name="retrino" size={13} />@{post.retrinoBy} retrinó
+            <Icon name="retrino" size={13} />{t("post.retrinoedBy", { handle: post.retrinoBy })}
           </div>
         )}
 
@@ -113,14 +115,14 @@ export function PostCard({ post, last = false }: PostCardProps) {
             <div className="-ml-1.5 mt-2 flex max-w-[440px] items-center justify-between">
               <ActionBtn
                 icon="reply"
-                label="Responder"
+                label={t("post.actions.reply")}
                 count={post.counts.replies}
                 tone="accent"
                 onClick={() => (uuid ? openReply({ id: post.id, handle: post.author.handle }) : open())}
               />
               <ActionBtn
                 icon="retrino"
-                label={post.me.retrino ? "Deshacer retrino" : "Retrinar"}
+                label={post.me.retrino ? t("post.actions.undoRetrino") : t("post.actions.retrino")}
                 count={post.counts.retrinos}
                 tone="rt"
                 active={post.me.retrino}
@@ -134,7 +136,7 @@ export function PostCard({ post, last = false }: PostCardProps) {
               />
               <ActionBtn
                 icon="bookmark"
-                label={post.me.bookmark ? "Quitar de guardados" : "Guardar"}
+                label={post.me.bookmark ? t("post.actions.unsave") : t("post.actions.save")}
                 tone="accent"
                 active={post.me.bookmark}
                 onClick={() => uuid && bookmark.mutate(post.id)}

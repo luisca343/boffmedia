@@ -4,14 +4,12 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { MySql2Database } from 'drizzle-orm/mysql2';
 import { Logger } from 'nestjs-pino';
-import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
 import {
   STARBANK_ACCOUNT_REPOSITORY_TOKEN,
   STARBANK_TRANSACTION_REPOSITORY_TOKEN,
 } from '@api/_utils/repositories/interfaces/repository.token';
-import { starBankAccounts } from '@/_db/schema/SmartRotomStarBank';
+import { TreasuryRepository } from './treasury.repository';
 import { IStarbankAccountRepository } from '../../starbank/repositories/interfaces/starbank-account.repository';
 import { IStarbankTransactionRepository } from '../../starbank/repositories/interfaces/starbank-transaction.repository';
 import { AccountType } from '../../starbank/enums/account-type.enum';
@@ -20,17 +18,15 @@ import { WingullFacadeService } from '../../wingull/wingull.facade.service';
 
 const TREASURY_NAME = 'Tesorería de Teras';
 
-// The single civic bank account. Fines, taxes, auction settlements and bounty payouts are
-// real StarBank transactions against this account — never bookkeeping rows. Reuses the
-// StarBank account/transaction repositories directly (fresh instances, same DB) so balances
-// and the ledger stay consistent with the rest of the bank.
+// Every civic movement is a real StarBank transaction against this account, never a
+// bookkeeping row — that is what keeps balances and the ledger consistent with the bank.
 @Injectable()
 export class TreasuryService {
   private treasuryAccountId: number | null = null;
 
   constructor(
     private readonly logger: Logger,
-    @Inject(DRIZZLE) private readonly db: MySql2Database<Record<string, never>>,
+    private readonly treasuryRepository: TreasuryRepository,
     @Inject(STARBANK_ACCOUNT_REPOSITORY_TOKEN)
     private readonly accountRepository: IStarbankAccountRepository,
     @Inject(STARBANK_TRANSACTION_REPOSITORY_TOKEN)
@@ -38,11 +34,7 @@ export class TreasuryService {
     private readonly wingullFacadeService: WingullFacadeService,
   ) {}
 
-  /**
-   * Resolves the single GOVERNMENT account, lazily seeding it once if the `pnpm seed` script
-   * hasn't run yet. Bypasses `StarbankAccountRepository.create()`, which always links the new
-   * account to a player uuid in `rotom_bank_users_accounts` — the treasury has no owner.
-   */
+  /** Resolves the single GOVERNMENT account, lazily seeding it once if `pnpm seed` hasn't run. */
   async getTreasuryAccountId(): Promise<number> {
     if (this.treasuryAccountId) return this.treasuryAccountId;
 
@@ -54,11 +46,10 @@ export class TreasuryService {
       return this.treasuryAccountId;
     }
 
-    const result = await this.db
-      .insert(starBankAccounts)
-      .values({ name: TREASURY_NAME, balance: 0, type: AccountType.GOVERNMENT })
-      .execute();
-    this.treasuryAccountId = result[0].insertId;
+    this.treasuryAccountId = await this.treasuryRepository.createOwnerlessAccount(
+      TREASURY_NAME,
+      AccountType.GOVERNMENT,
+    );
     this.logger.log(
       `Seeded treasury account #${this.treasuryAccountId} (${TREASURY_NAME})`,
     );

@@ -5,8 +5,8 @@ import { useRotomUuid } from "@/components/smartrotom/behavior/useRotomUuid";
 import { useAccounts, useAllAccounts, useTransferMutation } from "../_hooks/queries";
 import { userMessageFrom } from "@/services/boffAPI";
 import { PageHeader, Card, Button, Ico, Stepper, Label, Input, Select, ContactAvatar, AccountAvatar } from "../_components/ui";
-import { formatMoney } from "../_utils/format";
-import { displayName } from "../_utils/account";
+import { formatMoney, parseAmount } from "../_utils/format";
+import { displayName, transferBlocker } from "../_utils/account";
 import { cn } from "@/lib/utils";
 import type { SBAccount } from "../_types";
 
@@ -47,9 +47,10 @@ export default function Enviar() {
     [everyone, mine, q2],
   );
 
-  const amount = Math.round(Number(amountStr.replace(/\./g, "").replace(",", ".")) || 0);
+  const amount = parseAmount(amountStr);
   const canNext1 = !!recipient;
-  const canNext2 = amount > 0 && !!fromAcc && amount <= fromAcc.balance && recipient?.id !== from;
+  const canNext2 =
+    transferBlocker({ amount, fromId: fromAcc?.id, toId: recipient?.id, balance: fromAcc?.balance }) === null;
 
   function finish() {
     if (!recipient || !fromAcc) return;

@@ -2,7 +2,7 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import type { Region, StarBankAccount, StarBankTransaction, TaxiStop } from "@boffmedia/shared"
-import { rotomGETOrThrow, rotomPOSTOrThrow, wingullGETOrThrow } from "@/services/boffAPI"
+import { rotomAuthedPOSTOrThrow, rotomGETOrThrow, rotomPOSTOrThrow, wingullGETOrThrow } from "@/services/boffAPI"
 import { getMcUserData } from "@/services/mcef/mcefApi"
 import { POSITION_REFRESH_INTERVAL, TAXI_SERVICE_ACCOUNT } from "../_utils/constants"
 import { TRIP_CONCEPT_PREFIX } from "../_utils/trips"
@@ -132,7 +132,7 @@ export function useTeleport(uuid?: string) {
       if (!uuid) throw new Error("Necesitas iniciar sesión para viajar")
 
       try {
-        await rotomPOSTOrThrow<void>("/starbank/transfer/from-main", {
+        await rotomAuthedPOSTOrThrow<void>("/starbank/transfer/from-main", {
           uuid,
           to: TAXI_SERVICE_ACCOUNT,
           amount: price,

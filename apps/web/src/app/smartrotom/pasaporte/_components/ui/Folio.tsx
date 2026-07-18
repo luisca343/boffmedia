@@ -1,5 +1,6 @@
 // PAPER. The furniture at the foot of every leaf.
 
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { Icon } from "./Icon"
 
@@ -19,6 +20,7 @@ export function Folio({
   onIndex?: () => void
   className?: string
 }) {
+  const t = useTranslations("pasaporte")
   return (
     <>
       <span
@@ -42,7 +44,7 @@ export function Folio({
           )}
         >
           <Icon name="book" className="h-3.5 w-3.5" />
-          Índice
+          {t("indice.title")}
         </button>
       )}
     </>

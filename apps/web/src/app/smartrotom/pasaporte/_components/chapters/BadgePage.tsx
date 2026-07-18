@@ -2,6 +2,7 @@
 
 // PAPER. One earned gym badge, and the battle it was taken with.
 
+import { useTranslations } from "next-intl"
 import type { UserAchievement } from "@boffmedia/shared"
 import { typesOf } from "@/app/smartrotom/pc/_utils/derive"
 import { TYPE_LABELS } from "@/app/smartrotom/pokedex/_utils/typeColors"
@@ -26,6 +27,7 @@ export function BadgePage({
   inspect: boolean
   onReplay: (achievement: UserAchievement) => void
 }) {
+  const t = useTranslations("pasaporte")
   const speciesByDex = usePokemonStore((s) => s.pokemonByDex)
   const team = parseTeam(achievement.team)
   const circuit = shortCircuit(achievement.subcategory)
@@ -46,7 +48,7 @@ export function BadgePage({
           <h2 className="font-ps-ceremony text-[clamp(22px,3.4vh,32px)] leading-[1.04]">{achievement.name}</h2>
           <p className="ps-num mt-1.5 flex items-center gap-1.5 font-ps-mono text-[11px] tracking-[.06em] text-ps-ink-faint">
             <Icon name="cal" className="h-3.5 w-3.5" />
-            Obtenida · {docDate(achievement.completedAt)}
+            {t("badgePage.obtained", { date: docDate(achievement.completedAt) })}
           </p>
           {achievement.replay && (
             <Button
@@ -54,7 +56,7 @@ export function BadgePage({
               className="mt-2 h-auto border-ps-ink bg-ps-ink px-3.5 py-2 text-ps-paper shadow-[0_2px_0_rgba(0,0,0,.3)] hover:border-ps-chapter-deep hover:bg-ps-chapter-deep hover:text-ps-paper focus-visible:ring-ps-chapter focus-visible:ring-offset-ps-paper"
             >
               <Icon name="play" className="h-3.5 w-3.5" />
-              Ver Repetición
+              {t("badgePage.watchReplay")}
             </Button>
           )}
         </div>
@@ -64,8 +66,8 @@ export function BadgePage({
 
       {team.length > 0 && (
         <>
-          <SectionLabel className="text-[13px]" count={`${team.length} Pokémon`}>
-            Equipo de la victoria
+          <SectionLabel className="text-[13px]" count={t("badgePage.teamCount", { count: team.length })}>
+            {t("badgePage.team")}
           </SectionLabel>
           <ul className="flex-1">
             {team.slice(0, 6).map((mon, i) => {
@@ -84,11 +86,13 @@ export function BadgePage({
                   <div className="min-w-0 flex-1">
                     <div className="truncate font-ps-ceremony text-[13px]">
                       {mon.name || mon.species}{" "}
-                      <span className="ps-num font-ps-mono text-[9px] text-ps-ink-faint">Nv.{mon.level}</span>
+                      <span className="ps-num font-ps-mono text-[9px] text-ps-ink-faint">
+                        {t("common.level", { level: mon.level })}
+                      </span>
                     </div>
                     <div className="mt-0.5 flex flex-wrap gap-1">
-                      {types.map((t, ti) => (
-                        <TypePill key={`${ti}-${t}`} type={t} className="px-[5px] py-px text-[8px]" />
+                      {types.map((typeName, ti) => (
+                        <TypePill key={`${ti}-${typeName}`} type={typeName} className="px-[5px] py-px text-[8px]" />
                       ))}
                     </div>
                   </div>
@@ -105,9 +109,9 @@ export function BadgePage({
       )}
 
       <HoloStamp show={inspect} className="top-[30%]">
-        SELLO
+        {t("badgePage.seal.line1")}
         <br />
-        VÁLIDO
+        {t("badgePage.seal.line2")}
       </HoloStamp>
     </>
   )

@@ -22,7 +22,6 @@ export function ScreenshotPreviewDialog({
   onNavigate,
   onDelete
 }: ScreenshotPreviewDialogProps) {
-  console.log('ScreenshotPreviewDialog render - isOpen:', isOpen, 'previewIndex:', previewIndex)
 
   if (previewIndex === null || !gallery[previewIndex]) {
     return null
@@ -53,7 +52,6 @@ export function ScreenshotPreviewDialog({
     <Dialog 
       open={isOpen} 
       onOpenChange={(open) => {
-        console.log('Dialog onOpenChange:', open)
         if (!open) onClose()
       }}
     >

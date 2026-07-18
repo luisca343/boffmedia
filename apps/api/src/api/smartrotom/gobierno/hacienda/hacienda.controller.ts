@@ -9,8 +9,11 @@ import {
   Patch,
   Post,
   Query,
+  Req,
+  UseGuards,
 } from '@nestjs/common';
 import {
+  ApiBearerAuth,
   ApiBody,
   ApiOperation,
   ApiParam,
@@ -18,6 +21,13 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { Public } from '@api/_utils/decorators/public.decorator';
+import { Request } from 'express';
+import { GameOrUserAuthGuard } from '@api/_utils/guards/game-or-user-auth.guard';
+import { resolveActor } from '@api/_utils/auth/actor';
+import { JwtAuthGuard } from '@api/auth/jwt-auth.guard';
+import { RolesGuard } from '@api/_utils/guards/roles.guard';
+import { Roles } from '@api/_utils/decorators/roles.decorator';
+import { USER_ROLES } from '@api/_utils/auth/roles.constants';
 import { ActorBodyDto } from '../_shared/dto/actor-body.dto';
 import { HaciendaService } from './hacienda.service';
 import {
@@ -39,7 +49,6 @@ import {
 } from './entities/hacienda.entity';
 
 @ApiTags('SmartRotom | Gobierno | Hacienda')
-@Public()
 @Controller('smartrotom/gobierno/hacienda')
 export class HaciendaController {
   constructor(private readonly haciendaService: HaciendaService) {}
@@ -47,6 +56,7 @@ export class HaciendaController {
   // ==================== MULTAS ====================
 
   @Get('multas')
+  @Public()
   @ApiOperation({ summary: 'List multas' })
   @ApiResponse({ status: HttpStatus.OK, type: GobiernoMultaListEntity })
   async listMultas(
@@ -56,6 +66,7 @@ export class HaciendaController {
   }
 
   @Get('multas/:id')
+  @Public()
   @ApiOperation({ summary: 'Get a multa by id' })
   @ApiParam({ name: 'id', type: Number })
   @ApiResponse({ status: HttpStatus.OK, type: GobiernoMultaEntity })
@@ -66,6 +77,9 @@ export class HaciendaController {
   }
 
   @Post('multas')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.GOBIERNO, USER_ROLES.ROTOM_ADMIN)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Issue a multa' })
   @ApiBody({ type: CreateMultaDto })
   @ApiResponse({ status: HttpStatus.CREATED, type: GobiernoMultaEntity })
@@ -74,6 +88,9 @@ export class HaciendaController {
   }
 
   @Patch('multas/:id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.GOBIERNO, USER_ROLES.ROTOM_ADMIN)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Update a pending multa' })
   @ApiParam({ name: 'id', type: Number })
   @ApiBody({ type: UpdateMultaDto })
@@ -86,6 +103,9 @@ export class HaciendaController {
   }
 
   @Delete('multas/:id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.GOBIERNO, USER_ROLES.ROTOM_ADMIN)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Delete a multa' })
   @ApiParam({ name: 'id', type: Number })
   @ApiBody({ type: ActorBodyDto })
@@ -98,6 +118,9 @@ export class HaciendaController {
   }
 
   @Post('multas/:id/pay')
+  @Public()
+  @UseGuards(GameOrUserAuthGuard)
+  @ApiBearerAuth()
   @ApiOperation({
     summary: "Pay a multa from the player's main account into the treasury",
   })
@@ -107,11 +130,15 @@ export class HaciendaController {
   async payMulta(
     @Param('id', ParseIntPipe) id: number,
     @Body() _dto: PayMultaDto,
+    @Req() req: Request,
   ): Promise<GobiernoMultaEntity> {
-    return this.haciendaService.payMulta(id);
+    return this.haciendaService.payMulta(id, resolveActor(req));
   }
 
   @Patch('multas/:id/cancel')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.GOBIERNO, USER_ROLES.ROTOM_ADMIN)
+  @ApiBearerAuth()
   @ApiOperation({
     summary: 'Cancel a pending multa (paid fines are refunded via apelaciones)',
   })
@@ -128,6 +155,7 @@ export class HaciendaController {
   // ==================== TASAS ====================
 
   @Get('tasas')
+  @Public()
   @ApiOperation({ summary: 'List the rate card' })
   @ApiResponse({ status: HttpStatus.OK, type: [GobiernoTasaEntity] })
   async listTasas(
@@ -137,6 +165,7 @@ export class HaciendaController {
   }
 
   @Get('tasas/:id')
+  @Public()
   @ApiOperation({ summary: 'Get a tasa by id' })
   @ApiParam({ name: 'id', type: Number })
   @ApiResponse({ status: HttpStatus.OK, type: GobiernoTasaEntity })
@@ -147,6 +176,9 @@ export class HaciendaController {
   }
 
   @Post('tasas')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.GOBIERNO, USER_ROLES.ROTOM_ADMIN)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Create a rate-card entry' })
   @ApiBody({ type: CreateTasaDto })
   @ApiResponse({ status: HttpStatus.CREATED, type: GobiernoTasaEntity })
@@ -155,6 +187,9 @@ export class HaciendaController {
   }
 
   @Patch('tasas/:id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.GOBIERNO, USER_ROLES.ROTOM_ADMIN)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Update a rate-card entry' })
   @ApiParam({ name: 'id', type: Number })
   @ApiBody({ type: UpdateTasaDto })
@@ -167,6 +202,9 @@ export class HaciendaController {
   }
 
   @Delete('tasas/:id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.GOBIERNO, USER_ROLES.ROTOM_ADMIN)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Delete a rate-card entry' })
   @ApiParam({ name: 'id', type: Number })
   @ApiBody({ type: ActorBodyDto })
@@ -181,6 +219,7 @@ export class HaciendaController {
   // ==================== TESORERIA ====================
 
   @Get('tesoreria')
+  @Public()
   @ApiOperation({
     summary:
       'Derived treasury snapshot: balance, income/expense series and breakdown',

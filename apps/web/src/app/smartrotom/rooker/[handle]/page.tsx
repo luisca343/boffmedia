@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react"
 import { useParams } from "next/navigation"
 import Link from "next/link"
+import { useTranslations } from "next-intl"
 import { usePokemonStore } from "@/stores/pokemonStore"
 import {
   Avatar,
@@ -23,7 +24,7 @@ import { DexTile } from "../_components/DexTile"
 import { EditProfileModal } from "../_components/EditProfileModal"
 import { useFollow, useMe, useProfile, useProfilePosts, useRookerUuid } from "../_hooks/queries"
 import { useVitrina } from "../_hooks/useVitrina"
-import { exact, joinedAt } from "../_utils/format"
+import { useFormat } from "../_hooks/useFormat"
 import type { ProfileTab } from "../_types"
 
 /**
@@ -40,6 +41,8 @@ import type { ProfileTab } from "../_types"
  * no factions, so both are omitted rather than invented.
  */
 export default function ProfilePage() {
+  const t = useTranslations("rooker")
+  const { exact, joinedAt } = useFormat()
   const params = useParams<{ handle: string }>()
   const handle = params.handle
 
@@ -61,7 +64,7 @@ export default function ProfilePage() {
   if (isLoading) {
     return (
       <div>
-        <SubHeader title="Perfil" back />
+        <SubHeader title={t("profile.title")} back />
         <Skeleton className="h-[130px] rounded-none" />
         <div className="p-4">
           <Skeleton className="h-20 w-20 rounded-full" />
@@ -74,11 +77,11 @@ export default function ProfilePage() {
   if (isError || !profile) {
     return (
       <div>
-        <SubHeader title="Perfil" back />
+        <SubHeader title={t("profile.title")} back />
         <EmptyState
           icon="search"
-          title={`@${handle} no está en el nido`}
-          body="Puede que el nombre esté mal escrito, o que este entrenador aún no tenga perfil."
+          title={t("profile.notFound.title", { handle })}
+          body={t("profile.notFound.body")}
         />
       </div>
     )
@@ -92,7 +95,7 @@ export default function ProfilePage() {
     <div>
       <SubHeader
         title={name}
-        subtitle={`${exact(profile.counts.posts)} ${profile.counts.posts === 1 ? "trino" : "trinos"}`}
+        subtitle={t("common.postsCount", { formatted: exact(profile.counts.posts), count: profile.counts.posts })}
         back
       />
 
@@ -120,13 +123,13 @@ export default function ProfilePage() {
 
           {isMe ? (
             <Button intent="ghost" onClick={() => setEditing(true)} className="mb-1">
-              Editar perfil
+              {t("editProfile.title")}
             </Button>
           ) : uuid ? (
             <div className="mb-1 flex gap-2">
               <Link
                 href="/smartrotom/chatapp"
-                aria-label="Enviar mensaje"
+                aria-label={t("profile.sendMessageAriaLabel")}
                 className="grid h-[38px] w-[38px] place-items-center rounded-full border border-rk-line-strong text-rk-fg transition-colors hover:bg-rk-hover"
               >
                 <Icon name="mail" size={17} />
@@ -137,7 +140,7 @@ export default function ProfilePage() {
                 disabled={follow.isPending}
                 className="px-6"
               >
-                {profile.isFollowedByMe ? "Siguiendo" : "Seguir"}
+                {profile.isFollowedByMe ? t("common.follow.following") : t("common.follow.follow")}
               </Button>
             </div>
           ) : null}
@@ -176,34 +179,34 @@ export default function ProfilePage() {
 
           <div className="mt-2.5 flex gap-4 text-[14px]">
             <span className="text-rk-fg-subtle">
-              <b className="text-rk-fg">{exact(profile.counts.following)}</b> Siguiendo
+              <b className="text-rk-fg">{exact(profile.counts.following)}</b> {t("profile.countsFollowing")}
             </span>
             <span className="text-rk-fg-subtle">
-              <b className="text-rk-fg">{exact(profile.counts.followers)}</b> Seguidores
+              <b className="text-rk-fg">{exact(profile.counts.followers)}</b> {t("profile.countsFollowers")}
             </span>
           </div>
         </div>
 
         {/* Derived from the registry and the replay log — never posed. */}
         <div className="mt-3.5 flex gap-2">
-          <StatPill value={exact(profile.stats.captures)} label="CAPTURAS" icon="plus" tone="accent" />
-          <StatPill value={exact(profile.stats.battles)} label="COMBATES" icon="sword" tone="fuego" />
-          <StatPill value={exact(profile.stats.shinies)} label="SHINIES" icon="sparkle" tone="shiny" filled />
-          <StatPill value={`${Math.round(profile.stats.dexPct)}%`} label="POKÉDEX" icon="trophy" tone="choque" filled />
+          <StatPill value={exact(profile.stats.captures)} label={t("profile.stats.captures")} icon="plus" tone="accent" />
+          <StatPill value={exact(profile.stats.battles)} label={t("profile.stats.battles")} icon="sword" tone="fuego" />
+          <StatPill value={exact(profile.stats.shinies)} label={t("profile.stats.shinies")} icon="sparkle" tone="shiny" filled />
+          <StatPill value={`${Math.round(profile.stats.dexPct)}%`} label={t("profile.stats.dex")} icon="trophy" tone="choque" filled />
         </div>
 
         {showcase.length > 0 && (
           <div className="mt-4">
             <SectionTitle
               icon="grid"
-              title="Vitrina"
+              title={t("profile.vitrinaTitle")}
               action={
                 isMe ? (
                   <Link
                     href="/smartrotom/rooker/vitrina"
                     className="text-[13px] font-bold text-rk-accent hover:underline"
                   >
-                    Ver colección →
+                    {t("profile.viewCollection")}
                   </Link>
                 ) : undefined
               }
@@ -229,10 +232,10 @@ export default function ProfilePage() {
           active={tab}
           onChange={setTab}
           tabs={[
-            { key: "trinos", label: "Trinos" },
-            { key: "capturas", label: "Capturas" },
-            { key: "combates", label: "Combates" },
-            { key: "media", label: "Media" },
+            { key: "trinos", label: t("profile.tabs.trinos") },
+            { key: "capturas", label: t("profile.tabs.capturas") },
+            { key: "combates", label: t("profile.tabs.combates") },
+            { key: "media", label: t("profile.tabs.media") },
           ]}
         />
       </div>
@@ -243,12 +246,8 @@ export default function ProfilePage() {
         posts.map((p, i) => <PostCard key={p.id} post={p} last={i === posts.length - 1} />)
       ) : (
         <EmptyState
-          title="Nada por aquí"
-          body={
-            isMe
-              ? "Todavía no has trinado en esta categoría."
-              : `@${profile.handle} todavía no ha trinado en esta categoría.`
-          }
+          title={t("profile.noPosts.title")}
+          body={isMe ? t("profile.noPosts.bodyMe") : t("profile.noPosts.bodyOther", { handle: profile.handle })}
         />
       )}
 
