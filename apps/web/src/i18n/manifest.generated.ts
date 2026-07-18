@@ -65,6 +65,6 @@ export const NAMESPACE_ROOTS: Record<Namespace, readonly string[]> = {
   "tools/pokemon.json": ["pokemon"],
   "tools/tcgpocket/common.json": ["tcgpocket"],
   "tools/vgc.json": ["vgc"],
-  "twitch.json": ["twitch","video","clip","game","loading"],
+  "twitch.json": ["twitch"],
   "youtube.json": ["youtube"],
 };

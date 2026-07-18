@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { ForbiddenException, Inject, Injectable } from '@nestjs/common';
 import {
   CHAT_REPOSITORY_TOKEN,
   CHAT_MEMBER_REPOSITORY_TOKEN,
@@ -64,7 +64,10 @@ export class GroupService {
     );
     if (!userInChat && chat.type !== 0) {
       // Type 0 = public chats
-      throw new Error('User does not have access to this group');
+      throw new ForbiddenException({
+        message: 'User does not have access to this group',
+        userMessage: 'No tienes acceso a este grupo.',
+      });
     }
 
     return this.buildGroupFromChat(chat, requestingUserUuid);

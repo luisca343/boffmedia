@@ -1,4 +1,9 @@
-import { Inject, Injectable } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { promises as fs } from 'fs';
 import * as path from 'path';
 import {
@@ -146,12 +151,15 @@ export class MessageService {
     const existingMessage =
       await this.chatMessageRepository.findMessageById(messageId);
     if (!existingMessage) {
-      throw new Error('Message not found');
+      throw new NotFoundException('Message not found');
     }
 
     // Validate sender can edit this message
     if (existingMessage.uuid !== senderUuid) {
-      throw new Error('User does not have permission to edit this message');
+      throw new ForbiddenException({
+        message: 'User does not have permission to edit this message',
+        userMessage: 'No puedes editar este mensaje.',
+      });
     }
 
     await this.chatMessageRepository.updateMessage(messageId, content);
@@ -170,12 +178,15 @@ export class MessageService {
     const existingMessage =
       await this.chatMessageRepository.findMessageById(messageId);
     if (!existingMessage) {
-      throw new Error('Message not found');
+      throw new NotFoundException('Message not found');
     }
 
     // Validate sender can delete this message
     if (existingMessage.uuid !== senderUuid) {
-      throw new Error('User does not have permission to delete this message');
+      throw new ForbiddenException({
+        message: 'User does not have permission to delete this message',
+        userMessage: 'No puedes eliminar este mensaje.',
+      });
     }
 
     await this.chatMessageRepository.deleteMessage(messageId);

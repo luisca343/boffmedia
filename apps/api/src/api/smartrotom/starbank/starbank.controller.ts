@@ -12,12 +12,14 @@ import {
   UseInterceptors,
   ValidationPipe,
   UploadedFile,
+  BadRequestException,
 } from '@nestjs/common';
 import { Request } from 'express';
 import { Public } from '@api/_utils/decorators/public.decorator';
 import { GameOrUserAuthGuard } from '@api/_utils/guards/game-or-user-auth.guard';
 import { GameServerAuthGuard } from '@api/_utils/guards/game-server-auth.guard';
-import { resolveActor } from '@api/_utils/auth/actor';
+import { GameServerTransitionalAuthGuard } from '@api/_utils/guards/game-server-transitional-auth.guard';
+import { resolveActor, assertActsAsSelf } from '@api/_utils/auth/actor';
 import {
   ApiTags,
   ApiOperation,
@@ -43,7 +45,6 @@ import { StarBankTransaction } from './entities/starbank-transaction.entity';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { Logger } from 'nestjs-pino';
-import { env } from '@/config/env';
 
 @ApiTags('SmartRotom | Starbank')
 @Public()
@@ -75,10 +76,13 @@ export class StarbankController {
   }
 
   @Post('accounts')
+  @UseGuards(GameOrUserAuthGuard)
   @ApiOperation({
     summary: 'Create a new account',
     description:
-      'Create a new StarBank account for a user with optional profile image',
+      'Create a new StarBank account for a user with optional profile image. ' +
+      'A signed-in user may only create an account for their own uuid; the ' +
+      "mod's Bearer may create any (e.g. a treasury account).",
   })
   @ApiConsumes('multipart/form-data')
   @ApiBody({
@@ -138,18 +142,32 @@ export class StarbankController {
           cb(null, name + ext);
         },
       }),
+      // Cap size and restrict to images: the destination is web-served static,
+      // so an unbounded or non-image upload is a storage/abuse vector.
+      limits: { fileSize: 5 * 1024 * 1024, files: 1 },
+      fileFilter: (req, file, cb) => {
+        if (/^image\/(jpe?g|png|gif|webp)$/.test(file.mimetype)) {
+          cb(null, true);
+        } else {
+          cb(
+            new BadRequestException(
+              'Unsupported image format. Use jpg, jpeg, png, gif or webp.',
+            ),
+            false,
+          );
+        }
+      },
     }),
   )
   async createAccount(
     @Body('uuid') uuid: string,
     @Body('name') name: string,
-    @Body('server') server: string,
+    @Req() req: Request,
     @UploadedFile() image?: Express.Multer.File,
   ): Promise<StarBankAccount> {
-    const mcWorld = env.MC_WORLD;
-    if (server !== mcWorld) {
-      throw new Error('You are not authorized to access this route.');
-    }
+    // Auth is enforced by GameOrUserAuthGuard; a signed-in user may only create
+    // their own account, the server Bearer may create any.
+    assertActsAsSelf(uuid, resolveActor(req));
 
     let imagePath: string | undefined;
     if (image) {
@@ -353,9 +371,15 @@ export class StarbankController {
   }
 
   @Post('shop')
+  @UseGuards(GameServerTransitionalAuthGuard)
+  @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Process shop transaction (buy/sell)',
-    description: 'Process a purchase or sale transaction with an NPC shop',
+    description:
+      'Process a purchase or sale transaction with an NPC shop. Mints/moves ' +
+      "money on the mod's behalf, so it is server-only: the mod's Bearer, or " +
+      'the transitional `server` tripwire while ENFORCE_MONEY_AUTH is off. ' +
+      'Never user-reachable — it carries no ownership check.',
   })
   @ApiBody({ type: CreateShopTransactionDto })
   @ApiResponse({
@@ -377,9 +401,13 @@ export class StarbankController {
   }
 
   @Post('trainerdefeat')
+  @UseGuards(GameServerTransitionalAuthGuard)
+  @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Process trainer defeat reward',
-    description: 'Process money reward for defeating an NPC trainer',
+    description:
+      'Mint a money reward for defeating an NPC trainer. Server-only (same ' +
+      'policy as `shop`): the reward is unilateral, so no user may call it.',
   })
   @ApiBody({ type: TrainerDefeatMoneyDto })
   @ApiResponse({

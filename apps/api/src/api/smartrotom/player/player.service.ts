@@ -1,16 +1,10 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
-import type { MySql2Database } from 'drizzle-orm/mysql2';
+import { Injectable } from '@nestjs/common';
 import axios from 'axios';
 import { env } from '@/config/env';
 
-// LEGACY_DIRECT_DB: pre-dates the repository rule; extract a repository when next touched
+// Pure HTTP proxy to the Wingull API — no database access.
 @Injectable()
 export class PlayerService {
-  constructor(
-    @Inject(DRIZZLE) private db: MySql2Database<Record<string, never>>,
-  ) {}
-
   async getStats(uuid: string) {
     return axios
       .post(`${env.WINGULL_API}/stats`, { uuid })
