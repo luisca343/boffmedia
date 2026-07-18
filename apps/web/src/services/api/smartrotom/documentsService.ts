@@ -1,4 +1,4 @@
-import { rotomGET, rotomPOST, rotomPUT, rotomDELETE, apiAuthedPOST, apiAuthedPUT, apiAuthedDELETE } from '@/services/boffAPI';
+import { rotomGET, rotomPOST, rotomPUT, rotomDELETE, rotomAuthedPOST, rotomAuthedDELETE, apiAuthedPOST, apiAuthedPUT, apiAuthedDELETE } from '@/services/boffAPI';
 import type {
   CreateDocumentDto,
   CreateDocumentDtoWithUuid,
@@ -237,7 +237,7 @@ export class DocumentsService {
    * Update news article status
    */
   static updateNewsStatus(data: NewsStatusDto) {
-    return rotomPOST<SuccessResponse>('/documents/newsstatus', data);
+    return rotomAuthedPOST<SuccessResponse>('/documents/newsstatus', data);
   }
 
   // ==================== FURRET TODAY EDITORIAL ====================
@@ -256,7 +256,7 @@ export class DocumentsService {
 
   /** Delete a reader comment */
   static deleteNewsComment(commentId: number) {
-    return rotomDELETE<SuccessResponse>(`/documents/news/comments/${commentId}`);
+    return rotomAuthedDELETE<SuccessResponse>(`/documents/news/comments/${commentId}`);
   }
 
   /** Applaud an article — increments its clap counter */

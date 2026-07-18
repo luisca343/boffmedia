@@ -158,7 +158,7 @@ export const authOptions: NextAuthOptions = {
             googleId: googleProfile?.sub,
           });
 
-          if (!response.statusCode || response.statusCode !== 200 || !response.data) {
+          if (!response?.success || !response.data) {
             throw new Error('Failed to authenticate with backend');
           }
 
@@ -193,7 +193,7 @@ export const authOptions: NextAuthOptions = {
             picture: avatar,
           });
 
-          if (!response.statusCode || response.statusCode !== 200 || !response.data) {
+          if (!response?.success || !response.data) {
             throw new Error('Failed to authenticate with backend');
           }
 
@@ -221,7 +221,7 @@ export const authOptions: NextAuthOptions = {
             picture: p?.picture,
           });
 
-          if (!response.statusCode || response.statusCode !== 200 || !response.data) {
+          if (!response?.success || !response.data) {
             throw new Error('Failed to authenticate with backend');
           }
 
@@ -266,7 +266,10 @@ export const authOptions: NextAuthOptions = {
             refresh_token: token.refreshToken,
           });
 
-          if (response && response.statusCode === 200 && response.data) {
+          // Trust the envelope's own `success`, never a literal status: /auth/refresh
+          // is a @Post with no @HttpCode, so it answers 201 and a `=== 200` check
+          // silently discards every successful refresh.
+          if (response?.success && response.data) {
             const userData = response.data;
             token.roles = userData.user.roles as UserRole[];
             token.name = userData.user.name;

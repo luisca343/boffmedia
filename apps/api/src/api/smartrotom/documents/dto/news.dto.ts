@@ -157,7 +157,7 @@ export class NewsStatusDto extends BaseDto {
   featured: number;
 }
 
-export class GetNewsDto {
+export class GetNewsDto extends BaseDto {
   @ApiProperty({
     description: 'Filter by published status',
     example: 'true',
