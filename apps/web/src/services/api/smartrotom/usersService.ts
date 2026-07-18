@@ -1,4 +1,4 @@
-import { rotomGET, rotomPOST, rotomPATCH, rotomDELETE, ApiResponse } from '@/services/boffAPI';
+import { rotomGET, rotomPOST, rotomPATCH, rotomAuthedDELETE, ApiResponse } from '@/services/boffAPI';
 import type { 
   SmartRotomUser,
   CreateSmartrotomUserDto,
@@ -51,7 +51,7 @@ export class UsersService {
    * Delete a user
    */
   static remove(id: number): Promise<ApiResponse<{ success: boolean; message: string }>> {
-    return rotomDELETE<{ success: boolean; message: string }>(`/users/${id}`);
+    return rotomAuthedDELETE<{ success: boolean; message: string }>(`/users/${id}`);
   }
 
   /**

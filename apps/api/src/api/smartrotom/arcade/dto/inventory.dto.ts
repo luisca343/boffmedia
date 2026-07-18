@@ -83,7 +83,7 @@ export class AddInventoryItemDto extends BaseDto {
   rarity?: ItemRarity;
 }
 
-export class ConsumeInventoryItemDto {
+export class ConsumeInventoryItemDto extends BaseDto {
   @ApiProperty({
     description: 'Player UUID',
     example: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4',
@@ -119,7 +119,7 @@ export class ClaimItemDto {
   type?: string;
 }
 
-export class ClaimInventoryItemsDto {
+export class ClaimInventoryItemsDto extends BaseDto {
   @ApiProperty({
     description: 'Player UUID',
     example: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4',

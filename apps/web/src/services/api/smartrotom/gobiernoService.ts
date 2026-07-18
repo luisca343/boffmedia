@@ -1,12 +1,14 @@
 import {
   rotomGETOrThrow as rotomGET,
-  rotomPOSTOrThrow as rotomPOST,
-  rotomPATCHOrThrow as rotomPATCH,
-  rotomDELETEOrThrow as rotomDELETE,
+  rotomAuthedPOSTOrThrow as rotomPOST,
+  rotomAuthedPATCHOrThrow as rotomPATCH,
+  rotomAuthedDELETEOrThrow as rotomDELETE,
 } from "@/services/boffAPI"
 
-// Transport for /smartrotom/gobierno. `rotomPOST/PATCH/DELETE` inject `body.server`, which
-// MinecraftMiddleware requires on every non-GET under /smartrotom/* (SMARTROTOM_V3 §8).
+// Transport for /smartrotom/gobierno. Every write here carries @UseGuards(JwtAuthGuard,
+// RolesGuard), so it MUST go out authed — the plain rotom* helpers send no Bearer and 401.
+// Gobierno writes are on the MinecraftMiddleware exclude list, but `server` rides along
+// harmlessly since the DTOs extend BaseDto.
 //
 // The API is namespaced BY DEPARTMENT — `smartrotom/gobierno/urbanismo/zonas`, not
 // `smartrotom/gobierno/zonas`. Only the cross-department reads (anuncios, auditoria,
@@ -80,7 +82,8 @@ export class GobiernoService {
   static createMulta = (body: unknown) => rotomPOST<unknown>(`${HAC}/multas`, body)
   /** Debits the citizen's StarBank account into the treasury. */
   static payMulta = (id: number) => rotomPOST<unknown>(`${HAC}/multas/${id}/pay`, {})
-  static cancelMulta = (id: number) => rotomPATCH<unknown>(`${HAC}/multas/${id}/cancel`, {})
+  static cancelMulta = (id: number, actorUuid: string) =>
+    rotomPATCH<unknown>(`${HAC}/multas/${id}/cancel`, { actorUuid })
 
   static tasas = () => rotomGET<unknown>(`${HAC}/tasas`)
   static createTasa = (body: unknown) => rotomPOST<unknown>(`${HAC}/tasas`, body)

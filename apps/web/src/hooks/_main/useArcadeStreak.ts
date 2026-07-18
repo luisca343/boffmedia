@@ -140,7 +140,7 @@ export function useArcadeStreak(): UseArcadeStreakReturn {
 
       console.log("daily", daily);
       
-      if (result.statusCode === 200 && result.data) {
+      if (result.success && result.data) {
         setStreakData({
           streak: streak.streak,
           claimed: true,
