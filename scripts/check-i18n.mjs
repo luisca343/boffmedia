@@ -11,12 +11,12 @@ import { buildManifest, namespaceFiles, render } from "./generate-i18n-manifest.
 const LOCALES = ["es", "en"];
 const BASE = "es";
 
-// Pre-existing English gap, inherited 2026-07-18. A ratchet, exactly like
-// LEGACY_DIRECT_DB in check-layering.mjs: lower these as they are backfilled,
-// never raise them. Biggest remaining: items.json (145), tools/pmdsky (36),
-// twitch.json (23 — its clip/video/game roots were never translated).
-const MISSING_BASELINE = 216;
-const ORPHAN_BASELINE = 11;
+// English parity ratchet, exactly like LEGACY_DIRECT_DB in check-layering.mjs:
+// lower these as gaps are backfilled, never raise them. Fully closed 2026-07-18
+// (items, tools/pmdsky, twitch, boffmedia, pokedex all backfilled), so both sit
+// at 0 — any new untranslated key now fails the build.
+const MISSING_BASELINE = 0;
+const ORPHAN_BASELINE = 0;
 const ROOT = "apps/web/locales";
 const SRC = "apps/web/src";
 const MANIFEST = "apps/web/src/i18n/manifest.generated.ts";

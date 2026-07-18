@@ -168,6 +168,16 @@ export class AppModule implements NestModule {
         // field. Must never inherit the public MC_WORLD tripwire.
         { path: 'smartrotom/starbank/set-balance', method: RequestMethod.POST },
         { path: 'smartrotom/starbank/accounts', method: RequestMethod.POST },
+        // Server-only money routes owning their own auth
+        // (GameServerTransitionalAuthGuard: Bearer, or the tripwire only while
+        // ENFORCE_MONEY_AUTH is off). The guard reads `body.server` itself, so
+        // the middleware must not also gate them or it would 403 the eventual
+        // Bearer-only, no-`server` call.
+        { path: 'smartrotom/starbank/shop', method: RequestMethod.POST },
+        {
+          path: 'smartrotom/starbank/trainerdefeat',
+          method: RequestMethod.POST,
+        },
         // Money routes guarded by GameOrUserAuthGuard own their own auth (JWT,
         // server key, or transitional tripwire) — the middleware would 403 the
         // JWT-only path that has no `server` in the body.

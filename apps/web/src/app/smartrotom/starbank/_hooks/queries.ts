@@ -1,8 +1,8 @@
 "use client"
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import type { CreateShopTransactionDto, CreateTransferDto, StarBankAccount, StarBankTransaction, TrainerDefeatMoneyDto } from "@boffmedia/shared"
-import { rotomAuthedPOSTOrThrow, rotomGETOrThrow, rotomMultipartPOSTOrThrow, rotomPOSTOrThrow } from "@/services/boffAPI"
+import type { CreateTransferDto, StarBankAccount, StarBankTransaction } from "@boffmedia/shared"
+import { rotomAuthedPOSTOrThrow, rotomGETOrThrow, rotomMultipartPOSTOrThrow } from "@/services/boffAPI"
 import type { CreateAccountDto } from "@/types/dto/create-account-dto"
 
 export const starbankKeys = {
@@ -102,24 +102,3 @@ export function useTransferMutation(uuid?: string | null) {
   })
 }
 
-/**
- * Server-triggered (Minecraft shop purchase), not called from any screen yet — kept as
- * a mutation so a future shop UI has it ready. Invalidates the whole namespace: without
- * a screen driving it there is no single account id to scope the refetch to.
- */
-export function useShopMutation() {
-  const qc = useQueryClient()
-  return useMutation({
-    mutationFn: (data: CreateShopTransactionDto) => rotomPOSTOrThrow<void>("/starbank/shop", data),
-    onSuccess: () => void qc.invalidateQueries({ queryKey: starbankKeys.all }),
-  })
-}
-
-/** Server-triggered (Minecraft trainer battle payout), not called from any screen yet. */
-export function useTrainerDefeatMutation() {
-  const qc = useQueryClient()
-  return useMutation({
-    mutationFn: (data: TrainerDefeatMoneyDto) => rotomPOSTOrThrow<void>("/starbank/trainerdefeat", data),
-    onSuccess: () => void qc.invalidateQueries({ queryKey: starbankKeys.all }),
-  })
-}

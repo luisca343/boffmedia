@@ -252,8 +252,7 @@ export class StarbankTransactionService {
       if (!result.success) {
         throw new ConflictException(result.message || 'Purchase failed');
       }
-    } else {
-      // VENTA
+    } else if (shopDto.operation === TransactionType.VENTA) {
       this.logger.log(
         `Venta de ${shopDto.count} ${shopDto.itemName} a ${shopDto.npcName} por ${total}`,
       );
@@ -270,6 +269,13 @@ export class StarbankTransactionService {
       if (!result.success) {
         throw new ConflictException(result.message || 'Sale failed');
       }
+    } else {
+      // The DTO already restricts `operation` to COMPRA|VENTA; this guards the
+      // service independently so an unknown value can never fall through to a
+      // payout — reject it instead of guessing the money direction.
+      throw new BadRequestException(
+        `Unknown shop operation: ${shopDto.operation}`,
+      );
     }
   }
 

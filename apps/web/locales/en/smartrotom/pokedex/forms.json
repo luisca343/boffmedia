@@ -2449,6 +2449,7 @@
         "pixelmon_nimbeon": "Nimbeon",
         "pixelmon_nimbeon_description": "",
         "pixelmon_sandeon": "Sandeon",
-        "pixelmon_sandeon_description": ""
+        "pixelmon_sandeon_description": "",
+        "unknown_description": "Description not available."
     }
 }

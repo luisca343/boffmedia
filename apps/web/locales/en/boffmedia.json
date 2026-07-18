@@ -99,23 +99,20 @@
       "noRankingAvailable": "No ranking available",
       "viewFullRanking": "View Full Ranking"
     },
-    "communitySection": {
-      "title": "Join the Community",
-      "subtitle": "Be part of an active community of gamers, participate in special events, and share your experiences",
-      "joinNowButton": "Join Now",
-      "features": {
-        "teams": {
-          "title": "Teams and Clans",
-          "description": "Join a team or create your own"
-        },
-        "events": {
-          "title": "Special Events",
-          "description": "Participate in exclusive community events"
-        },
-        "ranks": {
-          "title": "Ranking System",
-          "description": "Level up and unlock unique rewards"
-        }
+    "community": {
+      "title": {
+        "first": "Join a",
+        "second": "growing community"
+      },
+      "description": "Be part of an active community of players, take part in special events and share your experiences.",
+      "buttons": {
+        "joinNow": "Join Now",
+        "discord": "Join Discord"
+      },
+      "highlights": {
+        "connect": "Connect with passionate developers and players",
+        "collaborate": "Take part in unique collaborative projects",
+        "resources": "Access exclusive resources and special events"
       }
     },
     "footer": {

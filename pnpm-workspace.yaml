@@ -16,6 +16,37 @@ overrides:
   react-dom: 19.2.3
   '@types/react': 19.2.7
   '@types/react-dom': 19.2.3
+  # @pkmn/* pins for the battle sim. Moved here from the root package.json
+  # `pnpm.overrides` (2026-07-18), which pnpm 10 silently ignores — the pins
+  # were not taking effect there.
+  '@pkmn/client': ^0.7.0
+  '@pkmn/data': ^0.10.7
+  '@pkmn/dex': ^0.9.38
+  '@pkmn/img': ^0.2.40
+  '@pkmn/login': ^0.2.0
+  '@pkmn/protocol': ^0.7.0
+  '@pkmn/randoms': ^0.9.38
+  '@pkmn/sim': ^0.9.38
+  '@pkmn/view': ^0.7.0
+
+# Packages allowed to run install/build scripts. Moved here from the root
+# package.json `pnpm.onlyBuiltDependencies` (2026-07-18), which pnpm 10 ignores.
+onlyBuiltDependencies:
+  - '@nestjs/core'
+  - '@parcel/watcher'
+  - '@scarf/scarf'
+  - '@swc/core'
+  - bcrypt
+  - bufferutil
+  - core-js
+  - es5-ext
+  - esbuild
+  - necord
+  - next-translate-plugin
+  - protobufjs
+  - sharp
+  - unrs-resolver
+  - utf-8-validate
 
 packageExtensions:
   '@hookform/resolvers@*':
