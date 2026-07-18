@@ -3,11 +3,11 @@
 // PAPER. Two leaves: the resumen (points, tiers, categories, the rarest one) and the
 // colección (every trophy card).
 
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import type { Logro, LogroTier } from "../../_types"
 import { docDate } from "../../_utils/dates"
 import { fmt } from "../../_utils/stats"
-import { TIER_LABEL, rarityInfo } from "../../_utils/tiers"
 import {
   Bar,
   Card,
@@ -71,10 +71,12 @@ function categoriesOf(logros: Logro[]): string[] {
 }
 
 export function LogrosResumen({ logros, loading }: { logros?: Logro[] | null; loading: boolean }) {
+  const t = useTranslations("pasaporte")
+
   if (loading) {
     return (
       <>
-        <PageHead eyebrow="Salón de Trofeos" title="Logros" />
+        <PageHead eyebrow={t("logros.eyebrow")} title={t("logros.title")} />
         <Skeleton className="mb-3 h-[92px]" />
         {Array.from({ length: 4 }, (_, i) => (
           <Skeleton key={i} className="mb-2 h-9" />
@@ -87,8 +89,8 @@ export function LogrosResumen({ logros, loading }: { logros?: Logro[] | null; lo
   if (all.length === 0) {
     return (
       <>
-        <PageHead eyebrow="Salón de Trofeos" title="Logros" />
-        <EmptyState icon="star" title="Sin logros" sub="El salón de trofeos aún está vacío." />
+        <PageHead eyebrow={t("logros.eyebrow")} title={t("logros.title")} />
+        <EmptyState icon="star" title={t("logros.empty.title")} sub={t("logros.empty.sub")} />
       </>
     )
   }
@@ -105,18 +107,18 @@ export function LogrosResumen({ logros, loading }: { logros?: Logro[] | null; lo
 
   return (
     <>
-      <PageHead eyebrow="Salón de Trofeos" title="Logros" />
+      <PageHead eyebrow={t("logros.eyebrow")} title={t("logros.title")} />
 
       <Card className="mb-3 flex items-center justify-between gap-3.5 px-4 py-3.5">
         <div className="min-w-0">
           <div className="font-ps-mono text-[10px] uppercase tracking-[.22em] text-ps-ink-faint">
-            Puntos de logro
+            {t("logros.points")}
           </div>
           <div className="ps-foil ps-num mt-0.5 font-ps-ceremony text-[clamp(34px,5.4vh,46px)] leading-[.95]">
             {points}
           </div>
           <div className="ps-num mt-1 text-[11px] text-ps-ink-soft">
-            de {totalPoints} posibles · {own.length}/{all.length} logros
+            {t("logros.pointsSub", { total: totalPoints, own: own.length, all: all.length })}
           </div>
         </div>
         <div className="relative grid flex-none place-items-center">
@@ -152,7 +154,7 @@ export function LogrosResumen({ logros, loading }: { logros?: Logro[] | null; lo
               <Medal tier={tier} size={22} />
               <div className="min-w-0">
                 <div className="truncate text-[9.5px] uppercase tracking-[.06em] text-ps-ink-soft">
-                  {TIER_LABEL[tier]}
+                  {t(`tiers.${tier}`)}
                 </div>
                 <div className="ps-num font-ps-mono text-[14px] font-bold leading-none text-ps-ink">
                   {owned}
@@ -164,7 +166,7 @@ export function LogrosResumen({ logros, loading }: { logros?: Logro[] | null; lo
         })}
       </div>
 
-      <SectionLabel className="mt-3 text-[13px]">Progreso por categoría</SectionLabel>
+      <SectionLabel className="mt-3 text-[13px]">{t("logros.categoryProgress")}</SectionLabel>
       <div className="flex flex-col gap-[7px]">
         {categoriesOf(all).map((category) => {
           const list = all.filter((l) => l.category === category)
@@ -183,7 +185,7 @@ export function LogrosResumen({ logros, loading }: { logros?: Logro[] | null; lo
                 max={list.length}
                 thin
                 fill={catInk(category)}
-                label={`${category}: ${done} de ${list.length}`}
+                label={t("logros.categoryBar", { category, done, total: list.length })}
               />
             </div>
           )
@@ -192,7 +194,7 @@ export function LogrosResumen({ logros, loading }: { logros?: Logro[] | null; lo
 
       {rarest && (
         <>
-          <SectionLabel className="mt-2.5 text-[13px]">Logro más raro</SectionLabel>
+          <SectionLabel className="mt-2.5 text-[13px]">{t("logros.rarest")}</SectionLabel>
           <Card className="flex items-center gap-3">
             <Medal tier={rarest.tier} size={46} />
             <div className="min-w-0 flex-1">
@@ -211,10 +213,12 @@ export function LogrosResumen({ logros, loading }: { logros?: Logro[] | null; lo
 }
 
 export function LogrosColeccion({ logros, loading }: { logros?: Logro[] | null; loading: boolean }) {
+  const t = useTranslations("pasaporte")
+
   if (loading) {
     return (
       <>
-        <PageHead eyebrow="Colección · Salón de Trofeos" title="Logros" />
+        <PageHead eyebrow={t("logros.eyebrowCollection")} title={t("logros.title")} />
         <div className="grid grid-cols-2 gap-[9px]">
           {Array.from({ length: 8 }, (_, i) => (
             <Skeleton key={i} className="h-[54px]" />
@@ -228,8 +232,8 @@ export function LogrosColeccion({ logros, loading }: { logros?: Logro[] | null; 
   if (all.length === 0) {
     return (
       <>
-        <PageHead eyebrow="Colección · Salón de Trofeos" title="Logros" />
-        <EmptyState icon="star" title="Sin logros" sub="El salón de trofeos aún está vacío." />
+        <PageHead eyebrow={t("logros.eyebrowCollection")} title={t("logros.title")} />
+        <EmptyState icon="star" title={t("logros.empty.title")} sub={t("logros.empty.sub")} />
       </>
     )
   }
@@ -246,7 +250,7 @@ export function LogrosColeccion({ logros, loading }: { logros?: Logro[] | null; 
 
   return (
     <>
-      <PageHead eyebrow="Colección · Salón de Trofeos" title="Logros" />
+      <PageHead eyebrow={t("logros.eyebrowCollection")} title={t("logros.title")} />
 
       <div className="ps-scroll grid min-h-0 flex-1 grid-cols-2 content-start gap-[9px] overflow-y-auto pb-7 pr-1">
         {cards.map((logro) => {
@@ -260,8 +264,12 @@ export function LogrosColeccion({ logros, loading }: { logros?: Logro[] | null; 
               onClick={() =>
                 toast(
                   done
-                    ? `${logro.name} · Desbloqueado · ${docDate(logro.completedAt)}`
-                    : `${logro.name} · En progreso · ${fmt(logro.progress)}/${fmt(logro.target)}`,
+                    ? t("logros.unlockedToast", { name: logro.name, date: docDate(logro.completedAt) })
+                    : t("logros.progressToast", {
+                        name: logro.name,
+                        progress: fmt(logro.progress),
+                        target: fmt(logro.target),
+                      }),
                 )
               }
               className={cn(
@@ -311,7 +319,11 @@ export function LogrosColeccion({ logros, loading }: { logros?: Logro[] | null; 
                       thin
                       className="mt-1.5"
                       fill={catInk(logro.category)}
-                      label={`${logro.name}: ${logro.progress} de ${logro.target}`}
+                      label={t("logros.collectionBar", {
+                        name: logro.name,
+                        progress: logro.progress,
+                        target: logro.target,
+                      })}
                     />
                     <span className="ps-num mt-[3px] block font-ps-mono text-[9px] text-ps-ink-faint">
                       {fmt(logro.progress)} / {fmt(logro.target)}

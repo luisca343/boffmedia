@@ -2,17 +2,18 @@
 
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { fmt } from "../_utils/format"
 import { cartCount, useCartStore } from "../_stores/cartStore"
 import { Button, Icon, NavBadge, type IconName } from "./ui"
 
-const NAV: Array<{ href: string; label: string; icon: IconName }> = [
-  { href: "/smartrotom/wigglypop", label: "Mercado", icon: "grid" },
-  { href: "/smartrotom/wigglypop/objetos", label: "Objetos", icon: "package" },
-  { href: "/smartrotom/wigglypop/anuncios", label: "Mis anuncios", icon: "list" },
-  { href: "/smartrotom/wigglypop/seguimiento", label: "Seguimiento", icon: "bookmark" },
-  { href: "/smartrotom/wigglypop/compras", label: "Mis compras", icon: "history" },
+const NAV: Array<{ href: string; labelKey: string; icon: IconName }> = [
+  { href: "/smartrotom/wigglypop", labelKey: "nav.market", icon: "grid" },
+  { href: "/smartrotom/wigglypop/objetos", labelKey: "nav.items", icon: "package" },
+  { href: "/smartrotom/wigglypop/anuncios", labelKey: "nav.myListings", icon: "list" },
+  { href: "/smartrotom/wigglypop/seguimiento", labelKey: "nav.watchlist", icon: "bookmark" },
+  { href: "/smartrotom/wigglypop/compras", labelKey: "nav.myOrders", icon: "history" },
 ]
 
 /**
@@ -38,6 +39,7 @@ export function TopNav({
   activeOrders: number
   activeListings: number
 }) {
+  const t = useTranslations("wigglypop")
   const pathname = usePathname()
   const router = useRouter()
   const lines = useCartStore((s) => s.lines)
@@ -79,7 +81,7 @@ export function TopNav({
             Wiggly<b className="font-semibold text-wp-accent">pop</b>
           </span>
           <span className="mt-[3px] block font-wp text-[10px] font-extrabold uppercase tracking-[.1em] text-wp-fg-subtle">
-            compra · vende · cambia
+            {t("nav.tagline")}
           </span>
         </span>
       </Link>
@@ -106,7 +108,7 @@ export function TopNav({
               )}
             >
               <Icon name={item.icon} size={16} />
-              {item.label}
+              {t(item.labelKey)}
               {badgeFor(item.href)}
             </Link>
           )
@@ -125,8 +127,8 @@ export function TopNav({
           onFocus={() => {
             if (pathname !== "/smartrotom/wigglypop") router.push("/smartrotom/wigglypop")
           }}
-          placeholder="Buscar…"
-          aria-label="Buscar en el mercado"
+          placeholder={t("nav.searchPlaceholder")}
+          aria-label={t("nav.searchAriaLabel")}
           className={cn(
             "h-11 w-full rounded-wp-pill border-wp border-wp-line/24 bg-white pl-[42px] pr-4",
             "font-wp text-sm font-bold text-wp-fg shadow-[inset_0_1px_2px_rgba(223,63,137,.05)]",
@@ -138,7 +140,7 @@ export function TopNav({
       </div>
 
       <Link href="/smartrotom/wigglypop/carrito" className="relative flex-none">
-        <Button iconOnly aria-label={`Carrito, ${count} artículos`}>
+        <Button iconOnly aria-label={t("nav.cartAriaLabel", { count })}>
           <Icon name="cart" size={18} />
         </Button>
         {count > 0 && <NavBadge tone="accent">{count}</NavBadge>}
@@ -148,7 +150,7 @@ export function TopNav({
         <Icon name="dollar" size={16} className="text-wp-accent" />
         <div>
           <div className="font-wp text-[9.5px] font-bold uppercase leading-none tracking-[.06em] text-wp-fg-subtle">
-            Monedero
+            {t("nav.walletLabel")}
           </div>
           {/* Real StarBank balance. `null` while it loads — never a fake 0, which
               would flash "you are broke" at every player on every page load. */}
@@ -161,7 +163,7 @@ export function TopNav({
       <Link href="/smartrotom/wigglypop/vender" className="flex-none">
         <Button variant="primary">
           <Icon name="plus" size={16} />
-          Vender
+          {t("nav.sellButton")}
         </Button>
       </Link>
     </nav>

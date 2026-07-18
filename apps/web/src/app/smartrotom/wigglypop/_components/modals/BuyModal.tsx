@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation"
 import { useState } from "react"
+import { useTranslations } from "next-intl"
 import type { WpListing } from "../../_types/market.types"
 import { fmt } from "../../_utils/format"
 import { feeFor } from "../../_stores/cartStore"
@@ -16,6 +17,7 @@ import { CostSummary, EscrowSteps, MonRow, WalletRow, listingHero } from "./part
  * running atomic custody — see `WigglypopCustodyService`).
  */
 export function BuyModal({ listing: L, onClose }: { listing: WpListing; onClose: () => void }) {
+  const t = useTranslations("wigglypop")
   const router = useRouter()
   const [done, setDone] = useState<{ code: string; atomic: boolean } | null>(null)
 
@@ -35,10 +37,10 @@ export function BuyModal({ listing: L, onClose }: { listing: WpListing; onClose:
     return (
       <Modal onClose={onClose}>
         <ModalDone
-          title="¡Compra realizada!"
+          title={t("modal.buy.doneTitle")}
           actions={
             <>
-              <Button onClick={onClose}>Seguir comprando</Button>
+              <Button onClick={onClose}>{t("common.keepShopping")}</Button>
               <Button
                 variant="primary"
                 onClick={() => {
@@ -46,16 +48,16 @@ export function BuyModal({ listing: L, onClose }: { listing: WpListing; onClose:
                   router.push("/smartrotom/wigglypop/compras")
                 }}
               >
-                Ver mis compras
+                {t("common.viewOrders")}
               </Button>
             </>
           }
         >
-          Pedido <b className="text-wp-fg">{done.code}</b> · ₽{fmt(total)}{" "}
-          {done.atomic ? "pagados" : "retenidos en depósito"}.{" "}
+          {t("common.orderCodePrefix")} <b className="text-wp-fg">{done.code}</b> · ₽{fmt(total)}{" "}
+          {done.atomic ? t("modal.buy.paid") : t("common.heldInEscrow")}.{" "}
           {done.atomic
-            ? "El Pokémon ya está en tu PC."
-            : `${L.seller.username} te lo transferirá en el juego; el pago se libera cuando confirmes que lo has recibido.`}
+            ? t("modal.buy.atomicDelivered")
+            : t("modal.buy.manualDelivery", { seller: L.seller.username })}
           <EscrowSteps atomic={done.atomic} />
         </ModalDone>
       </Modal>
@@ -65,14 +67,14 @@ export function BuyModal({ listing: L, onClose }: { listing: WpListing; onClose:
   return (
     <Modal onClose={onClose}>
       <ModalHead
-        title="Finalizar compra"
-        sub="Pago protegido en depósito hasta confirmar la entrega"
+        title={t("modal.buy.title")}
+        sub={t("modal.buy.sub")}
         onClose={onClose}
       />
       <div className="p-5">
         {mon && <MonRow mon={mon} />}
 
-        <CostSummary subtotal={amount} fee={fee} total={total} subtotalLabel="Precio del artículo" />
+        <CostSummary subtotal={amount} fee={fee} total={total} subtotalLabel={t("modal.buy.itemPriceLabel")} />
         <WalletRow balance={balance} insufficient={insufficient} />
 
         <div className="mt-3.5">
@@ -98,10 +100,10 @@ export function BuyModal({ listing: L, onClose }: { listing: WpListing; onClose:
         >
           <Icon name="lock" size={16} />
           {insufficient
-            ? "Saldo insuficiente"
+            ? t("common.insufficientBalance")
             : createOrder.isPending
-              ? "Procesando…"
-              : `Pagar ₽${fmt(total)}`}
+              ? t("common.processing")
+              : t("modal.buy.payButton", { total: fmt(total) })}
         </Button>
       </div>
     </Modal>

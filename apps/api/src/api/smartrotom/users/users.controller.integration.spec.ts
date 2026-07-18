@@ -8,6 +8,10 @@ import { UsersFacadeService } from './users.facade.service';
 import { GlobalExceptionFilter } from '@/common/filters/global-exception.filter';
 import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
 import { Reflector } from '@nestjs/core';
+import { JwtAuthGuard } from '@api/auth/jwt-auth.guard';
+import { RolesGuard } from '@api/_utils/guards/roles.guard';
+import { ROLES_METADATA_KEY } from '@api/_utils/decorators/roles.decorator';
+import { USER_ROLES } from '@api/_utils/auth/roles.constants';
 
 const mockLogger = {
   log: jest.fn(),
@@ -48,7 +52,15 @@ describe('UsersController (SmartRotom) — integration (ValidationPipe + GlobalE
         ResponseInterceptor,
         Reflector,
       ],
-    }).compile();
+    })
+      // This suite exercises ValidationPipe/ParseIntPipe, not auth: the module registers
+      // no passport strategy, so a real JwtAuthGuard would 500 before the pipes run. The
+      // DELETE route's role gate is asserted separately, from its metadata.
+      .overrideGuard(JwtAuthGuard)
+      .useValue({ canActivate: () => true })
+      .overrideGuard(RolesGuard)
+      .useValue({ canActivate: () => true })
+      .compile();
 
     app = moduleRef.createNestApplication();
     app.useGlobalPipes(
@@ -262,6 +274,17 @@ describe('UsersController (SmartRotom) — integration (ValidationPipe + GlobalE
       );
 
       expect(res.status).toBe(400);
+    });
+
+    // The guards are stubbed above, so assert the gate from metadata instead — this is
+    // the only destructive route here and it must never go back to being reachable.
+    it('is gated on ROTOM_ADMIN', () => {
+      const roles = new Reflector().get<string[]>(
+        ROLES_METADATA_KEY,
+        UsersController.prototype.remove,
+      );
+
+      expect(roles).toEqual([USER_ROLES.ROTOM_ADMIN]);
     });
   });
 

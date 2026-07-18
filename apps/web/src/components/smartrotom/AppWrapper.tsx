@@ -14,8 +14,36 @@ import { getMcUserData } from "@/services/mcef/mcefApi"
 import { isMinecraft } from "@/services/mcef/mcefHelper"
 import { MinecraftAuthForm } from "./MinecraftAuthForm"
 import { RotomErrorPage } from "./RotomError"
-import { RotomErrorCodeKey } from "./RotomErrorSystem"
 import { useRotomThemeClass } from "./theme/useRotomTheme"
+
+const NOT_LINKED_SMARTROTOM = {
+  message: "Usuario de SmartRotom no vinculado. Accede a Minecraft antes de usar la web.",
+  help: {
+    possibleCauses: [
+      "No has iniciado sesión en Minecraft",
+      "Los datos de sesión de Minecraft no son válidos",
+    ],
+    solutions: [
+      "Inicia sesión en Minecraft primero",
+      "Reinicia el cliente de Minecraft",
+      "Contacta con soporte si el problema persiste",
+    ],
+  },
+}
+
+const NOT_LINKED_BOFFMEDIA = {
+  message: "Usuario de BoffMedia no vinculado",
+  help: {
+    possibleCauses: [
+      "No has vinculado tu cuenta de BoffMedia",
+      "La conexión con BoffMedia ha fallado",
+    ],
+    solutions: [
+      "Vincula tu cuenta de BoffMedia en la configuración",
+      "Cierra sesión y vuelve a iniciarla",
+    ],
+  },
+}
 
 export default function AppWrapper({
   children,
@@ -130,11 +158,8 @@ export default function AppWrapper({
       return (
         <AuthScreen>
           <RotomErrorPage
-            errorCode={"SMARTROTOM_NOT_LINKED" as RotomErrorCodeKey}
-            context={{
-              userId: session?.user?.id,
-              hasMinecraft: isMC
-            }}
+            error={NOT_LINKED_SMARTROTOM.message}
+            help={NOT_LINKED_SMARTROTOM.help}
             onAction={() => signOut({ callbackUrl: "/" })}
             actionText="Cerrar sesión"
             showHelp={true}
@@ -159,8 +184,8 @@ export default function AppWrapper({
     return (
       <AuthScreen>
         <RotomErrorPage
-          errorCode={"BOFFMEDIA_NOT_LINKED" as RotomErrorCodeKey}
-          context={{ userId: session?.user?.id }}
+          error={NOT_LINKED_BOFFMEDIA.message}
+          help={NOT_LINKED_BOFFMEDIA.help}
           showHelp={true}
         />
       </AuthScreen>

@@ -20,10 +20,8 @@ import { extractBearer, matchesServerToken } from '../auth/server-token';
  *    `req.serverAuthed` is set and ownership checks are skipped (trusted).
  *
  * The mod's token is checked *before* JWT verification because it is not a JWT:
- * passport would reject it outright. The mod deliberately dropped the old
- * `X-Server-Key` header in favour of this Bearer, keeping its outbound token
- * distinct from the inbound one guarding its own HTTP API — so the API adopts
- * the credential the mod actually sends rather than the reverse.
+ * passport would reject it outright. Bearer is the only server credential —
+ * do not reintroduce a header-based one (see DARCAJA.md §D1).
  *
  * Rollout: while `ENFORCE_MONEY_AUTH` is false (default), a request carrying the
  * legacy `body.server === MC_WORLD` tripwire is still allowed, so an un-migrated

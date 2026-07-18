@@ -2,6 +2,7 @@
 
 // PAPER.
 
+import { useTranslations } from "next-intl"
 import type { PokemonW } from "@boffmedia/shared"
 import { typesOf, prettyItem } from "@/app/smartrotom/pc/_utils/derive"
 import { TYPE_LABELS } from "@/app/smartrotom/pokedex/_utils/typeColors"
@@ -9,7 +10,7 @@ import { usePokemonStore } from "@/stores/pokemonStore"
 import { moveName } from "../../_utils/medals"
 import { Bar, Card, EmptyState, PageHead, Skeleton, Sprite, TypePill } from "../ui"
 
-const STAT_LABELS = ["PS", "At", "Def", "AtS", "DefS", "Vel"] as const
+const STAT_KEYS = ["hp", "atk", "def", "spa", "spd", "spe"] as const
 
 /** Pixelmon sends an empty hand as an item id, not as an empty string. */
 const NO_ITEM = "item.minecraft.air"
@@ -30,6 +31,7 @@ function nums(values: readonly (number | string)[] | undefined): number[] {
 }
 
 function MonCard({ mon }: { mon: PokemonW }) {
+  const t = useTranslations("pasaporte")
   const speciesByDex = usePokemonStore((s) => s.pokemonByDex)
 
   // The party payload carries no types; they are looked up on the species' form in the
@@ -53,7 +55,9 @@ function MonCard({ mon }: { mon: PokemonW }) {
         <div className="min-w-0 flex-1">
           <div className="flex items-baseline justify-between gap-2">
             <span className="truncate font-ps-ceremony text-[14px]">{mon.name || mon.species}</span>
-            <span className="ps-num flex-none font-ps-mono text-[10px] text-ps-ink-faint">Nv.{mon.level}</span>
+            <span className="ps-num flex-none font-ps-mono text-[10px] text-ps-ink-faint">
+              {t("common.level", { level: mon.level })}
+            </span>
           </div>
           <div className="mt-0.5 flex flex-wrap gap-1">
             {types.map((t, i) => (
@@ -83,29 +87,28 @@ function MonCard({ mon }: { mon: PokemonW }) {
       </ul>
 
       <div className="mt-[7px] grid grid-cols-6 gap-[3px] text-center">
-        {stats.map((value, i) => (
-          <div key={STAT_LABELS[i] ?? i}>
-            <div className="text-[9px] uppercase text-ps-ink-faint">{STAT_LABELS[i]}</div>
-            <div className="ps-num font-ps-mono text-[12px] font-bold">{value}</div>
-            <Bar
-              value={value}
-              max={peak}
-              thin
-              className="mt-0.5 h-[3px]"
-              label={`${STAT_LABELS[i]} ${value}`}
-            />
-          </div>
-        ))}
+        {stats.map((value, i) => {
+          const statLabel = STAT_KEYS[i] ? t(`equipo.stats.${STAT_KEYS[i]}`) : undefined
+          return (
+            <div key={STAT_KEYS[i] ?? i}>
+              <div className="text-[9px] uppercase text-ps-ink-faint">{statLabel}</div>
+              <div className="ps-num font-ps-mono text-[12px] font-bold">{value}</div>
+              <Bar value={value} max={peak} thin className="mt-0.5 h-[3px]" label={`${statLabel} ${value}`} />
+            </div>
+          )
+        })}
       </div>
     </Card>
   )
 }
 
 export function Equipo({ team, loading }: { team?: PokemonW[] | null; loading: boolean }) {
+  const t = useTranslations("pasaporte")
+
   if (loading) {
     return (
       <>
-        <PageHead eyebrow="Compañeros" title="Equipo Actual" />
+        <PageHead eyebrow={t("equipo.eyebrow")} title={t("equipo.title")} />
         <div className="grid grid-cols-2 gap-2.5">
           {Array.from({ length: 6 }, (_, i) => (
             <Skeleton key={i} className="h-[120px]" />
@@ -120,19 +123,15 @@ export function Equipo({ team, loading }: { team?: PokemonW[] | null; loading: b
   if (mons.length === 0) {
     return (
       <>
-        <PageHead eyebrow="Compañeros" title="Equipo Actual" />
-        <EmptyState
-          icon="heart"
-          title="Sin equipo activo"
-          sub="Este entrenador aún no ha registrado un equipo."
-        />
+        <PageHead eyebrow={t("equipo.eyebrow")} title={t("equipo.title")} />
+        <EmptyState icon="heart" title={t("equipo.empty.title")} sub={t("equipo.empty.sub")} />
       </>
     )
   }
 
   return (
     <>
-      <PageHead eyebrow={`Compañeros · ${mons.length}`} title="Equipo Actual" />
+      <PageHead eyebrow={t("equipo.eyebrowCount", { count: mons.length })} title={t("equipo.title")} />
       <div className="grid flex-1 grid-cols-2 content-start gap-x-3 gap-y-[9px]">
         {mons.map((mon, i) => (
           <MonCard key={`${mon.dex}-${mon.name}-${i}`} mon={mon} />

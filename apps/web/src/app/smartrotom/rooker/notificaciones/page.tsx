@@ -1,10 +1,11 @@
 "use client"
 
 import Link from "next/link"
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { EmptyState, FeedSkeleton, Icon, SubHeader } from "../_components/ui"
 import { useNotifications, useRookerUuid } from "../_hooks/queries"
-import { relTime } from "../_utils/format"
+import { useFormat } from "../_hooks/useFormat"
 
 /**
  * The notification inbox.
@@ -25,17 +26,19 @@ function glyphFor(link: string | null) {
 }
 
 export default function NotificacionesPage() {
+  const t = useTranslations("rooker")
+  const { relTime } = useFormat()
   const uuid = useRookerUuid()
   const { data: notifications, isLoading } = useNotifications()
 
   if (!uuid) {
     return (
       <div>
-        <SubHeader title="Notificaciones" />
+        <SubHeader title={t("notifications.title")} />
         <EmptyState
           icon="bell"
-          title="Inicia sesión"
-          body="Aquí verás quién responde, reacciona y te sigue."
+          title={t("common.loginRequiredTitle")}
+          body={t("notifications.loggedOutBody")}
         />
       </div>
     )
@@ -43,7 +46,7 @@ export default function NotificacionesPage() {
 
   return (
     <div>
-      <SubHeader title="Notificaciones" />
+      <SubHeader title={t("notifications.title")} />
 
       {isLoading ? (
         <FeedSkeleton rows={4} />
@@ -83,8 +86,8 @@ export default function NotificacionesPage() {
       ) : (
         <EmptyState
           icon="bell"
-          title="Nada por aquí todavía"
-          body="Cuando alguien responda, reaccione o te siga, te avisaremos."
+          title={t("notifications.empty.title")}
+          body={t("notifications.empty.body")}
         />
       )}
     </div>

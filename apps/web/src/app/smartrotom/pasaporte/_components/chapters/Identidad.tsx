@@ -1,5 +1,6 @@
 // PAPER.
 
+import { useTranslations } from "next-intl"
 import type { MinecraftStats } from "@/services/api/smartrotom/playerService"
 import type { Passport } from "../../_types"
 import { deaths, distanceKm, fmt, perMovement, playtime, totalKills } from "../../_utils/stats"
@@ -18,10 +19,12 @@ export function Identidad({
   loading: boolean
   inspect: boolean
 }) {
+  const t = useTranslations("pasaporte")
+
   if (loading) {
     return (
       <>
-        <PageHead eyebrow="Identidad" title="Datos del Jugador" />
+        <PageHead eyebrow={t("identidad.eyebrow")} title={t("identidad.title")} />
         <div className="flex gap-[18px]">
           <Skeleton className="h-[200px] w-[120px]" />
           <div className="grid flex-1 grid-cols-2 gap-[9px]">
@@ -39,7 +42,7 @@ export function Identidad({
 
   return (
     <>
-      <PageHead eyebrow="Identidad" title="Datos del Jugador" />
+      <PageHead eyebrow={t("identidad.eyebrow")} title={t("identidad.title")} />
 
       <div className="flex items-start gap-[18px]">
         <div className="flex-none text-center">
@@ -54,30 +57,40 @@ export function Identidad({
           <div className="grid grid-cols-2 gap-[9px]">
             <Stat
               icon="clock"
-              label="Tiempo de juego"
+              label={t("identidad.stat.playtime")}
               value={`${time.hours}h ${time.minutes}m`}
-              sub="En el servidor"
+              sub={t("identidad.stat.playtimeSub")}
             />
-            <Stat icon="trophy" label="Victorias" value={fmt(totalKills(stats))} sub="Enemigos derrotados" />
-            <Stat icon="skull" label="Caídas" value={fmt(deaths(stats))} sub="Veces derrotado" />
+            <Stat
+              icon="trophy"
+              label={t("identidad.stat.wins")}
+              value={fmt(totalKills(stats))}
+              sub={t("identidad.stat.winsSub")}
+            />
+            <Stat
+              icon="skull"
+              label={t("identidad.stat.deaths")}
+              value={fmt(deaths(stats))}
+              sub={t("identidad.stat.deathsSub")}
+            />
             <Stat
               icon="foot"
-              label="Distancia"
+              label={t("identidad.stat.distance")}
               value={`${fmt(distanceKm(stats))} km`}
-              sub="A pie, mar y montura"
+              sub={t("identidad.stat.distanceSub")}
             />
           </div>
 
           <hr className="my-2.5 border-0 border-t border-dashed border-ps-ink/22" />
 
-          <SectionLabel className="text-[13px]">Detalles de Movimiento</SectionLabel>
+          <SectionLabel className="text-[13px]">{t("identidad.sectionMovement")}</SectionLabel>
           <dl className="grid grid-cols-3 gap-x-2 text-[11px]">
             {movement.map((row) => (
               <div
                 key={row.key}
                 className="flex justify-between gap-2 border-b border-dotted border-ps-ink/22 py-1"
               >
-                <dt className="text-ps-ink-soft">{row.label}</dt>
+                <dt className="text-ps-ink-soft">{t(`identidad.movement.${row.key}`)}</dt>
                 <dd className="ps-num font-ps-mono font-bold">
                   {fmt(row.value)}
                   {row.unit === "km" && " km"}

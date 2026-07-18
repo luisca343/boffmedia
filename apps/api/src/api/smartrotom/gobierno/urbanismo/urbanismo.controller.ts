@@ -9,8 +9,11 @@ import {
   Patch,
   Post,
   Query,
+  Req,
+  UseGuards,
 } from '@nestjs/common';
 import {
+  ApiBearerAuth,
   ApiBody,
   ApiOperation,
   ApiParam,
@@ -19,6 +22,13 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { Public } from '@api/_utils/decorators/public.decorator';
+import { Request } from 'express';
+import { GameOrUserAuthGuard } from '@api/_utils/guards/game-or-user-auth.guard';
+import { resolveActor } from '@api/_utils/auth/actor';
+import { JwtAuthGuard } from '@api/auth/jwt-auth.guard';
+import { RolesGuard } from '@api/_utils/guards/roles.guard';
+import { Roles } from '@api/_utils/decorators/roles.decorator';
+import { USER_ROLES } from '@api/_utils/auth/roles.constants';
 import { ActorBodyDto } from '../_shared/dto/actor-body.dto';
 import { UrbanismoService } from './urbanismo.service';
 import {
@@ -46,7 +56,6 @@ import {
 } from './entities/urbanismo.entity';
 
 @ApiTags('SmartRotom | Gobierno | Urbanismo')
-@Public()
 @Controller('smartrotom/gobierno/urbanismo')
 export class UrbanismoController {
   constructor(private readonly urbanismoService: UrbanismoService) {}
@@ -54,6 +63,7 @@ export class UrbanismoController {
   // ==================== ZONAS ====================
 
   @Get('zonas')
+  @Public()
   @ApiOperation({ summary: 'List zonas' })
   @ApiResponse({ status: HttpStatus.OK, type: [GobiernoZonaEntity] })
   async listZonas(
@@ -63,6 +73,7 @@ export class UrbanismoController {
   }
 
   @Get('zonas/:id')
+  @Public()
   @ApiOperation({ summary: 'Get a zona by id' })
   @ApiParam({ name: 'id', type: Number })
   @ApiResponse({ status: HttpStatus.OK, type: GobiernoZonaEntity })
@@ -73,6 +84,9 @@ export class UrbanismoController {
   }
 
   @Post('zonas')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.GOBIERNO, USER_ROLES.ROTOM_ADMIN)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Create a zona' })
   @ApiBody({ type: CreateZonaDto })
   @ApiResponse({ status: HttpStatus.CREATED, type: GobiernoZonaEntity })
@@ -81,6 +95,9 @@ export class UrbanismoController {
   }
 
   @Patch('zonas/:id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.GOBIERNO, USER_ROLES.ROTOM_ADMIN)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Update a zona' })
   @ApiParam({ name: 'id', type: Number })
   @ApiBody({ type: UpdateZonaDto })
@@ -93,6 +110,9 @@ export class UrbanismoController {
   }
 
   @Delete('zonas/:id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.GOBIERNO, USER_ROLES.ROTOM_ADMIN)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Delete a zona' })
   @ApiParam({ name: 'id', type: Number })
   @ApiBody({ type: ActorBodyDto })
@@ -107,6 +127,7 @@ export class UrbanismoController {
   // ==================== HISTORIAL (aggregate, all plots) ====================
 
   @Get('historial')
+  @Public()
   @ApiOperation({
     summary:
       'Aggregate ownership-change register across every plot in Teras, newest first',
@@ -124,6 +145,7 @@ export class UrbanismoController {
   // ==================== PARCELAS ====================
 
   @Get('parcelas')
+  @Public()
   @ApiOperation({
     summary: 'List parcelas, enriched with the real WorldGuard plot/owner data',
   })
@@ -135,6 +157,7 @@ export class UrbanismoController {
   }
 
   @Get('parcelas/:regionId')
+  @Public()
   @ApiOperation({ summary: 'Get a parcela by WorldGuard region id' })
   @ApiParam({ name: 'regionId', type: String })
   @ApiResponse({ status: HttpStatus.OK, type: GobiernoParcelaEntity })
@@ -145,6 +168,9 @@ export class UrbanismoController {
   }
 
   @Post('parcelas')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.GOBIERNO, USER_ROLES.ROTOM_ADMIN)
+  @ApiBearerAuth()
   @ApiOperation({
     summary: 'Register or replace gobierno metadata for a WorldGuard plot',
   })
@@ -157,6 +183,9 @@ export class UrbanismoController {
   }
 
   @Patch('parcelas/:regionId')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.GOBIERNO, USER_ROLES.ROTOM_ADMIN)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Update gobierno metadata for a parcela' })
   @ApiParam({ name: 'regionId', type: String })
   @ApiBody({ type: UpdateParcelaDto })
@@ -169,6 +198,7 @@ export class UrbanismoController {
   }
 
   @Get('parcelas/:regionId/historial')
+  @Public()
   @ApiOperation({ summary: 'List ownership/tax history for a parcela' })
   @ApiParam({ name: 'regionId', type: String })
   @ApiQuery({ name: 'page', required: false, type: Number })
@@ -192,6 +222,9 @@ export class UrbanismoController {
   }
 
   @Post('parcelas/:regionId/historial')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.GOBIERNO, USER_ROLES.ROTOM_ADMIN)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Append a historial entry for a parcela' })
   @ApiParam({ name: 'regionId', type: String })
   @ApiBody({ type: CreateParcelaHistorialDto })
@@ -209,6 +242,7 @@ export class UrbanismoController {
   // ==================== SUBASTAS ====================
 
   @Get('subastas')
+  @Public()
   @ApiOperation({ summary: 'List subastas' })
   @ApiResponse({ status: HttpStatus.OK, type: GobiernoSubastaListEntity })
   async listSubastas(
@@ -218,6 +252,7 @@ export class UrbanismoController {
   }
 
   @Get('subastas/:id')
+  @Public()
   @ApiOperation({ summary: 'Get a subasta by id, with recent bids' })
   @ApiParam({ name: 'id', type: Number })
   @ApiResponse({ status: HttpStatus.OK, type: GobiernoSubastaEntity })
@@ -228,6 +263,9 @@ export class UrbanismoController {
   }
 
   @Post('subastas')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.GOBIERNO, USER_ROLES.ROTOM_ADMIN)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Create a subasta' })
   @ApiBody({ type: CreateSubastaDto })
   @ApiResponse({ status: HttpStatus.CREATED, type: GobiernoSubastaEntity })
@@ -238,6 +276,9 @@ export class UrbanismoController {
   }
 
   @Patch('subastas/:id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.GOBIERNO, USER_ROLES.ROTOM_ADMIN)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Update a subasta' })
   @ApiParam({ name: 'id', type: Number })
   @ApiBody({ type: UpdateSubastaDto })
@@ -250,6 +291,9 @@ export class UrbanismoController {
   }
 
   @Delete('subastas/:id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.GOBIERNO, USER_ROLES.ROTOM_ADMIN)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Delete a subasta' })
   @ApiParam({ name: 'id', type: Number })
   @ApiBody({ type: ActorBodyDto })
@@ -262,6 +306,9 @@ export class UrbanismoController {
   }
 
   @Post('subastas/:id/puja')
+  @Public()
+  @UseGuards(GameOrUserAuthGuard)
+  @ApiBearerAuth()
   @ApiOperation({
     summary: 'Place a bid on a subasta (must exceed the current bid)',
   })
@@ -271,11 +318,15 @@ export class UrbanismoController {
   async placeBid(
     @Param('id', ParseIntPipe) id: number,
     @Body() dto: PlaceBidDto,
+    @Req() req: Request,
   ): Promise<GobiernoSubastaEntity> {
-    return this.urbanismoService.placeBid(id, dto);
+    return this.urbanismoService.placeBid(id, dto, resolveActor(req));
   }
 
   @Post('subastas/:id/close')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.GOBIERNO, USER_ROLES.ROTOM_ADMIN)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Close a subasta and settle it into the treasury' })
   @ApiParam({ name: 'id', type: Number })
   @ApiBody({ type: CloseSubastaDto })

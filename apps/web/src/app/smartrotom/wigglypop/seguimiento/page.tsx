@@ -1,8 +1,9 @@
 "use client"
 
 import { useRouter } from "next/navigation"
+import { useTranslations } from "next-intl"
 import { userMessageFrom } from "@/services/boffAPI"
-import { FORMAT_ICON, FORMAT_LABEL, fmt } from "../_utils/format"
+import { FORMAT_ICON, FORMAT_LABEL_KEY, fmt } from "../_utils/format"
 import { useToggleWatch, useWatchlist } from "../_hooks/queries"
 import {
   Button,
@@ -27,6 +28,7 @@ import {
  * underpriced, rather than merely cheap.
  */
 export default function WatchlistPage() {
+  const t = useTranslations("wigglypop")
   const router = useRouter()
   const { data: listings, isLoading, error } = useWatchlist()
   const toggleWatch = useToggleWatch()
@@ -38,16 +40,16 @@ export default function WatchlistPage() {
       <div className="flex-none border-b border-wp-line/24 px-[30px] py-[18px]">
         <h1 className="flex items-center gap-2.5 font-wp-display text-[21px] font-semibold text-wp-fg">
           <Icon name="bookmark" size={20} className="text-wp-gold" />
-          Seguimiento
+          {t("seguimiento.title")}
         </h1>
         <p className="mt-0.5 font-wp text-[12.5px] font-semibold text-wp-fg-subtle">
-          <span className="wp-num">{rows.length}</span> anuncios guardados
+          <span className="wp-num">{rows.length}</span> {t("seguimiento.savedListingsSuffix")}
         </p>
       </div>
 
       <div className="wp-scroll min-h-0 flex-1 overflow-y-auto px-[30px] pb-10 pt-[18px]">
         {error ? (
-          <EmptyState icon="alert" title="No se pudo cargar tu seguimiento" body={userMessageFrom(error, "Inténtalo de nuevo en unos segundos.")} />
+          <EmptyState icon="alert" title={t("seguimiento.errorTitle")} body={userMessageFrom(error, t("common.retryFallback"))} />
         ) : isLoading ? (
           <div className="grid gap-2">
             {Array.from({ length: 5 }).map((_, i) => (
@@ -57,22 +59,22 @@ export default function WatchlistPage() {
         ) : rows.length === 0 ? (
           <EmptyState
             icon="bookmark"
-            title="Aún no sigues ningún anuncio"
-            body="Pulsa el marcador en cualquier anuncio para guardarlo aquí."
+            title={t("seguimiento.emptyTitle")}
+            body={t("seguimiento.emptyBody")}
           >
             <Button variant="primary" onClick={() => router.push("/smartrotom/wigglypop")}>
-              Explorar mercado
+              {t("common.exploreMarket")}
             </Button>
           </EmptyState>
         ) : (
           <Table>
             <thead>
               <tr>
-                <TH>Pokémon</TH>
-                <TH>Formato</TH>
-                <TH>Vendedor</TH>
-                <TH>Valoración</TH>
-                <TH className="text-right">Precio</TH>
+                <TH>{t("seguimiento.colPokemon")}</TH>
+                <TH>{t("seguimiento.colFormat")}</TH>
+                <TH>{t("seguimiento.colSeller")}</TH>
+                <TH>{t("seguimiento.colValuation")}</TH>
+                <TH className="text-right">{t("seguimiento.colPrice")}</TH>
                 <TH />
               </tr>
             </thead>
@@ -105,7 +107,7 @@ export default function WatchlistPage() {
                           {mon && (
                             <div className="flex items-center gap-1.5 font-wp text-[11.5px] font-semibold text-wp-fg-subtle">
                               <span className="wp-num">
-                                Lv.{mon.level} · IV {mon.ivPct}%
+                                {t("common.levelIvPercent", { level: mon.level, pct: mon.ivPct })}
                               </span>
                               <IVMeter ivs={mon.ivs} />
                             </div>
@@ -116,7 +118,7 @@ export default function WatchlistPage() {
                     <TD>
                       <Chip className="text-[11px]">
                         <Icon name={FORMAT_ICON[L.format]} size={12} />
-                        {FORMAT_LABEL[L.format]}
+                        {t(FORMAT_LABEL_KEY[L.format])}
                       </Chip>
                     </TD>
                     <TD className="text-wp-fg-muted">{L.seller.username}</TD>
@@ -127,7 +129,7 @@ export default function WatchlistPage() {
                       <Price amount={price} size={14} />
                       {under && (
                         <div className="font-wp text-[10.5px] font-bold text-wp-green">
-                          −{Math.round((1 - price / L.value) * 100)}% vs valoración
+                          {t("seguimiento.belowValuationPct", { pct: Math.round((1 - price / L.value) * 100) })}
                         </div>
                       )}
                     </TD>
@@ -135,7 +137,7 @@ export default function WatchlistPage() {
                       <Button
                         variant="ghost"
                         iconOnly
-                        aria-label="Quitar de seguimiento"
+                        aria-label={t("seguimiento.removeAria")}
                         onClick={(e) => {
                           e.stopPropagation()
                           toggleWatch.mutate(L.id)

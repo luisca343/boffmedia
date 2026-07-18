@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { cn } from "@/lib/utils"
 import { Verified } from "./Verified"
-import { relTime } from "../../_utils/format"
+import { useFormat } from "../../_hooks/useFormat"
 import type { RookerAuthor } from "../../_types"
 
 /**
@@ -21,6 +21,7 @@ export interface AuthorLineProps {
 }
 
 export function AuthorLine({ author, createdAt, compact = false, className }: AuthorLineProps) {
+  const { relTime } = useFormat()
   const name = author.displayName || author.username
 
   return (

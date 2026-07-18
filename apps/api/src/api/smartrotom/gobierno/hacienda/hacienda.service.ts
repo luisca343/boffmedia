@@ -3,6 +3,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { ActorContext, assertActsAsSelf } from '@api/_utils/auth/actor';
 import { Logger } from 'nestjs-pino';
 import { PeopleRepository } from '../_shared/people.repository';
 import { AuditoriaService } from '../_shared/auditoria.service';
@@ -171,9 +172,13 @@ export class HaciendaService {
     return { success: true };
   }
 
-  async payMulta(id: number): Promise<GobiernoMultaEntity> {
+  async payMulta(
+    id: number,
+    actor?: ActorContext,
+  ): Promise<GobiernoMultaEntity> {
     const existing = await this.haciendaRepository.findMulta(id);
     if (!existing) throw new NotFoundException(`Multa ${id} not found`);
+    assertActsAsSelf(existing.playerUuid, actor);
     if (existing.status !== 'pending') {
       throw new BadRequestException(
         `Multa ${existing.code} is already ${existing.status}`,

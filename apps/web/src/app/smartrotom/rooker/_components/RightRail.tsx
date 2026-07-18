@@ -1,10 +1,11 @@
 "use client"
 
 import Link from "next/link"
+import { useTranslations } from "next-intl"
 import { Icon, SearchBar, SectionTitle, Skeleton } from "./ui"
 import { FollowRow } from "./FollowRow"
 import { useSuggestions, useTrends } from "../_hooks/queries"
-import { fmt } from "../_utils/format"
+import { useFormat } from "../_hooks/useFormat"
 
 /**
  * The discovery rail.
@@ -23,6 +24,8 @@ function Box({ children }: { children: React.ReactNode }) {
 }
 
 export function RightRail() {
+  const t = useTranslations("rooker")
+  const { fmt } = useFormat()
   const { data: trends, isLoading: trendsLoading } = useTrends(5)
   const { data: suggestions, isLoading: suggestionsLoading } = useSuggestions(3)
 
@@ -34,7 +37,7 @@ export function RightRail() {
 
       <Box>
         <div className="px-4 pb-1.5 pt-3">
-          <SectionTitle icon="trending" title="Tendencias" />
+          <SectionTitle icon="trending" title={t("rightRail.trendsTitle")} />
         </div>
 
         {trendsLoading ? (
@@ -44,17 +47,17 @@ export function RightRail() {
             <Skeleton className="h-3 w-20" />
           </div>
         ) : trends?.length ? (
-          trends.map((t) => (
+          trends.map((trend) => (
             <Link
-              key={t.tag}
-              href={`/smartrotom/rooker/buscar?q=${encodeURIComponent(t.tag)}`}
+              key={trend.tag}
+              href={`/smartrotom/rooker/buscar?q=${encodeURIComponent(trend.tag)}`}
               className="flex items-start justify-between gap-2.5 px-4 py-2.5 transition-colors hover:bg-rk-hover"
             >
               <div className="min-w-0">
-                <div className="text-[12px] text-rk-fg-subtle">Tendencia en el nido</div>
-                <div className="mt-px truncate text-[15px] font-bold text-rk-fg">#{t.tag}</div>
+                <div className="text-[12px] text-rk-fg-subtle">{t("common.trendingInNest")}</div>
+                <div className="mt-px truncate text-[15px] font-bold text-rk-fg">#{trend.tag}</div>
                 <div className="text-[12.5px] text-rk-fg-subtle">
-                  {fmt(t.posts)} {t.posts === 1 ? "trino" : "trinos"}
+                  {t("common.postsCount", { formatted: fmt(trend.posts), count: trend.posts })}
                 </div>
               </div>
               <Icon name="more" size={16} className="mt-1 flex-none text-rk-fg-subtle" />
@@ -62,14 +65,14 @@ export function RightRail() {
           ))
         ) : (
           <p className="px-4 pb-4 pt-1 text-[13.5px] leading-relaxed text-rk-fg-subtle">
-            Todavía no hay tendencias. Usa una #etiqueta en tu próximo trino y aparecerá aquí.
+            {t("rightRail.trendsEmpty")}
           </p>
         )}
       </Box>
 
       <Box>
         <div className="px-4 pb-1.5 pt-3">
-          <SectionTitle icon="users" title="A quién seguir" />
+          <SectionTitle icon="users" title={t("common.whoToFollow")} />
         </div>
 
         {suggestionsLoading ? (
@@ -84,13 +87,13 @@ export function RightRail() {
           suggestions.map((u) => <FollowRow key={u.uuid} user={u} />)
         ) : (
           <p className="px-4 pb-4 pt-1 text-[13.5px] leading-relaxed text-rk-fg-subtle">
-            Ya sigues a todo el nido.
+            {t("common.followedEveryone")}
           </p>
         )}
       </Box>
 
       <p className="px-4 pb-4 text-[12px] leading-loose text-rk-fg-subtle">
-        Rooker · parte del ecosistema BoffMedia · SmartRotom
+        {t("rightRail.footer")}
       </p>
     </div>
   )

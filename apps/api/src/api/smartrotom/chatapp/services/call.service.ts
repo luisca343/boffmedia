@@ -1,4 +1,10 @@
-import { Injectable, Inject } from '@nestjs/common';
+import {
+  Injectable,
+  Inject,
+  NotFoundException,
+  ForbiddenException,
+  BadRequestException,
+} from '@nestjs/common';
 import {
   CHAT_REPOSITORY_TOKEN,
   CHAT_MEMBER_REPOSITORY_TOKEN,
@@ -40,7 +46,10 @@ export class CallService {
     // Validate chat exists
     const chat = await this.chatRepository.findChatById(chatId);
     if (!chat) {
-      throw new Error('Chat not found');
+      throw new NotFoundException({
+        message: 'Chat not found',
+        userMessage: 'No se encontró el chat.',
+      });
     }
 
     // Validate caller is in the chat
@@ -49,7 +58,10 @@ export class CallService {
       callerUuid,
     );
     if (!callerInChat) {
-      throw new Error('Caller is not a member of this chat');
+      throw new ForbiddenException({
+        message: 'Caller is not a member of this chat',
+        userMessage: 'No formas parte de este chat.',
+      });
     }
 
     // Get all chat members except the caller
@@ -59,7 +71,10 @@ export class CallService {
     );
 
     if (otherMembers.length === 0) {
-      throw new Error('No other users in chat to call');
+      throw new BadRequestException({
+        message: 'No other users in chat to call',
+        userMessage: 'No hay nadie más en el chat para llamar.',
+      });
     }
 
     // Build call users list

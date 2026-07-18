@@ -2,6 +2,7 @@
 
 // DESK. The controls lie on the walnut, under the book.
 
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { Icon, NavButton } from "./ui"
 
@@ -24,12 +25,13 @@ export function Controls({
   onNext: () => void
   onFlip: (page: number) => void
 }) {
+  const t = useTranslations("pasaporte")
   const last = Math.max(0, total - 1)
 
   return (
     <footer className="z-40 flex flex-wrap items-center justify-center gap-3.5 px-4 py-3.5">
       <div className="flex items-center gap-1 rounded-full border border-ps-gild/18 bg-ps-desk-lo/50 p-[5px]">
-        <NavButton aria-label="Página anterior" onClick={onPrev} disabled={page <= 0}>
+        <NavButton aria-label={t("controls.prevPage")} onClick={onPrev} disabled={page <= 0}>
           <Icon name="chevL" className="h-[19px] w-[19px]" />
         </NavButton>
 
@@ -38,7 +40,7 @@ export function Controls({
           {String(last).padStart(2, "0")}
         </p>
 
-        <NavButton aria-label="Página siguiente" onClick={onNext} disabled={page >= last}>
+        <NavButton aria-label={t("controls.nextPage")} onClick={onNext} disabled={page >= last}>
           <Icon name="chevR" className="h-[19px] w-[19px]" />
         </NavButton>
       </div>
@@ -48,7 +50,7 @@ export function Controls({
           <button
             key={i}
             type="button"
-            aria-label={`Ir a la página ${i}`}
+            aria-label={t("controls.goToPage", { n: i })}
             aria-current={i === page ? "page" : undefined}
             onClick={() => onFlip(i)}
             className={cn(

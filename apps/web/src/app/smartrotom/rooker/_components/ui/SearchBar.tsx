@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { Icon } from "./Icon"
 
@@ -22,6 +23,7 @@ export interface SearchBarProps {
 
 export function SearchBar({ defaultValue = "", onChange, autoFocus, className }: SearchBarProps) {
   const router = useRouter()
+  const t = useTranslations("rooker")
   const [value, setValue] = useState(defaultValue)
   const [focused, setFocused] = useState(false)
 
@@ -55,15 +57,15 @@ export function SearchBar({ defaultValue = "", onChange, autoFocus, className }:
         onFocus={() => setFocused(true)}
         onBlur={() => setFocused(false)}
         autoFocus={autoFocus}
-        aria-label="Buscar en el nido"
-        placeholder="Buscar entrenadores, Pokémon, #etiquetas…"
+        aria-label={t("searchBar.ariaLabel")}
+        placeholder={t("searchBar.placeholder")}
         className="min-w-0 flex-1 bg-transparent text-[14.5px] text-rk-fg outline-none placeholder:text-rk-fg-subtle"
       />
       {value && (
         <button
           type="button"
           onClick={() => set("")}
-          aria-label="Limpiar"
+          aria-label={t("searchBar.clearAriaLabel")}
           className="grid h-[18px] w-[18px] flex-none place-items-center rounded-full bg-rk-line-strong text-rk-fg"
         >
           <Icon name="close" size={11} />

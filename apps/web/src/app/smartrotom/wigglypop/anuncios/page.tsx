@@ -2,11 +2,12 @@
 
 import { useRouter } from "next/navigation"
 import { useState } from "react"
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { WigglypopService } from "@/services/api/smartrotom/wigglypopService"
 import { useQueryClient } from "@tanstack/react-query"
 import type { WpListing, WpListingStatus } from "../_types/market.types"
-import { FORMAT_ICON, FORMAT_LABEL, LISTING_STATUS, fmt, timeAgo } from "../_utils/format"
+import { FORMAT_ICON, FORMAT_LABEL_KEY, LISTING_STATUS_STYLE, fmt, timeAgo } from "../_utils/format"
 import {
   useListings,
   useMarkTransferred,
@@ -35,10 +36,10 @@ import {
 } from "../_components/ui"
 
 const TABS = [
-  { key: "activo", label: "Activos" },
-  { key: "pausado", label: "Pausados" },
-  { key: "vendido", label: "Vendidos" },
-  { key: "todos", label: "Todos" },
+  { key: "activo", labelKey: "anuncios.tabActive" },
+  { key: "pausado", labelKey: "anuncios.tabPaused" },
+  { key: "vendido", labelKey: "anuncios.tabSold" },
+  { key: "todos", labelKey: "anuncios.tabAll" },
 ] as const
 
 type Tab = (typeof TABS)[number]["key"]
@@ -53,6 +54,7 @@ type Tab = (typeof TABS)[number]["key"]
  * gets a reputation for slow sellers.
  */
 export default function SellerDashboardPage() {
+  const t = useTranslations("wigglypop")
   const router = useRouter()
   const uuid = useWpUuid()
   const [tab, setTab] = useState<Tab>("activo")
@@ -98,25 +100,25 @@ export default function SellerDashboardPage() {
         <div className="min-w-[220px] flex-1">
           <h1 className="flex items-center gap-2.5 whitespace-nowrap font-wp-display text-[21px] font-semibold text-wp-fg">
             <Icon name="list" size={20} className="text-wp-accent" />
-            Mis anuncios
+            {t("anuncios.title")}
           </h1>
           <p className="mt-0.5 font-wp text-[12.5px] font-semibold text-wp-fg-subtle">
-            Gestiona tus ventas
+            {t("anuncios.subtitle")}
           </p>
         </div>
         <Button variant="primary" onClick={() => router.push("/smartrotom/wigglypop/vender")}>
           <Icon name="plus" size={16} />
-          Publicar anuncio
+          {t("common.publishListingButton")}
         </Button>
       </div>
 
       <div className="wp-scroll min-h-0 flex-1 overflow-y-auto px-[30px] pb-10 pt-5">
         {/* KPIs */}
         <div className="mb-5 grid grid-cols-2 gap-3 lg:grid-cols-4">
-          <Stat k="Ingresos" v={`₽${fmt(income)}`} icon="dollar" tone="text-wp-green" />
-          <Stat k="Ventas" v={fmt(sold.length)} icon="cart" />
-          <Stat k="En venta" v={`₽${fmt(onSale)}`} icon="tag" tone="text-wp-accent" />
-          <Stat k="En seguimiento" v={fmt(watchers)} icon="bookmark" tone="text-wp-gold" />
+          <Stat k={t("anuncios.statIncome")} v={`₽${fmt(income)}`} icon="dollar" tone="text-wp-green" />
+          <Stat k={t("anuncios.statSales")} v={fmt(sold.length)} icon="cart" />
+          <Stat k={t("anuncios.statOnSale")} v={`₽${fmt(onSale)}`} icon="tag" tone="text-wp-accent" />
+          <Stat k={t("anuncios.statWatchers")} v={fmt(watchers)} icon="bookmark" tone="text-wp-gold" />
         </div>
 
         {/* Things other players are waiting on */}
@@ -124,8 +126,8 @@ export default function SellerDashboardPage() {
           <ActionPanel
             icon="package"
             tone="gold"
-            title={`${toDeliver.length} ${toDeliver.length === 1 ? "entrega pendiente" : "entregas pendientes"}`}
-            body="El comprador ya ha pagado. Entrégale el Pokémon en el juego y márcalo aquí — entonces cobrarás."
+            title={t("anuncios.pendingDeliveries", { count: toDeliver.length })}
+            body={t("anuncios.pendingDeliveriesBody")}
           >
             {toDeliver.map(({ order, line }) => (
               <DeliverRow key={line.id} orderId={order.id} title={line.title} buyerPaid={line.lineTotal} />
@@ -137,8 +139,8 @@ export default function SellerDashboardPage() {
           <ActionPanel
             icon="handshake"
             tone="violet"
-            title={`${pendingOffers.length} ${pendingOffers.length === 1 ? "oferta sin responder" : "ofertas sin responder"}`}
-            body="Aceptar una oferta crea el pedido al precio ofrecido y retiene el pago en depósito."
+            title={t("anuncios.pendingOffers", { count: pendingOffers.length })}
+            body={t("anuncios.pendingOffersBody")}
           >
             {pendingOffers.map((o) => (
               <OfferRow
@@ -153,7 +155,7 @@ export default function SellerDashboardPage() {
         )}
 
         <Tabs
-          tabs={TABS.map((t) => ({ ...t, count: counts[t.key] }))}
+          tabs={TABS.map((tb) => ({ ...tb, label: t(tb.labelKey), count: counts[tb.key] }))}
           value={tab}
           onChange={setTab}
           className="mb-3.5 w-fit"
@@ -166,28 +168,28 @@ export default function SellerDashboardPage() {
             ))}
           </div>
         ) : shown.length === 0 ? (
-          <EmptyState icon="list" title="Nada por aquí" body="No tienes anuncios en este estado.">
+          <EmptyState icon="list" title={t("anuncios.emptyTitle")} body={t("anuncios.emptyBody")}>
             <Button variant="primary" onClick={() => router.push("/smartrotom/wigglypop/vender")}>
               <Icon name="plus" size={15} />
-              Publicar anuncio
+              {t("common.publishListingButton")}
             </Button>
           </EmptyState>
         ) : (
           <Table>
             <thead>
               <tr>
-                <TH>Anuncio</TH>
-                <TH>Formato</TH>
-                <TH>Estado</TH>
-                <TH className="text-right">Vistas</TH>
-                <TH className="text-right">Seguidores</TH>
-                <TH className="text-right">Precio</TH>
-                <TH className="text-right">Acciones</TH>
+                <TH>{t("anuncios.colListing")}</TH>
+                <TH>{t("anuncios.colFormat")}</TH>
+                <TH>{t("anuncios.colStatus")}</TH>
+                <TH className="text-right">{t("anuncios.colViews")}</TH>
+                <TH className="text-right">{t("anuncios.colWatchers")}</TH>
+                <TH className="text-right">{t("anuncios.colPrice")}</TH>
+                <TH className="text-right">{t("anuncios.colActions")}</TH>
               </tr>
             </thead>
             <tbody>
               {shown.map((L) => {
-                const st = LISTING_STATUS[L.status]
+                const st = LISTING_STATUS_STYLE[L.status]
                 const mon = L.mons[0]
                 const price = L.format === "auction" ? (L.currentBid ?? L.price) : L.price
                 return (
@@ -215,7 +217,7 @@ export default function SellerDashboardPage() {
                           <div className="font-wp text-[11.5px] font-semibold text-wp-fg-subtle">
                             {mon ? (
                               <span className="wp-num">
-                                Lv.{mon.level} · IV {mon.ivPct}%
+                                {t("common.levelIvPercent", { level: mon.level, pct: mon.ivPct })}
                               </span>
                             ) : (
                               L.items[0]?.category
@@ -228,7 +230,7 @@ export default function SellerDashboardPage() {
                     <TD>
                       <Chip className="text-[11px]">
                         <Icon name={FORMAT_ICON[L.format]} size={12} />
-                        {FORMAT_LABEL[L.format]}
+                        {t(FORMAT_LABEL_KEY[L.format])}
                       </Chip>
                     </TD>
                     <TD>
@@ -239,7 +241,7 @@ export default function SellerDashboardPage() {
                           st.bg,
                         )}
                       >
-                        {st.label}
+                        {t(st.key)}
                       </span>
                     </TD>
                     <TD className="wp-num text-right text-wp-fg-muted">{fmt(L.views)}</TD>
@@ -255,7 +257,7 @@ export default function SellerDashboardPage() {
                           <Button
                             variant="ghost"
                             iconOnly
-                            aria-label="Editar precio"
+                            aria-label={t("anuncios.editPriceAria")}
                             onClick={() => setEditing(L)}
                           >
                             <Icon name="tag" size={15} />
@@ -265,11 +267,11 @@ export default function SellerDashboardPage() {
                           <Button
                             variant="ghost"
                             iconOnly
-                            aria-label="Pausar anuncio"
+                            aria-label={t("anuncios.pauseAria")}
                             onClick={() =>
                               update.mutate(
                                 { id: L.id, patch: { status: "pausado" as WpListingStatus } },
-                                { onSuccess: () => toast("Anuncio pausado", "info") },
+                                { onSuccess: () => toast(t("toast.listingPaused"), "info") },
                               )
                             }
                           >
@@ -280,11 +282,11 @@ export default function SellerDashboardPage() {
                           <Button
                             variant="ghost"
                             iconOnly
-                            aria-label="Reanudar anuncio"
+                            aria-label={t("anuncios.resumeAria")}
                             onClick={() =>
                               update.mutate(
                                 { id: L.id, patch: { status: "activo" as WpListingStatus } },
-                                { onSuccess: () => toast("Anuncio reactivado", "success") },
+                                { onSuccess: () => toast(t("toast.listingResumed"), "success") },
                               )
                             }
                           >
@@ -294,7 +296,7 @@ export default function SellerDashboardPage() {
                         {L.status === "vendido" && (
                           <span className="inline-flex items-center gap-1 font-wp text-[11.5px] font-bold text-wp-green">
                             <Icon name="shieldCheck" size={14} />
-                            Liquidado
+                            {t("anuncios.settledLabel")}
                           </span>
                         )}
                       </div>
@@ -376,13 +378,14 @@ function DeliverRow({
   title: string
   buyerPaid: number
 }) {
+  const t = useTranslations("wigglypop")
   const mark = useMarkTransferred()
   return (
     <div className="flex items-center gap-3 rounded-xl border border-wp-line/24 bg-white px-3.5 py-2.5">
       <div className="min-w-0 flex-1">
         <div className="truncate font-wp text-[13.5px] font-bold text-wp-fg">{title}</div>
         <div className="font-wp text-[11.5px] font-semibold text-wp-fg-subtle">
-          El comprador pagó <span className="wp-num">₽{fmt(buyerPaid)}</span>
+          {t("anuncios.buyerPaid", { amount: fmt(buyerPaid) })}
         </div>
       </div>
       <Button
@@ -392,7 +395,7 @@ function DeliverRow({
         onClick={() => mark.mutate(orderId)}
       >
         <Icon name="check" size={14} />
-        Ya lo he entregado
+        {t("anuncios.markDeliveredButton")}
       </Button>
     </div>
   )
@@ -409,6 +412,7 @@ function OfferRow({
   what: string
   amount: number
 }) {
+  const t = useTranslations("wigglypop")
   const qc = useQueryClient()
   const uuid = useWpUuid()
   const [busy, setBusy] = useState(false)
@@ -421,10 +425,10 @@ function OfferRow({
       : await WigglypopService.rejectOffer(id, uuid)
     setBusy(false)
     if (!res.success) {
-      toast(res.userMessage ?? "No se pudo responder a la oferta", "error")
+      toast(res.userMessage ?? t("toast.offerRespondError"), "error")
       return
     }
-    toast(accept ? "Oferta aceptada · pedido creado" : "Oferta rechazada", "success")
+    toast(accept ? t("toast.offerAccepted") : t("toast.offerRejected"), "success")
     void qc.invalidateQueries({ queryKey: ["wigglypop"] })
   }
 
@@ -433,11 +437,11 @@ function OfferRow({
       <div className="min-w-0 flex-1">
         <div className="truncate font-wp text-[13.5px] font-bold text-wp-fg">{what}</div>
         <div className="font-wp text-[11.5px] font-semibold text-wp-fg-subtle">
-          {who} ofrece <span className="wp-num text-wp-teal">₽{fmt(amount)}</span>
+          {t("anuncios.buyerOffers", { buyer: who, amount: fmt(amount) })}
         </div>
       </div>
       <Button variant="danger" className="px-3 py-2 text-[12.5px]" disabled={busy} onClick={() => respond(false)}>
-        Rechazar
+        {t("common.reject")}
       </Button>
       <Button
         variant="primary"
@@ -446,7 +450,7 @@ function OfferRow({
         onClick={() => respond(true)}
       >
         <Icon name="check" size={14} />
-        Aceptar
+        {t("common.accept")}
       </Button>
     </div>
   )

@@ -1,3 +1,4 @@
+import type { useTranslations } from "next-intl"
 import type { LogroTier, Rarity, StandingTier } from "../_types"
 
 /**
@@ -8,15 +9,6 @@ import type { LogroTier, Rarity, StandingTier } from "../_types"
  * nothing at all — no error, no warning, just an uncoloured medal (§4).
  */
 type Metal = LogroTier | StandingTier
-
-export const TIER_LABEL: Record<Metal, string> = {
-  bronce: "Bronce",
-  plata: "Plata",
-  oro: "Oro",
-  platino: "Platino",
-  diamante: "Diamante",
-  maestro: "Maestro",
-}
 
 export const TIER_TEXT: Record<Metal, string> = {
   bronce: "text-ps-tier-bronce",
@@ -50,9 +42,9 @@ export const TIER_RANK: Record<Metal, number> = {
  * `rarity` is a REAL percentage from the API — the share of players who completed the
  * logro — so the bands read the way a player expects: the fewer who have it, the rarer.
  */
-export function rarityInfo(rarity: number): Rarity {
-  if (rarity <= 5) return { label: "Legendario", className: "text-ps-tier-oro" }
-  if (rarity <= 15) return { label: "Épico", className: "text-ps-plum" }
-  if (rarity <= 35) return { label: "Raro", className: "text-ps-teal" }
-  return { label: "Común", className: "text-ps-ink-faint" }
+export function rarityInfo(rarity: number, t: ReturnType<typeof useTranslations>): Rarity {
+  if (rarity <= 5) return { label: t("rarity.legendary"), className: "text-ps-tier-oro" }
+  if (rarity <= 15) return { label: t("rarity.epic"), className: "text-ps-plum" }
+  if (rarity <= 35) return { label: t("rarity.rare"), className: "text-ps-teal" }
+  return { label: t("rarity.common"), className: "text-ps-ink-faint" }
 }

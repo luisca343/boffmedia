@@ -6,14 +6,13 @@ export default function Error({ error, reset }: { error: Error; reset: () => voi
   if (error instanceof RotomAppError) {
     return (
       <RotomErrorPage
-        errorCode={error.errorCode as any}
-        context={error.context}
+        error={error.message}
+        help={error.help}
         onAction={reset}
         actionText="Reintentar"
       />
     );
   }
-  // fallback for unknown errors
   return (
     <RotomErrorPage error={error.message || 'Error desconocido'} onAction={reset} actionText="Reintentar" />
   );

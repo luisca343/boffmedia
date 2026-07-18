@@ -4,14 +4,12 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { MySql2Database } from 'drizzle-orm/mysql2';
 import { Logger } from 'nestjs-pino';
-import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
 import {
   STARBANK_ACCOUNT_REPOSITORY_TOKEN,
   STARBANK_TRANSACTION_REPOSITORY_TOKEN,
 } from '@api/_utils/repositories/interfaces/repository.token';
-import { starBankAccounts } from '@/_db/schema/SmartRotomStarBank';
+import { WigglypopEscrowRepository } from '../repositories/wigglypop-escrow.repository';
 import { IStarbankAccountRepository } from '../../starbank/repositories/interfaces/starbank-account.repository';
 import { IStarbankTransactionRepository } from '../../starbank/repositories/interfaces/starbank-transaction.repository';
 import { AccountType } from '../../starbank/enums/account-type.enum';
@@ -20,19 +18,16 @@ import { WingullFacadeService } from '../../wingull/wingull.facade.service';
 
 const ESCROW_NAME = 'Wigglypop Escrow';
 
-// The market's single escrow account. A buyer's money sits here between "paid" and
-// "delivered", so its balance is money in flight plus whatever fee the house has kept.
-//
-// Every movement is a REAL StarBank transaction, never a bookkeeping row — which is what makes
-// a refund an actual refund. Reuses the StarBank account/transaction repositories directly
-// (fresh instances, same DB), exactly as gobierno's TreasuryService does.
+// A buyer's money sits here between "paid" and "delivered", so this balance is money in
+// flight plus the house's kept fees. Every movement is a real StarBank transaction, never a
+// bookkeeping row — which is what makes a refund an actual refund.
 @Injectable()
 export class WigglypopEscrowService {
   private escrowAccountId: number | null = null;
 
   constructor(
     private readonly logger: Logger,
-    @Inject(DRIZZLE) private readonly db: MySql2Database<Record<string, never>>,
+    private readonly escrowRepository: WigglypopEscrowRepository,
     @Inject(STARBANK_ACCOUNT_REPOSITORY_TOKEN)
     private readonly accountRepository: IStarbankAccountRepository,
     @Inject(STARBANK_TRANSACTION_REPOSITORY_TOKEN)
@@ -40,11 +35,7 @@ export class WigglypopEscrowService {
     private readonly wingullFacadeService: WingullFacadeService,
   ) {}
 
-  /**
-   * Resolves the single MARKET account, lazily seeding it once. Bypasses
-   * StarbankAccountRepository.create(), which always links a new account to a player uuid in
-   * rotom_bank_users_accounts — the escrow has no owner.
-   */
+  /** Resolves the single MARKET account, lazily seeding it once. */
   async getEscrowAccountId(): Promise<number> {
     if (this.escrowAccountId) return this.escrowAccountId;
 
@@ -56,11 +47,10 @@ export class WigglypopEscrowService {
       return this.escrowAccountId;
     }
 
-    const result = await this.db
-      .insert(starBankAccounts)
-      .values({ name: ESCROW_NAME, balance: 0, type: AccountType.MARKET })
-      .execute();
-    this.escrowAccountId = result[0].insertId;
+    this.escrowAccountId = await this.escrowRepository.createOwnerlessAccount(
+      ESCROW_NAME,
+      AccountType.MARKET,
+    );
     this.logger.log(
       `Seeded Wigglypop escrow account #${this.escrowAccountId} (${ESCROW_NAME})`,
     );

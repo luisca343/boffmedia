@@ -1,0 +1,264 @@
+{
+  "pasaporte": {
+    "cover": {
+      "subtitle": "Pixelmon Trainer · Official Registry",
+      "complete": "{pct}% COMPLETE",
+      "hint": "OPEN · DRAG THE CORNER",
+      "id": "ID",
+      "region": "Region",
+      "rank": "Rank"
+    },
+    "backCover": {
+      "property": "— PROPERTY OF THE TRAINER —"
+    },
+    "chapters": {
+      "indice": "Index",
+      "identidad": "Identity",
+      "carne": "Trainer Card",
+      "equipo": "Current Team",
+      "medallas": "Badges",
+      "competiciones": "Competitions",
+      "temporada": "Season",
+      "logros": "Achievements",
+      "insignias": "Badge",
+      "bitacora": "Travel Log",
+      "cronica": "Chronicle"
+    },
+    "indice": {
+      "eyebrow": "Contents",
+      "title": "Index"
+    },
+    "identidad": {
+      "eyebrow": "Identity",
+      "title": "Player Data",
+      "sectionMovement": "Movement Details",
+      "stat": {
+        "playtime": "Playtime",
+        "playtimeSub": "On the server",
+        "wins": "Wins",
+        "winsSub": "Enemies defeated",
+        "deaths": "Deaths",
+        "deathsSub": "Times defeated",
+        "distance": "Distance",
+        "distanceSub": "On foot, by sea and mount"
+      },
+      "movement": {
+        "walk": "On foot",
+        "sprint": "Sprinting",
+        "horse": "On horseback",
+        "boat": "By boat",
+        "swim": "Swimming",
+        "jump": "Jumps"
+      }
+    },
+    "carne": {
+      "eyebrow": "Identity Document · Visa",
+      "title": "Official Trainer Card",
+      "bandAuthority": "GOBIERNO DE TERAS · BORDER OFFICE",
+      "bandCardTitle": "TRAINER CARD · TRAINER ID",
+      "classA": "CLASS A",
+      "field": {
+        "name": "Name",
+        "docNumber": "Document No.",
+        "region": "Region",
+        "class": "Class",
+        "issued": "Issued",
+        "expires": "Expires",
+        "hours": "Hours",
+        "rank": "Rank"
+      },
+      "scanAria": "Scan the card code",
+      "verified": "VERIFIED",
+      "scan": "SCAN",
+      "inspectPrompt": "Activate Inspection Mode (key I) to scan the code",
+      "verifiedToast": "✓ Code verified · GOB·TERAS · Trainer in good standing",
+      "footer": "Official document of Gobierno de Teras. Press <key>I</key> to activate <mode>Inspection Mode</mode> and scan the verification code."
+    },
+    "equipo": {
+      "eyebrow": "Team",
+      "eyebrowCount": "Team · {count}",
+      "title": "Current Team",
+      "empty": {
+        "title": "No active team",
+        "sub": "This trainer has not registered a team yet."
+      },
+      "stats": {
+        "hp": "HP",
+        "atk": "Atk",
+        "def": "Def",
+        "spa": "SpA",
+        "spd": "SpD",
+        "spe": "Spe"
+      }
+    },
+    "medallas": {
+      "eyebrow": "Trainer Progress",
+      "title": "Badges",
+      "empty": {
+        "title": "No circuit registered",
+        "sub": "There are no gyms open in your region yet."
+      },
+      "badgesEarned": "Badges earned",
+      "badgesCount": "{done} of {total, plural, one {# badge} other {# badges}}",
+      "noCircuit": "No circuit",
+      "unsealedToast": "You haven't earned this badge yet",
+      "circuitBar": "{name}: {pct}%"
+    },
+    "competiciones": {
+      "eyebrow": "Leagues & Battle Frontier",
+      "title": "Competitions",
+      "empty": {
+        "title": "No competitions",
+        "sub": "Teras' competitive circuit has not opened its doors yet."
+      },
+      "intro": "The great challenges of Teras' competitive circuit. Every victory leaves its mark.",
+      "locked": "Locked"
+    },
+    "temporada": {
+      "eyebrow": "Competitive Ranking",
+      "title": "Season Seal",
+      "empty": {
+        "title": "No active season",
+        "sub": "The seal will be stamped when the next cycle begins."
+      },
+      "notFought": {
+        "title": "You haven't battled this season yet",
+        "sub": "{name} · ends {date}"
+      },
+      "seasonLine": "Season {number} · ends {date}",
+      "progressTo": "Progress to {name}",
+      "maxRank": "Maximum rank reached",
+      "nextRankAria": "Progress to next rank",
+      "remaining": "You still need <b>{n} LP</b>",
+      "atTop": "You're at the top of the ladder",
+      "streak": "current streak {n, plural, one {# win} other {# wins}}",
+      "box": {
+        "lp": "League Points",
+        "peak": "Peak {n}",
+        "wins": "Wins",
+        "losses": "{n, plural, one {# loss} other {# losses}}",
+        "winRate": "Win Rate",
+        "matches": "{n, plural, one {# match} other {# matches}}",
+        "regionalRank": "Regional Ranking",
+        "battles": "{n, plural, one {# battle} other {# battles}}"
+      }
+    },
+    "logros": {
+      "eyebrow": "Trophy Hall",
+      "eyebrowCollection": "Collection · Trophy Hall",
+      "title": "Achievements",
+      "empty": {
+        "title": "No achievements",
+        "sub": "The trophy hall is still empty."
+      },
+      "points": "Achievement points",
+      "pointsSub": "of {total} possible · {own}/{all} {all, plural, one {achievement} other {achievements}}",
+      "categoryProgress": "Progress by category",
+      "categoryBar": "{category}: {done} of {total}",
+      "rarest": "Rarest achievement",
+      "unlockedToast": "{name} · Unlocked · {date}",
+      "progressToast": "{name} · In progress · {progress}/{target}",
+      "collectionBar": "{name}: {progress} of {target}"
+    },
+    "bitacora": {
+      "eyebrow": "Stamps · Entries and Visas",
+      "title": "Travel Log",
+      "empty": {
+        "title": "No stamps yet",
+        "sub": "Travel the regions and earn badges to stamp your travel log."
+      },
+      "legend": {
+        "viaje": "Entry / Visa",
+        "gimnasio": "Gym",
+        "liga": "League",
+        "evento": "Event"
+      },
+      "countFull": "{count, plural, one {# stamp} other {# stamps}}",
+      "countPartial": "{shown} of {count, plural, one {# stamp} other {# stamps}}",
+      "stamp": {
+        "gymBare": "GYM",
+        "gymWithSub": "GYM · {sub}",
+        "leagueChampion": "LEAGUE · CHAMPION",
+        "leagueWithSub": "LEAGUE · {sub}",
+        "visado": "VISA · ENTRY"
+      }
+    },
+    "cronica": {
+      "eyebrow": "Timeline · Milestones",
+      "title": "Trainer Chronicle",
+      "empty": {
+        "title": "No milestones yet",
+        "sub": "Your story will be written as you progress."
+      },
+      "arrival": {
+        "title": "Arrival in Teras",
+        "desc": "First registered in {region}. The adventure begins."
+      }
+    },
+    "badgePage": {
+      "obtained": "Obtained · {date}",
+      "watchReplay": "Watch Replay",
+      "team": "Winning team",
+      "teamCount": "{count} Pokémon",
+      "seal": {
+        "line1": "SEAL",
+        "line2": "VALID"
+      }
+    },
+    "replayModal": {
+      "title": "Replay · {name}"
+    },
+    "passportPhoto": {
+      "missing": "No<br></br>photo",
+      "alt": "Photograph of the holder"
+    },
+    "controls": {
+      "prevPage": "Previous page",
+      "nextPage": "Next page",
+      "goToPage": "Go to page {n}"
+    },
+    "chapterRail": {
+      "nav": "Chapters"
+    },
+    "book": {
+      "inspectToast": "Inspection Mode activated · document verified",
+      "emptyTitle": "No passport",
+      "emptySub": "Link your Minecraft account so Gobierno de Teras can issue your document."
+    },
+    "modal": {
+      "close": "Close",
+      "dialog": "Dialog"
+    },
+    "holoStamp": {
+      "seal": "SEAL",
+      "valid": "VALID"
+    },
+    "verifyBadge": {
+      "verified": "VERIFIED",
+      "subtitle": "Gobierno de Teras · Border Control"
+    },
+    "waxSeal": {
+      "unsealed": "{alt} (not sealed)"
+    },
+    "medal": {
+      "locked": "{tier} (locked)"
+    },
+    "tiers": {
+      "bronce": "Bronze",
+      "plata": "Silver",
+      "oro": "Gold",
+      "platino": "Platinum",
+      "diamante": "Diamond",
+      "maestro": "Master"
+    },
+    "rarity": {
+      "legendary": "Legendary",
+      "epic": "Epic",
+      "rare": "Rare",
+      "common": "Common"
+    },
+    "common": {
+      "level": "Lv.{level}"
+    }
+  }
+}

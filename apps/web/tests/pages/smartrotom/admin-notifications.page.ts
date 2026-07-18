@@ -1,5 +1,6 @@
 import { type Locator, type Page } from "@playwright/test"
 import { BasePage } from "../base.page"
+import { expectOnAdminSurface } from "../../helpers/pageMarker"
 
 // Points at the Gobierno de Teras "Notificaciones" tool — the successor to
 // /smartrotom/admin/notifications, ported into apps/web/src/app/smartrotom/gobierno/admin/
@@ -26,8 +27,10 @@ export class AdminNotificationsPage extends BasePage {
     this.toast = page.getByRole("status")
   }
 
+  /** Navigating asserts we actually landed, so no spec can be satisfied by a redirect. */
   async goto(): Promise<void> {
     await this.page.goto("/smartrotom/gobierno/admin/notificaciones")
+    await expectOnAdminSurface(this.page, "notificaciones")
   }
 
   /** Selects a recipient by searching for their uuid and clicking the matching result. */

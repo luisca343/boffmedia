@@ -1,5 +1,6 @@
 // The front board. A hard leaf: navy buckram, gold foil, an embossed rule.
 
+import { useTranslations } from "next-intl"
 import type { Passport } from "../../_types"
 import { Icon } from "../ui"
 
@@ -14,6 +15,7 @@ const CLOTH = {
 }
 
 export function Cover({ profile }: { profile?: Passport | null }) {
+  const t = useTranslations("pasaporte")
   const pct = Math.max(0, Math.min(100, Math.round(profile?.completionPct ?? 0)))
   const offset = CIRCUMFERENCE * (1 - pct / 100)
 
@@ -30,7 +32,7 @@ export function Cover({ profile }: { profile?: Passport | null }) {
           PASAPORTE
         </h1>
         <p className="mt-2 font-ps-mono text-[11px] uppercase tracking-[.34em] text-ps-chrome-fg/60">
-          Entrenador Pixelmon · Registro Oficial
+          {t("cover.subtitle")}
         </p>
       </div>
 
@@ -62,7 +64,7 @@ export function Cover({ profile }: { profile?: Passport | null }) {
           />
         </span>
         <span className="ps-num absolute -bottom-1.5 whitespace-nowrap font-ps-display text-[14px] font-bold text-ps-gild-hi [text-shadow:0_1px_3px_rgba(0,0,0,.6)]">
-          {pct}% COMPLETO
+          {t("cover.complete", { pct })}
         </span>
       </div>
 
@@ -72,20 +74,20 @@ export function Cover({ profile }: { profile?: Passport | null }) {
         </p>
         <div className="ps-num mt-2.5 flex justify-center gap-4 font-ps-mono text-[10.5px] uppercase tracking-[.12em] text-ps-chrome-fg/60">
           <span>
-            ID <b className="font-bold text-ps-gild">{profile?.trainerId ?? "—"}</b>
+            {t("cover.id")} <b className="font-bold text-ps-gild">{profile?.trainerId ?? "—"}</b>
           </span>
           <span>
-            Región <b className="font-bold text-ps-gild">{profile?.region ?? "—"}</b>
+            {t("cover.region")} <b className="font-bold text-ps-gild">{profile?.region ?? "—"}</b>
           </span>
           <span>
-            Rango <b className="font-bold text-ps-gild">{String(profile?.rank ?? 0).padStart(2, "0")}</b>
+            {t("cover.rank")} <b className="font-bold text-ps-gild">{String(profile?.rank ?? 0).padStart(2, "0")}</b>
           </span>
         </div>
       </div>
 
       <p className="ps-loop absolute bottom-[26px] left-1/2 z-[2] flex -translate-x-1/2 items-center gap-[7px] font-ps-mono text-[10px] tracking-[.2em] text-ps-chrome-fg/40 animate-ps-hint motion-reduce:animate-none">
         <Icon name="book" className="h-3.5 w-3.5" />
-        ABRIR · ARRASTRA LA ESQUINA
+        {t("cover.hint")}
       </p>
     </div>
   )

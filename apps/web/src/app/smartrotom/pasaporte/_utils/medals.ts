@@ -1,3 +1,4 @@
+import type { useTranslations } from "next-intl"
 import type { UserAchievement } from "@boffmedia/shared"
 import type { ExtendedPokemonW } from "@/types/dto/pc-pokemon.dto"
 import { apiAsset } from "@/lib/assets"
@@ -68,12 +69,15 @@ export interface Circuit {
 }
 
 /** The gym badges, grouped by circuit, in the order the API lists them. */
-export function circuitsOf(achievements: UserAchievement[] = []): Circuit[] {
+export function circuitsOf(
+  achievements: UserAchievement[] = [],
+  t: ReturnType<typeof useTranslations>,
+): Circuit[] {
   const groups = new Map<string, UserAchievement[]>()
 
   for (const achievement of achievements) {
     if (!isGym(achievement)) continue
-    const name = (achievement.subcategory ?? "").trim() || "Sin circuito"
+    const name = (achievement.subcategory ?? "").trim() || t("medallas.noCircuit")
     const list = groups.get(name)
     if (list) list.push(achievement)
     else groups.set(name, [achievement])

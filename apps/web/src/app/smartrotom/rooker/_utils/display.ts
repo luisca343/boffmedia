@@ -51,13 +51,13 @@ export const DISPLAY_DEFAULTS: RookerDisplay = {
  */
 export type RookerAccent = "azul" | "amarillo" | "rosa" | "morado" | "naranja" | "verde"
 
-export const ACCENTS: Record<RookerAccent, { label: string; rgb: string; fg: string }> = {
-  azul:     { label: "Azul",     rgb: "29 155 240",  fg: "255 255 255" },
-  amarillo: { label: "Amarillo", rgb: "255 212 0",   fg: "15 20 25" },
-  rosa:     { label: "Rosa",     rgb: "249 24 128",  fg: "255 255 255" },
-  morado:   { label: "Morado",   rgb: "120 86 255",  fg: "255 255 255" },
-  naranja:  { label: "Naranja",  rgb: "255 122 0",   fg: "255 255 255" },
-  verde:    { label: "Verde",    rgb: "0 186 124",   fg: "15 20 25" },
+export const ACCENTS: Record<RookerAccent, { rgb: string; fg: string }> = {
+  azul:     { rgb: "29 155 240",  fg: "255 255 255" },
+  amarillo: { rgb: "255 212 0",   fg: "15 20 25" },
+  rosa:     { rgb: "249 24 128",  fg: "255 255 255" },
+  morado:   { rgb: "120 86 255",  fg: "255 255 255" },
+  naranja:  { rgb: "255 122 0",   fg: "255 255 255" },
+  verde:    { rgb: "0 186 124",   fg: "15 20 25" },
 }
 
 /** The platform decides light vs dark; the reader only decides *which* dark. */

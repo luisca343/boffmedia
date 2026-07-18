@@ -14,12 +14,15 @@
     "build:web": "pnpm --filter web build",
     "build:api": "pnpm --filter api build",
     "generate:shared": "pnpm --filter api generate:shared",
-    "lint": "node scripts/lint-sequential.js && node scripts/check-v3-conventions.mjs",
+    "lint": "node scripts/lint-sequential.js && node scripts/check-v3-conventions.mjs && node scripts/check-layering.mjs && node scripts/check-i18n.mjs",
     "lint:parallel": "pnpm -r lint",
     "check:v3": "node scripts/check-v3-conventions.mjs",
+    "check:layering": "node scripts/check-layering.mjs",
     "type-check": "node scripts/typecheck-sequential.js",
     "type-check:parallel": "pnpm -r type-check",
-    "memory-check": "node scripts/memory-check.js"
+    "memory-check": "node scripts/memory-check.js",
+    "generate:i18n": "node scripts/generate-i18n-manifest.mjs",
+    "check:i18n": "node scripts/check-i18n.mjs"
   },
   "devDependencies": {
     "concurrently": "^9.0.0",

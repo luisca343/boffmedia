@@ -1,5 +1,6 @@
 // PAPER.
 
+import { useTranslations } from "next-intl"
 import type { UserAchievement } from "@boffmedia/shared"
 import { cn } from "@/lib/utils"
 import { badgeArt, circuitsOf, isEarned, isGym, sealInk } from "../../_utils/medals"
@@ -24,10 +25,12 @@ export function Medallas({
   /** Flips to that badge's own leaf. */
   onOpenBadge: (id: string) => void
 }) {
+  const t = useTranslations("pasaporte")
+
   if (loading) {
     return (
       <>
-        <PageHead eyebrow="Progreso del Entrenador" title="Medallas" />
+        <PageHead eyebrow={t("medallas.eyebrow")} title={t("medallas.title")} />
         <Skeleton className="mb-3 h-[62px]" />
         {Array.from({ length: 2 }, (_, i) => (
           <Skeleton key={i} className="mb-3 h-[110px]" />
@@ -37,34 +40,30 @@ export function Medallas({
   }
 
   const gyms = (achievements ?? []).filter(isGym)
-  const circuits = circuitsOf(achievements ?? [])
+  const circuits = circuitsOf(achievements ?? [], t)
   const done = gyms.filter(isEarned).length
 
   if (gyms.length === 0) {
     return (
       <>
-        <PageHead eyebrow="Progreso del Entrenador" title="Medallas" />
-        <EmptyState
-          icon="medal"
-          title="Sin circuito registrado"
-          sub="Todavía no hay gimnasios abiertos en tu región."
-        />
+        <PageHead eyebrow={t("medallas.eyebrow")} title={t("medallas.title")} />
+        <EmptyState icon="medal" title={t("medallas.empty.title")} sub={t("medallas.empty.sub")} />
       </>
     )
   }
 
   return (
     <>
-      <PageHead eyebrow="Progreso del Entrenador" title="Medallas" />
+      <PageHead eyebrow={t("medallas.eyebrow")} title={t("medallas.title")} />
 
       <Card className="mb-3 px-3.5 py-[11px]">
         <div className="mb-[7px] flex items-center justify-between gap-2">
-          <span className="font-ps-ceremony text-[15px]">Insignias obtenidas</span>
+          <span className="font-ps-ceremony text-[15px]">{t("medallas.badgesEarned")}</span>
           <span className="ps-num font-ps-mono text-[13px] text-ps-ink-soft">
             <b className="text-[18px] text-ps-ink">{done}</b>/{gyms.length}
           </span>
         </div>
-        <Bar value={done} max={gyms.length} label={`${done} de ${gyms.length} insignias`} />
+        <Bar value={done} max={gyms.length} label={t("medallas.badgesCount", { done, total: gyms.length })} />
       </Card>
 
       {/* Three circuits of nine badges do not fit one leaf, and a passport that hides two
@@ -80,7 +79,7 @@ export function Medallas({
             max={circuit.badges.length}
             thin
             className="mb-3"
-            label={`${shortCircuit(circuit.name)}: ${circuit.pct}%`}
+            label={t("medallas.circuitBar", { name: shortCircuit(circuit.name), pct: circuit.pct })}
           />
 
           <div className="grid grid-cols-5 justify-items-center gap-x-1.5 gap-y-3">
@@ -90,9 +89,7 @@ export function Medallas({
                 <button
                   key={badge.id}
                   type="button"
-                  onClick={() =>
-                    earned ? onOpenBadge(badge.id) : toast("Aún no has sellado esta medalla")
-                  }
+                  onClick={() => (earned ? onOpenBadge(badge.id) : toast(t("medallas.unsealedToast")))}
                   className={cn(
                     "flex flex-col items-center gap-1.5 rounded-lg p-0.5",
                     "transition-transform duration-200 hover:-translate-y-[3px] hover:scale-105 motion-reduce:transition-none motion-reduce:hover:transform-none",

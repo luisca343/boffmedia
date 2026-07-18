@@ -1,5 +1,6 @@
 import { test, expect } from "../../fixtures"
 import { mockGet, mockPost, apiOk } from "../../helpers/api"
+import { ADMIN_MARKER, expectOnAdminSurface } from "../../helpers/pageMarker"
 
 const USERS_URL = "https://api.ficuslab.es/smartrotom/users"
 const SEND_URL = "https://api.ficuslab.es/smartrotom/notifications/send"
@@ -24,6 +25,20 @@ const mockNotificationResponse = {
 }
 
 test.describe("Admin — Send Notification page (Gobierno de Teras)", () => {
+  // The guard this suite previously lacked. Every other test here reaches the page via
+  // `adminNotificationsPage.goto()`, which now asserts the same marker — but this one
+  // states the contract outright: without ROTOM_ADMIN the layout redirects to
+  // /smartrotom/gobierno and the marker is never rendered, so a bounced run fails here
+  // instead of asserting on whatever page it landed on.
+  test("is actually on the authorised admin surface", { tag: "@smoke" }, async ({ page }) => {
+    await mockGet(page, USERS_URL, apiOk([mockUser]))
+    await page.goto("/smartrotom/gobierno/admin/notificaciones")
+
+    await expectOnAdminSurface(page, "notificaciones")
+    await expect(page.locator(ADMIN_MARKER)).toHaveCount(1)
+    await expect(page.getByRole("heading", { name: "Notificaciones push", exact: true })).toBeVisible()
+  })
+
   test(
     "renders the page with all form fields",
     { tag: "@smoke" },

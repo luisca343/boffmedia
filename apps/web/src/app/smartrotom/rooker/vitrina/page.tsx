@@ -1,6 +1,7 @@
 "use client"
 
 import { useMemo, useState } from "react"
+import { useTranslations } from "next-intl"
 import { usePokemonStore } from "@/stores/pokemonStore"
 import { cn } from "@/lib/utils"
 import { EmptyState, Skeleton, SubHeader } from "../_components/ui"
@@ -19,6 +20,7 @@ type Filter = "todos" | "shiny"
  * them, so offering the filter would have meant an always-empty tab.
  */
 export default function VitrinaPage() {
+  const t = useTranslations("rooker")
   const uuid = useRookerUuid()
   const { data: me } = useMe()
   const { data: entries, isLoading } = useVitrina(uuid)
@@ -48,15 +50,15 @@ export default function VitrinaPage() {
   if (!uuid) {
     return (
       <div>
-        <SubHeader title="Vitrina Pokédex" />
-        <EmptyState icon="grid" title="Inicia sesión" body="Tu colección aparecerá aquí." />
+        <SubHeader title={t("vitrina.title")} />
+        <EmptyState icon="grid" title={t("common.loginRequiredTitle")} body={t("vitrina.loggedOutBody")} />
       </div>
     )
   }
 
   return (
     <div>
-      <SubHeader title="Vitrina Pokédex" subtitle={me?.displayName || me?.username} />
+      <SubHeader title={t("vitrina.title")} subtitle={me?.displayName || me?.username} />
 
       <div className="flex items-center gap-4 border-b border-rk-line p-4">
         <div className="relative h-[68px] w-[68px] flex-none">
@@ -81,10 +83,10 @@ export default function VitrinaPage() {
         </div>
         <div>
           <div className="text-[18px] font-bold text-rk-fg">
-            {isLoading ? "…" : `${species} de ${total} registrados`}
+            {isLoading ? "…" : t("vitrina.registeredCount", { species, total })}
           </div>
           <div className="mt-0.5 text-[13px] text-rk-fg-muted">
-            Pokédex viva · {shinies} {shinies === 1 ? "shiny" : "shinies"}
+            {t("vitrina.liveDexCount", { count: shinies })}
           </div>
         </div>
       </div>
@@ -103,7 +105,7 @@ export default function VitrinaPage() {
                 : "border border-rk-line-strong bg-rk-card text-rk-fg-muted hover:bg-rk-hover",
             )}
           >
-            {f === "todos" ? "Todos" : "Shiny"}
+            {f === "todos" ? t("vitrina.filters.all") : t("vitrina.filters.shiny")}
           </button>
         ))}
       </div>
@@ -131,12 +133,8 @@ export default function VitrinaPage() {
       ) : (
         <EmptyState
           icon="grid"
-          title={filter === "shiny" ? "Ningún shiny todavía" : "Tu vitrina está vacía"}
-          body={
-            filter === "shiny"
-              ? "Cuando registres tu primer shiny en el juego, brillará aquí."
-              : "Captura Pokémon en el servidor y aparecerán en tu vitrina automáticamente."
-          }
+          title={filter === "shiny" ? t("vitrina.emptyShiny.title") : t("vitrina.emptyAll.title")}
+          body={filter === "shiny" ? t("vitrina.emptyShiny.body") : t("vitrina.emptyAll.body")}
         />
       )}
     </div>

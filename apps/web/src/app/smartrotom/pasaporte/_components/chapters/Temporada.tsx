@@ -1,5 +1,6 @@
 // PAPER.
 
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import type { Season, StandingTier } from "../../_types"
 import { docDate } from "../../_utils/dates"
@@ -36,10 +37,12 @@ export function Temporada({
   region?: string
   loading: boolean
 }) {
+  const t = useTranslations("pasaporte")
+
   if (loading) {
     return (
       <>
-        <PageHead eyebrow="Ranking Competitivo" title="Sello de Temporada" />
+        <PageHead eyebrow={t("temporada.eyebrow")} title={t("temporada.title")} />
         <Skeleton className="mx-auto mb-4 h-[150px] w-[150px] rounded-full" />
         <Skeleton className="mb-2.5 h-10" />
         {Array.from({ length: 3 }, (_, i) => (
@@ -52,12 +55,8 @@ export function Temporada({
   if (!season?.season) {
     return (
       <>
-        <PageHead eyebrow="Ranking Competitivo" title="Sello de Temporada" />
-        <EmptyState
-          icon="crown"
-          title="No hay temporada activa"
-          sub="El sello se estampará cuando comience el próximo ciclo."
-        />
+        <PageHead eyebrow={t("temporada.eyebrow")} title={t("temporada.title")} />
+        <EmptyState icon="crown" title={t("temporada.empty.title")} sub={t("temporada.empty.sub")} />
       </>
     )
   }
@@ -68,11 +67,11 @@ export function Temporada({
   if (!s || s.battles === 0) {
     return (
       <>
-        <PageHead eyebrow="Ranking Competitivo" title="Sello de Temporada" />
+        <PageHead eyebrow={t("temporada.eyebrow")} title={t("temporada.title")} />
         <EmptyState
           icon="swords"
-          title="Aún no has combatido esta temporada"
-          sub={`${info.name} · termina ${docDate(info.endsAt)}`}
+          title={t("temporada.notFought.title")}
+          sub={t("temporada.notFought.sub", { name: info.name, date: docDate(info.endsAt) })}
         />
       </>
     )
@@ -87,7 +86,7 @@ export function Temporada({
 
   return (
     <>
-      <PageHead eyebrow="Ranking Competitivo" title="Sello de Temporada" />
+      <PageHead eyebrow={t("temporada.eyebrow")} title={t("temporada.title")} />
 
       <div className="relative mx-auto mb-3.5 grid h-[158px] w-[158px] place-items-center">
         <span
@@ -114,7 +113,7 @@ export function Temporada({
       </div>
 
       <p className="ps-num mb-3 text-center font-ps-mono text-[10.5px] tracking-[.06em] text-ps-ink-faint">
-        Temporada {info.number} · termina {docDate(info.endsAt)}
+        {t("temporada.seasonLine", { number: info.number, date: docDate(info.endsAt) })}
       </p>
 
       <ol className="mb-3 grid grid-cols-6 gap-1">
@@ -158,7 +157,7 @@ export function Temporada({
 
       <Card className="mb-3 px-3.5 py-[11px]">
         <div className="mb-[7px] flex items-baseline justify-between gap-2 text-[12px] text-ps-ink-soft">
-          <span>{nextRung ? `Progreso a ${nextRung.name}` : "Rango máximo alcanzado"}</span>
+          <span>{nextRung ? t("temporada.progressTo", { name: nextRung.name }) : t("temporada.maxRank")}</span>
           <b className="ps-num font-ps-mono text-ps-ink">
             {s.lp} {s.nextAt ? `/ ${s.nextAt}` : ""} LP
           </b>
@@ -169,7 +168,7 @@ export function Temporada({
             aria-valuenow={nextPct}
             aria-valuemin={0}
             aria-valuemax={100}
-            aria-label="Progreso al siguiente rango"
+            aria-label={t("temporada.nextRankAria")}
             style={{
               width: `${nextPct}%`,
               background:
@@ -179,25 +178,32 @@ export function Temporada({
           />
         </div>
         <p className="mt-1.5 text-[10.5px] text-ps-ink-faint">
-          {s.nextAt ? (
-            <>
-              Te faltan <b className="text-ps-ink-soft">{Math.max(0, s.nextAt - s.lp)} LP</b>
-            </>
-          ) : (
-            <>Estás en la cima de la escalera</>
-          )}{" "}
-          · racha actual {s.streak} {s.streak === 1 ? "victoria" : "victorias"}
+          {s.nextAt
+            ? t.rich("temporada.remaining", {
+                n: Math.max(0, s.nextAt - s.lp),
+                b: (chunks) => <b className="text-ps-ink-soft">{chunks}</b>,
+              })
+            : t("temporada.atTop")}{" "}
+          · {t("temporada.streak", { n: s.streak })}
         </p>
       </Card>
 
       <div className="grid grid-cols-4 gap-[9px]">
-        <Box label="Puntos de Liga" value={String(s.lp)} sub={`Pico ${s.peakLp}`} />
-        <Box label="Victorias" value={String(s.wins)} sub={`${s.losses} derrotas`} />
-        <Box label="Win Rate" value={`${winRate}%`} sub={`${total} partidas`} />
+        <Box label={t("temporada.box.lp")} value={String(s.lp)} sub={t("temporada.box.peak", { n: s.peakLp })} />
         <Box
-          label="Ranking Regional"
+          label={t("temporada.box.wins")}
+          value={String(s.wins)}
+          sub={t("temporada.box.losses", { n: s.losses })}
+        />
+        <Box
+          label={t("temporada.box.winRate")}
+          value={`${winRate}%`}
+          sub={t("temporada.box.matches", { n: total })}
+        />
+        <Box
+          label={t("temporada.box.regionalRank")}
           value={s.regionRank > 0 ? `#${s.regionRank}` : "—"}
-          sub={region ?? `${s.battles} combates`}
+          sub={region ?? t("temporada.box.battles", { n: s.battles })}
         />
       </div>
     </>

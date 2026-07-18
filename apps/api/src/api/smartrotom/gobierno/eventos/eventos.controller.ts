@@ -9,8 +9,11 @@ import {
   Patch,
   Post,
   Query,
+  Req,
+  UseGuards,
 } from '@nestjs/common';
 import {
+  ApiBearerAuth,
   ApiBody,
   ApiOperation,
   ApiParam,
@@ -18,6 +21,13 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { Public } from '@api/_utils/decorators/public.decorator';
+import { Request } from 'express';
+import { GameOrUserAuthGuard } from '@api/_utils/guards/game-or-user-auth.guard';
+import { resolveActor } from '@api/_utils/auth/actor';
+import { JwtAuthGuard } from '@api/auth/jwt-auth.guard';
+import { RolesGuard } from '@api/_utils/guards/roles.guard';
+import { Roles } from '@api/_utils/decorators/roles.decorator';
+import { USER_ROLES } from '@api/_utils/auth/roles.constants';
 import { ActorBodyDto } from '../_shared/dto/actor-body.dto';
 import { resolvePageSize } from '../_shared/dto/paged-query.dto';
 import { EventosService } from './eventos.service';
@@ -44,7 +54,6 @@ import {
 } from './entities/eventos.entity';
 
 @ApiTags('SmartRotom | Gobierno | Eventos')
-@Public()
 @Controller('smartrotom/gobierno/eventos')
 export class EventosController {
   constructor(private readonly eventosService: EventosService) {}
@@ -52,6 +61,7 @@ export class EventosController {
   // ==================== EVENTOS ====================
 
   @Get()
+  @Public()
   @ApiOperation({ summary: 'List eventos' })
   @ApiResponse({ status: HttpStatus.OK, type: [GobiernoEventoEntity] })
   async listEventos(
@@ -61,6 +71,7 @@ export class EventosController {
   }
 
   @Get(':id')
+  @Public()
   @ApiOperation({ summary: 'Get an evento by id' })
   @ApiParam({ name: 'id', type: Number })
   @ApiResponse({ status: HttpStatus.OK, type: GobiernoEventoEntity })
@@ -71,6 +82,9 @@ export class EventosController {
   }
 
   @Post()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.GOBIERNO, USER_ROLES.ROTOM_ADMIN)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Create an evento (construccion or caza)' })
   @ApiBody({ type: CreateEventoDto })
   @ApiResponse({ status: HttpStatus.CREATED, type: GobiernoEventoEntity })
@@ -81,6 +95,9 @@ export class EventosController {
   }
 
   @Patch(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.GOBIERNO, USER_ROLES.ROTOM_ADMIN)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Update an evento' })
   @ApiParam({ name: 'id', type: Number })
   @ApiBody({ type: UpdateEventoDto })
@@ -93,6 +110,9 @@ export class EventosController {
   }
 
   @Delete(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.GOBIERNO, USER_ROLES.ROTOM_ADMIN)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Delete an evento' })
   @ApiParam({ name: 'id', type: Number })
   @ApiBody({ type: ActorBodyDto })
@@ -107,6 +127,7 @@ export class EventosController {
   // ==================== OBRAS (construccion) ====================
 
   @Get(':id/obras')
+  @Public()
   @ApiOperation({
     summary:
       'List obras for a construccion evento, with derived vote aggregates',
@@ -127,6 +148,9 @@ export class EventosController {
   }
 
   @Post(':id/obras')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.GOBIERNO, USER_ROLES.ROTOM_ADMIN)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Submit an obra to a construccion evento' })
   @ApiParam({ name: 'id', type: Number })
   @ApiBody({ type: CreateObraDto })
@@ -139,6 +163,7 @@ export class EventosController {
   }
 
   @Get('obras/:obraId')
+  @Public()
   @ApiOperation({ summary: 'Get an obra by id, with derived vote aggregates' })
   @ApiParam({ name: 'obraId', type: Number })
   @ApiResponse({ status: HttpStatus.OK, type: GobiernoEventoObraEntity })
@@ -149,6 +174,9 @@ export class EventosController {
   }
 
   @Patch('obras/:obraId')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.GOBIERNO, USER_ROLES.ROTOM_ADMIN)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Update an obra' })
   @ApiParam({ name: 'obraId', type: Number })
   @ApiBody({ type: UpdateObraDto })
@@ -161,6 +189,9 @@ export class EventosController {
   }
 
   @Delete('obras/:obraId')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.GOBIERNO, USER_ROLES.ROTOM_ADMIN)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Delete an obra' })
   @ApiParam({ name: 'obraId', type: Number })
   @ApiBody({ type: ActorBodyDto })
@@ -173,6 +204,9 @@ export class EventosController {
   }
 
   @Post('obras/:obraId/voto')
+  @Public()
+  @UseGuards(GameOrUserAuthGuard)
+  @ApiBearerAuth()
   @ApiOperation({
     summary: 'Cast (or replace) a vote on an obra — one per player, upserted',
   })
@@ -182,13 +216,15 @@ export class EventosController {
   async voteObra(
     @Param('obraId', ParseIntPipe) obraId: number,
     @Body() dto: VoteObraDto,
+    @Req() req: Request,
   ): Promise<GobiernoEventoObraEntity> {
-    return this.eventosService.voteObra(obraId, dto);
+    return this.eventosService.voteObra(obraId, dto, resolveActor(req));
   }
 
   // ==================== ESPECIES (caza) ====================
 
   @Get(':id/especies')
+  @Public()
   @ApiOperation({
     summary: 'List the public spawn/scoring species table for a caza evento',
   })
@@ -208,6 +244,9 @@ export class EventosController {
   }
 
   @Post(':id/especies')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.GOBIERNO, USER_ROLES.ROTOM_ADMIN)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Add a species to a caza evento' })
   @ApiParam({ name: 'id', type: Number })
   @ApiBody({ type: CreateEspecieDto })
@@ -223,6 +262,9 @@ export class EventosController {
   }
 
   @Patch('especies/:especieId')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.GOBIERNO, USER_ROLES.ROTOM_ADMIN)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Update a species' })
   @ApiParam({ name: 'especieId', type: Number })
   @ApiBody({ type: UpdateEspecieDto })
@@ -235,6 +277,9 @@ export class EventosController {
   }
 
   @Delete('especies/:especieId')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.GOBIERNO, USER_ROLES.ROTOM_ADMIN)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Delete a species' })
   @ApiParam({ name: 'especieId', type: Number })
   @ApiBody({ type: ActorBodyDto })
@@ -249,6 +294,9 @@ export class EventosController {
   // ==================== CAPTURAS (caza) ====================
 
   @Post(':id/captura')
+  @Public()
+  @UseGuards(GameOrUserAuthGuard)
+  @ApiBearerAuth()
   @ApiOperation({
     summary: "Register (or replace) the caller's capture for a caza evento",
   })
@@ -258,11 +306,13 @@ export class EventosController {
   async registerCaptura(
     @Param('id', ParseIntPipe) id: number,
     @Body() dto: RegisterCapturaDto,
+    @Req() req: Request,
   ): Promise<GobiernoEventoCapturaEntity> {
-    return this.eventosService.registerCaptura(id, dto);
+    return this.eventosService.registerCaptura(id, dto, resolveActor(req));
   }
 
   @Get(':id/captura/:uuid')
+  @Public()
   @ApiOperation({
     summary: "Get a single player's own capture (safe while the hunt is blind)",
   })
@@ -277,6 +327,7 @@ export class EventosController {
   }
 
   @Get(':id/capturas')
+  @Public()
   @ApiOperation({
     summary:
       'List captures. While live, only aggregate counts are returned — rows are withheld until the hunt closes.',

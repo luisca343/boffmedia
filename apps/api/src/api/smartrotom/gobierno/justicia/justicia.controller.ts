@@ -9,8 +9,11 @@ import {
   Patch,
   Post,
   Query,
+  Req,
+  UseGuards,
 } from '@nestjs/common';
 import {
+  ApiBearerAuth,
   ApiBody,
   ApiOperation,
   ApiParam,
@@ -18,6 +21,13 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { Public } from '@api/_utils/decorators/public.decorator';
+import { Request } from 'express';
+import { GameOrUserAuthGuard } from '@api/_utils/guards/game-or-user-auth.guard';
+import { resolveActor } from '@api/_utils/auth/actor';
+import { JwtAuthGuard } from '@api/auth/jwt-auth.guard';
+import { RolesGuard } from '@api/_utils/guards/roles.guard';
+import { Roles } from '@api/_utils/decorators/roles.decorator';
+import { USER_ROLES } from '@api/_utils/auth/roles.constants';
 import { ActorBodyDto } from '../_shared/dto/actor-body.dto';
 import { JusticiaService } from './justicia.service';
 import {
@@ -39,7 +49,6 @@ import {
 } from './entities/justicia.entity';
 
 @ApiTags('SmartRotom | Gobierno | Justicia')
-@Public()
 @Controller('smartrotom/gobierno/justicia')
 export class JusticiaController {
   constructor(private readonly justiciaService: JusticiaService) {}
@@ -47,6 +56,7 @@ export class JusticiaController {
   // ==================== EXPEDIENTES ====================
 
   @Get('expedientes')
+  @Public()
   @ApiOperation({ summary: 'List expedientes' })
   @ApiResponse({ status: HttpStatus.OK, type: GobiernoExpedienteListEntity })
   async listExpedientes(
@@ -56,6 +66,7 @@ export class JusticiaController {
   }
 
   @Get('expedientes/:id')
+  @Public()
   @ApiOperation({ summary: 'Get an expediente by id, with its timeline' })
   @ApiParam({ name: 'id', type: Number })
   @ApiResponse({ status: HttpStatus.OK, type: GobiernoExpedienteEntity })
@@ -66,6 +77,9 @@ export class JusticiaController {
   }
 
   @Post('expedientes')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.GOBIERNO, USER_ROLES.ROTOM_ADMIN)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Open an expediente' })
   @ApiBody({ type: CreateExpedienteDto })
   @ApiResponse({ status: HttpStatus.CREATED, type: GobiernoExpedienteEntity })
@@ -76,6 +90,9 @@ export class JusticiaController {
   }
 
   @Patch('expedientes/:id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.GOBIERNO, USER_ROLES.ROTOM_ADMIN)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Update an expediente' })
   @ApiParam({ name: 'id', type: Number })
   @ApiBody({ type: UpdateExpedienteDto })
@@ -88,6 +105,9 @@ export class JusticiaController {
   }
 
   @Delete('expedientes/:id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.GOBIERNO, USER_ROLES.ROTOM_ADMIN)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Delete an expediente' })
   @ApiParam({ name: 'id', type: Number })
   @ApiBody({ type: ActorBodyDto })
@@ -100,6 +120,7 @@ export class JusticiaController {
   }
 
   @Get('expedientes/:id/eventos')
+  @Public()
   @ApiOperation({ summary: 'List timeline events for an expediente' })
   @ApiParam({ name: 'id', type: Number })
   @ApiResponse({
@@ -120,6 +141,9 @@ export class JusticiaController {
   }
 
   @Post('expedientes/:id/eventos')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.GOBIERNO, USER_ROLES.ROTOM_ADMIN)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Append a timeline event to an expediente' })
   @ApiParam({ name: 'id', type: Number })
   @ApiBody({ type: CreateExpedienteEventoDto })
@@ -137,6 +161,7 @@ export class JusticiaController {
   // ==================== APELACIONES ====================
 
   @Get('apelaciones')
+  @Public()
   @ApiOperation({ summary: 'List apelaciones' })
   @ApiResponse({ status: HttpStatus.OK, type: GobiernoApelacionListEntity })
   async listApelaciones(
@@ -146,6 +171,7 @@ export class JusticiaController {
   }
 
   @Get('apelaciones/:id')
+  @Public()
   @ApiOperation({ summary: 'Get an apelacion by id' })
   @ApiParam({ name: 'id', type: Number })
   @ApiResponse({ status: HttpStatus.OK, type: GobiernoApelacionEntity })
@@ -156,16 +182,23 @@ export class JusticiaController {
   }
 
   @Post('apelaciones')
+  @Public()
+  @UseGuards(GameOrUserAuthGuard)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'File an apelacion against a multa' })
   @ApiBody({ type: CreateApelacionDto })
   @ApiResponse({ status: HttpStatus.CREATED, type: GobiernoApelacionEntity })
   async createApelacion(
     @Body() dto: CreateApelacionDto,
+    @Req() req: Request,
   ): Promise<GobiernoApelacionEntity> {
-    return this.justiciaService.createApelacion(dto);
+    return this.justiciaService.createApelacion(dto, resolveActor(req));
   }
 
   @Patch('apelaciones/:id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.GOBIERNO, USER_ROLES.ROTOM_ADMIN)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Update an unresolved apelacion' })
   @ApiParam({ name: 'id', type: Number })
   @ApiBody({ type: UpdateApelacionDto })
@@ -178,6 +211,9 @@ export class JusticiaController {
   }
 
   @Delete('apelaciones/:id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.GOBIERNO, USER_ROLES.ROTOM_ADMIN)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Delete an apelacion' })
   @ApiParam({ name: 'id', type: Number })
   @ApiBody({ type: ActorBodyDto })
@@ -190,6 +226,9 @@ export class JusticiaController {
   }
 
   @Post('apelaciones/:id/resolve')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.GOBIERNO, USER_ROLES.ROTOM_ADMIN)
+  @ApiBearerAuth()
   @ApiOperation({
     summary:
       'Resolve an apelacion. Overturning an already-paid multa refunds the payer out of the treasury.',

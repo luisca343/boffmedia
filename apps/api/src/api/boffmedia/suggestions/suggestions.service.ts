@@ -7,6 +7,7 @@ import { CreateSuggestionDto } from './dto/create-suggestion.dto';
 import { ReviewSuggestionDto } from './dto/review-suggestion.dto';
 import { SuggestionEntity } from './entities/suggestion.entity';
 
+// LEGACY_DIRECT_DB: pre-dates the repository rule; extract a repository when next touched
 @Injectable()
 export class SuggestionsService {
   constructor(

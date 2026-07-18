@@ -12,7 +12,7 @@ function fmtDate(value: string): string | null {
 }
 
 export function EventPreviewCard({ data }: { data: SuggestFormData }) {
-  const t = useTranslations("events.sugerir.preview")
+  const t = useTranslations("sugerir.preview")
   const game = data.gameName && data.gameName !== "__other__" ? data.gameName : t("noGame")
   const start = fmtDate(data.suggestedDate)
 

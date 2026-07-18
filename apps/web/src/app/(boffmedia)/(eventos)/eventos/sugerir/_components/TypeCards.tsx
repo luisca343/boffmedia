@@ -15,7 +15,7 @@ interface TypeCardsProps {
 }
 
 export function TypeCards({ value, onChange }: TypeCardsProps) {
-  const t = useTranslations("events.sugerir.type")
+  const t = useTranslations("sugerir.type")
   return (
     <fieldset>
       <legend className="mb-3 font-mono text-[11px] font-semibold uppercase leading-none tracking-[0.12em] text-txt-muted">

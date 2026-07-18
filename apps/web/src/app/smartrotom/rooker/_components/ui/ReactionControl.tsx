@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { ActionBtn } from "./ActionBtn"
 import { ReactionGlyph } from "./ReactionGlyph"
@@ -33,6 +34,7 @@ export interface ReactionControlProps {
 }
 
 export function ReactionControl({ reactions, mine, onReact }: ReactionControlProps) {
+  const t = useTranslations("rooker")
   const expressive = useDisplayStore((s) => s.reactions) === "expresivas"
   const [tray, setTray] = useState(false)
   const [burst, setBurst] = useState<ReactionType | null>(null)
@@ -70,7 +72,7 @@ export function ReactionControl({ reactions, mine, onReact }: ReactionControlPro
   return (
     <div className="relative inline-flex" onMouseEnter={open} onMouseLeave={close}>
       <ActionBtn
-        label={active ? `Quitar ${active.label}` : "Me gusta"}
+        label={active ? t("reactions.remove", { reaction: t(`reactions.${active.type}`) }) : t("reactions.heart")}
         tone="heart"
         active={Boolean(mine)}
         fillActive={false}
@@ -91,7 +93,7 @@ export function ReactionControl({ reactions, mine, onReact }: ReactionControlPro
       {expressive && tray && (
         <div
           role="menu"
-          aria-label="Reacciones"
+          aria-label={t("reactions.trayLabel")}
           onMouseEnter={open}
           onMouseLeave={close}
           className={cn(
@@ -105,8 +107,8 @@ export function ReactionControl({ reactions, mine, onReact }: ReactionControlPro
               key={r.type}
               type="button"
               role="menuitem"
-              title={r.label}
-              aria-label={r.label}
+              title={t(`reactions.${r.type}`)}
+              aria-label={t(`reactions.${r.type}`)}
               aria-pressed={mine === r.type}
               onClick={(e) => {
                 e.stopPropagation()

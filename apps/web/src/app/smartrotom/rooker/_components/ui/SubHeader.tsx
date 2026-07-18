@@ -2,6 +2,7 @@
 
 import type { ReactNode } from "react"
 import { useRouter } from "next/navigation"
+import { useTranslations } from "next-intl"
 import { Icon } from "./Icon"
 
 /**
@@ -19,6 +20,7 @@ export interface SubHeaderProps {
 
 export function SubHeader({ title, subtitle, back = false, right }: SubHeaderProps) {
   const router = useRouter()
+  const t = useTranslations("rooker")
 
   return (
     <div className="sticky top-0 z-30 flex items-center gap-3.5 border-b border-rk-line bg-rk-nav px-3.5 py-2.5 backdrop-blur-md">
@@ -26,7 +28,7 @@ export function SubHeader({ title, subtitle, back = false, right }: SubHeaderPro
         <button
           type="button"
           onClick={() => router.back()}
-          aria-label="Volver"
+          aria-label={t("common.back")}
           className="grid h-[34px] w-[34px] flex-none place-items-center rounded-full text-rk-fg transition-colors hover:bg-rk-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-rk-accent"
         >
           <Icon name="back" size={20} />

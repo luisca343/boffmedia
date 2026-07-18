@@ -16,6 +16,7 @@ import {
   SiteStatsEntity,
 } from './entities/community.entity';
 
+// LEGACY_DIRECT_DB: pre-dates the repository rule; extract a repository when next touched
 @Injectable()
 export class CommunityService {
   constructor(

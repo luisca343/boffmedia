@@ -4,6 +4,7 @@ import type { MySql2Database } from 'drizzle-orm/mysql2';
 import axios from 'axios';
 import { env } from '@/config/env';
 
+// LEGACY_DIRECT_DB: pre-dates the repository rule; extract a repository when next touched
 @Injectable()
 export class PlayerService {
   constructor(

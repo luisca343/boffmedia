@@ -2,7 +2,7 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import type { CreateShopTransactionDto, CreateTransferDto, StarBankAccount, StarBankTransaction, TrainerDefeatMoneyDto } from "@boffmedia/shared"
-import { rotomGETOrThrow, rotomMultipartPOSTOrThrow, rotomPOSTOrThrow } from "@/services/boffAPI"
+import { rotomAuthedPOSTOrThrow, rotomGETOrThrow, rotomMultipartPOSTOrThrow, rotomPOSTOrThrow } from "@/services/boffAPI"
 import type { CreateAccountDto } from "@/types/dto/create-account-dto"
 
 export const starbankKeys = {
@@ -89,7 +89,7 @@ export function useCreateAccountMutation(uuid?: string | null) {
 export function useTransferMutation(uuid?: string | null) {
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: (data: CreateTransferDto) => rotomPOSTOrThrow<void>("/starbank/transfer", data),
+    mutationFn: (data: CreateTransferDto) => rotomAuthedPOSTOrThrow<void>("/starbank/transfer", data),
     onSuccess: (_result, variables) => {
       void qc.invalidateQueries({ queryKey: starbankKeys.accounts(uuid) })
       void qc.invalidateQueries({ queryKey: starbankKeys.allAccounts() })

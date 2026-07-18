@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation"
 import { useState } from "react"
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { WigglypopService } from "@/services/api/smartrotom/wigglypopService"
 import { useQuery } from "@tanstack/react-query"
@@ -41,6 +42,7 @@ interface CatalogItem {
  * unverified, and pretending otherwise would be the lie (§9).
  */
 export function SellItem() {
+  const t = useTranslations("wigglypop")
   const router = useRouter()
   const uuid = useWpUuid()
   const createListing = useCreateListing()
@@ -99,12 +101,12 @@ export function SellItem() {
         <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-wp-pill border border-wp-accent bg-wp-accent/[.13]">
           <Icon name="tag" size={28} className="text-wp-accent" />
         </div>
-        <h2 className="font-wp-display text-[22px] font-semibold text-wp-fg">Objeto publicado</h2>
+        <h2 className="font-wp-display text-[22px] font-semibold text-wp-fg">{t("sell.item.publishedTitle")}</h2>
         <p className="mt-2 font-wp text-[13.5px] font-semibold leading-relaxed text-wp-fg-muted">
           <b className="text-wp-fg">
             {qty}× {picked.name}
           </b>{" "}
-          está en el mercado por ₽{fmt(price)} la unidad.
+          {t("sell.item.publishedBody", { price: fmt(price) })}
         </p>
         <div className="mt-6 flex justify-center gap-2.5">
           <Button
@@ -113,10 +115,10 @@ export function SellItem() {
               setPublished(false)
             }}
           >
-            Publicar otro
+            {t("common.publishAnother")}
           </Button>
           <Button variant="primary" onClick={() => router.push("/smartrotom/wigglypop/anuncios")}>
-            Ver mis anuncios
+            {t("common.viewMyListings")}
           </Button>
         </div>
       </div>
@@ -129,13 +131,13 @@ export function SellItem() {
         <div className="mb-4 flex items-center gap-2.5">
           <span className="flex items-center gap-1.5 font-wp text-[13px] font-semibold text-wp-fg-muted">
             <Icon name="package" size={15} className="text-wp-accent" />
-            Catálogo de objetos
+            {t("sell.item.catalogLabel")}
           </span>
           <Input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Buscar objeto…"
-            aria-label="Buscar objeto"
+            placeholder={t("sell.item.searchPlaceholder")}
+            aria-label={t("sell.item.searchAria")}
             className="ml-auto max-w-[260px]"
           />
         </div>
@@ -144,9 +146,7 @@ export function SellItem() {
         <div className="mb-4 flex items-start gap-2 rounded-[11px] border border-wp-amber/25 bg-wp-amber/[.08] px-3 py-2.5">
           <Icon name="info" size={15} className="mt-px flex-none text-wp-amber" />
           <span className="font-wp text-[12.5px] font-semibold leading-relaxed text-wp-fg-muted">
-            Los objetos no se verifican contra tu mochila — el servidor de juego aún no permite
-            leerla. Declara sólo lo que tengas: al confirmarse la venta, el objeto se entrega de
-            verdad al comprador.
+            {t("sell.item.disclaimer")}
           </span>
         </div>
 
@@ -157,7 +157,7 @@ export function SellItem() {
             ))}
           </div>
         ) : results.length === 0 ? (
-          <EmptyState icon="package" title="Ningún objeto coincide" body="Prueba con otro nombre." />
+          <EmptyState icon="package" title={t("sell.item.noMatchTitle")} body={t("sell.item.noMatchBody")} />
         ) : (
           <div className="grid grid-cols-3 gap-3 xl:grid-cols-4">
             {results.map((it) => (
@@ -200,16 +200,16 @@ export function SellItem() {
           </div>
           <Button variant="ghost" onClick={() => setPicked(null)}>
             <Icon name="arrowL" size={14} />
-            Elegir otro
+            {t("common.pickAnother")}
           </Button>
         </div>
 
         <div className="mt-5">
-          <label className="font-wp text-[12.5px] font-semibold text-wp-fg-muted">Cantidad</label>
+          <label className="font-wp text-[12.5px] font-semibold text-wp-fg-muted">{t("sell.item.qtyLabel")}</label>
           <div className="mt-1.5 flex items-center gap-2.5">
             <Button
               iconOnly
-              aria-label="Menos"
+              aria-label={t("common.decrease")}
               disabled={qty <= 1}
               onClick={() => setQty((q) => Math.max(1, q - 1))}
             >
@@ -220,10 +220,10 @@ export function SellItem() {
               min={1}
               value={qty}
               onChange={(e) => setQty(Math.max(1, Number(e.target.value) || 1))}
-              aria-label="Cantidad"
+              aria-label={t("sell.item.qtyLabel")}
               className="wp-num w-20 text-center"
             />
-            <Button iconOnly aria-label="Más" onClick={() => setQty((q) => q + 1)}>
+            <Button iconOnly aria-label={t("common.increase")} onClick={() => setQty((q) => q + 1)}>
               <Icon name="plus" size={16} />
             </Button>
           </div>
@@ -232,18 +232,18 @@ export function SellItem() {
         <ValueBox className="mt-4">
           <div className="flex items-center gap-2">
             <Icon name="wand" size={15} className="text-wp-teal" />
-            <span className="font-wp text-[12.5px] font-bold text-wp-fg">Precio de referencia</span>
+            <span className="font-wp text-[12.5px] font-bold text-wp-fg">{t("sell.item.refPriceLabel")}</span>
             <Price amount={picked.refPrice} size={16} symbolClassName="text-wp-teal-deep" />
-            <span className="font-wp text-[11px] font-semibold text-wp-fg-subtle">/ unidad</span>
+            <span className="font-wp text-[11px] font-semibold text-wp-fg-subtle">{t("sell.item.perUnitSuffix")}</span>
             <Button className="ml-auto px-2.5 py-1 text-xs" onClick={() => setPrice(picked.refPrice)}>
-              Usar
+              {t("common.useSuggested")}
             </Button>
           </div>
         </ValueBox>
 
         <div className="mt-4">
           <label className="font-wp text-[12.5px] font-semibold text-wp-fg-muted">
-            Precio por unidad (₽)
+            {t("sell.item.unitPriceLabel")}
           </label>
           <div className="mt-1.5">
             <PriceInput
@@ -256,7 +256,7 @@ export function SellItem() {
 
         <div className="mt-4 flex items-center justify-between rounded-wp border border-wp-line/24 bg-wp-panel-2 px-4 py-3">
           <span className="font-wp text-[13px] font-semibold text-wp-fg-muted">
-            Ingreso si se vende ({qty} × ₽{fmt(price)})
+            {t("sell.item.incomeIfSold", { qty, price: fmt(price) })}
           </span>
           <Price amount={total} size={19} />
         </div>
@@ -268,7 +268,7 @@ export function SellItem() {
           onClick={publish}
         >
           <Icon name="tag" size={15} />
-          {createListing.isPending ? "Publicando…" : "Publicar objeto"}
+          {createListing.isPending ? t("common.publishing") : t("sell.item.publishButton")}
         </Button>
       </div>
     </div>

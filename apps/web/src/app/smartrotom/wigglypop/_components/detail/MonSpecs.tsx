@@ -1,32 +1,34 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import type { WpMon } from "../../_types/market.types"
-import { STAT_KEYS, STAT_LABELS, typeColor } from "../../_utils/typeColors"
+import { STAT_KEYS, STAT_LABEL_KEY, typeColor } from "../../_utils/typeColors"
 import { Chip, DividerLabel, Icon, Panel, StatBar, TypeBadge } from "../ui"
 
 /** The four headline facts, then the full IV/EV breakdown, then the moves. */
 export function MonSpecs({ mon }: { mon: WpMon }) {
+  const t = useTranslations("wigglypop")
   const maxStat = Math.max(...(mon.stats.length ? mon.stats : [1]))
   const perfect = mon.ivPct >= 90
 
   return (
     <>
       <div className="mt-4 grid grid-cols-2 gap-2.5">
-        <Spec k="Habilidad" v={mon.ability} />
-        <Spec k="Naturaleza" v={mon.nature} />
+        <Spec k={t("specs.ability")} v={mon.ability} />
+        <Spec k={t("specs.nature")} v={mon.nature} />
         <Spec
-          k="IVs totales"
-          v={`${mon.ivPct}% · ${mon.ivs.reduce((a, b) => a + b, 0)}/186`}
+          k={t("specs.totalIvs")}
+          v={t("specs.totalIvsValue", { pct: mon.ivPct, sum: mon.ivs.reduce((a, b) => a + b, 0) })}
           tone={perfect ? "text-wp-green" : undefined}
         />
-        <Spec k="Objeto" v={mon.heldItem ? prettyItem(mon.heldItem) : "Ninguno"} muted={!mon.heldItem} />
+        <Spec k={t("specs.item")} v={mon.heldItem ? prettyItem(mon.heldItem) : t("specs.none")} muted={!mon.heldItem} />
       </div>
 
       <Panel className="mt-3.5 p-4">
         <div className="mb-3 flex items-center justify-between">
-          <h3 className="font-wp text-sm font-bold text-wp-fg">Estadísticas e IVs</h3>
+          <h3 className="font-wp text-sm font-bold text-wp-fg">{t("specs.statsHeading")}</h3>
           <span className="font-wp text-[11.5px] font-semibold text-wp-fg-subtle">
-            IV / EV por estadística
+            {t("specs.statsSubheading")}
           </span>
         </div>
         <div className="grid gap-2.5">
@@ -34,7 +36,7 @@ export function MonSpecs({ mon }: { mon: WpMon }) {
             <div key={k} className="grid grid-cols-[1fr_auto] items-center gap-3">
               <div className="grid grid-cols-[64px_36px_1fr] items-center gap-2.5">
                 <span className="font-wp text-[12px] font-bold text-wp-fg-muted">
-                  {STAT_LABELS[k]}
+                  {t(STAT_LABEL_KEY[k])}
                 </span>
                 <span className="wp-num text-right font-wp text-[12.5px] text-wp-fg">
                   {mon.stats[i] ?? "—"}
@@ -43,9 +45,9 @@ export function MonSpecs({ mon }: { mon: WpMon }) {
               </div>
               <div className="flex gap-1.5 whitespace-nowrap font-wp text-[11px]">
                 <span className={mon.ivs[i] === 31 ? "wp-num text-wp-green" : "wp-num text-wp-fg-muted"}>
-                  IV {mon.ivs[i] ?? "—"}
+                  {t("specs.ivValue", { value: mon.ivs[i] ?? "—" })}
                 </span>
-                <span className="wp-num text-wp-fg-subtle">EV {mon.evs[i] ?? 0}</span>
+                <span className="wp-num text-wp-fg-subtle">{t("specs.evValue", { value: mon.evs[i] ?? 0 })}</span>
               </div>
             </div>
           ))}
@@ -54,7 +56,7 @@ export function MonSpecs({ mon }: { mon: WpMon }) {
 
       {mon.moves.length > 0 && (
         <div className="mt-3.5">
-          <DividerLabel className="mb-2.5">Movimientos</DividerLabel>
+          <DividerLabel className="mb-2.5">{t("specs.movesHeading")}</DividerLabel>
           <div className="grid grid-cols-2 gap-2">
             {mon.moves.map((mv) => (
               <div
@@ -75,8 +77,8 @@ export function MonSpecs({ mon }: { mon: WpMon }) {
       )}
 
       <div className="mt-3.5 flex flex-wrap gap-2">
-        {mon.ot && <Chip>OT {mon.ot}</Chip>}
-        {mon.caughtIn && <Chip>Capturado en {mon.caughtIn}</Chip>}
+        {mon.ot && <Chip>{t("specs.otPrefix", { ot: mon.ot })}</Chip>}
+        {mon.caughtIn && <Chip>{t("specs.caughtInPrefix", { place: mon.caughtIn })}</Chip>}
         {mon.ball && <Chip className="capitalize">{prettyItem(mon.ball)}</Chip>}
       </div>
     </>
@@ -116,22 +118,24 @@ export function prettyItem(raw: string): string {
 
 /** The type pill row under the title. */
 export function TypeRow({ mon }: { mon: WpMon }) {
+  const t = useTranslations("wigglypop")
   return (
     <div className="mt-2 flex flex-wrap items-center gap-[7px]">
-      {mon.types.map((t) => (
-        <TypeBadge key={t} type={t} />
+      {mon.types.map((ty) => (
+        <TypeBadge key={ty} type={ty} />
       ))}
-      <Chip>Nivel {mon.level}</Chip>
+      <Chip>{t("specs.levelChip", { level: mon.level })}</Chip>
       <Chip>{mon.nature}</Chip>
     </div>
   )
 }
 
 export function GenderIcon({ gender, size = 18 }: { gender: WpMon["gender"]; size?: number }) {
+  const t = useTranslations("wigglypop")
   if (gender === "male")
-    return <Icon name="mars" size={size} style={{ color: "#5aa9ff" }} aria-label="Macho" />
+    return <Icon name="mars" size={size} style={{ color: "#5aa9ff" }} aria-label={t("specs.male")} />
   if (gender === "female")
-    return <Icon name="venus" size={size} style={{ color: "#ff7eb6" }} aria-label="Hembra" />
+    return <Icon name="venus" size={size} style={{ color: "#ff7eb6" }} aria-label={t("specs.female")} />
   return null
 }
 

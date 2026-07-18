@@ -12,7 +12,9 @@ import { StarbankTransactionRepository } from '../starbank/repositories/starbank
 import { AuditoriaRepository } from './_shared/auditoria.repository';
 import { AuditoriaService } from './_shared/auditoria.service';
 import { PeopleRepository } from './_shared/people.repository';
+import { CountersRepository } from './_shared/counters.repository';
 import { CountersService } from './_shared/counters.service';
+import { TreasuryRepository } from './_shared/treasury.repository';
 import { TreasuryService } from './_shared/treasury.service';
 
 // Urbanismo
@@ -82,7 +84,9 @@ import { AdministracionController } from './administracion/administracion.contro
     AuditoriaRepository,
     AuditoriaService,
     PeopleRepository,
+    CountersRepository,
     CountersService,
+    TreasuryRepository,
     TreasuryService,
 
     UrbanismoRepository,

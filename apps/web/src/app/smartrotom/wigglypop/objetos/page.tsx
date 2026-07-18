@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation"
 import { useMemo, useState } from "react"
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { userMessageFrom } from "@/services/boffAPI"
 import { fmt } from "../_utils/format"
@@ -31,6 +32,7 @@ import {
  * guarantee that does not exist.
  */
 export default function ItemsPage() {
+  const t = useTranslations("wigglypop")
   const router = useRouter()
   const uuid = useWpUuid()
   const [cat, setCat] = useState<string>("Todo")
@@ -51,7 +53,7 @@ export default function ItemsPage() {
 
   const shown = listings.filter((L) => cat === "Todo" || L.items[0]?.category === cat)
 
-  const tabs = ["Todo", ...categories].map((c) => ({ key: c, label: c }))
+  const tabs = ["Todo", ...categories].map((c) => ({ key: c, label: c === "Todo" ? t("common.allLabel") : c }))
 
   return (
     <div className="flex min-w-0 flex-1 flex-col">
@@ -59,7 +61,7 @@ export default function ItemsPage() {
         <div className="flex flex-wrap items-center gap-3.5">
           {tabs.length > 1 && <Tabs tabs={tabs} value={cat} onChange={setCat} />}
           <span className="ml-auto font-wp text-[12.5px] font-semibold text-wp-fg-subtle">
-            <b className="wp-num text-wp-fg-muted">{shown.length}</b> objetos
+            <b className="wp-num text-wp-fg-muted">{shown.length}</b> {t("objetos.itemsCountSuffix")}
           </span>
           <Button
             variant="primary"
@@ -67,23 +69,21 @@ export default function ItemsPage() {
             onClick={() => router.push("/smartrotom/wigglypop/vender")}
           >
             <Icon name="plus" size={15} />
-            Vender objeto
+            {t("objetos.sellItemButton")}
           </Button>
         </div>
 
         <div className="mt-3.5 flex items-start gap-2 rounded-[11px] border border-wp-amber/25 bg-wp-amber/[.08] px-3 py-2.5">
           <Icon name="info" size={15} className="mt-px flex-none text-wp-amber" />
           <span className="font-wp text-[12.5px] font-semibold leading-relaxed text-wp-fg-muted">
-            Los objetos los declara el vendedor: el servidor de juego todavía no permite leer una
-            mochila, así que no hay verificación de propiedad. Tu pago sigue protegido en depósito —
-            si no te lo entregan, lo recuperas.
+            {t("objetos.disclaimer")}
           </span>
         </div>
       </div>
 
       <div className="wp-scroll min-h-0 flex-1 overflow-y-auto">
         {error ? (
-          <EmptyState icon="alert" title="No se pudieron cargar los objetos" body={userMessageFrom(error, "Inténtalo de nuevo en unos segundos.")} />
+          <EmptyState icon="alert" title={t("objetos.errorTitle")} body={userMessageFrom(error, t("common.retryFallback"))} />
         ) : isLoading ? (
           <div className="grid grid-cols-[repeat(auto-fill,minmax(236px,1fr))] gap-[18px] px-[26px] pb-11 pt-5">
             {Array.from({ length: 8 }).map((_, i) => (
@@ -93,12 +93,12 @@ export default function ItemsPage() {
         ) : shown.length === 0 ? (
           <EmptyState
             icon="package"
-            title="Aún no hay objetos a la venta"
-            body="Sé el primero en publicar uno."
+            title={t("objetos.emptyTitle")}
+            body={t("objetos.emptyBody")}
           >
             <Button variant="primary" onClick={() => router.push("/smartrotom/wigglypop/vender")}>
               <Icon name="plus" size={15} />
-              Vender objeto
+              {t("objetos.sellItemButton")}
             </Button>
           </EmptyState>
         ) : (
@@ -131,7 +131,7 @@ export default function ItemsPage() {
                     <div className="mt-1 flex items-center justify-between">
                       <Price amount={it.unitPrice} size={17} />
                       <span className="wp-num font-wp text-[11px] font-semibold text-wp-fg-subtle">
-                        {fmt(it.qty)} disponibles
+                        {t("objetos.availableCount", { qty: fmt(it.qty) })}
                       </span>
                     </div>
 
@@ -144,17 +144,17 @@ export default function ItemsPage() {
                       {uuid && L.seller.uuid === uuid ? (
                         <Chip className="text-[10.5px]">
                           <Icon name="tag" size={11} />
-                          Tu anuncio
+                          {t("common.yourListing")}
                         </Chip>
                       ) : (
                         <div className="flex gap-1.5">
                           <Button
                             iconOnly
-                            aria-label="Añadir al carrito"
+                            aria-label={t("common.addToCartAria")}
                             className="h-[30px] w-[30px] p-0"
                             onClick={() => {
                               addToCart(L)
-                              toast("Añadido al carrito", "success")
+                              toast(t("toast.addedToCart"), "success")
                             }}
                           >
                             <Icon name="cart" size={14} />
@@ -164,7 +164,7 @@ export default function ItemsPage() {
                             className="px-3 py-1.5 text-xs"
                             onClick={() => setBuying(L)}
                           >
-                            Comprar
+                            {t("objetos.buyButton")}
                           </Button>
                         </div>
                       )}

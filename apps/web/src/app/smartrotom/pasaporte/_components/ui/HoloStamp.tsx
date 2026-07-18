@@ -1,5 +1,6 @@
 // PAPER. The overprint that surfaces on a page while it is under the lamp.
 
+import { useTranslations } from "next-intl"
 import type { ReactNode } from "react"
 import { cn } from "@/lib/utils"
 
@@ -10,21 +11,24 @@ import { cn } from "@/lib/utils"
  */
 export function HoloStamp({
   show,
-  children = (
-    <>
-      SELLO
-      <br />
-      TERAS
-      <br />
-      VÁLIDO
-    </>
-  ),
+  children,
   className,
 }: {
   show: boolean
   children?: ReactNode
   className?: string
 }) {
+  const t = useTranslations("pasaporte")
+  const content = children ?? (
+    <>
+      {t("holoStamp.seal")}
+      <br />
+      TERAS
+      <br />
+      {t("holoStamp.valid")}
+    </>
+  )
+
   return (
     <div
       aria-hidden="true"
@@ -36,7 +40,7 @@ export function HoloStamp({
       )}
     >
       <div className="ps-holo-ring grid h-full w-full place-items-center rounded-full text-center font-ps-mono text-[11px] tracking-[.12em] text-ps-teal-deep">
-        {children}
+        {content}
       </div>
     </div>
   )

@@ -10,15 +10,21 @@ import {
   Post,
   Put,
   Query,
+  Req,
+  UseGuards,
 } from '@nestjs/common';
 import {
+  ApiBearerAuth,
   ApiBody,
   ApiOperation,
   ApiParam,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
+import { Request } from 'express';
 import { Public } from '@api/_utils/decorators/public.decorator';
+import { GameOrUserAuthGuard } from '@api/_utils/guards/game-or-user-auth.guard';
+import { resolveActor } from '@api/_utils/auth/actor';
 import { WigglypopFacadeService } from './wigglypop.facade.service';
 import {
   CreateBidDto,
@@ -85,6 +91,8 @@ export class WigglypopController {
   }
 
   @Post('listings')
+  @UseGuards(GameOrUserAuthGuard)
+  @ApiBearerAuth()
   @ApiOperation({
     summary: 'List something for sale',
     description:
@@ -95,11 +103,14 @@ export class WigglypopController {
   @ApiResponse({ status: HttpStatus.CREATED, type: WigglypopListingEntity })
   async createListing(
     @Body() dto: CreateListingDto,
+    @Req() req: Request,
   ): Promise<WigglypopListingEntity> {
-    return this.wigglypop.createListing(dto);
+    return this.wigglypop.createListing(dto, resolveActor(req));
   }
 
   @Patch('listings/:id')
+  @UseGuards(GameOrUserAuthGuard)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Edit a listing (price, note, status)' })
   @ApiParam({ name: 'id', type: Number })
   @ApiBody({ type: UpdateListingDto })
@@ -107,11 +118,14 @@ export class WigglypopController {
   async updateListing(
     @Param('id', ParseIntPipe) id: number,
     @Body() dto: UpdateListingDto,
+    @Req() req: Request,
   ): Promise<WigglypopListingEntity> {
-    return this.wigglypop.updateListing(id, dto);
+    return this.wigglypop.updateListing(id, dto, resolveActor(req));
   }
 
   @Delete('listings/:id')
+  @UseGuards(GameOrUserAuthGuard)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Delete a listing that has not sold' })
   @ApiParam({ name: 'id', type: Number })
   @ApiBody({ type: DeleteListingDto })
@@ -119,8 +133,9 @@ export class WigglypopController {
   async deleteListing(
     @Param('id', ParseIntPipe) id: number,
     @Body() dto: DeleteListingDto,
+    @Req() req: Request,
   ): Promise<WigglypopSuccessEntity> {
-    return this.wigglypop.deleteListing(id, dto.actorUuid);
+    return this.wigglypop.deleteListing(id, dto.actorUuid, resolveActor(req));
   }
 
   @Get('listings/:id/bids')
@@ -164,6 +179,8 @@ export class WigglypopController {
   }
 
   @Post('valuate')
+  @UseGuards(GameOrUserAuthGuard)
+  @ApiBearerAuth()
   @ApiOperation({
     summary: 'Value a Pokémon or a stack of items',
     description:
@@ -201,18 +218,23 @@ export class WigglypopController {
   }
 
   @Put('watchlist')
+  @UseGuards(GameOrUserAuthGuard)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Watch or unwatch a listing' })
   @ApiBody({ type: WatchlistDto })
   @ApiResponse({ status: HttpStatus.OK, type: WigglypopWatchResultEntity })
   async setWatching(
     @Body() dto: WatchlistDto,
+    @Req() req: Request,
   ): Promise<WigglypopWatchResultEntity> {
-    return this.wigglypop.setWatching(dto);
+    return this.wigglypop.setWatching(dto, resolveActor(req));
   }
 
   // ==================== ORDERS ====================
 
   @Post('orders')
+  @UseGuards(GameOrUserAuthGuard)
+  @ApiBearerAuth()
   @ApiOperation({
     summary: 'THE BUY',
     description:
@@ -222,13 +244,17 @@ export class WigglypopController {
   })
   @ApiBody({ type: CreateOrderDto })
   @ApiResponse({ status: HttpStatus.CREATED, type: WigglypopOrderEntity })
-  async createOrder(@Body() dto: CreateOrderDto): Promise<WigglypopOrderEntity> {
-    return this.wigglypop.createOrder(dto);
+  async createOrder(
+    @Body() dto: CreateOrderDto,
+    @Req() req: Request,
+  ): Promise<WigglypopOrderEntity> {
+    return this.wigglypop.createOrder(dto, resolveActor(req));
   }
 
   @Get('orders/user/:uuid')
   @ApiOperation({
-    summary: 'A player’s orders — both the ones they bought and the ones they sold',
+    summary:
+      'A player’s orders — both the ones they bought and the ones they sold',
   })
   @ApiParam({ name: 'uuid', type: String })
   @ApiResponse({ status: HttpStatus.OK, type: [WigglypopOrderEntity] })
@@ -239,6 +265,8 @@ export class WigglypopController {
   }
 
   @Post('orders/:id/transferred')
+  @UseGuards(GameOrUserAuthGuard)
+  @ApiBearerAuth()
   @ApiOperation({
     summary: 'The seller marks the in-game hand-off done',
     description: 'A claim, not a settlement. No money moves here.',
@@ -249,11 +277,14 @@ export class WigglypopController {
   async markTransferred(
     @Param('id', ParseIntPipe) id: number,
     @Body() dto: OrderActorDto,
+    @Req() req: Request,
   ): Promise<WigglypopOrderEntity> {
-    return this.wigglypop.markTransferred(id, dto.actorUuid);
+    return this.wigglypop.markTransferred(id, dto.actorUuid, resolveActor(req));
   }
 
   @Post('orders/:id/confirm')
+  @UseGuards(GameOrUserAuthGuard)
+  @ApiBearerAuth()
   @ApiOperation({
     summary: 'The buyer confirms receipt — this is what pays the seller',
     description: 'Releases the escrow: escrow → seller, per line. Idempotent.',
@@ -264,11 +295,14 @@ export class WigglypopController {
   async confirmOrder(
     @Param('id', ParseIntPipe) id: number,
     @Body() dto: OrderActorDto,
+    @Req() req: Request,
   ): Promise<WigglypopOrderEntity> {
-    return this.wigglypop.confirmOrder(id, dto.actorUuid);
+    return this.wigglypop.confirmOrder(id, dto.actorUuid, resolveActor(req));
   }
 
   @Post('orders/:id/cancel')
+  @UseGuards(GameOrUserAuthGuard)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Cancel and refund the escrow back to the buyer' })
   @ApiParam({ name: 'id', type: Number })
   @ApiBody({ type: OrderActorDto })
@@ -276,13 +310,16 @@ export class WigglypopController {
   async cancelOrder(
     @Param('id', ParseIntPipe) id: number,
     @Body() dto: OrderActorDto,
+    @Req() req: Request,
   ): Promise<WigglypopOrderEntity> {
-    return this.wigglypop.cancelOrder(id, dto.actorUuid);
+    return this.wigglypop.cancelOrder(id, dto.actorUuid, resolveActor(req));
   }
 
   // ==================== BIDS ====================
 
   @Post('bids')
+  @UseGuards(GameOrUserAuthGuard)
+  @ApiBearerAuth()
   @ApiOperation({
     summary: 'Bid on an auction',
     description:
@@ -290,18 +327,26 @@ export class WigglypopController {
   })
   @ApiBody({ type: CreateBidDto })
   @ApiResponse({ status: HttpStatus.CREATED, type: WigglypopBidEntity })
-  async createBid(@Body() dto: CreateBidDto): Promise<WigglypopBidEntity> {
-    return this.wigglypop.createBid(dto);
+  async createBid(
+    @Body() dto: CreateBidDto,
+    @Req() req: Request,
+  ): Promise<WigglypopBidEntity> {
+    return this.wigglypop.createBid(dto, resolveActor(req));
   }
 
   // ==================== OFFERS ====================
 
   @Post('offers')
+  @UseGuards(GameOrUserAuthGuard)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Make an offer on a listing' })
   @ApiBody({ type: CreateOfferDto })
   @ApiResponse({ status: HttpStatus.CREATED, type: WigglypopOfferEntity })
-  async createOffer(@Body() dto: CreateOfferDto): Promise<WigglypopOfferEntity> {
-    return this.wigglypop.createOffer(dto);
+  async createOffer(
+    @Body() dto: CreateOfferDto,
+    @Req() req: Request,
+  ): Promise<WigglypopOfferEntity> {
+    return this.wigglypop.createOffer(dto, resolveActor(req));
   }
 
   @Get('offers/seller/:uuid')
@@ -315,6 +360,8 @@ export class WigglypopController {
   }
 
   @Post('offers/:id/accept')
+  @UseGuards(GameOrUserAuthGuard)
+  @ApiBearerAuth()
   @ApiOperation({
     summary: 'Accept an offer — creates an order at the offered price',
     description:
@@ -327,11 +374,14 @@ export class WigglypopController {
   async acceptOffer(
     @Param('id', ParseIntPipe) id: number,
     @Body() dto: RespondOfferDto,
+    @Req() req: Request,
   ): Promise<WigglypopOrderEntity> {
-    return this.wigglypop.acceptOffer(id, dto.actorUuid);
+    return this.wigglypop.acceptOffer(id, dto.actorUuid, resolveActor(req));
   }
 
   @Post('offers/:id/reject')
+  @UseGuards(GameOrUserAuthGuard)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Reject an offer' })
   @ApiParam({ name: 'id', type: Number })
   @ApiBody({ type: RespondOfferDto })
@@ -339,13 +389,16 @@ export class WigglypopController {
   async rejectOffer(
     @Param('id', ParseIntPipe) id: number,
     @Body() dto: RespondOfferDto,
+    @Req() req: Request,
   ): Promise<WigglypopOfferEntity> {
-    return this.wigglypop.rejectOffer(id, dto.actorUuid);
+    return this.wigglypop.rejectOffer(id, dto.actorUuid, resolveActor(req));
   }
 
   // ==================== TRADES ====================
 
   @Post('trades')
+  @UseGuards(GameOrUserAuthGuard)
+  @ApiBearerAuth()
   @ApiOperation({
     summary: 'Propose a trade',
     description:
@@ -355,8 +408,9 @@ export class WigglypopController {
   @ApiResponse({ status: HttpStatus.CREATED, type: WigglypopTradeOfferEntity })
   async createTrade(
     @Body() dto: CreateTradeDto,
+    @Req() req: Request,
   ): Promise<WigglypopTradeOfferEntity> {
-    return this.wigglypop.createTrade(dto);
+    return this.wigglypop.createTrade(dto, resolveActor(req));
   }
 
   @Get('trades/seller/:uuid')
@@ -370,6 +424,8 @@ export class WigglypopController {
   }
 
   @Post('trades/:id/accept')
+  @UseGuards(GameOrUserAuthGuard)
+  @ApiBearerAuth()
   @ApiOperation({
     summary: 'Accept a trade proposal',
     description:
@@ -382,11 +438,14 @@ export class WigglypopController {
   async acceptTrade(
     @Param('id', ParseIntPipe) id: number,
     @Body() dto: RespondTradeDto,
+    @Req() req: Request,
   ): Promise<WigglypopTradeOfferEntity> {
-    return this.wigglypop.acceptTrade(id, dto.actorUuid);
+    return this.wigglypop.acceptTrade(id, dto.actorUuid, resolveActor(req));
   }
 
   @Post('trades/:id/reject')
+  @UseGuards(GameOrUserAuthGuard)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Reject a trade proposal' })
   @ApiParam({ name: 'id', type: Number })
   @ApiBody({ type: RespondTradeDto })
@@ -394,13 +453,16 @@ export class WigglypopController {
   async rejectTrade(
     @Param('id', ParseIntPipe) id: number,
     @Body() dto: RespondTradeDto,
+    @Req() req: Request,
   ): Promise<WigglypopTradeOfferEntity> {
-    return this.wigglypop.rejectTrade(id, dto.actorUuid);
+    return this.wigglypop.rejectTrade(id, dto.actorUuid, resolveActor(req));
   }
 
   // ==================== REVIEWS ====================
 
   @Post('reviews')
+  @UseGuards(GameOrUserAuthGuard)
+  @ApiBearerAuth()
   @ApiOperation({
     summary: 'Review a completed order',
     description:
@@ -411,7 +473,8 @@ export class WigglypopController {
   @ApiResponse({ status: HttpStatus.CREATED, type: WigglypopReviewEntity })
   async createReview(
     @Body() dto: CreateReviewDto,
+    @Req() req: Request,
   ): Promise<WigglypopReviewEntity> {
-    return this.wigglypop.createReview(dto);
+    return this.wigglypop.createReview(dto, resolveActor(req));
   }
 }

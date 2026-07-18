@@ -3,7 +3,7 @@
 import type { ReactNode } from "react"
 import { cn } from "@/lib/utils"
 import { Icon, type IconName } from "./Icon"
-import { fmt } from "../../_utils/format"
+import { useFormat } from "../../_hooks/useFormat"
 
 /**
  * One control in a post's action bar: reply, retrino, views, bookmark, share.
@@ -49,6 +49,7 @@ export function ActionBtn({
   label,
   onClick,
 }: ActionBtnProps) {
+  const { fmt } = useFormat()
   const t = TONE[tone]
   return (
     <button

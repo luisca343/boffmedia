@@ -9,8 +9,11 @@ import {
   Patch,
   Post,
   Query,
+  Req,
+  UseGuards,
 } from '@nestjs/common';
 import {
+  ApiBearerAuth,
   ApiBody,
   ApiOperation,
   ApiParam,
@@ -18,6 +21,13 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { Public } from '@api/_utils/decorators/public.decorator';
+import { Request } from 'express';
+import { GameOrUserAuthGuard } from '@api/_utils/guards/game-or-user-auth.guard';
+import { resolveActor } from '@api/_utils/auth/actor';
+import { JwtAuthGuard } from '@api/auth/jwt-auth.guard';
+import { RolesGuard } from '@api/_utils/guards/roles.guard';
+import { Roles } from '@api/_utils/decorators/roles.decorator';
+import { USER_ROLES } from '@api/_utils/auth/roles.constants';
 import { ActorBodyDto } from '../_shared/dto/actor-body.dto';
 import { SeguridadService } from './seguridad.service';
 import {
@@ -45,7 +55,6 @@ import {
 } from './entities/seguridad.entity';
 
 @ApiTags('SmartRotom | Gobierno | Seguridad')
-@Public()
 @Controller('smartrotom/gobierno/seguridad')
 export class SeguridadController {
   constructor(private readonly seguridadService: SeguridadService) {}
@@ -53,6 +62,7 @@ export class SeguridadController {
   // ==================== DENUNCIAS ====================
 
   @Get('denuncias')
+  @Public()
   @ApiOperation({ summary: 'List denuncias' })
   @ApiResponse({ status: HttpStatus.OK, type: GobiernoDenunciaListEntity })
   async listDenuncias(
@@ -62,6 +72,7 @@ export class SeguridadController {
   }
 
   @Get('denuncias/:id')
+  @Public()
   @ApiOperation({ summary: 'Get a denuncia by id' })
   @ApiParam({ name: 'id', type: Number })
   @ApiResponse({ status: HttpStatus.OK, type: GobiernoDenunciaEntity })
@@ -72,16 +83,23 @@ export class SeguridadController {
   }
 
   @Post('denuncias')
+  @Public()
+  @UseGuards(GameOrUserAuthGuard)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'File a denuncia' })
   @ApiBody({ type: CreateDenunciaDto })
   @ApiResponse({ status: HttpStatus.CREATED, type: GobiernoDenunciaEntity })
   async createDenuncia(
     @Body() dto: CreateDenunciaDto,
+    @Req() req: Request,
   ): Promise<GobiernoDenunciaEntity> {
-    return this.seguridadService.createDenuncia(dto);
+    return this.seguridadService.createDenuncia(dto, resolveActor(req));
   }
 
   @Patch('denuncias/:id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.GOBIERNO, USER_ROLES.ROTOM_ADMIN)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Update a denuncia' })
   @ApiParam({ name: 'id', type: Number })
   @ApiBody({ type: UpdateDenunciaDto })
@@ -94,6 +112,9 @@ export class SeguridadController {
   }
 
   @Patch('denuncias/:id/resolve')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.GOBIERNO, USER_ROLES.ROTOM_ADMIN)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Resolve or dismiss a denuncia' })
   @ApiParam({ name: 'id', type: Number })
   @ApiBody({ type: ResolveDenunciaDto })
@@ -106,6 +127,9 @@ export class SeguridadController {
   }
 
   @Delete('denuncias/:id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.GOBIERNO, USER_ROLES.ROTOM_ADMIN)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Delete a denuncia' })
   @ApiParam({ name: 'id', type: Number })
   @ApiBody({ type: ActorBodyDto })
@@ -120,6 +144,7 @@ export class SeguridadController {
   // ==================== BUSCADOS ====================
 
   @Get('buscados')
+  @Public()
   @ApiOperation({ summary: 'List buscados' })
   @ApiResponse({ status: HttpStatus.OK, type: GobiernoBuscadoListEntity })
   async listBuscados(
@@ -129,6 +154,7 @@ export class SeguridadController {
   }
 
   @Get('buscados/:id')
+  @Public()
   @ApiOperation({ summary: 'Get a buscado by id' })
   @ApiParam({ name: 'id', type: Number })
   @ApiResponse({ status: HttpStatus.OK, type: GobiernoBuscadoEntity })
@@ -139,6 +165,9 @@ export class SeguridadController {
   }
 
   @Post('buscados')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.GOBIERNO, USER_ROLES.ROTOM_ADMIN)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Issue a wanted notice' })
   @ApiBody({ type: CreateBuscadoDto })
   @ApiResponse({ status: HttpStatus.CREATED, type: GobiernoBuscadoEntity })
@@ -149,6 +178,9 @@ export class SeguridadController {
   }
 
   @Patch('buscados/:id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.GOBIERNO, USER_ROLES.ROTOM_ADMIN)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Update a buscado' })
   @ApiParam({ name: 'id', type: Number })
   @ApiBody({ type: UpdateBuscadoDto })
@@ -161,6 +193,9 @@ export class SeguridadController {
   }
 
   @Delete('buscados/:id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.GOBIERNO, USER_ROLES.ROTOM_ADMIN)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Delete a buscado' })
   @ApiParam({ name: 'id', type: Number })
   @ApiBody({ type: ActorBodyDto })
@@ -173,6 +208,9 @@ export class SeguridadController {
   }
 
   @Post('buscados/:id/capture')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.GOBIERNO, USER_ROLES.ROTOM_ADMIN)
+  @ApiBearerAuth()
   @ApiOperation({
     summary:
       'Mark a buscado as captured and pay the bounty out of the treasury',
@@ -190,6 +228,7 @@ export class SeguridadController {
   // ==================== PATRULLAS ====================
 
   @Get('patrullas')
+  @Public()
   @ApiOperation({ summary: 'List patrullas, with their officers' })
   @ApiResponse({ status: HttpStatus.OK, type: [GobiernoPatrullaEntity] })
   async listPatrullas(
@@ -199,6 +238,7 @@ export class SeguridadController {
   }
 
   @Get('patrullas/:id')
+  @Public()
   @ApiOperation({ summary: 'Get a patrulla by id, with its officers' })
   @ApiParam({ name: 'id', type: Number })
   @ApiResponse({ status: HttpStatus.OK, type: GobiernoPatrullaEntity })
@@ -209,6 +249,9 @@ export class SeguridadController {
   }
 
   @Post('patrullas')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.GOBIERNO, USER_ROLES.ROTOM_ADMIN)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Create a patrulla' })
   @ApiBody({ type: CreatePatrullaDto })
   @ApiResponse({ status: HttpStatus.CREATED, type: GobiernoPatrullaEntity })
@@ -219,6 +262,9 @@ export class SeguridadController {
   }
 
   @Patch('patrullas/:id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.GOBIERNO, USER_ROLES.ROTOM_ADMIN)
+  @ApiBearerAuth()
   @ApiOperation({
     summary: 'Update a patrulla (officers array replaces the roster)',
   })
@@ -233,6 +279,9 @@ export class SeguridadController {
   }
 
   @Delete('patrullas/:id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.GOBIERNO, USER_ROLES.ROTOM_ADMIN)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Delete a patrulla' })
   @ApiParam({ name: 'id', type: Number })
   @ApiBody({ type: ActorBodyDto })
@@ -247,6 +296,7 @@ export class SeguridadController {
   // ==================== BITACORA ====================
 
   @Get('bitacora')
+  @Public()
   @ApiOperation({ summary: 'List bitácora entries' })
   @ApiResponse({ status: HttpStatus.OK, type: [GobiernoBitacoraEntity] })
   async listBitacora(
@@ -256,6 +306,9 @@ export class SeguridadController {
   }
 
   @Post('bitacora')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.GOBIERNO, USER_ROLES.ROTOM_ADMIN)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Append a bitácora entry' })
   @ApiBody({ type: CreateBitacoraDto })
   @ApiResponse({ status: HttpStatus.CREATED, type: [GobiernoBitacoraEntity] })

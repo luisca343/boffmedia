@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import type { WpListing } from "../_types/market.types"
 import { fmt } from "../_utils/format"
@@ -15,6 +16,7 @@ export function EditPriceModal({
   listing: WpListing
   onClose: () => void
 }) {
+  const t = useTranslations("wigglypop")
   const current = L.format === "auction" ? (L.currentBid ?? L.price) : L.price
   const [price, setPrice] = useState(current)
   const update = useUpdateListing()
@@ -22,32 +24,32 @@ export function EditPriceModal({
   const ref = L.value || current
   const verdict =
     price < ref * 0.95
-      ? { label: "Buen precio", tone: "text-wp-green" }
+      ? { label: t("common.priceVerdictGood"), tone: "text-wp-green" }
       : price > ref * 1.15
-        ? { label: "Por encima del mercado", tone: "text-wp-rose" }
-        : { label: "En línea con el mercado", tone: "text-wp-fg-muted" }
+        ? { label: t("common.priceVerdictAbove"), tone: "text-wp-rose" }
+        : { label: t("common.priceVerdictInline"), tone: "text-wp-fg-muted" }
 
   return (
     <Modal onClose={onClose}>
       <ModalHead
-        title="Editar precio"
-        sub={`${L.title}${L.kind === "item" ? " · ₽ por unidad" : ""}`}
+        title={t("modal.editPrice.title")}
+        sub={`${L.title}${L.kind === "item" ? t("modal.editPrice.perUnitSuffix") : ""}`}
         onClose={onClose}
       />
       <div className="p-5">
         <ValueBox className="mb-4">
           <div className="flex items-center gap-2">
             <Icon name="wand" size={15} className="text-wp-teal" />
-            <span className="font-wp text-[12.5px] font-bold text-wp-fg">SmartRotom sugiere</span>
+            <span className="font-wp text-[12.5px] font-bold text-wp-fg">{t("common.smartRotomSuggests")}</span>
             <Price amount={ref} size={15} symbolClassName="text-wp-teal-deep" />
             <Button className="ml-auto px-2.5 py-1 text-xs" onClick={() => setPrice(ref)}>
-              Usar
+              {t("common.useSuggested")}
             </Button>
           </div>
         </ValueBox>
 
         <label className="font-wp text-[12.5px] font-semibold text-wp-fg-muted">
-          {L.format === "auction" ? "Puja inicial" : "Precio"} (₽)
+          {L.format === "auction" ? t("common.initialBid") : t("common.price")} (₽)
         </label>
         <div className="mb-1 mt-1.5 flex items-center gap-2.5">
           <PriceInput
@@ -63,7 +65,7 @@ export function EditPriceModal({
           max={Math.round(ref * 1.6)}
           step={50}
           value={Math.min(Math.round(ref * 1.6), Math.max(Math.round(ref * 0.4), price))}
-          aria-label="Precio"
+          aria-label={t("common.price")}
           className="mt-1.5"
           onChange={(e) => setPrice(Number(e.target.value))}
         />
@@ -77,7 +79,7 @@ export function EditPriceModal({
               { id: L.id, patch: { price } },
               {
                 onSuccess: () => {
-                  toast("Precio actualizado", "success")
+                  toast(t("toast.priceUpdated"), "success")
                   onClose()
                 },
               },
@@ -85,7 +87,7 @@ export function EditPriceModal({
           }
         >
           <Icon name="check" size={16} />
-          {update.isPending ? "Guardando…" : `Guardar ₽${fmt(price)}`}
+          {update.isPending ? t("modal.editPrice.saving") : t("modal.editPrice.saveButton", { price: fmt(price) })}
         </Button>
       </div>
     </Modal>

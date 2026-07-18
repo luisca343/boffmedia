@@ -31,7 +31,7 @@ const EMPTY: SuggestFormData = {
 }
 
 export function SuggestEventView() {
-  const t = useTranslations("events.sugerir")
+  const t = useTranslations("sugerir")
   const [data, setData] = React.useState<SuggestFormData>(EMPTY)
   const [submitting, setSubmitting] = React.useState(false)
   const [submitted, setSubmitted] = React.useState(false)

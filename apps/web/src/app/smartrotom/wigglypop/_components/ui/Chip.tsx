@@ -1,7 +1,10 @@
+"use client"
+
 import type { ReactNode } from "react"
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import type { WpRarity } from "../../_types/market.types"
-import { RARITY_LABEL, RARITY_TEXT } from "../../_utils/rarity"
+import { RARITY_LABEL_KEY, RARITY_TEXT } from "../../_utils/rarity"
 
 /** The default pill: sunken pink tint, plum hairline, muted text. */
 export function Chip({
@@ -31,6 +34,7 @@ export function Chip({
  * colour: the word is always spelled out (§11).
  */
 export function RarityBadge({ rarity, className }: { rarity: WpRarity; className?: string }) {
+  const t = useTranslations("wigglypop")
   return (
     <span
       className={cn(
@@ -39,7 +43,7 @@ export function RarityBadge({ rarity, className }: { rarity: WpRarity; className
         className,
       )}
     >
-      {RARITY_LABEL[rarity]}
+      {t(RARITY_LABEL_KEY[rarity])}
     </span>
   )
 }

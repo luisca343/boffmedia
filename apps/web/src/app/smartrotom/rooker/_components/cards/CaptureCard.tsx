@@ -1,9 +1,10 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { usePokemonStore } from "@/stores/pokemonStore"
 import { cn } from "@/lib/utils"
 import { Icon, Pill, Sprite } from "../ui"
-import { fullTime } from "../../_utils/format"
+import { useFormat } from "../../_hooks/useFormat"
 import type { RookerCapture } from "../../_types"
 
 /**
@@ -23,6 +24,8 @@ import type { RookerCapture } from "../../_types"
  * — because that IS the moment worth posting about, and the registry does know.
  */
 export function CaptureCard({ data }: { data: RookerCapture }) {
+  const t = useTranslations("rooker")
+  const { fullTime } = useFormat()
   const species = usePokemonStore((s) => s.allPokemon.find((p) => p.dex === data.pokemonId))
   const name = species?.name ?? `#${String(data.pokemonId).padStart(3, "0")}`
 
@@ -64,10 +67,10 @@ export function CaptureCard({ data }: { data: RookerCapture }) {
         <div className="min-w-0 flex-1">
           <div className="mb-1 flex flex-wrap items-center gap-1.5">
             <Pill className="border border-rk-accent/30 bg-rk-accent/15 text-rk-accent">
-              <Icon name="plus" size={10} /> Captura
+              <Icon name="plus" size={10} /> {t("card.capture.badge")}
             </Pill>
             {data.shiny && (
-              <Pill className="border border-rk-shiny/45 bg-rk-shiny/20 text-rk-shiny">★ Shiny</Pill>
+              <Pill className="border border-rk-shiny/45 bg-rk-shiny/20 text-rk-shiny">{t("card.capture.shinyBadge")}</Pill>
             )}
           </div>
 
@@ -76,7 +79,7 @@ export function CaptureCard({ data }: { data: RookerCapture }) {
           {data.caughtAt && (
             <div className="mt-1 flex items-center gap-1.5 text-[12.5px] text-rk-fg-muted">
               <Icon name="calendar" size={12} className="flex-none text-rk-fg-subtle" />
-              Registrado el {fullTime(data.caughtAt)}
+              {t("card.capture.registeredOn", { date: fullTime(data.caughtAt) })}
             </div>
           )}
         </div>

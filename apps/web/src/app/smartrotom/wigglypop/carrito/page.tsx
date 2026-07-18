@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation"
 import { useState } from "react"
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { fmt } from "../_utils/format"
 import { cartCount, feeFor, lineTotal, useCartStore } from "../_stores/cartStore"
@@ -29,6 +30,7 @@ import {
  * are still waiting on does not), so a slow seller cannot hold the rest hostage.
  */
 export default function CartPage() {
+  const t = useTranslations("wigglypop")
   const router = useRouter()
   const lines = useCartStore((s) => s.lines)
   const setQty = useCartStore((s) => s.setQty)
@@ -66,18 +68,18 @@ export default function CartPage() {
     return (
       <Modal onClose={() => router.push("/smartrotom/wigglypop")}>
         <ModalDone
-          title="¡Pedido realizado!"
+          title={t("carrito.orderDoneTitle")}
           actions={
             <>
-              <Button onClick={() => router.push("/smartrotom/wigglypop")}>Seguir comprando</Button>
+              <Button onClick={() => router.push("/smartrotom/wigglypop")}>{t("common.keepShopping")}</Button>
               <Button variant="primary" onClick={() => router.push("/smartrotom/wigglypop/compras")}>
-                Ver mis compras
+                {t("common.viewOrders")}
               </Button>
             </>
           }
         >
-          Pedido <b className="text-wp-fg">{done.code}</b> · ₽{fmt(total)}{" "}
-          {done.atomic ? "pagados" : "retenidos en depósito"}.
+          {t("common.orderCodePrefix")} <b className="text-wp-fg">{done.code}</b> · ₽{fmt(total)}{" "}
+          {done.atomic ? t("modal.buy.paid") : t("common.heldInEscrow")}.
           <EscrowSteps atomic={done.atomic} />
         </ModalDone>
       </Modal>
@@ -90,11 +92,11 @@ export default function CartPage() {
         <Head count={0} sellers={0} onClear={clear} />
         <EmptyState
           icon="cart"
-          title="Tu carrito está vacío"
-          body="Añade Pokémon y objetos para pagarlos juntos en un solo depósito."
+          title={t("carrito.emptyTitle")}
+          body={t("carrito.emptyBody")}
         >
           <Button variant="primary" onClick={() => router.push("/smartrotom/wigglypop")}>
-            Explorar mercado
+            {t("common.exploreMarket")}
           </Button>
         </EmptyState>
       </div>
@@ -134,7 +136,7 @@ export default function CartPage() {
                     </div>
                     <div className="mt-1 font-wp text-[11.5px] font-semibold text-wp-fg-subtle">
                       {l.listing.seller.username}
-                      {item && ` · ₽${fmt(item.unitPrice)}/u`}
+                      {item && ` · ${t("carrito.unitPriceAbbrev", { price: fmt(item.unitPrice) })}`}
                     </div>
                   </div>
 
@@ -142,7 +144,7 @@ export default function CartPage() {
                     <div className="flex items-center gap-1.5">
                       <Button
                         iconOnly
-                        aria-label="Menos"
+                        aria-label={t("common.decrease")}
                         disabled={l.qty <= 1}
                         onClick={() => setQty(l.key, l.qty - 1)}
                       >
@@ -151,7 +153,7 @@ export default function CartPage() {
                       <span className="wp-num min-w-[26px] text-center font-wp text-sm text-wp-fg">
                         {l.qty}
                       </span>
-                      <Button iconOnly aria-label="Más" onClick={() => setQty(l.key, l.qty + 1)}>
+                      <Button iconOnly aria-label={t("common.increase")} onClick={() => setQty(l.key, l.qty + 1)}>
                         <Icon name="plus" size={15} />
                       </Button>
                     </div>
@@ -164,7 +166,7 @@ export default function CartPage() {
                   <Button
                     variant="ghost"
                     iconOnly
-                    aria-label="Quitar del carrito"
+                    aria-label={t("carrito.removeAria")}
                     onClick={() => remove(l.key)}
                   >
                     <Icon name="x" size={16} />
@@ -176,14 +178,14 @@ export default function CartPage() {
 
           <Panel className="sticky top-2 rounded-wp-lg p-5">
             <h3 className="mb-3.5 font-wp-display text-base font-semibold text-wp-fg">
-              Resumen del pedido
+              {t("carrito.summaryTitle")}
             </h3>
             <div className="grid gap-2.5">
-              <Row k={`Subtotal (${count} art.)`} v={subtotal} />
-              <Row k="Comisión de protección (2,5%)" v={fee} />
+              <Row k={t("carrito.subtotalLabel", { count })} v={subtotal} />
+              <Row k={t("common.protectionFee")} v={fee} />
               <div className="my-1 h-px bg-wp-line/24" />
               <div className="flex items-baseline justify-between">
-                <span className="font-wp text-base font-extrabold text-wp-fg">Total</span>
+                <span className="font-wp text-base font-extrabold text-wp-fg">{t("common.total")}</span>
                 <Price amount={total} size={22} />
               </div>
             </div>
@@ -199,13 +201,12 @@ export default function CartPage() {
               onClick={() => setCheckingOut(true)}
             >
               <Icon name="lock" size={16} />
-              {insufficient ? "Saldo insuficiente" : `Tramitar compra · ₽${fmt(total)}`}
+              {insufficient ? t("common.insufficientBalance") : t("carrito.checkoutButton", { total: fmt(total) })}
             </Button>
 
             <p className="mt-3 flex items-start gap-2 font-wp text-[11.5px] font-semibold leading-relaxed text-wp-fg-muted">
               <Icon name="shieldCheck" size={15} className="mt-px flex-none text-wp-green" />
-              Todo el pedido queda en un único depósito. El pago a cada vendedor se libera cuando
-              confirmes su entrega.
+              {t("carrito.escrowExplain")}
             </p>
           </Panel>
         </div>
@@ -214,8 +215,8 @@ export default function CartPage() {
       {checkingOut && (
         <Modal onClose={() => setCheckingOut(false)}>
           <ModalHead
-            title="Tramitar compra"
-            sub={`${count} artículos · ${sellers} ${sellers === 1 ? "vendedor" : "vendedores"} · un solo depósito`}
+            title={t("carrito.checkoutTitle")}
+            sub={t("carrito.checkoutSub", { count, sellers })}
             onClose={() => setCheckingOut(false)}
           />
           <div className="p-5">
@@ -244,11 +245,11 @@ export default function CartPage() {
             </div>
 
             <div className="my-4 grid gap-2.5">
-              <Row k="Subtotal" v={subtotal} />
-              <Row k="Comisión de protección (2,5%)" v={fee} />
+              <Row k={t("modal.parts.subtotalDefault")} v={subtotal} />
+              <Row k={t("common.protectionFee")} v={fee} />
               <div className="my-0.5 h-px bg-wp-line/24" />
               <div className="flex items-baseline justify-between">
-                <span className="font-wp text-[15px] font-bold text-wp-fg">Total</span>
+                <span className="font-wp text-[15px] font-bold text-wp-fg">{t("common.total")}</span>
                 <Price amount={total} size={20} />
               </div>
             </div>
@@ -262,7 +263,7 @@ export default function CartPage() {
               onClick={pay}
             >
               <Icon name="lock" size={16} />
-              {createOrder.isPending ? "Procesando…" : `Pagar ₽${fmt(total)} en depósito`}
+              {createOrder.isPending ? t("common.processing") : t("carrito.payButton", { total: fmt(total) })}
             </Button>
           </div>
         </Modal>
@@ -280,23 +281,22 @@ function Head({
   sellers: number
   onClear: () => void
 }) {
+  const t = useTranslations("wigglypop")
   return (
     <div className="flex flex-none items-center gap-3 border-b border-wp-line/24 px-[30px] py-[18px]">
       <div className="flex-1">
         <h1 className="flex items-center gap-2.5 font-wp-display text-[21px] font-semibold text-wp-fg">
           <Icon name="cart" size={20} className="text-wp-accent" />
-          Carrito
+          {t("carrito.headTitle")}
         </h1>
         <p className="mt-0.5 font-wp text-[12.5px] font-semibold text-wp-fg-subtle">
-          {count === 0
-            ? "Vacío"
-            : `${count} artículo${count !== 1 ? "s" : ""} · ${sellers} vendedor${sellers !== 1 ? "es" : ""} · un solo pago en depósito`}
+          {count === 0 ? t("carrito.emptyLabel") : t("carrito.headSubtitle", { count, sellers })}
         </p>
       </div>
       {count > 0 && (
         <Button variant="ghost" onClick={onClear}>
           <Icon name="trash" size={15} />
-          Vaciar
+          {t("carrito.clearButton")}
         </Button>
       )}
     </div>

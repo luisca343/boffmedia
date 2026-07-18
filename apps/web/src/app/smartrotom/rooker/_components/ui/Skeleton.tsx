@@ -1,3 +1,6 @@
+"use client"
+
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 
 /** A loading block. Pulses, and honours the OS reduced-motion preference (§11). */
@@ -23,8 +26,9 @@ export function PostSkeleton() {
 }
 
 export function FeedSkeleton({ rows = 5 }: { rows?: number }) {
+  const t = useTranslations("rooker")
   return (
-    <div aria-busy="true" aria-label="Cargando trinos">
+    <div aria-busy="true" aria-label={t("common.loadingPosts")}>
       {Array.from({ length: rows }).map((_, i) => (
         <PostSkeleton key={i} />
       ))}

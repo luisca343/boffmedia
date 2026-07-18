@@ -3,6 +3,7 @@
 // PAPER — but a card ON the paper: the carné is its own pale-blue laminate, so its ink is
 // `ps-info-*` and `ps-ink`, never desk chrome.
 
+import { useTranslations } from "next-intl"
 import { useState, type ReactNode } from "react"
 import { cn } from "@/lib/utils"
 import type { MinecraftStats } from "@/services/api/smartrotom/playerService"
@@ -62,12 +63,13 @@ export function Carne({
   loading: boolean
   inspect: boolean
 }) {
+  const t = useTranslations("pasaporte")
   const [verified, setVerified] = useState(false)
 
   if (loading || !profile) {
     return (
       <>
-        <PageHead eyebrow="Documento de Identidad · Visado" title="Carné Oficial" />
+        <PageHead eyebrow={t("carne.eyebrow")} title={t("carne.title")} />
         <Skeleton className="h-[300px] rounded-2xl" />
       </>
     )
@@ -85,16 +87,16 @@ export function Carne({
 
   function onScan() {
     if (!inspect) {
-      toast("Activa el Modo Inspección (tecla I) para escanear el código")
+      toast(t("carne.inspectPrompt"))
       return
     }
     setVerified(true)
-    toast("✓ Código verificado · GOB·TERAS · Entrenador en regla")
+    toast(t("carne.verifiedToast"))
   }
 
   return (
     <>
-      <PageHead eyebrow="Documento de Identidad · Visado" title="Carné Oficial" />
+      <PageHead eyebrow={t("carne.eyebrow")} title={t("carne.title")} />
 
       <div
         style={LAMINATE}
@@ -117,14 +119,14 @@ export function Carne({
           <Icon name="globe" className="h-[26px] w-[26px] flex-none text-ps-chrome-fg/80" />
           <div className="min-w-0 flex-1">
             <div className="truncate font-ps-mono text-[9.5px] tracking-[.2em] text-ps-chrome-fg/70">
-              GOBIERNO DE TERAS · DIRECCIÓN DE FRONTERAS
+              {t("carne.bandAuthority")}
             </div>
             <div className="truncate font-ps-ceremony text-[16px] tracking-[.02em] text-ps-chrome-fg">
-              CARNÉ DE ENTRENADOR · TRAINER ID
+              {t("carne.bandCardTitle")}
             </div>
           </div>
           <span className="flex-none rounded-md border border-white/45 px-2.5 py-[3px] font-ps-mono text-[10.5px] font-bold tracking-[.08em] text-ps-chrome-fg">
-            CLASE A
+            {t("carne.classA")}
           </span>
         </div>
 
@@ -139,23 +141,23 @@ export function Carne({
           </div>
 
           <div className="grid grid-cols-2 content-start gap-x-3 gap-y-[9px]">
-            <Field label="Nombre · Name" value={profile.username} wide />
-            <Field label="N.º documento" value={profile.trainerId} />
-            <Field label="Región" value={profile.region} />
-            <Field label="Clase" value={profile.title} wide />
+            <Field label={t("carne.field.name")} value={profile.username} wide />
+            <Field label={t("carne.field.docNumber")} value={profile.trainerId} />
+            <Field label={t("carne.field.region")} value={profile.region} />
+            <Field label={t("carne.field.class")} value={profile.title} wide />
             <div className="col-span-2 grid grid-cols-3 gap-2.5">
-              <Code label="Emitido" value={docDate(issued)} />
-              <Code label="Caduca" value={docDate(expires)} />
-              <Code label="Horas" value={`${hours}h`} />
+              <Code label={t("carne.field.issued")} value={docDate(issued)} />
+              <Code label={t("carne.field.expires")} value={docDate(expires)} />
+              <Code label={t("carne.field.hours")} value={`${hours}h`} />
             </div>
-            <Code label="Rango" value={String(profile.rank).padStart(2, "0")} />
+            <Code label={t("carne.field.rank")} value={String(profile.rank).padStart(2, "0")} />
           </div>
 
           <div className="text-center">
             <button
               type="button"
               onClick={onScan}
-              aria-label="Escanear el código del carné"
+              aria-label={t("carne.scanAria")}
               className={cn(
                 "relative block w-full overflow-hidden rounded-lg border border-ps-info/30 bg-ps-paper p-[5px]",
                 "shadow-[0_1px_3px_rgba(0,0,0,.15)] transition-shadow duration-300 motion-reduce:transition-none",
@@ -205,7 +207,7 @@ export function Carne({
               )}
             >
               <Icon name={verified ? "shield" : "scan"} className="h-[11px] w-[11px]" />
-              {verified ? "VERIFICADO" : "ESCANEAR"}
+              {verified ? t("carne.verified") : t("carne.scan")}
             </span>
           </div>
         </div>
@@ -219,9 +221,10 @@ export function Carne({
           key, now that Rotom's marginalia (which used to say it) is gone. Printed instructions
           are what a real document carries anyway. */}
       <p className="mt-3 px-0.5 text-[11px] leading-[1.45] text-ps-ink-soft">
-        Documento oficial del Gobierno de Teras. Pulsa{" "}
-        <b className="ps-num font-ps-mono text-ps-ink">I</b> para activar el{" "}
-        <b className="text-ps-ink">Modo Inspección</b> y escanear el código de verificación.
+        {t.rich("carne.footer", {
+          key: (chunks) => <b className="ps-num font-ps-mono text-ps-ink">{chunks}</b>,
+          mode: (chunks) => <b className="text-ps-ink">{chunks}</b>,
+        })}
       </p>
     </>
   )

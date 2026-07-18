@@ -203,7 +203,6 @@ export function ArmourerModel({ name }: { name: string }) {
               }
             );
             setObj(object);
-            console.log(object);
           });
       });
   }, [name, texture]);

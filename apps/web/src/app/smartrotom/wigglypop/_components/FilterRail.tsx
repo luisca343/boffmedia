@@ -1,9 +1,10 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import type { WpRarity } from "../_types/market.types"
 import { fmt } from "../_utils/format"
-import { RARITY_LABEL, RARITY_TEXT } from "../_utils/rarity"
+import { RARITY_LABEL_KEY, RARITY_TEXT } from "../_utils/rarity"
 import { ALL_TYPES, typeColor } from "../_utils/typeColors"
 import { useFeedFilters } from "../_stores/filterStore"
 import { Button, Checkbox, Icon, Range, Toggle } from "./ui"
@@ -12,6 +13,7 @@ const RARITIES: WpRarity[] = ["comun", "raro", "epico", "legendario"]
 
 /** The discovery rail. Only ever mounted on the feed — the other views have no grid. */
 export function FilterRail() {
+  const t = useTranslations("wigglypop")
   const f = useFeedFilters()
   const dirty =
     f.types.length > 0 ||
@@ -22,7 +24,7 @@ export function FilterRail() {
 
   return (
     <aside className="wp-noscroll w-[270px] flex-none overflow-y-auto border-r border-wp-line/24 bg-white/50 px-4 py-[18px]">
-      <Section title="Rareza">
+      <Section title={t("filters.sectionRarity")}>
         {RARITIES.map((r) => (
           <Checkbox
             key={r}
@@ -30,36 +32,36 @@ export function FilterRail() {
             onChange={() => f.toggleRarity(r)}
           >
             <span className={cn("text-[12.5px] font-black uppercase tracking-[.04em]", RARITY_TEXT[r])}>
-              {RARITY_LABEL[r]}
+              {t(RARITY_LABEL_KEY[r])}
             </span>
           </Checkbox>
         ))}
       </Section>
 
-      <Section title="Especiales">
+      <Section title={t("filters.sectionSpecial")}>
         <SwitchRow
-          label="Solo Shiny"
+          label={t("filters.shinyOnly")}
           on={f.shinyOnly}
           onChange={f.setShinyOnly}
           icon={<Icon name="sparkles" size={15} className="text-wp-teal" />}
         />
         <SwitchRow
-          label="Legendarios"
+          label={t("filters.legendaryOnly")}
           on={f.legendaryOnly}
           onChange={f.setLegendaryOnly}
           icon={<Icon name="crown" size={15} filled className="text-wp-gold" />}
         />
         <SwitchRow
-          label="6 IV perfectos"
+          label={t("filters.perfectIv")}
           on={f.perfectOnly}
           onChange={f.setPerfectOnly}
           icon={<Icon name="badgeCheck" size={15} className="text-wp-green" />}
         />
       </Section>
 
-      <Section title="Precio máximo">
+      <Section title={t("filters.sectionMaxPrice")}>
         <div className="mb-2 flex items-center justify-between">
-          <span className="font-wp text-[13px] font-semibold text-wp-fg-muted">Hasta</span>
+          <span className="font-wp text-[13px] font-semibold text-wp-fg-muted">{t("filters.upTo")}</span>
           <span className="wp-num font-wp text-[13.5px] text-wp-accent">₽{fmt(f.priceMax)}</span>
         </div>
         <Range
@@ -67,12 +69,12 @@ export function FilterRail() {
           max={60000}
           step={500}
           value={f.priceMax}
-          aria-label="Precio máximo"
+          aria-label={t("filters.sectionMaxPrice")}
           onChange={(e) => f.setPriceMax(Number(e.target.value))}
         />
       </Section>
 
-      <Section title="Tipo">
+      <Section title={t("filters.sectionType")}>
         <div className="grid grid-cols-3 gap-[5px]">
           {ALL_TYPES.map((t) => {
             const on = f.types.includes(t)
@@ -105,7 +107,7 @@ export function FilterRail() {
           onClick={f.clear}
         >
           <Icon name="filterX" size={14} />
-          Limpiar filtros
+          {t("filters.clearButton")}
         </Button>
       )}
     </aside>

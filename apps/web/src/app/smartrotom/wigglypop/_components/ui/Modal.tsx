@@ -1,6 +1,7 @@
 "use client"
 
 import type { ReactNode } from "react"
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { ModalShell } from "@/components/smartrotom/behavior/ModalShell"
 import { ThemedLayer as SharedThemedLayer } from "@/components/smartrotom/behavior/ThemedLayer"
@@ -27,11 +28,12 @@ export interface OverlayProps {
  * The bare scrim, kept exported for parity with the barrel (unused internally beyond
  * `Modal` below). A skin over the shared `ModalShell` (SMARTROTOM_V3 §2).
  */
-export function Overlay({ onClose, children, className, label = "Diálogo" }: OverlayProps) {
+export function Overlay({ onClose, children, className, label }: OverlayProps) {
+  const t = useTranslations("wigglypop")
   return (
     <ModalShell
       onClose={onClose}
-      label={label}
+      label={label ?? t("modal.common.defaultLabel")}
       scope={WP_SCOPE}
       scrimClassName={cn(
         "z-[80] flex items-center justify-center p-5",
@@ -50,17 +52,18 @@ export function Modal({
   onClose,
   children,
   className,
-  label = "Diálogo",
+  label,
 }: {
   onClose: () => void
   children: ReactNode
   className?: string
   label?: string
 }) {
+  const t = useTranslations("wigglypop")
   return (
     <ModalShell
       onClose={onClose}
-      label={label}
+      label={label ?? t("modal.common.defaultLabel")}
       scope={WP_SCOPE}
       scrimClassName="z-[80] flex items-center justify-center p-5 bg-wp-fg/[.34] backdrop-blur-[5px] animate-wp-fade motion-reduce:animate-none"
       className={cn(
@@ -84,13 +87,14 @@ export function ModalHead({
   sub?: ReactNode
   onClose: () => void
 }) {
+  const t = useTranslations("wigglypop")
   return (
     <div className="flex items-start gap-3 border-b border-wp-line/24 px-5 pb-3.5 pt-[18px]">
       <div className="flex-1">
         <h2 className="font-wp-display text-[19px] font-semibold text-wp-fg">{title}</h2>
         {sub && <p className="mt-1 font-wp text-[12.5px] font-semibold text-wp-fg-subtle">{sub}</p>}
       </div>
-      <Button variant="ghost" iconOnly onClick={onClose} aria-label="Cerrar">
+      <Button variant="ghost" iconOnly onClick={onClose} aria-label={t("common.close")}>
         <Icon name="x" size={18} />
       </Button>
     </div>

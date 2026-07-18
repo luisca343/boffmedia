@@ -17,7 +17,7 @@ interface SuggestFormProps {
 }
 
 export function SuggestForm({ data, onChange, onSubmit, submitting }: SuggestFormProps) {
-  const t = useTranslations("events.sugerir")
+  const t = useTranslations("sugerir")
   const { games } = useGetGames()
 
   const gameOptions = React.useMemo(() => {

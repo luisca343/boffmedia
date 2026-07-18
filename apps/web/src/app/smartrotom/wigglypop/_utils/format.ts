@@ -1,12 +1,12 @@
 import type { IconName } from "../_components/ui/Icon"
 import type { WpFormat, WpListingStatus, WpOrderStatus } from "../_types/market.types"
 
-/** The four ways a thing can be sold. Labels are the handoff's, verbatim. */
-export const FORMAT_LABEL: Record<WpFormat, string> = {
-  fixed: "Cómpralo ya",
-  auction: "Subasta",
-  offer: "Mejor oferta",
-  trade: "Intercambio",
+/** The four ways a thing can be sold. Values are i18n key suffixes, not text — resolve with `t()`. */
+export const FORMAT_LABEL_KEY: Record<WpFormat, string> = {
+  fixed: "status.format.fixed.label",
+  auction: "status.format.auction.label",
+  offer: "status.format.offer.label",
+  trade: "status.format.trade.label",
 }
 
 export const FORMAT_ICON: Record<WpFormat, IconName> = {
@@ -16,22 +16,22 @@ export const FORMAT_ICON: Record<WpFormat, IconName> = {
   trade: "swap",
 }
 
-export const FORMAT_HINT: Record<WpFormat, string> = {
-  fixed: "Precio fijo, venta inmediata",
-  auction: "Los compradores pujan",
-  offer: "Acepta ofertas y negocia",
-  trade: "Cambia por otros Pokémon",
+export const FORMAT_HINT_KEY: Record<WpFormat, string> = {
+  fixed: "status.format.fixed.hint",
+  auction: "status.format.auction.hint",
+  offer: "status.format.offer.hint",
+  trade: "status.format.trade.hint",
 }
 
-/** Seller-side listing state (Mis anuncios). */
-export const LISTING_STATUS: Record<
+/** Seller-side listing state (Mis anuncios). `key` resolves the label via `t()`. */
+export const LISTING_STATUS_STYLE: Record<
   WpListingStatus,
-  { label: string; text: string; bg: string }
+  { key: string; text: string; bg: string }
 > = {
-  activo: { label: "Activo", text: "text-wp-green", bg: "bg-wp-green/15" },
-  pausado: { label: "Pausado", text: "text-wp-amber", bg: "bg-wp-amber/15" },
-  vendido: { label: "Vendido", text: "text-wp-accent", bg: "bg-wp-accent/[.13]" },
-  cancelado: { label: "Cancelado", text: "text-wp-rose", bg: "bg-wp-rose/12" },
+  activo: { key: "status.listing.activo", text: "text-wp-green", bg: "bg-wp-green/15" },
+  pausado: { key: "status.listing.pausado", text: "text-wp-amber", bg: "bg-wp-amber/15" },
+  vendido: { key: "status.listing.vendido", text: "text-wp-accent", bg: "bg-wp-accent/[.13]" },
+  cancelado: { key: "status.listing.cancelado", text: "text-wp-rose", bg: "bg-wp-rose/12" },
 }
 
 /**
@@ -40,19 +40,24 @@ export const LISTING_STATUS: Record<
  * `completado` = the buyer confirmed and the money was released. `reembolsado`
  * is the off-ramp. The label on `transferido` is an imperative on purpose — at
  * that step the ball is in the *buyer's* court, and the card is asking for a click.
+ * `key` resolves the label via `t()`.
  */
-export const ORDER_STATUS: Record<
+export const ORDER_STATUS_STYLE: Record<
   WpOrderStatus,
-  { label: string; text: string; bg: string }
+  { key: string; text: string; bg: string }
 > = {
-  escrow: { label: "Pago en depósito", text: "text-wp-teal", bg: "bg-wp-teal/14" },
-  transferido: { label: "Confirma recepción", text: "text-wp-gold", bg: "bg-wp-gold/[.16]" },
-  completado: { label: "Completado", text: "text-wp-green", bg: "bg-wp-green/14" },
-  cancelado: { label: "Cancelado", text: "text-wp-rose", bg: "bg-wp-rose/12" },
-  reembolsado: { label: "Reembolsado", text: "text-wp-rose", bg: "bg-wp-rose/12" },
+  escrow: { key: "status.order.escrow", text: "text-wp-teal", bg: "bg-wp-teal/14" },
+  transferido: { key: "status.order.transferido", text: "text-wp-gold", bg: "bg-wp-gold/[.16]" },
+  completado: { key: "status.order.completado", text: "text-wp-green", bg: "bg-wp-green/14" },
+  cancelado: { key: "status.order.cancelado", text: "text-wp-rose", bg: "bg-wp-rose/12" },
+  reembolsado: { key: "status.order.reembolsado", text: "text-wp-rose", bg: "bg-wp-rose/12" },
 }
 
-export const ESCROW_STEPS = ["Pago retenido", "Transferencia PC", "Pago liberado"] as const
+export const ESCROW_STEP_KEYS = [
+  "status.escrowStep.held",
+  "status.escrowStep.transfer",
+  "status.escrowStep.released",
+] as const
 
 /** Which of the three tracker steps an order is standing on. -1 = refunded/off-ramp. */
 export function escrowStep(status: WpOrderStatus): number {
@@ -65,10 +70,14 @@ export function escrowStep(status: WpOrderStatus): number {
 // Every figure in the app goes through `fmt` (es-ES grouping, no symbol).
 export { formatNumber as fmt, timeAgo } from "@/lib/format"
 
-/** An auction's remaining time. Under an hour it counts seconds and turns urgent. */
-export function countdown(endsAt: string | Date): { text: string; urgent: boolean; over: boolean } {
+/** An auction's remaining time. Under an hour it counts seconds and turns urgent.
+ *  `overLabel` is the caller's translated string for the "ended" state. */
+export function countdown(
+  endsAt: string | Date,
+  overLabel: string,
+): { text: string; urgent: boolean; over: boolean } {
   const secs = Math.floor((new Date(endsAt).getTime() - Date.now()) / 1000)
-  if (secs <= 0) return { text: "Finalizada", urgent: false, over: true }
+  if (secs <= 0) return { text: overLabel, urgent: false, over: true }
   const d = Math.floor(secs / 86400)
   const h = Math.floor((secs % 86400) / 3600)
   const m = Math.floor((secs % 3600) / 60)

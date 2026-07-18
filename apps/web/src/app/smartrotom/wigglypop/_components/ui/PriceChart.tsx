@@ -1,3 +1,6 @@
+"use client"
+
+import { useTranslations } from "next-intl"
 import { fmt } from "../../_utils/format"
 
 /**
@@ -14,13 +17,14 @@ import { fmt } from "../../_utils/format"
  * acceptable because the min/max figures underneath state it in numbers too.
  */
 export function PriceChart({ data, height = 78 }: { data: number[]; height?: number }) {
+  const t = useTranslations("wigglypop")
   if (data.length < 2) {
     return (
       <div
         className="flex items-center justify-center font-wp text-[12px] font-semibold text-wp-fg-subtle"
         style={{ height }}
       >
-        Aún no hay ventas suficientes para un histórico.
+        {t("chart.notEnoughSales")}
       </div>
     )
   }
@@ -51,7 +55,7 @@ export function PriceChart({ data, height = 78 }: { data: number[]; height?: num
         viewBox={`0 0 ${w} ${height}`}
         preserveAspectRatio="none"
         role="img"
-        aria-label={`Histórico de precios: de ₽${fmt(data[0])} a ₽${fmt(data[data.length - 1])}`}
+        aria-label={t("chart.ariaLabel", { from: fmt(data[0]), to: fmt(data[data.length - 1]) })}
       >
         <defs>
           <linearGradient id={gid} x1="0" y1="0" x2="0" y2="1">
@@ -71,8 +75,8 @@ export function PriceChart({ data, height = 78 }: { data: number[]; height?: num
         <circle cx={pts[pts.length - 1][0]} cy={pts[pts.length - 1][1]} r="3.2" fill={stroke} />
       </svg>
       <div className="mt-1 flex justify-between font-wp text-[11px] font-semibold text-wp-fg-subtle">
-        <span>mín ₽{fmt(min)}</span>
-        <span>máx ₽{fmt(max)}</span>
+        <span>{t("chart.min", { min: fmt(min) })}</span>
+        <span>{t("chart.max", { max: fmt(max) })}</span>
       </div>
     </>
   )

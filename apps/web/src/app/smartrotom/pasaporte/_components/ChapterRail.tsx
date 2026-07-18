@@ -4,6 +4,7 @@
 // here: each tab carries its chapter's spelled-out class (`Chapter.tab`), never an
 // interpolated one (§4).
 
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import type { ChapterKey } from "../_types"
 
@@ -32,9 +33,10 @@ export function ChapterRail({
   active: number
   onFlip: (page: number) => void
 }) {
+  const t = useTranslations("pasaporte")
   return (
     <nav
-      aria-label="Capítulos"
+      aria-label={t("chapterRail.nav")}
       className="group/rail absolute left-[max(18px,3vw)] top-1/2 z-30 flex -translate-y-1/2 flex-col gap-[7px]"
     >
       {chapters.map((c, i) => {

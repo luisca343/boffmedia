@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, type CSSProperties } from "react"
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import type { RookerAuthor } from "../../_types"
 
@@ -29,6 +30,7 @@ export interface AvatarProps {
 
 export function Avatar({ user, size = 44, ring = true, onClick, className }: AvatarProps) {
   const [failed, setFailed] = useState(false)
+  const t = useTranslations("rooker")
   const interactive = Boolean(onClick)
   const inner = ring ? size - 4 : size
 
@@ -36,7 +38,7 @@ export function Avatar({ user, size = 44, ring = true, onClick, className }: Ava
     <span
       role={interactive ? "button" : undefined}
       tabIndex={interactive ? 0 : undefined}
-      aria-label={interactive ? `Perfil de ${user.username}` : undefined}
+      aria-label={interactive ? t("avatar.profileOfAriaLabel", { username: user.username }) : undefined}
       onClick={
         interactive
           ? (e) => {

@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import type { WpListing } from "../../_types/market.types"
 import { fmt } from "../../_utils/format"
 import { useCartStore } from "../../_stores/cartStore"
@@ -28,6 +29,7 @@ export function PurchasePanel({
   onBid: () => void
   onTrade: () => void
 }) {
+  const t = useTranslations("wigglypop")
   const uuid = useWpUuid()
   const addToCart = useCartStore((s) => s.add)
   const valDelta = L.value > 0 ? Math.round(((L.price - L.value) / L.value) * 100) : 0
@@ -40,13 +42,13 @@ export function PurchasePanel({
       <div className="flex flex-wrap items-center gap-3">
         <div className="flex-1">
           <div className="font-wp text-[11px] font-bold uppercase tracking-[.06em] text-wp-fg-subtle">
-            Tu anuncio
+            {t("common.yourListing")}
           </div>
           <Price amount={L.format === "auction" ? (L.currentBid ?? L.price) : L.price} size={30} />
         </div>
         <Chip>
           <Icon name="tag" size={12} />
-          No puedes comprarte a ti mismo
+          {t("purchase.cannotBuyOwn")}
         </Chip>
       </div>
     )
@@ -60,14 +62,14 @@ export function PurchasePanel({
         <div className="mb-3.5 flex items-start justify-between">
           <div>
             <div className="font-wp text-[11px] font-bold uppercase tracking-[.06em] text-wp-fg-subtle">
-              Puja actual · {L.bids ?? 0} {L.bids === 1 ? "puja" : "pujas"}
+              {t("purchase.currentBidLabel")} · {t("common.bidsCount", { count: L.bids ?? 0 })}
             </div>
             <Price amount={bid} size={30} />
           </div>
           {L.endsAt && (
             <div className="text-right">
               <div className="mb-1 font-wp text-[11px] font-bold uppercase tracking-[.06em] text-wp-fg-subtle">
-                Termina en
+                {t("purchase.endsIn")}
               </div>
               <Countdown endsAt={L.endsAt} />
             </div>
@@ -76,16 +78,16 @@ export function PurchasePanel({
         <div className="flex gap-2.5">
           <Button variant="primary" className="flex-1 py-[13px]" onClick={onBid}>
             <Icon name="gavel" size={17} />
-            Pujar ₽{fmt(next)}
+            {t("purchase.bidButton", { amount: fmt(next) })}
           </Button>
           {L.buyNow && (
             <Button className="px-4 py-[13px]" onClick={onBuy}>
-              Cómpralo ya · ₽{fmt(L.buyNow)}
+              {t("purchase.buyNowButton", { amount: fmt(L.buyNow) })}
             </Button>
           )}
         </div>
         <div className="mt-2.5 font-wp text-[11.5px] font-semibold text-wp-fg-subtle">
-          Incremento mínimo ₽{fmt(L.minIncrement ?? 50)} · pago protegido en depósito
+          {t("purchase.minIncrementNote", { step: fmt(L.minIncrement ?? 50) })}
         </div>
       </div>
     )
@@ -95,7 +97,7 @@ export function PurchasePanel({
     return (
       <div>
         <div className="mb-2 font-wp text-[11px] font-bold uppercase tracking-[.06em] text-wp-fg-subtle">
-          Intercambio · este vendedor busca
+          {t("purchase.tradeSeeksLabel")}
         </div>
         <div className="mb-3.5 flex flex-wrap gap-2">
           {(L.wants ?? []).map((w) => (
@@ -104,11 +106,11 @@ export function PurchasePanel({
               {w}
             </Chip>
           ))}
-          {L.tradePlus && <Chip className="px-3 py-[7px] text-[13px]">+ compensación ₽</Chip>}
+          {L.tradePlus && <Chip className="px-3 py-[7px] text-[13px]">{t("purchase.tradePlusCompensation")}</Chip>}
         </div>
         <Button variant="primary" className="w-full py-[13px]" onClick={onTrade}>
           <Icon name="swap" size={17} />
-          Proponer intercambio
+          {t("common.proposeTrade")}
         </Button>
       </div>
     )
@@ -120,13 +122,13 @@ export function PurchasePanel({
       <div className="mb-1 flex items-end gap-3">
         <div>
           <div className="font-wp text-[11px] font-bold uppercase tracking-[.06em] text-wp-fg-subtle">
-            Precio
+            {t("common.price")}
           </div>
           <Price amount={L.price} size={32} />
         </div>
         {valDelta < 0 && (
           <span className="mb-1.5 font-wp text-[13px] font-bold text-wp-green">
-            {Math.abs(valDelta)}% bajo valoración
+            {t("purchase.belowValuationPct", { pct: Math.abs(valDelta) })}
           </span>
         )}
       </div>
@@ -134,14 +136,14 @@ export function PurchasePanel({
       <div className="mt-3.5 flex gap-2.5">
         <Button variant="primary" className="flex-1 py-[13px]" onClick={onBuy}>
           <Icon name="cart" size={17} />
-          Comprar ahora
+          {t("purchase.buyNowCta")}
         </Button>
         <Button
           className="px-[15px] py-[13px]"
-          aria-label="Añadir al carrito"
+          aria-label={t("common.addToCartAria")}
           onClick={() => {
             addToCart(L)
-            toast("Añadido al carrito", "success")
+            toast(t("toast.addedToCart"), "success")
           }}
         >
           <Icon name="cart" size={16} />
@@ -150,7 +152,7 @@ export function PurchasePanel({
         {L.format === "offer" && (
           <Button className="px-4 py-[13px]" onClick={onOffer}>
             <Icon name="handshake" size={16} />
-            Ofertar
+            {t("purchase.offerButton")}
           </Button>
         )}
       </div>
@@ -159,7 +161,7 @@ export function PurchasePanel({
           marketing — it is literally what `POST /orders` does with the money. */}
       <div className="mt-3 flex items-center gap-2 font-wp text-[12px] font-semibold text-wp-fg-muted">
         <Icon name="lock" size={14} className="text-wp-green" />
-        Pago retenido en depósito hasta que confirmes la recepción.
+        {t("purchase.escrowNote")}
       </div>
     </div>
   )

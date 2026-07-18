@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useMemo, useState } from "react"
+import { useTranslations } from "next-intl"
 import { usePokemonStore } from "@/stores/pokemonStore"
 import { cn } from "@/lib/utils"
 import { Button, Icon, Modal, Sprite, toast } from "./ui"
@@ -31,6 +32,7 @@ export function EditProfileModal({
   onClose: () => void
   profile: RookerProfile
 }) {
+  const t = useTranslations("rooker")
   const uuid = useRookerUuid()
   const update = useUpdateProfile()
   const { data: vitrina } = useVitrina(uuid)
@@ -78,38 +80,38 @@ export function EditProfileModal({
       {
         onSuccess: () => {
           onClose()
-          toast("Perfil actualizado.")
+          toast(t("toast.profileUpdated"))
         },
         onError: (err) =>
           toast(
             err instanceof Error && /409|exist|uso/i.test(err.message)
-              ? "Ese handle ya está cogido."
-              : "No se pudo guardar el perfil.",
+              ? t("toast.handleTaken")
+              : t("toast.profileSaveFailed"),
           ),
       },
     )
   }
 
   return (
-    <Modal open={open} onClose={onClose} label="Editar perfil">
+    <Modal open={open} onClose={onClose} label={t("editProfile.title")}>
       <div className="flex items-center justify-between border-b border-rk-line px-4 py-3">
         <button
           type="button"
           onClick={onClose}
-          aria-label="Cerrar"
+          aria-label={t("common.close")}
           className="grid h-8 w-8 place-items-center rounded-full text-rk-fg transition-colors hover:bg-rk-hover"
         >
           <Icon name="close" size={20} />
         </button>
-        <h2 className="text-[17px] font-extrabold text-rk-fg">Editar perfil</h2>
+        <h2 className="text-[17px] font-extrabold text-rk-fg">{t("editProfile.title")}</h2>
         <Button intent="accent" onClick={submit} disabled={blocked} className="px-4 py-1.5 text-[13px]">
-          {update.isPending ? "Guardando…" : "Guardar"}
+          {update.isPending ? t("editProfile.saving") : t("editProfile.saveButton")}
         </Button>
       </div>
 
       <div className="rk-scroll max-h-[70vh] space-y-4 overflow-y-auto p-4">
         <label className="block">
-          <span className="text-[13px] font-bold uppercase tracking-[.04em] text-rk-fg-subtle">Handle</span>
+          <span className="text-[13px] font-bold uppercase tracking-[.04em] text-rk-fg-subtle">{t("editProfile.fields.handle.label")}</span>
           <div
             className={cn(
               "mt-1.5 flex items-center rounded-rk-md border bg-rk-card px-3",
@@ -126,13 +128,13 @@ export function EditProfileModal({
           </div>
           {!handleValid && (
             <p className="mt-1 text-[12.5px] text-rk-ball">
-              Entre 3 y 32 caracteres: minúsculas, números y guion bajo.
+              {t("editProfile.fields.handle.error")}
             </p>
           )}
         </label>
 
         <label className="block">
-          <span className="text-[13px] font-bold uppercase tracking-[.04em] text-rk-fg-subtle">Nombre</span>
+          <span className="text-[13px] font-bold uppercase tracking-[.04em] text-rk-fg-subtle">{t("editProfile.fields.displayName.label")}</span>
           <input
             value={displayName}
             onChange={(e) => setDisplayName(e.target.value)}
@@ -142,7 +144,7 @@ export function EditProfileModal({
         </label>
 
         <label className="block">
-          <span className="text-[13px] font-bold uppercase tracking-[.04em] text-rk-fg-subtle">Bio</span>
+          <span className="text-[13px] font-bold uppercase tracking-[.04em] text-rk-fg-subtle">{t("editProfile.fields.bio.label")}</span>
           <textarea
             value={bio}
             onChange={(e) => setBio(e.target.value)}
@@ -156,22 +158,22 @@ export function EditProfileModal({
         </label>
 
         <label className="block">
-          <span className="text-[13px] font-bold uppercase tracking-[.04em] text-rk-fg-subtle">Enlace</span>
+          <span className="text-[13px] font-bold uppercase tracking-[.04em] text-rk-fg-subtle">{t("editProfile.fields.link.label")}</span>
           <input
             value={link}
             onChange={(e) => setLink(e.target.value)}
             maxLength={120}
-            placeholder="https://…"
+            placeholder={t("editProfile.fields.link.placeholder")}
             className="mt-1.5 w-full rounded-rk-md border border-rk-line-strong bg-rk-card px-3 py-2 text-[15px] text-rk-fg outline-none focus:border-rk-accent"
           />
         </label>
 
         <div>
           <span className="text-[13px] font-bold uppercase tracking-[.04em] text-rk-fg-subtle">
-            Pokémon compañero
+            {t("editProfile.fields.partner.label")}
           </span>
           <p className="mb-2 mt-0.5 text-[12.5px] text-rk-fg-subtle">
-            Solo puedes elegir entre los que has capturado de verdad.
+            {t("editProfile.fields.partner.hint")}
           </p>
 
           {owned.length ? (
@@ -196,8 +198,7 @@ export function EditProfileModal({
             </div>
           ) : (
             <p className="rounded-rk-md border border-rk-line bg-rk-card px-3 py-3 text-[13.5px] text-rk-fg-subtle">
-              Todavía no has registrado ninguna captura. Captura un Pokémon en el servidor y podrás
-              elegirlo aquí.
+              {t("editProfile.fields.partner.empty")}
             </p>
           )}
         </div>

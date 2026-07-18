@@ -35,7 +35,6 @@ export default function CamaraLucha(){
 
 
 function TeamPreview({team}: {team: PokemonData[]}){
-    console.log('team', team)
     return(
         <div className="flex flex-row justify-around items-center">
             {team.map((p, index) => <PokemonSprite 

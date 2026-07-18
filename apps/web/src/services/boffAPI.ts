@@ -308,6 +308,11 @@ export async function rotomPOST<T>(url: string, data: any): Promise<ApiResponse<
   return apiPOST<T>(`/smartrotom${url}`, { ...data, server: getServer() });
 }
 
+// `server` stays alongside the Bearer: MinecraftMiddleware still 403s a non-GET without it.
+export async function rotomAuthedPOST<T>(url: string, data: any): Promise<ApiResponse<T>> {
+  return authedRequest<T>("POST", `${getApiUrl()}/smartrotom${url}`, await sessionToken(), { ...data, server: getServer() });
+}
+
 export async function rotomMultipartPOST<T>(
   url: string,
   fields: Record<string, any> = {},
@@ -362,6 +367,10 @@ export async function rotomGETOrThrow<T>(url: string): Promise<T> {
 
 export async function rotomPOSTOrThrow<T>(url: string, data: any): Promise<T> {
   return orThrow(rotomPOST<T>(url, data));
+}
+
+export async function rotomAuthedPOSTOrThrow<T>(url: string, data: any): Promise<T> {
+  return orThrow(rotomAuthedPOST<T>(url, data));
 }
 
 export async function rotomPUTOrThrow<T>(url: string, data: any): Promise<T> {

@@ -11,6 +11,7 @@ import { StarbankTransactionRepository } from '../starbank/repositories/starbank
 import { WingullModule } from '../wingull/wingull.module';
 import { NotificationsModule } from '../notifications/notifications.module';
 
+import { WigglypopEscrowRepository } from './repositories/wigglypop-escrow.repository';
 import { WigglypopListingsRepository } from './repositories/wigglypop-listings.repository';
 import { WigglypopOrdersRepository } from './repositories/wigglypop-orders.repository';
 import { WigglypopTradingRepository } from './repositories/wigglypop-trading.repository';
@@ -53,6 +54,7 @@ import { WigglypopController } from './wigglypop.controller';
       useClass: StarbankTransactionRepository,
     },
 
+    WigglypopEscrowRepository,
     WigglypopListingsRepository,
     WigglypopOrdersRepository,
     WigglypopTradingRepository,

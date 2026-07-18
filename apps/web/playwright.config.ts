@@ -40,11 +40,20 @@ export default defineConfig({
       testMatch: /auth\.setup\.ts/,
     },
 
+    // Runs once to log in as a ROTOM_ADMIN account and save session to .auth/admin.json.
+    // Unlike `setup` it FAILS when the credentials are missing or the account lacks the
+    // role — an admin suite that silently degrades to a non-admin session is the bug
+    // this project exists to close.
+    {
+      name: "admin-setup",
+      testMatch: /admin\.setup\.ts/,
+    },
+
     // Public-page tests — no session required
     {
       name: "chromium",
       use: { ...devices["Desktop Chrome"] },
-      testIgnore: [/auth\.setup\.ts/, /\.auth\.spec\.ts/],
+      testIgnore: [/auth\.setup\.ts/, /admin\.setup\.ts/, /\.auth\.spec\.ts/, /\.admin\.spec\.ts/],
     },
 
     // Authenticated tests — depends on setup, session loaded from .auth/user.json
@@ -56,6 +65,17 @@ export default defineConfig({
       },
       dependencies: ["setup"],
       testMatch: /.*\.auth\.spec\.ts/,
+    },
+
+    // Administración tests — require a session that actually carries ROTOM_ADMIN.
+    {
+      name: "chromium:admin",
+      use: {
+        ...devices["Desktop Chrome"],
+        storageState: ".auth/admin.json",
+      },
+      dependencies: ["admin-setup"],
+      testMatch: /.*\.admin\.spec\.ts/,
     },
   ],
   webServer: {
