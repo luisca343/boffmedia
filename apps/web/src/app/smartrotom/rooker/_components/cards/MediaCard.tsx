@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useTranslations } from "next-intl"
 import { Icon } from "../ui"
 
 /**
@@ -17,12 +18,13 @@ import { Icon } from "../ui"
  */
 export function MediaCard({ url }: { url: string }) {
   const [failed, setFailed] = useState(false)
+  const t = useTranslations("rooker")
 
   if (failed) {
     return (
       <div className="flex aspect-video items-center justify-center gap-2 rounded-rk border border-rk-line bg-rk-card text-[13px] text-rk-fg-subtle">
         <Icon name="image" size={16} />
-        La imagen ya no está disponible
+        {t("card.media.unavailable")}
       </div>
     )
   }
@@ -31,7 +33,7 @@ export function MediaCard({ url }: { url: string }) {
     <div className="overflow-hidden rounded-rk border border-rk-line bg-rk-card">
       <img
         src={url}
-        alt="Adjunto del trino"
+        alt={t("card.media.alt")}
         loading="lazy"
         onError={() => setFailed(true)}
         className="aspect-video w-full object-cover"

@@ -1,5 +1,6 @@
 // PAPER. Three small printed chips.
 
+import { useTranslations } from "next-intl"
 import type { ReactNode } from "react"
 import { cn } from "@/lib/utils"
 import { rarityInfo } from "../../_utils/tiers"
@@ -33,7 +34,8 @@ export function RarityBadge({
   showPct?: boolean
   className?: string
 }) {
-  const info = rarityInfo(rarity)
+  const t = useTranslations("pasaporte")
+  const info = rarityInfo(rarity, t)
   return (
     <span
       className={cn(

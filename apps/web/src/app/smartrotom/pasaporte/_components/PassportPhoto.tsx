@@ -2,6 +2,7 @@
 
 // PAPER. The photograph tipped into the identity page and into the carné.
 
+import { useTranslations } from "next-intl"
 import { useState } from "react"
 import { cn } from "@/lib/utils"
 
@@ -30,6 +31,7 @@ export function PassportPhoto({
   size?: number
   className?: string
 }) {
+  const t = useTranslations("pasaporte")
   const [failed, setFailed] = useState(false)
 
   if (!uuid || failed) {
@@ -42,9 +44,7 @@ export function PassportPhoto({
         )}
       >
         <span className="px-1 text-center font-ps-mono text-[8px] uppercase leading-[1.3] tracking-[.14em] text-ps-ink-faint">
-          Sin
-          <br />
-          fotografía
+          {t.rich("passportPhoto.missing", { br: () => <br /> })}
         </span>
       </div>
     )
@@ -54,7 +54,7 @@ export function PassportPhoto({
     <img
       // 2× so the skin stays crisp on a retina counter.
       src={`https://mc-heads.net/body/${encodeURIComponent(uuid)}/${size * 2}`}
-      alt="Fotografía del titular"
+      alt={t("passportPhoto.alt")}
       draggable={false}
       referrerPolicy="no-referrer"
       onError={() => setFailed(true)}

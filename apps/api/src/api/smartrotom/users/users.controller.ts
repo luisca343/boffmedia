@@ -8,9 +8,20 @@ import {
   Delete,
   HttpStatus,
   ParseIntPipe,
+  UseGuards,
 } from '@nestjs/common';
 import { Public } from '@api/_utils/decorators/public.decorator';
-import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
+import { JwtAuthGuard } from '@api/auth/jwt-auth.guard';
+import { RolesGuard } from '@api/_utils/guards/roles.guard';
+import { Roles } from '@api/_utils/decorators/roles.decorator';
+import { USER_ROLES } from '@api/_utils/auth/roles.constants';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiParam,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 import { UsersFacadeService } from './users.facade.service';
 import { CreateSmartrotomUserDto } from './dto/create-user.dto';
 import { UpdateSmartrotomUserDto } from './dto/update-user.dto';
@@ -24,13 +35,13 @@ import { UserStatistics } from './entities/user-statistics.entity';
 import { UserValidationResult } from './entities/user-validation-result.entity';
 
 @ApiTags('SmartRotom | Users')
-@Public()
 @Controller('smartrotom/users')
 export class UsersController {
   constructor(private readonly usersFacadeService: UsersFacadeService) {}
 
   // ==================== BASIC USER OPERATIONS ====================
 
+  @Public()
   @Get()
   @ApiOperation({ summary: 'Get all users' })
   @ApiResponse({
@@ -46,6 +57,7 @@ export class UsersController {
     return this.usersFacadeService.getAllUsers() as unknown as SmartRotomUser[];
   }
 
+  @Public()
   @Post()
   @ApiOperation({ summary: 'Create a new user' })
   @ApiResponse({
@@ -73,6 +85,7 @@ export class UsersController {
     ) as unknown as SmartRotomUser;
   }
 
+  @Public()
   @Get(':id')
   @ApiOperation({ summary: 'Get a user by ID' })
   @ApiResponse({
@@ -92,6 +105,7 @@ export class UsersController {
     return this.usersFacadeService.getUserById(id) as unknown as SmartRotomUser;
   }
 
+  @Public()
   @Get('uuid/:uuid')
   @ApiOperation({ summary: 'Get a user by UUID' })
   @ApiResponse({
@@ -113,6 +127,7 @@ export class UsersController {
     return user as unknown as SmartRotomUser;
   }
 
+  @Public()
   @Patch(':id')
   @ApiOperation({ summary: 'Update a user by ID' })
   @ApiResponse({
@@ -141,7 +156,14 @@ export class UsersController {
   }
 
   @Delete(':id')
-  @ApiOperation({ summary: 'Delete a user by ID' })
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.ROTOM_ADMIN)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Delete a user by ID (ROTOM_ADMIN only)' })
+  @ApiResponse({
+    status: HttpStatus.FORBIDDEN,
+    description: 'Requires the ROTOM_ADMIN role.',
+  })
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'User deleted successfully.',
@@ -167,6 +189,7 @@ export class UsersController {
 
   // ==================== ENHANCED OPERATIONS ====================
 
+  @Public()
   @Post('find-or-create')
   @ApiOperation({ summary: 'Find or create a user' })
   @ApiResponse({
@@ -194,6 +217,7 @@ export class UsersController {
     } as unknown as FindOrCreateResult;
   }
 
+  @Public()
   @Post('initialize')
   @ApiOperation({ summary: 'Initialize user and accounts' })
   @ApiResponse({
@@ -215,6 +239,7 @@ export class UsersController {
 
   // ==================== USER WITH ACCOUNTS ====================
 
+  @Public()
   @Get(':uuid/accounts')
   @ApiOperation({ summary: 'Get user with their accounts' })
   @ApiResponse({
@@ -234,6 +259,7 @@ export class UsersController {
     return result as unknown as UserWithAccounts;
   }
 
+  @Public()
   @Post('batch')
   @ApiOperation({ summary: 'Get multiple users by UUIDs' })
   @ApiResponse({
@@ -261,6 +287,7 @@ export class UsersController {
     ) as unknown as { [uuid: string]: SmartRotomUser | null };
   }
 
+  @Public()
   @Post('batch/accounts')
   @ApiOperation({ summary: 'Get multiple users with their accounts' })
   @ApiResponse({
@@ -290,6 +317,7 @@ export class UsersController {
 
   // ==================== STATISTICS ====================
 
+  @Public()
   @Get('stats/overview')
   @ApiOperation({ summary: 'Get user statistics overview' })
   @ApiResponse({
@@ -303,6 +331,7 @@ export class UsersController {
 
   // ==================== VALIDATION ====================
 
+  @Public()
   @Get('validate/:uuid')
   @ApiOperation({ summary: 'Validate if user exists' })
   @ApiResponse({

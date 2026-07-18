@@ -8,11 +8,12 @@ import type { WpRarity } from "../_types/market.types"
  * no error (SMARTROTOM_V3.md §4, audit gap G2).
  */
 
-export const RARITY_LABEL: Record<WpRarity, string> = {
-  comun: "Común",
-  raro: "Raro",
-  epico: "Épico",
-  legendario: "Legendario",
+/** Values are i18n key suffixes, not text — resolve with `t()`. */
+export const RARITY_LABEL_KEY: Record<WpRarity, string> = {
+  comun: "status.rarity.comun",
+  raro: "status.rarity.raro",
+  epico: "status.rarity.epico",
+  legendario: "status.rarity.legendario",
 }
 
 export const RARITY_TEXT: Record<WpRarity, string> = {

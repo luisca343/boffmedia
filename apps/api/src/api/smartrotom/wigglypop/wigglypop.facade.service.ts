@@ -1,4 +1,9 @@
 import { Injectable } from '@nestjs/common';
+import {
+  ActorContext,
+  actingUuid,
+  assertActsAsSelf,
+} from '@api/_utils/auth/actor';
 import { WigglypopListingsService } from './services/wigglypop-listings.service';
 import { WigglypopOrdersService } from './services/wigglypop-orders.service';
 import { WigglypopTradingService } from './services/wigglypop-trading.service';
@@ -43,7 +48,9 @@ export class WigglypopFacadeService {
 
   // ─── Listings ───────────────────────────────────────────────────────────────
 
-  listListings(query: ListListingsQueryDto): Promise<WigglypopListingListEntity> {
+  listListings(
+    query: ListListingsQueryDto,
+  ): Promise<WigglypopListingListEntity> {
     return this.listings.list(query);
   }
 
@@ -51,19 +58,31 @@ export class WigglypopFacadeService {
     return this.listings.get(id);
   }
 
-  createListing(dto: CreateListingDto): Promise<WigglypopListingEntity> {
+  createListing(
+    dto: CreateListingDto,
+    actor?: ActorContext,
+  ): Promise<WigglypopListingEntity> {
+    assertActsAsSelf(dto.sellerUuid, actor);
     return this.listings.create(dto);
   }
 
   updateListing(
     id: number,
     dto: UpdateListingDto,
+    actor?: ActorContext,
   ): Promise<WigglypopListingEntity> {
-    return this.listings.update(id, dto);
+    return this.listings.update(id, {
+      ...dto,
+      actorUuid: actingUuid(dto.actorUuid, actor),
+    });
   }
 
-  deleteListing(id: number, actorUuid?: string): Promise<{ success: boolean }> {
-    return this.listings.remove(id, actorUuid);
+  deleteListing(
+    id: number,
+    actorUuid?: string,
+    actor?: ActorContext,
+  ): Promise<{ success: boolean }> {
+    return this.listings.remove(id, actingUuid(actorUuid, actor));
   }
 
   // ─── Market data ────────────────────────────────────────────────────────────
@@ -90,13 +109,21 @@ export class WigglypopFacadeService {
     return this.listings.getWatchlist(uuid);
   }
 
-  setWatching(dto: WatchlistDto): Promise<{ watching: boolean }> {
+  setWatching(
+    dto: WatchlistDto,
+    actor?: ActorContext,
+  ): Promise<{ watching: boolean }> {
+    assertActsAsSelf(dto.userUuid, actor);
     return this.listings.setWatching(dto.userUuid, dto.listingId, dto.watching);
   }
 
   // ─── Orders ─────────────────────────────────────────────────────────────────
 
-  createOrder(dto: CreateOrderDto): Promise<WigglypopOrderEntity> {
+  createOrder(
+    dto: CreateOrderDto,
+    actor?: ActorContext,
+  ): Promise<WigglypopOrderEntity> {
+    assertActsAsSelf(dto.buyerUuid, actor);
     return this.orders.create(dto);
   }
 
@@ -107,19 +134,32 @@ export class WigglypopFacadeService {
   markTransferred(
     id: number,
     actorUuid?: string,
+    actor?: ActorContext,
   ): Promise<WigglypopOrderEntity> {
-    return this.orders.markTransferred(id, actorUuid);
+    return this.orders.markTransferred(id, actingUuid(actorUuid, actor));
   }
 
-  confirmOrder(id: number, actorUuid?: string): Promise<WigglypopOrderEntity> {
-    return this.orders.confirm(id, actorUuid);
+  confirmOrder(
+    id: number,
+    actorUuid?: string,
+    actor?: ActorContext,
+  ): Promise<WigglypopOrderEntity> {
+    return this.orders.confirm(id, actingUuid(actorUuid, actor));
   }
 
-  cancelOrder(id: number, actorUuid?: string): Promise<WigglypopOrderEntity> {
-    return this.orders.cancel(id, actorUuid);
+  cancelOrder(
+    id: number,
+    actorUuid?: string,
+    actor?: ActorContext,
+  ): Promise<WigglypopOrderEntity> {
+    return this.orders.cancel(id, actingUuid(actorUuid, actor));
   }
 
-  createReview(dto: CreateReviewDto): Promise<WigglypopReviewEntity> {
+  createReview(
+    dto: CreateReviewDto,
+    actor?: ActorContext,
+  ): Promise<WigglypopReviewEntity> {
+    assertActsAsSelf(dto.reviewerUuid, actor);
     return this.orders.createReview(dto);
   }
 
@@ -129,11 +169,19 @@ export class WigglypopFacadeService {
     return this.trading.listBids(listingId);
   }
 
-  createBid(dto: CreateBidDto): Promise<WigglypopBidEntity> {
+  createBid(
+    dto: CreateBidDto,
+    actor?: ActorContext,
+  ): Promise<WigglypopBidEntity> {
+    assertActsAsSelf(dto.bidderUuid, actor);
     return this.trading.placeBid(dto);
   }
 
-  createOffer(dto: CreateOfferDto): Promise<WigglypopOfferEntity> {
+  createOffer(
+    dto: CreateOfferDto,
+    actor?: ActorContext,
+  ): Promise<WigglypopOfferEntity> {
+    assertActsAsSelf(dto.buyerUuid, actor);
     return this.trading.createOffer(dto);
   }
 
@@ -141,15 +189,27 @@ export class WigglypopFacadeService {
     return this.trading.listOffersForSeller(uuid);
   }
 
-  acceptOffer(id: number, actorUuid?: string): Promise<WigglypopOrderEntity> {
-    return this.trading.acceptOffer(id, actorUuid);
+  acceptOffer(
+    id: number,
+    actorUuid?: string,
+    actor?: ActorContext,
+  ): Promise<WigglypopOrderEntity> {
+    return this.trading.acceptOffer(id, actingUuid(actorUuid, actor));
   }
 
-  rejectOffer(id: number, actorUuid?: string): Promise<WigglypopOfferEntity> {
-    return this.trading.rejectOffer(id, actorUuid);
+  rejectOffer(
+    id: number,
+    actorUuid?: string,
+    actor?: ActorContext,
+  ): Promise<WigglypopOfferEntity> {
+    return this.trading.rejectOffer(id, actingUuid(actorUuid, actor));
   }
 
-  createTrade(dto: CreateTradeDto): Promise<WigglypopTradeOfferEntity> {
+  createTrade(
+    dto: CreateTradeDto,
+    actor?: ActorContext,
+  ): Promise<WigglypopTradeOfferEntity> {
+    assertActsAsSelf(dto.proposerUuid, actor);
     return this.trading.createTrade(dto);
   }
 
@@ -160,15 +220,17 @@ export class WigglypopFacadeService {
   acceptTrade(
     id: number,
     actorUuid?: string,
+    actor?: ActorContext,
   ): Promise<WigglypopTradeOfferEntity> {
-    return this.trading.acceptTrade(id, actorUuid);
+    return this.trading.acceptTrade(id, actingUuid(actorUuid, actor));
   }
 
   rejectTrade(
     id: number,
     actorUuid?: string,
+    actor?: ActorContext,
   ): Promise<WigglypopTradeOfferEntity> {
-    return this.trading.rejectTrade(id, actorUuid);
+    return this.trading.rejectTrade(id, actingUuid(actorUuid, actor));
   }
 
   /** Which custody path is live. The UI copy differs completely between the two. */

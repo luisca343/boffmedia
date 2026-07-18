@@ -49,23 +49,17 @@ export function chapterInk(accent: ChapterAccent): { accent: string; deep: strin
  * `text-ps-chapter-deep` and needs the literal.
  */
 export const CHAPTERS: Chapter[] = [
-  { key: "indice", label: "Índice", accent: "gild", deep: "text-ps-gild-lo", tab: "bg-ps-gild-lo" },
-  { key: "identidad", label: "Identidad", accent: "oxblood", deep: "text-ps-oxblood-deep", tab: "bg-ps-oxblood-deep" },
-  { key: "carne", label: "Carné Oficial", accent: "info", deep: "text-ps-info-deep", tab: "bg-ps-info-deep" },
-  { key: "equipo", label: "Equipo Actual", accent: "teal", deep: "text-ps-teal-deep", tab: "bg-ps-teal-deep" },
-  { key: "medallas", label: "Medallas", accent: "olive", deep: "text-ps-olive-deep", tab: "bg-ps-olive-deep" },
-  {
-    key: "competiciones",
-    label: "Competiciones",
-    accent: "oxblood",
-    deep: "text-ps-oxblood-deep",
-    tab: "bg-ps-oxblood-deep",
-  },
-  { key: "temporada", label: "Temporada", accent: "gild", deep: "text-ps-gild-lo", tab: "bg-ps-gild-lo" },
-  { key: "logros", label: "Logros", accent: "plum", deep: "text-ps-plum-deep", tab: "bg-ps-plum-deep" },
-  { key: "insignias", label: "Insignias", accent: "gild", deep: "text-ps-gild-lo", tab: "bg-ps-gild-lo" },
-  { key: "bitacora", label: "Bitácora", accent: "teal", deep: "text-ps-teal-deep", tab: "bg-ps-teal-deep" },
-  { key: "cronica", label: "Crónica", accent: "plum", deep: "text-ps-plum-deep", tab: "bg-ps-plum-deep" },
+  { key: "indice", accent: "gild", deep: "text-ps-gild-lo", tab: "bg-ps-gild-lo" },
+  { key: "identidad", accent: "oxblood", deep: "text-ps-oxblood-deep", tab: "bg-ps-oxblood-deep" },
+  { key: "carne", accent: "info", deep: "text-ps-info-deep", tab: "bg-ps-info-deep" },
+  { key: "equipo", accent: "teal", deep: "text-ps-teal-deep", tab: "bg-ps-teal-deep" },
+  { key: "medallas", accent: "olive", deep: "text-ps-olive-deep", tab: "bg-ps-olive-deep" },
+  { key: "competiciones", accent: "oxblood", deep: "text-ps-oxblood-deep", tab: "bg-ps-oxblood-deep" },
+  { key: "temporada", accent: "gild", deep: "text-ps-gild-lo", tab: "bg-ps-gild-lo" },
+  { key: "logros", accent: "plum", deep: "text-ps-plum-deep", tab: "bg-ps-plum-deep" },
+  { key: "insignias", accent: "gild", deep: "text-ps-gild-lo", tab: "bg-ps-gild-lo" },
+  { key: "bitacora", accent: "teal", deep: "text-ps-teal-deep", tab: "bg-ps-teal-deep" },
+  { key: "cronica", accent: "plum", deep: "text-ps-plum-deep", tab: "bg-ps-plum-deep" },
 ]
 
 const BY_KEY: Record<ChapterKey, Chapter> = CHAPTERS.reduce(

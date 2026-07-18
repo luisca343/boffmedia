@@ -1,9 +1,9 @@
 // PAPER. The logro coin, lying on the page.
 
+import { useTranslations } from "next-intl"
 import type { CSSProperties } from "react"
 import { cn } from "@/lib/utils"
 import type { LogroTier, StandingTier } from "../../_types"
-import { TIER_LABEL } from "../../_utils/tiers"
 import { Icon } from "./Icon"
 
 type Metal = LogroTier | StandingTier
@@ -34,10 +34,12 @@ export function Medal({
   size?: number
   className?: string
 }) {
+  const t = useTranslations("pasaporte")
+  const tierLabel = t(`tiers.${tier}`)
   return (
     <div
       role="img"
-      aria-label={locked ? `${TIER_LABEL[tier]} (bloqueado)` : TIER_LABEL[tier]}
+      aria-label={locked ? t("medal.locked", { tier: tierLabel }) : tierLabel}
       style={{ width: size, height: size, "--ps-metal": TIER_VAR[tier] } as CSSProperties}
       className={cn(
         "grid flex-none place-items-center rounded-full",

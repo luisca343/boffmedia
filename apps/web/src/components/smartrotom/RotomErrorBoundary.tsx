@@ -1,12 +1,12 @@
 import React from "react";
-import { RotomErrorPage } from "./RotomError";
+import { RotomErrorPage, RotomErrorHelp } from "./RotomError";
 
 export class RotomAppError extends Error {
-  errorCode: string;
+  help?: RotomErrorHelp;
   context?: Record<string, any>;
-  constructor(errorCode: string, message?: string, context?: Record<string, any>) {
+  constructor(message: string, help?: RotomErrorHelp, context?: Record<string, any>) {
     super(message);
-    this.errorCode = errorCode;
+    this.help = help;
     this.context = context;
   }
 }
@@ -33,8 +33,8 @@ export class RotomErrorBoundary extends React.Component<Props, State> {
     if (this.state.error) {
       return (
         <RotomErrorPage
-          errorCode={this.state.error.errorCode as any}
-          context={this.state.error.context}
+          error={this.state.error.message}
+          help={this.state.error.help}
         />
       );
     }

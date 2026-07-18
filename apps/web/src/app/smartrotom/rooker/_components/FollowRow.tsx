@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import { useTranslations } from "next-intl"
 import { Avatar, Button, Verified } from "./ui"
 import { useFollow, useRookerUuid } from "../_hooks/queries"
 import type { RookerSuggestion } from "../_types"
@@ -19,6 +20,7 @@ export function FollowRow({
   user: RookerSuggestion
   isFollowing?: boolean
 }) {
+  const t = useTranslations("rooker")
   const uuid = useRookerUuid()
   const follow = useFollow()
   const isMe = uuid === user.uuid
@@ -44,7 +46,7 @@ export function FollowRow({
           disabled={follow.isPending}
           className="flex-none px-4 py-1.5 text-[13px]"
         >
-          {isFollowing ? "Siguiendo" : "Seguir"}
+          {isFollowing ? t("common.follow.following") : t("common.follow.follow")}
         </Button>
       )}
     </div>

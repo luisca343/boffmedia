@@ -3,6 +3,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { ActorContext, assertActsAsSelf } from '@api/_utils/auth/actor';
 import { Logger } from 'nestjs-pino';
 import { PeopleRepository } from '../_shared/people.repository';
 import { AuditoriaService } from '../_shared/auditoria.service';
@@ -257,7 +258,9 @@ export class EventosService {
   async voteObra(
     id: number,
     dto: VoteObraDto,
+    actor?: ActorContext,
   ): Promise<GobiernoEventoObraEntity> {
+    assertActsAsSelf(dto.voterUuid, actor);
     const existing = await this.eventosRepository.findObra(id);
     if (!existing) throw new NotFoundException(`Obra ${id} not found`);
     await this.eventosRepository.voteObra(
@@ -425,7 +428,9 @@ export class EventosService {
   async registerCaptura(
     eventoId: number,
     dto: RegisterCapturaDto,
+    actor?: ActorContext,
   ): Promise<GobiernoEventoCapturaEntity> {
+    assertActsAsSelf(dto.uuid, actor);
     const evento = await this.eventosRepository.findEvento(eventoId);
     if (!evento) throw new NotFoundException(`Evento ${eventoId} not found`);
     if (evento.type !== 'caza') {

@@ -20,7 +20,6 @@ export const EMPTY_REACTIONS: ReactionCounts = { heart: 0, pokeball: 0, choque: 
 
 export interface ReactionSpec {
   type: ReactionType
-  label: string
   /** Colour when the reader has picked this reaction. */
   text: string
   /** The hover/active halo behind the glyph. */
@@ -29,11 +28,11 @@ export interface ReactionSpec {
 }
 
 export const REACTIONS: ReactionSpec[] = [
-  { type: "heart",    label: "Me gusta",  text: "text-rk-heart",  wash: "bg-rk-heart/15",  ring: "ring-rk-heart/40" },
-  { type: "pokeball", label: "¡Captura!", text: "text-rk-ball",   wash: "bg-rk-ball/15",   ring: "ring-rk-ball/40" },
-  { type: "choque",   label: "Choque",    text: "text-rk-choque", wash: "bg-rk-choque/15", ring: "ring-rk-choque/40" },
-  { type: "shiny",    label: "Shiny",     text: "text-rk-shiny",  wash: "bg-rk-shiny/15",  ring: "ring-rk-shiny/40" },
-  { type: "fuego",    label: "Fueguito",  text: "text-rk-fuego",  wash: "bg-rk-fuego/15",  ring: "ring-rk-fuego/40" },
+  { type: "heart",    text: "text-rk-heart",  wash: "bg-rk-heart/15",  ring: "ring-rk-heart/40" },
+  { type: "pokeball", text: "text-rk-ball",   wash: "bg-rk-ball/15",   ring: "ring-rk-ball/40" },
+  { type: "choque",   text: "text-rk-choque", wash: "bg-rk-choque/15", ring: "ring-rk-choque/40" },
+  { type: "shiny",    text: "text-rk-shiny",  wash: "bg-rk-shiny/15",  ring: "ring-rk-shiny/40" },
+  { type: "fuego",    text: "text-rk-fuego",  wash: "bg-rk-fuego/15",  ring: "ring-rk-fuego/40" },
 ]
 
 export const REACTION_BY_TYPE: Record<ReactionType, ReactionSpec> = REACTIONS.reduce(

@@ -30,8 +30,10 @@ import {
   TypeBadge,
   ValueBox,
 } from "@/app/smartrotom/wigglypop/_components/ui"
-import { ESCROW_STEPS } from "@/app/smartrotom/wigglypop/_utils/format"
 import { Sample, Section } from "../showcase-shared"
+
+// Static sample copy — the app itself resolves these via next-intl.
+const ESCROW_STEPS = ["Pago retenido", "Transferencia PC", "Pago liberado"]
 
 /** Wigglypop's primitive library — `wp-*`. Every specimen renders from real props. */
 export function WpPrimitivasChapter() {

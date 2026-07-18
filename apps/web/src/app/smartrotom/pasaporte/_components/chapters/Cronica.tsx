@@ -1,5 +1,6 @@
 // PAPER. The trainer's life on the server, in order.
 
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import type { Milestone } from "../../_types"
 import { chapterInk } from "../../_utils/chapters"
@@ -7,10 +8,12 @@ import { timelineDate } from "../../_utils/dates"
 import { EmptyState, Icon, PageHead, Skeleton } from "../ui"
 
 export function Cronica({ milestones, loading }: { milestones: Milestone[]; loading: boolean }) {
+  const t = useTranslations("pasaporte")
+
   if (loading) {
     return (
       <>
-        <PageHead eyebrow="Línea de Tiempo · Hitos" title="Crónica del Entrenador" />
+        <PageHead eyebrow={t("cronica.eyebrow")} title={t("cronica.title")} />
         {Array.from({ length: 6 }, (_, i) => (
           <Skeleton key={i} className="mb-2.5 h-[52px]" />
         ))}
@@ -21,8 +24,8 @@ export function Cronica({ milestones, loading }: { milestones: Milestone[]; load
   if (milestones.length === 0) {
     return (
       <>
-        <PageHead eyebrow="Línea de Tiempo · Hitos" title="Crónica del Entrenador" />
-        <EmptyState icon="flag" title="Aún sin hitos" sub="Tu historia se escribirá a medida que avances." />
+        <PageHead eyebrow={t("cronica.eyebrow")} title={t("cronica.title")} />
+        <EmptyState icon="flag" title={t("cronica.empty.title")} sub={t("cronica.empty.sub")} />
       </>
     )
   }
@@ -32,7 +35,7 @@ export function Cronica({ milestones, loading }: { milestones: Milestone[]; load
 
   return (
     <>
-      <PageHead eyebrow="Línea de Tiempo · Hitos" title="Crónica del Entrenador" />
+      <PageHead eyebrow={t("cronica.eyebrow")} title={t("cronica.title")} />
 
       <ol className="relative py-0.5">
         {shown.map((milestone, i) => {

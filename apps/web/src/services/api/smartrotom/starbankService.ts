@@ -1,4 +1,4 @@
-import { rotomGET, rotomPOST, ApiResponse, rotomMultipartPOST } from '@/services/boffAPI';
+import { rotomGET, rotomPOST, rotomAuthedPOST, ApiResponse, rotomMultipartPOST } from '@/services/boffAPI';
 import { CreateAccountDto } from '@/types/dto/create-account-dto';
 import { StarBankAccount, StarBankTransaction, TrainerDefeatMoneyDto, CreateShopTransactionDto, CreateTransferDto, TransferFromMainDto } from '@boffmedia/shared';
 
@@ -23,7 +23,7 @@ export class StarbankService {
    * Create a main account for a user
    */
   static createMainAccount(uuid: string, username: string) {
-    return rotomPOST<StarBankAccount>('/starbank/accounts/main', { uuid, username });
+    return rotomAuthedPOST<StarBankAccount>('/starbank/accounts/main', { uuid, username });
   }
 
   /**
@@ -46,25 +46,25 @@ export class StarbankService {
    * Transfer money between accounts
    */
   static transfer(data: CreateTransferDto) {
-    return rotomPOST<void>('/starbank/transfer', data);
+    return rotomAuthedPOST<void>('/starbank/transfer', data);
   }
 
   /**
    * Transfer money from main account
    */
   static transferFromMain(data: TransferFromMainDto) {
-    return rotomPOST<void>('/starbank/transfer/from-main', data);
+    return rotomAuthedPOST<void>('/starbank/transfer/from-main', data);
   }
 
   /**
-   * Process a shop transaction
+   * Process a shop transaction. Game-server route: unguarded, so it stays on rotomPOST.
    */
   static shopTransaction(data: CreateShopTransactionDto) {
     return rotomPOST<void>('/starbank/shop', data);
   }
 
   /**
-   * Process trainer defeat money transaction
+   * Process trainer defeat money transaction. Game-server route: unguarded, so it stays on rotomPOST.
    */
   static trainerDefeat(data: TrainerDefeatMoneyDto) {
     return rotomPOST<void>('/starbank/trainerdefeat', data);

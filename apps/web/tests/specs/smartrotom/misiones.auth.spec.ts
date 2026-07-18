@@ -50,12 +50,12 @@ async function mockMcef(page: Page, responses: Record<string, unknown>) {
     }: {
       request: string
       onSuccess: (response: string) => void
-      onFailure: (error: string) => void
+      onFailure: (errorCode: number, errorMessage: string) => void
     }) => {
       const { query } = JSON.parse(request) as { query: string }
       const match = (map as Record<string, unknown>)[query]
       if (match !== undefined) onSuccess(JSON.stringify(match))
-      else onFailure(`unmocked query: ${query}`)
+      else onFailure(-1, `unmocked query: ${query}`)
     }
   }, responses)
 }

@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { Icon, Sprite } from "./ui"
 
@@ -29,6 +30,7 @@ export function DexTile({
   name,
   size = 64,
 }: DexTileProps) {
+  const t = useTranslations("rooker")
   return (
     <div
       title={caught ? name : "???"}
@@ -48,7 +50,7 @@ export function DexTile({
         form={form}
         palette={palette}
         size={Math.round(size * 0.8)}
-        alt={caught ? (name ?? String(dex)) : "No capturado"}
+        alt={caught ? (name ?? String(dex)) : t("dexTile.notCaught")}
         // An uncaught species is knocked all the way down to a flat silhouette. The
         // filter is inline because it is a composite no Tailwind utility expresses.
         className={caught ? undefined : "opacity-30"}

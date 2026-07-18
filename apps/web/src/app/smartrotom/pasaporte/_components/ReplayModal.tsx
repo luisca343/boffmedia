@@ -2,6 +2,7 @@
 
 // DESK. The sheet is chrome — it is the officer's screen, not a page of the book.
 
+import { useTranslations } from "next-intl"
 import type { UserAchievement } from "@boffmedia/shared"
 import { Game } from "@/app/battlesim/replay/_components/Game"
 import { Modal } from "./ui"
@@ -22,8 +23,9 @@ export function ReplayModal({
   achievement: UserAchievement
   onClose: () => void
 }) {
+  const t = useTranslations("pasaporte")
   return (
-    <Modal title={`Repetición · ${achievement.name}`} onClose={onClose}>
+    <Modal title={t("replayModal.title", { name: achievement.name })} onClose={onClose}>
       <div className="bg-ps-desk-lo p-3">
         <Game battleName={achievement.id} />
       </div>

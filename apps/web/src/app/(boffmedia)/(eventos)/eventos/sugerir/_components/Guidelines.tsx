@@ -6,7 +6,7 @@ import { Panel, Icon } from "@/components/boffmedia/primitives"
 const ITEMS = ["g1", "g2", "g3", "g4"] as const
 
 export function Guidelines() {
-  const t = useTranslations("events.sugerir.guidelines")
+  const t = useTranslations("sugerir.guidelines")
   return (
     <Panel title={t("title")} className="lg:sticky lg:top-[calc(var(--nav-h)_+_20px)]">
       <ul className="grid gap-3">

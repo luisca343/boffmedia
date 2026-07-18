@@ -51,7 +51,8 @@ export function timeAgoLong(value: string | number | Date | null | undefined): s
 /** Grouped integer, es-ES: 1234 → "1.234". "—" when not finite. */
 export function formatNumber(n: number): string {
   if (!Number.isFinite(n)) return "—"
-  return Math.round(n).toLocaleString("es-ES")
+  // `+0` collapses -0: Math.round(-0.4) is -0, which Intl renders as "-0".
+  return (Math.round(n) + 0).toLocaleString("es-ES")
 }
 
 /** The house money format, shared by StarBank and every app that shows ¥: "1.234 ¥". */

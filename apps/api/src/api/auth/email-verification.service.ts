@@ -10,6 +10,7 @@ import { MailService } from '@api/mail/mail.service';
 
 const TOKEN_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
 
+// LEGACY_DIRECT_DB: pre-dates the repository rule; extract a repository when next touched
 @Injectable()
 export class EmailVerificationService {
   constructor(

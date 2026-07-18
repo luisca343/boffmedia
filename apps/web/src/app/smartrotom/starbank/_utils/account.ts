@@ -52,3 +52,21 @@ export function isOutgoing(tx: SBTransaction, accountId?: number): boolean {
 export function displayName(name?: string): string {
   return (name ?? "").replace(/_/g, " ");
 }
+
+/** Why this transfer cannot be sent, or `null` when it can. The API is the real
+ *  authority; this only stops the obviously-doomed request from leaving. */
+export type TransferBlock = "amount" | "funds" | "same-account" | "no-source";
+
+export function transferBlocker(opts: {
+  amount: number;
+  fromId?: number;
+  toId?: number;
+  balance?: number;
+}): TransferBlock | null {
+  const { amount, fromId, toId, balance } = opts;
+  if (fromId == null || balance == null) return "no-source";
+  if (!Number.isFinite(amount) || amount <= 0) return "amount";
+  if (toId != null && toId === fromId) return "same-account";
+  if (amount > balance) return "funds";
+  return null;
+}

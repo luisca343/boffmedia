@@ -1,0 +1,264 @@
+{
+  "pasaporte": {
+    "cover": {
+      "subtitle": "Entrenador Pixelmon · Registro Oficial",
+      "complete": "{pct}% COMPLETO",
+      "hint": "ABRIR · ARRASTRA LA ESQUINA",
+      "id": "ID",
+      "region": "Región",
+      "rank": "Rango"
+    },
+    "backCover": {
+      "property": "— PROPIEDAD DEL ENTRENADOR —"
+    },
+    "chapters": {
+      "indice": "Índice",
+      "identidad": "Identidad",
+      "carne": "Carné Oficial",
+      "equipo": "Equipo Actual",
+      "medallas": "Medallas",
+      "competiciones": "Competiciones",
+      "temporada": "Temporada",
+      "logros": "Logros",
+      "insignias": "Insignias",
+      "bitacora": "Bitácora",
+      "cronica": "Crónica"
+    },
+    "indice": {
+      "eyebrow": "Contenido",
+      "title": "Índice"
+    },
+    "identidad": {
+      "eyebrow": "Identidad",
+      "title": "Datos del Jugador",
+      "sectionMovement": "Detalles de Movimiento",
+      "stat": {
+        "playtime": "Tiempo de juego",
+        "playtimeSub": "En el servidor",
+        "wins": "Victorias",
+        "winsSub": "Enemigos derrotados",
+        "deaths": "Caídas",
+        "deathsSub": "Veces derrotado",
+        "distance": "Distancia",
+        "distanceSub": "A pie, mar y montura"
+      },
+      "movement": {
+        "walk": "A pie",
+        "sprint": "Esprintando",
+        "horse": "A caballo",
+        "boat": "En bote",
+        "swim": "Nadando",
+        "jump": "Saltos"
+      }
+    },
+    "carne": {
+      "eyebrow": "Documento de Identidad · Visado",
+      "title": "Carné Oficial",
+      "bandAuthority": "GOBIERNO DE TERAS · DIRECCIÓN DE FRONTERAS",
+      "bandCardTitle": "CARNÉ DE ENTRENADOR · TRAINER ID",
+      "classA": "CLASE A",
+      "field": {
+        "name": "Nombre · Name",
+        "docNumber": "N.º documento",
+        "region": "Región",
+        "class": "Clase",
+        "issued": "Emitido",
+        "expires": "Caduca",
+        "hours": "Horas",
+        "rank": "Rango"
+      },
+      "scanAria": "Escanear el código del carné",
+      "verified": "VERIFICADO",
+      "scan": "ESCANEAR",
+      "inspectPrompt": "Activa el Modo Inspección (tecla I) para escanear el código",
+      "verifiedToast": "✓ Código verificado · GOB·TERAS · Entrenador en regla",
+      "footer": "Documento oficial del Gobierno de Teras. Pulsa <key>I</key> para activar el <mode>Modo Inspección</mode> y escanear el código de verificación."
+    },
+    "equipo": {
+      "eyebrow": "Compañeros",
+      "eyebrowCount": "Compañeros · {count}",
+      "title": "Equipo Actual",
+      "empty": {
+        "title": "Sin equipo activo",
+        "sub": "Este entrenador aún no ha registrado un equipo."
+      },
+      "stats": {
+        "hp": "PS",
+        "atk": "At",
+        "def": "Def",
+        "spa": "AtS",
+        "spd": "DefS",
+        "spe": "Vel"
+      }
+    },
+    "medallas": {
+      "eyebrow": "Progreso del Entrenador",
+      "title": "Medallas",
+      "empty": {
+        "title": "Sin circuito registrado",
+        "sub": "Todavía no hay gimnasios abiertos en tu región."
+      },
+      "badgesEarned": "Insignias obtenidas",
+      "badgesCount": "{done} de {total, plural, one {# insignia} other {# insignias}}",
+      "noCircuit": "Sin circuito",
+      "unsealedToast": "Aún no has sellado esta medalla",
+      "circuitBar": "{name}: {pct}%"
+    },
+    "competiciones": {
+      "eyebrow": "Ligas & Frente Batalla",
+      "title": "Competiciones",
+      "empty": {
+        "title": "Sin competiciones",
+        "sub": "El circuito competitivo de Teras aún no ha abierto sus puertas."
+      },
+      "intro": "Los grandes desafíos del circuito competitivo de Teras. Cada victoria deja su sello.",
+      "locked": "Bloqueado"
+    },
+    "temporada": {
+      "eyebrow": "Ranking Competitivo",
+      "title": "Sello de Temporada",
+      "empty": {
+        "title": "No hay temporada activa",
+        "sub": "El sello se estampará cuando comience el próximo ciclo."
+      },
+      "notFought": {
+        "title": "Aún no has combatido esta temporada",
+        "sub": "{name} · termina {date}"
+      },
+      "seasonLine": "Temporada {number} · termina {date}",
+      "progressTo": "Progreso a {name}",
+      "maxRank": "Rango máximo alcanzado",
+      "nextRankAria": "Progreso al siguiente rango",
+      "remaining": "Te faltan <b>{n} LP</b>",
+      "atTop": "Estás en la cima de la escalera",
+      "streak": "racha actual {n, plural, one {# victoria} other {# victorias}}",
+      "box": {
+        "lp": "Puntos de Liga",
+        "peak": "Pico {n}",
+        "wins": "Victorias",
+        "losses": "{n, plural, one {# derrota} other {# derrotas}}",
+        "winRate": "Win Rate",
+        "matches": "{n, plural, one {# partida} other {# partidas}}",
+        "regionalRank": "Ranking Regional",
+        "battles": "{n, plural, one {# combate} other {# combates}}"
+      }
+    },
+    "logros": {
+      "eyebrow": "Salón de Trofeos",
+      "eyebrowCollection": "Colección · Salón de Trofeos",
+      "title": "Logros",
+      "empty": {
+        "title": "Sin logros",
+        "sub": "El salón de trofeos aún está vacío."
+      },
+      "points": "Puntos de logro",
+      "pointsSub": "de {total} posibles · {own}/{all} {all, plural, one {logro} other {logros}}",
+      "categoryProgress": "Progreso por categoría",
+      "categoryBar": "{category}: {done} de {total}",
+      "rarest": "Logro más raro",
+      "unlockedToast": "{name} · Desbloqueado · {date}",
+      "progressToast": "{name} · En progreso · {progress}/{target}",
+      "collectionBar": "{name}: {progress} de {target}"
+    },
+    "bitacora": {
+      "eyebrow": "Sellos · Entradas y Visados",
+      "title": "Bitácora de Viaje",
+      "empty": {
+        "title": "Sin sellos todavía",
+        "sub": "Viaja por las regiones y gana medallas para estampar tu bitácora."
+      },
+      "legend": {
+        "viaje": "Entrada / Visado",
+        "gimnasio": "Gimnasio",
+        "liga": "Liga",
+        "evento": "Evento"
+      },
+      "countFull": "{count, plural, one {# sello} other {# sellos}}",
+      "countPartial": "{shown} de {count, plural, one {# sello} other {# sellos}}",
+      "stamp": {
+        "gymBare": "GIMNASIO",
+        "gymWithSub": "GIMNASIO · {sub}",
+        "leagueChampion": "LIGA · CAMPEÓN",
+        "leagueWithSub": "LIGA · {sub}",
+        "visado": "VISADO · ENTRADA"
+      }
+    },
+    "cronica": {
+      "eyebrow": "Línea de Tiempo · Hitos",
+      "title": "Crónica del Entrenador",
+      "empty": {
+        "title": "Aún sin hitos",
+        "sub": "Tu historia se escribirá a medida que avances."
+      },
+      "arrival": {
+        "title": "Llegada a Teras",
+        "desc": "Primer registro en {region}. Comienza la aventura."
+      }
+    },
+    "badgePage": {
+      "obtained": "Obtenida · {date}",
+      "watchReplay": "Ver Repetición",
+      "team": "Equipo de la victoria",
+      "teamCount": "{count} Pokémon",
+      "seal": {
+        "line1": "SELLO",
+        "line2": "VÁLIDO"
+      }
+    },
+    "replayModal": {
+      "title": "Repetición · {name}"
+    },
+    "passportPhoto": {
+      "missing": "Sin<br></br>fotografía",
+      "alt": "Fotografía del titular"
+    },
+    "controls": {
+      "prevPage": "Página anterior",
+      "nextPage": "Página siguiente",
+      "goToPage": "Ir a la página {n}"
+    },
+    "chapterRail": {
+      "nav": "Capítulos"
+    },
+    "book": {
+      "inspectToast": "Modo Inspección activado · documento verificado",
+      "emptyTitle": "Sin pasaporte",
+      "emptySub": "Vincula tu cuenta de Minecraft para que el Gobierno de Teras emita tu documento."
+    },
+    "modal": {
+      "close": "Cerrar",
+      "dialog": "Diálogo"
+    },
+    "holoStamp": {
+      "seal": "SELLO",
+      "valid": "VÁLIDO"
+    },
+    "verifyBadge": {
+      "verified": "VERIFICADO",
+      "subtitle": "Gobierno de Teras · Control de Fronteras"
+    },
+    "waxSeal": {
+      "unsealed": "{alt} (sin sellar)"
+    },
+    "medal": {
+      "locked": "{tier} (bloqueado)"
+    },
+    "tiers": {
+      "bronce": "Bronce",
+      "plata": "Plata",
+      "oro": "Oro",
+      "platino": "Platino",
+      "diamante": "Diamante",
+      "maestro": "Maestro"
+    },
+    "rarity": {
+      "legendary": "Legendario",
+      "epic": "Épico",
+      "rare": "Raro",
+      "common": "Común"
+    },
+    "common": {
+      "level": "Nv.{level}"
+    }
+  }
+}

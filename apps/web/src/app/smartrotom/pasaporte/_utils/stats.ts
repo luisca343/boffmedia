@@ -48,12 +48,12 @@ export function distanceKm(stats: Blob): number {
  */
 export function perMovement(stats: Blob): MovementRow[] {
   return [
-    { key: "walk", label: "A pie", value: km(read(stats, "minecraft:walk_one_cm")), unit: "km" },
-    { key: "sprint", label: "Esprintando", value: km(read(stats, "minecraft:sprint_one_cm")), unit: "km" },
-    { key: "horse", label: "A caballo", value: km(read(stats, "minecraft:horse_one_cm")), unit: "km" },
-    { key: "boat", label: "En bote", value: km(read(stats, "minecraft:boat_one_cm")), unit: "km" },
-    { key: "swim", label: "Nadando", value: km(read(stats, "minecraft:swim_one_cm")), unit: "km" },
-    { key: "jump", label: "Saltos", value: read(stats, "minecraft:jump"), unit: "n" },
+    { key: "walk", value: km(read(stats, "minecraft:walk_one_cm")), unit: "km" },
+    { key: "sprint", value: km(read(stats, "minecraft:sprint_one_cm")), unit: "km" },
+    { key: "horse", value: km(read(stats, "minecraft:horse_one_cm")), unit: "km" },
+    { key: "boat", value: km(read(stats, "minecraft:boat_one_cm")), unit: "km" },
+    { key: "swim", value: km(read(stats, "minecraft:swim_one_cm")), unit: "km" },
+    { key: "jump", value: read(stats, "minecraft:jump"), unit: "n" },
   ]
 }
 

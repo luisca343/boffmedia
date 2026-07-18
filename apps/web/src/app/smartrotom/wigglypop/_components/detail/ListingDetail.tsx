@@ -2,9 +2,10 @@
 
 import { useRouter } from "next/navigation"
 import { useMemo, useState } from "react"
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import type { WpListing } from "../../_types/market.types"
-import { FORMAT_LABEL, fmt } from "../../_utils/format"
+import { FORMAT_LABEL_KEY, fmt } from "../../_utils/format"
 import { RARITY_STRIP } from "../../_utils/rarity"
 import {
   useListing,
@@ -40,6 +41,7 @@ import { PurchasePanel } from "./PurchasePanel"
 type Sheet = null | "buy" | "bid" | "offer" | "trade"
 
 export function ListingDetail({ id }: { id: number }) {
+  const t = useTranslations("wigglypop")
   const router = useRouter()
   const [sheet, setSheet] = useState<Sheet>(null)
 
@@ -58,13 +60,13 @@ export function ListingDetail({ id }: { id: number }) {
   if (isLoading) return <DetailSkeleton />
   if (error || !L) {
     return (
-      <EmptyState icon="alert" title="Anuncio no encontrado">
-        <Button onClick={() => router.push("/smartrotom/wigglypop")}>Volver al mercado</Button>
+      <EmptyState icon="alert" title={t("detail.notFoundTitle")}>
+        <Button onClick={() => router.push("/smartrotom/wigglypop")}>{t("detail.backToMarket")}</Button>
       </EmptyState>
     )
   }
   if (!mon) {
-    return <EmptyState icon="package" title="Este anuncio no tiene un Pokémon" />
+    return <EmptyState icon="package" title={t("detail.noMonTitle")} />
   }
 
   const valDelta = L.value > 0 ? Math.round(((L.price - L.value) / L.value) * 100) : 0
@@ -74,10 +76,10 @@ export function ListingDetail({ id }: { id: number }) {
       <div className="flex flex-none items-center gap-3 px-[26px] pt-3">
         <Button variant="ghost" onClick={() => router.back()}>
           <Icon name="arrowL" size={16} />
-          Volver
+          {t("common.back")}
         </Button>
         <span className="font-wp text-[12.5px] font-semibold text-wp-fg-subtle">
-          Mercado / {FORMAT_LABEL[L.format]} / <span className="text-wp-fg-muted">{mon.name}</span>
+          {t("detail.breadcrumbMarket")} / {t(FORMAT_LABEL_KEY[L.format])} / <span className="text-wp-fg-muted">{mon.name}</span>
         </span>
       </div>
 
@@ -94,13 +96,13 @@ export function ListingDetail({ id }: { id: number }) {
               {mon.shiny && (
                 <CornerBadge tone="shiny" className="text-[12px]">
                   <Icon name="sparkles" size={13} />
-                  SHINY
+                  {t("common.shinyBadge")}
                 </CornerBadge>
               )}
               {mon.legendary && (
                 <CornerBadge tone="legend" className="text-[12px]">
                   <Icon name="crown" size={13} filled />
-                  LEGENDARIO
+                  {t("common.legendaryBadge")}
                 </CornerBadge>
               )}
               <CornerBadge tone="neutral" className="bg-white/85">
@@ -111,7 +113,7 @@ export function ListingDetail({ id }: { id: number }) {
             <button
               type="button"
               onClick={() => toggleWatch.mutate(L.id)}
-              aria-label={isWatched ? "Dejar de seguir" : "Seguir anuncio"}
+              aria-label={isWatched ? t("common.unwatch") : t("common.watch")}
               aria-pressed={isWatched}
               className={cn(
                 "absolute right-[18px] top-4 z-[3] flex h-10 w-10 items-center justify-center rounded-wp-pill border-wp",
@@ -133,7 +135,7 @@ export function ListingDetail({ id }: { id: number }) {
             <div className="absolute bottom-5 z-[3] flex gap-2">
               <Chip className="bg-white/85">#{String(mon.dex).padStart(3, "0")}</Chip>
               <Chip className="bg-white/85">
-                <span className="wp-num">{fmt(L.views)}</span> vistas
+                <span className="wp-num">{fmt(L.views)}</span> {t("common.viewsSuffix")}
               </Chip>
             </div>
           </SpriteStage>
@@ -167,7 +169,7 @@ export function ListingDetail({ id }: { id: number }) {
               <div className="mb-2 flex items-center gap-2">
                 <Icon name="wand" size={16} className="text-wp-teal" />
                 <span className="font-wp text-[13px] font-bold text-wp-fg">
-                  Valoración SmartRotom
+                  {t("detail.valuationTitle")}
                 </span>
               </div>
               <div className="flex items-baseline gap-2.5">
@@ -179,19 +181,19 @@ export function ListingDetail({ id }: { id: number }) {
                   )}
                 >
                   {valDelta > 0
-                    ? `+${valDelta}% sobre la valoración`
+                    ? t("detail.aboveValuation", { delta: valDelta })
                     : valDelta < 0
-                      ? `${valDelta}% bajo la valoración`
-                      : "precio justo"}
+                      ? t("detail.belowValuation", { delta: valDelta })
+                      : t("detail.fairPrice")}
                 </span>
               </div>
               {/* Not "IA" — it is a published, deterministic formula over IVs, level,
                   rarity and shininess. Calling a rules engine AI would be a lie the
                   seller then has to live with. */}
               <p className="mt-2 font-wp text-[11.5px] font-semibold leading-relaxed text-wp-fg-muted">
-                Estimación calculada a partir de IVs, nivel, rareza
-                {mon.shiny ? ", condición shiny" : ""} y legendariedad. Es una referencia, no un
-                precio: quien fija el precio es el vendedor.
+                {t("detail.valuationExplain", {
+                  shinyPart: mon.shiny ? t("detail.valuationShinyPart") : "",
+                })}
               </p>
             </ValueBox>
 
@@ -199,10 +201,10 @@ export function ListingDetail({ id }: { id: number }) {
               <div className="mb-1.5 flex items-center gap-[7px]">
                 <Icon name="history" size={15} className="text-wp-fg-muted" />
                 <span className="font-wp text-[13px] font-bold text-wp-fg">
-                  Historial de precios
+                  {t("trust.priceHistory")}
                 </span>
                 <span className="ml-auto font-wp text-[11px] font-semibold text-wp-fg-subtle">
-                  ventas reales de {mon.species}
+                  {t("detail.realSalesOf", { species: mon.species })}
                 </span>
               </div>
               <PriceChart data={history ?? []} />
@@ -222,7 +224,7 @@ export function ListingDetail({ id }: { id: number }) {
                     <Stars value={L.seller.rating} size={12} />
                     {L.seller.rating === null ? (
                       <span className="font-wp text-[11.5px] font-semibold text-wp-fg-subtle">
-                        Vendedor nuevo · sin valoraciones
+                        {t("detail.newSellerNoRatings")}
                       </span>
                     ) : (
                       <>
@@ -230,7 +232,7 @@ export function ListingDetail({ id }: { id: number }) {
                           {L.seller.rating.toFixed(2)}
                         </span>
                         <span className="font-wp text-[11.5px] font-semibold text-wp-fg-subtle">
-                          · <span className="wp-num">{fmt(L.seller.sales)}</span> ventas
+                          · <span className="wp-num">{fmt(L.seller.sales)}</span> {t("detail.salesSuffix")}
                         </span>
                       </>
                     )}

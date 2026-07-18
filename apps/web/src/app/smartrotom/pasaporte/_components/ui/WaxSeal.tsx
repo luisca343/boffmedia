@@ -2,6 +2,7 @@
 
 "use client"
 
+import { useTranslations } from "next-intl"
 import { useState, type CSSProperties } from "react"
 import { cn } from "@/lib/utils"
 import { Icon } from "./Icon"
@@ -35,12 +36,13 @@ export function WaxSeal({
   slam?: boolean
   className?: string
 }) {
+  const t = useTranslations("pasaporte")
   const [failed, setFailed] = useState(false)
 
   return (
     <div
       role="img"
-      aria-label={earned ? alt : `${alt} (sin sellar)`}
+      aria-label={earned ? alt : t("waxSeal.unsealed", { alt })}
       style={{ width: size, height: size, "--ps-seal": tint } as CSSProperties}
       className={cn(
         "relative grid flex-none place-items-center",

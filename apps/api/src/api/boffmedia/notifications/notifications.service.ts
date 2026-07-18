@@ -7,6 +7,7 @@ import { boffMediaUsers } from '@/_db/schema/BoffMedia';
 import { NotificationEntity } from './entities/notification.entity';
 import { CreateNotificationDto } from './dto/create-notification.dto';
 
+// LEGACY_DIRECT_DB: pre-dates the repository rule; extract a repository when next touched
 @Injectable()
 export class NotificationsService {
   constructor(

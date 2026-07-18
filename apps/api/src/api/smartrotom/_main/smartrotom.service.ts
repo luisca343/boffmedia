@@ -6,6 +6,7 @@ import { StarbankFacadeService } from '../starbank/starbank.facade.service';
 import { DailyRewardsConfig } from '../arcade/entities/daily-rewards.entity';
 import { Logger } from 'nestjs-pino';
 
+// LEGACY_DIRECT_DB: pre-dates the repository rule; extract a repository when next touched
 @Injectable()
 export class SmartrotomService {
   private rewardsConfig: DailyRewardsConfig;

@@ -85,11 +85,18 @@ export function useReelSpin({ winningPosition, tileCount, sound, reduceMotion }:
     setSettled(false)
     setRevealed(false)
 
+    const track = trackRef.current
     let frameId = 0
     let revealId = 0
+    let guardId = 0
+    // 0 until the browser reports the transition actually started. The countdown
+    // must not begin at arm time: `setOffset` only schedules a render, so the
+    // transition starts a commit and a paint later — with ~60 tiles that lag is
+    // big enough to land the win sound and the prize before the reel stops.
     let start = 0
     let lastFace = -1
     let counter = 0
+    let finished = false
 
     const readFace = () => {
       const el = trackRef.current
@@ -99,25 +106,39 @@ export function useReelSpin({ winningPosition, tileCount, sound, reduceMotion }:
       return Math.floor(-new DOMMatrixReadOnly(transform).m41 / REEL_STRIDE)
     }
 
-    const frame = (now: number) => {
-      const elapsed = now - start
-      const face = readFace()
-      if (face >= 0 && face !== lastFace) {
-        lastFace = face
-        counter = (counter + 1) % FAST_TICK_EVERY
-        const blurring = elapsed < SPIN_MS * FAST_PHASE
-        if (audio.current.sound && (!blurring || counter === 0)) audio.current.tick.play()
-      }
-
-      if (elapsed < SPIN_MS) {
-        frameId = requestAnimationFrame(frame)
-        return
-      }
-
+    const finish = () => {
+      if (finished) return
+      finished = true
+      cancelAnimationFrame(frameId)
+      window.clearTimeout(guardId)
       setSpinning(false)
       setSettled(true)
       if (audio.current.sound) audio.current.win.play()
       revealId = window.setTimeout(() => setRevealed(true), REVEAL_DELAY_MS)
+    }
+
+    // The reel's own transition is the clock — not a timer racing it.
+    // `transitionend` bubbles from the tiles too, so only the track counts.
+    const onTransitionStart = (e: TransitionEvent) => {
+      if (e.target === track && e.propertyName === "transform") start = performance.now()
+    }
+    const onTransitionEnd = (e: TransitionEvent) => {
+      if (e.target === track && e.propertyName === "transform") finish()
+    }
+    track?.addEventListener("transitionstart", onTransitionStart)
+    track?.addEventListener("transitionend", onTransitionEnd)
+
+    const frame = (now: number) => {
+      const face = readFace()
+      if (face >= 0 && face !== lastFace) {
+        lastFace = face
+        counter = (counter + 1) % FAST_TICK_EVERY
+        // Before the transition reports starting there is no elapsed time yet,
+        // so treat it as the blur phase rather than ticking every face.
+        const blurring = start === 0 || now - start < SPIN_MS * FAST_PHASE
+        if (audio.current.sound && (!blurring || counter === 0)) audio.current.tick.play()
+      }
+      if (!finished) frameId = requestAnimationFrame(frame)
     }
 
     // One frame of headroom so the browser paints the reel at rest before the
@@ -125,14 +146,20 @@ export function useReelSpin({ winningPosition, tileCount, sound, reduceMotion }:
     const armId = requestAnimationFrame(() => {
       setSpinning(true)
       setOffset(target)
-      start = performance.now()
       frameId = requestAnimationFrame(frame)
+      // Safety net: a transition that never runs (tab hidden, interrupted, a
+      // browser that skips it) must still settle rather than spin forever.
+      guardId = window.setTimeout(finish, SPIN_MS + 2000)
     })
 
     return () => {
+      finished = true
+      track?.removeEventListener("transitionstart", onTransitionStart)
+      track?.removeEventListener("transitionend", onTransitionEnd)
       cancelAnimationFrame(armId)
       cancelAnimationFrame(frameId)
       window.clearTimeout(revealId)
+      window.clearTimeout(guardId)
     }
   }, [target, tileCount, winningPosition, reduceMotion])
 

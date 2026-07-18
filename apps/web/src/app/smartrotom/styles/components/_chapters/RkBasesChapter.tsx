@@ -9,6 +9,15 @@ import { Sample, Section, Swatches } from "../showcase-shared"
  * Rooker's foundations. The one thing worth reading twice is the canvas story: three,
  * not two, and the third is not a theme.
  */
+const ACCENT_LABEL: Record<RookerAccent, string> = {
+  azul: "Azul",
+  amarillo: "Amarillo",
+  rosa: "Rosa",
+  morado: "Morado",
+  naranja: "Naranja",
+  verde: "Verde",
+}
+
 export function RkBasesChapter() {
   const [accent, setAccent] = React.useState<RookerAccent>("azul")
 
@@ -125,7 +134,7 @@ export function RkBasesChapter() {
                 <button
                   key={key}
                   onClick={() => setAccent(key)}
-                  aria-label={ACCENTS[key].label}
+                  aria-label={ACCENT_LABEL[key]}
                   aria-pressed={accent === key}
                   style={{ background: `rgb(${ACCENTS[key].rgb})` }}
                   className={cn(

@@ -1,3 +1,6 @@
+"use client"
+
+import { useTranslations } from "next-intl"
 import { Icon } from "./Icon"
 
 /**
@@ -10,9 +13,10 @@ import { Icon } from "./Icon"
  * Registered in docs/smartrotom/deferred/README.md.
  */
 export function Verified({ size = 15 }: { size?: number }) {
+  const t = useTranslations("rooker")
   return (
     <span
-      title="Entrenador verificado"
+      title={t("common.verifiedTrainer")}
       className="relative inline-grid flex-none place-items-center text-rk-verified"
       style={{ width: size, height: size }}
     >

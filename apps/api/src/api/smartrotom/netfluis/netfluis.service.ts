@@ -4,6 +4,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import * as path from 'path';
 import { promises as fsPromises } from 'fs';
 
+// LEGACY_DIRECT_DB: pre-dates the repository rule; extract a repository when next touched
 @Injectable()
 export class NetfluisService {
   constructor(

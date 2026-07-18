@@ -1,5 +1,7 @@
 import { getRequestConfig } from 'next-intl/server';
 import { cookies, headers } from 'next/headers';
+import { ALL_NAMESPACES } from './manifest.generated';
+import { namespacesFor, PATHNAME_HEADER } from './scopes';
 
 // Supported locales
 const SUPPORTED_LOCALES = ['en', 'es'] as const;
@@ -97,6 +99,15 @@ const getLocaleFromCookies = async (): Promise<SupportedLocale | null> => {
   }
 };
 
+/** The pathname published by middleware; '' when it did not run (see namespacesFor). */
+const requestPathname = async (): Promise<string> => {
+  try {
+    return (await headers()).get(PATHNAME_HEADER) ?? '';
+  } catch {
+    return '';
+  }
+};
+
 /**
  * Determine the current locale
  */
@@ -111,83 +122,28 @@ const determineLocale = async (): Promise<SupportedLocale> => {
 };
 
 export default getRequestConfig(async () => {
-  // Determine locale with proper error handling
   const locale = await determineLocale();
-  
-  // Define paths to import
-  const paths = [
-    'boffmedia.json',
-    'battlesim.json',
-    'admin.json',
-    'nav.json',
-    'auth.json',
-    'profile.json',
-    'leaderboard.json',
-    'events.json',
-    'items.json',
-    'tools/games.json',
-    'tools/hub.json',
-    'tools/mhwilds.json',
-    'tools/pokemon.json',
-    'tools/vgc.json',
-    'smartrotom/pokedex/abilities.json',
-    'smartrotom/pokedex/common.json',
-    'smartrotom/pokedex/forms.json',
-    'smartrotom/pokedex/moves.json',
-    'smartrotom/pokedex/spawns.json',
-    'tools/pmdsky/common.json',
-    'tools/pmdsky/dungeons.json',
-    'tools/tcgpocket/common.json',
-    'tools/otros.json',
-    'common.json',
-    'twitch.json',
-    'youtube.json',
-  ];
-  
-  // Load translations for the current locale
-  const imports = await Promise.all(
-    paths.map(path => 
-      import(`../../locales/${locale}/${path}`)
-        .catch(err => {
-          console.warn(`Failed to load translation: ${path} for locale ${locale}`, err.message);
+  const paths = namespacesFor(await requestPathname(), ALL_NAMESPACES);
+
+  const load = async (loc: SupportedLocale) => {
+    const modules = await Promise.all(
+      paths.map((path) =>
+        import(`../../locales/${loc}/${path}`).catch((err) => {
+          console.warn(`Failed to load translation: ${path} for locale ${loc}`, err.message);
           return { default: {} };
-        })
-    )
-  );
-  
-  // Deep merge current locale messages
-  let currentLocaleMessages = {};
-  imports.forEach(module => {
-    currentLocaleMessages = deepMerge(currentLocaleMessages, module.default);
-  });
-
-  // If current locale is not the default, load default locale as fallback
-  let messages = currentLocaleMessages;
-  
-  if (locale !== DEFAULT_LOCALE) {
-    // Load default locale translations
-    const defaultImports = await Promise.all(
-      paths.map(path => 
-        import(`../../locales/${DEFAULT_LOCALE}/${path}`)
-          .catch(err => {
-            console.warn(`Failed to load translation: ${path} for default locale ${DEFAULT_LOCALE}`, err.message);
-            return { default: {} };
-          })
-      )
+        }),
+      ),
     );
-    
-    // Deep merge default locale messages
-    let defaultMessages = {};
-    defaultImports.forEach(module => {
-      defaultMessages = deepMerge(defaultMessages, module.default);
-    });
-    
-    // Deep merge default messages with current locale messages (current locale takes precedence)
-    messages = deepMerge(defaultMessages, currentLocaleMessages);
-  }
+    return modules.reduce<DeepMergeable>((acc, m) => deepMerge(acc, m.default), {});
+  };
 
+  const messages = await load(locale);
+
+  // A non-default locale merges on top of `es` so a missing key falls back rather
+  // than rendering its own name.
   return {
     locale,
-    messages,
+    messages:
+      locale === DEFAULT_LOCALE ? messages : deepMerge(await load(DEFAULT_LOCALE), messages),
   };
 });

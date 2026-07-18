@@ -88,23 +88,28 @@ export const authOptions: NextAuthOptions = {
             world: credentials.world,
           })).data;
           if (response && !('error' in response)) {
-            const responseData = response.user as any;
-            const user: any = {
-              id: responseData.id,
-              // The API names this field `username`; without it token.name stays
-              // empty and AppWrapper's boffMediaLinked() gate rejects the session.
-              name: responseData.username ?? responseData.name,
-              email: responseData.email,
-              image: responseData.image,
+            const { user } = response;
+            return {
+              id: String(user.id),
+              username: user.username,
+              // The API names this field `username`; the jwt callback maps it to
+              // token.name, which AppWrapper's boffMediaLinked() gate requires.
+              name: user.username,
+              email: user.email,
+              // Without these the MC session carries no roles/mcUuid — role-gated
+              // features (e.g. ROTOM_ADMIN) silently reject every Minecraft login.
+              roles: user.roles as UserRole[],
+              mcUuid: user.mcUuid ?? undefined,
               accessToken: response.access_token,
               refreshToken: response.refresh_token,
+              // Prefer the live game credentials over the API's smartRotomUser,
+              // which is `{}` when nothing is linked.
               smartRotomUser: {
                 username: credentials.username,
                 uuid: credentials.uuid,
                 world: credentials.world
               }
             };
-            return user;
           }
           throw new AuthError("Invalid Minecraft credentials", AUTH_ERROR_CODES.INVALID_CREDENTIALS);
         } catch (error) {

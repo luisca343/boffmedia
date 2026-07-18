@@ -51,11 +51,13 @@ export const STAT_COLORS: Record<string, string> = {
 }
 
 export const STAT_KEYS = ["hp", "atk", "def", "spa", "spd", "spe"] as const
-export const STAT_LABELS: Record<string, string> = {
-  hp: "PS",
-  atk: "Ataque",
-  def: "Defensa",
-  spa: "At. Esp.",
-  spd: "Def. Esp.",
-  spe: "Velocidad",
+
+/** Values are i18n key suffixes, not text — resolve with `t()`. */
+export const STAT_LABEL_KEY: Record<string, string> = {
+  hp: "status.stat.hp",
+  atk: "status.stat.atk",
+  def: "status.stat.def",
+  spa: "status.stat.spa",
+  spd: "status.stat.spd",
+  spe: "status.stat.spe",
 }

@@ -1,3 +1,4 @@
+import type { useTranslations } from "next-intl"
 import type { StarBankTransaction, UserAchievement } from "@boffmedia/shared"
 import { tripsFromTransactions } from "@/app/smartrotom/taxi/_utils/trips"
 import type { TravelStamp } from "../_types"
@@ -47,10 +48,14 @@ function kindOf(achievement: UserAchievement): TravelStamp["kind"] {
   return "evento"
 }
 
-function subOf(achievement: UserAchievement, kind: TravelStamp["kind"]): string {
+function subOf(
+  achievement: UserAchievement,
+  kind: TravelStamp["kind"],
+  t: ReturnType<typeof useTranslations>,
+): string {
   const sub = (achievement.subcategory ?? "").trim().toUpperCase()
-  if (kind === "gimnasio") return sub ? `GIMNASIO · ${sub}` : "GIMNASIO"
-  if (kind === "liga") return sub ? `LIGA · ${sub}` : "LIGA · CAMPEÓN"
+  if (kind === "gimnasio") return sub ? t("bitacora.stamp.gymWithSub", { sub }) : t("bitacora.stamp.gymBare")
+  if (kind === "liga") return sub ? t("bitacora.stamp.leagueWithSub", { sub }) : t("bitacora.stamp.leagueChampion")
   const category = (achievement.category ?? "").trim().toUpperCase()
   return sub ? `${category} · ${sub}` : category
 }
@@ -73,6 +78,7 @@ function iso(value: string | null | undefined): string | null {
 export function stampsFromHistory(
   achievements: UserAchievement[] = [],
   transactions: StarBankTransaction[] = [],
+  t: ReturnType<typeof useTranslations>,
 ): TravelStamp[] {
   const stamps: TravelStamp[] = []
 
@@ -88,7 +94,7 @@ export function stampsFromHistory(
     stamps.push({
       id,
       place: (achievement.name ?? "").trim().toUpperCase(),
-      sub: subOf(achievement, kind),
+      sub: subOf(achievement, kind, t),
       date,
       kind,
       shape: shapeOf(id),
@@ -114,7 +120,7 @@ export function stampsFromHistory(
     stamps.push({
       id,
       place: stopId.trim().toUpperCase(),
-      sub: "VISADO · ENTRADA",
+      sub: t("bitacora.stamp.visado"),
       date,
       kind: "viaje",
       shape: shapeOf(id),

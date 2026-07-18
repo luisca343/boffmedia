@@ -2,6 +2,7 @@
 
 import { useParams } from "next/navigation"
 import Link from "next/link"
+import { useTranslations } from "next-intl"
 import { userMessageFrom } from "@/services/boffAPI"
 import {
   ActionBtn,
@@ -21,7 +22,7 @@ import { BattleCard } from "../../_components/cards/BattleCard"
 import { MediaCard } from "../../_components/cards/MediaCard"
 import { useBookmark, useMe, usePost, useReact, useRetrino, useRookerUuid } from "../../_hooks/queries"
 import { useComposeStore } from "../../_stores/composeStore"
-import { fmt, fullTime } from "../../_utils/format"
+import { useFormat } from "../../_hooks/useFormat"
 
 /**
  * One trino, opened.
@@ -33,6 +34,8 @@ import { fmt, fullTime } from "../../_utils/format"
  * PostCards, because in the thread they are back to being timeline rows.
  */
 export default function TrinoPage() {
+  const t = useTranslations("rooker")
+  const { fmt, fullTime } = useFormat()
   const params = useParams<{ id: string }>()
   const id = Number(params.id)
 
@@ -47,7 +50,7 @@ export default function TrinoPage() {
   if (isLoading) {
     return (
       <div>
-        <SubHeader title="Trino" back />
+        <SubHeader title={t("post.title")} back />
         <FeedSkeleton rows={3} />
       </div>
     )
@@ -56,11 +59,11 @@ export default function TrinoPage() {
   if (isError || !data) {
     return (
       <div>
-        <SubHeader title="Trino" back />
+        <SubHeader title={t("post.title")} back />
         <EmptyState
           icon="close"
-          title="Este trino ya no está"
-          body={userMessageFrom(error, "Puede que su autor lo haya borrado.")}
+          title={t("post.notFound.title")}
+          body={userMessageFrom(error, t("post.notFound.fallbackBody"))}
         />
       </div>
     )
@@ -79,7 +82,7 @@ export default function TrinoPage() {
 
   return (
     <div>
-      <SubHeader title="Trino" back />
+      <SubHeader title={t("post.title")} back />
 
       <article className="border-b border-rk-line px-4 py-3.5">
         <div className="mb-2.5 flex items-center gap-3">
@@ -109,10 +112,10 @@ export default function TrinoPage() {
           <ReactionSummary reactions={post.counts.reactions} />
           <div className="flex gap-3.5 text-[13px] text-rk-fg-subtle">
             <span>
-              <b className="text-rk-fg">{fmt(post.counts.retrinos)}</b> Retrinos
+              <b className="text-rk-fg">{fmt(post.counts.retrinos)}</b> {t("post.stats.retrinos")}
             </span>
             <span>
-              <b className="text-rk-fg">{fmt(post.counts.replies)}</b> Respuestas
+              <b className="text-rk-fg">{fmt(post.counts.replies)}</b> {t("post.stats.replies")}
             </span>
           </div>
         </div>
@@ -120,13 +123,13 @@ export default function TrinoPage() {
         <div className="flex items-center justify-around pt-1">
           <ActionBtn
             icon="reply"
-            label="Responder"
+            label={t("post.actions.reply")}
             tone="accent"
             onClick={() => uuid && openReply({ id: post.id, handle: post.author.handle })}
           />
           <ActionBtn
             icon="retrino"
-            label={post.me.retrino ? "Deshacer retrino" : "Retrinar"}
+            label={post.me.retrino ? t("post.actions.undoRetrino") : t("post.actions.retrino")}
             tone="rt"
             active={post.me.retrino}
             fillActive={false}
@@ -139,7 +142,7 @@ export default function TrinoPage() {
           />
           <ActionBtn
             icon="bookmark"
-            label={post.me.bookmark ? "Quitar de guardados" : "Guardar"}
+            label={post.me.bookmark ? t("post.actions.unsave") : t("post.actions.save")}
             tone="accent"
             active={post.me.bookmark}
             onClick={() => uuid && bookmark.mutate(post.id)}
@@ -158,10 +161,10 @@ export default function TrinoPage() {
             onClick={() => openReply({ id: post.id, handle: post.author.handle })}
             className="flex-1 cursor-text text-left text-[16px] text-rk-fg-subtle"
           >
-            Responde a @{post.author.handle ?? name}…
+            {t("post.replyPrompt", { handle: post.author.handle ?? name })}
           </button>
           <Button intent="accent" onClick={() => openReply({ id: post.id, handle: post.author.handle })}>
-            Responder
+            {t("post.actions.reply")}
           </Button>
         </div>
       )}
@@ -173,8 +176,8 @@ export default function TrinoPage() {
       ) : (
         <EmptyState
           icon="reply"
-          title="Sin respuestas todavía"
-          body="Sé quien empiece la conversación."
+          title={t("post.noReplies.title")}
+          body={t("post.noReplies.body")}
         />
       )}
     </div>

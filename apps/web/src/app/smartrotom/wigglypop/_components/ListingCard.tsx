@@ -1,8 +1,9 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import type { WpListing } from "../_types/market.types"
-import { FORMAT_ICON, FORMAT_LABEL, fmt } from "../_utils/format"
+import { FORMAT_ICON, FORMAT_LABEL_KEY, fmt } from "../_utils/format"
 import { RARITY_HOVER, RARITY_STRIP } from "../_utils/rarity"
 import {
   Chip,
@@ -30,12 +31,13 @@ import {
  */
 
 function FormatLine({ L }: { L: WpListing }) {
+  const t = useTranslations("wigglypop")
   if (L.format === "auction") {
     return (
       <div className="flex items-center justify-between gap-1.5">
         <div>
           <div className="font-wp text-[10px] font-bold uppercase tracking-[.06em] text-wp-fg-subtle">
-            {L.bids ?? 0} {L.bids === 1 ? "puja" : "pujas"}
+            {t("common.bidsCount", { count: L.bids ?? 0 })}
           </div>
           <Price amount={L.currentBid ?? L.price} size={16} />
         </div>
@@ -49,13 +51,13 @@ function FormatLine({ L }: { L: WpListing }) {
       <div className="flex items-center justify-between gap-1.5">
         <div>
           <div className="font-wp text-[10px] font-bold uppercase tracking-[.06em] text-wp-fg-subtle">
-            Precio / oferta
+            {t("card.offerPriceLabel")}
           </div>
           <Price amount={L.price} size={16} />
         </div>
         <Chip className="border-wp-violet/35 text-wp-violet">
           <Icon name="handshake" size={12} />
-          {L.offers ?? 0} ofertas
+          {t("card.offersCountLabel", { count: L.offers ?? 0 })}
         </Chip>
       </div>
     )
@@ -65,12 +67,12 @@ function FormatLine({ L }: { L: WpListing }) {
     return (
       <div>
         <div className="mb-0.5 font-wp text-[10px] font-bold uppercase tracking-[.06em] text-wp-fg-subtle">
-          Busca
+          {t("card.seeksLabel")}
         </div>
         <div className="flex flex-wrap items-center gap-1.5 font-wp text-[12.5px] font-semibold text-wp-fg">
           <Icon name="swap" size={13} className="text-wp-teal" />
           {(L.wants ?? []).join(" · ")}
-          {L.tradePlus && <span className="text-wp-fg-subtle">+ extra</span>}
+          {L.tradePlus && <span className="text-wp-fg-subtle">{t("card.tradePlusExtra")}</span>}
         </div>
       </div>
     )
@@ -105,6 +107,7 @@ export function ListingCard({
   onWatch,
   onOpen,
 }: ListingCardProps) {
+  const t = useTranslations("wigglypop")
   const mon = L.mons[0]
   const compact = variant === "compact"
 
@@ -119,7 +122,7 @@ export function ListingCard({
         e.stopPropagation()
         onWatch()
       }}
-      aria-label={watched ? "Dejar de seguir" : "Seguir anuncio"}
+      aria-label={watched ? t("common.unwatch") : t("common.watch")}
       aria-pressed={watched}
       className={cn(
         "absolute right-2.5 top-2.5 z-[5] flex h-[34px] w-[34px] items-center justify-center rounded-wp-pill border-wp",
@@ -160,27 +163,27 @@ export function ListingCard({
                 {mon.shiny && <span className="text-wp-teal">✦ </span>}
                 {mon.name}
               </span>
-              <span className="wp-num font-wp text-[12px] text-wp-fg-subtle">Lv.{mon.level}</span>
+              <span className="wp-num font-wp text-[12px] text-wp-fg-subtle">{t("common.levelDot", { level: mon.level })}</span>
               <RarityBadge rarity={L.rarity} />
             </div>
             <div className="flex flex-wrap items-center gap-1.5">
-              {mon.types.map((t) => (
-                <TypeBadge key={t} type={t} size="sm" />
+              {mon.types.map((ty) => (
+                <TypeBadge key={ty} type={ty} size="sm" />
               ))}
               <Chip className="text-[10.5px]">{mon.nature}</Chip>
-              <span className="wp-num font-wp text-[11.5px] text-wp-fg-muted">IV {mon.ivPct}%</span>
+              <span className="wp-num font-wp text-[11.5px] text-wp-fg-muted">{t("card.ivPercent", { pct: mon.ivPct })}</span>
               <IVMeter ivs={mon.ivs} />
             </div>
             <div className="mt-1.5 flex items-center gap-2 font-wp text-[11.5px] font-semibold text-wp-fg-subtle">
               <span>{L.seller.username}</span>
-              <span>· {L.views.toLocaleString("es-ES")} vistas</span>
+              <span>· {L.views.toLocaleString("es-ES")} {t("common.viewsSuffix")}</span>
             </div>
           </div>
 
           <div className="min-w-[140px] text-right">
             <Chip className="mb-1.5 text-[10.5px]">
               <Icon name={FORMAT_ICON[L.format]} size={12} />
-              {FORMAT_LABEL[L.format]}
+              {t(FORMAT_LABEL_KEY[L.format])}
             </Chip>
             <div className="flex flex-col items-end gap-0.5">
               <Price amount={L.format === "auction" ? (L.currentBid ?? L.price) : L.price} size={18} />
@@ -212,13 +215,13 @@ export function ListingCard({
         {mon.shiny && (
           <CornerBadge tone="shiny">
             <Icon name="sparkles" size={11} />
-            SHINY
+            {t("common.shinyBadge")}
           </CornerBadge>
         )}
         {mon.legendary && (
           <CornerBadge tone="legend">
             <Icon name="crown" size={11} filled />
-            LEGENDARIO
+            {t("common.legendaryBadge")}
           </CornerBadge>
         )}
         {/* "Cómpralo ya" is the default and gets no badge — badging all four
@@ -226,7 +229,7 @@ export function ListingCard({
         {L.format !== "fixed" && (
           <CornerBadge tone="neutral">
             <Icon name={FORMAT_ICON[L.format]} size={11} />
-            {FORMAT_LABEL[L.format]}
+            {t(FORMAT_LABEL_KEY[L.format])}
           </CornerBadge>
         )}
       </div>
@@ -250,20 +253,20 @@ export function ListingCard({
             {mon.name}
           </div>
           <span className="wp-num mt-0.5 whitespace-nowrap font-wp text-[11.5px] text-wp-fg-subtle">
-            Lv.{mon.level}
+            {t("common.levelDot", { level: mon.level })}
           </span>
         </div>
 
         <div className="flex flex-wrap items-center gap-1.5">
-          {mon.types.map((t) => (
-            <TypeBadge key={t} type={t} size="sm" />
+          {mon.types.map((ty) => (
+            <TypeBadge key={ty} type={ty} size="sm" />
           ))}
           {!compact && <RarityBadge rarity={L.rarity} />}
         </div>
 
         {!compact && (
           <div className="flex items-center gap-2 font-wp text-[11.5px] font-semibold text-wp-fg-muted">
-            <span className="wp-num">IV {mon.ivPct}%</span>
+            <span className="wp-num">{t("card.ivPercent", { pct: mon.ivPct })}</span>
             <IVMeter ivs={mon.ivs} />
             <span className="ml-auto text-wp-fg-subtle">{mon.nature}</span>
           </div>

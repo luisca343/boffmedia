@@ -20,5 +20,11 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
 
   if (status === "loading" || !isAdmin) return <LoadingScreen />
 
-  return <>{children}</>
+  // Rendered only past the ROTOM_ADMIN gate above, so its presence in the DOM is proof
+  // the session was actually authorised — e2e asserts on it to catch a silent redirect.
+  return (
+    <div data-admin-surface="gobierno" className="contents">
+      {children}
+    </div>
+  )
 }

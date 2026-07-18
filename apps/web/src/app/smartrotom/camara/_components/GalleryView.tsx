@@ -56,7 +56,6 @@ export function GalleryView({ gallery, onClose, onImageClick, onDelete }: Galler
               >
                 <button
                   onClick={() => {
-                    console.log('Gallery item clicked, index:', idx)
                     onImageClick(idx)
                   }}
                   className="w-full h-full focus:outline-none focus:ring-2 focus:ring-blue-500"

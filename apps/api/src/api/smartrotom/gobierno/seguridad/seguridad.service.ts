@@ -3,6 +3,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { ActorContext, assertActsAsSelf } from '@api/_utils/auth/actor';
 import { Logger } from 'nestjs-pino';
 import { PeopleRepository } from '../_shared/people.repository';
 import { AuditoriaService } from '../_shared/auditoria.service';
@@ -105,7 +106,9 @@ export class SeguridadService {
 
   async createDenuncia(
     dto: CreateDenunciaDto,
+    actor?: ActorContext,
   ): Promise<GobiernoDenunciaEntity> {
+    assertActsAsSelf(dto.reporterUuid, actor);
     const d = await this.seguridadRepository.createDenuncia(dto);
     await this.auditoriaService.log({
       actorUuid: dto.reporterUuid,

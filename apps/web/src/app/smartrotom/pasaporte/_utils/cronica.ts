@@ -1,3 +1,4 @@
+import type { useTranslations } from "next-intl"
 import type { PasaporteLogroEntity, PasaporteProfileEntity, UserAchievement } from "@boffmedia/shared"
 import type { ChapterAccent, Milestone, MilestoneIcon } from "../_types"
 import { TIER_RANK } from "./tiers"
@@ -49,7 +50,8 @@ function lookOf(category: string): Look {
 export function milestonesFromHistory(
   achievements: UserAchievement[] = [],
   logros: PasaporteLogroEntity[] = [],
-  profile?: PasaporteProfileEntity | null,
+  profile: PasaporteProfileEntity | null | undefined,
+  t: ReturnType<typeof useTranslations>,
 ): Milestone[] {
   const milestones: Milestone[] = []
 
@@ -58,8 +60,8 @@ export function milestonesFromHistory(
     milestones.push({
       id: "llegada",
       date: arrival,
-      title: "Llegada a Teras",
-      desc: `Primer registro en ${profile.region}. Comienza la aventura.`,
+      title: t("cronica.arrival.title"),
+      desc: t("cronica.arrival.desc", { region: profile.region }),
       icon: "pin",
       accent: "teal",
     })

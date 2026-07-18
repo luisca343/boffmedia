@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import type { WpListing, WpMon } from "../../_types/market.types"
 import { fmt } from "../../_utils/format"
@@ -7,6 +8,7 @@ import { Icon, Price, Sprite, SpriteStage, TypeBadge } from "../ui"
 
 /** The thing you are about to pay for, shown once at the top of every money modal. */
 export function MonRow({ mon }: { mon: WpMon }) {
+  const t = useTranslations("wigglypop")
   return (
     <div className="flex items-center gap-3 rounded-xl border border-wp-line/24 bg-wp-panel-2 p-3">
       <SpriteStage mon={mon} dots={false} className="h-[58px] w-[58px] flex-none rounded-[10px]">
@@ -16,11 +18,11 @@ export function MonRow({ mon }: { mon: WpMon }) {
         <div className="flex items-center gap-1.5 font-wp text-[14.5px] font-bold text-wp-fg">
           {mon.shiny && <span className="text-wp-teal">✦</span>}
           {mon.name}
-          <span className="wp-num font-wp text-[12px] text-wp-fg-subtle">Lv.{mon.level}</span>
+          <span className="wp-num font-wp text-[12px] text-wp-fg-subtle">{t("common.levelDot", { level: mon.level })}</span>
         </div>
         <div className="mt-1.5 flex gap-1.5">
-          {mon.types.map((t) => (
-            <TypeBadge key={t} type={t} size="sm" />
+          {mon.types.map((ty) => (
+            <TypeBadge key={ty} type={ty} size="sm" />
           ))}
         </div>
       </div>
@@ -47,20 +49,21 @@ export function CostSummary({
   subtotal,
   fee,
   total,
-  subtotalLabel = "Subtotal",
+  subtotalLabel,
 }: {
   subtotal: number
   fee: number
   total: number
   subtotalLabel?: string
 }) {
+  const t = useTranslations("wigglypop")
   return (
     <div className="my-4 grid gap-2.5">
-      <SumLine k={subtotalLabel} v={subtotal} />
-      <SumLine k="Comisión de protección (2,5%)" v={fee} />
+      <SumLine k={subtotalLabel ?? t("modal.parts.subtotalDefault")} v={subtotal} />
+      <SumLine k={t("common.protectionFee")} v={fee} />
       <div className="my-0.5 h-px bg-wp-line/24" />
       <div className="flex items-baseline justify-between">
-        <span className="font-wp text-[15px] font-bold text-wp-fg">Total</span>
+        <span className="font-wp text-[15px] font-bold text-wp-fg">{t("common.total")}</span>
         <Price amount={total} size={20} />
       </div>
     </div>
@@ -79,6 +82,7 @@ export function WalletRow({
   balance: number | null
   insufficient: boolean
 }) {
+  const t = useTranslations("wigglypop")
   return (
     <div
       className={cn(
@@ -90,7 +94,7 @@ export function WalletRow({
     >
       <span className="flex items-center gap-2 font-wp text-[13px] font-semibold text-wp-fg-muted">
         <Icon name="dollar" size={15} />
-        Monedero Rotom
+        {t("modal.parts.walletLabel")}
       </span>
       <span
         className={cn(
@@ -106,12 +110,13 @@ export function WalletRow({
 
 /** The three-beat explainer on the escrow success screen. */
 export function EscrowSteps({ atomic }: { atomic: boolean }) {
+  const t = useTranslations("wigglypop")
   // Which story we tell depends on which custody path the server is running. Under
   // atomic custody the Pokémon has ALREADY moved by the time this renders, so
   // promising "the seller will transfer it" would be a lie.
   const steps = atomic
-    ? ["Pago retenido en depósito", "Pokémon transferido automáticamente", "Pago liberado"]
-    : ["Pago retenido en depósito", "Vendedor notificado", "Esperando la transferencia"]
+    ? [t("modal.parts.escrowHeld"), t("modal.parts.escrowAtomicTransferred"), t("modal.parts.escrowReleased")]
+    : [t("modal.parts.escrowHeld"), t("modal.parts.escrowNotified"), t("modal.parts.escrowWaiting")]
 
   return (
     <div className="my-5 grid gap-2 text-left">

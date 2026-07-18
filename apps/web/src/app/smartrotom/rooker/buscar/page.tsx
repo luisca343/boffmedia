@@ -3,11 +3,12 @@
 import { Suspense, useState } from "react"
 import Link from "next/link"
 import { useSearchParams } from "next/navigation"
+import { useTranslations } from "next-intl"
 import { EmptyState, FeedSkeleton, SearchBar, SectionTitle, Skeleton } from "../_components/ui"
 import { PostCard } from "../_components/PostCard"
 import { FollowRow } from "../_components/FollowRow"
 import { useSearch, useSuggestions, useTrends } from "../_hooks/queries"
-import { fmt } from "../_utils/format"
+import { useFormat } from "../_hooks/useFormat"
 
 /**
  * Explorar — discovery when there is no query, search results when there is.
@@ -17,6 +18,8 @@ import { fmt } from "../_utils/format"
  * on every keystroke.
  */
 function SearchInner() {
+  const t = useTranslations("rooker")
+  const { fmt } = useFormat()
   const params = useSearchParams()
   const [q, setQ] = useState(params.get("q") ?? "")
   const term = q.trim()
@@ -36,7 +39,7 @@ function SearchInner() {
       {!searchable ? (
         <>
           <div className="px-4 pb-1 pt-3.5">
-            <SectionTitle icon="trending" title="Tendencias en el nido" />
+            <SectionTitle icon="trending" title={t("search.trendsTitle")} />
           </div>
 
           {trendsLoading ? (
@@ -45,34 +48,33 @@ function SearchInner() {
               <Skeleton className="h-3 w-24" />
             </div>
           ) : trends?.length ? (
-            trends.map((t) => (
+            trends.map((trend) => (
               <Link
-                key={t.tag}
-                href={`/smartrotom/rooker/buscar?q=${encodeURIComponent(t.tag)}`}
-                onClick={() => setQ(t.tag)}
+                key={trend.tag}
+                href={`/smartrotom/rooker/buscar?q=${encodeURIComponent(trend.tag)}`}
+                onClick={() => setQ(trend.tag)}
                 className="block px-4 py-2.5 transition-colors hover:bg-rk-hover"
               >
-                <div className="text-[12px] text-rk-fg-subtle">Tendencia en el nido</div>
-                <div className="text-[15px] font-bold text-rk-fg">#{t.tag}</div>
+                <div className="text-[12px] text-rk-fg-subtle">{t("common.trendingInNest")}</div>
+                <div className="text-[15px] font-bold text-rk-fg">#{trend.tag}</div>
                 <div className="text-[12.5px] text-rk-fg-subtle">
-                  {fmt(t.posts)} {t.posts === 1 ? "trino" : "trinos"}
+                  {t("common.postsCount", { formatted: fmt(trend.posts), count: trend.posts })}
                 </div>
               </Link>
             ))
           ) : (
             <p className="px-4 pb-5 pt-1 text-[14px] leading-relaxed text-rk-fg-subtle">
-              Todavía no hay tendencias. Las #etiquetas de los trinos de los últimos siete días
-              aparecen aquí.
+              {t("search.trendsEmpty")}
             </p>
           )}
 
           <div className="border-t border-rk-line px-4 pb-1 pt-3.5">
-            <SectionTitle icon="users" title="A quién seguir" />
+            <SectionTitle icon="users" title={t("common.whoToFollow")} />
           </div>
           {suggestions?.length ? (
             suggestions.map((u) => <FollowRow key={u.uuid} user={u} />)
           ) : (
-            <p className="px-4 pb-5 pt-1 text-[14px] text-rk-fg-subtle">Ya sigues a todo el nido.</p>
+            <p className="px-4 pb-5 pt-1 text-[14px] text-rk-fg-subtle">{t("common.followedEveryone")}</p>
           )}
         </>
       ) : searching ? (
@@ -82,7 +84,7 @@ function SearchInner() {
           {results.users.length > 0 && (
             <>
               <div className="px-4 pb-1 pt-3.5">
-                <SectionTitle icon="users" title="Entrenadores" />
+                <SectionTitle icon="users" title={t("search.resultsUsersTitle")} />
               </div>
               {results.users.map((u) => (
                 <FollowRow key={u.uuid} user={u} />
@@ -93,18 +95,18 @@ function SearchInner() {
           {results.tags.length > 0 && (
             <>
               <div className="border-t border-rk-line px-4 pb-1 pt-3.5">
-                <SectionTitle icon="hash" title="Etiquetas" />
+                <SectionTitle icon="hash" title={t("search.resultsTagsTitle")} />
               </div>
-              {results.tags.map((t) => (
+              {results.tags.map((tag) => (
                 <Link
-                  key={t.tag}
-                  href={`/smartrotom/rooker/buscar?q=${encodeURIComponent(t.tag)}`}
-                  onClick={() => setQ(t.tag)}
+                  key={tag.tag}
+                  href={`/smartrotom/rooker/buscar?q=${encodeURIComponent(tag.tag)}`}
+                  onClick={() => setQ(tag.tag)}
                   className="block px-4 py-2.5 transition-colors hover:bg-rk-hover"
                 >
-                  <div className="text-[15px] font-bold text-rk-fg">#{t.tag}</div>
+                  <div className="text-[15px] font-bold text-rk-fg">#{tag.tag}</div>
                   <div className="text-[12.5px] text-rk-fg-subtle">
-                    {fmt(t.posts)} {t.posts === 1 ? "trino" : "trinos"}
+                    {t("common.postsCount", { formatted: fmt(tag.posts), count: tag.posts })}
                   </div>
                 </Link>
               ))}
@@ -114,7 +116,7 @@ function SearchInner() {
           {results.posts.length > 0 && (
             <>
               <div className="border-t border-rk-line px-4 pb-1 pt-3.5">
-                <SectionTitle icon="feather" title="Trinos" />
+                <SectionTitle icon="feather" title={t("search.resultsPostsTitle")} />
               </div>
               {results.posts.map((p, i) => (
                 <PostCard key={p.id} post={p} last={i === results.posts.length - 1} />
@@ -125,8 +127,8 @@ function SearchInner() {
       ) : (
         <EmptyState
           icon="search"
-          title={`Sin resultados para «${term}»`}
-          body="Prueba con el nombre de un entrenador, una #etiqueta o una palabra suelta."
+          title={t("search.noResults.title", { term })}
+          body={t("search.noResults.body")}
         />
       )}
     </div>

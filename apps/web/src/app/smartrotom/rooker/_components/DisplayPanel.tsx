@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, type ReactNode } from "react"
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { useRotomMode } from "@/components/smartrotom/theme/useRotomTheme"
 import { Icon, Modal } from "./ui"
@@ -63,6 +64,7 @@ function Choice<T extends string>({
 }
 
 export function DisplayPanel({ compact = false }: { compact?: boolean }) {
+  const t = useTranslations("rooker")
   const [open, setOpen] = useState(false)
   const mode = useRotomMode()
   const d = useDisplayStore()
@@ -72,7 +74,7 @@ export function DisplayPanel({ compact = false }: { compact?: boolean }) {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        aria-label="Pantalla"
+        aria-label={t("display.title")}
         className={cn(
           "text-rk-fg transition-colors hover:bg-rk-hover",
           compact
@@ -81,16 +83,16 @@ export function DisplayPanel({ compact = false }: { compact?: boolean }) {
         )}
       >
         <Icon name="settings" size={compact ? 20 : 26} stroke={2} />
-        {!compact && <span className="hidden xl:inline">Pantalla</span>}
+        {!compact && <span className="hidden xl:inline">{t("display.title")}</span>}
       </button>
 
-      <Modal open={open} onClose={() => setOpen(false)} label="Ajustes de pantalla">
+      <Modal open={open} onClose={() => setOpen(false)} label={t("display.modalLabel")}>
         <div className="flex items-center justify-between border-b border-rk-line px-4 py-3">
-          <h2 className="text-[17px] font-extrabold text-rk-fg">Pantalla</h2>
+          <h2 className="text-[17px] font-extrabold text-rk-fg">{t("display.title")}</h2>
           <button
             type="button"
             onClick={() => setOpen(false)}
-            aria-label="Cerrar"
+            aria-label={t("common.close")}
             className="grid h-8 w-8 place-items-center rounded-full text-rk-fg transition-colors hover:bg-rk-hover"
           >
             <Icon name="close" size={20} />
@@ -98,24 +100,22 @@ export function DisplayPanel({ compact = false }: { compact?: boolean }) {
         </div>
 
         <div className="rk-scroll max-h-[70vh] space-y-6 overflow-y-auto p-4">
-          <Row label="Fondo">
+          <Row label={t("display.rows.background")}>
             <Choice
               value={d.darkness}
               onChange={d.setDarkness}
               disabled={mode === "light"}
               options={[
-                { value: "dim", label: "Tenue" },
-                { value: "lightsout", label: "Oscuro" },
+                { value: "dim", label: t("display.background.options.dim") },
+                { value: "lightsout", label: t("display.background.options.lightsout") },
               ]}
             />
             <p className="text-[12.5px] leading-relaxed text-rk-fg-subtle">
-              {mode === "light"
-                ? "Estás en modo claro. El claro y el oscuro se eligen en Ajustes → Temas, para todo SmartRotom."
-                : "Elige qué tan oscuro. El cambio a claro se hace en Ajustes → Temas."}
+              {mode === "light" ? t("display.background.lightHint") : t("display.background.darkHint")}
             </p>
           </Row>
 
-          <Row label="Color de acento">
+          <Row label={t("display.rows.accent")}>
             <div className="flex gap-2.5">
               {(Object.keys(ACCENTS) as RookerAccent[]).map((key) => {
                 const on = d.accent === key
@@ -124,7 +124,7 @@ export function DisplayPanel({ compact = false }: { compact?: boolean }) {
                     key={key}
                     type="button"
                     onClick={() => d.setAccent(key)}
-                    aria-label={ACCENTS[key].label}
+                    aria-label={t(`display.accents.${key}`)}
                     aria-pressed={on}
                     // The swatch IS the accent, so its colour is a runtime value and
                     // must be inline — a `bg-rk-${key}` class would never compile (§4).
@@ -148,51 +148,50 @@ export function DisplayPanel({ compact = false }: { compact?: boolean }) {
             </div>
           </Row>
 
-          <Row label="Tipografía">
+          <Row label={t("display.rows.font")}>
             <Choice
               value={d.font}
               onChange={d.setFont}
               options={[
-                { value: "sistema", label: "Sistema" },
-                { value: "chirp", label: "Chirp" },
+                { value: "sistema", label: t("display.font.options.sistema") },
+                { value: "chirp", label: t("display.font.options.chirp") },
               ]}
             />
           </Row>
 
-          <Row label="Densidad">
+          <Row label={t("display.rows.density")}>
             <Choice
               value={d.density}
               onChange={d.setDensity}
               options={[
-                { value: "comodo", label: "Cómodo" },
-                { value: "compacto", label: "Compacto" },
+                { value: "comodo", label: t("display.density.options.comodo") },
+                { value: "compacto", label: t("display.density.options.compacto") },
               ]}
             />
           </Row>
 
-          <Row label="Estilo de trino">
+          <Row label={t("display.rows.cardStyle")}>
             <Choice
               value={d.cardStyle}
               onChange={d.setCardStyle}
               options={[
-                { value: "plano", label: "Plano" },
-                { value: "tarjeta", label: "Tarjeta" },
+                { value: "plano", label: t("display.cardStyle.options.plano") },
+                { value: "tarjeta", label: t("display.cardStyle.options.tarjeta") },
               ]}
             />
           </Row>
 
-          <Row label="Reacciones">
+          <Row label={t("display.rows.reactions")}>
             <Choice
               value={d.reactions}
               onChange={d.setReactions}
               options={[
-                { value: "expresivas", label: "Expresivas" },
-                { value: "simple", label: "Solo me gusta" },
+                { value: "expresivas", label: t("display.reactionsSetting.options.expresivas") },
+                { value: "simple", label: t("display.reactionsSetting.options.simple") },
               ]}
             />
             <p className="text-[12.5px] leading-relaxed text-rk-fg-subtle">
-              Con «Solo me gusta» desaparece la bandeja de cinco reacciones y el botón se
-              comporta como un me gusta normal.
+              {t("display.reactionsSetting.hint")}
             </p>
           </Row>
         </div>

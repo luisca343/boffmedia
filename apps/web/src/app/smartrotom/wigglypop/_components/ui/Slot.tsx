@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import type { WpMon } from "../../_types/market.types"
 import { Icon } from "./Icon"
@@ -24,6 +25,7 @@ export function Slot({
   onClick?: () => void
   className?: string
 }) {
+  const t = useTranslations("wigglypop")
   if (!mon) {
     return (
       <div
@@ -64,7 +66,7 @@ export function Slot({
         </span>
       )}
       <span className="wp-num absolute bottom-1 right-1 z-[3] rounded-[5px] bg-wp-fg/70 px-1 py-px font-wp text-[9px] text-white">
-        Lv{mon.level}
+        {t("slot.level", { level: mon.level })}
       </span>
     </button>
   )

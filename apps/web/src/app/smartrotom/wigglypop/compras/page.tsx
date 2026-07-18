@@ -2,10 +2,11 @@
 
 import { useRouter } from "next/navigation"
 import { useState } from "react"
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { userMessageFrom } from "@/services/boffAPI"
 import type { WpOrder } from "../_types/market.types"
-import { ESCROW_STEPS, ORDER_STATUS, escrowStep, fmt, timeAgo } from "../_utils/format"
+import { ESCROW_STEP_KEYS, ORDER_STATUS_STYLE, escrowStep, fmt, timeAgo } from "../_utils/format"
 import { useConfirmOrder, useOrders } from "../_hooks/queries"
 import {
   Button,
@@ -21,9 +22,9 @@ import {
 } from "../_components/ui"
 
 const TABS = [
-  { key: "todas", label: "Todas" },
-  { key: "activas", label: "En curso" },
-  { key: "completadas", label: "Completadas" },
+  { key: "todas", labelKey: "compras.tabAll" },
+  { key: "activas", labelKey: "compras.tabActive" },
+  { key: "completadas", labelKey: "compras.tabCompleted" },
 ] as const
 
 type Tab = (typeof TABS)[number]["key"]
@@ -38,6 +39,7 @@ type Tab = (typeof TABS)[number]["key"]
  * handed the Pokémon over.
  */
 export default function OrdersPage() {
+  const t = useTranslations("wigglypop")
   const [tab, setTab] = useState<Tab>("todas")
   const { data: orders, isLoading, error } = useOrders()
 
@@ -58,19 +60,19 @@ export default function OrdersPage() {
         <div className="min-w-[240px] flex-1">
           <h1 className="flex items-center gap-2.5 whitespace-nowrap font-wp-display text-[21px] font-semibold text-wp-fg">
             <Icon name="history" size={20} className="text-wp-accent" />
-            Mis compras
+            {t("compras.title")}
           </h1>
           <p className="mt-0.5 font-wp text-[12.5px] font-semibold text-wp-fg-subtle">
-            <span className="wp-num">{all.length}</span> pedidos ·{" "}
-            <span className="wp-num">₽{fmt(spent)}</span> gastado
+            <span className="wp-num">{all.length}</span> {t("compras.subtitleOrders")} ·{" "}
+            <span className="wp-num">₽{fmt(spent)}</span> {t("compras.subtitleSpent")}
           </p>
         </div>
-        <Tabs tabs={TABS} value={tab} onChange={setTab} />
+        <Tabs tabs={TABS.map((tb) => ({ ...tb, label: t(tb.labelKey) }))} value={tab} onChange={setTab} />
       </div>
 
       <div className="wp-scroll min-h-0 flex-1 overflow-y-auto px-[30px] pb-10 pt-5">
         {error ? (
-          <EmptyState icon="alert" title="No se pudieron cargar tus pedidos" body={userMessageFrom(error, "Inténtalo de nuevo en unos segundos.")} />
+          <EmptyState icon="alert" title={t("compras.errorTitle")} body={userMessageFrom(error, t("common.retryFallback"))} />
         ) : isLoading ? (
           <div className="grid max-w-[880px] gap-3.5">
             {Array.from({ length: 3 }).map((_, i) => (
@@ -80,8 +82,8 @@ export default function OrdersPage() {
         ) : filtered.length === 0 ? (
           <EmptyState
             icon="history"
-            title="Sin pedidos aquí"
-            body="Cuando compres algo aparecerá aquí su seguimiento de depósito."
+            title={t("compras.emptyTitle")}
+            body={t("compras.emptyBody")}
           />
         ) : (
           <div className="grid max-w-[880px] gap-3.5">
@@ -96,9 +98,10 @@ export default function OrdersPage() {
 }
 
 function OrderCard({ order: o }: { order: WpOrder }) {
+  const t = useTranslations("wigglypop")
   const router = useRouter()
   const confirm = useConfirmOrder()
-  const st = ORDER_STATUS[o.status]
+  const st = ORDER_STATUS_STYLE[o.status]
   const step = escrowStep(o.status)
   const refunded = step === -1
 
@@ -113,14 +116,14 @@ function OrderCard({ order: o }: { order: WpOrder }) {
             st.bg,
           )}
         >
-          {st.label}
+          {t(st.key)}
         </span>
         <span className="font-wp text-[12px] font-semibold text-wp-fg-subtle">
           {timeAgo(o.createdAt)}
         </span>
         <div className="ml-auto flex items-center gap-1.5">
           <span className="font-wp text-[11.5px] font-semibold text-wp-fg-subtle">
-            {o.lines.length} línea{o.lines.length !== 1 ? "s" : ""} ·
+            {t("compras.linesCount", { count: o.lines.length })} ·
           </span>
           <Price amount={o.total} size={17} />
         </div>
@@ -156,7 +159,7 @@ function OrderCard({ order: o }: { order: WpOrder }) {
                     <span className="font-semibold text-wp-fg-subtle"> ×{l.qty}</span>
                   )}
                   {mon && (
-                    <span className="wp-num font-semibold text-wp-fg-subtle"> · Lv.{mon.level}</span>
+                    <span className="wp-num font-semibold text-wp-fg-subtle"> · {t("common.levelDot", { level: mon.level })}</span>
                   )}
                 </div>
                 <div className="font-wp text-[11.5px] font-semibold text-wp-fg-subtle">
@@ -172,16 +175,16 @@ function OrderCard({ order: o }: { order: WpOrder }) {
       {refunded ? (
         <div className="flex items-center gap-2 rounded-xl border border-wp-rose/25 bg-wp-rose/[.08] px-3.5 py-3 font-wp text-[12.5px] font-semibold text-wp-fg-muted">
           <Icon name="arrowL" size={15} className="text-wp-rose" />
-          Depósito reembolsado a tu monedero.
+          {t("compras.refundedNote")}
         </div>
       ) : (
         <div className="flex items-center gap-3.5 rounded-xl border border-wp-line/24 bg-wp-panel-2 px-3.5 py-3">
-          <Stepper steps={ESCROW_STEPS} current={step} className="flex-1" />
+          <Stepper steps={ESCROW_STEP_KEYS.map((k) => t(k))} current={step} className="flex-1" />
           <div className="flex-none">
             {o.status === "escrow" && (
               <span className="flex items-center gap-1.5 font-wp text-[12px] font-semibold text-wp-fg-subtle">
                 <Icon name="clock" size={14} />
-                Esperando al vendedor
+                {t("compras.waitingSeller")}
               </span>
             )}
             {o.status === "transferido" && (
@@ -192,13 +195,13 @@ function OrderCard({ order: o }: { order: WpOrder }) {
                 onClick={() => confirm.mutate(o.id)}
               >
                 <Icon name="check" size={15} />
-                {confirm.isPending ? "Liberando…" : "Confirmar recepción"}
+                {confirm.isPending ? t("compras.releasing") : t("compras.confirmButton")}
               </Button>
             )}
             {o.status === "completado" && (
               <span className="flex items-center gap-1.5 font-wp text-[12px] font-bold text-wp-green">
                 <Icon name="shieldCheck" size={15} />
-                Pago liberado
+                {t("compras.paymentReleased")}
               </span>
             )}
           </div>

@@ -42,8 +42,6 @@ export type ChapterKey =
 
 export interface Chapter {
   key: ChapterKey
-  /** Inked on the page head and on the rail. Spanish — it is what the reader reads. */
-  label: string
   /** Feed it to `chapterVars()` on the chapter's root; the pair cascades from there. */
   accent: ChapterAccent
   /**
@@ -113,7 +111,6 @@ export interface Milestone {
 /** A movement row on the Identidad spread: five distances and one count. */
 export interface MovementRow {
   key: string
-  label: string
   value: number
   unit: "km" | "n"
 }

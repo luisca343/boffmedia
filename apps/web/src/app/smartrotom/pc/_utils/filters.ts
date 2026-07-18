@@ -1,7 +1,7 @@
 import type { Pokemon } from "@/types/Pokemon"
 import type { Mon, PokemonFilter, Sort } from "../_types/pc.types"
 import type { PcMarkMap } from "./marks"
-import { displayName, hasItem, isLegendary, isShiny, totalIv, typesOf } from "./derive"
+import { displayName, genderOf, hasItem, isLegendary, isShiny, totalIv, typesOf } from "./derive"
 
 /** Does any filter or search term actually narrow anything? */
 export function hasAnyFilter(f: PokemonFilter, search: string): boolean {
@@ -34,7 +34,9 @@ export function matches(m: Mon, f: PokemonFilter, search: string, ctx: MatchCtx)
   if (f.isShiny && !isShiny(p)) return false
   if (f.isLegendary && !isLegendary(p)) return false
   if (f.hasItem && !hasItem(p)) return false
-  if (f.gender && (p.gender ?? "genderless").toLowerCase() !== f.gender) return false
+  // Via genderOf, so the filter agrees with what the card renders: anything that
+  // is not male/female (""/"None"/undefined) is genderless in both places.
+  if (f.gender && genderOf(p) !== f.gender) return false
   if (f.nature && p.nature !== f.nature) return false
   if (f.ability && p.ability !== f.ability) return false
 

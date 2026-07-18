@@ -2,12 +2,13 @@
 
 import Link from "next/link"
 import { useQuery } from "@tanstack/react-query"
+import { useTranslations } from "next-intl"
 import type { Chat } from "@boffmedia/shared"
 import { ChatAppService } from "@/services/api/smartrotom/chatAppService"
 import { cn } from "@/lib/utils"
 import { Avatar, Button, EmptyState, FeedSkeleton, Icon, SubHeader } from "../_components/ui"
 import { useRookerUuid } from "../_hooks/queries"
-import { relTime } from "../_utils/format"
+import { useFormat } from "../_hooks/useFormat"
 
 /**
  * Mensajes.
@@ -25,13 +26,15 @@ import { relTime } from "../_utils/format"
 const DIRECT = 2
 
 export default function MensajesPage() {
+  const t = useTranslations("rooker")
+  const { relTime } = useFormat()
   const uuid = useRookerUuid()
 
   const { data: chats, isLoading } = useQuery({
     queryKey: ["rooker", "dms", uuid],
     queryFn: async () => {
       const res = await ChatAppService.getChats(uuid!)
-      if (!res.success || !res.data) throw new Error(res.userMessage ?? "No se pudieron cargar los mensajes")
+      if (!res.success || !res.data) throw new Error(res.userMessage ?? t("messages.loadError"))
       return res.data.filter((c) => c.type === DIRECT)
     },
     enabled: Boolean(uuid),
@@ -40,8 +43,8 @@ export default function MensajesPage() {
   if (!uuid) {
     return (
       <div>
-        <SubHeader title="Mensajes" />
-        <EmptyState icon="mail" title="Inicia sesión" body="Tus conversaciones aparecerán aquí." />
+        <SubHeader title={t("messages.title")} />
+        <EmptyState icon="mail" title={t("common.loginRequiredTitle")} body={t("messages.loggedOutBody")} />
       </div>
     )
   }
@@ -49,12 +52,12 @@ export default function MensajesPage() {
   return (
     <div>
       <SubHeader
-        title="Mensajes"
-        subtitle="Tus conversaciones de ChatApp"
+        title={t("messages.title")}
+        subtitle={t("messages.subtitle")}
         right={
           <Link
             href="/smartrotom/chatapp"
-            aria-label="Abrir ChatApp"
+            aria-label={t("messages.openChatApp")}
             className="grid h-[34px] w-[34px] place-items-center rounded-full text-rk-accent transition-colors hover:bg-rk-accent/12"
           >
             <Icon name="compose" size={19} />
@@ -84,7 +87,7 @@ export default function MensajesPage() {
               <Avatar
                 user={{
                   uuid: other?.uuid ?? "",
-                  username: other?.username ?? chat.name ?? "Entrenador",
+                  username: other?.username ?? chat.name ?? t("messages.fallbackUsername"),
                   partnerPokemonId: null,
                 }}
                 size={46}
@@ -104,7 +107,7 @@ export default function MensajesPage() {
                     unread ? "font-semibold text-rk-fg" : "text-rk-fg-subtle",
                   )}
                 >
-                  {last?.content || "Sin mensajes todavía"}
+                  {last?.content || t("messages.noMessagesYet")}
                 </p>
               </div>
               {unread && <span className="h-2.5 w-2.5 flex-none rounded-full bg-rk-accent" />}
@@ -114,11 +117,11 @@ export default function MensajesPage() {
       ) : (
         <EmptyState
           icon="mail"
-          title="Sin conversaciones"
-          body="Los mensajes directos del servidor viven en ChatApp. Empieza una conversación allí y la verás aquí."
+          title={t("messages.empty.title")}
+          body={t("messages.empty.body")}
           action={
             <Link href="/smartrotom/chatapp">
-              <Button intent="accent">Abrir ChatApp</Button>
+              <Button intent="accent">{t("messages.openChatApp")}</Button>
             </Link>
           }
         />
