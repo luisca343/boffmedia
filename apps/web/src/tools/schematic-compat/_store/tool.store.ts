@@ -9,6 +9,7 @@ import type {
 import type { GameId } from "../_lib/adapters";
 
 export type PreviewMode = "source" | "result" | "converted";
+export type NavMode = "orbit" | "fly";
 
 interface ResolutionChoice {
   targetId: string;
@@ -57,6 +58,9 @@ interface ToolState {
   // "converted"→ changed blocks rendered with their target texture + highlighted,
   //              unchanged blocks ghosted so the conversion result stands out.
   previewMode: PreviewMode;
+  // "orbit" → drag-to-orbit around the build; "fly" → spectator-style free
+  // flight (pointer lock + WASD). Esc / F drop back to orbit.
+  navMode: NavMode;
 
   // UI state.
   isLoadingSource: boolean;
@@ -91,6 +95,7 @@ interface ToolState {
   setLayerY: (y: number) => void;
   setHideUnchanged: (v: boolean) => void;
   setPreviewMode: (m: PreviewMode) => void;
+  setNavMode: (m: NavMode) => void;
   reset: () => void;
 }
 
@@ -110,6 +115,7 @@ export const useToolStore = create<ToolState>((set) => ({
   layerY: 0,
   hideUnchanged: false,
   previewMode: "source",
+  navMode: "orbit",
 
   setSourceGame: (g) =>
     set((state) =>
@@ -160,6 +166,7 @@ export const useToolStore = create<ToolState>((set) => ({
   setLayerY: (y) => set({ layerY: y }),
   setHideUnchanged: (v) => set({ hideUnchanged: v }),
   setPreviewMode: (m) => set({ previewMode: m }),
+  setNavMode: (m) => set({ navMode: m }),
   reset: () =>
     set({
       sourceReg: undefined,
@@ -178,5 +185,6 @@ export const useToolStore = create<ToolState>((set) => ({
       layerY: 0,
       hideUnchanged: false,
       previewMode: "source",
+      navMode: "orbit",
     }),
 }));

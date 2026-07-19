@@ -169,7 +169,13 @@
           "resultCaption": "Vista del resultado convertido",
           "selectedHighlighted": "Bloque seleccionado resaltado",
           "clickToInspect": "Click en un bloque para inspeccionar",
-          "emptyCaption": "Vista 3D del esquema · WebGL"
+          "emptyCaption": "Vista 3D del esquema · WebGL",
+          "navOrbit": "Órbita",
+          "navFly": "Vuelo",
+          "navOrbitHint": "Navegación orbital (F)",
+          "navFlyHint": "Vuelo espectador (F)",
+          "flyClickToStart": "Haz clic para tomar el control",
+          "flyControlsHint": "WASD moverse · Espacio/Mayús subir/bajar · Rueda velocidad · Esc salir"
         },
         "export": {
           "title": "Exportar",

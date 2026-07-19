@@ -196,15 +196,17 @@ const api: CompatWorkerAPI = {
   },
 
   async getSchematicBlockPositions(schematicId: string): Promise<BlockPositionGroup[]> {
-    // Past this many *renderable* (non-air) blocks we drop fully-enclosed interior
-    // cells and keep only the visible surface — a 500³ solid build is 125M blocks
-    // but only ~1.5M surface cells, so this is what makes very large schematics
-    // both fit in memory and render as a recognisable shape instead of a decimated
-    // point cloud. Below it, every block is kept so the Y-layer slider can peel
-    // through solid interiors.
+    // Every cell is classified as surface (≥1 open neighbour / volume edge) or
+    // interior (fully enclosed). Surface cells always render; interior cells go
+    // into a separate per-group array the viewer only draws at the active
+    // Y-slice, which is the only moment slicing can expose them. Past this many
+    // *renderable* (non-air) blocks, interiors are dropped entirely — a 500³
+    // solid build is 125M blocks but only ~1.5M surface cells, so this is what
+    // makes very large schematics fit in memory at all (the layer slider then
+    // shows a hollow shell, the accepted trade-off for that size).
     const CULL_THRESHOLD = 1_500_000;
-    // Hard cap on instances handed to the GPU; if the surface itself is larger we
-    // stride within each block group as a last resort.
+    // Hard cap on always-rendered instances handed to the GPU; if the surface
+    // itself is larger we stride within each block group as a last resort.
     const MAX_INSTANCES = 2_000_000;
 
     const structure = schematics.get(schematicId);
@@ -224,24 +226,25 @@ const api: CompatWorkerAPI = {
     // airFlags lookup → NaN-ish, so `!== 0` covers both air and out-of-range).
     const open = (li: number): boolean => airFlags[data[li]] !== 0;
     // A cell is on the visible surface when it touches the volume edge or any of
-    // its six neighbours is open. Interior cells (all neighbours solid) are hidden
-    // anyway, so dropping them changes nothing you could see from outside.
+    // its six neighbours is open.
     const exposed = (xi: number, yi: number, zi: number, li: number): boolean =>
       xi === 0 || yi === 0 || zi === 0 || xi === sx - 1 || yi === sy - 1 || zi === sz - 1 ||
       open(li - 1) || open(li + 1) ||
       open(li - sx) || open(li + sx) ||
       open(li - sxsz) || open(li + sxsz);
 
-    // Pass A — count renderable blocks; decides whether interior culling kicks in.
+    // Pass A — count renderable blocks; decides whether interiors are dropped.
     let nonAir = 0;
     for (let li = 0; li < data.length; li++) {
       if (airFlags[data[li]] === 0) nonAir++;
     }
-    const cull = nonAir > CULL_THRESHOLD;
+    const keepInterior = nonAir <= CULL_THRESHOLD;
 
-    // Pass B — count kept instances per palette index (Y-outer so the fill pass
-    // writes Y-sorted positions, which the UI's layer cutoff binary-searches).
-    const counts = new Uint32Array(palLen);
+    // Pass B — count surface/interior instances per palette index (Y-outer so
+    // the fill pass writes Y-sorted positions, which the UI binary-searches for
+    // both the layer cutoff and the interior slice window).
+    const surfCounts = new Uint32Array(palLen);
+    const intCounts = new Uint32Array(palLen);
     for (let yi = 0; yi < sy; yi++) {
       for (let zi = 0; zi < sz; zi++) {
         const row = (yi * sz + zi) * sx;
@@ -249,23 +252,26 @@ const api: CompatWorkerAPI = {
           const li = row + xi;
           const pi = data[li];
           if (airFlags[pi] !== 0) continue; // air / invalid
-          if (cull && !exposed(xi, yi, zi, li)) continue;
-          counts[pi]++;
+          if (exposed(xi, yi, zi, li)) surfCounts[pi]++;
+          else if (keepInterior) intCounts[pi]++;
         }
       }
     }
 
     let total = 0;
-    for (let i = 0; i < palLen; i++) total += counts[i];
+    for (let i = 0; i < palLen; i++) total += surfCounts[i];
     const stride = total > MAX_INSTANCES ? Math.ceil(total / MAX_INSTANCES) : 1;
 
     // Exact-size typed arrays, no boxed number[][] intermediates (the old path
     // allocated ~3 JS numbers per block — gigabytes on a large solid schematic).
-    const buffers: (Float32Array | null)[] = new Array(palLen).fill(null);
+    const surfBufs: (Float32Array | null)[] = new Array(palLen).fill(null);
+    const intBufs: (Float32Array | null)[] = new Array(palLen).fill(null);
     for (let i = 0; i < palLen; i++) {
-      if (counts[i] > 0) buffers[i] = new Float32Array(counts[i] * 3);
+      if (surfCounts[i] > 0) surfBufs[i] = new Float32Array(surfCounts[i] * 3);
+      if (intCounts[i] > 0) intBufs[i] = new Float32Array(intCounts[i] * 3);
     }
-    const cursor = new Uint32Array(palLen);
+    const surfCursor = new Uint32Array(palLen);
+    const intCursor = new Uint32Array(palLen);
 
     // Pass C — fill positions.
     for (let yi = 0; yi < sy; yi++) {
@@ -275,34 +281,47 @@ const api: CompatWorkerAPI = {
           const li = row + xi;
           const pi = data[li];
           if (airFlags[pi] !== 0) continue;
-          if (cull && !exposed(xi, yi, zi, li)) continue;
-          const buf = buffers[pi]!;
-          const c = cursor[pi];
+          let buf: Float32Array;
+          let c: number;
+          if (exposed(xi, yi, zi, li)) {
+            buf = surfBufs[pi]!;
+            c = surfCursor[pi];
+            surfCursor[pi] = c + 3;
+          } else if (keepInterior) {
+            buf = intBufs[pi]!;
+            c = intCursor[pi];
+            intCursor[pi] = c + 3;
+          } else continue;
           buf[c] = xi;
           buf[c + 1] = yi;
           buf[c + 2] = zi;
-          cursor[pi] = c + 3;
         }
       }
     }
 
     const groups: BlockPositionGroup[] = [];
     for (let i = 0; i < palLen; i++) {
-      const buf = buffers[i];
-      if (!buf || buf.length === 0) continue;
-      let positions = buf;
-      if (stride > 1) {
-        const n = buf.length / 3;
+      const surf = surfBufs[i];
+      const interior = intBufs[i];
+      if (!surf && !interior) continue;
+      let positions = surf ?? new Float32Array(0);
+      if (surf && stride > 1) {
+        const n = surf.length / 3;
         const kept = new Float32Array(Math.ceil(n / stride) * 3);
         let w = 0;
         for (let j = 0; j < n; j += stride) {
-          kept[w++] = buf[j * 3];
-          kept[w++] = buf[j * 3 + 1];
-          kept[w++] = buf[j * 3 + 2];
+          kept[w++] = surf[j * 3];
+          kept[w++] = surf[j * 3 + 1];
+          kept[w++] = surf[j * 3 + 2];
         }
         positions = kept;
       }
-      groups.push({ paletteIndex: i, block: structure.palette[i], positions });
+      groups.push({
+        paletteIndex: i,
+        block: structure.palette[i],
+        positions,
+        ...(interior ? { interiorPositions: interior } : {}),
+      });
     }
     return groups;
   },
