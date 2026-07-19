@@ -169,7 +169,13 @@
           "resultCaption": "Converted result view",
           "selectedHighlighted": "Selected block highlighted",
           "clickToInspect": "Click a block to inspect",
-          "emptyCaption": "3D schematic view · WebGL"
+          "emptyCaption": "3D schematic view · WebGL",
+          "navOrbit": "Orbit",
+          "navFly": "Fly",
+          "navOrbitHint": "Orbit navigation (F)",
+          "navFlyHint": "Spectator flight (F)",
+          "flyClickToStart": "Click to take control",
+          "flyControlsHint": "WASD move · Space/Shift up/down · Scroll speed · Esc exit"
         },
         "export": {
           "title": "Export",

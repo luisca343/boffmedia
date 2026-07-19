@@ -1,10 +1,11 @@
 "use client";
 
-import { useRef, useEffect, useMemo, useCallback, useState } from "react";
-import { Canvas, useThree } from "@react-three/fiber";
-import { OrbitControls } from "@react-three/drei";
+import { Fragment, useRef, useEffect, useMemo, useCallback, useState } from "react";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
+import { Grid, OrbitControls, PointerLockControls } from "@react-three/drei";
 import * as THREE from "three";
-import { useToolStore } from "../../_store/tool.store";
+import { useTranslations } from "next-intl";
+import { useToolStore, type NavMode } from "../../_store/tool.store";
 import { placeholderColor } from "../../_lib/textures/blockTexture";
 import { fluidColor } from "../../_lib/pipeline/fluid";
 import { useModTextureLoader, useModelLoader, useConnectionsLoader } from "../../_hooks/modTextureContext";
@@ -12,6 +13,14 @@ import { getBlockTexture } from "./blockTextureCache";
 import { useBlockModel } from "./useBlockModel";
 import type { BuiltModel } from "./blockModelCache";
 import { sourcePlan, convertedPlan, resultPlan, type RenderKind } from "./previewPlan";
+import {
+  buildPickIndex,
+  cutoffCount,
+  ddaPick,
+  maxSliceCount,
+  sliceRange,
+  type PickIndex,
+} from "./picking";
 import type { BlockPositionGroup, DiffEntry, BlockDefinition, UnifiedBlock } from "../../_lib/types";
 import type { CompiledModel } from "../../_lib/model/types";
 import type { GameId } from "../../_lib/adapters/game-adapter";
@@ -97,6 +106,18 @@ function useBlockTexture(
   return tex;
 }
 
+/** DOM nodes the fly HUD writes into directly — no React re-render per frame. */
+interface FlyHudRefs {
+  pos: React.RefObject<HTMLSpanElement | null>;
+  look: React.RefObject<HTMLSpanElement | null>;
+  speed: React.RefObject<HTMLSpanElement | null>;
+}
+
+// Frame-loop scratch vectors (module-level to avoid per-frame allocation).
+const V_DIR = new THREE.Vector3();
+const V_RIGHT = new THREE.Vector3();
+const V_WISH = new THREE.Vector3();
+
 // ─── Per-render-kind material styling ─────────────────────────────────────────
 
 const CHANGED_GLOW = "#22c55e"; // green — this block was converted
@@ -175,57 +196,76 @@ function makeMaterial(
 
 // ─── Shared instance-matrix plumbing ─────────────────────────────────────────
 
+function writeTranslation(mat: Float32Array, slot: number, positions: Float32Array, src: number) {
+  const b = slot * 16;
+  mat[b]      = 1; mat[b + 1]  = 0; mat[b + 2]  = 0; mat[b + 3]  = 0;
+  mat[b + 4]  = 0; mat[b + 5]  = 1; mat[b + 6]  = 0; mat[b + 7]  = 0;
+  mat[b + 8]  = 0; mat[b + 9]  = 0; mat[b + 10] = 1; mat[b + 11] = 0;
+  mat[b + 12] = positions[src];
+  mat[b + 13] = positions[src + 1];
+  mat[b + 14] = positions[src + 2];
+  mat[b + 15] = 1;
+}
+
 /**
- * Write per-instance translation matrices and apply the Y-layer cutoff. Worker
- * positions are Y-sorted, so the cutoff is a binary search rather than a scan.
- * Re-runs (rewriting matrices) whenever the mesh is recreated — e.g. when a
- * block swaps from the cube fallback to its compiled model.
+ * Write per-instance translation matrices and apply the Y-layer visibility rule.
+ * Worker positions are Y-sorted, so cutoffs are binary searches, not scans.
+ *  - surface (slice=false): matrices written once per mesh identity; the cutoff
+ *    effect trims `count` to cells with y ≤ maxLayerY.
+ *  - interior (slice=true): only the y === maxLayerY window is ever visible
+ *    (that's the moment slicing exposes an enclosed cell), so its matrices are
+ *    rewritten on each layer change — at most one Y-plane, so the rewrite is
+ *    tiny. `capacity` is the largest such window (see maxSliceCount).
+ * Re-runs whenever the mesh is recreated (meshEpoch) — e.g. when a block swaps
+ * from the cube fallback to its compiled model.
  */
 function useInstanceMatrices(
   meshRef: React.RefObject<THREE.InstancedMesh | null>,
   positions: Float32Array,
-  maxCount: number,
+  capacity: number,
   maxLayerY: number,
   meshEpoch: unknown,
+  slice: boolean,
 ) {
   useEffect(() => {
     const mesh = meshRef.current;
-    if (!mesh || maxCount === 0) return;
+    if (slice || !mesh || capacity === 0) return;
     const mat = mesh.instanceMatrix.array as Float32Array;
-    for (let i = 0; i < maxCount; i++) {
-      const x = positions[i * 3];
-      const y = positions[i * 3 + 1];
-      const z = positions[i * 3 + 2];
-      const b = i * 16;
-      mat[b]    = 1; mat[b+1]  = 0; mat[b+2]  = 0; mat[b+3]  = 0;
-      mat[b+4]  = 0; mat[b+5]  = 1; mat[b+6]  = 0; mat[b+7]  = 0;
-      mat[b+8]  = 0; mat[b+9]  = 0; mat[b+10] = 1; mat[b+11] = 0;
-      mat[b+12] = x; mat[b+13] = y; mat[b+14] = z; mat[b+15] = 1;
-    }
+    for (let i = 0; i < capacity; i++) writeTranslation(mat, i, positions, i * 3);
     mesh.instanceMatrix.needsUpdate = true;
-    mesh.count = maxCount;
+    mesh.count = capacity;
     // meshEpoch is in deps so matrices are rewritten when the mesh is recreated.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [positions, maxCount, meshEpoch]);
+  }, [positions, capacity, slice, meshEpoch]);
 
   useEffect(() => {
     const mesh = meshRef.current;
-    if (!mesh || maxCount === 0) return;
-    let lo = 0, hi = maxCount - 1, last = -1;
-    while (lo <= hi) {
-      const mid = (lo + hi) >> 1;
-      if (positions[mid * 3 + 1] <= maxLayerY) { last = mid; lo = mid + 1; }
-      else hi = mid - 1;
-    }
-    mesh.count = last + 1;
+    if (slice || !mesh || capacity === 0) return;
+    mesh.count = cutoffCount(positions, maxLayerY);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [maxLayerY, positions, maxCount, meshEpoch]);
+  }, [maxLayerY, positions, capacity, slice, meshEpoch]);
+
+  useEffect(() => {
+    const mesh = meshRef.current;
+    if (!slice || !mesh || capacity === 0) return;
+    const [first, len] = sliceRange(positions, maxLayerY);
+    const count = Math.min(len, capacity);
+    const mat = mesh.instanceMatrix.array as Float32Array;
+    for (let i = 0; i < count; i++) writeTranslation(mat, i, positions, (first + i) * 3);
+    mesh.count = count;
+    mesh.instanceMatrix.needsUpdate = true;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [maxLayerY, positions, capacity, slice, meshEpoch]);
 }
 
 // ─── Per-block-type instanced mesh ────────────────────────────────────────────
 
 interface BlockInstancesProps {
   group: BlockPositionGroup;
+  /** Position triples this mesh renders — the group's surface set or its interior set. */
+  positions: Float32Array;
+  /** True when rendering the interior set (only the active Y-slice ever shows). */
+  slice: boolean;
   /** Block id whose model/texture to render (may differ from the group's source id). */
   textureId: string;
   /** Blockstate properties driving the model (empty for converted target blocks). */
@@ -247,6 +287,9 @@ interface BlockInstancesProps {
 /** Fallback: a single-texture cube (modded blocks, or while a model loads). */
 function CubeInstances({
   group,
+  positions,
+  slice,
+  capacity,
   textureId,
   kind,
   isSelected,
@@ -255,13 +298,12 @@ function CubeInstances({
   registryId,
   modLoader,
   onSelect,
-}: BlockInstancesProps) {
+}: BlockInstancesProps & { capacity: number }) {
   const meshRef = useRef<THREE.InstancedMesh>(null);
-  const maxCount = group.positions.length / 3;
-  useInstanceMatrices(meshRef, group.positions, maxCount, maxLayerY, "cube");
+  useInstanceMatrices(meshRef, positions, capacity, maxLayerY, "cube", slice);
 
   const texture = useBlockTexture(textureId, version, registryId, modLoader);
-  if (maxCount === 0) return null;
+  if (capacity === 0) return null;
   const sp = styleParams(kind, isSelected);
 
   // Fluids (Minecraft water/lava, Hytale Fluid_*) have no usable cube texture —
@@ -281,12 +323,15 @@ function CubeInstances({
   return (
     <instancedMesh
       ref={meshRef}
-      args={[undefined, undefined, maxCount]}
+      args={[undefined, undefined, capacity]}
       // Instances are spread across the schematic, but the bounding sphere is
       // origin-centred — leave culling off so a block-type never vanishes when
       // its (tiny, origin-based) sphere leaves the frustum.
       frustumCulled={false}
       onClick={(e) => {
+        // Fly mode selects via the crosshair voxel walk; pointer coords are
+        // frozen under pointer lock, so cursor-based picking would misfire.
+        if (useToolStore.getState().navMode === "fly") return;
         e.stopPropagation();
         onSelect(group.block.id);
       }}
@@ -312,17 +357,19 @@ function CubeInstances({
 /** Real Minecraft geometry: compiled model geometry + one material per face group. */
 function ModelInstances({
   group,
+  positions,
+  slice,
+  capacity,
   built,
   textureId,
   kind,
   isSelected,
   maxLayerY,
   onSelect,
-}: { built: BuiltModel } & Omit<BlockInstancesProps, "states" | "version" | "registryId" | "modLoader" | "modelLoader">) {
+}: { built: BuiltModel; capacity: number } & Omit<BlockInstancesProps, "states" | "version" | "registryId" | "modLoader" | "modelLoader">) {
   const meshRef = useRef<THREE.InstancedMesh>(null);
-  const maxCount = group.positions.length / 3;
   // Recreate the mesh (and rewrite matrices) when geometry identity changes.
-  useInstanceMatrices(meshRef, group.positions, maxCount, maxLayerY, built.geometry);
+  useInstanceMatrices(meshRef, positions, capacity, maxLayerY, built.geometry, slice);
 
   const materials = useMemo(() => {
     const sp = styleParams(kind, isSelected);
@@ -331,12 +378,12 @@ function ModelInstances({
 
   useEffect(() => () => materials.forEach((m) => m.dispose()), [materials]);
 
-  if (maxCount === 0) return null;
+  if (capacity === 0) return null;
 
   return (
     <instancedMesh
       ref={meshRef}
-      args={[undefined, undefined, maxCount]}
+      args={[undefined, undefined, capacity]}
       geometry={built.geometry}
       material={materials}
       // Origin-centred bounding sphere ignores instance spread — keep culling off
@@ -347,6 +394,8 @@ function ModelInstances({
       // instance never disposes the shared cached geometry.
       dispose={null}
       onClick={(e) => {
+        // See CubeInstances — fly mode picks via the crosshair, not the cursor.
+        if (useToolStore.getState().navMode === "fly") return;
         e.stopPropagation();
         onSelect(group.block.id);
       }}
@@ -368,11 +417,17 @@ function BlockInstances(props: BlockInstancesProps) {
   const textureId = override?.id ?? props.textureId;
   const states = override?.states ?? props.states;
   const built = useBlockModel(textureId, states, props.version, props.registryId, props.modelLoader);
+  // Interior meshes only ever draw one Y-plane, so their GPU buffer is sized to
+  // the largest plane, not the whole set.
+  const capacity = useMemo(
+    () => (props.slice ? maxSliceCount(props.positions) : props.positions.length / 3),
+    [props.slice, props.positions],
+  );
   if (built) {
     const { states: _s, version: _v, registryId: _r, modLoader: _m, modelLoader: _ml, ...rest } = props;
-    return <ModelInstances {...rest} textureId={textureId} built={built} />;
+    return <ModelInstances {...rest} capacity={capacity} textureId={textureId} built={built} />;
   }
-  return <CubeInstances {...props} textureId={textureId} />;
+  return <CubeInstances {...props} capacity={capacity} textureId={textureId} />;
 }
 
 // ─── Camera initial placement ─────────────────────────────────────────────────
@@ -398,7 +453,172 @@ function CameraRig({ dimensions }: { dimensions: { x: number; y: number; z: numb
   return null;
 }
 
+// ─── Spectator flight rig ─────────────────────────────────────────────────────
+
+interface FlyRigProps {
+  span: number;
+  pickIndex: PickIndex | null;
+  lockSelector: string;
+  hud: FlyHudRefs;
+  onPick: (blockId: string | null) => void;
+  onLockChange: (locked: boolean) => void;
+}
+
+/**
+ * Minecraft-spectator navigation: pointer-lock mouse look, WASD along the view
+ * direction (forward follows pitch, like spectator), Space/Shift for world
+ * up/down, scroll to scale flight speed, and exponential velocity smoothing for
+ * the drifty spectator feel. Esc releases the pointer and the parent drops back
+ * to orbit. While locked, a click selects the block under the crosshair via the
+ * voxel walk.
+ */
+function FlyRig({ span, pickIndex, lockSelector, hud, onPick, onLockChange }: FlyRigProps) {
+  const { camera, gl } = useThree();
+  const lockedRef = useRef(false);
+  const keys = useRef({ f: false, b: false, l: false, r: false, up: false, down: false });
+  const vel = useRef(new THREE.Vector3());
+  const speedMul = useRef(1);
+  const hudClock = useRef(0);
+  const baseSpeed = Math.max(8, span / 5);
+
+  // Fly-range clipping: orbit scales `near` with the schematic (depth precision
+  // at orbit distance), which would clip walls you hover next to. Restore the
+  // orbit planes on exit.
+  useEffect(() => {
+    if (!(camera instanceof THREE.PerspectiveCamera)) return;
+    const prevNear = camera.near;
+    const prevFar = camera.far;
+    camera.near = 0.1;
+    camera.far = Math.max(200, span * 6);
+    camera.updateProjectionMatrix();
+    return () => {
+      camera.near = prevNear;
+      camera.far = prevFar;
+      camera.updateProjectionMatrix();
+    };
+  }, [camera, span]);
+
+  // Movement keys — Minecraft defaults, by physical key (layout-independent).
+  useEffect(() => {
+    const apply = (code: string, v: boolean): boolean => {
+      const k = keys.current;
+      switch (code) {
+        case "KeyW": k.f = v; return true;
+        case "KeyS": k.b = v; return true;
+        case "KeyA": k.l = v; return true;
+        case "KeyD": k.r = v; return true;
+        case "Space": k.up = v; return true;
+        case "ShiftLeft":
+        case "ShiftRight": k.down = v; return true;
+        default: return false;
+      }
+    };
+    const down = (e: KeyboardEvent) => {
+      if (lockedRef.current && apply(e.code, true)) e.preventDefault();
+    };
+    const up = (e: KeyboardEvent) => {
+      apply(e.code, false);
+    };
+    window.addEventListener("keydown", down);
+    window.addEventListener("keyup", up);
+    return () => {
+      window.removeEventListener("keydown", down);
+      window.removeEventListener("keyup", up);
+    };
+  }, []);
+
+  // Scroll scales flight speed (spectator's scroll-to-change-speed).
+  useEffect(() => {
+    const el = gl.domElement;
+    const onWheel = (e: WheelEvent) => {
+      if (!lockedRef.current) return;
+      e.preventDefault();
+      speedMul.current = Math.min(10, Math.max(0.25, speedMul.current * Math.pow(1.15, -e.deltaY / 100)));
+      if (hud.speed.current) hud.speed.current.textContent = `×${speedMul.current.toFixed(2)}`;
+    };
+    el.addEventListener("wheel", onWheel, { passive: false });
+    return () => el.removeEventListener("wheel", onWheel);
+  }, [gl, hud]);
+
+  // Crosshair click-to-select while locked.
+  useEffect(() => {
+    const el = gl.domElement;
+    const onClick = () => {
+      if (!lockedRef.current || !pickIndex) return;
+      camera.getWorldDirection(V_DIR);
+      onPick(ddaPick(camera.position, V_DIR, pickIndex, useToolStore.getState().layerY, span * 4));
+    };
+    el.addEventListener("click", onClick);
+    return () => el.removeEventListener("click", onClick);
+  }, [gl, camera, pickIndex, onPick, span]);
+
+  // Release the pointer when fly mode unmounts — drei disconnects its listeners
+  // but does not exit an active lock.
+  useEffect(() => {
+    const el = gl.domElement;
+    return () => {
+      if (document.pointerLockElement === el) document.exitPointerLock();
+    };
+  }, [gl]);
+
+  useFrame((_, rawDelta) => {
+    const delta = Math.min(rawDelta, 0.1); // no teleporting after a tab switch
+    const k = keys.current;
+    camera.getWorldDirection(V_DIR);
+    // Strafe stays horizontal (Minecraft-style): camera right, flattened.
+    V_RIGHT.setFromMatrixColumn(camera.matrixWorld, 0);
+    V_RIGHT.y = 0;
+    if (V_RIGHT.lengthSq() > 1e-6) V_RIGHT.normalize();
+    V_WISH.set(0, 0, 0);
+    if (lockedRef.current) {
+      if (k.f) V_WISH.add(V_DIR);
+      if (k.b) V_WISH.sub(V_DIR);
+      if (k.r) V_WISH.add(V_RIGHT);
+      if (k.l) V_WISH.sub(V_RIGHT);
+      if (k.up) V_WISH.y += 1;
+      if (k.down) V_WISH.y -= 1;
+      if (V_WISH.lengthSq() > 0) V_WISH.normalize().multiplyScalar(baseSpeed * speedMul.current);
+    }
+    vel.current.lerp(V_WISH, 1 - Math.exp(-10 * delta));
+    if (vel.current.lengthSq() > 1e-7) camera.position.addScaledVector(vel.current, delta);
+
+    hudClock.current += delta;
+    if (hudClock.current >= 0.12) {
+      hudClock.current = 0;
+      const p = camera.position;
+      if (hud.pos.current) {
+        hud.pos.current.textContent = `${p.x.toFixed(1)} / ${p.y.toFixed(1)} / ${p.z.toFixed(1)}`;
+      }
+      if (hud.look.current) {
+        const id = pickIndex
+          ? ddaPick(p, V_DIR, pickIndex, useToolStore.getState().layerY, span * 4)
+          : null;
+        hud.look.current.textContent = id ?? "—";
+      }
+    }
+  });
+
+  return (
+    <PointerLockControls
+      makeDefault
+      selector={lockSelector}
+      onLock={() => {
+        lockedRef.current = true;
+        onLockChange(true);
+      }}
+      onUnlock={() => {
+        lockedRef.current = false;
+        keys.current = { f: false, b: false, l: false, r: false, up: false, down: false };
+        vel.current.set(0, 0, 0);
+        onLockChange(false);
+      }}
+    />
+  );
+}
+
 // ─── Scene — reads from the Zustand store ────────────────────────────────────
+
+const DEFAULT_DIMS = { x: 16, y: 16, z: 16 };
 
 interface SceneProps {
   sourceVersion: string | undefined;
@@ -409,6 +629,10 @@ interface SceneProps {
   modLoader: ModTextureLoader | null;
   modelLoader: ModelLoader | null;
   connectionsLoader: ConnectionsLoader | null;
+  navMode: NavMode;
+  lockSelector: string;
+  hud: FlyHudRefs;
+  onLockChange: (locked: boolean) => void;
 }
 
 function Scene({
@@ -420,6 +644,10 @@ function Scene({
   modLoader,
   modelLoader,
   connectionsLoader,
+  navMode,
+  lockSelector,
+  hud,
+  onLockChange,
 }: SceneProps) {
   const blockPositions = useToolStore((s) => s.blockPositions);
   const diff = useToolStore((s) => s.diff);
@@ -462,17 +690,59 @@ function Scene({
     (id: string) => setSelectedBlock(id === selectedBlockId ? undefined : id),
     [selectedBlockId, setSelectedBlock],
   );
+  // Crosshair pick result: a block toggles selection, empty space deselects.
+  const handlePick = useCallback(
+    (id: string | null) => {
+      if (id) handleSelect(id);
+      else setSelectedBlock(undefined);
+    },
+    [handleSelect, setSelectedBlock],
+  );
 
-  const dims = schematic?.dimensions ?? { x: 16, y: 16, z: 16 };
+  const dims = schematic?.dimensions ?? DEFAULT_DIMS;
+  const span = Math.max(dims.x, dims.y, dims.z);
   const target = useMemo<[number, number, number]>(
     () => [dims.x / 2, dims.y / 2, dims.z / 2],
     [dims.x, dims.y, dims.z],
   );
 
+  const fly = navMode === "fly";
+  // Built only for fly mode — spectator targeting walks this instead of
+  // raycasting instanced meshes.
+  const pickIndex = useMemo(
+    () => (fly ? buildPickIndex(visibleGroups, dims) : null),
+    [fly, visibleGroups, dims],
+  );
+
   return (
     <>
       <CameraRig dimensions={dims} />
-      <OrbitControls makeDefault target={target} />
+      {fly ? (
+        <FlyRig
+          span={span}
+          pickIndex={pickIndex}
+          lockSelector={lockSelector}
+          hud={hud}
+          onPick={handlePick}
+          onLockChange={onLockChange}
+        />
+      ) : (
+        <OrbitControls makeDefault target={target} />
+      )}
+      {/* Distance fog is a fly-only horizon cue: at orbit distance (≈2.2×span)
+          it would wash out the whole build. */}
+      {fly && <fog attach="fog" args={["#0f172a", span * 1.6, span * 5.5]} />}
+      <Grid
+        position={[dims.x / 2 - 0.5, -0.55, dims.z / 2 - 0.5]}
+        cellSize={1}
+        sectionSize={16}
+        cellColor="#1c2a45"
+        sectionColor="#2f4370"
+        fadeDistance={span * 5}
+        fadeStrength={1.5}
+        infiniteGrid
+        frustumCulled={false}
+      />
       <ambientLight intensity={0.55} />
       <directionalLight position={[10, 20, 10]} intensity={0.8} />
       <directionalLight position={[-6, 8, -8]} intensity={0.25} />
@@ -484,35 +754,39 @@ function Scene({
           : result
           ? resultPlan(id, entry?.status, entry?.autoCandidate?.id, resolutions[id]?.targetId)
           : sourcePlan(id);
+        // Source blocks render with their real states; a converted target
+        // block renders with its default model (we don't track its states) —
+        // except across a cross-game conversion, where we bridge MC
+        // facing/half <-> Hytale rotation so a converted stair/door still
+        // points the right way in the preview, matching the export.
+        const states = !plan.useTarget
+          ? group.block.states
+          : targetGameId && (group.block.namespace === "hytale") !== (targetGameId === "hytale")
+          ? bridgeRotationStates(group.block, targetGameId).states
+          : EMPTY_STATES;
+        const shared = {
+          group,
+          textureId: plan.textureId,
+          states,
+          kind: plan.kind,
+          isSelected: id === selectedBlockId,
+          maxLayerY: layerY,
+          version: plan.useTarget ? (targetVersion ?? sourceVersion) : sourceVersion,
+          registryId: plan.useTarget ? (targetRegistryId ?? sourceRegistryId) : sourceRegistryId,
+          modLoader,
+          modelLoader,
+          useTarget: plan.useTarget,
+          targetGameId,
+          connectionsLoader,
+          onSelect: handleSelect,
+        };
         return (
-          <BlockInstances
-            key={group.paletteIndex}
-            group={group}
-            textureId={plan.textureId}
-            // Source blocks render with their real states; a converted target
-            // block renders with its default model (we don't track its states) —
-            // except across a cross-game conversion, where we bridge MC
-            // facing/half <-> Hytale rotation so a converted stair/door still
-            // points the right way in the preview, matching the export.
-            states={
-              !plan.useTarget
-                ? group.block.states
-                : targetGameId && (group.block.namespace === "hytale") !== (targetGameId === "hytale")
-                ? bridgeRotationStates(group.block, targetGameId).states
-                : EMPTY_STATES
-            }
-            kind={plan.kind}
-            isSelected={id === selectedBlockId}
-            maxLayerY={layerY}
-            version={plan.useTarget ? (targetVersion ?? sourceVersion) : sourceVersion}
-            registryId={plan.useTarget ? (targetRegistryId ?? sourceRegistryId) : sourceRegistryId}
-            modLoader={modLoader}
-            modelLoader={modelLoader}
-            useTarget={plan.useTarget}
-            targetGameId={targetGameId}
-            connectionsLoader={connectionsLoader}
-            onSelect={handleSelect}
-          />
+          <Fragment key={group.paletteIndex}>
+            <BlockInstances {...shared} positions={group.positions} slice={false} />
+            {group.interiorPositions && group.interiorPositions.length > 0 && (
+              <BlockInstances {...shared} positions={group.interiorPositions} slice />
+            )}
+          </Fragment>
         );
       })}
     </>
@@ -522,9 +796,12 @@ function Scene({
 // ─── Public component (rendered inside a no-SSR dynamic import) ───────────────
 
 export function SchematicViewer3D() {
+  const t = useTranslations("games.minecraft.schematicCompat");
   const blockPositions = useToolStore((s) => s.blockPositions);
   const isFetchingPositions = useToolStore((s) => s.isFetchingPositions);
   const schematic = useToolStore((s) => s.schematic);
+  const navMode = useToolStore((s) => s.navMode);
+  const setNavMode = useToolStore((s) => s.setNavMode);
   // Schematic blocks come from the source instance — resolve their textures
   // against the source registry's version (vanilla CDN) and id (mod JARs).
   // In "converted" mode, changed blocks instead resolve against the target
@@ -537,6 +814,20 @@ export function SchematicViewer3D() {
   const modLoader = useModTextureLoader();
   const modelLoader = useModelLoader();
   const connectionsLoader = useConnectionsLoader();
+
+  const [flyLocked, setFlyLocked] = useState(false);
+  const hudPos = useRef<HTMLSpanElement>(null);
+  const hudLook = useRef<HTMLSpanElement>(null);
+  const hudSpeed = useRef<HTMLSpanElement>(null);
+  const hud = useMemo<FlyHudRefs>(() => ({ pos: hudPos, look: hudLook, speed: hudSpeed }), []);
+  const handleLockChange = useCallback(
+    (locked: boolean) => {
+      setFlyLocked(locked);
+      // Esc (or any pointer-lock loss) drops back to orbit navigation.
+      if (!locked) setNavMode("orbit");
+    },
+    [setNavMode],
+  );
 
   if (!schematic) {
     return (
@@ -562,22 +853,60 @@ export function SchematicViewer3D() {
     );
   }
 
+  const fly = navMode === "fly";
+
   return (
-    <Canvas
-      gl={{ antialias: true, alpha: false }}
-      style={{ background: "#0f172a" }}
-      className="h-full w-full"
-    >
-      <Scene
-        sourceVersion={sourceReg?.version}
-        sourceRegistryId={sourceReg?.id}
-        targetVersion={targetReg?.version}
-        targetRegistryId={targetReg?.id}
-        targetGameId={targetReg?.gameId}
-        modLoader={modLoader}
-        modelLoader={modelLoader}
-        connectionsLoader={connectionsLoader}
-      />
-    </Canvas>
+    // The id doubles as the pointer-lock click target (drei's `selector`).
+    <div id="sch3d-stage" className="relative h-full w-full">
+      <Canvas
+        gl={{ antialias: true, alpha: false }}
+        style={{ background: "#0f172a" }}
+        className="h-full w-full"
+      >
+        <Scene
+          sourceVersion={sourceReg?.version}
+          sourceRegistryId={sourceReg?.id}
+          targetVersion={targetReg?.version}
+          targetRegistryId={targetReg?.id}
+          targetGameId={targetReg?.gameId}
+          modLoader={modLoader}
+          modelLoader={modelLoader}
+          connectionsLoader={connectionsLoader}
+          navMode={navMode}
+          lockSelector="#sch3d-stage"
+          hud={hud}
+          onLockChange={handleLockChange}
+        />
+      </Canvas>
+      {fly && (
+        <>
+          {/* crosshair */}
+          <div aria-hidden className="pointer-events-none absolute left-1/2 top-1/2">
+            <div className="absolute -translate-x-1/2 -translate-y-1/2 w-[1.5px] h-3 bg-white/70" />
+            <div className="absolute -translate-x-1/2 -translate-y-1/2 w-3 h-[1.5px] bg-white/70" />
+          </div>
+          {/* F3-style HUD: position / crosshair target / flight speed */}
+          <div className="pointer-events-none absolute left-2.5 top-2.5 grid gap-[3px] max-w-[280px] py-1.5 px-2.5 bg-[color-mix(in_srgb,var(--panel)_70%,transparent)] border border-line font-mono text-[10px] leading-tight">
+            <span ref={hudPos} className="text-txt">
+              0.0 / 0.0 / 0.0
+            </span>
+            <span ref={hudLook} className="text-txt-dim break-all">
+              —
+            </span>
+            <span ref={hudSpeed} className="text-accent-bright">
+              ×1.00
+            </span>
+          </div>
+          {!flyLocked && (
+            <div className="pointer-events-none absolute inset-0 grid place-items-center">
+              <div className="grid gap-1 text-center py-3 px-4 bg-[color-mix(in_srgb,var(--panel)_85%,transparent)] border border-line">
+                <span className="font-mono text-[12px] text-txt">{t("preview.flyClickToStart")}</span>
+                <span className="font-mono text-[10px] text-txt-dim">{t("preview.flyControlsHint")}</span>
+              </div>
+            </div>
+          )}
+        </>
+      )}
+    </div>
   );
 }
