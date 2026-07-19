@@ -1,7 +1,9 @@
 import type { BlockRegistry, BlockDefinition, ModInfo, ProgressCb } from "../../types";
-import { detectInstance } from "./loader-detect";
+import { detectInstance, INSTANCE_META_FILENAMES, type ModLoader } from "./loader-detect";
 import { scanJar } from "./jar-scanner";
 import { fingerprintFiles, cacheGet, cachePut } from "../../cache/registry-cache";
+import { ERR, codedError } from "../../errors";
+import { BUNDLED_VERSIONS, isBundledVersion, type BundledVersion } from "../../versions";
 
 /** Shape of the bundled `vanilla/<version>.json` files (see generate-vanilla.mjs). */
 interface VanillaRegistryFile {
@@ -11,17 +13,7 @@ interface VanillaRegistryFile {
   blocks: Record<string, { states: Record<string, string[]>; default: Record<string, string> }>;
 }
 
-/**
- * Vanilla versions shipped as offline bundles. Must match the `VERSIONS` list in
- * `vanilla/generate-vanilla.mjs`. These are the vanilla bases the JAR scanner
- * layers mod blocks on top of, selected by the version detected from an instance.
- */
-export const BUNDLED_VERSIONS = ["1.16.5", "1.18", "1.20", "1.21.1"] as const;
-export type BundledVersion = (typeof BUNDLED_VERSIONS)[number];
-
-export function isBundledVersion(v: string): v is BundledVersion {
-  return (BUNDLED_VERSIONS as readonly string[]).includes(v);
-}
+export { BUNDLED_VERSIONS, isBundledVersion, type BundledVersion } from "../../versions";
 
 /** Parse "1.21.1" → [1, 21, 1] for nearest-version matching. */
 function parseVersion(v: string): number[] {
@@ -98,6 +90,7 @@ export async function loadBundledRegistry(version: string): Promise<BlockRegistr
   return {
     gameId: "minecraft",
     version: file.version,
+    dataVersion: file.dataVersion,
     mods: [],
     blocks,
     tags: new Map(),
@@ -107,10 +100,21 @@ export async function loadBundledRegistry(version: string): Promise<BlockRegistr
 }
 
 /** Filenames (lowercased) that carry instance version/loader metadata. */
-const META_FILENAMES = new Set(["minecraftinstance.json", "manifest.json"]);
+const META_FILENAMES = new Set<string>(INSTANCE_META_FILENAMES);
 
 export function isInstanceMetaFile(name: string): boolean {
   return META_FILENAMES.has(name.toLowerCase());
+}
+
+/**
+ * Explicit version + loader supplied by the user when no launcher layout was
+ * recognised. Bypasses detection entirely, which is what lets an arbitrary
+ * folder (a server dir, a hand-assembled instance) still be scanned.
+ */
+export interface ScanOverride {
+  version: string;
+  modLoader?: ModLoader;
+  instanceName?: string;
 }
 
 /** Reverse a tag → members map onto each block definition's `tags` array. */
@@ -135,10 +139,13 @@ function applyTags(blocks: Map<string, BlockDefinition>, tags: Map<string, strin
 export async function buildScannedRegistry(
   metaFiles: File[],
   jarFiles: File[],
-  onProgress: ProgressCb
+  onProgress: ProgressCb,
+  override?: ScanOverride,
 ): Promise<BlockRegistry> {
   // ── Cache check ──────────────────────────────────────────────────────────────
-  const fp = fingerprintFiles(metaFiles, jarFiles);
+  // The override participates in the key: the same folder scanned as 1.16.5 and
+  // as 1.21.1 are different registries.
+  const fp = fingerprintFiles(metaFiles, jarFiles, override);
   onProgress(1, "Checking cache…");
   const cached = await cacheGet(fp);
   if (cached) {
@@ -150,10 +157,20 @@ export async function buildScannedRegistry(
   const metas = new Map<string, string>();
   for (const f of metaFiles) metas.set(f.name.toLowerCase(), await f.text());
 
-  const info = detectInstance(metas);
+  const info = override ?? detectInstance(metas);
   if (!info) {
-    throw new Error(
-      "Could not detect the Minecraft version of this folder. Pick a CurseForge instance folder (one containing minecraftinstance.json or manifest.json)."
+    // No launcher layout matched. The UI turns this code into a prompt for the
+    // version + loader and re-scans with an override, so an unrecognised folder
+    // is a question rather than a dead end.
+    if (metaFiles.length === 0 && jarFiles.length === 0) {
+      throw codedError(
+        ERR.instanceEmpty,
+        "That folder has no launcher metadata and no mods/*.jar files.",
+      );
+    }
+    throw codedError(
+      ERR.instanceUndetected,
+      "Could not detect the Minecraft version of this folder.",
     );
   }
 

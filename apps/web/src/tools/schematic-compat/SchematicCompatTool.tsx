@@ -84,6 +84,9 @@ export function SchematicCompatTool() {
               onScanTarget={actions.scanTargetInstance}
               onChangeSourceGame={actions.changeSourceGame}
               onChangeTargetGame={actions.changeTargetGame}
+              onLoadVanilla={actions.loadVanillaEnv}
+              onRetryPendingScan={actions.retryPendingScan}
+              onCancelPendingScan={actions.cancelPendingScan}
               onPickSchematic={actions.loadSchematic}
               onAnalyze={actions.analyze}
             />

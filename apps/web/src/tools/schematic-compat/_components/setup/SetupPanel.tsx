@@ -1,11 +1,13 @@
 "use client";
 
+import { useEffect } from "react";
 import { useTranslations } from "next-intl";
 import { Button, Banner, Disclosure, Icon } from "@/components/boffmedia/primitives";
 import type { GameId } from "../../_lib/adapters";
-import { useToolStore } from "../../_store/tool.store";
+import { useToolStore, type EnvMode, type EnvRole } from "../../_store/tool.store";
 import { EnvPicker } from "./EnvPicker";
 import { FilePicker } from "./FilePicker";
+import { ManualEnvDialog, type ManualEnvChoice } from "./ManualEnvDialog";
 
 interface SetupPanelProps {
   engineReady: boolean;
@@ -13,9 +15,20 @@ interface SetupPanelProps {
   onScanTarget: (gameId: GameId, files: File[]) => void;
   onChangeSourceGame: (gameId: GameId) => void;
   onChangeTargetGame: (gameId: GameId) => void;
+  onLoadVanilla: (role: EnvRole, version: string) => void;
+  onRetryPendingScan: (choice: ManualEnvChoice) => void;
+  onCancelPendingScan: () => void;
   onPickSchematic: (file: File) => void;
   onAnalyze: () => void;
 }
+
+/** `error.*` message keys, by machine code. Uncoded failures show raw detail. */
+const ERROR_KEY: Record<string, string> = {
+  E_INSTANCE_EMPTY: "error.instanceEmpty",
+  E_SCHEMATIC_UNSUPPORTED: "error.schematicUnsupported",
+  E_SCHEMATIC_LEGACY: "error.schematicLegacy",
+  E_EXPORT_TOO_LARGE: "error.exportTooLarge",
+};
 
 function GroupHead({ title }: { title: string }) {
   return (
@@ -32,6 +45,9 @@ export function SetupPanel({
   onScanTarget,
   onChangeSourceGame,
   onChangeTargetGame,
+  onLoadVanilla,
+  onRetryPendingScan,
+  onCancelPendingScan,
   onPickSchematic,
   onAnalyze,
 }: SetupPanelProps) {
@@ -43,13 +59,40 @@ export function SetupPanel({
     schematic,
     sourceScan,
     targetScan,
+    sourceEnvMode,
+    targetEnvMode,
+    sourceVanillaVersion,
+    targetVanillaVersion,
+    pendingScan,
     isLoadingSource,
     isLoadingTarget,
     isAnalyzing,
     diff,
     error,
+    errorCode,
+    setEnvMode,
+    setVanillaVersion,
   } = useToolStore();
   const t = useTranslations("games.minecraft.schematicCompat");
+
+  // A vanilla environment needs no picker interaction — selecting the mode (or a
+  // different version) IS the choice, so build the registry as soon as it changes.
+  useEffect(() => {
+    if (engineReady && sourceGame === "minecraft" && sourceEnvMode === "vanilla") {
+      onLoadVanilla("source", sourceVanillaVersion);
+    }
+    // onLoadVanilla is stable (useCallback in useToolActions).
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [engineReady, sourceGame, sourceEnvMode, sourceVanillaVersion]);
+
+  useEffect(() => {
+    if (engineReady && targetGame === "minecraft" && targetEnvMode === "vanilla") {
+      onLoadVanilla("target", targetVanillaVersion);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [engineReady, targetGame, targetEnvMode, targetVanillaVersion]);
+
+  const errorText = errorCode && ERROR_KEY[errorCode] ? t(ERROR_KEY[errorCode]) : error;
 
   const guideSteps = [t("guide.step1"), t("guide.step2"), t("guide.step3"), t("guide.step4"), t("guide.step5")];
 
@@ -85,6 +128,10 @@ export function SetupPanel({
           loading={isLoadingSource}
           disabled={!engineReady}
           onPick={(files) => onScanSource(sourceGame, files)}
+          mode={sourceEnvMode}
+          onModeChange={(m: EnvMode) => setEnvMode("source", m)}
+          vanillaVersion={sourceVanillaVersion}
+          onVanillaVersionChange={(v) => setVanillaVersion("source", v)}
         />
         <div className="flex items-center justify-center gap-2 text-txt-dim py-px px-1">
           <span className="flex-1 h-px bg-line" />
@@ -101,6 +148,10 @@ export function SetupPanel({
           loading={isLoadingTarget}
           disabled={!engineReady}
           onPick={(files) => onScanTarget(targetGame, files)}
+          mode={targetEnvMode}
+          onModeChange={(m: EnvMode) => setEnvMode("target", m)}
+          vanillaVersion={targetVanillaVersion}
+          onVanillaVersionChange={(v) => setVanillaVersion("target", v)}
         />
       </div>
 
@@ -114,11 +165,18 @@ export function SetupPanel({
         {isAnalyzing ? t("diff.analyzing") : analyzed ? t("setup.analyzed") : t("setup.analyzeCompat")}
       </Button>
 
-      {error && (
+      {errorText && (
         <Banner tone="error" className="text-[12.5px]">
-          {error}
+          {errorText}
         </Banner>
       )}
+
+      <ManualEnvDialog
+        open={!!pendingScan}
+        jarCount={pendingScan?.files.filter((f) => f.name.toLowerCase().endsWith(".jar")).length ?? 0}
+        onConfirm={onRetryPendingScan}
+        onCancel={onCancelPendingScan}
+      />
     </div>
   );
 }

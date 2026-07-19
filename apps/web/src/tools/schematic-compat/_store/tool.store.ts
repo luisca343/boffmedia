@@ -7,9 +7,24 @@ import type {
   BlockPositionGroup,
 } from "../_lib/types";
 import type { GameId } from "../_lib/adapters";
+import type { ErrCode } from "../_lib/errors";
+import { DEFAULT_VANILLA_VERSION } from "../_lib/versions";
 
 export type PreviewMode = "source" | "result" | "converted";
 export type NavMode = "orbit" | "fly";
+export type EnvMode = "instance" | "vanilla";
+export type EnvRole = "source" | "target";
+
+/**
+ * A scan that stopped because no launcher layout was recognised. Holds the
+ * already-collected files so answering the version/loader prompt re-runs the
+ * scan without making the user pick the folder a second time.
+ */
+export interface PendingScan {
+  role: EnvRole;
+  gameId: GameId;
+  files: File[];
+}
 
 interface ResolutionChoice {
   targetId: string;
@@ -36,6 +51,17 @@ interface ToolState {
   // Per-environment scan progress (folder → registry).
   sourceScan?: ScanProgress;
   targetScan?: ScanProgress;
+
+  // How each side sources its environment: scan an instance folder, or use a
+  // bundled vanilla registry (no Minecraft install needed).
+  sourceEnvMode: EnvMode;
+  targetEnvMode: EnvMode;
+  sourceVanillaVersion: string;
+  targetVanillaVersion: string;
+
+  // Set when a scan could not detect the instance's version — drives the manual
+  // version/loader prompt.
+  pendingScan?: PendingScan;
 
   // Block ids of the target registry, for replacement comboboxes.
   targetBlockIds: string[];
@@ -68,7 +94,10 @@ interface ToolState {
   isLoadingSchematic: boolean;
   isAnalyzing: boolean;
   isExporting: boolean;
+  /** Human-readable detail of the last failure (already stripped of its code). */
   error?: string;
+  /** Machine code of the last failure, when it carried one — the UI translates it. */
+  errorCode?: ErrCode;
 
   // Actions
   setSourceGame: (g: GameId) => void;
@@ -77,6 +106,9 @@ interface ToolState {
   setTargetReg: (h: RegistryHandle | undefined) => void;
   setSourceScan: (p: ScanProgress | undefined) => void;
   setTargetScan: (p: ScanProgress | undefined) => void;
+  setEnvMode: (role: EnvRole, mode: EnvMode) => void;
+  setVanillaVersion: (role: EnvRole, version: string) => void;
+  setPendingScan: (p: PendingScan | undefined) => void;
   setTargetBlockIds: (ids: string[]) => void;
   setSchematic: (s: SchematicSummary | undefined) => void;
   setDiff: (d: CompatDiff | undefined) => void;
@@ -87,7 +119,7 @@ interface ToolState {
   setLoadingSchematic: (v: boolean) => void;
   setAnalyzing: (v: boolean) => void;
   setExporting: (v: boolean) => void;
-  setError: (msg: string | undefined) => void;
+  setError: (msg: string | undefined, code?: ErrCode) => void;
   // Phase 3
   setBlockPositions: (groups: BlockPositionGroup[]) => void;
   setFetchingPositions: (v: boolean) => void;
@@ -102,6 +134,10 @@ interface ToolState {
 export const useToolStore = create<ToolState>((set) => ({
   sourceGame: "minecraft",
   targetGame: "minecraft",
+  sourceEnvMode: "instance",
+  targetEnvMode: "instance",
+  sourceVanillaVersion: DEFAULT_VANILLA_VERSION,
+  targetVanillaVersion: DEFAULT_VANILLA_VERSION,
   targetBlockIds: [],
   resolutions: {},
   isLoadingSource: false,
@@ -121,23 +157,49 @@ export const useToolStore = create<ToolState>((set) => ({
     set((state) =>
       state.sourceGame === g
         ? state
-        : { sourceGame: g, sourceReg: undefined, diff: undefined },
+        : {
+            sourceGame: g,
+            sourceReg: undefined,
+            diff: undefined,
+            resolutions: {},
+            sourceEnvMode: g === "hytale" ? "instance" : state.sourceEnvMode,
+          },
     ),
   setTargetGame: (g) =>
     set((state) =>
       state.targetGame === g
         ? state
-        : { targetGame: g, targetReg: undefined, targetBlockIds: [], diff: undefined },
+        : {
+            targetGame: g,
+            targetReg: undefined,
+            targetBlockIds: [],
+            diff: undefined,
+            // Choices name blocks in the outgoing game's registry.
+            resolutions: {},
+            // Hytale has no bundled registries — only the folder scan applies.
+            targetEnvMode: g === "hytale" ? "instance" : state.targetEnvMode,
+          },
     ),
   setSourceReg: (h) => set({ sourceReg: h }),
-  setTargetReg: (h) => set({ targetReg: h }),
+  // Resolutions name blocks in the OLD target registry — a different target may
+  // not have them at all, and a stale choice would silently ride along into the
+  // next export. Same reasoning as clearing the diff.
+  setTargetReg: (h) => set({ targetReg: h, resolutions: {} }),
   setSourceScan: (p) => set({ sourceScan: p }),
   setTargetScan: (p) => set({ targetScan: p }),
+  setEnvMode: (role, mode) =>
+    set(role === "source" ? { sourceEnvMode: mode } : { targetEnvMode: mode }),
+  setVanillaVersion: (role, version) =>
+    set(role === "source" ? { sourceVanillaVersion: version } : { targetVanillaVersion: version }),
+  setPendingScan: (p) => set({ pendingScan: p }),
   setTargetBlockIds: (ids) => set({ targetBlockIds: ids }),
   setSchematic: (s) =>
     set({
       schematic: s,
       diff: undefined,
+      // A new schematic has its own palette; choices made for the previous one
+      // would apply to whichever block ids happen to coincide.
+      resolutions: {},
       blockPositions: [],
       selectedBlockId: undefined,
       layerY: s ? s.dimensions.y - 1 : 0,
@@ -158,7 +220,7 @@ export const useToolStore = create<ToolState>((set) => ({
   setLoadingSchematic: (v) => set({ isLoadingSchematic: v }),
   setAnalyzing: (v) => set({ isAnalyzing: v }),
   setExporting: (v) => set({ isExporting: v }),
-  setError: (msg) => set({ error: msg }),
+  setError: (msg, code) => set({ error: msg, errorCode: code }),
   // Phase 3
   setBlockPositions: (groups) => set({ blockPositions: groups }),
   setFetchingPositions: (v) => set({ isFetchingPositions: v }),
@@ -178,6 +240,8 @@ export const useToolStore = create<ToolState>((set) => ({
       diff: undefined,
       resolutions: {},
       error: undefined,
+      errorCode: undefined,
+      pendingScan: undefined,
       isExporting: false,
       blockPositions: [],
       isFetchingPositions: false,
