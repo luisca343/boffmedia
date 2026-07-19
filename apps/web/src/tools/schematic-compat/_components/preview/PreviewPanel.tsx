@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 import { Icon } from "@/components/boffmedia/primitives";
 import { AxisSlider, type SchStatus } from "../ui/sch-kit";
 import { useToolStore } from "../../_store/tool.store";
-import type { PreviewMode } from "../../_store/tool.store";
+import type { NavMode, PreviewMode } from "../../_store/tool.store";
 import { convertedPlan, resultPlan } from "./previewPlan";
 
 /** Maps an engine status to its `diff.*` translation key (mirrors DiffPanel). */
@@ -154,6 +154,38 @@ function ModeSwitch({
   );
 }
 
+function NavSwitch({
+  mode,
+  disabled,
+  onChange,
+}: {
+  mode: NavMode;
+  disabled?: boolean;
+  onChange: (m: NavMode) => void;
+}) {
+  const t = useTranslations("games.minecraft.schematicCompat");
+  const segment = (value: NavMode, label: string, title: string) => (
+    <button
+      type="button"
+      disabled={disabled}
+      onClick={() => onChange(value)}
+      title={title}
+      className={cn(
+        "py-1 px-2 font-mono text-[11px] cursor-pointer transition-colors duration-[140ms] disabled:opacity-40 disabled:cursor-not-allowed",
+        mode === value ? "bg-accent-soft text-accent-bright" : "text-txt-dim hover:text-txt",
+      )}
+    >
+      {label}
+    </button>
+  );
+  return (
+    <div className="inline-flex items-center gap-0.5 p-0.5 border border-line bg-base">
+      {segment("orbit", t("preview.navOrbit"), t("preview.navOrbitHint"))}
+      {segment("fly", t("preview.navFly"), t("preview.navFlyHint"))}
+    </div>
+  );
+}
+
 function LegendDot({ color, label, faded }: { color?: string; label: string; faded?: boolean }) {
   return (
     <span className={cn("inline-flex items-center gap-1.5", faded && "opacity-60")}>
@@ -177,6 +209,8 @@ export function PreviewPanel() {
   const setLayerY = useToolStore((s) => s.setLayerY);
   const setHideUnchanged = useToolStore((s) => s.setHideUnchanged);
   const setPreviewMode = useToolStore((s) => s.setPreviewMode);
+  const navMode = useToolStore((s) => s.navMode);
+  const setNavMode = useToolStore((s) => s.setNavMode);
 
   const rootRef = useRef<HTMLDivElement>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -190,6 +224,35 @@ export function PreviewPanel() {
   const toggleFullscreen = useCallback(() => {
     if (document.fullscreenElement) void document.exitFullscreen();
     else void rootRef.current?.requestFullscreen?.();
+  }, []);
+
+  // Viewer shortcuts: F toggles orbit/fly, PageUp/PageDown steps the Y-layer.
+  // Handlers read the store directly so the listener binds once.
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      const el = e.target as HTMLElement | null;
+      if (
+        el &&
+        (el.tagName === "INPUT" || el.tagName === "TEXTAREA" || el.tagName === "SELECT" || el.isContentEditable)
+      ) {
+        return;
+      }
+      if (e.ctrlKey || e.metaKey || e.altKey) return;
+      const s = useToolStore.getState();
+      if (!s.schematic) return;
+      if (e.code === "KeyF") {
+        e.preventDefault();
+        s.setNavMode(s.navMode === "fly" ? "orbit" : "fly");
+      } else if (e.code === "PageUp") {
+        e.preventDefault();
+        s.setLayerY(Math.min(s.schematic.dimensions.y - 1, s.layerY + 1));
+      } else if (e.code === "PageDown") {
+        e.preventDefault();
+        s.setLayerY(Math.max(0, s.layerY - 1));
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
   }, []);
 
   const maxLayerY = schematic ? schematic.dimensions.y - 1 : 0;
@@ -208,6 +271,7 @@ export function PreviewPanel() {
             {t("preview.onlyChanges")}
           </PreviewButton>
         )}
+        <NavSwitch mode={navMode} disabled={!schematic} onChange={setNavMode} />
         <PreviewButton
           onClick={toggleFullscreen}
           disabled={!schematic}

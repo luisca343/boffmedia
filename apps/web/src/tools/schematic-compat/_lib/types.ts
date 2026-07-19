@@ -190,8 +190,18 @@ export type ProgressCb = (pct: number, msg: string) => void;
 export interface BlockPositionGroup {
   paletteIndex: number;
   block: UnifiedBlock;
-  /** Flat Float32Array: [x0,y0,z0, x1,y1,z1, …]. Length = instanceCount × 3. */
+  /**
+   * Flat Float32Array: [x0,y0,z0, x1,y1,z1, …]. Length = instanceCount × 3.
+   * Surface cells only (≥1 open neighbour or on the volume edge), Y-sorted.
+   */
   positions: Float32Array;
+  /**
+   * Fully-enclosed cells (all six neighbours solid), Y-sorted. Invisible from
+   * outside, so the viewer only draws the single Y-slice the layer cutoff sits
+   * on — that's when slicing exposes their top face. Absent when the schematic
+   * is so large the worker drops interiors entirely (see CULL_THRESHOLD).
+   */
+  interiorPositions?: Float32Array;
 }
 
 /**
