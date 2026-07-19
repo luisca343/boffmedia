@@ -1,9 +1,12 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ScanCard, type SchRegistry } from "../ui/sch-kit";
 import type { RegistryHandle } from "../../_lib/types";
 import type { GameId } from "../../_lib/adapters";
+import type { EnvMode } from "../../_store/tool.store";
+import { BUNDLED_VERSIONS } from "../../_lib/versions";
+import { INSTANCE_META_FILENAMES } from "../../_lib/pipeline/registry/loader-detect";
 
 interface ScanProgress {
   pct: number;
@@ -20,9 +23,19 @@ interface EnvPickerProps {
   loading: boolean;
   disabled: boolean;
   onPick: (files: File[]) => void;
+  mode: EnvMode;
+  onModeChange: (m: EnvMode) => void;
+  vanillaVersion: string;
+  onVanillaVersionChange: (v: string) => void;
 }
 
-const META_NAMES = new Set(["minecraftinstance.json", "manifest.json"]);
+const META_NAMES = new Set<string>(INSTANCE_META_FILENAMES);
+/**
+ * Launchers that keep the game files in a subfolder rather than at the instance
+ * root: MultiMC/Prism use `minecraft/` (or `.minecraft/`), so `mods/` lives one
+ * level down while the metadata stays at the root.
+ */
+const GAME_SUBDIRS = new Set([".minecraft", "minecraft"]);
 /** Hytale install path under the picked folder; tried first for a fast lookup. */
 const HYTALE_PATH = ["install", "release", "package", "game", "latest"];
 /** Bound the recursive Assets.zip search so we never walk the whole install. */
@@ -46,7 +59,22 @@ function getDirectoryPicker(): ShowDirectoryPicker | undefined {
   return (window as unknown as { showDirectoryPicker?: ShowDirectoryPicker }).showDirectoryPicker;
 }
 
-/** Walk a Minecraft instance dir, collecting launcher metadata + every mods/*.jar. */
+async function collectJars(modsDir: FsDirHandle): Promise<File[]> {
+  const files: File[] = [];
+  for await (const [jarName, jarHandle] of modsDir.entries()) {
+    if (jarHandle.kind === "file" && jarName.toLowerCase().endsWith(".jar")) {
+      files.push(await jarHandle.getFile());
+    }
+  }
+  return files;
+}
+
+/**
+ * Walk a Minecraft instance dir, collecting launcher metadata + every
+ * `mods/*.jar`. Descends one level into a `minecraft/` / `.minecraft/` game
+ * folder so MultiMC/Prism layouts (metadata at the root, mods one level down)
+ * work as well as the flat CurseForge one.
+ */
 async function collectMinecraft(dir: FsDirHandle): Promise<File[]> {
   const files: File[] = [];
   for await (const [name, handle] of dir.entries()) {
@@ -54,9 +82,14 @@ async function collectMinecraft(dir: FsDirHandle): Promise<File[]> {
     if (handle.kind === "file" && META_NAMES.has(lower)) {
       files.push(await handle.getFile());
     } else if (handle.kind === "directory" && lower === "mods") {
-      for await (const [jarName, jarHandle] of handle.entries()) {
-        if (jarHandle.kind === "file" && jarName.toLowerCase().endsWith(".jar")) {
-          files.push(await jarHandle.getFile());
+      files.push(...(await collectJars(handle)));
+    } else if (handle.kind === "directory" && GAME_SUBDIRS.has(lower)) {
+      for await (const [innerName, innerHandle] of handle.entries()) {
+        const innerLower = innerName.toLowerCase();
+        if (innerHandle.kind === "directory" && innerLower === "mods") {
+          files.push(...(await collectJars(innerHandle)));
+        } else if (innerHandle.kind === "file" && META_NAMES.has(innerLower)) {
+          files.push(await innerHandle.getFile());
         }
       }
     }
@@ -120,6 +153,8 @@ function collectFromFileList(files: FileList, game: GameId): File[] {
     const rel = (file as File & { webkitRelativePath?: string }).webkitRelativePath || file.name;
     const segments = rel.split("/");
     const base = segments[segments.length - 1].toLowerCase();
+    // Metadata may sit at the instance root or inside the game subfolder; a
+    // recursive directory input reports both, and either is fine.
     if (META_NAMES.has(base)) {
       out.push(file);
     } else if (base.endsWith(".jar") && segments.some((s) => s.toLowerCase() === "mods")) {
@@ -138,6 +173,7 @@ function toScanRegistry(h: RegistryHandle | undefined): SchRegistry | null {
     loader: h.modLoader,
     mods: h.mods.length,
     blocks: h.blockCount,
+    bundled: h.source === "bundled",
   };
 }
 
@@ -157,9 +193,19 @@ export function EnvPicker({
   loading,
   disabled,
   onPick,
+  mode,
+  onModeChange,
+  vanillaVersion,
+  onVanillaVersionChange,
 }: EnvPickerProps) {
   const inputRef = useRef<HTMLInputElement>(null);
-  const hasFsApi = typeof window !== "undefined" && !!getDirectoryPicker();
+  // Resolved after mount, never during render: reading `window` inline makes the
+  // server (always false) and the client (usually true) disagree on the input's
+  // `multiple`, which React reports as a hydration mismatch.
+  const [hasFsApi, setHasFsApi] = useState(false);
+  useEffect(() => {
+    setHasFsApi(!!getDirectoryPicker());
+  }, []);
   const fallbackIsFolder = !hasFsApi && game === "minecraft";
 
   useEffect(() => {
@@ -214,6 +260,12 @@ export function EnvPicker({
         scanning={loading}
         progress={scan?.pct ?? 0}
         onPick={handleClick}
+        // Only Minecraft ships bundled registries; Hytale must scan its install.
+        mode={game === "minecraft" ? mode : "instance"}
+        onMode={game === "minecraft" ? onModeChange : undefined}
+        versions={BUNDLED_VERSIONS}
+        version={vanillaVersion}
+        onVersion={onVanillaVersionChange}
       />
     </>
   );

@@ -16,6 +16,7 @@ import type {
   ProgressCb,
 } from "../types";
 import { computeDiff } from "../pipeline/diff";
+import { loadBundledRegistry, type ScanOverride } from "../pipeline/registry";
 import { applyRules } from "../pipeline/rules/engine";
 import { transformStates } from "../pipeline/state/transformer";
 import { buildRuleSet, parseRuleSet } from "../pipeline/rules/ruleset";
@@ -96,6 +97,7 @@ function registryHandle(id: string, reg: BlockRegistry): RegistryHandle {
     id,
     gameId: reg.gameId,
     version: reg.version,
+    dataVersion: reg.dataVersion,
     modLoader: reg.modLoader,
     mods: reg.mods,
     blockCount: reg.blocks.size,
@@ -132,9 +134,21 @@ const api: CompatWorkerAPI = {
   async scanInstance(
     gameId: GameId,
     files: File[],
-    onProgress: ProgressCb
+    onProgress: ProgressCb,
+    override?: ScanOverride,
   ): Promise<RegistryHandle> {
-    const reg = await getAdapter(gameId).buildRegistry(files, onProgress);
+    const reg = await getAdapter(gameId).buildRegistry(files, onProgress, override);
+    const id = nextId("reg");
+    registries.set(id, reg);
+    return registryHandle(id, reg);
+  },
+
+  async loadVanillaRegistry(version: string): Promise<RegistryHandle> {
+    // No instance to scan — the bundled vanilla registry IS the environment.
+    // Analysis never needed a folder (computeDiff only reads the source
+    // registry's gameId; classification is namespace-based), so this is a
+    // first-class environment, not a degraded one.
+    const reg = await loadBundledRegistry(version);
     const id = nextId("reg");
     registries.set(id, reg);
     return registryHandle(id, reg);
@@ -383,13 +397,20 @@ const api: CompatWorkerAPI = {
     return { schematicId: newId, remaining };
   },
 
-  async export(schematicId: string, format: ExportFormat): Promise<Blob> {
+  async export(schematicId: string, format: ExportFormat, dataVersion?: number): Promise<Blob> {
     const structure = schematics.get(schematicId);
     if (!structure) throw new Error(`Schematic not found: ${schematicId}`);
     const targetGame = adapterForFormat(format);
     // Drop any block still foreign to the target game (unmapped in a cross-game
     // conversion) so its source id never lands in the written file.
-    const cleaned = stripForeignBlocks(structure, targetGame);
+    let cleaned = stripForeignBlocks(structure, targetGame);
+    // Stamp the TARGET environment's save-format version. Without this the
+    // writers fall back to the source file's DataVersion and the export declares
+    // the version it was converted *from* — the game then runs its data fixers
+    // across ids that are already in the target's format.
+    if (dataVersion !== undefined) {
+      cleaned = { ...cleaned, metadata: { ...cleaned.metadata, dataVersion } };
+    }
     const out = getAdapter(targetGame).export(cleaned, format);
     // A writer may stream straight to a Blob (large prefabs); pass it through
     // rather than forcing its bytes back through a second in-memory copy.

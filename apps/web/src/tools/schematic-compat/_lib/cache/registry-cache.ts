@@ -22,6 +22,7 @@ import type { BlockRegistry, BlockDefinition, ModInfo } from "../types";
 interface SerializedRegistry {
   gameId: "minecraft" | "hytale";
   version: string;
+  dataVersion?: number;
   modLoader?: "forge" | "fabric" | "neoforge";
   mods: ModInfo[];
   blocks: Record<string, BlockDefinition>;
@@ -65,13 +66,20 @@ function getDB(): RegistryCacheDB {
 
 /**
  * Stable fingerprint from sorted file metadata. Incorporates both meta files
- * (carry the instance version) and JAR files (carry the mod set).
+ * (carry the instance version) and JAR files (carry the mod set), plus any
+ * manual version/loader override — the same folder scanned as two different
+ * versions must not collide on one cache entry.
  */
-export function fingerprintFiles(metaFiles: File[], jarFiles: File[]): string {
-  return [...metaFiles, ...jarFiles]
+export function fingerprintFiles(
+  metaFiles: File[],
+  jarFiles: File[],
+  override?: { version: string; modLoader?: string },
+): string {
+  const files = [...metaFiles, ...jarFiles]
     .sort((a, b) => a.name.localeCompare(b.name))
     .map((f) => `${f.name}:${f.size}:${f.lastModified}`)
     .join("|");
+  return override ? `${files}#${override.version}:${override.modLoader ?? ""}` : files;
 }
 
 // ─── Serialization helpers ────────────────────────────────────────────────────
@@ -92,6 +100,7 @@ function serialize(reg: BlockRegistry): SerializedRegistry {
   return {
     gameId: reg.gameId,
     version: reg.version,
+    dataVersion: reg.dataVersion,
     modLoader: reg.modLoader,
     mods: reg.mods,
     blocks,
@@ -111,6 +120,7 @@ function deserialize(s: SerializedRegistry): BlockRegistry {
   return {
     gameId: s.gameId,
     version: s.version,
+    dataVersion: s.dataVersion,
     modLoader: s.modLoader,
     mods: s.mods,
     blocks,

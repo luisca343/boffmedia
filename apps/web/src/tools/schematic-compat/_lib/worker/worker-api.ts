@@ -13,6 +13,7 @@ import type {
 import type { ExportFormat } from "../pipeline/exporter";
 import type { GameId } from "../adapters";
 import type { CompiledModel } from "../model/types";
+import type { ScanOverride } from "../pipeline/registry";
 
 /**
  * Comlink-exposed worker API.
@@ -40,8 +41,17 @@ export interface CompatWorkerAPI {
   scanInstance(
     gameId: GameId,
     files: File[],
-    onProgress: ProgressCb
+    onProgress: ProgressCb,
+    override?: ScanOverride,
   ): Promise<RegistryHandle>;
+
+  /**
+   * Build an environment from a bundled vanilla registry — no instance folder.
+   * Rejects the `E_INSTANCE_UNDETECTED` dead end for the common "I just want to
+   * convert between two vanilla versions" case, and gives cross-game conversions
+   * a target that needs no Minecraft install at all.
+   */
+  loadVanillaRegistry(version: string): Promise<RegistryHandle>;
 
   /** Full list of block ids in a loaded registry (for replacement comboboxes). */
   getRegistryBlockIds(registryId: string): Promise<string[]>;
@@ -108,7 +118,13 @@ export interface CompatWorkerAPI {
     targetRegId: string
   ): Promise<{ schematicId: string; remaining: DiffEntry[] }>;
 
-  export(schematicId: string, format: ExportFormat): Promise<Blob>;
+  /**
+   * Serialise a cached schematic. `dataVersion` is the target environment's
+   * save-format version, stamped onto the written file so it declares the format
+   * it was converted *to* rather than the source file's (see
+   * {@link RegistryHandle.dataVersion}). Omitted for games without the concept.
+   */
+  export(schematicId: string, format: ExportFormat, dataVersion?: number): Promise<Blob>;
 
   importRuleSet(json: string): Promise<RuleSet>;
   exportRuleSet(resolutions: ResolutionMap, meta: RuleSetMeta): Promise<string>;

@@ -62,6 +62,15 @@ export interface ModInfo {
 export interface BlockRegistry {
   gameId: "minecraft" | "hytale";
   version: string;
+  /**
+   * Minecraft's numeric save-format version for {@link version}. Stamped onto
+   * exported files so a converted schematic declares the format it was converted
+   * *to* — writing the source file's DataVersion makes the game run its data
+   * fixers over already-converted ids. Sourced from the bundled vanilla registry,
+   * so a scanned instance carries its nearest bundled version's number (close
+   * enough that no fixer step applies). Undefined for games without the concept.
+   */
+  dataVersion?: number;
   modLoader?: "forge" | "fabric" | "neoforge";
   mods: ModInfo[];
   blocks: Map<string, BlockDefinition>;
@@ -212,6 +221,8 @@ export interface RegistryHandle {
   id: string;
   gameId: "minecraft" | "hytale";
   version: string;
+  /** See {@link BlockRegistry.dataVersion} — the UI passes it back on export. */
+  dataVersion?: number;
   modLoader?: "forge" | "fabric" | "neoforge";
   mods: ModInfo[];
   blockCount: number;
