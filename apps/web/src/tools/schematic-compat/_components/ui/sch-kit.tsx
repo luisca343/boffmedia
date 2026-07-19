@@ -36,7 +36,11 @@ export interface SchRegistry {
   loader?: string;
   mods: number;
   blocks: number;
+  /** Built from a bundled vanilla registry rather than a scanned folder. */
+  bundled?: boolean;
 }
+/** How an environment is sourced: scan a game folder, or use bundled vanilla. */
+export type SchEnvMode = "instance" | "vanilla";
 export interface BulkNsGroup {
   namespace: string;
   entries: unknown[];
@@ -228,6 +232,11 @@ export function ScanCard({
   scanning = false,
   progress = 0,
   onPick,
+  mode = "instance",
+  onMode,
+  versions,
+  version,
+  onVersion,
 }: {
   role: "source" | "target";
   roleLabel: string;
@@ -237,8 +246,16 @@ export function ScanCard({
   scanning?: boolean;
   progress?: number;
   onPick: () => void;
+  /** "instance" scans a game folder; "vanilla" uses a bundled registry. */
+  mode?: SchEnvMode;
+  /** Omit to hide the mode toggle entirely (games with no bundled registries). */
+  onMode?: (m: SchEnvMode) => void;
+  versions?: readonly string[];
+  version?: string;
+  onVersion?: (v: string) => void;
 }) {
   const t = useTranslations("games.minecraft.schematicCompat");
+  const vanilla = mode === "vanilla";
   return (
     <div
       className={cn(
@@ -281,20 +298,69 @@ export function ScanCard({
         </div>
       </div>
 
+      {/* environment source: scan a folder, or pick a bundled vanilla version */}
+      {onMode && (
+        <div className="inline-flex gap-0.5 p-0.5 border border-line bg-base" role="group">
+          {(["instance", "vanilla"] as const).map((m) => (
+            <button
+              key={m}
+              type="button"
+              aria-pressed={mode === m}
+              disabled={scanning}
+              onClick={() => onMode(m)}
+              className={cn(
+                "flex-1 inline-flex items-center justify-center gap-1 py-1 px-[7px] font-mono text-[10.5px]",
+                "cursor-pointer transition-colors duration-[140ms] disabled:opacity-50 disabled:cursor-default",
+                mode === m
+                  ? "bg-panel-2 text-txt shadow-[inset_0_0_0_1px_var(--line-2)]"
+                  : "text-txt-dim enabled:hover:text-txt-muted",
+              )}
+            >
+              <Icon name={m === "vanilla" ? "cube" : "folder"} size={12} />
+              {m === "vanilla" ? t("setup.modeVanilla") : t("setup.modeInstance")}
+            </button>
+          ))}
+        </div>
+      )}
+
       {/* pick */}
-      <button
-        type="button"
-        disabled={scanning}
-        onClick={onPick}
-        className={cn(
-          "flex items-center justify-center gap-2 p-[9px] w-full bg-base border border-dashed border-line-2",
-          "text-txt-muted text-[13px] cursor-pointer transition-[border-color,color] duration-[140ms]",
-          "enabled:hover:border-accent-line enabled:hover:text-txt disabled:opacity-60 disabled:cursor-default",
-        )}
-      >
-        <Icon name="folder" size={15} />
-        {scanning ? t("setup.scanningShort") : game === "hytale" ? t("setup.pickHytaleShort") : t("setup.pickInstanceShort")}
-      </button>
+      {vanilla ? (
+        <label className="flex flex-col gap-1">
+          <span className="font-mono text-[10px] tracking-[0.12em] uppercase text-txt-dim">
+            {t("setup.vanillaVersion")}
+          </span>
+          <select
+            value={version ?? ""}
+            disabled={scanning}
+            onChange={(e) => onVersion?.(e.target.value)}
+            className={cn(
+              "w-full p-[9px] bg-base border border-solid border-line-2 font-mono text-[12.5px] text-txt",
+              "cursor-pointer transition-[border-color] duration-[140ms]",
+              "hover:border-accent-line disabled:opacity-60 disabled:cursor-default",
+            )}
+          >
+            {(versions ?? []).map((v) => (
+              <option key={v} value={v}>
+                {v}
+              </option>
+            ))}
+          </select>
+        </label>
+      ) : (
+        <button
+          type="button"
+          disabled={scanning}
+          onClick={onPick}
+          className={cn(
+            "flex items-center justify-center gap-2 p-[9px] w-full bg-base border border-dashed border-line-2",
+            "text-txt-muted text-[13px] cursor-pointer transition-[border-color,color] duration-[140ms]",
+            "enabled:hover:border-accent-line enabled:hover:text-txt disabled:opacity-60 disabled:cursor-default",
+          )}
+        >
+          <Icon name="folder" size={15} />
+          {scanning ? t("setup.scanningShort") : game === "hytale" ? t("setup.pickHytaleShort") : t("setup.pickInstanceShort")}
+        </button>
+      )}
 
       {scanning && (
         <div className="h-1 bg-line overflow-hidden">
@@ -320,7 +386,10 @@ export function ScanCard({
             <code className="font-mono text-[11px] text-accent-bright">{registry.version}</code>
             {registry.loader ? " · " + registry.loader : ""}
             <br />
-            {registry.mods} {t("setup.modsLabel")} · {registry.blocks.toLocaleString()} {t("setup.blocksLabel")}
+            {registry.bundled
+              ? t("setup.vanillaRegistry")
+              : `${registry.mods} ${t("setup.modsLabel")}`}{" "}
+            · {registry.blocks.toLocaleString()} {t("setup.blocksLabel")}
           </span>
         ) : (
           <span className="text-txt-dim">{scanning ? progress + "% · " + t("setup.reading") : t("setup.noEnv")}</span>

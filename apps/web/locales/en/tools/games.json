@@ -93,7 +93,11 @@
           "reading": "reading registry…",
           "noEnv": "No environment selected",
           "loaded": "Loaded",
-          "dropHere": "Drop your schematic"
+          "dropHere": "Drop your schematic",
+          "modeInstance": "Folder",
+          "modeVanilla": "Vanilla",
+          "vanillaVersion": "Minecraft version",
+          "vanillaRegistry": "Vanilla registry"
         },
         "diff": {
           "header": "Compatibility",
@@ -184,7 +188,8 @@
           "importRules": "Import Rules",
           "exportRules": "Export Rules",
           "exporting": "Exporting…",
-          "exportSchematic": "Export schematic"
+          "exportSchematic": "Export schematic",
+          "blockedWarning": "{count, plural, one {# block type has no target and will be written unchanged, or dropped in a cross-game export.} other {# block types have no target and will be written unchanged, or dropped in a cross-game export.}} Export anyway?"
         },
         "worker": {
           "connecting": "Connecting to analysis engine...",
@@ -194,6 +199,22 @@
           "label": "Ready to export",
           "resolved": "resolved",
           "blocked": "{count, plural, one {# unresolved} other {# unresolved}}"
+        },
+        "manualEnv": {
+          "title": "Which Minecraft version is this?",
+          "body": "This folder has no launcher metadata we recognise. Tell us its version and mod loader and we'll scan it anyway — any mods found are still included.",
+          "jarsFound": "{count, plural, =0 {No mod JARs found} one {# mod JAR found} other {# mod JARs found}}",
+          "version": "Version",
+          "loader": "Mod loader",
+          "loaderNone": "None",
+          "cancel": "Cancel",
+          "confirm": "Scan folder"
+        },
+        "error": {
+          "instanceEmpty": "That folder has no launcher metadata and no mods. Pick a game instance folder, or switch this environment to Vanilla.",
+          "schematicUnsupported": "Unsupported file type. Use .schem, .litematic, .nbt, .mca or .prefab.json.",
+          "schematicLegacy": "This is a pre-1.13 MCEdit schematic, which uses numeric block ids this tool cannot read yet. Re-save it with a modern WorldEdit as .schem.",
+          "exportTooLarge": "This schematic is too large for the selected format. Export a smaller region, or choose .schem / .litematic."
         }
       }
     }

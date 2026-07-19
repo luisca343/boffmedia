@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef } from "react";
+import { useTranslations } from "next-intl";
 import { ExportBar as ExportBarUI, CompatMeter } from "../ui/sch-kit";
 import { useToolStore } from "../../_store/tool.store";
 import type { CompatDiff } from "../../_lib/types";
@@ -28,6 +29,7 @@ function readiness(diff: CompatDiff | undefined, resolutions: Record<string, unk
 }
 
 export function ExportBar({ onExport, onExportRuleSet, onImportRuleSet }: ExportBarProps) {
+  const t = useTranslations("games.minecraft.schematicCompat");
   const schematic = useToolStore((s) => s.schematic);
   const isExporting = useToolStore((s) => s.isExporting);
   const resolutions = useToolStore((s) => s.resolutions);
@@ -37,6 +39,14 @@ export function ExportBar({ onExport, onExportRuleSet, onImportRuleSet }: Export
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const { resolved, total, blocked } = readiness(diff, resolutions);
+
+  // Unresolved blocks don't stop an export — they're written as-is (same game)
+  // or dropped to air (cross-game, see stripForeignBlocks). Both are silent data
+  // loss, so confirm rather than let it happen unannounced.
+  const handleExport = (fmt: ExportFormat) => {
+    if (blocked > 0 && !window.confirm(t("export.blockedWarning", { count: blocked }))) return;
+    onExport(fmt);
+  };
 
   return (
     <>
@@ -56,7 +66,7 @@ export function ExportBar({ onExport, onExportRuleSet, onImportRuleSet }: Export
         canExport={!!schematic}
         ruleCount={ruleCount}
         exporting={isExporting}
-        onExport={(fmt) => onExport(fmt as ExportFormat)}
+        onExport={(fmt) => handleExport(fmt as ExportFormat)}
         onExportRules={onExportRuleSet}
         onImportRules={() => fileInputRef.current?.click()}
         meter={diff ? <CompatMeter resolved={resolved} total={total} blocked={blocked} /> : undefined}

@@ -4,6 +4,7 @@ import type {
   ProgressCb,
 } from "../types";
 import type { ExportFormat } from "../pipeline/exporter";
+import type { ScanOverride } from "../pipeline/registry";
 
 export type GameId = "minecraft" | "hytale";
 
@@ -34,8 +35,16 @@ export interface GameAdapter {
    * Build a block registry from the files collected for an environment. What
    * those files are is game-specific (Minecraft: launcher metadata + mod JARs;
    * Hytale: the install's Assets.zip), so each adapter picks what it needs.
+   *
+   * `override` supplies the version/loader the user entered by hand when no
+   * launcher layout was recognised; adapters that don't detect a version from
+   * metadata ignore it.
    */
-  buildRegistry(files: File[], onProgress: ProgressCb): Promise<BlockRegistry>;
+  buildRegistry(
+    files: File[],
+    onProgress: ProgressCb,
+    override?: ScanOverride,
+  ): Promise<BlockRegistry>;
 
   /** Parse a schematic/structure file into the engine's neutral representation. */
   parseSchematic(file: File): Promise<SchematicStructure>;

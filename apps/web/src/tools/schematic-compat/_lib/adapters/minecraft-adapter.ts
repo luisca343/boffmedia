@@ -5,7 +5,7 @@ import type {
 } from "../types";
 import type { ExportFormat } from "../pipeline/exporter";
 import { loadSchematicFile } from "../pipeline/loader";
-import { buildScannedRegistry, isInstanceMetaFile } from "../pipeline/registry";
+import { buildScannedRegistry, isInstanceMetaFile, type ScanOverride } from "../pipeline/registry";
 import { exportStructure } from "../pipeline/exporter";
 import type { GameAdapter } from "./game-adapter";
 
@@ -18,10 +18,14 @@ import type { GameAdapter } from "./game-adapter";
 export class MinecraftAdapter implements GameAdapter {
   readonly gameId = "minecraft" as const;
 
-  buildRegistry(files: File[], onProgress: ProgressCb): Promise<BlockRegistry> {
+  buildRegistry(
+    files: File[],
+    onProgress: ProgressCb,
+    override?: ScanOverride,
+  ): Promise<BlockRegistry> {
     const metaFiles = files.filter((f) => isInstanceMetaFile(f.name));
     const jarFiles = files.filter((f) => f.name.toLowerCase().endsWith(".jar"));
-    return buildScannedRegistry(metaFiles, jarFiles, onProgress);
+    return buildScannedRegistry(metaFiles, jarFiles, onProgress, override);
   }
 
   parseSchematic(file: File): Promise<SchematicStructure> {

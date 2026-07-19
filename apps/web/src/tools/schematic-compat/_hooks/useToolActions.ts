@@ -4,8 +4,11 @@ import { useCallback } from "react";
 import { proxy, type Remote } from "comlink";
 import type { CompatWorkerAPI } from "../_lib/worker/worker-api";
 import { useToolStore } from "../_store/tool.store";
+import type { EnvRole } from "../_store/tool.store";
 import type { GameId } from "../_lib/adapters";
-import type { ResolutionMap, RuleSetMeta, CompatDiff } from "../_lib/types";
+import type { ScanOverride } from "../_lib/pipeline/registry";
+import { ERR, errorCode, errorDetail } from "../_lib/errors";
+import type { ResolutionMap, RuleSetMeta, CompatDiff, RegistryHandle } from "../_lib/types";
 import { parseBlockState } from "../_lib/pipeline/normalizer";
 import { exactRulePairs } from "../_lib/pipeline/rules/ruleset";
 import type { ExportFormat } from "../_lib/pipeline/exporter";
@@ -98,63 +101,132 @@ export function useToolActions(api: Remote<CompatWorkerAPI> | null) {
     [api],
   );
 
-  const scanSourceInstance = useCallback(
-    async (gameId: GameId, files: File[]) => {
+  /**
+   * Install a freshly built registry on one side. The target side additionally
+   * pulls its block-id list (the replacement comboboxes read it).
+   */
+  const applyRegistry = useCallback(
+    async (role: EnvRole, handle: RegistryHandle) => {
+      if (role === "source") {
+        store.getState().setSourceReg(handle);
+      } else {
+        store.getState().setTargetReg(handle);
+        const ids = api ? await api.getRegistryBlockIds(handle.id) : [];
+        store.getState().setTargetBlockIds(ids);
+      }
+      store.getState().setDiff(undefined);
+    },
+    [api, store],
+  );
+
+  const clearRegistry = useCallback(
+    (role: EnvRole) => {
+      if (role === "source") {
+        store.getState().setSourceReg(undefined);
+      } else {
+        store.getState().setTargetReg(undefined);
+        store.getState().setTargetBlockIds([]);
+      }
+    },
+    [store],
+  );
+
+  /**
+   * Build one side's environment from a picked game folder. When no launcher
+   * layout is recognised the scan doesn't fail outright — it parks the collected
+   * files in `pendingScan` so the UI can ask for the version + loader and retry
+   * via {@link retryPendingScan}, which is what makes non-CurseForge and
+   * hand-assembled folders usable.
+   */
+  const scanInstance = useCallback(
+    async (role: EnvRole, gameId: GameId, files: File[], override?: ScanOverride) => {
       if (!api) return;
       const s = store.getState();
-      const prevRegId = s.sourceReg?.id;
+      const prevRegId = role === "source" ? s.sourceReg?.id : s.targetReg?.id;
+      const setLoading = role === "source" ? s.setLoadingSource : s.setLoadingTarget;
+      const setScan = role === "source" ? s.setSourceScan : s.setTargetScan;
       s.setError(undefined);
-      s.setLoadingSource(true);
-      s.setSourceScan({ pct: 0, msg: "" });
+      s.setPendingScan(undefined);
+      setLoading(true);
+      setScan({ pct: 0, msg: "" });
       try {
-        const onProgress = proxy((pct: number, msg: string) =>
-          store.getState().setSourceScan({ pct, msg })
-        );
-        const handle = await api.scanInstance(gameId, files, onProgress);
-        store.getState().setSourceReg(handle);
-        store.getState().setDiff(undefined);
+        const onProgress = proxy((pct: number, msg: string) => {
+          const st = store.getState();
+          (role === "source" ? st.setSourceScan : st.setTargetScan)({ pct, msg });
+        });
+        const handle = await api.scanInstance(gameId, files, onProgress, override);
+        await applyRegistry(role, handle);
       } catch (err) {
-        store.getState().setError(errMsg(err));
-        store.getState().setSourceReg(undefined);
+        const code = errorCode(err);
+        if (code === ERR.instanceUndetected) {
+          // Recoverable: ask the user for what detection couldn't find.
+          store.getState().setPendingScan({ role, gameId, files });
+        } else {
+          store.getState().setError(errorDetail(err), code);
+        }
+        clearRegistry(role);
       } finally {
         // The outgoing registry is now replaced (or cleared on error); free it.
         await releaseHandle(prevRegId);
-        store.getState().setLoadingSource(false);
-        store.getState().setSourceScan(undefined);
+        const st = store.getState();
+        (role === "source" ? st.setLoadingSource : st.setLoadingTarget)(false);
+        (role === "source" ? st.setSourceScan : st.setTargetScan)(undefined);
       }
     },
-    [api, store, releaseHandle]
+    [api, store, releaseHandle, applyRegistry, clearRegistry],
+  );
+
+  const scanSourceInstance = useCallback(
+    (gameId: GameId, files: File[]) => scanInstance("source", gameId, files),
+    [scanInstance],
   );
 
   const scanTargetInstance = useCallback(
-    async (gameId: GameId, files: File[]) => {
+    (gameId: GameId, files: File[]) => scanInstance("target", gameId, files),
+    [scanInstance],
+  );
+
+  /** Re-run the parked scan with the version/loader the user supplied by hand. */
+  const retryPendingScan = useCallback(
+    async (override: ScanOverride) => {
+      const pending = store.getState().pendingScan;
+      if (!pending) return;
+      await scanInstance(pending.role, pending.gameId, pending.files, override);
+    },
+    [store, scanInstance],
+  );
+
+  const cancelPendingScan = useCallback(() => {
+    store.getState().setPendingScan(undefined);
+  }, [store]);
+
+  /**
+   * Build one side's environment from a bundled vanilla registry — no folder to
+   * pick. Analysis never depended on a scan (the diff classifies by namespace
+   * and only reads the source registry's game), so this is a full environment.
+   */
+  const loadVanillaEnv = useCallback(
+    async (role: EnvRole, version: string) => {
       if (!api) return;
       const s = store.getState();
-      const prevRegId = s.targetReg?.id;
+      const prevRegId = role === "source" ? s.sourceReg?.id : s.targetReg?.id;
+      const setLoading = role === "source" ? s.setLoadingSource : s.setLoadingTarget;
       s.setError(undefined);
-      s.setLoadingTarget(true);
-      s.setTargetScan({ pct: 0, msg: "" });
+      s.setPendingScan(undefined);
+      setLoading(true);
       try {
-        const onProgress = proxy((pct: number, msg: string) =>
-          store.getState().setTargetScan({ pct, msg })
-        );
-        const handle = await api.scanInstance(gameId, files, onProgress);
-        store.getState().setTargetReg(handle);
-        const ids = await api.getRegistryBlockIds(handle.id);
-        store.getState().setTargetBlockIds(ids);
-        store.getState().setDiff(undefined);
+        const handle = await api.loadVanillaRegistry(version);
+        await applyRegistry(role, handle);
       } catch (err) {
-        store.getState().setError(errMsg(err));
-        store.getState().setTargetReg(undefined);
-        store.getState().setTargetBlockIds([]);
+        store.getState().setError(errorDetail(err), errorCode(err));
+        clearRegistry(role);
       } finally {
-        // The outgoing registry is now replaced (or cleared on error); free it.
         await releaseHandle(prevRegId);
-        store.getState().setLoadingTarget(false);
-        store.getState().setTargetScan(undefined);
+        const st = store.getState();
+        (role === "source" ? st.setLoadingSource : st.setLoadingTarget)(false);
       }
     },
-    [api, store, releaseHandle]
+    [api, store, releaseHandle, applyRegistry, clearRegistry],
   );
 
   const loadSchematic = useCallback(
@@ -168,7 +240,7 @@ export function useToolActions(api: Remote<CompatWorkerAPI> | null) {
         const summary = await api.loadSchematic(file);
         store.getState().setSchematic(summary);
       } catch (err) {
-        store.getState().setError(errMsg(err));
+        store.getState().setError(errorDetail(err), errorCode(err));
         store.getState().setSchematic(undefined);
       } finally {
         // The outgoing schematic is now replaced (or cleared on error); free it.
@@ -189,7 +261,7 @@ export function useToolActions(api: Remote<CompatWorkerAPI> | null) {
       const diff = await api.computeDiff(schematic.id, sourceReg.id, targetReg.id);
       store.getState().setDiff(diff);
     } catch (err) {
-      store.getState().setError(errMsg(err));
+      store.getState().setError(errorDetail(err), errorCode(err));
       store.getState().setDiff(undefined);
     } finally {
       store.getState().setAnalyzing(false);
@@ -240,7 +312,7 @@ export function useToolActions(api: Remote<CompatWorkerAPI> | null) {
           exportId = res.schematicId;
           convertedId = res.schematicId;
         }
-        const blob = await api.export(exportId, format);
+        const blob = await api.export(exportId, format, targetReg?.dataVersion);
         // A prefab too large for one file comes back as a .zip of part prefabs
         // (worker sets the Blob type); swap the extension so the download is a .zip.
         const name = convertedFilename(schematic.fileName, format);
@@ -248,7 +320,7 @@ export function useToolActions(api: Remote<CompatWorkerAPI> | null) {
           blob.type === "application/zip" ? name.replace(/\.prefab\.json$/i, "-parts.zip") : name;
         triggerDownload(blob, filename);
       } catch (err) {
-        store.getState().setError(errMsg(err));
+        store.getState().setError(errorDetail(err), errorCode(err));
       } finally {
         if (convertedId) await api.release(convertedId).catch(() => {});
         store.getState().setExporting(false);
@@ -280,7 +352,7 @@ export function useToolActions(api: Remote<CompatWorkerAPI> | null) {
       const json = await api.exportRuleSet(map, meta);
       triggerDownload(new Blob([json], { type: "application/json" }), `${meta.id}.ruleset.json`);
     } catch (err) {
-      store.getState().setError(errMsg(err));
+      store.getState().setError(errorDetail(err), errorCode(err));
     }
   }, [api, store]);
 
@@ -296,7 +368,7 @@ export function useToolActions(api: Remote<CompatWorkerAPI> | null) {
           store.getState().setResolution(block, targetId);
         }
       } catch (err) {
-        store.getState().setError(errMsg(err));
+        store.getState().setError(errorDetail(err), errorCode(err));
       }
     },
     [api, store]
@@ -305,6 +377,9 @@ export function useToolActions(api: Remote<CompatWorkerAPI> | null) {
   return {
     scanSourceInstance,
     scanTargetInstance,
+    retryPendingScan,
+    cancelPendingScan,
+    loadVanillaEnv,
     changeSourceGame,
     changeTargetGame,
     loadSchematic,
@@ -313,8 +388,4 @@ export function useToolActions(api: Remote<CompatWorkerAPI> | null) {
     exportRuleSet,
     importRuleSet,
   };
-}
-
-function errMsg(err: unknown): string {
-  return err instanceof Error ? err.message : "Unexpected error";
 }

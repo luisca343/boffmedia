@@ -93,7 +93,11 @@
           "reading": "leyendo registro…",
           "noEnv": "Sin entorno seleccionado",
           "loaded": "Cargado",
-          "dropHere": "Suelta tu esquema"
+          "dropHere": "Suelta tu esquema",
+          "modeInstance": "Carpeta",
+          "modeVanilla": "Vanilla",
+          "vanillaVersion": "Versión de Minecraft",
+          "vanillaRegistry": "Registro vanilla"
         },
         "diff": {
           "header": "Compatibilidad",
@@ -184,7 +188,8 @@
           "importRules": "Importar Reglas",
           "exportRules": "Exportar Reglas",
           "exporting": "Exportando…",
-          "exportSchematic": "Exportar esquema"
+          "exportSchematic": "Exportar esquema",
+          "blockedWarning": "{count, plural, one {# tipo de bloque no tiene destino y se escribirá sin cambios, o se descartará en una conversión entre juegos.} other {# tipos de bloque no tienen destino y se escribirán sin cambios, o se descartarán en una conversión entre juegos.}} ¿Exportar de todos modos?"
         },
         "worker": {
           "connecting": "Conectando al motor de análisis...",
@@ -194,6 +199,22 @@
           "label": "Listo para exportar",
           "resolved": "resueltos",
           "blocked": "{count, plural, one {# sin resolver} other {# sin resolver}}"
+        },
+        "manualEnv": {
+          "title": "¿Qué versión de Minecraft es esta?",
+          "body": "Esta carpeta no tiene metadatos de launcher que reconozcamos. Indica su versión y cargador de mods y la escanearemos igualmente — los mods encontrados se incluyen.",
+          "jarsFound": "{count, plural, =0 {No se encontraron JAR de mods} one {# JAR de mod encontrado} other {# JAR de mods encontrados}}",
+          "version": "Versión",
+          "loader": "Cargador de mods",
+          "loaderNone": "Ninguno",
+          "cancel": "Cancelar",
+          "confirm": "Escanear carpeta"
+        },
+        "error": {
+          "instanceEmpty": "Esa carpeta no tiene metadatos de launcher ni mods. Elige una carpeta de instancia, o cambia este entorno a Vanilla.",
+          "schematicUnsupported": "Tipo de archivo no admitido. Usa .schem, .litematic, .nbt, .mca o .prefab.json.",
+          "schematicLegacy": "Este es un schematic de MCEdit anterior a 1.13, que usa ids numéricos que esta herramienta aún no puede leer. Vuelve a guardarlo con un WorldEdit moderno como .schem.",
+          "exportTooLarge": "Este esquema es demasiado grande para el formato elegido. Exporta una región más pequeña, o elige .schem / .litematic."
         }
       }
     }
