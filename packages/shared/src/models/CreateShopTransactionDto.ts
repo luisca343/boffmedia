@@ -20,9 +20,9 @@ export type CreateShopTransactionDto = {
      */
     itemName: string;
     /**
-     * Operation type (e.g., buy, sell)
+     * Operation type: COMPRA (player pays) or VENTA (player is paid)
      */
-    operation: string;
+    operation: CreateShopTransactionDto.operation;
     /**
      * Unit price of the item
      */
@@ -32,4 +32,13 @@ export type CreateShopTransactionDto = {
      */
     count: number;
 };
+export namespace CreateShopTransactionDto {
+    /**
+     * Operation type: COMPRA (player pays) or VENTA (player is paid)
+     */
+    export enum operation {
+        COMPRA = 'COMPRA',
+        VENTA = 'VENTA',
+    }
+}
 
