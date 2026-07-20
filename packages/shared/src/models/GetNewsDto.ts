@@ -4,6 +4,10 @@
 /* eslint-disable */
 export type GetNewsDto = {
     /**
+     * Server UUID (automatically added by middleware)
+     */
+    server?: string;
+    /**
      * Filter by published status
      */
     published?: string;

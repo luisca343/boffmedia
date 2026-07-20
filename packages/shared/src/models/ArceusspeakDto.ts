@@ -3,6 +3,10 @@
 /* tslint:disable */
 /* eslint-disable */
 export type ArceusspeakDto = {
+    /**
+     * Server UUID (automatically added by middleware)
+     */
+    server?: string;
     name: string;
     value: string;
     format: string;

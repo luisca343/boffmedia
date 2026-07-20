@@ -78,6 +78,7 @@ export namespace StarBankTransaction {
         RETIRO = 'RETIRO',
         MULTA = 'MULTA',
         TASA = 'TASA',
+        AJUSTE = 'AJUSTE',
         SUBASTA = 'SUBASTA',
         RECOMPENSA = 'RECOMPENSA',
         MERCADO = 'MERCADO',
