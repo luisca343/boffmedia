@@ -6,8 +6,8 @@ import type {
   DiffEntry,
   DiffSummary,
   UnifiedBlock,
-} from "../types";
-import { parseBlockState } from "./normalizer";
+} from "@/lib/schematic/types";
+import { parseBlockState } from "@/lib/schematic/normalizer";
 import RENAMES_JSON from "./rules/known-renames/1.18-1.21.json";
 import { crossGameMap } from "./rules/cross-game";
 

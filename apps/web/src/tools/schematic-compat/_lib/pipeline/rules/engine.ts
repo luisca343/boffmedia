@@ -9,8 +9,8 @@
  * Returns null if no rule matches (caller falls back to rename detection or
  * marks the block as missing/mod-only).
  */
-import type { MappingRule, RuleSet, UnifiedBlock, BlockRegistry } from "../../types";
-import { parseBlockState } from "../normalizer";
+import type { MappingRule, RuleSet, UnifiedBlock, BlockRegistry } from "@/lib/schematic/types";
+import { parseBlockState } from "@/lib/schematic/normalizer";
 
 export function applyRules(
   block: UnifiedBlock,

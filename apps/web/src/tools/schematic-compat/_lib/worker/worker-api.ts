@@ -9,11 +9,11 @@ import type {
   BlockPositionGroup,
   BlockDefinition,
   ProgressCb,
-} from "../types";
-import type { ExportFormat } from "../pipeline/exporter";
-import type { GameId } from "../adapters";
-import type { CompiledModel } from "../model/types";
-import type { ScanOverride } from "../pipeline/registry";
+  ScanOverride,
+  ExportFormat,
+} from "@/lib/schematic/types";
+import type { GameId } from "@/lib/schematic/adapters/game-adapter";
+import type { CompiledModel } from "@/lib/schematic/model/types";
 
 /**
  * Comlink-exposed worker API.

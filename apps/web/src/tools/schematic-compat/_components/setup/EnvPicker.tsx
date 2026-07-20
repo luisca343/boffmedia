@@ -1,12 +1,13 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { ScanCard, type SchRegistry } from "../ui/sch-kit";
-import type { RegistryHandle } from "../../_lib/types";
-import type { GameId } from "../../_lib/adapters";
+import { ScanCard } from "./ScanCard";
+import type { SchRegistry } from "../ui/sch-tokens";
+import type { RegistryHandle } from "@/lib/schematic/types";
+import { gameMeta, type GameId } from "@/lib/schematic/adapters/game-adapter";
 import type { EnvMode } from "../../_store/tool.store";
-import { BUNDLED_VERSIONS } from "../../_lib/versions";
-import { INSTANCE_META_FILENAMES } from "../../_lib/pipeline/registry/loader-detect";
+import { BUNDLED_VERSIONS } from "@/lib/schematic/versions";
+import { INSTANCE_META_FILENAMES } from "@/lib/schematic/registry/loader-detect";
 
 interface ScanProgress {
   pct: number;
@@ -142,7 +143,7 @@ async function collectHytale(dir: FsDirHandle): Promise<File[]> {
 /** Fallback for browsers without the File System Access API: split a FileList. */
 function collectFromFileList(files: FileList, game: GameId): File[] {
   const list = Array.from(files);
-  if (game === "hytale") {
+  if (gameMeta(game).pickerKind === "asset-archive") {
     const zip =
       list.find((f) => f.name.toLowerCase() === "assets.zip") ??
       list.filter((f) => f.name.toLowerCase().endsWith(".zip")).sort((a, b) => b.size - a.size)[0];
@@ -206,7 +207,8 @@ export function EnvPicker({
   useEffect(() => {
     setHasFsApi(!!getDirectoryPicker());
   }, []);
-  const fallbackIsFolder = !hasFsApi && game === "minecraft";
+  const meta = gameMeta(game);
+  const fallbackIsFolder = !hasFsApi && meta.pickerKind === "instance-folder";
 
   useEffect(() => {
     if (inputRef.current) {
@@ -227,7 +229,8 @@ export function EnvPicker({
       if (!picker) return;
       try {
         const dir = await picker();
-        const files = game === "hytale" ? await collectHytale(dir) : await collectMinecraft(dir);
+        const files =
+          meta.pickerKind === "asset-archive" ? await collectHytale(dir) : await collectMinecraft(dir);
         onPick(files);
       } catch {
         // User dismissed the picker — nothing to do.
@@ -243,7 +246,7 @@ export function EnvPicker({
         ref={inputRef}
         type="file"
         multiple={fallbackIsFolder}
-        accept={game === "hytale" && !hasFsApi ? ".zip" : undefined}
+        accept={!hasFsApi ? meta.fallbackAccept : undefined}
         className="hidden"
         onChange={(e) => {
           const files = e.target.files;
@@ -260,9 +263,9 @@ export function EnvPicker({
         scanning={loading}
         progress={scan?.pct ?? 0}
         onPick={handleClick}
-        // Only Minecraft ships bundled registries; Hytale must scan its install.
-        mode={game === "minecraft" ? mode : "instance"}
-        onMode={game === "minecraft" ? onModeChange : undefined}
+        // A game without bundled registries must scan its install.
+        mode={meta.hasBundledRegistries ? mode : "instance"}
+        onMode={meta.hasBundledRegistries ? onModeChange : undefined}
         versions={BUNDLED_VERSIONS}
         version={vanillaVersion}
         onVersion={onVanillaVersionChange}

@@ -3,18 +3,14 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { useTranslations } from "next-intl";
 import { Button, Icon } from "@/components/boffmedia/primitives";
-import {
-  FilterChips,
-  MappingCard,
-  BulkRulesSheet,
-  type SchStatus,
-  type SchDiffEntry,
-  type SchRing,
-  type BulkAction,
-} from "../ui/sch-kit";
-import { useToolStore } from "../../_store/tool.store";
-import type { DiffEntry } from "../../_lib/types";
-import { BlockThumb, type PreviewRow } from "./BlockThumb";
+import type { SchRing } from "@/components/boffmedia/ui/schematic";
+import { FilterChips } from "./FilterChips";
+import { MappingCard } from "./MappingCard";
+import { BulkRulesSheet } from "./BulkRulesSheet";
+import type { BulkAction, SchDiffEntry, SchStatus } from "../ui/sch-tokens";
+import { selectEnv, useToolStore } from "../../_store/tool.store";
+import type { DiffEntry } from "@/lib/schematic/types";
+import { BlockThumb, type PreviewRow } from "@/components/boffmedia/ui/schematic";
 
 // Missing and mod-only are merged into a single red "missing" group (mod-only
 // rows carry a "mod" pill), so mod-only is bucketed under "missing".
@@ -81,11 +77,13 @@ export function DiffPanel() {
   const clearResolution = useToolStore((s) => s.clearResolution);
   const selectedBlockId = useToolStore((s) => s.selectedBlockId);
   const setSelectedBlock = useToolStore((s) => s.setSelectedBlock);
-  const sourceVersion = useToolStore((s) => s.sourceReg?.version);
-  const targetVersion = useToolStore((s) => s.targetReg?.version);
-  const sourceRegId = useToolStore((s) => s.sourceReg?.id);
-  const targetRegId = useToolStore((s) => s.targetReg?.id);
-  const targetGame = useToolStore((s) => s.targetGame);
+  const sourceEnv = useToolStore(selectEnv("source"));
+  const targetEnv = useToolStore(selectEnv("target"));
+  const sourceVersion = sourceEnv.registry?.version;
+  const targetVersion = targetEnv.registry?.version;
+  const sourceRegId = sourceEnv.registry?.id;
+  const targetRegId = targetEnv.registry?.id;
+  const targetGame = targetEnv.game;
 
   // Bulk-rule targets follow the target game's namespace, not a hardcoded
   // "minecraft:" (which is wrong/absent when converting to Hytale).

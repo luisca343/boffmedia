@@ -49,7 +49,8 @@
         "tools": "Tools"
       },
       "tools": {
-        "schematicCompat": "Schematic Compatibility"
+        "schematicCompat": "Schematic Compatibility",
+        "schematicViewer": "Schematic Viewer"
       },
       "schematicCompat": {
         "title": "Schematic Compatibility Tool",
@@ -179,7 +180,10 @@
           "navOrbitHint": "Orbit navigation (F)",
           "navFlyHint": "Spectator flight (F)",
           "flyClickToStart": "Click to take control",
-          "flyControlsHint": "WASD move · Space/Shift up/down · Scroll speed · Esc exit"
+          "flyControlsHint": "WASD move · Space/Shift up/down · Scroll speed · Esc exit",
+          "emptyNoSchematic": "Load a schematic to see the 3D preview",
+          "preparing": "Preparing 3D data…",
+          "noBlocks": "This schematic has no renderable blocks"
         },
         "export": {
           "title": "Export",
@@ -215,6 +219,55 @@
           "schematicUnsupported": "Unsupported file type. Use .schem, .litematic, .nbt, .mca or .prefab.json.",
           "schematicLegacy": "This is a pre-1.13 MCEdit schematic, which uses numeric block ids this tool cannot read yet. Re-save it with a modern WorldEdit as .schem.",
           "exportTooLarge": "This schematic is too large for the selected format. Export a smaller region, or choose .schem / .litematic."
+        }
+      },
+      "schematicViewer": {
+        "title": "Schematic Viewer",
+        "description": "Open any schematic and explore it in 3D — no conversion, no setup",
+        "features": {
+          "viewer3d": "3D View",
+          "layers": "Layer Slicing",
+          "versions": "Vanilla Versions"
+        },
+        "appName": "Schematic Viewer",
+        "appTagline": "Minecraft · Hytale",
+        "setup": {
+          "version": "Version",
+          "schematic": "Schematic",
+          "view": "View",
+          "loadingRegistry": "Loading registry…",
+          "registry": "Registry",
+          "vanillaRegistry": "Vanilla",
+          "blocks": "Blocks",
+          "dropHere": "Drop your schematic",
+          "loaded": "Loaded",
+          "parsing": "Reading the file…",
+          "details": "Details",
+          "format": "Format",
+          "size": "Size",
+          "palette": "Palette"
+        },
+        "preview": {
+          "title": "3D view",
+          "loading3d": "Loading 3D engine…",
+          "fullscreen": "Fullscreen",
+          "exitFullscreen": "Exit fullscreen",
+          "navOrbit": "Orbit",
+          "navFly": "Fly",
+          "navOrbitHint": "Orbit navigation (F)",
+          "navFlyHint": "Spectator fly (F)",
+          "flyClickToStart": "Click to take control",
+          "flyControlsHint": "WASD move · Space/Shift up/down · Wheel speed · Esc exit",
+          "emptyCaption": "3D schematic view · WebGL",
+          "emptyNoSchematic": "Load a schematic to see the 3D view",
+          "preparing": "Preparing 3D data…",
+          "noBlocks": "This schematic has no blocks to show",
+          "inspectorEmpty": "Click a block in the 3D view to inspect it.",
+          "instances": "{count, plural, one {# instance} other {# instances}}"
+        },
+        "error": {
+          "schematicUnsupported": "Unsupported file type. Use .schem, .litematic, .nbt, .mca or .prefab.json.",
+          "schematicLegacy": "This is a pre-1.13 MCEdit schematic, which uses numeric ids this tool cannot read yet. Re-save it with a modern WorldEdit as .schem."
         }
       }
     }

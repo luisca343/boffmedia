@@ -14,35 +14,27 @@ import type {
   DiffEntry,
   BlockPositionGroup,
   ProgressCb,
-} from "../types";
+  ScanOverride,
+  ExportFormat,
+} from "@/lib/schematic/types";
+import {
+  createEngineState,
+  type SchematicEngineState,
+} from "@/lib/schematic/worker/core-ops";
+import * as core from "@/lib/schematic/worker/core-ops";
+import { getAdapter, adapterForFormat, adapterForNamespace, type GameId } from "@/lib/schematic/adapters";
 import { computeDiff } from "../pipeline/diff";
-import { loadBundledRegistry, type ScanOverride } from "../pipeline/registry";
 import { applyRules } from "../pipeline/rules/engine";
 import { transformStates } from "../pipeline/state/transformer";
 import { buildRuleSet, parseRuleSet } from "../pipeline/rules/ruleset";
+import { crossGameTargetIds } from "../pipeline/rules/cross-game";
 import { bridgeRotationStates, isRedundantDoorHalf } from "../pipeline/rules/cross-game/rotation";
-import { getAdapter, type GameId } from "../adapters";
-import type { ExportFormat } from "../pipeline/exporter";
+import { exportStructure } from "../pipeline/exporter";
 
-// All game-specific work (scan / parse / export) goes through a per-game adapter.
-// The engine itself stays game-agnostic — it only sees UnifiedBlock /
-// BlockRegistry / SchematicStructure.
-
-/** Pick the adapter for a schematic file by extension (Hytale prefab vs Minecraft). */
-function adapterForFile(fileName: string): GameId {
-  const lower = fileName.toLowerCase();
-  return lower.endsWith(".prefab.json") || lower.endsWith(".prefab") ? "hytale" : "minecraft";
-}
-
-/** Pick the adapter for an export by format (prefab → Hytale, else Minecraft). */
-function adapterForFormat(format: ExportFormat): GameId {
-  return format === "prefab" ? "hytale" : "minecraft";
-}
-
-/** Which game a block belongs to (Hytale ids are namespaced, everything else is MC). */
-function blockGameOf(block: UnifiedBlock): GameId {
-  return block.namespace === "hytale" ? "hytale" : "minecraft";
-}
+// The engine half (scan / parse / texture / model / positions) lives in
+// `@/lib/schematic/worker/core-ops` and is shared with any other schematic
+// worker. Only the conversion ops below are specific to this tool.
+const state: SchematicEngineState = createEngineState();
 
 /**
  * The block definition `transformStates` should key off after a bridge. Normally
@@ -60,12 +52,6 @@ function effectiveDef(
   return targetReg.blocks.get(bridged.id) ?? targetDef;
 }
 
-function airBlock(game: GameId): UnifiedBlock {
-  return game === "hytale"
-    ? { id: "hytale:air", namespace: "hytale", name: "air", states: {}, tags: [], source: "vanilla" }
-    : { id: "minecraft:air", namespace: "minecraft", name: "air", states: {}, tags: [], source: "vanilla" };
-}
-
 /**
  * Cross-game exports must not leak the other game's blocks. Any palette entry
  * that isn't the target game — i.e. it was never mapped to a target-game block
@@ -75,104 +61,52 @@ function airBlock(game: GameId): UnifiedBlock {
  * prefab). Same-game exports change nothing (every block already matches).
  */
 function stripForeignBlocks(structure: SchematicStructure, targetGame: GameId): SchematicStructure {
-  const air = airBlock(targetGame);
+  const air = getAdapter(targetGame).airBlock();
   let changed = false;
   const palette = structure.palette.map((b) => {
-    if (b.name === "air" || blockGameOf(b) === targetGame) return b;
+    if (b.name === "air" || adapterForNamespace(b.namespace).gameId === targetGame) return b;
     changed = true;
     return air;
   });
   return changed ? { ...structure, palette } : structure;
 }
 
-// ─── In-worker caches ──────────────────────────────────────────────────────────
-
-const registries = new Map<string, BlockRegistry>();
-const schematics = new Map<string, SchematicStructure>();
-let idCounter = 0;
-const nextId = (prefix: string) => `${prefix}-${++idCounter}`;
-
-function registryHandle(id: string, reg: BlockRegistry): RegistryHandle {
-  return {
-    id,
-    gameId: reg.gameId,
-    version: reg.version,
-    dataVersion: reg.dataVersion,
-    modLoader: reg.modLoader,
-    mods: reg.mods,
-    blockCount: reg.blocks.size,
-    source: reg.snapshotHash.startsWith("vanilla-") ? "bundled" : "scanned",
-    instanceName: reg.instanceName,
-  };
-}
-
-function schematicSummary(
-  id: string,
-  s: SchematicStructure,
-  fileName: string,
-  fileSize: number
-): SchematicSummary {
-  return {
-    id,
-    format: s.format,
-    formatVersion: s.formatVersion,
-    dimensions: s.dimensions,
-    paletteSize: s.palette.length,
-    blockCount: s.dimensions.x * s.dimensions.y * s.dimensions.z,
-    fileName,
-    fileSize,
-  };
-}
-
-// ─── API ────────────────────────────────────────────────────────────────────────
-
 const api: CompatWorkerAPI = {
-  async ping() {
-    return "pong";
-  },
+  ping: () => core.ping(),
 
-  async scanInstance(
+  scanInstance(
     gameId: GameId,
     files: File[],
     onProgress: ProgressCb,
     override?: ScanOverride,
   ): Promise<RegistryHandle> {
-    const reg = await getAdapter(gameId).buildRegistry(files, onProgress, override);
-    const id = nextId("reg");
-    registries.set(id, reg);
-    return registryHandle(id, reg);
+    // The cross-game rule table decides which target blocks must resolve; the
+    // registry builder is handed the ids and never reads the table itself.
+    return core.scanInstance(state, gameId, files, onProgress, {
+      override,
+      requiredBlockIds: crossGameTargetIds(gameId),
+    });
   },
 
-  async loadVanillaRegistry(version: string): Promise<RegistryHandle> {
-    // No instance to scan — the bundled vanilla registry IS the environment.
-    // Analysis never needed a folder (computeDiff only reads the source
-    // registry's gameId; classification is namespace-based), so this is a
-    // first-class environment, not a degraded one.
-    const reg = await loadBundledRegistry(version);
-    const id = nextId("reg");
-    registries.set(id, reg);
-    return registryHandle(id, reg);
-  },
+  loadVanillaRegistry: (version: string) => core.loadVanillaRegistry(state, version),
+
+  getBlockTexture: (registryId: string, blockId: string) =>
+    core.getBlockTexture(state, registryId, blockId),
+
+  getBlockModel: (registryId: string, blockId: string, stateLabel?: string, rotation?: number) =>
+    core.getBlockModel(state, registryId, blockId, stateLabel, rotation),
+
+  loadSchematic: (file: File): Promise<SchematicSummary> => core.loadSchematic(state, file),
+
+  getSchematicBlockPositions: (schematicId: string): Promise<BlockPositionGroup[]> =>
+    core.getSchematicBlockPositions(state, schematicId),
+
+  release: (id: string) => core.release(state, id),
 
   async getRegistryBlockIds(registryId: string): Promise<string[]> {
-    const reg = registries.get(registryId);
+    const reg = state.registries.get(registryId);
     if (!reg) throw new Error(`Registry not found: ${registryId}`);
     return [...reg.blocks.keys()].sort();
-  },
-
-  async getBlockTexture(registryId: string, blockId: string): Promise<string | null> {
-    const reg = registries.get(registryId);
-    if (!reg) return null;
-    // Prebuilt textures (Minecraft mod JARs) first, then a lazy resolver if the
-    // game extracts on demand (Hytale pulls the icon out of Assets.zip here).
-    return reg.textures?.get(blockId) ?? (await reg.getTexture?.(blockId)) ?? null;
-  },
-
-  async getBlockModel(registryId: string, blockId: string, stateLabel?: string, rotation?: number) {
-    const reg = registries.get(registryId);
-    if (!reg?.getModel) return null;
-    // Compiled geometry (plain typed arrays) → safe to clone across postMessage.
-    return (await reg.getModel(blockId, stateLabel, rotation)) ?? null;
   },
 
   async getBlockConnections(registryId: string, blockId: string) {
@@ -180,14 +114,7 @@ const api: CompatWorkerAPI = {
     // preview uses it to resolve a converted block's corner/T/cross variant the
     // same way the export path does (target block defs otherwise stay in the
     // worker). `null` for non-connected blocks, so the preview leaves them as-is.
-    return registries.get(registryId)?.blocks.get(blockId)?.connections ?? null;
-  },
-
-  async loadSchematic(file: File): Promise<SchematicSummary> {
-    const structure = await getAdapter(adapterForFile(file.name)).parseSchematic(file);
-    const id = nextId("schem");
-    schematics.set(id, structure);
-    return schematicSummary(id, structure, file.name, file.size);
+    return state.registries.get(registryId)?.blocks.get(blockId)?.connections ?? null;
   },
 
   async computeDiff(
@@ -195,169 +122,33 @@ const api: CompatWorkerAPI = {
     sourceRegId: string,
     targetRegId: string
   ): Promise<CompatDiff> {
-    const structure = schematics.get(schematicId);
+    const structure = state.schematics.get(schematicId);
     if (!structure) throw new Error(`Schematic not found: ${schematicId}`);
-    const sourceReg = registries.get(sourceRegId);
+    const sourceReg = state.registries.get(sourceRegId);
     if (!sourceReg) throw new Error(`Source registry not found: ${sourceRegId}`);
-    const targetReg = registries.get(targetRegId);
+    const targetReg = state.registries.get(targetRegId);
     if (!targetReg) throw new Error(`Target registry not found: ${targetRegId}`);
     return computeDiff(structure, sourceReg, targetReg);
   },
 
-  async release(id: string): Promise<void> {
-    registries.delete(id);
-    schematics.delete(id);
-  },
-
-  async getSchematicBlockPositions(schematicId: string): Promise<BlockPositionGroup[]> {
-    // Every cell is classified as surface (≥1 open neighbour / volume edge) or
-    // interior (fully enclosed). Surface cells always render; interior cells go
-    // into a separate per-group array the viewer only draws at the active
-    // Y-slice, which is the only moment slicing can expose them. Past this many
-    // *renderable* (non-air) blocks, interiors are dropped entirely — a 500³
-    // solid build is 125M blocks but only ~1.5M surface cells, so this is what
-    // makes very large schematics fit in memory at all (the layer slider then
-    // shows a hollow shell, the accepted trade-off for that size).
-    const CULL_THRESHOLD = 1_500_000;
-    // Hard cap on always-rendered instances handed to the GPU; if the surface
-    // itself is larger we stride within each block group as a last resort.
-    const MAX_INSTANCES = 2_000_000;
-
-    const structure = schematics.get(schematicId);
-    if (!structure) throw new Error(`Schematic not found: ${schematicId}`);
-    const { x: sx, y: sy, z: sz } = structure.dimensions;
-    const data = structure.blockData;
-    const palLen = structure.palette.length;
-    const sxsz = sx * sz;
-
-    // air (or out-of-range) palette indices → treated as empty space.
-    const airFlags = new Uint8Array(palLen);
-    for (let i = 0; i < palLen; i++) {
-      const id = structure.palette[i].id;
-      if (id === "air" || id.endsWith(":air")) airFlags[i] = 1;
-    }
-    // A neighbour cell is "open" when it's air or an invalid index (undefined
-    // airFlags lookup → NaN-ish, so `!== 0` covers both air and out-of-range).
-    const open = (li: number): boolean => airFlags[data[li]] !== 0;
-    // A cell is on the visible surface when it touches the volume edge or any of
-    // its six neighbours is open.
-    const exposed = (xi: number, yi: number, zi: number, li: number): boolean =>
-      xi === 0 || yi === 0 || zi === 0 || xi === sx - 1 || yi === sy - 1 || zi === sz - 1 ||
-      open(li - 1) || open(li + 1) ||
-      open(li - sx) || open(li + sx) ||
-      open(li - sxsz) || open(li + sxsz);
-
-    // Pass A — count renderable blocks; decides whether interiors are dropped.
-    let nonAir = 0;
-    for (let li = 0; li < data.length; li++) {
-      if (airFlags[data[li]] === 0) nonAir++;
-    }
-    const keepInterior = nonAir <= CULL_THRESHOLD;
-
-    // Pass B — count surface/interior instances per palette index (Y-outer so
-    // the fill pass writes Y-sorted positions, which the UI binary-searches for
-    // both the layer cutoff and the interior slice window).
-    const surfCounts = new Uint32Array(palLen);
-    const intCounts = new Uint32Array(palLen);
-    for (let yi = 0; yi < sy; yi++) {
-      for (let zi = 0; zi < sz; zi++) {
-        const row = (yi * sz + zi) * sx;
-        for (let xi = 0; xi < sx; xi++) {
-          const li = row + xi;
-          const pi = data[li];
-          if (airFlags[pi] !== 0) continue; // air / invalid
-          if (exposed(xi, yi, zi, li)) surfCounts[pi]++;
-          else if (keepInterior) intCounts[pi]++;
-        }
-      }
-    }
-
-    let total = 0;
-    for (let i = 0; i < palLen; i++) total += surfCounts[i];
-    const stride = total > MAX_INSTANCES ? Math.ceil(total / MAX_INSTANCES) : 1;
-
-    // Exact-size typed arrays, no boxed number[][] intermediates (the old path
-    // allocated ~3 JS numbers per block — gigabytes on a large solid schematic).
-    const surfBufs: (Float32Array | null)[] = new Array(palLen).fill(null);
-    const intBufs: (Float32Array | null)[] = new Array(palLen).fill(null);
-    for (let i = 0; i < palLen; i++) {
-      if (surfCounts[i] > 0) surfBufs[i] = new Float32Array(surfCounts[i] * 3);
-      if (intCounts[i] > 0) intBufs[i] = new Float32Array(intCounts[i] * 3);
-    }
-    const surfCursor = new Uint32Array(palLen);
-    const intCursor = new Uint32Array(palLen);
-
-    // Pass C — fill positions.
-    for (let yi = 0; yi < sy; yi++) {
-      for (let zi = 0; zi < sz; zi++) {
-        const row = (yi * sz + zi) * sx;
-        for (let xi = 0; xi < sx; xi++) {
-          const li = row + xi;
-          const pi = data[li];
-          if (airFlags[pi] !== 0) continue;
-          let buf: Float32Array;
-          let c: number;
-          if (exposed(xi, yi, zi, li)) {
-            buf = surfBufs[pi]!;
-            c = surfCursor[pi];
-            surfCursor[pi] = c + 3;
-          } else if (keepInterior) {
-            buf = intBufs[pi]!;
-            c = intCursor[pi];
-            intCursor[pi] = c + 3;
-          } else continue;
-          buf[c] = xi;
-          buf[c + 1] = yi;
-          buf[c + 2] = zi;
-        }
-      }
-    }
-
-    const groups: BlockPositionGroup[] = [];
-    for (let i = 0; i < palLen; i++) {
-      const surf = surfBufs[i];
-      const interior = intBufs[i];
-      if (!surf && !interior) continue;
-      let positions = surf ?? new Float32Array(0);
-      if (surf && stride > 1) {
-        const n = surf.length / 3;
-        const kept = new Float32Array(Math.ceil(n / stride) * 3);
-        let w = 0;
-        for (let j = 0; j < n; j += stride) {
-          kept[w++] = surf[j * 3];
-          kept[w++] = surf[j * 3 + 1];
-          kept[w++] = surf[j * 3 + 2];
-        }
-        positions = kept;
-      }
-      groups.push({
-        paletteIndex: i,
-        block: structure.palette[i],
-        positions,
-        ...(interior ? { interiorPositions: interior } : {}),
-      });
-    }
-    return groups;
-  },
-
-  // ── Phase 2 ───────────────────────────────────────────────────────────────
   async applyResolutions(
     schematicId: string,
     resolutions: ResolutionMap,
     ruleSets: RuleSet[],
     targetRegId: string
   ): Promise<{ schematicId: string; remaining: DiffEntry[] }> {
-    const structure = schematics.get(schematicId);
+    const structure = state.schematics.get(schematicId);
     if (!structure) throw new Error(`Schematic not found: ${schematicId}`);
-    const targetReg = registries.get(targetRegId);
+    const targetReg = state.registries.get(targetRegId);
     if (!targetReg) throw new Error(`Target registry not found: ${targetRegId}`);
+    const targetAdapter = getAdapter(targetReg.gameId);
 
     // Step 1: apply explicit per-block-id resolutions
     let newPalette = structure.palette.map((block) => {
       // A two-block Minecraft door's upper half has nothing to become: Hytale's
       // door model already spans both cells from the lower placement. Force it
       // to air regardless of how (or whether) the base door id was resolved.
-      if (isRedundantDoorHalf(block, targetReg.gameId)) return airBlock(targetReg.gameId);
+      if (isRedundantDoorHalf(block, targetReg.gameId)) return targetAdapter.airBlock();
       const res = resolutions[block.id];
       if (!res) return block;
       const targetDef = targetReg.blocks.get(res.target.id);
@@ -386,9 +177,9 @@ const api: CompatWorkerAPI = {
       });
     }
 
-    const newId = nextId("schem");
+    const newId = state.nextId("schem");
     const newStructure: SchematicStructure = { ...structure, palette: newPalette };
-    schematics.set(newId, newStructure);
+    state.schematics.set(newId, newStructure);
 
     // Re-diff the modified schematic against the target registry
     const diff = computeDiff(newStructure, targetReg, targetReg);
@@ -398,9 +189,9 @@ const api: CompatWorkerAPI = {
   },
 
   async export(schematicId: string, format: ExportFormat, dataVersion?: number): Promise<Blob> {
-    const structure = schematics.get(schematicId);
+    const structure = state.schematics.get(schematicId);
     if (!structure) throw new Error(`Schematic not found: ${schematicId}`);
-    const targetGame = adapterForFormat(format);
+    const targetGame = adapterForFormat(format).gameId;
     // Drop any block still foreign to the target game (unmapped in a cross-game
     // conversion) so its source id never lands in the written file.
     let cleaned = stripForeignBlocks(structure, targetGame);
@@ -411,7 +202,7 @@ const api: CompatWorkerAPI = {
     if (dataVersion !== undefined) {
       cleaned = { ...cleaned, metadata: { ...cleaned.metadata, dataVersion } };
     }
-    const out = getAdapter(targetGame).export(cleaned, format);
+    const out = exportStructure(cleaned, format);
     // A writer may stream straight to a Blob (large prefabs); pass it through
     // rather than forcing its bytes back through a second in-memory copy.
     return out instanceof Blob ? out : new Blob([out as BlobPart], { type: "application/octet-stream" });

@@ -2,13 +2,12 @@
 
 import { useCallback } from "react";
 import { useTranslations } from "next-intl";
-import { Icon } from "@/components/boffmedia/primitives";
-import { Stepper } from "./_components/ui/sch-kit";
+import { Icon, Stepper } from "@/components/boffmedia/primitives";
 import { useCompatEngine } from "./_hooks/useCompatEngine";
 import { useToolActions } from "./_hooks/useToolActions";
 import { useSchematicRender } from "./_hooks/useSchematicRender";
-import { ModTextureProvider } from "./_hooks/modTextureContext";
-import { useToolStore } from "./_store/tool.store";
+import { SchematicAssetProvider } from "@/lib/schematic/render";
+import { selectEnv, useToolStore } from "./_store/tool.store";
 import { SetupPanel } from "./_components/setup/SetupPanel";
 import { DiffPanel } from "./_components/diff/DiffPanel";
 import { PreviewPanel } from "./_components/preview/PreviewPanel";
@@ -23,8 +22,8 @@ export function SchematicCompatTool() {
 
   const engineReady = status === "ready" && api !== null;
 
-  const sourceReg = useToolStore((s) => s.sourceReg);
-  const targetReg = useToolStore((s) => s.targetReg);
+  const sourceReg = useToolStore(selectEnv("source")).registry;
+  const targetReg = useToolStore(selectEnv("target")).registry;
   const schematic = useToolStore((s) => s.schematic);
   const diff = useToolStore((s) => s.diff);
 
@@ -51,7 +50,7 @@ export function SchematicCompatTool() {
   );
 
   return (
-    <ModTextureProvider
+    <SchematicAssetProvider
       getBlockTexture={getBlockTexture}
       getBlockModel={getBlockModel}
       getBlockConnections={getBlockConnections}
@@ -109,6 +108,6 @@ export function SchematicCompatTool() {
           onImportRuleSet={actions.importRuleSet}
         />
       </div>
-    </ModTextureProvider>
+    </SchematicAssetProvider>
   );
 }
