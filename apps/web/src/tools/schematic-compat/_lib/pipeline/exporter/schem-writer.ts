@@ -28,10 +28,10 @@ import {
   Compound,
   List,
   type Tag,
-} from "../../parsers/nbt-writer";
-import { NBT_TAG } from "../../parsers/nbt";
-import { serializeBlockState } from "../normalizer";
-import type { SchematicStructure, TileEntity } from "../../types";
+} from "@/lib/schematic/parsers/nbt-writer";
+import { NBT_TAG } from "@/lib/schematic/parsers/nbt";
+import { serializeBlockState } from "@/lib/schematic/normalizer";
+import type { SchematicStructure, TileEntity } from "@/lib/schematic/types";
 
 const DEFAULT_DATA_VERSION = 3700; // 1.20.4 — a safe modern default
 

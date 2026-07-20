@@ -1,8 +1,11 @@
 /**
- * Per-block render planning for the 3D viewer's "converted" display mode.
+ * Diff-aware render planning — the conversion half of the renderer's
+ * {@link RenderPlan} contract. Plain source rendering lives in
+ * `@/lib/schematic/render` (`sourcePlan`); everything here needs a diff, so it
+ * stays with the tool that produces one.
  *
- * Mirrors the export resolution logic (`buildExportResolutionMap` in
- * useToolActions) so the preview shows exactly what the exported file will be:
+ * Mirrors the export resolution logic (`buildExportResolutionMap`) so the
+ * preview shows exactly what the exported file will be:
  *
  *  - explicit per-row override  → render the chosen target texture, highlighted
  *  - renamed (auto candidate)   → render the candidate's texture, highlighted
@@ -14,22 +17,11 @@
  *                                 changed blocks stand out
  */
 
-import type { DiffEntry } from "../../_lib/types";
+import type { RenderPlan } from "@/lib/schematic/render";
+import type { DiffEntry } from "@/lib/schematic/types";
 
-export type RenderKind = "normal" | "changed" | "ghost" | "problem";
-
-export interface RenderPlan {
-  /** Block id whose texture to render. */
-  textureId: string;
-  /** When true, resolve the texture against the target registry (vs. source). */
-  useTarget: boolean;
-  kind: RenderKind;
-}
-
-/** Source mode: render every block exactly as it is in the source game. */
-export function sourcePlan(sourceId: string): RenderPlan {
-  return { textureId: sourceId, useTarget: false, kind: "normal" };
-}
+export type { RenderKind, RenderPlan } from "@/lib/schematic/render";
+export { sourcePlan } from "@/lib/schematic/render";
 
 /**
  * Result mode: resolve textures exactly like converted mode (target ids for

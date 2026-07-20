@@ -3,13 +3,15 @@
  * requested format. The structure passed in is already version-converted
  * (resolutions applied) by the worker; this layer only handles serialisation.
  */
-import type { SchematicStructure } from "../../types";
+import type { SchematicStructure, ExportFormat } from "@/lib/schematic/types";
 import { writeSchem } from "./schem-writer";
 import { writeLitematic } from "./litematic-writer";
 import { writeNbtStruct } from "./nbt-writer";
 import { writePrefab } from "./prefab-writer";
 
-export type ExportFormat = "schem" | "schem3" | "litematic" | "nbt" | "prefab";
+// The format union is declared with the shared types so an adapter can advertise
+// what it writes without dragging these writers in behind the declaration.
+export type { ExportFormat };
 
 // Most formats return an in-memory byte buffer; `prefab` returns a streamed Blob
 // (its dense document can be multiple GB, so it's never fully resident — see

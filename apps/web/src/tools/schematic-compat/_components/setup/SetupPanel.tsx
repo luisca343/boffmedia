@@ -3,10 +3,10 @@
 import { useEffect } from "react";
 import { useTranslations } from "next-intl";
 import { Button, Banner, Disclosure, Icon } from "@/components/boffmedia/primitives";
-import type { GameId } from "../../_lib/adapters";
-import { useToolStore, type EnvMode, type EnvRole } from "../../_store/tool.store";
+import { SchematicFilePicker } from "@/components/boffmedia/ui/schematic";
+import { gameMeta, type GameId } from "@/lib/schematic/adapters/game-adapter";
+import { selectEnv, useToolStore, type EnvMode, type EnvRole } from "../../_store/tool.store";
 import { EnvPicker } from "./EnvPicker";
-import { FilePicker } from "./FilePicker";
 import { ManualEnvDialog, type ManualEnvChoice } from "./ManualEnvDialog";
 
 interface SetupPanelProps {
@@ -51,53 +51,43 @@ export function SetupPanel({
   onPickSchematic,
   onAnalyze,
 }: SetupPanelProps) {
-  const {
-    sourceGame,
-    targetGame,
-    sourceReg,
-    targetReg,
-    schematic,
-    sourceScan,
-    targetScan,
-    sourceEnvMode,
-    targetEnvMode,
-    sourceVanillaVersion,
-    targetVanillaVersion,
-    pendingScan,
-    isLoadingSource,
-    isLoadingTarget,
-    isAnalyzing,
-    diff,
-    error,
-    errorCode,
-    setEnvMode,
-    setVanillaVersion,
-  } = useToolStore();
+  // Selectors, not a bare `useToolStore()`: an unselected subscription re-renders
+  // this panel on every scan-progress tick.
+  const source = useToolStore(selectEnv("source"));
+  const target = useToolStore(selectEnv("target"));
+  const schematic = useToolStore((s) => s.schematic);
+  const pendingScan = useToolStore((s) => s.pendingScan);
+  const isAnalyzing = useToolStore((s) => s.isAnalyzing);
+  const diff = useToolStore((s) => s.diff);
+  const error = useToolStore((s) => s.error);
+  const errorCode = useToolStore((s) => s.errorCode);
+  const setEnvMode = useToolStore((s) => s.setEnvMode);
+  const setVanillaVersion = useToolStore((s) => s.setVanillaVersion);
   const t = useTranslations("games.minecraft.schematicCompat");
 
   // A vanilla environment needs no picker interaction — selecting the mode (or a
   // different version) IS the choice, so build the registry as soon as it changes.
   useEffect(() => {
-    if (engineReady && sourceGame === "minecraft" && sourceEnvMode === "vanilla") {
-      onLoadVanilla("source", sourceVanillaVersion);
+    if (engineReady && gameMeta(source.game).hasBundledRegistries && source.envMode === "vanilla") {
+      onLoadVanilla("source", source.vanillaVersion);
     }
     // onLoadVanilla is stable (useCallback in useToolActions).
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [engineReady, sourceGame, sourceEnvMode, sourceVanillaVersion]);
+  }, [engineReady, source.game, source.envMode, source.vanillaVersion]);
 
   useEffect(() => {
-    if (engineReady && targetGame === "minecraft" && targetEnvMode === "vanilla") {
-      onLoadVanilla("target", targetVanillaVersion);
+    if (engineReady && gameMeta(target.game).hasBundledRegistries && target.envMode === "vanilla") {
+      onLoadVanilla("target", target.vanillaVersion);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [engineReady, targetGame, targetEnvMode, targetVanillaVersion]);
+  }, [engineReady, target.game, target.envMode, target.vanillaVersion]);
 
   const errorText = errorCode && ERROR_KEY[errorCode] ? t(ERROR_KEY[errorCode]) : error;
 
   const guideSteps = [t("guide.step1"), t("guide.step2"), t("guide.step3"), t("guide.step4"), t("guide.step5")];
 
   const analyzed = !!diff;
-  const canAnalyze = engineReady && !!schematic && !!sourceReg && !!targetReg && !isAnalyzing && !analyzed;
+  const canAnalyze = engineReady && !!schematic && !!source.registry && !!target.registry && !isAnalyzing && !analyzed;
 
   return (
     <div className="p-4 pb-[22px] flex flex-col gap-4">
@@ -121,16 +111,16 @@ export function SetupPanel({
         <EnvPicker
           role="source"
           roleLabel={t("setup.source")}
-          game={sourceGame}
+          game={source.game}
           onGameChange={onChangeSourceGame}
-          registry={sourceReg}
-          scan={sourceScan}
-          loading={isLoadingSource}
+          registry={source.registry}
+          scan={source.scan}
+          loading={source.isLoading}
           disabled={!engineReady}
-          onPick={(files) => onScanSource(sourceGame, files)}
-          mode={sourceEnvMode}
+          onPick={(files) => onScanSource(source.game, files)}
+          mode={source.envMode}
           onModeChange={(m: EnvMode) => setEnvMode("source", m)}
-          vanillaVersion={sourceVanillaVersion}
+          vanillaVersion={source.vanillaVersion}
           onVanillaVersionChange={(v) => setVanillaVersion("source", v)}
         />
         <div className="flex items-center justify-center gap-2 text-txt-dim py-px px-1">
@@ -141,16 +131,16 @@ export function SetupPanel({
         <EnvPicker
           role="target"
           roleLabel={t("setup.target")}
-          game={targetGame}
+          game={target.game}
           onGameChange={onChangeTargetGame}
-          registry={targetReg}
-          scan={targetScan}
-          loading={isLoadingTarget}
+          registry={target.registry}
+          scan={target.scan}
+          loading={target.isLoading}
           disabled={!engineReady}
-          onPick={(files) => onScanTarget(targetGame, files)}
-          mode={targetEnvMode}
+          onPick={(files) => onScanTarget(target.game, files)}
+          mode={target.envMode}
           onModeChange={(m: EnvMode) => setEnvMode("target", m)}
-          vanillaVersion={targetVanillaVersion}
+          vanillaVersion={target.vanillaVersion}
           onVanillaVersionChange={(v) => setVanillaVersion("target", v)}
         />
       </div>
@@ -158,7 +148,12 @@ export function SetupPanel({
       {/* schematic */}
       <div className="flex flex-col gap-2.5">
         <GroupHead title={t("setup.schematicSection")} />
-        <FilePicker schematic={schematic} disabled={!engineReady} onPick={onPickSchematic} />
+        <SchematicFilePicker
+          schematic={schematic}
+          labels={{ dropHere: t("setup.dropHere"), loaded: t("setup.loaded") }}
+          disabled={!engineReady}
+          onPick={onPickSchematic}
+        />
       </div>
 
       <Button variant="pri" icon="play" className="w-full justify-center mt-0.5" disabled={!canAnalyze} onClick={onAnalyze}>

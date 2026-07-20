@@ -1,11 +1,11 @@
-import type { UnifiedBlock, BlockDefinition } from "../../../types";
-import type { GameId } from "../../../adapters/game-adapter";
+import type { UnifiedBlock, BlockDefinition } from "@/lib/schematic/types";
+import type { GameId } from "@/lib/schematic/adapters/game-adapter";
 import {
   rotationIndex,
   decodeRotationIndex,
   verifyVariant,
   type Rot,
-} from "../../../model/rotation-tuple";
+} from "@/lib/schematic/model/rotation-tuple";
 
 /**
  * Bridges Minecraft orientation blockstates (`facing`/`half`/`type`/`axis`) and

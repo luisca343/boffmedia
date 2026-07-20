@@ -2,9 +2,9 @@ import { describe, expect, it } from "vitest";
 import { writeSchem } from "./schem-writer";
 import { writeLitematic } from "./litematic-writer";
 import { writeNbtStruct } from "./nbt-writer";
-import { parseNBT, asNumber, asCompound } from "../../parsers/nbt";
-import { parseBlockState } from "../normalizer";
-import type { SchematicStructure } from "../../types";
+import { parseNBT, asNumber, asCompound } from "@/lib/schematic/parsers/nbt";
+import { parseBlockState } from "@/lib/schematic/normalizer";
+import type { SchematicStructure } from "@/lib/schematic/types";
 
 /** 2×1×1: one stone, one air. */
 function structure(metadata: Record<string, unknown> = {}): SchematicStructure {

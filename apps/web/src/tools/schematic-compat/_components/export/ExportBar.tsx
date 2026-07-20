@@ -2,10 +2,11 @@
 
 import { useRef } from "react";
 import { useTranslations } from "next-intl";
-import { ExportBar as ExportBarUI, CompatMeter } from "../ui/sch-kit";
-import { useToolStore } from "../../_store/tool.store";
-import type { CompatDiff } from "../../_lib/types";
-import type { ExportFormat } from "../../_lib/pipeline/exporter";
+import { ExportBarUI } from "./ExportBarUI";
+import { CompatMeter } from "./CompatMeter";
+import { selectEnv, useToolStore } from "../../_store/tool.store";
+import type { CompatDiff } from "@/lib/schematic/types";
+import type { ExportFormat } from "@/lib/schematic/types";
 
 interface ExportBarProps {
   onExport: (format: ExportFormat) => void;
@@ -35,7 +36,7 @@ export function ExportBar({ onExport, onExportRuleSet, onImportRuleSet }: Export
   const resolutions = useToolStore((s) => s.resolutions);
   const diff = useToolStore((s) => s.diff);
   const ruleCount = Object.keys(resolutions).length;
-  const targetGame = useToolStore((s) => s.targetGame);
+  const targetGame = useToolStore(selectEnv("target")).game;
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const { resolved, total, blocked } = readiness(diff, resolutions);
