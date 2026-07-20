@@ -13,8 +13,8 @@
  * (facing, waterlogged, etc.) — we warn if they had to be defaulted so the
  * user knows the structure might look or behave differently after export.
  */
-import { parseBlockState } from "../normalizer";
-import type { UnifiedBlock, BlockDefinition } from "../../types";
+import { parseBlockState } from "@/lib/schematic/normalizer";
+import type { UnifiedBlock, BlockDefinition } from "@/lib/schematic/types";
 
 const SEMANTIC_STATES = new Set([
   "facing",

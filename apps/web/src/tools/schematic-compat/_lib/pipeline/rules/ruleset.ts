@@ -6,8 +6,8 @@
  * {@link ResolutionMap} into rules; import validates an untrusted JSON file back
  * into a typed {@link RuleSet} (see §12 of the plan).
  */
-import { parseBlockState } from "../normalizer";
-import type { MappingRule, ResolutionMap, RuleSet, RuleSetMeta } from "../../types";
+import { parseBlockState } from "@/lib/schematic/normalizer";
+import type { MappingRule, ResolutionMap, RuleSet, RuleSetMeta } from "@/lib/schematic/types";
 
 /** Serialise the current per-block resolutions into a `.ruleset.json` string. */
 export function buildRuleSet(resolutions: ResolutionMap, meta: RuleSetMeta): string {

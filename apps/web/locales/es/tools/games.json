@@ -49,7 +49,8 @@
         "tools": "Herramientas"
       },
       "tools": {
-        "schematicCompat": "Compatibilidad de Schematics"
+        "schematicCompat": "Compatibilidad de Schematics",
+        "schematicViewer": "Visor de Schematics"
       },
       "schematicCompat": {
         "title": "Herramienta de Compatibilidad de Schematics",
@@ -179,7 +180,10 @@
           "navOrbitHint": "Navegación orbital (F)",
           "navFlyHint": "Vuelo espectador (F)",
           "flyClickToStart": "Haz clic para tomar el control",
-          "flyControlsHint": "WASD moverse · Espacio/Mayús subir/bajar · Rueda velocidad · Esc salir"
+          "flyControlsHint": "WASD moverse · Espacio/Mayús subir/bajar · Rueda velocidad · Esc salir",
+          "emptyNoSchematic": "Carga un esquema para ver la vista 3D",
+          "preparing": "Preparando datos 3D…",
+          "noBlocks": "Este esquema no tiene bloques que mostrar"
         },
         "export": {
           "title": "Exportar",
@@ -215,6 +219,55 @@
           "schematicUnsupported": "Tipo de archivo no admitido. Usa .schem, .litematic, .nbt, .mca o .prefab.json.",
           "schematicLegacy": "Este es un schematic de MCEdit anterior a 1.13, que usa ids numéricos que esta herramienta aún no puede leer. Vuelve a guardarlo con un WorldEdit moderno como .schem.",
           "exportTooLarge": "Este esquema es demasiado grande para el formato elegido. Exporta una región más pequeña, o elige .schem / .litematic."
+        }
+      },
+      "schematicViewer": {
+        "title": "Visor de Schematics",
+        "description": "Abre cualquier schematic y explóralo en 3D, sin conversiones ni ajustes",
+        "features": {
+          "viewer3d": "Vista 3D",
+          "layers": "Corte por Capas",
+          "versions": "Versiones Vanilla"
+        },
+        "appName": "Schematic Viewer",
+        "appTagline": "Minecraft · Hytale",
+        "setup": {
+          "version": "Versión",
+          "schematic": "Esquema",
+          "view": "Ver",
+          "loadingRegistry": "Cargando registro…",
+          "registry": "Registro",
+          "vanillaRegistry": "Vanilla",
+          "blocks": "Bloques",
+          "dropHere": "Suelta tu esquema",
+          "loaded": "Cargado",
+          "parsing": "Leyendo el archivo…",
+          "details": "Detalles",
+          "format": "Formato",
+          "size": "Tamaño",
+          "palette": "Paleta"
+        },
+        "preview": {
+          "title": "Vista 3D",
+          "loading3d": "Cargando motor 3D…",
+          "fullscreen": "Pantalla completa",
+          "exitFullscreen": "Salir de pantalla completa",
+          "navOrbit": "Órbita",
+          "navFly": "Vuelo",
+          "navOrbitHint": "Navegación orbital (F)",
+          "navFlyHint": "Vuelo espectador (F)",
+          "flyClickToStart": "Haz clic para tomar el control",
+          "flyControlsHint": "WASD moverse · Espacio/Mayús subir/bajar · Rueda velocidad · Esc salir",
+          "emptyCaption": "Vista 3D del esquema · WebGL",
+          "emptyNoSchematic": "Carga un esquema para ver la vista 3D",
+          "preparing": "Preparando datos 3D…",
+          "noBlocks": "Este esquema no tiene bloques que mostrar",
+          "inspectorEmpty": "Haz clic en un bloque de la vista 3D para inspeccionarlo.",
+          "instances": "{count, plural, one {# instancia} other {# instancias}}"
+        },
+        "error": {
+          "schematicUnsupported": "Tipo de archivo no admitido. Usa .schem, .litematic, .nbt, .mca o .prefab.json.",
+          "schematicLegacy": "Este es un schematic de MCEdit anterior a 1.13, que usa ids numéricos que esta herramienta aún no puede leer. Vuelve a guardarlo con un WorldEdit moderno como .schem."
         }
       }
     }

@@ -4,8 +4,8 @@ import { useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Button, Icon } from "@/components/boffmedia/primitives";
 import { cn } from "@/lib/utils";
-import { BUNDLED_VERSIONS, DEFAULT_VANILLA_VERSION } from "../../_lib/versions";
-import type { ModLoader } from "../../_lib/pipeline/registry/loader-detect";
+import { BUNDLED_VERSIONS, DEFAULT_VANILLA_VERSION } from "@/lib/schematic/versions";
+import type { ModLoader } from "@/lib/schematic/registry/loader-detect";
 
 export interface ManualEnvChoice {
   version: string;

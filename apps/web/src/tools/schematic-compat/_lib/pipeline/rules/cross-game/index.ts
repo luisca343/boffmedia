@@ -1,4 +1,4 @@
-import type { GameId } from "../../../adapters/game-adapter";
+import type { GameId } from "@/lib/schematic/adapters/game-adapter";
 import MC_HYTALE from "./minecraft-hytale.json";
 
 interface CrossGameTable {
@@ -28,4 +28,25 @@ export function crossGameMap(
     return TABLE.hytaleToMinecraft;
   }
   return null;
+}
+
+/**
+ * Block ids this table maps *to* for a game, so a scanned registry can be asked
+ * to guarantee them. A cross-game target that the picked install doesn't define
+ * would otherwise resolve to nothing and the mapping would silently drop.
+ *
+ * The registry builder takes these as an argument rather than reading this
+ * table: what blocks exist is registry construction, what blocks map to is
+ * conversion policy, and only this direction of the dependency is sound.
+ * `air` is excluded — every game supplies its own via the adapter.
+ */
+export function crossGameTargetIds(targetGame: GameId): string[] {
+  const prefix = `${targetGame}:`;
+  const targets = new Set<string>();
+  for (const map of [TABLE.minecraftToHytale, TABLE.hytaleToMinecraft]) {
+    for (const id of Object.values(map)) {
+      if (id.startsWith(prefix) && id !== `${prefix}air`) targets.add(id);
+    }
+  }
+  return [...targets];
 }

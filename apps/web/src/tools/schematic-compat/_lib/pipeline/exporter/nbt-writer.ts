@@ -13,9 +13,9 @@ import {
   Compound,
   List,
   type Tag,
-} from "../../parsers/nbt-writer";
-import { NBT_TAG } from "../../parsers/nbt";
-import type { SchematicStructure, UnifiedBlock } from "../../types";
+} from "@/lib/schematic/parsers/nbt-writer";
+import { NBT_TAG } from "@/lib/schematic/parsers/nbt";
+import type { SchematicStructure, UnifiedBlock } from "@/lib/schematic/types";
 
 const DEFAULT_DATA_VERSION = 3700; // 1.20.4
 

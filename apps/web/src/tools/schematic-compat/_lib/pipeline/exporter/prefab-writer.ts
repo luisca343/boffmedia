@@ -1,6 +1,7 @@
-import type { SchematicStructure, UnifiedBlock } from "../../types";
-import { ZipWriter } from "../../parsers/zip-writer";
-import { fluidPlacement, isHytaleFluidName, type FluidPlacement } from "../fluid";
+import type { SchematicStructure, UnifiedBlock } from "@/lib/schematic/types";
+import { ZipWriter } from "@/lib/schematic/parsers/zip-writer";
+import { isHytaleFluidName } from "@/lib/schematic/fluids";
+import { fluidPlacement, type FluidPlacement } from "../fluid";
 
 interface Vec3 {
   x: number;
