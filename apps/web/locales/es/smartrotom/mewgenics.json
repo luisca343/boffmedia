@@ -194,17 +194,21 @@
       "misc": "Varios"
     },
     "filter": {
-      "kind": "Tipo",
-      "kind.weapon": "Arma",
-      "kind.head": "Cabeza",
-      "kind.face": "Cara",
-      "kind.neck": "Cuello",
-      "kind.trinket": "Abalorio",
+      "kind": {
+        "label": "Tipo",
+        "weapon": "Arma",
+        "head": "Cabeza",
+        "face": "Cara",
+        "neck": "Cuello",
+        "trinket": "Abalorio"
+      },
       "rarity": "Rareza",
       "faction": "Facción",
       "type": "Tipo",
-      "cls": "Clase",
-      "cls.general": "General",
+      "cls": {
+        "label": "Clase",
+        "general": "General"
+      },
       "act": "Acto"
     },
     "sort": {
