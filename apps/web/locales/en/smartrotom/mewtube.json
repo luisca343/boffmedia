@@ -1,0 +1,76 @@
+{
+  "mewtube": {
+    "common": {
+      "close": "Close",
+      "back": "Back",
+      "retry": "Retry",
+      "loading": "Loading…",
+      "search": "Search",
+      "viewAll": "View all",
+      "play": "Play",
+      "watchLater": "Watch later",
+      "emptyState": "There's nothing here yet."
+    },
+    "home": {
+      "trending": "Trending",
+      "trendingNow": "Most viewed right now",
+      "searchResults": "Results for «{query}»",
+      "comingSoon": "Coming soon",
+      "noResults": "Could not complete the search.",
+      "errorLoading": "Could not load videos."
+    },
+    "video": {
+      "loadingVideo": "Loading video…",
+      "notFound": "Video not found.",
+      "autoplay": "Autoplay",
+      "subscribe": "Subscribe",
+      "subscribed": "Subscribed",
+      "like": "Like",
+      "dislike": "Dislike",
+      "share": "Share",
+      "save": "Save",
+      "saved": "Saved",
+      "views": "{count} views",
+      "chapters": "Chapters · {count}",
+      "subscribers": "{count} subscribers",
+      "notifyMe": "Notify me"
+    },
+    "comments": {
+      "loading": "Loading comments…",
+      "empty": "No comments available.",
+      "count": "{count} comments",
+      "replies": "{count} replies"
+    },
+    "player": {
+      "seekTo": "Go to {label}",
+      "pause": "Pause",
+      "play": "Play",
+      "volume": "Volume",
+      "fullscreen": "Fullscreen"
+    },
+    "channel": {
+      "loadingChannel": "Loading channel…",
+      "notFound": "Channel not found.",
+      "subscribers": "subscribers",
+      "videos": "videos",
+      "views": "views",
+      "average": "Average",
+      "activeSince": "Active since",
+      "latestUploads": "Latest uploads",
+      "subscribe": "Subscribe",
+      "notifications": "Notifications"
+    },
+    "history": {
+      "title": "History",
+      "yourActivity": "Your activity",
+      "clearHistory": "Clear history",
+      "empty": "You haven't watched any videos yet."
+    },
+    "sidebar": {
+      "home": "Home",
+      "trending": "Trending",
+      "history": "History",
+      "subscriptions": "Subscriptions"
+    }
+  }
+}

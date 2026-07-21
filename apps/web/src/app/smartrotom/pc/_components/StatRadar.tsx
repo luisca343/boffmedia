@@ -1,3 +1,4 @@
+import { useTranslations } from "next-intl"
 import { locId } from "../_stores/pcUiStore"
 import type { Mon } from "../_types/pc.types"
 import { STAT_KEYS, STAT_SHORT } from "../_utils/constants"
@@ -30,11 +31,12 @@ export interface StatRadarProps {
 
 /** Six axes, one polygon per Pokémon. Scaled to the strongest stat on the board. */
 export function StatRadar({ mons }: StatRadarProps) {
+  const t = useTranslations("pc")
   const maxStat = Math.max(150, ...mons.flatMap((m) => STAT_KEYS.map((k) => statAt(m.pokemon.stats, k))))
 
   return (
     <div className="flex flex-col items-center gap-2.5">
-      <svg width={SIZE} height={SIZE} className="overflow-visible" role="img" aria-label="Radar de estadísticas">
+      <svg width={SIZE} height={SIZE} className="overflow-visible" role="img" aria-label={t("detail.stats")}>
         {RINGS.map((ring) => (
           <polygon
             key={ring}

@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState, type MouseEvent } from "react";
 import dynamic from "next/dynamic";
+import { useTranslations } from "next-intl";
 import type { NoteFolder, NoteTag } from "@boffmedia/shared";
 import { Icon, IconButton, Tooltip, MiniTag, Avatar, type IconName } from "./ui";
 import { useNoteContent } from "../_hooks/useNoteContent";
@@ -44,6 +45,7 @@ interface NotePaneProps extends PaneHandlers {
 }
 
 export function NotePane(props: NotePaneProps) {
+  const t = useTranslations("notas");
   const { note, tags, folders } = props;
   const { note: loaded } = useNoteContent(note.id);
   const [saveState, setSaveState] = useState<"saved" | "saving">("saved");
@@ -63,7 +65,7 @@ export function NotePane(props: NotePaneProps) {
 
   const commit = useCallback(
     (html: string) => {
-      props.onCommit(note.id, html, extractTitle(html) || "Sin título");
+      props.onCommit(note.id, html, extractTitle(html) || t("editor.untitled"));
       setSaveState("saved");
     },
     [note.id, props],
@@ -93,7 +95,7 @@ export function NotePane(props: NotePaneProps) {
             <button
               className="inline-flex md:hidden"
               onClick={props.mobileBack}
-              aria-label="Volver"
+              aria-label={t("common.back")}
             >
               <Icon name="chevron-left" size={18} className="text-nt-fg-muted" />
             </button>
@@ -106,7 +108,7 @@ export function NotePane(props: NotePaneProps) {
             />
             <span>{folder ? folder.name : "SmartRotom"}</span>
             <Icon name="chevron-right" size={12} />
-            <span className="min-w-0 truncate text-nt-fg-muted">{note.title || "Sin título"}</span>
+            <span className="min-w-0 truncate text-nt-fg-muted">{note.title || t("editor.untitled")}</span>
           </div>
           <div
             className="inline-flex h-7 items-center gap-1.5 rounded-full border border-nt-border bg-nt-hover px-2.5 text-[12px] text-nt-fg-subtle"
@@ -117,56 +119,56 @@ export function NotePane(props: NotePaneProps) {
                 saveState === "saving" ? "animate-pulse bg-nt-c-warning" : "bg-nt-c-success"
               }`}
             />
-            {saveState === "saving" ? "Guardando…" : "Guardado"}
+            {saveState === "saving" ? t("editor.saving") : t("editor.saved")}
           </div>
           <div className="flex flex-none items-center gap-0.5">
-            <Tooltip label={note.pinned ? "Desanclar" : "Anclar"}>
-              <IconButton active={!!note.pinned} onClick={() => props.onTogglePin(note)} aria-label="Anclar">
+            <Tooltip label={note.pinned ? t("common.unpin") : t("common.pin")}>
+              <IconButton active={!!note.pinned} onClick={() => props.onTogglePin(note)} aria-label={t("common.pin")}>
                 <Icon name="pin" size={16} />
               </IconButton>
             </Tooltip>
-            <Tooltip label="Historial de versiones">
-              <IconButton onClick={() => props.onHistory(note)} aria-label="Historial">
+            <Tooltip label={t("editor.versionHistory")}>
+              <IconButton onClick={() => props.onHistory(note)} aria-label={t("editor.versionHistory")}>
                 <Icon name="history" size={16} />
               </IconButton>
             </Tooltip>
-            <Tooltip label="Compartir">
-              <IconButton onClick={() => props.onShare(note)} aria-label="Compartir">
+            <Tooltip label={t("common.share")}>
+              <IconButton onClick={() => props.onShare(note)} aria-label={t("common.share")}>
                 <Icon name="share" size={15} />
               </IconButton>
             </Tooltip>
             {!props.isSplit && props.onSplit && (
-              <Tooltip label="Vista dividida">
+              <Tooltip label={t("editor.splitView")}>
                 <IconButton
                   className="max-md:hidden"
                   onClick={() => props.onSplit!(note.id)}
-                  aria-label="Dividir"
+                  aria-label={t("editor.splitView")}
                 >
                   <Icon name="split" size={16} />
                 </IconButton>
               </Tooltip>
             )}
             {props.isSplit && (
-              <Tooltip label="Cerrar panel">
-                <IconButton onClick={props.onCloseSplit} aria-label="Cerrar panel">
+              <Tooltip label={t("editor.closePanel")}>
+                <IconButton onClick={props.onCloseSplit} aria-label={t("editor.closePanel")}>
                   <Icon name="x" size={16} />
                 </IconButton>
               </Tooltip>
             )}
             {!props.isSplit && props.onToggleCtx && (
-              <Tooltip label="Panel lateral">
+              <Tooltip label={t("editor.sidePanel")}>
                 <IconButton
                   active={props.ctxOn}
                   className="max-lg:hidden"
                   onClick={props.onToggleCtx}
-                  aria-label="Panel lateral"
+                  aria-label={t("editor.sidePanel")}
                 >
                   <Icon name={"file-text" as IconName} size={16} />
                 </IconButton>
               </Tooltip>
             )}
-            <Tooltip label="Más">
-              <IconButton onClick={(e) => props.onMore(note, e)} aria-label="Más">
+            <Tooltip label={t("editor.more")}>
+              <IconButton onClick={(e) => props.onMore(note, e)} aria-label={t("editor.more")}>
                 <Icon name="more-v" size={16} />
               </IconButton>
             </Tooltip>
@@ -187,7 +189,7 @@ export function NotePane(props: NotePaneProps) {
             className="inline-flex items-center gap-1 rounded-full border border-dashed border-nt-border-2 px-2 py-0.5 text-[11px] text-nt-fg-subtle hover:border-nt-fg-subtle hover:text-nt-fg-muted"
             onClick={(e) => props.onAddTag(note, e)}
           >
-            <Icon name="plus" size={11} /> etiqueta
+            <Icon name="plus" size={11} /> {t("editor.addTag")}
           </button>
           <span className="flex-1" />
           <span className="flex items-center gap-2 text-[11.5px] text-nt-fg-subtle">
@@ -198,7 +200,7 @@ export function NotePane(props: NotePaneProps) {
                 ))}
               </span>
             )}
-            {wc} palabras · {readMin} min
+            {t("editor.words", { count: wc })} · {readMin} min
           </span>
         </div>
       </div>

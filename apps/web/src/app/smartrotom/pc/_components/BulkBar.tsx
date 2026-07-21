@@ -1,6 +1,7 @@
 "use client"
 
 import { useMemo, useState } from "react"
+import { useTranslations } from "next-intl"
 import { useBulkMark, useBoxGrid, useMons } from "../_hooks/queries"
 import { planBulkMove, useMoveQueue } from "../_hooks/useMoveQueue"
 import { locId, usePcUi } from "../_stores/pcUiStore"
@@ -16,6 +17,7 @@ import { Button, ChipButton, Icon, Input, toast } from "./ui"
  * swaps. There is no release endpoint, so there is no Liberar button.
  */
 export function BulkBar() {
+  const t = useTranslations("pc")
   const multiMode = usePcUi((s) => s.multiMode)
   const selected = usePcUi((s) => s.selected)
   const clearSelection = usePcUi((s) => s.clearSelection)
@@ -49,15 +51,15 @@ export function BulkBar() {
 
   const favorite = () => {
     bulkMark.mutate({ keys, favorite: true })
-    toast(`${n} marcados como favoritos`, "success")
+    toast(`${n} ${t("filters.statusToggles.favorite")}`, "success")
     setMenu(null)
   }
 
-  const addTag = (t: string) => {
-    const clean = t.trim()
+  const addTag = (tag: string) => {
+    const clean = tag.trim()
     if (!clean) return
     bulkMark.mutate({ keys, addTags: [clean] })
-    toast(`Etiqueta «${clean}» añadida a ${n}`, "success")
+    toast(`${t("filters.tag")} «${clean}» ${n}`, "success")
     setTag("")
     setMenu(null)
   }
@@ -66,15 +68,15 @@ export function BulkBar() {
     setMenu(null)
     const { moves, placed, overflow } = planBulkMove(picked, box, boxes[box])
     if (!moves.length) {
-      toast("No hay hueco en esa caja", "error")
+      toast(t("toast.boxFull"), "error")
       return
     }
-    const ok = await run(moves, `Mover a ${boxName(boxMeta, box)}`)
+    const ok = await run(moves, `${t("bulk.moveTo")} ${boxName(boxMeta, box)}`)
     if (!ok) return
     toast(
       overflow > 0
-        ? `${placed} movidos a ${boxName(boxMeta, box)} — ${overflow} no cabían`
-        : `${placed} movidos a ${boxName(boxMeta, box)}`,
+        ? t("toast.movedOverflow", { count: placed, overflow })
+        : t("toast.moved", { count: placed }),
       overflow > 0 ? "info" : "success",
     )
     exit()
@@ -86,7 +88,7 @@ export function BulkBar() {
         <span className="flex h-[26px] min-w-[26px] items-center justify-center rounded-lg bg-pc-cyan px-1.5 font-pc-mono text-[13px] font-extrabold text-[#06222a]">
           {n}
         </span>
-        <span className="whitespace-nowrap text-[12.5px] text-pc-fg-muted">seleccionados</span>
+        <span className="whitespace-nowrap text-[12.5px] text-pc-fg-muted">{t("bulk.selected", { count: n })}</span>
       </span>
 
       <span className="h-6 w-px bg-pc-line" />
@@ -97,7 +99,7 @@ export function BulkBar() {
         </span>
       ) : (
         <>
-          <Button variant="ghost" icon disabled={none} onClick={favorite} aria-label="Marcar como favoritos" title="Favorito">
+          <Button variant="ghost" icon disabled={none} onClick={favorite} aria-label={t("filters.statusToggles.favorite")} title={t("filters.statusToggles.favorite")}>
             <Icon name="heart" size={16} />
           </Button>
 
@@ -107,8 +109,8 @@ export function BulkBar() {
               icon
               disabled={none}
               onClick={() => setMenu(menu === "tag" ? null : "tag")}
-              aria-label="Etiquetar selección"
-              title="Etiquetar"
+              aria-label={t("filters.tag")}
+              title={t("filters.tag")}
             >
               <Icon name="tag" size={16} />
             </Button>
@@ -120,8 +122,8 @@ export function BulkBar() {
                   onKeyDown={(e) => {
                     if (e.key === "Enter") addTag(tag)
                   }}
-                  aria-label="Nueva etiqueta"
-                  placeholder="Etiqueta…"
+                  aria-label={t("filters.tag")}
+                  placeholder={`${t("filters.tag")}…`}
                   className="mb-2"
                   autoFocus
                 />
@@ -139,7 +141,7 @@ export function BulkBar() {
           <div className="relative">
             <Button disabled={none} onClick={() => setMenu(menu === "move" ? null : "move")}>
               <Icon name="boxes" size={15} />
-              Mover a…
+              {t("bulk.moveTo")}…
             </Button>
             {menu === "move" && (
               <div className="pc-glass absolute bottom-[46px] left-0 max-h-[300px] w-[240px] overflow-auto rounded-xl p-[7px] shadow-[0_18px_40px_-18px_rgb(0_0_0_/_.7)]">
@@ -158,7 +160,7 @@ export function BulkBar() {
                         <span className="font-pc-mono text-[11px] text-pc-fg-subtle">{i + 1}</span>
                         {boxName(boxMeta, i)}
                       </span>
-                      <span className="text-[10.5px] text-pc-fg-subtle">{free} libres</span>
+                      <span className="text-[10.5px] text-pc-fg-subtle">{free} {t("filters.all")}</span>
                     </Button>
                   )
                 })}
@@ -179,7 +181,7 @@ export function BulkBar() {
               }
             }}
           >
-            {n ? "Deseleccionar" : "Salir"}
+            {n ? t("bulk.deselectAll") : t("common.close")}
           </Button>
         </>
       )}

@@ -1,0 +1,184 @@
+{
+  "pc": {
+    "common": {
+      "close": "Cerrar",
+      "back": "Volver",
+      "retry": "Reintentar",
+      "loading": "Cargando…",
+      "apply": "Aplicar",
+      "clear": "Limpiar",
+      "cancel": "Cancelar",
+      "save": "Guardar",
+      "search": "Buscar"
+    },
+    "topbar": {
+      "title": "SmartRotom PC",
+      "subtitle": "SISTEMA DE ALMACENAMIENTO",
+      "searchPlaceholder": "Buscar por nombre, apodo o número de Pokédex…",
+      "searchAriaLabel": "Buscar Pokémon",
+      "clearSearch": "Limpiar búsqueda",
+      "filters": "Filtros (F)",
+      "dualBox": "Doble caja (D)",
+      "multiSelect": "Selección múltiple (M)",
+      "livingDex": "Living Dex",
+      "commands": "Comandos (Ctrl/⌘K)",
+      "sound": "Sonido",
+      "muteSound": "Silenciar sonidos",
+      "unmuteSound": "Activar sonidos",
+      "help": "Atajos de teclado"
+    },
+    "filters": {
+      "title": "Filtros y búsqueda",
+      "subtitle": "Refina tu colección",
+      "searchAndSort": "Buscar y ordenar",
+      "searchPlaceholder": "Nombre, apodo o número…",
+      "sortBy": "Ordenar por",
+      "types": "Tipos",
+      "levelRange": "Rango de nivel",
+      "minLevel": "Mín",
+      "maxLevel": "Máx",
+      "specialStatus": "Estado especial",
+      "gender": "Género",
+      "nature": "Naturaleza",
+      "ability": "Habilidad",
+      "tag": "Etiqueta",
+      "all": "Todas",
+      "matchCount": "{count} coincide",
+      "matchCountPlural": "{count} coinciden",
+      "asc": "Asc",
+      "desc": "Desc",
+      "sortFields": {
+        "box": "Caja",
+        "level": "Nivel",
+        "dex": "Pokédex",
+        "name": "Nombre",
+        "iv": "IV total"
+      },
+      "statusToggles": {
+        "shiny": "Shiny",
+        "legendary": "Legendario",
+        "withItem": "Con objeto",
+        "favorite": "Favorito"
+      },
+      "genderOptions": {
+        "male": "Macho",
+        "female": "Hembra",
+        "genderless": "Sin gén."
+      }
+    },
+    "themes": {
+      "title": "Tema · {box}",
+      "classic": "Clásico",
+      "forest": "Bosque",
+      "ocean": "Océano",
+      "volcano": "Volcán",
+      "space": "Espacio",
+      "meadow": "Pradera",
+      "dusk": "Ocaso",
+      "cave": "Cueva",
+      "rainbow": "Arcoíris",
+      "sakura": "Sakura"
+    },
+    "bulk": {
+      "selected": "{count} seleccionados",
+      "moveTo": "Mover a caja",
+      "deselectAll": "Salir de selección múltiple"
+    },
+    "compare": {
+      "title": "Comparando",
+      "empty": "Selecciona Pokémon para comparar"
+    },
+    "detail": {
+      "stats": "Estadísticas",
+      "moves": "Movimientos",
+      "abilities": "Habilidades",
+      "nature": "Naturaleza",
+      "item": "Objeto",
+      "none": "Ninguno",
+      "ot": "OT",
+      "level": "Nivel"
+    },
+    "boot": {
+      "connecting": "Conectando con el almacén…",
+      "loading": "Cargando datos Pokémon…"
+    },
+    "error": {
+      "title": "No se pudo leer tu PC",
+      "retry": "Inténtalo de nuevo en unos segundos."
+    },
+    "empty": {
+      "noResults": "Sin resultados",
+      "noResultsBody": "Ningún Pokémon coincide con los filtros actuales."
+    },
+    "help": {
+      "title": "Atajos de teclado",
+      "shortcuts": {
+        "search": "Enfocar búsqueda",
+        "filters": "Abrir filtros",
+        "multiSelect": "Alternar selección múltiple",
+        "dualBox": "Alternar doble caja",
+        "overview": "Vista general de cajas",
+        "commands": "Paleta de comandos",
+        "help": "Mostrar atajos"
+      }
+    },
+    "toast": {
+      "moved": "{count} movidos",
+      "movedOverflow": "{count} movidos · {overflow} no cabían",
+      "boxFull": "La caja está llena",
+      "alreadyInBox": "Ya están en esa caja"
+    },
+    "livingDex": {
+      "title": "Progreso de Pokédex",
+      "subtitle": "Un ejemplar de cada especie — rastrea tus huecos",
+      "complete": "{pct}% completo",
+      "missing": "Te faltan {count} especies.",
+      "noGaps": "¡Sin huecos en este filtro!",
+      "loading": "Cargando la Pokédex…",
+      "all": "Todas",
+      "onlyMissing": "Solo huecos"
+    },
+    "team": {
+      "title": "Equipo",
+      "battle": "Batalla",
+      "inCombat": "{count}/6 en combate",
+      "dragHint": "arrastra para ordenar",
+      "emptySlot": "Espacio libre",
+      "readOnly": "Solo lectura — los equipos de batalla se editan dentro del juego.",
+      "noTeams": "No tienes equipos de batalla guardados.",
+      "loadError": "No se pudo leer tu equipo",
+      "loadErrorBody": "El servidor de juego no respondió. Tus cajas siguen disponibles."
+    },
+    "share": {
+      "title": "Compartir caja",
+      "code": "Código para compartir",
+      "summary": "Resumen legible",
+      "hint": "Pega este código en otra instancia de SmartRotom PC para importar la caja.",
+      "copied": "Código copiado",
+      "summaryCopied": "Resumen copiado"
+    },
+    "organize": {
+      "by": "Auto-organizar por",
+      "done": "organizada · {count} movimientos",
+      "alreadyOrdered": "La caja ya está en ese orden"
+    },
+    "views": {
+      "title": "Vistas",
+      "save": "Guardar vista",
+      "savePrompt": "Nombre de la vista guardada:",
+      "saved": "Vista «{name}» guardada",
+      "delete": "Eliminar vista {name}"
+    },
+    "boxOverview": {
+      "title": "Todas las cajas",
+      "search": "Buscar caja…",
+      "empty": "Vacía"
+    },
+    "pagination": {
+      "page": "página {current}/{total}",
+      "prev": "Página anterior",
+      "next": "Página siguiente",
+      "selectAll": "Seleccionar todos los resultados (todas las páginas)"
+    }
+  }
+}

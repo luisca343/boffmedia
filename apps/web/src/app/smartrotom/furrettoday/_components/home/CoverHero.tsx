@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 
 import type { FtArticle } from "../../_utils/article";
 import { articleHref } from "../ArticleCard";
@@ -33,6 +34,7 @@ export function CoverHero({
   /** Up to four other published articles, for the "EN ESTE NÚMERO" strip. */
   contents: FtArticle[];
 }) {
+  const t = useTranslations("furrettoday.coverHero");
   const router = useRouter();
   const words = cover.title.split(" ");
 
@@ -85,7 +87,7 @@ export function CoverHero({
               size="lg"
               onClick={() => router.push(articleHref(cover.id))}
             >
-              LEER LA PORTADA →
+              {t("readCover")}
             </Button>
             <Meta className="text-white/75">
               {cover.author ? `${cover.author} · ` : ""}
@@ -121,7 +123,7 @@ export function CoverHero({
             className="text-[22px]"
             style={{ position: "absolute", right: 36, top: 36 }}
           >
-            NUEVO
+            {t("new")}
           </Sticker>
 
           <SpeechBubble
@@ -150,7 +152,7 @@ export function CoverHero({
       {contents.length > 0 ? (
         <div className="border-ft relative border-x-0 border-b-0 border-ft-ink bg-white/[0.06]">
           <div className="ft-wrap-wide grid grid-cols-1 gap-4 px-6 py-[18px] sm:grid-cols-[auto_repeat(4,1fr)] sm:items-center">
-            <Eyebrow className="text-ft-yellow">EN ESTE NÚMERO</Eyebrow>
+            <Eyebrow className="text-ft-yellow">{t("inThisIssue")}</Eyebrow>
             {contents.map((article) => (
               <Link
                 key={article.id}

@@ -1,20 +1,22 @@
 import Link from "next/link"
+import { useTranslations } from "next-intl"
 import { Bar, Card, Icon, type IconName } from "../ui"
 import { hrefOf } from "../../_utils/nav"
 import { TONES, type Tone } from "../../_utils/tones"
 
-const ACTIONS: { label: string; icon: IconName; slug: string; tone: Tone }[] = [
-  { label: "Nueva denuncia", icon: "fileText", slug: "denuncias", tone: "seguridad" },
-  { label: "Emitir multa", icon: "gavel", slug: "multas", tone: "hacienda" },
-  { label: "Abrir mapa", icon: "map", slug: "mapa", tone: "urbanismo" },
-  { label: "Ver censo", icon: "users", slug: "censo", tone: "poblacion" },
-]
-
 export function QuickActionsCard() {
+  const t = useTranslations("gobierno")
+  const ACTIONS: { label: string; icon: IconName; slug: string; tone: Tone }[] = [
+    { label: t("quickActions.nuevaDenuncia"), icon: "fileText", slug: "denuncias", tone: "seguridad" },
+    { label: t("quickActions.emitirMulta"), icon: "gavel", slug: "multas", tone: "hacienda" },
+    { label: t("quickActions.abrirMapa"), icon: "map", slug: "mapa", tone: "urbanismo" },
+    { label: t("quickActions.verCenso"), icon: "users", slug: "censo", tone: "poblacion" },
+  ]
+
   return (
     <Card>
       <Bar icon="zap" dep="gold">
-        Acciones rápidas
+        {t("quickActions.title")}
       </Bar>
       <div className="grid grid-cols-2">
         {ACTIONS.map((a, i) => (

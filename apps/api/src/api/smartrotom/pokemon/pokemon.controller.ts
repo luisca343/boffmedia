@@ -162,7 +162,9 @@ export class PokemonController {
     @Query('amount') amount?: string,
   ): Promise<PokemonSearchResult[]> {
     const parsed = amount ? parseInt(amount, 10) : 16;
-    const limit = Number.isNaN(parsed) ? 16 : Math.min(Math.max(parsed, 1), 100);
+    const limit = Number.isNaN(parsed)
+      ? 16
+      : Math.min(Math.max(parsed, 1), 100);
     const fuseResults = this.pokemonFacadeService.searchPokemonByName(
       name,
       limit,

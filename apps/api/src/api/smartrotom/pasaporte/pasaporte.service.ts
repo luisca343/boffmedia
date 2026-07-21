@@ -81,7 +81,9 @@ export class PasaporteService {
       });
       profile = await this.repo.findProfile(uuid);
       if (!profile) {
-        throw new NotFoundException(`Could not provision a passport for ${uuid}`);
+        throw new NotFoundException(
+          `Could not provision a passport for ${uuid}`,
+        );
       }
     }
 
@@ -170,7 +172,9 @@ export class PasaporteService {
   // ==================== DERIVATIONS ====================
 
   // The whole standing, walked out of the real battle list in chronological order.
-  private standingFrom(battles: SeasonBattle[]): Omit<SeasonStanding, 'regionRank'> {
+  private standingFrom(
+    battles: SeasonBattle[],
+  ): Omit<SeasonStanding, 'regionRank'> {
     let wins = 0;
     let losses = 0;
     let peakLp = 0;
@@ -245,9 +249,7 @@ export class PasaporteService {
   }
 
   private titleFor(completionPct: number): string {
-    return (
-      TITLES.find((t) => completionPct >= t.min)?.title ?? DEFAULT_TITLE
-    );
+    return TITLES.find((t) => completionPct >= t.min)?.title ?? DEFAULT_TITLE;
   }
 
   private emptyStanding(): SeasonStanding {

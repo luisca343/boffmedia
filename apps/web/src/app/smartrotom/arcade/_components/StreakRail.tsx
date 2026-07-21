@@ -93,7 +93,7 @@ export function DayTile({
           isToday ? TEXT_TONE[tone] : "text-ar-ink-muted",
         )}
       >
-        DÍA {reward.day}
+        {t("arcade.common.day", { day: reward.day })}
       </div>
 
       <div
@@ -118,7 +118,7 @@ export function DayTile({
       </div>
 
       {state === "claimed" && (
-        <div aria-label="Reclamado" className="absolute right-1.5 top-1.5 text-[10px] text-ar-lime">
+        <div aria-label={t("arcade.common.claimed")} className="absolute right-1.5 top-1.5 text-[10px] text-ar-lime">
           ✓
         </div>
       )}
@@ -180,7 +180,7 @@ export function StreakRail() {
       <div className="mb-3.5 flex flex-wrap items-center justify-between gap-2.5">
         <div>
           <div className="mb-1.5 font-ar-display text-[9px] uppercase tracking-[0.18em] text-ar-cyan">
-            Racha semanal · Día {currentDay}/{streak.data?.totalDays ?? 7}
+            {t("arcade.streak.weeklyStreak", { current: currentDay, total: streak.data?.totalDays ?? 7 })}
           </div>
           <h3 className="font-ar-display text-sm leading-relaxed text-ar-ink">
             {streak.data?.currentBanner ?? banner.data?.name}
@@ -189,7 +189,7 @@ export function StreakRail() {
         <div className="flex flex-wrap items-center gap-2.5">
           {resetIn && (
             <span className="font-ar-mono text-[11px] text-ar-ink-dim">
-              <span className="text-ar-ink-muted">Reinicia en</span>{" "}
+              <span className="text-ar-ink-muted">{t("arcade.streak.resetsIn", { time: resetIn })}</span>{" "}
               <b className="text-ar-amber">{resetIn}</b>
             </span>
           )}
@@ -198,7 +198,7 @@ export function StreakRail() {
               href="/smartrotom/arcade/racha"
               className="ar-lift inline-flex items-center gap-1.5 rounded-lg border border-ar-lime/40 bg-ar-lime/[.12] px-3 py-1.5 font-ar text-[11px] font-semibold uppercase tracking-[0.08em] text-ar-lime"
             >
-              <Icon.Shield s={12} /> Día {currentDay} reclamado
+              <Icon.Shield s={12} /> {t("arcade.streak.dayClaimed", { day: currentDay })}
             </Link>
           ) : (
             <Button
@@ -208,7 +208,7 @@ export function StreakRail() {
               onClick={onClaim}
               disabled={claim.isPending}
             >
-              {claim.isPending ? "Reclamando…" : `Reclamar día ${currentDay}`}
+              {claim.isPending ? t("arcade.streak.claiming") : t("arcade.streak.claimDay", { day: currentDay })}
             </Button>
           )}
         </div>
@@ -226,7 +226,7 @@ export function StreakRail() {
 
       {claim.isError && (
         <p role="alert" className="mt-3 font-ar-mono text-[11px] text-ar-danger">
-          No se pudo reclamar la recompensa. Inténtalo de nuevo.
+          {t("arcade.streak.claimError")}
         </p>
       )}
 

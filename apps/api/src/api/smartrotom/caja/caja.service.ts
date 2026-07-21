@@ -47,7 +47,10 @@ export class CajaService {
   }
 
   /** Phase two: finalize a delivered reservation. Idempotent — a replay or expired reservation reports `confirmed: 0`. */
-  async confirm(uuid: string, reservationId: string): Promise<ConfirmCajaResponse> {
+  async confirm(
+    uuid: string,
+    reservationId: string,
+  ): Promise<ConfirmCajaResponse> {
     const confirmed = await this.cajaRepository.confirm(uuid, reservationId);
     return { confirmed };
   }

@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { Button, Icon, Stat } from "./ui"
 import { formatMoney, formatNum } from "../_utils/format"
@@ -36,13 +37,14 @@ export function SelectedCard({
   /** Inside the mobile sheet the card IS the surface — it drops its own chrome. */
   bare?: boolean
 }) {
+  const t = useTranslations("taxi.selectedCard")
   const affordable = balance !== undefined && balance >= stop.price
   const after = (balance ?? 0) - stop.price
 
   return (
     <div
       role="group"
-      aria-label={`Destino ${stop.id}`}
+      aria-label={t("destination", { name: stop.id })}
       className={cn(
         bare
           ? "p-0"
@@ -70,7 +72,7 @@ export function SelectedCard({
         <button
           type="button"
           onClick={() => onToggleFavorite(stop.id)}
-          aria-label={favorite ? "Quitar de favoritos" : "Añadir a favoritos"}
+          aria-label={favorite ? t("removeFavorite") : t("addFavorite")}
           aria-pressed={favorite}
           className={cn(
             "grid h-9 w-9 place-items-center rounded-[10px] bg-tx-surface transition-all duration-150",
@@ -83,7 +85,7 @@ export function SelectedCard({
         <button
           type="button"
           onClick={onClose}
-          aria-label="Cerrar"
+          aria-label={t("close")}
           className="grid h-[34px] w-[34px] place-items-center rounded-[10px] bg-tx-surface text-tx-txt-2 transition-[background,color] duration-150 hover:bg-tx-surface-2 hover:text-tx-txt"
         >
           <Icon name="x" size={18} />
@@ -91,31 +93,31 @@ export function SelectedCard({
       </div>
 
       <div className="mt-3 grid grid-cols-3 gap-2">
-        <Stat icon="crosshair" label="Coords" value={`${stop.x}, ${stop.z}`} />
-        <Stat icon="walking" label="Distancia" value={`${formatNum(stop.dist)} b`} />
-        <Stat icon="coins" label="Tarifa" value={formatMoney(stop.price)} tone={affordable ? "money" : "bad"} />
+        <Stat icon="crosshair" label={t("coords")} value={`${stop.x}, ${stop.z}`} />
+        <Stat icon="walking" label={t("distance")} value={`${formatNum(stop.dist)} b`} />
+        <Stat icon="coins" label={t("fare")} value={formatMoney(stop.price)} tone={affordable ? "money" : "bad"} />
       </div>
 
       <div className="mt-3.5 flex flex-col gap-3">
         <div className="flex items-center justify-between px-0.5 text-[13px] text-tx-txt-2">
-          <span>Saldo tras el viaje</span>
+          <span>{t("balanceAfter")}</span>
           <strong className={cn("font-tx-mono text-[15px]", affordable ? "text-tx-txt" : "text-tx-no")}>
             {balance === undefined ? "— ¥" : formatMoney(Math.max(0, after))}
           </strong>
         </div>
         <div className="flex gap-[9px]">
-          <Button variant="ghost" onClick={onRecenter} aria-label="Centrar en el mapa" title="Centrar en el mapa">
+          <Button variant="ghost" onClick={onRecenter} aria-label={t("centerMap")} title={t("centerMap")}>
             <Icon name="crosshair" size={17} stroke={2} />
           </Button>
           {affordable ? (
             <Button variant="primary" onClick={() => onTravel(stop)}>
               <Icon name="nav" size={17} stroke={2.4} />
-              Viajar · {formatMoney(stop.price)}
+              {t("travel", { price: formatMoney(stop.price) })}
             </Button>
           ) : (
             <Button variant="secondary" onClick={onTopUp}>
               <Icon name="wallet" size={17} stroke={2.2} />
-              Recargar saldo
+              {t("topUp")}
             </Button>
           )}
         </div>

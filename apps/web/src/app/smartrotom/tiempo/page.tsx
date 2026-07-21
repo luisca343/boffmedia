@@ -2,6 +2,7 @@
 
 import React from "react";
 import { useState, useEffect } from "react";
+import { useTranslations } from "next-intl";
 import {
   Sun,
   Cloud,
@@ -14,6 +15,7 @@ import {
 import useGetWeather from "./_hooks/useGetWeather";
 
 export default function Component() {
+  const t = useTranslations("tiempo");
   const { weatherData, minecraftTime, refreshWeather } = useGetWeather();
 
   const formatTime = (seconds: number): string => {
@@ -30,11 +32,11 @@ export default function Component() {
   };
 
   const getDaySection = (ticks: number): string => {
-    if (ticks >= 0 && ticks < 12000) return "Día";
-    if (ticks >= 12000 && ticks < 13000) return "Atardecer";
-    if (ticks >= 13000 && ticks < 23000) return "Noche";
-    if (ticks >= 23000 && ticks < 24000) return "Amanecer";
-    return "Desconocido";
+    if (ticks >= 0 && ticks < 12000) return t("daySections.day");
+    if (ticks >= 12000 && ticks < 13000) return t("daySections.sunset");
+    if (ticks >= 13000 && ticks < 23000) return t("daySections.night");
+    if (ticks >= 23000 && ticks < 24000) return t("daySections.dawn");
+    return t("daySections.unknown");
   };
 
   const getWeatherIcon = (weather: string): React.JSX.Element => {
@@ -52,10 +54,20 @@ export default function Component() {
     }
   };
 
+  const getWeatherLabel = (weather: string): string => {
+    switch (weather) {
+      case "nublado": return t("weather.cloudy");
+      case "lluvia": return t("weather.rain");
+      case "tormenta": return t("weather.storm");
+      case "noche": return t("weather.night");
+      default: return t("weather.clear");
+    }
+  };
+
   return (
     <div className="w-full max-w-[300px] bg-white rounded-2xl shadow-lg overflow-hidden">
       <div className="bg-secondary p-3 flex justify-between items-center">
-        <h2 className="text-white text-lg font-semibold">Clima de Minecraft</h2>
+        <h2 className="text-white text-lg font-semibold">{t("title")}</h2>
         <button
           onClick={refreshWeather}
           className="text-white hover:bg-secondary-active rounded-full p-1"
@@ -68,22 +80,22 @@ export default function Component() {
           {getWeatherIcon(weatherData.weather)}
           <div className="text-right">
             <p className="text-2xl font-bold text-ink-dim capitalize">
-              {weatherData.weather}
+              {getWeatherLabel(weatherData.weather)}
             </p>
             <p className="text-sm text-ink-dim">
-              Cambia en: {formatTime(weatherData.changeTime)}
+              {t("changesIn", { time: formatTime(weatherData.changeTime) })}
             </p>
           </div>
         </div>
         <div className="flex justify-between items-center">
           <div>
-            <p className="text-sm text-ink-dim">Hora del juego</p>
+            <p className="text-sm text-ink-dim">{t("gameTime")}</p>
             <p className="text-lg font-semibold text-ink-dim">
               {formatMinecraftTime(minecraftTime)}
             </p>
           </div>
           <div className="text-right">
-            <p className="text-sm text-ink-dim">Sección</p>
+            <p className="text-sm text-ink-dim">{t("daySection")}</p>
             <p className="text-lg font-semibold text-ink-dim">
               {getDaySection(minecraftTime)}
             </p>

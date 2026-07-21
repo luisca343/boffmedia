@@ -65,11 +65,16 @@ async function bootstrap() {
   // sprites/packs/jcef are content-addressed or append-only → immutable; uploads
   // are overwritten in place (profile pics keyed by userId) → short TTL.
   const publicDir = join(__dirname, '..', 'public');
-  const staticOpts = (maxAge: string): Parameters<typeof express.static>[1] => ({
+  const staticOpts = (
+    maxAge: string,
+  ): Parameters<typeof express.static>[1] => ({
     index: false,
     maxAge,
   });
-  app.use('/uploads', express.static(join(publicDir, 'uploads'), staticOpts('5m')));
+  app.use(
+    '/uploads',
+    express.static(join(publicDir, 'uploads'), staticOpts('5m')),
+  );
   app.use(
     '/jcef',
     express.static(join(publicDir, 'jcef'), {
@@ -84,10 +89,7 @@ async function bootstrap() {
       ...staticOpts('1h'),
       setHeaders: (res, filePath) => {
         if (/[/\\]smartrotom[/\\](img|packs)[/\\]/.test(filePath)) {
-          res.setHeader(
-            'Cache-Control',
-            'public, max-age=31536000, immutable',
-          );
+          res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
         }
       },
     }),

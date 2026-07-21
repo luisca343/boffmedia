@@ -1,0 +1,443 @@
+{
+  "arcade": {
+    "common": {
+      "back": "Volver",
+      "close": "Cerrar",
+      "retry": "Reintentar",
+      "loading": "Cargando…",
+      "loginRequired": "Inicia sesión con tu cuenta de SmartRotom para ver tu colección.",
+      "loginRequiredBoxes": "Inicia sesión con tu cuenta de SmartRotom para abrir cajas y guardar los objetos.",
+      "errorLoading": "No se pudo cargar. Vuelve a intentarlo en un momento.",
+      "copied": "Copiado",
+      "copy": "Copiar",
+      "connected": "Conectado",
+      "logout": "Cerrar sesión",
+      "freeToPlay": "Free to play",
+      "freeToPlayDesc": "Arcade individual con datos en vivo del servidor. Sin compras: todo se gana jugando.",
+      "help": "Ayuda",
+      "reset": "Reiniciar",
+      "confirm": "Confirmar",
+      "understood": "Entendido",
+      "cancel": "Cancelar",
+      "done": "Hecho",
+      "claimed": "Reclamado",
+      "day": "DÍA {day}",
+      "generating": "Abriendo…",
+      "prizeObtained": "Premio obtenido",
+      "spinning": "Girando…"
+    },
+    "sidebar": {
+      "arcade": "Arcade",
+      "play": "Jugar",
+      "playHint": "Inicio · biblioteca",
+      "streak": "Racha diaria",
+      "streakHint": "Recompensa de hoy",
+      "boxes": "Cajas",
+      "boxesHint": "Abrir botín",
+      "collection": "Colección",
+      "collectionHint": "Tus objetos",
+      "account": "Cuenta",
+      "settings": "Ajustes",
+      "settingsHint": "Cabina · accesibilidad"
+    },
+    "home": {
+      "library": "Librería · {count} juegos",
+      "arcadeGames": "Juegos Arcade",
+      "allCategory": "Todos",
+      "footer": "ARCADE · SMARTROTOM EXPERIENCE"
+    },
+    "gameTopBar": {
+      "help": "Ayuda",
+      "reset": "Reiniciar"
+    },
+    "games": {
+      "squirdle": {
+        "title": "Squirdle",
+        "tagline": "Adivina la criatura oculta a partir de sus pistas.",
+        "category": "Palabras",
+        "badge": "Nuevo"
+      },
+      "voltorb": {
+        "title": "Gira Voltorb",
+        "tagline": "Voltea números y no toques una bomba.",
+        "category": "Riesgo",
+        "badge": "Hot"
+      },
+      "mina": {
+        "title": "Minería",
+        "tagline": "Excava profundo y encuentra tesoros ocultos.",
+        "category": "Aventura"
+      },
+      "maze": {
+        "title": "Laberinto",
+        "tagline": "Recorre las salas generadas y escapa del calabozo.",
+        "category": "Acción"
+      },
+      "typedoku": {
+        "title": "Typedoku",
+        "tagline": "Sudoku de tipos: cada fila y columna, sin repetir.",
+        "category": "Lógica"
+      },
+      "puzle": {
+        "title": "Puzle",
+        "tagline": "Encaja las piezas en los menos movimientos posibles.",
+        "category": "Lógica"
+      }
+    },
+    "categories": {
+      "todos": "Todos",
+      "palabras": "Palabras",
+      "riesgo": "Riesgo",
+      "aventura": "Aventura",
+      "accion": "Acción",
+      "logica": "Lógica"
+    },
+    "inventory": {
+      "title": "Inventario de cajas",
+      "unopenedBoxes": "Tienes {count, plural, one {# caja} other {# cajas}} sin abrir",
+      "openInventory": "Abrir inventario"
+    },
+    "streak": {
+      "rewardReady": "Recompensa de hoy",
+      "openReward": "Reclamar recompensa",
+      "weeklyStreak": "Racha semanal · Día {current}/{total}",
+      "dayClaimed": "Día {day} reclamado",
+      "claiming": "Reclamando…",
+      "claimDay": "Reclamar día {day}",
+      "resetsIn": "Reinicia en {time}",
+      "claimError": "No se pudo reclamar la recompensa. Inténtalo de nuevo.",
+      "progression": "Progresión · {days} días",
+      "currentWeek": "Semana actual",
+      "totalStreak": "Racha total",
+      "totalStreakSub": "días reclamados seguidos",
+      "totalClaims": "Reclamos totales",
+      "totalClaimsSub": "desde que empezaste",
+      "unopenedBoxes": "Cajas sin abrir",
+      "unopenedBoxesSub": "en tu inventario",
+      "nextReset": "Próximo reinicio",
+      "nextResetSub": "a las 06:00",
+      "claimDescription": "Reclama la recompensa de cada día para avanzar por el banner. La racha se reinicia a las 06:00; si reclamas hoy, mañana te espera el día siguiente."
+    },
+    "toast": {
+      "boxOpened": "¡Caja abierta!",
+      "itemClaimed": "Objeto reclamado."
+    },
+    "loot": {
+      "title": "Cajas de botín",
+      "selectBox": "Selecciona una caja",
+      "howItWorks": "¿Cómo funciona?",
+      "noBoxes": "Sin cajas",
+      "openAnother": "Abrir otra",
+      "noBoxesLoaded": "No se pudieron cargar las cajas de botín. Vuelve a intentarlo en un momento.",
+      "opening": "Abriendo…",
+      "openBox": "Abrir caja",
+      "viewFullOdds": "Ver probabilidades completas",
+      "inInventory": "En inventario",
+      "noBoxOwned": "No tienes esta caja. Se consiguen en la {streakLink} y jugando en el servidor.",
+      "noBoxItems": "Esta caja no tiene objetos configurados.",
+      "probabilities": "Probabilidades",
+      "miCollection": "Mi colección",
+      "noBoxesAlert": "Sin cajas",
+      "boxOpenError": "No se pudo abrir la caja. Inténtalo de nuevo.",
+      "howBoxesWork": "Cómo funcionan las cajas",
+      "lootBoxProbabilities": "{name} · probabilidades",
+      "lootBoxes": "Cajas de botín",
+      "steps": {
+        "getBoxes": "Consigue cajas con la racha diaria o jugando en el servidor; aparecen en tu inventario.",
+        "chooseBox": "Elige una caja en el carrusel. Solo puedes abrir las que ya tienes.",
+        "openBox": "Al abrirla, el servidor decide el premio y la ruleta te lo enseña.",
+        "itemCollection": "El objeto entra en tu colección. Desde ahí puedes reclamarlo al juego."
+      },
+      "oddsExplanation": "Las probabilidades salen del peso de cada objeto dentro de la caja: peso del objeto entre el peso total. No hay tiradas garantizadas ni compras.",
+      "prizeObtained": "¡Premio obtenido!",
+      "next": "Siguiente",
+      "openAnotherBtn": "Abrir otra",
+      "viewMyCollection": "Ver mi colección",
+      "backToSelector": "Volver al selector",
+      "saved": "Guardado",
+      "itemInCollection": "El objeto ya está en tu colección. Te quedan {count, plural, one {# caja} other {# cajas}} de este tipo.",
+      "reelNoServer": "La ruleta no llegó del servidor, pero el premio sí es tuyo.",
+      "abriendo": "Abriendo"
+    },
+    "coleccion": {
+      "title": "Tu colección",
+      "backToBoxes": "Cajas",
+      "itemsCount": "{total} objetos · {unique} únicos",
+      "claimToGame": "Reclamar al juego",
+      "emptyTitle": "Tu colección está vacía",
+      "emptyBody": "Abre cajas de botín para conseguir objetos.",
+      "filters": {
+        "search": "Buscar objetos…",
+        "searchAria": "Buscar en mi colección",
+        "rarity": "Rareza",
+        "type": "Tipo de objeto"
+      },
+      "stats": {
+        "uniqueItems": "Objetos únicos",
+        "uniqueItemsSub": "entradas en la colección",
+        "totalItems": "Objetos totales",
+        "totalItemsSub": "unidades sin reclamar",
+        "byRarity": "Por rareza"
+      },
+      "toolbar": {
+        "all": "Todo",
+        "items": "Objetos",
+        "pokemon": "Pokémon",
+        "mina": "Mina",
+        "box": "Cajas"
+      },
+      "claim": {
+        "kicker": "▸ Reclamar recompensas",
+        "claimedTitle": "Reclamación enviada",
+        "moveToGame": "Mover al inventario del juego",
+        "claimItems": "Reclamar {count} objetos",
+        "claiming": "Reclamando…",
+        "deliveredInGame": "Entregado en el juego",
+        "deliveredDescription": "Los objetos llegaron a tu inventario y los Pokémon a tu equipo. Si tu equipo estaba lleno, el Pokémon fue enviado a tu PC.",
+        "noItemsToClaim": "No tienes objetos para reclamar ahora mismo.",
+        "selectItemsDescription": "Selecciona los objetos que quieres enviar al juego. Los Pokémon van directos a tu PC; los objetos de Minecraft llegan en cofres.",
+        "outsideMinecraft": "Estás fuera del cliente de Minecraft. La entrega solo se completa si estás conectado al servidor.",
+        "claimError": "Ocurrió un error al reclamar los objetos.",
+        "selected": "Seleccionados {count}",
+        "occupy": "Ocupan {slots, plural, one {# hueco} other {# huecos}} en {chests, plural, one {# cofre} other {# cofres}}",
+        "pokemonSection": "Pokémon",
+        "minecraftSection": "Objetos de Minecraft"
+      },
+      "detail": {
+        "quantity": "Cantidad",
+        "rarity": "Rareza",
+        "origin": "Origen",
+        "claimed": "Reclamados",
+        "sources": {
+          "arcade": "Arcade",
+          "mina": "Mina",
+          "lootbox": "Caja de botín",
+          "streak": "Racha diaria"
+        }
+      }
+    },
+    "ajustes": {
+      "title": "Ajustes",
+      "backToArcade": "Arcade",
+      "cabina": {
+        "audioMotion": "Audio y motion",
+        "soundEffects": "Efectos de sonido",
+        "soundEffectsHint": "El carrete de las cajas hace clic mientras gira y suena al parar. Es el único audio que emite el arcade.",
+        "reduceMotion": "Reducir motion",
+        "reduceMotionHint": "Detiene los parpadeos, brillos, flotados y partículas de toda la cabina; el carrete pasa a resolverse sin animación. Si tu sistema ya pide prefers-reduced-motion, lo respetamos automáticamente sin tocar esto.",
+        "visual": "Visual",
+        "scanlines": "Intensidad de scanlines",
+        "scanlinesHint": "La capa CRT que cubre paneles, cartas y cabinas. «Off» la retira por completo.",
+        "scanlineOptions": {
+          "off": "Off",
+          "subtle": "Sutil",
+          "strong": "Intenso"
+        },
+        "localNotice": "Estas tres preferencias se guardan en este navegador, no en tu cuenta: en otro dispositivo empiezas de nuevo con los valores por defecto."
+      },
+      "cuenta": {
+        "title": "Cuenta",
+        "uuidLabel": "UUID de SmartRotom",
+        "bannerLabel": "Banner activo",
+        "sessionLabel": "Sesión",
+        "connected": "Conectado",
+        "resetsIn": "Reinicia en {time}"
+      }
+    },
+    "squirdle": {
+      "enigma": "Enigma",
+      "guessTheCreature": "Adivina la criatura oculta",
+      "attempts": "{count} intentos",
+      "noAttemptsYet": "Aún no hay intentos.",
+      "guessAPokemon": "¡Adivina un Pokémon para comenzar!",
+      "columns": {
+        "gen": "Gen",
+        "type1": "Tipo 1",
+        "type2": "Tipo 2",
+        "height": "Altura",
+        "weight": "Peso"
+      },
+      "guessInput": {
+        "placeholder": "Escribe un nombre de Pokémon",
+        "ariaLabel": "Intento de nombre de Pokémon",
+        "guess": "Adivinar"
+      },
+      "legend": {
+        "title": "Leyenda",
+        "correct": "Correcto",
+        "near": "El tipo está, pero en la otra posición",
+        "incorrect": "Incorrecto",
+        "arrowHint": "El valor objetivo es mayor / menor"
+      },
+      "typeTracker": {
+        "title": "Tipos",
+        "doubleType": "Doble tipo",
+        "singleType": "Tipo único",
+        "status": {
+          "possible": "posible",
+          "correct": "correcto",
+          "present": "presente en la otra posición",
+          "incorrect": "descartado"
+        }
+      },
+      "attemptsPanel": {
+        "title": "Intentos",
+        "remaining": "Te quedan {remaining} de {total} intentos."
+      },
+      "result": {
+        "playAgain": "Jugar otra vez"
+      },
+      "howToPlay": "¿Cómo jugar?",
+      "rules": {
+        "guessPokemon": "Adivina cuál es el Pokémon misterioso en menos de {max} intentos.",
+        "eachAttempt": "Con cada intento, recibirás pistas sobre las características del Pokémon.",
+        "greenTile": "Una casilla verde indica que la característica es correcta.",
+        "arrowUp": "▲ indica que el valor objetivo es mayor.",
+        "arrowDown": "▼ indica que el valor objetivo es menor.",
+        "amberType": "Una casilla ámbar en un tipo indica que ese tipo está en la otra posición."
+      }
+    },
+    "voltorb": {
+      "howToPlay": "Cómo se juega",
+      "rulesTitle": "REGLAS DE GIRA VOLTORB",
+      "understood": "Entendido",
+      "introduction": "Introducción",
+      "introText": "Gira Voltorb es una mezcla entre Picross y Buscaminas. Tu objetivo es encontrar las cartas multiplicadoras sin voltear ningún Voltorb.",
+      "theBoard": "El tablero",
+      "boardItems": [
+        "El juego se desarrolla en una cuadrícula de 5x5.",
+        "Bajo cada casilla se esconde un número (1, 2 o 3) o un Voltorb.",
+        "Los números son multiplicadores que aumentan tus monedas.",
+        "Los Voltorb hacen que pierdas todas las monedas de la ronda actual."
+      ],
+      "howToPlaySection": "Cómo jugar",
+      "playSteps": [
+        "Haz clic en una casilla para voltearla.",
+        "Si encuentras un multiplicador (x2 o x3), tus monedas se multiplican por ese valor.",
+        "Si es la primera carta que volteas, obtienes ese número de monedas.",
+        "Si encuentras un Voltorb, pierdes todas las monedas de la ronda y el juego termina.",
+        "Puedes elegir Cobrar en cualquier momento para guardar tus monedas y pasar al siguiente nivel."
+      ],
+      "levelsProgression": "Niveles y progresión",
+      "levelItems": [
+        "Hay 8 niveles en total.",
+        "Ganas y avanzas de nivel encontrando todas las cartas x2 y x3.",
+        "Los niveles más altos tienen más multiplicadores y Voltorbs, aumentando el riesgo y la recompensa.",
+        "Regla de regresión de nivel: si al terminar la ronda has volteado menos cartas multiplicadoras que el número de tu nivel actual, bajarás de nivel."
+      ],
+      "level8": "Nivel 8",
+      "level8Text": "Para alcanzar el nivel 8, debes ganar 5 juegos seguidos en cualquier nivel, volteando 8 o más cartas multiplicadoras en cada uno de estos 5 juegos.",
+      "memoMode": "Modo memo",
+      "memoModeText": "Puedes usar el modo Memo para marcar las casillas con símbolos (Voltorb, 1, 2 o 3) sin voltearlas. Esto te ayuda a recordar tus sospechas sobre el contenido de cada casilla.",
+      "tips": "Consejos",
+      "tipItems": [
+        "Usa la información de las filas y columnas para deducir la ubicación de los multiplicadores y Voltorbs.",
+        "A veces es mejor cobrar y pasar al siguiente nivel que arriesgarse a perder todo.",
+        "Utiliza el modo Memo para marcar tus sospechas y estrategias.",
+        "Practica y desarrolla tu intuición para mejorar en el juego."
+      ],
+      "playAgain": "Volver a jugar",
+      "nextLevel": "Siguiente nivel",
+      "cashOut": "Cobrar monedas",
+      "viewRules": "Ver reglas",
+      "quitGame": "Abandonar partida",
+      "cardsFlipped": "{count} cartas volteadas",
+      "difficulty": "DIFICULTAD {level}",
+      "bombs": "BOMBAS {count}",
+      "combo": "Combo ×{score}",
+      "bombCount": "{count} bombas",
+      "quitConfirm": "¿Salir del juego?",
+      "quitDescription": "Te llevarás {count} monedas.",
+      "newGameConfirm": "¿Nuevo juego?",
+      "newGameDescription": "Perderás tu progreso actual.",
+      "cashOutConfirm": "¿Cobrar monedas?",
+      "cashOutDescription": "Ganarás {count} monedas.",
+      "quit": "Salir",
+      "new": "Nuevo",
+      "keep": "Seguir",
+      "continuePlaying": "Seguir",
+      "gameOver": "GAME OVER",
+      "gameOverText": "Has encontrado un Voltorb y perdido {count} monedas.",
+      "newGameHint": "Inicia una nueva partida para seguir jugando.",
+      "levelComplete": "¡NIVEL COMPLETADO!",
+      "levelCompleteText": "¡Encontraste todos los multiplicadores sin activar ningún Voltorb!",
+      "saveAndQuit": "Guardar y salir",
+      "memo": {
+        "title": "MEMO",
+        "notesOn": "Notas ON",
+        "notesOff": "Notas OFF",
+        "markVoltorb": "Marcar Voltorb",
+        "markX": "Marcar x{mark}",
+        "hint": "Activa {bold} y haz clic en una casilla para marcarla sin voltearla."
+      }
+    },
+    "puzle": {
+      "slidingPuzzle": "Puzle deslizante",
+      "solved": "Resuelto",
+      "inProgress": "En curso",
+      "completed": "¡Puzle completado en {moves} movimientos!",
+      "moves": "Movimientos",
+      "pieces": "Piezas",
+      "inPlace": "En su sitio",
+      "shuffle": "Barajar",
+      "howToPlay": "¿Cómo jugar?",
+      "rules": [
+        "Haz clic en una pieza contigua al hueco para deslizarla.",
+        "Recompón la imagen original en los menos movimientos posibles.",
+        "«Barajar» reparte un tablero nuevo, siempre resoluble."
+      ]
+    },
+    "typedoku": {
+      "sudokuOfTypes": "Sudoku de tipos",
+      "eachRowColumn": "Cada fila, columna y caja, sin repetir",
+      "notes": "Notas {state}",
+      "congratulations": "¡Felicidades! Has completado el TypeDoku",
+      "types": "Tipos",
+      "newGame": "Nuevo juego (N)",
+      "undo": "Deshacer (Ctrl+Z)",
+      "redo": "Rehacer (Ctrl+Y)",
+      "hint": "Pista (H)",
+      "noteHint": "Pista de notas (P)",
+      "notesMode": "Modo notas: {state} (M)",
+      "howToPlay": "¿Cómo jugar?",
+      "rules": [
+        "Rellena la cuadrícula sin repetir un tipo en la misma fila, columna o caja de 3×3.",
+        "Selecciona una casilla y elige un tipo del panel, o pulsa su inicial en el teclado.",
+        "Muévete por el tablero con las flechas.",
+        "{boldM} alterna el modo notas, {boldP} anota los tipos posibles y {boldH} revela la casilla seleccionada.",
+        "{boldN} empieza una partida nueva; {boldCtrlZ} y {boldCtrlY} deshacen y rehacen."
+      ]
+    },
+    "maze": {
+      "dungeon": "Calabozo",
+      "generator": "Generador",
+      "size": "Tamaño",
+      "depth": "Profundidad",
+      "regenerate": "Regenerar",
+      "hideDebug": "Ocultar debug",
+      "showDebug": "Ver debug",
+      "debugView": "Vista debug",
+      "rooms": "Salas",
+      "deadEnds": "Sin salida",
+      "alleys": "Callejones",
+      "bossDistance": "Distancia al jefe",
+      "howItWorks": "¿Cómo funciona?",
+      "roomLabels": {
+        "start": "Sala inicial",
+        "room": "Sala",
+        "boss": "Sala del jefe",
+        "wall": "Muro"
+      },
+      "rules": [
+        "Cada calabazo se genera al vuelo: una sala inicial, salas conectadas y un jefe.",
+        "{boldSize} cambia el lado de la cuadrícula; {boldDepth}, cuántas salas se excavan.",
+        "«Regenerar» reparte un calabazo nuevo con los mismos parámetros.",
+        "La vista debug imprime la rejilla en texto: S inicio, R sala, B jefe, W muro."
+      ]
+    },
+    "collectionGrid": {
+      "noMatches": "No hay objetos que coincidan con los filtros.",
+      "page": "Página {current} de {total}"
+    }
+  }
+}

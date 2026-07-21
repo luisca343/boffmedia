@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, type MouseEvent } from "react";
+import { useTranslations } from "next-intl";
 import type { NoteFolder, NoteTag } from "@boffmedia/shared";
 import { Icon, Kbd } from "./ui";
 import { NotePane, type PaneHandlers } from "./NotePane";
@@ -33,6 +34,7 @@ interface EditorColumnProps extends PaneHandlers {
 }
 
 export function EditorColumn(props: EditorColumnProps) {
+  const t = useTranslations("notas");
   const { active, splitNote, tabs, activeTab } = props;
 
   const scrollTo = useCallback((title: string) => {
@@ -60,29 +62,28 @@ export function EditorColumn(props: EditorColumnProps) {
           <span className="mb-[22px] grid h-[76px] w-[76px] place-items-center rounded-nt-2xl bg-nt-accent/15 text-nt-accent-fg">
             <Icon name="file-text" size={36} />
           </span>
-          <h1 className="m-0 mb-2.5 font-nt-display text-[24px] font-bold text-nt-fg">Notas SmartRotom</h1>
+          <h1 className="m-0 mb-2.5 font-nt-display text-[24px] font-bold text-nt-fg">{t("editor.welcomeTitle")}</h1>
           <p className="m-0 mb-6 max-w-[420px] text-[15px] leading-[1.6] text-nt-fg-muted">
-            Tu espacio para estrategias, guías y diario de entrenador. Selecciona una nota, crea una
-            nueva o pulsa <Kbd>⌘K</Kbd> para buscar.
+            {t("editor.welcomeDesc")} <Kbd>⌘K</Kbd> {t("editor.welcomeSearch")}
           </p>
           <div className="flex flex-wrap justify-center gap-2.5">
             <button
               onClick={props.onNew}
               className="inline-flex h-9 items-center gap-2 rounded-nt-md bg-gradient-to-b from-nt-500 to-nt-600 px-3.5 text-[13.5px] font-[550] text-white hover:brightness-[1.06]"
             >
-              <Icon name="plus" size={15} /> Nueva nota
+              <Icon name="plus" size={15} /> {t("sidebar.newNote")}
             </button>
             <button
               onClick={props.onOpenTemplates}
               className="inline-flex h-9 items-center gap-2 rounded-nt-md border border-nt-border bg-nt-hover px-3.5 text-[13.5px] font-[550] text-nt-fg-muted hover:bg-nt-hover-strong hover:text-nt-fg"
             >
-              <Icon name="layers" size={15} /> Desde plantilla
+              <Icon name="layers" size={15} /> {t("editor.fromTemplate")}
             </button>
             <button
               onClick={props.onOpenGraph}
               className="inline-flex h-9 items-center gap-2 rounded-nt-md border border-nt-border bg-nt-hover px-3.5 text-[13.5px] font-[550] text-nt-fg-muted hover:bg-nt-hover-strong hover:text-nt-fg"
             >
-              <Icon name="network" size={15} /> Grafo
+              <Icon name="network" size={15} /> {t("editor.graph")}
             </button>
           </div>
         </div>
@@ -118,7 +119,7 @@ export function EditorColumn(props: EditorColumnProps) {
                 : "text-nt-fg-muted hover:bg-nt-hover"
             }`}
           >
-            <span className="flex-1 truncate">{n.title || "Sin título"}</span>
+            <span className="flex-1 truncate">{n.title || t("list.untitled")}</span>
             <span
               className="grid h-[18px] w-[18px] flex-none place-items-center rounded text-nt-fg-subtle hover:bg-nt-hover-strong hover:text-nt-fg"
               onClick={(e) => {
@@ -133,7 +134,7 @@ export function EditorColumn(props: EditorColumnProps) {
         <button
           className="grid w-9 flex-none place-items-center text-nt-fg-subtle hover:bg-nt-hover hover:text-nt-fg"
           onClick={props.onNewTab}
-          aria-label="Nueva pestaña"
+          aria-label={t("editor.newTab")}
         >
           <Icon name="plus" size={16} />
         </button>

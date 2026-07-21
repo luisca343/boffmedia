@@ -1,6 +1,7 @@
 "use client"
 
 import { Fragment } from "react"
+import { useTranslations } from "next-intl"
 import { usePokemonStore } from "@/stores/pokemonStore"
 import { locId } from "../_stores/pcUiStore"
 import type { Mon } from "../_types/pc.types"
@@ -16,6 +17,7 @@ export interface ComparePanelProps {
 
 /** Side-by-side, up to four. Everything shown is real: `stats` and `ivs`, nothing else. */
 export function ComparePanel({ mons, onClose }: ComparePanelProps) {
+  const t = useTranslations("pc")
   const speciesByDex = usePokemonStore((s) => s.pokemonByDex)
 
   const best: Record<string, number> = {}
@@ -25,7 +27,7 @@ export function ComparePanel({ mons, onClose }: ComparePanelProps) {
   return (
     <Modal
       onClose={onClose}
-      title="Comparación"
+      title={t("compare.title")}
       icon="layers"
       tone="text-pc-violet"
       width={200 + mons.length * 200}
@@ -51,7 +53,7 @@ export function ComparePanel({ mons, onClose }: ComparePanelProps) {
               />
               <div className="truncate text-[13.5px] font-bold text-pc-fg">{displayName(p)}</div>
               <div className="text-[11px] text-pc-fg-subtle">
-                Nv {p.level} · {p.nature}
+                {t("detail.level")} {p.level} · {p.nature}
               </div>
               <div className="mt-1.5 flex justify-center gap-1">
                 {typesOf(p, speciesByDex).map((t) => (
@@ -92,7 +94,7 @@ export function ComparePanel({ mons, onClose }: ComparePanelProps) {
         ))}
 
         <div className="border-t border-pc-line px-3.5 py-[11px] text-xs font-bold text-pc-fg-muted">
-          Total base
+          {t("detail.stats")}
         </div>
         {mons.map((m) => {
           const total = statTotal(m.pokemon)
@@ -109,7 +111,7 @@ export function ComparePanel({ mons, onClose }: ComparePanelProps) {
           )
         })}
 
-        <div className="border-t border-pc-line px-3.5 py-[11px] text-xs text-pc-fg-muted">IV total</div>
+        <div className="border-t border-pc-line px-3.5 py-[11px] text-xs text-pc-fg-muted">{t("detail.stats")}</div>
         {mons.map((m) => (
           <div
             key={locId(m.loc)}

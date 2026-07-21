@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { usePcUi } from "../_stores/pcUiStore"
 import type { SmartView } from "../_types/pc.types"
 import { hasAnyFilter } from "../_utils/filters"
@@ -7,6 +8,7 @@ import { SMART_VIEWS } from "../_utils/smartViews"
 import { ChipButton, Icon, toast, type IconName } from "./ui"
 
 export function SmartViewsBar() {
+  const t = useTranslations("pc")
   const filters = usePcUi((s) => s.filters)
   const search = usePcUi((s) => s.search)
   const activeView = usePcUi((s) => s.activeView)
@@ -18,7 +20,7 @@ export function SmartViewsBar() {
   const filterActive = hasAnyFilter(filters, search)
 
   const saveCurrent = () => {
-    const name = window.prompt("Nombre de la vista guardada:")?.trim()
+    const name = window.prompt(t("views.savePrompt"))?.trim()
     if (!name) return
     const view: SmartView = {
       id: `sv-${Date.now()}`,
@@ -30,7 +32,7 @@ export function SmartViewsBar() {
       custom: true,
     }
     saveView(view)
-    toast(`Vista «${name}» guardada`, "success")
+    toast(t("views.saved", { name }), "success")
   }
 
   const views = [...SMART_VIEWS, ...savedViews]
@@ -38,7 +40,7 @@ export function SmartViewsBar() {
   return (
     <div className="flex items-center gap-[7px] overflow-x-auto py-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
       <span className="flex-none pr-0.5 text-[10.5px] font-bold uppercase tracking-[.05em] text-pc-fg-subtle">
-        Vistas
+        {t("views.title")}
       </span>
 
       {views.map((v) => {
@@ -66,7 +68,7 @@ export function SmartViewsBar() {
               <span
                 role="button"
                 tabIndex={0}
-                aria-label={`Eliminar vista ${v.name}`}
+                aria-label={t("views.delete", { name: v.name })}
                 onClick={(e) => {
                   e.stopPropagation()
                   deleteView(v.id)
@@ -89,7 +91,7 @@ export function SmartViewsBar() {
       {filterActive && !activeView && (
         <ChipButton onClick={saveCurrent} className="flex-none border-dashed">
           <Icon name="bookmark" size={12} />
-          Guardar vista
+          {t("views.save")}
         </ChipButton>
       )}
     </div>

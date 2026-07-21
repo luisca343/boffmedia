@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 
 import { useSubscribeNewsletter } from "../../_hooks/queries";
 import { Button, ComicBurst, FurretMascot, Input, Modal, toast } from "../ui";
@@ -12,6 +13,7 @@ export function NewsletterModal({
   open: boolean;
   onClose: () => void;
 }) {
+  const t = useTranslations("furrettoday.newsletterModal");
   const [email, setEmail] = useState("");
   const [sent, setSent] = useState(false);
   const { mutate, isPending } = useSubscribeNewsletter();
@@ -30,7 +32,7 @@ export function NewsletterModal({
     e.preventDefault();
     mutate(email, {
       onSuccess: () => setSent(true),
-      onError: () => toast.error("No hemos podido apuntarte. Prueba de nuevo."),
+      onError: () => toast.error(t("error")),
     });
   }
 
@@ -57,18 +59,18 @@ export function NewsletterModal({
 
           {sent ? (
             <div className="border-ft rounded-ft mt-2 border-ft-ink bg-white p-[18px]">
-              <div className="font-ft-display text-[28px]">¡LISTO!</div>
+              <div className="font-ft-display text-[28px]">{t("successTitle")}</div>
               <p className="font-ft mt-1 text-ft-body">
-                Te hemos guardado en la lista. Nos vemos el viernes.
+                {t("successMessage")}
               </p>
             </div>
           ) : (
             <>
               <h3 className="font-ft-display mb-1.5 mt-1 text-[42px] leading-[0.95]">
-                Furret a tu buzón, todos los viernes
+                {t("title")}
               </h3>
               <p className="font-ft mb-[18px] text-ft-body">
-                Un email. Titulares, meta, torneos y un meme. Cancelas cuando quieras.
+                {t("description")}
               </p>
               <form onSubmit={handleSubmit} className="flex gap-2.5">
                 <Input
@@ -76,12 +78,12 @@ export function NewsletterModal({
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="tu@email.com"
+                  placeholder={t("emailPlaceholder")}
                   aria-label="Email"
                   className="flex-1"
                 />
                 <Button type="submit" variant="primary" size="lg" disabled={isPending}>
-                  {isPending ? "…" : "SUSCRIBIR"}
+                  {isPending ? t("subscribing") : t("subscribe")}
                 </Button>
               </form>
             </>

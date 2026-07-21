@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useRef } from "react"
+import { useTranslations } from "next-intl"
 import { useBoxGrid, useMons } from "../_hooks/queries"
 import { boxDropAttrs, useDragLayer } from "../_hooks/useDrag"
 import { usePcUi } from "../_stores/pcUiStore"
@@ -22,6 +23,7 @@ export interface BoxRailProps {
  * has no notion of their order, so a reordering would exist only in this browser.
  */
 export function BoxRail({ onOverview }: BoxRailProps) {
+  const t = useTranslations("pc")
   const { mons } = useMons()
   const boxes = useBoxGrid(mons)
   const { drag } = useDragLayer()
@@ -41,11 +43,11 @@ export function BoxRail({ onOverview }: BoxRailProps) {
       <div className="flex items-center justify-between border-b border-pc-line px-[13px] pb-[9px] pt-3">
         <div className="flex items-center gap-2">
           <Icon name="boxes" size={16} className="text-pc-accent" />
-          <span className="font-pc-display text-[13px] font-bold tracking-[.04em] text-pc-fg">CAJAS</span>
+          <span className="font-pc-display text-[13px] font-bold tracking-[.04em] text-pc-fg">{t("filters.sortFields.box")}</span>
           <span className="font-pc-mono text-[10.5px] text-pc-fg-subtle">{TOTAL_BOXES}</span>
         </div>
         {onOverview && (
-          <Button variant="ghost" icon onClick={onOverview} aria-label="Vista general de las cajas">
+          <Button variant="ghost" icon onClick={onOverview} aria-label={t("boxOverview.title")}>
             <Icon name="grid" size={15} />
           </Button>
         )}

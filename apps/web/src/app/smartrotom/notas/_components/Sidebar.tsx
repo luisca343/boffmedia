@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
+import { useTranslations } from "next-intl";
 import type { NoteFolder, NoteTag } from "@boffmedia/shared";
 import { Icon, IconButton, Tooltip, type IconName } from "./ui";
 import { rgbOf, colorKey } from "../_utils/colors";
@@ -32,6 +33,7 @@ interface SidebarProps {
 }
 
 export function Sidebar(props: SidebarProps) {
+  const t = useTranslations("notas");
   const { folders, tags, notes, view, setView, expanded, theme } = props;
 
   const counts = useMemo(() => {
@@ -57,11 +59,11 @@ export function Sidebar(props: SidebarProps) {
     view.type === type && view.id === id;
 
   const smart: { id: string; label: string; icon: IconName; count?: number }[] = [
-    { id: "all", label: "Todas las notas", icon: "layers", count: notes.length },
-    { id: "recent", label: "Recientes", icon: "clock" },
-    { id: "pinned", label: "Ancladas", icon: "pin", count: counts.pinned },
-    { id: "shared", label: "Compartidas", icon: "share", count: counts.shared },
-    { id: "trash", label: "Papelera", icon: "trash" },
+    { id: "all", label: t("sidebar.smartViews.all"), icon: "layers", count: notes.length },
+    { id: "recent", label: t("sidebar.smartViews.recent"), icon: "clock" },
+    { id: "pinned", label: t("sidebar.smartViews.pinned"), icon: "pin", count: counts.pinned },
+    { id: "shared", label: t("sidebar.smartViews.shared"), icon: "share", count: counts.shared },
+    { id: "trash", label: t("sidebar.smartViews.trash"), icon: "trash" },
   ];
 
   const FolderNode = ({ f, depth }: { f: NoteFolder; depth: number }) => {
@@ -124,26 +126,26 @@ export function Sidebar(props: SidebarProps) {
         props.railOpen ? "max-md:translate-x-0" : "max-md:-translate-x-full"
       }`}
       role="navigation"
-      aria-label="Organización de notas"
+      aria-label={t("sidebar.newNote")}
     >
       <div className="flex flex-col gap-2 p-3 pb-2">
         <button
           onClick={props.onNew}
           className="inline-flex h-9 items-center justify-center gap-2 rounded-nt-md bg-gradient-to-b from-nt-500 to-nt-600 px-3.5 text-[13.5px] font-[550] text-white shadow-[inset_0_1px_0_rgb(255_255_255/.12),0_6px_16px_-8px_rgb(234_88_12/.8)] transition-all hover:brightness-[1.06] active:brightness-95"
         >
-          <Icon name="plus" size={16} /> Nueva nota
+          <Icon name="plus" size={16} /> {t("sidebar.newNote")}
         </button>
         <div className="flex gap-2">
           <button
             onClick={props.onCapture}
             className="inline-flex h-9 flex-1 items-center justify-center gap-2 rounded-nt-md border border-nt-border bg-nt-hover px-3.5 text-[13.5px] font-[550] text-nt-fg-muted transition-all hover:bg-nt-hover-strong hover:text-nt-fg"
           >
-            <Icon name="zap" size={15} /> Captura
+            <Icon name="zap" size={15} /> {t("sidebar.capture")}
           </button>
-          <Tooltip label={theme === "dark" ? "Modo claro" : "Modo oscuro"}>
+          <Tooltip label={theme === "dark" ? t("sidebar.lightMode") : t("sidebar.darkMode")}>
             <button
               onClick={props.toggleTheme}
-              aria-label="Cambiar tema"
+              aria-label={t("sidebar.changeTheme")}
               className="inline-flex h-9 w-9 flex-none items-center justify-center rounded-nt-md border border-nt-border bg-nt-hover text-nt-fg-muted transition-all hover:bg-nt-hover-strong hover:text-nt-fg"
             >
               <Icon name={theme === "dark" ? "sun" : "moon"} size={16} />
@@ -174,7 +176,7 @@ export function Sidebar(props: SidebarProps) {
         <div className="group mt-3">
           <div className="mb-0.5 flex items-center justify-between px-2 py-1">
             <span className="font-nt-display text-[10px] font-semibold uppercase tracking-[.12em] text-nt-fg-subtle">
-              Carpetas
+              {t("sidebar.folders")}
             </span>
             <span
               className="cursor-pointer text-nt-fg-subtle opacity-0 transition-opacity group-hover:opacity-100"
@@ -191,7 +193,7 @@ export function Sidebar(props: SidebarProps) {
         <div className="mt-3">
           <div className="mb-0.5 flex items-center justify-between px-2 py-1">
             <span className="font-nt-display text-[10px] font-semibold uppercase tracking-[.12em] text-nt-fg-subtle">
-              Etiquetas
+              {t("sidebar.tags")}
             </span>
           </div>
           {tags.map((t) => (

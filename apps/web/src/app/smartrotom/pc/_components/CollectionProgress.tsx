@@ -1,6 +1,7 @@
 "use client"
 
 import { useMemo } from "react"
+import { useTranslations } from "next-intl"
 import { usePokemonStore } from "@/stores/pokemonStore"
 import { useMarks, useMons } from "../_hooks/queries"
 import { isLegendary, isShiny } from "../_utils/derive"
@@ -25,6 +26,7 @@ export interface CollectionProgressProps {
  * hardcoded 1025, so it stays right when the game server's roster changes.
  */
 export function CollectionProgress({ onOpenLivingDex }: CollectionProgressProps) {
+  const t = useTranslations("pc")
   const { mons } = useMons()
   const { data: marks } = useMarks()
   const dexTotal = usePokemonStore((s) => s.allPokemon.length)
@@ -46,10 +48,10 @@ export function CollectionProgress({ onOpenLivingDex }: CollectionProgressProps)
   const dexPct = dexTotal > 0 ? Math.round((stats.species / dexTotal) * 100) : 0
 
   const tiles: Tile[] = [
-    { icon: "package", label: "Total", value: stats.total, tone: "text-pc-accent" },
-    { icon: "sparkles", label: "Shiny", value: stats.shiny, tone: "text-pc-gold" },
-    { icon: "zap", label: "Legend.", value: stats.legend, tone: "text-pc-violet" },
-    { icon: "heart", label: "Favs", value: stats.fav, tone: "text-pc-rose" },
+    { icon: "package", label: t("livingDex.title"), value: stats.total, tone: "text-pc-accent" },
+    { icon: "sparkles", label: t("filters.statusToggles.shiny"), value: stats.shiny, tone: "text-pc-gold" },
+    { icon: "zap", label: t("filters.statusToggles.legendary"), value: stats.legend, tone: "text-pc-violet" },
+    { icon: "heart", label: t("filters.statusToggles.favorite"), value: stats.fav, tone: "text-pc-rose" },
   ]
 
   return (
@@ -57,12 +59,12 @@ export function CollectionProgress({ onOpenLivingDex }: CollectionProgressProps)
       <button
         type="button"
         onClick={onOpenLivingDex}
-        title="Abrir Living Dex"
+        title={t("topbar.livingDex")}
         className="mb-2 flex w-full items-center justify-between rounded-md text-left focus-visible:outline-none"
       >
         <span className="flex items-center gap-1.5 font-pc text-[11.5px] font-semibold text-pc-fg-muted">
           <Icon name="book" size={13} className="text-pc-gold" />
-          Progreso de Pokédex
+          {t("livingDex.title")}
         </span>
         <span className="flex items-center gap-1 font-pc-mono text-xs font-extrabold text-pc-accent">
           {dexPct}%

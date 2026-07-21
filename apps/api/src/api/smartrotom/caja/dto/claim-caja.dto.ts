@@ -28,7 +28,8 @@ export class ClaimCajaDto {
   uuid: string;
 
   @ApiProperty({
-    description: 'Which ledger source to redeem. Mandatory — see CajaRepository.',
+    description:
+      'Which ledger source to redeem. Mandatory — see CajaRepository.',
     enum: CAJA_SOURCES,
     example: 'mine',
   })
@@ -54,7 +55,8 @@ export class ClaimCajaDto {
 /** Finalizes a delivered reservation. Not a `BaseDto`, like `ClaimCajaDto`. */
 export class ConfirmCajaDto {
   @ApiProperty({
-    description: 'The player, read by the mod off the connection — never supplied by the page.',
+    description:
+      'The player, read by the mod off the connection — never supplied by the page.',
     example: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4',
   })
   @IsNotEmpty()
@@ -62,7 +64,8 @@ export class ConfirmCajaDto {
   uuid: string;
 
   @ApiProperty({
-    description: 'The id returned by POST /caja/reserve for the grant that was just delivered.',
+    description:
+      'The id returned by POST /caja/reserve for the grant that was just delivered.',
     example: '9b7c1f2e-3d4a-4b5c-8e9f-0a1b2c3d4e5f',
   })
   @IsNotEmpty()

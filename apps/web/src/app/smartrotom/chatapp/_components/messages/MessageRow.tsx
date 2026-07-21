@@ -1,6 +1,7 @@
 "use client";
 import { useState, type ReactNode } from "react";
 import { toast } from "react-toastify";
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import { addWaypoint } from "@/services/mcef/mcefApi";
 import { Icon, MiniButton, Popover } from "../ui";
@@ -28,16 +29,17 @@ function MetaLine({ time, out, status }: { time: string; out: boolean; status: M
 }
 
 function ReplyQuote({ chat, replyTo, out }: { chat: ChatVM; replyTo: number; out: boolean }) {
+  const t = useTranslations("chatapp");
   const src = chat.messages.find((m) => m.id === replyTo);
   if (!src) return null;
   const who = src.uuid === chat.members[0]?.uuid ? memberName(chat, src.uuid) : memberName(chat, src.uuid);
-  let preview = "Mensaje";
+  let preview = t("preview.message");
   if (src.type === "text" || src.type === "chat" || src.type === "emoji") preview = src.content;
-  else if (src.type === "image") preview = "📷 Foto";
-  else if (src.type === "sticker") preview = "Sticker";
-  else if (src.type === "waypoint") preview = "📍 Ubicación";
-  else if (src.type === "document") preview = "📄 Documento";
-  else if (src.type === "video") preview = "▶ Vídeo";
+  else if (src.type === "image") preview = t("preview.photo");
+  else if (src.type === "sticker") preview = t("preview.sticker");
+  else if (src.type === "waypoint") preview = t("preview.location");
+  else if (src.type === "document") preview = t("preview.document");
+  else if (src.type === "video") preview = t("preview.video");
   return (
     <div className={cn("mb-1 overflow-hidden rounded-[5px] border-l-4 border-ca-accent px-[9px] py-1 text-[13px]", out ? "bg-black/10" : "bg-ca-500/[.14]")}>
       <span className="block text-[12.5px] font-semibold text-ca-accent-soft">{who}</span>
@@ -71,6 +73,7 @@ function Reactions({ message, myUuid, onReact }: { message: ChatMessageVM; myUui
 }
 
 function HoverTools({ message, out, onReact, onReply }: { message: ChatMessageVM; out: boolean; onReact?: (m: ChatMessageVM, e: string) => void; onReply?: (m: ChatMessageVM) => void }) {
+  const t = useTranslations("chatapp");
   const [pick, setPick] = useState(false);
   const Tool = ({ icon, title, onClick }: { icon: "smile" | "reply" | "more"; title: string; onClick?: () => void }) => (
     <button title={title} onClick={onClick} className="grid h-[30px] w-[30px] place-items-center rounded-full bg-ca-panel/85 text-ca-300 shadow-[0_1px_3px_rgba(0,0,0,.18)] hover:bg-ca-700 hover:text-ca-50">
@@ -79,9 +82,9 @@ function HoverTools({ message, out, onReact, onReply }: { message: ChatMessageVM
   );
   return (
     <div className={cn("relative flex items-center gap-0.5 self-center px-1 opacity-0 transition-opacity group-hover/m:opacity-100", out && "order-first")}>
-      <Tool icon="smile" title="Reaccionar" onClick={() => setPick((s) => !s)} />
-      <Tool icon="reply" title="Responder" onClick={() => onReply?.(message)} />
-      <Tool icon="more" title="Más" />
+      <Tool icon="smile" title={t("message.react")} onClick={() => setPick((s) => !s)} />
+      <Tool icon="reply" title={t("message.reply")} onClick={() => onReply?.(message)} />
+      <Tool icon="more" title={t("message.more")} />
       {pick && (
         <Popover className={cn("flex gap-0.5 bottom-auto", out ? "right-0" : "left-0")} style={{ top: "calc(100% + 6px)" }} onMouseLeave={() => setPick(false)}>
           {REACTION_SET.map((e) => (
@@ -101,15 +104,16 @@ function CardShell({ out, children }: { out: boolean; children: ReactNode }) {
 }
 
 function WaypointInner({ content, out, time }: { content: string; out: boolean; time: string }) {
+  const t = useTranslations("chatapp");
   const w = parseWaypoint(content);
   if (!w) return null;
   const color = w.color || "#f97316";
-  const copy = () => { navigator.clipboard.writeText(`${w.x} ${w.y} ${w.z}`); toast.success("Coordenadas copiadas"); };
+  const copy = () => { navigator.clipboard.writeText(`${w.x} ${w.y} ${w.z}`); toast.success(t("message.coordinatesCopied")); };
   const add = async () => {
     try {
       const r = await addWaypoint({ name: w.name, x: w.x, y: w.y, z: w.z, color });
-      r?.success ? toast.success(`Waypoint "${w.name}" añadido`) : toast.error(r?.error || "Error al añadir waypoint");
-    } catch { toast.error("Error al añadir waypoint"); }
+      r?.success ? toast.success(t("message.waypointAdded", { name: w.name })) : toast.error(r?.error || t("message.waypointError"));
+    } catch { toast.error(t("message.waypointError")); }
   };
   return (
     <CardShell out={out}>
@@ -124,8 +128,8 @@ function WaypointInner({ content, out, time }: { content: string; out: boolean; 
         </div>
       </div>
       <div className="flex gap-2 px-3 pb-3">
-        <MiniButton onClick={copy}><Icon name="copy" size={14} /> Copiar</MiniButton>
-        <MiniButton accent onClick={add}><Icon name="plus" size={14} /> Añadir waypoint</MiniButton>
+        <MiniButton onClick={copy}><Icon name="copy" size={14} /> {t("message.copy")}</MiniButton>
+        <MiniButton accent onClick={add}><Icon name="plus" size={14} /> {t("message.addWaypoint")}</MiniButton>
       </div>
       <div className="px-[13px] pb-2 text-[10.5px] text-ca-500" style={{ textAlign: out ? "right" : "left" }}>{time}</div>
     </CardShell>
@@ -133,6 +137,7 @@ function WaypointInner({ content, out, time }: { content: string; out: boolean; 
 }
 
 function DocumentInner({ content, out, time }: { content: string; out: boolean; time: string }) {
+  const t = useTranslations("chatapp");
   const d = parseDocument(content);
   if (!d) return null;
   return (
@@ -144,11 +149,11 @@ function DocumentInner({ content, out, time }: { content: string; out: boolean; 
         <div className="min-w-0">
           <div className="text-[14.5px] font-semibold text-ca-bubble-in-text">{d.title}</div>
           {d.content && <div className="mt-0.5 line-clamp-2 text-[12.5px] text-ca-400">{d.content}</div>}
-          <div className="mt-1 font-ca-mono text-[12.5px] text-ca-400">Notas</div>
+          <div className="mt-1 font-ca-mono text-[12.5px] text-ca-400">{t("message.notes")}</div>
         </div>
       </div>
       <div className="flex gap-2 px-3 pb-3">
-        <MiniButton onClick={() => toast.info("Abriendo nota…")}><Icon name="eye" size={14} /> Abrir nota</MiniButton>
+        <MiniButton onClick={() => toast.info(t("message.openingNote"))}><Icon name="eye" size={14} /> {t("message.openNote")}</MiniButton>
       </div>
       <div className="px-[13px] pb-2 text-[10.5px] text-ca-500" style={{ textAlign: out ? "right" : "left" }}>{time}</div>
     </CardShell>
@@ -156,6 +161,7 @@ function DocumentInner({ content, out, time }: { content: string; out: boolean; 
 }
 
 function VideoInner({ content, out, time }: { content: string; out: boolean; time: string }) {
+  const t = useTranslations("chatapp");
   const v = parseVideo(content);
   if (!v) return null;
   const thumb = `https://img.youtube.com/vi/${v.videoId}/hqdefault.jpg`;
@@ -169,7 +175,7 @@ function VideoInner({ content, out, time }: { content: string; out: boolean; tim
         </span>
       </a>
       <div className="px-3 py-[9px]">
-        <div className="text-[13.5px] font-semibold text-ca-bubble-in-text">{v.title || "Vídeo de YouTube"}</div>
+        <div className="text-[13.5px] font-semibold text-ca-bubble-in-text">{v.title || t("media.youtubeVideo")}</div>
         <div className="mt-0.5 flex items-center gap-[5px] text-[11.5px] text-ca-400"><Icon name="play" size={11} /> YouTube</div>
       </div>
       <div className="bg-ca-800 px-3 pb-2 text-[10.5px] text-ca-500" style={{ textAlign: out ? "right" : "left" }}>{time}</div>
@@ -178,10 +184,11 @@ function VideoInner({ content, out, time }: { content: string; out: boolean; tim
 }
 
 function CallInner({ message, out, onCallback }: { message: ChatMessageVM; out: boolean; onCallback?: () => void }) {
+  const t = useTranslations("chatapp");
   const c = parseCall(message.content);
   const missed = !c || c.duration <= 0;
-  const title = missed ? "Llamada perdida" : out ? "Llamada saliente" : "Llamada entrante";
-  const sub = missed ? "Sin respuesta" : `Duración ${formatDuration(c!.duration)}`;
+  const title = missed ? t("message.call.missed") : out ? t("message.call.outgoing") : t("message.call.incoming");
+  const sub = missed ? t("message.call.noAnswer") : t("message.call.duration", { time: formatDuration(c!.duration) });
   return (
     <div className="my-2.5 flex justify-center">
       <div className="inline-flex max-w-[min(440px,86%)] items-center gap-3 rounded-ca-md bg-ca-bubble-in py-2 pl-3.5 pr-2 shadow-ca-bubble">
@@ -194,7 +201,7 @@ function CallInner({ message, out, onCallback }: { message: ChatMessageVM; out: 
           </div>
           <div className="mt-px text-[12px] text-ca-400">{sub} · {timeOf(message.createdAt)}</div>
         </div>
-        <button onClick={onCallback} title="Llamar" className="grid h-[38px] w-[38px] flex-none place-items-center rounded-full text-ca-accent-soft transition-colors hover:bg-ca-accent/[.14] active:scale-[.92]">
+        <button onClick={onCallback} title={t("actions.call")} className="grid h-[38px] w-[38px] flex-none place-items-center rounded-full text-ca-accent-soft transition-colors hover:bg-ca-accent/[.14] active:scale-[.92]">
           <Icon name="phone" size={17} />
         </button>
       </div>

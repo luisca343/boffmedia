@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import type { Region, SealStatus } from "../_types"
 import { SEAL_STATUSES, STATUS_LABEL } from "../_utils/status"
 import { Button, Chip, Icon, SearchField, Select } from "./ui"
@@ -16,16 +17,17 @@ export function RegionStrip({
   active: string | null
   onSelect: (id: string | null) => void
 }) {
+  const t = useTranslations("misiones.boardFilters")
   if (regions.length === 0) return null
 
   return (
     <div className="mb-[18px]">
       <div className="mb-2.5 flex items-center gap-3 text-ms-gold-1">
-        <span className="font-ms-display text-lg tracking-[.04em]">Filtrar por reino</span>
+        <span className="font-ms-display text-lg tracking-[.04em]">{t("filterByKingdom")}</span>
         <div className="h-px flex-1 bg-gradient-to-r from-ms-gold-3 to-transparent opacity-50" />
         {active && (
           <Button variant="dark" sm onClick={() => onSelect(null)}>
-            <Icon.X size={11} /> Quitar
+            <Icon.X size={11} /> {t("remove")}
           </Button>
         )}
       </div>
@@ -63,20 +65,21 @@ export function BoardFilters({
   onSort: (value: SortKey) => void
   counts: Record<string, number>
 }) {
+  const t = useTranslations("misiones.boardFilters")
   return (
     <div className="mb-6 flex flex-wrap items-center gap-3 rounded border border-black/40 bg-gradient-to-b from-[rgba(60,40,20,.55)] to-[rgba(40,24,12,.65)] p-3 px-4 shadow-[inset_0_1px_0_rgba(255,200,100,.1)]">
       <SearchField
         className="max-w-[320px] flex-[1_1_240px]"
-        placeholder="Buscar misión, NPC, reino…"
+        placeholder={t("searchPlaceholder")}
         value={search}
         onChange={(event) => onSearch(event.target.value)}
-        aria-label="Buscar en el tablón"
+        aria-label={t("searchLabel")}
       />
 
       <div className="flex flex-wrap gap-1.5">
         {(["ALL", ...SEAL_STATUSES] as const).map((key) => (
           <Chip key={key} active={status === key} onClick={() => onStatus(key)}>
-            {key === "ALL" ? "Todas" : STATUS_LABEL[key]}
+            {key === "ALL" ? t("all") : STATUS_LABEL[key]}
             <span className="opacity-65">({counts[key] ?? 0})</span>
           </Chip>
         ))}
@@ -84,10 +87,10 @@ export function BoardFilters({
 
       <div className="flex-1" />
 
-      <Select value={sort} onChange={(event) => onSort(event.target.value as SortKey)} aria-label="Orden del tablón">
-        <option value="status">Orden: por sello</option>
-        <option value="level">Orden: por nivel</option>
-        <option value="name">Orden: alfabético</option>
+      <Select value={sort} onChange={(event) => onSort(event.target.value as SortKey)} aria-label={t("searchLabel")}>
+        <option value="status">{t("sortOrder")}</option>
+        <option value="level">{t("sortLevel")}</option>
+        <option value="name">{t("sortName")}</option>
       </Select>
     </div>
   )

@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { Icon, type IconName } from "@/components/boffmedia/primitives"
 import { MhStars } from "@/app/(boffmedia)/(herramientas)/mhwilds/monsters/_components/bst-kit"
@@ -229,6 +230,7 @@ export interface MhReward {
   conditions: { type: string; rank?: string; chance: number; quantity: number; subtype?: string }[]
 }
 export function MhDropTable({ rewards }: { rewards: MhReward[] }) {
+  const t = useTranslations("common.bestiary")
   const rows: { item: MhRewardItem; cond: MhReward["conditions"][number]; rare: boolean }[] = []
   rewards.forEach((r) => r.conditions.forEach((c) => rows.push({ item: r.item, cond: c, rare: r.item.rarity >= 7 })))
   rows.sort((a, b) => b.cond.chance - a.cond.chance)
@@ -242,7 +244,7 @@ export function MhDropTable({ rewards }: { rewards: MhReward[] }) {
               <span className="h-[11px] w-[11px] flex-none rotate-45 border border-solid" style={{ borderColor: `var(--rar${row.item.rarity})`, background: `var(--rar${row.item.rarity})` }} />
               <span className="truncate font-body text-[13px] text-txt">{row.item.name}</span>
               <MhRarity rarity={row.item.rarity} />
-              {row.rare && <span className="text-[12px] text-[color:var(--rar8)]" title="Material raro">★</span>}
+              {row.rare && <span className="text-[12px] text-[color:var(--rar8)]" title={t("rareMaterial")}>★</span>}
             </span>
             <span className="inline-flex items-center gap-[5px] whitespace-nowrap font-mono text-[10px]/none uppercase tracking-[0.04em] text-txt-muted">
               <Icon name={dt.icon} size={11} />

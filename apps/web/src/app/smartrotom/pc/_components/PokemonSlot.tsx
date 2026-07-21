@@ -1,6 +1,7 @@
 "use client"
 
 import { memo, type MouseEvent, type PointerEvent } from "react"
+import { useTranslations } from "next-intl"
 import { useMarks, useSetMark } from "../_hooks/queries"
 import { dropAttrs, isOver, useDragLayer } from "../_hooks/useDrag"
 import { locId, usePcUi } from "../_stores/pcUiStore"
@@ -31,6 +32,7 @@ export const PokemonSlot = memo(function PokemonSlot({
   droppable = true,
   onHover,
 }: PokemonSlotProps) {
+  const t = useTranslations("pc")
   const { drag, beginDrag } = useDragLayer()
   const id = loc ? locId(loc) : ""
 
@@ -84,7 +86,7 @@ export const PokemonSlot = memo(function PokemonSlot({
     <button
       type="button"
       tabIndex={mon ? 0 : -1}
-      aria-label={p ? `${displayName(p)}, nivel ${p.level}` : "Espacio vacío"}
+      aria-label={p ? `${displayName(p)}, ${t("detail.level")} ${p.level}` : t("team.emptySlot")}
       className={className}
       style={{ touchAction: "none" }}
       {...(droppable && loc ? dropAttrs(loc) : {})}

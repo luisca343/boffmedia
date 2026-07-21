@@ -1,4 +1,5 @@
 import type { ReactNode } from "react"
+import { useTranslations } from "next-intl"
 import { CardSkeleton, SectionHeader, VideoCard, type VideoCardData } from "@/components/smartrotom/media/ui"
 
 /** A titled grid of video cards with loading + empty states. */
@@ -17,6 +18,8 @@ export function VideoSection({
   loading?: boolean
   action?: ReactNode
 }) {
+  const t = useTranslations("mewtube")
+
   return (
     <section className="mb-8">
       <SectionHeader eyebrow={eyebrow} title={title} subtitle={subtitle} rule={!subtitle} action={action} />
@@ -26,7 +29,7 @@ export function VideoSection({
           : videos.map((v) => <VideoCard key={v.href} v={v} />)}
       </div>
       {!loading && videos.length === 0 && (
-        <p className="py-12 text-center text-sm text-mw-fg-faint">No hay nada por aquí todavía.</p>
+        <p className="py-12 text-center text-sm text-mw-fg-faint">{t("common.emptyState")}</p>
       )}
     </section>
   )

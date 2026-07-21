@@ -25,6 +25,11 @@
       "ends": "Hasta {date}",
       "game": "Juego"
     },
+    "countdown": {
+      "days": "días",
+      "hours": "hrs",
+      "minutes": "min"
+    },
     "empty": {
       "title": "Sin eventos",
       "lead": "No hay eventos que coincidan con tu búsqueda."

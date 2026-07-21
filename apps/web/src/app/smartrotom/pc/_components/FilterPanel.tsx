@@ -1,6 +1,7 @@
 "use client"
 
 import { useMemo, useState, type ReactNode } from "react"
+import { useTranslations } from "next-intl"
 import { usePokemonStore } from "@/stores/pokemonStore"
 import { useMarks, useMons } from "../_hooks/queries"
 import { usePcUi } from "../_stores/pcUiStore"
@@ -62,12 +63,12 @@ function Toggle({
   )
 }
 
-const SORT_FIELDS: [SortField, string][] = [
-  ["box", "Caja"],
-  ["level", "Nivel"],
-  ["dex", "Pokédex"],
-  ["name", "Nombre"],
-  ["iv", "IV total"],
+const SORT_FIELD_KEYS: [SortField, string][] = [
+  ["box", "filters.sortFields.box"],
+  ["level", "filters.sortFields.level"],
+  ["dex", "filters.sortFields.dex"],
+  ["name", "filters.sortFields.name"],
+  ["iv", "filters.sortFields.iv"],
 ]
 
 export interface FilterPanelProps {
@@ -75,6 +76,7 @@ export interface FilterPanelProps {
 }
 
 export function FilterPanel({ onClose }: FilterPanelProps) {
+  const t = useTranslations("pc")
   const { mons } = useMons()
   const { data: marks } = useMarks()
   const pokemonByDex = usePokemonStore((s) => s.pokemonByDex)
@@ -140,8 +142,8 @@ export function FilterPanel({ onClose }: FilterPanelProps) {
   return (
     <Modal
       onClose={onClose}
-      title="Filtros y búsqueda"
-      subtitle="Refina tu colección"
+      title={t("filters.title")}
+      subtitle={t("filters.subtitle")}
       icon="sliders"
       tone="text-pc-violet"
       width={560}
@@ -154,51 +156,51 @@ export function FilterPanel({ onClose }: FilterPanelProps) {
               setS("")
             }}
           >
-            Limpiar
+            {t("common.clear")}
           </Button>
           <div className="flex-1 text-right text-[12.5px] text-pc-fg-muted">
-            <b className="text-pc-accent">{count}</b> coinciden
+            <b className="text-pc-accent">{count}</b> {t("filters.matchCount", { count })}
           </div>
           <Button variant="primary" onClick={apply}>
             <Icon name="check" size={15} />
-            Aplicar
+            {t("common.apply")}
           </Button>
         </>
       }
     >
       <div className="p-[18px]">
-        <Section icon="search" title="Buscar y ordenar">
+        <Section icon="search" title={t("filters.searchAndSort")}>
           <div className="relative mb-2.5">
             <Icon name="search" size={15} className="absolute left-[11px] top-[11px] text-pc-fg-subtle" />
             <Input
               value={s}
               onChange={(e) => setS(e.target.value)}
-              aria-label="Buscar"
-              placeholder="Nombre, apodo o número…"
+              aria-label={t("common.search")}
+              placeholder={t("filters.searchPlaceholder")}
               className="pl-[33px]"
             />
           </div>
           <div className="flex gap-2">
             <Select
               value={sort.field}
-              aria-label="Ordenar por"
+              aria-label={t("filters.sortBy")}
               onChange={(e) => setLocalSort({ ...sort, field: e.target.value as SortField })}
               className="flex-1"
             >
-              {SORT_FIELDS.map(([v, l]) => (
+              {SORT_FIELD_KEYS.map(([v, key]) => (
                 <option key={v} value={v}>
-                  {l}
+                  {t(key)}
                 </option>
               ))}
             </Select>
             <Button onClick={() => setLocalSort({ ...sort, dir: sort.dir === "asc" ? "desc" : "asc" })}>
               <Icon name="sort" size={14} />
-              {sort.dir === "asc" ? "Asc" : "Desc"}
+              {sort.dir === "asc" ? t("filters.asc") : t("filters.desc")}
             </Button>
           </div>
         </Section>
 
-        <Section icon="grid" title="Tipos" badge={f.types?.length}>
+        <Section icon="grid" title={t("filters.types")} badge={f.types?.length}>
           <div className="grid grid-cols-[repeat(auto-fill,minmax(78px,1fr))] gap-1.5">
             {ALL_TYPES.map((t) => {
               const on = (f.types ?? []).includes(t)
@@ -223,14 +225,14 @@ export function FilterPanel({ onClose }: FilterPanelProps) {
           </div>
         </Section>
 
-        <Section icon="sort" title="Rango de nivel" badge={f.minLevel || f.maxLevel ? 1 : 0}>
+        <Section icon="sort" title={t("filters.levelRange")} badge={f.minLevel || f.maxLevel ? 1 : 0}>
           <div className="flex items-center gap-2.5">
             <Input
               type="number"
               min={1}
               max={100}
-              aria-label="Nivel mínimo"
-              placeholder="Mín"
+              aria-label={t("filters.minLevel")}
+              placeholder={t("filters.minLevel")}
               value={f.minLevel ?? ""}
               onChange={(e) => upd({ minLevel: e.target.value ? Number(e.target.value) : undefined })}
               className="flex-1"
@@ -240,8 +242,8 @@ export function FilterPanel({ onClose }: FilterPanelProps) {
               type="number"
               min={1}
               max={100}
-              aria-label="Nivel máximo"
-              placeholder="Máx"
+              aria-label={t("filters.maxLevel")}
+              placeholder={t("filters.maxLevel")}
               value={f.maxLevel ?? ""}
               onChange={(e) => upd({ maxLevel: e.target.value ? Number(e.target.value) : undefined })}
               className="flex-1"
@@ -249,31 +251,31 @@ export function FilterPanel({ onClose }: FilterPanelProps) {
           </div>
         </Section>
 
-        <Section icon="star" title="Estado especial">
+        <Section icon="star" title={t("filters.specialStatus")}>
           <div className="grid grid-cols-2 gap-[7px]">
             <Toggle
-              label="Shiny"
+              label={t("filters.statusToggles.shiny")}
               icon="sparkles"
               tone="text-pc-gold"
               on={!!f.isShiny}
               onClick={() => upd({ isShiny: !f.isShiny })}
             />
             <Toggle
-              label="Legendario"
+              label={t("filters.statusToggles.legendary")}
               icon="zap"
               tone="text-pc-violet"
               on={!!f.isLegendary}
               onClick={() => upd({ isLegendary: !f.isLegendary })}
             />
             <Toggle
-              label="Con objeto"
+              label={t("filters.statusToggles.withItem")}
               icon="tag"
               tone="text-pc-amber"
               on={!!f.hasItem}
               onClick={() => upd({ hasItem: !f.hasItem })}
             />
             <Toggle
-              label="Favorito"
+              label={t("filters.statusToggles.favorite")}
               icon="heart"
               tone="text-pc-rose"
               on={!!f.isFavorited}
@@ -282,24 +284,24 @@ export function FilterPanel({ onClose }: FilterPanelProps) {
           </div>
         </Section>
 
-        <Section icon="users" title="Género">
+        <Section icon="users" title={t("filters.gender")}>
           <div className="grid grid-cols-3 gap-[7px]">
             <Toggle
-              label="Macho"
+              label={t("filters.genderOptions.male")}
               icon="mars"
               tone="text-[#5aa9ff]"
               on={f.gender === "male"}
               onClick={() => upd({ gender: f.gender === "male" ? undefined : "male" })}
             />
             <Toggle
-              label="Hembra"
+              label={t("filters.genderOptions.female")}
               icon="venus"
               tone="text-[#ff7eb6]"
               on={f.gender === "female"}
               onClick={() => upd({ gender: f.gender === "female" ? undefined : "female" })}
             />
             <Toggle
-              label="Sin gén."
+              label={t("filters.genderOptions.genderless")}
               icon="neuter"
               tone="text-pc-fg-muted"
               on={f.gender === "genderless"}
@@ -309,13 +311,13 @@ export function FilterPanel({ onClose }: FilterPanelProps) {
         </Section>
 
         <div className="grid grid-cols-2 gap-3.5">
-          <Section icon="info" title="Naturaleza">
+          <Section icon="info" title={t("filters.nature")}>
             <Select
               value={f.nature ?? ""}
-              aria-label="Naturaleza"
+              aria-label={t("filters.nature")}
               onChange={(e) => upd({ nature: e.target.value || undefined })}
             >
-              <option value="">Todas</option>
+              <option value="">{t("filters.all")}</option>
               {natures.map((n) => (
                 <option key={n} value={n}>
                   {n}
@@ -323,13 +325,13 @@ export function FilterPanel({ onClose }: FilterPanelProps) {
               ))}
             </Select>
           </Section>
-          <Section icon="zap" title="Habilidad">
+          <Section icon="zap" title={t("filters.ability")}>
             <Select
               value={f.ability ?? ""}
-              aria-label="Habilidad"
+              aria-label={t("filters.ability")}
               onChange={(e) => upd({ ability: e.target.value || undefined })}
             >
-              <option value="">Todas</option>
+              <option value="">{t("filters.all")}</option>
               {abilities.map((a) => (
                 <option key={a} value={a}>
                   {a}
@@ -339,9 +341,9 @@ export function FilterPanel({ onClose }: FilterPanelProps) {
           </Section>
         </div>
 
-        <Section icon="tag" title="Etiqueta">
-          <Select value={f.tag ?? ""} aria-label="Etiqueta" onChange={(e) => upd({ tag: e.target.value || undefined })}>
-            <option value="">Todas</option>
+        <Section icon="tag" title={t("filters.tag")}>
+          <Select value={f.tag ?? ""} aria-label={t("filters.tag")} onChange={(e) => upd({ tag: e.target.value || undefined })}>
+            <option value="">{t("filters.all")}</option>
             {tags.map((t) => (
               <option key={t} value={t}>
                 {t}

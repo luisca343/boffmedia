@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import { getMcUserData, getWaypoints, type Waypoint } from "@/services/mcef/mcefApi";
 import { Icon, Modal } from "../ui";
 
@@ -14,6 +15,7 @@ export function WaypointPicker({
   onOpenChange?: (open: boolean) => void;
   onWaypointSelect: (wp: WP) => void;
 }) {
+  const t = useTranslations("chatapp");
   const [waypoints, setWaypoints] = useState<Waypoint[]>([]);
   const [current, setCurrent] = useState<{ x: number; y: number; z: number } | null>(null);
   const [loading, setLoading] = useState(false);
@@ -47,13 +49,13 @@ export function WaypointPicker({
   );
 
   return (
-    <Modal title="Compartir ubicación" icon="mappin" onClose={close}>
+    <Modal title={t("locationPicker.title")} icon="mappin" onClose={close}>
       {loading ? (
-        <div className="py-10 text-center text-[13.5px] text-ca-500">Cargando waypoints…</div>
+        <div className="py-10 text-center text-[13.5px] text-ca-500">{t("locationPicker.loading")}</div>
       ) : (
         <div className="flex flex-col gap-1">
           {current && (
-            <Row color="#00a884" title="Ubicación actual" coords={`X ${current.x} · Y ${current.y} · Z ${current.z}`} onClick={() => pick({ name: "Ubicación actual", ...current })} />
+            <Row color="#00a884" title={t("locationPicker.currentLocation")} coords={`X ${current.x} · Y ${current.y} · Z ${current.z}`} onClick={() => pick({ name: t("locationPicker.currentLocation"), ...current })} />
           )}
           {waypoints.map((w) => (
             <Row
@@ -65,7 +67,7 @@ export function WaypointPicker({
             />
           ))}
           {waypoints.length === 0 && !current && (
-            <div className="py-10 text-center text-[13.5px] text-ca-500">No hay waypoints guardados.</div>
+            <div className="py-10 text-center text-[13.5px] text-ca-500">{t("locationPicker.noWaypoints")}</div>
           )}
         </div>
       )}

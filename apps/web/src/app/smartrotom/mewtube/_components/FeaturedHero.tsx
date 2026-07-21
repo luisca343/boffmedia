@@ -1,3 +1,4 @@
+import { useTranslations } from "next-intl"
 import { Avatar, Button, Check, I } from "@/components/smartrotom/media/ui"
 
 export interface FeaturedData {
@@ -14,6 +15,8 @@ export interface FeaturedData {
 
 /** Home hero — a single editorialized/top video with a bled poster + vignette. */
 export function FeaturedHero({ data }: { data: FeaturedData }) {
+  const t = useTranslations("mewtube")
+
   return (
     <section className="relative h-[480px] overflow-hidden">
       {data.thumb && (
@@ -46,16 +49,16 @@ export function FeaturedHero({ data }: { data: FeaturedData }) {
               {data.verified && <Check />}
             </div>
             <div className="mt-0.5 text-xs text-mw-fg-mute">
-              {[data.views && `${data.views} visitas`, data.age, data.duration].filter(Boolean).join(" · ")}
+              {[data.views && t("video.views", { count: data.views }), data.age, data.duration].filter(Boolean).join(" · ")}
             </div>
           </div>
         </div>
         <div className="flex flex-wrap items-center gap-3">
           <Button variant="solid" size="lg" href={data.href}>
-            <I.play size={14} /> Reproducir
+            <I.play size={14} /> {t("common.play")}
           </Button>
-          <Button variant="ghost" size="lg" aria-disabled title="Próximamente">
-            <I.plus size={16} /> Ver más tarde
+          <Button variant="ghost" size="lg" aria-disabled title={t("home.comingSoon")}>
+            <I.plus size={16} /> {t("common.watchLater")}
           </Button>
         </div>
       </div>

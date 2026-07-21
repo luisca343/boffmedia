@@ -30,7 +30,11 @@ describe('CajaController (integration)', () => {
     app = moduleRef.createNestApplication();
     app.useGlobalInterceptors(new ResponseInterceptor(app.get(Reflector)));
     app.useGlobalPipes(
-      new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true, transform: true }),
+      new ValidationPipe({
+        whitelist: true,
+        forbidNonWhitelisted: true,
+        transform: true,
+      }),
     );
     await app.init();
   });
@@ -57,8 +61,12 @@ describe('CajaController (integration)', () => {
       .send({ uuid: UUID, source: 'arcade' })
       .expect(200);
 
-    expect(res.body.objetos).toEqual([{ id: 'minecraft:diamond', cantidad: 5 }]);
-    expect(res.body.pokemon).toEqual([{ spec: 'Incineroar lvl:50', cantidad: 1 }]);
+    expect(res.body.objetos).toEqual([
+      { id: 'minecraft:diamond', cantidad: 5 },
+    ]);
+    expect(res.body.pokemon).toEqual([
+      { spec: 'Incineroar lvl:50', cantidad: 1 },
+    ]);
     expect(res.body.data).toBeUndefined();
     expect(res.body.success).toBeUndefined();
   });
@@ -119,7 +127,11 @@ describe('CajaController (integration)', () => {
     // The whole point: the page must never name what it receives.
     await request(app.getHttpServer())
       .post('/smartrotom/caja/claim')
-      .send({ uuid: UUID, source: 'mine', objetos: [{ id: 'minecraft:netherite_block', cantidad: 64 }] })
+      .send({
+        uuid: UUID,
+        source: 'mine',
+        objetos: [{ id: 'minecraft:netherite_block', cantidad: 64 }],
+      })
       .expect(400);
     expect(claim).not.toHaveBeenCalled();
   });
@@ -138,8 +150,12 @@ describe('CajaController (integration)', () => {
         .expect(200);
 
       expect(res.body.reservationId).toBe('res-9');
-      expect(res.body.objetos).toEqual([{ id: 'minecraft:diamond', cantidad: 5 }]);
-      expect(res.body.pokemon).toEqual([{ spec: 'Incineroar lvl:50', cantidad: 1 }]);
+      expect(res.body.objetos).toEqual([
+        { id: 'minecraft:diamond', cantidad: 5 },
+      ]);
+      expect(res.body.pokemon).toEqual([
+        { spec: 'Incineroar lvl:50', cantidad: 1 },
+      ]);
       expect(res.body.data).toBeUndefined();
       expect(reserve).toHaveBeenCalledWith(UUID, 'arcade', [12, 13]);
     });
@@ -158,11 +174,17 @@ describe('CajaController (integration)', () => {
       confirm.mockResolvedValue({ confirmed: 2 });
       const res = await request(app.getHttpServer())
         .post('/smartrotom/caja/confirm')
-        .send({ uuid: UUID, reservationId: '9b7c1f2e-3d4a-4b5c-8e9f-0a1b2c3d4e5f' })
+        .send({
+          uuid: UUID,
+          reservationId: '9b7c1f2e-3d4a-4b5c-8e9f-0a1b2c3d4e5f',
+        })
         .expect(200);
       expect(res.body.confirmed).toBe(2);
       expect(res.body.data).toBeUndefined();
-      expect(confirm).toHaveBeenCalledWith(UUID, '9b7c1f2e-3d4a-4b5c-8e9f-0a1b2c3d4e5f');
+      expect(confirm).toHaveBeenCalledWith(
+        UUID,
+        '9b7c1f2e-3d4a-4b5c-8e9f-0a1b2c3d4e5f',
+      );
     });
 
     it('rejects a non-uuid reservationId', async () => {

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef } from "react";
+import { useTranslations } from "next-intl";
 import { CKEditor } from "@ckeditor/ckeditor5-react";
 import Bundle from "@/components/shared/ckeditor/ckeditor.js";
 import { COLOR_KEYS, COLOR_RGB } from "../../_utils/colors";
@@ -59,6 +60,7 @@ interface NotesEditorProps {
 }
 
 export default function NotesEditor(props: NotesEditorProps) {
+  const t = useTranslations("notas");
   const editorRef = useRef<Editor | null>(null);
   // The config must stay referentially stable; every callback flows through this ref.
   const cb = useRef(props);
@@ -124,7 +126,7 @@ export default function NotesEditor(props: NotesEditorProps) {
       language: "es",
       // Markdown would flip the data format; Title hijacks the first <h1>.
       removePlugins: ["Markdown", "Title", "MediaEmbed", "MediaEmbedToolbar"],
-      placeholder: "Escribe aquí…",
+      placeholder: t("editor.placeholder"),
       toolbar: {
         items: [
           "heading",
@@ -162,10 +164,10 @@ export default function NotesEditor(props: NotesEditorProps) {
       },
       heading: {
         options: [
-          { model: "paragraph", title: "Párrafo", class: "ck-heading_paragraph" },
-          { model: "heading1", view: "h1", title: "Título 1", class: "ck-heading_heading1" },
-          { model: "heading2", view: "h2", title: "Título 2", class: "ck-heading_heading2" },
-          { model: "heading3", view: "h3", title: "Título 3", class: "ck-heading_heading3" },
+          { model: "paragraph", title: t("editor.paragraph"), class: "ck-heading_paragraph" },
+          { model: "heading1", view: "h1", title: t("editor.heading1"), class: "ck-heading_heading1" },
+          { model: "heading2", view: "h2", title: t("editor.heading2"), class: "ck-heading_heading2" },
+          { model: "heading3", view: "h3", title: t("editor.heading3"), class: "ck-heading_heading3" },
         ],
       },
       fontColor: {
@@ -203,7 +205,7 @@ export default function NotesEditor(props: NotesEditorProps) {
             itemRenderer: (item: any) => {
               const el = document.createElement("span");
               el.className = "nt-mention-item" + (item.isNew ? " nt-mention-new" : "");
-              el.textContent = item.isNew ? `Crear «${item.wikiTitle}»` : item.wikiTitle;
+              el.textContent = item.isNew ? t("editor.createLinked", { title: item.wikiTitle }) : item.wikiTitle;
               return el;
             },
           },

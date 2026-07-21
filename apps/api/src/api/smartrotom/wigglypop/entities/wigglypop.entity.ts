@@ -18,7 +18,8 @@ export class WigglypopPersonRef {
 export class WigglypopListingMonEntity {
   @ApiProperty() id: number;
   @ApiProperty() pokemonKey: string;
-  @ApiProperty({ description: 'PC box the mon sat in when listed' }) sourceBox: number;
+  @ApiProperty({ description: 'PC box the mon sat in when listed' })
+  sourceBox: number;
   @ApiProperty() sourceIndex: number;
   @ApiProperty() dex: number;
   @ApiProperty() species: string;
@@ -37,13 +38,25 @@ export class WigglypopListingMonEntity {
   // `type: [Number]` is load-bearing: an array @ApiProperty with only an `example` gives the
   // OpenAPI generator nothing to infer from, and it ships these as string[] — which silently
   // turns every IV sum downstream into string concatenation. Same trap as PokemonW.
-  @ApiProperty({ type: [Number], example: [31, 31, 31, 31, 31, 31], nullable: true })
+  @ApiProperty({
+    type: [Number],
+    example: [31, 31, 31, 31, 31, 31],
+    nullable: true,
+  })
   ivs: number[] | null;
 
-  @ApiProperty({ type: [Number], example: [252, 0, 4, 252, 0, 0], nullable: true })
+  @ApiProperty({
+    type: [Number],
+    example: [252, 0, 4, 252, 0, 0],
+    nullable: true,
+  })
   evs: number[] | null;
 
-  @ApiProperty({ type: [Number], example: [341, 200, 180, 220, 190, 260], nullable: true })
+  @ApiProperty({
+    type: [Number],
+    example: [341, 200, 180, 220, 190, 260],
+    nullable: true,
+  })
   stats: number[] | null;
 
   @ApiProperty({ type: [String], nullable: true })
@@ -52,7 +65,8 @@ export class WigglypopListingMonEntity {
   @ApiProperty({ example: 'epico' }) rarity: string;
   @ApiProperty() legendary: boolean;
   @ApiProperty() shiny: boolean;
-  @ApiProperty({ description: 'Deterministic valuation at listing time' }) value: number;
+  @ApiProperty({ description: 'Deterministic valuation at listing time' })
+  value: number;
 }
 
 export class WigglypopListingItemEntity {
@@ -85,7 +99,8 @@ export class WigglypopListingEntity {
   @ApiPropertyOptional({ nullable: true }) note: string | null;
   @ApiProperty({ example: 'activo' }) status: string;
   @ApiProperty() price: number;
-  @ApiProperty({ description: 'The tasación. Never used to charge anybody.' }) value: number;
+  @ApiProperty({ description: 'The tasación. Never used to charge anybody.' })
+  value: number;
   @ApiProperty() escrow: boolean;
   @ApiProperty() views: number;
 
@@ -116,7 +131,9 @@ export class WigglypopListingEntity {
   @ApiProperty() minIncrement: number;
   @ApiPropertyOptional({ nullable: true }) buyNow: number | null;
 
-  @ApiPropertyOptional({ type: [String], nullable: true }) wants: string[] | null;
+  @ApiPropertyOptional({ type: [String], nullable: true }) wants:
+    | string[]
+    | null;
   @ApiProperty() tradePlus: boolean;
 
   @ApiPropertyOptional({ nullable: true }) soldAt: Date | null;
@@ -148,7 +165,10 @@ export class WigglypopValuationEntity {
   @ApiProperty({ example: 12350, description: 'Rounded to the nearest 50' })
   value: number;
 
-  @ApiProperty({ example: 'epico', enum: ['comun', 'raro', 'epico', 'legendario'] })
+  @ApiProperty({
+    example: 'epico',
+    enum: ['comun', 'raro', 'epico', 'legendario'],
+  })
   rarity: string;
 }
 
@@ -183,7 +203,8 @@ export class WigglypopOrderEntity {
   @ApiProperty({ example: 'ORD-4B7C09EE' }) code: string;
   @ApiProperty({ type: WigglypopPersonRef }) buyer: WigglypopPersonRef;
   @ApiProperty() subtotal: number;
-  @ApiProperty({ description: 'House fee, kept by the escrow account' }) fee: number;
+  @ApiProperty({ description: 'House fee, kept by the escrow account' })
+  fee: number;
   @ApiProperty() total: number;
 
   @ApiProperty({
@@ -194,7 +215,8 @@ export class WigglypopOrderEntity {
 
   @ApiPropertyOptional({
     nullable: true,
-    description: 'The real StarBank buyer → escrow transfer. Not a bookkeeping row.',
+    description:
+      'The real StarBank buyer → escrow transfer. Not a bookkeeping row.',
   })
   escrowTxId: number | null;
 
@@ -234,7 +256,8 @@ export class WigglypopTradeOfferEntity {
   @ApiPropertyOptional({
     type: WigglypopListingMonEntity,
     nullable: true,
-    description: 'Snapshot of the offered mon, taken from the proposer\'s live PC',
+    description:
+      "Snapshot of the offered mon, taken from the proposer's live PC",
   })
   offeredSnapshot: unknown | null;
 

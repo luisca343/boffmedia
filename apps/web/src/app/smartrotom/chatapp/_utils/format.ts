@@ -1,5 +1,3 @@
-const WEEKDAYS = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
-
 /** "HH:MM" in the viewer's locale/timezone. */
 export function timeOf(date: string | number | Date | undefined): string {
   if (date == null) return "";
@@ -15,14 +13,14 @@ export function dayKey(date: string | Date): string {
 }
 
 /** "Hoy" / "Ayer" / weekday (within a week) / full date. */
-export function dayLabel(date: string | Date): string {
+export function dayLabel(date: string | Date, t: (key: string, values?: Record<string, string | number | Date>) => string): string {
   const d = new Date(date);
   if (Number.isNaN(d.getTime())) return "";
   const today = new Date();
   const startOf = (x: Date) => new Date(x.getFullYear(), x.getMonth(), x.getDate()).getTime();
   const diffDays = Math.round((startOf(today) - startOf(d)) / 86_400_000);
-  if (diffDays === 0) return "Hoy";
-  if (diffDays === 1) return "Ayer";
-  if (diffDays > 1 && diffDays < 7) return WEEKDAYS[d.getDay()];
-  return d.toLocaleDateString("es-ES", { day: "numeric", month: "long", year: "numeric" });
+  if (diffDays === 0) return t("format.today");
+  if (diffDays === 1) return t("format.yesterday");
+  if (diffDays > 1 && diffDays < 7) return t(`format.weekday.${d.getDay()}`);
+  return d.toLocaleDateString(undefined, { day: "numeric", month: "long", year: "numeric" });
 }

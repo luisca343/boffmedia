@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { Icon } from "@/components/boffmedia/primitives"
 import { DkFlag, DkPin } from "@/components/boffmedia/ui/tools/datakit"
@@ -24,6 +25,7 @@ export interface TnLb {
 
 // Free-for-all leaderboard (builds, timed runs, speedruns). `.tn-lb`
 export function TnLeaderboard({ lb, onOpen, pinned, onPin, query }: { lb: TnLb; onOpen?: (id: string) => void; pinned?: string | null; onPin?: (id: string) => void; query?: string }) {
+  const t = useTranslations("common.tournaments")
   const peak = Math.max(...lb.entries.map((e) => e.score), 1)
   const low = Math.min(...lb.entries.map((e) => e.score))
   const q = (query || "").trim().toLowerCase()
@@ -65,16 +67,16 @@ export function TnLeaderboard({ lb, onOpen, pinned, onPin, query }: { lb: TnLb; 
               <b className="font-mono text-[15px]/none font-extrabold text-txt">{e.meta}</b>
               <span className="font-mono text-[9.5px]/none text-txt-dim">{e.unit}</span>
               {e.verified ? (
-                <span className="inline-grid place-items-center text-ok" title="Verificado"><Icon name="check" size={11} /></span>
+                <span className="inline-grid place-items-center text-ok" title={t("verified")}><Icon name="check" size={11} /></span>
               ) : (
-                <span className="inline-grid place-items-center text-txt-dim" title="Sin verificar"><Icon name="clock" size={11} /></span>
+                <span className="inline-grid place-items-center text-txt-dim" title={t("unverified")}><Icon name="clock" size={11} /></span>
               )}
             </span>
             {onPin && <DkPin on={pinned === e.author.id} onClick={() => onPin(e.author.id)} size={13} />}
           </div>
         )
       })}
-      {rows.length === 0 && <p className="font-mono text-[12px]/[1.5] text-txt-dim">Sin entradas para «{query}».</p>}
+      {rows.length === 0 && <p className="font-mono text-[12px]/[1.5] text-txt-dim">{t("noEntriesFor", { query: query || "" })}</p>}
     </div>
   )
 }

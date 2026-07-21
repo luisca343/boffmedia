@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useTranslations } from "next-intl";
 import { Portal } from "../ui";
 import { ThemedLayer } from "../ui/ThemedLayer";
 import { Icon } from "../ui";
@@ -20,6 +21,7 @@ export function GraphView({
   onClose: () => void;
   onOpenNote: (id: number) => void;
 }) {
+  const t = useTranslations("notas");
   const boxRef = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState({ w: 1000, h: 700 });
 
@@ -63,16 +65,16 @@ export function GraphView({
           <div className="flex h-[52px] flex-none items-center gap-3 border-b border-nt-border px-[18px]">
             <Icon name="network" size={18} className="text-nt-accent-fg" />
             <span className="font-nt-display text-[13px] font-bold uppercase tracking-[.08em] text-nt-fg">
-              Grafo de conocimiento
+              {t("graph.title")}
             </span>
             <span className="text-[12px] text-nt-fg-subtle">
-              {nodes.length} notas · {edges.length} enlaces
+              {nodes.length} {t("graph.notes")} · {edges.length} {t("graph.links")}
             </span>
             <span className="flex-1" />
             <button
               onClick={onClose}
               className="inline-flex h-8 min-w-8 items-center justify-center rounded-nt-sm text-nt-fg-muted hover:bg-nt-hover-strong hover:text-nt-fg"
-              aria-label="Cerrar grafo"
+              aria-label={t("common.close")}
             >
               <Icon name="x" size={18} />
             </button>

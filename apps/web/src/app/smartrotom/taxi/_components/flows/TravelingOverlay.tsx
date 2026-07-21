@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { Icon, Overlay } from "../ui"
 
@@ -8,6 +9,7 @@ import { Icon, Overlay } from "../ui"
  * and the player is mid-flight — there is nothing to cancel.
  */
 export function TravelingOverlay({ stopId, reduceMotion }: { stopId: string; reduceMotion: boolean }) {
+  const t = useTranslations("taxi.travelingOverlay")
   return (
     <Overlay>
       <div className="flex flex-col items-center gap-1.5 p-8 text-center" role="status" aria-live="polite">
@@ -26,9 +28,9 @@ export function TravelingOverlay({ stopId, reduceMotion }: { stopId: string; red
           />
           <Icon name="nav" size={34} stroke={2.2} />
         </div>
-        <div className="text-xl font-extrabold text-tx-txt">Teletransportando…</div>
+        <div className="text-xl font-extrabold text-tx-txt">{t("teleporting")}</div>
         <div className="text-sm text-tx-txt-2">
-          Preparando tu llegada a <strong className="text-tx-accent">{stopId}</strong>
+          {t("preparing", { destination: stopId })}
         </div>
         <div className="mt-4 h-[5px] w-[220px] overflow-hidden rounded-[3px] bg-tx-surface-2">
           <span

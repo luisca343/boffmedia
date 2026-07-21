@@ -119,13 +119,22 @@ export class RookerProfileCountsEntity {
 }
 
 export class RookerTrainerStatsEntity {
-  @ApiProperty({ example: 143, description: 'rotom_pokedex rows with caught_at' })
+  @ApiProperty({
+    example: 143,
+    description: 'rotom_pokedex rows with caught_at',
+  })
   captures: number;
 
-  @ApiProperty({ example: 3, description: 'caught rows with palette_id <> "none"' })
+  @ApiProperty({
+    example: 3,
+    description: 'caught rows with palette_id <> "none"',
+  })
   shinies: number;
 
-  @ApiProperty({ example: 27, description: 'rotom_replays where side1|side2 = uuid' })
+  @ApiProperty({
+    example: 27,
+    description: 'rotom_replays where side1|side2 = uuid',
+  })
   battles: number;
 
   @ApiProperty({
@@ -189,7 +198,10 @@ export class RookerFollowResultEntity {
   @ApiProperty({ example: true, description: 'State AFTER the toggle' })
   following: boolean;
 
-  @ApiProperty({ example: 5, description: "Target's follower count after the toggle" })
+  @ApiProperty({
+    example: 5,
+    description: "Target's follower count after the toggle",
+  })
   followers: number;
 }
 
@@ -200,7 +212,10 @@ export class RookerNotificationEntity {
   @ApiProperty({ example: '@luisca respondió tu trino' }) title: string;
   @ApiProperty() body: string;
 
-  @ApiPropertyOptional({ nullable: true, example: '/smartrotom/rooker/trino/12' })
+  @ApiPropertyOptional({
+    nullable: true,
+    example: '/smartrotom/rooker/trino/12',
+  })
   link: string | null;
 
   @ApiProperty({ example: 0 }) isRead: number;

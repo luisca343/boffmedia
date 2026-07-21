@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { boxAccent, type ResolvedBox } from "../../_utils/inventory"
 import { Icon, type ArTone } from "../../_components/ui"
@@ -32,6 +33,7 @@ const BADGE: Record<ArTone, string> = {
 
 /** The three-up box stage: the picked box centred, its neighbours dimmed either side. */
 export function BoxCarousel({ boxes, index, onIndex, owned }: BoxCarouselProps) {
+  const t = useTranslations("")
   if (boxes.length === 0) return null
 
   const step = (delta: number) => onIndex((index + delta + boxes.length) % boxes.length)
@@ -44,7 +46,7 @@ export function BoxCarousel({ boxes, index, onIndex, owned }: BoxCarouselProps) 
           <button
             type="button"
             onClick={() => step(-1)}
-            aria-label="Caja anterior"
+            aria-label={t("arcade.loot.selectBox")}
             className="ar-lift absolute left-3.5 top-1/2 z-[2] grid h-[38px] w-[38px] -translate-y-1/2 place-items-center rounded-full border border-ar-cyan/40 bg-black/50 text-ar-cyan"
           >
             <Icon.Chevron s={18} dir="left" />
@@ -52,7 +54,7 @@ export function BoxCarousel({ boxes, index, onIndex, owned }: BoxCarouselProps) 
           <button
             type="button"
             onClick={() => step(1)}
-            aria-label="Caja siguiente"
+            aria-label={t("arcade.loot.selectBox")}
             className="ar-lift absolute right-3.5 top-1/2 z-[2] grid h-[38px] w-[38px] -translate-y-1/2 place-items-center rounded-full border border-ar-cyan/40 bg-black/50 text-ar-cyan"
           >
             <Icon.Chevron s={18} />
@@ -112,7 +114,7 @@ export function BoxCarousel({ boxes, index, onIndex, owned }: BoxCarouselProps) 
                       count > 0 ? BADGE[tone] : BADGE.ghost,
                     )}
                   >
-                    <Icon.Box s={12} /> {count} en inventario
+                    <Icon.Box s={12} /> {count} {t("arcade.loot.inInventory")}
                   </span>
                 </div>
               )}
@@ -128,7 +130,7 @@ export function BoxCarousel({ boxes, index, onIndex, owned }: BoxCarouselProps) 
               key={box.id}
               type="button"
               onClick={() => onIndex(i)}
-              aria-label={`Ver ${box.name}`}
+              aria-label={box.name}
               className={cn(
                 "h-2 rounded-sm transition-all duration-200",
                 i === index

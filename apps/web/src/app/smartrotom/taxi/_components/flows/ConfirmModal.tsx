@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { Button, Icon, Modal } from "../ui"
 import { fareBreakdown } from "../../_utils/fare"
@@ -27,18 +28,19 @@ export function ConfirmModal({
   onConfirm: () => void
   onCancel: () => void
 }) {
+  const t = useTranslations("taxi.confirmModal")
   const fare = fareBreakdown(stop.dist)
   const after = balance - fare.total
 
   return (
-    <Modal onClose={onCancel} label="Confirmar viaje">
+    <Modal onClose={onCancel} label={t("title")}>
       <div className="rounded-tx-lg border border-solid border-tx-line bg-tx-surface px-4 py-3.5">
         <div className="flex items-center gap-3">
           <span className="h-[26px] w-[26px] shrink-0 rounded-full bg-tx-blue-500 shadow-[0_0_0_4px_rgb(var(--tx-blue-500)/0.22)]" />
           <div>
-            <div className="text-[11px] font-extrabold uppercase tracking-[0.4px] text-tx-txt-3">Origen</div>
+            <div className="text-[11px] font-extrabold uppercase tracking-[0.4px] text-tx-txt-3">{t("origin")}</div>
             <div className="mt-px text-sm font-bold text-tx-txt">
-              Tu posición ·{" "}
+              {t("yourPosition")} ·{" "}
               <span className="font-tx-mono">
                 {player.x}, {player.z}
               </span>
@@ -53,7 +55,7 @@ export function ConfirmModal({
             <Icon name="pin" size={12} stroke={2.6} />
           </span>
           <div>
-            <div className="text-[11px] font-extrabold uppercase tracking-[0.4px] text-tx-txt-3">Destino</div>
+            <div className="text-[11px] font-extrabold uppercase tracking-[0.4px] text-tx-txt-3">{t("destination")}</div>
             <div className="mt-px text-sm font-bold text-tx-txt">
               {stop.id} ·{" "}
               <span className="font-tx-mono">
@@ -65,38 +67,38 @@ export function ConfirmModal({
       </div>
 
       <div className="my-4 flex flex-col gap-2.5">
-        <FareRow label="Tarifa base" value={formatMoney(fare.base)} />
+        <FareRow label={t("baseFare")} value={formatMoney(fare.base)} />
         <FareRow
-          label={`Distancia · ${formatNum(fare.dist)} b × ${PRICE_PER_BLOCK} ¥`}
+          label={t("distanceFare", { blocks: formatNum(fare.dist), rate: PRICE_PER_BLOCK })}
           value={formatMoney(fare.distanceFare)}
         />
         <div className="mt-0.5 flex justify-between border-t border-dashed border-tx-line-2 pt-3 text-base font-extrabold text-tx-txt">
-          <span>Total</span>
+          <span>{t("total")}</span>
           <span className="font-tx-mono text-tx-money">{formatMoney(fare.total)}</span>
         </div>
       </div>
 
       <div className="flex items-center justify-between gap-3 rounded-tx-md border border-solid border-tx-line bg-tx-surface px-4 py-3">
         <div className="flex flex-col gap-0.5">
-          <span className="text-[11px] font-extrabold uppercase tracking-[0.4px] text-tx-txt-3">Saldo actual</span>
+          <span className="text-[11px] font-extrabold uppercase tracking-[0.4px] text-tx-txt-3">{t("currentBalance")}</span>
           <strong className="font-tx-mono text-base text-tx-txt">{formatMoney(balance)}</strong>
         </div>
         <span className="shrink-0 text-tx-txt-3">
           <Icon name="arrowR" size={16} stroke={2.2} />
         </span>
         <div className="flex flex-col gap-0.5 text-right">
-          <span className="text-[11px] font-extrabold uppercase tracking-[0.4px] text-tx-txt-3">Tras el viaje</span>
+          <span className="text-[11px] font-extrabold uppercase tracking-[0.4px] text-tx-txt-3">{t("afterTrip")}</span>
           <strong className="font-tx-mono text-base text-tx-txt">{formatMoney(after)}</strong>
         </div>
       </div>
 
       <div className="mt-[18px] flex gap-2.5">
         <Button variant="quiet" onClick={onCancel} disabled={pending} className="flex-[0_0_38%]">
-          Cancelar
+          {t("cancel")}
         </Button>
         <Button variant="primary" onClick={onConfirm} disabled={pending}>
           <Icon name="nav" size={17} stroke={2.4} />
-          {pending ? "Cobrando…" : "Confirmar viaje"}
+          {pending ? t("charging") : t("confirm")}
         </Button>
       </div>
     </Modal>
@@ -126,39 +128,40 @@ export function InsufficientModal({
   onClose: () => void
   onTopUp: () => void
 }) {
+  const t = useTranslations("taxi.insufficientModal")
   return (
-    <Modal onClose={onClose} label="Saldo insuficiente">
+    <Modal onClose={onClose} label={t("title")}>
       <div className="px-0 pb-1.5 pt-2 text-center">
         <span className="mx-auto mb-3 grid h-14 w-14 place-items-center rounded-[18px] bg-tx-no-soft text-tx-no">
           <Icon name="wallet" size={26} stroke={2} />
         </span>
-        <h3 className="mb-1.5 text-[19px] font-extrabold text-tx-txt">Saldo insuficiente</h3>
+        <h3 className="mb-1.5 text-[19px] font-extrabold text-tx-txt">{t("title")}</h3>
         <p className="mb-4 text-sm text-tx-txt-2">
-          Te faltan <strong className="text-tx-txt">{formatMoney(price - balance)}</strong> para viajar a {stop.id}.
+          {t("missing", { amount: formatMoney(price - balance), destination: stop.id })}
         </p>
       </div>
 
       <div className="flex items-center justify-between gap-3 rounded-tx-md border border-solid border-tx-line bg-tx-surface px-4 py-3">
         <div className="flex flex-col gap-0.5">
-          <span className="text-[11px] font-extrabold uppercase tracking-[0.4px] text-tx-txt-3">Tu saldo</span>
+          <span className="text-[11px] font-extrabold uppercase tracking-[0.4px] text-tx-txt-3">{t("yourBalance")}</span>
           <strong className="font-tx-mono text-base text-tx-no">{formatMoney(balance)}</strong>
         </div>
         <span className="shrink-0 text-tx-txt-3">
           <Icon name="arrowR" size={16} stroke={2.2} />
         </span>
         <div className="flex flex-col gap-0.5 text-right">
-          <span className="text-[11px] font-extrabold uppercase tracking-[0.4px] text-tx-txt-3">Tarifa</span>
+          <span className="text-[11px] font-extrabold uppercase tracking-[0.4px] text-tx-txt-3">{t("fare")}</span>
           <strong className="font-tx-mono text-base text-tx-money">{formatMoney(price)}</strong>
         </div>
       </div>
 
       <div className="mt-[18px] flex gap-2.5">
         <Button variant="quiet" onClick={onClose} className="flex-[0_0_38%]">
-          Cerrar
+          {t("close")}
         </Button>
         <Button variant="primary" onClick={onTopUp}>
           <Icon name="wallet" size={16} stroke={2.2} />
-          Ver cartera
+          {t("viewWallet")}
         </Button>
       </div>
     </Modal>

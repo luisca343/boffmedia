@@ -1,6 +1,7 @@
 "use client"
 
 import { useMemo, useState } from "react"
+import { useTranslations } from "next-intl"
 import { useBoxGrid, useMons } from "../_hooks/queries"
 import { boxDropAttrs, useDragLayer } from "../_hooks/useDrag"
 import { usePcUi } from "../_stores/pcUiStore"
@@ -17,6 +18,7 @@ import { Bar, Icon, Input, Modal, Sprite } from "./ui"
  * offers no endpoint to add or remove one — a card here would be a lie.
  */
 export function BoxOverview({ onClose }: { onClose: () => void }) {
+  const t = useTranslations("pc")
   const { mons } = useMons()
   const boxes = useBoxGrid(mons)
   const { drag } = useDragLayer()
@@ -45,15 +47,15 @@ export function BoxOverview({ onClose }: { onClose: () => void }) {
       <Input
         value={query}
         onChange={(e) => setQuery(e.target.value)}
-        placeholder="Buscar caja…"
-        aria-label="Buscar caja"
+        placeholder={t("topbar.searchPlaceholder")}
+        aria-label={t("topbar.searchAriaLabel")}
         className="h-[38px] py-0 pl-[34px] pr-3 text-[13px]"
       />
     </div>
   )
 
   return (
-    <Modal onClose={onClose} title="Todas las cajas" icon="boxes" width={980} headerExtra={search}>
+    <Modal onClose={onClose} title={t("boxOverview.title")} icon="boxes" width={980} headerExtra={search}>
       <div className="grid grid-cols-[repeat(auto-fill,minmax(168px,1fr))] gap-3 p-[18px]">
         {visible.map(({ contents, i }) => {
           const count = contents.filter(Boolean).length
@@ -108,7 +110,7 @@ export function BoxOverview({ onClose }: { onClose: () => void }) {
 
                 <span className="flex flex-1 items-center gap-0.5">
                   {previews.length === 0 ? (
-                    <span className="text-[11px] text-pc-fg-subtle">Vacía</span>
+                    <span className="text-[11px] text-pc-fg-subtle">{t("boxOverview.empty")}</span>
                   ) : (
                     previews.map((m) => (
                       <Sprite

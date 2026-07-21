@@ -48,7 +48,8 @@ export class ItemsTakeResponse {
   @ApiProperty({
     type: TakeItemDto,
     isArray: true,
-    description: 'What was actually removed from the player — settle against this.',
+    description:
+      'What was actually removed from the player — settle against this.',
   })
   taken: TakeItemDto[];
 }

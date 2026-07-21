@@ -1,0 +1,23 @@
+{
+  "tiempo": {
+    "title": "Minecraft Weather",
+    "refresh": "Refresh",
+    "weather": {
+      "clear": "Clear",
+      "cloudy": "Cloudy",
+      "rain": "Rain",
+      "storm": "Storm",
+      "night": "Night"
+    },
+    "changesIn": "Changes in: {time}",
+    "gameTime": "Game time",
+    "daySection": "Section",
+    "daySections": {
+      "day": "Day",
+      "sunset": "Sunset",
+      "night": "Night",
+      "dawn": "Dawn",
+      "unknown": "Unknown"
+    }
+  }
+}

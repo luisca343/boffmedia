@@ -1,5 +1,6 @@
 "use client";
 import { useState, type ReactNode } from "react";
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import { getSmartRotomUser } from "@/lib/utils";
 import { Avatar, Icon, Modal, Toggle, type IconName } from "../ui";
@@ -29,6 +30,7 @@ function ToggleRow({ icon, label, desc, on, onClick }: { icon: IconName; label: 
 }
 
 export function SettingsModal({ session, onClose }: { session: unknown; onClose: () => void }) {
+  const t = useTranslations("chatapp");
   const { accent, setAccent } = useChatSettings();
   const me = getSmartRotomUser(session);
   // [deferred] privacy/notification prefs have no settings API — presentational only
@@ -36,21 +38,21 @@ export function SettingsModal({ session, onClose }: { session: unknown; onClose:
   const flip = (k: keyof typeof prefs) => setPrefs((p) => ({ ...p, [k]: !p[k] }));
 
   return (
-    <Modal title="Ajustes" icon="settings" onClose={onClose}>
+    <Modal title={t("settingsModal.title")} icon="settings" onClose={onClose}>
       <div className="mb-1.5 flex items-center gap-3 border-b border-ca-800 pb-3.5">
         <Avatar src={`https://mc-heads.net/avatar/${me?.uuid}`} size={52} />
         <div>
           <div className="text-[16px] font-bold text-ca-50">{me?.username}</div>
-          <div className="text-[12.5px] text-ca-400">Conectado · multi-dispositivo</div>
+          <div className="text-[12.5px] text-ca-400">{t("settingsModal.connected")}</div>
         </div>
       </div>
 
-      <Section title="Apariencia">
+      <Section title={t("settingsModal.appearance")}>
         {/* Light/dark moved to the platform picker (Ajustes → Temas) so one choice
             drives every SmartRotom app. The accent stays here — it is ChatApp's own. */}
         <p className="mb-3 flex items-center gap-2 rounded-ca-md border border-ca-800 bg-ca-800 px-3 py-2 text-[12.5px] text-ca-400">
           <Icon name="settings" size={15} className="flex-none text-ca-500" />
-          El modo claro/oscuro se elige en los ajustes de SmartRotom, en «Temas».
+          {t("settingsModal.accentHint")}
         </p>
         <div className="flex flex-wrap gap-2.5">
           {ACCENTS.map((c) => (
@@ -65,19 +67,19 @@ export function SettingsModal({ session, onClose }: { session: unknown; onClose:
         </div>
       </Section>
 
-      <Section title="Privacidad">
-        <ToggleRow icon="checks" label="Confirmaciones de lectura" desc="Mostrar el doble check azul" on={prefs.receipts} onClick={() => flip("receipts")} />
-        <ToggleRow icon="eye" label="Última conexión" on={prefs.lastseen} onClick={() => flip("lastseen")} />
-        <ToggleRow icon="lock" label="Vista previa en notificaciones" on={prefs.preview} onClick={() => flip("preview")} />
+      <Section title={t("settingsModal.privacy")}>
+        <ToggleRow icon="checks" label={t("settingsModal.readReceipts")} desc={t("settingsModal.readReceiptsDesc")} on={prefs.receipts} onClick={() => flip("receipts")} />
+        <ToggleRow icon="eye" label={t("settingsModal.lastSeen")} on={prefs.lastseen} onClick={() => flip("lastseen")} />
+        <ToggleRow icon="lock" label={t("settingsModal.notifPreview")} on={prefs.preview} onClick={() => flip("preview")} />
       </Section>
 
-      <Section title="Notificaciones">
-        <ToggleRow icon="volume" label="Sonidos" on={prefs.sounds} onClick={() => flip("sounds")} />
-        <ToggleRow icon="bell" label="Modo concentración" desc="Silencia chats no fijados mientras juegas" on={prefs.quiet} onClick={() => flip("quiet")} />
+      <Section title={t("settingsModal.notifications")}>
+        <ToggleRow icon="volume" label={t("settingsModal.sounds")} on={prefs.sounds} onClick={() => flip("sounds")} />
+        <ToggleRow icon="bell" label={t("settingsModal.focusMode")} desc={t("settingsModal.focusModeDesc")} on={prefs.quiet} onClick={() => flip("quiet")} />
       </Section>
 
-      <Section title="Chat">
-        <ToggleRow icon="send" label="Enter para enviar" on={prefs.enter} onClick={() => flip("enter")} />
+      <Section title={t("settingsModal.chat")}>
+        <ToggleRow icon="send" label={t("settingsModal.enterToSend")} on={prefs.enter} onClick={() => flip("enter")} />
       </Section>
     </Modal>
   );

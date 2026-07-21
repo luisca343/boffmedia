@@ -1,4 +1,5 @@
 import * as React from "react"
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { Icon, Spinner } from "@/components/boffmedia/primitives"
 import { ArtImage } from "@/components/boffmedia/ui/tools/ArtImage"
@@ -46,16 +47,17 @@ export function ProfileHero({
   statusBadge,
   metrics,
   live,
-  liveLabel = "EN VIVO",
+  liveLabel,
   editable,
   uploading,
   coverUploading,
-  avatarLabel = "Cambiar foto",
-  coverLabel = "Cambiar portada",
+  avatarLabel,
+  coverLabel,
   onAvatarClick,
   onCoverClick,
   className,
 }: ProfileHeroProps) {
+  const t = useTranslations("common.profile")
   return (
     <div className={cn("relative mb-[22px] border border-solid border-line bg-panel cut-corner", className)}>
       {/* cover band */}
@@ -84,15 +86,15 @@ export function ProfileHero({
         {live && (
           <span className="absolute left-0 top-4 z-[4] inline-flex items-center gap-2 bg-accent py-[7px] pl-5 pr-3.5 font-mono text-[11px]/none font-bold uppercase tracking-[0.16em] text-accent-ink [clip-path:polygon(0_0,100%_0,calc(100%_-_9px)_100%,0_100%)]">
             <i className="h-[7px] w-[7px] rounded-full bg-accent-ink animate-[bm-pulse_1.6s_ease-in-out_infinite] motion-reduce:animate-none" />
-            {liveLabel}
+            {liveLabel ?? t("live")}
           </span>
         )}
 
         {editable && (
           <button
             type="button"
-            aria-label={coverLabel}
-            title={coverLabel}
+            aria-label={coverLabel ?? t("changeCover")}
+            title={coverLabel ?? t("changeCover")}
             onClick={onCoverClick}
             className={cn(CAM_BTN, "absolute right-4 top-4 z-[6] h-[38px] w-[38px]")}
           >
@@ -132,7 +134,7 @@ export function ProfileHero({
           {editable && (
             <button
               type="button"
-              aria-label={avatarLabel}
+              aria-label={avatarLabel ?? t("changePhoto")}
               onClick={(e) => {
                 e.stopPropagation()
                 onAvatarClick?.()

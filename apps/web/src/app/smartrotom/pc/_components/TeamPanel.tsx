@@ -1,6 +1,7 @@
 "use client"
 
 import { useMemo } from "react"
+import { useTranslations } from "next-intl"
 import { useMons } from "../_hooks/queries"
 import type { Mon } from "../_types/pc.types"
 import { PARTY_SIZE } from "../_utils/constants"
@@ -9,6 +10,7 @@ import { TeamRow } from "./TeamRow"
 
 /** The live in-game party. Six rows, every one of them a drop target. */
 export function TeamPanel() {
+  const t = useTranslations("pc")
   const { mons, partyError } = useMons()
 
   const party = useMemo(() => {
@@ -30,9 +32,9 @@ export function TeamPanel() {
     return (
       <div className="flex h-full flex-col items-center justify-center gap-2.5 p-6 text-center">
         <Icon name="wifiOff" size={26} className="text-pc-fg-subtle" />
-        <p className="text-[12.5px] text-pc-fg-muted">No se pudo leer tu equipo</p>
+        <p className="text-[12.5px] text-pc-fg-muted">{t("team.loadError")}</p>
         <p className="text-[11.5px] text-pc-fg-subtle">
-          El servidor de juego no respondió. Tus cajas siguen disponibles.
+          {t("team.loadErrorBody")}
         </p>
       </div>
     )
@@ -41,10 +43,10 @@ export function TeamPanel() {
   return (
     <div className="flex h-full flex-col gap-[7px] overflow-auto p-[11px]">
       <div className="flex items-center justify-between px-1 pb-1 pt-0.5">
-        <span className="text-[11.5px] text-pc-fg-subtle">{filled}/6 en combate</span>
+        <span className="text-[11.5px] text-pc-fg-subtle">{t("team.inCombat", { count: filled })}</span>
         <Chip className="text-[10px]">
           <Icon name="info" size={11} />
-          arrastra para ordenar
+          {t("team.dragHint")}
         </Chip>
       </div>
       {party.map((mon, i) => (

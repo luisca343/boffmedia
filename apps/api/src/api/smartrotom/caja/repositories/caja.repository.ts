@@ -34,7 +34,11 @@ export class CajaRepository {
   /** Atomically spends everything `uuid` is owed from `source`. Empty array = nothing owed. */
   async spend(uuid: string, source: CajaSource): Promise<ClaimedRow[]> {
     return await this.spendWhere(
-      and(this.claimable(), eq(smartRotomInventory.uuid, uuid), eq(smartRotomInventory.sourceType, source)),
+      and(
+        this.claimable(),
+        eq(smartRotomInventory.uuid, uuid),
+        eq(smartRotomInventory.sourceType, source),
+      ),
     );
   }
 
@@ -42,7 +46,11 @@ export class CajaRepository {
   async spendByIds(uuid: string, ids: number[]): Promise<ClaimedRow[]> {
     if (ids.length === 0) return [];
     return await this.spendWhere(
-      and(this.claimable(), eq(smartRotomInventory.uuid, uuid), inArray(smartRotomInventory.id, ids)),
+      and(
+        this.claimable(),
+        eq(smartRotomInventory.uuid, uuid),
+        inArray(smartRotomInventory.id, ids),
+      ),
     );
   }
 
@@ -76,7 +84,11 @@ export class CajaRepository {
     source: CajaSource,
   ): Promise<{ reservationId: string | null; rows: ClaimedRow[] }> {
     return await this.reserveWhere(
-      and(this.claimable(), eq(smartRotomInventory.uuid, uuid), eq(smartRotomInventory.sourceType, source)),
+      and(
+        this.claimable(),
+        eq(smartRotomInventory.uuid, uuid),
+        eq(smartRotomInventory.sourceType, source),
+      ),
     );
   }
 
@@ -87,7 +99,11 @@ export class CajaRepository {
   ): Promise<{ reservationId: string | null; rows: ClaimedRow[] }> {
     if (ids.length === 0) return { reservationId: null, rows: [] };
     return await this.reserveWhere(
-      and(this.claimable(), eq(smartRotomInventory.uuid, uuid), inArray(smartRotomInventory.id, ids)),
+      and(
+        this.claimable(),
+        eq(smartRotomInventory.uuid, uuid),
+        inArray(smartRotomInventory.id, ids),
+      ),
     );
   }
 

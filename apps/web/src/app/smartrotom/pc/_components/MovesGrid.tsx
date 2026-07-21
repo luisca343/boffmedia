@@ -1,3 +1,4 @@
+import { useTranslations } from "next-intl"
 import { moveName } from "../_utils/derive"
 
 export interface MovesGridProps {
@@ -16,10 +17,11 @@ export interface MovesGridProps {
  * rather than faked — they were mock data.
  */
 export function MovesGrid({ moves }: MovesGridProps) {
+  const t = useTranslations("pc")
   const names = (moves ?? []).map(moveName).filter((n): n is string => !!n)
 
   if (names.length === 0) {
-    return <p className="text-xs text-pc-fg-subtle">Sin movimientos registrados.</p>
+    return <p className="text-xs text-pc-fg-subtle">{t("detail.none")}</p>
   }
 
   return (

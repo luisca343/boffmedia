@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState, type MouseEvent } from "react";
+import { useTranslations } from "next-intl";
 import type { NoteFolder, NoteTag } from "@boffmedia/shared";
 import { Icon, Tooltip, MiniTag, Avatar } from "./ui";
 import { rgbOf, colorKey, hashColor, COLOR_RGB } from "../_utils/colors";
@@ -8,9 +9,9 @@ import { timeAgo } from "../_utils/format";
 import type { NoteVM, View, SortKey } from "../_types";
 
 const SORT_LABELS: Record<SortKey, string> = {
-  updated: "Modificación",
-  created: "Creación",
-  title: "Título",
+  updated: "sort.updated",
+  created: "sort.created",
+  title: "sort.title",
 };
 
 interface NoteListProps {
@@ -29,6 +30,7 @@ interface NoteListProps {
 }
 
 export function NoteList(props: NoteListProps) {
+  const t = useTranslations("notas");
   const { notes, folders, tags, view, search, setSearch, sort, setSort, activeId } = props;
   const tagById = useMemo(() => new Map(tags.map((t) => [t.id, t])), [tags]);
   const folderById = useMemo(() => new Map(folders.map((f) => [f.id, f])), [folders]);
@@ -38,19 +40,19 @@ export function NoteList(props: NoteListProps) {
     if (view.type === "folder") return folderById.get(Number(view.id))?.name || "Carpeta";
     if (view.type === "tag") return `#${tagById.get(Number(view.id))?.label || ""}`;
     const map: Record<string, string> = {
-      all: "Todas las notas",
-      recent: "Recientes",
-      pinned: "Ancladas",
-      shared: "Compartidas",
-      trash: "Papelera",
+      all: t("sidebar.smartViews.all"),
+      recent: t("sidebar.smartViews.recent"),
+      pinned: t("sidebar.smartViews.pinned"),
+      shared: t("sidebar.smartViews.shared"),
+      trash: t("sidebar.smartViews.trash"),
     };
-    return map[String(view.id)] || "Notas";
+    return map[String(view.id)] || t("list.title");
   };
 
   return (
     <section
       className="flex w-[300px] flex-none flex-col border-r border-nt-border bg-nt-bg-1 max-md:w-full"
-      aria-label="Lista de notas"
+      aria-label={t("list.title")}
     >
       <div className="border-b border-nt-border px-3.5 pb-2 pt-3">
         <div className="mb-2.5 flex items-center justify-between">
@@ -63,10 +65,10 @@ export function NoteList(props: NoteListProps) {
             )}
             {viewTitle()}
           </h2>
-          <Tooltip label="Nueva nota">
+          <Tooltip label={t("sidebar.newNote")}>
             <button
               onClick={props.onNew}
-              aria-label="Nueva nota"
+              aria-label={t("sidebar.newNote")}
               className="inline-flex h-8 min-w-8 items-center justify-center rounded-nt-sm text-nt-fg-muted transition-all hover:bg-nt-hover-strong hover:text-nt-fg"
             >
               <Icon name="plus" size={17} />
@@ -79,24 +81,24 @@ export function NoteList(props: NoteListProps) {
           </span>
           <input
             className="h-[34px] w-full rounded-nt-md border border-nt-border bg-nt-bg-2 pl-8 pr-2.5 text-[13px] text-nt-fg outline-none transition-colors placeholder:text-nt-fg-subtle focus:border-nt-accent focus:shadow-[0_0_0_3px_rgb(var(--nt-accent)/.15)]"
-            placeholder="Buscar en estas notas…"
+            placeholder={t("list.searchPlaceholder")}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            aria-label="Buscar notas"
+            aria-label={t("common.search")}
           />
         </div>
       </div>
 
       <div className="flex items-center justify-between px-3.5 py-2 text-[12px] text-nt-fg-subtle">
         <span>
-          {notes.length} {notes.length === 1 ? "nota" : "notas"}
+          {t("list.count", { count: notes.length })}
         </span>
         <div className="relative">
           <button
             className="inline-flex items-center gap-1.5 text-nt-fg-muted hover:text-nt-fg"
             onClick={() => setSortOpen((o) => !o)}
           >
-            <Icon name="sort" size={13} /> {SORT_LABELS[sort]}
+            <Icon name="sort" size={13} /> {t(SORT_LABELS[sort])}
           </button>
           {sortOpen && (
             <>
@@ -112,7 +114,7 @@ export function NoteList(props: NoteListProps) {
                     }}
                   >
                     {sort === k ? <Icon name="check" size={14} /> : <span className="w-[14px]" />}
-                    <span>{SORT_LABELS[k]}</span>
+                    <span>{t(SORT_LABELS[k])}</span>
                   </div>
                 ))}
               </div>
@@ -125,13 +127,13 @@ export function NoteList(props: NoteListProps) {
         {notes.length === 0 ? (
           <div className="flex flex-col items-center justify-center gap-2 px-5 py-[50px] text-center text-nt-fg-subtle">
             <Icon name="file-text" size={34} className="opacity-40" />
-            <p className="m-0 text-[13.5px]">{search ? "Sin resultados" : "No hay notas aquí"}</p>
+            <p className="m-0 text-[13.5px]">{search ? t("list.noResults") : t("list.emptyTitle")}</p>
             {!search && (
               <button
                 className="mt-1.5 inline-flex h-9 items-center gap-2 rounded-nt-md border border-nt-border bg-nt-hover px-3.5 text-[13px] text-nt-fg-muted hover:bg-nt-hover-strong hover:text-nt-fg"
                 onClick={props.onNew}
               >
-                <Icon name="plus" size={14} /> Crear nota
+                <Icon name="plus" size={14} /> {t("list.createNote")}
               </button>
             )}
           </div>
@@ -161,7 +163,7 @@ export function NoteList(props: NoteListProps) {
                       active ? "text-nt-accent-fg" : "text-nt-fg"
                     }`}
                   >
-                    {n.title || "Sin título"}
+                    {n.title || t("list.untitled")}
                   </span>
                   {!!n.pinned && <Icon name="pin" size={13} className="flex-none text-nt-accent-fg" />}
                 </div>

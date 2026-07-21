@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { Icon } from "@/components/boffmedia/primitives"
 import { LZ_GENRE_ICON, LZ_PLATFORMS, type LzPlatformKey } from "./calendar-util"
@@ -8,13 +9,14 @@ import { LZ_GENRE_ICON, LZ_PLATFORMS, type LzPlatformKey } from "./calendar-util
 // The per-release atoms: wish star, platform pills, hype meter, versions list and
 // the striped box-art placeholder. Prefix lz- in calendario.css.
 
-export function LzWishStar({ on, onToggle, size = 18, label = "Seguir lanzamiento" }: { on?: boolean; onToggle?: (next: boolean) => void; size?: number; label?: string }) {
+export function LzWishStar({ on, onToggle, size = 18, label }: { on?: boolean; onToggle?: (next: boolean) => void; size?: number; label?: string }) {
+  const t = useTranslations("common.calendar")
   return (
     <button
       type="button"
       aria-pressed={on}
-      aria-label={on ? "Dejar de seguir" : label}
-      title={on ? "Siguiendo" : label}
+      aria-label={on ? t("following") : (label ?? t("followRelease"))}
+      title={on ? t("following") : (label ?? t("followRelease"))}
       onClick={(e) => {
         e.stopPropagation()
         onToggle && onToggle(!on)
@@ -55,17 +57,18 @@ export function LzPlatformPills({ platforms = [], color = true, compact = false,
   )
 }
 
-const HYPE_LABELS: Record<number, string> = { 5: "Imprescindible", 4: "Muy esperado", 3: "En el radar", 2: "Discreto", 1: "Nicho" }
+const HYPE_LABELS: Record<number, string> = { 5: "calendar.mustPlay", 4: "calendar.highlyAnticipated", 3: "calendar.onRadar", 2: "calendar.discreet", 1: "calendar.niche" }
 
 export function LzHypeMeter({ value = 0, showLabel = false }: { value?: number; showLabel?: boolean }) {
+  const t = useTranslations("common")
   return (
-    <span className="inline-flex items-center gap-2" title={"Expectación: " + value + "/5"}>
+    <span className="inline-flex items-center gap-2" title={t("calendar.onRadar") + ": " + value + "/5"}>
       <span aria-hidden className="inline-flex items-end gap-[3px]">
         {[1, 2, 3, 4, 5].map((i) => (
           <span key={i} style={{ "--ti": i } as React.CSSProperties} className={cn("w-1 h-[calc(6px_+_var(--ti)_*_1.6px)]", i <= value ? "bg-accent" : "bg-line-2")} />
         ))}
       </span>
-      {showLabel && <span className="font-mono text-[10px]/none font-semibold uppercase tracking-[0.08em] text-txt-muted">{HYPE_LABELS[value] || ""}</span>}
+      {showLabel && <span className="font-mono text-[10px]/none font-semibold uppercase tracking-[0.08em] text-txt-muted">{HYPE_LABELS[value] ? t(HYPE_LABELS[value]) : ""}</span>}
     </span>
   )
 }

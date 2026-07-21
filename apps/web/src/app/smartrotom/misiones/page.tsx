@@ -1,6 +1,7 @@
 "use client"
 
 import { useMemo, useState } from "react"
+import { useTranslations } from "next-intl"
 import { BoardError, BoardLoading } from "./_components/BoardStatus"
 import { BoardFilters, RegionStrip, type SortKey } from "./_components/BoardFilters"
 import { PlayerHeader } from "./_components/PlayerHeader"
@@ -16,6 +17,7 @@ import { regionOf } from "./_utils/regions"
 
 /** El Tablón — the board itself. Thin: it filters, then hangs papers. */
 export default function TablonPage() {
+  const t = useTranslations("misiones.board")
   const { quests, npcs, regions, isLoading, error, open, openQuest, trackedQuest } = useBoard()
 
   const [search, setSearch] = useState("")
@@ -79,8 +81,8 @@ export default function TablonPage() {
         {papers.length === 0 ? (
           <EmptyBoard>
             {quests.length === 0
-              ? "No hay encargos en el tablón todavía."
-              : "El tablón está vacío con esos criterios. Cambia los filtros."}
+              ? t("emptyBoard")
+              : t("emptyFiltered")}
           </EmptyBoard>
         ) : (
           <div className="relative z-[2] grid gap-9 [grid-template-columns:repeat(auto-fill,minmax(280px,1fr))]">

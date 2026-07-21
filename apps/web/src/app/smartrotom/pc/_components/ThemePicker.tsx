@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { usePcUi } from "../_stores/pcUiStore"
 import { boxName, boxTheme } from "../_utils/boxMeta"
 import { BOX_THEMES, THEME_LABEL, WALLPAPER_CLASS } from "../_utils/boxThemes"
@@ -12,12 +13,13 @@ export interface ThemePickerProps {
 
 /** The ten wallpapers. Cosmetic, per-device — see `_utils/boxMeta.ts`. */
 export function ThemePicker({ box, onClose }: ThemePickerProps) {
+  const t = useTranslations("pc")
   const boxMeta = usePcUi((s) => s.boxMeta)
   const setBoxTheme = usePcUi((s) => s.setBoxTheme)
   const current = boxTheme(boxMeta, box)
 
   return (
-    <Modal onClose={onClose} title={`Tema · ${boxName(boxMeta, box)}`} icon="palette" width={420}>
+    <Modal onClose={onClose} title={t("themes.title", { box: boxName(boxMeta, box) })} icon="palette" width={420}>
       <div className="grid grid-cols-5 gap-2.5 p-5">
         {BOX_THEMES.map((theme) => {
           const selected = theme === current
@@ -26,7 +28,7 @@ export function ThemePicker({ box, onClose }: ThemePickerProps) {
               key={theme}
               type="button"
               aria-pressed={selected}
-              aria-label={THEME_LABEL[theme]}
+              aria-label={t(`themes.${theme}`)}
               onClick={() => {
                 setBoxTheme(box, theme)
                 onClose()
@@ -37,7 +39,7 @@ export function ThemePicker({ box, onClose }: ThemePickerProps) {
             >
               <span aria-hidden className={`pc-wp pc-wp-dots ${WALLPAPER_CLASS[theme]}`} />
               <span className="absolute inset-x-0 bottom-1 z-[1] text-center text-[10px] font-semibold text-pc-fg [text-shadow:0_1px_3px_#000]">
-                {THEME_LABEL[theme]}
+                {t(`themes.${theme}`)}
               </span>
             </button>
           )

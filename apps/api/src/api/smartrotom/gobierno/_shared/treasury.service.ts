@@ -46,10 +46,11 @@ export class TreasuryService {
       return this.treasuryAccountId;
     }
 
-    this.treasuryAccountId = await this.treasuryRepository.createOwnerlessAccount(
-      TREASURY_NAME,
-      AccountType.GOVERNMENT,
-    );
+    this.treasuryAccountId =
+      await this.treasuryRepository.createOwnerlessAccount(
+        TREASURY_NAME,
+        AccountType.GOVERNMENT,
+      );
     this.logger.log(
       `Seeded treasury account #${this.treasuryAccountId} (${TREASURY_NAME})`,
     );

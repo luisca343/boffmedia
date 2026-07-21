@@ -369,7 +369,9 @@ export class WingullPlayerRepository implements IWingullPlayerRepository {
     }
   }
 
-  async takeItemsInAPI(request: ItemsTakeRequestDto): Promise<ItemsTakeResponse> {
+  async takeItemsInAPI(
+    request: ItemsTakeRequestDto,
+  ): Promise<ItemsTakeResponse> {
     if (!request?.uuid || request.uuid.trim() === '') {
       throw new Error('UUID is required for taking items');
     }
@@ -396,7 +398,10 @@ export class WingullPlayerRepository implements IWingullPlayerRepository {
       );
       return response.data.data;
     } catch (error: any) {
-      this.logger.error(`Failed to take items from UUID ${request.uuid}:`, error);
+      this.logger.error(
+        `Failed to take items from UUID ${request.uuid}:`,
+        error,
+      );
       throw new Error(`Items taking failed: ${error.message}`);
     }
   }

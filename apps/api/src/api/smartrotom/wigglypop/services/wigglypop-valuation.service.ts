@@ -24,7 +24,13 @@ export interface Valuation {
 export const IV_TOTAL_MAX = 186; // 6 stats × 31
 
 // Pixelmon reports an empty held-item slot as this, not as null/"".
-const NO_ITEM = new Set(['', 'none', 'air', 'minecraft:air', 'item.minecraft.air']);
+const NO_ITEM = new Set([
+  '',
+  'none',
+  'air',
+  'minecraft:air',
+  'item.minecraft.air',
+]);
 
 @Injectable()
 export class WigglypopValuationService {
@@ -77,9 +83,7 @@ export class WigglypopValuationService {
    * there are, and nothing else. An item missing from the catalog is worth 0 rather than a
    * guess.
    */
-  valuateItems(
-    lines: Array<{ qty: number; refPrice: number }>,
-  ): Valuation {
+  valuateItems(lines: Array<{ qty: number; refPrice: number }>): Valuation {
     const value = lines.reduce(
       (acc, l) => acc + Number(l.refPrice || 0) * Number(l.qty || 0),
       0,

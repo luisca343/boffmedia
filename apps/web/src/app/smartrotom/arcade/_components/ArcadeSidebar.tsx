@@ -2,19 +2,20 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { Icon, type IconName } from "./ui"
 
 interface NavItem {
   href: string
-  label: string
-  hint: string
+  labelKey: string
+  hintKey: string
   icon: IconName
   badge?: number
 }
 
 interface NavGroup {
-  group: string
+  groupKey: string
   items: NavItem[]
 }
 
@@ -33,46 +34,47 @@ export interface ArcadeSidebarProps {
 function navigation({ boxesOwned, rewardReady }: ArcadeSidebarProps): NavGroup[] {
   return [
     {
-      group: "Arcade",
+      groupKey: "arcade.sidebar.arcade",
       items: [
-        { href: "/smartrotom/arcade", label: "Jugar", hint: "Inicio · biblioteca", icon: "Joystick" },
+        { href: "/smartrotom/arcade", labelKey: "arcade.sidebar.play", hintKey: "arcade.sidebar.playHint", icon: "Joystick" },
         {
           href: "/smartrotom/arcade/racha",
-          label: "Racha diaria",
-          hint: "Recompensa de hoy",
+          labelKey: "arcade.sidebar.streak",
+          hintKey: "arcade.sidebar.streakHint",
           icon: "Calendar",
           badge: rewardReady ? 1 : undefined,
         },
       ],
     },
     {
-      group: "Cajas",
+      groupKey: "arcade.sidebar.boxes",
       items: [
         {
           href: "/smartrotom/arcade/loot",
-          label: "Cajas",
-          hint: "Abrir botín",
+          labelKey: "arcade.sidebar.boxes",
+          hintKey: "arcade.sidebar.boxesHint",
           icon: "Box",
           badge: boxesOwned || undefined,
         },
         {
           href: "/smartrotom/arcade/coleccion",
-          label: "Colección",
-          hint: "Tus objetos",
+          labelKey: "arcade.sidebar.collection",
+          hintKey: "arcade.sidebar.collectionHint",
           icon: "Grid",
         },
       ],
     },
     {
-      group: "Cuenta",
+      groupKey: "arcade.sidebar.account",
       items: [
-        { href: "/smartrotom/arcade/ajustes", label: "Ajustes", hint: "Cabina · accesibilidad", icon: "Gear" },
+        { href: "/smartrotom/arcade/ajustes", labelKey: "arcade.sidebar.settings", hintKey: "arcade.sidebar.settingsHint", icon: "Gear" },
       ],
     },
   ]
 }
 
 function NavButton({ item, active }: { item: NavItem; active: boolean }) {
+  const t = useTranslations("")
   const Glyph = Icon[item.icon]
   return (
     <Link
@@ -90,10 +92,10 @@ function NavButton({ item, active }: { item: NavItem; active: boolean }) {
       </span>
       <span className="min-w-0 flex-1">
         <span className={cn("block font-ar text-[13.5px] leading-tight", active ? "font-bold" : "font-semibold")}>
-          {item.label}
+          {t(item.labelKey)}
         </span>
         <span className="mt-0.5 block truncate font-ar-mono text-[10px] text-ar-ink-muted">
-          {item.hint}
+          {t(item.hintKey)}
         </span>
       </span>
       {item.badge ? (
@@ -110,6 +112,7 @@ function NavButton({ item, active }: { item: NavItem; active: boolean }) {
 }
 
 export function ArcadeSidebar(props: ArcadeSidebarProps) {
+  const t = useTranslations("")
   const pathname = usePathname()
   const groups = navigation(props)
 
@@ -126,9 +129,9 @@ export function ArcadeSidebar(props: ArcadeSidebarProps) {
       </div>
 
       {groups.map((g) => (
-        <div key={g.group} className="mb-3">
+        <div key={g.groupKey} className="mb-3">
           <div className="px-1.5 py-1 font-ar-mono text-[10px] uppercase tracking-[0.18em] text-ar-ink-muted">
-            {g.group}
+            {t(g.groupKey)}
           </div>
           {g.items.map((item) => (
             <NavButton
@@ -142,10 +145,10 @@ export function ArcadeSidebar(props: ArcadeSidebarProps) {
 
       <div className="mt-1.5 rounded-[10px] border border-dashed border-ar-magenta/30 bg-[linear-gradient(180deg,rgb(var(--ar-magenta)/.08),rgb(var(--ar-violet)/.04))] p-3">
         <div className="mb-1.5 font-ar-mono text-[10px] font-bold uppercase tracking-wider text-ar-magenta-2">
-          Free to play
+          {t("arcade.common.freeToPlay")}
         </div>
         <div className="font-ar-mono text-[11px] leading-relaxed text-ar-ink-dim">
-          Arcade individual con datos en vivo del servidor. Sin compras: todo se gana jugando.
+          {t("arcade.common.freeToPlayDesc")}
         </div>
       </div>
     </aside>

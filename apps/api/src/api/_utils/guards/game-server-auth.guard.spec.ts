@@ -1,6 +1,10 @@
 import { UnauthorizedException } from '@nestjs/common';
 
-const mockEnv: { TERAS_API_TOKEN?: string; ENFORCE_MONEY_AUTH: boolean; MC_WORLD: string } = {
+const mockEnv: {
+  TERAS_API_TOKEN?: string;
+  ENFORCE_MONEY_AUTH: boolean;
+  MC_WORLD: string;
+} = {
   TERAS_API_TOKEN: 'server-token',
   ENFORCE_MONEY_AUTH: false,
   MC_WORLD: 'world-uuid',
@@ -13,9 +17,8 @@ jest.mock('@/config/env', () => ({
 }));
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const {
-  GameServerAuthGuard,
-} = require('./game-server-auth.guard') as typeof import('./game-server-auth.guard');
+const { GameServerAuthGuard } =
+  require('./game-server-auth.guard') as typeof import('./game-server-auth.guard');
 
 const ctxFor = (req: any) =>
   ({
@@ -34,7 +37,10 @@ describe('GameServerAuthGuard', () => {
   });
 
   it('accepts the mod token and flags serverAuthed', () => {
-    const req: any = { headers: { authorization: 'Bearer server-token' }, body: {} };
+    const req: any = {
+      headers: { authorization: 'Bearer server-token' },
+      body: {},
+    };
     expect(guard.canActivate(ctxFor(req))).toBe(true);
     expect(req.serverAuthed).toBe(true);
   });
@@ -48,18 +54,27 @@ describe('GameServerAuthGuard', () => {
   });
 
   it('rejects a user JWT — this route is not for users', () => {
-    const req: any = { headers: { authorization: 'Bearer some.jwt.here' }, body: {} };
+    const req: any = {
+      headers: { authorization: 'Bearer some.jwt.here' },
+      body: {},
+    };
     expect(() => guard.canActivate(ctxFor(req))).toThrow(UnauthorizedException);
   });
 
   it('rejects a same-length wrong token', () => {
-    const req: any = { headers: { authorization: 'Bearer xxxxxxxxxxxx' }, body: {} };
+    const req: any = {
+      headers: { authorization: 'Bearer xxxxxxxxxxxx' },
+      body: {},
+    };
     expect(() => guard.canActivate(ctxFor(req))).toThrow(UnauthorizedException);
   });
 
   it('rejects everything when TERAS_API_TOKEN is unset (fail-closed)', () => {
     mockEnv.TERAS_API_TOKEN = undefined;
-    const req: any = { headers: { authorization: 'Bearer anything' }, body: {} };
+    const req: any = {
+      headers: { authorization: 'Bearer anything' },
+      body: {},
+    };
     expect(() => guard.canActivate(ctxFor(req))).toThrow(UnauthorizedException);
   });
 

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 
 import { useNewsroom } from "../_hooks/queries";
 import { categoriesOf } from "../_utils/article";
@@ -10,25 +11,26 @@ import { Button, Chip, FurretMascot, Input } from "./ui";
 
 const BASE = "/smartrotom/furrettoday";
 
-const SECTIONS = [
-  { href: BASE, label: "Portada" },
-  { href: `${BASE}/secciones`, label: "Secciones" },
-  { href: `${BASE}/secciones#archivo`, label: "Archivo" },
-  { href: `${BASE}/editar`, label: "Editar" },
-];
-
 /**
  * The masthead. The category rail underneath is DERIVED from the categories
  * actually in use (the API has no sections table), so an empty section never
  * appears; picking one deep-links into the browse screen.
  */
 export function FurretNav() {
+  const t = useTranslations("furrettoday.nav");
   const pathname = usePathname();
   const router = useRouter();
   const [query, setQuery] = useState("");
   const { articles } = useNewsroom();
 
   const categories = categoriesOf(articles.filter((a) => a.published));
+
+  const SECTIONS = [
+    { href: BASE, label: t("home") },
+    { href: `${BASE}/secciones`, label: t("sections") },
+    { href: `${BASE}/secciones#archivo`, label: t("archive") },
+    { href: `${BASE}/editar`, label: t("edit") },
+  ];
 
   function search() {
     const q = query.trim();
@@ -41,7 +43,7 @@ export function FurretNav() {
         <Link
           href={BASE}
           className="font-ft-display flex shrink-0 items-center gap-2.5 whitespace-nowrap"
-          aria-label="Portada de Furret Today"
+          aria-label={t("coverLabel")}
         >
           <FurretMascot size={48} />
           <span className="text-3xl leading-[0.9] tracking-[0.04em]">
@@ -51,7 +53,7 @@ export function FurretNav() {
 
         <nav
           className="ml-auto flex flex-wrap items-center gap-1"
-          aria-label="Secciones"
+          aria-label={t("sections")}
         >
           {SECTIONS.map((item) => {
             // The hash variant ("Archivo") points at the browse screen too, so
@@ -84,12 +86,12 @@ export function FurretNav() {
               onKeyDown={(e) => {
                 if (e.key === "Enter") search();
               }}
-              placeholder="Buscar en el número…"
-              aria-label="Buscar artículos"
+              placeholder={t("searchPlaceholder")}
+              aria-label={t("search")}
               className="w-[220px]"
             />
             <Button variant="primary" size="sm" onClick={search}>
-              Buscar
+              {t("search")}
             </Button>
           </div>
         </nav>

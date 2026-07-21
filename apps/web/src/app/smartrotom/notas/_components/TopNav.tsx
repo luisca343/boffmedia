@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { Icon, IconButton, Tooltip, Kbd } from "./ui";
 
 interface TopNavProps {
@@ -11,11 +12,12 @@ interface TopNavProps {
 }
 
 export function TopNav({ activeTitle, onMenu, onSearch, onGraph, onTemplates }: TopNavProps) {
+  const t = useTranslations("notas");
   return (
     <header className="z-40 flex h-12 flex-none items-center gap-1 border-b border-nt-border bg-nt-bg-2 px-2.5">
       <button
         onClick={onMenu}
-        aria-label="Menú"
+        aria-label="Menu"
         className="inline-flex h-8 min-w-8 items-center justify-center rounded-nt-sm text-nt-fg-muted hover:bg-nt-hover-strong hover:text-nt-fg md:hidden"
       >
         <Icon name="menu" size={18} />
@@ -52,19 +54,19 @@ export function TopNav({ activeTitle, onMenu, onSearch, onGraph, onTemplates }: 
         className="flex h-8 min-w-0 items-center gap-2 rounded-nt-md border border-nt-border bg-nt-hover px-2.5 text-[13px] text-nt-fg-subtle transition-colors hover:border-nt-border-2 hover:text-nt-fg-muted sm:min-w-[200px]"
       >
         <Icon name="search" size={14} />
-        <span className="max-sm:hidden">Buscar…</span>
+        <span className="max-sm:hidden">{t("common.search")}…</span>
         <span className="ml-auto max-sm:hidden">
           <Kbd>⌘K</Kbd>
         </span>
       </button>
 
-      <Tooltip label="Grafo de conocimiento">
-        <IconButton onClick={onGraph} aria-label="Grafo">
+      <Tooltip label={t("graph.title")}>
+        <IconButton onClick={onGraph} aria-label={t("graph.title")}>
           <Icon name="network" size={17} />
         </IconButton>
       </Tooltip>
-      <Tooltip label="Plantillas">
-        <IconButton onClick={onTemplates} aria-label="Plantillas" className="max-sm:hidden">
+      <Tooltip label={t("templates.title")}>
+        <IconButton onClick={onTemplates} aria-label={t("templates.title")} className="max-sm:hidden">
           <Icon name="layers" size={17} />
         </IconButton>
       </Tooltip>

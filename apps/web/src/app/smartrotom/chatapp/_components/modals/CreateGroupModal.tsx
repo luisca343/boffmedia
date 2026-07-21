@@ -1,5 +1,6 @@
 "use client";
 import { useMemo, useState } from "react";
+import { useTranslations } from "next-intl";
 import { toast } from "react-toastify";
 import { cn } from "@/lib/utils";
 import { getSmartRotomUser } from "@/lib/utils";
@@ -10,6 +11,7 @@ import { Avatar, Button, Field, Icon, Modal, ModalFoot, SearchBox } from "../ui"
 type Player = { uuid: string; username: string };
 
 export function CreateGroupModal({ session, onClose, onCreated }: { session: unknown; onClose: () => void; onCreated: (chatId: number) => void }) {
+  const t = useTranslations("chatapp");
   const myUuid = getSmartRotomUser(session)?.uuid;
   const { users } = useGetAllUsers();
   const { createChat, isLoading } = useCreateChat();
@@ -23,7 +25,7 @@ export function CreateGroupModal({ session, onClose, onCreated }: { session: unk
   );
   const toggle = (u: Player) => setSel((s) => (s.find((x) => x.uuid === u.uuid) ? s.filter((x) => x.uuid !== u.uuid) : [...s, u]));
 
-  const placeholder = sel.length > 1 ? "Nombre del grupo" : sel.length === 1 ? sel[0].username : "Mensajes guardados";
+  const placeholder = sel.length > 1 ? t("createGroup.groupName") : sel.length === 1 ? sel[0].username : t("createGroup.savedMessages");
   const canCreate = sel.length === 1 || (sel.length > 1 && name.trim().length > 0);
 
   const create = async () => {
@@ -38,25 +40,25 @@ export function CreateGroupModal({ session, onClose, onCreated }: { session: unk
       // as if the chat had been created.
       const id = res.success ? res.data?.chatId ?? res.data?.id : undefined;
       if (id == null) {
-        toast.error(res.userMessage ?? "No se pudo crear el chat");
+        toast.error(res.userMessage ?? t("createGroup.createFailed"));
         return;
       }
       onCreated(id);
       onClose();
     } catch {
-      toast.error("No se pudo crear el chat");
+      toast.error(t("createGroup.createFailed"));
     }
   };
 
   return (
     <Modal
-      title="Nuevo chat"
+      title={t("createGroup.title")}
       icon="users"
       onClose={onClose}
       foot={
         <ModalFoot>
-          <Button variant="ghost" onClick={onClose}>Cancelar</Button>
-          <Button onClick={create} disabled={!canCreate || isLoading}>Crear chat</Button>
+          <Button variant="ghost" onClick={onClose}>{t("common.cancel")}</Button>
+          <Button onClick={create} disabled={!canCreate || isLoading}>{t("createGroup.createChat")}</Button>
         </ModalFoot>
       }
     >
@@ -66,13 +68,13 @@ export function CreateGroupModal({ session, onClose, onCreated }: { session: unk
             <span key={u.uuid} className="inline-flex items-center gap-1.5 rounded-full bg-ca-800 py-0.5 pl-0.5 pr-1.5 text-[12.5px] text-ca-100">
               <Avatar src={`https://mc-heads.net/avatar/${u.uuid}`} size={22} />
               {u.username}
-              <button onClick={() => toggle(u)} aria-label="Quitar"><Icon name="x" size={13} /></button>
+              <button onClick={() => toggle(u)} aria-label={t("createGroup.remove")}><Icon name="x" size={13} /></button>
             </span>
           ))}
         </div>
       )}
 
-      <SearchBox value={query} onChange={setQuery} placeholder="Buscar jugadores…" className="mb-3" />
+      <SearchBox value={query} onChange={setQuery} placeholder={t("createGroup.searchPlayers")} className="mb-3" />
 
       <div className="ca-scroll flex max-h-[240px] flex-col gap-0.5 overflow-y-auto">
         {list.map((u) => {
@@ -87,7 +89,7 @@ export function CreateGroupModal({ session, onClose, onCreated }: { session: unk
             </button>
           );
         })}
-        {list.length === 0 && <div className="py-8 text-center text-[13.5px] text-ca-500">No hay jugadores.</div>}
+        {list.length === 0 && <div className="py-8 text-center text-[13.5px] text-ca-500">{t("createGroup.noPlayers")}</div>}
       </div>
 
       {sel.length > 1 && <Field className="mt-3" placeholder={placeholder} value={name} onChange={(e) => setName(e.target.value)} />}

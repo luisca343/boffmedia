@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { toast } from "react-toastify";
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import { useCameraGalleryStore } from "@/stores/cameraGalleryStore";
 import { Icon } from "../ui";
@@ -20,6 +21,7 @@ export function ImageBubble({
   time: string;
   onOpen?: () => void;
 }) {
+  const t = useTranslations("chatapp");
   const [open, setOpen] = useState(false);
   const { addScreenshot } = useCameraGalleryStore();
   const meta = data.meta;
@@ -30,24 +32,24 @@ export function ImageBubble({
     e.stopPropagation();
     try {
       addScreenshot(data.imageUrl, meta?.location as never, meta?.entities);
-      toast.success("Imagen guardada en la galería");
+      toast.success(t("message.imageSaved"));
     } catch {
-      toast.error("Error al guardar la imagen");
+      toast.error(t("message.imageSaveError"));
     }
   };
 
   return (
     <div className={cn("w-[320px] max-w-full overflow-hidden rounded-[10px] shadow-ca-bubble", out ? "bg-ca-bubble-out" : "bg-ca-bubble-in")}>
       <div className="group relative aspect-[16/10] cursor-pointer overflow-hidden bg-ca-950" onClick={onOpen}>
-        <img src={data.imageUrl} alt={meta?.caption || "Captura"} className="h-full w-full object-cover" />
+        <img src={data.imageUrl} alt={meta?.caption || ""} className="h-full w-full object-cover" />
         {scanned && (
           <div className="absolute left-2 top-2 flex items-center gap-[5px] rounded-full border border-ca-online/40 bg-black/60 px-2 py-[3px] font-ca-mono text-[10px] tracking-[.06em] text-ca-online backdrop-blur-sm">
-            <Icon name="sparkles" size={11} /> ESCANEADO
+            <Icon name="sparkles" size={11} /> {t("message.scanned")}
           </div>
         )}
         <button
           onClick={save}
-          title="Guardar en galería"
+          title={t("message.saveToGallery")}
           className="absolute right-2 top-2 grid h-[30px] w-[30px] place-items-center rounded-full bg-black/55 text-white opacity-0 backdrop-blur-sm transition-opacity group-hover:opacity-100"
         >
           <Icon name="download" size={15} />
@@ -63,7 +65,7 @@ export function ImageBubble({
             className="flex w-full items-center justify-between gap-2 border-t border-ca-500/20 px-[11px] py-2 text-[12.5px] text-ca-300 hover:bg-ca-500/10"
           >
             <span className="flex items-center gap-[7px]">
-              <Icon name="cube" size={14} /> Detalles del escaneo · {entities.length}
+              <Icon name="cube" size={14} /> {t("message.scanDetails", { count: entities.length })}
             </span>
             <Icon name="chevdown" size={15} className={cn("transition-transform", open && "rotate-180")} />
           </button>
@@ -77,7 +79,7 @@ export function ImageBubble({
                       X {meta.location.playerPosition.x.toFixed(1)} · Y {meta.location.playerPosition.y.toFixed(1)} · Z {meta.location.playerPosition.z.toFixed(1)}
                     </div>
                     {meta.location.lookingAt?.block && (
-                      <div className="mt-0.5 text-ca-500">mirando a {meta.location.lookingAt.block.replace("minecraft:", "")}</div>
+                      <div className="mt-0.5 text-ca-500">{t("message.lookingAt", { block: meta.location.lookingAt.block.replace("minecraft:", "") })}</div>
                     )}
                   </div>
                 </div>

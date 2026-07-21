@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { useCameraGalleryStore, type Screenshot } from "@/stores/cameraGalleryStore";
 import { Button, Icon, Modal, ModalFoot } from "../ui";
 
@@ -12,6 +13,7 @@ export function GalleryPicker({
   onOpenChange: (open: boolean) => void;
   onSendImage: (screenshot: Screenshot, caption?: string) => void;
 }) {
+  const t = useTranslations("chatapp");
   const { gallery } = useCameraGalleryStore();
   const [selected, setSelected] = useState<Screenshot | null>(null);
   const [caption, setCaption] = useState("");
@@ -30,15 +32,15 @@ export function GalleryPicker({
 
   return (
     <Modal
-      title="Compartir captura"
+      title={t("gallery.title")}
       icon="image"
       wide
       onClose={close}
       foot={
         selected ? (
           <ModalFoot>
-            <Button variant="ghost" onClick={() => setSelected(null)}>Elegir otra</Button>
-            <Button onClick={send}><Icon name="send" size={16} /> Enviar</Button>
+            <Button variant="ghost" onClick={() => setSelected(null)}>{t("gallery.chooseOther")}</Button>
+            <Button onClick={send}><Icon name="send" size={16} /> {t("gallery.send")}</Button>
           </ModalFoot>
         ) : undefined
       }
@@ -46,17 +48,17 @@ export function GalleryPicker({
       {gallery.length === 0 ? (
         <div className="flex flex-col items-center gap-3 py-10 text-center text-ca-500">
           <Icon name="camera" size={34} className="opacity-50" />
-          <p className="text-[13.5px]">Aún no tienes capturas en tu galería.</p>
+          <p className="text-[13.5px]">{t("gallery.noCaptures")}</p>
         </div>
       ) : selected ? (
         <div className="flex flex-col gap-3">
           <div className="overflow-hidden rounded-ca-lg bg-ca-950">
-            <img src={selected.image} alt="Captura" className="max-h-[340px] w-full object-contain" />
+            <img src={selected.image} alt="" className="max-h-[340px] w-full object-contain" />
           </div>
           <input
             value={caption}
             onChange={(e) => setCaption(e.target.value)}
-            placeholder="Añade un comentario…"
+            placeholder={t("gallery.addComment")}
             className="w-full rounded-ca-md border border-ca-700 bg-ca-search-bg px-3 py-2.5 text-[14px] text-ca-50 outline-none placeholder:text-ca-500 focus:border-ca-accent/50"
           />
         </div>

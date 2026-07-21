@@ -1,4 +1,5 @@
 import { useMemo, useState, type ReactNode } from "react";
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import { Chip, Icon, IconButton, SearchBox, type IconName } from "./ui";
 import { ContactRow } from "./ContactRow";
@@ -6,14 +7,6 @@ import type { ChatVM } from "../_types/view";
 import { isGroupLike } from "../_utils/chat";
 
 type Category = "all" | "unread" | "direct" | "groups" | "favorites";
-
-const CATEGORIES: { id: Category; label: string }[] = [
-  { id: "all", label: "Todos" },
-  { id: "unread", label: "No leídos" },
-  { id: "direct", label: "Directos" },
-  { id: "groups", label: "Grupos" },
-  { id: "favorites", label: "Favoritos" },
-];
 
 function SectionHead({ icon, children }: { icon?: IconName; children: ReactNode }) {
   return (
@@ -45,8 +38,17 @@ export function Sidebar({
   onOpenSearch: () => void;
   onOpenSettings: () => void;
 }) {
+  const t = useTranslations("chatapp");
   const [category, setCategory] = useState<Category>("all");
   const [query, setQuery] = useState("");
+
+  const CATEGORIES: { id: Category; label: string }[] = [
+    { id: "all", label: t("sidebar.categories.all") },
+    { id: "unread", label: t("sidebar.categories.unread") },
+    { id: "direct", label: t("sidebar.categories.direct") },
+    { id: "groups", label: t("sidebar.categories.groups") },
+    { id: "favorites", label: t("sidebar.categories.favorites") },
+  ];
 
   const filtered = useMemo(() => {
     let list = chats;
@@ -82,24 +84,24 @@ export function Sidebar({
               <Icon name="message" size={18} className="text-ca-on-accent" />
             </div>
             <div className="text-[17px] font-bold leading-[1.1] tracking-[-.01em] text-ca-50">
-              ChatApp
-              <small className="mt-px block text-[11px] font-medium tracking-[.02em] text-ca-400">SmartRotom</small>
+              {t("sidebar.title")}
+              <small className="mt-px block text-[11px] font-medium tracking-[.02em] text-ca-400">{t("sidebar.subtitle")}</small>
             </div>
           </div>
           <div className="ml-auto flex gap-0.5">
-            <IconButton icon="search" onClick={onOpenSearch} title="Buscar" />
-            <IconButton icon="edit" iconSize={18} onClick={onNew} title="Nuevo chat" />
-            <IconButton icon="settings" onClick={onOpenSettings} title="Ajustes" />
+            <IconButton icon="search" onClick={onOpenSearch} title={t("common.search")} />
+            <IconButton icon="edit" iconSize={18} onClick={onNew} title={t("common.newChat")} />
+            <IconButton icon="settings" onClick={onOpenSettings} title={t("common.settings")} />
           </div>
         </div>
         <SearchBox
           value={query}
           onChange={setQuery}
-          placeholder="Buscar chats y mensajes"
+          placeholder={t("sidebar.searchPlaceholder")}
           className="mx-3 mb-1.5 mt-2"
           right={
             query ? (
-              <button type="button" onClick={() => setQuery("")} aria-label="Limpiar">
+              <button type="button" onClick={() => setQuery("")} aria-label={t("sidebar.clearSearch")}>
                 <Icon name="x" size={15} className="text-ca-500" />
               </button>
             ) : (
@@ -125,16 +127,16 @@ export function Sidebar({
       <div className="ca-scroll flex min-h-0 flex-1 flex-col overflow-y-auto bg-ca-panel">
         {pinned.length > 0 && (
           <>
-            <SectionHead icon="pin">Fijados</SectionHead>
+            <SectionHead icon="pin">{t("sidebar.pinned")}</SectionHead>
             {pinned.map(renderRow)}
           </>
         )}
-        {rest.length > 0 && pinned.length > 0 && <SectionHead>Todos los chats</SectionHead>}
+        {rest.length > 0 && pinned.length > 0 && <SectionHead>{t("sidebar.allChats")}</SectionHead>}
         {rest.map(renderRow)}
         {filtered.length === 0 && (
           <div className="px-5 py-12 text-center text-ca-500">
             <Icon name="search" size={30} className="mx-auto opacity-50" />
-            <p className="mt-3 text-[13.5px]">No se encontraron chats</p>
+            <p className="mt-3 text-[13.5px]">{t("sidebar.noResults")}</p>
           </div>
         )}
       </div>

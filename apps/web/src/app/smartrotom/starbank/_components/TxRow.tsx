@@ -1,5 +1,6 @@
 "use client";
 import * as React from "react";
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import { ContactAvatar } from "./ui";
 import { resolveCategory } from "../_utils/categories";
@@ -8,6 +9,7 @@ import { isOutgoing, displayName } from "../_utils/account";
 import type { SBTransaction } from "../_types";
 
 export function TxRow({ tx, activeAccountId, onClick }: { tx: SBTransaction; activeAccountId: number; onClick?: (tx: SBTransaction) => void }) {
+  const t = useTranslations("starbank");
   const cat = resolveCategory(tx);
   const out = isOutgoing(tx, activeAccountId);
   return (
@@ -25,7 +27,7 @@ export function TxRow({ tx, activeAccountId, onClick }: { tx: SBTransaction; act
           <span className="truncate">{displayName(tx.displayName)}</span>
           <span className={cn("inline-flex h-[18px] items-center gap-1.5 rounded-sb-pill px-2 text-[10.5px] font-semibold", cat.soft, cat.text)}>
             <span className={cn("size-1.5 rounded-full", cat.dotBg)} />
-            {cat.label}
+            {t(`categories.${cat.id}`)}
           </span>
         </div>
       </div>

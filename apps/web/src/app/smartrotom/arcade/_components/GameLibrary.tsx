@@ -1,25 +1,27 @@
 "use client"
 
 import { useState } from "react"
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
-import { GAME_CATEGORIES, GAMES } from "../_data/games"
+import { GAME_CATEGORY_KEYS, GAMES } from "../_data/games"
 import { CabinetCard } from "./CabinetCard"
 import { SectionTitle } from "./ui"
 
 /** The cabinet grid, filterable by category. */
 export function GameLibrary() {
-  const [category, setCategory] = useState("Todos")
-  const shown = category === "Todos" ? GAMES : GAMES.filter((g) => g.category === category)
+  const t = useTranslations("")
+  const [category, setCategory] = useState(GAME_CATEGORY_KEYS[0])
+  const shown = category === GAME_CATEGORY_KEYS[0] ? GAMES : GAMES.filter((g) => g.categoryKey === category)
 
   return (
     <section>
       <SectionTitle
-        kicker={`Librería · ${GAMES.length} juegos`}
-        title="Juegos Arcade"
+        kicker={t("arcade.home.library", { count: GAMES.length })}
+        title={t("arcade.home.arcadeGames")}
         accent="cyan"
         right={
           <div className="flex flex-wrap gap-1.5">
-            {GAME_CATEGORIES.map((c) => {
+            {GAME_CATEGORY_KEYS.map((c) => {
               const active = c === category
               return (
                 <button
@@ -34,7 +36,7 @@ export function GameLibrary() {
                       : "border-white/[.08] bg-white/[.04] text-ar-ink-dim hover:text-ar-ink",
                   )}
                 >
-                  {c}
+                  {t(c)}
                 </button>
               )
             })}

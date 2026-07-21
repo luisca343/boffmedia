@@ -1,20 +1,22 @@
 "use client";
 import { useMemo, useState } from "react";
+import { useTranslations } from "next-intl";
 import { Avatar, Chip, Icon, Modal, SearchBox } from "../ui";
 import type { ChatVM } from "../../_types/view";
 import { timeOf } from "../../_utils/format";
 
-const FILTERS = [
-  { id: "all", label: "Todo", types: null as string[] | null },
-  { id: "photos", label: "Fotos", types: ["image"] },
-  { id: "links", label: "Enlaces", types: ["video"] },
-  { id: "docs", label: "Documentos", types: ["document"] },
-  { id: "wp", label: "Waypoints", types: ["waypoint"] },
-];
-
 export function SearchModal({ chats, myUuid, onClose, onJump }: { chats: ChatVM[]; myUuid: string; onClose: () => void; onJump: (id: number) => void }) {
+  const t = useTranslations("chatapp");
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState("all");
+
+  const FILTERS = [
+    { id: "all", label: t("searchModal.filters.all"), types: null as string[] | null },
+    { id: "photos", label: t("searchModal.filters.photos"), types: ["image"] },
+    { id: "links", label: t("searchModal.filters.links"), types: ["video"] },
+    { id: "docs", label: t("searchModal.filters.docs"), types: ["document"] },
+    { id: "wp", label: t("searchModal.filters.wp"), types: ["waypoint"] },
+  ];
 
   const results = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -34,8 +36,8 @@ export function SearchModal({ chats, myUuid, onClose, onJump }: { chats: ChatVM[
   }, [chats, query, filter]);
 
   return (
-    <Modal title="Buscar en todos los chats" icon="search" wide onClose={onClose}>
-      <SearchBox value={query} onChange={setQuery} placeholder="Mensajes, personas, waypoints…" className="mb-3" autoFocus iconSize={18} />
+    <Modal title={t("searchModal.title")} icon="search" wide onClose={onClose}>
+      <SearchBox value={query} onChange={setQuery} placeholder={t("searchModal.placeholder")} className="mb-3" autoFocus iconSize={18} />
       <div className="mb-3.5 flex flex-wrap gap-1.5">
         {FILTERS.map((f) => (
           <Chip key={f.id} active={filter === f.id} onClick={() => setFilter(f.id)}>{f.label}</Chip>
@@ -44,10 +46,10 @@ export function SearchModal({ chats, myUuid, onClose, onJump }: { chats: ChatVM[
       {!query.trim() && filter === "all" ? (
         <div className="px-2.5 py-8 text-center text-ca-500">
           <Icon name="search" size={34} className="mx-auto opacity-50" />
-          <p className="mt-2.5 text-[13.5px]">Busca por palabra, persona o coordenadas.</p>
+          <p className="mt-2.5 text-[13.5px]">{t("searchModal.emptyHint")}</p>
         </div>
       ) : results.length === 0 ? (
-        <div className="px-2.5 py-8 text-center text-[13.5px] text-ca-500">Sin resultados.</div>
+        <div className="px-2.5 py-8 text-center text-[13.5px] text-ca-500">{t("searchModal.noResults")}</div>
       ) : (
         <div className="flex flex-col gap-0.5">
           {results.map(({ chat, message }, i) => (
@@ -59,7 +61,7 @@ export function SearchModal({ chats, myUuid, onClose, onJump }: { chats: ChatVM[
                   <span className="ml-auto text-[12px] text-ca-400">{timeOf(message.createdAt)}</span>
                 </div>
                 <div className="truncate text-[14px] text-ca-300">
-                  {message.uuid === myUuid ? "Tú: " : ""}
+                  {message.uuid === myUuid ? `${t("preview.you")}: ` : ""}
                   {message.type === "text" || message.type === "emoji" || message.type === "chat" ? message.content : message.type}
                 </div>
               </div>

@@ -43,9 +43,9 @@ export class PasaporteController {
   async getLogros(
     @Param() params: TrainerParamsDto,
   ): Promise<PasaporteLogroEntity[]> {
-    return this.pasaporteService.getLogros(
-      params.uuid,
-    ) as unknown as Promise<PasaporteLogroEntity[]>;
+    return this.pasaporteService.getLogros(params.uuid) as unknown as Promise<
+      PasaporteLogroEntity[]
+    >;
   }
 
   @Get('season/:uuid')

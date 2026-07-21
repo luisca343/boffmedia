@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { Button, Icon, Panel } from "../../_components/ui"
 import VoltorbImage from "./VoltorbIcon"
 
@@ -20,6 +21,8 @@ export default function Messages({
   onQuit,
   lostCoins,
 }: MessagesProps) {
+  const t = useTranslations("")
+
   if (gameOver) {
     return (
       <Panel
@@ -28,14 +31,13 @@ export default function Messages({
       >
         <div className="flex items-center justify-center gap-2.5">
           <VoltorbImage size="md" glow />
-          <p className="ar-chrom m-0 font-ar-display text-[14px] text-ar-magenta-2">GAME OVER</p>
+          <p className="ar-chrom m-0 font-ar-display text-[14px] text-ar-magenta-2">{t("arcade.voltorb.gameOver")}</p>
         </div>
         <p className="mt-3 text-center font-ar text-[13px] leading-relaxed text-ar-ink-dim">
-          Has encontrado un Voltorb y perdido{" "}
-          <b className="tabular-nums text-ar-amber">{lostCoins}</b> monedas.
+          {t("arcade.voltorb.gameOverText", { count: lostCoins })}
         </p>
         <p className="mt-1.5 text-center font-ar-mono text-[11px] text-ar-cyan">
-          Inicia una nueva partida para seguir jugando.
+          {t("arcade.voltorb.newGameHint")}
         </p>
       </Panel>
     )
@@ -46,10 +48,10 @@ export default function Messages({
       <Panel tone="cyan" className="w-full max-w-[560px] animate-ar-pop motion-reduce:animate-none">
         <div className="flex items-center justify-center gap-2.5 text-ar-amber">
           <Icon.Trophy s={20} />
-          <p className="ar-glow-amber m-0 font-ar-display text-[13px]">¡NIVEL COMPLETADO!</p>
+          <p className="ar-glow-amber m-0 font-ar-display text-[13px]">{t("arcade.voltorb.levelComplete")}</p>
         </div>
         <p className="mt-3 text-center font-ar text-[13px] leading-relaxed text-ar-ink-dim">
-          ¡Encontraste todos los multiplicadores sin activar ningún Voltorb!
+          {t("arcade.voltorb.levelCompleteText")}
         </p>
         <div className="mt-4 flex flex-wrap justify-center gap-2.5">
           <Button
@@ -58,10 +60,10 @@ export default function Messages({
             iconRight={<Icon.Chevron s={14} />}
             onClick={onNextLevel}
           >
-            Siguiente nivel
+            {t("arcade.voltorb.nextLevel")}
           </Button>
           <Button variant="ghost" size="md" icon={<Icon.Coin s={16} />} onClick={onQuit}>
-            Guardar y salir
+            {t("arcade.voltorb.saveAndQuit")}
           </Button>
         </div>
       </Panel>
