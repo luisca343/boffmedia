@@ -5,6 +5,7 @@ import { motion } from "framer-motion"
 import { AlertTriangle, User, UserPlus, Link } from "lucide-react"
 import { toast } from "react-toastify"
 import { boffPOST } from "@/services/boffAPI"
+import { useTranslations } from "next-intl"
 
 interface MinecraftAuthFormProps {
   mcUserData: any
@@ -19,6 +20,7 @@ export function MinecraftAuthForm({ mcUserData }: MinecraftAuthFormProps) {
     email: '',
     confirmPassword: ''
   })
+  const t = useTranslations("smartrotom.auth")
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -40,7 +42,7 @@ export function MinecraftAuthForm({ mcUserData }: MinecraftAuthFormProps) {
       alert("Response: " + JSON.stringify(response))
 
         if (response?.error) {
-            toast.error(response.error || "Error al vincular cuenta")
+            toast.error(response.error || t("linkError"))
             setIsLoading(false)
             return
         }
@@ -53,16 +55,15 @@ export function MinecraftAuthForm({ mcUserData }: MinecraftAuthFormProps) {
         })
 
         if (mcResult?.error) {
-          toast.error("Error al vincular cuenta de Minecraft")
+          toast.error(t("minecraftLinkError"))
           setIsLoading(false)
           return
         }
       }
 
-      toast.success("Cuenta vinculada exitosamente")
-      // The page will refresh automatically when authentication state changes
+      toast.success(t("linkSuccess"))
     } catch (error) {
-      toast.error("Error al vincular cuenta")
+      toast.error(t("linkError"))
       setIsLoading(false)
     }
   }
@@ -71,14 +72,13 @@ export function MinecraftAuthForm({ mcUserData }: MinecraftAuthFormProps) {
     e.preventDefault()
     
     if (formData.password !== formData.confirmPassword) {
-      toast.error("Las contraseñas no coinciden")
+      toast.error(t("passwordMismatch"))
       return
     }
 
     setIsLoading(true)
 
     try {
-      // Create new BoffMedia account with Minecraft data using boffPOST
       const response = await boffPOST('/auth/register-minecraft', {
         username: formData.username,
         email: formData.email,
@@ -91,12 +91,11 @@ export function MinecraftAuthForm({ mcUserData }: MinecraftAuthFormProps) {
       })
 
       if (response?.error) {
-        toast.error(response.error || "Error al crear cuenta")
+        toast.error(response.error || t("createError"))
         setIsLoading(false)
         return
       }
 
-      // After successful registration, sign in with the new credentials
       const signInResult = await signIn("boffmedia", {
         redirect: false,
         username: formData.username,
@@ -104,20 +103,19 @@ export function MinecraftAuthForm({ mcUserData }: MinecraftAuthFormProps) {
       })
 
       if (signInResult?.error) {
-        toast.error("Error al iniciar sesión con la nueva cuenta")
+        toast.error(t("loginNewError"))
         setIsLoading(false)
         return
       }
 
-      toast.success("Cuenta creada y vinculada exitosamente")
+      toast.success(t("createSuccess"))
     } catch (error) {
       console.error("Registration error:", error)
-      toast.error("Error al crear cuenta")
+      toast.error(t("createError"))
       setIsLoading(false)
     }
   }
 
-  // ...rest of the component remains the same...
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData(prev => ({
       ...prev,
@@ -136,15 +134,15 @@ export function MinecraftAuthForm({ mcUserData }: MinecraftAuthFormProps) {
         >
           <div className="flex items-center mb-6">
             <Link className="w-8 h-8 text-primary mr-2" />
-            <h1 className="text-2xl font-bold">Vincular Cuenta</h1>
+            <h1 className="text-2xl font-bold">{t("linkAccount")}</h1>
           </div>
           
           <div className="bg-primary-soft p-4 rounded mb-6">
             <p className="text-sm mb-2">
-              Usuario de Minecraft: <span className="font-bold">{mcUserData?.username}</span>
+              {t("minecraftUser")} <span className="font-bold">{mcUserData?.username}</span>
             </p>
             <p className="text-xs text-primary-active">
-              Para continuar, necesitas vincular tu cuenta de BoffMedia
+              {t("linkPrompt")}
             </p>
           </div>
 
@@ -154,7 +152,7 @@ export function MinecraftAuthForm({ mcUserData }: MinecraftAuthFormProps) {
               className="w-full flex items-center justify-center space-x-2 bg-primary hover:bg-primary-active text-white p-3 rounded transition-colors"
             >
               <User className="w-5 h-5" />
-              <span>Tengo una cuenta de BoffMedia</span>
+              <span>{t("hasAccount")}</span>
             </button>
             
             <button
@@ -162,7 +160,7 @@ export function MinecraftAuthForm({ mcUserData }: MinecraftAuthFormProps) {
               className="w-full flex items-center justify-center space-x-2 bg-primary-active hover:bg-primary-active text-white p-3 rounded transition-colors"
             >
               <UserPlus className="w-5 h-5" />
-              <span>Crear nueva cuenta</span>
+              <span>{t("createAccount")}</span>
             </button>
 
             <button
@@ -170,7 +168,7 @@ export function MinecraftAuthForm({ mcUserData }: MinecraftAuthFormProps) {
                 className="w-full flex items-center justify-center space-x-2 bg-red-500 hover:bg-red-600 text-white p-3 rounded transition-colors"
             >
                 <AlertTriangle className="w-5 h-5" />
-                <span>Cancelar Vinculación</span>
+                <span>{t("cancelLink")}</span>
             </button>
               
           </div>
@@ -190,12 +188,12 @@ export function MinecraftAuthForm({ mcUserData }: MinecraftAuthFormProps) {
         >
           <div className="flex items-center mb-6">
             <User className="w-8 h-8 text-primary mr-2" />
-            <h1 className="text-2xl font-bold">Vincular Cuenta Existente</h1>
+            <h1 className="text-2xl font-bold">{t("linkExisting")}</h1>
           </div>
 
           <form onSubmit={handleLogin} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium mb-1">Usuario</label>
+              <label className="block text-sm font-medium mb-1">{t("username")}</label>
               <input
                 type="text"
                 name="username"
@@ -208,7 +206,7 @@ export function MinecraftAuthForm({ mcUserData }: MinecraftAuthFormProps) {
             </div>
             
             <div>
-              <label className="block text-sm font-medium mb-1">Contraseña</label>
+              <label className="block text-sm font-medium mb-1">{t("password")}</label>
               <input
                 type="password"
                 name="password"
@@ -227,14 +225,14 @@ export function MinecraftAuthForm({ mcUserData }: MinecraftAuthFormProps) {
                 className="flex-1 bg-layer-3 hover:bg-layer-3 text-white p-2 rounded transition-colors"
                 disabled={isLoading}
               >
-                Volver
+                {t("back")}
               </button>
               <button
                 type="submit"
                 className="flex-1 bg-primary hover:bg-primary-active text-white p-2 rounded transition-colors disabled:opacity-50"
                 disabled={isLoading}
               >
-                {isLoading ? 'Vinculando...' : 'Vincular'}
+                {isLoading ? t("linking") : t("link")}
               </button>
             </div>
           </form>
@@ -254,12 +252,12 @@ export function MinecraftAuthForm({ mcUserData }: MinecraftAuthFormProps) {
         >
           <div className="flex items-center mb-6">
             <UserPlus className="w-8 h-8 text-primary mr-2" />
-            <h1 className="text-2xl font-bold">Crear Nueva Cuenta</h1>
+            <h1 className="text-2xl font-bold">{t("createNew")}</h1>
           </div>
 
           <form onSubmit={handleRegister} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium mb-1">Usuario</label>
+              <label className="block text-sm font-medium mb-1">{t("username")}</label>
               <input
                 type="text"
                 name="username"
@@ -272,7 +270,7 @@ export function MinecraftAuthForm({ mcUserData }: MinecraftAuthFormProps) {
             </div>
             
             <div>
-              <label className="block text-sm font-medium mb-1">Email</label>
+              <label className="block text-sm font-medium mb-1">{t("email")}</label>
               <input
                 type="email"
                 name="email"
@@ -285,7 +283,7 @@ export function MinecraftAuthForm({ mcUserData }: MinecraftAuthFormProps) {
             </div>
             
             <div>
-              <label className="block text-sm font-medium mb-1">Contraseña</label>
+              <label className="block text-sm font-medium mb-1">{t("password")}</label>
               <input
                 type="password"
                 name="password"
@@ -298,7 +296,7 @@ export function MinecraftAuthForm({ mcUserData }: MinecraftAuthFormProps) {
             </div>
             
             <div>
-              <label className="block text-sm font-medium mb-1">Confirmar Contraseña</label>
+              <label className="block text-sm font-medium mb-1">{t("confirmPassword")}</label>
               <input
                 type="password"
                 name="confirmPassword"
@@ -317,14 +315,14 @@ export function MinecraftAuthForm({ mcUserData }: MinecraftAuthFormProps) {
                 className="flex-1 bg-layer-3 hover:bg-layer-3 text-white p-2 rounded transition-colors"
                 disabled={isLoading}
               >
-                Volver
+                {t("back")}
               </button>
               <button
                 type="submit"
                 className="flex-1 bg-primary hover:bg-primary-active text-white p-2 rounded transition-colors disabled:opacity-50"
                 disabled={isLoading}
               >
-                {isLoading ? 'Creando...' : 'Crear Cuenta'}
+                {isLoading ? t("creating") : t("create")}
               </button>
             </div>
           </form>

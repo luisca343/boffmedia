@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { Button, Icon, toast } from "@/components/boffmedia/primitives"
 import { TM_CARD, TM_CARD_HEAD, TM_CARD_H3 } from "@/components/boffmedia/ui/tournaments"
@@ -19,6 +20,7 @@ export function LiveReportPanel({
   oppName: string
   onChanged: () => void
 }) {
+  const t = useTranslations("torneos.report")
   const bestOf = Math.max(1, detail.bestOf)
   const majority = Math.ceil(bestOf / 2)
   const [games, setGames] = React.useState<(string | null)[]>(() => Array(bestOf).fill(null))
@@ -48,7 +50,7 @@ export function LiveReportPanel({
   const losses = games.filter((g) => g === "L").length
   const decisive = wins >= majority || losses >= majority
   const resultText =
-    wins > losses ? `Ganas esta partida ${wins}-${losses}` : losses > wins ? `Pierdes esta partida ${losses}-${wins}` : `Marca el resultado`
+    wins > losses ? t("resultWin", { w: wins, l: losses }) : losses > wins ? t("resultLoss", { l: losses, w: wins }) : t("resultNone")
 
   const shown: (string | null)[] =
     phase === "incoming" || phase === "dispute"
@@ -94,27 +96,27 @@ export function LiveReportPanel({
   return (
     <section className={TM_CARD}>
       <div className={TM_CARD_HEAD}>
-        <h3 className={TM_CARD_H3}>Reportar partidas</h3>
-        {phase === "verified" && <span className={cn(pill, "border-[color:color-mix(in_srgb,var(--ok)_45%,transparent)] bg-ok-soft text-ok")}><Icon name="check" size={12} />Verificada</span>}
-        {phase === "awaiting" && <span className={cn(pill, "border-[color:color-mix(in_srgb,var(--warn)_45%,transparent)] bg-warn-soft text-warn")}><Icon name="clock" size={12} />Esperando confirmación</span>}
-        {phase === "dispute" && <span className={cn(pill, "border-[color:color-mix(in_srgb,var(--bad)_45%,transparent)] bg-bad-soft text-bad")}><Icon name="alert" size={12} />En disputa</span>}
-        {phase === "incoming" && <span className={cn(pill, "border-[color:color-mix(in_srgb,var(--warn)_45%,transparent)] bg-warn-soft text-warn")}><Icon name="clock" size={12} />Te toca verificar</span>}
+        <h3 className={TM_CARD_H3}>{t("title")}</h3>
+        {phase === "verified" && <span className={cn(pill, "border-[color:color-mix(in_srgb,var(--ok)_45%,transparent)] bg-ok-soft text-ok")}><Icon name="check" size={12} />{t("phaseVerified")}</span>}
+        {phase === "awaiting" && <span className={cn(pill, "border-[color:color-mix(in_srgb,var(--warn)_45%,transparent)] bg-warn-soft text-warn")}><Icon name="clock" size={12} />{t("phaseAwaiting")}</span>}
+        {phase === "dispute" && <span className={cn(pill, "border-[color:color-mix(in_srgb,var(--bad)_45%,transparent)] bg-bad-soft text-bad")}><Icon name="alert" size={12} />{t("phaseDispute")}</span>}
+        {phase === "incoming" && <span className={cn(pill, "border-[color:color-mix(in_srgb,var(--warn)_45%,transparent)] bg-warn-soft text-warn")}><Icon name="clock" size={12} />{t("phaseIncoming")}</span>}
       </div>
 
       {phase === "incoming" && (
         <div className={cn(banner, "text-info bg-info-soft border border-solid border-[color:color-mix(in_srgb,var(--info)_40%,transparent)]")}>
           <Icon name="info" size={15} className="flex-none" />
-          <span><b>{oppName}</b> ha reportado el resultado. Revísalo y verifica si es correcto.</span>
+          <span><b>{oppName}</b> {t("incomingInfo")}</span>
         </div>
       )}
 
       <div className={cn("grid gap-2.5 p-4", locked && "[&_button:not(.on)]:opacity-40")}>
         {Array.from({ length: bestOf }, (_, i) => (
           <div key={i} className="grid grid-cols-[90px_1fr] items-center gap-4 max-[760px]:grid-cols-[70px_1fr]">
-            <span className="text-right font-mono text-[12px]/none font-bold uppercase tracking-[0.06em] text-txt-muted">Partida {i + 1}</span>
+            <span className="text-right font-mono text-[12px]/none font-bold uppercase tracking-[0.06em] text-txt-muted">{t("gameLabel", { n: i + 1 })}</span>
             <div className="flex max-w-[300px] gap-2.5">
-              <button type="button" disabled={locked} onClick={() => setGame(i, "W")} className={cn(gbtn, shown[i] === "W" && "on border-ok bg-ok-soft text-ok")}>Victoria</button>
-              <button type="button" disabled={locked} onClick={() => setGame(i, "L")} className={cn(gbtn, shown[i] === "L" && "on border-bad bg-bad-soft text-bad")}>Derrota</button>
+              <button type="button" disabled={locked} onClick={() => setGame(i, "W")} className={cn(gbtn, shown[i] === "W" && "on border-ok bg-ok-soft text-ok")}>{t("win")}</button>
+              <button type="button" disabled={locked} onClick={() => setGame(i, "L")} className={cn(gbtn, shown[i] === "L" && "on border-bad bg-bad-soft text-bad")}>{t("loss")}</button>
             </div>
           </div>
         ))}
@@ -122,8 +124,8 @@ export function LiveReportPanel({
 
       {phase === "edit" && (
         <div className="flex flex-wrap items-center justify-between gap-3.5 border-t border-solid border-line bg-base px-4 py-3.5">
-          <span className={cn("font-body text-[14px]/[1.3]", decisive ? "font-bold text-txt" : "text-txt-dim")}>{decisive ? resultText : "Marca el resultado de cada partida"}</span>
-          <Button variant="pri" size="sm" icon="check" disabled={!decisive || busy} onClick={submit}>Enviar reporte</Button>
+          <span className={cn("font-body text-[14px]/[1.3]", decisive ? "font-bold text-txt" : "text-txt-dim")}>{decisive ? resultText : t("footerHint")}</span>
+          <Button variant="pri" size="sm" icon="check" disabled={!decisive || busy} onClick={submit}>{t("submit")}</Button>
         </div>
       )}
 
@@ -134,11 +136,11 @@ export function LiveReportPanel({
       {phase === "incoming" && proposal && (
         <div className="flex flex-wrap items-center justify-between gap-3.5 border-t border-solid border-line bg-base px-4 py-3.5">
           <span className="font-body text-[14px]/[1.3] font-bold text-txt">
-            Según {oppName}: {gamesToMyScore(proposal.games, false)}-{gamesToMyScore(proposal.games, true)} a su favor
+            {t("incomingScore", { oppName, score: `${gamesToMyScore(proposal.games, false)}-${gamesToMyScore(proposal.games, true)}` })}
           </span>
           <span className="inline-flex gap-2.5">
-            <Button variant="ghost" size="sm" icon="alert" disabled={busy} onClick={() => verdict(false)}>Disputar</Button>
-            <Button variant="pri" size="sm" icon="check" disabled={busy} onClick={() => verdict(true)}>Verificar</Button>
+            <Button variant="ghost" size="sm" icon="alert" disabled={busy} onClick={() => verdict(false)}>{t("dispute")}</Button>
+            <Button variant="pri" size="sm" icon="check" disabled={busy} onClick={() => verdict(true)}>{t("verify")}</Button>
           </span>
         </div>
       )}
@@ -146,13 +148,13 @@ export function LiveReportPanel({
       {phase === "verified" && (
         <div className={cn(banner, "text-ok bg-ok-soft border border-solid border-[color:color-mix(in_srgb,var(--ok)_40%,transparent)]")}>
           <Icon name="check" size={16} className="flex-none" />
-          <span><b>Resultado verificado {Math.max(myFinal, oppFinal)}-{Math.min(myFinal, oppFinal)}.</b> {iWon ? "¡Victoria!" : "Derrota — a por la siguiente."}</span>
+          <span><b>{t("verifiedScore", { score: `${Math.max(myFinal, oppFinal)}-${Math.min(myFinal, oppFinal)}` })}</b> {iWon ? t("verifiedWin") : t("verifiedLoss")}</span>
         </div>
       )}
       {phase === "dispute" && (
         <div className={cn(banner, "text-bad bg-bad-soft border border-solid border-[color:color-mix(in_srgb,var(--bad)_40%,transparent)]")}>
           <Icon name="alert" size={16} className="flex-none" />
-          <span><b>Resultado en disputa.</b> Un juez revisará la mesa. Usad el chat para explicar lo ocurrido.</span>
+          <span><b>{t("disputeTitle")}</b> {t("disputeBody")}</span>
         </div>
       )}
     </section>
@@ -185,7 +187,8 @@ function AwaitingFoot({
   mine: string
   onExpired: () => void
 }) {
-  const total = React.useRef<number | null>(null)
+  const t = useTranslations("torneos.report")
+  const total = React.useRef<number |null>(null)
   const calc = React.useCallback(
     () => Math.max(0, Math.floor((new Date(expiresAt).getTime() - Date.now()) / 1000)),
     [expiresAt],
@@ -211,16 +214,16 @@ function AwaitingFoot({
   return (
     <div className="grid gap-[9px] border-t border-solid border-line bg-base px-4 py-3.5">
       <div className="flex flex-wrap items-center justify-between gap-3.5">
-        <span className="font-body text-[14px]/[1.3] font-bold text-txt">Has reportado {mine}</span>
+        <span className="font-body text-[14px]/[1.3] font-bold text-txt">{t("awaitingReported", { score: mine })}</span>
         <span className="inline-flex items-center gap-1.5 font-mono text-[12px]/none text-warn">
-          <Icon name="clock" size={12} />Auto-verificación en <b className="font-bold">{fmt(left)}</b>
+          <Icon name="clock" size={12} />{t("awaitingCountdownLabel")} <b className="font-bold">{fmt(left)}</b>
         </span>
       </div>
       <div className="h-1 overflow-hidden bg-line">
         <i className="block h-full bg-warn transition-[width] duration-1000 ease-linear" style={{ width: `${(left / (total.current || 1)) * 100}%` }} />
       </div>
       <p className="m-0 max-w-[68ch] font-body text-[11.5px]/[1.5] text-txt-muted">
-        El reporte aparece al instante en la mesa de {oppName}. Si no responde a tiempo se validará automáticamente para no bloquear el torneo.
+        {t("awaitingNote", { oppName })}
       </p>
     </div>
   )

@@ -1,11 +1,13 @@
 "use client"
 import { use, useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
+import { useTranslations } from "next-intl"
 import { PokemonSprite } from "../../_components/PokemonSprite"
 import { usePokemonStore } from "@/stores/pokemonStore"
 
 // Cinematic capture-reveal: silhouette scan → reveal → brief flash → entrada.
 export default function Registro({ params }: { params: Promise<{ params?: string[] }> }) {
+  const t = useTranslations("pokedex")
   const router = useRouter()
   // Params arrive as a promise; reading `.params` straight off it yields undefined.
   const { params: route } = use(params)
@@ -35,7 +37,7 @@ export default function Registro({ params }: { params: Promise<{ params?: string
     }
   }, [pokemonIndex, formIndex])
 
-  const label = phase === "scan" ? "Escaneando…" : phase === "reveal" ? "Identificando…" : "Registrando…"
+  const label = phase === "scan" ? t("registro_scanning") : phase === "reveal" ? t("registro_identifying") : t("registro_registering")
 
   const corners = [
     "top-0 left-0 border-t-2 border-l-2",

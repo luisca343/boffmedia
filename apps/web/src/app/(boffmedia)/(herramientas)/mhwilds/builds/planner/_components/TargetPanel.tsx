@@ -62,8 +62,8 @@ export function TargetPanel({
       >
         <Icon name="skull" size={16} className="shrink-0 text-[var(--mh-bright)]" />
         <span className="grid min-w-0 gap-0.5">
-          <b className="font-display text-[14px] leading-tight font-bold uppercase">{t("build_planner.target.cta_title")}</b>
-          <span className="font-mono text-[11px] leading-none text-txt-muted">{t("build_planner.target.cta_lead")}</span>
+          <b className="font-display text-[14px] leading-tight font-bold uppercase">{t("build_planner.target.ctaTitle")}</b>
+          <span className="font-mono text-[11px] leading-none text-txt-muted">{t("build_planner.target.ctaLead")}</span>
         </span>
         <Icon name="chevronRight" size={15} className="ml-auto shrink-0 text-txt-dim" />
       </button>
@@ -97,7 +97,7 @@ export function TargetPanel({
         </Button>
       </div>
 
-      <MhLabel className="mt-3">{t("build_planner.target.weak_to")}</MhLabel>
+      <MhLabel className="mt-3">{t("build_planner.target.weakTo")}</MhLabel>
       {weaks.length ? (
         <div className="flex flex-wrap gap-1.5">
           {weaks.map((w) => (

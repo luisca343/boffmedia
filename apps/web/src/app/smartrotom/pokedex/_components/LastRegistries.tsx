@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { PokemonSprite, PokemonSpriteLink } from "./PokemonSprite"
 import { StatusIcon } from "./StatusIcon"
 import { useRotomUuid } from "@/components/smartrotom/behavior/useRotomUuid"
@@ -7,6 +8,7 @@ import { useGetRegistries } from "@/hooks/pokemon/useGetRegistries"
 import { Loading } from "@/components/smartrotom/Loading"
 
 export function LastRegistries() {
+    const t = useTranslations("pokedex")
     const uuid = useRotomUuid();
     const { registries, isLoading } = useGetRegistries(uuid!);
 
@@ -22,7 +24,7 @@ export function LastRegistries() {
     if (!registries?.length) {
         return (
             <div className="flex justify-center items-center h-20 text-ink">
-                No hay registros recientes
+                {t("lastregistries_no_records")}
             </div>
         );
     }

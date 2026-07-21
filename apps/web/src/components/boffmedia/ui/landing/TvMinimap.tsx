@@ -1,15 +1,18 @@
 "use client"
 
 import * as React from "react"
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { TV3_STOPS } from "./landing-data"
 import { tvGoTo } from "./landing-shared"
 
 export function TvMinimap({ active }: { active: number }) {
+  const tStops = useTranslations("boffmedia.landing.stops")
+  const tMinimap = useTranslations("boffmedia.landing.minimap")
   return (
     <aside
       className="group/map fixed left-[22px] top-1/2 z-[560] flex -translate-y-1/2 flex-col gap-[2px] py-1.5 max-[1120px]:hidden"
-      aria-label="Mapa del recorrido"
+      aria-label={tMinimap("ariaLabel")}
     >
       <span className="absolute bottom-3.5 left-1.5 top-3.5 w-[2px] overflow-hidden bg-line" aria-hidden="true">
         <i
@@ -26,7 +29,7 @@ export function TvMinimap({ active }: { active: number }) {
             className="group/stop relative flex cursor-pointer items-center gap-3 py-1.5 pr-1.5 text-left"
             onClick={() => tvGoTo(s.id)}
             aria-current={on ? "true" : undefined}
-            title={s.t}
+            title={tStops(s.tk)}
           >
             <span
               aria-hidden="true"
@@ -46,7 +49,7 @@ export function TvMinimap({ active }: { active: number }) {
               )}
             >
               <b className={on ? "text-txt" : "text-txt-muted"}>{s.n}</b>
-              {s.t}
+              {tStops(s.tk)}
             </span>
           </button>
         )

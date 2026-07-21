@@ -64,9 +64,9 @@ export function SchematicCompatTool() {
             </span>
             <span className="flex flex-col leading-none min-w-0">
               <span className="font-display font-extrabold italic text-[20px] tracking-[0.01em] text-white whitespace-nowrap">
-                Schematic Compat
+                {t("appName")}
               </span>
-              <span className="font-mono text-[9.5px] tracking-[0.14em] uppercase text-txt-dim mt-1">Minecraft · Hytale</span>
+              <span className="font-mono text-[9.5px] tracking-[0.14em] uppercase text-txt-dim mt-1">{t("appTagline")}</span>
             </span>
           </div>
           <div className="flex-1 min-w-2" />

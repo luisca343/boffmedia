@@ -42,6 +42,7 @@ export const SCOPED_NAMESPACES: ReadonlyArray<{
   { prefix: "/smartrotom/rooker", namespaces: ["smartrotom/rooker.json"] },
   { prefix: "/smartrotom/wigglypop", namespaces: ["smartrotom/wigglypop.json"] },
   { prefix: "/smartrotom/pasaporte", namespaces: ["smartrotom/pasaporte.json"] },
+  { prefix: "/otros/mewgenics", namespaces: ["smartrotom/mewgenics.json"] },
 ]
 
 /**

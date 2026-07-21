@@ -160,6 +160,121 @@
         "terms": "Terms",
         "cookies": "Cookies"
       }
+    },
+    "landing": {
+      "stops": {
+        "hero": "Home",
+        "tools": "Tools",
+        "smartrotom": "SmartRotom",
+        "torneos": "Tournaments",
+        "juegos": "Games",
+        "comunidad": "Community",
+        "meta": "Finish"
+      },
+      "minimap": {
+        "ariaLabel": "Journey map"
+      },
+      "countdown": {
+        "days": "Days",
+        "hours": "Hours",
+        "min": "Min",
+        "sec": "Sec",
+        "ariaLabel": "Countdown to next event"
+      },
+      "hero": {
+        "kicker": "Pixelmon Community · One journey",
+        "titleLine1": "Start the",
+        "titleEmphasis": "journey",
+        "titleLine2suffix": "gamer",
+        "lead": "Tools, tournaments, giveaways and community linked in a single journey. Scroll down and let it carry you — every stop lights the next.",
+        "ctaStart": "Begin the journey",
+        "ctaMap": "View the map",
+        "hudCommunityLabel": "Community",
+        "hudCommunityRegistered": "registered users",
+        "hudEventsLabel": "Events",
+        "hudEventsLive": "live now",
+        "hudEventsTotal": "total",
+        "hudFallbackGameLabel": "Session",
+        "hudFallbackGameSub": "active players",
+        "hudFallbackSeasonLabel": "Season",
+        "hudFallbackSeasonSub": "on air",
+        "tagActive": "Journey active",
+        "tagStops": "7 stops · 1 community",
+        "scrollCta": "Scroll to start",
+        "scrollAriaLabel": "Start the journey"
+      },
+      "tools": {
+        "kick": "Stop 01 · Your toolkit",
+        "title": "The <em>toolbox</em>",
+        "lead": "Calculators, simulators and trackers built by and for the community. Fine-tune before every match.",
+        "modulesActive": "{count} active modules",
+        "ctaOpen": "Open the toolbox",
+        "utilitiesActive": "{count} active utilities",
+        "battlesim": { "n": "BattleSim", "d": "VGC doubles battle simulator with expected damage." },
+        "damageCalc": { "n": "Damage Calculator", "d": "VGC and singles ranges instantly, with links." },
+        "tracker": { "n": "VGC Tracker", "d": "Log matches and analyze your performance." },
+        "metaAnalysis": { "n": "Meta Analysis", "d": "Usage, trends and species detail for the VGC meta." },
+        "steamKeys": { "n": "Steam Keys", "d": "Key catalog for giveaways and deliveries." },
+        "tcgPocket": { "n": "TCG Pocket", "d": "Collection, packs and TCG Pocket battles." }
+      },
+      "smartrotom": {
+        "kick": "Stop 02 · Featured product",
+        "title": "Smart<em>Rotom</em>",
+        "lead": "Your in-game smartphone, now in the browser too. Pokédex, maps, economy and messages synced live with your game.",
+        "demoAriaLabel": "SmartRotom demo",
+        "featMultiplatform": "Multiplatform",
+        "featPokedex": "Live Pokédex",
+        "featEconomy": "Live economy",
+        "featMessaging": "Messaging",
+        "ctaView": "View SmartRotom",
+        "ctaNotify": "Notify me"
+      },
+      "torneos": {
+        "kick": "Stop 03 · Competition",
+        "title": "Tournaments every <em>week</em>",
+        "lead": "Live brackets, season ranking and a regional grand final with 96 spots. Glory is earned on the server.",
+        "finalLabel": "Grand final · Bo3",
+        "team1Name": "Team Volt",
+        "team1Seed": "Seed #1",
+        "team2Name": "Team Aqua",
+        "team2Seed": "Seed #2",
+        "mapInGame": "Map 4 · In game",
+        "nextBroadcast": "Next broadcast ·",
+        "ctaTournaments": "View tournaments",
+        "ctaRanking": "View ranking"
+      },
+      "juegos": {
+        "kick": "Stop 04 · Servers",
+        "title": "Choose your <em>game</em>",
+        "lead": "Three worlds, one community. Your next adventure starts at one of these stops.",
+        "enterWorld": "Enter the world",
+        "wingull": { "n": "Pixelmon Wingull 2", "d": "The definitive Pokémon adventure inside Minecraft.", "tag": "Badge — Season 04" },
+        "bingo": { "n": "Minecraft Bingo", "d": "Team objective races, fast editions.", "tag": "Competitive — Weekly" },
+        "zomboff": { "n": "Project ZomBOFF", "d": "Cooperative survival in an infected world.", "tag": "Survival — Special nights" }
+      },
+      "comunidad": {
+        "kick": "Stop 05 · More than a server",
+        "title": "A <em>living</em> community",
+        "leadWithParticipants": "Teams, clans, giveaways and special events. {count} players already compete; only your name is missing from the ranking.",
+        "leadNoParticipants": "Teams, clans, giveaways and special events — only your name is missing from the ranking.",
+        "chipForum": "Forum 24/7",
+        "chipSorteos": "Weekly giveaways",
+        "chipTeams": "Teams and clans",
+        "ctaJoin": "Join",
+        "ctaDiscord": "Discord",
+        "feedWin1": "AxelCraft won a ranked match",
+        "feedGift1": "Key delivered to NovaPixel in the giveaway",
+        "feedJoin1": "Kira_07 joined Team Volt",
+        "feedWin2": "MintLeaf entered the top 5 of the season"
+      },
+      "meta": {
+        "kicker": "End of the journey · Beginning of everything",
+        "titleStart": "Join the",
+        "titleEmphasis": "community",
+        "lead": "Create your account, join the Discord and start your own journey alongside the Pixelmon community.",
+        "ctaRegister": "Create free account",
+        "ctaDiscord": "Join Discord"
+      }
     }
   }
 }

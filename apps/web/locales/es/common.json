@@ -65,6 +65,23 @@
       "remove": "Eliminar",
       "loadMore": "Cargar Más",
       "goBack": "Volver"
+    },
+    "primitives": {
+      "dismiss": "Descartar",
+      "close": "Cerrar",
+      "copy": "Copiar",
+      "copied": "Copiado",
+      "copyCode": "Copiar código",
+      "actions": "Acciones",
+      "loading": "Cargando",
+      "notifications": "Notificaciones",
+      "searchPlaceholder": "Buscar…",
+      "clearSearch": "Limpiar búsqueda",
+      "show": "Mostrar",
+      "hide": "Ocultar",
+      "pagination": "Paginación",
+      "previousPage": "Página anterior",
+      "nextPage": "Página siguiente"
     }
   }
 }

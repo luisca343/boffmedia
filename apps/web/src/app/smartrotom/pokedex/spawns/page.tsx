@@ -1,5 +1,6 @@
 "use client"
 import { useEffect, useState } from "react"
+import { useTranslations } from "next-intl"
 import { CompassIcon } from "lucide-react"
 import { getSpawns } from "@/services/mcef/mcefApi"
 import { usePokedexData } from "@/hooks/usePokedexData"
@@ -22,6 +23,7 @@ function classifyRarity(percentage: number): string {
 }
 
 export default function SpawnsPage() {
+  const t = useTranslations("pokedex")
   const [spawns, setSpawns] = useState<PossibleSpawn[]>([])
   const [tick, setTick] = useState(30)
   const [hideCaught, setHideCaught] = useState(false)
@@ -68,12 +70,12 @@ export default function SpawnsPage() {
     <ScreenShell>
       <PageHead
         icon={CompassIcon}
-        eyebrow="Tiempo real"
-        title="Spawns posibles ahora mismo"
-        desc="Pokémon que pueden aparecer en el mundo en este preciso instante. Se actualiza cada 30 s; las novedades se destacan con un badge NUEVO."
+        eyebrow={t("spawns_eyebrow")}
+        title={t("spawns_title")}
+        desc={t("spawns_desc")}
         meta={
           <>
-            <MetaStat label="Visibles" value={total} />
+            <MetaStat label={t("spawns_visible")} value={total} />
             <span className="inline-flex items-center justify-end gap-1.5 font-pk-mono text-pk-secondary-400">
               <span className="w-1.5 h-1.5 rounded-full bg-pk-secondary-400 shadow-[0_0_6px_#22d3ee] animate-pulse" />⟳ {tick}s
             </span>
@@ -82,7 +84,7 @@ export default function SpawnsPage() {
       />
 
       <div className="flex items-center gap-3 flex-wrap bg-white/[0.02] border border-white/[0.05] rounded-xl p-2.5">
-        <span className="font-pk-mono text-[11px] tracking-[0.1em] uppercase text-pk-surface-400 mr-1">Ocultar</span>
+        <span className="font-pk-mono text-[11px] tracking-[0.1em] uppercase text-pk-surface-400 mr-1">{t("spawns_hide")}</span>
         <div className="flex gap-1.5">
           <button
             onClick={() => setHideCaught((c) => !c)}
@@ -92,7 +94,7 @@ export default function SpawnsPage() {
             }`}
           >
             <StatusPill status="caught" size="sm" showLabel={false} />
-            Capturados
+            {t("spawns_captured")}
           </button>
           <button
             onClick={() => setHideSeen((c) => !c)}
@@ -102,16 +104,16 @@ export default function SpawnsPage() {
             }`}
           >
             <StatusPill status="seen" size="sm" showLabel={false} />
-            Avistados
+            {t("spawns_seen")}
           </button>
         </div>
         <span className="ml-auto text-[11px] text-pk-surface-500 font-pk-mono">
-          visibles <b className="text-pk-surface-100">{total}</b> de {spawns.length}
+          {t("spawns_visible_of")} <b className="text-pk-surface-100">{total}</b> {t("spawns_of")} {spawns.length}
         </span>
       </div>
 
       {total === 0 ? (
-        <div className="bg-white/[0.02] border border-white/[0.05] rounded-xl p-8 text-center text-pk-surface-400 text-sm">No hay Pokémon apareciendo ahora mismo.</div>
+        <div className="bg-white/[0.02] border border-white/[0.05] rounded-xl p-8 text-center text-pk-surface-400 text-sm">{t("spawns_no_pokemon")}</div>
       ) : (
         RARITY_ORDER.map((gid) => {
           const items = grouped[gid]

@@ -1,5 +1,6 @@
 import * as React from "react"
 import { cn } from "@/lib/utils"
+import { useTranslations } from "next-intl"
 import { Icon } from "./icon"
 
 function pagerItems(page: number, total: number): (number | "…")[] {
@@ -30,11 +31,13 @@ export interface PaginationProps {
   className?: string
 }
 
-export function Pagination({ page, total, onChange, ariaLabel = "Paginación", className }: PaginationProps) {
+export function Pagination({ page, total, onChange, ariaLabel, className }: PaginationProps) {
+  const t = useTranslations("common.primitives")
+  const resolvedAriaLabel = ariaLabel ?? t("pagination")
   const go = (p: number) => onChange?.(Math.min(total, Math.max(1, p)))
   return (
-    <nav aria-label={ariaLabel} className={cn("inline-flex items-center gap-[5px]", className)}>
-      <button type="button" className={BTN} disabled={page <= 1} aria-label="Página anterior" onClick={() => go(page - 1)}>
+    <nav aria-label={resolvedAriaLabel} className={cn("inline-flex items-center gap-[5px]", className)}>
+      <button type="button" className={BTN} disabled={page <= 1} aria-label={t("previousPage")} onClick={() => go(page - 1)}>
         <Icon name="back" size={14} />
       </button>
       {pagerItems(page, total).map((p, i) =>
@@ -59,7 +62,7 @@ export function Pagination({ page, total, onChange, ariaLabel = "Paginación", c
           </button>
         ),
       )}
-      <button type="button" className={BTN} disabled={page >= total} aria-label="Página siguiente" onClick={() => go(page + 1)}>
+      <button type="button" className={BTN} disabled={page >= total} aria-label={t("nextPage")} onClick={() => go(page + 1)}>
         <Icon name="arrow" size={14} />
       </button>
     </nav>

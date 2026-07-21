@@ -7,10 +7,12 @@ import useSocketStore from "@/stores/useSocketStore"
 import { type CallData, type UserData, UserStatus } from "../types/call"
 import { ExpandedView } from "./ExpandedView"
 import { CollapsedView } from "./CollapsedView"
+import { useTranslations } from "next-intl"
 
 export function CallStatus() {
   const { socket } = useSocketStore()
   const { session } = useBoffSession()
+  const t = useTranslations("smartrotom.calls")
   const [activeCall, setActiveCall] = useState<CallData>({
     users: [],
     caller: "",
@@ -24,7 +26,7 @@ export function CallStatus() {
     const intervalId = setInterval(() => {
       const activeUser = activeCall.users.find((user) => user.uuid === getSmartRotomUser(session).uuid)
       if (callStartTime && Date.now() - callStartTime > 3000000 && activeUser?.status === UserStatus.RINGING) {
-        toast.error("Llamada perdida")
+        toast.error(t("missed"))
         exitCall()
       }
     }, 1000)

@@ -14,6 +14,7 @@ import { ArrowRightIcon } from "lucide-react"
 import PokemonList from "./_components/PokemonList"
 import { TypeEffectivenessSection } from "./_components/TypeEffectivenessSection"
 import { PalettesSection } from "./_components/PalettesSection"
+import { getTranslations } from "next-intl/server"
 
 function SectionHead({
   num,
@@ -42,6 +43,7 @@ function SectionHead({
 }
 
 export default async function EntradaPokedex({ params }: any) {
+  const t = await getTranslations("pokedex")
   const resolvedParams = await params
   if (!resolvedParams.params) return <PokemonList />
 
@@ -55,7 +57,7 @@ export default async function EntradaPokedex({ params }: any) {
 
   if (pokemonIndex === undefined) pokemonIndex = 0
 
-  if (!pokemon?.forms) return <h1 className="p-6 text-pk-surface-100">Pokémon no encontrado {pokemonIndex}</h1>
+  if (!pokemon?.forms) return <h1 className="p-6 text-pk-surface-100">{t("entrada_pokemon_not_found", { id: pokemonIndex })}</h1>
 
   if (formIndex === undefined) {
     formIndex = 0
@@ -72,7 +74,7 @@ export default async function EntradaPokedex({ params }: any) {
   const movesRes = await PokemonService.getMoves(pokemonIndex, formIndex)
   const moves = movesRes.success ? movesRes.data : undefined
 
-  if (!pokemon.forms[formIndex]) return <h1 className="p-6 text-pk-surface-100">Forma no encontrada {formIndex}</h1>
+  if (!pokemon.forms[formIndex]) return <h1 className="p-6 text-pk-surface-100">{t("entrada_form_not_found", { id: formIndex })}</h1>
 
   const formName = getFormName(pokemon, formIndex)
   const spawnsRes = await PokemonService.getSpawns(getPokemonId(pokemon.name, formName))
@@ -100,28 +102,28 @@ export default async function EntradaPokedex({ params }: any) {
         </section>
 
         <section id="evo" className="scroll-mt-[130px]">
-          <SectionHead num="02" title="Cadena evolutiva" />
+          <SectionHead num="02" title={t("entrada_evolution_chain")} />
           <EvoTree params={{ id: pokemon.dex.toString() }} />
         </section>
 
         <section id="stats" className="scroll-mt-[130px]">
-          <SectionHead num="03" title="Estadísticas base" sub="Nivel 100 · 31 IVs · 252 EVs" />
+          <SectionHead num="03" title={t("entrada_base_stats")} sub={t("entrada_stats_sub")} />
           <StatsTable pokemon={pokemon} formIndex={formIndex} />
         </section>
 
         <section id="effect" className="scroll-mt-[130px]">
-          <SectionHead num="04" title="Efectividades de tipo" />
+          <SectionHead num="04" title={t("entrada_type_effectiveness")} />
           <TypeEffectivenessSection type1={type1} type2={type2} />
         </section>
 
         <section id="spawns" className="scroll-mt-[130px]">
           <SectionHead
             num="05"
-            title="Localizaciones de spawn"
+            title={t("entrada_spawn_locations")}
             meta={`(${spawns?.length ?? 0})`}
             action={
               <Link href="/smartrotom/pokedex/spawns" className="inline-flex items-center gap-1 text-xs text-pk-surface-400 hover:text-pk-primary-300 transition-colors">
-                Ver tabla completa <ArrowRightIcon className="w-3 h-3" />
+                {t("entrada_view_full_table")} <ArrowRightIcon className="w-3 h-3" />
               </Link>
             }
           />
@@ -129,12 +131,12 @@ export default async function EntradaPokedex({ params }: any) {
         </section>
 
         <section id="moves" className="scroll-mt-[130px]">
-          <SectionHead num="06" title="Movimientos" />
+          <SectionHead num="06" title={t("entrada_moves")} />
           <UnifiedMovesTable pokemon={pokemon} formIndex={formIndex} moveData={moves} />
         </section>
 
         <section id="variants" className="scroll-mt-[130px]">
-          <SectionHead num="07" title="Variantes y variocolor" />
+          <SectionHead num="07" title={t("entrada_variants_and_shiny")} />
           <PalettesSection palettes={palettes} pokemonIndex={pokemonIndex} formName={formName} />
         </section>
       </div>

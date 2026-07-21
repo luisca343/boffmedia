@@ -55,7 +55,7 @@ export function SpawnTile({
             className="absolute top-1.5 right-1.5 font-pk-mono text-[8px] font-bold tracking-widest px-1 py-px rounded"
             style={{ background: accent, color: "#030609" }}
           >
-            NUEVO
+            {t("spawntile_new")}
           </span>
         )}
         {spriteUrl && (

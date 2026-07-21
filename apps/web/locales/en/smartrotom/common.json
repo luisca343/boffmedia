@@ -1,0 +1,114 @@
+{
+  "smartrotom": {
+    "settings": {
+      "themes": "Themes",
+      "themeHint": "Apps with their own theme (Chat, Notes) display in",
+      "dark": "dark",
+      "light": "light",
+      "session": "Session",
+      "signIn": "Sign in",
+      "signOut": "Sign out",
+      "copied": "Copied",
+      "token": "Token"
+    },
+    "error": {
+      "detected": "Error Detected",
+      "retry": "Retry",
+      "showHelp": "Show help",
+      "unknown": "Unknown error",
+      "possibleCauses": "Possible causes:",
+      "solutions": "Solutions:"
+    },
+    "auth": {
+      "linkAccount": "Link Account",
+      "linkExisting": "Link Existing Account",
+      "createNew": "Create New Account",
+      "minecraftUser": "Minecraft User:",
+      "linkPrompt": "To continue, you need to link your BoffMedia account",
+      "hasAccount": "I have a BoffMedia account",
+      "createAccount": "Create new account",
+      "cancelLink": "Cancel Linking",
+      "username": "Username",
+      "password": "Password",
+      "email": "Email",
+      "confirmPassword": "Confirm Password",
+      "back": "Back",
+      "link": "Link",
+      "linking": "Linking...",
+      "create": "Create Account",
+      "creating": "Creating...",
+      "linkSuccess": "Account linked successfully",
+      "createSuccess": "Account created and linked successfully",
+      "linkError": "Error linking account",
+      "minecraftLinkError": "Error linking Minecraft account",
+      "createError": "Error creating account",
+      "loginNewError": "Error signing in with new account",
+      "passwordMismatch": "Passwords do not match"
+    },
+    "notFound": {
+      "title": "404",
+      "message": "Page not found."
+    },
+    "appError": {
+      "crashed": "This app has crashed",
+      "retry": "Retry",
+      "backToMenu": "Back to menu"
+    },
+    "nav": {
+      "settings": "Settings",
+      "close": "Close",
+      "language": "Language",
+      "connected": "Connected with id {id}",
+      "disconnected": "Not connected"
+    },
+    "calls": {
+      "missed": "Missed call",
+      "calling": "Calling...",
+      "connecting": "Connecting...",
+      "encrypted": "End-to-end encrypted call",
+      "participants": "{count} participants",
+      "yourCall": "Your call",
+      "incoming": "Incoming call",
+      "minimize": "Minimize",
+      "mute": "Mute",
+      "muted": "Muted",
+      "camera": "Camera",
+      "cameraOff": "No camera",
+      "speaker": "Speaker",
+      "accept": "Accept",
+      "hangUp": "Hang up",
+      "expand": "Expand"
+    },
+    "clock": {
+      "rainExpected": "Rain expected at",
+      "clearExpected": "Clear at"
+    },
+    "appGrid": {
+      "updatingOrder": "Updating order..."
+    },
+    "languageSwitcher": {
+      "label": "Language:"
+    },
+    "notLinked": {
+      "smartrotomMessage": "SmartRotom user not linked. Access Minecraft before using the web.",
+      "smartrotomCauses": [
+        "You have not logged into Minecraft",
+        "Minecraft session data is invalid"
+      ],
+      "smartrotomSolutions": [
+        "Log into Minecraft first",
+        "Restart the Minecraft client",
+        "Contact support if the problem persists"
+      ],
+      "boffmediaMessage": "BoffMedia user not linked",
+      "boffmediaCauses": [
+        "You have not linked your BoffMedia account",
+        "The connection to BoffMedia has failed"
+      ],
+      "boffmediaSolutions": [
+        "Link your BoffMedia account in settings",
+        "Log out and log back in"
+      ]
+    }
+  }
+}

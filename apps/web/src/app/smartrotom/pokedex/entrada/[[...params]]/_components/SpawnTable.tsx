@@ -19,8 +19,8 @@ export function SpawnTable({ spawns }: { spawns: SpawnInfo[] }) {
     return (
       <div className="bg-white/[0.02] border border-white/[0.05] rounded-xl p-8 text-center">
         <MapPinIcon className="h-12 w-12 mx-auto text-pk-surface-400 mb-3" />
-        <div className="text-xl text-pk-surface-300">Sin apariciones</div>
-        <div className="text-sm text-pk-surface-400 mt-2">Este Pokémon no aparece de forma salvaje.</div>
+        <div className="text-xl text-pk-surface-300">{t("spawn_no_appearances")}</div>
+        <div className="text-sm text-pk-surface-400 mt-2">{t("spawn_wild_message")}</div>
       </div>
     )
   }
@@ -33,7 +33,7 @@ export function SpawnTable({ spawns }: { spawns: SpawnInfo[] }) {
           ?.filter((biome) => !biome.includes("biomesoplenty") && !biome.includes("terraforged"))
           .map((biome) => ({ biome, translated: t(`${biome.replace(" ", "_").replace(":", "_")}`) }))
 
-        const times = spawn.condition?.times?.map((time) => t(`${time.toLowerCase()}`)) || ["Cualquier momento"]
+        const times = spawn.condition?.times?.map((time) => t(`${time.toLowerCase()}`)) || [t("spawn_any_time")]
         const method = spawn.stringLocationTypes?.[0] || "Tierra"
         const levels = `${spawn.minLevel}-${spawn.maxLevel}`
 
@@ -49,7 +49,7 @@ export function SpawnTable({ spawns }: { spawns: SpawnInfo[] }) {
 
             <div>
               <div className="font-pk-display font-semibold text-sm text-pk-surface-50 mb-1.5">
-                {biomas?.map((b) => b.translated).join(", ") || "Bioma desconocido"}
+                {biomas?.map((b) => b.translated).join(", ") || t("spawn_unknown_biome")}
               </div>
               <div className="flex flex-wrap gap-1.5">
                 <span className="inline-flex items-center gap-1 text-[11px] text-pk-surface-300 bg-white/[0.04] px-2 py-0.5 rounded">{method}</span>

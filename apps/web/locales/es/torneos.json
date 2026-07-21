@@ -1,0 +1,161 @@
+{
+  "torneos": {
+    "listing": {
+      "section": "Comunidad",
+      "title": "Torneos",
+      "subtitle": "Brackets de eliminación, ligas, grupos y clasificaciones de la comunidad Boffmedia.",
+      "filterAriaLabel": "Filtrar torneos",
+      "filterAll": "Todos",
+      "filterLive": "En vivo",
+      "filterRegistration": "Registro",
+      "filterCompleted": "Finalizados",
+      "searchPlaceholder": "Buscar torneo o juego…",
+      "searchAriaLabel": "Buscar torneos",
+      "empty": "Aún no hay torneos.",
+      "players": "{count} jugadores"
+    },
+    "status": {
+      "draft": "Borrador",
+      "registration": "Inscripciones abiertas",
+      "live": "En vivo",
+      "completed": "Finalizado",
+      "cancelled": "Cancelado"
+    },
+    "detail": {
+      "section": "Torneo",
+      "participants": "{count}{max} participantes",
+      "registrationDeadline": "Inscripciones hasta el {date}",
+      "notFound": "Torneo no encontrado",
+      "backToList": "Volver a torneos",
+      "rulesTitle": "Reglas",
+      "prizesTitle": "Premios",
+      "myMatchBanner": "Tu partida está lista — únete a la mesa para jugar y reportar el resultado.",
+      "myMatchCta": "Ir a mi partida →",
+      "rosterEmpty": "Sin participantes aún. ¡Sé el primero!",
+      "rosterTitle": "Participantes · {count}"
+    },
+    "checkin": {
+      "doCheckin": "Registrarse",
+      "undoCheckin": "✓ Registrado — deshacer",
+      "toastDone": "¡Registrado!",
+      "toastUndo": "Registro deshecho"
+    },
+    "score": {
+      "submitBtn": "Enviar puntuación",
+      "modalTitle": "Enviar puntuación",
+      "fieldLabel": "Puntuación",
+      "fieldLabelWithUnit": "Puntuación ({unit})",
+      "evidenceLabel": "Evidencia (clip, captura… — opcional)",
+      "evidencePlaceholder": "https://…",
+      "note": "Cada envío reemplaza tu puntuación anterior y queda pendiente de verificación del administrador.",
+      "cancel": "Cancelar",
+      "submit": "Enviar",
+      "validationRequired": "Introduce tu puntuación",
+      "toastOk": "Puntuación enviada — pendiente de verificación"
+    },
+    "register": {
+      "loginPrompt": "Inicia sesión para registrarte",
+      "registerBtn": "Registrarse",
+      "withdrawBtn": "Cancelar inscripción",
+      "toastRegistered": "¡Inscrito en el torneo!",
+      "toastWithdrawn": "Inscripción cancelada",
+      "teamModalTitle": "Registrar equipo",
+      "teamSubmitBtn": "Registrar",
+      "teamNameLabel": "Nombre del equipo",
+      "teamTagLabel": "Etiqueta",
+      "teamMembersLabel": "Miembros (opcional)",
+      "teamMemberPlaceholder": "Jugador {n}",
+      "teamAddMember": "+ Añadir miembro",
+      "teamNameRequired": "El nombre del equipo es obligatorio",
+      "cancel": "Cancelar"
+    },
+    "match": {
+      "notFound": "Partida no encontrada",
+      "backToTournament": "Volver al torneo",
+      "meFallback": "Tú"
+    },
+    "chat": {
+      "title": "Chat de mesa",
+      "judgeRequested": "Juez notificado",
+      "requestJudge": "Solicitar juez",
+      "judgeToast": "Juez notificado",
+      "empty": "La mesa está abierta. ¡Buena suerte!",
+      "judgeSuffix": "juez",
+      "judgeFallback": "Staff",
+      "playerFallback": "Jugador",
+      "placeholder": "Escribe un mensaje… (comparte tu ID de batalla)",
+      "send": "Enviar"
+    },
+    "report": {
+      "title": "Reportar partidas",
+      "phaseVerified": "Verificado",
+      "phaseAwaiting": "Esperando confirmación",
+      "phaseDispute": "En disputa",
+      "phaseIncoming": "Tu turno para verificar",
+      "incomingInfo": "ha reportado el resultado. Revísalo y verifica si es correcto.",
+      "gameLabel": "Partida {n}",
+      "win": "Victoria",
+      "loss": "Derrota",
+      "footerHint": "Marca el resultado de cada partida",
+      "resultWin": "Ganas esta partida {w}-{l}",
+      "resultLoss": "Pierdes esta partida {l}-{w}",
+      "resultNone": "Marca el resultado",
+      "submit": "Enviar reporte",
+      "incomingScore": "Según {oppName}: {score} a su favor",
+      "dispute": "Disputar",
+      "verify": "Verificar",
+      "verifiedScore": "Resultado verificado {score}.",
+      "verifiedWin": "¡Victoria!",
+      "verifiedLoss": "Derrota — a por la siguiente.",
+      "disputeTitle": "Resultado en disputa.",
+      "disputeBody": "Un juez revisará la mesa. Usa el chat para explicar qué pasó.",
+      "awaitingReported": "Reportaste {score}",
+      "awaitingCountdownLabel": "Auto-verificar en",
+      "awaitingNote": "El reporte aparece al instante en la mesa de {oppName}. Si no responde a tiempo se validará automáticamente para mantener el torneo en marcha.",
+      "cancel": "Cancelar"
+    },
+    "spectator": {
+      "done": "Resultado",
+      "playing": "En juego",
+      "disputed": "En disputa"
+    },
+    "teamsheet": {
+      "title": "Mi equipo",
+      "update": "Actualizar",
+      "info": "Tu oponente en cada ronda verá esta hoja (open teamsheet). Pega tu equipo exportado de Pokémon Showdown.",
+      "parsedCount": "{count} Pokémon detectados",
+      "formatHint": "Formato Showdown",
+      "save": "Guardar",
+      "cancel": "Cancelar",
+      "validationPaste": "Pega tu equipo en formato Showdown",
+      "toastOk": "Hoja de equipo guardada"
+    },
+    "view": {
+      "thirdPlace": "Tercer puesto",
+      "phaseAriaLabel": "Fase del torneo"
+    },
+    "league": {
+      "tableTab": "Tabla",
+      "crossTab": "Cruces",
+      "ariaLabel": "Vista de liga"
+    },
+    "swiss": {
+      "standingsTab": "Clasificación",
+      "pairingsTab": "Emparejamientos",
+      "ariaLabel": "Vista suiza",
+      "colRank": "#",
+      "colCompetitor": "Competidor",
+      "colPlayed": "PJ",
+      "colRecord": "V-D",
+      "colFullRecord": "V-E-D",
+      "colPoints": "Pts",
+      "cutRecord": "Corte · {maxLosses} derrotas",
+      "cutTopN": "Corte · top {count}",
+      "cutTopOrRecord": "Corte · top {count} + {maxLosses} derrotas",
+      "cut": "Corte"
+    },
+    "sr": {
+      "title": "Torneos"
+    }
+  }
+}

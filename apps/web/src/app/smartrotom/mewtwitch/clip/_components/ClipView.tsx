@@ -1,18 +1,20 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import { useTranslations } from "next-intl"
 import { useClip } from "../../_hooks/useTwitch"
 import { compactCount } from "../../_utils/twitch"
 import { getTimeSince } from "../../_utils/format"
 
 export function ClipView({ id }: { id: string }) {
+  const t = useTranslations("twitch")
   const clip = useClip(id)
   const [host, setHost] = useState("")
   useEffect(() => setHost(window.location.hostname), [])
   const c = clip.data
 
-  if (clip.isLoading) return <div className="p-6 text-sm text-mw-fg-faint">Cargando clip…</div>
-  if (!c) return <div className="p-6 text-sm text-mw-fg-faint">No se encontró el clip.</div>
+  if (clip.isLoading) return <div className="p-6 text-sm text-mw-fg-faint">{t("clip.loading")}</div>
+  if (!c) return <div className="p-6 text-sm text-mw-fg-faint">{t("clip.notFound")}</div>
 
   return (
     <div className="mx-auto max-w-[1100px] px-4 pb-20 pt-6 md:px-10">
@@ -30,13 +32,13 @@ export function ClipView({ id }: { id: string }) {
       <div className="flex flex-wrap items-center gap-2 text-[13px] text-mw-fg-mute">
         <span className="font-semibold text-mw-fg">{c.broadcaster_name}</span>
         <span>·</span>
-        <span>{compactCount(c.view_count)} visitas</span>
+        <span>{compactCount(c.view_count)} {t("clip.views")}</span>
         <span>·</span>
         <span>{getTimeSince(c.created_at)}</span>
         {c.creator_name && (
           <>
             <span>·</span>
-            <span>clip de {c.creator_name}</span>
+            <span>{t("clip.byCreator", { creator: c.creator_name })}</span>
           </>
         )}
       </div>

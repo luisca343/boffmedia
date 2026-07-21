@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { useSession } from "next-auth/react"
+import { useTranslations } from "next-intl"
 import { Button, Field, Input, Modal, toast } from "@/components/boffmedia/primitives"
 import {
   TournamentsService,
@@ -16,6 +17,7 @@ export function RegisterButton({
   detail: TournamentDetailApi
   onChange: () => void
 }) {
+  const t = useTranslations("torneos.register")
   const { status } = useSession()
   const [busy, setBusy] = useState(false)
   const [teamOpen, setTeamOpen] = useState(false)
@@ -25,7 +27,7 @@ export function RegisterButton({
   if (status !== "authenticated") {
     return (
       <Button href="/entrar" size="sm">
-        Inicia sesión para apuntarte
+        {t("loginPrompt")}
       </Button>
     )
   }
@@ -41,7 +43,7 @@ export function RegisterButton({
     setBusy(false)
     if (r.error) toast.error(r.error)
     else {
-      toast.success("¡Inscrito en el torneo!")
+      toast.success(t("toastRegistered"))
       setTeamOpen(false)
       onChange()
     }
@@ -53,7 +55,7 @@ export function RegisterButton({
     setBusy(false)
     if (r.error) toast.error(r.error)
     else {
-      toast("Inscripción cancelada")
+      toast(t("toastWithdrawn"))
       onChange()
     }
   }
@@ -61,7 +63,7 @@ export function RegisterButton({
   if (registered) {
     return (
       <Button size="sm" disabled={busy} onClick={doWithdraw}>
-        Cancelar inscripción
+        {t("withdrawBtn")}
       </Button>
     )
   }
@@ -75,7 +77,7 @@ export function RegisterButton({
         disabled={busy}
         onClick={() => (isTeam ? setTeamOpen(true) : submitRegister({}))}
       >
-        Apuntarme
+        {t("registerBtn")}
       </Button>
       {isTeam && (
         <TeamRegisterModal
@@ -100,12 +102,13 @@ function TeamRegisterModal({
   onClose: () => void
   onSubmit: (body: { name?: string; tag?: string; roster?: { name: string }[] }) => void
 }) {
+  const t = useTranslations("torneos.register")
   const [name, setName] = useState("")
   const [tag, setTag] = useState("")
   const [members, setMembers] = useState<string[]>([""])
 
   const submit = () => {
-    if (!name.trim()) return toast.error("El nombre del equipo es obligatorio")
+    if (!name.trim()) return toast.error(t("teamNameRequired"))
     const roster = members
       .map((m) => m.trim())
       .filter(Boolean)
@@ -121,30 +124,30 @@ function TeamRegisterModal({
     <Modal
       open={open}
       onClose={onClose}
-      title="Inscribir equipo"
+      title={t("teamModalTitle")}
       footer={
         <div className="flex justify-end gap-2">
           <Button size="sm" onClick={onClose}>
-            Cancelar
+            {t("cancel")}
           </Button>
           <Button variant="pri" size="sm" disabled={busy} onClick={submit}>
-            Inscribir
+            {t("teamSubmitBtn")}
           </Button>
         </div>
       }
     >
       <div className="grid gap-3">
         <div className="grid gap-3 sm:grid-cols-[1fr_auto]">
-          <Field label="Nombre del equipo">
+          <Field label={t("teamNameLabel")}>
             <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Team Rocket" />
           </Field>
-          <Field label="Tag">
+          <Field label={t("teamTagLabel")}>
             <Input value={tag} onChange={(e) => setTag(e.target.value)} placeholder="TR" className="w-24" />
           </Field>
         </div>
         <div className="grid gap-1.5">
           <span className="font-mono text-[11px] uppercase tracking-[0.08em] text-txt-dim">
-            Miembros (opcional)
+            {t("teamMembersLabel")}
           </span>
           {members.map((m, i) => (
             <div key={i} className="flex items-center gap-2">
@@ -153,7 +156,7 @@ function TeamRegisterModal({
                 onChange={(e) =>
                   setMembers((cur) => cur.map((x, j) => (j === i ? e.target.value : x)))
                 }
-                placeholder={`Jugador ${i + 1}`}
+                placeholder={t("teamMemberPlaceholder", { n: i + 1 })}
               />
               {members.length > 1 && (
                 <button
@@ -171,7 +174,7 @@ function TeamRegisterModal({
             onClick={() => setMembers((cur) => [...cur, ""])}
             className="justify-self-start font-mono text-[11px] text-accent transition-opacity hover:opacity-70"
           >
-            + Añadir miembro
+            {t("teamAddMember")}
           </button>
         </div>
       </div>

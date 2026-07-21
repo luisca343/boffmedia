@@ -24,7 +24,8 @@ import { useTranslations } from "next-intl";
 export function RotomNav() {
   const { socket, connect } = useSocketStore();
   const { session } = useBoffSession();
-  const t = useTranslations("nav.notifications");
+  const tNotif = useTranslations("nav.notifications");
+  const t = useTranslations("smartrotom.nav");
 
   const [notifications, setNotifications] = useState<NotificationResponseDto[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -93,7 +94,7 @@ export function RotomNav() {
         title={
           <span className="flex items-center gap-2">
             <Bell className="text-sr-accent" size={15} />
-            {t("title")}
+            {tNotif("title")}
           </span>
         }
         aside={
@@ -104,10 +105,10 @@ export function RotomNav() {
       >
         <div className="p-3 space-y-2 max-h-80 overflow-y-auto">
           {isLoading && (
-            <p className="text-sr-txt-muted text-xs text-center py-4">{t("loading")}</p>
+            <p className="text-sr-txt-muted text-xs text-center py-4">{tNotif("loading")}</p>
           )}
           {!isLoading && notifications.length === 0 && (
-            <p className="text-sr-txt-muted text-xs text-center py-4">{t("emptyState")}</p>
+            <p className="text-sr-txt-muted text-xs text-center py-4">{tNotif("emptyState")}</p>
           )}
           {notifications.map((notif) => (
             <div
@@ -137,10 +138,10 @@ export function RotomNav() {
                     size="sm"
                     className="!py-1 !px-2 text-[11px]"
                     onClick={() => handleMarkRead(notif.id)}
-                    aria-label={t("markRead")}
+                    aria-label={tNotif("markRead")}
                   >
                     <Check size={12} className="mr-1" />
-                    {t("markRead")}
+                    {tNotif("markRead")}
                   </SmartRotomButton>
                 </div>
               )}
@@ -156,7 +157,7 @@ export function RotomNav() {
               onClick={handleMarkAllRead}
             >
               <Check size={12} className="mr-1" />
-              {t("markAllRead")}
+              {tNotif("markAllRead")}
             </SmartRotomButton>
           </footer>
         )}
@@ -180,16 +181,16 @@ export function RotomNav() {
         </SrSheetTrigger>
         <SrSheetContent
           side="top"
-          label="Ajustes"
+          label={t("settings")}
           className="bg-sr-panel text-sr-txt border-b border-sr-line max-h-[80vh] overflow-y-auto"
         >
           <SrSheetClose className="absolute right-4 top-4 rounded-sm opacity-70 transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-offset-2 ring-offset-sr-panel focus:ring-sr-accent">
             <X className="h-4 w-4" />
-            <span className="sr-only">Cerrar</span>
+            <span className="sr-only">{t("close")}</span>
           </SrSheetClose>
           <SrSheetHeader className="mb-4">
             <SrSheetTitle className="text-sr-txt font-display not-italic uppercase tracking-[0.05em] text-lg">
-              Ajustes
+              {t("settings")}
             </SrSheetTitle>
           </SrSheetHeader>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -200,7 +201,7 @@ export function RotomNav() {
               <div className="flex items-center gap-2 mb-3">
                 <Globe size={16} className="text-sr-accent" />
                 <h3 className="font-display text-sm font-bold not-italic uppercase tracking-[0.06em] text-sr-txt">
-                  Idioma
+                  {t("language")}
                 </h3>
               </div>
               <div className="bg-sr-panel-2 border border-sr-line p-4 cut-corner [--cut-lg:12px]">
@@ -221,7 +222,7 @@ export function RotomNav() {
         >
           <SrSheetClose className="absolute right-4 top-4 cut [--cut:6px] p-1.5 opacity-90 transition-opacity hover:opacity-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-sr-accent bg-sr-accent text-sr-accent-ink z-10">
             <X className="h-4 w-4" />
-            <span className="sr-only">Cerrar</span>
+            <span className="sr-only">{t("close")}</span>
           </SrSheetClose>
           <div className="h-full overflow-hidden">
             <FicusAI />
@@ -253,8 +254,9 @@ export function RotomNav() {
 
 function SocketStatus({ socket }: { socket: Socket | null }) {
   const connected = Boolean(socket && socket.connected);
+  const t = useTranslations("smartrotom.nav");
   return (
-    <SrTooltip content={connected ? `Conectado con id ${socket?.id}` : "No conectado"}>
+    <SrTooltip content={connected ? t("connected", { id: socket?.id ?? "" }) : t("disconnected")}>
       <div className="cursor-pointer h-10 flex items-center px-1.5">
         <span
           className={cn(

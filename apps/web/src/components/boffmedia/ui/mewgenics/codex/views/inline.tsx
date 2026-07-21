@@ -1,11 +1,12 @@
 "use client"
 
 import { Icon, type IconName } from "@/components/boffmedia/primitives"
+import { useTranslations } from "next-intl"
 import { MewKind, MewRarity, MewText, MewTile } from "../../MewAtoms"
 import { select } from "../../mew-store"
 import { mewClip, mewHuman } from "../../mew-util"
 import { MewRef, type NavFn } from "../MewRefs"
-import { MEW_TARGET_MODE, abilityRange } from "./ability-format"
+import { getTargetMode, abilityRange } from "./ability-format"
 
 // Compact embedded cards for 1:1 references — inline the target's key facts (with a
 // click to open its full fiche) instead of a hover-only pill.
@@ -52,6 +53,8 @@ function factLabel(label: string, value: React.ReactNode) {
 
 /** Compact card for an ability referenced 1:1 (item «Uso», enemy attack, chain). */
 export function MewAbilityInline({ id, onNav, label }: { id: string; onNav: NavFn; label?: string }) {
+  const t = useTranslations("mewgenics")
+  const TARGET_MODE = getTargetMode(t)
   const ab = select.get("abilities", id)
   if (!ab) return <MewRef id={id} cat="abilities" icon="bolt" onNav={onNav} label={label} />
   const cost = ab.cost || {}
@@ -61,11 +64,11 @@ export function MewAbilityInline({ id, onNav, label }: { id: string; onNav: NavF
   const effNames = dmg.effects ? Object.keys(dmg.effects).map((k) => (select.effect(k)?.rec.name ?? mewHuman(k))) : []
   const facts = (
     <>
-      {tgt.target_mode && factLabel("Obj", MEW_TARGET_MODE[tgt.target_mode] || mewHuman(tgt.target_mode))}
-      {range && factLabel("Alc", range)}
-      {dmg.damage != null && factLabel("Daño", String(dmg.damage))}
-      {dmg.heal != null && factLabel("Cura", String(dmg.heal))}
-      {effNames.length > 0 && factLabel("Aplica", effNames.slice(0, 4).join(" · "))}
+      {tgt.target_mode && factLabel(t("inline.targetAbbr"), TARGET_MODE[tgt.target_mode] || mewHuman(tgt.target_mode))}
+      {range && factLabel(t("inline.rangeAbbr"), range)}
+      {dmg.damage != null && factLabel(t("inline.damageAbbr"), String(dmg.damage))}
+      {dmg.heal != null && factLabel(t("inline.healAbbr"), String(dmg.heal))}
+      {effNames.length > 0 && factLabel(t("inline.appliesAbbr"), effNames.slice(0, 4).join(" · "))}
     </>
   )
   const badges = (
@@ -80,6 +83,7 @@ export function MewAbilityInline({ id, onNav, label }: { id: string; onNav: NavF
 
 /** Compact card for an item referenced 1:1 (class innate weapon). */
 export function MewItemInline({ id, onNav }: { id: string; onNav: NavFn }) {
+  const t = useTranslations("mewgenics")
   const it = select.get("items", id)
   if (!it) return <MewRef id={id} cat="items" icon="sword" onNav={onNav} />
   const passNames = it.passives ? Object.keys(it.passives).map((k) => (select.effect(k)?.rec.name ?? mewHuman(k))) : []
@@ -91,9 +95,9 @@ export function MewItemInline({ id, onNav }: { id: string; onNav: NavFn }) {
   )
   const facts = (
     <>
-      {it.shield != null && factLabel("Escudo", String(it.shield))}
-      {it.durability != null && factLabel("Durab", String(it.durability))}
-      {passNames.length > 0 && factLabel("Pasivas", passNames.slice(0, 4).join(" · "))}
+      {it.shield != null && factLabel(t("inline.shieldAbbr"), String(it.shield))}
+      {it.durability != null && factLabel(t("inline.durabilityAbbr"), String(it.durability))}
+      {passNames.length > 0 && factLabel(t("inline.passivesAbbr"), passNames.slice(0, 4).join(" · "))}
     </>
   )
   const hasFacts = it.shield != null || it.durability != null || passNames.length > 0

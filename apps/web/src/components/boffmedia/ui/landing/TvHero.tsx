@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { Kicker, Button, CountUp } from "@/components/boffmedia/primitives"
 import { Decode, FxParticles } from "./travesia-fx"
@@ -10,6 +11,7 @@ import { useTvMouseVar } from "./landing-hooks"
 import { useSiteStats } from "@/hooks/community/useCommunity"
 
 export function TvHero({ lvl, density }: { lvl: number; density: number }) {
+  const t = useTranslations("boffmedia.landing.hero")
   const artRef = React.useRef<HTMLDivElement>(null)
   useTvMouseVar(artRef)
   const { stats } = useSiteStats()
@@ -17,11 +19,11 @@ export function TvHero({ lvl, density }: { lvl: number; density: number }) {
   // while loading or if the API is unavailable (keeps the hero visually stable).
   const hud = stats
     ? [
-        { k: "Comunidad", big: String(stats.users), suf: "+", sub: "usuarios registrados", live: false },
+        { k: t("hudCommunityLabel"), big: String(stats.users), suf: "+", sub: t("hudCommunityRegistered"), live: false },
         {
-          k: "Eventos",
+          k: t("hudEventsLabel"),
           big: String(stats.activeEvents > 0 ? stats.activeEvents : stats.events),
-          sub: stats.activeEvents > 0 ? "en directo" : "en total",
+          sub: stats.activeEvents > 0 ? t("hudEventsLive") : t("hudEventsTotal"),
           live: stats.activeEvents > 0,
         },
       ]
@@ -44,7 +46,7 @@ export function TvHero({ lvl, density }: { lvl: number; density: number }) {
       <div className="wrap relative z-[2] grid grid-cols-[1.08fr_0.92fr] items-center gap-[50px] px-5 max-[980px]:grid-cols-1 max-[980px]:gap-[30px] min-[640px]:px-10">
         <div>
           <Kicker>
-            <Decode text="Comunidad Pixelmon · Un solo recorrido" />
+            <Decode text={t("kicker")} />
           </Kicker>
           {/* display treatment comes from the data-ds base styles (root of LandingPage) */}
           <h1
@@ -53,15 +55,15 @@ export function TvHero({ lvl, density }: { lvl: number; density: number }) {
           >
             <span className={LINE_MASK}>
               <span className={LINE_INNER} style={{ ["--l"]: 0 } as React.CSSProperties}>
-                Empieza la
+                {t("titleLine1")}
               </span>
             </span>
             <span className={LINE_MASK}>
               <span className={LINE_INNER} style={{ ["--l"]: 1 } as React.CSSProperties}>
                 <em className="italic text-accent [-webkit-text-stroke:1.6px_var(--accent)] [text-shadow:0_0_38px_rgba(255,92,10,0.45)]">
-                  travesía
+                  {t("titleEmphasis")}
                 </em>{" "}
-                gamer
+                {t("titleLine2suffix")}
               </span>
             </span>
           </h1>
@@ -70,15 +72,14 @@ export function TvHero({ lvl, density }: { lvl: number; density: number }) {
             style={{ ["--i"]: 1 } as React.CSSProperties}
             className="mb-0 mt-6 max-w-[500px] font-body text-[17px] font-normal leading-[1.65] text-txt-muted"
           >
-            Herramientas, torneos, sorteos y comunidad enlazados en un único recorrido. Baja y déjate llevar: cada parada enciende la
-            siguiente.
+            {t("lead")}
           </p>
           <div data-reveal style={{ ["--i"]: 2 } as React.CSSProperties} className="mt-8 flex flex-wrap gap-3.5">
             <Button variant="pri" size="lg" iconRight="arrow" href="/herramientas" className={PRI_GLOW}>
-              Comenzar el recorrido
+              {t("ctaStart")}
             </Button>
             <Button size="lg" onClick={() => tvGoTo("tv-cp1")}>
-              Ver el mapa
+              {t("ctaMap")}
             </Button>
           </div>
           <div data-reveal style={{ ["--i"]: 3 } as React.CSSProperties} className="mt-10 flex gap-3.5 max-[820px]:flex-wrap">
@@ -89,13 +90,13 @@ export function TvHero({ lvl, density }: { lvl: number; density: number }) {
               >
                 <span className="inline-flex items-center gap-1.5 font-mono text-[10px] font-semibold uppercase leading-none tracking-[0.12em] text-txt-dim">
                   {h.live && <i className="h-1.5 w-1.5 rounded-full bg-ok animate-[lv4-blink_1.6s_infinite] motion-reduce:animate-none" aria-hidden="true" />}
-                  {h.k}
+                  {"tk" in h ? t(`${h.tk}Label`) : h.k}
                 </span>
                 <span className="mb-[3px] mt-2 block font-display text-[30px] font-extrabold leading-none text-txt tabular-nums">
                   <CountUp value={h.big} />
                   {h.suf && <b>{h.suf}</b>}
                 </span>
-                <span className="block font-body text-[12px] font-normal leading-[1.3] text-txt-muted">{h.sub}</span>
+                <span className="block font-body text-[12px] font-normal leading-[1.3] text-txt-muted">{"tk" in h ? t(`${h.tk}Sub`) : h.sub}</span>
               </div>
             ))}
           </div>
@@ -119,19 +120,19 @@ export function TvHero({ lvl, density }: { lvl: number; density: number }) {
 
           <div className="absolute left-[-6%] top-[12%] z-[3] inline-flex items-center gap-2 border border-solid border-line-2 border-l-[3px] border-l-accent px-3 py-2 font-mono text-[10px] font-semibold uppercase leading-none tracking-[0.1em] text-[#f2f4f8] [background:rgba(0,0,0,0.82)] cut-tag [--cut-tag:7px] animate-[tv-bob_5s_ease-in-out_infinite] [.no-motion_&]:animate-none [[data-theme=light]_&]:[background:rgba(16,19,24,0.9)] max-[980px]:left-0">
             <i className="h-1.5 w-1.5 rounded-full bg-ok animate-[lv4-blink_1.6s_infinite] motion-reduce:animate-none" />
-            Recorrido activo
+            {t("tagActive")}
           </div>
           <div className="absolute bottom-[16%] right-[-4%] z-[3] inline-flex items-center gap-2 border border-solid border-line-2 border-l-[3px] border-l-accent px-3 py-2 font-mono text-[10px] font-semibold uppercase leading-none tracking-[0.1em] text-[#f2f4f8] [animation-delay:-2.5s] [background:rgba(0,0,0,0.82)] cut-tag [--cut-tag:7px] animate-[tv-bob_5s_ease-in-out_infinite] [.no-motion_&]:animate-none [[data-theme=light]_&]:[background:rgba(16,19,24,0.9)] max-[980px]:right-0">
-            7 paradas · 1 comunidad
+            {t("tagStops")}
           </div>
         </div>
       </div>
       <button
         onClick={() => tvGoTo("tv-cp1")}
-        aria-label="Empezar el recorrido"
+        aria-label={t("scrollAriaLabel")}
         className="absolute bottom-[-2px] left-1/2 z-[4] inline-flex -translate-x-1/2 cursor-pointer flex-col items-center gap-3.5 font-mono text-[10px] font-semibold uppercase leading-none tracking-[0.2em] text-txt-muted transition-colors duration-[140ms] hover:text-txt max-[820px]:left-[18px] max-[820px]:translate-x-0 max-[820px]:items-start"
       >
-        <span>Baja para empezar</span>
+        <span>{t("scrollCta")}</span>
         <i
           aria-hidden="true"
           className="relative block h-[120px] w-[3px] shadow-[0_0_18px_rgba(255,92,10,0.65)] [background:linear-gradient(rgba(255,92,10,0),var(--accent)_55%,var(--accent))] before:absolute before:bottom-[-3px] before:left-1/2 before:h-[30px] before:w-[30px] before:-translate-x-1/2 before:rounded-full before:blur-[2px] before:content-[''] before:[background:radial-gradient(circle,rgba(255,92,10,0.6),transparent_70%)] after:absolute after:left-[-1.5px] after:top-0 after:h-4 after:w-1.5 after:rounded-[3px] after:bg-white after:shadow-[0_0_14px_var(--accent)] after:content-[''] after:animate-[tv-drop_1.9s_ease-in-out_infinite] [.no-motion_&]:after:animate-none"

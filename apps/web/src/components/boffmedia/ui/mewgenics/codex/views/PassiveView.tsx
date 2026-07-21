@@ -1,11 +1,13 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { MewPanel, MewText } from "../../MewAtoms"
 import { mewHuman } from "../../mew-util"
 import { MewEffects, MewRef } from "../MewRefs"
 import { MewCol, MewDesc, MewDetail, MewFacts, MewGrid2, MewHero, MewTag, rows, type ViewProps } from "./scaffold"
 
 export function PassiveView({ rec, onNav }: ViewProps) {
+  const t = useTranslations("mewgenics")
   return (
     <MewDetail>
       <MewHero cat="passives" rec={rec} badges={rec.cls ? <MewRef id={rec.cls} cat="classes" icon="star" onNav={onNav} label={mewHuman(rec.cls)} /> : undefined} />
@@ -13,10 +15,10 @@ export function PassiveView({ rec, onNav }: ViewProps) {
       <MewGrid2>
         <MewCol>
           {rec.base && Object.keys(rec.base).length > 0 && (
-            <MewPanel title="Efecto base" icon="bolt"><MewEffects map={rec.base} onNav={onNav} /></MewPanel>
+            <MewPanel title={t("panel.baseEffect")} icon="bolt"><MewEffects map={rec.base} onNav={onNav} /></MewPanel>
           )}
           {rec.ranks && rec.ranks.length > 0 && (
-            <MewPanel title="Rangos" icon="layers" count={rec.ranks.length}>
+            <MewPanel title={t("panel.ranks")} icon="layers" count={rec.ranks.length}>
               <div className="flex flex-col gap-3">
                 {rec.ranks.map((rk) => (
                   <div className="grid grid-cols-[28px_1fr] items-start gap-[11px]" key={rk.r}>
@@ -32,17 +34,17 @@ export function PassiveView({ rec, onNav }: ViewProps) {
           )}
         </MewCol>
         <MewCol>
-          <MewPanel title="Datos" icon="database">
+          <MewPanel title={t("panel.data")} icon="database">
             <MewFacts
               rows={rows([
-                { label: "Clase", value: rec.cls ? mewHuman(rec.cls) : "General" },
-                rec.shield != null && { label: "Escudo", value: rec.shield },
-                { label: "ID", value: rec.id, mono: true },
+                { label: t("label.class"), value: rec.cls ? mewHuman(rec.cls) : t("label.general") },
+                rec.shield != null && { label: t("label.shield"), value: rec.shield },
+                { label: t("label.id"), value: rec.id, mono: true },
               ])}
             />
           </MewPanel>
           {Array.isArray(rec.tags) && rec.tags.length > 0 && (
-            <MewPanel title="Etiquetas" icon="bookmark">
+            <MewPanel title={t("panel.tags")} icon="bookmark">
               <div className="flex flex-wrap gap-1.5">{rec.tags.map((t) => <MewTag key={t}>{mewHuman(t)}</MewTag>)}</div>
             </MewPanel>
           )}

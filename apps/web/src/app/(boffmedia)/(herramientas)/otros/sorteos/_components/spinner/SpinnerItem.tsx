@@ -1,5 +1,7 @@
 "use client"
 
+import { useTranslations } from "next-intl"
+
 interface SpinnerItemProps {
   name: string
   index: number
@@ -20,6 +22,7 @@ function getInitials(name: string): string {
 }
 
 export default function SpinnerItem({ name, isWinningItem, spinComplete }: SpinnerItemProps) {
+  const t = useTranslations("otros.sorteosApp")
   const showWin = isWinningItem && spinComplete
   const initials = getInitials(name)
 
@@ -75,7 +78,7 @@ export default function SpinnerItem({ name, isWinningItem, spinComplete }: Spinn
       {/* winner tag */}
       {showWin && (
         <span className="mt-2 animate-[bm-fade_0.3s_ease-out] bg-accent px-[10px] py-[2px] font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-accent-ink motion-reduce:animate-none">
-          Ganador
+          {t("winnerTag")}
         </span>
       )}
     </div>

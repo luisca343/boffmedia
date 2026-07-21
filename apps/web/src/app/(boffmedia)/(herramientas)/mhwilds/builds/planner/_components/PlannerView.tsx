@@ -167,8 +167,8 @@ export function PlannerView() {
                 >
                   <Icon name="search" size={16} className="shrink-0 text-[var(--mh-bright)]" />
                   <span className="grid min-w-0 gap-0.5">
-                    <b className="font-display text-[14px] leading-tight font-bold uppercase">{t("build_planner.skillsearch.cta_title")}</b>
-                    <span className="font-mono text-[11px] leading-none text-txt-muted">{t("build_planner.skillsearch.cta_lead")}</span>
+                    <b className="font-display text-[14px] leading-tight font-bold uppercase">{t("build_planner.skillsearch.ctaTitle")}</b>
+                    <span className="font-mono text-[11px] leading-none text-txt-muted">{t("build_planner.skillsearch.ctaLead")}</span>
                   </span>
                   <Icon name="chevronRight" size={15} className="ml-auto shrink-0 text-txt-dim" />
                 </button>

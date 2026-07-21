@@ -2,6 +2,7 @@
 
 import * as React from "react"
 import { cn } from "@/lib/utils"
+import { useTranslations } from "next-intl"
 import { Icon } from "./icon"
 
 export interface ModalProps {
@@ -20,6 +21,7 @@ const FOCUSABLE =
   'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
 
 export function Modal({ open, onClose, title, aside, footer, size, className, bodyClassName, children }: ModalProps) {
+  const t = useTranslations("common.primitives")
   const panelRef = React.useRef<HTMLDivElement>(null)
   const titleId = React.useId()
 
@@ -89,7 +91,7 @@ export function Modal({ open, onClose, title, aside, footer, size, className, bo
             {aside}
             <button
               type="button"
-              aria-label="Cerrar"
+              aria-label={t("close")}
               onClick={onClose}
               className="grid place-items-center w-[26px] h-[26px] p-0 border-0 bg-transparent text-txt-dim cursor-pointer hover:text-txt transition-colors"
             >

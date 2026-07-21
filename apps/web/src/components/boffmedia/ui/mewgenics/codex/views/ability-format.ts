@@ -3,7 +3,9 @@ import { mewHuman, type MewRec } from "../../mew-util"
 // Shared ability formatting used by both the full ability fiche and the compact
 // inline card, so the labels stay in one place.
 
-export const MEW_TARGET_MODE: Record<string, string> = { none: "Sin objetivo", self: "Sí mismo", single: "Un objetivo", tile: "Una casilla", direction: "Dirección", direction4: "Dirección", direction8: "Dirección", line: "Línea", cone: "Cono", all: "Todos", aoe: "Área" }
+export function getTargetMode(t: (k: string) => string): Record<string, string> {
+  return { none: t("targetMode.none"), self: t("targetMode.self"), single: t("targetMode.single"), tile: t("targetMode.tile"), direction: t("targetMode.direction"), direction4: t("targetMode.direction"), direction8: t("targetMode.direction"), line: t("targetMode.line"), cone: t("targetMode.cone"), all: t("targetMode.all"), aoe: t("targetMode.aoe") }
+}
 
 export function mewClassName(c?: string) { return mewHuman(String(c || "").replace(/Ability$/, "")) }
 
