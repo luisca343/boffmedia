@@ -58,7 +58,8 @@ export function useEnvironmentActions<S extends EnvironmentStore>(
    */
   const scanInstance = useCallback(
     async (role: EnvRole, gameId: GameId, files: File[], override?: ScanOverride) => {
-      if (!api) return;
+      const runScan = api?.scanInstance;
+      if (!runScan) return;
       const s = store.getState();
       const prevRegId = s.envs[role].registry?.id;
       s.setError(undefined);
@@ -69,7 +70,7 @@ export function useEnvironmentActions<S extends EnvironmentStore>(
         const onProgress = proxy((pct: number, msg: string) => {
           store.getState().setEnvScan(role, { pct, msg });
         });
-        const handle = await api.scanInstance(gameId, files, onProgress, override);
+        const handle = await runScan(gameId, files, onProgress, override);
         await applyRegistry(role, handle);
       } catch (err) {
         const code = errorCode(err);
