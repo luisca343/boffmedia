@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { DkBracket, DkSeg } from "@/components/boffmedia/ui/tools/datakit"
 import {
@@ -25,6 +26,7 @@ import type {
 import * as A from "../_lib/adapt"
 
 export function TorneoView({ detail }: { detail: TournamentDetailApi }) {
+  const t = useTranslations("torneos")
   const phases = detail.phases ?? []
   const single = phases.length <= 1
   const [activeId, setActiveId] = useState<number>(
@@ -40,6 +42,7 @@ export function TorneoView({ detail }: { detail: TournamentDetailApi }) {
         view={phases[0]?.view ?? detail.view}
         champion={A.comp(detail.champion)}
         phase={phases[0] ?? null}
+        t={t}
       />
     )
   }
@@ -55,7 +58,7 @@ export function TorneoView({ detail }: { detail: TournamentDetailApi }) {
         size="sm"
         value={String(active.id)}
         onChange={(v) => setActiveId(Number(v))}
-        ariaLabel="Fase del torneo"
+        ariaLabel={t("view.phaseAriaLabel")}
         options={phases.map((p) => ({
           value: String(p.id),
           label: p.name,
@@ -66,6 +69,7 @@ export function TorneoView({ detail }: { detail: TournamentDetailApi }) {
         view={active.view}
         champion={A.comp(detail.champion)}
         phase={active}
+        t={t}
       />
     </div>
   )
@@ -76,11 +80,13 @@ function PhaseBody({
   view,
   champion,
   phase,
+  t,
 }: {
   format: TnFormat
   view: TnViewApi
   champion: ReturnType<typeof A.comp>
   phase: TnPhaseApi | null
+  t: ReturnType<typeof useTranslations>
 }) {
   switch (format) {
     case "single":
@@ -95,7 +101,7 @@ function PhaseBody({
           {view.thirdPlace && (
             <div className="grid gap-1.5">
               <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.1em] text-txt-dim">
-                Tercer puesto
+                {t("view.thirdPlace")}
               </span>
               <div className="max-w-[280px]">
                 <TnBracketMatch m={A.match(view.thirdPlace)} champion={null} />
@@ -116,11 +122,11 @@ function PhaseBody({
         />
       )
     case "roundrobin":
-      return <LeagueBlock view={view} />
+      return <LeagueBlock view={view} t={t} />
     case "groups":
       return <GroupsBlock view={view} champion={champion} />
     case "swiss":
-      return <SwissBlock view={view} phase={phase} />
+      return <SwissBlock view={view} phase={phase} t={t} />
     case "leaderboard":
       return <TnLeaderboard lb={A.leaderboard(view)} />
     default:
@@ -132,7 +138,7 @@ function Scroll({ children }: { children: React.ReactNode }) {
   return <div className="overflow-x-auto">{children}</div>
 }
 
-function LeagueBlock({ view }: { view: TnViewApi }) {
+function LeagueBlock({ view, t }: { view: TnViewApi; t: ReturnType<typeof useTranslations> }) {
   const [seg, setSeg] = useState<"table" | "cross">("table")
   const league = A.league(view)
   return (
@@ -141,10 +147,10 @@ function LeagueBlock({ view }: { view: TnViewApi }) {
         size="sm"
         value={seg}
         onChange={(v) => setSeg(v as "table" | "cross")}
-        ariaLabel="Vista de liga"
+        ariaLabel={t("league.ariaLabel")}
         options={[
-          { value: "table", label: "Tabla" },
-          { value: "cross", label: "Crosstable" },
+          { value: "table", label: t("league.tableTab") },
+          { value: "cross", label: t("league.crossTab") },
         ]}
       />
       {seg === "table" ? (
@@ -216,9 +222,11 @@ function qualifiedIds(
 function SwissBlock({
   view,
   phase,
+  t,
 }: {
   view: TnViewApi
   phase: TnPhaseApi | null
+  t: ReturnType<typeof useTranslations>
 }) {
   const rows = view.standings ?? []
   const advance = phase?.advance ?? null
@@ -243,6 +251,7 @@ function SwissBlock({
       lastCutIndex={advance ? lastCut : -1}
       dimEliminated={completed}
       advance={advance}
+      t={t}
     />
   )
 
@@ -255,10 +264,10 @@ function SwissBlock({
         size="sm"
         value={seg}
         onChange={(v) => setSeg(v as "standings" | "pairings")}
-        ariaLabel="Vista del suizo"
+        ariaLabel={t("swiss.ariaLabel")}
         options={[
-          { value: "standings", label: "Clasificación" },
-          { value: "pairings", label: "Emparejamientos" },
+          { value: "standings", label: t("swiss.standingsTab") },
+          { value: "pairings", label: t("swiss.pairingsTab") },
         ]}
       />
       {seg === "standings" ? standings : <TnPairings rounds={pairingRounds} />}
@@ -272,36 +281,38 @@ function SwissStandings({
   lastCutIndex,
   dimEliminated,
   advance,
+  t,
 }: {
   rows: TnStandingApi[]
   qualified: Set<string>
   lastCutIndex: number
   dimEliminated: boolean
   advance: TnAdvanceRuleApi | null
+  t: ReturnType<typeof useTranslations>
 }) {
   const th =
     "px-2 py-2 text-left font-mono text-[10px] font-semibold uppercase tracking-[0.08em] text-txt-dim"
   const td = "px-2 py-2 align-middle"
   const cutLabel =
     advance?.type === "record"
-      ? `Corte · ${advance.maxLosses ?? 0} derrotas`
+      ? t("swiss.cutRecord", { maxLosses: advance.maxLosses ?? 0 })
       : advance?.type === "top_n"
-        ? `Corte · top ${advance.count ?? ""}`
+        ? t("swiss.cutTopN", { count: advance.count ?? "" })
         : advance?.type === "top_or_record"
-          ? `Corte · top ${advance.count ?? ""} + ${advance.maxLosses ?? 0} derrotas`
-          : "Corte"
+          ? t("swiss.cutTopOrRecord", { count: advance.count ?? "", maxLosses: advance.maxLosses ?? 0 })
+          : t("swiss.cut")
 
   return (
     <div className="overflow-x-auto border border-solid border-line bg-panel">
       <table className="w-full border-collapse">
         <thead>
           <tr className="border-b border-line">
-            <th className={cn(th, "w-8 text-center")}>#</th>
-            <th className={th}>Competidor</th>
-            <th className={cn(th, "text-center")}>PJ</th>
-            <th className={cn(th, "text-center text-accent-bright")}>V-D</th>
-            <th className={cn(th, "text-center")}>V-E-D</th>
-            <th className={cn(th, "text-right")}>Pts</th>
+            <th className={cn(th, "w-8 text-center")}>{t("swiss.colRank")}</th>
+            <th className={th}>{t("swiss.colCompetitor")}</th>
+            <th className={cn(th, "text-center")}>{t("swiss.colPlayed")}</th>
+            <th className={cn(th, "text-center text-accent-bright")}>{t("swiss.colRecord")}</th>
+            <th className={cn(th, "text-center")}>{t("swiss.colFullRecord")}</th>
+            <th className={cn(th, "text-right")}>{t("swiss.colPoints")}</th>
           </tr>
         </thead>
         <tbody>

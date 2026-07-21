@@ -140,7 +140,16 @@
       "copied": "Copied",
       "copyHeader": "Boffmedia raffle · seed #{seed}",
       "historyTitle": "Winners history",
-      "clearHistory": "Clear history"
+      "clearHistory": "Clear history",
+      "weightLess": "Less weight",
+      "weightMore": "More weight",
+      "spinnerWinnerSelected": "Winner selected!",
+      "spinnerSpinning": "Drawing…",
+      "spinnerRuleta": "Draw roulette",
+      "spinnerGanadorConfirmado": "Winner confirmed",
+      "spinnerTenemosGanador": "We have a winner!",
+      "spinnerSorteando": "Drawing!",
+      "winnerTag": "Winner"
     },
     "bibliotecaApp": {
       "kicker": "Others · Library",

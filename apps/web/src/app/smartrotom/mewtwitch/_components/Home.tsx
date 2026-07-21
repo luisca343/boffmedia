@@ -1,6 +1,7 @@
 "use client"
 
 import { useSearchParams } from "next/navigation"
+import { useTranslations } from "next-intl"
 import { ChipRail } from "@/components/smartrotom/media"
 import { useSearchStreams, useTopGames, useTopStreams } from "../_hooks/useTwitch"
 import { MEWTWITCH_BASE, toCategoryCard, toStreamCard, twitchThumb, uptimeFrom } from "../_utils/twitch"
@@ -9,6 +10,7 @@ import { StreamSection } from "./StreamSection"
 import { CategoryRail } from "./CategoryRail"
 
 export function Home() {
+  const t = useTranslations("twitch")
   const params = useSearchParams()
   const q = params.get("q") ?? ""
   const searching = q.trim().length > 0
@@ -23,7 +25,7 @@ export function Home() {
       <>
         <ChipRail />
         <div className="mx-auto max-w-[1640px] px-4 pb-20 pt-5 md:px-10">
-          <StreamSection title={`Resultados para «${q}»`} streams={results} loading={search.isLoading} />
+          <StreamSection title={t("home.searchResults", { q })} streams={results} loading={search.isLoading} />
         </div>
       </>
     )
@@ -52,13 +54,13 @@ export function Home() {
         />
       )}
       <div className="mx-auto max-w-[1640px] px-4 pb-20 pt-5 md:px-10">
-        <StreamSection eyebrow="En directo" title="Directos populares ahora" streams={rest} loading={top.isLoading} />
+        <StreamSection eyebrow={t("home.liveEyebrow")} title={t("home.popularLive")} streams={rest} loading={top.isLoading} />
         {top.isError && (
           <p className="py-4 text-center text-sm text-mw-fg-faint">
-            No se pudo conectar con Twitch. Revisa las credenciales de la API.
+            {t("home.error")}
           </p>
         )}
-        <CategoryRail eyebrow="Explora" title="Categorías principales" categories={cats} loading={games.isLoading} />
+        <CategoryRail eyebrow={t("home.exploreEyebrow")} title={t("home.topCategories")} categories={cats} loading={games.isLoading} />
       </div>
     </>
   )

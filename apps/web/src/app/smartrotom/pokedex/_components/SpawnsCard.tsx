@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import { useTranslations } from "next-intl"
 import { CompassIcon } from "lucide-react"
 import { getSpawns } from "@/services/mcef/mcefApi"
 import { Loading } from "@/components/smartrotom/Loading"
@@ -27,6 +28,7 @@ function classifyRarity(percentage: number): string {
 }
 
 export function SpawnsCard() {
+  const t = useTranslations("pokedex")
   const [spawns, setSpawns] = useState<PossibleSpawn[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [filter, setFilter] = useState("all")
@@ -66,9 +68,9 @@ export function SpawnsCard() {
   const groups = filter === "all" ? RARITY_ORDER : [filter]
 
   const filters = [
-    { id: "all", label: "Todos" },
-    { id: "ultra", label: "Ultra" },
-    { id: "rare", label: "Raros" },
+    { id: "all", label: t("spawnscard_all") },
+    { id: "ultra", label: t("spawnscard_ultra") },
+    { id: "rare", label: t("spawnscard_rares") },
   ]
 
   return (
@@ -76,10 +78,10 @@ export function SpawnsCard() {
       <div className="flex items-center justify-between flex-wrap gap-2">
         <h3 className="font-pk-display font-semibold text-[15px] tracking-tight text-pk-surface-50 flex items-center gap-2.5">
           <CompassIcon className="w-4 h-4 text-pk-primary-400" />
-          Apariciones activas
+          {t("spawnscard_active")}
           <span className="inline-flex items-center gap-1.5 font-pk-mono text-[10.5px] text-pk-surface-500">
             <span className="w-1.5 h-1.5 rounded-full bg-pk-secondary-400 shadow-[0_0_6px_#22d3ee] animate-pulse" />
-            Actualiza en {tick}s
+            {t("spawnscard_updates_in", { tick })}
           </span>
         </h3>
         <div className="flex gap-1.5">

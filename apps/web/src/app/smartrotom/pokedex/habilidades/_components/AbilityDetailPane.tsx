@@ -17,7 +17,7 @@ export function AbilityDetailPane({ abilityKey }: { abilityKey: string }) {
         <span className="font-pk-display font-bold text-lg text-pk-surface-50 tracking-tight">{t(`ability_${k}`)}</span>
         <span className="inline-flex items-center gap-1.5 px-2 py-[3px] text-[10px] font-bold tracking-[0.1em] uppercase text-pk-surface-400 bg-white/[0.04] rounded">
           <StarIcon className="w-2.5 h-2.5" />
-          Habilidad
+          {t("abilitydetail_eyebrow")}
         </span>
       </div>
 
@@ -28,7 +28,7 @@ export function AbilityDetailPane({ abilityKey }: { abilityKey: string }) {
       {carriers.length > 0 && (
         <>
           <div className="flex items-center justify-between mt-3.5 mb-2.5">
-            <span className="font-pk-mono text-[10.5px] tracking-[0.1em] uppercase text-pk-surface-500">Portadores</span>
+            <span className="font-pk-mono text-[10.5px] tracking-[0.1em] uppercase text-pk-surface-500">{t("ability_carriers")}</span>
             <span className="font-pk-mono text-xs text-pk-surface-100">{carriers.length}</span>
           </div>
           <div className="grid grid-cols-[repeat(auto-fill,minmax(64px,1fr))] gap-1.5">

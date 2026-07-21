@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useTranslations } from "next-intl"
 import { Avatar, Button, Check, I, PillBtn, SectionHeader, StreamCard, Tag } from "@/components/smartrotom/media/ui"
 import { useFollowerCount, useStreamByUser, useTopStreams, useUser } from "../../_hooks/useTwitch"
 import { compactCount, toStreamCard, twitchThumb, uptimeFrom } from "../../_utils/twitch"
@@ -18,6 +19,7 @@ function Stat({ label, value, sub }: { label: string; value: string; sub?: strin
 }
 
 export function Live({ channel }: { channel: string }) {
+  const t = useTranslations("twitch")
   const stream = useStreamByUser(channel)
   const user = useUser(channel)
   const followers = useFollowerCount(user.data?.id ?? "")
@@ -28,7 +30,7 @@ export function Live({ channel }: { channel: string }) {
   const u = user.data
 
   if (stream.isLoading || user.isLoading) {
-    return <div className="p-6 text-sm text-mw-fg-faint">Cargando directo…</div>
+    return <div className="p-6 text-sm text-mw-fg-faint">{t("stream.loading")}</div>
   }
 
   const name = u?.display_name ?? channel
@@ -51,7 +53,7 @@ export function Live({ channel }: { channel: string }) {
             <Avatar src={u?.profile_image_url} name={name} size={56} ring>
               {s && (
                 <span className="absolute -bottom-2 left-1/2 inline-flex -translate-x-1/2 items-center gap-1 whitespace-nowrap rounded-mw-pill border-2 border-mw-bg bg-mw-accent px-1.5 py-0.5 text-[9px] font-extrabold tracking-[0.08em] text-white">
-                  <span className="h-1 w-1 rounded-full bg-white" /> EN VIVO
+                  <span className="h-1 w-1 rounded-full bg-white" /> {t("stream.liveBadge")}
                 </span>
               )}
             </Avatar>
@@ -61,13 +63,13 @@ export function Live({ channel }: { channel: string }) {
                 {u?.broadcaster_type === "partner" && <Check />}
               </div>
               <h1 className="my-1.5 max-w-[740px] text-[15px] font-medium leading-[1.4] [text-wrap:pretty]">
-                {s?.title ?? "El canal está desconectado ahora mismo."}
+                {s?.title ?? t("stream.offline")}
               </h1>
               {s && (
                 <div className="inline-flex flex-wrap items-center gap-1.5 text-xs text-mw-fg-mute">
                   <span className="font-semibold text-mw-accent">{s.game_name}</span>
-                  {s.tags?.slice(0, 3).map((t) => (
-                    <Tag key={t}>{t}</Tag>
+                  {s.tags?.slice(0, 3).map((tag) => (
+                    <Tag key={tag}>{tag}</Tag>
                   ))}
                 </div>
               )}
@@ -76,12 +78,12 @@ export function Live({ channel }: { channel: string }) {
           <div className="flex flex-wrap items-start gap-2">
             {/* [deferred] follow/subscribe need Twitch OAuth (§13) */}
             <Button variant={following ? "ghost" : "solid"} onClick={() => setFollowing((f) => !f)}>
-              <I.heart size={14} /> {following ? "Siguiendo" : "Seguir"}
+              <I.heart size={14} /> {following ? t("hero.following") : t("hero.follow")}
             </Button>
-            <Button variant="ghost" aria-disabled title="Próximamente">
-              <I.sparkles size={14} /> Suscribirse
+            <Button variant="ghost" aria-disabled title={t("common.comingSoon")}>
+              <I.sparkles size={14} /> {t("stream.subscribe")}
             </Button>
-            <PillBtn iconOnly aria-label="Compartir">
+            <PillBtn iconOnly aria-label={t("common.share")}>
               <I.share size={14} />
             </PillBtn>
           </div>
@@ -89,23 +91,23 @@ export function Live({ channel }: { channel: string }) {
 
         {s && (
           <div className="my-[18px] grid grid-cols-2 gap-3 lg:grid-cols-4">
-            <Stat label="Espectadores" value={compactCount(s.viewer_count)} sub="en directo" />
-            <Stat label="Seguidores" value={followers.data != null ? compactCount(followers.data) : "—"} sub="total" />
-            <Stat label="Tiempo en directo" value={uptimeFrom(startedAt)} sub={startClock ? `empezó a las ${startClock}` : undefined} />
-            <Stat label="Idioma" value={(s.language ?? "").toUpperCase() || "—"} sub="del directo" />
+            <Stat label={t("stream.statViewers")} value={compactCount(s.viewer_count)} sub={t("stream.statViewersSub")} />
+            <Stat label={t("stream.statFollowers")} value={followers.data != null ? compactCount(followers.data) : "—"} sub={t("stream.statFollowersSub")} />
+            <Stat label={t("stream.statTimeLabel")} value={uptimeFrom(startedAt)} sub={startClock ? t("stream.statTimeStarted", { time: startClock }) : undefined} />
+            <Stat label={t("stream.statLangLabel")} value={(s.language ?? "").toUpperCase() || "—"} sub={t("stream.statLangSub")} />
           </div>
         )}
 
         {u?.description && (
           <div className="mb-6 rounded-mw-2xl border border-[color-mix(in_srgb,rgb(var(--mw-accent))_28%,var(--mw-hairline))] bg-[color-mix(in_srgb,rgb(var(--mw-accent))_6%,rgb(var(--mw-800)))] px-[22px] py-[18px]">
-            <h3 className="mb-2 font-mw-display text-lg">Acerca del canal</h3>
+            <h3 className="mb-2 font-mw-display text-lg">{t("stream.about")}</h3>
             <p className="m-0 whitespace-pre-line text-sm leading-[1.6] text-mw-fg-mute">{u.description}</p>
           </div>
         )}
 
         {otherStreams.length > 0 && (
           <section>
-            <SectionHeader title="Otros canales en directo" />
+            <SectionHeader title={t("stream.otherLive")} />
             <div className="grid grid-cols-1 gap-[18px] sm:grid-cols-2 xl:grid-cols-4">
               {otherStreams.map((x) => (
                 <StreamCard key={x.href} s={x} />

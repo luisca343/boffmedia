@@ -1,0 +1,59 @@
+{
+  "camara": {
+    "page": {
+      "screenshotSaved": "Screenshot saved to gallery",
+      "screenshotFailed": "Could not capture the screen",
+      "screenshotError": "Error capturing the screen"
+    },
+    "album": {
+      "title": "Album"
+    },
+    "error": {
+      "appName": "Camera"
+    },
+    "controls": {
+      "hideUi": "Hide interface",
+      "showUi": "Show interface",
+      "uiOn": "UI: ON",
+      "uiOff": "UI: OFF"
+    },
+    "gallery": {
+      "title": "Gallery",
+      "photoCount": "{count, plural, one {# photo} other {# photos}}",
+      "emptyTitle": "No screenshots yet",
+      "emptySubtext": "Take a photo to get started",
+      "deleteConfirm": "Delete this screenshot?",
+      "screenshotAlt": "Screenshot {n}"
+    },
+    "preview": {
+      "downloaded": "Screenshot downloaded",
+      "deleteConfirm": "Delete this screenshot?",
+      "deleted": "Screenshot deleted",
+      "prevAriaLabel": "Previous",
+      "nextAriaLabel": "Next",
+      "download": "Download",
+      "delete": "Delete",
+      "imageAlt": "Screenshot preview"
+    },
+    "metadata": {
+      "timestamp": "Date and time",
+      "location": "Location",
+      "position": "Position:",
+      "lookingAt": "Looking at:",
+      "detectedHeading": "Detected ({count})",
+      "pokemon": "Pokémon",
+      "statue": "Statue",
+      "npc": "NPC",
+      "entity": "Entity",
+      "distanceCoverage": "{distance}m · {coverage}% visible",
+      "noMetadata": "No metadata available for this screenshot"
+    },
+    "flashlight": {
+      "turnOff": "Turn off flashlight",
+      "turnOn": "Turn on flashlight"
+    },
+    "zoom": {
+      "setZoom": "Set zoom to {factor}"
+    }
+  }
+}

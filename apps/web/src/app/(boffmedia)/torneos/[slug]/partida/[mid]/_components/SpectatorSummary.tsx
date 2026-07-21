@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { Icon } from "@/components/boffmedia/primitives"
 import { TM_CARD, TM_CARD_HEAD, TM_CARD_H3 } from "@/components/boffmedia/ui/tournaments"
@@ -16,6 +17,7 @@ export function SpectatorSummary({
   showChat: boolean
   onChanged: () => void
 }) {
+  const t = useTranslations("torneos.spectator")
   const done = detail.status === "completed" || detail.status === "bye"
   const line = (c: TnCompetitorApi | null, score: number | null, winner: boolean) => (
     <div className={cn("flex items-center justify-between gap-3 px-4 py-3", winner && "bg-ok-soft")}>
@@ -30,10 +32,10 @@ export function SpectatorSummary({
     <>
       <section className={TM_CARD}>
         <div className={TM_CARD_HEAD}>
-          <h3 className={TM_CARD_H3}>{done ? "Resultado" : "En juego"}</h3>
+          <h3 className={TM_CARD_H3}>{done ? t("done") : t("playing")}</h3>
           {detail.proposalState === "disputed" && (
             <span className="inline-flex items-center gap-1.5 border border-solid border-bad px-2 py-1 font-mono text-[10px] font-bold uppercase text-bad">
-              <Icon name="alert" size={12} />En disputa
+              <Icon name="alert" size={12} />{t("disputed")}
             </span>
           )}
         </div>

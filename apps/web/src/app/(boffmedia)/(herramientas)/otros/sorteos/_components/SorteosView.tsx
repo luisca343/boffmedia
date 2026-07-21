@@ -102,7 +102,7 @@ export function SorteosView() {
               {tab === "single" ? (
                 <form className="flex items-stretch gap-[9px]" onSubmit={submitSingle}>
                   <Input className="min-w-0 flex-1" placeholder={t("namePlaceholder")} value={single} onChange={(e) => setSingle(e.target.value)} />
-                  {weighted && <SrtWeight value={singleW} onChange={setSingleW} />}
+                  {weighted && <SrtWeight value={singleW} onChange={setSingleW} lessLabel={t("weightLess")} moreLabel={t("weightMore")} />}
                   <Button variant="pri" type="submit" icon="plus">
                     {t("add")}
                   </Button>
@@ -188,6 +188,8 @@ export function SorteosView() {
                     onRename={(name) => rename(e.id, name)}
                     onWeight={(w) => setWeight(e.id, w)}
                     onRemove={() => removeOne(e.id)}
+                    weightLessLabel={t("weightLess")}
+                    weightMoreLabel={t("weightMore")}
                   />
                 ))}
               </div>

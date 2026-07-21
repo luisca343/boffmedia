@@ -1,0 +1,114 @@
+{
+  "smartrotom": {
+    "settings": {
+      "themes": "Temas",
+      "themeHint": "Las apps con tema propio (Chat, Notas) se muestran en",
+      "dark": "oscuro",
+      "light": "claro",
+      "session": "Sesión",
+      "signIn": "Iniciar sesión",
+      "signOut": "Cerrar sesión",
+      "copied": "Copiado",
+      "token": "Token"
+    },
+    "error": {
+      "detected": "Error Detectado",
+      "retry": "Reintentar",
+      "showHelp": "Mostrar ayuda",
+      "unknown": "Error desconocido",
+      "possibleCauses": "Posibles causas:",
+      "solutions": "Soluciones:"
+    },
+    "auth": {
+      "linkAccount": "Vincular Cuenta",
+      "linkExisting": "Vincular Cuenta Existente",
+      "createNew": "Crear Nueva Cuenta",
+      "minecraftUser": "Usuario de Minecraft:",
+      "linkPrompt": "Para continuar, necesitas vincular tu cuenta de BoffMedia",
+      "hasAccount": "Tengo una cuenta de BoffMedia",
+      "createAccount": "Crear nueva cuenta",
+      "cancelLink": "Cancelar Vinculación",
+      "username": "Usuario",
+      "password": "Contraseña",
+      "email": "Email",
+      "confirmPassword": "Confirmar Contraseña",
+      "back": "Volver",
+      "link": "Vincular",
+      "linking": "Vinculando...",
+      "create": "Crear Cuenta",
+      "creating": "Creando...",
+      "linkSuccess": "Cuenta vinculada exitosamente",
+      "createSuccess": "Cuenta creada y vinculada exitosamente",
+      "linkError": "Error al vincular cuenta",
+      "minecraftLinkError": "Error al vincular cuenta de Minecraft",
+      "createError": "Error al crear cuenta",
+      "loginNewError": "Error al iniciar sesión con la nueva cuenta",
+      "passwordMismatch": "Las contraseñas no coinciden"
+    },
+    "notFound": {
+      "title": "404",
+      "message": "Página no encontrada."
+    },
+    "appError": {
+      "crashed": "Esta app ha fallado",
+      "retry": "Reintentar",
+      "backToMenu": "Volver al menú"
+    },
+    "nav": {
+      "settings": "Ajustes",
+      "close": "Cerrar",
+      "language": "Idioma",
+      "connected": "Conectado con id {id}",
+      "disconnected": "No conectado"
+    },
+    "calls": {
+      "missed": "Llamada perdida",
+      "calling": "Llamando…",
+      "connecting": "Conectando…",
+      "encrypted": "Llamada cifrada de extremo a extremo",
+      "participants": "{count} participantes",
+      "yourCall": "Tu llamada",
+      "incoming": "Llamada entrante",
+      "minimize": "Minimizar",
+      "mute": "Silenciar",
+      "muted": "Silenciado",
+      "camera": "Cámara",
+      "cameraOff": "Sin cámara",
+      "speaker": "Altavoz",
+      "accept": "Aceptar",
+      "hangUp": "Colgar",
+      "expand": "Ampliar"
+    },
+    "clock": {
+      "rainExpected": "Lluvia prevista a las",
+      "clearExpected": "Despejado a las"
+    },
+    "appGrid": {
+      "updatingOrder": "Actualizando orden..."
+    },
+    "languageSwitcher": {
+      "label": "Idioma:"
+    },
+    "notLinked": {
+      "smartrotomMessage": "Usuario de SmartRotom no vinculado. Accede a Minecraft antes de usar la web.",
+      "smartrotomCauses": [
+        "No has iniciado sesión en Minecraft",
+        "Los datos de sesión de Minecraft no son válidos"
+      ],
+      "smartrotomSolutions": [
+        "Inicia sesión en Minecraft primero",
+        "Reinicia el cliente de Minecraft",
+        "Contacta con soporte si el problema persiste"
+      ],
+      "boffmediaMessage": "Usuario de BoffMedia no vinculado",
+      "boffmediaCauses": [
+        "No has vinculado tu cuenta de BoffMedia",
+        "La conexión con BoffMedia ha fallado"
+      ],
+      "boffmediaSolutions": [
+        "Vincula tu cuenta de BoffMedia en la configuración",
+        "Cierra sesión y vuelve a iniciarla"
+      ]
+    }
+  }
+}

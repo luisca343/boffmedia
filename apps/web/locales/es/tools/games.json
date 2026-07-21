@@ -53,6 +53,8 @@
         "schematicViewer": "Visor de Schematics"
       },
       "schematicCompat": {
+        "appName": "Schematic Compat",
+        "appTagline": "Minecraft · Hytale",
         "title": "Herramienta de Compatibilidad de Schematics",
         "description": "Convierte schematics entre versiones de Minecraft y mod loaders",
         "features": {
@@ -193,7 +195,12 @@
           "exportRules": "Exportar Reglas",
           "exporting": "Exportando…",
           "exportSchematic": "Exportar esquema",
-          "blockedWarning": "{count, plural, one {# tipo de bloque no tiene destino y se escribirá sin cambios, o se descartará en una conversión entre juegos.} other {# tipos de bloque no tienen destino y se escribirán sin cambios, o se descartarán en una conversión entre juegos.}} ¿Exportar de todos modos?"
+          "blockedWarning": "{count, plural, one {# tipo de bloque no tiene destino y se escribirá sin cambios, o se descartará en una conversión entre juegos.} other {# tipos de bloque no tienen destino y se escribirán sin cambios, o se descartarán en una conversión entre juegos.}} ¿Exportar de todos modos?",
+          "formatSchem2": ".schem (v2)",
+          "formatSchem3": ".schem (v3)",
+          "formatLitematic": ".litematic",
+          "formatNbt": ".nbt",
+          "formatPrefab": ".prefab.json"
         },
         "worker": {
           "connecting": "Conectando al motor de análisis...",

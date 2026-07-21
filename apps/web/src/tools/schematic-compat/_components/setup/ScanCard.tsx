@@ -5,9 +5,9 @@ import { cn } from "@/lib/utils";
 import { Icon } from "@/components/boffmedia/primitives";
 import type { SchEnvMode, SchGame, SchRegistry } from "../ui/sch-tokens";
 
-const GAMES_LIST: { id: SchGame; label: string; icon: "cube" | "gamepad" }[] = [
-  { id: "minecraft", label: "Minecraft", icon: "cube" },
-  { id: "hytale", label: "Hytale", icon: "gamepad" },
+const GAMES_LIST: { id: SchGame; labelKey: string; icon: "cube" | "gamepad" }[] = [
+  { id: "minecraft", labelKey: "game.minecraft", icon: "cube" },
+  { id: "hytale", labelKey: "game.hytale", icon: "gamepad" },
 ];
 
 /** Environment capture: game toggle · folder pick or vanilla version · result. */
@@ -80,7 +80,7 @@ export function ScanCard({
               )}
             >
               <Icon name={g.icon} size={12} />
-              {g.label}
+              {t(g.labelKey)}
             </button>
           ))}
         </div>

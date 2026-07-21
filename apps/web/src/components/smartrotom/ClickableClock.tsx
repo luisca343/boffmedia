@@ -8,9 +8,11 @@ import {
   getWeatherName,
 } from "@/lib/minecraftWeather";
 import { mcTimeToRealTime, mcTimeToRealTimeWithExtraDays } from "@/lib/utils";
+import { useTranslations } from "next-intl";
 
 export default function ClickableClock() {
   const { weatherData, minecraftTime, changeTime } = useGetWeather();
+  const t = useTranslations("smartrotom.clock");
 
   return (
     <div className="w-full cursor-pointer flex items-center justify-center">
@@ -36,9 +38,9 @@ export default function ClickableClock() {
         </div>
         <div className="text-ink text-sm sm:text-lg text-center font-semibold">
           {weatherData.weather === "clear"
-            ? "Lluvia prevista a las "
-            : "Despejado a las "}
-          {mcTimeToRealTimeWithExtraDays(changeTime)}
+            ? t("rainExpected")
+            : t("clearExpected")}
+          {" "}{mcTimeToRealTimeWithExtraDays(changeTime)}
         </div>
       </div>
     </div>

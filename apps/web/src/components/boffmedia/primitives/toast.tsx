@@ -2,6 +2,7 @@
 
 import * as React from "react"
 import { cn } from "@/lib/utils"
+import { useTranslations } from "next-intl"
 import { Icon, type IconName } from "./icon"
 
 export type ToastTone = "ok" | "bad" | "warn" | "info"
@@ -45,6 +46,7 @@ toast.warn = withTone("warn")
 toast.info = withTone("info")
 
 export function ToastStack() {
+  const tr = useTranslations("common.primitives")
   const [items, setItems] = React.useState<ToastItem[]>([])
   const seq = React.useRef(0)
   const remove = (id: number) => setItems((a) => a.filter((t) => t.id !== id))
@@ -64,7 +66,7 @@ export function ToastStack() {
   return (
     <div
       role="region"
-      aria-label="Notificaciones"
+      aria-label={tr("notifications")}
       aria-live="polite"
       className="fixed right-[22px] bottom-[22px] z-[900] flex flex-col gap-[10px] max-w-[min(380px,calc(100vw_-_44px))] pointer-events-none"
     >
@@ -101,7 +103,7 @@ export function ToastStack() {
             )}
             <button
               type="button"
-              aria-label="Descartar"
+              aria-label={tr("dismiss")}
               onClick={() => remove(t.id)}
               className="flex-none grid place-items-center w-[22px] h-[22px] -mt-[3px] -mr-1 p-0 border-0 bg-transparent text-txt-dim cursor-pointer hover:text-txt transition-colors"
             >

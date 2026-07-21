@@ -17,20 +17,20 @@ export interface FilterDef {
 
 export const CX_FILTERS: Record<string, FilterDef[]> = {
   items: [
-    { key: "kind", label: "Tipo", from: (r) => r.kind || "", order: ["weapon", "head", "face", "neck", "trinket"], labelFn: (v) => ({ weapon: "Arma", head: "Cabeza", face: "Cara", neck: "Cuello", trinket: "Abalorio" }[v] || mewHuman(v)) },
-    { key: "rarity", label: "Rareza", from: (r) => r.rarity || "", labelFn: (v) => MEW.rarity(v).label, colorFn: (v) => "hsl(" + MEW.rarity(v).hue + " 70% 60%)" },
+    { key: "kind", label: "filter.kind", from: (r) => r.kind || "", order: ["weapon", "head", "face", "neck", "trinket"], labelFn: (v) => "filter.kind." + v },
+    { key: "rarity", label: "filter.rarity", from: (r) => r.rarity || "", labelFn: (v) => mewHuman(v), colorFn: (v) => "hsl(" + MEW.rarity(v).hue + " 70% 60%)" },
   ],
   characters: [
-    { key: "faction", label: "Facción", from: (r) => r.faction || "", labelFn: (v) => MEW.faction(v).label, colorFn: (v) => "hsl(" + MEW.faction(v).hue + " 70% 60%)" },
-    { key: "type", label: "Tipo", from: (r) => r.type || "", labelFn: (v) => mewHuman(v) },
+    { key: "faction", label: "filter.faction", from: (r) => r.faction || "", labelFn: (v) => mewHuman(v), colorFn: (v) => "hsl(" + MEW.faction(v).hue + " 70% 60%)" },
+    { key: "type", label: "filter.type", from: (r) => r.type || "", labelFn: (v) => mewHuman(v) },
   ],
-  passives: [{ key: "cls", label: "Clase", from: (r) => r.cls || "—", labelFn: (v) => (v === "—" ? "General" : mewHuman(v)) }],
-  maps: [{ key: "act", label: "Acto", from: (r) => "Acto " + r.act, labelFn: (v) => v }],
+  passives: [{ key: "cls", label: "filter.cls", from: (r) => r.cls || "—", labelFn: (v) => (v === "—" ? "filter.cls.general" : mewHuman(v)) }],
+  maps: [{ key: "act", label: "filter.act", from: (r) => "Acto " + r.act, labelFn: (v) => v }],
 }
 
 export const CX_SORT: Record<string, { v: string; label: string }[]> = {
-  items: [{ v: "name", label: "A–Z" }, { v: "rarity", label: "Rareza" }, { v: "kind", label: "Tipo" }],
-  characters: [{ v: "name", label: "A–Z" }, { v: "hp", label: "Salud" }, { v: "faction", label: "Facción" }],
+  items: [{ v: "name", label: "sort.name" }, { v: "rarity", label: "sort.rarity" }, { v: "kind", label: "sort.kind" }],
+  characters: [{ v: "name", label: "sort.name" }, { v: "hp", label: "sort.hp" }, { v: "faction", label: "sort.faction" }],
 }
 
 export function cxSearchText(cat: string, r: MewRec): string {

@@ -1,18 +1,19 @@
 import { getPokemonDefense, getPokemonCoverage } from "../../../dexUtils"
 import { TypeChip } from "../../../_components/ui"
+import { useTranslations } from "next-intl"
 
 interface TypeEffectivenessSectionProps {
   type1?: string
   type2?: string
 }
 
-const MULT_CONFIG: Record<string, { bg: string; fg: string; label: string; es: string }> = {
-  "4": { bg: "rgba(239,68,68,0.12)", fg: "#ef4444", label: "×4", es: "Súper débil" },
-  "2": { bg: "rgba(251,146,60,0.12)", fg: "#fb923c", label: "×2", es: "Débil" },
-  "1": { bg: "rgba(255,255,255,0.02)", fg: "#97a6bb", label: "×1", es: "Normal" },
-  "0.5": { bg: "rgba(163,230,53,0.1)", fg: "#a3e635", label: "×½", es: "Resistente" },
-  "0.25": { bg: "rgba(34,211,238,0.1)", fg: "#22d3ee", label: "×¼", es: "Muy resistente" },
-  "0": { bg: "rgba(192,132,252,0.1)", fg: "#c084fc", label: "×0", es: "Inmune" },
+const MULT_CONFIG: Record<string, { bg: string; fg: string; label: string; key: string }> = {
+  "4": { bg: "rgba(239,68,68,0.12)", fg: "#ef4444", label: "×4", key: "eff_super_weak" },
+  "2": { bg: "rgba(251,146,60,0.12)", fg: "#fb923c", label: "×2", key: "eff_weak" },
+  "1": { bg: "rgba(255,255,255,0.02)", fg: "#97a6bb", label: "×1", key: "eff_normal" },
+  "0.5": { bg: "rgba(163,230,53,0.1)", fg: "#a3e635", label: "×½", key: "eff_resistant" },
+  "0.25": { bg: "rgba(34,211,238,0.1)", fg: "#22d3ee", label: "×¼", key: "eff_very_resistant" },
+  "0": { bg: "rgba(192,132,252,0.1)", fg: "#c084fc", label: "×0", key: "eff_immune" },
 }
 
 const DEF_ORDER = ["4", "2", "1", "0.5", "0.25", "0"]
@@ -29,18 +30,19 @@ function groupByMultiplier(data: Record<string, number>): Record<string, string[
 }
 
 export function TypeEffectivenessSection({ type1, type2 }: TypeEffectivenessSectionProps) {
+  const t = useTranslations("pokedex")
   const defense = groupByMultiplier(getPokemonDefense(type1!, type2))
   const coverage = groupByMultiplier(getPokemonCoverage(type1!, type2))
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-[22px]">
-      <EffColumn title="Daño Recibido" sub="por tipo atacante" data={defense} order={DEF_ORDER} />
-      <EffColumn title="Daño Infligido" sub="mejor multiplicador de sus tipos" data={coverage} order={OFF_ORDER} />
+      <EffColumn title={t("eff_damage_received")} sub={t("eff_by_attacker_type")} data={defense} order={DEF_ORDER} t={t} />
+      <EffColumn title={t("eff_damage_dealt")} sub={t("eff_best_multiplier")} data={coverage} order={OFF_ORDER} t={t} />
     </div>
   )
 }
 
-function EffColumn({ title, sub, data, order }: { title: string; sub: string; data: Record<string, string[]>; order: string[] }) {
+function EffColumn({ title, sub, data, order, t }: { title: string; sub: string; data: Record<string, string[]>; order: string[]; t: any }) {
   return (
     <div className="bg-white/[0.015] border border-white/[0.05] rounded-xl p-[16px_18px]">
       <h4 className="font-pk-display font-semibold text-sm text-pk-surface-50 mb-3.5 pb-3 border-b border-white/[0.05] flex items-center gap-2">
@@ -62,11 +64,11 @@ function EffColumn({ title, sub, data, order }: { title: string; sub: string; da
                 <span className="font-pk-display font-bold text-lg leading-none tabular-nums" style={{ color: cfg.fg }}>
                   {cfg.label}
                 </span>
-                <span className="font-pk-mono text-[10px] tracking-[0.08em] uppercase text-pk-surface-400 mt-0.5">{cfg.es}</span>
+                <span className="font-pk-mono text-[10px] tracking-[0.08em] uppercase text-pk-surface-400 mt-0.5">{t(cfg.key)}</span>
               </div>
               <div className="flex flex-wrap gap-1 items-center">
                 {types.length === 0 ? (
-                  <span className="text-[11.5px] text-pk-surface-500 italic">— ningún tipo —</span>
+                  <span className="text-[11.5px] text-pk-surface-500 italic">{t("eff_no_types")}</span>
                 ) : (
                   types.map((type) => <TypeChip key={type} type={type} size="sm" />)
                 )}

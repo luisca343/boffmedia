@@ -17,33 +17,64 @@
         },
         "common": {
             "streamer": "Streamer",
-            "game": "Game"
+            "game": "Game",
+            "comingSoon": "Coming soon",
+            "views": "views",
+            "share": "Share"
+        },
+        "home": {
+            "searchResults": "Results for «{q}»",
+            "popularLive": "Popular Live Streams",
+            "liveEyebrow": "Live",
+            "error": "Could not connect to Twitch. Check your API credentials.",
+            "exploreEyebrow": "Explore",
+            "topCategories": "Top Categories",
+            "noLive": "No live streams right now."
+        },
+        "hero": {
+            "viewingNow": "watching now",
+            "viewersNow": "{count} watching now",
+            "liveTag": "live",
+            "uptimeLive": "{uptime} live",
+            "watchLive": "Watch Live",
+            "follow": "Follow",
+            "following": "Following",
+            "joinChat": "Join Chat"
         },
         "stream": {
             "live": "Live",
             "viewers": "viewers",
             "notFound": "Stream not found",
-            "loading": "Loading stream..."
+            "loading": "Loading stream…",
+            "offline": "The channel is offline right now.",
+            "liveBadge": "LIVE",
+            "subscribe": "Subscribe",
+            "about": "About the channel",
+            "otherLive": "Other Live Channels",
+            "statViewers": "Viewers",
+            "statViewersSub": "live",
+            "statFollowers": "Followers",
+            "statFollowersSub": "total",
+            "statTimeLabel": "Live time",
+            "statTimeStarted": "started at {time}",
+            "statLangLabel": "Language",
+            "statLangSub": "of the stream"
         },
-        "video": {
-            "views": "views",
-            "duration": "Duration",
-            "publishedAt": "Published at",
-            "notFound": "Video not found",
-            "loading": "Loading video..."
-        },
-        "clip": {
-            "views": "views",
-            "duration": "Duration",
-            "createdAt": "Created at",
-            "creator": "Creator",
-            "notFound": "Clip not found",
-            "publishedAt": "Published at",
-            "loading": "Loading clip..."
-        },
-        "game": {
-            "notFound": "Game not found",
-            "loading": "Loading game..."
+        "chat": {
+            "title": "Live Chat",
+            "watching": "watching",
+            "tabChat": "Chat",
+            "tabSubOnly": "Subs Only",
+            "tabRules": "Rules",
+            "connecting": "Connecting to chat…",
+            "connectionFailed": "Could not connect to chat.",
+            "resume": "Resume chat ↓",
+            "placeholder": "Sign in to chat…",
+            "send": "Send",
+            "footer": "Live chat",
+            "statusConnected": "connected",
+            "statusConnecting": "connecting…",
+            "statusDisconnected": "disconnected"
         },
         "user": {
             "videos": "Videos",
@@ -57,11 +88,43 @@
             "totalViews": "Total views",
             "followers": "Followers",
             "notFound": "User not found",
-            "loading": "Loading user..."
+            "loading": "Loading user...",
+            "channelLoading": "Loading channel…",
+            "channelNotFound": "Channel not found.",
+            "totalViewsSuffix": "total views",
+            "noContent": "Nothing here yet."
+        },
+        "clip": {
+            "views": "views",
+            "duration": "Duration",
+            "createdAt": "Created at",
+            "creator": "Creator",
+            "notFound": "Clip not found.",
+            "publishedAt": "Published at",
+            "loading": "Loading clip…",
+            "byCreator": "clip by {creator}"
+        },
+        "video": {
+            "views": "views",
+            "duration": "Duration",
+            "publishedAt": "Published at",
+            "notFound": "Video not found.",
+            "loading": "Loading video…"
+        },
+        "game": {
+            "notFound": "Game not found",
+            "loading": "Loading game...",
+            "category": "Category",
+            "viewersSuffix": "viewers",
+            "streamsSuffix": "streams",
+            "liveNow": "Live now"
         },
         "history": {
             "title": "Twitch History",
-            "empty": "No watch history yet",
+            "sectionTitle": "History",
+            "eyebrow": "Your activity",
+            "clearBtn": "Clear history",
+            "empty": "Nothing watched yet.",
             "emptySubtext": "The streams, videos and clips you watch will appear here.",
             "loading": "Loading history..."
         },

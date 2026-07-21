@@ -2,6 +2,7 @@
 
 import Link from "next/link"
 import { useMemo, useState } from "react"
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { Spinner } from "@/components/boffmedia/primitives"
 import { DkSeg } from "@/components/boffmedia/ui/tools/datakit"
@@ -20,6 +21,7 @@ const DOT_TONE: Record<string, string> = {
 }
 
 export default function TorneosPage() {
+  const t = useTranslations("torneos")
   const { tournaments, isLoading } = useTournaments()
   const [filter, setFilter] = useState<Filter>("all")
   const [query, setQuery] = useState("")
@@ -41,11 +43,11 @@ export default function TorneosPage() {
     <main className="wrap py-10">
       <header className="mb-6 grid gap-3">
         <span className="font-mono text-[11px] font-semibold uppercase tracking-[0.14em] text-txt-dim">
-          Comunidad
+          {t("listing.section")}
         </span>
-        <h1 className="text-[clamp(34px,5vw,56px)]">Torneos</h1>
+        <h1 className="text-[clamp(34px,5vw,56px)]">{t("listing.title")}</h1>
         <p className="max-w-xl font-body text-[14px] leading-[1.55] text-txt-muted">
-          Cuadros de eliminación, ligas, grupos y clasificaciones de la comunidad Boffmedia.
+          {t("listing.subtitle")}
         </p>
       </header>
 
@@ -54,19 +56,19 @@ export default function TorneosPage() {
           size="sm"
           value={filter}
           onChange={(v) => setFilter(v as Filter)}
-          ariaLabel="Filtrar torneos"
+          ariaLabel={t("listing.filterAriaLabel")}
           options={[
-            { value: "all", label: "Todos" },
-            { value: "live", label: "En directo" },
-            { value: "registration", label: "Inscripción" },
-            { value: "completed", label: "Finalizados" },
+            { value: "all", label: t("listing.filterAll") },
+            { value: "live", label: t("listing.filterLive") },
+            { value: "registration", label: t("listing.filterRegistration") },
+            { value: "completed", label: t("listing.filterCompleted") },
           ]}
         />
         <input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Buscar torneo o juego…"
-          aria-label="Buscar torneos"
+          placeholder={t("listing.searchPlaceholder")}
+          aria-label={t("listing.searchAriaLabel")}
           className="min-w-[180px] flex-1 border border-solid border-line bg-panel px-3 py-1.5 font-body text-[13px] placeholder:text-txt-dim sm:max-w-xs"
         />
       </div>
@@ -78,7 +80,7 @@ export default function TorneosPage() {
       ) : shown.length === 0 ? (
         <div className="border border-dashed border-line-2 bg-panel px-6 py-16 text-center">
           <p className="font-mono text-[12px] uppercase tracking-[0.08em] text-txt-dim">
-            No hay torneos por ahora.
+            {t("listing.empty")}
           </p>
         </div>
       ) : (
@@ -93,6 +95,7 @@ export default function TorneosPage() {
 }
 
 function TorneoCard({ t }: { t: TournamentSummaryApi }) {
+  const intl = useTranslations("torneos")
   return (
     <Link
       href={`/torneos/${t.slug}`}
@@ -107,7 +110,7 @@ function TorneoCard({ t }: { t: TournamentSummaryApi }) {
       </h2>
       <div className="flex flex-wrap gap-x-3 gap-y-1 font-mono text-[10.5px] text-txt-dim">
         {t.gameTitle && <span>{t.gameTitle}</span>}
-        <span>{t.participantCount} jugadores</span>
+        <span>{intl("listing.players", { count: t.participantCount })}</span>
         {t.championName && <span className="text-accent">🏆 {t.championName}</span>}
       </div>
     </Link>

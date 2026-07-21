@@ -1,4 +1,5 @@
 import * as React from "react"
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/boffmedia/primitives"
 import { FxParticles } from "./travesia-fx"
@@ -6,6 +7,7 @@ import { BEAMS, Grain, PRI_GLOW } from "./landing-shared"
 import { DISCORD } from "./landing-data"
 
 export function TvMeta({ lvl, density }: { lvl: number; density: number }) {
+  const t = useTranslations("boffmedia.landing.meta")
   return (
     <section className="relative z-[1] overflow-hidden pb-[150px] pt-32 text-center" id="tv-meta">
       {lvl >= 2 && (
@@ -29,7 +31,7 @@ export function TvMeta({ lvl, density }: { lvl: number; density: number }) {
           className="inline-flex items-center gap-[9px] font-mono text-[11px] font-bold uppercase leading-none tracking-[0.16em] text-[rgba(var(--zr),var(--zg),var(--zb),1)] transition-colors duration-[260ms] ease-linear"
         >
           <i className="h-[7px] w-[7px] rounded-full bg-current shadow-[0_0_10px_currentColor]" aria-hidden="true" />
-          Fin del recorrido · Principio de todo
+          {t("kicker")}
         </span>
         {/* display treatment from data-ds base styles; zone-tinted em stroke kept local */}
         <h2
@@ -37,9 +39,9 @@ export function TvMeta({ lvl, density }: { lvl: number; density: number }) {
           style={{ ["--i"]: 1 } as React.CSSProperties}
           className="mb-4 mt-[22px] leading-[0.88] text-txt [font-size:clamp(58px,8vw,132px)]"
         >
-          Únete a la{" "}
+          {t("titleStart")}{" "}
           <em className="italic text-transparent [-webkit-text-stroke:2px_rgba(var(--zr),var(--zg),var(--zb),1)] [text-shadow:0_0_44px_rgba(var(--zr),var(--zg),var(--zb),0.4)] [[data-theme=light]_&]:[text-shadow:0_0_28px_rgba(var(--zr),var(--zg),var(--zb),0.22)]">
-            comunidad
+            {t("titleEmphasis")}
           </em>
         </h2>
         <p
@@ -47,14 +49,14 @@ export function TvMeta({ lvl, density }: { lvl: number; density: number }) {
           style={{ ["--i"]: 2 } as React.CSSProperties}
           className="mx-auto max-w-[52ch] font-body text-[17px] font-normal leading-[1.6] text-txt-muted"
         >
-          Crea tu cuenta, entra al Discord y empieza tu propio recorrido junto a la comunidad Pixelmon.
+          {t("lead")}
         </p>
         <div data-reveal style={{ ["--i"]: 3 } as React.CSSProperties} className="mt-[34px] flex flex-wrap justify-center gap-3.5">
           <Button variant="pri" size="lg" iconRight="arrow" href="/entrar?mode=register" className={PRI_GLOW}>
-            Crear cuenta gratis
+            {t("ctaRegister")}
           </Button>
           <Button size="lg" href={DISCORD}>
-            Entrar al Discord
+            {t("ctaDiscord")}
           </Button>
         </div>
       </div>

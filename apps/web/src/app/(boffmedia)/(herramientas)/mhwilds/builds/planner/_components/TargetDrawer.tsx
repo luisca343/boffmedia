@@ -23,7 +23,7 @@ export function TargetDrawer({ onPick, onClose }: { onPick: (m: MhMonster) => vo
   return (
     <MhDrawer
       iconName="skull"
-      title={t("build_planner.target.drawer_title")}
+      title={t("build_planner.target.drawerTitle")}
       sub={t("build_planner.optionsCount", { count: list.length })}
       onClose={onClose}
       tools={<MhSearch value={q} onChange={setQ} placeholder={t("build_planner.search")} />}
@@ -33,7 +33,7 @@ export function TargetDrawer({ onPick, onClose }: { onPick: (m: MhMonster) => vo
           <Spinner />
         </div>
       ) : list.length === 0 ? (
-        <Empty icon="search" title={t("build_planner.no_results")} lead={t("build_planner.target.drawer_empty")} />
+        <Empty icon="search" title={t("build_planner.no_results")} lead={t("build_planner.target.drawerEmpty")} />
       ) : (
         <div className="flex flex-col gap-1.5">
           {list.map((m) => {

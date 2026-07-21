@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import { useTranslations } from "next-intl"
 import { ClockIcon, ArrowRightIcon } from "lucide-react"
 import { useRotomUuid } from "@/components/smartrotom/behavior/useRotomUuid"
 import { useGetRegistries } from "@/hooks/pokemon/useGetRegistries"
@@ -23,6 +24,7 @@ type EnrichedRegistry = {
 }
 
 export function RecentCard() {
+  const t = useTranslations("pokedex")
   const uuid = useRotomUuid()
   const { registries, isLoading } = useGetRegistries(uuid!)
   const { getPokemonByDex } = usePokemonStore()
@@ -55,13 +57,13 @@ export function RecentCard() {
       <div className="flex items-center justify-between">
         <h3 className="font-pk-display font-semibold text-[15px] tracking-tight text-pk-surface-50 flex items-center gap-2.5">
           <ClockIcon className="w-4 h-4 text-pk-primary-400" />
-          Registros recientes
+          {t("recent_title")}
         </h3>
         <Link
           href="/smartrotom/pokedex/registro"
           className="text-xs text-pk-surface-400 hover:text-pk-primary-300 transition-colors flex items-center gap-1"
         >
-          Ver todo
+          {t("recent_view_all")}
           <ArrowRightIcon className="w-3 h-3" />
         </Link>
       </div>
@@ -71,7 +73,7 @@ export function RecentCard() {
           <Loading width={30} height={30} colorClass="border-pk-primary-400" />
         </div>
       ) : !enriched.length ? (
-        <div className="flex justify-center items-center h-20 text-pk-surface-400 text-sm">Sin registros todavía</div>
+        <div className="flex justify-center items-center h-20 text-pk-surface-400 text-sm">{t("recent_no_records")}</div>
       ) : (
         <div className="flex flex-col gap-1.5">
           {enriched.map((reg, i) => {

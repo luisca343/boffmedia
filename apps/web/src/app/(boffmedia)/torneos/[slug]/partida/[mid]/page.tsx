@@ -3,6 +3,7 @@
 import * as React from "react"
 import Link from "next/link"
 import { use } from "react"
+import { useTranslations } from "next-intl"
 import { Button, Spinner } from "@/components/boffmedia/primitives"
 import {
   TmRoundHeader,
@@ -57,6 +58,7 @@ export default function PartidaPage({
 }: {
   params: Promise<{ slug: string; mid: string }>
 }) {
+  const t = useTranslations("torneos")
   const { slug, mid } = use(params)
   const matchId = Number(mid)
   const [detail, setDetail] = React.useState<TnMatchDetailApi | null>(null)
@@ -90,9 +92,9 @@ export default function PartidaPage({
   if (!detail) {
     return (
       <main className="wrap py-24 text-center">
-        <p className="font-display text-[22px] font-bold uppercase">Partida no encontrada</p>
+        <p className="font-display text-[22px] font-bold uppercase">{t("match.notFound")}</p>
         <Button href={`/torneos/${slug}`} size="sm" className="mt-4">
-          Volver al torneo
+          {t("match.backToTournament")}
         </Button>
       </main>
     )
@@ -131,7 +133,7 @@ export default function PartidaPage({
         {isPlayer && opp ? (
           <>
             <TmOpponentCard opp={opp} />
-            <LiveReportPanel detail={detail} meName={meSide?.name ?? "Tú"} oppName={opp.name} onChanged={refetch} />
+            <LiveReportPanel detail={detail} meName={meSide?.name ?? t("match.meFallback")} oppName={opp.name} onChanged={refetch} />
             <LiveMatchChat detail={detail} onChanged={refetch} />
             {opp._pk?.length ? (
               <TmTeamsheet opp={opp} onCalc={() => window.open("https://calc.pokemonshowdown.com", "_blank")} />

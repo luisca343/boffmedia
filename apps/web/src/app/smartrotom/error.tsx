@@ -9,11 +9,10 @@ export default function Error({ error, reset }: { error: Error; reset: () => voi
         error={error.message}
         help={error.help}
         onAction={reset}
-        actionText="Reintentar"
       />
     );
   }
   return (
-    <RotomErrorPage error={error.message || 'Error desconocido'} onAction={reset} actionText="Reintentar" />
+    <RotomErrorPage error={error.message || undefined} onAction={reset} />
   );
 }

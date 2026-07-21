@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { TV3_EVENT_TS } from "./landing-data"
 
@@ -55,6 +56,7 @@ export const tvGoTo = (id: string) => {
 }
 
 export function TvCountdown({ to = TV3_EVENT_TS, compact }: { to?: number; compact?: boolean }) {
+  const t = useTranslations("boffmedia.landing.countdown")
   const [left, setLeft] = React.useState(() => Math.max(0, to - Date.now()))
   React.useEffect(() => {
     const iv = setInterval(() => setLeft(Math.max(0, to - Date.now())), 1000)
@@ -62,13 +64,13 @@ export function TvCountdown({ to = TV3_EVENT_TS, compact }: { to?: number; compa
   }, [to])
   const s = Math.floor(left / 1000)
   const parts = [
-    { n: Math.floor(s / 86400), l: "Días" },
-    { n: Math.floor((s % 86400) / 3600), l: "Horas" },
-    { n: Math.floor((s % 3600) / 60), l: "Min" },
-    { n: s % 60, l: "Seg" },
+    { n: Math.floor(s / 86400), l: t("days") },
+    { n: Math.floor((s % 86400) / 3600), l: t("hours") },
+    { n: Math.floor((s % 3600) / 60), l: t("min") },
+    { n: s % 60, l: t("sec") },
   ]
   return (
-    <div className={cn("flex", compact ? "gap-2" : "gap-3.5")} role="timer" aria-label="Cuenta atrás al próximo evento">
+    <div className={cn("flex", compact ? "gap-2" : "gap-3.5")} role="timer" aria-label={t("ariaLabel")}>
       {parts.map((p) => (
         <span
           key={p.l}

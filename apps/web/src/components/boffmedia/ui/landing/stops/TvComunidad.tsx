@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { Button, Chip } from "@/components/boffmedia/primitives"
 import { Decode } from "../travesia-fx"
@@ -10,6 +11,7 @@ import { DISCORD, TV3_FEED } from "../landing-data"
 import { useSiteActivity, useSiteStats } from "@/hooks/community/useCommunity"
 
 export function TvComunidad() {
+  const t = useTranslations("boffmedia.landing.comunidad")
   const { activity } = useSiteActivity(6)
   const { stats } = useSiteStats()
   // Real activity feeds the ticker; falls back to the editorial placeholders
@@ -26,16 +28,16 @@ export function TvComunidad() {
   // no number is fabricated.
   const lead =
     stats && stats.participants > 0
-      ? `Equipos, clanes, sorteos y eventos especiales. ${stats.participants.toLocaleString("es-ES")} jugadores ya compiten; solo falta tu nombre en el ranking.`
-      : "Equipos, clanes, sorteos y eventos especiales; solo falta tu nombre en el ranking."
+      ? t("leadWithParticipants", { count: stats.participants.toLocaleString("es-ES") })
+      : t("leadNoParticipants")
 
   return (
     <TvCP
       id="tv-cp5"
       n="05"
       side="l"
-      kick={<Decode text="Parada 05 · Más que un servidor" />}
-      title="Una comunidad <em>viva</em>"
+      kick={<Decode text={t("kick")} />}
+      title={t("title")}
       lead={lead}
     >
       <div
@@ -57,20 +59,20 @@ export function TvComunidad() {
               style={{ ["--i"]: i } as React.CSSProperties}
             >
               <i className={cn("h-[7px] w-[7px] flex-none rounded-full animate-[lv4-blink_2s_infinite] motion-reduce:animate-none", f.tp)} />
-              {f.t}
+              {"tk" in f && typeof f.tk === "string" ? t(f.tk) : f.t}
             </span>
           ))}
         </div>
         <div className="mb-[18px] flex flex-wrap gap-2">
-          <Chip>Foro 24/7</Chip>
-          <Chip>Sorteos semanales</Chip>
-          <Chip>Equipos y clanes</Chip>
+          <Chip>{t("chipForum")}</Chip>
+          <Chip>{t("chipSorteos")}</Chip>
+          <Chip>{t("chipTeams")}</Chip>
         </div>
         <div className={CTA_ROW}>
           <Button variant="pri" iconRight="arrow" href="/community" className={PRI_GLOW}>
-            Unirme
+            {t("ctaJoin")}
           </Button>
-          <Button href={DISCORD}>Discord</Button>
+          <Button href={DISCORD}>{t("ctaDiscord")}</Button>
         </div>
       </div>
     </TvCP>

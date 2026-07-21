@@ -15,35 +15,7 @@ import { isMinecraft } from "@/services/mcef/mcefHelper"
 import { MinecraftAuthForm } from "./MinecraftAuthForm"
 import { RotomErrorPage } from "./RotomError"
 import { useRotomThemeClass } from "./theme/useRotomTheme"
-
-const NOT_LINKED_SMARTROTOM = {
-  message: "Usuario de SmartRotom no vinculado. Accede a Minecraft antes de usar la web.",
-  help: {
-    possibleCauses: [
-      "No has iniciado sesión en Minecraft",
-      "Los datos de sesión de Minecraft no son válidos",
-    ],
-    solutions: [
-      "Inicia sesión en Minecraft primero",
-      "Reinicia el cliente de Minecraft",
-      "Contacta con soporte si el problema persiste",
-    ],
-  },
-}
-
-const NOT_LINKED_BOFFMEDIA = {
-  message: "Usuario de BoffMedia no vinculado",
-  help: {
-    possibleCauses: [
-      "No has vinculado tu cuenta de BoffMedia",
-      "La conexión con BoffMedia ha fallado",
-    ],
-    solutions: [
-      "Vincula tu cuenta de BoffMedia en la configuración",
-      "Cierra sesión y vuelve a iniciarla",
-    ],
-  },
-}
+import { useTranslations } from "next-intl"
 
 export default function AppWrapper({
   children,
@@ -57,38 +29,44 @@ export default function AppWrapper({
   const rotomUuid = useRotomUuid()
   const [datosUsuario, setDatosUsuario] = useState<Object | null>(null)
   const [isMC, setIsMC] = useState(false)
+  const t = useTranslations("smartrotom")
 
-  // The theme lives in a persisted store, not local state — it used to reset on every
-  // reload. `RotomNav`/`Settings` write to the same store, so no setter is threaded down.
   const tema = useRotomThemeClass()
 
-  // Pre-authenticated screens (loading, auth, link errors) render OUTSIDE the
-  // `h-screen` app shell below, as direct flex children of the `min-h-screen`
-  // <body>. `min-h-screen` is not a definite height, so their `h-full` roots
-  // (LoadingScreen, MinecraftAuthForm, RotomErrorPage…) collapse to content
-  // height. This shell bounds them at the viewport so they fill it, and scrolls
-  // if a tall form (register) exceeds it.
+  const NOT_LINKED_SMARTROTOM = {
+    message: t("notLinked.smartrotomMessage"),
+    help: {
+      possibleCauses: [
+        t("notLinked.smartrotomCauses.0"),
+        t("notLinked.smartrotomCauses.1"),
+      ],
+      solutions: [
+        t("notLinked.smartrotomSolutions.0"),
+        t("notLinked.smartrotomSolutions.1"),
+        t("notLinked.smartrotomSolutions.2"),
+      ],
+    },
+  }
+
+  const NOT_LINKED_BOFFMEDIA = {
+    message: t("notLinked.boffmediaMessage"),
+    help: {
+      possibleCauses: [
+        t("notLinked.boffmediaCauses.0"),
+        t("notLinked.boffmediaCauses.1"),
+      ],
+      solutions: [
+        t("notLinked.boffmediaSolutions.0"),
+        t("notLinked.boffmediaSolutions.1"),
+      ],
+    },
+  }
+
   const AuthScreen = ({ children }: { children: React.ReactNode }) => (
     <div className={`roboto h-screen w-full overflow-y-auto ${tema}`}>
       {children}
     </div>
   )
-
-  /*
-    if ('speechSynthesis' in window) {
-      var msg = new SpeechSynthesisUtterance();
-      var voices = window.speechSynthesis.getVoices();
-      msg.voice = voices[10]; 
-      msg.volume = 1; // From 0 to 1
-      msg.rate = 1; // From 0.1 to 10
-      msg.pitch = 2; // From 0 to 2
-      msg.text = "Como estas Joel";
-      msg.lang = 'es';
-      speechSynthesis.speak(msg);
-     }else{
-       // Speech Synthesis Not Supported 😣
-       alert("Sorry, your browser doesn't support text to speech!");
-     }*/
 
   useEffect(() => {
     const isSmart = isMinecraft()
@@ -161,7 +139,7 @@ export default function AppWrapper({
             error={NOT_LINKED_SMARTROTOM.message}
             help={NOT_LINKED_SMARTROTOM.help}
             onAction={() => signOut({ callbackUrl: "/" })}
-            actionText="Cerrar sesión"
+            actionText={t("settings.signOut")}
             showHelp={true}
           />
         </AuthScreen>
@@ -173,7 +151,7 @@ export default function AppWrapper({
             className="bg-red-500 text-white px-4 py-2 rounded"
             onClick={() => signOut({ callbackUrl: "/" })}
           >
-            Cerrar sesión
+            {t("settings.signOut")}
           </button>
         </div>
       </AuthScreen>
@@ -195,10 +173,6 @@ export default function AppWrapper({
   return (
     <section
       id="smartrotom"
-      // h-screen (not min-h-screen): the shell must BOUND the app, or per-app
-      // scroll roots (e.g. Furret Today's `.ft-app` overflow-auto) stretch to
-      // content height and can never scroll — and window scroll is dead anyway
-      // because the overflow-hidden <main> stops wheel chaining.
       className={`roboto flex h-screen flex-col ${tema} text-black bg-transparent`}
     >
       <RotomNav />

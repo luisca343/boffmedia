@@ -31,10 +31,10 @@ export function BasicInfo({ pokemon, formIndex, formName }: { pokemon: Pokemon; 
   const baseExp = pokemon.forms[formIndex].spawn?.baseExp ?? pokemon.forms[0]?.spawn?.baseExp
 
   const facts = [
-    { label: "Altura", value: height ? `${height}` : "—", unit: "m" },
-    { label: "Peso", value: pokemon.forms[formIndex].weight || pokemon.forms[0]?.weight || "—", unit: "kg" },
-    { label: "Tasa cap.", value: catchRate !== undefined ? `${catchRate}` : "—", unit: "/255" },
-    { label: "Exp. base", value: baseExp !== undefined ? `${baseExp}` : "—", unit: "" },
+    { label: t("info_height"), value: height ? `${height}` : "—", unit: "m" },
+    { label: t("info_weight"), value: pokemon.forms[formIndex].weight || pokemon.forms[0]?.weight || "—", unit: "kg" },
+    { label: t("info_catch_rate"), value: catchRate !== undefined ? `${catchRate}` : "—", unit: "/255" },
+    { label: t("info_base_exp"), value: baseExp !== undefined ? `${baseExp}` : "—", unit: "" },
   ]
 
   const renderAbility = (ability: string, hidden: boolean) => {
@@ -51,7 +51,7 @@ export function BasicInfo({ pokemon, formIndex, formName }: { pokemon: Pokemon; 
       >
         <div className={`inline-flex items-center gap-1 font-pk-mono text-[9.5px] tracking-[0.1em] uppercase mb-1.5 ${hidden ? "text-pk-accent-400" : "text-pk-surface-500"}`}>
           {hidden ? <SparklesIcon className="w-[11px] h-[11px]" /> : <StarIcon className="w-[11px] h-[11px]" />}
-          {hidden ? "Habilidad oculta" : "Habilidad estándar"}
+          {hidden ? t("info_hidden_ability") : t("info_standard_ability")}
         </div>
         <div className="text-[15px] font-semibold text-pk-surface-50 mb-1">{t(`ability_${key}`)}</div>
         <div className="text-[12.5px] leading-[1.5] text-pk-surface-300">{t(`ability_${key}_description`)}</div>
@@ -62,7 +62,7 @@ export function BasicInfo({ pokemon, formIndex, formName }: { pokemon: Pokemon; 
   return (
     <div className="flex flex-col gap-[22px]">
       <div>
-        <SubHead num="01" title="Descripción" />
+        <SubHead num="01" title={t("info_description")} />
         <div className="bg-white/[0.02] border border-white/[0.05] rounded-xl p-[18px_22px] relative">
           <span className="absolute -top-1.5 left-3.5 font-pk-display text-[56px] text-pk-primary-500 opacity-25 leading-none select-none">&ldquo;</span>
           <p className="m-0 text-[15px] leading-[1.65] text-pk-surface-100 font-normal relative z-10">{description}</p>
@@ -70,7 +70,7 @@ export function BasicInfo({ pokemon, formIndex, formName }: { pokemon: Pokemon; 
       </div>
 
       <div>
-        <SubHead num="·" title="Datos" />
+        <SubHead num="·" title={t("info_data")} />
         <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5">
           {facts.map((fact) => (
             <div key={fact.label} className="bg-white/[0.02] border border-white/[0.05] rounded-[10px] p-[12px_14px]">
@@ -85,7 +85,7 @@ export function BasicInfo({ pokemon, formIndex, formName }: { pokemon: Pokemon; 
       </div>
 
       <div>
-        <SubHead num="·" title="Habilidades" />
+        <SubHead num="·" title={t("info_abilities")} />
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           {abilities?.abilities?.map((ability: string) => renderAbility(ability, false))}
           {abilities?.hiddenAbilities?.map((ability: string) => renderAbility(ability, true))}

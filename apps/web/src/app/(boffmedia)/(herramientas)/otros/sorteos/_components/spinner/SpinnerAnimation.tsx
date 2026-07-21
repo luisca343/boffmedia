@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect } from "react"
+import { useTranslations } from "next-intl"
 import { useGiveawayAnimation } from "../../_hooks/useGiveawayAnimation"
 import Spinner from "./Spinner"
 
@@ -11,6 +12,7 @@ type SpinnerAnimationProps = {
 }
 
 export default function SpinnerAnimation({ participants, winner, onComplete }: SpinnerAnimationProps) {
+  const t = useTranslations("otros.sorteosApp")
   const {
     spinItems,
     scrollPosition,
@@ -38,7 +40,7 @@ export default function SpinnerAnimation({ participants, winner, onComplete }: S
             : "animate-[bm-pulse_1.2s_ease-in-out_infinite] text-accent-bright motion-reduce:animate-none")
         }
       >
-        {spinComplete ? "¡Tenemos un ganador!" : "¡Sorteando!"}
+        {spinComplete ? t("spinnerTenemosGanador") : t("spinnerSorteando")}
       </h2>
 
       {/* spinner with accent glow ring while live */}

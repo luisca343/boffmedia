@@ -71,7 +71,7 @@ export function useWmV3(t: Tr, tApp: Tr) {
   const rewardTypes = React.useMemo(() => getRewardTypes(t), [t])
   const dungeons = React.useMemo(() => getValidDungeons(t), [t])
   const items = React.useMemo(() => getItemData(), [])
-  const pokemon = React.useMemo(() => getValidPokemon().filter((o) => o.value !== "0"), [])
+  const pokemon = React.useMemo(() => getValidPokemon(t("selectPokemon")).filter((o) => o.value !== "0"), [t])
   const subQuestData = React.useMemo(() => getSubQuestData(f.questType, t), [f.questType, t])
 
   // ── derived ─────────────────────────────────────────────────────────────────

@@ -1,6 +1,7 @@
 import { PhoneIcon, Maximize2Icon, MicIcon } from "lucide-react"
 import { type CallData, UserStatus } from "../types/call"
 import { useState, useEffect } from "react"
+import { useTranslations } from "next-intl"
 
 interface CollapsedViewProps {
   activeCall: CallData
@@ -19,6 +20,7 @@ export function CollapsedView({
   onExpand,
   callStartTime,
 }: CollapsedViewProps) {
+  const t = useTranslations("smartrotom.calls")
   const [callDuration, setCallDuration] = useState("0:00")
   const [muted, setMuted] = useState(false)
   const currentUser = activeCall.users.find((user) => user.uuid === currentUserUuid)
@@ -26,7 +28,7 @@ export function CollapsedView({
   const isUserRinging = currentUser?.status === UserStatus.RINGING
   const usersInCall = activeCall.users.filter((user) => user.status === UserStatus.IN_CALL)
   const caller = activeCall.users.find((u) => u.uuid === activeCall.caller)
-  const name = activeCall.caller === currentUserUuid ? "Tu llamada" : caller?.username || "Llamada"
+  const name = activeCall.caller === currentUserUuid ? t("yourCall") : caller?.username || "Llamada"
 
   useEffect(() => {
     if (!isUserInCall || !callStartTime) return
@@ -39,7 +41,7 @@ export function CollapsedView({
     return () => clearInterval(interval)
   }, [callStartTime, isUserInCall])
 
-  const status = isUserRinging ? "Llamada entrante" : isUserInCall ? callDuration : "Llamando…"
+  const status = isUserRinging ? t("incoming") : isUserInCall ? callDuration : t("calling")
 
   return (
     <div className="flex w-full items-center gap-3 px-3 py-2.5">
@@ -59,23 +61,23 @@ export function CollapsedView({
 
       <button
         onClick={() => setMuted((v) => !v)}
-        title="Silenciar"
+        title={t("mute")}
         className={`grid h-9 w-9 flex-none place-items-center rounded-full transition-colors ${muted ? "bg-[#00a884] text-white" : "bg-white/[0.14] text-[#e9edef] hover:bg-white/[0.24]"}`}
       >
         <MicIcon className="h-[18px] w-[18px]" strokeWidth={2} />
       </button>
 
       {isUserRinging && (
-        <button onClick={onJoinCall} title="Aceptar" className="grid h-9 w-9 flex-none place-items-center rounded-full bg-[#25d366] text-white transition-transform hover:brightness-110 active:scale-90">
+        <button onClick={onJoinCall} title={t("accept")} className="grid h-9 w-9 flex-none place-items-center rounded-full bg-[#25d366] text-white transition-transform hover:brightness-110 active:scale-90">
           <PhoneIcon className="h-[18px] w-[18px]" strokeWidth={2} />
         </button>
       )}
 
-      <button onClick={onExitCall} title="Colgar" className="grid h-9 w-9 flex-none place-items-center rounded-full bg-[#f05454] text-white transition-transform hover:brightness-110 active:scale-90">
+      <button onClick={onExitCall} title={t("hangUp")} className="grid h-9 w-9 flex-none place-items-center rounded-full bg-[#f05454] text-white transition-transform hover:brightness-110 active:scale-90">
         <PhoneIcon className="h-[18px] w-[18px] rotate-[135deg]" strokeWidth={2} />
       </button>
 
-      <button onClick={onExpand} title="Ampliar" className="grid h-9 w-9 flex-none place-items-center rounded-full bg-white/[0.14] text-[#e9edef] transition-colors hover:bg-white/[0.24]">
+      <button onClick={onExpand} title={t("expand")} className="grid h-9 w-9 flex-none place-items-center rounded-full bg-white/[0.14] text-[#e9edef] transition-colors hover:bg-white/[0.24]">
         <Maximize2Icon className="h-[18px] w-[18px]" strokeWidth={2} />
       </button>
     </div>

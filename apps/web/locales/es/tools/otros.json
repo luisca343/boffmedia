@@ -140,7 +140,16 @@
       "copied": "Copiada",
       "copyHeader": "Sorteo Boffmedia · semilla #{seed}",
       "historyTitle": "Historial de ganadores",
-      "clearHistory": "Vaciar historial"
+      "clearHistory": "Vaciar historial",
+      "weightLess": "Menos peso",
+      "weightMore": "Más peso",
+      "spinnerWinnerSelected": "¡Ganador seleccionado!",
+      "spinnerSpinning": "Sorteando…",
+      "spinnerRuleta": "Ruleta del sorteo",
+      "spinnerGanadorConfirmado": "Ganador confirmado",
+      "spinnerTenemosGanador": "¡Tenemos un ganador!",
+      "spinnerSorteando": "¡Sorteando!",
+      "winnerTag": "Ganador"
     },
     "bibliotecaApp": {
       "kicker": "Otros · Biblioteca",

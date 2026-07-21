@@ -50,7 +50,7 @@ export default function BiomeDetailPage() {
       >
         <span className="absolute top-0 right-0 w-[160px] h-[160px] bg-[radial-gradient(circle_at_70%_30%,rgba(255,255,255,.14),transparent_60%)] pointer-events-none" />
         <Link href="/smartrotom/pokedex/localizacion" className="inline-flex items-center gap-1 text-xs opacity-80 hover:opacity-100 mb-3 relative transition-opacity">
-          <ArrowLeftIcon className="w-3.5 h-3.5" /> Biomas
+          <ArrowLeftIcon className="w-3.5 h-3.5" /> {t("biome_back")}
         </Link>
         <div className="flex items-center gap-3 relative">
           <span className="w-12 h-12 rounded-xl bg-black/20 grid place-items-center text-2xl" aria-hidden="true">
@@ -58,24 +58,24 @@ export default function BiomeDetailPage() {
           </span>
           <div>
             <h1 className="font-pk-display font-bold text-[26px] tracking-tight leading-none">{getTranslatedBiomeName(biomeId, t)}</h1>
-            <span className="text-sm opacity-90 font-pk-mono">{totalCount} especies localizables</span>
+            <span className="text-sm opacity-90 font-pk-mono">{totalCount} {t("biome_localizable_species")}</span>
           </div>
         </div>
       </div>
 
       <div className="flex flex-wrap gap-3 text-xs text-pk-surface-300">
         <label className="inline-flex items-center gap-2 cursor-pointer bg-white/[0.03] border border-white/[0.07] rounded-lg px-3 py-1.5">
-          <input type="checkbox" checked={hideSeen} onChange={(e) => setHideSeen(e.target.checked)} className="accent-pk-primary-500" /> Ocultar avistados
+          <input type="checkbox" checked={hideSeen} onChange={(e) => setHideSeen(e.target.checked)} className="accent-pk-primary-500" /> {t("biome_hide_seen")}
         </label>
         <label className="inline-flex items-center gap-2 cursor-pointer bg-white/[0.03] border border-white/[0.07] rounded-lg px-3 py-1.5">
-          <input type="checkbox" checked={hideCaught} onChange={(e) => setHideCaught(e.target.checked)} className="accent-pk-primary-500" /> Ocultar atrapados
+          <input type="checkbox" checked={hideCaught} onChange={(e) => setHideCaught(e.target.checked)} className="accent-pk-primary-500" /> {t("biome_hide_caught")}
         </label>
       </div>
 
       {!pokemon ? (
-        <div className="p-8 text-center text-pk-surface-500 text-sm">Cargando…</div>
+        <div className="p-8 text-center text-pk-surface-500 text-sm">{t("biome_loading")}</div>
       ) : totalCount === 0 ? (
-        <div className="p-8 text-center text-pk-surface-500 text-sm">No se encontraron Pokémon en este bioma.</div>
+        <div className="p-8 text-center text-pk-surface-500 text-sm">{t("biome_no_pokemon")}</div>
       ) : (
         groups.map(([biome, spawns]) => {
           const visible = spawns.filter((s) => getVisibility(s.dex, s.form || "base", hideCaught, hideSeen))
