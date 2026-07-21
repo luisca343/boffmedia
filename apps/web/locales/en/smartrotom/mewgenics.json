@@ -194,17 +194,21 @@
       "misc": "Misc"
     },
     "filter": {
-      "kind": "Type",
-      "kind.weapon": "Weapon",
-      "kind.head": "Head",
-      "kind.face": "Face",
-      "kind.neck": "Neck",
-      "kind.trinket": "Trinket",
+      "kind": {
+        "label": "Type",
+        "weapon": "Weapon",
+        "head": "Head",
+        "face": "Face",
+        "neck": "Neck",
+        "trinket": "Trinket"
+      },
       "rarity": "Rarity",
       "faction": "Faction",
       "type": "Type",
-      "cls": "Class",
-      "cls.general": "General",
+      "cls": {
+        "label": "Class",
+        "general": "General"
+      },
       "act": "Act"
     },
     "sort": {
