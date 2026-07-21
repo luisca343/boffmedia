@@ -36,6 +36,8 @@ export class GameServerAuthGuard implements CanActivate {
       return true;
     }
 
-    throw new UnauthorizedException('This route requires a valid server token.');
+    throw new UnauthorizedException(
+      'This route requires a valid server token.',
+    );
   }
 }

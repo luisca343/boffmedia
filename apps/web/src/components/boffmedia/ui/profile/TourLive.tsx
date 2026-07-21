@@ -1,4 +1,5 @@
 import * as React from "react"
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { Button, Icon } from "@/components/boffmedia/primitives"
 import type { TourData } from "./profile-data"
@@ -10,7 +11,8 @@ export interface TourLiveProps extends TourData {
   className?: string
 }
 
-export function TourLive({ name, where, format, stats, roundLabel, vs, liveLabel = "En vivo", hue, action, className }: TourLiveProps) {
+export function TourLive({ name, where, format, stats, roundLabel, vs, liveLabel, hue, action, className }: TourLiveProps) {
+  const t = useTranslations("common.profile")
   const tint = hue != null ? `hsl(${hue} 65% 62%)` : undefined
   return (
     <div
@@ -23,7 +25,7 @@ export function TourLive({ name, where, format, stats, roundLabel, vs, liveLabel
       <div className="flex items-center justify-between gap-3 border-b border-solid border-line bg-panel-2 px-[18px] py-[11px]">
         <span className="inline-flex items-center gap-2 font-mono text-[10px]/none font-bold uppercase tracking-[0.12em] text-bad">
           <i className="h-[7px] w-[7px] rounded-full bg-bad animate-[bm-pulse_1.8s_ease-in-out_infinite] motion-reduce:animate-none" />
-          {liveLabel}
+          {liveLabel ?? t("live")}
         </span>
         <span
           className="inline-flex items-center gap-1.5 font-mono text-[10.5px]/none font-semibold text-[hsl(28_65%_62%)]"

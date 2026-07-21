@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { Panel } from "../../_components/ui"
 
@@ -29,11 +30,12 @@ export default function MemoPanel({
   onToggleMemoMode,
   onSelectMark,
 }: MemoPanelProps) {
+  const t = useTranslations("")
   return (
     <Panel tone="void" tight>
       <div className="mb-2.5 flex items-center justify-between gap-2">
         <span className="font-ar-display text-[9px] uppercase tracking-[0.18em] text-ar-magenta-2">
-          MEMO
+          {t("arcade.voltorb.memo.title")}
         </span>
         <button
           type="button"
@@ -46,7 +48,7 @@ export default function MemoPanel({
               : "border-white/10 bg-white/[.04] text-ar-ink-muted",
           )}
         >
-          {memoMode ? "Notas ON" : "Notas OFF"}
+          {memoMode ? t("arcade.voltorb.memo.notesOn") : t("arcade.voltorb.memo.notesOff")}
         </button>
       </div>
 
@@ -58,7 +60,7 @@ export default function MemoPanel({
             onClick={() => onSelectMark(mark)}
             disabled={!memoMode}
             aria-pressed={memoMode && selectedMark === mark}
-            aria-label={mark === 0 ? "Marcar Voltorb" : `Marcar x${mark}`}
+            aria-label={mark === 0 ? t("arcade.voltorb.memo.markVoltorb") : t("arcade.voltorb.memo.markX", { mark })}
             className={cn(
               "ar-lift h-[38px] flex-1 rounded-md border font-ar-display text-[13px]",
               "disabled:pointer-events-none disabled:opacity-45",
@@ -71,8 +73,7 @@ export default function MemoPanel({
       </div>
 
       <p className="mt-2 font-ar-mono text-[10px] leading-relaxed text-ar-ink-muted">
-        Activa <b className="text-ar-ink-dim">Notas</b> y haz clic en una casilla para marcarla sin
-        voltearla.
+        {t("arcade.voltorb.memo.hint", { bold: "" })}
       </p>
     </Panel>
   )

@@ -12,7 +12,12 @@ import {
 import { smartRotomReplays, smartrotomUsers } from './SmartRotom';
 import { pokedexRegistry } from './SmartRotomPokedex';
 
-export const ROOKER_POST_TYPES = ['text', 'media', 'capture', 'battle'] as const;
+export const ROOKER_POST_TYPES = [
+  'text',
+  'media',
+  'capture',
+  'battle',
+] as const;
 export type RookerPostType = (typeof ROOKER_POST_TYPES)[number];
 
 export const ROOKER_REACTION_TYPES = [

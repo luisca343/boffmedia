@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { Icon } from "@/components/boffmedia/primitives"
 import { srtSourceMeta, srtPrizeMeta, type SrtPrizeType, type SrtSourceKey, type SrtStatus, type SrtOrganizerData } from "./giveaways-util"
@@ -47,11 +48,12 @@ const ORG_SEAL: Record<string, string> = {
 }
 
 export function SrtOrganizer({ organizer }: { organizer: SrtOrganizerData }) {
+  const t = useTranslations("common.giveaways")
   const o = organizer || ({} as SrtOrganizerData)
   return (
     <span className="inline-flex items-center gap-2 font-mono text-[11px]/none font-semibold tracking-[0.05em] text-txt-muted">
       <span className={cn("grid h-6 w-6 flex-none place-items-center font-display text-[11px]/none font-bold cut-seal [--cut:5px]", ORG_SEAL[o.kind] || ORG_SEAL.boffmedia)}>{o.avatar || "B"}</span>
-      Por <b className="font-bold text-txt">{o.name}</b>
+      {t("by")} <b className="font-bold text-txt">{o.name}</b>
     </span>
   )
 }
@@ -67,22 +69,24 @@ export function SrtSourceTag({ source }: { source: SrtSourceKey }) {
 }
 
 export function SrtPrizeTag({ type, winners }: { type: SrtPrizeType; winners?: number }) {
+  const t = useTranslations("common.giveaways")
   const m = srtPrizeMeta(type)
   return (
     <span className="cut [--cut:4px] inline-flex items-center gap-1.5 border border-solid border-accent-line bg-accent-soft px-2 py-[5px] font-mono text-[9.5px]/none font-semibold uppercase tracking-[0.1em] text-accent">
       <Icon name={m.icon} size={12} />
       {m.label}
-      {winners && winners > 1 ? ` · ${winners} ganadores` : ""}
+      {winners && winners > 1 ? ` · ${winners} ${t("winner", { count: winners })}` : ""}
     </span>
   )
 }
 
-export function SrtTicketMeter({ tickets, max, odds, label = "Tus tickets" }: { tickets: number; max: number; odds?: number | null; label?: string }) {
+export function SrtTicketMeter({ tickets, max, odds, label }: { tickets: number; max: number; odds?: number | null; label?: string }) {
+  const t = useTranslations("common.giveaways")
   const pct = max ? Math.min(100, (tickets / max) * 100) : 0
   return (
     <div className="block">
       <div className="mb-2 flex items-baseline justify-between gap-3">
-        <span className="font-mono text-[10px]/none font-medium uppercase tracking-[0.1em] text-txt-muted">{label}</span>
+        <span className="font-mono text-[10px]/none font-medium uppercase tracking-[0.1em] text-txt-muted">{label ?? t("yourTickets")}</span>
         <span className="font-display text-[22px]/none font-extrabold italic text-accent">
           {tickets}
           <small className="ml-1 font-mono text-[10px]/none font-medium not-italic tracking-[0.06em] text-txt-muted">/ {max}</small>
@@ -93,7 +97,7 @@ export function SrtTicketMeter({ tickets, max, odds, label = "Tus tickets" }: { 
       </div>
       {odds != null && (
         <div className="mt-[7px] font-mono text-[10px]/[1.4] font-medium tracking-[0.04em] text-txt-dim">
-          Probabilidad estimada <b className="text-txt">{odds < 0.1 ? "<0,1" : odds.toFixed(1)}%</b> · ponderada por tickets
+          {t("estimatedProbability")} <b className="text-txt">{odds < 0.1 ? "<0,1" : odds.toFixed(1)}%</b> · {t("weightedByTickets")}
         </div>
       )}
     </div>

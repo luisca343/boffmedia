@@ -1,6 +1,7 @@
 "use client"
 
 import type { FormEvent } from "react"
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { Button, Icon, Input, PixelArt } from "../../_components/ui"
 import type { WordlePokemon } from "../_hooks/useGetWordlePokemon"
@@ -29,6 +30,7 @@ export function GuessInput({
   attempt,
   disabled,
 }: GuessInputProps) {
+  const t = useTranslations("")
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault()
     onSubmit()
@@ -48,8 +50,8 @@ export function GuessInput({
             type="text"
             value={value}
             onChange={(e) => onChange(e.target.value)}
-            placeholder="Escribe un nombre de Pokémon"
-            aria-label="Intento de nombre de Pokémon"
+            placeholder={t("arcade.squirdle.guessInput.placeholder")}
+            aria-label={t("arcade.squirdle.guessInput.ariaLabel")}
             autoComplete="off"
             disabled={disabled}
             className={cn(
@@ -62,7 +64,7 @@ export function GuessInput({
           </span>
         </div>
         <Button type="submit" variant="cyan" size="md" disabled={disabled}>
-          Adivinar
+          {t("arcade.squirdle.guessInput.guess")}
         </Button>
       </div>
 

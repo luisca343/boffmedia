@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { useTranslations } from "next-intl";
 import type { NoteFolder, NoteTag } from "@boffmedia/shared";
 import { Icon, MiniTag, Avatar } from "./ui";
 import { outline, extractLinks } from "../_utils/wikilinks";
@@ -23,6 +24,7 @@ interface ContextPanelProps {
 type Tab = "outline" | "backlinks" | "info";
 
 export function ContextPanel(props: ContextPanelProps) {
+  const t = useTranslations("notas");
   const { note, activeContent, notes, contentById, folders, tags } = props;
   const [tab, setTab] = useState<Tab>("outline");
 
@@ -54,14 +56,14 @@ export function ContextPanel(props: ContextPanelProps) {
   return (
     <aside
       className="flex w-[280px] flex-none flex-col border-l border-nt-border bg-nt-bg-2 max-lg:hidden"
-      aria-label="Panel de contexto"
+      aria-label={t("context.outline")}
     >
       <div className="flex gap-0.5 border-b border-nt-border px-2.5 pt-2">
         <div className={tabCls("outline")} onClick={() => setTab("outline")}>
-          <Icon name="list" size={14} /> Esquema
+          <Icon name="list" size={14} /> {t("context.outline")}
         </div>
         <div className={tabCls("backlinks")} onClick={() => setTab("backlinks")}>
-          <Icon name="link" size={14} /> Enlaces{linkCount ? ` ${linkCount}` : ""}
+          <Icon name="link" size={14} /> {t("context.links")}{linkCount ? ` ${linkCount}` : ""}
         </div>
         <div className={tabCls("info")} onClick={() => setTab("info")}>
           <Icon name="settings" size={14} />
@@ -84,7 +86,7 @@ export function ContextPanel(props: ContextPanelProps) {
             ))
           ) : (
             <div className="px-2.5 py-[30px] text-center text-[12.5px] leading-[1.6] text-nt-fg-subtle">
-              Añade títulos para ver el esquema del documento.
+              {t("context.outlineHint")}
             </div>
           ))}
 
@@ -93,7 +95,7 @@ export function ContextPanel(props: ContextPanelProps) {
             <>
               {outgoing.length > 0 && (
                 <>
-                  <SectionLabel>Enlaces salientes</SectionLabel>
+                  <SectionLabel>{t("context.outgoing")}</SectionLabel>
                   {outgoing.map((o, i) => (
                     <button
                       key={i}
@@ -104,7 +106,7 @@ export function ContextPanel(props: ContextPanelProps) {
                       <Icon name="link" size={13} className="flex-none text-nt-accent-fg" />
                       <span className="min-w-0 flex-1 truncate font-medium text-nt-fg">{o.title}</span>
                       {!o.target && (
-                        <span className="flex-none text-[10.5px] text-nt-fg-subtle">sin crear</span>
+                        <span className="flex-none text-[10.5px] text-nt-fg-subtle">{t("context.uncreated")}</span>
                       )}
                     </button>
                   ))}
@@ -112,7 +114,7 @@ export function ContextPanel(props: ContextPanelProps) {
               )}
               {backlinks.length > 0 && (
                 <>
-                  <SectionLabel>Enlaces entrantes</SectionLabel>
+                  <SectionLabel>{t("context.incoming")}</SectionLabel>
                   {backlinks.map((b) => (
                     <div
                       key={b.id}
@@ -131,18 +133,18 @@ export function ContextPanel(props: ContextPanelProps) {
             </>
           ) : (
             <div className="px-2.5 py-[30px] text-center text-[12.5px] leading-[1.6] text-nt-fg-subtle">
-              Ninguna nota enlaza aquí todavía.
+              {t("context.noBacklinks")}
               <br />
-              Usa{" "}
+              {t("context.useWikilinks")}{" "}
               <code className="rounded bg-nt-hover-strong px-1.5 py-px font-nt-mono text-nt-accent-fg">[[</code>{" "}
-              para crear enlaces.
+              {t("context.toCreateLinks")}
             </div>
           ))}
 
         {tab === "info" && (
           <div className="flex flex-col gap-3.5 text-[13px] text-nt-fg-muted">
-            <InfoRow label="Carpeta">{folder?.name || "—"}</InfoRow>
-            <InfoRow label="Etiquetas">
+            <InfoRow label={t("context.folder")}>{folder?.name || "—"}</InfoRow>
+            <InfoRow label={t("context.tags")}>
               <div className="flex flex-wrap gap-1.5">
                 {note.tags.length
                   ? note.tags.map((t) => {
@@ -152,7 +154,7 @@ export function ContextPanel(props: ContextPanelProps) {
                   : "—"}
               </div>
             </InfoRow>
-            <InfoRow label="Compartida con">
+            <InfoRow label={t("context.sharedWith")}>
               {note.sharedWith.length ? (
                 note.sharedWith.map((u) => (
                   <div key={u} className="mb-1.5 flex items-center gap-2">
@@ -161,15 +163,15 @@ export function ContextPanel(props: ContextPanelProps) {
                   </div>
                 ))
               ) : (
-                "Privada"
+                t("context.private")
               )}
             </InfoRow>
-            <InfoRow label="Creada">{fullDate(note.createdMs)}</InfoRow>
-            <InfoRow label="Modificada">{fullDate(note.updatedMs)}</InfoRow>
-            <InfoRow label="Visibilidad">
+            <InfoRow label={t("context.created")}>{fullDate(note.createdMs)}</InfoRow>
+            <InfoRow label={t("context.modified")}>{fullDate(note.updatedMs)}</InfoRow>
+            <InfoRow label={t("context.visibility")}>
               <span className="inline-flex items-center gap-1.5">
                 <Icon name={note.public ? "globe" : "lock"} size={14} />
-                {note.public ? "Pública" : "Privada"}
+                {note.public ? t("context.public") : t("context.private")}
               </span>
             </InfoRow>
           </div>

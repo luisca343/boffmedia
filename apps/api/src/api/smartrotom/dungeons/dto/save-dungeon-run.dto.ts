@@ -23,7 +23,10 @@ export class DungeonRunParticipantDto {
   @IsUUID()
   uuid: string;
 
-  @ApiProperty({ description: 'Player name at the time of the run', example: 'Ana' })
+  @ApiProperty({
+    description: 'Player name at the time of the run',
+    example: 'Ana',
+  })
   @IsString()
   @IsNotEmpty()
   @MaxLength(32)
@@ -107,12 +110,18 @@ export class SaveDungeonRunDto extends BaseDto {
   @Min(0)
   monedasConvertidas: number;
 
-  @ApiProperty({ description: 'Run end timestamp (epoch millis)', example: 1700000000000 })
+  @ApiProperty({
+    description: 'Run end timestamp (epoch millis)',
+    example: 1700000000000,
+  })
   @IsInt()
   @Min(0)
   fecha: number;
 
-  @ApiProperty({ description: 'Party members', type: [DungeonRunParticipantDto] })
+  @ApiProperty({
+    description: 'Party members',
+    type: [DungeonRunParticipantDto],
+  })
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => DungeonRunParticipantDto)

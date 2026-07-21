@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import { useTranslations } from "next-intl"
 import { Badge, Bar, Card, Empty, Skeleton, Sunken } from "../ui"
 import { useAnuncios } from "../../_hooks/queries"
 import { fmtDate } from "../../_utils/format"
@@ -10,6 +11,7 @@ import type { Tone } from "../../_utils/tones"
 const KIND_TONE: Record<string, Tone> = { evento: "gold", anuncio: "civic", alerta: "danger" }
 
 export function AnunciosCard() {
+  const t = useTranslations("gobierno")
   const { data, isLoading } = useAnuncios({ pinned: true, pageSize: 2 })
   const items = data?.items ?? []
 
@@ -20,17 +22,17 @@ export function AnunciosCard() {
         dep="gold"
         right={
           <Link href={hrefOf("anuncios")} className="text-xs font-bold text-gt-ink-600 hover:text-gt-ink-900">
-            Más
+            {t("common.more")}
           </Link>
         }
       >
-        Anuncios
+        {t("anuncios.title")}
       </Bar>
       <div className="grid gap-2.5 p-3">
         {isLoading ? (
           Array.from({ length: 2 }, (_, i) => <Skeleton key={i} className="h-[92px]" />)
         ) : items.length === 0 ? (
-          <Empty icon="megaphone" title="Sin anuncios fijados" sub="El gobierno no ha publicado avisos destacados." />
+          <Empty icon="megaphone" title={t("anuncios.emptyTitle")} sub={t("anuncios.emptyBody")} />
         ) : (
           items.map((e) => (
             <Link key={e.id} href={hrefOf("anuncios")} className="block">

@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import { useTranslations } from "next-intl"
 import { Avatar, Badge, Bar, Card, Empty, Skeleton } from "../ui"
 import { useDenuncias } from "../../_hooks/queries"
 import { DENUNCIA_STATUS } from "../../_utils/tones"
@@ -8,6 +9,7 @@ import { hrefOf } from "../../_utils/nav"
 import { useGobiernoUi } from "../../_stores/useGobiernoUi"
 
 export function DenunciasCard() {
+  const t = useTranslations("gobierno")
   const { data, isLoading } = useDenuncias({ pageSize: 5 })
   const openDossier = useGobiernoUi((s) => s.openDossier)
 
@@ -27,11 +29,11 @@ export function DenunciasCard() {
             href={hrefOf("denuncias")}
             className="inline-flex items-center gap-1.5 rounded-gt-sm px-2 py-1 text-xs font-bold text-gt-ink-600 transition-colors hover:bg-gt-paper-1 hover:text-gt-ink-900"
           >
-            Ver todas
+            {t("denuncias.verTodas")}
           </Link>
         }
       >
-        Denuncias recientes
+        {t("denuncias.recentTitle")}
       </Bar>
 
       {isLoading ? (
@@ -43,8 +45,8 @@ export function DenunciasCard() {
       ) : recientes.length === 0 ? (
         <Empty
           icon="fileText"
-          title="Sin denuncias"
-          sub="Todavía no se ha registrado ninguna denuncia en la región."
+          title={t("denuncias.emptyTitle")}
+          sub={t("denuncias.emptyBody")}
         />
       ) : (
         <div>
@@ -66,7 +68,7 @@ export function DenunciasCard() {
                     <div className="flex items-center gap-2">
                       <span className="font-gt-mono text-[11px] text-gt-ink-400">{d.code}</span>
                       <span className="truncate text-[13px] font-bold text-gt-ink-900">
-                        {d.accused?.username ?? "Sin identificar"}
+                        {d.accused?.username ?? t("denuncias.sinIdentificar")}
                       </span>
                     </div>
                     <div className="mt-0.5 truncate text-[12px] text-gt-ink-500">{d.description}</div>

@@ -1,6 +1,7 @@
 "use client"
 
 import type { ReactNode } from "react"
+import { useTranslations } from "next-intl"
 import { Button, Icon, Modal } from "../../_components/ui"
 
 interface RulesModalProps {
@@ -22,99 +23,63 @@ function Section({ title, children }: { title: string; children: ReactNode }) {
 const LIST = "ml-4 list-disc space-y-1.5 marker:text-ar-cyan"
 
 export function RulesModal({ isOpen, onClose }: RulesModalProps) {
+  const t = useTranslations("")
+
   return (
     <Modal
       open={isOpen}
       onClose={onClose}
       size="lg"
       tone="cyan"
-      kicker="Cómo se juega"
-      title="REGLAS DE GIRA VOLTORB"
+      kicker={t("arcade.voltorb.howToPlay")}
+      title={t("arcade.voltorb.rulesTitle")}
       footer={
         <Button variant="cyan" size="sm" icon={<Icon.Joystick s={12} />} onClick={onClose}>
-          Entendido
+          {t("arcade.voltorb.understood")}
         </Button>
       }
     >
-      <Section title="Introducción">
-        <p>
-          Gira Voltorb es una mezcla entre Picross y Buscaminas. Tu objetivo es encontrar las cartas
-          multiplicadoras sin voltear ningún Voltorb.
-        </p>
+      <Section title={t("arcade.voltorb.introduction")}>
+        <p>{t("arcade.voltorb.introText")}</p>
       </Section>
 
-      <Section title="El tablero">
+      <Section title={t("arcade.voltorb.theBoard")}>
         <ul className={LIST}>
-          <li>El juego se desarrolla en una cuadrícula de 5x5.</li>
-          <li>Bajo cada casilla se esconde un número (1, 2 o 3) o un Voltorb.</li>
-          <li>Los números son multiplicadores que aumentan tus monedas.</li>
-          <li>Los Voltorb hacen que pierdas todas las monedas de la ronda actual.</li>
+          {(["boardItems.0", "boardItems.1", "boardItems.2", "boardItems.3"] as const).map((key) => (
+            <li key={key}>{t(`arcade.voltorb.${key}`)}</li>
+          ))}
         </ul>
       </Section>
 
-      <Section title="Cómo jugar">
+      <Section title={t("arcade.voltorb.howToPlaySection")}>
         <ol className="ml-4 list-decimal space-y-1.5 marker:font-ar-mono marker:text-ar-cyan">
-          <li>Haz clic en una casilla para voltearla.</li>
-          <li>Si encuentras un multiplicador (x2 o x3), tus monedas se multiplican por ese valor.</li>
-          <li>Si es la primera carta que volteas, obtienes ese número de monedas.</li>
-          <li>Si encuentras un Voltorb, pierdes todas las monedas de la ronda y el juego termina.</li>
-          <li>
-            Puedes elegir Cobrar en cualquier momento para guardar tus monedas y pasar al siguiente
-            nivel.
-          </li>
+          {(["playSteps.0", "playSteps.1", "playSteps.2", "playSteps.3", "playSteps.4"] as const).map((key) => (
+            <li key={key}>{t(`arcade.voltorb.${key}`)}</li>
+          ))}
         </ol>
       </Section>
 
-      <Section title="Niveles y progresión">
+      <Section title={t("arcade.voltorb.levelsProgression")}>
         <ul className={LIST}>
-          <li>Hay 8 niveles en total.</li>
-          <li>Ganas y avanzas de nivel encontrando todas las cartas x2 y x3.</li>
-          <li>
-            Los niveles más altos tienen más multiplicadores y Voltorbs, aumentando el riesgo y la
-            recompensa.
-          </li>
-          <li>
-            <b className="text-ar-ink">Regla de regresión de nivel:</b>
-            <ul className="ml-4 mt-1.5 list-disc space-y-1.5 marker:text-ar-magenta-2">
-              <li>Todas las cartas con números (x1, x2, x3) cuentan como cartas multiplicadoras.</li>
-              <li>
-                Si al terminar la ronda (ya sea por encontrar un Voltorb o por elegir Cobrar) has
-                volteado menos cartas multiplicadoras que el número de tu nivel actual, bajarás de
-                nivel.
-              </li>
-              <li>El nuevo nivel será igual al número de cartas multiplicadoras que hayas volteado.</li>
-              <li>
-                Ejemplo: Si estás en el nivel 5 y volteas solo 3 cartas multiplicadoras (incluyendo
-                x1) antes de que termine la ronda, bajarás al nivel 3 para la siguiente ronda.
-              </li>
-            </ul>
-          </li>
+          {(["levelItems.0", "levelItems.1", "levelItems.2", "levelItems.3"] as const).map((key) => (
+            <li key={key}>{t(`arcade.voltorb.${key}`)}</li>
+          ))}
         </ul>
       </Section>
 
-      <Section title="Nivel 8">
-        <p>
-          Para alcanzar el nivel 8, debes ganar 5 juegos seguidos en cualquier nivel, volteando 8 o
-          más cartas multiplicadoras en cada uno de estos 5 juegos.
-        </p>
+      <Section title={t("arcade.voltorb.level8")}>
+        <p>{t("arcade.voltorb.level8Text")}</p>
       </Section>
 
-      <Section title="Modo memo">
-        <p>
-          Puedes usar el modo Memo para marcar las casillas con símbolos (Voltorb, 1, 2 o 3) sin
-          voltearlas. Esto te ayuda a recordar tus sospechas sobre el contenido de cada casilla.
-        </p>
+      <Section title={t("arcade.voltorb.memoMode")}>
+        <p>{t("arcade.voltorb.memoModeText")}</p>
       </Section>
 
-      <Section title="Consejos">
+      <Section title={t("arcade.voltorb.tips")}>
         <ul className={LIST}>
-          <li>
-            Usa la información de las filas y columnas para deducir la ubicación de los
-            multiplicadores y Voltorbs.
-          </li>
-          <li>A veces es mejor cobrar y pasar al siguiente nivel que arriesgarse a perder todo.</li>
-          <li>Utiliza el modo Memo para marcar tus sospechas y estrategias.</li>
-          <li>Practica y desarrolla tu intuición para mejorar en el juego.</li>
+          {(["tipItems.0", "tipItems.1", "tipItems.2", "tipItems.3"] as const).map((key) => (
+            <li key={key}>{t(`arcade.voltorb.${key}`)}</li>
+          ))}
         </ul>
       </Section>
     </Modal>

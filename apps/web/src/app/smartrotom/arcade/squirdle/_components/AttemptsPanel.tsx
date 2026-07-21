@@ -1,3 +1,4 @@
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { Panel } from "../../_components/ui"
 import { MAX_GUESSES } from "../_utils/compare"
@@ -15,9 +16,10 @@ const PIP: Record<"spent" | "current" | "free", string> = {
 
 /** The magazine: one pip per guess the machine will accept. */
 export function AttemptsPanel({ used, remaining }: AttemptsPanelProps) {
+  const t = useTranslations("")
   return (
     <Panel tone="cyan" tight>
-      <div className="mb-2.5 font-ar-display text-[9px] uppercase text-ar-cyan">Intentos</div>
+      <div className="mb-2.5 font-ar-display text-[9px] uppercase text-ar-cyan">{t("arcade.squirdle.attemptsPanel.title")}</div>
       <div className="flex gap-1.5">
         {Array.from({ length: MAX_GUESSES }, (_, i) => (
           <span
@@ -30,7 +32,7 @@ export function AttemptsPanel({ used, remaining }: AttemptsPanelProps) {
         ))}
       </div>
       <p className="m-0 mt-2.5 font-ar-mono text-[11px] text-ar-ink-dim">
-        Te quedan <b className="text-ar-ink tabular-nums">{remaining}</b> de {MAX_GUESSES} intentos.
+        {t("arcade.squirdle.attemptsPanel.remaining", { remaining, total: MAX_GUESSES })}
       </p>
     </Panel>
   )

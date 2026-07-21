@@ -1,6 +1,7 @@
 "use client"
 
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from "react"
+import { useTranslations } from "next-intl"
 import { I } from "@/components/smartrotom/media/ui"
 import type { Chapter } from "../../_utils/chapters"
 
@@ -83,6 +84,7 @@ export const NativePlayer = forwardRef<
   NativePlayerHandle,
   { videoId: string; poster?: string; title?: string; chapters?: Chapter[] }
 >(function NativePlayer({ videoId, poster, title, chapters = [] }, ref) {
+  const t = useTranslations("mewtube")
   const holderRef = useRef<HTMLDivElement>(null)
   const wrapRef = useRef<HTMLDivElement>(null)
   const playerRef = useRef<YTPlayer | null>(null)
@@ -184,7 +186,7 @@ export const NativePlayer = forwardRef<
               <button
                 key={c.seconds}
                 type="button"
-                aria-label={`Ir a ${c.label}`}
+                aria-label={t("player.seekTo", { label: c.label })}
                 onClick={(e) => {
                   e.stopPropagation()
                   seekTo(c.seconds)
@@ -199,7 +201,7 @@ export const NativePlayer = forwardRef<
         <button
           type="button"
           onClick={toggle}
-          aria-label={playing ? "Pausa" : "Reproducir"}
+          aria-label={playing ? t("player.pause") : t("player.play")}
           className="pointer-events-auto flex h-8 w-8 items-center justify-center rounded-md hover:bg-white/10"
         >
           {playing ? <PauseGlyph /> : <I.play size={18} />}
@@ -218,7 +220,7 @@ export const NativePlayer = forwardRef<
               playerRef.current?.setVolume(v)
             }}
             className="w-20 accent-white"
-            aria-label="Volumen"
+            aria-label={t("player.volume")}
           />
         </div>
 
@@ -232,7 +234,7 @@ export const NativePlayer = forwardRef<
           <button
             type="button"
             onClick={() => wrapRef.current?.requestFullscreen?.()}
-            aria-label="Pantalla completa"
+            aria-label={t("player.fullscreen")}
             className="flex h-8 w-8 items-center justify-center rounded-md hover:bg-white/10"
           >
             <FsGlyph />

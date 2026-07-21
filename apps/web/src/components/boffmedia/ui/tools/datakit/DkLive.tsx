@@ -1,17 +1,18 @@
 "use client"
 
 import * as React from "react"
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { Icon } from "@/components/boffmedia/primitives"
 
 // live / playing / pending / final / soon status pill. Mirrors `.dk-live`.
 const DK_LIVE: Record<string, [string, string, boolean]> = {
-  live: ["En vivo", "live", true],
-  playing: ["Jugando", "playing", true],
-  pending: ["Pendiente", "pending", false],
-  final: ["Final", "final", false],
-  soon: ["Próximo", "soon", false],
-  done: ["Finalizado", "final", false],
+  live: ["dkLive.live", "live", true],
+  playing: ["dkLive.playing", "playing", true],
+  pending: ["dkLive.pending", "pending", false],
+  final: ["dkLive.final", "final", false],
+  soon: ["dkLive.soon", "soon", false],
+  done: ["dkLive.done", "final", false],
 }
 
 const DK_LIVE_TONE: Record<string, string> = {
@@ -23,7 +24,8 @@ const DK_LIVE_TONE: Record<string, string> = {
 }
 
 export function DkLive({ status = "live", label, size = "md" }: { status?: string; label?: React.ReactNode; size?: "sm" | "md" }) {
-  const [defLabel, kind, dot] = DK_LIVE[status] || DK_LIVE.live
+  const t = useTranslations("common")
+  const [defLabelKey, kind, dot] = DK_LIVE[status] || DK_LIVE.live
   return (
     <span
       className={cn(
@@ -33,22 +35,23 @@ export function DkLive({ status = "live", label, size = "md" }: { status?: strin
       )}
     >
       {dot && <span className="h-1.5 w-1.5 rounded-full bg-current animate-[bm-pulse_1.4s_ease-in-out_infinite] motion-reduce:animate-none" aria-hidden="true" />}
-      {label != null ? label : defLabel}
+      {label != null ? label : t(defLabelKey)}
     </span>
   )
 }
 
-function dkRelTime(ms: number): string {
+function dkRelTime(ms: number, t: ReturnType<typeof useTranslations>): string {
   const s = Math.max(0, Math.round((Date.now() - ms) / 1000))
-  if (s < 5) return "ahora mismo"
-  if (s < 60) return "hace " + s + " s"
+  if (s < 5) return t("dkLive.justNow")
+  if (s < 60) return t("dkLive.secondsAgo", { seconds: s })
   const m = Math.round(s / 60)
-  if (m < 60) return "hace " + m + " min"
-  return "hace " + Math.round(m / 60) + " h"
+  if (m < 60) return t("dkLive.minutesAgo", { minutes: m })
+  return t("dkLive.hoursAgo", { hours: Math.round(m / 60) })
 }
 
 // «updated N ago», auto-ticking + manual refresh. Mirrors `.dk-updated`.
 export function DkUpdated({ updatedAt, live = false, onRefresh }: { updatedAt: number; live?: boolean; onRefresh?: () => void }) {
+  const t = useTranslations("common")
   const [, force] = React.useState(0)
   React.useEffect(() => {
     if (!live) return undefined
@@ -58,9 +61,9 @@ export function DkUpdated({ updatedAt, live = false, onRefresh }: { updatedAt: n
   return (
     <span className="inline-flex items-center gap-[7px] whitespace-nowrap font-mono text-[10px]/none font-medium tracking-[0.06em] text-txt-dim">
       {live && <Icon name="refresh" size={13} className="animate-[bm-spin_2.6s_linear_infinite] text-ok motion-reduce:animate-none" />}
-      <span suppressHydrationWarning>{dkRelTime(updatedAt)}</span>
+      <span suppressHydrationWarning>{dkRelTime(updatedAt, t)}</span>
       {onRefresh && (
-        <button type="button" onClick={onRefresh} aria-label="Actualizar ahora" className="grid cursor-pointer place-items-center border-0 bg-transparent p-[3px] text-txt-dim hover:text-accent-bright">
+        <button type="button" onClick={onRefresh} aria-label={t("dkLive.refreshNow")} className="grid cursor-pointer place-items-center border-0 bg-transparent p-[3px] text-txt-dim hover:text-accent-bright">
           <Icon name="refresh" size={13} />
         </button>
       )}

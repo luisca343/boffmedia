@@ -1,5 +1,17 @@
-import { Body, Controller, HttpCode, HttpStatus, Post, UseGuards } from '@nestjs/common';
-import { ApiOperation, ApiResponse, ApiTags, ApiBearerAuth } from '@nestjs/swagger';
+import {
+  Body,
+  Controller,
+  HttpCode,
+  HttpStatus,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
+import {
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 import { Public } from '@api/_utils/decorators/public.decorator';
 import { SkipEnvelope } from '@/common/decorators/skip-envelope.decorator';
 import { GameServerAuthGuard } from '@api/_utils/guards/game-server-auth.guard';
@@ -69,7 +81,9 @@ export class CajaController {
   @SkipEnvelope()
   @HttpCode(HttpStatus.OK)
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Confirm a delivered reservation, spending it (mod only)' })
+  @ApiOperation({
+    summary: 'Confirm a delivered reservation, spending it (mod only)',
+  })
   @ApiResponse({ status: HttpStatus.OK, type: ConfirmCajaResponse })
   async confirm(@Body() body: ConfirmCajaDto): Promise<ConfirmCajaResponse> {
     return await this.cajaService.confirm(body.uuid, body.reservationId);

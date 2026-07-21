@@ -18,9 +18,8 @@ jest.mock('@/config/env', () => ({
 }));
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const {
-  GameOrUserAuthGuard,
-} = require('./game-or-user-auth.guard') as typeof import('./game-or-user-auth.guard');
+const { GameOrUserAuthGuard } =
+  require('./game-or-user-auth.guard') as typeof import('./game-or-user-auth.guard');
 
 const ctxFor = (req: any) =>
   ({
@@ -59,7 +58,10 @@ describe('GameOrUserAuthGuard', () => {
   it('falls through to JWT verification for a non-matching Bearer', async () => {
     // Not the server token, so it must be treated as a (here invalid) JWT and
     // rejected — never silently accepted.
-    const req: any = { headers: { authorization: 'Bearer not-the-token' }, body: {} };
+    const req: any = {
+      headers: { authorization: 'Bearer not-the-token' },
+      body: {},
+    };
     await expect(guard.canActivate(ctxFor(req))).rejects.toBeInstanceOf(
       UnauthorizedException,
     );

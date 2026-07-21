@@ -2,6 +2,7 @@
 
 import Link from "next/link"
 import type { ReactNode } from "react"
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import type { GameAccent } from "../_data/games"
 import { Button, Icon } from "./ui"
@@ -50,6 +51,7 @@ const ACCENT: Record<GameAccent, { bar: string; back: string }> = {
  * endpoint, so it is not rendered (docs/smartrotom/deferred/arcade.md).
  */
 export function GameTopBar({ title, accent = "cyan", onHelp, onReset, actions }: GameTopBarProps) {
+  const t = useTranslations("")
   const skin = ACCENT[accent]
 
   return (
@@ -70,7 +72,7 @@ export function GameTopBar({ title, accent = "cyan", onHelp, onReset, actions }:
           )}
         >
           <Icon.Chevron s={12} dir="left" />
-          Arcade
+          {t("arcade.sidebar.arcade")}
         </Link>
         <span aria-hidden className="h-[18px] w-px bg-white/10" />
         <span className="flex min-w-0 items-center gap-2">
@@ -86,12 +88,12 @@ export function GameTopBar({ title, accent = "cyan", onHelp, onReset, actions }:
           {actions}
           {onHelp && (
             <Button variant="outline" size="sm" icon={<Icon.Info s={12} />} onClick={onHelp}>
-              Ayuda
+              {t("arcade.gameTopBar.help")}
             </Button>
           )}
           {onReset && (
             <Button variant="ghost" size="sm" icon={<Icon.Reset s={12} />} onClick={onReset}>
-              Reiniciar
+              {t("arcade.gameTopBar.reset")}
             </Button>
           )}
         </div>

@@ -16,7 +16,11 @@ import {
   pasaporteProfiles,
   pasaporteSeasons,
 } from '@/_db/schema/SmartRotomPasaporte';
-import { BADGE_CATEGORY, LogroView, SeasonBattle } from './types/pasaporte.types';
+import {
+  BADGE_CATEGORY,
+  LogroView,
+  SeasonBattle,
+} from './types/pasaporte.types';
 
 @Injectable()
 export class PasaporteRepository {
@@ -80,9 +84,7 @@ export class PasaporteRepository {
     badges: number;
   }> {
     const [totalRows, completedRows] = await Promise.all([
-      this.db
-        .select({ c: sql<number>`count(*)` })
-        .from(smartRotomAchievements),
+      this.db.select({ c: sql<number>`count(*)` }).from(smartRotomAchievements),
       this.db
         .select({
           c: sql<number>`count(*)`,
@@ -91,7 +93,10 @@ export class PasaporteRepository {
         .from(smartRotomUserAchievements)
         .innerJoin(
           smartRotomAchievements,
-          eq(smartRotomAchievements.id, smartRotomUserAchievements.achievementId),
+          eq(
+            smartRotomAchievements.id,
+            smartRotomUserAchievements.achievementId,
+          ),
         )
         .where(
           and(
@@ -113,7 +118,9 @@ export class PasaporteRepository {
   // hold for them — that is what the carné's "miembro desde" is built from.
   async firstActivityAt(uuid: string): Promise<Date | null> {
     const rows = await this.db
-      .select({ at: sql<Date | null>`min(${smartRotomUserAchievements.completedAt})` })
+      .select({
+        at: sql<Date | null>`min(${smartRotomUserAchievements.completedAt})`,
+      })
       .from(smartRotomUserAchievements)
       .where(
         and(
@@ -134,9 +141,10 @@ export class PasaporteRepository {
     const completions = this.db
       .select({
         achievementId: smartRotomUserAchievements.achievementId,
-        players: sql<number>`count(distinct ${smartRotomUserAchievements.uuid})`.as(
-          'players',
-        ),
+        players:
+          sql<number>`count(distinct ${smartRotomUserAchievements.uuid})`.as(
+            'players',
+          ),
       })
       .from(smartRotomUserAchievements)
       .where(eq(smartRotomUserAchievements.completed, 1))
@@ -165,7 +173,10 @@ export class PasaporteRepository {
       .leftJoin(
         smartRotomUserAchievements,
         and(
-          eq(smartRotomAchievements.id, smartRotomUserAchievements.achievementId),
+          eq(
+            smartRotomAchievements.id,
+            smartRotomUserAchievements.achievementId,
+          ),
           eq(smartRotomUserAchievements.uuid, uuid),
         ),
       )

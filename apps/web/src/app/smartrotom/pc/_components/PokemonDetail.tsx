@@ -1,6 +1,7 @@
 "use client"
 
 import { useCallback, useEffect, useMemo, type ReactNode } from "react"
+import { useTranslations } from "next-intl"
 import { usePokemonStore } from "@/stores/pokemonStore"
 import { useMarks, useMons, useSetMark } from "../_hooks/queries"
 import { locId, usePcUi } from "../_stores/pcUiStore"
@@ -45,6 +46,7 @@ import {
  * and no footer to hold it.
  */
 export function PokemonDetail() {
+  const t = useTranslations("pc")
   const detail = usePcUi((s) => s.detail)
   const setDetail = usePcUi((s) => s.setDetail)
   const compare = usePcUi((s) => s.compare)
@@ -120,8 +122,8 @@ export function PokemonDetail() {
 
   const locLabel =
     mon.loc.kind === "party"
-      ? "Equipo activo"
-      : `Caja ${(mon.loc.box ?? 0) + 1} · Pos ${mon.loc.index + 1}`
+      ? t("detail.level")
+      : `${t("filters.sortFields.box")} ${(mon.loc.box ?? 0) + 1} · ${t("detail.level")} ${mon.loc.index + 1}`
 
   const onCompare = () => {
     const error = toggleCompare(id)
@@ -135,8 +137,8 @@ export function PokemonDetail() {
           icon
           onClick={() => nav(-1)}
           disabled={neighbours.length < 2 || index < 0}
-          aria-label="Anterior"
-          title="Anterior (←)"
+          aria-label={t("common.back")}
+          title={t("common.back")}
         >
           <Icon name="chevL" size={16} />
         </Button>
@@ -152,12 +154,12 @@ export function PokemonDetail() {
           icon
           onClick={() => nav(1)}
           disabled={neighbours.length < 2 || index < 0}
-          aria-label="Siguiente"
-          title="Siguiente (→)"
+          aria-label={t("common.back")}
+          title={t("common.back")}
         >
           <Icon name="chevR" size={16} />
         </Button>
-        <Button variant="ghost" icon onClick={() => setDetail(null)} aria-label="Cerrar" title="Cerrar (Esc)">
+        <Button variant="ghost" icon onClick={() => setDetail(null)} aria-label={t("common.close")} title={t("common.close")}>
           <Icon name="x" size={18} />
         </Button>
       </header>
@@ -194,11 +196,11 @@ export function PokemonDetail() {
               <span className="font-pc-mono text-[11.5px] text-pc-fg-subtle">
                 #{String(p.dex).padStart(3, "0")}
               </span>
-              <Chip className="text-[11px]">Nv {p.level}</Chip>
+              <Chip className="text-[11px]">{t("detail.level")} {p.level}</Chip>
               {isLegendary(p) && (
                 <Chip className="border-pc-violet text-[11px] text-pc-violet">
                   <Icon name="zap" size={11} />
-                  Legend.
+                  {t("filters.statusToggles.legendary")}
                 </Chip>
               )}
             </div>
@@ -220,7 +222,7 @@ export function PokemonDetail() {
             className={`flex-1 justify-center ${mark.favorite ? "border-pc-rose text-pc-rose" : ""}`}
           >
             <Icon name="heart" size={14} fill={mark.favorite ? "currentColor" : "none"} />
-            Favorito
+            {t("filters.statusToggles.favorite")}
           </Button>
           <Button
             onClick={onCompare}
@@ -228,45 +230,45 @@ export function PokemonDetail() {
             className={`flex-1 justify-center ${inCompare ? "border-pc-violet text-pc-violet" : ""}`}
           >
             <Icon name="layers" size={14} />
-            {inCompare ? "En comparación" : "Comparar"}
+            {inCompare ? t("compare.title") : t("compare.title")}
           </Button>
         </div>
 
         <div className="flex flex-col gap-5 px-[18px] pb-6">
           <section>
-            <SectionTitle icon="sliders">Estadísticas</SectionTitle>
+            <SectionTitle icon="sliders">{t("detail.stats")}</SectionTitle>
             <StatBars pokemon={p} />
             <div className="mt-3 flex gap-3.5 text-xs">
               <span className="text-pc-fg-muted">
-                Naturaleza: <b className="text-pc-fg">{p.nature}</b>
+                {t("detail.nature")}: <b className="text-pc-fg">{p.nature}</b>
               </span>
               <span className="text-pc-fg-muted">
-                IV total:{" "}
+                {t("filters.sortFields.iv")}{" "}
                 <b className={ivPct(p) > 80 ? "text-pc-green" : "text-pc-fg"}>{ivPct(p)}%</b>
               </span>
             </div>
             <div className="mt-1.5 text-xs text-pc-fg-muted">
-              Habilidad: <b className="text-pc-fg">{p.ability}</b>
+              {t("filters.ability")}: <b className="text-pc-fg">{p.ability}</b>
               {hasItem(p) && (
                 <>
-                  {" · "}Objeto: <b className="text-pc-amber">{prettyItem(p.item)}</b>
+                  {" · "}{t("detail.item")}: <b className="text-pc-amber">{prettyItem(p.item)}</b>
                 </>
               )}
             </div>
           </section>
 
           <section>
-            <SectionTitle icon="zap">Efectividad de tipo</SectionTitle>
+            <SectionTitle icon="zap">{t("filters.types")}</SectionTitle>
             <TypeMatchups types={types} />
           </section>
 
           <section>
-            <SectionTitle icon="sword">Movimientos</SectionTitle>
+            <SectionTitle icon="sword">{t("detail.moves")}</SectionTitle>
             <MovesGrid moves={p.moves} />
           </section>
 
           <section>
-            <SectionTitle icon="tag">Etiquetas</SectionTitle>
+            <SectionTitle icon="tag">{t("filters.tag")}</SectionTitle>
             <TagEditor monKey={mon.key} />
           </section>
         </div>

@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useMemo, useState } from "react"
+import { useTranslations } from "next-intl"
 import { usePokemonStore } from "@/stores/pokemonStore"
 import { useMons } from "../_hooks/queries"
 import { usePcUi } from "../_stores/pcUiStore"
@@ -24,6 +25,7 @@ export interface LivingDexProps {
  * 900 Pokémon behind one click is not.
  */
 export function LivingDex({ onClose }: LivingDexProps) {
+  const t = useTranslations("pc")
   const { mons } = useMons()
   const allPokemon = usePokemonStore((s) => s.allPokemon)
   const isLoadingSpecies = usePokemonStore((s) => s.isLoading)
@@ -81,8 +83,8 @@ export function LivingDex({ onClose }: LivingDexProps) {
   return (
     <Modal
       onClose={onClose}
-      title="Living Dex"
-      subtitle="Un ejemplar de cada especie — rastrea tus huecos"
+      title={t("livingDex.title")}
+      subtitle={t("livingDex.subtitle")}
       icon="book"
       tone="text-pc-gold"
       width={920}
@@ -92,12 +94,12 @@ export function LivingDex({ onClose }: LivingDexProps) {
             {have}
             <span className="text-[13px] text-pc-fg-subtle">/{total}</span>
           </div>
-          <div className="text-[10.5px] text-pc-fg-subtle">{pct}% completo</div>
+          <div className="text-[10.5px] text-pc-fg-subtle">{t("livingDex.complete", { pct })}</div>
         </div>
       }
       footer={
         <p className="flex-1 text-[12px] text-pc-fg-muted">
-          Te faltan <b className="text-pc-rose">{total - have}</b> especies.
+          {t("livingDex.missing", { count: total - have })}
         </p>
       }
     >
@@ -107,7 +109,7 @@ export function LivingDex({ onClose }: LivingDexProps) {
         <Bar pct={pct} tone="linear-gradient(90deg, rgb(var(--pc-gold)), #ff8a3d)" className="min-w-[160px] flex-1" />
         <div className="flex flex-wrap gap-[5px]">
           <ChipButton active={gen === 0} onClick={() => setGen(0)}>
-            Todas
+            {t("livingDex.all")}
           </ChipButton>
           {gens.map((g) => (
             <ChipButton key={g} active={gen === g} onClick={() => setGen(g)}>
@@ -120,7 +122,7 @@ export function LivingDex({ onClose }: LivingDexProps) {
           className={onlyMissing ? "border-pc-rose text-pc-rose" : ""}
         >
           <Icon name="target" size={12} />
-          Solo huecos
+          {t("livingDex.onlyMissing")}
         </ChipButton>
       </div>
 
@@ -162,7 +164,7 @@ export function LivingDex({ onClose }: LivingDexProps) {
         })}
         {shown.length === 0 && (
           <p className="col-span-full p-8 text-center text-pc-fg-subtle">
-            {dex.length ? "¡Sin huecos en este filtro!" : "Cargando la Pokédex…"}
+            {dex.length ? t("livingDex.noGaps") : t("livingDex.loading")}
           </p>
         )}
       </div>

@@ -2,6 +2,7 @@
 
 import Link from "next/link"
 import { useState } from "react"
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import type { ArcadeGame, GameAccent } from "../_data/games"
 import { Corners, Icon, PixelArt, Tag } from "./ui"
@@ -67,6 +68,7 @@ const SPRITE_GLOW: Record<GameAccent, { idle: string; hot: string }> = {
  * the machine up.
  */
 export function CabinetCard({ game, compact }: CabinetCardProps) {
+  const t = useTranslations("")
   const [hot, setHot] = useState(false)
   const accent = ACCENT[game.accent]
   const glow = SPRITE_GLOW[game.accent]
@@ -96,9 +98,9 @@ export function CabinetCard({ game, compact }: CabinetCardProps) {
         <span
           className={cn("font-ar-display text-[9px] uppercase tracking-[0.18em]", accent.text)}
         >
-          ▸ {game.category}
+          ▸ {t(game.categoryKey)}
         </span>
-        {game.badge && <Tag tone={game.badge.tone}>{game.badge.label}</Tag>}
+        {game.badge && <Tag tone={game.badge.tone}>{t(game.badge.labelKey)}</Tag>}
       </div>
 
       <div
@@ -130,13 +132,13 @@ export function CabinetCard({ game, compact }: CabinetCardProps) {
               hot && "ar-chrom",
             )}
           >
-            {game.title}
+            {t(game.titleKey)}
           </span>
         </div>
       </div>
 
       <div className="flex flex-col gap-2.5 px-3.5 pb-3.5 pt-3">
-        <p className="m-0 min-h-8 font-ar text-xs leading-relaxed text-ar-ink-dim">{game.tagline}</p>
+        <p className="m-0 min-h-8 font-ar text-xs leading-relaxed text-ar-ink-dim">{t(game.taglineKey)}</p>
         <div className="flex items-center justify-between">
           <span
             className={cn(
@@ -149,7 +151,7 @@ export function CabinetCard({ game, compact }: CabinetCardProps) {
             INSERT COIN ●
           </span>
           <span className={cn("inline-flex items-center gap-1 text-[11px] font-semibold", accent.text)}>
-            JUGAR <Icon.Chevron s={12} />
+            {t("arcade.sidebar.play")} <Icon.Chevron s={12} />
           </span>
         </div>
       </div>

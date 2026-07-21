@@ -37,7 +37,9 @@ export interface IWingullPlayerRepository {
   // The take-side. These 404 until the Pixelmon plugin ships /takepokemon + /takeitems —
   // that is expected, and the only caller (WigglypopCustodyService) is gated behind
   // WIGGLYPOP_ATOMIC_CUSTODY, which stays false until they exist.
-  takePokemonInAPI(request: PokemonTakeRequestDto): Promise<PokemonTakeResponse>;
+  takePokemonInAPI(
+    request: PokemonTakeRequestDto,
+  ): Promise<PokemonTakeResponse>;
   takeItemsInAPI(request: ItemsTakeRequestDto): Promise<ItemsTakeResponse>;
   getBattleTeamsFromAPI(uuid: string): Promise<any>;
   updateBattleTeamInAPI(

@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { Badge, Icon, Panel } from "@/components/boffmedia/primitives"
 import { ArtImage } from "@/components/boffmedia/ui/tools/ArtImage"
@@ -25,6 +26,7 @@ export function ThreadRow({
   // showcase CM_NOW default; real pages pass a live Date.
   now?: Date
 }) {
+  const t = useTranslations("common.forum")
   const open = () => onOpen && onOpen("/foro/" + thread.catSlug + "/" + thread.id)
   const hot = thread.replies >= 3 || (thread.votes || 0) >= 40
   return (
@@ -67,10 +69,10 @@ export function ThreadRow({
           {thread.pinned && <Icon name="bookmark" size={13} className="text-accent" />}
           {thread.locked && <Icon name="lock" size={13} className="text-txt-dim" />}
           <h3 className="font-display text-[17px]/[1.2] font-bold uppercase not-italic tracking-[0.01em] group-hover:text-accent-bright">{thread.title}</h3>
-          {thread.solved && <Badge tone="ok">Resuelto</Badge>}
+          {thread.solved && <Badge tone="ok">{t("solved")}</Badge>}
         </div>
         <div className="mt-1.5 flex flex-wrap items-center gap-3 font-mono text-[10px]/none font-medium uppercase tracking-[0.06em] text-txt-muted">
-          <span>{thread.author ? thread.author.name : "Anónimo"}</span>
+          <span>{thread.author ? thread.author.name : t("anonymous")}</span>
           {showCat && thread.catName && (
             <>
               <span className="text-line-2">·</span>
@@ -83,7 +85,7 @@ export function ThreadRow({
             <>
               <span className="text-line-2">·</span>
               <span>
-                último: {thread.lastAuthor.name}
+                {t("lastBy", { name: thread.lastAuthor.name })}
                 {thread.lastAt && <> · {timeAgo(thread.lastAt, now)}</>}
               </span>
             </>
@@ -93,11 +95,11 @@ export function ThreadRow({
       <div className={cn("flex flex-none items-center gap-[18px]", compact && "gap-3")}>
         <span className="text-center">
           <b className={cn("block font-mono text-[16px]/none font-bold", hot ? "text-accent" : "text-txt")}>{thread.replies}</b>
-          <span className="mt-1 block font-mono text-[9px]/none font-medium uppercase tracking-[0.08em] text-txt-dim">resp.</span>
+          <span className="mt-1 block font-mono text-[9px]/none font-medium uppercase tracking-[0.08em] text-txt-dim">{t("replies")}</span>
         </span>
         <span className="text-center">
           <b className="block font-mono text-[16px]/none font-bold text-txt">{fmtNum(thread.views)}</b>
-          <span className="mt-1 block font-mono text-[9px]/none font-medium uppercase tracking-[0.08em] text-txt-dim">vistas</span>
+          <span className="mt-1 block font-mono text-[9px]/none font-medium uppercase tracking-[0.08em] text-txt-dim">{t("views")}</span>
         </span>
       </div>
     </div>
@@ -105,6 +107,7 @@ export function ThreadRow({
 }
 
 export function CategoryTile({ cat, onOpen, now }: { cat: ForumCategoryLike; onOpen?: (href: string) => void; now?: Date }) {
+  const t = useTranslations("common.forum")
   const open = () => onOpen && onOpen("/foro/" + cat.slug)
   return (
     <div
@@ -130,15 +133,15 @@ export function CategoryTile({ cat, onOpen, now }: { cat: ForumCategoryLike; onO
       <div className="flex flex-none items-center gap-[22px]">
         <span className="text-center">
           <b className="block font-display text-[24px]/none font-extrabold italic text-txt">{cat.threads}</b>
-          <span className="mt-[5px] block font-mono text-[9px]/none font-medium uppercase tracking-[0.1em] text-txt-muted">hilos</span>
+          <span className="mt-[5px] block font-mono text-[9px]/none font-medium uppercase tracking-[0.1em] text-txt-muted">{t("threads")}</span>
         </span>
         <span className="text-center">
           <b className="block font-display text-[24px]/none font-extrabold italic text-txt">{fmtNum(cat.posts)}</b>
-          <span className="mt-[5px] block font-mono text-[9px]/none font-medium uppercase tracking-[0.1em] text-txt-muted">posts</span>
+          <span className="mt-[5px] block font-mono text-[9px]/none font-medium uppercase tracking-[0.1em] text-txt-muted">{t("posts")}</span>
         </span>
         {cat.lastAuthor && cat.lastAt && (
           <div className="min-w-[150px] border-l border-solid border-line pl-[22px]">
-            <span className="mb-2 block font-mono text-[9px]/none font-medium uppercase tracking-[0.1em] text-txt-dim">Última actividad</span>
+            <span className="mb-2 block font-mono text-[9px]/none font-medium uppercase tracking-[0.1em] text-txt-dim">{t("lastActivity")}</span>
             <Byline author={cat.lastAuthor} when={cat.lastAt} size={24} link={false} now={now} />
           </div>
         )}
@@ -203,9 +206,10 @@ function WidgetHead({ icon, title, right }: { icon: "users" | "chart"; title: st
 }
 
 export function OnlineList({ members, onOpen, now }: { members: ForumMember[]; onOpen?: (href: string) => void; now?: Date }) {
+  const t = useTranslations("common.forum")
   return (
     <Panel>
-      <WidgetHead icon="users" title="En línea ahora" right={<span className="font-mono text-[11px] font-medium uppercase tracking-[0.14em] text-ok">{members.length}</span>} />
+      <WidgetHead icon="users" title={t("onlineNow")} right={<span className="font-mono text-[11px] font-medium uppercase tracking-[0.14em] text-ok">{members.length}</span>} />
       <div className="grid">
         {members.map((m) => (
           <CmMemberRow key={m.handle} member={m} onOpen={onOpen} now={now} />
@@ -216,15 +220,16 @@ export function OnlineList({ members, onOpen, now }: { members: ForumMember[]; o
 }
 
 export function ForumStats({ stats }: { stats: ForumStatsData }) {
+  const t = useTranslations("common.forum")
   const cells: [string, string][] = [
-    [fmtNum(stats.posts), "Posts"],
-    [String(stats.threads), "Hilos"],
-    [fmtNum(stats.members), "Miembros"],
-    [String(stats.online), "En línea"],
+    [fmtNum(stats.posts), t("posts")],
+    [String(stats.threads), t("threads")],
+    [fmtNum(stats.members), t("members")],
+    [String(stats.online), t("online")],
   ]
   return (
     <Panel>
-      <WidgetHead icon="chart" title="Estadísticas" />
+      <WidgetHead icon="chart" title={t("stats")} />
       <div className="grid grid-cols-2 gap-px border border-solid border-line bg-line">
         {cells.map(([val, label]) => (
           <div key={label} className="bg-panel p-[14px] text-center">
@@ -234,7 +239,7 @@ export function ForumStats({ stats }: { stats: ForumStatsData }) {
         ))}
       </div>
       <p className="mt-[14px] text-center font-mono text-[11px]/[1.4] font-medium uppercase tracking-[0.04em] text-txt-muted">
-        Nuevo miembro: <b className="text-accent">{stats.newest}</b>
+        {t("newMember")} <b className="text-accent">{stats.newest}</b>
       </p>
     </Panel>
   )

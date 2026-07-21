@@ -1,15 +1,16 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { Button, Icon, Modal } from "../../_components/ui"
 
 interface ConfirmationDialogProps {
   isOpen: boolean
   onClose: () => void
   onConfirm: () => void
-  title: string
-  description: string
-  confirmText: string
-  cancelText: string
+  titleKey: string
+  descriptionKey: string
+  confirmKey: string
+  cancelKey: string
   variant: "quit" | "new"
 }
 
@@ -23,12 +24,13 @@ export default function ConfirmationDialog({
   isOpen,
   onClose,
   onConfirm,
-  title,
-  description,
-  confirmText,
-  cancelText,
+  titleKey,
+  descriptionKey,
+  confirmKey,
+  cancelKey,
   variant,
 }: ConfirmationDialogProps) {
+  const t = useTranslations("")
   const skin = VARIANT[variant]
   return (
     <Modal
@@ -36,12 +38,12 @@ export default function ConfirmationDialog({
       onClose={onClose}
       size="sm"
       tone={skin.tone}
-      kicker="Confirmar"
-      title={title}
+      kicker={t("arcade.common.confirm")}
+      title={t(titleKey)}
       footer={
         <>
           <Button variant="ghost" size="sm" onClick={onClose}>
-            {cancelText}
+            {t(cancelKey)}
           </Button>
           <Button
             variant={skin.button}
@@ -49,13 +51,13 @@ export default function ConfirmationDialog({
             icon={variant === "quit" ? <Icon.X s={12} /> : <Icon.Coin s={14} />}
             onClick={onConfirm}
           >
-            {confirmText}
+            {t(confirmKey)}
           </Button>
         </>
       }
     >
       <p className="text-center font-ar text-[13px] leading-relaxed text-ar-ink-dim">
-        {description}
+        {t(descriptionKey)}
       </p>
     </Modal>
   )

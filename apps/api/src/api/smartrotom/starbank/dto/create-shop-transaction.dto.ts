@@ -17,7 +17,8 @@ export class CreateShopTransactionDto extends BaseDto {
 
   // Any non-COMPRA value is treated as VENTA, which mints money to the player.
   @ApiProperty({
-    description: 'Operation type: COMPRA (player pays) or VENTA (player is paid)',
+    description:
+      'Operation type: COMPRA (player pays) or VENTA (player is paid)',
     enum: ['COMPRA', 'VENTA'],
   })
   @IsIn(['COMPRA', 'VENTA'])

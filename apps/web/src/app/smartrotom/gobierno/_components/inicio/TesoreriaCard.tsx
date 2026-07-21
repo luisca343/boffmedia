@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { Bar, Card, Empty, Skeleton } from "../ui"
 import { TONES } from "../../_utils/tones"
 import { useTesoreria } from "../../_hooks/queries"
@@ -32,6 +33,7 @@ function SparkBars({ series }: { series: { label: string; ingreso: number; gasto
 }
 
 export function TesoreriaCard() {
+  const t = useTranslations("gobierno")
   const { data, isLoading } = useTesoreria()
 
   return (
@@ -42,28 +44,28 @@ export function TesoreriaCard() {
         right={
           <span className="flex items-center gap-3 text-[11px] text-gt-ink-500">
             <span className="flex items-center gap-[5px]">
-              <span className={`h-[9px] w-[9px] rounded-[2px] ${TONES.civic.solidBg}`} /> Ingresos
+              <span className={`h-[9px] w-[9px] rounded-[2px] ${TONES.civic.solidBg}`} /> {t("tesoreria.ingresos")}
             </span>
             <span className="flex items-center gap-[5px]">
-              <span className={`h-[9px] w-[9px] rounded-[2px] opacity-[.55] ${TONES.urbanismo.solidBg}`} /> Gastos
+              <span className={`h-[9px] w-[9px] rounded-[2px] opacity-[.55] ${TONES.urbanismo.solidBg}`} /> {t("tesoreria.gastos")}
             </span>
           </span>
         }
       >
-        Tesorería · últimas semanas
+        {t("tesoreria.title")}
       </Bar>
 
       <div className="p-[18px]">
         {isLoading ? (
           <Skeleton className="h-[120px]" />
         ) : !data ? (
-          <Empty icon="coins" title="Sin datos de tesorería" />
+          <Empty icon="coins" title={t("tesoreria.emptyTitle")} />
         ) : (
           <>
             <div className="mb-3.5 flex flex-wrap gap-[22px]">
               <div>
                 <div className="font-gt-mono text-[9px] uppercase tracking-[.14em] text-gt-ink-400">
-                  Balance municipal
+                  {t("tesoreria.balance")}
                 </div>
                 <div className="font-gt-display text-[26px] tabular-nums text-gt-ink-900">
                   {moneyR(data.balance)}
@@ -71,7 +73,7 @@ export function TesoreriaCard() {
               </div>
               <div>
                 <div className="font-gt-mono text-[9px] uppercase tracking-[.14em] text-gt-ink-400">
-                  Ingresos mes
+                  {t("tesoreria.ingresosMes")}
                 </div>
                 <div className={`font-gt-display text-[26px] tabular-nums ${TONES.civic.text}`}>
                   +{moneyR(data.ingresosMes)}
@@ -79,7 +81,7 @@ export function TesoreriaCard() {
               </div>
               <div>
                 <div className="font-gt-mono text-[9px] uppercase tracking-[.14em] text-gt-ink-400">
-                  Gastos mes
+                  {t("tesoreria.gastosMes")}
                 </div>
                 <div className={`font-gt-display text-[26px] tabular-nums ${TONES.urbanismo.text}`}>
                   −{moneyR(data.gastosMes)}
@@ -90,7 +92,7 @@ export function TesoreriaCard() {
               <SparkBars series={data.series} />
             ) : (
               <div className="py-4 text-center text-[12px] text-gt-ink-400">
-                Aún no hay histórico semanal que graficar.
+                {t("tesoreria.noHistorical")}
               </div>
             )}
           </>

@@ -1,6 +1,7 @@
 "use client"
 
 import { useMemo } from "react"
+import { useTranslations } from "next-intl"
 import { useSpriteManifestStore } from "@/stores/spriteManifestStore"
 import { useMons, useParty, usePcBoxes, usePcUuid } from "../_hooks/queries"
 import { Icon, Sprite } from "./ui"
@@ -15,6 +16,7 @@ const CELLS = 18
  * from the collection as they arrive — when it is full, the app is genuinely ready.
  */
 export function BootScreen() {
+  const t = useTranslations("pc")
   const uuid = usePcUuid()
   const pc = usePcBoxes()
   const party = useParty()
@@ -22,15 +24,15 @@ export function BootScreen() {
   const { mons } = useMons()
 
   const steps = [
-    { done: !!uuid, label: "Encendiendo sistema…" },
-    { done: !!manifest, label: "Conectando con el almacén…" },
-    { done: !pc.isLoading && !!pc.data, label: "Sincronizando 30 cajas…" },
-    { done: !party.isLoading && !!party.data, label: "Cargando Pokémon…" },
+    { done: !!uuid, label: t("boot.connecting") },
+    { done: !!manifest, label: t("boot.connecting") },
+    { done: !pc.isLoading && !!pc.data, label: t("boot.loading") },
+    { done: !party.isLoading && !!party.data, label: t("boot.loading") },
   ]
 
   const done = steps.filter((s) => s.done).length
   const pct = Math.round((done / steps.length) * 100)
-  const phase = steps.find((s) => !s.done)?.label ?? "Casi listo…"
+  const phase = steps.find((s) => !s.done)?.label ?? t("common.loading")
 
   /** A spread across the collection, so the grid looks like *your* PC booting up. */
   const previews = useMemo(() => {
@@ -65,7 +67,7 @@ export function BootScreen() {
             SMARTROTOM <span className="text-pc-accent">PC</span>
           </div>
           <div className="mt-[5px] font-pc-mono text-[11px] tracking-[.06em] text-pc-fg-subtle">
-            SISTEMA DE ALMACENAMIENTO
+            {t("topbar.subtitle")}
           </div>
         </div>
       </div>

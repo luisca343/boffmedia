@@ -1,0 +1,190 @@
+{
+  "notas": {
+    "common": {
+      "close": "Close",
+      "back": "Back",
+      "retry": "Retry",
+      "loading": "Loading…",
+      "save": "Save",
+      "cancel": "Cancel",
+      "delete": "Delete",
+      "search": "Search",
+      "create": "Create",
+      "share": "Share",
+      "duplicate": "Duplicate",
+      "restore": "Restore",
+      "pin": "Pin",
+      "unpin": "Unpin"
+    },
+    "sidebar": {
+      "newNote": "New note",
+      "capture": "Capture",
+      "changeTheme": "Change theme",
+      "lightMode": "Light mode",
+      "darkMode": "Dark mode",
+      "smartViews": {
+        "all": "All notes",
+        "recent": "Recent",
+        "pinned": "Pinned",
+        "shared": "Shared",
+        "trash": "Trash"
+      },
+      "folders": "Folders",
+      "tags": "Tags",
+      "newFolder": "New folder",
+      "folderNamePrompt": "Folder name:"
+    },
+    "list": {
+      "title": "Notes",
+      "searchPlaceholder": "Search in these notes…",
+      "count": "{count, plural, one {# note} other {# notes}}",
+      "noResults": "No results",
+      "emptyTitle": "No notes here",
+      "createNote": "Create note",
+      "untitled": "Untitled"
+    },
+    "sort": {
+      "label": "Sort by",
+      "updated": "Modified",
+      "created": "Created",
+      "title": "Title"
+    },
+    "editor": {
+      "placeholder": "Write here…",
+      "paragraph": "Paragraph",
+      "heading1": "Heading 1",
+      "heading2": "Heading 2",
+      "heading3": "Heading 3",
+      "createLinked": "Create «{title}»",
+      "words": "{count} words",
+      "saving": "Saving…",
+      "saved": "Saved",
+      "addTag": "tag",
+      "untitled": "Untitled",
+      "splitView": "Split view",
+      "closePanel": "Close panel",
+      "sidePanel": "Side panel",
+      "more": "More",
+      "versionHistory": "Version history",
+      "newTab": "New tab",
+      "welcomeTitle": "SmartRotom Notes",
+      "welcomeDesc": "Your space for strategies, guides and trainer diary. Select a note, create a new one or press",
+      "welcomeSearch": "to search.",
+      "fromTemplate": "From template",
+      "graph": "Graph"
+    },
+    "commands": {
+      "newNote": "New note",
+      "quickCapture": "Quick capture",
+      "fromTemplate": "New from template",
+      "splitView": "Split view",
+      "knowledgeGraph": "Open knowledge graph",
+      "toggleTheme": "Toggle light / dark theme",
+      "togglePin": "Pin / unpin current note"
+    },
+    "palette": {
+      "placeholder": "Search notes or run a command…",
+      "actions": "Actions",
+      "notes": "Notes",
+      "noResults": "No results",
+      "navigate": "navigate",
+      "open": "open",
+      "close": "close"
+    },
+    "capture": {
+      "title": "Quick capture",
+      "placeholder": "Write a quick idea… (first line is the title)",
+      "saveHint": "to save",
+      "save": "Save"
+    },
+    "contextMenu": {
+      "open": "Open",
+      "openSplit": "Open in split view",
+      "pin": "Pin",
+      "unpin": "Unpin",
+      "share": "Share",
+      "duplicate": "Duplicate",
+      "restore": "Restore",
+      "delete": "Delete"
+    },
+    "context": {
+      "outline": "Outline",
+      "links": "Links",
+      "outgoing": "Outgoing links",
+      "incoming": "Incoming links",
+      "noBacklinks": "No notes link here yet.",
+      "useWikilinks": "Use",
+      "toCreateLinks": "to create links.",
+      "folder": "Folder",
+      "tags": "Tags",
+      "sharedWith": "Shared with",
+      "private": "Private",
+      "public": "Public",
+      "created": "Created",
+      "modified": "Modified",
+      "visibility": "Visibility",
+      "outlineHint": "Add headings to see the document outline.",
+      "uncreated": "not created"
+    },
+    "templates": {
+      "title": "Templates",
+      "blank": "Blank note",
+      "setAnalysis": "Set Analysis"
+    },
+    "share": {
+      "title": "Share note",
+      "shareWith": "Share with",
+      "makePublic": "Make public",
+      "removeAccess": "Remove access",
+      "trainerUuid": "Trainer UUID…",
+      "add": "Add",
+      "onlyYou": "Only you have access.",
+      "public": "Public",
+      "private": "Private",
+      "publicDesc": "Anyone with the link can view",
+      "privateDesc": "Invited people only"
+    },
+    "history": {
+      "title": "Version history",
+      "restore": "Restore this version",
+      "loading": "Loading…",
+      "empty": "No saved versions yet.",
+      "emptyHint": "A snapshot is created when saving important changes.",
+      "current": "Current",
+      "version": "Version {num}",
+      "words": "{count} words",
+      "restoreBtn": "Restore"
+    },
+    "graph": {
+      "title": "Knowledge graph",
+      "notes": "notes",
+      "links": "links"
+    },
+    "tweaks": {
+      "appearance": "Appearance",
+      "theme": "Theme",
+      "dark": "Dark",
+      "light": "Light",
+      "accent": "Accent",
+      "reading": "Reading",
+      "typography": "Typography",
+      "width": "Width",
+      "normal": "Normal",
+      "wide": "Wide",
+      "settingsLabel": "Appearance settings"
+    },
+    "tagPicker": {
+      "placeholder": "Search or create tag…",
+      "create": "Create «{name}»"
+    },
+    "toast": {
+      "created": "Note created.",
+      "deleted": "Moved to trash.",
+      "restored": "Version restored.",
+      "shared": "Shared.",
+      "folderCreated": "Folder created.",
+      "tagCreated": "Tag created.",
+      "duplicateError": "Could not read the note to duplicate it"
+    }
+  }
+}

@@ -1,6 +1,7 @@
 "use client"
 
 import { useMemo } from "react"
+import { useTranslations } from "next-intl"
 import { useBoxGrid, useMons } from "../_hooks/queries"
 import { usePcUi } from "../_stores/pcUiStore"
 import type { Mon } from "../_types/pc.types"
@@ -20,7 +21,7 @@ function toBase64(text: string): string {
 
 /** Copying is client-only: the async clipboard first, a hidden textarea when it is blocked. */
 function copyText(text: string, label: string): void {
-  const done = () => toast(`${label} al portapapeles`, "success")
+  const done = () => toast(`${label}`, "success")
   const fallback = () => {
     try {
       const ta = document.createElement("textarea")
@@ -50,6 +51,7 @@ export interface ShareBoxProps {
 }
 
 export function ShareBox({ box, onClose }: ShareBoxProps) {
+  const t = useTranslations("pc")
   const { mons } = useMons()
   const boxes = useBoxGrid(mons)
   const boxMeta = usePcUi((s) => s.boxMeta)
@@ -88,8 +90,8 @@ export function ShareBox({ box, onClose }: ShareBoxProps) {
   return (
     <Modal
       onClose={onClose}
-      title="Compartir caja"
-      subtitle={`${name} · ${filled.length} Pokémon${shinies ? ` · ${shinies} shiny` : ""}`}
+      title={t("share.title")}
+      subtitle={`${name} · ${filled.length} Pokémon${shinies ? ` · ${shinies} ${t("filters.statusToggles.shiny")}` : ""}`}
       icon="share"
       tone="text-pc-cyan"
       width={560}
@@ -120,43 +122,43 @@ export function ShareBox({ box, onClose }: ShareBoxProps) {
         <div>
           <div className="mb-2 flex items-center gap-[7px]">
             <Icon name="copy" size={14} className="text-pc-accent" />
-            <h3 className="text-[13px] font-bold">Código para compartir</h3>
+            <h3 className="text-[13px] font-bold">{t("share.code")}</h3>
           </div>
           <div className="flex gap-2">
             <Textarea
               readOnly
               value={code}
-              aria-label="Código para compartir"
+              aria-label={t("share.code")}
               onFocus={(e) => e.target.select()}
               className="h-16 flex-1 font-pc-mono"
               // The shared field's font-size and `resize-y` are emitted after any
               // utility we could add here, so the code block sets them inline to win.
               style={{ fontSize: 11, lineHeight: 1.5, resize: "none" }}
             />
-            <Button variant="primary" aria-label="Copiar código" onClick={() => copyText(code, "Código copiado")}>
+            <Button variant="primary" aria-label={t("share.code")} onClick={() => copyText(code, t("share.copied"))}>
               <Icon name="copy" size={15} />
             </Button>
           </div>
           <p className="mt-1.5 text-[11px] text-pc-fg-subtle">
-            Pega este código en otra instancia de SmartRotom PC para importar la caja.
+            {t("share.hint")}
           </p>
         </div>
 
         <div>
           <div className="mb-2 flex items-center gap-[7px]">
             <Icon name="list" size={14} className="text-pc-accent" />
-            <h3 className="text-[13px] font-bold">Resumen legible</h3>
+            <h3 className="text-[13px] font-bold">{t("share.summary")}</h3>
           </div>
           <div className="flex gap-2">
             <Textarea
               readOnly
               value={summary}
-              aria-label="Resumen legible"
+              aria-label={t("share.summary")}
               onFocus={(e) => e.target.select()}
               className="h-[120px] flex-1 font-pc-mono"
               style={{ fontSize: 11.5, lineHeight: 1.5, resize: "none" }}
             />
-            <Button aria-label="Copiar resumen" onClick={() => copyText(summary, "Resumen copiado")}>
+            <Button aria-label={t("share.summary")} onClick={() => copyText(summary, t("share.summaryCopied"))}>
               <Icon name="copy" size={15} />
             </Button>
           </div>

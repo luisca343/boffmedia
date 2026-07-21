@@ -1,0 +1,98 @@
+{
+  "taxi": {
+    "topBar": {
+      "appName": "SmartRotom",
+      "taxiName": "Taxi de Teras",
+      "openWallet": "Open wallet",
+      "passport": "Your passport"
+    },
+    "navTabs": {
+      "go": "Travel",
+      "pass": "Passport"
+    },
+    "destinations": {
+      "searchPlaceholder": "Search destination…",
+      "all": "All",
+      "favorites": "Favorites",
+      "recents": "Recent",
+      "destino": "{count, plural, =0 {No destinations} one {# destination} other {# destinations}}",
+      "nearest": "Nearest",
+      "farthest": "Farthest",
+      "emptyMessage": "No destination matches your search.",
+      "viewAll": "View all",
+      "loadingError": "Could not load taxi stops"
+    },
+    "selectedCard": {
+      "destination": "Destination {name}",
+      "removeFavorite": "Remove from favorites",
+      "addFavorite": "Add to favorites",
+      "close": "Close",
+      "coords": "Coords",
+      "distance": "Distance",
+      "fare": "Fare",
+      "balanceAfter": "Balance after trip",
+      "centerMap": "Center on map",
+      "travel": "Travel · {price}",
+      "topUp": "Top up balance"
+    },
+    "confirmModal": {
+      "title": "Confirm trip",
+      "origin": "Origin",
+      "yourPosition": "Your position",
+      "destination": "Destination",
+      "baseFare": "Base fare",
+      "distanceFare": "Distance · {blocks} b × {rate} ¥",
+      "total": "Total",
+      "currentBalance": "Current balance",
+      "afterTrip": "After trip",
+      "cancel": "Cancel",
+      "charging": "Charging…",
+      "confirm": "Confirm trip"
+    },
+    "insufficientModal": {
+      "title": "Insufficient balance",
+      "missing": "You are missing {amount} to travel to {destination}.",
+      "yourBalance": "Your balance",
+      "fare": "Fare",
+      "close": "Close",
+      "viewWallet": "View wallet"
+    },
+    "travelingOverlay": {
+      "teleporting": "Teleporting…",
+      "preparing": "Preparing your arrival at {destination}"
+    },
+    "walletModal": {
+      "title": "Wallet",
+      "starbankTitle": "StarBank Wallet",
+      "availableBalance": "Available balance",
+      "syncedWith": "Synced with your server account · {player}",
+      "recentMovements": "Recent movements",
+      "emptyMovements": "No movements in your account yet.",
+      "movement": "Movement"
+    },
+    "passportPanel": {
+      "visitedDestinations": "Destinations visited",
+      "totalTrips": "Total trips",
+      "blocksTravelled": "Blocks travelled",
+      "taxiSpent": "¥ in taxis",
+      "passportStamps": "Passport stamps",
+      "travelHistory": "Travel history",
+      "emptyHistory": "You haven't traveled by taxi yet."
+    },
+    "stopRow": {
+      "removeFromFavorites": "Remove {name} from favorites",
+      "addToFavorites": "Add {name} to favorites"
+    },
+    "eventsPanel": {
+      "title": "Events",
+      "empty": "No active events"
+    },
+    "presence": {
+      "online": "{count, plural, =0 {No one} one {# player} other {# players}} at this stop"
+    },
+    "rewards": {
+      "title": "Rewards",
+      "empty": "No rewards available"
+    }
+  }
+}

@@ -302,11 +302,7 @@ export class WigglypopListingsService {
 
     // The sell flow sends a singular `mon` / `item`; the bundle form sends `mons` / `items`.
     // Both are accepted and collapse to the same thing here.
-    const monInputs = dto.mons?.length
-      ? dto.mons
-      : dto.mon
-        ? [dto.mon]
-        : [];
+    const monInputs = dto.mons?.length ? dto.mons : dto.mon ? [dto.mon] : [];
     const itemInputs = dto.items?.length
       ? dto.items
       : dto.item
@@ -321,7 +317,11 @@ export class WigglypopListingsService {
     if (isItemsKind(dto.kind) && itemInputs.length === 0) {
       throw new BadRequestException('An item listing must carry an item');
     }
-    if (dto.kind === 'bundle' && monInputs.length === 0 && itemInputs.length === 0) {
+    if (
+      dto.kind === 'bundle' &&
+      monInputs.length === 0 &&
+      itemInputs.length === 0
+    ) {
       throw new BadRequestException('A `bundle` listing cannot be empty');
     }
 
@@ -408,7 +408,11 @@ export class WigglypopListingsService {
         'This listing has a pending order against it and cannot be edited',
       );
     }
-    if (dto.price !== undefined && listing.format === 'auction' && listing.bids > 0) {
+    if (
+      dto.price !== undefined &&
+      listing.format === 'auction' &&
+      listing.bids > 0
+    ) {
       throw new BadRequestException(
         'An auction that already has bids cannot be repriced',
       );
@@ -422,10 +426,7 @@ export class WigglypopListingsService {
     return this.toEntity(updated as ListingWithContents);
   }
 
-  async remove(
-    id: number,
-    actorUuid?: string,
-  ): Promise<{ success: boolean }> {
+  async remove(id: number, actorUuid?: string): Promise<{ success: boolean }> {
     const listing = await this.listingsRepository.findById(id);
     if (!listing) throw new NotFoundException(`Listing ${id} not found`);
     this.assertSeller(listing, actorUuid);
@@ -447,10 +448,7 @@ export class WigglypopListingsService {
     return { success: true };
   }
 
-  private assertSeller(
-    listing: ListingWithContents,
-    actorUuid?: string,
-  ): void {
+  private assertSeller(listing: ListingWithContents, actorUuid?: string): void {
     // actorUuid is optional on the DTO because these routes are @Public() and the client is
     // trusted to send it, like the rest of SmartRotom. When it IS sent, it must match.
     if (actorUuid && actorUuid !== listing.sellerUuid) {

@@ -1,6 +1,7 @@
 "use client"
 
 import { useCallback, useEffect, useMemo, useState } from "react"
+import { useTranslations } from "next-intl"
 import { usePokemonStore } from "@/stores/pokemonStore"
 import { useBoxGrid, useMarks, useMons } from "../_hooks/queries"
 import { useDragLayer } from "../_hooks/useDrag"
@@ -34,6 +35,7 @@ interface HoverState {
  * a filter comes and goes.
  */
 export function PCBoard({ onOpenFilters, onShareBox }: PCBoardProps) {
+  const t = useTranslations("pc")
   const { mons } = useMons()
   const boxes = useBoxGrid(mons)
   const { drag } = useDragLayer()
@@ -113,7 +115,7 @@ export function PCBoard({ onOpenFilters, onShareBox }: PCBoardProps) {
     // `setMultiMode` clears the selection, so it has to land first.
     setMultiMode(true)
     setSelected(resultIds)
-    toast(`${resultIds.length} seleccionados`, "info")
+    toast(`${resultIds.length} ${t("bulk.selected", { count: resultIds.length })}`, "info")
   }
 
   const showDual = dualMode && secondaryBox != null && secondaryBox !== activeBox
@@ -123,7 +125,7 @@ export function PCBoard({ onOpenFilters, onShareBox }: PCBoardProps) {
       {filtering ? (
         <Panel className="relative flex flex-1 flex-col overflow-hidden">
           <ResultsHeader
-            title={activeView?.name ?? "Resultados"}
+            title={activeView?.name ?? t("empty.noResults")}
             count={results.length}
             page={current + 1}
             pages={pages}

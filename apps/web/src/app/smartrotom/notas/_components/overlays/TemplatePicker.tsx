@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { Overlay, MODAL_PANEL, Icon } from "../ui";
 import { TEMPLATES, type NoteTemplate } from "../../_data/templates";
 
@@ -10,13 +11,14 @@ export function TemplatePicker({
   onClose: () => void;
   onPick: (t: NoteTemplate) => void;
 }) {
+  const t = useTranslations("notas");
   return (
     <Overlay onClose={onClose} align="center">
       <div className={`${MODAL_PANEL} w-[560px] max-w-[92vw]`}>
         <div className="flex items-center gap-2.5 border-b border-nt-border px-[18px] py-4">
           <Icon name="layers" size={18} className="text-nt-accent-fg" />
-          <h3 className="m-0 flex-1 text-[16px] font-[650] text-nt-fg">Nueva desde plantilla</h3>
-          <button onClick={onClose} aria-label="Cerrar" className="text-nt-fg-subtle hover:text-nt-fg">
+          <h3 className="m-0 flex-1 text-[16px] font-[650] text-nt-fg">{t("commands.fromTemplate")}</h3>
+          <button onClick={onClose} aria-label={t("common.close")} className="text-nt-fg-subtle hover:text-nt-fg">
             <Icon name="x" size={18} />
           </button>
         </div>

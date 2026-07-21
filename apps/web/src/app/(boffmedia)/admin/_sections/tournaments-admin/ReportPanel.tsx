@@ -1,6 +1,7 @@
 "use client"
 
 import { useCallback, useEffect, useState } from "react"
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { Panel, Field, Input, Select, Button, toast, Spinner } from "@/components/boffmedia/primitives"
 import { TnFormatBadge } from "@/components/boffmedia/ui/tournaments"
@@ -34,8 +35,7 @@ export function ReportPanel({
   matches: TnMatchApi[]
   onReported: () => void
 }) {
-  // Scores start blank so a stray click can never record a phantom result — the
-  // admin must enter a real score (or use a walkover) before OK enables.
+  const t = useTranslations("admin.tournaments")
   const [scores, setScores] = useState<Record<number, { a: string; b: string }>>({})
   const [amendId, setAmendId] = useState<number | null>(null)
 
@@ -56,7 +56,7 @@ export function ReportPanel({
 
   const report = async (m: TnMatchApi, amend = false) => {
     const s = scores[m.id] ?? { a: "", b: "" }
-    if (s.a === "" || s.b === "") return toast.error("Introduce el resultado")
+    if (s.a === "" || s.b === "") return toast.error(t("resultRequired"))
     const a = +s.a
     const b = +s.b
     const winnerParticipantId = a === b ? undefined : a > b ? Number(m.top!.id) : Number(m.bot!.id)
@@ -68,10 +68,6 @@ export function ReportPanel({
     await send(m, { topScore: 0, botScore: 0, winnerParticipantId, forfeit: true })
   }
 
-  // Elimination brackets are reported round by round: a semifinal can't be
-  // entered until every quarterfinal is in. The earliest round of each such
-  // bracket that still has an open match is the only reportable one; later
-  // rounds wait. League/group/swiss aren't gated (order-free / engine-gated).
   const ELIM = ["winners", "losers", "grand"]
   const currentRound: Record<string, number> = {}
   const maxRound: Record<string, number> = {}
@@ -88,22 +84,19 @@ export function ReportPanel({
   const ready = matches.filter((m) => m.status === "ready" && m.top && m.bot)
   const reportable = ready.filter((m) => !isLocked(m))
   const waiting = ready.filter((m) => isLocked(m))
-  // Resolved matches with two named sides can be corrected (the API guards
-  // whether it is still safe to amend).
   const resolved = matches.filter((m) => m.status === "completed" && m.top && m.bot)
 
   const roundLabel = (m: TnMatchApi): string => {
-    if (m.bracket === "grand") return "Gran final"
+    if (m.bracket === "grand") return t("roundLabel.grand")
     if (m.bracket === "winners") {
       const fromEnd = (maxRound["winners"] ?? m.roundNumber) - m.roundNumber
-      return ["Final", "Semifinales", "Cuartos", "Octavos"][fromEnd] ?? `Ronda ${m.roundNumber}`
+      return [t("roundLabel.final"), t("roundLabel.semis"), t("roundLabel.quarters"), t("roundLabel.eighths")][fromEnd] ?? t("roundLabel.swiss", { n: m.roundNumber })
     }
-    if (m.bracket === "losers") return `Perdedores · ronda ${m.roundNumber}`
-    if (m.bracket === "swiss") return `Ronda ${m.roundNumber}`
-    return `Jornada ${m.roundNumber}`
+    if (m.bracket === "losers") return t("roundLabel.losers", { n: m.roundNumber })
+    if (m.bracket === "swiss") return t("roundLabel.swiss", { n: m.roundNumber })
+    return t("roundLabel.league", { n: m.roundNumber })
   }
 
-  // Group reportable matches by round (bracket precedence, then round order).
   const groups = new Map<string, { label: string; items: TnMatchApi[] }>()
   for (const m of reportable) {
     const key = `${m.bracket}#${m.roundNumber}`
@@ -126,12 +119,12 @@ export function ReportPanel({
 
   if (matches.length === 0) return null
   return (
-    <Panel title={`Reportar resultados (${reportable.length} listos)`}>
+    <Panel title={t("reportResults", { count: reportable.length })}>
       {reportable.length === 0 ? (
         <p className="py-2 font-mono text-[12px] text-txt-dim">
           {waiting.length > 0
-            ? "Completa la ronda actual para desbloquear la siguiente."
-            : "No hay partidas listas para reportar."}
+            ? t("reportWaiting")
+            : t("reportNone")}
         </p>
       ) : (
         <div className="grid gap-3">
@@ -154,8 +147,8 @@ export function ReportPanel({
                     <input type="number" min={0} value={s.b} onChange={(e) => setScore(m.id, { b: e.target.value })} className="w-12 border border-line bg-panel px-1 py-0.5 text-center font-mono text-[12px]" placeholder="–" />
                     <span className="min-w-[80px] flex-1 truncate font-body text-[12px]">{m.bot?.name}</span>
                     <Button size="sm" disabled={!filled} onClick={() => report(m)}>OK</Button>
-                    <button type="button" onClick={() => forfeit(m, "top")} className="border border-solid border-line px-1.5 py-0.5 font-mono text-[9px] uppercase text-txt-dim transition-colors hover:border-line-2 hover:text-txt" title={`Walkover a favor de ${m.top?.name}`}>W.O. ↑</button>
-                    <button type="button" onClick={() => forfeit(m, "bot")} className="border border-solid border-line px-1.5 py-0.5 font-mono text-[9px] uppercase text-txt-dim transition-colors hover:border-line-2 hover:text-txt" title={`Walkover a favor de ${m.bot?.name}`}>W.O. ↓</button>
+                    <button type="button" onClick={() => forfeit(m, "top")} className="border border-solid border-line px-1.5 py-0.5 font-mono text-[9px] uppercase text-txt-dim transition-colors hover:border-line-2 hover:text-txt" title={`W.O. ${m.top?.name}`}>W.O. ↑</button>
+                    <button type="button" onClick={() => forfeit(m, "bot")} className="border border-solid border-line px-1.5 py-0.5 font-mono text-[9px] uppercase text-txt-dim transition-colors hover:border-line-2 hover:text-txt" title={`W.O. ${m.bot?.name}`}>W.O. ↓</button>
                   </div>
                 )
               })}
@@ -165,7 +158,7 @@ export function ReportPanel({
       )}
       {waiting.length > 0 && (
         <p className="mt-3 border-t border-dashed border-line pt-2 font-mono text-[10px] text-txt-dim">
-          🔒 {waiting.length} partida{waiting.length === 1 ? "" : "s"} en rondas posteriores — se desbloquean al cerrar la ronda actual.
+          {t("reportLocked", { count: waiting.length })}
         </p>
       )}
 
@@ -174,7 +167,7 @@ export function ReportPanel({
         if (!disputed.length) return null
         return (
           <div className="mt-3 border border-solid border-bad bg-bad-soft px-3 py-2 font-mono text-[11px] text-bad">
-            ⚠ {disputed.length} partida{disputed.length === 1 ? "" : "s"} en disputa — revisa el chat de mesa y resuelve con el reporte manual.
+            {t("reportDisputed", { count: disputed.length })}
           </div>
         )
       })()}
@@ -182,7 +175,7 @@ export function ReportPanel({
       {resolved.length > 0 && (
         <details className="mt-3 border-t border-dashed border-line pt-2">
           <summary className="cursor-pointer font-mono text-[10px] font-semibold uppercase tracking-[0.1em] text-txt-dim">
-            Corregir resultados ({resolved.length})
+            {t("correctResults", { count: resolved.length })}
           </summary>
           <div className="mt-2 grid gap-1.5">
             {resolved.map((m) => {
@@ -204,11 +197,11 @@ export function ReportPanel({
                   <span className="min-w-[80px] flex-1 truncate font-body text-[12px]">{m.bot?.name}</span>
                   {editing ? (
                     <>
-                      <Button size="sm" disabled={!filled} onClick={() => report(m, true)}>Guardar</Button>
-                      <button type="button" onClick={() => setAmendId(null)} className="font-mono text-[10px] text-txt-dim hover:text-txt">cancelar</button>
+                      <Button size="sm" disabled={!filled} onClick={() => report(m, true)}>{t("save")}</Button>
+                      <button type="button" onClick={() => setAmendId(null)} className="font-mono text-[10px] text-txt-dim hover:text-txt">{t("cancel")}</button>
                     </>
                   ) : (
-                    <button type="button" onClick={() => { setAmendId(m.id); setScore(m.id, { a: String(m.g1 ?? 0), b: String(m.g2 ?? 0) }) }} className="font-mono text-[10px] text-accent transition-opacity hover:opacity-70">corregir</button>
+                    <button type="button" onClick={() => { setAmendId(m.id); setScore(m.id, { a: String(m.g1 ?? 0), b: String(m.g2 ?? 0) }) }} className="font-mono text-[10px] text-accent transition-opacity hover:opacity-70">{t("correct")}</button>
                   )}
                 </div>
               )

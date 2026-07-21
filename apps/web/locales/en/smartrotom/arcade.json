@@ -1,0 +1,443 @@
+{
+  "arcade": {
+    "common": {
+      "back": "Back",
+      "close": "Close",
+      "retry": "Retry",
+      "loading": "Loading…",
+      "loginRequired": "Sign in with your SmartRotom account to view your collection.",
+      "loginRequiredBoxes": "Sign in with your SmartRotom account to open boxes and save items.",
+      "errorLoading": "Could not load. Try again in a moment.",
+      "copied": "Copied",
+      "copy": "Copy",
+      "connected": "Connected",
+      "logout": "Sign out",
+      "freeToPlay": "Free to play",
+      "freeToPlayDesc": "Standalone arcade with live server data. No purchases: everything is earned by playing.",
+      "help": "Help",
+      "reset": "Reset",
+      "confirm": "Confirm",
+      "understood": "Understood",
+      "cancel": "Cancel",
+      "done": "Done",
+      "claimed": "Claimed",
+      "day": "DAY {day}",
+      "generating": "Opening…",
+      "prizeObtained": "Prize obtained",
+      "spinning": "Spinning…"
+    },
+    "sidebar": {
+      "arcade": "Arcade",
+      "play": "Play",
+      "playHint": "Home · library",
+      "streak": "Daily streak",
+      "streakHint": "Today's reward",
+      "boxes": "Boxes",
+      "boxesHint": "Open loot",
+      "collection": "Collection",
+      "collectionHint": "Your items",
+      "account": "Account",
+      "settings": "Settings",
+      "settingsHint": "Cabinet · accessibility"
+    },
+    "home": {
+      "library": "Library · {count} games",
+      "arcadeGames": "Arcade Games",
+      "allCategory": "All",
+      "footer": "ARCADE · SMARTROTOM EXPERIENCE"
+    },
+    "gameTopBar": {
+      "help": "Help",
+      "reset": "Reset"
+    },
+    "games": {
+      "squirdle": {
+        "title": "Squirdle",
+        "tagline": "Guess the hidden creature from its clues.",
+        "category": "Words",
+        "badge": "New"
+      },
+      "voltorb": {
+        "title": "Flip Voltorb",
+        "tagline": "Flip numbers and don't hit a bomb.",
+        "category": "Risk",
+        "badge": "Hot"
+      },
+      "mina": {
+        "title": "Mining",
+        "tagline": "Dig deep and find hidden treasures.",
+        "category": "Adventure"
+      },
+      "maze": {
+        "title": "Maze",
+        "tagline": "Traverse generated rooms and escape the dungeon.",
+        "category": "Action"
+      },
+      "typedoku": {
+        "title": "Typedoku",
+        "tagline": "Type sudoku: each row and column, no repeats.",
+        "category": "Logic"
+      },
+      "puzle": {
+        "title": "Puzzle",
+        "tagline": "Fit the pieces in as few moves as possible.",
+        "category": "Logic"
+      }
+    },
+    "categories": {
+      "todos": "All",
+      "palabras": "Words",
+      "riesgo": "Risk",
+      "aventura": "Adventure",
+      "accion": "Action",
+      "logica": "Logic"
+    },
+    "inventory": {
+      "title": "Box inventory",
+      "unopenedBoxes": "You have {count, plural, one {# box} other {# boxes}} unopened",
+      "openInventory": "Open inventory"
+    },
+    "streak": {
+      "rewardReady": "Today's reward",
+      "openReward": "Claim reward",
+      "weeklyStreak": "Weekly streak · Day {current}/{total}",
+      "dayClaimed": "Day {day} claimed",
+      "claiming": "Claiming…",
+      "claimDay": "Claim day {day}",
+      "resetsIn": "Resets in {time}",
+      "claimError": "Could not claim reward. Try again.",
+      "progression": "Progression · {days} days",
+      "currentWeek": "Current week",
+      "totalStreak": "Total streak",
+      "totalStreakSub": "consecutive days claimed",
+      "totalClaims": "Total claims",
+      "totalClaimsSub": "since you started",
+      "unopenedBoxes": "Unopened boxes",
+      "unopenedBoxesSub": "in your inventory",
+      "nextReset": "Next reset",
+      "nextResetSub": "at 06:00",
+      "claimDescription": "Claim each day's reward to progress through the banner. The streak resets at 06:00; if you claim today, tomorrow the next day awaits."
+    },
+    "toast": {
+      "boxOpened": "Box opened!",
+      "itemClaimed": "Item claimed."
+    },
+    "loot": {
+      "title": "Loot boxes",
+      "selectBox": "Select a box",
+      "howItWorks": "How does it work?",
+      "noBoxes": "No boxes",
+      "openAnother": "Open another",
+      "noBoxesLoaded": "Could not load loot boxes. Try again in a moment.",
+      "opening": "Opening…",
+      "openBox": "Open box",
+      "viewFullOdds": "View full odds",
+      "inInventory": "In inventory",
+      "noBoxOwned": "You don't have this box. They are obtained from the {streakLink} and by playing on the server.",
+      "noBoxItems": "This box has no configured items.",
+      "probabilities": "Probabilities",
+      "miCollection": "My collection",
+      "noBoxesAlert": "No boxes",
+      "boxOpenError": "Could not open the box. Try again.",
+      "howBoxesWork": "How boxes work",
+      "lootBoxProbabilities": "{name} · probabilities",
+      "lootBoxes": "Loot boxes",
+      "steps": {
+        "getBoxes": "Get boxes from the daily streak or by playing on the server; they appear in your inventory.",
+        "chooseBox": "Choose a box in the carousel. You can only open the ones you already have.",
+        "openBox": "When you open it, the server decides the prize and the reel shows it to you.",
+        "itemCollection": "The item enters your collection. From there you can claim it in the game."
+      },
+      "oddsExplanation": "The odds come from each item's weight inside the box: item weight divided by total weight. No guaranteed rolls, no purchases.",
+      "prizeObtained": "Prize obtained!",
+      "next": "Next",
+      "openAnotherBtn": "Open another",
+      "viewMyCollection": "View my collection",
+      "backToSelector": "Back to selector",
+      "saved": "Saved",
+      "itemInCollection": "The item is already in your collection. You have {count, plural, one {# box} other {# boxes}} of this type left.",
+      "reelNoServer": "The reel didn't arrive from the server, but the prize is still yours.",
+      "abriendo": "Opening"
+    },
+    "coleccion": {
+      "title": "Your collection",
+      "backToBoxes": "Boxes",
+      "itemsCount": "{total} items · {unique} unique",
+      "claimToGame": "Claim in game",
+      "emptyTitle": "Your collection is empty",
+      "emptyBody": "Open loot boxes to get items.",
+      "filters": {
+        "search": "Search items…",
+        "searchAria": "Search in my collection",
+        "rarity": "Rarity",
+        "type": "Item type"
+      },
+      "stats": {
+        "uniqueItems": "Unique items",
+        "uniqueItemsSub": "entries in the collection",
+        "totalItems": "Total items",
+        "totalItemsSub": "unclaimed units",
+        "byRarity": "By rarity"
+      },
+      "toolbar": {
+        "all": "All",
+        "items": "Items",
+        "pokemon": "Pokémon",
+        "mina": "Mine",
+        "box": "Boxes"
+      },
+      "claim": {
+        "kicker": "▸ Claim rewards",
+        "claimedTitle": "Claim sent",
+        "moveToGame": "Move to game inventory",
+        "claimItems": "Claim {count} items",
+        "claiming": "Claiming…",
+        "deliveredInGame": "Delivered in game",
+        "deliveredDescription": "The items arrived in your inventory and the Pokémon to your team. If your team was full, the Pokémon was sent to your PC.",
+        "noItemsToClaim": "You don't have items to claim right now.",
+        "selectItemsDescription": "Select the items you want to send to the game. Pokémon go straight to your PC; Minecraft items arrive in chests.",
+        "outsideMinecraft": "You are outside the Minecraft client. Delivery only completes if you are connected to the server.",
+        "claimError": "An error occurred while claiming the items.",
+        "selected": "Selected {count}",
+        "occupy": "They take {slots, plural, one {# slot} other {# slots}} in {chests, plural, one {# chest} other {# chests}}",
+        "pokemonSection": "Pokémon",
+        "minecraftSection": "Minecraft Objects"
+      },
+      "detail": {
+        "quantity": "Quantity",
+        "rarity": "Rarity",
+        "origin": "Origin",
+        "claimed": "Claimed",
+        "sources": {
+          "arcade": "Arcade",
+          "mina": "Mine",
+          "lootbox": "Loot box",
+          "streak": "Daily streak"
+        }
+      }
+    },
+    "ajustes": {
+      "title": "Settings",
+      "backToArcade": "Arcade",
+      "cabina": {
+        "audioMotion": "Audio and motion",
+        "soundEffects": "Sound effects",
+        "soundEffectsHint": "The loot box reel clicks while spinning and sounds when stopping. It's the only audio the arcade emits.",
+        "reduceMotion": "Reduce motion",
+        "reduceMotionHint": "Stops all flickers, glows, floats and particles across the cabinet; the reel resolves without animation. If your system already requests prefers-reduced-motion, we respect it automatically without touching this.",
+        "visual": "Visual",
+        "scanlines": "Scanline intensity",
+        "scanlinesHint": "The CRT layer over panels, cards and cabinets. «Off» removes it completely.",
+        "scanlineOptions": {
+          "off": "Off",
+          "subtle": "Subtle",
+          "strong": "Strong"
+        },
+        "localNotice": "These three preferences are saved in this browser, not in your account: on another device you start with defaults."
+      },
+      "cuenta": {
+        "title": "Account",
+        "uuidLabel": "SmartRotom UUID",
+        "bannerLabel": "Active banner",
+        "sessionLabel": "Session",
+        "connected": "Connected",
+        "resetsIn": "Resets in {time}"
+      }
+    },
+    "squirdle": {
+      "enigma": "Enigma",
+      "guessTheCreature": "Guess the hidden creature",
+      "attempts": "{count} attempts",
+      "noAttemptsYet": "No attempts yet.",
+      "guessAPokemon": "Guess a Pokémon to start!",
+      "columns": {
+        "gen": "Gen",
+        "type1": "Type 1",
+        "type2": "Type 2",
+        "height": "Height",
+        "weight": "Weight"
+      },
+      "guessInput": {
+        "placeholder": "Type a Pokémon name",
+        "ariaLabel": "Pokémon name attempt",
+        "guess": "Guess"
+      },
+      "legend": {
+        "title": "Legend",
+        "correct": "Correct",
+        "near": "The type is there, but in the other position",
+        "incorrect": "Incorrect",
+        "arrowHint": "The target value is higher / lower"
+      },
+      "typeTracker": {
+        "title": "Types",
+        "doubleType": "Double type",
+        "singleType": "Single type",
+        "status": {
+          "possible": "possible",
+          "correct": "correct",
+          "present": "present in the other position",
+          "incorrect": "discarded"
+        }
+      },
+      "attemptsPanel": {
+        "title": "Attempts",
+        "remaining": "You have {remaining} of {total} attempts left."
+      },
+      "result": {
+        "playAgain": "Play again"
+      },
+      "howToPlay": "How to play?",
+      "rules": {
+        "guessPokemon": "Guess which is the mysterious Pokémon in fewer than {max} attempts.",
+        "eachAttempt": "With each attempt, you will receive clues about the Pokémon's characteristics.",
+        "greenTile": "A green tile indicates the characteristic is correct.",
+        "arrowUp": "▲ indicates the target value is higher.",
+        "arrowDown": "▼ indicates the target value is lower.",
+        "amberType": "An amber tile on a type indicates that type is in the other position."
+      }
+    },
+    "voltorb": {
+      "howToPlay": "How to play",
+      "rulesTitle": "FLIP VOLTORB RULES",
+      "understood": "Understood",
+      "introduction": "Introduction",
+      "introText": "Flip Voltorb is a mix between Picross and Minesweeper. Your goal is to find the multiplier cards without flipping any Voltorb.",
+      "theBoard": "The board",
+      "boardItems": [
+        "The game takes place on a 5×5 grid.",
+        "Under each tile hides a number (1, 2 or 3) or a Voltorb.",
+        "The numbers are multipliers that increase your coins.",
+        "The Voltorbs make you lose all coins from the current round."
+      ],
+      "howToPlaySection": "How to play",
+      "playSteps": [
+        "Click on a tile to flip it.",
+        "If you find a multiplier (x2 or x3), your coins are multiplied by that value.",
+        "If it's the first card you flip, you get that number of coins.",
+        "If you find a Voltorb, you lose all coins from the round and the game ends.",
+        "You can choose Cash out at any time to save your coins and move to the next level."
+      ],
+      "levelsProgression": "Levels and progression",
+      "levelItems": [
+        "There are 8 levels in total.",
+        "You win and advance by finding all x2 and x3 cards.",
+        "Higher levels have more multipliers and Voltorbs, increasing risk and reward.",
+        "Regression rule: if at the end of the round you have flipped fewer multiplier cards than your current level number, you will drop to that level."
+      ],
+      "level8": "Level 8",
+      "level8Text": "To reach level 8, you must win 5 consecutive games at any level, flipping 8 or more multiplier cards in each of these 5 games.",
+      "memoMode": "Memo mode",
+      "memoModeText": "You can use Memo mode to mark tiles with symbols (Voltorb, 1, 2 or 3) without flipping them. This helps you remember your suspicions about each tile's contents.",
+      "tips": "Tips",
+      "tipItems": [
+        "Use the row and column information to deduce the location of multipliers and Voltorbs.",
+        "Sometimes it's better to cash out and move to the next level than risk losing everything.",
+        "Use Memo mode to mark your suspicions and strategies.",
+        "Practice and develop your intuition to improve at the game."
+      ],
+      "playAgain": "Play again",
+      "nextLevel": "Next level",
+      "cashOut": "Cash out",
+      "viewRules": "View rules",
+      "quitGame": "Quit game",
+      "cardsFlipped": "{count} cards flipped",
+      "difficulty": "DIFFICULTY {level}",
+      "bombs": "BOMBS {count}",
+      "combo": "Combo ×{score}",
+      "bombCount": "{count} bombs",
+      "quitConfirm": "Quit game?",
+      "quitDescription": "You'll take {count} coins with you.",
+      "newGameConfirm": "New game?",
+      "newGameDescription": "You'll lose your current progress.",
+      "cashOutConfirm": "Cash out coins?",
+      "cashOutDescription": "You'll earn {count} coins.",
+      "quit": "Quit",
+      "new": "New",
+      "keep": "Keep",
+      "continuePlaying": "Continue",
+      "gameOver": "GAME OVER",
+      "gameOverText": "You found a Voltorb and lost {count} coins.",
+      "newGameHint": "Start a new game to keep playing.",
+      "levelComplete": "LEVEL COMPLETE!",
+      "levelCompleteText": "You found all multipliers without triggering any Voltorb!",
+      "saveAndQuit": "Save and quit",
+      "memo": {
+        "title": "MEMO",
+        "notesOn": "Notes ON",
+        "notesOff": "Notes OFF",
+        "markVoltorb": "Mark Voltorb",
+        "markX": "Mark x{mark}",
+        "hint": "Activate {bold} and click on a tile to mark it without flipping it."
+      }
+    },
+    "puzle": {
+      "slidingPuzzle": "Sliding puzzle",
+      "solved": "Solved",
+      "inProgress": "In progress",
+      "completed": "Puzzle completed in {moves} moves!",
+      "moves": "Moves",
+      "pieces": "Pieces",
+      "inPlace": "In place",
+      "shuffle": "Shuffle",
+      "howToPlay": "How to play?",
+      "rules": [
+        "Click on a piece next to the gap to slide it.",
+        "Reconstruct the original image in as few moves as possible.",
+        "Shuffle deals a new board, always solvable."
+      ]
+    },
+    "typedoku": {
+      "sudokuOfTypes": "Sudoku of types",
+      "eachRowColumn": "Each row, column and box, no repeats",
+      "notes": "Notes {state}",
+      "congratulations": "Congratulations! You completed the TypeDoku",
+      "types": "Types",
+      "newGame": "New game (N)",
+      "undo": "Undo (Ctrl+Z)",
+      "redo": "Redo (Ctrl+Y)",
+      "hint": "Hint (H)",
+      "noteHint": "Note hint (P)",
+      "notesMode": "Notes mode: {state} (M)",
+      "howToPlay": "How to play?",
+      "rules": [
+        "Fill the grid without repeating a type in the same row, column or 3×3 box.",
+        "Select a tile and choose a type from the panel, or press its initial on the keyboard.",
+        "Move around the board with the arrow keys.",
+        "{boldM} toggles notes mode, {boldP} notes possible types and {boldH} reveals the selected tile.",
+        "{boldN} starts a new game; {boldCtrlZ} and {boldCtrlY} undo and redo."
+      ]
+    },
+    "maze": {
+      "dungeon": "Dungeon",
+      "generator": "Generator",
+      "size": "Size",
+      "depth": "Depth",
+      "regenerate": "Regenerate",
+      "hideDebug": "Hide debug",
+      "showDebug": "Show debug",
+      "debugView": "Debug view",
+      "rooms": "Rooms",
+      "deadEnds": "Dead ends",
+      "alleys": "Alleys",
+      "bossDistance": "Distance to boss",
+      "howItWorks": "How does it work?",
+      "roomLabels": {
+        "start": "Start room",
+        "room": "Room",
+        "boss": "Boss room",
+        "wall": "Wall"
+      },
+      "rules": [
+        "Each dungeon is generated on the fly: a starting room, connected rooms and a boss.",
+        "{boldSize} changes the grid side; {boldDepth}, how many rooms are dug out.",
+        "Regenerate deals a new dungeon with the same parameters.",
+        "The debug view prints the grid in text: S start, R room, B boss, W wall."
+      ]
+    },
+    "collectionGrid": {
+      "noMatches": "No items match the filters.",
+      "page": "Page {current} of {total}"
+    }
+  }
+}

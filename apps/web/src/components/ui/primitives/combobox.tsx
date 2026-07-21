@@ -2,6 +2,7 @@
 
 import * as React from "react"
 import { Check, ChevronsUpDown } from "lucide-react"
+import { useTranslations } from "next-intl"
 
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/primitives/button"
@@ -42,11 +43,12 @@ export function Combobox({
   data, 
   value, 
   onChange, 
-  placeholder = "Buscar Elemento", 
+  placeholder, 
   disabled = false, 
   className,
   variant = 'default'
 }: ComboboxProps) {
+  const t = useTranslations("common.combobox")
   const [open, setOpen] = React.useState(false)
 
   const handleSelect = (currentValue: string) => {
@@ -113,7 +115,7 @@ export function Combobox({
             <span className="min-w-0 truncate">
               {value && data.find((element) => element.value === value)?.label
                 ? data.find((element) => element.value === value)?.label
-                : "Selecciona un elemento"}
+                : t("selectItem")}
             </span>
           </span>
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
@@ -136,12 +138,12 @@ export function Combobox({
         >
           <CommandInput
             dark={variant === 'orange' || variant === 'wingull' || variant === 'boff'}
-            placeholder={placeholder}
+            placeholder={placeholder ?? t("searchItem")}
             className={cn(variantStyles[variant].input, 'w-full')}
           />
           <CommandList>
             <CommandEmpty className={variantStyles[variant].emptyText}>
-              No element found.
+              {t("noElementFound")}
             </CommandEmpty>
             <CommandGroup>
               {data.map((element) => (

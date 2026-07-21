@@ -1,0 +1,92 @@
+{
+  "misiones": {
+    "board": {
+      "loading": "Taking down the quests from the board…",
+      "closedTitle": "✦ Board closed ✦",
+      "closedHeading": "No one answers at the inn",
+      "closedDescription": "The quests are kept by the Minecraft server; the board only hangs them. If the server is down, there is nothing to take down here.",
+      "retry": "Try again",
+      "emptyBoard": "No quests on the board yet.",
+      "emptyFiltered": "The board is empty with those criteria. Change the filters."
+    },
+    "playerHeader": {
+      "adventurerLog": "Adventurer's log",
+      "questsInKingdoms": "Quests in {count, plural, one {# kingdom} other {# kingdoms}}",
+      "noQuests": "No quests on the board",
+      "completedQuests": "Quests completed",
+      "active": "Active",
+      "available": "Available",
+      "sealed": "Sealed",
+      "kingdoms": "Kingdoms",
+      "inn": "❦ Rotom Inn",
+      "questsOnBoard": "⚔ {count} quests on the board"
+    },
+    "boardFilters": {
+      "filterByKingdom": "Filter by kingdom",
+      "remove": "Remove",
+      "searchPlaceholder": "Search quest, NPC, kingdom…",
+      "searchLabel": "Search the board",
+      "all": "All",
+      "sortOrder": "Sort: by seal",
+      "sortLevel": "Sort: by level",
+      "sortName": "Sort: alphabetical"
+    },
+    "questPaper": {
+      "completed": "Completed",
+      "failed": "Failed",
+      "repeatable": "Repeatable",
+      "level": "Lv. {level}",
+      "from": "from {npc}",
+      "unknown": "Unknown",
+      "objectives": "{done}/{total} objectives",
+      "reward": "Reward"
+    },
+    "questLetter": {
+      "readLetter": "Read letter"
+    },
+    "questChain": {
+      "title": "Quest chain"
+    },
+    "journalEntry": {
+      "title": "Journal entry"
+    },
+    "npcDossier": {
+      "title": "NPC dossier"
+    },
+    "satchelSlot": {
+      "empty": "Empty slot"
+    },
+    "trackedQuest": {
+      "title": "Tracked quest"
+    },
+    "threadWall": {
+      "title": "Thread wall"
+    },
+    "sideRail": {
+      "title": "Side rail"
+    },
+    "kingdomMap": {
+      "title": "Kingdom map"
+    },
+    "scatterLayer": {
+      "title": "Scatter layer"
+    },
+    "rewardCard": {
+      "title": "Reward"
+    },
+    "nav": {
+      "board": "Board",
+      "log": "Log",
+      "backpack": "Backpack",
+      "map": "Map",
+      "story": "Story"
+    },
+    "status": {
+      "active": "Active",
+      "available": "Available",
+      "locked": "Sealed",
+      "completed": "Completed",
+      "failed": "Failed"
+    }
+  }
+}

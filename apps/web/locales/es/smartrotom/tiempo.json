@@ -1,0 +1,23 @@
+{
+  "tiempo": {
+    "title": "Clima de Minecraft",
+    "refresh": "Actualizar",
+    "weather": {
+      "clear": "Despejado",
+      "cloudy": "Nublado",
+      "rain": "Lluvia",
+      "storm": "Tormenta",
+      "night": "Noche"
+    },
+    "changesIn": "Cambia en: {time}",
+    "gameTime": "Hora del juego",
+    "daySection": "Sección",
+    "daySections": {
+      "day": "Día",
+      "sunset": "Atardecer",
+      "night": "Noche",
+      "dawn": "Amanecer",
+      "unknown": "Desconocido"
+    }
+  }
+}

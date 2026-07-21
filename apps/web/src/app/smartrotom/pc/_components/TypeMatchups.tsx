@@ -1,6 +1,7 @@
 "use client"
 
 import { useMemo } from "react"
+import { useTranslations } from "next-intl"
 import { getPokemonDefense } from "@/app/smartrotom/pokedex/dexUtils"
 import { TypeBadge } from "./ui"
 
@@ -16,6 +17,7 @@ type Entry = [type: string, multiplier: number]
  * here would be the way to get two of them.
  */
 export function TypeMatchups({ types }: TypeMatchupsProps) {
+  const t = useTranslations("pc")
   const groups = useMemo(() => {
     const weak: Entry[] = []
     const resist: Entry[] = []
@@ -34,14 +36,14 @@ export function TypeMatchups({ types }: TypeMatchupsProps) {
   }, [types])
 
   if (types.length === 0) {
-    return <p className="text-xs text-pc-fg-subtle">Sin datos de tipo para este Pokémon.</p>
+    return <p className="text-xs text-pc-fg-subtle">{t("detail.none")}</p>
   }
 
   return (
     <div>
-      <Group label="Débil contra" entries={groups.weak} tone="text-pc-rose" />
-      <Group label="Resiste" entries={groups.resist} tone="text-pc-green" />
-      <Group label="Inmune" entries={groups.immune} tone="text-pc-fg-muted" />
+      <Group label={t("filters.types")} entries={groups.weak} tone="text-pc-rose" />
+      <Group label={t("detail.stats")} entries={groups.resist} tone="text-pc-green" />
+      <Group label={t("detail.none")} entries={groups.immune} tone="text-pc-fg-muted" />
     </div>
   )
 }

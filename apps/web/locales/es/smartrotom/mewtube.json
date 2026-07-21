@@ -1,0 +1,76 @@
+{
+  "mewtube": {
+    "common": {
+      "close": "Cerrar",
+      "back": "Volver",
+      "retry": "Reintentar",
+      "loading": "Cargando…",
+      "search": "Buscar",
+      "viewAll": "Ver todo",
+      "play": "Reproducir",
+      "watchLater": "Ver más tarde",
+      "emptyState": "No hay nada por aquí todavía."
+    },
+    "home": {
+      "trending": "En tendencia",
+      "trendingNow": "Lo más visto ahora",
+      "searchResults": "Resultados para «{query}»",
+      "comingSoon": "Próximamente",
+      "noResults": "No se pudo completar la búsqueda.",
+      "errorLoading": "No se pudieron cargar los vídeos."
+    },
+    "video": {
+      "loadingVideo": "Cargando vídeo…",
+      "notFound": "No se encontró el vídeo.",
+      "autoplay": "Reproducción automática",
+      "subscribe": "Suscribirse",
+      "subscribed": "Suscrito",
+      "like": "Me gusta",
+      "dislike": "No me gusta",
+      "share": "Compartir",
+      "save": "Guardar",
+      "saved": "Guardado",
+      "views": "{count} visitas",
+      "chapters": "Capítulos · {count}",
+      "subscribers": "{count} suscriptores",
+      "notifyMe": "Avisarme al empezar"
+    },
+    "comments": {
+      "loading": "Cargando comentarios…",
+      "empty": "No hay comentarios disponibles.",
+      "count": "{count} comentarios",
+      "replies": "{count} respuestas"
+    },
+    "player": {
+      "seekTo": "Ir a {label}",
+      "pause": "Pausa",
+      "play": "Reproducir",
+      "volume": "Volumen",
+      "fullscreen": "Pantalla completa"
+    },
+    "channel": {
+      "loadingChannel": "Cargando canal…",
+      "notFound": "No se encontró el canal.",
+      "subscribers": "suscriptores",
+      "videos": "vídeos",
+      "views": "visualizaciones",
+      "average": "Promedio",
+      "activeSince": "Activo desde",
+      "latestUploads": "Últimas subidas",
+      "subscribe": "Suscribirse",
+      "notifications": "Notificaciones"
+    },
+    "history": {
+      "title": "Historial",
+      "yourActivity": "Tu actividad",
+      "clearHistory": "Borrar historial",
+      "empty": "Aún no has visto ningún vídeo."
+    },
+    "sidebar": {
+      "home": "Inicio",
+      "trending": "Tendencias",
+      "history": "Historial",
+      "subscriptions": "Suscripciones"
+    }
+  }
+}

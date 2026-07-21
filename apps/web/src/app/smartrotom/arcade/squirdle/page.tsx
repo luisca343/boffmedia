@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useTranslations } from "next-intl"
 import { GameStage } from "../_components/GameStage"
 import { GameTopBar } from "../_components/GameTopBar"
 import { Modal, Panel, Skeleton } from "../_components/ui"
@@ -14,6 +15,7 @@ import { useSquirdleGame } from "./_hooks/useSquirdleGame"
 import { MAX_GUESSES } from "./_utils/compare"
 
 export default function SquirdlePage() {
+  const t = useTranslations("")
   const game = useSquirdleGame()
   const [help, setHelp] = useState(false)
 
@@ -27,12 +29,12 @@ export default function SquirdlePage() {
         <div className="grid items-start gap-4 lg:grid-cols-[1fr_260px] lg:gap-5">
           <Panel tone="deep" clip={false} innerClassName="p-4 md:p-[18px]">
             <div className="mb-4 flex flex-wrap items-center justify-between gap-2 border-b border-dashed border-white/10 px-1.5 pb-3.5">
-              <span className="font-ar-display text-[11px] text-ar-cyan">▸ Enigma</span>
+              <span className="font-ar-display text-[11px] text-ar-cyan">▸ {t("arcade.squirdle.enigma")}</span>
               <span className="font-ar-mono text-[11px] uppercase text-ar-ink-dim">
-                Adivina la criatura oculta
+                {t("arcade.squirdle.guessTheCreature")}
               </span>
               <span className="font-ar-display text-[11px] text-ar-magenta-2">
-                {MAX_GUESSES} intentos
+                {t("arcade.squirdle.attempts", { count: MAX_GUESSES })}
               </span>
             </div>
 
@@ -83,14 +85,14 @@ export default function SquirdlePage() {
         </div>
       </GameStage>
 
-      <Modal open={help} onClose={() => setHelp(false)} kicker="Squirdle" title="¿Cómo jugar?">
+      <Modal open={help} onClose={() => setHelp(false)} kicker="Squirdle" title={t("arcade.squirdle.howToPlay")}>
         <ul className="m-0 list-disc space-y-2 pl-5">
-          <li>Adivina cuál es el Pokémon misterioso en menos de {MAX_GUESSES} intentos.</li>
-          <li>Con cada intento, recibirás pistas sobre las características del Pokémon.</li>
-          <li>Una casilla verde indica que la característica es correcta.</li>
-          <li>▲ indica que el valor objetivo es mayor.</li>
-          <li>▼ indica que el valor objetivo es menor.</li>
-          <li>Una casilla ámbar en un tipo indica que ese tipo está en la otra posición.</li>
+          <li>{t("arcade.squirdle.rules.guessPokemon", { max: MAX_GUESSES })}</li>
+          <li>{t("arcade.squirdle.rules.eachAttempt")}</li>
+          <li>{t("arcade.squirdle.rules.greenTile")}</li>
+          <li>{t("arcade.squirdle.rules.arrowUp")}</li>
+          <li>{t("arcade.squirdle.rules.arrowDown")}</li>
+          <li>{t("arcade.squirdle.rules.amberType")}</li>
         </ul>
       </Modal>
     </div>

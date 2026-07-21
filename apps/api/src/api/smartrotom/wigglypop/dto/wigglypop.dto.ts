@@ -186,14 +186,20 @@ export class ListingMonInputDto {
   @IsNotEmpty()
   pokemonKey: string;
 
-  @ApiPropertyOptional({ example: 0, description: 'PC box. Alias of sourceBox.' })
+  @ApiPropertyOptional({
+    example: 0,
+    description: 'PC box. Alias of sourceBox.',
+  })
   @IsOptional()
   @Type(() => Number)
   @IsInt()
   @Min(0)
   box?: number;
 
-  @ApiPropertyOptional({ example: 5, description: 'Slot index. Alias of sourceIndex.' })
+  @ApiPropertyOptional({
+    example: 5,
+    description: 'Slot index. Alias of sourceIndex.',
+  })
   @IsOptional()
   @Type(() => Number)
   @IsInt()
@@ -365,7 +371,8 @@ export class CreateListingDto extends BaseDto {
   @ApiPropertyOptional({
     type: ListingMonInputDto,
     isArray: true,
-    description: 'Several Pokémon, for kind=bundle. Use `mon` for a single one.',
+    description:
+      'Several Pokémon, for kind=bundle. Use `mon` for a single one.',
   })
   @IsOptional()
   @IsArray()
@@ -511,7 +518,8 @@ export class ValuateDto extends BaseDto {
   @ApiPropertyOptional({
     type: ListingItemInputDto,
     isArray: true,
-    description: 'Valuing items instead of a mon: sum of catalog ref_price × qty',
+    description:
+      'Valuing items instead of a mon: sum of catalog ref_price × qty',
   })
   @IsOptional()
   @IsArray()
@@ -633,7 +641,7 @@ export class CreateTradeDto extends BaseDto {
   proposerUuid: string;
 
   @ApiProperty({
-    description: 'The offered mon, verified against the proposer\'s live PC',
+    description: "The offered mon, verified against the proposer's live PC",
   })
   @ValidateNested()
   @Type(() => ListingMonInputDto)

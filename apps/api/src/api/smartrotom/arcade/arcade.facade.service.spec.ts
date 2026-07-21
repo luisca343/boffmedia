@@ -461,7 +461,6 @@ describe('ArcadeFacadeService', () => {
     });
   });
 
-
   describe('getCompleteUserData', () => {
     it('should return streak, inventory and inventoryStats in parallel', async () => {
       const inventory = { items: [], total: 0 };

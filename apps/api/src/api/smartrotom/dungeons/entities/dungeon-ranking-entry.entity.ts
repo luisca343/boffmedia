@@ -10,7 +10,10 @@ export class DungeonRankingEntry {
   })
   uuid: string;
 
-  @ApiProperty({ description: 'Most recent name seen for this player', example: 'Ana' })
+  @ApiProperty({
+    description: 'Most recent name seen for this player',
+    example: 'Ana',
+  })
   nombre: string;
 
   @ApiProperty({ description: 'Runs played', example: 12 })
@@ -26,7 +29,8 @@ export class DungeonRankingEntry {
   mejorPisos: number;
 
   @ApiProperty({
-    description: 'Fastest completed run in milliseconds; null if never completed',
+    description:
+      'Fastest completed run in milliseconds; null if never completed',
     example: 725000,
     // Explicit: reflection cannot see through `number | null`, and without it the
     // generated shared type comes out as an object.

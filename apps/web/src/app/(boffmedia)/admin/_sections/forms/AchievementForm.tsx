@@ -8,12 +8,12 @@ import { CreateAchievementDto } from "@boffmedia/shared"
 
 const achievementSchema = z.object({
   id: z.number().optional(),
-  name: z.string().min(3, "El nombre debe tener al menos 3 caracteres"),
-  description: z.string().min(10, "La descripción debe tener al menos 10 caracteres"),
-  icon: z.string().min(1, "El icono es requerido"),
+  name: z.string().min(3),
+  description: z.string().min(10),
+  icon: z.string().min(1),
   eventId: z.number(),
-  points: z.number().min(0, "Los puntos no pueden ser negativos"),
-  maxProgress: z.number().min(1, "El progreso máximo debe ser al menos 1"),
+  points: z.number().min(0),
+  maxProgress: z.number().min(1),
   itemType: z.nativeEnum(CreateAchievementDto.itemType).optional(),
   category: z.nativeEnum(CreateAchievementDto.category).optional(),
   rarity: z.nativeEnum(CreateAchievementDto.rarity).optional(),
@@ -31,7 +31,7 @@ interface AchievementFormProps {
   submitLabel?: string
 }
 
-export function AchievementForm({ defaultValues, isSubmitting, onSubmit, onCancel, submitLabel = "Guardar" }: AchievementFormProps) {
+export function AchievementForm({ defaultValues, isSubmitting, onSubmit, onCancel, submitLabel }: AchievementFormProps) {
   const t = useTranslations("admin.form")
   const { events, isLoading: isLoadingEvents } = useGetEvents()
   const { register, handleSubmit, control, formState: { errors } } = useForm<AchievementFormValues>({

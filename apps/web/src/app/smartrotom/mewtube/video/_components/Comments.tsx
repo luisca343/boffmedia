@@ -1,8 +1,11 @@
+import { useTranslations } from "next-intl"
 import { Avatar, I } from "@/components/smartrotom/media/ui"
 import type { YtComment } from "../../_services/youtubeService"
 import { formatCount, relativeTime } from "../../_utils/youtube"
 
 function Comment({ c }: { c: YtComment }) {
+  const t = useTranslations("mewtube")
+
   return (
     <div className="flex gap-3 border-b border-mw-line py-3">
       <Avatar src={c.authorAvatar} name={c.author} size={38} />
@@ -18,7 +21,7 @@ function Comment({ c }: { c: YtComment }) {
           </span>
           {c.replyCount > 0 && (
             <span className="inline-flex items-center gap-1.5 px-2 py-1 text-xs font-semibold text-mw-accent">
-              <I.chevron size={12} /> {c.replyCount} respuestas
+              <I.chevron size={12} /> {t("comments.replies", { count: c.replyCount })}
             </span>
           )}
         </div>
@@ -29,13 +32,15 @@ function Comment({ c }: { c: YtComment }) {
 
 /** Real comment threads. Gracefully empty when comments are disabled/quota. */
 export function Comments({ comments, loading }: { comments: YtComment[]; loading?: boolean }) {
-  if (loading) return <p className="py-6 text-sm text-mw-fg-faint">Cargando comentarios…</p>
+  const t = useTranslations("mewtube")
+
+  if (loading) return <p className="py-6 text-sm text-mw-fg-faint">{t("comments.loading")}</p>
   if (comments.length === 0) {
-    return <p className="py-6 text-sm text-mw-fg-faint">No hay comentarios disponibles.</p>
+    return <p className="py-6 text-sm text-mw-fg-faint">{t("comments.empty")}</p>
   }
   return (
     <div className="mt-6">
-      <h3 className="mb-4 font-mw-display text-xl">{formatCount(comments.length)} comentarios</h3>
+      <h3 className="mb-4 font-mw-display text-xl">{t("comments.count", { count: comments.length })}</h3>
       {/* compose bar deferred — needs Google OAuth to post (§13) */}
       {comments.map((c) => (
         <Comment key={c.id} c={c} />

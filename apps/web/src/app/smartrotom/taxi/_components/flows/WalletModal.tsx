@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import type { StarBankTransaction } from "@boffmedia/shared"
 import { cn } from "@/lib/utils"
 import { Empty, Eyebrow, Icon, Modal, ModalTitle, Skeleton } from "../ui"
@@ -34,15 +35,16 @@ export function WalletModal({
   playerName: string
   onClose: () => void
 }) {
+  const t = useTranslations("taxi.walletModal")
   return (
-    <Modal onClose={onClose} label="Cartera" className="max-w-[480px]">
-      <ModalTitle icon="wallet" title="Cartera StarBank" onClose={onClose} />
+    <Modal onClose={onClose} label={t("title")} className="max-w-[480px]">
+      <ModalTitle icon="wallet" title={t("starbankTitle")} onClose={onClose} />
 
       <div className="relative mb-[18px] overflow-hidden rounded-tx-lg border border-solid border-tx-line-2 bg-[linear-gradient(135deg,#0b1c45,#15306e)] p-[18px] text-white">
         {/* The amber bloom — the one place the money colour becomes light, not ink. */}
         <span className="pointer-events-none absolute -right-[8%] -top-1/2 h-[220px] w-[220px] rounded-full bg-[radial-gradient(circle,var(--tx-accent-glow),transparent_64%)]" />
         <div className="relative text-[11.5px] font-extrabold uppercase tracking-[0.6px] text-white/60">
-          Saldo disponible
+          {t("availableBalance")}
         </div>
         {loading || balance === undefined ? (
           <Skeleton className="relative mt-1 h-[38px] w-40 bg-white/10" />
@@ -53,12 +55,12 @@ export function WalletModal({
           </div>
         )}
         <div className="relative mt-2 text-xs text-white/60">
-          Sincronizado con tu cuenta del servidor · {playerName}
+          {t("syncedWith", { player: playerName })}
         </div>
       </div>
 
       <Eyebrow icon="clock" className="mb-2.5">
-        Movimientos recientes
+        {t("recentMovements")}
       </Eyebrow>
 
       {loading ? (
@@ -68,7 +70,7 @@ export function WalletModal({
           ))}
         </div>
       ) : transactions.length === 0 ? (
-        <Empty icon="clock" message="Todavía no hay movimientos en tu cuenta." />
+        <Empty icon="clock" message={t("emptyMovements")} />
       ) : (
         <div>
           {transactions.slice(0, 8).map((tx, i) => {
@@ -88,7 +90,7 @@ export function WalletModal({
                   <Icon name={debit ? "route" : "arrowDown"} size={16} stroke={2.2} />
                 </span>
                 <div className="min-w-0 flex-1">
-                  <div className="truncate text-[13.5px] font-bold text-tx-txt">{tx.reason || "Movimiento"}</div>
+                  <div className="truncate text-[13.5px] font-bold text-tx-txt">{tx.reason || t("movement")}</div>
                   <div className="mt-px text-[11.5px] text-tx-txt-3">{relativeTime(new Date(tx.date).getTime())}</div>
                 </div>
                 <span

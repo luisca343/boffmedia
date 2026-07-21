@@ -187,7 +187,10 @@ export class RookerRepository {
     limit: number,
     offset: number,
   ): Promise<FeedRow[]> {
-    const conditions = [eq(rookerPosts.uuid, uuid), isNull(rookerPosts.parentId)];
+    const conditions = [
+      eq(rookerPosts.uuid, uuid),
+      isNull(rookerPosts.parentId),
+    ];
     if (types && types.length > 0) {
       conditions.push(inArray(rookerPosts.type, types));
     }
@@ -429,7 +432,8 @@ export class RookerRepository {
 
       const capture =
         p.captureId !== null ? captureMap.get(p.captureId) : undefined;
-      const battle = p.replayId !== null ? battleMap.get(p.replayId) : undefined;
+      const battle =
+        p.replayId !== null ? battleMap.get(p.replayId) : undefined;
 
       views.push({
         id: p.id,
@@ -715,7 +719,10 @@ export class RookerRepository {
 
   // Real derived trainer stats — read straight off the pokédex and the battle log.
   // `totalSpecies` is injected by the service (it owns the pokémon data source).
-  async trainerStats(uuid: string, totalSpecies: number): Promise<TrainerStats> {
+  async trainerStats(
+    uuid: string,
+    totalSpecies: number,
+  ): Promise<TrainerStats> {
     const [captures, shinies, battles, distinctSpecies] = await Promise.all([
       this.db
         .select({ c: sql<number>`count(*)` })

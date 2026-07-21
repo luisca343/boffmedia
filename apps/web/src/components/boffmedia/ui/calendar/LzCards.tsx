@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { Icon } from "@/components/boffmedia/primitives"
 import { LzCover, LzVersList, LzWishStar } from "./LzAtoms"
@@ -18,6 +19,7 @@ function onCardKey(e: React.KeyboardEvent, fn: () => void) {
 }
 
 export function LzReleaseCard({ game, wished, onWish, onOpen, dense = false, showDate = false }: { game: LzRelease; wished?: boolean; onWish?: (id: LzRelease["id"]) => void; onOpen?: (g: LzRelease) => void; dense?: boolean; showDate?: boolean }) {
+  const t = useTranslations("common.calendar")
   const max = dense ? 3 : 4
   const followers = lzFollowers(game)
   const dateLabel = game.date
@@ -25,7 +27,7 @@ export function LzReleaseCard({ game, wished, onWish, onOpen, dense = false, sho
         const d = lzParse(game.date)
         return lzWdShort(d) + " " + d.getDate() + " " + LZ_MONTHS[d.getMonth()].slice(0, 3)
       })()
-    : game.window || "Sin fecha"
+    : game.window || t("noDate")
   const open = () => onOpen && onOpen(game)
   return (
     <article
@@ -47,7 +49,7 @@ export function LzReleaseCard({ game, wished, onWish, onOpen, dense = false, sho
         )}
       </div>
       <div className="flex min-w-[42px] flex-none flex-col items-center justify-center gap-[3px] pl-1">
-        <span className={cn("font-display font-extrabold italic text-txt", dense ? "text-[18px]/none" : "text-[21px]/none")} title={followers + " siguiendo"}>
+        <span className={cn("font-display font-extrabold italic text-txt", dense ? "text-[18px]/none" : "text-[21px]/none")} title={t("viewCount", { count: followers })}>
           {followers}
         </span>
         <LzWishStar on={wished} onToggle={() => onWish && onWish(game.id)} size={dense ? 15 : 17} />
@@ -57,6 +59,7 @@ export function LzReleaseCard({ game, wished, onWish, onOpen, dense = false, sho
 }
 
 export function LzBannerCard({ game, popular, wished, onWish, onOpen }: { game: LzRelease; popular?: boolean; wished?: boolean; onWish?: (id: LzRelease["id"]) => void; onOpen?: (g: LzRelease) => void }) {
+  const t = useTranslations("common.calendar")
   const isPop = popular != null ? popular : game.hype >= 5
   const followers = lzFollowers(game)
   const gi = LZ_GENRE_ICON[game.genre] || "gamepad"
@@ -87,7 +90,7 @@ export function LzBannerCard({ game, popular, wished, onWish, onOpen }: { game: 
         <span className="relative w-[118px] flex-none [box-shadow:0_12px_32px_rgba(0,0,0,0.5)]">
           <span className={cn("absolute -left-2 -top-2 z-[3] inline-flex items-center gap-[5px] border border-solid px-[9px] py-1.5 font-mono text-[9px]/none font-bold uppercase tracking-[0.1em]", isPop ? "border-accent bg-accent text-accent-ink" : "border-accent-line bg-base-deep text-accent-bright")}>
             <Icon name="flame" size={11} />
-            {isPop ? "Popular" : "Muy esperado"}
+            {isPop ? t("popular") : t("highlyAnticipated")}
           </span>
           <LzCover genre={game.genre} size={34} className="w-full border-line-2" />
         </span>
@@ -97,7 +100,7 @@ export function LzBannerCard({ game, popular, wished, onWish, onOpen }: { game: 
           <span className="flex flex-wrap items-center gap-2">
             <button
               type="button"
-              aria-label={"Ficha de " + game.title}
+              aria-label={t("releaseCard", { title: game.title })}
               onClick={(e) => {
                 e.stopPropagation()
                 open()
@@ -109,7 +112,7 @@ export function LzBannerCard({ game, popular, wished, onWish, onOpen }: { game: 
             <button
               type="button"
               aria-pressed={wished}
-              title={wished ? "Siguiendo" : "Seguir lanzamiento"}
+              title={wished ? t("following") : t("followRelease")}
               onClick={(e) => {
                 e.stopPropagation()
                 onWish && onWish(game.id)

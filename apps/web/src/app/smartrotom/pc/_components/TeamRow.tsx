@@ -1,6 +1,7 @@
 "use client"
 
 import type { PointerEvent as ReactPointerEvent } from "react"
+import { useTranslations } from "next-intl"
 import { useMarks, useSetMark } from "../_hooks/queries"
 import { dropAttrs, isOver, useDragLayer } from "../_hooks/useDrag"
 import { locId, usePcUi } from "../_stores/pcUiStore"
@@ -19,6 +20,7 @@ export interface TeamRowProps {
  * it has the room to carry the thing only a party member has: live HP.
  */
 export function TeamRow({ mon, index }: TeamRowProps) {
+  const t = useTranslations("pc")
   const loc: SlotLoc = { kind: "party", index }
   const { drag, beginDrag } = useDragLayer()
   const detail = usePcUi((s) => s.detail)
@@ -45,7 +47,7 @@ export function TeamRow({ mon, index }: TeamRowProps) {
         <span className="flex h-[22px] w-[22px] items-center justify-center rounded-pc-pill border border-pc-line-strong font-pc-mono text-[11px] text-pc-fg-subtle">
           {index + 1}
         </span>
-        <span className="text-xs text-pc-fg-subtle">Espacio libre</span>
+        <span className="text-xs text-pc-fg-subtle">{t("team.emptySlot")}</span>
       </div>
     )
   }

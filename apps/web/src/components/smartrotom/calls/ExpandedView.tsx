@@ -98,7 +98,7 @@ export function ExpandedView({
                     />
                   </div>
                   <span className="max-w-[140px] truncate text-sm text-[#c9d2d6]">
-                    {user.uuid === currentUserUuid ? "Tú" : user.username}
+                    {user.uuid === currentUserUuid ? t("you") : user.username}
                   </span>
                 </div>
               )
@@ -107,7 +107,7 @@ export function ExpandedView({
 
           {solo && (
             <div className="text-[30px] font-semibold leading-none text-white">
-              {activeCall.users.find((u) => u.uuid !== currentUserUuid)?.username || "Llamada"}
+              {activeCall.users.find((u) => u.uuid !== currentUserUuid)?.username || t("call")}
             </div>
           )}
           <div className="font-mono text-base tabular-nums text-[#c9d2d6]">{statusMessage}</div>

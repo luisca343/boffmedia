@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import { useTranslations } from "next-intl"
 import type { ResolvedBox } from "../../_utils/inventory"
 import { RARITY_ORDER, raritySkin, type ArRarity } from "../../_utils/rarity"
 import { Button, Icon, Panel } from "../../_components/ui"
@@ -21,13 +22,14 @@ const ladder = (odds: ResolvedBox["odds"]) =>
 
 /** Real odds: each rarity's share of the box's total weight, straight from the config. */
 export function BoxOddsPanel({ box, owned, opening, onOpen, onShowInfo }: BoxOddsPanelProps) {
+  const t = useTranslations("")
   const empty = (box.items ?? []).length === 0
   const canOpen = owned > 0 && !empty && !opening
 
   return (
     <Panel tone="void">
       <div className="mb-3.5 font-ar-display text-[9px] uppercase tracking-[0.18em] text-ar-cyan">
-        Probabilidades
+        {t("arcade.loot.probabilities")}
       </div>
 
       <div className="flex flex-col gap-2">
@@ -70,7 +72,7 @@ export function BoxOddsPanel({ box, owned, opening, onOpen, onShowInfo }: BoxOdd
 
       <div className="mt-[18px] rounded-[10px] border border-white/[.06] bg-black/40 px-3.5 py-3">
         <div className="font-ar-mono text-[11px] uppercase tracking-[0.12em] text-ar-ink-muted">
-          En inventario
+          {t("arcade.loot.inInventory")}
         </div>
         <div
           className={`mt-1.5 font-ar-display text-[16px] leading-relaxed ${owned > 0 ? "text-ar-ink" : "text-ar-ink-muted"}`}
@@ -79,11 +81,9 @@ export function BoxOddsPanel({ box, owned, opening, onOpen, onShowInfo }: BoxOdd
         </div>
         {owned === 0 && (
           <p className="mt-2 font-ar text-xs leading-relaxed text-ar-ink-dim">
-            No tienes esta caja. Se consiguen en la{" "}
-            <Link href="/smartrotom/arcade/racha" className="text-ar-cyan underline-offset-2 hover:underline">
-              racha diaria
-            </Link>{" "}
-            y jugando en el servidor.
+            {t("arcade.loot.noBoxOwned", {
+              streakLink: "",
+            })}
           </p>
         )}
       </div>
@@ -97,7 +97,7 @@ export function BoxOddsPanel({ box, owned, opening, onOpen, onShowInfo }: BoxOdd
           onClick={onOpen}
           disabled={!canOpen}
         >
-          {opening ? "Abriendo…" : "Abrir caja"}
+          {opening ? t("arcade.loot.opening") : t("arcade.loot.openBox")}
         </Button>
       </div>
 
@@ -109,12 +109,12 @@ export function BoxOddsPanel({ box, owned, opening, onOpen, onShowInfo }: BoxOdd
         icon={<Icon.Info s={12} />}
         onClick={onShowInfo}
       >
-        Ver probabilidades completas
+        {t("arcade.loot.viewFullOdds")}
       </Button>
 
       {empty && (
         <p role="alert" className="mt-2.5 font-ar-mono text-[11px] text-ar-danger">
-          Esta caja no tiene objetos configurados.
+          {t("arcade.loot.noBoxItems")}
         </p>
       )}
     </Panel>

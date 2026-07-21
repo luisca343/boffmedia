@@ -15,7 +15,10 @@ import {
   WigglypopListingsRepository,
 } from '../repositories/wigglypop-listings.repository';
 import { WigglypopTradingRepository } from '../repositories/wigglypop-trading.repository';
-import { WigglypopCustodyService, computeFee } from './wigglypop-custody.service';
+import {
+  WigglypopCustodyService,
+  computeFee,
+} from './wigglypop-custody.service';
 import { WigglypopNotifyService } from './wigglypop-notify.service';
 import { generateWpCode } from '../_shared/code.util';
 import { CreateOrderDto, isItemsKind } from '../dto/wigglypop.dto';
@@ -334,7 +337,9 @@ export class WigglypopOrdersService {
     const order = await this.load(dto.orderId);
 
     if (order.buyerUuid !== dto.reviewerUuid) {
-      throw new ForbiddenException('Only the buyer of this order can review it');
+      throw new ForbiddenException(
+        'Only the buyer of this order can review it',
+      );
     }
     if (order.status !== 'completado') {
       throw new BadRequestException(

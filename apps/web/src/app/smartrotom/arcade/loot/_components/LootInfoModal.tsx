@@ -14,13 +14,6 @@ export interface LootInfoModalProps {
   box: ResolvedBox | undefined
 }
 
-const STEPS = [
-  "Consigue cajas con la racha diaria o jugando en el servidor; aparecen en tu inventario.",
-  "Elige una caja en el carrusel. Solo puedes abrir las que ya tienes.",
-  "Al abrirla, el servidor decide el premio y la ruleta te lo enseña.",
-  "El objeto entra en tu colección. Desde ahí puedes reclamarlo al juego.",
-]
-
 /** Every figure below is the item's weight over the box's total — no house numbers. */
 export function LootInfoModal({ open, onClose, box }: LootInfoModalProps) {
   const t = useTranslations("")
@@ -59,28 +52,27 @@ export function LootInfoModal({ open, onClose, box }: LootInfoModalProps) {
       open={open}
       onClose={onClose}
       size="lg"
-      kicker="Cómo funcionan las cajas"
-      title={box ? `${box.name} · probabilidades` : "Cajas de botín"}
+      kicker={t("arcade.loot.howBoxesWork")}
+      title={box ? t("arcade.loot.lootBoxProbabilities", { name: box.name }) : t("arcade.loot.lootBoxes")}
       footer={
         <Button variant="cyan" size="md" onClick={onClose}>
-          Entendido
+          {t("arcade.common.understood")}
         </Button>
       }
     >
       <ol className="mb-5 flex flex-col gap-2.5">
-        {STEPS.map((step, i) => (
-          <li key={step} className="flex items-start gap-2.5">
+        {(["steps.getBoxes", "steps.chooseBox", "steps.openBox", "steps.itemCollection"] as const).map((key, i) => (
+          <li key={key} className="flex items-start gap-2.5">
             <span className="mt-0.5 grid h-[22px] w-[22px] shrink-0 place-items-center rounded-md border border-ar-cyan/40 bg-ar-cyan/[.12] font-ar-display text-[9px] text-ar-cyan">
               {i + 1}
             </span>
-            <span className="text-ar-ink-dim">{step}</span>
+            <span className="text-ar-ink-dim">{t(`arcade.loot.${key}`)}</span>
           </li>
         ))}
       </ol>
 
       <p className="mb-4 rounded-[10px] border border-white/[.07] bg-black/40 p-3 font-ar-mono text-[11px] leading-relaxed text-ar-ink-muted">
-        Las probabilidades salen del peso de cada objeto dentro de la caja: peso del objeto entre el
-        peso total. No hay tiradas garantizadas ni compras.
+        {t("arcade.loot.oddsExplanation")}
       </p>
 
       <div className="flex flex-col gap-3">

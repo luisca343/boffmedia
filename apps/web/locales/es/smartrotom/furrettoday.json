@@ -1,0 +1,92 @@
+{
+  "furrettoday": {
+    "nav": {
+      "home": "Portada",
+      "sections": "Secciones",
+      "archive": "Archivo",
+      "edit": "Editar",
+      "searchPlaceholder": "Buscar en el número…",
+      "search": "Buscar",
+      "coverLabel": "Portada de Furret Today"
+    },
+    "coverHero": {
+      "readCover": "LEER LA PORTADA →",
+      "new": "NUEVO",
+      "inThisIssue": "EN ESTE NÚMERO"
+    },
+    "subscribeStrip": {
+      "subscribe": "Suscribirse",
+      "subscribed": "Suscrito"
+    },
+    "newsletterModal": {
+      "title": "Furret a tu buzón, todos los viernes",
+      "description": "Un email. Titulares, meta, torneos y un meme. Cancelas cuando quieras.",
+      "emailPlaceholder": "tu@email.com",
+      "subscribe": "SUSCRIBIR",
+      "subscribing": "…",
+      "successTitle": "¡LISTO!",
+      "successMessage": "Te hemos guardado en la lista. Nos vemos el viernes.",
+      "error": "No hemos podido apuntarte. Prueba de nuevo."
+    },
+    "featureCards": {
+      "title": "Destacados"
+    },
+    "collectorStrip": {
+      "title": "Coleccionista"
+    },
+    "articleCard": {
+      "readMore": "Leer más"
+    },
+    "furretFooter": {
+      "copyright": "© Furret Today",
+      "allRights": "Todos los derechos reservados"
+    },
+    "sections": {
+      "title": "Secciones",
+      "browse": "Explorar",
+      "archive": "Archivo",
+      "editorial": "Junta editorial"
+    },
+    "browseHero": {
+      "title": "Explorar artículos"
+    },
+    "issueArchive": {
+      "title": "Archivo de números"
+    },
+    "editorialBoard": {
+      "title": "Junta editorial"
+    },
+    "article": {
+      "by": "por {author}",
+      "readTime": "{minutes} min de lectura",
+      "share": "Compartir",
+      "copyLink": "Copiar enlace",
+      "linkCopied": "Enlace copiado",
+      "relatedArticles": "Artículos relacionados",
+      "upNext": "Siguiente"
+    },
+    "shareModal": {
+      "title": "Compartir artículo",
+      "copyLink": "Copiar enlace",
+      "close": "Cerrar"
+    },
+    "editor": {
+      "title": "Editor",
+      "newArticle": "Nuevo artículo",
+      "save": "Guardar",
+      "publish": "Publicar",
+      "draft": "Borrador",
+      "published": "Publicado",
+      "delete": "Eliminar",
+      "confirmDelete": "¿Eliminar este artículo?"
+    },
+    "newsroom": {
+      "title": "Redacción",
+      "empty": "Sin artículos todavía"
+    },
+    "error": {
+      "title": "Error",
+      "retry": "Reintentar"
+    }
+  }
+}

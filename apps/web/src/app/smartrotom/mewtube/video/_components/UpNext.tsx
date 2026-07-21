@@ -1,7 +1,10 @@
 import Link from "next/link"
+import { useTranslations } from "next-intl"
 import { Check, Skeleton, type VideoCardData } from "@/components/smartrotom/media/ui"
 
 function Reco({ v }: { v: VideoCardData }) {
+  const t = useTranslations("mewtube")
+
   return (
     <Link
       href={v.href}
@@ -27,7 +30,7 @@ function Reco({ v }: { v: VideoCardData }) {
           {v.verified && <Check />}
         </div>
         <div className="mt-0.5 text-[11px] text-mw-fg-faint">
-          {[v.views && `${v.views} visitas`, v.age].filter(Boolean).join(" · ")}
+          {[v.views && t("video.views", { count: v.views }), v.age].filter(Boolean).join(" · ")}
         </div>
       </div>
     </Link>

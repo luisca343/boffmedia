@@ -1,6 +1,7 @@
 "use client"
 
 import { useMemo, useState } from "react"
+import { useTranslations } from "next-intl"
 import { userMessageFrom } from "@/services/boffAPI"
 import { Badge, Button, Card, Empty, Icon, PageHead, Skeleton } from "../ui"
 import { Segmented } from "./Segmented"
@@ -16,8 +17,7 @@ const FILTERS = ["all", "pending", "reviewing", "resolved", "dismissed"] as cons
 type Filter = (typeof FILTERS)[number]
 
 export function DenunciasSection() {
-  // `limit`/`page` are what ListDenunciasQueryDto actually validates — 100 is its max, and
-  // this government is brand new, so client-side tab filtering over one fetch is enough.
+  const t = useTranslations("gobierno")
   const { data, isLoading, isError, error } = useDenuncias({ limit: 100 })
   const [filter, setFilter] = useState<Filter>("all")
   const [openId, setOpenId] = useState<number | null>(null)
@@ -32,20 +32,20 @@ export function DenunciasSection() {
 
   const options = FILTERS.map((f) => ({
     value: f,
-    label: f === "all" ? "Todas" : DENUNCIA_STATUS[f].label,
+    label: f === "all" ? t("denuncias.filters.all") : DENUNCIA_STATUS[f].label,
     count: f === "all" ? rows.length : rows.filter((d) => d.status === f).length,
   }))
 
   return (
     <>
       <PageHead
-        kicker="Seguridad · Policía municipal"
+        kicker={t("denuncias.kicker")}
         dep="seguridad"
-        title="Denuncias"
-        sub="Reportes ciudadanos recibidos por la policía. Revisa, multa o escala a busca y captura."
+        title={t("denuncias.title")}
+        sub={t("denuncias.description")}
         right={
           <Button tone="primary" icon="plus" onClick={() => setNuevaOpen(true)}>
-            Nueva denuncia
+            {t("denuncias.newButton")}
           </Button>
         }
       />
@@ -63,14 +63,14 @@ export function DenunciasSection() {
       ) : isError ? (
         <Empty
           icon="alert"
-          title="No se ha podido cargar el registro"
-          sub={error ? userMessageFrom(error, "Inténtalo de nuevo en unos segundos.") : undefined}
+          title={t("denuncias.errorTitle")}
+          sub={error ? userMessageFrom(error, t("common.retry")) : undefined}
         />
       ) : filtered.length === 0 ? (
         <Empty
           icon="fileText"
-          title={filter === "all" ? "Sin denuncias registradas" : `Sin denuncias en «${DENUNCIA_STATUS[filter as keyof typeof DENUNCIA_STATUS]?.label ?? filter}»`}
-          sub="Cuando lleguen nuevos reportes ciudadanos aparecerán aquí."
+          title={filter === "all" ? t("denuncias.emptyTitle") : t("denuncias.emptyFiltered", { status: DENUNCIA_STATUS[filter as keyof typeof DENUNCIA_STATUS]?.label ?? filter })}
+          sub={t("denuncias.emptyFilteredBody")}
         />
       ) : (
         <div className="space-y-3">
@@ -122,7 +122,7 @@ export function DenunciasSection() {
                     {!actionable && d.resolution ? (
                       <div className="rounded-gt-sm border border-gt-line bg-gt-paper-1 px-3.5 py-3">
                         <div className="font-gt-mono text-[9.5px] font-bold uppercase tracking-[.14em] text-gt-ink-400">
-                          Resolución
+                          {t("denuncias.resolucion")}
                         </div>
                         <p className="mt-1 text-[13px] text-gt-ink-700">{d.resolution ?? "—"}</p>
                         {d.resolvedBy && (
@@ -132,7 +132,7 @@ export function DenunciasSection() {
                         )}
                       </div>
                     ) : !actionable ? (
-                      <p className="text-[12.5px] italic text-gt-ink-400">Sin acciones disponibles.</p>
+                      <p className="text-[12.5px] italic text-gt-ink-400">{t("denuncias.sinAcciones")}</p>
                     ) : (
                       <div className="flex flex-wrap items-center gap-2">
                         <Button
@@ -141,11 +141,11 @@ export function DenunciasSection() {
                           icon="check"
                           onClick={() => setAction({ kind: "resolver", denuncia: d })}
                         >
-                          {d.accused ? "Resolver" : "Resolver / archivar"}
+                          {d.accused ? t("denuncias.resolver") : t("denuncias.resolverArchivar")}
                         </Button>
                         {d.accused && (
                           <Button size="sm" tone="gold" icon="gavel" onClick={() => setAction({ kind: "multa", denuncia: d })}>
-                            Emitir multa
+                            {t("denuncias.emitirMulta")}
                           </Button>
                         )}
                         {d.accused && (
@@ -156,7 +156,7 @@ export function DenunciasSection() {
                             className="ml-auto"
                             onClick={() => setAction({ kind: "buscado", denuncia: d })}
                           >
-                            Escalar a buscado
+                            {t("denuncias.escalarBuscado")}
                           </Button>
                         )}
                       </div>

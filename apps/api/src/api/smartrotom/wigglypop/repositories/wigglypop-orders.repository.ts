@@ -137,7 +137,8 @@ export class WigglypopOrdersRepository {
     const set: Record<string, unknown> = { deliveryStatus };
     if (extra?.settleTxId !== undefined) set.settleTxId = extra.settleTxId;
     if (extra?.confirmedAt !== undefined) set.confirmedAt = extra.confirmedAt;
-    if (extra?.takenPayload !== undefined) set.takenPayload = extra.takenPayload;
+    if (extra?.takenPayload !== undefined)
+      set.takenPayload = extra.takenPayload;
 
     await this.db
       .update(wigglypopOrderLines)

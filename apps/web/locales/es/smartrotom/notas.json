@@ -1,0 +1,190 @@
+{
+  "notas": {
+    "common": {
+      "close": "Cerrar",
+      "back": "Volver",
+      "retry": "Reintentar",
+      "loading": "Cargando…",
+      "save": "Guardar",
+      "cancel": "Cancelar",
+      "delete": "Eliminar",
+      "search": "Buscar",
+      "create": "Crear",
+      "share": "Compartir",
+      "duplicate": "Duplicar",
+      "restore": "Restaurar",
+      "pin": "Anclar",
+      "unpin": "Desanclar"
+    },
+    "sidebar": {
+      "newNote": "Nueva nota",
+      "capture": "Captura",
+      "changeTheme": "Cambiar tema",
+      "lightMode": "Modo claro",
+      "darkMode": "Modo oscuro",
+      "smartViews": {
+        "all": "Todas las notas",
+        "recent": "Recientes",
+        "pinned": "Ancladas",
+        "shared": "Compartidas",
+        "trash": "Papelera"
+      },
+      "folders": "Carpetas",
+      "tags": "Etiquetas",
+      "newFolder": "Nueva carpeta",
+      "folderNamePrompt": "Nombre de la carpeta:"
+    },
+    "list": {
+      "title": "Notas",
+      "searchPlaceholder": "Buscar en estas notas…",
+      "count": "{count, plural, one {# nota} other {# notas}}",
+      "noResults": "Sin resultados",
+      "emptyTitle": "No hay notas aquí",
+      "createNote": "Crear nota",
+      "untitled": "Sin título"
+    },
+    "sort": {
+      "label": "Ordenar por",
+      "updated": "Modificación",
+      "created": "Creación",
+      "title": "Título"
+    },
+    "editor": {
+      "placeholder": "Escribe aquí…",
+      "paragraph": "Párrafo",
+      "heading1": "Título 1",
+      "heading2": "Título 2",
+      "heading3": "Título 3",
+      "createLinked": "Crear «{title}»",
+      "words": "{count} palabras",
+      "saving": "Guardando…",
+      "saved": "Guardado",
+      "addTag": "etiqueta",
+      "untitled": "Sin título",
+      "splitView": "Vista dividida",
+      "closePanel": "Cerrar panel",
+      "sidePanel": "Panel lateral",
+      "more": "Más",
+      "versionHistory": "Historial de versiones",
+      "newTab": "Nueva pestaña",
+      "welcomeTitle": "Notas SmartRotom",
+      "welcomeDesc": "Tu espacio para estrategias, guías y diario de entrenador. Selecciona una nota, crea una nueva o pulsa",
+      "welcomeSearch": "para buscar.",
+      "fromTemplate": "Desde plantilla",
+      "graph": "Grafo"
+    },
+    "commands": {
+      "newNote": "Nueva nota",
+      "quickCapture": "Captura rápida",
+      "fromTemplate": "Nueva desde plantilla",
+      "splitView": "Vista dividida",
+      "knowledgeGraph": "Abrir grafo de conocimiento",
+      "toggleTheme": "Cambiar tema claro / oscuro",
+      "togglePin": "Anclar / desanclar nota actual"
+    },
+    "palette": {
+      "placeholder": "Buscar notas o ejecutar un comando…",
+      "actions": "Acciones",
+      "notes": "Notas",
+      "noResults": "Sin resultados",
+      "navigate": "navegar",
+      "open": "abrir",
+      "close": "cerrar"
+    },
+    "capture": {
+      "title": "Captura rápida",
+      "placeholder": "Escribe una idea rápida… (la primera línea es el título)",
+      "saveHint": "para guardar",
+      "save": "Guardar"
+    },
+    "contextMenu": {
+      "open": "Abrir",
+      "openSplit": "Abrir en panel dividido",
+      "pin": "Anclar",
+      "unpin": "Desanclar",
+      "share": "Compartir",
+      "duplicate": "Duplicar",
+      "restore": "Restaurar",
+      "delete": "Eliminar"
+    },
+    "context": {
+      "outline": "Esquema",
+      "links": "Enlaces",
+      "outgoing": "Enlaces salientes",
+      "incoming": "Enlaces entrantes",
+      "noBacklinks": "Ninguna nota enlaza aquí todavía.",
+      "useWikilinks": "Usa",
+      "toCreateLinks": "para crear enlaces.",
+      "folder": "Carpeta",
+      "tags": "Etiquetas",
+      "sharedWith": "Compartida con",
+      "private": "Privada",
+      "public": "Pública",
+      "created": "Creada",
+      "modified": "Modificada",
+      "visibility": "Visibilidad",
+      "outlineHint": "Añade títulos para ver el esquema del documento.",
+      "uncreated": "sin crear"
+    },
+    "templates": {
+      "title": "Plantillas",
+      "blank": "Nota en blanco",
+      "setAnalysis": "Análisis de Set"
+    },
+    "share": {
+      "title": "Compartir nota",
+      "shareWith": "Compartir con",
+      "makePublic": "Hacer pública",
+      "removeAccess": "Quitar acceso",
+      "trainerUuid": "UUID de entrenador…",
+      "add": "Añadir",
+      "onlyYou": "Solo tú tienes acceso.",
+      "public": "Pública",
+      "private": "Privada",
+      "publicDesc": "Cualquiera con el enlace puede verla",
+      "privateDesc": "Solo personas invitadas"
+    },
+    "history": {
+      "title": "Historial de versiones",
+      "restore": "Restaurar esta versión",
+      "loading": "Cargando…",
+      "empty": "Aún no hay versiones guardadas.",
+      "emptyHint": "Se crea una instantánea al guardar cambios importantes.",
+      "current": "Actual",
+      "version": "Versión {num}",
+      "words": "{count} palabras",
+      "restoreBtn": "Restaurar"
+    },
+    "graph": {
+      "title": "Grafo de conocimiento",
+      "notes": "notas",
+      "links": "enlaces"
+    },
+    "tweaks": {
+      "appearance": "Apariencia",
+      "theme": "Tema",
+      "dark": "Oscuro",
+      "light": "Claro",
+      "accent": "Acento",
+      "reading": "Lectura",
+      "typography": "Tipografía",
+      "width": "Ancho",
+      "normal": "Normal",
+      "wide": "Ancho",
+      "settingsLabel": "Ajustes de apariencia"
+    },
+    "tagPicker": {
+      "placeholder": "Buscar o crear etiqueta…",
+      "create": "Crear «{name}»"
+    },
+    "toast": {
+      "created": "Nota creada.",
+      "deleted": "Movida a la papelera.",
+      "restored": "Versión restaurada.",
+      "shared": "Compartida.",
+      "folderCreated": "Carpeta creada.",
+      "tagCreated": "Etiqueta creada.",
+      "duplicateError": "No se pudo leer la nota para duplicarla"
+    }
+  }
+}

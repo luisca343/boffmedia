@@ -1,0 +1,231 @@
+{
+  "chatapp": {
+    "common": {
+      "close": "Cerrar",
+      "back": "Volver",
+      "cancel": "Cancelar",
+      "search": "Buscar",
+      "loading": "Cargando…",
+      "retry": "Reintentar",
+      "newChat": "Nuevo chat",
+      "settings": "Ajustes"
+    },
+    "sidebar": {
+      "title": "ChatApp",
+      "subtitle": "SmartRotom",
+      "searchPlaceholder": "Buscar chats y mensajes",
+      "clearSearch": "Limpiar",
+      "noResults": "No se encontraron chats",
+      "categories": {
+        "all": "Todos",
+        "unread": "No leídos",
+        "direct": "Directos",
+        "groups": "Grupos",
+        "favorites": "Favoritos"
+      },
+      "pinned": "Fijados",
+      "allChats": "Todos los chats"
+    },
+    "empty": {
+      "title": "Aún no tienes chats",
+      "body": "Empieza una conversación con alguien de tu servidor o crea un grupo para tu equipo.",
+      "noConversation": "Tus conversaciones",
+      "noConversationBody": "Selecciona un chat para empezar a hablar, compartir waypoints, capturas y notas con tu equipo."
+    },
+    "error": {
+      "title": "Sin conexión con SmartRotom",
+      "body": "No hemos podido sincronizar tus chats. Comprueba tu conexión y vuelve a intentarlo."
+    },
+    "info": {
+      "groupInfo": "Info del grupo",
+      "contactInfo": "Info del contacto",
+      "members": "Miembros · {count}",
+      "sharedMedia": "Multimedia compartida",
+      "sharedWaypoints": "Waypoints compartidos",
+      "privacy": "Privacidad",
+      "e2eEncryption": "Cifrado de extremo a extremo",
+      "muteNotifications": "Silenciar notificaciones",
+      "pinChat": "Fijar chat",
+      "clearChat": "Vaciar chat",
+      "you": "Tú"
+    },
+    "actions": {
+      "call": "Llamar",
+      "video": "Vídeo",
+      "mute": "Silenc.",
+      "unmute": "Sonido"
+    },
+    "status": {
+      "members": "{count} miembros",
+      "onlyYou": "Solo tú · tus notas y enlaces",
+      "playing": "Jugando ahora",
+      "online": "En línea",
+      "offline": "Desconectado",
+      "typing": "escribiendo…"
+    },
+    "composer": {
+      "placeholder": "Escribe un mensaje…",
+      "replyingTo": "Respondiendo a {user}",
+      "yourself": "ti mismo",
+      "attach": "Adjuntar",
+      "emoji": "Emoji y stickers",
+      "voiceNote": "Nota de voz",
+      "voiceNoteSoon": "Notas de voz: próximamente",
+      "send": "Enviar",
+      "cancelReply": "Cancelar",
+      "tabs": {
+        "emoji": "Emojis",
+        "sticker": "Stickers"
+      },
+      "attachment": {
+        "photos": "Fotos y vídeos",
+        "photosSub": "Galería de capturas",
+        "camera": "Cámara",
+        "cameraSub": "Captura del juego",
+        "document": "Documento",
+        "documentSub": "Tus notas",
+        "location": "Ubicación",
+        "locationSub": "Compartir waypoint"
+      }
+    },
+    "media": {
+      "title": "Multimedia y archivos",
+      "tabs": {
+        "photos": "Fotos",
+        "videos": "Vídeos",
+        "waypoints": "Waypoints",
+        "documents": "Documentos"
+      },
+      "emptyPhotos": "Aún no hay fotos compartidas.",
+      "emptyVideos": "Aún no hay vídeos compartidos.",
+      "emptyWaypoints": "Aún no hay waypoints compartidos.",
+      "emptyDocuments": "Aún no hay documentos compartidos.",
+      "viewAll": "Ver todo",
+      "youtubeVideo": "Vídeo de YouTube"
+    },
+    "searchModal": {
+      "title": "Buscar en todos los chats",
+      "placeholder": "Mensajes, personas, waypoints…",
+      "emptyHint": "Busca por palabra, persona o coordenadas.",
+      "noResults": "Sin resultados.",
+      "filters": {
+        "all": "Todo",
+        "photos": "Fotos",
+        "links": "Enlaces",
+        "docs": "Documentos",
+        "wp": "Waypoints"
+      }
+    },
+    "settingsModal": {
+      "title": "Ajustes",
+      "connected": "Conectado · multi-dispositivo",
+      "appearance": "Apariencia",
+      "accentHint": "El modo claro/oscuro se elige en los ajustes de SmartRotom, en «Temas».",
+      "privacy": "Privacidad",
+      "readReceipts": "Confirmaciones de lectura",
+      "readReceiptsDesc": "Mostrar el doble check azul",
+      "lastSeen": "Última conexión",
+      "notifPreview": "Vista previa en notificaciones",
+      "notifications": "Notificaciones",
+      "sounds": "Sonidos",
+      "focusMode": "Modo concentración",
+      "focusModeDesc": "Silencia chats no fijados mientras juegas",
+      "chat": "Chat",
+      "enterToSend": "Enter para enviar"
+    },
+    "createGroup": {
+      "title": "Nuevo chat",
+      "createChat": "Crear chat",
+      "groupName": "Nombre del grupo",
+      "savedMessages": "Mensajes guardados",
+      "searchPlayers": "Buscar jugadores…",
+      "noPlayers": "No hay jugadores.",
+      "remove": "Quitar",
+      "createFailed": "No se pudo crear el chat"
+    },
+    "toast": {
+      "messageSent": "Mensaje enviado.",
+      "sendFailed": "No se pudo enviar el mensaje."
+    },
+    "gallery": {
+      "title": "Compartir captura",
+      "chooseOther": "Elegir otra",
+      "send": "Enviar",
+      "noCaptures": "Aún no tienes capturas en tu galería.",
+      "addComment": "Añade un comentario…"
+    },
+    "notePicker": {
+      "title": "Compartir nota",
+      "searchPlaceholder": "Buscar notas…",
+      "loading": "Cargando notas…",
+      "noResults": "No se encontraron notas.",
+      "untitled": "Sin título"
+    },
+    "locationPicker": {
+      "title": "Compartir ubicación",
+      "loading": "Cargando waypoints…",
+      "currentLocation": "Ubicación actual",
+      "noWaypoints": "No hay waypoints guardados."
+    },
+    "conversation": {
+      "summaryTitle": "Resumen de SmartRotom",
+      "searchChat": "Buscar en el chat",
+      "videoCall": "Videollamada",
+      "viewInfo": "Ver info",
+      "attached": "Adjunto"
+    },
+    "message": {
+      "react": "Reaccionar",
+      "reply": "Responder",
+      "more": "Más",
+      "copy": "Copiar",
+      "addWaypoint": "Añadir waypoint",
+      "notes": "Notas",
+      "openNote": "Abrir nota",
+      "saveToGallery": "Guardar en galería",
+      "goToLocation": "Ir a la ubicación",
+      "coordinatesCopied": "Coordenadas copiadas",
+      "imageSaved": "Imagen guardada en la galería",
+      "imageSaveError": "Error al guardar la imagen",
+      "waypointAdded": "Waypoint \"{name}\" añadido",
+      "waypointError": "Error al añadir waypoint",
+      "openingNote": "Abriendo nota…",
+      "scanned": "ESCANEADO",
+      "scanDetails": "Detalles del escaneo · {count}",
+      "lookingAt": "mirando a {block}",
+      "call": {
+        "missed": "Llamada perdida",
+        "outgoing": "Llamada saliente",
+        "incoming": "Llamada entrante",
+        "noAnswer": "Sin respuesta",
+        "duration": "Duración {time}"
+      }
+    },
+    "preview": {
+      "noMessages": "No hay mensajes",
+      "photo": "Foto",
+      "sticker": "Sticker",
+      "document": "Documento",
+      "location": "Ubicación",
+      "video": "Vídeo",
+      "voiceNote": "Nota de voz",
+      "message": "Mensaje",
+      "call": "Llamada",
+      "callMissed": "Llamada perdida",
+      "you": "Tú"
+    },
+    "format": {
+      "today": "Hoy",
+      "yesterday": "Ayer",
+      "weekday": {
+        "0": "Domingo",
+        "1": "Lunes",
+        "2": "Martes",
+        "3": "Miércoles",
+        "4": "Jueves",
+        "5": "Viernes",
+        "6": "Sábado"
+      }
+    }
+  }
+}

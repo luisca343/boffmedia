@@ -157,7 +157,10 @@ export class WingullPlayerService {
    * Removes items from a player. Returns what was ACTUALLY removed, which may be less than
    * asked for — settle against `taken`, never against the request.
    */
-  async takeItems(uuid: string, items: TakeItemDto[]): Promise<ItemsTakeResponse> {
+  async takeItems(
+    uuid: string,
+    items: TakeItemDto[],
+  ): Promise<ItemsTakeResponse> {
     try {
       return await this.wingullPlayerRepository.takeItemsInAPI({ uuid, items });
     } catch (error: any) {

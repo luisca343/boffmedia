@@ -1,6 +1,7 @@
 "use client"
 
 import { useCallback, useEffect, useState } from "react"
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { Panel, Field, Input, Select, Button, toast, Spinner } from "@/components/boffmedia/primitives"
 import { TnFormatBadge } from "@/components/boffmedia/ui/tournaments"
@@ -23,7 +24,6 @@ import {
 import { FORMATS, KINDS, PHASE_FORMATS, ADVANCE_TYPE_OPTIONS, PARTICIPANT_STATUS, VGC_PRESET, PHASE_STATUS_TONE } from "./constants"
 import { SectionHead, Stat } from "./shared"
 
-// ── edit tournament meta ─────────────────────────────────────────────────────
 export function EditPanel({
   detail,
   onChange,
@@ -31,6 +31,7 @@ export function EditPanel({
   detail: NonNullable<ReturnType<typeof useTournament>["tournament"]>
   onChange: () => void
 }) {
+  const t = useTranslations("admin.tournaments")
   const toLocal = (iso: string | null) =>
     iso ? new Date(iso).toISOString().slice(0, 16) : ""
   const [name, setName] = useState(detail.name)
@@ -48,7 +49,7 @@ export function EditPanel({
   const [open, setOpen] = useState(false)
 
   const save = async () => {
-    if (!name.trim()) return toast.error("El nombre es obligatorio")
+    if (!name.trim()) return toast.error(t("nameRequired"))
     setBusy(true)
     const body: Record<string, unknown> = {
       name: name.trim(),
@@ -66,55 +67,55 @@ export function EditPanel({
     const r = await TournamentsService.update(detail.id, body)
     setBusy(false)
     if (r.error) toast.error(r.error)
-    else { toast.success("Torneo actualizado"); onChange() }
+    else { toast.success(t("tournamentUpdated")); onChange() }
   }
 
   return (
     <Panel
-      title="Editar torneo"
+      title={t("editTournament")}
       aside={
         <button
           type="button"
           onClick={() => setOpen((o) => !o)}
           className="font-mono text-[11px] text-accent transition-opacity hover:opacity-70"
         >
-          {open ? "Ocultar" : "Editar"}
+          {open ? t("hide") : t("edit")}
         </button>
       }
     >
       {open && (
         <div className="grid gap-3">
           <div className="grid gap-3 sm:grid-cols-2">
-            <Field label="Nombre">
+            <Field label={t("name")}>
               <Input value={name} onChange={(e) => setName(e.target.value)} />
             </Field>
-            <Field label="Banner (URL)">
+            <Field label={t("banner")}>
               <Input value={banner} onChange={(e) => setBanner(e.target.value)} placeholder="https://…" />
             </Field>
-            <Field label="Al mejor de (BO)">
+            <Field label={t("bestOf")}>
               <Input type="number" min={1} value={bestOf} onChange={(e) => setBestOf(Math.max(1, +e.target.value || 1))} />
             </Field>
-            <Field label="Máx. participantes">
+            <Field label={t("maxParticipants")}>
               <Input type="number" min={2} value={maxParticipants} onChange={(e) => setMaxParticipants(e.target.value === "" ? "" : Math.max(2, +e.target.value))} />
             </Field>
-            <Field label="Auto-verificación (min · vacío = 10)">
+            <Field label={t("autoVerify")}>
               <Input type="number" min={1} value={autoVerify} onChange={(e) => setAutoVerify(e.target.value === "" ? "" : Math.max(1, +e.target.value))} placeholder="10" />
             </Field>
-            <Field label="Inscripción">
+            <Field label={t("registration")}>
               <Select
                 value={regOpen ? "yes" : "no"}
-                options={[{ value: "yes", label: "Abierta" }, { value: "no", label: "Cerrada" }]}
+                options={[{ value: "yes", label: t("regOpen") }, { value: "no", label: t("regClosed") }]}
                 onChange={(v) => setRegOpen(v === "yes")}
               />
             </Field>
-            <Field label="Inicio">
+            <Field label={t("startDate")}>
               <Input type="datetime-local" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
             </Field>
-            <Field label="Fin">
+            <Field label={t("endDate")}>
               <Input type="datetime-local" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
             </Field>
           </div>
-          <Field label="Descripción">
+          <Field label={t("description")}>
             <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
@@ -122,7 +123,7 @@ export function EditPanel({
               className="w-full resize-y border border-solid border-line bg-base px-2 py-1.5 font-body text-[13px]"
             />
           </Field>
-          <Field label="Reglas">
+          <Field label={t("rules")}>
             <textarea
               value={rules}
               onChange={(e) => setRules(e.target.value)}
@@ -130,17 +131,17 @@ export function EditPanel({
               className="w-full resize-y border border-solid border-line bg-base px-2 py-1.5 font-body text-[13px]"
             />
           </Field>
-          <Field label="Premios">
+          <Field label={t("prizes")}>
             <textarea
               value={prizes}
               onChange={(e) => setPrizes(e.target.value)}
               rows={2}
-              placeholder={"1º — 50€\n2º — 25€"}
+              placeholder={t("prizesPlaceholder")}
               className="w-full resize-y border border-solid border-line bg-base px-2 py-1.5 font-body text-[13px]"
             />
           </Field>
           <div className="flex justify-end">
-            <Button variant="pri" size="sm" disabled={busy} onClick={save}>Guardar cambios</Button>
+            <Button variant="pri" size="sm" disabled={busy} onClick={save}>{t("saveChanges")}</Button>
           </div>
         </div>
       )}

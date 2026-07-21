@@ -173,7 +173,9 @@ export class WigglypopTradingRepository {
     return rows[0] ?? null;
   }
 
-  async findTradesForSeller(sellerUuid: string): Promise<WigglypopTradeOffer[]> {
+  async findTradesForSeller(
+    sellerUuid: string,
+  ): Promise<WigglypopTradeOffer[]> {
     const rows = await this.db
       .select({ trade: wigglypopTradeOffers })
       .from(wigglypopTradeOffers)

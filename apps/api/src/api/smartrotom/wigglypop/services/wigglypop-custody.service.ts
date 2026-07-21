@@ -263,7 +263,9 @@ export class WigglypopCustodyService {
     const settled = (await this.ordersRepository.findById(
       order.id,
     )) as OrderWithLines;
-    const allDone = settled.lines.every((l) => l.deliveryStatus === 'confirmado');
+    const allDone = settled.lines.every(
+      (l) => l.deliveryStatus === 'confirmado',
+    );
     await this.ordersRepository.setStatus(
       order.id,
       allDone ? 'completado' : 'transferido',

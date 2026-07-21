@@ -72,21 +72,21 @@ export function OpeningStage({
   }
 
   const description =
-    item && item.type === "pokemon" ? item.data || item.id : item ? getItemDescription(t, item.id) : ""
+    item && item.type === "pokemon" ? item.data || item.id : item ? getItemDescription(t, item.itemId) : ""
 
   return (
     <>
       <Panel tone="deep" tight className="mb-4">
         <div className="flex flex-wrap items-center justify-between gap-2.5">
           <span className="inline-flex items-center gap-3.5">
-            <span className="font-ar-display text-[11px] text-ar-magenta-2">▸ Abriendo</span>
+            <span className="font-ar-display text-[11px] text-ar-magenta-2">▸ {t("arcade.loot.abriendo")}</span>
             <span className="ar-chrom font-ar-display text-[13px] text-ar-ink">{box.name}</span>
           </span>
           <span className="font-ar-mono text-[11px] uppercase tracking-[0.12em] text-ar-cyan">
             {settled ? (
-              <span className="text-ar-lime">Premio obtenido</span>
+              <span className="text-ar-lime">{t("arcade.common.prizeObtained")}</span>
             ) : (
-              <span className="motion-reduce:animate-none animate-ar-blink">Girando…</span>
+              <span className="motion-reduce:animate-none animate-ar-blink">{t("arcade.common.spinning")}</span>
             )}
           </span>
         </div>
@@ -96,7 +96,7 @@ export function OpeningStage({
         <div aria-hidden className="ar-horizon opacity-40" />
         <div className="relative z-[2]">
           <div className="mb-3 text-center font-ar-display text-[9px] uppercase tracking-[0.18em] text-ar-cyan">
-            {settled ? "¡Premio obtenido!" : "Girando…"}
+            {settled ? t("arcade.loot.prizeObtained") : t("arcade.common.spinning")}
           </div>
           {reel.tiles.length > 0 && reel.winningPosition >= 0 ? (
             <ReelSpinner
@@ -106,7 +106,7 @@ export function OpeningStage({
             />
           ) : (
             <p role="alert" className="py-8 text-center font-ar-mono text-[11px] text-ar-danger">
-              La ruleta no llegó del servidor, pero el premio sí es tuyo.
+              {t("arcade.loot.reelNoServer")}
             </p>
           )}
         </div>
@@ -154,7 +154,7 @@ export function OpeningStage({
 
         <Panel tone="void">
           <div className="mb-3 font-ar-display text-[9px] uppercase tracking-[0.18em] text-ar-cyan">
-            Siguiente
+            {t("arcade.loot.next")}
           </div>
           <div className="flex flex-wrap gap-2.5">
             <Button
@@ -164,7 +164,7 @@ export function OpeningStage({
               onClick={onOpenAnother}
               disabled={!settled || opening || owned <= 0}
             >
-              {opening ? "Abriendo…" : "Abrir otra"}
+              {opening ? t("arcade.loot.opening") : t("arcade.loot.openAnotherBtn")}
             </Button>
             <Link
               href="/smartrotom/arcade/coleccion"
@@ -177,7 +177,7 @@ export function OpeningStage({
                 !settled && "pointer-events-none opacity-45",
               )}
             >
-              <Icon.Trophy s={14} /> Ver mi colección
+              <Icon.Trophy s={14} /> {t("arcade.loot.viewMyCollection")}
             </Link>
             <Button
               variant="ghost"
@@ -186,18 +186,16 @@ export function OpeningStage({
               onClick={onBack}
               disabled={!settled}
             >
-              Volver al selector
+              {t("arcade.loot.backToSelector")}
             </Button>
           </div>
 
           <div className="mt-[18px] rounded-[10px] border border-white/[.07] bg-black/45 px-3.5 py-3">
             <div className="mb-1.5 font-ar-mono text-[11px] uppercase tracking-[0.12em] text-ar-ink-muted">
-              Guardado
+              {t("arcade.loot.saved")}
             </div>
             <p className="font-ar text-[13px] leading-relaxed text-ar-ink-dim">
-              El objeto ya está en tu colección. Te quedan{" "}
-              <b className="font-ar-mono text-ar-amber">{owned}</b>{" "}
-              {owned === 1 ? "caja" : "cajas"} de este tipo.
+              {t("arcade.loot.itemInCollection", { count: owned })}
             </p>
           </div>
         </Panel>

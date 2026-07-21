@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import type { NPC, QuestData, Region } from "../_types"
 import { spriteName } from "../_utils/items"
@@ -26,6 +27,7 @@ export function QuestPaper({
   selected?: boolean
   onOpen: () => void
 }) {
+  const t = useTranslations("misiones.questPaper")
   const status = normalizeStatus(quest)
   const progress = questProgress(quest)
   const level = quest.requirements?.requiredLevel
@@ -54,8 +56,6 @@ export function QuestPaper({
         }
       }}
     >
-      {/* What holds it up: gold tack for the quest you are on, red for one you
-          could take, an iron nail for everything settled. */}
       <span className="absolute -top-3 left-1/2 z-[6] -translate-x-1/2">
         {isActive ? (
           <Thumbtack size={20} color={TACK_GOLD} />
@@ -67,10 +67,9 @@ export function QuestPaper({
       </span>
 
       {isActive && <Sparkles count={5} />}
-      {status === "COMPLETED" && <Stamp kind="completed">Completada</Stamp>}
-      {status === "FAILED" && <Stamp kind="failed">Fallida</Stamp>}
+      {status === "COMPLETED" && <Stamp kind="completed">{t("completed")}</Stamp>}
+      {status === "FAILED" && <Stamp kind="failed">{t("failed")}</Stamp>}
 
-      {/* A sealed quest is a folded, creased sheet. */}
       {status === "LOCKED" && (
         <span
           aria-hidden
@@ -86,8 +85,8 @@ export function QuestPaper({
       <div className="mb-1.5 flex items-center justify-between gap-2">
         <Label className={SEAL_TEXT[status]}>{STATUS_LABEL[status]}</Label>
         <span className="flex items-center gap-2">
-          {quest.repeatable && <Label>Repetible</Label>}
-          {level > 0 && <Label>Nv. {level}</Label>}
+          {quest.repeatable && <Label>{t("repeatable")}</Label>}
+          {level > 0 && <Label>{t("level", { level })}</Label>}
         </span>
       </div>
 
@@ -96,7 +95,7 @@ export function QuestPaper({
       <div className="mb-2.5 flex items-center gap-2 text-xs italic text-ms-ink-3">
         <NpcPortrait skin={npc?.skin} size={22} />
         <span className="truncate">
-          de <strong className="font-semibold not-italic text-ms-ink-2">{npc?.name || "Desconocido"}</strong>
+          {t("from", { npc: npc?.name || t("unknown") })}
         </span>
         {region && (
           <>
@@ -109,13 +108,13 @@ export function QuestPaper({
         )}
       </div>
 
-      <p className="mb-3 line-clamp-2 text-[13px] italic leading-[1.55] text-ms-ink-2">“{quest.logText}”</p>
+      <p className="mb-3 line-clamp-2 text-[13px] italic leading-[1.55] text-ms-ink-2">&ldquo;{quest.logText}&rdquo;</p>
 
       {showProgress && (
         <div className="mb-3">
           <div className="mb-1 flex justify-between font-ms-uppercase text-[10px] uppercase tracking-[.12em] text-ms-ink-3">
             <span>
-              {progress.done}/{progress.total} objetivos
+              {t("objectives", { done: progress.done, total: progress.total })}
             </span>
             <span>{progress.pct}%</span>
           </div>
@@ -125,7 +124,7 @@ export function QuestPaper({
 
       <div className="mt-auto flex items-center justify-between gap-3 border-t border-dashed border-ms-ink-1/30 pt-2.5">
         <div className="flex min-w-0 flex-col gap-1">
-          <Label>Recompensa</Label>
+          <Label>{t("reward")}</Label>
           {rewards.length > 0 ? (
             <span className="flex items-center gap-1">
               {rewards.slice(0, 3).map((reward) => (

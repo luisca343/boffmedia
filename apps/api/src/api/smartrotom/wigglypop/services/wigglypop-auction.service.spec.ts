@@ -88,7 +88,9 @@ describe('WigglypopAuctionService', () => {
 
       // The listing is repriced to the winning bid before the order is built from it, so the
       // winner is charged what they actually promised — not the starting price.
-      expect(listingsRepository.update).toHaveBeenCalledWith(101, { price: 8000 });
+      expect(listingsRepository.update).toHaveBeenCalledWith(101, {
+        price: 8000,
+      });
       expect(ordersService.create).toHaveBeenCalledWith(
         { buyerUuid: WINNER, lines: [{ listingId: 101, qty: 1 }] },
         { closingAuction: true },
@@ -116,8 +118,16 @@ describe('WigglypopAuctionService', () => {
       await service.sweep();
 
       expect(notify.auctionLost).toHaveBeenCalledTimes(2);
-      expect(notify.auctionLost).toHaveBeenCalledWith('loser-a', 101, 'Shiny Garchomp');
-      expect(notify.auctionLost).toHaveBeenCalledWith('loser-b', 101, 'Shiny Garchomp');
+      expect(notify.auctionLost).toHaveBeenCalledWith(
+        'loser-a',
+        101,
+        'Shiny Garchomp',
+      );
+      expect(notify.auctionLost).toHaveBeenCalledWith(
+        'loser-b',
+        101,
+        'Shiny Garchomp',
+      );
       // The winner is never told they lost.
       expect(notify.auctionLost).not.toHaveBeenCalledWith(
         WINNER,
@@ -131,7 +141,10 @@ describe('WigglypopAuctionService', () => {
     it('does not mark the listing sold itself', async () => {
       await service.sweep();
 
-      expect(listingsRepository.setStatus).not.toHaveBeenCalledWith(101, 'vendido');
+      expect(listingsRepository.setStatus).not.toHaveBeenCalledWith(
+        101,
+        'vendido',
+      );
     });
 
     it('closes the auction unsold — and charges nobody — when the winner cannot pay', async () => {
@@ -139,8 +152,14 @@ describe('WigglypopAuctionService', () => {
 
       const result = await service.sweep();
 
-      expect(listingsRepository.setStatus).toHaveBeenCalledWith(101, 'cancelado');
-      expect(listingsRepository.setStatus).not.toHaveBeenCalledWith(101, 'vendido');
+      expect(listingsRepository.setStatus).toHaveBeenCalledWith(
+        101,
+        'cancelado',
+      );
+      expect(listingsRepository.setStatus).not.toHaveBeenCalledWith(
+        101,
+        'vendido',
+      );
       expect(notify.auctionWon).not.toHaveBeenCalled();
       expect(result).toMatchObject({ closed: 1, sold: 0, cancelled: 1 });
     });
@@ -155,7 +174,10 @@ describe('WigglypopAuctionService', () => {
     it('cancels it — there is no winner to invent', async () => {
       const result = await service.sweep();
 
-      expect(listingsRepository.setStatus).toHaveBeenCalledWith(101, 'cancelado');
+      expect(listingsRepository.setStatus).toHaveBeenCalledWith(
+        101,
+        'cancelado',
+      );
       expect(ordersService.create).not.toHaveBeenCalled();
       expect(notify.auctionNoBids).toHaveBeenCalledWith(
         SELLER,

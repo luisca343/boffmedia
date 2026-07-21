@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useMemo, useRef, useState } from "react"
+import { useTranslations } from "next-intl"
 import { usePcUi } from "../_stores/pcUiStore"
 import { boxName } from "../_utils/boxMeta"
 import { TOTAL_BOXES } from "../_utils/constants"
@@ -31,6 +32,7 @@ export function CommandPalette({
   onOpenOverview,
   onOpenShare,
 }: CommandPaletteProps) {
+  const t = useTranslations("pc")
   const multiMode = usePcUi((s) => s.multiMode)
   const setMultiMode = usePcUi((s) => s.setMultiMode)
   const dualMode = usePcUi((s) => s.dualMode)
@@ -51,39 +53,39 @@ export function CommandPalette({
 
   const commands = useMemo<Command[]>(() => {
     const list: Command[] = [
-      { id: "filters", label: "Abrir filtros y búsqueda", icon: "sliders", kw: "filtro buscar", run: onOpenFilters },
-      { id: "overview", label: "Vista general de cajas", icon: "grid", kw: "cajas todas overview", run: onOpenOverview },
+      { id: "filters", label: t("topbar.filters"), icon: "sliders", kw: "filtro buscar", run: onOpenFilters },
+      { id: "overview", label: t("help.shortcuts.overview"), icon: "grid", kw: "cajas todas overview", run: onOpenOverview },
       {
         id: "livingdex",
-        label: "Living Dex — rastreador",
+        label: t("topbar.livingDex"),
         icon: "book",
         kw: "living dex pokedex huecos completar",
         run: onOpenLivingDex,
       },
       {
         id: "multi",
-        label: multiMode ? "Salir de selección múltiple" : "Selección múltiple",
+        label: multiMode ? t("bulk.deselectAll") : t("topbar.multiSelect"),
         icon: "check",
         kw: "seleccionar bulk multiple",
         run: () => setMultiMode(!multiMode),
       },
       {
         id: "dual",
-        label: dualMode ? "Desactivar doble caja" : "Activar doble caja",
+        label: dualMode ? t("topbar.dualBox") : t("topbar.dualBox"),
         icon: "columns",
         kw: "dual dos cajas",
         run: toggleDual,
       },
       {
         id: "sound",
-        label: sound ? "Silenciar sonidos" : "Activar sonidos",
+        label: sound ? t("topbar.muteSound") : t("topbar.unmuteSound"),
         icon: sound ? "volumeOff" : "volume",
         kw: "sonido audio mute",
         run: () => setSound(!sound),
       },
       {
         id: "share",
-        label: "Compartir / exportar caja actual",
+        label: t("topbar.commands"),
         icon: "share",
         kw: "compartir exportar codigo share",
         run: onOpenShare,
@@ -93,7 +95,7 @@ export function CommandPalette({
     for (const v of SMART_VIEWS) {
       list.push({
         id: v.id,
-        label: `Vista: ${v.name}`,
+        label: `${t("views.title")}: ${v.name}`,
         icon: v.icon as IconName,
         kw: `vista ${v.name}`,
         run: () => applyView(v),
@@ -104,7 +106,7 @@ export function CommandPalette({
       const name = boxName(boxMeta, i)
       list.push({
         id: `box-${i}`,
-        label: `Ir a caja ${i + 1} — ${name}`,
+        label: `${t("filters.sortFields.box")} ${i + 1} — ${name}`,
         icon: "box",
         kw: `caja ${i + 1} ${name}`,
         run: () => setActiveBox(i),
@@ -171,8 +173,8 @@ export function CommandPalette({
                 exec(filtered[sel])
               }
             }}
-            aria-label="Comando"
-            placeholder="Escribe un comando o caja…"
+            aria-label={t("topbar.commands")}
+            placeholder={t("topbar.commands")}
             className="flex-1 border-none bg-transparent p-0 text-[15px] text-pc-fg outline-none placeholder:text-pc-fg-subtle"
           />
           <Chip className="text-[10px]">ESC</Chip>
@@ -180,7 +182,7 @@ export function CommandPalette({
 
         <div className="max-h-[360px] overflow-auto p-[7px]">
           {filtered.length === 0 && (
-            <p className="p-6 text-center text-[13px] text-pc-fg-subtle">Sin resultados</p>
+            <p className="p-6 text-center text-[13px] text-pc-fg-subtle">{t("empty.noResults")}</p>
           )}
           {filtered.map((c, i) => (
             <button

@@ -5,7 +5,10 @@ import { ApiProperty } from '@nestjs/swagger';
  * contract (`ObjetoMC`), not this API's naming — do not rename them.
  */
 export class ObjetoMC {
-  @ApiProperty({ description: 'Minecraft item id', example: 'minecraft:diamond' })
+  @ApiProperty({
+    description: 'Minecraft item id',
+    example: 'minecraft:diamond',
+  })
   id: string;
 
   @ApiProperty({ description: 'How many to grant', example: 5 })
@@ -14,7 +17,10 @@ export class ObjetoMC {
 
 /** A Pokémon to give to the player's party, by spec. Distinct from ObjetoMC: a mon is not a stack. */
 export class PokemonMC {
-  @ApiProperty({ description: 'Pokémon spec string', example: 'Incineroar lvl:50 otn:Wolfey' })
+  @ApiProperty({
+    description: 'Pokémon spec string',
+    example: 'Incineroar lvl:50 otn:Wolfey',
+  })
   spec: string;
 
   @ApiProperty({ description: 'How many to give', example: 1 })
@@ -51,7 +57,8 @@ export class ReserveCajaResponse extends ClaimCajaResponse {
 /** The result of finalizing a reservation: how many ledger rows were spent (0 on replay). */
 export class ConfirmCajaResponse {
   @ApiProperty({
-    description: 'Rows spent by this confirm. 0 means already confirmed, expired, or reclaimed.',
+    description:
+      'Rows spent by this confirm. 0 means already confirmed, expired, or reclaimed.',
     example: 2,
   })
   confirmed: number;

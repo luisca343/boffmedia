@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import { getSmartRotomUser } from "@/lib/utils";
 import { Icon, IconButton, MiniButton, Toggle, type IconName } from "./ui";
@@ -8,12 +9,12 @@ import type { ChatVM } from "../_types/view";
 import { isGroupLike, isSaved, memberName } from "../_utils/chat";
 import { sharedImages, sharedWaypoints } from "../_utils/media";
 
-function statusLine(chat: ChatVM): string {
-  if (isGroupLike(chat.type)) return `${chat.members.length} miembros`;
-  if (isSaved(chat.type)) return "Solo tú";
-  if (chat.presence === "ingame") return "Jugando ahora";
-  if (chat.presence === "online") return "En línea";
-  return "Desconectado";
+function statusLine(chat: ChatVM, t: ReturnType<typeof useTranslations<"chatapp">>): string {
+  if (isGroupLike(chat.type)) return t("status.members", { count: chat.members.length });
+  if (isSaved(chat.type)) return t("status.onlyYou");
+  if (chat.presence === "ingame") return t("status.playing");
+  if (chat.presence === "online") return t("status.online");
+  return t("status.offline");
 }
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
@@ -48,6 +49,7 @@ export function InfoPanel({
   onTogglePin: (pinned: boolean) => void;
   onToggleMute: (muted: boolean) => void;
 }) {
+  const t = useTranslations("chatapp");
   const isGroup = isGroupLike(chat.type);
   const muted = !!chat.muted;
   const [enc, setEnc] = useState(true);
@@ -65,8 +67,8 @@ export function InfoPanel({
   return (
     <aside className={cn("flex min-h-0 flex-col border-l border-ca-800 bg-ca-panel animate-ca-slide-in", overlay ? "absolute inset-0 z-[45] w-full" : "w-[340px] flex-none")}>
       <div className="flex h-[60px] flex-none items-center gap-3.5 border-b border-ca-800 bg-ca-header px-4 text-[16px] font-semibold text-ca-50">
-        <IconButton icon="x" onClick={onClose} title="Cerrar" />
-        {isGroup ? "Info del grupo" : "Info del contacto"}
+        <IconButton icon="x" onClick={onClose} title={t("common.close")} />
+        {isGroup ? t("info.groupInfo") : t("info.contactInfo")}
       </div>
 
       <div className="ca-scroll min-h-0 flex-1 overflow-y-auto bg-ca-800/40">
@@ -74,19 +76,19 @@ export function InfoPanel({
           <img src={chat.image} alt="" className={cn("h-[200px] w-[200px] max-w-[60%] object-cover [image-rendering:pixelated]", isGroup ? "rounded-[24px]" : "rounded-full")} />
           <div>
             <div className="text-[19px] font-semibold text-ca-50">{chat.name}</div>
-            <div className="text-[14px] text-ca-400">{statusLine(chat)}</div>
+            <div className="text-[14px] text-ca-400">{statusLine(chat, t)}</div>
           </div>
         </div>
 
         <div className="flex gap-2 bg-ca-panel px-4 py-3.5">
-          <Quick icon="phone" label="Llamar" onClick={() => onStartCall("voice")} />
-          <Quick icon="video" label="Vídeo" onClick={() => onStartCall("video")} />
-          <Quick icon="search" label="Buscar" onClick={onOpenSearch} />
-          <Quick icon={muted ? "belloff" : "bell"} label={muted ? "Silenc." : "Sonido"} onClick={() => onToggleMute(!muted)} />
+          <Quick icon="phone" label={t("actions.call")} onClick={() => onStartCall("voice")} />
+          <Quick icon="video" label={t("actions.video")} onClick={() => onStartCall("video")} />
+          <Quick icon="search" label={t("common.search")} onClick={onOpenSearch} />
+          <Quick icon={muted ? "belloff" : "bell"} label={muted ? t("actions.mute") : t("actions.unmute")} onClick={() => onToggleMute(!muted)} />
         </div>
 
         {media.length > 0 && (
-          <Section title="Multimedia compartida">
+          <Section title={t("info.sharedMedia")}>
             <div className="grid grid-cols-3 gap-[5px]">
               {media.map((img) => (
                 <button key={img.messageId} onClick={() => onOpenImage(img)} className="aspect-square overflow-hidden rounded-ca-md bg-ca-800">
@@ -94,23 +96,23 @@ export function InfoPanel({
                 </button>
               ))}
             </div>
-            <MiniButton grow={false} onClick={onOpenMedia} className="mt-2 w-full bg-ca-800">Ver todo</MiniButton>
+            <MiniButton grow={false} onClick={onOpenMedia} className="mt-2 w-full bg-ca-800">{t("media.viewAll")}</MiniButton>
           </Section>
         )}
 
         {isGroup && (
-          <Section title={`Miembros · ${chat.members.length}`}>
+          <Section title={t("info.members", { count: chat.members.length })}>
             {chat.members.map((m) => (
               <div key={m.uuid} className="flex items-center gap-3 py-2">
                 <img src={`https://mc-heads.net/avatar/${m.uuid}`} alt="" className="h-9 w-9 rounded-full [image-rendering:pixelated]" />
-                <div className="text-[15px] font-medium text-ca-50">{m.uuid === myUuid ? "Tú" : memberName(chat, m.uuid)}</div>
+                <div className="text-[15px] font-medium text-ca-50">{m.uuid === myUuid ? t("info.you") : memberName(chat, m.uuid)}</div>
               </div>
             ))}
           </Section>
         )}
 
         {waypoints.length > 0 && (
-          <Section title="Waypoints compartidos">
+          <Section title={t("info.sharedWaypoints")}>
             {waypoints.map((w) => (
               <div key={`${w.name}-${w.x}`} className="flex items-center gap-3 py-2">
                 <div className="grid h-[34px] w-[34px] flex-none place-items-center rounded-ca-md" style={{ background: `${w.color || "#f97316"}33`, color: w.color || "#f97316" }}>
@@ -125,21 +127,21 @@ export function InfoPanel({
           </Section>
         )}
 
-        <Section title="Privacidad">
+        <Section title={t("info.privacy")}>
           <div className="flex items-center gap-3 py-2.5 text-[14.5px] text-ca-100">
-            <Icon name="lock" size={17} className="text-ca-highlight" /> Cifrado de extremo a extremo
+            <Icon name="lock" size={17} className="text-ca-highlight" /> {t("info.e2eEncryption")}
             <Toggle on={enc} onClick={() => setEnc((v) => !v)} className="ml-auto" />
           </div>
           <div className="flex items-center gap-3 py-2.5 text-[14.5px] text-ca-100">
-            <Icon name="belloff" size={17} /> Silenciar notificaciones
+            <Icon name="belloff" size={17} /> {t("info.muteNotifications")}
             <Toggle on={muted} onClick={() => onToggleMute(!muted)} className="ml-auto" />
           </div>
           <div className="flex items-center gap-3 py-2.5 text-[14.5px] text-ca-100">
-            <Icon name="pin" size={17} /> Fijar chat
+            <Icon name="pin" size={17} /> {t("info.pinChat")}
             <Toggle on={!!chat.pinned} onClick={() => onTogglePin(!chat.pinned)} className="ml-auto" />
           </div>
           <div className="pt-1">
-            <MiniButton grow={false} className="w-full bg-transparent text-ca-error hover:bg-ca-error/10"><Icon name="trash" size={17} /> Vaciar chat</MiniButton>
+            <MiniButton grow={false} className="w-full bg-transparent text-ca-error hover:bg-ca-error/10"><Icon name="trash" size={17} /> {t("info.clearChat")}</MiniButton>
           </div>
         </Section>
       </div>

@@ -2,6 +2,7 @@
 
 import Link from "next/link"
 import { useState } from "react"
+import { useTranslations } from "next-intl"
 import type { OpenLootBoxResponseDto } from "@boffmedia/shared"
 import { userMessageFrom } from "@/services/boffAPI"
 import {
@@ -48,6 +49,7 @@ const TITLE_ACCENT: Record<string, ArAccent> = {
 }
 
 export default function LootPage() {
+  const t = useTranslations("")
   const uuid = useArcadeUuid()
   const config = useLootboxConfig()
   const inventory = useArcadeInventory()
@@ -87,7 +89,7 @@ export default function LootPage() {
     return (
       <Panel tone="deep">
         <p role="alert" className="font-ar-mono text-[12px] text-ar-danger">
-          No se pudieron cargar las cajas de botín. Vuelve a intentarlo en un momento.
+          {t("arcade.loot.noBoxesLoaded")}
         </p>
         <Button
           variant="outline"
@@ -96,7 +98,7 @@ export default function LootPage() {
           icon={<Icon.Reset s={12} />}
           onClick={() => void config.refetch()}
         >
-          Reintentar
+          {t("arcade.common.retry")}
         </Button>
       </Panel>
     )
@@ -125,15 +127,15 @@ export default function LootPage() {
               href="/smartrotom/arcade"
               className="ar-lift inline-flex items-center gap-1.5 rounded-lg border border-white/10 px-2.5 py-1.5 font-ar text-[11px] font-semibold uppercase tracking-[0.08em] text-ar-ink-dim hover:text-ar-ink"
             >
-              <Icon.Chevron s={12} dir="left" /> Arcade
+              <Icon.Chevron s={12} dir="left" /> {t("arcade.sidebar.arcade")}
             </Link>
-            <span className="ar-chrom font-ar-display text-[15px] text-ar-ink">Cajas de botín</span>
+            <span className="ar-chrom font-ar-display text-[15px] text-ar-ink">{t("arcade.loot.title")}</span>
           </div>
 
           <div className="flex flex-wrap items-center gap-2.5">
             {total === 0 ? (
               <Tag tone="ghost" size="md">
-                Sin cajas
+                {t("arcade.loot.noBoxes")}
               </Tag>
             ) : (
               boxes
@@ -148,7 +150,7 @@ export default function LootPage() {
               href="/smartrotom/arcade/coleccion"
               className="ar-lift inline-flex items-center gap-2 rounded-lg border border-ar-cyan/45 px-3 py-1.5 font-ar text-[11px] font-semibold uppercase tracking-[0.08em] text-ar-cyan shadow-[inset_0_0_20px_rgb(var(--ar-cyan)/.08)]"
             >
-              <Icon.Grid s={12} /> Mi colección
+              <Icon.Grid s={12} /> {t("arcade.loot.miCollection")}
             </Link>
           </div>
         </div>
@@ -157,7 +159,7 @@ export default function LootPage() {
       {!uuid && (
         <Panel tone="deep" tight className="mb-4">
           <p role="alert" className="font-ar-mono text-[12px] text-ar-amber">
-            Inicia sesión con tu cuenta de SmartRotom para abrir cajas y guardar los objetos.
+            {t("arcade.common.loginRequiredBoxes")}
           </p>
         </Panel>
       )}
@@ -165,7 +167,7 @@ export default function LootPage() {
       {openBox.isError && (
         <Panel tone="deep" tight className="mb-4">
           <p role="alert" className="font-ar-mono text-[12px] text-ar-danger">
-            {userMessageFrom(openBox.error, "No se pudo abrir la caja. Inténtalo de nuevo.")}
+            {userMessageFrom(openBox.error, t("arcade.loot.boxOpenError"))}
           </p>
         </Panel>
       )}
@@ -173,7 +175,7 @@ export default function LootPage() {
       {box && (
         <>
           <SectionTitle
-            kicker="Selecciona una caja"
+            kicker={t("arcade.loot.selectBox")}
             title={box.name}
             accent={TITLE_ACCENT[boxAccent(box.theme)] ?? "violet"}
             right={
@@ -183,7 +185,7 @@ export default function LootPage() {
                 icon={<Icon.Info s={12} />}
                 onClick={() => setInfo(true)}
               >
-                ¿Cómo funciona?
+                {t("arcade.loot.howItWorks")}
               </Button>
             }
           />

@@ -1,6 +1,7 @@
 "use client"
 
 import { useMemo, useState } from "react"
+import { useTranslations } from "next-intl"
 import { Chip, Empty, Eyebrow, FilterChip, Icon, SearchBar } from "./ui"
 import { StopRow } from "./StopRow"
 import type { EnrichedStop } from "../_types"
@@ -29,6 +30,7 @@ export function DestinationsPanel({
   onSelect: (stop: EnrichedStop) => void
   onToggleFavorite: (id: string) => void
 }) {
+  const t = useTranslations("taxi.destinations")
   const [query, setQuery] = useState("")
   const [sort, setSort] = useState<"near" | "far">("near")
   const [region, setRegion] = useState<string>(ALL)
@@ -66,7 +68,7 @@ export function DestinationsPanel({
       {Object.keys(regionCounts).length > 0 && (
         <div className="tx-rail flex shrink-0 gap-[7px] overflow-x-auto pb-1">
           <FilterChip active={region === ALL} count={stops.length} onClick={() => setRegion(ALL)}>
-            Todos
+            {t("all")}
           </FilterChip>
           {Object.entries(regionCounts)
             .sort(([a], [b]) => a.localeCompare(b, "es"))
@@ -85,7 +87,7 @@ export function DestinationsPanel({
 
       {favStops.length > 0 && unfiltered && (
         <div className="flex shrink-0 flex-col gap-2">
-          <Eyebrow icon="star">Favoritos</Eyebrow>
+          <Eyebrow icon="star">{t("favorites")}</Eyebrow>
           <div className="tx-rail flex gap-2 overflow-x-auto pb-1">
             {favStops.map((s) => (
               <Chip key={s.id} active={selected?.id === s.id} onClick={() => onSelect(s)}>
@@ -99,7 +101,7 @@ export function DestinationsPanel({
 
       {recentStops.length > 0 && unfiltered && (
         <div className="flex shrink-0 flex-col gap-2">
-          <Eyebrow icon="clock">Recientes</Eyebrow>
+          <Eyebrow icon="clock">{t("recents")}</Eyebrow>
           <div className="tx-rail flex gap-2 overflow-x-auto pb-1">
             {recentStops.map((s) => (
               <Chip key={s.id} active={selected?.id === s.id} onClick={() => onSelect(s)}>
@@ -113,16 +115,16 @@ export function DestinationsPanel({
 
       <div className="flex shrink-0 items-center justify-between px-0.5 text-xs font-extrabold text-tx-txt-3">
         <span>
-          {list.length} {list.length === 1 ? "destino" : "destinos"}
+          {t("destino", { count: list.length })}
         </span>
-        <span className="text-tx-accent">{sort === "near" ? "Más cercano" : "Más lejano"}</span>
+        <span className="text-tx-accent">{sort === "near" ? t("nearest") : t("farthest")}</span>
       </div>
 
       <div className="flex flex-col gap-[9px]">
         {list.length === 0 ? (
           <Empty
-            message="Ningún destino coincide con tu búsqueda."
-            action="Ver todos"
+            message={t("emptyMessage")}
+            action={t("viewAll")}
             onAction={() => {
               setQuery("")
               setRegion(ALL)
