@@ -1,11 +1,8 @@
 import type {
   BlockPositionGroup,
-  ProgressCb,
   RegistryHandle,
-  ScanOverride,
   SchematicSummary,
 } from "@/lib/schematic/types";
-import type { GameId } from "@/lib/schematic/adapters/game-adapter";
 import type { CompiledModel } from "@/lib/schematic/model/types";
 
 /**
@@ -23,19 +20,10 @@ export interface ViewerWorkerAPI {
   ping(): Promise<"pong">;
 
   /**
-   * Build a registry from a real install. The viewer's UI never calls this —
-   * picking a bundled version is the whole environment story — but the shared
-   * `useEnvironmentActions` hook types its api as `EnvironmentApi`, which
-   * includes it, so it is exposed to satisfy that contract rather than to be used.
+   * Load a bundled vanilla registry for a version — the viewer's only
+   * environment. Instance scanning is deliberately absent: `EnvironmentApi`
+   * makes it optional, so a read-only viewer never carries a scan it can't run.
    */
-  scanInstance(
-    gameId: GameId,
-    files: File[],
-    onProgress: ProgressCb,
-    override?: ScanOverride,
-  ): Promise<RegistryHandle>;
-
-  /** Load a bundled vanilla registry for a version. The viewer's only environment. */
   loadVanillaRegistry(version: string): Promise<RegistryHandle>;
 
   /** A block's texture as a data URL, or `null` for vanilla / unresolved blocks. */
