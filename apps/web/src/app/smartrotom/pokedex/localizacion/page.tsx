@@ -22,13 +22,13 @@ export default async function LocalizacionPage() {
     <ScreenShell>
       <PageHead
         icon={MapIcon}
-        eyebrow="Mundo"
-        title="Localización por bioma"
-        desc="Cada tarjeta muestra el bioma con su paleta característica, el número de especies registrables y su proporción frente al bioma más poblado."
+        eyebrow={t("localizacion_eyebrow")}
+        title={t("localizacion_title")}
+        desc={t("localizacion_desc")}
         meta={
           <>
-            <MetaStat label="Biomas" value={biomes.length} />
-            <MetaStat label="Especies localizables" value={total} />
+            <MetaStat label={t("localizacion_biomes")} value={biomes.length} />
+            <MetaStat label={t("localizacion_localizable_species")} value={total} />
           </>
         }
       />
@@ -50,7 +50,7 @@ export default async function LocalizacionPage() {
               <span className="font-pk-display font-bold text-base leading-tight mt-auto relative">{getTranslatedBiomeName(b.name, t)}</span>
               <div className="flex items-center justify-between gap-2.5 relative">
                 <span className="flex items-baseline gap-1.5 text-xs opacity-90">
-                  <b className="font-pk-display font-bold text-lg tabular-nums">{b.count}</b> Pokémon
+                  <b className="font-pk-display font-bold text-lg tabular-nums">{b.count}</b> {t("localizacion_pokemon")}
                 </span>
                 <TypeChip type={m.type} size="sm" />
               </div>
@@ -63,7 +63,7 @@ export default async function LocalizacionPage() {
       </div>
 
       {biomes.length === 0 && (
-        <div className="bg-white/[0.02] border border-white/[0.05] rounded-xl p-8 text-center text-pk-surface-400 text-sm">No se encontraron biomas disponibles.</div>
+        <div className="bg-white/[0.02] border border-white/[0.05] rounded-xl p-8 text-center text-pk-surface-400 text-sm">{t("localizacion_no_biomes")}</div>
       )}
     </ScreenShell>
   )

@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import { useTranslations } from "next-intl"
 import { Button, SectionHeader } from "@/components/smartrotom/media/ui"
 import { clearHistory, getHistory, type HistoryItem } from "../../_services/historyService"
 import { MEWTWITCH_BASE, compactCount, twitchThumb } from "../../_utils/twitch"
@@ -14,6 +15,7 @@ function hrefFor(item: HistoryItem): string {
 }
 
 export function HistoryView() {
+  const t = useTranslations("twitch")
   const [items, setItems] = useState<HistoryItem[]>([])
 
   useEffect(() => {
@@ -26,7 +28,7 @@ export function HistoryView() {
     title: item.title,
     streamer: item.streamer_name,
     duration: item.duration,
-    meta: [item.view_count != null && `${compactCount(item.view_count)} visitas`, item.created_at && getTimeSince(item.created_at)]
+    meta: [item.view_count != null && `${compactCount(item.view_count)} ${t("clip.views")}`, item.created_at && getTimeSince(item.created_at)]
       .filter(Boolean)
       .join(" · "),
   }))
@@ -34,8 +36,8 @@ export function HistoryView() {
   return (
     <div className="mx-auto max-w-[1640px] px-4 pb-20 pt-5 md:px-10">
       <SectionHeader
-        eyebrow="Tu actividad"
-        title="Historial"
+        eyebrow={t("history.eyebrow")}
+        title={t("history.sectionTitle")}
         action={
           items.length > 0 && (
             <Button
@@ -46,13 +48,13 @@ export function HistoryView() {
                 setItems([])
               }}
             >
-              Borrar historial
+              {t("history.clearBtn")}
             </Button>
           )
         }
       />
       {cards.length === 0 ? (
-        <p className="py-16 text-center text-sm text-mw-fg-faint">Aún no has visto nada.</p>
+        <p className="py-16 text-center text-sm text-mw-fg-faint">{t("history.empty")}</p>
       ) : (
         <div className="grid grid-cols-1 gap-[18px] sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {cards.map((v) => (

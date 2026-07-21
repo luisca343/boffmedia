@@ -9,6 +9,7 @@ import { SmartRotomButton } from "@/components/smartrotom/ui";
 import { Copy, Check, LogIn, LogOut, Palette, Bug, Monitor, Smartphone, Sun } from "lucide-react";
 import { ROTOM_THEMES } from "@/components/smartrotom/theme/rotomTheme";
 import { useRotomMode, useRotomThemeStore } from "@/components/smartrotom/theme/useRotomTheme";
+import { useTranslations } from "next-intl";
 
 const isDev = env.NODE_ENV === "development";
 
@@ -33,8 +34,8 @@ export function SettingsPage() {
   const [copied, setCopied] = useState(false);
   const theme = useRotomThemeStore((s) => s.theme);
   const setTheme = useRotomThemeStore((s) => s.setTheme);
-  // What the themeable apps (ChatApp, Notas) will actually render under this choice.
   const mode = useRotomMode();
+  const t = useTranslations("smartrotom");
 
   const copyToken = () => {
     if (session?.user?.accessToken) {
@@ -56,14 +57,8 @@ export function SettingsPage() {
         <span>{isMinecraft() ? 'SmartRotom' : 'Browser'}</span>
       </div>
 
-      {/*
-        One theme control for the whole of SmartRotom. It used to be two — this grid
-        (which set a class nothing styled) plus a separate "Modo del chat" that only
-        ChatApp read. Now the themeable apps derive their light/dark from this choice,
-        so a theme with no app-specific skin still lands somewhere sensible.
-      */}
       <div>
-        <SectionLabel icon={Palette}>Temas</SectionLabel>
+        <SectionLabel icon={Palette}>{t("settings.themes")}</SectionLabel>
         <div className="grid grid-cols-3 gap-2">
           {ROTOM_THEMES.map((t) => {
             const active = theme === t.id;
@@ -93,14 +88,14 @@ export function SettingsPage() {
         </div>
         <p className="mt-2 flex items-center gap-1.5 text-[10px] leading-none text-sr-txt-dim">
           <Sun size={11} className="text-sr-txt-dim" />
-          Las apps con tema propio (Chat, Notas) se muestran en{" "}
-          <strong className="font-medium text-sr-txt-muted">{mode === "dark" ? "oscuro" : "claro"}</strong>.
+          {t("settings.themeHint")}{" "}
+          <strong className="font-medium text-sr-txt-muted">{mode === "dark" ? t("settings.dark") : t("settings.light")}</strong>.
         </p>
       </div>
 
       {/* Auth Section */}
       <div>
-        <SectionLabel icon={LogIn}>Sesión</SectionLabel>
+        <SectionLabel icon={LogIn}>{t("settings.session")}</SectionLabel>
         <div className="flex gap-2">
           <SmartRotomButton
             onClick={() => signIn('boffmedia')}
@@ -109,7 +104,7 @@ export function SettingsPage() {
             className="gap-2 flex-1"
           >
             <LogIn size={14} />
-            Iniciar sesión
+            {t("settings.signIn")}
           </SmartRotomButton>
           <SmartRotomButton
             onClick={() => signOut()}
@@ -118,7 +113,7 @@ export function SettingsPage() {
             className="gap-2 flex-1"
           >
             <LogOut size={14} />
-            Cerrar sesión
+            {t("settings.signOut")}
           </SmartRotomButton>
         </div>
       </div>
@@ -148,12 +143,12 @@ export function SettingsPage() {
                   {copied ? (
                     <>
                       <Check size={12} />
-                      <span className="text-[10px]">Copiado</span>
+                      <span className="text-[10px]">{t("settings.copied")}</span>
                     </>
                   ) : (
                     <>
                       <Copy size={12} />
-                      <span className="text-[10px]">Token</span>
+                      <span className="text-[10px]">{t("settings.token")}</span>
                     </>
                   )}
                 </SmartRotomButton>

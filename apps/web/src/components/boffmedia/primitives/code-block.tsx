@@ -2,6 +2,7 @@
 
 import * as React from "react"
 import { cn } from "@/lib/utils"
+import { useTranslations } from "next-intl"
 import { Icon } from "./icon"
 
 export interface CodeBlockProps {
@@ -15,6 +16,7 @@ export interface CodeBlockProps {
 }
 
 export function CodeBlock({ lines, label, copyText, scan = false, tone, actions, className }: CodeBlockProps) {
+  const t = useTranslations("common.primitives")
   const [ok, setOk] = React.useState(false)
   const arr = Array.isArray(lines) ? lines : String(lines || "").split("\n")
   const text = copyText != null ? copyText : arr.join("")
@@ -48,7 +50,7 @@ export function CodeBlock({ lines, label, copyText, scan = false, tone, actions,
           <button
             type="button"
             onClick={copy}
-            aria-label="Copiar código"
+            aria-label={t("copyCode")}
             className={cn(
               "inline-flex items-center gap-[5px] font-mono text-[11px] font-semibold leading-none tracking-[0.04em] cursor-pointer",
               "bg-transparent border border-solid py-[6px] px-[9px] cut [--cut:4px]",
@@ -57,7 +59,7 @@ export function CodeBlock({ lines, label, copyText, scan = false, tone, actions,
             )}
           >
             <Icon name={ok ? "check" : "copy"} size={14} />
-            {ok ? "Copiado" : "Copiar"}
+            {ok ? t("copied") : t("copy")}
           </button>
         </div>
       )}

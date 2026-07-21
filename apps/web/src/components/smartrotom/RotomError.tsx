@@ -2,6 +2,7 @@
 import { AlertTriangle, HelpCircle } from "lucide-react"
 import { motion } from "framer-motion"
 import { useState } from "react"
+import { useTranslations } from "next-intl"
 
 export interface RotomErrorHelp {
   possibleCauses: string[];
@@ -27,13 +28,17 @@ export function RotomErrorPage(props: RotomErrorProps) {
 
 export function RotomError({
   error,
-  title = "Error Detectado",
+  title,
   help,
   onAction,
-  actionText = "Reintentar",
+  actionText,
   showHelp: initialShowHelp = false,
 }: RotomErrorProps) {
+  const t = useTranslations("smartrotom.error")
   const [showHelp, setShowHelp] = useState(initialShowHelp);
+
+  const resolvedTitle = title ?? t("detected")
+  const resolvedActionText = actionText ?? t("retry")
 
   return (
     <motion.div
@@ -45,13 +50,13 @@ export function RotomError({
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center">
           <AlertTriangle className="w-8 h-8 text-primary mr-2" />
-          <h1 className="text-2xl font-bold">{title}</h1>
+          <h1 className="text-2xl font-bold">{resolvedTitle}</h1>
         </div>
         {help && (
           <button
             onClick={() => setShowHelp(!showHelp)}
             className="text-primary-active hover:text-primary-active"
-            title="Mostrar ayuda"
+            title={t("showHelp")}
           >
             <HelpCircle size={20} />
           </button>
@@ -59,7 +64,7 @@ export function RotomError({
       </div>
 
       <div className="bg-primary-soft p-4 rounded mb-4">
-        <p className="text-sm">{error || "Error desconocido"}</p>
+        <p className="text-sm">{error || t("unknown")}</p>
       </div>
 
       {showHelp && help && (
@@ -70,14 +75,14 @@ export function RotomError({
           className="mb-4"
         >
           <div className="bg-primary-soft p-4 rounded border border-primary">
-            <h3 className="font-bold mb-2">Posibles causas:</h3>
+            <h3 className="font-bold mb-2">{t("possibleCauses")}</h3>
             <ul className="list-disc pl-5 text-sm mb-3">
               {help.possibleCauses.map((cause, i) => (
                 <li key={i}>{cause}</li>
               ))}
             </ul>
 
-            <h3 className="font-bold mb-2">Soluciones:</h3>
+            <h3 className="font-bold mb-2">{t("solutions")}</h3>
             <ul className="list-disc pl-5 text-sm">
               {help.solutions.map((solution, i) => (
                 <li key={i}>{solution}</li>
@@ -93,7 +98,7 @@ export function RotomError({
             onClick={onAction}
             className="px-4 py-2 bg-primary text-white rounded hover:bg-primary-active transition-colors"
           >
-            {actionText}
+            {resolvedActionText}
           </button>
         </div>
       )}

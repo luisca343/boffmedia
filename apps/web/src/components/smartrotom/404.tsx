@@ -1,6 +1,7 @@
 import { RotomNav } from "./RotomNav"
 import { GlobalProviders } from "@/app/GlobalProviders"
 import { TooltipProvider } from "@radix-ui/react-tooltip"
+import { useTranslations } from "next-intl"
 
 export function RotomNotFoundFull(){ 
     return (
@@ -16,10 +17,11 @@ export function RotomNotFoundFull(){
 }
 
 export function RotomNotFound(){
+    const t = useTranslations("smartrotom.notFound")
     return (
         <div className="flex flex-col items-center justify-center h-screen bg-primary-hover">
-            <h1 className="text-5xl font-bold text-black">404</h1>
-            <p className="text-b">Pagina no encontrada.</p>
+            <h1 className="text-5xl font-bold text-black">{t("title")}</h1>
+            <p className="text-b">{t("message")}</p>
         </div>
     )
 }

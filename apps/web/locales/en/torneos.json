@@ -1,0 +1,161 @@
+{
+  "torneos": {
+    "listing": {
+      "section": "Community",
+      "title": "Tournaments",
+      "subtitle": "Elimination brackets, leagues, groups and rankings from the Boffmedia community.",
+      "filterAriaLabel": "Filter tournaments",
+      "filterAll": "All",
+      "filterLive": "Live",
+      "filterRegistration": "Registration",
+      "filterCompleted": "Completed",
+      "searchPlaceholder": "Search tournament or game…",
+      "searchAriaLabel": "Search tournaments",
+      "empty": "No tournaments yet.",
+      "players": "{count} players"
+    },
+    "status": {
+      "draft": "Draft",
+      "registration": "Registration open",
+      "live": "Live",
+      "completed": "Completed",
+      "cancelled": "Cancelled"
+    },
+    "detail": {
+      "section": "Tournament",
+      "participants": "{count}{max} participants",
+      "registrationDeadline": "Registration until {date}",
+      "notFound": "Tournament not found",
+      "backToList": "Back to tournaments",
+      "rulesTitle": "Rules",
+      "prizesTitle": "Prizes",
+      "myMatchBanner": "Your match is ready — join the table to play and report the result.",
+      "myMatchCta": "Go to my match →",
+      "rosterEmpty": "No participants yet. Be the first!",
+      "rosterTitle": "Participants · {count}"
+    },
+    "checkin": {
+      "doCheckin": "Check in",
+      "undoCheckin": "✓ Checked in — undo",
+      "toastDone": "Checked in!",
+      "toastUndo": "Check-in undone"
+    },
+    "score": {
+      "submitBtn": "Submit score",
+      "modalTitle": "Submit score",
+      "fieldLabel": "Score",
+      "fieldLabelWithUnit": "Score ({unit})",
+      "evidenceLabel": "Evidence (clip, screenshot… — optional)",
+      "evidencePlaceholder": "https://…",
+      "note": "Each submission replaces your previous score and is pending admin verification.",
+      "cancel": "Cancel",
+      "submit": "Submit",
+      "validationRequired": "Enter your score",
+      "toastOk": "Score submitted — pending verification"
+    },
+    "register": {
+      "loginPrompt": "Sign in to register",
+      "registerBtn": "Register",
+      "withdrawBtn": "Cancel registration",
+      "toastRegistered": "Registered for the tournament!",
+      "toastWithdrawn": "Registration cancelled",
+      "teamModalTitle": "Register team",
+      "teamSubmitBtn": "Register",
+      "teamNameLabel": "Team name",
+      "teamTagLabel": "Tag",
+      "teamMembersLabel": "Members (optional)",
+      "teamMemberPlaceholder": "Player {n}",
+      "teamAddMember": "+ Add member",
+      "teamNameRequired": "Team name is required",
+      "cancel": "Cancel"
+    },
+    "match": {
+      "notFound": "Match not found",
+      "backToTournament": "Back to tournament",
+      "meFallback": "You"
+    },
+    "chat": {
+      "title": "Table chat",
+      "judgeRequested": "Judge notified",
+      "requestJudge": "Request judge",
+      "judgeToast": "Judge notified",
+      "empty": "The table is open. Good luck!",
+      "judgeSuffix": "judge",
+      "judgeFallback": "Staff",
+      "playerFallback": "Player",
+      "placeholder": "Type a message… (share your battle ID)",
+      "send": "Send"
+    },
+    "report": {
+      "title": "Report matches",
+      "phaseVerified": "Verified",
+      "phaseAwaiting": "Awaiting confirmation",
+      "phaseDispute": "In dispute",
+      "phaseIncoming": "Your turn to verify",
+      "incomingInfo": "has reported the result. Review it and verify if it is correct.",
+      "gameLabel": "Game {n}",
+      "win": "Win",
+      "loss": "Loss",
+      "footerHint": "Mark the result of each game",
+      "resultWin": "You win this game {w}-{l}",
+      "resultLoss": "You lose this game {l}-{w}",
+      "resultNone": "Mark the result",
+      "submit": "Submit report",
+      "incomingScore": "According to {oppName}: {score} in their favour",
+      "dispute": "Dispute",
+      "verify": "Verify",
+      "verifiedScore": "Verified result {score}.",
+      "verifiedWin": "Victory!",
+      "verifiedLoss": "Loss — on to the next one.",
+      "disputeTitle": "Result in dispute.",
+      "disputeBody": "A judge will review the table. Use the chat to explain what happened.",
+      "awaitingReported": "You reported {score}",
+      "awaitingCountdownLabel": "Auto-verify in",
+      "awaitingNote": "The report appears instantly on {oppName}'s table. If they don't respond in time it will be validated automatically to keep the tournament moving.",
+      "cancel": "Cancel"
+    },
+    "spectator": {
+      "done": "Result",
+      "playing": "In game",
+      "disputed": "In dispute"
+    },
+    "teamsheet": {
+      "title": "My team sheet",
+      "update": "Update",
+      "info": "Your opponent each round will see this sheet (open teamsheet). Paste your team exported from Pokémon Showdown.",
+      "parsedCount": "{count} Pokémon detected",
+      "formatHint": "Showdown format",
+      "save": "Save",
+      "cancel": "Cancel",
+      "validationPaste": "Paste your team in Showdown format",
+      "toastOk": "Team sheet saved"
+    },
+    "view": {
+      "thirdPlace": "Third place",
+      "phaseAriaLabel": "Tournament phase"
+    },
+    "league": {
+      "tableTab": "Table",
+      "crossTab": "Crosstable",
+      "ariaLabel": "League view"
+    },
+    "swiss": {
+      "standingsTab": "Standings",
+      "pairingsTab": "Pairings",
+      "ariaLabel": "Swiss view",
+      "colRank": "#",
+      "colCompetitor": "Competitor",
+      "colPlayed": "GP",
+      "colRecord": "W-L",
+      "colFullRecord": "W-D-L",
+      "colPoints": "Pts",
+      "cutRecord": "Cut · {maxLosses} losses",
+      "cutTopN": "Cut · top {count}",
+      "cutTopOrRecord": "Cut · top {count} + {maxLosses} losses",
+      "cut": "Cut"
+    },
+    "sr": {
+      "title": "Tournaments"
+    }
+  }
+}

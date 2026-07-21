@@ -1,12 +1,14 @@
 "use client"
 
 import * as React from "react"
+import { useTranslations } from "next-intl"
 import { Button, Icon, Modal, toast } from "@/components/boffmedia/primitives"
 import { TM_CARD, TM_CARD_HEAD, TM_CARD_H3 } from "@/components/boffmedia/ui/tournaments"
 import { TournamentsService, type TnMonApi } from "@/services/api/boffmedia/tournamentsService"
 import { parseShowdownPaste } from "@/features/vgc-tracker/showdown-parse"
 
 export function MyTeamsheetCard({ tournamentId }: { tournamentId: number }) {
+  const t = useTranslations("torneos.teamsheet")
   const [open, setOpen] = React.useState(false)
   const [paste, setPaste] = React.useState("")
   const [busy, setBusy] = React.useState(false)
@@ -14,7 +16,7 @@ export function MyTeamsheetCard({ tournamentId }: { tournamentId: number }) {
   const parsed = React.useMemo(() => (paste.trim() ? parseShowdownPaste(paste) : []), [paste])
 
   const save = async () => {
-    if (!parsed.length) return toast.error("Pega tu equipo en formato Showdown")
+    if (!parsed.length) return toast.error(t("validationPaste"))
     setBusy(true)
     const mons: TnMonApi[] = parsed.map((s, i) => ({
       slot: i + 1,
@@ -28,7 +30,7 @@ export function MyTeamsheetCard({ tournamentId }: { tournamentId: number }) {
     setBusy(false)
     if (r.error) toast.error(r.error)
     else {
-      toast.success("Hoja de equipo guardada")
+      toast.success(t("toastOk"))
       setOpen(false)
       setPaste("")
     }
@@ -37,23 +39,23 @@ export function MyTeamsheetCard({ tournamentId }: { tournamentId: number }) {
   return (
     <section className={TM_CARD}>
       <div className={TM_CARD_HEAD}>
-        <h3 className={TM_CARD_H3}>Mi hoja de equipo</h3>
-        <Button size="sm" icon="edit" onClick={() => setOpen(true)}>Actualizar</Button>
+        <h3 className={TM_CARD_H3}>{t("title")}</h3>
+        <Button size="sm" icon="edit" onClick={() => setOpen(true)}>{t("update")}</Button>
       </div>
       <p className="m-0 flex items-center gap-2 p-4 font-body text-[12px]/[1.5] text-txt-muted">
         <Icon name="info" size={12} className="flex-none" />
-        Tu rival de cada ronda verá esta hoja (open teamsheet). Pega tu equipo exportado de Pokémon Showdown.
+        {t("info")}
       </p>
       <Modal
         open={open}
         onClose={() => setOpen(false)}
-        title="Mi hoja de equipo"
+        title={t("title")}
         footer={
           <div className="flex items-center justify-between gap-3">
-            <span className="font-mono text-[11px] text-txt-dim">{parsed.length ? `${parsed.length} Pokémon detectados` : "Formato Showdown"}</span>
+            <span className="font-mono text-[11px] text-txt-dim">{parsed.length ? t("parsedCount", { count: parsed.length }) : t("formatHint")}</span>
             <div className="flex gap-2">
-              <Button size="sm" onClick={() => setOpen(false)}>Cancelar</Button>
-              <Button variant="pri" size="sm" disabled={busy || !parsed.length} onClick={save}>Guardar</Button>
+              <Button size="sm" onClick={() => setOpen(false)}>{t("cancel")}</Button>
+              <Button variant="pri" size="sm" disabled={busy || !parsed.length} onClick={save}>{t("save")}</Button>
             </div>
           </div>
         }

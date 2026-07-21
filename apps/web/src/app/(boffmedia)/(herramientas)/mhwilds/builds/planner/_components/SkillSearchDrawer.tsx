@@ -124,7 +124,7 @@ export function SkillSearchDrawer({
               className="flex items-center gap-3 border border-line bg-base-2 px-3 py-2.5 text-left transition-colors hover:border-[var(--mh)]"
             >
               <span className="min-w-0 flex-1 truncate font-display text-[14px] leading-tight font-bold uppercase not-italic">{s.name}</span>
-              <MhTag>{t("build_planner.skillsearch.source_count", { count: s.sources.length })}</MhTag>
+              <MhTag>{t("build_planner.skillsearch.sourceCount", { count: s.sources.length })}</MhTag>
               <Icon name="arrow" size={14} className="shrink-0 text-txt-dim" />
             </button>
           ))}

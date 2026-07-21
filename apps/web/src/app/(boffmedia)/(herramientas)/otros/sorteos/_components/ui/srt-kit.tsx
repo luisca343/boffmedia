@@ -16,13 +16,13 @@ const CLIP_9 = "polygon(9px 0,100% 0,100% calc(100% - 9px),calc(100% - 9px) 100%
 const CLIP_14 = "polygon(14px 0,100% 0,100% calc(100% - 14px),calc(100% - 14px) 100%,0 100%,0 14px)"
 
 /* ── weight stepper ───────────────────────────────────────────────────────── */
-export function SrtWeight({ value, onChange, min = 1, max = 99, sm }: { value: number; onChange: (v: number) => void; min?: number; max?: number; sm?: boolean }) {
+export function SrtWeight({ value, onChange, min = 1, max = 99, sm, lessLabel, moreLabel }: { value: number; onChange: (v: number) => void; min?: number; max?: number; sm?: boolean; lessLabel?: string; moreLabel?: string }) {
   const set = (v: number) => onChange(Math.max(min, Math.min(max, v)))
   return (
     <div className={"inline-flex items-center border border-line-2 bg-panel-2 " + (sm ? "h-[26px]" : "h-[30px]")}>
       <button
         type="button"
-        aria-label="Menos peso"
+        aria-label={lessLabel ?? "Less weight"}
         disabled={value <= min}
         onClick={() => set(value - 1)}
         className={"grid h-full place-items-center text-txt-muted transition-colors enabled:hover:bg-accent-soft enabled:hover:text-accent disabled:opacity-35 " + (sm ? "w-[22px]" : "w-[26px]")}
@@ -32,7 +32,7 @@ export function SrtWeight({ value, onChange, min = 1, max = 99, sm }: { value: n
       <span className="grid h-full min-w-[26px] place-items-center border-x border-line-2 text-center font-mono text-[12px] font-bold tabular-nums text-txt">{value}</span>
       <button
         type="button"
-        aria-label="Más peso"
+        aria-label={moreLabel ?? "More weight"}
         disabled={value >= max}
         onClick={() => set(value + 1)}
         className={"grid h-full place-items-center text-txt-muted transition-colors enabled:hover:bg-accent-soft enabled:hover:text-accent disabled:opacity-35 " + (sm ? "w-[22px]" : "w-[26px]")}
@@ -45,7 +45,7 @@ export function SrtWeight({ value, onChange, min = 1, max = 99, sm }: { value: n
 
 /* ── participant row ──────────────────────────────────────────────────────── */
 export function SrtRow({
-  index, entrant, weighted, won, removeLabel, onRename, onWeight, onRemove,
+  index, entrant, weighted, won, removeLabel, onRename, onWeight, onRemove, weightLessLabel, weightMoreLabel,
 }: {
   index: number
   entrant: Entrant
@@ -55,6 +55,8 @@ export function SrtRow({
   onRename: (name: string) => void
   onWeight: (w: number) => void
   onRemove: () => void
+  weightLessLabel?: string
+  weightMoreLabel?: string
 }) {
   const [editing, setEditing] = React.useState(false)
   const [draft, setDraft] = React.useState(entrant.name)
@@ -95,7 +97,7 @@ export function SrtRow({
           <span className="truncate">{entrant.name}</span>
         </span>
       )}
-      {weighted ? <SrtWeight sm value={entrant.weight || 1} onChange={onWeight} /> : <span aria-hidden="true" />}
+      {weighted ? <SrtWeight sm value={entrant.weight || 1} onChange={onWeight} lessLabel={weightLessLabel} moreLabel={weightMoreLabel} /> : <span aria-hidden="true" />}
       <button
         type="button"
         aria-label={removeLabel}

@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { Icon, type IconName } from "@/components/boffmedia/primitives"
 import { MewFaction, MewKind, MewRarity, MewStats, MewText, MewTile } from "./MewAtoms"
@@ -49,8 +50,8 @@ export function CxCard({ cat, rec, active, onOpen, view }: { cat: string; rec: M
   )
 }
 
-function mewCatLabel(cat: string): string {
-  if (cat === "sets") return "conjunto"
+function mewCatLabel(cat: string, t: (k: string, p?: Record<string, string | number | Date>) => string): string {
+  if (cat === "sets") return t("pop.setFlag").toLowerCase()
   const c = MEW.catBy[cat]
   return c ? c.singular || c.label : cat
 }
@@ -97,12 +98,12 @@ function PopFacts({ rows }: { rows: unknown[] }) {
   )
 }
 
-function MewPopBody({ cat, rec }: { cat: string; rec: MewRec }) {
+function MewPopBody({ cat, rec, t }: { cat: string; rec: MewRec; t: (k: string, p?: Record<string, string | number | Date>) => string }) {
   if (cat === "abilities") {
     const cost = rec.cost || {}
     const tgt = rec.target || {}
     const dmg = rec.dmg || {}
-    const TM: Record<string, string> = { none: "Sin objetivo", self: "Sí mismo", single: "Un objetivo", tile: "Casilla", line: "Línea", cone: "Cono", all: "Todos", aoe: "Área" }
+    const TM: Record<string, string> = { none: t("targetMode.none"), self: t("targetMode.self"), single: t("targetMode.single"), tile: t("targetMode.tile"), line: t("targetMode.line"), cone: t("targetMode.cone"), all: t("targetMode.all"), aoe: t("targetMode.aoe") }
     const range = tgt.min_range != null || tgt.max_range != null ? (tgt.min_range === tgt.max_range ? String(tgt.max_range || 0) : (tgt.min_range || 0) + "–" + (tgt.max_range || 0)) : null
     const eff = mewEffectNames(dmg.effects)
     return (
@@ -117,7 +118,7 @@ function MewPopBody({ cat, rec }: { cat: string; rec: MewRec }) {
           {cost.move_points ? <PopFlag icon="compass">{cost.move_points} PM</PopFlag> : null}
         </div>
         {mewClip(rec.desc, 130) ? <MewText muted>{mewClip(rec.desc, 130)}</MewText> : null}
-        <PopFacts rows={[tgt.target_mode && { label: "Objetivo", value: TM[tgt.target_mode] || mewHuman(tgt.target_mode) }, range && { label: "Alcance", value: range }, dmg.damage && { label: "Daño", value: dmg.damage, mono: true }, dmg.heal && { label: "Cura", value: dmg.heal, mono: true }, eff && { label: "Aplica", value: eff }]} />
+        <PopFacts rows={[tgt.target_mode && { label: t("label.target"), value: TM[tgt.target_mode] || mewHuman(tgt.target_mode) }, range && { label: t("label.range"), value: range }, dmg.damage && { label: t("label.damage"), value: dmg.damage, mono: true }, dmg.heal && { label: t("label.heal"), value: dmg.heal, mono: true }, eff && { label: t("label.applies"), value: eff }]} />
       </>
     )
   }
@@ -126,11 +127,11 @@ function MewPopBody({ cat, rec }: { cat: string; rec: MewRec }) {
     return (
       <>
         <div className="flex flex-wrap gap-[5px]">
-          {rec.cls ? <PopFlag icon="star">{mewHuman(rec.cls)}</PopFlag> : <PopFlag icon="shield">General</PopFlag>}
-          {rec.ranks && rec.ranks.length > 0 && <PopFlag icon="layers">{rec.ranks.length} rangos</PopFlag>}
+          {rec.cls ? <PopFlag icon="star">{mewHuman(rec.cls)}</PopFlag> : <PopFlag icon="shield">{t("label.general")}</PopFlag>}
+          {rec.ranks && rec.ranks.length > 0 && <PopFlag icon="layers">{t("pop.passiveRanks", { n: rec.ranks.length })}</PopFlag>}
         </div>
         {mewClip(rec.desc, 150) ? <MewText muted>{mewClip(rec.desc, 150)}</MewText> : null}
-        <PopFacts rows={[base && { label: "Efecto", value: base }, rec.shield != null && { label: "Escudo", value: rec.shield, mono: true }]} />
+        <PopFacts rows={[base && { label: t("pop.effect"), value: base }, rec.shield != null && { label: t("label.shield"), value: rec.shield, mono: true }]} />
       </>
     )
   }
@@ -140,10 +141,10 @@ function MewPopBody({ cat, rec }: { cat: string; rec: MewRec }) {
       <>
         <div className="flex flex-wrap gap-[5px]">
           <PopFlag icon="flame" tone="warn">
-            Estado
+            {t("label.statusBadge")}
           </PopFlag>
         </div>
-        {tip ? <MewText muted>{tip}</MewText> : <div className="text-[12px]/[1.4] font-medium italic text-[color:var(--mwp-ink-soft)] [font-family:var(--mwf-hand)]">Sin descripción en los datos.</div>}
+        {tip ? <MewText muted>{tip}</MewText> : <div className="text-[12px]/[1.4] font-medium italic text-[color:var(--mwp-ink-soft)] [font-family:var(--mwf-hand)]">{t("pop.noDesc")}</div>}
       </>
     )
   }
@@ -160,7 +161,7 @@ function MewPopBody({ cat, rec }: { cat: string; rec: MewRec }) {
           )}
         </div>
         {mewClip(rec.desc, 130) ? <MewText muted>{mewClip(rec.desc, 130)}</MewText> : null}
-        <PopFacts rows={[rec.shield != null && { label: "Escudo", value: rec.shield, mono: true }, rec.durability != null && { label: "Durabilidad", value: rec.durability, mono: true }, passN > 0 && { label: "Pasivas", value: passN + " que otorga" }]} />
+        <PopFacts rows={[rec.shield != null && { label: t("label.shield"), value: rec.shield, mono: true }, rec.durability != null && { label: t("label.durability"), value: rec.durability, mono: true }, passN > 0 && { label: t("inline.passivesAbbr"), value: t("pop.passivesCount", { n: passN }) }]} />
       </>
     )
   }
@@ -194,9 +195,9 @@ function MewPopBody({ cat, rec }: { cat: string; rec: MewRec }) {
     return (
       <>
         <div className="flex flex-wrap gap-[5px]">
-          <PopFlag icon="layers">Conjunto</PopFlag>
+          <PopFlag icon="layers">{t("pop.setFlag")}</PopFlag>
           <PopFlag icon="sword" tone="rar">
-            {members.length} {members.length === 1 ? "pieza" : "piezas"}
+            {t("pop.setPieces", { n: members.length })}
           </PopFlag>
         </div>
         {members.length ? (
@@ -208,7 +209,7 @@ function MewPopBody({ cat, rec }: { cat: string; rec: MewRec }) {
             ))}
           </div>
         ) : null}
-        {kinds.length ? <PopFacts rows={[{ label: "Ranuras", value: kinds.join(" · ") }]} /> : null}
+        {kinds.length ? <PopFacts rows={[{ label: t("pop.slots"), value: kinds.join(" · ") }]} /> : null}
       </>
     )
   }
@@ -216,6 +217,7 @@ function MewPopBody({ cat, rec }: { cat: string; rec: MewRec }) {
 }
 
 export function MewPopCard({ cat, rec }: { cat: string; rec: MewRec }) {
+  const t = useTranslations("mewgenics")
   const isSet = cat === "sets"
   return (
     <div style={{ "--h": mewPopHue(cat, rec) } as React.CSSProperties} className="relative border-2 border-solid border-[color:var(--mwp-ink)] bg-[color:var(--mwp-paper)] text-[color:var(--mwp-ink)] [border-radius:var(--wob-c)] [box-shadow:0_5px_0_rgba(0,0,0,0.4)] [font-family:var(--mwf-hand)] [transform:rotate(-0.5deg)]">
@@ -223,22 +225,22 @@ export function MewPopCard({ cat, rec }: { cat: string; rec: MewRec }) {
       <header className="flex items-center gap-[11px] border-b-2 border-dashed border-[color:var(--mwp-ink-line)] px-[14px] pb-2.5 pt-3">
         <MewTile cat={cat} rec={rec} size={40} glyph={isSet ? "layers" : undefined} />
         <div className="flex min-w-0 flex-col gap-[3px]">
-          <span className="text-[10px]/none uppercase tracking-[0.1em] text-[hsl(var(--h)_45%_34%)] [font-family:var(--mwf-disp)]">{mewCatLabel(cat)}</span>
+          <span className="text-[10px]/none uppercase tracking-[0.1em] text-[hsl(var(--h)_45%_34%)] [font-family:var(--mwf-disp)]">{mewCatLabel(cat, t)}</span>
           <span className="truncate text-[16px]/none text-[color:var(--mwp-ink)] [font-family:var(--mwf-disp)] [text-shadow:1.5px_1.5px_0_color-mix(in_srgb,hsl(var(--h)_55%_55%)_40%,transparent)]">{rec.name}</span>
         </div>
       </header>
       <div className="flex flex-col gap-[9px] px-[14px] pb-3 pt-[11px]">
-        <MewPopBody cat={cat} rec={rec} />
+        <MewPopBody cat={cat} rec={rec} t={t} />
       </div>
       {isSet ? (
         <div className="flex items-center gap-[5px] border-t-2 border-dashed border-[color:var(--mwp-ink-line)] px-[14px] py-2 text-[10.5px]/none font-bold tracking-[0.02em] text-[color:var(--mwp-ink-soft)] [font-family:var(--mwf-hand)] [&_svg]:text-[color:var(--mwp-ink-soft)]">
           <Icon name="layers" size={11} />
-          Conjunto de equipo
+          {t("pop.setFooter")}
         </div>
       ) : (
         <div className="flex items-center gap-[5px] border-t-2 border-dashed border-[color:var(--mwp-ink-line)] bg-[color-mix(in_srgb,var(--mwp-red)_6%,transparent)] px-[14px] py-2 text-[10.5px]/none font-bold tracking-[0.02em] text-[color:var(--mwp-red-deep)] [font-family:var(--mwf-hand)] [&_svg]:text-[color:var(--mwp-red)]">
           <Icon name="arrow" size={11} />
-          Clic para abrir la ficha
+          {t("pop.openCard")}
         </div>
       )}
     </div>

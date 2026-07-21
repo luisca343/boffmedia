@@ -17,16 +17,67 @@
         },
         "common": {
             "streamer": "Streamer",
-            "game": "Juego"
+            "game": "Juego",
+            "comingSoon": "Próximamente",
+            "views": "visitas",
+            "share": "Compartir"
+        },
+        "home": {
+            "searchResults": "Resultados para «{q}»",
+            "popularLive": "Directos populares ahora",
+            "liveEyebrow": "En directo",
+            "error": "No se pudo conectar con Twitch. Revisa las credenciales de la API.",
+            "exploreEyebrow": "Explora",
+            "topCategories": "Categorías principales",
+            "noLive": "No hay directos por aquí ahora mismo."
+        },
+        "hero": {
+            "viewingNow": "viendo ahora",
+            "viewersNow": "{count} viendo ahora",
+            "liveTag": "en directo",
+            "uptimeLive": "{uptime} en directo",
+            "watchLive": "Ver directo",
+            "follow": "Seguir",
+            "following": "Siguiendo",
+            "joinChat": "Unirse al chat"
         },
         "stream": {
             "live": "En vivo",
             "viewers": "espectadores",
             "notFound": "Stream no encontrado",
-            "loading": "Cargando stream..."
+            "loading": "Cargando directo…",
+            "offline": "El canal está desconectado ahora mismo.",
+            "liveBadge": "EN VIVO",
+            "subscribe": "Suscribirse",
+            "about": "Acerca del canal",
+            "otherLive": "Otros canales en directo",
+            "statViewers": "Espectadores",
+            "statViewersSub": "en directo",
+            "statFollowers": "Seguidores",
+            "statFollowersSub": "total",
+            "statTimeLabel": "Tiempo en directo",
+            "statTimeStarted": "empezó a las {time}",
+            "statLangLabel": "Idioma",
+            "statLangSub": "del directo"
+        },
+        "chat": {
+            "title": "Chat del directo",
+            "watching": "viendo",
+            "tabChat": "Chat",
+            "tabSubOnly": "Solo Sub",
+            "tabRules": "Reglas",
+            "connecting": "Conectando al chat…",
+            "connectionFailed": "No se pudo conectar al chat.",
+            "resume": "Reanudar chat ↓",
+            "placeholder": "Inicia sesión para chatear…",
+            "send": "Enviar",
+            "footer": "Chat en vivo",
+            "statusConnected": "conectado",
+            "statusConnecting": "conectando…",
+            "statusDisconnected": "desconectado"
         },
         "user": {
-            "videos": "Videos",
+            "videos": "Vídeos",
             "clips": "Clips",
             "about": "Acerca de",
             "live": "En vivo",
@@ -37,31 +88,43 @@
             "totalViews": "Vistas totales",
             "followers": "Seguidores",
             "notFound": "Usuario no encontrado",
-            "loading": "Cargando usuario..."
+            "loading": "Cargando usuario...",
+            "channelLoading": "Cargando canal…",
+            "channelNotFound": "No se encontró el canal.",
+            "totalViewsSuffix": "visualizaciones totales",
+            "noContent": "Nada por aquí todavía."
         },
         "clip": {
-            "views": "vistas",
+            "views": "visitas",
             "duration": "Duración",
             "createdAt": "Creado el",
             "creator": "Creador",
-            "notFound": "Clip no encontrado",
+            "notFound": "No se encontró el clip.",
             "publishedAt": "Publicado el",
-            "loading": "Cargando clip..."
+            "loading": "Cargando clip…",
+            "byCreator": "clip de {creator}"
         },
         "video": {
-            "views": "vistas",
+            "views": "visitas",
             "duration": "Duración",
             "publishedAt": "Publicado el",
-            "notFound": "Video no encontrado",
-            "loading": "Cargando video..."
+            "notFound": "No se encontró el vídeo.",
+            "loading": "Cargando vídeo…"
         },
         "game": {
             "notFound": "Juego no encontrado",
-            "loading": "Cargando juego..."
+            "loading": "Cargando juego...",
+            "category": "Categoría",
+            "viewersSuffix": "espectadores",
+            "streamsSuffix": "directos",
+            "liveNow": "En directo ahora"
         },
         "history": {
             "title": "Historial de Twitch",
-            "empty": "No hay historial de visualización",
+            "sectionTitle": "Historial",
+            "eyebrow": "Tu actividad",
+            "clearBtn": "Borrar historial",
+            "empty": "Aún no has visto nada.",
             "emptySubtext": "Aquí aparecerán los streams, videos y clips que veas.",
             "loading": "Cargando historial..."
         },

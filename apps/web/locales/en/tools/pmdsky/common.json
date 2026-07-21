@@ -94,6 +94,7 @@
         "REWARD_SETTINGS": "Sets the rewards for completing the quest",
         "ADDITIONAL_SETTINGS": "Extra options to customize the mail"
     },
+    "selectPokemon": "Select a Pokémon",
     "pmdsky": {
         "app": {
             "kicker": "Mystery Dungeon · Explorers of Sky",

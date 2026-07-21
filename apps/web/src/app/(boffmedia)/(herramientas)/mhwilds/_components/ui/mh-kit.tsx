@@ -1,6 +1,7 @@
 "use client"
 
 import React, { useEffect } from "react"
+import { useTranslations } from "next-intl"
 import { Icon, IconButton, type IconName } from "@/components/boffmedia/primitives"
 import {
   MH_VARS, rarClamp, rarVar, rarInk, elementColor, SK_COLOR, skillCategory,
@@ -123,10 +124,11 @@ export function MhRarity({ rarity, long }: { rarity?: number; long?: boolean }) 
 
 // ── element / status chip ─────────────────────────────────────────────────────
 export function MhElement({ type, value, hidden, label }: { type: string; value: number; hidden?: boolean; label: string }) {
+  const t = useTranslations("mhwilds.ui")
   return (
     <span className={`inline-flex items-center gap-[7px] px-2.5 py-1.5 bg-base-2 border border-line font-mono text-[12px] leading-none ${hidden ? "opacity-60" : ""}`} title={label}>
       <span className="w-[9px] h-[9px] rounded-full" style={{ background: elementColor(type) }} />
-      <span>{label} {value}{hidden ? " (oculto)" : ""}</span>
+      <span>{label} {value}{hidden ? ` ${t("hidden")}` : ""}</span>
     </span>
   )
 }
@@ -261,19 +263,20 @@ export function MhSlot({
 export function MhDecoSocket({
   size, decoName, decoSlot, onOpen, onClear,
 }: { size: number; decoName?: string | null; decoSlot?: number; onOpen: () => void; onClear?: () => void }) {
+  const t = useTranslations("mhwilds.ui")
   const filled = !!decoName
   return (
     <div className={`grid grid-cols-[22px_1fr_auto] items-center gap-[9px] w-full py-[7px] px-2.5 bg-base-2 border border-line border-l-2 transition-colors hover:bg-panel ${filled ? "border-l-[var(--mh)]" : "border-l-line-2 hover:border-l-[var(--mh)]"}`}>
-      <button type="button" onClick={onOpen} aria-label={`Ranura nivel ${size}`} className="w-[22px] h-[22px] grid place-items-center flex-none font-mono text-[11px] leading-none font-bold text-[var(--mh-bright)] border border-[var(--mh-line)] rotate-45">
+      <button type="button" onClick={onOpen} aria-label={t("slotLevel", { size })} className="w-[22px] h-[22px] grid place-items-center flex-none font-mono text-[11px] leading-none font-bold text-[var(--mh-bright)] border border-[var(--mh-line)] rotate-45">
         <span className="-rotate-45">{filled ? decoSlot : size}</span>
       </button>
       <button type="button" onClick={onOpen} className="min-w-0 flex-1 text-left bg-transparent border-0 p-0 cursor-pointer">
         <span className={`block font-body text-[12px] leading-tight truncate ${filled ? "text-txt" : "text-txt-dim italic"}`}>
-          {filled ? decoName : `Nivel ${size} — vacía`}
+          {filled ? decoName : t("emptySlot", { size })}
         </span>
       </button>
       {filled && onClear && (
-        <button type="button" onClick={onClear} aria-label="Quitar joya" className="text-txt-dim grid place-items-center hover:text-bad">
+        <button type="button" onClick={onClear} aria-label={t("removeJewel")} className="text-txt-dim grid place-items-center hover:text-bad">
           <Icon name="x" size={13} />
         </button>
       )}
@@ -300,6 +303,7 @@ export function MhSlotPips({ slots }: { slots?: number[] }) {
 export function MhMaterial({
   name, rarity, quantity, owned, onToggle,
 }: { name: string; rarity?: number; quantity: number; owned?: boolean; onToggle?: () => void }) {
+  const t = useTranslations("mhwilds.ui")
   return (
     <div className="grid grid-cols-[auto_1fr_auto] items-center gap-2.5 py-2 px-[11px] bg-base-2 border border-line">
       <span className="w-3 h-3 flex-none rotate-45 border" style={{ borderColor: rarVar(rarity), background: rarClamp(rarity) >= 7 ? rarVar(rarity) : "transparent" }} />
@@ -310,7 +314,7 @@ export function MhMaterial({
       <span className="flex items-center gap-1.5">
         <span className="font-mono text-[13px] leading-none font-bold text-txt">×{quantity}</span>
         {onToggle && (
-          <button type="button" onClick={onToggle} aria-label="Marcar como obtenido" className={`w-5 h-5 grid place-items-center border cursor-pointer ${owned ? "bg-[var(--mh-soft)] border-[var(--mh)] text-[var(--mh-bright)]" : "border-line-2 text-txt-dim"}`}>
+          <button type="button" onClick={onToggle} aria-label={t("markObtained")} className={`w-5 h-5 grid place-items-center border cursor-pointer ${owned ? "bg-[var(--mh-soft)] border-[var(--mh)] text-[var(--mh-bright)]" : "border-line-2 text-txt-dim"}`}>
             <Icon name="check" size={12} />
           </button>
         )}
@@ -332,14 +336,15 @@ export interface MhEquipItemData {
 export function MhEquipItem({
   item, kind, active, onPick,
 }: { item: MhEquipItemData; kind: "weapon" | "armor" | "charm"; active?: boolean; onPick: () => void }) {
+  const t = useTranslations("mhwilds.ui")
   const skills = (item.skills || []).map((s) => `${s.name} ${s.level}`)
   const stat =
     kind === "weapon" ? (
-      <><b className="text-txt">ATQ {item.attack}</b><br />{(item.affinity ?? 0) >= 0 ? "+" : ""}{item.affinity}% afin.</>
+      <><b className="text-txt">{t("atk")} {item.attack}</b><br />{(item.affinity ?? 0) >= 0 ? "+" : ""}{item.affinity}% {t("affinity")}</>
     ) : kind === "charm" ? (
-      <b className="text-txt">Rareza {rarClamp(item.rarity)}</b>
+      <b className="text-txt">{t("rarity")} {rarClamp(item.rarity)}</b>
     ) : (
-      <b className="text-txt">DEF {item.defense}</b>
+      <b className="text-txt">{t("def")} {item.defense}</b>
     )
   return (
     <button
@@ -373,6 +378,7 @@ export interface MhSetBonusData {
   skill?: { name: string } | null
 }
 export function MhSetBonus({ bonus }: { bonus: MhSetBonusData }) {
+  const t = useTranslations("mhwilds.ui")
   const active = bonus.activeAt != null
   return (
     <div className={`py-[9px] px-[11px] bg-base-2 border border-line ${active ? "" : "opacity-50"}`}>
@@ -386,9 +392,9 @@ export function MhSetBonus({ bonus }: { bonus: MhSetBonusData }) {
       </div>
       <div className={`mt-[5px] font-mono text-[11px] leading-[1.3] ${active ? "text-[var(--mh-bright)]" : "text-txt-dim"}`}>
         {active ? (
-          <><Icon name="check" size={11} className="align-[-1px]" /> {bonus.skill ? bonus.skill.name : bonus.bonusName} · {bonus.activeAt} pzs</>
+          <><Icon name="check" size={11} className="align-[-1px]" /> {bonus.skill ? bonus.skill.name : bonus.bonusName} · {bonus.activeAt} {t("pieces")}</>
         ) : (
-          <>Requiere {bonus.nextAt} piezas ({bonus.pieces}/{bonus.nextAt})</>
+          <>{t("requires")} {bonus.nextAt} {t("piecesN")} ({bonus.pieces}/{bonus.nextAt})</>
         )}
       </div>
     </div>
@@ -433,17 +439,18 @@ export function MhRing({ pct, label }: { pct: number; label: React.ReactNode }) 
 
 // ── search input (in the system chassis) ─────────────────────────────────────
 export function MhSearch({ value, onChange, placeholder }: { value: string; onChange: (v: string) => void; placeholder?: string }) {
+  const t = useTranslations("mhwilds.ui")
   return (
     <div className="flex-1 min-w-0 inline-flex items-center gap-2.5 bg-panel border border-line px-3 h-[42px]">
       <Icon name="search" size={16} className="text-txt-dim flex-none" />
       <input
         className="flex-1 min-w-0 bg-transparent border-0 outline-none text-txt font-body text-[14px] placeholder:text-txt-dim"
-        placeholder={placeholder || "Buscar…"}
+        placeholder={placeholder || t("search")}
         value={value}
         onChange={(e) => onChange(e.target.value)}
       />
       {value && (
-        <button type="button" onClick={() => onChange("")} aria-label="Limpiar" className="text-txt-dim hover:text-txt flex-none">
+        <button type="button" onClick={() => onChange("")} aria-label={t("clear")} className="text-txt-dim hover:text-txt flex-none">
           <Icon name="x" size={14} />
         </button>
       )}
@@ -534,6 +541,7 @@ export function MhDrawer({
 }: {
   icon?: React.ReactNode; iconName?: IconName; title: React.ReactNode; sub?: React.ReactNode; onClose: () => void; tools?: React.ReactNode; children: React.ReactNode
 }) {
+  const t = useTranslations("mhwilds.ui")
   useEffect(() => {
     const esc = (e: KeyboardEvent) => { if (e.key === "Escape") onClose() }
     document.addEventListener("keydown", esc)
@@ -557,7 +565,7 @@ export function MhDrawer({
             <div className="font-display text-[16px] leading-[1.1] font-bold uppercase tracking-[0.03em] not-italic">{title}</div>
             {sub && <div className="font-mono text-[11px] leading-none text-txt-muted mt-0.5">{sub}</div>}
           </div>
-          <IconButton name="x" label="Cerrar" className="ml-auto" onClick={onClose} />
+          <IconButton name="x" label={t("close")} className="ml-auto" onClick={onClose} />
         </div>
         {tools && <div className="flex-none py-3 px-4 border-b border-line flex flex-col gap-2.5">{tools}</div>}
         <div className="flex-1 overflow-y-auto py-3 px-4 pb-10">{children}</div>

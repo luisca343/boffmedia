@@ -2,29 +2,30 @@
 
 import { usePathname } from "next/navigation"
 import Link from "next/link"
+import { useTranslations } from "next-intl"
 import { PokeballIcon } from "./ui"
 import { HomeIcon, BookOpenIcon, MapIcon, ZapIcon, SparklesIcon, SettingsIcon } from "lucide-react"
 import { useBoffSession } from "@/services/useBoffSession"
 
 type NavItem = { href: string; label: string; icon: typeof HomeIcon; tail?: string }
 
-// Nav badge counts are static design placeholders — wire to real totals later. [deferred]
-const NAV_DATA: NavItem[] = [
-  { href: "/smartrotom/pokedex", label: "Inicio", icon: HomeIcon },
-  { href: "/smartrotom/pokedex/entrada", label: "Pokémon", icon: BookOpenIcon, tail: "905" },
-  { href: "/smartrotom/pokedex/spawns", label: "Apariciones", icon: MapIcon, tail: "21" },
-  { href: "/smartrotom/pokedex/localizacion", label: "Biomas", icon: MapIcon, tail: "48" },
-]
-
-const NAV_REF: NavItem[] = [
-  { href: "/smartrotom/pokedex/movimientos", label: "Movimientos", icon: ZapIcon, tail: "924" },
-  { href: "/smartrotom/pokedex/habilidades", label: "Habilidades", icon: SparklesIcon, tail: "298" },
-  { href: "/smartrotom/pokedex/tipos", label: "Tipos", icon: BookOpenIcon },
-]
-
 export function HubSidebar() {
+  const t = useTranslations("pokedex")
   const pathname = usePathname()
   const { session } = useBoffSession()
+
+  const NAV_DATA: NavItem[] = [
+    { href: "/smartrotom/pokedex", label: t("sidebar_home"), icon: HomeIcon },
+    { href: "/smartrotom/pokedex/entrada", label: t("sidebar_pokemon"), icon: BookOpenIcon, tail: "905" },
+    { href: "/smartrotom/pokedex/spawns", label: t("sidebar_appearances"), icon: MapIcon, tail: "21" },
+    { href: "/smartrotom/pokedex/localizacion", label: t("sidebar_biomes"), icon: MapIcon, tail: "48" },
+  ]
+
+  const NAV_REF: NavItem[] = [
+    { href: "/smartrotom/pokedex/movimientos", label: t("sidebar_moves"), icon: ZapIcon, tail: "924" },
+    { href: "/smartrotom/pokedex/habilidades", label: t("sidebar_abilities"), icon: SparklesIcon, tail: "298" },
+    { href: "/smartrotom/pokedex/tipos", label: t("sidebar_types"), icon: BookOpenIcon },
+  ]
 
   return (
     <aside className="hidden lg:flex flex-col w-[260px] shrink-0 bg-white/[0.015] border-r border-white/[0.05] p-[18px_14px] gap-[22px]">
@@ -38,8 +39,8 @@ export function HubSidebar() {
         </div>
       </div>
 
-      <NavSection items={NAV_DATA} label="Datos" pathname={pathname} />
-      <NavSection items={NAV_REF} label="Referencia" pathname={pathname} />
+      <NavSection items={NAV_DATA} label={t("sidebar_data")} pathname={pathname} />
+      <NavSection items={NAV_REF} label={t("sidebar_reference")} pathname={pathname} />
 
       <div className="mt-auto flex flex-col gap-[10px] p-3 bg-white/[0.02] border border-white/[0.05] rounded-[10px]">
         <div className="flex items-center gap-[10px] text-xs">
@@ -48,12 +49,12 @@ export function HubSidebar() {
           </div>
           <div className="flex flex-col gap-px min-w-0">
             <b className="text-[12.5px] text-pk-surface-100">{session?.user?.name || "Usuario"}</b>
-            <span className="text-[10.5px] text-pk-surface-500 font-pk-mono">Conectado · server-01</span>
+            <span className="text-[10.5px] text-pk-surface-500 font-pk-mono">{t("sidebar_connected")} · server-01</span>
           </div>
         </div>
         <button className="flex items-center gap-[11px] px-2 py-1.5 rounded-md text-xs text-pk-surface-300 hover:text-pk-surface-100 hover:bg-white/[0.04] transition-colors">
           <SettingsIcon className="w-3.5 h-3.5" />
-          Ajustes
+          {t("sidebar_settings")}
         </button>
       </div>
     </aside>

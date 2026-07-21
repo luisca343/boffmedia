@@ -32,13 +32,13 @@ export default function HabilidadesPage() {
     <ScreenShell>
       <PageHead
         icon={SparklesIcon}
-        eyebrow="Referencia"
-        title="Habilidades"
-        desc="Ordenadas por popularidad. Busca por nombre o efecto y abre cualquier habilidad para ver su descripción y los Pokémon que la portan."
+        eyebrow={t("habilidades_eyebrow")}
+        title={t("habilidades_title")}
+        desc={t("habilidades_desc")}
         meta={
           <>
-            <MetaStat label="Total" value={abilities?.length ?? 0} />
-            <MetaStat label="Resultados" value={list.length} />
+            <MetaStat label={t("movimientos_total")} value={abilities?.length ?? 0} />
+            <MetaStat label={t("movimientos_results")} value={list.length} />
           </>
         }
       />
@@ -48,7 +48,7 @@ export default function HabilidadesPage() {
         <input
           value={q}
           onChange={(e) => setQ(e.target.value)}
-          placeholder="Buscar por nombre o efecto…"
+          placeholder={t("habilidades_search_placeholder")}
           className="w-full bg-white/[0.03] border border-white/[0.07] rounded-[10px] py-2.5 pr-3.5 pl-10 text-[13.5px] text-pk-surface-50 outline-none placeholder:text-pk-surface-500 focus:border-pk-primary-400/50 focus:bg-white/[0.05] focus:shadow-[0_0_0_3px_rgba(249,115,22,0.12)] transition-colors"
         />
       </div>
@@ -56,7 +56,7 @@ export default function HabilidadesPage() {
       <div className="grid grid-cols-1 xl:grid-cols-[1fr_380px] gap-[18px] items-start">
         <div className="flex flex-col border border-white/[0.05] rounded-xl overflow-hidden bg-white/[0.012]">
           {isLoading ? (
-            <div className="p-8 text-center text-pk-surface-500 text-sm">Cargando habilidades…</div>
+            <div className="p-8 text-center text-pk-surface-500 text-sm">{t("habilidades_loading")}</div>
           ) : list.length ? (
             list.map((a) => {
               const active = activeKey === a.name
@@ -84,7 +84,7 @@ export default function HabilidadesPage() {
               )
             })
           ) : (
-            <div className="p-[30px] text-center text-pk-surface-500 text-[13px]">No hay habilidades que coincidan con la búsqueda.</div>
+            <div className="p-[30px] text-center text-pk-surface-500 text-[13px]">{t("habilidades_no_results")}</div>
           )}
         </div>
 

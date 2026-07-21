@@ -65,6 +65,23 @@
       "remove": "Remove",
       "loadMore": "Load More",
       "goBack": "Go Back"
+    },
+    "primitives": {
+      "dismiss": "Dismiss",
+      "close": "Close",
+      "copy": "Copy",
+      "copied": "Copied",
+      "copyCode": "Copy code",
+      "actions": "Actions",
+      "loading": "Loading",
+      "notifications": "Notifications",
+      "searchPlaceholder": "Search…",
+      "clearSearch": "Clear search",
+      "show": "Show",
+      "hide": "Hide",
+      "pagination": "Pagination",
+      "previousPage": "Previous page",
+      "nextPage": "Next page"
     }
   }
 }

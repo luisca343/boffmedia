@@ -53,6 +53,8 @@
         "schematicViewer": "Schematic Viewer"
       },
       "schematicCompat": {
+        "appName": "Schematic Compat",
+        "appTagline": "Minecraft · Hytale",
         "title": "Schematic Compatibility Tool",
         "description": "Convert schematics between Minecraft versions and mod loaders",
         "features": {
@@ -193,7 +195,12 @@
           "exportRules": "Export Rules",
           "exporting": "Exporting…",
           "exportSchematic": "Export schematic",
-          "blockedWarning": "{count, plural, one {# block type has no target and will be written unchanged, or dropped in a cross-game export.} other {# block types have no target and will be written unchanged, or dropped in a cross-game export.}} Export anyway?"
+          "blockedWarning": "{count, plural, one {# block type has no target and will be written unchanged, or dropped in a cross-game export.} other {# block types have no target and will be written unchanged, or dropped in a cross-game export.}} Export anyway?",
+          "formatSchem2": ".schem (v2)",
+          "formatSchem3": ".schem (v3)",
+          "formatLitematic": ".litematic",
+          "formatNbt": ".nbt",
+          "formatPrefab": ".prefab.json"
         },
         "worker": {
           "connecting": "Connecting to analysis engine...",

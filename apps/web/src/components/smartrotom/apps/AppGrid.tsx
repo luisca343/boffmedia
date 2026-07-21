@@ -11,6 +11,7 @@ import { stablePositionStrategy } from "@/lib/drag-and-drop"
 import { useActiveDragItem, useDndSensors, COLLISION_STRATEGIES, DROP_ANIMATIONS } from '@/lib/dnd-kit-setup'
 import AppSlot from './AppSlot'
 import { App } from "./App"
+import { useTranslations } from "next-intl"
 // Grid configuration - 6 apps per row
 const GRID_COLS = 8
 const GRID_ROWS = 6
@@ -25,6 +26,7 @@ interface AppGridProps {
 export default function AppGrid({ apps, setApps, className }: AppGridProps) {
   const uuid = useRotomUuid()
   const { orderApps, isLoading } = useOrderApps()
+  const t = useTranslations("smartrotom.appGrid")
   
   // Use the same drag and drop setup as PC page
   const { activeDragItem, handleDragStart, handleDragEnd } = useActiveDragItem()
@@ -106,7 +108,7 @@ export default function AppGrid({ apps, setApps, className }: AppGridProps) {
           transition={{ duration: 0.3 }}
         >
           <div className="w-4 h-4 border-2 border-blue-400 border-t-transparent rounded-full animate-spin" />
-          Updating order...
+          {t("updatingOrder")}
         </motion.div>
       </div>
     )

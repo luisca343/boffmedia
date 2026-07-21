@@ -1,10 +1,12 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { usePokedexData } from "@/hooks/usePokedexData"
 import { useRotomUuid } from "@/components/smartrotom/behavior/useRotomUuid"
 import { useGetRegistries } from "@/hooks/pokemon/useGetRegistries"
 
 export function ProgressStrip() {
+  const t = useTranslations("pokedex")
   const uuid = useRotomUuid()
   const { pokedexData } = usePokedexData()
   const { registries } = useGetRegistries(uuid!)
@@ -21,9 +23,9 @@ export function ProgressStrip() {
   const streak = computeStreak(registries)
 
   const segments = [
-    { id: "caught", color: "#34d399", n: caught, label: "Capturados" },
-    { id: "seen", color: "#fbbf24", n: seen, label: "Vistos" },
-    { id: "shiny", color: "#f0abfc", n: shiny, label: "Shiny" },
+    { id: "caught", color: "#34d399", n: caught, label: t("progress_captured") },
+    { id: "seen", color: "#fbbf24", n: seen, label: t("progress_seen") },
+    { id: "shiny", color: "#f0abfc", n: shiny, label: t("progress_shiny") },
   ]
 
   return (
@@ -31,7 +33,7 @@ export function ProgressStrip() {
       <div className="flex items-end justify-between gap-6 mb-4">
         <div>
           <p className="font-pk-mono text-[11px] tracking-[0.12em] uppercase text-pk-surface-500 mb-1.5">
-            Progreso de la Pokédex
+            {t("progress_title")}
           </p>
           <div className="font-pk-display font-bold text-[44px] leading-none tracking-tight flex items-baseline gap-2.5 tabular-nums">
             <span className="text-pk-surface-50">{caught}</span>
@@ -44,10 +46,10 @@ export function ProgressStrip() {
         </div>
         <div className="flex flex-col gap-1 text-right text-xs text-pk-surface-400">
           <span>
-            Última captura · <b className="text-pk-surface-100 font-semibold">{lastCaptureAgo}</b>
+            {t("progress_last_capture")} · <b className="text-pk-surface-100 font-semibold">{lastCaptureAgo}</b>
           </span>
           <span>
-            Racha · <b className="text-pk-surface-100 font-semibold">{streak} {streak === 1 ? "día" : "días"}</b>
+            {t("progress_streak")} · <b className="text-pk-surface-100 font-semibold">{streak} {streak === 1 ? t("progress_streak_day") : t("progress_streak_days")}</b>
           </span>
         </div>
       </div>
@@ -82,7 +84,7 @@ export function ProgressStrip() {
         ))}
         <button className="inline-flex items-center gap-2 text-xs text-pk-surface-300 hover:text-pk-surface-50 transition-colors bg-transparent border-none p-1">
           <span className="w-2.5 h-2.5 rounded-full shadow-[0_0_8px_currentColor]" style={{ background: "#97a6bb", color: "#97a6bb" }} />
-          Pendientes
+          {t("progress_pending")}
           <b className="font-pk-mono text-xs tabular-nums text-pk-surface-100 ml-0.5">{Math.max(0, pending)}</b>
         </button>
       </div>

@@ -1,9 +1,10 @@
 "use client"
 
 import * as React from "react"
+import { useTranslations } from "next-intl"
 import { MewData, select, useMewData } from "../mew-store"
 import { MEW, MEW_CATS, type MewRec } from "../mew-util"
-import { CX_CAP, CX_FILTERS, cxReadHash, cxSearchText, cxTitle, cxWriteHash, type FilterDef, type TrailItem } from "./codex-config"
+import { CX_CAP, CX_FILTERS, CX_SORT, cxReadHash, cxSearchText, cxTitle, cxWriteHash, type FilterDef, type TrailItem } from "./codex-config"
 
 export interface FilterOption { value: string; label: string; count: number; color?: string }
 export interface FilterGroup extends FilterDef { options: FilterOption[] }
@@ -13,6 +14,7 @@ export interface FilterGroup extends FilterDef { options: FilterOption[] }
  * components are pure presenters of this model (separates state logic from render).
  */
 export function useMewCodex() {
+  const t = useTranslations("mewgenics")
   const { ready, error, rev } = useMewData()
   const boot = React.useRef(true)
   const scrollRef = React.useRef<HTMLDivElement>(null)
@@ -51,9 +53,9 @@ export function useMewCodex() {
       let keys = Object.keys(counts)
       if (fd.order) keys.sort((a, b) => { const ia = fd.order!.indexOf(a), ib = fd.order!.indexOf(b); return (ia < 0 ? 99 : ia) - (ib < 0 ? 99 : ib) || a.localeCompare(b) })
       else keys.sort((a, b) => counts[b] - counts[a] || a.localeCompare(b))
-      return { ...fd, options: keys.map((k) => ({ value: k, label: fd.labelFn ? fd.labelFn(k) : k, count: counts[k], color: fd.colorFn ? fd.colorFn(k) : undefined })) }
+      return { ...fd, label: t(fd.label), options: keys.map((k) => ({ value: k, label: fd.labelFn ? t(fd.labelFn(k)) : k, count: counts[k], color: fd.colorFn ? fd.colorFn(k) : undefined })) }
     })
-  }, [cat, list])
+  }, [cat, list, t])
 
   const filtered = React.useMemo(() => {
     const term = q.trim().toLowerCase()

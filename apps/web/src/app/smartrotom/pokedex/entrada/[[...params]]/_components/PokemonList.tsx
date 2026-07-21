@@ -52,7 +52,7 @@ export default function PokemonList() {
         <main className="flex-1 flex items-center justify-center">
           <div className="flex items-center gap-3">
             <div className="animate-spin h-5 w-5 border-2 border-pk-primary-300 rounded-full border-t-transparent" />
-            <div className="text-pk-surface-100 text-xl font-pk-display">Cargando Pokédex…</div>
+            <div className="text-pk-surface-100 text-xl font-pk-display">{t("dexlist_loading")}</div>
           </div>
         </main>
       </div>
@@ -72,17 +72,17 @@ export default function PokemonList() {
                 </span>
                 <span className="font-pk-mono text-[10.5px] tracking-[0.12em] uppercase text-pk-surface-500">Pokédex</span>
               </div>
-              <h1 className="font-pk-display font-bold text-[28px] tracking-tight text-pk-surface-50">Explorar Pokédex</h1>
+              <h1 className="font-pk-display font-bold text-[28px] tracking-tight text-pk-surface-50">{t("dexlist_explore")}</h1>
               <p className="text-pk-surface-400 text-sm mt-1 max-w-[600px]">
-                {pokemonList.length} Pokémon registrados. Haz clic en cualquiera para ver su ficha completa.
+                {t("dexlist_registered", { count: pokemonList.length })}
               </p>
             </div>
             <div className="flex items-center gap-4 text-sm text-pk-surface-400 font-pk-mono">
               <span>
-                Total<b className="ml-1 text-pk-surface-100">{pokemonList.length}</b>
+                {t("dexlist_total")}<b className="ml-1 text-pk-surface-100">{pokemonList.length}</b>
               </span>
               <span>
-                Resultados<b className="ml-1 text-pk-surface-100">{filteredPokemon.length}</b>
+                {t("dexlist_results")}<b className="ml-1 text-pk-surface-100">{filteredPokemon.length}</b>
               </span>
             </div>
           </div>
@@ -93,7 +93,7 @@ export default function PokemonList() {
             <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-pk-surface-500" />
             <input
               type="search"
-              placeholder="Buscar por nombre o número…"
+              placeholder={t("dexlist_search_placeholder")}
               className="w-full bg-white/[0.03] border border-white/[0.07] rounded-[10px] py-2.5 pr-3 pl-9 text-[13px] text-pk-surface-50 outline-none placeholder:text-pk-surface-500 focus:border-pk-primary-400/50 focus:shadow-[0_0_0_3px_rgba(249,115,22,0.12)] transition-colors"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -132,7 +132,7 @@ export default function PokemonList() {
             </div>
           ) : (
             <div className="bg-white/[0.02] border border-white/[0.05] rounded-xl p-8 text-center">
-              <p className="text-pk-surface-400 text-sm">No se encontraron Pokémon que coincidan con la búsqueda.</p>
+              <p className="text-pk-surface-400 text-sm">{t("dexlist_no_results")}</p>
             </div>
           )}
         </div>

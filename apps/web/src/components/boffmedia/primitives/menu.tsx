@@ -2,6 +2,7 @@
 
 import * as React from "react"
 import { cn } from "@/lib/utils"
+import { useTranslations } from "next-intl"
 import { useDismiss } from "@/components/boffmedia/hooks/use-dismiss"
 import { Icon, type IconName } from "./icon"
 import { Button } from "./button"
@@ -34,7 +35,7 @@ const POP_SHADOW = "0 1px 0 var(--accent-line), 0 18px 40px -18px rgba(0,0,0,0.7
 
 export function Menu({
   trigger,
-  label = "Acciones",
+  label,
   icon = "chevronDown",
   variant = "default",
   size,
@@ -42,6 +43,8 @@ export function Menu({
   align = "start",
   ariaLabel,
 }: MenuProps) {
+  const t = useTranslations("common.primitives")
+  const resolvedLabel = label ?? t("actions")
   const [open, setOpen] = React.useState(false)
   const [active, setActive] = React.useState(-1)
   const rootRef = React.useRef<HTMLSpanElement>(null)
@@ -132,13 +135,13 @@ export function Menu({
           onClick={() => (open ? setOpen(false) : openWith(-1))}
           onKeyDown={onTrigKey}
         >
-          {label}
+          {resolvedLabel}
         </Button>
       )}
       {open && (
         <div
           role="menu"
-          aria-label={typeof (ariaLabel || label) === "string" ? (ariaLabel as string) || (label as string) : undefined}
+          aria-label={typeof (ariaLabel || resolvedLabel) === "string" ? (ariaLabel as string) || (resolvedLabel as string) : undefined}
           onKeyDown={onItemKey}
           style={{ boxShadow: POP_SHADOW }}
           className={cn(

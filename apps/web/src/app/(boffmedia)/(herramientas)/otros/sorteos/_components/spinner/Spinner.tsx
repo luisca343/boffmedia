@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import SpinnerItem from "./SpinnerItem"
 
 interface SpinnerProps {
@@ -24,6 +25,7 @@ export default function Spinner({
   spinnerRef,
   itemsContainerRef,
 }: SpinnerProps) {
+  const t = useTranslations("otros.sorteosApp")
   const live = isSpinning && !spinComplete
   return (
     <div className="relative w-full">
@@ -59,7 +61,7 @@ export default function Spinner({
                 (spinComplete ? "text-accent" : "text-txt")
               }
             >
-              {spinComplete ? "¡Ganador seleccionado!" : live ? "Sorteando…" : "Ruleta del sorteo"}
+              {spinComplete ? t("spinnerWinnerSelected") : live ? t("spinnerSpinning") : t("spinnerRuleta")}
             </h3>
           </div>
 
@@ -143,7 +145,7 @@ export default function Spinner({
               </div>
             ) : (
               <span className="inline-flex items-center gap-[6px] font-mono text-xs font-bold uppercase tracking-[0.18em] text-accent">
-                <span aria-hidden="true">✓</span> Ganador confirmado
+                <span aria-hidden="true">✓</span> {t("spinnerGanadorConfirmado")}
               </span>
             )}
           </div>

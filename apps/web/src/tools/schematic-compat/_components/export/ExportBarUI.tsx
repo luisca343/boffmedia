@@ -5,14 +5,14 @@ import { useTranslations } from "next-intl";
 import { Button } from "@/components/boffmedia/primitives";
 import type { SchGame } from "../ui/sch-tokens";
 
-const FMT: Record<SchGame, [string, string][]> = {
+const FMT_KEYS: Record<SchGame, [string, string][]> = {
   minecraft: [
-    [".schem (v2)", "schem"],
-    [".schem (v3)", "schem3"],
-    [".litematic", "litematic"],
-    [".nbt", "nbt"],
+    ["export.formatSchem2", "schem"],
+    ["export.formatSchem3", "schem3"],
+    ["export.formatLitematic", "litematic"],
+    ["export.formatNbt", "nbt"],
   ],
-  hytale: [[".prefab.json", "prefab"]],
+  hytale: [["export.formatPrefab", "prefab"]],
 };
 
 /** Footer: meter · rule import/export · target-game format list · export. */
@@ -36,7 +36,7 @@ export function ExportBarUI({
   meter?: ReactNode;
 }) {
   const t = useTranslations("games.minecraft.schematicCompat");
-  const formats = FMT[targetGame] || FMT.minecraft;
+  const formats = (FMT_KEYS[targetGame] || FMT_KEYS.minecraft).map(([key, val]) => [t(key), val] as [string, string]);
   const [fmt, setFmt] = useState(formats[0][1]);
   useEffect(() => {
     if (!formats.some((f) => f[1] === fmt)) setFmt(formats[0][1]);

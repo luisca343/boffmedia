@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import { PokemonSpriteLink } from "./PokemonSprite";
 import { getSpawns } from "@/services/mcef/mcefApi";
 import { Loading } from "@/components/smartrotom/Loading";
@@ -51,6 +52,7 @@ export function PossibleSpawnsSection({pokemonSpawns, hideCaught = true, hideSee
 }
 
 export function PossibleSpawns({ pokemonSpawns, hideCaught = true, hideSeen = true, id, }: { pokemonSpawns?: PossibleSpawn[]; hideCaught?: boolean; hideSeen?: boolean; id?: string; }) {
+  const t = useTranslations("pokedex")
   const [spawns, setSpawns] = useState<PossibleSpawn[]>();
   const [isLoading, setIsLoading] = useState(true);
 
@@ -92,7 +94,7 @@ export function PossibleSpawns({ pokemonSpawns, hideCaught = true, hideSeen = tr
   if (!spawns || spawns.length === 0) {
     return (
       <div className="flex justify-center items-center h-20 text-ink">
-        No hay Pokémon disponibles para capturar
+        {t("possiblespawns_no_available")}
       </div>
     );
   }

@@ -1,11 +1,13 @@
 "use client"
 
 import { useMemo } from "react"
+import { useTranslations } from "next-intl"
 import { BookmarkIcon } from "lucide-react"
 import { usePokedexData } from "@/hooks/usePokedexData"
 import { usePokemonStore } from "@/stores/pokemonStore"
 
 export function GoalsCard() {
+  const t = useTranslations("pokedex")
   const { pokedexData } = usePokedexData()
   const allPokemon = usePokemonStore((state) => state.allPokemon)
   const pokemonByDex = usePokemonStore((state) => state.pokemonByDex)
@@ -35,9 +37,9 @@ export function GoalsCard() {
     }
 
     return [
-      { label: "Gen 1 completa", value: gen1Caught, total: 151, color: "#fb923c" },
-      { label: "Cazador shiny", value: shinyCount, total: 10, color: "#f0abfc" },
-      { label: "Maestro de tipos", value: Math.min(uniqueTypes.size, 18), total: 18, color: "#22d3ee" },
+      { label: t("goals_gen1"), value: gen1Caught, total: 151, color: "#fb923c" },
+      { label: t("goals_shiny_hunter"), value: shinyCount, total: 10, color: "#f0abfc" },
+      { label: t("goals_type_master"), value: Math.min(uniqueTypes.size, 18), total: 18, color: "#22d3ee" },
     ]
   }, [pokedexData, allPokemon, pokemonByDex])
 
@@ -46,9 +48,9 @@ export function GoalsCard() {
       <div className="flex items-center justify-between">
         <h3 className="font-pk-display font-semibold text-[15px] tracking-tight text-pk-surface-50 flex items-center gap-2.5">
           <BookmarkIcon className="w-4 h-4 text-pk-primary-400" />
-          Objetivos
+          {t("goals_title")}
         </h3>
-        <button className="text-xs text-pk-surface-400 hover:text-pk-primary-300 transition-colors">Editar</button>
+        <button className="text-xs text-pk-surface-400 hover:text-pk-primary-300 transition-colors">{t("goals_edit")}</button>
       </div>
 
       <div className="flex flex-col gap-3">

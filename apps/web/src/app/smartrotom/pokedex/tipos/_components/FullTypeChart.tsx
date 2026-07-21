@@ -4,6 +4,7 @@ import { typeChart } from "../../dexUtils"
 import { TypeGlyph } from "../../_components/ui"
 import { TYPE_COLORS, TYPE_LABELS, ALL_TYPES } from "../../_utils/typeColors"
 import { getContrastingTextColor } from "../../_utils/dexMeta"
+import { useTranslations } from "next-intl"
 
 // Attacker's perspective: 2× = green (good), ½ = red (bad), 0 = purple (immune).
 function multSymbol(m: number) {
@@ -22,13 +23,14 @@ function multStyle(m: number): { background: string; color: string } {
 }
 
 const LEGEND = [
-  { s: "2×", style: { background: "rgba(163,230,53,.16)", color: "#a3e635" }, label: "Súper eficaz" },
-  { s: "·", style: { background: "rgba(255,255,255,.03)", color: "#677790" }, label: "Daño normal" },
-  { s: "½", style: { background: "rgba(239,68,68,.16)", color: "#f87171" }, label: "Poco eficaz" },
-  { s: "0", style: { background: "rgba(192,132,252,.18)", color: "#c084fc" }, label: "Sin efecto" },
+  { s: "2×", style: { background: "rgba(163,230,53,.16)", color: "#a3e635" }, key: "chart_super_effective" },
+  { s: "·", style: { background: "rgba(255,255,255,.03)", color: "#677790" }, key: "chart_normal_damage" },
+  { s: "½", style: { background: "rgba(239,68,68,.16)", color: "#f87171" }, key: "chart_not_effective" },
+  { s: "0", style: { background: "rgba(192,132,252,.18)", color: "#c084fc" }, key: "chart_no_effect" },
 ]
 
 export default function FullTypeChart() {
+  const t = useTranslations("pokedex")
   const [hover, setHover] = useState<{ axis: "atk" | "def"; type: string } | null>(null)
 
   return (
@@ -80,17 +82,17 @@ export default function FullTypeChart() {
       </div>
 
       <div className="bg-white/[0.02] border border-white/[0.05] rounded-[10px] p-[16px_18px] flex flex-col gap-2.5">
-        <h4 className="font-pk-mono text-[10px] tracking-[0.1em] uppercase text-pk-surface-500 mb-1">Leyenda</h4>
+        <h4 className="font-pk-mono text-[10px] tracking-[0.1em] uppercase text-pk-surface-500 mb-1">{t("chart_legend")}</h4>
         {LEGEND.map((r) => (
-          <div key={r.label} className="flex items-center gap-2.5 text-[12.5px] text-pk-surface-200">
+          <div key={r.key} className="flex items-center gap-2.5 text-[12.5px] text-pk-surface-200">
             <span className="w-6 h-6 rounded grid place-items-center font-pk-mono text-[10px] font-semibold" style={r.style}>
               {r.s}
             </span>
-            {r.label}
+            {t(r.key)}
           </div>
         ))}
         <div className="text-[11.5px] text-pk-surface-500 leading-[1.5] pt-3 border-t border-white/[0.05] mt-1">
-          Filas = atacante · Columnas = defensor. Pasa el cursor sobre una cabecera para destacar su fila/columna.
+          {t("chart_hint")}
         </div>
       </div>
     </div>

@@ -117,7 +117,7 @@ export function PlannerCompare({
       </div>
 
       {saved.length === 0 ? (
-        <Empty icon="bookmark" title={t("build_planner.compare.empty_title")} lead={t("build_planner.compare.empty_lead")} />
+        <Empty icon="bookmark" title={t("build_planner.compare.emptyTitle")} lead={t("build_planner.compare.emptyLead")} />
       ) : (
         <>
           <div>
@@ -170,7 +170,7 @@ export function PlannerCompare({
               })}
 
               <div className="flex items-center bg-panel px-3 py-2.5 font-mono text-[10px] leading-none font-bold uppercase tracking-[0.12em] text-txt-dim">
-                {t("build_planner.compare.top_skills")}
+                {t("build_planner.compare.topSkills")}
               </div>
               {cols.map((c) => (
                 <div key={c.key} className="flex flex-wrap content-start gap-1 bg-panel px-3 py-2.5">

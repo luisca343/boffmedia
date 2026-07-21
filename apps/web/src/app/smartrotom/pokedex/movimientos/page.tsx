@@ -29,13 +29,13 @@ export default function MovimientosPage() {
     <ScreenShell>
       <PageHead
         icon={ZapIcon}
-        eyebrow="Referencia"
-        title="Movimientos"
-        desc="Ordenados por popularidad. Busca por nombre y abre cualquier movimiento para ver poder, precisión, efecto y los Pokémon que lo aprenden."
+        eyebrow={t("movimientos_eyebrow")}
+        title={t("movimientos_title")}
+        desc={t("movimientos_desc")}
         meta={
           <>
-            <MetaStat label="Total" value={moves?.length ?? 0} />
-            <MetaStat label="Resultados" value={list.length} />
+            <MetaStat label={t("movimientos_total")} value={moves?.length ?? 0} />
+            <MetaStat label={t("movimientos_results")} value={list.length} />
           </>
         }
       />
@@ -45,7 +45,7 @@ export default function MovimientosPage() {
         <input
           value={q}
           onChange={(e) => setQ(e.target.value)}
-          placeholder="Buscar por nombre…"
+          placeholder={t("movimientos_search_placeholder")}
           className="w-full bg-white/[0.03] border border-white/[0.07] rounded-[10px] py-2.5 pr-3.5 pl-10 text-[13.5px] text-pk-surface-50 outline-none placeholder:text-pk-surface-500 focus:border-pk-primary-400/50 focus:bg-white/[0.05] focus:shadow-[0_0_0_3px_rgba(249,115,22,0.12)] transition-colors"
         />
       </div>
@@ -53,7 +53,7 @@ export default function MovimientosPage() {
       <div className="grid grid-cols-1 xl:grid-cols-[1fr_380px] gap-[18px] items-start">
         <div className="flex flex-col border border-white/[0.05] rounded-xl overflow-hidden bg-white/[0.012]">
           {isLoading ? (
-            <div className="p-8 text-center text-pk-surface-500 text-sm">Cargando movimientos…</div>
+            <div className="p-8 text-center text-pk-surface-500 text-sm">{t("movimientos_loading")}</div>
           ) : list.length ? (
             list.map((m) => {
               const active = activeKey === m.name
@@ -81,7 +81,7 @@ export default function MovimientosPage() {
               )
             })
           ) : (
-            <div className="p-[30px] text-center text-pk-surface-500 text-[13px]">No hay movimientos que coincidan con la búsqueda.</div>
+            <div className="p-[30px] text-center text-pk-surface-500 text-[13px]">{t("movimientos_no_results")}</div>
           )}
         </div>
 

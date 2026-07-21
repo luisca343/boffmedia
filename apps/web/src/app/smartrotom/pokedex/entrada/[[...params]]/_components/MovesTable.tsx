@@ -19,7 +19,7 @@ interface MoveEntry {
   source: string
 }
 
-const CATEGORY_LABELS: Record<string, string> = { physical: "Físico", special: "Especial", status: "Estado" }
+const CATEGORY_LABELS: Record<string, string> = { physical: "category_physical", special: "category_special", status: "category_status" }
 const CATEGORY_COLORS: Record<string, string> = { physical: "#fb923c", special: "#22d3ee", status: "#cdd7e3" }
 
 // entry-move-row / entry-moves-header column template (handoff).
@@ -90,13 +90,13 @@ export function UnifiedMovesTable({ pokemon, formIndex, moveData }: { pokemon: P
     return list
   }, [moveEntries, tab, query, typeFilter])
 
-  if (!moves) return <div className="text-pk-surface-300 text-center py-4">Movimientos no disponibles</div>
+  if (!moves) return <div className="text-pk-surface-300 text-center py-4">{t("moves_not_available")}</div>
 
   const TABS = [
-    { id: "level" as const, label: "Por nivel", count: counts.level },
-    { id: "mt" as const, label: "MT/MO", count: counts.mt },
-    { id: "egg" as const, label: "Huevo", count: counts.egg },
-    { id: "tutor" as const, label: "Tutor", count: counts.tutor },
+    { id: "level" as const, label: t("moves_by_level"), count: counts.level },
+    { id: "mt" as const, label: t("moves_tm_hm"), count: counts.mt },
+    { id: "egg" as const, label: t("moves_egg"), count: counts.egg },
+    { id: "tutor" as const, label: t("moves_tutor"), count: counts.tutor },
   ]
 
   return (
@@ -126,7 +126,7 @@ export function UnifiedMovesTable({ pokemon, formIndex, moveData }: { pokemon: P
           <SearchIcon className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-pk-surface-500" />
           <input
             type="search"
-            placeholder="Filtrar movimientos…"
+            placeholder={t("moves_filter_placeholder")}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             className="w-full bg-white/[0.03] border border-white/[0.07] rounded-[7px] text-pk-surface-100 text-[12.5px] px-2.5 py-1.5 pl-8 outline-none focus:border-pk-primary-400/50"
@@ -137,7 +137,7 @@ export function UnifiedMovesTable({ pokemon, formIndex, moveData }: { pokemon: P
           onChange={(e) => setTypeFilter(e.target.value)}
           className="bg-white/[0.03] border border-white/[0.07] rounded-[7px] text-pk-surface-100 text-[12.5px] px-2.5 py-1.5 outline-none focus:border-pk-primary-400/50"
         >
-          <option value="all">Cualquier tipo</option>
+          <option value="all">{t("moves_any_type")}</option>
           {availableTypes.map((type) => (
             <option key={type} value={type}>
               {t(`type_${type}` as any) || type}
@@ -149,14 +149,14 @@ export function UnifiedMovesTable({ pokemon, formIndex, moveData }: { pokemon: P
       <div className="overflow-x-auto">
         <div className="min-w-[680px]">
           <div className="grid gap-2.5 px-3 py-2 font-pk-mono text-[10px] tracking-[0.08em] uppercase text-pk-surface-500 border-b border-white/[0.05]" style={{ gridTemplateColumns: GRID }}>
-            <span>{tab === "level" ? "Nivel" : "Origen"}</span>
-            <span>Movimiento</span>
-            <span>Tipo</span>
-            <span>Categoría</span>
-            <span className="text-center">Pot.</span>
-            <span className="text-center">Pre.</span>
+            <span>{tab === "level" ? t("moves_level") : t("moves_origin")}</span>
+            <span>{t("moves_move")}</span>
+            <span>{t("moves_type")}</span>
+            <span>{t("moves_category")}</span>
+            <span className="text-center">{t("moves_pow")}</span>
+            <span className="text-center">{t("moves_acc")}</span>
             <span className="text-center">PP</span>
-            <span className="text-center">Detalles</span>
+            <span className="text-center">{t("moves_details")}</span>
           </div>
 
           {filteredMoves.length > 0 ? (
@@ -175,7 +175,7 @@ export function UnifiedMovesTable({ pokemon, formIndex, moveData }: { pokemon: P
                   <TypeChip type={move.type} size="sm" />
                 </span>
                 <span className="text-[11px] font-semibold uppercase tracking-[0.04em]" style={{ color: CATEGORY_COLORS[move.category] || "#cdd7e3" }}>
-                  {CATEGORY_LABELS[move.category] || move.category}
+                  {t(CATEGORY_LABELS[move.category]) || move.category}
                 </span>
                 <span className={`text-center font-pk-mono text-xs tabular-nums ${move.power >= 90 ? "text-pk-primary-300 font-semibold" : "text-pk-surface-300"}`}>
                   {move.power || "—"}
@@ -190,7 +190,7 @@ export function UnifiedMovesTable({ pokemon, formIndex, moveData }: { pokemon: P
               </Link>
             ))
           ) : (
-            <div className="py-[30px] text-center text-pk-surface-500">No hay movimientos con esos filtros.</div>
+            <div className="py-[30px] text-center text-pk-surface-500">{t("moves_no_results")}</div>
           )}
         </div>
       </div>

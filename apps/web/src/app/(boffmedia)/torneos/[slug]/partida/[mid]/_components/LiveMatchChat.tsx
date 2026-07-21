@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { Button, toast } from "@/components/boffmedia/primitives"
 import { useBoffSession } from "@/services/useBoffSession"
@@ -14,6 +15,7 @@ export function LiveMatchChat({
   detail: TnMatchDetailApi
   onChanged: () => void
 }) {
+  const t = useTranslations("torneos.chat")
   const { session } = useBoffSession()
   const meUserId = session?.user?.id ? Number(session.user.id) : null
   const [msgs, setMsgs] = React.useState<TnMatchMessageApi[]>([])
@@ -54,7 +56,7 @@ export function LiveMatchChat({
     const r = await TournamentsService.requestJudge(detail.tournamentId, detail.id)
     if (r.error) toast.error(r.error)
     else {
-      toast("Juez avisado")
+      toast(t("judgeToast"))
       onChanged()
       load()
     }
@@ -69,14 +71,14 @@ export function LiveMatchChat({
   return (
     <section className={TM_CARD}>
       <div className={TM_CARD_HEAD}>
-        <h3 className={TM_CARD_H3}>Chat de mesa</h3>
+        <h3 className={TM_CARD_H3}>{t("title")}</h3>
         <Button variant="default" size="sm" icon="alert" disabled={judgeRequested} onClick={judge} className={cn(!judgeRequested && "border-warn text-warn hover:border-warn hover:bg-warn hover:text-white")}>
-          {judgeRequested ? "Juez avisado" : "Solicitar juez"}
+          {judgeRequested ? t("judgeRequested") : t("requestJudge")}
         </Button>
       </div>
       <div ref={bodyRef} className="flex h-[320px] flex-col gap-2.5 overflow-y-auto bg-base p-4">
         {msgs.length === 0 && (
-          <p className="m-auto font-mono text-[11px] uppercase tracking-[0.08em] text-txt-dim">La mesa está abierta. ¡Buena suerte!</p>
+          <p className="m-auto font-mono text-[11px] uppercase tracking-[0.08em] text-txt-dim">{t("empty")}</p>
         )}
         {msgs.map((m) => {
           if (m.kind === "sys")
@@ -93,7 +95,7 @@ export function LiveMatchChat({
               <div className={cn("grid gap-[3px] border border-solid px-3 py-2", isMe ? "border-accent-line bg-accent-soft" : isJudge ? "border-[color:color-mix(in_srgb,var(--warn)_35%,transparent)] bg-warn-soft" : "border-line bg-panel-2")}>
                 <div className="flex items-baseline gap-2">
                   <b className={cn("font-mono text-[11px]/none font-bold", isMe ? "text-accent-bright" : isJudge ? "text-warn" : "text-txt")}>
-                    {isJudge ? `${m.authorName ?? "Staff"} · juez` : m.authorName ?? "Jugador"}
+                    {isJudge ? `${m.authorName ?? t("judgeFallback")} · ${t("judgeSuffix")}` : m.authorName ?? t("playerFallback")}
                   </b>
                   <i className="font-mono text-[10px]/none not-italic text-txt-dim">{hm(m.createdAt)}</i>
                 </div>
@@ -107,11 +109,11 @@ export function LiveMatchChat({
         <input
           className="min-w-0 flex-1 border border-solid border-line-2 bg-base px-3 py-2.5 font-body text-[13.5px]/[1.3] text-txt focus:border-accent-line focus:outline focus:outline-2 focus:outline-accent-line"
           value={input}
-          placeholder="Escribe un mensaje… (comparte tu ID de combate)"
+          placeholder={t("placeholder")}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => { if (e.key === "Enter") send() }}
         />
-        <Button variant="pri" size="sm" icon="arrow" onClick={send}>Enviar</Button>
+        <Button variant="pri" size="sm" icon="arrow" onClick={send}>{t("send")}</Button>
       </div>
     </section>
   )

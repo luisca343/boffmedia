@@ -1,4 +1,5 @@
 import type { ReactNode } from "react"
+import { useTranslations } from "next-intl"
 import { CardSkeleton, SectionHeader, StreamCard, type StreamCardData } from "@/components/smartrotom/media/ui"
 
 export function StreamSection({
@@ -16,6 +17,8 @@ export function StreamSection({
   loading?: boolean
   action?: ReactNode
 }) {
+  const t = useTranslations("twitch")
+
   return (
     <section className="mb-8">
       <SectionHeader eyebrow={eyebrow} title={title} subtitle={subtitle} rule={!subtitle} action={action} />
@@ -25,7 +28,7 @@ export function StreamSection({
           : streams.map((s) => <StreamCard key={s.href} s={s} />)}
       </div>
       {!loading && streams.length === 0 && (
-        <p className="py-12 text-center text-sm text-mw-fg-faint">No hay directos por aquí ahora mismo.</p>
+        <p className="py-12 text-center text-sm text-mw-fg-faint">{t("home.noLive")}</p>
       )}
     </section>
   )

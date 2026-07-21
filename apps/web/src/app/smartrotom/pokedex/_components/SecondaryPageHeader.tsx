@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { HubSidebar } from "./HubSidebar"
 
 export function SecondaryPageHeader({
@@ -15,6 +16,7 @@ export function SecondaryPageHeader({
   count?: number
   children?: React.ReactNode
 }) {
+  const t = useTranslations("pokedex")
   return (
     <div className="flex h-full">
       <HubSidebar />
@@ -33,7 +35,7 @@ export function SecondaryPageHeader({
           {count !== undefined && (
             <div className="flex flex-col gap-1.5 text-right text-xs text-pk-surface-400">
               <b className="font-pk-display font-bold text-xl text-pk-surface-50 tabular-nums">{count}</b>
-              <span>entradas</span>
+              <span>{t("secondary_entries")}</span>
             </div>
           )}
         </div>

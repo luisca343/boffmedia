@@ -15,21 +15,23 @@ export const TV3_ZONES: [number, number, number][] = [
 ]
 
 export const TV3_STOPS = [
-  { id: "tv-hero", n: "00", t: "Inicio" },
-  { id: "tv-cp1", n: "01", t: "Herramientas" },
-  { id: "tv-cp2", n: "02", t: "SmartRotom" },
-  { id: "tv-cp3", n: "03", t: "Torneos" },
-  { id: "tv-cp4", n: "04", t: "Juegos" },
-  { id: "tv-cp5", n: "05", t: "Comunidad" },
-  { id: "tv-meta", n: "06", t: "Meta" },
+  { id: "tv-hero", n: "00", t: "Inicio", tk: "hero" },
+  { id: "tv-cp1", n: "01", t: "Herramientas", tk: "tools" },
+  { id: "tv-cp2", n: "02", t: "SmartRotom", tk: "smartrotom" },
+  { id: "tv-cp3", n: "03", t: "Torneos", tk: "torneos" },
+  { id: "tv-cp4", n: "04", t: "Juegos", tk: "juegos" },
+  { id: "tv-cp5", n: "05", t: "Comunidad", tk: "comunidad" },
+  { id: "tv-meta", n: "06", t: "Meta", tk: "meta" },
 ]
 
 // Fallback for the landing HUD only — `TvHero` renders real site stats from
 // `useSiteStats` (GET /stats/site) and drops to these while the API loads or is
 // unavailable, so the hero stays visually stable.
+// NOTE: HUD labels are translated at render time in TvHero via useTranslations;
+// these values are only the numeric fallbacks shown while loading.
 export const TV3_HUD = [
-  { k: "Partida", big: "412", suf: "+", sub: "jugadores activos", live: true },
-  { k: "Temporada", big: "04", sub: "en emisión" },
+  { k: "Partida", big: "412", suf: "+", sub: "jugadores activos", live: true, tk: "hudFallbackGame" },
+  { k: "Temporada", big: "04", sub: "en emisión", tk: "hudFallbackSeason" },
 ]
 
 /** Real tool count across every hub game (drives the landing "utilidades" stat). */
@@ -41,41 +43,42 @@ interface Tv3Tool {
   d: string
   ic: IconName
   href: string
+  tk?: string
 }
 
 // Curated landing feature list — display copy (name/description/icon) is
 // landing-specific, but hrefs derive from the `@/data/games` registry (§10) so a
 // route change follows automatically instead of drifting here.
 export const TV3_TOOLS: Tv3Tool[] = [
-  { ix: "01", n: "BattleSim", d: "Simulador de combates dobles VGC con daño previsto.", ic: "sword", href: getToolHref("pokemon", "battlesim") },
-  { ix: "02", n: "Calculadora de daño", d: "Rangos VGC y singles al instante, con enlaces.", ic: "calc", href: getToolHref("pokemon", "damageCalc") },
-  { ix: "03", n: "VGC Tracker", d: "Registra partidas y analiza tu rendimiento.", ic: "chart", href: getToolHref("pokemon", "tracker") },
-  { ix: "04", n: "Análisis de Meta", d: "Uso, tendencias y detalle por especie del meta VGC.", ic: "trending", href: getToolHref("pokemon", "meta") },
-  { ix: "05", n: "Claves de Steam", d: "Catálogo de claves para sorteos y entregas.", ic: "key", href: getToolHref("otros", "keys") },
-  { ix: "06", n: "TCG Pocket", d: "Colección, sobres y combates del TCG Pocket.", ic: "cards", href: getToolHref("pokemon", "tcgPanel") },
+  { ix: "01", n: "BattleSim", d: "Simulador de combates dobles VGC con daño previsto.", ic: "sword", href: getToolHref("pokemon", "battlesim"), tk: "battlesim" },
+  { ix: "02", n: "Calculadora de daño", d: "Rangos VGC y singles al instante, con enlaces.", ic: "calc", href: getToolHref("pokemon", "damageCalc"), tk: "damageCalc" },
+  { ix: "03", n: "VGC Tracker", d: "Registra partidas y analiza tu rendimiento.", ic: "chart", href: getToolHref("pokemon", "tracker"), tk: "tracker" },
+  { ix: "04", n: "Análisis de Meta", d: "Uso, tendencias y detalle por especie del meta VGC.", ic: "trending", href: getToolHref("pokemon", "meta"), tk: "metaAnalysis" },
+  { ix: "05", n: "Claves de Steam", d: "Catálogo de claves para sorteos y entregas.", ic: "key", href: getToolHref("otros", "keys"), tk: "steamKeys" },
+  { ix: "06", n: "TCG Pocket", d: "Colección, sobres y combates del TCG Pocket.", ic: "cards", href: getToolHref("pokemon", "tcgPanel"), tk: "tcgPocket" },
 ]
 
 export const TV3_FEATS = ["Multiplataforma", "Pokédex viva", "Economía en vivo", "Mensajería"]
 
 // Fallback next-event only — `TvTorneos` shows the real next upcoming event
 // (useGetEvents) and drops to this while events load or if none are scheduled.
-export const TV3_EVENT = { title: "Torneo Regional — Wingull 2", date: "14 JUL 2026 · 18:00" }
+export const TV3_EVENT = { title: "Torneo Regional — Wingull 2", date: "14 JUL 2026 · 18:00", tk: "fallback" }
 export const TV3_EVENT_TS = new Date("2026-07-14T18:00:00").getTime()
 
 // TV3_GAMES stays editorial (no games-showcase API). TV3_FEED below is only the
 // fallback for `TvComunidad`'s activity ticker, which renders real activity from
 // `useSiteActivity` (GET /activity) when available.
 export const TV3_GAMES = [
-  { n: "Pixelmon Wingull 2", d: "La aventura Pokémon definitiva dentro de Minecraft.", tag: "Insignia — Temporada 04", img: "/assets/img/personajes.webp" },
-  { n: "Minecraft Bingo", d: "Carreras de objetivos por equipos, ediciones rápidas.", tag: "Competitivo — Semanal", ph: "Minecraft Bingo" },
-  { n: "Project ZomBOFF", d: "Supervivencia cooperativa en un mundo infectado.", tag: "Survival — Noches especiales", ph: "Project ZomBOFF" },
+  { n: "Pixelmon Wingull 2", d: "La aventura Pokémon definitiva dentro de Minecraft.", tag: "Insignia — Temporada 04", img: "/assets/img/personajes.webp", tk: "wingull" },
+  { n: "Minecraft Bingo", d: "Carreras de objetivos por equipos, ediciones rápidas.", tag: "Competitivo — Semanal", ph: "Minecraft Bingo", tk: "bingo" },
+  { n: "Project ZomBOFF", d: "Supervivencia cooperativa en un mundo infectado.", tag: "Survival — Noches especiales", ph: "Project ZomBOFF", tk: "zomboff" },
 ]
 
 export const TV3_FEED = [
-  { k: "win", t: "AxelCraft ganó un combate ranked", ln: "border-l-ok", tp: "bg-ok" },
-  { k: "gift", t: "Key entregada a NovaPixel en el sorteo", ln: "border-l-warn", tp: "bg-warn" },
-  { k: "join", t: "Kira_07 se unió al Equipo Volt", ln: "border-l-signal", tp: "bg-signal" },
-  { k: "win", t: "MintLeaf entró al top 5 de la temporada", ln: "border-l-ok", tp: "bg-ok" },
+  { k: "win", t: "AxelCraft ganó un combate ranked", ln: "border-l-ok", tp: "bg-ok", tk: "feedWin1" },
+  { k: "gift", t: "Key entregada a NovaPixel en el sorteo", ln: "border-l-warn", tp: "bg-warn", tk: "feedGift1" },
+  { k: "join", t: "Kira_07 se unió al Equipo Volt", ln: "border-l-signal", tp: "bg-signal", tk: "feedJoin1" },
+  { k: "win", t: "MintLeaf entró al top 5 de la temporada", ln: "border-l-ok", tp: "bg-ok", tk: "feedWin2" },
 ]
 
 export const DISCORD = "https://discord.gg/TWqjNHQz7d"

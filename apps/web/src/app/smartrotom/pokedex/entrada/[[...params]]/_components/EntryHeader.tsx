@@ -14,13 +14,13 @@ import { TYPE_COLORS } from "../../../_utils/typeColors"
 
 // Section ids match the scroll-spy targets rendered by page.tsx.
 const TABS = [
-  { id: "info", label: "Info" },
-  { id: "evo", label: "Evolución" },
-  { id: "stats", label: "Estadísticas" },
-  { id: "effect", label: "Efectividades" },
-  { id: "spawns", label: "Spawns" },
-  { id: "moves", label: "Movimientos" },
-  { id: "variants", label: "Variantes" },
+  { id: "info", label: "tab_info" },
+  { id: "evo", label: "tab_evolution" },
+  { id: "stats", label: "tab_stats" },
+  { id: "effect", label: "tab_effectiveness" },
+  { id: "spawns", label: "tab_spawns" },
+  { id: "moves", label: "tab_moves" },
+  { id: "variants", label: "tab_variants" },
 ]
 
 export function EntryHeader({
@@ -150,7 +150,7 @@ export function EntryHeader({
                     className="w-1.5 h-1.5 rounded-full"
                     style={{ background: isActive ? "#fb923c" : "#4a576e", boxShadow: isActive ? "0 0 6px #fb923c" : "none" }}
                   />
-                  {tab.label}
+                  {t(tab.label)}
                   {isActive && (
                     <span className="absolute left-3.5 right-3.5 -bottom-px h-[2px] rounded-full" style={{ background: "#fb923c", boxShadow: "0 0 8px #fb923c" }} />
                   )}

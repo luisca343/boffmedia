@@ -2,6 +2,7 @@
 
 import Link from "next/link"
 import { use, useState } from "react"
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { Button, Field, Input, Modal, toast, Icon, Spinner } from "@/components/boffmedia/primitives"
 import { TnFormatBadge, TnEntrant, TnPodium } from "@/components/boffmedia/ui/tournaments"
@@ -13,14 +14,6 @@ import {
 import { TorneoView } from "../_components/TorneoView"
 import { RegisterButton } from "../_components/RegisterButton"
 import * as A from "../_lib/adapt"
-
-const STATUS_LABEL: Record<string, string> = {
-  draft: "Borrador",
-  registration: "Inscripción abierta",
-  live: "En directo",
-  completed: "Finalizado",
-  cancelled: "Cancelado",
-}
 
 const STATUS_TONE: Record<string, string> = {
   live: "text-accent-bright border-accent-line",
@@ -42,8 +35,9 @@ export default function TorneoPage({
 }: {
   params: Promise<{ slug: string }>
 }) {
+  const t = useTranslations("torneos")
   const { slug } = use(params)
-  const { tournament: t, isLoading, refetch } = useTournament(slug)
+  const { tournament: tn, isLoading, refetch } = useTournament(slug)
 
   if (isLoading) {
     return (
@@ -52,51 +46,53 @@ export default function TorneoPage({
       </div>
     )
   }
-  if (!t) {
+  if (!tn) {
     return (
       <main className="wrap py-24 text-center">
-        <p className="font-display text-[22px] font-bold uppercase">Torneo no encontrado</p>
+        <p className="font-display text-[22px] font-bold uppercase">{t("detail.notFound")}</p>
         <Button href="/torneos" size="sm" className="mt-4">
-          Volver a torneos
+          {t("detail.backToList")}
         </Button>
       </main>
     )
   }
 
-  const start = formatDate(t.startDate)
-  const end = formatDate(t.endDate)
-  const preStart = t.status === "registration" || t.status === "draft"
+  const start = formatDate(tn.startDate)
+  const end = formatDate(tn.endDate)
+  const preStart = tn.status === "registration" || tn.status === "draft"
 
   return (
     <main className="wrap py-10">
-      {t.banner && (
+      {tn.banner && (
         <div className="mb-6 aspect-[3/1] w-full overflow-hidden border border-solid border-line bg-panel">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={t.banner} alt="" className="h-full w-full object-cover" />
+          <img src={tn.banner} alt="" className="h-full w-full object-cover" />
         </div>
       )}
 
       <header className="mb-7 grid gap-3">
         <div className="flex items-center gap-2">
           <span className="font-mono text-[11px] font-semibold uppercase tracking-[0.14em] text-txt-dim">
-            Torneo
+            {t("detail.section")}
           </span>
           <span
             className={cn(
               "inline-flex items-center border border-solid px-2 py-[3px] font-mono text-[10px] font-semibold uppercase tracking-[0.08em] cut [--cut:4px]",
-              STATUS_TONE[t.status] ?? "text-txt-dim border-line",
+              STATUS_TONE[tn.status] ?? "text-txt-dim border-line",
             )}
           >
-            {STATUS_LABEL[t.status] ?? t.status}
+            {t(`status.${tn.status}`)}
           </span>
         </div>
-        <h1 className="text-[clamp(30px,5vw,48px)]">{t.name}</h1>
+        <h1 className="text-[clamp(30px,5vw,48px)]">{tn.name}</h1>
         <div className="flex flex-wrap items-center gap-x-4 gap-y-2 font-mono text-[11.5px] text-txt-muted">
-          <TnFormatBadge format={t.format} />
-          {t.gameTitle && <span>{t.gameTitle}</span>}
+          <TnFormatBadge format={tn.format} />
+          {tn.gameTitle && <span>{tn.gameTitle}</span>}
           <span>
-            {t.participants.length}
-            {t.maxParticipants ? `/${t.maxParticipants}` : ""} participantes
+            {t("detail.participants", {
+              count: tn.participants.length,
+              max: tn.maxParticipants ? `/${tn.maxParticipants}` : "",
+            })}
           </span>
           {(start || end) && (
             <span>
@@ -105,43 +101,44 @@ export default function TorneoPage({
               {end}
             </span>
           )}
-          {t.status === "registration" && start && (
-            <span className="text-ok">Inscripción hasta el {start}</span>
+          {tn.status === "registration" && start && (
+            <span className="text-ok">{t("detail.registrationDeadline", { date: start })}</span>
           )}
-          {t.champion && (
-            <span className="font-semibold text-accent-bright">🏆 {t.champion.name}</span>
+          {tn.champion && (
+            <span className="font-semibold text-accent-bright">🏆 {tn.champion.name}</span>
           )}
         </div>
-        {t.description && (
+        {tn.description && (
           <p className="max-w-2xl font-body text-[14px] leading-[1.55] text-txt-muted">
-            {t.description}
+            {tn.description}
           </p>
         )}
         <div className="flex flex-wrap items-center gap-2">
-          <RegisterButton detail={t} onChange={refetch} />
-          <CheckInButton detail={t} onChange={refetch} />
-          <SubmitScoreButton detail={t} onChange={refetch} />
+          <RegisterButton detail={tn} onChange={refetch} />
+          <CheckInButton detail={tn} onChange={refetch} />
+          <SubmitScoreButton detail={tn} onChange={refetch} />
         </div>
       </header>
 
-      <MyMatchBanner detail={t} />
+      <MyMatchBanner detail={tn} />
 
-      {t.rules && <FoldBlock title="Reglas" body={t.rules} />}
-      {t.prizes && <FoldBlock title="Premios" body={t.prizes} open />}
+      {tn.rules && <FoldBlock title={t("detail.rulesTitle")} body={tn.rules} />}
+      {tn.prizes && <FoldBlock title={t("detail.prizesTitle")} body={tn.prizes} open />}
 
-      {t.status === "completed" && t.podium.length > 0 && (
+      {tn.status === "completed" && tn.podium.length > 0 && (
         <div className="mb-8">
-          <TnPodium podium={t.podium.map((p) => A.comp(p)!)} />
+          <TnPodium podium={tn.podium.map((p) => A.comp(p)!)} />
         </div>
       )}
 
-      {preStart ? <RegistrationRoster detail={t} /> : <TorneoView detail={t} />}
+      {preStart ? <RegistrationRoster detail={tn} /> : <TorneoView detail={tn} />}
     </main>
   )
 }
 
 /** Link the signed-in participant straight to their playable match. */
 function MyMatchBanner({ detail }: { detail: TournamentDetailApi }) {
+  const t = useTranslations("torneos.detail")
   if (detail.myMatchId == null) return null
   return (
     <Link
@@ -150,10 +147,10 @@ function MyMatchBanner({ detail }: { detail: TournamentDetailApi }) {
     >
       <Icon name="zap" size={16} className="flex-none text-accent-bright" />
       <span className="flex-1 font-body text-[14px] font-semibold text-txt">
-        Tu partida está lista — entra a la mesa para jugar y reportar el resultado.
+        {t("myMatchBanner")}
       </span>
       <span className="font-mono text-[11px] font-semibold uppercase tracking-[0.08em] text-accent-bright">
-        Ir a mi partida →
+        {t("myMatchCta")}
       </span>
     </Link>
   )
@@ -167,6 +164,7 @@ function CheckInButton({
   detail: TournamentDetailApi
   onChange: () => void
 }) {
+  const t = useTranslations("torneos.checkin")
   const [busy, setBusy] = useState(false)
   if (!detail.checkInOpen || detail.viewerParticipantId == null) return null
   const me = detail.participants.find((p) => p.id === detail.viewerParticipantId)
@@ -180,14 +178,14 @@ function CheckInButton({
     setBusy(false)
     if (r.error) toast.error(r.error)
     else {
-      toast.success(checkedIn ? "Check-in anulado" : "¡Check-in hecho!")
+      toast.success(checkedIn ? t("toastUndo") : t("toastDone"))
       onChange()
     }
   }
 
   return (
     <Button size="sm" variant={checkedIn ? "default" : "pri"} icon="check" disabled={busy} onClick={toggle}>
-      {checkedIn ? "✓ Presente — anular" : "Hacer check-in"}
+      {checkedIn ? t("undoCheckin") : t("doCheckin")}
     </Button>
   )
 }
@@ -200,6 +198,7 @@ function SubmitScoreButton({
   detail: TournamentDetailApi
   onChange: () => void
 }) {
+  const t = useTranslations("torneos.score")
   const [open, setOpen] = useState(false)
   const [score, setScore] = useState<number | "">("")
   const [meta, setMeta] = useState("")
@@ -212,7 +211,7 @@ function SubmitScoreButton({
   if (!eligible) return null
 
   const submit = async () => {
-    if (score === "") return toast.error("Introduce tu marca")
+    if (score === "") return toast.error(t("validationRequired"))
     setBusy(true)
     const r = await TournamentsService.submitScore(detail.id, {
       score,
@@ -221,7 +220,7 @@ function SubmitScoreButton({
     setBusy(false)
     if (r.error) toast.error(r.error)
     else {
-      toast.success("Marca enviada — pendiente de verificación")
+      toast.success(t("toastOk"))
       setOpen(false)
       setScore("")
       setMeta("")
@@ -232,21 +231,21 @@ function SubmitScoreButton({
   return (
     <>
       <Button size="sm" variant="pri" icon="chart" onClick={() => setOpen(true)}>
-        Enviar marca
+        {t("submitBtn")}
       </Button>
       <Modal
         open={open}
         onClose={() => setOpen(false)}
-        title="Enviar marca"
+        title={t("modalTitle")}
         footer={
           <div className="flex justify-end gap-2">
-            <Button size="sm" onClick={() => setOpen(false)}>Cancelar</Button>
-            <Button variant="pri" size="sm" disabled={busy} onClick={submit}>Enviar</Button>
+            <Button size="sm" onClick={() => setOpen(false)}>{t("cancel")}</Button>
+            <Button variant="pri" size="sm" disabled={busy} onClick={submit}>{t("submit")}</Button>
           </div>
         }
       >
         <div className="grid gap-3">
-          <Field label={`Marca${detail.unit ? ` (${detail.unit})` : ""}`}>
+          <Field label={detail.unit ? t("fieldLabelWithUnit", { unit: detail.unit }) : t("fieldLabel")}>
             <Input
               type="number"
               min={0}
@@ -254,11 +253,11 @@ function SubmitScoreButton({
               onChange={(e) => setScore(e.target.value === "" ? "" : Math.max(0, +e.target.value))}
             />
           </Field>
-          <Field label="Evidencia (clip, captura… — opcional)">
-            <Input value={meta} onChange={(e) => setMeta(e.target.value)} placeholder="https://…" />
+          <Field label={t("evidenceLabel")}>
+            <Input value={meta} onChange={(e) => setMeta(e.target.value)} placeholder={t("evidencePlaceholder")} />
           </Field>
           <p className="font-mono text-[10.5px] leading-[1.5] text-txt-dim">
-            Cada envío sustituye tu marca anterior y queda pendiente de verificación por un admin.
+            {t("note")}
           </p>
         </div>
       </Modal>
@@ -282,11 +281,12 @@ function FoldBlock({ title, body, open }: { title: string; body: string; open?: 
 
 /** Registration/draft: no bracket yet, so show who has signed up so far. */
 function RegistrationRoster({ detail }: { detail: TournamentDetailApi }) {
+  const t = useTranslations("torneos.detail")
   if (detail.participants.length === 0) {
     return (
       <div className="border border-dashed border-line-2 bg-panel px-6 py-16 text-center">
         <p className="font-mono text-[12px] uppercase tracking-[0.08em] text-txt-dim">
-          Aún no hay inscritos. ¡Sé el primero!
+          {t("rosterEmpty")}
         </p>
       </div>
     )
@@ -294,7 +294,7 @@ function RegistrationRoster({ detail }: { detail: TournamentDetailApi }) {
   return (
     <section className="grid gap-3">
       <h2 className="font-mono text-[11px] font-semibold uppercase tracking-[0.1em] text-txt-dim">
-        Inscritos · {detail.participants.length}
+        {t("rosterTitle", { count: detail.participants.length })}
       </h2>
       <div className="grid gap-1.5 sm:grid-cols-2 lg:grid-cols-3">
         {detail.participants.map((p) => (

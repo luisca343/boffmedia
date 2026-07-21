@@ -1,7 +1,7 @@
 "use client"
 
 import { useRouter } from "next/navigation"
-import { useLocale } from "next-intl"
+import { useLocale, useTranslations } from "next-intl"
 import { useTransition } from "react"
 import { Globe } from "lucide-react"
 
@@ -13,6 +13,7 @@ export default function LanguageSwitcher({ variant = "default" }: LanguageSwitch
   const locale = useLocale()
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
+  const t = useTranslations("smartrotom.languageSwitcher")
 
   const locales = [
     { code: 'es', label: 'ES', fullLabel: 'Español' },
@@ -34,7 +35,7 @@ export default function LanguageSwitcher({ variant = "default" }: LanguageSwitch
       <div className="pb-2 mb-2" style={{ borderBottom: "var(--hairline) solid var(--border)" }}>
         <div className="flex items-center gap-3">
           <Globe size={20} className={isPending ? "text-[var(--orange-500)] animate-spin" : "text-ink-dim"} />
-          <span className="text-ink-muted">Idioma:</span>
+          <span className="text-ink-muted">{t("label")}</span>
           {locales.map((loc) => (
             <button
               key={loc.code}

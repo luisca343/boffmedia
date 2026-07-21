@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useMemo } from "react"
 import { useRouter } from "next/navigation"
+import { useTranslations } from "next-intl"
 import { SearchIcon, ZapIcon, FilterIcon, SettingsIcon } from "lucide-react"
 import { TypeChip, StatusPill } from "./ui"
 import { usePokemonStore } from "@/stores/pokemonStore"
@@ -11,6 +12,7 @@ import Image from "next/image"
 import { getSpriteUrl } from "@/utils/spriteUtils"
 
 export function HubTopbar() {
+  const t = useTranslations("pokedex")
   const router = useRouter()
   const [query, setQuery] = useState("")
   const [active, setActive] = useState(0)
@@ -71,7 +73,7 @@ export function HubTopbar() {
           ref={inputRef}
           type="search"
           className="w-full bg-white/[0.04] border border-white/[0.08] rounded-[10px] py-[11px] pr-3 pl-[42px] text-sm text-pk-surface-50 font-pk outline-none placeholder:text-pk-surface-500 focus:border-pk-primary-400/50 focus:bg-white/[0.06] focus:shadow-[0_0_0_3px_rgba(249,115,22,0.15)] transition-colors"
-          placeholder="Buscar Pokémon, movimiento, habilidad…"
+          placeholder={t("topbar_search_placeholder")}
           value={query}
           onChange={(e) => {
             setQuery(e.target.value)
@@ -80,7 +82,7 @@ export function HubTopbar() {
           onFocus={() => setOpen(true)}
           onBlur={() => setTimeout(() => setOpen(false), 150)}
           onKeyDown={onKeyDown}
-          aria-label="Buscar Pokémon, movimiento, habilidad"
+          aria-label={t("topbar_search_aria")}
           role="combobox"
           aria-autocomplete="list"
           aria-expanded={open && results.length > 0}
@@ -136,9 +138,9 @@ export function HubTopbar() {
               )
             })}
             <div className="flex justify-between px-3.5 py-2 border-t border-white/[0.05] text-[11px] text-pk-surface-500 font-pk-mono">
-              <span>↑↓ Navegar · ↵ Abrir</span>
+              <span>↑↓ {t("topbar_navigate")} · ↵ {t("topbar_open")}</span>
               <span>
-                {results.length} resultado{results.length === 1 ? "" : "s"}
+                {results.length} {results.length === 1 ? t("topbar_result_one") : t("topbar_result_other")}
               </span>
             </div>
           </div>

@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { Button, CountUp } from "@/components/boffmedia/primitives"
 import { Decode } from "../travesia-fx"
@@ -11,6 +12,7 @@ import { useGetEvents } from "@/hooks/events/useGetEvents"
 import type { EventLike } from "@/components/boffmedia/ui/events"
 
 export function TvTorneos() {
+  const t = useTranslations("boffmedia.landing.torneos")
   const { events } = useGetEvents()
   // Real next upcoming event feeds the header + countdown; falls back to the
   // editorial placeholder while events load or if none are scheduled.
@@ -38,9 +40,9 @@ export function TvTorneos() {
       id="tv-cp3"
       n="03"
       side="l"
-      kick={<Decode text="Parada 03 · Competición" />}
-      title="Torneos cada <em>semana</em>"
-      lead="Brackets en directo, ranking por temporada y una gran final regional con 96 plazas. La gloria se gana en el servidor."
+      kick={<Decode text={t("kick")} />}
+      title={t("title")}
+      lead={t("lead")}
     >
       <div
         data-glare
@@ -53,7 +55,7 @@ export function TvTorneos() {
         <div className="flex items-center justify-between gap-3.5 border-b border-solid border-line px-[18px] py-3.5 font-mono text-[11px] font-semibold uppercase leading-none tracking-[0.08em] text-[#9aa3b2]">
           <span className="inline-flex items-center gap-[7px] text-[#ff4d5e]">
             <i className="h-1.5 w-1.5 rounded-full bg-[#ff4d5e] animate-[lv4-blink_1.3s_infinite] motion-reduce:animate-none" />
-            Gran final · Bo3
+            {t("finalLabel")}
           </span>
           <span className="min-w-0 truncate">{title}</span>
         </div>
@@ -62,8 +64,8 @@ export function TvTorneos() {
             <span className="grid h-[50px] w-[50px] place-items-center bg-accent font-display text-[22px] font-extrabold not-italic leading-none text-accent-ink shadow-[0_0_22px_rgba(255,92,10,0.45)] cut-tag [--cut-tag:10px]">
               V
             </span>
-            <b className="font-display text-[16px] font-bold uppercase leading-none">Equipo Volt</b>
-            <small className="font-mono text-[10px] font-medium uppercase leading-none tracking-[0.08em] text-[#5f6774]">Semilla #1</small>
+            <b className="font-display text-[16px] font-bold uppercase leading-none">{t("team1Name")}</b>
+            <small className="font-mono text-[10px] font-medium uppercase leading-none tracking-[0.08em] text-[#5f6774]">{t("team1Seed")}</small>
           </div>
           <div className="grid justify-items-center gap-1.5">
             <span className="font-display text-[44px] font-extrabold leading-none tabular-nums [text-shadow:0_0_26px_rgba(255,92,10,0.35)]">
@@ -72,28 +74,28 @@ export function TvTorneos() {
               </b>
               –<CountUp value="1" />
             </span>
-            <small className="font-mono text-[10px] font-medium uppercase leading-none tracking-[0.08em] text-[#9aa3b2]">Mapa 4 · En juego</small>
+            <small className="font-mono text-[10px] font-medium uppercase leading-none tracking-[0.08em] text-[#9aa3b2]">{t("mapInGame")}</small>
           </div>
           <div className="grid justify-items-center gap-1.5 text-center">
             <span className="grid h-[50px] w-[50px] place-items-center bg-signal font-display text-[22px] font-extrabold not-italic leading-none text-accent-ink shadow-[0_0_22px_rgba(77,163,255,0.45)] cut-tag [--cut-tag:10px]">
               A
             </span>
-            <b className="font-display text-[16px] font-bold uppercase leading-none">Equipo Aqua</b>
-            <small className="font-mono text-[10px] font-medium uppercase leading-none tracking-[0.08em] text-[#5f6774]">Semilla #2</small>
+            <b className="font-display text-[16px] font-bold uppercase leading-none">{t("team2Name")}</b>
+            <small className="font-mono text-[10px] font-medium uppercase leading-none tracking-[0.08em] text-[#5f6774]">{t("team2Seed")}</small>
           </div>
         </div>
         <div className="flex flex-wrap items-center justify-between gap-3.5 border-t border-solid border-line px-5 py-4">
           <span className="font-mono text-[10px] font-semibold uppercase leading-none tracking-[0.1em] text-[#5f6774]">
-            Próxima emisión · {dateStr}
+            {t("nextBroadcast")} {dateStr}
           </span>
           <TvCountdown compact to={eventTs} />
         </div>
       </div>
       <div className={CTA_ROW}>
         <Button variant="pri" iconRight="arrow" href="/torneos" className={PRI_GLOW}>
-          Ver torneos
+          {t("ctaTournaments")}
         </Button>
-        <Button href="/clasificacion">Ver ranking</Button>
+        <Button href="/clasificacion">{t("ctaRanking")}</Button>
       </div>
     </TvCP>
   )
