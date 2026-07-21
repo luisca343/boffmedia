@@ -24,7 +24,11 @@ export interface DocumentApi extends ReleasableApi {
 }
 
 export interface EnvironmentApi extends ReleasableApi {
-  scanInstance(
+  /**
+   * Optional: a vanilla-only tool (the viewer) never scans a real install, so
+   * its worker omits this method and the hook's scan path becomes a no-op.
+   */
+  scanInstance?(
     gameId: GameId,
     files: File[],
     onProgress: ProgressCb,
