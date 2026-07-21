@@ -16,7 +16,7 @@ export interface LootInfoModalProps {
 
 /** Every figure below is the item's weight over the box's total — no house numbers. */
 export function LootInfoModal({ open, onClose, box }: LootInfoModalProps) {
-  const t = useTranslations("")
+  const t = useTranslations("arcade")
 
   const groups = useMemo(() => {
     const items = box?.items ?? []

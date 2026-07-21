@@ -19,7 +19,7 @@ const STATUS_SKIN: Record<TypeStatus, string> = {
 
 /** What every guess so far has proved about the hidden creature's types. */
 export function TypeTracker({ types, statuses, isDoubleType }: TypeTrackerProps) {
-  const t = useTranslations("")
+  const t = useTranslations("arcade")
 
   return (
     <Panel tone="void" tight>

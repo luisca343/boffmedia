@@ -90,7 +90,7 @@ function ClaimRow({
 }
 
 export function ClaimModal({ open, onClose, items }: ClaimModalProps) {
-  const t = useTranslations("")
+  const t = useTranslations("arcade")
   const claim = useClaimItems()
   const [selected, setSelected] = useState<number[]>([])
   const [inGame, setInGame] = useState(true)

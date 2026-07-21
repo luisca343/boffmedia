@@ -49,7 +49,7 @@ const TITLE_ACCENT: Record<string, ArAccent> = {
 }
 
 export default function LootPage() {
-  const t = useTranslations("")
+  const t = useTranslations("arcade")
   const uuid = useArcadeUuid()
   const config = useLootboxConfig()
   const inventory = useArcadeInventory()
