@@ -30,7 +30,7 @@ export function GuessInput({
   attempt,
   disabled,
 }: GuessInputProps) {
-  const t = useTranslations("")
+  const t = useTranslations("arcade")
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault()
     onSubmit()

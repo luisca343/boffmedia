@@ -8,7 +8,7 @@ import { Corners, Icon, Panel } from "./ui"
 
 /** "You have N unopened boxes" — the hub's route into the loot flow. */
 export function InventoryBanner() {
-  const t = useTranslations("")
+  const t = useTranslations("arcade")
   const inventory = useArcadeInventory()
   const config = useLootboxConfig()
 

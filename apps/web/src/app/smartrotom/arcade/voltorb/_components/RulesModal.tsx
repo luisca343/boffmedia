@@ -23,7 +23,7 @@ function Section({ title, children }: { title: string; children: ReactNode }) {
 const LIST = "ml-4 list-disc space-y-1.5 marker:text-ar-cyan"
 
 export function RulesModal({ isOpen, onClose }: RulesModalProps) {
-  const t = useTranslations("")
+  const t = useTranslations("arcade")
 
   return (
     <Modal

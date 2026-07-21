@@ -9,7 +9,7 @@ import { SectionTitle } from "./ui"
 
 /** The cabinet grid, filterable by category. */
 export function GameLibrary() {
-  const t = useTranslations("")
+  const t = useTranslations("arcade")
   const [category, setCategory] = useState(GAME_CATEGORY_KEYS[0])
   const shown = category === GAME_CATEGORY_KEYS[0] ? GAMES : GAMES.filter((g) => g.categoryKey === category)
 

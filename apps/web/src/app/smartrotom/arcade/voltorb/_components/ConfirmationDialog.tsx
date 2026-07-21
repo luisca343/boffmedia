@@ -30,7 +30,7 @@ export default function ConfirmationDialog({
   cancelKey,
   variant,
 }: ConfirmationDialogProps) {
-  const t = useTranslations("")
+  const t = useTranslations("arcade")
   const skin = VARIANT[variant]
   return (
     <Modal

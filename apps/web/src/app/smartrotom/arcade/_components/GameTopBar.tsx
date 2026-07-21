@@ -51,7 +51,7 @@ const ACCENT: Record<GameAccent, { bar: string; back: string }> = {
  * endpoint, so it is not rendered (docs/smartrotom/deferred/arcade.md).
  */
 export function GameTopBar({ title, accent = "cyan", onHelp, onReset, actions }: GameTopBarProps) {
-  const t = useTranslations("")
+  const t = useTranslations("arcade")
   const skin = ACCENT[accent]
 
   return (

@@ -33,7 +33,7 @@ const BADGE: Record<ArTone, string> = {
 
 /** The three-up box stage: the picked box centred, its neighbours dimmed either side. */
 export function BoxCarousel({ boxes, index, onIndex, owned }: BoxCarouselProps) {
-  const t = useTranslations("")
+  const t = useTranslations("arcade")
   if (boxes.length === 0) return null
 
   const step = (delta: number) => onIndex((index + delta + boxes.length) % boxes.length)

@@ -60,7 +60,7 @@ export function DayTile({
   state: DayState
   size?: "sm" | "lg"
 }) {
-  const t = useTranslations("")
+  const t = useTranslations("arcade")
   const view = rewardView(reward, t, size === "lg" ? 44 : 32)
   const tone = rewardTone(reward)
   const isToday = state === "today"
@@ -134,7 +134,7 @@ export const dayState = (day: number, currentDay: number, claimedToday: boolean)
 
 /** The compact 7-day rail on the hub. The full view lives at /arcade/racha. */
 export function StreakRail() {
-  const t = useTranslations("")
+  const t = useTranslations("arcade")
   const streak = useArcadeStreak()
   const banner = useRewardsBanner()
   const claim = useClaimDailyReward()

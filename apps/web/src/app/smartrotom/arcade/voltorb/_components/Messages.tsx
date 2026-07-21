@@ -21,7 +21,7 @@ export default function Messages({
   onQuit,
   lostCoins,
 }: MessagesProps) {
-  const t = useTranslations("")
+  const t = useTranslations("arcade")
 
   if (gameOver) {
     return (

@@ -19,7 +19,7 @@ export interface ReelSpinnerProps {
 }
 
 export function ReelSpinner({ tiles, winningPosition, onRevealed }: ReelSpinnerProps) {
-  const t = useTranslations("")
+  const t = useTranslations("arcade")
   const { sound } = useArcadePrefs()
 
   const spin = useReelSpin({

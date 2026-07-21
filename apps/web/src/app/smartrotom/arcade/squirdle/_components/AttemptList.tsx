@@ -11,7 +11,7 @@ export interface AttemptListProps {
 
 /** The comparison grid — every guess so far, newest last. */
 export function AttemptList({ guesses, target, gameOver, nameOf }: AttemptListProps) {
-  const t = useTranslations("")
+  const t = useTranslations("arcade")
 
   if (guesses.length === 0) {
     return (

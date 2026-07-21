@@ -11,7 +11,7 @@ export interface ResultPanelProps {
 
 /** The verdict. Only the outcome states are celebratory — an invalid name is not. */
 export function ResultPanel({ message, won, gameOver, onReset }: ResultPanelProps) {
-  const t = useTranslations("")
+  const t = useTranslations("arcade")
   if (!message) return null
 
   return (

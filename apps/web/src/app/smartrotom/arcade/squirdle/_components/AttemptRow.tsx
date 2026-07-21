@@ -16,7 +16,7 @@ export interface AttemptRowProps {
 
 /** One guess: its creature, then a verdict per comparable attribute. */
 export function AttemptRow({ guess, target, name, revealed }: AttemptRowProps) {
-  const t = useTranslations("")
+  const t = useTranslations("arcade")
   const tone = toneForType(guess.type1)
 
   return (

@@ -30,7 +30,7 @@ export default function MemoPanel({
   onToggleMemoMode,
   onSelectMark,
 }: MemoPanelProps) {
-  const t = useTranslations("")
+  const t = useTranslations("arcade")
   return (
     <Panel tone="void" tight>
       <div className="mb-2.5 flex items-center justify-between gap-2">

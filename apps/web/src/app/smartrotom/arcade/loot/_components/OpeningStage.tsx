@@ -49,7 +49,7 @@ export function OpeningStage({
   onOpenAnother,
   onBack,
 }: OpeningStageProps) {
-  const t = useTranslations("")
+  const t = useTranslations("arcade")
   const [settled, setSettled] = useState(false)
   const [celebration, setCelebration] = useState<ArCelebrationReward | null>(null)
 

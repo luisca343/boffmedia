@@ -28,7 +28,7 @@ import {
 } from "../_components/ui"
 
 export default function RachaPage() {
-  const t = useTranslations("")
+  const t = useTranslations("arcade")
   const streak = useArcadeStreak()
   const banner = useRewardsBanner()
   const inventory = useArcadeInventory()
