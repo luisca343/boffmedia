@@ -57,7 +57,29 @@ export function ModalShell({
 }: ModalShellProps) {
   const panel = useRef<HTMLDivElement>(null)
   const [mounted, setMounted] = useState(false)
-  useEffect(() => setMounted(true), [])
+  const containerRef = useRef<HTMLDivElement | null>(null)
+
+  // Create a stable container for the portal
+  useEffect(() => {
+    if (!containerRef.current) {
+      containerRef.current = document.createElement("div")
+      containerRef.current.setAttribute("data-modal-portal", "")
+    }
+    const container = containerRef.current
+    document.body.appendChild(container)
+    setMounted(true)
+    
+    return () => {
+      // Use try-catch to handle cases where the node might already be removed
+      try {
+        if (container.parentNode === document.body) {
+          document.body.removeChild(container)
+        }
+      } catch (e) {
+        // Silently handle if the node was already removed
+      }
+    }
+  }, [])
 
   // Deferred unmount: stay present for exitDurationMs after `open` flips false
   // so the closed-state animation can play.
@@ -122,7 +144,7 @@ export function ModalShell({
     }
   }, [])
 
-  if (!mounted || !present) return null
+  if (!mounted || !present || !containerRef.current) return null
 
   return createPortal(
     <ThemedLayer scope={scope}>
@@ -149,6 +171,6 @@ export function ModalShell({
         </div>
       </div>
     </ThemedLayer>,
-    document.body,
+    containerRef.current,
   )
 }
