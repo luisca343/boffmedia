@@ -1,6 +1,7 @@
 "use client"
 
 import { useCallback, useEffect, useRef, useState } from "react"
+import { useTranslations } from "next-intl"
 import { userMessageFrom } from "@/services/boffAPI"
 import PlayOnMountAudio from "@/components/shared/PlayOnMountAudio"
 import { BootScreen } from "./_components/BootScreen"
@@ -34,6 +35,7 @@ type OverlayKind = "filters" | "palette" | "help" | "overview" | "livingdex" | "
  * three callbacks — everything visible is a section component.
  */
 export default function PCPage() {
+  const t = useTranslations("pc")
   const [overlay, setOverlay] = useState<OverlayKind | null>(null)
   const [shareBox, setShareBox] = useState(0)
   const searchRef = useRef<HTMLInputElement>(null)
@@ -77,12 +79,12 @@ export default function PCPage() {
     async (items: Mon[], box: number) => {
       const { moves, placed, overflow } = planBulkMove(items, box, boxes[box] ?? [])
       if (moves.length === 0) {
-        toast(overflow > 0 ? "La caja está llena" : "Ya están en esa caja", "info")
+        toast(overflow > 0 ? t("toast.boxFull") : t("toast.alreadyInBox"), "info")
         return
       }
-      if (await run(moves, `Moviendo ${placed}`)) {
+      if (await run(moves, t("boot.loading"))) {
         toast(
-          overflow > 0 ? `${placed} movidos · ${overflow} no cabían` : `${placed} movidos`,
+          overflow > 0 ? t("toast.movedOverflow", { count: placed, overflow }) : t("toast.moved", { count: placed }),
           overflow > 0 ? "info" : "success",
         )
       }
@@ -140,7 +142,7 @@ export default function PCPage() {
   if (error) {
     return (
       <ErrorOverlay
-        message={userMessageFrom(error, "Inténtalo de nuevo en unos segundos.")}
+        message={userMessageFrom(error, t("error.retry"))}
         onRetry={() => window.location.reload()}
       />
     )

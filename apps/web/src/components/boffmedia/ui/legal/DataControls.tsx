@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { Icon, Badge, Button, Toggle, type IconName } from "@/components/boffmedia/primitives"
 
@@ -43,47 +44,48 @@ function Ctrl({
 }
 
 export function DataControls() {
+  const t = useTranslations("common.dataControls")
   const [analytics, setAnalytics] = React.useState(true)
   const [marketing, setMarketing] = React.useState(false)
   return (
     <div className="mt-2 border border-solid border-line bg-panel cut-corner">
       <div className="flex items-center gap-3 border-b border-solid border-line px-[22px] py-4">
         <Icon name="sliders" size={18} className="text-accent" />
-        <h3 className="font-display text-[17px]/none font-bold uppercase tracking-[0.02em]">Control de tus datos</h3>
+        <h3 className="font-display text-[17px]/none font-bold uppercase tracking-[0.02em]">{t("title")}</h3>
         <span className="ml-auto">
-          <Badge tone="ok">Tú decides</Badge>
+          <Badge tone="ok">{t("youDecide")}</Badge>
         </span>
       </div>
 
       <Ctrl
         icon="download"
-        title="Descargar mis datos"
-        desc="Exporta una copia de tu perfil, estadísticas y actividad en formato legible."
-        end={<Button size="sm" icon="download">Exportar</Button>}
+        title={t("downloadData")}
+        desc={t("downloadDesc")}
+        end={<Button size="sm" icon="download">{t("export")}</Button>}
       />
       <Ctrl
         icon="check"
-        title="Cookies esenciales"
-        desc="Necesarias para iniciar sesión y mantener la sesión. No se pueden desactivar."
-        end={<Badge>Siempre activo</Badge>}
+        title={t("essentialCookies")}
+        desc={t("essentialDesc")}
+        end={<Badge>{t("alwaysActive")}</Badge>}
       />
       <Ctrl
         icon="chart"
-        title="Analítica"
-        desc="Nos ayuda a entender qué se usa para mejorar la plataforma. Datos agregados."
+        title={t("analytics")}
+        desc={t("analyticsDesc")}
         end={<Toggle on={analytics} onChange={setAnalytics} />}
       />
       <Ctrl
         icon="mail"
-        title="Comunicaciones"
-        desc="Novedades, eventos y ofertas por correo. Puedes darte de baja cuando quieras."
+        title={t("communications")}
+        desc={t("communicationsDesc")}
         end={<Toggle on={marketing} onChange={setMarketing} />}
       />
       <Ctrl
         icon="trash"
-        title="Eliminar mi cuenta"
-        desc="Borra permanentemente tu cuenta y todos los datos asociados. Esta acción es irreversible."
-        end={<Button size="sm" variant="danger" icon="trash">Eliminar</Button>}
+        title={t("deleteAccount")}
+        desc={t("deleteDesc")}
+        end={<Button size="sm" variant="danger" icon="trash">{t("delete")}</Button>}
         danger
       />
     </div>

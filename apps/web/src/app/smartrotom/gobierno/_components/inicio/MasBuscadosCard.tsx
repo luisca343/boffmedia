@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import { useTranslations } from "next-intl"
 import { Bar, Card, Empty, Skeleton } from "../ui"
 import { useBuscados } from "../../_hooks/queries"
 import { money } from "../../_utils/format"
@@ -9,6 +10,7 @@ import { useGobiernoUi } from "../../_stores/useGobiernoUi"
 import { CitizenRow } from "./CitizenRow"
 
 export function MasBuscadosCard() {
+  const t = useTranslations("gobierno")
   const { data, isLoading } = useBuscados({ status: "active", pageSize: 3 })
   const openDossier = useGobiernoUi((s) => s.openDossier)
 
@@ -21,11 +23,11 @@ export function MasBuscadosCard() {
         dep="danger"
         right={
           <Link href={hrefOf("buscados")} className="text-xs font-bold text-gt-ink-600 hover:text-gt-ink-900">
-            Tablón
+            {t("buscados.tablon")}
           </Link>
         }
       >
-        Más buscados
+        {t("buscados.title")}
       </Bar>
       <div className="p-1.5">
         {isLoading ? (
@@ -35,7 +37,7 @@ export function MasBuscadosCard() {
             ))}
           </div>
         ) : top.length === 0 ? (
-          <Empty icon="alert" title="Nadie en busca y captura" sub="No hay órdenes de captura activas." />
+          <Empty icon="alert" title={t("buscados.emptyTitle")} sub={t("buscados.emptyBody")} />
         ) : (
           top.map((b) => (
             <CitizenRow

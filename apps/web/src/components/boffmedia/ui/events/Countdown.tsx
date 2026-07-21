@@ -1,16 +1,18 @@
 "use client"
 
 import * as React from "react"
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { Icon } from "@/components/boffmedia/primitives"
 
 /** Live countdown to an event start. Renders nothing once the date has passed. */
 export function Countdown({ date, compact, className }: { date: string; compact?: boolean; className?: string }) {
+  const t = useTranslations("events.countdown")
   const [now, setNow] = React.useState<number | null>(null)
   React.useEffect(() => {
     setNow(Date.now())
-    const t = setInterval(() => setNow(Date.now()), 30000)
-    return () => clearInterval(t)
+    const interval = setInterval(() => setNow(Date.now()), 30000)
+    return () => clearInterval(interval)
   }, [])
 
   // null on the server + first client render → no hydration mismatch
@@ -33,9 +35,9 @@ export function Countdown({ date, compact, className }: { date: string; compact?
   return (
     <span className={cn("inline-flex items-center", compact ? "gap-[7px]" : "gap-[10px]", className)}>
       <Icon name="clock" size={13} className="flex-none text-accent" />
-      {d > 0 && seg(d, "días")}
-      {seg(h, "hrs")}
-      {seg(m, "min")}
+      {d > 0 && seg(d, t("days"))}
+      {seg(h, t("hours"))}
+      {seg(m, t("minutes"))}
     </span>
   )
 }

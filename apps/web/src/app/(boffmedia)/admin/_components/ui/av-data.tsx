@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { Icon, Avatar, Badge, IconButton, Spinner, type IconName } from "@/components/boffmedia/primitives"
 import { AvPill, AvLiveDot } from "./av-kit"
@@ -22,10 +23,11 @@ export function AvRow({ off, className, children }: { off?: boolean; className?:
 }
 
 export function RowActions({ onEdit, onDelete }: { onEdit?: () => void; onDelete?: () => void }) {
+  const t = useTranslations("admin.data")
   return (
     <div className="flex flex-none items-center gap-1.5">
-      <IconButton name="edit" label="Editar" size={15} className="!h-8 !w-8" onClick={onEdit} />
-      <IconButton name="trash" label="Eliminar" size={15} className="!h-8 !w-8" onClick={onDelete} />
+      <IconButton name="edit" label={t("editLabel")} size={15} className="!h-8 !w-8" onClick={onEdit} />
+      <IconButton name="trash" label={t("deleteLabel")} size={15} className="!h-8 !w-8" onClick={onDelete} />
     </div>
   )
 }
@@ -72,10 +74,10 @@ export interface AvMember {
   points: number
 }
 
-const AV_MEMBER_STATUS: Record<AvMemberStatus, { label: string; tone: "green" | "amber" | "rose" }> = {
-  active: { label: "Activo", tone: "green" },
-  muted: { label: "Silenciado", tone: "amber" },
-  banned: { label: "Baneado", tone: "rose" },
+const AV_MEMBER_STATUS: Record<AvMemberStatus, { key: string; tone: "green" | "amber" | "rose" }> = {
+  active: { key: "statusActive", tone: "green" },
+  muted: { key: "statusMuted", tone: "amber" },
+  banned: { key: "statusBanned", tone: "rose" },
 }
 
 export function MemberRow({
@@ -89,6 +91,7 @@ export function MemberRow({
   onMute?: () => void
   onBan?: () => void
 }) {
+  const t = useTranslations("admin.data")
   const st = AV_MEMBER_STATUS[member.status]
   const initials = member.name.split(" ").map((w) => w[0]).slice(0, 2).join("")
   return (
@@ -100,17 +103,17 @@ export function MemberRow({
           <Badge tone={member.role === "Moderador" ? "new" : member.roleTone === "info" ? "info" : "default"}>{member.role}</Badge>
           <AvPill tone={st.tone}>
             {member.status === "active" && <AvLiveDot />}
-            {st.label}
+            {t(st.key)}
           </AvPill>
         </div>
         <div className="mt-1 font-mono text-[11px]/[1.3] font-medium tracking-[0.03em] text-txt-muted">
-          @{member.handle} · {member.games} · desde {member.joined} · {member.points.toLocaleString("es-ES")} pts
+          @{member.handle} · {member.games} · {t("from")} {member.joined} · {member.points.toLocaleString()} pts
         </div>
       </div>
       <div className="flex flex-none items-center gap-1.5">
-        <IconButton name="eye" label="Ver perfil" size={15} className="!h-8 !w-8" onClick={onView} />
-        {member.status !== "banned" && <IconButton name="minus" label="Silenciar" size={15} className="!h-8 !w-8" onClick={onMute} />}
-        <IconButton name="shield" label="Banear" size={15} className="!h-8 !w-8" onClick={onBan} />
+        <IconButton name="eye" label={t("viewProfile")} size={15} className="!h-8 !w-8" onClick={onView} />
+        {member.status !== "banned" && <IconButton name="minus" label={t("muteLabel")} size={15} className="!h-8 !w-8" onClick={onMute} />}
+        <IconButton name="shield" label={t("banLabel")} size={15} className="!h-8 !w-8" onClick={onBan} />
       </div>
     </AvRow>
   )
@@ -215,6 +218,7 @@ export interface AvPipeStage {
 }
 
 export function AvPipeline({ stages, active, onNav }: { stages: AvPipeStage[]; active?: string; onNav?: (key: string) => void }) {
+  const t = useTranslations("admin.data")
   return (
     <div className="mb-[18px] flex items-stretch gap-0 overflow-x-auto border border-solid border-line bg-panel p-[5px]">
       {stages.map((s) => (
@@ -245,7 +249,7 @@ export function AvPipeline({ stages, active, onNav }: { stages: AvPipeStage[]; a
           </div>
           <span className="font-mono text-[10px]/none font-medium text-txt-dim">{s.meta}</span>
           <span className={cn("font-mono text-[8.5px]/none font-bold uppercase tracking-[0.1em]", s.state === "done" ? "text-ok" : s.state === "active" ? "text-accent" : "text-txt-dim")}>
-            {s.state === "done" ? "Listo" : s.state === "active" ? "Activo" : "En cola"}
+            {s.state === "done" ? t("pipelineReady") : s.state === "active" ? t("pipelineActive") : t("pipelineQueued")}
           </span>
         </button>
       ))}

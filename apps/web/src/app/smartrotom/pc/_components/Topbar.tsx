@@ -1,10 +1,12 @@
 "use client"
 
 import type { RefObject } from "react"
+import { useTranslations } from "next-intl"
 import { usePcUi } from "../_stores/pcUiStore"
 import { Button, Icon, Input, Kbd } from "./ui"
 
 function Logo() {
+  const t = useTranslations("pc")
   return (
     <div className="flex flex-none items-center gap-2.5">
       <span className="relative flex h-[38px] w-[38px] items-center justify-center rounded-[11px] border border-pc-line-strong bg-gradient-to-br from-[#1f3a63] to-[#0c1830] shadow-[inset_0_0_14px_-4px_rgb(79_155_255_/_.6)]">
@@ -15,7 +17,7 @@ function Logo() {
         <div className="font-pc-display text-[16px] font-bold tracking-[.02em]">
           SmartRotom <span className="text-pc-accent">PC</span>
         </div>
-        <div className="text-[10px] tracking-[.04em] text-pc-fg-subtle">SISTEMA DE ALMACENAMIENTO</div>
+        <div className="text-[10px] tracking-[.04em] text-pc-fg-subtle">{t("topbar.subtitle")}</div>
       </div>
     </div>
   )
@@ -33,6 +35,7 @@ export interface TopbarProps {
 }
 
 export function Topbar({ onOpenFilters, onOpenLivingDex, onOpenPalette, onOpenHelp, searchRef }: TopbarProps) {
+  const t = useTranslations("pc")
   const search = usePcUi((s) => s.search)
   const setSearch = usePcUi((s) => s.setSearch)
   const dualMode = usePcUi((s) => s.dualMode)
@@ -57,15 +60,15 @@ export function Topbar({ onOpenFilters, onOpenLivingDex, onOpenPalette, onOpenHe
           ref={searchRef}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          aria-label="Buscar Pokémon"
-          placeholder="Buscar por nombre, apodo o número de Pokédex…"
+          aria-label={t("topbar.searchAriaLabel")}
+          placeholder={t("topbar.searchPlaceholder")}
           className="h-[42px] rounded-xl pl-10 pr-10 text-sm"
         />
         {search ? (
           <Button
             variant="ghost"
             icon
-            aria-label="Limpiar búsqueda"
+            aria-label={t("topbar.clearSearch")}
             onClick={() => setSearch("")}
             className="absolute right-1.5 top-1/2 -translate-y-1/2 p-[5px]"
           >
@@ -79,10 +82,10 @@ export function Topbar({ onOpenFilters, onOpenLivingDex, onOpenPalette, onOpenHe
       </div>
 
       <div className="flex flex-none items-center gap-[5px]">
-        <Button icon aria-label="Filtros (F)" title="Filtros (F)" onClick={onOpenFilters}>
+        <Button icon aria-label={t("topbar.filters")} title={t("topbar.filters")} onClick={onOpenFilters}>
           <Icon name="sliders" size={17} />
         </Button>
-        <Button icon active={dualMode} aria-label="Doble caja (D)" title="Doble caja (D)" onClick={toggleDual}>
+        <Button icon active={dualMode} aria-label={t("topbar.dualBox")} title={t("topbar.dualBox")} onClick={toggleDual}>
           <Icon name="columns" size={17} />
         </Button>
         <Button
@@ -90,13 +93,13 @@ export function Topbar({ onOpenFilters, onOpenLivingDex, onOpenPalette, onOpenHe
           active={multiMode}
           // The multi-selection tone is cyan everywhere it appears — slots, bulk bar, here.
           activeClass="border-pc-cyan bg-pc-cyan/[.16] text-pc-cyan"
-          aria-label="Selección múltiple (M)"
-          title="Selección múltiple (M)"
+          aria-label={t("topbar.multiSelect")}
+          title={t("topbar.multiSelect")}
           onClick={() => setMultiMode(!multiMode)}
         >
           <Icon name="check" size={17} />
         </Button>
-        <Button icon aria-label="Living Dex" title="Living Dex" onClick={onOpenLivingDex} className="text-pc-gold">
+        <Button icon aria-label={t("topbar.livingDex")} title={t("topbar.livingDex")} onClick={onOpenLivingDex} className="text-pc-gold">
           <Icon name="book" size={17} />
         </Button>
       </div>
@@ -104,19 +107,19 @@ export function Topbar({ onOpenFilters, onOpenLivingDex, onOpenPalette, onOpenHe
       <Divider />
 
       <div className="flex flex-none items-center gap-[5px]">
-        <Button icon aria-label="Comandos (Ctrl/⌘K)" title="Comandos (Ctrl/⌘K)" onClick={onOpenPalette}>
+        <Button icon aria-label={t("topbar.commands")} title={t("topbar.commands")} onClick={onOpenPalette}>
           <Icon name="command" size={17} />
         </Button>
         <Button
           icon
           active={sound}
-          aria-label={sound ? "Silenciar sonidos" : "Activar sonidos"}
-          title="Sonido"
+          aria-label={sound ? t("topbar.muteSound") : t("topbar.unmuteSound")}
+          title={t("topbar.sound")}
           onClick={() => setSound(!sound)}
         >
           <Icon name={sound ? "volume" : "volumeOff"} size={17} />
         </Button>
-        <Button icon aria-label="Atajos de teclado" title="Ayuda (?)" onClick={onOpenHelp}>
+        <Button icon aria-label={t("topbar.help")} title={t("topbar.help")} onClick={onOpenHelp}>
           <Icon name="keyboard" size={17} />
         </Button>
       </div>

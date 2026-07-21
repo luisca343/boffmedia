@@ -1,5 +1,6 @@
 "use client";
 import * as React from "react";
+import { useTranslations } from "next-intl";
 import useStarBank from "../_hooks/useStarBank";
 import { useRotomUuid } from "@/components/smartrotom/behavior/useRotomUuid";
 import { useCreateAccountMutation } from "../_hooks/queries";
@@ -16,6 +17,7 @@ const MAIN_BG =
   "linear-gradient(135deg, #1e3a8a, #2463eb)";
 
 export default function Cuentas() {
+  const t = useTranslations("starbank");
   const uuid = useRotomUuid();
   const { accounts, activeAccount, setActiveAccount } = useStarBank();
   const [creating, setCreating] = React.useState(false);
@@ -29,21 +31,21 @@ export default function Cuentas() {
     changeActiveAccount(id);
     setActiveAccount(id);
     const a = list.find((x) => x.id === id);
-    if (a) toast(`Cuenta activa: ${displayName(a.name)}`);
+    if (a) toast(t("cuentas.dialog.created"));
   }
 
   return (
     <>
       <PageHeader
-        title="Mis cuentas"
-        sub="Organiza tu dinero entre tu cuenta principal y tus cuentas secundarias"
-        actions={<Button variant="primary" onClick={() => setCreating(true)}><Ico name="plus" size={16} /> Nueva cuenta</Button>}
+        title={t("cuentas.title")}
+        sub={t("cuentas.sub")}
+        actions={<Button variant="primary" onClick={() => setCreating(true)}><Ico name="plus" size={16} /> {t("cuentas.newAccount")}</Button>}
       />
 
       <div className="grid gap-4 md:grid-cols-3">
-        <Kpi label="Balance total" value={formatMoney(total)} icon="card" tone="brand" sub={`Distribuido en ${list.length} cuentas`} />
-        <Kpi label="Cuenta principal" value={main ? displayName(main.name) : "—"} icon="user" tone="brand" sub={formatMoney(main?.balance ?? 0)} />
-        <Kpi label="Cuentas secundarias" value={`${secondary.length} activas`} icon="bag" tone="brand" sub={`Total: ${formatMoney(secondary.reduce((s, a) => s + a.balance, 0))}`} />
+        <Kpi label={t("cuentas.totalBalance")} value={formatMoney(total)} icon="card" tone="brand" sub={t("cuentas.distributedIn", { count: list.length })} />
+        <Kpi label={t("cuentas.mainAccount")} value={main ? displayName(main.name) : "—"} icon="user" tone="brand" sub={formatMoney(main?.balance ?? 0)} />
+        <Kpi label={t("cuentas.secondaryAccounts")} value={t("cuentas.activeAccounts", { count: secondary.length })} icon="bag" tone="brand" sub={`${t("accounts.totalBalance")}: ${formatMoney(secondary.reduce((s, a) => s + a.balance, 0))}`} />
       </div>
 
       {main && (
@@ -52,7 +54,7 @@ export default function Cuentas() {
             <div className="flex items-center gap-3.5">
               <AccountAvatar account={main} size={56} square />
               <div>
-                <div className="text-[12px] uppercase tracking-[0.06em] text-[#b6d3ff]">Cuenta principal</div>
+                <div className="text-[12px] uppercase tracking-[0.06em] text-[#b6d3ff]">{t("cuentas.mainAccount")}</div>
                 <div className="mt-1 text-[22px] font-semibold">{displayName(main.name)}</div>
                 <button
                   type="button"
@@ -60,17 +62,17 @@ export default function Cuentas() {
                   className="mt-2 inline-flex items-center gap-1.5 rounded-sb-pill border border-white/25 bg-white/15 px-2.5 py-1 text-[11.5px] font-semibold backdrop-blur-[8px] transition-colors hover:bg-white/25"
                 >
                   {activeAccount?.id === main.id
-                    ? <><span className="size-1.5 rounded-full bg-sb-pos-2" /> Cuenta activa</>
-                    : "Seleccionar cuenta"}
+                    ? <><span className="size-1.5 rounded-full bg-sb-pos-2" /> {t("cuentas.activeAccount")}</>
+                    : t("cuentas.selectAccount")}
                 </button>
               </div>
             </div>
             <div className="text-right">
-              <div className="text-[11px] uppercase tracking-[0.15em] text-[#b6d3ff]">Saldo</div>
+              <div className="text-[11px] uppercase tracking-[0.15em] text-[#b6d3ff]">{t("cuentas.balance")}</div>
               <div className="font-sb-display text-[34px] font-bold tracking-[-0.02em] tabular-nums">{formatMoney(main.balance)}</div>
               <div className="mt-2.5 flex justify-end gap-2">
-                <Button variant="glass" size="sm" href={`${BASE}/enviar`}><Ico name="send" size={14} /> Enviar</Button>
-                <Button variant="solid" size="sm" href={`${BASE}/enviar`}><Ico name="arrows" size={14} /> Mover</Button>
+                <Button variant="glass" size="sm" href={`${BASE}/enviar`}><Ico name="send" size={14} /> {t("cuentas.send")}</Button>
+                <Button variant="solid" size="sm" href={`${BASE}/enviar`}><Ico name="arrows" size={14} /> {t("cuentas.move")}</Button>
               </div>
             </div>
           </div>
@@ -78,7 +80,7 @@ export default function Cuentas() {
       )}
 
       <Card flat className="border-0 bg-transparent shadow-none">
-        <SectionHead eyebrow={`${secondary.length} activas`} title="Cuentas secundarias" action={<Button variant="secondary" size="sm" onClick={() => setCreating(true)}><Ico name="plus" size={14} /> Añadir</Button>} />
+        <SectionHead eyebrow={t("cuentas.activeAccounts", { count: secondary.length })} title={t("cuentas.secondaryAccounts")} action={<Button variant="secondary" size="sm" onClick={() => setCreating(true)}><Ico name="plus" size={14} /> {t("cuentas.add")}</Button>} />
         <CardBody noPad>
           <div className="grid gap-4 [grid-template-columns:repeat(auto-fill,minmax(240px,1fr))]">
             {secondary.map((acc) => {
@@ -99,12 +101,12 @@ export default function Cuentas() {
                       style={{ background: color + "1a", color }}
                     >
                       <span className="size-1.5 rounded-full" style={{ background: color }} />
-                      {active ? "Activa" : "Secundaria"}
+                      {active ? t("cuentas.active") : t("accounts.secondary")}
                     </span>
                   </div>
                   <div>
                     <div className="text-[16px] font-semibold">{displayName(acc.name)}</div>
-                    <div className="text-[12px] text-sb-fg-muted">Cuenta secundaria</div>
+                    <div className="text-[12px] text-sb-fg-muted">{t("cuentas.secondaryAccount")}</div>
                   </div>
                   <div className="flex items-center justify-between">
                     <div className="font-sb-display text-[22px] font-semibold tabular-nums tracking-[-0.01em]">{formatMoney(acc.balance)}</div>
@@ -123,8 +125,8 @@ export default function Cuentas() {
                 <div className="mx-auto mb-2.5 grid size-11 place-items-center rounded-xl bg-sb-surface-3 text-sb-600">
                   <Ico name="plus" size={20} />
                 </div>
-                <div className="font-semibold">Nueva cuenta secundaria</div>
-                <div className="mt-0.5 text-[12px]">Ahorros, gastos, viajes…</div>
+                <div className="font-semibold">{t("cuentas.newSecondary")}</div>
+                <div className="mt-0.5 text-[12px]">{t("cuentas.newSecondarySub")}</div>
               </div>
             </button>
           </div>
@@ -137,7 +139,7 @@ export default function Cuentas() {
           onClose={() => setCreating(false)}
           onCreated={() => {
             setCreating(false);
-            toast("Cuenta creada");
+            toast(t("cuentas.dialog.created"));
           }}
         />
       )}
@@ -146,13 +148,14 @@ export default function Cuentas() {
 }
 
 function CreateAccountDialog({ uuid, onClose, onCreated }: { uuid?: string; onClose: () => void; onCreated: () => void }) {
+  const t = useTranslations("starbank");
   const [name, setName] = React.useState("");
   const [error, setError] = React.useState("");
   const createAccount = useCreateAccountMutation(uuid);
 
   function submit() {
     if (!name.trim() || !uuid) {
-      setError("Introduce un nombre para la cuenta");
+      setError(t("cuentas.dialog.errorEmpty"));
       return;
     }
     setError("");
@@ -160,25 +163,25 @@ function CreateAccountDialog({ uuid, onClose, onCreated }: { uuid?: string; onCl
       { data: { name: name.trim(), uuid } },
       {
         onSuccess: onCreated,
-        onError: (err) => setError(userMessageFrom(err, "No se pudo crear la cuenta")),
+        onError: (err) => setError(userMessageFrom(err, t("cuentas.dialog.errorFailed"))),
       },
     );
   }
 
   return (
-    <Sheet width={460} onClose={onClose} eyebrow="Cuenta secundaria" title="Nueva cuenta">
+    <Sheet width={460} onClose={onClose} eyebrow={t("cuentas.dialog.eyebrow")} title={t("cuentas.dialog.title")}>
       <div className="flex items-start gap-2.5 rounded-sb-md border border-sb-border bg-sb-info-soft p-3 text-[13px] text-sb-info">
         <Ico name="info" size={16} className="mt-0.5 shrink-0" />
-        <span>Las cuentas secundarias te permiten organizar tu dinero para ahorros, gastos o viajes.</span>
+        <span>{t("cuentas.dialog.info")}</span>
       </div>
       <div>
-        <Label htmlFor="acc-name">Nombre de la cuenta</Label>
-        <Input id="acc-name" value={name} onChange={(e) => setName(e.target.value)} placeholder="Ej: Ahorros Liga" maxLength={40} autoFocus />
+        <Label htmlFor="acc-name">{t("cuentas.dialog.nameLabel")}</Label>
+        <Input id="acc-name" value={name} onChange={(e) => setName(e.target.value)} placeholder={t("cuentas.dialog.namePlaceholder")} maxLength={40} autoFocus />
       </div>
       {error && <div className="text-[13px] font-medium text-sb-neg">{error}</div>}
       <div className="mt-auto flex justify-end gap-2">
-        <Button variant="ghost" onClick={onClose}>Cancelar</Button>
-        <Button variant="primary" onClick={submit} disabled={createAccount.isPending || !name.trim()}>{createAccount.isPending ? "Creando…" : "Crear cuenta"}</Button>
+        <Button variant="ghost" onClick={onClose}>{t("common.cancel")}</Button>
+        <Button variant="primary" onClick={submit} disabled={createAccount.isPending || !name.trim()}>{createAccount.isPending ? t("cuentas.dialog.creating") : t("cuentas.dialog.create")}</Button>
       </div>
     </Sheet>
   );

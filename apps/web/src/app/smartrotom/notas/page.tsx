@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState, type MouseEvent } from "react";
+import { useTranslations } from "next-intl";
 import { useNotesData } from "./_hooks/useNotesData";
 import { useNoteContents } from "./_hooks/useNoteContents";
 import { useNotesTheme } from "./_hooks/useNotesTheme";
@@ -22,6 +23,7 @@ import { TweaksPanel } from "./_components/overlays/TweaksPanel";
 import type { NoteVM, View, SortKey, ModalKind } from "./_types";
 
 export default function NotesPage() {
+  const t = useTranslations("notas");
   const { notes, trash, folders, tags, actions } = useNotesData();
   const { contentById, cacheContent } = useNoteContents(notes);
   const theme = useNotesTheme();
@@ -101,8 +103,8 @@ export default function NotesPage() {
       folderId: view.type === "folder" ? Number(view.id) : null,
     });
     if (id != null) openNote(id);
-    toast("Nota creada");
-  }, [actions, view, openNote]);
+    toast(t("toast.created"));
+  }, [actions, view, openNote, t]);
 
   const openTitle = useCallback(
     async (title: string) => {
@@ -121,9 +123,9 @@ export default function NotesPage() {
   const createLinked = useCallback(
     async (title: string) => {
       const id = await actions.newNote({ title, content: `<h1>${title}</h1><p><br></p>` });
-      if (id != null) toast(`Nota «${title}» creada`);
+      if (id != null) toast(t("editor.createLinked", { title }));
     },
-    [actions],
+    [actions, t],
   );
 
   // ---- pane handlers ----
@@ -141,24 +143,24 @@ export default function NotesPage() {
         x: e.clientX,
         y: e.clientY,
         items: [
-          { icon: "file-text", label: "Abrir", onClick: () => openNote(n.id) },
-          { icon: "split", label: "Abrir en panel dividido", onClick: () => setSplitId(n.id) },
+          { icon: "file-text", label: t("contextMenu.open"), onClick: () => openNote(n.id) },
+          { icon: "split", label: t("contextMenu.openSplit"), onClick: () => setSplitId(n.id) },
           { sep: true },
           {
             icon: "pin",
-            label: n.pinned ? "Desanclar" : "Anclar",
+            label: n.pinned ? t("contextMenu.unpin") : t("contextMenu.pin"),
             onClick: () => actions.setPinned(n.id, !n.pinned),
           },
-          { icon: "share", label: "Compartir", onClick: () => { setModalNote(n); setModal("share"); } },
+          { icon: "share", label: t("contextMenu.share"), onClick: () => { setModalNote(n); setModal("share"); } },
           {
             icon: "copy",
-            label: "Duplicar",
+            label: t("contextMenu.duplicate"),
             onClick: async () => {
               const res = await DocumentsService.getDocument(n.id);
               // Falling back to an empty template here would duplicate the note with its
               // body silently dropped, so a failed read must abort the copy outright.
               if (!res.success || !res.data) {
-                toast(res.userMessage ?? "No se pudo leer la nota para duplicarla", "error");
+                toast(res.userMessage ?? t("toast.duplicateError"), "error");
                 return;
               }
               await actions.newNote({
@@ -169,15 +171,15 @@ export default function NotesPage() {
           },
           { sep: true },
           view.type === "trash"
-            ? { icon: "history", label: "Restaurar", onClick: () => actions.restoreNote(n.id) }
+            ? { icon: "history", label: t("contextMenu.restore"), onClick: () => actions.restoreNote(n.id) }
             : {
                 icon: "trash",
-                label: "Eliminar",
+                label: t("contextMenu.delete"),
                 danger: true,
                 onClick: () => {
                   actions.deleteNote(n.id);
                   closeTab(n.id);
-                  toast("Movida a la papelera", "warn");
+                  toast(t("toast.deleted"), "warn");
                 },
               },
         ],
@@ -200,18 +202,18 @@ export default function NotesPage() {
 
   // ---- commands ----
   const commands: Command[] = [
-    { id: "new", label: "Nueva nota", icon: "plus", kbd: "⌘N", run: newNote },
-    { id: "qc", label: "Captura rápida", icon: "zap", kbd: "⌘⇧N", run: () => setModal("qc") },
-    { id: "tpl", label: "Nueva desde plantilla", icon: "layers", run: () => setModal("templates") },
-    { id: "split", label: "Vista dividida", icon: "split", kbd: "⌘\\", run: () => activeTab && setSplitId(activeTab) },
-    { id: "graph", label: "Abrir grafo de conocimiento", icon: "network", run: () => setModal("graph") },
+    { id: "new", label: t("commands.newNote"), icon: "plus", kbd: "⌘N", run: newNote },
+    { id: "qc", label: t("commands.quickCapture"), icon: "zap", kbd: "⌘⇧N", run: () => setModal("qc") },
+    { id: "tpl", label: t("commands.fromTemplate"), icon: "layers", run: () => setModal("templates") },
+    { id: "split", label: t("commands.splitView"), icon: "split", kbd: "⌘\\", run: () => activeTab && setSplitId(activeTab) },
+    { id: "graph", label: t("commands.knowledgeGraph"), icon: "network", run: () => setModal("graph") },
     {
       id: "theme",
-      label: "Cambiar tema claro / oscuro",
+      label: t("commands.toggleTheme"),
       icon: theme.theme === "dark" ? "sun" : "moon",
       run: theme.toggleTheme,
     },
-    { id: "pin", label: "Anclar / desanclar nota actual", icon: "pin", run: () => active && actions.setPinned(active.id, !active.pinned) },
+    { id: "pin", label: t("commands.togglePin"), icon: "pin", run: () => active && actions.setPinned(active.id, !active.pinned) },
   ];
 
   // ---- keyboard ----
@@ -270,10 +272,10 @@ export default function NotesPage() {
           onNew={newNote}
           onCapture={() => setModal("qc")}
           onNewFolder={async () => {
-            const name = window.prompt("Nombre de la carpeta:");
+            const name = window.prompt(t("sidebar.folderNamePrompt"));
             if (name?.trim()) {
               await actions.createFolder(name.trim());
-              toast("Carpeta creada", "info");
+              toast(t("toast.folderCreated"), "info");
             }
           }}
           onMoveNote={(id, folderId) => actions.moveNote(id, folderId)}
@@ -339,7 +341,7 @@ export default function NotesPage() {
           onSave={async (init) => {
             const id = await actions.newNote(init);
             if (id != null) openNote(id);
-            toast("Nota creada");
+            toast(t("toast.created"));
           }}
         />
       )}
@@ -356,7 +358,7 @@ export default function NotesPage() {
         <ShareDialog
           note={notes.find((n) => n.id === modalNote.id) ?? modalNote}
           onClose={() => setModal(null)}
-          onShare={(uuid) => { actions.shareNote(modalNote.id, uuid); toast("Compartida"); }}
+          onShare={(uuid) => { actions.shareNote(modalNote.id, uuid); toast(t("toast.shared")); }}
           onUnshare={(uuid) => actions.unshareNote(modalNote.id, uuid)}
           onTogglePublic={(isPublic) => actions.setPublic(modalNote.id, isPublic)}
         />
@@ -368,7 +370,7 @@ export default function NotesPage() {
           onRestore={async (versionId) => {
             await DocumentsService.restoreVersion(versionId);
             await actions.refetchNotes();
-            toast("Versión restaurada", "info");
+            toast(t("toast.restored"), "info");
           }}
         />
       )}
@@ -393,7 +395,7 @@ export default function NotesPage() {
           onToggle={(tagId) => actions.toggleTag(tagPick.note.id, tagId)}
           onCreate={async (label) => {
             await actions.createTag(label);
-            toast("Etiqueta creada", "info");
+            toast(t("toast.tagCreated"), "info");
           }}
         />
       )}

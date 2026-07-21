@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { Button, Icon } from "./ui"
 
 export interface ErrorOverlayProps {
@@ -10,6 +11,7 @@ export interface ErrorOverlayProps {
 
 /** Shown when a PC query actually failed — never as a demo state. */
 export function ErrorOverlay({ onRetry, message }: ErrorOverlayProps) {
+  const t = useTranslations("pc")
   return (
     <div
       role="alert"
@@ -19,14 +21,14 @@ export function ErrorOverlay({ onRetry, message }: ErrorOverlayProps) {
         <Icon name="wifiOff" size={40} className="text-pc-rose" />
       </div>
       <div className="max-w-[320px] text-center">
-        <h2 className="mb-1.5 font-pc-display text-[19px] font-bold">Conexión perdida con el PC</h2>
+        <h2 className="mb-1.5 font-pc-display text-[19px] font-bold">{t("error.title")}</h2>
         <p className="text-[13.5px] text-pc-fg-muted">
-          {message || "No se pudo contactar con el almacén de SmartRotom. Inténtalo de nuevo."}
+          {message || t("error.retry")}
         </p>
       </div>
       <Button variant="primary" onClick={onRetry}>
         <Icon name="refresh" size={15} />
-        Reintentar
+        {t("common.retry")}
       </Button>
     </div>
   )

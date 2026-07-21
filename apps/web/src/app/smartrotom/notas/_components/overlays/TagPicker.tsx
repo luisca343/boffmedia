@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
+import { useTranslations } from "next-intl";
 import type { NoteTag } from "@boffmedia/shared";
 import { Icon } from "../ui";
 import { ThemedLayer } from "../ui/ThemedLayer";
@@ -24,6 +25,7 @@ export function TagPicker({
   onToggle: (tagId: number) => void;
   onCreate: (label: string) => void;
 }) {
+  const t = useTranslations("notas");
   const [q, setQ] = useState("");
   const filtered = tags.filter((t) => t.label.toLowerCase().includes(q.toLowerCase()));
   const canCreate = q.trim() && !tags.some((t) => t.label.toLowerCase() === q.trim().toLowerCase());
@@ -54,7 +56,7 @@ export function TagPicker({
                 setQ("");
               }
             }}
-            placeholder="Buscar o crear etiqueta…"
+            placeholder={t("tagPicker.placeholder")}
             className="w-full border-b border-nt-border bg-transparent px-3 py-2.5 text-[13px] text-nt-fg outline-none placeholder:text-nt-fg-subtle"
           />
           <div className="nt-scroll max-h-[220px] overflow-auto p-1.5">
@@ -84,7 +86,7 @@ export function TagPicker({
                 className="flex cursor-pointer items-center gap-2 rounded-nt-sm px-2 py-2 text-[13px] text-nt-accent-fg hover:bg-nt-hover"
               >
                 <Icon name="plus" size={14} />
-                Crear «{q.trim()}»
+                {t("tagPicker.create", { name: q.trim() })}
               </div>
             )}
           </div>

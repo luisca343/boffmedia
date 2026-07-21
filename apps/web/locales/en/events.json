@@ -25,6 +25,11 @@
       "ends": "Until {date}",
       "game": "Game"
     },
+    "countdown": {
+      "days": "days",
+      "hours": "hrs",
+      "minutes": "min"
+    },
     "empty": {
       "title": "No events",
       "lead": "No events match your search."

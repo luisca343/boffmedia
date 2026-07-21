@@ -1,12 +1,14 @@
 "use client"
 
 import Link from "next/link"
+import { useTranslations } from "next-intl"
 import { useArcadeInventory, useLootboxConfig } from "../_hooks/queries"
 import { ownedBoxes, resolveBoxes, totalBoxesOwned } from "../_utils/inventory"
 import { Corners, Icon, Panel } from "./ui"
 
 /** "You have N unopened boxes" — the hub's route into the loot flow. */
 export function InventoryBanner() {
+  const t = useTranslations("")
   const inventory = useArcadeInventory()
   const config = useLootboxConfig()
 
@@ -25,7 +27,7 @@ export function InventoryBanner() {
   return (
     <Panel tone="magenta" className="relative mb-[22px]">
       <div aria-hidden className="ar-horizon opacity-50" />
-      <Corners tone="violet" inset={10} size={14} thick={1.4} />
+      <Corners tone="violet" inset={10} size={14} />
 
       <div className="relative z-[2] flex flex-wrap items-center justify-between gap-[18px]">
         <div className="flex items-center gap-[18px]">
@@ -37,10 +39,10 @@ export function InventoryBanner() {
           </div>
           <div>
             <div className="mb-1.5 font-ar-display text-[9px] uppercase tracking-[0.18em] text-ar-violet-2">
-              Inventario de cajas
+              {t("arcade.inventory.title")}
             </div>
             <div className="font-ar text-lg font-bold text-ar-ink">
-              Tienes <span className="ar-chrom">{total} {total === 1 ? "caja" : "cajas"}</span> sin abrir
+              {t("arcade.inventory.unopenedBoxes", { count: total })}
             </div>
             {breakdown && <div className="mt-1 font-ar text-xs text-ar-ink-dim">{breakdown}</div>}
           </div>
@@ -50,7 +52,7 @@ export function InventoryBanner() {
           href="/smartrotom/arcade/loot"
           className="ar-lift inline-flex items-center justify-center gap-2 rounded-lg border border-white/[.18] px-4 py-2.5 font-ar text-xs font-semibold uppercase tracking-[0.08em] text-white bg-[linear-gradient(180deg,#ff5fbf_0%,rgb(var(--ar-magenta))_55%,#c4127a_100%)] shadow-[inset_0_1px_0_rgb(255_255_255/.35),inset_0_-2px_0_rgb(0_0_0/.35),0_8px_26px_-8px_rgb(var(--ar-magenta)/.6)]"
         >
-          <Icon.Box s={14} /> Abrir inventario <Icon.Chevron s={14} />
+          <Icon.Box s={14} /> {t("arcade.inventory.openInventory")} <Icon.Chevron s={14} />
         </Link>
       </div>
     </Panel>

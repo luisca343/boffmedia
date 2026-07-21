@@ -2,12 +2,13 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { useMediaTheme } from "./_theme"
 import { navFor, type NavItem } from "./_nav"
 import { I } from "./ui/icons"
 
-function Item({ item, collapsed, active }: { item: NavItem; collapsed: boolean; active: boolean }) {
+function Item({ item, collapsed, active, comingSoonLabel }: { item: NavItem; collapsed: boolean; active: boolean; comingSoonLabel: string }) {
   const Glyph = I[item.icon]
   const inner = (
     <>
@@ -40,7 +41,7 @@ function Item({ item, collapsed, active }: { item: NavItem; collapsed: boolean; 
       type="button"
       aria-disabled="true"
       className={cn(base, "cursor-default opacity-45")}
-      title={collapsed ? `${item.label} · próximamente` : "Próximamente"}
+      title={collapsed ? `${item.label} · ${comingSoonLabel}` : comingSoonLabel}
     >
       {inner}
     </button>
@@ -50,6 +51,7 @@ function Item({ item, collapsed, active }: { item: NavItem; collapsed: boolean; 
 export function Sidebar({ collapsed = false, className }: { collapsed?: boolean; className?: string }) {
   const theme = useMediaTheme()
   const pathname = usePathname()
+  const t = useTranslations("common.media.sidebar")
   const nav = navFor(theme.id, theme.basePath)
 
   const isActive = (item: NavItem) =>
@@ -67,7 +69,7 @@ export function Sidebar({ collapsed = false, className }: { collapsed?: boolean;
       <div className="mw-scroll flex-1 overflow-y-auto px-3 pb-6 pt-3.5">
         <div className="flex flex-col gap-0.5">
           {nav.main.map((item) => (
-            <Item key={item.key} item={item} collapsed={collapsed} active={isActive(item)} />
+            <Item key={item.key} item={item} collapsed={collapsed} active={isActive(item)} comingSoonLabel={t("comingSoon")} />
           ))}
         </div>
 
@@ -78,11 +80,11 @@ export function Sidebar({ collapsed = false, className }: { collapsed?: boolean;
         <div className="flex flex-col gap-0.5">
           {!collapsed && (
             <div className="px-3 pb-2 pt-1.5 font-mono text-[10px] font-bold uppercase tracking-[0.14em] text-[color-mix(in_srgb,rgb(var(--mw-accent))_60%,rgb(var(--mw-fg-faint)))]">
-              Tú
+              {t("you")}
             </div>
           )}
           {nav.library.map((item) => (
-            <Item key={item.key} item={item} collapsed={collapsed} active={isActive(item)} />
+            <Item key={item.key} item={item} collapsed={collapsed} active={isActive(item)} comingSoonLabel={t("comingSoon")} />
           ))}
         </div>
       </div>
@@ -90,7 +92,7 @@ export function Sidebar({ collapsed = false, className }: { collapsed?: boolean;
       {!collapsed && (
         <div className="flex flex-col gap-1.5 border-t border-mw-line px-4 py-3.5 text-[11px] text-mw-fg-faint">
           <div className="flex items-center justify-between text-mw-fg-mute">
-            <span>Parte de</span>
+            <span>{t("partOf")}</span>
             <strong className="font-mw-display text-xs font-bold tracking-[0.02em] text-mw-fg">SmartRotom</strong>
           </div>
         </div>

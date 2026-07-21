@@ -211,7 +211,9 @@ export class TrendsQueryDto {
 }
 
 export class SuggestionsQueryDto {
-  @ApiPropertyOptional({ description: 'Viewer UUID — excludes already-followed' })
+  @ApiPropertyOptional({
+    description: 'Viewer UUID — excludes already-followed',
+  })
   @IsOptional()
   @IsUUID()
   uuid?: string;

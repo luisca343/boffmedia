@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { useTranslations } from "next-intl";
 import { Overlay, MODAL_PANEL, Icon, Kbd, type IconName } from "../ui";
 import type { NoteVM } from "../../_types";
 
@@ -23,6 +24,7 @@ export function CommandPalette({
   onClose: () => void;
   onOpenNote: (id: number) => void;
 }) {
+  const t = useTranslations("notas");
   const [q, setQ] = useState("");
   const [sel, setSel] = useState(0);
 
@@ -76,25 +78,25 @@ export function CommandPalette({
                 run(sel);
               }
             }}
-            placeholder="Buscar notas o ejecutar un comando…"
+            placeholder={t("palette.placeholder")}
             className="flex-1 bg-transparent text-[17px] text-nt-fg outline-none placeholder:text-nt-fg-subtle"
           />
         </div>
         <div className="nt-scroll max-h-[380px] overflow-auto p-2">
           {filteredCommands.length > 0 && (
             <div className="px-2.5 pb-1 pt-2 text-[11px] font-semibold uppercase tracking-[.08em] text-nt-fg-subtle">
-              Acciones
+              {t("palette.actions")}
             </div>
           )}
           {flat.map((item, i) => {
             const active = i === sel;
             const icon: IconName = item.kind === "cmd" ? item.cmd.icon : "file-text";
-            const label = item.kind === "cmd" ? item.cmd.label : item.note.title || "Sin título";
+            const label = item.kind === "cmd" ? item.cmd.label : item.note.title || t("list.untitled");
             return (
               <div key={i}>
                 {item.kind === "note" && i === filteredCommands.length && (
                   <div className="px-2.5 pb-1 pt-2 text-[11px] font-semibold uppercase tracking-[.08em] text-nt-fg-subtle">
-                    Notas
+                    {t("palette.notes")}
                   </div>
                 )}
                 <div
@@ -118,19 +120,19 @@ export function CommandPalette({
             );
           })}
           {flat.length === 0 && (
-            <div className="px-3 py-8 text-center text-[13px] text-nt-fg-subtle">Sin resultados</div>
+            <div className="px-3 py-8 text-center text-[13px] text-nt-fg-subtle">{t("palette.noResults")}</div>
           )}
         </div>
         <div className="flex items-center gap-4 border-t border-nt-border px-4 py-2.5 text-[11px] text-nt-fg-subtle">
           <span className="inline-flex items-center gap-1.5">
             <Kbd>↑</Kbd>
-            <Kbd>↓</Kbd> navegar
+            <Kbd>↓</Kbd> {t("palette.navigate")}
           </span>
           <span className="inline-flex items-center gap-1.5">
-            <Kbd>↵</Kbd> abrir
+            <Kbd>↵</Kbd> {t("palette.open")}
           </span>
           <span className="inline-flex items-center gap-1.5">
-            <Kbd>esc</Kbd> cerrar
+            <Kbd>esc</Kbd> {t("palette.close")}
           </span>
         </div>
       </div>

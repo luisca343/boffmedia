@@ -1,7 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { BadRequestException } from '@nestjs/common';
 import { Logger } from 'nestjs-pino';
-import { WigglypopCustodyService, computeFee } from './wigglypop-custody.service';
+import {
+  WigglypopCustodyService,
+  computeFee,
+} from './wigglypop-custody.service';
 import { WigglypopEscrowService } from './wigglypop-escrow.service';
 import { WingullFacadeService } from '../../wingull/wingull.facade.service';
 import { WigglypopOrdersRepository } from '../repositories/wigglypop-orders.repository';
@@ -110,7 +113,10 @@ describe('WigglypopCustodyService', () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         WigglypopCustodyService,
-        { provide: Logger, useValue: { log: jest.fn(), warn: jest.fn(), error: jest.fn() } },
+        {
+          provide: Logger,
+          useValue: { log: jest.fn(), warn: jest.fn(), error: jest.fn() },
+        },
         { provide: WigglypopEscrowService, useValue: escrow },
         { provide: WingullFacadeService, useValue: wingull },
         { provide: WigglypopOrdersRepository, useValue: ordersRepository },
@@ -156,7 +162,9 @@ describe('WigglypopCustodyService', () => {
 
       await service.settleNewOrder(order);
       await service.markTransferred(makeOrder({ status: 'escrow' }));
-      await service.confirmOrder(makeOrder({ status: 'transferido', escrowTxId: 9001 }));
+      await service.confirmOrder(
+        makeOrder({ status: 'transferido', escrowTxId: 9001 }),
+      );
 
       expect(wingull.givePokemon).not.toHaveBeenCalled();
       expect(wingull.giveItems).not.toHaveBeenCalled();
@@ -191,14 +199,18 @@ describe('WigglypopCustodyService', () => {
 
     it('refuses to release escrow that was never taken', async () => {
       await expect(
-        service.confirmOrder(makeOrder({ status: 'transferido', escrowTxId: null })),
+        service.confirmOrder(
+          makeOrder({ status: 'transferido', escrowTxId: null }),
+        ),
       ).rejects.toThrow(BadRequestException);
 
       expect(escrow.release).not.toHaveBeenCalled();
     });
 
     it('refunds the buyer on cancel and puts the listing back on the shelf', async () => {
-      await service.cancelOrder(makeOrder({ status: 'escrow', escrowTxId: 9001 }));
+      await service.cancelOrder(
+        makeOrder({ status: 'escrow', escrowTxId: 9001 }),
+      );
 
       expect(escrow.refund).toHaveBeenCalledWith(
         BUYER,
@@ -210,7 +222,9 @@ describe('WigglypopCustodyService', () => {
     });
 
     it('does not refund an order that never took any money — that would MINT it', async () => {
-      await service.cancelOrder(makeOrder({ status: 'escrow', escrowTxId: null }));
+      await service.cancelOrder(
+        makeOrder({ status: 'escrow', escrowTxId: null }),
+      );
 
       expect(escrow.refund).not.toHaveBeenCalled();
       expect(ordersRepository.setStatus).toHaveBeenCalledWith(1, 'cancelado');
@@ -245,20 +259,26 @@ describe('WigglypopCustodyService', () => {
     });
 
     it('is a no-op when /confirm hits an already-completed order', async () => {
-      await service.confirmOrder(makeOrder({ status: 'completado', escrowTxId: 9001 }));
+      await service.confirmOrder(
+        makeOrder({ status: 'completado', escrowTxId: 9001 }),
+      );
 
       expect(escrow.release).not.toHaveBeenCalled();
     });
 
     it('does not refund twice when /cancel is replayed', async () => {
-      await service.cancelOrder(makeOrder({ status: 'cancelado', escrowTxId: 9001 }));
+      await service.cancelOrder(
+        makeOrder({ status: 'cancelado', escrowTxId: 9001 }),
+      );
 
       expect(escrow.refund).not.toHaveBeenCalled();
     });
 
     it('refuses to cancel an order that already completed', async () => {
       await expect(
-        service.cancelOrder(makeOrder({ status: 'completado', escrowTxId: 9001 })),
+        service.cancelOrder(
+          makeOrder({ status: 'completado', escrowTxId: 9001 }),
+        ),
       ).rejects.toThrow(BadRequestException);
 
       expect(escrow.refund).not.toHaveBeenCalled();
@@ -294,14 +314,25 @@ describe('WigglypopCustodyService', () => {
 
       // Took the exact mon that was listed, at the slot it was listed from, against its hash.
       expect(wingull.takePokemon).toHaveBeenCalledWith(SELLER, 2, 7, 'abc123');
-      expect(escrow.hold).toHaveBeenCalledWith(BUYER, 10250, expect.any(String));
+      expect(escrow.hold).toHaveBeenCalledWith(
+        BUYER,
+        10250,
+        expect.any(String),
+      );
       expect(wingull.givePokemon).toHaveBeenCalledWith(
         BUYER,
         'garchomp lvl:100',
         true,
       );
-      expect(escrow.release).toHaveBeenCalledWith(SELLER, 10000, expect.any(String));
-      expect(ordersRepository.setStatus).toHaveBeenLastCalledWith(1, 'completado');
+      expect(escrow.release).toHaveBeenCalledWith(
+        SELLER,
+        10000,
+        expect.any(String),
+      );
+      expect(ordersRepository.setStatus).toHaveBeenLastCalledWith(
+        1,
+        'completado',
+      );
     });
 
     it('takes BEFORE it charges — the ordering is the whole safety property', async () => {
@@ -342,8 +373,18 @@ describe('WigglypopCustodyService', () => {
         subtotal: 20000,
         total: 20500,
         lines: [
-          { ...makeOrder().lines[0], id: 11, listingId: 101, sellerUuid: 'seller-a' },
-          { ...makeOrder().lines[0], id: 12, listingId: 102, sellerUuid: 'seller-b' },
+          {
+            ...makeOrder().lines[0],
+            id: 11,
+            listingId: 101,
+            sellerUuid: 'seller-a',
+          },
+          {
+            ...makeOrder().lines[0],
+            id: 12,
+            listingId: 102,
+            sellerUuid: 'seller-b',
+          },
         ],
       });
       listingsRepository.findManyByIds.mockResolvedValue([
@@ -395,7 +436,9 @@ describe('WigglypopCustodyService', () => {
         makeListing({
           kind: 'items',
           mons: [],
-          items: [{ id: 1, listingId: 101, itemId: 'pixelmon:rare_candy', qty: 10 }],
+          items: [
+            { id: 1, listingId: 101, itemId: 'pixelmon:rare_candy', qty: 10 },
+          ],
         }),
       ]);
       // The player only actually had 6 of them.

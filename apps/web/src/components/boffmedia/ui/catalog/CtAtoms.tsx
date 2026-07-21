@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { Icon } from "@/components/boffmedia/primitives"
 import { CT_STATUS, CT_STATUS_ORDER, CtStore, useCtStatus, type CtStatusKey } from "./catalog-util"
@@ -8,7 +9,8 @@ import { CT_STATUS, CT_STATUS_ORDER, CtStore, useCtStatus, type CtStatusKey } fr
 // Catálogo atoms: half-star rating, status pill, status menu + log button.
 // Prefix ct- in catalogo.css.
 
-export function CtStars({ value = 0, onChange, size = 16, count, ariaLabel = "Puntuación" }: { value?: number; onChange?: (v: number) => void; size?: number; count?: React.ReactNode; ariaLabel?: string }) {
+export function CtStars({ value = 0, onChange, size = 16, count, ariaLabel }: { value?: number; onChange?: (v: number) => void; size?: number; count?: React.ReactNode; ariaLabel?: string }) {
+  const t = useTranslations("common.catalog")
   const [hover, setHover] = React.useState(0)
   const interactive = !!onChange
   const shown = interactive && hover ? hover : value
@@ -17,7 +19,7 @@ export function CtStars({ value = 0, onChange, size = 16, count, ariaLabel = "Pu
 
   if (!interactive) {
     return (
-      <span className="inline-flex items-center gap-2" title={value ? value + "/5" : "Sin nota"} aria-label={ariaLabel + " " + value + " de 5"}>
+      <span className="inline-flex items-center gap-2" title={value ? value + "/5" : t("noRating")} aria-label={(ariaLabel ?? t("rating")) + " " + value + " de 5"}>
         <span className="relative inline-flex leading-[0] text-line-2">
           {stars(false)}
           <span className="absolute inset-0 inline-flex overflow-hidden whitespace-nowrap text-accent" style={{ width: pct + "%" }}>
@@ -29,7 +31,7 @@ export function CtStars({ value = 0, onChange, size = 16, count, ariaLabel = "Pu
     )
   }
   return (
-    <span className="relative inline-flex cursor-pointer items-center gap-2 [&:hover_.ct-fill]:text-accent-bright" role="slider" aria-label={ariaLabel} aria-valuemin={0} aria-valuemax={5} aria-valuenow={value} onMouseLeave={() => setHover(0)}>
+    <span className="relative inline-flex cursor-pointer items-center gap-2 [&:hover_.ct-fill]:text-accent-bright" role="slider" aria-label={ariaLabel ?? t("rating")} aria-valuemin={0} aria-valuemax={5} aria-valuenow={value} onMouseLeave={() => setHover(0)}>
       <span aria-hidden className="relative inline-flex leading-[0] text-line-2">
         {stars(false)}
         <span className="ct-fill absolute inset-0 inline-flex overflow-hidden whitespace-nowrap text-accent" style={{ width: pct + "%" }}>
@@ -38,8 +40,8 @@ export function CtStars({ value = 0, onChange, size = 16, count, ariaLabel = "Pu
         <span className="absolute inset-0 flex">
           {[1, 2, 3, 4, 5].map((n) => (
             <React.Fragment key={n}>
-              <button type="button" tabIndex={-1} aria-label={n - 0.5 + " estrellas"} className="m-0 h-full flex-1 cursor-pointer border-0 bg-transparent p-0" onMouseEnter={() => setHover(n - 0.5)} onClick={() => onChange!(n - 0.5 === value ? 0 : n - 0.5)} />
-              <button type="button" tabIndex={-1} aria-label={n + " estrellas"} className="m-0 h-full flex-1 cursor-pointer border-0 bg-transparent p-0" onMouseEnter={() => setHover(n)} onClick={() => onChange!(n === value ? 0 : n)} />
+              <button type="button" tabIndex={-1} aria-label={t("halfStars", { count: n - 0.5 })} className="m-0 h-full flex-1 cursor-pointer border-0 bg-transparent p-0" onMouseEnter={() => setHover(n - 0.5)} onClick={() => onChange!(n - 0.5 === value ? 0 : n - 0.5)} />
+              <button type="button" tabIndex={-1} aria-label={t("stars", { count: n })} className="m-0 h-full flex-1 cursor-pointer border-0 bg-transparent p-0" onMouseEnter={() => setHover(n)} onClick={() => onChange!(n === value ? 0 : n)} />
             </React.Fragment>
           ))}
         </span>
@@ -67,6 +69,7 @@ export function CtStatusPill({ status, size = "md", solid = false, showLabel = t
 }
 
 export function CtStatusMenu({ gameId, onClose, block }: { gameId: string; onClose?: () => void; block?: boolean }) {
+  const t = useTranslations("common.catalog")
   const cur = useCtStatus(gameId)
   const ref = React.useRef<HTMLDivElement>(null)
   React.useEffect(() => {
@@ -121,7 +124,7 @@ export function CtStatusMenu({ gameId, onClose, block }: { gameId: string; onClo
           <span className="grid h-[26px] w-[26px] flex-none place-items-center border border-solid border-line text-txt-dim">
             <Icon name="x" size={15} />
           </span>
-          <span className="flex-1">Quitar de mi biblioteca</span>
+          <span className="flex-1">{t("removeFromLibrary")}</span>
         </button>
       )}
     </div>
@@ -129,6 +132,7 @@ export function CtStatusMenu({ gameId, onClose, block }: { gameId: string; onClo
 }
 
 export function CtLogButton({ gameId, block = false, size = "md" }: { gameId: string; block?: boolean; size?: "sm" | "md" }) {
+  const t = useTranslations("common.catalog")
   const [open, setOpen] = React.useState(false)
   const cur = useCtStatus(gameId)
   const s = cur ? CT_STATUS[cur] : null
@@ -151,7 +155,7 @@ export function CtLogButton({ gameId, block = false, size = "md" }: { gameId: st
         )}
       >
         <Icon name={s ? s.icon : "plus"} size={size === "sm" ? 13 : 15} className={cur === "wishlist" ? "fill-current" : undefined} />
-        {s ? s.label : "Registrar"}
+        {s ? s.label : t("log")}
         <Icon name="chevronDown" size={13} className="opacity-60" />
       </button>
       {open && <CtStatusMenu gameId={gameId} onClose={() => setOpen(false)} block={block} />}

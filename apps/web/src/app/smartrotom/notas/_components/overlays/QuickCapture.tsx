@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { Overlay, MODAL_PANEL, Icon, Kbd } from "../ui";
 
 // ⌘⇧N — jot a quick note; first line becomes the title.
@@ -11,6 +12,7 @@ export function QuickCapture({
   onClose: () => void;
   onSave: (init: { title: string; content: string }) => void;
 }) {
+  const t = useTranslations("notas");
   const [text, setText] = useState("");
 
   const save = () => {
@@ -34,7 +36,7 @@ export function QuickCapture({
         <div className="flex items-center gap-2.5 border-b border-nt-border px-[18px] py-3.5">
           <Icon name="zap" size={17} className="text-nt-accent-fg" />
           <span className="font-nt-display text-[12px] font-semibold uppercase tracking-[.08em] text-nt-accent-fg">
-            Captura rápida
+            {t("capture.title")}
           </span>
         </div>
         <div className="p-[18px]">
@@ -45,19 +47,19 @@ export function QuickCapture({
             onKeyDown={(e) => {
               if ((e.metaKey || e.ctrlKey) && e.key === "Enter") save();
             }}
-            placeholder="Escribe una idea rápida… (la primera línea es el título)"
+            placeholder={t("capture.placeholder")}
             className="min-h-[120px] w-full resize-none bg-transparent text-[15px] leading-[1.6] text-nt-fg outline-none placeholder:text-nt-fg-subtle"
           />
         </div>
         <div className="flex items-center justify-between border-t border-nt-border px-[18px] py-3">
           <span className="text-[11px] text-nt-fg-subtle">
-            <Kbd>⌘</Kbd> <Kbd>↵</Kbd> para guardar
+            <Kbd>⌘</Kbd> <Kbd>↵</Kbd> {t("capture.saveHint")}
           </span>
           <button
             onClick={save}
             className="inline-flex h-9 items-center gap-2 rounded-nt-md bg-gradient-to-b from-nt-500 to-nt-600 px-3.5 text-[13.5px] font-[550] text-white hover:brightness-[1.06]"
           >
-            <Icon name="plus" size={15} /> Guardar
+            <Icon name="plus" size={15} /> {t("capture.save")}
           </button>
         </div>
       </div>

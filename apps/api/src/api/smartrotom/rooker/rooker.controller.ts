@@ -60,7 +60,8 @@ export class RookerController {
 
   @Get('feed')
   @ApiOperation({
-    summary: 'Timeline. parati = every non-reply trino (pinned first, then newest). ' +
+    summary:
+      'Timeline. parati = every non-reply trino (pinned first, then newest). ' +
       'siguiendo = trinos authored or retrinoed by the uuids the viewer follows.',
   })
   @ApiResponse({ status: HttpStatus.OK, type: RookerFeedEntity })
@@ -77,7 +78,8 @@ export class RookerController {
 
   @Get('trends')
   @ApiOperation({
-    summary: 'Derived trends: #tags on trinos from the last 7 days, by post count.',
+    summary:
+      'Derived trends: #tags on trinos from the last 7 days, by post count.',
   })
   @ApiResponse({ status: HttpStatus.OK, type: RookerTrendListEntity })
   async getTrends(
@@ -87,7 +89,9 @@ export class RookerController {
   }
 
   @Get('suggestions')
-  @ApiOperation({ summary: 'Who to follow — profiles the viewer does not follow yet.' })
+  @ApiOperation({
+    summary: 'Who to follow — profiles the viewer does not follow yet.',
+  })
   @ApiResponse({ status: HttpStatus.OK, type: RookerSuggestionListEntity })
   async getSuggestions(
     @Query() query: SuggestionsQueryDto,
@@ -96,7 +100,9 @@ export class RookerController {
   }
 
   @Get('search')
-  @ApiOperation({ summary: 'LIKE search over handles/display names, trino text and tags.' })
+  @ApiOperation({
+    summary: 'LIKE search over handles/display names, trino text and tags.',
+  })
   @ApiResponse({ status: HttpStatus.OK, type: RookerSearchEntity })
   async search(@Query() query: SearchQueryDto): Promise<RookerSearchEntity> {
     return this.rookerService.search(
@@ -136,10 +142,15 @@ export class RookerController {
   // ==================== PROFILES ====================
 
   @Patch('profile')
-  @ApiOperation({ summary: 'Upsert your own profile. 409 if the handle is taken.' })
+  @ApiOperation({
+    summary: 'Upsert your own profile. 409 if the handle is taken.',
+  })
   @ApiBody({ type: UpdateProfileDto })
   @ApiResponse({ status: HttpStatus.OK, type: RookerProfileEntity })
-  @ApiResponse({ status: HttpStatus.CONFLICT, description: 'Handle already taken' })
+  @ApiResponse({
+    status: HttpStatus.CONFLICT,
+    description: 'Handle already taken',
+  })
   async updateProfile(
     @Body() dto: UpdateProfileDto,
   ): Promise<RookerProfileEntity> {
@@ -153,7 +164,9 @@ export class RookerController {
   // handle — the seeder may have suffixed it to dodge a collision — so it cannot
   // address its own profile through the handle route without asking first.
   @Get('me')
-  @ApiOperation({ summary: "The signed-in trainer's own profile, resolved by uuid." })
+  @ApiOperation({
+    summary: "The signed-in trainer's own profile, resolved by uuid.",
+  })
   @ApiResponse({
     status: HttpStatus.OK,
     type: RookerProfileEntity,
@@ -167,7 +180,8 @@ export class RookerController {
 
   @Get('profile/:handle')
   @ApiOperation({
-    summary: 'Profile + counts + real derived trainer stats (pokédex & battle log).',
+    summary:
+      'Profile + counts + real derived trainer stats (pokédex & battle log).',
   })
   @ApiParam({ name: 'handle', example: 'luisca' })
   @ApiResponse({ status: HttpStatus.OK, type: RookerProfileEntity })
@@ -212,7 +226,8 @@ export class RookerController {
   @Post('posts')
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({
-    summary: 'Create a trino. Parses #tags; notifies the parent author on a reply.',
+    summary:
+      'Create a trino. Parses #tags; notifies the parent author on a reply.',
   })
   @ApiBody({ type: CreatePostDto })
   @ApiResponse({ status: HttpStatus.CREATED, type: RookerPostEntity })
@@ -275,7 +290,9 @@ export class RookerController {
 
   @Post('posts/:id/retrino')
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Toggle a retrino. Notifies the author when added.' })
+  @ApiOperation({
+    summary: 'Toggle a retrino. Notifies the author when added.',
+  })
   @ApiParam({ name: 'id', type: Number })
   @ApiBody({ type: ActorDto })
   @ApiResponse({ status: HttpStatus.OK, type: RookerPostEntity })

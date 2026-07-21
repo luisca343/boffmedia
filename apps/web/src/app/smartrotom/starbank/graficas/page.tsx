@@ -1,5 +1,6 @@
 "use client";
 import * as React from "react";
+import { useTranslations } from "next-intl";
 import useStarBank from "../_hooks/useStarBank";
 import { useTransactions } from "../_hooks/queries";
 import { PageHeader, Card, SectionHead, CardBody, Kpi, Button, Ico, Seg, AreaChart, BarChart, Donut, Skeleton } from "../_components/ui";
@@ -8,16 +9,18 @@ import { displayName } from "../_utils/account";
 import { formatMoney } from "../_utils/format";
 import type { SBTransaction } from "../_types";
 
-const RANGES = [
-  { id: "7d", label: "7 días", days: 7 },
-  { id: "30d", label: "30 días", days: 30 },
-  { id: "90d", label: "90 días", days: 90 },
-  { id: "1y", label: "1 año", days: 365 },
-];
 const DAY = 86_400_000;
 
 export default function Graficas() {
+  const t = useTranslations("starbank");
   const { activeAccount } = useStarBank();
+
+  const RANGES = [
+    { id: "7d", label: t("graficas.rangeLabels.7d"), days: 7 },
+    { id: "30d", label: t("graficas.rangeLabels.30d"), days: 30 },
+    { id: "90d", label: t("graficas.rangeLabels.90d"), days: 90 },
+    { id: "1y", label: t("graficas.rangeLabels.1y"), days: 365 },
+  ];
   const accId = activeAccount?.id ?? -1;
   const { data: transactions, isLoading } = useTransactions(accId, 100);
   const [range, setRange] = React.useState("30d");
@@ -56,36 +59,36 @@ export default function Graficas() {
   return (
     <>
       <PageHeader
-        title="Gráficas y análisis"
-        sub={`Visualización de ${displayName(activeAccount.name)} · ${filtered.length} transacciones`}
+        title={t("graficas.title")}
+        sub={t("graficas.sub", { name: displayName(activeAccount.name), count: filtered.length })}
         actions={
           <>
             <Seg options={RANGES} value={range} onChange={setRange} />
-            <Button variant="secondary"><Ico name="download" size={14} /> Exportar</Button>
+            <Button variant="secondary"><Ico name="download" size={14} /> {t("common.export")}</Button>
           </>
         }
       />
 
       <div className="grid gap-4 md:grid-cols-3">
-        <Kpi label="Ingresos" value={formatMoney(inc)} icon="arrUR" tone="pos" />
-        <Kpi label="Gastos" value={formatMoney(exp)} icon="arrDR" tone="neg" />
-        <Kpi label="Transacción media" value={formatMoney(Math.round(avg))} icon="chart" tone="brand" sub={`${filtered.length} operaciones`} />
+        <Kpi label={t("graficas.kpi.income")} value={formatMoney(inc)} icon="arrUR" tone="pos" />
+        <Kpi label={t("graficas.kpi.expenses")} value={formatMoney(exp)} icon="arrDR" tone="neg" />
+        <Kpi label={t("graficas.kpi.avgTransaction")} value={formatMoney(Math.round(avg))} icon="chart" tone="brand" sub={t("graficas.kpi.operations", { count: filtered.length })} />
       </div>
 
       <div className="grid gap-4 md:grid-cols-12">
         <Card className="md:col-span-8">
-          <SectionHead eyebrow={`Últimos ${days} días`} title="Evolución de balance" />
+          <SectionHead eyebrow={t("graficas.charts.balanceEvolution")} title={t("graficas.charts.balanceEvolution")} />
           <CardBody>
             <AreaChart data={series} height={260} color="#2463eb" />
           </CardBody>
         </Card>
         <Card className="md:col-span-4">
-          <SectionHead eyebrow="Período" title="Mayor gasto" />
+          <SectionHead eyebrow={t("graficas.charts.largestExpense")} title={t("graficas.charts.largestExpense")} />
           <CardBody>
             <div className="font-sb-display text-[32px] font-semibold tabular-nums tracking-[-0.01em]">{formatMoney(largest)}</div>
-            <div className="text-[13px] text-sb-fg-muted">Operación más alta de salida en el período seleccionado.</div>
+            <div className="text-[13px] text-sb-fg-muted">{t("graficas.charts.largestExpenseDesc")}</div>
             <div className="h-px bg-sb-border" />
-            <div className="mb-1.5 block text-[12px] font-semibold uppercase tracking-[0.02em] text-sb-fg-muted">Actividad (14 días)</div>
+            <div className="mb-1.5 block text-[12px] font-semibold uppercase tracking-[0.02em] text-sb-fg-muted">{t("graficas.charts.activity14d")}</div>
             <div className="flex h-20 w-full items-end gap-1">
               {activity.map((a, i) => (
                 <div key={i} className="flex-1 rounded" style={{ height: `${20 + (a / maxAct) * 60}%`, background: a === maxAct && a > 0 ? "#2463eb" : "#bfdbfe" }} />
@@ -97,21 +100,21 @@ export default function Graficas() {
 
       <div className="grid gap-4 md:grid-cols-12">
         <Card className="md:col-span-6">
-          <SectionHead eyebrow="Por semana" title="Ingresos vs. gastos" />
+          <SectionHead eyebrow={t("graficas.charts.incomeVsExpenses")} title={t("graficas.charts.incomeVsExpenses")} />
           <CardBody>
             <BarChart data={weekly} height={220} />
             <div className="flex justify-center gap-4 pt-2">
-              <span className="flex items-center gap-1.5 text-[12px]"><span className="size-2.5 rounded bg-sb-pos-2" /> Ingresos</span>
-              <span className="flex items-center gap-1.5 text-[12px]"><span className="size-2.5 rounded bg-sb-neg-2" /> Gastos</span>
+              <span className="flex items-center gap-1.5 text-[12px]"><span className="size-2.5 rounded bg-sb-pos-2" /> {t("graficas.kpi.income")}</span>
+              <span className="flex items-center gap-1.5 text-[12px]"><span className="size-2.5 rounded bg-sb-neg-2" /> {t("graficas.kpi.expenses")}</span>
             </div>
           </CardBody>
         </Card>
 
         <Card className="md:col-span-6">
-          <SectionHead eyebrow="Gastos" title="Distribución por categoría" />
+          <SectionHead eyebrow={t("graficas.charts.byCategory")} title={t("graficas.charts.byCategory")} />
           <CardBody className="flex-row items-center justify-between gap-7">
             {byCat.length === 0 ? (
-              <div className="w-full py-8 text-center text-[13px] text-sb-fg-muted">Sin gastos en el período</div>
+              <div className="w-full py-8 text-center text-[13px] text-sb-fg-muted">{t("graficas.charts.noExpenses")}</div>
             ) : (
               <>
                 <Donut data={byCat} size={200} thickness={26} />

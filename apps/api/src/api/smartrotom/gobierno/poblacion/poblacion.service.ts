@@ -103,7 +103,9 @@ export class PoblacionService {
     // the FILTERED set, which is what the screen's counters read.
     if (query.standing) {
       const all = await this.poblacionRepository.listAllUsers(query.search);
-      const matching = all.map(enrich).filter((c) => c.standing === query.standing);
+      const matching = all
+        .map(enrich)
+        .filter((c) => c.standing === query.standing);
       const start = (page - 1) * limit;
       return {
         items: matching.slice(start, start + limit),

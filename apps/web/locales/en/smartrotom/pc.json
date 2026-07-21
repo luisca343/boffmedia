@@ -1,0 +1,184 @@
+{
+  "pc": {
+    "common": {
+      "close": "Close",
+      "back": "Back",
+      "retry": "Retry",
+      "loading": "Loading…",
+      "apply": "Apply",
+      "clear": "Clear",
+      "cancel": "Cancel",
+      "save": "Save",
+      "search": "Search"
+    },
+    "topbar": {
+      "title": "SmartRotom PC",
+      "subtitle": "STORAGE SYSTEM",
+      "searchPlaceholder": "Search by name, nickname or Pokédex number…",
+      "searchAriaLabel": "Search Pokémon",
+      "clearSearch": "Clear search",
+      "filters": "Filters (F)",
+      "dualBox": "Dual box (D)",
+      "multiSelect": "Multi-select (M)",
+      "livingDex": "Living Dex",
+      "commands": "Commands (Ctrl/⌘K)",
+      "sound": "Sound",
+      "muteSound": "Mute sounds",
+      "unmuteSound": "Enable sounds",
+      "help": "Keyboard shortcuts"
+    },
+    "filters": {
+      "title": "Filters and search",
+      "subtitle": "Refine your collection",
+      "searchAndSort": "Search and sort",
+      "searchPlaceholder": "Name, nickname or number…",
+      "sortBy": "Sort by",
+      "types": "Types",
+      "levelRange": "Level range",
+      "minLevel": "Min",
+      "maxLevel": "Max",
+      "specialStatus": "Special status",
+      "gender": "Gender",
+      "nature": "Nature",
+      "ability": "Ability",
+      "tag": "Tag",
+      "all": "All",
+      "matchCount": "{count} match",
+      "matchCountPlural": "{count} match",
+      "asc": "Asc",
+      "desc": "Desc",
+      "sortFields": {
+        "box": "Box",
+        "level": "Level",
+        "dex": "Pokédex",
+        "name": "Name",
+        "iv": "Total IV"
+      },
+      "statusToggles": {
+        "shiny": "Shiny",
+        "legendary": "Legendary",
+        "withItem": "With item",
+        "favorite": "Favorite"
+      },
+      "genderOptions": {
+        "male": "Male",
+        "female": "Female",
+        "genderless": "Genderless"
+      }
+    },
+    "themes": {
+      "title": "Theme · {box}",
+      "classic": "Classic",
+      "forest": "Forest",
+      "ocean": "Ocean",
+      "volcano": "Volcano",
+      "space": "Space",
+      "meadow": "Meadow",
+      "dusk": "Dusk",
+      "cave": "Cave",
+      "rainbow": "Rainbow",
+      "sakura": "Sakura"
+    },
+    "bulk": {
+      "selected": "{count} selected",
+      "moveTo": "Move to box",
+      "deselectAll": "Exit multi-select"
+    },
+    "compare": {
+      "title": "Comparing",
+      "empty": "Select Pokémon to compare"
+    },
+    "detail": {
+      "stats": "Stats",
+      "moves": "Moves",
+      "abilities": "Abilities",
+      "nature": "Nature",
+      "item": "Item",
+      "none": "None",
+      "ot": "OT",
+      "level": "Level"
+    },
+    "boot": {
+      "connecting": "Connecting to storage…",
+      "loading": "Loading Pokémon data…"
+    },
+    "error": {
+      "title": "Could not read your PC",
+      "retry": "Try again in a few seconds."
+    },
+    "empty": {
+      "noResults": "No results",
+      "noResultsBody": "No Pokémon match the current filters."
+    },
+    "help": {
+      "title": "Keyboard shortcuts",
+      "shortcuts": {
+        "search": "Focus search",
+        "filters": "Open filters",
+        "multiSelect": "Toggle multi-select",
+        "dualBox": "Toggle dual box",
+        "overview": "Box overview",
+        "commands": "Command palette",
+        "help": "Show shortcuts"
+      }
+    },
+    "toast": {
+      "moved": "{count} moved",
+      "movedOverflow": "{count} moved · {overflow} didn't fit",
+      "boxFull": "The box is full",
+      "alreadyInBox": "Already in that box"
+    },
+    "livingDex": {
+      "title": "Pokédex Progress",
+      "subtitle": "One of each species — track your gaps",
+      "complete": "{pct}% complete",
+      "missing": "You're missing {count} species.",
+      "noGaps": "No gaps in this filter!",
+      "loading": "Loading Pokédex…",
+      "all": "All",
+      "onlyMissing": "Only gaps"
+    },
+    "team": {
+      "title": "Team",
+      "battle": "Battle",
+      "inCombat": "{count}/6 in combat",
+      "dragHint": "drag to reorder",
+      "emptySlot": "Empty slot",
+      "readOnly": "Read-only — battle teams are edited in-game.",
+      "noTeams": "No saved battle teams.",
+      "loadError": "Could not read your team",
+      "loadErrorBody": "The game server didn't respond. Your boxes are still available."
+    },
+    "share": {
+      "title": "Share box",
+      "code": "Share code",
+      "summary": "Readable summary",
+      "hint": "Paste this code in another SmartRotom PC instance to import the box.",
+      "copied": "Code copied",
+      "summaryCopied": "Summary copied"
+    },
+    "organize": {
+      "by": "Auto-organize by",
+      "done": "organized · {count} moves",
+      "alreadyOrdered": "The box is already in that order"
+    },
+    "views": {
+      "title": "Views",
+      "save": "Save view",
+      "savePrompt": "Saved view name:",
+      "saved": "View «{name}» saved",
+      "delete": "Delete view {name}"
+    },
+    "boxOverview": {
+      "title": "All boxes",
+      "search": "Search box…",
+      "empty": "Empty"
+    },
+    "pagination": {
+      "page": "page {current}/{total}",
+      "prev": "Previous page",
+      "next": "Next page",
+      "selectAll": "Select all results (all pages)"
+    }
+  }
+}

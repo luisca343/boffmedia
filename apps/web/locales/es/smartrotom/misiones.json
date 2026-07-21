@@ -1,0 +1,92 @@
+{
+  "misiones": {
+    "board": {
+      "loading": "Descolgando los encargos del tablón…",
+      "closedTitle": "✦ Tablón cerrado ✦",
+      "closedHeading": "Nadie responde en la posada",
+      "closedDescription": "Los encargos los guarda el servidor de Minecraft; el tablón sólo los cuelga. Si el servidor está caído, aquí no hay nada que descolgar.",
+      "retry": "Volver a llamar",
+      "emptyBoard": "No hay encargos en el tablón todavía.",
+      "emptyFiltered": "El tablón está vacío con esos criterios. Cambia los filtros."
+    },
+    "playerHeader": {
+      "adventurerLog": "Bitácora del aventurero",
+      "questsInKingdoms": "Encargos en {count, plural, one {# reino} other {# reinos}}",
+      "noQuests": "Sin encargos en el tablón",
+      "completedQuests": "Encargos cumplidos",
+      "active": "Vigentes",
+      "available": "Disponibles",
+      "sealed": "Selladas",
+      "kingdoms": "Reinos",
+      "inn": "❦ Posada del Rotom",
+      "questsOnBoard": "⚔ {count} encargos en el tablón"
+    },
+    "boardFilters": {
+      "filterByKingdom": "Filtrar por reino",
+      "remove": "Quitar",
+      "searchPlaceholder": "Buscar misión, NPC, reino…",
+      "searchLabel": "Buscar en el tablón",
+      "all": "Todas",
+      "sortOrder": "Orden: por sello",
+      "sortLevel": "Orden: por nivel",
+      "sortName": "Orden: alfabético"
+    },
+    "questPaper": {
+      "completed": "Completada",
+      "failed": "Fallida",
+      "repeatable": "Repetible",
+      "level": "Nv. {level}",
+      "from": "de {npc}",
+      "unknown": "Desconocido",
+      "objectives": "{done}/{total} objetivos",
+      "reward": "Recompensa"
+    },
+    "questLetter": {
+      "readLetter": "Leer carta"
+    },
+    "questChain": {
+      "title": "Cadena de misiones"
+    },
+    "journalEntry": {
+      "title": "Entrada del diario"
+    },
+    "npcDossier": {
+      "title": "Dossier del NPC"
+    },
+    "satchelSlot": {
+      "empty": "Ranura vacía"
+    },
+    "trackedQuest": {
+      "title": "Encargo rastreado"
+    },
+    "threadWall": {
+      "title": "Muro de hilos"
+    },
+    "sideRail": {
+      "title": "Raíl lateral"
+    },
+    "kingdomMap": {
+      "title": "Mapa de reinos"
+    },
+    "scatterLayer": {
+      "title": "Capa de dispersión"
+    },
+    "rewardCard": {
+      "title": "Recompensa"
+    },
+    "nav": {
+      "board": "Tablón",
+      "log": "Bitácora",
+      "backpack": "Mochila",
+      "map": "Mapa",
+      "story": "Trama"
+    },
+    "status": {
+      "active": "Vigente",
+      "available": "Disponible",
+      "locked": "Sellada",
+      "completed": "Completada",
+      "failed": "Fallida"
+    }
+  }
+}

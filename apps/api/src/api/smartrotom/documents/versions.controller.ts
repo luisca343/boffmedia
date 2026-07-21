@@ -1,11 +1,4 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Param,
-  Post,
-  HttpStatus,
-} from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, HttpStatus } from '@nestjs/common';
 import { Public } from '@api/_utils/decorators/public.decorator';
 import {
   ApiTags,

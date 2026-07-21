@@ -74,7 +74,10 @@ export class RookerService {
         const prevIsOriginal = prev.retrinoByUuid === null;
         const curIsOriginal = c.retrinoByUuid === null;
         if (curIsOriginal && !prevIsOriginal) best.set(c.postId, c);
-        else if (curIsOriginal === prevIsOriginal && c.surfacedAt > prev.surfacedAt) {
+        else if (
+          curIsOriginal === prevIsOriginal &&
+          c.surfacedAt > prev.surfacedAt
+        ) {
           best.set(c.postId, c);
         }
       }
@@ -105,7 +108,13 @@ export class RookerService {
 
     const [postViews, replies] = await Promise.all([
       this.repo.hydrate(
-        [{ postId: id, surfacedAt: post.createdAt ?? new Date(0), retrinoByUuid: null }],
+        [
+          {
+            postId: id,
+            surfacedAt: post.createdAt ?? new Date(0),
+            retrinoByUuid: null,
+          },
+        ],
         viewer,
       ),
       this.repo.hydrate(replyRows, viewer),
@@ -162,7 +171,10 @@ export class RookerService {
     return views[0];
   }
 
-  async deletePost(id: number, uuid: string): Promise<{ ok: true; id: number }> {
+  async deletePost(
+    id: number,
+    uuid: string,
+  ): Promise<{ ok: true; id: number }> {
     const post = await this.repo.findPost(id);
     if (!post) throw new NotFoundException(`Trino ${id} not found`);
     if (post.uuid !== uuid) {
@@ -292,7 +304,9 @@ export class RookerService {
     const [counts, stats, follow] = await Promise.all([
       this.repo.profileCounts(profile.uuid),
       this.repo.trainerStats(profile.uuid, totalSpecies),
-      viewer ? this.repo.findFollow(viewer, profile.uuid) : Promise.resolve(null),
+      viewer
+        ? this.repo.findFollow(viewer, profile.uuid)
+        : Promise.resolve(null),
     ]);
 
     return {

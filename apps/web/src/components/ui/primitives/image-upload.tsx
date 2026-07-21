@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useRef, useCallback } from 'react';
+import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/primitives/button';
 import {
   ImageIcon,
@@ -32,8 +33,9 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
   disabled = false,
   multiple = false,
   value,
-  placeholder = "Arrastra una imagen aquí o haz clic para seleccionar"
+  placeholder,
 }) => {
+  const t = useTranslations("common.imageUpload");
   const [dragActive, setDragActive] = useState(false);
   const [preview, setPreview] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -58,17 +60,17 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
   const validateFile = useCallback((file: File): string | null => {
     // Check file type
     if (!acceptedTypes.includes(file.type)) {
-      return `Tipo de archivo no válido. Se aceptan: ${acceptedTypes.map(type => type.split('/')[1]).join(', ')}`;
+      return t("invalidFileType", { types: acceptedTypes.map(type => type.split('/')[1]).join(', ') });
     }
 
     // Check file size
     const sizeInMB = file.size / (1024 * 1024);
     if (sizeInMB > maxSizeInMB) {
-      return `El archivo es demasiado grande. Tamaño máximo: ${maxSizeInMB}MB`;
+      return t("fileTooLarge", { maxSize: maxSizeInMB });
     }
 
     return null;
-  }, [acceptedTypes, maxSizeInMB]);
+  }, [acceptedTypes, maxSizeInMB, t]);
 
   const handleFile = useCallback((file: File) => {
     const validationError = validateFile(file);
@@ -179,7 +181,7 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
                 disabled={disabled}
               >
                 <XIcon className="h-4 w-4 mr-1" />
-                Eliminar
+                {t("remove")}
               </Button>
             </div>
           </div>
@@ -207,7 +209,7 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
             {isUploading ? (
               <>
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
-                <p className="text-sm text-blue-600 font-medium">Subiendo imagen...</p>
+                <p className="text-sm text-blue-600 font-medium">{t("uploading")}</p>
               </>
             ) : (
               <>
@@ -221,17 +223,17 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
                 
                 <div className="mt-4 flex text-sm leading-6 text-gray-600">
                   <span className="font-semibold text-blue-600 hover:text-blue-500">
-                    Seleccionar archivo
+                    {t("selectFile")}
                   </span>
-                  <p className="pl-1">o arrastra y suelta</p>
+                  <p className="pl-1">{t("orDragDrop")}</p>
                 </div>
                 
                 <p className="text-xs leading-5 text-gray-500 mt-2">
-                  {placeholder}
+                  {placeholder ?? t("placeholder")}
                 </p>
                 
                 <p className="text-xs text-gray-400 mt-1">
-                  {acceptedTypes.map(type => type.split('/')[1].toUpperCase()).join(', ')} hasta {maxSizeInMB}MB
+                  {acceptedTypes.map(type => type.split('/')[1].toUpperCase()).join(', ')} {t("maxSize", { maxSize: maxSizeInMB })}
                 </p>
               </>
             )}
@@ -242,7 +244,7 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
             <div className="absolute inset-0 bg-blue-500 bg-opacity-10 rounded-lg flex items-center justify-center">
               <div className="bg-white rounded-lg p-4 shadow-lg border border-blue-200">
                 <ImageIcon className="h-8 w-8 text-blue-600 mx-auto mb-2" />
-                <p className="text-sm font-medium text-blue-800">Suelta la imagen aquí</p>
+                <p className="text-sm font-medium text-blue-800">{t("dropImageHere")}</p>
               </div>
             </div>
           )}
@@ -260,8 +262,8 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
       {/* Help Text */}
       {!error && !preview && (
         <div className="mt-2 text-xs text-gray-500">
-          <p>Formatos soportados: {acceptedTypes.map(type => type.split('/')[1].toUpperCase()).join(', ')}</p>
-          <p>Tamaño máximo: {maxSizeInMB}MB</p>
+          <p>{t("supportedFormats", { formats: acceptedTypes.map(type => type.split('/')[1].toUpperCase()).join(', ') })}</p>
+          <p>{t("maxSize", { maxSize: maxSizeInMB })}</p>
         </div>
       )}
     </div>

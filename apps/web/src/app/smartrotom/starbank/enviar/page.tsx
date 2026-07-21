@@ -1,6 +1,7 @@
 "use client";
 import * as React from "react";
 import type { CreateTransferDto } from "@boffmedia/shared";
+import { useTranslations, useLocale } from "next-intl";
 import { useRotomUuid } from "@/components/smartrotom/behavior/useRotomUuid";
 import { useAccounts, useAllAccounts, useTransferMutation } from "../_hooks/queries";
 import { userMessageFrom } from "@/services/boffAPI";
@@ -12,9 +13,11 @@ import type { SBAccount } from "../_types";
 
 const BASE = "/smartrotom/starbank";
 const PRESETS = [1000, 5000, 10000, 25000, 50000];
-const STEPS = ["Destinatario", "Importe", "Revisar"];
 
 export default function Enviar() {
+  const t = useTranslations("starbank");
+  const locale = useLocale();
+  const STEPS = [t("enviar.steps.recipient"), t("enviar.steps.amount"), t("enviar.steps.review")];
   const uuid = useRotomUuid();
   const { data: myAccounts } = useAccounts(uuid);
   const { data: allAccounts } = useAllAccounts();
@@ -78,19 +81,19 @@ export default function Enviar() {
           <div className="mx-auto mb-5 grid size-20 place-items-center rounded-full bg-sb-pos-soft text-sb-pos">
             <Ico name="check" size={36} />
           </div>
-          <h2 className="m-0 mb-1.5 font-sb-display text-[24px] font-semibold">¡Transferencia enviada!</h2>
+          <h2 className="m-0 mb-1.5 font-sb-display text-[24px] font-semibold">{t("enviar.transferSent")}</h2>
           <div className="mb-4 text-sb-fg-muted">
-            Has enviado <strong className="tabular-nums text-sb-fg">{formatMoney(amount)}</strong> a <strong>{displayName(recipient.name)}</strong>
+            {t("enviar.transferSentBody", { amount: formatMoney(amount), name: displayName(recipient.name) })}
           </div>
           <div className="mb-4 font-sb-display text-[48px] font-semibold tabular-nums text-sb-fg">{formatMoney(amount)}</div>
           <div className="rounded-sb-md bg-sb-surface-2 p-3.5 text-left text-[13px]">
-            <div className="flex justify-between"><span className="text-sb-fg-muted">De</span><span>{displayName(fromAcc.name)}</span></div>
-            <div className="mt-1.5 flex justify-between"><span className="text-sb-fg-muted">Concepto</span><span>{concept || "—"}</span></div>
-            <div className="mt-1.5 flex justify-between"><span className="text-sb-fg-muted">Referencia</span><span className="font-mono">SR-{Date.now().toString().slice(-8)}</span></div>
+            <div className="flex justify-between"><span className="text-sb-fg-muted">{t("enviar.from")}</span><span>{displayName(fromAcc.name)}</span></div>
+            <div className="mt-1.5 flex justify-between"><span className="text-sb-fg-muted">{t("enviar.concept")}</span><span>{concept || "—"}</span></div>
+            <div className="mt-1.5 flex justify-between"><span className="text-sb-fg-muted">{t("enviar.reference")}</span><span className="font-mono">SR-{Date.now().toString().slice(-8)}</span></div>
           </div>
           <div className="mt-5 flex justify-center gap-2">
-            <Button variant="secondary" onClick={() => { transferMutation.reset(); setDone(false); setStep(0); setRecipient(null); setAmountStr(""); setConcept(""); }}>Nueva transferencia</Button>
-            <Button variant="primary" href={`${BASE}/transacciones`}>Ver movimientos</Button>
+            <Button variant="secondary" onClick={() => { transferMutation.reset(); setDone(false); setStep(0); setRecipient(null); setAmountStr(""); setConcept(""); }}>{t("enviar.newTransfer")}</Button>
+            <Button variant="primary" href={`${BASE}/transacciones`}>{t("enviar.viewMovements")}</Button>
           </div>
         </Card>
       </div>
@@ -99,7 +102,7 @@ export default function Enviar() {
 
   return (
     <>
-      <PageHeader title="Enviar dinero" sub="Transfiere a otro entrenador, tienda o cuenta tuya" />
+      <PageHeader title={t("enviar.title")} sub={t("enviar.sub")} />
 
       <Card className="p-6">
         <Stepper steps={STEPS} current={step} />
@@ -107,31 +110,31 @@ export default function Enviar() {
         {step === 0 && (
           <div className="mx-auto flex w-full max-w-[720px] flex-col gap-[18px]">
             <div>
-              <Label htmlFor="recip">Buscar destinatario</Label>
+              <Label htmlFor="recip">{t("enviar.searchRecipient")}</Label>
               <div className="relative">
                 <Ico name="search" size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-sb-fg-subtle" />
-                <Input id="recip" className="pl-9" placeholder="Nombre de la cuenta…" value={q} onChange={(e) => setQ(e.target.value)} />
+                <Input id="recip" className="pl-9" placeholder={t("enviar.searchPlaceholder")} value={q} onChange={(e) => setQ(e.target.value)} />
               </div>
             </div>
             <div>
-              <Label>Mis cuentas</Label>
-              <p className="-mt-1 mb-2 text-[12px] text-sb-fg-muted">Mueve dinero entre tus propias cuentas.</p>
+              <Label>{t("enviar.myAccounts")}</Label>
+              <p className="-mt-1 mb-2 text-[12px] text-sb-fg-muted">{t("enviar.myAccountsSub")}</p>
               <div className="grid gap-2.5 [grid-template-columns:repeat(auto-fill,minmax(140px,1fr))]">
                 {myTargets.map((c) => <RecipientCard key={c.id} account={c} selected={recipient?.id === c.id} onSelect={setRecipient} />)}
-                {myTargets.length === 0 && <div className="col-span-full py-4 text-center text-[13px] text-sb-fg-muted">Sin coincidencias</div>}
+                {myTargets.length === 0 && <div className="col-span-full py-4 text-center text-[13px] text-sb-fg-muted">{t("enviar.noMatches")}</div>}
               </div>
             </div>
 
             <div>
-              <Label>Otras cuentas</Label>
+              <Label>{t("enviar.otherAccounts")}</Label>
               <div className="grid gap-2.5 [grid-template-columns:repeat(auto-fill,minmax(140px,1fr))]">
                 {otherTargets.slice(0, 12).map((c) => <RecipientCard key={c.id} account={c} selected={recipient?.id === c.id} onSelect={setRecipient} />)}
-                {otherTargets.length === 0 && <div className="col-span-full py-4 text-center text-[13px] text-sb-fg-muted">{q2 ? "Sin coincidencias" : "No hay otras cuentas"}</div>}
+                {otherTargets.length === 0 && <div className="col-span-full py-4 text-center text-[13px] text-sb-fg-muted">{q2 ? t("enviar.noMatches") : t("enviar.noOtherAccounts")}</div>}
               </div>
             </div>
             <div className="mt-2 flex items-center justify-between">
-              <Button variant="ghost" href={BASE}>Cancelar</Button>
-              <Button variant="primary" disabled={!canNext1} onClick={() => setStep(1)}>Continuar <Ico name="arrR" size={14} /></Button>
+              <Button variant="ghost" href={BASE}>{t("enviar.cancel")}</Button>
+              <Button variant="primary" disabled={!canNext1} onClick={() => setStep(1)}>{t("enviar.continue")} <Ico name="arrR" size={14} /></Button>
             </div>
           </div>
         )}
@@ -139,14 +142,14 @@ export default function Enviar() {
         {step === 1 && recipient && (
           <div className="mx-auto flex w-full max-w-[520px] flex-col gap-5">
             <div className="flex items-center justify-center gap-2.5 rounded-sb-md bg-sb-surface-2 p-3.5">
-              <span className="text-[13px] text-sb-fg-muted">Enviando a</span>
+              <span className="text-[13px] text-sb-fg-muted">{t("enviar.sendingTo")}</span>
               <ContactAvatar name={recipient.name} type={recipient.type} image={recipient.image} id={recipient.id} size={28} />
               <strong>{displayName(recipient.name)}</strong>
-              <Button variant="ghost" size="sm" onClick={() => setStep(0)}>Cambiar</Button>
+              <Button variant="ghost" size="sm" onClick={() => setStep(0)}>{t("enviar.change")}</Button>
             </div>
 
             <div className="py-5 text-center">
-              <Label className="text-center">Importe</Label>
+              <Label className="text-center">{t("enviar.amountLabel")}</Label>
               <input
                 autoFocus
                 inputMode="decimal"
@@ -157,35 +160,35 @@ export default function Enviar() {
               />
               <div className={cn("text-[13px]", fromAcc && amount > fromAcc.balance ? "text-sb-neg" : "text-sb-fg-muted")}>
                 {fromAcc && amount > fromAcc.balance
-                  ? `Excede el saldo disponible (${formatMoney(fromAcc.balance)})`
-                  : `Disponible en ${fromAcc ? displayName(fromAcc.name) : "—"}: ${formatMoney(fromAcc?.balance ?? 0)}`}
+                  ? t("enviar.exceedsBalance", { amount: formatMoney(fromAcc.balance) })
+                  : t("enviar.available", { name: fromAcc ? displayName(fromAcc.name) : "—", amount: formatMoney(fromAcc?.balance ?? 0) })}
               </div>
             </div>
 
             <div className="flex flex-wrap justify-center gap-2">
               {PRESETS.map((v) => (
-                <button key={v} type="button" onClick={() => setAmountStr(v.toLocaleString("es-ES"))} className="rounded-sb-pill border border-sb-border bg-sb-surface px-3.5 py-2 text-[13px] font-medium transition-colors hover:border-sb-300 hover:bg-sb-50 hover:text-sb-700">
+                <button key={v} type="button" onClick={() => setAmountStr(v.toLocaleString(locale))} className="rounded-sb-pill border border-sb-border bg-sb-surface px-3.5 py-2 text-[13px] font-medium transition-colors hover:border-sb-300 hover:bg-sb-50 hover:text-sb-700">
                   {formatMoney(v)}
                 </button>
               ))}
             </div>
 
             <div>
-              <Label htmlFor="from-acc">Pagar desde</Label>
+              <Label htmlFor="from-acc">{t("enviar.payFrom")}</Label>
               <Select id="from-acc" value={from} onChange={(e) => setFrom(Number(e.target.value))}>
                 {mine.map((a) => <option key={a.id} value={a.id}>{displayName(a.name)} — {formatMoney(a.balance)}</option>)}
               </Select>
-              {recipient?.id === from && <p className="mt-1.5 text-[12px] font-medium text-sb-neg">Elige una cuenta de origen distinta al destinatario.</p>}
+              {recipient?.id === from && <p className="mt-1.5 text-[12px] font-medium text-sb-neg">{t("enviar.differentAccount")}</p>}
             </div>
 
             <div>
-              <Label htmlFor="concept">Concepto (opcional)</Label>
-              <Input id="concept" value={concept} onChange={(e) => setConcept(e.target.value)} placeholder="Ej: Reembolso pokébolas" maxLength={50} />
+              <Label htmlFor="concept">{t("enviar.concept")}</Label>
+              <Input id="concept" value={concept} onChange={(e) => setConcept(e.target.value)} placeholder={t("enviar.conceptPlaceholder")} maxLength={50} />
             </div>
 
             <div className="flex items-center justify-between">
-              <Button variant="ghost" onClick={() => setStep(0)}><Ico name="arrL" size={14} /> Atrás</Button>
-              <Button variant="primary" disabled={!canNext2} onClick={() => setStep(2)}>Revisar <Ico name="arrR" size={14} /></Button>
+              <Button variant="ghost" onClick={() => setStep(0)}><Ico name="arrL" size={14} /> {t("common.back")}</Button>
+              <Button variant="primary" disabled={!canNext2} onClick={() => setStep(2)}>{t("enviar.steps.review")} <Ico name="arrR" size={14} /></Button>
             </div>
           </div>
         )}
@@ -193,36 +196,36 @@ export default function Enviar() {
         {step === 2 && recipient && fromAcc && (
           <div className="mx-auto flex w-full max-w-[520px] flex-col gap-[18px]">
             <div className="text-center">
-              <Label className="text-center">Vas a enviar</Label>
+              <Label className="text-center">{t("enviar.reviewTitle")}</Label>
               <div className="font-sb-display text-[56px] font-bold tabular-nums tracking-[-0.02em]">{formatMoney(amount)}</div>
             </div>
 
             <div className="flex flex-col gap-3 rounded-sb-md bg-sb-surface-2 p-[18px]">
               <div className="flex items-center justify-between">
-                <span className="text-sb-fg-muted">De</span>
+                <span className="text-sb-fg-muted">{t("enviar.from")}</span>
                 <span className="flex items-center gap-2"><AccountAvatar account={fromAcc} size={24} /><strong>{displayName(fromAcc.name)}</strong></span>
               </div>
               <div className="h-px bg-sb-border" />
               <div className="flex items-center justify-between">
-                <span className="text-sb-fg-muted">A</span>
+                <span className="text-sb-fg-muted">{t("enviar.to")}</span>
                 <span className="flex items-center gap-2"><ContactAvatar name={recipient.name} type={recipient.type} image={recipient.image} id={recipient.id} size={24} /><strong>{displayName(recipient.name)}</strong></span>
               </div>
               <div className="h-px bg-sb-border" />
-              <div className="flex items-center justify-between"><span className="text-sb-fg-muted">Concepto</span><span>{concept || "—"}</span></div>
+              <div className="flex items-center justify-between"><span className="text-sb-fg-muted">{t("enviar.concept")}</span><span>{concept || "—"}</span></div>
               <div className="h-px bg-sb-border" />
-              <div className="flex items-center justify-between"><span className="font-semibold">Total a debitar</span><span className="text-[16px] font-bold tabular-nums">{formatMoney(amount)}</span></div>
+              <div className="flex items-center justify-between"><span className="font-semibold">{t("enviar.totalDebit")}</span><span className="text-[16px] font-bold tabular-nums">{formatMoney(amount)}</span></div>
             </div>
 
             <div className="flex items-center gap-2.5 rounded-sb-md bg-sb-info-soft p-3 text-sb-info">
               <Ico name="shieldOk" size={16} />
-              <span className="text-[12.5px]">Transferencia instantánea y protegida. Saldo proyectado tras la operación: <strong className="tabular-nums">{formatMoney(fromAcc.balance - amount)}</strong></span>
+              <span className="text-[12.5px]">{t("enviar.instantProtected", { amount: formatMoney(fromAcc.balance - amount) })}</span>
             </div>
 
             {error && <div className="text-[13px] font-medium text-sb-neg">{error}</div>}
 
             <div className="flex items-center justify-between">
-              <Button variant="ghost" onClick={() => setStep(1)}><Ico name="arrL" size={14} /> Atrás</Button>
-              <Button variant="primary" size="lg" onClick={finish} disabled={transferMutation.isPending}><Ico name="send" size={16} /> {transferMutation.isPending ? "Enviando…" : "Confirmar y enviar"}</Button>
+              <Button variant="ghost" onClick={() => setStep(1)}><Ico name="arrL" size={14} /> {t("common.back")}</Button>
+              <Button variant="primary" size="lg" onClick={finish} disabled={transferMutation.isPending}><Ico name="send" size={16} /> {transferMutation.isPending ? t("enviar.sending") : t("enviar.confirmSend")}</Button>
             </div>
           </div>
         )}
@@ -232,6 +235,7 @@ export default function Enviar() {
 }
 
 function RecipientCard({ account: c, selected, onSelect }: { account: SBAccount; selected: boolean; onSelect: (a: SBAccount) => void }) {
+  const t = useTranslations("starbank");
   return (
     <button
       type="button"
@@ -243,7 +247,7 @@ function RecipientCard({ account: c, selected, onSelect }: { account: SBAccount;
     >
       <ContactAvatar name={c.name} type={c.type} image={c.image} id={c.id} size={44} />
       <span className="text-center text-[13px] font-semibold">{displayName(c.name)}</span>
-      <span className="text-[11px] text-sb-fg-muted">{c.type === "MAIN" ? "Principal" : "Secundaria"}</span>
+      <span className="text-[11px] text-sb-fg-muted">{c.type === "MAIN" ? t("accounts.main") : t("accounts.secondary")}</span>
     </button>
   );
 }

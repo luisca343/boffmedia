@@ -45,7 +45,10 @@ export class StarbankTransactionRepository implements IStarbankTransactionReposi
         const lockAccount = async (id: number) => {
           if (id === 0) return null;
           const rows = await tx
-            .select({ id: starBankAccounts.id, balance: starBankAccounts.balance })
+            .select({
+              id: starBankAccounts.id,
+              balance: starBankAccounts.balance,
+            })
             .from(starBankAccounts)
             .where(eq(starBankAccounts.id, id))
             .for('update');
@@ -65,7 +68,9 @@ export class StarbankTransactionRepository implements IStarbankTransactionReposi
           return { success: false, message: 'Insufficient balance' };
         }
 
-        const fromBalance = fromAccount ? (fromAccount.balance ?? 0) - amount : 0;
+        const fromBalance = fromAccount
+          ? (fromAccount.balance ?? 0) - amount
+          : 0;
         const toBalance = toAccount ? (toAccount.balance ?? 0) + amount : 0;
 
         if (fromAccount) {
@@ -118,7 +123,10 @@ export class StarbankTransactionRepository implements IStarbankTransactionReposi
     newBalance?: number;
   }> {
     if (accountId === 0) {
-      return { success: false, message: 'Cannot set the system account balance' };
+      return {
+        success: false,
+        message: 'Cannot set the system account balance',
+      };
     }
     if (targetBalance < 0) {
       return { success: false, message: 'Target balance must be non-negative' };
@@ -174,7 +182,10 @@ export class StarbankTransactionRepository implements IStarbankTransactionReposi
     } catch (error: any) {
       // Rolled back — no partial change persisted.
       this.logger.error('Failed to set balance:', error);
-      return { success: false, message: `Set balance failed: ${error.message}` };
+      return {
+        success: false,
+        message: `Set balance failed: ${error.message}`,
+      };
     }
   }
 

@@ -1,14 +1,16 @@
 "use client";
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { Chip, Icon, Modal } from "../ui";
 import type { ImageMessageData } from "../../_types/Chat";
 import type { ChatVM } from "../../_types/view";
 import { sharedDocuments, sharedImages, sharedVideos, sharedWaypoints } from "../../_utils/media";
 
-const TABS = ["Fotos", "Vídeos", "Waypoints", "Documentos"] as const;
+const TAB_KEYS = ["photos", "videos", "waypoints", "documents"] as const;
 
 export function MediaModal({ chat, onClose, onOpenImage }: { chat: ChatVM; onClose: () => void; onOpenImage: (d: ImageMessageData) => void }) {
-  const [tab, setTab] = useState<(typeof TABS)[number]>("Fotos");
+  const t = useTranslations("chatapp");
+  const [tab, setTab] = useState<(typeof TAB_KEYS)[number]>("photos");
   const images = sharedImages(chat);
   const videos = sharedVideos(chat);
   const waypoints = sharedWaypoints(chat);
@@ -22,14 +24,14 @@ export function MediaModal({ chat, onClose, onOpenImage }: { chat: ChatVM; onClo
   );
 
   return (
-    <Modal title="Multimedia y archivos" icon="image" wide onClose={onClose}>
+    <Modal title={t("media.title")} icon="image" wide onClose={onClose}>
       <div className="mb-3.5 flex flex-wrap gap-1.5">
-        {TABS.map((t) => (
-          <Chip key={t} active={tab === t} onClick={() => setTab(t)}>{t}</Chip>
+        {TAB_KEYS.map((k) => (
+          <Chip key={k} active={tab === k} onClick={() => setTab(k)}>{t(`media.tabs.${k}`)}</Chip>
         ))}
       </div>
 
-      {tab === "Fotos" &&
+      {tab === "photos" &&
         (images.length ? (
           <div className="grid grid-cols-4 gap-1.5">
             {images.map((img) => (
@@ -39,24 +41,24 @@ export function MediaModal({ chat, onClose, onOpenImage }: { chat: ChatVM; onClo
             ))}
           </div>
         ) : (
-          <Empty icon="image" text="Aún no hay fotos compartidas." />
+          <Empty icon="image" text={t("media.emptyPhotos")} />
         ))}
 
-      {tab === "Vídeos" &&
+      {tab === "videos" &&
         (videos.length ? (
           <div className="flex flex-col gap-2">
             {videos.map((v, i) => (
               <a key={i} href={v.url} target="_blank" rel="noreferrer" className="flex items-center gap-3 rounded-ca-md bg-ca-500/10 p-2 hover:bg-ca-500/20">
                 <img src={`https://img.youtube.com/vi/${v.videoId}/default.jpg`} alt="" className="h-12 w-20 flex-none rounded-ca-sm object-cover" />
-                <span className="truncate text-[14px] text-ca-100">{v.title || "Vídeo de YouTube"}</span>
+                <span className="truncate text-[14px] text-ca-100">{v.title || t("media.youtubeVideo")}</span>
               </a>
             ))}
           </div>
         ) : (
-          <Empty icon="play" text="Aún no hay vídeos compartidos." />
+          <Empty icon="play" text={t("media.emptyVideos")} />
         ))}
 
-      {tab === "Waypoints" &&
+      {tab === "waypoints" &&
         (waypoints.length ? (
           <div className="flex flex-col gap-2">
             {waypoints.map((w, i) => (
@@ -72,10 +74,10 @@ export function MediaModal({ chat, onClose, onOpenImage }: { chat: ChatVM; onClo
             ))}
           </div>
         ) : (
-          <Empty icon="mappin" text="Aún no hay waypoints compartidos." />
+          <Empty icon="mappin" text={t("media.emptyWaypoints")} />
         ))}
 
-      {tab === "Documentos" &&
+      {tab === "documents" &&
         (documents.length ? (
           <div className="flex flex-col gap-2">
             {documents.map((d, i) => (
@@ -89,7 +91,7 @@ export function MediaModal({ chat, onClose, onOpenImage }: { chat: ChatVM; onClo
             ))}
           </div>
         ) : (
-          <Empty icon="file" text="Aún no hay documentos compartidos." />
+          <Empty icon="file" text={t("media.emptyDocuments")} />
         ))}
     </Modal>
   );

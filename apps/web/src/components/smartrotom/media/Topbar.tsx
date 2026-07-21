@@ -3,6 +3,7 @@
 import { useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { MEDIA_THEMES, useMediaTheme, type MediaAppId } from "./_theme"
 import { I } from "./ui/icons"
@@ -43,6 +44,7 @@ function AppSwitchBtn({ id, active }: { id: MediaAppId; active: boolean }) {
 export function Topbar({ onToggleSidebar }: { onToggleSidebar?: () => void }) {
   const theme = useMediaTheme()
   const router = useRouter()
+  const t = useTranslations("common.media")
   const [q, setQ] = useState("")
 
   const submit = (e: React.FormEvent) => {
@@ -58,7 +60,7 @@ export function Topbar({ onToggleSidebar }: { onToggleSidebar?: () => void }) {
         <button
           type="button"
           onClick={onToggleSidebar}
-          aria-label="Menú"
+          aria-label={t("menu")}
           className="inline-flex h-10 w-10 items-center justify-center rounded-mw-md border border-transparent text-mw-fg-mute transition-colors hover:border-mw-line-strong hover:bg-mw-800 hover:text-mw-fg"
         >
           <I.menu />
@@ -92,17 +94,17 @@ export function Topbar({ onToggleSidebar }: { onToggleSidebar?: () => void }) {
             value={q}
             onChange={(e) => setQ(e.target.value)}
             placeholder={theme.searchPlaceholder}
-            aria-label="Buscar"
+            aria-label={t("search")}
             className="min-w-0 flex-1 border-0 bg-transparent px-3 text-sm text-mw-fg outline-none placeholder:text-mw-fg-faint"
           />
           {q && (
-            <button type="button" onClick={() => setQ("")} className="px-2 text-lg text-mw-fg-subtle" aria-label="Limpiar">
+            <button type="button" onClick={() => setQ("")} className="px-2 text-lg text-mw-fg-subtle" aria-label={t("clear")}>
               ×
             </button>
           )}
           <button
             type="submit"
-            aria-label="Buscar"
+            aria-label={t("search")}
             className="inline-flex h-10 w-14 items-center justify-center rounded-r-mw-pill border-l border-mw-line bg-mw-800 text-mw-fg-mute transition-colors hover:text-mw-fg hover:bg-[color-mix(in_srgb,rgb(var(--mw-accent))_14%,rgb(var(--mw-800)))]"
           >
             <I.search size={18} />
@@ -120,7 +122,7 @@ export function Topbar({ onToggleSidebar }: { onToggleSidebar?: () => void }) {
         {/* notifications — decorative until wired */}
         <button
           type="button"
-          aria-label="Notificaciones"
+          aria-label={t("notifications")}
           className="relative inline-flex h-10 w-10 items-center justify-center rounded-mw-md border border-transparent text-mw-fg-mute transition-colors hover:border-mw-line-strong hover:bg-mw-800 hover:text-mw-fg"
         >
           <I.bell />
@@ -129,11 +131,11 @@ export function Topbar({ onToggleSidebar }: { onToggleSidebar?: () => void }) {
         <button
           type="button"
           aria-disabled="true"
-          title="Próximamente"
+          title={t("comingSoon")}
           className="hidden h-10 cursor-default items-center gap-1.5 rounded-mw-md px-3 text-xs font-semibold text-mw-accent-on opacity-90 md:inline-flex bg-[linear-gradient(135deg,rgb(var(--mw-accent)),var(--mw-accent-dark))]"
         >
           {theme.id === "mewtube" ? <I.plus size={16} /> : <I.live size={16} />}
-          {theme.id === "mewtube" ? "Subir" : "Crear directo"}
+          {theme.id === "mewtube" ? t("upload") : t("goLive")}
         </button>
       </div>
     </header>

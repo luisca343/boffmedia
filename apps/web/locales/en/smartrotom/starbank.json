@@ -1,0 +1,249 @@
+{
+  "starbank": {
+    "common": {
+      "close": "Close",
+      "back": "Back",
+      "retry": "Retry",
+      "loading": "Loading…",
+      "cancel": "Cancel",
+      "save": "Save",
+      "search": "Search",
+      "export": "Export",
+      "send": "Send",
+      "manage": "Manage",
+      "viewAll": "View all"
+    },
+    "topBar": {
+      "searchPlaceholder": "Search transactions, accounts, contacts…",
+      "notifications": "Notifications",
+      "noAccounts": "No accounts available",
+      "manageAccounts": "Manage accounts"
+    },
+    "sidebar": {
+      "title": "Starbank",
+      "subtitle": "SmartRotom · Beta",
+      "switchAccount": "Switch account",
+      "systemStatus": "System running",
+      "groups": {
+        "personal": "Personal",
+        "analysis": "Analysis"
+      },
+      "nav": {
+        "general": "General",
+        "accounts": "Accounts",
+        "transactions": "Transactions",
+        "sendMoney": "Send money",
+        "charts": "Charts",
+        "calendar": "Calendar"
+      }
+    },
+    "heroBalance": {
+      "availableBalance": "Available balance",
+      "showBalance": "Show balance",
+      "hideBalance": "Hide balance",
+      "last7days": "in the last 7 days",
+      "request": "Request",
+      "moveBetween": "Move between accounts",
+      "insights": "Insights",
+      "movementsAgo": "{count} movements ago",
+      "today": "Today"
+    },
+    "txDetail": {
+      "in": "Income",
+      "out": "Outcome",
+      "date": "Date",
+      "time": "Time",
+      "balanceAfter": "Balance after operation",
+      "reference": "Reference",
+      "status": "Status",
+      "completed": "Completed",
+      "copyReference": "Copy reference",
+      "receipt": "Receipt",
+      "report": "Report"
+    },
+    "dashboard": {
+      "greeting": "Hello, {name}",
+      "sub": "Here's your account overview · {date}",
+      "kicker": "Shortcuts",
+      "quickActions": "Quick actions",
+      "recentTransactions": "Recent transactions",
+      "yourAccounts": "Your accounts",
+      "noTransactions": "No transactions yet",
+      "noScheduledPayments": "No scheduled payments",
+      "days7": "7 days",
+      "incomePeriod": "Period income",
+      "expensePeriod": "Period expenses",
+      "savingsRate": "Savings rate",
+      "savedAmount": "You've saved {amount}",
+      "vsPeriod": "vs. previous period"
+    },
+    "quickActions": {
+      "sendMoney": "Send money",
+      "sendMoneySub": "To a trainer or shop",
+      "moveAccounts": "Move between accounts",
+      "moveAccountsSub": "Reorganize your money",
+      "requestPayment": "Request payment",
+      "requestPaymentSub": "Share your code",
+      "schedulePayment": "Schedule payment",
+      "schedulePaymentSub": "Recurring payments"
+    },
+    "accounts": {
+      "main": "Main account",
+      "secondary": "Secondary account",
+      "totalBalance": "Total balance"
+    },
+    "enviar": {
+      "title": "Send money",
+      "sub": "Transfer to another trainer, shop or your own account",
+      "steps": {
+        "recipient": "Recipient",
+        "amount": "Amount",
+        "review": "Review"
+      },
+      "searchRecipient": "Search recipient",
+      "searchPlaceholder": "Account name…",
+      "myAccounts": "My accounts",
+      "myAccountsSub": "Move money between your own accounts.",
+      "otherAccounts": "Other accounts",
+      "noMatches": "No matches",
+      "noOtherAccounts": "No other accounts",
+      "continue": "Continue",
+      "cancel": "Cancel",
+      "sendingTo": "Sending to",
+      "change": "Change",
+      "amountLabel": "Amount",
+      "available": "Available in {name}: {amount}",
+      "exceedsBalance": "Exceeds available balance ({amount})",
+      "payFrom": "Pay from",
+      "concept": "Concept (optional)",
+      "conceptPlaceholder": "E.g.: Pokéball refund",
+      "reviewTitle": "You're going to send",
+      "from": "From",
+      "to": "To",
+      "totalDebit": "Total to debit",
+      "confirmSend": "Confirm and send",
+      "sending": "Sending…",
+      "transferSent": "Transfer sent!",
+      "transferSentBody": "You've sent {amount} to {name}",
+      "reference": "Reference",
+      "newTransfer": "New transfer",
+      "viewMovements": "View movements",
+      "instantProtected": "Instant and protected transfer. Projected balance after operation: {amount}",
+      "differentAccount": "Choose a source account different from the recipient."
+    },
+    "graficas": {
+      "title": "Charts and analysis",
+      "sub": "{name} visualization · {count} transactions",
+      "rangeLabels": {
+        "7d": "7 days",
+        "30d": "30 days",
+        "90d": "90 days",
+        "1y": "1 year"
+      },
+      "kpi": {
+        "income": "Income",
+        "expenses": "Expenses",
+        "avgTransaction": "Average transaction",
+        "operations": "{count} operations"
+      },
+      "charts": {
+        "balanceEvolution": "Balance evolution",
+        "largestExpense": "Largest expense",
+        "largestExpenseDesc": "Highest outgoing operation in the selected period.",
+        "activity14d": "Activity (14 days)",
+        "incomeVsExpenses": "Income vs. expenses",
+        "byCategory": "Distribution by category",
+        "noExpenses": "No expenses in the period"
+      }
+    },
+    "calendario": {
+      "title": "Payment calendar",
+      "sub": "Your movements by day and expected income",
+      "newPayment": "New payment",
+      "monthlyView": "Monthly view",
+      "today": "Today",
+      "prevMonth": "Previous month",
+      "nextMonth": "Next month",
+      "dayHeaders": ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+      "noMovements": "No movements that day",
+      "selectDay": "Select a day to see details",
+      "income": "Income",
+      "expense": "Expense",
+      "scheduled": "Scheduled",
+      "upcomingPayments": "Upcoming payments",
+      "noScheduledPayments": "No scheduled payments",
+      "noScheduledPaymentsDesc": "Recurring payments will appear here when available."
+    },
+    "transacciones": {
+      "title": "Transactions",
+      "sub": "Account movements {name}",
+      "currentBalance": "Current balance",
+      "incomePeriod": "Income · period",
+      "expensePeriod": "Expenses · period",
+      "entries": "{count} entries",
+      "exits": "{count} exits",
+      "allCategories": "All categories",
+      "counterparty": "Counterparty",
+      "concept": "Concept",
+      "category": "Category",
+      "amount": "Amount",
+      "balance": "Balance",
+      "date": "Date",
+      "noResults": "No transactions found with these filters",
+      "showing": "Showing {count} transactions",
+      "previous": "Previous",
+      "next": "Next",
+      "entry": "Entry",
+      "exit": "Exit",
+      "all": "All",
+      "entriesLabel": "Entries",
+      "exitsLabel": "Exits"
+    },
+    "cuentas": {
+      "title": "My accounts",
+      "sub": "Organize your money between your main account and secondary accounts",
+      "newAccount": "New account",
+      "totalBalance": "Total balance",
+      "distributedIn": "Distributed in {count} accounts",
+      "mainAccount": "Main account",
+      "secondaryAccounts": "Secondary accounts",
+      "active": "Active",
+      "activeAccounts": "{count} active",
+      "add": "Add",
+      "newSecondary": "New secondary account",
+      "newSecondarySub": "Savings, expenses, trips…",
+      "activeAccount": "Active account",
+      "selectAccount": "Select account",
+      "balance": "Balance",
+      "send": "Send",
+      "move": "Move",
+      "secondaryAccount": "Secondary account",
+      "dialog": {
+        "eyebrow": "Secondary account",
+        "title": "New account",
+        "info": "Secondary accounts let you organize your money for savings, expenses or trips.",
+        "nameLabel": "Account name",
+        "namePlaceholder": "E.g.: League Savings",
+        "creating": "Creating…",
+        "create": "Create account",
+        "errorEmpty": "Enter a name for the account",
+        "errorFailed": "Could not create the account",
+        "created": "Account created"
+      }
+    },
+    "categories": {
+      "league": "League",
+      "shop": "Shop",
+      "heal": "Pokémon Center",
+      "transfer": "Transfer",
+      "reward": "Reward",
+      "fee": "Fee",
+      "subscription": "Subscription",
+      "other": "Other"
+    },
+    "toast": {
+      "transferSent": "Transfer sent!",
+      "transferFailed": "Could not complete the transfer."
+    }
+  }
+}

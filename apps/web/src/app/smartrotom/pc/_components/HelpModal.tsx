@@ -1,18 +1,19 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { Chip, Modal } from "./ui"
 
 /** Only the shortcuts that actually exist. There is no undo, so ⌘Z is not listed. */
-const SHORTCUTS: [string, string][] = [
-  ["⌘ / Ctrl + K", "Paleta de comandos"],
-  ["/", "Buscar"],
-  ["F", "Filtros"],
-  ["M", "Selección múltiple"],
-  ["D", "Doble caja"],
-  ["G", "Vista general de cajas"],
-  ["← →", "Navegar Pokémon (en detalle)"],
-  ["Clic der.", "Marcar favorito"],
-  ["Esc", "Cerrar"],
+const SHORTCUT_KEYS: [string, string][] = [
+  ["⌘ / Ctrl + K", "help.shortcuts.commands"],
+  ["/", "help.shortcuts.search"],
+  ["F", "help.shortcuts.filters"],
+  ["M", "help.shortcuts.multiSelect"],
+  ["D", "help.shortcuts.dualBox"],
+  ["G", "help.shortcuts.overview"],
+  ["← →", "detail.stats"],
+  ["Clic der.", "filters.statusToggles.favorite"],
+  ["Esc", "common.close"],
 ]
 
 export interface HelpModalProps {
@@ -20,12 +21,13 @@ export interface HelpModalProps {
 }
 
 export function HelpModal({ onClose }: HelpModalProps) {
+  const t = useTranslations("pc")
   return (
-    <Modal onClose={onClose} title="Atajos de teclado" icon="keyboard" width={460}>
+    <Modal onClose={onClose} title={t("help.title")} icon="keyboard" width={460}>
       <div className="flex flex-col gap-[7px] p-4">
-        {SHORTCUTS.map(([k, label]) => (
-          <div key={label} className="flex items-center justify-between px-1 py-1.5">
-            <span className="text-[13px] text-pc-fg-muted">{label}</span>
+        {SHORTCUT_KEYS.map(([k, key]) => (
+          <div key={key} className="flex items-center justify-between px-1 py-1.5">
+            <span className="text-[13px] text-pc-fg-muted">{t(key)}</span>
             <Chip className="font-pc-mono text-[11px]">{k}</Chip>
           </div>
         ))}

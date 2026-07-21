@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { useBoffSession } from "@/services/useBoffSession"
 import { useRotomUsername } from "@/components/smartrotom/behavior/useRotomUuid"
 import type { QuestData, Region } from "../_types"
@@ -16,6 +17,7 @@ import { Bar, FlourishCorners, Label, Nail, Paper, Shield } from "./ui"
  * account on the session.
  */
 export function PlayerHeader({ quests, regions }: { quests: QuestData[]; regions: Region[] }) {
+  const t = useTranslations("misiones.playerHeader")
   const { session } = useBoffSession()
   const user = session?.user
   const name = useRotomUsername() || user?.username || "Aventurero"
@@ -27,10 +29,10 @@ export function PlayerHeader({ quests, regions }: { quests: QuestData[]; regions
   const pct = total > 0 ? Math.round((completed / total) * 100) : 0
 
   const tablets = [
-    { label: "Vigentes", value: counts.ACTIVE ?? 0, className: "text-ms-seal-active" },
-    { label: "Disponibles", value: counts.AVAILABLE ?? 0, className: "text-ms-seal-available" },
-    { label: "Selladas", value: counts.LOCKED ?? 0, className: "text-ms-seal-locked" },
-    { label: "Reinos", value: regions.length, className: "text-ms-gold-3" },
+    { label: t("active"), value: counts.ACTIVE ?? 0, className: "text-ms-seal-active" },
+    { label: t("available"), value: counts.AVAILABLE ?? 0, className: "text-ms-seal-available" },
+    { label: t("sealed"), value: counts.LOCKED ?? 0, className: "text-ms-seal-locked" },
+    { label: t("kingdoms"), value: regions.length, className: "text-ms-gold-3" },
   ]
 
   return (
@@ -66,17 +68,17 @@ export function PlayerHeader({ quests, regions }: { quests: QuestData[]; regions
         </div>
 
         <div className="min-w-0 flex-[1_1_240px]">
-          <Label className="text-ms-gold-3">Bitácora del aventurero</Label>
+          <Label className="text-ms-gold-3">{t("adventurerLog")}</Label>
           <h1 className="my-0.5 font-ms-display text-[28px] leading-tight text-ms-ink-1">{name}</h1>
           <div className="text-[13px] italic text-ms-ink-3">
             {regions.length > 0
-              ? `Encargos en ${regions.length} ${regions.length === 1 ? "reino" : "reinos"}`
-              : "Sin encargos en el tablón"}
+              ? t("questsInKingdoms", { count: regions.length })
+              : t("noQuests")}
           </div>
 
           <div className="mt-2.5">
             <div className="mb-1 flex justify-between font-ms-uppercase text-[10px] uppercase tracking-[.14em] text-ms-ink-3">
-              <span>Encargos cumplidos</span>
+              <span>{t("completedQuests")}</span>
               <span className="text-ms-gold-3">
                 {completed} / {total}
               </span>
@@ -99,8 +101,8 @@ export function PlayerHeader({ quests, regions }: { quests: QuestData[]; regions
       </div>
 
       <div className="mt-3.5 flex flex-wrap items-center justify-between gap-2.5 border-t border-dashed border-ms-ink-1/[.28] pt-3 font-ms-uppercase text-[11px] uppercase tracking-[.12em] text-ms-ink-3">
-        <span>❦ Posada del Rotom</span>
-        <span>⚔ {total} encargos en el tablón</span>
+        <span>{t("inn")}</span>
+        <span>{t("questsOnBoard", { count: total })}</span>
       </div>
     </Paper>
   )

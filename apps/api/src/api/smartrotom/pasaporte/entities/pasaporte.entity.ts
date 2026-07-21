@@ -35,7 +35,8 @@ export class PasaporteProfileEntity {
 
   @ApiProperty({
     example: 'Entrenador Veterano',
-    description: 'Derived from completionPct: 90+ / 70+ / 40+ / 15+ / else Novato.',
+    description:
+      'Derived from completionPct: 90+ / 70+ / 40+ / 15+ / else Novato.',
   })
   title: string;
 
@@ -57,14 +58,20 @@ export class PasaporteLogroEntity {
   @ApiProperty({ example: 1 }) target: number;
   @ApiProperty({ example: 0 }) order: number;
 
-  @ApiProperty({ example: 1, description: '0 when the trainer never touched it.' })
+  @ApiProperty({
+    example: 1,
+    description: '0 when the trainer never touched it.',
+  })
   progress: number;
 
   @ApiProperty({ example: false }) completed: boolean;
   @ApiPropertyOptional({ type: String, format: 'date-time', nullable: true })
   completedAt: Date | null;
 
-  @ApiProperty({ example: 25, description: 'Curated by category — see the seed.' })
+  @ApiProperty({
+    example: 25,
+    description: 'Curated by category — see the seed.',
+  })
   points: number;
 
   @ApiProperty({ enum: ACHIEVEMENT_TIERS, example: 'plata' })
@@ -87,7 +94,10 @@ export class PasaporteSeasonInfoEntity {
 }
 
 export class PasaporteStandingEntity {
-  @ApiProperty({ example: 24, description: 'Battles fought inside the season window.' })
+  @ApiProperty({
+    example: 24,
+    description: 'Battles fought inside the season window.',
+  })
   battles: number;
 
   @ApiProperty({ example: 15 }) wins: number;
@@ -95,7 +105,8 @@ export class PasaporteStandingEntity {
 
   @ApiProperty({
     example: 3,
-    description: 'Current consecutive wins, counting back from the most recent battle.',
+    description:
+      'Current consecutive wins, counting back from the most recent battle.',
   })
   streak: number;
 
@@ -108,7 +119,8 @@ export class PasaporteStandingEntity {
 
   @ApiProperty({
     example: 220,
-    description: 'The highest lp reached walking the season’s battles chronologically.',
+    description:
+      'The highest lp reached walking the season’s battles chronologically.',
   })
   peakLp: number;
 
@@ -118,7 +130,8 @@ export class PasaporteStandingEntity {
   @ApiProperty({
     enum: ['I', 'II', 'III', 'IV'],
     example: 'II',
-    description: 'How deep into the tier band the lp sits — the top quarter is I.',
+    description:
+      'How deep into the tier band the lp sits — the top quarter is I.',
   })
   division: string;
 
@@ -148,7 +161,8 @@ export class PasaporteSeasonEntity {
   @ApiPropertyOptional({
     type: PasaporteSeasonInfoEntity,
     nullable: true,
-    description: 'Null between cycles — the standing is then zeroed, not an error.',
+    description:
+      'Null between cycles — the standing is then zeroed, not an error.',
   })
   season: PasaporteSeasonInfoEntity | null;
 
@@ -157,7 +171,8 @@ export class PasaporteSeasonEntity {
 
   @ApiProperty({
     type: [PasaporteLadderRungEntity],
-    description: 'Shipped so the client never duplicates the ladder definition.',
+    description:
+      'Shipped so the client never duplicates the ladder definition.',
   })
   ladder: PasaporteLadderRungEntity[];
 }

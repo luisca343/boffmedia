@@ -1,0 +1,92 @@
+{
+  "furrettoday": {
+    "nav": {
+      "home": "Home",
+      "sections": "Sections",
+      "archive": "Archive",
+      "edit": "Edit",
+      "searchPlaceholder": "Search in the issue…",
+      "search": "Search",
+      "coverLabel": "Furret Today cover"
+    },
+    "coverHero": {
+      "readCover": "READ THE COVER →",
+      "new": "NEW",
+      "inThisIssue": "IN THIS ISSUE"
+    },
+    "subscribeStrip": {
+      "subscribe": "Subscribe",
+      "subscribed": "Subscribed"
+    },
+    "newsletterModal": {
+      "title": "Furret to your inbox, every Friday",
+      "description": "One email. Headlines, meta, tournaments and a meme. Cancel whenever you want.",
+      "emailPlaceholder": "you@email.com",
+      "subscribe": "SUBSCRIBE",
+      "subscribing": "…",
+      "successTitle": "DONE!",
+      "successMessage": "We've saved you on the list. See you on Friday.",
+      "error": "We couldn't sign you up. Please try again."
+    },
+    "featureCards": {
+      "title": "Featured"
+    },
+    "collectorStrip": {
+      "title": "Collector"
+    },
+    "articleCard": {
+      "readMore": "Read more"
+    },
+    "furretFooter": {
+      "copyright": "© Furret Today",
+      "allRights": "All rights reserved"
+    },
+    "sections": {
+      "title": "Sections",
+      "browse": "Browse",
+      "archive": "Archive",
+      "editorial": "Editorial board"
+    },
+    "browseHero": {
+      "title": "Browse articles"
+    },
+    "issueArchive": {
+      "title": "Issue archive"
+    },
+    "editorialBoard": {
+      "title": "Editorial board"
+    },
+    "article": {
+      "by": "by {author}",
+      "readTime": "{minutes} min read",
+      "share": "Share",
+      "copyLink": "Copy link",
+      "linkCopied": "Link copied",
+      "relatedArticles": "Related articles",
+      "upNext": "Up next"
+    },
+    "shareModal": {
+      "title": "Share article",
+      "copyLink": "Copy link",
+      "close": "Close"
+    },
+    "editor": {
+      "title": "Editor",
+      "newArticle": "New article",
+      "save": "Save",
+      "publish": "Publish",
+      "draft": "Draft",
+      "published": "Published",
+      "delete": "Delete",
+      "confirmDelete": "Delete this article?"
+    },
+    "newsroom": {
+      "title": "Newsroom",
+      "empty": "No articles yet"
+    },
+    "error": {
+      "title": "Error",
+      "retry": "Retry"
+    }
+  }
+}

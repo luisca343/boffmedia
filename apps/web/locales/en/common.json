@@ -82,6 +82,542 @@
       "pagination": "Pagination",
       "previousPage": "Previous page",
       "nextPage": "Next page"
+    },
+    "construction": {
+      "title": "Page under construction",
+      "message": "We are working on this section. Come back soon to see the news!",
+      "discordText": "If you need access or information, visit our",
+      "discordLink": "Discord community",
+      "goHome": "Go Home",
+      "reload": "Reload",
+      "thanks": "Thanks for your patience — The BoffMedia team"
+    },
+    "combobox": {
+      "searchItem": "Search item",
+      "selectItem": "Select an item",
+      "noElementFound": "No element found."
+    },
+    "imageUpload": {
+      "placeholder": "Drag an image here or click to select",
+      "invalidFileType": "Invalid file type. Accepted: {types}",
+      "fileTooLarge": "File is too large. Maximum size: {maxSize}MB",
+      "uploading": "Uploading image...",
+      "selectFile": "Select file",
+      "orDragDrop": "or drag and drop",
+      "dropImageHere": "Drop the image here",
+      "remove": "Remove",
+      "supportedFormats": "Supported formats: {formats}",
+      "maxSize": "Maximum size: {maxSize}MB"
+    },
+    "baseStatBars": {
+      "title": "Base stats"
+    },
+    "dkLive": {
+      "live": "Live",
+      "playing": "Playing",
+      "pending": "Pending",
+      "final": "Final",
+      "soon": "Soon",
+      "done": "Finished",
+      "justNow": "just now",
+      "secondsAgo": "{seconds} s ago",
+      "minutesAgo": "{minutes} min ago",
+      "hoursAgo": "{hours} h ago",
+      "refreshNow": "Refresh now"
+    },
+    "tournaments": {
+      "verified": "Verified",
+      "unverified": "Unverified",
+      "noEntriesFor": "No entries for \"{query}\".",
+      "round": "Round",
+      "table": "Table",
+      "bestOf": "Best of {count}",
+      "finished": "Finished",
+      "inProgress": "In progress",
+      "youFace": "You face",
+      "tableChat": "Table chat",
+      "judgeNotified": "Judge notified",
+      "requestJudge": "Request judge",
+      "tableChatPlaceholder": "Type a message… (share your battle ID)",
+      "send": "Send",
+      "teamSheet": "Team sheet of {name}",
+      "damageCalc": "Damage calc",
+      "copyTeam": "Copy team",
+      "copiedShowdown": "Team copied in Showdown format",
+      "item": "Item",
+      "ability": "Ability",
+      "reportGames": "Report games",
+      "game": "Game",
+      "victory": "Victory",
+      "defeat": "Defeat",
+      "verifiedStatus": "Verified",
+      "awaitingConfirmation": "Awaiting confirmation",
+      "inDispute": "In dispute",
+      "yourTurnToVerify": "Your turn to verify",
+      "reportSubmitted": "You reported the result {wins}-{losses}. Waiting for {name} to confirm.",
+      "reportConfirmed": "{name} confirmed the result. Match verified ✓",
+      "resultVerifiedByYou": "You verified the result reported by {name}. Match verified ✓",
+      "resultRejected": "You rejected the result. A judge has been notified to review the table.",
+      "autoVerificationApplied": "No response in time — auto-verification applied to avoid blocking the tournament.",
+      "autoVerificationCountdown": "Auto-verification in",
+      "reportAppearsInstantly": "The report appears instantly on {name}'s table. If they don't respond in time it will be validated automatically to avoid blocking the tournament.",
+      "markEachGameResult": "Mark the result of each game",
+      "submitReport": "Submit report",
+      "dispute": "Dispute",
+      "verify": "Verify",
+      "accordingTo": "According to {name}: {losses}-{wins} in their favor",
+      "resultVerified": "Result verified {wins}-{losses}.",
+      "autoVerifiedByTimeout": "Validated automatically due to timeout.",
+      "confirmedByBoth": "Confirmed by both players.",
+      "resultInDispute": "Result in dispute.",
+      "judgeWillReview": "A judge will review the table. Use the chat to explain what happened.",
+      "incomingBanner": "{name} reported the result. Review it and verify if it's correct.",
+      "tableOpen": "The table is open. Good luck!",
+      "judgeIntroduction": "I'm Álex, table judge. How can I help?",
+      "judgeRequested": "You requested a judge. A staff member will join shortly.",
+      "nameCopied": "Name copied: {name}",
+      "copyName": "Copy",
+      "inGameName": "In-game name",
+      "chatTableLink": "Go to table chat",
+      "viewTeamSheet": "View team sheet",
+      "record": "record",
+      "points": "pts",
+      "rondaLabel": "Ronda {round}",
+      "mesaLabel": "Mesa {table}"
+    },
+    "giveaways": {
+      "winner": "{count, plural, one {winner} other {winners}}",
+      "yourTickets": "Your tickets",
+      "estimatedProbability": "Estimated probability",
+      "weightedByTickets": "weighted by tickets",
+      "youAreIn": "You're in",
+      "participateNow": "Participate now",
+      "viewWinner": "View winner",
+      "viewDetails": "View details",
+      "viewGiveaway": "View giveaway",
+      "youreInDotView": "You're in · view",
+      "opensIn": "Opens",
+      "closesIn": "Closes",
+      "drawingNow": "Drawing now…",
+      "prizeValue": "prize value",
+      "featuredGiveaway": "Featured giveaway",
+      "participants": "participants",
+      "by": "By"
+    },
+    "forum": {
+      "solved": "Solved",
+      "anonymous": "Anonymous",
+      "lastBy": "last: {name}",
+      "replies": "replies",
+      "views": "views",
+      "lastActivity": "Last activity",
+      "onlineNow": "Online now",
+      "stats": "Stats",
+      "posts": "Posts",
+      "threads": "Threads",
+      "members": "Members",
+      "online": "Online",
+      "newMember": "New member:",
+      "write": "Write",
+      "preview": "Preview",
+      "title": "Title",
+      "titlePlaceholder": "A clear and descriptive title",
+      "messagePlaceholder": "Write your message… supports Markdown.",
+      "nothingToPreview": "Nothing to preview yet.",
+      "cancel": "Cancel",
+      "titleMinChars": "Minimum 3 characters in the title",
+      "supportsMarkdown": "Supports Markdown"
+    },
+    "dataControls": {
+      "title": "Control your data",
+      "youDecide": "You decide",
+      "downloadData": "Download my data",
+      "downloadDesc": "Export a copy of your profile, stats and activity in a readable format.",
+      "export": "Export",
+      "essentialCookies": "Essential cookies",
+      "essentialDesc": "Required to log in and maintain the session. Cannot be disabled.",
+      "alwaysActive": "Always active",
+      "analytics": "Analytics",
+      "analyticsDesc": "Helps us understand what's used to improve the platform. Aggregated data.",
+      "communications": "Communications",
+      "communicationsDesc": "News, events and offers by email. You can unsubscribe at any time.",
+      "deleteAccount": "Delete my account",
+      "deleteDesc": "Permanently deletes your account and all associated data. This action is irreversible.",
+      "delete": "Delete"
+    },
+    "calendar": {
+      "noDate": "TBA",
+      "popular": "Popular",
+      "highlyAnticipated": "Highly anticipated",
+      "onRadar": "On the radar",
+      "discreet": "Discreet",
+      "niche": "Niche",
+      "following": "Following",
+      "followRelease": "Follow release",
+      "mustPlay": "Must-play",
+      "releaseCard": "Card for {title}",
+      "viewCount": "{count} following"
+    },
+    "catalog": {
+      "noRating": "No rating",
+      "rating": "Rating",
+      "stars": "{count} stars",
+      "halfStars": "{count} half stars",
+      "removeFromLibrary": "Remove from library",
+      "log": "Log"
+    },
+    "bestiary": {
+      "rareMaterial": "Rare material"
+    },
+    "profile": {
+      "changePhoto": "Change photo",
+      "changeCover": "Change cover",
+      "live": "LIVE"
+    },
+    "error": {
+      "unknown": "Unknown error"
+    },
+    "media": {
+      "menu": "Menu",
+      "search": "Search",
+      "clear": "Clear",
+      "notifications": "Notifications",
+      "comingSoon": "Coming soon",
+      "upload": "Upload",
+      "goLive": "Go live",
+      "mewtube": {
+        "searchPlaceholder": "Search videos, creators…",
+        "primaryCta": "Subscribe"
+      },
+      "mewtwitch": {
+        "searchPlaceholder": "Search streams, channels, categories…",
+        "primaryCta": "Follow"
+      },
+      "chips": {
+        "all": "All",
+        "trending": "Trending",
+        "pixelmon": "Pixelmon",
+        "competitive": "Competitive",
+        "tutorials": "Tutorials",
+        "showdown": "Showdown",
+        "music": "Music",
+        "speedruns": "Speedruns",
+        "streams": "Streams",
+        "tcg": "TCG",
+        "live": "Live",
+        "talks": "Talks",
+        "tournaments": "Tournaments",
+        "retro": "Retro",
+        "coop": "Co-op"
+      },
+      "sidebar": {
+        "you": "You",
+        "partOf": "Part of",
+        "comingSoon": "Coming soon"
+      }
+    }
+    "legal": {
+      "cancelaciones": {
+        "metaTitle": "Cancellation Policy · Boffmedia",
+        "metaDescription": "How to request a cancellation for a purchase on Boffmedia and under what conditions.",
+        "kicker": "Legal · Cancellations",
+        "title": "Cancellation Policy",
+        "lead": "Since we only sell in-game items and online services for Minecraft, our cancellation policy is limited. However, we understand that exceptional situations may arise.",
+        "tocLabel": "Contents",
+        "updatedPrefix": "Last updated: ",
+        "sections": {
+          "process": {
+            "title": "Cancellation Process",
+            "body1": "If you encounter any issues with your purchase or need to request a cancellation, please contact our customer service through our contact page as soon as possible."
+          },
+          "conditions": {
+            "title": "Cancellation Conditions",
+            "item1": "The cancellation request must be made within 24 hours of purchase.",
+            "item2": "The item or service must not have been used or activated.",
+            "item3": "You must provide specific details about the issue found or the reason for cancellation.",
+            "item4": "We reserve the right to investigate and resolve the cancellation request at our discretion.",
+            "fee": "Please note that approved cancellations may be subject to a processing fee of 5% of the purchase value."
+          },
+          "moreInfo": {
+            "title": "More Information",
+            "body1": "For more information about refunds and disputes, please see our Disputes and Refunds Policy."
+          }
+        }
+      },
+      "cookies": {
+        "metaTitle": "Cookie Policy · Boffmedia",
+        "metaDescription": "What cookies we use on Boffmedia and how to manage your preferences.",
+        "kicker": "Legal · Cookies",
+        "title": "Cookie Policy",
+        "lead": "At Boffmedia we use cookies and similar technologies to improve your experience, personalize content and analyze traffic. This policy explains how we use them and how you can control them.",
+        "tocLabel": "Contents",
+        "updatedPrefix": "Last updated: ",
+        "sections": {
+          "introduction": {
+            "title": "Introduction",
+            "body1": "This Cookie Policy explains what cookies are, how we use them on Boffmedia, and how you can manage your preferences. By using our website and services, you accept the use of cookies as described in this policy."
+          },
+          "whatAre": {
+            "title": "What Are Cookies",
+            "body1": "Cookies are small text files stored on your device (computer, tablet or mobile) when you visit a website. They allow the website to remember your preferences and actions over a period of time, so you don't have to re-enter them each time you visit.",
+            "body2": "Cookies can be first-party (set by the website you are visiting) or third-party (set by external domains). They can also be temporary (session) or persistent (remain on your device until deleted or expired)."
+          },
+          "types": {
+            "title": "Types of Cookies We Use",
+            "intro": "At Boffmedia we use the following types of cookies to improve your experience:",
+            "essential": "Essential cookies: necessary for the basic operation of the site. They enable navigation, login and access to secure areas. Without these cookies, the site cannot function properly.",
+            "preference": "Preference cookies: allow us to remember your preferences, such as language, visual theme and accent color, to offer you a personalized experience.",
+            "analytics": "Analytics cookies: help us understand how you interact with the site, which sections you visit and how we can improve. The information collected is aggregated and anonymous.",
+            "functionality": "Functionality cookies: improve site performance by remembering decisions you make, such as keeping your session active or preserving recent tools."
+          },
+          "thirdParty": {
+            "title": "Third-Party Cookies",
+            "intro": "Some external services we use may set their own cookies on your device:",
+            "analytics": "Analytics providers: we use anonymous analytics tools to understand site usage and improve our services.",
+            "social": "Social media: social sharing buttons may set cookies to track your interaction with them.",
+            "payments": "Payment services: external payment processors may use cookies necessary to process transactions securely.",
+            "disclaimer": "We have no control over third-party cookies. We recommend reviewing the privacy and cookie policies of each external service for detailed information."
+          },
+          "management": {
+            "title": "Cookie Management",
+            "intro": "You can manage and control cookies in the following ways:",
+            "browser": "Browser settings: most browsers allow you to block or delete cookies from their settings. Check your browser's help section for more information.",
+            "tools": "Specific tools: you can use online privacy tools to manage your cookie preferences centrally.",
+            "optOut": "Analytics opt-out: some analytics providers offer opt-out plugins that you can install in your browser.",
+            "warning": "Please note that if you block essential cookies, some parts of our site may not function properly or your experience may be affected."
+          },
+          "changes": {
+            "title": "Changes to This Policy",
+            "body1": "We may update this Cookie Policy periodically to reflect changes in the cookies we use or for legal requirements. We will notify you of significant changes through the site or by email."
+          },
+          "contact": {
+            "title": "Contact",
+            "body1": "If you have questions about our Cookie Policy, please contact us through our contact page."
+          }
+        }
+      },
+      "devoluciones": {
+        "metaTitle": "Return Policy · Boffmedia",
+        "metaDescription": "Conditions, process and resolution of returns on Boffmedia.",
+        "kicker": "Legal · Returns",
+        "title": "Return Policy",
+        "lead": "At Boffmedia, we strive to ensure that every purchase is a satisfying experience. If you are not satisfied with your purchase, we will review your case according to the criteria detailed below.",
+        "tocLabel": "Contents",
+        "updatedPrefix": "Last updated: ",
+        "sections": {
+          "conditions": {
+            "title": "Return Conditions",
+            "item1": "The request must be made within 7 calendar days from the date of purchase.",
+            "item2": "The item or service must not have been used, activated or redeemed.",
+            "item3": "You must verify the purchase with the receipt or order number.",
+            "item4": "Items purchased on promotion or with special discount are excluded unless a verified defect is found."
+          },
+          "process": {
+            "title": "Request Process",
+            "body1": "To initiate a return, contact our team through the contact page indicating the order number and the detailed reason for the request. Our team will respond within a maximum of 48 business hours."
+          },
+          "resolution": {
+            "title": "Resolution",
+            "body1": "If the return is approved, the amount will be refunded via the original payment method within 7 business hours, and may be subject to a management fee of 5% of the purchase value.",
+            "body2": "We reserve the right to reject requests that do not meet the above conditions or that are considered abusive."
+          },
+          "moreInfo": {
+            "title": "More Information",
+            "body1": "Also see our Cancellation Policy and our Disputes and Refunds Policy."
+          }
+        }
+      },
+      "privacidad": {
+        "metaTitle": "Privacy Policy · Boffmedia",
+        "metaDescription": "How we collect, use and protect your personal information on Boffmedia.",
+        "kicker": "Legal · Privacy",
+        "title": "Privacy Policy",
+        "lead": "At Boffmedia we value and respect your privacy. This policy explains how we collect, use and protect your personal information when you use our services.",
+        "tocLabel": "Contents",
+        "updatedPrefix": "Last updated: ",
+        "sections": {
+          "info": {
+            "title": "Information We Collect",
+            "intro": "We may collect the following types of information when you use our services:",
+            "registration": "Registration information: username, email address and password.",
+            "profile": "Profile information: avatar, biography and gaming preferences.",
+            "gameplay": "Gameplay information: statistics, achievements and match history.",
+            "payments": "Payment information: managed by secure payment processors."
+          },
+          "usage": {
+            "title": "Use of Information",
+            "intro": "We use your information to:",
+            "services": "Provide and improve our gaming services.",
+            "personalize": "Personalize your gaming experience.",
+            "transactions": "Process transactions and send related notifications.",
+            "communicate": "Communicate with you about updates, offers and events.",
+            "fraud": "Prevent fraud and ensure the security of our services."
+          },
+          "sharing": {
+            "title": "Sharing Information",
+            "intro": "We do not sell your personal information. We may share information in the following circumstances:",
+            "players": "With other players, according to your profile settings.",
+            "providers": "With service providers that help us operate the platform.",
+            "legal": "If required by law or to protect our legal rights."
+          },
+          "security": {
+            "title": "Data Security",
+            "body1": "We implement technical and organizational security measures to protect your personal information against unauthorized access, loss or alteration."
+          },
+          "rights": {
+            "title": "Your Rights",
+            "intro": "You have the right to:",
+            "access": "Access your personal information.",
+            "correct": "Correct inaccurate information.",
+            "delete": "Delete your information.",
+            "object": "Object to the processing of your information.",
+            "withdraw": "Withdraw your consent at any time."
+          },
+          "cookies": {
+            "title": "Cookies and Similar Technologies",
+            "body1": "We use cookies and similar technologies to improve site functionality. You can manage your preferences through your browser settings."
+          },
+          "changes": {
+            "title": "Changes to This Policy",
+            "body1": "We may update this Privacy Policy periodically. We will notify you of significant changes through the site or by email."
+          },
+          "contact": {
+            "title": "Contact",
+            "body1": "If you have questions about this Privacy Policy, please contact us through our contact page."
+          }
+        }
+      },
+      "reembolsos": {
+        "metaTitle": "Disputes and Refunds Policy · Boffmedia",
+        "metaDescription": "How we resolve disputes and manage refunds on Boffmedia.",
+        "kicker": "Legal · Refunds",
+        "title": "Disputes and Refunds Policy",
+        "lead": "At Boffmedia, we strive to provide the best possible experience for our customers. However, we understand that problems or misunderstandings may arise. This policy is designed to handle such situations fairly and efficiently.",
+        "tocLabel": "Contents",
+        "updatedPrefix": "Last updated: ",
+        "sections": {
+          "disputeProcess": {
+            "title": "Dispute Process",
+            "intro": "If you have any issues with your purchase, follow these steps:",
+            "item1": "Contact our customer service through our contact page.",
+            "item2": "Provide all relevant details, including the order number and a detailed description of the issue.",
+            "item3": "Our team will investigate the issue and respond within 48 business hours."
+          },
+          "refundPolicy": {
+            "title": "Refund Policy",
+            "intro": "Refunds are handled on a case-by-case basis, taking into account the following conditions:",
+            "item1": "The refund request must be made within 7 days of purchase.",
+            "item2": "The item or service must not have been substantially used or activated.",
+            "item3": "A valid reason for the refund must be provided."
+          },
+          "refundProcess": {
+            "title": "Refund Process",
+            "intro": "If a refund is approved:",
+            "item1": "It will be processed via the original payment method within 7 business days.",
+            "item2": "It may be subject to a processing fee of 5% of the purchase value.",
+            "disclaimer": "We reserve the right to reject refund requests that do not comply with our policies or that are considered abusive."
+          },
+          "moreInfo": {
+            "title": "More Information",
+            "body1": "For more information about cancellations, please see our Cancellation Policy."
+          }
+        }
+      },
+      "terminos": {
+        "metaTitle": "Terms of Service · Boffmedia",
+        "metaDescription": "The conditions that govern the use of Boffmedia services.",
+        "kicker": "Legal · Terms",
+        "title": "Terms of Service",
+        "lead": "These terms govern access to and use of Boffmedia services. By using them, you agree to comply with the conditions described below.",
+        "tocLabel": "Contents",
+        "updatedPrefix": "Last updated: ",
+        "sections": {
+          "acceptance": {
+            "title": "Acceptance of Terms",
+            "body1": "By accessing and using our services, you agree to comply with and be bound by these Terms of Service in their entirety. If you do not agree with these terms, please do not use our services."
+          },
+          "changes": {
+            "title": "Changes to Terms",
+            "body1": "We reserve the right to modify these terms at any time. We will notify you of significant changes through our website or by email. Your continued use of our services after such changes constitutes your acceptance of the new terms."
+          },
+          "usage": {
+            "title": "Use of Service",
+            "intro": "Our services are intended solely for personal, non-commercial use. You agree not to:",
+            "item1": "Use our services for any illegal or unauthorized purpose.",
+            "item2": "Interfere with or disrupt the integrity or performance of our services.",
+            "item3": "Attempt to gain unauthorized access to our systems or networks.",
+            "item4": "Copy, modify, distribute, sell or lease any part of our services."
+          },
+          "accounts": {
+            "title": "User Accounts",
+            "intro": "To access certain features of our services, you must create an account. You are responsible for:",
+            "item1": "Maintaining the confidentiality of your account and password.",
+            "item2": "Restricting access to your computer or device.",
+            "item3": "All activities that occur under your account."
+          },
+          "userContent": {
+            "title": "User Content",
+            "body1": "Our services may allow you to post, link, store, share and make available certain information, text, graphics, videos or other materials. You are responsible for this content and any claims related to it."
+          },
+          "intellectualProperty": {
+            "title": "Intellectual Property",
+            "body1": "The service and its original content, features and functionality are and will remain the exclusive property of Boffmedia and its licensors. The service is protected by copyright, trademark and other laws."
+          },
+          "purchases": {
+            "title": "Purchases and Payments",
+            "body1": "If you make a purchase through our services, you agree to provide accurate and complete payment information. All fees are subject to change. Transactions are managed by secure payment processors."
+          },
+          "cancellations": {
+            "title": "Cancellations",
+            "intro": "Since we offer in-game items and online services, our cancellation policy is limited. If you encounter any issues with your purchase, please contact our customer service as soon as possible.",
+            "howTo": "To request a cancellation:",
+            "item1": "The request must be made within 24 hours of purchase.",
+            "item2": "The item or service must not have been used or activated.",
+            "item3": "You must provide specific details about the issue found or the reason for cancellation.",
+            "item4": "We reserve the right to investigate and resolve the request at our discretion.",
+            "fee": "Approved cancellations may be subject to a processing fee of 5% of the purchase value."
+          },
+          "returns": {
+            "title": "Returns",
+            "intro": "We strive to ensure that every purchase is a satisfying experience. If you are not satisfied with your purchase, we will review your case according to the following criteria:",
+            "item1": "The request must be made within 7 calendar days from the date of purchase.",
+            "item2": "The item or service must not have been used, activated or redeemed.",
+            "item3": "You must verify the purchase with the receipt or order number.",
+            "item4": "Items purchased on promotion or with special discount are excluded unless a verified defect is found.",
+            "process": "To initiate a return, contact our team indicating the order number and the detailed reason. We will respond within a maximum of 48 business hours.",
+            "resolution": "If the return is approved, the amount will be refunded via the original payment method within 7 business hours, and may be subject to a management fee of 5% of the purchase value. We reserve the right to reject requests that do not meet the above conditions or that are considered abusive."
+          },
+          "refunds": {
+            "title": "Refunds and Disputes",
+            "intro": "We understand that problems or misunderstandings may arise. This policy is designed to handle such situations fairly and efficiently.",
+            "steps": "If you have any issues with your purchase, follow these steps:",
+            "step1": "Contact our customer service through our contact page.",
+            "step2": "Provide all relevant details, including the order number and a detailed description of the issue.",
+            "step3": "Our team will investigate the issue and respond within 48 business hours.",
+            "conditions": "Refunds are handled on a case-by-case basis, taking into account the following conditions:",
+            "cond1": "The refund request must be made within 7 days of purchase.",
+            "cond2": "The item or service must not have been substantially used or activated.",
+            "cond3": "A valid reason for the refund must be provided.",
+            "resolution": "If a refund is approved, it will be processed via the original payment method within 7 business days. It may be subject to a processing fee of 5% of the purchase value. We reserve the right to reject refund requests that do not comply with our policies or that are considered abusive."
+          },
+          "termination": {
+            "title": "Termination",
+            "body1": "We may terminate or suspend your access immediately, without prior notice or liability, for any reason, including, without limitation, if you breach these Terms of Service."
+          },
+          "liability": {
+            "title": "Limitation of Liability",
+            "body1": "In no event shall Boffmedia, nor its directors, employees, partners, agents, suppliers or affiliates, be liable for any indirect, incidental, special, consequential or punitive damages arising from the use or inability to use our services."
+          },
+          "law": {
+            "title": "Applicable Law",
+            "body1": "These Terms shall be governed and construed in accordance with the laws of Spain, without regard to its conflict of law provisions."
+          },
+          "contact": {
+            "title": "Contact",
+            "body1": "If you have questions about these Terms of Service, please contact us through our contact page."
+          }
+        }
+      }
     }
   }
 }

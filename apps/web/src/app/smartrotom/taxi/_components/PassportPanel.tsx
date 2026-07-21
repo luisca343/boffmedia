@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { Empty, Eyebrow, Icon, Skeleton, StatBox } from "./ui"
 import { formatMoney, formatNum, relativeTime } from "../_utils/format"
@@ -35,6 +36,7 @@ export function PassportPanel({
   stats: TravelStats
   loading: boolean
 }) {
+  const t = useTranslations("taxi.passportPanel")
   if (loading) {
     return (
       <div className="tx-scroll flex min-h-0 flex-1 flex-col gap-3.5 overflow-y-auto p-3.5">
@@ -51,14 +53,14 @@ export function PassportPanel({
   return (
     <div className="tx-scroll flex min-h-0 flex-1 flex-col gap-3.5 overflow-y-auto p-3.5">
       <div className="grid shrink-0 grid-cols-2 gap-[9px]">
-        <StatBox icon="map" value={stats.visited.length} suffix={` / ${stops.length}`} label="Destinos visitados" />
-        <StatBox icon="route" value={stats.trips} label="Viajes totales" />
-        <StatBox {...blocksTravelled(stats.blocks)} icon="walking" label="Bloques recorridos" />
-        <StatBox icon="coins" value={formatNum(stats.spent)} label="¥ en taxis" money />
+        <StatBox icon="map" value={stats.visited.length} suffix={` / ${stops.length}`} label={t("visitedDestinations")} />
+        <StatBox icon="route" value={stats.trips} label={t("totalTrips")} />
+        <StatBox {...blocksTravelled(stats.blocks)} icon="walking" label={t("blocksTravelled")} />
+        <StatBox icon="coins" value={formatNum(stats.spent)} label={t("taxiSpent")} money />
       </div>
 
       <Eyebrow icon="map" count={`${stats.visited.length}/${stops.length}`}>
-        Sellos del pasaporte
+        {t("passportStamps")}
       </Eyebrow>
       <div className="grid shrink-0 grid-cols-3 gap-[9px]">
         {stops.map((stop) => {
@@ -101,11 +103,11 @@ export function PassportPanel({
       </div>
 
       <Eyebrow icon="clock" count={trips.length}>
-        Historial de viajes
+        {t("travelHistory")}
       </Eyebrow>
       <div className="flex flex-col gap-[9px]">
         {trips.length === 0 ? (
-          <Empty icon="clock" message="Aún no has viajado en taxi." />
+          <Empty icon="clock" message={t("emptyHistory")} />
         ) : (
           trips.map((trip) => (
             <div

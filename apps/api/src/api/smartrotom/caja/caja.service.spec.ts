@@ -30,8 +30,20 @@ describe('CajaService', () => {
 
   it('splits spent rows into chested items and party Pokémon', async () => {
     spend.mockResolvedValue([
-      { id: 1, itemId: 'minecraft:diamond', itemType: 'item', itemData: null, granted: 5 },
-      { id: 2, itemId: 'Incineroar de Wolfey', itemType: 'pokemon', itemData: 'Incineroar lvl:50', granted: 1 },
+      {
+        id: 1,
+        itemId: 'minecraft:diamond',
+        itemType: 'item',
+        itemData: null,
+        granted: 5,
+      },
+      {
+        id: 2,
+        itemId: 'Incineroar de Wolfey',
+        itemType: 'pokemon',
+        itemData: 'Incineroar lvl:50',
+        granted: 1,
+      },
     ]);
 
     const res = await service.claim('u', 'arcade');
@@ -42,7 +54,13 @@ describe('CajaService', () => {
 
   it('falls back to itemId when a Pokémon row has no spec', async () => {
     spend.mockResolvedValue([
-      { id: 3, itemId: 'pikachu', itemType: 'pokemon', itemData: null, granted: 1 },
+      {
+        id: 3,
+        itemId: 'pikachu',
+        itemType: 'pokemon',
+        itemData: null,
+        granted: 1,
+      },
     ]);
     const res = await service.claim('u', 'arcade');
     expect(res.pokemon).toEqual([{ spec: 'pikachu', cantidad: 1 }]);
@@ -70,8 +88,20 @@ describe('CajaService', () => {
       reserve.mockResolvedValue({
         reservationId: 'r-1',
         rows: [
-          { id: 1, itemId: 'minecraft:diamond', itemType: 'item', itemData: null, granted: 5 },
-          { id: 2, itemId: 'x', itemType: 'pokemon', itemData: 'Incineroar lvl:50', granted: 1 },
+          {
+            id: 1,
+            itemId: 'minecraft:diamond',
+            itemType: 'item',
+            itemData: null,
+            granted: 5,
+          },
+          {
+            id: 2,
+            itemId: 'x',
+            itemType: 'pokemon',
+            itemData: 'Incineroar lvl:50',
+            granted: 1,
+          },
         ],
       });
 

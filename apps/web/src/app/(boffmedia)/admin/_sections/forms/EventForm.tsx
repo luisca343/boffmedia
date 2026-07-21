@@ -11,8 +11,8 @@ import type { Event } from "@boffmedia/shared"
 const eventSchema = z.object({
   id: z.number().optional(),
   parentId: z.number().optional(),
-  title: z.string().min(3, "El título debe tener al menos 3 caracteres"),
-  description: z.string().min(10, "La descripción debe tener al menos 10 caracteres"),
+  title: z.string().min(3),
+  description: z.string().min(10),
   icon: z.string().optional(),
   banner: z.string().optional(),
   gameId: z.number(),
@@ -33,7 +33,7 @@ interface EventFormProps {
   parentEvent?: Event | null
 }
 
-export function EventForm({ defaultValues, isSubmitting, onSubmit, onCancel, submitLabel = "Guardar", parentEvent }: EventFormProps) {
+export function EventForm({ defaultValues, isSubmitting, onSubmit, onCancel, submitLabel, parentEvent }: EventFormProps) {
   const t = useTranslations("admin.form")
   const { events, isLoading: isLoadingEvents } = useGetEvents()
   const { games, isLoading: isLoadingGames } = useGetGames()
@@ -166,11 +166,11 @@ export function EventForm({ defaultValues, isSubmitting, onSubmit, onCancel, sub
       </div>
 
       <Field label={t("event.iconLabel")} hint={t("event.iconHint")} error={errors.icon?.message}>
-        <Input placeholder="https://ejemplo.com/icono.jpg" {...register("icon")} />
+        <Input placeholder="https://example.com/icon.jpg" {...register("icon")} />
       </Field>
 
       <Field label={t("event.bannerLabel")} hint={t("event.bannerHint")} error={errors.banner?.message}>
-        <Input placeholder="https://ejemplo.com/banner.jpg" {...register("banner")} />
+        <Input placeholder="https://example.com/banner.jpg" {...register("banner")} />
       </Field>
 
       <div className="flex justify-end gap-2.5 pt-2">

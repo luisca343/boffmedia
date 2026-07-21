@@ -142,7 +142,9 @@ export class WigglypopTradingService {
       );
     }
     if (listing.sellerUuid === dto.buyerUuid) {
-      throw new BadRequestException('You cannot make an offer on your own listing');
+      throw new BadRequestException(
+        'You cannot make an offer on your own listing',
+      );
     }
     if (listing.format === 'auction') {
       throw new BadRequestException(
@@ -218,7 +220,9 @@ export class WigglypopTradingService {
     } catch (error) {
       // The sale did not happen — put the asking price back rather than leaving the listing
       // silently repriced to a rejected offer.
-      await this.listingsRepository.update(listing.id, { price: originalPrice });
+      await this.listingsRepository.update(listing.id, {
+        price: originalPrice,
+      });
       throw error;
     }
 
@@ -261,12 +265,11 @@ export class WigglypopTradingService {
       throw new BadRequestException(`This offer is already ${offer.status}`);
     }
 
-    const updated = await this.tradingRepository.setOfferStatus(id, 'rechazada');
-    await this.notify.offerRejected(
-      offer.buyerUuid,
-      listing.id,
-      listing.title,
+    const updated = await this.tradingRepository.setOfferStatus(
+      id,
+      'rechazada',
     );
+    await this.notify.offerRejected(offer.buyerUuid, listing.id, listing.title);
     return this.toOfferEntity(updated, listing);
   }
 
@@ -311,9 +314,7 @@ export class WigglypopTradingService {
     const listing = await this.loadListing(dto.listingId);
 
     if (listing.format !== 'trade') {
-      throw new BadRequestException(
-        `"${listing.title}" is not open to trades`,
-      );
+      throw new BadRequestException(`"${listing.title}" is not open to trades`);
     }
     if (listing.status !== 'activo') {
       throw new BadRequestException(
@@ -414,7 +415,10 @@ export class WigglypopTradingService {
       throw new BadRequestException(`This trade is already ${trade.status}`);
     }
 
-    const updated = await this.tradingRepository.setTradeStatus(id, 'rechazada');
+    const updated = await this.tradingRepository.setTradeStatus(
+      id,
+      'rechazada',
+    );
     await this.notify.tradeRejected(
       trade.proposerUuid,
       listing.id,

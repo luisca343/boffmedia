@@ -1,6 +1,7 @@
 "use client"
 
 import { useMemo, useState } from "react"
+import { useTranslations } from "next-intl"
 import { useMons } from "../_hooks/queries"
 import { locId, usePcUi } from "../_stores/pcUiStore"
 import type { Mon } from "../_types/pc.types"
@@ -14,6 +15,7 @@ import { Button, Icon, Panel, Sprite } from "./ui"
  * user clicked.
  */
 export function CompareTray() {
+  const t = useTranslations("pc")
   const [open, setOpen] = useState(false)
   const compare = usePcUi((s) => s.compare)
   const setCompare = usePcUi((s) => s.setCompare)
@@ -36,7 +38,7 @@ export function CompareTray() {
       <Panel className="fixed bottom-4 left-1/2 z-[70] flex -translate-x-1/2 animate-pc-slide-up items-center gap-3 !rounded-pc-pill py-2 pl-4 pr-2 shadow-[0_18px_50px_-18px_rgb(0_0_0_/_.75)] motion-reduce:animate-none">
         <span className="flex items-center gap-1.5 text-xs font-semibold text-pc-violet">
           <Icon name="layers" size={14} />
-          Comparar {picked.length}
+          {t("compare.title")} {picked.length}
         </span>
 
         <div className="flex gap-1">
@@ -52,7 +54,7 @@ export function CompareTray() {
                 />
                 <button
                   type="button"
-                  aria-label={`Quitar ${displayName(m.pokemon)} de la comparación`}
+                  aria-label={`${t("compare.title")} ${displayName(m.pokemon)}`}
                   onClick={() => remove(id)}
                   className="absolute -right-[5px] -top-[5px] flex h-4 w-4 items-center justify-center rounded-pc-pill bg-pc-rose text-white focus-visible:outline-none"
                 >
@@ -64,9 +66,9 @@ export function CompareTray() {
         </div>
 
         <Button variant="primary" disabled={picked.length < 2} onClick={() => setOpen(true)}>
-          Ver
+          {t("common.apply")}
         </Button>
-        <Button variant="ghost" icon aria-label="Vaciar comparación" onClick={() => setCompare([])}>
+        <Button variant="ghost" icon aria-label={t("compare.empty")} onClick={() => setCompare([])}>
           <Icon name="x" size={16} />
         </Button>
       </Panel>

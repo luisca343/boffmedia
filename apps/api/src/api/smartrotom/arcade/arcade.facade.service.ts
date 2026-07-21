@@ -319,7 +319,6 @@ export class ArcadeFacadeService implements OnModuleInit {
     }
   }
 
-
   // ==================== PRIVATE HELPER METHODS ====================
 
   /**

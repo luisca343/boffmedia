@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { Overlay, MODAL_PANEL, Icon } from "../ui";
 import { useRotomRequest } from "@/hooks/useRotomRequest";
 import { DocumentsService } from "@/services/api/smartrotom/documentsService";
@@ -16,6 +17,7 @@ export function VersionHistory({
   onClose: () => void;
   onRestore: (versionId: number) => void;
 }) {
+  const t = useTranslations("notas");
   const { data, isLoading } = useRotomRequest<NoteVersion[]>(DocumentsService.getVersions, note.id);
   const versions = data ?? [];
 
@@ -24,19 +26,19 @@ export function VersionHistory({
       <div className={`${MODAL_PANEL} w-[460px] max-w-[92vw]`}>
         <div className="flex items-center gap-2.5 border-b border-nt-border px-[18px] py-4">
           <Icon name="history" size={17} className="text-nt-accent-fg" />
-          <h3 className="m-0 flex-1 truncate text-[16px] font-[650] text-nt-fg">Historial de versiones</h3>
-          <button onClick={onClose} aria-label="Cerrar" className="text-nt-fg-subtle hover:text-nt-fg">
+          <h3 className="m-0 flex-1 truncate text-[16px] font-[650] text-nt-fg">{t("history.title")}</h3>
+          <button onClick={onClose} aria-label={t("common.close")} className="text-nt-fg-subtle hover:text-nt-fg">
             <Icon name="x" size={18} />
           </button>
         </div>
         <div className="nt-scroll max-h-[420px] overflow-auto p-2.5">
           {isLoading ? (
-            <div className="px-3 py-10 text-center text-[13px] text-nt-fg-subtle">Cargando…</div>
+            <div className="px-3 py-10 text-center text-[13px] text-nt-fg-subtle">{t("history.loading")}</div>
           ) : versions.length === 0 ? (
             <div className="px-3 py-10 text-center text-[13px] leading-[1.6] text-nt-fg-subtle">
-              Aún no hay versiones guardadas.
+              {t("history.empty")}
               <br />
-              Se crea una instantánea al guardar cambios importantes.
+              {t("history.emptyHint")}
             </div>
           ) : (
             versions.map((v, i) => (
@@ -52,9 +54,9 @@ export function VersionHistory({
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2">
                     <span className="truncate text-[13px] font-medium text-nt-fg">
-                      {v.label || (i === 0 ? "Actual" : `Versión ${versions.length - i}`)}
+                      {v.label || (i === 0 ? t("history.current") : t("history.version", { num: versions.length - i }))}
                     </span>
-                    <span className="text-[11px] tabular-nums text-nt-fg-subtle">{v.words} palabras</span>
+                    <span className="text-[11px] tabular-nums text-nt-fg-subtle">{t("history.words", { count: v.words })}</span>
                   </div>
                   <div className="mt-0.5 text-[11.5px] text-nt-fg-subtle">{fullDate(toMs(v.createdAt))}</div>
                 </div>
@@ -66,7 +68,7 @@ export function VersionHistory({
                     }}
                     className="self-center rounded-nt-sm border border-nt-border bg-nt-hover px-2.5 py-1 text-[12px] text-nt-fg-muted opacity-0 transition-opacity hover:text-nt-fg group-hover:opacity-100"
                   >
-                    Restaurar
+                    {t("history.restoreBtn")}
                   </button>
                 )}
               </div>

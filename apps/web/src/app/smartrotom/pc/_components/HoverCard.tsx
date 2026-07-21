@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { usePokemonStore } from "@/stores/pokemonStore"
 import type { Mon } from "../_types/pc.types"
 import { displayName, isShiny, ivPct, typesOf } from "../_utils/derive"
@@ -15,6 +16,7 @@ export interface HoverCardProps {
 
 /** The peek. Everything here is already on screen or one click away; nothing is fetched. */
 export function HoverCard({ mon, rect }: HoverCardProps) {
+  const t = useTranslations("pc")
   const speciesByDex = usePokemonStore((s) => s.pokemonByDex)
   const p = mon.pokemon
 
@@ -64,18 +66,18 @@ export function HoverCard({ mon, rect }: HoverCardProps) {
 
       <div className="mt-2.5 flex flex-wrap gap-x-3 gap-y-1 text-[11.5px] text-pc-fg-muted">
         <span>
-          Natur: <b className="text-pc-fg">{p.nature || "—"}</b>
+          {t("detail.nature")}: <b className="text-pc-fg">{p.nature || "—"}</b>
         </span>
         <span>
-          IV: <b className={iv > 80 ? "text-pc-green" : "text-pc-fg"}>{iv}%</b>
+          {t("detail.stats")}: <b className={iv > 80 ? "text-pc-green" : "text-pc-fg"}>{iv}%</b>
         </span>
         <span className="w-full truncate">
-          Hab: <b className="text-pc-fg">{p.ability || "—"}</b>
+          {t("filters.ability")}: <b className="text-pc-fg">{p.ability || "—"}</b>
         </span>
       </div>
 
       <div className="mt-2 font-pc-mono text-[10.5px] text-pc-fg-subtle">
-        arrastra · clic = detalle
+        {t("team.dragHint")}
       </div>
     </div>
   )

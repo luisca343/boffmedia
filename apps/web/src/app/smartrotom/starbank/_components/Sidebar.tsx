@@ -1,6 +1,7 @@
 "use client";
 import * as React from "react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import { AccountAvatar, Ico, type IconName } from "./ui";
 import { formatMoney } from "../_utils/format";
@@ -9,30 +10,33 @@ import type { SBAccount } from "../_types";
 
 const BASE = "/smartrotom/starbank";
 
-interface NavItem { seg: string; href: string; label: string; icon: IconName }
-const NAV: { group: string; items: NavItem[] }[] = [
-  {
-    group: "Personal",
-    items: [
-      { seg: "starbank", href: BASE, label: "General", icon: "home" },
-      { seg: "cuentas", href: `${BASE}/cuentas`, label: "Cuentas", icon: "card" },
-      { seg: "transacciones", href: `${BASE}/transacciones`, label: "Transacciones", icon: "list" },
-      { seg: "enviar", href: `${BASE}/enviar`, label: "Enviar Dinero", icon: "send" },
-    ],
-  },
-  {
-    group: "Análisis",
-    items: [
-      { seg: "graficas", href: `${BASE}/graficas`, label: "Gráficas", icon: "chart" },
-      { seg: "calendario", href: `${BASE}/calendario`, label: "Calendario", icon: "cal" },
-    ],
-  },
-];
+interface NavItem { seg: string; href: string; key: string; icon: IconName }
 
 const SIDE_BG = "linear-gradient(180deg, #0b1638 0%, #172554 60%, #1e3a8a 100%)";
 const LOGO_BG = "conic-gradient(from 220deg, #93c5fd, #2463eb 35%, #1e3a8a 70%, #93c5fd)";
 
 export function Sidebar({ currentPage, account, onOpenAccounts }: { currentPage: string; account?: SBAccount | null; onOpenAccounts: () => void }) {
+  const t = useTranslations("starbank");
+
+  const NAV: { groupKey: string; items: NavItem[] }[] = [
+    {
+      groupKey: "sidebar.groups.personal",
+      items: [
+        { seg: "starbank", href: BASE, key: "sidebar.nav.general", icon: "home" },
+        { seg: "cuentas", href: `${BASE}/cuentas`, key: "sidebar.nav.accounts", icon: "card" },
+        { seg: "transacciones", href: `${BASE}/transacciones`, key: "sidebar.nav.transactions", icon: "list" },
+        { seg: "enviar", href: `${BASE}/enviar`, key: "sidebar.nav.sendMoney", icon: "send" },
+      ],
+    },
+    {
+      groupKey: "sidebar.groups.analysis",
+      items: [
+        { seg: "graficas", href: `${BASE}/graficas`, key: "sidebar.nav.charts", icon: "chart" },
+        { seg: "calendario", href: `${BASE}/calendario`, key: "sidebar.nav.calendar", icon: "cal" },
+      ],
+    },
+  ];
+
   return (
     <aside
       className="relative z-[1] hidden h-full flex-col gap-2 overflow-hidden border-r border-white/[0.06] px-3.5 py-[18px] text-[#c8d4ec] md:flex"
@@ -50,8 +54,8 @@ export function Sidebar({ currentPage, account, onOpenAccounts }: { currentPage:
           <span className="pointer-events-none absolute inset-1.5 rounded-md" style={{ background: "radial-gradient(circle at 30% 30%, rgba(255,255,255,.7), rgba(255,255,255,0) 55%)" }} />
         </div>
         <div className="font-sb-display text-[18px] font-bold tracking-[-0.02em] text-white">
-          Starbank
-          <small className="block text-[10px] font-medium uppercase tracking-[0.14em] text-[#9bb3da]">SmartRotom · Beta</small>
+          {t("sidebar.title")}
+          <small className="block text-[10px] font-medium uppercase tracking-[0.14em] text-[#9bb3da]">{t("sidebar.subtitle")}</small>
         </div>
       </div>
 
@@ -72,7 +76,7 @@ export function Sidebar({ currentPage, account, onOpenAccounts }: { currentPage:
         </div>
         <button
           type="button"
-          aria-label="Cambiar cuenta"
+          aria-label={t("sidebar.switchAccount")}
           onClick={(e) => { e.stopPropagation(); onOpenAccounts(); }}
           className="rounded-lg p-1.5 text-[#9bb3da] transition-colors hover:bg-white/[0.08] hover:text-white"
         >
@@ -82,8 +86,8 @@ export function Sidebar({ currentPage, account, onOpenAccounts }: { currentPage:
 
       {/* Nav */}
       {NAV.map((g) => (
-        <div key={g.group}>
-          <div className="px-3 pb-1.5 pt-3.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-[#6e84ab]">{g.group}</div>
+        <div key={g.groupKey}>
+          <div className="px-3 pb-1.5 pt-3.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-[#6e84ab]">{t(g.groupKey)}</div>
           <div className="flex flex-col gap-0.5">
             {g.items.map((item) => {
               const active = currentPage === item.seg;
@@ -100,7 +104,7 @@ export function Sidebar({ currentPage, account, onOpenAccounts }: { currentPage:
                 >
                   {active && <span className="absolute bottom-2 left-0 top-2 w-[3px] rounded-r bg-sb-400" />}
                   <Ico name={item.icon} size={18} />
-                  <span>{item.label}</span>
+                  <span>{t(item.key)}</span>
                 </Link>
               );
             })}
@@ -111,7 +115,7 @@ export function Sidebar({ currentPage, account, onOpenAccounts }: { currentPage:
       {/* Foot */}
       <div className="mt-auto flex items-center gap-2 border-t border-white/[0.07] pt-3 text-[12px] text-[#8597b6]">
         <span className="size-1.5 rounded-full bg-sb-pos-2 shadow-[0_0_0_3px_rgba(5,150,105,.25)]" aria-hidden />
-        Sistema operativo
+        {t("sidebar.systemStatus")}
       </div>
     </aside>
   );

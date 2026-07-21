@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
+import { useTranslations } from "next-intl"
 import { usePokemonStore } from "@/stores/pokemonStore"
 import type { Pokemon } from "@/types/Pokemon"
 import { planOrganize, useMoveQueue } from "../_hooks/useMoveQueue"
@@ -79,6 +80,7 @@ export function BoxHeader({
   onShare,
   onClose,
 }: BoxHeaderProps) {
+  const t = useTranslations("pc")
   const boxMeta = usePcUi((s) => s.boxMeta)
   const renameBox = usePcUi((s) => s.renameBox)
   const speciesByDex = usePokemonStore((s) => s.pokemonByDex)
@@ -113,16 +115,16 @@ export function BoxHeader({
     setMenu(false)
     const moves = planOrganize(box, contents, desiredOrder(mode, contents, speciesByDex))
     if (moves.length === 0) {
-      toast("La caja ya está en ese orden", "info")
+      toast(t("organize.alreadyOrdered"), "info")
       return
     }
-    const ok = await run(moves, "Organizando")
-    if (ok) toast(`${name} organizada · ${moves.length} movimientos`, "success")
+    const ok = await run(moves, t("organize.by"))
+    if (ok) toast(`${name} ${t("organize.done", { count: moves.length })}`, "success")
   }
 
   return (
     <div className="flex items-center gap-2.5 border-b border-pc-line px-3.5 py-2.5">
-      <Button icon onClick={onPrev} aria-label="Caja anterior">
+      <Button icon onClick={onPrev} aria-label={t("common.back")}>
         <Icon name="chevL" size={16} />
       </Button>
 
@@ -158,7 +160,7 @@ export function BoxHeader({
           <button
             type="button"
             onClick={() => setEditing(true)}
-            title="Renombrar"
+            title={t("common.save")}
             className="flex max-w-full cursor-text items-center gap-2 text-left"
           >
             <h3 className="truncate font-pc-display text-[17px] font-bold tracking-[.01em] text-pc-fg">
@@ -213,7 +215,7 @@ export function BoxHeader({
             className="pc-glass absolute right-0 top-[42px] z-30 w-[210px] animate-pc-slide-up rounded-xl border-pc-line-strong p-[7px] shadow-[0_24px_60px_-20px_rgb(0_0_0_/_.8)] motion-reduce:animate-none"
           >
             <div className="px-2 pb-1.5 pt-1 text-[10px] font-bold uppercase tracking-[.05em] text-pc-fg-subtle">
-              Auto-organizar por
+              {t("organize.by")}
             </div>
             {ORGANIZE.map(({ mode, label, icon }) => (
               <Button
@@ -241,17 +243,17 @@ export function BoxHeader({
               className="w-full justify-start"
             >
               <Icon name="share" size={14} className="text-pc-cyan" />
-              Compartir / exportar
+              {t("share.title")}
             </Button>
           </div>
         )}
 
-        <Button icon onClick={onNext} aria-label="Caja siguiente">
+        <Button icon onClick={onNext} aria-label={t("common.back")}>
           <Icon name="chevR" size={16} />
         </Button>
 
         {onClose && (
-          <Button variant="ghost" icon onClick={onClose} aria-label="Cerrar la segunda caja">
+          <Button variant="ghost" icon onClick={onClose} aria-label={t("common.close")}>
             <Icon name="x" size={16} />
           </Button>
         )}

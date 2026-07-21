@@ -1,3 +1,4 @@
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import { Avatar, CountBadge, Dots, Icon } from "./ui";
 import type { ChatVM } from "../_types/view";
@@ -18,7 +19,8 @@ export function ContactRow({
   typing?: boolean;
   onClick: () => void;
 }) {
-  const p = previewOf(chat, myUuid);
+  const t = useTranslations("chatapp");
+  const p = previewOf(chat, myUuid, t);
   const unread = chat.unread > 0;
   const last = lastMessage(chat);
 
@@ -49,7 +51,7 @@ export function ContactRow({
           <span className={cn("flex min-w-0 flex-1 items-center gap-[5px] text-[14px]", unread ? "text-ca-300" : "text-ca-400")}>
             {typing ? (
               <span className="flex items-center gap-1.5 text-ca-accent-soft">
-                <Dots sm /> escribiendo…
+                <Dots sm /> {t("status.typing")}
               </span>
             ) : (
               <>

@@ -88,10 +88,7 @@ async function main() {
     const weight = CATEGORY_WEIGHTS[achievement.category] ?? DEFAULT_WEIGHT;
 
     // "anything else → bronce/10" is already the default — skip the write.
-    if (
-      weight.points === DEFAULT_POINTS &&
-      weight.tier === DEFAULT_TIER
-    ) {
+    if (weight.points === DEFAULT_POINTS && weight.tier === DEFAULT_TIER) {
       continue;
     }
 

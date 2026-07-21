@@ -338,11 +338,7 @@ export class WigglypopListingsRepository {
     return result[0].affectedRows > 0;
   }
 
-  async markSold(
-    id: number,
-    orderId: number,
-    soldFor: number,
-  ): Promise<void> {
+  async markSold(id: number, orderId: number, soldFor: number): Promise<void> {
     await this.db
       .update(wigglypopListings)
       .set({
@@ -389,10 +385,7 @@ export class WigglypopListingsRepository {
     return Number(rows[0]?.total ?? 0);
   }
 
-  async bumpBid(
-    id: number,
-    amount: number,
-  ): Promise<void> {
+  async bumpBid(id: number, amount: number): Promise<void> {
     await this.db
       .update(wigglypopListings)
       .set({
@@ -404,7 +397,9 @@ export class WigglypopListingsRepository {
 
   // ─── Item catalog ───────────────────────────────────────────────────────────
 
-  async findCatalogEntries(ids: string[]): Promise<WigglypopItemCatalogEntry[]> {
+  async findCatalogEntries(
+    ids: string[],
+  ): Promise<WigglypopItemCatalogEntry[]> {
     if (ids.length === 0) return [];
     return this.db
       .select()
@@ -421,7 +416,10 @@ export class WigglypopListingsRepository {
     return this.db
       .select()
       .from(wigglypopItemCatalog)
-      .orderBy(asc(wigglypopItemCatalog.category), asc(wigglypopItemCatalog.name));
+      .orderBy(
+        asc(wigglypopItemCatalog.category),
+        asc(wigglypopItemCatalog.name),
+      );
   }
 
   // ─── Derived data ───────────────────────────────────────────────────────────
@@ -470,7 +468,10 @@ export class WigglypopListingsRepository {
     const names = new Map<string, string | null>();
     if (uuids.length === 0) return names;
     const rows = await this.db
-      .select({ uuid: smartrotomUsers.uuid, username: smartrotomUsers.username })
+      .select({
+        uuid: smartrotomUsers.uuid,
+        username: smartrotomUsers.username,
+      })
       .from(smartrotomUsers)
       .where(inArray(smartrotomUsers.uuid, uuids));
     for (const r of rows) names.set(r.uuid, r.username ?? null);

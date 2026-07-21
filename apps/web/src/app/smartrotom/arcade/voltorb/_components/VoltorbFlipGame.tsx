@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
+import { useTranslations } from "next-intl"
 import { Button, Icon, Panel, Tag } from "../../_components/ui"
 import { GameTopBar } from "../../_components/GameTopBar"
 import GameGrid from "./GameGrid"
@@ -17,6 +18,7 @@ import { RulesModal } from "./RulesModal"
 const GRID_SIZE = 5
 
 export default function VoltorbFlipGame() {
+  const t = useTranslations("")
   const router = useRouter()
   const [grid, setGrid] = useState<Cell[][]>([])
   const [rowInfo, setRowInfo] = useState<RowColInfo[]>([])
@@ -274,10 +276,10 @@ export default function VoltorbFlipGame() {
   // The primary control changes job with the run: bank what you have, take the
   // next board, or start over after a Voltorb.
   const action = gameOver
-    ? { label: "Volver a jugar", variant: "cyan" as const, icon: <Icon.Reset s={14} /> }
+    ? { label: t("arcade.voltorb.playAgain"), variant: "cyan" as const, icon: <Icon.Reset s={14} /> }
     : gameWon
-      ? { label: "Siguiente nivel", variant: "cyan" as const, icon: <Icon.Chevron s={14} /> }
-      : { label: "Cobrar monedas", variant: "amber" as const, icon: <Icon.Coin s={16} /> }
+      ? { label: t("arcade.voltorb.nextLevel"), variant: "cyan" as const, icon: <Icon.Chevron s={14} /> }
+      : { label: t("arcade.voltorb.cashOut"), variant: "amber" as const, icon: <Icon.Coin s={16} /> }
 
   const bombs = colInfo.reduce((sum, info) => sum + info.voltorbs, 0)
   const difficulty = "▲".repeat(Math.min(Math.ceil(level / 2), 4))
@@ -312,9 +314,9 @@ export default function VoltorbFlipGame() {
                 ▸ CARTAS {flippedMultipliers}
               </span>
               <span className="hidden font-ar-mono text-[11px] text-ar-ink-dim md:inline">
-                5×5 · DIFICULTAD {difficulty}
+                5×5 · {t("arcade.voltorb.difficulty", { level: difficulty })}
               </span>
-              <span className="font-ar-display text-[10px] text-ar-cyan">BOMBAS {bombs}</span>
+              <span className="font-ar-display text-[10px] text-ar-cyan">{t("arcade.voltorb.bombs", { count: bombs })}</span>
             </div>
 
             <GameGrid
@@ -327,9 +329,9 @@ export default function VoltorbFlipGame() {
             />
 
             <div className="mt-[18px] flex flex-wrap justify-center gap-2">
-              <Tag tone="cyan">{flippedMultipliers} cartas volteadas</Tag>
-              <Tag tone="amber">Combo ×{roundScore}</Tag>
-              <Tag tone="magenta">⚡ {bombs} bombas</Tag>
+              <Tag tone="cyan">{t("arcade.voltorb.cardsFlipped", { count: flippedMultipliers })}</Tag>
+              <Tag tone="amber">{t("arcade.voltorb.combo", { score: roundScore })}</Tag>
+              <Tag tone="magenta">⚡ {t("arcade.voltorb.bombCount", { count: bombs })}</Tag>
             </div>
           </Panel>
 
@@ -359,7 +361,7 @@ export default function VoltorbFlipGame() {
               icon={<Icon.Info s={12} />}
               onClick={() => setShowRulesModal(true)}
             >
-              Ver reglas
+              {t("arcade.voltorb.viewRules")}
             </Button>
             <Button
               variant="ghost"
@@ -368,7 +370,7 @@ export default function VoltorbFlipGame() {
               icon={<Icon.X s={12} />}
               onClick={handleQuit}
             >
-              Abandonar partida
+              {t("arcade.voltorb.quitGame")}
             </Button>
           </div>
         </div>
@@ -389,10 +391,10 @@ export default function VoltorbFlipGame() {
         isOpen={showConfirmQuit}
         onClose={() => setShowConfirmQuit(false)}
         onConfirm={handleConfirmQuit}
-        title="¿Salir del juego?"
-        description={`Te llevarás ${totalCoins} monedas.`}
-        confirmText="Salir"
-        cancelText="Seguir"
+        titleKey="arcade.voltorb.quitConfirm"
+        descriptionKey="arcade.voltorb.quitDescription"
+        confirmKey="arcade.voltorb.quit"
+        cancelKey="arcade.voltorb.keep"
         variant="quit"
       />
 
@@ -400,10 +402,10 @@ export default function VoltorbFlipGame() {
         isOpen={showConfirmNew}
         onClose={handleCancelNewGame}
         onConfirm={handleConfirmNewGame}
-        title="¿Nuevo juego?"
-        description="Perderás tu progreso actual."
-        confirmText="Nuevo"
-        cancelText="Seguir"
+        titleKey="arcade.voltorb.newGameConfirm"
+        descriptionKey="arcade.voltorb.newGameDescription"
+        confirmKey="arcade.voltorb.new"
+        cancelKey="arcade.voltorb.keep"
         variant="new"
       />
 
@@ -411,10 +413,10 @@ export default function VoltorbFlipGame() {
         isOpen={showConfirmStop}
         onClose={handleCancelStop}
         onConfirm={handleConfirmStop}
-        title="¿Cobrar monedas?"
-        description={`Ganarás ${roundScore} monedas.`}
-        confirmText="Cobrar"
-        cancelText="Seguir"
+        titleKey="arcade.voltorb.cashOutConfirm"
+        descriptionKey="arcade.voltorb.cashOutDescription"
+        confirmKey="arcade.voltorb.cashOut"
+        cancelKey="arcade.voltorb.keep"
         variant="new"
       />
 

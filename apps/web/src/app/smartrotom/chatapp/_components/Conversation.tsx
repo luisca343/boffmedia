@@ -1,5 +1,6 @@
 "use client";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import { getSmartRotomUser } from "@/lib/utils";
 import useSocketStore from "@/stores/useSocketStore";
@@ -14,13 +15,13 @@ import { isDirect, isGroupLike, isSaved } from "../_utils/chat";
 import { dayKey, dayLabel } from "../_utils/format";
 import { useSendMessage } from "../_hooks/useSendMessage";
 
-function useStatus(chat: ChatVM, typing?: boolean) {
-  if (typing) return { txt: "escribiendo…", live: true, game: false };
-  if (isGroupLike(chat.type)) return { txt: `${chat.members.length} miembros`, live: false, game: false };
-  if (isSaved(chat.type)) return { txt: "Solo tú · tus notas y enlaces", live: false, game: false };
-  if (chat.presence === "ingame") return { txt: "Jugando ahora", live: true, game: true };
-  if (chat.presence === "online") return { txt: "En línea", live: true, game: false };
-  return { txt: "Desconectado", live: false, game: false };
+function useStatus(chat: ChatVM, typing: boolean | undefined, t: ReturnType<typeof useTranslations<"chatapp">>) {
+  if (typing) return { txt: t("status.typing"), live: true, game: false };
+  if (isGroupLike(chat.type)) return { txt: t("status.members", { count: chat.members.length }), live: false, game: false };
+  if (isSaved(chat.type)) return { txt: t("status.onlyYou"), live: false, game: false };
+  if (chat.presence === "ingame") return { txt: t("status.playing"), live: true, game: true };
+  if (chat.presence === "online") return { txt: t("status.online"), live: true, game: false };
+  return { txt: t("status.offline"), live: false, game: false };
 }
 
 export function Conversation({
@@ -48,6 +49,7 @@ export function Conversation({
   onOpenSearch: () => void;
   onStartCall: (kind: "voice" | "video") => void;
 }) {
+  const t = useTranslations("chatapp");
   const scroller = useRef<HTMLDivElement>(null);
   const [reply, setReply] = useState<ChatMessageVM | null>(null);
   const [summaryOpen, setSummaryOpen] = useState(true);
@@ -58,7 +60,7 @@ export function Conversation({
   const { socket } = useSocketStore();
   const typingTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isGroup = isGroupLike(chat.type);
-  const st = useStatus(chat, typing);
+  const st = useStatus(chat, typing, t);
   const send = useSendMessage(chat.id, session, (m) => { onSent(m); setReply(null); });
 
   useEffect(() => { setReply(null); setSummaryOpen(true); }, [chat.id]);
@@ -83,7 +85,7 @@ export function Conversation({
     if (!prev || dayKey(prev.createdAt) !== dayKey(m.createdAt)) {
       rows.push(
         <div key={`d${m.id}`} className="my-2.5 self-center rounded-ca-md bg-ca-header px-3.5 py-1.5 text-[12.5px] font-medium uppercase tracking-[.02em] text-ca-300 shadow-[0_1px_1px_rgba(0,0,0,.08)]">
-          {dayLabel(m.createdAt)}
+          {dayLabel(m.createdAt, t)}
         </div>,
       );
     }
@@ -109,8 +111,8 @@ export function Conversation({
       <div className="ca-doodle pointer-events-none absolute inset-0" />
 
       <header className="relative z-[2] flex h-[60px] flex-none items-center gap-3.5 border-b border-ca-800 bg-ca-header pl-4 pr-3.5">
-        <IconButton icon="arrowleft" iconSize={20} className="md:hidden" onClick={onBack} title="Volver" />
-        <button onClick={onOpenInfo} className="flex min-w-0 items-center gap-3.5" aria-label="Ver info">
+        <IconButton icon="arrowleft" iconSize={20} className="md:hidden" onClick={onBack} title={t("common.back")} />
+        <button onClick={onOpenInfo} className="flex min-w-0 items-center gap-3.5" aria-label={t("conversation.viewInfo")}>
           <Avatar src={chat.image} size={42} presence={isDirect(chat.type) && !isSaved(chat.type) ? chat.presence : undefined} />
           <div className="min-w-0 text-left">
             <div className="flex items-center gap-1.5 text-[16px] font-semibold text-ca-50">
@@ -125,10 +127,10 @@ export function Conversation({
           </div>
         </button>
         <div className="ml-auto flex gap-0.5">
-          <IconButton icon="search" onClick={onOpenSearch} title="Buscar en el chat" />
-          <IconButton icon="video" iconSize={20} onClick={() => onStartCall("video")} title="Videollamada" />
-          <IconButton icon="phone" iconSize={18} onClick={() => onStartCall("voice")} title="Llamar" />
-          <IconButton icon="info" onClick={onOpenInfo} title="Info" />
+          <IconButton icon="search" onClick={onOpenSearch} title={t("conversation.searchChat")} />
+          <IconButton icon="video" iconSize={20} onClick={() => onStartCall("video")} title={t("conversation.videoCall")} />
+          <IconButton icon="phone" iconSize={18} onClick={() => onStartCall("voice")} title={t("actions.call")} />
+          <IconButton icon="info" onClick={onOpenInfo} title={t("info.groupInfo")} />
         </div>
       </header>
 
@@ -139,10 +141,10 @@ export function Conversation({
             <Icon name="sparkles" size={17} />
           </div>
           <div className="flex-1">
-            <h5 className="mb-[3px] text-[12px] font-bold text-ca-accent-soft">Resumen de SmartRotom</h5>
+            <h5 className="mb-[3px] text-[12px] font-bold text-ca-accent-soft">{t("conversation.summaryTitle")}</h5>
             <p className="text-[13.5px] leading-[1.5] text-ca-200">{chat.summary}</p>
           </div>
-          <IconButton icon="x" iconSize={16} className="h-[30px] w-[30px]" onClick={() => setSummaryOpen(false)} title="Cerrar" />
+          <IconButton icon="x" iconSize={16} className="h-[30px] w-[30px]" onClick={() => setSummaryOpen(false)} title={t("common.close")} />
         </div>
       )}
 

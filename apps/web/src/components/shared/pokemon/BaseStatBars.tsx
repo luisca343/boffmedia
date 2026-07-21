@@ -1,3 +1,5 @@
+import { useTranslations } from "next-intl"
+
 interface BaseStats {
   hp: number
   atk: number
@@ -24,11 +26,12 @@ const STAT_META: Record<string, [string, string]> = {
 
 const STAT_ORDER = ["hp", "atk", "def", "spa", "spd", "spe"] as const
 
-export function BaseStatBars({ base, title = "Estadísticas base", max = 200 }: BaseStatBarsProps) {
+export function BaseStatBars({ base, title, max = 200 }: BaseStatBarsProps) {
+  const t = useTranslations("common.baseStatBars")
   const total = STAT_ORDER.reduce((a, k) => a + (base[k] || 0), 0)
   return (
     <div>
-      {title && <div className="font-mono text-xs tracking-wider uppercase text-ink-dim mb-2">{title}</div>}
+      <div className="font-mono text-xs tracking-wider uppercase text-ink-dim mb-2">{title ?? t("title")}</div>
       {STAT_ORDER.map((k) => (
         <div key={k} className="flex items-center gap-2 mb-1">
           <span className="w-7 font-mono text-xs font-bold text-right" style={{ color: STAT_META[k][1] }}>

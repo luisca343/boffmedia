@@ -122,7 +122,11 @@ describe('WigglypopListingsService', () => {
           kind: 'mon',
           format: 'fixed',
           price: 15000,
-          mon: { pokemonKey: 'not-the-real-hash', sourceBox: 2, sourceIndex: 7 },
+          mon: {
+            pokemonKey: 'not-the-real-hash',
+            sourceBox: 2,
+            sourceIndex: 7,
+          },
         } as any),
       ).rejects.toThrow(/is not the one you selected/);
 

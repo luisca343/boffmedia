@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
+import { useTranslations } from "next-intl"
 import { Avatar, Button, I, PillBtn, Toggle } from "@/components/smartrotom/media/ui"
 import { useChannel, useComments, useRelated, useVideo } from "../../_hooks/useYoutube"
 import { addToHistory } from "../../_services/historyService"
@@ -11,6 +12,7 @@ import { UpNext } from "./UpNext"
 import { Comments } from "./Comments"
 
 export function Watch({ id }: { id: string }) {
+  const t = useTranslations("mewtube")
   const playerRef = useRef<NativePlayerHandle>(null)
   const video = useVideo(id)
   const v = video.data
@@ -29,10 +31,10 @@ export function Watch({ id }: { id: string }) {
   const [autoplay, setAutoplay] = useState(true)
 
   if (video.isLoading) {
-    return <div className="p-6 text-sm text-mw-fg-faint">Cargando vídeo…</div>
+    return <div className="p-6 text-sm text-mw-fg-faint">{t("video.loadingVideo")}</div>
   }
   if (!v) {
-    return <div className="p-6 text-sm text-mw-fg-faint">No se encontró el vídeo.</div>
+    return <div className="p-6 text-sm text-mw-fg-faint">{t("video.notFound")}</div>
   }
 
   const chapters = parseChapters(v.snippet.description)
@@ -60,7 +62,7 @@ export function Watch({ id }: { id: string }) {
               <div className="inline-flex items-center gap-1.5 text-[15px] font-semibold">
                 {v.snippet.channelTitle}
               </div>
-              {subs && <div className="text-xs text-mw-fg-mute">{formatCount(subs)} suscriptores</div>}
+              {subs && <div className="text-xs text-mw-fg-mute">{t("video.subscribers", { count: formatCount(subs) })}</div>}
             </div>
             {/* [deferred] real subscribe needs Google OAuth */}
             <Button
@@ -68,7 +70,7 @@ export function Watch({ id }: { id: string }) {
               className="ml-2"
               onClick={() => setSubscribed((s) => !s)}
             >
-              {subscribed ? "Suscrito" : "Suscribirse"}
+              {subscribed ? t("video.subscribed") : t("video.subscribe")}
             </Button>
           </div>
 
@@ -79,27 +81,27 @@ export function Watch({ id }: { id: string }) {
                 <I.thumbUp size={16} /> {v.statistics ? formatCount(v.statistics.likeCount) : ""}
               </PillBtn>
               <span className="h-5 w-px bg-mw-line" />
-              <PillBtn iconOnly aria-label="No me gusta" className="!rounded-none !border-0 !bg-transparent">
+              <PillBtn iconOnly aria-label={t("video.dislike")} className="!rounded-none !border-0 !bg-transparent">
                 <I.thumbUp size={16} className="rotate-180" />
               </PillBtn>
             </div>
             <PillBtn>
-              <I.share size={16} /> Compartir
+              <I.share size={16} /> {t("video.share")}
             </PillBtn>
             <PillBtn active={saved} onClick={() => setSaved((s) => !s)}>
-              <I.save size={16} /> {saved ? "Guardado" : "Guardar"}
+              <I.save size={16} /> {saved ? t("video.saved") : t("video.save")}
             </PillBtn>
           </div>
         </div>
 
         <div className="mt-[18px] rounded-mw-2xl border border-[color-mix(in_srgb,rgb(var(--mw-accent))_28%,var(--mw-hairline))] bg-[color-mix(in_srgb,rgb(var(--mw-accent))_6%,rgb(var(--mw-800)))] px-5 py-[18px]">
           <div className="flex flex-wrap items-center gap-2 text-[13px] text-mw-fg-mute">
-            {v.statistics && <strong className="font-semibold text-mw-fg">{formatCount(v.statistics.viewCount)} visitas</strong>}
+            {v.statistics && <strong className="font-semibold text-mw-fg">{t("video.views", { count: formatCount(v.statistics.viewCount) })}</strong>}
             <span>·</span>
             <span>{relativeTime(v.snippet.publishedAt)}</span>
             {tags.length > 0 && <span>·</span>}
-            {tags.map((t) => (
-              <span key={t} className="text-mw-accent">#{t}</span>
+            {tags.map((tag) => (
+              <span key={tag} className="text-mw-accent">#{tag}</span>
             ))}
           </div>
           {v.snippet.description && (
@@ -109,7 +111,7 @@ export function Watch({ id }: { id: string }) {
           {chapters.length > 0 && (
             <div className="mt-4">
               <div className="mb-2 inline-flex items-center gap-1.5 font-mono text-[11px] font-bold uppercase tracking-[0.14em] text-mw-fg-faint">
-                <I.bookmark size={14} /> Capítulos · {chapters.length}
+                <I.bookmark size={14} /> {t("video.chapters", { count: chapters.length })}
               </div>
               <div className="grid gap-1 [grid-template-columns:repeat(auto-fill,minmax(220px,1fr))]">
                 {chapters.map((c) => (
@@ -133,8 +135,8 @@ export function Watch({ id }: { id: string }) {
 
       <aside className="flex flex-col gap-4">
         <div className="flex items-center justify-between rounded-mw-md border border-[color-mix(in_srgb,rgb(var(--mw-accent))_30%,var(--mw-hairline))] bg-[color-mix(in_srgb,rgb(var(--mw-accent))_8%,rgb(var(--mw-900)))] px-3.5 py-2 text-[13px]">
-          <span>Reproducción automática</span>
-          <Toggle checked={autoplay} onChange={setAutoplay} label="Reproducción automática" />
+          <span>{t("video.autoplay")}</span>
+          <Toggle checked={autoplay} onChange={setAutoplay} label={t("video.autoplay")} />
         </div>
         <UpNext videos={recos} loading={related.isLoading} />
       </aside>

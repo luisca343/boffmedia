@@ -16,7 +16,9 @@ import {
 } from './interfaces/dungeons.repository.interface';
 
 /** Fastest *completed* run — an abandoned run's clock says nothing about skill. */
-const BEST_TIME = sql<number | null>`MIN(CASE WHEN ${dungeonRuns.completada} THEN ${dungeonRuns.duracionMs} END)`;
+const BEST_TIME = sql<
+  number | null
+>`MIN(CASE WHEN ${dungeonRuns.completada} THEN ${dungeonRuns.duracionMs} END)`;
 const COMPLETED = sql<number>`COALESCE(SUM(${dungeonRuns.completada}), 0)`;
 const BEST_STAGE = sql<number>`COALESCE(MAX(${dungeonRuns.etapaFinal}), 0)`;
 const RUNS = sql<number>`COUNT(DISTINCT ${dungeonRunPlayers.runId})`;

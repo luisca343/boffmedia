@@ -7,8 +7,8 @@ import { useGetEvents } from "@/hooks/events/useGetEvents"
 
 const teamSchema = z.object({
   id: z.number().optional(),
-  name: z.string().min(3, "El nombre debe tener al menos 3 caracteres"),
-  tag: z.string().max(5, "El tag no puede tener más de 5 caracteres").optional(),
+  name: z.string().min(3),
+  tag: z.string().max(5).optional(),
   icon: z.string().optional(),
   eventId: z.number(),
 })
@@ -23,7 +23,7 @@ interface TeamFormProps {
   submitLabel?: string
 }
 
-export function TeamForm({ defaultValues, isSubmitting, onSubmit, onCancel, submitLabel = "Guardar" }: TeamFormProps) {
+export function TeamForm({ defaultValues, isSubmitting, onSubmit, onCancel, submitLabel }: TeamFormProps) {
   const t = useTranslations("admin.form")
   const { events, isLoading: isLoadingEvents } = useGetEvents()
   const { register, handleSubmit, control, formState: { errors } } = useForm<TeamFormValues>({
@@ -63,7 +63,7 @@ export function TeamForm({ defaultValues, isSubmitting, onSubmit, onCancel, subm
       />
 
       <Field label={t("team.iconLabel")} hint={t("team.iconHint")} error={errors.icon?.message}>
-        <Input placeholder="https://ejemplo.com/icono.jpg" {...register("icon")} />
+        <Input placeholder="https://example.com/icon.jpg" {...register("icon")} />
       </Field>
 
       <div className="flex justify-end gap-2.5 pt-2">

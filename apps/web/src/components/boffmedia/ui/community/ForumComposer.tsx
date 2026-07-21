@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { useTranslations } from "next-intl"
 import { Button, Input, Textarea, Seg } from "@/components/boffmedia/primitives"
 import { ForumMarkdown } from "./ForumMarkdown"
 
@@ -37,6 +38,7 @@ export function ForumComposer({
   onSubmit,
   onCancel,
 }: ForumComposerProps) {
+  const t = useTranslations("common.forum")
   const [tab, setTab] = React.useState<"write" | "preview">("write")
   const [title, setTitle] = React.useState(initialTitle)
   const [body, setBody] = React.useState(initialBody)
@@ -60,13 +62,13 @@ export function ForumComposer({
       {withTitle && (
         <div className="mb-3">
           <label className="mb-1.5 block font-mono text-[11px] font-semibold uppercase tracking-[0.1em] text-txt-muted">
-            Título
+            {t("title")}
           </label>
           <Input
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             maxLength={TITLE_MAX}
-            placeholder="Un título claro y descriptivo"
+            placeholder={t("titlePlaceholder")}
             disabled={busy}
           />
         </div>
@@ -75,8 +77,8 @@ export function ForumComposer({
       <div className="mb-2.5 flex items-center justify-between gap-3">
         <Seg
           options={[
-            { value: "write", label: "Escribir" },
-            { value: "preview", label: "Vista previa" },
+            { value: "write", label: t("write") },
+            { value: "preview", label: t("preview") },
           ]}
           value={tab}
           onChange={(v) => setTab(v as "write" | "preview")}
@@ -91,7 +93,7 @@ export function ForumComposer({
           value={body}
           onChange={(e) => setBody(e.target.value)}
           maxLength={BODY_MAX}
-          placeholder="Escribe tu mensaje… admite Markdown."
+          placeholder={t("messagePlaceholder")}
           disabled={busy}
           className="min-h-[160px] font-mono text-[13px]/[1.6]"
         />
@@ -100,7 +102,7 @@ export function ForumComposer({
           {bodyTrimmed ? (
             <ForumMarkdown>{body}</ForumMarkdown>
           ) : (
-            <p className="font-body text-[14px] italic text-txt-dim">Nada que previsualizar todavía.</p>
+            <p className="font-body text-[14px] italic text-txt-dim">{t("nothingToPreview")}</p>
           )}
         </div>
       )}
@@ -111,11 +113,11 @@ export function ForumComposer({
         </Button>
         {onCancel && (
           <Button variant="ghost" onClick={onCancel} disabled={busy}>
-            Cancelar
+            {t("cancel")}
           </Button>
         )}
         <span className="ml-auto font-mono text-[11px] font-medium uppercase tracking-[0.08em] text-txt-dim">
-          {titleTooShort ? "Mínimo 3 caracteres en el título" : "Admite Markdown"}
+          {titleTooShort ? t("titleMinChars") : t("supportsMarkdown")}
         </span>
       </div>
     </div>

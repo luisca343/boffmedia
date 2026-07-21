@@ -1,5 +1,6 @@
 "use client";
 import * as React from "react";
+import { useTranslations } from "next-intl";
 import useStarBank from "../_hooks/useStarBank";
 import { useTransactions } from "../_hooks/queries";
 import { PageHeader, Card, Kpi, Button, Ico, Seg, Input, Skeleton } from "../_components/ui";
@@ -11,21 +12,23 @@ import { isOutgoing, displayName, balanceAfter } from "../_utils/account";
 import { cn } from "@/lib/utils";
 import type { SBTransaction } from "../_types";
 
-const PERIODS = [
-  { id: "7d", label: "7 días", days: 7 },
-  { id: "30d", label: "30 días", days: 30 },
-  { id: "90d", label: "90 días", days: 90 },
-  { id: "all", label: "Todas", days: 9999 },
-];
-const TYPES = [
-  { id: "all", label: "Todas" },
-  { id: "in", label: "Entradas" },
-  { id: "out", label: "Salidas" },
-];
 type SortId = "amount" | "balance" | "date";
 
 export default function Transacciones() {
+  const t = useTranslations("starbank");
   const { activeAccount } = useStarBank();
+
+  const PERIODS = [
+    { id: "7d", label: t("graficas.rangeLabels.7d"), days: 7 },
+    { id: "30d", label: t("graficas.rangeLabels.30d"), days: 30 },
+    { id: "90d", label: t("graficas.rangeLabels.90d"), days: 90 },
+    { id: "all", label: t("transacciones.all"), days: 9999 },
+  ];
+  const TYPES = [
+    { id: "all", label: t("transacciones.all") },
+    { id: "in", label: t("transacciones.entriesLabel") },
+    { id: "out", label: t("transacciones.exitsLabel") },
+  ];
   const accId = activeAccount?.id ?? -1;
   const { data: transactions, isLoading } = useTransactions(accId, 100);
 
@@ -82,22 +85,22 @@ export default function Transacciones() {
   return (
     <>
       <PageHeader
-        title="Transacciones"
-        sub={`Movimientos de la cuenta ${displayName(activeAccount.name)}`}
-        actions={<Button variant="secondary"><Ico name="download" size={14} /> Exportar</Button>}
+        title={t("transacciones.title")}
+        sub={t("transacciones.sub", { name: displayName(activeAccount.name) })}
+        actions={<Button variant="secondary"><Ico name="download" size={14} /> {t("common.export")}</Button>}
       />
 
       <div className="grid gap-4 md:grid-cols-3">
-        <Kpi label="Saldo actual" value={formatMoney(activeAccount.balance)} icon="card" tone="brand" />
-        <Kpi label="Ingresos · periodo" value={formatMoney(inc)} icon="arrUR" tone="pos" sub={`${filtered.filter((t) => !isOutgoing(t, accId)).length} entradas`} />
-        <Kpi label="Gastos · periodo" value={formatMoney(exp)} icon="arrDR" tone="neg" sub={`${filtered.filter((t) => isOutgoing(t, accId)).length} salidas`} />
+        <Kpi label={t("transacciones.currentBalance")} value={formatMoney(activeAccount.balance)} icon="card" tone="brand" />
+        <Kpi label={t("transacciones.incomePeriod")} value={formatMoney(inc)} icon="arrUR" tone="pos" sub={t("transacciones.entries", { count: filtered.filter((t2) => !isOutgoing(t2, accId)).length })} />
+        <Kpi label={t("transacciones.expensePeriod")} value={formatMoney(exp)} icon="arrDR" tone="neg" sub={t("transacciones.exits", { count: filtered.filter((t2) => isOutgoing(t2, accId)).length })} />
       </div>
 
       <Card>
         <div className="flex flex-wrap items-center gap-2 border-b border-sb-border bg-sb-surface px-4 py-3">
           <Seg options={PERIODS} value={period} onChange={setPeriod} />
           <Seg options={TYPES} value={type} onChange={setType} />
-          <FChip active={cat === "all"} onClick={() => setCat("all")}><Ico name="filter" size={12} /> Todas las categorías</FChip>
+          <FChip active={cat === "all"} onClick={() => setCat("all")}><Ico name="filter" size={12} /> {t("transacciones.allCategories")}</FChip>
           {Object.values(CATEGORIES).map((c) => (
             <FChip key={c.id} active={cat === c.id} color={c.hex} onClick={() => setCat(cat === c.id ? "all" : c.id)}>
               <span className="size-1.5 rounded-full" style={{ background: cat === c.id ? "#fff" : c.hex }} />
@@ -106,7 +109,7 @@ export default function Transacciones() {
           ))}
           <div className="relative ml-auto min-w-[200px]">
             <Ico name="search" size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-sb-fg-subtle" />
-            <Input className="h-8 pl-8 text-[13px]" placeholder="Buscar…" value={q} onChange={(e) => setQ(e.target.value)} />
+            <Input className="h-8 pl-8 text-[13px]" placeholder={t("common.search") + "…"} value={q} onChange={(e) => setQ(e.target.value)} />
           </div>
         </div>
 
@@ -114,17 +117,17 @@ export default function Transacciones() {
           <table className="w-full border-separate border-spacing-0">
             <thead>
               <tr>
-                <Th className="w-[280px]">Contraparte</Th>
-                <Th>Concepto</Th>
-                <Th>Categoría</Th>
-                <Th align="right"><SortHead id="amount" label="Cantidad" /></Th>
-                <Th align="right"><SortHead id="balance" label="Saldo" /></Th>
-                <Th align="right"><SortHead id="date" label="Fecha" /></Th>
+                <Th className="w-[280px]">{t("transacciones.counterparty")}</Th>
+                <Th>{t("transacciones.concept")}</Th>
+                <Th>{t("transacciones.category")}</Th>
+                <Th align="right"><SortHead id="amount" label={t("transacciones.amount")} /></Th>
+                <Th align="right"><SortHead id="balance" label={t("transacciones.balance")} /></Th>
+                <Th align="right"><SortHead id="date" label={t("transacciones.date")} /></Th>
               </tr>
             </thead>
             <tbody>
               {filtered.length === 0 ? (
-                <tr><td colSpan={6} className="px-4 py-10 text-center text-sb-fg-muted">No se encontraron transacciones con estos filtros</td></tr>
+                <tr><td colSpan={6} className="px-4 py-10 text-center text-sb-fg-muted">{t("transacciones.noResults")}</td></tr>
               ) : (
                 filtered.map((tx, i) => {
                   const c = resolveCategory(tx);
@@ -135,13 +138,13 @@ export default function Transacciones() {
                         <div className="flex items-center gap-2">
                           <span className="text-[13px] font-semibold">{displayName(tx.displayName)}</span>
                         </div>
-                        <div className="text-[11px] text-sb-fg-muted">{out ? "Salida" : "Entrada"}</div>
+                        <div className="text-[11px] text-sb-fg-muted">{out ? t("transacciones.exit") : t("transacciones.entry")}</div>
                       </Td>
                       <Td className="text-sb-fg-2">{tx.reason}</Td>
                       <Td>
                         <span className={cn("inline-flex h-6 items-center gap-1.5 rounded-sb-pill px-2.5 text-[11.5px] font-semibold", c.soft, c.text)}>
                           <span className={cn("size-1.5 rounded-full", c.dotBg)} />
-                          {c.label}
+                          {t(`categories.${c.id}`)}
                         </span>
                       </Td>
                       <Td align="right">
@@ -162,11 +165,11 @@ export default function Transacciones() {
 
         <div className="flex items-center justify-between border-t border-sb-border p-4">
           <div className="text-[13px] text-sb-fg-muted">
-            Mostrando <strong className="text-sb-fg">{filtered.length}</strong> transacciones
+            {t("transacciones.showing", { count: filtered.length })}
           </div>
           <div className="flex gap-2">
-            <Button variant="secondary" size="sm" disabled><Ico name="arrL" size={14} /> Anterior</Button>
-            <Button variant="secondary" size="sm">Siguiente <Ico name="arrR" size={14} /></Button>
+            <Button variant="secondary" size="sm" disabled><Ico name="arrL" size={14} /> {t("transacciones.previous")}</Button>
+            <Button variant="secondary" size="sm">{t("transacciones.next")} <Ico name="arrR" size={14} /></Button>
           </div>
         </div>
       </Card>

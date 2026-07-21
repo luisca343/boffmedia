@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { Avatar, Button, Check, I, PillBtn } from "@/components/smartrotom/media/ui"
 import { useChannel, useChannelUploads } from "../../_hooks/useYoutube"
 import { formatCount, toVideoCard } from "../../_utils/youtube"
@@ -15,12 +16,13 @@ function Kpi({ label, value }: { label: string; value: string }) {
 }
 
 export function ChannelView({ id }: { id: string }) {
+  const t = useTranslations("mewtube")
   const channel = useChannel(id)
   const uploads = useChannelUploads(id)
   const c = channel.data
 
-  if (channel.isLoading) return <div className="p-6 text-sm text-mw-fg-faint">Cargando canal…</div>
-  if (!c) return <div className="p-6 text-sm text-mw-fg-faint">No se encontró el canal.</div>
+  if (channel.isLoading) return <div className="p-6 text-sm text-mw-fg-faint">{t("channel.loadingChannel")}</div>
+  if (!c) return <div className="p-6 text-sm text-mw-fg-faint">{t("channel.notFound")}</div>
 
   const banner = c.brandingSettings?.image?.bannerExternalUrl
   const avatar = c.snippet.thumbnails.high?.url ?? c.snippet.thumbnails.medium?.url
@@ -62,10 +64,10 @@ export function ChannelView({ id }: { id: string }) {
               {c.snippet.customUrl && <span>{c.snippet.customUrl}</span>}
               <span className="h-1 w-1 rounded-full bg-mw-fg-faint" />
               <span>
-                <strong className="text-mw-fg">{formatCount(subs)}</strong> suscriptores
+                <strong className="text-mw-fg">{formatCount(subs)}</strong> {t("channel.subscribers")}
               </span>
               <span className="h-1 w-1 rounded-full bg-mw-fg-faint" />
-              <span>{formatCount(vids)} vídeos</span>
+              <span>{formatCount(vids)} {t("channel.videos")}</span>
             </div>
             {c.snippet.description && (
               <p className="my-3 max-w-[720px] whitespace-pre-line text-[13px] text-mw-fg-mute line-clamp-3">
@@ -74,22 +76,22 @@ export function ChannelView({ id }: { id: string }) {
             )}
             <div className="mt-1.5 inline-flex items-center gap-2">
               {/* [deferred] real subscribe needs Google OAuth (§13) */}
-              <Button variant="solid" aria-disabled title="Próximamente">
-                Suscribirse
+              <Button variant="solid" aria-disabled title={t("home.comingSoon")}>
+                {t("channel.subscribe")}
               </Button>
-              <PillBtn iconOnly aria-label="Notificaciones">
+              <PillBtn iconOnly aria-label={t("channel.notifications")}>
                 <I.bell size={14} />
               </PillBtn>
             </div>
           </div>
           <div className="grid grid-flow-col gap-6 rounded-mw-xl border border-[color-mix(in_srgb,rgb(var(--mw-accent))_30%,var(--mw-hairline))] bg-[color-mix(in_srgb,rgb(var(--mw-accent))_8%,rgb(var(--mw-800)))] px-[22px] py-3.5 max-md:justify-start">
-            <Kpi label="Visualizaciones" value={formatCount(views)} />
-            <Kpi label="Promedio" value={formatCount(avg)} />
-            {since && <Kpi label="Activo desde" value={String(since)} />}
+            <Kpi label={t("channel.views")} value={formatCount(views)} />
+            <Kpi label={t("channel.average")} value={formatCount(avg)} />
+            {since && <Kpi label={t("channel.activeSince")} value={String(since)} />}
           </div>
         </div>
 
-        <VideoSection title="Últimas subidas" videos={videos} loading={uploads.isLoading} />
+        <VideoSection title={t("channel.latestUploads")} videos={videos} loading={uploads.isLoading} />
       </div>
     </div>
   )

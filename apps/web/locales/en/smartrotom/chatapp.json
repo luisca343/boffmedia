@@ -1,0 +1,231 @@
+{
+  "chatapp": {
+    "common": {
+      "close": "Close",
+      "back": "Back",
+      "cancel": "Cancel",
+      "search": "Search",
+      "loading": "Loading…",
+      "retry": "Retry",
+      "newChat": "New chat",
+      "settings": "Settings"
+    },
+    "sidebar": {
+      "title": "ChatApp",
+      "subtitle": "SmartRotom",
+      "searchPlaceholder": "Search chats and messages",
+      "clearSearch": "Clear",
+      "noResults": "No chats found",
+      "categories": {
+        "all": "All",
+        "unread": "Unread",
+        "direct": "Direct",
+        "groups": "Groups",
+        "favorites": "Favorites"
+      },
+      "pinned": "Pinned",
+      "allChats": "All chats"
+    },
+    "empty": {
+      "title": "You don't have any chats yet",
+      "body": "Start a conversation with someone from your server or create a group for your team.",
+      "noConversation": "Your conversations",
+      "noConversationBody": "Select a chat to start talking, share waypoints, screenshots and notes with your team."
+    },
+    "error": {
+      "title": "No connection to SmartRotom",
+      "body": "We couldn't sync your chats. Check your connection and try again."
+    },
+    "info": {
+      "groupInfo": "Group info",
+      "contactInfo": "Contact info",
+      "members": "Members · {count}",
+      "sharedMedia": "Shared media",
+      "sharedWaypoints": "Shared waypoints",
+      "privacy": "Privacy",
+      "e2eEncryption": "End-to-end encryption",
+      "muteNotifications": "Mute notifications",
+      "pinChat": "Pin chat",
+      "clearChat": "Clear chat",
+      "you": "You"
+    },
+    "actions": {
+      "call": "Call",
+      "video": "Video",
+      "mute": "Mute",
+      "unmute": "Sound"
+    },
+    "status": {
+      "members": "{count} members",
+      "onlyYou": "Only you · your notes and links",
+      "playing": "Playing now",
+      "online": "Online",
+      "offline": "Disconnected",
+      "typing": "typing…"
+    },
+    "composer": {
+      "placeholder": "Write a message…",
+      "replyingTo": "Replying to {user}",
+      "yourself": "yourself",
+      "attach": "Attach",
+      "emoji": "Emoji and stickers",
+      "voiceNote": "Voice note",
+      "voiceNoteSoon": "Voice notes: coming soon",
+      "send": "Send",
+      "cancelReply": "Cancel",
+      "tabs": {
+        "emoji": "Emojis",
+        "sticker": "Stickers"
+      },
+      "attachment": {
+        "photos": "Photos and videos",
+        "photosSub": "Screenshot gallery",
+        "camera": "Camera",
+        "cameraSub": "Game capture",
+        "document": "Document",
+        "documentSub": "Your notes",
+        "location": "Location",
+        "locationSub": "Share waypoint"
+      }
+    },
+    "media": {
+      "title": "Media and files",
+      "tabs": {
+        "photos": "Photos",
+        "videos": "Videos",
+        "waypoints": "Waypoints",
+        "documents": "Documents"
+      },
+      "emptyPhotos": "No photos shared yet.",
+      "emptyVideos": "No videos shared yet.",
+      "emptyWaypoints": "No waypoints shared yet.",
+      "emptyDocuments": "No documents shared yet.",
+      "viewAll": "View all",
+      "youtubeVideo": "YouTube video"
+    },
+    "searchModal": {
+      "title": "Search all chats",
+      "placeholder": "Messages, people, waypoints…",
+      "emptyHint": "Search by word, person or coordinates.",
+      "noResults": "No results.",
+      "filters": {
+        "all": "All",
+        "photos": "Photos",
+        "links": "Links",
+        "docs": "Documents",
+        "wp": "Waypoints"
+      }
+    },
+    "settingsModal": {
+      "title": "Settings",
+      "connected": "Connected · multi-device",
+      "appearance": "Appearance",
+      "accentHint": "Light/dark mode is chosen in SmartRotom settings, under «Themes».",
+      "privacy": "Privacy",
+      "readReceipts": "Read receipts",
+      "readReceiptsDesc": "Show the blue double check",
+      "lastSeen": "Last seen",
+      "notifPreview": "Notification preview",
+      "notifications": "Notifications",
+      "sounds": "Sounds",
+      "focusMode": "Focus mode",
+      "focusModeDesc": "Mutes non-pinned chats while gaming",
+      "chat": "Chat",
+      "enterToSend": "Enter to send"
+    },
+    "createGroup": {
+      "title": "New chat",
+      "createChat": "Create chat",
+      "groupName": "Group name",
+      "savedMessages": "Saved messages",
+      "searchPlayers": "Search players…",
+      "noPlayers": "No players found.",
+      "remove": "Remove",
+      "createFailed": "Could not create the chat"
+    },
+    "toast": {
+      "messageSent": "Message sent.",
+      "sendFailed": "Could not send message."
+    },
+    "gallery": {
+      "title": "Share capture",
+      "chooseOther": "Choose another",
+      "send": "Send",
+      "noCaptures": "You don't have any captures in your gallery yet.",
+      "addComment": "Add a comment…"
+    },
+    "notePicker": {
+      "title": "Share note",
+      "searchPlaceholder": "Search notes…",
+      "loading": "Loading notes…",
+      "noResults": "No notes found.",
+      "untitled": "Untitled"
+    },
+    "locationPicker": {
+      "title": "Share location",
+      "loading": "Loading waypoints…",
+      "currentLocation": "Current location",
+      "noWaypoints": "No saved waypoints."
+    },
+    "conversation": {
+      "summaryTitle": "SmartRotom summary",
+      "searchChat": "Search in chat",
+      "videoCall": "Video call",
+      "viewInfo": "View info",
+      "attached": "Attachment"
+    },
+    "message": {
+      "react": "React",
+      "reply": "Reply",
+      "more": "More",
+      "copy": "Copy",
+      "addWaypoint": "Add waypoint",
+      "notes": "Notes",
+      "openNote": "Open note",
+      "saveToGallery": "Save to gallery",
+      "goToLocation": "Go to location",
+      "coordinatesCopied": "Coordinates copied",
+      "imageSaved": "Image saved to gallery",
+      "imageSaveError": "Error saving image",
+      "waypointAdded": "Waypoint \"{name}\" added",
+      "waypointError": "Error adding waypoint",
+      "openingNote": "Opening note…",
+      "scanned": "SCANNED",
+      "scanDetails": "Scan details · {count}",
+      "lookingAt": "looking at {block}",
+      "call": {
+        "missed": "Missed call",
+        "outgoing": "Outgoing call",
+        "incoming": "Incoming call",
+        "noAnswer": "No answer",
+        "duration": "Duration {time}"
+      }
+    },
+    "preview": {
+      "noMessages": "No messages",
+      "photo": "Photo",
+      "sticker": "Sticker",
+      "document": "Document",
+      "location": "Location",
+      "video": "Video",
+      "voiceNote": "Voice note",
+      "message": "Message",
+      "call": "Call",
+      "callMissed": "Missed call",
+      "you": "You"
+    },
+    "format": {
+      "today": "Today",
+      "yesterday": "Yesterday",
+      "weekday": {
+        "0": "Sunday",
+        "1": "Monday",
+        "2": "Tuesday",
+        "3": "Wednesday",
+        "4": "Thursday",
+        "5": "Friday",
+        "6": "Saturday"
+      }
+    }
+  }
+}

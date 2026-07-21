@@ -1,3 +1,4 @@
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { Button, Icon, Panel } from "../../_components/ui"
 
@@ -10,6 +11,7 @@ export interface ResultPanelProps {
 
 /** The verdict. Only the outcome states are celebratory — an invalid name is not. */
 export function ResultPanel({ message, won, gameOver, onReset }: ResultPanelProps) {
+  const t = useTranslations("")
   if (!message) return null
 
   return (
@@ -29,7 +31,7 @@ export function ResultPanel({ message, won, gameOver, onReset }: ResultPanelProp
         </p>
         {gameOver && (
           <Button variant="cyan" size="sm" icon={<Icon.Reset s={12} />} onClick={onReset}>
-            Jugar otra vez
+            {t("arcade.squirdle.result.playAgain")}
           </Button>
         )}
       </div>

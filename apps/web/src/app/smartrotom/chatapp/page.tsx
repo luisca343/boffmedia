@@ -1,5 +1,6 @@
 "use client";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useTranslations } from "next-intl";
 import { toast } from "react-toastify";
 import { getSmartRotomUser } from "@/lib/utils";
 import { useSocket } from "@/services/useSocket";
@@ -290,6 +291,7 @@ export default function ChatAppPage() {
 }
 
 function EmptyConversation() {
+  const t = useTranslations("chatapp");
   return (
     <section className="relative flex min-w-0 flex-1 flex-col bg-ca-wallpaper">
       <div className="ca-doodle pointer-events-none absolute inset-0" />
@@ -297,9 +299,9 @@ function EmptyConversation() {
         <div className="grid h-[92px] w-[92px] place-items-center rounded-full bg-ca-accent/[.14] text-ca-accent-soft">
           <Icon name="message" size={42} />
         </div>
-        <h3 className="text-[22px] font-semibold text-ca-50">Tus conversaciones</h3>
+        <h3 className="text-[22px] font-semibold text-ca-50">{t("empty.noConversation")}</h3>
         <p className="max-w-[360px] text-[14.5px] leading-[1.6] text-ca-400">
-          Selecciona un chat para empezar a hablar, compartir waypoints, capturas y notas con tu equipo.
+          {t("empty.noConversationBody")}
         </p>
       </div>
     </section>

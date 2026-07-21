@@ -26,7 +26,8 @@ export class DungeonBestRun {
 
 export class DungeonPlayerStats extends DungeonRankingEntry {
   @ApiProperty({
-    description: 'The run this player is ranked on; null if they have never played',
+    description:
+      'The run this player is ranked on; null if they have never played',
     type: DungeonBestRun,
     nullable: true,
   })

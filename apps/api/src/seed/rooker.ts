@@ -50,7 +50,10 @@ async function main() {
 
   const [users, existing] = await Promise.all([
     db
-      .select({ uuid: smartrotomUsers.uuid, username: smartrotomUsers.username })
+      .select({
+        uuid: smartrotomUsers.uuid,
+        username: smartrotomUsers.username,
+      })
       .from(smartrotomUsers),
     db
       .select({ uuid: rookerProfiles.uuid, handle: rookerProfiles.handle })

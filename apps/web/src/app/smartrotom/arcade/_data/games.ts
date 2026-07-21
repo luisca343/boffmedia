@@ -13,14 +13,13 @@ export type GameAccent = Extract<ArTone, "cyan" | "magenta" | "violet" | "amber"
 
 export interface ArcadeGame {
   id: string
-  title: string
-  /** Absolute route. `mina` lives outside the arcade tree — it is its own app. */
+  titleKey: string
+  taglineKey: string
+  categoryKey: string
   href: string
-  tagline: string
-  category: string
   accent: GameAccent
   art: PixelArtSprite
-  badge?: { label: string; tone: ArTone }
+  badge?: { labelKey: string; tone: ArTone }
 }
 
 /**
@@ -32,60 +31,67 @@ export interface ArcadeGame {
 export const GAMES: ArcadeGame[] = [
   {
     id: "squirdle",
-    title: "Squirdle",
+    titleKey: "arcade.games.squirdle.title",
+    taglineKey: "arcade.games.squirdle.tagline",
+    categoryKey: "arcade.categories.palabras",
     href: "/smartrotom/arcade/squirdle",
-    tagline: "Adivina la criatura oculta a partir de sus pistas.",
-    category: "Palabras",
     accent: "cyan",
     art: SQUIRDLE_SPRITE,
-    badge: { label: "Nuevo", tone: "cyan" },
+    badge: { labelKey: "arcade.games.squirdle.badge", tone: "cyan" },
   },
   {
     id: "voltorb",
-    title: "Gira Voltorb",
+    titleKey: "arcade.games.voltorb.title",
+    taglineKey: "arcade.games.voltorb.tagline",
+    categoryKey: "arcade.categories.riesgo",
     href: "/smartrotom/arcade/voltorb",
-    tagline: "Voltea números y no toques una bomba.",
-    category: "Riesgo",
     accent: "magenta",
     art: VOLTORB_SPRITE,
-    badge: { label: "Hot", tone: "magenta" },
+    badge: { labelKey: "arcade.games.voltorb.badge", tone: "magenta" },
   },
   {
     id: "mina",
-    title: "Minería",
+    titleKey: "arcade.games.mina.title",
+    taglineKey: "arcade.games.mina.tagline",
+    categoryKey: "arcade.categories.aventura",
     href: "/smartrotom/mina",
-    tagline: "Excava profundo y encuentra tesoros ocultos.",
-    category: "Aventura",
     accent: "amber",
     art: MINA_SPRITE,
   },
   {
     id: "maze",
-    title: "Laberinto",
+    titleKey: "arcade.games.maze.title",
+    taglineKey: "arcade.games.maze.tagline",
+    categoryKey: "arcade.categories.accion",
     href: "/smartrotom/arcade/maze",
-    tagline: "Recorre las salas generadas y escapa del calabozo.",
-    category: "Acción",
     accent: "violet",
     art: MAZE_SPRITE,
   },
   {
     id: "typedoku",
-    title: "Typedoku",
+    titleKey: "arcade.games.typedoku.title",
+    taglineKey: "arcade.games.typedoku.tagline",
+    categoryKey: "arcade.categories.logica",
     href: "/smartrotom/arcade/typedoku",
-    tagline: "Sudoku de tipos: cada fila y columna, sin repetir.",
-    category: "Lógica",
     accent: "cyan",
     art: TYPEDOKU_SPRITE,
   },
   {
     id: "puzle",
-    title: "Puzle",
+    titleKey: "arcade.games.puzle.title",
+    taglineKey: "arcade.games.puzle.tagline",
+    categoryKey: "arcade.categories.logica",
     href: "/smartrotom/arcade/puzle",
-    tagline: "Encaja las piezas en los menos movimientos posibles.",
-    category: "Lógica",
     accent: "lime",
     art: PUZLE_SPRITE,
   },
 ]
 
-export const GAME_CATEGORIES = ["Todos", ...new Set(GAMES.map((g) => g.category))]
+export const GAME_CATEGORY_KEYS = [
+  "arcade.categories.todos",
+  "arcade.categories.palabras",
+  "arcade.categories.riesgo",
+  "arcade.categories.aventura",
+  "arcade.categories.accion",
+  "arcade.categories.logica",
+]

@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useTranslations } from "next-intl"
 import { useMarks, useSetMark } from "../_hooks/queries"
 import { SUGGESTED_TAGS, markOf } from "../_utils/marks"
 import { Button, Chip, ChipButton, Icon, Input } from "./ui"
@@ -12,6 +13,7 @@ export interface TagEditorProps {
 
 /** Tags are ours, not the game's: they live in `rotom_pc_marks`. */
 export function TagEditor({ monKey }: TagEditorProps) {
+  const t = useTranslations("pc")
   const [draft, setDraft] = useState("")
   const { data: marks } = useMarks()
   const setMark = useSetMark()
@@ -43,7 +45,7 @@ export function TagEditor({ monKey }: TagEditorProps) {
             </button>
           </Chip>
         ))}
-        {tags.length === 0 && <span className="text-xs text-pc-fg-subtle">Sin etiquetas</span>}
+        {tags.length === 0 && <span className="text-xs text-pc-fg-subtle">{t("detail.none")}</span>}
       </div>
 
       <div className="flex gap-1.5">
@@ -58,11 +60,11 @@ export function TagEditor({ monKey }: TagEditorProps) {
             // The drawer navigates on ← / →; typing a tag must not flip the Pokémon.
             e.stopPropagation()
           }}
-          placeholder="Nueva etiqueta…"
-          aria-label="Nueva etiqueta"
+          placeholder={`${t("filters.tag")}…`}
+          aria-label={t("filters.tag")}
           className="flex-1"
         />
-        <Button icon onClick={() => add(draft)} aria-label="Añadir etiqueta" disabled={!draft.trim()}>
+        <Button icon onClick={() => add(draft)} aria-label={t("filters.tag")} disabled={!draft.trim()}>
           <Icon name="plus" size={14} />
         </Button>
       </div>

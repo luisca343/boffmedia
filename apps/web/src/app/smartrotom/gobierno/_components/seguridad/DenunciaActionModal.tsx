@@ -1,10 +1,7 @@
 "use client"
 
-// The three ways a denuncia closes: a fine, an escalation to busca y captura, or a plain
-// resolution/archive. All three end by resolving the denuncia itself, so the register never
-// shows a "handled" case still sitting in Pendientes — that is the enforcement chain the
-// department exists for.
 import { useEffect, useState } from "react"
+import { useTranslations } from "next-intl"
 import { useRouter } from "next/navigation"
 import { Modal, Button, Field, TextArea, Select } from "../ui"
 import { useCreateMulta, useCreateBuscado, useResolveDenuncia } from "../../_hooks/queries"

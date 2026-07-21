@@ -113,10 +113,16 @@ describe('WigglypopValuationService', () => {
     it('treats Pixelmon’s empty-slot sentinels as NO held item', () => {
       const bare = service.valuateMon({ level: 50, ivs: MID });
 
-      for (const empty of ['', 'none', 'air', 'minecraft:air', 'item.minecraft.air']) {
-        expect(service.valuateMon({ level: 50, ivs: MID, heldItem: empty }).value).toBe(
-          bare.value,
-        );
+      for (const empty of [
+        '',
+        'none',
+        'air',
+        'minecraft:air',
+        'item.minecraft.air',
+      ]) {
+        expect(
+          service.valuateMon({ level: 50, ivs: MID, heldItem: empty }).value,
+        ).toBe(bare.value);
       }
     });
 
@@ -132,14 +138,19 @@ describe('WigglypopValuationService', () => {
     it('calls anything legendary `legendario`, whatever its IVs', () => {
       // Even a terrible legendary is legendario — the flag wins over the IV bands.
       expect(
-        service.valuateMon({ level: 5, ivs: [0, 0, 0, 0, 0, 0], legendary: true })
-          .rarity,
+        service.valuateMon({
+          level: 5,
+          ivs: [0, 0, 0, 0, 0, 0],
+          legendary: true,
+        }).rarity,
       ).toBe('legendario');
     });
 
     it('bands a non-legendary by IV percentage', () => {
       // >= 92 → epico
-      expect(service.valuateMon({ level: 50, ivs: PERFECT }).rarity).toBe('epico');
+      expect(service.valuateMon({ level: 50, ivs: PERFECT }).rarity).toBe(
+        'epico',
+      );
       // >= 74 → raro  (168/186 = 90%)
       expect(service.valuateMon({ level: 50, ivs: HIGH }).rarity).toBe('raro');
       // else → comun  (120/186 = 65%)
@@ -165,7 +176,14 @@ describe('WigglypopValuationService', () => {
     // The shared PokemonW once typed ivs as string[], which turned every `+` in the repo into
     // string concatenation. The service coerces, so a stringly-typed payload still SUMS.
     it('sums stringly-typed IVs numerically instead of concatenating them', () => {
-      const asStrings = ['31', '31', '31', '31', '31', '31'] as unknown as number[];
+      const asStrings = [
+        '31',
+        '31',
+        '31',
+        '31',
+        '31',
+        '31',
+      ] as unknown as number[];
       expect(service.ivPercent(asStrings)).toBe(100);
       expect(service.valuateMon({ level: 100, ivs: asStrings })).toEqual(
         service.valuateMon({ level: 100, ivs: PERFECT }),

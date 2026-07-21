@@ -36,7 +36,8 @@ export class SetBalanceDto {
   balance: number;
 
   @ApiProperty({
-    description: 'Ledger memo for the correction. Defaults server-side if omitted.',
+    description:
+      'Ledger memo for the correction. Defaults server-side if omitted.',
     example: '[AJUSTE] Ajuste de saldo (admin)',
     required: false,
     minLength: 1,

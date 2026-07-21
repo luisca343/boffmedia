@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { useBattleTeams, useMons } from "../_hooks/queries"
 import type { ExtendedPokemonW, Mon } from "../_types/pc.types"
 import { PARTY_SIZE } from "../_utils/constants"
@@ -22,6 +23,7 @@ import { PokemonSlot } from "./PokemonSlot"
  * slot behave like any other: click it and its real box/party location opens.
  */
 export function BattleTeamsPanel() {
+  const t = useTranslations("pc")
   const { data, isLoading } = useBattleTeams()
   const { byKey } = useMons()
 
@@ -41,7 +43,7 @@ export function BattleTeamsPanel() {
     return (
       <div className="flex h-full flex-col items-center justify-center gap-2 p-6 text-center">
         <Icon name="sword" size={22} className="text-pc-fg-subtle" />
-        <p className="text-xs text-pc-fg-subtle">No tienes equipos de batalla guardados.</p>
+        <p className="text-xs text-pc-fg-subtle">{t("team.noTeams")}</p>
       </div>
     )
   }
@@ -72,7 +74,7 @@ export function BattleTeamsPanel() {
         )
       })}
       <p className="p-1 text-center text-[11px] text-pc-fg-subtle">
-        Solo lectura — los equipos de batalla se editan dentro del juego.
+        {t("team.readOnly")}
       </p>
     </div>
   )
