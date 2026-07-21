@@ -68,7 +68,7 @@ const SPRITE_GLOW: Record<GameAccent, { idle: string; hot: string }> = {
  * the machine up.
  */
 export function CabinetCard({ game, compact }: CabinetCardProps) {
-  const t = useTranslations("")
+  const t = useTranslations("arcade")
   const [hot, setHot] = useState(false)
   const accent = ACCENT[game.accent]
   const glow = SPRITE_GLOW[game.accent]

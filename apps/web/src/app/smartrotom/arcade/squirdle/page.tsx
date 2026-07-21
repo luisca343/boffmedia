@@ -15,7 +15,7 @@ import { useSquirdleGame } from "./_hooks/useSquirdleGame"
 import { MAX_GUESSES } from "./_utils/compare"
 
 export default function SquirdlePage() {
-  const t = useTranslations("")
+  const t = useTranslations("arcade")
   const game = useSquirdleGame()
   const [help, setHelp] = useState(false)
 

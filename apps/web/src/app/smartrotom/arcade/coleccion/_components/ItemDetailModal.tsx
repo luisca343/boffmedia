@@ -21,7 +21,7 @@ const SOURCE_LABEL: Record<string, string> = {
 }
 
 export function ItemDetailModal({ item, onClose }: ItemDetailModalProps) {
-  const t = useTranslations("")
+  const t = useTranslations("arcade")
   if (!item) return null
 
   const skin = raritySkin(item.rarity)

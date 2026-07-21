@@ -74,7 +74,7 @@ function navigation({ boxesOwned, rewardReady }: ArcadeSidebarProps): NavGroup[]
 }
 
 function NavButton({ item, active }: { item: NavItem; active: boolean }) {
-  const t = useTranslations("")
+  const t = useTranslations("arcade")
   const Glyph = Icon[item.icon]
   return (
     <Link
@@ -112,7 +112,7 @@ function NavButton({ item, active }: { item: NavItem; active: boolean }) {
 }
 
 export function ArcadeSidebar(props: ArcadeSidebarProps) {
-  const t = useTranslations("")
+  const t = useTranslations("arcade")
   const pathname = usePathname()
   const groups = navigation(props)
 

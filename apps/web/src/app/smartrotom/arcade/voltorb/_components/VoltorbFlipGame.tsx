@@ -18,7 +18,7 @@ import { RulesModal } from "./RulesModal"
 const GRID_SIZE = 5
 
 export default function VoltorbFlipGame() {
-  const t = useTranslations("")
+  const t = useTranslations("arcade")
   const router = useRouter()
   const [grid, setGrid] = useState<Cell[][]>([])
   const [rowInfo, setRowInfo] = useState<RowColInfo[]>([])

@@ -6,7 +6,7 @@ import { FEED_SKIN } from "./FeedbackCell"
 
 /** How to read the board. */
 export function Legend() {
-  const t = useTranslations("")
+  const t = useTranslations("arcade")
   const ROWS: { state: FeedState; text: string }[] = [
     { state: "hit", text: t("arcade.squirdle.legend.correct") },
     { state: "near", text: t("arcade.squirdle.legend.near") },

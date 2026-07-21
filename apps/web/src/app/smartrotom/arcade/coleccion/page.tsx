@@ -16,7 +16,7 @@ import { ItemDetailModal } from "./_components/ItemDetailModal"
 import { useCollectionFilter } from "./_hooks/useCollectionFilter"
 
 export default function ColeccionPage() {
-  const t = useTranslations("")
+  const t = useTranslations("arcade")
   const uuid = useArcadeUuid()
   const inventory = useArcadeInventory()
   const config = useLootboxConfig()

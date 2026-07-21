@@ -16,7 +16,7 @@ const PIP: Record<"spent" | "current" | "free", string> = {
 
 /** The magazine: one pip per guess the machine will accept. */
 export function AttemptsPanel({ used, remaining }: AttemptsPanelProps) {
-  const t = useTranslations("")
+  const t = useTranslations("arcade")
   return (
     <Panel tone="cyan" tight>
       <div className="mb-2.5 font-ar-display text-[9px] uppercase text-ar-cyan">{t("arcade.squirdle.attemptsPanel.title")}</div>

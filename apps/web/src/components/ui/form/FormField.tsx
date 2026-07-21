@@ -24,7 +24,7 @@ export function FormField({
   hint,
   variant = "default",
 }: FormFieldProps) {
-  const t = useTranslations("");
+  const t = useTranslations("boffmedia");
 
   if (variant === "gaming") {
     return (

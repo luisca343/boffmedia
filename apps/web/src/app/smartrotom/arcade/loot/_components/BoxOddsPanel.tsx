@@ -22,7 +22,7 @@ const ladder = (odds: ResolvedBox["odds"]) =>
 
 /** Real odds: each rarity's share of the box's total weight, straight from the config. */
 export function BoxOddsPanel({ box, owned, opening, onOpen, onShowInfo }: BoxOddsPanelProps) {
-  const t = useTranslations("")
+  const t = useTranslations("arcade")
   const empty = (box.items ?? []).length === 0
   const canOpen = owned > 0 && !empty && !opening
 
