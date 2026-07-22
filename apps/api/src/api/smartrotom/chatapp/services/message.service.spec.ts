@@ -24,6 +24,8 @@ const mockMessageRepo = {
   updateMessage: jest.fn(),
   deleteMessage: jest.fn(),
   markMessageAsRead: jest.fn(),
+  markMessagesAsRead: jest.fn(),
+  findUnreadMessageIds: jest.fn(),
 };
 
 const mockLogger = { log: jest.fn(), error: jest.fn(), warn: jest.fn() };
@@ -210,6 +212,46 @@ describe('MessageService', () => {
       await expect(service.deleteMessage(1, 'other-uuid')).rejects.toThrow(
         'does not have permission',
       );
+    });
+  });
+
+  // ─── markChatAsRead ───────────────────────────────────────────────────────────
+
+  describe('markChatAsRead()', () => {
+    it('persists every unread message and returns the ids it flipped', async () => {
+      mockChatRepo.findChatById.mockResolvedValue({ id: 7 });
+      mockMessageRepo.findUnreadMessageIds.mockResolvedValue([11, 12, 13]);
+      mockMessageRepo.markMessagesAsRead.mockResolvedValue(undefined);
+
+      await expect(service.markChatAsRead(7, 'player-uuid')).resolves.toEqual([
+        11, 12, 13,
+      ]);
+      expect(mockMessageRepo.markMessagesAsRead).toHaveBeenCalledWith(
+        [11, 12, 13],
+        'player-uuid',
+      );
+    });
+
+    it('is a no-op when nothing is unread', async () => {
+      mockChatRepo.findChatById.mockResolvedValue({ id: 7 });
+      mockMessageRepo.findUnreadMessageIds.mockResolvedValue([]);
+
+      await expect(service.markChatAsRead(7, 'player-uuid')).resolves.toEqual(
+        [],
+      );
+      expect(mockMessageRepo.markMessagesAsRead).toHaveBeenCalledWith(
+        [],
+        'player-uuid',
+      );
+    });
+
+    it('throws when the chat does not exist', async () => {
+      mockChatRepo.findChatById.mockResolvedValue(null);
+
+      await expect(service.markChatAsRead(404, 'player-uuid')).rejects.toThrow(
+        'not found',
+      );
+      expect(mockMessageRepo.markMessagesAsRead).not.toHaveBeenCalled();
     });
   });
 });
