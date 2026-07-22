@@ -17,7 +17,7 @@ export function TvJuegos() {
       n="04"
       side="r"
       kick={<Decode text={t("kick")} />}
-      title={t("title")}
+      title={t.rich("title", { em: (chunks) => <em>{chunks}</em> })}
       lead={t("lead")}
     >
       <div className="grid grid-cols-2 gap-3 max-[520px]:grid-cols-1">
