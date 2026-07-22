@@ -16,7 +16,7 @@ export function TvTools() {
       n="01"
       side="l"
       kick={<Decode text={t("kick")} />}
-      title={t("title")}
+      title={t.rich("title", { em: (chunks) => <em>{chunks}</em> })}
       lead={t("lead")}
     >
       <div className="overflow-hidden border border-solid border-line backdrop-blur-[6px] [background:rgba(10,12,16,0.5)] cut-tag [--cut-tag:12px] [[data-theme=light]_&]:[background:rgba(255,255,255,0.55)]">

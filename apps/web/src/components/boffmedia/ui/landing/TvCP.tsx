@@ -14,7 +14,7 @@ export function TvCP({
   n: string
   side: "l" | "r"
   kick: React.ReactNode
-  title: string
+  title: React.ReactNode
   lead?: string
   children: React.ReactNode
 }) {
@@ -52,10 +52,9 @@ export function TvCP({
             {kick}
           </span>
           {/* display treatment from data-ds base styles; zone-tinted em stroke kept local */}
-          <h3
-            className="mb-2.5 mt-3 leading-[0.98] text-txt [font-size:clamp(30px,3.4vw,46px)] [&_em]:text-transparent [&_em]:[-webkit-text-stroke:1.5px_rgba(var(--zr),var(--zg),var(--zb),1)]"
-            dangerouslySetInnerHTML={{ __html: title }}
-          />
+          <h3 className="mb-2.5 mt-3 leading-[0.98] text-txt [font-size:clamp(30px,3.4vw,46px)] [&_em]:text-transparent [&_em]:[-webkit-text-stroke:1.5px_rgba(var(--zr),var(--zg),var(--zb),1)]">
+            {title}
+          </h3>
           {lead && (
             <p className="max-w-[42ch] font-body text-[15.5px] font-normal leading-[1.62] text-txt-muted [text-wrap:pretty]">{lead}</p>
           )}
