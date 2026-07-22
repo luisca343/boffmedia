@@ -200,10 +200,15 @@ export class GroupService {
 
     // ── Enrichment: reactions, read receipts / status, unread, presence, flags ──
     const messageIds = messages.map((m) => m.id);
-    const [reactionRows, readRows, flags] = await Promise.all([
+    const [reactionRows, readRows, flags, unread] = await Promise.all([
       this.chatMessageRepository.findReactionsForMessages(messageIds),
       this.chatMessageRepository.findReadsForMessages(messageIds),
       this.chatMemberRepository.findMemberFlags(chat.id, requestingUserUuid),
+      // Counted over the chat's whole history, not just the 50 loaded above.
+      this.chatMessageRepository.countUnreadMessages(
+        chat.id,
+        requestingUserUuid,
+      ),
     ]);
 
     const reactionsByMsg = new Map<number, Map<string, string[]>>();
@@ -238,13 +243,6 @@ export class GroupService {
           : 'sent';
       return { ...m, reactions, status };
     });
-
-    const unread = messages.filter(
-      (m) =>
-        m.uuid &&
-        m.uuid !== requestingUserUuid &&
-        !readsByMsg.get(m.id)?.has(requestingUserUuid),
-    ).length;
 
     let presence: PresenceStatus | undefined;
     if (chat.type === 2) {

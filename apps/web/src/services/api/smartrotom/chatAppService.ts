@@ -5,6 +5,7 @@ import type {
   UpdateMessageDto,
   DeleteMessageDto,
   MarkMessageReadDto,
+  MarkChatReadDto,
   AddMemberDto,
   RemoveMemberDto,
   InitiateCallDto,
@@ -17,6 +18,7 @@ import type {
   CreateChatResponse,
   CreateMessageResponse,
   MessageResponse,
+  MarkChatReadResponse,
   CallResponse
 } from '@boffmedia/shared';
 
@@ -76,6 +78,13 @@ export class ChatAppService {
    */
   static markMessageAsRead(messageId: number, data: MarkMessageReadDto) {
     return rotomPOST<MessageResponse>(`/chatapp/message/${messageId}/read`, data);
+  }
+
+  /**
+   * Mark every unread message in a chat as read, in one request
+   */
+  static markChatAsRead(chatId: number, data: MarkChatReadDto) {
+    return rotomPOST<MarkChatReadResponse>(`/chatapp/chat/${chatId}/read`, data);
   }
 
   /**

@@ -45,7 +45,13 @@ export default function ChatAppPage() {
 
   useEffect(() => {
     if (!socket) return;
-    const onMessage = (m: ChatMessageVM) => updateChats(m as never, activeId ?? 0);
+    const onMessage = (m: ChatMessageVM) => {
+      updateChats(m as never, activeId);
+      // Landing in the chat that's already open counts as read straight away.
+      if (m.chatId === activeId && m.uuid && m.uuid !== myUuid) {
+        ChatAppService.markMessageAsRead(m.id, { messageId: m.id, uuid: myUuid }).catch(() => undefined);
+      }
+    };
     const onStart = (d: { chatId: number; uuid: string }) =>
       setTypingByChat((prev) => {
         const n = new Map(prev);
@@ -83,6 +89,19 @@ export default function ChatAppPage() {
           : prev,
       );
     };
+    const onReadBulk = (d: { chatId: number; messageIds: number[]; uuid: string }) => {
+      if (d.uuid === myUuid) return;
+      const ids = new Set(d.messageIds);
+      setChats((prev: ChatVM[] | null) =>
+        prev
+          ? prev.map((c) =>
+              c.id !== d.chatId
+                ? c
+                : { ...c, messages: c.messages.map((m) => (ids.has(m.id) && m.uuid === myUuid ? { ...m, status: "read" as const } : m)) },
+            )
+          : prev,
+      );
+    };
     const onPresence = (d: { uuid: string; status: "online" | "ingame" | "offline" }) =>
       setChats((prev: ChatVM[] | null) =>
         prev
@@ -99,6 +118,7 @@ export default function ChatAppPage() {
     socket.on("chat:typing:stop", onStop);
     socket.on("chat:reaction", onReaction);
     socket.on("chat:read", onRead);
+    socket.on("chat:read:bulk", onReadBulk);
     socket.on("presence:update", onPresence);
     return () => {
       socket.off("chat:message", onMessage);
@@ -106,6 +126,7 @@ export default function ChatAppPage() {
       socket.off("chat:typing:stop", onStop);
       socket.off("chat:reaction", onReaction);
       socket.off("chat:read", onRead);
+      socket.off("chat:read:bulk", onReadBulk);
       socket.off("presence:update", onPresence);
     };
   }, [socket, activeId, myUuid, updateChats, setChats]);
@@ -121,15 +142,42 @@ export default function ChatAppPage() {
     return s;
   }, [typingByChat, myUuid]);
 
+  // Persist AND clear the badge. The old code only did the optimistic clear, so
+  // the effect that was meant to persist always saw unread === 0 and bailed —
+  // nothing ever reached the server and the count returned on every reload.
+  const markChatRead = useCallback(
+    (chatId: number) => {
+      if (!myUuid) return;
+      const previous = list.find((c) => c.id === chatId)?.unread ?? 0;
+      if (previous === 0) return;
+
+      setChats((prev: ChatVM[] | null) => (prev ? prev.map((c) => (c.id === chatId ? { ...c, unread: 0 } : c)) : prev));
+
+      // rotomPOST resolves an envelope instead of rejecting, so a bare .catch()
+      // would hide a server-side failure and we'd lie until the next reload.
+      const restore = () =>
+        setChats((prev: ChatVM[] | null) =>
+          prev ? prev.map((c) => (c.id === chatId ? { ...c, unread: Math.max(c.unread, previous) } : c)) : prev,
+        );
+      ChatAppService.markChatAsRead(chatId, { uuid: myUuid }).then(
+        (r) => {
+          if (!r?.success) restore();
+        },
+        restore,
+      );
+    },
+    [list, myUuid, setChats],
+  );
+
   const selectChat = useCallback(
     (id: number) => {
       setActiveId(id);
       setPane("conv");
       setInfoOpen(false);
       setModal(null);
-      setChats((prev: ChatVM[] | null) => (prev ? prev.map((c) => (c.id === id ? { ...c, unread: 0 } : c)) : prev));
+      markChatRead(id);
     },
-    [setChats],
+    [markChatRead],
   );
 
   const appendOwn = useCallback(
@@ -181,14 +229,6 @@ export default function ChatAppPage() {
     },
     [myUuid, setChats],
   );
-
-  // Mark the open chat's incoming messages as read (idempotent; only when unread).
-  useEffect(() => {
-    if (!active || !myUuid || active.unread === 0) return;
-    active.messages
-      .filter((m) => m.uuid && m.uuid !== myUuid)
-      .forEach((m) => ChatAppService.markMessageAsRead(m.id, { messageId: m.id, uuid: myUuid }).catch(() => undefined));
-  }, [activeId]);
 
   const startCall = useCallback(
     (_kind: "voice" | "video") => {

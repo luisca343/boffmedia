@@ -183,6 +183,31 @@ export class ChatappFacadeService {
     }
   }
 
+  async markChatAsRead(
+    chatId: number,
+    uuid: string,
+  ): Promise<{ success: boolean; message: string; marked: number }> {
+    try {
+      const messageIds = await this.messageService.markChatAsRead(chatId, uuid);
+      if (messageIds.length > 0) {
+        this.socketGateway.server.emit('chat:read:bulk', {
+          chatId,
+          messageIds,
+          uuid,
+        });
+      }
+      return {
+        success: true,
+        message: `Marked ${messageIds.length} message(s) as read`,
+        marked: messageIds.length,
+      };
+    } catch (error: any) {
+      if (error instanceof HttpException) throw error;
+      this.logger.error(`Error marking chat ${chatId} as read:`, error);
+      throw new Error(`Failed to mark chat as read: ${error.message}`);
+    }
+  }
+
   async toggleReaction(
     messageId: number,
     uuid: string,

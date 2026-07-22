@@ -201,6 +201,27 @@ export class MessageService {
     await this.chatMessageRepository.markMessageAsRead(messageId, uuid);
   }
 
+  /**
+   * Mark every message in the chat the user has not read. Returns the ids that
+   * actually flipped, so callers only broadcast receipts for real changes.
+   */
+  async markChatAsRead(chatId: number, uuid: string): Promise<number[]> {
+    const chat = await this.chatRepository.findChatById(chatId);
+    if (!chat) {
+      throw new NotFoundException({
+        message: `Chat ${chatId} not found`,
+        userMessage: 'Este chat no existe.',
+      });
+    }
+
+    const messageIds = await this.chatMessageRepository.findUnreadMessageIds(
+      chatId,
+      uuid,
+    );
+    await this.chatMessageRepository.markMessagesAsRead(messageIds, uuid);
+    return messageIds;
+  }
+
   /** Toggle a reaction on/off, returning the message's chat + the fresh set. */
   async toggleReaction(
     messageId: number,

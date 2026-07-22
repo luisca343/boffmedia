@@ -66,20 +66,28 @@ export const rotomChatMessages = mysqlTable('rotom_chat_messages', {
 
 export type RotomChatMessage = typeof rotomChatMessages.$inferSelect;
 
-export const rotomChatMessageReads = mysqlTable('rotom_chat_message_reads', {
-  messageId: int('message_id')
-    .notNull()
-    .references(() => rotomChatMessages.id, {
-      onDelete: 'cascade',
-      onUpdate: 'cascade',
-    }),
-  uuid: varchar('uuid', { length: 36 })
-    .notNull()
-    .references(() => smartrotomUsers.uuid, {
-      onDelete: 'cascade',
-      onUpdate: 'cascade',
-    }),
-});
+export const rotomChatMessageReads = mysqlTable(
+  'rotom_chat_message_reads',
+  {
+    messageId: int('message_id')
+      .notNull()
+      .references(() => rotomChatMessages.id, {
+        onDelete: 'cascade',
+        onUpdate: 'cascade',
+      }),
+    uuid: varchar('uuid', { length: 36 })
+      .notNull()
+      .references(() => smartrotomUsers.uuid, {
+        onDelete: 'cascade',
+        onUpdate: 'cascade',
+      }),
+  },
+  // The composite PK is what makes marking a chat read idempotent: the bulk
+  // insert relies on ON DUPLICATE KEY to absorb concurrent tabs/retries.
+  (table) => ({
+    pk: primaryKey({ columns: [table.messageId, table.uuid] }),
+  }),
+);
 
 export type RotomChatMessageRead = typeof rotomChatMessageReads.$inferSelect;
 

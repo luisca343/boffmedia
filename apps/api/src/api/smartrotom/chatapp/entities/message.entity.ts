@@ -103,3 +103,11 @@ export class MessageResponse {
   })
   message: string;
 }
+
+export class MarkChatReadResponse extends MessageResponse {
+  @ApiProperty({
+    example: 12,
+    description: 'How many messages flipped from unread to read',
+  })
+  marked: number;
+}

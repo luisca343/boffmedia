@@ -292,6 +292,8 @@ export type { MangaChapter } from './models/MangaChapter';
 export type { MangaDetail } from './models/MangaDetail';
 export type { MangaResult } from './models/MangaResult';
 export type { MangaSearchResult } from './models/MangaSearchResult';
+export type { MarkChatReadDto } from './models/MarkChatReadDto';
+export type { MarkChatReadResponse } from './models/MarkChatReadResponse';
 export type { MarkMessageReadDto } from './models/MarkMessageReadDto';
 export type { MarkReadBodyDto } from './models/MarkReadBodyDto';
 export { MatchDetail } from './models/MatchDetail';
