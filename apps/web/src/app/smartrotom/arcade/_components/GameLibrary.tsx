@@ -16,8 +16,8 @@ export function GameLibrary() {
   return (
     <section>
       <SectionTitle
-        kicker={t("arcade.home.library", { count: GAMES.length })}
-        title={t("arcade.home.arcadeGames")}
+        kicker={t("home.library", { count: GAMES.length })}
+        title={t("home.arcadeGames")}
         accent="cyan"
         right={
           <div className="flex flex-wrap gap-1.5">

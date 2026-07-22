@@ -29,12 +29,12 @@ export default function SquirdlePage() {
         <div className="grid items-start gap-4 lg:grid-cols-[1fr_260px] lg:gap-5">
           <Panel tone="deep" clip={false} innerClassName="p-4 md:p-[18px]">
             <div className="mb-4 flex flex-wrap items-center justify-between gap-2 border-b border-dashed border-white/10 px-1.5 pb-3.5">
-              <span className="font-ar-display text-[11px] text-ar-cyan">▸ {t("arcade.squirdle.enigma")}</span>
+              <span className="font-ar-display text-[11px] text-ar-cyan">▸ {t("squirdle.enigma")}</span>
               <span className="font-ar-mono text-[11px] uppercase text-ar-ink-dim">
-                {t("arcade.squirdle.guessTheCreature")}
+                {t("squirdle.guessTheCreature")}
               </span>
               <span className="font-ar-display text-[11px] text-ar-magenta-2">
-                {t("arcade.squirdle.attempts", { count: MAX_GUESSES })}
+                {t("squirdle.attempts", { count: MAX_GUESSES })}
               </span>
             </div>
 
@@ -85,14 +85,14 @@ export default function SquirdlePage() {
         </div>
       </GameStage>
 
-      <Modal open={help} onClose={() => setHelp(false)} kicker="Squirdle" title={t("arcade.squirdle.howToPlay")}>
+      <Modal open={help} onClose={() => setHelp(false)} kicker="Squirdle" title={t("squirdle.howToPlay")}>
         <ul className="m-0 list-disc space-y-2 pl-5">
-          <li>{t("arcade.squirdle.rules.guessPokemon", { max: MAX_GUESSES })}</li>
-          <li>{t("arcade.squirdle.rules.eachAttempt")}</li>
-          <li>{t("arcade.squirdle.rules.greenTile")}</li>
-          <li>{t("arcade.squirdle.rules.arrowUp")}</li>
-          <li>{t("arcade.squirdle.rules.arrowDown")}</li>
-          <li>{t("arcade.squirdle.rules.amberType")}</li>
+          <li>{t("squirdle.rules.guessPokemon", { max: MAX_GUESSES })}</li>
+          <li>{t("squirdle.rules.eachAttempt")}</li>
+          <li>{t("squirdle.rules.greenTile")}</li>
+          <li>{t("squirdle.rules.arrowUp")}</li>
+          <li>{t("squirdle.rules.arrowDown")}</li>
+          <li>{t("squirdle.rules.amberType")}</li>
         </ul>
       </Modal>
     </div>

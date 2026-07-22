@@ -77,7 +77,9 @@
       "speaker": "Altavoz",
       "accept": "Aceptar",
       "hangUp": "Colgar",
-      "expand": "Ampliar"
+      "expand": "Ampliar",
+      "you": "Tú",
+      "call": "Llamada"
     },
     "clock": {
       "rainExpected": "Lluvia prevista a las",
@@ -91,24 +93,24 @@
     },
     "notLinked": {
       "smartrotomMessage": "Usuario de SmartRotom no vinculado. Accede a Minecraft antes de usar la web.",
-      "smartrotomCauses": [
-        "No has iniciado sesión en Minecraft",
-        "Los datos de sesión de Minecraft no son válidos"
-      ],
-      "smartrotomSolutions": [
-        "Inicia sesión en Minecraft primero",
-        "Reinicia el cliente de Minecraft",
-        "Contacta con soporte si el problema persiste"
-      ],
+      "smartrotomCauses": {
+        "0": "No has iniciado sesión en Minecraft",
+        "1": "Los datos de sesión de Minecraft no son válidos"
+      },
+      "smartrotomSolutions": {
+        "0": "Inicia sesión en Minecraft primero",
+        "1": "Reinicia el cliente de Minecraft",
+        "2": "Contacta con soporte si el problema persiste"
+      },
       "boffmediaMessage": "Usuario de BoffMedia no vinculado",
-      "boffmediaCauses": [
-        "No has vinculado tu cuenta de BoffMedia",
-        "La conexión con BoffMedia ha fallado"
-      ],
-      "boffmediaSolutions": [
-        "Vincula tu cuenta de BoffMedia en la configuración",
-        "Cierra sesión y vuelve a iniciarla"
-      ]
+      "boffmediaCauses": {
+        "0": "No has vinculado tu cuenta de BoffMedia",
+        "1": "La conexión con BoffMedia ha fallado"
+      },
+      "boffmediaSolutions": {
+        "0": "Vincula tu cuenta de BoffMedia en la configuración",
+        "1": "Cierra sesión y vuelve a iniciarla"
+      }
     }
   }
 }

@@ -38,7 +38,7 @@ export default function ConfirmationDialog({
       onClose={onClose}
       size="sm"
       tone={skin.tone}
-      kicker={t("arcade.common.confirm")}
+      kicker={t("common.confirm")}
       title={t(titleKey)}
       footer={
         <>

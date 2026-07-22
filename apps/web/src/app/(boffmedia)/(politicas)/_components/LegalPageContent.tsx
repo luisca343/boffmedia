@@ -385,7 +385,14 @@ const sectionBuilders: Record<LegalPage, (t: ReturnType<typeof useTranslations>)
 }
 
 export function LegalPageContent({ page }: { page: LegalPage }) {
-  const t = useTranslations(`common.legal.${page}`)
+  const tC = useTranslations("common.legal.cancelaciones")
+  const tK = useTranslations("common.legal.cookies")
+  const tD = useTranslations("common.legal.devoluciones")
+  const tP = useTranslations("common.legal.privacidad")
+  const tR = useTranslations("common.legal.reembolsos")
+  const tT = useTranslations("common.legal.terminos")
+  const translators = { cancelaciones: tC, cookies: tK, devoluciones: tD, privacidad: tP, reembolsos: tR, terminos: tT }
+  const t = translators[page]
   const sections = sectionBuilders[page](t)
 
   const updated = `${t("updatedPrefix")}${new Date().toLocaleDateString("es-ES", { year: "numeric", month: "long", day: "numeric" })}`

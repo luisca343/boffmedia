@@ -20,10 +20,11 @@ const STATUS_SKIN: Record<TypeStatus, string> = {
 /** What every guess so far has proved about the hidden creature's types. */
 export function TypeTracker({ types, statuses, isDoubleType }: TypeTrackerProps) {
   const t = useTranslations("arcade")
+  const tPokedex = useTranslations("pokedex")
 
   return (
     <Panel tone="void" tight>
-      <div className="mb-2.5 font-ar-display text-[9px] uppercase text-ar-magenta-2">{t("arcade.squirdle.typeTracker.title")}</div>
+      <div className="mb-2.5 font-ar-display text-[9px] uppercase text-ar-magenta-2">{t("squirdle.typeTracker.title")}</div>
       <ul className="m-0 flex list-none flex-wrap gap-1.5 p-0">
         {types.map((type) => {
           const status = statuses[type] ?? "possible"
@@ -36,8 +37,8 @@ export function TypeTracker({ types, statuses, isDoubleType }: TypeTrackerProps)
                   STATUS_SKIN[status],
                 )}
               >
-                {t(`pokedex.type_${type}`)}
-                <span className="sr-only">: {t(`arcade.squirdle.typeTracker.status.${status}`)}</span>
+                {tPokedex(`type_${type}`)}
+                <span className="sr-only">: {t(`squirdle.typeTracker.status.${status}`)}</span>
               </span>
             </li>
           )
@@ -46,7 +47,7 @@ export function TypeTracker({ types, statuses, isDoubleType }: TypeTrackerProps)
       {isDoubleType !== null && (
         <div className="mt-3">
           <Tag tone={isDoubleType ? "violet" : "amber"} size="md">
-            {isDoubleType ? t("arcade.squirdle.typeTracker.doubleType") : t("arcade.squirdle.typeTracker.singleType")}
+            {isDoubleType ? t("squirdle.typeTracker.doubleType") : t("squirdle.typeTracker.singleType")}
           </Tag>
         </div>
       )}

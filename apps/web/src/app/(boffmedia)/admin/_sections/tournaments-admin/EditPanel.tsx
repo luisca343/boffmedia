@@ -31,7 +31,7 @@ export function EditPanel({
   detail: NonNullable<ReturnType<typeof useTournament>["tournament"]>
   onChange: () => void
 }) {
-  const t = useTranslations("admin.tournaments")
+  const t = useTranslations("tournaments")
   const toLocal = (iso: string | null) =>
     iso ? new Date(iso).toISOString().slice(0, 16) : ""
   const [name, setName] = useState(detail.name)

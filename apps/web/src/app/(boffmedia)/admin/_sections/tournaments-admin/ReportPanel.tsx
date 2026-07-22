@@ -35,7 +35,7 @@ export function ReportPanel({
   matches: TnMatchApi[]
   onReported: () => void
 }) {
-  const t = useTranslations("admin.tournaments")
+  const t = useTranslations("tournaments")
   const [scores, setScores] = useState<Record<number, { a: string; b: string }>>({})
   const [amendId, setAmendId] = useState<number | null>(null)
 

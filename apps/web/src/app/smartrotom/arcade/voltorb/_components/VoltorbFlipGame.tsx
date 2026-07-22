@@ -276,10 +276,10 @@ export default function VoltorbFlipGame() {
   // The primary control changes job with the run: bank what you have, take the
   // next board, or start over after a Voltorb.
   const action = gameOver
-    ? { label: t("arcade.voltorb.playAgain"), variant: "cyan" as const, icon: <Icon.Reset s={14} /> }
+    ? { label: t("voltorb.playAgain"), variant: "cyan" as const, icon: <Icon.Reset s={14} /> }
     : gameWon
-      ? { label: t("arcade.voltorb.nextLevel"), variant: "cyan" as const, icon: <Icon.Chevron s={14} /> }
-      : { label: t("arcade.voltorb.cashOut"), variant: "amber" as const, icon: <Icon.Coin s={16} /> }
+      ? { label: t("voltorb.nextLevel"), variant: "cyan" as const, icon: <Icon.Chevron s={14} /> }
+      : { label: t("voltorb.cashOut"), variant: "amber" as const, icon: <Icon.Coin s={16} /> }
 
   const bombs = colInfo.reduce((sum, info) => sum + info.voltorbs, 0)
   const difficulty = "▲".repeat(Math.min(Math.ceil(level / 2), 4))
@@ -314,9 +314,9 @@ export default function VoltorbFlipGame() {
                 ▸ CARTAS {flippedMultipliers}
               </span>
               <span className="hidden font-ar-mono text-[11px] text-ar-ink-dim md:inline">
-                5×5 · {t("arcade.voltorb.difficulty", { level: difficulty })}
+                5×5 · {t("voltorb.difficulty", { level: difficulty })}
               </span>
-              <span className="font-ar-display text-[10px] text-ar-cyan">{t("arcade.voltorb.bombs", { count: bombs })}</span>
+              <span className="font-ar-display text-[10px] text-ar-cyan">{t("voltorb.bombs", { count: bombs })}</span>
             </div>
 
             <GameGrid
@@ -329,9 +329,9 @@ export default function VoltorbFlipGame() {
             />
 
             <div className="mt-[18px] flex flex-wrap justify-center gap-2">
-              <Tag tone="cyan">{t("arcade.voltorb.cardsFlipped", { count: flippedMultipliers })}</Tag>
-              <Tag tone="amber">{t("arcade.voltorb.combo", { score: roundScore })}</Tag>
-              <Tag tone="magenta">⚡ {t("arcade.voltorb.bombCount", { count: bombs })}</Tag>
+              <Tag tone="cyan">{t("voltorb.cardsFlipped", { count: flippedMultipliers })}</Tag>
+              <Tag tone="amber">{t("voltorb.combo", { score: roundScore })}</Tag>
+              <Tag tone="magenta">⚡ {t("voltorb.bombCount", { count: bombs })}</Tag>
             </div>
           </Panel>
 
@@ -361,7 +361,7 @@ export default function VoltorbFlipGame() {
               icon={<Icon.Info s={12} />}
               onClick={() => setShowRulesModal(true)}
             >
-              {t("arcade.voltorb.viewRules")}
+              {t("voltorb.viewRules")}
             </Button>
             <Button
               variant="ghost"
@@ -370,7 +370,7 @@ export default function VoltorbFlipGame() {
               icon={<Icon.X s={12} />}
               onClick={handleQuit}
             >
-              {t("arcade.voltorb.quitGame")}
+              {t("voltorb.quitGame")}
             </Button>
           </div>
         </div>
@@ -391,7 +391,7 @@ export default function VoltorbFlipGame() {
         isOpen={showConfirmQuit}
         onClose={() => setShowConfirmQuit(false)}
         onConfirm={handleConfirmQuit}
-        titleKey="arcade.voltorb.quitConfirm"
+        titleKey="voltorb.quitConfirm"
         descriptionKey="arcade.voltorb.quitDescription"
         confirmKey="arcade.voltorb.quit"
         cancelKey="arcade.voltorb.keep"
@@ -402,7 +402,7 @@ export default function VoltorbFlipGame() {
         isOpen={showConfirmNew}
         onClose={handleCancelNewGame}
         onConfirm={handleConfirmNewGame}
-        titleKey="arcade.voltorb.newGameConfirm"
+        titleKey="voltorb.newGameConfirm"
         descriptionKey="arcade.voltorb.newGameDescription"
         confirmKey="arcade.voltorb.new"
         cancelKey="arcade.voltorb.keep"
@@ -413,7 +413,7 @@ export default function VoltorbFlipGame() {
         isOpen={showConfirmStop}
         onClose={handleCancelStop}
         onConfirm={handleConfirmStop}
-        titleKey="arcade.voltorb.cashOutConfirm"
+        titleKey="voltorb.cashOutConfirm"
         descriptionKey="arcade.voltorb.cashOutDescription"
         confirmKey="arcade.voltorb.cashOut"
         cancelKey="arcade.voltorb.keep"

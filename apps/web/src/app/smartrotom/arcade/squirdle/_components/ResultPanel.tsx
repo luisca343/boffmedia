@@ -31,7 +31,7 @@ export function ResultPanel({ message, won, gameOver, onReset }: ResultPanelProp
         </p>
         {gameOver && (
           <Button variant="cyan" size="sm" icon={<Icon.Reset s={12} />} onClick={onReset}>
-            {t("arcade.squirdle.result.playAgain")}
+            {t("squirdle.result.playAgain")}
           </Button>
         )}
       </div>

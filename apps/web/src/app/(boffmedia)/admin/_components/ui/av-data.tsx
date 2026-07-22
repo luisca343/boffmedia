@@ -23,7 +23,7 @@ export function AvRow({ off, className, children }: { off?: boolean; className?:
 }
 
 export function RowActions({ onEdit, onDelete }: { onEdit?: () => void; onDelete?: () => void }) {
-  const t = useTranslations("admin.data")
+  const t = useTranslations("data")
   return (
     <div className="flex flex-none items-center gap-1.5">
       <IconButton name="edit" label={t("editLabel")} size={15} className="!h-8 !w-8" onClick={onEdit} />
@@ -91,7 +91,7 @@ export function MemberRow({
   onMute?: () => void
   onBan?: () => void
 }) {
-  const t = useTranslations("admin.data")
+  const t = useTranslations("data")
   const st = AV_MEMBER_STATUS[member.status]
   const initials = member.name.split(" ").map((w) => w[0]).slice(0, 2).join("")
   return (
@@ -218,7 +218,7 @@ export interface AvPipeStage {
 }
 
 export function AvPipeline({ stages, active, onNav }: { stages: AvPipeStage[]; active?: string; onNav?: (key: string) => void }) {
-  const t = useTranslations("admin.data")
+  const t = useTranslations("data")
   return (
     <div className="mb-[18px] flex items-stretch gap-0 overflow-x-auto border border-solid border-line bg-panel p-[5px]">
       {stages.map((s) => (
