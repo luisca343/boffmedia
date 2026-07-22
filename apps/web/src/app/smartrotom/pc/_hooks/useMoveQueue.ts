@@ -1,6 +1,7 @@
 "use client"
 
 import { useCallback, useRef, useState } from "react"
+import { useTranslations } from "next-intl"
 import { toast } from "../_components/ui"
 import type { QueuedMove } from "../_utils/movePlan"
 import { useMovePokemon } from "./queries"
@@ -27,6 +28,7 @@ export interface QueueProgress {
  * so nothing is lost), and the user is told how far it got.
  */
 export function useMoveQueue() {
+  const t = useTranslations("pc")
   const move = useMovePokemon()
   const [progress, setProgress] = useState<QueueProgress | null>(null)
   const cancelled = useRef(false)
@@ -43,14 +45,14 @@ export function useMoveQueue() {
 
       for (let i = 0; i < moves.length; i++) {
         if (cancelled.current) {
-          toast(`${label} cancelado — ${i} de ${moves.length} aplicados`, "info")
+          toast(t("moveQueue.cancelled", { label, applied: i, count: moves.length }), "info")
           setProgress(null)
           return false
         }
         try {
           await move.mutateAsync(moves[i])
         } catch {
-          toast(`${label} interrumpido tras ${i} de ${moves.length} movimientos`, "error", 4000)
+          toast(t("moveQueue.interrupted", { label, done: i, count: moves.length }), "error", 4000)
           setProgress(null)
           return false
         }
@@ -60,7 +62,7 @@ export function useMoveQueue() {
       setProgress(null)
       return true
     },
-    [move],
+    [move, t],
   )
 
   return { run, cancel, progress, isRunning: progress !== null }

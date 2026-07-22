@@ -15,12 +15,12 @@ import { Bar, Button, Chip, Icon, Input, toast, type IconName } from "./ui"
 
 type OrganizeMode = "dex" | "type" | "gen" | "level" | "shiny"
 
-const ORGANIZE: Array<{ mode: OrganizeMode; label: string; icon: IconName }> = [
-  { mode: "dex", label: "Pokédex", icon: "list" },
-  { mode: "type", label: "Tipo", icon: "grid" },
-  { mode: "gen", label: "Generación", icon: "layers" },
-  { mode: "level", label: "Nivel", icon: "sort" },
-  { mode: "shiny", label: "Shiny primero", icon: "sparkles" },
+const ORGANIZE: Array<{ mode: OrganizeMode; icon: IconName }> = [
+  { mode: "dex", icon: "list" },
+  { mode: "type", icon: "grid" },
+  { mode: "gen", icon: "layers" },
+  { mode: "level", icon: "sort" },
+  { mode: "shiny", icon: "sparkles" },
 ]
 
 /** The order the box should end up in. Packed: the Pokémon first, empties after. */
@@ -81,6 +81,13 @@ export function BoxHeader({
   onClose,
 }: BoxHeaderProps) {
   const t = useTranslations("pc")
+  const sortLabel: Record<OrganizeMode, string> = {
+    dex: t("box.sortDex"),
+    type: t("box.sortType"),
+    gen: t("box.sortGen"),
+    level: t("box.sortLevel"),
+    shiny: t("box.sortShiny"),
+  }
   const boxMeta = usePcUi((s) => s.boxMeta)
   const renameBox = usePcUi((s) => s.renameBox)
   const speciesByDex = usePokemonStore((s) => s.pokemonByDex)
@@ -144,7 +151,7 @@ export function BoxHeader({
           <Input
             autoFocus
             value={draft}
-            aria-label="Nombre de la caja"
+            aria-label={t("box.nameAriaLabel")}
             onChange={(e) => setDraft(e.target.value)}
             onBlur={commitName}
             onKeyDown={(e) => {
@@ -195,14 +202,14 @@ export function BoxHeader({
       )}
 
       <div ref={menuRef} className="relative flex flex-none gap-1.5">
-        <Button icon onClick={onTheme} aria-label="Tema de la caja">
+        <Button icon onClick={onTheme} aria-label={t("box.themeAriaLabel")}>
           <Icon name="palette" size={16} />
         </Button>
 
         <Button
           icon
           active={menu}
-          aria-label="Organizar o compartir la caja"
+          aria-label={t("box.organizeAriaLabel")}
           aria-expanded={menu}
           onClick={() => setMenu((m) => !m)}
         >
@@ -217,7 +224,7 @@ export function BoxHeader({
             <div className="px-2 pb-1.5 pt-1 text-[10px] font-bold uppercase tracking-[.05em] text-pc-fg-subtle">
               {t("organize.by")}
             </div>
-            {ORGANIZE.map(({ mode, label, icon }) => (
+            {ORGANIZE.map(({ mode, icon }) => (
               <Button
                 key={mode}
                 variant="ghost"
@@ -227,7 +234,7 @@ export function BoxHeader({
                 className="w-full justify-start"
               >
                 <Icon name={icon} size={14} className="text-pc-fg-subtle" />
-                {label}
+                {sortLabel[mode]}
               </Button>
             ))}
 

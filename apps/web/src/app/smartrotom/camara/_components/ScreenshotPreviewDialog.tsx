@@ -2,6 +2,7 @@ import { ChevronLeft, ChevronRight, Download, Trash2 } from "lucide-react"
 import { Button } from "@/components/ui/primitives/button"
 import { Dialog, DialogContent } from "@/components/ui/primitives/dialog"
 import { toast } from "react-toastify"
+import { useTranslations } from "next-intl"
 import type { Screenshot } from "@/stores/cameraGalleryStore"
 import { ScreenshotMetadata } from "./ScreenshotMetadata"
 
@@ -22,6 +23,7 @@ export function ScreenshotPreviewDialog({
   onNavigate,
   onDelete
 }: ScreenshotPreviewDialogProps) {
+  const t = useTranslations("camara")
 
   if (previewIndex === null || !gallery[previewIndex]) {
     return null
@@ -34,17 +36,17 @@ export function ScreenshotPreviewDialog({
     link.href = screenshot.image
     link.download = `minecraft-screenshot-${screenshot.timestamp}.png`
     link.click()
-    toast.success('Screenshot downloaded')
+    toast.success(t("preview.downloaded"))
   }
 
   const handleDelete = () => {
-    if (confirm('Delete this screenshot?')) {
+    if (confirm(t("preview.deleteConfirm"))) {
       const wasLast = gallery.length === 1
       onDelete(previewIndex)
       if (wasLast) {
         onClose()
       }
-      toast.success('Screenshot deleted')
+      toast.success(t("preview.deleted"))
     }
   }
 
@@ -73,7 +75,7 @@ export function ScreenshotPreviewDialog({
                   <button
                     className="absolute left-3 top-1/2 -translate-y-1/2 z-40 p-3 rounded-full bg-black/70 text-white hover:bg-black/90 transition-colors"
                     onClick={() => onNavigate('prev')}
-                    aria-label="Previous"
+                    aria-label={t("preview.prev")}
                   >
                     <ChevronLeft className="h-6 w-6" />
                   </button>
@@ -81,7 +83,7 @@ export function ScreenshotPreviewDialog({
                   <button
                     className="absolute right-3 top-1/2 -translate-y-1/2 z-40 p-3 rounded-full bg-black/70 text-white hover:bg-black/90 transition-colors"
                     onClick={() => onNavigate('next')}
-                    aria-label="Next"
+                    aria-label={t("preview.next")}
                   >
                     <ChevronRight className="h-6 w-6" />
                   </button>
@@ -108,7 +110,7 @@ export function ScreenshotPreviewDialog({
               className="hover:bg-white/10"
             >
               <Download className="h-4 w-4 mr-2" />
-              Download
+              {t("preview.download")}
             </Button>
             <Button
               variant="ghost"
@@ -117,7 +119,7 @@ export function ScreenshotPreviewDialog({
               className="hover:bg-red-500/10 text-red-400 hover:text-red-300"
             >
               <Trash2 className="h-4 w-4 mr-2" />
-              Delete
+              {t("preview.delete")}
             </Button>
           </div>
         </div>

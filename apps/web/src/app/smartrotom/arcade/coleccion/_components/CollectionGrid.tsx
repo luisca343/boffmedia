@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import { useTranslations } from "next-intl"
 import type { ArcadeInventoryItem } from "@boffmedia/shared"
 import { Button, Icon, Panel } from "../../_components/ui"
 import { ItemTile } from "./ItemTile"
@@ -30,6 +31,8 @@ export function CollectionGrid({
   onPrevious,
   onNext,
 }: CollectionGridProps) {
+  const t = useTranslations("arcade")
+
   if (owned === 0) {
     return (
       <Panel tone="deep" className="text-center">
@@ -37,16 +40,16 @@ export function CollectionGrid({
           <Icon.Box s={26} />
         </div>
         <h3 className="font-ar-display text-[13px] leading-relaxed text-ar-ink">
-          Aún no tienes objetos
+          {t("coleccion.grid.emptyTitle")}
         </h3>
         <p className="mx-auto mt-2 max-w-[380px] font-ar text-[13px] leading-relaxed text-ar-ink-dim">
-          Abre cajas de botín para empezar tu colección.
+          {t("coleccion.grid.emptyBody")}
         </p>
         <Link
           href="/smartrotom/arcade/loot"
           className="ar-lift mt-4 inline-flex items-center gap-2 rounded-lg border border-white/[.18] px-4 py-2.5 font-ar text-xs font-semibold uppercase tracking-[0.08em] text-white bg-[linear-gradient(180deg,#ff5fbf_0%,rgb(var(--ar-magenta))_55%,#c4127a_100%)] shadow-[inset_0_1px_0_rgb(255_255_255/.35),inset_0_-2px_0_rgb(0_0_0/.35),0_8px_26px_-8px_rgb(var(--ar-magenta)/.6)]"
         >
-          <Icon.Box s={14} /> Ir a las cajas
+          <Icon.Box s={14} /> {t("coleccion.grid.goToBoxes")}
         </Link>
       </Panel>
     )
@@ -58,9 +61,9 @@ export function CollectionGrid({
         <div className="mx-auto mb-3.5 grid h-14 w-14 place-items-center rounded-[14px] border border-ar-cyan/40 bg-ar-cyan/[.12] text-ar-cyan">
           <Icon.Search s={26} />
         </div>
-        <h3 className="font-ar-display text-[13px] leading-relaxed text-ar-ink">Sin resultados</h3>
+        <h3 className="font-ar-display text-[13px] leading-relaxed text-ar-ink">{t("coleccion.grid.noMatchTitle")}</h3>
         <p className="mt-2 font-ar text-[13px] text-ar-ink-dim">
-          Ningún objeto coincide con la búsqueda o el filtro.
+          {t("coleccion.grid.noMatchBody")}
         </p>
       </Panel>
     )
@@ -88,10 +91,10 @@ export function CollectionGrid({
             onClick={onPrevious}
             disabled={page === 0}
           >
-            Anterior
+            {t("coleccion.grid.prev")}
           </Button>
           <span className="font-ar-mono text-[11px] tabular-nums text-ar-ink-dim">
-            Página {page + 1} de {pageCount}
+            {t("coleccion.grid.page", { current: page + 1, total: pageCount })}
           </span>
           <Button
             variant="ghost"
@@ -100,7 +103,7 @@ export function CollectionGrid({
             onClick={onNext}
             disabled={page >= pageCount - 1}
           >
-            Siguiente
+            {t("coleccion.grid.next")}
           </Button>
         </div>
       )}

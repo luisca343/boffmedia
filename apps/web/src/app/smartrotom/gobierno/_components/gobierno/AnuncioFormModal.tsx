@@ -1,8 +1,9 @@
 "use client"
 
 import { useState } from "react"
+import { useTranslations } from "next-intl"
 import { Button, Field, Icon, Modal, Select, TextArea } from "../ui"
-import { ANUNCIO_KIND_OPTIONS } from "./anuncioMeta"
+import { getAnuncioKindOptions } from "./anuncioMeta"
 import { useCreateAnuncio, useUpdateAnuncio } from "../../_hooks/queries"
 import { useOfficer } from "../../_hooks/useOfficer"
 import type { Anuncio } from "../../_types"
@@ -10,6 +11,7 @@ import type { Anuncio } from "../../_types"
 // One modal for both publishing and editing — an edit is a PATCH against the same shape,
 // so it did not earn a second component.
 export function AnuncioFormModal({ anuncio, onClose }: { anuncio?: Anuncio | null; onClose: () => void }) {
+  const t = useTranslations("gobierno")
   const officer = useOfficer()
   const [kind, setKind] = useState<Anuncio["kind"]>(anuncio?.kind ?? "anuncio")
   const [title, setTitle] = useState(anuncio?.title ?? "")
@@ -36,25 +38,30 @@ export function AnuncioFormModal({ anuncio, onClose }: { anuncio?: Anuncio | nul
     <Modal
       open
       onClose={onClose}
-      kicker="Gobierno · Comunicación"
-      title={isEdit ? "Editar publicación" : "Publicar en el tablón"}
+      kicker={t("anuncios.boardKicker")}
+      title={isEdit ? t("anuncios.formEditar") : t("anuncios.formPublicar")}
       width={520}
       footer={
         <>
           <Button tone="ghost" onClick={onClose}>
-            Cancelar
+            {t("common.cancel")}
           </Button>
           <Button tone="gold" onClick={handleSubmit} disabled={!title.trim() || !body.trim() || pending}>
-            {isEdit ? "Guardar" : "Publicar"}
+            {isEdit ? t("common.save") : t("common.publish")}
           </Button>
         </>
       }
     >
       <div className="space-y-4">
-        <Select value={kind} onChange={(v) => setKind(v as Anuncio["kind"])} options={ANUNCIO_KIND_OPTIONS} label="Tipo" />
-        <Field value={title} onChange={setTitle} placeholder="Título de la publicación" label="Título" />
-        <TextArea value={body} onChange={setBody} placeholder="Contenido del comunicado…" rows={5} label="Contenido" />
-        <Field value={town} onChange={setTown} placeholder="ciudad_carmin (opcional)" label="Municipio" mono />
+        <Select
+          value={kind}
+          onChange={(v) => setKind(v as Anuncio["kind"])}
+          options={getAnuncioKindOptions(t)}
+          label={t("anuncios.formTipo")}
+        />
+        <Field value={title} onChange={setTitle} placeholder={t("anuncios.formTituloPlaceholder")} label={t("anuncios.formTitulo")} />
+        <TextArea value={body} onChange={setBody} placeholder={t("anuncios.formContenidoPlaceholder")} rows={5} label={t("anuncios.formContenido")} />
+        <Field value={town} onChange={setTown} placeholder={t("anuncios.formMunicipioPlaceholder")} label={t("anuncios.formMunicipio")} mono />
 
         <button
           type="button"
@@ -65,7 +72,7 @@ export function AnuncioFormModal({ anuncio, onClose }: { anuncio?: Anuncio | nul
           }`}
         >
           <Icon name={pinned ? "checkCircle" : "pin"} size={16} />
-          Fijar en portada del tablón
+          {t("anuncios.formFijar")}
         </button>
       </div>
     </Modal>

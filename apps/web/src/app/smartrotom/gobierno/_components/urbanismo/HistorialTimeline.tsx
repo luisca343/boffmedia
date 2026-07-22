@@ -1,6 +1,7 @@
 "use client"
 
 import { useMemo, useState } from "react"
+import { useTranslations } from "next-intl"
 import { Bar, Badge, Card, Empty, PageHead, Select, Skeleton } from "../ui"
 import { useHistorial } from "../../_hooks/queries"
 import { fmtDateTime, townName } from "../../_utils/format"
@@ -11,6 +12,7 @@ import { groupBy } from "./helpers"
 // (only a per-parcela historial route exists on the real API today, not this aggregate
 // one, so this page renders the honest error state until that's wired up).
 export function HistorialTimeline() {
+  const t = useTranslations("gobierno")
   const { data, isLoading, isError } = useHistorial({ limit: 100 })
   const [town, setTown] = useState("all")
 
@@ -34,10 +36,10 @@ export function HistorialTimeline() {
   return (
     <div>
       <PageHead
-        kicker="Urbanismo · Registro de la propiedad"
+        kicker={t("urbanismo.historialKicker")}
         dep="urbanismo"
-        title="Historial de titularidad"
-        sub="Cada traspaso de parcela queda inscrito en el registro municipal de la propiedad."
+        title={t("urbanismo.historialTitle")}
+        sub={t("urbanismo.historialSub")}
         right={
           towns.length > 1 ? (
             <div className="w-[190px]">
@@ -45,8 +47,8 @@ export function HistorialTimeline() {
                 value={town}
                 onChange={setTown}
                 options={[
-                  { value: "all", label: "Todos los municipios" },
-                  ...towns.map((t) => ({ value: t, label: townName(t) })),
+                  { value: "all", label: t("urbanismo.todosMunicipios") },
+                  ...towns.map((tn) => ({ value: tn, label: townName(tn) })),
                 ]}
               />
             </div>
@@ -62,14 +64,14 @@ export function HistorialTimeline() {
         </div>
       ) : isError ? (
         <Card>
-          <Empty icon="alert" title="No se pudo cargar el historial" sub="Inténtalo de nuevo en unos minutos." />
+          <Empty icon="alert" title={t("urbanismo.emptyHistorial")} sub={t("urbanismo.emptyHistorialSub")} />
         </Card>
       ) : groups.length === 0 ? (
         <Card>
           <Empty
             icon="scroll"
-            title="Sin movimientos registrados"
-            sub="Todavía no hay traspasos inscritos en el registro de la propiedad."
+            title={t("urbanismo.emptyHistorialMovimientos")}
+            sub={t("urbanismo.emptyHistorialMovimientosSub")}
           />
         </Card>
       ) : (
@@ -96,15 +98,13 @@ export function HistorialTimeline() {
                       <div className="flex flex-wrap items-center gap-2">
                         <span className="text-[13.5px] text-gt-ink-800">
                           {h.previousOwner ? (
-                            <>
-                              <strong>{h.previousOwner.username}</strong> transfirió a{" "}
-                            </>
+                            t("urbanismo.transfirió", { from: h.previousOwner.username })
                           ) : (
-                            "El municipio adjudicó a "
-                          )}
+                            t("urbanismo.adjudico")
+                          )}{" "}
                           <strong className="text-gt-civic">{h.newOwner?.username ?? "—"}</strong>
                         </span>
-                        {i === 0 && <Badge tone="ok">Actual</Badge>}
+                        {i === 0 && <Badge tone="ok">{t("urbanismo.actual")}</Badge>}
                       </div>
                       <div className="mt-0.5 font-gt-mono text-[10.5px] text-gt-ink-400">{fmtDateTime(h.changedAt)}</div>
                       {h.reason && <div className="mt-0.5 text-[12px] italic text-gt-ink-500">{h.reason}</div>}

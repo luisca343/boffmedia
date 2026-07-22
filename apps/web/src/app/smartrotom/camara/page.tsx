@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from "react"
+import { useTranslations } from "next-intl"
 import { takeScreenshot } from "@/services/mcef/mcefApi"
 import { isMinecraft } from "@/services/mcef/mcefHelper"
 import { toast } from "react-toastify"
@@ -12,6 +13,7 @@ import { GalleryView } from "./_components/GalleryView"
 import { ScreenshotPreviewDialog } from "./_components/ScreenshotPreviewDialog"
 
 export default function CameraApp() {
+  const t = useTranslations("camara")
   const [includeUI, setIncludeUI] = useState(false)
   const [isCapturing, setIsCapturing] = useState(false)
   const [showGallery, setShowGallery] = useState(false)
@@ -64,12 +66,12 @@ export default function CameraApp() {
       if (result.success && result.image) {
         shutter.play()
         addScreenshot(result.image, result.location, result.entities)
-        toast.success('Screenshot saved to gallery')
+        toast.success(t("page.screenshotSaved"))
       } else {
-        toast.error(result.error || 'Failed to capture screenshot')
+        toast.error(result.error || t("page.screenshotFailed"))
       }
     } catch (error) {
-      toast.error('Error capturing screenshot')
+      toast.error(t("page.screenshotError"))
       console.error('Screenshot error:', error)
     } finally {
       setIsCapturing(false)

@@ -619,6 +619,24 @@
           }
         }
       }
+    },
+    "notFound": {
+      "heading": "Oops! Page not found.",
+      "body": "Looks like you've ventured into uncharted territory. Don't worry, even the best explorers get lost sometimes.",
+      "cta": "How about we head back to familiar ground?",
+      "home": "Back to Home",
+      "back": "Previous Page"
+    },
+    "error": {
+      "title": "Something went wrong!",
+      "body": "An unexpected error has occurred.",
+      "messageLabel": "Error message:",
+      "unknown": "Unknown error",
+      "trackingId": "Tracking ID:",
+      "retry": "Retry",
+      "home": "Home",
+      "helpText": "Need help?",
+      "discordLink": "Discord Community"
     }
   }
 }

@@ -1,23 +1,5 @@
 {
-  "pokedex":
-  {
-      "tmMoves": "MT",
-      "trMoves": "DT",
-      "hmMoves": "MO",
-      "eggMoves": "Huevo",
-      "tutorMoves": "Tutor",
-      "tmMoves1": "MT Gen 1",
-      "tmMoves2": "MT Gen 2",
-      "tmMoves3": "MT Gen 3",
-      "tmMoves4": "MT Gen 4",
-      "tmMoves5": "MT Gen 5",
-      "tmMoves6": "MT Gen 6",
-      "tmMoves7": "MT Gen 7",
-      "tmMoves8": "MT Gen 8",
-      "tmMoves9": "MT Gen 9",
-      "transferMoves": "Tutor de Transferencia",
-      "levelUpMoves": "Nivel",
-
+  "pokedex": {
     "attack_absorb": "Absorber",
     "attack_absorb_description": "Los PS del usuario son restaurados a la mitad el daño recibido por el objetivo.",
     "attack_acid": "Ácido",
@@ -1559,7 +1541,6 @@
     "attack_take_heart_description": "El usuario se envalentona y se cura de los problemas de estado. Además, sube su ofensiva y su defensiva.",
     "attack_victory_dance": "Danza triunfal",
     "attack_victory_dance_description": "Ejecuta una danza que invoca la victoria y aumenta la ofensiva y la defensiva, y hace que los movimientos consecuentes causen un 50% más de daño.",
-
     "attack_breakneck_blitz": "Carrera arrolladora",
     "attack_breakneck_blitz_description": "El usuario emplea el Poder Z para coger carrerilla y arremeter contra el objetivo a gran fuerza. Su potencia deriva de la del movimiento original.",
     "attack_all-out_pummeling": "Ráfaga demoledora",
@@ -1721,7 +1702,7 @@
     "attack_triple_dive": "Triple Inmersión",
     "attack_triple_dive_description": "Ejecuta una inmersión triple en perfecta sincronía que golpea al objetivo con salpicaduras de agua tres veces seguidas.",
     "attack_twin_beam": "Láser Doble",
-    "attack_twin_beam_description": "Ataca emitiendo dos misteriosos haces lumínicos por los ojos que infligen daño dos veces seguidas.", 
+    "attack_twin_beam_description": "Ataca emitiendo dos misteriosos haces lumínicos por los ojos que infligen daño dos veces seguidas.",
     "attack_syrup_bomb": "Bomba Caramelo",
     "attack_syrup_bomb_description": "Lanza una bomba de caramelo que explota al impactar. El objetivo queda pegajoso reducirá su Velocidad al final de cada turno por 3 turnos.",
     "attack_matcha_gotcha": "Cañón Batidor",
@@ -1730,8 +1711,6 @@
     "attack_ivy_cudgel_description": "Ataca al objetivo con una liana que se enrosca en él y lo golpea con fuerza. Este movimiento tiene una alta probabilidad de ser crítico.",
     "attack_blood_moon": "Luna Roja",
     "attack_blood_moon_description": "Este movimiento no puede usarse dos veces seguidas.",
-    
-    
     "attack_max_flare": "Maxignición",
     "attack_max_flare_description": "Hace daño y hace que el usuario invoque Día Soleado por 5 turnos.",
     "attack_max_flutterby": "Maxinsecto",
@@ -1770,7 +1749,6 @@
     "attack_max_steelspike_description": "Hace daño y aumenta en un nivel la defensa del usuario.",
     "attack_max_guard": "Maxibarrera",
     "attack_max_guard_description": "Protege al usuario de movimientos realizados por el enemigo. Cuantas más veces seguidas se use, más probable es que falle.",
-
     "attack_g-max_vine_lash": "Gigalianas",
     "attack_g-max_vine_lash_description": "Un ataque de tipo planta que puede usar Venusaur Gigamax. Este movimiento inflige daño a todos los oponentes durante cuatro turnos.",
     "attack_g-max_wildfire": "Gigallamarada",
@@ -1837,5 +1815,5 @@
     "attack_g-max_one_blow_description": "Un ataque de tipo siniestro que puede usar Urshifu Gigamax. Este movimiento de un solo golpe es capaz incluso de atravesar Maxibarrera.",
     "attack_g-max_rapid_flow": "Gigagolpe fluido",
     "attack_g-max_rapid_flow_description": "Un ataque de tipo agua que puede usar Urshifu Gigamax. Este movimiento veloz es capaz incluso de atravesar Maxibarrera."
-  }     
+  }
 }

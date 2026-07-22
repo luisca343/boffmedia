@@ -157,7 +157,9 @@
       "saved": "Guardado",
       "itemInCollection": "El objeto ya está en tu colección. Te quedan {count, plural, one {# caja} other {# cajas}} de este tipo.",
       "reelNoServer": "La ruleta no llegó del servidor, pero el premio sí es tuyo.",
-      "abriendo": "Abriendo"
+      "abriendo": "Abriendo",
+      "reelAriaSettled": "Premio obtenido",
+      "reelAriaSpinning": "Girando la caja"
     },
     "coleccion": {
       "title": "Tu colección",
@@ -177,14 +179,23 @@
         "uniqueItemsSub": "entradas en la colección",
         "totalItems": "Objetos totales",
         "totalItemsSub": "unidades sin reclamar",
-        "byRarity": "Por rareza"
+        "byRarity": "Por rareza",
+        "entries": "entradas en la colección",
+        "unclaimed": "unidades sin reclamar"
       },
       "toolbar": {
         "all": "Todo",
         "items": "Objetos",
         "pokemon": "Pokémon",
         "mina": "Mina",
-        "box": "Cajas"
+        "box": "Cajas",
+        "typeItems": "Objetos",
+        "typeMine": "Mina",
+        "typeBoxes": "Cajas",
+        "searchPlaceholder": "Buscar en mi colección…",
+        "searchAriaLabel": "Buscar en mi colección",
+        "typeLabel": "Tipo de objeto",
+        "allRarities": "Todas"
       },
       "claim": {
         "kicker": "▸ Reclamar recompensas",
@@ -214,6 +225,16 @@
           "lootbox": "Caja de botín",
           "streak": "Racha diaria"
         }
+      },
+      "grid": {
+        "emptyTitle": "Aún no tienes objetos",
+        "emptyBody": "Abre cajas de botín para empezar tu colección.",
+        "goToBoxes": "Ir a las cajas",
+        "noMatchTitle": "Sin resultados",
+        "noMatchBody": "Ningún objeto coincide con la búsqueda o el filtro.",
+        "prev": "Anterior",
+        "next": "Siguiente",
+        "page": "Página {current} de {total}"
       }
     },
     "ajustes": {
@@ -241,7 +262,13 @@
         "bannerLabel": "Banner activo",
         "sessionLabel": "Sesión",
         "connected": "Conectado",
-        "resetsIn": "Reinicia en {time}"
+        "resetsIn": "Reinicia en {time}",
+        "uuid": "UUID de SmartRotom",
+        "copied": "Copiado",
+        "copy": "Copiar",
+        "bannerActive": "Banner activo",
+        "session": "Sesión",
+        "signOut": "Cerrar sesión"
       }
     },
     "squirdle": {
@@ -434,6 +461,16 @@
         "«Regenerar» reparte un calabazo nuevo con los mismos parámetros.",
         "La vista debug imprime la rejilla en texto: S inicio, R sala, B jefe, W muro."
       ]
+    },
+    "hud": {
+      "trainerFallback": "Entrenador",
+      "streakDay": "Día de la racha",
+      "weeklyStreakProgress": "Progreso de la racha semanal",
+      "rewardReady": "Recompensa lista",
+      "box": "{count, plural, one {caja} other {cajas}}",
+      "resetsIn": "REINICIA EN {resetIn}",
+      "syncing": "Sincronizando…",
+      "synced": "Sincronizado"
     },
     "collectionGrid": {
       "noMatches": "No hay objetos que coincidan con los filtros.",

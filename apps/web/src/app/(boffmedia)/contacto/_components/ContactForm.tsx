@@ -1,7 +1,9 @@
 "use client"
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 
 export function ContactForm() {
+  const t = useTranslations("boffmedia");
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -35,7 +37,7 @@ export function ContactForm() {
     >
       <div className="mb-4">
         <label htmlFor="name" className="block text-accent-bright mb-2">
-          Nombre
+          {t("contact.nameLabel")}
         </label>
         <input
           type="text"
@@ -49,7 +51,7 @@ export function ContactForm() {
       </div>
       <div className="mb-4">
         <label htmlFor="email" className="block text-accent-bright mb-2">
-          Correo Electrónico
+          {t("contact.emailLabel")}
         </label>
         <input
           type="email"
@@ -63,7 +65,7 @@ export function ContactForm() {
       </div>
       <div className="mb-4">
         <label htmlFor="message" className="block text-accent-bright mb-2">
-          Mensaje
+          {t("contact.messageLabel")}
         </label>
         <textarea
           id="message"
@@ -77,14 +79,14 @@ export function ContactForm() {
       </div>
       {sent && (
         <p className="mb-4 text-accent-bright">
-          Mensaje enviado. ¡Gracias por contactarnos!
+          {t("contact.successMessage")}
         </p>
       )}
       <button
         type="submit"
         className="bg-gradient-to-r from-accent to-accent-bright px-6 py-2 rounded-full text-white font-bold hover:from-accent-bright hover:to-accent-soft transition duration-300 shadow-neon"
       >
-        Enviar
+        {t("contact.submit")}
       </button>
     </form>
   );

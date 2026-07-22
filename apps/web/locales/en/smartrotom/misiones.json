@@ -87,6 +87,15 @@
       "locked": "Sealed",
       "completed": "Completed",
       "failed": "Failed"
+    },
+    "bitacora": {
+      "searchPlaceholder": "Search the log…",
+      "searchAriaLabel": "Search the log",
+      "emptyTitle": "No dialogue entries yet.",
+      "noResults": "No entries match that search."
+    },
+    "letter": {
+      "unknownNpc": "an unknown person"
     }
   }
 }

@@ -149,13 +149,24 @@
       "loadError": "No se pudo leer tu equipo",
       "loadErrorBody": "El servidor de juego no respondió. Tus cajas siguen disponibles."
     },
+    "box": {
+      "nameAriaLabel": "Nombre de la caja",
+      "themeAriaLabel": "Tema de la caja",
+      "organizeAriaLabel": "Organizar o compartir la caja",
+      "sortType": "Tipo",
+      "sortGen": "Generación",
+      "sortLevel": "Nivel",
+      "sortShiny": "Shiny primero",
+      "sortDex": "Pokédex"
+    },
     "share": {
       "title": "Compartir caja",
       "code": "Código para compartir",
       "summary": "Resumen legible",
       "hint": "Pega este código en otra instancia de SmartRotom PC para importar la caja.",
       "copied": "Código copiado",
-      "summaryCopied": "Resumen copiado"
+      "summaryCopied": "Resumen copiado",
+      "copyError": "No se pudo copiar — selecciónalo manualmente"
     },
     "organize": {
       "by": "Auto-organizar por",
@@ -179,6 +190,13 @@
       "prev": "Página anterior",
       "next": "Página siguiente",
       "selectAll": "Seleccionar todos los resultados (todas las páginas)"
+    },
+    "drag": {
+      "dropHint": "Suelta en una caja para mover varios"
+    },
+    "moveQueue": {
+      "cancelled": "{label} cancelado — {applied} de {count} aplicados",
+      "interrupted": "{label} interrumpido tras {done} de {count} movimientos"
     }
   }
 }

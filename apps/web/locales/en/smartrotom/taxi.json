@@ -1,5 +1,7 @@
 {
   "taxi": {
+    "playerFallback": "Trainer",
+    "loadStopsError": "Could not load taxi stops",
     "topBar": {
       "appName": "SmartRotom",
       "taxiName": "Taxi de Teras",

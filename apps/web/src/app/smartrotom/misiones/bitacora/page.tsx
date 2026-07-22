@@ -1,6 +1,7 @@
 "use client"
 
 import { useMemo, useState } from "react"
+import { useTranslations } from "next-intl"
 import { useBoard } from "../_hooks/useBoard"
 import { npcForQuest } from "../_utils/quests"
 import { Divider, EmptyBoard, Label, SearchField } from "../_components/ui"
@@ -9,6 +10,7 @@ import { JournalEntry } from "../_components/JournalEntry"
 
 /** Bitácora de Diálogos — every line any NPC has spoken, searchable. */
 export default function BitacoraPage() {
+  const t = useTranslations("misiones")
   const { quests, npcs, dialogs, isLoading, error, open } = useBoard()
   const [search, setSearch] = useState("")
 
@@ -45,14 +47,14 @@ export default function BitacoraPage() {
         <SearchField
           value={search}
           onChange={(event) => setSearch(event.target.value)}
-          placeholder="Buscar en la bitácora…"
-          aria-label="Buscar en la bitácora"
+          placeholder={t("bitacora.searchPlaceholder")}
+          aria-label={t("bitacora.searchAriaLabel")}
           className="mb-5 max-w-[380px]"
         />
 
         {filtered.length === 0 ? (
           <EmptyBoard>
-            {dialogs.length === 0 ? "Aún no hay diálogos registrados." : "Ninguna entrada coincide con esa búsqueda."}
+            {dialogs.length === 0 ? t("bitacora.emptyTitle") : t("bitacora.noResults")}
           </EmptyBoard>
         ) : (
           <div className="flex flex-col gap-4">

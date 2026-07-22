@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useTranslations } from "next-intl"
 import { Bar, Button, Empty, PageHead, Skeleton } from "../ui"
 import { AnuncioFeatured } from "./AnuncioFeatured"
 import { AnuncioCard } from "./AnuncioCard"
@@ -12,6 +13,7 @@ import type { Anuncio } from "../../_types"
 const PAGE_SIZE = 24
 
 export function AnunciosBoard() {
+  const t = useTranslations("gobierno")
   const [page, setPage] = useState(1)
   const { data, isLoading } = useAnuncios({ page, limit: PAGE_SIZE })
   const deleteAnuncio = useDeleteAnuncio()
@@ -24,20 +26,20 @@ export function AnunciosBoard() {
   const rest = items.filter((a) => !a.pinned)
 
   const handleDelete = (a: Anuncio) => {
-    if (!window.confirm(`¿Retirar «${a.title}» del tablón?`)) return
+    if (!window.confirm(t("anuncios.confirmDelete", { title: a.title }))) return
     deleteAnuncio.mutate(a.id)
   }
 
   return (
     <div>
       <PageHead
-        kicker="Gobierno · Comunicación"
+        kicker={t("anuncios.boardKicker")}
         dep="gold"
-        title="Anuncios"
-        sub="Tablón oficial del ayuntamiento. Avisos, comunicados y alertas para toda la ciudadanía de Teras."
+        title={t("anuncios.boardTitle")}
+        sub={t("anuncios.boardSub")}
         right={
           <Button tone="gold" icon="plus" onClick={() => setComposing(true)}>
-            Publicar
+            {t("common.publish")}
           </Button>
         }
       />
@@ -54,8 +56,8 @@ export function AnunciosBoard() {
       ) : items.length === 0 ? (
         <Empty
           icon="megaphone"
-          title="El tablón está vacío"
-          sub="Todavía no se ha publicado ningún comunicado oficial. Publica el primer aviso para la ciudadanía."
+          title={t("anuncios.emptyBoard")}
+          sub={t("anuncios.emptyBoardSub")}
         />
       ) : (
         <>
@@ -65,7 +67,7 @@ export function AnunciosBoard() {
 
           {rest.length > 0 && (
             <>
-              {pinned.length > 0 && <Bar dep="gold">Más publicaciones</Bar>}
+              {pinned.length > 0 && <Bar dep="gold">{t("anuncios.masPublicaciones")}</Bar>}
               <div className="mt-3 grid gap-4 [grid-template-columns:repeat(auto-fit,minmax(300px,1fr))]">
                 {rest.map((a) => (
                   <AnuncioCard key={a.id} anuncio={a} onEdit={() => setEditing(a)} onDelete={() => handleDelete(a)} />

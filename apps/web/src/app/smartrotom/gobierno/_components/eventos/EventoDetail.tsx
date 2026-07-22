@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { userMessageFrom } from "@/services/boffAPI"
 import { Empty, Skeleton } from "../ui"
 import { useEvento } from "../../_hooks/queries"
@@ -8,6 +9,7 @@ import { ConstruccionDetail } from "./ConstruccionDetail"
 import { CazaDetail } from "./CazaDetail"
 
 export function EventoDetail({ id }: { id: string }) {
+  const t = useTranslations("gobierno")
   const eventoId = Number.parseInt(id, 10)
   const { data: ev, isLoading, error } = useEvento(Number.isFinite(eventoId) ? eventoId : null)
 
@@ -15,7 +17,7 @@ export function EventoDetail({ id }: { id: string }) {
     return (
       <>
         <BackToEventos />
-        <Empty icon="alert" title="Evento no válido" sub="El enlace no apunta a un evento reconocible." />
+        <Empty icon="alert" title={t("eventos.errorEvento")} sub={t("eventos.errorEventoSub")} />
       </>
     )
   }
@@ -40,8 +42,8 @@ export function EventoDetail({ id }: { id: string }) {
         <BackToEventos />
         <Empty
           icon="alert"
-          title="No se ha podido cargar el evento"
-          sub={error ? userMessageFrom(error, "Inténtalo de nuevo en unos segundos.") : undefined}
+          title={t("eventos.errorCarga")}
+          sub={error ? userMessageFrom(error, t("eventos.errorCargaSub")) : undefined}
         />
       </>
     )

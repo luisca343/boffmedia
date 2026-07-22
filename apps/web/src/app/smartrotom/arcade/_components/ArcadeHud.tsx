@@ -1,6 +1,7 @@
 "use client"
 
 import type { ArcadeStreak } from "@boffmedia/shared"
+import { useTranslations } from "next-intl"
 import { useBoffSession } from "@/services/useBoffSession"
 import { useRotomUsername } from "@/components/smartrotom/behavior/useRotomUuid"
 import { useCountdown } from "../_hooks/useCountdown"
@@ -24,10 +25,11 @@ export interface ArcadeHudProps {
  * derive, defer, or ask; never invent).
  */
 export function ArcadeHud({ streak, boxesOwned, loading, syncing }: ArcadeHudProps) {
+  const t = useTranslations("arcade")
   const { session } = useBoffSession()
   const resetIn = useCountdown(streak?.nextResetTime)
 
-  const name = useRotomUsername() ?? session?.user?.username ?? "Entrenador"
+  const name = useRotomUsername() ?? session?.user?.username ?? t("hud.trainerFallback")
   const currentDay = streak?.currentDay ?? 0
   const totalDays = streak?.totalDays ?? 7
 
@@ -42,7 +44,7 @@ export function ArcadeHud({ streak, boxesOwned, loading, syncing }: ArcadeHudPro
             value={currentDay}
             max={totalDays}
             tone="cyan"
-            title="Día de la racha"
+            title={t("hud.streakDay")}
           />
         )}
         <div>
@@ -59,7 +61,7 @@ export function ArcadeHud({ streak, boxesOwned, loading, syncing }: ArcadeHudPro
                 max={totalDays}
                 tone="cyan"
                 height={6}
-                label="Progreso de la racha semanal"
+                label={t("hud.weeklyStreakProgress")}
               />
             </div>
             <span className="font-ar-mono text-[10px] tabular-nums text-ar-ink-muted">
@@ -72,17 +74,17 @@ export function ArcadeHud({ streak, boxesOwned, loading, syncing }: ArcadeHudPro
       <div className="flex flex-wrap items-center gap-2.5">
         {streak && !streak.claimedToday && (
           <Tag tone="amber" size="md">
-            <Icon.Sparkle s={13} /> Recompensa lista
+            <Icon.Sparkle s={13} /> {t("hud.rewardReady")}
           </Tag>
         )}
         {boxesOwned > 0 && (
           <Tag tone="violet" size="md">
-            <Icon.Box s={13} /> {boxesOwned} {boxesOwned === 1 ? "caja" : "cajas"}
+            <Icon.Box s={13} /> {boxesOwned} {t("hud.box", { count: boxesOwned })}
           </Tag>
         )}
         {resetIn && (
           <span className="inline-flex items-center gap-1.5 rounded-lg border border-ar-amber/35 bg-black/45 px-2.5 py-1.5 font-ar-mono text-[11px] font-bold tabular-nums text-ar-amber">
-            REINICIA EN {resetIn}
+            {t("hud.resetsIn", { resetIn })}
           </span>
         )}
         <span className="inline-flex items-center gap-[7px] rounded-lg border border-ar-lime/30 bg-black/35 px-2.5 py-1.5 font-ar-mono text-[11px] text-ar-lime">
@@ -90,7 +92,7 @@ export function ArcadeHud({ streak, boxesOwned, loading, syncing }: ArcadeHudPro
             aria-hidden
             className="h-2 w-2 rounded-full bg-ar-lime shadow-[0_0_8px_rgb(var(--ar-lime))] motion-reduce:animate-none animate-ar-pulse"
           />
-          {syncing ? "Sincronizando…" : "Sincronizado"}
+          {syncing ? t("hud.syncing") : t("hud.synced")}
         </span>
       </div>
     </div>

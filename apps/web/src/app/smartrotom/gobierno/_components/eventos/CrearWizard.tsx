@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react"
 import { useRouter } from "next/navigation"
+import { useTranslations } from "next-intl"
 import { Badge, Button, Icon } from "../ui"
 import { useCreateEvento, useSetEspecies } from "../../_hooks/queries"
 import { useOfficer } from "../../_hooks/useOfficer"
@@ -17,17 +18,23 @@ const HOUR = 3_600_000
 const DAY = 24 * HOUR
 const plus = (ms: number) => new Date(Date.now() + ms)
 
-const STEPS = ["Tipo", "Datos", "Reglas", "Revisar"]
+const STEP_COUNT = 4
 
 const DEFAULT_WEIGHTS: EventoWeights = { tamano: 20, ivs: 25, shiny: 30, nivel: 15, especie: 20 }
-const DEFAULT_RULES =
-  "No se publica quién ha capturado qué ni la mejor puntuación actual. Cada jugador decide a ciegas si conserva su captura o arriesga a soltarla para cazar otra mejor. Solo cuenta la captura registrada al cerrar el evento."
 
 export function CrearWizard() {
+  const t = useTranslations("gobierno")
   const router = useRouter()
   const officer = useOfficer()
   const createEvento = useCreateEvento()
   const setEspeciesMut = useSetEspecies()
+
+  const steps = [
+    t("eventos.stepTipo"),
+    t("eventos.stepDatos"),
+    t("eventos.stepReglas"),
+    t("eventos.stepRevisar"),
+  ]
 
   const [step, setStep] = useState(0)
   const [type, setType] = useState<"construccion" | "caza" | null>(null)
@@ -49,7 +56,7 @@ export function CrearWizard() {
   const [opensAt, setOpensAt] = useState(() => toLocalInput(plus(DAY)))
   const [closesAt, setClosesAt] = useState(() => toLocalInput(plus(DAY + 6 * HOUR)))
   const [weights, setWeights] = useState<EventoWeights>(DEFAULT_WEIGHTS)
-  const [rules, setRules] = useState(DEFAULT_RULES)
+  const [rules, setRules] = useState(() => t("eventos.defaultRules"))
   const [especies, setEspeciesList] = useState<Omit<Especie, "id" | "eventoId">[]>([])
 
   const addEspecie = (sp: Omit<Especie, "id" | "eventoId">) =>
@@ -118,8 +125,8 @@ export function CrearWizard() {
       code: "PREVIA",
       type: type ?? "construccion",
       status: "upcoming",
-      title: title || (type === "caza" ? "Nueva caza de bichos" : "Nuevo reto de construcción"),
-      brief: brief || "Describe aquí el reto que deberán construir las ciudades…",
+      title: title || (type === "caza" ? t("eventos.nuevaCazaTitulo") : t("eventos.nuevoRetoTitulo")),
+      brief: brief || t("eventos.previewBrief"),
       prize: prize || null,
       crew: crew || null,
       buildClosedAt: buildClosedAt ? new Date(buildClosedAt).toISOString() : null,
@@ -140,6 +147,7 @@ export function CrearWizard() {
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [type, title, brief, prize, crew, buildClosedAt, ratingClosesAt, zone, coordsX, coordsZ, radius, opensAt, closesAt, rules, weights, officer.uuid],
   )
 
@@ -154,13 +162,15 @@ export function CrearWizard() {
               <Icon name="star" size={16} className="text-gt-gold-600" />
             </span>
             <div>
-              <div className="font-gt-display text-lg font-bold leading-none text-gt-ink-900">Convocar evento</div>
+              <div className="font-gt-display text-lg font-bold leading-none text-gt-ink-900">
+                {t("eventos.convocarEvento")}
+              </div>
               <div className="mt-0.5 font-gt-mono text-[8.5px] uppercase tracking-[.14em] text-gt-ink-400">
-                Gobierno · Organización
+                {t("eventos.gobiernoOrganizacion")}
               </div>
             </div>
           </div>
-          <StepRail step={step} dep={dep} />
+          <StepRail step={step} dep={dep} steps={steps} />
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_340px]">
@@ -233,14 +243,14 @@ export function CrearWizard() {
             <div className="mb-2.5 flex items-center gap-1.5">
               <Icon name="eye" size={13} className="text-gt-gold-600" />
               <span className="font-gt-mono text-[8.5px] font-bold uppercase tracking-[.12em] text-gt-ink-500">
-                Previsualización en vivo
+                {t("eventos.previaEnVivo")}
               </span>
             </div>
             {!type ? (
               <div className="grid place-items-center px-4 py-10 text-center">
                 <Icon name="eye" size={26} className="mb-2 text-gt-ink-300" />
                 <div className="max-w-[180px] font-gt-mono text-[11px] leading-relaxed text-gt-ink-400">
-                  La previsualización aparecerá al elegir el tipo de evento.
+                  {t("eventos.previaHint")}
                 </div>
               </div>
             ) : (
@@ -249,7 +259,7 @@ export function CrearWizard() {
                 {type === "caza" && especies.length > 0 && (
                   <div className="rounded-gt border border-gt-line bg-gt-paper-0 p-3 shadow-gt-sm">
                     <div className="mb-2 font-gt-mono text-[8px] uppercase tracking-[.12em] text-gt-ink-400">
-                      Especies publicadas ({especies.length})
+                      {t("eventos.especiesPublicadas", { count: especies.length })}
                     </div>
                     <div className="flex flex-wrap gap-1.5">
                       {especies.map((sp) => (
@@ -267,11 +277,11 @@ export function CrearWizard() {
 
         <div className="flex items-center justify-between border-t border-gt-line bg-gt-paper-1 px-5 py-3.5">
           <Button tone="ghost" icon="arrowLeft" disabled={step === 0} onClick={() => setStep((s) => Math.max(0, s - 1))}>
-            Atrás
+            {t("eventos.atras")}
           </Button>
           <div className="flex items-center gap-2.5">
             <span className="hidden font-gt-mono text-[10.5px] text-gt-ink-400 sm:inline">
-              Paso {step + 1} de {STEPS.length}
+              {t("common.stepOf", { step: step + 1, total: STEP_COUNT })}
             </span>
             {step < 3 ? (
               <Button
@@ -280,11 +290,11 @@ export function CrearWizard() {
                 disabled={!valid}
                 onClick={() => setStep((s) => Math.min(3, s + 1))}
               >
-                Siguiente
+                {t("eventos.siguiente")}
               </Button>
             ) : (
               <Button tone="gold" icon="send" disabled={publishing} onClick={publish}>
-                {publishing ? "Publicando…" : "Publicar evento"}
+                {publishing ? t("common.publishing") : t("eventos.publicarEvento")}
               </Button>
             )}
           </div>
@@ -294,15 +304,15 @@ export function CrearWizard() {
   )
 }
 
-function StepRail({ step, dep }: { step: number; dep: "civic" | "urbanismo" }) {
+function StepRail({ step, dep, steps }: { step: number; dep: "civic" | "urbanismo"; steps: string[] }) {
   const depClass = dep === "civic" ? "bg-gt-civic" : "bg-gt-dep-urbanismo"
   return (
     <div className="flex items-center gap-0">
-      {STEPS.map((s, i) => {
+      {steps.map((s, i) => {
         const done = i < step
         const on = i === step
         return (
-          <div key={s} className={`flex items-center gap-2 ${i < STEPS.length - 1 ? "flex-1" : "flex-none"}`}>
+          <div key={s} className={`flex items-center gap-2 ${i < steps.length - 1 ? "flex-1" : "flex-none"}`}>
             <div className="flex flex-none items-center gap-2">
               <span
                 className={`grid h-6 w-6 flex-none place-items-center rounded-full font-gt-mono text-[11px] font-bold ${
@@ -315,7 +325,7 @@ function StepRail({ step, dep }: { step: number; dep: "civic" | "urbanismo" }) {
                 {s}
               </span>
             </div>
-            {i < STEPS.length - 1 && (
+            {i < steps.length - 1 && (
               <div className={`h-[1.5px] min-w-[14px] flex-1 ${done ? "bg-gt-ok" : "bg-gt-line-strong"}`} />
             )}
           </div>

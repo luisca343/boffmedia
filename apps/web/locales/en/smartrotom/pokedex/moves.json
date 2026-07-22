@@ -1,20 +1,5 @@
 {
   "pokedex": {
-    "tmMoves": "MT",
-    "trMoves": "DT",
-    "hmMoves": "MO",
-    "eggMoves": "Huevo",
-    "tutorMoves": "Tutor",
-    "tmMoves1": "MT Gen 1",
-    "tmMoves2": "MT Gen 2",
-    "tmMoves3": "MT Gen 3",
-    "tmMoves4": "MT Gen 4",
-    "tmMoves5": "MT Gen 5",
-    "tmMoves6": "MT Gen 6",
-    "tmMoves7": "MT Gen 7",
-    "tmMoves8": "MT Gen 8",
-    "tmMoves9": "MT Gen 9",
-    "transferMoves": "Tutor de Transferencia",
     "attack_absorb": "Absorb",
     "attack_absorb_description": "A nutrient-draining attack_ The user's HP is restored by half the damage taken by the target.",
     "attack_acid": "Acid",
@@ -1829,7 +1814,6 @@
     "attack_g-max_one_blow_description": "A Dark-type attack that Gigantamax Urshifu use. This single-strike move can ignore Max Guard.",
     "attack_g-max_rapid_flow": "G-Max Rapid Flow",
     "attack_g-max_rapid_flow_description": "A Water-type attack that Gigantamax Urshifu use. This rapid-strike move can ignore Max Guard.",
-    "attack_expanding_force_onpsychicterrain": "Expanding Force's range was increased due to the terrain type!",
-    "levelUpMoves": "Level"
+    "attack_expanding_force_onpsychicterrain": "Expanding Force's range was increased due to the terrain type!"
   }
 }

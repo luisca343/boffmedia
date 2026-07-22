@@ -2,6 +2,7 @@
 
 import { createPortal } from "react-dom"
 import { useEffect } from "react"
+import { useTranslations } from "next-intl"
 import { Avatar, Badge, Icon, Sunken, ThemedLayer, Skeleton } from "../ui"
 import { useGobiernoUi } from "../../_stores/useGobiernoUi"
 import { useCiudadano, useBuscados, useDenuncias, useMultas } from "../../_hooks/queries"
@@ -14,6 +15,7 @@ import { fmtDate, money, townName } from "../../_utils/format"
  * there is no dossier table, and there should not be one.
  */
 export function Dossier() {
+  const t = useTranslations("gobierno")
   const uuid = useGobiernoUi((s) => s.dossier)
   const close = useGobiernoUi((s) => s.closeDossier)
 
@@ -42,7 +44,7 @@ export function Dossier() {
         <aside
           role="dialog"
           aria-modal="true"
-          aria-label="Expediente ciudadano"
+          aria-label={t("dossier.ariaDialog")}
           className="gt-scroll relative flex w-full max-w-[420px] animate-gt-pop flex-col overflow-y-auto border-l border-gt-line-strong bg-gt-paper-0 shadow-gt-lg motion-reduce:animate-none"
         >
           {/* the identity card at the top of every file */}
@@ -50,14 +52,14 @@ export function Dossier() {
             <button
               type="button"
               onClick={close}
-              aria-label="Cerrar expediente"
+              aria-label={t("dossier.cerrar")}
               className="absolute right-3 top-3 rounded-gt-sm p-1.5 text-gt-ink-400 transition-colors hover:bg-gt-paper-2 hover:text-gt-ink-900"
             >
               <Icon name="x" size={17} />
             </button>
 
             <div className="font-gt-mono text-[9.5px] font-bold uppercase tracking-[.22em] text-gt-ink-400">
-              Expediente ciudadano
+              {t("dossier.kicker")}
             </div>
 
             {isLoading || !citizen ? (
@@ -101,7 +103,7 @@ export function Dossier() {
                 <Sunken className="px-3 py-2.5 text-center">
                   <div className="font-gt-display text-xl tabular-nums text-gt-ink-900">{citizen.parcelas}</div>
                   <div className="mt-0.5 font-gt-mono text-[8.5px] uppercase tracking-[.12em] text-gt-ink-400">
-                    Parcelas
+                    {t("dossier.parcelas")}
                   </div>
                 </Sunken>
                 <Sunken className="px-3 py-2.5 text-center">
@@ -109,19 +111,19 @@ export function Dossier() {
                     {citizen.multasPendientes}
                   </div>
                   <div className="mt-0.5 font-gt-mono text-[8.5px] uppercase tracking-[.12em] text-gt-ink-400">
-                    Multas
+                    {t("dossier.multas")}
                   </div>
                 </Sunken>
                 <Sunken className="px-3 py-2.5 text-center">
                   <div className="font-gt-display text-xl tabular-nums text-gt-ink-900">{citizen.towns.length}</div>
                   <div className="mt-0.5 font-gt-mono text-[8.5px] uppercase tracking-[.12em] text-gt-ink-400">
-                    Ciudades
+                    {t("dossier.ciudades")}
                   </div>
                 </Sunken>
               </div>
 
               {citizen.towns.length > 0 && (
-                <DossierSection title="Residencia" icon="mapPin">
+                <DossierSection title={t("dossier.residencia")} icon="mapPin">
                   <div className="flex flex-wrap gap-1.5">
                     {citizen.towns.map((t) => (
                       <Badge key={t} tone="urbanismo">
@@ -133,7 +135,7 @@ export function Dossier() {
               )}
 
               {activeBounty && (
-                <DossierSection title="Busca y captura" icon="alert">
+                <DossierSection title={t("dossier.buscaCaptura")} icon="alert">
                   <div className="rounded-gt-sm border border-gt-danger/35 bg-gt-danger-tint px-3 py-2.5">
                     <div className="text-[13px] font-semibold text-gt-ink-900">{activeBounty.offense}</div>
                     <div className="mt-1 flex items-center gap-2">
@@ -146,14 +148,14 @@ export function Dossier() {
                     </div>
                     {activeBounty.lastSeen && (
                       <div className="mt-1.5 text-[12px] text-gt-ink-500">
-                        Visto por última vez: {activeBounty.lastSeen}
+                        {t("dossier.vistoUltimamente", { location: activeBounty.lastSeen })}
                       </div>
                     )}
                   </div>
                 </DossierSection>
               )}
 
-              <DossierSection title="Multas" icon="gavel">
+              <DossierSection title={t("dossier.multas")} icon="gavel">
                 {multas?.items.length ? (
                   <ul className="space-y-1.5">
                     {multas.items.map((m) => (
@@ -174,11 +176,11 @@ export function Dossier() {
                     ))}
                   </ul>
                 ) : (
-                  <EmptyLine>Sin multas registradas.</EmptyLine>
+                  <EmptyLine>{t("dossier.sinMultas")}</EmptyLine>
                 )}
               </DossierSection>
 
-              <DossierSection title="Denuncias en su contra" icon="fileText">
+              <DossierSection title={t("dossier.denunciasContra")} icon="fileText">
                 {denuncias?.items.length ? (
                   <ul className="space-y-1.5">
                     {denuncias.items.map((d) => (
@@ -194,7 +196,7 @@ export function Dossier() {
                     ))}
                   </ul>
                 ) : (
-                  <EmptyLine>Sin denuncias en su contra.</EmptyLine>
+                  <EmptyLine>{t("dossier.sinDenuncias")}</EmptyLine>
                 )}
               </DossierSection>
             </div>

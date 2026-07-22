@@ -1,7 +1,7 @@
 {
   "camara": {
     "page": {
-      "screenshotSaved": "Captura guardada en la galería",
+      "screenshotSaved": "Captura guardada en el álbum",
       "screenshotFailed": "No se pudo capturar la pantalla",
       "screenshotError": "Error al capturar la pantalla"
     },
@@ -14,21 +14,25 @@
     "controls": {
       "hideUi": "Ocultar interfaz",
       "showUi": "Mostrar interfaz",
-      "uiOn": "Interfaz: ON",
-      "uiOff": "Interfaz: OFF"
+      "uiOn": "UI: ACTIVA",
+      "uiOff": "UI: OCULTA"
     },
     "gallery": {
       "title": "Galería",
       "photoCount": "{count, plural, one {# foto} other {# fotos}}",
-      "emptyTitle": "Aún no hay capturas",
+      "emptyTitle": "Sin capturas",
+      "emptyBody": "Haz una foto para empezar",
       "emptySubtext": "Toma una foto para empezar",
       "deleteConfirm": "¿Eliminar esta captura?",
+      "deleteLabel": "Eliminar",
       "screenshotAlt": "Captura {n}"
     },
     "preview": {
       "downloaded": "Captura descargada",
       "deleteConfirm": "¿Eliminar esta captura?",
       "deleted": "Captura eliminada",
+      "prev": "Anterior",
+      "next": "Siguiente",
       "prevAriaLabel": "Anterior",
       "nextAriaLabel": "Siguiente",
       "download": "Descargar",
@@ -36,17 +40,21 @@
       "imageAlt": "Vista previa de captura"
     },
     "metadata": {
-      "timestamp": "Fecha y hora",
+      "timestamp": "Marca de tiempo",
       "location": "Ubicación",
       "position": "Posición:",
-      "lookingAt": "Mirando a:",
+      "lookingAt": "Mirando hacia:",
+      "detected": "Detectados ({count})",
       "detectedHeading": "Detectados ({count})",
+      "typeStatue": "Estatua",
+      "typeNpc": "NPC",
+      "typeEntity": "Entidad",
       "pokemon": "Pokémon",
       "statue": "Estatua",
       "npc": "NPC",
       "entity": "Entidad",
       "distanceCoverage": "{distance}m · {coverage}% visible",
-      "noMetadata": "No hay metadatos disponibles para esta captura"
+      "noMetadata": "Sin metadatos para esta captura"
     },
     "flashlight": {
       "turnOff": "Apagar linterna",

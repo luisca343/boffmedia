@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import type { ArcadeInventoryItem } from "@boffmedia/shared"
 import { remaining } from "../../_utils/inventory"
 import { RARITY_ORDER, raritySkin, type ArRarity, type ItemRarity } from "../../_utils/rarity"
@@ -17,6 +18,7 @@ export interface CollectionStatsProps {
  * completion / milestone" panel has no backing data and is not rendered.
  */
 export function CollectionStats({ items }: CollectionStatsProps) {
+  const t = useTranslations("arcade")
   const unique = items.length
   const total = items.reduce((sum, item) => sum + remaining(item), 0)
 
@@ -29,23 +31,23 @@ export function CollectionStats({ items }: CollectionStatsProps) {
   return (
     <div className="mb-4 grid gap-3 lg:grid-cols-[repeat(2,minmax(0,1fr))_1.6fr]">
       <StatCard
-        kicker="Objetos únicos"
+        kicker={t("coleccion.stats.uniqueItems")}
         value={unique}
-        sub="entradas en la colección"
+        sub={t("coleccion.stats.entries")}
         tone="cyan"
         icon={<Icon.Grid s={18} />}
       />
       <StatCard
-        kicker="Objetos totales"
+        kicker={t("coleccion.stats.totalItems")}
         value={total}
-        sub="unidades sin reclamar"
+        sub={t("coleccion.stats.unclaimed")}
         tone="amber"
         icon={<Icon.Box s={18} />}
       />
 
       <Panel tone="deep" tight>
         <div className="mb-2.5 font-ar-display text-[8px] uppercase tracking-[0.12em] text-ar-violet-2">
-          Por rareza
+          {t("coleccion.stats.byRarity")}
         </div>
         <ul className="flex flex-col gap-1.5">
           {byRarity.map(({ rarity, count }) => {

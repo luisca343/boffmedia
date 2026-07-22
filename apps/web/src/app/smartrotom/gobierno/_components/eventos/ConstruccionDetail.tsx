@@ -1,26 +1,28 @@
 "use client"
 
 import { useMemo, useState } from "react"
+import { useTranslations } from "next-intl"
 import { Avatar, Badge, Bar, Button, Card, Empty, Field, Modal, Sunken, TextArea, Icon, Table, THead, TBody, TH, TR, TD } from "../ui"
 import { useCreateObra, useUpdateEvento } from "../../_hooks/queries"
 import { fmtDateTime } from "../../_utils/format"
 import type { Evento, Obra } from "../../_types"
 import { BackToEventos, BuildSlot, Countdown, RankMark, ScoreDisplay, eventoStatusMeta } from "./shared"
 
-const CAT_LABELS: Record<"diseno" | "ambicion" | "fidelidad", string> = {
-  diseno: "Diseño",
-  ambicion: "Ambición",
-  fidelidad: "Fidelidad al tema",
-}
-
 /** The wire has no combined score — it's the simple average of the three vote categories. */
 const score10 = (o: Obra) => (o.diseno + o.ambicion + o.fidelidad) / 3
 
 export function ConstruccionDetail({ ev }: { ev: Evento }) {
-  const status = eventoStatusMeta(ev.status)
+  const t = useTranslations("gobierno")
+  const status = eventoStatusMeta(ev.status, t)
   const closed = ev.status === "closed"
   const canClose = ev.status === "rating"
   const canRegister = !closed
+
+  const catLabels: Record<"diseno" | "ambicion" | "fidelidad", string> = {
+    diseno: t("eventos.diseno"),
+    ambicion: t("eventos.ambicion"),
+    fidelidad: t("eventos.fidelidadTema"),
+  }
 
   const [registering, setRegistering] = useState(false)
   const [confirmClose, setConfirmClose] = useState(false)
@@ -40,12 +42,12 @@ export function ConstruccionDetail({ ev }: { ev: Evento }) {
       <Card edgeGold className="mb-[18px] overflow-hidden">
         <div className="grid grid-cols-1 md:grid-cols-[200px_1fr]">
           <div className="hidden md:block">
-            <BuildSlot icon="building" label="maqueta del reto" className="h-full" />
+            <BuildSlot icon="building" label={t("eventos.maquetaReto")} className="h-full" />
           </div>
           <div className="p-5">
             <div className="mb-2.5 flex flex-wrap items-center gap-2">
               <Badge tone="urbanismo" icon="building">
-                Reto de construcción
+                {t("eventos.retoConstruccionBadge")}
               </Badge>
               <Badge tone={status.tone} dot={status.dot}>
                 {status.label}
@@ -53,7 +55,7 @@ export function ConstruccionDetail({ ev }: { ev: Evento }) {
               <span className="font-gt-mono text-[10.5px] text-gt-ink-400">{ev.code}</span>
               {ev.status === "rating" && (
                 <div className="ml-auto">
-                  <Countdown iso={ev.ratingClosesAt} label="Valoración cierra en" />
+                  <Countdown iso={ev.ratingClosesAt} label={t("eventos.valoracionCierraEn")} />
                 </div>
               )}
             </div>
@@ -62,23 +64,23 @@ export function ConstruccionDetail({ ev }: { ev: Evento }) {
               {ev.prize && (
                 <div>
                   <div className="mb-0.5 font-gt-mono text-[8.5px] uppercase tracking-[.12em] text-gt-ink-400">
-                    Premio
+                    {t("eventos.premioLabel")}
                   </div>
                   <div className="font-gt-display text-[13.5px] font-bold text-gt-gold-600">{ev.prize}</div>
                 </div>
               )}
               <div>
                 <div className="mb-0.5 font-gt-mono text-[8.5px] uppercase tracking-[.12em] text-gt-ink-400">
-                  Participan
+                  {t("eventos.participanLabel")}
                 </div>
                 <div className="font-gt-display text-[13.5px] font-bold text-gt-ink-800">
-                  {ranked.length} ciudad{ranked.length === 1 ? "" : "es"}
+                  {t("eventos.ciudades", { count: ranked.length, plural: ranked.length === 1 ? "" : "es" })}
                 </div>
               </div>
               {ev.crew && (
                 <div>
                   <div className="mb-0.5 font-gt-mono text-[8.5px] uppercase tracking-[.12em] text-gt-ink-400">
-                    Cuadrilla
+                    {t("eventos.cuadrillaLabel")}
                   </div>
                   <div className="font-gt-display text-[13.5px] font-bold text-gt-ink-800">{ev.crew}</div>
                 </div>
@@ -86,7 +88,7 @@ export function ConstruccionDetail({ ev }: { ev: Evento }) {
               {ev.buildClosedAt && (
                 <div>
                   <div className="mb-0.5 font-gt-mono text-[8.5px] uppercase tracking-[.12em] text-gt-ink-400">
-                    Fin construcción
+                    {t("eventos.finConstruccionLabel")}
                   </div>
                   <div className="font-gt-mono text-[13px] text-gt-ink-700">{fmtDateTime(ev.buildClosedAt)}</div>
                 </div>
@@ -99,12 +101,12 @@ export function ConstruccionDetail({ ev }: { ev: Evento }) {
       <div className="mb-5 flex flex-wrap items-center gap-2.5">
         {canRegister && (
           <Button icon="plus" tone="primary" onClick={() => setRegistering(true)}>
-            Registrar obra
+            {t("eventos.registrarObra")}
           </Button>
         )}
         {canClose && (
           <Button icon="checkCircle" tone="gold" onClick={() => setConfirmClose(true)}>
-            Cerrar valoración y publicar ganador
+            {t("eventos.cerrarValoracion")}
           </Button>
         )}
       </div>
@@ -112,14 +114,14 @@ export function ConstruccionDetail({ ev }: { ev: Evento }) {
       {ranked.length === 0 ? (
         <Empty
           icon="building"
-          title="Todavía no hay obras registradas"
-          sub="Registra cada obra a medida que las ciudades terminen de construir. Los jugadores de otras ciudades las valorarán."
+          title={t("eventos.emptyObras")}
+          sub={t("eventos.emptyObrasSub")}
         />
       ) : (
         <>
           <div className="mb-3 flex flex-wrap items-center justify-between gap-2.5">
             <Bar icon="award" dep="urbanismo">
-              Clasificación{closed ? " final" : " provisional"}
+              {t("eventos.clasificacion")}{closed ? t("eventos.clasificacionFinal") : t("eventos.clasificacionProvisional")}
             </Bar>
           </div>
 
@@ -127,11 +129,11 @@ export function ConstruccionDetail({ ev }: { ev: Evento }) {
             <Table>
               <THead>
                 <TR>
-                  <TH className="w-[70px]">Puesto</TH>
-                  <TH>Ciudad y obra</TH>
-                  <TH>Cuadrilla</TH>
-                  <TH className="text-center">Votos</TH>
-                  <TH className="text-right">Valoración</TH>
+                  <TH className="w-[70px]">{t("eventos.puesto")}</TH>
+                  <TH>{t("eventos.ciudadObra")}</TH>
+                  <TH>{t("eventos.cuadrillaCol")}</TH>
+                  <TH className="text-center">{t("eventos.votos")}</TH>
+                  <TH className="text-right">{t("eventos.valoracion")}</TH>
                 </TR>
               </THead>
               <TBody>
@@ -149,7 +151,7 @@ export function ConstruccionDetail({ ev }: { ev: Evento }) {
                           </div>
                           <div className="font-gt-mono text-[10.5px] text-gt-ink-400">
                             {townLabel(r.town)}
-                            {isWinner && " · ganadora"}
+                            {isWinner && t("eventos.ganadora")}
                           </div>
                         </div>
                       </TD>
@@ -182,12 +184,12 @@ export function ConstruccionDetail({ ev }: { ev: Evento }) {
           </Card>
 
           <Bar icon="building" dep="urbanismo">
-            Obras presentadas
+            {t("eventos.obrasPresentadas")}
           </Bar>
           <div className="mt-3.5 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {ranked.map((r, i) => (
               <Card key={r.id} dep="urbanismo" className="overflow-hidden">
-                <BuildSlot icon="building" label={`obra de ${townLabel(r.town)}`} className="h-[120px]" />
+                <BuildSlot icon="building" label={t("eventos.obraDe", { town: townLabel(r.town) })} className="h-[120px]" />
                 <div className="p-3.5">
                   <div className="mb-2 flex items-center justify-between">
                     <span className="font-gt-mono text-[10.5px] text-gt-ink-500">{townLabel(r.town)}</span>
@@ -198,10 +200,10 @@ export function ConstruccionDetail({ ev }: { ev: Evento }) {
                     <p className="mb-3 text-xs leading-relaxed text-gt-ink-600">{r.description}</p>
                   )}
                   <Sunken className="grid gap-1.5 p-2.5">
-                    {(Object.keys(CAT_LABELS) as (keyof typeof CAT_LABELS)[]).map((k) => (
+                    {(Object.keys(catLabels) as (keyof typeof catLabels)[]).map((k) => (
                       <div key={k}>
                         <div className="mb-0.5 flex items-center justify-between">
-                          <span className="text-[10.5px] text-gt-ink-500">{CAT_LABELS[k]}</span>
+                          <span className="text-[10.5px] text-gt-ink-500">{catLabels[k]}</span>
                           <span className="font-gt-mono text-[10px] tabular-nums text-gt-ink-600">
                             {r.votes > 0 ? r[k].toFixed(1) : "—"}
                           </span>
@@ -227,22 +229,21 @@ export function ConstruccionDetail({ ev }: { ev: Evento }) {
       <Modal
         open={confirmClose}
         onClose={() => setConfirmClose(false)}
-        title="Cerrar valoración"
-        kicker="Confirmar"
+        title={t("eventos.cerrarValoracionTitle")}
+        kicker={t("eventos.confirmar")}
         footer={
           <>
             <Button tone="ghost" onClick={() => setConfirmClose(false)}>
-              Cancelar
+              {t("common.cancel")}
             </Button>
             <Button tone="gold" icon="checkCircle" onClick={closeEvento}>
-              Cerrar y publicar ganador
+              {t("eventos.cerrarPublicarGanador")}
             </Button>
           </>
         }
       >
         <p className="text-[13.5px] leading-relaxed text-gt-ink-700">
-          Se cerrará la valoración de <strong>{ev.title}</strong> y se publicará la obra ganadora. Esta acción no se
-          puede deshacer.
+          {t("eventos.cerrarDescription", { title: ev.title })}
         </p>
       </Modal>
     </>
@@ -262,6 +263,7 @@ function RegistrarObraModal({
   eventoId: number
   onClose: () => void
 }) {
+  const t = useTranslations("gobierno")
   const createObra = useCreateObra()
   const [town, setTown] = useState("")
   const [buildName, setBuildName] = useState("")
@@ -293,45 +295,44 @@ function RegistrarObraModal({
     <Modal
       open={open}
       onClose={onClose}
-      title="Registrar obra"
-      kicker="Reto de construcción"
+      title={t("eventos.registrarObraTitle")}
+      kicker={t("eventos.registrarObraKicker")}
       footer={
         <>
           <Button tone="ghost" onClick={onClose}>
-            Cancelar
+            {t("common.cancel")}
           </Button>
           <Button tone="primary" icon="plus" disabled={!valid || createObra.isPending} onClick={submit}>
-            Registrar
+            {t("eventos.registrar")}
           </Button>
         </>
       }
     >
       <div className="grid gap-3.5">
         <Field
-          label="Ciudad (identificador WorldGuard)"
+          label={t("eventos.ciudadWG")}
           value={town}
           onChange={setTown}
-          placeholder="Ej. ciudad_carmin"
+          placeholder={t("eventos.ciudadPlaceholder")}
           mono
         />
-        <Field label="Nombre de la obra" value={buildName} onChange={setBuildName} placeholder="Ej. El Faro de Charizard" />
+        <Field label={t("eventos.nombreObra")} value={buildName} onChange={setBuildName} placeholder={t("eventos.nombreObraPlaceholder")} />
         <TextArea
-          label="Descripción"
+          label={t("eventos.descripcion")}
           value={description}
           onChange={setDescription}
           rows={3}
-          placeholder="Qué han construido, materiales, detalles a destacar…"
+          placeholder={t("eventos.descripcionPlaceholder")}
         />
         <Field
-          label="Cuadrilla (usuarios separados por comas)"
+          label={t("eventos.cuadrillaUsuarios")}
           value={builders}
           onChange={setBuilders}
-          placeholder="Ej. LtSurgeVolt, BlaineFuego"
+          placeholder={t("eventos.cuadrillaUsuariosPlaceholder")}
         />
         <div className="flex items-start gap-2 rounded-gt-sm bg-gt-paper-2 p-2.5 text-[11.5px] leading-relaxed text-gt-ink-500">
           <Icon name="alert" size={13} className="mt-0.5 flex-none text-gt-ink-400" />
-          La valoración (diseño, ambición, fidelidad) la emiten los jugadores desde su app — aquí solo se registra la
-          obra presentada.
+          {t("eventos.valoracionHint2")}
         </div>
       </div>
     </Modal>

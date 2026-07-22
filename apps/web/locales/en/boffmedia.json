@@ -19,7 +19,22 @@
       "disabled": "Disabled",
       "selectElement": "Select an element",
       "searchElement": "Search element",
-      "noElementFound": "No element found"
+      "noElementFound": "No element found",
+      "comboboxPlaceholder": "Select an option",
+      "comboboxPreviewAlt": "Preview"
+    },
+    "unauthorized": {
+      "title": "Restricted access",
+      "body": "You do not have permission to view this page. If you think this is an error, contact the administrator.",
+      "back": "Go back",
+      "home": "Go to home"
+    },
+    "contact": {
+      "nameLabel": "Name",
+      "emailLabel": "Email Address",
+      "messageLabel": "Message",
+      "successMessage": "Message sent. Thank you for contacting us!",
+      "submit": "Send"
     },
     "featuredGames": {
       "title": "Featured Games and Tools",

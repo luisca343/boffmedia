@@ -1,6 +1,7 @@
 "use client"
 
 import { useCallback, useEffect, useMemo, useState } from "react"
+import { useTranslations } from "next-intl"
 import { useBoffSession } from "@/services/useBoffSession"
 import { useRotomUuid } from "@/components/smartrotom/behavior/useRotomUuid"
 import { MapCanvas } from "./_components/map/MapCanvas"
@@ -25,9 +26,10 @@ type Flow = "idle" | "confirm" | "insufficient" | "traveling"
 const SHEET_RATIO = 0.46
 
 export default function TaxiPage() {
+  const t = useTranslations("taxi")
   const { session } = useBoffSession()
   const uuid = useRotomUuid() ?? undefined
-  const playerName = session?.user?.name ?? "Entrenador"
+  const playerName = session?.user?.name ?? t("playerFallback")
 
   const stopsQuery = useStops()
   const regionsQuery = useRegions()
@@ -66,7 +68,7 @@ export default function TaxiPage() {
   )
 
   useEffect(() => {
-    if (stopsQuery.isError) toast.error("No se pudieron cargar las paradas de taxi")
+    if (stopsQuery.isError) toast.error(t("loadStopsError"))
   }, [stopsQuery.isError])
 
   const onSelect = useCallback(

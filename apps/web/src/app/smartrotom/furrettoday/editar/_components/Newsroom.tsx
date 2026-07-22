@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { useTranslations } from "next-intl";
 
 import {
   useDeleteArticle,
@@ -29,15 +30,16 @@ function escapeHtml(value: string): string {
  * So any change that would leave zero featured articles is refused
  * client-side rather than sent, with a toast explaining why.
  */
-function requireFeatured(featured: number | null): featured is number {
+function requireFeatured(featured: number | null, message: string): featured is number {
   if (featured == null) {
-    toast.error("Elige primero una noticia destacada.");
+    toast.error(message);
     return false;
   }
   return true;
 }
 
 export function Newsroom({ initialId = null }: { initialId?: number | null }) {
+  const t = useTranslations("furrettoday");
   const { articles, isLoading } = useNewsroom();
   const saveArticle = useSaveArticle();
   const deleteArticle = useDeleteArticle();
@@ -100,12 +102,12 @@ export function Newsroom({ initialId = null }: { initialId?: number | null }) {
         : featuredId
       : (featuredId ?? article.id);
 
-    if (!requireFeatured(nextFeatured)) return;
+    if (!requireFeatured(nextFeatured, t("newsroom.chooseFeatureFirst"))) return;
     updateStatus.mutate(
       { published: nextPublished, featured: nextFeatured },
       {
         onSuccess: () => toast(article.published ? "Vuelve a borrador." : "Publicada."),
-        onError: () => toast.error("No se pudo actualizar el estado."),
+        onError: () => toast.error(t("newsroom.updateStatusError")),
       },
     );
   }
@@ -115,7 +117,7 @@ export function Newsroom({ initialId = null }: { initialId?: number | null }) {
     const publishedIds = articles.filter((a) => a.published).map((a) => a.id);
 
     const nextFeatured = featuredId === article.id ? null : article.id;
-    if (!requireFeatured(nextFeatured)) return;
+    if (!requireFeatured(nextFeatured, t("newsroom.chooseFeatureFirst"))) return;
     const nextPublished = publishedIds.includes(nextFeatured)
       ? publishedIds
       : [...publishedIds, nextFeatured];
@@ -123,8 +125,8 @@ export function Newsroom({ initialId = null }: { initialId?: number | null }) {
     updateStatus.mutate(
       { published: nextPublished, featured: nextFeatured },
       {
-        onSuccess: () => toast("Ahora es la portada del número."),
-        onError: () => toast.error("No se pudo actualizar el estado."),
+        onSuccess: () => toast(t("newsroom.setCoverSuccess")),
+        onError: () => toast.error(t("newsroom.updateStatusError")),
       },
     );
   }
@@ -134,13 +136,13 @@ export function Newsroom({ initialId = null }: { initialId?: number | null }) {
     const id = pendingDeleteId;
     deleteArticle.mutate(id, {
       onSuccess: () => {
-        toast.error("Noticia eliminada.");
+        toast(t("newsroom.deleteSuccess"));
         if (selectedId === id) {
           const remaining = sorted.filter((a) => a.id !== id);
           setSelectedId(remaining[0]?.id ?? null);
         }
       },
-      onError: () => toast.error("No se pudo eliminar."),
+      onError: () => toast.error(t("newsroom.deleteError")),
     });
     setPendingDeleteId(null);
   }
@@ -166,9 +168,9 @@ export function Newsroom({ initialId = null }: { initialId?: number | null }) {
         onSuccess: (saved) => {
           setSelectedId(saved.id);
           setNewOpen(false);
-          toast("Borrador creado. ¡A escribir!");
+          toast(t("newsroom.draftCreated"));
         },
-        onError: () => toast.error("No se pudo crear el borrador."),
+        onError: () => toast.error(t("newsroom.draftError")),
       },
     );
   }
