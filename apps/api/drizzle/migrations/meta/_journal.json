@@ -232,6 +232,13 @@
       "when": 1784491286233,
       "tag": "0032_lively_spacker_dave",
       "breakpoints": true
+    },
+    {
+      "idx": 33,
+      "version": "5",
+      "when": 1784720600149,
+      "tag": "0033_chat_read_receipts_pk",
+      "breakpoints": true
     }
   ]
 }

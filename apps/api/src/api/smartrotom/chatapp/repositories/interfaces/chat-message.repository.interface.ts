@@ -16,6 +16,9 @@ export interface IMessageRepository {
     messageId: number,
     uuid: string,
   ): Promise<{ insertId: number }>;
+  markMessagesAsRead(messageIds: number[], uuid: string): Promise<void>;
+  findUnreadMessageIds(chatId: number, uuid: string): Promise<number[]>;
+  countUnreadMessages(chatId: number, uuid: string): Promise<number>;
   findMessageReads(messageId: number): Promise<{ uuid: string }[]>;
   findMessageChatId(messageId: number): Promise<number | null>;
   hasRead(messageId: number, uuid: string): Promise<boolean>;

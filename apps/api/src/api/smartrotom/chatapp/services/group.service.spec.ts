@@ -25,6 +25,7 @@ const mockMessageRepo = {
   findChatMessages: jest.fn(),
   findReactionsForMessages: jest.fn(),
   findReadsForMessages: jest.fn(),
+  countUnreadMessages: jest.fn(),
 };
 
 const mockUserRepo = {
@@ -62,6 +63,7 @@ describe('GroupService', () => {
     mockMemberRepo.findChatMembers.mockResolvedValue([]);
     mockMessageRepo.findReactionsForMessages.mockResolvedValue([]);
     mockMessageRepo.findReadsForMessages.mockResolvedValue([]);
+    mockMessageRepo.countUnreadMessages.mockResolvedValue(0);
     mockMemberRepo.findMemberFlags.mockResolvedValue({
       pinned: false,
       muted: false,
@@ -169,6 +171,18 @@ describe('GroupService', () => {
       const group = await service.getGroupById(1, UUID);
 
       expect(group.id).toBe(1);
+    });
+
+    it('takes unread from the full-history count, not the 50 loaded messages', async () => {
+      mockChatRepo.findChatById.mockResolvedValue(makeChat(1, 3));
+      mockMemberRepo.findUserInChat.mockResolvedValue(makeMember(UUID));
+      mockMessageRepo.findChatMessages.mockResolvedValue([]);
+      mockMessageRepo.countUnreadMessages.mockResolvedValue(137);
+
+      const group = await service.getGroupById(1, UUID);
+
+      expect(group.unread).toBe(137);
+      expect(mockMessageRepo.countUnreadMessages).toHaveBeenCalledWith(1, UUID);
     });
   });
 

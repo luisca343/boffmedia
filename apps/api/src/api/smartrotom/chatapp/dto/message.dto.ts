@@ -109,6 +109,16 @@ export class ReactMessageDto extends BaseDto {
   emoji: string;
 }
 
+export class MarkChatReadDto extends BaseDto {
+  @ApiProperty({
+    description: 'User UUID',
+    example: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4',
+  })
+  @IsNotEmpty()
+  @IsString()
+  uuid: string;
+}
+
 export class MarkMessageReadDto extends BaseDto {
   @ApiProperty({
     description: 'Message ID',

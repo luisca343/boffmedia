@@ -1,13 +1,12 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { MySql2Database } from 'drizzle-orm/mysql2';
-import { eq, asc, desc, and, inArray } from 'drizzle-orm';
+import { eq, asc, desc, and, inArray, ne, isNull, sql } from 'drizzle-orm';
 import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
 import {
   rotomChatMessages,
   rotomChatMessageReads,
   rotomChatMessageReactions,
   RotomChatMessage,
-  RotomChatMessageRead,
 } from '@/_db/schema/SmartRotomChat';
 import { ChatMessage } from '../entities/chat.entity';
 
@@ -98,13 +97,63 @@ export class ChatMessageRepository {
     messageId: number,
     uuid: string,
   ): Promise<{ insertId: number }> {
-    const result = await this.db.insert(rotomChatMessageReads).values({
-      messageId,
-      uuid,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    } as RotomChatMessageRead);
+    const result = await this.db
+      .insert(rotomChatMessageReads)
+      .values({ messageId, uuid })
+      .onDuplicateKeyUpdate({ set: { uuid } });
     return { insertId: result[0].insertId };
+  }
+
+  async markMessagesAsRead(messageIds: number[], uuid: string): Promise<void> {
+    if (messageIds.length === 0) return;
+    await this.db
+      .insert(rotomChatMessageReads)
+      .values(messageIds.map((messageId) => ({ messageId, uuid })))
+      .onDuplicateKeyUpdate({ set: { uuid } });
+  }
+
+  /** Ids of every message in the chat the user has not read; excludes their own. */
+  async findUnreadMessageIds(chatId: number, uuid: string): Promise<number[]> {
+    const rows = await this.db
+      .select({ id: rotomChatMessages.id })
+      .from(rotomChatMessages)
+      .leftJoin(
+        rotomChatMessageReads,
+        and(
+          eq(rotomChatMessageReads.messageId, rotomChatMessages.id),
+          eq(rotomChatMessageReads.uuid, uuid),
+        ),
+      )
+      .where(
+        and(
+          eq(rotomChatMessages.chatId, chatId),
+          ne(rotomChatMessages.senderUUID, uuid),
+          isNull(rotomChatMessageReads.messageId),
+        ),
+      );
+    return rows.map((r) => r.id);
+  }
+
+  /** Same predicate as findUnreadMessageIds, counted over the chat's full history. */
+  async countUnreadMessages(chatId: number, uuid: string): Promise<number> {
+    const rows = await this.db
+      .select({ total: sql<number>`count(*)` })
+      .from(rotomChatMessages)
+      .leftJoin(
+        rotomChatMessageReads,
+        and(
+          eq(rotomChatMessageReads.messageId, rotomChatMessages.id),
+          eq(rotomChatMessageReads.uuid, uuid),
+        ),
+      )
+      .where(
+        and(
+          eq(rotomChatMessages.chatId, chatId),
+          ne(rotomChatMessages.senderUUID, uuid),
+          isNull(rotomChatMessageReads.messageId),
+        ),
+      );
+    return Number(rows[0]?.total ?? 0);
   }
 
   async findMessageReads(messageId: number): Promise<{ uuid: string }[]> {

@@ -35,6 +35,7 @@ import {
   UpdateMessageDto,
   DeleteMessageDto,
   MarkMessageReadDto,
+  MarkChatReadDto,
   ReactMessageDto,
 } from './dto/message.dto';
 import { AddMemberDto, RemoveMemberDto } from './dto/group.dto';
@@ -46,6 +47,7 @@ import {
   RotomMessage,
   CreateMessageResponse,
   MessageResponse,
+  MarkChatReadResponse,
 } from './entities/message.entity';
 import { CallSession, CallResponse } from './entities/call.entity';
 
@@ -281,6 +283,30 @@ export class ChatappController {
       messageIdNum,
       markReadDto.uuid,
     );
+  }
+
+  @Post('chat/:chatId/read')
+  @ApiOperation({
+    summary: "Mark every unread message in a chat as read for a user",
+  })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Chat marked as read successfully.',
+    type: MarkChatReadResponse,
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'Chat not found.',
+  })
+  @ApiParam({ name: 'chatId', description: 'Chat ID' })
+  @ApiBody({ type: MarkChatReadDto })
+  async markChatAsRead(
+    @Param('chatId') chatId: string,
+    @Body() dto: MarkChatReadDto,
+  ): Promise<MarkChatReadResponse> {
+    const id = parseInt(chatId, 10);
+    if (isNaN(id)) throw new Error('Invalid chat ID');
+    return await this.chatappFacadeService.markChatAsRead(id, dto.uuid);
   }
 
   @Post('message/:messageId/react')
