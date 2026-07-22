@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import { useTranslations } from "next-intl"
 import {
   Avatar,
   Badge,
@@ -34,6 +35,7 @@ const UUID_RE = /^[0-9a-f]{8}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{1
 // account. Bidding needs the citizen's uuid — there is no player-search endpoint in scope
 // yet (that is the Población/Censo module, not built), so the officer enters it directly.
 export function SubastasBoard() {
+  const t = useTranslations("gobierno")
   const { data, isLoading, isError } = useSubastas({ limit: 100 })
   const { data: parcelas } = useParcelas({ limit: 100 })
   const officer = useOfficer()
@@ -59,13 +61,13 @@ export function SubastasBoard() {
   return (
     <div>
       <PageHead
-        kicker="Urbanismo · Patrimonio"
+        kicker={t("subastas.kicker")}
         dep="urbanismo"
-        title="Subastas de parcelas"
-        sub="Parcelas vacantes o embargadas sacadas a subasta pública. Puja por terreno o adjudícalo al mejor postor."
+        title={t("subastas.title")}
+        sub={t("subastas.sub")}
         right={
           <Button icon="plus" tone="gold" onClick={() => setCreating(true)}>
-            Nueva subasta
+            {t("subastas.nuevaSubasta")}
           </Button>
         }
       />
@@ -78,7 +80,7 @@ export function SubastasBoard() {
         </div>
       ) : isError ? (
         <Card className="mb-6">
-          <Empty icon="alert" title="No se pudieron cargar las subastas" sub="Inténtalo de nuevo en unos minutos." />
+          <Empty icon="alert" title={t("subastas.errorCarga")} sub={t("subastas.errorCargaSub")} />
         </Card>
       ) : (
         <>
@@ -90,27 +92,27 @@ export function SubastasBoard() {
             </div>
           ) : (
             <Card className="mb-6">
-              <Empty icon="gavel" title="Sin subastas en curso" sub="No hay ninguna parcela a subasta pública en este momento." />
+              <Empty icon="gavel" title={t("subastas.sinSubastasEnCurso")} sub={t("subastas.sinSubastasEnCursoSub")} />
             </Card>
           )}
 
           <div className="mb-3 flex items-center gap-2.5 border-b border-gt-line px-1 pb-[11px]">
             <Icon name="history" size={16} className="text-gt-dep-urbanismo" />
-            <span className="font-gt-display text-base font-bold text-gt-ink-900">Subastas cerradas</span>
+            <span className="font-gt-display text-base font-bold text-gt-ink-900">{t("subastas.subastasCerradas")}</span>
           </div>
           <Card className="overflow-hidden">
             {closed.length === 0 ? (
-              <Empty icon="scroll" title="Sin subastas cerradas" sub="Todavía no se ha adjudicado ninguna subasta." />
+              <Empty icon="scroll" title={t("subastas.sinSubastasCerradas")} sub={t("subastas.sinSubastasCerradasSub")} />
             ) : (
               <Table>
                 <THead>
                   <TR>
-                    <TH>Subasta</TH>
-                    <TH>Parcela</TH>
-                    <TH>Adjudicada a</TH>
-                    <TH>Importe final</TH>
-                    <TH>Motivo</TH>
-                    <TH>Estado</TH>
+                    <TH>{t("subastas.colSubasta")}</TH>
+                    <TH>{t("subastas.colParcela")}</TH>
+                    <TH>{t("subastas.colAdjudicada")}</TH>
+                    <TH>{t("subastas.colImporte")}</TH>
+                    <TH>{t("subastas.colMotivo")}</TH>
+                    <TH>{t("subastas.colEstado")}</TH>
                   </TR>
                 </THead>
                 <TBody>
@@ -135,7 +137,7 @@ export function SubastasBoard() {
                               {a.bidder.username}
                             </button>
                           ) : (
-                            <span className="italic text-gt-ink-400">— sin adjudicar —</span>
+                            <span className="italic text-gt-ink-400">{t("subastas.sinAdjudicar")}</span>
                           )}
                         </TD>
                         <TD>
@@ -173,6 +175,7 @@ export function SubastasBoard() {
 }
 
 function SubastaCard({ subasta: a, onOpenOwner }: { subasta: Subasta; onOpenOwner: (uuid: string) => void }) {
+  const t = useTranslations("gobierno")
   const puja = usePuja()
   const closeSubasta = useCloseSubasta()
 
@@ -206,13 +209,13 @@ function SubastaCard({ subasta: a, onOpenOwner }: { subasta: Subasta; onOpenOwne
       <div className="p-4">
         <div className="mb-1 flex items-center justify-between gap-2">
           <span className="font-gt-mono text-[11px] text-gt-ink-400">
-            {a.code} · {a.bids} pujas
+            {a.code} · {t("subastas.pujas", { count: a.bids })}
           </span>
           {a.reason && <span className="max-w-[160px] truncate text-[11px] text-gt-ink-400">{a.reason}</span>}
         </div>
         <div className="mb-3 flex items-end justify-between gap-2">
           <div>
-            <div className="font-gt-mono text-[9px] uppercase tracking-[.12em] text-gt-ink-400">Puja actual</div>
+            <div className="font-gt-mono text-[9px] uppercase tracking-[.12em] text-gt-ink-400">{t("subastas.pujaActual")}</div>
             <div className="font-gt-display text-[26px] font-bold tabular-nums text-gt-ink-900">
               {money(a.currentBid)} ₽
             </div>
@@ -227,13 +230,13 @@ function SubastaCard({ subasta: a, onOpenOwner }: { subasta: Subasta; onOpenOwne
               <span className="text-[12px] font-semibold text-gt-ink-700">{a.bidder.username}</span>
             </button>
           ) : (
-            <Badge tone="warn">Sin pujas</Badge>
+            <Badge tone="warn">{t("subastas.sinPujas")}</Badge>
           )}
         </div>
 
         {bidding ? (
           <div className="flex flex-col gap-2">
-            <Field mono value={bidUuid} onChange={setBidUuid} placeholder="UUID del jugador" />
+            <Field mono value={bidUuid} onChange={setBidUuid} placeholder={t("subastas.pujaUuidPlaceholder")} />
             <div className="flex gap-2">
               <Field type="number" mono value={bidAmount} onChange={setBidAmount} placeholder={`> ${a.currentBid}`} />
               <Button
@@ -246,23 +249,23 @@ function SubastaCard({ subasta: a, onOpenOwner }: { subasta: Subasta; onOpenOwne
                   )
                 }
               >
-                Pujar
+                {t("subastas.pujar")}
               </Button>
             </div>
           </div>
         ) : (
           <Button tone="gold" icon="gavel" className="w-full" onClick={() => setBidding(true)}>
-            Pujar por esta parcela
+            {t("subastas.pujarParcela")}
           </Button>
         )}
 
         <div className="mt-2.5 border-t border-gt-line-soft pt-2.5">
           {confirmClose ? (
             <div className="flex items-center justify-between gap-2">
-              <span className="text-[11.5px] text-gt-ink-500">¿Cerrar y adjudicar ahora?</span>
+              <span className="text-[11.5px] text-gt-ink-500">{t("subastas.confirmarCierre")}</span>
               <div className="flex gap-1.5">
                 <Button size="sm" tone="ghost" onClick={() => setConfirmClose(false)}>
-                  No
+                  {t("subastas.no")}
                 </Button>
                 <Button
                   size="sm"
@@ -270,7 +273,7 @@ function SubastaCard({ subasta: a, onOpenOwner }: { subasta: Subasta; onOpenOwne
                   disabled={closeSubasta.isPending}
                   onClick={() => closeSubasta.mutate(a.id, { onSuccess: () => setConfirmClose(false) })}
                 >
-                  Sí, cerrar
+                  {t("subastas.siCerrar")}
                 </Button>
               </div>
             </div>
@@ -280,7 +283,7 @@ function SubastaCard({ subasta: a, onOpenOwner }: { subasta: Subasta; onOpenOwne
               onClick={() => setConfirmClose(true)}
               className="text-[11.5px] font-semibold text-gt-ink-400 underline-offset-2 hover:text-gt-ink-700 hover:underline"
             >
-              Cerrar subasta ahora
+              {t("subastas.cerrarSubastaAhora")}
             </button>
           )}
         </div>
@@ -310,6 +313,7 @@ function NuevaSubastaModal({
     createdBy: string
   }) => void
 }) {
+  const t = useTranslations("gobierno")
   const [regionId, setRegionId] = useState(parcelas[0]?.regionId ?? "")
   const [startBid, setStartBid] = useState("5000")
   const [endsAt, setEndsAt] = useState("")
@@ -322,12 +326,12 @@ function NuevaSubastaModal({
     <Modal
       open
       onClose={onClose}
-      kicker="Urbanismo · Patrimonio"
-      title="Nueva subasta"
+      kicker={t("subastas.kicker")}
+      title={t("subastas.nuevaSubasta")}
       footer={
         <>
           <Button tone="ghost" onClick={onClose}>
-            Cancelar
+            {t("common.cancel")}
           </Button>
           <Button
             tone="primary"
@@ -345,7 +349,7 @@ function NuevaSubastaModal({
               })
             }
           >
-            {saving ? "Abriendo…" : "Abrir subasta"}
+            {saving ? t("common.opening") : t("subastas.abrirSubasta")}
           </Button>
         </>
       }
@@ -354,23 +358,23 @@ function NuevaSubastaModal({
         {parcelas.length === 0 ? (
           <Empty
             icon="mapPin"
-            title="No hay parcelas disponibles"
-            sub="Solo pueden subastarse parcelas vacantes o embargadas ya registradas en el catastro."
+            title={t("subastas.noParcelas")}
+            sub={t("subastas.noParcelasSub")}
           />
         ) : (
           <>
             <Select
-              label="Parcela"
+              label={t("urbanismo.parcela")}
               value={regionId}
               onChange={setRegionId}
               options={parcelas.map((p) => ({
                 value: p.regionId,
-                label: `${townName(p.town)} #${p.number} · ${p.status === "embargada" ? "Embargada" : "Vacante"}`,
+                label: `${townName(p.town)} #${p.number} · ${p.status === "embargada" ? t("urbanismo.embargadas") : t("urbanismo.vacantes")}`,
               }))}
             />
-            <Field label="Puja de salida (₽)" type="number" mono value={startBid} onChange={setStartBid} />
-            <Field label="Cierre" type="datetime-local" value={endsAt} onChange={setEndsAt} />
-            <Field label="Motivo (opcional)" value={reason} onChange={setReason} placeholder="Impago de impuestos…" />
+            <Field label={t("subastas.pujaInicial")} type="number" mono value={startBid} onChange={setStartBid} />
+            <Field label={t("subastas.cierre")} type="datetime-local" value={endsAt} onChange={setEndsAt} />
+            <Field label={t("subastas.motivo")} value={reason} onChange={setReason} placeholder={t("subastas.motivoPlaceholder")} />
           </>
         )}
       </div>

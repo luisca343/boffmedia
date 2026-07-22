@@ -41,7 +41,7 @@ export function ReelSpinner({ tiles, winningPosition, onRevealed }: ReelSpinnerP
     <div
       className="ar-scanlines relative h-[180px] overflow-hidden rounded-xl border-2 border-ar-cyan/45 bg-[#06031a] shadow-[inset_0_0_60px_rgb(var(--ar-cyan)/.12)]"
       role="img"
-      aria-label={spin.settled ? "Premio obtenido" : "Girando la caja"}
+      aria-label={spin.settled ? t("loot.reelAriaSettled") : t("loot.reelAriaSpinning")}
     >
       <div
         aria-hidden

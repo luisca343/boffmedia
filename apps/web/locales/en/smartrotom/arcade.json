@@ -157,7 +157,9 @@
       "saved": "Saved",
       "itemInCollection": "The item is already in your collection. You have {count, plural, one {# box} other {# boxes}} of this type left.",
       "reelNoServer": "The reel didn't arrive from the server, but the prize is still yours.",
-      "abriendo": "Opening"
+      "abriendo": "Opening",
+      "reelAriaSettled": "Prize obtained",
+      "reelAriaSpinning": "Spinning the box"
     },
     "coleccion": {
       "title": "Your collection",
@@ -177,14 +179,23 @@
         "uniqueItemsSub": "entries in the collection",
         "totalItems": "Total items",
         "totalItemsSub": "unclaimed units",
-        "byRarity": "By rarity"
+        "byRarity": "By rarity",
+        "entries": "collection entries",
+        "unclaimed": "unclaimed units"
       },
       "toolbar": {
         "all": "All",
         "items": "Items",
         "pokemon": "Pokémon",
         "mina": "Mine",
-        "box": "Boxes"
+        "box": "Boxes",
+        "typeItems": "Items",
+        "typeMine": "Mine",
+        "typeBoxes": "Boxes",
+        "searchPlaceholder": "Search my collection…",
+        "searchAriaLabel": "Search my collection",
+        "typeLabel": "Item type",
+        "allRarities": "All"
       },
       "claim": {
         "kicker": "▸ Claim rewards",
@@ -214,6 +225,16 @@
           "lootbox": "Loot box",
           "streak": "Daily streak"
         }
+      },
+      "grid": {
+        "emptyTitle": "No items yet",
+        "emptyBody": "Open loot boxes to start your collection.",
+        "goToBoxes": "Go to boxes",
+        "noMatchTitle": "No results",
+        "noMatchBody": "No items match the search or filter.",
+        "prev": "Previous",
+        "next": "Next",
+        "page": "Page {current} of {total}"
       }
     },
     "ajustes": {
@@ -241,7 +262,13 @@
         "bannerLabel": "Active banner",
         "sessionLabel": "Session",
         "connected": "Connected",
-        "resetsIn": "Resets in {time}"
+        "resetsIn": "Resets in {time}",
+        "uuid": "SmartRotom UUID",
+        "copied": "Copied",
+        "copy": "Copy",
+        "bannerActive": "Active banner",
+        "session": "Session",
+        "signOut": "Sign out"
       }
     },
     "squirdle": {
@@ -434,6 +461,16 @@
         "Regenerate deals a new dungeon with the same parameters.",
         "The debug view prints the grid in text: S start, R room, B boss, W wall."
       ]
+    },
+    "hud": {
+      "trainerFallback": "Trainer",
+      "streakDay": "Streak day",
+      "weeklyStreakProgress": "Weekly streak progress",
+      "rewardReady": "Reward ready",
+      "box": "{count, plural, one {box} other {boxes}}",
+      "resetsIn": "RESETS IN {resetIn}",
+      "syncing": "Syncing…",
+      "synced": "Synced"
     },
     "collectionGrid": {
       "noMatches": "No items match the filters.",

@@ -2,8 +2,8 @@
   "camara": {
     "page": {
       "screenshotSaved": "Screenshot saved to gallery",
-      "screenshotFailed": "Could not capture the screen",
-      "screenshotError": "Error capturing the screen"
+      "screenshotFailed": "Failed to capture screenshot",
+      "screenshotError": "Error capturing screenshot"
     },
     "album": {
       "title": "Album"
@@ -12,8 +12,8 @@
       "appName": "Camera"
     },
     "controls": {
-      "hideUi": "Hide interface",
-      "showUi": "Show interface",
+      "hideUi": "Hide UI",
+      "showUi": "Show UI",
       "uiOn": "UI: ON",
       "uiOff": "UI: OFF"
     },
@@ -21,14 +21,18 @@
       "title": "Gallery",
       "photoCount": "{count, plural, one {# photo} other {# photos}}",
       "emptyTitle": "No screenshots yet",
+      "emptyBody": "Take a photo to get started",
       "emptySubtext": "Take a photo to get started",
       "deleteConfirm": "Delete this screenshot?",
+      "deleteLabel": "Delete",
       "screenshotAlt": "Screenshot {n}"
     },
     "preview": {
       "downloaded": "Screenshot downloaded",
       "deleteConfirm": "Delete this screenshot?",
       "deleted": "Screenshot deleted",
+      "prev": "Previous",
+      "next": "Next",
       "prevAriaLabel": "Previous",
       "nextAriaLabel": "Next",
       "download": "Download",
@@ -36,11 +40,15 @@
       "imageAlt": "Screenshot preview"
     },
     "metadata": {
-      "timestamp": "Date and time",
+      "timestamp": "Timestamp",
       "location": "Location",
       "position": "Position:",
       "lookingAt": "Looking at:",
+      "detected": "Detected ({count})",
       "detectedHeading": "Detected ({count})",
+      "typeStatue": "Statue",
+      "typeNpc": "NPC",
+      "typeEntity": "Entity",
       "pokemon": "Pokémon",
       "statue": "Statue",
       "npc": "NPC",

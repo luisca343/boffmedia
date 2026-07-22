@@ -87,6 +87,15 @@
       "locked": "Sellada",
       "completed": "Completada",
       "failed": "Fallida"
+    },
+    "bitacora": {
+      "searchPlaceholder": "Buscar en la bitácora…",
+      "searchAriaLabel": "Buscar en la bitácora",
+      "emptyTitle": "Aún no hay diálogos registrados.",
+      "noResults": "Ninguna entrada coincide con esa búsqueda."
+    },
+    "letter": {
+      "unknownNpc": "un desconocido"
     }
   }
 }

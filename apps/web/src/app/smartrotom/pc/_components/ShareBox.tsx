@@ -20,7 +20,7 @@ function toBase64(text: string): string {
 }
 
 /** Copying is client-only: the async clipboard first, a hidden textarea when it is blocked. */
-function copyText(text: string, label: string): void {
+function copyText(text: string, label: string, errorMsg: string): void {
   const done = () => toast(`${label}`, "success")
   const fallback = () => {
     try {
@@ -34,7 +34,7 @@ function copyText(text: string, label: string): void {
       document.body.removeChild(ta)
       done()
     } catch {
-      toast("No se pudo copiar — selecciónalo manualmente", "error")
+      toast(errorMsg, "error")
     }
   }
 
@@ -135,7 +135,7 @@ export function ShareBox({ box, onClose }: ShareBoxProps) {
               // utility we could add here, so the code block sets them inline to win.
               style={{ fontSize: 11, lineHeight: 1.5, resize: "none" }}
             />
-            <Button variant="primary" aria-label={t("share.code")} onClick={() => copyText(code, t("share.copied"))}>
+            <Button variant="primary" aria-label={t("share.code")} onClick={() => copyText(code, t("share.copied"), t("share.copyError"))}>
               <Icon name="copy" size={15} />
             </Button>
           </div>
@@ -158,7 +158,7 @@ export function ShareBox({ box, onClose }: ShareBoxProps) {
               className="h-[120px] flex-1 font-pc-mono"
               style={{ fontSize: 11.5, lineHeight: 1.5, resize: "none" }}
             />
-            <Button aria-label={t("share.summary")} onClick={() => copyText(summary, t("share.summaryCopied"))}>
+            <Button aria-label={t("share.summary")} onClick={() => copyText(summary, t("share.summaryCopied"), t("share.copyError"))}>
               <Icon name="copy" size={15} />
             </Button>
           </div>

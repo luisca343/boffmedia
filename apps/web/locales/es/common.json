@@ -619,6 +619,24 @@
           }
         }
       }
+    },
+    "notFound": {
+      "heading": "Oops! Página no encontrada.",
+      "body": "Parece que te has aventurado en un territorio inexplorado. No te preocupes, incluso los mejores exploradores se pierden a veces.",
+      "cta": "¿Qué tal si volvemos a un lugar conocido?",
+      "home": "Volver al Inicio",
+      "back": "Página Anterior"
+    },
+    "error": {
+      "title": "¡Algo salió mal!",
+      "body": "Ha ocurrido un error inesperado.",
+      "messageLabel": "Mensaje de error:",
+      "unknown": "Error desconocido",
+      "trackingId": "ID de seguimiento:",
+      "retry": "Reintentar",
+      "home": "Inicio",
+      "helpText": "¿Necesitas ayuda?",
+      "discordLink": "Comunidad Discord"
     }
   }
 }

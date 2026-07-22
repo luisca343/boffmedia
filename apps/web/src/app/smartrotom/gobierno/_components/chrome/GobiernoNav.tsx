@@ -2,6 +2,7 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
+import { useTranslations } from "next-intl"
 import { Icon, Seal } from "../ui"
 import { NAV_GROUPS, hrefOf, type NavItem } from "../../_utils/nav"
 import { DEPARTMENTS, TONES } from "../../_utils/tones"
@@ -9,6 +10,7 @@ import { useOfficer } from "../../_hooks/useOfficer"
 import { useCounters } from "../../_hooks/queries"
 
 export function GobiernoNav() {
+  const t = useTranslations("gobierno")
   const pathname = usePathname()
   const { isAdmin } = useOfficer()
   const { data: counters } = useCounters()
@@ -22,7 +24,7 @@ export function GobiernoNav() {
     // Desktop: a 244px column of grouped departments. Below md it becomes a horizontal
     // scroller — the group labels drop away and the items run in one strip.
     <nav
-      aria-label="Departamentos"
+      aria-label={t("nav.ariaLabel")}
       className="gt-scroll flex flex-none gap-1.5 overflow-x-auto border-b border-gt-line-strong bg-gradient-to-b from-[#f3ecdd] to-[#efe7d6] p-2 md:w-[244px] md:flex-col md:gap-0 md:overflow-x-visible md:overflow-y-auto md:border-b-0 md:border-r md:px-3 md:pb-2.5 md:pt-3.5 lg:w-[244px]"
     >
       {NAV_GROUPS.filter((g) => !g.restricted || isAdmin).map((group) => {
@@ -78,9 +80,9 @@ export function GobiernoNav() {
         <div className="flex items-center gap-[7px]">
           <Seal size={26} ring={false} />
           <div className="font-gt-mono text-[9px] leading-normal text-gt-ink-400">
-            Plataforma cívica
+            {t("nav.plataformaCivica")}
             <br />
-            <span className="text-gt-ok">● Sistema operativo · v1.0</span>
+            <span className="text-gt-ok">● {t("nav.sistemaOperativo")}</span>
           </div>
         </div>
       </div>

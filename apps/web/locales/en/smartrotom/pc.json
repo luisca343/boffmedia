@@ -149,13 +149,24 @@
       "loadError": "Could not read your team",
       "loadErrorBody": "The game server didn't respond. Your boxes are still available."
     },
+    "box": {
+      "nameAriaLabel": "Box name",
+      "themeAriaLabel": "Box theme",
+      "organizeAriaLabel": "Organize or share this box",
+      "sortType": "Type",
+      "sortGen": "Generation",
+      "sortLevel": "Level",
+      "sortShiny": "Shiny first",
+      "sortDex": "Pokédex"
+    },
     "share": {
       "title": "Share box",
       "code": "Share code",
       "summary": "Readable summary",
       "hint": "Paste this code in another SmartRotom PC instance to import the box.",
       "copied": "Code copied",
-      "summaryCopied": "Summary copied"
+      "summaryCopied": "Summary copied",
+      "copyError": "Could not copy — select it manually"
     },
     "organize": {
       "by": "Auto-organize by",
@@ -179,6 +190,13 @@
       "prev": "Previous page",
       "next": "Next page",
       "selectAll": "Select all results (all pages)"
+    },
+    "drag": {
+      "dropHint": "Drop on a box to move multiple"
+    },
+    "moveQueue": {
+      "cancelled": "{label} cancelled — {applied} of {count} applied",
+      "interrupted": "{label} interrupted after {done} of {count} moves"
     }
   }
 }

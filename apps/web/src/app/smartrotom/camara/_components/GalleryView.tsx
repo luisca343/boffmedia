@@ -1,6 +1,7 @@
 import { Camera, X, Trash2 } from "lucide-react"
 import { Button } from "@/components/ui/primitives/button"
 import { useEffect } from "react"
+import { useTranslations } from "next-intl"
 import type { Screenshot } from "@/stores/cameraGalleryStore"
 
 interface GalleryViewProps {
@@ -11,6 +12,7 @@ interface GalleryViewProps {
 }
 
 export function GalleryView({ gallery, onClose, onImageClick, onDelete }: GalleryViewProps) {
+  const t = useTranslations("camara")
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
@@ -26,9 +28,9 @@ export function GalleryView({ gallery, onClose, onImageClick, onDelete }: Galler
     <div className="absolute inset-0 bg-black z-10 flex flex-col">
       <div className="flex justify-between items-center p-4 border-b border-gray-700 bg-black/80 backdrop-blur-sm">
         <div>
-          <h2 className="text-xl font-semibold">Gallery</h2>
+          <h2 className="text-xl font-semibold">{t("gallery.title")}</h2>
           <p className="text-sm text-gray-400">
-            {gallery.length} {gallery.length === 1 ? 'photo' : 'photos'}
+            {t("gallery.photoCount", { count: gallery.length })}
           </p>
         </div>
         <Button 
@@ -44,8 +46,8 @@ export function GalleryView({ gallery, onClose, onImageClick, onDelete }: Galler
         {gallery.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-gray-400">
             <Camera className="h-16 w-16 mb-4 opacity-50" />
-            <p className="text-lg">No screenshots yet</p>
-            <p className="text-sm">Take a photo to get started</p>
+            <p className="text-lg">{t("gallery.emptyTitle")}</p>
+            <p className="text-sm">{t("gallery.emptyBody")}</p>
           </div>
         ) : (
           <div className="grid grid-cols-2 gap-3">
@@ -70,12 +72,12 @@ export function GalleryView({ gallery, onClose, onImageClick, onDelete }: Galler
                 <button
                   onClick={(e) => {
                     e.stopPropagation()
-                    if (confirm('Delete this screenshot?')) {
+                    if (confirm(t("gallery.deleteConfirm"))) {
                       onDelete(idx)
                     }
                   }}
                   className="absolute top-2 right-2 p-2 rounded-full bg-red-500/80 text-white opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600 z-10"
-                  aria-label="Delete"
+                  aria-label={t("gallery.deleteLabel")}
                 >
                   <Trash2 className="h-4 w-4" />
                 </button>

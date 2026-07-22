@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 
 import { Button, FurretMascot, Input, toast } from "../../../_components/ui";
 import { useClap, useSubscribeNewsletter } from "../../../_hooks/queries";
@@ -12,6 +13,7 @@ import type { FtArticle } from "../../../_utils/article";
  * instead of fighting a baked-in background class.
  */
 export function ArticleFooter({ article }: { article: FtArticle }) {
+  const t = useTranslations("furrettoday");
   const clap = useClap(article.id);
   const subscribe = useSubscribeNewsletter();
   const [showSubscribe, setShowSubscribe] = useState(false);
@@ -25,7 +27,7 @@ export function ArticleFooter({ article }: { article: FtArticle }) {
       onSuccess: () => {
         setEmail("");
         setShowSubscribe(false);
-        toast("Te hemos guardado en la lista. Nos vemos el viernes.");
+        toast(t("footer.newsletterSuccess"));
       },
       onError: () =>
         toast.error("No hemos podido suscribirte. Inténtalo otra vez."),

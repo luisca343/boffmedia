@@ -1,7 +1,8 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { Avatar, Badge, Button, Card } from "../ui"
-import { ANUNCIO_KIND_META } from "./anuncioMeta"
+import { getAnuncioKindMeta } from "./anuncioMeta"
 import { fmtDate, townName } from "../../_utils/format"
 import { useGobiernoUi } from "../../_stores/useGobiernoUi"
 import { useOfficer } from "../../_hooks/useOfficer"
@@ -16,9 +17,11 @@ export function AnuncioCard({
   onEdit: () => void
   onDelete: () => void
 }) {
+  const t = useTranslations("gobierno")
   const openDossier = useGobiernoUi((s) => s.openDossier)
   const officer = useOfficer()
-  const km = ANUNCIO_KIND_META[anuncio.kind]
+  const kindMeta = getAnuncioKindMeta(t)
+  const km = kindMeta[anuncio.kind]
   const canManage = officer.isAdmin || officer.uuid === anuncio.author.uuid
 
   return (
@@ -42,9 +45,9 @@ export function AnuncioCard({
         {canManage && (
           <div className={`flex items-center gap-1 ${anuncio.town ? "" : "ml-auto"}`}>
             <Button tone="plain" size="sm" onClick={onEdit}>
-              Editar
+              {t("anuncios.editar")}
             </Button>
-            <Button tone="plain" size="sm" icon="trash" onClick={onDelete} aria-label="Retirar publicación" />
+            <Button tone="plain" size="sm" icon="trash" onClick={onDelete} aria-label={t("anuncios.retirar")} />
           </div>
         )}
       </div>

@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { RARITY_ORDER, raritySkin, type ItemRarity } from "../../_utils/rarity"
 import { Icon, Input, Panel, Segmented, type SegmentedOption } from "../../_components/ui"
@@ -7,13 +8,6 @@ import type { RarityFilter } from "../_hooks/useCollectionFilter"
 
 /** The API's five real tiers — `mythic` exists only as a showcase skin. */
 const RARITIES: ItemRarity[] = RARITY_ORDER.filter((r) => r !== "mythic") as ItemRarity[]
-
-const TYPE_LABEL: Record<string, string> = {
-  item: "Objetos",
-  pokemon: "Pokémon",
-  mina: "Mina",
-  box: "Cajas",
-}
 
 export interface CollectionToolbarProps {
   search: string
@@ -35,9 +29,18 @@ export function CollectionToolbar({
   onType,
   types,
 }: CollectionToolbarProps) {
+  const t = useTranslations("arcade")
+
+  const typeLabel: Record<string, string> = {
+    item: t("coleccion.toolbar.typeItems"),
+    pokemon: "Pokémon",
+    mina: t("coleccion.toolbar.typeMine"),
+    box: t("coleccion.toolbar.typeBoxes"),
+  }
+
   const typeOptions: SegmentedOption<string>[] = [
-    { value: "all", label: "Todo" },
-    ...types.map((value) => ({ value, label: TYPE_LABEL[value] ?? value })),
+    { value: "all", label: t("coleccion.toolbar.all") },
+    ...types.map((value) => ({ value, label: typeLabel[value] ?? value })),
   ]
 
   return (
@@ -50,14 +53,14 @@ export function CollectionToolbar({
           <Input
             value={search}
             onChange={(e) => onSearch(e.target.value)}
-            placeholder="Buscar en mi colección…"
-            aria-label="Buscar en mi colección"
+            placeholder={t("coleccion.toolbar.searchPlaceholder")}
+            aria-label={t("coleccion.toolbar.searchAriaLabel")}
             className="pl-9"
           />
         </div>
 
         {types.length > 1 && (
-          <Segmented options={typeOptions} value={type} onChange={onType} label="Tipo de objeto" />
+          <Segmented options={typeOptions} value={type} onChange={onType} label={t("coleccion.toolbar.typeLabel")} />
         )}
       </div>
 
@@ -73,7 +76,7 @@ export function CollectionToolbar({
               : "border-white/[.08] bg-white/[.04] text-ar-ink-dim hover:text-ar-ink",
           )}
         >
-          Todas
+          {t("coleccion.toolbar.allRarities")}
         </button>
 
         {RARITIES.map((r) => {

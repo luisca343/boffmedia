@@ -44,7 +44,8 @@
       "stepOf": "Paso {step} de {total}",
       "noResults": "Sin resultados",
       "activo": "Activa",
-      "inactivo": "Inactiva"
+      "inactivo": "Inactiva",
+      "horaOficial": "Hora oficial"
     },
     "nav": {
       "inicio": "Inicio",
@@ -67,7 +68,8 @@
       "eventos": "Eventos",
       "departamentos": "Departamentos",
       "plataformaCivica": "Plataforma cívica",
-      "sistemaOperativo": "Sistema operativo · v1.0"
+      "sistemaOperativo": "Sistema operativo · v1.0",
+      "ariaLabel": "Departamentos"
     },
     "header": {
       "title": "Gobierno de Teras",
@@ -76,7 +78,8 @@
     },
     "commandPalette": {
       "searchPlaceholder": "Buscar un módulo…",
-      "noResults": "Ningún módulo coincide con «{query}»."
+      "noResults": "Ningún módulo coincide con «{query}».",
+      "ariaLabel": "Buscar en el gobierno"
     },
     "inicio": {
       "panelMunicipal": "Panel municipal",
@@ -240,7 +243,10 @@
       "formContenidoPlaceholder": "Contenido del comunicado…",
       "formMunicipio": "Municipio",
       "formMunicipioPlaceholder": "ciudad_carmin (opcional)",
-      "formFijar": "Fijar en portada del tablón"
+      "formFijar": "Fijar en portada del tablón",
+      "kindEvento": "Evento",
+      "kindAnuncio": "Anuncio",
+      "kindAlerta": "Alerta"
     },
     "quickActions": {
       "title": "Acciones rápidas",
@@ -433,7 +439,40 @@
       "anuncioPublished": "Anuncio publicado.",
       "expedienteCreated": "Expediente creado.",
       "vozCreated": "Voz «{name}» creada",
-      "vozCreateError": "No se pudo crear la voz."
+      "vozCreateError": "No se pudo crear la voz.",
+      "genericError": "La solicitud al Gobierno de Teras ha fallado.",
+      "denunciaRegistrada": "Denuncia {code} registrada",
+      "denunciaResuelta": "Denuncia {code} resuelta",
+      "multaEmitida": "Multa {code} emitida",
+      "multaPagada": "Multa {code} pagada a la Tesorería",
+      "multaAnulada": "Multa {code} anulada",
+      "buscadoAnadido": "{username} añadido a busca y captura",
+      "capturaConfirmada": "Captura confirmada · recompensa pagada",
+      "subastaAbierta": "Subasta {code} abierta",
+      "pujaRegistrada": "Puja registrada · {code}",
+      "subastaAdjudicada": "Subasta {code} adjudicada",
+      "apelacionEstimada": "Apelación {code} estimada",
+      "apelacionDesestimada": "Apelación {code} desestimada",
+      "expedienteAbierto": "Expediente {code} abierto",
+      "zonaCreada": "Zona «{name}» creada",
+      "zonaActualizada": "Zona «{name}» actualizada",
+      "parcelaActualizada": "Parcela actualizada",
+      "bitacoraAnadida": "Anotación registrada en la bitácora",
+      "turnoCreado": "Turno «{label}» creado",
+      "turnoActualizado": "Turno «{label}» actualizado",
+      "anuncioTituloPublicado": "«{title}» publicado",
+      "anuncioActualizado": "Anuncio actualizado",
+      "anuncioRetirado": "Anuncio retirado",
+      "eventoCreado": "Evento {code} creado",
+      "eventoActualizado": "Evento actualizado",
+      "obraRegistrada": "Obra registrada",
+      "tablaGuardada": "Tabla de aparición guardada",
+      "nombramientoRegistrado": "Nombramiento registrado",
+      "ceseRegistrado": "Cese registrado",
+      "skinGuardada": "Skin «{skin}» guardada",
+      "mensajeEmitido": "Mensaje emitido al servidor",
+      "cartelGuardado": "Cartel «{name}» guardado",
+      "cartelEliminado": "Cartel eliminado"
     },
     "senalizacion": {
       "kicker": "Administración · Urbanismo",
@@ -528,7 +567,8 @@
       "accion": "Acción",
       "objetivo": "Objetivo",
       "departamento": "Departamento",
-      "fuente": "Fuente"
+      "fuente": "Fuente",
+      "estado": "Estado"
     },
     "skins": {
       "kicker": "Administración · Recursos",
@@ -549,7 +589,8 @@
       "nombreSkinPlaceholder": "ProfesorOak",
       "npcsUsan": "NPCs que la usan",
       "npcsPlaceholder": "Prof. Oak, Asistente lab.",
-      "editarSkin": "Editar «{name}»"
+      "editarSkin": "Editar «{name}»",
+      "face": "2D"
     },
     "apps": {
       "kicker": "Administración · Dispositivos",
@@ -565,7 +606,11 @@
       "emptyDisponibles": "Todo asignado",
       "emptyDisponiblesSub": "Este jugador tiene todas las apps disponibles.",
       "quitar": "Quitar",
-      "anadir": "Añadir"
+      "anadir": "Añadir",
+      "appAnadida": "App añadida al dispositivo",
+      "errorAnadir": "No se pudo añadir la app",
+      "appEliminada": "App eliminada",
+      "errorEliminar": "No se pudo eliminar la app"
     },
     "rendimiento": {
       "kicker": "Administración · Infraestructura",
@@ -620,7 +665,9 @@
       "typeArcade": "Arcade",
       "typeMisiones": "Misiones",
       "typeSubastas": "Subastas",
-      "typeAdmin": "Admin"
+      "typeAdmin": "Admin",
+      "notifEnviada": "Notificación enviada",
+      "errorEnviar": "No se pudo enviar la notificación"
     },
     "auditoria": {
       "kicker": "Gobierno · Transparencia",
@@ -636,7 +683,8 @@
       "fechaHora": "Fecha y hora",
       "accion": "Acción",
       "objeto": "Objeto",
-      "departamento": "Departamento"
+      "departamento": "Departamento",
+      "sistema": "Sistema"
     },
     "urbanismo": {
       "parcelasKicker": "Urbanismo · Catastro",
@@ -680,7 +728,8 @@
       "emptyHistorialMovimientosSub": "Todavía no hay traspasos inscritos en el registro de la propiedad.",
       "transfirió": "{from} transfirió a",
       "adjudico": "El municipio adjudicó a",
-      "actual": "Actual"
+      "actual": "Actual",
+      "sinRegistrar": "Sin registrar"
     },
     "eventos": {
       "convocarEvento": "Convocar evento",
@@ -717,7 +766,7 @@
       "teletransportHint": "Los jugadores serán teletransportados a esta zona al comenzar.",
       "calendario": "Calendario",
       "finConstruccion": "Fin de construcción",
-      "finValoracion": "Fin de valoracion",
+      "finValoracion": "Fin de valoración",
       "errorFechasConstruccion": "El fin de valoración debe ser posterior al fin de construcción.",
       "valoracionHint": "La valoración abrirá automáticamente en cuanto se cierre la construcción.",
       "inicio": "Inicio",
@@ -825,7 +874,112 @@
       "cerrarCaceriaDescription": "Se cerrará {title} y se revelará la captura ganadora. Mientras la cacería está en curso nadie —tampoco el gobierno— puede ver las capturas de los demás; esta acción es lo que las hace públicas.",
       "diseno": "Diseño",
       "ambicion": "Ambición",
-      "fidelidadTema": "Fidelidad al tema"
+      "fidelidadTema": "Fidelidad al tema",
+      "tamano": "Tamaño",
+      "ivs": "IVs",
+      "shiny": "Shiny",
+      "confirmar": "Confirmar",
+      "stepTipo": "Tipo",
+      "stepDatos": "Datos",
+      "stepReglas": "Reglas",
+      "stepRevisar": "Revisar",
+      "scoreEspecieDesc": "Según la rareza de aparición en la zona. Cuanto más raro el bicho, más puntos base.",
+      "scoreTamanoDesc": "Desviación respecto al tamaño medio de la especie. Cuanto más extremo, más puntos.",
+      "scoreIvsDesc": "Porcentaje de estadísticas perfectas del ejemplar.",
+      "scoreNivelDesc": "Nivel del Pokémon en el momento de registrarlo.",
+      "scoreShinyDesc": "Variante cromática. Bonificación fija.",
+      "errorCargaSub": "Inténtalo de nuevo en unos segundos.",
+      "defaultRules": "No se publica quién ha capturado qué ni la mejor puntuación actual. Cada jugador decide a ciegas si conserva su captura o arriesga a soltarla para cazar otra mejor. Solo cuenta la captura registrada al cerrar el evento.",
+      "nuevaCazaTitulo": "Nueva caza de bichos",
+      "nuevoRetoTitulo": "Nuevo reto de construcción",
+      "previewBrief": "Describe aquí el reto que deberán construir las ciudades…",
+      "especiesLabel": "Especies"
+    },
+    "dossier": {
+      "ariaDialog": "Expediente ciudadano",
+      "cerrar": "Cerrar expediente",
+      "kicker": "Expediente ciudadano",
+      "parcelas": "Parcelas",
+      "multas": "Multas",
+      "ciudades": "Ciudades",
+      "residencia": "Residencia",
+      "buscaCaptura": "Busca y captura",
+      "vistoUltimamente": "Visto por última vez: {location}",
+      "sinMultas": "Sin multas registradas.",
+      "denunciasContra": "Denuncias en su contra",
+      "sinDenuncias": "Sin denuncias en su contra."
+    },
+    "campana": {
+      "titulo": "Notificaciones",
+      "unread": "Notificaciones ({count} sin leer)",
+      "marcarLeidas": "Marcar leídas",
+      "markError": "No se pudieron marcar como leídas",
+      "sinAvisos": "Sin avisos",
+      "sinAvisosSub": "No hay notificaciones para tu placa."
+    },
+    "subastas": {
+      "kicker": "Urbanismo · Patrimonio",
+      "title": "Subastas de parcelas",
+      "sub": "Parcelas vacantes o embargadas sacadas a subasta pública. Puja por terreno o adjudícalo al mejor postor.",
+      "nuevaSubasta": "Nueva subasta",
+      "sinSubastasEnCurso": "Sin subastas en curso",
+      "sinSubastasEnCursoSub": "No hay ninguna parcela a subasta pública en este momento.",
+      "subastasCerradas": "Subastas cerradas",
+      "sinSubastasCerradas": "Sin subastas cerradas",
+      "sinSubastasCerradasSub": "Todavía no se ha adjudicado ninguna subasta.",
+      "colSubasta": "Subasta",
+      "colParcela": "Parcela",
+      "colAdjudicada": "Adjudicada a",
+      "colImporte": "Importe final",
+      "colMotivo": "Motivo",
+      "colEstado": "Estado",
+      "sinAdjudicar": "— sin adjudicar —",
+      "pujaActual": "Puja actual",
+      "pujas": "{count} pujas",
+      "sinPujas": "Sin pujas",
+      "pujaUuidPlaceholder": "UUID del jugador",
+      "pujar": "Pujar",
+      "pujarParcela": "Pujar por esta parcela",
+      "confirmarCierre": "¿Cerrar y adjudicar ahora?",
+      "no": "No",
+      "siCerrar": "Sí, cerrar",
+      "cerrarSubastaAhora": "Cerrar subasta ahora",
+      "noParcelas": "No hay parcelas disponibles",
+      "noParcelasSub": "Solo pueden subastarse parcelas vacantes o embargadas ya registradas en el catastro.",
+      "pujaInicial": "Puja de salida (₽)",
+      "cierre": "Cierre",
+      "motivo": "Motivo (opcional)",
+      "motivoPlaceholder": "Impago de impuestos…",
+      "abrirSubasta": "Abrir subasta",
+      "errorCarga": "No se pudieron cargar las subastas",
+      "errorCargaSub": "Inténtalo de nuevo en unos minutos."
+    },
+    "zonas": {
+      "kicker": "Urbanismo · Ordenación del territorio",
+      "title": "Zonas y sectores",
+      "sub": "Cada municipio se divide en sectores con uso de suelo propio. Selecciona un municipio para ver sus sectores, su ocupación y las parcelas que contienen.",
+      "nuevaZona": "Nueva zona",
+      "errorCarga": "No se pudo cargar la ordenación del territorio",
+      "errorCargaSub": "Inténtalo de nuevo en unos minutos.",
+      "sinZonas": "Sin zonas registradas",
+      "sinZonasSub": "Todavía no se ha delimitado ningún sector en ningún municipio.",
+      "municipios": "Municipios",
+      "sectores": "{count} sectores",
+      "ocupacion": "Ocupación",
+      "sinDescripcion": "Sin descripción.",
+      "editarZona": "Editar zona",
+      "municipioLabel": "Municipio",
+      "nombreSector": "Nombre del sector",
+      "usoSuelo": "Uso de suelo",
+      "descripcion": "Descripción",
+      "municipioPlaceholder": "tulipan",
+      "sectorPlaceholder": "Distrito Comercial",
+      "descripcionPlaceholder": "Zona destinada a…",
+      "kindResidencial": "Residencial",
+      "kindComercial": "Comercial",
+      "kindCivico": "Cívico",
+      "kindIndustrial": "Industrial",
+      "kindAgricola": "Agrícola"
     },
     "chrome": {
       "servicioInterno": "Servicio interno · {code}"

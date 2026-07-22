@@ -1,6 +1,7 @@
 "use client"
 
 import { useRef, useState } from "react"
+import { useTranslations } from "next-intl"
 import { SmartrotomService } from "@/services/api/smartrotom/smartrotomService"
 import { Bar, Button, Card, Field, Icon, Sunken, toast } from "../ui"
 import { MCText, MC_STYLE_CODES, MC_SWATCHES } from "./MCText"
@@ -33,6 +34,7 @@ const LIGHT_SWATCH = new Set(["6", "7", "3", "a", "b", "d", "e", "f"])
  * Gobierno megafonia endpoints.
  */
 export function VozCreator({ onCreated, onClose }: { onCreated: (value: string) => void; onClose: () => void }) {
+  const t = useTranslations("gobierno")
   const [name, setName] = useState("")
   const [fmt, setFmt] = useState("")
   const [saving, setSaving] = useState(false)
@@ -56,12 +58,12 @@ export function VozCreator({ onCreated, onClose }: { onCreated: (value: string) 
     try {
       const res = await SmartrotomService.postArceuSpeak({ name: name.trim(), value, format: fmt.trim() })
       if (res.success === false || (res.statusCode && res.statusCode >= 400)) {
-        throw new Error(res.userMessage ?? "No se pudo crear la voz.")
+        throw new Error(res.userMessage ?? t("toast.vozCreateError"))
       }
-      toast.success(`Voz «${name.trim()}» creada`)
+      toast.success(t("toast.vozCreated", { name: name.trim() }))
       onCreated(value)
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "No se pudo crear la voz.")
+      toast.error(e instanceof Error ? e.message : t("toast.vozCreateError"))
     } finally {
       setSaving(false)
     }
@@ -76,18 +78,18 @@ export function VozCreator({ onCreated, onClose }: { onCreated: (value: string) 
           <button
             type="button"
             onClick={onClose}
-            aria-label="Cerrar creador de voces"
+            aria-label={t("megafonia.cerrarCreador")}
             className="text-gt-ink-400 transition-colors hover:text-gt-ink-900"
           >
             <Icon name="x" size={16} />
           </button>
         }
       >
-        Nueva voz oficial
+        {t("megafonia.nuevaVoz")}
       </Bar>
       <div className="p-4">
         <div className="mb-2.5">
-          <Field value={name} onChange={setName} placeholder="Nombre (ej. Liga Teras)" />
+          <Field value={name} onChange={setName} placeholder={t("megafonia.nombreVoz")} />
         </div>
         <div className="mb-2.5">
           <input
@@ -95,13 +97,13 @@ export function VozCreator({ onCreated, onClose }: { onCreated: (value: string) 
             value={fmt}
             onChange={(e) => setFmt(e.target.value)}
             placeholder="Formato §l§f[§6Nombre§f]"
-            aria-label="Formato §-coded"
+            aria-label={t("megafonia.formato")}
             className="w-full rounded-gt-sm border border-gt-line-strong bg-gt-paper-0 px-3 py-[9px] font-gt-mono text-[13px] text-gt-ink-900 placeholder:text-gt-ink-400 focus:border-gt-accent focus:outline-none focus:ring-[3px] focus:ring-gt-accent-tint"
           />
         </div>
 
         <div className="mb-1.5 font-gt-mono text-[8.5px] font-bold uppercase tracking-[.12em] text-gt-ink-400">
-          Colores
+          {t("megafonia.colores")}
         </div>
         <div className="mb-2.5 grid grid-cols-8 gap-1">
           {MC_SWATCHES.map(([c, n]) => (
@@ -119,7 +121,7 @@ export function VozCreator({ onCreated, onClose }: { onCreated: (value: string) 
         </div>
 
         <div className="mb-1.5 font-gt-mono text-[8.5px] font-bold uppercase tracking-[.12em] text-gt-ink-400">
-          Estilos
+          {t("megafonia.estilos")}
         </div>
         <div className="mb-3 flex flex-wrap gap-1">
           {MC_STYLE_CODES.map(([c, n]) => (
@@ -135,14 +137,14 @@ export function VozCreator({ onCreated, onClose }: { onCreated: (value: string) 
         </div>
 
         <Sunken className="mb-3 px-3 py-2.5">
-          <div className="mb-1 font-gt-mono text-[8.5px] uppercase tracking-[.14em] text-gt-ink-400">Resultado</div>
+          <div className="mb-1 font-gt-mono text-[8.5px] uppercase tracking-[.14em] text-gt-ink-400">{t("megafonia.resultado")}</div>
           <div className="text-sm">
             <MCText format={fmt} fallback="…" />
           </div>
         </Sunken>
 
         <Button icon="check" className="w-full" disabled={!name.trim() || !fmt.trim() || saving} onClick={create}>
-          {saving ? "Creando…" : "Crear voz"}
+          {saving ? t("common.creating") : t("megafonia.crearVozBtn")}
         </Button>
       </div>
     </Card>

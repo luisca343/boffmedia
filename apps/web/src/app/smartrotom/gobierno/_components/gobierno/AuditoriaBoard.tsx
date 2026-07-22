@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useTranslations } from "next-intl"
 import { Avatar, Badge, Button, Empty, Field, PageHead, Select, Table, TBody, TD, TH, THead, TR, TableSkeleton } from "../ui"
 import { FilterTabs } from "../poblacion/FilterTabs"
 import { Pager } from "../poblacion/Pager"
@@ -16,6 +17,7 @@ const PAGE_SIZE = 30
 const AUDIT_DEPS: Department[] = ["urbanismo", "seguridad", "hacienda", "justicia", "poblacion", "gobierno"]
 
 export function AuditoriaBoard() {
+  const t = useTranslations("gobierno")
   const [dep, setDep] = useState<"all" | Department>("all")
   const [actorUuid, setActorUuid] = useState("")
   const [dateFrom, setDateFrom] = useState("")
@@ -62,13 +64,13 @@ export function AuditoriaBoard() {
   return (
     <div>
       <PageHead
-        kicker="Gobierno · Transparencia"
+        kicker={t("auditoria.kicker")}
         dep="gold"
-        title="Registro de auditoría"
-        sub="Bitácora inmutable de toda acción administrativa. Garantiza la transparencia del Gobierno de Teras."
+        title={t("auditoria.title")}
+        sub={t("auditoria.sub")}
         right={
           <Button tone="ghost" icon="download" onClick={handleExport} disabled={items.length === 0}>
-            Exportar
+            {t("common.export")}
           </Button>
         }
       />
@@ -79,7 +81,7 @@ export function AuditoriaBoard() {
           value={dep}
           onChange={setFilter(setDep)}
           options={[
-            { value: "all" as const, label: "Todo" },
+            { value: "all" as const, label: t("auditoria.todo") },
             ...AUDIT_DEPS.map((d) => ({ value: d, label: DEPARTMENTS[d].label })),
           ]}
         />
@@ -87,15 +89,15 @@ export function AuditoriaBoard() {
           <Select
             value={actorUuid}
             onChange={setFilter(setActorUuid)}
-            label="Funcionario"
-            options={[{ value: "", label: "Todos" }, ...(oficiales ?? []).map((o) => ({ value: o.uuid, label: o.username }))]}
+            label={t("auditoria.funcionario")}
+            options={[{ value: "", label: t("auditoria.todos") }, ...(oficiales ?? []).map((o) => ({ value: o.uuid, label: o.username }))]}
           />
         </div>
         <div className="w-full max-w-[150px]">
-          <Field type="date" value={dateFrom} onChange={setFilter(setDateFrom)} label="Desde" />
+          <Field type="date" value={dateFrom} onChange={setFilter(setDateFrom)} label={t("auditoria.desde")} />
         </div>
         <div className="w-full max-w-[150px]">
-          <Field type="date" value={dateTo} onChange={setFilter(setDateTo)} label="Hasta" />
+          <Field type="date" value={dateTo} onChange={setFilter(setDateTo)} label={t("auditoria.hasta")} />
         </div>
       </div>
 
@@ -103,16 +105,16 @@ export function AuditoriaBoard() {
         {isLoading ? (
           <TableSkeleton rows={8} cols={5} />
         ) : items.length === 0 ? (
-          <Empty icon="scroll" title="Sin movimientos" sub="No hay entradas de auditoría para los filtros seleccionados." />
+          <Empty icon="scroll" title={t("auditoria.emptyTitle")} sub={t("auditoria.emptySub")} />
         ) : (
           <Table>
             <THead>
               <TR>
-                <TH>Fecha y hora</TH>
-                <TH>Funcionario</TH>
-                <TH>Acción</TH>
-                <TH>Objeto</TH>
-                <TH>Departamento</TH>
+                <TH>{t("auditoria.fechaHora")}</TH>
+                <TH>{t("auditoria.funcionario")}</TH>
+                <TH>{t("auditoria.accion")}</TH>
+                <TH>{t("auditoria.objeto")}</TH>
+                <TH>{t("auditoria.departamento")}</TH>
               </TR>
             </THead>
             <TBody>
@@ -134,7 +136,7 @@ export function AuditoriaBoard() {
                         className="flex items-center gap-2 font-semibold text-gt-ink-900 disabled:cursor-default"
                       >
                         <Avatar user={a.actor?.username} size={24} />
-                        {a.actor?.username ?? "Sistema"}
+                        {a.actor?.username ?? t("auditoria.sistema")}
                       </button>
                     </TD>
                     <TD>

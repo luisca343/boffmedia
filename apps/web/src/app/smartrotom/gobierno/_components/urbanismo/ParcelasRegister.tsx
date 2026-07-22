@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react"
 import Link from "next/link"
+import { useTranslations } from "next-intl"
 import {
   Avatar,
   Badge,
@@ -38,6 +39,7 @@ type StatusFilter = "all" | "ocupada" | "vacante" | "embargada" | "subasta"
 // API's own fallback status `sin_registrar` and cannot be PATCHed until it is created
 // through some other path — this register can only edit rows that already have one.
 export function ParcelasRegister() {
+  const t = useTranslations("gobierno")
   const { data, isLoading, isError } = useParcelas({ limit: 100 })
   const { data: zonas } = useZonas()
   const updateParcela = useUpdateParcela()
@@ -83,15 +85,15 @@ export function ParcelasRegister() {
   return (
     <div>
       <PageHead
-        kicker="Urbanismo · Catastro"
+        kicker={t("urbanismo.parcelasKicker")}
         dep="urbanismo"
-        title="Parcelas"
-        sub="Registro catastral de todas las parcelas de la región. Filtra por municipio, sector o disponibilidad."
+        title={t("urbanismo.parcelasTitle")}
+        sub={t("urbanismo.parcelasSub")}
       />
 
       {data && data.total > data.items.length && (
         <div className="mb-3 font-gt-mono text-[10.5px] text-gt-ink-400">
-          Mostrando {data.items.length} de {data.total} parcelas registradas.
+          {t("urbanismo.mostrando", { shown: data.items.length, total: data.total })}
         </div>
       )}
 
@@ -100,11 +102,11 @@ export function ParcelasRegister() {
           value={status}
           onChange={setStatus}
           options={[
-            { value: "all", label: "Todas", count: counts.all },
-            { value: "ocupada", label: "Ocupadas", count: counts.ocupada },
-            { value: "vacante", label: "Vacantes", count: counts.vacante },
-            { value: "embargada", label: "Embargadas", count: counts.embargada },
-            { value: "subasta", label: "En subasta", count: counts.subasta },
+            { value: "all", label: t("urbanismo.todas"), count: counts.all },
+            { value: "ocupada", label: t("urbanismo.ocupadas"), count: counts.ocupada },
+            { value: "vacante", label: t("urbanismo.vacantes"), count: counts.vacante },
+            { value: "embargada", label: t("urbanismo.embargadas"), count: counts.embargada },
+            { value: "subasta", label: t("urbanismo.enSubasta"), count: counts.subasta },
           ]}
         />
         <div className="w-[190px]">
@@ -115,8 +117,8 @@ export function ParcelasRegister() {
               setZonaFilter("all")
             }}
             options={[
-              { value: "all", label: "Todos los municipios" },
-              ...towns.map((t) => ({ value: t, label: townName(t) })),
+              { value: "all", label: t("urbanismo.todosMunicipios") },
+              ...towns.map((tn) => ({ value: tn, label: townName(tn) })),
             ]}
           />
         </div>
@@ -126,7 +128,7 @@ export function ParcelasRegister() {
               value={zonaFilter}
               onChange={setZonaFilter}
               options={[
-                { value: "all", label: "Todos los sectores" },
+                { value: "all", label: t("urbanismo.todosSectores") },
                 ...townZonas.map((z) => ({ value: String(z.id), label: z.name })),
               ]}
             />
@@ -138,27 +140,23 @@ export function ParcelasRegister() {
         {isLoading ? (
           <TableSkeleton cols={6} />
         ) : isError ? (
-          <Empty icon="alert" title="No se pudo cargar el catastro" sub="Inténtalo de nuevo en unos minutos." />
+          <Empty icon="alert" title={t("urbanismo.emptyError")} sub={t("urbanismo.emptyErrorSub")} />
         ) : rows.length === 0 ? (
           <Empty
             icon="mapPin"
-            title="Sin parcelas"
-            sub={
-              items.length === 0
-                ? "Todavía no hay parcelas registradas en el catastro."
-                : "Ninguna parcela coincide con estos filtros."
-            }
+            title={t("urbanismo.emptyParcelas")}
+            sub={items.length === 0 ? t("urbanismo.emptyParcelasSub") : t("urbanismo.emptyParcelasFilter")}
           />
         ) : (
           <Table>
             <THead>
               <TR>
-                <TH>Parcela</TH>
-                <TH>Municipio</TH>
-                <TH>Sector</TH>
-                <TH>Propietario</TH>
-                <TH>Región</TH>
-                <TH>Estado</TH>
+                <TH>{t("urbanismo.parcela")}</TH>
+                <TH>{t("urbanismo.municipio")}</TH>
+                <TH>{t("urbanismo.sector")}</TH>
+                <TH>{t("urbanismo.propietario")}</TH>
+                <TH>{t("urbanismo.region")}</TH>
+                <TH>{t("urbanismo.estado")}</TH>
                 <TH />
               </TR>
             </THead>
@@ -166,7 +164,7 @@ export function ParcelasRegister() {
               {rows.map((p) => {
                 const zona = p.zona ?? (p.zonaId != null ? zonasById.get(p.zonaId) : null)
                 const k = zona ? kindOf(zona.kind) : null
-                const st = statusOf(p.status)
+                const st = statusOf(p.status, t("urbanismo.sinRegistrar"))
                 return (
                   <TR key={p.regionId}>
                     <TD>
@@ -194,7 +192,7 @@ export function ParcelasRegister() {
                           <span className="font-semibold text-gt-ink-900">{p.owner.username}</span>
                         </button>
                       ) : (
-                        <span className="italic text-gt-ink-400">— vacante —</span>
+                        <span className="italic text-gt-ink-400">{t("urbanismo.vacante")}</span>
                       )}
                     </TD>
                     <TD>
@@ -206,7 +204,7 @@ export function ParcelasRegister() {
                     <TD className="text-right">
                       {p.id != null ? (
                         <Button size="sm" tone="plain" onClick={() => setEditing(p)}>
-                          Editar
+                          {t("urbanismo.editar")}
                         </Button>
                       ) : !p.owner ? (
                         <Link
@@ -214,7 +212,7 @@ export function ParcelasRegister() {
                           className="inline-flex items-center gap-1.5 rounded-gt-sm px-[11px] py-1.5 text-xs font-bold text-gt-accent hover:underline"
                         >
                           <Icon name="gavel" size={13} />
-                          Subastar
+                          {t("urbanismo.subastar")}
                         </Link>
                       ) : null}
                     </TD>
@@ -257,6 +255,7 @@ function ParcelaEditModal({
   onClose: () => void
   onSave: (body: { status: string; zonaId: number | null; taxAmount: number; taxDueAt?: string; notes: string }) => void
 }) {
+  const t = useTranslations("gobierno")
   const [status, setStatus] = useState<string>(parcela.status)
   const [zonaId, setZonaId] = useState(parcela.zonaId != null ? String(parcela.zonaId) : "")
   const [taxAmount, setTaxAmount] = useState(String(parcela.taxAmount ?? 0))
@@ -270,11 +269,11 @@ function ParcelaEditModal({
       open
       onClose={onClose}
       kicker={`Parcela · ${townName(parcela.town)} #${parcela.number}`}
-      title="Editar parcela"
+      title={t("urbanismo.editarParcela")}
       footer={
         <>
           <Button tone="ghost" onClick={onClose}>
-            Cancelar
+            {t("common.cancel")}
           </Button>
           <Button
             tone="primary"
@@ -289,26 +288,26 @@ function ParcelaEditModal({
               })
             }
           >
-            {saving ? "Guardando…" : "Guardar cambios"}
+            {saving ? t("common.saving") : t("urbanismo.guardarCambios")}
           </Button>
         </>
       }
     >
       <div className="space-y-3.5">
         <div className="font-gt-mono text-[10.5px] text-gt-ink-400">{parcela.regionId}</div>
-        <Select label="Estado" value={status} onChange={setStatus} options={statusOptions} />
+        <Select label={t("urbanismo.estado")} value={status} onChange={setStatus} options={statusOptions} />
         <Select
           label="Zona"
           value={zonaId}
           onChange={setZonaId}
           options={[
-            { value: "", label: "Sin zona asignada" },
+            { value: "", label: t("urbanismo.sinZona") },
             ...zonaOptions.map((z) => ({ value: String(z.id), label: z.name })),
           ]}
         />
-        <Field label="Cuota catastral (₽)" type="number" mono value={taxAmount} onChange={setTaxAmount} />
-        <Field label="Vencimiento" type="date" value={taxDueAt} onChange={setTaxDueAt} />
-        <TextArea label="Notas" value={notes} onChange={setNotes} rows={3} placeholder="Observaciones para el expediente…" />
+        <Field label={t("urbanismo.cuotaCatastral")} type="number" mono value={taxAmount} onChange={setTaxAmount} />
+        <Field label={t("urbanismo.vencimiento")} type="date" value={taxDueAt} onChange={setTaxDueAt} />
+        <TextArea label={t("urbanismo.notas")} value={notes} onChange={setNotes} rows={3} placeholder={t("urbanismo.notasPlaceholder")} />
       </div>
     </Modal>
   )

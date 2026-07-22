@@ -10,6 +10,7 @@ import {
   type PointerEvent as ReactPointerEvent,
   type ReactNode,
 } from "react"
+import { useTranslations } from "next-intl"
 import type { Mon, SlotLoc } from "../_types/pc.types"
 import { Sprite, toast } from "../_components/ui"
 import { locId, parseLocId, usePcUi } from "../_stores/pcUiStore"
@@ -97,6 +98,7 @@ export interface DragProviderProps {
 const DRAG_THRESHOLD_PX = 7
 
 export function DragProvider({ children, monAt, onDropSingle, onDropMany, validate }: DragProviderProps) {
+  const t = useTranslations("pc")
   const [drag, setDrag] = useState<DragState | null>(null)
   const state = useRef<DragState & { startX: number; startY: number }>(null)
 
@@ -132,7 +134,7 @@ export function DragProvider({ children, monAt, onDropSingle, onDropMany, valida
         onDropMany(items, over.box)
         setMultiMode(false)
       } else {
-        toast("Suelta en una caja para mover varios", "info")
+        toast(t("drag.dropHint"), "info")
       }
       return
     }
@@ -144,7 +146,7 @@ export function DragProvider({ children, monAt, onDropSingle, onDropMany, valida
       return
     }
     onDropSingle(from, to)
-  }, [monAt, onDropMany, onDropSingle, setMultiMode, validate])
+  }, [monAt, onDropMany, onDropSingle, setMultiMode, t, validate])
 
   const beginDrag = useCallback(
     (e: ReactPointerEvent, mon: Mon) => {

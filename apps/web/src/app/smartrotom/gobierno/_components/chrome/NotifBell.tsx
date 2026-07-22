@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
 import Link from "next/link"
+import { useTranslations } from "next-intl"
 import type { NotificationsInboxDto } from "@boffmedia/shared"
 import { rotomGETOrThrow, rotomPATCHOrThrow, userMessageFrom } from "@/services/boffAPI"
 import { Icon, Empty, toast } from "../ui"
@@ -24,6 +25,7 @@ const TYPE_TONE: Record<string, Tone> = {
 }
 
 export function NotifBell() {
+  const t = useTranslations("gobierno")
   const { uuid } = useOfficer()
   const qc = useQueryClient()
   const [open, setOpen] = useState(false)
@@ -58,7 +60,7 @@ export function NotifBell() {
       await rotomPATCHOrThrow("/notifications/read-all", { uuid })
       qc.invalidateQueries({ queryKey: ["gob", "notifs", uuid] })
     } catch (e) {
-      toast.error(userMessageFrom(e, "No se pudieron marcar como leídas"))
+      toast.error(userMessageFrom(e, t("campana.markError")))
     }
   }
 
@@ -67,7 +69,7 @@ export function NotifBell() {
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
-        aria-label={unread ? `Notificaciones (${unread} sin leer)` : "Notificaciones"}
+        aria-label={unread ? t("campana.unread", { count: unread }) : t("campana.titulo")}
         className="relative rounded-gt-sm border border-gt-line-strong bg-gt-paper-0 p-2 text-gt-ink-600 shadow-gt-sm transition-colors hover:bg-gt-paper-1 hover:text-gt-ink-900"
       >
         <Icon name="bell" size={17} />
@@ -81,21 +83,21 @@ export function NotifBell() {
       {open && (
         <div className="absolute right-0 top-[calc(100%_+_8px)] z-50 w-[340px] animate-gt-pop overflow-hidden rounded-gt border border-gt-line-strong bg-gt-paper-0 shadow-gt-lg motion-reduce:animate-none">
           <div className="flex items-center justify-between border-b border-gt-line px-4 py-2.5">
-            <span className="font-gt-display text-sm font-bold text-gt-ink-900">Notificaciones</span>
+            <span className="font-gt-display text-sm font-bold text-gt-ink-900">{t("campana.titulo")}</span>
             {unread > 0 && (
               <button
                 type="button"
                 onClick={markAllRead}
                 className="font-gt-mono text-[9.5px] font-bold uppercase tracking-[.12em] text-gt-accent hover:underline"
               >
-                Marcar leídas
+                {t("campana.marcarLeidas")}
               </button>
             )}
           </div>
 
           <div className="gt-scroll max-h-[340px] overflow-y-auto">
             {items.length === 0 ? (
-              <Empty icon="bell" title="Sin avisos" sub="No hay notificaciones para tu placa." />
+              <Empty icon="bell" title={t("campana.sinAvisos")} sub={t("campana.sinAvisosSub")} />
             ) : (
               items.map((n) => {
                 const tone = TONES[TYPE_TONE[n.type ?? ""] ?? "default"]

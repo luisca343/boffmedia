@@ -1,62 +1,61 @@
 {
-    "youtube": {
-        "search": {
-        "placeholder": "Buscar en YouTube",
-        "button": "Buscar",
-        "searching": "Buscando...",
-        "title": "Resultados de Búsqueda",
-        "error": "Error al buscar vídeos. Inténtalo de nuevo.",
-        "trendingTitle": "Tendencias",
-        "noTrending": "No hay vídeos en tendencia disponibles"
-        },
-        "loading": {
-        "videos": "Cargando vídeos...",
-        "video": "Cargando vídeo...",
-        "channel": "Cargando información del canal...",
-        "history": "Cargando tu historial...",
-        "search": "Buscando vídeos..."
-        },
-        "history": {
-        "title": "Historial de Visualización",
-        "empty": "Tu historial de visualización está vacío",
-        "emptySubtext": "Los vídeos que veas aparecerán aquí",
-        "clearButton": "Borrar Historial",
-        "clearConfirm": "¿Borrar historial de visualización?",
-        "clearDescription": "Esto borrará todo tu historial de visualización. Esta acción no se puede deshacer.",
-        "removeConfirm": "Esto eliminará este vídeo de tu historial de visualización.",
-        "cancelButton": "Cancelar",
-        "confirmButton": "Borrar Historial",
-        "removeButton": "Eliminar"
-        },
-        "video": {
-        "notFound": "Vídeo no encontrado",
-        "returnToSearch": "Volver a la búsqueda de YouTube",
-        "views": "vistas",
-        "likes": "me gusta",
-        "description": "Descripción",
-        "stats": "Estadísticas"
-        },
-        "channel": {
-        "notFound": "Canal no encontrado",
-        "returnToSearch": "Volver a la búsqueda de YouTube",
-        "subscribers": "suscriptores",
-        "videos": "vídeos",
-        "views": "vistas",
-        "about": "Acerca de",
-        "description": "Descripción",
-        "noDescription": "No hay descripción disponible.",
-        "stats": "Estadísticas",
-        "joined": "Se unió",
-        "totalViews": "Total de vistas",
-        "totalVideos": "Total de vídeos",
-        "subscribers_stats": "Suscriptores",
-        "loadMore": "Cargar más",
-        "loading": "Cargando...",
-        "popularVideos": "Vídeos Populares",
-        "noPopular": "No se encontraron vídeos populares"
-        },
-        "common": {
-        "channel": "Canal"
-        }
+  "youtube": {
+    "search": {
+      "placeholder": "Buscar en YouTube",
+      "button": "Buscar",
+      "searching": "Buscando...",
+      "title": "Resultados de Búsqueda",
+      "error": "Error al buscar vídeos. Inténtalo de nuevo.",
+      "trendingTitle": "Tendencias",
+      "noTrending": "No hay vídeos en tendencia disponibles"
+    },
+    "loading": {
+      "videos": "Cargando vídeos...",
+      "video": "Cargando vídeo...",
+      "channel": "Cargando información del canal...",
+      "history": "Cargando tu historial...",
+      "search": "Buscando vídeos..."
+    },
+    "history": {
+      "title": "Historial de Visualización",
+      "empty": "Tu historial de visualización está vacío",
+      "emptySubtext": "Los vídeos que veas aparecerán aquí",
+      "clearButton": "Borrar Historial",
+      "clearConfirm": "¿Borrar historial de visualización?",
+      "clearDescription": "Esto borrará todo tu historial de visualización. Esta acción no se puede deshacer.",
+      "removeConfirm": "Esto eliminará este vídeo de tu historial de visualización.",
+      "cancelButton": "Cancelar",
+      "confirmButton": "Borrar Historial",
+      "removeButton": "Eliminar"
+    },
+    "video": {
+      "notFound": "Vídeo no encontrado",
+      "returnToSearch": "Volver a la búsqueda de YouTube",
+      "views": "vistas",
+      "likes": "me gusta",
+      "description": "Descripción",
+      "stats": "Estadísticas"
+    },
+    "channel": {
+      "notFound": "Canal no encontrado",
+      "returnToSearch": "Volver a la búsqueda de YouTube",
+      "subscribers": "suscriptores",
+      "videos": "vídeos",
+      "views": "vistas",
+      "about": "Acerca de",
+      "description": "Descripción",
+      "noDescription": "No hay descripción disponible.",
+      "stats": "Estadísticas",
+      "joined": "Se unió",
+      "totalViews": "Total de vistas",
+      "totalVideos": "Total de vídeos",
+      "loadMore": "Cargar más",
+      "loading": "Cargando...",
+      "popularVideos": "Vídeos Populares",
+      "noPopular": "No se encontraron vídeos populares"
+    },
+    "common": {
+      "channel": "Canal"
     }
+  }
 }

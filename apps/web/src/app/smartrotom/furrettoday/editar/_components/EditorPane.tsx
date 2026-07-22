@@ -3,6 +3,7 @@
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import { useQueryClient } from "@tanstack/react-query";
 import type { News, UpdateNewsDto } from "@boffmedia/shared";
 
@@ -94,6 +95,7 @@ function EditorPaneContent({
   article: FtArticle;
   categories: FtCategory[];
 }) {
+  const t = useTranslations("furrettoday");
   const { session } = useBoffSession();
   const token = session?.user?.accessToken ?? "";
   const client = useQueryClient();
@@ -152,7 +154,7 @@ function EditorPaneContent({
           setBaseline(form);
           toast(`Cambios guardados en «${title}».`);
         },
-        onError: () => toast.error("No se pudieron guardar los cambios."),
+        onError: () => toast.error(t("editor.saveError")),
       },
     );
   }
@@ -182,7 +184,7 @@ function EditorPaneContent({
           aria-label="Entradilla"
           value={form.subtitle}
           onChange={(e) => set("subtitle", e.target.value)}
-          placeholder="Escribe una entradilla — qué vas a contar en una frase."
+          placeholder={t("editor.leadPlaceholder")}
           className="font-ft-deck mt-2.5 w-full border-0 bg-transparent p-0 text-lg italic text-ft-deck outline-none placeholder:text-ft-deck/50"
         />
 
@@ -191,14 +193,14 @@ function EditorPaneContent({
             <MetaInput
               value={form.author}
               onChange={(e) => set("author", e.target.value)}
-              placeholder="Redacción"
+              placeholder={t("editor.bodyPlaceholder")}
             />
           </Field>
           <Field label="Rol">
             <MetaInput
               value={form.authorRole}
               onChange={(e) => set("authorRole", e.target.value)}
-              placeholder="Editor/a"
+              placeholder={t("editor.authorPlaceholder")}
             />
           </Field>
           <Field label="Sección">
@@ -206,14 +208,14 @@ function EditorPaneContent({
               list="ft-editor-categories"
               value={form.category}
               onChange={(e) => set("category", e.target.value)}
-              placeholder="Comunidad, Torneos…"
+              placeholder={t("editor.tagsPlaceholder")}
             />
           </Field>
           <Field label="Subsección">
             <MetaInput
               value={form.subcategory}
               onChange={(e) => set("subcategory", e.target.value)}
-              placeholder="Opcional"
+              placeholder={t("editor.optionalPlaceholder")}
             />
           </Field>
           <Field label="Nº de número">
@@ -229,7 +231,7 @@ function EditorPaneContent({
             <MetaInput
               value={form.buttonText}
               onChange={(e) => set("buttonText", e.target.value)}
-              placeholder="Leer más"
+              placeholder={t("editor.readMorePlaceholder")}
             />
           </Field>
           <Field label="URL imagen" full>

@@ -2,12 +2,14 @@
 
 import { useEffect, useState } from "react"
 import { signOut } from "next-auth/react"
+import { useTranslations } from "next-intl"
 import { useArcadeStreak, useArcadeUuid } from "../../_hooks/queries"
 import { useCountdown } from "../../_hooks/useCountdown"
 import { Button, Icon, Panel, Skeleton, Tag } from "../../_components/ui"
 import { AccountCard } from "./AccountCard"
 
 export function CuentaSection() {
+  const t = useTranslations("arcade")
   const uuid = useArcadeUuid()
   const streak = useArcadeStreak()
   const resetIn = useCountdown(streak.data?.nextResetTime)
@@ -35,11 +37,11 @@ export function CuentaSection() {
   return (
     <Panel tone="deep" className="lg:col-span-2">
       <div className="mb-3.5 font-ar-display text-[9px] uppercase leading-relaxed tracking-[0.12em] text-ar-amber">
-        Cuenta
+        {t("ajustes.cuenta.title")}
       </div>
 
       <div className="grid gap-3.5 md:grid-cols-3">
-        <AccountCard kicker="UUID de SmartRotom">
+        <AccountCard kicker={t("ajustes.cuenta.uuid")}>
           <div className="break-all font-ar-mono text-[13px] text-ar-ink">{uuid ?? "—"}</div>
           <Button
             variant="ghost"
@@ -49,11 +51,11 @@ export function CuentaSection() {
             disabled={!uuid}
             icon={copied ? <Icon.Shield s={12} /> : undefined}
           >
-            {copied ? "Copiado" : "Copiar"}
+            {copied ? t("ajustes.cuenta.copied") : t("ajustes.cuenta.copy")}
           </Button>
         </AccountCard>
 
-        <AccountCard kicker="Banner activo">
+        <AccountCard kicker={t("ajustes.cuenta.bannerActive")}>
           {streak.isLoading ? (
             <Skeleton className="h-5 w-40 rounded-md" />
           ) : (
@@ -63,13 +65,13 @@ export function CuentaSection() {
               banner no lleva fecha de fin, así que no se anuncia ninguna. */}
           {resetIn && (
             <Tag tone="violet" size="md" className="mt-2">
-              Reinicia en {resetIn}
+              {t("ajustes.cuenta.resetsIn", { time: resetIn })}
             </Tag>
           )}
         </AccountCard>
 
-        <AccountCard kicker="Sesión">
-          <div className="font-ar text-[14px] font-semibold text-ar-ink">Conectado</div>
+        <AccountCard kicker={t("ajustes.cuenta.session")}>
+          <div className="font-ar text-[14px] font-semibold text-ar-ink">{t("ajustes.cuenta.connected")}</div>
           <Button
             variant="danger"
             size="sm"
@@ -77,7 +79,7 @@ export function CuentaSection() {
             icon={<Icon.X s={12} />}
             onClick={() => signOut({ callbackUrl: "/" })}
           >
-            Cerrar sesión
+            {t("ajustes.cuenta.signOut")}
           </Button>
         </AccountCard>
       </div>
