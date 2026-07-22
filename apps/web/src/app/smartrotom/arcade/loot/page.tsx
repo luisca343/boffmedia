@@ -89,7 +89,7 @@ export default function LootPage() {
     return (
       <Panel tone="deep">
         <p role="alert" className="font-ar-mono text-[12px] text-ar-danger">
-          {t("arcade.loot.noBoxesLoaded")}
+          {t("loot.noBoxesLoaded")}
         </p>
         <Button
           variant="outline"
@@ -98,7 +98,7 @@ export default function LootPage() {
           icon={<Icon.Reset s={12} />}
           onClick={() => void config.refetch()}
         >
-          {t("arcade.common.retry")}
+          {t("common.retry")}
         </Button>
       </Panel>
     )
@@ -127,15 +127,15 @@ export default function LootPage() {
               href="/smartrotom/arcade"
               className="ar-lift inline-flex items-center gap-1.5 rounded-lg border border-white/10 px-2.5 py-1.5 font-ar text-[11px] font-semibold uppercase tracking-[0.08em] text-ar-ink-dim hover:text-ar-ink"
             >
-              <Icon.Chevron s={12} dir="left" /> {t("arcade.sidebar.arcade")}
+              <Icon.Chevron s={12} dir="left" /> {t("sidebar.arcade")}
             </Link>
-            <span className="ar-chrom font-ar-display text-[15px] text-ar-ink">{t("arcade.loot.title")}</span>
+            <span className="ar-chrom font-ar-display text-[15px] text-ar-ink">{t("loot.title")}</span>
           </div>
 
           <div className="flex flex-wrap items-center gap-2.5">
             {total === 0 ? (
               <Tag tone="ghost" size="md">
-                {t("arcade.loot.noBoxes")}
+                {t("loot.noBoxes")}
               </Tag>
             ) : (
               boxes
@@ -150,7 +150,7 @@ export default function LootPage() {
               href="/smartrotom/arcade/coleccion"
               className="ar-lift inline-flex items-center gap-2 rounded-lg border border-ar-cyan/45 px-3 py-1.5 font-ar text-[11px] font-semibold uppercase tracking-[0.08em] text-ar-cyan shadow-[inset_0_0_20px_rgb(var(--ar-cyan)/.08)]"
             >
-              <Icon.Grid s={12} /> {t("arcade.loot.miCollection")}
+              <Icon.Grid s={12} /> {t("loot.miCollection")}
             </Link>
           </div>
         </div>
@@ -159,7 +159,7 @@ export default function LootPage() {
       {!uuid && (
         <Panel tone="deep" tight className="mb-4">
           <p role="alert" className="font-ar-mono text-[12px] text-ar-amber">
-            {t("arcade.common.loginRequiredBoxes")}
+            {t("common.loginRequiredBoxes")}
           </p>
         </Panel>
       )}
@@ -167,7 +167,7 @@ export default function LootPage() {
       {openBox.isError && (
         <Panel tone="deep" tight className="mb-4">
           <p role="alert" className="font-ar-mono text-[12px] text-ar-danger">
-            {userMessageFrom(openBox.error, t("arcade.loot.boxOpenError"))}
+            {userMessageFrom(openBox.error, t("loot.boxOpenError"))}
           </p>
         </Panel>
       )}
@@ -175,7 +175,7 @@ export default function LootPage() {
       {box && (
         <>
           <SectionTitle
-            kicker={t("arcade.loot.selectBox")}
+            kicker={t("loot.selectBox")}
             title={box.name}
             accent={TITLE_ACCENT[boxAccent(box.theme)] ?? "violet"}
             right={
@@ -185,7 +185,7 @@ export default function LootPage() {
                 icon={<Icon.Info s={12} />}
                 onClick={() => setInfo(true)}
               >
-                {t("arcade.loot.howItWorks")}
+                {t("loot.howItWorks")}
               </Button>
             }
           />

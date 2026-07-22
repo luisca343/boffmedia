@@ -72,7 +72,7 @@ export function GameTopBar({ title, accent = "cyan", onHelp, onReset, actions }:
           )}
         >
           <Icon.Chevron s={12} dir="left" />
-          {t("arcade.sidebar.arcade")}
+          {t("sidebar.arcade")}
         </Link>
         <span aria-hidden className="h-[18px] w-px bg-white/10" />
         <span className="flex min-w-0 items-center gap-2">
@@ -88,12 +88,12 @@ export function GameTopBar({ title, accent = "cyan", onHelp, onReset, actions }:
           {actions}
           {onHelp && (
             <Button variant="outline" size="sm" icon={<Icon.Info s={12} />} onClick={onHelp}>
-              {t("arcade.gameTopBar.help")}
+              {t("gameTopBar.help")}
             </Button>
           )}
           {onReset && (
             <Button variant="ghost" size="sm" icon={<Icon.Reset s={12} />} onClick={onReset}>
-              {t("arcade.gameTopBar.reset")}
+              {t("gameTopBar.reset")}
             </Button>
           )}
         </div>

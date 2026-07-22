@@ -24,7 +24,7 @@ export function TournamentsAdmin() {
 }
 
 function Manage({ slug, onBack }: { slug: string; onBack: () => void }) {
-  const t = useTranslations("admin.tournaments")
+  const t = useTranslations("tournaments")
   const { tournament: tn, isLoading, refetch } = useTournament(slug)
   const [matches, setMatches] = useState<TnMatchApi[]>([])
   const [seeding, setSeeding] = useState("as-seeded")

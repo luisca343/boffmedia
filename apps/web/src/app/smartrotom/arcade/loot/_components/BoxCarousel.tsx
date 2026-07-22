@@ -46,7 +46,7 @@ export function BoxCarousel({ boxes, index, onIndex, owned }: BoxCarouselProps) 
           <button
             type="button"
             onClick={() => step(-1)}
-            aria-label={t("arcade.loot.selectBox")}
+            aria-label={t("loot.selectBox")}
             className="ar-lift absolute left-3.5 top-1/2 z-[2] grid h-[38px] w-[38px] -translate-y-1/2 place-items-center rounded-full border border-ar-cyan/40 bg-black/50 text-ar-cyan"
           >
             <Icon.Chevron s={18} dir="left" />
@@ -54,7 +54,7 @@ export function BoxCarousel({ boxes, index, onIndex, owned }: BoxCarouselProps) 
           <button
             type="button"
             onClick={() => step(1)}
-            aria-label={t("arcade.loot.selectBox")}
+            aria-label={t("loot.selectBox")}
             className="ar-lift absolute right-3.5 top-1/2 z-[2] grid h-[38px] w-[38px] -translate-y-1/2 place-items-center rounded-full border border-ar-cyan/40 bg-black/50 text-ar-cyan"
           >
             <Icon.Chevron s={18} />
@@ -114,7 +114,7 @@ export function BoxCarousel({ boxes, index, onIndex, owned }: BoxCarouselProps) 
                       count > 0 ? BADGE[tone] : BADGE.ghost,
                     )}
                   >
-                    <Icon.Box s={12} /> {count} {t("arcade.loot.inInventory")}
+                    <Icon.Box s={12} /> {count} {t("loot.inInventory")}
                   </span>
                 </div>
               )}

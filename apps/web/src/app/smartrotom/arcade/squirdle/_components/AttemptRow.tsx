@@ -17,6 +17,7 @@ export interface AttemptRowProps {
 /** One guess: its creature, then a verdict per comparable attribute. */
 export function AttemptRow({ guess, target, name, revealed }: AttemptRowProps) {
   const t = useTranslations("arcade")
+  const tPokedex = useTranslations("pokedex")
   const tone = toneForType(guess.type1)
 
   return (
@@ -39,19 +40,19 @@ export function AttemptRow({ guess, target, name, revealed }: AttemptRowProps) {
         </span>
       </div>
 
-      <FeedbackCell label={t("arcade.squirdle.columns.gen")} fb={numberFeedback(guess.gen, target?.gen ?? guess.gen)}>
+      <FeedbackCell label={t("squirdle.columns.gen")} fb={numberFeedback(guess.gen, target?.gen ?? guess.gen)}>
         {guess.gen}
       </FeedbackCell>
-      <FeedbackCell label={t("arcade.squirdle.columns.type1")} fb={typeFeedback(guess.type1, 1, target)}>
-        {guess.type1 ? t(`pokedex.type_${guess.type1}`) : "—"}
+      <FeedbackCell label={t("squirdle.columns.type1")} fb={typeFeedback(guess.type1, 1, target)}>
+        {guess.type1 ? tPokedex(`type_${guess.type1}`) : "—"}
       </FeedbackCell>
-      <FeedbackCell label={t("arcade.squirdle.columns.type2")} fb={typeFeedback(guess.type2, 2, target)}>
-        {guess.type2 ? t(`pokedex.type_${guess.type2}`) : "—"}
+      <FeedbackCell label={t("squirdle.columns.type2")} fb={typeFeedback(guess.type2, 2, target)}>
+        {guess.type2 ? tPokedex(`type_${guess.type2}`) : "—"}
       </FeedbackCell>
-      <FeedbackCell label={t("arcade.squirdle.columns.height")} fb={numberFeedback(guess.height, target?.height ?? guess.height)}>
+      <FeedbackCell label={t("squirdle.columns.height")} fb={numberFeedback(guess.height, target?.height ?? guess.height)}>
         {guess.height}m
       </FeedbackCell>
-      <FeedbackCell label={t("arcade.squirdle.columns.weight")} fb={numberFeedback(guess.weight, target?.weight ?? guess.weight)}>
+      <FeedbackCell label={t("squirdle.columns.weight")} fb={numberFeedback(guess.weight, target?.weight ?? guess.weight)}>
         {guess.weight}
       </FeedbackCell>
     </div>

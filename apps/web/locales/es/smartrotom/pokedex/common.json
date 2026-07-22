@@ -441,6 +441,7 @@
     "tipos_title": "Tipos",
     "topbar_navigate": "Navegar",
     "topbar_open": "Abrir",
-    "unknown_description": "Descripción no disponible"
+    "unknown_description": "Descripción no disponible",
+    "dexlist_registered": "{count} Pokémon registrados"
   }
 }

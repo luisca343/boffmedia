@@ -37,7 +37,7 @@ export function EntrantsPanel({
   detail: NonNullable<ReturnType<typeof useTournament>["tournament"]>
   onChange: () => void
 }) {
-  const t = useTranslations("admin.tournaments")
+  const t = useTranslations("tournaments")
   const [name, setName] = useState("")
   const [seed, setSeed] = useState<number | "">("")
   const [country, setCountry] = useState("")
@@ -163,7 +163,7 @@ function EntrantRow({
   onUpdate: (body: Record<string, unknown>) => void
   onRemove: () => void
 }) {
-  const t = useTranslations("admin.tournaments")
+  const t = useTranslations("tournaments")
   const [seed, setSeed] = useState<number | "">(p.seed ?? "")
   const [score, setScore] = useState<number | "">(p.score ?? "")
 

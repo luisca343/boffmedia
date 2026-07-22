@@ -50,8 +50,8 @@ export function GuessInput({
             type="text"
             value={value}
             onChange={(e) => onChange(e.target.value)}
-            placeholder={t("arcade.squirdle.guessInput.placeholder")}
-            aria-label={t("arcade.squirdle.guessInput.ariaLabel")}
+            placeholder={t("squirdle.guessInput.placeholder")}
+            aria-label={t("squirdle.guessInput.ariaLabel")}
             autoComplete="off"
             disabled={disabled}
             className={cn(
@@ -64,7 +64,7 @@ export function GuessInput({
           </span>
         </div>
         <Button type="submit" variant="cyan" size="md" disabled={disabled}>
-          {t("arcade.squirdle.guessInput.guess")}
+          {t("squirdle.guessInput.guess")}
         </Button>
       </div>
 

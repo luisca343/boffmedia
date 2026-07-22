@@ -25,7 +25,7 @@ import { SectionHead, Stat } from "./shared"
 import { PhasesEditor } from "./PhasesEditor"
 
 export function ListAndCreate({ onSelect }: { onSelect: (slug: string) => void }) {
-  const t = useTranslations("admin.tournaments")
+  const t = useTranslations("tournaments")
   const { tournaments, isLoading, refetch } = useTournaments()
   const [name, setName] = useState("")
   const [format, setFormat] = useState<TnFormat>("single")

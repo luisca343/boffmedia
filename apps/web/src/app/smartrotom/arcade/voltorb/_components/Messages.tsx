@@ -31,13 +31,13 @@ export default function Messages({
       >
         <div className="flex items-center justify-center gap-2.5">
           <VoltorbImage size="md" glow />
-          <p className="ar-chrom m-0 font-ar-display text-[14px] text-ar-magenta-2">{t("arcade.voltorb.gameOver")}</p>
+          <p className="ar-chrom m-0 font-ar-display text-[14px] text-ar-magenta-2">{t("voltorb.gameOver")}</p>
         </div>
         <p className="mt-3 text-center font-ar text-[13px] leading-relaxed text-ar-ink-dim">
-          {t("arcade.voltorb.gameOverText", { count: lostCoins })}
+          {t("voltorb.gameOverText", { count: lostCoins })}
         </p>
         <p className="mt-1.5 text-center font-ar-mono text-[11px] text-ar-cyan">
-          {t("arcade.voltorb.newGameHint")}
+          {t("voltorb.newGameHint")}
         </p>
       </Panel>
     )
@@ -48,10 +48,10 @@ export default function Messages({
       <Panel tone="cyan" className="w-full max-w-[560px] animate-ar-pop motion-reduce:animate-none">
         <div className="flex items-center justify-center gap-2.5 text-ar-amber">
           <Icon.Trophy s={20} />
-          <p className="ar-glow-amber m-0 font-ar-display text-[13px]">{t("arcade.voltorb.levelComplete")}</p>
+          <p className="ar-glow-amber m-0 font-ar-display text-[13px]">{t("voltorb.levelComplete")}</p>
         </div>
         <p className="mt-3 text-center font-ar text-[13px] leading-relaxed text-ar-ink-dim">
-          {t("arcade.voltorb.levelCompleteText")}
+          {t("voltorb.levelCompleteText")}
         </p>
         <div className="mt-4 flex flex-wrap justify-center gap-2.5">
           <Button
@@ -60,10 +60,10 @@ export default function Messages({
             iconRight={<Icon.Chevron s={14} />}
             onClick={onNextLevel}
           >
-            {t("arcade.voltorb.nextLevel")}
+            {t("voltorb.nextLevel")}
           </Button>
           <Button variant="ghost" size="md" icon={<Icon.Coin s={16} />} onClick={onQuit}>
-            {t("arcade.voltorb.saveAndQuit")}
+            {t("voltorb.saveAndQuit")}
           </Button>
         </div>
       </Panel>
