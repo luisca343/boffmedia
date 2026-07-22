@@ -34,40 +34,40 @@ export interface ArcadeSidebarProps {
 function navigation({ boxesOwned, rewardReady }: ArcadeSidebarProps): NavGroup[] {
   return [
     {
-      groupKey: "arcade.sidebar.arcade",
+      groupKey: "sidebar.arcade",
       items: [
-        { href: "/smartrotom/arcade", labelKey: "arcade.sidebar.play", hintKey: "arcade.sidebar.playHint", icon: "Joystick" },
+        { href: "/smartrotom/arcade", labelKey: "sidebar.play", hintKey: "sidebar.playHint", icon: "Joystick" },
         {
           href: "/smartrotom/arcade/racha",
-          labelKey: "arcade.sidebar.streak",
-          hintKey: "arcade.sidebar.streakHint",
+          labelKey: "sidebar.streak",
+          hintKey: "sidebar.streakHint",
           icon: "Calendar",
           badge: rewardReady ? 1 : undefined,
         },
       ],
     },
     {
-      groupKey: "arcade.sidebar.boxes",
+      groupKey: "sidebar.boxes",
       items: [
         {
           href: "/smartrotom/arcade/loot",
-          labelKey: "arcade.sidebar.boxes",
-          hintKey: "arcade.sidebar.boxesHint",
+          labelKey: "sidebar.boxes",
+          hintKey: "sidebar.boxesHint",
           icon: "Box",
           badge: boxesOwned || undefined,
         },
         {
           href: "/smartrotom/arcade/coleccion",
-          labelKey: "arcade.sidebar.collection",
-          hintKey: "arcade.sidebar.collectionHint",
+          labelKey: "sidebar.collection",
+          hintKey: "sidebar.collectionHint",
           icon: "Grid",
         },
       ],
     },
     {
-      groupKey: "arcade.sidebar.account",
+      groupKey: "sidebar.account",
       items: [
-        { href: "/smartrotom/arcade/ajustes", labelKey: "arcade.sidebar.settings", hintKey: "arcade.sidebar.settingsHint", icon: "Gear" },
+        { href: "/smartrotom/arcade/ajustes", labelKey: "sidebar.settings", hintKey: "sidebar.settingsHint", icon: "Gear" },
       ],
     },
   ]
@@ -145,10 +145,10 @@ export function ArcadeSidebar(props: ArcadeSidebarProps) {
 
       <div className="mt-1.5 rounded-[10px] border border-dashed border-ar-magenta/30 bg-[linear-gradient(180deg,rgb(var(--ar-magenta)/.08),rgb(var(--ar-violet)/.04))] p-3">
         <div className="mb-1.5 font-ar-mono text-[10px] font-bold uppercase tracking-wider text-ar-magenta-2">
-          {t("arcade.common.freeToPlay")}
+          {t("common.freeToPlay")}
         </div>
         <div className="font-ar-mono text-[11px] leading-relaxed text-ar-ink-dim">
-          {t("arcade.common.freeToPlayDesc")}
+          {t("common.freeToPlayDesc")}
         </div>
       </div>
     </aside>

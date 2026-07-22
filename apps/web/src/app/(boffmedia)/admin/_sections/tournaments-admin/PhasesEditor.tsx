@@ -31,7 +31,7 @@ export function PhasesEditor({
   phases: TnPhaseInput[]
   onChange: (p: TnPhaseInput[]) => void
 }) {
-  const t = useTranslations("admin.tournaments")
+  const t = useTranslations("tournaments")
   const update = (i: number, patch: Partial<TnPhaseInput>) =>
     onChange(phases.map((p, j) => (j === i ? { ...p, ...patch } : p)))
   const add = () =>
@@ -95,7 +95,7 @@ export function PhasesManager({
   detail: NonNullable<ReturnType<typeof useTournament>["tournament"]>
   onChange: () => void
 }) {
-  const t = useTranslations("admin.tournaments")
+  const t = useTranslations("tournaments")
   const phases = (detail.phases ?? []).filter((p) => p.id > 0)
   const [editingId, setEditingId] = useState<number | null>(null)
   const canAppend = detail.status !== "completed" && detail.status !== "cancelled"
@@ -186,7 +186,7 @@ function PhaseRowEditor({
   onClose: () => void
   onChange: () => void
 }) {
-  const t = useTranslations("admin.tournaments")
+  const t = useTranslations("tournaments")
   const [draft, setDraft] = useState<TnPhaseInput>({
     name: phase.name,
     format: phase.format,
@@ -235,7 +235,7 @@ function PhaseFields({
   isLast: boolean
   upd: (patch: Partial<TnPhaseInput>) => void
 }) {
-  const t = useTranslations("admin.tournaments")
+  const t = useTranslations("tournaments")
   const advType = p.advanceType ?? "record"
   const isGroups = p.format === "groups"
   return (
@@ -334,7 +334,7 @@ export function RoundScheduler({
   items: TnMatchApi[]
   onScheduled: () => void
 }) {
-  const t = useTranslations("admin.tournaments")
+  const t = useTranslations("tournaments")
   const existing = items.find((m) => m.scheduledAt)?.scheduledAt ?? null
   const toLocal = (iso: string | null) => {
     if (!iso) return ""

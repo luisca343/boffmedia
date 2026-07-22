@@ -72,21 +72,21 @@ export function OpeningStage({
   }
 
   const description =
-    item && item.type === "pokemon" ? item.data || item.id : item ? getItemDescription(t, item.itemId) : ""
+    item && item.type === "pokemon" ? item.data || item.id : item ? getItemDescription(t, item.id) : ""
 
   return (
     <>
       <Panel tone="deep" tight className="mb-4">
         <div className="flex flex-wrap items-center justify-between gap-2.5">
           <span className="inline-flex items-center gap-3.5">
-            <span className="font-ar-display text-[11px] text-ar-magenta-2">▸ {t("arcade.loot.abriendo")}</span>
+            <span className="font-ar-display text-[11px] text-ar-magenta-2">▸ {t("loot.abriendo")}</span>
             <span className="ar-chrom font-ar-display text-[13px] text-ar-ink">{box.name}</span>
           </span>
           <span className="font-ar-mono text-[11px] uppercase tracking-[0.12em] text-ar-cyan">
             {settled ? (
-              <span className="text-ar-lime">{t("arcade.common.prizeObtained")}</span>
+              <span className="text-ar-lime">{t("common.prizeObtained")}</span>
             ) : (
-              <span className="motion-reduce:animate-none animate-ar-blink">{t("arcade.common.spinning")}</span>
+              <span className="motion-reduce:animate-none animate-ar-blink">{t("common.spinning")}</span>
             )}
           </span>
         </div>
@@ -96,7 +96,7 @@ export function OpeningStage({
         <div aria-hidden className="ar-horizon opacity-40" />
         <div className="relative z-[2]">
           <div className="mb-3 text-center font-ar-display text-[9px] uppercase tracking-[0.18em] text-ar-cyan">
-            {settled ? t("arcade.loot.prizeObtained") : t("arcade.common.spinning")}
+            {settled ? t("loot.prizeObtained") : t("common.spinning")}
           </div>
           {reel.tiles.length > 0 && reel.winningPosition >= 0 ? (
             <ReelSpinner
@@ -106,7 +106,7 @@ export function OpeningStage({
             />
           ) : (
             <p role="alert" className="py-8 text-center font-ar-mono text-[11px] text-ar-danger">
-              {t("arcade.loot.reelNoServer")}
+              {t("loot.reelNoServer")}
             </p>
           )}
         </div>
@@ -154,7 +154,7 @@ export function OpeningStage({
 
         <Panel tone="void">
           <div className="mb-3 font-ar-display text-[9px] uppercase tracking-[0.18em] text-ar-cyan">
-            {t("arcade.loot.next")}
+            {t("loot.next")}
           </div>
           <div className="flex flex-wrap gap-2.5">
             <Button
@@ -164,7 +164,7 @@ export function OpeningStage({
               onClick={onOpenAnother}
               disabled={!settled || opening || owned <= 0}
             >
-              {opening ? t("arcade.loot.opening") : t("arcade.loot.openAnotherBtn")}
+              {opening ? t("loot.opening") : t("loot.openAnotherBtn")}
             </Button>
             <Link
               href="/smartrotom/arcade/coleccion"
@@ -177,7 +177,7 @@ export function OpeningStage({
                 !settled && "pointer-events-none opacity-45",
               )}
             >
-              <Icon.Trophy s={14} /> {t("arcade.loot.viewMyCollection")}
+              <Icon.Trophy s={14} /> {t("loot.viewMyCollection")}
             </Link>
             <Button
               variant="ghost"
@@ -186,16 +186,16 @@ export function OpeningStage({
               onClick={onBack}
               disabled={!settled}
             >
-              {t("arcade.loot.backToSelector")}
+              {t("loot.backToSelector")}
             </Button>
           </div>
 
           <div className="mt-[18px] rounded-[10px] border border-white/[.07] bg-black/45 px-3.5 py-3">
             <div className="mb-1.5 font-ar-mono text-[11px] uppercase tracking-[0.12em] text-ar-ink-muted">
-              {t("arcade.loot.saved")}
+              {t("loot.saved")}
             </div>
             <p className="font-ar text-[13px] leading-relaxed text-ar-ink-dim">
-              {t("arcade.loot.itemInCollection", { count: owned })}
+              {t("loot.itemInCollection", { count: owned })}
             </p>
           </div>
         </Panel>

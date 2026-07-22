@@ -151,7 +151,7 @@ export function CabinetCard({ game, compact }: CabinetCardProps) {
             INSERT COIN ●
           </span>
           <span className={cn("inline-flex items-center gap-1 text-[11px] font-semibold", accent.text)}>
-            {t("arcade.sidebar.play")} <Icon.Chevron s={12} />
+            {t("sidebar.play")} <Icon.Chevron s={12} />
           </span>
         </div>
       </div>

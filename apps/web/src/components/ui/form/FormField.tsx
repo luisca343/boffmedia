@@ -62,7 +62,7 @@ export function FormField({
                 background: "rgba(15,23,42,0.5)",
               }}
             >
-              {t("boffmedia.ui.disabled")}
+              {t("ui.disabled")}
             </span>
           )}
         </div>
@@ -90,7 +90,7 @@ export function FormField({
           {icon}
           <span>{label}</span>
           {required && <span className="text-red-400">*</span>}
-          {disabled && <Badge variant="outline" className="text-xs">{t("boffmedia.ui.disabled")}</Badge>}
+          {disabled && <Badge variant="outline" className="text-xs">{t("ui.disabled")}</Badge>}
         </div>
       </label>
       {children}

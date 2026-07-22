@@ -77,7 +77,9 @@
       "speaker": "Speaker",
       "accept": "Accept",
       "hangUp": "Hang up",
-      "expand": "Expand"
+      "expand": "Expand",
+      "you": "You",
+      "call": "Call"
     },
     "clock": {
       "rainExpected": "Rain expected at",
@@ -91,24 +93,24 @@
     },
     "notLinked": {
       "smartrotomMessage": "SmartRotom user not linked. Access Minecraft before using the web.",
-      "smartrotomCauses": [
-        "You have not logged into Minecraft",
-        "Minecraft session data is invalid"
-      ],
-      "smartrotomSolutions": [
-        "Log into Minecraft first",
-        "Restart the Minecraft client",
-        "Contact support if the problem persists"
-      ],
+      "smartrotomCauses": {
+        "0": "You have not logged into Minecraft",
+        "1": "Minecraft session data is invalid"
+      },
+      "smartrotomSolutions": {
+        "0": "Log into Minecraft first",
+        "1": "Restart the Minecraft client",
+        "2": "Contact support if the problem persists"
+      },
       "boffmediaMessage": "BoffMedia user not linked",
-      "boffmediaCauses": [
-        "You have not linked your BoffMedia account",
-        "The connection to BoffMedia has failed"
-      ],
-      "boffmediaSolutions": [
-        "Link your BoffMedia account in settings",
-        "Log out and log back in"
-      ]
+      "boffmediaCauses": {
+        "0": "You have not linked your BoffMedia account",
+        "1": "The connection to BoffMedia has failed"
+      },
+      "boffmediaSolutions": {
+        "0": "Link your BoffMedia account in settings",
+        "1": "Log out and log back in"
+      }
     }
   }
 }

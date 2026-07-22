@@ -29,7 +29,7 @@ export function BoxOddsPanel({ box, owned, opening, onOpen, onShowInfo }: BoxOdd
   return (
     <Panel tone="void">
       <div className="mb-3.5 font-ar-display text-[9px] uppercase tracking-[0.18em] text-ar-cyan">
-        {t("arcade.loot.probabilities")}
+        {t("loot.probabilities")}
       </div>
 
       <div className="flex flex-col gap-2">
@@ -72,7 +72,7 @@ export function BoxOddsPanel({ box, owned, opening, onOpen, onShowInfo }: BoxOdd
 
       <div className="mt-[18px] rounded-[10px] border border-white/[.06] bg-black/40 px-3.5 py-3">
         <div className="font-ar-mono text-[11px] uppercase tracking-[0.12em] text-ar-ink-muted">
-          {t("arcade.loot.inInventory")}
+          {t("loot.inInventory")}
         </div>
         <div
           className={`mt-1.5 font-ar-display text-[16px] leading-relaxed ${owned > 0 ? "text-ar-ink" : "text-ar-ink-muted"}`}
@@ -81,7 +81,7 @@ export function BoxOddsPanel({ box, owned, opening, onOpen, onShowInfo }: BoxOdd
         </div>
         {owned === 0 && (
           <p className="mt-2 font-ar text-xs leading-relaxed text-ar-ink-dim">
-            {t("arcade.loot.noBoxOwned", {
+            {t("loot.noBoxOwned", {
               streakLink: "",
             })}
           </p>
@@ -97,7 +97,7 @@ export function BoxOddsPanel({ box, owned, opening, onOpen, onShowInfo }: BoxOdd
           onClick={onOpen}
           disabled={!canOpen}
         >
-          {opening ? t("arcade.loot.opening") : t("arcade.loot.openBox")}
+          {opening ? t("loot.opening") : t("loot.openBox")}
         </Button>
       </div>
 
@@ -109,12 +109,12 @@ export function BoxOddsPanel({ box, owned, opening, onOpen, onShowInfo }: BoxOdd
         icon={<Icon.Info s={12} />}
         onClick={onShowInfo}
       >
-        {t("arcade.loot.viewFullOdds")}
+        {t("loot.viewFullOdds")}
       </Button>
 
       {empty && (
         <p role="alert" className="mt-2.5 font-ar-mono text-[11px] text-ar-danger">
-          {t("arcade.loot.noBoxItems")}
+          {t("loot.noBoxItems")}
         </p>
       )}
     </Panel>

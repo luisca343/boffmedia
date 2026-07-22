@@ -441,6 +441,7 @@
     "tipos_title": "Types",
     "topbar_navigate": "Navigate",
     "topbar_open": "Open",
-    "unknown_description": "No description available"
+    "unknown_description": "No description available",
+    "dexlist_registered": "{count} Pokémon registered"
   }
 }

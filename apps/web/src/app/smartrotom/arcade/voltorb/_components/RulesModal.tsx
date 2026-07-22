@@ -31,54 +31,54 @@ export function RulesModal({ isOpen, onClose }: RulesModalProps) {
       onClose={onClose}
       size="lg"
       tone="cyan"
-      kicker={t("arcade.voltorb.howToPlay")}
-      title={t("arcade.voltorb.rulesTitle")}
+      kicker={t("voltorb.howToPlay")}
+      title={t("voltorb.rulesTitle")}
       footer={
         <Button variant="cyan" size="sm" icon={<Icon.Joystick s={12} />} onClick={onClose}>
-          {t("arcade.voltorb.understood")}
+          {t("voltorb.understood")}
         </Button>
       }
     >
-      <Section title={t("arcade.voltorb.introduction")}>
-        <p>{t("arcade.voltorb.introText")}</p>
+      <Section title={t("voltorb.introduction")}>
+        <p>{t("voltorb.introText")}</p>
       </Section>
 
-      <Section title={t("arcade.voltorb.theBoard")}>
+      <Section title={t("voltorb.theBoard")}>
         <ul className={LIST}>
           {(["boardItems.0", "boardItems.1", "boardItems.2", "boardItems.3"] as const).map((key) => (
-            <li key={key}>{t(`arcade.voltorb.${key}`)}</li>
+            <li key={key}>{t(`voltorb.${key}`)}</li>
           ))}
         </ul>
       </Section>
 
-      <Section title={t("arcade.voltorb.howToPlaySection")}>
+      <Section title={t("voltorb.howToPlaySection")}>
         <ol className="ml-4 list-decimal space-y-1.5 marker:font-ar-mono marker:text-ar-cyan">
           {(["playSteps.0", "playSteps.1", "playSteps.2", "playSteps.3", "playSteps.4"] as const).map((key) => (
-            <li key={key}>{t(`arcade.voltorb.${key}`)}</li>
+            <li key={key}>{t(`voltorb.${key}`)}</li>
           ))}
         </ol>
       </Section>
 
-      <Section title={t("arcade.voltorb.levelsProgression")}>
+      <Section title={t("voltorb.levelsProgression")}>
         <ul className={LIST}>
           {(["levelItems.0", "levelItems.1", "levelItems.2", "levelItems.3"] as const).map((key) => (
-            <li key={key}>{t(`arcade.voltorb.${key}`)}</li>
+            <li key={key}>{t(`voltorb.${key}`)}</li>
           ))}
         </ul>
       </Section>
 
-      <Section title={t("arcade.voltorb.level8")}>
-        <p>{t("arcade.voltorb.level8Text")}</p>
+      <Section title={t("voltorb.level8")}>
+        <p>{t("voltorb.level8Text")}</p>
       </Section>
 
-      <Section title={t("arcade.voltorb.memoMode")}>
-        <p>{t("arcade.voltorb.memoModeText")}</p>
+      <Section title={t("voltorb.memoMode")}>
+        <p>{t("voltorb.memoModeText")}</p>
       </Section>
 
-      <Section title={t("arcade.voltorb.tips")}>
+      <Section title={t("voltorb.tips")}>
         <ul className={LIST}>
           {(["tipItems.0", "tipItems.1", "tipItems.2", "tipItems.3"] as const).map((key) => (
-            <li key={key}>{t(`arcade.voltorb.${key}`)}</li>
+            <li key={key}>{t(`voltorb.${key}`)}</li>
           ))}
         </ul>
       </Section>

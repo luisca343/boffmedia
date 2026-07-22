@@ -52,11 +52,11 @@ export function LootInfoModal({ open, onClose, box }: LootInfoModalProps) {
       open={open}
       onClose={onClose}
       size="lg"
-      kicker={t("arcade.loot.howBoxesWork")}
-      title={box ? t("arcade.loot.lootBoxProbabilities", { name: box.name }) : t("arcade.loot.lootBoxes")}
+      kicker={t("loot.howBoxesWork")}
+      title={box ? t("loot.lootBoxProbabilities", { name: box.name }) : t("loot.lootBoxes")}
       footer={
         <Button variant="cyan" size="md" onClick={onClose}>
-          {t("arcade.common.understood")}
+          {t("common.understood")}
         </Button>
       }
     >
@@ -66,13 +66,13 @@ export function LootInfoModal({ open, onClose, box }: LootInfoModalProps) {
             <span className="mt-0.5 grid h-[22px] w-[22px] shrink-0 place-items-center rounded-md border border-ar-cyan/40 bg-ar-cyan/[.12] font-ar-display text-[9px] text-ar-cyan">
               {i + 1}
             </span>
-            <span className="text-ar-ink-dim">{t(`arcade.loot.${key}`)}</span>
+            <span className="text-ar-ink-dim">{t(`loot.${key}`)}</span>
           </li>
         ))}
       </ol>
 
       <p className="mb-4 rounded-[10px] border border-white/[.07] bg-black/40 p-3 font-ar-mono text-[11px] leading-relaxed text-ar-ink-muted">
-        {t("arcade.loot.oddsExplanation")}
+        {t("loot.oddsExplanation")}
       </p>
 
       <div className="flex flex-col gap-3">
