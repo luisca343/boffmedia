@@ -19,7 +19,22 @@
       "disabled": "Desactivado",
       "selectElement": "Selecciona un elemento",
       "searchElement": "Buscar elemento",
-      "noElementFound": "No se encontró ningún elemento"
+      "noElementFound": "No se encontró ningún elemento",
+      "comboboxPlaceholder": "Selecciona una opción",
+      "comboboxPreviewAlt": "Vista previa"
+    },
+    "unauthorized": {
+      "title": "Acceso restringido",
+      "body": "No tienes permiso para ver esta página. Si crees que es un error, contacta al administrador.",
+      "back": "Volver atrás",
+      "home": "Ir al inicio"
+    },
+    "contact": {
+      "nameLabel": "Nombre",
+      "emailLabel": "Correo Electrónico",
+      "messageLabel": "Mensaje",
+      "successMessage": "Mensaje enviado. ¡Gracias por contactarnos!",
+      "submit": "Enviar"
     },
     "featuredGames": {
       "title": "Juegos y Herramientas Destacados",

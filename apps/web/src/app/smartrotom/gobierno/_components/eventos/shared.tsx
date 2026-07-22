@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react"
 import Link from "next/link"
+import { useTranslations } from "next-intl"
 import { Badge, Icon, type IconName } from "../ui"
 import { TONES, type Tone } from "../../_utils/tones"
 import { fmtDateTime, timeLeft } from "../../_utils/format"
@@ -11,57 +12,68 @@ import type { Evento, EventoWeights } from "../../_types"
 // Two event types, one screen. Everything below is shared between the browse card, the
 // detail pages and the creation wizard so the three never drift.
 
-export const EVENTO_TYPE_META: Record<Evento["type"], { label: string; icon: IconName; tone: Tone }> = {
-  construccion: { label: "Construcción", icon: "building", tone: "urbanismo" },
-  caza: { label: "Caza de bichos", icon: "crosshair", tone: "civic" },
+type TFn = (key: string) => string
+
+export function getEventoTypeMeta(t: TFn): Record<Evento["type"], { label: string; icon: IconName; tone: Tone }> {
+  return {
+    construccion: { label: t("eventos.tipoConstruccion"), icon: "building", tone: "urbanismo" },
+    caza: { label: t("eventos.tipoCaza"), icon: "crosshair", tone: "civic" },
+  }
 }
 
-export function eventoStatusMeta(status: Evento["status"]): { label: string; tone: Tone; dot: boolean } {
+export function eventoStatusMeta(
+  status: Evento["status"],
+  t: TFn,
+): { label: string; tone: Tone; dot: boolean } {
   switch (status) {
     case "upcoming":
-      return { label: "Próximamente", tone: "info", dot: false }
+      return { label: t("eventos.proximamente"), tone: "info", dot: false }
     case "building":
-      return { label: "En construcción", tone: "urbanismo", dot: true }
+      return { label: t("eventos.enConstruccion"), tone: "urbanismo", dot: true }
     case "rating":
-      return { label: "Valoración abierta", tone: "gold", dot: true }
+      return { label: t("eventos.valoracionAbierta"), tone: "gold", dot: true }
     case "live":
-      return { label: "En curso", tone: "ok", dot: true }
+      return { label: t("eventos.enCurso"), tone: "ok", dot: true }
     case "closed":
-      return { label: "Finalizado", tone: "default", dot: false }
+      return { label: t("eventos.finalizado"), tone: "default", dot: false }
   }
 }
 
 /** The one date worth surfacing on a card or a header, given where the event stands. */
-export function relevantMoment(ev: Evento): { label: string; iso: string | null } {
+export function relevantMoment(ev: Evento, t: TFn): { label: string; iso: string | null } {
   if (ev.type === "construccion") {
-    if (ev.status === "rating") return { label: "Vota hasta", iso: ev.ratingClosesAt }
-    if (ev.status === "closed") return { label: "Cerrado", iso: null }
-    return { label: "Construcción hasta", iso: ev.buildClosedAt }
+    if (ev.status === "rating") return { label: t("eventos.votaHasta"), iso: ev.ratingClosesAt }
+    if (ev.status === "closed") return { label: t("eventos.cerrado"), iso: null }
+    return { label: t("eventos.construccionHasta"), iso: ev.buildClosedAt }
   }
-  if (ev.status === "live") return { label: "Cierra en", iso: ev.closesAt }
-  if (ev.status === "closed") return { label: "Cerrado", iso: null }
-  return { label: "Empieza", iso: ev.opensAt }
+  if (ev.status === "live") return { label: t("eventos.cierraEn"), iso: ev.closesAt }
+  if (ev.status === "closed") return { label: t("eventos.cerrado"), iso: null }
+  return { label: t("eventos.empieza"), iso: ev.opensAt }
 }
 
 // ─── Scoring vocabulary (caza) ─────────────────────────────────────────────────
 
-export const SCORE_FIELDS: { key: keyof EventoWeights; label: string; icon: IconName; desc: string }[] = [
-  {
-    key: "especie",
-    label: "Especie",
-    icon: "crosshair",
-    desc: "Según la rareza de aparición en la zona. Cuanto más raro el bicho, más puntos base.",
-  },
-  {
-    key: "tamano",
-    label: "Tamaño",
-    icon: "arrowUp",
-    desc: "Desviación respecto al tamaño medio de la especie. Cuanto más extremo, más puntos.",
-  },
-  { key: "ivs", label: "IVs", icon: "star", desc: "Porcentaje de estadísticas perfectas del ejemplar." },
-  { key: "nivel", label: "Nivel", icon: "trendUp", desc: "Nivel del Pokémon en el momento de registrarlo." },
-  { key: "shiny", label: "Shiny", icon: "flame", desc: "Variante cromática. Bonificación fija." },
-]
+export function getScoreFields(
+  t: TFn,
+): { key: keyof EventoWeights; label: string; icon: IconName; desc: string }[] {
+  return [
+    {
+      key: "especie",
+      label: t("eventos.especie"),
+      icon: "crosshair",
+      desc: t("eventos.scoreEspecieDesc"),
+    },
+    {
+      key: "tamano",
+      label: t("eventos.tamano"),
+      icon: "arrowUp",
+      desc: t("eventos.scoreTamanoDesc"),
+    },
+    { key: "ivs", label: t("eventos.ivs"), icon: "star", desc: t("eventos.scoreIvsDesc") },
+    { key: "nivel", label: t("eventos.nivel"), icon: "trendUp", desc: t("eventos.scoreNivelDesc") },
+    { key: "shiny", label: t("eventos.shiny"), icon: "flame", desc: t("eventos.scoreShinyDesc") },
+  ]
+}
 
 export const weightMax = (w: EventoWeights | null | undefined): number =>
   w ? w.tamano + w.ivs + w.shiny + w.nivel + w.especie : 0
@@ -117,10 +129,11 @@ export function BuildSlot({
 }
 
 /** Ticks every second; renders nothing once there is no target moment. */
-export function Countdown({ iso, label = "Cierra en" }: { iso: string | null; label?: string }) {
+export function Countdown({ iso, label }: { iso: string | null; label?: string }) {
+  const t = useTranslations("gobierno")
   const [, setTick] = useState(0)
   useEffect(() => {
-    const id = setInterval(() => setTick((t) => t + 1), 1000)
+    const id = setInterval(() => setTick((n) => n + 1), 1000)
     return () => clearInterval(id)
   }, [])
   if (!iso) return null
@@ -132,14 +145,14 @@ export function Countdown({ iso, label = "Cierra en" }: { iso: string | null; la
   return (
     <div className="text-right">
       <div className="font-gt-mono text-[8.5px] uppercase tracking-[.14em] text-gt-ink-400">
-        {closed ? "Estado" : label}
+        {closed ? t("actividad.estado") : (label ?? t("eventos.cierraEn"))}
       </div>
       <div
         className={`font-gt-mono text-lg font-bold leading-tight tabular-nums ${
           closed ? "text-gt-ink-400" : urgent ? "text-gt-danger" : "text-gt-ink-900"
         }`}
       >
-        {closed ? "Cerrado" : timeLeft(iso)}
+        {closed ? t("eventos.cerrado") : timeLeft(iso)}
       </div>
     </div>
   )
@@ -194,12 +207,13 @@ export function ScoreDisplay({ score10 }: { score10: number }) {
 }
 
 export function BackToEventos() {
+  const t = useTranslations("gobierno")
   return (
     <Link
       href={`${GOBIERNO_ROOT}/eventos`}
       className="mb-3 inline-flex items-center gap-1.5 text-[13px] font-semibold text-gt-ink-500 transition-colors hover:text-gt-ink-900"
     >
-      <Icon name="arrowLeft" size={15} /> Eventos
+      <Icon name="arrowLeft" size={15} /> {t("nav.eventos")}
     </Link>
   )
 }
@@ -207,14 +221,16 @@ export function BackToEventos() {
 // ─── The card ───────────────────────────────────────────────────────────────────
 
 export function EventoCard({ ev, linkable = true }: { ev: Evento; linkable?: boolean }) {
-  const type = EVENTO_TYPE_META[ev.type]
-  const status = eventoStatusMeta(ev.status)
+  const t = useTranslations("gobierno")
+  const typeMeta = getEventoTypeMeta(t)
+  const type = typeMeta[ev.type]
+  const status = eventoStatusMeta(ev.status, t)
   const isCons = ev.type === "construccion"
-  const moment = relevantMoment(ev)
+  const moment = relevantMoment(ev, t)
 
   const body = (
     <>
-      <BuildSlot icon={type.icon} label={isCons ? "maqueta del reto" : "mapa de la zona"} />
+      <BuildSlot icon={type.icon} label={isCons ? t("eventos.maquetaReto") : t("eventos.mapaZona")} />
       <div className="flex flex-1 flex-col p-4">
         <div className="mb-2.5 flex flex-wrap items-center gap-1.5">
           <Badge tone={type.tone} icon={type.icon}>
@@ -244,7 +260,7 @@ export function EventoCard({ ev, linkable = true }: { ev: Evento; linkable?: boo
           )}
           {linkable && (
             <span className={`flex flex-none items-center gap-1 text-[11.5px] font-bold ${TONES[type.tone].text}`}>
-              Abrir <Icon name="arrowRight" size={13} />
+              {t("eventos.abrir")} <Icon name="arrowRight" size={13} />
             </span>
           )}
         </div>

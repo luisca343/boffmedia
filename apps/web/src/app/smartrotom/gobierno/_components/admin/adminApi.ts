@@ -1,6 +1,7 @@
 "use client"
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import { useTranslations } from "next-intl"
 import { rotomGETOrThrow, rotomPOSTOrThrow, userMessageFrom } from "@/services/boffAPI"
 import type { SendNotificationPayload } from "@/services/api/smartrotom/notificationsService"
 import type { NotificationResponseDto } from "@boffmedia/shared"
@@ -38,37 +39,41 @@ export const useAdminPlayerApps = (uuid: string | null) =>
   })
 
 export const useAdminAddApp = () => {
+  const t = useTranslations("gobierno")
   const qc = useQueryClient()
   return useMutation({
     mutationFn: ({ uuid, id }: { uuid: string; id: number }) =>
       rotomPOSTOrThrow("/apps/player/add", { uuid, id }),
     onSuccess: (_d, { uuid }) => {
       qc.invalidateQueries({ queryKey: adminKeys.playerApps(uuid) })
-      toast.success("App añadida al dispositivo")
+      toast.success(t("apps.appAnadida"))
     },
-    onError: (e: unknown) => toast.error(userMessageFrom(e, "No se pudo añadir la app")),
+    onError: (e: unknown) => toast.error(userMessageFrom(e, t("apps.errorAnadir"))),
   })
 }
 
 export const useAdminRemoveApp = () => {
+  const t = useTranslations("gobierno")
   const qc = useQueryClient()
   return useMutation({
     mutationFn: ({ uuid, id }: { uuid: string; id: number }) =>
       rotomPOSTOrThrow("/apps/player/remove", { uuid, id }),
     onSuccess: (_d, { uuid }) => {
       qc.invalidateQueries({ queryKey: adminKeys.playerApps(uuid) })
-      toast.info("App eliminada")
+      toast.info(t("apps.appEliminada"))
     },
-    onError: (e: unknown) => toast.error(userMessageFrom(e, "No se pudo eliminar la app")),
+    onError: (e: unknown) => toast.error(userMessageFrom(e, t("apps.errorEliminar"))),
   })
 }
 
-export const useSendNotification = () =>
-  useMutation({
+export const useSendNotification = () => {
+  const t = useTranslations("gobierno")
+  return useMutation({
     mutationFn: (payload: SendNotificationPayload) =>
       rotomPOSTOrThrow<NotificationResponseDto>("/notifications/send", payload),
-    onSuccess: () => toast.success("Notificación enviada"),
-    onError: (e: unknown) => toast.error(userMessageFrom(e, "No se pudo enviar la notificación")),
+    onSuccess: () => toast.success(t("notificaciones.notifEnviada")),
+    onError: (e: unknown) => toast.error(userMessageFrom(e, t("notificaciones.errorEnviar"))),
   })
+}
 
 export type { SmartRotomApp, SmartRotomUser }

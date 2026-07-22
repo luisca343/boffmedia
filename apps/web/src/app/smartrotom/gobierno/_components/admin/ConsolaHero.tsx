@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import { useTranslations } from "next-intl"
 import { Card, Icon, type IconName } from "../ui"
 import { TONES, type Tone } from "../../_utils/tones"
 
@@ -25,13 +26,14 @@ export function ConsolaHero({
   status?: string
   statusTone?: Tone
 }) {
+  const t = useTranslations("gobierno")
   const [now, setNow] = useState<Date | null>(null)
   useEffect(() => {
     setNow(new Date())
     const iv = setInterval(() => setNow(new Date()), 1000)
     return () => clearInterval(iv)
   }, [])
-  const t = TONES[dep]
+  const tone = TONES[dep]
   const st = TONES[statusTone]
   const pad = (n: number) => String(n).padStart(2, "0")
 
@@ -40,14 +42,14 @@ export function ConsolaHero({
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex min-w-0 items-center gap-3">
           <div
-            className={`grid h-9 w-9 flex-none place-items-center rounded-gt border ${t.softBorder} ${t.softBg}`}
+            className={`grid h-9 w-9 flex-none place-items-center rounded-gt border ${tone.softBorder} ${tone.softBg}`}
           >
-            <Icon name={icon} size={18} className={t.text} />
+            <Icon name={icon} size={18} className={tone.text} />
           </div>
           <div className="min-w-0">
             <div className="font-gt-display text-base font-bold tracking-[.01em] text-gt-ink-900">{title}</div>
             <div className="mt-[3px] font-gt-mono text-[9px] uppercase tracking-[.14em] text-gt-ink-400">
-              Servicio interno · {code}
+              {t("chrome.servicioInterno", { code })}
             </div>
           </div>
         </div>

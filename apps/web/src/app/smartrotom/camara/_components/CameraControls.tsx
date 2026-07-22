@@ -1,4 +1,7 @@
+'use client'
+
 import { PanelsTopLeft } from "lucide-react"
+import { useTranslations } from "next-intl"
 import { Button } from "@/components/ui/primitives/button"
 import { CameraZoomSlider } from "./CameraZoomSlider"
 import { CameraFlashlightButton } from "./CameraFlashlightButton"
@@ -10,6 +13,7 @@ interface CameraControlsProps {
 }
 
 export function CameraControls({ includeUI, onToggleUI, onZoomChange }: CameraControlsProps) {
+  const t = useTranslations("camara")
   return (
     <div className="absolute top-4 left-4 right-4 flex justify-between items-center">
       <div className="flex items-center gap-2">
@@ -18,7 +22,7 @@ export function CameraControls({ includeUI, onToggleUI, onZoomChange }: CameraCo
           size="icon"
           className={`rounded-full ${includeUI ? 'bg-white/50' : 'bg-black/50'}`}
           onClick={onToggleUI}
-          title={includeUI ? 'Hide UI' : 'Show UI'}
+          title={includeUI ? t("controls.hideUi") : t("controls.showUi")}
         >
           <PanelsTopLeft className="h-6 w-6" />
         </Button>
@@ -29,7 +33,7 @@ export function CameraControls({ includeUI, onToggleUI, onZoomChange }: CameraCo
       <CameraZoomSlider onZoomChange={onZoomChange} />
       
       <div className="text-sm bg-black/50 px-3 py-1 rounded-full">
-        {includeUI ? 'UI: ON' : 'UI: OFF'}
+        {includeUI ? t("controls.uiOn") : t("controls.uiOff")}
       </div>
     </div>
   )

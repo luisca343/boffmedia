@@ -37,6 +37,12 @@
     "articleCard": {
       "readMore": "Leer más"
     },
+    "footer": {
+      "newsletterSuccess": "Te hemos guardado en la lista. ¡Nos vemos el viernes!",
+      "newsletterError": "No hemos podido suscribirte. Inténtalo de nuevo.",
+      "emailPlaceholder": "tu@email",
+      "emailAriaLabel": "Email para la newsletter"
+    },
     "furretFooter": {
       "copyright": "© Furret Today",
       "allRights": "Todos los derechos reservados"
@@ -63,7 +69,10 @@
       "copyLink": "Copiar enlace",
       "linkCopied": "Enlace copiado",
       "relatedArticles": "Artículos relacionados",
-      "upNext": "Siguiente"
+      "upNext": "Siguiente",
+      "deleteCommentAriaLabel": "Borrar comentario",
+      "commentPlaceholder": "Deja tu viñeta…",
+      "commentAriaLabel": "Escribir comentario"
     },
     "shareModal": {
       "title": "Compartir artículo",
@@ -78,11 +87,25 @@
       "draft": "Borrador",
       "published": "Publicado",
       "delete": "Eliminar",
-      "confirmDelete": "¿Eliminar este artículo?"
+      "confirmDelete": "¿Eliminar este artículo?",
+      "saveError": "No se pudieron guardar los cambios.",
+      "leadPlaceholder": "Escribe una entradilla…",
+      "bodyPlaceholder": "Redacción",
+      "authorPlaceholder": "Editor/a",
+      "tagsPlaceholder": "Comunidad, Torneos…",
+      "optionalPlaceholder": "Opcional",
+      "readMorePlaceholder": "Leer más"
     },
     "newsroom": {
       "title": "Redacción",
-      "empty": "Sin artículos todavía"
+      "empty": "Sin artículos todavía",
+      "chooseFeatureFirst": "Elige primero una noticia destacada.",
+      "updateStatusError": "No se pudo actualizar el estado.",
+      "setCoverSuccess": "Ahora es la portada del número.",
+      "deleteSuccess": "Noticia eliminada.",
+      "deleteError": "No se pudo eliminar.",
+      "draftCreated": "Borrador creado. ¡A escribir!",
+      "draftError": "No se pudo crear el borrador."
     },
     "error": {
       "title": "Error",

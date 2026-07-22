@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import { useTranslations } from "next-intl"
 import { useBoard } from "../_hooks/useBoard"
 import type { NPC, QuestData } from "../_types"
 import { objectiveSprite } from "../_utils/items"
@@ -30,6 +31,7 @@ import {
  * floats on.
  */
 export function QuestLetter({ quest, onOpenNpc }: { quest: QuestData; onOpenNpc: (npc: NPC) => void }) {
+  const t = useTranslations("misiones")
   const { quests, npcs, dialogs, open, track, isTracked } = useBoard()
 
   const status = normalizeStatus(quest)
@@ -213,7 +215,7 @@ export function QuestLetter({ quest, onOpenNpc }: { quest: QuestData; onOpenNpc:
                   <NpcPortrait skin={npc?.skin} size={48} />
                 </div>
                 <div className="mb-1.5 font-ms-uppercase text-[11px] uppercase tracking-[.14em] text-ms-ink-3">
-                  — palabras de {npc?.name || "un desconocido"}
+                  — palabras de {npc?.name || t("letter.unknownNpc")}
                   {dialog.name && ` · ${dialog.name}`}
                 </div>
                 <p className="m-0 border-l-2 border-ms-ink-3 pl-3 text-[15px] italic leading-relaxed text-ms-ink-1">

@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react"
 import { createPortal } from "react-dom"
 import { useRouter } from "next/navigation"
+import { useTranslations } from "next-intl"
 import { Icon, ThemedLayer } from "../ui"
 import { FLAT_MODULES, hrefOf } from "../../_utils/nav"
 import { DEPARTMENTS, TONES } from "../../_utils/tones"
@@ -12,6 +13,7 @@ import { useGobiernoUi } from "../../_stores/useGobiernoUi"
 // ⌘K over every module in the government. Deliberately modules only — a citizen is found
 // through the Censo, which is itself one keystroke away.
 export function CommandPalette() {
+  const t = useTranslations("gobierno")
   const router = useRouter()
   const { isAdmin } = useOfficer()
   const open = useGobiernoUi((s) => s.cmdOpen)
@@ -65,7 +67,7 @@ export function CommandPalette() {
         <div
           role="dialog"
           aria-modal="true"
-          aria-label="Buscar en el gobierno"
+          aria-label={t("commandPalette.ariaLabel")}
           className="gt-edge-gold relative w-full max-w-[540px] animate-gt-pop-scale overflow-hidden rounded-gt border border-gt-line-strong bg-gt-paper-0 shadow-gt-lg motion-reduce:animate-none"
         >
           <div className="flex items-center gap-2.5 border-b border-gt-line px-4 py-3">
@@ -85,8 +87,8 @@ export function CommandPalette() {
                   go(results[cursor].slug)
                 }
               }}
-              placeholder="Buscar un módulo…"
-              aria-label="Buscar un módulo"
+              placeholder={t("commandPalette.searchPlaceholder")}
+              aria-label={t("commandPalette.searchPlaceholder")}
               className="flex-1 bg-transparent text-[14px] text-gt-ink-900 outline-none placeholder:text-gt-ink-400"
             />
             <span className="rounded border border-gt-line-strong px-1.5 py-px font-gt-mono text-[10px] text-gt-ink-400">
@@ -97,7 +99,7 @@ export function CommandPalette() {
           <div className="gt-scroll max-h-[50vh] overflow-y-auto py-1.5">
             {results.length === 0 ? (
               <div className="px-4 py-8 text-center text-[13px] text-gt-ink-400">
-                Ningún módulo coincide con «{q}».
+                {t("commandPalette.noResults", { query: q })}
               </div>
             ) : (
               results.map((m, i) => {

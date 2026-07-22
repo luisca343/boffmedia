@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import MenuWrapper from "../_components/MenuWrapper";
 import Image from "next/image";
 import { toast } from "react-toastify";
@@ -14,6 +15,7 @@ import { ItemImage } from "@/lib/ItemImage";
 import { UnclaimedItem } from "@boffmedia/shared";
 
 export default function Reclamar() {
+  const t = useTranslations("mina");
   const uuid = useRotomUuid();
   const { unclaimed, setUnclaimed, boxes, isLoading } = useGetUnclaimed(uuid!);
 
@@ -22,7 +24,7 @@ export default function Reclamar() {
   async function claimReward() {
     if (!unclaimed || claiming) return;
     if (!isMinecraft()) {
-      toast.error("No estas en Minecraft");
+      toast.error(t("reclamar.notInMinecraft"));
       return;
     }
 
@@ -38,14 +40,14 @@ export default function Reclamar() {
       if (!cajaResult) return;
 
       if (cajaResult.error) {
-        toast.error("Error al dar la caja");
+        toast.error(t("reclamar.giveBoxError"));
         return;
       }
 
-      toast.success("Recompensas reclamadas correctamente");
+      toast.success(t("reclamar.claimSuccess"));
       setUnclaimed([]);
     } catch {
-      toast.error("Error al reclamar las recompensas");
+      toast.error(t("reclamar.claimError"));
     } finally {
       setClaiming(false);
     }
@@ -63,7 +65,7 @@ export default function Reclamar() {
     // transport level but not a claim, and reporting it as one would be the same
     // lie this whole path exists to remove — just a smaller one.
     if (!result.data?.objetos) {
-      toast.info("No hay recompensas que reclamar");
+      toast.info(t("reclamar.noRewards"));
       setUnclaimed([]);
       return null;
     }
@@ -80,7 +82,7 @@ export default function Reclamar() {
     const { claimedItems } = await MinaService.claimRewards({ uuid: uuid! });
 
     if (!claimedItems?.length) {
-      toast.info("No hay recompensas que reclamar");
+      toast.info(t("reclamar.noRewards"));
       setUnclaimed([]);
       return null;
     }
@@ -134,7 +136,7 @@ export default function Reclamar() {
             size="lg"
             className="text-base"
           >
-            {claiming ? "RECLAMANDO…" : `RECLAMAR TODO (${boxes} CAJAS)`}
+            {claiming ? t("reclamar.claiming") : t("reclamar.claimAll", { count: boxes })}
           </SmartRotomButton>
         </div>
       </div>

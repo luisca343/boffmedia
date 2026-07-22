@@ -44,7 +44,8 @@
       "stepOf": "Step {step} of {total}",
       "noResults": "No results",
       "activo": "Active",
-      "inactivo": "Inactive"
+      "inactivo": "Inactive",
+      "horaOficial": "Official time"
     },
     "nav": {
       "inicio": "Home",
@@ -67,7 +68,8 @@
       "eventos": "Events",
       "departamentos": "Departments",
       "plataformaCivica": "Civic platform",
-      "sistemaOperativo": "Operating system · v1.0"
+      "sistemaOperativo": "Operating system · v1.0",
+      "ariaLabel": "Departments"
     },
     "header": {
       "title": "Government of Teras",
@@ -76,7 +78,8 @@
     },
     "commandPalette": {
       "searchPlaceholder": "Search for a module…",
-      "noResults": "No module matches «{query}»."
+      "noResults": "No module matches «{query}».",
+      "ariaLabel": "Search the government"
     },
     "inicio": {
       "panelMunicipal": "Municipal panel",
@@ -240,7 +243,10 @@
       "formContenidoPlaceholder": "Bulletin content…",
       "formMunicipio": "Town",
       "formMunicipioPlaceholder": "city_carmin (optional)",
-      "formFijar": "Pin to board front page"
+      "formFijar": "Pin to board front page",
+      "kindEvento": "Event",
+      "kindAnuncio": "Announcement",
+      "kindAlerta": "Alert"
     },
     "quickActions": {
       "title": "Quick actions",
@@ -433,7 +439,40 @@
       "anuncioPublished": "Announcement published.",
       "expedienteCreated": "Case file created.",
       "vozCreated": "Voice «{name}» created",
-      "vozCreateError": "Could not create the voice."
+      "vozCreateError": "Could not create the voice.",
+      "genericError": "The request to the Government of Teras failed.",
+      "denunciaRegistrada": "Complaint {code} registered",
+      "denunciaResuelta": "Complaint {code} resolved",
+      "multaEmitida": "Fine {code} issued",
+      "multaPagada": "Fine {code} paid to the Treasury",
+      "multaAnulada": "Fine {code} cancelled",
+      "buscadoAnadido": "{username} added to the wanted list",
+      "capturaConfirmada": "Capture confirmed · bounty paid",
+      "subastaAbierta": "Auction {code} opened",
+      "pujaRegistrada": "Bid registered · {code}",
+      "subastaAdjudicada": "Auction {code} awarded",
+      "apelacionEstimada": "Appeal {code} upheld",
+      "apelacionDesestimada": "Appeal {code} dismissed",
+      "expedienteAbierto": "Case file {code} opened",
+      "zonaCreada": "Zone «{name}» created",
+      "zonaActualizada": "Zone «{name}» updated",
+      "parcelaActualizada": "Plot updated",
+      "bitacoraAnadida": "Note recorded in the log",
+      "turnoCreado": "Shift «{label}» created",
+      "turnoActualizado": "Shift «{label}» updated",
+      "anuncioTituloPublicado": "«{title}» published",
+      "anuncioActualizado": "Announcement updated",
+      "anuncioRetirado": "Announcement removed",
+      "eventoCreado": "Event {code} created",
+      "eventoActualizado": "Event updated",
+      "obraRegistrada": "Build registered",
+      "tablaGuardada": "Spawn table saved",
+      "nombramientoRegistrado": "Appointment registered",
+      "ceseRegistrado": "Dismissal registered",
+      "skinGuardada": "Skin «{skin}» saved",
+      "mensajeEmitido": "Message broadcast to the server",
+      "cartelGuardado": "Sign «{name}» saved",
+      "cartelEliminado": "Sign deleted"
     },
     "senalizacion": {
       "kicker": "Administration · Urban planning",
@@ -528,7 +567,8 @@
       "accion": "Action",
       "objetivo": "Target",
       "departamento": "Department",
-      "fuente": "Source"
+      "fuente": "Source",
+      "estado": "Status"
     },
     "skins": {
       "kicker": "Administration · Resources",
@@ -549,7 +589,8 @@
       "nombreSkinPlaceholder": "ProfOak",
       "npcsUsan": "NPCs using it",
       "npcsPlaceholder": "Prof. Oak, Lab assistant",
-      "editarSkin": "Edit «{name}»"
+      "editarSkin": "Edit «{name}»",
+      "face": "2D"
     },
     "apps": {
       "kicker": "Administration · Devices",
@@ -565,7 +606,11 @@
       "emptyDisponibles": "All assigned",
       "emptyDisponiblesSub": "This player has all available apps.",
       "quitar": "Remove",
-      "anadir": "Add"
+      "anadir": "Add",
+      "appAnadida": "App added to device",
+      "errorAnadir": "Could not add the app",
+      "appEliminada": "App removed",
+      "errorEliminar": "Could not remove the app"
     },
     "rendimiento": {
       "kicker": "Administration · Infrastructure",
@@ -620,7 +665,9 @@
       "typeArcade": "Arcade",
       "typeMisiones": "Missions",
       "typeSubastas": "Auctions",
-      "typeAdmin": "Admin"
+      "typeAdmin": "Admin",
+      "notifEnviada": "Notification sent",
+      "errorEnviar": "Could not send the notification"
     },
     "auditoria": {
       "kicker": "Government · Transparency",
@@ -636,7 +683,8 @@
       "fechaHora": "Date and time",
       "accion": "Action",
       "objeto": "Object",
-      "departamento": "Department"
+      "departamento": "Department",
+      "sistema": "System"
     },
     "urbanismo": {
       "parcelasKicker": "Urban planning · Cadastre",
@@ -680,7 +728,8 @@
       "emptyHistorialMovimientosSub": "There are no transfers recorded in the property registry yet.",
       "transfirió": "{from} transferred to",
       "adjudico": "The municipality awarded to",
-      "actual": "Current"
+      "actual": "Current",
+      "sinRegistrar": "Unregistered"
     },
     "eventos": {
       "convocarEvento": "Create event",
@@ -825,7 +874,112 @@
       "cerrarCaceriaDescription": "{title} will be closed and the winning capture revealed. While the hunt is in progress no one — not even the government — can see others' captures; this action is what makes them public.",
       "diseno": "Design",
       "ambicion": "Ambition",
-      "fidelidadTema": "Faithfulness to theme"
+      "fidelidadTema": "Faithfulness to theme",
+      "tamano": "Size",
+      "ivs": "IVs",
+      "shiny": "Shiny",
+      "confirmar": "Confirm",
+      "stepTipo": "Type",
+      "stepDatos": "Data",
+      "stepReglas": "Rules",
+      "stepRevisar": "Review",
+      "scoreEspecieDesc": "Based on the spawn rarity in the zone. The rarer the Pokémon, the more base points.",
+      "scoreTamanoDesc": "Deviation from the species average size. The more extreme, the more points.",
+      "scoreIvsDesc": "Percentage of perfect stats on the specimen.",
+      "scoreNivelDesc": "The Pokémon's level at the time of registration.",
+      "scoreShinyDesc": "Chromatic variant. Fixed bonus.",
+      "errorCargaSub": "Try again in a few seconds.",
+      "defaultRules": "No one can see who caught what or the current top score. Each player decides blindly whether to keep their catch or risk releasing it to hunt a better one. Only the catch registered when the event closes counts.",
+      "nuevaCazaTitulo": "New bug hunt",
+      "nuevoRetoTitulo": "New building challenge",
+      "previewBrief": "Describe the challenge the towns should build here…",
+      "especiesLabel": "Species"
+    },
+    "dossier": {
+      "ariaDialog": "Citizen case file",
+      "cerrar": "Close case file",
+      "kicker": "Citizen case file",
+      "parcelas": "Plots",
+      "multas": "Fines",
+      "ciudades": "Towns",
+      "residencia": "Residence",
+      "buscaCaptura": "Wanted",
+      "vistoUltimamente": "Last seen: {location}",
+      "sinMultas": "No fines on record.",
+      "denunciasContra": "Complaints against",
+      "sinDenuncias": "No complaints on record."
+    },
+    "campana": {
+      "titulo": "Notifications",
+      "unread": "Notifications ({count} unread)",
+      "marcarLeidas": "Mark as read",
+      "markError": "Could not mark as read",
+      "sinAvisos": "No alerts",
+      "sinAvisosSub": "No notifications for your badge."
+    },
+    "subastas": {
+      "kicker": "Urban planning · Property",
+      "title": "Plot auctions",
+      "sub": "Vacant or seized plots put up for public auction. Bid on land or award it to the highest bidder.",
+      "nuevaSubasta": "New auction",
+      "sinSubastasEnCurso": "No active auctions",
+      "sinSubastasEnCursoSub": "There are no plots currently up for public auction.",
+      "subastasCerradas": "Closed auctions",
+      "sinSubastasCerradas": "No closed auctions",
+      "sinSubastasCerradasSub": "No auction has been awarded yet.",
+      "colSubasta": "Auction",
+      "colParcela": "Plot",
+      "colAdjudicada": "Awarded to",
+      "colImporte": "Final amount",
+      "colMotivo": "Reason",
+      "colEstado": "Status",
+      "sinAdjudicar": "— not awarded —",
+      "pujaActual": "Current bid",
+      "pujas": "{count} bids",
+      "sinPujas": "No bids yet",
+      "pujaUuidPlaceholder": "Player UUID",
+      "pujar": "Bid",
+      "pujarParcela": "Bid on this plot",
+      "confirmarCierre": "Close and award now?",
+      "no": "No",
+      "siCerrar": "Yes, close",
+      "cerrarSubastaAhora": "Close auction now",
+      "noParcelas": "No plots available",
+      "noParcelasSub": "Only vacant or seized plots already registered in the cadastre can be auctioned.",
+      "pujaInicial": "Starting bid (₽)",
+      "cierre": "Close date",
+      "motivo": "Reason (optional)",
+      "motivoPlaceholder": "Tax default…",
+      "abrirSubasta": "Open auction",
+      "errorCarga": "Could not load auctions",
+      "errorCargaSub": "Try again in a few minutes."
+    },
+    "zonas": {
+      "kicker": "Urban planning · Land use",
+      "title": "Zones and sectors",
+      "sub": "Each town is divided into sectors with their own land use. Select a town to see its sectors, occupancy and the plots they contain.",
+      "nuevaZona": "New zone",
+      "errorCarga": "Could not load the land use data",
+      "errorCargaSub": "Try again in a few minutes.",
+      "sinZonas": "No zones registered",
+      "sinZonasSub": "No sector has been defined in any town yet.",
+      "municipios": "Towns",
+      "sectores": "{count} sectors",
+      "ocupacion": "Occupancy",
+      "sinDescripcion": "No description.",
+      "editarZona": "Edit zone",
+      "municipioLabel": "Town",
+      "nombreSector": "Sector name",
+      "usoSuelo": "Land use",
+      "descripcion": "Description",
+      "municipioPlaceholder": "tulipan",
+      "sectorPlaceholder": "Commercial District",
+      "descripcionPlaceholder": "Zone intended for…",
+      "kindResidencial": "Residential",
+      "kindComercial": "Commercial",
+      "kindCivico": "Civic",
+      "kindIndustrial": "Industrial",
+      "kindAgricola": "Agricultural"
     },
     "chrome": {
       "servicioInterno": "Internal service · {code}"

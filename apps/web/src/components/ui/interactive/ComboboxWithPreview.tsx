@@ -1,3 +1,6 @@
+"use client";
+
+import { useTranslations } from "next-intl";
 import { Combobox } from "@/components/ui/primitives/combobox";
 
 interface ComboboxWithPreviewProps {
@@ -32,15 +35,18 @@ export function ComboboxWithPreview({
   value,
   onChange,
   data,
-  placeholder = "Select an option",
+  placeholder,
   preview,
-  previewAlt = "Preview",
+  previewAlt,
   variant = "default",
   disabled = false,
   className,
   previewSize = 40,
   fallbackText = "?",
 }: ComboboxWithPreviewProps) {
+  const t = useTranslations("boffmedia");
+  const resolvedPlaceholder = placeholder ?? t("ui.comboboxPlaceholder");
+  const resolvedPreviewAlt = previewAlt ?? t("ui.comboboxPreviewAlt");
   const isNothingSelected = value === "0" || !preview;
   const frameSize = previewSize + 8;
 
@@ -52,7 +58,7 @@ export function ComboboxWithPreview({
         value={value}
         onChange={onChange}
         disabled={disabled}
-        placeholder={placeholder}
+        placeholder={resolvedPlaceholder}
         className={`flex-grow ${className || ""}`}
       />
       <div
@@ -64,7 +70,7 @@ export function ComboboxWithPreview({
             width={previewSize}
             height={previewSize}
             src={preview}
-            alt={previewAlt}
+            alt={resolvedPreviewAlt}
             style={{ imageRendering: "pixelated" }}
           />
         ) : (

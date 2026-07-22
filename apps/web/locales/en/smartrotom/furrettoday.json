@@ -37,6 +37,12 @@
     "articleCard": {
       "readMore": "Read more"
     },
+    "footer": {
+      "newsletterSuccess": "We've added you to the list. See you on Friday!",
+      "newsletterError": "We couldn't subscribe you. Please try again.",
+      "emailPlaceholder": "your@email",
+      "emailAriaLabel": "Newsletter email"
+    },
     "furretFooter": {
       "copyright": "© Furret Today",
       "allRights": "All rights reserved"
@@ -63,7 +69,10 @@
       "copyLink": "Copy link",
       "linkCopied": "Link copied",
       "relatedArticles": "Related articles",
-      "upNext": "Up next"
+      "upNext": "Up next",
+      "deleteCommentAriaLabel": "Delete comment",
+      "commentPlaceholder": "Leave your comment…",
+      "commentAriaLabel": "Write a comment"
     },
     "shareModal": {
       "title": "Share article",
@@ -78,11 +87,25 @@
       "draft": "Draft",
       "published": "Published",
       "delete": "Delete",
-      "confirmDelete": "Delete this article?"
+      "confirmDelete": "Delete this article?",
+      "saveError": "Could not save changes.",
+      "leadPlaceholder": "Write a lead…",
+      "bodyPlaceholder": "Body",
+      "authorPlaceholder": "Editor",
+      "tagsPlaceholder": "Community, Tournaments…",
+      "optionalPlaceholder": "Optional",
+      "readMorePlaceholder": "Read more"
     },
     "newsroom": {
       "title": "Newsroom",
-      "empty": "No articles yet"
+      "empty": "No articles yet",
+      "chooseFeatureFirst": "Choose a featured article first.",
+      "updateStatusError": "Could not update the status.",
+      "setCoverSuccess": "Now it's the issue's cover.",
+      "deleteSuccess": "Article deleted.",
+      "deleteError": "Could not delete.",
+      "draftCreated": "Draft created. Let's write!",
+      "draftError": "Could not create the draft."
     },
     "error": {
       "title": "Error",

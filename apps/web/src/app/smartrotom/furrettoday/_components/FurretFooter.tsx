@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 
 import { useSubscribeNewsletter } from "../_hooks/queries";
 import { Button, Eyebrow, FurretMascot, Input, Marquee, Meta, toast } from "./ui";
@@ -23,6 +24,7 @@ const SMARTROTOM = [
 ];
 
 export function FurretFooter() {
+  const t = useTranslations("furrettoday");
   const [email, setEmail] = useState("");
   const subscribe = useSubscribeNewsletter();
 
@@ -33,9 +35,9 @@ export function FurretFooter() {
     subscribe.mutate(value, {
       onSuccess: () => {
         setEmail("");
-        toast("Te hemos guardado en la lista. Nos vemos el viernes.");
+        toast(t("footer.newsletterSuccess"));
       },
-      onError: () => toast.error("No hemos podido suscribirte. Inténtalo otra vez."),
+      onError: () => toast.error(t("footer.newsletterError")),
     });
   }
 
@@ -104,8 +106,8 @@ export function FurretFooter() {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="tu@email"
-              aria-label="Email para la newsletter"
+              placeholder={t("footer.emailPlaceholder")}
+              aria-label={t("footer.emailAriaLabel")}
               className="flex-1 border-ft-yellow shadow-none"
             />
             <Button

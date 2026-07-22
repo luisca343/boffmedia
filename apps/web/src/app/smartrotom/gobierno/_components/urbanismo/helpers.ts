@@ -5,8 +5,10 @@ import type { IconName } from "../ui"
 // known maps don't cover is a real possibility, not a bug — fall back to the raw string
 // rather than throwing or rendering "undefined". `sin_registrar` is the API's literal
 // fallback status for a WorldGuard plot that has no gobierno metadata row yet.
-export const statusOf = (status: string): { label: string; tone: Tone } =>
-  PARCELA_STATUS[status] ?? { label: status === "sin_registrar" ? "Sin registrar" : status, tone: "default" }
+// Pass `sinRegistrarLabel` from the caller (e.g. `t("urbanismo.sinRegistrar")`) when
+// rendering inside a translated component.
+export const statusOf = (status: string, sinRegistrarLabel = "Sin registrar"): { label: string; tone: Tone } =>
+  PARCELA_STATUS[status] ?? { label: status === "sin_registrar" ? sinRegistrarLabel : status, tone: "default" }
 
 export const kindOf = (
   kind: string,

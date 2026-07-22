@@ -3,6 +3,7 @@
 import * as React from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
+import { useTranslations } from "next-intl"
 import { Button, Empty, Icon, Seg, Spinner, type IconName } from "@/components/boffmedia/primitives"
 import { ForumComposer, ForumStats, OnlineList, ThreadRow } from "@/components/boffmedia/ui/community"
 import { useForumCategory } from "@/hooks/forum/useForumCategory"
@@ -14,16 +15,17 @@ import type { ThreadSort } from "@/services/api/boffmedia/forumService"
 import { useBoffSession } from "@/services/useBoffSession"
 import { toMemberLike, toThreadLike } from "../../_lib/adapters"
 
-const SORTS: { value: ThreadSort; label: string }[] = [
-  { value: "recent", label: "Recientes" },
-  { value: "top", label: "Top" },
-  { value: "new", label: "Nuevos" },
-]
-
 const PAGE = 20
 
 export function ForumCategoryView({ slug }: { slug: string }) {
+  const t = useTranslations("foro")
   const router = useRouter()
+
+  const SORTS: { value: ThreadSort; label: string }[] = [
+    { value: "recent", label: t("cat.sortRecent") },
+    { value: "top", label: t("cat.sortTop") },
+    { value: "new", label: t("cat.sortNew") },
+  ]
   const [now] = React.useState(() => new Date())
   const [sort, setSort] = React.useState<ThreadSort>("recent")
   const [limit, setLimit] = React.useState(PAGE)
@@ -52,9 +54,9 @@ export function ForumCategoryView({ slug }: { slug: string }) {
   if (catError || !category) {
     return (
       <main data-ds="boffmedia" className="wrap">
-        <Empty icon="alert" title="Tablón no encontrado" lead="Esta categoría del foro no existe o ya no está disponible.">
+        <Empty icon="alert" title={t("cat.notFoundTitle")} lead={t("cat.notFoundLead")}>
           <Button variant="pri" icon="back" href="/foro">
-            Volver al foro
+            {t("cat.backToForum")}
           </Button>
         </Empty>
       </main>
@@ -79,7 +81,7 @@ export function ForumCategoryView({ slug }: { slug: string }) {
         href="/foro"
         className="mb-5 inline-flex items-center gap-2 font-mono text-[11px]/none font-semibold uppercase tracking-[0.1em] text-txt-dim no-underline transition-colors hover:text-txt"
       >
-        <Icon name="back" size={14} /> Foro
+        <Icon name="back" size={14} /> {t("cat.breadcrumb")}
       </Link>
 
       <header className="mb-6 flex items-start gap-4" style={{ "--chue": category.hue } as React.CSSProperties}>
@@ -103,14 +105,14 @@ export function ForumCategoryView({ slug }: { slug: string }) {
                 setComposing((v) => !v)
               }}
             >
-              {composing ? "Cancelar" : "Nuevo hilo"}
+              {composing ? t("cat.cancel") : t("cat.newThread")}
             </Button>
           ) : !loggedIn && !category.locked ? (
             <Link
               href="/entrar"
               className="inline-flex items-center gap-1.5 font-mono text-[11px] font-semibold uppercase tracking-[0.1em] text-txt-dim no-underline transition-colors hover:text-accent-bright"
             >
-              <Icon name="user" size={13} /> Inicia sesión para crear un hilo
+              <Icon name="user" size={13} /> {t("cat.loginToPost")}
             </Link>
           ) : null}
         </div>
@@ -125,7 +127,7 @@ export function ForumCategoryView({ slug }: { slug: string }) {
           )}
           <ForumComposer
             withTitle
-            submitLabel="Publicar hilo"
+            submitLabel={t("cat.submitLabel")}
             busy={creating}
             onSubmit={handleCreate}
             onCancel={() => {
@@ -151,7 +153,7 @@ export function ForumCategoryView({ slug }: { slug: string }) {
               />
             </div>
             <span className="ml-auto font-mono text-[11px] font-medium uppercase tracking-[0.1em] text-txt-muted">
-              {total} {total === 1 ? "hilo" : "hilos"}
+              {t("cat.threadCount", { count: total })}
             </span>
           </div>
 
@@ -160,7 +162,7 @@ export function ForumCategoryView({ slug }: { slug: string }) {
               <Spinner />
             </div>
           ) : items.length === 0 ? (
-            <Empty icon="list" title="Sin hilos" lead="Aún no hay hilos en este tablón." />
+            <Empty icon="list" title={t("cat.emptyTitle")} lead={t("cat.emptyLead")} />
           ) : (
             <>
               <div className="border border-solid border-line bg-panel">
@@ -171,7 +173,7 @@ export function ForumCategoryView({ slug }: { slug: string }) {
               {items.length < total && (
                 <div className="mt-4 flex justify-center">
                   <Button icon="chevronDown" onClick={() => setLimit((l) => l + PAGE)}>
-                    Cargar más
+                    {t("cat.loadMore")}
                   </Button>
                 </div>
               )}

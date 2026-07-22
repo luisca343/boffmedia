@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 
 import { useBoffSession } from "@/services/useBoffSession";
 
@@ -111,6 +112,7 @@ function formatCommentDate(iso: string): string {
 }
 
 function SidebarComments({ newsId }: { newsId: number }) {
+  const t = useTranslations("furrettoday");
   const { data: comments } = useComments(newsId);
   const post = usePostComment(newsId);
   const del = useDeleteComment(newsId);
@@ -151,7 +153,7 @@ function SidebarComments({ newsId }: { newsId: number }) {
                       <button
                         type="button"
                         onClick={() => del.mutate(c.id)}
-                        aria-label="Borrar comentario"
+                        aria-label={t("article.deleteCommentAriaLabel")}
                         className="text-ft-ink/40 hover:text-ft-pink"
                       >
                         ✕
@@ -173,9 +175,9 @@ function SidebarComments({ newsId }: { newsId: number }) {
           <Textarea
             value={body}
             onChange={(e) => setBody(e.target.value)}
-            placeholder="Deja tu viñeta…"
+            placeholder={t("article.commentPlaceholder")}
             rows={3}
-            aria-label="Escribir comentario"
+            aria-label={t("article.commentAriaLabel")}
           />
           <Button
             type="submit"

@@ -2,6 +2,7 @@
 
 import * as React from "react"
 import { useRouter } from "next/navigation"
+import { useTranslations } from "next-intl"
 import { Empty, Spinner } from "@/components/boffmedia/primitives"
 import { CategoryTile, ForumStats, OnlineList } from "@/components/boffmedia/ui/community"
 import { useForumCategories } from "@/hooks/forum/useForumCategories"
@@ -10,6 +11,7 @@ import { useForumStats } from "@/hooks/forum/useForumStats"
 import { toCategoryLike, toMemberLike } from "../_lib/adapters"
 
 export function ForumView() {
+  const t = useTranslations("foro")
   const router = useRouter()
   const [now] = React.useState(() => new Date())
   const { categories, isLoading } = useForumCategories()
@@ -21,10 +23,10 @@ export function ForumView() {
   return (
     <main data-ds="boffmedia" className="wrap pb-[90px] pt-[34px]">
       <div className="mb-6">
-        <span className="mono-label">Comunidad</span>
-        <h1 className="mt-2 text-[clamp(46px,6vw,80px)]">Foro</h1>
+        <span className="mono-label">{t("view.kicker")}</span>
+        <h1 className="mt-2 text-[clamp(46px,6vw,80px)]">{t("view.title")}</h1>
         <p className="mt-3 max-w-[64ch] font-body text-[17px]/[1.6] text-txt-muted">
-          Debate, dudas y estrategia con el resto de la comunidad. Elige un tablón para empezar.
+          {t("view.lead")}
         </p>
       </div>
 
@@ -35,7 +37,7 @@ export function ForumView() {
               <Spinner />
             </div>
           ) : categories.length === 0 ? (
-            <Empty icon="list" title="Sin tablones" lead="Aún no hay categorías en el foro." />
+            <Empty icon="list" title={t("view.emptyTitle")} lead={t("view.emptyLead")} />
           ) : (
             <div className="grid gap-3">
               {categories.map((c) => (

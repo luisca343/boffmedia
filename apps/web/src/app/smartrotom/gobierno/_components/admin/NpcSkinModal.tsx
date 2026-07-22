@@ -1,18 +1,23 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import { useTranslations } from "next-intl"
 import { Button, Field, Modal } from "../ui"
 import { useUpsertNpcSkin } from "../../_hooks/queries"
 import type { NpcSkin } from "../../_types"
 
-const FLAGS: { key: "src" | "face" | "head" | "body"; label: string }[] = [
-  { key: "src", label: "Origen" },
-  { key: "face", label: "2D" },
-  { key: "head", label: "Cabeza" },
-  { key: "body", label: "Cuerpo" },
-]
+const FLAG_KEYS = ["src", "face", "head", "body"] as const
+type FlagKey = (typeof FLAG_KEYS)[number]
+
+const FLAG_I18N: Record<FlagKey, string> = {
+  src: "skins.origen",
+  face: "skins.face",
+  head: "skins.cabeza",
+  body: "skins.cuerpo",
+}
 
 export function NpcSkinModal({ open, onClose, skin }: { open: boolean; onClose: () => void; skin?: NpcSkin }) {
+  const t = useTranslations("gobierno")
   const upsert = useUpsertNpcSkin()
   const [name, setName] = useState("")
   const [npcs, setNpcs] = useState("")
@@ -47,39 +52,39 @@ export function NpcSkinModal({ open, onClose, skin }: { open: boolean; onClose: 
     <Modal
       open={open}
       onClose={onClose}
-      kicker="Administración · Recursos"
-      title={skin ? `Editar «${skin.skin}»` : "Nueva skin"}
+      kicker={t("skins.kicker")}
+      title={skin ? t("skins.editarSkin", { name: skin.skin }) : t("skins.nuevaSkin")}
       footer={
         <>
           <Button tone="ghost" onClick={onClose}>
-            Cancelar
+            {t("common.cancel")}
           </Button>
           <Button icon="check" disabled={!canSave || upsert.isPending} onClick={save}>
-            {upsert.isPending ? "Guardando…" : "Guardar"}
+            {upsert.isPending ? t("common.saving") : t("common.save")}
           </Button>
         </>
       }
     >
       <div className="grid gap-3.5">
-        <Field label="Nombre de la skin" value={name} onChange={setName} placeholder="ProfesorOak" mono />
-        <Field label="NPCs que la usan" value={npcs} onChange={setNpcs} placeholder="Prof. Oak, Asistente lab." />
+        <Field label={t("skins.nombreSkin")} value={name} onChange={setName} placeholder={t("skins.nombreSkinPlaceholder")} mono />
+        <Field label={t("skins.npcsUsan")} value={npcs} onChange={setNpcs} placeholder={t("skins.npcsPlaceholder")} />
         <div>
           <div className="mb-1.5 font-gt-mono text-[9.5px] font-bold uppercase tracking-[.14em] text-gt-ink-400">
-            Renders completados
+            {t("skins.rendersCompletados")}
           </div>
           <div className="flex flex-wrap gap-1.5">
-            {FLAGS.map((f) => {
-              const on = flags[f.key]
+            {FLAG_KEYS.map((key) => {
+              const on = flags[key]
               return (
                 <button
-                  key={f.key}
+                  key={key}
                   type="button"
-                  onClick={() => setFlags((s) => ({ ...s, [f.key]: !s[f.key] }))}
+                  onClick={() => setFlags((s) => ({ ...s, [key]: !s[key] }))}
                   className={`rounded-gt-sm border px-3 py-1.5 font-gt text-[12.5px] font-bold transition-colors ${
                     on ? "border-gt-ok bg-gt-ok/12 text-gt-ok" : "border-gt-line-strong bg-gt-paper-0 text-gt-ink-500"
                   }`}
                 >
-                  {f.label}
+                  {t(FLAG_I18N[key])}
                 </button>
               )
             })}

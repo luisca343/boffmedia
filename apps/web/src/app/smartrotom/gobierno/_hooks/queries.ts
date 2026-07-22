@@ -1,6 +1,7 @@
 "use client"
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import { useTranslations } from "next-intl"
 import { GobiernoService } from "@/services/api/smartrotom/gobiernoService"
 import { userMessageFrom } from "@/services/boffAPI"
 import { toast } from "../_components/ui"
@@ -238,6 +239,7 @@ function useGobMutation<TArgs, TData>(
   opts: { keys: readonly unknown[][]; money?: boolean; success?: (data: TData, args: TArgs) => string },
 ) {
   const qc = useQueryClient()
+  const t = useTranslations("gobierno")
   return useMutation({
     mutationFn: (args: TArgs) => fn(args) as Promise<TData>,
     onSuccess: (data, args) => {
@@ -247,212 +249,278 @@ function useGobMutation<TArgs, TData>(
       const msg = opts.success?.(data, args)
       if (msg) toast.success(msg)
     },
-    onError: (e: unknown) => toast.error(userMessageFrom(e, "La solicitud al Gobierno de Teras ha fallado.")),
+    onError: (e: unknown) => toast.error(userMessageFrom(e, t("toast.genericError"))),
   })
 }
 
-export const useCreateDenuncia = () =>
-  useGobMutation<unknown, Denuncia>((b) => GobiernoService.createDenuncia(b).then(normalizeDenuncia), {
+export const useCreateDenuncia = () => {
+  const t = useTranslations("gobierno")
+  return useGobMutation<unknown, Denuncia>((b) => GobiernoService.createDenuncia(b).then(normalizeDenuncia), {
     keys: [["gob", "denuncias"]],
-    success: (d) => `Denuncia ${d.code} registrada`,
+    success: (d) => t("toast.denunciaRegistrada", { code: d.code }),
   })
+}
 
-export const useResolveDenuncia = () =>
-  useGobMutation<{ id: number; resolution: string; status: string }, Denuncia>(
+export const useResolveDenuncia = () => {
+  const t = useTranslations("gobierno")
+  return useGobMutation<{ id: number; resolution: string; status: string }, Denuncia>(
     ({ id, ...b }) => GobiernoService.resolveDenuncia(id, b).then(normalizeDenuncia),
-    { keys: [["gob", "denuncias"]], success: (d) => `Denuncia ${d.code} resuelta` },
+    { keys: [["gob", "denuncias"]], success: (d) => t("toast.denunciaResuelta", { code: d.code }) },
   )
+}
 
-export const useCreateMulta = () =>
-  useGobMutation<unknown, Multa>((b) => GobiernoService.createMulta(b).then(normalizeMulta), {
+export const useCreateMulta = () => {
+  const t = useTranslations("gobierno")
+  return useGobMutation<unknown, Multa>((b) => GobiernoService.createMulta(b).then(normalizeMulta), {
     keys: [["gob", "multas"]],
-    success: (m) => `Multa ${m.code} emitida`,
+    success: (m) => t("toast.multaEmitida", { code: m.code }),
   })
+}
 
-export const usePayMulta = () =>
-  useGobMutation<number, Multa>((id) => GobiernoService.payMulta(id).then(normalizeMulta), {
+export const usePayMulta = () => {
+  const t = useTranslations("gobierno")
+  return useGobMutation<number, Multa>((id) => GobiernoService.payMulta(id).then(normalizeMulta), {
     keys: [["gob", "multas"], ["gob", "apelaciones"]],
     money: true,
-    success: (m) => `Multa ${m.code} pagada a la Tesorería`,
+    success: (m) => t("toast.multaPagada", { code: m.code }),
   })
+}
 
 // CancelMultaDto requires actorUuid — inject it here rather than at the call site so a
 // page can't omit it (which is exactly how this shipped 400ing).
 export const useCancelMulta = () => {
+  const t = useTranslations("gobierno")
   const officer = useOfficer()
   return useGobMutation<number, Multa>(
     (id) => GobiernoService.cancelMulta(id, officer.uuid).then(normalizeMulta),
-    { keys: [["gob", "multas"]], success: (m) => `Multa ${m.code} anulada` },
+    { keys: [["gob", "multas"]], success: (m) => t("toast.multaAnulada", { code: m.code }) },
   )
 }
 
-export const useCreateBuscado = () =>
-  useGobMutation<unknown, Buscado>((b) => GobiernoService.createBuscado(b).then(normalizeBuscado), {
+export const useCreateBuscado = () => {
+  const t = useTranslations("gobierno")
+  return useGobMutation<unknown, Buscado>((b) => GobiernoService.createBuscado(b).then(normalizeBuscado), {
     keys: [["gob", "buscados"]],
-    success: (b) => `${b.player.username} añadido a busca y captura`,
+    success: (b) => t("toast.buscadoAnadido", { username: b.player.username }),
   })
+}
 
-export const useCaptureBuscado = () =>
-  useGobMutation<{ id: number; capturedBy: string }, Buscado>(
+export const useCaptureBuscado = () => {
+  const t = useTranslations("gobierno")
+  return useGobMutation<{ id: number; capturedBy: string }, Buscado>(
     ({ id, ...b }) => GobiernoService.captureBuscado(id, b).then(normalizeBuscado),
     {
       keys: [["gob", "buscados"]],
       money: true,
-      success: (b) => `Captura confirmada · recompensa pagada`,
+      success: () => t("toast.capturaConfirmada"),
     },
   )
+}
 
-export const useCreateSubasta = () =>
-  useGobMutation<unknown, Subasta>((b) => GobiernoService.createSubasta(b).then(normalizeSubasta), {
+export const useCreateSubasta = () => {
+  const t = useTranslations("gobierno")
+  return useGobMutation<unknown, Subasta>((b) => GobiernoService.createSubasta(b).then(normalizeSubasta), {
     keys: [["gob", "subastas"], ["gob", "parcelas"]],
-    success: (s) => `Subasta ${s.code} abierta`,
+    success: (s) => t("toast.subastaAbierta", { code: s.code }),
   })
+}
 
-export const usePuja = () =>
-  useGobMutation<{ id: number; uuid: string; amount: number }, Subasta>(
+export const usePuja = () => {
+  const t = useTranslations("gobierno")
+  return useGobMutation<{ id: number; uuid: string; amount: number }, Subasta>(
     ({ id, ...b }) => GobiernoService.puja(id, b).then(normalizeSubasta),
-    { keys: [["gob", "subastas"]], success: (s) => `Puja registrada · ${s.code}` },
+    { keys: [["gob", "subastas"]], success: (s) => t("toast.pujaRegistrada", { code: s.code }) },
   )
+}
 
-export const useCloseSubasta = () =>
-  useGobMutation<number, Subasta>((id) => GobiernoService.closeSubasta(id).then(normalizeSubasta), {
+export const useCloseSubasta = () => {
+  const t = useTranslations("gobierno")
+  return useGobMutation<number, Subasta>((id) => GobiernoService.closeSubasta(id).then(normalizeSubasta), {
     keys: [["gob", "subastas"], ["gob", "parcelas"]],
     money: true,
-    success: (s) => `Subasta ${s.code} adjudicada`,
+    success: (s) => t("toast.subastaAdjudicada", { code: s.code }),
   })
+}
 
-export const useResolveApelacion = () =>
-  useGobMutation<{ id: number; outcome: "upheld" | "overturned"; decision: string }, Apelacion>(
+export const useResolveApelacion = () => {
+  const t = useTranslations("gobierno")
+  return useGobMutation<{ id: number; outcome: "upheld" | "overturned"; decision: string }, Apelacion>(
     ({ id, ...b }) => GobiernoService.resolveApelacion(id, b).then(normalizeApelacion),
     {
       keys: [["gob", "apelaciones"], ["gob", "multas"]],
       money: true,
-      success: (a) => `Apelación ${a.code} ${a.status === "overturned" ? "estimada" : "desestimada"}`,
+      success: (a) =>
+        a.status === "overturned"
+          ? t("toast.apelacionEstimada", { code: a.code })
+          : t("toast.apelacionDesestimada", { code: a.code }),
     },
   )
+}
 
-export const useCreateExpediente = () =>
-  useGobMutation<unknown, Expediente>((b) => GobiernoService.createExpediente(b).then(normalizeExpediente), {
+export const useCreateExpediente = () => {
+  const t = useTranslations("gobierno")
+  return useGobMutation<unknown, Expediente>((b) => GobiernoService.createExpediente(b).then(normalizeExpediente), {
     keys: [["gob", "expedientes"]],
-    success: (e) => `Expediente ${e.code} abierto`,
+    success: (e) => t("toast.expedienteAbierto", { code: e.code }),
   })
+}
 
-export const useAddExpedienteEvento = () =>
-  useGobMutation<{ id: number; kind: string; text: string; ref?: string }, unknown>(
+export const useAddExpedienteEvento = () => {
+  const t = useTranslations("gobierno")
+  return useGobMutation<{ id: number; kind: string; text: string; ref?: string }, unknown>(
     ({ id, ...b }) => GobiernoService.addExpedienteEvento(id, b),
-    { keys: [["gob", "expedientes"], ["gob", "expediente"]], success: () => "Anotación añadida al expediente" },
+    { keys: [["gob", "expedientes"], ["gob", "expediente"]], success: () => t("toast.notaAdded") },
   )
+}
 
-export const useCreateZona = () =>
-  useGobMutation<unknown, Zona>((b) => GobiernoService.createZona(b), {
+export const useCreateZona = () => {
+  const t = useTranslations("gobierno")
+  return useGobMutation<unknown, Zona>((b) => GobiernoService.createZona(b), {
     keys: [["gob", "zonas"], ["gob", "parcelas"]],
-    success: (z) => `Zona «${z.name}» creada`,
+    success: (z) => t("toast.zonaCreada", { name: z.name }),
   })
+}
 
-export const useUpdateZona = () =>
-  useGobMutation<{ id: number; [k: string]: unknown }, Zona>(({ id, ...b }) => GobiernoService.updateZona(id, b), {
+export const useUpdateZona = () => {
+  const t = useTranslations("gobierno")
+  return useGobMutation<{ id: number; [k: string]: unknown }, Zona>(({ id, ...b }) => GobiernoService.updateZona(id, b), {
     keys: [["gob", "zonas"], ["gob", "parcelas"]],
-    success: (z) => `Zona «${z.name}» actualizada`,
+    success: (z) => t("toast.zonaActualizada", { name: z.name }),
   })
+}
 
-export const useUpdateParcela = () =>
-  useGobMutation<{ regionId: string; [k: string]: unknown }, Parcela>(
+export const useUpdateParcela = () => {
+  const t = useTranslations("gobierno")
+  return useGobMutation<{ regionId: string; [k: string]: unknown }, Parcela>(
     ({ regionId, ...b }) => GobiernoService.updateParcela(regionId, b).then(normalizeParcela),
-    { keys: [["gob", "parcelas"], ["gob", "zonas"]], success: () => "Parcela actualizada" },
+    { keys: [["gob", "parcelas"], ["gob", "zonas"]], success: () => t("toast.parcelaActualizada") },
   )
+}
 
-export const useAddBitacora = () =>
-  useGobMutation<unknown, BitacoraEntry>((b) => GobiernoService.addBitacora(b).then(normalizeBitacoraEntry), {
+export const useAddBitacora = () => {
+  const t = useTranslations("gobierno")
+  return useGobMutation<unknown, BitacoraEntry>((b) => GobiernoService.addBitacora(b).then(normalizeBitacoraEntry), {
     keys: [["gob", "bitacora"], ["gob", "patrullas"]],
-    success: () => "Anotación registrada en la bitácora",
+    success: () => t("toast.bitacoraAnadida"),
   })
+}
 
-export const useCreatePatrulla = () =>
-  useGobMutation<unknown, Patrulla>((b) => GobiernoService.createPatrulla(b).then(normalizePatrulla), {
+export const useCreatePatrulla = () => {
+  const t = useTranslations("gobierno")
+  return useGobMutation<unknown, Patrulla>((b) => GobiernoService.createPatrulla(b).then(normalizePatrulla), {
     keys: [["gob", "patrullas"]],
-    success: (p) => `Turno «${p.label}» creado`,
+    success: (p) => t("toast.turnoCreado", { label: p.label }),
   })
+}
 
-export const useUpdatePatrulla = () =>
-  useGobMutation<{ id: number; [k: string]: unknown }, Patrulla>(
+export const useUpdatePatrulla = () => {
+  const t = useTranslations("gobierno")
+  return useGobMutation<{ id: number; [k: string]: unknown }, Patrulla>(
     ({ id, ...b }) => GobiernoService.updatePatrulla(id, b).then(normalizePatrulla),
-    { keys: [["gob", "patrullas"]], success: (p) => `Turno «${p.label}» actualizado` },
+    { keys: [["gob", "patrullas"]], success: (p) => t("toast.turnoActualizado", { label: p.label }) },
   )
+}
 
-export const useCreateAnuncio = () =>
-  useGobMutation<unknown, Anuncio>((b) => GobiernoService.createAnuncio(b).then(normalizeAnuncio), {
+export const useCreateAnuncio = () => {
+  const t = useTranslations("gobierno")
+  return useGobMutation<unknown, Anuncio>((b) => GobiernoService.createAnuncio(b).then(normalizeAnuncio), {
     keys: [["gob", "anuncios"]],
-    success: (a) => `«${a.title}» publicado`,
+    success: (a) => t("toast.anuncioTituloPublicado", { title: a.title }),
   })
+}
 
-export const useUpdateAnuncio = () =>
-  useGobMutation<{ id: number; [k: string]: unknown }, Anuncio>(
+export const useUpdateAnuncio = () => {
+  const t = useTranslations("gobierno")
+  return useGobMutation<{ id: number; [k: string]: unknown }, Anuncio>(
     ({ id, ...b }) => GobiernoService.updateAnuncio(id, b).then(normalizeAnuncio),
-    { keys: [["gob", "anuncios"]], success: () => "Anuncio actualizado" },
+    { keys: [["gob", "anuncios"]], success: () => t("toast.anuncioActualizado") },
   )
+}
 
-export const useDeleteAnuncio = () =>
-  useGobMutation<number, unknown>((id) => GobiernoService.deleteAnuncio(id), {
+export const useDeleteAnuncio = () => {
+  const t = useTranslations("gobierno")
+  return useGobMutation<number, unknown>((id) => GobiernoService.deleteAnuncio(id), {
     keys: [["gob", "anuncios"]],
-    success: () => "Anuncio retirado",
+    success: () => t("toast.anuncioRetirado"),
   })
+}
 
-export const useCreateEvento = () =>
-  useGobMutation<unknown, Evento>((b) => GobiernoService.createEvento(b).then(normalizeEvento), {
+export const useCreateEvento = () => {
+  const t = useTranslations("gobierno")
+  return useGobMutation<unknown, Evento>((b) => GobiernoService.createEvento(b).then(normalizeEvento), {
     keys: [["gob", "eventos"]],
-    success: (e) => `Evento ${e.code} creado`,
+    success: (e) => t("toast.eventoCreado", { code: e.code }),
   })
+}
 
-export const useUpdateEvento = () =>
-  useGobMutation<{ id: number; [k: string]: unknown }, Evento>(
+export const useUpdateEvento = () => {
+  const t = useTranslations("gobierno")
+  return useGobMutation<{ id: number; [k: string]: unknown }, Evento>(
     ({ id, ...b }) => GobiernoService.updateEvento(id, b).then(normalizeEvento),
-    { keys: [["gob", "eventos"], ["gob", "evento"]], success: () => "Evento actualizado" },
+    { keys: [["gob", "eventos"], ["gob", "evento"]], success: () => t("toast.eventoActualizado") },
   )
+}
 
-export const useCreateObra = () =>
-  useGobMutation<{ eventoId: number; [k: string]: unknown }, unknown>(
+export const useCreateObra = () => {
+  const t = useTranslations("gobierno")
+  return useGobMutation<{ eventoId: number; [k: string]: unknown }, unknown>(
     ({ eventoId, ...b }) => GobiernoService.createObra(eventoId, b),
-    { keys: [["gob", "eventos"], ["gob", "evento"]], success: () => "Obra registrada" },
+    { keys: [["gob", "eventos"], ["gob", "evento"]], success: () => t("toast.obraRegistrada") },
   )
+}
 
-export const useSetEspecies = () =>
-  useGobMutation<{ eventoId: number; especies: unknown[] }, unknown>(
+export const useSetEspecies = () => {
+  const t = useTranslations("gobierno")
+  return useGobMutation<{ eventoId: number; especies: unknown[] }, unknown>(
     ({ eventoId, especies }) => GobiernoService.setEspecies(eventoId, { especies }),
-    { keys: [["gob", "eventos"], ["gob", "evento"]], success: () => "Tabla de aparición guardada" },
+    { keys: [["gob", "eventos"], ["gob", "evento"]], success: () => t("toast.tablaGuardada") },
   )
+}
 
-export const useGrantRole = () =>
-  useGobMutation<{ uuid: string; role: string }, unknown>(({ uuid, role }) => GobiernoService.grantRole(uuid, { role }), {
+export const useGrantRole = () => {
+  const t = useTranslations("gobierno")
+  return useGobMutation<{ uuid: string; role: string }, unknown>(({ uuid, role }) => GobiernoService.grantRole(uuid, { role }), {
     keys: [["gob", "oficiales"]],
-    success: () => "Nombramiento registrado",
+    success: () => t("toast.nombramientoRegistrado"),
   })
+}
 
-export const useRevokeRole = () =>
-  useGobMutation<{ uuid: string; role: string }, unknown>(
+export const useRevokeRole = () => {
+  const t = useTranslations("gobierno")
+  return useGobMutation<{ uuid: string; role: string }, unknown>(
     ({ uuid, role }) => GobiernoService.revokeRole(uuid, role),
-    { keys: [["gob", "oficiales"]], success: () => "Cese registrado" },
+    { keys: [["gob", "oficiales"]], success: () => t("toast.ceseRegistrado") },
   )
+}
 
-export const useUpsertNpcSkin = () =>
-  useGobMutation<unknown, NpcSkin>((b) => GobiernoService.upsertNpcSkin(b), {
+export const useUpsertNpcSkin = () => {
+  const t = useTranslations("gobierno")
+  return useGobMutation<unknown, NpcSkin>((b) => GobiernoService.upsertNpcSkin(b), {
     keys: [["gob", "npc-skins"]],
-    success: (s) => `Skin «${s.skin}» guardada`,
+    success: (s) => t("toast.skinGuardada", { skin: s.skin }),
   })
+}
 
-export const useSendMegafonia = () =>
-  useGobMutation<{ speaker: string; text: string; byUuid: string }, unknown>((b) => GobiernoService.sendMegafonia(b), {
+export const useSendMegafonia = () => {
+  const t = useTranslations("gobierno")
+  return useGobMutation<{ speaker: string; text: string; byUuid: string }, unknown>((b) => GobiernoService.sendMegafonia(b), {
     keys: [["gob", "megafonia"]],
-    success: () => "Mensaje emitido al servidor",
+    success: () => t("toast.mensajeEmitido"),
   })
+}
 
-export const useCreateCartel = () =>
-  useGobMutation<unknown, Cartel>((b) => GobiernoService.createCartel(b), {
+export const useCreateCartel = () => {
+  const t = useTranslations("gobierno")
+  return useGobMutation<unknown, Cartel>((b) => GobiernoService.createCartel(b), {
     keys: [["gob", "carteles"]],
-    success: (c) => `Cartel «${c.name}» guardado`,
+    success: (c) => t("toast.cartelGuardado", { name: c.name }),
   })
+}
 
-export const useDeleteCartel = () =>
-  useGobMutation<number, unknown>((id) => GobiernoService.deleteCartel(id), {
+export const useDeleteCartel = () => {
+  const t = useTranslations("gobierno")
+  return useGobMutation<number, unknown>((id) => GobiernoService.deleteCartel(id), {
     keys: [["gob", "carteles"]],
-    success: () => "Cartel eliminado",
+    success: () => t("toast.cartelEliminado"),
   })
+}

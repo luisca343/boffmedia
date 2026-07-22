@@ -1,7 +1,8 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { Avatar, Badge, Button, Card, Icon } from "../ui"
-import { ANUNCIO_KIND_META } from "./anuncioMeta"
+import { getAnuncioKindMeta } from "./anuncioMeta"
 import { fmtDateTime, townName } from "../../_utils/format"
 import { useGobiernoUi } from "../../_stores/useGobiernoUi"
 import { useOfficer } from "../../_hooks/useOfficer"
@@ -16,9 +17,11 @@ export function AnuncioFeatured({
   onEdit: () => void
   onDelete: () => void
 }) {
+  const t = useTranslations("gobierno")
   const openDossier = useGobiernoUi((s) => s.openDossier)
   const officer = useOfficer()
-  const km = ANUNCIO_KIND_META[anuncio.kind]
+  const kindMeta = getAnuncioKindMeta(t)
+  const km = kindMeta[anuncio.kind]
   const canManage = officer.isAdmin || officer.uuid === anuncio.author.uuid
 
   return (
@@ -39,7 +42,7 @@ export function AnuncioFeatured({
               {km.label}
             </Badge>
             <Badge tone="default" dot>
-              Fijado
+              {t("anuncios.fijado")}
             </Badge>
             <span className="ml-auto flex items-center gap-1 font-gt-mono text-[10.5px] text-gt-ink-400">
               <Icon name="calendar" size={11} />
@@ -55,7 +58,7 @@ export function AnuncioFeatured({
               className="flex items-center gap-2 text-left"
             >
               <Avatar user={anuncio.author.username} size={26} />
-              <span className="text-xs text-gt-ink-600">Publica {anuncio.author.username}</span>
+              <span className="text-xs text-gt-ink-600">{t("anuncios.publica", { username: anuncio.author.username })}</span>
             </button>
             {anuncio.town && (
               <Badge tone="default" icon="mapPin">
@@ -65,9 +68,9 @@ export function AnuncioFeatured({
             {canManage && (
               <div className="ml-auto flex items-center gap-1.5">
                 <Button tone="plain" size="sm" onClick={onEdit}>
-                  Editar
+                  {t("anuncios.editar")}
                 </Button>
-                <Button tone="plain" size="sm" icon="trash" onClick={onDelete} aria-label="Retirar publicación" />
+                <Button tone="plain" size="sm" icon="trash" onClick={onDelete} aria-label={t("anuncios.retirar")} />
               </div>
             )}
           </div>
