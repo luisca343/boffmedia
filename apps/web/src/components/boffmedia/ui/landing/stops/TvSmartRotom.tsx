@@ -15,7 +15,7 @@ export function TvSmartRotom() {
       n="02"
       side="r"
       kick={<Decode text={t("kick")} />}
-      title={t("title")}
+      title={t.rich("title", { em: (chunks) => <em>{chunks}</em> })}
       lead={t("lead")}
     >
       <div className="relative grid justify-items-start gap-[22px] max-[980px]:justify-items-center max-[980px]:text-center">

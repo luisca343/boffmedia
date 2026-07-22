@@ -41,7 +41,7 @@ export function TvTorneos() {
       n="03"
       side="l"
       kick={<Decode text={t("kick")} />}
-      title={t("title")}
+      title={t.rich("title", { em: (chunks) => <em>{chunks}</em> })}
       lead={t("lead")}
     >
       <div
