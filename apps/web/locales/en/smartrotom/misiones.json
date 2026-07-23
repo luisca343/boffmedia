@@ -63,7 +63,51 @@
       "title": "Thread wall"
     },
     "sideRail": {
-      "title": "Side rail"
+      "eyebrow": "✦ Rotom Inn ✦",
+      "brand": "Guild of Explorers",
+      "tagline": "— Adventurer's log —",
+      "ariaLabel": "Guild of Explorers sections",
+      "footer": "◆ Rotom · Codex",
+      "tabs": {
+        "board": { "label": "The Board", "short": "Board" },
+        "story": { "label": "The Story", "short": "Story" },
+        "map": { "label": "Kingdom Map", "short": "Map" },
+        "backpack": { "label": "The Backpack", "short": "Backpack" },
+        "log": { "label": "Log", "short": "Log" },
+        "mazmorra": { "label": "The Dungeon", "short": "Dungeon" }
+      }
+    },
+    "mazmorra": {
+      "eyebrow": "Expedition",
+      "title": "The Dungeon",
+      "subtitle": "The depths kept beneath Pallet Town — descend, and let your name be carved in stone",
+      "loading": "Descending into the depths…",
+      "leaderboard": {
+        "title": "Leaderboard",
+        "empty": "No one has entered the dungeon yet.",
+        "columns": {
+          "rank": "Rank",
+          "player": "Player",
+          "floors": "Floors",
+          "clears": "Clears",
+          "bestTime": "Best time"
+        }
+      },
+      "personalRecord": {
+        "title": "Your best expedition",
+        "loading": "Looking up your best expedition…",
+        "empty": "You haven't completed an expedition yet.",
+        "stats": {
+          "floors": "Floors",
+          "stage": "Stage",
+          "clearTime": "Time",
+          "curses": "Curses"
+        },
+        "status": {
+          "completed": "Expedition completed",
+          "failed": "Expedition not completed"
+        }
+      }
     },
     "kingdomMap": {
       "title": "Kingdom map"
