@@ -63,7 +63,51 @@
       "title": "Muro de hilos"
     },
     "sideRail": {
-      "title": "Raíl lateral"
+      "eyebrow": "✦ Posada del Rotom ✦",
+      "brand": "Gremio de Exploradores",
+      "tagline": "— Bitácora del aventurero —",
+      "ariaLabel": "Secciones del Gremio de Exploradores",
+      "footer": "◆ Rotom · Códex",
+      "tabs": {
+        "board": { "label": "El Tablón", "short": "Tablón" },
+        "story": { "label": "La Trama", "short": "Trama" },
+        "map": { "label": "Mapa del Reino", "short": "Mapa" },
+        "backpack": { "label": "La Mochila", "short": "Mochila" },
+        "log": { "label": "Bitácora", "short": "Bitácora" },
+        "mazmorra": { "label": "La Mazmorra", "short": "Mazmorra" }
+      }
+    },
+    "mazmorra": {
+      "eyebrow": "Expedición",
+      "title": "La Mazmorra",
+      "subtitle": "Las profundidades que guarda Pueblo Paleta — desciende y que tu nombre quede grabado en la piedra",
+      "loading": "Descendiendo a las profundidades…",
+      "leaderboard": {
+        "title": "Clasificación",
+        "empty": "Nadie ha entrado en la mazmorra todavía.",
+        "columns": {
+          "rank": "Puesto",
+          "player": "Jugador",
+          "floors": "Pisos",
+          "clears": "Completadas",
+          "bestTime": "Mejor tiempo"
+        }
+      },
+      "personalRecord": {
+        "title": "Tu mejor expedición",
+        "loading": "Buscando tu mejor expedición…",
+        "empty": "Aún no has completado ninguna expedición.",
+        "stats": {
+          "floors": "Pisos",
+          "stage": "Etapa",
+          "clearTime": "Tiempo",
+          "curses": "Maldiciones"
+        },
+        "status": {
+          "completed": "Expedición completada",
+          "failed": "Expedición sin completar"
+        }
+      }
     },
     "kingdomMap": {
       "title": "Mapa de reinos"

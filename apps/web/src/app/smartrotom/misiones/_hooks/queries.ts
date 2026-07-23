@@ -4,6 +4,8 @@ import { useQuery } from "@tanstack/react-query"
 import { useMemo } from "react"
 import { getMisiones } from "@/services/mcef/mcefApi"
 import { isMinecraft } from "@/services/mcef/mcefHelper"
+import { useRotomUuid } from "@/components/smartrotom/behavior/useRotomUuid"
+import { MazmorraService } from "@/services/api/smartrotom/mazmorraService"
 import type { IDialogue, NPC, QuestData } from "../_types"
 import { buildRegions } from "../_utils/regions"
 
@@ -57,4 +59,39 @@ export function useQuestSystem() {
     error,
     refetch: query.refetch,
   }
+}
+
+export const misionesKeys = {
+  dungeonRanking: (limit?: number) => ["misiones", "dungeon-ranking", limit ?? null] as const,
+  dungeonStats: (uuid: string) => ["misiones", "dungeon-stats", uuid] as const,
+}
+
+/** The dungeon leaderboard. Runs are written by the mod (POST /dungeons/run); read-only here. */
+export function useDungeonRanking(limit?: number) {
+  return useQuery({
+    queryKey: misionesKeys.dungeonRanking(limit),
+    staleTime: 60_000,
+    queryFn: async () => {
+      const result = await MazmorraService.getRanking(limit)
+      if (!result.success) throw new Error(result.error || result.message || `HTTP ${result.statusCode}`)
+      return result.data ?? []
+    },
+  })
+}
+
+/**
+ * The signed-in player's own dungeon stats, keyed by uuid — mirrors
+ * useArcadeStreak's enabled-on-uuid gate. A 404 means "no runs yet", not a
+ * failure, so it resolves to `null` instead of throwing into render.
+ */
+export function useDungeonPlayerStats() {
+  const uuid = useRotomUuid()
+  return useQuery({
+    queryKey: misionesKeys.dungeonStats(uuid ?? ""),
+    enabled: Boolean(uuid),
+    queryFn: async () => {
+      const result = await MazmorraService.getPlayerStats(uuid as string)
+      return result.data ?? null
+    },
+  })
 }
