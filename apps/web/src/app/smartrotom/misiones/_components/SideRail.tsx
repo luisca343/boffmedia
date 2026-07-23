@@ -2,14 +2,16 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 
 const SECTIONS = [
-  { href: "/smartrotom/misiones", label: "El Tablón", short: "Tablón", glyph: "❦" },
-  { href: "/smartrotom/misiones/trama", label: "La Trama", short: "Trama", glyph: "✶" },
-  { href: "/smartrotom/misiones/mapa", label: "Mapa del Reino", short: "Mapa", glyph: "✦" },
-  { href: "/smartrotom/misiones/mochila", label: "La Mochila", short: "Mochila", glyph: "◆" },
-  { href: "/smartrotom/misiones/bitacora", label: "Bitácora", short: "Bitácora", glyph: "✥" },
+  { href: "/smartrotom/misiones", key: "board", glyph: "❦" },
+  { href: "/smartrotom/misiones/trama", key: "story", glyph: "✶" },
+  { href: "/smartrotom/misiones/mapa", key: "map", glyph: "✦" },
+  { href: "/smartrotom/misiones/mochila", key: "backpack", glyph: "◆" },
+  { href: "/smartrotom/misiones/bitacora", key: "log", glyph: "✥" },
+  { href: "/smartrotom/misiones/mazmorra", key: "mazmorra", glyph: "⚔" },
 ] as const
 
 const useIsCurrent = () => {
@@ -19,25 +21,26 @@ const useIsCurrent = () => {
 
 /** The tavern sign and the leather tabs nailed down the left of the board. */
 export function SideRail() {
+  const t = useTranslations("misiones.sideRail")
   const isCurrent = useIsCurrent()
 
   return (
     <aside className="ms-wood hidden w-60 shrink-0 flex-col border-r-[3px] border-[#050201] md:flex">
       <div className="bg-gradient-to-b from-black/40 to-transparent px-4 pb-[18px] pt-[22px] text-center">
         <div className="inline-flex items-center gap-1.5 font-ms-uppercase text-[11px] uppercase tracking-[.2em] text-ms-gold-2">
-          ✦ Posada del Rotom ✦
+          {t("eyebrow")}
         </div>
         <h1 className="mt-2 font-ms-display text-[26px] leading-none text-ms-gold-1 [text-shadow:0_2px_4px_rgba(0,0,0,.7)]">
-          Misiones
+          {t("brand")}
         </h1>
         <div className="mt-2 font-ms-uppercase text-[10px] italic tracking-[.16em] text-ms-gold-3 opacity-80">
-          — Bitácora del aventurero —
+          {t("tagline")}
         </div>
       </div>
 
       <div className="mx-3.5 h-0.5 bg-gradient-to-r from-transparent via-ms-gold-3 to-transparent opacity-50" />
 
-      <nav className="flex flex-1 flex-col gap-0.5 py-3.5" aria-label="Secciones de Misiones">
+      <nav className="flex flex-1 flex-col gap-0.5 py-3.5" aria-label={t("ariaLabel")}>
         {SECTIONS.map((section) => {
           const current = isCurrent(section.href)
           return (
@@ -48,7 +51,7 @@ export function SideRail() {
               className={cn("ms-tab relative focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ms-gold-2")}
             >
               <span className="text-base opacity-70">{section.glyph}</span>
-              <span className="flex-1">{section.label}</span>
+              <span className="flex-1">{t(`tabs.${section.key}.label`)}</span>
               {current && <span className="absolute right-2.5 text-[9px] text-ms-gold-2">▶</span>}
             </Link>
           )
@@ -56,19 +59,20 @@ export function SideRail() {
       </nav>
 
       <div className="px-3.5 pb-3.5 pt-2 text-center font-ms-uppercase text-[9px] uppercase tracking-[.16em] text-ms-gold-1/50">
-        ◆ Rotom · Códex
+        {t("footer")}
       </div>
     </aside>
   )
 }
 
-/** The same five tabs, as a scrolling plank across the top on a phone. */
+/** The same six tabs, as a scrolling plank across the top on a phone. */
 export function MobileRail() {
+  const t = useTranslations("misiones.sideRail")
   const isCurrent = useIsCurrent()
 
   return (
     <div className="ms-wood flex items-center gap-1.5 overflow-x-auto p-2.5 px-3 md:hidden">
-      <span className="mr-2 shrink-0 font-ms-display text-base text-ms-gold-1">✦ Misiones</span>
+      <span className="mr-2 shrink-0 font-ms-display text-base text-ms-gold-1">✦ {t("brand")}</span>
       {SECTIONS.map((section) => {
         const current = isCurrent(section.href)
         return (
@@ -83,7 +87,7 @@ export function MobileRail() {
                 : "border-ms-gold-1/30 text-ms-gold-1",
             )}
           >
-            {section.short}
+            {t(`tabs.${section.key}.short`)}
           </Link>
         )
       })}
