@@ -2895,6 +2895,118 @@ const config: Config = {
           colorScheme: "dark",
           color: "rgb(var(--ms-ink-1))",
         },
+        // Grimdark — soot-black board, bone parchment, iron-gall ink.
+        '.ms-app[data-palette="grimdark"]': {
+          "--ms-board-1": "42 24 16",
+          "--ms-board-2": "26 14 7",
+          "--ms-board-3": "14 8 5",
+          "--ms-board-frame": "5 2 1",
+          "--ms-board-frame-hi": "58 36 24",
+          "--ms-paper-1": "200 180 137",
+          "--ms-paper-2": "168 148 109",
+          "--ms-paper-3": "122 104 74",
+          "--ms-paper-edge": "74 58 34",
+          "--ms-ink-1": "24 16 10",
+          "--ms-ink-2": "40 30 18",
+          "--ms-ink-3": "74 58 34",
+          "--ms-ink-4": "106 90 58",
+          "--ms-gold-1": "216 192 138",
+          "--ms-gold-2": "168 132 28",
+          "--ms-gold-3": "110 84 24",
+          "--ms-gold-4": "58 44 12",
+          "--ms-seal-active": "138 104 24",
+          "--ms-seal-available": "142 28 14",
+          "--ms-seal-completed": "74 10 8",
+          "--ms-seal-failed": "10 10 10",
+          "--ms-seal-locked": "42 32 24",
+          "--ms-stamp-red": "138 20 20",
+          "--ms-stamp-gold": "110 84 24",
+          "--ms-paper-shadow": "rgba(0, 0, 0, .7)",
+        },
+        // Royal — midnight-blue board, cream parchment, silver-and-gold seals.
+        '.ms-app[data-palette="royal"]': {
+          "--ms-board-1": "30 39 86",
+          "--ms-board-2": "18 24 58",
+          "--ms-board-3": "10 14 38",
+          "--ms-board-frame": "10 14 38",
+          "--ms-board-frame-hi": "58 70 130",
+          "--ms-paper-1": "242 230 200",
+          "--ms-paper-2": "226 212 173",
+          "--ms-paper-3": "196 183 138",
+          "--ms-paper-edge": "110 96 56",
+          "--ms-ink-1": "27 26 46",
+          "--ms-ink-2": "42 38 64",
+          "--ms-ink-3": "74 70 104",
+          "--ms-ink-4": "106 102 136",
+          "--ms-gold-1": "232 216 160",
+          "--ms-gold-2": "194 160 76",
+          "--ms-gold-3": "142 108 32",
+          "--ms-gold-4": "90 68 12",
+          "--ms-seal-active": "194 160 76",
+          "--ms-seal-available": "74 76 158",
+          "--ms-seal-completed": "44 42 94",
+          "--ms-seal-failed": "42 42 58",
+          "--ms-seal-locked": "90 76 106",
+          "--ms-stamp-red": "138 52 52",
+          "--ms-stamp-gold": "142 108 32",
+          "--ms-paper-shadow": "rgba(8, 12, 38, .55)",
+        },
+        // Forest — mossy board, sun-bleached parchment, verdigris seals.
+        '.ms-app[data-palette="forest"]': {
+          "--ms-board-1": "42 62 34",
+          "--ms-board-2": "27 42 22",
+          "--ms-board-3": "14 26 10",
+          "--ms-board-frame": "26 42 20",
+          "--ms-board-frame-hi": "74 94 58",
+          "--ms-paper-1": "239 224 184",
+          "--ms-paper-2": "221 201 152",
+          "--ms-paper-3": "192 170 120",
+          "--ms-paper-edge": "106 84 48",
+          "--ms-ink-1": "30 36 16",
+          "--ms-ink-2": "46 58 24",
+          "--ms-ink-3": "74 90 40",
+          "--ms-ink-4": "106 122 68",
+          "--ms-gold-1": "232 200 144",
+          "--ms-gold-2": "192 138 60",
+          "--ms-gold-3": "138 90 32",
+          "--ms-gold-4": "74 46 12",
+          "--ms-seal-active": "62 122 58",
+          "--ms-seal-available": "176 74 28",
+          "--ms-seal-completed": "74 36 16",
+          "--ms-seal-failed": "42 24 18",
+          "--ms-seal-locked": "58 52 34",
+          "--ms-stamp-red": "156 58 40",
+          "--ms-stamp-gold": "138 90 32",
+          "--ms-paper-shadow": "rgba(20, 30, 12, .55)",
+        },
+        // Nocturno — starless-night board, moonlit parchment, ember seals.
+        '.ms-app[data-palette="nocturno"]': {
+          "--ms-board-1": "26 34 56",
+          "--ms-board-2": "14 20 36",
+          "--ms-board-3": "7 11 22",
+          "--ms-board-frame": "6 9 18",
+          "--ms-board-frame-hi": "46 58 94",
+          "--ms-paper-1": "239 226 188",
+          "--ms-paper-2": "221 202 154",
+          "--ms-paper-3": "194 171 120",
+          "--ms-paper-edge": "106 90 56",
+          "--ms-ink-1": "34 26 16",
+          "--ms-ink-2": "54 41 26",
+          "--ms-ink-3": "90 72 48",
+          "--ms-ink-4": "122 104 72",
+          "--ms-gold-1": "255 217 138",
+          "--ms-gold-2": "232 176 76",
+          "--ms-gold-3": "176 124 36",
+          "--ms-gold-4": "110 74 16",
+          "--ms-seal-active": "217 152 40",
+          "--ms-seal-available": "184 67 28",
+          "--ms-seal-completed": "106 36 16",
+          "--ms-seal-failed": "22 22 22",
+          "--ms-seal-locked": "58 54 80",
+          "--ms-stamp-red": "176 52 38",
+          "--ms-stamp-gold": "176 124 36",
+          "--ms-paper-shadow": "rgba(2, 5, 14, .7)",
+        },
         // The tavern canvas: warm light from above, dark from below, wood below
         // that. `::before` are the cork specks, `::after` the paper grain.
         ".ms-tavern": {
@@ -2924,9 +3036,40 @@ const config: Config = {
           position: "absolute",
           inset: "0",
           pointerEvents: "none",
-          backgroundImage: grain(0.9, 0.55),
+          backgroundImage: "url('/assets/misiones/textures/wall-bg.png')",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
           mixBlendMode: "overlay",
-          opacity: ".35",
+          opacity: ".7",
+        },
+        // ── Swappable surface textures for the showcase (ancestor toggle) ──
+        "[data-surface='corcho'] .ms-tavern::after": {
+          backgroundImage: "url('/assets/misiones/textures/cork-board.png')",
+          backgroundSize: "cover",
+          backgroundRepeat: "no-repeat",
+          opacity: ".6",
+        },
+        "[data-surface='cuero'] .ms-tavern::after": {
+          backgroundImage: "url('/assets/misiones/textures/leather-grain.png')",
+          backgroundSize: "520px 520px",
+          backgroundRepeat: "repeat",
+          opacity: ".5",
+        },
+        "[data-surface='fieltro'] .ms-tavern::after": {
+          backgroundImage: "url('/assets/misiones/textures/felt.png')",
+          backgroundSize: "cover",
+          backgroundRepeat: "no-repeat",
+          opacity: ".55",
+        },
+        "[data-surface='piedra'] .ms-tavern::after": {
+          backgroundImage: "url('/assets/misiones/textures/slate.png')",
+          backgroundSize: "cover",
+          backgroundRepeat: "no-repeat",
+          opacity: ".62",
+        },
+        "[data-surface='fieltro'] .ms-tavern": {
+          filter: "saturate(.9)",
         },
       })
 
@@ -2996,9 +3139,13 @@ const config: Config = {
           position: "relative",
           borderRadius: "4px",
           border: "1px solid rgba(0,0,0,.45)",
-          background:
-            "radial-gradient(ellipse at 30% 20%, rgba(255,220,160,.08), transparent 50%)," +
-            "linear-gradient(180deg, rgba(40,24,12,.4), rgba(20,12,6,.5))",
+          backgroundColor: "#9c7440",
+          backgroundImage:
+            "url('/assets/misiones/textures/cork-board.png')," +
+            "radial-gradient(ellipse at 50% 32%, rgba(0,0,0,0) 45%, rgba(40,24,10,.42))," +
+            "linear-gradient(180deg, #bd925a, #9c7440 58%, #85602f)",
+          backgroundSize: "440px, cover, cover",
+          backgroundBlendMode: "overlay, normal, normal",
           boxShadow: "inset 0 1px 0 rgba(255,200,100,.12), inset 0 0 80px rgba(0,0,0,.5)",
         },
         ".ms-cork::before": {
@@ -3016,13 +3163,71 @@ const config: Config = {
         },
         // ── Wooden plank frame (the side rail, the mobile bar) ─────────────
         ".ms-wood": {
-          background:
-            "repeating-linear-gradient(90deg, rgb(var(--ms-board-frame)) 0px, rgb(var(--ms-board-frame-hi)) 18px," +
-            "rgb(var(--ms-board-frame)) 24px, rgb(var(--ms-board-frame-hi)) 60px, rgb(var(--ms-board-frame)) 84px)," +
-            "rgb(var(--ms-board-frame))",
+          backgroundImage:
+            "url('/assets/misiones/textures/wood-planks.png')," +
+            "linear-gradient(90deg, rgb(var(--ms-board-frame)), rgb(var(--ms-board-frame-hi)) 42%, rgb(var(--ms-board-frame-hi)) 58%, rgb(var(--ms-board-frame)))",
+          backgroundSize: "100% 100%, cover",
+          backgroundBlendMode: "overlay, normal",
           boxShadow:
             "inset 0 0 20px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,200,.06), inset 0 -1px 0 rgba(0,0,0,.4)",
           color: "rgb(var(--ms-gold-1))",
+        },
+        // ── Side rail: raised panel above the board (layers on .ms-wood; texture-overlay TODO) ──
+        ".ms-side-rail": {
+          position: "relative",
+          zIndex: "3",
+          boxShadow:
+            "7px 0 26px -6px rgba(0,0,0,.72), inset -3px 0 0 rgba(0,0,0,.55)," +
+            "inset 4px 0 10px -6px rgba(255,220,150,.18), inset 0 0 20px rgba(0,0,0,.5)",
+        },
+        // ── Parchment control panel (filters bar; texture-overlay TODO) ─────
+        ".ms-filters": {
+          position: "relative",
+          borderRadius: "10px",
+          padding: "16px 18px 18px",
+          background:
+            "radial-gradient(ellipse at 18% 12%, rgba(120,70,30,.07), transparent 55%)," +
+            "radial-gradient(ellipse at 50% 50%, rgb(var(--ms-paper-1)), rgb(var(--ms-paper-2)) 72%, rgb(var(--ms-paper-3)))",
+          border: "1px solid rgb(var(--ms-ink-3))",
+          boxShadow:
+            "0 14px 30px -14px rgba(0,0,0,.55), inset 0 0 44px rgba(80,50,20,.14), inset 0 1px 0 rgba(255,255,255,.35)",
+          color: "rgb(var(--ms-ink-1))",
+        },
+        ".ms-filters-rule": {
+          flex: "1",
+          height: "2px",
+          borderRadius: "2px",
+          background: "linear-gradient(90deg, rgba(90,60,30,.45), rgba(90,60,30,.10) 70%, transparent)",
+        },
+        ".ms-filters-divider": {
+          height: "1px",
+          margin: "14px 0 12px",
+          background:
+            "linear-gradient(90deg, transparent, rgba(60,40,20,.30) 15%, rgba(60,40,20,.30) 85%, transparent)",
+          boxShadow: "0 1px 0 rgba(255,255,255,.4)",
+        },
+        // ── Wooden frame around the cork board (wraps .ms-cork) ──
+        ".ms-board-frame": {
+          position: "relative",
+          padding: "22px",
+          borderRadius: "12px",
+          border: "1px solid rgba(0,0,0,.55)",
+          backgroundImage:
+            "url('/assets/misiones/textures/wall-planks.png')," +
+            "linear-gradient(180deg, rgb(var(--ms-board-frame-hi)), rgb(var(--ms-board-frame)) 50%, rgb(var(--ms-board-3)))",
+          backgroundSize: "340px, cover",
+          backgroundBlendMode: "overlay, normal",
+          boxShadow:
+            "0 18px 46px -10px rgba(0,0,0,.72), inset 0 3px 0 rgba(255,220,150,.22)," +
+            "inset 0 -5px 10px rgba(0,0,0,.55), inset 3px 0 6px rgba(0,0,0,.32), inset -3px 0 6px rgba(0,0,0,.32)",
+        },
+        ".ms-board-frame::after": {
+          content: '""',
+          position: "absolute",
+          inset: "22px",
+          borderRadius: "5px",
+          pointerEvents: "none",
+          boxShadow: "0 0 0 2px rgba(0,0,0,.5), inset 0 0 14px rgba(0,0,0,.5)",
         },
         // ── The desk the letter is read on (planks running the other way) ──
         ".ms-desk": {
@@ -3041,22 +3246,149 @@ const config: Config = {
           fontSize: "12px",
           letterSpacing: ".10em",
           textTransform: "uppercase",
-          color: "#d9b673",
-          background: "linear-gradient(90deg, #3a2418, #2a1810 80%, transparent)",
+          color: "rgb(var(--ms-gold-1) / .85)",
+          backgroundImage:
+            "url('/assets/misiones/textures/leather-grain.png')," +
+            "linear-gradient(90deg, rgb(var(--ms-board-frame-hi)), rgb(var(--ms-board-frame)) 80%, transparent)",
+          backgroundSize: "160px, cover",
+          backgroundBlendMode: "overlay, normal",
           borderLeft: "3px solid transparent",
           cursor: "pointer",
           transition: "all .15s",
         },
         ".ms-tab:hover": {
-          background: "linear-gradient(90deg, #4a2e1c, #38201a 80%, transparent)",
+          background: "linear-gradient(90deg, rgb(var(--ms-board-frame-hi)), rgb(var(--ms-board-frame)) 80%, transparent)",
+          filter: "brightness(1.25)",
           color: "rgb(var(--ms-gold-1))",
         },
         ".ms-tab[aria-current='page']": {
-          background: "linear-gradient(90deg, #5a3818, #38201a 80%, transparent)",
+          background: "linear-gradient(90deg, rgb(var(--ms-board-frame-hi)), rgb(var(--ms-board-frame)) 80%, transparent)",
+          filter: "brightness(1.45)",
           color: "rgb(var(--ms-gold-1))",
           borderLeftColor: "rgb(var(--ms-gold-2))",
-          boxShadow: "inset 6px 0 18px -6px rgba(255,200,100,.25)",
+          boxShadow: "inset 6px 0 18px -6px rgb(var(--ms-gold-1) / .25)",
         },
+        // ── Menu-item variants — same `.ms-tab` markup, restyled by an
+        // ancestor `[data-tabstyle]`. Leather (above) stays the default.
+        // Placa — a raised carved-wood plaque.
+        "[data-tabstyle='placa'] nav": { padding: "16px 12px", gap: "9px" },
+        "[data-tabstyle='placa'] .ms-tab": {
+          borderRadius: "6px",
+          background: "linear-gradient(180deg, rgb(var(--ms-board-frame-hi)), rgb(var(--ms-board-frame)))",
+          border: "1px solid rgba(0,0,0,.55)",
+          boxShadow:
+            "inset 0 1px 0 rgba(255,220,150,.20), inset 0 -2px 4px rgba(0,0,0,.4), 0 2px 4px rgba(0,0,0,.4)",
+          color: "rgb(var(--ms-gold-1))",
+        },
+        "[data-tabstyle='placa'] .ms-tab:hover": {
+          filter: "brightness(1.14)",
+          transform: "translateX(3px)",
+        },
+        "[data-tabstyle='placa'] .ms-tab[aria-current='page']": {
+          background: "linear-gradient(180deg, rgb(var(--ms-gold-3)), rgb(var(--ms-gold-4)))",
+          color: "#20140a",
+          borderColor: "rgb(var(--ms-gold-4))",
+          boxShadow: "inset 0 2px 5px rgba(0,0,0,.45), 0 0 14px -4px rgb(var(--ms-gold-2))",
+        },
+        "[data-tabstyle='placa'] .ms-tab[aria-current='page'] > span:nth-child(3)": { display: "none" },
+        // Sello — a wax-seal medallion.
+        "[data-tabstyle='sello'] nav": { padding: "14px 10px", gap: "4px" },
+        "[data-tabstyle='sello'] .ms-tab": {
+          background: "none",
+          borderLeft: "none",
+          padding: "8px 10px",
+          borderRadius: "10px",
+          color: "rgb(var(--ms-gold-1))",
+          gap: "12px",
+        },
+        "[data-tabstyle='sello'] .ms-tab > span:first-child": {
+          width: "36px",
+          height: "36px",
+          borderRadius: "50%",
+          display: "grid",
+          placeItems: "center",
+          opacity: "1",
+          background: "radial-gradient(circle at 36% 30%, rgb(var(--ms-seal-available)), rgb(var(--ms-seal-completed)))",
+          color: "#f5d785",
+          fontSize: "15px",
+          boxShadow:
+            "inset 0 -2px 5px rgba(0,0,0,.5), inset 0 2px 3px rgba(255,220,150,.25), 0 2px 4px rgba(0,0,0,.45)",
+        },
+        "[data-tabstyle='sello'] .ms-tab:hover": { background: "rgba(255,220,150,.06)" },
+        "[data-tabstyle='sello'] .ms-tab[aria-current='page']": { background: "rgba(255,220,150,.10)" },
+        "[data-tabstyle='sello'] .ms-tab[aria-current='page'] > span:first-child": {
+          background: "radial-gradient(circle at 36% 30%, rgb(var(--ms-gold-2)), rgb(var(--ms-gold-4)))",
+          boxShadow: "0 0 14px -2px rgb(var(--ms-gold-2)), inset 0 -2px 5px rgba(0,0,0,.4)",
+        },
+        "[data-tabstyle='sello'] .ms-tab[aria-current='page'] > span:nth-child(3)": { display: "none" },
+        // Grabado — engraved brass, minimal.
+        "[data-tabstyle='grabado'] nav": { padding: "10px 0", gap: "0" },
+        "[data-tabstyle='grabado'] .ms-tab": {
+          background: "none",
+          padding: "13px 20px",
+          color: "rgb(var(--ms-gold-2))",
+          letterSpacing: ".16em",
+          borderLeft: "3px solid transparent",
+          borderBottom: "1px solid rgba(255,220,150,.07)",
+        },
+        "[data-tabstyle='grabado'] .ms-tab > span:first-child": { opacity: ".5" },
+        "[data-tabstyle='grabado'] .ms-tab:hover": {
+          color: "rgb(var(--ms-gold-1))",
+          background: "linear-gradient(90deg, rgba(255,220,150,.06), transparent 70%)",
+        },
+        "[data-tabstyle='grabado'] .ms-tab[aria-current='page']": {
+          color: "rgb(var(--ms-gold-1))",
+          borderLeftColor: "rgb(var(--ms-gold-2))",
+          textShadow: "0 0 8px rgba(255,220,150,.45)",
+          background: "linear-gradient(90deg, rgba(255,220,150,.12), transparent 72%)",
+        },
+        "[data-tabstyle='grabado'] .ms-tab[aria-current='page'] > span:nth-child(3)": { display: "none" },
+        // Estandarte — a heraldic hanging banner.
+        "[data-tabstyle='estandarte'] nav": { padding: "16px 14px", gap: "11px" },
+        "[data-tabstyle='estandarte'] .ms-tab": {
+          padding: "12px 14px 17px",
+          border: "none",
+          color: "#f0d9a0",
+          background: "linear-gradient(180deg, rgb(var(--ms-seal-available)), rgb(var(--ms-seal-completed)))",
+          clipPath: "polygon(0 0,100% 0,100% 100%,50% 84%,0 100%)",
+          boxShadow: "inset 0 1px 0 rgba(255,220,150,.25), 0 3px 6px -1px rgba(0,0,0,.5)",
+        },
+        "[data-tabstyle='estandarte'] .ms-tab:hover": {
+          filter: "brightness(1.12)",
+          transform: "translateY(-2px)",
+        },
+        "[data-tabstyle='estandarte'] .ms-tab[aria-current='page']": {
+          background: "linear-gradient(180deg, rgb(var(--ms-gold-2)), rgb(var(--ms-gold-4)))",
+          color: "#20140a",
+          boxShadow: "inset 0 1px 0 rgba(255,255,255,.35), 0 0 16px -3px rgb(var(--ms-gold-2))",
+        },
+        "[data-tabstyle='estandarte'] .ms-tab[aria-current='page'] > span:nth-child(3)": { display: "none" },
+        // Manuscrito — illuminated minimal text.
+        "[data-tabstyle='manuscrito'] nav": { padding: "16px 8px", gap: "3px" },
+        "[data-tabstyle='manuscrito'] .ms-tab": {
+          background: "none",
+          border: "none",
+          padding: "10px 16px",
+          fontFamily: "'Cinzel Decorative', Cinzel, serif",
+          textTransform: "none",
+          letterSpacing: ".01em",
+          fontSize: "15px",
+          color: "rgb(var(--ms-gold-1))",
+        },
+        "[data-tabstyle='manuscrito'] .ms-tab > span:first-child": {
+          color: "rgb(var(--ms-gold-3))",
+          opacity: ".85",
+        },
+        "[data-tabstyle='manuscrito'] .ms-tab:hover": { color: "#fff2d0" },
+        "[data-tabstyle='manuscrito'] .ms-tab[aria-current='page'] > span:nth-child(2)": {
+          borderBottom: "2px solid rgb(var(--ms-gold-2))",
+          paddingBottom: "3px",
+        },
+        "[data-tabstyle='manuscrito'] .ms-tab[aria-current='page'] > span:first-child": {
+          color: "rgb(var(--ms-gold-1))",
+          opacity: "1",
+        },
+        "[data-tabstyle='manuscrito'] .ms-tab[aria-current='page'] > span:nth-child(3)": { display: "none" },
         // ── Wax stamp struck across a finished paper ───────────────────────
         ".ms-stamp": {
           position: "absolute",

@@ -67,7 +67,7 @@ export function BoardFilters({
 }) {
   const t = useTranslations("misiones.boardFilters")
   return (
-    <div className="mb-6 flex flex-wrap items-center gap-3 rounded border border-black/40 bg-gradient-to-b from-[rgba(60,40,20,.55)] to-[rgba(40,24,12,.65)] p-3 px-4 shadow-[inset_0_1px_0_rgba(255,200,100,.1)]">
+    <div className="ms-filters mb-6 flex flex-wrap items-center gap-3">
       <SearchField
         className="max-w-[320px] flex-[1_1_240px]"
         placeholder={t("searchPlaceholder")}
