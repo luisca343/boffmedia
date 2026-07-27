@@ -3,6 +3,7 @@
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { useFormat } from "@/lib/useFormat";
 import { useTranslations } from "next-intl";
 import { useQueryClient } from "@tanstack/react-query";
 import type { News, UpdateNewsDto } from "@boffmedia/shared";
@@ -10,7 +11,7 @@ import type { News, UpdateNewsDto } from "@boffmedia/shared";
 import { useBoffSession } from "@/services/useBoffSession";
 
 import { furretKeys, useSaveArticle } from "../../_hooks/queries";
-import { datelineOf, type FtArticle, type FtCategory } from "../../_utils/article";
+import type { FtArticle, FtCategory } from "../../_utils/article";
 import {
   Button,
   CardFlat,
@@ -57,9 +58,9 @@ function formFrom(article: FtArticle): MetaForm {
 }
 
 function statusOf(article: FtArticle) {
-  if (article.featured) return { label: "DESTACADA", tone: "pink" as const };
-  if (article.published) return { label: "PUBLICADA", tone: "lime" as const };
-  return { label: "BORRADOR", tone: "yellow" as const };
+  if (article.featured) return { labelKey: "statusFeatured", tone: "pink" as const };
+  if (article.published) return { labelKey: "statusPublished", tone: "lime" as const };
+  return { labelKey: "statusDraft", tone: "yellow" as const };
 }
 
 export function EditorPane({
@@ -71,13 +72,14 @@ export function EditorPane({
   categories: FtCategory[];
   onRequestNew: () => void;
 }) {
+  const t = useTranslations("furrettoday.editor");
   if (!article) {
     return (
       <EmptyState
         className="min-h-[420px]"
-        title="ELIGE UNA NOTICIA"
-        message="Selecciona algo de la lista o crea un borrador. Furret aplaudirá lo que escribas."
-        actionLabel="+ Nueva noticia"
+        title={t("emptyTitle")}
+        message={t("emptyMessage")}
+        actionLabel={t("emptyAction")}
         onAction={onRequestNew}
       />
     );
@@ -96,6 +98,7 @@ function EditorPaneContent({
   categories: FtCategory[];
 }) {
   const t = useTranslations("furrettoday");
+  const { date } = useFormat();
   const { session } = useBoffSession();
   const token = session?.user?.accessToken ?? "";
   const client = useQueryClient();
@@ -133,7 +136,7 @@ function EditorPaneContent({
     const cached = client.getQueryData<News>(furretKeys.article(article.id));
     const content = cached?.content ?? article.content;
 
-    const title = form.title.trim() || "Sin título";
+    const title = form.title.trim() || t("editor.untitled");
     const data: UpdateNewsDto = {
       title,
       subtitle: form.subtitle.trim() || undefined,
@@ -152,7 +155,7 @@ function EditorPaneContent({
       {
         onSuccess: () => {
           setBaseline(form);
-          toast(`Cambios guardados en «${title}».`);
+          toast(t("editor.saveSuccess", { title }));
         },
         onError: () => toast.error(t("editor.saveError")),
       },
@@ -165,23 +168,23 @@ function EditorPaneContent({
     <CardFlat className="overflow-hidden">
       <div className="border-t-ft-hair border-b border-dashed border-ft-ink bg-ft-paper-2 p-5">
         <div className="mb-2.5 flex flex-wrap items-center justify-between gap-3">
-          <Eyebrow className="text-ft-pink">EDITANDO · #{article.id}</Eyebrow>
+          <Eyebrow className="text-ft-pink">{t("editor.editing", { id: article.id })}</Eyebrow>
           <div className="flex flex-wrap items-center gap-2.5">
-            <Pill tone={status.tone}>{status.label}</Pill>
-            <Meta>Actualizado: {datelineOf(article.updatedAt)}</Meta>
-            <Meta>Lectura: {article.readTime}</Meta>
+            <Pill tone={status.tone}>{t(`editor.${status.labelKey}`)}</Pill>
+            <Meta>{t("editor.updated", { date: date(article.updatedAt) })}</Meta>
+            <Meta>{t("editor.readTimeLabel", { time: article.readTime })}</Meta>
             <Meta>👏 {article.claps}</Meta>
           </div>
         </div>
 
         <input
-          aria-label="Título"
+          aria-label={t("editor.titleAria")}
           value={form.title}
           onChange={(e) => set("title", e.target.value)}
           className="font-ft-display w-full border-0 bg-transparent p-0 text-[clamp(32px,4vw,48px)] leading-none tracking-[0.02em] text-ft-ink outline-none"
         />
         <input
-          aria-label="Entradilla"
+          aria-label={t("editor.leadAria")}
           value={form.subtitle}
           onChange={(e) => set("subtitle", e.target.value)}
           placeholder={t("editor.leadPlaceholder")}
@@ -189,21 +192,21 @@ function EditorPaneContent({
         />
 
         <div className="mt-3.5 grid grid-cols-2 gap-2.5 md:grid-cols-4">
-          <Field label="Autor/a">
+          <Field label={t("editor.authorField")}>
             <MetaInput
               value={form.author}
               onChange={(e) => set("author", e.target.value)}
               placeholder={t("editor.bodyPlaceholder")}
             />
           </Field>
-          <Field label="Rol">
+          <Field label={t("editor.roleField")}>
             <MetaInput
               value={form.authorRole}
               onChange={(e) => set("authorRole", e.target.value)}
               placeholder={t("editor.authorPlaceholder")}
             />
           </Field>
-          <Field label="Sección">
+          <Field label={t("editor.sectionField")}>
             <MetaInput
               list="ft-editor-categories"
               value={form.category}
@@ -211,34 +214,34 @@ function EditorPaneContent({
               placeholder={t("editor.tagsPlaceholder")}
             />
           </Field>
-          <Field label="Subsección">
+          <Field label={t("editor.subsectionField")}>
             <MetaInput
               value={form.subcategory}
               onChange={(e) => set("subcategory", e.target.value)}
               placeholder={t("editor.optionalPlaceholder")}
             />
           </Field>
-          <Field label="Nº de número">
+          <Field label={t("editor.issueField")}>
             <MetaInput
               type="number"
               min={1}
               value={form.issue}
               onChange={(e) => set("issue", e.target.value)}
-              placeholder="—"
+              placeholder={t("editor.issuePh")}
             />
           </Field>
-          <Field label="Texto botón">
+          <Field label={t("editor.buttonTextField")}>
             <MetaInput
               value={form.buttonText}
               onChange={(e) => set("buttonText", e.target.value)}
               placeholder={t("editor.readMorePlaceholder")}
             />
           </Field>
-          <Field label="URL imagen" full>
+          <Field label={t("editor.imageUrlField")} full>
             <MetaInput
               value={form.imageUrl}
               onChange={(e) => set("imageUrl", e.target.value)}
-              placeholder="https://… o /smartrotom/img/…"
+              placeholder={t("editor.imageUrlPh")}
             />
           </Field>
         </div>
@@ -251,7 +254,7 @@ function EditorPaneContent({
 
       <div className="px-5 pt-4">
         <Eyebrow className="text-ft-pink">
-          Cuerpo del artículo · se guarda con 💾 en su propia barra
+          {t("editor.bodyHint")}
         </Eyebrow>
       </div>
 
@@ -277,7 +280,7 @@ function EditorPaneContent({
       </div>
 
       <div className="border-t-ft-hair flex flex-wrap items-center justify-between gap-3 border-t border-dashed border-ft-ink bg-ft-paper-2 px-5 py-3.5">
-        <Meta>CKEditor · estilo Furret · el cuerpo se guarda aparte</Meta>
+        <Meta>{t("editor.footerNote")}</Meta>
         <div className="flex gap-2">
           <Link
             href={`/smartrotom/furrettoday/leer/${article.id}`}
@@ -285,7 +288,7 @@ function EditorPaneContent({
             rel="noopener noreferrer"
             className="font-ft-ui border-ft inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-ft-pill border-ft-ink bg-ft-yellow px-3.5 py-2 text-xs font-extrabold uppercase tracking-[0.06em] text-ft-ink shadow-ft-pop-sm transition-[transform,box-shadow] duration-150 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-ft-pop-md motion-reduce:transition-none"
           >
-            Previsualizar
+            {t("editor.preview")}
           </Link>
           <Button
             variant={dirty ? "primary" : "ghost"}
@@ -293,7 +296,11 @@ function EditorPaneContent({
             onClick={handleSaveMeta}
             disabled={!dirty || saveArticle.isPending}
           >
-            {saveArticle.isPending ? "Guardando…" : dirty ? "Guardar cambios" : "Sin cambios"}
+            {saveArticle.isPending
+              ? t("editor.saving")
+              : dirty
+                ? t("editor.saveChanges")
+                : t("editor.noChanges")}
           </Button>
         </div>
       </div>

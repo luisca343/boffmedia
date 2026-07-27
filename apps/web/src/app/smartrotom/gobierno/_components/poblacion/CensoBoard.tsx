@@ -1,6 +1,7 @@
 "use client"
 
 import { useMemo, useState } from "react"
+import { useTranslations } from "next-intl"
 import { Badge, Empty, PageHead, SearchBar, Skeleton } from "../ui"
 import { FilterTabs } from "./FilterTabs"
 import { Pager } from "./Pager"
@@ -13,6 +14,7 @@ const PAGE_SIZE = 60
 type StandingFilter = "all" | Ciudadano["standing"]
 
 export function CensoBoard() {
+  const t = useTranslations("gobierno")
   const [search, setSearch] = useState("")
   const [standing, setStanding] = useState<StandingFilter>("all")
   const [page, setPage] = useState(1)
@@ -48,30 +50,30 @@ export function CensoBoard() {
   return (
     <div>
       <PageHead
-        kicker="Población · Registro civil"
+        kicker={t("poblacion.censoKicker")}
         dep="poblacion"
-        title="Censo de ciudadanos"
-        sub="Padrón municipal de Teras. Toda persona registrada, su municipio, propiedades y reputación cívica."
+        title={t("poblacion.censoTitle")}
+        sub={t("poblacion.censoSub")}
         right={
           <Badge tone="poblacion" icon="users">
-            {data?.total ?? "—"} habitantes
+            {t("poblacion.habitantes", { count: data?.total ?? "—" })}
           </Badge>
         }
       />
 
       <div className="mb-4 flex flex-wrap items-center gap-2.5">
         <div className="w-full max-w-[260px]">
-          <SearchBar value={search} onChange={setSearch} placeholder="Buscar en esta página…" />
+          <SearchBar value={search} onChange={setSearch} placeholder={t("poblacion.searchPagePlaceholder")} />
         </div>
         <FilterTabs
           value={standing}
           onChange={setStandingFilter}
           tone="poblacion"
           options={[
-            { value: "all", label: "Todos" },
-            { value: "bueno", label: "Buena rep.", count: buenoCount?.total },
-            { value: "observado", label: "Observados", count: observadoCount?.total },
-            { value: "sancionado", label: "Sancionados", count: sancionadoCount?.total },
+            { value: "all", label: t("poblacion.todos") },
+            { value: "bueno", label: t("poblacion.buenaRep"), count: buenoCount?.total },
+            { value: "observado", label: t("poblacion.observados"), count: observadoCount?.total },
+            { value: "sancionado", label: t("poblacion.sancionados"), count: sancionadoCount?.total },
           ]}
         />
       </div>
@@ -85,12 +87,8 @@ export function CensoBoard() {
       ) : rows.length === 0 ? (
         <Empty
           icon="users"
-          title="Sin ciudadanos"
-          sub={
-            search
-              ? "Ningún nombre en esta página coincide con la búsqueda."
-              : "Todavía no hay ciudadanos registrados en este padrón."
-          }
+          title={t("poblacion.emptyCenso")}
+          sub={search ? t("poblacion.emptyCensoSearch") : t("poblacion.emptyCensoSub")}
         />
       ) : (
         <>
@@ -99,7 +97,7 @@ export function CensoBoard() {
               <CiudadanoCard key={c.uuid} citizen={c} />
             ))}
           </div>
-          <Pager page={page} pageSize={PAGE_SIZE} total={data?.total ?? 0} onChange={setPage} />
+          <Pager page={page} pageSize={PAGE_SIZE} total={data?.total ?? 0} onChange={setPage} t={t} />
         </>
       )}
     </div>

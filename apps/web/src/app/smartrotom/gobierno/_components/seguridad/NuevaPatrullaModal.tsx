@@ -5,27 +5,34 @@
 // the acting officer is still real data and stays selectable/pre-checked; nobody else is
 // invented to fill the list.
 import { useEffect, useState } from "react"
+import { useTranslations } from "next-intl"
 import { Avatar, Badge, Button, Field, Modal, Select } from "../ui"
 import { useCreatePatrulla, useOficiales } from "../../_hooks/queries"
 import { useOfficer } from "../../_hooks/useOfficer"
 import { rankMeta } from "../poblacion/officerRoles"
 
-const STATUS_OPTIONS = [
-  { value: "rest", label: "Descanso" },
-  { value: "active", label: "En curso" },
-]
-
 export function NuevaPatrullaModal({ open, onClose }: { open: boolean; onClose: () => void }) {
+  const t = useTranslations("gobierno")
   const officer = useOfficer()
   const { data: oficiales } = useOficiales()
   const createPatrulla = useCreatePatrulla()
+
+  const STATUS_OPTIONS = [
+    { value: "rest", label: t("seguridad.descanso") },
+    { value: "active", label: t("seguridad.enCurso") },
+  ]
+
+  const rankLabelOf = (role?: string) => {
+    const meta = rankMeta(role)
+    return meta.labelKey ? t(meta.labelKey) : (meta.label ?? "")
+  }
 
   const roster: { uuid: string; username: string; rankLabel: string }[] =
     oficiales && oficiales.length > 0
       ? oficiales.map((o) => ({
           uuid: o.uuid,
           username: o.username,
-          rankLabel: rankMeta(o.rank?.role).label,
+          rankLabel: rankLabelOf(o.rank?.role),
         }))
       : [{ uuid: officer.uuid, username: officer.username, rankLabel: officer.rankLabel }]
 
@@ -60,19 +67,19 @@ export function NuevaPatrullaModal({ open, onClose }: { open: boolean; onClose: 
   if (!open) return null
 
   return (
-    <Modal open={open} onClose={onClose} title="Nuevo turno" kicker="Seguridad · Operaciones">
+    <Modal open={open} onClose={onClose} title={t("seguridad.nuevoTurnoTitle")} kicker={t("seguridad.nuevoTurnoKicker")}>
       <div className="space-y-3.5">
-        <Field label="Nombre del turno" value={label} onChange={setLabel} placeholder="Ronda nocturna — Mizu" />
+        <Field label={t("seguridad.nombreTurno")} value={label} onChange={setLabel} placeholder={t("seguridad.nombreTurnoPlaceholder")} />
         <div className="grid grid-cols-2 gap-2.5">
-          <Field label="Desde" value={fromTime} onChange={setFromTime} placeholder="22:00" mono />
-          <Field label="Hasta" value={toTime} onChange={setToTime} placeholder="06:00" mono />
+          <Field label={t("seguridad.desde")} value={fromTime} onChange={setFromTime} placeholder="22:00" mono />
+          <Field label={t("seguridad.hasta")} value={toTime} onChange={setToTime} placeholder="06:00" mono />
         </div>
-        <Field label="Zona" value={zone} onChange={setZone} placeholder="pueblo_mizu" />
-        <Select label="Estado inicial" value={status} onChange={setStatus} options={STATUS_OPTIONS} />
+        <Field label={t("seguridad.zona")} value={zone} onChange={setZone} placeholder={t("denuncias.new.townPlaceholder")} />
+        <Select label={t("seguridad.estadoInicial")} value={status} onChange={setStatus} options={STATUS_OPTIONS} />
 
         <div>
           <div className="mb-1.5 font-gt-mono text-[9.5px] font-bold uppercase tracking-[.14em] text-gt-ink-400">
-            Agentes asignados
+            {t("seguridad.agentesAsignados")}
           </div>
           <div className="max-h-[180px] space-y-1.5 overflow-y-auto">
             {roster.map((o) => {
@@ -98,10 +105,10 @@ export function NuevaPatrullaModal({ open, onClose }: { open: boolean; onClose: 
 
       <div className="mt-4 flex items-center justify-end gap-2">
         <Button tone="ghost" onClick={onClose} disabled={createPatrulla.isPending}>
-          Cancelar
+          {t("common.cancel")}
         </Button>
         <Button tone="primary" icon="plus" onClick={submit} disabled={createPatrulla.isPending || !label.trim()}>
-          Crear turno
+          {t("seguridad.crearTurno")}
         </Button>
       </div>
     </Modal>

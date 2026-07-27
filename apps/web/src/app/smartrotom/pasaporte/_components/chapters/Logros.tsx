@@ -3,7 +3,7 @@
 // PAPER. Two leaves: the resumen (points, tiers, categories, the rarest one) and the
 // colección (every trophy card).
 
-import { useTranslations } from "next-intl"
+import { useLocale, useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import type { Logro, LogroTier } from "../../_types"
 import { docDate } from "../../_utils/dates"
@@ -214,6 +214,7 @@ export function LogrosResumen({ logros, loading }: { logros?: Logro[] | null; lo
 
 export function LogrosColeccion({ logros, loading }: { logros?: Logro[] | null; loading: boolean }) {
   const t = useTranslations("pasaporte")
+  const locale = useLocale()
 
   if (loading) {
     return (
@@ -264,11 +265,11 @@ export function LogrosColeccion({ logros, loading }: { logros?: Logro[] | null; 
               onClick={() =>
                 toast(
                   done
-                    ? t("logros.unlockedToast", { name: logro.name, date: docDate(logro.completedAt) })
+                    ? t("logros.unlockedToast", { name: logro.name, date: docDate(logro.completedAt, locale) })
                     : t("logros.progressToast", {
                         name: logro.name,
-                        progress: fmt(logro.progress),
-                        target: fmt(logro.target),
+                        progress: fmt(logro.progress, locale),
+                        target: fmt(logro.target, locale),
                       }),
                 )
               }
@@ -326,7 +327,7 @@ export function LogrosColeccion({ logros, loading }: { logros?: Logro[] | null; 
                       })}
                     />
                     <span className="ps-num mt-[3px] block font-ps-mono text-[9px] text-ps-ink-faint">
-                      {fmt(logro.progress)} / {fmt(logro.target)}
+                      {fmt(logro.progress, locale)} / {fmt(logro.target, locale)}
                     </span>
                   </>
                 )}

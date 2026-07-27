@@ -308,6 +308,70 @@
     "topbar_navigate": "Navigate",
     "topbar_open": "Open",
     "unknown_description": "No description available",
-    "dexlist_registered": "{count} Pokémon registered"
+    "dexlist_registered": "{count} Pokémon registered",
+    "eff_weak": "Weak",
+    "eff_normal": "Neutral",
+    "eff_resistant": "Resistant",
+    "eff_immune": "Immune",
+    "evolution_moveType": "Knowing a {type}-type move",
+    "evolution_heldItem": "Holding {item}",
+    "evolution_statRatio": "With {stat1} equal to {stat2}",
+    "evolution_healthAbsence": "With {health} HP or less",
+    "evolution_highAltitude": "Above altitude {minAltitude}",
+    "evolution_blocksWalkedOutsideBall": "After walking {blocks} blocks outside the Poké Ball",
+    "evolution_insideBattle": "During battle",
+    "time_day": "During the day",
+    "time_night": "At night",
+    "time_dawn": "At dawn",
+    "time_dusk": "At dusk",
+    "dexStatus": {
+      "caught": "Caught",
+      "seen": "Seen",
+      "shiny": "Shiny",
+      "unknown": "Unknown"
+    },
+    "rarity": {
+      "common": "Common",
+      "uncommon": "Uncommon",
+      "rare": "Rare",
+      "ultra": "Ultra Rare",
+      "legendary": "Legendary"
+    },
+    "hero": {
+      "forms": "Forms",
+      "baseForm": "Base",
+      "rankingPosition": "Rank #{rank} in the ranking",
+      "unranked": "Unranked",
+      "dexNumber": "No. {dex}"
+    },
+    "evoTree": {
+      "loadError": "Could not load the evolution line",
+      "noEvolution": "This Pokémon does not evolve",
+      "evolves": "Evolves",
+      "or": "or",
+      "specificBiomes": "In specific biomes"
+    },
+    "sprite": {
+      "pokemonAlt": "Pokémon",
+      "itemAlt": "Item"
+    },
+    "spawnTable": {
+      "levelRange": "Lv. {range}",
+      "methodGround": "Land"
+    },
+    "hub": {
+      "footerCounts": "{indexed} indexed · {generable} generable"
+    },
+    "progress": {
+      "justNow": "now",
+      "barAria": "{pct}% caught, {seen} seen, {shiny} shiny",
+      "streakCount": "{count, plural, one {# day} other {# days}}"
+    },
+    "streak": {
+      "capturesCount": "{count, plural, one {# capture} other {# captures}}"
+    },
+    "sidebar": {
+      "userFallback": "User"
+    }
   }
 }

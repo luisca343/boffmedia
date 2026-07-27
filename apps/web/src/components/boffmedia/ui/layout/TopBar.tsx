@@ -1,21 +1,23 @@
 import * as React from "react"
+import { useTranslations } from "next-intl"
 import { Clock, Ticker } from "@/components/boffmedia/primitives"
 
-const TICKER_ITEMS = [
-  "Torneo Pixelmon Wingull 2 — 14 Jun",
-  "Minecraft Bingo · Edición rápida — 21 Jun",
-  "Project ZomBOFF · Supervivencia — 28 Jun",
-  "Ranking: <em>AxelCraft</em> lidera con 12 480 pts",
-  "SmartRotom — próximamente",
-]
+// Keys, not literals — a module-scope `t()` would freeze whichever locale loaded
+// first. `Ticker` renders each item as HTML, so the <em> stroke rides in the value.
+const TICKER_KEYS = ["item1", "item2", "item3", "item4", "item5"] as const
 
 export function TopBar() {
+  // Server Component: `useTranslations` is sync-valid here, so no "use client"
+  // and no hooks that would require one (useMemo).
+  const t = useTranslations("boffmedia.topbar")
+  const tickerItems = TICKER_KEYS.map((k) => t(k))
+
   return (
     <div className="relative z-[60] flex h-10 items-center gap-3 border-b-2 border-accent bg-base-deep px-5 font-mono text-[11px] font-medium leading-none tracking-[0.04em] text-[#8b93a1] min-[640px]:gap-5 min-[640px]:px-10">
       <span className="shrink-0 animate-[bm-pulse_2.4s_ease-in-out_infinite] motion-reduce:animate-none bg-[var(--naranja)] px-2.5 py-[5px] font-bold tracking-[0.14em] text-accent-ink cut [--cut:6px]">
-        EN VIVO
+        {t("live")}
       </span>
-      <Ticker items={TICKER_ITEMS} />
+      <Ticker items={tickerItems} />
       <Clock className="hidden text-[#c9cfd9] min-[520px]:block" />
     </div>
   )

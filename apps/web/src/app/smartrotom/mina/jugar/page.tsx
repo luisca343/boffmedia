@@ -13,6 +13,7 @@ import { useRotomUuid } from "@/components/smartrotom/behavior/useRotomUuid"
 import { useGuardedSubmit } from "@/components/smartrotom/behavior/useGuardedSubmit"
 import { RewardEntry } from "@/types/mina"
 import { MinaService } from "@/services/api/smartrotom/minaService"
+import { useTranslations } from "next-intl"
 
 enum Tool {
     PICKAXE = 1,
@@ -20,6 +21,7 @@ enum Tool {
 }
 
 export default function Jugar(){
+    const t = useTranslations("mina")
     const { session } = useBoffSession();
     const uuid = useRotomUuid();
     const [index, setIndex] = useState(0)
@@ -179,7 +181,7 @@ export default function Jugar(){
         <div className="bg-cover bg-repeat  overflow-hidden" style={{backgroundImage: 'url(/smartrotom/img/apps/mina/gui/fondo.png)'}}>
             <AlertDialog open={open}>
                 <AlertDialogContent className='bg-layer-1 border-edge-strong'>
-                    {obtainedRewards.length === 0 ?  <></> : <div className="w-full text-ink text-center text-2xl">Recompensas obtenidas</div>}
+                    {obtainedRewards.length === 0 ?  <></> : <div className="w-full text-ink text-center text-2xl">{t("play.rewardsObtained")}</div>}
                     <div className="flex flex-row justify-center items-center">
                     {obtainedRewards.map((reward, i) => {
                         return (
@@ -199,8 +201,8 @@ export default function Jugar(){
                             className="text-ink border border-edge hover:bg-layer-3"
                             onClick={() => { startGame() }}
                             disabled={starting}>
-                            {index === 0 ? 'Jugar' : 'Volver a Jugar'}</Button>
-                        <Button className="text-ink border border-edge hover:bg-layer-3" onClick={() => router.replace('/smartrotom/mina')}>Cerrar</Button>
+                            {index === 0 ? t("play.start") : t("play.playAgain")}</Button>
+                        <Button className="text-ink border border-edge hover:bg-layer-3" onClick={() => router.replace('/smartrotom/mina')}>{t("play.close")}</Button>
                     </div>
                 </AlertDialogContent>
             </AlertDialog>

@@ -1,6 +1,7 @@
 "use client"
 
 import { Fragment } from "react"
+import { useTranslations } from "next-intl"
 import { Skeleton } from "../../_components/ui"
 import type { Cell, RowColInfo } from "../types"
 import CellComponent from "./Cell"
@@ -21,6 +22,7 @@ interface GameGridProps {
  * on purpose — it keeps the board off the panel's right edge on desktop.
  */
 function GameGrid({ grid, rowInfo, colInfo, onCellClick, level, roundScore }: GameGridProps) {
+  const t = useTranslations("arcade")
   if (grid.length === 0) {
     return <Skeleton className="mx-auto aspect-square w-full max-w-[560px] rounded-2xl" />
   }
@@ -29,13 +31,13 @@ function GameGrid({ grid, rowInfo, colInfo, onCellClick, level, roundScore }: Ga
     <div className="mx-auto grid max-w-[560px] grid-cols-[44px_repeat(5,minmax(0,1fr))_0px] gap-1.5 md:grid-cols-[48px_repeat(5,minmax(0,1fr))_64px]">
       <div />
       {colInfo.map((info, i) => (
-        <HintCell key={`col-${i}`} info={info} label={`Columna ${i + 1}`} />
+        <HintCell key={`col-${i}`} info={info} label={t("voltorb.columnLabel", { index: i + 1 })} />
       ))}
       <div />
 
       {grid.map((row, rowIndex) => (
         <Fragment key={`row-${rowIndex}`}>
-          <HintCell info={rowInfo[rowIndex]} label={`Fila ${rowIndex + 1}`} />
+          <HintCell info={rowInfo[rowIndex]} label={t("voltorb.rowLabel", { index: rowIndex + 1 })} />
           {row.map((cell, colIndex) => (
             <CellComponent
               key={`${rowIndex}-${colIndex}`}
@@ -51,9 +53,9 @@ function GameGrid({ grid, rowInfo, colInfo, onCellClick, level, roundScore }: Ga
 
       <div />
       <div className="col-span-5 mt-1.5 flex items-center justify-between gap-2 rounded-lg border border-ar-cyan/25 bg-black/40 px-3 py-2">
-        <span className="font-ar-display text-[10px] text-ar-cyan">NIVEL {level}</span>
+        <span className="font-ar-display text-[10px] text-ar-cyan">{t("voltorb.levelLabel", { level })}</span>
         <span className="hidden font-ar-mono text-[11px] uppercase text-ar-ink-dim md:inline">
-          Voltea números para acumular puntos
+          {t("voltorb.flipHint")}
         </span>
         <span className="ar-glow-amber font-ar-display text-[12px] tabular-nums text-ar-amber">
           ×{roundScore}

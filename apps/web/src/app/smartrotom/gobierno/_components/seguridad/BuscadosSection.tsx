@@ -1,7 +1,9 @@
 "use client"
 
 import { useMemo, useState } from "react"
+import { useTranslations } from "next-intl"
 import { userMessageFrom } from "@/services/boffAPI"
+import { useFormat } from "@/lib/useFormat"
 import {
   Avatar,
   Badge,
@@ -29,6 +31,8 @@ import { severityTone } from "./severity"
 import type { Buscado } from "../../_types"
 
 export function BuscadosSection() {
+  const t = useTranslations("gobierno")
+  const { intlLocale } = useFormat()
   // `limit`/`page` are what ListBuscadosQueryDto actually validates — 100 is its max.
   const { data, isLoading, isError, error } = useBuscados({ limit: 100 })
   const officer = useOfficer()
@@ -49,14 +53,14 @@ export function BuscadosSection() {
   return (
     <>
       <PageHead
-        kicker="Seguridad · Busca y captura"
+        kicker={t("buscados.sectionKicker")}
         dep="seguridad"
-        title="Buscados"
-        sub="Infractores reclamados por la justicia de Teras. Recompensa pagada por la tesorería municipal."
+        title={t("buscados.sectionTitle")}
+        sub={t("buscados.sectionSub")}
         right={
           active.length > 0 ? (
             <Badge tone="danger" icon="coins" solid className="px-[11px] py-[7px] text-[12px]">
-              Bolsa total {money(totalBounty)} ₽
+              {t("buscados.bolsaTotal", { amount: money(totalBounty, intlLocale) })}
             </Badge>
           ) : undefined
         }
@@ -71,14 +75,14 @@ export function BuscadosSection() {
       ) : isError ? (
         <Empty
           icon="alert"
-          title="No se ha podido cargar el registro"
-          sub={error ? userMessageFrom(error, "Inténtalo de nuevo en unos segundos.") : undefined}
+          title={t("denuncias.errorTitle")}
+          sub={error ? userMessageFrom(error, t("common.retry")) : undefined}
         />
       ) : active.length === 0 && resolved.length === 0 ? (
         <Empty
           icon="shieldAlert"
-          title="No hay órdenes de busca y captura"
-          sub="Los infractores escalados desde Denuncias aparecerán aquí, con recompensa a cargo de la tesorería."
+          title={t("buscados.emptyCapture")}
+          sub={t("buscados.emptyCaptureSub")}
         />
       ) : (
         <>
@@ -89,13 +93,13 @@ export function BuscadosSection() {
                 return (
                   <Card key={b.id} className="overflow-hidden border-gt-line-strong p-0">
                     <div className="bg-gt-ink-900 py-2 text-center">
-                      <div className="font-gt-display text-[19px] font-bold tracking-[.22em] text-gt-paper-0">SE BUSCA</div>
+                      <div className="font-gt-display text-[19px] font-bold tracking-[.22em] text-gt-paper-0">{t("buscados.seBusca")}</div>
                     </div>
                     <div className="bg-gradient-to-b from-gt-paper-1 to-gt-paper-0 p-4 text-center">
                       <div className="relative inline-block">
                         <Avatar user={b.player.username} size={92} />
                         <div className="absolute -bottom-2 -right-6 -rotate-[9deg]">
-                          <Stamp tone={sev.tone}>{sev.label}</Stamp>
+                          <Stamp tone={sev.tone}>{t(sev.labelKey)}</Stamp>
                         </div>
                       </div>
                       <div className="mt-3 font-gt-display text-[21px] font-bold text-gt-ink-900">{b.player.username}</div>
@@ -103,9 +107,9 @@ export function BuscadosSection() {
                         {b.offense}
                       </div>
                       <div className="my-2.5 h-px bg-gt-line-strong" />
-                      <div className="font-gt-mono text-[9px] uppercase tracking-[.14em] text-gt-ink-400">Recompensa</div>
+                      <div className="font-gt-mono text-[9px] uppercase tracking-[.14em] text-gt-ink-400">{t("buscados.recompensa")}</div>
                       <div className="font-gt-display text-[30px] font-bold leading-none tabular-nums text-gt-danger">
-                        {money(b.bounty)} ₽
+                        {money(b.bounty, intlLocale)} ₽
                       </div>
                       {b.lastSeen && (
                         <div className="my-2 font-gt-mono text-[10.5px] text-gt-ink-400">
@@ -115,10 +119,10 @@ export function BuscadosSection() {
                       )}
                       <div className="mt-3 flex gap-1.5">
                         <Button size="sm" tone="ghost" icon="eye" className="flex-1" onClick={() => openDossier(b.player.uuid)}>
-                          Ficha
+                          {t("buscados.ficha")}
                         </Button>
                         <Button size="sm" tone="primary" icon="check" className="flex-1" onClick={() => setConfirming(b)}>
-                          Capturado
+                          {t("buscados.capturado")}
                         </Button>
                       </div>
                     </div>
@@ -133,11 +137,11 @@ export function BuscadosSection() {
               <Table>
                 <THead>
                   <TR>
-                    <TH>Caso</TH>
-                    <TH>Infractor</TH>
-                    <TH>Delito</TH>
-                    <TH>Recompensa</TH>
-                    <TH>Estado</TH>
+                    <TH>{t("buscados.tableCaso")}</TH>
+                    <TH>{t("buscados.tableInfractor")}</TH>
+                    <TH>{t("buscados.tableDelito")}</TH>
+                    <TH>{t("buscados.tableRecompensa")}</TH>
+                    <TH>{t("buscados.tableEstado")}</TH>
                   </TR>
                 </THead>
                 <TBody>
@@ -151,9 +155,9 @@ export function BuscadosSection() {
                         </span>
                       </TD>
                       <TD className="max-w-[280px] truncate text-[12px] text-gt-ink-600">{b.offense}</TD>
-                      <TD className="font-gt-display tabular-nums">{money(b.bounty)} ₽</TD>
+                      <TD className="font-gt-display tabular-nums">{money(b.bounty, intlLocale)} ₽</TD>
                       <TD>
-                        <Badge tone={BUSCADO_STATUS[b.status].tone}>{BUSCADO_STATUS[b.status].label}</Badge>
+                        <Badge tone={BUSCADO_STATUS[b.status].tone}>{t(BUSCADO_STATUS[b.status].labelKey)}</Badge>
                       </TD>
                     </TR>
                   ))}
@@ -167,25 +171,26 @@ export function BuscadosSection() {
       <Modal
         open={!!confirming}
         onClose={() => setConfirming(null)}
-        title="Confirmar captura"
-        kicker="Seguridad · Pago de recompensa"
+        title={t("buscados.confirmCapture")}
+        kicker={t("buscados.captureKicker")}
         footer={
           <>
             <Button tone="ghost" onClick={() => setConfirming(null)} disabled={captureBuscado.isPending}>
-              Cancelar
+              {t("common.cancel")}
             </Button>
             <Button tone="primary" icon="coins" onClick={confirmCapture} disabled={captureBuscado.isPending}>
-              Confirmar y pagar
+              {t("buscados.confirmAndPay")}
             </Button>
           </>
         }
       >
         {confirming && (
           <p className="text-[13.5px] leading-relaxed text-gt-ink-700">
-            Vas a marcar a <strong className="font-gt-display text-gt-ink-900">{confirming.player.username}</strong> como
-            capturado. Esto transferirá <strong className="tabular-nums text-gt-danger">{money(confirming.bounty)} ₽</strong>{" "}
-            de la tesorería municipal a <strong className="font-gt-display text-gt-ink-900">{officer.username || "ti"}</strong>{" "}
-            de inmediato. Esta acción no se puede deshacer.
+            {t("buscados.captureDescription", {
+              username: confirming.player.username,
+              amount: money(confirming.bounty, intlLocale),
+              officer: officer.username || t("common.you"),
+            })}
           </p>
         )}
       </Modal>

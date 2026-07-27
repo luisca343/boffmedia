@@ -2,6 +2,7 @@
 
 import { use, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 import {
   Button,
@@ -35,6 +36,7 @@ export default function ArticlePage({
 }: {
   params: Promise<{ id: string }>;
 }) {
+  const t = useTranslations("furrettoday.article");
   const { id } = use(params);
   const router = useRouter();
   const numericId = Number(id);
@@ -48,9 +50,9 @@ export default function ArticlePage({
     return (
       <div className="mx-auto max-w-[880px] px-6 py-16">
         <EmptyState
-          title="¡PÁGINA EN BLANCO!"
-          message="Furret no encuentra este artículo. Puede que se haya movido o que nunca haya existido."
-          actionLabel="Volver a portada"
+          title={t("notFoundTitle")}
+          message={t("notFoundMessage")}
+          actionLabel={t("backToCover")}
           onAction={() => router.push(BASE)}
         />
       </div>
@@ -77,13 +79,13 @@ export default function ArticlePage({
       <div className="border-b-ft-hair border-dashed border-b-ft-ink bg-ft-paper-2">
         <div className="mx-auto flex max-w-[1400px] items-center gap-3 px-6 py-3">
           <Button variant="ghost" size="sm" onClick={() => router.push(BASE)}>
-            ← Portada
+            {t("backCover")}
           </Button>
           <Meta>/</Meta>
           <Meta>{article.eyebrow}</Meta>
           <div className="ml-auto">
             <Button size="sm" onClick={() => setShareOpen(true)}>
-              Compartir
+              {t("share")}
             </Button>
           </div>
         </div>
@@ -102,8 +104,8 @@ export default function ArticlePage({
             />
           </div>
           <div className="mt-2.5 flex justify-between">
-            <Meta>Ilustración · Estudio POP de Furret Today</Meta>
-            <Meta>Fig. 01</Meta>
+            <Meta>{t("illustration")}</Meta>
+            <Meta>{t("figure")}</Meta>
           </div>
         </div>
       </div>

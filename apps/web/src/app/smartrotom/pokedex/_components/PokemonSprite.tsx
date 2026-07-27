@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import { useTranslations } from "next-intl"
 import { StatusIconv2 } from "./StatusIcon"
 import Link from "next/link"
 import { usePokemonStore } from "@/stores/pokemonStore"
@@ -85,6 +86,7 @@ export function PokemonSprite({
   inverted = false, 
   className 
 }: PokemonSpriteProps) {
+  const t = useTranslations("pokedex")
   const { getPokemonStatus, getVisibility } = usePokedexData()
   const status = getPokemonStatus(id, form)
   const isVisible = getVisibility(id, form, hideCaught, hideSeen)
@@ -122,7 +124,7 @@ export function PokemonSprite({
           width={width}
           height={height}
           src={imageUrl || "/placeholder.svg"}
-          alt="pokemon"
+          alt={t("sprite.pokemonAlt")}
           style={{ imageRendering: pixelated ? "pixelated" : "auto",  height: 'auto' }}
           className={`${(status === PokedexStatus.UNSEEN && hide) || forceBlack ? `brightness-0 ${inverted ? "invert" : ""}` : ""}`}
         />
@@ -158,6 +160,7 @@ export function PokemonNameElement({
 }
 
 export function ItemSprite({ name, width = 100, height = 100 }: { name: string; width?: number; height?: number }) {
+  const t = useTranslations("pokedex")
   const [imageUrl, setImageUrl] = useState() as any
   const [loaded, setLoaded] = useState(false)
 
@@ -174,7 +177,7 @@ export function ItemSprite({ name, width = 100, height = 100 }: { name: string; 
       width={width}
       height={height}
       src={imageUrl?.url || "/placeholder.svg"}
-      alt="item"
+      alt={t("sprite.itemAlt")}
       style={{ imageRendering: "pixelated" }}
     />
   )

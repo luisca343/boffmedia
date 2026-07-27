@@ -58,6 +58,19 @@
       "loginToJoin": "Sign in to take part",
       "notFound": "Event not found",
       "notFoundLead": "This event doesn't exist or has been removed."
+    },
+    "organizer": {
+      "tagOfficial": "Official",
+      "tagCoorg": "Co-org",
+      "tagCommunity": "Community",
+      "labelBoffmedia": "Organised by Boffmedia",
+      "labelCoorg": "Co-organised",
+      "labelPlatform": "On the platform",
+      "lineBoffmedia": "An in-house event, organised from start to finish by Boffmedia.",
+      "lineCoorg": "Organised by Boffmedia together with {name}.",
+      "linePlatform": "{name} organises this event. Boffmedia provides the platform, the registrations and the achievements.",
+      "inBoffmedia": "on Boffmedia",
+      "by": "By"
     }
   },
   "logros": {
@@ -141,7 +154,11 @@
       "achievements": "Achievements",
       "calendar": "Calendar"
     },
-    "empty": "Nothing yet."
+    "empty": "Nothing yet.",
+    "vote": {
+      "up": "Upvote",
+      "down": "Downvote"
+    }
   },
   "calendario": {
     "kicker": "Community",

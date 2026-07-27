@@ -4,7 +4,7 @@ import type { CreateTransferDto } from "@boffmedia/shared";
 import { useTranslations, useLocale } from "next-intl";
 import { useRotomUuid } from "@/components/smartrotom/behavior/useRotomUuid";
 import { useAccounts, useAllAccounts, useTransferMutation } from "../_hooks/queries";
-import { userMessageFrom } from "@/services/boffAPI";
+import { useApiError } from "@/hooks/useApiError";
 import { PageHeader, Card, Button, Ico, Stepper, Label, Input, Select, ContactAvatar, AccountAvatar } from "../_components/ui";
 import { formatMoney, parseAmount } from "../_utils/format";
 import { displayName, transferBlocker } from "../_utils/account";
@@ -16,6 +16,7 @@ const PRESETS = [1000, 5000, 10000, 25000, 50000];
 
 export default function Enviar() {
   const t = useTranslations("starbank");
+  const apiError = useApiError();
   const locale = useLocale();
   const STEPS = [t("enviar.steps.recipient"), t("enviar.steps.amount"), t("enviar.steps.review")];
   const uuid = useRotomUuid();
@@ -73,7 +74,7 @@ export default function Enviar() {
     };
     transferMutation.mutate(body, {
       onSuccess: () => setDone(true),
-      onError: (err) => setError(userMessageFrom(err, "No se pudo completar la transferencia")),
+      onError: (err) => setError(apiError(err, t("enviar.errorTransferencia"))),
     });
   }
 

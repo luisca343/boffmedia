@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { Icon } from "@/components/boffmedia/primitives"
 
@@ -17,13 +18,14 @@ export function VoteRail({
   onVote?: (v: number) => void
   row?: boolean
 }) {
+  const t = useTranslations("community.vote")
   const total = votes + vote
   const btn = "grid h-[26px] w-[34px] place-items-center border border-solid bg-panel-2 transition-[color,border-color] duration-[140ms] cut-seal [--cut:6px]"
   return (
     <span className={cn("inline-grid justify-items-center gap-[5px]", row && "grid-flow-col items-center")}>
       <button
         type="button"
-        aria-label="Votar a favor"
+        aria-label={t("up")}
         aria-pressed={vote === 1}
         onClick={(e) => {
           e.stopPropagation()
@@ -36,7 +38,7 @@ export function VoteRail({
       <span className="font-mono text-[16px]/none font-bold text-txt">{total}</span>
       <button
         type="button"
-        aria-label="Votar en contra"
+        aria-label={t("down")}
         aria-pressed={vote === -1}
         onClick={(e) => {
           e.stopPropagation()

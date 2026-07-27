@@ -2,6 +2,7 @@
 
 import type { ReactNode } from "react"
 import { useMemo, useState } from "react"
+import { useTranslations } from "next-intl"
 import { Button, PageHead } from "../ui"
 import { useBuscados, useParcelas, useZonas } from "../../_hooks/queries"
 import { useGobiernoUi } from "../../_stores/useGobiernoUi"
@@ -21,6 +22,7 @@ import type { Parcela, Zona } from "../../_types"
  * as one tall plan of the region, just inside a card instead of edge-to-edge.
  */
 export function MapaView() {
+  const t = useTranslations("gobierno")
   const [selectedPlotId, setSelectedPlotId] = useState<string | null>(null)
   const [selectedZonaId, setSelectedZonaId] = useState<number | null>(null)
   const [showZonas, setShowZonas] = useState(true)
@@ -66,8 +68,8 @@ export function MapaView() {
   return (
     <div className="flex h-[calc(100dvh-210px)] min-h-[560px] flex-col animate-gt-pop motion-reduce:animate-none">
       <PageHead
-        kicker="Urbanismo · Catastro"
-        title="Mapa de la región de Teras"
+        kicker={t("urbanismo.parcelasKicker")}
+        title={t("mapa.titulo")}
         dep="urbanismo"
         right={
           <Button
@@ -75,9 +77,9 @@ export function MapaView() {
             size="sm"
             icon="layers"
             onClick={() => setShowZonas((v) => !v)}
-            aria-label={showZonas ? "Ocultar zonas urbanísticas" : "Mostrar zonas urbanísticas"}
+            aria-label={showZonas ? t("mapa.ocultarZonas") : t("mapa.mostrarZonas")}
           >
-            Zonas
+            {t("mapa.zonasBtn")}
           </Button>
         }
       />
@@ -85,7 +87,7 @@ export function MapaView() {
       <div className="flex min-h-0 flex-1 flex-col gap-4 lg:flex-row">
         <div className="relative min-h-[320px] flex-1 overflow-hidden rounded-gt border border-gt-line-strong shadow-gt">
           {loading ? (
-            <div className="grid h-full place-items-center text-[13px] text-gt-ink-400">Cargando el catastro…</div>
+            <div className="grid h-full place-items-center text-[13px] text-gt-ink-400">{t("mapa.cargandoCatastro")}</div>
           ) : (
             <MapaCanvas
               parcelas={parcelas}
@@ -101,7 +103,7 @@ export function MapaView() {
             />
           )}
 
-          <MapaLegend />
+          <MapaLegend t={t} />
         </div>
 
         <div className="gt-scroll min-h-[240px] w-full flex-none overflow-y-auto rounded-gt border border-gt-line bg-gt-paper-0 p-4 shadow-gt lg:min-h-0 lg:w-[320px]">
@@ -113,9 +115,10 @@ export function MapaView() {
               members={zonaMembers}
               onClose={() => setSelectedZonaId(null)}
               onSelectPlot={selectPlot}
+              t={t}
             />
           ) : (
-            <MapSummary parcelas={parcelas} zonas={zonas} />
+            <MapSummary parcelas={parcelas} zonas={zonas} t={t} />
           )}
         </div>
       </div>
@@ -123,13 +126,13 @@ export function MapaView() {
   )
 }
 
-function MapaLegend() {
+function MapaLegend({ t }: { t: ReturnType<typeof useTranslations> }) {
   return (
     <div className="pointer-events-none absolute bottom-3.5 left-4 flex max-w-[calc(100%-2rem)] flex-wrap items-center gap-3.5 rounded-gt border border-gt-line-strong bg-gt-paper-0 px-3.5 py-2 shadow-gt">
-      <LegendItem swatch="bg-gt-civic">Ocupada</LegendItem>
-      <LegendItem swatch="border border-dashed border-gt-ink-300 bg-transparent">Vacante</LegendItem>
-      <LegendItem swatch="bg-gt-danger">Buscado</LegendItem>
-      <LegendItem swatch="border border-dashed border-gt-dep-urbanismo bg-transparent">Zona</LegendItem>
+      <LegendItem swatch="bg-gt-civic">{t("mapa.legendOcupada")}</LegendItem>
+      <LegendItem swatch="border border-dashed border-gt-ink-300 bg-transparent">{t("mapa.legendVacante")}</LegendItem>
+      <LegendItem swatch="bg-gt-danger">{t("mapa.legendBuscado")}</LegendItem>
+      <LegendItem swatch="border border-dashed border-gt-dep-urbanismo bg-transparent">{t("mapa.legendZona")}</LegendItem>
     </div>
   )
 }

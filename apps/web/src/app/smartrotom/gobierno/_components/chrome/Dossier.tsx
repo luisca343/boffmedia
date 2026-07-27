@@ -8,6 +8,7 @@ import { useGobiernoUi } from "../../_stores/useGobiernoUi"
 import { useCiudadano, useBuscados, useDenuncias, useMultas } from "../../_hooks/queries"
 import { STANDING, MULTA_STATUS, BUSCADO_STATUS, DENUNCIA_STATUS } from "../../_utils/tones"
 import { fmtDate, money, townName } from "../../_utils/format"
+import { useFormat } from "@/lib/useFormat"
 
 /**
  * The citizen dossier: everything the government knows about one person, opened by clicking
@@ -16,6 +17,7 @@ import { fmtDate, money, townName } from "../../_utils/format"
  */
 export function Dossier() {
   const t = useTranslations("gobierno")
+  const { intlLocale } = useFormat()
   const uuid = useGobiernoUi((s) => s.dossier)
   const close = useGobiernoUi((s) => s.closeDossier)
 
@@ -33,7 +35,8 @@ export function Dossier() {
 
   if (!uuid || typeof document === "undefined") return null
 
-  const standing = citizen ? STANDING[citizen.standing] : null
+  const standingMeta = citizen ? STANDING[citizen.standing] : null
+  const standing = standingMeta ? { label: t(standingMeta.labelKey), tone: standingMeta.tone } : null
   const activeBounty = buscados?.items.find((b) => b.status === "active")
 
   return createPortal(
@@ -84,14 +87,14 @@ export function Dossier() {
                       )}
                       {activeBounty && (
                         <Badge tone="danger" icon="alert" solid>
-                          {money(activeBounty.bounty)} ₽
+                          {money(activeBounty.bounty, intlLocale)} ₽
                         </Badge>
                       )}
                     </div>
                   </div>
                 </div>
                 <div className="mt-3 font-gt-mono text-[9.5px] uppercase tracking-[.1em] text-gt-ink-400">
-                  UUID {citizen.uuid.slice(0, 8)}…
+                  {t("jugadores.uuid")} {citizen.uuid.slice(0, 8)}…
                 </div>
               </>
             )}
@@ -140,10 +143,10 @@ export function Dossier() {
                     <div className="text-[13px] font-semibold text-gt-ink-900">{activeBounty.offense}</div>
                     <div className="mt-1 flex items-center gap-2">
                       <Badge tone={BUSCADO_STATUS[activeBounty.status].tone}>
-                        {BUSCADO_STATUS[activeBounty.status].label}
+                        {t(BUSCADO_STATUS[activeBounty.status].labelKey)}
                       </Badge>
                       <span className="font-gt-mono text-[11px] tabular-nums text-gt-danger">
-                        {money(activeBounty.bounty)} ₽
+                        {money(activeBounty.bounty, intlLocale)} ₽
                       </span>
                     </div>
                     {activeBounty.lastSeen && (
@@ -163,14 +166,14 @@ export function Dossier() {
                         <div className="min-w-0">
                           <div className="truncate text-[12.5px] text-gt-ink-700">{m.reason}</div>
                           <div className="font-gt-mono text-[9.5px] uppercase tracking-[.1em] text-gt-ink-400">
-                            {m.code} · {fmtDate(m.createdAt)}
+                            {m.code} · {fmtDate(m.createdAt, intlLocale)}
                           </div>
                         </div>
                         <div className="flex flex-none items-center gap-2">
                           <span className="font-gt-mono text-[12px] tabular-nums text-gt-ink-900">
-                            {money(m.amount)} ₽
+                            {money(m.amount, intlLocale)} ₽
                           </span>
-                          <Badge tone={MULTA_STATUS[m.status].tone}>{MULTA_STATUS[m.status].label}</Badge>
+                          <Badge tone={MULTA_STATUS[m.status].tone}>{t(MULTA_STATUS[m.status].labelKey)}</Badge>
                         </div>
                       </li>
                     ))}
@@ -188,10 +191,10 @@ export function Dossier() {
                         <div className="min-w-0">
                           <div className="truncate text-[12.5px] text-gt-ink-700">{d.description}</div>
                           <div className="font-gt-mono text-[9.5px] uppercase tracking-[.1em] text-gt-ink-400">
-                            {d.code} · {fmtDate(d.createdAt)}
+                            {d.code} · {fmtDate(d.createdAt, intlLocale)}
                           </div>
                         </div>
-                        <Badge tone={DENUNCIA_STATUS[d.status].tone}>{DENUNCIA_STATUS[d.status].label}</Badge>
+                        <Badge tone={DENUNCIA_STATUS[d.status].tone}>{t(DENUNCIA_STATUS[d.status].labelKey)}</Badge>
                       </li>
                     ))}
                   </ul>

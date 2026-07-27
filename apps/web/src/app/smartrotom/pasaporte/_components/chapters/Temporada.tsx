@@ -1,6 +1,6 @@
 // PAPER.
 
-import { useTranslations } from "next-intl"
+import { useLocale, useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import type { Season, StandingTier } from "../../_types"
 import { docDate } from "../../_utils/dates"
@@ -38,6 +38,7 @@ export function Temporada({
   loading: boolean
 }) {
   const t = useTranslations("pasaporte")
+  const locale = useLocale()
 
   if (loading) {
     return (
@@ -71,7 +72,7 @@ export function Temporada({
         <EmptyState
           icon="swords"
           title={t("temporada.notFought.title")}
-          sub={t("temporada.notFought.sub", { name: info.name, date: docDate(info.endsAt) })}
+          sub={t("temporada.notFought.sub", { name: info.name, date: docDate(info.endsAt, locale) })}
         />
       </>
     )
@@ -113,7 +114,7 @@ export function Temporada({
       </div>
 
       <p className="ps-num mb-3 text-center font-ps-mono text-[10.5px] tracking-[.06em] text-ps-ink-faint">
-        {t("temporada.seasonLine", { number: info.number, date: docDate(info.endsAt) })}
+        {t("temporada.seasonLine", { number: info.number, date: docDate(info.endsAt, locale) })}
       </p>
 
       <ol className="mb-3 grid grid-cols-6 gap-1">

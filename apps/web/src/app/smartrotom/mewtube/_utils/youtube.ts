@@ -1,6 +1,7 @@
 import type { Video } from "../types"
 import type { VideoCardData } from "@/components/smartrotom/media/ui"
 import { timeAgoLong as relativeTime } from "@/lib/format"
+import { intlLocale } from "@/lib/locale"
 
 export const MEWTUBE_BASE = "/smartrotom/mewtube"
 
@@ -15,13 +16,21 @@ export function thumbOf(v: Video): string | undefined {
   return t.high?.url ?? t.medium?.url ?? t.default?.url
 }
 
-/** Spanish count: "1,2 M" · "248 K" · "812". */
-export function formatCount(raw?: string | number): string {
+/** Locale-aware compact count: "1,2 M" (es) / "1.2 M" (en) · "248 K" · "812". */
+export function formatCount(raw?: string | number, locale?: string | null): string {
   const n = typeof raw === "number" ? raw : parseInt(raw ?? "", 10)
   if (!Number.isFinite(n)) return ""
-  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1).replace(".", ",")} M`
+  const tag = intlLocale(locale)
+  if (n >= 1_000_000) {
+    const millions = (n / 1_000_000).toLocaleString(tag, {
+      minimumFractionDigits: 1,
+      maximumFractionDigits: 1,
+      useGrouping: false,
+    })
+    return `${millions} M`
+  }
   if (n >= 1_000) return `${Math.round(n / 1_000)} K`
-  return n.toLocaleString("es-ES")
+  return n.toLocaleString(tag)
 }
 
 /** ISO8601 duration (PT1H2M30S) → "1:02:30" / "27:14". */
@@ -36,12 +45,15 @@ export function formatDuration(iso?: string): string | undefined {
   return h > 0 ? `${h}:${pad(min)}:${pad(s)}` : `${min}:${pad(s)}`
 }
 
-// Long-form Spanish relative time: "hace 3 días".
+// Long-form relative time, locale-aware: "hace 3 días" / "3 days ago".
 export { relativeTime }
 
 /** Map a YouTube video to VideoCard props. Duration/views present only when the
  *  source part was requested (search results are enriched separately). */
-export function toVideoCard(v: Video, opts?: { creatorAvatar?: string }): VideoCardData {
+export function toVideoCard(
+  v: Video,
+  opts?: { creatorAvatar?: string; locale?: string | null },
+): VideoCardData {
   return {
     href: `${MEWTUBE_BASE}/video/${videoIdOf(v)}`,
     thumb: thumbOf(v),
@@ -49,7 +61,7 @@ export function toVideoCard(v: Video, opts?: { creatorAvatar?: string }): VideoC
     duration: formatDuration((v as { contentDetails?: { duration?: string } }).contentDetails?.duration),
     creator: v.snippet.channelTitle,
     creatorAvatar: opts?.creatorAvatar,
-    views: v.statistics ? formatCount(v.statistics.viewCount) : "",
-    age: relativeTime(v.snippet.publishedAt),
+    views: v.statistics ? formatCount(v.statistics.viewCount, opts?.locale) : "",
+    age: relativeTime(v.snippet.publishedAt, opts?.locale),
   }
 }

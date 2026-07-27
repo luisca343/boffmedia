@@ -116,7 +116,7 @@ export function SpawnsCard() {
                 <div className="flex items-center gap-2.5 text-[11px] tracking-wider uppercase font-pk-mono font-semibold" style={{ color: meta.fg }}>
                   <span className="flex items-center gap-1.5">
                     <span className="w-2 h-2 rounded-full" style={{ background: meta.fg, boxShadow: `0 0 6px ${meta.fg}` }} />
-                    {meta.label}
+                    {t(meta.labelKey)}
                     <span className="text-pk-surface-500 font-medium ml-1.5">· {items.length}</span>
                   </span>
                   <span className="flex-1 h-px bg-white/[0.06]" />

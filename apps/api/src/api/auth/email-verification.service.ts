@@ -38,11 +38,18 @@ export class EmailVerificationService {
       return;
     }
     if (!user || user.emailVerified) return;
-    await this.issue(user.id, user.email);
+    await this.issue(user.id, user.email, user.locale);
   }
 
-  /** Create + email a token for a known user (no existence/verified checks). */
-  async issue(userId: number, email: string): Promise<void> {
+  /**
+   * Create + email a token for a known user (no existence/verified checks).
+   * `locale` is the user's stored preference; omitting it sends Spanish.
+   */
+  async issue(
+    userId: number,
+    email: string,
+    locale?: string | null,
+  ): Promise<void> {
     const token = crypto.randomBytes(32).toString('hex');
     const expiresAt = new Date(Date.now() + TOKEN_TTL_MS);
 
@@ -62,7 +69,7 @@ export class EmailVerificationService {
       expiresAt,
     });
 
-    await this.mail.sendEmailVerification(email, token);
+    await this.mail.sendEmailVerification(email, token, locale);
   }
 
   /** Consume a verification token and mark the user's email verified. */

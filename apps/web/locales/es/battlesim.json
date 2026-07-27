@@ -21,7 +21,14 @@
       "vs": "vs",
       "fullscreen": "Pantalla completa",
       "exitFullscreen": "Salir de pantalla completa",
-      "opponent": "Rival"
+      "opponent": "Rival",
+      "aria": "Cabecera de combate",
+      "modes": {
+        "ai": "VS IA",
+        "pvp": "PVP",
+        "showdown": "SHOWDOWN",
+        "replay": "REPETICIÓN"
+      }
     },
     "connection": {
       "error": "Error",
@@ -45,7 +52,14 @@
       "forcedSwitch": "Cambio forzado",
       "trapped": " (atrapado)",
       "undo": "Deshacer",
-      "undoHint": "Cancela la elección enviada (antes de que se resuelva el turno)"
+      "undoHint": "Cancela la elección enviada (antes de que se resuelva el turno)",
+      "aria": "Acciones de combate",
+      "mechanics": {
+        "terastallize": "Teracristalización",
+        "mega": "Mega Evolución",
+        "dynamax": "Dynamax",
+        "zmove": "Movimiento Z"
+      }
     },
     "log": {
       "label": "Registro de combate",
@@ -69,7 +83,8 @@
       "battleEmpty": "El chat del combate aparecerá aquí",
       "unread": "{count} mensajes sin leer",
       "lobbyPlaceholder": "Escribe un mensaje…",
-      "lobbyEmpty": "Aún no hay mensajes. El chat aparecerá aquí al conectar con el lobby."
+      "lobbyEmpty": "Aún no hay mensajes. El chat aparecerá aquí al conectar con el lobby.",
+      "aria": "Chat"
     },
     "end": {
       "victory": "¡VICTORIA!",
@@ -272,6 +287,100 @@
         "errorFormat": "Formato de repetición no válido. Se espera texto de Showdown con líneas |player| y |turn|.",
         "errorUnknown": "Ha ocurrido un error desconocido."
       }
+    },
+    "preview": {
+      "title": "Título de la Batalla",
+      "start": "COMENZAR"
+    },
+    "field": {
+      "aria": "Condiciones de campo",
+      "cond": {
+        "sunnyday": "Sol",
+        "desolateland": "Sol abrasador",
+        "raindance": "Lluvia",
+        "primordialsea": "Diluvio",
+        "sandstorm": "Tormenta arena",
+        "hail": "Granizo",
+        "snow": "Nieve",
+        "deltastream": "Turbulencias",
+        "electricterrain": "C. Eléctrico",
+        "grassyterrain": "C. Hierba",
+        "mistyterrain": "C. Niebla",
+        "psychicterrain": "C. Psíquico",
+        "trickroom": "Espacio Raro",
+        "magicroom": "Zona Mágica",
+        "wonderroom": "Zona Extraña",
+        "gravity": "Gravedad"
+      }
+    },
+    "detail": {
+      "info": "Info",
+      "stats": "Stats",
+      "moves": "Moves",
+      "statChanges": "Stat Changes",
+      "abilities": "Abilities",
+      "item": "Item",
+      "tera": "Tera:",
+      "statsAdjusted": "Values adjusted for level and boosts",
+      "statsBaseOnly": "Only base stats are shown",
+      "knownMoves": "Known moves:",
+      "revealedMoves": "Revealed moves:",
+      "noMovesData": "No moves data available",
+      "noRevealedMoves": "No revealed moves yet",
+      "status": {
+        "brn": "Burned",
+        "frz": "Frozen",
+        "par": "Paralyzed",
+        "psn": "Poisoned",
+        "tox": "Badly Poisoned",
+        "slp": "Asleep"
+      }
+    },
+    "switchMenu": {
+      "title": "Switch a Pokémon",
+      "active": "Active"
+    },
+    "choiceInput": {
+      "battleActions": "Battle Actions",
+      "teamPreview": "Team Preview",
+      "confirmTeamOrder": "Confirm Team Order",
+      "confirmTeam": "Confirm Team",
+      "teamPreviewDefault": "Team Preview — sending default order"
+    },
+    "avatar": {
+      "alt": "avatar"
+    },
+    "sprite": {
+      "altFallback": "Pokemon"
+    },
+    "replayError": {
+      "title": "Replay Error",
+      "message": "Something went wrong loading the replay.",
+      "retry": "Try Again"
+    },
+    "bx": {
+      "spreadAllTag": "ÁREA · TODOS",
+      "spreadTag": "ÁREA",
+      "teraUsedTitle": "Teracristal ya usado en este combate",
+      "teraArmTitle": "Teracristalizar este turno",
+      "effective": "¡EFICAZ!",
+      "resisted": "resistido",
+      "logAria": "Registro del combate",
+      "teamStatusAria": "Estado del equipo",
+      "priorityNote": "La prioridad puede alterarlo",
+      "noOrder": "Sin orden",
+      "clearOrderAria": "Borrar orden",
+      "add": "Añadir",
+      "orderProjected": "Orden previsto",
+      "chosen": "ELEGIDO",
+      "teraTypeTitle": "Teratipo {type}",
+      "teraUsedLabel": "Tera usado",
+      "teraArmedLabel": "Tera {type} ✓",
+      "teraLabel": "Tera {type}",
+      "timerAria": "{sec} segundos",
+      "switchTo": "Cambio → {name}",
+      "targetAll": "todos",
+      "targetBoth": "ambos rivales"
     }
   }
 }

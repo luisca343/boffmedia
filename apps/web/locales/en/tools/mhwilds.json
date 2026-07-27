@@ -49,7 +49,49 @@
       "upgradeMaterials": "Upgrade materials",
       "noResults": "No results",
       "noResultsLead": "No weapon matches the filters.",
-      "loadError": "Error loading the weapon tree"
+      "loadError": "Error loading the weapon tree",
+      "loadErrorDetail": "Error loading the weapon tree. Please try again."
+    },
+    "shell": {
+      "ariaLabel": "Monster Hunter Wilds Tools",
+      "back": "Back to MH Wilds",
+      "favorites": "Favorites",
+      "removeFav": "Remove from favorites",
+      "addFav": "Add to favorites",
+      "tabs": {
+        "monsters": "Bestiary",
+        "armas": "Weapons",
+        "armor": "Armor",
+        "planner": "Planner",
+        "caza": "Hunt",
+        "dano": "Damage"
+      }
+    },
+    "db": {
+      "vial": {
+        "impact": "Impact Phial",
+        "element": "Elemental Phial",
+        "power": "Power Phial",
+        "dragon": "Dragon Phial"
+      },
+      "elderseal": {
+        "low": "Low",
+        "average": "Average",
+        "high": "High"
+      },
+      "weapon": {
+        "noSharpness": "No sharpness (ranged weapon)",
+        "sharpnessValue": "{value} sharpness",
+        "handicraftStatus": "Handicraft · level {level}",
+        "handicraftLevel": "Handicraft Level",
+        "handicraftAriaLevel": "Handicraft {level}",
+        "melodyNotes": "Melody notes"
+      },
+      "armor": {
+        "noRes": "no res.",
+        "groupBonus": "Group bonus",
+        "setBonus": "Set bonus"
+      }
     },
     "title": "Monster Hunter Wilds",
     "equipment": "Equipment",
@@ -203,7 +245,38 @@
       "locations": "Locations",
       "noLocations": "No known locations",
       "drops": "Rewards",
-      "noDrops": "No rewards recorded"
+      "noDrops": "No rewards recorded",
+      "errorLoadFailed": "Failed to load the bestiary. Please try again.",
+      "flagship": "Flagship",
+      "flagshipTitle": "Flagship monster",
+      "dropChancePct": "{chance}% chance",
+      "investigation": "Investigation",
+      "threat": {
+        "low": {
+          "label": "Minor",
+          "desc": "Prey or nuisance. Low risk."
+        },
+        "med": {
+          "label": "Standard",
+          "desc": "Common large-monster hunt."
+        },
+        "high": {
+          "label": "Dangerous",
+          "desc": "High threat. Knock-out attacks."
+        },
+        "apex": {
+          "label": "Apex",
+          "desc": "Dominant predator of the biome."
+        },
+        "elder": {
+          "label": "Elder",
+          "desc": "Elder dragon. Catastrophe-level."
+        }
+      },
+      "dropCarve": "Carve",
+      "dropReward": "Reward",
+      "dropBreak": "Break",
+      "dropTrack": "Track"
     },
     "build_planner": {
       "compare": {
@@ -354,7 +427,15 @@
       },
       "compatibleCount": "{count, plural, one {# compatible} other {# compatible}}",
       "optionsCount": "{count, plural, one {# option} other {# options}}",
-      "piecesCount": "{filled}/{total} pieces"
+      "piecesCount": "{filled}/{total} pieces",
+      "defaultBuildName": "My Build",
+      "errors": {
+        "loadDecorations": "Error loading decorations. Please try again.",
+        "loadWeapons": "Error loading weapons. Please try again.",
+        "loadArmor": "Error loading armor. Please try again.",
+        "loadSkills": "Error loading skills. Please try again.",
+        "loadCharms": "Error loading charms. Please try again."
+      }
     }
   }
 }

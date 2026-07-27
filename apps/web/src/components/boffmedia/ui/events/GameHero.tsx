@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { Badge, Icon } from "@/components/boffmedia/primitives"
 import { ArtImage } from "@/components/boffmedia/ui/tools/ArtImage"
+import { useFormat } from "@/lib/useFormat"
 import { formatEventDate } from "./events-util"
 import type { GameLike } from "./GameCard"
 
@@ -27,6 +28,7 @@ export function GameHero({
   children?: React.ReactNode
 }) {
   const t = useTranslations("juegos")
+  const { intlLocale, number: formatNumber } = useFormat()
   const active = game.active !== 0 && !game.deletedAt
   const hue = game.hue || "var(--accent)" // [deferred] no game→hue field
 
@@ -87,13 +89,13 @@ export function GameHero({
         {game.players != null && (
           <span className="inline-flex items-center gap-2 whitespace-nowrap font-mono text-[11px]/none font-semibold uppercase tracking-[0.09em] text-txt-muted [&_b]:font-bold [&_b]:text-txt">
             <Icon name="users" size={14} className="text-[var(--ghue)]" />
-            <b>{game.players.toLocaleString("es-ES")}</b> jugadores
+            <b>{formatNumber(game.players)}</b> jugadores
           </span>
         )}
         {game.createdAt && (
           <span className="ml-auto inline-flex items-center gap-2 whitespace-nowrap font-mono text-[11px]/none font-medium uppercase tracking-[0.09em] text-txt-dim">
             <Icon name="calendar" size={14} className="text-txt-dim" />
-            {t("since", { date: formatEventDate(game.createdAt) })}
+            {t("since", { date: formatEventDate(game.createdAt, intlLocale) })}
           </span>
         )}
       </div>

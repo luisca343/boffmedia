@@ -2,7 +2,7 @@
 
 import { useTranslations } from "next-intl"
 import { Banner, Empty } from "@/components/boffmedia/primitives"
-import { MEW_SENAL_VARS } from "../mew-util"
+import { MEW_SENAL_VARS, mewCatKey } from "../mew-util"
 import { MewCatTabs, MewTopBar, MewTrail } from "./MewChrome"
 import { MewRoster } from "./MewRoster"
 import { useMewCodex } from "./useMewCodex"
@@ -48,7 +48,7 @@ export function MewCodex() {
           <MewRoster codex={codex} />
           {rosterOpen && <div className="fixed inset-0 z-[55] hidden bg-[rgba(10,6,16,0.6)] max-[760px]:block" onClick={() => setRosterOpen(false)} />}
           <main ref={detailRef} className="min-w-0 overflow-y-auto scroll-smooth [scrollbar-width:thin]">
-            {Detail && selRec ? <Detail key={cat + selRec.id} rec={selRec} onNav={onNav} /> : <div className="p-10"><Empty icon={catDef.icon} title={t("roster.emptyPick", { category: catDef.singular })} lead={catDef.desc} /></div>}
+            {Detail && selRec ? <Detail key={cat + selRec.id} rec={selRec} onNav={onNav} /> : <div className="p-10"><Empty icon={catDef.icon} title={t("roster.emptyPick", { category: t(mewCatKey(catDef.key, "singular")) })} lead={t(mewCatKey(catDef.key, "desc"))} /></div>}
           </main>
         </div>
       )}

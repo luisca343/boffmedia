@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { Icon } from "@/components/boffmedia/primitives"
 
@@ -15,12 +16,13 @@ export function DkFlag({ flag, code, name, size = 15 }: { flag?: string; code?: 
 // «Follow» star toggle (the host persists it; this is just the control).
 // Mirrors `.dk-pin`.
 export function DkPin({ on, onClick, size = 14 }: { on?: boolean; onClick?: () => void; size?: number }) {
+  const t = useTranslations("common.dkExtras")
   return (
     <button
       type="button"
       aria-pressed={!!on}
-      aria-label={on ? "Dejar de seguir" : "Seguir"}
-      title={on ? "Siguiendo" : "Seguir"}
+      aria-label={on ? t("unfollow") : t("follow")}
+      title={on ? t("following") : t("follow")}
       onClick={(e) => {
         e.stopPropagation()
         onClick?.()

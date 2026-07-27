@@ -58,7 +58,7 @@ export function CollectionStats({ items }: CollectionStatsProps) {
                   className="w-[76px] shrink-0 font-ar-mono text-[10px] uppercase tracking-[0.08em]"
                   style={{ color: skin.fg }}
                 >
-                  {skin.name}
+                  {t(skin.nameKey)}
                 </span>
                 <span className="h-1.5 flex-1 overflow-hidden rounded-sm bg-black/50">
                   <span

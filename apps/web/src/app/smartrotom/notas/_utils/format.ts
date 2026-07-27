@@ -1,7 +1,9 @@
+import { intlLocale } from "@/lib/locale";
+
 export { timeAgo, toMs } from "@/lib/format";
 
-export function fullDate(ts: number): string {
-  return new Date(ts).toLocaleDateString("es-ES", {
+export function fullDate(ts: number, locale?: string | null): string {
+  return new Date(ts).toLocaleDateString(intlLocale(locale), {
     day: "numeric",
     month: "long",
     year: "numeric",

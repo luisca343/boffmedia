@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { TownData, Property, Amenity, SelectedMarker } from '../../types';
 import { MapPin } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { StandardizedMap, CoordinateTransformer, MAP_CONSTANTS } from '@/components/shared/map/StandardizedMap';
 import { PropertyMarker, AmenityMarker, BoundaryMarker, BusinessMarker } from './MapMarkers';
 
@@ -17,6 +18,7 @@ interface MapPosition {
 }
 
 export function TownMap({ townData, townName, selectedMarker, onMarkerSelect }: TownMapProps) {
+  const t = useTranslations('wingull.map');
   const [zoomLevel, setZoomLevel] = useState(6);
   const [mapCenter, setMapCenter] = useState<MapPosition>({ x: 0, z: 0 });
 
@@ -67,7 +69,7 @@ export function TownMap({ townData, townName, selectedMarker, onMarkerSelect }: 
   if (!townBounds) {
     return (
       <div className="h-96 bg-gray-100 dark:bg-gray-800 rounded-xl flex items-center justify-center">
-        <p className="text-gray-500">No hay coordenadas disponibles para mostrar el mapa</p>
+        <p className="text-gray-500">{t('noCoordinates')}</p>
       </div>
     );
   }
@@ -178,7 +180,7 @@ export function TownMap({ townData, townName, selectedMarker, onMarkerSelect }: 
           onClick={() => setMapCenter(townCenter)}
           className="w-10 h-10 bg-white dark:bg-gray-800 rounded-full shadow-md flex items-center justify-center hover:scale-105 transition-transform"
           style={{ color: colorMedio }}
-          title="Centrar en el pueblo"
+          title={t('centerTown')}
         >
           <MapPin className="w-5 h-5" />
         </button>

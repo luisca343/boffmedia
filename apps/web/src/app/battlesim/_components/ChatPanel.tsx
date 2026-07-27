@@ -62,7 +62,7 @@ export function ChatPanel({
       <div
         ref={scrollRef}
         role="log"
-        aria-label="Chat"
+        aria-label={t('chat.aria')}
         className="flex-1 overflow-y-auto p-2 space-y-0.5 text-sm min-h-0"
         style={{ maxHeight }}
       >

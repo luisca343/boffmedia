@@ -2,6 +2,7 @@
 
 import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
+import { useFormat } from "@/lib/useFormat"
 import type { WpListing } from "../_types/market.types"
 import { FORMAT_ICON, FORMAT_LABEL_KEY, fmt } from "../_utils/format"
 import { RARITY_HOVER, RARITY_STRIP } from "../_utils/rarity"
@@ -110,6 +111,7 @@ export function ListingCard({
   onOpen,
 }: ListingCardProps) {
   const t = useTranslations("wigglypop")
+  const { number } = useFormat()
   const mon = L.mons[0]
   const compact = variant === "compact"
 
@@ -180,7 +182,7 @@ export function ListingCard({
             </div>
             <div className="mt-1.5 flex items-center gap-2 font-wp text-[11.5px] font-semibold text-wp-fg-subtle">
               <span>{L.seller.username}</span>
-              <span>· {L.views.toLocaleString("es-ES")} {t("common.viewsSuffix")}</span>
+              <span>· {number(L.views)} {t("common.viewsSuffix")}</span>
             </div>
           </div>
 

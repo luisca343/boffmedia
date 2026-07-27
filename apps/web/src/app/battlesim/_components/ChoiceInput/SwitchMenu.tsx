@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import type { BattleRequest } from '../../types';
 
 interface SwitchMenuProps {
@@ -52,6 +53,7 @@ function getSpeciesName(ident: string): string {
 }
 
 export function SwitchMenu({ request, makeChoice }: SwitchMenuProps) {
+  const t = useTranslations('battlesim.switchMenu');
   if (!request.side?.pokemon) return null;
 
   const pokemon = request.side.pokemon;
@@ -59,7 +61,7 @@ export function SwitchMenu({ request, makeChoice }: SwitchMenuProps) {
   return (
     <div className="flex flex-col gap-2 p-3 bg-card rounded-lg border shadow-sm">
       <div className="text-xs text-muted-foreground font-medium uppercase tracking-wide">
-        Switch a Pokémon
+        {t('title')}
       </div>
       <div className="flex flex-col gap-1.5">
         {pokemon.map((poke: PokemonSlot, index: number) => {
@@ -90,7 +92,7 @@ export function SwitchMenu({ request, makeChoice }: SwitchMenuProps) {
                   <span className="font-semibold text-sm truncate">{speciesName}</span>
                   {isActive && (
                     <span className="text-[10px] bg-primary text-primary-foreground px-1.5 py-0.5 rounded-full font-medium">
-                      Active
+                      {t('active')}
                     </span>
                   )}
                   {status && (

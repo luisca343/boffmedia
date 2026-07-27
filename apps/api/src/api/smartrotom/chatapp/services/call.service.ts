@@ -14,6 +14,7 @@ import { IChatRepository } from '../repositories/interfaces/chat.repository.inte
 import { IMemberRepository } from '../repositories/interfaces/chat-member.repository.interface';
 import { IMessageRepository } from '../repositories/interfaces/chat-message.repository.interface';
 import { randomUUID } from 'crypto';
+import { ApiErrorCode } from '@/common/errors/error-codes.generated';
 
 export interface CallUser {
   uuid: string;
@@ -48,6 +49,7 @@ export class CallService {
     if (!chat) {
       throw new NotFoundException({
         message: 'Chat not found',
+        code: ApiErrorCode.CHAT_NOT_FOUND,
         userMessage: 'No se encontró el chat.',
       });
     }
@@ -60,6 +62,7 @@ export class CallService {
     if (!callerInChat) {
       throw new ForbiddenException({
         message: 'Caller is not a member of this chat',
+        code: ApiErrorCode.CHAT_NOT_MEMBER,
         userMessage: 'No formas parte de este chat.',
       });
     }
@@ -73,6 +76,7 @@ export class CallService {
     if (otherMembers.length === 0) {
       throw new BadRequestException({
         message: 'No other users in chat to call',
+        code: ApiErrorCode.CHAT_CALL_NO_PARTICIPANTS,
         userMessage: 'No hay nadie más en el chat para llamar.',
       });
     }

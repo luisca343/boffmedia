@@ -1,1 +1,61 @@
-{"foro":{"view":{"kicker":"Community","title":"Forum","lead":"Discussion, questions and strategy with the rest of the community. Pick a board to get started.","emptyTitle":"No boards","emptyLead":"There are no forum categories yet."},"cat":{"sortRecent":"Recent","sortTop":"Top","sortNew":"New","notFoundTitle":"Board not found","notFoundLead":"This forum category does not exist or is no longer available.","backToForum":"Back to forum","breadcrumb":"Forum","cancel":"Cancel","newThread":"New thread","loginToPost":"Log in to create a thread","submitLabel":"Post thread","threadCount":"{count, plural, one {{count} thread} other {{count} threads}}","emptyTitle":"No threads","emptyLead":"There are no threads in this board yet.","loadMore":"Load more"}}}
+{
+  "foro": {
+    "view": {
+      "kicker": "Community",
+      "title": "Forum",
+      "lead": "Discussion, questions and strategy with the rest of the community. Pick a board to get started.",
+      "emptyTitle": "No boards",
+      "emptyLead": "There are no forum categories yet."
+    },
+    "cat": {
+      "sortRecent": "Recent",
+      "sortTop": "Top",
+      "sortNew": "New",
+      "notFoundTitle": "Board not found",
+      "notFoundLead": "This forum category does not exist or is no longer available.",
+      "backToForum": "Back to forum",
+      "breadcrumb": "Forum",
+      "cancel": "Cancel",
+      "newThread": "New thread",
+      "loginToPost": "Log in to create a thread",
+      "submitLabel": "Post thread",
+      "threadCount": "{count, plural, one {{count} thread} other {{count} threads}}",
+      "emptyTitle": "No threads",
+      "emptyLead": "There are no threads in this board yet.",
+      "loadMore": "Load more"
+    },
+    "thread": {
+      "breadcrumb": "Forum",
+      "notFoundTitle": "Thread not found",
+      "notFoundLead": "This thread doesn't exist or is no longer available.",
+      "backToCat": "Back to board",
+      "pinned": "Pinned",
+      "locked": "Locked",
+      "solved": "Solved",
+      "repliesCount": "{count} replies",
+      "viewsCount": "{count} views",
+      "voted": "Voted",
+      "vote": "Vote",
+      "pin": "Pin",
+      "unpin": "Unpin",
+      "close": "Close",
+      "reopen": "Reopen",
+      "emptyTitle": "No messages",
+      "emptyLead": "This thread has no replies yet.",
+      "op": "Topic",
+      "solution": "Answer",
+      "save": "Save",
+      "markSolution": "Mark as answer",
+      "unmarkSolution": "Unmark as solved",
+      "edit": "Edit",
+      "delete": "Delete",
+      "confirmDelete": "Delete this message? This action cannot be undone.",
+      "loadMore": "Load more",
+      "closedNotice": "This thread is closed",
+      "replyTitle": "Reply",
+      "replySubmit": "Reply",
+      "joinConversation": "Join the conversation.",
+      "loginToReply": "Log in to reply"
+    }
+  }
+}

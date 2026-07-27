@@ -64,7 +64,7 @@ export function GalleryView({ gallery, onClose, onImageClick, onDelete }: Galler
                 >
                   <img 
                     src={screenshot.image} 
-                    alt={`Screenshot ${idx + 1}`}
+                    alt={t("gallery.screenshotAlt", { n: idx + 1 })}
                     className="w-full h-full object-cover transition-transform group-hover:scale-105"
                   />
                 </button>

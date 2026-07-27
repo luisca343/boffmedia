@@ -1,5 +1,6 @@
 import { ForbiddenException } from '@nestjs/common';
 import { Request } from 'express';
+import { ApiErrorCode } from '@/common/errors/error-codes.generated';
 
 /**
  * Who is performing a money/admin action, as resolved by GameOrUserAuthGuard.
@@ -27,6 +28,7 @@ export function assertActsAsSelf(claimed: string, actor?: ActorContext): void {
   if (claimed !== actor.mcUuid) {
     throw new ForbiddenException({
       message: 'Actor may only act on their own behalf',
+      code: ApiErrorCode.ACTOR_NOT_SELF,
       userMessage: 'No puedes actuar en nombre de otro jugador.',
     });
   }

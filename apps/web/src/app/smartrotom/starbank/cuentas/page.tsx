@@ -4,7 +4,7 @@ import { useTranslations } from "next-intl";
 import useStarBank from "../_hooks/useStarBank";
 import { useRotomUuid } from "@/components/smartrotom/behavior/useRotomUuid";
 import { useCreateAccountMutation } from "../_hooks/queries";
-import { userMessageFrom } from "@/services/boffAPI";
+import { useApiError } from "@/hooks/useApiError";
 import { PageHeader, Card, SectionHead, CardBody, Kpi, Button, Ico, AccountAvatar, Sheet, Label, Input, toast } from "../_components/ui";
 import { formatMoney } from "../_utils/format";
 import { displayName, accountColor } from "../_utils/account";
@@ -149,6 +149,7 @@ export default function Cuentas() {
 
 function CreateAccountDialog({ uuid, onClose, onCreated }: { uuid?: string; onClose: () => void; onCreated: () => void }) {
   const t = useTranslations("starbank");
+  const apiError = useApiError();
   const [name, setName] = React.useState("");
   const [error, setError] = React.useState("");
   const createAccount = useCreateAccountMutation(uuid);
@@ -164,7 +165,7 @@ function CreateAccountDialog({ uuid, onClose, onCreated }: { uuid?: string; onCl
       { data: { name: name.trim(), uuid } },
       {
         onSuccess: onCreated,
-        onError: (err) => setError(userMessageFrom(err, t("cuentas.dialog.errorFailed"))),
+        onError: (err) => setError(apiError(err, t("cuentas.dialog.errorFailed"))),
       },
     );
   }

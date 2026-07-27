@@ -11,13 +11,15 @@ import type { LzPlatformKey } from "@/components/boffmedia/ui/calendar"
 
 export type CtStatusKey = "playing" | "played" | "backlog" | "wishlist" | "shelved" | "retired"
 
-export const CT_STATUS: Record<CtStatusKey, { label: string; verb: string; icon: IconName; color: string }> = {
-  playing: { label: "Jugando", verb: "Jugando", icon: "play", color: "oklch(0.72 0.15 150)" },
-  played: { label: "Jugado", verb: "Completado", icon: "check", color: "oklch(0.70 0.13 235)" },
-  backlog: { label: "Pendiente", verb: "Pendiente", icon: "layers", color: "oklch(0.75 0.14 75)" },
-  wishlist: { label: "Deseado", verb: "Deseado", icon: "star", color: "oklch(0.72 0.17 55)" },
-  shelved: { label: "Abandonado", verb: "Abandonado", icon: "clock", color: "oklch(0.68 0.12 300)" },
-  retired: { label: "Descartado", verb: "Descartado", icon: "x", color: "oklch(0.62 0.02 260)" },
+// label/verb live in locales/{es,en}/common.json under common.catalog.status,
+// keyed by these same CtStatusKey values — resolve with t(`status.${key}.label`).
+export const CT_STATUS: Record<CtStatusKey, { icon: IconName; color: string }> = {
+  playing: { icon: "play", color: "oklch(0.72 0.15 150)" },
+  played: { icon: "check", color: "oklch(0.70 0.13 235)" },
+  backlog: { icon: "layers", color: "oklch(0.75 0.14 75)" },
+  wishlist: { icon: "star", color: "oklch(0.72 0.17 55)" },
+  shelved: { icon: "clock", color: "oklch(0.68 0.12 300)" },
+  retired: { icon: "x", color: "oklch(0.62 0.02 260)" },
 }
 export const CT_STATUS_ORDER: CtStatusKey[] = ["playing", "played", "backlog", "wishlist", "shelved", "retired"]
 

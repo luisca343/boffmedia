@@ -20,6 +20,7 @@ import { StarBankTransaction } from '../entities/starbank-transaction.entity';
 import { IStarbankAccountRepository } from '../repositories/interfaces/starbank-account.repository';
 import { IStarbankTransactionRepository } from '../repositories/interfaces/starbank-transaction.repository';
 import { Logger } from 'nestjs-pino';
+import { ApiErrorCode } from '@/common/errors/error-codes.generated';
 
 @Injectable()
 export class StarbankTransactionService {
@@ -46,6 +47,7 @@ export class StarbankTransactionService {
     if (!owned.some((account) => account.id === accountId)) {
       throw new ForbiddenException({
         message: 'Actor does not own the source account',
+        code: ApiErrorCode.BANK_ACCOUNT_NOT_OWNED,
         userMessage: 'No puedes transferir desde una cuenta que no es tuya.',
       });
     }
@@ -61,12 +63,14 @@ export class StarbankTransactionService {
     if (transferDto.amount <= 0) {
       throw new BadRequestException({
         message: 'Transfer amount must be positive',
+        code: ApiErrorCode.BANK_AMOUNT_NOT_POSITIVE,
         userMessage: 'El importe debe ser mayor que cero.',
       });
     }
     if (transferDto.from === transferDto.to) {
       throw new BadRequestException({
         message: 'Source and destination accounts must be different',
+        code: ApiErrorCode.BANK_SAME_ACCOUNT,
         userMessage: 'No puedes transferir a la misma cuenta.',
       });
     }
@@ -78,12 +82,14 @@ export class StarbankTransactionService {
     if (!fromAccount) {
       throw new NotFoundException({
         message: 'Source account not found',
+        code: ApiErrorCode.BANK_SOURCE_ACCOUNT_NOT_FOUND,
         userMessage: 'La cuenta de origen no existe.',
       });
     }
     if (!toAccount) {
       throw new NotFoundException({
         message: 'Destination account not found',
+        code: ApiErrorCode.BANK_TARGET_ACCOUNT_NOT_FOUND,
         userMessage: 'La cuenta de destino no existe.',
       });
     }
@@ -92,6 +98,7 @@ export class StarbankTransactionService {
     if (fromAccount.balance < transferDto.amount) {
       throw new ConflictException({
         message: 'Insufficient balance',
+        code: ApiErrorCode.BANK_INSUFFICIENT_FUNDS,
         userMessage: 'Saldo insuficiente.',
       });
     }
@@ -111,6 +118,7 @@ export class StarbankTransactionService {
       // surface its business message rather than a generic 500.
       throw new ConflictException({
         message: result.message || 'Transfer failed',
+        code: ApiErrorCode.BANK_TRANSFER_FAILED,
         userMessage: 'No se pudo completar la transferencia.',
       });
     }
@@ -125,6 +133,7 @@ export class StarbankTransactionService {
       if (actor.mcUuid !== transferDto.uuid) {
         throw new ForbiddenException({
           message: 'Actor does not own the main account',
+          code: ApiErrorCode.BANK_ACCOUNT_NOT_OWNED,
           userMessage: 'No puedes transferir desde una cuenta que no es tuya.',
         });
       }
@@ -191,6 +200,7 @@ export class StarbankTransactionService {
     if (balance < 0) {
       throw new BadRequestException({
         message: 'Target balance must be non-negative',
+        code: ApiErrorCode.BANK_NEGATIVE_BALANCE,
         userMessage: 'El saldo no puede ser negativo.',
       });
     }
@@ -208,6 +218,7 @@ export class StarbankTransactionService {
     if (!result.success) {
       throw new ConflictException({
         message: result.message || 'Set balance failed',
+        code: ApiErrorCode.BANK_BALANCE_ADJUST_FAILED,
         userMessage: 'No se pudo ajustar el saldo.',
       });
     }
@@ -232,6 +243,7 @@ export class StarbankTransactionService {
       if (mainAccount.balance < total) {
         throw new ConflictException({
           message: 'Insufficient balance for purchase',
+          code: ApiErrorCode.BANK_INSUFFICIENT_FUNDS_PURCHASE,
           userMessage: 'Saldo insuficiente para la compra.',
         });
       }

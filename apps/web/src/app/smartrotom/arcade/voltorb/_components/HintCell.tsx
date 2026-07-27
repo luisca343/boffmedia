@@ -1,3 +1,4 @@
+import { useTranslations } from "next-intl"
 import type { RowColInfo } from "../types"
 
 export interface HintCellProps {
@@ -11,11 +12,12 @@ export interface HintCellProps {
  * the player ever gets about what is under the tiles.
  */
 export default function HintCell({ info, label }: HintCellProps) {
+  const t = useTranslations("arcade")
   const coins = info?.coins ?? 0
   const voltorbs = info?.voltorbs ?? 0
   return (
     <div
-      aria-label={`${label}: ${coins} puntos, ${voltorbs} voltorbs`}
+      aria-label={t("voltorb.hintCellAria", { label, coins, voltorbs })}
       className="flex min-h-[44px] flex-col items-center justify-center gap-0.5 rounded-lg border border-white/10 bg-[linear-gradient(180deg,rgb(255_255_255/.04),transparent)] py-1 font-ar-mono"
     >
       <span aria-hidden className="text-[13px] font-bold leading-tight tabular-nums text-ar-ink">

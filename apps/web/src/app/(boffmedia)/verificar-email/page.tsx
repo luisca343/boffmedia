@@ -1,10 +1,11 @@
 import { Suspense } from "react"
 import type { Metadata } from "next"
+import { getTranslations } from "next-intl/server"
 import { VerifyEmailScreen } from "@/components/boffmedia/ui/auth"
 
-export const metadata: Metadata = {
-  title: "Verificar correo · Boffmedia",
-  description: "Verifica tu dirección de correo de Boffmedia.",
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("pageMeta.auth")
+  return { title: t("verificarEmail.title"), description: t("verificarEmail.description") }
 }
 
 export default function VerificarEmailPage() {

@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { useTranslations } from "next-intl"
 import { Icon, type IconName } from "@/components/boffmedia/primitives"
 
 // right-side drawer (saved teams, edit slot). Esc closes.
@@ -8,7 +9,7 @@ export function SideDrawer({
   title,
   icon,
   onClose,
-  closeLabel = "Cerrar",
+  closeLabel,
   children,
 }: {
   title: string
@@ -17,6 +18,9 @@ export function SideDrawer({
   closeLabel?: string
   children: React.ReactNode
 }) {
+  const t = useTranslations("vgc.calc.ui")
+  const resolvedCloseLabel = closeLabel ?? t("close")
+
   React.useEffect(() => {
     const esc = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose()
@@ -38,7 +42,7 @@ export function SideDrawer({
           <span>{title}</span>
           <button
             type="button"
-            aria-label={closeLabel}
+            aria-label={resolvedCloseLabel}
             onClick={onClose}
             className="ml-auto grid h-[34px] w-[34px] place-items-center text-txt-muted transition-colors hover:text-txt"
           >

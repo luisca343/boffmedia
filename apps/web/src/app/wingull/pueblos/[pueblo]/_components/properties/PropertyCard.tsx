@@ -1,3 +1,4 @@
+import { useTranslations } from "next-intl";
 import { Property, TownData } from "../../types";
 import { ArrowRight, Eye, Home, MapPin, Star, ChevronDown, Sparkles, Calendar, Shield, Building2 } from "lucide-react";
 import { getIconComponent } from "../../utils";
@@ -14,6 +15,7 @@ interface PropertyCardProps {
 }
 
 export function PropertyCard({ property, isExpanded, onToggle, townData, selectedImageIndex, onImageSelect, type }: PropertyCardProps) {
+  const t = useTranslations("wingull.properties");
   const { colorClaro, colorMedio, colorOscuro, comodidades } = townData.textos;
   const nearbyAmenities = comodidades?.filter(amenity => 
     property.comodidadesCercanas.includes(amenity.id)
@@ -42,7 +44,7 @@ export function PropertyCard({ property, isExpanded, onToggle, townData, selecte
           >
             <Shield className="w-4 h-4" style={{ color: colorMedio }} />
             <span style={{ color: colorMedio }}>
-              {type === 'parcela' ? 'PARCELA' : 'LOCAL'} #{property.id}
+              {type === 'parcela' ? t('badgeParcela') : t('badgeLocal')} #{property.id}
             </span>
           </div>
         </div>
@@ -68,7 +70,7 @@ export function PropertyCard({ property, isExpanded, onToggle, townData, selecte
                         {property.name}
                       </h3>
                       <p className="text-sm mt-1" style={{color: colorOscuro}}>
-                        {type === 'parcela' ? 'Parcela' : 'Local'} #{property.id}
+                        {type === 'parcela' ? t('typeParcela') : t('typeLocal')} #{property.id}
                       </p>
                     </div>
                   </div>
@@ -83,7 +85,7 @@ export function PropertyCard({ property, isExpanded, onToggle, townData, selecte
                 ) : (
                   <Building2 className="w-16 h-16 mx-auto mb-4" style={{ color: colorOscuro }} />
                 )}
-                <p style={{ color: colorMedio }}>No hay imágenes disponibles</p>
+                <p style={{ color: colorMedio }}>{t('noImages')}</p>
               </div>
             </div>
           )}
@@ -122,7 +124,7 @@ export function PropertyCard({ property, isExpanded, onToggle, townData, selecte
               <h4 className="text-sm font-bold uppercase tracking-wider mb-3"
                 style={{ color: 'white' }}
               >
-                Comodidades Cercanas
+                {t('nearbyAmenities')}
               </h4>
               <div className="flex flex-wrap gap-2">
                 {nearbyAmenities.slice(0, 3).map((amenity) => {
@@ -139,7 +141,7 @@ export function PropertyCard({ property, isExpanded, onToggle, townData, selecte
                 })}
                 {nearbyAmenities.length > 3 && (
                   <div className="flex items-center px-3 py-2 rounded-lg text-sm" style={{ background: `${colorClaro}10`, color: colorMedio }}>
-                    +{nearbyAmenities.length - 3} más
+                    {t('moreAmenities', { count: nearbyAmenities.length - 3 })}
                   </div>
                 )}
               </div>
@@ -157,7 +159,7 @@ export function PropertyCard({ property, isExpanded, onToggle, townData, selecte
             {isExpanded && (
               <div className="pt-4 border-t" style={{ borderColor: colorClaro }}>
                 <h4 className="text-lg font-semibold mb-3" style={{ color: colorClaro }}>
-                  Detalles Completos
+                  {t('fullDetails')}
                 </h4>
                 <p className="leading-relaxed mb-4" style={{ color: colorClaro }}>
                   {property.detalle}
@@ -166,7 +168,7 @@ export function PropertyCard({ property, isExpanded, onToggle, townData, selecte
                 {nearbyAmenities.length > 3 && (
                   <div>
                     <h5 className="text-sm font-semibold uppercase tracking-wider mb-3" style={{ color: colorMedio }}>
-                      Todas las Comodidades Cercanas
+                      {t('allNearbyAmenities')}
                     </h5>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       {nearbyAmenities.map((amenity) => {
@@ -207,7 +209,7 @@ export function PropertyCard({ property, isExpanded, onToggle, townData, selecte
               }}
             >
               <Eye className="w-4 h-4" />
-              {isExpanded ? 'Ver Menos' : 'Ver Detalles'}
+              {isExpanded ? t('viewLess') : t('viewDetails')}
               <ChevronDown 
                 className={`w-4 h-4 transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`} 
               />
@@ -218,7 +220,7 @@ export function PropertyCard({ property, isExpanded, onToggle, townData, selecte
               style={{ background: `${colorClaro}10`, color: colorClaro, borderColor: colorClaro }}
             >
               <Sparkles className="w-4 h-4" style={{ color: colorClaro }} />
-              Comprar
+              {t('buy')}
             </button>
           </div>
         </div>

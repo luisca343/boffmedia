@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { useLocale } from "next-intl"
 import useGetKeys from "../_hooks/useGetKeys"
 import useFetchSteamData from "../_hooks/useFetchSteamData"
 import type { KvItem } from "../_components/ui/kv-kit"
@@ -15,6 +16,7 @@ export type KeysSort = "estado" | "nombre" | "stock"
  * (price, genres, media) only appear once the per-game detail is fetched.
  */
 export function useKeysV3() {
+  const locale = useLocale()
   const { keys, loading } = useGetKeys()
   const { selectedGame, isModalVisible, setIsModalVisible, fetchGameData } = useFetchSteamData()
 
@@ -62,14 +64,14 @@ export function useKeysV3() {
     let out = items.filter((it) => (filter === "all" ? true : !it.given))
     if (term) out = out.filter((it) => it.name.toLowerCase().includes(term) || it.source.toLowerCase().includes(term))
     out = [...out].sort((a, b) => {
-      if (sort === "nombre") return a.name.localeCompare(b.name, "es")
+      if (sort === "nombre") return a.name.localeCompare(b.name, locale)
       if (sort === "stock") return b.count - a.count
       // estado: available first, then by name
       if (a.given !== b.given) return a.given ? 1 : -1
-      return a.name.localeCompare(b.name, "es")
+      return a.name.localeCompare(b.name, locale)
     })
     return out
-  }, [items, q, filter, sort])
+  }, [items, q, filter, sort, locale])
 
   const open = React.useCallback(
     (item: KvItem) => {

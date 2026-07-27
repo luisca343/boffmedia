@@ -21,7 +21,7 @@ export default function SquirdlePage() {
 
   return (
     <div className="mt-4">
-      <GameTopBar title="SQUIRDLE" accent="cyan" onHelp={() => setHelp(true)} onReset={game.reset} />
+      <GameTopBar title={t("gameTopBar.titles.squirdle")} accent="cyan" onHelp={() => setHelp(true)} onReset={game.reset} />
 
       {/* Unclipped: the guess autocomplete drops out of the panel, and the panel
           sits at the bottom of the stage — so both would otherwise cut it off. */}

@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Decoration, ArmorPiece, Weapon, Charm } from '../../../../../../../types/tools/mhwilds';
-import { useLocale } from "next-intl"
+import { useLocale, useTranslations } from "next-intl"
 import { MhWildsService } from '@/services/api/tools/mhWildsService';
 
 // Define a type for the server-side skill data
@@ -27,6 +27,7 @@ export interface EnhancedSkill extends ServerSkill {
 
 export function useGameData() {
   const locale = useLocale()
+  const t = useTranslations("mhwilds.build_planner.errors")
   // Decorations state
   const [decorations, setDecorations] = useState<Decoration[]>([]);
   const [loadingDecorations, setLoadingDecorations] = useState(true);
@@ -94,7 +95,7 @@ export function useGameData() {
       setDecorationsError(null);
     } catch (err) {
       console.error("Error fetching decorations:", err);
-      setDecorationsError("Error al cargar las decoraciones. Por favor, inténtalo de nuevo.");
+      setDecorationsError(t("loadDecorations"));
     } finally {
       setLoadingDecorations(false);
     }
@@ -109,7 +110,7 @@ export function useGameData() {
       setWeaponsError(null);
     } catch (err) {
       console.error("Error fetching weapons:", err);
-      setWeaponsError("Error al cargar las armas. Por favor, inténtalo de nuevo.");
+      setWeaponsError(t("loadWeapons"));
     } finally {
       setLoadingWeapons(false);
     }
@@ -124,7 +125,7 @@ export function useGameData() {
       setArmorError(null);
     } catch (err) {
       console.error("Error fetching armor:", err);
-      setArmorError("Error al cargar las armaduras. Por favor, inténtalo de nuevo.");
+      setArmorError(t("loadArmor"));
     } finally {
       setLoadingArmor(false);
     }
@@ -160,7 +161,7 @@ export function useGameData() {
       setSkillsError(null);
     } catch (err) {
       console.error("Error fetching skills:", err);
-      setSkillsError("Error al cargar las habilidades. Por favor, inténtalo de nuevo.");
+      setSkillsError(t("loadSkills"));
     } finally {
       setLoadingSkills(false);
     }
@@ -175,7 +176,7 @@ export function useGameData() {
       setCharmsError(null);
     } catch (err) {
       console.error("Error fetching charms:", err);
-      setCharmsError("Error al cargar los amuletos. Por favor, inténtalo de nuevo.");
+      setCharmsError(t("loadCharms"));
     } finally {
       setLoadingCharms(false);
     }

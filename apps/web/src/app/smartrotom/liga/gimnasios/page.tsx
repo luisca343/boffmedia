@@ -1,7 +1,11 @@
-export default function Gimnasios() {
+import { getTranslations } from "next-intl/server";
+
+export default async function Gimnasios() {
+  const t = await getTranslations("liga.gyms");
+
   return (
     <div className="bg-layer-2 min-h-full overflow-auto p-4">
-      <h1 className="text-white text-2xl font-bold">Gimnasios</h1>
+      <h1 className="text-white text-2xl font-bold">{t("title")}</h1>
     </div>
   );
 }

@@ -7,12 +7,12 @@ import { useCreateDenuncia } from "../../_hooks/queries"
 import { useOfficer } from "../../_hooks/useOfficer"
 import { DENUNCIA_CATEGORY } from "../../_utils/tones"
 
-const CATEGORY_OPTIONS = Object.entries(DENUNCIA_CATEGORY).map(([value, label]) => ({ value, label }))
-
 export function NuevaDenunciaModal({ open, onClose }: { open: boolean; onClose: () => void }) {
   const t = useTranslations("gobierno")
   const officer = useOfficer()
   const createDenuncia = useCreateDenuncia()
+
+  const CATEGORY_OPTIONS = Object.entries(DENUNCIA_CATEGORY).map(([value, key]) => ({ value, label: t(key) }))
 
   const [category, setCategory] = useState("griefing")
   const [town, setTown] = useState("")
@@ -63,7 +63,7 @@ export function NuevaDenunciaModal({ open, onClose }: { open: boolean; onClose: 
           placeholder={t("denuncias.new.descriptionPlaceholder")}
         />
         <p className="font-gt-mono text-[10.5px] uppercase tracking-[.1em] text-gt-ink-400">
-          {t("denuncias.new.registeredBy", { username: officer.username || "ti", rank: officer.rankLabel })}
+          {t("denuncias.new.registeredBy", { username: officer.username || t("common.you"), rank: officer.rankLabel })}
         </p>
       </div>
 

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 
 import type { FtCategory } from "../../_utils/article";
 import { Button, ComicBurst, Field, Input, Modal, Textarea } from "../../_components/ui";
@@ -23,7 +24,7 @@ const EMPTY: NewArticleValues = {
   authorRole: "",
   category: "",
   subcategory: "",
-  buttonText: "Leer más",
+  buttonText: "",
   imageUrl: "",
 };
 
@@ -41,13 +42,14 @@ export function NewArticleModal({
   categories: FtCategory[];
   isSubmitting?: boolean;
 }) {
+  const t = useTranslations("furrettoday.newArticleModal");
   const [values, setValues] = useState<NewArticleValues>(EMPTY);
 
   // The component itself never unmounts (Modal just renders null while
   // closed), so the form has to be reset explicitly on every open.
   useEffect(() => {
-    if (open) setValues(EMPTY);
-  }, [open]);
+    if (open) setValues({ ...EMPTY, buttonText: t("defaultButtonText") });
+  }, [open, t]);
 
   function set<K extends keyof NewArticleValues>(key: K, value: NewArticleValues[K]) {
     setValues((v) => ({ ...v, [key]: value }));
@@ -60,54 +62,53 @@ export function NewArticleModal({
   }
 
   return (
-    <Modal open={open} onClose={onClose} label="Nueva noticia">
+    <Modal open={open} onClose={onClose} label={t("label")}>
       <form onSubmit={handleSubmit} className="relative overflow-hidden p-6">
         <div className="font-ft-ui text-[11px] font-extrabold uppercase tracking-[0.18em] text-ft-pink">
-          NUEVA NOTICIA
+          {t("eyebrow")}
         </div>
-        <h3 className="font-ft-display mt-1 text-4xl leading-none">Empieza un borrador</h3>
+        <h3 className="font-ft-display mt-1 text-4xl leading-none">{t("title")}</h3>
         <p className="mb-4 mt-1.5 text-ft-body">
-          Crea el borrador y rellena el cuerpo después en el editor. Puedes despublicarlo cuando
-          quieras.
+          {t("description")}
         </p>
 
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-          <Field label="Título" full>
+          <Field label={t("titleField")} full>
             <Input
               required
               value={values.title}
               onChange={(e) => set("title", e.target.value)}
-              placeholder="P. ej. La dinastía Furret"
+              placeholder={t("titlePh")}
             />
           </Field>
-          <Field label="Entradilla" full>
+          <Field label={t("lead")} full>
             <Textarea
               rows={2}
               value={values.subtitle}
               onChange={(e) => set("subtitle", e.target.value)}
-              placeholder="Una frase: qué cuentas."
+              placeholder={t("leadPh")}
             />
           </Field>
-          <Field label="Autor/a">
+          <Field label={t("author")}>
             <Input
               value={values.author}
               onChange={(e) => set("author", e.target.value)}
-              placeholder="Tu nombre o alias"
+              placeholder={t("authorPh")}
             />
           </Field>
-          <Field label="Rol">
+          <Field label={t("role")}>
             <Input
               value={values.authorRole}
               onChange={(e) => set("authorRole", e.target.value)}
-              placeholder="Editor/a"
+              placeholder={t("rolePh")}
             />
           </Field>
-          <Field label="Sección">
+          <Field label={t("section")}>
             <Input
               list="ft-new-article-categories"
               value={values.category}
               onChange={(e) => set("category", e.target.value)}
-              placeholder="Comunidad, Torneos…"
+              placeholder={t("sectionPh")}
             />
             <datalist id="ft-new-article-categories">
               {categories.map((c) => (
@@ -115,28 +116,28 @@ export function NewArticleModal({
               ))}
             </datalist>
           </Field>
-          <Field label="Subsección">
+          <Field label={t("subsection")}>
             <Input
               value={values.subcategory}
               onChange={(e) => set("subcategory", e.target.value)}
-              placeholder="Opcional"
+              placeholder={t("subsectionPh")}
             />
           </Field>
-          <Field label="Texto del botón">
+          <Field label={t("buttonText")}>
             <Input value={values.buttonText} onChange={(e) => set("buttonText", e.target.value)} />
           </Field>
-          <Field label="URL imagen">
+          <Field label={t("imageUrl")}>
             <Input
               value={values.imageUrl}
               onChange={(e) => set("imageUrl", e.target.value)}
-              placeholder="https://…"
+              placeholder={t("imageUrlPh")}
             />
           </Field>
         </div>
 
         <div className="mt-5 flex justify-end gap-2.5">
           <Button type="button" variant="ghost" onClick={onClose}>
-            Cancelar
+            {t("cancel")}
           </Button>
           <Button
             type="submit"
@@ -144,7 +145,7 @@ export function NewArticleModal({
             size="lg"
             disabled={isSubmitting || !values.title.trim()}
           >
-            {isSubmitting ? "Creando…" : "Crear borrador"}
+            {isSubmitting ? t("creating") : t("create")}
           </Button>
         </div>
 

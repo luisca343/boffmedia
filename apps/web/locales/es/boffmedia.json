@@ -23,6 +23,11 @@
       "comboboxPlaceholder": "Selecciona una opción",
       "comboboxPreviewAlt": "Vista previa"
     },
+    "hub": {
+      "toolsOf": "Herramientas de {game}",
+      "toolCount": "{count, plural, one {herramienta} other {herramientas}}",
+      "enter": "Entrar"
+    },
     "unauthorized": {
       "title": "Acceso restringido",
       "body": "No tienes permiso para ver esta página. Si crees que es un error, contacta al administrador.",
@@ -177,6 +182,11 @@
       }
     },
     "landing": {
+      "marquee": {
+        "tournaments": "Torneos",
+        "giveaways": "Sorteos",
+        "community": "Comunidad"
+      },
       "stops": {
         "hero": "Inicio",
         "tools": "Herramientas",
@@ -225,12 +235,30 @@
         "modulesActive": "{count} módulos activos",
         "ctaOpen": "Abrir la caja",
         "utilitiesActive": "{count} utilidades activas",
-        "battlesim": { "n": "BattleSim", "d": "Simulador de combates dobles VGC con daño previsto." },
-        "damageCalc": { "n": "Calculadora de daño", "d": "Rangos VGC y singles al instante, con enlaces." },
-        "tracker": { "n": "VGC Tracker", "d": "Registra partidas y analiza tu rendimiento." },
-        "metaAnalysis": { "n": "Análisis de Meta", "d": "Uso, tendencias y detalle por especie del meta VGC." },
-        "steamKeys": { "n": "Claves de Steam", "d": "Catálogo de claves para sorteos y entregas." },
-        "tcgPocket": { "n": "TCG Pocket", "d": "Colección, sobres y combates del TCG Pocket." }
+        "battlesim": {
+          "n": "BattleSim",
+          "d": "Simulador de combates dobles VGC con daño previsto."
+        },
+        "damageCalc": {
+          "n": "Calculadora de daño",
+          "d": "Rangos VGC y singles al instante, con enlaces."
+        },
+        "tracker": {
+          "n": "VGC Tracker",
+          "d": "Registra partidas y analiza tu rendimiento."
+        },
+        "metaAnalysis": {
+          "n": "Análisis de Meta",
+          "d": "Uso, tendencias y detalle por especie del meta VGC."
+        },
+        "steamKeys": {
+          "n": "Claves de Steam",
+          "d": "Catálogo de claves para sorteos y entregas."
+        },
+        "tcgPocket": {
+          "n": "TCG Pocket",
+          "d": "Colección, sobres y combates del TCG Pocket."
+        }
       },
       "smartrotom": {
         "kick": "Parada 02 · Producto destacado",
@@ -256,16 +284,30 @@
         "mapInGame": "Mapa 4 · En juego",
         "nextBroadcast": "Próxima emisión ·",
         "ctaTournaments": "Ver torneos",
-        "ctaRanking": "Ver ranking"
+        "ctaRanking": "Ver ranking",
+        "fallbackTitle": "Torneo Regional — Wingull 2",
+        "fallbackDate": "14 JUL 2026 · 18:00"
       },
       "juegos": {
         "kick": "Parada 04 · Servidores",
         "title": "Elige tu <em>partida</em>",
         "lead": "Tres mundos, una misma comunidad. Tu próxima aventura empieza en una de estas paradas.",
         "enterWorld": "Entrar al mundo",
-        "wingull": { "n": "Pixelmon Wingull 2", "d": "La aventura Pokémon definitiva dentro de Minecraft.", "tag": "Insignia — Temporada 04" },
-        "bingo": { "n": "Minecraft Bingo", "d": "Carreras de objetivos por equipos, ediciones rápidas.", "tag": "Competitivo — Semanal" },
-        "zomboff": { "n": "Project ZomBOFF", "d": "Supervivencia cooperativa en un mundo infectado.", "tag": "Survival — Noches especiales" }
+        "wingull": {
+          "n": "Pixelmon Wingull 2",
+          "d": "La aventura Pokémon definitiva dentro de Minecraft.",
+          "tag": "Insignia — Temporada 04"
+        },
+        "bingo": {
+          "n": "Minecraft Bingo",
+          "d": "Carreras de objetivos por equipos, ediciones rápidas.",
+          "tag": "Competitivo — Semanal"
+        },
+        "zomboff": {
+          "n": "Project ZomBOFF",
+          "d": "Supervivencia cooperativa en un mundo infectado.",
+          "tag": "Survival — Noches especiales"
+        }
       },
       "comunidad": {
         "kick": "Parada 05 · Más que un servidor",
@@ -280,7 +322,9 @@
         "feedWin1": "AxelCraft ganó un combate ranked",
         "feedGift1": "Key entregada a NovaPixel en el sorteo",
         "feedJoin1": "Kira_07 se unió al Equipo Volt",
-        "feedWin2": "MintLeaf entró al top 5 de la temporada"
+        "feedWin2": "MintLeaf entró al top 5 de la temporada",
+        "feedAchievement": "{actor} desbloqueó {name}",
+        "feedJoin": "{actor} se unió a {name}"
       },
       "meta": {
         "kicker": "Fin del recorrido · Principio de todo",
@@ -290,6 +334,14 @@
         "ctaRegister": "Crear cuenta gratis",
         "ctaDiscord": "Entrar al Discord"
       }
+    },
+    "topbar": {
+      "live": "EN VIVO",
+      "item1": "Torneo Pixelmon Wingull 2 — 14 Jun",
+      "item2": "Minecraft Bingo · Edición rápida — 21 Jun",
+      "item3": "Project ZomBOFF · Supervivencia — 28 Jun",
+      "item4": "Ranking: <em>AxelCraft</em> lidera con 12 480 pts",
+      "item5": "SmartRotom — próximamente"
     }
   }
 }

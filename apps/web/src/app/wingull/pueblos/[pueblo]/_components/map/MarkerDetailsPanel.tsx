@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslations } from "next-intl";
 import { SelectedMarker, TownData, Property, Amenity } from "../../types";
 import { ImageShowcase } from "../shared/image/ImageShowcase";
 import { getIconComponent } from "../../utils";
@@ -26,6 +27,7 @@ export function MarkerDetailsPanel({
   colorOscuro,
   townData 
 }: MarkerDetailsPanelProps) {
+  const t = useTranslations("wingull.map");
   const { type, data } = selectedMarker;
   
   // Get the appropriate icon based on marker type
@@ -115,7 +117,7 @@ export function MarkerDetailsPanel({
                 <div className="text-center space-y-3">
                   {getMarkerIcon()}
                   <p className="text-sm" style={{ color: colorMedio }}>
-                    Sin imágenes disponibles
+                    {t("noImages")}
                   </p>
                 </div>
               </div>
@@ -143,7 +145,7 @@ export function MarkerDetailsPanel({
                   <div>
                     <h5 className="text-lg font-bold mb-3 flex items-center gap-2" style={{ color: colorOscuro }}>
                       <div className="w-2 h-2 rounded-full" style={{ backgroundColor: colorClaro }} />
-                      Características
+                      {t("features")}
                     </h5>
                     <ul className="space-y-2">
                       {(type === 'amenity' ? (data as Amenity).caracteristicas : (data as Property).caracteristicas).map((caracteristica: string, index: number) => (
@@ -161,7 +163,7 @@ export function MarkerDetailsPanel({
                   <div>
                     <h5 className="text-lg font-bold mb-3 flex items-center gap-2" style={{ color: colorOscuro }}>
                       <MapPin className="w-4 h-4" style={{ color: colorClaro }} />
-                      Coordenadas
+                      {t("coordinates")}
                     </h5>
                     <div className="flex gap-4 mt-2">
                       <div className="flex items-start gap-1">
@@ -181,7 +183,7 @@ export function MarkerDetailsPanel({
                   <div className="md:col-span-2">
                     <h5 className="text-lg font-bold mb-3 flex items-center gap-2" style={{ color: colorOscuro }}>
                       <Sparkles className="w-4 h-4" style={{ color: colorClaro }} />
-                      Comodidades Cercanas
+                      {t("nearbyAmenities")}
                     </h5>
                     <div className="flex flex-wrap gap-3 mt-2">
                       {(data as Property).comodidadesCercanas.map((amenityId: string) => {

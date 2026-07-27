@@ -82,20 +82,25 @@ export default function RachaPage() {
         <div className="relative z-[2] grid items-center gap-6 lg:grid-cols-[1fr_360px]">
           <div>
             <div className="mb-2.5 font-ar-display text-[10px] uppercase tracking-[0.18em] text-ar-cyan">
-              ▸ Racha semanal · {streak.data?.currentBanner ?? banner.data?.name}
+              {t("streak.kicker", {
+                banner: streak.data?.currentBanner ?? banner.data?.name ?? "",
+              })}
             </div>
             <h1 className="ar-chrom font-ar-display text-[26px] leading-tight text-ar-ink">
-              DÍA {currentDay} <span className="text-ar-ink-muted">de {totalDays}</span>
+              {t.rich("streak.dayHeading", {
+                current: currentDay,
+                total: totalDays,
+                muted: (chunks) => <span className="text-ar-ink-muted">{chunks}</span>,
+              })}
             </h1>
             <p className="mt-3 max-w-[520px] font-ar text-[13px] leading-relaxed text-ar-ink-dim">
-              Reclama la recompensa de cada día para avanzar por el banner. La racha se reinicia a
-              las 06:00; si reclamas hoy, mañana te espera el día siguiente.
+              {t("streak.claimDescription")}
             </p>
 
             <div className="mt-[18px] flex flex-wrap items-center gap-2.5">
               {claimedToday ? (
                 <Tag tone="lime" size="lg">
-                  <Icon.Shield s={14} /> Día {currentDay} reclamado
+                  <Icon.Shield s={14} /> {t("streak.dayClaimed", { day: currentDay })}
                 </Tag>
               ) : (
                 <Button
@@ -105,7 +110,9 @@ export default function RachaPage() {
                   onClick={onClaim}
                   disabled={claim.isPending}
                 >
-                  {claim.isPending ? "Reclamando…" : `Reclamar día ${currentDay}`}
+                  {claim.isPending
+                    ? t("streak.claiming")
+                    : t("streak.claimDay", { day: currentDay })}
                 </Button>
               )}
               {resetIn && (
@@ -116,14 +123,17 @@ export default function RachaPage() {
                   >
                     ●
                   </span>
-                  REINICIA EN <b>{resetIn}</b>
+                  {t.rich("streak.resetsInStrong", {
+                    time: resetIn,
+                    b: (chunks) => <b>{chunks}</b>,
+                  })}
                 </div>
               )}
             </div>
 
             {claim.isError && (
               <p role="alert" className="mt-3 font-ar-mono text-[11px] text-ar-danger">
-                No se pudo reclamar la recompensa. Inténtalo de nuevo.
+                {t("streak.claimError")}
               </p>
             )}
           </div>
@@ -131,7 +141,7 @@ export default function RachaPage() {
           {todayView && (
             <div className="relative rounded-[14px] border border-ar-cyan/30 bg-black/40 p-[18px]">
               <div className="mb-2.5 text-center font-ar-display text-[9px] uppercase tracking-[0.18em] text-ar-cyan">
-                Recompensa de hoy
+                {t("streak.rewardReady")}
               </div>
               <div className="mx-auto grid h-24 w-24 place-items-center overflow-hidden rounded-[18px] border border-ar-cyan/40 bg-[radial-gradient(60%_60%_at_50%_40%,rgb(var(--ar-cyan)/.2),transparent_70%)] shadow-[inset_0_0_30px_rgb(var(--ar-cyan)/.3)] motion-reduce:animate-none animate-ar-float">
                 {todayView.art}
@@ -144,7 +154,11 @@ export default function RachaPage() {
         </div>
       </Panel>
 
-      <SectionTitle kicker={`Progresión · ${totalDays} días`} title="Semana actual" accent="cyan" />
+      <SectionTitle
+        kicker={t("streak.progression", { days: totalDays })}
+        title={t("streak.currentWeek")}
+        accent="cyan"
+      />
       <div className="mb-6 grid grid-cols-3 gap-3 sm:grid-cols-4 lg:grid-cols-7">
         {rewards.map((reward) => (
           <DayTile
@@ -160,30 +174,30 @@ export default function RachaPage() {
           larga" and "reclamado esta semana" — the API stores neither. */}
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard
-          kicker="Racha total"
+          kicker={t("streak.totalStreak")}
           value={streak.data?.streak ?? 0}
-          sub="días reclamados seguidos"
+          sub={t("streak.totalStreakSub")}
           tone="cyan"
           icon={<Icon.Trophy s={18} />}
         />
         <StatCard
-          kicker="Reclamos totales"
+          kicker={t("streak.totalClaims")}
           value={streak.data?.totalClaims ?? 0}
-          sub="desde que empezaste"
+          sub={t("streak.totalClaimsSub")}
           tone="amber"
           icon={<Icon.Calendar s={18} />}
         />
         <StatCard
-          kicker="Cajas sin abrir"
+          kicker={t("streak.unopenedBoxes")}
           value={boxes}
-          sub="en tu inventario"
+          sub={t("streak.unopenedBoxesSub")}
           tone="violet"
           icon={<Icon.Box s={18} />}
         />
         <StatCard
-          kicker="Próximo reinicio"
+          kicker={t("streak.nextReset")}
           value={resetIn ?? "—"}
-          sub="a las 06:00"
+          sub={t("streak.nextResetSub")}
           tone="magenta"
           icon={<Icon.Sparkle s={18} />}
         />

@@ -1,4 +1,5 @@
 import { useCallback } from "react";
+import { useTranslations } from "next-intl";
 import { toast } from "react-toastify";
 import { CreateMessageDto } from "@boffmedia/shared";
 import { getSmartRotomUser } from "@/lib/utils";
@@ -30,6 +31,7 @@ const isYouTube = (t: string) => /(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/
 
 /** Centralised, real send handlers (optimistic + `createMessage`). */
 export function useSendMessage(chatId: number, session: unknown, onSent: (m: ChatMessageVM) => void) {
+  const t = useTranslations("chatapp");
   const uuid = getSmartRotomUser(session).uuid;
 
   // The send is awaited (not fire-and-forget) so the guard can keep a second
@@ -47,10 +49,10 @@ export function useSendMessage(chatId: number, session: unknown, onSent: (m: Cha
   );
 
   const push = useCallback(
-    (content: string, type: string, apiType: CreateMessageDto.type, apiMessage = content, fail = "No se pudo enviar el mensaje") => {
+    (content: string, type: string, apiType: CreateMessageDto.type, apiMessage = content, fail = t("toast.sendFailed")) => {
       void submit(content, type, apiType, apiMessage, fail);
     },
-    [submit],
+    [submit, t],
   );
 
   const sendText = useCallback(
@@ -60,14 +62,14 @@ export function useSendMessage(chatId: number, session: unknown, onSent: (m: Cha
       if (isYouTube(text)) {
         const id = youTubeId(text);
         if (id) {
-          const data = JSON.stringify({ videoId: id, url: text, title: "Vídeo de YouTube" });
-          return push(data, "video", CreateMessageDto.type.VIDEO, data, "No se pudo enviar el vídeo");
+          const data = JSON.stringify({ videoId: id, url: text, title: t("message.youtubeTitle") });
+          return push(data, "video", CreateMessageDto.type.VIDEO, data, t("toast.sendVideoFailed"));
         }
       }
       const emoji = isEmojiOnly(text);
       push(text, emoji ? "emoji" : "text", emoji ? CreateMessageDto.type.EMOJI : CreateMessageDto.type.TEXT);
     },
-    [push],
+    [push, t],
   );
 
   const sendSticker = useCallback((path: string) => push(path, "sticker", CreateMessageDto.type.STICKER), [push]);
@@ -75,17 +77,17 @@ export function useSendMessage(chatId: number, session: unknown, onSent: (m: Cha
   const sendWaypoint = useCallback(
     (w: { name: string; x: number; y: number; z: number; dimension?: string; color?: string }) => {
       const data = JSON.stringify(w);
-      push(data, "waypoint", CreateMessageDto.type.WAYPOINT, data, "No se pudo enviar el waypoint");
+      push(data, "waypoint", CreateMessageDto.type.WAYPOINT, data, t("toast.sendWaypointFailed"));
     },
-    [push],
+    [push, t],
   );
 
   const sendDocument = useCallback(
     (d: { id: string; title: string; content: string }) => {
       const data = JSON.stringify({ documentId: parseInt(d.id, 10), title: d.title, content: d.content });
-      push(data, "document", CreateMessageDto.type.DOCUMENT, data, "No se pudo enviar el documento");
+      push(data, "document", CreateMessageDto.type.DOCUMENT, data, t("toast.sendDocumentFailed"));
     },
-    [push],
+    [push, t],
   );
 
   const sendImage = useCallback(
@@ -95,9 +97,9 @@ export function useSendMessage(chatId: number, session: unknown, onSent: (m: Cha
         meta: { id: screenshot.id, timestamp: screenshot.timestamp, location: screenshot.location, entities: screenshot.entities, ...(caption ? { caption } : {}) },
       });
       const backend = JSON.stringify({ caption, screenshot });
-      push(optimistic, "image", CreateMessageDto.type.IMAGE, backend, "No se pudo enviar la imagen");
+      push(optimistic, "image", CreateMessageDto.type.IMAGE, backend, t("toast.sendImageFailed"));
     },
-    [push],
+    [push, t],
   );
 
   return { sendText, sendSticker, sendWaypoint, sendDocument, sendImage, isSending };

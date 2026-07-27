@@ -1,6 +1,7 @@
 "use client"
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import { useTranslations } from "next-intl"
 import type { Region, StarBankAccount, StarBankTransaction, TaxiStop } from "@boffmedia/shared"
 import { rotomAuthedPOSTOrThrow, rotomGETOrThrow, rotomPOSTOrThrow, wingullGETOrThrow } from "@/services/boffAPI"
 import { getMcUserData } from "@/services/mcef/mcefApi"
@@ -97,11 +98,12 @@ export function useRegions() {
  * MCEF — in a plain browser the bridge returns 0,0 and the map simply centres on spawn.
  */
 export function usePlayerPosition() {
+  const t = useTranslations("taxi.errors")
   return useQuery<Position>({
     queryKey: taxiKeys.position,
     queryFn: async () => {
       const res = await getMcUserData()
-      if (res.status !== 200 || !res.data) throw new Error("Sin posición del jugador")
+      if (res.status !== 200 || !res.data) throw new Error(t("noPlayerPosition"))
       return { x: Math.floor(res.data.x), z: Math.floor(res.data.z) }
     },
     refetchInterval: POSITION_REFRESH_INTERVAL,
@@ -127,9 +129,10 @@ export function useBalance(uuid?: string) {
  */
 export function useTeleport(uuid?: string) {
   const qc = useQueryClient()
+  const t = useTranslations("taxi.errors")
   return useMutation({
     mutationFn: async ({ stop, price }: { stop: TaxiStop; price: number }) => {
-      if (!uuid) throw new Error("Necesitas iniciar sesión para viajar")
+      if (!uuid) throw new Error(t("loginRequired"))
 
       try {
         await rotomAuthedPOSTOrThrow<void>("/starbank/transfer/from-main", {
@@ -139,13 +142,13 @@ export function useTeleport(uuid?: string) {
           concept: `${TRIP_CONCEPT_PREFIX}${stop.id}`,
         })
       } catch {
-        throw new Error("No se pudo cobrar el viaje")
+        throw new Error(t("chargeFailed"))
       }
 
       try {
         await rotomPOSTOrThrow("/taxi/teleport", { id: stop.id, uuid })
       } catch {
-        throw new Error("Se cobró el viaje pero el teletransporte falló. Contacta con soporte.")
+        throw new Error(t("teleportFailedAfterCharge"))
       }
 
       return stop

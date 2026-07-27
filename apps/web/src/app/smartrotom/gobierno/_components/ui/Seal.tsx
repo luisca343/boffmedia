@@ -1,11 +1,13 @@
 "use client"
 
 import { useId } from "react"
+import { useTranslations } from "next-intl"
 
 // The seal of Teras: an engraved roundel with a circular legend and a civic pediment.
 // It is the app's whole identity in one mark — the header, the nav foot, every stamped
 // document. The legend turns once every 90 seconds; `motion-reduce` stops it dead.
 export function Seal({ size = 64, ring = true, tone = "gold" }: { size?: number; ring?: boolean; tone?: "gold" | "green" }) {
+  const t = useTranslations("gobierno")
   const pathId = `gt-seal-${useId().replace(/:/g, "")}`
   const textR = 41
   const ringCol = tone === "green" ? "rgb(var(--gt-civic))" : "rgb(var(--gt-gold-600))"
@@ -16,7 +18,7 @@ export function Seal({ size = 64, ring = true, tone = "gold" }: { size?: number;
       height={size}
       viewBox="0 0 100 100"
       role="img"
-      aria-label="Sello del Gobierno de Teras"
+      aria-label={t("ui.sealAriaLabel")}
       className="block flex-none"
     >
       <defs>

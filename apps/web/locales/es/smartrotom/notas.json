@@ -129,7 +129,34 @@
     "templates": {
       "title": "Plantillas",
       "blank": "Nota en blanco",
-      "setAnalysis": "Análisis de Set"
+      "setAnalysis": "Análisis de Set",
+      "items": {
+        "set": {
+          "name": "Análisis de Set",
+          "desc": "EVs, movimientos y matchups de un Pokémon.",
+          "content": "<h1>Nombre del Pokémon — Rol</h1><p class=\"lead\">Resumen en una línea del propósito del set.</p><h2>Spread</h2><table><thead><tr><th>Stat</th><th>EVs</th><th>Nota</th></tr></thead><tbody><tr><td>PS</td><td></td><td></td></tr><tr><td>Atq / At.Esp</td><td></td><td></td></tr><tr><td>Velocidad</td><td></td><td></td></tr></tbody></table><h2>Movimientos</h2><ol><li></li><li></li><li></li><li></li></ol><h2>Matchups clave</h2><ul><li></li></ul>"
+        },
+        "team": {
+          "name": "Equipo Competitivo",
+          "desc": "Núcleo de 6, plan de partida y checklist.",
+          "content": "<h1>Equipo — Nombre</h1><p class=\"lead\">Idea del equipo en una línea.</p><h2>Núcleo</h2><ul><li></li><li></li></ul><h2>Plan de partida</h2><p><br></p><h2>Checklist</h2><ul class=\"todo\"><li data-done=\"false\">Calcular EVs</li><li data-done=\"false\">Probar en ladder</li></ul>"
+        },
+        "raid": {
+          "name": "Estrategia de Raid",
+          "desc": "Roles, fases y temporización.",
+          "content": "<h1>Raid — Objetivo</h1><p class=\"lead\">Composición y plan.</p><h2>Roles</h2><ul><li><strong>Atacante:</strong> </li><li><strong>Soporte:</strong> </li></ul><h2>Fases</h2><ol><li></li></ol>"
+        },
+        "diary": {
+          "name": "Entrada de Diario",
+          "desc": "Tareas del día y reflexiones.",
+          "content": "<h1>Entrada de diario</h1><ul class=\"todo\"><li data-done=\"false\">Tarea 1</li></ul><blockquote>Reflexión del día…</blockquote>"
+        },
+        "blank": {
+          "name": "Nota en blanco",
+          "desc": "Empieza desde cero.",
+          "content": "<h1>Nueva nota</h1><p><br></p>"
+        }
+      }
     },
     "share": {
       "title": "Compartir nota",
@@ -185,6 +212,19 @@
       "folderCreated": "Carpeta creada.",
       "tagCreated": "Etiqueta creada.",
       "duplicateError": "No se pudo leer la nota para duplicarla"
+    },
+    "colors": {
+      "primary": "Naranja",
+      "secondary": "Azul",
+      "accent": "Fucsia",
+      "success": "Esmeralda",
+      "warning": "Ámbar",
+      "error": "Rojo",
+      "info": "Violeta"
+    },
+    "nav": {
+      "menu": "Menú",
+      "breadcrumb": "Ruta"
     }
   }
 }

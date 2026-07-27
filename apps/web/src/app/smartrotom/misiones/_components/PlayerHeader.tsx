@@ -20,7 +20,7 @@ export function PlayerHeader({ quests, regions }: { quests: QuestData[]; regions
   const t = useTranslations("misiones.playerHeader")
   const { session } = useBoffSession()
   const user = session?.user
-  const name = useRotomUsername() || user?.username || "Aventurero"
+  const name = useRotomUsername() || user?.username || t("defaultName")
   const avatar = user?.profilePicture || user?.image
 
   const counts = questCounts(quests)

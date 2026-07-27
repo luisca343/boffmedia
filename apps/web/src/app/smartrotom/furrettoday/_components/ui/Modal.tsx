@@ -1,6 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
+import { useTranslations } from "next-intl";
 import { ModalShell } from "@/components/smartrotom/behavior/ModalShell";
 
 /** The `.ft-app` scope-root classes, for the shared `ModalShell`'s portal. */
@@ -23,6 +24,7 @@ export function Modal({
   children: ReactNode;
   className?: string;
 }) {
+  const t = useTranslations("furrettoday.modal");
   if (!open) return null;
 
   return (
@@ -39,7 +41,7 @@ export function Modal({
     >
       <button
         onClick={onClose}
-        aria-label="Cerrar"
+        aria-label={t("close")}
         className="border-ft absolute right-3 top-3 z-10 flex h-9 w-9 items-center justify-center rounded-full border-ft-ink bg-ft-yellow font-extrabold text-ft-ink"
       >
         ✕

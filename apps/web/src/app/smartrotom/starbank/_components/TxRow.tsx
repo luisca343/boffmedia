@@ -1,6 +1,6 @@
 "use client";
 import * as React from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import { ContactAvatar } from "./ui";
 import { resolveCategory } from "../_utils/categories";
@@ -10,6 +10,7 @@ import type { SBTransaction } from "../_types";
 
 export function TxRow({ tx, activeAccountId, onClick }: { tx: SBTransaction; activeAccountId: number; onClick?: (tx: SBTransaction) => void }) {
   const t = useTranslations("starbank");
+  const locale = useLocale();
   const cat = resolveCategory(tx);
   const out = isOutgoing(tx, activeAccountId);
   return (
@@ -35,7 +36,7 @@ export function TxRow({ tx, activeAccountId, onClick }: { tx: SBTransaction; act
         {out ? "− " : "+ "}
         {formatMoney(tx.amount)}
       </div>
-      <div className="text-right text-[12px] tabular-nums text-sb-fg-muted">{fmtDate(tx.date, "rel")}</div>
+      <div className="text-right text-[12px] tabular-nums text-sb-fg-muted">{fmtDate(tx.date, "rel", locale)}</div>
     </div>
   );
 }

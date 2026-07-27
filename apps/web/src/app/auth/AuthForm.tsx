@@ -10,30 +10,48 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { signIn } from "next-auth/react"
 import { Lock, Mail, User } from 'lucide-react'
 import { useState } from "react"
+import { useTranslations } from "next-intl"
 import { UsersService } from "@/services/api/boffmedia/usersService"
 
-const loginSchema = z.object({
-  username: z.string().min(1, "Username is required"),
-  password: z.string().min(8, "Password must be at least 8 characters"),
-})
+type AuthMessages = (key: string, values?: Record<string, string>) => string
 
-const registerSchema = loginSchema.extend({
-  email: z.string().email("Invalid email address"),
-  confirmPassword: z.string().min(8, "Password must be at least 8 characters"),
-}).refine((data) => data.password === data.confirmPassword, {
-  message: "Passwords don't match",
-  path: ["confirmPassword"],
+// Built per render so the zod messages come from the active locale — a schema
+// hoisted to module scope would freeze whichever locale loaded first.
+function buildSchemas(t: AuthMessages) {
+  const loginSchema = z.object({
+    username: z.string().min(1, t("errors.usernameRequired")),
+    password: z.string().min(8, t("errors.passwordMin")),
+  })
+
+  const registerSchema = loginSchema.extend({
+    email: z.string().email(t("errors.emailInvalid")),
+    confirmPassword: z.string().min(8, t("errors.passwordMin")),
+  }).refine((data) => data.password === data.confirmPassword, {
+    message: t("errors.passwordMismatch"),
+    path: ["confirmPassword"],
+  })
+
+  return { loginSchema, registerSchema }
+}
+
+const registerSchemaShape = z.object({
+  username: z.string(),
+  password: z.string(),
+  email: z.string(),
+  confirmPassword: z.string(),
 })
 
 export function AuthForm({ redirect = '/', url = 'boffmedia', message= ''}: { url?: string, redirect?: string, message?: string }) {
   const router = useRouter()
+  const t = useTranslations("auth")
+  const { loginSchema, registerSchema } = buildSchemas(t as AuthMessages)
   const [isLoading, setIsLoading] = useState(false)
   const [formError, setFormError] = useState<string | null>(null)
   const searchParams = useSearchParams()
   const mode = searchParams.get('mode')
   const isRegister = mode === 'register'
 
-  const form = useForm<z.infer<typeof registerSchema>>({
+  const form = useForm<z.infer<typeof registerSchemaShape>>({
     resolver: zodResolver(isRegister ? registerSchema : loginSchema),
     defaultValues: {
       username: "",
@@ -43,7 +61,7 @@ export function AuthForm({ redirect = '/', url = 'boffmedia', message= ''}: { ur
     }
   })
 
-  async function onSubmit(values: z.infer<typeof registerSchema>) {
+  async function onSubmit(values: z.infer<typeof registerSchemaShape>) {
     setIsLoading(true)
     setFormError(null)
     if (isRegister) {
@@ -55,13 +73,13 @@ export function AuthForm({ redirect = '/', url = 'boffmedia', message= ''}: { ur
           }
         )
         if (response.success) {
-          router.push('/auth?mode=login&message=Registration successful. Please log in.')
+          router.push(`/auth?mode=login&message=${encodeURIComponent(t('success.register'))}`)
         } else {
-          setFormError(response.error || 'No se pudo completar el registro')
+          setFormError(response.error || t('errors.register'))
         }
       } catch (error) {
         console.error(error)
-        setFormError('Ocurrió un error durante el registro')
+        setFormError(t('errors.generic'))
       }
     } else {
       const { username, password } = values
@@ -88,7 +106,7 @@ export function AuthForm({ redirect = '/', url = 'boffmedia', message= ''}: { ur
     <div className="flex items-center justify-center min-h-screen w-full bg-layer-1 bg-[url('/placeholder.svg?height=1080&width=1920')] bg-cover bg-center bg-no-repeat">
       <div className="w-full max-w-md p-8 bg-layer-2 bg-opacity-80 rounded-lg shadow-xl backdrop-blur-sm border border-edge">
         <h2 className="text-3xl font-bold mb-6 text-center text-transparent bg-clip-text bg-gradient-to-r from-primary-hover to-primary-active">
-          {isRegister ? 'Registrarse' : 'Iniciar Sesión'}
+          {isRegister ? t('register.title') : t('login.title')}
         </h2>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -98,10 +116,10 @@ export function AuthForm({ redirect = '/', url = 'boffmedia', message= ''}: { ur
               name="username"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-primary-hover font-semibold">Username</FormLabel>
+                  <FormLabel className="text-primary-hover font-semibold">{t('fields.username')}</FormLabel>
                   <FormControl>
                     <div className="relative">
-                      <Input placeholder="Enter your username" {...field} className="bg-layer-3 text-primary-hover border-edge focus:border-primary pl-10" />
+                      <Input placeholder={t('fields.usernamePh')} {...field} className="bg-layer-3 text-primary-hover border-edge focus:border-primary pl-10" />
                       <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-primary-hover w-5 h-5" />
                     </div>
                   </FormControl>
@@ -116,10 +134,10 @@ export function AuthForm({ redirect = '/', url = 'boffmedia', message= ''}: { ur
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-primary-hover font-semibold">Email</FormLabel>
+                    <FormLabel className="text-primary-hover font-semibold">{t('fields.email')}</FormLabel>
                     <FormControl>
                       <div className="relative">
-                        <Input placeholder="Enter your email" type="email" {...field} className="bg-layer-3 text-primary-hover border-edge focus:border-primary pl-10" />
+                        <Input placeholder={t('fields.emailPh')} type="email" {...field} className="bg-layer-3 text-primary-hover border-edge focus:border-primary pl-10" />
                         <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-primary-hover w-5 h-5" />
                       </div>
                     </FormControl>
@@ -134,10 +152,10 @@ export function AuthForm({ redirect = '/', url = 'boffmedia', message= ''}: { ur
               name="password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-primary-hover font-semibold">Password</FormLabel>
+                  <FormLabel className="text-primary-hover font-semibold">{t('fields.password')}</FormLabel>
                   <FormControl>
                     <div className="relative">
-                      <Input placeholder="Enter your password" type="password" {...field} className="bg-layer-3 text-primary-hover border-edge focus:border-primary pl-10" />
+                      <Input placeholder={t('fields.passwordPh')} type="password" {...field} className="bg-layer-3 text-primary-hover border-edge focus:border-primary pl-10" />
                       <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-primary-hover w-5 h-5" />
                     </div>
                   </FormControl>
@@ -152,10 +170,10 @@ export function AuthForm({ redirect = '/', url = 'boffmedia', message= ''}: { ur
                 name="confirmPassword"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-primary-hover font-semibold">Confirm Password</FormLabel>
+                    <FormLabel className="text-primary-hover font-semibold">{t('fields.confirm')}</FormLabel>
                     <FormControl>
                       <div className="relative">
-                        <Input placeholder="Confirm your password" type="password" {...field} className="bg-layer-3 text-primary-hover border-edge focus:border-primary pl-10" />
+                        <Input placeholder={t('fields.confirmPh')} type="password" {...field} className="bg-layer-3 text-primary-hover border-edge focus:border-primary pl-10" />
                         <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-primary-hover w-5 h-5" />
                       </div>
                     </FormControl>
@@ -168,7 +186,7 @@ export function AuthForm({ redirect = '/', url = 'boffmedia', message= ''}: { ur
             {formError && <p className="text-red-400 text-sm text-center">{formError}</p>}
 
             <Button type="submit" className="w-full bg-gradient-to-r from-primary to-primary-active text-white hover:from-primary-active hover:to-primary-active transition-all duration-200 font-semibold py-2 rounded-md" disabled={isLoading}>
-              {isLoading ? 'Processing...' : isRegister ? 'Register' : 'Sign In'}
+              {isLoading ? t('submit.loading') : isRegister ? t('submit.register') : t('submit.login')}
             </Button>
           </form>
         </Form>
@@ -198,7 +216,7 @@ export function AuthForm({ redirect = '/', url = 'boffmedia', message= ''}: { ur
               />
               <path fill="none" d="M1 1h22v22H1z" />
             </svg>
-            Sign in with Google
+            {t('providers.signInWith', { provider: t('providers.google') })}
           </Button>
         </div>
       </div>

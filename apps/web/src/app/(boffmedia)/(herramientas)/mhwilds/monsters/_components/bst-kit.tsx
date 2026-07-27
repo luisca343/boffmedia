@@ -1,4 +1,5 @@
 import * as React from "react"
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { Icon, type IconName } from "@/components/boffmedia/primitives"
 import { elementColor } from "../../_components/mh-helpers"
@@ -39,12 +40,15 @@ export function speciesHue(species: string): number {
 const cap = (s: string) => (s ? s[0].toUpperCase() + s.slice(1) : s)
 
 /* ── threat tiers & species meta (editorial — see [deferred] fields on MhMonster) ── */
-export const THREAT: Record<number, { key: string; label: string; color: string; desc: string }> = {
-  1: { key: "low", label: "Menor", color: "#7fd6a8", desc: "Presa o estorbo. Poco riesgo." },
-  2: { key: "med", label: "Estándar", color: "#6cc4e8", desc: "Gran monstruo de cacería habitual." },
-  3: { key: "high", label: "Peligroso", color: "#ffb224", desc: "Alta amenaza. Ataques que noquean." },
-  4: { key: "apex", label: "Ápex", color: "#ff7a33", desc: "Depredador dominante del bioma." },
-  5: { key: "elder", label: "Anciano", color: "#b06bff", desc: "Dragón anciano. Nivel de catástrofe." },
+// Labels/descriptions are chrome and live under the mhwilds.bestiary.threat
+// namespace, keyed by the `key` below and resolved by MhThreatBadge.
+// Never resolve them at module scope — that freezes the first locale loaded.
+export const THREAT: Record<number, { key: string; color: string }> = {
+  1: { key: "low", color: "#7fd6a8" },
+  2: { key: "med", color: "#6cc4e8" },
+  3: { key: "high", color: "#ffb224" },
+  4: { key: "apex", color: "#ff7a33" },
+  5: { key: "elder", color: "#b06bff" },
 }
 
 export const SPECIES: Record<string, { label: string; icon: IconName; hue: number }> = {
@@ -79,23 +83,24 @@ export function MhStars({ value = 0, max = 3 }: { value?: number; max?: number }
 
 /* ── threat tier badge ──────────────────────────────────────────────────────── */
 export function MhThreatBadge({ threat, showLabel = true, size = "md" }: { threat: number; showLabel?: boolean; size?: "sm" | "md" }) {
-  const t = THREAT[threat]
-  if (!t) return null
+  const t = useTranslations("mhwilds.bestiary.threat")
+  const tier = THREAT[threat]
+  if (!tier) return null
   const sm = size === "sm"
   return (
-    <span className="inline-flex items-center gap-1.5" title={t.desc}>
+    <span className="inline-flex items-center gap-1.5" title={t(`${tier.key}.desc`)}>
       <span className="inline-flex gap-[2px]">
         {[1, 2, 3, 4, 5].map((n) => (
           <i
             key={n}
             className={cn("block", sm ? "w-1 h-[9px]" : "w-[5px] h-[11px]")}
-            style={{ transform: "skewX(-12deg)", background: n <= threat ? t.color : "var(--line-2)" }}
+            style={{ transform: "skewX(-12deg)", background: n <= threat ? tier.color : "var(--line-2)" }}
           />
         ))}
       </span>
       {showLabel && (
-        <span className={cn("font-mono font-bold leading-none uppercase tracking-[0.06em]", sm ? "text-[9px]" : "text-[10px]")} style={{ color: t.color }}>
-          {t.label}
+        <span className={cn("font-mono font-bold leading-none uppercase tracking-[0.06em]", sm ? "text-[9px]" : "text-[10px]")} style={{ color: tier.color }}>
+          {t(`${tier.key}.label`)}
         </span>
       )}
     </span>
@@ -163,6 +168,7 @@ export function WeakDots({ monster }: { monster: MhMonster }) {
 
 /* ── roster: grid card ──────────────────────────────────────────────────────── */
 export function MonsterCard({ m, active, onClick }: { m: MhMonster; active: boolean; onClick: () => void }) {
+  const t = useTranslations("mhwilds.bestiary")
   const s = speciesMeta(m.species)
   const top = topWeaknesses(m).slice(0, 3)
   return (
@@ -193,9 +199,9 @@ export function MonsterCard({ m, active, onClick }: { m: MhMonster; active: bool
           <span
             className="absolute top-[7px] right-[7px] font-mono text-[8px] font-bold leading-none uppercase tracking-[0.05em] text-warn bg-warn-soft border border-solid px-[5px] py-[3px]"
             style={{ borderColor: "color-mix(in srgb, var(--warn) 40%, transparent)" }}
-            title="Monstruo insignia"
+            title={t("flagshipTitle")}
           >
-            ◆ Insignia
+            ◆ {t("flagship")}
           </span>
         )}
       </div>
@@ -217,6 +223,7 @@ export function MonsterCard({ m, active, onClick }: { m: MhMonster; active: bool
 
 /* ── roster: list row ───────────────────────────────────────────────────────── */
 export function MonsterRow({ m, active, onClick }: { m: MhMonster; active: boolean; onClick: () => void }) {
+  const t = useTranslations("mhwilds.bestiary")
   const s = speciesMeta(m.species)
   const top = topWeaknesses(m).slice(0, 3)
   const tc = m.threat != null ? THREAT[m.threat]?.color ?? "var(--mh)" : "var(--mh)"
@@ -239,7 +246,7 @@ export function MonsterRow({ m, active, onClick }: { m: MhMonster; active: boole
       <span className="min-w-0">
         <span className="flex items-center gap-[5px] font-display text-[13px] font-bold leading-[1.1] uppercase tracking-[0.01em]">
           <span className="truncate">{m.name}</span>
-          {m.flagship && <span className="text-warn text-[10px] flex-none" title="Insignia">◆</span>}
+          {m.flagship && <span className="text-warn text-[10px] flex-none" title={t("flagship")}>◆</span>}
         </span>
         <span className="block font-mono text-[10px] font-medium leading-[1.2] text-txt-dim truncate">
           {s.label}

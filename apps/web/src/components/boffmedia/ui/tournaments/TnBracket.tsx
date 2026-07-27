@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { Icon } from "@/components/boffmedia/primitives"
 import { DkBracket, DkFlag, DkLive, type DkBracketRound } from "@/components/boffmedia/ui/tools/datakit"
@@ -21,6 +22,7 @@ export function TnBracketMatch({
   hi?: Set<string> | null
   reset?: boolean
 }) {
+  const t = useTranslations("torneos.bracket")
   const hot = (p: TnCompetitor | null) => !!(hi && hi.size && p && p.country && hi.has(p.country))
   const cold = (p: TnCompetitor | null) => !!(hi && hi.size && (!p || !p.country || !hi.has(p.country)))
   const isChamp = !!champion && m.winner === champion
@@ -44,7 +46,7 @@ export function TnBracketMatch({
           <span className="min-w-0 flex-1 truncate">{p.name}</span>
         </>
       ) : (
-        <span className="min-w-0 flex-1 truncate italic text-txt-dim">Por determinar</span>
+        <span className="min-w-0 flex-1 truncate italic text-txt-dim">{t("tbd")}</span>
       )}
       <span className="flex-none font-mono text-[12px]/none font-bold">{m.status === "final" ? g : ""}</span>
     </button>
@@ -84,6 +86,7 @@ export interface TnDoubleData {
 
 // Double-elimination: winners + losers brackets and a grand final. `.tn-double`
 export function TnDoubleBracket({ d, onOpen, hi }: { d: TnDoubleData; onOpen?: (id: string) => void; hi?: Set<string> | null }) {
+  const t = useTranslations("torneos.bracket")
   const lane = "overflow-x-auto border border-solid border-line px-4 pb-4 pt-3"
   const head = "mb-3 flex items-center gap-2 font-mono text-[10px]/none font-bold uppercase tracking-[0.14em]"
   return (
@@ -91,14 +94,14 @@ export function TnDoubleBracket({ d, onOpen, hi }: { d: TnDoubleData; onOpen?: (
       <div className={cn(lane, "bg-base-2")}>
         <div className={cn(head, "text-ok")}>
           <Icon name="trophy" size={13} />
-          Cuadro de ganadores
+          {t("winnersTitle")}
         </div>
         <DkBracket rounds={d.winners} renderMatch={(m) => <TnBracketMatch m={m} onOpen={onOpen} champion={d.champion} hi={hi} />} />
       </div>
       <div className={cn(lane, "bg-[color-mix(in_srgb,var(--bad)_3%,var(--bg-2))]")}>
         <div className={cn(head, "text-bad")}>
           <Icon name="refresh" size={13} />
-          Cuadro de perdedores
+          {t("losersTitle")}
         </div>
         <DkBracket rounds={d.losers} renderMatch={(m) => <TnBracketMatch m={m} onOpen={onOpen} champion={d.champion} hi={hi} />} />
       </div>
@@ -106,12 +109,12 @@ export function TnDoubleBracket({ d, onOpen, hi }: { d: TnDoubleData; onOpen?: (
         <div className={cn(lane, "bg-[color-mix(in_srgb,var(--accent)_4%,var(--bg-2))]")}>
           <div className={cn(head, "text-accent-bright")}>
             <Icon name="star" size={13} />
-            Gran Final
+            {t("grandFinalTitle")}
           </div>
           <div className="max-w-[320px]">
             <TnBracketMatch m={d.grandFinal} onOpen={onOpen} champion={d.champion} hi={hi} reset={d.grandFinal.reset} />
           </div>
-          {d.grandFinal.reset && <p className="mt-2 font-mono text-[10.5px]/[1.4] font-medium text-txt-dim">El aspirante forzó el bracket reset.</p>}
+          {d.grandFinal.reset && <p className="mt-2 font-mono text-[10.5px]/[1.4] font-medium text-txt-dim">{t("resetNote")}</p>}
         </div>
       )}
     </div>

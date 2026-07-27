@@ -1,5 +1,7 @@
 import type { News } from "@boffmedia/shared";
 
+import { intlLocale } from "@/lib/locale";
+
 import { accentFor, type FtAccent } from "./accents";
 
 /**
@@ -102,8 +104,8 @@ export function datelineShortOf(date: Date): string {
 }
 
 /** "17 de mayo, 2026" — the long form used in the article header. */
-export function longDateOf(date: Date): string {
-  return date.toLocaleDateString("es-ES", {
+export function longDateOf(date: Date, locale?: string | null): string {
+  return date.toLocaleDateString(intlLocale(locale), {
     day: "numeric",
     month: "long",
     year: "numeric",

@@ -1,15 +1,15 @@
 {
   "common": {
     "search": {
-        "placeholder": "Search...",
-        "button": "Search",
-        "searching": "Searching...",
-        "error": "Search failed. Please try again.",
-        "noResults": "No results found",
-        "youtubePlaceholder": "Search YouTube...",
-        "twitchPlaceholder": "Search channels, games or streams...",
-        "youtubeButton": "Search YouTube",
-        "twitchButton": "Search Twitch"
+      "placeholder": "Search...",
+      "button": "Search",
+      "searching": "Searching...",
+      "error": "Search failed. Please try again.",
+      "noResults": "No results found",
+      "youtubePlaceholder": "Search YouTube...",
+      "twitchPlaceholder": "Search channels, games or streams...",
+      "youtubeButton": "Search YouTube",
+      "twitchButton": "Search Twitch"
     },
     "loading": {
       "content": "Loading content...",
@@ -57,14 +57,17 @@
       "noVideos": "No videos found",
       "noClips": "No clips found",
       "popularVideos": "Popular Videos",
-      "noPopular": "No popular videos found"
+      "noPopular": "No popular videos found",
+      "index": "Index"
     },
     "actions": {
       "watchNow": "Watch Now",
       "viewChannel": "View Channel",
       "remove": "Remove",
       "loadMore": "Load More",
-      "goBack": "Go Back"
+      "goBack": "Go Back",
+      "voteUp": "Upvote",
+      "voteDown": "Downvote"
     },
     "primitives": {
       "dismiss": "Dismiss",
@@ -124,6 +127,23 @@
       "minutesAgo": "{minutes} min ago",
       "hoursAgo": "{hours} h ago",
       "refreshNow": "Refresh now"
+    },
+    "dkExtras": {
+      "roundsAria": "Rounds",
+      "allCountries": "All countries",
+      "countriesCount": "{count} countries",
+      "selectedCount": "{count} selected",
+      "filterByCountry": "Filter by country",
+      "searchCountryPh": "Search country…",
+      "clear": "Clear",
+      "noMatchesFor": "No matches for “{query}”.",
+      "removeCountry": "Remove {name}",
+      "defaultNoun": "results",
+      "searchPh": "Search…",
+      "unfollow": "Unfollow",
+      "follow": "Follow",
+      "following": "Following",
+      "trendAria": "Trend"
     },
     "tournaments": {
       "verified": "Verified",
@@ -202,7 +222,65 @@
       "prizeValue": "prize value",
       "featuredGiveaway": "Featured giveaway",
       "participants": "participants",
-      "by": "By"
+      "by": "By",
+      "approxValue": "approx. value",
+      "requirementMet": "Met",
+      "requirementPending": "Pending",
+      "stepDone": "Done",
+      "verifiableLabel": "Verifiable giveaway · public seed",
+      "recomputeNote": "The result can be recomputed by anyone.",
+      "reelExplainer": "Each block is a participant; its width is proportional to their tickets. More tickets, more room on the strip.",
+      "wonWith": "Won with {tickets, plural, one {# ticket} other {# tickets}} · {odds}% odds",
+      "watchDraw": "Watch how it was drawn",
+      "share": "Share",
+      "prize": {
+        "key": {
+          "label": "Game key"
+        },
+        "item": {
+          "label": "In-game item"
+        },
+        "merch": {
+          "label": "Merchandise"
+        },
+        "nitro": {
+          "label": "Subscription"
+        },
+        "pass": {
+          "label": "Event pass"
+        },
+        "cash": {
+          "label": "Balance / card"
+        }
+      },
+      "source": {
+        "comunidad": {
+          "label": "Community",
+          "desc": "Members sign up by meeting the requirements."
+        },
+        "twitch": {
+          "label": "Twitch viewers",
+          "desc": "List imported from the live chat."
+        },
+        "manual": {
+          "label": "Manual list",
+          "desc": "Participants loaded by hand or via CSV."
+        }
+      },
+      "status": {
+        "announced": {
+          "label": "Winner announced"
+        },
+        "upcoming": {
+          "label": "Upcoming"
+        },
+        "ended": {
+          "label": "Drawing"
+        },
+        "active": {
+          "label": "Ongoing"
+        }
+      }
     },
     "forum": {
       "solved": "Solved",
@@ -256,7 +334,9 @@
       "followRelease": "Follow release",
       "mustPlay": "Must-play",
       "releaseCard": "Card for {title}",
-      "viewCount": "{count} following"
+      "viewCount": "{count} following",
+      "today": "today",
+      "premieres": "{count, plural, one {premiere} other {premieres}}"
     },
     "catalog": {
       "noRating": "No rating",
@@ -264,10 +344,60 @@
       "stars": "{count} stars",
       "halfStars": "{count} half stars",
       "removeFromLibrary": "Remove from library",
-      "log": "Log"
+      "log": "Log",
+      "games": "{count, plural, one {game} other {games}}",
+      "systemList": "Boffmedia",
+      "yourList": "Yours",
+      "defaultVerb": "logged",
+      "aGame": "a game",
+      "justNow": "just now",
+      "status": {
+        "playing": { "label": "Playing", "verb": "Playing" },
+        "played": { "label": "Played", "verb": "Completed" },
+        "backlog": { "label": "Backlog", "verb": "Backlogged" },
+        "wishlist": { "label": "Wishlist", "verb": "Wishlisted" },
+        "shelved": { "label": "Shelved", "verb": "Shelved" },
+        "retired": { "label": "Retired", "verb": "Retired" }
+      }
     },
     "bestiary": {
       "rareMaterial": "Rare material"
+    },
+    "keys": {
+      "metacritic": "Metacritic",
+      "steamRating": "Steam rating",
+      "developer": "Developer",
+      "publisher": "Publisher",
+      "release": "Release",
+      "platforms": "Platforms",
+      "genres": "Genres",
+      "free": "Free",
+      "freeToPlay": "Free to play on Steam",
+      "currentPrice": "Current Steam price",
+      "regularPrice": "Steam price",
+      "keyValueSuffix": "key value",
+      "screenshotAlt": "{game} screenshot {n}",
+      "mediaAria": "Media {n}",
+      "given": "Delivered",
+      "available": "Available",
+      "reviewsCount": "{count} reviews",
+      "keysCount": "{count, plural, one {key} other {keys}}",
+      "review": {
+        "extremelyPositive": "Overwhelmingly positive",
+        "veryPositive": "Very positive",
+        "positive": "Positive",
+        "mixed": "Mixed"
+      },
+      "meta": {
+        "universal": "Universal acclaim",
+        "favorable": "Generally favorable",
+        "mixed": "Mixed reviews",
+        "unfavorable": "Generally unfavorable"
+      },
+      "via": {
+        "sorteo": { "label": "Giveaway", "short": "Giveaway" },
+        "manual": { "label": "Manual delivery", "short": "Manual" }
+      }
     },
     "profile": {
       "changePhoto": "Change photo",
@@ -275,7 +405,15 @@
       "live": "LIVE"
     },
     "error": {
-      "unknown": "Unknown error"
+      "title": "Something went wrong!",
+      "body": "An unexpected error has occurred.",
+      "messageLabel": "Error message:",
+      "unknown": "Unknown error",
+      "trackingId": "Tracking ID:",
+      "retry": "Retry",
+      "home": "Home",
+      "helpText": "Need help?",
+      "discordLink": "Discord Community"
     },
     "media": {
       "menu": "Menu",
@@ -314,10 +452,24 @@
       "sidebar": {
         "you": "You",
         "partOf": "Part of",
-        "comingSoon": "Coming soon"
+        "comingSoon": "Coming soon",
+        "home": "Home",
+        "browse": "Browse",
+        "shorts": "Shorts",
+        "following": "Following",
+        "trending": "Trending",
+        "categories": "Categories",
+        "history": "History",
+        "watchlater": "Watch later",
+        "watchparty": "Watch Party",
+        "liked": "Liked",
+        "clips": "Saved clips",
+        "subsTube": "Subscriptions",
+        "subsTwitch": "Channels you follow"
       }
     },
     "legal": {
+      "tocLabel": "Contents",
       "cancelaciones": {
         "metaTitle": "Cancellation Policy · Boffmedia",
         "metaDescription": "How to request a cancellation for a purchase on Boffmedia and under what conditions.",
@@ -627,16 +779,9 @@
       "home": "Back to Home",
       "back": "Previous Page"
     },
-    "error": {
-      "title": "Something went wrong!",
-      "body": "An unexpected error has occurred.",
-      "messageLabel": "Error message:",
-      "unknown": "Unknown error",
-      "trackingId": "Tracking ID:",
-      "retry": "Retry",
-      "home": "Home",
-      "helpText": "Need help?",
-      "discordLink": "Discord Community"
+    "editor": {
+      "untitled": "Untitled",
+      "saved": "Changes saved to {title}"
     }
   }
 }

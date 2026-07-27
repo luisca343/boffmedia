@@ -287,7 +287,7 @@ export default function VoltorbFlipGame() {
   return (
     <>
       <GameTopBar
-        title="GIRA VOLTORB"
+        title={t("gameTopBar.titles.voltorb")}
         accent="magenta"
         onHelp={() => setShowRulesModal(true)}
         onReset={handleNewGame}
@@ -295,7 +295,7 @@ export default function VoltorbFlipGame() {
           // The coins banked THIS session — game state, not an account balance.
           // The arcade has no currency endpoint (deferred/arcade.md).
           <span
-            aria-label={`${totalCoins} monedas acumuladas en esta partida`}
+            aria-label={t("voltorb.coinsAria", { count: totalCoins })}
             className="inline-flex items-center gap-1.5 rounded-lg border border-ar-amber/35 bg-black/45 px-2.5 py-1.5 font-ar-mono text-[12px] font-bold tabular-nums text-ar-amber"
           >
             <Icon.Coin s={14} />
@@ -311,7 +311,7 @@ export default function VoltorbFlipGame() {
           <Panel tone="deep" innerClassName="p-3 md:p-[18px]">
             <div className="mb-4 flex items-center justify-between gap-2 border-b border-dashed border-white/10 px-1.5 pb-3.5 pt-1">
               <span className="font-ar-display text-[10px] text-ar-magenta-2">
-                ▸ CARTAS {flippedMultipliers}
+                ▸ {t("voltorb.cardsKicker", { count: flippedMultipliers })}
               </span>
               <span className="hidden font-ar-mono text-[11px] text-ar-ink-dim md:inline">
                 5×5 · {t("voltorb.difficulty", { level: difficulty })}
@@ -392,9 +392,10 @@ export default function VoltorbFlipGame() {
         onClose={() => setShowConfirmQuit(false)}
         onConfirm={handleConfirmQuit}
         titleKey="voltorb.quitConfirm"
-        descriptionKey="arcade.voltorb.quitDescription"
-        confirmKey="arcade.voltorb.quit"
-        cancelKey="arcade.voltorb.keep"
+        descriptionKey="voltorb.quitDescription"
+        descriptionValues={{ count: totalCoins + roundScore }}
+        confirmKey="voltorb.quit"
+        cancelKey="voltorb.keep"
         variant="quit"
       />
 
@@ -403,9 +404,9 @@ export default function VoltorbFlipGame() {
         onClose={handleCancelNewGame}
         onConfirm={handleConfirmNewGame}
         titleKey="voltorb.newGameConfirm"
-        descriptionKey="arcade.voltorb.newGameDescription"
-        confirmKey="arcade.voltorb.new"
-        cancelKey="arcade.voltorb.keep"
+        descriptionKey="voltorb.newGameDescription"
+        confirmKey="voltorb.new"
+        cancelKey="voltorb.keep"
         variant="new"
       />
 
@@ -414,9 +415,10 @@ export default function VoltorbFlipGame() {
         onClose={handleCancelStop}
         onConfirm={handleConfirmStop}
         titleKey="voltorb.cashOutConfirm"
-        descriptionKey="arcade.voltorb.cashOutDescription"
-        confirmKey="arcade.voltorb.cashOut"
-        cancelKey="arcade.voltorb.keep"
+        descriptionKey="voltorb.cashOutDescription"
+        descriptionValues={{ count: roundScore }}
+        confirmKey="voltorb.cashOut"
+        cancelKey="voltorb.keep"
         variant="new"
       />
 

@@ -101,14 +101,15 @@ export default function TaxiPage() {
           setSelected(null)
           setRecenterSignal((n) => n + 1)
           toast.success(
-            <>
-              ¡Has llegado a <strong>{stop.id}</strong>!
-            </>,
+            t.rich("arrived", {
+              name: stop.id,
+              b: (chunks) => <strong>{chunks}</strong>,
+            }),
           )
         },
         onError: (error) => {
           setFlow("idle")
-          toast.error(error instanceof Error ? error.message : "No se pudo completar el viaje")
+          toast.error(error instanceof Error ? error.message : t("errors.tripFailed"))
         },
       },
     )

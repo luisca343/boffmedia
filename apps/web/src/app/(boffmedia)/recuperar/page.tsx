@@ -1,10 +1,11 @@
 import { Suspense } from "react"
 import type { Metadata } from "next"
+import { getTranslations } from "next-intl/server"
 import { RecoverScreen } from "@/components/boffmedia/ui/auth"
 
-export const metadata: Metadata = {
-  title: "Recuperar contraseña · Boffmedia",
-  description: "Recibe un enlace para restablecer tu contraseña de Boffmedia.",
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("pageMeta.auth")
+  return { title: t("recuperar.title"), description: t("recuperar.description") }
 }
 
 export default function RecuperarPage() {

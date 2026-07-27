@@ -1,3 +1,4 @@
+import { useTranslations } from "next-intl";
 import { TownData } from "../../types";
 import { SectionHeader } from "../shared/section/SectionHeader";
 import { SectionTemplate } from "../shared/section/SectionTemplate";
@@ -9,6 +10,7 @@ interface TownMapSectionProps {
 }
 
 export function TownMapSection({ townData, townName }: TownMapSectionProps) {
+  const t = useTranslations("wingull.map");
   const { colorClaro, colorMedio, colorOscuro, coordenadas, parcelas, negocios, nombre } = townData.textos;
 
   // Check if we have coordinates to show the map
@@ -36,9 +38,9 @@ export function TownMapSection({ townData, townName }: TownMapSectionProps) {
       </div>
 
       <SectionHeader
-        title={<span style={{color: colorClaro}}>Mapa</span>}
-        subtitle={<span style={{color: colorMedio}}>Interactivo</span>}
-        description={<span>Explora la ubicación de las parcelas disponibles en {nombre} y navega por el territorio</span>}
+        title={<span style={{color: colorClaro}}>{t("titlePrimary")}</span>}
+        subtitle={<span style={{color: colorMedio}}>{t("titleAccent")}</span>}
+        description={<span>{t("description", { town: nombre })}</span>}
         townName={nombre}
         colorClaro={colorClaro}
         colorMedio={colorMedio}

@@ -7,11 +7,12 @@ import Link from 'next/link';
 import { Icon } from '@/components/boffmedia/primitives';
 import { BxRing } from '@/app/(boffmedia)/(herramientas)/pokemon/battlesim/_components/ui/bx-kit';
 
-const MODE_META: Record<string, { label: string; tone: string }> = {
-  ai: { label: 'VS IA', tone: 'var(--signal)' },
-  pvp: { label: 'PVP', tone: 'var(--warn)' },
-  showdown: { label: 'SHOWDOWN', tone: 'var(--accent)' },
-  replay: { label: 'REPETICIÓN', tone: 'var(--ok)' },
+/** `labelKey` is a key id under `battlesim.header.modes` — never copy. */
+const MODE_META: Record<string, { labelKey: string; tone: string }> = {
+  ai: { labelKey: 'ai', tone: 'var(--signal)' },
+  pvp: { labelKey: 'pvp', tone: 'var(--warn)' },
+  showdown: { labelKey: 'showdown', tone: 'var(--accent)' },
+  replay: { labelKey: 'replay', tone: 'var(--ok)' },
 };
 
 interface BattleHeaderProps {
@@ -59,7 +60,7 @@ export function BattleHeader({
 
   return (
     <header
-      aria-label="Battle header"
+      aria-label={t('header.aria')}
       style={{ clipPath: 'polygon(0 0,100% 0,100% calc(100% - 12px),calc(100% - 12px) 100%,0 100%)' }}
       className="flex flex-wrap items-center gap-x-3 gap-y-2 border border-solid border-line bg-[color-mix(in_srgb,var(--panel)_88%,transparent)] px-3 py-2 backdrop-blur-[4px]"
     >
@@ -76,7 +77,7 @@ export function BattleHeader({
           style={{ ['--tyc']: meta.tone, clipPath: 'polygon(3px 0,100% 0,calc(100% - 3px) 100%,0 100%)' } as CSSProperties}
           className="flex-none border border-solid border-[color-mix(in_srgb,var(--tyc)_45%,transparent)] bg-[color-mix(in_srgb,var(--tyc)_14%,transparent)] px-2 py-1 font-mono text-[10px] font-bold uppercase leading-none tracking-[0.12em] text-[var(--tyc)]"
         >
-          {meta.label}
+          {t(`header.modes.${meta.labelKey}`)}
         </span>
         {roomId && (
           <span

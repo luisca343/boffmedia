@@ -94,13 +94,13 @@ export function MetaLayoutClient() {
     try {
       const res = await VgcMetaService.getLimitlessPlayerTeam(tournamentIdNum, slug);
       if (res.data) {
-        const adapted = { team: res.data.slots.map((s) => toTeamSlot(s)), rawText: res.data.rawText };
+        const adapted = { team: res.data.slots.map((s) => toTeamSlot(s, t("adapter.teraNone"))), rawText: res.data.rawText };
         setTeamCache((prev) => new Map(prev).set(slug, adapted));
         return adapted;
       }
     } catch { /* ignore */ }
     return null;
-  }, [tournamentIdNum]);
+  }, [tournamentIdNum, t]);
 
   // ── Divergence hook — only active when view=divergence in tournament tab ──
   const divergenceRegulation = tab === "tournament" && view_preread === "divergence" ? regulation || undefined : undefined;
@@ -163,8 +163,8 @@ export function MetaLayoutClient() {
   }, [pokeMap, selectedEntry, speciesId, isPreviewFormat, pasteDetail]);
 
   const adaptedPlayers = useMemo(
-    () => standingsPlayers.map((p) => toPlayerEntry(p, new Map())),
-    [standingsPlayers],
+    () => standingsPlayers.map((p) => toPlayerEntry(p, new Map(), t("adapter.teraNone"))),
+    [standingsPlayers, t],
   );
 
   const adaptedDivergence = useMemo(
@@ -178,7 +178,10 @@ export function MetaLayoutClient() {
     speciesId || undefined,
     resolvedTeamsRegId,
   );
-  const adaptedTeams = useMemo(() => speciesTeams.map(toTeamEntry), [speciesTeams]);
+  const adaptedTeams = useMemo(
+    () => speciesTeams.map((entry) => toTeamEntry(entry, t("adapter.teamFallback"), t("adapter.teraNone"))),
+    [speciesTeams, t],
+  );
 
   // ── Toolbar / subbar derived data ──────────────────────────────────────────
   const totalBattles = ladderEntries.reduce((a, e) => a + e.rawCount, 0);

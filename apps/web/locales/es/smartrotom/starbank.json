@@ -129,7 +129,8 @@
       "newTransfer": "Nueva transferencia",
       "viewMovements": "Ver movimientos",
       "instantProtected": "Transferencia instantánea y protegida. Saldo proyectado tras la operación: {amount}",
-      "differentAccount": "Elige una cuenta de origen distinta al destinatario."
+      "differentAccount": "Elige una cuenta de origen distinta al destinatario.",
+      "errorTransferencia": "No se pudo completar la transferencia."
     },
     "graficas": {
       "title": "Gráficas y análisis",
@@ -164,7 +165,15 @@
       "today": "Hoy",
       "prevMonth": "Mes anterior",
       "nextMonth": "Mes siguiente",
-      "dayHeaders": ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"],
+      "dayHeaders": [
+        "Lun",
+        "Mar",
+        "Mié",
+        "Jue",
+        "Vie",
+        "Sáb",
+        "Dom"
+      ],
       "noMovements": "Sin movimientos ese día",
       "selectDay": "Selecciona un día para ver el detalle",
       "income": "Ingreso",
@@ -229,7 +238,8 @@
         "errorEmpty": "Introduce un nombre para la cuenta",
         "errorFailed": "No se pudo crear la cuenta",
         "created": "Cuenta creada"
-      }
+      },
+      "errorCarga": "No se pudieron cargar las cuentas."
     },
     "categories": {
       "league": "Liga",

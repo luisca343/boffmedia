@@ -1,6 +1,6 @@
 // PAPER.
 
-import { useTranslations } from "next-intl"
+import { useLocale, useTranslations } from "next-intl"
 import type { MinecraftStats } from "@/services/api/smartrotom/playerService"
 import { usePassportStore } from "../../_stores/usePassportStore"
 import type { Passport } from "../../_types"
@@ -19,6 +19,7 @@ export function Identidad({
   loading: boolean
 }) {
   const t = useTranslations("pasaporte")
+  const locale = useLocale()
   // The lamp is read HERE, not passed down: a prop would put it in the leaf array the book
   // hands to StPageFlip, and that array must not change when the reader toggles anything.
   const inspect = usePassportStore((s) => s.inspect)
@@ -66,19 +67,19 @@ export function Identidad({
             <Stat
               icon="trophy"
               label={t("identidad.stat.wins")}
-              value={fmt(totalKills(stats))}
+              value={fmt(totalKills(stats), locale)}
               sub={t("identidad.stat.winsSub")}
             />
             <Stat
               icon="skull"
               label={t("identidad.stat.deaths")}
-              value={fmt(deaths(stats))}
+              value={fmt(deaths(stats), locale)}
               sub={t("identidad.stat.deathsSub")}
             />
             <Stat
               icon="foot"
               label={t("identidad.stat.distance")}
-              value={`${fmt(distanceKm(stats))} km`}
+              value={`${fmt(distanceKm(stats), locale)} km`}
               sub={t("identidad.stat.distanceSub")}
             />
           </div>
@@ -94,7 +95,7 @@ export function Identidad({
               >
                 <dt className="text-ps-ink-soft">{t(`identidad.movement.${row.key}`)}</dt>
                 <dd className="ps-num font-ps-mono font-bold">
-                  {fmt(row.value)}
+                  {fmt(row.value, locale)}
                   {row.unit === "km" && " km"}
                 </dd>
               </div>

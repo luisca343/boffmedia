@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 
 import { articleHref } from "../../../_components/ArticleCard";
 import { Card, Eyebrow, HeroArt, Meta, Pill } from "../../../_components/ui";
@@ -16,6 +17,7 @@ export function UpNext({
   article: FtArticle;
   articles: FtArticle[];
 }) {
+  const t = useTranslations("furrettoday.upNext");
   const related = relatedTo(article, articles, 3);
   const relatedIds = new Set(related.map((a) => a.id));
 
@@ -33,9 +35,9 @@ export function UpNext({
       <div className="mx-auto max-w-[1400px] px-6">
         <div className="mb-6 flex items-end justify-between gap-4 border-b-2 border-dashed border-white/30 pb-3">
           <div>
-            <Eyebrow className="text-ft-yellow">PASA LA PÁGINA</Eyebrow>
+            <Eyebrow className="text-ft-yellow">{t("eyebrow")}</Eyebrow>
             <h2 className="font-ft-display mt-1 text-[clamp(36px,5vw,56px)] leading-none text-ft-yellow">
-              No Pares de Caminar
+              {t("title")}
             </h2>
           </div>
         </div>

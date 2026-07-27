@@ -2,7 +2,7 @@
 
 import { useTranslations } from "next-intl"
 import type { Region, SealStatus } from "../_types"
-import { SEAL_STATUSES, STATUS_LABEL } from "../_utils/status"
+import { SEAL_STATUSES, STATUS_LABEL_KEY } from "../_utils/status"
 import { Button, Chip, Icon, SearchField, Select } from "./ui"
 
 export type SortKey = "status" | "level" | "name"
@@ -66,6 +66,7 @@ export function BoardFilters({
   counts: Record<string, number>
 }) {
   const t = useTranslations("misiones.boardFilters")
+  const tStatus = useTranslations("misiones")
   return (
     <div className="ms-filters mb-6 flex flex-wrap items-center gap-3">
       <SearchField
@@ -79,7 +80,7 @@ export function BoardFilters({
       <div className="flex flex-wrap gap-1.5">
         {(["ALL", ...SEAL_STATUSES] as const).map((key) => (
           <Chip key={key} active={status === key} onClick={() => onStatus(key)}>
-            {key === "ALL" ? t("all") : STATUS_LABEL[key]}
+            {key === "ALL" ? t("all") : tStatus(STATUS_LABEL_KEY[key])}
             <span className="opacity-65">({counts[key] ?? 0})</span>
           </Chip>
         ))}

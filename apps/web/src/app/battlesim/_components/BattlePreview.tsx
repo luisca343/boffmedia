@@ -1,5 +1,6 @@
 "use client"
 import type { Battle } from "@pkmn/client"
+import { useTranslations } from "next-intl"
 import useViewportWidth from "@/services/useViewPortWidth"
 import { PokemonTeam } from "./PokemonTeam"
 import { useEffect, useState } from "react"
@@ -15,6 +16,7 @@ export const EnhancedBattlePreview = ({
   pov: 0 | 1 | any
   onStartBattle?: () => void
 }) => {
+  const t = useTranslations("battlesim.preview")
   const [, canvasWidth] = useViewportWidth()
   const [isLoaded, setIsLoaded] = useState(false)
   const [isHovering, setIsHovering] = useState(false)
@@ -58,7 +60,7 @@ export const EnhancedBattlePreview = ({
             ${isLoaded ? "opacity-100 transform-none" : "opacity-0 -translate-y-10"}`}
         >
           <h2 className="text-white text-xl md:text-2xl font-bold text-center">
-            Título de la Batalla
+            {t("title")}
           </h2>
         </div>
 
@@ -95,7 +97,7 @@ export const EnhancedBattlePreview = ({
               className={`mt-6 bg-primary hover:bg-primary-active text-white font-bold py-2 px-6 rounded-full 
                 transform transition-all duration-300 pulse-animation ${isHovering ? 'scale-110 shadow-lg' : ''}`}
             >
-              COMENZAR
+              {t("start")}
             </button>
           </div>
 

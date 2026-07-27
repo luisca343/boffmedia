@@ -176,15 +176,17 @@ export type Department =
   | "admin"
 
 // A department's colour is its identity: it does not follow the accent.
-export const DEPARTMENTS: Record<Department, { label: string; tone: Tone }> = {
-  resumen: { label: "Resumen", tone: "civic" },
-  urbanismo: { label: "Urbanismo", tone: "urbanismo" },
-  seguridad: { label: "Seguridad", tone: "seguridad" },
-  hacienda: { label: "Hacienda", tone: "hacienda" },
-  justicia: { label: "Justicia", tone: "justicia" },
-  poblacion: { label: "Población", tone: "poblacion" },
-  gobierno: { label: "Gobierno", tone: "gold" },
-  admin: { label: "Administración", tone: "seguridad" },
+// `labelKey` is resolved with the `gobierno` translator at the call site — a module-scope
+// object can never hold a translated literal.
+export const DEPARTMENTS: Record<Department, { labelKey: string; tone: Tone }> = {
+  resumen: { labelKey: "dep.resumen", tone: "civic" },
+  urbanismo: { labelKey: "dep.urbanismo", tone: "urbanismo" },
+  seguridad: { labelKey: "dep.seguridad", tone: "seguridad" },
+  hacienda: { labelKey: "dep.hacienda", tone: "hacienda" },
+  justicia: { labelKey: "dep.justicia", tone: "justicia" },
+  poblacion: { labelKey: "dep.poblacion", tone: "poblacion" },
+  gobierno: { labelKey: "dep.gobierno", tone: "gold" },
+  admin: { labelKey: "dep.admin", tone: "seguridad" },
 }
 
 export const depTone = (dep: Department): ToneStyle => TONES[DEPARTMENTS[dep].tone]
@@ -193,105 +195,82 @@ export const depTone = (dep: Department): ToneStyle => TONES[DEPARTMENTS[dep].to
 // Never encode meaning by colour alone: every one of these is rendered next to a
 // word, and the badges below are what supply that word.
 
-export const DENUNCIA_STATUS: Record<string, { label: string; tone: Tone }> = {
-  pending: { label: "Pendiente", tone: "warn" },
-  reviewing: { label: "En revisión", tone: "info" },
-  resolved: { label: "Resuelta", tone: "ok" },
-  dismissed: { label: "Archivada", tone: "default" },
+type Labelled = Record<string, { labelKey: string; tone: Tone }>
+
+export const DENUNCIA_STATUS: Labelled = {
+  pending: { labelKey: "status.pending", tone: "warn" },
+  reviewing: { labelKey: "status.reviewing", tone: "info" },
+  resolved: { labelKey: "status.resolved", tone: "ok" },
+  dismissed: { labelKey: "status.dismissed", tone: "default" },
 }
 
-export const MULTA_STATUS: Record<string, { label: string; tone: Tone }> = {
-  pending: { label: "Pendiente", tone: "warn" },
-  paid: { label: "Pagada", tone: "ok" },
-  cancelled: { label: "Anulada", tone: "default" },
-  appealed: { label: "Apelada", tone: "info" },
+export const MULTA_STATUS: Labelled = {
+  pending: { labelKey: "status.pending", tone: "warn" },
+  paid: { labelKey: "multaStatus.paid", tone: "ok" },
+  cancelled: { labelKey: "multaStatus.cancelled", tone: "default" },
+  appealed: { labelKey: "multaStatus.appealed", tone: "info" },
 }
 
-export const BUSCADO_STATUS: Record<string, { label: string; tone: Tone }> = {
-  active: { label: "En busca", tone: "danger" },
-  resolved: { label: "Capturado", tone: "ok" },
-  cancelled: { label: "Anulado", tone: "default" },
+export const BUSCADO_STATUS: Labelled = {
+  active: { labelKey: "buscadoStatus.active", tone: "danger" },
+  resolved: { labelKey: "buscadoStatus.resolved", tone: "ok" },
+  cancelled: { labelKey: "buscadoStatus.cancelled", tone: "default" },
 }
 
-export const SEVERITY: Record<string, { label: string; tone: Tone }> = {
-  low: { label: "Baja", tone: "default" },
-  medium: { label: "Media", tone: "info" },
-  high: { label: "Alta", tone: "warn" },
-  critical: { label: "Crítica", tone: "danger" },
+export const SEVERITY: Labelled = {
+  low: { labelKey: "expedientes.severity.low", tone: "default" },
+  medium: { labelKey: "expedientes.severity.medium", tone: "info" },
+  high: { labelKey: "expedientes.severity.high", tone: "warn" },
+  critical: { labelKey: "expedientes.severity.critical", tone: "danger" },
 }
 
-export const APELACION_STATUS: Record<string, { label: string; tone: Tone }> = {
-  pending: { label: "Pendiente", tone: "warn" },
-  reviewing: { label: "En revisión", tone: "info" },
-  upheld: { label: "Desestimada", tone: "default" },
-  overturned: { label: "Estimada", tone: "ok" },
+export const APELACION_STATUS: Labelled = {
+  pending: { labelKey: "status.pending", tone: "warn" },
+  reviewing: { labelKey: "status.reviewing", tone: "info" },
+  upheld: { labelKey: "apelacionStatus.upheld", tone: "default" },
+  overturned: { labelKey: "apelacionStatus.overturned", tone: "ok" },
 }
 
-export const EXPEDIENTE_STATUS: Record<string, { label: string; tone: Tone }> = {
-  open: { label: "Abierto", tone: "warn" },
-  closed: { label: "Archivado", tone: "default" },
+export const EXPEDIENTE_STATUS: Labelled = {
+  open: { labelKey: "expedientes.status.open", tone: "warn" },
+  closed: { labelKey: "expedientes.status.archived", tone: "default" },
 }
 
-export const SUBASTA_STATUS: Record<string, { label: string; tone: Tone }> = {
-  live: { label: "En curso", tone: "ok" },
-  closed: { label: "Cerrada", tone: "default" },
-  cancelled: { label: "Anulada", tone: "danger" },
+export const SUBASTA_STATUS: Labelled = {
+  live: { labelKey: "subastaStatus.live", tone: "ok" },
+  closed: { labelKey: "subastaStatus.closed", tone: "default" },
+  cancelled: { labelKey: "subastaStatus.cancelled", tone: "danger" },
 }
 
-export const PARCELA_STATUS: Record<string, { label: string; tone: Tone }> = {
-  ocupada: { label: "Ocupada", tone: "civic" },
-  vacante: { label: "Vacante", tone: "default" },
-  embargada: { label: "Embargada", tone: "danger" },
-  subasta: { label: "En subasta", tone: "gold" },
+export const PARCELA_STATUS: Labelled = {
+  ocupada: { labelKey: "parcelaStatus.ocupada", tone: "civic" },
+  vacante: { labelKey: "parcelaStatus.vacante", tone: "default" },
+  embargada: { labelKey: "parcelaStatus.embargada", tone: "danger" },
+  subasta: { labelKey: "parcelaStatus.subasta", tone: "gold" },
 }
 
-export const STANDING: Record<string, { label: string; tone: Tone }> = {
-  bueno: { label: "Bueno", tone: "ok" },
-  observado: { label: "Observado", tone: "warn" },
-  sancionado: { label: "Sancionado", tone: "danger" },
+export const STANDING: Labelled = {
+  bueno: { labelKey: "standing.bueno", tone: "ok" },
+  observado: { labelKey: "standing.observado", tone: "warn" },
+  sancionado: { labelKey: "standing.sancionado", tone: "danger" },
 }
 
 export const DENUNCIA_CATEGORY: Record<string, string> = {
-  griefing: "Griefing",
-  theft: "Robo",
-  dispute: "Disputa",
-  harassment: "Acoso",
-  other: "Otros",
+  griefing: "denunciaCategory.griefing",
+  theft: "denunciaCategory.theft",
+  dispute: "denunciaCategory.dispute",
+  harassment: "denunciaCategory.harassment",
+  other: "denunciaCategory.other",
 }
 
 // The five land uses a district can be zoned for.
 export const ZONA_KINDS: Record<
   string,
-  { label: string; tone: Tone; icon: "home" | "store" | "landmark" | "hammer" | "sprout"; desc: string }
+  { labelKey: string; tone: Tone; icon: "home" | "store" | "landmark" | "hammer" | "sprout"; descKey: string }
 > = {
-  residencial: {
-    label: "Residencial",
-    tone: "civic",
-    icon: "home",
-    desc: "Uso residencial. Construcción libre dentro de la normativa municipal.",
-  },
-  comercial: {
-    label: "Comercial",
-    tone: "gold",
-    icon: "store",
-    desc: "Comercio y tiendas. Cofres públicos protegidos, licencia requerida.",
-  },
-  civico: {
-    label: "Cívico",
-    tone: "seguridad",
-    icon: "landmark",
-    desc: "Edificios públicos y servicios. Protección municipal total.",
-  },
-  industrial: {
-    label: "Industrial",
-    tone: "urbanismo",
-    icon: "hammer",
-    desc: "Talleres, granjas de recursos y almacenes. Maquinaria permitida.",
-  },
-  agricola: {
-    label: "Agrícola",
-    tone: "ok",
-    icon: "sprout",
-    desc: "Cultivos y huertos. Sin construcción en altura.",
-  },
+  residencial: { labelKey: "zonas.kindResidencial", tone: "civic", icon: "home", descKey: "zonaKindDesc.residencial" },
+  comercial: { labelKey: "zonas.kindComercial", tone: "gold", icon: "store", descKey: "zonaKindDesc.comercial" },
+  civico: { labelKey: "zonas.kindCivico", tone: "seguridad", icon: "landmark", descKey: "zonaKindDesc.civico" },
+  industrial: { labelKey: "zonas.kindIndustrial", tone: "urbanismo", icon: "hammer", descKey: "zonaKindDesc.industrial" },
+  agricola: { labelKey: "zonas.kindAgricola", tone: "ok", icon: "sprout", descKey: "zonaKindDesc.agricola" },
 }

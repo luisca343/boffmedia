@@ -1,3 +1,4 @@
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { Icon } from "./Icon"
 
@@ -7,7 +8,7 @@ export function SearchBar({
   onChange,
   sort,
   onToggleSort,
-  placeholder = "Buscar destino o zona…",
+  placeholder,
 }: {
   value: string
   onChange: (v: string) => void
@@ -15,6 +16,7 @@ export function SearchBar({
   onToggleSort: () => void
   placeholder?: string
 }) {
+  const t = useTranslations("taxi.searchBar")
   return (
     <div className="relative flex shrink-0 items-center gap-2">
       <span className="pointer-events-none absolute left-[13px] flex text-tx-txt-3">
@@ -23,8 +25,8 @@ export function SearchBar({
       <input
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        placeholder={placeholder}
-        aria-label="Buscar destino"
+        placeholder={placeholder ?? t("placeholderPh")}
+        aria-label={t("search")}
         className={cn(
           "flex-1 rounded-tx-md py-3 pl-10 pr-3 text-sm outline-none",
           "bg-tx-surface border border-solid border-tx-line text-tx-txt placeholder:text-tx-txt-3",
@@ -36,7 +38,7 @@ export function SearchBar({
         <button
           type="button"
           onClick={() => onChange("")}
-          aria-label="Limpiar búsqueda"
+          aria-label={t("clear")}
           className="absolute right-[58px] flex p-1 text-tx-txt-3 hover:text-tx-txt"
         >
           <Icon name="x" size={15} />
@@ -45,8 +47,8 @@ export function SearchBar({
       <button
         type="button"
         onClick={onToggleSort}
-        aria-label={sort === "near" ? "Ordenar por más lejano" : "Ordenar por más cercano"}
-        title={sort === "near" ? "Más cercano primero" : "Más lejano primero"}
+        aria-label={sort === "near" ? t("sortFarthest") : t("sortNearest")}
+        title={sort === "near" ? t("nearestFirst") : t("farthestFirst")}
         className={cn(
           "grid h-11 w-11 shrink-0 place-items-center rounded-tx-md",
           "bg-tx-surface border border-solid transition-[background,color] duration-150",

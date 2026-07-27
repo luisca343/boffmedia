@@ -1,6 +1,6 @@
 // PAPER. Rubber stamps, inked into the sheet.
 
-import { useTranslations } from "next-intl"
+import { useLocale, useTranslations } from "next-intl"
 import type { TravelStamp } from "../../_types"
 import { stampDate } from "../../_utils/dates"
 import { EmptyState, PageHead, Skeleton } from "../ui"
@@ -28,7 +28,7 @@ const LEGEND_KINDS: TravelStamp["kind"][] = ["viaje", "gimnasio", "liga", "event
 export function Stamp({ stamp, index }: { stamp: TravelStamp; index: number }) {
   const id = `ps-stamp-${index}`
   const ink = INK[stamp.kind]
-  const date = stampDate(stamp.date)
+  const date = stampDate(stamp.date, useLocale())
   const style = { transform: `rotate(${stamp.rot}deg)`, opacity: stamp.gold ? 0.94 : 0.85 }
 
   const rough = (

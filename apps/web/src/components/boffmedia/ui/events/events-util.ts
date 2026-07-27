@@ -1,3 +1,5 @@
+import { intlLocale } from "@/lib/locale"
+
 export type EventStatus = "active" | "upcoming" | "completed"
 
 /** Who runs the event and what role Boffmedia plays. */
@@ -35,13 +37,14 @@ export interface EventLike {
 
 export const EV_BOFF = { name: "Boffmedia", avatar: "B", handle: "@boffmedia" } as const
 
-/** Rarity palette shared by achievements + the RarityTag atom (label · color · soft bg). */
-export const RARITY: Record<string, { label: string; color: string; soft: string }> = {
-  bronze: { label: "Bronce", color: "#cd7f47", soft: "rgba(205,127,71,0.14)" },
-  silver: { label: "Plata", color: "#c0c7d1", soft: "rgba(192,199,209,0.16)" },
-  gold: { label: "Oro", color: "#f4b04e", soft: "rgba(244,176,78,0.16)" },
-  platinum: { label: "Platino", color: "#5fd6c4", soft: "rgba(95,214,196,0.16)" },
-  diamond: { label: "Diamante", color: "#7cc4ff", soft: "rgba(124,196,255,0.18)" },
+// Rarity palette shared by achievements + the RarityTag atom (color · soft bg).
+// The label lives in `logros.rarity.*` — resolve with useTranslations, not here.
+export const RARITY: Record<string, { color: string; soft: string }> = {
+  bronze: { color: "#cd7f47", soft: "rgba(205,127,71,0.14)" },
+  silver: { color: "#c0c7d1", soft: "rgba(192,199,209,0.16)" },
+  gold: { color: "#f4b04e", soft: "rgba(244,176,78,0.16)" },
+  platinum: { color: "#5fd6c4", soft: "rgba(95,214,196,0.16)" },
+  diamond: { color: "#7cc4ff", soft: "rgba(124,196,255,0.18)" },
 }
 
 /** Per-game hue in the events' `hsl(H 62% 58%)` formula. [deferred] until games API carries hue. */
@@ -50,9 +53,9 @@ export function evHue(hue?: number | string | null): string {
   return typeof hue === "number" ? `hsl(${hue} 62% 58%)` : hue
 }
 
-/** es-ES thousands formatting for point/participant counts. */
-export function evNum(n?: number | null): string {
-  return (n || 0).toLocaleString("es-ES")
+/** Locale-aware thousands formatting for point/participant counts. */
+export function evNum(n?: number | null, locale?: string | null): string {
+  return (n || 0).toLocaleString(intlLocale(locale))
 }
 
 /**
@@ -74,10 +77,12 @@ export interface PlayerLike {
 
 /** Label · tag · icon per organizer role (used by the block variant). */
 export function evOrgMeta(role: EventOrganizerRole) {
+  // `*Key` fields, not literals — resolving with t() at module scope would freeze
+  // whichever locale loaded first. Callers resolve against `events.organizer`.
   const map = {
-    boffmedia: { role: "boffmedia", label: "Organiza Boffmedia", tag: "Oficial", icon: "shield" },
-    coorg: { role: "coorg", label: "Co-organizado", tag: "Co-org", icon: "users" },
-    platform: { role: "platform", label: "En la plataforma", tag: "Comunidad", icon: "globe" },
+    boffmedia: { role: "boffmedia", labelKey: "labelBoffmedia", tagKey: "tagOfficial", icon: "shield" },
+    coorg: { role: "coorg", labelKey: "labelCoorg", tagKey: "tagCoorg", icon: "users" },
+    platform: { role: "platform", labelKey: "labelPlatform", tagKey: "tagCommunity", icon: "globe" },
   } as const
   return map[role] ?? map.boffmedia
 }
@@ -99,20 +104,20 @@ export function eventStatus(e: EventLike): EventStatus {
   return "active"
 }
 
-export function formatEventDate(iso?: string | null, locale = "es-ES"): string {
+export function formatEventDate(iso?: string | null, locale?: string | null): string {
   if (!iso) return ""
   const d = new Date(iso)
   if (Number.isNaN(d.getTime())) return ""
-  return d.toLocaleDateString(locale, { day: "numeric", month: "short", year: "numeric" })
+  return d.toLocaleDateString(intlLocale(locale), { day: "numeric", month: "short", year: "numeric" })
 }
 
 /** `{ d: "14", m: "JUL" }` for the compact date block. */
-export function dayMonth(iso?: string | null, locale = "es-ES"): { d: string; m: string } {
+export function dayMonth(iso?: string | null, locale?: string | null): { d: string; m: string } {
   if (!iso) return { d: "–", m: "" }
   const d = new Date(iso)
   if (Number.isNaN(d.getTime())) return { d: "–", m: "" }
   return {
     d: String(d.getDate()),
-    m: d.toLocaleDateString(locale, { month: "short" }).replace(".", "").toUpperCase(),
+    m: d.toLocaleDateString(intlLocale(locale), { month: "short" }).replace(".", "").toUpperCase(),
   }
 }

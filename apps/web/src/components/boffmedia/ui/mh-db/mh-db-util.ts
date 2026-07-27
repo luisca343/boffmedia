@@ -43,11 +43,13 @@ export const MH_COATINGS: Record<string, { label: string; color: string }> = {
   blast: { label: "Explosión", color: "#ff8a3d" },
   exhaust: { label: "Agotamiento", color: "#5fe3f0" },
 }
-export const MH_PHIALS: Record<string, { label: string; icon: IconName }> = {
-  impact: { label: "Vial de impacto", icon: "hammer" },
-  element: { label: "Vial elemental", icon: "flame" },
-  power: { label: "Vial de potencia", icon: "bolt" },
-  dragon: { label: "Vial dragón", icon: "flame" },
+// labels are chrome, resolved via t(`mhwilds.db.vial.${key}`) by the consuming
+// component — never call t() at module scope.
+export const MH_PHIALS: Record<string, { labelKey: string; icon: IconName }> = {
+  impact: { labelKey: "impact", icon: "hammer" },
+  element: { labelKey: "element", icon: "flame" },
+  power: { labelKey: "power", icon: "bolt" },
+  dragon: { labelKey: "dragon", icon: "flame" },
 }
 
 // resistance elements (colour + label) for armor set cards
@@ -60,7 +62,9 @@ export const MH_ELEMENTS: Record<string, { color: string; label: string; short: 
 }
 export const MH_RES_ORDER = ["fire", "water", "thunder", "ice", "dragon"]
 
-export const MH_ELDERSEAL: Record<string, string> = { low: "Bajo", average: "Medio", high: "Alto" }
+// values are chrome keys, resolved via t(`mhwilds.db.elderseal.${key}`) by the
+// consuming component — never call t() at module scope.
+export const MH_ELDERSEAL: Record<string, string> = { low: "low", average: "average", high: "high" }
 
 // ── types ────────────────────────────────────────────────────────────────────
 export interface MhSkill {

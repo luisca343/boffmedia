@@ -1,3 +1,4 @@
+import { getTranslations } from "next-intl/server"
 import { HubSidebar } from "./_components/HubSidebar"
 import { HubTopbar } from "./_components/HubTopbar"
 import { ProgressStrip } from "./_components/ProgressStrip"
@@ -6,7 +7,9 @@ import { RecentCard } from "./_components/RecentCard"
 import { StreakCard } from "./_components/StreakCard"
 import { GoalsCard } from "./_components/GoalsCard"
 
-export default function PokedexHub() {
+export default async function PokedexHub() {
+  const t = await getTranslations("pokedex")
+
   return (
     <div className="flex h-full">
       <HubSidebar />
@@ -26,7 +29,7 @@ export default function PokedexHub() {
 
         <div className="flex items-center justify-between px-3.5 py-2 text-[11px] text-pk-surface-500 font-pk-mono">
           <span>v2.4.0 · a9c12f3</span>
-          <span>905 indexados · 21 generables</span>
+          <span>{t("hub.footerCounts", { indexed: 905, generable: 21 })}</span>
         </div>
       </main>
     </div>

@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { cssVars } from "./utils"
 
@@ -41,7 +42,9 @@ export interface DkTrendProps {
 }
 
 /** Responsive progression chart: one or more lines + optional dashed baseline. */
-export function DkTrend({ lines, baseline, height = 170, className, ariaLabel = "Progresión" }: DkTrendProps) {
+export function DkTrend({ lines, baseline, height = 170, className, ariaLabel }: DkTrendProps) {
+  const t = useTranslations("common.dkExtras")
+  const label = ariaLabel ?? t("trendAria")
   const [ref, width] = useElementWidth<HTMLDivElement>()
   const padX = 8
   const padY = 12
@@ -73,7 +76,7 @@ export function DkTrend({ lines, baseline, height = 170, className, ariaLabel = 
   return (
     <div ref={ref} className={cn("w-full border border-solid border-line bg-base", className)}>
       {width > 0 && (
-        <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`} role="img" aria-label={ariaLabel}>
+        <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`} role="img" aria-label={label}>
           {baseline != null && (
             <line
               x1={padX}

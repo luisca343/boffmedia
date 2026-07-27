@@ -7,6 +7,10 @@ export interface ApiResponse<T = any> {
   // Spanish, explicitly user-facing — only present when a service set it on
   // purpose (via `userMessage` on the thrown exception body). Safe to render.
   userMessage?: string;
+  // Stable machine code (see @boffmedia/shared/error-codes) on errors that
+  // surface to a user. Translate it with useApiError(); `userMessage` is the
+  // fallback for codes the web does not know.
+  code?: string;
   data?: T;
   error?: string;
   success: boolean;
@@ -18,6 +22,7 @@ export interface ApiResponse<T = any> {
 export class ApiError extends Error {
   readonly statusCode: number;
   readonly userMessage?: string;
+  readonly code?: string;
   readonly envelope: ApiResponse<unknown>;
 
   constructor(envelope: ApiResponse<unknown>) {
@@ -25,8 +30,15 @@ export class ApiError extends Error {
     this.name = "ApiError";
     this.statusCode = envelope.statusCode;
     this.userMessage = envelope.userMessage;
+    this.code = envelope.code;
     this.envelope = envelope;
   }
+}
+
+// The server's error code, when the failure carried one. Prefer useApiError()
+// in components — this is for non-React call sites that only need the code.
+export function apiErrorCodeFrom(error: unknown): string | undefined {
+  return error instanceof ApiError ? error.code : undefined;
 }
 
 // Spanish-safe error text: the server's explicit user-facing message when one

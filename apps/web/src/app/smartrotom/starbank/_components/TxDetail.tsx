@@ -1,6 +1,6 @@
 "use client";
 import * as React from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import { Sheet, ContactAvatar, Chip, CategoryChip, Button, Ico } from "./ui";
 import { resolveCategory } from "../_utils/categories";
@@ -26,6 +26,7 @@ function DetailRow({ label, value, strong }: { label: string; value: React.React
 
 export function TxDetail({ tx, activeAccountId, onClose }: { tx: SBTransaction; activeAccountId: number; onClose: () => void }) {
   const t = useTranslations("starbank");
+  const locale = useLocale();
   const cat = resolveCategory(tx);
   const out = isOutgoing(tx, activeAccountId);
   return (
@@ -47,9 +48,9 @@ export function TxDetail({ tx, activeAccountId, onClose }: { tx: SBTransaction; 
       </div>
 
       <div className="flex flex-col gap-3 rounded-sb-md bg-sb-surface-2 p-[18px] text-[13px]">
-        <DetailRow label={t("txDetail.date")} value={fmtDate(tx.date, "long")} />
+        <DetailRow label={t("txDetail.date")} value={fmtDate(tx.date, "long", locale)} />
         <div className="h-px bg-sb-border" />
-        <DetailRow label={t("txDetail.time")} value={fmtTime(tx.date)} />
+        <DetailRow label={t("txDetail.time")} value={fmtTime(tx.date, locale)} />
         <div className="h-px bg-sb-border" />
         <DetailRow label={t("txDetail.balanceAfter")} value={formatMoney(balanceAfter(tx, activeAccountId))} strong />
         <div className="h-px bg-sb-border" />

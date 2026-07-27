@@ -200,10 +200,11 @@ export function MhHitzoneTable({ hitzones }: { hitzones: MhHitzone[] }) {
 
 // ── drops ─────────────────────────────────────────────────────────────────────
 export function MhDropChance({ chance, rare }: { chance: number; rare?: boolean }) {
+  const t = useTranslations("mhwilds.bestiary")
   const band = rare ? "rare" : chance >= 40 ? "hi" : chance >= 18 ? "mid" : "low"
   const col = { hi: "var(--ok)", mid: "var(--warn)", low: "var(--bad)", rare: "var(--rar8)" }[band]
   return (
-    <span className="inline-flex min-w-[96px] items-center gap-[7px]" title={chance + "% de probabilidad"}>
+    <span className="inline-flex min-w-[96px] items-center gap-[7px]" title={t("dropChancePct", { chance })}>
       <span className="h-[7px] flex-1 overflow-hidden border border-solid border-line bg-base-deep">
         <i className="block h-full" style={{ width: Math.max(6, Math.min(100, chance)) + "%", background: col }} />
       </span>
@@ -214,12 +215,14 @@ export function MhDropChance({ chance, rare }: { chance: number; rare?: boolean 
   )
 }
 
-const DROP_TYPES: Record<string, { label: string; icon: IconName }> = {
-  carve: { label: "Corte", icon: "sword" },
-  reward: { label: "Recompensa", icon: "gift" },
-  break: { label: "Rotura", icon: "hammer" },
-  investigation: { label: "Investigación", icon: "compass" },
-  track: { label: "Rastro", icon: "target" },
+// `labelKey`, not a literal: these resolve against `mhwilds.bestiary` in the
+// component. A module-scope t() would freeze whichever locale loaded first.
+const DROP_TYPES: Record<string, { labelKey: string; icon: IconName }> = {
+  carve: { labelKey: "dropCarve", icon: "sword" },
+  reward: { labelKey: "dropReward", icon: "gift" },
+  break: { labelKey: "dropBreak", icon: "hammer" },
+  investigation: { labelKey: "investigation", icon: "compass" },
+  track: { labelKey: "dropTrack", icon: "target" },
 }
 export interface MhRewardItem {
   name: string
@@ -231,13 +234,18 @@ export interface MhReward {
 }
 export function MhDropTable({ rewards }: { rewards: MhReward[] }) {
   const t = useTranslations("common.bestiary")
+  const tMh = useTranslations("mhwilds.bestiary")
   const rows: { item: MhRewardItem; cond: MhReward["conditions"][number]; rare: boolean }[] = []
   rewards.forEach((r) => r.conditions.forEach((c) => rows.push({ item: r.item, cond: c, rare: r.item.rarity >= 7 })))
   rows.sort((a, b) => b.cond.chance - a.cond.chance)
   return (
     <div className="flex flex-col gap-[5px]">
       {rows.map((row, i) => {
-        const dt = DROP_TYPES[row.cond.type] || { label: row.cond.type, icon: "gift" as IconName }
+        const meta = DROP_TYPES[row.cond.type]
+        // Unknown drop types fall back to the raw API value, which is data, not chrome.
+        const dt = meta
+          ? { label: tMh(meta.labelKey), icon: meta.icon }
+          : { label: row.cond.type, icon: "gift" as IconName }
         return (
           <div key={i} className={cn("grid grid-cols-[minmax(0,1.5fr)_auto_auto_minmax(96px,0.8fr)] items-center gap-3 border border-solid border-line bg-base-2 px-[11px] py-2", row.rare && "border-[color-mix(in_srgb,var(--rar8)_40%,var(--line))] bg-[color-mix(in_srgb,var(--rar8)_6%,var(--bg-2))]")}>
             <span className="flex min-w-0 items-center gap-2">

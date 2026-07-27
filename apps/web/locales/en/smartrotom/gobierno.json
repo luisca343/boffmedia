@@ -45,7 +45,12 @@
       "noResults": "No results",
       "activo": "Active",
       "inactivo": "Inactive",
-      "horaOficial": "Official time"
+      "horaOficial": "Official time",
+      "finalizado": "finished",
+      "you": "you",
+      "pagerSummary": "Page {page} of {totalPages} · {total} total",
+      "paginaAnterior": "Previous page",
+      "paginaSiguiente": "Next page"
     },
     "nav": {
       "inicio": "Home",
@@ -69,7 +74,18 @@
       "departamentos": "Departments",
       "plataformaCivica": "Civic platform",
       "sistemaOperativo": "Operating system · v1.0",
-      "ariaLabel": "Departments"
+      "ariaLabel": "Departments",
+      "zonas": "Districts",
+      "historial": "History",
+      "recompensas": "Bounties",
+      "apelaciones": "Appeals",
+      "jugadores": "Players",
+      "skinsNpc": "NPC skins",
+      "appsJugador": "Player apps",
+      "rendimiento": "Performance",
+      "actividad": "Activity",
+      "notificaciones": "Notifications",
+      "senalizacion": "Signage"
     },
     "header": {
       "title": "Government of Teras",
@@ -292,7 +308,11 @@
         "medium": "Medium",
         "high": "High",
         "critical": "Critical"
-      }
+      },
+      "casosAbiertos": "Open cases",
+      "casosAbiertosSub": "Each offender's reports, fines, wanted orders and appeals come together in a single case file.",
+      "mostrando": "Showing {shown} of {total} case files.",
+      "abriendo": "Opening…"
     },
     "poblacion": {
       "title": "Population",
@@ -327,7 +347,12 @@
       "placa": "Badge {badge}",
       "cesar": "Dismiss",
       "cesarConfirm": "Dismiss {username} from their position?",
-      "ostentaRoles": "Holds {count} government roles"
+      "ostentaRoles": "Holds {count} government roles",
+      "buscadoBadge": "Wanted",
+      "sinResidencia": "No residence",
+      "parcelasUnit": "plots",
+      "multasUnit": "fines",
+      "cesarAriaLabel": "Dismiss {username}"
     },
     "seguridad": {
       "patrullas": "Patrols",
@@ -398,7 +423,29 @@
       "acciones": "Actions",
       "cobrar": "Collect",
       "anular": "Cancel",
-      "denunciaRef": "· complaint #{id}"
+      "denunciaRef": "· complaint #{id}",
+      "multasKicker": "Treasury · Fines",
+      "multasSub": "Economic sanctions issued by the police and the administration. What is collected goes into the treasury.",
+      "mostrandoMultas": "Showing {shown} of {total} fines.",
+      "tabPagadas": "Paid",
+      "tabApeladas": "Appealed",
+      "cobroKicker": "Fine collection",
+      "cobroTitle": "Collect {code}",
+      "cobroBodyPrefix": "Will transfer",
+      "cobroBodySuffix": "from {username}'s StarBank account to the Treasury of Teras. If the player has insufficient funds, the collection will fail.",
+      "anulacionKicker": "Fine cancellation",
+      "anulacionTitle": "Void {code}",
+      "anulacionBodyPrefix": "The fine for",
+      "anulacionBodySuffix": "to {username} will be voided and can no longer be collected.",
+      "flujoCaja": "Cash flow",
+      "emptyFlujo": "No movements yet",
+      "emptyFlujoSub": "Treasury income and expenses will appear here as soon as there is activity in the ledger.",
+      "flujoCajaWeeks": "Cash flow · {count} weeks",
+      "flujoCajaAriaLabel": "Weekly treasury income and expenses",
+      "flujoCajaTooltip": "Week {label} · income +{ingreso} · expenses −{gasto}",
+      "gastoPublico": "Public spending",
+      "emptyGasto": "No spending recorded",
+      "emptyGastoSub": "Each department's public spending will appear here as it is recorded."
     },
     "justicia": {
       "apelaciones": "Appeals",
@@ -419,7 +466,8 @@
       "motivacion": "Resolution reasoning",
       "motivacionPlaceholder": "Explain the basis for the decision…",
       "confirmarAnulacion": "Confirm cancellation",
-      "confirmarResolucion": "Confirm resolution"
+      "confirmarResolucion": "Confirm resolution",
+      "resolviendo": "Resolving…"
     },
     "status": {
       "pending": "Pending",
@@ -491,7 +539,16 @@
       "emptyCarteles": "No saved signs",
       "emptyCartelesSub": "Signs you save will appear here.",
       "quitarDestino": "Remove destination",
-      "eliminarCartel": "Delete sign {name}"
+      "eliminarCartel": "Delete sign {name}",
+      "roadAutopista": "Highway",
+      "roadNacional": "National road",
+      "roadComarcal": "Regional road",
+      "roadRural": "Rural road",
+      "dirRecto": "↑ Straight",
+      "dirIzquierda": "← Left",
+      "dirDerecha": "→ Right",
+      "dirSalida": "↓ Exit",
+      "destNombre": "Name"
     },
     "jugadores": {
       "kicker": "Administration · Directory",
@@ -547,7 +604,8 @@
       "colores": "Colors",
       "estilos": "Styles",
       "resultado": "Result",
-      "crearVozBtn": "Create voice"
+      "crearVozBtn": "Create voice",
+      "vistaPreviaDefault": "Preview"
     },
     "actividad": {
       "kicker": "Administration · Technical audit",
@@ -568,7 +626,9 @@
       "objetivo": "Target",
       "departamento": "Department",
       "fuente": "Source",
-      "estado": "Status"
+      "estado": "Status",
+      "sistema": "System",
+      "enVivoBtn": "Live"
     },
     "skins": {
       "kicker": "Administration · Resources",
@@ -590,7 +650,10 @@
       "npcsUsan": "NPCs using it",
       "npcsPlaceholder": "Prof. Oak, Lab assistant",
       "editarSkin": "Edit «{name}»",
-      "face": "2D"
+      "face": "2D",
+      "tagFace": "2d",
+      "tagCabeza": "head",
+      "tagCuerpo": "body"
     },
     "apps": {
       "kicker": "Administration · Devices",
@@ -729,7 +792,9 @@
       "transfirió": "{from} transferred to",
       "adjudico": "The municipality awarded to",
       "actual": "Current",
-      "sinRegistrar": "Unregistered"
+      "sinRegistrar": "Unregistered",
+      "zona": "District",
+      "vacanteTitle": "Vacant"
     },
     "eventos": {
       "convocarEvento": "Create event",
@@ -893,7 +958,18 @@
       "nuevaCazaTitulo": "New bug hunt",
       "nuevoRetoTitulo": "New building challenge",
       "previewBrief": "Describe the challenge the towns should build here…",
-      "especiesLabel": "Species"
+      "especiesLabel": "Species",
+      "listKicker": "Government · Civic activity",
+      "listSub": "Community events in Teras: building challenges rated by the citizenry and bug hunts with public parameters. Organised by the town hall.",
+      "listEmptyTitle": "No events called yet",
+      "listEmptySub": "Call a building challenge or a bug hunt for the citizens of Teras to take part in.",
+      "statActivos": "Active events",
+      "statActivosSub": "running now",
+      "statRetos": "Building challenges",
+      "statCacerias": "Bug hunts",
+      "statCapturasSub": "in active hunts",
+      "statProximos": "Upcoming",
+      "statHistorial": "History"
     },
     "dossier": {
       "ariaDialog": "Citizen case file",
@@ -983,6 +1059,106 @@
     },
     "chrome": {
       "servicioInterno": "Internal service · {code}"
+    },
+    "dep": {
+      "resumen": "Overview",
+      "urbanismo": "Planning",
+      "seguridad": "Security",
+      "hacienda": "Treasury",
+      "justicia": "Justice",
+      "poblacion": "Population",
+      "gobierno": "Government",
+      "admin": "Administration"
+    },
+    "multaStatus": {
+      "paid": "Paid",
+      "cancelled": "Voided",
+      "appealed": "Appealed"
+    },
+    "buscadoStatus": {
+      "active": "Wanted",
+      "resolved": "Captured",
+      "cancelled": "Voided"
+    },
+    "apelacionStatus": {
+      "upheld": "Dismissed",
+      "overturned": "Upheld"
+    },
+    "subastaStatus": {
+      "live": "Live",
+      "closed": "Closed",
+      "cancelled": "Voided"
+    },
+    "parcelaStatus": {
+      "ocupada": "Occupied",
+      "vacante": "Vacant",
+      "embargada": "Seized",
+      "subasta": "At auction"
+    },
+    "standing": {
+      "bueno": "Good",
+      "observado": "Under watch",
+      "sancionado": "Sanctioned"
+    },
+    "denunciaCategory": {
+      "griefing": "Griefing",
+      "theft": "Theft",
+      "dispute": "Dispute",
+      "harassment": "Harassment",
+      "other": "Other"
+    },
+    "zonaKindDesc": {
+      "residencial": "Residential use. Free building within municipal regulations.",
+      "comercial": "Shops and trade. Public chests protected, licence required.",
+      "civico": "Public buildings and services. Full municipal protection.",
+      "industrial": "Workshops, resource farms and warehouses. Machinery allowed.",
+      "agricola": "Crops and orchards. No high-rise building."
+    },
+    "ranks": {
+      "funcionario": "Civil servant"
+    },
+    "accents": {
+      "civic": "Municipal green",
+      "navy": "Institutional blue",
+      "burgundy": "Burgundy",
+      "gold": "Heraldic gold"
+    },
+    "apelaciones": {
+      "kicker": "Justice · Appeals",
+      "sub": "Appeals filed by citizens contesting a fine. Review the arguments and resolve.",
+      "mostrando": "Showing {shown} of {total} appeals.",
+      "emptyTitle": "No appeals filed",
+      "emptySub": "Appeals contesting a fine will appear here for review."
+    },
+    "mapa": {
+      "titulo": "Map of the Teras region",
+      "resumenCatastral": "Land registry summary",
+      "municipiosCount": "{count, plural, one {# town} other {# towns}}",
+      "zonasCount": "{count, plural, one {# district} other {# districts}}",
+      "instrucciones": "Tap a district or a plot on the map to see its record. Use the switch to show or hide the planning districts.",
+      "sinParcelas": "No plots registered yet.",
+      "usoSueloZonas": "Land use · districts",
+      "sinParcelasUbicables": "No locatable plots",
+      "sinParcelasUbicablesSub": "No plots whose WorldGuard region could be resolved yet.",
+      "ocultarZonas": "Hide planning districts",
+      "mostrarZonas": "Show planning districts",
+      "zonasBtn": "Districts",
+      "cargandoCatastro": "Loading the land registry…",
+      "legendOcupada": "Occupied",
+      "legendVacante": "Vacant",
+      "legendBuscado": "Wanted",
+      "legendZona": "District",
+      "cerrarFichaParcela": "Close plot record",
+      "parcelaVacante": "Vacant plot",
+      "sinSubastaAbierta": "No auction open",
+      "titularidad": "Ownership",
+      "sinCambiosTitularidad": "No ownership changes recorded.",
+      "cerrarFichaZona": "Close district record",
+      "parcelasDeZona": "Plots in this district",
+      "sinParcelasResueltas": "No resolved plots for this district on the map."
+    },
+    "ui": {
+      "sealAriaLabel": "Seal of the Government of Teras"
     }
   }
 }

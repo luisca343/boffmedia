@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { Icon, type IconName } from "@/components/boffmedia/primitives"
 import { MEW, MEW_KIND_LABEL, MEW_TOKEN_ICON, mewHueFor, mewHuman, mewIsRawKey, mewMonogram, mewParseText, mewTokenLabel, type MewRec } from "./mew-util"
@@ -113,9 +114,10 @@ export function MewStats({ stats, max = 10 }: { stats?: Record<string, number>; 
 }
 
 export function MewRef({ id, label, icon, count }: { id: string; cat?: string; label?: string; icon?: IconName; count?: number }) {
+  const t = useTranslations("mewgenics")
   const name = label || mewHuman(id)
   return (
-    <span className="inline-flex items-center gap-[5px] border-[1.5px] border-dashed border-[color:var(--mwp-ink-line)] bg-[color:var(--mwp-paper-2)] px-[9px] pb-1 pt-[5px] text-[12px]/[1.15] font-semibold text-[color:var(--mwp-ink-soft)] [font-family:var(--mwf-hand)] [border-radius:var(--wob-sm)]" title="Sin ficha en la base de datos">
+    <span className="inline-flex items-center gap-[5px] border-[1.5px] border-dashed border-[color:var(--mwp-ink-line)] bg-[color:var(--mwp-paper-2)] px-[9px] pb-1 pt-[5px] text-[12px]/[1.15] font-semibold text-[color:var(--mwp-ink-soft)] [font-family:var(--mwf-hand)] [border-radius:var(--wob-sm)]" title={t("label.noRef")}>
       {icon && <Icon name={icon} size={12} className="flex-none text-[color:var(--mwp-ink-soft)]" />}
       <span className="min-w-0">{name}</span>
       {count != null && <span className="pl-[3px] font-mono text-[9px]/none font-bold text-[color:var(--mwp-ink-soft)]">{count}</span>}

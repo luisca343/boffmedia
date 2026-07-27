@@ -309,6 +309,8 @@
         "sources": "Available sources",
         "sourceActive": "Active",
         "sourceInactive": "Unavailable",
+        "sourceNovelcoolDesc": "Manga and manhwa in Spanish",
+        "sourcePkprojectDesc": "Pokémon Adventures",
         "tunnel": "Browser tunnel",
         "tunnelDesc": "Use a remote browser (tunnel) for scraping",
         "search": "Search series",

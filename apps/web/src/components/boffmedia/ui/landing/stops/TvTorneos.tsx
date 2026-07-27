@@ -10,9 +10,11 @@ import { CTA_ROW, GLARE, HUD_FRAME, PRI_GLOW, TvCountdown } from "../landing-sha
 import { TV3_EVENT } from "../landing-data"
 import { useGetEvents } from "@/hooks/events/useGetEvents"
 import type { EventLike } from "@/components/boffmedia/ui/events"
+import { useFormat } from "@/lib/useFormat"
 
 export function TvTorneos() {
   const t = useTranslations("boffmedia.landing.torneos")
+  const { intlLocale } = useFormat()
   const { events } = useGetEvents()
   // Real next upcoming event feeds the header + countdown; falls back to the
   // editorial placeholder while events load or if none are scheduled.
@@ -29,11 +31,12 @@ export function TvTorneos() {
     )
   }, [events])
 
-  const title = next?.title ?? TV3_EVENT.title
+  // `next.title` is DB content (a real tournament name); only the fallback is chrome.
+  const title = next?.title ?? t("fallbackTitle")
   const eventTs = next ? new Date(next.startDate).getTime() : undefined
   const dateStr = next
-    ? `${new Date(next.startDate).toLocaleDateString("es-ES", { day: "numeric", month: "short" }).replace(".", "").toUpperCase()} · ${new Date(next.startDate).toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" })}`
-    : TV3_EVENT.date
+    ? `${new Date(next.startDate).toLocaleDateString(intlLocale, { day: "numeric", month: "short" }).replace(".", "").toUpperCase()} · ${new Date(next.startDate).toLocaleTimeString(intlLocale, { hour: "2-digit", minute: "2-digit" })}`
+    : t("fallbackDate")
 
   return (
     <TvCP

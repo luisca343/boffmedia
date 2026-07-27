@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { useTranslations } from "next-intl"
 import {
   Bar,
   Button,
@@ -29,7 +30,7 @@ import {
   Thumbtack,
   WaxSeal,
 } from "@/app/smartrotom/misiones/_components/ui"
-import { SEAL_STATUSES, STATUS_LABEL } from "@/app/smartrotom/misiones/_utils/status"
+import { SEAL_STATUSES, STATUS_LABEL_KEY } from "@/app/smartrotom/misiones/_utils/status"
 import { Sample, Section } from "../showcase-shared"
 
 // The same little nav from `SideRail`, worn as six different skins. Leather
@@ -72,6 +73,7 @@ const SEAL_SWATCHES = [
 ] as const
 
 export function MsPrimitivasChapter() {
+  const t = useTranslations("misiones")
   const [chip, setChip] = React.useState("ACTIVE")
 
   return (
@@ -86,7 +88,7 @@ export function MsPrimitivasChapter() {
           {SEAL_STATUSES.map((status) => (
             <div key={status} className="flex flex-col items-center gap-2">
               <WaxSeal status={status} size={58} />
-              <Label>{STATUS_LABEL[status]}</Label>
+              <Label>{t(STATUS_LABEL_KEY[status])}</Label>
             </div>
           ))}
         </Sample>
@@ -147,7 +149,7 @@ export function MsPrimitivasChapter() {
         <Sample app="ms" title="Fichas" code="<Chip active />">
           {SEAL_STATUSES.map((status) => (
             <Chip key={status} active={chip === status} onClick={() => setChip(status)}>
-              {STATUS_LABEL[status]}
+              {t(STATUS_LABEL_KEY[status])}
             </Chip>
           ))}
         </Sample>

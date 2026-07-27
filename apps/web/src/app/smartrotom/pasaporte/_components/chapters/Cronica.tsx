@@ -1,6 +1,6 @@
 // PAPER. The trainer's life on the server, in order.
 
-import { useTranslations } from "next-intl"
+import { useLocale, useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import type { Milestone } from "../../_types"
 import { chapterInk } from "../../_utils/chapters"
@@ -9,6 +9,7 @@ import { EmptyState, Icon, PageHead, Skeleton } from "../ui"
 
 export function Cronica({ milestones, loading }: { milestones: Milestone[]; loading: boolean }) {
   const t = useTranslations("pasaporte")
+  const locale = useLocale()
 
   if (loading) {
     return (
@@ -39,7 +40,7 @@ export function Cronica({ milestones, loading }: { milestones: Milestone[]; load
 
       <ol className="relative py-0.5">
         {shown.map((milestone, i) => {
-          const date = timelineDate(milestone.date)
+          const date = timelineDate(milestone.date, locale)
           // The accent is a NAME on the milestone; the ink comes from the literal token map,
           // never from an interpolated class (§4).
           const ink = chapterInk(milestone.accent).accent

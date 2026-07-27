@@ -1,0 +1,16 @@
+{
+  "liga": {
+    "nav": {
+      "camaraLucha": "Camara Lucha"
+    },
+    "gyms": {
+      "title": "Gyms"
+    },
+    "tournaments": {
+      "title": "Tournaments"
+    },
+    "replay": {
+      "loading": "Loading..."
+    }
+  }
+}

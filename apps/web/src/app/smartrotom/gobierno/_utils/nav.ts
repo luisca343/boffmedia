@@ -4,7 +4,8 @@ import type { Department } from "./tones"
 export type NavItem = {
   /** Route segment under /smartrotom/gobierno. `""` is the index. */
   slug: string
-  label: string
+  /** Key under the `gobierno` namespace — resolved with `t()` at the call site. */
+  labelKey: string
   icon: IconName
   /** Which pending-count feeds this item's badge, if any. */
   counter?: "denuncias" | "buscados" | "multas" | "apelaciones"
@@ -12,7 +13,8 @@ export type NavItem = {
 
 export type NavGroup = {
   dep: Department
-  label: string
+  /** Key under the `gobierno` namespace — resolved with `t()` at the call site. */
+  labelKey: string
   /** Administración additionally requires ROTOM_ADMIN — the GOBIERNO role is not enough. */
   restricted?: boolean
   items: NavItem[]
@@ -21,78 +23,78 @@ export type NavGroup = {
 export const NAV_GROUPS: NavGroup[] = [
   {
     dep: "resumen",
-    label: "Resumen",
+    labelKey: "dep.resumen",
     items: [
-      { slug: "", label: "Inicio", icon: "home" },
-      { slug: "mapa", label: "Mapa", icon: "map" },
+      { slug: "", labelKey: "nav.inicio", icon: "home" },
+      { slug: "mapa", labelKey: "nav.mapa", icon: "map" },
     ],
   },
   {
     dep: "urbanismo",
-    label: "Urbanismo",
+    labelKey: "dep.urbanismo",
     items: [
-      { slug: "parcelas", label: "Parcelas", icon: "mapPin" },
-      { slug: "zonas", label: "Zonas", icon: "layers" },
-      { slug: "subastas", label: "Subastas", icon: "gavel" },
-      { slug: "historial", label: "Historial", icon: "history" },
+      { slug: "parcelas", labelKey: "nav.parcelas", icon: "mapPin" },
+      { slug: "zonas", labelKey: "nav.zonas", icon: "layers" },
+      { slug: "subastas", labelKey: "nav.subastas", icon: "gavel" },
+      { slug: "historial", labelKey: "nav.historial", icon: "history" },
     ],
   },
   {
     dep: "seguridad",
-    label: "Seguridad",
+    labelKey: "dep.seguridad",
     items: [
-      { slug: "denuncias", label: "Denuncias", icon: "fileText", counter: "denuncias" },
-      { slug: "buscados", label: "Buscados", icon: "alert", counter: "buscados" },
-      { slug: "patrullas", label: "Patrullas", icon: "shield" },
-      { slug: "recompensas", label: "Recompensas", icon: "star" },
+      { slug: "denuncias", labelKey: "nav.denuncias", icon: "fileText", counter: "denuncias" },
+      { slug: "buscados", labelKey: "nav.buscados", icon: "alert", counter: "buscados" },
+      { slug: "patrullas", labelKey: "nav.patrullas", icon: "shield" },
+      { slug: "recompensas", labelKey: "nav.recompensas", icon: "star" },
     ],
   },
   {
     dep: "hacienda",
-    label: "Hacienda",
+    labelKey: "dep.hacienda",
     items: [
-      { slug: "multas", label: "Multas", icon: "gavel", counter: "multas" },
-      { slug: "tesoreria", label: "Tesorería", icon: "coins" },
+      { slug: "multas", labelKey: "nav.multas", icon: "gavel", counter: "multas" },
+      { slug: "tesoreria", labelKey: "nav.tesoreria", icon: "coins" },
     ],
   },
   {
     dep: "justicia",
-    label: "Justicia",
+    labelKey: "dep.justicia",
     items: [
-      { slug: "expedientes", label: "Expedientes", icon: "folder" },
-      { slug: "apelaciones", label: "Apelaciones", icon: "scale", counter: "apelaciones" },
+      { slug: "expedientes", labelKey: "nav.expedientes", icon: "folder" },
+      { slug: "apelaciones", labelKey: "nav.apelaciones", icon: "scale", counter: "apelaciones" },
     ],
   },
   {
     dep: "poblacion",
-    label: "Población",
+    labelKey: "dep.poblacion",
     items: [
-      { slug: "censo", label: "Censo", icon: "users" },
-      { slug: "oficiales", label: "Oficiales", icon: "badge" },
+      { slug: "censo", labelKey: "nav.censo", icon: "users" },
+      { slug: "oficiales", labelKey: "nav.oficiales", icon: "badge" },
     ],
   },
   {
     dep: "gobierno",
-    label: "Gobierno",
+    labelKey: "dep.gobierno",
     items: [
-      { slug: "eventos", label: "Eventos", icon: "star" },
-      { slug: "anuncios", label: "Anuncios", icon: "megaphone" },
-      { slug: "auditoria", label: "Auditoría", icon: "list" },
+      { slug: "eventos", labelKey: "nav.eventos", icon: "star" },
+      { slug: "anuncios", labelKey: "nav.anuncios", icon: "megaphone" },
+      { slug: "auditoria", labelKey: "nav.auditoria", icon: "list" },
     ],
   },
   {
     dep: "admin",
-    label: "Administración",
+    labelKey: "dep.admin",
     restricted: true,
     items: [
-      { slug: "admin/jugadores", label: "Jugadores", icon: "users" },
-      { slug: "admin/megafonia", label: "Megafonía", icon: "megaphone" },
-      { slug: "admin/notificaciones", label: "Notificaciones", icon: "bell" },
-      { slug: "admin/senalizacion", label: "Señalización", icon: "signal" },
-      { slug: "admin/skins", label: "Skins NPC", icon: "eye" },
-      { slug: "admin/apps", label: "Apps de jugador", icon: "command" },
-      { slug: "admin/rendimiento", label: "Rendimiento", icon: "zap" },
-      { slug: "admin/actividad", label: "Actividad", icon: "list" },
+      { slug: "admin/jugadores", labelKey: "nav.jugadores", icon: "users" },
+      { slug: "admin/megafonia", labelKey: "nav.megafonia", icon: "megaphone" },
+      { slug: "admin/notificaciones", labelKey: "nav.notificaciones", icon: "bell" },
+      { slug: "admin/senalizacion", labelKey: "nav.senalizacion", icon: "signal" },
+      { slug: "admin/skins", labelKey: "nav.skinsNpc", icon: "eye" },
+      { slug: "admin/apps", labelKey: "nav.appsJugador", icon: "command" },
+      { slug: "admin/rendimiento", labelKey: "nav.rendimiento", icon: "zap" },
+      { slug: "admin/actividad", labelKey: "nav.actividad", icon: "list" },
     ],
   },
 ]
@@ -103,5 +105,5 @@ export const hrefOf = (slug: string): string => (slug ? `${GOBIERNO_ROOT}/${slug
 
 /** Every module as one flat list — what the command palette searches. */
 export const FLAT_MODULES = NAV_GROUPS.flatMap((g) =>
-  g.items.map((it) => ({ ...it, dep: g.dep, group: g.label, restricted: g.restricted ?? false })),
+  g.items.map((it) => ({ ...it, dep: g.dep, groupKey: g.labelKey, restricted: g.restricted ?? false })),
 )

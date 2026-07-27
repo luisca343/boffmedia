@@ -87,14 +87,95 @@
     },
     "eventsPanel": {
       "title": "Eventos",
-      "empty": "Sin eventos activos"
+      "empty": "Sin eventos activos",
+      "activeCount": "{count, plural, one {# activo} other {# activos}}",
+      "liveEvents": "Eventos en directo",
+      "endingSoon": "Próximos a terminar",
+      "hot": "Popular",
+      "go": "Ir",
+      "featuredNow": "Destacado ahora",
+      "endsIn": "Termina en {time}",
+      "travelTo": "Viajar a {name}"
     },
     "presence": {
-      "online": "{count, plural, =0 {Nadie} one {# jugador} other {# jugadores}} en esta parada"
+      "online": "{count, plural, =0 {Nadie} one {# jugador} other {# jugadores}} en esta parada",
+      "onlineCount": "{count} en línea",
+      "happyHourTitle": "Hora feliz · −{percent}% en todos los viajes",
+      "happyHourSub": "Descuento aplicado automáticamente al pagar"
     },
     "rewards": {
       "title": "Recompensas",
-      "empty": "Sin recompensas disponibles"
-    }
+      "empty": "Sin recompensas disponibles",
+      "groupTrip": "Viaje en grupo",
+      "passengers": "· {count, plural, one {# pasajero} other {# pasajeros}}",
+      "groupExtra": "+{amount} por tu party",
+      "bringParty": "Lleva a tu party ({count} en línea)",
+      "online": "en línea",
+      "offline": "desconectado",
+      "member": "Socio {tier}",
+      "frequentProgram": "Programa Pasajero Frecuente",
+      "perTrip": "en cada viaje",
+      "tripsToNext": "{count, plural, one {# viaje para {tier}} other {# viajes para {tier}}}",
+      "maxLevel": "Nivel máximo alcanzado",
+      "streakDays": "{count, plural, one {# día} other {# días}}",
+      "activeStreak": "Racha activa",
+      "freeTrip": "Viaje gratis",
+      "achieved": "Logrado",
+      "bonus": "+{count} bonus",
+      "noBonus": "sin bonus"
+    },
+    "countdown": {
+      "endingNow": "termina ya",
+      "minutes": "{minutes} min",
+      "hours": "{hours} h",
+      "hoursMinutes": "{hours} h {minutes} m"
+    },
+    "errors": {
+      "noPlayerPosition": "Sin posición del jugador",
+      "loginRequired": "Necesitas iniciar sesión para viajar",
+      "chargeFailed": "No se pudo cobrar el viaje",
+      "teleportFailedAfterCharge": "Se cobró el viaje pero el teletransporte falló. Contacta con soporte.",
+      "tripFailed": "No se pudo completar el viaje"
+    },
+    "compass": {
+      "n": "N",
+      "ne": "NE",
+      "e": "E",
+      "se": "SE",
+      "s": "S",
+      "so": "SO",
+      "o": "O",
+      "no": "NO"
+    },
+    "map": {
+      "north": "N",
+      "zoomIn": "Acercar",
+      "zoomOut": "Alejar",
+      "recenter": "Centrar en ti",
+      "scale": "{blocks} bloques",
+      "you": "TÚ",
+      "destination": "Destino {name}",
+      "goTo": "Ir a {name}"
+    },
+    "searchBar": {
+      "placeholderPh": "Buscar destino o zona…",
+      "search": "Buscar destino",
+      "clear": "Limpiar búsqueda",
+      "sortFarthest": "Ordenar por más lejano",
+      "sortNearest": "Ordenar por más cercano",
+      "nearestFirst": "Más cercano primero",
+      "farthestFirst": "Más lejano primero"
+    },
+    "modal": {
+      "close": "Cerrar"
+    },
+    "eventTypes": {
+      "gym": "Gimnasio",
+      "market": "Mercado",
+      "raid": "Incursión",
+      "social": "Social",
+      "boss": "Jefe"
+    },
+    "arrived": "¡Has llegado a <b>{name}</b>!"
   }
 }

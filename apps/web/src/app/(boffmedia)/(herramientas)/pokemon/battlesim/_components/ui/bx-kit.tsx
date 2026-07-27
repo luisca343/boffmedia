@@ -5,6 +5,7 @@
 // only; callers own data + choices. Sprites resolve through the shared
 // `spriteUrl` used by every other v3 Pokémon tool.
 import * as React from "react"
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { Icon } from "@/components/boffmedia/primitives"
 import { DkSprite } from "@/components/boffmedia/ui/tools/datakit"
@@ -77,7 +78,8 @@ export function BxBoost({ stat, value }: { stat: string; value: number }) {
 }
 
 export function BxTera({ type, size = "1em" }: { type: string; size?: string }) {
-  return <span style={{ ...tyc(tyColor(type)), fontSize: size }} title={"Teratipo " + tyLabel(type)}
+  const t = useTranslations("battlesim")
+  return <span style={{ ...tyc(tyColor(type)), fontSize: size }} title={t("bx.teraTypeTitle", { type: tyLabel(type) })}
     className="flex-none leading-none [color:var(--tyc)] [text-shadow:0_0_8px_color-mix(in_srgb,var(--tyc)_65%,transparent)]">◆</span>
 }
 
@@ -157,6 +159,7 @@ export function BxKey({ move, hotkey, target = null, selected = false, disabled 
   move: BxMove; hotkey?: string | number; target?: BxMon | null; selected?: boolean; disabled?: boolean; tera?: boolean
   onClick?: () => void; onHover?: () => void; onLeave?: () => void
 }) {
+  const t = useTranslations("battlesim")
   const off = disabled || move.pp <= 0
   const effTag = move.cat !== "status" && target ? effLabel(effMult(move.type, target.tera && target.teraType ? [target.teraType] : target.types)) : null
   return (
@@ -176,7 +179,7 @@ export function BxKey({ move, hotkey, target = null, selected = false, disabled 
         </span>
         <span className="flex flex-wrap items-center gap-[7px]">
           <BxType type={move.type} small /><BxCat cat={move.cat} />
-          {move.spread && <i className="border border-dashed border-line-2 px-1 py-[2px] font-mono text-[8.5px] font-semibold not-italic leading-none tracking-[0.08em] text-txt-dim">{move.spread === "all" ? "ÁREA · TODOS" : "ÁREA"}</i>}
+          {move.spread && <i className="border border-dashed border-line-2 px-1 py-[2px] font-mono text-[8.5px] font-semibold not-italic leading-none tracking-[0.08em] text-txt-dim">{move.spread === "all" ? t("bx.spreadAllTag") : t("bx.spreadTag")}</i>}
           {(move.prio ?? 0) > 0 && <i className="border border-dashed border-[color-mix(in_srgb,var(--ok)_45%,transparent)] px-1 py-[2px] font-mono text-[8.5px] font-semibold not-italic leading-none tracking-[0.08em] text-ok">+{move.prio}</i>}
         </span>
       </span>
@@ -196,6 +199,7 @@ export function BxKey({ move, hotkey, target = null, selected = false, disabled 
 export function BxBench({ mon, hotkey, disabled = false, reserved = false, onClick }: {
   mon: BxMon; hotkey?: string | number; disabled?: boolean; reserved?: boolean; onClick?: () => void
 }) {
+  const t = useTranslations("battlesim")
   const pct = mon.fnt ? 0 : mon.hp
   return (
     <button type="button" disabled={disabled || mon.fnt} onClick={onClick} style={{ clipPath: CUT }}
@@ -207,7 +211,7 @@ export function BxBench({ mon, hotkey, disabled = false, reserved = false, onCli
       <span className="grid min-w-0 flex-1 gap-1">
         <span className="flex items-center gap-[6px] font-display text-[12.5px] font-bold uppercase leading-none tracking-[0.03em]">
           {mon.name}<BxStatus status={mon.status} />
-          {reserved && <i className="font-mono text-[8px] font-bold not-italic leading-none tracking-[0.1em] text-accent-bright">ELEGIDO</i>}
+          {reserved && <i className="font-mono text-[8px] font-bold not-italic leading-none tracking-[0.1em] text-accent-bright">{t("bx.chosen")}</i>}
         </span>
         <span className="h-[5px] overflow-hidden border border-solid border-line bg-base"><i className="block h-full transition-[width]" style={{ width: pct + "%", background: hpTone(pct) }} /></span>
         <BxTypeRow types={mon.types} small />
@@ -220,27 +224,29 @@ export function BxBench({ mon, hotkey, disabled = false, reserved = false, onCli
 export function BxTeraBtn({ type, armed = false, used = false, onToggle, hotkey }: {
   type: string; armed?: boolean; used?: boolean; onToggle?: () => void; hotkey?: string | number
 }) {
+  const t = useTranslations("battlesim")
   return (
     <button type="button" disabled={used} onClick={onToggle} style={{ ...tyc(tyColor(type)), clipPath: "polygon(4px 0,100% 0,calc(100% - 4px) 100%,0 100%)" }}
-      title={used ? "Teracristal ya usado en este combate" : "Teracristalizar este turno"}
+      title={used ? t("bx.teraUsedTitle") : t("bx.teraArmTitle")}
       className={cn("inline-flex items-center gap-2 border border-solid border-line-2 bg-panel px-3 py-2 font-mono text-[10.5px] font-semibold uppercase leading-none tracking-[0.06em] text-txt-muted transition-[border-color,color,box-shadow]",
         "hover:border-[color-mix(in_srgb,var(--tyc)_60%,transparent)] hover:text-txt",
         armed && "border-[var(--tyc)] text-txt [box-shadow:0_0_12px_color-mix(in_srgb,var(--tyc)_35%,transparent),inset_0_0_12px_color-mix(in_srgb,var(--tyc)_12%,transparent)]",
         used && "cursor-not-allowed opacity-45")}>
       {hotkey != null && <BxKbd>{hotkey}</BxKbd>}
       <BxTera type={type} size="1.02em" />
-      <span>{used ? "Tera usado" : armed ? `Tera ${tyLabel(type)} ✓` : `Tera ${tyLabel(type)}`}</span>
+      <span>{used ? t("bx.teraUsedLabel") : armed ? t("bx.teraArmedLabel", { type: tyLabel(type) }) : t("bx.teraLabel", { type: tyLabel(type) })}</span>
     </button>
   )
 }
 
 /* ── Turn ring ───────────────────────────────────────────────────────────── */
 export function BxRing({ sec, max = 45, size = 50 }: { sec: number; max?: number; size?: number }) {
+  const t = useTranslations("battlesim")
   const r = (size - 6) / 2, c = 2 * Math.PI * r
   const frac = Math.max(0, Math.min(1, sec / max))
   const low = sec <= 10
   return (
-    <span role="timer" aria-label={sec + " segundos"} className="relative inline-grid flex-none place-items-center" style={{ width: size, height: size }}>
+    <span role="timer" aria-label={t("bx.timerAria", { sec })} className="relative inline-grid flex-none place-items-center" style={{ width: size, height: size }}>
       <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className="absolute inset-0">
         <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="var(--line)" strokeWidth="4" />
         <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke={low ? "var(--bad)" : "var(--accent)"} strokeWidth="4" strokeLinecap="round"
@@ -254,6 +260,7 @@ export function BxRing({ sec, max = 45, size = 50 }: { sec: number; max?: number
 
 /* ── Log tick + region ───────────────────────────────────────────────────── */
 export function BxTick({ ev }: { ev: BxTickEv }) {
+  const t = useTranslations("battlesim")
   if (ev.turn != null) {
     return (
       <div className="flex items-center gap-[10px] pb-1 pt-[10px]">
@@ -277,8 +284,8 @@ export function BxTick({ ev }: { ev: BxTickEv }) {
       {(ev.dmg || ev.eff) && (
         <span className="ml-auto inline-flex flex-none gap-1">
           {ev.dmg && <b className="bg-bad-soft px-1 py-[3px] font-mono text-[10px] font-bold leading-none text-bad">{ev.dmg}</b>}
-          {ev.eff === "super" && <b className="font-mono text-[8.5px] font-bold leading-[1.2] tracking-[0.06em] text-ok">¡EFICAZ!</b>}
-          {ev.eff === "weak" && <b className="font-mono text-[8.5px] font-semibold leading-[1.2] text-txt-dim">resistido</b>}
+          {ev.eff === "super" && <b className="font-mono text-[8.5px] font-bold leading-[1.2] tracking-[0.06em] text-ok">{t("bx.effective")}</b>}
+          {ev.eff === "weak" && <b className="font-mono text-[8.5px] font-semibold leading-[1.2] text-txt-dim">{t("bx.resisted")}</b>}
         </span>
       )}
     </div>
@@ -286,6 +293,7 @@ export function BxTick({ ev }: { ev: BxTickEv }) {
 }
 
 export function BxLog({ log, className }: { log: BxTickEv[]; className?: string }) {
+  const t = useTranslations("battlesim")
   const ref = React.useRef<HTMLDivElement>(null)
   const pinned = React.useRef(true)
   React.useEffect(() => {
@@ -297,7 +305,7 @@ export function BxLog({ log, className }: { log: BxTickEv[]; className?: string 
     if (el) pinned.current = el.scrollHeight - el.scrollTop - el.clientHeight < 40
   }
   return (
-    <div ref={ref} role="log" aria-label="Registro del combate" onScroll={onScroll}
+    <div ref={ref} role="log" aria-label={t("bx.logAria")} onScroll={onScroll}
       className={cn("grid content-start gap-[2px] overflow-y-auto pr-1", className)}>
       {log.map((ev, i) => <BxTick key={i} ev={ev} />)}
     </div>
@@ -308,6 +316,7 @@ export function BxLog({ log, className }: { log: BxTickEv[]; className?: string 
 export function BxScore({ name, handle, rating, av, team = [], right = false, tag }: {
   name: string; handle?: string; rating?: string | number; av: string; team?: BxTeamHP[]; right?: boolean; tag?: string
 }) {
+  const t = useTranslations("battlesim")
   return (
     <div className={cn("flex min-w-0 items-center gap-[10px]", right && "flex-row-reverse text-right")}>
       <span style={{ clipPath: "polygon(0 0,100% 0,100% calc(100% - 8px),calc(100% - 8px) 100%,0 100%)" }}
@@ -319,7 +328,7 @@ export function BxScore({ name, handle, rating, av, team = [], right = false, ta
         </b>
         <small className="truncate font-mono text-[10px] font-medium leading-[1.2] tracking-[0.04em] text-txt-dim">{handle ? handle + " · " : ""}{rating}</small>
       </span>
-      <span aria-label="Estado del equipo" className={cn("flex gap-1", right ? "ml-0 mr-1" : "ml-1")}>
+      <span aria-label={t("bx.teamStatusAria")} className={cn("flex gap-1", right ? "ml-0 mr-1" : "ml-1")}>
         {team.map((m, i) => <i key={i} title={m.name} className={cn("h-2 w-2 [clip-path:polygon(50%_0,100%_50%,50%_100%,0_50%)]", m.fnt ? "bg-line-2" : (m.hp ?? 100) < 35 ? "bg-warn" : "bg-ok")} />)}
       </span>
     </div>
@@ -328,12 +337,13 @@ export function BxScore({ name, handle, rating, av, team = [], right = false, ta
 
 /* ── Projected speed order rail ──────────────────────────────────────────── */
 export function BxOrder({ slots }: { slots: OrderSlot[] }) {
+  const t = useTranslations("battlesim")
   const order = speedOrder(slots)
   if (!order.length) return null
   return (
     <div className="flex min-w-0 flex-wrap items-center gap-[10px] py-[7px]">
       <span className="inline-flex flex-none items-center gap-[5px] font-mono text-[9.5px] font-semibold uppercase leading-none tracking-[0.12em] text-txt-dim">
-        <Icon name="trending" size={12} />Orden previsto
+        <Icon name="trending" size={12} />{t("bx.orderProjected")}
       </span>
       <span className="flex min-w-0 flex-wrap gap-[6px]">
         {order.map((s, i) => (
@@ -346,7 +356,7 @@ export function BxOrder({ slots }: { slots: OrderSlot[] }) {
           </span>
         ))}
       </span>
-      <span className="ml-auto flex-none font-mono text-[9.5px] leading-none text-txt-dim">La prioridad puede alterarlo</span>
+      <span className="ml-auto flex-none font-mono text-[9.5px] leading-none text-txt-dim">{t("bx.priorityNote")}</span>
     </div>
   )
 }
@@ -398,17 +408,18 @@ type BxPlanAction =
   | { kind: "switch"; toName: string }
   | null
 export function BxPlan({ tag, action, onClear, hint }: { tag: string; action: BxPlanAction; onClear?: () => void; hint?: string }) {
+  const t = useTranslations("battlesim")
   if (!action) {
     return (
       <div style={{ clipPath: "polygon(4px 0,100% 0,calc(100% - 4px) 100%,0 100%)" }}
         className="inline-flex min-w-0 items-center gap-[7px] border border-dashed border-line-2 bg-panel px-[9px] py-[6px]">
         <b className={SLOTTAG}>{tag}</b>
-        <span className="font-mono text-[10px] font-medium leading-none tracking-[0.04em] text-txt-dim">{hint || "Sin orden"}</span>
+        <span className="font-mono text-[10px] font-medium leading-none tracking-[0.04em] text-txt-dim">{hint || t("bx.noOrder")}</span>
       </div>
     )
   }
   const isMove = action.kind === "move"
-  const tgt = !isMove ? null : action.target && action.target.spread ? (action.target.spread === "all" ? "todos" : "ambos rivales") : action.targetName || ""
+  const tgt = !isMove ? null : action.target && action.target.spread ? (action.target.spread === "all" ? t("bx.targetAll") : t("bx.targetBoth")) : action.targetName || ""
   return (
     <div style={{ ...tyc(isMove ? tyColor(action.move.type) : "var(--accent)"), clipPath: "polygon(4px 0,100% 0,calc(100% - 4px) 100%,0 100%)" }}
       className="inline-flex min-w-0 items-center gap-[7px] border border-solid border-[color-mix(in_srgb,var(--tyc)_45%,var(--line))] bg-panel px-[9px] py-[6px]">
@@ -417,11 +428,11 @@ export function BxPlan({ tag, action, onClear, hint }: { tag: string; action: Bx
         {isMove ? (
           <>{action.tera && <i className="mr-1 border border-[color-mix(in_srgb,var(--accent)_50%,transparent)] px-[3px] py-px font-mono text-[7.5px] not-italic tracking-[0.08em] text-accent-bright">TERA</i>}<b>{action.move.name}</b>{tgt ? " → " + tgt : ""}</>
         ) : (
-          <>Cambio → <b>{action.toName}</b></>
+          <>{t("bx.switchTo", { name: action.toName })}</>
         )}
       </span>
       {onClear && (
-        <button type="button" onClick={onClear} aria-label="Borrar orden" className="grid flex-none place-items-center border-0 bg-transparent p-[2px] text-txt-dim hover:text-bad">
+        <button type="button" onClick={onClear} aria-label={t("bx.clearOrderAria")} className="grid flex-none place-items-center border-0 bg-transparent p-[2px] text-txt-dim hover:text-bad">
           <Icon name="x" size={12} />
         </button>
       )}
@@ -434,11 +445,12 @@ export type BxSlotMon = { name: string; types: string[]; item?: string }
 export function BxSlot({ mon, order, selected = false, dim = false, onClick, aside }: {
   mon: (BxMon & { item?: string }) | BxSlotMon | null; order?: number; selected?: boolean; dim?: boolean; onClick?: () => void; aside?: React.ReactNode
 }) {
+  const t = useTranslations("battlesim")
   if (!mon) {
     return (
       <button type="button" onClick={onClick} style={{ clipPath: CUT }}
         className="flex min-h-[58px] w-full items-center justify-center gap-2 border border-dashed border-line bg-panel px-[10px] py-2 font-mono text-[10.5px] font-semibold uppercase leading-none tracking-[0.08em] text-txt-dim transition-[border-color,color] hover:border-accent-line hover:text-txt focus-visible:outline-none">
-        <Icon name="plus" size={16} /><span>Añadir</span>
+        <Icon name="plus" size={16} /><span>{t("bx.add")}</span>
       </button>
     )
   }

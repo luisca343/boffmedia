@@ -1,6 +1,6 @@
 // PAPER.
 
-import { useTranslations } from "next-intl"
+import { useLocale, useTranslations } from "next-intl"
 import type { UserAchievement } from "@boffmedia/shared"
 import { cn } from "@/lib/utils"
 import { docDate } from "../../_utils/dates"
@@ -15,6 +15,7 @@ export function Competiciones({
   loading: boolean
 }) {
   const t = useTranslations("pasaporte")
+  const locale = useLocale()
 
   if (loading) {
     return (
@@ -67,7 +68,7 @@ export function Competiciones({
                 {event.name}
               </span>
               <span className="ps-num font-ps-mono text-[9px] text-ps-ink-faint">
-                {earned ? docDate(event.completedAt) : t("competiciones.locked")}
+                {earned ? docDate(event.completedAt, locale) : t("competiciones.locked")}
               </span>
             </div>
           )

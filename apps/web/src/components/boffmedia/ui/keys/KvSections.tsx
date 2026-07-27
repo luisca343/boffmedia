@@ -1,45 +1,48 @@
 "use client"
 
 import * as React from "react"
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { Icon } from "@/components/boffmedia/primitives"
 import { KvPlatforms, KvReview, KvTags } from "./KvAtoms"
-import { kvMetaColor, kvMetaLabel, kvReviewLabel, type KvInfoData, type KvKey, type KvPriceData } from "./keys-util"
+import { kvMetaBand, kvMetaColor, kvReviewBand, type KvInfoData, type KvKey, type KvPriceData } from "./keys-util"
 
 const FACT_K = "font-mono text-[9.5px]/none font-semibold uppercase tracking-[0.1em] text-txt-dim"
 
 export function KvScores({ info }: { info: KvInfoData }) {
+  const t = useTranslations("common.keys")
   const hasMeta = info.metacritic != null
   const cell = "flex min-w-0 flex-col justify-center gap-2.5 bg-panel px-[15px] py-[13px]"
   return (
     <div className={cn("grid gap-px border border-solid border-line bg-line", hasMeta ? "grid-cols-[minmax(190px,auto)_1fr]" : "grid-cols-1")}>
       {hasMeta && (
         <div className={cell}>
-          <span className={FACT_K}>Metacritic</span>
+          <span className={FACT_K}>{t("metacritic")}</span>
           <div className="flex items-center gap-3">
             <span className="inline-grid h-[42px] min-w-[48px] flex-none place-items-center border-2 border-solid px-2 font-display text-[25px]/none font-extrabold italic tabular-nums" style={{ color: kvMetaColor(info.metacritic!), borderColor: kvMetaColor(info.metacritic!) }}>
               {info.metacritic}
             </span>
-            <span className="font-mono text-[11px]/[1.35] text-txt-muted text-pretty">{kvMetaLabel(info.metacritic!)}</span>
+            <span className="font-mono text-[11px]/[1.35] text-txt-muted text-pretty">{t(`meta.${kvMetaBand(info.metacritic!)}`)}</span>
           </div>
         </div>
       )}
       <div className={cell}>
-        <span className={FACT_K}>Valoración de Steam</span>
+        <span className={FACT_K}>{t("steamRating")}</span>
         <KvReview score={info.review} count={info.reviewCount} />
-        <span className="font-mono text-[11px]/[1.35] text-txt-muted text-pretty">{kvReviewLabel(info.review)}</span>
+        <span className="font-mono text-[11px]/[1.35] text-txt-muted text-pretty">{t(`review.${kvReviewBand(info.review)}`)}</span>
       </div>
     </div>
   )
 }
 
 export function KvInfo({ item }: { item: KvKey }) {
+  const t = useTranslations("common.keys")
   const f = item.info
   const facts: { label: string; value: React.ReactNode }[] = [
-    { label: "Desarrollador", value: f.developer },
-    { label: "Editor", value: f.publisher },
-    { label: "Lanzamiento", value: f.release },
-    { label: "Plataformas", value: <KvPlatforms platforms={f.platforms} /> },
+    { label: t("developer"), value: f.developer },
+    { label: t("publisher"), value: f.publisher },
+    { label: t("release"), value: f.release },
+    { label: t("platforms"), value: <KvPlatforms platforms={f.platforms} /> },
   ]
   return (
     <div className="grid gap-4">
@@ -55,7 +58,7 @@ export function KvInfo({ item }: { item: KvKey }) {
       <KvScores info={f} />
       {f.genres && f.genres.length > 0 && (
         <div className="grid gap-2">
-          <span className={FACT_K}>Géneros</span>
+          <span className={FACT_K}>{t("genres")}</span>
           <KvTags tags={f.genres} />
         </div>
       )}
@@ -64,11 +67,12 @@ export function KvInfo({ item }: { item: KvKey }) {
 }
 
 export function KvPrice({ price }: { price: KvPriceData }) {
+  const t = useTranslations("common.keys")
   if (price.isFree) {
     return (
       <div className="flex flex-col items-start gap-2.5 border border-solid border-line bg-panel-2 p-[22px]">
-        <span className="font-display text-[44px]/[0.9] font-extrabold italic text-ok">Gratis</span>
-        <span className="font-mono text-[11px]/none uppercase tracking-[0.06em] text-txt-muted">Gratis para jugar en Steam</span>
+        <span className="font-display text-[44px]/[0.9] font-extrabold italic text-ok">{t("free")}</span>
+        <span className="font-mono text-[11px]/none uppercase tracking-[0.06em] text-txt-muted">{t("freeToPlay")}</span>
       </div>
     )
   }
@@ -81,12 +85,13 @@ export function KvPrice({ price }: { price: KvPriceData }) {
         </div>
       )}
       <span className="font-display text-[44px]/[0.9] font-extrabold italic text-accent">{price.final}</span>
-      <span className="font-mono text-[11px]/none uppercase tracking-[0.06em] text-txt-muted">{price.discount > 0 ? "Precio actual en Steam" : "Precio en Steam"} · valor de la clave</span>
+      <span className="font-mono text-[11px]/none uppercase tracking-[0.06em] text-txt-muted">{price.discount > 0 ? t("currentPrice") : t("regularPrice")} · {t("keyValueSuffix")}</span>
     </div>
   )
 }
 
 export function KvGallery({ images, name }: { images: string[]; name: string }) {
+  const t = useTranslations("common.keys")
   const [i, setI] = React.useState(0)
   const [err, setErr] = React.useState<Record<number, boolean>>({})
   const shots = images || []
@@ -100,14 +105,14 @@ export function KvGallery({ images, name }: { images: string[]; name: string }) 
       <div className="relative aspect-[16/9] overflow-hidden border border-solid border-line-2 bg-base-2">
         {!err[i] && shots[i] ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={shots[i]} alt={name + " captura " + (i + 1)} onError={() => setErr((e) => ({ ...e, [i]: true }))} className="block h-full w-full object-cover" />
+          <img src={shots[i]} alt={t("screenshotAlt", { game: name, n: i + 1 })} onError={() => setErr((e) => ({ ...e, [i]: true }))} className="block h-full w-full object-cover" />
         ) : (
           fb
         )}
       </div>
       <div className="grid grid-cols-4 gap-2">
         {shots.map((s, k) => (
-          <button key={k} type="button" aria-label={"Medio " + (k + 1)} onClick={() => setI(k)} className={cn("relative aspect-[16/9] cursor-pointer overflow-hidden border border-solid bg-base-2 p-0 transition-[border-color] duration-[140ms]", k === i ? "border-accent [box-shadow:inset_0_0_0_1px_var(--accent)]" : "border-line hover:border-line-2")}>
+          <button key={k} type="button" aria-label={t("mediaAria", { n: k + 1 })} onClick={() => setI(k)} className={cn("relative aspect-[16/9] cursor-pointer overflow-hidden border border-solid bg-base-2 p-0 transition-[border-color] duration-[140ms]", k === i ? "border-accent [box-shadow:inset_0_0_0_1px_var(--accent)]" : "border-line hover:border-line-2")}>
             {!err[k] && s ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img src={s} alt="" onError={() => setErr((e) => ({ ...e, [k]: true }))} className="block h-full w-full object-cover" />

@@ -152,7 +152,7 @@ export function Countdown({ iso, label }: { iso: string | null; label?: string }
           closed ? "text-gt-ink-400" : urgent ? "text-gt-danger" : "text-gt-ink-900"
         }`}
       >
-        {closed ? t("eventos.cerrado") : timeLeft(iso)}
+        {closed ? t("eventos.cerrado") : timeLeft(iso, t("common.finalizado"))}
       </div>
     </div>
   )

@@ -1,3 +1,6 @@
+"use client"
+
+import { useTranslations } from "next-intl"
 import type { ChangeEvent } from "react"
 import { Button, Icon, Input, Panel } from "../../_components/ui"
 
@@ -21,16 +24,17 @@ export function MazeControls({
   onRegenerate,
   onToggleDebug,
 }: MazeControlsProps) {
+  const t = useTranslations("arcade")
   return (
     <Panel tone="cyan" tight>
-      <div className="mb-3 font-ar-display text-[9px] uppercase text-ar-cyan">Generador</div>
+      <div className="mb-3 font-ar-display text-[9px] uppercase text-ar-cyan">{t("maze.generator")}</div>
       <div className="flex flex-col gap-3">
         <div className="flex flex-col gap-1.5">
           <label
             htmlFor="maze-size"
             className="font-ar-mono text-[10px] font-bold uppercase tracking-[0.1em] text-ar-ink-muted"
           >
-            Tamaño
+            {t("maze.size")}
           </label>
           <Input id="maze-size" type="number" min="5" value={size} onChange={onSizeChange} />
         </div>
@@ -39,12 +43,12 @@ export function MazeControls({
             htmlFor="maze-depth"
             className="font-ar-mono text-[10px] font-bold uppercase tracking-[0.1em] text-ar-ink-muted"
           >
-            Profundidad
+            {t("maze.depth")}
           </label>
           <Input id="maze-depth" type="number" min="1" value={depth} onChange={onDepthChange} />
         </div>
         <Button variant="cyan" size="sm" full icon={<Icon.Reset s={12} />} onClick={onRegenerate}>
-          Regenerar
+          {t("maze.regenerate")}
         </Button>
         <Button
           variant={showDebug ? "primary" : "ghost"}
@@ -54,7 +58,7 @@ export function MazeControls({
           onClick={onToggleDebug}
           aria-pressed={showDebug}
         >
-          {showDebug ? "Ocultar debug" : "Ver debug"}
+          {showDebug ? t("maze.hideDebug") : t("maze.showDebug")}
         </Button>
       </div>
     </Panel>

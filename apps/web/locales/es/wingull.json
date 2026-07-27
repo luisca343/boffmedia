@@ -1,0 +1,163 @@
+{
+  "wingull": {
+    "home": {
+      "logoAlt": "Logo de Pixelmon Wingull",
+      "title": "Bienvenido a Pixelmon Wingull",
+      "tagline": "¡Explora la región de Teras y experimenta el choque de eras!",
+      "comingSoon": "Próximamente",
+      "pastBadge": "El Pasado",
+      "pastDesc": "Sumérgete en los antiguos misterios y legendarias tradiciones de Fukitsu-Gansolia. Desvela Pokémon ancestrales y enfrenta desafíos épicos forjados en la historia.",
+      "futureBadge": "El Futuro",
+      "futureDesc": "Abraza la tecnología de vanguardia y los paisajes futuristas de Narukami-Akina. Domina la ciencia avanzada en el arte del entrenamiento Pokémon y reta a la élite tecnológica en combates legendarios.",
+      "serverInfoTitle": "Información del Servidor",
+      "serverInfoSubtitle": "Todo lo que necesitas saber para comenzar tu aventura",
+      "statTowns": "Pueblos",
+      "statPokemon": "Pokémon Únicos",
+      "statQuests": "Misiones y Eventos",
+      "statAdventures": "Aventuras"
+    },
+    "footer": {
+      "rights": "© 2022-2025 Pixelmon Wingull. Todos los derechos reservados."
+    },
+    "connect": {
+      "heading": "¡Únete a la Aventura Hoy!",
+      "serverLabel": "Servidor Pixelmon Wingull",
+      "ipUnavailable": "IP no disponible",
+      "copySuccess": "IP del servidor copiada al portapapeles.",
+      "copyError": "No se pudo copiar la IP del servidor.",
+      "copied": "¡IP Copiada!",
+      "connect": "Conectar al Servidor",
+      "hint": "Haz clic en el botón para copiar la IP del servidor a tu portapapeles"
+    },
+    "towns": {
+      "loading": "Cargando pueblos...",
+      "titlePrimary": "Pueblos",
+      "titleAccent": "Disponibles",
+      "description": "Explora todos los pueblos disponibles en la región",
+      "searchPh": "Buscar pueblo...",
+      "emptyTitle": "No se encontraron pueblos",
+      "emptyBody": "No hay pueblos que coincidan con \"{query}\"",
+      "count": "{count, plural, one {# pueblo disponible} other {# pueblos disponibles}}",
+      "cardDesc": "Descubre las parcelas disponibles y comodidades de {town}",
+      "explore": "Explorar pueblo"
+    },
+    "town": {
+      "loading": "Cargando información del pueblo...",
+      "loadingSub": "Preparando tu experiencia inmobiliaria",
+      "errorTitle": "Error al cargar el pueblo",
+      "retry": "Intentar de nuevo",
+      "fetchError": "No se pudo cargar la información del pueblo. Por favor, verifica el nombre e intenta de nuevo.",
+      "noData": "No se encontraron datos para este pueblo",
+      "missingTitle": "Pueblo no especificado",
+      "missingBody": "Por favor, proporciona el nombre del pueblo en la URL"
+    },
+    "hero": {
+      "townPrefix": "Pueblo",
+      "explore": "Explorar Pueblo",
+      "community": "Ver Comunidad"
+    },
+    "amenities": {
+      "titlePrimary": "Comodidades",
+      "titleAccent": "del Pueblo",
+      "description": "Descubre todas las facilidades que hacen de {town} el lugar perfecto para establecer tu base",
+      "features": "Características"
+    },
+    "properties": {
+      "titlePrimary": "Parcelas",
+      "titleAccent": "Disponibles",
+      "description": "Encuentra tu hogar perfecto en {town}. Cada parcela ofrece una experiencia única con acceso a diferentes comodidades",
+      "badgeParcela": "PARCELA",
+      "badgeLocal": "LOCAL",
+      "typeParcela": "Parcela",
+      "typeLocal": "Local",
+      "noImages": "No hay imágenes disponibles",
+      "nearbyAmenities": "Comodidades Cercanas",
+      "moreAmenities": "+{count} más",
+      "fullDetails": "Detalles Completos",
+      "allNearbyAmenities": "Todas las Comodidades Cercanas",
+      "viewLess": "Ver Menos",
+      "viewDetails": "Ver Detalles",
+      "buy": "Comprar"
+    },
+    "business": {
+      "titlePrimary": "Oportunidades",
+      "titleAccent": " de Negocio",
+      "subtitle": "Oportunidades de negocio en {town}",
+      "description": "Descubre las ubicaciones comerciales disponibles en {town} para establecer tu próximo emprendimiento en este próspero pueblo"
+    },
+    "cta": {
+      "title": "¿No encuentras lo que buscas?",
+      "body": "Nuestro equipo puede ayudarte a encontrar la parcela perfecta o informarte sobre futuras disponibilidades en Pueblo {town}",
+      "contactAgent": "Contactar Agente",
+      "moreTowns": "Ver Más Pueblos"
+    },
+    "map": {
+      "titlePrimary": "Mapa",
+      "titleAccent": "Interactivo",
+      "description": "Explora la ubicación de las parcelas disponibles en {town} y navega por el territorio",
+      "noCoordinates": "No hay coordenadas disponibles para mostrar el mapa",
+      "centerTown": "Centrar en el pueblo",
+      "noImages": "Sin imágenes disponibles",
+      "features": "Características",
+      "coordinates": "Coordenadas",
+      "nearbyAmenities": "Comodidades Cercanas"
+    },
+    "invite": {
+      "subject": "Invitación: Plan de Desarrollo de Teras",
+      "senderName": "Teras Project",
+      "senderEmail": "teras@project.com",
+      "senderInitials": "TP",
+      "reply": "Responder",
+      "replyAll": "Responder a todos",
+      "forward": "Reenviar",
+      "greeting": "¡Hola, {username}!",
+      "body1": "Nos complace informarle que le ha sido otorgada una plaza para participar en el Plan de Desarrollo de Teras. En caso de querer colaborar con el desarrollo de la región, por favor, rellene el siguiente formulario.",
+      "body2": "Muchas gracias por su interés. El destino de la región de Teras depende de usted.",
+      "formTitle": "¡Únete a la aventura de Teras!",
+      "avatarAlt": "Avatar de {username}",
+      "roleLabel": "Aventurero de Minecraft",
+      "usernameLabel": "Tu nombre de aventurero",
+      "usernamePh": "¿Cómo quieres que te llamemos?",
+      "usernameHelp": "Este será tu nombre en Teras",
+      "mcUsernameLabel": "Tu nombre en Minecraft",
+      "mcUsernamePh": "Tu nombre en Minecraft",
+      "mcUsernameHelp": "Este es tu nombre actual en Minecraft",
+      "emailLabel": "Tu correo electrónico",
+      "emailPh": "¿Dónde podemos contactarte?",
+      "emailHelp": "Te mantendremos informado de todas las novedades",
+      "passwordLabel": "Tu contraseña secreta",
+      "passwordPh": "Crea una contraseña segura",
+      "passwordHelp": "Asegúrate de que sea segura y fácil de recordar",
+      "submitting": "¡Embarcando..!",
+      "submit": "¡Comenzar la aventura!",
+      "inviteNumber": "Invitación #{id}",
+      "attachment": "1 regalo adjunto",
+      "errors": {
+        "usernameRequired": "¡Ups! No olvides tu nombre de usuario",
+        "mcUsernameRequired": "¡El nombre de Minecraft es importante!",
+        "emailInvalid": "Parece que este email no es válido",
+        "passwordMin": "Tu contraseña debe tener al menos 8 caracteres para mantenerte seguro",
+        "submitFailed": "¡Vaya! Algo salió mal durante el registro. ¿Podrías intentarlo de nuevo?"
+      }
+    },
+    "inviteNotFound": {
+      "title": "Invitación no encontrada",
+      "lead": "Lo sentimos, no pudimos encontrar la invitación con el ID: {id}",
+      "reasonsIntro": "Esto puede deberse a varias razones:",
+      "reasonExpired": "La invitación puede haber expirado",
+      "reasonWrongId": "El ID de la invitación puede ser incorrecto",
+      "reasonDeleted": "La invitación puede haber sido eliminada",
+      "outro": "Por favor, verifica el enlace de invitación o contacta al administrador para obtener ayuda.",
+      "contactSupport": "Contactar soporte",
+      "backHome": "Volver al inicio"
+    },
+    "inviteUsed": {
+      "title": "Invitación ya utilizada",
+      "lead": "La invitación con ID {id} ya ha sido utilizada.",
+      "body": "Cada invitación solo puede ser usada una vez para registrarse en el Plan de Desarrollo de Teras.",
+      "outro": "Si crees que esto es un error o necesitas una nueva invitación, por favor contacta al administrador.",
+      "contactSupport": "Contactar soporte",
+      "backHome": "Volver al inicio"
+    }
+  }
+}

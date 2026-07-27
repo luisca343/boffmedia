@@ -33,7 +33,7 @@ export function CollectionToolbar({
 
   const typeLabel: Record<string, string> = {
     item: t("coleccion.toolbar.typeItems"),
-    pokemon: "Pokémon",
+    pokemon: t("coleccion.toolbar.pokemon"),
     mina: t("coleccion.toolbar.typeMine"),
     box: t("coleccion.toolbar.typeBoxes"),
   }
@@ -95,7 +95,7 @@ export function CollectionToolbar({
                   : { background: "rgba(255,255,255,0.04)", borderColor: "rgba(255,255,255,0.08)" }
               }
             >
-              <span className={active ? undefined : "text-ar-ink-dim"}>{skin.name}</span>
+              <span className={active ? undefined : "text-ar-ink-dim"}>{t(skin.nameKey)}</span>
             </button>
           )
         })}

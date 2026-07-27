@@ -128,7 +128,8 @@
       "save": "Guardar",
       "cancel": "Cancelar",
       "validationPaste": "Pega tu equipo en formato Showdown",
-      "toastOk": "Hoja de equipo guardada"
+      "toastOk": "Hoja de equipo guardada",
+      "viewerHint": "Hoja registrada por el rival al inscribirse. Cópiala a Pokémon Showdown o ábrela en la calculadora para preparar tus daños."
     },
     "view": {
       "thirdPlace": "Tercer puesto",
@@ -156,6 +157,66 @@
     },
     "sr": {
       "title": "Torneos"
+    },
+    "bracket": {
+      "winnersTitle": "Cuadro de ganadores",
+      "losersTitle": "Cuadro de perdedores",
+      "grandFinalTitle": "Gran Final",
+      "resetNote": "El aspirante forzó el bracket reset.",
+      "tbd": "Por determinar",
+      "radialAriaLabel": "Cuadro radial de eliminación",
+      "tbdShort": "por definir",
+      "champion": "Campeón",
+      "finalist": "Finalista",
+      "finalTbd": "Final · por definir",
+      "seed": "Semilla {seed}",
+      "live": "En juego",
+      "roundsPlayed": "{played}/{total} rondas",
+      "roundFinal": "Final",
+      "roundSemis": "Semifinales",
+      "roundQuarters": "Cuartos",
+      "round16": "Octavos",
+      "roundOf": "Ronda de {players}"
+    },
+    "pairings": {
+      "roundAriaLabel": "Ronda",
+      "roundOption": "Ronda {round}",
+      "colTable": "Mesa",
+      "colHome": "Local",
+      "colResult": "Res.",
+      "colAway": "Visitante",
+      "bye": "descansa",
+      "playing": "En juego",
+      "vs": "vs"
+    },
+    "entrant": {
+      "bye": "BYE",
+      "team": "equipo",
+      "players": "{count, plural, one {# jugador} other {# jugadores}}"
+    },
+    "standings": {
+      "colCompetitor": "Competidor",
+      "colPlayed": "PJ",
+      "colRecord": "V-E-D",
+      "colDiff": "Dif",
+      "colPoints": "Pts",
+      "colForm": "Forma",
+      "colW": "V",
+      "colD": "E",
+      "colL": "D",
+      "playedOf": "{done}/{total} jugados",
+      "resultWin": "Victoria",
+      "resultLoss": "Derrota",
+      "resultDraw": "Empate",
+      "pending": "Pendiente"
+    },
+    "format": {
+      "swiss": "Suizo",
+      "single": "Eliminación",
+      "double": "Doble elim.",
+      "groups": "Grupos + eliminatoria",
+      "roundrobin": "Liga (todos contra todos)",
+      "leaderboard": "Clasificación libre"
     }
   }
 }

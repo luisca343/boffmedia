@@ -1,25 +1,14 @@
 'use client';
 
 import { Battle } from '@pkmn/client';
+import { useTranslations } from 'next-intl';
 
-const COND_LABELS: Record<string, string> = {
-  sunnyday: 'Sol',
-  desolateland: 'Sol abrasador',
-  raindance: 'Lluvia',
-  primordialsea: 'Diluvio',
-  sandstorm: 'Tormenta arena',
-  hail: 'Granizo',
-  snow: 'Nieve',
-  deltastream: 'Turbulencias',
-  electricterrain: 'C. Eléctrico',
-  grassyterrain: 'C. Hierba',
-  mistyterrain: 'C. Niebla',
-  psychicterrain: 'C. Psíquico',
-  trickroom: 'Espacio Raro',
-  magicroom: 'Zona Mágica',
-  wonderroom: 'Zona Extraña',
-  gravity: 'Gravedad',
-};
+/** Condition ids that have a `battlesim.field.cond.*` label; anything else falls back to the raw id. */
+const COND_IDS = new Set([
+  'sunnyday', 'desolateland', 'raindance', 'primordialsea', 'sandstorm', 'hail', 'snow',
+  'deltastream', 'electricterrain', 'grassyterrain', 'mistyterrain', 'psychicterrain',
+  'trickroom', 'magicroom', 'wonderroom', 'gravity',
+]);
 
 const COND_COLORS: Record<string, string> = {
   sunnyday: 'var(--amber-400)',
@@ -44,7 +33,13 @@ interface ConditionChip {
   side?: 'ally' | 'foe';
 }
 
-function buildChips(battle: Battle, pov: 0 | 1): ConditionChip[] {
+type CondT = (key: string) => string;
+
+function condLabel(t: CondT, id: string) {
+  return COND_IDS.has(id) ? t(`cond.${id}`) : id;
+}
+
+function buildChips(battle: Battle, pov: 0 | 1, t: CondT): ConditionChip[] {
   const chips: ConditionChip[] = [];
 
   const pushState = (st: { id?: string; minDuration?: number; maxDuration?: number } | undefined) => {
@@ -54,7 +49,7 @@ function buildChips(battle: Battle, pov: 0 | 1): ConditionChip[] {
       : undefined;
     chips.push({
       key: st.id,
-      label: COND_LABELS[st.id] ?? st.id,
+      label: condLabel(t, st.id),
       turns,
       color: COND_COLORS[st.id] ?? 'var(--text-muted)',
     });
@@ -65,7 +60,7 @@ function buildChips(battle: Battle, pov: 0 | 1): ConditionChip[] {
   for (const [id, pw] of Object.entries(battle.field.pseudoWeather)) {
     chips.push({
       key: id,
-      label: COND_LABELS[id] ?? id,
+      label: condLabel(t, id),
       turns: (pw as any)?.minDuration ? String((pw as any).minDuration) : undefined,
       color: COND_COLORS[id] ?? 'var(--text-muted)',
     });
@@ -94,11 +89,12 @@ function buildChips(battle: Battle, pov: 0 | 1): ConditionChip[] {
  * so the field state is readable without the log.
  */
 export function FieldConditions({ battle, pov = 0 }: { battle: Battle; pov?: 0 | 1 }) {
-  const chips = buildChips(battle, pov);
+  const t = useTranslations('battlesim.field');
+  const chips = buildChips(battle, pov, t);
   if (chips.length === 0) return null;
 
   return (
-    <div className="flex flex-wrap gap-1 max-w-[280px]" role="status" aria-label="Condiciones de campo">
+    <div className="flex flex-wrap gap-1 max-w-[280px]" role="status" aria-label={t('aria')}>
       {chips.map((chip) => (
         <span
           key={chip.key}

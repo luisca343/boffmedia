@@ -5,7 +5,7 @@ import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { Icon, type IconName } from "@/components/boffmedia/primitives"
 import { MewFaction, MewKind, MewRarity, MewStats, MewText, MewTile } from "./MewAtoms"
-import { MEW, MEW_KIND_LABEL, mewClip, mewHueFor, mewHuman, type MewRec } from "./mew-util"
+import { MEW, MEW_KIND_LABEL, mewCatKey, mewClip, mewHueFor, mewHuman, type MewRec } from "./mew-util"
 
 // Mewgenics roster card (CxCard) + the hover popover card. Prefix cx- / mew-pop-.
 
@@ -53,7 +53,7 @@ export function CxCard({ cat, rec, active, onOpen, view }: { cat: string; rec: M
 function mewCatLabel(cat: string, t: (k: string, p?: Record<string, string | number | Date>) => string): string {
   if (cat === "sets") return t("pop.setFlag").toLowerCase()
   const c = MEW.catBy[cat]
-  return c ? c.singular || c.label : cat
+  return c ? t(mewCatKey(c.key, "singular")) : cat
 }
 function mewPopHue(cat: string, rec: MewRec): number {
   if (cat === "sets") return 40

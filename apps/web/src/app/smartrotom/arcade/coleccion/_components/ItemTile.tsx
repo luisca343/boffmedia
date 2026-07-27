@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import type { ArcadeInventoryItem } from "@boffmedia/shared"
 import { ItemImage } from "@/lib/ItemImage"
 import { remaining } from "../../_utils/inventory"
@@ -13,6 +14,7 @@ export interface ItemTileProps {
 
 /** One item in the collection grid, skinned by its rarity (data-driven → inline). */
 export function ItemTile({ item, name, onClick }: ItemTileProps) {
+  const t = useTranslations("arcade")
   const skin = raritySkin(item.rarity)
   const count = remaining(item)
 
@@ -40,7 +42,7 @@ export function ItemTile({ item, name, onClick }: ItemTileProps) {
         className="mb-1 font-ar-display text-[8px] uppercase tracking-[0.12em]"
         style={{ color: skin.fg }}
       >
-        {skin.name}
+        {t(skin.nameKey)}
       </div>
       <div className="line-clamp-2 min-h-[28px] font-ar-mono text-[11px] font-semibold leading-tight text-ar-ink">
         {name}

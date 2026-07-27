@@ -13,12 +13,16 @@ export function normalizeStatus(quest: Pick<QuestData, "status" | "requirements"
   return quest.requirements?.available ? "AVAILABLE" : "LOCKED"
 }
 
-export const STATUS_LABEL: Record<SealStatus, string> = {
-  ACTIVE: "Vigente",
-  AVAILABLE: "Disponible",
-  COMPLETED: "Completada",
-  FAILED: "Fallida",
-  LOCKED: "Sellada",
+/**
+ * The seal's label, as a key into the `misiones` namespace — never the copy
+ * itself, so a module-scope map cannot pin the board to one language.
+ */
+export const STATUS_LABEL_KEY: Record<SealStatus, string> = {
+  ACTIVE: "status.active",
+  AVAILABLE: "status.available",
+  COMPLETED: "status.completed",
+  FAILED: "status.failed",
+  LOCKED: "status.locked",
 }
 
 /** The letter struck into the wax. */

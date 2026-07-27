@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { Avatar, Badge, Card } from "../ui"
 import { STANDING } from "../../_utils/tones"
 import { townName } from "../../_utils/format"
@@ -11,6 +12,7 @@ import type { Ciudadano } from "../../_types"
 // lives in Minecraft NBT, there is no wallet column on this read, and presence isn't
 // tracked here), so they are omitted rather than faked.
 export function CiudadanoCard({ citizen }: { citizen: Ciudadano }) {
+  const t = useTranslations("gobierno")
   const openDossier = useGobiernoUi((s) => s.openDossier)
   const standing = STANDING[citizen.standing]
   const [firstTown, ...restTowns] = citizen.towns
@@ -31,32 +33,36 @@ export function CiudadanoCard({ citizen }: { citizen: Ciudadano }) {
               </span>
               {citizen.buscado && (
                 <Badge tone="danger" icon="alert" solid>
-                  Buscado
+                  {t("poblacion.buscadoBadge")}
                 </Badge>
               )}
             </div>
             <div className="mt-0.5 font-gt-mono text-[10px] uppercase tracking-[.08em] text-gt-ink-400">
-              {firstTown ? townName(firstTown) : "Sin residencia"}
+              {firstTown ? townName(firstTown) : t("poblacion.sinResidencia")}
               {restTowns.length > 0 && ` +${restTowns.length}`}
             </div>
           </div>
         </div>
 
         <div className="flex items-center justify-between border-t border-gt-line-soft pt-2.5">
-          <Badge tone={standing.tone}>{standing.label}</Badge>
+          <Badge tone={standing.tone}>{t(standing.labelKey)}</Badge>
           <div className="flex items-center gap-3">
             <span className="flex items-baseline gap-1">
               <span className="font-gt-display text-sm font-bold tabular-nums text-gt-ink-900">
                 {citizen.parcelas}
               </span>
-              <span className="font-gt-mono text-[9px] uppercase tracking-[.08em] text-gt-ink-400">parcelas</span>
+              <span className="font-gt-mono text-[9px] uppercase tracking-[.08em] text-gt-ink-400">
+                {t("poblacion.parcelasUnit")}
+              </span>
             </span>
             {citizen.multasPendientes > 0 && (
               <span className="flex items-baseline gap-1">
                 <span className="font-gt-display text-sm font-bold tabular-nums text-gt-warn">
                   {citizen.multasPendientes}
                 </span>
-                <span className="font-gt-mono text-[9px] uppercase tracking-[.08em] text-gt-ink-400">multas</span>
+                <span className="font-gt-mono text-[9px] uppercase tracking-[.08em] text-gt-ink-400">
+                  {t("poblacion.multasUnit")}
+                </span>
               </span>
             )}
           </div>

@@ -15,7 +15,9 @@
       "hideUi": "Hide UI",
       "showUi": "Show UI",
       "uiOn": "UI: ON",
-      "uiOff": "UI: OFF"
+      "uiOff": "UI: OFF",
+      "openGallery": "Open gallery",
+      "capture": "Take photo"
     },
     "gallery": {
       "title": "Gallery",
@@ -61,7 +63,9 @@
       "turnOn": "Turn on flashlight"
     },
     "zoom": {
-      "setZoom": "Set zoom to {factor}"
+      "setZoom": "Set zoom to {factor}",
+      "decrease": "Zoom out",
+      "increase": "Zoom in"
     }
   }
 }

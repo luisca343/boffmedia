@@ -1,5 +1,7 @@
 "use client";
 
+import { useTranslations } from "next-intl";
+
 import { accentFor, ACCENT_HEX } from "../../_utils/accents";
 import { useIssues } from "../../_hooks/queries";
 import { Card, FurretMascot, Pill, SectionHeader, Skeleton } from "../ui";
@@ -11,14 +13,15 @@ import { Card, FurretMascot, Pill, SectionHeader, Skeleton } from "../ui";
  * issues.
  */
 export function CollectorStrip() {
+  const t = useTranslations("furrettoday.collectorStrip");
   const { data: issues, isLoading } = useIssues();
 
   if (isLoading) {
     return (
       <section className="ft-wrap-wide px-6 pb-8 pt-4">
         <SectionHeader
-          eyebrow="ARCHIVO COLECCIONABLE"
-          title="Números Anteriores"
+          eyebrow={t("eyebrow")}
+          title={t("title")}
           number="03"
         />
         <div className="mt-7 flex gap-[18px] overflow-hidden pb-3">
@@ -35,10 +38,10 @@ export function CollectorStrip() {
   return (
     <section className="ft-wrap-wide px-6 pb-8 pt-4">
       <SectionHeader
-        eyebrow="ARCHIVO COLECCIONABLE"
-        title="Números Anteriores"
+        eyebrow={t("eyebrow")}
+        title={t("title")}
         number="03"
-        hint="↓ DESLIZA"
+        hint={t("hint")}
       />
       <div className="ft-scroll mt-7 grid grid-flow-col auto-cols-[minmax(220px,1fr)] gap-[18px] overflow-x-auto pb-3">
         {issues.map((iss) => {
@@ -55,13 +58,13 @@ export function CollectorStrip() {
               >
                 <FurretMascot size={160} style={{ transform: "rotate(-6deg)" }} />
                 <Pill tone="paper" className="absolute left-2.5 top-2.5">
-                  Nº {iss.issue}
+                  {t("issueNumber", { issue: iss.issue })}
                 </Pill>
               </div>
               <div className="p-3.5">
                 <div className="font-ft-display text-[22px] leading-none">{iss.headline}</div>
                 <div className="font-ft-ui mt-1 text-[13px] font-medium uppercase tracking-[0.04em] text-ft-ink/70">
-                  {iss.articles} {iss.articles === 1 ? "artículo" : "artículos"}
+                  {t("articles", { count: iss.articles })}
                 </div>
               </div>
             </Card>

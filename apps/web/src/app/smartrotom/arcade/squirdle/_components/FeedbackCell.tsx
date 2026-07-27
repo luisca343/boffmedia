@@ -1,3 +1,4 @@
+import { useTranslations } from "next-intl"
 import type { ReactNode } from "react"
 import { cn } from "@/lib/utils"
 import { Icon } from "../../_components/ui"
@@ -18,16 +19,20 @@ export const FEED_SKIN: Record<FeedState, string> = {
 
 // Colour never carries the verdict alone (§ house style): the state is spelled out
 // for screen readers, and the ordered attributes also show a direction arrow.
-const SPOKEN: Record<FeedState, string> = {
-  hit: "correcto",
-  near: "presente en el otro tipo",
-  miss: "incorrecto",
+const SPOKEN_KEY: Record<FeedState, string> = {
+  hit: "squirdle.feedback.hit",
+  near: "squirdle.feedback.near",
+  miss: "squirdle.feedback.miss",
 }
 
-const SPOKEN_DIR = { up: "el objetivo es mayor", down: "el objetivo es menor" } as const
+const SPOKEN_DIR_KEY = {
+  up: "squirdle.feedback.dirUp",
+  down: "squirdle.feedback.dirDown",
+} as const
 
 /** One attribute of one guess, judged against the hidden creature. */
 export function FeedbackCell({ fb, children, label }: FeedbackCellProps) {
+  const t = useTranslations("arcade")
   return (
     <div
       className={cn(
@@ -45,8 +50,8 @@ export function FeedbackCell({ fb, children, label }: FeedbackCellProps) {
         {fb.dir && <Icon.Chevron s={12} dir={fb.dir} />}
       </span>
       <span className="sr-only">
-        {label}: {SPOKEN[fb.state]}
-        {fb.dir ? `, ${SPOKEN_DIR[fb.dir]}` : ""}
+        {label}: {t(SPOKEN_KEY[fb.state])}
+        {fb.dir ? `, ${t(SPOKEN_DIR_KEY[fb.dir])}` : ""}
       </span>
     </div>
   )

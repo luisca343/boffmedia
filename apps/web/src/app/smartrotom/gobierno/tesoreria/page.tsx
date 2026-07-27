@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { PageHead, Skeleton } from "../_components/ui"
 import { TesoreriaStats } from "../_components/hacienda/TesoreriaStats"
 import { CashFlowChart } from "../_components/hacienda/CashFlowChart"
@@ -8,15 +9,16 @@ import { TasasTable } from "../_components/hacienda/TasasTable"
 import { useTesoreria } from "../_hooks/queries"
 
 export default function TesoreriaPage() {
+  const t = useTranslations("gobierno")
   const { data, isLoading } = useTesoreria()
 
   return (
     <>
       <PageHead
-        kicker="Hacienda · Tesorería municipal"
+        kicker={t("tesoreria.pageKicker")}
         dep="hacienda"
-        title="Tesorería"
-        sub="Balance de las arcas municipales, recaudación de tasas e impuestos, y gasto público de la región. Cada cifra procede del libro mayor de StarBank."
+        title={t("tesoreria.pageTitle")}
+        sub={t("tesoreria.pageSub")}
       />
 
       {isLoading || !data ? (

@@ -1,4 +1,5 @@
 import * as React from "react"
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { Icon } from "@/components/boffmedia/primitives"
 import { evOrgMeta, EV_BOFF, type EventOrganizerData } from "./events-util"
@@ -18,6 +19,8 @@ export function EventOrganizer({
   variant?: "inline" | "block"
   className?: string
 }) {
+  // `useTranslations` is sync-valid in a Server Component too — no "use client" needed here.
+  const t = useTranslations("events.organizer")
   const o = organizer ?? { role: "boffmedia" as const, name: EV_BOFF.name, avatar: EV_BOFF.avatar }
   const m = evOrgMeta(o.role)
   const dual = o.role !== "boffmedia"
@@ -40,10 +43,10 @@ export function EventOrganizer({
   if (variant === "block") {
     const line =
       o.role === "boffmedia"
-        ? "Un evento propio, organizado de principio a fin por Boffmedia."
+        ? t("lineBoffmedia")
         : o.role === "coorg"
-          ? `Organizado por Boffmedia junto a ${o.name}.`
-          : `${o.name} organiza este evento. Boffmedia aporta la plataforma, las inscripciones y los logros.`
+          ? t("lineCoorg", { name: o.name })
+          : t("linePlatform", { name: o.name })
     const tagCls =
       o.role === "coorg"
         ? "text-signal bg-signal-soft border border-solid border-[color-mix(in_srgb,var(--signal)_40%,var(--line-2))]"
@@ -56,7 +59,7 @@ export function EventOrganizer({
         <div className="flex min-w-0 flex-col gap-[7px]">
           <span className={cn("inline-flex items-center gap-[6px] self-start font-mono text-[9.5px] font-bold uppercase leading-none tracking-[0.13em] px-[9px] py-[5px] cut-tag [--cut-tag:4px]", tagCls)}>
             <Icon name={m.icon} size={12} />
-            {m.tag}
+            {t(m.tagKey)}
           </span>
           <span className="font-display text-[15px] font-bold uppercase leading-[1.15] tracking-[0.01em] text-txt [&_b]:font-bold">
             {o.role === "boffmedia" ? (
@@ -67,7 +70,7 @@ export function EventOrganizer({
               </>
             ) : (
               <>
-                <b>{o.name}</b> <span className="font-medium normal-case text-txt-dim">en Boffmedia</span>
+                <b>{o.name}</b> <span className="font-medium normal-case text-txt-dim">{t("inBoffmedia")}</span>
               </>
             )}
           </span>
@@ -80,13 +83,13 @@ export function EventOrganizer({
   return (
     <span
       className={cn("inline-flex min-w-0 items-center gap-[9px] font-mono text-[11px] font-semibold leading-none tracking-[0.04em] text-txt-muted", className)}
-      title={m.label}
+      title={t(m.labelKey)}
     >
       {seals("w-[22px] h-[22px] text-[10px]", "-ml-[7px]")}
       <span className="overflow-hidden text-ellipsis whitespace-nowrap [&_b]:font-bold [&_b]:text-txt">
         {o.role === "boffmedia" ? (
           <>
-            Por <b>Boffmedia</b>
+            {t("by")} <b>Boffmedia</b>
           </>
         ) : o.role === "coorg" ? (
           <>
@@ -94,7 +97,7 @@ export function EventOrganizer({
           </>
         ) : (
           <>
-            Por <b>{o.name}</b>
+            {t("by")} <b>{o.name}</b>
           </>
         )}
       </span>

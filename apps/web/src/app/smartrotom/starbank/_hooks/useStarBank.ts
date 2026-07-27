@@ -1,8 +1,9 @@
 import { useEffect } from "react";
+import { useTranslations } from "next-intl";
 import { useStarBankStore } from "../_stores/useStarBankStore";
 import { useRotomUuid } from "@/components/smartrotom/behavior/useRotomUuid";
 import { getValidAccountId } from "../bankUtils";
-import { userMessageFrom } from "@/services/boffAPI";
+import { useApiError } from "@/hooks/useApiError";
 import { useAccounts } from "./queries";
 
 /**
@@ -14,6 +15,8 @@ import { useAccounts } from "./queries";
  * the account the trainer is looking at out from under them.
  */
 export default function useStarBank() {
+  const t = useTranslations("starbank");
+  const apiError = useApiError();
   const uuid = useRotomUuid();
   const { data: accounts, error, isLoading, refetch } = useAccounts(uuid);
   const { activeAccountId, setActiveAccountId } = useStarBankStore();
@@ -31,7 +34,7 @@ export default function useStarBank() {
     accounts: accounts ?? [],
     activeAccount,
     setActiveAccount: setActiveAccountId,
-    error: error ? userMessageFrom(error, "No se pudieron cargar las cuentas") : null,
+    error: error ? apiError(error, t("cuentas.errorCarga")) : null,
     isLoading,
     refetch,
   };

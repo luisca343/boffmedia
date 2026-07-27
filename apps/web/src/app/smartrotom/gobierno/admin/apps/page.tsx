@@ -2,6 +2,7 @@
 
 import { Suspense, useEffect, useState, type ReactNode } from "react"
 import { useSearchParams } from "next/navigation"
+import { useTranslations } from "next-intl"
 import { Bar, Button, Card, Empty, PageHead, Select, Skeleton } from "../../_components/ui"
 import { ConsolaHero } from "../../_components/admin/ConsolaHero"
 import {
@@ -39,6 +40,7 @@ export default function AppsPage() {
 }
 
 function AppsScreen() {
+  const t = useTranslations("gobierno")
   const searchParams = useSearchParams()
   const presetUuid = searchParams.get("uuid")
   const openDossier = useGobiernoUi((s) => s.openDossier)
@@ -68,17 +70,17 @@ function AppsScreen() {
   return (
     <>
       <PageHead
-        kicker="Administración · Dispositivos"
+        kicker={t("apps.kicker")}
         dep="poblacion"
-        title="Apps de jugador"
-        sub="Gestiona las aplicaciones del SmartRotom de cada ciudadano. Antes Gestión de Apps."
+        title={t("apps.title")}
+        sub={t("apps.sub")}
       />
-      <ConsolaHero title="Gestor de apps" code="apps" icon="smartphone" dep="poblacion" />
+      <ConsolaHero title={t("apps.heroTitle")} code="apps" icon="smartphone" dep="poblacion" />
 
       <Card className="mb-4">
         <div className="flex flex-wrap items-center gap-3 p-3.5">
           <span className="font-gt-mono text-[9.5px] font-bold uppercase tracking-[.12em] text-gt-ink-400">
-            Jugador
+            {t("apps.jugador")}
           </span>
           <div className="w-[260px]">
             {usersLoading ? (
@@ -89,7 +91,7 @@ function AppsScreen() {
           </div>
           {selectedUser && (
             <Button tone="ghost" size="sm" icon="fileText" className="ml-auto" onClick={() => openDossier(selectedUser.uuid)}>
-              Ver expediente
+              {t("apps.verExpediente")}
             </Button>
           )}
         </div>
@@ -98,7 +100,7 @@ function AppsScreen() {
       <div className="grid gap-4 lg:grid-cols-2">
         <Card className="overflow-hidden">
           <Bar icon="star" dep="gold">
-            Apps asignadas {assigned.length > 0 && <span className="font-gt-mono text-[11px] text-gt-ink-400"> · {assigned.length}</span>}
+            {t("apps.appsAsignadas")} {assigned.length > 0 && <span className="font-gt-mono text-[11px] text-gt-ink-400"> · {assigned.length}</span>}
           </Bar>
           {appsLoading || playerAppsLoading ? (
             <div className="grid grid-cols-4 gap-2.5 p-3.5">
@@ -114,20 +116,20 @@ function AppsScreen() {
                   app={a}
                   action={
                     <Button size="sm" tone="ghost" icon="minus" disabled={removeApp.isPending} onClick={() => removeApp.mutate({ uuid, id: a.id })}>
-                      Quitar
+                      {t("apps.quitar")}
                     </Button>
                   }
                 />
               ))}
             </div>
           ) : (
-            <Empty icon="badge" title="Sin apps asignadas" sub="Este jugador no tiene apps adicionales asignadas." />
+            <Empty icon="badge" title={t("apps.emptyAsignadas")} sub={t("apps.emptyAsignadasSub")} />
           )}
         </Card>
 
         <Card className="overflow-hidden">
           <Bar icon="plus" dep="poblacion">
-            Disponibles para asignar
+            {t("apps.disponibles")}
           </Bar>
           {appsLoading || playerAppsLoading ? (
             <div className="grid grid-cols-4 gap-2.5 p-3.5">
@@ -143,14 +145,14 @@ function AppsScreen() {
                   app={a}
                   action={
                     <Button size="sm" tone="soft" icon="plus" disabled={addApp.isPending} onClick={() => addApp.mutate({ uuid, id: a.id })}>
-                      Añadir
+                      {t("apps.anadir")}
                     </Button>
                   }
                 />
               ))}
             </div>
           ) : (
-            <Empty icon="checkCircle" title="Todo asignado" sub="Este jugador tiene todas las apps disponibles." />
+            <Empty icon="checkCircle" title={t("apps.emptyDisponibles")} sub={t("apps.emptyDisponiblesSub")} />
           )}
         </Card>
       </div>

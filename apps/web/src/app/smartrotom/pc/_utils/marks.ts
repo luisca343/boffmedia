@@ -14,7 +14,13 @@ export type PcMarkMap = Record<string, PcMarkState>
 
 export const EMPTY_MARK: PcMarkState = { favorite: false, tags: [] }
 
-/** The tags we suggest. Users can type any other. */
+/**
+ * The tags we suggest. Users can type any other.
+ *
+ * NOT chrome: a tag is persisted verbatim on the mark and filtered on by value,
+ * so translating these would orphan every tag already saved. They stay as-is in
+ * every locale, like any other user-authored content.
+ */
 export const SUGGESTED_TAGS = [
   "Competitivo",
   "Cría",

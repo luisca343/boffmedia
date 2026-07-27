@@ -24,7 +24,26 @@
       "day": "DAY {day}",
       "generating": "Opening…",
       "prizeObtained": "Prize obtained",
-      "spinning": "Spinning…"
+      "spinning": "Spinning…",
+      "dialog": "Dialog",
+      "ringAria": "{title}: {value} of {max}"
+    },
+    "rarity": {
+      "common": "Common",
+      "uncommon": "Uncommon",
+      "rare": "Rare",
+      "epic": "Epic",
+      "legendary": "Legendary",
+      "mythic": "Mythic"
+    },
+    "rewards": {
+      "coins": "{amount} coins",
+      "money": "{amount} PokéDollars"
+    },
+    "celebration": {
+      "ariaLabel": "Reward obtained: {name}",
+      "rewardObtained": "Reward obtained!",
+      "great": "Awesome!"
     },
     "sidebar": {
       "arcade": "Arcade",
@@ -44,11 +63,21 @@
       "library": "Library · {count} games",
       "arcadeGames": "Arcade Games",
       "allCategory": "All",
-      "footer": "ARCADE · SMARTROTOM EXPERIENCE"
+      "footer": "ARCADE · SMARTROTOM EXPERIENCE",
+      "marqueeStatus": "Linked · Roto-motor active",
+      "marqueeTitle": "YOUR RETRO ARCADE STATION",
+      "marqueeSubtitle": "Play the SmartRotom minigames, build your streak and unlock boxes from the active banner."
     },
     "gameTopBar": {
       "help": "Help",
-      "reset": "Reset"
+      "reset": "Reset",
+      "titles": {
+        "squirdle": "SQUIRDLE",
+        "voltorb": "FLIP VOLTORB",
+        "puzle": "PUZZLE",
+        "typedoku": "TYPEDOKU",
+        "maze": "MAZE"
+      }
     },
     "games": {
       "squirdle": {
@@ -116,7 +145,10 @@
       "unopenedBoxesSub": "in your inventory",
       "nextReset": "Next reset",
       "nextResetSub": "at 06:00",
-      "claimDescription": "Claim each day's reward to progress through the banner. The streak resets at 06:00; if you claim today, tomorrow the next day awaits."
+      "dayHeading": "DAY {current} <muted>of {total}</muted>",
+      "claimDescription": "Claim each day's reward to progress through the banner. The streak resets at 06:00; if you claim today, tomorrow the next day awaits.",
+      "kicker": "▸ Weekly streak · {banner}",
+      "resetsInStrong": "RESETS IN <b>{time}</b>"
     },
     "toast": {
       "boxOpened": "Box opened!",
@@ -159,7 +191,9 @@
       "reelNoServer": "The reel didn't arrive from the server, but the prize is still yours.",
       "abriendo": "Opening",
       "reelAriaSettled": "Prize obtained",
-      "reelAriaSpinning": "Spinning the box"
+      "reelAriaSpinning": "Spinning the box",
+      "oddsBarAria": "{rarity}: {pct} percent",
+      "boxArtAria": "Box with no artwork"
     },
     "coleccion": {
       "title": "Your collection",
@@ -168,6 +202,7 @@
       "claimToGame": "Claim in game",
       "emptyTitle": "Your collection is empty",
       "emptyBody": "Open loot boxes to get items.",
+      "inventoryError": "Could not load your inventory. Try again in a moment.",
       "filters": {
         "search": "Search items…",
         "searchAria": "Search in my collection",
@@ -195,7 +230,8 @@
         "searchPlaceholder": "Search my collection…",
         "searchAriaLabel": "Search my collection",
         "typeLabel": "Item type",
-        "allRarities": "All"
+        "allRarities": "All",
+        "typePokemon": "Pokémon"
       },
       "claim": {
         "kicker": "▸ Claim rewards",
@@ -209,10 +245,11 @@
         "selectItemsDescription": "Select the items you want to send to the game. Pokémon go straight to your PC; Minecraft items arrive in chests.",
         "outsideMinecraft": "You are outside the Minecraft client. Delivery only completes if you are connected to the server.",
         "claimError": "An error occurred while claiming the items.",
-        "selected": "Selected {count}",
-        "occupy": "They take {slots, plural, one {# slot} other {# slots}} in {chests, plural, one {# chest} other {# chests}}",
+        "selected": "Selected <b>{count}</b>",
+        "occupy": "They take <b>{slots}</b> {slots, plural, one {slot} other {slots}} in <c>{chests}</c> {chests, plural, one {chest} other {chests}}",
         "pokemonSection": "Pokémon",
-        "minecraftSection": "Minecraft Objects"
+        "minecraftSection": "Minecraft Objects",
+        "selectedPokemon": "<b>{count}</b> Pokémon"
       },
       "detail": {
         "quantity": "Quantity",
@@ -276,6 +313,16 @@
       "guessTheCreature": "Guess the hidden creature",
       "attempts": "{count} attempts",
       "noAttemptsYet": "No attempts yet.",
+      "invalidGuess": "That's not a valid Pokémon!",
+      "wonMessage": "Congratulations! You guessed the Pokémon: {name}",
+      "lostMessage": "You lost! The Pokémon was: {name}",
+      "feedback": {
+        "hit": "correct",
+        "near": "present in the other type",
+        "miss": "incorrect",
+        "dirUp": "the target is higher",
+        "dirDown": "the target is lower"
+      },
       "guessAPokemon": "Guess a Pokémon to start!",
       "columns": {
         "gen": "Gen",
@@ -322,7 +369,10 @@
         "arrowUp": "▲ indicates the target value is higher.",
         "arrowDown": "▼ indicates the target value is lower.",
         "amberType": "An amber tile on a type indicates that type is in the other position."
-      }
+      },
+      "invalidPokemon": "That's not a valid Pokémon!",
+      "won": "Congratulations! You guessed the Pokémon: {name}",
+      "lost": "You lost! The Pokémon was: {name}"
     },
     "voltorb": {
       "howToPlay": "How to play",
@@ -389,6 +439,16 @@
       "levelComplete": "LEVEL COMPLETE!",
       "levelCompleteText": "You found all multipliers without triggering any Voltorb!",
       "saveAndQuit": "Save and quit",
+      "score": "SCORE",
+      "level": "LEVEL",
+      "total": "TOTAL",
+      "levelLabel": "LEVEL {level}",
+      "flipHint": "Flip numbers to build up points",
+      "columnLabel": "Column {index}",
+      "rowLabel": "Row {index}",
+      "hintCellAria": "{label}: {coins} points, {voltorbs} voltorbs",
+      "cardsKicker": "CARDS {count}",
+      "coinsAria": "{count} coins banked this game",
       "memo": {
         "title": "MEMO",
         "notesOn": "Notes ON",
@@ -396,7 +456,10 @@
         "markVoltorb": "Mark Voltorb",
         "markX": "Mark x{mark}",
         "hint": "Activate {bold} and click on a tile to mark it without flipping it."
-      }
+      },
+      "cellRevealed": "Tile row {row}, column {col}: {value}",
+      "cellMarked": "Tile row {row}, column {col}, unflipped, marked: {marks}",
+      "cellHidden": "Tile row {row}, column {col}, unflipped"
     },
     "puzle": {
       "slidingPuzzle": "Sliding puzzle",
@@ -407,6 +470,7 @@
       "pieces": "Pieces",
       "inPlace": "In place",
       "shuffle": "Shuffle",
+      "pieceAria": "Piece {number}",
       "howToPlay": "How to play?",
       "rules": [
         "Click on a piece next to the gap to slide it.",
@@ -427,13 +491,13 @@
       "noteHint": "Note hint (P)",
       "notesMode": "Notes mode: {state} (M)",
       "howToPlay": "How to play?",
-      "rules": [
-        "Fill the grid without repeating a type in the same row, column or 3×3 box.",
-        "Select a tile and choose a type from the panel, or press its initial on the keyboard.",
-        "Move around the board with the arrow keys.",
-        "{boldM} toggles notes mode, {boldP} notes possible types and {boldH} reveals the selected tile.",
-        "{boldN} starts a new game; {boldCtrlZ} and {boldCtrlY} undo and redo."
-      ]
+      "rules": {
+        "fillGrid": "Fill the grid without repeating a type in the same row, column or 3×3 box.",
+        "selectTile": "Select a tile and choose a type from the panel, or press its initial on the keyboard.",
+        "moveArrows": "Move around the board with the arrow keys.",
+        "toggleNotes": "<boldM>M</boldM> toggles notes mode, <boldP>P</boldP> notes possible types and <boldH>H</boldH> reveals the selected tile.",
+        "newGame": "<boldN>N</boldN> starts a new game; <boldCtrlZ>Ctrl+Z</boldCtrlZ> and <boldCtrlY>Ctrl+Y</boldCtrlY> undo and redo."
+      }
     },
     "maze": {
       "dungeon": "Dungeon",
@@ -448,6 +512,9 @@
       "deadEnds": "Dead ends",
       "alleys": "Alleys",
       "bossDistance": "Distance to boss",
+      "bossTag": "1 boss",
+      "sizeDepth": "{size} × {size} · Depth {depth}",
+      "expectedRooms": "Expected {min}–{max}",
       "howItWorks": "How does it work?",
       "roomLabels": {
         "start": "Start room",
@@ -455,12 +522,12 @@
         "boss": "Boss room",
         "wall": "Wall"
       },
-      "rules": [
-        "Each dungeon is generated on the fly: a starting room, connected rooms and a boss.",
-        "{boldSize} changes the grid side; {boldDepth}, how many rooms are dug out.",
-        "Regenerate deals a new dungeon with the same parameters.",
-        "The debug view prints the grid in text: S start, R room, B boss, W wall."
-      ]
+      "rules": {
+        "onTheFly": "Each dungeon is generated on the fly: a starting room, connected rooms and a boss.",
+        "dials": "<boldSize>Size</boldSize> changes the grid side; <boldDepth>depth</boldDepth>, how many rooms are dug out.",
+        "regenerate": "Regenerate deals a new dungeon with the same parameters.",
+        "debugView": "The debug view prints the grid in text: S start, R room, B boss, W wall."
+      }
     },
     "hud": {
       "trainerFallback": "Trainer",
@@ -470,7 +537,8 @@
       "box": "{count, plural, one {box} other {boxes}}",
       "resetsIn": "RESETS IN {resetIn}",
       "syncing": "Syncing…",
-      "synced": "Synced"
+      "synced": "Synced",
+      "dayOf": "DAY {current}/{total}"
     },
     "collectionGrid": {
       "noMatches": "No items match the filters.",

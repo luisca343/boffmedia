@@ -1,4 +1,5 @@
 import * as React from "react"
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { Icon, type IconName } from "@/components/boffmedia/primitives"
 import { DK_CUT } from "./utils"
@@ -61,7 +62,9 @@ export interface DkSearchProps {
   className?: string
 }
 
-export function DkSearch({ value, onChange, placeholder = "Buscar…", ariaLabel, className }: DkSearchProps) {
+export function DkSearch({ value, onChange, placeholder, ariaLabel, className }: DkSearchProps) {
+  const t = useTranslations("common.dkExtras")
+  const ph = placeholder ?? t("searchPh")
   return (
     <div
       style={{ clipPath: DK_CUT }}
@@ -74,14 +77,14 @@ export function DkSearch({ value, onChange, placeholder = "Buscar…", ariaLabel
       <input
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        placeholder={placeholder}
-        aria-label={ariaLabel ?? placeholder}
+        placeholder={ph}
+        aria-label={ariaLabel ?? ph}
         className="min-w-0 flex-1 border-0 bg-transparent py-[9px] font-body text-[13px] font-medium leading-none text-txt outline-none placeholder:text-txt-dim"
       />
       {value && (
         <button
           type="button"
-          aria-label="Limpiar"
+          aria-label={t("clear")}
           onClick={() => onChange("")}
           className="grid place-items-center p-1 text-txt-dim transition-colors hover:text-txt"
         >

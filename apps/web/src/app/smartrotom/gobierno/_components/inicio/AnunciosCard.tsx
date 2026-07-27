@@ -6,12 +6,19 @@ import { Badge, Bar, Card, Empty, Skeleton, Sunken } from "../ui"
 import { useAnuncios } from "../../_hooks/queries"
 import { fmtDate } from "../../_utils/format"
 import { hrefOf } from "../../_utils/nav"
+import { useFormat } from "@/lib/useFormat"
 import type { Tone } from "../../_utils/tones"
 
 const KIND_TONE: Record<string, Tone> = { evento: "gold", anuncio: "civic", alerta: "danger" }
+const KIND_KEY: Record<string, string> = {
+  evento: "anuncios.kindEvento",
+  anuncio: "anuncios.kindAnuncio",
+  alerta: "anuncios.kindAlerta",
+}
 
 export function AnunciosCard() {
   const t = useTranslations("gobierno")
+  const { intlLocale } = useFormat()
   const { data, isLoading } = useAnuncios({ pinned: true, pageSize: 2 })
   const items = data?.items ?? []
 
@@ -38,8 +45,8 @@ export function AnunciosCard() {
             <Link key={e.id} href={hrefOf("anuncios")} className="block">
               <Sunken className="p-3 transition-colors hover:bg-gt-paper-1">
                 <div className="mb-[5px] flex items-center gap-[7px]">
-                  <Badge tone={KIND_TONE[e.kind] ?? "default"}>{e.kind}</Badge>
-                  <span className="font-gt-mono text-[10px] text-gt-ink-400">{fmtDate(e.publishedAt)}</span>
+                  <Badge tone={KIND_TONE[e.kind] ?? "default"}>{KIND_KEY[e.kind] ? t(KIND_KEY[e.kind]) : e.kind}</Badge>
+                  <span className="font-gt-mono text-[10px] text-gt-ink-400">{fmtDate(e.publishedAt, intlLocale)}</span>
                 </div>
                 <div className="mb-[3px] font-gt-display text-[14.5px] text-gt-ink-900">{e.title}</div>
                 <div className="line-clamp-2 text-[11.5px] leading-relaxed text-gt-ink-500">{e.body}</div>

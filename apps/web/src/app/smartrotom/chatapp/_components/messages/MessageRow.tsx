@@ -238,6 +238,7 @@ export function MessageRow({
   onCallback?: () => void;
   callBusy?: boolean;
 }) {
+  const t = useTranslations("chatapp");
   if (message.uuid === "system" || message.type === "system") {
     return <div className="my-1.5 self-center rounded-ca-md bg-ca-header px-[13px] py-[5px] text-[12.5px] text-ca-300 shadow-[0_1px_1px_rgba(0,0,0,.08)]">{message.content}</div>;
   }
@@ -270,7 +271,7 @@ export function MessageRow({
   } else if (message.type === "sticker") {
     inner = (
       <div>
-        <img src={message.content} alt="sticker" className="h-32 w-32 object-contain drop-shadow-[0_4px_8px_rgb(0_0_0/.25)]" />
+        <img src={message.content} alt={t("message.stickerAlt")} className="h-32 w-32 object-contain drop-shadow-[0_4px_8px_rgb(0_0_0/.25)]" />
         <div className={cn("mt-0.5 text-[10.5px] text-ca-500", out ? "text-right" : "text-left")}>{time}</div>
       </div>
     );

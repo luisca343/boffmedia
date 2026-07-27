@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { DkSeg } from "@/components/boffmedia/ui/tools/datakit"
 import { TnEntrant } from "./TnEntrant"
@@ -17,6 +18,7 @@ export interface TnPairingRound {
  * selector defaults to the latest round; a single round hides it.
  */
 export function TnPairings({ rounds }: { rounds: TnPairingRound[] }) {
+  const t = useTranslations("torneos.pairings")
   const valid = rounds.filter((r) => r.matches.length > 0)
   const [sel, setSel] = React.useState<number | null>(null)
   if (valid.length === 0) return null
@@ -33,18 +35,18 @@ export function TnPairings({ rounds }: { rounds: TnPairingRound[] }) {
           size="sm"
           value={String(active.round)}
           onChange={(v) => setSel(Number(v))}
-          ariaLabel="Ronda"
-          options={valid.map((r) => ({ value: String(r.round), label: `Ronda ${r.round}` }))}
+          ariaLabel={t("roundAriaLabel")}
+          options={valid.map((r) => ({ value: String(r.round), label: t("roundOption", { round: r.round }) }))}
         />
       )}
       <div className="overflow-x-auto border border-solid border-line bg-panel">
         <table className="w-full border-collapse">
           <thead>
             <tr className="border-b border-line">
-              <th className={cn(th, "w-12 text-center")}>Mesa</th>
-              <th className={cn(th, "text-right")}>Local</th>
-              <th className={cn(th, "w-20 text-center")}>Res.</th>
-              <th className={cn(th, "text-left")}>Visitante</th>
+              <th className={cn(th, "w-12 text-center")}>{t("colTable")}</th>
+              <th className={cn(th, "text-right")}>{t("colHome")}</th>
+              <th className={cn(th, "w-20 text-center")}>{t("colResult")}</th>
+              <th className={cn(th, "text-left")}>{t("colAway")}</th>
             </tr>
           </thead>
           <tbody>
@@ -66,7 +68,7 @@ export function TnPairings({ rounds }: { rounds: TnPairingRound[] }) {
                   <td className={td}>
                     {bye ? (
                       <span className="font-mono text-[11px] uppercase tracking-[0.1em] text-txt-dim">
-                        descansa
+                        {t("bye")}
                       </span>
                     ) : (
                       <TnEntrant c={m.bot} align="left" win={botWin} lose={topWin} compact />
@@ -83,7 +85,9 @@ export function TnPairings({ rounds }: { rounds: TnPairingRound[] }) {
 }
 
 function ScoreCell({ m, bye }: { m: TnMatch; bye: boolean }) {
-  if (bye) return <span className="font-mono text-[11px] font-bold text-ok">BYE</span>
+  const t = useTranslations("torneos.pairings")
+  const tEntrant = useTranslations("torneos.entrant")
+  if (bye) return <span className="font-mono text-[11px] font-bold text-ok">{tEntrant("bye")}</span>
   if (m.status === "final") {
     return (
       <span className="whitespace-nowrap font-mono text-[13px] font-bold tabular-nums">
@@ -94,6 +98,6 @@ function ScoreCell({ m, bye }: { m: TnMatch; bye: boolean }) {
     )
   }
   if (m.status === "playing")
-    return <span className="font-mono text-[9.5px] font-semibold uppercase tracking-[0.08em] text-warn">En juego</span>
-  return <span className="font-mono text-[11px] text-txt-dim">vs</span>
+    return <span className="font-mono text-[9.5px] font-semibold uppercase tracking-[0.08em] text-warn">{t("playing")}</span>
+  return <span className="font-mono text-[11px] text-txt-dim">{t("vs")}</span>
 }

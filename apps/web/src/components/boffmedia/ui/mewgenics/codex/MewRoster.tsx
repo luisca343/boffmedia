@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl"
 import { ChipGroup, Empty, Icon, SearchInput, Select } from "@/components/boffmedia/primitives"
 import { CxCard } from "../MewPop"
 import { MewData } from "../mew-store"
+import { mewCatKey } from "../mew-util"
 import { CX_CAP, CX_SORT } from "./codex-config"
 import type { MewCodexModel } from "./useMewCodex"
 
@@ -19,7 +20,7 @@ export function MewRoster({ codex }: { codex: MewCodexModel }) {
   return (
     <aside className={"mew-roster flex min-h-0 flex-col border-r-2 border-solid border-[color:var(--mwp-nline)] bg-[rgba(0,0,0,0.16)] max-[760px]:fixed max-[760px]:inset-y-0 max-[760px]:left-0 max-[760px]:z-[60] max-[760px]:w-[min(348px,88vw)] max-[760px]:bg-[color:var(--mwp-night-2)] max-[760px]:shadow-[12px_0_40px_rgba(0,0,0,0.5)] max-[760px]:transition-transform " + (rosterOpen ? "max-[760px]:translate-x-0" : "max-[760px]:-translate-x-full")}>
       <div className="flex flex-none flex-col gap-2.5 border-b border-dashed border-[color:var(--mwp-nline)] px-3.5 pb-[11px] pt-[13px]">
-        <SearchInput value={q} onChange={setQ} placeholder={t("roster.searchPlaceholder", { category: catDef.label.toLowerCase() })} size="sm" />
+        <SearchInput value={q} onChange={setQ} placeholder={t("roster.searchPlaceholder", { category: t(mewCatKey(codex.cat, "label")).toLowerCase() })} size="sm" />
         <div className="flex items-stretch gap-2">
           <div className="flex flex-none gap-[5px]">
             {(["grid", "list"] as const).map((vw) => (
@@ -39,7 +40,8 @@ export function MewRoster({ codex }: { codex: MewCodexModel }) {
       </div>
       <div ref={scrollRef} className="min-h-0 flex-1 overflow-y-auto px-3.5 pb-11 pt-[13px] [scrollbar-width:thin]">
         <div className="mb-3 text-[11px]/[1.3] tracking-[0.06em] text-[color:var(--mwp-cream-dim)] [font-family:var(--mwf-disp)]">
-          {filtered.length.toLocaleString("es")} {filtered.length === 1 ? catDef.singular : catDef.label.toLowerCase()}{filtered.length > CX_CAP ? t("roster.showingCap", { n: CX_CAP }) : ""}
+          {t("roster.count", { count: filtered.length, singular: t(mewCatKey(codex.cat, "singular")), label: t(mewCatKey(codex.cat, "label")).toLowerCase() })}
+          {filtered.length > CX_CAP ? t("roster.showingCap", { n: CX_CAP }) : ""}
         </div>
         {filtered.length === 0 ? (
           catDef.remote && abilitiesLoading ? (

@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useTranslations } from "next-intl"
 import { Avatar, Field, Icon, Modal, Select, Sunken, Button } from "../ui"
 import { RANK_OPTIONS } from "./officerRoles"
 import { useCenso, useGrantRole } from "../../_hooks/queries"
@@ -10,12 +11,15 @@ import type { Ciudadano } from "../../_types"
 // government roles. There is no officers table to insert into — granting the role IS the
 // appointment (SMARTROTOM_V3 domain note).
 export function AppointModal({ onClose }: { onClose: () => void }) {
+  const t = useTranslations("gobierno")
   const [search, setSearch] = useState("")
   const [selected, setSelected] = useState<Ciudadano | null>(null)
   const [role, setRole] = useState(RANK_OPTIONS[0]?.value ?? "")
 
   const { data } = useCenso({ page: 1, limit: 100 })
   const grant = useGrantRole()
+
+  const rankOptions = RANK_OPTIONS.map((o) => ({ value: o.value, label: o.labelKey ? t(o.labelKey) : (o.label ?? o.value) }))
 
   const results =
     !selected && search.trim().length > 0
@@ -31,15 +35,15 @@ export function AppointModal({ onClose }: { onClose: () => void }) {
     <Modal
       open
       onClose={onClose}
-      kicker="Población · Oficiales"
-      title="Nombrar funcionario"
+      kicker={t("poblacion.appointKicker")}
+      title={t("poblacion.appointTitle")}
       footer={
         <>
           <Button tone="ghost" onClick={onClose}>
-            Cancelar
+            {t("common.cancel")}
           </Button>
           <Button tone="gold" onClick={handleSubmit} disabled={!selected || !role || grant.isPending}>
-            Nombrar
+            {t("poblacion.nombrar")}
           </Button>
         </>
       }
@@ -47,7 +51,7 @@ export function AppointModal({ onClose }: { onClose: () => void }) {
       <div className="space-y-4">
         <div>
           <span className="mb-1.5 block font-gt-mono text-[9.5px] font-bold uppercase tracking-[.14em] text-gt-ink-400">
-            Ciudadano
+            {t("poblacion.ciudadano")}
           </span>
           {selected ? (
             <Sunken className="flex items-center gap-2.5 px-3 py-2">
@@ -56,7 +60,7 @@ export function AppointModal({ onClose }: { onClose: () => void }) {
               <button
                 type="button"
                 onClick={() => setSelected(null)}
-                aria-label="Cambiar ciudadano"
+                aria-label={t("poblacion.cambiarCiudadano")}
                 className="rounded-gt-sm p-1 text-gt-ink-400 hover:bg-gt-paper-3 hover:text-gt-ink-900"
               >
                 <Icon name="x" size={14} />
@@ -64,7 +68,12 @@ export function AppointModal({ onClose }: { onClose: () => void }) {
             </Sunken>
           ) : (
             <>
-              <Field value={search} onChange={setSearch} placeholder="Buscar ciudadano del censo…" icon="search" />
+              <Field
+                value={search}
+                onChange={setSearch}
+                placeholder={t("poblacion.buscarCiudadano")}
+                icon="search"
+              />
               {results.length > 0 && (
                 <div className="mt-1.5 max-h-[180px] overflow-y-auto rounded-gt-sm border border-gt-line">
                   {results.map((c) => (
@@ -87,7 +96,7 @@ export function AppointModal({ onClose }: { onClose: () => void }) {
           )}
         </div>
 
-        <Select value={role} onChange={setRole} options={RANK_OPTIONS} label="Cargo" />
+        <Select value={role} onChange={setRole} options={rankOptions} label={t("poblacion.cargo")} />
       </div>
     </Modal>
   )

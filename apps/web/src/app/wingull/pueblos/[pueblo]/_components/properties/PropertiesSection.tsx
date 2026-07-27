@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { TownData } from "../../types";
 import { SectionHeader } from "../shared/section/SectionHeader";
 import { PropertyCard } from "./PropertyCard";
@@ -11,6 +12,7 @@ interface PropertiesSectionProps {
 }
 
 export function PropertiesSection({ townData, townName }: PropertiesSectionProps) {
+  const t = useTranslations("wingull.properties");
   const [expandedProperty, setExpandedProperty] = useState<number | null>(null);
   const [selectedImages, setSelectedImages] = useState<{ [key: number]: number }>({});
   const { colorClaro, colorMedio, colorOscuro, parcelas, nombre } = townData.textos;
@@ -41,9 +43,9 @@ export function PropertiesSection({ townData, townName }: PropertiesSectionProps
 
       <div className="max-w-[80%] mx-auto">
         <SectionHeader
-          title={<span style={{color: colorClaro}}>Parcelas</span>}
-          subtitle={<span style={{color: colorMedio}}>Disponibles</span>}
-          description={<span>Encuentra tu hogar perfecto en {nombre}. Cada parcela ofrece una experiencia única con acceso a diferentes comodidades</span>}
+          title={<span style={{color: colorClaro}}>{t("titlePrimary")}</span>}
+          subtitle={<span style={{color: colorMedio}}>{t("titleAccent")}</span>}
+          description={<span>{t("description", { town: nombre })}</span>}
           townName={nombre}
           colorClaro={colorClaro}
           colorMedio={colorMedio}

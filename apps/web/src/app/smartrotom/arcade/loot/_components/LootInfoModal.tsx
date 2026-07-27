@@ -89,7 +89,7 @@ export function LootInfoModal({ open, onClose, box }: LootInfoModalProps) {
                   className="font-ar-display text-[10px] uppercase tracking-[0.12em]"
                   style={{ color: skin.fg }}
                 >
-                  {skin.name}
+                  {t(skin.nameKey)}
                 </span>
                 <Tag tone="ghost" size="sm">
                   {group.pct.toFixed(2)}%
