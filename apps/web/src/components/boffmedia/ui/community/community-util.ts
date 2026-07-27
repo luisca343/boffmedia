@@ -1,4 +1,5 @@
 import type { IconName } from "@/components/boffmedia/primitives"
+import { timeAgo as sharedTimeAgo } from "@/lib/format"
 
 // v3 «Señal» — Comunidad (Blog + Foro) shared types + helpers. Mirrors the
 // window globals/helpers from comunidad-data.js + comunidad-kit.jsx, but the
@@ -32,21 +33,12 @@ export interface CmAuthor {
 // drift). All community data is demo/[deferred] until the API lands.
 export const CM_NOW = new Date("2026-07-09T12:00:00")
 
-const MIN = 60000
-const HOUR = 3600000
-const DAY = 86400000
-
-/** Spanish relative time — mirrors window.timeAgo. */
+/** Spanish relative time — mirrors window.timeAgo. Thin wrapper over the shared
+ *  `lib/format` implementation (`lib/` is design-system neutral); Comunidad only
+ *  differs in its injected `now` and in counting weeks/months instead of falling
+ *  back to a date. */
 export function timeAgo(iso: string, now: Date = CM_NOW): string {
-  const diff = now.getTime() - new Date(iso).getTime()
-  if (diff < MIN) return "ahora mismo"
-  if (diff < HOUR) return "hace " + Math.floor(diff / MIN) + " min"
-  if (diff < DAY) return "hace " + Math.floor(diff / HOUR) + " h"
-  const days = Math.floor(diff / DAY)
-  if (days < 7) return "hace " + days + " d"
-  if (days < 30) return "hace " + Math.floor(days / 7) + " sem"
-  const months = Math.floor(days / 30)
-  return "hace " + months + " mes" + (months > 1 ? "es" : "")
+  return sharedTimeAgo(iso, { now, tail: "relative", nowLabel: "ahora mismo" })
 }
 
 /** 1.2k-style compact number — mirrors window.fmtNum. */

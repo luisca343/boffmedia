@@ -1,0 +1,9 @@
+feature: gremio-mazmorra
+transitions[7]{ts,phase,result,model,note}:
+  2026-07-23,prepare,success,orchestrator,context gathered inline (skipped sdd-init: bounded change, context already held)
+  2026-07-23,spec,success,standard,launcher tile name is DB data not code -> in-app rebrand only; rest deferred to out-of-band admin edit
+  2026-07-23,design,skipped,,express-lane (small change, ms-* approach settled in spec)
+  2026-07-23,tasks,success,standard,8 tasks T1-T8; resolved client-not-server + lift ALL hardcoded SideRail strings
+  2026-07-23,apply,success,standard,all 8 tasks done; type-check passes both packages; stub removed; i18n en/es parity 95 keys
+  2026-07-23,verify,success,standard,review.toon verdict=pass; all RF-01..RF-08 met with file:line evidence; sensitive_areas clean
+  2026-07-23,archive,success,orchestrator,cycle complete; NOT committed (awaiting user authorization); launcher tile rename owed out-of-band

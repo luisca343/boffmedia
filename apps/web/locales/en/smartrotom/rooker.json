@@ -4,11 +4,11 @@
       "close": "Close",
       "back": "Back",
       "retry": "Retry",
-      "loadingPosts": "Loading chirps",
+      "loadingPosts": "Loading Trinos",
       "whoToFollow": "Who to follow",
       "followedEveryone": "You already follow the whole nest.",
       "trendingInNest": "Trending in the nest",
-      "postsCount": "{formatted} {count, plural, one {chirp} other {chirps}}",
+      "postsCount": "{formatted} {count, plural, one {Trino} other {Trinos}}",
       "loginRequiredTitle": "Sign in",
       "verifiedTrainer": "Verified trainer",
       "follow": {
@@ -40,7 +40,7 @@
     "shell": {
       "homeAriaLabel": "Rooker · Home",
       "yourProfileAriaLabel": "Your profile",
-      "composeFabAriaLabel": "Create chirp",
+      "composeFabAriaLabel": "Create Trino",
       "nav": {
         "inicio": "Home",
         "explorar": "Explore",
@@ -58,7 +58,7 @@
         "accent": "Accent color",
         "font": "Font",
         "density": "Density",
-        "cardStyle": "Chirp style",
+        "cardStyle": "Trino style",
         "reactions": "Reactions"
       },
       "background": {
@@ -90,13 +90,13 @@
     },
     "compose": {
       "attachImageAriaLabel": "Attach image",
-      "submit": "Chirp",
+      "submit": "Post Trino",
       "pending": "Sending…",
-      "inlinePlaceholder": "What's {name} chirping about?",
-      "dialogTitle": { "reply": "Reply", "new": "Create chirp" },
+      "inlinePlaceholder": "What is your next Trino, {name}?",
+      "dialogTitle": { "reply": "Reply", "new": "Create Trino" },
       "replyingToPrefix": "Replying to",
       "placeholder": {
-        "reply": "Chirp your reply…",
+        "reply": "Reply with a Trino…",
         "new": "What's happening?"
       },
       "mediaPlaceholder": "Paste your screenshot link…",
@@ -104,9 +104,9 @@
       "charCountAriaLabel": "{count} of {max}"
     },
     "toast": {
-      "postPublished": "Your chirp went out to the nest.",
+      "postPublished": "Your Trino went out to the nest.",
       "replyPublished": "Your reply went out.",
-      "publishFailed": "Couldn't send the chirp.",
+      "publishFailed": "Could not post it.",
       "profileUpdated": "Profile updated.",
       "handleTaken": "That handle is already taken.",
       "profileSaveFailed": "Couldn't save the profile."
@@ -120,21 +120,21 @@
       },
       "emptyFollowing": {
         "title": "Your nest is quiet",
-        "body": "Chirps from trainers you follow will show up here. You're not following anyone who has chirped yet."
+        "body": "Trinos from trainers you follow will show up here. You are not following anyone who has posted a Trino yet."
       },
       "emptyForYou": {
         "title": "The nest is empty",
-        "bodyLoggedIn": "Nobody has chirped yet. Be the first: tell everyone about a catch, challenge someone, or just say hi.",
-        "bodyLoggedOut": "There are no chirps yet. Sign in to write the first one.",
-        "cta": "Write the first chirp"
+        "bodyLoggedIn": "Nobody has posted a Trino yet. Be the first: tell everyone about a catch, challenge someone, or just say hi.",
+        "bodyLoggedOut": "There are no Trinos yet. Sign in to write the first one.",
+        "cta": "Write the first Trino"
       }
     },
     "search": {
       "trendsTitle": "Trending in the nest",
-      "trendsEmpty": "There are no trends yet. #Tags from the last seven days of chirps show up here.",
+      "trendsEmpty": "There are no trends yet. #Tags from the last seven days of Trinos show up here.",
       "resultsUsersTitle": "Trainers",
       "resultsTagsTitle": "Tags",
-      "resultsPostsTitle": "Chirps",
+      "resultsPostsTitle": "Trinos",
       "noResults": {
         "title": "No results for “{term}”",
         "body": "Try a trainer's name, a #tag, or a single word."
@@ -147,7 +147,7 @@
     },
     "rightRail": {
       "trendsTitle": "Trends",
-      "trendsEmpty": "There are no trends yet. Use a #tag in your next chirp and it'll show up here.",
+      "trendsEmpty": "There are no trends yet. Use a #tag in your next Trino and it will show up here.",
       "footer": "Rooker · part of the BoffMedia · SmartRotom ecosystem"
     },
     "messages": {
@@ -197,13 +197,13 @@
       "stats": { "captures": "CATCHES", "battles": "BATTLES", "shinies": "SHINIES", "dex": "POKÉDEX" },
       "vitrinaTitle": "Showcase",
       "viewCollection": "View collection →",
-      "tabs": { "trinos": "Chirps", "capturas": "Catches", "combates": "Battles", "media": "Media" },
+      "tabs": { "trinos": "Trinos", "capturas": "Catches", "combates": "Battles", "media": "Media" },
       "countsFollowing": "Following",
       "countsFollowers": "Followers",
       "noPosts": {
         "title": "Nothing here",
-        "bodyMe": "You haven't chirped in this category yet.",
-        "bodyOther": "@{handle} hasn't chirped in this category yet."
+        "bodyMe": "You have not posted a Trino in this category yet.",
+        "bodyOther": "@{handle} has not posted a Trino in this category yet."
       }
     },
     "editProfile": {
@@ -226,21 +226,21 @@
       }
     },
     "post": {
-      "title": "Chirp",
+      "title": "Trino",
       "notFound": {
-        "title": "This chirp is no longer here",
+        "title": "This Trino is no longer here",
         "fallbackBody": "Its author may have deleted it."
       },
       "pinnedBy": "Pinned by the nest",
-      "retrinoedBy": "@{handle} rechirped",
+      "retrinoedBy": "@{handle} shared a Retrino",
       "actions": {
         "reply": "Reply",
-        "retrino": "Rechirp",
-        "undoRetrino": "Undo rechirp",
+        "retrino": "Retrino",
+        "undoRetrino": "Undo Retrino",
         "save": "Save",
         "unsave": "Remove from saved"
       },
-      "stats": { "retrinos": "Rechirps", "replies": "Replies" },
+      "stats": { "retrinos": "Retrinos", "replies": "Replies" },
       "replyPrompt": "Reply to @{handle}…",
       "noReplies": {
         "title": "No replies yet",
@@ -266,7 +266,7 @@
       },
       "media": {
         "unavailable": "This image is no longer available",
-        "alt": "Chirp attachment"
+        "alt": "Trino attachment"
       }
     }
   }

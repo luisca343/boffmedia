@@ -154,6 +154,7 @@ function CreateAccountDialog({ uuid, onClose, onCreated }: { uuid?: string; onCl
   const createAccount = useCreateAccountMutation(uuid);
 
   function submit() {
+    if (createAccount.isPending) return;
     if (!name.trim() || !uuid) {
       setError(t("cuentas.dialog.errorEmpty"));
       return;
@@ -180,7 +181,7 @@ function CreateAccountDialog({ uuid, onClose, onCreated }: { uuid?: string; onCl
       </div>
       {error && <div className="text-[13px] font-medium text-sb-neg">{error}</div>}
       <div className="mt-auto flex justify-end gap-2">
-        <Button variant="ghost" onClick={onClose}>{t("common.cancel")}</Button>
+        <Button variant="ghost" onClick={onClose} disabled={createAccount.isPending}>{t("common.cancel")}</Button>
         <Button variant="primary" onClick={submit} disabled={createAccount.isPending || !name.trim()}>{createAccount.isPending ? t("cuentas.dialog.creating") : t("cuentas.dialog.create")}</Button>
       </div>
     </Sheet>

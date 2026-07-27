@@ -57,6 +57,9 @@ export default function Enviar() {
 
   function finish() {
     if (!recipient || !fromAcc) return;
+    // Money moves here: `disabled` only takes effect after a re-render, so a
+    // double-click landing before that would fire two transfers.
+    if (transferMutation.isPending) return;
     setError("");
     // `done` (the "¡Transferencia enviada!" screen) must only ever be set from
     // `onSuccess` — that fires exclusively when `rotomPOSTOrThrow` resolved, i.e. the
@@ -224,7 +227,7 @@ export default function Enviar() {
             {error && <div className="text-[13px] font-medium text-sb-neg">{error}</div>}
 
             <div className="flex items-center justify-between">
-              <Button variant="ghost" onClick={() => setStep(1)}><Ico name="arrL" size={14} /> {t("common.back")}</Button>
+              <Button variant="ghost" onClick={() => setStep(1)} disabled={transferMutation.isPending}><Ico name="arrL" size={14} /> {t("common.back")}</Button>
               <Button variant="primary" size="lg" onClick={finish} disabled={transferMutation.isPending}><Ico name="send" size={16} /> {transferMutation.isPending ? t("enviar.sending") : t("enviar.confirmSend")}</Button>
             </div>
           </div>

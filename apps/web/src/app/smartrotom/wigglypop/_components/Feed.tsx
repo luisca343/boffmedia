@@ -165,6 +165,7 @@ export function Feed() {
                 variant={f.density === "list" ? "list" : "cozy"}
                 watched={watchedIds.has(L.id)}
                 onWatch={() => toggleWatch.mutate(L.id)}
+                watchBusy={toggleWatch.isPending}
                 onOpen={() => router.push(`/smartrotom/wigglypop/anuncio/${L.id}`)}
               />
             ))}

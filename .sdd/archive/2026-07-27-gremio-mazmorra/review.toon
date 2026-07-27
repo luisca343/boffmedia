@@ -1,0 +1,21 @@
+feature: gremio-mazmorra
+phase: verify
+
+scenarios[8]{rf,verdict,evidence}:
+  RF-01,met,"MazmorraLeaderboard.tsx:33-73 renders Paper/Label ms-* only; rows 1-3 get MEDAL_CLASS (ms-gold-1/2/3, line 8) + Icon.Medal (line 61); isCurrent (line 49) compares entry.uuid to currentUuid from useRotomUuid() piped in from page.tsx:14,36 and highlighted via border-ms-gold-2/bg-ms-gold-2 (line 56)"
+  RF-02,met,"MazmorraLeaderboard.tsx:36-37 - ranking.length===0 renders EmptyBoard(t('empty')) instead of the table branch"
+  RF-03,met,"MazmorraRecord.tsx:42-47 reads run.pisosSuperados/etapaFinal/duracionMs/maldiciones.length from stats.mejorPartida (queries.ts:87-97 useDungeonPlayerStats -> MazmorraService.getPlayerStats), plus rank via stats.rank (record.tsx:61)"
+  RF-04,met,"queries.ts:92-95 queryFn does not throw on failure - returns result.data ?? null regardless of result.success, so a 404 resolves to null; MazmorraRecord.tsx:33-40 renders EmptyBoard when !run||!stats (covers null-uuid via enabled:Boolean(uuid) gate at queries.ts:91 and 404 alike) - never a raw error"
+  RF-05,met,"SideRail.tsx:14 adds the mazmorra SECTIONS entry (href /smartrotom/misiones/mazmorra, glyph ⚔) consumed by both SideRail (line 44-58) and MobileRail (line 76-93); useIsCurrent (line 17-20) applies pathname.startsWith(href) uniformly, same mechanism as the other 5 tabs"
+  RF-06,met,"SideRail.tsx has zero literal Spanish/English strings left - eyebrow/brand/tagline/ariaLabel/footer/tab label+short all via t() (lines 24,31,34,37,43,54,70,75,90); misiones.json en/es both carry sideRail.{eyebrow,brand,tagline,ariaLabel,footer,tabs.*} and mazmorra.{eyebrow,title,subtitle,loading,leaderboard.*,personalRecord.*} with identical key shape (compared en:1-146 vs es:1-146, only values differ); MazmorraLeaderboard/MazmorraRecord/page.tsx route every literal through useTranslations"
+  RF-07,met,"git status confirms apps/web/src/app/smartrotom/mazmorra/{page.tsx,ranking/page.tsx,_components/MenuWrapper.tsx} show as deleted (D); grep for smartrotom/mazmorra outside misiones/mazmorra across apps/web/src returns zero hits - nothing left dangling"
+  RF-08,met,"apply phase (history.toon 2026-07-23 apply row) reports pnpm type-check green for both packages; trusted per instructions, not re-run"
+
+sensitive_areas_check:
+  design_system_boundary,pass,"grep for bg-layer-1/bg-layer-edge/bg-edge under app/smartrotom/misiones returns nothing; every import in the 3 new files is ./ui (ms-* primitives), @boffmedia/shared types, or next-intl/react-query - no Boffmedia components/ui/primitives crossover"
+  shell_height_contract,pass,"mazmorra/page.tsx:18 root is 'flex min-h-full flex-col' matching layout.tsx's documented per-page-root contract (layout.tsx:31-33 comment); no h-full anywhere in the new files"
+  i18n_both_locales,pass,"en and es misiones.json both present, both valid JSON (read successfully), sideRail.tabs and mazmorra namespaces have identical key structure in both"
+  shared_src_untouched,pass,"git status shows no changes under packages/shared/src"
+  stub_removal_no_danglers,pass,"see RF-07 evidence"
+
+verdict: pass

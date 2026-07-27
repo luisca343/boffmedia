@@ -1,7 +1,9 @@
 // Surface-agnostic: every glyph paints in `currentColor`, so it is the desk or the paper
 // ink of whatever it is placed in.
 
+import type { ComponentProps } from "react"
 import { cn } from "@/lib/utils"
+import { makeIconComponent } from "@/components/smartrotom/behavior/makeIconComponent"
 import {
   Clock,
   Trophy,
@@ -83,24 +85,13 @@ const FILLED = new Set<IconName>(["star"])
 
 export type IconName = keyof typeof MAP
 
-export interface IconProps {
-  name: IconName
-  /** Size is a class (`h-4 w-4`, `h-[17px] w-[17px]`) — there is no `size` prop. */
-  className?: string
-}
+/** Sized by class (`h-4 w-4`, `h-[17px] w-[17px]`) — `size` is ignored here. */
+export const Icon = makeIconComponent(MAP, {
+  sizeless: true,
+  strokeWidth: 2,
+  fill: false,
+  filled: FILLED,
+  className: (cls) => cn("h-4 w-4 flex-none", cls),
+})
 
-export function Icon({ name, className }: IconProps) {
-  const Glyph = MAP[name]
-  if (!Glyph) return null
-  const filled = FILLED.has(name)
-  return (
-    <Glyph
-      fill={filled ? "currentColor" : "none"}
-      stroke={filled ? "none" : "currentColor"}
-      strokeWidth={2}
-      aria-hidden="true"
-      focusable="false"
-      className={cn("h-4 w-4 flex-none", className)}
-    />
-  )
-}
+export type IconProps = ComponentProps<typeof Icon>

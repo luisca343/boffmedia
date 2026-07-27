@@ -80,7 +80,7 @@ export function TeamRow({ mon, index }: TeamRowProps) {
       }}
       onContextMenu={(e) => {
         e.preventDefault()
-        setMark.mutate({ key: mon.key, patch: { favorite: !fav } })
+        if (!setMark.isPending) setMark.mutate({ key: mon.key, patch: { favorite: !fav } })
       }}
       className={[
         "flex h-14 flex-none cursor-pointer touch-none items-center gap-[9px] rounded-pc-sm border py-0 pl-1.5 pr-2.5",

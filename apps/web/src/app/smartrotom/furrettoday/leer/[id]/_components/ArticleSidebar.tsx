@@ -153,6 +153,7 @@ function SidebarComments({ newsId }: { newsId: number }) {
                       <button
                         type="button"
                         onClick={() => del.mutate(c.id)}
+                        disabled={del.isPending}
                         aria-label={t("article.deleteCommentAriaLabel")}
                         className="text-ft-ink/40 hover:text-ft-pink"
                       >

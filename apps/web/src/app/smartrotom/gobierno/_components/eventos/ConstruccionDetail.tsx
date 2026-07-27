@@ -236,7 +236,7 @@ export function ConstruccionDetail({ ev }: { ev: Evento }) {
             <Button tone="ghost" onClick={() => setConfirmClose(false)}>
               {t("common.cancel")}
             </Button>
-            <Button tone="gold" icon="checkCircle" onClick={closeEvento}>
+            <Button tone="gold" icon="checkCircle" onClick={closeEvento} disabled={updateEvento.isPending}>
               {t("eventos.cerrarPublicarGanador")}
             </Button>
           </>

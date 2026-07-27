@@ -15,6 +15,7 @@ export function NewsRow({
   onTogglePublished,
   onToggleFeatured,
   onRequestDelete,
+  busy = false,
 }: {
   article: FtArticle;
   active: boolean;
@@ -22,6 +23,7 @@ export function NewsRow({
   onTogglePublished: () => void;
   onToggleFeatured: () => void;
   onRequestDelete: () => void;
+  busy?: boolean;
 }) {
   const status = statusOf(article);
 
@@ -62,8 +64,20 @@ export function NewsRow({
           className="mt-2.5 flex flex-wrap items-center gap-1.5"
           onClick={(e) => e.stopPropagation()}
         >
-          <Toggle checked={article.published} label="Publicada" tone="cyan" onChange={onTogglePublished} />
-          <Toggle checked={article.featured} label="Destacada" tone="pink" onChange={onToggleFeatured} />
+          <Toggle
+            checked={article.published}
+            label="Publicada"
+            tone="cyan"
+            onChange={onTogglePublished}
+            disabled={busy}
+          />
+          <Toggle
+            checked={article.featured}
+            label="Destacada"
+            tone="pink"
+            onChange={onToggleFeatured}
+            disabled={busy}
+          />
           <button
             type="button"
             onClick={onRequestDelete}

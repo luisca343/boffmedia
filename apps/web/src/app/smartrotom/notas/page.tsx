@@ -20,6 +20,7 @@ import { ShareDialog } from "./_components/overlays/ShareDialog";
 import { VersionHistory } from "./_components/overlays/VersionHistory";
 import { GraphView } from "./_components/overlays/GraphView";
 import { TweaksPanel } from "./_components/overlays/TweaksPanel";
+import { useGuardedSubmit } from "@/components/smartrotom/behavior/useGuardedSubmit";
 import type { NoteVM, View, SortKey, ModalKind } from "./_types";
 
 export default function NotesPage() {
@@ -98,35 +99,52 @@ export default function NotesPage() {
     [activeTab, splitId],
   );
 
-  const newNote = useCallback(async () => {
+  // Double-clicking "new note" used to create two notes: the handler was a bare
+  // async callback and every trigger stayed enabled while it was in flight.
+  const { submit: newNote, isPending: creatingNote } = useGuardedSubmit(async () => {
     const id = await actions.newNote({
       folderId: view.type === "folder" ? Number(view.id) : null,
     });
     if (id != null) openNote(id);
     toast(t("toast.created"));
-  }, [actions, view, openNote, t]);
+  });
 
-  const openTitle = useCallback(
-    async (title: string) => {
-      const found = notes.find((n) => n.title === title);
-      if (found) openNote(found.id);
-      else {
-        const id = await actions.newNote({ title, content: `<h1>${title}</h1><p><br></p>` });
-        if (id != null) openNote(id);
-      }
-    },
-    [notes, actions, openNote],
-  );
+  const { submit: newFolder, isPending: creatingFolder } = useGuardedSubmit(async () => {
+    const name = window.prompt(t("sidebar.folderNamePrompt"));
+    if (!name?.trim()) return;
+    await actions.createFolder(name.trim());
+    toast(t("toast.folderCreated"), "info");
+  });
+
+  const { submit: openTitle } = useGuardedSubmit(async (title: string) => {
+    const found = notes.find((n) => n.title === title);
+    if (found) {
+      openNote(found.id);
+      return;
+    }
+    const id = await actions.newNote({ title, content: `<h1>${title}</h1><p><br></p>` });
+    if (id != null) openNote(id);
+  });
 
   // Creating from the link picker must not steal the writer's cursor, so the new
   // note is created in the background instead of being opened like `openTitle` does.
-  const createLinked = useCallback(
-    async (title: string) => {
-      const id = await actions.newNote({ title, content: `<h1>${title}</h1><p><br></p>` });
-      if (id != null) toast(t("editor.createLinked", { title }));
+  const { submit: createLinked } = useGuardedSubmit(async (title: string) => {
+    const id = await actions.newNote({ title, content: `<h1>${title}</h1><p><br></p>` });
+    if (id != null) toast(t("editor.createLinked", { title }));
+  });
+
+  const { submit: quickCapture } = useGuardedSubmit(
+    async (init: { title: string; content: string }) => {
+      const id = await actions.newNote(init);
+      if (id != null) openNote(id);
+      toast(t("toast.created"));
     },
-    [actions, t],
   );
+
+  const { submit: pickTemplate } = useGuardedSubmit(async (tpl: { name: string; content: string }) => {
+    const id = await actions.newNote({ title: tpl.name, content: tpl.content });
+    if (id != null) openNote(id);
+  });
 
   // ---- pane handlers ----
   const onCommit = useCallback(
@@ -270,14 +288,10 @@ export default function NotesPage() {
           expanded={expanded}
           toggleExpand={(id) => setExpanded((x) => ({ ...x, [id]: !x[id] }))}
           onNew={newNote}
+          newBusy={creatingNote}
           onCapture={() => setModal("qc")}
-          onNewFolder={async () => {
-            const name = window.prompt(t("sidebar.folderNamePrompt"));
-            if (name?.trim()) {
-              await actions.createFolder(name.trim());
-              toast(t("toast.folderCreated"), "info");
-            }
-          }}
+          onNewFolder={newFolder}
+          newFolderBusy={creatingFolder}
           onMoveNote={(id, folderId) => actions.moveNote(id, folderId)}
           dropTarget={dropTarget}
           setDropTarget={setDropTarget}
@@ -298,6 +312,7 @@ export default function NotesPage() {
           activeId={activeTab}
           onOpen={openNote}
           onNew={newNote}
+          newBusy={creatingNote}
           onContext={noteMenu}
         />
 
@@ -310,6 +325,7 @@ export default function NotesPage() {
           onSelectTab={openNote}
           onCloseTab={closeTab}
           onNewTab={newNote}
+          newBusy={creatingNote}
           showCtx={showCtx}
           onToggleCtx={() => setShowCtx((s) => !s)}
           onSplit={(id) => setSplitId(id)}
@@ -338,20 +354,13 @@ export default function NotesPage() {
       {modal === "qc" && (
         <QuickCapture
           onClose={() => setModal(null)}
-          onSave={async (init) => {
-            const id = await actions.newNote(init);
-            if (id != null) openNote(id);
-            toast(t("toast.created"));
-          }}
+          onSave={quickCapture}
         />
       )}
       {modal === "templates" && (
         <TemplatePicker
           onClose={() => setModal(null)}
-          onPick={async (t) => {
-            const id = await actions.newNote({ title: t.name, content: t.content });
-            if (id != null) openNote(id);
-          }}
+          onPick={pickTemplate}
         />
       )}
       {modal === "share" && modalNote && (

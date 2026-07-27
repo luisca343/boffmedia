@@ -218,6 +218,7 @@ export function PokemonDetail() {
         <div className="flex gap-[7px] px-4 pb-3.5">
           <Button
             onClick={() => setMark.mutate({ key: mon.key, patch: { favorite: !mark.favorite } })}
+            disabled={setMark.isPending}
             aria-pressed={mark.favorite}
             className={`flex-1 justify-center ${mark.favorite ? "border-pc-rose text-pc-rose" : ""}`}
           >

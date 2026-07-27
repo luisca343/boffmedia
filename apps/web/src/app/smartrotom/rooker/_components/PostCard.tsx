@@ -127,18 +127,21 @@ export function PostCard({ post, last = false }: PostCardProps) {
                 tone="rt"
                 active={post.me.retrino}
                 fillActive={false}
+                disabled={retrino.isPending}
                 onClick={() => uuid && retrino.mutate(post.id)}
               />
               <ReactionControl
                 reactions={post.counts.reactions}
                 mine={post.me.reaction}
                 onReact={(type) => uuid && react.mutate({ id: post.id, type })}
+                disabled={react.isPending}
               />
               <ActionBtn
                 icon="bookmark"
                 label={post.me.bookmark ? t("post.actions.unsave") : t("post.actions.save")}
                 tone="accent"
                 active={post.me.bookmark}
+                disabled={bookmark.isPending}
                 onClick={() => uuid && bookmark.mutate(post.id)}
               />
             </div>

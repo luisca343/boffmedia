@@ -36,6 +36,7 @@ export function Conversation({
   onOpenImage,
   onOpenSearch,
   onStartCall,
+  callBusy,
 }: {
   chat: ChatVM;
   myUuid: string;
@@ -48,6 +49,7 @@ export function Conversation({
   onOpenImage: (m: ChatMessageVM) => void;
   onOpenSearch: () => void;
   onStartCall: (kind: "voice" | "video") => void;
+  callBusy?: boolean;
 }) {
   const t = useTranslations("chatapp");
   const scroller = useRef<HTMLDivElement>(null);
@@ -102,6 +104,7 @@ export function Conversation({
         onReply={setReply}
         onOpenImage={onOpenImage}
         onCallback={() => onStartCall("voice")}
+        callBusy={callBusy}
       />,
     );
   });
@@ -128,8 +131,8 @@ export function Conversation({
         </button>
         <div className="ml-auto flex gap-0.5">
           <IconButton icon="search" onClick={onOpenSearch} title={t("conversation.searchChat")} />
-          <IconButton icon="video" iconSize={20} onClick={() => onStartCall("video")} title={t("conversation.videoCall")} />
-          <IconButton icon="phone" iconSize={18} onClick={() => onStartCall("voice")} title={t("actions.call")} />
+          <IconButton icon="video" iconSize={20} onClick={() => onStartCall("video")} disabled={callBusy} title={t("conversation.videoCall")} />
+          <IconButton icon="phone" iconSize={18} onClick={() => onStartCall("voice")} disabled={callBusy} title={t("actions.call")} />
           <IconButton icon="info" onClick={onOpenInfo} title={t("info.groupInfo")} />
         </div>
       </header>
@@ -170,6 +173,7 @@ export function Conversation({
         onOpenDocument={() => setDocOpen(true)}
         onTyping={handleTyping}
         clearReply={() => setReply(null)}
+        busy={send.isSending}
       />
 
       <GalleryPicker open={photoOpen} onOpenChange={setPhotoOpen} onSendImage={send.sendImage} />

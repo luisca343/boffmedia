@@ -3,6 +3,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 import { toast } from "react-toastify";
 import { getSmartRotomUser } from "@/lib/utils";
+import { useGuardedSubmit } from "@/components/smartrotom/behavior/useGuardedSubmit";
 import { useSocket } from "@/services/useSocket";
 import { ChatAppService } from "@/services/api/smartrotom/chatAppService";
 import useChatAppGetChats from "./_hooks/useGetChats";
@@ -230,15 +231,11 @@ export default function ChatAppPage() {
     [myUuid, setChats],
   );
 
-  const startCall = useCallback(
-    (_kind: "voice" | "video") => {
-      if (!active) return;
-      ChatAppService.initiateCall(active.id, { chatId: active.id, uuid: myUuid }).then((r) => {
-        if ((r as { error?: string }).error) toast.error((r as { error?: string }).error);
-      });
-    },
-    [active, myUuid],
-  );
+  const { submit: startCall, isPending: callPending } = useGuardedSubmit(async (_kind: "voice" | "video") => {
+    if (!active) return;
+    const r = await ChatAppService.initiateCall(active.id, { chatId: active.id, uuid: myUuid });
+    if ((r as { error?: string }).error) toast.error((r as { error?: string }).error);
+  }, { onError: (e) => console.error("initiateCall failed", e) });
 
   const openImageFromMessage = useCallback((m: ChatMessageVM) => {
     const d = parseImage(m.content);
@@ -301,6 +298,7 @@ export default function ChatAppPage() {
             onOpenImage={openImageFromMessage}
             onOpenSearch={() => setModal("search")}
             onStartCall={startCall}
+            callBusy={callPending}
           />
         ) : (
           <EmptyConversation />
@@ -313,6 +311,7 @@ export default function ChatAppPage() {
           overlay={narrow}
           onClose={() => setInfoOpen(false)}
           onStartCall={startCall}
+          callBusy={callPending}
           onOpenSearch={() => setModal("search")}
           onOpenImage={setViewer}
           onOpenMedia={() => setModal("media")}

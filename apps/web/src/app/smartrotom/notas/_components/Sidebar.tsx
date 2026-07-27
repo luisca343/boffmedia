@@ -22,8 +22,10 @@ interface SidebarProps {
   expanded: Record<number, boolean>;
   toggleExpand: (id: number) => void;
   onNew: () => void;
+  newBusy?: boolean;
   onCapture: () => void;
   onNewFolder: () => void;
+  newFolderBusy?: boolean;
   onMoveNote: (id: number, folderId: number) => void;
   dropTarget: number | null;
   setDropTarget: (id: number | null) => void;
@@ -131,6 +133,7 @@ export function Sidebar(props: SidebarProps) {
       <div className="flex flex-col gap-2 p-3 pb-2">
         <button
           onClick={props.onNew}
+          disabled={props.newBusy}
           className="inline-flex h-9 items-center justify-center gap-2 rounded-nt-md bg-gradient-to-b from-nt-500 to-nt-600 px-3.5 text-[13.5px] font-[550] text-white shadow-[inset_0_1px_0_rgb(255_255_255/.12),0_6px_16px_-8px_rgb(234_88_12/.8)] transition-all hover:brightness-[1.06] active:brightness-95"
         >
           <Icon name="plus" size={16} /> {t("sidebar.newNote")}
@@ -181,6 +184,7 @@ export function Sidebar(props: SidebarProps) {
             <span
               className="cursor-pointer text-nt-fg-subtle opacity-0 transition-opacity group-hover:opacity-100"
               onClick={props.onNewFolder}
+              aria-disabled={props.newFolderBusy}
             >
               <Icon name="plus" size={13} />
             </span>

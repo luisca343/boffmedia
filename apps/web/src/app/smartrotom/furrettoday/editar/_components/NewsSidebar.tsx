@@ -27,6 +27,7 @@ export function NewsSidebar({
   onTogglePublished,
   onToggleFeatured,
   onRequestDelete,
+  statusPending = false,
 }: {
   total: number;
   articles: FtArticle[];
@@ -40,6 +41,7 @@ export function NewsSidebar({
   onTogglePublished: (article: FtArticle) => void;
   onToggleFeatured: (article: FtArticle) => void;
   onRequestDelete: (id: number) => void;
+  statusPending?: boolean;
 }) {
   return (
     <CardFlat className="sticky top-[110px] flex max-h-[calc(100vh-140px)] flex-col overflow-hidden">
@@ -96,6 +98,7 @@ export function NewsSidebar({
                 onTogglePublished={() => onTogglePublished(a)}
                 onToggleFeatured={() => onToggleFeatured(a)}
                 onRequestDelete={() => onRequestDelete(a.id)}
+                busy={statusPending}
               />
             ))}
           </ul>

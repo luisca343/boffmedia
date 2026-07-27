@@ -10,6 +10,7 @@ import { useRouter } from 'next/navigation';
 import { Button } from "@/components/ui/primitives/button"
 import { useBoffSession } from "@/services/useBoffSession"
 import { useRotomUuid } from "@/components/smartrotom/behavior/useRotomUuid"
+import { useGuardedSubmit } from "@/components/smartrotom/behavior/useGuardedSubmit"
 import { RewardEntry } from "@/types/mina"
 import { MinaService } from "@/services/api/smartrotom/minaService"
 
@@ -51,6 +52,14 @@ export default function Jugar(){
         await setObtainedRewards([])
         await setDamage(0)
     }
+
+    // playGame spends a run's energy, so a second click before the first resolves
+    // costs the player twice for one game.
+    const { submit: startGame, isPending: starting } = useGuardedSubmit(async () => {
+        await jugar(session, router, "/smartrotom/mina")
+        setOpen(false)
+        await generateMap()
+    })
 
     useEffect(() => {
         setOpen(true)
@@ -188,11 +197,8 @@ export default function Jugar(){
                     <div className="flex justify-evenly">
                         <Button 
                             className="text-ink border border-edge hover:bg-layer-3"
-                            onClick={async () => {
-                                jugar(session, router, "/smartrotom/mina")
-                                setOpen(false)
-                                generateMap()
-                            }}>
+                            onClick={() => { startGame() }}
+                            disabled={starting}>
                             {index === 0 ? 'Jugar' : 'Volver a Jugar'}</Button>
                         <Button className="text-ink border border-edge hover:bg-layer-3" onClick={() => router.replace('/smartrotom/mina')}>Cerrar</Button>
                     </div>

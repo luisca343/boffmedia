@@ -2,6 +2,7 @@ import { useCallback } from "react";
 import { toast } from "react-toastify";
 import { CreateMessageDto } from "@boffmedia/shared";
 import { getSmartRotomUser } from "@/lib/utils";
+import { useGuardedSubmit } from "@/components/smartrotom/behavior/useGuardedSubmit";
 import { ChatAppService } from "@/services/api/smartrotom/chatAppService";
 import type { Screenshot } from "@/stores/cameraGalleryStore";
 import type { ChatMessageVM } from "../_types/view";
@@ -31,15 +32,25 @@ const isYouTube = (t: string) => /(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/
 export function useSendMessage(chatId: number, session: unknown, onSent: (m: ChatMessageVM) => void) {
   const uuid = getSmartRotomUser(session).uuid;
 
-  const push = useCallback(
-    (content: string, type: string, apiType: CreateMessageDto.type, apiMessage = content, fail = "No se pudo enviar el mensaje") => {
+  // The send is awaited (not fire-and-forget) so the guard can keep a second
+  // Enter/click from posting the same message twice while the first is in flight.
+  const { submit, isPending: isSending } = useGuardedSubmit(
+    async (content: string, type: string, apiType: CreateMessageDto.type, apiMessage: string, fail: string) => {
       onSent({ id: Date.now(), content, createdAt: new Date().toISOString(), uuid, chatId, type, status: "sent" });
-      ChatAppService.createMessage(chatId, { message: apiMessage, uuid, type: apiType }).catch((e) => {
+      try {
+        await ChatAppService.createMessage(chatId, { message: apiMessage, uuid, type: apiType });
+      } catch (e) {
         console.error(fail, e);
         toast.error(fail);
-      });
+      }
     },
-    [chatId, uuid, onSent],
+  );
+
+  const push = useCallback(
+    (content: string, type: string, apiType: CreateMessageDto.type, apiMessage = content, fail = "No se pudo enviar el mensaje") => {
+      void submit(content, type, apiType, apiMessage, fail);
+    },
+    [submit],
   );
 
   const sendText = useCallback(
@@ -89,5 +100,5 @@ export function useSendMessage(chatId: number, session: unknown, onSent: (m: Cha
     [push],
   );
 
-  return { sendText, sendSticker, sendWaypoint, sendDocument, sendImage };
+  return { sendText, sendSticker, sendWaypoint, sendDocument, sendImage, isSending };
 }
