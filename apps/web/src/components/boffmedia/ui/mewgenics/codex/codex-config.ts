@@ -17,14 +17,14 @@ export interface FilterDef {
 
 export const CX_FILTERS: Record<string, FilterDef[]> = {
   items: [
-    { key: "kind", label: "filter.kind", from: (r) => r.kind || "", order: ["weapon", "head", "face", "neck", "trinket"], labelFn: (v) => "filter.kind." + v },
+    { key: "kind", label: "filter.kind.label", from: (r) => r.kind || "", order: ["weapon", "head", "face", "neck", "trinket"], labelFn: (v) => "filter.kind." + v },
     { key: "rarity", label: "filter.rarity", from: (r) => r.rarity || "", labelFn: (v) => mewHuman(v), colorFn: (v) => "hsl(" + MEW.rarity(v).hue + " 70% 60%)" },
   ],
   characters: [
     { key: "faction", label: "filter.faction", from: (r) => r.faction || "", labelFn: (v) => mewHuman(v), colorFn: (v) => "hsl(" + MEW.faction(v).hue + " 70% 60%)" },
     { key: "type", label: "filter.type", from: (r) => r.type || "", labelFn: (v) => mewHuman(v) },
   ],
-  passives: [{ key: "cls", label: "filter.cls", from: (r) => r.cls || "—", labelFn: (v) => (v === "—" ? "filter.cls.general" : mewHuman(v)) }],
+  passives: [{ key: "cls", label: "filter.cls.label", from: (r) => r.cls || "—", labelFn: (v) => (v === "—" ? "filter.cls.general" : mewHuman(v)) }],
   maps: [{ key: "act", label: "filter.act", from: (r) => "Acto " + r.act, labelFn: (v) => v }],
 }
 

@@ -17,6 +17,7 @@
         "collection": "Collection",
         "packs": "Packs",
         "skyGenerator": "Wonder Mail Generator",
+        "pokedex": "Pokédex",
         "damageCalc": "Damage Calculator",
         "battlesim": "Battlesim"
       }
