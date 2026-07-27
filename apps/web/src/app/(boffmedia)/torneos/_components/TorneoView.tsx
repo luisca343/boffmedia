@@ -88,13 +88,15 @@ function PhaseBody({
   phase: TnPhaseApi | null
   t: ReturnType<typeof useTranslations>
 }) {
+  // `t` is scoped to `torneos`; round names live under `torneos.bracket`.
+  const tb: A.BracketT = (k, v) => t(`bracket.${k}`, v)
   switch (format) {
     case "single":
       return (
         <div className="grid gap-4">
           <Scroll>
             <DkBracket
-              rounds={A.bracketRounds(view.rounds)}
+              rounds={A.bracketRounds(view.rounds, tb)}
               renderMatch={(m) => <TnBracketMatch m={m} champion={champion} />}
             />
           </Scroll>
@@ -114,8 +116,8 @@ function PhaseBody({
       return (
         <TnDoubleBracket
           d={{
-            winners: A.bracketRounds(view.winners),
-            losers: A.bracketRounds(view.losers),
+            winners: A.bracketRounds(view.winners, tb),
+            losers: A.bracketRounds(view.losers, tb),
             grandFinal: view.grandFinal ? A.match(view.grandFinal) : null,
             champion,
           }}
@@ -124,7 +126,7 @@ function PhaseBody({
     case "roundrobin":
       return <LeagueBlock view={view} t={t} />
     case "groups":
-      return <GroupsBlock view={view} champion={champion} />
+      return <GroupsBlock view={view} champion={champion} tb={tb} />
     case "swiss":
       return <SwissBlock view={view} phase={phase} t={t} />
     case "leaderboard":
@@ -167,9 +169,11 @@ function LeagueBlock({ view, t }: { view: TnViewApi; t: ReturnType<typeof useTra
 function GroupsBlock({
   view,
   champion,
+  tb,
 }: {
   view: TnViewApi
   champion: ReturnType<typeof A.comp>
+  tb: A.BracketT
 }) {
   return (
     <div className="grid gap-4">
@@ -181,7 +185,7 @@ function GroupsBlock({
       {view.knockout && (
         <Scroll>
           <DkBracket
-            rounds={A.bracketRounds(view.knockout.rounds)}
+            rounds={A.bracketRounds(view.knockout.rounds, tb)}
             renderMatch={(m) => <TnBracketMatch m={m} champion={champion} />}
           />
         </Scroll>

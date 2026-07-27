@@ -1,9 +1,10 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import type { NPC, QuestData, Region } from "../_types"
 import { spriteName } from "../_utils/items"
 import { nextObjective, questProgress } from "../_utils/quests"
-import { normalizeStatus, SEAL_TEXT, STATUS_LABEL } from "../_utils/status"
+import { normalizeStatus, SEAL_TEXT, STATUS_LABEL_KEY } from "../_utils/status"
 import { Bar, Button, FlourishCorners, Icon, ItemSprite, Label, Nail, NpcPortrait, Paper, Ribbon, Sparkles, WaxSeal } from "./ui"
 
 /**
@@ -22,6 +23,8 @@ export function TrackedQuestPaper({
   region?: Region
   onOpen: () => void
 }) {
+  const t = useTranslations("misiones.trackedQuest")
+  const tStatus = useTranslations("misiones")
   const status = normalizeStatus(quest)
   const progress = questProgress(quest)
   const next = nextObjective(quest)
@@ -34,7 +37,7 @@ export function TrackedQuestPaper({
 
       <div className="absolute -top-7 left-1/2 z-[8] -translate-x-1/2">
         <Ribbon color="rgb(var(--ms-stamp-red))" width={260} height={48}>
-          ¶ Misión Rastreada
+          {t("ribbon")}
         </Ribbon>
       </div>
 
@@ -63,16 +66,16 @@ export function TrackedQuestPaper({
 
         <div className="min-w-0 flex-1">
           <Label className={SEAL_TEXT[status]}>
-            {STATUS_LABEL[status]}
-            {level > 0 && ` · Nv. ${level}`}
-            {quest.repeatable && " · Repetible"}
+            {tStatus(STATUS_LABEL_KEY[status])}
+            {level > 0 && t("level", { level })}
+            {quest.repeatable && t("repeatable")}
           </Label>
           <h2 className="mb-1.5 mt-1 font-ms-display text-[28px] leading-tight text-ms-ink-1">{quest.name}</h2>
 
           <div className="mb-3 flex flex-wrap items-center gap-2 text-[13px] italic text-ms-ink-3">
             <Icon.Quill size={12} />
-            <span>encomendada por</span>
-            <strong className="font-semibold not-italic text-ms-ink-2">{npc?.name || "Desconocido"}</strong>
+            <span>{t("commissionedBy")}</span>
+            <strong className="font-semibold not-italic text-ms-ink-2">{npc?.name || t("unknown")}</strong>
             {region && (
               <>
                 <span className="opacity-50">·</span>
@@ -86,7 +89,7 @@ export function TrackedQuestPaper({
             <div className="mb-3 flex items-center gap-3 rounded-sm border border-ms-ink-1/30 bg-[rgba(255,240,200,.5)] px-3.5 py-2.5">
               <Icon.Target size={16} />
               <div className="min-w-0 flex-1">
-                <div className="font-ms-uppercase text-[11px] uppercase tracking-[.12em] text-ms-ink-3">Siguiente</div>
+                <div className="font-ms-uppercase text-[11px] uppercase tracking-[.12em] text-ms-ink-3">{t("next")}</div>
                 <div className="truncate text-sm font-medium text-ms-ink-1">{next.name}</div>
               </div>
               <span className="shrink-0 font-ms-mono text-sm text-ms-ink-2">
@@ -101,7 +104,7 @@ export function TrackedQuestPaper({
               {progress.pct}%
             </span>
             {rewards.length > 0 && (
-              <span className="flex items-center gap-1" aria-label="Recompensas">
+              <span className="flex items-center gap-1" aria-label={t("rewardsAria")}>
                 {rewards.slice(0, 3).map((reward) => (
                   <ItemSprite key={reward.item} name={spriteName(reward.item)} size={20} />
                 ))}
@@ -114,7 +117,7 @@ export function TrackedQuestPaper({
                 onOpen()
               }}
             >
-              <Icon.Quill size={12} /> Continuar
+              <Icon.Quill size={12} /> {t("continue")}
             </Button>
           </div>
         </div>

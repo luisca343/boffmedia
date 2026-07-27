@@ -1,5 +1,7 @@
 "use client"
 
+import { useTranslations } from "next-intl"
+
 import type { ReactNode } from "react"
 import { cn } from "@/lib/utils"
 import { ModalShell } from "@/components/smartrotom/behavior/ModalShell"
@@ -31,11 +33,13 @@ export interface OverlayProps {
  * Escape — every overlay in the app gets both for free (SMARTROTOM_V3 §2), which is why
  * nothing else binds Escape itself.
  */
-export function Overlay({ onClose, children, align = "center", className = "", label = "Diálogo" }: OverlayProps) {
+export function Overlay({ onClose, children, align = "center", className = "", label }: OverlayProps) {
+  const t = useTranslations("pc")
+  const name = label ?? t("common.dialog")
   return (
     <ModalShell
       onClose={onClose}
-      label={label}
+      label={name}
       scope={PC_SCOPE}
       scrimClassName={cn(
         "z-[80] flex animate-pc-fade bg-[rgb(4_7_14_/_.62)] backdrop-blur-md motion-reduce:animate-none",
@@ -74,6 +78,7 @@ export function Modal({
   footer,
   headerExtra,
 }: ModalProps) {
+  const t = useTranslations("pc")
   return (
     <ModalShell
       onClose={onClose}
@@ -101,7 +106,7 @@ export function Modal({
             {subtitle && <p className="truncate text-[11.5px] text-pc-fg-subtle">{subtitle}</p>}
           </div>
           {headerExtra}
-          <Button variant="ghost" icon onClick={onClose} aria-label="Cerrar">
+          <Button variant="ghost" icon onClick={onClose} aria-label={t("common.close")}>
             <Icon name="x" size={18} />
           </Button>
         </header>

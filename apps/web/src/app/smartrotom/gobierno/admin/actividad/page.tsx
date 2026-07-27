@@ -1,6 +1,8 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import { useTranslations } from "next-intl"
+import { useFormat } from "@/lib/useFormat"
 import {
   Avatar,
   Badge,
@@ -26,6 +28,8 @@ import { fmtDateTime } from "../../_utils/format"
 const POLL_MS = 5000
 
 export default function ActividadPage() {
+  const t = useTranslations("gobierno")
+  const { intlLocale } = useFormat()
   const { data, isLoading, refetch } = useAuditoria({ pageSize: 200 })
   const entries = data?.items ?? []
 
@@ -55,7 +59,7 @@ export default function ActividadPage() {
 
   const exportTxt = () => {
     const text = filtered
-      .map((e) => `${fmtDateTime(e.createdAt)} [${e.source}] [${e.dep}] ${e.actor?.username ?? "Sistema"} · ${e.action} · ${e.target}`)
+      .map((e) => `${fmtDateTime(e.createdAt, intlLocale)} [${e.source}] [${e.dep}] ${e.actor?.username ?? t("actividad.sistema")} · ${e.action} · ${e.target}`)
       .join("\n")
     const blob = new Blob([text], { type: "text/plain" })
     const url = URL.createObjectURL(blob)
@@ -69,17 +73,17 @@ export default function ActividadPage() {
   return (
     <>
       <PageHead
-        kicker="Administración · Auditoría técnica"
+        kicker={t("actividad.kicker")}
         dep="hacienda"
-        title="Actividad del sistema"
-        sub="El mismo registro de auditoría de la Auditoría cívica, en vista operativa: filtrable por fuente, con todos los departamentos a la vez."
+        title={t("actividad.title")}
+        sub={t("actividad.sub")}
       />
       <ConsolaHero
-        title="Registro de actividad"
+        title={t("actividad.heroTitle")}
         code="actividad"
         icon="list"
         dep="hacienda"
-        status={live ? "en vivo" : "en pausa"}
+        status={live ? t("actividad.enVivo") : t("actividad.enPausa")}
         statusTone={live ? "ok" : "default"}
       />
 
@@ -89,16 +93,16 @@ export default function ActividadPage() {
             <Select
               value={source}
               onChange={setSource}
-              options={[{ value: "all", label: "Todas las fuentes" }, ...sources.map((s) => ({ value: s, label: s }))]}
+              options={[{ value: "all", label: t("actividad.todasFuentes") }, ...sources.map((s) => ({ value: s, label: s }))]}
             />
           </div>
           <div className="min-w-[160px] flex-1">
-            <Field icon="search" value={query} onChange={setQuery} placeholder="Buscar en la actividad…" />
+            <Field icon="search" value={query} onChange={setQuery} placeholder={t("actividad.buscarPlaceholder")} />
           </div>
           <Button size="sm" tone={live ? "danger" : "ghost"} icon={live ? "minus" : "chevronRight"} onClick={() => setLive((v) => !v)}>
-            {live ? "Detener" : "En vivo"}
+            {live ? t("actividad.detener") : t("actividad.enVivoBtn")}
           </Button>
-          <Button size="sm" tone="ghost" icon="download" onClick={exportTxt} aria-label="Exportar actividad" />
+          <Button size="sm" tone="ghost" icon="download" onClick={exportTxt} aria-label={t("actividad.exportar")} />
         </div>
 
         {isLoading ? (
@@ -107,12 +111,12 @@ export default function ActividadPage() {
           <Table>
             <THead>
               <TR>
-                <TH>Hora</TH>
-                <TH>Actor</TH>
-                <TH>Acción</TH>
-                <TH>Objetivo</TH>
-                <TH>Departamento</TH>
-                <TH>Fuente</TH>
+                <TH>{t("actividad.hora")}</TH>
+                <TH>{t("actividad.actor")}</TH>
+                <TH>{t("actividad.accion")}</TH>
+                <TH>{t("actividad.objetivo")}</TH>
+                <TH>{t("actividad.departamento")}</TH>
+                <TH>{t("actividad.fuente")}</TH>
               </TR>
             </THead>
             <TBody>
@@ -121,18 +125,18 @@ export default function ActividadPage() {
                 return (
                   <TR key={e.id}>
                     <TD className="whitespace-nowrap font-gt-mono text-[11px] tabular-nums text-gt-ink-500">
-                      {fmtDateTime(e.createdAt)}
+                      {fmtDateTime(e.createdAt, intlLocale)}
                     </TD>
                     <TD>
                       <div className="flex items-center gap-2">
                         <Avatar user={e.actor?.username} size={22} />
-                        <span className="text-[12.5px] font-bold text-gt-ink-900">{e.actor?.username ?? "Sistema"}</span>
+                        <span className="text-[12.5px] font-bold text-gt-ink-900">{e.actor?.username ?? t("actividad.sistema")}</span>
                       </div>
                     </TD>
                     <TD className="text-[12.5px]">{e.action}</TD>
                     <TD className="max-w-[220px] truncate text-[12.5px] text-gt-ink-500">{e.target}</TD>
                     <TD>
-                      <Badge tone={depInfo?.tone ?? "default"}>{depInfo?.label ?? e.dep}</Badge>
+                      <Badge tone={depInfo?.tone ?? "default"}>{depInfo ? t(depInfo.labelKey) : e.dep}</Badge>
                     </TD>
                     <TD className="font-gt-mono text-[11px] text-gt-ink-500">{e.source}</TD>
                   </TR>
@@ -141,7 +145,7 @@ export default function ActividadPage() {
             </TBody>
           </Table>
         ) : (
-          <Empty icon="list" title="Sin entradas" sub="Ningún evento coincide con estos filtros." />
+          <Empty icon="list" title={t("actividad.emptyTitle")} sub={t("actividad.emptySub")} />
         )}
       </Card>
     </>

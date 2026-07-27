@@ -5,6 +5,7 @@ import {
   } from '@pkmn/img';
 import { PokemonSprite } from "./PokemonSprite";
 import React from "react";
+import { useTranslations } from "next-intl";
 import NpcSkin from "@/components/smartrotom/MinecraftSkin";
 
 
@@ -12,6 +13,7 @@ import NpcSkin from "@/components/smartrotom/MinecraftSkin";
 
 
   export function PlayerDataBar({ battle, side, pov } : { battle: Battle, side: 'p1' | 'p2', pov: 'p1' | 'p2' }) {
+    const t = useTranslations("battlesim.avatar");
     const player = battle[side];
   
     const avatarId = player?.avatar || 'unknown';
@@ -28,7 +30,7 @@ import NpcSkin from "@/components/smartrotom/MinecraftSkin";
         <div className="h-fit">
           {
             uuid !== null ? (
-              <img className="mx-auto" alt="avatar"
+              <img className="mx-auto" alt={t("alt")}
                 style={{
                   height: '100px', width: '45px',
                   transform: side === 'p2' ? 'scaleX(-1)' : undefined
@@ -37,7 +39,7 @@ import NpcSkin from "@/components/smartrotom/MinecraftSkin";
               />
             ) : (
               avatarNmber >= 0 ? (
-                <img className="mx-auto" src={avatar} alt="avatar" />
+                <img className="mx-auto" src={avatar} alt={t("alt")} />
               ) : (
                 <NpcSkin npcName={avatarId} height={75} width={75} style={{transform: 'scaleX(-1)', margin:'auto', marginTop:'-1.5em'}}/>
               )

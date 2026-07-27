@@ -23,7 +23,7 @@ export function EntryHero({ pokemon, formIndex, formName }: { pokemon: Pokemon; 
       <div className="h-[300px] grid place-items-center relative">
         <div className="absolute w-[240px] h-[24px] bottom-[18px] bg-[radial-gradient(120px_12px_at_50%_50%,rgba(0,0,0,.5),transparent_70%)] blur-[2px]" />
         <div className="absolute top-0 left-0 right-0 flex justify-between px-1.5 py-1 font-pk-mono text-[11px] text-pk-surface-500 tracking-[0.04em]">
-          <span>N.º {String(pokemon.dex).padStart(4, "0")}</span>
+          <span>{t("hero.dexNumber", { dex: String(pokemon.dex).padStart(4, "0") })}</span>
           <span>{formName}</span>
         </div>
         <PokemonSprite
@@ -49,7 +49,7 @@ export function EntryHero({ pokemon, formIndex, formName }: { pokemon: Pokemon; 
       {pokemon.forms.length > 1 && (
         <div>
           <div className="font-pk-mono text-[10px] tracking-[0.12em] uppercase text-pk-surface-400 mb-2 flex items-center gap-2 before:content-[''] before:w-3.5 before:h-px before:bg-current">
-            Formas
+            {t("hero.forms")}
           </div>
           <div className="bg-white/[0.04] border border-white/[0.06] rounded-[10px] p-1 flex gap-0.5">
             {pokemon.forms.map((form, idx) => {
@@ -64,7 +64,7 @@ export function EntryHero({ pokemon, formIndex, formName }: { pokemon: Pokemon; 
                     isCurrent ? "bg-pk-primary-400/[0.14] text-pk-primary-200" : "text-pk-surface-400 hover:text-pk-surface-100 hover:bg-white/[0.04]"
                   }`}
                 >
-                  {getForm(fFormName, t) || "Base"}
+                  {getForm(fFormName, t) || t("hero.baseForm")}
                 </Link>
               )
             })}
@@ -82,7 +82,7 @@ export function EntryHero({ pokemon, formIndex, formName }: { pokemon: Pokemon; 
           </div>
           <div className="flex-1 min-w-0 flex flex-col gap-0.5">
             <b className="text-[12.5px] text-pk-surface-100 font-semibold">Ficus Ranking</b>
-            <span className="text-[11px] text-pk-surface-400">{rank.ranking > 0 ? `Posición #${rank.ranking} del ranking` : "Sin clasificar"}</span>
+            <span className="text-[11px] text-pk-surface-400">{rank.ranking > 0 ? t("hero.rankingPosition", { rank: rank.ranking }) : t("hero.unranked")}</span>
           </div>
           <div className="font-pk-display font-bold text-[19px] text-pk-surface-50 tabular-nums">{rank.ranking > 0 ? `#${rank.ranking}` : "—"}</div>
         </div>

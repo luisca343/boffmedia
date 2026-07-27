@@ -65,7 +65,7 @@ export function ArcadeHud({ streak, boxesOwned, loading, syncing }: ArcadeHudPro
               />
             </div>
             <span className="font-ar-mono text-[10px] tabular-nums text-ar-ink-muted">
-              DÍA {currentDay}/{totalDays}
+              {t("hud.dayOf", { current: currentDay, total: totalDays })}
             </span>
           </div>
         </div>

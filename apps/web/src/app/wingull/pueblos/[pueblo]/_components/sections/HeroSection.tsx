@@ -1,5 +1,6 @@
 import React from 'react';
 import { Sparkles, Users, ChevronDown } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import type { TownData } from '../../types';
 import { HeroBackground } from '../shared/decorative/HeroBackground';
 import { BackgroundDecorations } from '../shared/decorative/BackgroundDecorations';
@@ -11,6 +12,7 @@ interface HeroSectionProps {
 }
 
 export function HeroSection({ townName, townData, onScrollToContent }: HeroSectionProps) {
+  const t = useTranslations('wingull.hero');
   const { colorClaro, colorMedio, colorOscuro, frasebonita, descripcion, nombre } = townData.textos;
 
   return (
@@ -31,7 +33,7 @@ export function HeroSection({ townName, townData, onScrollToContent }: HeroSecti
         <div className="text-center space-y-8 max-w-5xl mx-auto">
           <div className="space-y-4">
             <h1 className="text-5xl lg:text-8xl font-black text-white capitalize tracking-tight">
-              <span className="block">Pueblo</span>
+              <span className="block">{t('townPrefix')}</span>
               <span 
                 className="block bg-gradient-to-r bg-clip-text text-transparent animate-pulse" 
                 style={{ backgroundImage: `linear-gradient(135deg, white 0%, ${colorClaro} 50%, white 100%)` }}
@@ -62,11 +64,11 @@ export function HeroSection({ townName, townData, onScrollToContent }: HeroSecti
               onClick={onScrollToContent}
             >
               <Sparkles className="w-6 h-6 mr-3 inline" />
-              Explorar Pueblo
+              {t('explore')}
             </button>
             <button className="text-lg px-8 py-4 rounded-2xl bg-white/10 backdrop-blur-md border-white/30 text-white hover:bg-white/20 border-2 transition-all duration-300 hover:scale-105">
               <Users className="w-6 h-6 mr-3 inline" />
-              Ver Comunidad
+              {t('community')}
             </button>
           </div>
           <div 

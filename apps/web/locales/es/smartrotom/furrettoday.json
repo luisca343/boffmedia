@@ -9,14 +9,28 @@
       "search": "Buscar",
       "coverLabel": "Portada de Furret Today"
     },
+    "home": {
+      "emptyTitle": "SIN NÚMERO",
+      "emptyMessage": "Todavía no hay ningún artículo publicado para hacer la portada.",
+      "tickerLabel": "Titulares de última hora",
+      "topEyebrow": "LO MÁS LEÍDO ESTA SEMANA",
+      "topTitle": "Las Tres en Boca de Todos",
+      "moreEyebrow": "REPORTAJES · COMUNIDAD · GUÍAS",
+      "moreTitle": "Más Páginas Que Pasar"
+    },
     "coverHero": {
       "readCover": "LEER LA PORTADA →",
       "new": "NUEVO",
-      "inThisIssue": "EN ESTE NÚMERO"
+      "inThisIssue": "EN ESTE NÚMERO",
+      "issueNumber": "Nº {issue}"
     },
     "subscribeStrip": {
       "subscribe": "Suscribirse",
-      "subscribed": "Suscrito"
+      "subscribed": "Suscrito",
+      "eyebrow": "NEWSLETTER",
+      "title": "Furret en tu buzón los viernes",
+      "description": "Un email, sin spam: titulares, meta, torneos y un meme. Cancelas cuando quieras.",
+      "cta": "SUSCRIBIRME"
     },
     "newsletterModal": {
       "title": "Furret a tu buzón, todos los viernes",
@@ -28,14 +42,23 @@
       "successMessage": "Te hemos guardado en la lista. Nos vemos el viernes.",
       "error": "No hemos podido apuntarte. Prueba de nuevo."
     },
+    "modal": {
+      "close": "Cerrar"
+    },
     "featureCards": {
-      "title": "Destacados"
+      "title": "Destacados",
+      "read": "LEER →"
     },
     "collectorStrip": {
-      "title": "Coleccionista"
+      "eyebrow": "ARCHIVO COLECCIONABLE",
+      "title": "Números Anteriores",
+      "hint": "↓ DESLIZA",
+      "issueNumber": "Nº {issue}",
+      "articles": "{count, plural, one {# artículo} other {# artículos}}"
     },
     "articleCard": {
-      "readMore": "Leer más"
+      "readMore": "Leer más",
+      "read": "Leer →"
     },
     "footer": {
       "newsletterSuccess": "Te hemos guardado en la lista. ¡Nos vemos el viernes!",
@@ -44,8 +67,17 @@
       "emailAriaLabel": "Email para la newsletter"
     },
     "furretFooter": {
-      "copyright": "© Furret Today",
-      "allRights": "Todos los derechos reservados"
+      "copyright": "© {year} Furret Today · BoffMedia",
+      "allRights": "Todos los derechos reservados",
+      "marqueeItem": "FURRET TODAY · SEMANARIO POP",
+      "marqueeLabel": "Furret Today, semanario pop",
+      "tagline": "El semanario pop de la comunidad Pokémon hispanohablante. Hecho a tinta y a píxeles desde BoffMedia.",
+      "sections": "Secciones",
+      "subscribe": "Suscríbete",
+      "subscribeBlurb": "Un email los viernes. Sin spam, solo noticias POP.",
+      "submit": "OK",
+      "submitting": "…",
+      "slogan": "«Las mejores noticias dibujadas a papel y tinta»"
     },
     "sections": {
       "title": "Secciones",
@@ -54,13 +86,40 @@
       "editorial": "Junta editorial"
     },
     "browseHero": {
-      "title": "Explorar artículos"
+      "eyebrow": "SECCIONES & ARCHIVO",
+      "titleStart": "Explora",
+      "titleTilt": "el",
+      "titleEnd": "Número",
+      "description": "Cinco secciones, decenas de artículos y un buscador que funciona. Para los que coleccionan.",
+      "searchPh": "¿Qué buscas? — escribe «furret», «meta», «torneo»…",
+      "searchAria": "Buscar",
+      "submit": "Buscar",
+      "allCount": "Todo · {count}"
+    },
+    "browse": {
+      "resultsEyebrow": "RESULTADOS",
+      "resultsCount": "{count, plural, one {# artículo} other {# artículos}} en {category}",
+      "allSections": "Todas las secciones",
+      "sort": "Ordenar",
+      "sortAria": "Ordenar artículos",
+      "sortRecent": "Más recientes",
+      "sortClaps": "Más leídos",
+      "sortIssue": "Por número",
+      "emptyTitle": "¡VAYA, NADA!",
+      "emptyMessage": "Furret ha buscado por todo el número y no encuentra nada con esos filtros. Prueba otra palabra o limpia los filtros.",
+      "resetSearch": "Reiniciar búsqueda",
+      "tagsEyebrow": "NAVEGA POR ETIQUETAS"
     },
     "issueArchive": {
-      "title": "Archivo de números"
+      "eyebrow": "NÚMEROS ANTERIORES",
+      "title": "El Archivo",
+      "issues": "{count, plural, one {# número} other {# números}}",
+      "articles": "{count, plural, one {# artículo} other {# artículos}}"
     },
     "editorialBoard": {
-      "title": "Junta editorial"
+      "eyebrow": "QUIÉNES DIBUJAN ESTO",
+      "title": "El Consejo Editorial",
+      "articles": "Artículos"
     },
     "article": {
       "by": "por {author}",
@@ -72,12 +131,106 @@
       "upNext": "Siguiente",
       "deleteCommentAriaLabel": "Borrar comentario",
       "commentPlaceholder": "Deja tu viñeta…",
-      "commentAriaLabel": "Escribir comentario"
+      "commentAriaLabel": "Escribir comentario",
+      "notFoundTitle": "¡PÁGINA EN BLANCO!",
+      "notFoundMessage": "Furret no encuentra este artículo. Puede que se haya movido o que nunca haya existido.",
+      "backToCover": "Volver a portada",
+      "backCover": "← Portada",
+      "illustration": "Ilustración · Estudio POP de Furret Today",
+      "figure": "Fig. 01"
+    },
+    "articleFooter": {
+      "title": "¿Te gustó el reportaje?",
+      "description": "Reacciona, comenta o suscríbete al semanario. Furret cuenta los aplausos.",
+      "clapAria": "Aplaudir este artículo",
+      "subscribe": "Suscribirme",
+      "subscribeError": "No hemos podido suscribirte. Inténtalo otra vez.",
+      "submit": "OK",
+      "submitting": "…"
+    },
+    "sidebar": {
+      "progress": "PROGRESO",
+      "share": "COMPARTIR",
+      "shareArticle": "Compartir este artículo",
+      "related": "SEGUIR LEYENDO",
+      "comments": "VIÑETAS DE LECTORES",
+      "commentsEmpty": "Sé el primero en dejar una viñeta.",
+      "signInToComment": "Inicia sesión para dejar tu viñeta.",
+      "post": "Publicar",
+      "posting": "Publicando…"
+    },
+    "upNext": {
+      "eyebrow": "PASA LA PÁGINA",
+      "title": "No Pares de Caminar"
     },
     "shareModal": {
       "title": "Compartir artículo",
+      "eyebrow": "COMPARTIR",
+      "heading": "Pasa la voz",
       "copyLink": "Copiar enlace",
+      "copied": "✓ Copiado",
+      "copyError": "No se pudo copiar el enlace.",
+      "discordCopied": "Enlace copiado. Pégalo en tu servidor de Discord.",
       "close": "Cerrar"
+    },
+    "access": {
+      "deniedTitle": "ACCESO DENEGADO",
+      "deniedMessage": "Necesitas el rol de redacción (ROTOM_ADMIN o ROTOM_FURRET) para entrar en la sala de redacción.",
+      "backToCover": "Volver a portada"
+    },
+    "newsroomHeader": {
+      "eyebrow": "SALA DE REDACCIÓN",
+      "title": "Editor de Noticias",
+      "description": "Escribe, publica y destaca. Aquí se decide qué lleva la portada del número.",
+      "total": "TOTAL",
+      "published": "PUBLIC.",
+      "featured": "DESTAC.",
+      "drafts": "BORRAD."
+    },
+    "newsSidebar": {
+      "title": "LISTA DE NOTICIAS",
+      "new": "+ Nueva noticia",
+      "searchPh": "Buscar por título o entradilla…",
+      "searchAria": "Buscar noticias",
+      "emptyTitle": "NADA POR AQUÍ",
+      "emptyMessage": "Prueba a cambiar el filtro o la búsqueda.",
+      "filterAll": "Todo",
+      "filterFeatured": "Destacada",
+      "filterPublished": "Publicadas",
+      "filterDraft": "Borradores"
+    },
+    "newsRow": {
+      "featured": "DESTACADA",
+      "published": "PUBLICADA",
+      "draft": "BORRADOR",
+      "togglePublished": "Publicada",
+      "toggleFeatured": "Destacada",
+      "deleteAria": "Eliminar «{title}»"
+    },
+    "newArticleModal": {
+      "label": "Nueva noticia",
+      "eyebrow": "NUEVA NOTICIA",
+      "title": "Empieza un borrador",
+      "description": "Crea el borrador y rellena el cuerpo después en el editor. Puedes despublicarlo cuando quieras.",
+      "titleField": "Título",
+      "titlePh": "P. ej. La dinastía Furret",
+      "lead": "Entradilla",
+      "leadPh": "Una frase: qué cuentas.",
+      "author": "Autor/a",
+      "authorPh": "Tu nombre o alias",
+      "role": "Rol",
+      "rolePh": "Editor/a",
+      "section": "Sección",
+      "sectionPh": "Comunidad, Torneos…",
+      "subsection": "Subsección",
+      "subsectionPh": "Opcional",
+      "buttonText": "Texto del botón",
+      "defaultButtonText": "Leer más",
+      "imageUrl": "URL imagen",
+      "imageUrlPh": "https://…",
+      "cancel": "Cancelar",
+      "create": "Crear borrador",
+      "creating": "Creando…"
     },
     "editor": {
       "title": "Editor",
@@ -94,7 +247,35 @@
       "authorPlaceholder": "Editor/a",
       "tagsPlaceholder": "Comunidad, Torneos…",
       "optionalPlaceholder": "Opcional",
-      "readMorePlaceholder": "Leer más"
+      "readMorePlaceholder": "Leer más",
+      "emptyTitle": "ELIGE UNA NOTICIA",
+      "emptyMessage": "Selecciona algo de la lista o crea un borrador. Furret aplaudirá lo que escribas.",
+      "emptyAction": "+ Nueva noticia",
+      "statusFeatured": "DESTACADA",
+      "statusPublished": "PUBLICADA",
+      "statusDraft": "BORRADOR",
+      "editing": "EDITANDO · #{id}",
+      "updated": "Actualizado: {date}",
+      "readTimeLabel": "Lectura: {time}",
+      "titleAria": "Título",
+      "leadAria": "Entradilla",
+      "authorField": "Autor/a",
+      "roleField": "Rol",
+      "sectionField": "Sección",
+      "subsectionField": "Subsección",
+      "issueField": "Nº de número",
+      "issuePh": "—",
+      "buttonTextField": "Texto botón",
+      "imageUrlField": "URL imagen",
+      "imageUrlPh": "https://… o /smartrotom/img/…",
+      "bodyHint": "Cuerpo del artículo · se guarda con 💾 en su propia barra",
+      "footerNote": "CKEditor · estilo Furret · el cuerpo se guarda aparte",
+      "preview": "Previsualizar",
+      "saving": "Guardando…",
+      "saveChanges": "Guardar cambios",
+      "noChanges": "Sin cambios",
+      "saveSuccess": "Cambios guardados en «{title}».",
+      "untitled": "Sin título"
     },
     "newsroom": {
       "title": "Redacción",
@@ -105,7 +286,19 @@
       "deleteSuccess": "Noticia eliminada.",
       "deleteError": "No se pudo eliminar.",
       "draftCreated": "Borrador creado. ¡A escribir!",
-      "draftError": "No se pudo crear el borrador."
+      "draftError": "No se pudo crear el borrador.",
+      "publishSuccess": "Publicada.",
+      "unpublishSuccess": "Vuelve a borrador.",
+      "untitledDraft": "Nueva noticia sin título",
+      "draftBody": "Empieza a escribir aquí…",
+      "deleteLabel": "Confirmar borrado",
+      "deleteEyebrow": "ELIMINAR NOTICIA",
+      "deleteTitle": "¿Seguro?",
+      "deleteMessage": "Esto borra «{title}» para siempre. No hay deshacer.",
+      "deleteFallbackTitle": "esta noticia",
+      "cancel": "Cancelar",
+      "deleting": "Eliminando…",
+      "confirmDeleteAction": "Sí, eliminar"
     },
     "error": {
       "title": "Error",

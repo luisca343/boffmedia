@@ -1,4 +1,5 @@
 import { type CSSProperties, type ReactNode } from "react";
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import { ModalShell } from "@/components/smartrotom/behavior/ModalShell";
 import { useResolvedTheme } from "../../_hooks/useResolvedTheme";
@@ -30,6 +31,7 @@ export const CA_SCOPE = "ca-app font-ca text-ca-50";
  * rides an inner wrapper here rather than the shared layer's `scope` string.
  */
 export function Modal({ title, icon, wide, onClose, foot, children, scrimClassName, bare }: Props) {
+  const t = useTranslations("chatapp");
   const { accentTriplet } = useResolvedTheme();
 
   return (
@@ -58,7 +60,7 @@ export function Modal({ title, icon, wide, onClose, foot, children, scrimClassNa
                 {icon && <Icon name={icon} size={20} className="text-ca-accent-soft" />}
                 {title}
               </div>
-              <IconButton icon="x" className="ml-auto" onClick={onClose} title="Cerrar" />
+              <IconButton icon="x" className="ml-auto" onClick={onClose} title={t("common.close")} />
             </div>
             <div className="ca-scroll min-h-0 overflow-y-auto px-[18px] py-4">{children}</div>
             {foot}

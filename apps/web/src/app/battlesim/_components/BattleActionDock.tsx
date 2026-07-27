@@ -12,12 +12,7 @@ import type { ActiveMechanic } from '../_hooks/useChoiceMechanics';
 import type { BSXLayout } from '../_hooks/useBSXLayout';
 import type { BSXKeyMove } from '../_utils/toBSXMon';
 
-const MECHANIC_LABELS: Record<string, string> = {
-  terastallize: 'Teracristalización',
-  mega: 'Mega Evolución',
-  dynamax: 'Dynamax',
-  zmove: 'Movimiento Z',
-};
+
 
 interface BattleActionDockProps {
   bsx: BSXLayout;
@@ -100,7 +95,7 @@ export function BattleActionDock({
             style={{ clipPath: 'polygon(4px 0,100% 0,calc(100% - 4px) 100%,0 100%)' }}
           >
             <span aria-hidden>★</span>
-            {MECHANIC_LABELS[activeMechanic] ?? activeMechanic}
+            {t(`dock.mechanics.${activeMechanic}`)}
             <button
               type="button"
               onClick={() => setActiveMechanic(null)}
@@ -176,7 +171,7 @@ export function BattleActionDock({
 
   return (
     <section
-      aria-label="Acciones de combate"
+      aria-label={t('dock.aria')}
       style={{ clipPath: 'polygon(0 0,100% 0,100% calc(100% - 14px),calc(100% - 14px) 100%,0 100%)' }}
       className="min-h-[96px] border border-solid border-line bg-[color-mix(in_srgb,var(--panel)_88%,transparent)] p-3 backdrop-blur-[4px]"
     >

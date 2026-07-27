@@ -1,3 +1,4 @@
+import type { useTranslations } from "next-intl"
 import type { DailyRewardItem } from "@boffmedia/shared"
 import { ItemImage } from "@/lib/ItemImage"
 import { getItemName } from "@/lib/intlUtils"
@@ -35,7 +36,8 @@ export const isNamedReward = (reward: Pick<DailyRewardItem, "type">) =>
 
 export function rewardView(
   reward: DailyRewardItem,
-  t: (key: string) => string,
+  /** The `arcade` translator. Reward keys are resolved at runtime, so it is passed in. */
+  t: ReturnType<typeof useTranslations<"arcade">>,
   size = 36,
 ): RewardView {
   const type = kind(reward)
@@ -51,7 +53,7 @@ export function rewardView(
 
   // A quantity reward: coins/money have no sprite, so they get the pixel star.
   return {
-    label: `${reward.amount} ${type === "money" ? "PokéDólares" : "monedas"}`,
+    label: t(type === "money" ? "rewards.money" : "rewards.coins", { amount: reward.amount ?? 0 }),
     tone,
     art: <span className="font-ar-display">★</span>,
   }

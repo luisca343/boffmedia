@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useMemo, useRef, useState } from "react"
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { GameStage } from "../../_components/GameStage"
 import { GameTopBar } from "../../_components/GameTopBar"
@@ -18,11 +19,12 @@ const ROOM_SKIN: Record<Room, string> = {
   wall: "border-white/[.04] bg-ar-void/70 text-transparent",
 }
 
-const ROOM_LABEL: Record<Room, string> = {
-  start: "Sala inicial",
-  room: "Sala",
-  boss: "Sala del jefe",
-  wall: "Muro",
+// Module scope: the label is an `arcade` key the component resolves with `t(...)`.
+const ROOM_LABEL_KEY: Record<Room, string> = {
+  start: "maze.roomLabels.start",
+  room: "maze.roomLabels.room",
+  boss: "maze.roomLabels.boss",
+  wall: "maze.roomLabels.wall",
 }
 
 function RoomIcon({ room }: { room: Room }) {
@@ -56,6 +58,7 @@ const findRoom = (maze: Room[][], type: Room): Position | null => {
 }
 
 export default function BindingOfIsaacMaze() {
+  const t = useTranslations("arcade")
   const [size, setSize] = useState(13)
   const [depth, setDepth] = useState(1)
   const [maze, setMaze] = useState<Room[][]>(() => generateMaze(13, 1))
@@ -116,7 +119,7 @@ export default function BindingOfIsaacMaze() {
   return (
     <div className="mt-4">
       <GameTopBar
-        title="LABERINTO"
+        title={t("gameTopBar.titles.maze")}
         accent="violet"
         onHelp={() => setHelp(true)}
         onReset={regenerateMaze}
@@ -126,11 +129,11 @@ export default function BindingOfIsaacMaze() {
         <div className="grid items-start gap-4 lg:grid-cols-[1fr_260px] lg:gap-5">
           <Panel tone="deep" innerClassName="p-4 md:p-[18px]">
             <div className="mb-4 flex flex-wrap items-center justify-between gap-2 border-b border-dashed border-white/10 px-1.5 pb-3.5">
-              <span className="font-ar-display text-[11px] text-ar-violet-2">▸ Calabozo</span>
+              <span className="font-ar-display text-[11px] text-ar-violet-2">▸ {t("maze.dungeon")}</span>
               <span className="font-ar-mono text-[11px] uppercase text-ar-ink-dim">
-                {size} × {size} · Profundidad {depth}
+                {t("maze.sizeDepth", { size, depth })}
               </span>
-              <Tag tone="magenta">1 jefe</Tag>
+              <Tag tone="magenta">{t("maze.bossTag")}</Tag>
             </div>
 
             <div
@@ -148,7 +151,7 @@ export default function BindingOfIsaacMaze() {
                 row.map((room, x) => (
                   <div
                     key={`${x},${y}`}
-                    title={ROOM_LABEL[room]}
+                    title={t(ROOM_LABEL_KEY[room])}
                     className={cn("flex items-center justify-center border", ROOM_SKIN[room])}
                     style={{ width: `${cellSize}px`, height: `${cellSize}px` }}
                   >
@@ -161,7 +164,7 @@ export default function BindingOfIsaacMaze() {
             {showDebug && (
               <div className="mt-4">
                 <div className="mb-2 font-ar-display text-[9px] uppercase text-ar-cyan">
-                  Vista debug
+                  {t("maze.debugView")}
                 </div>
                 <pre className="ar-scroll m-0 overflow-x-auto rounded-lg border border-white/[.08] bg-black/50 p-3.5 font-ar-mono text-[11px] leading-relaxed text-ar-ink-dim">
                   {maze.map((row) => row.map((room) => room[0].toUpperCase()).join(" ")).join("\n")}
@@ -183,16 +186,19 @@ export default function BindingOfIsaacMaze() {
 
             <div className="grid grid-cols-2 gap-3">
               <StatCard
-                kicker="Salas"
+                kicker={t("maze.rooms")}
                 value={String(roomCount)}
-                sub={`Previstas ${Math.floor(3.33 * depth + 5)}–${Math.floor(3.33 * depth + 6)}`}
+                sub={t("maze.expectedRooms", {
+                  min: Math.floor(3.33 * depth + 5),
+                  max: Math.floor(3.33 * depth + 6),
+                })}
                 icon={<Icon.Box s={16} />}
                 tone="violet"
               />
               <StatCard
-                kicker="Sin salida"
+                kicker={t("maze.deadEnds")}
                 value={String(deadEndsCount)}
-                sub="Callejones"
+                sub={t("maze.alleys")}
                 icon={<Icon.Shield s={16} />}
                 tone="cyan"
               />
@@ -200,7 +206,7 @@ export default function BindingOfIsaacMaze() {
 
             <Panel tone="void" tight>
               <div className="mb-2.5 font-ar-display text-[9px] uppercase text-ar-magenta-2">
-                Distancia al jefe
+                {t("maze.bossDistance")}
               </div>
               <div className="font-ar-mono text-[22px] font-bold tabular-nums text-ar-ink">
                 {startToBossDistance ?? "—"}
@@ -218,7 +224,7 @@ export default function BindingOfIsaacMaze() {
                       <RoomIcon room={room} />
                     </span>
                     <span className="font-ar-mono text-[11px] text-ar-ink-dim">
-                      {ROOM_LABEL[room]}
+                      {t(ROOM_LABEL_KEY[room])}
                     </span>
                   </li>
                 ))}
@@ -228,15 +234,17 @@ export default function BindingOfIsaacMaze() {
         </div>
       </GameStage>
 
-      <Modal open={help} onClose={() => setHelp(false)} kicker="Laberinto" title="¿Cómo funciona?">
+      <Modal open={help} onClose={() => setHelp(false)} kicker={t("games.maze.title")} title={t("maze.howItWorks")}>
         <ul className="m-0 list-disc space-y-2 pl-5">
-          <li>Cada calabozo se genera al vuelo: una sala inicial, salas conectadas y un jefe.</li>
+          <li>{t("maze.rules.onTheFly")}</li>
           <li>
-            <b>Tamaño</b> cambia el lado de la cuadrícula; <b>profundidad</b>, cuántas salas se
-            excavan.
+            {t.rich("maze.rules.dials", {
+              boldSize: (c) => <b>{c}</b>,
+              boldDepth: (c) => <b>{c}</b>,
+            })}
           </li>
-          <li>«Regenerar» reparte un calabozo nuevo con los mismos parámetros.</li>
-          <li>La vista debug imprime la rejilla en texto: S inicio, R sala, B jefe, W muro.</li>
+          <li>{t("maze.rules.regenerate")}</li>
+          <li>{t("maze.rules.debugView")}</li>
         </ul>
       </Modal>
     </div>

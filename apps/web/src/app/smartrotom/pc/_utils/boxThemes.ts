@@ -42,17 +42,18 @@ export const THEME_ACCENT: Record<BoxTheme, string> = {
   sakura: "#fb7eb6",
 }
 
-export const THEME_LABEL: Record<BoxTheme, string> = {
-  classic: "Clásico",
-  forest: "Bosque",
-  ocean: "Océano",
-  volcano: "Volcán",
-  space: "Espacio",
-  meadow: "Pradera",
-  dusk: "Ocaso",
-  cave: "Cueva",
-  rainbow: "Arcoíris",
-  sakura: "Sakura",
+/** `pc` message keys — the picker resolves them with `t(...)`. */
+export const THEME_LABEL_KEY: Record<BoxTheme, string> = {
+  classic: "themes.classic",
+  forest: "themes.forest",
+  ocean: "themes.ocean",
+  volcano: "themes.volcano",
+  space: "themes.space",
+  meadow: "themes.meadow",
+  dusk: "themes.dusk",
+  cave: "themes.cave",
+  rainbow: "themes.rainbow",
+  sakura: "themes.sakura",
 }
 
 /** A box with no saved theme still looks deliberate: cycle the ten by index. */

@@ -15,7 +15,7 @@ export async function EvoTree({ params }: { params: { id: string } }) {
     return (
       <div className="flex items-center justify-center gap-2 rounded-xl bg-white/[0.02] p-6 border border-white/[0.05] text-base text-pk-surface-300">
         <InfoIcon className="h-5 w-5" />
-        <span>No se pudo cargar la línea evolutiva</span>
+        <span>{t("evoTree.loadError")}</span>
       </div>
     )
   }
@@ -40,7 +40,7 @@ export async function EvoTree({ params }: { params: { id: string } }) {
         )}
         <div className="flex items-center justify-center gap-2 text-base text-pk-surface-300">
           <InfoIcon className="h-5 w-5" />
-          <span>Este Pokémon no evoluciona</span>
+          <span>{t("evoTree.noEvolution")}</span>
         </div>
       </div>
     )

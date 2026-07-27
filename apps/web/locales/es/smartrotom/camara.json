@@ -15,7 +15,9 @@
       "hideUi": "Ocultar interfaz",
       "showUi": "Mostrar interfaz",
       "uiOn": "UI: ACTIVA",
-      "uiOff": "UI: OCULTA"
+      "uiOff": "UI: OCULTA",
+      "openGallery": "Abrir galería",
+      "capture": "Hacer foto"
     },
     "gallery": {
       "title": "Galería",
@@ -61,7 +63,9 @@
       "turnOn": "Encender linterna"
     },
     "zoom": {
-      "setZoom": "Establecer zoom a {factor}"
+      "setZoom": "Establecer zoom a {factor}",
+      "decrease": "Reducir zoom",
+      "increase": "Aumentar zoom"
     }
   }
 }

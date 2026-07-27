@@ -23,7 +23,9 @@ interface GameFormProps {
 
 export function GameForm({ defaultValues, isSubmitting, onSubmit, onCancel, submitLabel }: GameFormProps) {
   const t = useTranslations("admin.form")
-  const tv = useTranslations("admin.validation")
+  // `validation` is a root namespace in admin.json, not nested under `admin` —
+  // scoping to "admin.validation" resolved to admin.admin.validation.* and rendered raw keys.
+  const tv = useTranslations("validation")
   const { register, handleSubmit, formState: { errors } } = useForm<GameFormValues>({
     resolver: zodResolver(gameSchema),
     defaultValues: defaultValues || { title: "", description: "", icon: "" },

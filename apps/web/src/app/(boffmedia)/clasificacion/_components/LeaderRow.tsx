@@ -41,11 +41,11 @@ export interface LeaderRowProps {
   entry: LeaderRowData
   activeSort: SortKey
   labels: { points: string; medals: string; achievements: string }
+  /** Locale-aware point formatter — pass `useFormat().number` from the parent. */
+  formatPoints: (n: number) => string
 }
 
-const nf = new Intl.NumberFormat("es-ES")
-
-export function LeaderRow({ position, entry, activeSort, labels }: LeaderRowProps) {
+export function LeaderRow({ position, entry, activeSort, labels, formatPoints }: LeaderRowProps) {
   const top3 = position <= 3
   const initial = (entry.nickname || "?").charAt(0).toUpperCase()
   return (
@@ -68,7 +68,7 @@ export function LeaderRow({ position, entry, activeSort, labels }: LeaderRowProp
         {entry.nickname}
       </span>
       <div className="flex items-center gap-4 sm:gap-6">
-        <Metric value={nf.format(entry.totalPoints)} label={labels.points} active={activeSort === "points"} />
+        <Metric value={formatPoints(entry.totalPoints)} label={labels.points} active={activeSort === "points"} />
         <Metric value={entry.medalCount} label={labels.medals} active={activeSort === "medals"} className="hidden min-[560px]:grid" />
         <Metric
           value={entry.achievementCount}

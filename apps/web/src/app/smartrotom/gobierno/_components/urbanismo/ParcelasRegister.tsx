@@ -163,8 +163,8 @@ export function ParcelasRegister() {
             <TBody>
               {rows.map((p) => {
                 const zona = p.zona ?? (p.zonaId != null ? zonasById.get(p.zonaId) : null)
-                const k = zona ? kindOf(zona.kind) : null
-                const st = statusOf(p.status, t("urbanismo.sinRegistrar"))
+                const k = zona ? kindOf(zona.kind, t) : null
+                const st = statusOf(p.status, t)
                 return (
                   <TR key={p.regionId}>
                     <TD>
@@ -262,13 +262,13 @@ function ParcelaEditModal({
   const [taxDueAt, setTaxDueAt] = useState(parcela.taxDueAt ? parcela.taxDueAt.slice(0, 10) : "")
   const [notes, setNotes] = useState(parcela.notes ?? "")
 
-  const statusOptions = Object.entries(PARCELA_STATUS).map(([value, v]) => ({ value, label: v.label }))
+  const statusOptions = Object.entries(PARCELA_STATUS).map(([value, v]) => ({ value, label: t(v.labelKey) }))
 
   return (
     <Modal
       open
       onClose={onClose}
-      kicker={`Parcela · ${townName(parcela.town)} #${parcela.number}`}
+      kicker={`${t("urbanismo.parcela")} · ${townName(parcela.town)} #${parcela.number}`}
       title={t("urbanismo.editarParcela")}
       footer={
         <>
@@ -297,7 +297,7 @@ function ParcelaEditModal({
         <div className="font-gt-mono text-[10.5px] text-gt-ink-400">{parcela.regionId}</div>
         <Select label={t("urbanismo.estado")} value={status} onChange={setStatus} options={statusOptions} />
         <Select
-          label="Zona"
+          label={t("urbanismo.zona")}
           value={zonaId}
           onChange={setZonaId}
           options={[

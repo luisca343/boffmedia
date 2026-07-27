@@ -31,7 +31,8 @@
         "reference": "Reference",
         "referenceSub": "(max / neutral, 31 IV)",
         "speedEmpty": "Add Pokémon to your team and to threats to compare speeds.",
-        "typesEmpty": "Add Pokémon to your team (Matrix tab) to see their type coverage."
+        "typesEmpty": "Add Pokémon to your team (Matrix tab) to see their type coverage.",
+        "close": "Close"
       },
       "panel": {
         "attacker": "Pokémon 1 — Attacker",
@@ -301,7 +302,8 @@
       "tabs": {
         "tiers": "Tiers",
         "matchup": "Matchup"
-      }
+      },
+      "clearInput": "Clear"
     },
     "speedTiers": {
       "title": "Speed Tiers",
@@ -949,6 +951,10 @@
         "combined": "Combined · {count} tournaments",
         "tourWithPlayers": "{name} · {count} players",
         "formatNote": "Current regulation. Allows two restricted Pokémon per team."
+      },
+      "adapter": {
+        "teamFallback": "Team",
+        "teraNone": "None"
       }
     }
   }

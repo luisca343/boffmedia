@@ -28,9 +28,9 @@ export const useGobiernoPrefs = create<GobiernoPrefs>()(
   ),
 )
 
-export const ACCENTS: { value: GobiernoAccent; label: string; css: string }[] = [
-  { value: "civic", label: "Verde municipal", css: "#1f6f4a" },
-  { value: "navy", label: "Azul institucional", css: "#2f5a9e" },
-  { value: "burgundy", label: "Burdeos", css: "#8a3a55" },
-  { value: "gold", label: "Oro heráldico", css: "#a9842f" },
+export const ACCENTS: { value: GobiernoAccent; labelKey: string; css: string }[] = [
+  { value: "civic", labelKey: "accents.civic", css: "#1f6f4a" },
+  { value: "navy", labelKey: "accents.navy", css: "#2f5a9e" },
+  { value: "burgundy", labelKey: "accents.burgundy", css: "#8a3a55" },
+  { value: "gold", labelKey: "accents.gold", css: "#a9842f" },
 ]

@@ -21,9 +21,6 @@ export interface MediaTheme {
   sibling: MediaAppId
   /** rare inline/SVG cases; prefer the `mw-accent` utility everywhere else */
   accentHex: string
-  searchPlaceholder: string
-  /** primary follow/subscribe CTA copy */
-  primaryCta: string
 }
 
 export const MEDIA_THEMES: Record<MediaAppId, MediaTheme> = {
@@ -33,8 +30,6 @@ export const MEDIA_THEMES: Record<MediaAppId, MediaTheme> = {
     basePath: "/smartrotom/mewtube",
     sibling: "mewtwitch",
     accentHex: "#ec4899",
-    searchPlaceholder: "Buscar vídeos, creadores…",
-    primaryCta: "Suscribirse",
   },
   mewtwitch: {
     id: "mewtwitch",
@@ -42,8 +37,6 @@ export const MEDIA_THEMES: Record<MediaAppId, MediaTheme> = {
     basePath: "/smartrotom/mewtwitch",
     sibling: "mewtube",
     accentHex: "#a855f7",
-    searchPlaceholder: "Buscar directos, canales, categorías…",
-    primaryCta: "Seguir",
   },
 }
 

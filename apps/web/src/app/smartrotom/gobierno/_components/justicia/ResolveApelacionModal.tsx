@@ -1,6 +1,8 @@
 "use client"
 
 import { useState } from "react"
+import { useTranslations } from "next-intl"
+import { useFormat } from "@/lib/useFormat"
 import { Modal, TextArea, Button } from "../ui"
 import { money } from "../../_utils/format"
 import { useResolveApelacion } from "../../_hooks/queries"
@@ -17,6 +19,8 @@ export function ResolveApelacionModal({
   outcome: "upheld" | "overturned" | null
   onClose: () => void
 }) {
+  const t = useTranslations("gobierno")
+  const { intlLocale } = useFormat()
   const [decision, setDecision] = useState("")
   const resolve = useResolveApelacion()
 
@@ -33,44 +37,41 @@ export function ResolveApelacionModal({
     <Modal
       open
       onClose={close}
-      kicker={`Resolución · ${target.code}`}
-      title={overturning ? "Anular multa" : "Mantener multa"}
+      kicker={t("justicia.resolverApelacion", { code: target.code })}
+      title={overturning ? t("justicia.anularTitle") : t("justicia.mantenerTitle")}
       footer={
         <>
           <Button tone="ghost" onClick={close} disabled={resolve.isPending}>
-            Cancelar
+            {t("common.cancel")}
           </Button>
           <Button
             tone={overturning ? "primary" : "danger"}
             disabled={!decision.trim() || resolve.isPending}
             onClick={() => resolve.mutate({ id: target.id, outcome, decision: decision.trim() }, { onSuccess: close })}
           >
-            {resolve.isPending ? "Resolviendo…" : overturning ? "Confirmar anulación" : "Confirmar resolución"}
+            {resolve.isPending
+              ? t("justicia.resolviendo")
+              : overturning
+                ? t("justicia.confirmarAnulacion")
+                : t("justicia.confirmarResolucion")}
           </Button>
         </>
       }
     >
       <div className="space-y-3">
         <p className="text-[13px] leading-relaxed text-gt-ink-700">
-          {overturning ? (
-            <>
-              La apelación de <strong>{target.player.username}</strong> quedará <strong>estimada</strong>: la multa
-              se anulará y, si ya estaba pagada, se reembolsarán{" "}
-              <strong className="tabular-nums">{money(target.multa?.amount ?? 0)} ₽</strong> desde la Tesorería de
-              Teras a su cuenta StarBank.
-            </>
-          ) : (
-            <>
-              La apelación de <strong>{target.player.username}</strong> quedará <strong>desestimada</strong>: la
-              multa se mantiene vigente y sigue siendo exigible.
-            </>
-          )}
+          {overturning
+            ? t("justicia.anularDescription", {
+                username: target.player.username,
+                amount: money(target.multa?.amount ?? 0, intlLocale),
+              })
+            : t("justicia.mantenerDescription", { username: target.player.username })}
         </p>
         <TextArea
-          label="Motivación de la resolución"
+          label={t("justicia.motivacion")}
           value={decision}
           onChange={setDecision}
-          placeholder="Explica el fundamento de la decisión…"
+          placeholder={t("justicia.motivacionPlaceholder")}
           rows={3}
         />
       </div>

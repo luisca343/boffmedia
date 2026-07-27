@@ -84,7 +84,8 @@
       "tabPrice": "Price",
       "tabMedia": "Media",
       "viewSteam": "View on Steam",
-      "detailLoading": "Loading Steam details…"
+      "detailLoading": "Loading Steam details…",
+      "mediaN": "Media {n}"
     },
     "sorteosApp": {
       "kicker": "Others · Community",
@@ -165,6 +166,7 @@
       "regionCustomPlaceholder": "Custom region…",
       "addRegion": "Add",
       "activeRegions": "Active:",
+      "removeRegion": "Remove {r}",
       "kpiFiles": "Files",
       "kpiConsoles": "Consoles",
       "resultsFor": "Results for <b>“{q}”</b>",

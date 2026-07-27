@@ -1,3 +1,5 @@
+import { intlLocale } from "@/lib/locale";
+
 // Chat's day-separator helpers. Nothing here overlaps `lib/format` (relative time,
 // numbers, money) — these are absolute clock/calendar labels, so there is nothing to
 // delegate.
@@ -16,8 +18,13 @@ export function dayKey(date: string | Date): string {
   return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
 }
 
-/** "Hoy" / "Ayer" / weekday (within a week) / full date. */
-export function dayLabel(date: string | Date, t: (key: string, values?: Record<string, string | number | Date>) => string): string {
+/** "Hoy" / "Ayer" / weekday (within a week) / full date. A pure module: the
+ *  viewer's locale arrives as a parameter, never off a global. */
+export function dayLabel(
+  date: string | Date,
+  t: (key: string, values?: Record<string, string | number | Date>) => string,
+  locale?: string | null,
+): string {
   const d = new Date(date);
   if (Number.isNaN(d.getTime())) return "";
   const today = new Date();
@@ -26,5 +33,5 @@ export function dayLabel(date: string | Date, t: (key: string, values?: Record<s
   if (diffDays === 0) return t("format.today");
   if (diffDays === 1) return t("format.yesterday");
   if (diffDays > 1 && diffDays < 7) return t(`format.weekday.${d.getDay()}`);
-  return d.toLocaleDateString(undefined, { day: "numeric", month: "long", year: "numeric" });
+  return d.toLocaleDateString(intlLocale(locale), { day: "numeric", month: "long", year: "numeric" });
 }

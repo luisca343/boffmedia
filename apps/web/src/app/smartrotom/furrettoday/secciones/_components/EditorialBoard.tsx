@@ -1,5 +1,7 @@
 "use client";
 
+import { useTranslations } from "next-intl";
+
 import { useEditorialBoard } from "../../_hooks/queries";
 import { Avatar, Meta, SectionHeader, Stat } from "../../_components/ui";
 
@@ -11,6 +13,7 @@ const TONES = ["cyan", "lime", "pink", "yellow"] as const;
  * author, so this renders nothing rather than a cast of invented editors.
  */
 export function EditorialBoard() {
+  const t = useTranslations("furrettoday.editorialBoard");
   const { data: board } = useEditorialBoard();
 
   if (!board || board.length === 0) return null;
@@ -19,8 +22,8 @@ export function EditorialBoard() {
     <section className="mx-auto max-w-[1400px] px-6 py-12">
       <div className="mb-6">
         <SectionHeader
-          eyebrow="QUIÉNES DIBUJAN ESTO"
-          title="El Consejo Editorial"
+          eyebrow={t("eyebrow")}
+          title={t("title")}
           number="03"
         />
       </div>
@@ -40,7 +43,7 @@ export function EditorialBoard() {
               ) : null}
             </div>
             <Stat
-              label="Artículos"
+              label={t("articles")}
               value={member.articles}
               tone={TONES[i % TONES.length]}
             />

@@ -7,6 +7,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { Public } from '@api/_utils/decorators/public.decorator';
+import { ApiErrorCode, userError } from '@/common/errors/user-error';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
 import { AuthThrottlerGuard } from '@api/_utils/guards/auth-throttler.guard';
@@ -58,7 +59,9 @@ export class AuthController {
       loginDto.password,
     );
     if (!user) {
-      throw new UnauthorizedException('Usuario o contraseña incorrectos');
+      throw new UnauthorizedException(
+        userError(ApiErrorCode.AUTH_INVALID_CREDENTIALS, 'Invalid credentials'),
+      );
     }
 
     return this.authService.login(user);

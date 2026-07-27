@@ -9,35 +9,40 @@ import { TownMapSection } from './_components/map/TownMapSection';
 import { PropertiesSection } from './_components/properties/PropertiesSection';
 import { BusinessSection } from './_components/properties/BusinessSection';
 import { Loader2 } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { HeroSection } from './_components/sections/HeroSection';
 
 
 function LoadingScreen() {
+  const t = useTranslations('wingull.town');
+
   return (
     <div className="min-h-screen bg-slate-900 flex items-center justify-center">
       <div className="text-center space-y-6">
         <Loader2 className="w-12 h-12 text-purple-400 animate-spin mx-auto" />
-        <h2 className="text-2xl font-bold text-ink">Cargando información del pueblo...</h2>
-        <p className="text-ink">Preparando tu experiencia inmobiliaria</p>
+        <h2 className="text-2xl font-bold text-ink">{t('loading')}</h2>
+        <p className="text-ink">{t('loadingSub')}</p>
       </div>
     </div>
   );
 }
 
 function ErrorScreen({ error, onRetry }: { error: string; onRetry: () => void }) {
+  const t = useTranslations('wingull.town');
+
   return (
     <div className="min-h-screen bg-slate-900 flex items-center justify-center px-4">
       <div className="text-center space-y-6 max-w-md">
         <div className="w-16 h-16 bg-red-500/20 rounded-full flex items-center justify-center mx-auto">
           <span className="text-2xl">⚠️</span>
         </div>
-        <h2 className="text-2xl font-bold text-ink">Error al cargar el pueblo</h2>
+        <h2 className="text-2xl font-bold text-ink">{t('errorTitle')}</h2>
         <p className='text-ink'>{error}</p>
         <button 
           onClick={onRetry}
           className="px-6 py-3 bg-purple-600 text-white rounded-xl hover:bg-purple-700 transition-colors"
         >
-          Intentar de nuevo
+          {t('retry')}
         </button>
       </div>
     </div>
@@ -45,6 +50,7 @@ function ErrorScreen({ error, onRetry }: { error: string; onRetry: () => void })
 }
 
 export default function TownRealEstatePage() {
+  const t = useTranslations('wingull.town');
   const params = useParams();
   const pueblo = Array.isArray(params.pueblo) ? params.pueblo[0] : params.pueblo;
   const [townData, setTownData] = useState<TownData | null>(null);
@@ -65,7 +71,7 @@ export default function TownRealEstatePage() {
       setTownData(response.data);
     } catch (error) {
       console.error('Error fetching town data:', error);
-      setError('No se pudo cargar la información del pueblo. Por favor, verifica el nombre e intenta de nuevo.');
+      setError(t('fetchError'));
     } finally {
       setLoading(false);
     }
@@ -83,8 +89,8 @@ export default function TownRealEstatePage() {
     return (
       <div className="min-h-screen bg-slate-900 flex items-center justify-center px-4">
         <div className="text-center space-y-6">
-          <h2 className="text-2xl font-bold text-white">Pueblo no especificado</h2>
-          <p className="text-gray-400">Por favor, proporciona el nombre del pueblo en la URL</p>
+          <h2 className="text-2xl font-bold text-white">{t('missingTitle')}</h2>
+          <p className="text-gray-400">{t('missingBody')}</p>
         </div>
       </div>
     );
@@ -99,7 +105,7 @@ export default function TownRealEstatePage() {
   }
 
   if (!townData) {
-    return <ErrorScreen error="No se encontraron datos para este pueblo" onRetry={fetchTownData} />;
+    return <ErrorScreen error={t('noData')} onRetry={fetchTownData} />;
   }
 
   return (

@@ -1,0 +1,163 @@
+{
+  "wingull": {
+    "home": {
+      "logoAlt": "Pixelmon Wingull logo",
+      "title": "Welcome to Pixelmon Wingull",
+      "tagline": "Explore the Teras region and experience the clash of eras!",
+      "comingSoon": "Coming soon",
+      "pastBadge": "The Past",
+      "pastDesc": "Dive into the ancient mysteries and legendary traditions of Fukitsu-Gansolia. Uncover ancestral Pokémon and face epic challenges forged in history.",
+      "futureBadge": "The Future",
+      "futureDesc": "Embrace the cutting-edge technology and futuristic landscapes of Narukami-Akina. Master advanced science in the art of Pokémon training and challenge the tech elite in legendary battles.",
+      "serverInfoTitle": "Server Information",
+      "serverInfoSubtitle": "Everything you need to know to start your adventure",
+      "statTowns": "Towns",
+      "statPokemon": "Unique Pokémon",
+      "statQuests": "Quests and Events",
+      "statAdventures": "Adventures"
+    },
+    "footer": {
+      "rights": "© 2022-2025 Pixelmon Wingull. All rights reserved."
+    },
+    "connect": {
+      "heading": "Join the Adventure Today!",
+      "serverLabel": "Pixelmon Wingull Server",
+      "ipUnavailable": "IP unavailable",
+      "copySuccess": "Server IP copied to clipboard.",
+      "copyError": "The server IP could not be copied.",
+      "copied": "IP Copied!",
+      "connect": "Connect to the Server",
+      "hint": "Click the button to copy the server IP to your clipboard"
+    },
+    "towns": {
+      "loading": "Loading towns...",
+      "titlePrimary": "Towns",
+      "titleAccent": "Available",
+      "description": "Explore every town available in the region",
+      "searchPh": "Search town...",
+      "emptyTitle": "No towns found",
+      "emptyBody": "No towns match \"{query}\"",
+      "count": "{count, plural, one {# town available} other {# towns available}}",
+      "cardDesc": "Discover the available plots and amenities of {town}",
+      "explore": "Explore town"
+    },
+    "town": {
+      "loading": "Loading town information...",
+      "loadingSub": "Preparing your real estate experience",
+      "errorTitle": "Error loading the town",
+      "retry": "Try again",
+      "fetchError": "The town information could not be loaded. Please check the name and try again.",
+      "noData": "No data was found for this town",
+      "missingTitle": "Town not specified",
+      "missingBody": "Please provide the town name in the URL"
+    },
+    "hero": {
+      "townPrefix": "Town",
+      "explore": "Explore Town",
+      "community": "View Community"
+    },
+    "amenities": {
+      "titlePrimary": "Amenities",
+      "titleAccent": "of the Town",
+      "description": "Discover all the facilities that make {town} the perfect place to set up your base",
+      "features": "Features"
+    },
+    "properties": {
+      "titlePrimary": "Plots",
+      "titleAccent": "Available",
+      "description": "Find your perfect home in {town}. Each plot offers a unique experience with access to different amenities",
+      "badgeParcela": "PLOT",
+      "badgeLocal": "UNIT",
+      "typeParcela": "Plot",
+      "typeLocal": "Unit",
+      "noImages": "No images available",
+      "nearbyAmenities": "Nearby Amenities",
+      "moreAmenities": "+{count} more",
+      "fullDetails": "Full Details",
+      "allNearbyAmenities": "All Nearby Amenities",
+      "viewLess": "View Less",
+      "viewDetails": "View Details",
+      "buy": "Buy"
+    },
+    "business": {
+      "titlePrimary": "Business",
+      "titleAccent": " Opportunities",
+      "subtitle": "Business opportunities in {town}",
+      "description": "Discover the commercial locations available in {town} to set up your next venture in this thriving town"
+    },
+    "cta": {
+      "title": "Can't find what you're looking for?",
+      "body": "Our team can help you find the perfect plot or tell you about future availability in Town {town}",
+      "contactAgent": "Contact Agent",
+      "moreTowns": "See More Towns"
+    },
+    "map": {
+      "titlePrimary": "Map",
+      "titleAccent": "Interactive",
+      "description": "Explore the location of the available plots in {town} and navigate the territory",
+      "noCoordinates": "No coordinates available to display the map",
+      "centerTown": "Center on the town",
+      "noImages": "No images available",
+      "features": "Features",
+      "coordinates": "Coordinates",
+      "nearbyAmenities": "Nearby Amenities"
+    },
+    "invite": {
+      "subject": "Invitation: Teras Development Plan",
+      "senderName": "Teras Project",
+      "senderEmail": "teras@project.com",
+      "senderInitials": "TP",
+      "reply": "Reply",
+      "replyAll": "Reply all",
+      "forward": "Forward",
+      "greeting": "Hello, {username}!",
+      "body1": "We are pleased to inform you that you have been granted a place in the Teras Development Plan. If you would like to collaborate on the development of the region, please fill in the form below.",
+      "body2": "Thank you very much for your interest. The fate of the Teras region depends on you.",
+      "formTitle": "Join the Teras adventure!",
+      "avatarAlt": "{username}'s avatar",
+      "roleLabel": "Minecraft Adventurer",
+      "usernameLabel": "Your adventurer name",
+      "usernamePh": "What should we call you?",
+      "usernameHelp": "This will be your name in Teras",
+      "mcUsernameLabel": "Your Minecraft name",
+      "mcUsernamePh": "Your Minecraft name",
+      "mcUsernameHelp": "This is your current Minecraft name",
+      "emailLabel": "Your email address",
+      "emailPh": "Where can we reach you?",
+      "emailHelp": "We will keep you posted on all the news",
+      "passwordLabel": "Your secret password",
+      "passwordPh": "Create a secure password",
+      "passwordHelp": "Make sure it is secure and easy to remember",
+      "submitting": "Boarding..!",
+      "submit": "Start the adventure!",
+      "inviteNumber": "Invitation #{id}",
+      "attachment": "1 gift attached",
+      "errors": {
+        "usernameRequired": "Oops! Don't forget your username",
+        "mcUsernameRequired": "Your Minecraft name matters!",
+        "emailInvalid": "This email does not look valid",
+        "passwordMin": "Your password must be at least 8 characters to keep you safe",
+        "submitFailed": "Whoops! Something went wrong during registration. Could you try again?"
+      }
+    },
+    "inviteNotFound": {
+      "title": "Invitation not found",
+      "lead": "Sorry, we could not find the invitation with ID: {id}",
+      "reasonsIntro": "This may be due to several reasons:",
+      "reasonExpired": "The invitation may have expired",
+      "reasonWrongId": "The invitation ID may be incorrect",
+      "reasonDeleted": "The invitation may have been deleted",
+      "outro": "Please check the invitation link or contact the administrator for help.",
+      "contactSupport": "Contact support",
+      "backHome": "Back to home"
+    },
+    "inviteUsed": {
+      "title": "Invitation already used",
+      "lead": "The invitation with ID {id} has already been used.",
+      "body": "Each invitation can only be used once to register for the Teras Development Plan.",
+      "outro": "If you think this is a mistake or you need a new invitation, please contact the administrator.",
+      "contactSupport": "Contact support",
+      "backHome": "Back to home"
+    }
+  }
+}

@@ -23,13 +23,16 @@ export interface TaxiEvent {
   hot?: boolean
 }
 
-/** Event hues are data, not theme: they live as a JS map and are applied inline (§4). */
-export const EVENT_META: Record<EventType, { label: string; icon: IconName; color: string }> = {
-  gym: { label: "Gimnasio", icon: "swords", color: "#a78bfa" },
-  market: { label: "Mercado", icon: "tag", color: "#fbbf24" },
-  raid: { label: "Incursión", icon: "flame", color: "#fb7185" },
-  social: { label: "Social", icon: "partyPop", color: "#22d3ee" },
-  boss: { label: "Jefe", icon: "skull", color: "#f472b6" },
+/**
+ * Event hues are data, not theme: they live as a JS map and are applied inline (§4).
+ * `labelKey` is a key id under `taxi.eventTypes` — never copy (i18n.md §Conventions).
+ */
+export const EVENT_META: Record<EventType, { labelKey: EventType; icon: IconName; color: string }> = {
+  gym: { labelKey: "gym", icon: "swords", color: "#a78bfa" },
+  market: { labelKey: "market", icon: "tag", color: "#fbbf24" },
+  raid: { labelKey: "raid", icon: "flame", color: "#fb7185" },
+  social: { labelKey: "social", icon: "partyPop", color: "#22d3ee" },
+  boss: { labelKey: "boss", icon: "skull", color: "#f472b6" },
 }
 
 export interface PartyMember {

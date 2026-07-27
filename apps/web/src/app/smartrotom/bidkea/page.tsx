@@ -20,40 +20,41 @@ import { Card, CardContent } from "@/components/ui/primitives/card";
 import { OBJLoader } from "three/addons/loaders/OBJLoader.js";
 import { MTLLoader } from "three/addons/loaders/MTLLoader.js";
 import { apiAsset } from "@/lib/assets";
+import { useTranslations } from "next-intl";
 
 const furnitureItems = [
   {
     name: "Sayori",
-    title: "Modelo de Sayori",
-    subtitle: "Conjunto",
+    titleKey: "items.sayoriTitle",
+    subtitleKey: "categories.conjunto",
     price: "100",
-    description: "Un conjunto completo de Sayori, desde los pies a la cabeza.",
+    descriptionKey: "items.sayoriDesc",
   },
   {
     name: "A",
-    title: "Casco Lancero",
-    subtitle: "Casco",
+    titleKey: "items.lancerHelmetTitle",
+    subtitleKey: "categories.casco",
     price: "$50",
-    description: "Un casco de lancero con detalles en oro.",
+    descriptionKey: "items.lancerHelmetDesc",
   },
   {
     name: "luffy",
-    title: "Monkey D Luffy",
-    subtitle: "Conjunto",
+    titleKey: "items.luffyTitle",
+    subtitleKey: "categories.conjunto",
     price: "$150",
-    description:
-      "Un conjunto completo de Monkey D Luffy. Incluye su famoso sombrero de paja.",
+    descriptionKey: "items.luffyDesc",
   },
   {
     name: "piano",
-    title: "Piano",
-    subtitle: "Bloque",
+    titleKey: "items.pianoTitle",
+    subtitleKey: "categories.bloque",
     price: "$200",
-    description: "Un piano de cola de tamaño real.",
+    descriptionKey: "items.pianoDesc",
   },
 ];
 
 export default function BidkeaMenu() {
+  const t = useTranslations("bidkea");
   const ref = useRef<HTMLDivElement>(null);
 
   return (
@@ -63,7 +64,7 @@ export default function BidkeaMenu() {
           <div className="flex items-center space-x-2">
             <img
               src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/bidkea-IlaragMewET6XF5bGQdoTxGGKB1hAX.webp"
-              alt="Bidkea Logo"
+              alt={t("header.logoAlt")}
               className="w-12 h-12"
             />
             <h1 className="text-2xl font-bold">Bidkea</h1>
@@ -71,7 +72,7 @@ export default function BidkeaMenu() {
           <div className="flex items-center space-x-4">
             <input
               type="search"
-              placeholder="Buscar productos..."
+              placeholder={t("header.searchPh")}
               className="px-4 py-2 rounded-full text-[#3e2723]"
             />
             <Button variant="outline" className="rounded-full">
@@ -95,19 +96,19 @@ export default function BidkeaMenu() {
       </header>
 
       <main className="container mx-auto py-8">
-        <h2 className="text-3xl font-bold mb-6">Catálogo de Productos</h2>
+        <h2 className="text-3xl font-bold mb-6">{t("catalog.title")}</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {furnitureItems.map((item, index) => (
             <Card key={index} className="bg-white shadow-lg">
               <CardContent className="p-4">
                 <ModelView name={item.name} />
-                <h3 className="text-xl font-semibold mb-2">{item.title}</h3>
+                <h3 className="text-xl font-semibold mb-2">{t(item.titleKey)}</h3>
                 <p className="text-lg font-bold text-[#8b4513]">{item.price}</p>
-                <p className="text-sm text-ink-dim">{item.subtitle}</p>
+                <p className="text-sm text-ink-dim">{t(item.subtitleKey)}</p>
                 <div className="grid gap-4 mt-4">
-                  <p className="text-sm">{item.description}</p>
+                  <p className="text-sm">{t(item.descriptionKey)}</p>
                   <Button className="w-full bg-[#8b4513] hover:bg-[#6d370f] text-white">
-                    Añadir al carrito
+                    {t("catalog.addToCart")}
                   </Button>
                 </div>
               </CardContent>
@@ -118,7 +119,7 @@ export default function BidkeaMenu() {
 
       <footer className="bg-[#8b4513] text-white p-4 mt-12">
         <div className="container mx-auto text-center">
-          <p>&copy; 2023 Bidkea. Todos los derechos reservados.</p>
+          <p>{t("footer.rights")}</p>
         </div>
       </footer>
 
@@ -180,6 +181,7 @@ function ModelView({ name, color = "" }: { name: string; color?: string }) {
 }
 
 export function ArmourerModel({ name }: { name: string }) {
+  const t = useTranslations("bidkea");
   const [obj, setObj] = useState(null as any);
   const texture = useLoader(
     TextureLoader,
@@ -207,6 +209,6 @@ export function ArmourerModel({ name }: { name: string }) {
       });
   }, [name, texture]);
 
-  if (!obj) return <>LOADING</>;
+  if (!obj) return <>{t("catalog.loading")}</>;
   return <primitive object={obj} />;
 }

@@ -1,5 +1,8 @@
+"use client"
+
 import Link from "next/link"
 import { cn } from "@/lib/utils"
+import { useFormat } from "@/lib/useFormat"
 import { Avatar } from "./Avatar"
 import { Check } from "./Check"
 import { LivePill } from "./LivePill"
@@ -21,6 +24,7 @@ export interface StreamCardData {
 
 /** A single Mewtwitch live stream: preview + live pill + viewers pulse + tags. */
 export function StreamCard({ s, className }: { s: StreamCardData; className?: string }) {
+  const { number } = useFormat()
   return (
     <Link
       href={s.href}
@@ -37,7 +41,7 @@ export function StreamCard({ s, className }: { s: StreamCardData; className?: st
         <div className="absolute inset-0 z-[1] bg-gradient-to-t from-black/65 to-transparent to-50%" />
         <LivePill className="absolute left-2.5 top-2.5 shadow-[0_4px_14px_rgb(var(--mw-accent)/.35)]" />
         <span className="absolute bottom-2.5 left-2.5 z-[2] inline-flex items-center gap-1.5 rounded-mw-sm border border-mw-line-strong bg-black/75 px-2 py-[3px] font-mono text-[11px] font-bold text-white">
-          <PulseDot /> {s.viewers.toLocaleString("es-ES")}
+          <PulseDot /> {number(s.viewers)}
         </span>
       </div>
       <div className="flex gap-2.5 px-1 pb-1 pt-3">

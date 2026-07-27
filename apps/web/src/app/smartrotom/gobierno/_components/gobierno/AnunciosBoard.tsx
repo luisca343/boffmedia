@@ -76,7 +76,7 @@ export function AnunciosBoard() {
             </>
           )}
 
-          <Pager page={page} pageSize={PAGE_SIZE} total={data?.total ?? 0} onChange={setPage} />
+          <Pager page={page} pageSize={PAGE_SIZE} total={data?.total ?? 0} onChange={setPage} t={t} />
         </>
       )}
 

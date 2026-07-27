@@ -4,7 +4,7 @@ import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { Button, Icon, Stat } from "./ui"
 import { formatMoney, formatNum } from "../_utils/format"
-import { compassLabel } from "../_utils/geo"
+import { compassKey } from "../_utils/geo"
 import type { EnrichedStop } from "../_types"
 
 /**
@@ -38,6 +38,7 @@ export function SelectedCard({
   bare?: boolean
 }) {
   const t = useTranslations("taxi.selectedCard")
+  const tc = useTranslations("taxi.compass")
   const affordable = balance !== undefined && balance >= stop.price
   const after = (balance ?? 0) - stop.price
 
@@ -65,7 +66,7 @@ export function SelectedCard({
               className="text-tx-accent"
               style={{ transform: `rotate(${stop.bearing}deg)` }}
             />
-            {compassLabel(stop.bearing)}
+            {tc(compassKey(stop.bearing))}
             {stop.region && <> · {stop.region}</>}
           </div>
         </div>

@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { Panel } from "../../_components/ui"
 
 interface ScoreboardProps {
@@ -13,10 +14,11 @@ interface ScoreboardProps {
  * a Voltorb takes away — with the level and the banked total underneath.
  */
 export default function Scoreboard({ roundScore, totalCoins, level }: ScoreboardProps) {
+  const t = useTranslations("arcade")
   return (
     <Panel tone="cyan" tight>
       <div className="mb-2 font-ar-display text-[9px] uppercase tracking-[0.18em] text-ar-cyan">
-        PUNTUACIÓN
+        {t("voltorb.score")}
       </div>
       <div
         key={roundScore}
@@ -27,10 +29,10 @@ export default function Scoreboard({ roundScore, totalCoins, level }: Scoreboard
       </div>
       <div className="mt-2 flex items-center justify-between font-ar-mono text-[11px] text-ar-ink-dim">
         <span>
-          NIVEL <b className="text-ar-ink">{level}</b>
+          {t("voltorb.level")} <b className="text-ar-ink">{level}</b>
         </span>
         <span>
-          TOTAL <b className="tabular-nums text-ar-amber">{totalCoins}</b>
+          {t("voltorb.total")} <b className="tabular-nums text-ar-amber">{totalCoins}</b>
         </span>
       </div>
     </Panel>

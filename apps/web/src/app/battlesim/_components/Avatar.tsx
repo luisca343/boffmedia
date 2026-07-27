@@ -1,9 +1,11 @@
+import { useTranslations } from "next-intl";
 import { Sprites } from "@pkmn/img";
 import { getScaleMultiplier } from "../_utils/viewUtils";
 import {  Side } from "@pkmn/client";
 import NpcSkin from "@/components/smartrotom/MinecraftSkin";
 
 export function Avatar({ side, pov} : { side: Side, pov: 0 | 1}) {
+    const t = useTranslations("battlesim.avatar")
     const povCentered = pov === side.n
     const player = side
     const avatarId = player?.avatar || 'unknown';
@@ -50,7 +52,7 @@ export function Avatar({ side, pov} : { side: Side, pov: 0 | 1}) {
             {uuid !== null ? (
                 <img
                     className="mx-auto"
-                    alt="avatar"
+                    alt={t("alt")}
                     style={baseStyles}
                     src={`https://api.mineatar.io/body/full${uuid}`}
                 />
@@ -59,7 +61,7 @@ export function Avatar({ side, pov} : { side: Side, pov: 0 | 1}) {
                     className="mx-auto"
                     style={avatarStyles}
                     src={avatar}
-                    alt="avatar"
+                    alt={t("alt")}
                 />
             ) : (
                 <NpcSkin

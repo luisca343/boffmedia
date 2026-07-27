@@ -9,6 +9,8 @@ interface ConfirmationDialogProps {
   onConfirm: () => void
   titleKey: string
   descriptionKey: string
+  /** ICU arguments for `descriptionKey` — the coin figures the confirm quotes. */
+  descriptionValues?: Record<string, string | number>
   confirmKey: string
   cancelKey: string
   variant: "quit" | "new"
@@ -26,6 +28,7 @@ export default function ConfirmationDialog({
   onConfirm,
   titleKey,
   descriptionKey,
+  descriptionValues,
   confirmKey,
   cancelKey,
   variant,
@@ -57,7 +60,7 @@ export default function ConfirmationDialog({
       }
     >
       <p className="text-center font-ar text-[13px] leading-relaxed text-ar-ink-dim">
-        {t(descriptionKey)}
+        {t(descriptionKey, descriptionValues)}
       </p>
     </Modal>
   )

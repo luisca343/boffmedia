@@ -23,13 +23,14 @@ export interface TnCompetitor {
   pts?: number
 }
 
-export const TN_FORMAT_LABEL: Record<string, string> = {
-  swiss: "Suizo",
-  single: "Eliminación",
-  double: "Doble elim.",
-  groups: "Grupos + eliminatoria",
-  roundrobin: "Liga (todos contra todos)",
-  leaderboard: "Clasificación libre",
+// Values are keys under `torneos.format.*` — resolve with t(TN_FORMAT_LABEL_KEY[format]).
+export const TN_FORMAT_LABEL_KEY: Record<string, string> = {
+  swiss: "swiss",
+  single: "single",
+  double: "double",
+  groups: "groups",
+  roundrobin: "roundrobin",
+  leaderboard: "leaderboard",
 }
 
 export const TN_FORMAT_ICON: Record<string, IconName> = {

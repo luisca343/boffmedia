@@ -11,6 +11,7 @@ import { DenunciaActionModal, type DenunciaActionKind } from "./DenunciaActionMo
 import { useDenuncias } from "../../_hooks/queries"
 import { DENUNCIA_CATEGORY, DENUNCIA_STATUS } from "../../_utils/tones"
 import { fmtDateTime, townName } from "../../_utils/format"
+import { useFormat } from "@/lib/useFormat"
 import type { Denuncia } from "../../_types"
 
 const FILTERS = ["all", "pending", "reviewing", "resolved", "dismissed"] as const
@@ -18,6 +19,7 @@ type Filter = (typeof FILTERS)[number]
 
 export function DenunciasSection() {
   const t = useTranslations("gobierno")
+  const { intlLocale } = useFormat()
   const { data, isLoading, isError, error } = useDenuncias({ limit: 100 })
   const [filter, setFilter] = useState<Filter>("all")
   const [openId, setOpenId] = useState<number | null>(null)
@@ -32,7 +34,7 @@ export function DenunciasSection() {
 
   const options = FILTERS.map((f) => ({
     value: f,
-    label: f === "all" ? t("denuncias.filters.all") : DENUNCIA_STATUS[f].label,
+    label: f === "all" ? t("denuncias.filters.all") : t(DENUNCIA_STATUS[f].labelKey),
     count: f === "all" ? rows.length : rows.filter((d) => d.status === f).length,
   }))
 
@@ -69,14 +71,21 @@ export function DenunciasSection() {
       ) : filtered.length === 0 ? (
         <Empty
           icon="fileText"
-          title={filter === "all" ? t("denuncias.emptyTitle") : t("denuncias.emptyFiltered", { status: DENUNCIA_STATUS[filter as keyof typeof DENUNCIA_STATUS]?.label ?? filter })}
+          title={
+            filter === "all"
+              ? t("denuncias.emptyTitle")
+              : t("denuncias.emptyFiltered", {
+                  status: DENUNCIA_STATUS[filter]?.labelKey ? t(DENUNCIA_STATUS[filter].labelKey) : filter,
+                })
+          }
           sub={t("denuncias.emptyFilteredBody")}
         />
       ) : (
         <div className="space-y-3">
           {filtered.map((d) => {
             const isOpen = openId === d.id
-            const catLabel = DENUNCIA_CATEGORY[d.category] ?? d.category
+            const catKey = DENUNCIA_CATEGORY[d.category]
+            const catLabel = catKey ? t(catKey) : d.category
             const where = d.town ? `${townName(d.town)}${d.plotNumber != null ? ` #${d.plotNumber}` : ""}` : null
             // The resolve endpoint only accepts a denuncia that is still `pending` — there is
             // no route that ever produces `reviewing` (create has no status field, and update
@@ -108,11 +117,12 @@ export function DenunciasSection() {
                     </div>
                     <p className="mt-1 max-w-[620px] text-[13px] leading-relaxed text-gt-ink-600">{d.description}</p>
                     <div className="mt-1.5 font-gt-mono text-[10.5px] text-gt-ink-400">
-                      {where && `${where} · `}denunció {d.reporter.username} · {fmtDateTime(d.createdAt)}
+                      {where && `${where} · `}
+                      {t("denuncias.denouncedBy", { username: d.reporter.username, date: fmtDateTime(d.createdAt, intlLocale) })}
                     </div>
                   </div>
                   <div className="flex flex-none flex-col items-end gap-2">
-                    <Badge tone={DENUNCIA_STATUS[d.status].tone}>{DENUNCIA_STATUS[d.status].label}</Badge>
+                    <Badge tone={DENUNCIA_STATUS[d.status].tone}>{t(DENUNCIA_STATUS[d.status].labelKey)}</Badge>
                     <Icon name={isOpen ? "chevronDown" : "chevronRight"} size={16} className="text-gt-ink-300" />
                   </div>
                 </div>
@@ -127,7 +137,7 @@ export function DenunciasSection() {
                         <p className="mt-1 text-[13px] text-gt-ink-700">{d.resolution ?? "—"}</p>
                         {d.resolvedBy && (
                           <p className="mt-1.5 font-gt-mono text-[10.5px] text-gt-ink-400">
-                            {d.resolvedBy.username} · {fmtDateTime(d.resolvedAt)}
+                            {d.resolvedBy.username} · {fmtDateTime(d.resolvedAt, intlLocale)}
                           </p>
                         )}
                       </div>

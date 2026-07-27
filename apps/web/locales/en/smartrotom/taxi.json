@@ -87,14 +87,95 @@
     },
     "eventsPanel": {
       "title": "Events",
-      "empty": "No active events"
+      "empty": "No active events",
+      "activeCount": "{count, plural, one {# active} other {# active}}",
+      "liveEvents": "Live events",
+      "endingSoon": "Ending soon",
+      "hot": "Popular",
+      "go": "Go",
+      "featuredNow": "Featured now",
+      "endsIn": "Ends in {time}",
+      "travelTo": "Travel to {name}"
     },
     "presence": {
-      "online": "{count, plural, =0 {No one} one {# player} other {# players}} at this stop"
+      "online": "{count, plural, =0 {No one} one {# player} other {# players}} at this stop",
+      "onlineCount": "{count} online",
+      "happyHourTitle": "Happy hour · −{percent}% on every trip",
+      "happyHourSub": "Discount applied automatically at checkout"
     },
     "rewards": {
       "title": "Rewards",
-      "empty": "No rewards available"
-    }
+      "empty": "No rewards available",
+      "groupTrip": "Group trip",
+      "passengers": "· {count, plural, one {# passenger} other {# passengers}}",
+      "groupExtra": "+{amount} for your party",
+      "bringParty": "Bring your party ({count} online)",
+      "online": "online",
+      "offline": "offline",
+      "member": "{tier} member",
+      "frequentProgram": "Frequent Rider Programme",
+      "perTrip": "on every trip",
+      "tripsToNext": "{count, plural, one {# trip to {tier}} other {# trips to {tier}}}",
+      "maxLevel": "Max level reached",
+      "streakDays": "{count, plural, one {# day} other {# days}}",
+      "activeStreak": "Active streak",
+      "freeTrip": "Free trip",
+      "achieved": "Achieved",
+      "bonus": "+{count} bonus",
+      "noBonus": "no bonus"
+    },
+    "countdown": {
+      "endingNow": "ending now",
+      "minutes": "{minutes} min",
+      "hours": "{hours} h",
+      "hoursMinutes": "{hours} h {minutes} m"
+    },
+    "errors": {
+      "noPlayerPosition": "No player position",
+      "loginRequired": "You need to sign in to travel",
+      "chargeFailed": "The fare could not be charged",
+      "teleportFailedAfterCharge": "The fare was charged but the teleport failed. Contact support.",
+      "tripFailed": "The trip could not be completed"
+    },
+    "compass": {
+      "n": "N",
+      "ne": "NE",
+      "e": "E",
+      "se": "SE",
+      "s": "S",
+      "so": "SW",
+      "o": "W",
+      "no": "NW"
+    },
+    "map": {
+      "north": "N",
+      "zoomIn": "Zoom in",
+      "zoomOut": "Zoom out",
+      "recenter": "Centre on you",
+      "scale": "{blocks} blocks",
+      "you": "YOU",
+      "destination": "Destination {name}",
+      "goTo": "Go to {name}"
+    },
+    "searchBar": {
+      "placeholderPh": "Search a destination or zone…",
+      "search": "Search destination",
+      "clear": "Clear search",
+      "sortFarthest": "Sort by farthest",
+      "sortNearest": "Sort by nearest",
+      "nearestFirst": "Nearest first",
+      "farthestFirst": "Farthest first"
+    },
+    "modal": {
+      "close": "Close"
+    },
+    "eventTypes": {
+      "gym": "Gym",
+      "market": "Market",
+      "raid": "Raid",
+      "social": "Social",
+      "boss": "Boss"
+    },
+    "arrived": "You have arrived at <b>{name}</b>!"
   }
 }

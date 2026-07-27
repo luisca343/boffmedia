@@ -218,6 +218,8 @@
         "discard": "Discard",
         "saveChanges": "Save changes",
         "saving": "Saving…",
+        "saveSuccess": "Changes saved",
+        "saveError": "Could not save changes",
         "bestPack": "Pack analyzer",
         "bestPackHint": "Based on your collection, we work out the pack most likely to give you a card you don't own yet.",
         "analyze": "Analyze",
@@ -235,7 +237,8 @@
         "cardCount": "{count} cards",
         "packCards": "Pack cards",
         "noPackCards": "This pack has no registered cards.",
-        "noPacks": "No packs registered for this expansion."
+        "noPacks": "No packs registered for this expansion.",
+        "tileAria": "Pack {name} · {setId}"
       },
       "combates": {
         "title": "Battles",

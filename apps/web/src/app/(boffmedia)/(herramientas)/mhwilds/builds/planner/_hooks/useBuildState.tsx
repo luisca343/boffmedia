@@ -1,4 +1,5 @@
 import { useState, useCallback, useMemo } from "react";
+import { useTranslations } from "next-intl";
 import {
   BuildData,
   BuildDataWithIds,
@@ -19,8 +20,9 @@ export function useBuildState({
   getDecorationById,
   getCharmById
 }: BuildStateProps) {
+  const t = useTranslations("mhwilds.build_planner")
   const [currentBuild, setCurrentBuild] = useState<BuildDataWithIds>({
-    name: "Mi Build",
+    name: t("defaultBuildName"),
     weaponId: null,
     secondaryWeaponId: null,
     headId: null,
@@ -81,7 +83,7 @@ export function useBuildState({
   // Reset build to default values
   const handleReset = useCallback(() => {
     setCurrentBuild({
-      name: "Mi Build",
+      name: t("defaultBuildName"),
       weaponId: null,
       secondaryWeaponId: null,
       headId: null,

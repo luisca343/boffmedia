@@ -84,7 +84,8 @@
       "tabPrice": "Precio",
       "tabMedia": "Media",
       "viewSteam": "Ver en Steam",
-      "detailLoading": "Cargando ficha de Steam…"
+      "detailLoading": "Cargando ficha de Steam…",
+      "mediaN": "Media {n}"
     },
     "sorteosApp": {
       "kicker": "Otros · Comunidad",
@@ -165,6 +166,7 @@
       "regionCustomPlaceholder": "Región personalizada…",
       "addRegion": "Añadir",
       "activeRegions": "Activas:",
+      "removeRegion": "Quitar {r}",
       "kpiFiles": "Archivos",
       "kpiConsoles": "Consolas",
       "resultsFor": "Resultados para <b>«{q}»</b>",

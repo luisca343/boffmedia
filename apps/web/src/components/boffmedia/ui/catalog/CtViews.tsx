@@ -1,21 +1,24 @@
 "use client"
 
 import * as React from "react"
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { Icon } from "@/components/boffmedia/primitives"
+import { useFormat } from "@/lib/useFormat"
 import { CtCover } from "./CtCard"
 import { CtStars } from "./CtAtoms"
-import { CT_STATUS, ctRatingDist, type CtActivity, type CtGame } from "./catalog-util"
+import { ctRatingDist, type CtActivity, type CtGame } from "./catalog-util"
 
 // Community rating histogram (deterministic per game). Mirrors .ct-dist.
 export function CtRatingBars({ game, height = 66 }: { game: CtGame; height?: number }) {
+  const { number } = useFormat()
   const dist = ctRatingDist(game)
   const max = Math.max(1, ...dist.counts)
   return (
     <div className="flex flex-col gap-[5px]">
       <div className="flex items-end gap-[3px]" style={{ height }}>
         {dist.counts.map((c, i) => (
-          <span key={i} className="relative flex h-full flex-1 items-end border border-solid border-line bg-panel-2" title={dist.buckets[i] + "★ · " + c.toLocaleString("es")}>
+          <span key={i} className="relative flex h-full flex-1 items-end border border-solid border-line bg-panel-2" title={dist.buckets[i] + "★ · " + number(c)}>
             <span className="min-h-[2px] w-full transition-[height] duration-[260ms] [background:linear-gradient(180deg,var(--accent-bright),var(--accent))]" style={{ height: (c / max) * 100 + "%" }} />
           </span>
         ))}
@@ -33,6 +36,7 @@ export function CtRatingBars({ game, height = 66 }: { game: CtGame; height?: num
 
 // A collection preview (fanned cover stack + meta). Mirrors .ct-listcard.
 export function CtListCard({ list, games, onOpen }: { list: { title: string; desc?: string; system?: boolean }; games: CtGame[]; onOpen?: () => void }) {
+  const t = useTranslations("common.catalog")
   const stack = games.slice(0, 5)
   return (
     <article onClick={onOpen} tabIndex={0} role="button" onKeyDown={(e) => e.key === "Enter" && onOpen?.()} className="group flex cursor-pointer gap-[14px] border border-solid border-line bg-panel p-[14px] transition-[border-color] duration-[140ms] hover:border-accent-line">
@@ -52,12 +56,12 @@ export function CtListCard({ list, games, onOpen }: { list: { title: string; des
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2">
           <h4 className="font-body text-[16px]/[1.15] font-bold text-txt group-hover:text-accent">{list.title}</h4>
-          <span className={cn("border border-solid px-1.5 py-[3px] font-mono text-[9px]/none font-semibold uppercase tracking-[0.1em]", list.system ? "border-line text-txt-muted" : "border-accent-line text-accent")}>{list.system ? "Boffmedia" : "Tuya"}</span>
+          <span className={cn("border border-solid px-1.5 py-[3px] font-mono text-[9px]/none font-semibold uppercase tracking-[0.1em]", list.system ? "border-line text-txt-muted" : "border-accent-line text-accent")}>{list.system ? t("systemList") : t("yourList")}</span>
         </div>
         {list.desc && <p className="my-[5px] line-clamp-2 font-body text-[12.5px]/[1.4] font-medium text-txt-muted">{list.desc}</p>}
         <span className="inline-flex items-center gap-[5px] font-mono text-[11px]/none font-semibold text-txt-dim">
           <Icon name="gamepad" size={12} />
-          {games.length} {games.length === 1 ? "juego" : "juegos"}
+          {games.length} {t("games", { count: games.length })}
         </span>
       </div>
     </article>
@@ -66,8 +70,8 @@ export function CtListCard({ list, games, onOpen }: { list: { title: string; des
 
 // A feed entry — user · action · game · rating · optional review. Mirrors .ct-act.
 export function CtActivityRow({ item, game, onOpen }: { item: CtActivity; game?: CtGame; onOpen?: (g: CtGame) => void }) {
-  const s = item.status ? CT_STATUS[item.status] : null
-  const verb = item.verb || (s ? s.verb.toLowerCase() : "registró")
+  const t = useTranslations("common.catalog")
+  const verb = item.verb || (item.status ? t(`status.${item.status}.verb`).toLowerCase() : t("defaultVerb"))
   return (
     <div onClick={() => game && onOpen?.(game)} role={onOpen ? "button" : undefined} tabIndex={onOpen ? 0 : undefined} onKeyDown={(e) => onOpen && e.key === "Enter" && game && onOpen(game)} className="flex cursor-pointer gap-3 border-b border-solid border-line px-1 py-[14px] hover:bg-[color-mix(in_oklch,var(--panel)_60%,transparent)]">
       <span className="grid h-[34px] w-[34px] flex-none place-items-center border border-solid border-line-2 bg-panel-2 font-mono text-[11px]/none font-bold text-txt-muted">{(item.user || "AX").slice(0, 2).toUpperCase()}</span>
@@ -81,12 +85,12 @@ export function CtActivityRow({ item, game, onOpen }: { item: CtActivity; game?:
               game && onOpen?.(game)
             }}
           >
-            {game ? game.title : "un juego"}
+            {game ? game.title : t("aGame")}
           </a>
           {item.rating ? <CtStars value={item.rating} size={12} /> : null}
         </p>
         {item.review && <p className="mt-1.5 border-l-2 border-solid border-line-2 pl-2.5 font-body text-[13px]/[1.5] font-medium text-txt-muted">“{item.review}”</p>}
-        <span className="mt-1.5 inline-block font-mono text-[10px]/none font-semibold uppercase tracking-[0.08em] text-txt-dim">{item.time || "ahora"}</span>
+        <span className="mt-1.5 inline-block font-mono text-[10px]/none font-semibold uppercase tracking-[0.08em] text-txt-dim">{item.time || t("justNow")}</span>
       </div>
       {game && <CtCover game={game} xs className="w-[34px] flex-none self-start" />}
     </div>

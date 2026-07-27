@@ -46,7 +46,7 @@ export function EquipDrawer({
     return out.sort((a, b) => a.rarity - b.rarity)
   }, [items, q, rar, type, slot])
 
-  const label = t(slot === "secondaryWeapon" ? "secondary_weapon" : slot)
+  const label = t(slot === "secondaryWeapon" ? "secondaryWeapon" : slot)
   const rarOptions = [{ value: "all", label: t("tree.allRarity") }, ...[1, 2, 3, 4, 5, 6, 7, 8].map((r) => ({ value: String(r), label: `${t("rarity")} ${r}` }))]
 
   return (

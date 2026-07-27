@@ -1,11 +1,13 @@
+import { useTranslations } from "next-intl";
+
 import type { FtArticle } from "../../_utils/article";
 import { Meta, Pill, Toggle } from "../../_components/ui";
 
 /** Status pill tone/label, derived from the two real flags — never a third state. */
 function statusOf(article: FtArticle) {
-  if (article.featured) return { label: "DESTACADA", tone: "pink" as const };
-  if (article.published) return { label: "PUBLICADA", tone: "lime" as const };
-  return { label: "BORRADOR", tone: "yellow" as const };
+  if (article.featured) return { labelKey: "featured", tone: "pink" as const };
+  if (article.published) return { labelKey: "published", tone: "lime" as const };
+  return { labelKey: "draft", tone: "yellow" as const };
 }
 
 export function NewsRow({
@@ -25,6 +27,7 @@ export function NewsRow({
   onRequestDelete: () => void;
   busy?: boolean;
 }) {
+  const t = useTranslations("furrettoday.newsRow");
   const status = statusOf(article);
 
   return (
@@ -47,7 +50,7 @@ export function NewsRow({
         ].join(" ")}
       >
         <div className="mb-1.5 flex items-center justify-between gap-2">
-          <Pill tone={status.tone}>{status.label}</Pill>
+          <Pill tone={status.tone}>{t(status.labelKey)}</Pill>
           <Meta className="text-[11px] text-ft-ink/70">{article.datelineShort}</Meta>
         </div>
 
@@ -66,14 +69,14 @@ export function NewsRow({
         >
           <Toggle
             checked={article.published}
-            label="Publicada"
+            label={t("togglePublished")}
             tone="cyan"
             onChange={onTogglePublished}
             disabled={busy}
           />
           <Toggle
             checked={article.featured}
-            label="Destacada"
+            label={t("toggleFeatured")}
             tone="pink"
             onChange={onToggleFeatured}
             disabled={busy}
@@ -81,7 +84,7 @@ export function NewsRow({
           <button
             type="button"
             onClick={onRequestDelete}
-            aria-label={`Eliminar «${article.title}»`}
+            aria-label={t("deleteAria", { title: article.title })}
             className="font-ft-ui ml-auto rounded-ft-pill border border-ft-ink/30 px-2.5 py-1 text-[11px] font-bold text-ft-ink hover:border-ft-ink hover:bg-ft-ink/5"
           >
             🗑

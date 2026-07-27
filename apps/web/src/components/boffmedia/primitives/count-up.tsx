@@ -2,9 +2,13 @@
 
 import * as React from "react"
 
-const fmt = (n: number) => n.toLocaleString("es-ES").replace(/ /g, " ").replace(/,/g, " ")
+import { useFormat } from "@/lib/useFormat"
+
+const nbspFmt = (locale: string) => (n: number) => n.toLocaleString(locale).replace(/ /g, " ").replace(/,/g, " ")
 
 export function CountUp({ value, duration = 1400 }: { value: string | number; duration?: number }) {
+  const { intlLocale } = useFormat()
+  const fmt = React.useMemo(() => nbspFmt(intlLocale), [intlLocale])
   const target = typeof value === "number" ? value : Number(String(value).replace(/[^\d]/g, "")) || 0
   const [n, setN] = React.useState(0)
   const ref = React.useRef<HTMLSpanElement>(null)

@@ -1,5 +1,7 @@
 "use client"
 
+import { useTranslations } from "next-intl"
+
 import { useBoffSession } from "@/services/useBoffSession"
 import { useRotomUuid } from "@/components/smartrotom/behavior/useRotomUuid"
 import { USER_ROLES, GOBIERNO_RANKS } from "@boffmedia/shared/roles"
@@ -11,6 +13,7 @@ import { badgeOf } from "../_utils/format"
  * number is derived from the user id rather than stored anywhere.
  */
 export function useOfficer() {
+  const t = useTranslations("gobierno")
   const { session, status, hasRole, isRotomAdmin, isBoffAdmin } = useBoffSession()
   const uuid = useRotomUuid()
 
@@ -30,7 +33,9 @@ export function useOfficer() {
     isAdmin,
     username: session?.user?.smartRotomUser?.username ?? session?.user?.username ?? "",
     uuid: uuid ?? "",
-    rankLabel: rank?.label ?? (isAdmin ? "Administración" : "Funcionario"),
+    // `rank.label` comes from the shared roles module (not this app's copy); only the two
+    // fallbacks are chrome.
+    rankLabel: rank?.label ?? t(isAdmin ? "dep.admin" : "ranks.funcionario"),
     badge: badgeOf(userId, rank?.prefix ?? (isAdmin ? "A" : "G")),
   }
 }

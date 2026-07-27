@@ -4,6 +4,7 @@
 // dossier. When a record has no identified player yet (an unassigned denuncia — the accused
 // is optional on the real DTO), it renders a neutral, non-interactive placeholder instead of
 // guessing a name.
+import { useTranslations } from "next-intl"
 import { Avatar } from "../ui"
 import { useGobiernoUi } from "../../_stores/useGobiernoUi"
 import type { PlayerRef } from "../../_types"
@@ -19,6 +20,7 @@ export function PlayerLink({
   sub?: string
   className?: string
 }) {
+  const t = useTranslations("gobierno")
   const openDossier = useGobiernoUi((s) => s.openDossier)
 
   if (!player) {
@@ -28,7 +30,7 @@ export function PlayerLink({
           className="flex-none rounded-[4px] border border-dashed border-gt-line-strong bg-gt-paper-1"
           style={{ width: size, height: size }}
         />
-        <span className="text-[13px] italic text-gt-ink-400">Sin identificar</span>
+        <span className="text-[13px] italic text-gt-ink-400">{t("denuncias.sinIdentificar")}</span>
       </div>
     )
   }

@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { useTranslations } from "next-intl";
 
 import { ArticleCard } from "./_components/ArticleCard";
 import { CollectorStrip } from "./_components/home/CollectorStrip";
@@ -13,6 +14,7 @@ import { useNewsroom } from "./_hooks/queries";
 import { tickerOf } from "./_utils/article";
 
 export default function FurretTodayHome() {
+  const t = useTranslations("furrettoday.home");
   const { cover, published, isLoading, error } = useNewsroom();
   const [newsletterOpen, setNewsletterOpen] = useState(false);
 
@@ -36,8 +38,8 @@ export default function FurretTodayHome() {
     return (
       <div className="ft-wrap-wide px-6 py-16">
         <EmptyState
-          title="SIN NÚMERO"
-          message="Todavía no hay ningún artículo publicado para hacer la portada."
+          title={t("emptyTitle")}
+          message={t("emptyMessage")}
         />
       </div>
     );
@@ -47,13 +49,13 @@ export default function FurretTodayHome() {
     <div>
       <CoverHero cover={cover} contents={published.slice(0, 4)} />
 
-      <Marquee items={ticker} tone="yellow" label="Titulares de última hora" />
+      <Marquee items={ticker} tone="yellow" label={t("tickerLabel")} />
 
       {published.length > 0 ? (
         <section className="ft-wrap-wide px-6 pb-6 pt-14">
           <SectionHeader
-            eyebrow="LO MÁS LEÍDO ESTA SEMANA"
-            title="Las Tres en Boca de Todos"
+            eyebrow={t("topEyebrow")}
+            title={t("topTitle")}
             number="01"
           />
           <div className="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-[1.4fr_1fr_1fr]">
@@ -73,8 +75,8 @@ export default function FurretTodayHome() {
       {moreArticles.length > 0 ? (
         <section className="ft-wrap-wide px-6 pb-14 pt-6">
           <SectionHeader
-            eyebrow="REPORTAJES · COMUNIDAD · GUÍAS"
-            title="Más Páginas Que Pasar"
+            eyebrow={t("moreEyebrow")}
+            title={t("moreTitle")}
             number="02"
           />
           <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">

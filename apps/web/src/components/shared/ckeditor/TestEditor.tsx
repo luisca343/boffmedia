@@ -1,5 +1,6 @@
 "use client";
 import React, { useRef } from 'react';
+import { useTranslations } from 'next-intl';
 import { CKEditor } from "@ckeditor/ckeditor5-react";
 import Editor from "./ckeditor.js"
 import './styles.css'
@@ -76,6 +77,7 @@ const editorConfiguration = {
 
 function createSaveButton (data: any, props: {
     updateNews: any; documentId: any; documentType: any; refresh: () => void; type?: string; getToken: () => string;
+    untitled: string; savedToast: (title: string) => string;
 }) {
     console.log("=== CREATE SAVE BUTTON ===");
     const endpoint = props.type === 'news' ? 'news' : 'save';
@@ -86,13 +88,13 @@ function createSaveButton (data: any, props: {
     saveButton.onclick = () => {
         const documentId = props.documentId;
         const h1 = data.match(/<h1>(.*?)<\/h1>/);
-        let title = !h1 || h1[1] === '&nbsp;' ? 'Sin título' : h1[1];
+        let title = !h1 || h1[1] === '&nbsp;' ? props.untitled : h1[1];
         
         if(props.documentType === 1) {
             DocumentsService.updateActiveNews(documentId, {
                 content: data,
                 id: documentId,
-                title: title || "Sin título",
+                title: title || props.untitled,
               } as CreateNewsDto, props.getToken())
             .then(() => {
                 if(props.refresh) props.refresh();
@@ -102,7 +104,7 @@ function createSaveButton (data: any, props: {
             });
         } else rotomPOST(`/documents/${endpoint}/${documentId}`, { title, content: data, type: props.documentType })
             .then(() => {
-                sendToast(`Cambios guardados en ${title}`);
+                sendToast(props.savedToast(title));
                 if(props.refresh) props.refresh();
                 if(props.updateNews) props.updateNews(props.documentId, data);
             });
@@ -116,6 +118,9 @@ function CustomEditor(props) {
     // even if CKEditor doesn't re-bind its event listeners after a React re-render.
     const tokenRef = useRef<string>(props.token ?? '');
     tokenRef.current = props.token ?? '';
+    const t = useTranslations('common.editor');
+    const untitled = t('untitled');
+    const savedToast = (title: string) => t('saved', { title });
 
     if(!props.document) return null;
     const getToken = () => tokenRef.current;
@@ -134,7 +139,7 @@ function CustomEditor(props) {
                     editor.enableReadOnlyMode("sdfsedgd");
                     document.querySelector('.ck-editor__top')?.classList.add('hidden');
                 }
-                const saveButton = createSaveButton(editor, { ...props, getToken });
+                const saveButton = createSaveButton(editor, { ...props, getToken, untitled, savedToast });
                 editorBarElement?.prepend(saveButton);
             }}
             onChange={(event, editor) => {
@@ -145,7 +150,7 @@ function CustomEditor(props) {
                     saveButton.remove();
                 }
                 const editorBarElement = document.querySelector('.ck-toolbar__items');
-                const newSaveButton = createSaveButton(data, { ...props, getToken });
+                const newSaveButton = createSaveButton(data, { ...props, getToken, untitled, savedToast });
                 editorBarElement?.prepend(newSaveButton);
             }}
         />

@@ -2,7 +2,7 @@
 
 // PAPER. One earned gym badge, and the battle it was taken with.
 
-import { useTranslations } from "next-intl"
+import { useLocale, useTranslations } from "next-intl"
 import type { UserAchievement } from "@boffmedia/shared"
 import { typesOf } from "@/app/smartrotom/pc/_utils/derive"
 import { TYPE_LABELS } from "@/app/smartrotom/pokedex/_utils/typeColors"
@@ -27,6 +27,7 @@ export function BadgePage({
   onReplay: (achievement: UserAchievement) => void
 }) {
   const t = useTranslations("pasaporte")
+  const locale = useLocale()
   const speciesByDex = usePokemonStore((s) => s.pokemonByDex)
   // The open page and the lamp are read here, not passed down — see the note in `Identidad`.
   const slam = usePassportStore((s) => s.page === index && s.motion === "on")
@@ -50,7 +51,7 @@ export function BadgePage({
           <h2 className="font-ps-ceremony text-[clamp(22px,3.4vh,32px)] leading-[1.04]">{achievement.name}</h2>
           <p className="ps-num mt-1.5 flex items-center gap-1.5 font-ps-mono text-[11px] tracking-[.06em] text-ps-ink-faint">
             <Icon name="cal" className="h-3.5 w-3.5" />
-            {t("badgePage.obtained", { date: docDate(achievement.completedAt) })}
+            {t("badgePage.obtained", { date: docDate(achievement.completedAt, locale) })}
           </p>
           {achievement.replay && (
             <Button

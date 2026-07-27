@@ -49,7 +49,49 @@
       "upgradeMaterials": "Materiales de mejora",
       "noResults": "Sin resultados",
       "noResultsLead": "Ninguna arma coincide con los filtros.",
-      "loadError": "Error al cargar el árbol de armas"
+      "loadError": "Error al cargar el árbol de armas",
+      "loadErrorDetail": "Error al cargar el árbol de armas. Por favor, inténtalo de nuevo."
+    },
+    "shell": {
+      "ariaLabel": "Herramientas de Monster Hunter Wilds",
+      "back": "Volver a MH Wilds",
+      "favorites": "Favoritos",
+      "removeFav": "Quitar de favoritos",
+      "addFav": "Añadir a favoritos",
+      "tabs": {
+        "monsters": "Bestiario",
+        "armas": "Armas",
+        "armor": "Armadura",
+        "planner": "Planner",
+        "caza": "Caza",
+        "dano": "Daño"
+      }
+    },
+    "db": {
+      "vial": {
+        "impact": "Vial de impacto",
+        "element": "Vial elemental",
+        "power": "Vial de potencia",
+        "dragon": "Vial dragón"
+      },
+      "elderseal": {
+        "low": "Bajo",
+        "average": "Medio",
+        "high": "Alto"
+      },
+      "weapon": {
+        "noSharpness": "Sin afilado (arma a distancia)",
+        "sharpnessValue": "{value} de afilado",
+        "handicraftStatus": "Artesanía · nivel {level}",
+        "handicraftLevel": "Nivel de Artesanía",
+        "handicraftAriaLevel": "Artesanía {level}",
+        "melodyNotes": "Notas de la melodía"
+      },
+      "armor": {
+        "noRes": "sin res.",
+        "groupBonus": "Bonus de grupo",
+        "setBonus": "Bonus de conjunto"
+      }
     },
     "title": "Monster Hunter Wilds",
     "equipment": "Equipamiento",
@@ -203,7 +245,38 @@
       "locations": "Ubicaciones",
       "noLocations": "Sin ubicaciones conocidas",
       "drops": "Recompensas",
-      "noDrops": "Sin recompensas registradas"
+      "noDrops": "Sin recompensas registradas",
+      "errorLoadFailed": "Error al cargar el bestiario. Por favor, inténtalo de nuevo.",
+      "flagship": "Insignia",
+      "flagshipTitle": "Monstruo insignia",
+      "dropChancePct": "{chance}% de probabilidad",
+      "investigation": "Investigación",
+      "threat": {
+        "low": {
+          "label": "Menor",
+          "desc": "Presa o estorbo. Poco riesgo."
+        },
+        "med": {
+          "label": "Estándar",
+          "desc": "Gran monstruo de cacería habitual."
+        },
+        "high": {
+          "label": "Peligroso",
+          "desc": "Alta amenaza. Ataques que noquean."
+        },
+        "apex": {
+          "label": "Ápex",
+          "desc": "Depredador dominante del bioma."
+        },
+        "elder": {
+          "label": "Anciano",
+          "desc": "Dragón anciano. Nivel de catástrofe."
+        }
+      },
+      "dropCarve": "Corte",
+      "dropReward": "Recompensa",
+      "dropBreak": "Rotura",
+      "dropTrack": "Rastro"
     },
     "build_planner": {
       "compare": {
@@ -354,7 +427,15 @@
       },
       "compatibleCount": "{count, plural, one {# compatible} other {# compatibles}}",
       "optionsCount": "{count, plural, one {# opción} other {# opciones}}",
-      "piecesCount": "{filled}/{total} piezas"
+      "piecesCount": "{filled}/{total} piezas",
+      "defaultBuildName": "Mi Build",
+      "errors": {
+        "loadDecorations": "Error al cargar las decoraciones. Por favor, inténtalo de nuevo.",
+        "loadWeapons": "Error al cargar las armas. Por favor, inténtalo de nuevo.",
+        "loadArmor": "Error al cargar las armaduras. Por favor, inténtalo de nuevo.",
+        "loadSkills": "Error al cargar las habilidades. Por favor, inténtalo de nuevo.",
+        "loadCharms": "Error al cargar los amuletos. Por favor, inténtalo de nuevo."
+      }
     }
   }
 }

@@ -1,8 +1,11 @@
 import type { ReactNode } from "react"
-import { TYPE_LABELS } from "../../_utils/typeColors"
+import { useTranslations } from "next-intl"
+import { TYPE_LABEL_KEYS } from "../../_utils/typeColors"
 
 // Chip background + contrasting ink per type. Move-damage categories
-// (físico/especial/estado) reuse the same chip so tables stay consistent.
+// (physical/special/status) reuse the same chip so tables stay consistent.
+// Client component on purpose: most call sites are already client, and a server
+// call site can render it across the boundary without an async signature.
 const TYPE_CHIP_COLORS: Record<string, { bg: string; fg: string }> = {
   normal: { bg: "#9fa19f", fg: "#1a1a1a" },
   fire: { bg: "#e62829", fg: "#fff" },
@@ -27,11 +30,11 @@ const TYPE_CHIP_COLORS: Record<string, { bg: string; fg: string }> = {
   status: { bg: "#999999", fg: "#1a1a1a" },
 }
 
-// es-ES labels for the move-damage categories (types come from TYPE_LABELS).
-const CATEGORY_LABELS: Record<string, string> = {
-  physical: "Físico",
-  special: "Especial",
-  status: "Estado",
+// Message keys for the move-damage categories (types come from TYPE_LABEL_KEYS).
+const CATEGORY_LABEL_KEYS: Record<string, string> = {
+  physical: "type_physical",
+  special: "type_special",
+  status: "type_status",
 }
 
 const TYPE_GLYPHS: Record<string, ReactNode> = {
@@ -80,11 +83,13 @@ export function TypeChip({
   showGlyph?: boolean
   showLabel?: boolean
 }) {
+  const t = useTranslations("pokedex")
   const key = type.toLowerCase()
   const colors = TYPE_CHIP_COLORS[key]
   if (!colors) return null
   const s = SIZES[size]
-  const label = TYPE_LABELS[key] ?? CATEGORY_LABELS[key] ?? type
+  const labelKey = TYPE_LABEL_KEYS[key] ?? CATEGORY_LABEL_KEYS[key]
+  const label = labelKey ? t(labelKey) : type
 
   return (
     <span

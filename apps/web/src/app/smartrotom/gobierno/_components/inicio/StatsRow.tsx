@@ -4,11 +4,12 @@ import { useTranslations } from "next-intl"
 import { Stat } from "../ui"
 import { useBuscados, useCenso, useOficiales, useParcelas, useTesoreria } from "../../_hooks/queries"
 import { money } from "../../_utils/format"
-
-const moneyR = (n: number | null | undefined) => `${money(n)} ₽`
+import { useFormat } from "@/lib/useFormat"
 
 export function StatsRow() {
   const t = useTranslations("gobierno")
+  const { intlLocale } = useFormat()
+  const moneyR = (n: number | null | undefined) => `${money(n, intlLocale)} ₽`
   const censo = useCenso({ pageSize: 1 })
   const parcelas = useParcelas({ pageSize: 500 })
   const tesoreria = useTesoreria()

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 
 import { ACCENT_HEX, ACCENT_ON, type FtAccent } from "../../_utils/accents";
 import type { FtArticle } from "../../_utils/article";
@@ -7,6 +8,7 @@ import { Button, Card, ComicBurst, HeroArt, Meta, Pill } from "../ui";
 
 /** The lead story — the widest column of the featured trio. */
 export function BigFeatureCard({ article }: { article: FtArticle }) {
+  const t = useTranslations("furrettoday.featureCards");
   return (
     <Card lift className="flex flex-col overflow-hidden">
       <div className="border-ft relative h-[320px] shrink-0 border-x-0 border-t-0 border-b-ft-ink">
@@ -49,7 +51,7 @@ export function BigFeatureCard({ article }: { article: FtArticle }) {
             {article.readTime}
           </Meta>
           <Button tabIndex={-1} aria-hidden="true">
-            LEER →
+            {t("read")}
           </Button>
         </div>
       </div>
@@ -73,6 +75,7 @@ export function SmallFeatureCard({
   article: FtArticle;
   accent: FtAccent;
 }) {
+  const t = useTranslations("furrettoday.featureCards");
   const hex = ACCENT_HEX[accent];
 
   return (
@@ -115,7 +118,7 @@ export function SmallFeatureCard({
             {article.readTime}
           </Meta>
           <Button variant="ink" size="sm" tabIndex={-1} aria-hidden="true">
-            LEER →
+            {t("read")}
           </Button>
         </div>
       </div>

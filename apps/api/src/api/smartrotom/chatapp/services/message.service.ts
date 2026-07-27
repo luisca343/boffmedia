@@ -14,6 +14,7 @@ import { IChatRepository } from '../repositories/interfaces/chat.repository.inte
 import { IMessageRepository } from '../repositories/interfaces/chat-message.repository.interface';
 import { RotomMessage } from '../entities/message.entity';
 import { Logger } from 'nestjs-pino';
+import { ApiErrorCode } from '@/common/errors/error-codes.generated';
 
 @Injectable()
 export class MessageService {
@@ -158,6 +159,7 @@ export class MessageService {
     if (existingMessage.uuid !== senderUuid) {
       throw new ForbiddenException({
         message: 'User does not have permission to edit this message',
+        code: ApiErrorCode.CHAT_MESSAGE_NOT_EDITABLE,
         userMessage: 'No puedes editar este mensaje.',
       });
     }
@@ -185,6 +187,7 @@ export class MessageService {
     if (existingMessage.uuid !== senderUuid) {
       throw new ForbiddenException({
         message: 'User does not have permission to delete this message',
+        code: ApiErrorCode.CHAT_MESSAGE_NOT_DELETABLE,
         userMessage: 'No puedes eliminar este mensaje.',
       });
     }
@@ -210,6 +213,7 @@ export class MessageService {
     if (!chat) {
       throw new NotFoundException({
         message: `Chat ${chatId} not found`,
+        code: ApiErrorCode.CHAT_NOT_FOUND,
         userMessage: 'Este chat no existe.',
       });
     }

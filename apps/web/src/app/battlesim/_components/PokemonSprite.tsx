@@ -1,10 +1,12 @@
 import { getPokemonSprite } from "@/app/smartrotom/pokedex/dexUtils";
 import { Pokemon } from "@pkmn/client";
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import { getScaleMultiplier } from "../_utils/viewUtils";
 import { usePokemonStore } from "@/stores/pokemonStore";
 
 export function PokemonSprite({ pokemon, className, scale = 1 }: { pokemon: Pokemon, className?: string, props?: any, scale?: number }) {
+    const t = useTranslations("battlesim.sprite");
     const [url, setUrl] = useState<string>('/battlesim/img/pokeball.png');
     
 
@@ -30,7 +32,7 @@ export function PokemonSprite({ pokemon, className, scale = 1 }: { pokemon: Poke
         <div className="flex justify-center items-center" style={{ 
             width: 24 * scale , height: 24 * scale, opacity: `${pokemon?.fainted ? 0.5 : 1}`, filter: `${pokemon?.fainted ? 'brightness(0.2)' : 'brightness(1)'}`
             }}>
-            <img src={url} alt={pokemon?.species?.name || 'Pokemon'} className={className} width={size * getScaleMultiplier()} height={size * getScaleMultiplier()} />
+            <img src={url} alt={pokemon?.species?.name || t("altFallback")} className={className} width={size * getScaleMultiplier()} height={size * getScaleMultiplier()} />
         </div>
     );
 }

@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { useTranslations } from "next-intl"
 import { Icon, Seg, Button, IconButton } from "@/components/boffmedia/primitives"
 import type { SteamGame, MediaItem } from "../../_hooks/useFetchSteamData"
 
@@ -250,6 +251,7 @@ function thumbSrc(m: any): string | undefined {
 }
 
 export function KvGallery({ media, name }: { media: MediaItem[]; name: string }) {
+  const t = useTranslations("otros.keysApp")
   const [i, setI] = React.useState(0)
   const [err, setErr] = React.useState<Record<number, boolean>>({})
   const shots = media || []
@@ -281,7 +283,7 @@ export function KvGallery({ media, name }: { media: MediaItem[]; name: string })
               key={k}
               type="button"
               onClick={() => setI(k)}
-              aria-label={"Media " + (k + 1)}
+              aria-label={t("mediaN", { n: k + 1 })}
               className={
                 "relative aspect-video overflow-hidden border bg-base-2 p-0 transition-colors duration-[120ms] " +
                 (k === i ? "border-accent shadow-[inset_0_0_0_1px_var(--accent)]" : "border-line hover:border-line-2")
@@ -337,6 +339,7 @@ export function KeyModal({
   onClose: () => void
   t: KvModalStrings
 }) {
+  const tc = useTranslations("common.primitives")
   const [tab, setTab] = React.useState("info")
   React.useEffect(() => {
     setTab("info")
@@ -356,12 +359,12 @@ export function KeyModal({
 
   return (
     <div className="fixed inset-0 z-[200] grid place-items-center p-[20px]" role="dialog" aria-modal="true" aria-label={item.name}>
-      <button type="button" aria-label="Cerrar" onClick={onClose} className="absolute inset-0 cursor-default border-0 bg-[rgba(0,0,0,0.62)] p-0 backdrop-blur-[3px]" />
+      <button type="button" aria-label={tc("close")} onClick={onClose} className="absolute inset-0 cursor-default border-0 bg-[rgba(0,0,0,0.62)] p-0 backdrop-blur-[3px]" />
       <div
         style={{ clipPath: "polygon(0 0, calc(100% - 18px) 0, 100% 18px, 100% 100%, 0 100%)" }}
         className="relative max-h-[92vh] w-[min(600px,100%)] overflow-y-auto border border-line-2 border-t-[3px] border-t-accent bg-panel animate-[bm-modal-in_var(--t-med,180ms)] motion-reduce:animate-none bm-scroll"
       >
-        <IconButton name="x" label="Cerrar" onClick={onClose} className="absolute right-[14px] top-[14px] z-[3]" />
+        <IconButton name="x" label={tc("close")} onClick={onClose} className="absolute right-[14px] top-[14px] z-[3]" />
         <div className="relative aspect-[460/172] border-b border-line">
           <KvArt src={hero} name={item.name} />
           <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_top,var(--panel),transparent_55%)]" />

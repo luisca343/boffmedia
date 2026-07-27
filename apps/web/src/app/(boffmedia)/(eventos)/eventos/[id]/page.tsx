@@ -1,9 +1,10 @@
 import type { Metadata } from "next"
+import { getTranslations } from "next-intl/server"
 import { EventDetailView } from "./_components/EventDetailView"
 
-export const metadata: Metadata = {
-  title: "Evento · Boffmedia",
-  description: "Detalle del evento: logros, participantes y clasificación.",
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("pageMeta.eventos")
+  return { title: t("detalle.title"), description: t("detalle.description") }
 }
 
 export default async function EventDetailPage({ params }: { params: Promise<{ id: string }> }) {

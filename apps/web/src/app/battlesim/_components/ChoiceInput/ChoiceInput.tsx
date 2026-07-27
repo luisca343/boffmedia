@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from 'react';
 import { MoveSelector } from './MoveSelector';
+import { useTranslations } from 'next-intl';
 import { SwitchMenu } from './SwitchMenu';
 import { ActionButtons, type BattleMechanic } from './ActionButtons';
 import type { BattleRequest } from '../../types';
@@ -14,6 +15,7 @@ interface ChoiceInputProps {
 }
 
 export function ChoiceInput({ request, makeChoice, isWaiting, mechanicUsed }: ChoiceInputProps) {
+  const t = useTranslations('battlesim');
   const [activeMechanic, setActiveMechanic] = useState<BattleMechanic | null>(null);
 
   const handleToggle = useCallback((mechanic: BattleMechanic) => {
@@ -78,12 +80,12 @@ export function ChoiceInput({ request, makeChoice, isWaiting, mechanicUsed }: Ch
   if (requestType === 'team') {
     return (
       <div className="flex flex-col gap-2 p-4 bg-card rounded-lg border">
-        <p className="text-sm text-muted-foreground">Team Preview — sending default order</p>
+        <p className="text-sm text-muted-foreground">{t('choiceInput.teamPreviewDefault')}</p>
         <button
           onClick={() => makeChoice('team 1')}
           className="px-4 py-2 bg-primary text-primary-foreground rounded-md"
         >
-          Confirm Team
+          {t('choiceInput.confirmTeam')}
         </button>
       </div>
     );

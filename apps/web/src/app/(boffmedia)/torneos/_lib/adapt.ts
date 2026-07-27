@@ -73,24 +73,29 @@ export function match(a: TnMatchApi): TnMatch {
   }
 }
 
-const roundName = (matchesInRound: number): string => {
+/** Translator for `torneos.bracket`, threaded in — this is a pure module, so
+ *  calling `t()` here at module scope would freeze whichever locale loaded first. */
+export type BracketT = (key: string, values?: Record<string, string | number>) => string
+
+const roundName = (t: BracketT, matchesInRound: number): string => {
   const players = matchesInRound * 2
   return players <= 2
-    ? "Final"
+    ? t("roundFinal")
     : players === 4
-      ? "Semifinales"
+      ? t("roundSemis")
       : players === 8
-        ? "Cuartos"
+        ? t("roundQuarters")
         : players === 16
-          ? "Octavos"
-          : `Ronda de ${players}`
+          ? t("round16")
+          : t("roundOf", { players })
 }
 
 export function bracketRounds(
   rounds: TnMatchApi[][] | undefined,
+  t: BracketT,
 ): DkBracketRound<TnMatch>[] {
   return (rounds ?? []).map((r) => ({
-    phase: roundName(r.length),
+    phase: roundName(t, r.length),
     matches: r.map(match),
   }))
 }

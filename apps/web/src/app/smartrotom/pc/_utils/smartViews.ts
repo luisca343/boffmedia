@@ -6,11 +6,11 @@ import type { SmartView } from "../_types/pc.types"
  * favourite/Competitivo come out of the marks table.
  */
 export const SMART_VIEWS: SmartView[] = [
-  { id: "sv-shiny", name: "Todos los Shiny", icon: "sparkles", tone: "text-pc-gold", filters: { isShiny: true } },
-  { id: "sv-legend", name: "Legendarios", icon: "zap", tone: "text-pc-violet", filters: { isLegendary: true } },
-  { id: "sv-fav", name: "Favoritos", icon: "heart", tone: "text-pc-rose", filters: { isFavorited: true } },
-  { id: "sv-comp", name: "Competitivos", icon: "sword", tone: "text-pc-accent", filters: { tag: "Competitivo" } },
-  { id: "sv-item", name: "Con Objeto", icon: "tag", tone: "text-pc-amber", filters: { hasItem: true } },
+  { id: "sv-shiny", nameKey: "views.builtin.shiny", icon: "sparkles", tone: "text-pc-gold", filters: { isShiny: true } },
+  { id: "sv-legend", nameKey: "views.builtin.legendary", icon: "zap", tone: "text-pc-violet", filters: { isLegendary: true } },
+  { id: "sv-fav", nameKey: "views.builtin.favorites", icon: "heart", tone: "text-pc-rose", filters: { isFavorited: true } },
+  { id: "sv-comp", nameKey: "views.builtin.competitive", icon: "sword", tone: "text-pc-accent", filters: { tag: "Competitivo" } },
+  { id: "sv-item", nameKey: "views.builtin.withItem", icon: "tag", tone: "text-pc-amber", filters: { hasItem: true } },
 ]
 
 const KEY = "smartrotom-pc-views-v1"

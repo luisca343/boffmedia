@@ -1,6 +1,7 @@
 "use client"
 
 import { useMemo } from "react"
+import { useTranslations } from "next-intl"
 import Link from "next/link"
 import { Bar, Button, Empty, PageHead, Skeleton, Stat } from "../_components/ui"
 import { useEventos } from "../_hooks/queries"
@@ -8,6 +9,7 @@ import { GOBIERNO_ROOT } from "../_utils/nav"
 import { EventoCard } from "../_components/eventos/shared"
 
 export default function EventosPage() {
+  const t = useTranslations("gobierno")
   const { data: eventos, isLoading } = useEventos()
   const all = eventos ?? []
 
@@ -27,14 +29,14 @@ export default function EventosPage() {
   return (
     <>
       <PageHead
-        kicker="Gobierno · Actividad ciudadana"
+        kicker={t("eventos.listKicker")}
         dep="gold"
-        title="Eventos"
-        sub="Eventos comunitarios de Teras: retos de construcción que la ciudadanía valora y cacerías de bichos con parámetros públicos. La organización corre a cargo del ayuntamiento."
+        title={t("nav.eventos")}
+        sub={t("eventos.listSub")}
         right={
           <Link href={`${GOBIERNO_ROOT}/eventos/crear`}>
             <Button icon="plus" tone="gold">
-              Convocar evento
+              {t("eventos.convocarEvento")}
             </Button>
           </Link>
         }
@@ -47,30 +49,32 @@ export default function EventosPage() {
           ))}
         </div>
       ) : all.length === 0 ? (
-        <Empty
-          icon="star"
-          title="Todavía no hay eventos convocados"
-          sub="Convoca un reto de construcción o una cacería de bichos para que la ciudadanía de Teras participe."
-        />
+        <Empty icon="star" title={t("eventos.listEmptyTitle")} sub={t("eventos.listEmptySub")} />
       ) : (
         <>
           <div className="mb-5 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            <Stat label="Eventos activos" value={activos.length} icon="star" tone="gold" sub="en curso ahora" />
-            <Stat label="Retos de construcción" value={retos} icon="building" tone="urbanismo" />
-            <Stat label="Cacerías de bichos" value={cacerias} icon="crosshair" tone="civic" />
             <Stat
-              label="Capturas registradas"
+              label={t("eventos.statActivos")}
+              value={activos.length}
+              icon="star"
+              tone="gold"
+              sub={t("eventos.statActivosSub")}
+            />
+            <Stat label={t("eventos.statRetos")} value={retos} icon="building" tone="urbanismo" />
+            <Stat label={t("eventos.statCacerias")} value={cacerias} icon="crosshair" tone="civic" />
+            <Stat
+              label={t("eventos.capturasRegistradas")}
               value={capturas}
               icon="crosshair"
               tone="seguridad"
-              sub="en cacerías activas"
+              sub={t("eventos.statCapturasSub")}
             />
           </div>
 
           {activos.length > 0 && (
             <>
               <Bar icon="star" dep="gold">
-                En curso
+                {t("eventos.enCurso")}
               </Bar>
               <div className="mb-6 mt-3.5 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {activos.map((ev) => (
@@ -83,7 +87,7 @@ export default function EventosPage() {
           {proximos.length > 0 && (
             <>
               <Bar icon="calendar" dep="gold">
-                Próximos
+                {t("eventos.statProximos")}
               </Bar>
               <div className="mb-6 mt-3.5 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {proximos.map((ev) => (
@@ -96,7 +100,7 @@ export default function EventosPage() {
           {pasados.length > 0 && (
             <>
               <Bar icon="history" dep="gold">
-                Historial
+                {t("eventos.statHistorial")}
               </Bar>
               <div className="mt-3.5 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {pasados.map((ev) => (

@@ -1,3 +1,6 @@
+"use client"
+
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { Corners } from "../../_components/ui"
 import type { PuzzlePiece } from "../_hooks/useSlidingPuzzle"
@@ -14,6 +17,7 @@ const TILE = 98
 
 /** The tray. Pieces are absolutely placed and slide on a CSS transform — no motion lib. */
 export function PuzzleBoard({ pieces, columns, isComplete, onMove }: PuzzleBoardProps) {
+  const t = useTranslations("arcade")
   return (
     <div
       className={cn(
@@ -28,7 +32,7 @@ export function PuzzleBoard({ pieces, columns, isComplete, onMove }: PuzzleBoard
           key={piece.id}
           type="button"
           onClick={() => onMove(piece)}
-          aria-label={`Pieza ${piece.id + 1}`}
+          aria-label={t("puzle.pieceAria", { number: piece.id + 1 })}
           className={cn(
             "absolute left-1 top-1 overflow-hidden rounded-[6px] border border-white/[.08]",
             "transition-transform duration-300 ease-out motion-reduce:transition-none",

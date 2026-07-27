@@ -1,6 +1,7 @@
 "use client"
 
 import type { ReactNode } from "react"
+import { useTranslations } from "next-intl"
 import { ModalShell } from "@/components/smartrotom/behavior/ModalShell"
 import { Icon } from "./Icon"
 import { GT_SCOPE } from "./ThemedLayer"
@@ -26,6 +27,8 @@ export function Modal({
   footer?: ReactNode
   width?: number
 }) {
+  const t = useTranslations("gobierno")
+
   if (!open) return null
 
   return (
@@ -51,7 +54,7 @@ export function Modal({
           <button
             type="button"
             onClick={onClose}
-            aria-label="Cerrar"
+            aria-label={t("common.close")}
             className="-mr-1 -mt-1 rounded-gt-sm p-1.5 text-gt-ink-400 transition-colors hover:bg-gt-paper-2 hover:text-gt-ink-900"
           >
             <Icon name="x" size={17} />

@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslations } from "next-intl";
 
 interface PropertiesCTAProps {
   townName: string;
@@ -8,6 +9,8 @@ interface PropertiesCTAProps {
 }
 
 export function PropertiesCTA({ townName, colorClaro, colorMedio, colorOscuro }: PropertiesCTAProps) {
+  const t = useTranslations("wingull.cta");
+
   return (
     <div className="relative backdrop-blur-sm rounded-2xl border overflow-hidden shadow-lg mx-auto max-w-2xl p-8" style={{ background: `${colorMedio}70`, borderColor: colorClaro }}>
       {/* Decorative accent bar using town colors */}
@@ -19,23 +22,23 @@ export function PropertiesCTA({ townName, colorClaro, colorMedio, colorOscuro }:
 
       {/* Title */}
       <h3 className="text-2xl lg:text-3xl font-bold mb-4" style={{ color: colorClaro }}>
-        ¿No encuentras lo que buscas?
+        {t("title")}
       </h3>
       <p className="text-lg mb-8 max-w-2xl mx-auto" style={{ color: colorMedio }}>
-        Nuestro equipo puede ayudarte a encontrar la parcela perfecta o informarte sobre futuras disponibilidades en Pueblo {townName}
+        {t("body", { town: townName })}
       </p>
       <div className="flex flex-col sm:flex-row gap-4 justify-center">
         <button 
           className="px-6 py-3 rounded-xl border-2 font-medium transition-all duration-300 hover:scale-105 hover:shadow-md"
           style={{ borderColor: colorClaro, color: colorClaro, backgroundColor: `${colorClaro}10` }}
         >
-          Contactar Agente
+          {t("contactAgent")}
         </button>
         <button 
           className="px-6 py-3 rounded-xl font-medium border transition-all duration-300 hover:scale-105"
           style={{ background: `${colorOscuro}10`, color: colorMedio, borderColor: colorMedio }}
         >
-          Ver Más Pueblos
+          {t("moreTowns")}
         </button>
       </div>
 

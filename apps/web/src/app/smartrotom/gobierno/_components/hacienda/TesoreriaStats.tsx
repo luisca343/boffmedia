@@ -1,19 +1,23 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { Stat } from "../ui"
 import { money } from "../../_utils/format"
+import { useFormat } from "@/lib/useFormat"
 import type { Tesoreria } from "../../_types"
 
-export function TesoreriaStats({ t }: { t: Tesoreria }) {
-  const neto = t.ingresosMes - t.gastosMes
+export function TesoreriaStats({ t: data }: { t: Tesoreria }) {
+  const t = useTranslations("gobierno")
+  const { intlLocale } = useFormat()
+  const neto = data.ingresosMes - data.gastosMes
   return (
     <div className="mb-[18px] grid grid-cols-2 gap-3 sm:grid-cols-4">
-      <Stat label="Balance municipal" value={`${money(t.balance)} ₽`} tone="hacienda" icon="landmark" />
-      <Stat label="Ingresos del mes" value={`+${money(t.ingresosMes)} ₽`} tone="ok" icon="trendUp" />
-      <Stat label="Gastos del mes" value={`−${money(t.gastosMes)} ₽`} tone="urbanismo" icon="trendDown" />
+      <Stat label={t("tesoreria.stats.balance")} value={`${money(data.balance, intlLocale)} ₽`} tone="hacienda" icon="landmark" />
+      <Stat label={t("tesoreria.stats.ingresos")} value={`+${money(data.ingresosMes, intlLocale)} ₽`} tone="ok" icon="trendUp" />
+      <Stat label={t("tesoreria.stats.gastos")} value={`−${money(data.gastosMes, intlLocale)} ₽`} tone="urbanismo" icon="trendDown" />
       <Stat
-        label="Resultado neto"
-        value={`${neto >= 0 ? "+" : "−"}${money(Math.abs(neto))} ₽`}
+        label={t("tesoreria.stats.neto")}
+        value={`${neto >= 0 ? "+" : "−"}${money(Math.abs(neto), intlLocale)} ₽`}
         tone={neto >= 0 ? "civic" : "danger"}
         icon="coins"
       />

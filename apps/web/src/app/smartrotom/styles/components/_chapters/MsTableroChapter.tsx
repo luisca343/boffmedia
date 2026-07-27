@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { useTranslations } from "next-intl"
 import { QuestChain } from "@/app/smartrotom/misiones/_components/QuestChain"
 import { QuestPaper } from "@/app/smartrotom/misiones/_components/QuestPaper"
 import { RewardCard } from "@/app/smartrotom/misiones/_components/RewardCard"
@@ -9,7 +10,7 @@ import { TrackedQuestPaper } from "@/app/smartrotom/misiones/_components/Tracked
 import { Chip, SearchField, Select } from "@/app/smartrotom/misiones/_components/ui"
 import { buildSatchel } from "@/app/smartrotom/misiones/_utils/items"
 import { buildRegions } from "@/app/smartrotom/misiones/_utils/regions"
-import { STATUS_LABEL } from "@/app/smartrotom/misiones/_utils/status"
+import { STATUS_LABEL_KEY } from "@/app/smartrotom/misiones/_utils/status"
 import { Sample, Section } from "../showcase-shared"
 import { MS_NPCS, MS_QUESTS } from "./ms-demo"
 
@@ -24,6 +25,7 @@ const npcOf = (quest: (typeof MS_QUESTS)[number]) => MS_NPCS.find((npc) => npc.d
 const regionOf = (quest: (typeof MS_QUESTS)[number]) => REGIONS.find((region) => region.id === quest.category)
 
 export function MsTableroChapter() {
+  const t = useTranslations("misiones")
   return (
     <>
       <Section
@@ -119,13 +121,13 @@ export function MsTableroChapter() {
             <SearchField className="max-w-[240px] flex-[1_1_200px]" placeholder="Buscar encargo…" aria-label="Buscar encargo" />
             <div className="flex flex-wrap gap-1.5">
               <Chip active>
-                {STATUS_LABEL.ACTIVE} <span className="opacity-65">(2)</span>
+                {t(STATUS_LABEL_KEY.ACTIVE)} <span className="opacity-65">(2)</span>
               </Chip>
               <Chip>
-                {STATUS_LABEL.AVAILABLE} <span className="opacity-65">(1)</span>
+                {t(STATUS_LABEL_KEY.AVAILABLE)} <span className="opacity-65">(1)</span>
               </Chip>
               <Chip>
-                {STATUS_LABEL.COMPLETED} <span className="opacity-65">(1)</span>
+                {t(STATUS_LABEL_KEY.COMPLETED)} <span className="opacity-65">(1)</span>
               </Chip>
             </div>
             <div className="flex-1" />

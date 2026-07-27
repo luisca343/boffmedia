@@ -2,7 +2,9 @@
 
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
+import { useTranslations } from "next-intl"
 import { GOBIERNO_RANKS } from "@boffmedia/shared/roles"
+import { useFormat } from "@/lib/useFormat"
 import {
   Avatar,
   Badge,
@@ -30,6 +32,8 @@ import { useGobiernoUi } from "../../_stores/useGobiernoUi"
 import { fmtDateTime } from "../../_utils/format"
 
 export default function JugadoresPage() {
+  const t = useTranslations("gobierno")
+  const { intlLocale } = useFormat()
   const router = useRouter()
   const openDossier = useGobiernoUi((s) => s.openDossier)
   const { data: users, isLoading } = useAdminUsers()
@@ -65,17 +69,17 @@ export default function JugadoresPage() {
   return (
     <>
       <PageHead
-        kicker="Administración · Directorio"
+        kicker={t("jugadores.kicker")}
         dep="poblacion"
-        title="Jugadores"
-        sub="Registro de todos los jugadores del servidor y sus nombramientos de gobierno."
+        title={t("jugadores.title")}
+        sub={t("jugadores.sub")}
       />
       <ConsolaHero
-        title="Registro de jugadores"
+        title={t("jugadores.heroTitle")}
         code="jugadores"
         icon="users"
         dep="poblacion"
-        status={`${onlineCount} en línea`}
+        status={t("jugadores.enLinea", { count: onlineCount })}
         statusTone="ok"
       />
 
@@ -85,9 +89,9 @@ export default function JugadoresPage() {
             <div className="flex gap-1">
               {(
                 [
-                  ["all", "Todos"],
-                  ["online", "En línea"],
-                  ["offline", "Desconect."],
+                  ["all", t("jugadores.todos")],
+                  ["online", t("jugadores.enLineaFilter")],
+                  ["offline", t("jugadores.desconectados")],
                 ] as const
               ).map(([v, label]) => (
                 <Button key={v} size="sm" tone={filter === v ? "soft" : "plain"} onClick={() => setFilter(v)}>
@@ -96,7 +100,7 @@ export default function JugadoresPage() {
               ))}
             </div>
             <div className="min-w-[180px] flex-1">
-              <Field icon="search" value={query} onChange={setQuery} placeholder="Buscar jugador o UUID…" />
+              <Field icon="search" value={query} onChange={setQuery} placeholder={t("jugadores.buscarPlaceholder")} />
             </div>
           </div>
 
@@ -107,11 +111,11 @@ export default function JugadoresPage() {
               <THead>
                 <TR>
                   <TH></TH>
-                  <TH>Jugador</TH>
-                  <TH>Mundo</TH>
-                  <TH>Energía</TH>
-                  <TH>Últ. actividad</TH>
-                  <TH>Rol</TH>
+                  <TH>{t("jugadores.jugadorCol")}</TH>
+                  <TH>{t("jugadores.mundo")}</TH>
+                  <TH>{t("jugadores.energiaCol")}</TH>
+                  <TH>{t("jugadores.ultActividadCol")}</TH>
+                  <TH>{t("jugadores.rol")}</TH>
                   <TH></TH>
                 </TR>
               </THead>
@@ -129,15 +133,13 @@ export default function JugadoresPage() {
                     </TD>
                     <TD className="text-[12px]">{u.world ?? "—"}</TD>
                     <TD className="font-gt-mono text-xs tabular-nums">{u.energy ?? "—"}</TD>
-                    <TD className="font-gt-mono text-xs tabular-nums text-gt-ink-500">{fmtDateTime(u.lastCharge)}</TD>
+                    <TD className="font-gt-mono text-xs tabular-nums text-gt-ink-500">{fmtDateTime(u.lastCharge, intlLocale)}</TD>
                     <TD>
                       {(() => {
                         const o = oficiales?.find((x) => x.uuid === u.uuid)
-                        return o ? (
-                          <Badge tone="gold">{rankMeta(o.rank?.role).label}</Badge>
-                        ) : (
-                          <span className="text-gt-ink-300">—</span>
-                        )
+                        if (!o) return <span className="text-gt-ink-300">—</span>
+                        const meta = rankMeta(o.rank?.role)
+                        return <Badge tone="gold">{meta.labelKey ? t(meta.labelKey) : meta.label}</Badge>
                       })()}
                     </TD>
                     <TD className="w-px">
@@ -148,18 +150,18 @@ export default function JugadoresPage() {
               </TBody>
             </Table>
           ) : (
-            <Empty icon="users" title="Sin jugadores" sub="Ningún jugador coincide con el filtro actual." />
+            <Empty icon="users" title={t("jugadores.emptyTitle")} sub={t("jugadores.emptySub")} />
           )}
         </Card>
 
         {selUser && (
           <Card edgeGold className="h-fit overflow-hidden">
             <div className="flex items-center justify-between gap-2.5 border-b border-gt-line px-4 py-[11px]">
-              <span className="font-gt-display text-base font-bold text-gt-ink-900">Ficha</span>
+              <span className="font-gt-display text-base font-bold text-gt-ink-900">{t("jugadores.ficha")}</span>
               <button
                 type="button"
                 onClick={() => setSelUuid(null)}
-                aria-label="Cerrar ficha"
+                aria-label={t("jugadores.cerrarFicha")}
                 className="text-gt-ink-400 transition-colors hover:text-gt-ink-900"
               >
                 <Icon name="x" size={16} />
@@ -174,7 +176,7 @@ export default function JugadoresPage() {
                   <div className="mt-1 flex items-center gap-1.5">
                     <span className={`h-2 w-2 rounded-full ${selUser.world ? "bg-gt-ok" : "bg-gt-ink-300"}`} />
                     <span className="font-gt-mono text-[11px] text-gt-ink-500">
-                      {selUser.world ?? "Desconectado"}
+                      {selUser.world ?? t("jugadores.desconectado")}
                     </span>
                   </div>
                 </div>
@@ -182,8 +184,8 @@ export default function JugadoresPage() {
 
               <div className="mb-3 grid grid-cols-2 gap-2">
                 {[
-                  ["Energía", String(selUser.energy ?? "—")],
-                  ["Últ. actividad", fmtDateTime(selUser.lastCharge)],
+                  [t("jugadores.energia"), String(selUser.energy ?? "—")],
+                  [t("jugadores.ultActividad"), fmtDateTime(selUser.lastCharge, intlLocale)],
                 ].map(([k, v]) => (
                   <Sunken key={k} className="px-[11px] py-2">
                     <div className="font-gt-mono text-[8.5px] uppercase tracking-[.12em] text-gt-ink-400">{k}</div>
@@ -193,33 +195,36 @@ export default function JugadoresPage() {
               </div>
 
               <Sunken className="mb-3.5 px-[11px] py-2">
-                <div className="font-gt-mono text-[8.5px] uppercase tracking-[.12em] text-gt-ink-400">UUID</div>
+                <div className="font-gt-mono text-[8.5px] uppercase tracking-[.12em] text-gt-ink-400">{t("jugadores.uuid")}</div>
                 <div className="mt-[3px] break-all font-gt-mono text-[11.5px] text-gt-ink-700">{selUser.uuid}</div>
               </Sunken>
 
               <div className="mb-3.5">
                 <div className="mb-1.5 font-gt-mono text-[9px] font-bold uppercase tracking-[.14em] text-gt-ink-400">
-                  Nombramientos
+                  {t("jugadores.nombramientos")}
                 </div>
                 {selOficial && selOficial.roles.length ? (
                   <div className="mb-2 flex flex-wrap gap-1.5">
-                    {selOficial.roles.map((role) => (
-                      <button
-                        key={role}
-                        type="button"
-                        onClick={() => revokeRole.mutate({ uuid: selUser.uuid, role })}
-                        disabled={revokeRole.isPending}
-                        title="Cesar nombramiento"
-                        className="rounded-[4px] disabled:opacity-50"
-                      >
-                        <Badge tone="gold" icon="x">
-                          {rankMeta(role).label}
-                        </Badge>
-                      </button>
-                    ))}
+                    {selOficial.roles.map((role) => {
+                      const meta = rankMeta(role)
+                      return (
+                        <button
+                          key={role}
+                          type="button"
+                          onClick={() => revokeRole.mutate({ uuid: selUser.uuid, role })}
+                          disabled={revokeRole.isPending}
+                          title={t("jugadores.cesarNombramiento")}
+                          className="rounded-[4px] disabled:opacity-50"
+                        >
+                          <Badge tone="gold" icon="x">
+                            {meta.labelKey ? t(meta.labelKey) : meta.label}
+                          </Badge>
+                        </button>
+                      )
+                    })}
                   </div>
                 ) : (
-                  <div className="mb-2 text-[12px] italic text-gt-ink-400">Sin nombramientos.</div>
+                  <div className="mb-2 text-[12px] italic text-gt-ink-400">{t("jugadores.sinNombramientos")}</div>
                 )}
 
                 {availableRanks.length > 0 && (
@@ -238,7 +243,7 @@ export default function JugadoresPage() {
                       disabled={!roleToGrant || grantRole.isPending}
                       onClick={() => grantRole.mutate({ uuid: selUser.uuid, role: roleToGrant })}
                     >
-                      Nombrar
+                      {t("jugadores.nombrar")}
                     </Button>
                   </div>
                 )}
@@ -246,7 +251,7 @@ export default function JugadoresPage() {
 
               <div className="grid gap-1.5">
                 <Button tone="ghost" icon="fileText" className="w-full justify-start" onClick={() => openDossier(selUser.uuid)}>
-                  Ver expediente
+                  {t("jugadores.verExpediente")}
                 </Button>
                 <Button
                   tone="ghost"
@@ -254,7 +259,7 @@ export default function JugadoresPage() {
                   className="w-full justify-start"
                   onClick={() => router.push(`/smartrotom/gobierno/admin/apps?uuid=${selUser.uuid}`)}
                 >
-                  Gestionar apps
+                  {t("jugadores.gestionarApps")}
                 </Button>
                 <Button
                   tone="soft"
@@ -262,7 +267,7 @@ export default function JugadoresPage() {
                   className="w-full justify-start"
                   onClick={() => router.push(`/smartrotom/gobierno/admin/notificaciones?uuid=${selUser.uuid}`)}
                 >
-                  Enviar notificación
+                  {t("jugadores.enviarNotificacion")}
                 </Button>
               </div>
             </div>

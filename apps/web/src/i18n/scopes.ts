@@ -41,6 +41,16 @@ export const SCOPED_NAMESPACES: ReadonlyArray<{
   { prefix: "/smartrotom/rooker", namespaces: ["smartrotom/rooker.json"] },
   { prefix: "/smartrotom/wigglypop", namespaces: ["smartrotom/wigglypop.json"] },
   { prefix: "/smartrotom/pasaporte", namespaces: ["smartrotom/pasaporte.json"] },
+  // 50 KB, the largest single app namespace — 28 routes, self-contained.
+  { prefix: "/smartrotom/gobierno", namespaces: ["smartrotom/gobierno.json"] },
+  { prefix: "/smartrotom/furrettoday", namespaces: ["smartrotom/furrettoday.json"] },
+  // misiones stays CORE: the styles showcase chapters (MsPrimitivasChapter,
+  // MsTableroChapter) render its STATUS_LABEL_KEY copy from /smartrotom/styles,
+  // so scoping it to /smartrotom/misiones blanks them. check:i18n catches this.
+  // Entirely off /smartrotom, so no other route can reach it.
+  { prefix: "/wingull", namespaces: ["wingull.json"] },
+  // bidkea (0.9 KB), liga (0.2 KB) and guias (65 B) stay CORE on purpose: an entry
+  // here is only worth its config cost when the file is big enough to matter.
   // mewgenics is used from shared components (components/boffmedia/ui/mewgenics/) so it must be CORE
 ]
 

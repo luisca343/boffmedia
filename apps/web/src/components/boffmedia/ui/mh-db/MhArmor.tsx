@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { Icon } from "@/components/boffmedia/primitives"
 import { MhRarity, MhSlotPips } from "@/app/(boffmedia)/(herramientas)/mhwilds/_components/ui/mh-kit"
@@ -47,6 +48,7 @@ function topRes(profile: MhArmorProfile) {
 }
 
 export function MhSetCard({ set, active, onOpen, view }: { set: MhArmorSet; active?: boolean; onOpen?: () => void; view?: "grid" | "list" }) {
+  const t = useTranslations("mhwilds.db.armor")
   const p = set.profile
   const bonus = set.bonus || set.group
   const style = { "--sh": set.hue } as React.CSSProperties
@@ -87,7 +89,7 @@ export function MhSetCard({ set, active, onOpen, view }: { set: MhArmorSet; acti
             {topRes(p).length ? (
               topRes(p).map((r) => <i key={r.k} title={MH_ELEMENTS[r.k]?.label} className="h-[9px] w-[9px] rounded-full [box-shadow:inset_0_0_0_1px_rgba(0,0,0,0.3)]" style={{ background: MH_ELEMENTS[r.k]?.color }} />)
             ) : (
-              <span className="font-mono text-[9px]/none font-medium text-txt-dim">sin res.</span>
+              <span className="font-mono text-[9px]/none font-medium text-txt-dim">{t("noRes")}</span>
             )}
           </span>
         </span>
@@ -103,11 +105,12 @@ export function MhSetCard({ set, active, onOpen, view }: { set: MhArmorSet; acti
 }
 
 export function MhSetBonusDetail({ bonus, kind, activePieces }: { bonus: MhSetBonusData; kind?: "set" | "group"; activePieces?: number }) {
+  const t = useTranslations("mhwilds.db.armor")
   const group = kind === "group"
   return (
     <div className={cn("border border-solid border-line border-l-[3px] bg-base-2", group ? "border-l-[color:var(--info)]" : "border-l-[color:var(--mh)]")}>
       <div className="flex items-baseline justify-between gap-2.5 border-b border-solid border-line px-3 py-[9px]">
-        <span className="font-mono text-[9px]/none font-semibold uppercase tracking-[0.1em] text-txt-dim">{group ? "Bonus de grupo" : "Bonus de conjunto"}</span>
+        <span className="font-mono text-[9px]/none font-semibold uppercase tracking-[0.1em] text-txt-dim">{group ? t("groupBonus") : t("setBonus")}</span>
         <span className="font-display text-[13px]/none font-bold uppercase not-italic tracking-[0.02em] text-txt">{bonus.name}</span>
       </div>
       <div className="flex flex-col">

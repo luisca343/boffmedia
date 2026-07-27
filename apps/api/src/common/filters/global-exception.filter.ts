@@ -16,6 +16,10 @@ interface ErrorResponse {
   // Spanish, user-facing — only present when the throw site set `userMessage`
   // on the exception body on purpose. Clients may render it verbatim.
   userMessage?: string;
+  // Stable machine code from apps/api/src/common/errors/catalog.json. Present
+  // only on errors that surface to a user; the web translates it and falls
+  // back to `userMessage` for any code it does not know.
+  code?: string;
   timestamp: string;
   path: string;
 }
@@ -86,6 +90,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
       let errorCode = 'HTTP_EXCEPTION';
       let message = exception.message;
       let userMessage: string | undefined;
+      let code: string | undefined;
 
       if (typeof raw === 'object' && raw !== null) {
         const body = raw as Record<string, unknown>;
@@ -100,6 +105,10 @@ export class GlobalExceptionFilter implements ExceptionFilter {
         if (typeof body['userMessage'] === 'string') {
           userMessage = body['userMessage'];
         }
+        // Passed through untouched — the web owns the translation.
+        if (typeof body['code'] === 'string') {
+          code = body['code'];
+        }
       } else if (typeof raw === 'string') {
         message = raw;
       }
@@ -109,6 +118,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
         error: errorCode,
         message,
         userMessage,
+        code,
         timestamp,
         path,
       };

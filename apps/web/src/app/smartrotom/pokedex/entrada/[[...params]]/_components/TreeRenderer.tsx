@@ -39,12 +39,12 @@ function EvoArrow({ methods, t }: { methods: Evolution[]; t: any }) {
         {methods.length ? (
           methods.map((m, i) => (
             <React.Fragment key={i}>
-              {i > 0 && <div className="text-[8px] text-pk-surface-600 my-0.5">o</div>}
+              {i > 0 && <div className="text-[8px] text-pk-surface-600 my-0.5">{t("evoTree.or")}</div>}
               {getEvolutionMethod(m, t)}
             </React.Fragment>
           ))
         ) : (
-          <span>Evoluciona</span>
+          <span>{t("evoTree.evolves")}</span>
         )}
       </div>
       <ChevronRightIcon className="w-3.5 h-3.5" />

@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useTranslations } from "next-intl"
 import { Badge, Button, Empty, PageHead, Skeleton } from "../ui"
 import { OficialCard } from "./OficialCard"
 import { AppointModal } from "./AppointModal"
@@ -9,6 +10,7 @@ import { useOfficer } from "../../_hooks/useOfficer"
 import { rankOrder } from "./officerRoles"
 
 export function OficialesBoard() {
+  const t = useTranslations("gobierno")
   const { data: oficiales, isLoading } = useOficiales()
   const officer = useOfficer()
   const [appointOpen, setAppointOpen] = useState(false)
@@ -18,18 +20,18 @@ export function OficialesBoard() {
   return (
     <div>
       <PageHead
-        kicker="Población · Cuerpo de funcionarios"
+        kicker={t("poblacion.oficialesKicker")}
         dep="poblacion"
-        title="Oficiales"
-        sub="Plantilla del Gobierno de Teras. La titularidad de cada cargo se rige por los roles concedidos — no existe una tabla de plantilla aparte."
+        title={t("poblacion.oficialesTitle")}
+        sub={t("poblacion.oficialesSub")}
         right={
           <div className="flex items-center gap-2">
             <Badge tone="poblacion" icon="badge">
-              {oficiales?.length ?? "—"} en plantilla
+              {t("poblacion.enPlantilla", { count: oficiales?.length ?? "—" })}
             </Badge>
             {officer.isAdmin && (
               <Button tone="gold" icon="plus" onClick={() => setAppointOpen(true)}>
-                Nombrar
+                {t("poblacion.nombrar")}
               </Button>
             )}
           </div>
@@ -43,11 +45,7 @@ export function OficialesBoard() {
           ))}
         </div>
       ) : sorted.length === 0 ? (
-        <Empty
-          icon="badge"
-          title="Sin funcionarios nombrados"
-          sub="Todavía no se ha concedido ningún cargo de gobierno. Nombra al primer funcionario para empezar la plantilla."
-        />
+        <Empty icon="badge" title={t("poblacion.emptyOficiales")} sub={t("poblacion.emptyOficialesSub")} />
       ) : (
         <div className="grid gap-4 [grid-template-columns:repeat(auto-fill,minmax(300px,1fr))]">
           {sorted.map((o) => (

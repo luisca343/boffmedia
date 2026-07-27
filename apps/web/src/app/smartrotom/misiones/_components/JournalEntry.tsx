@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import type { IDialogue, NPC, QuestData } from "../_types"
 import { Button, FlourishCorners, Icon, Label, NpcPortrait, Paper, WaxSeal } from "./ui"
 
@@ -24,6 +25,7 @@ export function JournalEntry({
   quest?: QuestData
   onOpenQuest: (quest: QuestData) => void
 }) {
+  const t = useTranslations("misiones.journalEntry")
   return (
     <Paper tilt={tiltFor(dialog.id)} className="relative py-5 pl-[86px] pr-6">
       <FlourishCorners size={20} offset={6} className="text-ms-gold-3/40" />
@@ -48,7 +50,7 @@ export function JournalEntry({
 
       {quest && (
         <div className="mt-3 flex flex-wrap items-center justify-between gap-2.5 border-t border-dashed border-ms-ink-3/30 pt-2.5">
-          <Label>— misión relacionada</Label>
+          <Label>{t("relatedQuest")}</Label>
           <Button sm onClick={() => onOpenQuest(quest)}>
             <Icon.Scroll size={11} />
             {quest.name}

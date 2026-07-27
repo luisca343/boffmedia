@@ -1,1 +1,61 @@
-{"foro":{"view":{"kicker":"Comunidad","title":"Foro","lead":"Debate, dudas y estrategia con el resto de la comunidad. Elige un tablón para empezar.","emptyTitle":"Sin tablones","emptyLead":"Aún no hay categorías en el foro."},"cat":{"sortRecent":"Recientes","sortTop":"Top","sortNew":"Nuevos","notFoundTitle":"Tablón no encontrado","notFoundLead":"Esta categoría del foro no existe o ya no está disponible.","backToForum":"Volver al foro","breadcrumb":"Foro","cancel":"Cancelar","newThread":"Nuevo hilo","loginToPost":"Inicia sesión para crear un hilo","submitLabel":"Publicar hilo","threadCount":"{count, plural, one {{count} hilo} other {{count} hilos}}","emptyTitle":"Sin hilos","emptyLead":"Aún no hay hilos en este tablón.","loadMore":"Cargar más"}}}
+{
+  "foro": {
+    "view": {
+      "kicker": "Comunidad",
+      "title": "Foro",
+      "lead": "Debate, dudas y estrategia con el resto de la comunidad. Elige un tablón para empezar.",
+      "emptyTitle": "Sin tablones",
+      "emptyLead": "Aún no hay categorías en el foro."
+    },
+    "cat": {
+      "sortRecent": "Recientes",
+      "sortTop": "Top",
+      "sortNew": "Nuevos",
+      "notFoundTitle": "Tablón no encontrado",
+      "notFoundLead": "Esta categoría del foro no existe o ya no está disponible.",
+      "backToForum": "Volver al foro",
+      "breadcrumb": "Foro",
+      "cancel": "Cancelar",
+      "newThread": "Nuevo hilo",
+      "loginToPost": "Inicia sesión para crear un hilo",
+      "submitLabel": "Publicar hilo",
+      "threadCount": "{count, plural, one {{count} hilo} other {{count} hilos}}",
+      "emptyTitle": "Sin hilos",
+      "emptyLead": "Aún no hay hilos en este tablón.",
+      "loadMore": "Cargar más"
+    },
+    "thread": {
+      "breadcrumb": "Foro",
+      "notFoundTitle": "Hilo no encontrado",
+      "notFoundLead": "Este hilo no existe o ya no está disponible.",
+      "backToCat": "Volver al tablón",
+      "pinned": "Fijado",
+      "locked": "Cerrado",
+      "solved": "Resuelto",
+      "repliesCount": "{count} resp.",
+      "viewsCount": "{count} vistas",
+      "voted": "Votado",
+      "vote": "Votar",
+      "pin": "Fijar",
+      "unpin": "Desfijar",
+      "close": "Cerrar",
+      "reopen": "Reabrir",
+      "emptyTitle": "Sin mensajes",
+      "emptyLead": "Este hilo todavía no tiene respuestas.",
+      "op": "Tema",
+      "solution": "Respuesta",
+      "save": "Guardar",
+      "markSolution": "Marcar como respuesta",
+      "unmarkSolution": "Quitar resuelto",
+      "edit": "Editar",
+      "delete": "Eliminar",
+      "confirmDelete": "¿Eliminar este mensaje? Esta acción no se puede deshacer.",
+      "loadMore": "Cargar más",
+      "closedNotice": "Este hilo está cerrado",
+      "replyTitle": "Responder",
+      "replySubmit": "Responder",
+      "joinConversation": "Únete a la conversación.",
+      "loginToReply": "Inicia sesión para responder"
+    }
+  }
+}

@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { Icon } from "@/components/boffmedia/primitives"
 import { LzPlatformPills } from "@/components/boffmedia/ui/calendar"
@@ -24,6 +25,7 @@ export function CtCover({ game, className, xs = false, children }: { game: CtGam
 }
 
 export function CtGameCard({ game, variant = "comoda", onOpen }: { game: CtGame; variant?: "poster" | "comoda" | "fila"; onOpen?: (g: CtGame) => void }) {
+  const t = useTranslations("common.catalog")
   const status = useCtStatus(game.id)
   const mine = useCtRating(game.id)
   const s = status ? CT_STATUS[status] : null
@@ -67,7 +69,7 @@ export function CtGameCard({ game, variant = "comoda", onOpen }: { game: CtGame;
     <article onClick={open} tabIndex={0} role="button" onKeyDown={key} className="group flex cursor-pointer flex-col outline-none">
       <CtCover game={game} className="transition-[border-color,transform] duration-[140ms] group-hover:border-accent-line group-focus-visible:border-accent-line">
         {s && (
-          <span style={{ "--sc": s.color } as React.CSSProperties} title={s.label} className="absolute left-1.5 top-1.5 z-[3] grid h-[22px] w-[22px] place-items-center bg-[color:var(--sc)] text-accent-ink [box-shadow:0_2px_8px_rgba(0,0,0,0.4)]">
+          <span style={{ "--sc": s.color } as React.CSSProperties} title={t(`status.${status}.label`)} className="absolute left-1.5 top-1.5 z-[3] grid h-[22px] w-[22px] place-items-center bg-[color:var(--sc)] text-accent-ink [box-shadow:0_2px_8px_rgba(0,0,0,0.4)]">
             <Icon name={s.icon} size={12} className={status === "wishlist" ? "fill-current" : undefined} />
           </span>
         )}

@@ -142,7 +142,7 @@ export function DragProvider({ children, monAt, onDropSingle, onDropMany, valida
     const to: SlotLoc = over.kind === "party" ? { kind: "party", index: over.index } : { kind: "box", box: over.box ?? 0, index: over.index }
     const reason = validate(from, to, monAt(to) !== null)
     if (reason) {
-      toast(reason, "error")
+      toast(t(reason), "error")
       return
     }
     onDropSingle(from, to)

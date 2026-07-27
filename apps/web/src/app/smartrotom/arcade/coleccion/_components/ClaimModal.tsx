@@ -38,6 +38,7 @@ function ClaimRow({
   selected: boolean
   onToggle: () => void
 }) {
+  const t = useTranslations("arcade")
   const skin = raritySkin(item.rarity)
   return (
     <button
@@ -78,7 +79,7 @@ function ClaimRow({
           className="mt-1 block font-ar-display text-[8px] uppercase tracking-[0.12em]"
           style={{ color: skin.fg }}
         >
-          {skin.name}
+          {t(skin.nameKey)}
         </span>
       </span>
 
@@ -144,17 +145,17 @@ export function ClaimModal({ open, onClose, items }: ClaimModalProps) {
       onClose={close}
       size="lg"
       tone="magenta"
-      kicker="▸ Reclamar recompensas"
-      title={result ? "Reclamación enviada" : "Mover al inventario del juego"}
+      kicker={t("coleccion.claim.kicker")}
+      title={result ? t("coleccion.claim.claimedTitle") : t("coleccion.claim.moveToGame")}
       footer={
         result ? (
           <Button variant="amber" size="md" onClick={close}>
-            Hecho
+            {t("common.done")}
           </Button>
         ) : (
           <>
             <Button variant="ghost" size="md" onClick={close}>
-              Cancelar
+              {t("common.cancel")}
             </Button>
             <Button
               variant="amber"
@@ -163,7 +164,9 @@ export function ClaimModal({ open, onClose, items }: ClaimModalProps) {
               onClick={() => void submit()}
               disabled={picked.length === 0 || claim.isPending}
             >
-              {claim.isPending ? "Reclamando…" : `Reclamar ${picked.length} objetos`}
+              {claim.isPending
+                ? t("coleccion.claim.claiming")
+                : t("coleccion.claim.claimItems", { count: picked.length })}
             </Button>
           </>
         )
@@ -172,22 +175,20 @@ export function ClaimModal({ open, onClose, items }: ClaimModalProps) {
       {result ? (
         <div className="flex flex-col gap-3">
           <Tag tone="lime" size="lg">
-            <Icon.Shield s={14} /> Entregado en el juego
+            <Icon.Shield s={14} /> {t("coleccion.claim.deliveredInGame")}
           </Tag>
           <p className="rounded-[10px] border border-white/[.07] bg-black/40 p-3 font-ar-mono text-[11px] leading-relaxed text-ar-ink-dim">
-            Los objetos llegaron a tu inventario y los Pokémon a tu equipo. Si tu equipo
-            estaba lleno, el Pokémon fue enviado a tu PC.
+            {t("coleccion.claim.deliveredDescription")}
           </p>
         </div>
       ) : claimable.length === 0 ? (
         <p className="py-8 text-center font-ar-mono text-[12px] text-ar-ink-muted">
-          No tienes objetos para reclamar ahora mismo.
+          {t("coleccion.claim.noItemsToClaim")}
         </p>
       ) : (
         <div className="flex flex-col gap-4">
           <p className="text-ar-ink-dim">
-            Selecciona los objetos que quieres enviar al juego. Los Pokémon van directos a tu PC; los
-            objetos de Minecraft llegan en cofres.
+            {t("coleccion.claim.selectItemsDescription")}
           </p>
 
           {!inGame && (
@@ -195,8 +196,7 @@ export function ClaimModal({ open, onClose, items }: ClaimModalProps) {
               role="alert"
               className="rounded-[10px] border border-ar-amber/35 bg-ar-amber/[.08] p-3 font-ar-mono text-[11px] leading-relaxed text-ar-amber"
             >
-              Estás fuera del cliente de Minecraft. La entrega solo se completa si estás conectado al
-              servidor.
+              {t("coleccion.claim.outsideMinecraft")}
             </p>
           )}
 
@@ -205,14 +205,14 @@ export function ClaimModal({ open, onClose, items }: ClaimModalProps) {
               role="alert"
               className="rounded-[10px] border border-ar-danger/40 bg-ar-danger/[.08] p-3 font-ar-mono text-[11px] text-ar-danger"
             >
-              {userMessageFrom(claim.error, "Ocurrió un error al reclamar los objetos.")}
+              {userMessageFrom(claim.error, t("coleccion.claim.claimError"))}
             </p>
           )}
 
           {pokemon.length > 0 && (
             <section>
               <h3 className="mb-2 border-b border-white/[.07] pb-1.5 font-ar-display text-[9px] uppercase tracking-[0.18em] text-ar-violet-2">
-                Pokémon
+                {t("coleccion.claim.pokemonSection")}
               </h3>
               <div className="grid gap-2 sm:grid-cols-2">
                 {pokemon.map((item) => (
@@ -231,7 +231,7 @@ export function ClaimModal({ open, onClose, items }: ClaimModalProps) {
           {regular.length > 0 && (
             <section>
               <h3 className="mb-2 border-b border-white/[.07] pb-1.5 font-ar-display text-[9px] uppercase tracking-[0.18em] text-ar-amber">
-                Objetos de Minecraft
+                {t("coleccion.claim.minecraftSection")}
               </h3>
               <div className="grid gap-2 sm:grid-cols-2">
                 {regular.map((item) => (
@@ -254,20 +254,28 @@ export function ClaimModal({ open, onClose, items }: ClaimModalProps) {
             )}
           >
             <span className="font-ar-mono text-xs text-ar-ink-dim">
-              Seleccionados <b className="text-ar-amber">{picked.length}</b>
+              {t.rich("coleccion.claim.selected", {
+                count: picked.length,
+                b: (chunks) => <b className="text-ar-amber">{chunks}</b>,
+              })}
               {pickedPokemon.length > 0 && (
                 <>
                   {" · "}
-                  <b className="text-ar-violet-2">{pickedPokemon.length}</b> Pokémon
+                  {t.rich("coleccion.claim.selectedPokemon", {
+                    count: pickedPokemon.length,
+                    b: (chunks) => <b className="text-ar-violet-2">{chunks}</b>,
+                  })}
                 </>
               )}
             </span>
             {pickedRegular.length > 0 && (
               <span className="font-ar-mono text-xs text-ar-ink-dim">
-                Ocupan <b className="text-ar-ink">{chests.slots}</b>{" "}
-                {chests.slots === 1 ? "hueco" : "huecos"} en{" "}
-                <b className="text-ar-amber">{chests.chests}</b>{" "}
-                {chests.chests === 1 ? "cofre" : "cofres"}
+                {t.rich("coleccion.claim.occupy", {
+                  slots: chests.slots,
+                  chests: chests.chests,
+                  b: (chunks) => <b className="text-ar-ink">{chunks}</b>,
+                  c: (chunks) => <b className="text-ar-amber">{chunks}</b>,
+                })}
               </span>
             )}
           </div>

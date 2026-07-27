@@ -1,0 +1,81 @@
+{
+  "$comment": "SOURCE OF TRUTH for user-facing API error codes. Edit this file, then run `pnpm generate:shared` (or `pnpm generate:error-codes`) to regenerate apps/api/src/common/errors/error-codes.generated.ts and packages/shared/src/errorCodes.generated.ts. Never edit either generated file by hand. Only add a code for an error that ACTUALLY reaches a user; internal/500 errors get no code. `es` is the Spanish fallback the API ships as `userMessage` — the web translates by code and falls back to it.",
+  "codes": {
+    "ACTOR_NOT_SELF": {
+      "es": "No puedes actuar en nombre de otro jugador.",
+      "where": "api/_utils/auth/actor.ts"
+    },
+    "AUTH_INVALID_CREDENTIALS": {
+      "es": "Usuario o contraseña incorrectos.",
+      "where": "api/auth/auth.controller.ts"
+    },
+    "CHAT_NOT_FOUND": {
+      "es": "No se encontró el chat.",
+      "where": "smartrotom/chatapp"
+    },
+    "CHAT_NOT_MEMBER": {
+      "es": "No formas parte de este chat.",
+      "where": "smartrotom/chatapp"
+    },
+    "CHAT_CALL_NO_PARTICIPANTS": {
+      "es": "No hay nadie más en el chat para llamar.",
+      "where": "smartrotom/chatapp/services/call.service.ts"
+    },
+    "CHAT_MESSAGE_NOT_EDITABLE": {
+      "es": "No puedes editar este mensaje.",
+      "where": "smartrotom/chatapp/services/message.service.ts"
+    },
+    "CHAT_MESSAGE_NOT_DELETABLE": {
+      "es": "No puedes eliminar este mensaje.",
+      "where": "smartrotom/chatapp/services/message.service.ts"
+    },
+    "CHAT_GROUP_NO_ACCESS": {
+      "es": "No tienes acceso a este grupo.",
+      "where": "smartrotom/chatapp/services/group.service.ts"
+    },
+    "BANK_ACCOUNT_NOT_OWNED": {
+      "es": "No puedes transferir desde una cuenta que no es tuya.",
+      "where": "smartrotom/starbank"
+    },
+    "BANK_AMOUNT_NOT_POSITIVE": {
+      "es": "El importe debe ser mayor que cero.",
+      "where": "smartrotom/starbank"
+    },
+    "BANK_SAME_ACCOUNT": {
+      "es": "No puedes transferir a la misma cuenta.",
+      "where": "smartrotom/starbank"
+    },
+    "BANK_SOURCE_ACCOUNT_NOT_FOUND": {
+      "es": "La cuenta de origen no existe.",
+      "where": "smartrotom/starbank"
+    },
+    "BANK_TARGET_ACCOUNT_NOT_FOUND": {
+      "es": "La cuenta de destino no existe.",
+      "where": "smartrotom/starbank"
+    },
+    "BANK_INSUFFICIENT_FUNDS": {
+      "es": "Saldo insuficiente.",
+      "where": "smartrotom/starbank"
+    },
+    "BANK_INSUFFICIENT_FUNDS_PURCHASE": {
+      "es": "Saldo insuficiente para la compra.",
+      "where": "smartrotom/starbank"
+    },
+    "BANK_TRANSFER_FAILED": {
+      "es": "No se pudo completar la transferencia.",
+      "where": "smartrotom/starbank"
+    },
+    "BANK_NEGATIVE_BALANCE": {
+      "es": "El saldo no puede ser negativo.",
+      "where": "smartrotom/starbank"
+    },
+    "BANK_BALANCE_ADJUST_FAILED": {
+      "es": "No se pudo ajustar el saldo.",
+      "where": "smartrotom/starbank"
+    },
+    "TOURNAMENT_CHECKIN_CLOSED": {
+      "es": "El check-in no está abierto.",
+      "where": "boffmedia/tournaments/services/registration.service.ts"
+    }
+  }
+}

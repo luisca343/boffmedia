@@ -1,7 +1,7 @@
 "use client";
 import * as React from "react";
 import { useRouter } from "next/navigation";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { AccountAvatar, Button, Ico, Sparkline } from "../ui";
 import { fmtInt, formatMoney } from "../../_utils/format";
 import { displayName } from "../../_utils/account";
@@ -19,6 +19,7 @@ const GRID_OVERLAY =
 export function HeroBalance({ account, series, weekDelta }: { account: SBAccount; series: number[]; weekDelta?: { amount: number; pct: number } }) {
   const router = useRouter();
   const t = useTranslations("starbank");
+  const locale = useLocale();
   const [hide, setHide] = React.useState(false);
 
   return (
@@ -49,7 +50,7 @@ export function HeroBalance({ account, series, weekDelta }: { account: SBAccount
         <div className="text-[12px] uppercase tracking-[0.15em] text-[#c8d4ec]">{t("heroBalance.availableBalance")}</div>
 
         <div className="inline-flex items-baseline gap-1.5 font-sb-display text-[clamp(40px,6vw,64px)] font-bold leading-none tracking-[-0.03em] tabular-nums">
-          {hide ? "•••••• " : fmtInt(account.balance)}
+          {hide ? "•••••• " : fmtInt(account.balance, locale)}
           <span className="text-[0.42em] font-semibold text-sb-300">¥</span>
           <button
             type="button"

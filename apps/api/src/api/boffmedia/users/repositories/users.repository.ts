@@ -42,6 +42,9 @@ export class BoffMediaUsersRepository implements IBoffMediaUsersRepository {
     twitchId: boffMediaUsers.twitchId,
     steamId: boffMediaUsers.steamId,
     emailVerified: boffMediaUsers.emailVerified,
+    // Stored language preference — needed by MailService, which composes
+    // transactional email server-side and cannot use the web's translations.
+    locale: boffMediaUsers.locale,
     createdAt: boffMediaUsers.createdAt,
     updatedAt: boffMediaUsers.updatedAt,
   };

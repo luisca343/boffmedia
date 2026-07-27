@@ -100,7 +100,7 @@ export const toUrlSafeBase64 = (str: string): string => {
 /**
  * Import a build from a URL parameter
  */
-export const importBuildFromUrl = (): BuildDataWithIds | null => {
+export const importBuildFromUrl = (defaultName: string = "Mi Build"): BuildDataWithIds | null => {
     if (typeof window === 'undefined') return null;
     
     try {
@@ -115,7 +115,7 @@ export const importBuildFromUrl = (): BuildDataWithIds | null => {
         
         // Convert the minimal build back to a full BuildDataWithIds
         const importedBuild: BuildDataWithIds = {
-          name: minimalBuild.n || "Mi Build",
+          name: minimalBuild.n || defaultName,
           weaponId: minimalBuild.w || null,
           secondaryWeaponId: minimalBuild.s || null,
           headId: minimalBuild.h || null,

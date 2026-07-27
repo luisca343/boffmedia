@@ -51,6 +51,7 @@ export function CtStars({ value = 0, onChange, size = 16, count, ariaLabel }: { 
 }
 
 export function CtStatusPill({ status, size = "md", solid = false, showLabel = true }: { status: CtStatusKey; size?: "sm" | "md"; solid?: boolean; showLabel?: boolean }) {
+  const t = useTranslations("common.catalog")
   const s = CT_STATUS[status]
   if (!s) return null
   return (
@@ -63,7 +64,7 @@ export function CtStatusPill({ status, size = "md", solid = false, showLabel = t
       )}
     >
       <Icon name={s.icon} size={size === "sm" ? 11 : 13} className={status === "wishlist" ? "fill-current" : undefined} />
-      {showLabel && <span>{s.label}</span>}
+      {showLabel && <span>{t(`status.${status}.label`)}</span>}
     </span>
   )
 }
@@ -107,7 +108,7 @@ export function CtStatusMenu({ gameId, onClose, block }: { gameId: string; onClo
             <span className="grid h-[26px] w-[26px] flex-none place-items-center border border-solid border-[color-mix(in_oklch,var(--sc)_40%,var(--line))] bg-[color-mix(in_oklch,var(--sc)_12%,transparent)] text-[color:var(--sc)]">
               <Icon name={s.icon} size={15} className={k === "wishlist" ? "fill-current" : undefined} />
             </span>
-            <span className="flex-1">{s.label}</span>
+            <span className="flex-1">{t(`status.${k}.label`)}</span>
             {on && <Icon name="check" size={14} className="text-[color:var(--sc)]" />}
           </button>
         )
@@ -155,7 +156,7 @@ export function CtLogButton({ gameId, block = false, size = "md" }: { gameId: st
         )}
       >
         <Icon name={s ? s.icon : "plus"} size={size === "sm" ? 13 : 15} className={cur === "wishlist" ? "fill-current" : undefined} />
-        {s ? s.label : t("log")}
+        {cur ? t(`status.${cur}.label`) : t("log")}
         <Icon name="chevronDown" size={13} className="opacity-60" />
       </button>
       {open && <CtStatusMenu gameId={gameId} onClose={() => setOpen(false)} block={block} />}

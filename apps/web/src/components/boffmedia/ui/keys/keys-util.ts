@@ -50,27 +50,34 @@ export function kvReviewColor(score: number): string {
   if (score >= 85) return "var(--info)"
   return "var(--warn)"
 }
-export function kvReviewLabel(score: number): string {
-  if (score >= 95) return "Extremadamente positivas"
-  if (score >= 85) return "Muy positivas"
-  if (score >= 70) return "Positivas"
-  return "Variadas"
+// Bands resolve to copy in locales/{es,en}/common.json under common.keys.review.*
+// — components call t(`review.${kvReviewBand(score)}`).
+export type KvReviewBand = "extremelyPositive" | "veryPositive" | "positive" | "mixed"
+export function kvReviewBand(score: number): KvReviewBand {
+  if (score >= 95) return "extremelyPositive"
+  if (score >= 85) return "veryPositive"
+  if (score >= 70) return "positive"
+  return "mixed"
 }
 export function kvMetaColor(score: number): string {
   if (score >= 75) return "var(--ok)"
   if (score >= 50) return "var(--warn)"
   return "var(--bad)"
 }
-export function kvMetaLabel(score: number): string {
-  if (score >= 90) return "Aclamación universal"
-  if (score >= 75) return "Generalmente favorable"
-  if (score >= 50) return "Reseñas mixtas"
-  return "Generalmente desfavorable"
+// Bands resolve to copy under common.keys.meta.* — t(`meta.${kvMetaBand(score)}`).
+export type KvMetaBand = "universal" | "favorable" | "mixed" | "unfavorable"
+export function kvMetaBand(score: number): KvMetaBand {
+  if (score >= 90) return "universal"
+  if (score >= 75) return "favorable"
+  if (score >= 50) return "mixed"
+  return "unfavorable"
 }
+// Platform names (Windows/macOS/Linux) are proper nouns — never translated.
 export function kvPlatformMeta(p: KvPlatform): { icon: IconName; label: string } {
   return ({ win: { icon: "grid" as IconName, label: "Windows" }, mac: { icon: "swatch" as IconName, label: "macOS" }, linux: { icon: "database" as IconName, label: "Linux" } })[p] || { icon: "grid", label: p }
 }
-export function kvViaMeta(via: KvViaKey): { icon: IconName; label: string; short: string } {
-  if (via === "manual") return { icon: "gift", label: "Entrega manual", short: "Manual" }
-  return { icon: "trophy", label: "Sorteo", short: "Sorteo" }
+// label/short live under common.keys.via.<key> — components call
+// t(`via.${via}.label`) / t(`via.${via}.short`); this only carries the icon.
+export function kvViaIcon(via: KvViaKey): IconName {
+  return via === "manual" ? "gift" : "trophy"
 }

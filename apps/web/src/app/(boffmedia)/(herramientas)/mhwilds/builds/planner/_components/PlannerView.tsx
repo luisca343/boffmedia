@@ -23,7 +23,7 @@ export type SlotDef = { key: EquipmentType; icon: "sword" | "shield" | "sparkles
 
 export const SLOTS: SlotDef[] = [
   { key: "weapon", icon: "sword", kind: "weapon", labelKey: "weapon" },
-  { key: "secondaryWeapon", icon: "sword", kind: "weapon", labelKey: "secondary_weapon" },
+  { key: "secondaryWeapon", icon: "sword", kind: "weapon", labelKey: "secondaryWeapon" },
   { key: "head", icon: "shield", kind: "head", labelKey: "head" },
   { key: "chest", icon: "shield", kind: "chest", labelKey: "chest" },
   { key: "arms", icon: "shield", kind: "arms", labelKey: "arms" },
@@ -60,7 +60,7 @@ export function PlannerView() {
   const isLoading = loadingWeapons || loadingArmor || loadingDecorations || loadingCharms
 
   useEffect(() => {
-    const imported = importBuildFromUrl()
+    const imported = importBuildFromUrl(t("build_planner.defaultBuildName"))
     if (imported) setCurrentBuild(imported)
   }, [setCurrentBuild])
 

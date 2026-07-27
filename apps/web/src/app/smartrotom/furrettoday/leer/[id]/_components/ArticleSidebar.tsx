@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 
 import { useBoffSession } from "@/services/useBoffSession";
+import { useFormat } from "@/lib/useFormat";
 
 import { articleHref } from "../../../_components/ArticleCard";
 import {
@@ -23,6 +24,7 @@ import {
 import { relatedTo, type FtArticle } from "../../../_utils/article";
 
 function ReadingProgress() {
+  const t = useTranslations("furrettoday");
   const [pct, setPct] = useState(0);
 
   useEffect(() => {
@@ -41,7 +43,7 @@ function ReadingProgress() {
   return (
     <CardFlat className="p-4">
       <div className="flex justify-between">
-        <Eyebrow className="text-ft-pink">PROGRESO</Eyebrow>
+        <Eyebrow className="text-ft-pink">{t("sidebar.progress")}</Eyebrow>
         <Meta>{Math.round(pct)}%</Meta>
       </div>
       <div className="border-ft mt-2 h-3 overflow-hidden rounded-ft-pill border-ft-ink bg-ft-paper-2">
@@ -55,11 +57,12 @@ function ReadingProgress() {
 }
 
 function SidebarShare({ onShare }: { onShare: () => void }) {
+  const t = useTranslations("furrettoday");
   return (
     <CardFlat className="p-4">
-      <Eyebrow className="mb-2 text-ft-pink">COMPARTIR</Eyebrow>
+      <Eyebrow className="mb-2 text-ft-pink">{t("sidebar.share")}</Eyebrow>
       <Button variant="primary" size="sm" onClick={onShare} className="w-full">
-        Compartir este artículo
+        {t("sidebar.shareArticle")}
       </Button>
     </CardFlat>
   );
@@ -72,12 +75,13 @@ function SidebarRelated({
   article: FtArticle;
   articles: FtArticle[];
 }) {
+  const t = useTranslations("furrettoday");
   const items = relatedTo(article, articles, 3);
   if (items.length === 0) return null;
 
   return (
     <CardFlat className="p-4">
-      <Eyebrow className="mb-3 text-ft-pink">SEGUIR LEYENDO</Eyebrow>
+      <Eyebrow className="mb-3 text-ft-pink">{t("sidebar.related")}</Eyebrow>
       <div className="grid gap-3">
         {items.map((a, i) => (
           <Link
@@ -105,14 +109,14 @@ function SidebarRelated({
   );
 }
 
-function formatCommentDate(iso: string): string {
-  const d = new Date(iso);
-  if (Number.isNaN(d.getTime())) return "";
-  return d.toLocaleDateString("es-ES", { day: "numeric", month: "short" });
-}
-
 function SidebarComments({ newsId }: { newsId: number }) {
   const t = useTranslations("furrettoday");
+  const { date } = useFormat();
+  const formatCommentDate = (iso: string): string => {
+    const d = new Date(iso);
+    if (Number.isNaN(d.getTime())) return "";
+    return date(d, { day: "numeric", month: "short" });
+  };
   const { data: comments } = useComments(newsId);
   const post = usePostComment(newsId);
   const del = useDeleteComment(newsId);
@@ -131,7 +135,7 @@ function SidebarComments({ newsId }: { newsId: number }) {
   return (
     <CardFlat className="p-4">
       <div className="mb-3 flex items-center justify-between">
-        <Eyebrow className="text-ft-pink">VIÑETAS DE LECTORES</Eyebrow>
+        <Eyebrow className="text-ft-pink">{t("sidebar.comments")}</Eyebrow>
         <Meta>{list.length}</Meta>
       </div>
 
@@ -168,7 +172,7 @@ function SidebarComments({ newsId }: { newsId: number }) {
           ))}
         </div>
       ) : (
-        <Meta className="block">Sé el primero en dejar una viñeta.</Meta>
+        <Meta className="block">{t("sidebar.commentsEmpty")}</Meta>
       )}
 
       {post.canComment ? (
@@ -186,11 +190,11 @@ function SidebarComments({ newsId }: { newsId: number }) {
             size="sm"
             disabled={post.isPending || !body.trim()}
           >
-            {post.isPending ? "Publicando…" : "Publicar"}
+            {post.isPending ? t("sidebar.posting") : t("sidebar.post")}
           </Button>
         </form>
       ) : (
-        <Meta className="mt-3.5 block">Inicia sesión para dejar tu viñeta.</Meta>
+        <Meta className="mt-3.5 block">{t("sidebar.signInToComment")}</Meta>
       )}
     </CardFlat>
   );

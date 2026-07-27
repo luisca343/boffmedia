@@ -135,7 +135,7 @@ export function OpeningStage({
             </div>
             <div className="min-w-0">
               <Tag tone={RARITY_TONE[rarity]} size="md">
-                {skin.name}
+                {t(skin.nameKey)}
               </Tag>
               <div className="ar-chrom mt-2.5 font-ar-display text-[15px] leading-relaxed text-ar-ink">
                 {name}

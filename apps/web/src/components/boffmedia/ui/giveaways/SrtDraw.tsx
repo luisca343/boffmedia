@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { useTranslations } from "next-intl"
 import { Avatar, Button, Icon } from "@/components/boffmedia/primitives"
 import { SRT_REEL_COLORS, srtTotalTickets, type Sorteo, type SrtParticipant } from "./giveaways-util"
 
@@ -16,6 +17,7 @@ interface ReelCell {
 // tickets, and the needle lands on the winner. Mirrors .srt-reel from
 // sorteos.css; the transform animation is ported verbatim from the handoff.
 export function SrtDrawReel({ sorteo, spinning, revealed, onLand }: { sorteo: Sorteo; spinning?: boolean; revealed?: boolean; onLand?: () => void }) {
+  const t = useTranslations("common.giveaways")
   const trackRef = React.useRef<HTMLDivElement>(null)
   const viewportRef = React.useRef<HTMLDivElement>(null)
   const winner = sorteo.winner || sorteo.participants[0]
@@ -91,13 +93,14 @@ export function SrtDrawReel({ sorteo, spinning, revealed, onLand }: { sorteo: So
       </div>
       <div className="mt-3 flex flex-wrap items-center gap-2 font-mono text-[10px]/none font-medium tracking-[0.05em] text-txt-muted">
         <Icon name="info" size={13} />
-        Cada bloque = un participante; su anchura es proporcional a sus tickets. Más tickets, más espacio en la tira.
+        {t("reelExplainer")}
       </div>
     </div>
   )
 }
 
 export function SrtWinnerCard({ sorteo, onReplay }: { sorteo: Sorteo; onReplay?: () => void }) {
+  const t = useTranslations("common.giveaways")
   const w = sorteo.winner
   if (!w) return null
   const total = srtTotalTickets(sorteo)
@@ -107,7 +110,7 @@ export function SrtWinnerCard({ sorteo, onReplay }: { sorteo: Sorteo; onReplay?:
       <span aria-hidden className="pointer-events-none absolute inset-0 z-0 [background:radial-gradient(80%_70%_at_50%_0,var(--accent-soft),transparent_60%)]" />
       <span className="relative z-[1] inline-flex items-center gap-[7px] border border-solid border-accent-line px-[11px] py-1.5 font-mono text-[10px]/none font-bold uppercase tracking-[0.14em] text-accent">
         <Icon name="sparkles" size={12} />
-        Ganador anunciado
+        {t("status.announced.label")}
       </span>
       <div className="relative z-[1] mx-auto mb-[14px] mt-[18px] grid h-[76px] w-[76px] place-items-center border border-solid border-accent-line bg-accent-soft text-accent cut-seal [--cut:14px]">
         <Icon name="trophy" size={40} />
@@ -117,14 +120,14 @@ export function SrtWinnerCard({ sorteo, onReplay }: { sorteo: Sorteo; onReplay?:
         <b className="font-display text-[34px]/none font-extrabold italic text-txt">{w.name}</b>
       </div>
       <p className="relative z-[1] mt-3 text-[14px] text-txt-muted">
-        Ganó con <b className="text-accent">{w.tickets} ticket{w.tickets !== 1 ? "s" : ""}</b> · {odds.toFixed(1)}% de probabilidad
+        {t.rich("wonWith", { tickets: w.tickets, odds: odds.toFixed(1), b: (chunks) => <b className="text-accent">{chunks}</b> })}
       </p>
       {onReplay && (
         <div className="relative z-[1] mt-5 flex flex-wrap justify-center gap-2.5">
           <Button variant="pri" icon="play" onClick={onReplay}>
-            Ver cómo se sorteó
+            {t("watchDraw")}
           </Button>
-          <Button icon="link">Compartir</Button>
+          <Button icon="link">{t("share")}</Button>
         </div>
       )}
     </div>

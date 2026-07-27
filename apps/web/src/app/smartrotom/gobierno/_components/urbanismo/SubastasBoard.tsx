@@ -24,6 +24,7 @@ import {
 import { useCloseSubasta, useCreateSubasta, useParcelas, usePuja, useSubastas } from "../../_hooks/queries"
 import { useOfficer } from "../../_hooks/useOfficer"
 import { useGobiernoUi } from "../../_stores/useGobiernoUi"
+import { useFormat } from "@/lib/useFormat"
 import { money, timeLeft, townName } from "../../_utils/format"
 import { SUBASTA_STATUS } from "../../_utils/tones"
 import type { Parcela, Subasta } from "../../_types"
@@ -36,6 +37,7 @@ const UUID_RE = /^[0-9a-f]{8}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{1
 // yet (that is the Población/Censo module, not built), so the officer enters it directly.
 export function SubastasBoard() {
   const t = useTranslations("gobierno")
+  const { intlLocale } = useFormat()
   const { data, isLoading, isError } = useSubastas({ limit: 100 })
   const { data: parcelas } = useParcelas({ limit: 100 })
   const officer = useOfficer()
@@ -117,7 +119,8 @@ export function SubastasBoard() {
                 </THead>
                 <TBody>
                   {closed.map((a) => {
-                    const st = SUBASTA_STATUS[a.status] ?? { label: a.status, tone: "default" as const }
+                    const known = SUBASTA_STATUS[a.status]
+                    const st = known ? { label: t(known.labelKey), tone: known.tone } : { label: a.status, tone: "default" as const }
                     return (
                       <TR key={a.id}>
                         <TD>
@@ -142,7 +145,7 @@ export function SubastasBoard() {
                         </TD>
                         <TD>
                           <span className="font-gt-display font-bold tabular-nums text-gt-ink-900">
-                            {money(a.currentBid)} ₽
+                            {money(a.currentBid, intlLocale)} ₽
                           </span>
                         </TD>
                         <TD>
@@ -176,6 +179,7 @@ export function SubastasBoard() {
 
 function SubastaCard({ subasta: a, onOpenOwner }: { subasta: Subasta; onOpenOwner: (uuid: string) => void }) {
   const t = useTranslations("gobierno")
+  const { intlLocale } = useFormat()
   const puja = usePuja()
   const closeSubasta = useCloseSubasta()
 
@@ -203,7 +207,7 @@ function SubastaCard({ subasta: a, onOpenOwner }: { subasta: Subasta; onOpenOwne
           }`}
         >
           <Icon name="clock" size={12} />
-          {timeLeft(a.endsAt)}
+          {timeLeft(a.endsAt, t("common.finalizado"))}
         </span>
       </div>
       <div className="p-4">
@@ -217,7 +221,7 @@ function SubastaCard({ subasta: a, onOpenOwner }: { subasta: Subasta; onOpenOwne
           <div>
             <div className="font-gt-mono text-[9px] uppercase tracking-[.12em] text-gt-ink-400">{t("subastas.pujaActual")}</div>
             <div className="font-gt-display text-[26px] font-bold tabular-nums text-gt-ink-900">
-              {money(a.currentBid)} ₽
+              {money(a.currentBid, intlLocale)} ₽
             </div>
           </div>
           {a.bidder ? (

@@ -1,9 +1,11 @@
 "use client"
 
 import * as React from "react"
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { Icon } from "@/components/boffmedia/primitives"
-import { kvCapsuleArt, kvHeaderArt, kvPlatformMeta, kvReviewColor, kvViaMeta, type KvPlatform, type KvViaKey } from "./keys-util"
+import { useFormat } from "@/lib/useFormat"
+import { kvCapsuleArt, kvHeaderArt, kvPlatformMeta, kvReviewColor, kvViaIcon, type KvPlatform, type KvViaKey } from "./keys-util"
 
 const ART_FB = "grid h-full w-full place-items-center text-line-2 [background:repeating-linear-gradient(-45deg,var(--bg-2)_0_10px,var(--panel-2)_10px_20px)]"
 
@@ -27,6 +29,7 @@ export function KvArt({ appid, name, kind = "header", src }: { appid?: number; n
 }
 
 export function KvStatus({ given }: { given?: boolean }) {
+  const t = useTranslations("common.keys")
   return (
     <span
       className={cn(
@@ -35,13 +38,14 @@ export function KvStatus({ given }: { given?: boolean }) {
       )}
     >
       <Icon name={given ? "check" : "bookmark"} size={11} />
-      {given ? "Entregada" : "Disponible"}
+      {given ? t("given") : t("available")}
     </span>
   )
 }
 
 export function KvVia({ via, sm }: { via: KvViaKey; sm?: boolean }) {
-  const m = kvViaMeta(via)
+  const t = useTranslations("common.keys")
+  const icon = kvViaIcon(via)
   return (
     <span
       className={cn(
@@ -50,13 +54,15 @@ export function KvVia({ via, sm }: { via: KvViaKey; sm?: boolean }) {
         via === "sorteo" ? "border-accent-line bg-accent-soft text-accent" : "border-[color-mix(in_srgb,var(--info)_30%,transparent)] bg-[color:var(--info-soft)] text-[color:var(--info)]",
       )}
     >
-      <Icon name={m.icon} size={12} className="flex-none" />
-      {sm ? m.short : m.label}
+      <Icon name={icon} size={12} className="flex-none" />
+      {sm ? t(`via.${via}.short`) : t(`via.${via}.label`)}
     </span>
   )
 }
 
 export function KvReview({ score, count, sm }: { score: number; count?: number; sm?: boolean }) {
+  const t = useTranslations("common.keys")
+  const { number } = useFormat()
   const color = kvReviewColor(score)
   return (
     <div className="flex items-center gap-2.5">
@@ -66,7 +72,7 @@ export function KvReview({ score, count, sm }: { score: number; count?: number; 
       <span className="h-1.5 min-w-[60px] flex-1 overflow-hidden border border-solid border-line bg-panel-2">
         <span className="block h-full transition-[width] duration-[420ms]" style={{ width: score + "%", background: color }} />
       </span>
-      {count != null && <span className="flex-none font-mono text-[10px]/none font-medium tracking-[0.03em] text-txt-dim">{count.toLocaleString("es")} reseñas</span>}
+      {count != null && <span className="flex-none font-mono text-[10px]/none font-medium tracking-[0.03em] text-txt-dim">{t("reviewsCount", { count: number(count) })}</span>}
     </div>
   )
 }

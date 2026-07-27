@@ -1,3 +1,5 @@
+import { useLocale } from "next-intl";
+
 import { Avatar, Meta, Pill, Tag } from "../../../_components/ui";
 import { ACCENT_HEX } from "../../../_utils/accents";
 import { longDateOf, type FtArticle } from "../../../_utils/article";
@@ -9,13 +11,14 @@ import { longDateOf, type FtArticle } from "../../../_utils/article";
  * placeholder name.
  */
 export function ArticleHeader({ article }: { article: FtArticle }) {
+  const locale = useLocale();
   return (
     <header className="border-ft relative overflow-hidden border-x-0 border-t-0 border-b-ft-ink bg-ft-paper">
       <div className="ft-halftone absolute inset-0 opacity-10" aria-hidden="true" />
       <div className="relative mx-auto max-w-[880px] px-6 py-12">
         <div className="mb-4 flex flex-wrap items-center gap-2.5">
           <Pill tone={article.accent}>{article.eyebrow}</Pill>
-          <Meta>{longDateOf(article.createdAt)}</Meta>
+          <Meta>{longDateOf(article.createdAt, locale)}</Meta>
           <Meta>·</Meta>
           <Meta>{article.readTime}</Meta>
         </div>

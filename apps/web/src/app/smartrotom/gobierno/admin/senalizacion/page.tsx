@@ -1,6 +1,7 @@
 "use client"
 
 import { useMemo, useState } from "react"
+import { useTranslations } from "next-intl"
 import { env } from "@/config/env.public"
 import { Bar, Button, Card, Empty, Field, Icon, PageHead, Select, Skeleton, toast } from "../../_components/ui"
 import { ConsolaHero } from "../../_components/admin/ConsolaHero"
@@ -18,6 +19,7 @@ function buildUrl(tipo: string, highway: string, destinations: CartelDestination
 }
 
 export default function SenalizacionPage() {
+  const t = useTranslations("gobierno")
   const { data: carteles, isLoading } = useCarteles()
   const createCartel = useCreateCartel()
   const deleteCartel = useDeleteCartel()
@@ -57,22 +59,22 @@ export default function SenalizacionPage() {
     try {
       await navigator.clipboard.writeText(link)
       setCopiedKey(key)
-      toast.success("Enlace copiado")
+      toast.success(t("common.linkCopied"))
       setTimeout(() => setCopiedKey((k) => (k === key ? null : k)), 1800)
     } catch {
-      toast.error("No se pudo copiar el enlace")
+      toast.error(t("common.linkCopyError"))
     }
   }
 
   return (
     <>
       <PageHead
-        kicker="Administración · Urbanismo"
+        kicker={t("senalizacion.kicker")}
         dep="urbanismo"
-        title="Señalización"
-        sub="Genera carteles direccionales para las vías de Teras: autopistas, nacionales, comarcales y caminos rurales. Antes OGT Explorer / Carteles."
+        title={t("senalizacion.title")}
+        sub={t("senalizacion.sub")}
       />
-      <ConsolaHero title="Generador de carteles" code="senalizacion" icon="hammer" dep="urbanismo" />
+      <ConsolaHero title={t("senalizacion.heroTitle")} code="senalizacion" icon="hammer" dep="urbanismo" />
 
       <div className="grid gap-4 lg:grid-cols-2">
         <Card className="overflow-hidden">
@@ -82,34 +84,34 @@ export default function SenalizacionPage() {
             right={
               dests.length < 4 ? (
                 <Button size="sm" tone="ghost" icon="plus" onClick={() => setDests((d) => [...d, { dest: "", dist: "", dir: "recto" }])}>
-                  Destino
+                  {t("senalizacion.destino")}
                 </Button>
               ) : null
             }
           >
-            Configuración
+            {t("senalizacion.configuracion")}
           </Bar>
           <div className="p-4">
             <div className="mb-1.5 font-gt-mono text-[9px] font-bold uppercase tracking-[.12em] text-gt-ink-400">
-              Tipo de vía
+              {t("senalizacion.tipoVia")}
             </div>
             <div className="mb-4 flex w-fit gap-1 rounded-gt border border-gt-line-strong bg-gt-paper-2 p-[3px]">
               {ROAD_TYPES.map((x) => (
                 <Button key={x.value} size="sm" tone={roadType === x.value ? "primary" : "plain"} onClick={() => setRoadType(x.value)}>
-                  {x.label}
+                  {t(x.labelKey)}
                 </Button>
               ))}
             </div>
 
             <div className="mb-1.5 font-gt-mono text-[9px] font-bold uppercase tracking-[.12em] text-gt-ink-400">
-              Nombre del cartel
+              {t("senalizacion.nombreCartel")}
             </div>
             <div className="mb-3.5">
-              <Field value={name} onChange={setName} placeholder="Ej. A-2 hacia el norte" />
+              <Field value={name} onChange={setName} placeholder={t("senalizacion.nombreCartelPlaceholder")} />
             </div>
 
             <div className="mb-1.5 font-gt-mono text-[9px] font-bold uppercase tracking-[.12em] text-gt-ink-400">
-              Nombre de la vía
+              {t("senalizacion.nombreVia")}
             </div>
             <div className="mb-4">
               <Field value={highway} onChange={setHighway} placeholder={rt.example} />
@@ -123,16 +125,16 @@ export default function SenalizacionPage() {
                     <button
                       type="button"
                       onClick={() => setDests((ds) => ds.filter((_, j) => j !== i))}
-                      aria-label="Quitar destino"
+                      aria-label={t("senalizacion.quitarDestino")}
                       className="text-gt-danger"
                     >
                       <Icon name="minus" size={15} />
                     </button>
                   </div>
                   <div className="grid grid-cols-[2fr_1fr_1.1fr] gap-[7px]">
-                    <Field value={d.dest} onChange={(v) => setDest(i, { dest: v })} placeholder="Nombre" />
+                    <Field value={d.dest} onChange={(v) => setDest(i, { dest: v })} placeholder={t("senalizacion.destNombre")} />
                     <Field type="number" mono value={d.dist} onChange={(v) => setDest(i, { dist: v })} placeholder="bq" />
-                    <Select value={d.dir} onChange={(v) => setDest(i, { dir: v })} options={DIR_OPTIONS} />
+                    <Select value={d.dir} onChange={(v) => setDest(i, { dir: v })} options={DIR_OPTIONS.map((o) => ({ value: o.value, label: t(o.labelKey) }))} />
                   </div>
                 </div>
               ))}
@@ -140,12 +142,12 @@ export default function SenalizacionPage() {
 
             <div className="mt-4 border-t border-gt-line pt-3.5">
               <Button icon="check" className="w-full" disabled={!canSave} onClick={save}>
-                {createCartel.isPending ? "Guardando…" : "Guardar cartel"}
+                {createCartel.isPending ? t("common.saving") : t("senalizacion.guardarCartel")}
               </Button>
               <div className="mt-2.5 flex gap-1.5">
                 <Field value={url} onChange={() => {}} mono className="text-[11px]" />
                 <Button tone="ghost" icon={copiedKey === "draft" ? "check" : "fileText"} onClick={() => copy("draft", url)}>
-                  {copiedKey === "draft" ? "Copiado" : "Copiar"}
+                  {copiedKey === "draft" ? t("common.copied") : t("common.copy")}
                 </Button>
               </div>
             </div>
@@ -153,8 +155,8 @@ export default function SenalizacionPage() {
         </Card>
 
         <Card>
-          <Bar icon="eye" dep="urbanismo" right={<span className="font-gt-mono text-[9px] uppercase tracking-[.12em] text-gt-ink-400">{rt.label}</span>}>
-            Vista previa
+          <Bar icon="eye" dep="urbanismo" right={<span className="font-gt-mono text-[9px] uppercase tracking-[.12em] text-gt-ink-400">{t(rt.labelKey)}</span>}>
+            {t("senalizacion.vistaPrevia")}
           </Bar>
           <div
             className="grid place-items-center p-6"
@@ -170,7 +172,7 @@ export default function SenalizacionPage() {
 
       <div className="mt-6">
         <div className="mb-3 font-gt-mono text-[10.5px] font-bold uppercase tracking-[.14em] text-gt-ink-400">
-          Carteles guardados
+          {t("senalizacion.cartelesGuardados")}
         </div>
         {isLoading ? (
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -190,7 +192,7 @@ export default function SenalizacionPage() {
                     <button
                       type="button"
                       onClick={() => deleteCartel.mutate(c.id)}
-                      aria-label={`Eliminar cartel ${c.name}`}
+                      aria-label={t("senalizacion.eliminarCartel", { name: c.name })}
                       disabled={deleteCartel.isPending}
                       className="flex-none text-gt-danger disabled:opacity-50"
                     >
@@ -202,7 +204,7 @@ export default function SenalizacionPage() {
                   </div>
                   <div className="border-t border-gt-line p-2.5">
                     <Button tone="ghost" size="sm" className="w-full" icon={copiedKey === key ? "check" : "fileText"} onClick={() => copy(key, link)}>
-                      {copiedKey === key ? "Copiado" : "Copiar enlace"}
+                      {copiedKey === key ? t("common.copied") : t("common.copyLink")}
                     </Button>
                   </div>
                 </Card>
@@ -210,7 +212,7 @@ export default function SenalizacionPage() {
             })}
           </div>
         ) : (
-          <Empty icon="signal" title="Sin carteles guardados" sub="Los carteles que guardes aparecerán aquí." />
+          <Empty icon="signal" title={t("senalizacion.emptyCarteles")} sub={t("senalizacion.emptyCartelesSub")} />
         )}
       </div>
     </>

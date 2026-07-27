@@ -1,0 +1,39 @@
+// GENERATED FILE — DO NOT EDIT.
+// Source: apps/api/src/common/errors/catalog.json
+// Regenerate: pnpm generate:error-codes
+
+/**
+ * Stable API error codes. The API attaches one to every user-facing exception
+ * and keeps its Spanish `userMessage` as the fallback; the web maps
+ * code -> translated string via `useApiError()`.
+ */
+export const ApiErrorCode = {
+  ACTOR_NOT_SELF: 'ACTOR_NOT_SELF',
+  AUTH_INVALID_CREDENTIALS: 'AUTH_INVALID_CREDENTIALS',
+  BANK_ACCOUNT_NOT_OWNED: 'BANK_ACCOUNT_NOT_OWNED',
+  BANK_AMOUNT_NOT_POSITIVE: 'BANK_AMOUNT_NOT_POSITIVE',
+  BANK_BALANCE_ADJUST_FAILED: 'BANK_BALANCE_ADJUST_FAILED',
+  BANK_INSUFFICIENT_FUNDS: 'BANK_INSUFFICIENT_FUNDS',
+  BANK_INSUFFICIENT_FUNDS_PURCHASE: 'BANK_INSUFFICIENT_FUNDS_PURCHASE',
+  BANK_NEGATIVE_BALANCE: 'BANK_NEGATIVE_BALANCE',
+  BANK_SAME_ACCOUNT: 'BANK_SAME_ACCOUNT',
+  BANK_SOURCE_ACCOUNT_NOT_FOUND: 'BANK_SOURCE_ACCOUNT_NOT_FOUND',
+  BANK_TARGET_ACCOUNT_NOT_FOUND: 'BANK_TARGET_ACCOUNT_NOT_FOUND',
+  BANK_TRANSFER_FAILED: 'BANK_TRANSFER_FAILED',
+  CHAT_CALL_NO_PARTICIPANTS: 'CHAT_CALL_NO_PARTICIPANTS',
+  CHAT_GROUP_NO_ACCESS: 'CHAT_GROUP_NO_ACCESS',
+  CHAT_MESSAGE_NOT_DELETABLE: 'CHAT_MESSAGE_NOT_DELETABLE',
+  CHAT_MESSAGE_NOT_EDITABLE: 'CHAT_MESSAGE_NOT_EDITABLE',
+  CHAT_NOT_FOUND: 'CHAT_NOT_FOUND',
+  CHAT_NOT_MEMBER: 'CHAT_NOT_MEMBER',
+  TOURNAMENT_CHECKIN_CLOSED: 'TOURNAMENT_CHECKIN_CLOSED',
+} as const;
+
+export type ApiErrorCode = (typeof ApiErrorCode)[keyof typeof ApiErrorCode];
+
+export const API_ERROR_CODES: readonly ApiErrorCode[] =
+  Object.values(ApiErrorCode);
+
+export function isApiErrorCode(value: unknown): value is ApiErrorCode {
+  return typeof value === 'string' && value in ApiErrorCode;
+}

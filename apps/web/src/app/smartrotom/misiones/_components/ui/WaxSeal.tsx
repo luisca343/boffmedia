@@ -1,8 +1,9 @@
 "use client"
 
 import { useId } from "react"
+import { useTranslations } from "next-intl"
 import type { SealStatus } from "../../_types"
-import { SEAL_FILL, STATUS_GLYPH, STATUS_LABEL } from "../../_utils/status"
+import { SEAL_FILL, STATUS_GLYPH, STATUS_LABEL_KEY } from "../../_utils/status"
 
 /** A ridged disc of wax — 32 cusps, struck once at module load. */
 function ridgedPath(cx: number, cy: number, outer: number, inner: number, points = 32) {
@@ -33,6 +34,7 @@ interface WaxSealProps {
  * `bg-ms-seal-${status}` class the JIT would silently drop).
  */
 export function WaxSeal({ glyph, color, size = 60, tilt = -8, status, className }: WaxSealProps) {
+  const t = useTranslations("misiones")
   const id = useId().replace(/:/g, "")
   const fill = color ?? (status ? SEAL_FILL[status] : "rgb(var(--ms-seal-available))")
   const letter = glyph ?? (status ? STATUS_GLYPH[status] : "?")
@@ -44,7 +46,7 @@ export function WaxSeal({ glyph, color, size = 60, tilt = -8, status, className 
       height={size}
       className={className}
       role={status ? "img" : "presentation"}
-      aria-label={status ? STATUS_LABEL[status] : undefined}
+      aria-label={status ? t(STATUS_LABEL_KEY[status]) : undefined}
       aria-hidden={status ? undefined : true}
       style={{ transform: `rotate(${tilt}deg)`, filter: "drop-shadow(2px 4px 4px rgba(0,0,0,.5))" }}
     >

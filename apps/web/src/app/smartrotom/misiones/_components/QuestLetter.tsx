@@ -6,7 +6,7 @@ import { useBoard } from "../_hooks/useBoard"
 import type { NPC, QuestData } from "../_types"
 import { objectiveSprite } from "../_utils/items"
 import { dialogForQuest, npcForQuest } from "../_utils/quests"
-import { normalizeStatus, SEAL_FILL, STATUS_LABEL } from "../_utils/status"
+import { normalizeStatus, SEAL_FILL, STATUS_LABEL_KEY } from "../_utils/status"
 import { QuestChain } from "./QuestChain"
 import { RewardCard } from "./RewardCard"
 import {
@@ -32,6 +32,7 @@ import {
  */
 export function QuestLetter({ quest, onOpenNpc }: { quest: QuestData; onOpenNpc: (npc: NPC) => void }) {
   const t = useTranslations("misiones")
+  const tLetter = useTranslations("misiones.questLetter")
   const { quests, npcs, dialogs, open, track, isTracked } = useBoard()
 
   const status = normalizeStatus(quest)
@@ -44,11 +45,11 @@ export function QuestLetter({ quest, onOpenNpc }: { quest: QuestData; onOpenNpc:
   return (
     <div className="ms-desk relative flex h-full flex-col overflow-hidden">
       <Button variant="dark" sm onClick={() => open(null)} className="absolute right-3.5 top-3.5 z-[12]">
-        <Icon.X size={13} /> Cerrar
+        <Icon.X size={13} /> {tLetter("close")}
       </Button>
 
       <div className="absolute left-[18px] top-3.5 z-[11] border border-[#3a2410] bg-gradient-to-b from-[#c2a04c] to-[#6b440f] px-3 py-1 font-ms-uppercase text-[10px] uppercase tracking-[.2em] text-[#1e120a] shadow-[0_2px_3px_rgba(0,0,0,.5)]">
-        ✦ Encargo ✦
+        {tLetter("badge")}
       </div>
 
       {/* The desk itself: an inkwell, a quill laid down, a blot nobody cleaned. */}
@@ -102,7 +103,7 @@ export function QuestLetter({ quest, onOpenNpc }: { quest: QuestData; onOpenNpc:
 
           <div className="-mt-8 mb-3.5 text-center sm:ml-20">
             <Ribbon color={SEAL_FILL[status]} width={280} height={50}>
-              {STATUS_LABEL[status]}
+              {t(STATUS_LABEL_KEY[status])}
             </Ribbon>
           </div>
 
@@ -115,11 +116,11 @@ export function QuestLetter({ quest, onOpenNpc }: { quest: QuestData; onOpenNpc:
           <div className="mb-[18px] flex flex-wrap items-center justify-center gap-4 text-[13px] italic text-ms-ink-3">
             {npc && (
               <span className="inline-flex items-center gap-1">
-                <Icon.Quill size={11} /> de{" "}
+                <Icon.Quill size={11} /> {tLetter("from")}{" "}
                 <button
                   type="button"
                   onClick={() => onOpenNpc(npc)}
-                  title={`Ver expediente de ${npc.name}`}
+                  title={tLetter("viewDossier", { name: npc.name })}
                   className="border-b border-dashed border-ms-ink-1/40 font-semibold not-italic text-ms-ink-2 hover:text-ms-ink-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ms-gold-2"
                 >
                   {npc.name}
@@ -131,8 +132,8 @@ export function QuestLetter({ quest, onOpenNpc }: { quest: QuestData; onOpenNpc:
                 <Icon.Pin size={11} /> {quest.category}
               </span>
             )}
-            {level > 0 && <span className="text-ms-gold-3">Nv. {level}</span>}
-            {quest.repeatable && <span className="text-ms-gold-3">· Repetible</span>}
+            {level > 0 && <span className="text-ms-gold-3">{tLetter("level", { level })}</span>}
+            {quest.repeatable && <span className="text-ms-gold-3">{tLetter("repeatable")}</span>}
           </div>
 
           <div className="animate-ms-fade-up motion-reduce:animate-none [animation-delay:.1s]">
@@ -144,7 +145,7 @@ export function QuestLetter({ quest, onOpenNpc }: { quest: QuestData; onOpenNpc:
           {objectives.length > 0 && (
             <div className="mt-[26px] animate-ms-fade-up motion-reduce:animate-none [animation-delay:.18s]">
               <div className="mb-3 text-center">
-                <span className="font-ms-display text-lg tracking-[.08em] text-ms-gold-3">⚜ Objetivos ⚜</span>
+                <span className="font-ms-display text-lg tracking-[.08em] text-ms-gold-3">{tLetter("objectives")}</span>
               </div>
               <ol className="m-0 flex list-none flex-col gap-2.5 p-0">
                 {objectives.map((objective, index) => {
@@ -189,7 +190,7 @@ export function QuestLetter({ quest, onOpenNpc }: { quest: QuestData; onOpenNpc:
           {rewards.length > 0 && (
             <div className="mt-[26px] animate-ms-fade-up motion-reduce:animate-none [animation-delay:.26s]">
               <div className="mb-3 text-center">
-                <span className="font-ms-display text-lg tracking-[.08em] text-ms-gold-3">⚜ Recompensas ⚜</span>
+                <span className="font-ms-display text-lg tracking-[.08em] text-ms-gold-3">{tLetter("rewards")}</span>
               </div>
               <div className="grid gap-2.5 [grid-template-columns:repeat(auto-fit,minmax(170px,1fr))]">
                 {rewards.map((reward) => (
@@ -215,7 +216,7 @@ export function QuestLetter({ quest, onOpenNpc }: { quest: QuestData; onOpenNpc:
                   <NpcPortrait skin={npc?.skin} size={48} />
                 </div>
                 <div className="mb-1.5 font-ms-uppercase text-[11px] uppercase tracking-[.14em] text-ms-ink-3">
-                  — palabras de {npc?.name || t("letter.unknownNpc")}
+                  {tLetter("wordsOf", { name: npc?.name || t("letter.unknownNpc") })}
                   {dialog.name && ` · ${dialog.name}`}
                 </div>
                 <p className="m-0 border-l-2 border-ms-ink-3 pl-3 text-[15px] italic leading-relaxed text-ms-ink-1">
@@ -234,8 +235,8 @@ export function QuestLetter({ quest, onOpenNpc }: { quest: QuestData; onOpenNpc:
 
           <div className="mt-[30px] flex animate-ms-fade-up items-center justify-end gap-3.5 motion-reduce:animate-none [animation-delay:.42s]">
             <div className="text-right">
-              <div className="mb-1 text-[13px] italic text-ms-ink-3">Firmado con tinta y juramento,</div>
-              <div className="font-ms-display text-[22px] text-ms-ink-1">{npc?.name || "Anónimo"}</div>
+              <div className="mb-1 text-[13px] italic text-ms-ink-3">{tLetter("signedOff")}</div>
+              <div className="font-ms-display text-[22px] text-ms-ink-1">{npc?.name || tLetter("anonymous")}</div>
             </div>
             <NpcPortrait skin={npc?.skin} size={44} />
           </div>
@@ -245,11 +246,11 @@ export function QuestLetter({ quest, onOpenNpc }: { quest: QuestData; onOpenNpc:
       {status === "ACTIVE" && (
         <div className="absolute bottom-0 left-0 right-0 z-10 flex justify-center gap-2.5 bg-gradient-to-b from-transparent to-black/45 p-3">
           <Button variant={isTracked(quest) ? "default" : "primary"} onClick={() => track(quest)}>
-            <Icon.Pin size={13} /> {isTracked(quest) ? "Rastreando" : "Rastrear misión"}
+            <Icon.Pin size={13} /> {isTracked(quest) ? tLetter("tracking") : tLetter("track")}
           </Button>
           <Link href="/smartrotom/misiones/mapa">
             <Button variant="dark">
-              <Icon.Map size={13} /> Ir al mapa
+              <Icon.Map size={13} /> {tLetter("goToMap")}
             </Button>
           </Link>
         </div>

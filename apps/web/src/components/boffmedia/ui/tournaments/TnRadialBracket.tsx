@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import type { TnCompetitor, TnMatch } from "./tournaments-util"
 
@@ -133,8 +134,18 @@ function radialLayout(rounds: RadialRound[]) {
   return { cx, cy, maxR, seatR, flagR, seats, nodes, nodeR, paths, semi, fGap, finalR, finals, finalSeats, S }
 }
 
-const radialRoundName = (players: number) =>
-  players <= 2 ? "Final" : players === 4 ? "Semifinales" : players === 8 ? "Cuartos" : players === 16 ? "Octavos" : "Ronda de " + players
+type BracketT = (key: string, values?: Record<string, string | number>) => string
+
+const radialRoundName = (t: BracketT, players: number) =>
+  players <= 2
+    ? t("roundFinal")
+    : players === 4
+      ? t("roundSemis")
+      : players === 8
+        ? t("roundQuarters")
+        : players === 16
+          ? t("round16")
+          : t("roundOf", { players })
 
 function RadialFace({ c, r }: { c: TnCompetitor; r: number }) {
   if (c.kind === "team")
@@ -165,6 +176,7 @@ function ring(opts: { base: number; live: boolean; path: boolean; win: boolean; 
 }
 
 export function TnRadialBracket({ rounds, championId, onOpen, pinned }: { rounds: RadialRound[]; championId?: string | null; onOpen?: (id: string) => void; pinned?: string | null }) {
+  const t = useTranslations("torneos.bracket") as unknown as BracketT
   const L = React.useMemo(() => (rounds && rounds.length ? radialLayout(rounds) : null), [rounds])
   const [hovered, setHovered] = React.useState<string | null>(null)
   if (!L) return null
@@ -188,7 +200,7 @@ export function TnRadialBracket({ rounds, championId, onOpen, pinned }: { rounds
 
   return (
     <div className={cn("relative grid justify-items-center border border-solid border-line bg-base-2 p-[clamp(16px,3.4%,34px)]")}>
-      <svg viewBox="0 0 1000 1000" role="img" aria-label="Cuadro radial de eliminación" className="block h-auto w-full max-w-[min(820px,82vh)]">
+      <svg viewBox="0 0 1000 1000" role="img" aria-label={t("radialAriaLabel")} className="block h-auto w-full max-w-[min(820px,82vh)]">
         {/* connectors */}
         <g fill="none">
           {L.paths.map((p, i) => {
@@ -212,7 +224,7 @@ export function TnRadialBracket({ rounds, championId, onOpen, pinned }: { rounds
                 const isPath = !!(hl && w && w.id === hl)
                 const isWin = !!(championId && w && w.id === championId)
                 const st = ring({ base: 1.6, live: !!w, path: isPath, win: isWin, champ: !!(championId && w && w.id === championId) })
-                const tip = n.match && n.match.top && n.match.bot ? `${radialRoundName(players)} · ${n.match.top.name}${n.match.g1 != null ? ` ${n.match.g1}–${n.match.g2} ` : " vs "}${n.match.bot.name}` : `${radialRoundName(players)} · por definir`
+                const tip = n.match && n.match.top && n.match.bot ? `${radialRoundName(t, players)} · ${n.match.top.name}${n.match.g1 != null ? ` ${n.match.g1}–${n.match.g2} ` : " vs "}${n.match.bot.name}` : `${radialRoundName(t, players)} · ${t("tbdShort")}`
                 return (
                   <g key={m} transform={`translate(${n.x} ${n.y})`} style={{ opacity: dim(isPath) }} {...(w ? seatHandlers(w) : {})}>
                     <title>{tip}</title>
@@ -233,7 +245,7 @@ export function TnRadialBracket({ rounds, championId, onOpen, pinned }: { rounds
             const st = ring({ base: 2.4, live: !!c, path: isPath, win: isChamp, champ: isChamp })
             return (
               <g key={i} transform={`translate(${f.x} ${f.y})`} style={{ opacity: dim(isPath) }} {...seatHandlers(c)}>
-                <title>{c ? (isChamp ? "Campeón · " : "Finalista · ") + c.name : "Final · por definir"}</title>
+                <title>{c ? (isChamp ? t("champion") + " · " : t("finalist") + " · ") + c.name : t("finalTbd")}</title>
                 <circle r={L.finalR} fill={st.fill} stroke={st.stroke} strokeWidth={st.strokeWidth} strokeDasharray={st.dash} />
                 {c ? <RadialFace c={c} r={L.finalR} /> : <circle r={L.finalR * 0.24} fill="var(--muted)" />}
               </g>
@@ -250,7 +262,7 @@ export function TnRadialBracket({ rounds, championId, onOpen, pinned }: { rounds
             const st = ring({ base: 2, live: !!c, path: isPath, win: false, champ: isChamp, pin: isPin })
             return (
               <g key={i} transform={`translate(${s.x} ${s.y})`} style={{ opacity: dim(isPath) }} {...seatHandlers(c)}>
-                {c && <title>{c.name + (s.seed != null ? " · Semilla " + s.seed : "")}</title>}
+                {c && <title>{c.name + (s.seed != null ? " · " + t("seed", { seed: s.seed }) : "")}</title>}
                 <circle r={fr} fill={st.fill} stroke={st.stroke} strokeWidth={st.strokeWidth} strokeDasharray={st.dash} />
                 {c ? (
                   <RadialFace c={c} r={fr} />
@@ -271,17 +283,17 @@ export function TnRadialBracket({ rounds, championId, onOpen, pinned }: { rounds
         <div className="mt-4 inline-flex items-center gap-2.5 border border-solid border-warn bg-panel px-[14px] py-2 shadow-[var(--shadow)]">
           <span className="inline-flex text-[22px] leading-none">{champ.c.kind === "team" ? "🏆" : champ.c.flag}</span>
           <span className="grid gap-px">
-            <i className="font-mono text-[8.5px]/none font-bold uppercase not-italic tracking-[0.16em] text-warn">Campeón</i>
+            <i className="font-mono text-[8.5px]/none font-bold uppercase not-italic tracking-[0.16em] text-warn">{t("champion")}</i>
             <b className="font-display text-[15px]/none font-bold uppercase tracking-[0.02em]">{champ.c.name}</b>
           </span>
         </div>
       ) : (
         <div className="mt-4 inline-flex items-baseline gap-3 border border-solid border-line-2 bg-panel px-[14px] py-2 shadow-[var(--shadow)]">
           <span className="grid gap-px">
-            <i className="font-mono text-[8.5px]/none font-bold uppercase not-italic tracking-[0.16em] text-accent-bright">En juego</i>
-            <b className="font-display text-[15px]/none font-bold uppercase tracking-[0.02em]">{radialRoundName(liveRound.matches.length * 2)}</b>
+            <i className="font-mono text-[8.5px]/none font-bold uppercase not-italic tracking-[0.16em] text-accent-bright">{t("live")}</i>
+            <b className="font-display text-[15px]/none font-bold uppercase tracking-[0.02em]">{radialRoundName(t, liveRound.matches.length * 2)}</b>
           </span>
-          <em className="font-mono text-[11px]/none not-italic text-txt-dim">{played}/{rounds.length} rondas</em>
+          <em className="font-mono text-[11px]/none not-italic text-txt-dim">{t("roundsPlayed", { played, total: rounds.length })}</em>
         </div>
       )}
     </div>

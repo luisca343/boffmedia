@@ -4,6 +4,7 @@ import { useTranslations } from "next-intl"
 import { Avatar, Badge, Button, Card, Icon } from "../ui"
 import { getAnuncioKindMeta } from "./anuncioMeta"
 import { fmtDateTime, townName } from "../../_utils/format"
+import { useFormat } from "@/lib/useFormat"
 import { useGobiernoUi } from "../../_stores/useGobiernoUi"
 import { useOfficer } from "../../_hooks/useOfficer"
 import type { Anuncio } from "../../_types"
@@ -20,6 +21,7 @@ export function AnuncioFeatured({
   deleting?: boolean
 }) {
   const t = useTranslations("gobierno")
+  const { intlLocale } = useFormat()
   const openDossier = useGobiernoUi((s) => s.openDossier)
   const officer = useOfficer()
   const kindMeta = getAnuncioKindMeta(t)
@@ -48,7 +50,7 @@ export function AnuncioFeatured({
             </Badge>
             <span className="ml-auto flex items-center gap-1 font-gt-mono text-[10.5px] text-gt-ink-400">
               <Icon name="calendar" size={11} />
-              {fmtDateTime(anuncio.publishedAt)}
+              {fmtDateTime(anuncio.publishedAt, intlLocale)}
             </span>
           </div>
           <h2 className="mb-2 font-gt-display text-2xl leading-tight text-gt-ink-900">{anuncio.title}</h2>

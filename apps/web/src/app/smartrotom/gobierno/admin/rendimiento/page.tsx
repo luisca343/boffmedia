@@ -1,6 +1,8 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import { useTranslations } from "next-intl"
+import { useFormat } from "@/lib/useFormat"
 import { useGetPerformance } from "@/hooks/_main/useGetPerformance"
 import { Bar, Card, Icon, type IconName, PageHead, Skeleton } from "../../_components/ui"
 import { ConsolaHero } from "../../_components/admin/ConsolaHero"
@@ -9,10 +11,10 @@ import { TONES, type Tone } from "../../_utils/tones"
 const POLL_MS = 4000
 const HISTORY_MAX = 24
 
-function tpsBand(tps: number): { tone: Tone; label: string } {
-  if (tps < 10) return { tone: "danger", label: "Estado crítico" }
-  if (tps < 18) return { tone: "warn", label: "Estado regular" }
-  return { tone: "ok", label: "Estado óptimo" }
+function tpsBand(tps: number): { tone: Tone; labelKey: string } {
+  if (tps < 10) return { tone: "danger", labelKey: "rendimiento.estadoCritico" }
+  if (tps < 18) return { tone: "warn", labelKey: "rendimiento.estadoRegular" }
+  return { tone: "ok", labelKey: "rendimiento.estadoOptimo" }
 }
 
 function StatCard({
@@ -54,7 +56,9 @@ function StatCard({
 }
 
 export default function RendimientoPage() {
+  const t = useTranslations("gobierno")
   const { performance, refetch } = useGetPerformance()
+  const { time } = useFormat()
   const [hist, setHist] = useState<number[]>([])
 
   useEffect(() => {
@@ -74,10 +78,10 @@ export default function RendimientoPage() {
     return (
       <>
         <PageHead
-          kicker="Administración · Infraestructura"
+          kicker={t("rendimiento.kicker")}
           dep="hacienda"
-          title="Rendimiento del servidor"
-          sub="Monitor en tiempo real de los recursos del servidor de Teras."
+          title={t("rendimiento.title")}
+          sub={t("rendimiento.sub")}
         />
         <Skeleton className="mb-4 h-[62px]" />
         <div className="grid grid-cols-[repeat(auto-fit,minmax(190px,1fr))] gap-4">
@@ -97,40 +101,40 @@ export default function RendimientoPage() {
   return (
     <>
       <PageHead
-        kicker="Administración · Infraestructura"
+        kicker={t("rendimiento.kicker")}
         dep="hacienda"
-        title="Rendimiento del servidor"
-        sub={`Monitor en tiempo real de los recursos del servidor de Teras. Actualiza cada ${POLL_MS / 1000} segundos.`}
+        title={t("rendimiento.title")}
+        sub={t("rendimiento.subWithInterval", { seconds: POLL_MS / 1000 })}
       />
       <ConsolaHero
-        title="Monitor de rendimiento"
+        title={t("rendimiento.heroTitle")}
         code="rendimiento"
         icon="server"
         dep="hacienda"
-        status={band.label.toUpperCase()}
+        status={t(band.labelKey).toUpperCase()}
         statusTone={band.tone}
       />
 
       <div className="mb-4 grid grid-cols-[repeat(auto-fit,minmax(190px,1fr))] gap-4">
         <StatCard
-          label="TPS"
-          sub="Ticks por segundo"
+          label={t("rendimiento.tps")}
+          sub={t("rendimiento.tpsSub")}
           icon="zap"
           value={tpsSafe.toFixed(2)}
           tone={band.tone}
           pct={(tpsSafe / 20) * 100}
         />
         <StatCard
-          label="Memoria"
-          sub="Uso de RAM"
+          label={t("rendimiento.memoria")}
+          sub={t("rendimiento.memoriaSub")}
           icon="signal"
           value={`${performance.memory.toFixed(1)}%`}
           tone={performance.memory > 85 ? "danger" : "seguridad"}
           pct={performance.memory}
         />
         <StatCard
-          label="Jugadores"
-          sub="Conectados ahora"
+          label={t("rendimiento.jugadores")}
+          sub={t("rendimiento.jugadoresSub")}
           icon="users"
           value={String(performance.players)}
           tone="poblacion"
@@ -141,7 +145,7 @@ export default function RendimientoPage() {
       <div className="grid gap-4 lg:grid-cols-[1.6fr_1fr]">
         <Card className="overflow-hidden">
           <Bar icon="signal" dep="hacienda">
-            Historial de TPS · lecturas en vivo
+            {t("rendimiento.historialTps")}
           </Bar>
           <div className="p-4">
             {hist.length ? (
@@ -159,29 +163,29 @@ export default function RendimientoPage() {
               </div>
             ) : (
               <div className="grid h-[130px] place-items-center font-gt-mono text-xs text-gt-ink-400">
-                Esperando la primera lectura…
+                {t("rendimiento.esperandoLectura")}
               </div>
             )}
             <div className="mt-2 flex justify-between font-gt-mono text-[9.5px] tabular-nums text-gt-ink-400">
-              <span>máx 20 TPS</span>
-              <span>ahora {tpsSafe.toFixed(1)}</span>
+              <span>{t("rendimiento.maxTps")}</span>
+              <span>{t("rendimiento.ahora", { tps: tpsSafe.toFixed(1) })}</span>
             </div>
           </div>
         </Card>
 
         <Card className="overflow-hidden">
           <Bar icon="server" dep="hacienda">
-            Estado
+            {t("rendimiento.estado")}
           </Bar>
           <div className="p-[18px]">
             <div className="mb-3.5 flex items-center gap-2.5">
               <span className={`h-3 w-3 rounded-full ${TONES[band.tone].dot}`} />
-              <span className={`font-gt-display text-lg font-bold ${TONES[band.tone].text}`}>{band.label}</span>
+              <span className={`font-gt-display text-lg font-bold ${TONES[band.tone].text}`}>{t(band.labelKey)}</span>
             </div>
             {[
-              ["Tiempo activo", String(performance.uptime)],
-              ["Intervalo de sondeo", `${POLL_MS / 1000} s`],
-              ["Actualizado", new Date().toLocaleTimeString("es-ES")],
+              [t("rendimiento.tiempoActivo"), String(performance.uptime)],
+              [t("rendimiento.intervaloSondeo"), `${POLL_MS / 1000} s`],
+              [t("rendimiento.actualizado"), time(new Date())],
             ].map(([k, v]) => (
               <div key={k} className="flex items-center justify-between border-b border-gt-line-soft py-2 last:border-b-0">
                 <span className="font-gt-mono text-[11.5px] text-gt-ink-500">{k}</span>

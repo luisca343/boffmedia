@@ -5,12 +5,14 @@ import { useTranslations } from "next-intl"
 import { Button, Empty, SearchInput, Seg, Spinner } from "@/components/boffmedia/primitives"
 import { AchievementItem, type AchievementLike } from "@/components/boffmedia/ui/events"
 import { useGetAchievements } from "@/hooks/events/useGetAchievements"
+import { useFormat } from "@/lib/useFormat"
 
 const FILTERS = ["all", "achievement", "medal"] as const
 type Filter = (typeof FILTERS)[number]
 
 export function LogrosView() {
   const t = useTranslations("logros")
+  const { number: formatNumber } = useFormat()
   const { achievements, error, isLoading, refetch } = useGetAchievements()
   const [q, setQ] = React.useState("")
   const [filter, setFilter] = React.useState<Filter>("all")
@@ -39,7 +41,7 @@ export function LogrosView() {
         <p className="mt-3 max-w-[64ch] font-body text-[16px]/[1.55] text-txt-muted">{t("lead")}</p>
         {totalPoints > 0 && (
           <p className="mt-3 font-mono text-[12px] font-medium uppercase tracking-[0.1em] text-accent">
-            {t("totalPoints", { points: totalPoints.toLocaleString("es-ES") })}
+            {t("totalPoints", { points: formatNumber(totalPoints) })}
           </p>
         )}
       </div>

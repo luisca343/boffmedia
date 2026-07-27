@@ -1,3 +1,4 @@
+import { useTranslations } from "next-intl";
 import { TownData } from "../../types";
 import { SectionHeader } from "../shared/section/SectionHeader";
 import { AmenityCard } from "./AmenityCard";
@@ -9,6 +10,7 @@ interface AmenitiesSectionProps {
 }
 
 export function AmenitiesSection({ townData, townName }: AmenitiesSectionProps) {
+  const t = useTranslations("wingull.amenities");
   const { colorClaro, colorMedio, colorOscuro, comodidades, nombre } = townData.textos;
 
   if (!comodidades?.length) return null;
@@ -32,9 +34,9 @@ export function AmenitiesSection({ townData, townName }: AmenitiesSectionProps) 
 
       <div className="max-w-[80%] mx-auto">
         <SectionHeader
-          title={<span style={{color: colorClaro}}>Comodidades</span>}
-          subtitle={<span style={{color: colorMedio}}>del Pueblo</span>}
-          description={<span>Descubre todas las facilidades que hacen de {nombre} el lugar perfecto para establecer tu base</span>}
+          title={<span style={{color: colorClaro}}>{t("titlePrimary")}</span>}
+          subtitle={<span style={{color: colorMedio}}>{t("titleAccent")}</span>}
+          description={<span>{t("description", { town: nombre })}</span>}
           townName={nombre}
           colorClaro={colorClaro}
           colorMedio={colorMedio}

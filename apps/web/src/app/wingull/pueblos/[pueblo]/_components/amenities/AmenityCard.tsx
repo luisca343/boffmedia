@@ -2,6 +2,7 @@ import { getIconComponent } from "../../utils";
 import { Amenity } from "../../types";
 import { ImageShowcase } from "../shared/image/ImageShowcase";
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { BasicCard } from "../shared/cards/BasicCard";
 import { OrnamentalDots } from "../shared/decorative/OrnamentalDots";
 
@@ -13,6 +14,7 @@ interface AmenityCardProps {
 }
 
 export function AmenityCard({ amenity, colorClaro, colorMedio, colorOscuro }: AmenityCardProps) {
+  const t = useTranslations("wingull.amenities");
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const IconComponent = getIconComponent(amenity.icon);
   
@@ -90,7 +92,7 @@ export function AmenityCard({ amenity, colorClaro, colorMedio, colorOscuro }: Am
           {/* Features list with clean design */}
           <div className="space-y-3">
             <h4 className="text-sm font-semibold uppercase tracking-wider" style={{color: colorMedio}}>
-              Características
+              {t("features")}
             </h4>
             <div className="space-y-2">
               {amenity.caracteristicas.map((feature, index) => (

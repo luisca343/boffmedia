@@ -1,16 +1,18 @@
 "use client";
 
+import { useTranslations } from "next-intl";
+
 import type { FtArticle } from "../../_utils/article";
 import { Button, CardFlat, Chip, FurretMascot, Input, Meta } from "../../_components/ui";
 import { NewsRow } from "./NewsRow";
 
 export type StatusFilter = "all" | "featured" | "published" | "draft";
 
-const FILTERS: { id: StatusFilter; label: string }[] = [
-  { id: "all", label: "Todo" },
-  { id: "featured", label: "Destacada" },
-  { id: "published", label: "Publicadas" },
-  { id: "draft", label: "Borradores" },
+const FILTERS: { id: StatusFilter; labelKey: string }[] = [
+  { id: "all", labelKey: "filterAll" },
+  { id: "featured", labelKey: "filterFeatured" },
+  { id: "published", labelKey: "filterPublished" },
+  { id: "draft", labelKey: "filterDraft" },
 ];
 
 /** The sticky list rail. `articles` is already filtered/sorted by the caller. */
@@ -43,19 +45,20 @@ export function NewsSidebar({
   onRequestDelete: (id: number) => void;
   statusPending?: boolean;
 }) {
+  const t = useTranslations("furrettoday.newsSidebar");
   return (
     <CardFlat className="sticky top-[110px] flex max-h-[calc(100vh-140px)] flex-col overflow-hidden">
       <div className="border-ft border-x-0 border-t-0 border-b-ft-ink bg-ft-pink p-4 text-white">
         <div className="mb-3 flex items-center justify-between">
           <span className="font-ft-ui text-[11px] font-extrabold uppercase tracking-[0.18em] text-ft-yellow">
-            LISTA DE NOTICIAS
+            {t("title")}
           </span>
           <Meta className="text-white/85">
             {articles.length}/{total}
           </Meta>
         </div>
         <Button variant="ink" size="lg" className="w-full justify-center" onClick={onNew}>
-          + Nueva noticia
+          {t("new")}
         </Button>
       </div>
 
@@ -63,8 +66,8 @@ export function NewsSidebar({
         <Input
           value={search}
           onChange={(e) => onSearchChange(e.target.value)}
-          placeholder="Buscar por título o entradilla…"
-          aria-label="Buscar noticias"
+          placeholder={t("searchPh")}
+          aria-label={t("searchAria")}
           className="w-full"
         />
         <div className="mt-2.5 flex flex-wrap gap-1.5">
@@ -74,7 +77,7 @@ export function NewsSidebar({
               active={statusFilter === f.id}
               onClick={() => onStatusFilterChange(f.id)}
             >
-              {f.label}
+              {t(f.labelKey)}
             </Chip>
           ))}
         </div>
@@ -84,8 +87,8 @@ export function NewsSidebar({
         {articles.length === 0 ? (
           <div className="p-6 text-center">
             <FurretMascot size={80} className="mx-auto" />
-            <div className="font-ft-display mt-1.5 text-xl">NADA POR AQUÍ</div>
-            <p className="text-sm">Prueba a cambiar el filtro o la búsqueda.</p>
+            <div className="font-ft-display mt-1.5 text-xl">{t("emptyTitle")}</div>
+            <p className="text-sm">{t("emptyMessage")}</p>
           </div>
         ) : (
           <ul className="flex flex-col gap-2 p-2">

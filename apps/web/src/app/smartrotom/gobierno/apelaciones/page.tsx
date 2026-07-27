@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useTranslations } from "next-intl"
 import { PageHead, Empty, TableSkeleton } from "../_components/ui"
 import { ApelacionesStats } from "../_components/justicia/ApelacionesStats"
 import { ApelacionCard } from "../_components/justicia/ApelacionCard"
@@ -11,6 +12,7 @@ import type { Apelacion } from "../_types"
 const PAGE = { pageSize: 100 }
 
 export default function ApelacionesPage() {
+  const t = useTranslations("gobierno")
   const [target, setTarget] = useState<Apelacion | null>(null)
   const [outcome, setOutcome] = useState<"upheld" | "overturned" | null>(null)
 
@@ -25,17 +27,17 @@ export default function ApelacionesPage() {
   return (
     <>
       <PageHead
-        kicker="Justicia · Recursos"
+        kicker={t("apelaciones.kicker")}
         dep="justicia"
-        title="Apelaciones"
-        sub="Recursos presentados por ciudadanos que impugnan una multa. Revisa los argumentos y resuelve."
+        title={t("justicia.apelaciones")}
+        sub={t("apelaciones.sub")}
       />
 
       {!isLoading && items.length > 0 && <ApelacionesStats apelaciones={items} />}
 
       {data && data.total > items.length && (
         <p className="mb-3 font-gt-mono text-[10.5px] text-gt-ink-400">
-          Mostrando {items.length} de {data.total} apelaciones.
+          {t("apelaciones.mostrando", { shown: items.length, total: data.total })}
         </p>
       )}
 
@@ -50,8 +52,8 @@ export default function ApelacionesPage() {
       ) : items.length === 0 ? (
         <Empty
           icon="scale"
-          title="Sin apelaciones presentadas"
-          sub="Los recursos que impugnen una multa aparecerán aquí para su revisión."
+          title={t("apelaciones.emptyTitle")}
+          sub={t("apelaciones.emptySub")}
         />
       ) : (
         <div className="space-y-3.5">

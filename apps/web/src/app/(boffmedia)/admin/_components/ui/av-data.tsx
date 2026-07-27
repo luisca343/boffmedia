@@ -4,6 +4,7 @@ import * as React from "react"
 import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { Icon, Avatar, Badge, IconButton, Spinner, type IconName } from "@/components/boffmedia/primitives"
+import { useFormat } from "@/lib/useFormat"
 import { AvPill, AvLiveDot } from "./av-kit"
 
 /**
@@ -428,6 +429,7 @@ export function AvGpuBar({ name, pct, temp }: { name: React.ReactNode; pct: numb
 }
 
 export function AvDist({ rows, max }: { rows: AvDistRow[]; max?: number }) {
+  const { number: formatNumber } = useFormat()
   const peak = max || Math.max(...rows.map((r) => r.value))
   return (
     <div className="flex flex-col gap-2.5">
@@ -437,7 +439,7 @@ export function AvDist({ rows, max }: { rows: AvDistRow[]; max?: number }) {
           <span className="h-[9px] overflow-hidden border border-solid border-line bg-panel-2">
             <span className="block h-full" style={{ width: (r.value / peak) * 100 + "%", background: r.color || "var(--accent)" }} />
           </span>
-          <span className="text-right font-mono text-[11px]/none font-medium text-txt-muted">{r.display || r.value.toLocaleString("es-ES")}</span>
+          <span className="text-right font-mono text-[11px]/none font-medium text-txt-muted">{r.display || formatNumber(r.value)}</span>
         </div>
       ))}
     </div>

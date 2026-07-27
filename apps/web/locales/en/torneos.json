@@ -128,7 +128,8 @@
       "save": "Save",
       "cancel": "Cancel",
       "validationPaste": "Paste your team in Showdown format",
-      "toastOk": "Team sheet saved"
+      "toastOk": "Team sheet saved",
+      "viewerHint": "Sheet registered by your rival at sign-up. Copy it to Pokémon Showdown or open it in the calculator to prep your damage rolls."
     },
     "view": {
       "thirdPlace": "Third place",
@@ -156,6 +157,66 @@
     },
     "sr": {
       "title": "Tournaments"
+    },
+    "bracket": {
+      "winnersTitle": "Winners bracket",
+      "losersTitle": "Losers bracket",
+      "grandFinalTitle": "Grand Final",
+      "resetNote": "The challenger forced the bracket reset.",
+      "tbd": "TBD",
+      "radialAriaLabel": "Radial elimination bracket",
+      "tbdShort": "TBD",
+      "champion": "Champion",
+      "finalist": "Finalist",
+      "finalTbd": "Final · TBD",
+      "seed": "Seed {seed}",
+      "live": "In progress",
+      "roundsPlayed": "{played}/{total} rounds",
+      "roundFinal": "Final",
+      "roundSemis": "Semifinals",
+      "roundQuarters": "Quarterfinals",
+      "round16": "Round of 16",
+      "roundOf": "Round of {players}"
+    },
+    "pairings": {
+      "roundAriaLabel": "Round",
+      "roundOption": "Round {round}",
+      "colTable": "Table",
+      "colHome": "Home",
+      "colResult": "Res.",
+      "colAway": "Away",
+      "bye": "bye",
+      "playing": "In progress",
+      "vs": "vs"
+    },
+    "entrant": {
+      "bye": "BYE",
+      "team": "team",
+      "players": "{count, plural, one {# player} other {# players}}"
+    },
+    "standings": {
+      "colCompetitor": "Competitor",
+      "colPlayed": "GP",
+      "colRecord": "W-D-L",
+      "colDiff": "Diff",
+      "colPoints": "Pts",
+      "colForm": "Form",
+      "colW": "W",
+      "colD": "D",
+      "colL": "L",
+      "playedOf": "{done}/{total} played",
+      "resultWin": "Win",
+      "resultLoss": "Loss",
+      "resultDraw": "Draw",
+      "pending": "Pending"
+    },
+    "format": {
+      "swiss": "Swiss",
+      "single": "Single elim.",
+      "double": "Double elim.",
+      "groups": "Groups + knockout",
+      "roundrobin": "League (round robin)",
+      "leaderboard": "Free leaderboard"
     }
   }
 }

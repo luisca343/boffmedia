@@ -5,6 +5,7 @@ import {
   ConflictException,
   BadRequestException,
 } from '@nestjs/common';
+import { ApiErrorCode, userError } from '@/common/errors/user-error';
 import { TournamentsRepository } from '../repositories/tournaments.repository';
 import { AddParticipantDto } from '../dto/add-participant.dto';
 import { RegisterParticipantDto } from '../dto/register-participant.dto';
@@ -164,7 +165,9 @@ export class RegistrationService {
     const t = await this.repo.findById(tournamentId);
     if (!t) throw new NotFoundException('Tournament not found');
     if (!t.checkInOpen) {
-      throw new BadRequestException('El check-in no está abierto');
+      throw new BadRequestException(
+        userError(ApiErrorCode.TOURNAMENT_CHECKIN_CLOSED, 'Check-in is closed'),
+      );
     }
     const me = await this.repo.findParticipantByUser(tournamentId, userId);
     if (!me) throw new NotFoundException('Not registered');

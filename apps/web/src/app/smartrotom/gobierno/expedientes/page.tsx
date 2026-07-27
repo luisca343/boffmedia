@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import { useTranslations } from "next-intl"
 import { PageHead, Button } from "../_components/ui"
 import { ExpedienteList } from "../_components/justicia/ExpedienteList"
 import { ExpedienteDetail } from "../_components/justicia/ExpedienteDetail"
@@ -10,6 +11,7 @@ import { useExpedientes, useExpediente } from "../_hooks/queries"
 const PAGE = { pageSize: 100 }
 
 export default function ExpedientesPage() {
+  const t = useTranslations("gobierno")
   const [selectedId, setSelectedId] = useState<number | null>(null)
   const [showNew, setShowNew] = useState(false)
 
@@ -25,20 +27,20 @@ export default function ExpedientesPage() {
   return (
     <>
       <PageHead
-        kicker="Justicia · Expedientes"
+        kicker={t("expedientes.openExpedienteKicker")}
         dep="justicia"
-        title="Casos abiertos"
-        sub="Cada infractor reúne sus denuncias, multas, órdenes de captura y apelaciones en un único expediente."
+        title={t("expedientes.casosAbiertos")}
+        sub={t("expedientes.casosAbiertosSub")}
         right={
           <Button icon="plus" onClick={() => setShowNew(true)}>
-            Abrir expediente
+            {t("expedientes.openExpediente")}
           </Button>
         }
       />
 
       {data && data.total > items.length && (
         <p className="mb-3 font-gt-mono text-[10.5px] text-gt-ink-400">
-          Mostrando {items.length} de {data.total} expedientes.
+          {t("expedientes.mostrando", { shown: items.length, total: data.total })}
         </p>
       )}
 

@@ -2,16 +2,17 @@
 
 import * as React from "react"
 import Link from "next/link"
-import { useLocale, useTranslations } from "next-intl"
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { Button, Empty, Icon, Spinner } from "@/components/boffmedia/primitives"
 import { useGetEvents } from "@/hooks/events/useGetEvents"
+import { useFormat } from "@/lib/useFormat"
 import { EventStatusChip, dayMonth, eventStatus, type EventLike } from "@/components/boffmedia/ui/events"
 
 export function CalendarView() {
   const t = useTranslations("calendario")
   const tEv = useTranslations("events")
-  const locale = useLocale() === "en" ? "en-GB" : "es-ES"
+  const { intlLocale: locale } = useFormat()
   const { events, error, isLoading, refetch } = useGetEvents()
 
   const groups = React.useMemo(() => {

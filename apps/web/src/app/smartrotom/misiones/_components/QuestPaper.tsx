@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils"
 import type { NPC, QuestData, Region } from "../_types"
 import { spriteName } from "../_utils/items"
 import { questProgress, tiltFor } from "../_utils/quests"
-import { normalizeStatus, SEAL_TEXT, STATUS_LABEL, STATUS_PAPER_FILTER } from "../_utils/status"
+import { normalizeStatus, SEAL_TEXT, STATUS_LABEL_KEY, STATUS_PAPER_FILTER } from "../_utils/status"
 import { Icon, ItemSprite, Label, Nail, NpcPortrait, Paper, Bar, Sparkles, Stamp, TACK_GOLD, TACK_RED, Thumbtack, WaxSeal } from "./ui"
 
 /**
@@ -28,6 +28,7 @@ export function QuestPaper({
   onOpen: () => void
 }) {
   const t = useTranslations("misiones.questPaper")
+  const tStatus = useTranslations("misiones")
   const status = normalizeStatus(quest)
   const progress = questProgress(quest)
   const level = quest.requirements?.requiredLevel
@@ -47,7 +48,7 @@ export function QuestPaper({
       )}
       role="button"
       tabIndex={0}
-      aria-label={`${quest.name} — ${STATUS_LABEL[status]}`}
+      aria-label={`${quest.name} — ${tStatus(STATUS_LABEL_KEY[status])}`}
       onClick={onOpen}
       onKeyDown={(event) => {
         if (event.key === "Enter" || event.key === " ") {
@@ -83,7 +84,7 @@ export function QuestPaper({
       )}
 
       <div className="mb-1.5 flex items-center justify-between gap-2">
-        <Label className={SEAL_TEXT[status]}>{STATUS_LABEL[status]}</Label>
+        <Label className={SEAL_TEXT[status]}>{tStatus(STATUS_LABEL_KEY[status])}</Label>
         <span className="flex items-center gap-2">
           {quest.repeatable && <Label>{t("repeatable")}</Label>}
           {level > 0 && <Label>{t("level", { level })}</Label>}

@@ -1,3 +1,4 @@
+import { useTranslations } from "next-intl"
 import type { ReactNode } from "react"
 
 export type ArRingTone = "cyan" | "amber" | "magenta" | "violet"
@@ -22,6 +23,7 @@ const TONE: Record<ArRingTone, string> = {
 
 /** The HUD's progress dial: a glowing arc with a figure at its centre. */
 export function Ring({ label, value, max, size = 46, tone = "cyan", title }: RingProps) {
+  const t = useTranslations("arcade")
   const stroke = 3
   const radius = (size - 6) / 2
   const circumference = 2 * Math.PI * radius
@@ -33,7 +35,7 @@ export function Ring({ label, value, max, size = 46, tone = "cyan", title }: Rin
       className="relative shrink-0"
       style={{ width: size, height: size }}
       role="img"
-      aria-label={`${title}: ${value} de ${max}`}
+      aria-label={t("common.ringAria", { title, value, max })}
     >
       <svg width={size} height={size} className="-rotate-90" aria-hidden>
         <circle

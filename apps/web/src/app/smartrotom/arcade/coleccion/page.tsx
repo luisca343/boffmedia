@@ -51,7 +51,7 @@ export default function ColeccionPage() {
     return (
       <Panel tone="deep">
         <p role="alert" className="font-ar-mono text-[12px] text-ar-amber">
-          Inicia sesión con tu cuenta de SmartRotom para ver tu colección.
+          {t("common.loginRequired")}
         </p>
       </Panel>
     )
@@ -61,7 +61,7 @@ export default function ColeccionPage() {
     return (
       <Panel tone="deep">
         <p role="alert" className="font-ar-mono text-[12px] text-ar-danger">
-          No se pudo cargar tu inventario. Vuelve a intentarlo en un momento.
+          {t("common.errorLoading")}
         </p>
         <Button
           variant="outline"
@@ -70,7 +70,7 @@ export default function ColeccionPage() {
           icon={<Icon.Reset s={12} />}
           onClick={() => void inventory.refetch()}
         >
-          Reintentar
+          {t("common.retry")}
         </Button>
       </Panel>
     )
@@ -85,11 +85,11 @@ export default function ColeccionPage() {
               href="/smartrotom/arcade/loot"
               className="ar-lift inline-flex items-center gap-1.5 rounded-lg border border-white/10 px-2.5 py-1.5 font-ar text-[11px] font-semibold uppercase tracking-[0.08em] text-ar-ink-dim hover:text-ar-ink"
             >
-              <Icon.Chevron s={12} dir="left" /> Cajas
+              <Icon.Chevron s={12} dir="left" /> {t("coleccion.backToBoxes")}
             </Link>
-            <span className="ar-chrom font-ar-display text-[15px] text-ar-ink">Tu colección</span>
+            <span className="ar-chrom font-ar-display text-[15px] text-ar-ink">{t("coleccion.title")}</span>
             <Tag tone="cyan" size="md">
-              {total} objetos · {items.length} únicos
+              {t("coleccion.itemsCount", { total, unique: items.length })}
             </Tag>
           </div>
 
@@ -100,7 +100,7 @@ export default function ColeccionPage() {
             onClick={() => setClaiming(true)}
             disabled={items.length === 0}
           >
-            Reclamar al juego
+            {t("coleccion.claimToGame")}
           </Button>
         </div>
       </Panel>

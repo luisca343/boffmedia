@@ -78,26 +78,30 @@ export interface MewMeta {
 export interface MewCat {
   key: string
   file: string | null
-  label: string
-  singular: string
   icon: IconName
   hue: number
-  desc: string
   /** abilities load lazily (large file) after the structural categories. */
   remote?: boolean
 }
 
-// category definitions (order = tab order), mirroring the handoff data layer
+// Category definitions (order = tab order), mirroring the handoff data layer.
+// `label` / `singular` / `desc` are NOT stored here — a module-scope t() would
+// freeze whichever locale loaded first. Consumers resolve them against the
+// `mewgenics` namespace as `cat.<key>.{label,singular,desc}` via `mewCatKey`.
 export const MEW_CATS: MewCat[] = [
-  { key: "items", file: "items.json", label: "Objetos", singular: "objeto", icon: "sword", hue: 44, desc: "Armas, cabeza, cara, cuello, abalorios, consumibles, malditos y parásitos." },
-  { key: "characters", file: "characters.json", label: "Bestiario", singular: "personaje", icon: "paw", hue: 330, desc: "Enemigos, jefes, minijefes, kaijus, aliados y familiares." },
-  { key: "abilities", file: null, label: "Habilidades", singular: "habilidad", icon: "bolt", hue: 200, desc: "Ataques y hechizos: coste, alcance, daño y efectos.", remote: true },
-  { key: "passives", file: "passives.json", label: "Pasivas", singular: "pasiva", icon: "shield", hue: 265, desc: "Pasivas de clase y trastornos, con sus rangos." },
-  { key: "keywords", file: "keywords.json", label: "Estados", singular: "estado", icon: "flame", hue: 12, desc: "Efectos de estado y palabras clave con sus reglas." },
-  { key: "events", file: "events.json", label: "Eventos", singular: "evento", icon: "compass", hue: 150, desc: "Eventos de mapa: elecciones, chequeos de estadística y recompensas." },
-  { key: "classes", file: "classes.json", label: "Clases", singular: "clase", icon: "star", hue: 96, desc: "Clases y clases avanzadas con sus reservas de habilidades." },
-  { key: "maps", file: "maps.json", label: "Mapas", singular: "mapa", icon: "map", hue: 174, desc: "Áreas por acto y capítulo: enemigos, jefes, objetos y eventos." },
+  { key: "items", file: "items.json", icon: "sword", hue: 44 },
+  { key: "characters", file: "characters.json", icon: "paw", hue: 330 },
+  { key: "abilities", file: null, icon: "bolt", hue: 200, remote: true },
+  { key: "passives", file: "passives.json", icon: "shield", hue: 265 },
+  { key: "keywords", file: "keywords.json", icon: "flame", hue: 12 },
+  { key: "events", file: "events.json", icon: "compass", hue: 150 },
+  { key: "classes", file: "classes.json", icon: "star", hue: 96 },
+  { key: "maps", file: "maps.json", icon: "map", hue: 174 },
 ]
+
+/** Message key for a category's chrome: `cat.<key>.label|singular|desc`. */
+export const mewCatKey = (cat: string, leaf: "label" | "singular" | "desc") =>
+  `cat.${cat}.${leaf}`
 const CATBY: Record<string, MewCat> = {}
 MEW_CATS.forEach((c) => { CATBY[c.key] = c })
 

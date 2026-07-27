@@ -93,7 +93,7 @@ export function Topbar({ onToggleSidebar }: { onToggleSidebar?: () => void }) {
           <input
             value={q}
             onChange={(e) => setQ(e.target.value)}
-            placeholder={theme.searchPlaceholder}
+            placeholder={t(`${theme.id}.searchPlaceholder`)}
             aria-label={t("search")}
             className="min-w-0 flex-1 border-0 bg-transparent px-3 text-sm text-mw-fg outline-none placeholder:text-mw-fg-faint"
           />

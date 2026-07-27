@@ -129,7 +129,34 @@
     "templates": {
       "title": "Templates",
       "blank": "Blank note",
-      "setAnalysis": "Set Analysis"
+      "setAnalysis": "Set Analysis",
+      "items": {
+        "set": {
+          "name": "Set Analysis",
+          "desc": "EVs, moves and matchups for a Pokémon.",
+          "content": "<h1>Pokémon name — Role</h1><p class=\"lead\">One-line summary of the set's purpose.</p><h2>Spread</h2><table><thead><tr><th>Stat</th><th>EVs</th><th>Note</th></tr></thead><tbody><tr><td>HP</td><td></td><td></td></tr><tr><td>Atk / Sp.Atk</td><td></td><td></td></tr><tr><td>Speed</td><td></td><td></td></tr></tbody></table><h2>Moves</h2><ol><li></li><li></li><li></li><li></li></ol><h2>Key matchups</h2><ul><li></li></ul>"
+        },
+        "team": {
+          "name": "Competitive Team",
+          "desc": "Core of 6, game plan and checklist.",
+          "content": "<h1>Team — Name</h1><p class=\"lead\">The team's idea in one line.</p><h2>Core</h2><ul><li></li><li></li></ul><h2>Game plan</h2><p><br></p><h2>Checklist</h2><ul class=\"todo\"><li data-done=\"false\">Calculate EVs</li><li data-done=\"false\">Test on ladder</li></ul>"
+        },
+        "raid": {
+          "name": "Raid Strategy",
+          "desc": "Roles, phases and timing.",
+          "content": "<h1>Raid — Target</h1><p class=\"lead\">Composition and plan.</p><h2>Roles</h2><ul><li><strong>Attacker:</strong> </li><li><strong>Support:</strong> </li></ul><h2>Phases</h2><ol><li></li></ol>"
+        },
+        "diary": {
+          "name": "Diary Entry",
+          "desc": "Today's tasks and reflections.",
+          "content": "<h1>Diary entry</h1><ul class=\"todo\"><li data-done=\"false\">Task 1</li></ul><blockquote>Thought of the day…</blockquote>"
+        },
+        "blank": {
+          "name": "Blank note",
+          "desc": "Start from scratch.",
+          "content": "<h1>New note</h1><p><br></p>"
+        }
+      }
     },
     "share": {
       "title": "Share note",
@@ -185,6 +212,19 @@
       "folderCreated": "Folder created.",
       "tagCreated": "Tag created.",
       "duplicateError": "Could not read the note to duplicate it"
+    },
+    "colors": {
+      "primary": "Orange",
+      "secondary": "Blue",
+      "accent": "Fuchsia",
+      "success": "Emerald",
+      "warning": "Amber",
+      "error": "Red",
+      "info": "Violet"
+    },
+    "nav": {
+      "menu": "Menu",
+      "breadcrumb": "Breadcrumb"
     }
   }
 }

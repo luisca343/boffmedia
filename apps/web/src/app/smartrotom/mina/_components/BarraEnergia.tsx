@@ -2,8 +2,10 @@
 import { useGetEnergy } from '@/hooks/mina/useGetEnergy';
 import { useRotomUuid } from '@/components/smartrotom/behavior/useRotomUuid';
 import { AnimatePresence, motion } from 'framer-motion';
+import { useTranslations } from 'next-intl';
 
 export function BarraEnergia() {
+    const t = useTranslations('mina');
     const uuid = useRotomUuid();
     const { energy, maxEnergy, diff } = useGetEnergy(uuid!)
     
@@ -19,7 +21,7 @@ export function BarraEnergia() {
         <div className='flex flex-col w-full ml-auto mt-auto text-ink text-shadow-border1 tex-lg  xl:text-xl '>
         {energy >= maxEnergy ? 
             <></> : 
-            <div className='mx-auto '>Siguiente recarga en: {getHour()}</div>
+            <div className='mx-auto '>{t('energy.nextRecharge', { time: getHour() })}</div>
         }
         <motion.div className=" ml-auto px-1 w-full flex  rounded-lg border-2 border-edge-strong bg-layer-1 flex-wrap items-start justify-start">
         <AnimatePresence>

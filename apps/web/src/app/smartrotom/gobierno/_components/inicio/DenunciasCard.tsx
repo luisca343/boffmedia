@@ -74,7 +74,7 @@ export function DenunciasCard() {
                     <div className="mt-0.5 truncate text-[12px] text-gt-ink-500">{d.description}</div>
                   </div>
                 </button>
-                {status && <Badge tone={status.tone}>{status.label}</Badge>}
+                {status && <Badge tone={status.tone}>{t(status.labelKey)}</Badge>}
               </div>
             )
           })}

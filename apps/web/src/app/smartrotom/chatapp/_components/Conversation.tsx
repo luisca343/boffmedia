@@ -1,6 +1,6 @@
 "use client";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import { getSmartRotomUser } from "@/lib/utils";
 import useSocketStore from "@/stores/useSocketStore";
@@ -52,6 +52,7 @@ export function Conversation({
   callBusy?: boolean;
 }) {
   const t = useTranslations("chatapp");
+  const locale = useLocale();
   const scroller = useRef<HTMLDivElement>(null);
   const [reply, setReply] = useState<ChatMessageVM | null>(null);
   const [summaryOpen, setSummaryOpen] = useState(true);
@@ -87,7 +88,7 @@ export function Conversation({
     if (!prev || dayKey(prev.createdAt) !== dayKey(m.createdAt)) {
       rows.push(
         <div key={`d${m.id}`} className="my-2.5 self-center rounded-ca-md bg-ca-header px-3.5 py-1.5 text-[12.5px] font-medium uppercase tracking-[.02em] text-ca-300 shadow-[0_1px_1px_rgba(0,0,0,.08)]">
-          {dayLabel(m.createdAt, t)}
+          {dayLabel(m.createdAt, t, locale)}
         </div>,
       );
     }

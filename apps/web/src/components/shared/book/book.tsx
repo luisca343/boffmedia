@@ -1,6 +1,7 @@
 "use client"
 import React, { ForwardedRef, useState } from "react";
 import HTMLFlipBook from "react-pageflip";
+import { useTranslations } from "next-intl";
 import { motion, AnimatePresence } from "framer-motion";
 import './book.css'
 
@@ -77,6 +78,7 @@ interface PageCoverProps {
 
 export function Page({children, dataDensity = "soft",  className = 'bg-[#fde3e3]', style, number=0, book}: 
   {children?: React.ReactNode, dataDensity?: "hard" | "soft", className?: string, style?: React.CSSProperties, number?: number, book?: PageFlip}) {
+    const t = useTranslations("common.content");
 
     if(!book) return <div style={{...style, position: 'relative'}} className={`h-full w-full page drop-shadow-2xl p-2 flex flex-col `} data-density={dataDensity}></div>
     return (
@@ -91,7 +93,7 @@ export function Page({children, dataDensity = "soft",  className = 'bg-[#fde3e3]
               book={book}
               page={1}
           >
-              Índice
+              {t("index")}
           </BookLink>
         </>
         }

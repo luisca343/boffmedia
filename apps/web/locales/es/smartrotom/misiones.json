@@ -9,6 +9,10 @@
       "emptyBoard": "No hay encargos en el tablón todavía.",
       "emptyFiltered": "El tablón está vacío con esos criterios. Cambia los filtros."
     },
+    "errors": {
+      "outsideGame": "El tablón de misiones sólo puede leerse desde el juego.",
+      "unreadable": "No se pudo leer el tablón de misiones."
+    },
     "playerHeader": {
       "adventurerLog": "Bitácora del aventurero",
       "questsInKingdoms": "Encargos en {count, plural, one {# reino} other {# reinos}}",
@@ -19,7 +23,8 @@
       "sealed": "Selladas",
       "kingdoms": "Reinos",
       "inn": "❦ Posada del Rotom",
-      "questsOnBoard": "⚔ {count} encargos en el tablón"
+      "questsOnBoard": "⚔ {count} encargos en el tablón",
+      "defaultName": "Aventurero"
     },
     "boardFilters": {
       "filterByKingdom": "Filtrar por reino",
@@ -42,25 +47,64 @@
       "reward": "Recompensa"
     },
     "questLetter": {
-      "readLetter": "Leer carta"
+      "readLetter": "Leer carta",
+      "close": "Cerrar",
+      "closeQuest": "Cerrar la misión",
+      "badge": "✦ Encargo ✦",
+      "from": "de",
+      "viewDossier": "Ver expediente de {name}",
+      "level": "Nv. {level}",
+      "repeatable": "· Repetible",
+      "objectives": "⚜ Objetivos ⚜",
+      "rewards": "⚜ Recompensas ⚜",
+      "wordsOf": "— palabras de {name}",
+      "signedOff": "Firmado con tinta y juramento,",
+      "anonymous": "Anónimo",
+      "tracking": "Rastreando",
+      "track": "Rastrear misión",
+      "goToMap": "Ir al mapa"
     },
     "questChain": {
-      "title": "Cadena de misiones"
+      "title": "Cadena de misiones",
+      "here": "Aquí",
+      "level": "Nv. {level}"
     },
     "journalEntry": {
-      "title": "Entrada del diario"
+      "title": "Entrada del diario",
+      "relatedQuest": "— misión relacionada"
     },
     "npcDossier": {
-      "title": "Dossier del NPC"
+      "title": "Dossier del NPC",
+      "ariaLabel": "Expediente de {name}",
+      "close": "Cerrar",
+      "eyebrow": "✦ Expediente ✦",
+      "quests": "Encargos",
+      "active": "Vigentes",
+      "completed": "Cumplidos",
+      "questsOf": "Encargos de {name}",
+      "level": " · Nv. {level}",
+      "empty": "Aún no tiene encargos en el tablón."
     },
     "satchelSlot": {
-      "empty": "Ranura vacía"
+      "empty": "Ranura vacía",
+      "notObtained": "Aún no obtenido",
+      "lockedTitle": "{name} — Aún no obtenido"
     },
     "trackedQuest": {
-      "title": "Encargo rastreado"
+      "title": "Encargo rastreado",
+      "ribbon": "¶ Misión Rastreada",
+      "level": " · Nv. {level}",
+      "repeatable": " · Repetible",
+      "commissionedBy": "encomendada por",
+      "unknown": "Desconocido",
+      "next": "Siguiente",
+      "rewardsAria": "Recompensas",
+      "continue": "Continuar"
     },
     "threadWall": {
-      "title": "Muro de hilos"
+      "title": "Muro de hilos",
+      "thread": "❦ Hilo {index} · {region}",
+      "looseEnds": "Cabos sueltos"
     },
     "sideRail": {
       "eyebrow": "✦ Posada del Rotom ✦",
@@ -110,13 +154,55 @@
       }
     },
     "kingdomMap": {
-      "title": "Mapa de reinos"
+      "title": "Mapa de reinos",
+      "mapTitle": "REINO DE KANTO",
+      "mapSubtitle": "— anno aventurae · MMXXVI —",
+      "active": "vigente",
+      "more": "+{count} más",
+      "legend": "Leyenda",
+      "legendActive": "Misión vigente",
+      "legendAvailable": "Disponible",
+      "legendLocked": "Sin misiones nuevas",
+      "legendRoad": "Camino real",
+      "legendSea": "Ruta marítima"
     },
     "scatterLayer": {
-      "title": "Capa de dispersión"
+      "title": "Capa de dispersión",
+      "wantedLabel": "SE BUSCA",
+      "wantedName": "TEAM ROCKET",
+      "wantedReward": "Recompensa 5000₽",
+      "postItFooter": "— Oak",
+      "postIt": "Si encuentras a <b>Mew</b>, ¡tráelo al laboratorio inmediatamente!",
+      "clippingSource": "Diario Pokémon",
+      "clippingHeadline": "ROTOM DESAPARECE DE UNA TELEVISIÓN",
+      "clippingBody": "El extraño Pokémon eléctrico fantasma ha vuelto a hacer de las suyas. Los testigos aseguran haberle visto colarse en una bicicleta vieja en las afueras del Bosque Verde. Si ves a Rotom, no intentes capturarlo solo."
     },
     "rewardCard": {
       "title": "Recompensa"
+    },
+    "trama": {
+      "eyebrow": "El hilo conductor",
+      "title": "La Trama",
+      "subtitle": "Cada encargo atado al siguiente con hilo y chinchetas — sigue el rastro",
+      "loading": "Desenrollando el hilo…",
+      "empty": "Nadie ha atado un encargo todavía."
+    },
+    "mapa": {
+      "eyebrow": "Atlas",
+      "title": "Mapa del Reino",
+      "subtitle": "Trazado por cartógrafos de Pueblo Paleta — clava un alfiler para ver sus misiones",
+      "loading": "Desenrollando el mapa del reino…",
+      "empty": "Nadie ha trazado encargos todavía. El reino aguarda su primera misión."
+    },
+    "mochila": {
+      "eyebrow": "Pertenencias",
+      "title": "La Mochila",
+      "loading": "Reuniendo el inventario…",
+      "summary": "{owned} tesoros reclamados · {locked} por ganar",
+      "ownedTitle": "◆ En la mochila",
+      "ownedEmpty": "Tu mochila está vacía. Completa misiones para llenarla.",
+      "lockedTitle": "◇ Botín por reclamar",
+      "lockedEmpty": "Has reclamado todo el botín disponible."
     },
     "nav": {
       "board": "Tablón",
@@ -133,6 +219,10 @@
       "failed": "Fallida"
     },
     "bitacora": {
+      "eyebrow": "Diario",
+      "title": "Bitácora de Diálogos",
+      "subtitle": "Cada palabra registrada con tinta indeleble",
+      "loading": "Reuniendo la bitácora…",
       "searchPlaceholder": "Buscar en la bitácora…",
       "searchAriaLabel": "Buscar en la bitácora",
       "emptyTitle": "Aún no hay diálogos registrados.",

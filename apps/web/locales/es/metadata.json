@@ -1,0 +1,108 @@
+{
+  "pageMeta": {
+    "foro": {
+      "index": {
+        "title": "Foro · Boffmedia",
+        "description": "Debate, dudas y estrategia con la comunidad de Boffmedia."
+      },
+      "categoria": {
+        "title": "Tablón · Foro · Boffmedia",
+        "description": "Hilos y debates del tablón."
+      },
+      "hilo": {
+        "title": "Hilo · Foro · Boffmedia",
+        "description": "Detalle del hilo: mensajes y respuestas de la comunidad."
+      }
+    },
+    "perfil": {
+      "publico": {
+        "title": "Perfil · Boffmedia",
+        "description": "Perfil público: logros, estadísticas y actividad reciente."
+      },
+      "propio": {
+        "title": "Mi perfil · Boffmedia",
+        "description": "Gestiona tu cuenta, avatar y cuentas vinculadas."
+      }
+    },
+    "comunidad": {
+      "index": {
+        "title": "Comunidad · Boffmedia",
+        "description": "Torneos, clasificación, logros y la comunidad de Discord de Boffmedia."
+      },
+      "clasificacion": {
+        "title": "Clasificación global · Boffmedia",
+        "description": "El ranking de toda la comunidad Boffmedia: puntos, medallas y logros."
+      },
+      "logros": {
+        "title": "Logros · Boffmedia",
+        "description": "El catálogo de logros y medallas de la comunidad Boffmedia."
+      },
+      "calendario": {
+        "title": "Calendario · Boffmedia",
+        "description": "Todos los eventos de la comunidad Boffmedia ordenados por fecha."
+      }
+    },
+    "auth": {
+      "entrar": {
+        "title": "Entrar · Boffmedia",
+        "description": "Inicia sesión o crea tu cuenta en Boffmedia."
+      },
+      "recuperar": {
+        "title": "Recuperar contraseña · Boffmedia",
+        "description": "Recibe un enlace para restablecer tu contraseña de Boffmedia."
+      },
+      "restablecer": {
+        "title": "Restablecer contraseña · Boffmedia",
+        "description": "Elige una nueva contraseña para tu cuenta de Boffmedia."
+      },
+      "verificarEmail": {
+        "title": "Verificar correo · Boffmedia",
+        "description": "Verifica tu dirección de correo de Boffmedia."
+      }
+    },
+    "eventos": {
+      "index": {
+        "title": "Eventos · Boffmedia",
+        "description": "Torneos, retos y temporadas de la comunidad Boffmedia."
+      },
+      "detalle": {
+        "title": "Evento · Boffmedia",
+        "description": "Detalle del evento: logros, participantes y clasificación."
+      },
+      "sugerir": {
+        "title": "Sugerir evento · Boffmedia",
+        "description": "Propón un evento para la comunidad Boffmedia."
+      }
+    },
+    "juegos": {
+      "index": {
+        "title": "Juegos · Boffmedia",
+        "description": "Todos los juegos de la plataforma Boffmedia."
+      },
+      "detalle": {
+        "title": "Juego · Boffmedia",
+        "description": "Detalle del juego y sus eventos."
+      }
+    },
+    "herramientas": {
+      "battlesim": {
+        "title": "Battlesim",
+        "description": "Simulador de combates Pokémon — juega contra la IA, PvP o en Showdown."
+      },
+      "mewgenics": {
+        "title": "Codex Mewgenics",
+        "description": "Base de datos completa de Mewgenics: objetos, bestiario, habilidades, pasivas, estados, eventos, clases y mapas."
+      }
+    },
+    "smartrotom": {
+      "index": {
+        "title": "SmartRotom",
+        "description": "SmartRotom"
+      },
+      "arcade": {
+        "title": "Arcade · SmartRotom",
+        "description": "Minijuegos, racha diaria y cajas del servidor de SmartRotom."
+      }
+    }
+  }
+}

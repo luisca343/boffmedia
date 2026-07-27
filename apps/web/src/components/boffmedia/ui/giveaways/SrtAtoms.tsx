@@ -17,6 +17,7 @@ const STATUS_CLS: Record<string, string> = {
 }
 
 export function SrtStatusChip({ status, size }: { status: SrtStatus; size?: "lg" }) {
+  const t = useTranslations("common.giveaways")
   const key = status.key || "upcoming"
   const dot = key === "active" || key === "ended"
   return (
@@ -36,7 +37,7 @@ export function SrtStatusChip({ status, size }: { status: SrtStatus; size?: "lg"
           )}
         />
       )}
-      {status.label}
+      {t(`status.${key}.label`)}
     </span>
   )
 }
@@ -59,11 +60,12 @@ export function SrtOrganizer({ organizer }: { organizer: SrtOrganizerData }) {
 }
 
 export function SrtSourceTag({ source }: { source: SrtSourceKey }) {
+  const t = useTranslations("common.giveaways")
   const m = srtSourceMeta(source)
   return (
     <span className="inline-flex items-center gap-[7px] border border-dashed border-line-2 px-[9px] py-[5px] font-mono text-[10px]/none font-semibold uppercase tracking-[0.09em] text-txt-muted">
       <Icon name={m.icon} size={12} className={source === "twitch" ? "text-[#9146ff]" : "text-[color:var(--info)]"} />
-      {m.label}
+      {t(`source.${source}.label`)}
     </span>
   )
 }
@@ -74,7 +76,7 @@ export function SrtPrizeTag({ type, winners }: { type: SrtPrizeType; winners?: n
   return (
     <span className="cut [--cut:4px] inline-flex items-center gap-1.5 border border-solid border-accent-line bg-accent-soft px-2 py-[5px] font-mono text-[9.5px]/none font-semibold uppercase tracking-[0.1em] text-accent">
       <Icon name={m.icon} size={12} />
-      {m.label}
+      {t(`prize.${type}.label`)}
       {winners && winners > 1 ? ` · ${winners} ${t("winner", { count: winners })}` : ""}
     </span>
   )

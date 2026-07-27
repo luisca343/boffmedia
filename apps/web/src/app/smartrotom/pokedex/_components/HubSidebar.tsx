@@ -48,7 +48,7 @@ export function HubSidebar() {
             {session?.user?.name?.[0]?.toUpperCase() || "U"}
           </div>
           <div className="flex flex-col gap-px min-w-0">
-            <b className="text-[12.5px] text-pk-surface-100">{session?.user?.name || "Usuario"}</b>
+            <b className="text-[12.5px] text-pk-surface-100">{session?.user?.name || t("sidebar.userFallback")}</b>
             <span className="text-[10.5px] text-pk-surface-500 font-pk-mono">{t("sidebar_connected")} · server-01</span>
           </div>
         </div>

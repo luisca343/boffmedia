@@ -287,7 +287,7 @@ export class ChatappController {
 
   @Post('chat/:chatId/read')
   @ApiOperation({
-    summary: "Mark every unread message in a chat as read for a user",
+    summary: 'Mark every unread message in a chat as read for a user',
   })
   @ApiResponse({
     status: HttpStatus.OK,

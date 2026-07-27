@@ -1,13 +1,14 @@
 "use client"
 
 import { useLocale, useTranslations } from "next-intl"
+import { intlLocale as resolveIntlLocale } from "@/lib/locale"
 
 /** Locale-aware number/date formatting for the timeline (`rooker.format` messages). */
 export function useFormat() {
   const t = useTranslations("rooker")
   const locale = useLocale()
   const decimal = locale === "es" ? "," : "."
-  const intlLocale = locale === "es" ? "es-ES" : "en-US"
+  const intlLocale = resolveIntlLocale(locale)
 
   function fmt(n: number | undefined | null): string {
     if (n == null) return "0"

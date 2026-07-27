@@ -30,7 +30,7 @@ export function ArticleFooter({ article }: { article: FtArticle }) {
         toast(t("footer.newsletterSuccess"));
       },
       onError: () =>
-        toast.error("No hemos podido suscribirte. Inténtalo otra vez."),
+        toast.error(t("articleFooter.subscribeError")),
     });
   }
 
@@ -40,18 +40,17 @@ export function ArticleFooter({ article }: { article: FtArticle }) {
         <FurretMascot size={64} />
         <div className="min-w-[220px] flex-1">
           <div className="font-ft-display text-[28px] leading-[0.95]">
-            ¿Te gustó el reportaje?
+            {t("articleFooter.title")}
           </div>
           <p className="mt-1 text-ft-body">
-            Reacciona, comenta o suscríbete al semanario. Furret cuenta los
-            aplausos.
+            {t("articleFooter.description")}
           </p>
         </div>
         <div className="flex shrink-0 gap-2">
           <Button
             onClick={() => clap.mutate()}
             disabled={clap.isPending}
-            aria-label="Aplaudir este artículo"
+            aria-label={t("articleFooter.clapAria")}
           >
             👏 {article.claps}
           </Button>
@@ -59,7 +58,7 @@ export function ArticleFooter({ article }: { article: FtArticle }) {
             variant="primary"
             onClick={() => setShowSubscribe((v) => !v)}
           >
-            Suscribirme
+            {t("articleFooter.subscribe")}
           </Button>
         </div>
       </div>
@@ -71,12 +70,12 @@ export function ArticleFooter({ article }: { article: FtArticle }) {
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            placeholder="tu@email"
-            aria-label="Email para la newsletter"
+            placeholder={t("footer.emailPlaceholder")}
+            aria-label={t("footer.emailAriaLabel")}
             className="flex-1"
           />
           <Button type="submit" variant="ink" disabled={subscribe.isPending}>
-            {subscribe.isPending ? "…" : "OK"}
+            {subscribe.isPending ? t("articleFooter.submitting") : t("articleFooter.submit")}
           </Button>
         </form>
       ) : null}

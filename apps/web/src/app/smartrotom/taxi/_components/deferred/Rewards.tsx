@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { Icon, ProgressBar, Switch } from "../ui"
 import { formatMoney, formatNum } from "../../_utils/format"
@@ -24,6 +25,7 @@ export function GroupTeleport({
   /** Each extra rider costs this share of the base fare. */
   rate?: number
 }) {
+  const t = useTranslations("taxi.rewards")
   const [open, setOpen] = useState(false)
   const [members, setMembers] = useState<string[]>([])
   const groupAdd = Math.round(fare * rate * members.length)
@@ -55,12 +57,13 @@ export function GroupTeleport({
         </span>
         <div className="min-w-0 flex-1">
           <b className="text-[13px] font-extrabold text-tx-txt">
-            Viaje en grupo {members.length > 0 && `· ${members.length + 1} pasajeros`}
+            {t("groupTrip")}{" "}
+            {members.length > 0 && t("passengers", { count: members.length + 1 })}
           </b>
           <span className="block text-[11.5px] text-tx-txt-2">
             {members.length > 0
-              ? `+${formatMoney(groupAdd)} por tu party`
-              : `Lleva a tu party (${online} en línea)`}
+              ? t("groupExtra", { amount: formatMoney(groupAdd) })
+              : t("bringParty", { count: online })}
           </span>
         </div>
         <Switch on={open} />
@@ -94,7 +97,7 @@ export function GroupTeleport({
                 </span>
                 <span className="flex-1 text-[13px] font-bold text-tx-txt">{member.name}</span>
                 <span className={cn("text-[11px]", member.online ? "text-tx-ok" : "text-tx-txt-3")}>
-                  {member.online ? "en línea" : "desconectado"}
+                  {member.online ? t("online") : t("offline")}
                 </span>
                 <span
                   className={cn(
@@ -135,6 +138,7 @@ export function RiderCard({
   streakDays: number
   freeRideEvery: number
 }) {
+  const t = useTranslations("taxi.rewards")
   const pct = next ? Math.min(100, Math.round(((trips - tier.min) / (next.min - tier.min)) * 100)) : 100
 
   return (
@@ -154,22 +158,22 @@ export function RiderCard({
           </span>
           <div>
             <div className="font-tx-display text-[15px] font-bold tracking-[0.4px]" style={{ color: tier.color }}>
-              Socio {tier.name}
+              {t("member", { tier: tier.name })}
             </div>
-            <div className="text-[11.5px] text-white/60">Programa Pasajero Frecuente</div>
+            <div className="text-[11.5px] text-white/60">{t("frequentProgram")}</div>
           </div>
         </div>
         <div className="text-right">
           <div className="font-tx-mono text-[26px] font-extrabold leading-none text-tx-accent">
             {tier.discount > 0 ? `−${Math.round(tier.discount * 100)}%` : "—"}
           </div>
-          <div className="mt-[3px] text-[10.5px] uppercase tracking-[0.5px] text-white/60">en cada viaje</div>
+          <div className="mt-[3px] text-[10.5px] uppercase tracking-[0.5px] text-white/60">{t("perTrip")}</div>
         </div>
       </div>
 
       <div className="relative mt-4">
         <div className="mb-1.5 flex justify-between text-[11.5px] font-bold text-white/70">
-          <span>{next ? `${next.min - trips} viajes para ${next.name}` : "Nivel máximo alcanzado"}</span>
+          <span>{next ? t("tripsToNext", { count: next.min - trips, tier: next.name }) : t("maxLevel")}</span>
           <span className="font-tx-mono">
             {trips}
             {next && ` / ${next.min}`}
@@ -189,8 +193,8 @@ export function RiderCard({
             <Icon name="flame" size={15} stroke={2.2} />
           </span>
           <div>
-            <div className="text-[15px] font-extrabold">{streakDays} días</div>
-            <div className="text-[10.5px] text-white/60">Racha activa</div>
+            <div className="text-[15px] font-extrabold">{t("streakDays", { count: streakDays })}</div>
+            <div className="text-[10.5px] text-white/60">{t("activeStreak")}</div>
           </div>
         </div>
         <div className="flex items-center gap-[7px]">
@@ -201,7 +205,7 @@ export function RiderCard({
             <div className="text-[15px] font-extrabold">
               {trips % freeRideEvery}/{freeRideEvery}
             </div>
-            <div className="text-[10.5px] text-white/60">Viaje gratis</div>
+            <div className="text-[10.5px] text-white/60">{t("freeTrip")}</div>
           </div>
         </div>
       </div>
@@ -215,6 +219,7 @@ export function RiderCard({
  * backend has to exist first.
  */
 export function AchievementRow({ achievement }: { achievement: Achievement }) {
+  const t = useTranslations("taxi.rewards")
   const { done, progress = 0, goal = 1 } = achievement
   const pct = done ? 100 : Math.min(100, Math.round((progress / goal) * 100))
   return (
@@ -237,7 +242,7 @@ export function AchievementRow({ achievement }: { achievement: Achievement }) {
           {achievement.name}
           {done && (
             <span className="rounded-[5px] bg-tx-ok-soft px-1.5 py-0.5 text-[9.5px] font-extrabold uppercase tracking-[0.4px] text-tx-ok">
-              Logrado
+              {t("achieved")}
             </span>
           )}
         </div>
@@ -264,6 +269,7 @@ export function AchievementRow({ achievement }: { achievement: Achievement }) {
  * without it.
  */
 export function TopUpGrid({ packages }: { packages: CoinPackage[] }) {
+  const t = useTranslations("taxi.rewards")
   return (
     <div className="grid grid-cols-2 gap-2.5">
       {packages.map((pkg) => (
@@ -287,7 +293,7 @@ export function TopUpGrid({ packages }: { packages: CoinPackage[] }) {
               pkg.bonus ? "text-tx-ok" : "font-bold text-tx-txt-3",
             )}
           >
-            {pkg.bonus ? `+${formatNum(pkg.bonus)} bonus` : "sin bonus"}
+            {pkg.bonus ? t("bonus", { count: formatNum(pkg.bonus) }) : t("noBonus")}
           </div>
           <div className="mt-[11px] rounded-tx-sm bg-tx-blue-600 py-[9px] text-center text-[13.5px] font-extrabold text-white transition-colors group-hover:bg-tx-blue-500">
             {pkg.price}

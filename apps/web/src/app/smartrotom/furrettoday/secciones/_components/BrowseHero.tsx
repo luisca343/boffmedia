@@ -1,5 +1,7 @@
 "use client";
 
+import { useTranslations } from "next-intl";
+
 import { Button, Chip, Eyebrow, Input } from "../../_components/ui";
 import { FT_INK } from "../../_utils/accents";
 import type { FtCategory } from "../../_utils/article";
@@ -24,6 +26,7 @@ export function BrowseHero({
   onCategoryChange: (value: string) => void;
   totalCount: number;
 }) {
+  const t = useTranslations("furrettoday.browseHero");
   return (
     <section className="border-ft relative overflow-hidden border-x-0 border-t-0 border-b-ft-ink bg-ft-pink text-white">
       <div
@@ -31,17 +34,17 @@ export function BrowseHero({
         aria-hidden="true"
       />
       <div className="relative mx-auto max-w-[1400px] px-6 py-14">
-        <Eyebrow className="text-ft-yellow">SECCIONES &amp; ARCHIVO</Eyebrow>
+        <Eyebrow className="text-ft-yellow">{t("eyebrow")}</Eyebrow>
         <h1
           className="font-ft-display mt-2 mb-3 text-[clamp(56px,9vw,128px)] leading-[0.9]"
           style={{ textShadow: `6px 6px 0 ${FT_INK}` }}
         >
-          Explora{" "}
-          <span className="inline-block -rotate-3">el</span> Número
+          {t("titleStart")}{" "}
+          <span className="inline-block -rotate-3">{t("titleTilt")}</span>{" "}
+          {t("titleEnd")}
         </h1>
         <p className="font-ft-deck max-w-[720px] text-[22px] italic text-[#fffbe8]">
-          Cinco secciones, decenas de artículos y un buscador que funciona.
-          Para los que coleccionan.
+          {t("description")}
         </p>
 
         <form
@@ -51,12 +54,12 @@ export function BrowseHero({
           <Input
             value={query}
             onChange={(e) => onQueryChange(e.target.value)}
-            placeholder="¿Qué buscas? — escribe «furret», «meta», «torneo»…"
-            aria-label="Buscar"
+            placeholder={t("searchPh")}
+            aria-label={t("searchAria")}
             className="flex-1 py-4 text-lg"
           />
           <Button type="submit" variant="ink" size="lg">
-            Buscar
+            {t("submit")}
           </Button>
         </form>
 
@@ -65,7 +68,7 @@ export function BrowseHero({
             active={activeCategory === "all"}
             onClick={() => onCategoryChange("all")}
           >
-            Todo · {totalCount}
+            {t("allCount", { count: totalCount })}
           </Chip>
           {categories.map((c) => (
             <Chip

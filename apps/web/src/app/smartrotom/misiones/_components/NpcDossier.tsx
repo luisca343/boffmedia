@@ -1,9 +1,10 @@
 "use client"
 
 import { useEffect } from "react"
+import { useTranslations } from "next-intl"
 import { useBoard } from "../_hooks/useBoard"
 import type { NPC, QuestData } from "../_types"
-import { normalizeStatus, SEAL_TEXT, STATUS_LABEL } from "../_utils/status"
+import { normalizeStatus, SEAL_TEXT, STATUS_LABEL_KEY } from "../_utils/status"
 import { Button, Divider, FlourishCorners, Icon, Label, NpcPortrait, Paper, Thumbtack, WaxSeal } from "./ui"
 
 /**
@@ -12,6 +13,8 @@ import { Button, Divider, FlourishCorners, Icon, Label, NpcPortrait, Paper, Thum
  * are the categories those quests belong to.
  */
 export function NpcDossier({ npc, onClose }: { npc: NPC; onClose: () => void }) {
+  const t = useTranslations("misiones.npcDossier")
+  const tStatus = useTranslations("misiones")
   const { quests, dialogs, open } = useBoard()
 
   const given = quests.filter((quest) => quest.dialogId === npc.dialogId)
@@ -19,9 +22,9 @@ export function NpcDossier({ npc, onClose }: { npc: NPC; onClose: () => void }) 
   const regions = [...new Set(given.map((quest) => quest.category).filter(Boolean))]
 
   const tally = [
-    { label: "Encargos", value: given.length, className: "text-ms-ink-1" },
-    { label: "Vigentes", value: given.filter((q) => normalizeStatus(q) === "ACTIVE").length, className: "text-ms-seal-active" },
-    { label: "Cumplidos", value: given.filter((q) => normalizeStatus(q) === "COMPLETED").length, className: "text-ms-seal-completed" },
+    { label: t("quests"), value: given.length, className: "text-ms-ink-1" },
+    { label: t("active"), value: given.filter((q) => normalizeStatus(q) === "ACTIVE").length, className: "text-ms-seal-active" },
+    { label: t("completed"), value: given.filter((q) => normalizeStatus(q) === "COMPLETED").length, className: "text-ms-seal-completed" },
   ]
 
   useEffect(() => {
@@ -39,7 +42,7 @@ export function NpcDossier({ npc, onClose }: { npc: NPC; onClose: () => void }) 
     <div
       role="dialog"
       aria-modal="true"
-      aria-label={`Expediente de ${npc.name}`}
+      aria-label={t("ariaLabel", { name: npc.name })}
       onClick={onClose}
       className="fixed inset-0 z-[120] grid place-items-center bg-[rgba(20,12,6,.82)] p-6 backdrop-blur-[4px]"
     >
@@ -57,11 +60,11 @@ export function NpcDossier({ npc, onClose }: { npc: NPC; onClose: () => void }) 
         <FlourishCorners size={30} offset={8} className="text-ms-gold-3/55" />
 
         <Button variant="ghost" sm onClick={onClose} className="absolute right-10 top-3.5">
-          <Icon.X size={12} /> Cerrar
+          <Icon.X size={12} /> {t("close")}
         </Button>
 
         <div className="mb-3.5 text-center">
-          <Label className="justify-center tracking-[.34em] text-ms-seal-available">✦ Expediente ✦</Label>
+          <Label className="justify-center tracking-[.34em] text-ms-seal-available">{t("eyebrow")}</Label>
           <div className="my-3 flex justify-center">
             <div className="relative">
               <NpcPortrait skin={npc.skin} size={104} ring full />
@@ -95,7 +98,7 @@ export function NpcDossier({ npc, onClose }: { npc: NPC; onClose: () => void }) 
           </p>
         )}
 
-        <Label className="mb-2">Encargos de {npc.name.split(" ")[0]}</Label>
+        <Label className="mb-2">{t("questsOf", { name: npc.name.split(" ")[0] })}</Label>
         <div className="flex flex-col gap-2">
           {given.map((quest) => {
             const status = normalizeStatus(quest)
@@ -111,8 +114,8 @@ export function NpcDossier({ npc, onClose }: { npc: NPC; onClose: () => void }) 
                 <span className="min-w-0 flex-1">
                   <span className="block font-ms-display text-sm leading-[1.15] text-ms-ink-1">{quest.name}</span>
                   <span className={`block text-[11px] ${SEAL_TEXT[status]}`}>
-                    {STATUS_LABEL[status]}
-                    {level > 0 && ` · Nv. ${level}`}
+                    {tStatus(STATUS_LABEL_KEY[status])}
+                    {level > 0 && t("level", { level })}
                   </span>
                 </span>
                 <Icon.Arrow size={13} />
@@ -120,7 +123,7 @@ export function NpcDossier({ npc, onClose }: { npc: NPC; onClose: () => void }) 
             )
           })}
           {given.length === 0 && (
-            <p className="text-center text-sm italic text-ms-ink-3">Aún no tiene encargos en el tablón.</p>
+            <p className="text-center text-sm italic text-ms-ink-3">{t("empty")}</p>
           )}
         </div>
       </Paper>

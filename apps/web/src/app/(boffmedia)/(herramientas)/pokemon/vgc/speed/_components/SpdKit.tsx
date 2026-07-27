@@ -54,6 +54,7 @@ export function SpdInput({
   onClear?: () => void;
   className?: string;
 }) {
+  const t = useTranslations("vgc.speed");
   return (
     <div
       style={{ clipPath: "polygon(0 0,100% 0,100% calc(100% - 8px),calc(100% - 8px) 100%,0 100%)" }}
@@ -76,7 +77,7 @@ export function SpdInput({
         )}
       />
       {onClear && value && (
-        <button type="button" aria-label="Limpiar" onClick={onClear} className="grid place-items-center p-1 text-txt-dim transition-colors hover:text-txt">
+        <button type="button" aria-label={t("clearInput")} onClick={onClear} className="grid place-items-center p-1 text-txt-dim transition-colors hover:text-txt">
           <Icon name="x" size={14} />
         </button>
       )}

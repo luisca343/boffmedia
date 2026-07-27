@@ -20,8 +20,8 @@ import { MgResult, MgBar } from "./ui/mg-kit";
 import MangaMetadataForm from "./MangaMetadataForm";
 
 const SCRAPER_SOURCES = [
-  { name: "NovelCool", url: "https://es.novelcool.com", active: true, desc: "Manga y manhwa en español" },
-  { name: "PkProject", url: "https://pkproject.net", active: true, desc: "Pokémon Adventures" },
+  { name: "NovelCool", url: "https://es.novelcool.com", active: true, descKey: "sourceNovelcoolDesc" },
+  { name: "PkProject", url: "https://pkproject.net", active: true, descKey: "sourcePkprojectDesc" },
 ] as const;
 
 /* ---- scraper sources + tunnel --------------------------------------------- */
@@ -56,7 +56,7 @@ function ScraperSourcesPanel() {
             <div key={source.name} className="flex items-center gap-2 border border-solid border-line bg-base-2 px-3 py-1.5 text-[12px]">
               <AvLiveDot className={source.active ? "" : "bg-txt-dim"} />
               <span className="font-medium text-txt">{source.name}</span>
-              <span className="text-txt-dim">{source.desc}</span>
+              <span className="text-txt-dim">{t(source.descKey)}</span>
               <AvPill tone={source.active ? "green" : "default"}>
                 {source.active ? t("sourceActive") : t("sourceInactive")}
               </AvPill>
