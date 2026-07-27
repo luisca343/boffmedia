@@ -2,6 +2,7 @@
 
 import { useTranslations } from "next-intl"
 import type { MinecraftStats } from "@/services/api/smartrotom/playerService"
+import { usePassportStore } from "../../_stores/usePassportStore"
 import type { Passport } from "../../_types"
 import { deaths, distanceKm, fmt, perMovement, playtime, totalKills } from "../../_utils/stats"
 import { mrz } from "../../_utils/mrz"
@@ -12,14 +13,15 @@ export function Identidad({
   profile,
   stats,
   loading,
-  inspect,
 }: {
   profile?: Passport | null
   stats?: MinecraftStats | null
   loading: boolean
-  inspect: boolean
 }) {
   const t = useTranslations("pasaporte")
+  // The lamp is read HERE, not passed down: a prop would put it in the leaf array the book
+  // hands to StPageFlip, and that array must not change when the reader toggles anything.
+  const inspect = usePassportStore((s) => s.inspect)
 
   if (loading) {
     return (

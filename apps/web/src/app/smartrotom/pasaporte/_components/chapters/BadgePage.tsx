@@ -7,6 +7,7 @@ import type { UserAchievement } from "@boffmedia/shared"
 import { typesOf } from "@/app/smartrotom/pc/_utils/derive"
 import { TYPE_LABELS } from "@/app/smartrotom/pokedex/_utils/typeColors"
 import { usePokemonStore } from "@/stores/pokemonStore"
+import { usePassportStore } from "../../_stores/usePassportStore"
 import { docDate } from "../../_utils/dates"
 import { badgeArt, moveName, parseTeam, sealInk } from "../../_utils/medals"
 import { Button, CircuitTag, HoloStamp, Icon, SectionLabel, Sprite, TypePill, WaxSeal } from "../ui"
@@ -17,18 +18,19 @@ function shortCircuit(name: string | null | undefined): string {
 
 export function BadgePage({
   achievement,
-  slam,
-  inspect,
+  index,
   onReplay,
 }: {
   achievement: UserAchievement
-  /** True while this leaf is the open one: the seal comes down. */
-  slam: boolean
-  inspect: boolean
+  /** This leaf's position in the book — the seal comes down when it is the open one. */
+  index: number
   onReplay: (achievement: UserAchievement) => void
 }) {
   const t = useTranslations("pasaporte")
   const speciesByDex = usePokemonStore((s) => s.pokemonByDex)
+  // The open page and the lamp are read here, not passed down — see the note in `Identidad`.
+  const slam = usePassportStore((s) => s.page === index && s.motion === "on")
+  const inspect = usePassportStore((s) => s.inspect)
   const team = parseTeam(achievement.team)
   const circuit = shortCircuit(achievement.subcategory)
 

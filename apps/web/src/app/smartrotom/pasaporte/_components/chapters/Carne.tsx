@@ -7,6 +7,7 @@ import { useTranslations } from "next-intl"
 import { useState, type ReactNode } from "react"
 import { cn } from "@/lib/utils"
 import type { MinecraftStats } from "@/services/api/smartrotom/playerService"
+import { usePassportStore } from "../../_stores/usePassportStore"
 import type { Passport } from "../../_types"
 import { docDate, expiryDate } from "../../_utils/dates"
 import { qrMatrix, qrSeed } from "../../_utils/qr"
@@ -56,14 +57,14 @@ export function Carne({
   profile,
   stats,
   loading,
-  inspect,
 }: {
   profile?: Passport | null
   stats?: MinecraftStats | null
   loading: boolean
-  inspect: boolean
 }) {
   const t = useTranslations("pasaporte")
+  // Read here rather than taken as a prop — see the note in `Identidad`.
+  const inspect = usePassportStore((s) => s.inspect)
   const [verified, setVerified] = useState(false)
 
   if (loading || !profile) {

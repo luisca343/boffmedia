@@ -258,6 +258,140 @@ export function PassportBook() {
     [achievements.data, logros.data, profile.data, t],
   )
 
+  /**
+   * The leaves, as ONE memoised array — and the identity of that array is load-bearing.
+   * StPageFlip takes these nodes over: it moves them into a `.stf__block` of its own and, every
+   * time `children` changes identity, wipes that block with `innerHTML = ""` and re-appends
+   * them — while React still believes they hang off the wrapper it rendered. So a children array
+   * rebuilt on every render tears the book's DOM out from under React mid-flip, and the next
+   * reconciliation that removes a leaf calls `removeChild` on a parent that no longer holds it.
+   * Everything volatile — the open page, the lamp — is therefore read INSIDE the leaves (§7), so
+   * this array only changes when the data behind the book does.
+   */
+  const leaves = useMemo(() => {
+    function body(descriptor: PageDescriptor, index: number) {
+      switch (descriptor.chapter) {
+        case "indice":
+          return <Indice chapters={rail} onFlip={flipTo} />
+        case "identidad":
+          return (
+            <Identidad
+              profile={profile.data}
+              stats={stats.data}
+              loading={profile.isPending || stats.isPending}
+            />
+          )
+        case "carne":
+          return (
+            <Carne profile={profile.data} stats={stats.data} loading={profile.isPending || stats.isPending} />
+          )
+        case "equipo":
+          return <Equipo team={team.data} loading={team.isPending} />
+        case "medallas":
+          return (
+            <Medallas
+              achievements={achievements.data}
+              loading={achievements.isPending}
+              onOpenBadge={(id) => flipTo(pageOf(`badge:${id}`))}
+            />
+          )
+        case "competiciones":
+          return <Competiciones achievements={achievements.data} loading={achievements.isPending} />
+        case "temporada":
+          return <Temporada season={season.data} region={profile.data?.region} loading={season.isPending} />
+        case "logros":
+          return descriptor.key === "logros" ? (
+            <LogrosResumen logros={logros.data} loading={logros.isPending} />
+          ) : (
+            <LogrosColeccion logros={logros.data} loading={logros.isPending} />
+          )
+        case "insignias": {
+          const badge = badges.find((b) => b.id === descriptor.badgeId)
+          if (!badge) return null
+          return <BadgePage achievement={badge} index={index} onReplay={setReplay} />
+        }
+        case "bitacora":
+          return <Bitacora stamps={stamps} loading={achievements.isPending || ledger.isPending} />
+        case "cronica":
+          return (
+            <Cronica
+              milestones={milestones}
+              loading={achievements.isPending || logros.isPending || profile.isPending}
+            />
+          )
+        default:
+          return null
+      }
+    }
+
+    return pages.map((descriptor, index) => {
+      const side = index % 2 === 0 ? "right" : "left"
+      // The stack of leaves under this one, stepping away from the spine. It is what
+      // gives the passport thickness — without it every page reads as a loose sheet.
+      const leafStack = side === "right" ? "ps-leaves-r" : "ps-leaves-l"
+
+      // Keyed by POSITION, not by `descriptor.key`, and that is deliberate: with identity keys a
+      // page list that changes composition WITHOUT changing length — the blank verso giving way
+      // to a first gym badge, 14 leaves either way — makes React delete one leaf and insert
+      // another inside a live StPageFlip, and those leaves are the nodes it has reparented. A
+      // positional key means the leaf DOM is a pure function of `pages.length`, and a length
+      // change already remounts the whole book (see the `key` on HTMLFlipBook below), so React
+      // never inserts, removes or reorders a leaf under an instance that is holding them.
+      if (descriptor.kind === "cover" || descriptor.kind === "back") {
+        return (
+          <div
+            key={index}
+            data-density="hard"
+            className={cn("relative h-full w-full overflow-hidden", leafStack)}
+          >
+            {descriptor.kind === "cover" ? <Cover profile={profile.data} /> : <BackCover />}
+          </div>
+        )
+      }
+
+      return (
+        <div
+          key={index}
+          data-density="soft"
+          style={chapterVars(descriptor.accent)}
+          className={cn("relative h-full w-full overflow-hidden bg-ps-paper", leafStack)}
+        >
+          <Paper side={side}>
+            {descriptor.kind === "pad" ? null : body(descriptor, index)}
+            {descriptor.folio && (
+              <Folio
+                side={side}
+                page={descriptor.folio}
+                onIndex={descriptor.chapter === "indice" ? undefined : () => flipTo(pageOf("indice"))}
+              />
+            )}
+          </Paper>
+        </div>
+      )
+    })
+  }, [
+    pages,
+    rail,
+    badges,
+    flipTo,
+    pageOf,
+    stamps,
+    milestones,
+    profile.data,
+    profile.isPending,
+    stats.data,
+    stats.isPending,
+    team.data,
+    team.isPending,
+    achievements.data,
+    achievements.isPending,
+    logros.data,
+    logros.isPending,
+    season.data,
+    season.isPending,
+    ledger.isPending,
+  ])
+
   if (!uuid) {
     return (
       <main className="relative grid min-h-0 place-items-center px-4">
@@ -271,76 +405,6 @@ export function PassportBook() {
         </div>
       </main>
     )
-  }
-
-  function body(descriptor: PageDescriptor) {
-    switch (descriptor.chapter) {
-      case "indice":
-        return <Indice chapters={rail} onFlip={flipTo} />
-      case "identidad":
-        return (
-          <Identidad
-            profile={profile.data}
-            stats={stats.data}
-            loading={profile.isPending || stats.isPending}
-            inspect={inspect}
-          />
-        )
-      case "carne":
-        return (
-          <Carne
-            profile={profile.data}
-            stats={stats.data}
-            loading={profile.isPending || stats.isPending}
-            inspect={inspect}
-          />
-        )
-      case "equipo":
-        return <Equipo team={team.data} loading={team.isPending} />
-      case "medallas":
-        return (
-          <Medallas
-            achievements={achievements.data}
-            loading={achievements.isPending}
-            onOpenBadge={(id) => flipTo(pageOf(`badge:${id}`))}
-          />
-        )
-      case "competiciones":
-        return <Competiciones achievements={achievements.data} loading={achievements.isPending} />
-      case "temporada":
-        return <Temporada season={season.data} region={profile.data?.region} loading={season.isPending} />
-      case "logros":
-        return descriptor.key === "logros" ? (
-          <LogrosResumen logros={logros.data} loading={logros.isPending} />
-        ) : (
-          <LogrosColeccion logros={logros.data} loading={logros.isPending} />
-        )
-      case "insignias": {
-        const badge = badges.find((b) => b.id === descriptor.badgeId)
-        if (!badge) return null
-        return (
-          <BadgePage
-            achievement={badge}
-            slam={page === pages.indexOf(descriptor) && motion === "on"}
-            inspect={inspect}
-            onReplay={setReplay}
-          />
-        )
-      }
-      case "bitacora":
-        return (
-          <Bitacora stamps={stamps} loading={achievements.isPending || ledger.isPending} />
-        )
-      case "cronica":
-        return (
-          <Cronica
-            milestones={milestones}
-            loading={achievements.isPending || logros.isPending || profile.isPending}
-          />
-        )
-      default:
-        return null
-    }
   }
 
   const last = pages.length - 1
@@ -379,6 +443,11 @@ export function PassportBook() {
           </div>
 
           <HTMLFlipBook
+            // A leaf COUNT change cannot be reconciled — react-pageflip would answer it with
+            // `updateFromHtml`, which empties its block with `innerHTML` and re-appends, and
+            // React would be removing leaves from a parent that no longer holds them. So the
+            // count remounts the book outright: deleting the wrapper StPageFlip was given is the
+            // one removal that is still a legitimate child of its React parent.
             key={pages.length}
             // StPageFlip's `stretch` sizing measures THIS element (`getBlockWidth/Height`),
             // and its own children are absolutely positioned — so without a definite height
@@ -392,7 +461,10 @@ export function PassportBook() {
             maxWidth={1000}
             minHeight={380}
             maxHeight={1100}
-            startPage={Math.min(startPage.current, last)}
+            // The OPEN page, not the stored one: this is read on construction, and a construction
+            // that is not the first is a remount the reader did not ask for. Handing it the page
+            // they are on is what stops the book slamming back to the cover when their badges land.
+            startPage={Math.min(page, last)}
             startZIndex={0}
             autoSize={false}
             showCover
@@ -413,57 +485,7 @@ export function PassportBook() {
               flip.current = event.object
             }}
           >
-            {pages.map((descriptor, index) => {
-              const side = index % 2 === 0 ? "right" : "left"
-              // The stack of leaves under this one, stepping away from the spine. It is what
-              // gives the passport thickness — without it every page reads as a loose sheet.
-              const leaves = side === "right" ? "ps-leaves-r" : "ps-leaves-l"
-
-              if (descriptor.kind === "cover") {
-                return (
-                  <div
-                    key={descriptor.key}
-                    data-density="hard"
-                    className={cn("relative h-full w-full overflow-hidden", leaves)}
-                  >
-                    <Cover profile={profile.data} />
-                  </div>
-                )
-              }
-              if (descriptor.kind === "back") {
-                return (
-                  <div
-                    key={descriptor.key}
-                    data-density="hard"
-                    className={cn("relative h-full w-full overflow-hidden", leaves)}
-                  >
-                    <BackCover />
-                  </div>
-                )
-              }
-
-              return (
-                <div
-                  key={descriptor.key}
-                  data-density="soft"
-                  style={chapterVars(descriptor.accent)}
-                  className={cn("relative h-full w-full overflow-hidden bg-ps-paper", leaves)}
-                >
-                  <Paper side={side}>
-                    {descriptor.kind === "pad" ? null : body(descriptor)}
-                    {descriptor.folio && (
-                      <Folio
-                        side={side}
-                        page={descriptor.folio}
-                        onIndex={
-                          descriptor.chapter === "indice" ? undefined : () => flipTo(pageOf("indice"))
-                        }
-                      />
-                    )}
-                  </Paper>
-                </div>
-              )
-            })}
+            {leaves}
           </HTMLFlipBook>
         </div>
       </main>
