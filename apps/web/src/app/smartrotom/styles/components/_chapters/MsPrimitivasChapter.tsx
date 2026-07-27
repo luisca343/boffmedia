@@ -32,6 +32,45 @@ import {
 import { SEAL_STATUSES, STATUS_LABEL } from "@/app/smartrotom/misiones/_utils/status"
 import { Sample, Section } from "../showcase-shared"
 
+// The same little nav from `SideRail`, worn as six different skins. Leather
+// (no attribute) is the default; the rest are unlocked by a `data-tabstyle`
+// on the ancestor wrapping the <nav> — never a class on `.ms-tab` itself.
+const NAV_ITEMS = [
+  { glyph: "❦", label: "El Tablón" },
+  { glyph: "✶", label: "La Trama" },
+  { glyph: "✦", label: "Mapa" },
+  { glyph: "◆", label: "Mochila" },
+] as const
+
+const TAB_STYLES = [
+  { value: undefined, name: "Cuero" },
+  { value: "placa", name: "Placa de madera" },
+  { value: "sello", name: "Sello de cera" },
+  { value: "grabado", name: "Grabado en latón" },
+  { value: "estandarte", name: "Estandarte" },
+  { value: "manuscrito", name: "Manuscrito" },
+] as const
+
+// The five `data-palette` themes on `.ms-app`. Pergamino needs no attribute —
+// it's the token block declared on the bare class.
+const PALETTES = [
+  { value: undefined, name: "Pergamino" },
+  { value: "grimdark", name: "Grimdark" },
+  { value: "royal", name: "Real" },
+  { value: "forest", name: "Bosque" },
+  { value: "nocturno", name: "Nocturno" },
+] as const
+
+// Same rule as `MsBasesChapter`: never `bg-ms-seal-${status}`, always a literal
+// class from a map.
+const SEAL_SWATCHES = [
+  ["bg-ms-seal-active", "Vigente"],
+  ["bg-ms-seal-available", "Disponible"],
+  ["bg-ms-seal-completed", "Completada"],
+  ["bg-ms-seal-failed", "Fallida"],
+  ["bg-ms-seal-locked", "Sellada"],
+] as const
+
 export function MsPrimitivasChapter() {
   const [chip, setChip] = React.useState("ACTIVE")
 
@@ -154,6 +193,100 @@ export function MsPrimitivasChapter() {
           <Inkwell size={64} />
           <QuillPen size={120} tilt={24} />
         </Sample>
+      </Section>
+
+      <Section
+        id="ms-navegacion"
+        kicker="Misiones · ms-*"
+        title="Navegación · estilos de pestaña"
+        lead={
+          <>
+            El mismo nav del SideRail, vestido con seis pieles. El cuero es la piel por defecto — sin atributo; las
+            demás se activan con un <code>data-tabstyle</code> en el contenedor que envuelve el nav, nunca en el
+            propio <code>.ms-tab</code>.
+          </>
+        }
+      >
+        {TAB_STYLES.map((style) => (
+          <Sample
+            key={style.name}
+            app="ms"
+            title={style.name}
+            code={style.value ? `data-tabstyle="${style.value}"` : "(sin data-tabstyle)"}
+            note={
+              style.value === "sello"
+                ? "El glifo se vuelve un medallón de cera — el mismo patrón que <WaxSeal />."
+                : style.value === "manuscrito"
+                  ? "Cinzel Decorative, sin versalitas forzadas; la pestaña activa se subraya en oro, sin fondo."
+                  : undefined
+            }
+          >
+            <div className="ms-wood w-[200px] p-2" data-tabstyle={style.value}>
+              <nav className="flex flex-col gap-0.5">
+                {NAV_ITEMS.map((item, i) => {
+                  const current = i === 2
+                  return (
+                    <a
+                      key={item.label}
+                      href="#"
+                      onClick={(e) => e.preventDefault()}
+                      aria-current={current ? "page" : undefined}
+                      className="ms-tab relative focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ms-gold-2"
+                    >
+                      <span className="text-base opacity-70">{item.glyph}</span>
+                      <span className="flex-1">{item.label}</span>
+                      {current && <span className="absolute right-2.5 text-[9px] text-ms-gold-2">▶</span>}
+                    </a>
+                  )
+                })}
+              </nav>
+            </div>
+          </Sample>
+        ))}
+      </Section>
+
+      <Section
+        id="ms-paletas"
+        kicker="Misiones · ms-*"
+        title="Paletas · temas del tablón"
+        lead={
+          <>
+            «Pergamino» es la piel por defecto del tablón. Un <code>data-palette</code> en <code>.ms-app</code>{" "}
+            cambia las nueve rampas de color a la vez — corcho, pergamino, tinta, oro y cera — nunca una utilidad
+            suelta.
+          </>
+        }
+      >
+        {PALETTES.map((palette) => (
+          <Sample
+            key={palette.name}
+            app="ms"
+            canvas={false}
+            title={palette.name}
+            code={palette.value ? `data-palette="${palette.value}"` : "(por defecto)"}
+          >
+            <div
+              className="ms-app ms-tavern w-[220px] rounded-sm border border-black/40 p-4 font-ms text-ms-ink-1 antialiased"
+              data-palette={palette.value}
+            >
+              <div className="ms-paper p-3">
+                <p className="ms-drop-cap text-sm leading-snug">
+                  Un mensajero clava la nota en el corcho, junto a las demás cartas del reino.
+                </p>
+              </div>
+              <div className="mt-3 flex items-center gap-2">
+                <span className="inline-flex items-center gap-1 rounded-full border border-ms-gold-3 bg-ms-gold-4/30 px-2.5 py-1 font-ms-uppercase text-[10px] uppercase tracking-wider text-ms-gold-1">
+                  ✦ Vigente
+                </span>
+              </div>
+              <div className="mt-3 flex gap-1.5">
+                {SEAL_SWATCHES.map(([cls, label]) => (
+                  <span key={cls} title={label} className={`h-4 w-4 rounded-full border border-black/30 ${cls}`} />
+                ))}
+              </div>
+            </div>
+          </Sample>
+        ))}
       </Section>
     </>
   )

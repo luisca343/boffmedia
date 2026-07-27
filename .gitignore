@@ -47,3 +47,4 @@ __pycache__/
 .agents
 .horus/
 .claude
+.sdd/current/*

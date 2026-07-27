@@ -290,6 +290,8 @@ export const CHAPTERS: Chapter[] = [
       { id: "ms-ornamento", label: "Ornamento" },
       { id: "ms-controles", label: "Controles" },
       { id: "ms-recortes", label: "Recortes del corcho" },
+      { id: "ms-navegacion", label: "Navegación · estilos de pestaña" },
+      { id: "ms-paletas", label: "Paletas · temas del tablón" },
     ],
   },
   {
@@ -300,6 +302,7 @@ export const CHAPTERS: Chapter[] = [
       { id: "ms-papeles", label: "Papeles" },
       { id: "ms-botin", label: "Botín" },
       { id: "ms-cadena", label: "Cadena" },
+      { id: "ms-superficie", label: "Superficie" },
     ],
   },
 

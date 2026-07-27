@@ -25,7 +25,10 @@ export function SideRail() {
   const isCurrent = useIsCurrent()
 
   return (
-    <aside className="ms-wood hidden w-60 shrink-0 flex-col border-r-[3px] border-[#050201] md:flex">
+    <aside
+      data-tabstyle="sello"
+      className="ms-wood ms-side-rail hidden w-60 shrink-0 flex-col border-r-[3px] border-[#050201] md:flex"
+    >
       <div className="bg-gradient-to-b from-black/40 to-transparent px-4 pb-[18px] pt-[22px] text-center">
         <div className="inline-flex items-center gap-1.5 font-ms-uppercase text-[11px] uppercase tracking-[.2em] text-ms-gold-2">
           {t("eyebrow")}

@@ -75,29 +75,31 @@ export default function TablonPage() {
         counts={counts}
       />
 
-      <div className="ms-cork relative flex min-h-[200px] flex-1 flex-col px-6 pb-14 pt-8">
-        <ScatterLayer />
+      <div className="ms-board-frame flex-1">
+        <div className="ms-cork relative flex min-h-[200px] h-full flex-col px-6 pb-14 pt-8">
+          <ScatterLayer />
 
-        {papers.length === 0 ? (
-          <EmptyBoard>
-            {quests.length === 0
-              ? t("emptyBoard")
-              : t("emptyFiltered")}
-          </EmptyBoard>
-        ) : (
-          <div className="relative z-[2] grid gap-9 [grid-template-columns:repeat(auto-fill,minmax(280px,1fr))]">
-            {papers.map((quest) => (
-              <QuestPaper
-                key={quest.id}
-                quest={quest}
-                npc={npcForQuest(npcs, quest)}
-                region={regionOf(regions, quest.category)}
-                selected={openQuest?.id === quest.id}
-                onOpen={() => open(quest)}
-              />
-            ))}
-          </div>
-        )}
+          {papers.length === 0 ? (
+            <EmptyBoard>
+              {quests.length === 0
+                ? t("emptyBoard")
+                : t("emptyFiltered")}
+            </EmptyBoard>
+          ) : (
+            <div className="relative z-[2] grid gap-9 [grid-template-columns:repeat(auto-fill,minmax(280px,1fr))]">
+              {papers.map((quest) => (
+                <QuestPaper
+                  key={quest.id}
+                  quest={quest}
+                  npc={npcForQuest(npcs, quest)}
+                  region={regionOf(regions, quest.category)}
+                  selected={openQuest?.id === quest.id}
+                  onOpen={() => open(quest)}
+                />
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   )
