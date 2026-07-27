@@ -53,7 +53,10 @@ export function useMewCodex() {
       let keys = Object.keys(counts)
       if (fd.order) keys.sort((a, b) => { const ia = fd.order!.indexOf(a), ib = fd.order!.indexOf(b); return (ia < 0 ? 99 : ia) - (ib < 0 ? 99 : ib) || a.localeCompare(b) })
       else keys.sort((a, b) => counts[b] - counts[a] || a.localeCompare(b))
-      return { ...fd, label: t(fd.label), options: keys.map((k) => ({ value: k, label: fd.labelFn ? t(fd.labelFn(k)) : k, count: counts[k], color: fd.colorFn ? fd.colorFn(k) : undefined })) }
+      // labelFn may return either a message key (`filter.kind.weapon`) or an already
+      // human-readable label from mewHuman — only the former may reach t().
+      const tk = (s: string) => (/^[a-z][\w]*(\.[\w]+)+$/.test(s) ? t(s) : s)
+      return { ...fd, label: t(fd.label), options: keys.map((k) => ({ value: k, label: fd.labelFn ? tk(fd.labelFn(k)) : k, count: counts[k], color: fd.colorFn ? fd.colorFn(k) : undefined })) }
     })
   }, [cat, list, t])
 

@@ -55,6 +55,25 @@ export const SCOPED_NAMESPACES: ReadonlyArray<{
 ]
 
 /**
+ * DISABLED 2026-07-28 — narrowing is unsound while the provider lives in the root layout.
+ *
+ * `NextIntlClientProvider` is mounted in `app/layout.tsx` with `await getMessages()`.
+ * The root layout is shared by every route and does NOT re-render on client-side
+ * navigation, so the message set is frozen at whatever the ENTRY pathname resolved to.
+ * Enter on `/smartrotom` (CORE only), then click through to `/smartrotom/rooker`, and
+ * every `rooker.*` key is missing at once — the whole app renders MISSING_MESSAGE.
+ * A direct load of the same URL works, which is why curl probes all looked green.
+ *
+ * Re-enabling requires the provider to re-render per route — move it into a
+ * per-segment layout (or pass messages per route) FIRST, then flip this to true and
+ * verify by CLIENT-SIDE NAVIGATION, not by loading the URL directly.
+ *
+ * Until then every namespace loads on every request: the pre-2026-07-27 behaviour.
+ * Costs bytes (~630 KB vs 169 KB on a typical page), never correctness.
+ */
+const SCOPING_ENABLED = false
+
+/**
  * Namespaces to load for a pathname: CORE plus anything scoped to it.
  *
  * An empty pathname means the proxy did not run (it is the only source of the
@@ -62,6 +81,19 @@ export const SCOPED_NAMESPACES: ReadonlyArray<{
  * blank out exactly the scoped pages. Heavier, never broken.
  */
 export function namespacesFor(
+  pathname: string,
+  all: readonly Namespace[],
+): Namespace[] {
+  if (!SCOPING_ENABLED) return [...all]
+  return narrowNamespaces(pathname, all)
+}
+
+/**
+ * The narrowing itself, independent of {@link SCOPING_ENABLED}. Exported so the
+ * behaviour stays under test while scoping is off — the logic is correct, it is the
+ * root-layout provider that cannot deliver it. Do not call this directly.
+ */
+export function narrowNamespaces(
   pathname: string,
   all: readonly Namespace[],
 ): Namespace[] {
