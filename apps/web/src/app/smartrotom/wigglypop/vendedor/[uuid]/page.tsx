@@ -111,6 +111,7 @@ export default function SellerPage({ params }: { params: Promise<{ uuid: string 
                     variant="compact"
                     watched={watchedIds.has(L.id)}
                     onWatch={() => toggleWatch.mutate(L.id)}
+                    watchBusy={toggleWatch.isPending}
                     onOpen={() => router.push(`/smartrotom/wigglypop/anuncio/${L.id}`)}
                   />
                 ))}

@@ -1,3 +1,7 @@
+// Neither helper here has an equivalent in `lib/format`: `formatDuration` parses
+// Twitch's "1h2m30s" strings, and `getTimeSince` renders Twitch-style English
+// ("2m ago") that keeps counting in months/years instead of falling back to a date.
+// `formatCompact` IS single-sourced — see `_utils/twitch.ts`'s `compactCount`.
 export const formatDuration = (duration: string): string => {
   // Duration comes in format like "1h2m30s" or "2m30s" or "30s"
   const hours = duration.match(/(\d+)h/)?.[1] || '0';

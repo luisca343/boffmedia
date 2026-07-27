@@ -127,7 +127,7 @@ export function ClaimModal({ open, onClose, items }: ClaimModalProps) {
     setSelected((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]))
 
   const submit = async () => {
-    if (picked.length === 0) return
+    if (picked.length === 0 || claim.isPending) return
     try {
       await claim.mutateAsync(picked)
       setSelected([])

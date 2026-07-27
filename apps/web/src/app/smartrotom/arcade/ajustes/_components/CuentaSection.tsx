@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react"
 import { signOut } from "next-auth/react"
 import { useTranslations } from "next-intl"
+import { useGuardedSubmit } from "@/components/smartrotom/behavior/useGuardedSubmit"
 import { useArcadeStreak, useArcadeUuid } from "../../_hooks/queries"
 import { useCountdown } from "../../_hooks/useCountdown"
 import { Button, Icon, Panel, Skeleton, Tag } from "../../_components/ui"
@@ -14,6 +15,7 @@ export function CuentaSection() {
   const streak = useArcadeStreak()
   const resetIn = useCountdown(streak.data?.nextResetTime)
   const [copied, setCopied] = useState(false)
+  const { submit: doSignOut, isPending: signingOut } = useGuardedSubmit(() => signOut({ callbackUrl: "/" }))
 
   useEffect(() => {
     if (!copied) return
@@ -77,7 +79,8 @@ export function CuentaSection() {
             size="sm"
             className="mt-2.5"
             icon={<Icon.X s={12} />}
-            onClick={() => signOut({ callbackUrl: "/" })}
+            onClick={() => void doSignOut()}
+            disabled={signingOut}
           >
             {t("ajustes.cuenta.signOut")}
           </Button>

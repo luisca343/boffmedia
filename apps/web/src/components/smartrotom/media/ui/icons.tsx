@@ -31,6 +31,7 @@ import {
   type LucideIcon,
 } from "lucide-react"
 import { Rotom } from "@/lib/smartrotom/customIcons"
+import { makeGlyphIcon } from "@/components/smartrotom/behavior/makeIconComponent"
 
 export interface IconProps {
   size?: number
@@ -65,22 +66,10 @@ function Icon({
 
 /** `filled` glyphs render solid (`fill="currentColor"`, no visible stroke). */
 function make(Glyph: LucideIcon, opts: { filled?: boolean } = {}) {
-  return ({ size = 20, className }: IconProps) => (
-    <Glyph
-      size={size}
-      strokeWidth={1.75}
-      fill={opts.filled ? "currentColor" : "none"}
-      stroke={opts.filled ? "none" : "currentColor"}
-      className={className}
-      aria-hidden="true"
-      focusable="false"
-    />
-  )
+  return makeGlyphIcon(Glyph, { size: 20, strokeWidth: 1.75, fill: Boolean(opts.filled) })
 }
 
-const IcRotom = ({ size = 20, className }: IconProps) => (
-  <Rotom size={size} strokeWidth={1.5} className={className} aria-hidden="true" focusable="false" />
-)
+const IcRotom = makeGlyphIcon(Rotom, { size: 20, strokeWidth: 1.5 })
 
 /**
  * Icon registry — lucide-react placeholders standing in for the hand-drawn glyphs

@@ -12,10 +12,12 @@ export function AnuncioCard({
   anuncio,
   onEdit,
   onDelete,
+  deleting = false,
 }: {
   anuncio: Anuncio
   onEdit: () => void
   onDelete: () => void
+  deleting?: boolean
 }) {
   const t = useTranslations("gobierno")
   const openDossier = useGobiernoUi((s) => s.openDossier)
@@ -47,7 +49,7 @@ export function AnuncioCard({
             <Button tone="plain" size="sm" onClick={onEdit}>
               {t("anuncios.editar")}
             </Button>
-            <Button tone="plain" size="sm" icon="trash" onClick={onDelete} aria-label={t("anuncios.retirar")} />
+            <Button tone="plain" size="sm" icon="trash" onClick={onDelete} disabled={deleting} aria-label={t("anuncios.retirar")} />
           </div>
         )}
       </div>

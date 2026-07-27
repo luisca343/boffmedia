@@ -1,4 +1,4 @@
-import * as React from "react";
+import { makeGlyphIcon, type GlyphIconProps } from "@/components/smartrotom/behavior/makeIconComponent";
 import {
   Home,
   CreditCard,
@@ -45,24 +45,15 @@ import {
   type LucideIcon,
 } from "lucide-react";
 
-export interface IconProps {
-  size?: number;
-  stroke?: number;
-  className?: string;
-  style?: React.CSSProperties;
-}
+/** `stroke` is a WIDTH, not a colour. */
+export type IconProps = GlyphIconProps;
 
 function make(Glyph: LucideIcon) {
-  return ({ size = 18, stroke = 1.6, className = "", style, ...rest }: IconProps) => (
-    <Glyph
-      size={size}
-      strokeWidth={stroke}
-      className={"ico " + className}
-      style={style}
-      aria-hidden="true"
-      {...rest}
-    />
-  );
+  return makeGlyphIcon(Glyph, {
+    size: 18,
+    strokeWidth: 1.6,
+    className: (cls) => "ico " + (cls ?? ""),
+  });
 }
 
 /**

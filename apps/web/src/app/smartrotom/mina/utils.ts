@@ -119,7 +119,7 @@ function  validPosition(rew: {reward: MineReward, x: number, y: number}, compari
 
 
 export function jugar(session: any, router: AppRouterInstance, redirect: string = "" ){
-    MinaService.playGame({uuid: session?.user.smartRotomUser.uuid}).then(res => {
+    return MinaService.playGame({uuid: session?.user.smartRotomUser.uuid}).then(res => {
         if(!res.error) return router.push('/smartrotom/mina/jugar')
         toast.error(res.error)
         redirect != "" && router.push(redirect)

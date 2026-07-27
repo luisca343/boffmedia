@@ -10,17 +10,36 @@ export function toMs(value: string | number | Date | null | undefined): number {
   return Number.isNaN(t) ? 0 : t
 }
 
+export interface TimeAgoOptions {
+  /** Reference "now". Pass a fixed Date to keep rendering deterministic (no
+   *  hydration drift in demo/showcase data). Defaults to the real clock. */
+  now?: Date | number
+  /** What to render past a week. `"date"` (default) → a plain date, "12 mar".
+   *  `"relative"` → keeps counting in weeks and months, "hace 2 sem". */
+  tail?: "date" | "relative"
+  /** Label for the sub-minute bucket. Defaults to "ahora". */
+  nowLabel?: string
+}
+
 /** Short Spanish relative time: "ahora" · "hace 4 min" · "hace 3 h" · "hace 2 d",
  *  then a plain date ("12 mar") past a week. "—" when missing/unparseable. */
-export function timeAgo(value: string | number | Date | null | undefined): string {
+export function timeAgo(
+  value: string | number | Date | null | undefined,
+  options: TimeAgoOptions = {},
+): string {
   const ms = toMs(value)
   if (!ms) return "—"
-  const diff = Date.now() - ms
-  if (diff < MIN) return "ahora"
+  const { now, tail = "date", nowLabel = "ahora" } = options
+  const diff = (now == null ? Date.now() : toMs(now)) - ms
+  if (diff < MIN) return nowLabel
   if (diff < HOUR) return `hace ${Math.floor(diff / MIN)} min`
   if (diff < DAY) return `hace ${Math.floor(diff / HOUR)} h`
-  if (diff < 7 * DAY) return `hace ${Math.floor(diff / DAY)} d`
-  return new Date(ms).toLocaleDateString("es-ES", { day: "numeric", month: "short" })
+  const days = Math.floor(diff / DAY)
+  if (days < 7) return `hace ${days} d`
+  if (tail === "date") return new Date(ms).toLocaleDateString("es-ES", { day: "numeric", month: "short" })
+  if (days < 30) return `hace ${Math.floor(days / 7)} sem`
+  const months = Math.floor(days / 30)
+  return `hace ${months} mes${months > 1 ? "es" : ""}`
 }
 
 /** Long-form Spanish relative time: "hace 3 días" · "hace 2 semanas". "" when missing. */

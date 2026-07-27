@@ -20,12 +20,17 @@ export function TagEditor({ monKey }: TagEditorProps) {
 
   const tags = marks ? markOf(marks, monKey).tags : []
 
-  const write = (next: string[]) => setMark.mutate({ key: monKey, patch: { tags: next } })
+  const busy = setMark.isPending
+
+  const write = (next: string[]) => {
+    if (busy) return
+    setMark.mutate({ key: monKey, patch: { tags: next } })
+  }
 
   const add = (tag: string) => {
     const t = tag.trim()
     setDraft("")
-    if (!t || tags.includes(t)) return
+    if (!t || tags.includes(t) || busy) return
     write([...tags, t])
   }
 
@@ -38,6 +43,7 @@ export function TagEditor({ monKey }: TagEditorProps) {
             <button
               type="button"
               aria-label={`Quitar etiqueta ${t}`}
+              disabled={busy}
               onClick={() => write(tags.filter((x) => x !== t))}
               className="flex text-pc-fg-subtle transition-colors hover:text-pc-rose focus-visible:outline-none"
             >
@@ -55,7 +61,7 @@ export function TagEditor({ monKey }: TagEditorProps) {
           onKeyDown={(e) => {
             if (e.key === "Enter") {
               e.preventDefault()
-              add(draft)
+              if (!busy) add(draft)
             }
             // The drawer navigates on ← / →; typing a tag must not flip the Pokémon.
             e.stopPropagation()
@@ -64,14 +70,14 @@ export function TagEditor({ monKey }: TagEditorProps) {
           aria-label={t("filters.tag")}
           className="flex-1"
         />
-        <Button icon onClick={() => add(draft)} aria-label={t("filters.tag")} disabled={!draft.trim()}>
+        <Button icon onClick={() => add(draft)} aria-label={t("filters.tag")} disabled={!draft.trim() || busy}>
           <Icon name="plus" size={14} />
         </Button>
       </div>
 
       <div className="mt-2 flex flex-wrap gap-1.5">
         {SUGGESTED_TAGS.filter((s) => !tags.includes(s)).map((s) => (
-          <ChipButton key={s} onClick={() => add(s)}>
+          <ChipButton key={s} disabled={busy} onClick={() => add(s)}>
             + {s}
           </ChipButton>
         ))}

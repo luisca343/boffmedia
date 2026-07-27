@@ -50,6 +50,7 @@ export function ArticleFooter({ article }: { article: FtArticle }) {
         <div className="flex shrink-0 gap-2">
           <Button
             onClick={() => clap.mutate()}
+            disabled={clap.isPending}
             aria-label="Aplaudir este artículo"
           >
             👏 {article.claps}

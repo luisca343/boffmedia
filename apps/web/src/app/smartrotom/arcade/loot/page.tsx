@@ -65,6 +65,7 @@ export default function LootPage() {
   const box: ResolvedBox | undefined = boxes[Math.min(index, Math.max(boxes.length - 1, 0))]
 
   const open = async (target: ResolvedBox) => {
+    if (openBox.isPending) return
     try {
       const result = await openBox.mutateAsync(target.id)
       setSession((prev) => ({ nonce: (prev?.nonce ?? 0) + 1, box: target, result }))

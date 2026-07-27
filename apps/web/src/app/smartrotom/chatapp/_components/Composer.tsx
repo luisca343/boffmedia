@@ -23,6 +23,7 @@ export function Composer({
   onOpenDocument,
   onTyping,
   clearReply,
+  busy,
 }: {
   reply: ChatMessageVM | null;
   session: unknown;
@@ -33,6 +34,7 @@ export function Composer({
   onOpenDocument: () => void;
   onTyping: () => void;
   clearReply: () => void;
+  busy?: boolean;
 }) {
   const t = useTranslations("chatapp");
   const [text, setText] = useState("");
@@ -50,7 +52,7 @@ export function Composer({
   };
   const send = () => {
     const v = text.trim();
-    if (!v) return;
+    if (!v || busy) return;
     onSendText(v);
     setText("");
     if (ta.current) ta.current.style.height = "auto";
@@ -105,7 +107,7 @@ export function Composer({
             value={text}
             placeholder={t("composer.placeholder")}
             onChange={(e) => { setText(e.target.value); grow(e.target); onTyping(); }}
-            onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); } }}
+            onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); if (!busy) send(); } }}
             className="max-h-[120px] min-w-0 flex-1 resize-none bg-transparent px-1 py-[9px] text-[15px] leading-[1.4] text-ca-50 outline-none placeholder:text-ca-500"
           />
           <div className="relative flex-none self-end">
@@ -134,7 +136,7 @@ export function Composer({
                 ) : (
                   <div className="ca-scroll grid max-h-[210px] grid-cols-4 gap-1.5 overflow-y-auto p-2">
                     {STICKERS.map((s) => (
-                      <button key={s.path} onClick={() => { onSendSticker(s.path); setMenu(null); }} className="rounded-[10px] bg-ca-900 p-1.5 hover:bg-ca-700">
+                      <button key={s.path} onClick={() => { onSendSticker(s.path); setMenu(null); }} disabled={busy} className="rounded-[10px] bg-ca-900 p-1.5 hover:bg-ca-700 disabled:opacity-60">
                         <img src={s.path} alt={s.name} className="w-full [image-rendering:pixelated]" />
                       </button>
                     ))}
@@ -146,7 +148,7 @@ export function Composer({
         </div>
 
         {text.trim() ? (
-          <button onClick={send} title={t("composer.send")} className="grid h-[46px] w-[46px] flex-none place-items-center rounded-full bg-ca-accent text-ca-on-accent transition-[transform,filter] hover:brightness-[1.06] active:scale-90">
+          <button onClick={send} disabled={busy} title={t("composer.send")} className="grid h-[46px] w-[46px] flex-none place-items-center rounded-full bg-ca-accent text-ca-on-accent transition-[transform,filter] hover:brightness-[1.06] active:scale-90 disabled:opacity-60">
             <Icon name="send" size={19} />
           </button>
         ) : (

@@ -1,4 +1,4 @@
-import type { SVGProps } from "react"
+import { makeGlyphIcon } from "@/components/smartrotom/behavior/makeIconComponent"
 import {
   Scroll,
   Map,
@@ -22,12 +22,8 @@ import {
  * The board's icon set — lucide-react placeholders standing in for the hand-drawn
  * ink glyphs this replaced. See the migration ledger for fidelity notes.
  */
-type IconProps = SVGProps<SVGSVGElement> & { size?: number }
-
 function make(Glyph: LucideIcon, defaultStrokeWidth = 1.5) {
-  return ({ size = 14, ...rest }: IconProps) => (
-    <Glyph size={size} strokeWidth={defaultStrokeWidth} aria-hidden focusable="false" {...rest} />
-  )
+  return makeGlyphIcon(Glyph, { size: 14, strokeWidth: defaultStrokeWidth })
 }
 
 export const Icon = {

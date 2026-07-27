@@ -1,3 +1,8 @@
+// `ExtendedPokemonW` is the generated `PokemonW` DTO plus the four fields the game
+// server sends but the OpenAPI spec omits (see `types/dto/pc-pokemon.dto.ts`).
+// Everything else declared below is a PC-only view model: the server exposes four
+// reads and one write (`POST /pc/move`) and no DTO for placement, filters, sorting
+// or saved views, so those stay hand-written.
 import type { ExtendedPokemonW, PCPokemon } from "@/types/dto/pc-pokemon.dto"
 
 /**
