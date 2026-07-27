@@ -66,10 +66,12 @@ export function SorteosChapter() {
         }
       >
         <Sample title="Estados" code="<SrtStatusChip status>">
-          <SrtStatusChip status={{ key: "active", label: "En curso", tone: "live" }} />
-          <SrtStatusChip status={{ key: "upcoming", label: "Próximo", tone: "info" }} />
-          <SrtStatusChip status={{ key: "ended", label: "Sorteando", tone: "muted" }} />
-          <SrtStatusChip status={{ key: "announced", label: "Ganador anunciado", tone: "accent" }} />
+          {/* `SrtStatus` carries only key + tone now; the label is resolved from
+              common.giveaways.status.<key> by the chip itself. */}
+          <SrtStatusChip status={{ key: "active", tone: "live" }} />
+          <SrtStatusChip status={{ key: "upcoming", tone: "info" }} />
+          <SrtStatusChip status={{ key: "ended", tone: "muted" }} />
+          <SrtStatusChip status={{ key: "announced", tone: "accent" }} />
         </Sample>
         <Sample title="Organizador y origen" code="<SrtOrganizer> · <SrtSourceTag>" note="El origen distingue la plataforma abierta: comunidad, viewers importados de Twitch o lista manual/CSV.">
           <SrtOrganizer organizer={{ name: "Boffmedia", avatar: "B", kind: "boffmedia" }} />

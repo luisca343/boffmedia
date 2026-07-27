@@ -1,4 +1,5 @@
 import { Camera, Image as ImageIcon } from "lucide-react"
+import { useTranslations } from "next-intl"
 import { Button } from "@/components/ui/primitives/button"
 
 interface CameraBottomControlsProps {
@@ -14,6 +15,7 @@ export function CameraBottomControls({
   onOpenGallery, 
   onCapture 
 }: CameraBottomControlsProps) {
+  const t = useTranslations("camara")
   return (
     <div className="h-24 bg-gradient-to-t from-black/60 to-transparent flex items-center justify-between px-8">
       <Button 
@@ -21,6 +23,7 @@ export function CameraBottomControls({
         size="icon" 
         className="rounded-full"
         onClick={onOpenGallery}
+        aria-label={t("controls.openGallery")}
         disabled={galleryCount === 0}
       >
         <ImageIcon className="h-8 w-8" aria-hidden="true" />
@@ -35,6 +38,7 @@ export function CameraBottomControls({
         size="icon" 
         className="rounded-full border-4 border-white p-1"
         onClick={onCapture}
+        aria-label={t("controls.capture")}
         disabled={isCapturing}
       >
         <div className={`bg-white rounded-full h-16 w-16 ${isCapturing ? 'animate-pulse' : ''}`}></div>

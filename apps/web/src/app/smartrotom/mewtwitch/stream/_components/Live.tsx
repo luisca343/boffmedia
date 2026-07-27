@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { useTranslations } from "next-intl"
 import { Avatar, Button, Check, I, PillBtn, SectionHeader, StreamCard, Tag } from "@/components/smartrotom/media/ui"
+import { useFormat } from "@/lib/useFormat"
 import { useFollowerCount, useStreamByUser, useTopStreams, useUser } from "../../_hooks/useTwitch"
 import { compactCount, toStreamCard, twitchThumb, uptimeFrom } from "../../_utils/twitch"
 import { StreamPlayer } from "./StreamPlayer"
@@ -20,6 +21,7 @@ function Stat({ label, value, sub }: { label: string; value: string; sub?: strin
 
 export function Live({ channel }: { channel: string }) {
   const t = useTranslations("twitch")
+  const { time } = useFormat()
   const stream = useStreamByUser(channel)
   const user = useUser(channel)
   const followers = useFollowerCount(user.data?.id ?? "")
@@ -36,7 +38,7 @@ export function Live({ channel }: { channel: string }) {
   const name = u?.display_name ?? channel
   const startedAt = s?.started_at
   const startClock = startedAt
-    ? new Date(startedAt).toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" })
+    ? time(startedAt, { hour: "2-digit", minute: "2-digit" })
     : undefined
   const otherStreams = (others.data ?? [])
     .filter((x) => x.user_login !== channel.toLowerCase())

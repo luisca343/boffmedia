@@ -27,17 +27,17 @@ export default function BitacoraPage() {
     })
   }, [dialogs, npcs, search])
 
-  if (isLoading) return <BoardLoading>Reuniendo la bitácora…</BoardLoading>
+  if (isLoading) return <BoardLoading>{t("bitacora.loading")}</BoardLoading>
   if (error) return <BoardError message={error} />
 
   return (
     <div className="flex min-h-full flex-col">
       <div className="mb-6 mt-2.5 text-center">
-        <Label className="text-ms-gold-1">Diario</Label>
+        <Label className="text-ms-gold-1">{t("bitacora.eyebrow")}</Label>
         <h1 className="mb-1.5 mt-1 font-ms-display text-[38px] text-ms-paper-1 [text-shadow:0_2px_12px_rgba(0,0,0,.6)]">
-          Bitácora de Diálogos
+          {t("bitacora.title")}
         </h1>
-        <div className="font-ms text-sm italic text-ms-paper-3">Cada palabra registrada con tinta indeleble</div>
+        <div className="font-ms text-sm italic text-ms-paper-3">{t("bitacora.subtitle")}</div>
         <div className="mt-4">
           <Divider glyph="✦" className="text-ms-gold-2" />
         </div>

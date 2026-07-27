@@ -31,6 +31,11 @@ export const boffMediaUsers = mysqlTable('boffmedia_users', {
   // Credential sign-ups start unverified; OAuth (Google) accounts are verified
   // on creation. Existing rows are backfilled to true by migration 0009.
   emailVerified: boolean('email_verified').notNull().default(false),
+  // Stored language preference, used for server-composed text the browser
+  // cannot translate (transactional emails). NULL = never chosen, falls back
+  // to Spanish. Deliberately NOT request Accept-Language: that is wrong for
+  // anything the user did not trigger from a browser.
+  locale: varchar('locale', { length: 8 }),
   createdAt: timestamp('created_at', { mode: 'date' }).defaultNow(),
   updatedAt: timestamp('updated_at', { mode: 'date' })
     .defaultNow()

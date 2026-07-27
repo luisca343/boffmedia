@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import type { NoteFolder, NoteTag } from "@boffmedia/shared";
 import { Icon, MiniTag, Avatar } from "./ui";
 import { outline, extractLinks } from "../_utils/wikilinks";
@@ -25,6 +25,7 @@ type Tab = "outline" | "backlinks" | "info";
 
 export function ContextPanel(props: ContextPanelProps) {
   const t = useTranslations("notas");
+  const locale = useLocale();
   const { note, activeContent, notes, contentById, folders, tags } = props;
   const [tab, setTab] = useState<Tab>("outline");
 
@@ -166,8 +167,8 @@ export function ContextPanel(props: ContextPanelProps) {
                 t("context.private")
               )}
             </InfoRow>
-            <InfoRow label={t("context.created")}>{fullDate(note.createdMs)}</InfoRow>
-            <InfoRow label={t("context.modified")}>{fullDate(note.updatedMs)}</InfoRow>
+            <InfoRow label={t("context.created")}>{fullDate(note.createdMs, locale)}</InfoRow>
+            <InfoRow label={t("context.modified")}>{fullDate(note.updatedMs, locale)}</InfoRow>
             <InfoRow label={t("context.visibility")}>
               <span className="inline-flex items-center gap-1.5">
                 <Icon name={note.public ? "globe" : "lock"} size={14} />

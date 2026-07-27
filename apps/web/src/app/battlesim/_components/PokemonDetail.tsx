@@ -5,6 +5,7 @@ import { ScrollArea } from "@/components/ui/primitives/scroll-area";
 import { Pokemon } from "@pkmn/client";
 import { StatID } from "@pkmn/data";
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { Activity, Shield, Zap } from "lucide-react";
 
 interface PokemonDetailProps {
@@ -38,6 +39,7 @@ export default function PokemonDetail({
     offset = 20,
     showFullInfo = false,
 }: PokemonDetailProps) {
+    const t = useTranslations("battlesim.detail");
     const [activeTab, setActiveTab] = useState("info");
 
     let types;
@@ -103,7 +105,7 @@ export default function PokemonDetail({
                                     className="text-t-xs"
                                     style={{ color: "var(--text-dim)" }}
                                 >
-                                    Tera:
+                                    {t("tera")}
                                 </span>
                                 <TypeBadgeSmall
                                     key={pokemon.teraType}
@@ -151,7 +153,7 @@ export default function PokemonDetail({
                                 color: getStatusColor(pokemon.status).text,
                             }}
                         >
-                            {getStatusName(pokemon.status)}
+                            {statusName(t, pokemon.status)}
                         </div>
                     )}
                 </div>
@@ -172,21 +174,21 @@ export default function PokemonDetail({
                             style={activeTab === "info" ? tabBtnActive : tabBtn}
                         >
                             <Activity className="h-3.5 w-3.5 mr-1" />
-                            Info
+                            {t("info")}
                         </TabsTrigger>
                         <TabsTrigger
                             value="stats"
                             style={activeTab === "stats" ? tabBtnActive : tabBtn}
                         >
                             <Shield className="h-3.5 w-3.5 mr-1" />
-                            Stats
+                            {t("stats")}
                         </TabsTrigger>
                         <TabsTrigger
                             value="moves"
                             style={activeTab === "moves" ? tabBtnActive : tabBtn}
                         >
                             <Zap className="h-3.5 w-3.5 mr-1" />
-                            Moves
+                            {t("moves")}
                         </TabsTrigger>
                     </TabsList>
 
@@ -205,7 +207,7 @@ export default function PokemonDetail({
                                             className="text-t-xs font-semibold mb-1"
                                             style={{ color: "var(--text-dim)" }}
                                         >
-                                            Stat Changes
+                                            {t("statChanges")}
                                         </div>
                                         <div className="flex flex-wrap gap-1">
                                             {Object.entries(pokemon.boosts).map(
@@ -249,7 +251,7 @@ export default function PokemonDetail({
                                         className="text-t-xs font-semibold mb-1"
                                         style={{ color: "var(--text-dim)" }}
                                     >
-                                        Abilities
+                                        {t("abilities")}
                                     </div>
                                     <div className="flex flex-wrap gap-1">
                                         {pokemon.species.abilities[0] && (
@@ -304,7 +306,7 @@ export default function PokemonDetail({
                                             className="text-t-xs font-semibold mb-1"
                                             style={{ color: "var(--text-dim)" }}
                                         >
-                                            Item
+                                            {t("item")}
                                         </div>
                                         <span
                                             className="text-t-3xs px-2 py-1 rounded inline-block"
@@ -413,8 +415,8 @@ export default function PokemonDetail({
                                 style={{ color: "var(--text-dim)" }}
                             >
                                 {showDetailedInfo
-                                    ? "Values adjusted for level and boosts"
-                                    : "Only base stats are shown"}
+                                    ? t("statsAdjusted")
+                                    : t("statsBaseOnly")}
                             </div>
                         </div>
                     </TabsContent>
@@ -428,8 +430,8 @@ export default function PokemonDetail({
                                     style={{ color: "var(--text-dim)" }}
                                 >
                                     {showDetailedInfo
-                                        ? "Known moves:"
-                                        : "Revealed moves:"}
+                                        ? t("knownMoves")
+                                        : t("revealedMoves")}
                                 </div>
 
                                 {pokemon.movesUsedWhileActive.length > 0 ? (
@@ -456,8 +458,8 @@ export default function PokemonDetail({
                                         style={{ color: "var(--text-dim)" }}
                                     >
                                         {showDetailedInfo
-                                            ? "No moves data available"
-                                            : "No revealed moves yet"}
+                                            ? t("noMovesData")
+                                            : t("noRevealedMoves")}
                                     </div>
                                 )}
                             </div>
@@ -510,14 +512,9 @@ function getStatusColor(status: string) {
     }
 }
 
-function getStatusName(status: string) {
-    switch (status) {
-        case 'brn': return 'Burned';
-        case 'frz': return 'Frozen';
-        case 'par': return 'Paralyzed';
-        case 'psn': return 'Poisoned';
-        case 'tox': return 'Badly Poisoned';
-        case 'slp': return 'Asleep';
-        default: return status.toUpperCase();
-    }
+const STATUS_IDS = new Set(['brn', 'frz', 'par', 'psn', 'tox', 'slp']);
+
+/** Resolves a `battlesim.detail.status.*` label; unknown codes fall back to the raw id. */
+function statusName(t: (key: string) => string, status: string) {
+    return STATUS_IDS.has(status) ? t(`status.${status}`) : status.toUpperCase();
 }

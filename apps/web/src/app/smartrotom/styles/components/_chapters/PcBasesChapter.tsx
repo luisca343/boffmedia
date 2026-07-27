@@ -1,7 +1,8 @@
 "use client"
 
 import * as React from "react"
-import { BOX_THEMES, THEME_ACCENT, THEME_LABEL, WALLPAPER_CLASS } from "@/app/smartrotom/pc/_utils/boxThemes"
+import { useTranslations } from "next-intl"
+import { BOX_THEMES, THEME_ACCENT, THEME_LABEL_KEY, WALLPAPER_CLASS } from "@/app/smartrotom/pc/_utils/boxThemes"
 import { MONO_LABEL, Sample, Section, Swatches } from "../showcase-shared"
 
 const STRUCTURE = [
@@ -25,6 +26,7 @@ const ROLES = [
 ] as const
 
 export function PcBasesChapter() {
+  const tr = useTranslations("pc")
   return (
     <>
       <Section
@@ -118,7 +120,7 @@ export function PcBasesChapter() {
                   style={{ background: THEME_ACCENT[t] }}
                 />
                 <span className="absolute inset-x-0 bottom-1 text-center text-[10px] font-semibold text-pc-fg [text-shadow:0_1px_3px_#000]">
-                  {THEME_LABEL[t]}
+                  {tr(THEME_LABEL_KEY[t])}
                 </span>
               </div>
             ))}

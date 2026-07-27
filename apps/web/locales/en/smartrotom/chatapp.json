@@ -145,7 +145,11 @@
     },
     "toast": {
       "messageSent": "Message sent.",
-      "sendFailed": "Could not send message."
+      "sendFailed": "Could not send message.",
+      "sendVideoFailed": "Couldn't send the video",
+      "sendWaypointFailed": "Couldn't send the waypoint",
+      "sendDocumentFailed": "Couldn't send the document",
+      "sendImageFailed": "Couldn't send the image"
     },
     "gallery": {
       "title": "Share capture",
@@ -199,7 +203,9 @@
         "incoming": "Incoming call",
         "noAnswer": "No answer",
         "duration": "Duration {time}"
-      }
+      },
+      "youtubeTitle": "YouTube video",
+      "stickerAlt": "Sticker"
     },
     "preview": {
       "noMessages": "No messages",

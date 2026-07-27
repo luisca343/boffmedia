@@ -58,17 +58,26 @@ export function toPokeData(d: PokemonUsageDetail): PokeData {
   }
 }
 
-export function toTeamSlot(slot: { speciesName: string; item?: string; tera?: string; moves: string[] }): TeamSlot {
+// `teraNoneLabel`/`teamFallback` are Spanish defaults (matches on-screen copy today);
+// callers with access to `t()` should pass `t("meta.adapter.teraNone")` / `t("meta.adapter.teamFallback")`.
+export function toTeamSlot(
+  slot: { speciesName: string; item?: string; tera?: string; moves: string[] },
+  teraNoneLabel = "Nada",
+): TeamSlot {
   return {
     dex: getDex(slot.speciesName, slot.speciesName),
     name: slot.speciesName,
-    tera: slot.tera || "Nada",
+    tera: slot.tera || teraNoneLabel,
     item: slot.item || "",
     moves: slot.moves,
   }
 }
 
-export function toTeamEntry(entry: SpeciesTeamEntry): {
+export function toTeamEntry(
+  entry: SpeciesTeamEntry,
+  teamFallback = "Equipo",
+  teraNoneLabel = "Nada",
+): {
   slug: string
   name: string
   record: string
@@ -77,14 +86,18 @@ export function toTeamEntry(entry: SpeciesTeamEntry): {
 } {
   return {
     slug: `${entry.playerId}-${entry.source}`,
-    name: entry.rank || entry.playerName || "Equipo",
+    name: entry.rank || entry.playerName || teamFallback,
     record: entry.record || "—",
-    team: entry.slots.map(toTeamSlot),
+    team: entry.slots.map((s) => toTeamSlot(s, teraNoneLabel)),
     rawText: entry.rawText,
   }
 }
 
-export function toPlayerEntry(player: LimitlessPlayerEntry, teamCache: Map<string, LimitlessPlayerTeam>): PlayerEntry {
+export function toPlayerEntry(
+  player: LimitlessPlayerEntry,
+  teamCache: Map<string, LimitlessPlayerTeam>,
+  teraNoneLabel = "Nada",
+): PlayerEntry {
   const team = teamCache.get(player.playerSlug)
   return {
     slug: player.playerSlug,
@@ -95,7 +108,7 @@ export function toPlayerEntry(player: LimitlessPlayerEntry, teamCache: Map<strin
       ? team.slots.map((s) => ({
           dex: getDex(s.speciesName, s.speciesName),
           name: s.speciesName,
-          tera: s.tera || "Nada",
+          tera: s.tera || teraNoneLabel,
           item: s.item || "",
           moves: s.moves,
         }))

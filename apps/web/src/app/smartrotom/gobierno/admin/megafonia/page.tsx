@@ -1,7 +1,9 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import { useTranslations } from "next-intl"
 import { useGetArceuSpeak } from "@/hooks/_main/useGetArceuSpeak"
+import { useFormat } from "@/lib/useFormat"
 import { Bar, Button, Card, Empty, PageHead, Select, Skeleton, Sunken, TextArea } from "../../_components/ui"
 import { ConsolaHero } from "../../_components/admin/ConsolaHero"
 import { MCText } from "../../_components/admin/MCText"
@@ -11,6 +13,8 @@ import { useOfficer } from "../../_hooks/useOfficer"
 import { fmtDateTime } from "../../_utils/format"
 
 export default function MegafoniaPage() {
+  const t = useTranslations("gobierno")
+  const { intlLocale } = useFormat()
   const { speakers, isLoading: speakersLoading, refetch: refetchSpeakers } = useGetArceuSpeak()
   const { data: history, isLoading: historyLoading } = useMegafonia()
   const sendMegafonia = useSendMegafonia()
@@ -48,12 +52,12 @@ export default function MegafoniaPage() {
   return (
     <>
       <PageHead
-        kicker="Administración · Comunicación remota"
+        kicker={t("megafonia.kicker")}
         dep="seguridad"
-        title="Megafonía"
-        sub="Transmite mensajes al chat del servidor en nombre de una voz oficial. Antes ArceuSpeak."
+        title={t("megafonia.title")}
+        sub={t("megafonia.sub")}
       />
-      <ConsolaHero title="ArceuSpeak" code="megafonia" icon="megaphone" dep="seguridad" />
+      <ConsolaHero title={t("megafonia.heroTitle")} code="megafonia" icon="megaphone" dep="seguridad" />
 
       <div className="grid gap-4 lg:grid-cols-[1.3fr_1fr]">
         <Card className="h-fit overflow-hidden">
@@ -62,15 +66,15 @@ export default function MegafoniaPage() {
             dep="seguridad"
             right={
               <Button size="sm" tone="ghost" icon="plus" onClick={() => setShowCreator((v) => !v)}>
-                Crear voz
+                {t("megafonia.crearVoz")}
               </Button>
             }
           >
-            Emisión
+            {t("megafonia.emision")}
           </Bar>
           <div className="p-4">
             <div className="mb-1.5 font-gt-mono text-[9px] font-bold uppercase tracking-[.12em] text-gt-ink-400">
-              Emisor
+              {t("megafonia.emisor")}
             </div>
             <div className="mb-3.5">
               {speakersLoading ? (
@@ -85,18 +89,18 @@ export default function MegafoniaPage() {
             </div>
 
             <div className="mb-1.5 font-gt-mono text-[9px] font-bold uppercase tracking-[.12em] text-gt-ink-400">
-              Mensaje
+              {t("megafonia.mensaje")}
             </div>
             <div className="mb-2">
-              <TextArea rows={4} value={msg} onChange={setMsg} placeholder="Escribe el mensaje a transmitir…" />
+              <TextArea rows={4} value={msg} onChange={setMsg} placeholder={t("megafonia.mensajePlaceholder")} />
             </div>
 
             <Sunken className="mb-3.5 px-[13px] py-[11px]">
               <div className="mb-1.5 font-gt-mono text-[8.5px] uppercase tracking-[.14em] text-gt-ink-400">
-                Vista previa · chat del juego
+                {t("megafonia.vistaPrevia")}
               </div>
               <div className="text-[13.5px] leading-normal">
-                <MCText format={sp?.format} />
+                <MCText format={sp?.format} fallback={t("megafonia.vistaPreviaDefault")} />
                 <span className="text-gt-ink-800">: {msg || <span className="text-gt-ink-300">…</span>}</span>
               </div>
             </Sunken>
@@ -107,7 +111,7 @@ export default function MegafoniaPage() {
               disabled={!msg.trim() || !speakerValue || !officer.uuid || sendMegafonia.isPending}
               onClick={send}
             >
-              {sendMegafonia.isPending ? "Transmitiendo…" : "Enviar al servidor"}
+              {sendMegafonia.isPending ? t("megafonia.transmitiendo") : t("megafonia.enviarServidor")}
             </Button>
           </div>
         </Card>
@@ -117,7 +121,7 @@ export default function MegafoniaPage() {
 
           <Card className="overflow-hidden">
             <Bar icon="history" dep="seguridad">
-              Últimas emisiones
+              {t("megafonia.ultimasEmisiones")}
             </Bar>
             {historyLoading ? (
               <div className="space-y-2 p-4">
@@ -133,19 +137,19 @@ export default function MegafoniaPage() {
                     <div key={h.id} className="border-b border-gt-line-soft px-4 py-2.5 last:border-b-0">
                       <Sunken className="px-[11px] py-[7px]">
                         <span className="text-[12.5px]">
-                          <MCText format={hs?.format} />
+                          <MCText format={hs?.format} fallback={t("megafonia.vistaPreviaDefault")} />
                           <span className="text-gt-ink-800">: {h.text}</span>
                         </span>
                       </Sunken>
                       <div className="mt-[5px] font-gt-mono text-[9.5px] tabular-nums text-gt-ink-400">
-                        {h.by.username} · {fmtDateTime(h.createdAt)}
+                        {h.by.username} · {fmtDateTime(h.createdAt, intlLocale)}
                       </div>
                     </div>
                   )
                 })}
               </div>
             ) : (
-              <Empty icon="megaphone" title="Sin emisiones" sub="Todavía no se ha transmitido ningún mensaje." />
+              <Empty icon="megaphone" title={t("megafonia.emptyEmisiones")} sub={t("megafonia.emptyEmisionesSub")} />
             )}
           </Card>
         </div>

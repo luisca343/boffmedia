@@ -9,7 +9,7 @@ import { rotomGETOrThrow, rotomPATCHOrThrow, userMessageFrom } from "@/services/
 import { useGuardedSubmit } from "@/components/smartrotom/behavior/useGuardedSubmit"
 import { Icon, Empty, toast } from "../ui"
 import { useOfficer } from "../../_hooks/useOfficer"
-import { timeAgo } from "../../_utils/format"
+import { useFormat } from "@/lib/useFormat"
 import { TONES, type Tone } from "../../_utils/tones"
 
 // The officer's real SmartRotom inbox — the platform's notifications table, not a
@@ -27,6 +27,7 @@ const TYPE_TONE: Record<string, Tone> = {
 
 export function NotifBell() {
   const t = useTranslations("gobierno")
+  const { timeAgo } = useFormat()
   const { uuid } = useOfficer()
   const qc = useQueryClient()
   const [open, setOpen] = useState(false)

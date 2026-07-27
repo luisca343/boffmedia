@@ -7,10 +7,12 @@ import { useBuscados } from "../../_hooks/queries"
 import { money } from "../../_utils/format"
 import { hrefOf } from "../../_utils/nav"
 import { useGobiernoUi } from "../../_stores/useGobiernoUi"
+import { useFormat } from "@/lib/useFormat"
 import { CitizenRow } from "./CitizenRow"
 
 export function MasBuscadosCard() {
   const t = useTranslations("gobierno")
+  const { intlLocale } = useFormat()
   const { data, isLoading } = useBuscados({ status: "active", pageSize: 3 })
   const openDossier = useGobiernoUi((s) => s.openDossier)
 
@@ -47,7 +49,7 @@ export function MasBuscadosCard() {
               onClick={() => openDossier(b.player.uuid)}
               right={
                 <span className="font-gt-display text-sm font-bold tabular-nums text-gt-danger">
-                  {money(b.bounty)} ₽
+                  {money(b.bounty, intlLocale)} ₽
                 </span>
               }
             />

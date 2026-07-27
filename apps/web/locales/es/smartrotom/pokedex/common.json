@@ -308,6 +308,70 @@
     "topbar_navigate": "Navegar",
     "topbar_open": "Abrir",
     "unknown_description": "Descripción no disponible",
-    "dexlist_registered": "{count} Pokémon registrados"
+    "dexlist_registered": "{count} Pokémon registrados",
+    "eff_weak": "Débil",
+    "eff_normal": "Neutro",
+    "eff_resistant": "Resistente",
+    "eff_immune": "Inmune",
+    "evolution_moveType": "Conociendo un movimiento de tipo {type}",
+    "evolution_heldItem": "Equipado con {item}",
+    "evolution_statRatio": "Con {stat1} igual a {stat2}",
+    "evolution_healthAbsence": "Con {health} PS o menos",
+    "evolution_highAltitude": "Por encima de la altura {minAltitude}",
+    "evolution_blocksWalkedOutsideBall": "Tras caminar {blocks} bloques fuera de la Poké Ball",
+    "evolution_insideBattle": "Durante el combate",
+    "time_day": "De día",
+    "time_night": "De noche",
+    "time_dawn": "Al amanecer",
+    "time_dusk": "Al anochecer",
+    "dexStatus": {
+      "caught": "Capturado",
+      "seen": "Visto",
+      "shiny": "Shiny",
+      "unknown": "Desconocido"
+    },
+    "rarity": {
+      "common": "Común",
+      "uncommon": "Poco común",
+      "rare": "Raro",
+      "ultra": "Ultra raro",
+      "legendary": "Legendario"
+    },
+    "hero": {
+      "forms": "Formas",
+      "baseForm": "Base",
+      "rankingPosition": "Posición #{rank} del ranking",
+      "unranked": "Sin clasificar",
+      "dexNumber": "N.º {dex}"
+    },
+    "evoTree": {
+      "loadError": "No se pudo cargar la línea evolutiva",
+      "noEvolution": "Este Pokémon no evoluciona",
+      "evolves": "Evoluciona",
+      "or": "o",
+      "specificBiomes": "En biomas específicos"
+    },
+    "sprite": {
+      "pokemonAlt": "Pokémon",
+      "itemAlt": "Objeto"
+    },
+    "spawnTable": {
+      "levelRange": "Nv. {range}",
+      "methodGround": "Tierra"
+    },
+    "hub": {
+      "footerCounts": "{indexed} indexados · {generable} generables"
+    },
+    "progress": {
+      "justNow": "ahora",
+      "barAria": "{pct}% capturados, {seen} vistos, {shiny} shiny",
+      "streakCount": "{count, plural, one {# día} other {# días}}"
+    },
+    "streak": {
+      "capturesCount": "{count, plural, one {# captura} other {# capturas}}"
+    },
+    "sidebar": {
+      "userFallback": "Usuario"
+    }
   }
 }

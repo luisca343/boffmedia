@@ -100,7 +100,7 @@ export function AvShell({ nav, section, onNavigate, children, loading }: AvShell
         <div className="hidden md:flex sticky top-0 z-[5] items-center gap-4 py-[15px] px-[26px] border-b border-solid border-line bg-[color-mix(in_srgb,var(--bg)_88%,transparent)] backdrop-blur-[8px]">
           <span className="inline-flex items-center gap-2.5 font-display text-[24px] font-extrabold italic uppercase leading-none">
             {active && <Icon name={active.icon} size={20} className="text-accent" />}
-            {active?.label ?? "Admin"}
+            {active?.label ?? t("brand")}
           </span>
           <span className="ml-auto inline-flex items-center gap-2 font-mono text-[10px] font-bold leading-none uppercase tracking-[0.14em] text-ok">
             <AvLiveDot />

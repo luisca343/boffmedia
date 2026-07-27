@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { CKEditor } from "@ckeditor/ckeditor5-react";
 import Bundle from "@/components/shared/ckeditor/ckeditor.js";
 import { COLOR_KEYS, COLOR_RGB } from "../../_utils/colors";
@@ -15,16 +15,6 @@ import type { Reading, Width } from "../../_hooks/useNotesTheme";
 // `<a class="wikilink" data-title>` anchors that backlinks/graph derive from.
 
 type Editor = any;
-
-const COLOR_LABEL: Record<string, string> = {
-  primary: "Naranja",
-  secondary: "Azul",
-  accent: "Fucsia",
-  success: "Esmeralda",
-  warning: "Ámbar",
-  error: "Rojo",
-  info: "Violeta",
-};
 
 const rgb = (t: string) => `rgb(${t.split(" ").join(", ")})`;
 const rgba = (t: string, a: number) => `rgba(${t.split(" ").join(", ")}, ${a})`;
@@ -61,6 +51,7 @@ interface NotesEditorProps {
 
 export default function NotesEditor(props: NotesEditorProps) {
   const t = useTranslations("notas");
+  const locale = useLocale();
   const editorRef = useRef<Editor | null>(null);
   // The config must stay referentially stable; every callback flows through this ref.
   const cb = useRef(props);
@@ -123,7 +114,7 @@ export default function NotesEditor(props: NotesEditorProps) {
     }
 
     return {
-      language: "es",
+      language: locale,
       // Markdown would flip the data format; Title hijacks the first <h1>.
       removePlugins: ["Markdown", "Title", "MediaEmbed", "MediaEmbedToolbar"],
       placeholder: t("editor.placeholder"),
@@ -171,12 +162,12 @@ export default function NotesEditor(props: NotesEditorProps) {
         ],
       },
       fontColor: {
-        colors: COLOR_KEYS.map((k) => ({ color: rgb(COLOR_RGB[k]), label: COLOR_LABEL[k] })),
+        colors: COLOR_KEYS.map((k) => ({ color: rgb(COLOR_RGB[k]), label: t(`colors.${k}`) })),
         columns: 7,
         documentColors: 0,
       },
       fontBackgroundColor: {
-        colors: COLOR_KEYS.map((k) => ({ color: rgba(COLOR_RGB[k], 0.28), label: COLOR_LABEL[k] })),
+        colors: COLOR_KEYS.map((k) => ({ color: rgba(COLOR_RGB[k], 0.28), label: t(`colors.${k}`) })),
         columns: 7,
         documentColors: 0,
       },

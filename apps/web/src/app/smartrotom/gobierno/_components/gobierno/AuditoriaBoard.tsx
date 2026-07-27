@@ -9,6 +9,7 @@ import { useAuditoria, useOficiales } from "../../_hooks/queries"
 import { useGobiernoUi } from "../../_stores/useGobiernoUi"
 import { DEPARTMENTS, type Department, type Tone } from "../../_utils/tones"
 import { fmtDateTime } from "../../_utils/format"
+import { useFormat } from "@/lib/useFormat"
 
 const PAGE_SIZE = 30
 
@@ -18,6 +19,7 @@ const AUDIT_DEPS: Department[] = ["urbanismo", "seguridad", "hacienda", "justici
 
 export function AuditoriaBoard() {
   const t = useTranslations("gobierno")
+  const { intlLocale } = useFormat()
   const [dep, setDep] = useState<"all" | Department>("all")
   const [actorUuid, setActorUuid] = useState("")
   const [dateFrom, setDateFrom] = useState("")
@@ -47,7 +49,7 @@ export function AuditoriaBoard() {
   const handleExport = () => {
     const header = "fecha,funcionario,accion,objeto,departamento"
     const rows = items.map((a) =>
-      [fmtDateTime(a.createdAt), a.actor?.username ?? "Sistema", a.action, a.target, a.dep]
+      [fmtDateTime(a.createdAt, intlLocale), a.actor?.username ?? t("auditoria.sistema"), a.action, a.target, a.dep]
         .map((v) => `"${String(v).replace(/"/g, '""')}"`)
         .join(","),
     )
@@ -82,7 +84,7 @@ export function AuditoriaBoard() {
           onChange={setFilter(setDep)}
           options={[
             { value: "all" as const, label: t("auditoria.todo") },
-            ...AUDIT_DEPS.map((d) => ({ value: d, label: DEPARTMENTS[d].label })),
+            ...AUDIT_DEPS.map((d) => ({ value: d, label: t(DEPARTMENTS[d].labelKey) })),
           ]}
         />
         <div className="w-full max-w-[200px]">
@@ -122,11 +124,11 @@ export function AuditoriaBoard() {
                 // `dep` on a row is a free-form string (`eventos`, `administracion`… are real
                 // values that fall outside the six civic departments this screen filters by),
                 // so the lookup is intentionally partial rather than cast to `Department`.
-                const meta = (DEPARTMENTS as Partial<Record<string, { label: string; tone: Tone }>>)[a.dep]
+                const meta = (DEPARTMENTS as Partial<Record<string, { labelKey: string; tone: Tone }>>)[a.dep]
                 return (
                   <TR key={a.id}>
                     <TD className="whitespace-nowrap font-gt-mono text-[11px] text-gt-ink-500">
-                      {fmtDateTime(a.createdAt)}
+                      {fmtDateTime(a.createdAt, intlLocale)}
                     </TD>
                     <TD>
                       <button
@@ -146,7 +148,7 @@ export function AuditoriaBoard() {
                     </TD>
                     <TD className="text-[12.5px]">{a.target}</TD>
                     <TD>
-                      <Badge tone={meta?.tone ?? "default"}>{meta?.label ?? a.dep}</Badge>
+                      <Badge tone={meta?.tone ?? "default"}>{meta ? t(meta.labelKey) : a.dep}</Badge>
                     </TD>
                   </TR>
                 )
@@ -156,7 +158,7 @@ export function AuditoriaBoard() {
         )}
       </div>
 
-      <Pager page={page} pageSize={PAGE_SIZE} total={data?.total ?? 0} onChange={setPage} />
+      <Pager page={page} pageSize={PAGE_SIZE} total={data?.total ?? 0} onChange={setPage} t={t} />
     </div>
   )
 }

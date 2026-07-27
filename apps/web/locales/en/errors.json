@@ -1,0 +1,24 @@
+{
+  "apiErrors": {
+    "generic": "Something went wrong. Please try again.",
+    "ACTOR_NOT_SELF": "You can't act on another player's behalf.",
+    "AUTH_INVALID_CREDENTIALS": "Incorrect username or password.",
+    "CHAT_NOT_FOUND": "Chat not found.",
+    "CHAT_NOT_MEMBER": "You're not part of this chat.",
+    "CHAT_CALL_NO_PARTICIPANTS": "There's nobody else in the chat to call.",
+    "CHAT_MESSAGE_NOT_EDITABLE": "You can't edit this message.",
+    "CHAT_MESSAGE_NOT_DELETABLE": "You can't delete this message.",
+    "CHAT_GROUP_NO_ACCESS": "You don't have access to this group.",
+    "BANK_ACCOUNT_NOT_OWNED": "You can't transfer from an account that isn't yours.",
+    "BANK_AMOUNT_NOT_POSITIVE": "The amount must be greater than zero.",
+    "BANK_SAME_ACCOUNT": "You can't transfer to the same account.",
+    "BANK_SOURCE_ACCOUNT_NOT_FOUND": "The source account doesn't exist.",
+    "BANK_TARGET_ACCOUNT_NOT_FOUND": "The destination account doesn't exist.",
+    "BANK_INSUFFICIENT_FUNDS": "Insufficient balance.",
+    "BANK_INSUFFICIENT_FUNDS_PURCHASE": "Insufficient balance for this purchase.",
+    "BANK_TRANSFER_FAILED": "The transfer couldn't be completed.",
+    "BANK_NEGATIVE_BALANCE": "The balance can't be negative.",
+    "BANK_BALANCE_ADJUST_FAILED": "The balance couldn't be adjusted.",
+    "TOURNAMENT_CHECKIN_CLOSED": "Check-in isn't open."
+  }
+}

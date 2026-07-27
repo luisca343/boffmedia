@@ -1,18 +1,26 @@
+import type { useTranslations } from "next-intl"
 import { Avatar, Badge, Icon } from "../ui"
 import { PARCELA_STATUS, TONES, ZONA_KINDS } from "../../_utils/tones"
 import { townName } from "../../_utils/format"
 import type { Parcela, Zona } from "../../_types"
 
+// No "use client" here — this stays a server-shaped component — but it is only ever
+// rendered from `MapaView.tsx`, a client component, so it cannot be `async` +
+// `getTranslations`: React client trees can't render an async function component.
+// The translator is passed down as a prop from the client parent instead (brief's
+// documented fallback for a non-async-able server component).
 export function ZonaPanel({
   zona,
   members,
   onClose,
   onSelectPlot,
+  t,
 }: {
   zona: Zona
   members: Parcela[]
   onClose: () => void
   onSelectPlot: (p: Parcela) => void
+  t: ReturnType<typeof useTranslations>
 }) {
   const kind = ZONA_KINDS[zona.kind]
   // The list endpoint enriches `parcelas`/`ocupadas` as aggregate counts; if a given
@@ -28,7 +36,7 @@ export function ZonaPanel({
         <button
           type="button"
           onClick={onClose}
-          aria-label="Cerrar ficha de la zona"
+          aria-label={t("mapa.cerrarFichaZona")}
           className="rounded-gt-sm p-1 text-gt-ink-400 transition-colors hover:bg-gt-paper-2 hover:text-gt-ink-900"
         >
           <Icon name="x" size={18} />
@@ -46,17 +54,19 @@ export function ZonaPanel({
         <div className="min-w-0">
           <h2 className="font-gt-display text-[21px] leading-tight text-gt-ink-900">{zona.name}</h2>
           <div className="mt-1 flex items-center gap-1.5">
-            {kind && <Badge>{kind.label}</Badge>}
+            {kind && <Badge>{t(kind.labelKey)}</Badge>}
             <span className="font-gt-mono text-[10px] text-gt-ink-300">#{zona.id}</span>
           </div>
         </div>
       </div>
 
-      <p className="mb-3.5 text-[12.5px] leading-relaxed text-gt-ink-600">{zona.description || kind?.desc}</p>
+      <p className="mb-3.5 text-[12.5px] leading-relaxed text-gt-ink-600">
+        {zona.description || (kind ? t(kind.descKey) : undefined)}
+      </p>
 
       <div className="mb-3.5 rounded-gt-sm border border-gt-line bg-gt-paper-2 p-3">
         <div className="mb-1.5 flex items-center justify-between">
-          <span className="font-gt-mono text-[9px] uppercase tracking-[.12em] text-gt-ink-400">Ocupación</span>
+          <span className="font-gt-mono text-[9px] uppercase tracking-[.12em] text-gt-ink-400">{t("zonas.ocupacion")}</span>
           <span className="font-gt-mono text-[12px] font-bold tabular-nums text-gt-ink-800">
             {occupied}/{total} · {pct}%
           </span>
@@ -70,10 +80,10 @@ export function ZonaPanel({
       </div>
 
       <div className="mb-2 font-gt-mono text-[9.5px] font-bold uppercase tracking-[.14em] text-gt-ink-400">
-        Parcelas de la zona
+        {t("mapa.parcelasDeZona")}
       </div>
       {members.length === 0 ? (
-        <div className="text-[12.5px] italic text-gt-ink-400">Sin parcelas resueltas para esta zona en el mapa.</div>
+        <div className="text-[12.5px] italic text-gt-ink-400">{t("mapa.sinParcelasResueltas")}</div>
       ) : (
         <div className="grid gap-[7px]">
           {members.map((p) => (
@@ -92,10 +102,10 @@ export function ZonaPanel({
                   </span>
                 </>
               ) : (
-                <span className="flex-1 text-[12.5px] italic text-gt-ink-400">vacante</span>
+                <span className="flex-1 text-[12.5px] italic text-gt-ink-400">{t("urbanismo.vacante")}</span>
               )}
               <Badge tone={PARCELA_STATUS[p.status]?.tone ?? "default"}>
-                {PARCELA_STATUS[p.status]?.label ?? p.status}
+                {PARCELA_STATUS[p.status] ? t(PARCELA_STATUS[p.status].labelKey) : p.status}
               </Badge>
             </button>
           ))}

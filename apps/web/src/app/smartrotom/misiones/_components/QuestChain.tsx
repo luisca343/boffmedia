@@ -1,8 +1,9 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import type { ChainLink, QuestData } from "../_types"
 import { chainFor } from "../_utils/quests"
-import { normalizeStatus, SEAL_TEXT, STATUS_LABEL } from "../_utils/status"
+import { normalizeStatus, SEAL_TEXT, STATUS_LABEL_KEY } from "../_utils/status"
 import { Label, RopePath, WaxSeal } from "./ui"
 
 const NODE_W = 200
@@ -10,6 +11,8 @@ const GAP = 60
 const PAD_X = 30
 
 function ChainNode({ link, onSelect }: { link: ChainLink; onSelect: (quest: QuestData) => void }) {
+  const t = useTranslations("misiones.questChain")
+  const tStatus = useTranslations("misiones")
   const { quest, rel } = link
   const status = normalizeStatus(quest)
   const isCurrent = rel === "self"
@@ -31,13 +34,13 @@ function ChainNode({ link, onSelect }: { link: ChainLink; onSelect: (quest: Ques
       </span>
       {isCurrent && (
         <span className="absolute -top-1.5 left-2 border border-ms-gold-4 bg-ms-gold-2 px-1.5 font-ms-uppercase text-[8px] uppercase tracking-[.16em] text-[#1e120a]">
-          Aquí
+          {t("here")}
         </span>
       )}
-      <Label className={SEAL_TEXT[status]}>{STATUS_LABEL[status]}</Label>
+      <Label className={SEAL_TEXT[status]}>{tStatus(STATUS_LABEL_KEY[status])}</Label>
       <div className="mt-0.5 font-ms-display text-[13px] leading-[1.15] text-ms-ink-1">{quest.name}</div>
       {level > 0 && (
-        <div className="mt-1 font-ms-uppercase text-[10px] uppercase tracking-[.12em] text-ms-ink-3">Nv. {level}</div>
+        <div className="mt-1 font-ms-uppercase text-[10px] uppercase tracking-[.12em] text-ms-ink-3">{t("level", { level })}</div>
       )}
     </button>
   )

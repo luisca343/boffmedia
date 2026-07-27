@@ -21,7 +21,14 @@
       "vs": "vs",
       "fullscreen": "Fullscreen",
       "exitFullscreen": "Exit fullscreen",
-      "opponent": "Opponent"
+      "opponent": "Opponent",
+      "aria": "Battle header",
+      "modes": {
+        "ai": "VS AI",
+        "pvp": "PVP",
+        "showdown": "SHOWDOWN",
+        "replay": "REPLAY"
+      }
     },
     "connection": {
       "error": "Error",
@@ -45,7 +52,14 @@
       "forcedSwitch": "Forced Switch",
       "trapped": " (trapped)",
       "undo": "Undo",
-      "undoHint": "Cancel the submitted choice (before the turn resolves)"
+      "undoHint": "Cancel the submitted choice (before the turn resolves)",
+      "aria": "Battle actions",
+      "mechanics": {
+        "terastallize": "Terastallize",
+        "mega": "Mega Evolution",
+        "dynamax": "Dynamax",
+        "zmove": "Z-Move"
+      }
     },
     "log": {
       "label": "Battle log",
@@ -69,7 +83,8 @@
       "battleEmpty": "Battle chat will appear here",
       "unread": "{count} unread messages",
       "lobbyPlaceholder": "Type a message…",
-      "lobbyEmpty": "No messages yet. Chat appears here once connected to the lobby."
+      "lobbyEmpty": "No messages yet. Chat appears here once connected to the lobby.",
+      "aria": "Chat"
     },
     "end": {
       "victory": "VICTORY!",
@@ -272,6 +287,100 @@
         "errorFormat": "Invalid replay format. Expected Showdown replay text with |player| and |turn| lines.",
         "errorUnknown": "An unknown error occurred."
       }
+    },
+    "preview": {
+      "title": "Battle Title",
+      "start": "START"
+    },
+    "field": {
+      "aria": "Field conditions",
+      "cond": {
+        "sunnyday": "Sun",
+        "desolateland": "Harsh Sunlight",
+        "raindance": "Rain",
+        "primordialsea": "Heavy Rain",
+        "sandstorm": "Sandstorm",
+        "hail": "Hail",
+        "snow": "Snow",
+        "deltastream": "Strong Winds",
+        "electricterrain": "Electric Terrain",
+        "grassyterrain": "Grassy Terrain",
+        "mistyterrain": "Misty Terrain",
+        "psychicterrain": "Psychic Terrain",
+        "trickroom": "Trick Room",
+        "magicroom": "Magic Room",
+        "wonderroom": "Wonder Room",
+        "gravity": "Gravity"
+      }
+    },
+    "detail": {
+      "info": "Info",
+      "stats": "Stats",
+      "moves": "Moves",
+      "statChanges": "Stat Changes",
+      "abilities": "Abilities",
+      "item": "Item",
+      "tera": "Tera:",
+      "statsAdjusted": "Values adjusted for level and boosts",
+      "statsBaseOnly": "Only base stats are shown",
+      "knownMoves": "Known moves:",
+      "revealedMoves": "Revealed moves:",
+      "noMovesData": "No moves data available",
+      "noRevealedMoves": "No revealed moves yet",
+      "status": {
+        "brn": "Burned",
+        "frz": "Frozen",
+        "par": "Paralyzed",
+        "psn": "Poisoned",
+        "tox": "Badly Poisoned",
+        "slp": "Asleep"
+      }
+    },
+    "switchMenu": {
+      "title": "Switch Pokémon",
+      "active": "Active"
+    },
+    "choiceInput": {
+      "battleActions": "Battle Actions",
+      "teamPreview": "Team Preview",
+      "confirmTeamOrder": "Confirm Team Order",
+      "confirmTeam": "Confirm Team",
+      "teamPreviewDefault": "Team Preview — sending default order"
+    },
+    "avatar": {
+      "alt": "avatar"
+    },
+    "sprite": {
+      "altFallback": "Pokemon"
+    },
+    "replayError": {
+      "title": "Replay Error",
+      "message": "Something went wrong loading the replay.",
+      "retry": "Try Again"
+    },
+    "bx": {
+      "spreadAllTag": "AREA · ALL",
+      "spreadTag": "AREA",
+      "teraUsedTitle": "Terastal already used this battle",
+      "teraArmTitle": "Terastallize this turn",
+      "effective": "SUPER EFFECTIVE!",
+      "resisted": "resisted",
+      "logAria": "Battle log",
+      "teamStatusAria": "Team status",
+      "priorityNote": "Priority can change this",
+      "noOrder": "No order",
+      "clearOrderAria": "Clear order",
+      "add": "Add",
+      "orderProjected": "Projected order",
+      "chosen": "CHOSEN",
+      "teraTypeTitle": "Tera type {type}",
+      "teraUsedLabel": "Tera used",
+      "teraArmedLabel": "Tera {type} ✓",
+      "teraLabel": "Tera {type}",
+      "timerAria": "{sec} seconds",
+      "switchTo": "Switch → {name}",
+      "targetAll": "all",
+      "targetBoth": "both opponents"
     }
   }
 }

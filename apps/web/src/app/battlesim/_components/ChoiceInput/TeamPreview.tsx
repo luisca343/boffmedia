@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { Protocol } from '@pkmn/protocol';
 
 interface TeamPreviewProps {
@@ -8,6 +9,7 @@ interface TeamPreviewProps {
 }
 
 export function TeamPreview({ request, makeChoice }: TeamPreviewProps) {
+  const t = useTranslations('battlesim');
   if (!request.side?.pokemon) return null;
 
   const pokemon = request.side.pokemon;
@@ -15,7 +17,7 @@ export function TeamPreview({ request, makeChoice }: TeamPreviewProps) {
   return (
     <div className="flex flex-col gap-2 p-3 bg-card rounded-lg border shadow-sm">
       <div className="text-xs text-muted-foreground font-medium uppercase tracking-wide">
-        Team Preview
+        {t('choiceInput.teamPreview')}
       </div>
       <div className="flex flex-wrap gap-2">
         {pokemon.map((poke: { ident: string; details: string }, index: number) => {
@@ -34,7 +36,7 @@ export function TeamPreview({ request, makeChoice }: TeamPreviewProps) {
         onClick={() => makeChoice('team 123456')}
         className="mt-2 px-4 py-2 bg-primary text-primary-foreground rounded-md text-sm font-medium hover:bg-primary/90 transition-colors"
       >
-        Confirm Team Order
+        {t('choiceInput.confirmTeamOrder')}
       </button>
     </div>
   );

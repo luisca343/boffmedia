@@ -15,6 +15,7 @@
       "trail": "Trail"
     },
     "roster": {
+      "count": "{count, plural, one {{count} {singular}} other {{count} {label}}}",
       "searchPlaceholder": "Search in {category}…",
       "viewGrid": "Grid",
       "viewList": "List",
@@ -217,6 +218,48 @@
       "kind": "Type",
       "hp": "Health",
       "faction": "Faction"
+    },
+    "cat": {
+      "items": {
+        "label": "Items",
+        "singular": "item",
+        "desc": "Weapons, head, face, neck, trinkets, consumables, cursed items and parasites."
+      },
+      "characters": {
+        "label": "Bestiary",
+        "singular": "character",
+        "desc": "Enemies, bosses, mini-bosses, kaiju, allies and familiars."
+      },
+      "abilities": {
+        "label": "Abilities",
+        "singular": "ability",
+        "desc": "Attacks and spells: cost, range, damage and effects."
+      },
+      "passives": {
+        "label": "Passives",
+        "singular": "passive",
+        "desc": "Class passives and disorders, with their ranks."
+      },
+      "keywords": {
+        "label": "Statuses",
+        "singular": "status",
+        "desc": "Status effects and keywords with their rules."
+      },
+      "events": {
+        "label": "Events",
+        "singular": "event",
+        "desc": "Map events: choices, stat checks and rewards."
+      },
+      "classes": {
+        "label": "Classes",
+        "singular": "class",
+        "desc": "Classes and advanced classes with their ability pools."
+      },
+      "maps": {
+        "label": "Maps",
+        "singular": "map",
+        "desc": "Areas by act and chapter: enemies, bosses, items and events."
+      }
     }
   }
 }

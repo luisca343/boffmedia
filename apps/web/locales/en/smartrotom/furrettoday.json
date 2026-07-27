@@ -9,14 +9,28 @@
       "search": "Search",
       "coverLabel": "Furret Today cover"
     },
+    "home": {
+      "emptyTitle": "NO ISSUE",
+      "emptyMessage": "No article has been published yet to make the cover.",
+      "tickerLabel": "Breaking headlines",
+      "topEyebrow": "MOST READ THIS WEEK",
+      "topTitle": "The Three Everyone's Talking About",
+      "moreEyebrow": "FEATURES · COMMUNITY · GUIDES",
+      "moreTitle": "More Pages To Turn"
+    },
     "coverHero": {
       "readCover": "READ THE COVER →",
       "new": "NEW",
-      "inThisIssue": "IN THIS ISSUE"
+      "inThisIssue": "IN THIS ISSUE",
+      "issueNumber": "No. {issue}"
     },
     "subscribeStrip": {
       "subscribe": "Subscribe",
-      "subscribed": "Subscribed"
+      "subscribed": "Subscribed",
+      "eyebrow": "NEWSLETTER",
+      "title": "Furret in your inbox on Fridays",
+      "description": "One email, no spam: headlines, meta, tournaments and a meme. Cancel whenever you want.",
+      "cta": "SUBSCRIBE ME"
     },
     "newsletterModal": {
       "title": "Furret to your inbox, every Friday",
@@ -28,14 +42,23 @@
       "successMessage": "We've saved you on the list. See you on Friday.",
       "error": "We couldn't sign you up. Please try again."
     },
+    "modal": {
+      "close": "Close"
+    },
     "featureCards": {
-      "title": "Featured"
+      "title": "Featured",
+      "read": "READ →"
     },
     "collectorStrip": {
-      "title": "Collector"
+      "eyebrow": "COLLECTOR'S ARCHIVE",
+      "title": "Back Issues",
+      "hint": "↓ SWIPE",
+      "issueNumber": "No. {issue}",
+      "articles": "{count, plural, one {# article} other {# articles}}"
     },
     "articleCard": {
-      "readMore": "Read more"
+      "readMore": "Read more",
+      "read": "Read →"
     },
     "footer": {
       "newsletterSuccess": "We've added you to the list. See you on Friday!",
@@ -44,8 +67,17 @@
       "emailAriaLabel": "Newsletter email"
     },
     "furretFooter": {
-      "copyright": "© Furret Today",
-      "allRights": "All rights reserved"
+      "copyright": "© {year} Furret Today · BoffMedia",
+      "allRights": "All rights reserved",
+      "marqueeItem": "FURRET TODAY · POP WEEKLY",
+      "marqueeLabel": "Furret Today, pop weekly",
+      "tagline": "The pop weekly of the Spanish-speaking Pokémon community. Made with ink and pixels at BoffMedia.",
+      "sections": "Sections",
+      "subscribe": "Subscribe",
+      "subscribeBlurb": "One email on Fridays. No spam, only POP news.",
+      "submit": "OK",
+      "submitting": "…",
+      "slogan": "«The best news, drawn on paper and ink»"
     },
     "sections": {
       "title": "Sections",
@@ -54,13 +86,40 @@
       "editorial": "Editorial board"
     },
     "browseHero": {
-      "title": "Browse articles"
+      "eyebrow": "SECTIONS & ARCHIVE",
+      "titleStart": "Browse",
+      "titleTilt": "the",
+      "titleEnd": "Issue",
+      "description": "Five sections, dozens of articles and a search box that actually works. For the collectors.",
+      "searchPh": "What are you looking for? — try «furret», «meta», «torneo»…",
+      "searchAria": "Search",
+      "submit": "Search",
+      "allCount": "All · {count}"
+    },
+    "browse": {
+      "resultsEyebrow": "RESULTS",
+      "resultsCount": "{count, plural, one {# article} other {# articles}} in {category}",
+      "allSections": "All sections",
+      "sort": "Sort",
+      "sortAria": "Sort articles",
+      "sortRecent": "Most recent",
+      "sortClaps": "Most read",
+      "sortIssue": "By issue",
+      "emptyTitle": "WELL, NOTHING!",
+      "emptyMessage": "Furret searched the whole issue and found nothing with those filters. Try another word or clear the filters.",
+      "resetSearch": "Reset search",
+      "tagsEyebrow": "BROWSE BY TAG"
     },
     "issueArchive": {
-      "title": "Issue archive"
+      "eyebrow": "BACK ISSUES",
+      "title": "The Archive",
+      "issues": "{count, plural, one {# issue} other {# issues}}",
+      "articles": "{count, plural, one {# article} other {# articles}}"
     },
     "editorialBoard": {
-      "title": "Editorial board"
+      "eyebrow": "WHO DRAWS THIS",
+      "title": "The Editorial Board",
+      "articles": "Articles"
     },
     "article": {
       "by": "by {author}",
@@ -72,12 +131,106 @@
       "upNext": "Up next",
       "deleteCommentAriaLabel": "Delete comment",
       "commentPlaceholder": "Leave your comment…",
-      "commentAriaLabel": "Write a comment"
+      "commentAriaLabel": "Write a comment",
+      "notFoundTitle": "BLANK PAGE!",
+      "notFoundMessage": "Furret can't find this article. It may have moved, or it may never have existed.",
+      "backToCover": "Back to the cover",
+      "backCover": "← Cover",
+      "illustration": "Illustration · Furret Today POP Studio",
+      "figure": "Fig. 01"
+    },
+    "articleFooter": {
+      "title": "Did you like the feature?",
+      "description": "React, comment or subscribe to the weekly. Furret counts the claps.",
+      "clapAria": "Clap for this article",
+      "subscribe": "Subscribe me",
+      "subscribeError": "We couldn't subscribe you. Please try again.",
+      "submit": "OK",
+      "submitting": "…"
+    },
+    "sidebar": {
+      "progress": "PROGRESS",
+      "share": "SHARE",
+      "shareArticle": "Share this article",
+      "related": "KEEP READING",
+      "comments": "READERS' COMMENTS",
+      "commentsEmpty": "Be the first to leave a comment.",
+      "signInToComment": "Sign in to leave your comment.",
+      "post": "Post",
+      "posting": "Posting…"
+    },
+    "upNext": {
+      "eyebrow": "TURN THE PAGE",
+      "title": "Don't Stop Walking"
     },
     "shareModal": {
       "title": "Share article",
+      "eyebrow": "SHARE",
+      "heading": "Spread the word",
       "copyLink": "Copy link",
+      "copied": "✓ Copied",
+      "copyError": "The link could not be copied.",
+      "discordCopied": "Link copied. Paste it in your Discord server.",
       "close": "Close"
+    },
+    "access": {
+      "deniedTitle": "ACCESS DENIED",
+      "deniedMessage": "You need a newsroom role (ROTOM_ADMIN or ROTOM_FURRET) to enter the newsroom.",
+      "backToCover": "Back to the cover"
+    },
+    "newsroomHeader": {
+      "eyebrow": "NEWSROOM",
+      "title": "News Editor",
+      "description": "Write, publish and feature. This is where the issue's cover is decided.",
+      "total": "TOTAL",
+      "published": "PUBL.",
+      "featured": "FEAT.",
+      "drafts": "DRAFTS"
+    },
+    "newsSidebar": {
+      "title": "ARTICLE LIST",
+      "new": "+ New article",
+      "searchPh": "Search by title or lead…",
+      "searchAria": "Search articles",
+      "emptyTitle": "NOTHING HERE",
+      "emptyMessage": "Try changing the filter or the search.",
+      "filterAll": "All",
+      "filterFeatured": "Featured",
+      "filterPublished": "Published",
+      "filterDraft": "Drafts"
+    },
+    "newsRow": {
+      "featured": "FEATURED",
+      "published": "PUBLISHED",
+      "draft": "DRAFT",
+      "togglePublished": "Published",
+      "toggleFeatured": "Featured",
+      "deleteAria": "Delete «{title}»"
+    },
+    "newArticleModal": {
+      "label": "New article",
+      "eyebrow": "NEW ARTICLE",
+      "title": "Start a draft",
+      "description": "Create the draft and fill in the body later in the editor. You can unpublish it whenever you want.",
+      "titleField": "Title",
+      "titlePh": "E.g. The Furret dynasty",
+      "lead": "Lead",
+      "leadPh": "One sentence: what you're telling.",
+      "author": "Author",
+      "authorPh": "Your name or alias",
+      "role": "Role",
+      "rolePh": "Editor",
+      "section": "Section",
+      "sectionPh": "Community, Tournaments…",
+      "subsection": "Subsection",
+      "subsectionPh": "Optional",
+      "buttonText": "Button text",
+      "defaultButtonText": "Read more",
+      "imageUrl": "Image URL",
+      "imageUrlPh": "https://…",
+      "cancel": "Cancel",
+      "create": "Create draft",
+      "creating": "Creating…"
     },
     "editor": {
       "title": "Editor",
@@ -94,7 +247,35 @@
       "authorPlaceholder": "Editor",
       "tagsPlaceholder": "Community, Tournaments…",
       "optionalPlaceholder": "Optional",
-      "readMorePlaceholder": "Read more"
+      "readMorePlaceholder": "Read more",
+      "emptyTitle": "PICK AN ARTICLE",
+      "emptyMessage": "Select something from the list or create a draft. Furret will applaud whatever you write.",
+      "emptyAction": "+ New article",
+      "statusFeatured": "FEATURED",
+      "statusPublished": "PUBLISHED",
+      "statusDraft": "DRAFT",
+      "editing": "EDITING · #{id}",
+      "updated": "Updated: {date}",
+      "readTimeLabel": "Reading: {time}",
+      "titleAria": "Title",
+      "leadAria": "Lead",
+      "authorField": "Author",
+      "roleField": "Role",
+      "sectionField": "Section",
+      "subsectionField": "Subsection",
+      "issueField": "Issue no.",
+      "issuePh": "—",
+      "buttonTextField": "Button text",
+      "imageUrlField": "Image URL",
+      "imageUrlPh": "https://… or /smartrotom/img/…",
+      "bodyHint": "Article body · saved with 💾 in its own bar",
+      "footerNote": "CKEditor · Furret style · the body is saved separately",
+      "preview": "Preview",
+      "saving": "Saving…",
+      "saveChanges": "Save changes",
+      "noChanges": "No changes",
+      "saveSuccess": "Changes saved in «{title}».",
+      "untitled": "Untitled"
     },
     "newsroom": {
       "title": "Newsroom",
@@ -105,7 +286,19 @@
       "deleteSuccess": "Article deleted.",
       "deleteError": "Could not delete.",
       "draftCreated": "Draft created. Let's write!",
-      "draftError": "Could not create the draft."
+      "draftError": "Could not create the draft.",
+      "publishSuccess": "Published.",
+      "unpublishSuccess": "Back to draft.",
+      "untitledDraft": "New untitled article",
+      "draftBody": "Start writing here…",
+      "deleteLabel": "Confirm deletion",
+      "deleteEyebrow": "DELETE ARTICLE",
+      "deleteTitle": "Are you sure?",
+      "deleteMessage": "This deletes «{title}» forever. There is no undo.",
+      "deleteFallbackTitle": "this article",
+      "cancel": "Cancel",
+      "deleting": "Deleting…",
+      "confirmDeleteAction": "Yes, delete"
     },
     "error": {
       "title": "Error",

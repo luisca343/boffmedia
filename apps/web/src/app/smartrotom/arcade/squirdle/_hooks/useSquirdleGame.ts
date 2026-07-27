@@ -16,6 +16,7 @@ const initialStatuses = (types: string[]): Record<string, TypeStatus> =>
  */
 export function useSquirdleGame() {
   const t = useTranslations("pokedex")
+  const tArcade = useTranslations("arcade")
   const { pokemonData, allTypes, targetPokemon, pickTarget } = useGetWordlePokemon()
 
   const [guesses, setGuesses] = useState<WordlePokemon[]>([])
@@ -71,7 +72,7 @@ export function useSquirdleGame() {
 
     const guessed = pokemonData.find((p) => nameOf(p.name.toLowerCase()) === currentGuess)
     if (!guessed) {
-      setMessage("¡Ese no es un Pokémon válido!")
+      setMessage(tArcade("squirdle.invalidGuess"))
       return
     }
 
@@ -81,11 +82,11 @@ export function useSquirdleGame() {
     setSuggestions([])
 
     if (guessed.name === targetPokemon.name) {
-      setMessage(`¡Felicidades! Has adivinado el Pokémon: ${nameOf(targetPokemon.name)}`)
+      setMessage(tArcade("squirdle.wonMessage", { name: nameOf(targetPokemon.name) }))
       setWon(true)
       setGameOver(true)
     } else if (next.length >= MAX_GUESSES) {
-      setMessage(`¡Has perdido! El Pokémon era: ${nameOf(targetPokemon.name)}`)
+      setMessage(tArcade("squirdle.lostMessage", { name: nameOf(targetPokemon.name) }))
       setGuesses([...next, targetPokemon])
       setGameOver(true)
     } else {
@@ -107,7 +108,7 @@ export function useSquirdleGame() {
         (checkType(guessed.type2, 2, targetPokemon) === "incorrect" && guessed.type2 === undefined)
       return known ? true : current
     })
-  }, [currentGuess, gameOver, guesses, nameOf, pokemonData, targetPokemon])
+  }, [currentGuess, gameOver, guesses, nameOf, pokemonData, tArcade, targetPokemon])
 
   const reset = useCallback(() => {
     setGuesses([])

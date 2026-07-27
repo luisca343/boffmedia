@@ -45,7 +45,12 @@
       "noResults": "Sin resultados",
       "activo": "Activa",
       "inactivo": "Inactiva",
-      "horaOficial": "Hora oficial"
+      "horaOficial": "Hora oficial",
+      "finalizado": "finalizado",
+      "you": "ti",
+      "pagerSummary": "Página {page} de {totalPages} · {total} en total",
+      "paginaAnterior": "Página anterior",
+      "paginaSiguiente": "Página siguiente"
     },
     "nav": {
       "inicio": "Inicio",
@@ -69,7 +74,18 @@
       "departamentos": "Departamentos",
       "plataformaCivica": "Plataforma cívica",
       "sistemaOperativo": "Sistema operativo · v1.0",
-      "ariaLabel": "Departamentos"
+      "ariaLabel": "Departamentos",
+      "zonas": "Zonas",
+      "historial": "Historial",
+      "recompensas": "Recompensas",
+      "apelaciones": "Apelaciones",
+      "jugadores": "Jugadores",
+      "skinsNpc": "Skins NPC",
+      "appsJugador": "Apps de jugador",
+      "rendimiento": "Rendimiento",
+      "actividad": "Actividad",
+      "notificaciones": "Notificaciones",
+      "senalizacion": "Señalización"
     },
     "header": {
       "title": "Gobierno de Teras",
@@ -292,7 +308,11 @@
         "medium": "Media",
         "high": "Alta",
         "critical": "Crítica"
-      }
+      },
+      "casosAbiertos": "Casos abiertos",
+      "casosAbiertosSub": "Cada infractor reúne sus denuncias, multas, órdenes de captura y apelaciones en un único expediente.",
+      "mostrando": "Mostrando {shown} de {total} expedientes.",
+      "abriendo": "Abriendo…"
     },
     "poblacion": {
       "title": "Población",
@@ -327,7 +347,12 @@
       "placa": "Placa {badge}",
       "cesar": "Cesar",
       "cesarConfirm": "¿Cesar a {username} de su cargo?",
-      "ostentaRoles": "Ostenta {count} roles de gobierno"
+      "ostentaRoles": "Ostenta {count} roles de gobierno",
+      "buscadoBadge": "Buscado",
+      "sinResidencia": "Sin residencia",
+      "parcelasUnit": "parcelas",
+      "multasUnit": "multas",
+      "cesarAriaLabel": "Cesar a {username}"
     },
     "seguridad": {
       "patrullas": "Patrullas",
@@ -398,7 +423,29 @@
       "acciones": "Acciones",
       "cobrar": "Cobrar",
       "anular": "Anular",
-      "denunciaRef": "· denuncia #{id}"
+      "denunciaRef": "· denuncia #{id}",
+      "multasKicker": "Hacienda · Sanciones",
+      "multasSub": "Sanciones económicas emitidas por la policía y la administración. La recaudación ingresa en la tesorería.",
+      "mostrandoMultas": "Mostrando {shown} de {total} multas.",
+      "tabPagadas": "Pagadas",
+      "tabApeladas": "Apeladas",
+      "cobroKicker": "Cobro de multa",
+      "cobroTitle": "Cobrar {code}",
+      "cobroBodyPrefix": "Se transferirán",
+      "cobroBodySuffix": "desde la cuenta StarBank de {username} a la Tesorería de Teras. Si el jugador no tiene fondos suficientes, el cobro fallará.",
+      "anulacionKicker": "Anulación de multa",
+      "anulacionTitle": "Anular {code}",
+      "anulacionBodyPrefix": "La multa por",
+      "anulacionBodySuffix": "a {username} quedará anulada y no podrá cobrarse.",
+      "flujoCaja": "Flujo de caja",
+      "emptyFlujo": "Sin movimientos todavía",
+      "emptyFlujoSub": "Los ingresos y gastos de la tesorería aparecerán aquí en cuanto haya actividad en el libro mayor.",
+      "flujoCajaWeeks": "Flujo de caja · {count} semanas",
+      "flujoCajaAriaLabel": "Ingresos y gastos semanales de la tesorería",
+      "flujoCajaTooltip": "Semana {label} · ingresos +{ingreso} · gastos −{gasto}",
+      "gastoPublico": "Gasto público",
+      "emptyGasto": "Sin gasto registrado",
+      "emptyGastoSub": "El gasto público de cada departamento aparecerá aquí conforme se registre."
     },
     "justicia": {
       "apelaciones": "Apelaciones",
@@ -419,7 +466,8 @@
       "motivacion": "Motivación de la resolución",
       "motivacionPlaceholder": "Explica el fundamento de la decisión…",
       "confirmarAnulacion": "Confirmar anulación",
-      "confirmarResolucion": "Confirmar resolución"
+      "confirmarResolucion": "Confirmar resolución",
+      "resolviendo": "Resolviendo…"
     },
     "status": {
       "pending": "Pendiente",
@@ -491,7 +539,16 @@
       "emptyCarteles": "Sin carteles guardados",
       "emptyCartelesSub": "Los carteles que guardes aparecerán aquí.",
       "quitarDestino": "Quitar destino",
-      "eliminarCartel": "Eliminar cartel {name}"
+      "eliminarCartel": "Eliminar cartel {name}",
+      "roadAutopista": "Autopista",
+      "roadNacional": "Nacional",
+      "roadComarcal": "Comarcal",
+      "roadRural": "Rural",
+      "dirRecto": "↑ Recto",
+      "dirIzquierda": "← Izquierda",
+      "dirDerecha": "→ Derecha",
+      "dirSalida": "↓ Salida",
+      "destNombre": "Nombre"
     },
     "jugadores": {
       "kicker": "Administración · Directorio",
@@ -547,7 +604,8 @@
       "colores": "Colores",
       "estilos": "Estilos",
       "resultado": "Resultado",
-      "crearVozBtn": "Crear voz"
+      "crearVozBtn": "Crear voz",
+      "vistaPreviaDefault": "Vista previa"
     },
     "actividad": {
       "kicker": "Administración · Auditoría técnica",
@@ -568,7 +626,9 @@
       "objetivo": "Objetivo",
       "departamento": "Departamento",
       "fuente": "Fuente",
-      "estado": "Estado"
+      "estado": "Estado",
+      "sistema": "Sistema",
+      "enVivoBtn": "En vivo"
     },
     "skins": {
       "kicker": "Administración · Recursos",
@@ -590,7 +650,10 @@
       "npcsUsan": "NPCs que la usan",
       "npcsPlaceholder": "Prof. Oak, Asistente lab.",
       "editarSkin": "Editar «{name}»",
-      "face": "2D"
+      "face": "2D",
+      "tagFace": "2d",
+      "tagCabeza": "cabeza",
+      "tagCuerpo": "cuerpo"
     },
     "apps": {
       "kicker": "Administración · Dispositivos",
@@ -729,7 +792,9 @@
       "transfirió": "{from} transfirió a",
       "adjudico": "El municipio adjudicó a",
       "actual": "Actual",
-      "sinRegistrar": "Sin registrar"
+      "sinRegistrar": "Sin registrar",
+      "zona": "Zona",
+      "vacanteTitle": "Vacante"
     },
     "eventos": {
       "convocarEvento": "Convocar evento",
@@ -893,7 +958,18 @@
       "nuevaCazaTitulo": "Nueva caza de bichos",
       "nuevoRetoTitulo": "Nuevo reto de construcción",
       "previewBrief": "Describe aquí el reto que deberán construir las ciudades…",
-      "especiesLabel": "Especies"
+      "especiesLabel": "Especies",
+      "listKicker": "Gobierno · Actividad ciudadana",
+      "listSub": "Eventos comunitarios de Teras: retos de construcción que la ciudadanía valora y cacerías de bichos con parámetros públicos. La organización corre a cargo del ayuntamiento.",
+      "listEmptyTitle": "Todavía no hay eventos convocados",
+      "listEmptySub": "Convoca un reto de construcción o una cacería de bichos para que la ciudadanía de Teras participe.",
+      "statActivos": "Eventos activos",
+      "statActivosSub": "en curso ahora",
+      "statRetos": "Retos de construcción",
+      "statCacerias": "Cacerías de bichos",
+      "statCapturasSub": "en cacerías activas",
+      "statProximos": "Próximos",
+      "statHistorial": "Historial"
     },
     "dossier": {
       "ariaDialog": "Expediente ciudadano",
@@ -983,6 +1059,106 @@
     },
     "chrome": {
       "servicioInterno": "Servicio interno · {code}"
+    },
+    "dep": {
+      "resumen": "Resumen",
+      "urbanismo": "Urbanismo",
+      "seguridad": "Seguridad",
+      "hacienda": "Hacienda",
+      "justicia": "Justicia",
+      "poblacion": "Población",
+      "gobierno": "Gobierno",
+      "admin": "Administración"
+    },
+    "multaStatus": {
+      "paid": "Pagada",
+      "cancelled": "Anulada",
+      "appealed": "Apelada"
+    },
+    "buscadoStatus": {
+      "active": "En busca",
+      "resolved": "Capturado",
+      "cancelled": "Anulado"
+    },
+    "apelacionStatus": {
+      "upheld": "Desestimada",
+      "overturned": "Estimada"
+    },
+    "subastaStatus": {
+      "live": "En curso",
+      "closed": "Cerrada",
+      "cancelled": "Anulada"
+    },
+    "parcelaStatus": {
+      "ocupada": "Ocupada",
+      "vacante": "Vacante",
+      "embargada": "Embargada",
+      "subasta": "En subasta"
+    },
+    "standing": {
+      "bueno": "Bueno",
+      "observado": "Observado",
+      "sancionado": "Sancionado"
+    },
+    "denunciaCategory": {
+      "griefing": "Griefing",
+      "theft": "Robo",
+      "dispute": "Disputa",
+      "harassment": "Acoso",
+      "other": "Otros"
+    },
+    "zonaKindDesc": {
+      "residencial": "Uso residencial. Construcción libre dentro de la normativa municipal.",
+      "comercial": "Comercio y tiendas. Cofres públicos protegidos, licencia requerida.",
+      "civico": "Edificios públicos y servicios. Protección municipal total.",
+      "industrial": "Talleres, granjas de recursos y almacenes. Maquinaria permitida.",
+      "agricola": "Cultivos y huertos. Sin construcción en altura."
+    },
+    "ranks": {
+      "funcionario": "Funcionario"
+    },
+    "accents": {
+      "civic": "Verde municipal",
+      "navy": "Azul institucional",
+      "burgundy": "Burdeos",
+      "gold": "Oro heráldico"
+    },
+    "apelaciones": {
+      "kicker": "Justicia · Recursos",
+      "sub": "Recursos presentados por ciudadanos que impugnan una multa. Revisa los argumentos y resuelve.",
+      "mostrando": "Mostrando {shown} de {total} apelaciones.",
+      "emptyTitle": "Sin apelaciones presentadas",
+      "emptySub": "Los recursos que impugnen una multa aparecerán aquí para su revisión."
+    },
+    "mapa": {
+      "titulo": "Mapa de la región de Teras",
+      "resumenCatastral": "Resumen catastral",
+      "municipiosCount": "{count, plural, one {# municipio} other {# municipios}}",
+      "zonasCount": "{count, plural, one {# zona} other {# zonas}}",
+      "instrucciones": "Toca una zona o una parcela en el mapa para ver su ficha. Usa el interruptor para mostrar u ocultar las zonas urbanísticas.",
+      "sinParcelas": "Todavía no hay parcelas registradas.",
+      "usoSueloZonas": "Uso del suelo · zonas",
+      "sinParcelasUbicables": "Sin parcelas ubicables",
+      "sinParcelasUbicablesSub": "No hay parcelas cuya región de WorldGuard se haya podido resolver todavía.",
+      "ocultarZonas": "Ocultar zonas urbanísticas",
+      "mostrarZonas": "Mostrar zonas urbanísticas",
+      "zonasBtn": "Zonas",
+      "cargandoCatastro": "Cargando el catastro…",
+      "legendOcupada": "Ocupada",
+      "legendVacante": "Vacante",
+      "legendBuscado": "Buscado",
+      "legendZona": "Zona",
+      "cerrarFichaParcela": "Cerrar ficha de la parcela",
+      "parcelaVacante": "Parcela vacante",
+      "sinSubastaAbierta": "Sin subasta abierta",
+      "titularidad": "Titularidad",
+      "sinCambiosTitularidad": "Sin cambios de titularidad registrados.",
+      "cerrarFichaZona": "Cerrar ficha de la zona",
+      "parcelasDeZona": "Parcelas de la zona",
+      "sinParcelasResueltas": "Sin parcelas resueltas para esta zona en el mapa."
+    },
+    "ui": {
+      "sealAriaLabel": "Sello del Gobierno de Teras"
     }
   }
 }

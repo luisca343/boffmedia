@@ -8,6 +8,7 @@ import { Button, Icon, Panel, type IconName } from "@/components/boffmedia/primi
 import { EventCard, eventStatus, type EventLike } from "@/components/boffmedia/ui/events"
 import { useGetEvents } from "@/hooks/events/useGetEvents"
 import { useGetLeaderboards } from "@/hooks/events/useGetLeaderboards"
+import { useFormat } from "@/lib/useFormat"
 import { DISCORD } from "@/components/boffmedia/ui/landing/landing-data"
 
 const LINKS: { href: string; icon: IconName; key: "events" | "ranking" | "achievements" | "calendar" }[] = [
@@ -20,6 +21,7 @@ const LINKS: { href: string; icon: IconName; key: "events" | "ranking" | "achiev
 export function CommunityView() {
   const t = useTranslations("community")
   const tCal = useTranslations("calendario")
+  const { number: formatNumber } = useFormat()
   const { events } = useGetEvents()
   const { leaderboards } = useGetLeaderboards()
 
@@ -121,7 +123,7 @@ export function CommunityView() {
                     {(p as { nickname?: string }).nickname}
                   </span>
                   <span className="flex-none font-mono text-[13px]/none font-semibold text-txt">
-                    {Number((p as { totalPoints?: number }).totalPoints ?? 0).toLocaleString("es-ES")}
+                    {formatNumber(Number((p as { totalPoints?: number }).totalPoints ?? 0))}
                   </span>
                 </div>
               ))}

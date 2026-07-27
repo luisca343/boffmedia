@@ -4,7 +4,7 @@ import * as React from "react"
 import { useTranslations } from "next-intl"
 import { Icon } from "@/components/boffmedia/primitives"
 import { MewData } from "../mew-store"
-import { MEW, MEW_CATS } from "../mew-util"
+import { MEW, MEW_CATS, mewCatKey } from "../mew-util"
 import type { MewCodexModel } from "./useMewCodex"
 
 // Presentational chrome strips driven by the codex model: brand/actions bar, the
@@ -45,7 +45,7 @@ export function MewTopBar({ codex }: { codex: MewCodexModel }) {
           className="hidden items-center gap-[7px] border-2 border-solid border-[color:var(--mwp-nline)] bg-[color:var(--mwp-night-3)] px-3 pb-1.5 pt-[9px] text-[13px]/none tracking-[0.03em] text-[color:var(--mwp-cream)] [font-family:var(--mwf-disp)] [border-radius:var(--wob-sm)] max-[760px]:inline-flex"
         >
           <Icon name="list" size={16} />
-          {catDef.label}
+          {t(mewCatKey(catDef.key, "label"))}
         </button>
       </div>
     </div>
@@ -77,7 +77,7 @@ export function MewCatTabs({ codex }: { codex: MewCodexModel }) {
             }
           >
             <Icon name={c.icon} size={15} />
-            <span>{c.label}</span>
+            <span>{t(mewCatKey(c.key, "label"))}</span>
             {ready && <span className={"font-mono text-[10px]/none [border-radius:8px_10px_9px_11px] px-[5px] py-0.5 " + (on ? "bg-[rgba(255,255,255,0.5)] text-[color:var(--mwp-ink)]" : "bg-[rgba(0,0,0,0.28)] text-inherit")}>{n}</span>}
           </button>
         )
@@ -94,12 +94,13 @@ export function MewTrail({ codex }: { codex: MewCodexModel }) {
     <div className="relative z-[2] flex flex-none items-center gap-2.5 overflow-x-auto border-b border-dashed border-[color:var(--mwp-nline)] px-[clamp(16px,2.4vw,36px)] py-[7px] [scrollbar-width:none]">
       <span className="inline-flex flex-none items-center gap-1.5 text-[11px]/none tracking-[0.08em] text-[color:var(--mwp-cream-dim)] [font-family:var(--mwf-disp)]"><Icon name="paw" size={12} />{t("chrome.trail")}</span>
       <div className="flex gap-1.5">
-        {trail.map((t) => {
-          const tc = MEW.catBy[t.cat]
-          const on = t.cat === cat && t.id === selId
+        {/* the crumb was named `t`, which shadowed the translator — hence `crumb`. */}
+        {trail.map((crumb) => {
+          const tc = MEW.catBy[crumb.cat]
+          const on = crumb.cat === cat && crumb.id === selId
           return (
-            <button key={t.key} type="button" onClick={() => onNav(t.cat, t.id)} title={tc ? tc.label : ""} className={"inline-flex flex-none items-center gap-1.5 border-[1.5px] border-dashed px-[9px] py-[5px] text-[11.5px]/none font-semibold [font-family:var(--mwf-hand)] [border-radius:var(--wob-sm)] transition-all " + (on ? "border-[color:var(--mwp-cream-dim)] text-[color:var(--mwp-cream)]" : "border-[color:var(--mwp-nline)] text-[color:var(--mwp-cream-dim)] hover:border-[color:var(--mwp-ink)] hover:bg-[color:var(--mwp-paper)] hover:text-[color:var(--mwp-ink)]")}>
-              <Icon name={tc ? tc.icon : "paw"} size={11} />{t.name}
+            <button key={crumb.key} type="button" onClick={() => onNav(crumb.cat, crumb.id)} title={tc ? t(mewCatKey(tc.key, "label")) : ""} className={"inline-flex flex-none items-center gap-1.5 border-[1.5px] border-dashed px-[9px] py-[5px] text-[11.5px]/none font-semibold [font-family:var(--mwf-hand)] [border-radius:var(--wob-sm)] transition-all " + (on ? "border-[color:var(--mwp-cream-dim)] text-[color:var(--mwp-cream)]" : "border-[color:var(--mwp-nline)] text-[color:var(--mwp-cream-dim)] hover:border-[color:var(--mwp-ink)] hover:bg-[color:var(--mwp-paper)] hover:text-[color:var(--mwp-ink)]")}>
+              <Icon name={tc ? tc.icon : "paw"} size={11} />{crumb.name}
             </button>
           )
         })}

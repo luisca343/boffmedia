@@ -1,9 +1,10 @@
 import type { Metadata } from "next"
+import { getTranslations } from "next-intl/server"
 import { LogrosView } from "./_components/LogrosView"
 
-export const metadata: Metadata = {
-  title: "Logros · Boffmedia",
-  description: "El catálogo de logros y medallas de la comunidad Boffmedia.",
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("pageMeta.comunidad")
+  return { title: t("logros.title"), description: t("logros.description") }
 }
 
 export default function LogrosPage() {

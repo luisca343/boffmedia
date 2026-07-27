@@ -1,9 +1,11 @@
 import { Flashlight, FlashlightOff } from "lucide-react"
+import { useTranslations } from "next-intl"
 import { useEffect, useState } from "react"
 import { getFlashlight, setFlashlight, subscribeFlashlightChanged } from "@/services/mcef/mcefApi"
 import { cn } from "@/lib/utils"
 
 export function CameraFlashlightButton() {
+  const t = useTranslations("camara")
   // The switch, not whether it's lit. The reply's `active` also requires the camera in
   // hand, which is only false once the page is out of sight — and the mod's push carries
   // `on` alone, so tracking `active` here could only ever go stale.
@@ -47,7 +49,7 @@ export function CameraFlashlightButton() {
       type="button"
       onClick={toggle}
       disabled={isLoading}
-      title={on ? 'Turn flashlight off' : 'Turn flashlight on'}
+      title={on ? t("flashlight.turnOff") : t("flashlight.turnOn")}
       aria-pressed={on}
       className={cn(
         "inline-flex h-10 w-10 items-center justify-center rounded-full",

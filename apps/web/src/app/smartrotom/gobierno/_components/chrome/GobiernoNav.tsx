@@ -32,7 +32,7 @@ export function GobiernoNav() {
         return (
           <div key={group.dep} className="flex flex-none items-center gap-1.5 md:mb-3 md:block">
             <div className="hidden items-center gap-[7px] px-2.5 pb-[5px] pt-1.5 font-gt-mono text-[9.5px] font-bold uppercase tracking-[.2em] text-gt-ink-400 after:h-px after:flex-1 after:bg-gt-line after:content-[''] md:flex">
-              {group.label}
+              {t(group.labelKey)}
               {group.restricted && <Icon name="lock" size={10} className="text-gt-ink-300" />}
             </div>
 
@@ -59,7 +59,7 @@ export function GobiernoNav() {
                     stroke={on ? 2.2 : 1.9}
                     className={`flex-none ${on ? tone.text : "text-gt-ink-400"}`}
                   />
-                  <span className="flex-1 text-left">{item.label}</span>
+                  <span className="flex-1 text-left">{t(item.labelKey)}</span>
                   {count > 0 && (
                     <span
                       className={`min-w-[18px] rounded-[9px] px-1.5 py-px text-center font-gt-mono text-[10px] font-bold tabular-nums ${

@@ -63,12 +63,12 @@ export function SmartViewsBar() {
             ].join(" ")}
           >
             <Icon name={v.icon as IconName} size={12} className={on ? undefined : v.tone} />
-            {v.name}
+            {v.nameKey ? t(v.nameKey) : v.name}
             {v.custom && on && (
               <span
                 role="button"
                 tabIndex={0}
-                aria-label={t("views.delete", { name: v.name })}
+                aria-label={t("views.delete", { name: v.nameKey ? t(v.nameKey) : v.name ?? "" })}
                 onClick={(e) => {
                   e.stopPropagation()
                   deleteView(v.id)

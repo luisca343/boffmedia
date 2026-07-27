@@ -15,6 +15,7 @@ import {
   PresenceService,
   PresenceStatus,
 } from '@api/_utils/sockets/presence.service';
+import { ApiErrorCode } from '@/common/errors/error-codes.generated';
 
 @Injectable()
 export class GroupService {
@@ -66,6 +67,7 @@ export class GroupService {
       // Type 0 = public chats
       throw new ForbiddenException({
         message: 'User does not have access to this group',
+        code: ApiErrorCode.CHAT_GROUP_NO_ACCESS,
         userMessage: 'No tienes acceso a este grupo.',
       });
     }

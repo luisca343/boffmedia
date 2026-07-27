@@ -2,14 +2,14 @@
 
 import { useTranslations } from "next-intl";
 import { Overlay, MODAL_PANEL, Icon } from "../ui";
-import { TEMPLATES, type NoteTemplate } from "../../_data/templates";
+import { TEMPLATES } from "../../_data/templates";
 
 export function TemplatePicker({
   onClose,
   onPick,
 }: {
   onClose: () => void;
-  onPick: (t: NoteTemplate) => void;
+  onPick: (tpl: { name: string; content: string }) => void;
 }) {
   const t = useTranslations("notas");
   return (
@@ -23,21 +23,21 @@ export function TemplatePicker({
           </button>
         </div>
         <div className="grid gap-2 p-[18px] sm:grid-cols-2">
-          {TEMPLATES.map((t) => (
+          {TEMPLATES.map((tpl) => (
             <button
-              key={t.id}
+              key={tpl.id}
               onClick={() => {
-                onPick(t);
+                onPick({ name: t(tpl.nameKey), content: t(tpl.contentKey) });
                 onClose();
               }}
               className="flex items-start gap-3 rounded-nt-md border border-nt-border bg-nt-bg-1 p-3 text-left transition-colors hover:border-nt-border-2 hover:bg-nt-hover"
             >
               <span className="grid h-9 w-9 flex-none place-items-center rounded-nt-md bg-nt-accent/15 text-nt-accent-fg">
-                <Icon name={t.icon} size={17} />
+                <Icon name={tpl.icon} size={17} />
               </span>
               <span className="min-w-0">
-                <span className="block text-[13.5px] font-semibold text-nt-fg">{t.name}</span>
-                <span className="mt-0.5 block text-[12px] leading-[1.4] text-nt-fg-muted">{t.desc}</span>
+                <span className="block text-[13.5px] font-semibold text-nt-fg">{t(tpl.nameKey)}</span>
+                <span className="mt-0.5 block text-[12px] leading-[1.4] text-nt-fg-muted">{t(tpl.descKey)}</span>
               </span>
             </button>
           ))}

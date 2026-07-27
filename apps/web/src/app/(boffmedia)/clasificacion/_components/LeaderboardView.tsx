@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { Button, Empty, IconButton, Pagination, SearchInput, Seg, Spinner } from "@/components/boffmedia/primitives"
 import { useGetLeaderboards } from "@/hooks/events/useGetLeaderboards"
+import { useFormat } from "@/lib/useFormat"
 import { LeaderRow, type LeaderRowData, type SortKey } from "./LeaderRow"
 
 const PER_PAGE = 12
@@ -17,6 +18,7 @@ const METRIC: Record<SortKey, (e: LeaderRowData) => number> = {
 
 export function LeaderboardView() {
   const t = useTranslations("leaderboard")
+  const { number: formatPoints } = useFormat()
   const { leaderboards, error, isLoading, refetch } = useGetLeaderboards()
   const [q, setQ] = React.useState("")
   const [sort, setSort] = React.useState<SortKey>("points")
@@ -94,6 +96,7 @@ export function LeaderboardView() {
                 entry={e}
                 activeSort={sort}
                 labels={labels}
+                formatPoints={formatPoints}
               />
             ))}
           </div>

@@ -1,12 +1,14 @@
 "use client"
 
 import Link from "next/link"
+import { useTranslations } from "next-intl"
 import { useRotomUsername } from "@/components/smartrotom/behavior/useRotomUuid"
 import { Icon, Panel, Tag } from "../_components/ui"
 import { CabinaSection } from "./_components/CabinaSection"
 import { CuentaSection } from "./_components/CuentaSection"
 
 export default function AjustesPage() {
+  const t = useTranslations("arcade")
   const username = useRotomUsername() ?? undefined
 
   return (
@@ -19,10 +21,10 @@ export default function AjustesPage() {
               className="ar-lift inline-flex items-center gap-1.5 rounded-lg border border-white/10 px-2.5 py-1.5 font-ar text-[11px] font-semibold uppercase tracking-[0.08em] text-ar-ink-dim hover:text-ar-ink"
             >
               <Icon.Chevron s={12} dir="left" />
-              Arcade
+              {t("ajustes.backToArcade")}
             </Link>
-            <h1 className="ar-chrom font-ar-display text-[16px] leading-none text-ar-ink">
-              AJUSTES
+            <h1 className="ar-chrom font-ar-display text-[16px] uppercase leading-none text-ar-ink">
+              {t("ajustes.title")}
             </h1>
           </div>
           {/* El handoff ponía un tag de jugador «#4823»: no existe. La identidad real

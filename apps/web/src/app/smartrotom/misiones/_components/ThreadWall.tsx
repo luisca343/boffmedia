@@ -1,10 +1,11 @@
 "use client"
 
 import type { CSSProperties } from "react"
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { useBoard } from "../_hooks/useBoard"
 import { buildChains, npcForQuest, tiltFor } from "../_utils/quests"
-import { normalizeStatus, SEAL_TEXT, STATUS_LABEL, STATUS_PAPER_FILTER } from "../_utils/status"
+import { normalizeStatus, SEAL_TEXT, STATUS_LABEL_KEY, STATUS_PAPER_FILTER } from "../_utils/status"
 import type { NPC, QuestData } from "../_types"
 import { Icon, Label, NpcPortrait, Paper, Thumbtack, WaxSeal } from "./ui"
 
@@ -28,6 +29,7 @@ function ThreadCard({
   onSelect: () => void
   style?: CSSProperties
 }) {
+  const t = useTranslations("misiones")
   const status = normalizeStatus(quest)
   const locked = status === "LOCKED"
   const level = quest.requirements?.requiredLevel
@@ -66,8 +68,8 @@ function ThreadCard({
       )}
 
       <div className="mb-1 flex items-center justify-between gap-2">
-        <Label className={SEAL_TEXT[status]}>{STATUS_LABEL[status]}</Label>
-        {level ? <Label>Nv. {level}</Label> : null}
+        <Label className={SEAL_TEXT[status]}>{t(STATUS_LABEL_KEY[status])}</Label>
+        {level ? <Label>{t("questChain.level", { level })}</Label> : null}
       </div>
       <h3 className="mb-1.5 font-ms-display text-[15px] leading-tight text-ms-ink-1">{quest.name}</h3>
       <div className="mt-auto flex items-center justify-between gap-2">
@@ -87,6 +89,7 @@ function ThreadCard({
  * read directly (SMARTROTOM_V3.md: no mock data).
  */
 export function ThreadWall() {
+  const t = useTranslations("misiones.threadWall")
   const { quests, npcs, regions, open } = useBoard()
   const { chains, loose } = buildChains(quests)
 
@@ -130,7 +133,10 @@ export function ThreadWall() {
                   className="absolute font-ms-uppercase text-[10px] uppercase tracking-[.18em] text-ms-gold-1/80"
                   style={{ left: PAD, top: cyTop(row) - 26 }}
                 >
-                  ❦ Hilo {row + 1} · {regions.find((r) => r.id === line[0].category)?.name ?? ""}
+                  {t("thread", {
+                    index: row + 1,
+                    region: regions.find((r) => r.id === line[0].category)?.name ?? "",
+                  })}
                 </div>
                 {line.map((quest, col) => (
                   <ThreadCard
@@ -150,7 +156,7 @@ export function ThreadWall() {
       {loose.length > 0 && (
         <div className="mt-6">
           <div className="mb-3.5 flex items-center gap-3 text-ms-gold-1">
-            <span className="font-ms-display text-lg">Cabos sueltos</span>
+            <span className="font-ms-display text-lg">{t("looseEnds")}</span>
             <div className="h-px flex-1 bg-gradient-to-r from-ms-gold-3 to-transparent opacity-50" />
           </div>
           <div className="grid grid-cols-[repeat(auto-fill,minmax(230px,1fr))] gap-5">

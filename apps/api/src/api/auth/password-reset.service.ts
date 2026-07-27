@@ -60,7 +60,7 @@ export class PasswordResetService {
       expiresAt,
     });
 
-    await this.mail.sendPasswordReset(user.email, token);
+    await this.mail.sendPasswordReset(user.email, token, user.locale);
   }
 
   /**

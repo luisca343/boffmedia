@@ -1,6 +1,7 @@
 "use client"
 
 import type { ReactNode } from "react"
+import { useTranslations } from "next-intl"
 import { Modal, Button } from "../ui"
 
 // A generic yes/no confirmation for a money-moving or otherwise irreversible action —
@@ -28,6 +29,7 @@ export function ConfirmModal({
   tone?: "primary" | "danger" | "gold"
   pending?: boolean
 }) {
+  const t = useTranslations("gobierno")
   return (
     <Modal
       open={open}
@@ -38,10 +40,10 @@ export function ConfirmModal({
       footer={
         <>
           <Button tone="ghost" onClick={onClose} disabled={pending}>
-            Cancelar
+            {t("common.cancel")}
           </Button>
           <Button tone={tone} onClick={onConfirm} disabled={pending}>
-            {pending ? "Procesando…" : confirmLabel}
+            {pending ? t("common.processing") : confirmLabel}
           </Button>
         </>
       }

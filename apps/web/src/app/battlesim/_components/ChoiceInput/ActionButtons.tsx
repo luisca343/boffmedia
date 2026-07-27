@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { TypeBadgeSmall } from '@/components/shared/pokemon/TypeBadge';
 import type { BattleRequest } from '../../types';
 
@@ -13,6 +14,7 @@ interface ActionButtonsProps {
 }
 
 export function ActionButtons({ request, activeMechanic, onToggle, disabled }: ActionButtonsProps) {
+  const t = useTranslations('battlesim');
   const active = request.active?.[0];
   if (!active) return null;
 
@@ -21,7 +23,7 @@ export function ActionButtons({ request, activeMechanic, onToggle, disabled }: A
   if (active.canMegaEvo) {
     buttons.push({
       mechanic: 'mega',
-      label: 'Mega Evolve',
+      label: t('dock.mechanics.mega'),
       available: true,
     });
   }
@@ -29,7 +31,7 @@ export function ActionButtons({ request, activeMechanic, onToggle, disabled }: A
   if (active.zMoves) {
     buttons.push({
       mechanic: 'zmove',
-      label: 'Z-Move',
+      label: t('dock.mechanics.zmove'),
       available: true,
     });
   }
@@ -37,7 +39,7 @@ export function ActionButtons({ request, activeMechanic, onToggle, disabled }: A
   if (active.canDynamax) {
     buttons.push({
       mechanic: 'dynamax',
-      label: 'Dynamax',
+      label: t('dock.mechanics.dynamax'),
       available: true,
     });
   }
@@ -45,7 +47,7 @@ export function ActionButtons({ request, activeMechanic, onToggle, disabled }: A
   if (active.canTerastallize) {
     buttons.push({
       mechanic: 'terastallize',
-      label: 'Terastallize',
+      label: t('dock.mechanics.terastallize'),
       available: true,
       detail: active.canTerastallize,
     });
@@ -56,7 +58,7 @@ export function ActionButtons({ request, activeMechanic, onToggle, disabled }: A
   return (
     <div className="flex flex-wrap gap-2 p-3 bg-card rounded-lg border shadow-sm">
       <div className="text-xs text-muted-foreground font-medium uppercase tracking-wide w-full">
-        Battle Actions
+        {t('choiceInput.battleActions')}
       </div>
       {buttons.map(({ mechanic, label, available, detail }) => {
         const isActive = activeMechanic === mechanic;

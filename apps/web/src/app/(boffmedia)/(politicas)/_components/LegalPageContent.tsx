@@ -2,6 +2,7 @@
 
 import { useTranslations } from "next-intl"
 import { LegalDoc, type LegalSection } from "@/components/boffmedia/ui/legal"
+import { useFormat } from "@/lib/useFormat"
 
 type LegalPage = "cancelaciones" | "cookies" | "devoluciones" | "privacidad" | "reembolsos" | "terminos"
 
@@ -394,8 +395,9 @@ export function LegalPageContent({ page }: { page: LegalPage }) {
   const translators = { cancelaciones: tC, cookies: tK, devoluciones: tD, privacidad: tP, reembolsos: tR, terminos: tT }
   const t = translators[page]
   const sections = sectionBuilders[page](t)
+  const { intlLocale } = useFormat()
 
-  const updated = `${t("updatedPrefix")}${new Date().toLocaleDateString("es-ES", { year: "numeric", month: "long", day: "numeric" })}`
+  const updated = `${t("updatedPrefix")}${new Date().toLocaleDateString(intlLocale, { year: "numeric", month: "long", day: "numeric" })}`
 
   return (
     <LegalDoc

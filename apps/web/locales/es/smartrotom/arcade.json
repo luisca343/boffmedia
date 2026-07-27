@@ -24,7 +24,26 @@
       "day": "DÍA {day}",
       "generating": "Abriendo…",
       "prizeObtained": "Premio obtenido",
-      "spinning": "Girando…"
+      "spinning": "Girando…",
+      "dialog": "Diálogo",
+      "ringAria": "{title}: {value} de {max}"
+    },
+    "rarity": {
+      "common": "Común",
+      "uncommon": "Inusual",
+      "rare": "Raro",
+      "epic": "Épico",
+      "legendary": "Legendario",
+      "mythic": "Mítico"
+    },
+    "rewards": {
+      "coins": "{amount} monedas",
+      "money": "{amount} PokéDólares"
+    },
+    "celebration": {
+      "ariaLabel": "Recompensa obtenida: {name}",
+      "rewardObtained": "¡Recompensa obtenida!",
+      "great": "¡Genial!"
     },
     "sidebar": {
       "arcade": "Arcade",
@@ -44,11 +63,21 @@
       "library": "Librería · {count} juegos",
       "arcadeGames": "Juegos Arcade",
       "allCategory": "Todos",
-      "footer": "ARCADE · SMARTROTOM EXPERIENCE"
+      "footer": "ARCADE · SMARTROTOM EXPERIENCE",
+      "marqueeStatus": "Enlazado · Roto-motor activo",
+      "marqueeTitle": "TU ESTACIÓN RETRO ARCADE",
+      "marqueeSubtitle": "Juega los minijuegos de SmartRotom, sube tu racha y desbloquea cajas del banner activo."
     },
     "gameTopBar": {
       "help": "Ayuda",
-      "reset": "Reiniciar"
+      "reset": "Reiniciar",
+      "titles": {
+        "squirdle": "SQUIRDLE",
+        "voltorb": "GIRA VOLTORB",
+        "puzle": "PUZLE",
+        "typedoku": "TYPEDOKU",
+        "maze": "LABERINTO"
+      }
     },
     "games": {
       "squirdle": {
@@ -116,7 +145,10 @@
       "unopenedBoxesSub": "en tu inventario",
       "nextReset": "Próximo reinicio",
       "nextResetSub": "a las 06:00",
-      "claimDescription": "Reclama la recompensa de cada día para avanzar por el banner. La racha se reinicia a las 06:00; si reclamas hoy, mañana te espera el día siguiente."
+      "dayHeading": "DÍA {current} <muted>de {total}</muted>",
+      "claimDescription": "Reclama la recompensa de cada día para avanzar por el banner. La racha se reinicia a las 06:00; si reclamas hoy, mañana te espera el día siguiente.",
+      "kicker": "▸ Racha semanal · {banner}",
+      "resetsInStrong": "REINICIA EN <b>{time}</b>"
     },
     "toast": {
       "boxOpened": "¡Caja abierta!",
@@ -159,7 +191,9 @@
       "reelNoServer": "La ruleta no llegó del servidor, pero el premio sí es tuyo.",
       "abriendo": "Abriendo",
       "reelAriaSettled": "Premio obtenido",
-      "reelAriaSpinning": "Girando la caja"
+      "reelAriaSpinning": "Girando la caja",
+      "oddsBarAria": "{rarity}: {pct} por ciento",
+      "boxArtAria": "Caja sin ilustración"
     },
     "coleccion": {
       "title": "Tu colección",
@@ -168,6 +202,7 @@
       "claimToGame": "Reclamar al juego",
       "emptyTitle": "Tu colección está vacía",
       "emptyBody": "Abre cajas de botín para conseguir objetos.",
+      "inventoryError": "No se pudo cargar tu inventario. Vuelve a intentarlo en un momento.",
       "filters": {
         "search": "Buscar objetos…",
         "searchAria": "Buscar en mi colección",
@@ -195,7 +230,8 @@
         "searchPlaceholder": "Buscar en mi colección…",
         "searchAriaLabel": "Buscar en mi colección",
         "typeLabel": "Tipo de objeto",
-        "allRarities": "Todas"
+        "allRarities": "Todas",
+        "typePokemon": "Pokémon"
       },
       "claim": {
         "kicker": "▸ Reclamar recompensas",
@@ -209,10 +245,11 @@
         "selectItemsDescription": "Selecciona los objetos que quieres enviar al juego. Los Pokémon van directos a tu PC; los objetos de Minecraft llegan en cofres.",
         "outsideMinecraft": "Estás fuera del cliente de Minecraft. La entrega solo se completa si estás conectado al servidor.",
         "claimError": "Ocurrió un error al reclamar los objetos.",
-        "selected": "Seleccionados {count}",
-        "occupy": "Ocupan {slots, plural, one {# hueco} other {# huecos}} en {chests, plural, one {# cofre} other {# cofres}}",
+        "selected": "Seleccionados <b>{count}</b>",
+        "occupy": "Ocupan <b>{slots}</b> {slots, plural, one {hueco} other {huecos}} en <c>{chests}</c> {chests, plural, one {cofre} other {cofres}}",
         "pokemonSection": "Pokémon",
-        "minecraftSection": "Objetos de Minecraft"
+        "minecraftSection": "Objetos de Minecraft",
+        "selectedPokemon": "<b>{count}</b> Pokémon"
       },
       "detail": {
         "quantity": "Cantidad",
@@ -276,6 +313,16 @@
       "guessTheCreature": "Adivina la criatura oculta",
       "attempts": "{count} intentos",
       "noAttemptsYet": "Aún no hay intentos.",
+      "invalidGuess": "¡Ese no es un Pokémon válido!",
+      "wonMessage": "¡Felicidades! Has adivinado el Pokémon: {name}",
+      "lostMessage": "¡Has perdido! El Pokémon era: {name}",
+      "feedback": {
+        "hit": "correcto",
+        "near": "presente en el otro tipo",
+        "miss": "incorrecto",
+        "dirUp": "el objetivo es mayor",
+        "dirDown": "el objetivo es menor"
+      },
       "guessAPokemon": "¡Adivina un Pokémon para comenzar!",
       "columns": {
         "gen": "Gen",
@@ -322,7 +369,10 @@
         "arrowUp": "▲ indica que el valor objetivo es mayor.",
         "arrowDown": "▼ indica que el valor objetivo es menor.",
         "amberType": "Una casilla ámbar en un tipo indica que ese tipo está en la otra posición."
-      }
+      },
+      "invalidPokemon": "¡Ese no es un Pokémon válido!",
+      "won": "¡Felicidades! Has adivinado el Pokémon: {name}",
+      "lost": "¡Has perdido! El Pokémon era: {name}"
     },
     "voltorb": {
       "howToPlay": "Cómo se juega",
@@ -389,6 +439,16 @@
       "levelComplete": "¡NIVEL COMPLETADO!",
       "levelCompleteText": "¡Encontraste todos los multiplicadores sin activar ningún Voltorb!",
       "saveAndQuit": "Guardar y salir",
+      "score": "PUNTUACIÓN",
+      "level": "NIVEL",
+      "total": "TOTAL",
+      "levelLabel": "NIVEL {level}",
+      "flipHint": "Voltea números para acumular puntos",
+      "columnLabel": "Columna {index}",
+      "rowLabel": "Fila {index}",
+      "hintCellAria": "{label}: {coins} puntos, {voltorbs} voltorbs",
+      "cardsKicker": "CARTAS {count}",
+      "coinsAria": "{count} monedas acumuladas en esta partida",
       "memo": {
         "title": "MEMO",
         "notesOn": "Notas ON",
@@ -396,7 +456,10 @@
         "markVoltorb": "Marcar Voltorb",
         "markX": "Marcar x{mark}",
         "hint": "Activa {bold} y haz clic en una casilla para marcarla sin voltearla."
-      }
+      },
+      "cellRevealed": "Casilla fila {row}, columna {col}: {value}",
+      "cellMarked": "Casilla fila {row}, columna {col}, sin voltear, marcada: {marks}",
+      "cellHidden": "Casilla fila {row}, columna {col}, sin voltear"
     },
     "puzle": {
       "slidingPuzzle": "Puzle deslizante",
@@ -407,6 +470,7 @@
       "pieces": "Piezas",
       "inPlace": "En su sitio",
       "shuffle": "Barajar",
+      "pieceAria": "Pieza {number}",
       "howToPlay": "¿Cómo jugar?",
       "rules": [
         "Haz clic en una pieza contigua al hueco para deslizarla.",
@@ -427,13 +491,13 @@
       "noteHint": "Pista de notas (P)",
       "notesMode": "Modo notas: {state} (M)",
       "howToPlay": "¿Cómo jugar?",
-      "rules": [
-        "Rellena la cuadrícula sin repetir un tipo en la misma fila, columna o caja de 3×3.",
-        "Selecciona una casilla y elige un tipo del panel, o pulsa su inicial en el teclado.",
-        "Muévete por el tablero con las flechas.",
-        "{boldM} alterna el modo notas, {boldP} anota los tipos posibles y {boldH} revela la casilla seleccionada.",
-        "{boldN} empieza una partida nueva; {boldCtrlZ} y {boldCtrlY} deshacen y rehacen."
-      ]
+      "rules": {
+        "fillGrid": "Rellena la cuadrícula sin repetir un tipo en la misma fila, columna o caja de 3×3.",
+        "selectTile": "Selecciona una casilla y elige un tipo del panel, o pulsa su inicial en el teclado.",
+        "moveArrows": "Muévete por el tablero con las flechas.",
+        "toggleNotes": "<boldM>M</boldM> alterna el modo notas, <boldP>P</boldP> anota los tipos posibles y <boldH>H</boldH> revela la casilla seleccionada.",
+        "newGame": "<boldN>N</boldN> empieza una partida nueva; <boldCtrlZ>Ctrl+Z</boldCtrlZ> y <boldCtrlY>Ctrl+Y</boldCtrlY> deshacen y rehacen."
+      }
     },
     "maze": {
       "dungeon": "Calabozo",
@@ -448,6 +512,9 @@
       "deadEnds": "Sin salida",
       "alleys": "Callejones",
       "bossDistance": "Distancia al jefe",
+      "bossTag": "1 jefe",
+      "sizeDepth": "{size} × {size} · Profundidad {depth}",
+      "expectedRooms": "Previstas {min}–{max}",
       "howItWorks": "¿Cómo funciona?",
       "roomLabels": {
         "start": "Sala inicial",
@@ -455,12 +522,12 @@
         "boss": "Sala del jefe",
         "wall": "Muro"
       },
-      "rules": [
-        "Cada calabazo se genera al vuelo: una sala inicial, salas conectadas y un jefe.",
-        "{boldSize} cambia el lado de la cuadrícula; {boldDepth}, cuántas salas se excavan.",
-        "«Regenerar» reparte un calabazo nuevo con los mismos parámetros.",
-        "La vista debug imprime la rejilla en texto: S inicio, R sala, B jefe, W muro."
-      ]
+      "rules": {
+        "onTheFly": "Cada calabazo se genera al vuelo: una sala inicial, salas conectadas y un jefe.",
+        "dials": "<boldSize>Tamaño</boldSize> cambia el lado de la cuadrícula; <boldDepth>profundidad</boldDepth>, cuántas salas se excavan.",
+        "regenerate": "«Regenerar» reparte un calabazo nuevo con los mismos parámetros.",
+        "debugView": "La vista debug imprime la rejilla en texto: S inicio, R sala, B jefe, W muro."
+      }
     },
     "hud": {
       "trainerFallback": "Entrenador",
@@ -470,7 +537,8 @@
       "box": "{count, plural, one {caja} other {cajas}}",
       "resetsIn": "REINICIA EN {resetIn}",
       "syncing": "Sincronizando…",
-      "synced": "Sincronizado"
+      "synced": "Sincronizado",
+      "dayOf": "DÍA {current}/{total}"
     },
     "collectionGrid": {
       "noMatches": "No hay objetos que coincidan con los filtros.",

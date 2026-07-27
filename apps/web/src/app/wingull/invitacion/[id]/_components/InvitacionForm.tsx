@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
@@ -21,14 +22,17 @@ type Invitacion = {
   uuid: string;
 };
 
-const formSchema = z.object({
-  username: z.string().min(1, "¡Ups! No olvides tu nombre de usuario"),
-  mc_username: z.string().min(1, "¡El nombre de Minecraft es importante!"),
-  email: z.string().email("Parece que este email no es válido"),
-  password: z.string().min(8, "Tu contraseña debe tener al menos 8 caracteres para mantenerte seguro"),
+const buildFormSchema = (t: (key: string) => string) => z.object({
+  username: z.string().min(1, t('usernameRequired')),
+  mc_username: z.string().min(1, t('mcUsernameRequired')),
+  email: z.string().email(t('emailInvalid')),
+  password: z.string().min(8, t('passwordMin')),
 });
 
 export default function InvitacionForm({ invitacion }: { invitacion: Invitacion }) {
+  const t = useTranslations('wingull.invite');
+  const tErrors = useTranslations('wingull.invite.errors');
+  const formSchema = buildFormSchema(tErrors);
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
@@ -56,7 +60,7 @@ export default function InvitacionForm({ invitacion }: { invitacion: Invitacion 
       }
       router.push('/registro-exitoso');
     } catch (error) {
-      setFormError(error instanceof Error ? error.message : "¡Vaya! Algo salió mal durante el registro. ¿Podrías intentarlo de nuevo?");
+      setFormError(error instanceof Error ? error.message : tErrors('submitFailed'));
     } finally {
       setIsSubmitting(false);
     }
@@ -66,53 +70,52 @@ export default function InvitacionForm({ invitacion }: { invitacion: Invitacion 
       <Card className="w-full max-w-4xl shadow-xl bg-secondary-soft bg-opacity-70 text-white rounded-xl overflow-hidden relative z-10">
         <CardHeader className="border-b border-secondary-active">
           <div className="flex justify-between items-center">
-            <CardTitle className="text-2xl font-bold text-yellow-300">Invitación: Plan de Desarrollo de Teras</CardTitle>
+            <CardTitle className="text-2xl font-bold text-yellow-300">{t('subject')}</CardTitle>
             <Star className="text-yellow-300 h-6 w-6" />
           </div>
           <div className="flex items-center mt-2 text-secondary-hover">
             <div className="mr-2 w-8 h-8 bg-yellow-300 rounded-full flex items-center justify-center text-secondary-active font-bold">
-              TP
+              {t('senderInitials')}
             </div>
             <div>
-              <div className="font-semibold">Teras Project</div>
-              <div className="text-sm">teras@project.com</div>
+              <div className="font-semibold">{t('senderName')}</div>
+              <div className="text-sm">{t('senderEmail')}</div>
             </div>
           </div>
           <div className="flex space-x-2 mt-4">
             <Button variant="ghost" size="sm" className="text-secondary-hover hover:bg-secondary-active hover:text-yellow-300 transition-colors duration-300">
-              <Reply className="h-4 w-4 mr-2" /> Responder
+              <Reply className="h-4 w-4 mr-2" /> {t('reply')}
             </Button>
             <Button variant="ghost" size="sm" className="text-secondary-hover hover:bg-secondary-active hover:text-yellow-300 transition-colors duration-300">
-              <ReplyAll className="h-4 w-4 mr-2" /> Responder a todos
+              <ReplyAll className="h-4 w-4 mr-2" /> {t('replyAll')}
             </Button>
             <Button variant="ghost" size="sm" className="text-secondary-hover hover:bg-secondary-active hover:text-yellow-300 transition-colors duration-300">
-              <Forward className="h-4 w-4 mr-2" /> Reenviar
+              <Forward className="h-4 w-4 mr-2" /> {t('forward')}
             </Button>
           </div>
         </CardHeader>
         <CardContent className="pt-6">
           <div className="space-y-4 text-secondary-hover">
-            <p className="text-lg">¡Hola, {invitacion.username}!</p>
-            <p>Nos complace informarle que le ha sido otorgada una plaza para participar en el Plan de Desarrollo de Teras. 
-            En caso de querer colaborar con el desarrollo de la región, por favor, rellene el siguiente formulario.</p>
-            <p>Muchas gracias por su interés. El destino de la región de Teras depende de usted.</p>
+            <p className="text-lg">{t('greeting', { username: invitacion.username })}</p>
+            <p>{t('body1')}</p>
+            <p>{t('body2')}</p>
           </div>
           <Separator className="my-6 bg-secondary-active" />
           <div className="bg-secondary-soft bg-opacity-50 p-6 rounded-xl border border-secondary-active mt-4">
-            <h3 className="text-xl font-bold mb-4 text-yellow-300">¡Únete a la aventura de Teras!</h3>
+            <h3 className="text-xl font-bold mb-4 text-yellow-300">{t('formTitle')}</h3>
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                 <div className="flex items-center space-x-4 mb-4">
                   <Image
                     src={`https://minotar.net/avatar/${form.getValues().mc_username}/100.png`}
-                    alt={`Avatar de ${invitacion.username}`}
+                    alt={t('avatarAlt', { username: invitacion.username })}
                     width={50}
                     height={50}
                     className="rounded-full border-2 border-yellow-300"
                   />
                   <div>
                     <h2 className="text-xl font-bold text-yellow-300">{invitacion.username}</h2>
-                    <p className="text-secondary-hover">Aventurero de Minecraft</p>
+                    <p className="text-secondary-hover">{t('roleLabel')}</p>
                   </div>
                 </div>
                 <FormField
@@ -120,14 +123,14 @@ export default function InvitacionForm({ invitacion }: { invitacion: Invitacion 
                   name="username"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-secondary-hover font-semibold">Tu nombre de aventurero</FormLabel>
+                      <FormLabel className="text-secondary-hover font-semibold">{t('usernameLabel')}</FormLabel>
                       <FormControl>
                         <div className="relative">
                           <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-secondary-hover" size={18} />
-                          <Input placeholder="¿Cómo quieres que te llamemos?" {...field} className="pl-10 bg-secondary-soft bg-opacity-50 border-secondary-active text-secondary-hover placeholder-secondary-hover focus:ring-yellow-300 focus:border-yellow-300 rounded-lg" />
+                          <Input placeholder={t('usernamePh')} {...field} className="pl-10 bg-secondary-soft bg-opacity-50 border-secondary-active text-secondary-hover placeholder-secondary-hover focus:ring-yellow-300 focus:border-yellow-300 rounded-lg" />
                         </div>
                       </FormControl>
-                      <FormDescription className="text-secondary-hover">Este será tu nombre en Teras</FormDescription>
+                      <FormDescription className="text-secondary-hover">{t('usernameHelp')}</FormDescription>
                       <FormMessage className="text-red-300" />
                     </FormItem>
                   )}
@@ -137,14 +140,14 @@ export default function InvitacionForm({ invitacion }: { invitacion: Invitacion 
                   name="mc_username"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-secondary-hover font-semibold">Tu nombre en Minecraft</FormLabel>
+                      <FormLabel className="text-secondary-hover font-semibold">{t('mcUsernameLabel')}</FormLabel>
                       <FormControl>
                         <div className="relative">
                           <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-secondary-hover" size={18} />
-                          <Input placeholder="Tu nombre en Minecraft" {...field} disabled readOnly className="pl-10 bg-secondary-active bg-opacity-50 border-secondary-active text-secondary-hover rounded-lg" />
+                          <Input placeholder={t('mcUsernamePh')} {...field} disabled readOnly className="pl-10 bg-secondary-active bg-opacity-50 border-secondary-active text-secondary-hover rounded-lg" />
                         </div>
                       </FormControl>
-                      <FormDescription className="text-secondary-hover">Este es tu nombre actual en Minecraft</FormDescription>
+                      <FormDescription className="text-secondary-hover">{t('mcUsernameHelp')}</FormDescription>
                       <FormMessage className="text-red-300" />
                     </FormItem>
                   )}
@@ -154,14 +157,14 @@ export default function InvitacionForm({ invitacion }: { invitacion: Invitacion 
                   name="email"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-secondary-hover font-semibold">Tu correo electrónico</FormLabel>
+                      <FormLabel className="text-secondary-hover font-semibold">{t('emailLabel')}</FormLabel>
                       <FormControl>
                         <div className="relative">
                           <AtSign className="absolute left-3 top-1/2 transform -translate-y-1/2 text-secondary-hover" size={18} />
-                          <Input placeholder="¿Dónde podemos contactarte?" {...field} className="pl-10 bg-secondary-soft bg-opacity-50 border-secondary-active text-secondary-hover placeholder-secondary-hover focus:ring-yellow-300 focus:border-yellow-300 rounded-lg" />
+                          <Input placeholder={t('emailPh')} {...field} className="pl-10 bg-secondary-soft bg-opacity-50 border-secondary-active text-secondary-hover placeholder-secondary-hover focus:ring-yellow-300 focus:border-yellow-300 rounded-lg" />
                         </div>
                       </FormControl>
-                      <FormDescription className="text-secondary-hover">Te mantendremos informado de todas las novedades</FormDescription>
+                      <FormDescription className="text-secondary-hover">{t('emailHelp')}</FormDescription>
                       <FormMessage className="text-red-300" />
                     </FormItem>
                   )}
@@ -171,14 +174,14 @@ export default function InvitacionForm({ invitacion }: { invitacion: Invitacion 
                   name="password"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-secondary-hover font-semibold">Tu contraseña secreta</FormLabel>
+                      <FormLabel className="text-secondary-hover font-semibold">{t('passwordLabel')}</FormLabel>
                       <FormControl>
                         <div className="relative">
                           <Key className="absolute left-3 top-1/2 transform -translate-y-1/2 text-secondary-hover" size={18} />
-                          <Input placeholder="Crea una contraseña segura" type="password" {...field} className="pl-10 bg-secondary-soft bg-opacity-50 border-secondary-active text-secondary-hover placeholder-secondary-hover focus:ring-yellow-300 focus:border-yellow-300 rounded-lg" />
+                          <Input placeholder={t('passwordPh')} type="password" {...field} className="pl-10 bg-secondary-soft bg-opacity-50 border-secondary-active text-secondary-hover placeholder-secondary-hover focus:ring-yellow-300 focus:border-yellow-300 rounded-lg" />
                         </div>
                       </FormControl>
-                      <FormDescription className="text-secondary-hover">Asegúrate de que sea segura y fácil de recordar</FormDescription>
+                      <FormDescription className="text-secondary-hover">{t('passwordHelp')}</FormDescription>
                       <FormMessage className="text-red-300" />
                     </FormItem>
                   )}
@@ -190,7 +193,7 @@ export default function InvitacionForm({ invitacion }: { invitacion: Invitacion 
                     disabled={isSubmitting}
                     className="bg-yellow-300 text-secondary-active hover:bg-yellow-400 disabled:opacity-50 px-6 py-3 rounded-lg text-lg font-semibold transition-all duration-300 transform hover:scale-105 hover:shadow-lg"
                   >
-                    {isSubmitting ? '¡Embarcando..!' : '¡Comenzar la aventura!'}
+                    {isSubmitting ? t('submitting') : t('submit')}
                     <Send className="ml-2 h-5 w-5" />
                   </Button>
                 </div>
@@ -201,11 +204,11 @@ export default function InvitacionForm({ invitacion }: { invitacion: Invitacion 
         <CardFooter className="border-t border-secondary-active flex justify-between items-center text-secondary-hover">
           <div className="flex items-center space-x-2">
             <Mail className="h-5 w-5" />
-            <span className="text-sm font-medium">Invitación #{invitacion.id}</span>
+            <span className="text-sm font-medium">{t('inviteNumber', { id: invitacion.id })}</span>
           </div>
           <div className="flex items-center space-x-2">
             <Paperclip className="h-5 w-5" />
-            <span className="text-sm font-medium">1 regalo adjunto</span>
+            <span className="text-sm font-medium">{t('attachment')}</span>
           </div>
         </CardFooter>
       </Card>

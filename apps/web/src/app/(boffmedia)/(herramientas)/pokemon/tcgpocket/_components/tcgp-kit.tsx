@@ -294,11 +294,12 @@ function packArt(setId: string, name: string): string {
   return `/assets/img/games/tcgpocket/packs/${setId}/${name.toLowerCase()}.png`
 }
 export function TcgPackTile({ setId, name, meta, hue, onOpen }: { setId: string; name: string; meta?: string; hue?: string; onOpen?: () => void }) {
+  const t = useTranslations("tcgpocket")
   const c = hue || typeColor("fire")
   const [failed, setFailed] = useState(false)
   return (
     <button
-      type="button" onClick={onOpen} aria-label={`Sobre ${name} · ${setId}`}
+      type="button" onClick={onOpen} aria-label={t("app.sobres.tileAria", { name, setId })}
       className="group relative flex aspect-[3/4.2] flex-col overflow-hidden rounded-[10px] border border-solid shadow-[0_8px_22px_rgba(0,0,0,0.35)] transition-transform hover:-translate-y-[5px] hover:-rotate-[0.6deg] hover:shadow-[0_14px_32px_rgba(0,0,0,0.5)]"
       style={{
         borderColor: `color-mix(in srgb, ${c} 45%, var(--line-2))`,

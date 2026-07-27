@@ -1,3 +1,4 @@
+import { intlLocale } from "@/lib/locale"
 import type { MinecraftStats } from "@/services/api/smartrotom/playerService"
 import type { MovementRow } from "../_types"
 
@@ -67,11 +68,14 @@ export function deaths(stats: Blob): number {
   return read(stats, "minecraft:deaths")
 }
 
-/** Compact figures for the stat plates: 1,2K · 3,4M · 12.480. */
-export function fmt(n: number): string {
+/** Compact figures for the stat plates: 1,2K · 3,4M (es) / 1.2K · 3.4M (en) · 12.480. */
+export function fmt(n: number, locale?: string | null): string {
   if (!Number.isFinite(n)) return "0"
+  const tag = intlLocale(locale)
   const abs = Math.abs(n)
-  if (abs >= 1_000_000) return `${(n / 1_000_000).toFixed(1).replace(".", ",")}M`
-  if (abs >= 1_000) return `${(n / 1_000).toFixed(1).replace(".", ",")}K`
-  return new Intl.NumberFormat("es-ES").format(Math.round(n))
+  const decimal = (v: number, suffix: string) =>
+    `${v.toLocaleString(tag, { minimumFractionDigits: 1, maximumFractionDigits: 1, useGrouping: false })}${suffix}`
+  if (abs >= 1_000_000) return decimal(n / 1_000_000, "M")
+  if (abs >= 1_000) return decimal(n / 1_000, "K")
+  return new Intl.NumberFormat(tag).format(Math.round(n))
 }

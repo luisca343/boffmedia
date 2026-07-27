@@ -1,6 +1,7 @@
 "use client"
 
 import { useId, useMemo } from "react"
+import { useTranslations } from "next-intl"
 import type { Region } from "@boffmedia/shared"
 import { Empty } from "../ui"
 import { TONES, ZONA_KINDS } from "../../_utils/tones"
@@ -40,6 +41,7 @@ export function MapaCanvas({
   onSelectZona: (z: Zona) => void
   onOpenDossier: (uuid: string) => void
 }) {
+  const t = useTranslations("gobierno")
   const hatchId = `gt-hatch-${useId().replace(/:/g, "")}`
   const vignId = `gt-vign-${useId().replace(/:/g, "")}`
 
@@ -106,11 +108,7 @@ export function MapaCanvas({
 
   if (plotEntries.length === 0) {
     return (
-      <Empty
-        icon="map"
-        title="Sin parcelas ubicables"
-        sub="No hay parcelas cuya región de WorldGuard se haya podido resolver todavía."
-      />
+      <Empty icon="map" title={t("mapa.sinParcelasUbicables")} sub={t("mapa.sinParcelasUbicablesSub")} />
     )
   }
 

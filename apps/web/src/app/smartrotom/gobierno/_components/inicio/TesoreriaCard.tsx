@@ -5,10 +5,15 @@ import { Bar, Card, Empty, Skeleton } from "../ui"
 import { TONES } from "../../_utils/tones"
 import { useTesoreria } from "../../_hooks/queries"
 import { money } from "../../_utils/format"
+import { useFormat } from "@/lib/useFormat"
 
-const moneyR = (n: number | null | undefined) => `${money(n)} ₽`
-
-function SparkBars({ series }: { series: { label: string; ingreso: number; gasto: number }[] }) {
+function SparkBars({
+  series,
+  moneyR,
+}: {
+  series: { label: string; ingreso: number; gasto: number }[]
+  moneyR: (n: number | null | undefined) => string
+}) {
   const max = Math.max(1, ...series.flatMap((s) => [s.ingreso, s.gasto]))
   return (
     <div className="flex h-[72px] items-end gap-[7px]">
@@ -34,6 +39,8 @@ function SparkBars({ series }: { series: { label: string; ingreso: number; gasto
 
 export function TesoreriaCard() {
   const t = useTranslations("gobierno")
+  const { intlLocale } = useFormat()
+  const moneyR = (n: number | null | undefined) => `${money(n, intlLocale)} ₽`
   const { data, isLoading } = useTesoreria()
 
   return (
@@ -89,7 +96,7 @@ export function TesoreriaCard() {
               </div>
             </div>
             {data.series.length > 0 ? (
-              <SparkBars series={data.series} />
+              <SparkBars series={data.series} moneyR={moneyR} />
             ) : (
               <div className="py-4 text-center text-[12px] text-gt-ink-400">
                 {t("tesoreria.noHistorical")}

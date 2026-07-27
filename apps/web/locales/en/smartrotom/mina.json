@@ -1,1 +1,43 @@
-{"mina":{"reclamar":{"notInMinecraft":"You are not in Minecraft","giveBoxError":"Error giving the box","claimSuccess":"Rewards claimed successfully","claimError":"Error claiming rewards","noRewards":"No rewards to claim","claiming":"CLAIMING…","claimAll":"CLAIM ALL ({count} BOXES)"}}}
+{
+  "mina": {
+    "reclamar": {
+      "notInMinecraft": "You are not in Minecraft",
+      "giveBoxError": "Error giving the box",
+      "claimSuccess": "Rewards claimed successfully",
+      "claimError": "Error claiming rewards",
+      "noRewards": "No rewards to claim",
+      "claiming": "CLAIMING…",
+      "claimAll": "CLAIM ALL ({count} BOXES)"
+    },
+    "menu": {
+      "title": "Mina 2.0",
+      "play": "Play",
+      "history": "History",
+      "ranking": "Ranking",
+      "drops": "Drops",
+      "claim": "Claim",
+      "exit": "Exit"
+    },
+    "energy": {
+      "nextRecharge": "Next recharge in: {time}"
+    },
+    "drops": {
+      "title": "DROPS"
+    },
+    "history": {
+      "title": "HISTORY"
+    },
+    "ranking": {
+      "title": "RANKING",
+      "position": "Position",
+      "player": "Player",
+      "points": "Points"
+    },
+    "play": {
+      "rewardsObtained": "Rewards obtained",
+      "start": "Play",
+      "playAgain": "Play again",
+      "close": "Close"
+    }
+  }
+}

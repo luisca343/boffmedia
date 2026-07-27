@@ -3,7 +3,7 @@
 // PAPER — but a card ON the paper: the carné is its own pale-blue laminate, so its ink is
 // `ps-info-*` and `ps-ink`, never desk chrome.
 
-import { useTranslations } from "next-intl"
+import { useLocale, useTranslations } from "next-intl"
 import { useState, type ReactNode } from "react"
 import { cn } from "@/lib/utils"
 import type { MinecraftStats } from "@/services/api/smartrotom/playerService"
@@ -63,6 +63,7 @@ export function Carne({
   loading: boolean
 }) {
   const t = useTranslations("pasaporte")
+  const locale = useLocale()
   // Read here rather than taken as a prop — see the note in `Identidad`.
   const inspect = usePassportStore((s) => s.inspect)
   const [verified, setVerified] = useState(false)
@@ -147,8 +148,8 @@ export function Carne({
             <Field label={t("carne.field.region")} value={profile.region} />
             <Field label={t("carne.field.class")} value={profile.title} wide />
             <div className="col-span-2 grid grid-cols-3 gap-2.5">
-              <Code label={t("carne.field.issued")} value={docDate(issued)} />
-              <Code label={t("carne.field.expires")} value={docDate(expires)} />
+              <Code label={t("carne.field.issued")} value={docDate(issued, locale)} />
+              <Code label={t("carne.field.expires")} value={docDate(expires, locale)} />
               <Code label={t("carne.field.hours")} value={`${hours}h`} />
             </div>
             <Code label={t("carne.field.rank")} value={String(profile.rank).padStart(2, "0")} />

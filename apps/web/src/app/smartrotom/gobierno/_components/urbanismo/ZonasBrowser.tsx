@@ -114,7 +114,7 @@ export function ZonasBrowser() {
             </div>
             <div className="grid gap-3.5" style={{ gridTemplateColumns: "repeat(auto-fill,minmax(258px,1fr))" }}>
               {townZonas.map((z) => {
-                const k = kindOf(z.kind)
+                const k = kindOf(z.kind, t)
                 const members = parcelasByZona.get(z.id) ?? []
                 const total = z.parcelas ?? members.length
                 const occ = z.ocupadas ?? members.filter((p) => p.owner).length
@@ -166,7 +166,7 @@ export function ZonasBrowser() {
                             type="button"
                             disabled={!p.owner}
                             onClick={() => p.owner && openDossier(p.owner.uuid)}
-                            title={p.owner ? p.owner.username : "Vacante"}
+                            title={p.owner ? p.owner.username : t("urbanismo.vacanteTitle")}
                             className="inline-flex items-center gap-1 rounded-full border border-gt-line bg-gt-paper-0 px-2 py-0.5 font-gt-mono text-[11px] font-bold text-gt-ink-800 disabled:cursor-default"
                           >
                             <span

@@ -1,5 +1,7 @@
 "use client";
 
+import { useLocale, useTranslations } from "next-intl";
+
 import { useIssues } from "../../_hooks/queries";
 import { longDateOf } from "../../_utils/article";
 import { CardFlat, Meta, SectionHeader } from "../../_components/ui";
@@ -10,6 +12,8 @@ import { CardFlat, Meta, SectionHeader } from "../../_components/ui";
  * so this needs the anchor id and enough top offset to clear the sticky nav.
  */
 export function IssueArchive() {
+  const t = useTranslations("furrettoday.issueArchive");
+  const locale = useLocale();
   const { data: issues } = useIssues();
 
   if (!issues || issues.length === 0) return null;
@@ -23,10 +27,10 @@ export function IssueArchive() {
     >
       <div className="mb-6">
         <SectionHeader
-          eyebrow="NÚMEROS ANTERIORES"
-          title="El Archivo"
+          eyebrow={t("eyebrow")}
+          title={t("title")}
           number="04"
-          hint={`${sorted.length} ${sorted.length === 1 ? "número" : "números"}`}
+          hint={t("issues", { count: sorted.length })}
         />
       </div>
       <div className="grid gap-3">
@@ -43,11 +47,11 @@ export function IssueArchive() {
                 {issue.headline}
               </div>
               <Meta className="mt-1 block">
-                {longDateOf(new Date(issue.publishedAt))}
+                {longDateOf(new Date(issue.publishedAt), locale)}
               </Meta>
             </div>
             <Meta className="shrink-0 text-ft-pink">
-              {issue.articles} {issue.articles === 1 ? "artículo" : "artículos"}
+              {t("articles", { count: issue.articles })}
             </Meta>
           </CardFlat>
         ))}

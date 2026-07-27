@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils"
 import { Button, Field, Input, Modal, toast, Icon, Spinner } from "@/components/boffmedia/primitives"
 import { TnFormatBadge, TnEntrant, TnPodium } from "@/components/boffmedia/ui/tournaments"
 import { useTournament } from "@/hooks/tournaments/useTournament"
+import { useFormat } from "@/lib/useFormat"
 import {
   TournamentsService,
   type TournamentDetailApi,
@@ -23,11 +24,11 @@ const STATUS_TONE: Record<string, string> = {
   cancelled: "text-bad border-bad",
 }
 
-function formatDate(iso: string | null): string | null {
+function formatDate(iso: string | null, locale: string): string | null {
   if (!iso) return null
   const d = new Date(iso)
   if (Number.isNaN(d.getTime())) return null
-  return d.toLocaleDateString("es-ES", { day: "numeric", month: "short", year: "numeric" })
+  return d.toLocaleDateString(locale, { day: "numeric", month: "short", year: "numeric" })
 }
 
 export default function TorneoPage({
@@ -36,6 +37,7 @@ export default function TorneoPage({
   params: Promise<{ slug: string }>
 }) {
   const t = useTranslations("torneos")
+  const { intlLocale } = useFormat()
   const { slug } = use(params)
   const { tournament: tn, isLoading, refetch } = useTournament(slug)
 
@@ -57,8 +59,8 @@ export default function TorneoPage({
     )
   }
 
-  const start = formatDate(tn.startDate)
-  const end = formatDate(tn.endDate)
+  const start = formatDate(tn.startDate, intlLocale)
+  const end = formatDate(tn.endDate, intlLocale)
   const preStart = tn.status === "registration" || tn.status === "draft"
 
   return (

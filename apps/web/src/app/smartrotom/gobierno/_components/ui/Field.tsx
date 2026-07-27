@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { Icon, type IconName } from "./Icon"
 
 const BASE =
@@ -148,11 +149,14 @@ export function Select({
 export function SearchBar({
   value,
   onChange,
-  placeholder = "Buscar…",
+  placeholder,
 }: {
   value: string
   onChange: (v: string) => void
   placeholder?: string
 }) {
-  return <Field value={value} onChange={onChange} placeholder={placeholder} icon="search" />
+  const t = useTranslations("gobierno")
+  return (
+    <Field value={value} onChange={onChange} placeholder={placeholder ?? t("common.search")} icon="search" />
+  )
 }

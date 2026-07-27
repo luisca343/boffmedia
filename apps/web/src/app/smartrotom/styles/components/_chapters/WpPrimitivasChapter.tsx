@@ -30,6 +30,7 @@ import {
   TypeBadge,
   ValueBox,
 } from "@/app/smartrotom/wigglypop/_components/ui"
+import { useFormat } from "@/lib/useFormat"
 import { Sample, Section } from "../showcase-shared"
 
 // Static sample copy — the app itself resolves these via next-intl.
@@ -37,6 +38,7 @@ const ESCROW_STEPS = ["Pago retenido", "Transferencia PC", "Pago liberado"]
 
 /** Wigglypop's primitive library — `wp-*`. Every specimen renders from real props. */
 export function WpPrimitivasChapter() {
+  const { number } = useFormat()
   const [toggle, setToggle] = React.useState(true)
   const [check, setCheck] = React.useState(true)
   const [tab, setTab] = React.useState("fixed")
@@ -303,7 +305,7 @@ export function WpPrimitivasChapter() {
             <div className="mb-1.5 flex justify-between">
               <span className="font-wp text-[13px] font-semibold text-wp-fg-muted">Hasta</span>
               <span className="wp-num font-wp text-[13.5px] text-wp-accent">
-                ₽{range.toLocaleString("es-ES")}
+                ₽{number(range)}
               </span>
             </div>
             <Range

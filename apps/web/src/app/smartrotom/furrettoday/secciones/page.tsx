@@ -2,6 +2,7 @@
 
 import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 import { ArticleCard } from "../_components/ArticleCard";
 import { useNewsroom } from "../_hooks/queries";
@@ -60,6 +61,7 @@ function sortArticles(articles: FtArticle[], sort: SortKey): FtArticle[] {
 }
 
 function BrowseScreen() {
+  const t = useTranslations("furrettoday.browse");
   const [query, setQuery] = useUrlParam("q", "");
   const [activeCategory, setActiveCategory] = useUrlParam("cat", "all");
   const [sort, setSort] = useState<SortKey>("recent");
@@ -91,7 +93,7 @@ function BrowseScreen() {
 
   const catLabel =
     activeCategory === "all"
-      ? "Todas las secciones"
+      ? t("allSections")
       : (categories.find(
           (c) => c.label.toLowerCase() === activeCategory.toLowerCase(),
         )?.label ?? activeCategory);
@@ -141,25 +143,24 @@ function BrowseScreen() {
       <section className="mx-auto max-w-[1400px] px-6 pb-4 pt-10">
         <div className="border-ft flex flex-wrap items-end justify-between gap-4 border-x-0 border-t-0 border-b-ft-ink pb-3">
           <div>
-            <Eyebrow className="text-ft-pink">RESULTADOS</Eyebrow>
+            <Eyebrow className="text-ft-pink">{t("resultsEyebrow")}</Eyebrow>
             <h2 className="font-ft-display mt-1 text-[clamp(36px,5vw,56px)] leading-none">
-              {filtered.length}{" "}
-              {filtered.length === 1 ? "artículo" : "artículos"} en {catLabel}
+              {t("resultsCount", { count: filtered.length, category: catLabel })}
             </h2>
           </div>
           <label className="flex items-center gap-2">
             <span className="font-ft-ui text-[13px] font-medium uppercase tracking-[0.04em] text-ft-ink/70">
-              Ordenar
+              {t("sort")}
             </span>
             <Select
               value={sort}
               onChange={(e) => setSort(e.target.value as SortKey)}
-              aria-label="Ordenar artículos"
+              aria-label={t("sortAria")}
               className="w-auto"
             >
-              <option value="recent">Más recientes</option>
-              <option value="claps">Más leídos</option>
-              <option value="issue">Por número</option>
+              <option value="recent">{t("sortRecent")}</option>
+              <option value="claps">{t("sortClaps")}</option>
+              <option value="issue">{t("sortIssue")}</option>
             </Select>
           </label>
         </div>
@@ -168,9 +169,9 @@ function BrowseScreen() {
       <section className="mx-auto max-w-[1400px] px-6 pb-8 pt-2">
         {filtered.length === 0 ? (
           <EmptyState
-            title="¡VAYA, NADA!"
-            message="Furret ha buscado por todo el número y no encuentra nada con esos filtros. Prueba otra palabra o limpia los filtros."
-            actionLabel="Reiniciar búsqueda"
+            title={t("emptyTitle")}
+            message={t("emptyMessage")}
+            actionLabel={t("resetSearch")}
             onAction={resetFilters}
           />
         ) : (
@@ -185,7 +186,7 @@ function BrowseScreen() {
       {tagCloud.length > 0 ? (
         <section className="mx-auto max-w-[1400px] px-6 pb-12">
           <Eyebrow className="mb-3.5 text-ft-pink">
-            NAVEGA POR ETIQUETAS
+            {t("tagsEyebrow")}
           </Eyebrow>
           <div className="flex flex-wrap gap-2.5">
             {tagCloud.map((tag, i) => (

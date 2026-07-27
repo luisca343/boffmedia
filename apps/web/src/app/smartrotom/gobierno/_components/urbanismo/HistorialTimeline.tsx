@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl"
 import { Bar, Badge, Card, Empty, PageHead, Select, Skeleton } from "../ui"
 import { useHistorial } from "../../_hooks/queries"
 import { fmtDateTime, townName } from "../../_utils/format"
+import { useFormat } from "@/lib/useFormat"
 import { groupBy } from "./helpers"
 
 // One card per parcela, its ownership timeline newest-first. `useHistorial` is the hook
@@ -13,6 +14,7 @@ import { groupBy } from "./helpers"
 // one, so this page renders the honest error state until that's wired up).
 export function HistorialTimeline() {
   const t = useTranslations("gobierno")
+  const { intlLocale } = useFormat()
   const { data, isLoading, isError } = useHistorial({ limit: 100 })
   const [town, setTown] = useState("all")
 
@@ -106,7 +108,7 @@ export function HistorialTimeline() {
                         </span>
                         {i === 0 && <Badge tone="ok">{t("urbanismo.actual")}</Badge>}
                       </div>
-                      <div className="mt-0.5 font-gt-mono text-[10.5px] text-gt-ink-400">{fmtDateTime(h.changedAt)}</div>
+                      <div className="mt-0.5 font-gt-mono text-[10.5px] text-gt-ink-400">{fmtDateTime(h.changedAt, intlLocale)}</div>
                       {h.reason && <div className="mt-0.5 text-[12px] italic text-gt-ink-500">{h.reason}</div>}
                     </div>
                   </div>

@@ -1,6 +1,7 @@
 "use client"
 
 import { useCountUp } from "../../_hooks/useCountUp"
+import { useFormat } from "@/lib/useFormat"
 import { Icon } from "./Icon"
 
 export interface CoinCounterProps {
@@ -21,10 +22,11 @@ export interface CoinCounterProps {
 export function CoinCounter({ value, animate = true }: CoinCounterProps) {
   const live = useCountUp(value, 800)
   const shown = animate ? live : value
+  const { number } = useFormat()
   return (
     <span className="inline-flex items-center gap-2 rounded-lg border border-ar-amber/35 bg-black/45 px-2.5 py-1.5 font-ar-mono text-[13px] font-bold tabular-nums text-ar-amber">
       <Icon.Coin s={16} />
-      {shown.toLocaleString("es-ES")}
+      {number(shown)}
     </span>
   )
 }

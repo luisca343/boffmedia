@@ -9,6 +9,10 @@
       "emptyBoard": "No quests on the board yet.",
       "emptyFiltered": "The board is empty with those criteria. Change the filters."
     },
+    "errors": {
+      "outsideGame": "The quest board can only be read from inside the game.",
+      "unreadable": "The quest board could not be read."
+    },
     "playerHeader": {
       "adventurerLog": "Adventurer's log",
       "questsInKingdoms": "Quests in {count, plural, one {# kingdom} other {# kingdoms}}",
@@ -19,7 +23,8 @@
       "sealed": "Sealed",
       "kingdoms": "Kingdoms",
       "inn": "❦ Rotom Inn",
-      "questsOnBoard": "⚔ {count} quests on the board"
+      "questsOnBoard": "⚔ {count} quests on the board",
+      "defaultName": "Adventurer"
     },
     "boardFilters": {
       "filterByKingdom": "Filter by kingdom",
@@ -42,25 +47,64 @@
       "reward": "Reward"
     },
     "questLetter": {
-      "readLetter": "Read letter"
+      "readLetter": "Read letter",
+      "close": "Close",
+      "closeQuest": "Close the quest",
+      "badge": "✦ Quest ✦",
+      "from": "from",
+      "viewDossier": "View {name}'s dossier",
+      "level": "Lv. {level}",
+      "repeatable": "· Repeatable",
+      "objectives": "⚜ Objectives ⚜",
+      "rewards": "⚜ Rewards ⚜",
+      "wordsOf": "— words of {name}",
+      "signedOff": "Signed in ink and oath,",
+      "anonymous": "Anonymous",
+      "tracking": "Tracking",
+      "track": "Track quest",
+      "goToMap": "Go to the map"
     },
     "questChain": {
-      "title": "Quest chain"
+      "title": "Quest chain",
+      "here": "Here",
+      "level": "Lv. {level}"
     },
     "journalEntry": {
-      "title": "Journal entry"
+      "title": "Journal entry",
+      "relatedQuest": "— related quest"
     },
     "npcDossier": {
-      "title": "NPC dossier"
+      "title": "NPC dossier",
+      "ariaLabel": "{name}'s dossier",
+      "close": "Close",
+      "eyebrow": "✦ Dossier ✦",
+      "quests": "Quests",
+      "active": "Active",
+      "completed": "Completed",
+      "questsOf": "{name}'s quests",
+      "level": " · Lv. {level}",
+      "empty": "No quests on the board yet."
     },
     "satchelSlot": {
-      "empty": "Empty slot"
+      "empty": "Empty slot",
+      "notObtained": "Not obtained yet",
+      "lockedTitle": "{name} — Not obtained yet"
     },
     "trackedQuest": {
-      "title": "Tracked quest"
+      "title": "Tracked quest",
+      "ribbon": "¶ Tracked Quest",
+      "level": " · Lv. {level}",
+      "repeatable": " · Repeatable",
+      "commissionedBy": "commissioned by",
+      "unknown": "Unknown",
+      "next": "Next",
+      "rewardsAria": "Rewards",
+      "continue": "Continue"
     },
     "threadWall": {
-      "title": "Thread wall"
+      "title": "Thread wall",
+      "thread": "❦ Thread {index} · {region}",
+      "looseEnds": "Loose ends"
     },
     "sideRail": {
       "eyebrow": "✦ Rotom Inn ✦",
@@ -110,13 +154,55 @@
       }
     },
     "kingdomMap": {
-      "title": "Kingdom map"
+      "title": "Kingdom map",
+      "mapTitle": "KINGDOM OF KANTO",
+      "mapSubtitle": "— anno aventurae · MMXXVI —",
+      "active": "active",
+      "more": "+{count} more",
+      "legend": "Legend",
+      "legendActive": "Active quest",
+      "legendAvailable": "Available",
+      "legendLocked": "No new quests",
+      "legendRoad": "Royal road",
+      "legendSea": "Sea route"
     },
     "scatterLayer": {
-      "title": "Scatter layer"
+      "title": "Scatter layer",
+      "wantedLabel": "WANTED",
+      "wantedName": "TEAM ROCKET",
+      "wantedReward": "Reward 5000₽",
+      "postItFooter": "— Oak",
+      "postIt": "If you find <b>Mew</b>, bring it to the lab immediately!",
+      "clippingSource": "Diario Pokémon",
+      "clippingHeadline": "ROTOM VANISHES FROM A TELEVISION",
+      "clippingBody": "The strange electric ghost Pokémon is up to its old tricks again. Witnesses claim to have seen it slip into an old bicycle on the outskirts of Viridian Forest. If you see Rotom, do not try to catch it alone."
     },
     "rewardCard": {
       "title": "Reward"
+    },
+    "trama": {
+      "eyebrow": "The common thread",
+      "title": "The Story",
+      "subtitle": "Every quest tied to the next with thread and pins — follow the trail",
+      "loading": "Unwinding the thread…",
+      "empty": "No one has tied a quest yet."
+    },
+    "mapa": {
+      "eyebrow": "Atlas",
+      "title": "Kingdom Map",
+      "subtitle": "Drawn by cartographers of Pallet Town — stick a pin in to see its quests",
+      "loading": "Unrolling the kingdom map…",
+      "empty": "No one has charted any quests yet. The kingdom awaits its first one."
+    },
+    "mochila": {
+      "eyebrow": "Belongings",
+      "title": "The Backpack",
+      "loading": "Gathering the inventory…",
+      "summary": "{owned} treasures claimed · {locked} still to earn",
+      "ownedTitle": "◆ In the backpack",
+      "ownedEmpty": "Your backpack is empty. Complete quests to fill it.",
+      "lockedTitle": "◇ Loot to claim",
+      "lockedEmpty": "You have claimed all the available loot."
     },
     "nav": {
       "board": "Board",
@@ -133,6 +219,10 @@
       "failed": "Failed"
     },
     "bitacora": {
+      "eyebrow": "Journal",
+      "title": "Dialogue Log",
+      "subtitle": "Every word recorded in indelible ink",
+      "loading": "Gathering the log…",
       "searchPlaceholder": "Search the log…",
       "searchAriaLabel": "Search the log",
       "emptyTitle": "No dialogue entries yet.",

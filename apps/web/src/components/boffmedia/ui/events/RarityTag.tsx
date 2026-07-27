@@ -1,12 +1,16 @@
 "use client"
 
 import * as React from "react"
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { RARITY } from "./events-util"
 
 // Rarity pill (bronze…diamond) with a tag-cut clip. Mirrors `.ev-rarity`.
 export function RarityTag({ rarity, className }: { rarity: string; className?: string }) {
-  const m = RARITY[(rarity || "").toLowerCase()] || {}
+  const t = useTranslations("logros.rarity")
+  const key = (rarity || "").toLowerCase()
+  const m = RARITY[key] || {}
+  const label = key && key in RARITY ? t(key as "bronze" | "silver" | "gold" | "platinum" | "diamond") : rarity
   return (
     <span
       style={{ ["--rc" as string]: m.color, ["--rs" as string]: m.soft } as React.CSSProperties}
@@ -18,7 +22,7 @@ export function RarityTag({ rarity, className }: { rarity: string; className?: s
         className,
       )}
     >
-      {m.label || rarity}
+      {label}
     </span>
   )
 }

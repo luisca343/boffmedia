@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useTranslations } from "next-intl"
 import {
   Button,
   Card,
@@ -53,6 +54,7 @@ function RenderThumb({ skin, kind, ok, size }: { skin: string; kind: "face" | "h
 }
 
 export default function SkinsPage() {
+  const t = useTranslations("gobierno")
   const { data: skins, isLoading } = useNpcSkins()
   const [editing, setEditing] = useState<NpcSkin | null>(null)
   const [creating, setCreating] = useState(false)
@@ -62,27 +64,27 @@ export default function SkinsPage() {
   return (
     <>
       <PageHead
-        kicker="Administración · Recursos"
+        kicker={t("skins.kicker")}
         dep="urbanismo"
-        title="Skins de NPC"
-        sub="Renders por skin: cara (2D), cabeza y cuerpo (3D). Antes el gestor de NPC Skins."
+        title={t("skins.title")}
+        sub={t("skins.sub")}
       />
       <ConsolaHero
-        title="Renderizado de skins"
+        title={t("skins.heroTitle")}
         code="skins"
         icon="eye"
         dep="urbanismo"
-        status={pending ? `${pending} pendientes` : "al día"}
+        status={pending ? t("skins.pendientes", { count: pending }) : t("skins.alDia")}
         statusTone={pending ? "warn" : "ok"}
       />
 
       <Card className="overflow-hidden">
         <div className="flex flex-wrap items-center gap-2.5 border-b border-gt-line p-3.5">
           <Button size="sm" icon="plus" onClick={() => setCreating(true)}>
-            Nueva skin
+            {t("skins.nuevaSkin")}
           </Button>
           <span className="ml-auto font-gt-mono text-[11px] text-gt-ink-400">
-            {skins?.length ?? 0} skins únicas
+            {t("skins.skinsUnicas", { count: skins?.length ?? 0 })}
           </span>
         </div>
 
@@ -92,11 +94,11 @@ export default function SkinsPage() {
           <Table>
             <THead>
               <TR>
-                <TH>Skin / NPCs</TH>
-                <TH className="text-center">2D</TH>
-                <TH className="text-center">Cabeza</TH>
-                <TH className="text-center">Cuerpo</TH>
-                <TH>Estado</TH>
+                <TH>{t("skins.skinNpcs")}</TH>
+                <TH className="text-center">{t("skins.face")}</TH>
+                <TH className="text-center">{t("skins.cabeza")}</TH>
+                <TH className="text-center">{t("skins.cuerpo")}</TH>
+                <TH>{t("skins.estado")}</TH>
                 <TH></TH>
               </TR>
             </THead>
@@ -126,22 +128,22 @@ export default function SkinsPage() {
                     <div className="flex flex-wrap gap-x-3 gap-y-1">
                       {(
                         [
-                          ["origen", x.src],
-                          ["2d", x.face],
-                          ["cabeza", x.head],
-                          ["cuerpo", x.body],
+                          ["skins.origen", x.src],
+                          ["skins.tagFace", x.face],
+                          ["skins.tagCabeza", x.head],
+                          ["skins.tagCuerpo", x.body],
                         ] as const
                       ).map(([k, v]) => (
                         <span key={k} className="flex items-center gap-1">
                           <Icon name={v ? "check" : "x"} size={12} className={v ? "text-gt-ok" : "text-gt-danger"} />
-                          <span className="font-gt-mono text-[10px] text-gt-ink-400">{k}</span>
+                          <span className="font-gt-mono text-[10px] text-gt-ink-400">{t(k)}</span>
                         </span>
                       ))}
                     </div>
                   </TD>
                   <TD className="w-px whitespace-nowrap">
                     <Button size="sm" tone="ghost" icon="refresh" onClick={() => setEditing(x)}>
-                      Editar
+                      {t("common.edit")}
                     </Button>
                   </TD>
                 </TR>

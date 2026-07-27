@@ -1,9 +1,11 @@
 "use client"
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import { Game } from "@/app/battlesim/replay/_components/Game";
 import { LigaService } from "@/services/api/smartrotom/ligaService";
 
 export default function VerPage({ params }: { params: { id: string } }) {
+  const t = useTranslations("liga.replay");
   const [replay, setReplay] = useState(null);
 
   useEffect(() => {
@@ -16,7 +18,7 @@ export default function VerPage({ params }: { params: { id: string } }) {
   }, [params.id]);
 
   if (!replay) {
-    return <div>Loading...</div>;
+    return <div>{t("loading")}</div>;
   }
 
   return (

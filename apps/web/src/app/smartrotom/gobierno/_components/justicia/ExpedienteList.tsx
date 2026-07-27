@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { Avatar, Badge, Empty, TableSkeleton } from "../ui"
 import { EXPEDIENTE_STATUS, TONES, type Tone } from "../../_utils/tones"
 import type { Expediente } from "../../_types"
@@ -15,6 +16,7 @@ export function ExpedienteList({
   selectedId: number | null
   onSelect: (id: number) => void
 }) {
+  const t = useTranslations("gobierno")
   if (isLoading) {
     return (
       <div className="space-y-2.5">
@@ -31,8 +33,8 @@ export function ExpedienteList({
     return (
       <Empty
         icon="folder"
-        title="Sin expedientes abiertos"
-        sub="Los casos que reúnan denuncias, multas y órdenes de captura aparecerán aquí."
+        title={t("expedientes.emptyList")}
+        sub={t("expedientes.emptyListSub")}
       />
     )
   }
@@ -40,7 +42,8 @@ export function ExpedienteList({
   return (
     <div className="space-y-2.5">
       {expedientes.map((c) => {
-        const st = EXPEDIENTE_STATUS[c.status] ?? { label: c.status, tone: "default" as const }
+        const stMeta = EXPEDIENTE_STATUS[c.status]
+        const st = { label: stMeta ? t(stMeta.labelKey) : c.status, tone: stMeta?.tone ?? ("default" as const) }
         const spineTone: Tone = c.status === "open" ? "justicia" : "ok"
         const on = c.id === selectedId
         return (

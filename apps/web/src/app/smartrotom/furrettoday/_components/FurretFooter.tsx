@@ -10,12 +10,13 @@ import { Button, Eyebrow, FurretMascot, Input, Marquee, Meta, toast } from "./ui
 const BASE = "/smartrotom/furrettoday";
 
 const SECTIONS = [
-  { href: BASE, label: "Portada" },
-  { href: `${BASE}/secciones`, label: "Secciones" },
-  { href: `${BASE}/secciones#archivo`, label: "Archivo" },
-  { href: `${BASE}/editar`, label: "Editar" },
+  { href: BASE, labelKey: "nav.home" },
+  { href: `${BASE}/secciones`, labelKey: "nav.sections" },
+  { href: `${BASE}/secciones#archivo`, labelKey: "nav.archive" },
+  { href: `${BASE}/editar`, labelKey: "nav.edit" },
 ];
 
+// Proper nouns — app names, never translated.
 const SMARTROTOM = [
   { href: "/smartrotom", label: "SmartRotom" },
   { href: "/smartrotom/pokedex", label: "Pokédex" },
@@ -44,9 +45,9 @@ export function FurretFooter() {
   return (
     <footer className="mt-16 bg-ft-ink text-ft-paper">
       <Marquee
-        items={Array.from({ length: 7 }, () => "FURRET TODAY · SEMANARIO POP")}
+        items={Array.from({ length: 7 }, () => t("furretFooter.marqueeItem"))}
         tone="pink"
-        label="Furret Today, semanario pop"
+        label={t("furretFooter.marqueeLabel")}
       />
 
       <div className="mx-auto grid max-w-[1400px] gap-8 px-6 py-12 md:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
@@ -58,21 +59,20 @@ export function FurretFooter() {
             </span>
           </div>
           <p className="max-w-[360px] text-white/75">
-            El semanario pop de la comunidad Pokémon hispanohablante. Hecho a tinta y
-            a píxeles desde BoffMedia.
+            {t("furretFooter.tagline")}
           </p>
         </div>
 
         <div>
-          <Eyebrow className="mb-3 text-ft-pink">Secciones</Eyebrow>
+          <Eyebrow className="mb-3 text-ft-pink">{t("furretFooter.sections")}</Eyebrow>
           <ul className="grid gap-2">
             {SECTIONS.map((s) => (
-              <li key={s.label}>
+              <li key={s.labelKey}>
                 <Link
                   href={s.href}
                   className="font-ft-ui font-semibold text-white hover:text-ft-yellow"
                 >
-                  {s.label}
+                  {t(s.labelKey)}
                 </Link>
               </li>
             ))}
@@ -96,9 +96,9 @@ export function FurretFooter() {
         </div>
 
         <div>
-          <Eyebrow className="mb-3 text-ft-pink">Suscríbete</Eyebrow>
+          <Eyebrow className="mb-3 text-ft-pink">{t("furretFooter.subscribe")}</Eyebrow>
           <p className="mb-3 text-sm text-white/75">
-            Un email los viernes. Sin spam, solo noticias POP.
+            {t("furretFooter.subscribeBlurb")}
           </p>
           <form onSubmit={onSubscribe} className="flex gap-2">
             <Input
@@ -116,7 +116,7 @@ export function FurretFooter() {
               size="sm"
               disabled={subscribe.isPending}
             >
-              {subscribe.isPending ? "…" : "OK"}
+              {subscribe.isPending ? t("furretFooter.submitting") : t("furretFooter.submit")}
             </Button>
           </form>
         </div>
@@ -125,10 +125,10 @@ export function FurretFooter() {
       <div className="border-t-2 border-dashed border-white/20">
         <div className="mx-auto flex max-w-[1400px] flex-wrap items-center justify-between gap-4 px-6 py-5">
           <Meta className="text-white/60">
-            © {new Date().getFullYear()} Furret Today · BoffMedia
+            {t("furretFooter.copyright", { year: new Date().getFullYear() })}
           </Meta>
           <Meta className="text-white/60">
-            «Las mejores noticias dibujadas a papel y tinta»
+            {t("furretFooter.slogan")}
           </Meta>
         </div>
       </div>

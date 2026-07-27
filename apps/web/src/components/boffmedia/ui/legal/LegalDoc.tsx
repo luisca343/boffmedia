@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { Icon } from "@/components/boffmedia/primitives"
 
@@ -20,7 +21,8 @@ export interface LegalDocProps {
   sections: LegalSection[]
 }
 
-export function LegalDoc({ kicker, title, lead, updated, tocLabel = "Contenido", sections }: LegalDocProps) {
+export function LegalDoc({ kicker, title, lead, updated, tocLabel, sections }: LegalDocProps) {
+  const t = useTranslations("common.legal")
   const [active, setActive] = React.useState(sections[0]?.id)
 
   React.useEffect(() => {
@@ -55,7 +57,7 @@ export function LegalDoc({ kicker, title, lead, updated, tocLabel = "Contenido",
         {/* sticky TOC */}
         <aside className="sticky top-[92px] max-[900px]:static">
           <span className="mb-3.5 block pl-3.5 font-mono text-[10px]/none font-semibold uppercase tracking-[0.16em] text-txt-dim">
-            {tocLabel}
+            {tocLabel ?? t("tocLabel")}
           </span>
           <nav className="grid border-l border-line max-[900px]:auto-cols-max max-[900px]:grid-flow-col max-[900px]:overflow-x-auto max-[900px]:border-l-0 max-[900px]:border-b max-[900px]:border-line">
             {sections.map((s, i) => {

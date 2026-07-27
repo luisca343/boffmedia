@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useTranslations } from "next-intl"
 import { PageHead, Button } from "../_components/ui"
 import { StatusTabs } from "../_components/hacienda/StatusTabs"
 import { MultaForm } from "../_components/hacienda/MultaForm"
@@ -9,6 +10,7 @@ import { MultasTable } from "../_components/hacienda/MultasTable"
 import { ConfirmModal } from "../_components/hacienda/ConfirmModal"
 import { useMultas, useCreateMulta, usePayMulta, useCancelMulta } from "../_hooks/queries"
 import { money } from "../_utils/format"
+import { useFormat } from "@/lib/useFormat"
 import type { Multa } from "../_types"
 
 // Fetches one generous page rather than building real pagination: this government is
@@ -17,6 +19,8 @@ import type { Multa } from "../_types"
 const PAGE = { pageSize: 200 }
 
 export default function MultasPage() {
+  const t = useTranslations("gobierno")
+  const { intlLocale } = useFormat()
   const [showForm, setShowForm] = useState(false)
   const [filter, setFilter] = useState("all")
   const [payTarget, setPayTarget] = useState<Multa | null>(null)
@@ -33,13 +37,13 @@ export default function MultasPage() {
   return (
     <>
       <PageHead
-        kicker="Hacienda · Sanciones"
+        kicker={t("hacienda.multasKicker")}
         dep="hacienda"
-        title="Multas"
-        sub="Sanciones económicas emitidas por la policía y la administración. La recaudación ingresa en la tesorería."
+        title={t("hacienda.multas")}
+        sub={t("hacienda.multasSub")}
         right={
           <Button icon="plus" onClick={() => setShowForm((v) => !v)}>
-            {showForm ? "Cerrar" : "Emitir multa"}
+            {showForm ? t("common.cancel") : t("quickActions.emitirMulta")}
           </Button>
         }
       />
@@ -60,7 +64,7 @@ export default function MultasPage() {
 
       {data && data.total > all.length && (
         <p className="mb-3 font-gt-mono text-[10.5px] text-gt-ink-400">
-          Mostrando {all.length} de {data.total} multas.
+          {t("hacienda.mostrandoMultas", { shown: all.length, total: data.total })}
         </p>
       )}
 
@@ -69,11 +73,11 @@ export default function MultasPage() {
           value={filter}
           onChange={setFilter}
           options={[
-            { value: "all", label: "Todas", count: all.length },
-            { value: "pending", label: "Pendientes", count: all.filter((m) => m.status === "pending").length },
-            { value: "paid", label: "Pagadas", count: all.filter((m) => m.status === "paid").length },
-            { value: "appealed", label: "Apeladas", count: all.filter((m) => m.status === "appealed").length },
-            { value: "cancelled", label: "Anuladas", count: all.filter((m) => m.status === "cancelled").length },
+            { value: "all", label: t("denuncias.filters.all"), count: all.length },
+            { value: "pending", label: t("denuncias.filters.pending"), count: all.filter((m) => m.status === "pending").length },
+            { value: "paid", label: t("hacienda.tabPagadas"), count: all.filter((m) => m.status === "paid").length },
+            { value: "appealed", label: t("hacienda.tabApeladas"), count: all.filter((m) => m.status === "appealed").length },
+            { value: "cancelled", label: t("hacienda.anuladas"), count: all.filter((m) => m.status === "cancelled").length },
           ]}
         />
       </div>
@@ -85,15 +89,14 @@ export default function MultasPage() {
         onClose={() => setPayTarget(null)}
         onConfirm={() => payTarget && payMulta.mutate(payTarget.id, { onSuccess: () => setPayTarget(null) })}
         pending={payMulta.isPending}
-        kicker="Cobro de multa"
-        title={`Cobrar ${payTarget?.code ?? ""}`}
-        confirmLabel="Cobrar"
+        kicker={t("hacienda.cobroKicker")}
+        title={t("hacienda.cobroTitle", { code: payTarget?.code ?? "" })}
+        confirmLabel={t("hacienda.cobrar")}
         body={
           payTarget && (
             <>
-              Se transferirán <strong className="tabular-nums">{money(payTarget.amount)} ₽</strong> desde la cuenta
-              StarBank de <strong>{payTarget.player.username}</strong> a la Tesorería de Teras. Si el jugador no
-              tiene fondos suficientes, el cobro fallará.
+              {t("hacienda.cobroBodyPrefix")} <strong className="tabular-nums">{money(payTarget.amount, intlLocale)} ₽</strong>{" "}
+              {t("hacienda.cobroBodySuffix", { username: payTarget.player.username })}
             </>
           )
         }
@@ -104,15 +107,15 @@ export default function MultasPage() {
         onClose={() => setCancelTarget(null)}
         onConfirm={() => cancelTarget && cancelMulta.mutate(cancelTarget.id, { onSuccess: () => setCancelTarget(null) })}
         pending={cancelMulta.isPending}
-        kicker="Anulación de multa"
-        title={`Anular ${cancelTarget?.code ?? ""}`}
-        confirmLabel="Anular"
+        kicker={t("hacienda.anulacionKicker")}
+        title={t("hacienda.anulacionTitle", { code: cancelTarget?.code ?? "" })}
+        confirmLabel={t("hacienda.anular")}
         tone="danger"
         body={
           cancelTarget && (
             <>
-              La multa por <strong className="tabular-nums">{money(cancelTarget.amount)} ₽</strong> a{" "}
-              <strong>{cancelTarget.player.username}</strong> quedará anulada y no podrá cobrarse.
+              {t("hacienda.anulacionBodyPrefix")} <strong className="tabular-nums">{money(cancelTarget.amount, intlLocale)} ₽</strong>{" "}
+              {t("hacienda.anulacionBodySuffix", { username: cancelTarget.player.username })}
             </>
           )
         }

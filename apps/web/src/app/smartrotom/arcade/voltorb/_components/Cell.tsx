@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import type { Cell } from "../types"
 import VoltorbImage from "./VoltorbIcon"
@@ -33,10 +34,10 @@ const MARK_TONE: Record<number, string> = {
 // the bomb (mark 0).
 const MARKS = [1, 2, 3, 0]
 
-function markLabel(cell: Cell) {
-  if (cell.marks.length === 0) return ""
-  const marks = MARKS.filter((m) => cell.marks.includes(m)).map((m) => (m === 0 ? "voltorb" : `x${m}`))
-  return `, marcada: ${marks.join(", ")}`
+function markList(cell: Cell) {
+  return MARKS.filter((m) => cell.marks.includes(m))
+    .map((m) => (m === 0 ? "voltorb" : `x${m}`))
+    .join(", ")
 }
 
 /**
@@ -45,16 +46,29 @@ function markLabel(cell: Cell) {
  * a CSS 3D flip between them.
  */
 function CellComponent({ cell, onClick, rowIndex, colIndex }: CellProps) {
-  const position = `Casilla fila ${rowIndex + 1}, columna ${colIndex + 1}`
+  const t = useTranslations("arcade")
+  const row = rowIndex + 1
+  const col = colIndex + 1
+  const marks = markList(cell)
+
+  let label: string
+  if (cell.revealed) {
+    label = t("voltorb.cellRevealed", {
+      row,
+      col,
+      value: cell.value === 0 ? "Voltorb" : `x${cell.value}`,
+    })
+  } else if (marks) {
+    label = t("voltorb.cellMarked", { row, col, marks })
+  } else {
+    label = t("voltorb.cellHidden", { row, col })
+  }
+
   return (
     <button
       type="button"
       onClick={onClick}
-      aria-label={
-        cell.revealed
-          ? `${position}: ${cell.value === 0 ? "Voltorb" : `x${cell.value}`}`
-          : `${position}, sin voltear${markLabel(cell)}`
-      }
+      aria-label={label}
       className={cn(
         "relative aspect-square w-full select-none [perspective:600px]",
         "transition-transform duration-150 motion-reduce:transition-none",

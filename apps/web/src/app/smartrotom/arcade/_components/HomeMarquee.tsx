@@ -1,3 +1,4 @@
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { Corners, Icon, Tag } from "./ui"
 
@@ -8,6 +9,8 @@ export interface HomeMarqueeProps {
 
 /** The cabinet marquee at the top of the hub: the lit sign over the machines. */
 export function HomeMarquee({ bannerName, compact }: HomeMarqueeProps) {
+  const t = useTranslations("arcade")
+
   return (
     <div
       className={cn(
@@ -26,7 +29,7 @@ export function HomeMarquee({ bannerName, compact }: HomeMarqueeProps) {
             <span aria-hidden className="text-ar-magenta motion-reduce:animate-none animate-ar-blink">
               ●
             </span>
-            Enlazado · Roto-motor activo
+            {t("home.marqueeStatus")}
           </div>
           <h1
             className={cn(
@@ -35,10 +38,10 @@ export function HomeMarquee({ bannerName, compact }: HomeMarqueeProps) {
               compact ? "text-[18px]" : "text-[28px]",
             )}
           >
-            TU&nbsp;ESTACIÓN&nbsp;RETRO&nbsp;ARCADE
+            {t("home.marqueeTitle")}
           </h1>
           <p className="mt-3 max-w-[540px] font-ar text-[13px] text-ar-ink-dim">
-            Juega los minijuegos de SmartRotom, sube tu racha y desbloquea cajas del banner activo.
+            {t("home.marqueeSubtitle")}
           </p>
         </div>
 

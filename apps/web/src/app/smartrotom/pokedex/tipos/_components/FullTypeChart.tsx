@@ -2,7 +2,7 @@
 import React, { useState } from "react"
 import { typeChart } from "../../dexUtils"
 import { TypeGlyph } from "../../_components/ui"
-import { TYPE_COLORS, TYPE_LABELS, ALL_TYPES } from "../../_utils/typeColors"
+import { TYPE_COLORS, TYPE_LABEL_KEYS, ALL_TYPES } from "../../_utils/typeColors"
 import { getContrastingTextColor } from "../../_utils/dexMeta"
 import { useTranslations } from "next-intl"
 
@@ -43,7 +43,7 @@ export default function FullTypeChart() {
               key={"h-" + tp}
               className="grid place-items-center aspect-square rounded"
               style={{ background: TYPE_COLORS[tp], color: getContrastingTextColor(TYPE_COLORS[tp]) }}
-              title={TYPE_LABELS[tp]}
+              title={t(TYPE_LABEL_KEYS[tp])}
               onMouseEnter={() => setHover({ axis: "def", type: tp })}
               onMouseLeave={() => setHover(null)}
             >
@@ -56,7 +56,7 @@ export default function FullTypeChart() {
               <div
                 className="grid place-items-center aspect-square rounded"
                 style={{ background: TYPE_COLORS[atk], color: getContrastingTextColor(TYPE_COLORS[atk]) }}
-                title={TYPE_LABELS[atk]}
+                title={t(TYPE_LABEL_KEYS[atk])}
                 onMouseEnter={() => setHover({ axis: "atk", type: atk })}
                 onMouseLeave={() => setHover(null)}
               >
@@ -70,7 +70,7 @@ export default function FullTypeChart() {
                     key={atk + def}
                     className="grid place-items-center aspect-square rounded font-pk-mono text-[11px] font-semibold tabular-nums cursor-default"
                     style={{ ...multStyle(m), ...(hl ? { boxShadow: "inset 0 0 0 1px rgba(249,115,22,.5)" } : {}) }}
-                    title={`${TYPE_LABELS[atk]} → ${TYPE_LABELS[def]}: ×${m}`}
+                    title={`${t(TYPE_LABEL_KEYS[atk])} → ${t(TYPE_LABEL_KEYS[def])}: ×${m}`}
                   >
                     {multSymbol(m)}
                   </div>

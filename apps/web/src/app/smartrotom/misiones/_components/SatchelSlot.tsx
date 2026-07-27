@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import type { SatchelItem } from "../_types"
 import { ItemSprite } from "./ui"
 
@@ -10,6 +11,7 @@ import { ItemSprite } from "./ui"
  * for a "?" — rather than spoiling what you haven't gotten yet.
  */
 export function SatchelSlot({ item }: { item: SatchelItem }) {
+  const t = useTranslations("misiones.satchelSlot")
   const locked = !item.owned
 
   return (
@@ -20,7 +22,7 @@ export function SatchelSlot({ item }: { item: SatchelItem }) {
         filter: locked ? "grayscale(.7) brightness(.72)" : "none",
       }}
       tabIndex={0}
-      title={locked ? `${item.name} — Aún no obtenido` : item.name}
+      title={locked ? t("lockedTitle", { name: item.name }) : item.name}
     >
       <div className="grid h-full w-full place-items-center focus-visible:outline-none">
         {locked ? (
@@ -45,7 +47,7 @@ export function SatchelSlot({ item }: { item: SatchelItem }) {
         <div className="font-ms-display text-[13px] text-ms-ink-1">{item.name}</div>
         {locked && (
           <div className="mt-0.5 font-ms-uppercase text-[9px] uppercase tracking-[.12em] text-ms-ink-3">
-            Aún no obtenido
+            {t("notObtained")}
           </div>
         )}
       </div>

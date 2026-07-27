@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { Icon, Button, toast } from "@/components/boffmedia/primitives"
 import { DkFlag, DkLive, DkSprite, DkType } from "@/components/boffmedia/ui/tools/datakit"
+import { useFormat } from "@/lib/useFormat"
 import type { TnCompetitor } from "./tournaments-util"
 
 // Live self-report match table (LimitlessVGC model): round header, opponent card,
@@ -43,13 +44,13 @@ function showdownPaste(team: TmMon[]) {
     .map((m) => [`${m.name} @ ${m.item}`, "Ability: " + abilityOf(m), "Level: 50", "Tera Type: " + m.tera, "- " + m.moves.join("\n- ")].join("\n"))
     .join("\n\n")
 }
-function copyText(text: string, msg?: string) {
+function copyText(text: string, msg: string) {
   try {
     navigator.clipboard.writeText(text)
   } catch {
     /* noop */
   }
-  toast({ msg: msg || "Copiado al portapapeles", icon: "check", tone: "ok" })
+  toast({ msg, icon: "check", tone: "ok" })
 }
 
 export const TM_CARD = "border border-solid border-line bg-panel cut-corner [--cut-lg:14px]"
@@ -62,6 +63,7 @@ const GHUE_BORDER = "border-l-[3px] border-l-[hsl(var(--ghue,28)_60%_50%)]"
 
 export function TmRoundHeader({ comp, roundNo, tableNo, status, bestOf = 3, scheduledAt }: { comp: TmComp; roundNo: React.ReactNode; tableNo: React.ReactNode; status?: string; bestOf?: number; scheduledAt?: string | null }) {
   const t = useTranslations("common.tournaments")
+  const { intlLocale } = useFormat()
   const chip = "inline-flex items-center gap-1.5 border border-solid border-line-2 px-[9px] py-[5px] font-mono text-[11px]/none font-semibold text-txt-muted [&_svg]:text-txt-dim"
   return (
     <div className={cn("flex flex-wrap items-center justify-between gap-3.5 border border-solid border-line bg-panel px-[18px] py-[15px] cut-corner [--cut-lg:14px]", GHUE_BORDER)}>
@@ -74,7 +76,7 @@ export function TmRoundHeader({ comp, roundNo, tableNo, status, bestOf = 3, sche
           {scheduledAt && (
             <span className={chip}>
               <Icon name="clock" size={12} />
-              {new Date(scheduledAt).toLocaleString("es-ES", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}
+              {new Date(scheduledAt).toLocaleString(intlLocale, { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}
             </span>
           )}
         </div>
@@ -369,6 +371,7 @@ function TmMonCard({ mon }: { mon: TmMon }) {
 
 export function TmTeamsheet({ opp, onCalc }: { opp: TmPlayer; onCalc?: () => void }) {
   const t = useTranslations("common.tournaments")
+  const tTeamsheet = useTranslations("torneos.teamsheet")
   const team = opp._pk || []
   if (!team.length) return null
   return (
@@ -384,7 +387,7 @@ export function TmTeamsheet({ opp, onCalc }: { opp: TmPlayer; onCalc?: () => voi
         {team.map((m) => <TmMonCard key={m.slot != null ? m.slot : m.id || m.name} mon={m} />)}
       </div>
       <p className="m-0 flex items-center gap-2 px-4 pb-4 font-body text-[11.5px]/[1.5] text-txt-muted [&_svg]:flex-none [&_svg]:text-txt-dim">
-        <Icon name="info" size={12} />Hoja registrada por el rival al inscribirse. Cópiala a Pokémon Showdown o ábrela en la calculadora para preparar tus daños.
+        <Icon name="info" size={12} />{tTeamsheet("viewerHint")}
       </p>
     </section>
   )

@@ -13,11 +13,6 @@ import type { Denuncia } from "../../_types"
 
 export type DenunciaActionKind = "multa" | "buscado" | "resolver"
 
-const STATUS_OPTIONS = [
-  { value: "resolved", label: DENUNCIA_STATUS.resolved.label },
-  { value: "dismissed", label: DENUNCIA_STATUS.dismissed.label },
-]
-
 export function DenunciaActionModal({
   kind,
   denuncia,
@@ -27,11 +22,17 @@ export function DenunciaActionModal({
   denuncia: Denuncia | null
   onClose: () => void
 }) {
+  const t = useTranslations("gobierno")
   const officer = useOfficer()
   const router = useRouter()
   const createMulta = useCreateMulta()
   const createBuscado = useCreateBuscado()
   const resolveDenuncia = useResolveDenuncia()
+
+  const STATUS_OPTIONS = [
+    { value: "resolved", label: t(DENUNCIA_STATUS.resolved.labelKey) },
+    { value: "dismissed", label: t(DENUNCIA_STATUS.dismissed.labelKey) },
+  ]
 
   const [amount, setAmount] = useState("1000")
   const [reason, setReason] = useState("")
@@ -48,7 +49,8 @@ export function DenunciaActionModal({
       ? `${townName(denuncia.town)}${denuncia.plotNumber != null ? ` #${denuncia.plotNumber}` : ""}`
       : ""
     setAmount("1000")
-    setReason([DENUNCIA_CATEGORY[denuncia.category] ?? denuncia.category, where].filter(Boolean).join(" · "))
+    const catKey = DENUNCIA_CATEGORY[denuncia.category]
+    setReason([catKey ? t(catKey) : denuncia.category, where].filter(Boolean).join(" · "))
     setSeverity("media")
     setBounty("1000")
     setOffense(denuncia.description)
@@ -105,40 +107,48 @@ export function DenunciaActionModal({
   }
 
   const meta = {
-    multa: { kicker: "Hacienda · Sanción económica", title: `Emitir multa — ${denuncia.code}` },
-    buscado: { kicker: "Seguridad · Orden pública", title: `Escalar a busca y captura — ${denuncia.code}` },
-    resolver: { kicker: "Seguridad · Cierre de expediente", title: `Resolver — ${denuncia.code}` },
+    multa: { kicker: t("denuncias.action.multaTitle"), title: `${t("denuncias.emitirMulta")} — ${denuncia.code}` },
+    buscado: { kicker: t("denuncias.action.buscadoTitle"), title: `${t("denuncias.escalarBuscado")} — ${denuncia.code}` },
+    resolver: { kicker: t("denuncias.action.resolverTitle"), title: `${t("denuncias.resolver")} — ${denuncia.code}` },
   }[kind]
 
   return (
     <Modal open onClose={onClose} title={meta.title} kicker={meta.kicker}>
       {!accused && kind !== "resolver" ? (
-        <p className="text-[13px] text-gt-ink-500">
-          Esta denuncia no tiene un infractor identificado, así que no se puede multar ni escalar. Puedes
-          resolverla o archivarla desde su ficha.
-        </p>
+        <p className="text-[13px] text-gt-ink-500">{t("denuncias.action.noInfractor")}</p>
       ) : (
         <div className="space-y-3.5">
           {kind === "multa" && (
             <>
-              <Field label="Importe (₽)" value={amount} onChange={setAmount} type="number" mono />
-              <TextArea label="Motivo" value={reason} onChange={setReason} rows={3} />
+              <Field label={t("denuncias.action.importe")} value={amount} onChange={setAmount} type="number" mono />
+              <TextArea label={t("denuncias.action.motivo")} value={reason} onChange={setReason} rows={3} />
             </>
           )}
 
           {kind === "buscado" && (
             <>
-              <Select label="Gravedad" value={severity} onChange={setSeverity} options={SEVERITY_CREATE_OPTIONS} />
-              <Field label="Recompensa (₽)" value={bounty} onChange={setBounty} type="number" mono />
-              <TextArea label="Delito" value={offense} onChange={setOffense} rows={3} />
-              <Field label="Última localización" value={lastSeen} onChange={setLastSeen} placeholder="Pueblo Mizu, cerca del puerto" />
+              <Select label={t("denuncias.action.gravedad")} value={severity} onChange={setSeverity} options={SEVERITY_CREATE_OPTIONS.map((o) => ({ value: o.value, label: t(o.labelKey) }))} />
+              <Field label={t("denuncias.action.recompensa")} value={bounty} onChange={setBounty} type="number" mono />
+              <TextArea label={t("denuncias.action.delito")} value={offense} onChange={setOffense} rows={3} />
+              <Field
+                label={t("denuncias.action.ultimaLocalizacion")}
+                value={lastSeen}
+                onChange={setLastSeen}
+                placeholder={t("denuncias.action.ultimaLocalizacionPlaceholder")}
+              />
             </>
           )}
 
           {kind === "resolver" && (
             <>
-              <Select label="Resultado" value={status} onChange={(v) => setStatus(v as "resolved" | "dismissed")} options={STATUS_OPTIONS} />
-              <TextArea label="Resolución" value={resolution} onChange={setResolution} rows={3} placeholder="Qué se decidió y por qué…" />
+              <Select label={t("denuncias.action.resultado")} value={status} onChange={(v) => setStatus(v as "resolved" | "dismissed")} options={STATUS_OPTIONS} />
+              <TextArea
+                label={t("denuncias.resolucion")}
+                value={resolution}
+                onChange={setResolution}
+                rows={3}
+                placeholder={t("denuncias.action.resolucionPlaceholder")}
+              />
             </>
           )}
         </div>
@@ -146,21 +156,21 @@ export function DenunciaActionModal({
 
       <div className="mt-4 flex items-center justify-end gap-2">
         <Button tone="ghost" onClick={onClose} disabled={busy}>
-          Cancelar
+          {t("common.cancel")}
         </Button>
         {accused && kind === "multa" && (
           <Button tone="gold" icon="gavel" onClick={submitMulta} disabled={busy || !reason.trim()}>
-            Emitir multa
+            {t("denuncias.emitirMulta")}
           </Button>
         )}
         {accused && kind === "buscado" && (
           <Button tone="danger" icon="alert" onClick={submitBuscado} disabled={busy || !offense.trim()}>
-            Escalar
+            {t("denuncias.action.escalar")}
           </Button>
         )}
         {kind === "resolver" && (
           <Button tone="primary" icon="check" onClick={submitResolver} disabled={busy || !resolution.trim()}>
-            Confirmar
+            {t("denuncias.action.confirmar")}
           </Button>
         )}
       </div>

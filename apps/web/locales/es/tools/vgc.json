@@ -31,7 +31,8 @@
         "reference": "Referencia",
         "referenceSub": "(máx / neutra, 31 IV)",
         "speedEmpty": "Añade Pokémon a tu equipo y a rivales para comparar velocidades.",
-        "typesEmpty": "Añade Pokémon a tu equipo (pestaña Matriz) para ver su cobertura de tipos."
+        "typesEmpty": "Añade Pokémon a tu equipo (pestaña Matriz) para ver su cobertura de tipos.",
+        "close": "Cerrar"
       },
       "panel": {
         "attacker": "Pokémon 1 — Atacante",
@@ -301,7 +302,8 @@
       "tabs": {
         "tiers": "Niveles",
         "matchup": "Comparador"
-      }
+      },
+      "clearInput": "Limpiar"
     },
     "speedTiers": {
       "title": "Niveles de Velocidad",
@@ -949,6 +951,10 @@
         "combined": "Combinado · {count} torneos",
         "tourWithPlayers": "{name} · {count} jug.",
         "formatNote": "Regulación actual. Permite dos Pokémon restringidos por equipo."
+      },
+      "adapter": {
+        "teamFallback": "Equipo",
+        "teraNone": "Nada"
       }
     }
   }

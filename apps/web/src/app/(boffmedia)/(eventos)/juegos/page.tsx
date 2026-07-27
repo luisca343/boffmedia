@@ -1,9 +1,10 @@
 import type { Metadata } from "next"
+import { getTranslations } from "next-intl/server"
 import { GamesView } from "./_components/GamesView"
 
-export const metadata: Metadata = {
-  title: "Juegos · Boffmedia",
-  description: "Todos los juegos de la plataforma Boffmedia.",
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("pageMeta.juegos")
+  return { title: t("index.title"), description: t("index.description") }
 }
 
 export default function JuegosPage() {

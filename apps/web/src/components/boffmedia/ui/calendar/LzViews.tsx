@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { Icon } from "@/components/boffmedia/primitives"
 import { LzBannerCard, LzPosterCard } from "./LzCards"
@@ -26,6 +27,7 @@ export function LzCalendarMonth({
   onSelectDay?: (d: Date) => void
   countFor?: (d: Date) => number
 }) {
+  const t = useTranslations("common.calendar")
   const start = new Date(year, month, 1 - ((new Date(year, month, 1).getDay() + 6) % 7))
   const weeks: Date[][] = []
   let cur = new Date(start)
@@ -69,7 +71,7 @@ export function LzCalendarMonth({
             >
               <div className="flex items-center gap-1.5">
                 <span className={cn("font-mono text-[14px]/none font-bold", isToday ? "text-accent" : inMonth ? "text-txt-muted" : "text-txt-dim")}>{d.getDate()}</span>
-                {isToday && <span className="bg-accent px-[5px] py-[3px] font-mono text-[8px]/none font-bold uppercase tracking-[0.1em] text-accent-ink">hoy</span>}
+                {isToday && <span className="bg-accent px-[5px] py-[3px] font-mono text-[8px]/none font-bold uppercase tracking-[0.1em] text-accent-ink">{t("today")}</span>}
                 {n > 0 && <span className="ml-auto font-mono text-[10px]/none font-bold text-txt-dim">{n}</span>}
               </div>
               <div className="flex min-h-0 flex-col gap-1">{renderDay && renderDay(d, { inMonth, isToday })}</div>
@@ -84,6 +86,7 @@ export function LzCalendarMonth({
 // A date in the agenda (releases.com style): the date is a SEPARATOR, releases
 // staggered below by hype (banners then poster grid). Mirrors .lz-group.
 export function LzDateGroup({ date, items = [], today = new Date(), wished, onWish, onOpen, id }: { date: Date; items?: LzRelease[]; today?: Date; wished?: WishSet; onWish?: (id: LzRelease["id"]) => void; onOpen?: (g: LzRelease) => void; id?: string }) {
+  const t = useTranslations("common.calendar")
   const days = Math.round((date.getTime() - today.getTime()) / LZ_ONE_DAY)
   const isToday = lzSameDay(date, today)
   const past = date < today && !isToday
@@ -98,11 +101,11 @@ export function LzDateGroup({ date, items = [], today = new Date(), wished, onWi
           <span className="font-mono text-[12px]/none font-bold uppercase tracking-[0.14em] text-txt-muted">{LZ_MONTHS[date.getMonth()].slice(0, 3)}</span>
         </span>
         <span className="font-mono text-[12px]/none font-semibold capitalize tracking-[0.03em] text-txt-muted">{LZ_WD_LONG[(date.getDay() + 6) % 7]}</span>
-        <span className={cn("font-mono text-[10px]/none font-semibold uppercase tracking-[0.08em]", isToday ? "text-accent" : "text-txt-dim")}>{isToday ? "hoy" : lzRelativeDays(days)}</span>
-        {isToday && <span className="bg-accent px-[7px] py-1 font-mono text-[9px]/none font-bold uppercase tracking-[0.12em] text-accent-ink">hoy</span>}
+        <span className={cn("font-mono text-[10px]/none font-semibold uppercase tracking-[0.08em]", isToday ? "text-accent" : "text-txt-dim")}>{isToday ? t("today") : lzRelativeDays(days)}</span>
+        {isToday && <span className="bg-accent px-[7px] py-1 font-mono text-[9px]/none font-bold uppercase tracking-[0.12em] text-accent-ink">{t("today")}</span>}
         <span className="flex-1" />
         <span className="flex-none font-mono text-[11px]/none font-semibold uppercase tracking-[0.08em] text-txt-dim">
-          {items.length} {items.length === 1 ? "estreno" : "estrenos"}
+          {items.length} {t("premieres", { count: items.length })}
         </span>
       </div>
       <div className="flex flex-col gap-2.5">
@@ -127,6 +130,7 @@ export function LzDateGroup({ date, items = [], today = new Date(), wished, onWi
 
 // A 7-column week strip (mon→sun) with per-day cards. Mirrors .lz-week.
 export function LzWeekStrip({ days, byDay, today, wished, onOpen }: { days: Date[]; byDay: Record<string, LzRelease[]>; today: Date; wished?: WishSet; onOpen?: (g: LzRelease) => void }) {
+  const t = useTranslations("common.calendar")
   return (
     <div className="grid grid-cols-7">
       {days.map((d) => {
@@ -137,7 +141,7 @@ export function LzWeekStrip({ days, byDay, today, wished, onOpen }: { days: Date
             <div className={cn("relative flex flex-col items-center gap-[3px] border-b border-solid px-2 py-3", isToday ? "border-accent-line" : "border-line")}>
               <span className="font-mono text-[10px]/none font-semibold uppercase tracking-[0.12em] text-txt-dim">{lzWdShort(d)}</span>
               <span className={cn("font-display text-[24px]/none font-extrabold italic", isToday && "text-accent")}>{d.getDate()}</span>
-              {isToday && <span className="bg-accent px-[5px] py-[2px] font-mono text-[8px]/none font-bold uppercase tracking-[0.1em] text-accent-ink">hoy</span>}
+              {isToday && <span className="bg-accent px-[5px] py-[2px] font-mono text-[8px]/none font-bold uppercase tracking-[0.1em] text-accent-ink">{t("today")}</span>}
             </div>
             <div className="flex flex-1 flex-col gap-1.5 p-2">
               {items.length === 0 ? (

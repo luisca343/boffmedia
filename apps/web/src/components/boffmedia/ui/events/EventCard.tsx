@@ -4,6 +4,7 @@ import * as React from "react"
 import Link from "next/link"
 import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
+import { useFormat } from "@/lib/useFormat"
 import { Icon } from "@/components/boffmedia/primitives"
 import { EventStatusChip } from "./EventStatusChip"
 import { Countdown } from "./Countdown"
@@ -12,6 +13,7 @@ import { eventStatus, formatEventDate, type EventLike } from "./events-util"
 
 export function EventCard({ event, layout }: { event: EventLike; layout?: "grid" | "list" }) {
   const t = useTranslations("events")
+  const { intlLocale, number: formatNumber } = useFormat()
   const status = eventStatus(event)
   const isServer = (event.type || "event") === "server"
   const row = layout === "list"
@@ -22,8 +24,8 @@ export function EventCard({ event, layout }: { event: EventLike; layout?: "grid"
 
   const start = new Date(event.startDate)
   const valid = !Number.isNaN(start.getTime())
-  const day = valid ? start.toLocaleDateString("es-ES", { day: "2-digit" }) : "–"
-  const mon = valid ? start.toLocaleDateString("es-ES", { month: "short" }).replace(".", "").toUpperCase() : ""
+  const day = valid ? start.toLocaleDateString(intlLocale, { day: "2-digit" }) : "–"
+  const mon = valid ? start.toLocaleDateString(intlLocale, { month: "short" }).replace(".", "").toUpperCase() : ""
 
   return (
     <Link
@@ -83,7 +85,7 @@ export function EventCard({ event, layout }: { event: EventLike; layout?: "grid"
           ) : (
             <span className="inline-flex items-center gap-1.5 font-mono text-[11px]/none font-medium uppercase tracking-[0.05em] text-txt-muted">
               <Icon name="calendar" size={13} className="text-txt-dim" />
-              {formatEventDate(event.startDate)}
+              {formatEventDate(event.startDate, intlLocale)}
             </span>
           )}
           {/* participant count — NOT in the list API yet (the detail page fetches
@@ -91,7 +93,7 @@ export function EventCard({ event, layout }: { event: EventLike; layout?: "grid"
           {event.participants != null && (
             <span className="ml-auto inline-flex items-center gap-1.5 font-mono text-[11px]/none font-medium uppercase tracking-[0.05em] text-txt-muted">
               <Icon name="users" size={13} className="text-txt-dim" />
-              {event.participants.toLocaleString("es-ES")}
+              {formatNumber(event.participants)}
             </span>
           )}
         </div>

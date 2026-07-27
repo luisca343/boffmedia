@@ -8,7 +8,7 @@ import { useMediaTheme } from "./_theme"
 import { navFor, type NavItem } from "./_nav"
 import { I } from "./ui/icons"
 
-function Item({ item, collapsed, active, comingSoonLabel }: { item: NavItem; collapsed: boolean; active: boolean; comingSoonLabel: string }) {
+function Item({ item, collapsed, active, comingSoonLabel, label }: { item: NavItem; collapsed: boolean; active: boolean; comingSoonLabel: string; label: string }) {
   const Glyph = I[item.icon]
   const inner = (
     <>
@@ -16,7 +16,7 @@ function Item({ item, collapsed, active, comingSoonLabel }: { item: NavItem; col
         <Glyph />
       </span>
       {!collapsed && (
-        <span className="min-w-0 flex-1 overflow-hidden text-ellipsis whitespace-nowrap">{item.label}</span>
+        <span className="min-w-0 flex-1 overflow-hidden text-ellipsis whitespace-nowrap">{label}</span>
       )}
     </>
   )
@@ -30,7 +30,7 @@ function Item({ item, collapsed, active, comingSoonLabel }: { item: NavItem; col
 
   if (item.href && !item.deferred) {
     return (
-      <Link href={item.href} className={base} title={collapsed ? item.label : undefined} aria-current={active ? "page" : undefined}>
+      <Link href={item.href} className={base} title={collapsed ? label : undefined} aria-current={active ? "page" : undefined}>
         {inner}
       </Link>
     )
@@ -41,7 +41,7 @@ function Item({ item, collapsed, active, comingSoonLabel }: { item: NavItem; col
       type="button"
       aria-disabled="true"
       className={cn(base, "cursor-default opacity-45")}
-      title={collapsed ? `${item.label} · ${comingSoonLabel}` : comingSoonLabel}
+      title={collapsed ? `${label} · ${comingSoonLabel}` : comingSoonLabel}
     >
       {inner}
     </button>
@@ -69,7 +69,7 @@ export function Sidebar({ collapsed = false, className }: { collapsed?: boolean;
       <div className="mw-scroll flex-1 overflow-y-auto px-3 pb-6 pt-3.5">
         <div className="flex flex-col gap-0.5">
           {nav.main.map((item) => (
-            <Item key={item.key} item={item} collapsed={collapsed} active={isActive(item)} comingSoonLabel={t("comingSoon")} />
+            <Item key={item.key} item={item} collapsed={collapsed} active={isActive(item)} comingSoonLabel={t("comingSoon")} label={t(item.labelKey)} />
           ))}
         </div>
 
@@ -84,7 +84,7 @@ export function Sidebar({ collapsed = false, className }: { collapsed?: boolean;
             </div>
           )}
           {nav.library.map((item) => (
-            <Item key={item.key} item={item} collapsed={collapsed} active={isActive(item)} comingSoonLabel={t("comingSoon")} />
+            <Item key={item.key} item={item} collapsed={collapsed} active={isActive(item)} comingSoonLabel={t("comingSoon")} label={t(item.labelKey)} />
           ))}
         </div>
       </div>

@@ -1,6 +1,7 @@
 "use client"
 
 import type { ReactNode } from "react"
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { ModalShell } from "@/components/smartrotom/behavior/ModalShell"
 import { Corners } from "./Corners"
@@ -45,12 +46,13 @@ export function Modal({
   size = "md",
   tone = "cyan",
 }: ArModalProps) {
+  const t = useTranslations("arcade")
   if (!open) return null
 
   return (
     <ModalShell
       onClose={onClose}
-      label={typeof title === "string" ? title : "Diálogo"}
+      label={typeof title === "string" ? title : t("common.dialog")}
       scope={AR_SCOPE}
       scrimClassName="z-[200] grid place-items-center bg-[rgb(4_2_14/.78)] p-4 backdrop-blur-md"
       className={cn(
@@ -74,7 +76,7 @@ export function Modal({
         <button
           type="button"
           onClick={onClose}
-          aria-label="Cerrar"
+          aria-label={t("common.close")}
           className="ar-lift shrink-0 rounded-md border border-white/10 bg-white/[.04] p-1.5 text-ar-ink-dim hover:text-ar-ink"
         >
           <Icon.X s={14} />

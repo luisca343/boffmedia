@@ -9,9 +9,11 @@ import { TvCP } from "../TvCP"
 import { CTA_ROW, GLARE, HUD_FRAME, PRI_GLOW } from "../landing-shared"
 import { DISCORD, TV3_FEED } from "../landing-data"
 import { useSiteActivity, useSiteStats } from "@/hooks/community/useCommunity"
+import { useFormat } from "@/lib/useFormat"
 
 export function TvComunidad() {
   const t = useTranslations("boffmedia.landing.comunidad")
+  const { number: formatNumber } = useFormat()
   const { activity } = useSiteActivity(6)
   const { stats } = useSiteStats()
   // Real activity feeds the ticker; falls back to the editorial placeholders
@@ -19,8 +21,8 @@ export function TvComunidad() {
   const feed = activity.length
     ? activity.slice(0, 4).map((a) =>
         a.type === "achievement"
-          ? { k: "win", t: `${a.actor} desbloqueó ${a.name}`, ln: "border-l-ok", tp: "bg-ok" }
-          : { k: "join", t: `${a.actor} se unió a ${a.name}`, ln: "border-l-signal", tp: "bg-signal" },
+          ? { k: "win", t: t("feedAchievement", { actor: a.actor, name: a.name }), ln: "border-l-ok", tp: "bg-ok" }
+          : { k: "join", t: t("feedJoin", { actor: a.actor, name: a.name }), ln: "border-l-signal", tp: "bg-signal" },
       )
     : TV3_FEED
 
@@ -28,7 +30,7 @@ export function TvComunidad() {
   // no number is fabricated.
   const lead =
     stats && stats.participants > 0
-      ? t("leadWithParticipants", { count: stats.participants.toLocaleString("es-ES") })
+      ? t("leadWithParticipants", { count: formatNumber(stats.participants) })
       : t("leadNoParticipants")
 
   return (

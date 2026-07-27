@@ -42,7 +42,7 @@ export function BoxOddsPanel({ box, owned, opening, onOpen, onShowInfo }: BoxOdd
                   className="font-ar-display text-[9px] uppercase tracking-[0.12em]"
                   style={{ color: skin.fg }}
                 >
-                  {skin.name}
+                  {t(skin.nameKey)}
                 </span>
                 <span className="font-ar-mono text-[11px] tabular-nums text-ar-ink-dim">
                   {o.pct.toFixed(1)}%
@@ -50,7 +50,7 @@ export function BoxOddsPanel({ box, owned, opening, onOpen, onShowInfo }: BoxOdd
               </div>
               <div
                 role="progressbar"
-                aria-label={`${skin.name}: ${o.pct.toFixed(1)} por ciento`}
+                aria-label={t("loot.oddsBarAria", { rarity: t(skin.nameKey), pct: o.pct.toFixed(1) })}
                 aria-valuenow={Math.round(o.pct)}
                 aria-valuemin={0}
                 aria-valuemax={100}

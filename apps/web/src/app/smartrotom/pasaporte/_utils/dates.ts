@@ -1,9 +1,11 @@
+import { intlLocale } from "@/lib/locale"
+
 /**
  * The document's dates.
  *
  * `parseDate` in `@/lib/utils` appends a wall-clock time, which is exactly what a passport
  * never prints — an entry is stamped on a DAY. Every date in the book therefore goes
- * through here, in es-ES, and an absent or unparseable one prints an em dash rather than
+ * through here, locale-aware, and an absent or unparseable one prints an em dash rather than
  * "Invalid Date".
  */
 function parse(value: string | Date | null | undefined): Date | null {
@@ -13,14 +15,17 @@ function parse(value: string | Date | null | undefined): Date | null {
 }
 
 /** "14 mar 2026" — the printed form, on the carné and under every seal. */
-export function docDate(value: string | Date | null | undefined): string {
+export function docDate(value: string | Date | null | undefined, locale?: string | null): string {
   const date = parse(value)
   if (!date) return "—"
-  return date.toLocaleDateString("es-ES", { day: "2-digit", month: "short", year: "numeric" })
+  return date.toLocaleDateString(intlLocale(locale), { day: "2-digit", month: "short", year: "numeric" })
 }
 
 /** The three pieces a rubber stamp inks separately. */
-export function stampDate(value: string | Date | null | undefined): {
+export function stampDate(
+  value: string | Date | null | undefined,
+  locale?: string | null,
+): {
   day: string
   month: string
   year: string
@@ -31,7 +36,7 @@ export function stampDate(value: string | Date | null | undefined): {
 
   const day = String(date.getDate()).padStart(2, "0")
   const month = date
-    .toLocaleDateString("es-ES", { month: "short" })
+    .toLocaleDateString(intlLocale(locale), { month: "short" })
     .replace(".", "")
     .toUpperCase()
   const year = String(date.getFullYear())
@@ -41,12 +46,15 @@ export function stampDate(value: string | Date | null | undefined): {
 }
 
 /** The crónica's left rail: "04 mar" over "2026". */
-export function timelineDate(value: string | Date | null | undefined): { day: string; month: string; year: string } {
+export function timelineDate(
+  value: string | Date | null | undefined,
+  locale?: string | null,
+): { day: string; month: string; year: string } {
   const date = parse(value)
   if (!date) return { day: "--", month: "---", year: "----" }
   return {
     day: String(date.getDate()).padStart(2, "0"),
-    month: date.toLocaleDateString("es-ES", { month: "short" }).replace(".", ""),
+    month: date.toLocaleDateString(intlLocale(locale), { month: "short" }).replace(".", ""),
     year: String(date.getFullYear()),
   }
 }

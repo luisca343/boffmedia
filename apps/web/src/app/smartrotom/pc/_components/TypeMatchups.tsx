@@ -41,9 +41,9 @@ export function TypeMatchups({ types }: TypeMatchupsProps) {
 
   return (
     <div>
-      <Group label={t("filters.types")} entries={groups.weak} tone="text-pc-rose" />
-      <Group label={t("detail.stats")} entries={groups.resist} tone="text-pc-green" />
-      <Group label={t("detail.none")} entries={groups.immune} tone="text-pc-fg-muted" />
+      <Group label={t("matchups.weak")} entries={groups.weak} tone="text-pc-rose" />
+      <Group label={t("matchups.resist")} entries={groups.resist} tone="text-pc-green" />
+      <Group label={t("matchups.immune")} entries={groups.immune} tone="text-pc-fg-muted" />
     </div>
   )
 }

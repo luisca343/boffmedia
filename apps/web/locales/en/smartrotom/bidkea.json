@@ -1,0 +1,31 @@
+{
+  "bidkea": {
+    "header": {
+      "logoAlt": "Bidkea Logo",
+      "searchPh": "Search products..."
+    },
+    "catalog": {
+      "title": "Product Catalogue",
+      "addToCart": "Add to cart",
+      "loading": "LOADING"
+    },
+    "footer": {
+      "rights": "© 2023 Bidkea. All rights reserved."
+    },
+    "items": {
+      "sayoriTitle": "Sayori Model",
+      "sayoriDesc": "A complete Sayori outfit, from head to toe.",
+      "lancerHelmetTitle": "Lancer Helmet",
+      "lancerHelmetDesc": "A lancer helmet with gold detailing.",
+      "luffyTitle": "Monkey D Luffy",
+      "luffyDesc": "A complete Monkey D Luffy outfit. Includes his famous straw hat.",
+      "pianoTitle": "Piano",
+      "pianoDesc": "A full-size grand piano."
+    },
+    "categories": {
+      "conjunto": "Outfit",
+      "casco": "Helmet",
+      "bloque": "Block"
+    }
+  }
+}

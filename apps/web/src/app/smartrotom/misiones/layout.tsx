@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, type ReactNode } from "react"
+import { useTranslations } from "next-intl"
 import { BoardProvider, useBoard } from "./_hooks/useBoard"
 import type { NPC } from "./_types"
 import { NpcDossier } from "./_components/NpcDossier"
@@ -13,6 +14,7 @@ import { MobileRail, SideRail } from "./_components/SideRail"
  * rather than on a page, because every one of the five screens can raise them.
  */
 function Tavern({ children }: { children: ReactNode }) {
+  const t = useTranslations("misiones.questLetter")
   const { openQuest, open } = useBoard()
   const [dossier, setDossier] = useState<NPC | null>(null)
 
@@ -39,7 +41,7 @@ function Tavern({ children }: { children: ReactNode }) {
             <>
               <button
                 type="button"
-                aria-label="Cerrar la misión"
+                aria-label={t("closeQuest")}
                 onClick={() => open(null)}
                 className="absolute inset-0 z-40 animate-ms-fade-up bg-[rgba(20,12,6,.5)] backdrop-blur-[2px] motion-reduce:animate-none"
               />

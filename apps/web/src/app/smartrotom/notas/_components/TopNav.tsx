@@ -17,7 +17,7 @@ export function TopNav({ activeTitle, onMenu, onSearch, onGraph, onTemplates }: 
     <header className="z-40 flex h-12 flex-none items-center gap-1 border-b border-nt-border bg-nt-bg-2 px-2.5">
       <button
         onClick={onMenu}
-        aria-label="Menu"
+        aria-label={t("nav.menu")}
         className="inline-flex h-8 min-w-8 items-center justify-center rounded-nt-sm text-nt-fg-muted hover:bg-nt-hover-strong hover:text-nt-fg md:hidden"
       >
         <Icon name="menu" size={18} />
@@ -37,7 +37,7 @@ export function TopNav({ activeTitle, onMenu, onSearch, onGraph, onTemplates }: 
 
       <span className="mx-1.5 h-[22px] w-px bg-nt-border-2" />
 
-      <nav className="flex min-w-0 flex-1 items-center gap-1.5 text-[13px] text-nt-fg-muted" aria-label="Ruta">
+      <nav className="flex min-w-0 flex-1 items-center gap-1.5 text-[13px] text-nt-fg-muted" aria-label={t("nav.breadcrumb")}>
         <span className="whitespace-nowrap max-sm:hidden">SmartRotom</span>
         <span className="text-nt-fg-subtle max-sm:hidden">/</span>
         <span className="whitespace-nowrap">Notas</span>

@@ -22,10 +22,6 @@ import {
  * field at all, so a real issue number stands alone rather than pairing with
  * an invented season string.
  */
-function issueLabel(cover: FtArticle): string {
-  return cover.issue ? `Nº ${cover.issue}` : cover.eyebrow;
-}
-
 export function CoverHero({
   cover,
   contents,
@@ -36,6 +32,10 @@ export function CoverHero({
 }) {
   const t = useTranslations("furrettoday.coverHero");
   const router = useRouter();
+  // `cover.issue` is nullable on every pre-existing row — there is no season
+  // field at all, so a real issue number stands alone rather than pairing with
+  // an invented season string.
+  const issueLabel = cover.issue ? t("issueNumber", { issue: cover.issue }) : cover.eyebrow;
   const words = cover.title.split(" ");
 
   return (
@@ -46,7 +46,7 @@ export function CoverHero({
       />
 
       <div className="ft-wrap-wide relative flex flex-wrap items-baseline justify-between gap-4 px-6 pt-10">
-        <Eyebrow className="text-ft-yellow">{issueLabel(cover)}</Eyebrow>
+        <Eyebrow className="text-ft-yellow">{issueLabel}</Eyebrow>
         <Meta className="text-white/70">{cover.dateline}</Meta>
       </div>
 

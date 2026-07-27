@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { Marquee } from "@/components/boffmedia/ui/layout/Marquee"
 import { useReveal } from "@/components/boffmedia/hooks/use-reveal"
@@ -23,6 +24,7 @@ import { TvComunidad } from "./stops/TvComunidad"
    marker classes, consumed via group-[.near]/[&.near] variants. */
 
 export function LandingPage() {
+  const t = useTranslations("boffmedia.landing.marquee")
   const lvl = 3
   const density = 90
   const rootRef = React.useRef<HTMLElement>(null)
@@ -56,7 +58,7 @@ export function LandingPage() {
         <TvHero lvl={lvl} density={density} />
 
         <div className="relative z-[1]">
-          <Marquee items={["BoffMedia", "Pixelmon Wingull 2", "SmartRotom", "BattleSim", "Torneos", "Sorteos", "Comunidad"]} speed={30} />
+          <Marquee items={["BoffMedia", "Pixelmon Wingull 2", "SmartRotom", "BattleSim", t("tournaments"), t("giveaways"), t("community")]} speed={30} />
         </div>
 
         <section

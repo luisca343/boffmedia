@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { Icon } from "@/components/boffmedia/primitives"
 import { DkFlag } from "./DkFlag"
@@ -14,8 +15,9 @@ export interface DkStep {
   status?: "done" | "live" | "pending"
 }
 export function DkStepper({ steps, value, onChange }: { steps: DkStep[]; value: string; onChange: (v: string) => void }) {
+  const t = useTranslations("common.dkExtras")
   return (
-    <div className="flex gap-1 overflow-x-auto p-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" role="tablist" aria-label="Rondas">
+    <div className="flex gap-1 overflow-x-auto p-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" role="tablist" aria-label={t("roundsAria")}>
       {steps.map((s) => {
         const on = value === s.value
         const st = s.status || "pending"
@@ -46,7 +48,8 @@ export interface DkCountryOption {
   name: string
   n: number
 }
-export function DkCountryFilter({ options, value, onChange, resultCount, noun = "resultados" }: { options: DkCountryOption[]; value: string[]; onChange: (v: string[]) => void; resultCount?: number; noun?: string }) {
+export function DkCountryFilter({ options, value, onChange, resultCount, noun }: { options: DkCountryOption[]; value: string[]; onChange: (v: string[]) => void; resultCount?: number; noun?: string }) {
+  const t = useTranslations("common.dkExtras")
   const [open, setOpen] = React.useState(false)
   const [pq, setPq] = React.useState("")
   const ref = React.useRef<HTMLDivElement>(null)
@@ -74,7 +77,7 @@ export function DkCountryFilter({ options, value, onChange, resultCount, noun = 
     const t = pq.trim().toLowerCase()
     return t ? options.filter((c) => c.name.toLowerCase().includes(t) || c.code.toLowerCase().includes(t)) : options
   }, [options, pq])
-  const label = sel.length === 0 ? "Todos los países" : sel.length === 1 ? byCode.get(sel[0])?.name || sel[0] : sel.length + " países"
+  const label = sel.length === 0 ? t("allCountries") : sel.length === 1 ? byCode.get(sel[0])?.name || sel[0] : t("countriesCount", { count: sel.length })
 
   return (
     <div ref={ref} className="flex flex-wrap items-center gap-2.5">
@@ -86,16 +89,16 @@ export function DkCountryFilter({ options, value, onChange, resultCount, noun = 
           <Icon name="chevron" size={13} className={cn("transition-transform", open && "rotate-180")} />
         </button>
         {open && (
-          <div role="dialog" aria-label="Filtrar por país" className="absolute left-0 top-[calc(100%_+_6px)] z-[60] w-[min(430px,86vw)] border border-solid border-line-2 bg-panel [box-shadow:0_18px_50px_rgba(0,0,0,0.5)]">
+          <div role="dialog" aria-label={t("filterByCountry")} className="absolute left-0 top-[calc(100%_+_6px)] z-[60] w-[min(430px,86vw)] border border-solid border-line-2 bg-panel [box-shadow:0_18px_50px_rgba(0,0,0,0.5)]">
             <div className="flex items-center gap-2 border-b border-solid border-line px-3 py-2.5 text-txt-dim">
               <Icon name="search" size={14} />
-              <input value={pq} onChange={(e) => setPq(e.target.value)} placeholder="Buscar país…" autoFocus className="min-w-0 flex-1 border-0 bg-transparent font-body text-[12px]/none text-txt outline-none" />
+              <input value={pq} onChange={(e) => setPq(e.target.value)} placeholder={t("searchCountryPh")} autoFocus className="min-w-0 flex-1 border-0 bg-transparent font-body text-[12px]/none text-txt outline-none" />
             </div>
             <div className="flex items-center justify-between border-b border-solid border-line px-3 py-2 font-mono text-[9px]/none font-semibold uppercase tracking-[0.12em] text-txt-dim">
-              <span>{sel.length ? sel.length + " seleccionados" : "Todos los países"}</span>
+              <span>{sel.length ? t("selectedCount", { count: sel.length }) : t("allCountries")}</span>
               {sel.length > 0 && (
                 <button type="button" onClick={clear} className="border-0 bg-transparent font-mono text-[9px]/none font-semibold uppercase tracking-[0.12em] text-accent-bright">
-                  Limpiar
+                  {t("clear")}
                 </button>
               )}
             </div>
@@ -111,7 +114,7 @@ export function DkCountryFilter({ options, value, onChange, resultCount, noun = 
                   </button>
                 )
               })}
-              {filtered.length === 0 && <span className="col-span-2 p-3.5 font-mono text-[12px]/[1.4] text-txt-dim">Sin coincidencias para «{pq}».</span>}
+              {filtered.length === 0 && <span className="col-span-2 p-3.5 font-mono text-[12px]/[1.4] text-txt-dim">{t("noMatchesFor", { query: pq })}</span>}
             </div>
           </div>
         )}
@@ -122,7 +125,7 @@ export function DkCountryFilter({ options, value, onChange, resultCount, noun = 
           {sel.map((code) => {
             const c = byCode.get(code)
             return (
-              <button key={code} type="button" onClick={() => toggle(code)} title={"Quitar " + (c ? c.name : code)} className="inline-flex items-center gap-[5px] border border-solid border-accent-line bg-accent-soft px-2 py-[5px] font-mono text-[10px]/none font-semibold text-accent-bright cut [--cut:2px]">
+              <button key={code} type="button" onClick={() => toggle(code)} title={t("removeCountry", { name: c ? c.name : code })} className="inline-flex items-center gap-[5px] border border-solid border-accent-line bg-accent-soft px-2 py-[5px] font-mono text-[10px]/none font-semibold text-accent-bright cut [--cut:2px]">
                 <DkFlag flag={c?.flag} code={code} name={c?.name || code} size={12} />
                 <span>{code}</span>
                 <Icon name="x" size={10} />
@@ -130,14 +133,14 @@ export function DkCountryFilter({ options, value, onChange, resultCount, noun = 
             )
           })}
           <button type="button" onClick={clear} className="border-0 bg-transparent p-[5px] font-mono text-[10px]/none font-semibold uppercase tracking-[0.08em] text-txt-dim hover:text-txt">
-            Limpiar
+            {t("clear")}
           </button>
         </div>
       )}
 
       {sel.length > 0 && resultCount != null && (
         <span className="font-mono text-[11px]/none text-txt-dim [&_b]:text-txt">
-          <b>{resultCount}</b> {noun}
+          <b>{resultCount}</b> {noun ?? t("defaultNoun")}
         </span>
       )}
     </div>

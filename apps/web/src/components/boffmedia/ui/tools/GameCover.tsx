@@ -1,5 +1,6 @@
 import * as React from "react"
 import Link from "next/link"
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { Icon } from "@/components/boffmedia/primitives"
 import { GameLogo } from "./GameLogo"
@@ -22,10 +23,11 @@ export interface GameCoverData {
  * wide slim variant used in the mixed layout. Mirrors `.tx-cover` from tools.css.
  */
 export function GameCover({ game, mini = false }: { game: GameCoverData; mini?: boolean }) {
+  const t = useTranslations("boffmedia.hub")
   return (
     <Link
       href={game.href ?? `/herramientas/${game.slug}`}
-      aria-label={`Herramientas de ${game.name}`}
+      aria-label={t("toolsOf", { game: game.name })}
       style={hueStyle(game.hueColor)}
       className={cn(
         "group relative flex flex-col justify-end overflow-hidden border border-solid border-line bg-panel text-left no-underline",
@@ -41,7 +43,7 @@ export function GameCover({ game, mini = false }: { game: GameCoverData; mini?: 
       <div className="absolute inset-x-0 top-0 z-[2] flex items-center gap-3 px-[18px] py-4">
         <GameLogo label={game.logoLabel} hueColor={game.hueColor} size="sm" />
         <span className="ml-auto border border-solid border-line bg-[color-mix(in_srgb,var(--bg)_72%,transparent)] px-[9px] py-1.5 font-mono text-[10px]/none font-semibold uppercase tracking-[0.12em] text-txt backdrop-blur-[4px]">
-          {game.toolCount} herramientas
+          {game.toolCount} {t("toolCount", { count: game.toolCount })}
         </span>
       </div>
 
@@ -49,7 +51,7 @@ export function GameCover({ game, mini = false }: { game: GameCoverData; mini?: 
         <h3 className={cn("leading-[0.95]", mini ? "text-[28px]" : "text-[clamp(28px,2.6vw,38px)]")}>{game.name}</h3>
         {!mini && <p className="mt-[7px] max-w-[34ch] text-pretty text-[13.5px] text-txt-muted">{game.tagline}</p>}
         <span className={cn("flex items-center gap-2 font-mono text-[11px]/none font-semibold uppercase tracking-[0.1em] text-txt-muted", mini ? "mt-2.5" : "mt-3.5")}>
-          Entrar
+          {t("enter")}
           <span className="ml-auto text-txt-dim transition-[color,transform] duration-[140ms] group-hover:translate-x-1 group-hover:text-accent-bright">
             <Icon name="arrow" size={17} />
           </span>

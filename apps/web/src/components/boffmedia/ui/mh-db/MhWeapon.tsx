@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { Icon } from "@/components/boffmedia/primitives"
 import { MhRarity } from "@/app/(boffmedia)/(herramientas)/mhwilds/_components/ui/mh-kit"
@@ -106,9 +107,10 @@ export function MhWeaponCard({ weapon, active, onOpen, view, selectable, selecte
 }
 
 export function MhSharpHandicraft({ weapon, defaultLevel }: { weapon: MhWeapon; defaultLevel?: number }) {
+  const t = useTranslations("mhwilds.db.weapon")
   const levels = weapon.handicraftLevels || 5
   const [lv, setLv] = React.useState(defaultLevel != null ? defaultLevel : 0)
-  if (!weapon.sharpness) return <div className="inline-block border border-solid border-line bg-panel-2 px-2 py-1 font-mono text-[11px]/none text-txt-muted">Sin afilado (arma a distancia)</div>
+  if (!weapon.sharpness) return <div className="inline-block border border-solid border-line bg-panel-2 px-2 py-1 font-mono text-[11px]/none text-txt-muted">{t("noSharpness")}</div>
   const arr = sharpnessAt(weapon, lv)
   const total = arr.reduce((a, n) => a + n, 0)
   const top = topSharpColor(arr)
@@ -120,17 +122,17 @@ export function MhSharpHandicraft({ weapon, defaultLevel }: { weapon: MhWeapon; 
       <div className="flex items-center justify-between gap-2.5">
         <span className="inline-flex items-center gap-1.5 font-mono text-[12px]/none font-bold" style={{ color: top ? top.color : "var(--muted)" }}>
           <i className="h-[9px] w-[9px]" style={{ background: top ? top.color : "var(--muted)" }} />
-          {total} de afilado
+          {t("sharpnessValue", { value: total })}
         </span>
-        <span className="font-mono text-[10px]/none font-semibold uppercase tracking-[0.06em] text-txt-dim">Artesanía · nivel {lv}</span>
+        <span className="font-mono text-[10px]/none font-semibold uppercase tracking-[0.06em] text-txt-dim">{t("handicraftStatus", { level: lv })}</span>
       </div>
-      <div className="flex gap-1" role="tablist" aria-label="Nivel de Artesanía">
+      <div className="flex gap-1" role="tablist" aria-label={t("handicraftLevel")}>
         {Array.from({ length: levels + 1 }).map((_, i) => (
           <button
             key={i}
             type="button"
             onClick={() => setLv(i)}
-            aria-label={"Artesanía " + i}
+            aria-label={t("handicraftAriaLevel", { level: i })}
             className={cn("h-[26px] flex-1 border border-solid font-mono text-[11px]/none font-bold transition-[color,background,border-color] duration-[140ms]", i === lv ? "border-[color:var(--mh)] bg-[var(--mh)] text-[#06120c]" : i <= lv ? "border-[color:var(--mh-line)] bg-panel text-[color:var(--mh-bright)]" : "border-line bg-panel text-txt-dim hover:border-line-2 hover:text-txt")}
           >
             {i}
@@ -146,6 +148,7 @@ function MhLabel({ children, className }: { children: React.ReactNode; className
 }
 
 export function MhWeaponExtra({ weapon }: { weapon: MhWeapon }) {
+  const t = useTranslations("mhwilds.db")
   const ex = weapon.extra
   if (!ex) return null
   if (ex.coatings) {
@@ -167,13 +170,15 @@ export function MhWeaponExtra({ weapon }: { weapon: MhWeapon }) {
     )
   }
   if (ex.phial) {
-    const m = MH_PHIALS[ex.phial] || { label: ex.phial, icon: "sparkles" as const }
+    const m = MH_PHIALS[ex.phial]
+    const label = m ? t(`vial.${m.labelKey}`) : ex.phial
+    const icon = m ? m.icon : ("sparkles" as const)
     return (
       <div>
         <MhLabel>Vial</MhLabel>
         <div className="inline-flex items-center gap-[7px] border border-solid border-[color:var(--mh-line)] bg-[var(--mh-soft)] px-[11px] py-[7px] font-mono text-[12px]/none font-semibold text-[color:var(--mh-bright)]">
-          <Icon name={m.icon} size={14} />
-          {m.label}
+          <Icon name={icon} size={14} />
+          {label}
         </div>
       </div>
     )
@@ -183,7 +188,7 @@ export function MhWeaponExtra({ weapon }: { weapon: MhWeapon }) {
       <div>
         {ex.melody && (
           <>
-            <MhLabel>Notas de la melodía</MhLabel>
+            <MhLabel>{t("weapon.melodyNotes")}</MhLabel>
             <div className="flex gap-[5px]">
               {ex.melody.map((n, i) => (
                 <span key={i} title={n} className="h-[15px] w-[15px] rounded-full [box-shadow:inset_0_0_0_1px_rgba(0,0,0,0.35),0_1px_3px_rgba(0,0,0,0.4)]" style={{ background: MH_NOTE_COLORS[n] || "var(--muted)" }} />
@@ -215,8 +220,10 @@ export function MhWeaponExtra({ weapon }: { weapon: MhWeapon }) {
 }
 
 export function MhElderseal({ value }: { value?: string }) {
+  const t = useTranslations("mhwilds.db.elderseal")
   if (!value) return null
-  const lbl = MH_ELDERSEAL[value] || value
+  const key = MH_ELDERSEAL[value]
+  const lbl = key ? t(key) : value
   return (
     <span className={cn("inline-flex items-center gap-[5px] border border-solid border-[color-mix(in_srgb,#b06bff_36%,transparent)] bg-[color-mix(in_srgb,#b06bff_12%,transparent)] px-2 py-1 font-mono text-[10px]/none font-semibold uppercase tracking-[0.04em]", value === "high" ? "text-[#d08bff]" : "text-[#b06bff]")}>
       <Icon name="flame" size={11} />

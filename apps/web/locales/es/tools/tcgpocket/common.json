@@ -218,6 +218,8 @@
         "discard": "Descartar",
         "saveChanges": "Guardar cambios",
         "saving": "Guardando…",
+        "saveSuccess": "Cambios guardados",
+        "saveError": "No se pudieron guardar los cambios",
         "bestPack": "Analizador de sobres",
         "bestPackHint": "Según tu colección, calculamos el sobre con más probabilidad de darte una carta que aún no tienes.",
         "analyze": "Analizar",
@@ -235,7 +237,8 @@
         "cardCount": "{count} cartas",
         "packCards": "Cartas del sobre",
         "noPackCards": "Este sobre no tiene cartas registradas.",
-        "noPacks": "Sin sobres registrados para esta expansión."
+        "noPacks": "Sin sobres registrados para esta expansión.",
+        "tileAria": "Sobre {name} · {setId}"
       },
       "combates": {
         "title": "Combates",

@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { Icon } from "@/components/boffmedia/primitives"
 import { SrtPrizeTag } from "./SrtAtoms"
@@ -10,6 +11,7 @@ import { srtNum, srtPrizeMeta, type Sorteo, type SrtRequirement, type SrtStep } 
 // the transparency rules block. Prefix srt- in sorteos.css.
 
 export function SrtPrizeShowcase({ sorteo }: { sorteo: Sorteo }) {
+  const t = useTranslations("common.giveaways")
   const p = sorteo.prize
   const m = srtPrizeMeta(p.type)
   return (
@@ -28,7 +30,7 @@ export function SrtPrizeShowcase({ sorteo }: { sorteo: Sorteo }) {
         <h4 className="text-[clamp(24px,2.4vw,32px)]/none">{p.name}</h4>
         <div className="mt-3 flex items-baseline gap-2.5">
           <b className="font-display text-[34px]/none font-extrabold italic text-accent">{srtNum(p.value)} €</b>
-          <span className="font-mono text-[10px]/none font-medium uppercase tracking-[0.1em] text-txt-muted">valor aprox.</span>
+          <span className="font-mono text-[10px]/none font-medium uppercase tracking-[0.1em] text-txt-muted">{t("approxValue")}</span>
         </div>
         <ul className="mt-4 grid list-none gap-2">
           {p.items.map((it, i) => (
@@ -45,6 +47,7 @@ export function SrtPrizeShowcase({ sorteo }: { sorteo: Sorteo }) {
 }
 
 export function SrtReqList({ requirements }: { requirements: SrtRequirement[] }) {
+  const t = useTranslations("common.giveaways")
   return (
     <ul className="grid list-none gap-2.5">
       {requirements.map((r, i) => (
@@ -55,7 +58,7 @@ export function SrtReqList({ requirements }: { requirements: SrtRequirement[] })
           <span className="min-w-0 flex-1 text-[14px] text-txt">{r.label}</span>
           <span className={cn("inline-flex flex-none items-center gap-1.5 font-mono text-[9.5px]/none font-semibold uppercase tracking-[0.08em]", r.met ? "text-ok" : "text-warn")}>
             <Icon name={r.met ? "check" : "alert"} size={12} />
-            {r.met ? "Cumplido" : "Pendiente"}
+            {r.met ? t("requirementMet") : t("requirementPending")}
           </span>
         </li>
       ))}
@@ -64,6 +67,7 @@ export function SrtReqList({ requirements }: { requirements: SrtRequirement[] })
 }
 
 export function SrtSteps({ steps }: { steps: SrtStep[] }) {
+  const t = useTranslations("common.giveaways")
   return (
     <div className="grid">
       {steps.map((s, i) => {
@@ -79,7 +83,7 @@ export function SrtSteps({ steps }: { steps: SrtStep[] }) {
               {s.done && (
                 <span className="mt-[5px] inline-flex items-center gap-1.5 font-mono text-[10px]/none font-semibold uppercase tracking-[0.08em] text-ok">
                   <Icon name="check" size={11} />
-                  Hecho
+                  {t("stepDone")}
                 </span>
               )}
             </div>
@@ -91,6 +95,7 @@ export function SrtSteps({ steps }: { steps: SrtStep[] }) {
 }
 
 export function SrtRules({ rules, seed }: { rules: string[]; seed?: number | null }) {
+  const t = useTranslations("common.giveaways")
   return (
     <>
       <ul className="grid list-none gap-3">
@@ -107,7 +112,7 @@ export function SrtRules({ rules, seed }: { rules: string[]; seed?: number | nul
         <div className="mt-4 flex items-center gap-3 border border-solid border-[color-mix(in_srgb,var(--info)_30%,transparent)] bg-[color:var(--info-soft)] px-[15px] py-3">
           <Icon name="lock" size={18} className="flex-none text-[color:var(--info)]" />
           <span className="text-[13px]/[1.45] text-txt">
-            Sorteo verificable · semilla pública <code className="font-mono text-[12px]/none font-semibold text-[color:var(--info)]">#{seed}</code>. El resultado puede recomputarse por cualquiera.
+            {t("verifiableLabel")} <code className="font-mono text-[12px]/none font-semibold text-[color:var(--info)]">#{seed}</code>. {t("recomputeNote")}
           </span>
         </div>
       )}

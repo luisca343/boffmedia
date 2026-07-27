@@ -67,7 +67,7 @@ export function escrowStep(status: WpOrderStatus): number {
   return 0
 }
 
-// Every figure in the app goes through `fmt` (es-ES grouping, no symbol).
+// Every figure in the app goes through `fmt` (locale-aware grouping, no symbol).
 export { formatNumber as fmt, timeAgo } from "@/lib/format"
 
 /** An auction's remaining time. Under an hour it counts seconds and turns urgent.

@@ -106,7 +106,8 @@ export function Newsroom({ initialId = null }: { initialId?: number | null }) {
     updateStatus.mutate(
       { published: nextPublished, featured: nextFeatured },
       {
-        onSuccess: () => toast(article.published ? "Vuelve a borrador." : "Publicada."),
+        onSuccess: () =>
+          toast(article.published ? t("newsroom.unpublishSuccess") : t("newsroom.publishSuccess")),
         onError: () => toast.error(t("newsroom.updateStatusError")),
       },
     );
@@ -148,7 +149,7 @@ export function Newsroom({ initialId = null }: { initialId?: number | null }) {
   }
 
   function onCreateDraft(values: NewArticleValues) {
-    const title = values.title.trim() || "Nueva noticia sin título";
+    const title = values.title.trim() || t("newsroom.untitledDraft");
     saveArticle.mutate(
       {
         id: null,
@@ -157,7 +158,7 @@ export function Newsroom({ initialId = null }: { initialId?: number | null }) {
           subtitle: values.subtitle.trim() || undefined,
           category: values.category.trim() || undefined,
           subcategory: values.subcategory.trim() || undefined,
-          content: `<h1>${escapeHtml(title)}</h1><p>Empieza a escribir aquí…</p>`,
+          content: `<h1>${escapeHtml(title)}</h1><p>${t("newsroom.draftBody")}</p>`,
           buttonText: values.buttonText.trim() || undefined,
           imageUrl: values.imageUrl.trim() || undefined,
           author: values.author.trim() || undefined,
@@ -230,20 +231,22 @@ export function Newsroom({ initialId = null }: { initialId?: number | null }) {
       <Modal
         open={pendingDeleteId != null}
         onClose={() => setPendingDeleteId(null)}
-        label="Confirmar borrado"
+        label={t("newsroom.deleteLabel")}
       >
         <div className="p-6">
-          <Eyebrow className="text-ft-pink">ELIMINAR NOTICIA</Eyebrow>
-          <h3 className="font-ft-display mt-1 text-3xl">¿Seguro?</h3>
+          <Eyebrow className="text-ft-pink">{t("newsroom.deleteEyebrow")}</Eyebrow>
+          <h3 className="font-ft-display mt-1 text-3xl">{t("newsroom.deleteTitle")}</h3>
           <p className="mt-2 text-ft-body">
-            Esto borra «{pendingArticle?.title ?? "esta noticia"}» para siempre. No hay deshacer.
+            {t("newsroom.deleteMessage", {
+              title: pendingArticle?.title ?? t("newsroom.deleteFallbackTitle"),
+            })}
           </p>
           <div className="mt-5 flex justify-end gap-2.5">
             <Button variant="ghost" onClick={() => setPendingDeleteId(null)}>
-              Cancelar
+              {t("newsroom.cancel")}
             </Button>
             <Button variant="primary" onClick={confirmDelete} disabled={deleteArticle.isPending}>
-              {deleteArticle.isPending ? "Eliminando…" : "Sí, eliminar"}
+              {deleteArticle.isPending ? t("newsroom.deleting") : t("newsroom.confirmDeleteAction")}
             </Button>
           </div>
         </div>

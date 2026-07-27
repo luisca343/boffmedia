@@ -1,9 +1,10 @@
 import type { Metadata } from "next"
+import { getTranslations } from "next-intl/server"
 import { PublicProfileView } from "./_components/PublicProfileView"
 
-export const metadata: Metadata = {
-  title: "Perfil · Boffmedia",
-  description: "Perfil público: logros, estadísticas y actividad reciente.",
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("pageMeta.perfil")
+  return { title: t("publico.title"), description: t("publico.description") }
 }
 
 export default async function PublicProfilePage({

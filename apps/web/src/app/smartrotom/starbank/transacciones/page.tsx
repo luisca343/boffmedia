@@ -1,6 +1,6 @@
 "use client";
 import * as React from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import useStarBank from "../_hooks/useStarBank";
 import { useTransactions } from "../_hooks/queries";
 import { PageHeader, Card, Kpi, Button, Ico, Seg, Input, Skeleton } from "../_components/ui";
@@ -16,6 +16,7 @@ type SortId = "amount" | "balance" | "date";
 
 export default function Transacciones() {
   const t = useTranslations("starbank");
+  const locale = useLocale();
   const { activeAccount } = useStarBank();
 
   const PERIODS = [
@@ -152,8 +153,8 @@ export default function Transacciones() {
                       </Td>
                       <Td align="right" className="tabular-nums">{formatMoney(balanceAfter(tx, accId))}</Td>
                       <Td align="right" className="text-sb-fg-muted tabular-nums">
-                        <div>{fmtDate(tx.date)}</div>
-                        <div className="text-[11px]">{fmtTime(tx.date)}</div>
+                        <div>{fmtDate(tx.date, "short", locale)}</div>
+                        <div className="text-[11px]">{fmtTime(tx.date, locale)}</div>
                       </Td>
                     </tr>
                   );

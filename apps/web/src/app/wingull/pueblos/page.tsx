@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useTranslations } from 'next-intl'
 import { MapPin, Compass, Search, ChevronRight } from "lucide-react"
 import { WingullService } from "@/services/api/smartrotom/wingullService"
 import { Input } from "@/components/ui/primitives/input"
@@ -12,6 +13,7 @@ import { OrnamentalDots } from "./[pueblo]/_components/shared/decorative/Ornamen
 import { BackgroundDecorations } from '../_components/BackgroundDecorations'
 
 export default function PueblosPage() {
+  const t = useTranslations('wingull.towns')
   const [towns, setTowns] = useState<string[]>([])
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
@@ -55,7 +57,7 @@ export default function PueblosPage() {
         >
           <div className="flex items-center space-x-4">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2" style={{ borderColor: themeColors.colorClaro }} />
-            <span className="text-lg text-white">Cargando pueblos...</span>
+            <span className="text-lg text-white">{t('loading')}</span>
           </div>
         </BasicCard>
       </div>
@@ -73,9 +75,9 @@ export default function PueblosPage() {
         <BackgroundDecorations includeGradient={false} />
         <div className="max-w-6xl mx-auto">
           <SectionHeader
-            title={<span style={{color: themeColors.colorClaro}}>Pueblos</span>}
-            subtitle={<span style={{color: themeColors.colorMedio}}>Disponibles</span>}
-            description={<span>Explora todos los pueblos disponibles en la región</span>}
+            title={<span style={{color: themeColors.colorClaro}}>{t('titlePrimary')}</span>}
+            subtitle={<span style={{color: themeColors.colorMedio}}>{t('titleAccent')}</span>}
+            description={<span>{t('description')}</span>}
             townName="Wingull"
             colorClaro={themeColors.colorClaro}
             colorMedio={themeColors.colorMedio}
@@ -95,7 +97,7 @@ export default function PueblosPage() {
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-ink-muted" />
                   <Input
                     type="text"
-                    placeholder="Buscar pueblo..."
+                    placeholder={t('searchPh')}
                     variant={'wingull'}
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
@@ -128,9 +130,9 @@ export default function PueblosPage() {
               >
                 <div className="p-8">
                   <Search className="w-12 h-12 mx-auto mb-4 opacity-50 text-ink-muted" />
-                    <h3 className="text-xl font-semibold mb-2 text-white">No se encontraron pueblos</h3>
+                    <h3 className="text-xl font-semibold mb-2 text-white">{t('emptyTitle')}</h3>
                     <p className="text-ink-muted">
-                      No hay pueblos que coincidan con &quot;{searchTerm}&quot;
+                      {t('emptyBody', { query: searchTerm })}
                     </p>
                 </div>
               </BasicCard>
@@ -149,7 +151,7 @@ export default function PueblosPage() {
                 <div className="flex items-center justify-center space-x-3 mb-4">
                   <Compass className="w-6 h-6" style={{ color: themeColors.colorClaro }} />
                   <span className="text-lg font-semibold text-white">
-                    {towns.length} pueblos disponibles
+                    {t('count', { count: towns.length })}
                   </span>
                 </div>
                 <OrnamentalDots
@@ -178,6 +180,8 @@ interface TownCardProps {
 }
 
 function TownCard({ townName, themeColors, index }: TownCardProps) {
+  const t = useTranslations('wingull.towns')
+
   return (
     <Link href={`/wingull/pueblos/${townName}`}>
       <BasicCard
@@ -200,12 +204,12 @@ function TownCard({ townName, themeColors, index }: TownCardProps) {
           </h3>
           
           <p className="text-ink text-sm mb-6">
-            Descubre las parcelas disponibles y comodidades de {townName}
+            {t('cardDesc', { town: townName })}
           </p>
 
           <div className="flex justify-between items-center">
             <div className="flex items-center space-x-2 text-sm text-ink-muted group-hover:text-white transition-colors">
-              <span>Explorar pueblo</span>
+              <span>{t('explore')}</span>
             </div>
             
             <ChevronRight className="w-4 h-4 text-ink-muted group-hover:text-white group-hover:translate-x-1 transition-all" />

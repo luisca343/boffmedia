@@ -1,4 +1,5 @@
 import { Minus, Plus } from "lucide-react"
+import { useTranslations } from "next-intl"
 import { Button } from "@/components/ui/primitives/button"
 import { useEffect, useRef, useState } from "react"
 import { setZoomLevel, getZoomLevel, subscribeZoomChanged } from "@/services/mcef/mcefApi"
@@ -22,6 +23,7 @@ interface CameraZoomSliderProps {
 }
 
 export function CameraZoomSlider({ onZoomChange }: CameraZoomSliderProps) {
+  const t = useTranslations("camara")
   const [zoomLevel, setZoomLevelState] = useState(DEFAULT_LEVEL)
   const [factor, setFactor] = useState(ZOOM_LEVELS[DEFAULT_LEVEL].factor)
   const [isLoading, setIsLoading] = useState(false)
@@ -89,6 +91,7 @@ export function CameraZoomSlider({ onZoomChange }: CameraZoomSliderProps) {
         size="icon"
         className="h-8 w-8 rounded-full hover:bg-white/10"
         onClick={decreaseZoom}
+        aria-label={t("zoom.decrease")}
         disabled={zoomLevel === 0 || isLoading}
       >
         <Minus className="h-4 w-4" />
@@ -109,7 +112,7 @@ export function CameraZoomSlider({ onZoomChange }: CameraZoomSliderProps) {
               }`}
               onClick={() => handleZoomChange(zoom.level)}
               disabled={isLoading}
-              aria-label={`Set zoom to ${formatFactor(zoom.factor)}`}
+              aria-label={t("zoom.setZoom", { factor: formatFactor(zoom.factor) })}
             />
           ))}
         </div>
@@ -125,6 +128,7 @@ export function CameraZoomSlider({ onZoomChange }: CameraZoomSliderProps) {
         size="icon"
         className="h-8 w-8 rounded-full hover:bg-white/10"
         onClick={increaseZoom}
+        aria-label={t("zoom.increase")}
         disabled={zoomLevel === ZOOM_LEVELS.length - 1 || isLoading}
       >
         <Plus className="h-4 w-4" />

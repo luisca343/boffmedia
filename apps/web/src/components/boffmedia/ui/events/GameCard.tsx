@@ -6,6 +6,7 @@ import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { Badge, Icon } from "@/components/boffmedia/primitives"
 import { ArtImage } from "@/components/boffmedia/ui/tools/ArtImage"
+import { useFormat } from "@/lib/useFormat"
 import { formatEventDate } from "./events-util"
 
 export interface GameLike {
@@ -29,6 +30,7 @@ export interface GameLike {
 
 export function GameCard({ game }: { game: GameLike }) {
   const t = useTranslations("juegos")
+  const { intlLocale, number: formatNumber } = useFormat()
   const active = game.active !== 0 && !game.deletedAt
   const hue = game.hue || "var(--accent)" // [deferred] no game→hue field
 
@@ -88,13 +90,13 @@ export function GameCard({ game }: { game: GameLike }) {
           {game.players != null && (
             <span className="inline-flex items-center gap-1.5 font-mono text-[11px]/none uppercase tracking-[0.05em] text-txt-muted [&_b]:font-bold [&_b]:text-txt">
               <Icon name="users" size={13} className="text-[var(--ghue)]" />
-              <b>{game.players.toLocaleString("es-ES")}</b> jugadores
+              <b>{formatNumber(game.players)}</b> jugadores
             </span>
           )}
           {game.createdAt && (
             <span className="inline-flex items-center gap-1.5 font-mono text-[11px]/none uppercase tracking-[0.05em] text-txt-muted">
               <Icon name="calendar" size={13} className="text-txt-dim" />
-              {t("since", { date: formatEventDate(game.createdAt) })}
+              {t("since", { date: formatEventDate(game.createdAt, intlLocale) })}
             </span>
           )}
           <Icon

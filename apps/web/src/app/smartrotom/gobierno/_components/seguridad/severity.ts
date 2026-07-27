@@ -23,8 +23,8 @@ export const severityTone = (raw: string) => SEVERITY[TO_ENGLISH[raw.toLowerCase
 // What gets written back to the API when creating a buscado — Spanish, matching
 // CreateBuscadoDto's own documented examples.
 export const SEVERITY_CREATE_OPTIONS = [
-  { value: "baja", label: SEVERITY.low.label },
-  { value: "media", label: SEVERITY.medium.label },
-  { value: "alta", label: SEVERITY.high.label },
-  { value: "critica", label: SEVERITY.critical.label },
+  { value: "baja", labelKey: SEVERITY.low.labelKey },
+  { value: "media", labelKey: SEVERITY.medium.labelKey },
+  { value: "alta", labelKey: SEVERITY.high.labelKey },
+  { value: "critica", labelKey: SEVERITY.critical.labelKey },
 ]

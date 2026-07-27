@@ -1,5 +1,5 @@
 /**
- * Single source of truth for Pokémon type colours (hex) and their es-ES labels.
+ * Single source of truth for Pokémon type colours (hex) and their label keys.
  *
  * Colours are DATA-DRIVEN — consumed via inline `style`, never a dynamic
  * `bg-pk-type-${t}` class (that can't be seen by the Tailwind JIT). Values match
@@ -26,8 +26,36 @@ export const TYPE_COLORS: Record<string, string> = {
   fairy: "#ef71ef",
 }
 
-// es-ES type names. The Pokédex chrome is hardcoded Spanish to match the app —
-// there is no `pokedex` next-intl namespace on this branch.
+// Type name → `pokedex` message key. Resolve with `t(TYPE_LABEL_KEYS[type])`;
+// the keys live in the CORE half (smartrotom/pokedex/common.json) so they are
+// reachable from every route, not just /smartrotom/pokedex.
+export const TYPE_LABEL_KEYS: Record<string, string> = {
+  normal: "type_normal",
+  fire: "type_fire",
+  water: "type_water",
+  grass: "type_grass",
+  electric: "type_electric",
+  ice: "type_ice",
+  fighting: "type_fighting",
+  poison: "type_poison",
+  ground: "type_ground",
+  flying: "type_flying",
+  psychic: "type_psychic",
+  bug: "type_bug",
+  rock: "type_rock",
+  ghost: "type_ghost",
+  dragon: "type_dragon",
+  dark: "type_dark",
+  steel: "type_steel",
+  fairy: "type_fairy",
+}
+
+/**
+ * @deprecated Untranslated es-only labels, kept alive only for the two pasaporte
+ * consumers (`chapters/Equipo.tsx`, `chapters/BadgePage.tsx`) that still import it.
+ * Those are owned by the pasaporte batch; once they move to `TYPE_LABEL_KEYS` +
+ * `t(...)` this map must be deleted. Do not add new call sites.
+ */
 export const TYPE_LABELS: Record<string, string> = {
   normal: "Normal",
   fire: "Fuego",

@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react"
-import { useLocale } from "next-intl"
+import { useLocale, useTranslations } from "next-intl"
 import { MhWildsService } from "@/services/api/tools/mhWildsService"
 import type { MhMonster } from "@/types/tools/mhwilds"
 
 export function useMonsters() {
   const locale = useLocale()
+  const t = useTranslations("mhwilds.bestiary")
   const [monsters, setMonsters] = useState<MhMonster[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -18,7 +19,7 @@ export function useMonsters() {
       setError(null)
     } catch (err) {
       console.error("Error fetching monsters:", err)
-      setError("Error loading bestiary data. Please try again.")
+      setError(t("errorLoadFailed"))
     } finally {
       setLoading(false)
     }

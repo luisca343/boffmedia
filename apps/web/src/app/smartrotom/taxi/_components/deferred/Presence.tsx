@@ -1,3 +1,4 @@
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { Icon } from "../ui"
 import { formatNum, countdown } from "../../_utils/format"
@@ -32,10 +33,11 @@ export function LivePill({ count }: { count: number }) {
 
 /** [deferred] The "N en línea" pill in the top bar — same missing endpoint as `LivePill`. */
 export function OnlinePill({ count }: { count: number }) {
+  const t = useTranslations("taxi.presence")
   return (
     <span className="flex items-center gap-[7px] whitespace-nowrap rounded-tx-pill border border-solid border-tx-line bg-tx-surface px-3 py-2 text-[13px] font-bold text-tx-txt-2">
       <span className="h-2 w-2 animate-pulse rounded-full bg-tx-ok shadow-[0_0_0_3px_var(--tx-ok-soft)] motion-reduce:animate-none" />
-      {formatNum(count)} en línea
+      {t("onlineCount", { count: formatNum(count) })}
     </span>
   )
 }
@@ -48,6 +50,8 @@ export function OnlinePill({ count }: { count: number }) {
  * never do.
  */
 export function HappyHourBanner({ discount, endsInMin }: { discount: number; endsInMin: number }) {
+  const t = useTranslations("taxi")
+  const c = countdown(endsInMin)
   return (
     <div className="flex items-center gap-[11px] rounded-tx-md border border-solid border-tx-accent-soft bg-[linear-gradient(120deg,var(--tx-accent-soft),rgb(var(--tx-blue-600)/0.16))] px-3.5 py-3">
       <span className="grid h-9 w-9 shrink-0 place-items-center rounded-[10px] bg-tx-accent text-tx-on-accent shadow-[0_0_16px_var(--tx-accent-glow)]">
@@ -55,11 +59,11 @@ export function HappyHourBanner({ discount, endsInMin }: { discount: number; end
       </span>
       <div className="min-w-0 flex-1">
         <div className="text-[13.5px] font-extrabold text-tx-txt">
-          Hora feliz · −{Math.round(discount * 100)}% en todos los viajes
+          {t("presence.happyHourTitle", { percent: Math.round(discount * 100) })}
         </div>
-        <div className="mt-px text-xs text-tx-txt-2">Descuento aplicado automáticamente al pagar</div>
+        <div className="mt-px text-xs text-tx-txt-2">{t("presence.happyHourSub")}</div>
       </div>
-      <span className="font-tx-mono text-[13px] font-extrabold text-tx-money">{countdown(endsInMin)}</span>
+      <span className="font-tx-mono text-[13px] font-extrabold text-tx-money">{t(`countdown.${c.key}`, c.values)}</span>
     </div>
   )
 }

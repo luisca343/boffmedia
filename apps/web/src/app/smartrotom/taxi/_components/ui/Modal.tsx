@@ -1,6 +1,7 @@
 "use client"
 
 import type { ReactNode } from "react"
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { ModalShell } from "@/components/smartrotom/behavior/ModalShell"
 import { Icon, type IconName } from "./Icon"
@@ -45,6 +46,7 @@ export function Modal({
 }
 
 export function ModalTitle({ icon, title, onClose }: { icon: IconName; title: string; onClose: () => void }) {
+  const t = useTranslations("taxi.modal")
   return (
     <div className="mb-4 flex items-center gap-2.5">
       <span className="grid h-[38px] w-[38px] shrink-0 place-items-center rounded-[11px] bg-tx-surface-2 text-tx-accent">
@@ -54,7 +56,7 @@ export function ModalTitle({ icon, title, onClose }: { icon: IconName; title: st
       <button
         type="button"
         onClick={onClose}
-        aria-label="Cerrar"
+        aria-label={t("close")}
         className="grid h-[34px] w-[34px] shrink-0 place-items-center rounded-[10px] bg-tx-surface text-tx-txt-2 transition-all duration-150 hover:bg-tx-surface-2 hover:text-tx-txt"
       >
         <Icon name="x" size={18} />

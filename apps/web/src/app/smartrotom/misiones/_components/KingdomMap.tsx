@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { useBoard } from "../_hooks/useBoard"
 import { npcForQuest } from "../_utils/quests"
@@ -215,6 +216,7 @@ function SeaCartouche({ x = 90, y = 110 }: { x?: number; y?: number }) {
  * `_utils/regions.ts`). No mock data anywhere here.
  */
 export function KingdomMap() {
+  const t = useTranslations("misiones.kingdomMap")
   const { quests, npcs, regions, open } = useBoard()
   const [hovered, setHovered] = useState<string | null>(null)
   const [selected, setSelected] = useState<string | null>(null)
@@ -312,10 +314,10 @@ export function KingdomMap() {
             />
 
             <text x="500" y="430" textAnchor="middle" className="font-ms-display tracking-[0.3em]" fontSize="32" fill="#3a2410" opacity="0.5">
-              REINO DE KANTO
+              {t("mapTitle")}
             </text>
             <text x="500" y="455" textAnchor="middle" className="font-ms-uppercase italic" fontSize="13" fill="#3a2410" opacity="0.55">
-              — anno aventurae · MMXXVI —
+              {t("mapSubtitle")}
             </text>
 
             {regions.map((r) => (
@@ -419,7 +421,7 @@ export function KingdomMap() {
                   </span>
                   {activeHasActive && (
                     <span className="inline-flex items-center gap-1.5 rounded-full border border-ms-gold-4 bg-gradient-to-b from-ms-gold-2 to-ms-gold-3 px-2.5 py-1 font-ms-uppercase text-[9px] uppercase tracking-[.12em] text-[#1e120a] shadow-[inset_0_1px_0_rgba(255,255,255,.45)]">
-                      vigente
+                      {t("active")}
                     </span>
                   )}
                   {activeQuests.length > 0 && (
@@ -440,7 +442,7 @@ export function KingdomMap() {
                     </button>
                   ))}
                   {activeQuests.length > 3 && (
-                    <div className="text-center font-ms text-[10px] italic text-ms-ink-3">+{activeQuests.length - 3} más</div>
+                    <div className="text-center font-ms text-[10px] italic text-ms-ink-3">{t("more", { count: activeQuests.length - 3 })}</div>
                   )}
                 </div>
               </Paper>
@@ -450,12 +452,12 @@ export function KingdomMap() {
       </div>
 
       <Paper tilt={0.4} className="mt-3.5 flex flex-wrap items-center justify-center gap-4 px-4 py-3">
-        <Label className="text-ms-ink-2">Leyenda</Label>
+        <Label className="text-ms-ink-2">{t("legend")}</Label>
         {(
           [
-            { c: SEAL_FILL.ACTIVE, l: "Misión vigente" },
-            { c: SEAL_FILL.AVAILABLE, l: "Disponible" },
-            { c: SEAL_FILL.LOCKED, l: "Sin misiones nuevas" },
+            { c: SEAL_FILL.ACTIVE, l: t("legendActive") },
+            { c: SEAL_FILL.AVAILABLE, l: t("legendAvailable") },
+            { c: SEAL_FILL.LOCKED, l: t("legendLocked") },
           ] as const
         ).map((it) => (
           <span key={it.l} className="flex items-center gap-2 text-xs text-ms-ink-2">
@@ -470,13 +472,13 @@ export function KingdomMap() {
           <svg width="40" height="8" aria-hidden>
             <line x1="0" y1="4" x2="40" y2="4" stroke="rgba(58,36,16,0.6)" strokeWidth="3" strokeDasharray="5 4" />
           </svg>
-          Camino real
+          {t("legendRoad")}
         </span>
         <span className="flex items-center gap-2 text-xs text-ms-ink-2">
           <svg width="40" height="8" aria-hidden>
             <line x1="0" y1="4" x2="40" y2="4" stroke="rgba(8,40,72,0.7)" strokeWidth="2" strokeDasharray="3 4" />
           </svg>
-          Ruta marítima
+          {t("legendSea")}
         </span>
       </Paper>
     </div>

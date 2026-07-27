@@ -3,7 +3,7 @@
 import { useTranslations } from "next-intl"
 import { usePcUi } from "../_stores/pcUiStore"
 import { boxName, boxTheme } from "../_utils/boxMeta"
-import { BOX_THEMES, THEME_LABEL, WALLPAPER_CLASS } from "../_utils/boxThemes"
+import { BOX_THEMES, WALLPAPER_CLASS } from "../_utils/boxThemes"
 import { Modal } from "./ui"
 
 export interface ThemePickerProps {

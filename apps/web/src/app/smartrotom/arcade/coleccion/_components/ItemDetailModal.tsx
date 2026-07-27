@@ -13,11 +13,11 @@ export interface ItemDetailModalProps {
   onClose: () => void
 }
 
-const SOURCE_LABEL: Record<string, string> = {
-  arcade: "Arcade",
-  mina: "Mina",
-  lootbox: "Caja de botín",
-  streak: "Racha diaria",
+const SOURCE_LABEL_KEY: Record<string, string> = {
+  arcade: "coleccion.detail.sources.arcade",
+  mina: "coleccion.detail.sources.mina",
+  lootbox: "coleccion.detail.sources.lootbox",
+  streak: "coleccion.detail.sources.streak",
 }
 
 export function ItemDetailModal({ item, onClose }: ItemDetailModalProps) {
@@ -33,11 +33,11 @@ export function ItemDetailModal({ item, onClose }: ItemDetailModalProps) {
       open
       onClose={onClose}
       size="sm"
-      kicker={skin.name}
+      kicker={t(skin.nameKey)}
       title={getItemName(t, item.itemId, item.itemType)}
       footer={
         <Button variant="cyan" size="md" onClick={onClose}>
-          Cerrar
+          {t("common.close")}
         </Button>
       }
     >
@@ -54,22 +54,22 @@ export function ItemDetailModal({ item, onClose }: ItemDetailModalProps) {
 
       <Panel tone="deep" tight className="mb-3">
         <dl className="grid grid-cols-2 gap-y-2.5 font-ar-mono text-[11px]">
-          <dt className="uppercase tracking-[0.12em] text-ar-ink-muted">Cantidad</dt>
+          <dt className="uppercase tracking-[0.12em] text-ar-ink-muted">{t("coleccion.detail.quantity")}</dt>
           <dd className="text-right tabular-nums text-ar-amber">×{remaining(item)}</dd>
 
-          <dt className="uppercase tracking-[0.12em] text-ar-ink-muted">Rareza</dt>
+          <dt className="uppercase tracking-[0.12em] text-ar-ink-muted">{t("coleccion.detail.rarity")}</dt>
           <dd className="text-right" style={{ color: skin.fg }}>
-            {skin.name}
+            {t(skin.nameKey)}
           </dd>
 
-          <dt className="uppercase tracking-[0.12em] text-ar-ink-muted">Origen</dt>
+          <dt className="uppercase tracking-[0.12em] text-ar-ink-muted">{t("coleccion.detail.origin")}</dt>
           <dd className="text-right text-ar-ink">
-            {SOURCE_LABEL[item.sourceType] ?? item.sourceType}
+            {SOURCE_LABEL_KEY[item.sourceType] ? t(SOURCE_LABEL_KEY[item.sourceType]) : item.sourceType}
           </dd>
 
           {item.used > 0 && (
             <>
-              <dt className="uppercase tracking-[0.12em] text-ar-ink-muted">Reclamados</dt>
+              <dt className="uppercase tracking-[0.12em] text-ar-ink-muted">{t("coleccion.detail.claimed")}</dt>
               <dd className="text-right tabular-nums text-ar-ink-dim">{item.used}</dd>
             </>
           )}

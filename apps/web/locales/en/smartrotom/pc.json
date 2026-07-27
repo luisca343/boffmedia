@@ -9,7 +9,8 @@
       "clear": "Clear",
       "cancel": "Cancel",
       "save": "Save",
-      "search": "Search"
+      "search": "Search",
+      "dialog": "Dialog"
     },
     "topbar": {
       "title": "SmartRotom PC",
@@ -126,7 +127,8 @@
       "moved": "{count} moved",
       "movedOverflow": "{count} moved · {overflow} didn't fit",
       "boxFull": "The box is full",
-      "alreadyInBox": "Already in that box"
+      "alreadyInBox": "Already in that box",
+      "partyEmpty": "You can't leave the party completely empty"
     },
     "livingDex": {
       "title": "Pokédex Progress",
@@ -178,7 +180,14 @@
       "save": "Save view",
       "savePrompt": "Saved view name:",
       "saved": "View «{name}» saved",
-      "delete": "Delete view {name}"
+      "delete": "Delete view {name}",
+      "builtin": {
+        "shiny": "All Shiny",
+        "legendary": "Legendary",
+        "favorites": "Favorites",
+        "competitive": "Competitive",
+        "withItem": "With Item"
+      }
     },
     "boxOverview": {
       "title": "All boxes",
@@ -197,6 +206,14 @@
     "moveQueue": {
       "cancelled": "{label} cancelled — {applied} of {count} applied",
       "interrupted": "{label} interrupted after {done} of {count} moves"
+    },
+    "commands": {
+      "title": "Command palette"
+    },
+    "matchups": {
+      "weak": "Weak to",
+      "resist": "Resists",
+      "immune": "Immune"
     }
   }
 }

@@ -111,7 +111,7 @@ export function MwTarjetasChapter() {
           title="La misma tarjeta · Mewtube"
           code='data-app="mewtube"'
           grid
-          note="Los espectadores se formatean con toLocaleString('es-ES'), así que el separador de millares es el español."
+          note="Los espectadores se formatean con el locale del visitante (agrupación es-ES o en-US según corresponda)."
         >
           <StreamPair />
         </Sample>

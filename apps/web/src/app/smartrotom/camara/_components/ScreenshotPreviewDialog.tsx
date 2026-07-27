@@ -92,7 +92,7 @@ export function ScreenshotPreviewDialog({
 
               <img
                 src={screenshot.image}
-                alt="Screenshot preview"
+                alt={t("preview.imageAlt")}
                 className="max-w-full max-h-full object-contain"
               />
             </div>

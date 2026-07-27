@@ -14,9 +14,13 @@ export function bearing(fromX: number, fromZ: number, toX: number, toZ: number):
   return deg < 0 ? deg + 360 : deg
 }
 
-const COMPASS = ["N", "NE", "E", "SE", "S", "SO", "O", "NO"] as const
+/** Key ids under `taxi.compass` — the component resolves them with `t(...)`. */
+const COMPASS = ["n", "ne", "e", "se", "s", "so", "o", "no"] as const
 
-export function compassLabel(deg: number): string {
+export type CompassKey = (typeof COMPASS)[number]
+
+/** Returns a `taxi.compass.*` key id, never copy. */
+export function compassKey(deg: number): CompassKey {
   return COMPASS[Math.round(deg / 45) % 8]
 }
 

@@ -2,6 +2,7 @@
 
 import { useQuery } from "@tanstack/react-query"
 import { useMemo } from "react"
+import { useTranslations } from "next-intl"
 import { getMisiones } from "@/services/mcef/mcefApi"
 import { isMinecraft } from "@/services/mcef/mcefHelper"
 import { useRotomUuid } from "@/components/smartrotom/behavior/useRotomUuid"
@@ -9,20 +10,18 @@ import { MazmorraService } from "@/services/api/smartrotom/mazmorraService"
 import type { IDialogue, NPC, QuestData } from "../_types"
 import { buildRegions } from "../_utils/regions"
 
-const OUTSIDE_GAME = "El tablón de misiones sólo puede leerse desde el juego."
-const UNREADABLE = "No se pudo leer el tablón de misiones."
-
 /**
  * The board's single fetch. The mod answers for whoever's client is asking, so
  * status and progress arrive already resolved — hence no uuid here.
  */
 export function useQuestSystem() {
+  const t = useTranslations("misiones.errors")
   const query = useQuery({
     queryKey: ["misiones"],
     staleTime: 60_000,
     queryFn: async () => {
       const result = await getMisiones()
-      if (!result.data) throw new Error(result.error ?? UNREADABLE)
+      if (!result.data) throw new Error(result.error ?? "misiones/unreadable")
       return result.data
     },
   })
@@ -46,8 +45,8 @@ export function useQuestSystem() {
 
   const error = query.error
     ? isMinecraft()
-      ? UNREADABLE
-      : OUTSIDE_GAME
+      ? t("unreadable")
+      : t("outsideGame")
     : null
 
   return {

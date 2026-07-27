@@ -1,3 +1,4 @@
+import { useTranslations } from "next-intl"
 import { STATUS_META, type DexStatus } from "../../_utils/dexMeta"
 
 const SIZES = {
@@ -15,13 +16,15 @@ export function StatusPill({
   size?: "sm" | "md" | "lg"
   showLabel?: boolean
 }) {
+  const t = useTranslations("pokedex")
   const meta = STATUS_META[status as DexStatus] ?? STATUS_META.unknown
+  const label = t(meta.labelKey)
   const s = SIZES[size]
 
   return (
     <span
       role="status"
-      aria-label={meta.label}
+      aria-label={label}
       className="inline-flex items-center font-semibold whitespace-nowrap"
       style={{
         gap: s.gap,
@@ -45,7 +48,7 @@ export function StatusPill({
           flexShrink: 0,
         }}
       />
-      {showLabel && meta.label}
+      {showLabel && label}
     </span>
   )
 }

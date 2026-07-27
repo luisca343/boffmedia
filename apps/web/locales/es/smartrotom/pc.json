@@ -9,7 +9,8 @@
       "clear": "Limpiar",
       "cancel": "Cancelar",
       "save": "Guardar",
-      "search": "Buscar"
+      "search": "Buscar",
+      "dialog": "Diálogo"
     },
     "topbar": {
       "title": "SmartRotom PC",
@@ -126,7 +127,8 @@
       "moved": "{count} movidos",
       "movedOverflow": "{count} movidos · {overflow} no cabían",
       "boxFull": "La caja está llena",
-      "alreadyInBox": "Ya están en esa caja"
+      "alreadyInBox": "Ya están en esa caja",
+      "partyEmpty": "No puedes dejar el equipo completamente vacío"
     },
     "livingDex": {
       "title": "Progreso de Pokédex",
@@ -178,7 +180,14 @@
       "save": "Guardar vista",
       "savePrompt": "Nombre de la vista guardada:",
       "saved": "Vista «{name}» guardada",
-      "delete": "Eliminar vista {name}"
+      "delete": "Eliminar vista {name}",
+      "builtin": {
+        "shiny": "Todos los Shiny",
+        "legendary": "Legendarios",
+        "favorites": "Favoritos",
+        "competitive": "Competitivos",
+        "withItem": "Con Objeto"
+      }
     },
     "boxOverview": {
       "title": "Todas las cajas",
@@ -197,6 +206,14 @@
     "moveQueue": {
       "cancelled": "{label} cancelado — {applied} de {count} aplicados",
       "interrupted": "{label} interrumpido tras {done} de {count} movimientos"
+    },
+    "commands": {
+      "title": "Paleta de comandos"
+    },
+    "matchups": {
+      "weak": "Débil contra",
+      "resist": "Resiste",
+      "immune": "Inmune"
     }
   }
 }

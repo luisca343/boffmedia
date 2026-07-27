@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { Icon } from "@/components/boffmedia/primitives"
 import { KvArt, KvStatus, KvTags, KvVia } from "./KvAtoms"
@@ -9,6 +10,7 @@ import { kvReviewColor, type KvKey } from "./keys-util"
 // The catalogue card. Steam art with status · review · discount · stock overlaid,
 // name, price, tags and the delivery via at the foot. Delivered keys dim.
 export function KvCard({ item, onOpen }: { item: KvKey; onOpen?: (item: KvKey) => void }) {
+  const t = useTranslations("common.keys")
   const review = item.info.review
   return (
     <button
@@ -35,7 +37,7 @@ export function KvCard({ item, onOpen }: { item: KvKey; onOpen?: (item: KvKey) =
         {!item.given && item.stock > 1 && (
           <span className="absolute bottom-2.5 right-2.5 z-[2] inline-flex items-center gap-1.5 border border-solid border-line-2 bg-[color-mix(in_srgb,var(--bg)_82%,transparent)] px-2 py-[5px] font-mono text-[10px]/none font-bold uppercase tracking-[0.06em] text-txt backdrop-blur-[4px]">
             <Icon name="layers" size={12} className="text-accent" />
-            {item.stock} claves
+            {item.stock} {t("keysCount", { count: item.stock })}
           </span>
         )}
       </div>

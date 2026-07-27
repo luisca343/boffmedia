@@ -1,8 +1,10 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { Avatar, Badge, Button, Card, Empty, Table, THead, TBody, TH, TR, TD, TableSkeleton } from "../ui"
 import { MULTA_STATUS } from "../../_utils/tones"
 import { money, timeAgo } from "../../_utils/format"
+import { useFormat } from "@/lib/useFormat"
 import { useGobiernoUi } from "../../_stores/useGobiernoUi"
 import type { Multa } from "../../_types"
 
@@ -18,19 +20,21 @@ export function MultasTable({
   onCancel: (m: Multa) => void
 }) {
   const openDossier = useGobiernoUi((s) => s.openDossier)
+  const t = useTranslations("gobierno")
+  const { intlLocale } = useFormat()
 
   return (
     <Card className="overflow-hidden">
       <Table>
         <THead>
           <tr>
-            <TH>Código</TH>
-            <TH>Jugador</TH>
-            <TH>Motivo</TH>
-            <TH>Importe</TH>
-            <TH>Emisor</TH>
-            <TH>Estado</TH>
-            <TH className="text-right">Acciones</TH>
+            <TH>{t("hacienda.codigo")}</TH>
+            <TH>{t("hacienda.jugadorCol")}</TH>
+            <TH>{t("hacienda.motivoCol")}</TH>
+            <TH>{t("hacienda.importeCol")}</TH>
+            <TH>{t("hacienda.emisor")}</TH>
+            <TH>{t("hacienda.estadoCol")}</TH>
+            <TH className="text-right">{t("hacienda.acciones")}</TH>
           </tr>
         </THead>
         <TBody>
@@ -45,14 +49,16 @@ export function MultasTable({
               <td colSpan={7}>
                 <Empty
                   icon="gavel"
-                  title="Sin multas emitidas"
-                  sub="Las sanciones que emita la Hacienda de Teras aparecerán aquí."
+                  title={t("hacienda.emptyMultas")}
+                  sub={t("hacienda.emptyMultasSub")}
                 />
               </td>
             </tr>
           ) : (
             multas.map((m) => {
-              const st = MULTA_STATUS[m.status] ?? { label: m.status, tone: "default" as const }
+              const st = MULTA_STATUS[m.status]
+              const label = st ? t(st.labelKey) : m.status
+              const tone = st ? st.tone : ("default" as const)
               return (
                 <TR key={m.id}>
                   <TD className="font-gt-mono text-[11px] text-gt-ink-400">{m.code}</TD>
@@ -70,16 +76,16 @@ export function MultasTable({
                     {m.reason}
                     {m.denunciaId != null && (
                       <span className="ml-1.5 font-gt-mono text-[10px] text-gt-ink-400">
-                        · denuncia #{m.denunciaId}
+                        {t("hacienda.denunciaRef", { id: m.denunciaId })}
                       </span>
                     )}
                   </TD>
                   <TD className="font-gt-display text-[15px] font-bold tabular-nums text-gt-ink-900">
-                    {money(m.amount)} ₽
+                    {money(m.amount, intlLocale)} ₽
                   </TD>
                   <TD className="text-[12px] text-gt-ink-500">{m.issuedBy.username}</TD>
                   <TD>
-                    <Badge tone={st.tone}>{st.label}</Badge>
+                    <Badge tone={tone}>{label}</Badge>
                     {m.status === "paid" && m.paidAt && (
                       <div className="mt-1 font-gt-mono text-[9.5px] text-gt-ink-400">{timeAgo(m.paidAt)}</div>
                     )}
@@ -88,10 +94,10 @@ export function MultasTable({
                     {m.status === "pending" && (
                       <div className="flex justify-end gap-1.5">
                         <Button size="sm" tone="soft" onClick={() => onPay(m)}>
-                          Cobrar
+                          {t("hacienda.cobrar")}
                         </Button>
                         <Button size="sm" tone="plain" onClick={() => onCancel(m)}>
-                          Anular
+                          {t("hacienda.anular")}
                         </Button>
                       </div>
                     )}

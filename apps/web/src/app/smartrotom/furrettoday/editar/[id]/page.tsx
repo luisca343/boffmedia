@@ -2,6 +2,7 @@
 
 import { use } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 import { USER_ROLES } from "@boffmedia/shared/roles";
 import { useBoffSession } from "@/services/useBoffSession";
@@ -15,6 +16,7 @@ export default function EditArticlePage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = use(params);
+  const t = useTranslations("furrettoday.access");
   const router = useRouter();
   const { hasRole, status } = useBoffSession();
   const canManageNews = hasRole([USER_ROLES.ROTOM_ADMIN, USER_ROLES.ROTOM_FURRET]);
@@ -35,9 +37,9 @@ export default function EditArticlePage({
     return (
       <div className="mx-auto max-w-[1400px] px-6 py-16">
         <EmptyState
-          title="ACCESO DENEGADO"
-          message="Necesitas el rol de redacción (ROTOM_ADMIN o ROTOM_FURRET) para entrar en la sala de redacción."
-          actionLabel="Volver a portada"
+          title={t("deniedTitle")}
+          message={t("deniedMessage")}
+          actionLabel={t("backToCover")}
           onAction={() => router.push("/smartrotom/furrettoday")}
         />
       </div>

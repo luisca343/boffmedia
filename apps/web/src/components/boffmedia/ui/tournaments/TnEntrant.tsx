@@ -1,10 +1,11 @@
 "use client"
 
 import * as React from "react"
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { Icon } from "@/components/boffmedia/primitives"
 import { DkFlag, DkPin, DkLive } from "@/components/boffmedia/ui/tools/datakit"
-import { TN_FORMAT_ICON, TN_FORMAT_LABEL, type TnCompetitor } from "./tournaments-util"
+import { TN_FORMAT_ICON, TN_FORMAT_LABEL_KEY, type TnCompetitor } from "./tournaments-util"
 
 const TN_AV = "inline-grid flex-none place-items-center font-display font-extrabold uppercase cut-corner [--cut-lg:4px]"
 
@@ -49,7 +50,8 @@ export function TnEntrant({
   avatar?: boolean
   compact?: boolean
 }) {
-  if (!c) return <span className="inline-flex min-w-0 items-center gap-2 font-mono text-[11px]/none font-semibold uppercase tracking-[0.12em] text-txt-dim">BYE</span>
+  const t = useTranslations("torneos.entrant")
+  if (!c) return <span className="inline-flex min-w-0 items-center gap-2 font-mono text-[11px]/none font-semibold uppercase tracking-[0.12em] text-txt-dim">{t("bye")}</span>
   const sd = seed != null ? seed : c.seed
   const nameCls = cn(
     "max-w-full truncate font-body text-[13.5px]/[1.15] font-semibold transition-colors",
@@ -76,7 +78,7 @@ export function TnEntrant({
           const subText =
             sub ??
             (c.kind === "team"
-              ? `${c.tag ? c.tag + " · " : ""}${c.roster ? c.roster.length + " jugadores" : "equipo"}`
+              ? `${c.tag ? c.tag + " · " : ""}${c.roster ? t("players", { count: c.roster.length }) : t("team")}`
               : c.tag
                 ? "@" + c.tag
                 : null)
@@ -98,10 +100,12 @@ export function TnScore({ status, g1, g2 }: { status: string; g1?: number | null
 
 // Format label pill. `.tn-fmt`
 export function TnFormatBadge({ format, size }: { format: string; size?: "sm" }) {
+  const t = useTranslations("torneos.format")
+  const key = TN_FORMAT_LABEL_KEY[format]
   return (
     <span className={cn("inline-flex items-center border border-solid border-line-2 font-mono font-semibold tracking-[0.02em] text-txt-muted", size === "sm" ? "gap-1 px-1.5 py-1 text-[9.5px]/none" : "gap-1.5 px-2 py-[5px] text-[10.5px]/none")}>
       <Icon name={TN_FORMAT_ICON[format] || "trophy"} size={size === "sm" ? 11 : 12} className="text-accent-bright" />
-      {TN_FORMAT_LABEL[format] || format}
+      {key ? t(key) : format}
     </span>
   )
 }

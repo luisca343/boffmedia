@@ -1,12 +1,14 @@
 "use client"
 
 import { useTranslations } from "next-intl"
+import { useFormat } from "@/lib/useFormat"
 import { usePokedexData } from "@/hooks/usePokedexData"
 import { useRotomUuid } from "@/components/smartrotom/behavior/useRotomUuid"
 import { useGetRegistries } from "@/hooks/pokemon/useGetRegistries"
 
 export function ProgressStrip() {
   const t = useTranslations("pokedex")
+  const f = useFormat()
   const uuid = useRotomUuid()
   const { pokedexData } = usePokedexData()
   const { registries } = useGetRegistries(uuid!)
@@ -19,7 +21,7 @@ export function ProgressStrip() {
   const pct = Math.round((caught / total) * 100)
 
   const lastCaptureTime = registries?.[0]?.caughtAt || registries?.[0]?.seenAt
-  const lastCaptureAgo = lastCaptureTime ? getRelativeTime(lastCaptureTime) : "—"
+  const lastCaptureAgo = f.timeAgo(lastCaptureTime, { nowLabel: t("progress.justNow") })
   const streak = computeStreak(registries)
 
   const segments = [
@@ -49,7 +51,7 @@ export function ProgressStrip() {
             {t("progress_last_capture")} · <b className="text-pk-surface-100 font-semibold">{lastCaptureAgo}</b>
           </span>
           <span>
-            {t("progress_streak")} · <b className="text-pk-surface-100 font-semibold">{streak} {streak === 1 ? t("progress_streak_day") : t("progress_streak_days")}</b>
+            {t("progress_streak")} · <b className="text-pk-surface-100 font-semibold">{t("progress.streakCount", { count: streak })}</b>
           </span>
         </div>
       </div>
@@ -57,7 +59,7 @@ export function ProgressStrip() {
       <div
         className="flex h-3 rounded-full overflow-hidden bg-white/[0.04] shadow-[inset_0_0_0_1px_rgba(255,255,255,0.04)]"
         role="img"
-        aria-label={`${pct}% capturados, ${seen} vistos, ${shiny} shiny`}
+        aria-label={t("progress.barAria", { pct, seen, shiny })}
       >
         {segments.map((s) => (
           <div
@@ -90,19 +92,6 @@ export function ProgressStrip() {
       </div>
     </div>
   )
-}
-
-function getRelativeTime(dateStr: string): string {
-  const now = Date.now()
-  const then = new Date(dateStr).getTime()
-  const diffMs = now - then
-  const diffMin = Math.floor(diffMs / 60000)
-  if (diffMin < 1) return "ahora"
-  if (diffMin < 60) return `${diffMin} min`
-  const diffH = Math.floor(diffMin / 60)
-  if (diffH < 24) return `${diffH}h`
-  const diffD = Math.floor(diffH / 24)
-  return `${diffD}d`
 }
 
 // Consecutive-day capture streak derived from real registries (ending today or

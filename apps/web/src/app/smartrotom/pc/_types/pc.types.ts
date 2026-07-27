@@ -56,7 +56,9 @@ export interface Sort {
 /** A smart box or a user-saved view — a named, one-click filter. */
 export interface SmartView {
   id: string
-  name: string
+  /** Built-ins carry a `pc` message key instead; user-saved views carry `name`. */
+  nameKey?: string
+  name?: string
   icon: string
   /** A `pc-*` text colour class. Literal, never interpolated (SMARTROTOM_V3.md §4). */
   tone: string

@@ -2,7 +2,7 @@
 import { useState, useMemo } from "react"
 import { getPokemonDefense } from "../../dexUtils"
 import { TypeChip } from "../../_components/ui"
-import { TYPE_LABELS, ALL_TYPES } from "../../_utils/typeColors"
+import { TYPE_LABEL_KEYS, ALL_TYPES } from "../../_utils/typeColors"
 import { useTranslations } from "next-intl"
 
 const MULT_META: Record<string, { key: string; fg: string; bg: string; label: string }> = {
@@ -39,9 +39,9 @@ export default function TypeAnalysis() {
         <div>
           <div className="font-pk-mono text-[10px] tracking-[0.1em] uppercase text-pk-surface-500 mb-1.5">{t("analysis_primary_type")}</div>
           <select value={type1} onChange={(e) => setType1(e.target.value)} className={`${SELECT} min-w-[160px]`}>
-            {ALL_TYPES.map((t) => (
-              <option key={t} value={t}>
-                {TYPE_LABELS[t]}
+            {ALL_TYPES.map((tp) => (
+              <option key={tp} value={tp}>
+                {t(TYPE_LABEL_KEYS[tp])}
               </option>
             ))}
           </select>
@@ -51,9 +51,9 @@ export default function TypeAnalysis() {
           <div className="font-pk-mono text-[10px] tracking-[0.1em] uppercase text-pk-surface-500 mb-1.5">{t("analysis_secondary_type")}</div>
           <select value={type2} onChange={(e) => setType2(e.target.value)} className={`${SELECT} min-w-[180px]`}>
             <option value="">{t("analysis_mono_type")}</option>
-            {ALL_TYPES.filter((t) => t !== type1).map((t) => (
-              <option key={t} value={t}>
-                {TYPE_LABELS[t]}
+            {ALL_TYPES.filter((tp) => tp !== type1).map((tp) => (
+              <option key={tp} value={tp}>
+                {t(TYPE_LABEL_KEYS[tp])}
               </option>
             ))}
           </select>
@@ -73,7 +73,7 @@ export default function TypeAnalysis() {
         <h4 className="font-pk-display font-semibold text-sm text-pk-surface-50 mb-3.5 pb-3 border-b border-white/[0.05] flex items-center gap-2">
           {t("analysis_damage_received", { type: type2 ? t("analysis_dual") : "" })}
           <span className="font-pk font-normal text-[11.5px] text-pk-surface-500 ml-auto">
-            {type2 ? `${TYPE_LABELS[type1]} + ${TYPE_LABELS[type2]}` : TYPE_LABELS[type1]}
+            {type2 ? `${t(TYPE_LABEL_KEYS[type1])} + ${t(TYPE_LABEL_KEYS[type2])}` : t(TYPE_LABEL_KEYS[type1])}
           </span>
         </h4>
         <div className="flex flex-col gap-1.5">

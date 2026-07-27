@@ -1,11 +1,13 @@
 "use client"
 
 import { useState } from "react"
+import { useTranslations } from "next-intl"
 import { Modal, Field, Select, Button } from "../ui"
 import { SEVERITY } from "../../_utils/tones"
 import { useCreateExpediente } from "../../_hooks/queries"
 
 export function NewExpedienteModal({ open, onClose }: { open: boolean; onClose: () => void }) {
+  const t = useTranslations("gobierno")
   const [title, setTitle] = useState("")
   const [subject, setSubject] = useState("")
   const [severity, setSeverity] = useState("medium")
@@ -24,12 +26,12 @@ export function NewExpedienteModal({ open, onClose }: { open: boolean; onClose: 
     <Modal
       open={open}
       onClose={close}
-      kicker="Justicia · Expedientes"
-      title="Abrir expediente"
+      kicker={t("expedientes.openExpedienteKicker")}
+      title={t("expedientes.openExpediente")}
       footer={
         <>
           <Button tone="ghost" onClick={close}>
-            Cancelar
+            {t("common.cancel")}
           </Button>
           <Button
             disabled={!valid || createExpediente.isPending}
@@ -40,24 +42,24 @@ export function NewExpedienteModal({ open, onClose }: { open: boolean; onClose: 
               )
             }
           >
-            {createExpediente.isPending ? "Abriendo…" : "Abrir expediente"}
+            {createExpediente.isPending ? t("expedientes.abriendo") : t("expedientes.openExpediente")}
           </Button>
         </>
       }
     >
       <div className="space-y-3.5">
         <Field
-          label="Título del caso"
+          label={t("expedientes.tituloCaso")}
           value={title}
           onChange={setTitle}
-          placeholder="Ej. Vandalismo reincidente en Ciudad Carmín"
+          placeholder={t("expedientes.tituloCasoPlaceholder")}
         />
-        <Field label="Sujeto (jugador)" value={subject} onChange={setSubject} placeholder="Usuario" icon="users" />
+        <Field label={t("expedientes.sujeto")} value={subject} onChange={setSubject} placeholder={t("expedientes.sujetoPlaceholder")} icon="users" />
         <Select
-          label="Gravedad"
+          label={t("denuncias.action.gravedad")}
           value={severity}
           onChange={setSeverity}
-          options={Object.entries(SEVERITY).map(([value, s]) => ({ value, label: s.label }))}
+          options={Object.entries(SEVERITY).map(([value, s]) => ({ value, label: t(s.labelKey) }))}
         />
       </div>
     </Modal>

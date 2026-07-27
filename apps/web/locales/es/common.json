@@ -1,15 +1,15 @@
 {
   "common": {
     "search": {
-        "placeholder": "Buscar...",
-        "button": "Buscar",
-        "searching": "Buscando...",
-        "error": "La búsqueda falló. Inténtalo de nuevo.",
-        "noResults": "No se encontraron resultados",
-        "youtubePlaceholder": "Buscar en YouTube...",
-        "twitchPlaceholder": "Buscar canales, juegos o streams...",
-        "youtubeButton": "Buscar en YouTube",
-        "twitchButton": "Buscar en Twitch"
+      "placeholder": "Buscar...",
+      "button": "Buscar",
+      "searching": "Buscando...",
+      "error": "La búsqueda falló. Inténtalo de nuevo.",
+      "noResults": "No se encontraron resultados",
+      "youtubePlaceholder": "Buscar en YouTube...",
+      "twitchPlaceholder": "Buscar canales, juegos o streams...",
+      "youtubeButton": "Buscar en YouTube",
+      "twitchButton": "Buscar en Twitch"
     },
     "loading": {
       "content": "Cargando contenido...",
@@ -57,14 +57,17 @@
       "noVideos": "No se encontraron videos",
       "noClips": "No se encontraron clips",
       "popularVideos": "Videos Populares",
-      "noPopular": "No se encontraron videos populares"
+      "noPopular": "No se encontraron videos populares",
+      "index": "Índice"
     },
     "actions": {
       "watchNow": "Ver Ahora",
       "viewChannel": "Ver Canal",
       "remove": "Eliminar",
       "loadMore": "Cargar Más",
-      "goBack": "Volver"
+      "goBack": "Volver",
+      "voteUp": "Votar a favor",
+      "voteDown": "Votar en contra"
     },
     "primitives": {
       "dismiss": "Descartar",
@@ -124,6 +127,23 @@
       "minutesAgo": "hace {minutes} min",
       "hoursAgo": "hace {hours} h",
       "refreshNow": "Actualizar ahora"
+    },
+    "dkExtras": {
+      "roundsAria": "Rondas",
+      "allCountries": "Todos los países",
+      "countriesCount": "{count} países",
+      "selectedCount": "{count} seleccionados",
+      "filterByCountry": "Filtrar por país",
+      "searchCountryPh": "Buscar país…",
+      "clear": "Limpiar",
+      "noMatchesFor": "Sin coincidencias para «{query}».",
+      "removeCountry": "Quitar {name}",
+      "defaultNoun": "resultados",
+      "searchPh": "Buscar…",
+      "unfollow": "Dejar de seguir",
+      "follow": "Seguir",
+      "following": "Siguiendo",
+      "trendAria": "Progresión"
     },
     "tournaments": {
       "verified": "Verificado",
@@ -202,7 +222,65 @@
       "prizeValue": "valor del premio",
       "featuredGiveaway": "Sorteo destacado",
       "participants": "participantes",
-      "by": "Por"
+      "by": "Por",
+      "approxValue": "valor aprox.",
+      "requirementMet": "Cumplido",
+      "requirementPending": "Pendiente",
+      "stepDone": "Hecho",
+      "verifiableLabel": "Sorteo verificable · semilla pública",
+      "recomputeNote": "El resultado puede recomputarse por cualquiera.",
+      "reelExplainer": "Cada bloque = un participante; su anchura es proporcional a sus tickets. Más tickets, más espacio en la tira.",
+      "wonWith": "Ganó con {tickets, plural, one {# ticket} other {# tickets}} · {odds}% de probabilidad",
+      "watchDraw": "Ver cómo se sorteó",
+      "share": "Compartir",
+      "prize": {
+        "key": {
+          "label": "Clave de juego"
+        },
+        "item": {
+          "label": "Objeto in-game"
+        },
+        "merch": {
+          "label": "Merchandising"
+        },
+        "nitro": {
+          "label": "Suscripción"
+        },
+        "pass": {
+          "label": "Pase de evento"
+        },
+        "cash": {
+          "label": "Saldo / tarjeta"
+        }
+      },
+      "source": {
+        "comunidad": {
+          "label": "Comunidad",
+          "desc": "Los miembros se apuntan cumpliendo los requisitos."
+        },
+        "twitch": {
+          "label": "Viewers de Twitch",
+          "desc": "Lista importada del chat en directo."
+        },
+        "manual": {
+          "label": "Lista manual",
+          "desc": "Participantes cargados a mano o por CSV."
+        }
+      },
+      "status": {
+        "announced": {
+          "label": "Ganador anunciado"
+        },
+        "upcoming": {
+          "label": "Próximo"
+        },
+        "ended": {
+          "label": "Sorteando"
+        },
+        "active": {
+          "label": "En curso"
+        }
+      }
     },
     "forum": {
       "solved": "Resuelto",
@@ -256,7 +334,9 @@
       "followRelease": "Seguir lanzamiento",
       "mustPlay": "Imprescindible",
       "releaseCard": "Ficha de {title}",
-      "viewCount": "{count} siguiendo"
+      "viewCount": "{count} siguiendo",
+      "today": "hoy",
+      "premieres": "{count, plural, one {estreno} other {estrenos}}"
     },
     "catalog": {
       "noRating": "Sin nota",
@@ -264,10 +344,60 @@
       "stars": "{count} estrellas",
       "halfStars": "{count} estrellas",
       "removeFromLibrary": "Quitar de mi biblioteca",
-      "log": "Registrar"
+      "log": "Registrar",
+      "games": "{count, plural, one {juego} other {juegos}}",
+      "systemList": "Boffmedia",
+      "yourList": "Tuya",
+      "defaultVerb": "registró",
+      "aGame": "un juego",
+      "justNow": "ahora",
+      "status": {
+        "playing": { "label": "Jugando", "verb": "Jugando" },
+        "played": { "label": "Jugado", "verb": "Completado" },
+        "backlog": { "label": "Pendiente", "verb": "Pendiente" },
+        "wishlist": { "label": "Deseado", "verb": "Deseado" },
+        "shelved": { "label": "Abandonado", "verb": "Abandonado" },
+        "retired": { "label": "Descartado", "verb": "Descartado" }
+      }
     },
     "bestiary": {
       "rareMaterial": "Material raro"
+    },
+    "keys": {
+      "metacritic": "Metacritic",
+      "steamRating": "Valoración de Steam",
+      "developer": "Desarrollador",
+      "publisher": "Editor",
+      "release": "Lanzamiento",
+      "platforms": "Plataformas",
+      "genres": "Géneros",
+      "free": "Gratis",
+      "freeToPlay": "Gratis para jugar en Steam",
+      "currentPrice": "Precio actual en Steam",
+      "regularPrice": "Precio en Steam",
+      "keyValueSuffix": "valor de la clave",
+      "screenshotAlt": "{game} captura {n}",
+      "mediaAria": "Medio {n}",
+      "given": "Entregada",
+      "available": "Disponible",
+      "reviewsCount": "{count} reseñas",
+      "keysCount": "{count, plural, one {clave} other {claves}}",
+      "review": {
+        "extremelyPositive": "Extremadamente positivas",
+        "veryPositive": "Muy positivas",
+        "positive": "Positivas",
+        "mixed": "Variadas"
+      },
+      "meta": {
+        "universal": "Aclamación universal",
+        "favorable": "Generalmente favorable",
+        "mixed": "Reseñas mixtas",
+        "unfavorable": "Generalmente desfavorable"
+      },
+      "via": {
+        "sorteo": { "label": "Sorteo", "short": "Sorteo" },
+        "manual": { "label": "Entrega manual", "short": "Manual" }
+      }
     },
     "profile": {
       "changePhoto": "Cambiar foto",
@@ -275,7 +405,15 @@
       "live": "EN VIVO"
     },
     "error": {
-      "unknown": "Error desconocido"
+      "title": "¡Algo salió mal!",
+      "body": "Ha ocurrido un error inesperado.",
+      "messageLabel": "Mensaje de error:",
+      "unknown": "Error desconocido",
+      "trackingId": "ID de seguimiento:",
+      "retry": "Reintentar",
+      "home": "Inicio",
+      "helpText": "¿Necesitas ayuda?",
+      "discordLink": "Comunidad Discord"
     },
     "media": {
       "menu": "Menú",
@@ -314,10 +452,24 @@
       "sidebar": {
         "you": "Tú",
         "partOf": "Parte de",
-        "comingSoon": "Próximamente"
+        "comingSoon": "Próximamente",
+        "home": "Inicio",
+        "browse": "Explorar",
+        "shorts": "Shorts",
+        "following": "Siguiendo",
+        "trending": "Tendencias",
+        "categories": "Categorías",
+        "history": "Historial",
+        "watchlater": "Ver más tarde",
+        "watchparty": "Watch Party",
+        "liked": "Me gusta",
+        "clips": "Clips guardados",
+        "subsTube": "Suscripciones",
+        "subsTwitch": "Canales que sigues"
       }
     },
     "legal": {
+      "tocLabel": "Contenido",
       "cancelaciones": {
         "metaTitle": "Política de cancelaciones · Boffmedia",
         "metaDescription": "Cómo solicitar la cancelación de una compra en Boffmedia y en qué condiciones.",
@@ -627,16 +779,9 @@
       "home": "Volver al Inicio",
       "back": "Página Anterior"
     },
-    "error": {
-      "title": "¡Algo salió mal!",
-      "body": "Ha ocurrido un error inesperado.",
-      "messageLabel": "Mensaje de error:",
-      "unknown": "Error desconocido",
-      "trackingId": "ID de seguimiento:",
-      "retry": "Reintentar",
-      "home": "Inicio",
-      "helpText": "¿Necesitas ayuda?",
-      "discordLink": "Comunidad Discord"
+    "editor": {
+      "untitled": "Sin título",
+      "saved": "Cambios guardados en {title}"
     }
   }
 }

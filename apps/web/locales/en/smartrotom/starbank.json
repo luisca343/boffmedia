@@ -129,7 +129,8 @@
       "newTransfer": "New transfer",
       "viewMovements": "View movements",
       "instantProtected": "Instant and protected transfer. Projected balance after operation: {amount}",
-      "differentAccount": "Choose a source account different from the recipient."
+      "differentAccount": "Choose a source account different from the recipient.",
+      "errorTransferencia": "The transfer could not be completed."
     },
     "graficas": {
       "title": "Charts and analysis",
@@ -164,7 +165,15 @@
       "today": "Today",
       "prevMonth": "Previous month",
       "nextMonth": "Next month",
-      "dayHeaders": ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+      "dayHeaders": [
+        "Mon",
+        "Tue",
+        "Wed",
+        "Thu",
+        "Fri",
+        "Sat",
+        "Sun"
+      ],
       "noMovements": "No movements that day",
       "selectDay": "Select a day to see details",
       "income": "Income",
@@ -229,7 +238,8 @@
         "errorEmpty": "Enter a name for the account",
         "errorFailed": "Could not create the account",
         "created": "Account created"
-      }
+      },
+      "errorCarga": "Your accounts could not be loaded."
     },
     "categories": {
       "league": "League",

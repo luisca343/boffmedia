@@ -239,6 +239,13 @@
       "when": 1784720600149,
       "tag": "0033_chat_read_receipts_pk",
       "breakpoints": true
+    },
+    {
+      "idx": 34,
+      "version": "5",
+      "when": 1785186754835,
+      "tag": "0034_user_locale_preference",
+      "breakpoints": true
     }
   ]
 }

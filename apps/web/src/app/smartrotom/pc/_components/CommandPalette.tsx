@@ -95,9 +95,9 @@ export function CommandPalette({
     for (const v of SMART_VIEWS) {
       list.push({
         id: v.id,
-        label: `${t("views.title")}: ${v.name}`,
+        label: `${t("views.title")}: ${v.nameKey ? t(v.nameKey) : v.name ?? ""}`,
         icon: v.icon as IconName,
-        kw: `vista ${v.name}`,
+        kw: `${t("views.title")} ${v.nameKey ? t(v.nameKey) : v.name ?? ""}`,
         run: () => applyView(v),
       })
     }
@@ -151,7 +151,7 @@ export function CommandPalette({
       <div
         role="dialog"
         aria-modal="true"
-        aria-label="Paleta de comandos"
+        aria-label={t("commands.title")}
         onClick={(e) => e.stopPropagation()}
         className="pc-glass w-[560px] max-w-[94vw] animate-pc-slide-up overflow-hidden rounded-pc-lg font-pc text-pc-fg motion-reduce:animate-none"
       >

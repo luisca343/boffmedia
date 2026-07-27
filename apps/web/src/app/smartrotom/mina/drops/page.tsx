@@ -1,3 +1,5 @@
+import { getTranslations } from "next-intl/server";
+
 import MenuWrapper from "../_components/MenuWrapper";
 import {
   Collapsible,
@@ -10,6 +12,7 @@ import { MinaService } from "@/services/api/smartrotom/minaService";
 export default async function Drops() {
   // An HTTP failure resolves to `{ success: false }` with no `data`; destructuring it
   // would throw and take the whole route to the error boundary.
+  const t = await getTranslations("mina");
   const res = await MinaService.getRewardsByType();
   const payload = res.success
     ? (res.data as { drops: DropByType; totalValue: number } | undefined)
@@ -19,7 +22,7 @@ export default async function Drops() {
   return (
     <MenuWrapper className="w-full min-h-full overflow-hidden bg-layer-1 text-white pt-4   flex flex-col items-center">
       <div className="bg-black bg-opacity-70 p-6 rounded-lg w-3/4 max-w-full">
-        <h2 className="text-2xl font-bold mb-4">DROPS</h2>
+        <h2 className="text-2xl font-bold mb-4">{t("drops.title")}</h2>
         <div className="space-y-4 overflow-auto">
           {Object.keys(drops).map((type: string) => (
             <Collapsible key={type}>

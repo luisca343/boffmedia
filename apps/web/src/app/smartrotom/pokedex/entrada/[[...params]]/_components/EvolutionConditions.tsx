@@ -86,7 +86,7 @@ function addConditionByType(condition: any, conditionKey: string, conditions: Re
           title={biomes.join(", ")}
           className="underline decoration-dotted cursor-help inline-flex items-center gap-1"
         >
-          <span>En biomas específicos</span>
+          <span>{t("evoTree.specificBiomes")}</span>
           <InfoIcon className="h-4 w-4 text-pk-primary-300" />
         </span>
       )

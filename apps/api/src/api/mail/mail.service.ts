@@ -1,6 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { Logger } from 'nestjs-pino';
 import { env } from '@/config/env';
+import {
+  MAIL_TEMPLATES,
+  DEFAULT_MAIL_LOCALE,
+  type MailLocale,
+} from './mail.templates';
 
 export interface SendMailInput {
   to: string;
@@ -62,37 +67,63 @@ export class MailService {
     }
   }
 
+  /**
+   * Resolves the user's stored locale preference to a template locale. Unset,
+   * unknown or malformed values fall back to Spanish — emails are composed
+   * server-side with no browser to translate them, and request
+   * `Accept-Language` is the wrong signal for anything the user did not
+   * trigger from a browser.
+   */
+  private resolveLocale(locale?: string | null): MailLocale {
+    const base = (locale ?? '').toLowerCase().split(/[-_]/)[0];
+    return base in MAIL_TEMPLATES ? (base as MailLocale) : DEFAULT_MAIL_LOCALE;
+  }
+
   /** Password-reset email with a link back to the web reset page. */
-  async sendPasswordReset(to: string, token: string): Promise<void> {
+  async sendPasswordReset(
+    to: string,
+    token: string,
+    locale?: string | null,
+  ): Promise<void> {
     const link = `${this.webUrl}/restablecer?token=${encodeURIComponent(token)}`;
+    const copy = MAIL_TEMPLATES[this.resolveLocale(locale)];
     await this.send({
       to,
-      subject: 'Restablece tu contraseña · BoffMedia',
+      subject: copy.passwordReset.subject,
       html: this.layout(
-        'Restablece tu contraseña',
-        `Recibimos una solicitud para restablecer tu contraseña. Este enlace caduca en 1 hora.`,
-        'Restablecer contraseña',
+        copy.passwordReset.heading,
+        copy.passwordReset.intro,
+        copy.passwordReset.cta,
         link,
-        'Si no fuiste tú, puedes ignorar este correo con seguridad.',
+        copy.passwordReset.footer,
+        copy.lang,
+        copy.fallbackLinkLabel,
       ),
-      text: `Restablece tu contraseña abriendo este enlace (caduca en 1 hora): ${link}\n\nSi no fuiste tú, ignora este correo.`,
+      text: copy.passwordReset.text(link),
     });
   }
 
   /** Email-verification email with a link back to the web verify page. */
-  async sendEmailVerification(to: string, token: string): Promise<void> {
+  async sendEmailVerification(
+    to: string,
+    token: string,
+    locale?: string | null,
+  ): Promise<void> {
     const link = `${this.webUrl}/verificar-email?token=${encodeURIComponent(token)}`;
+    const copy = MAIL_TEMPLATES[this.resolveLocale(locale)];
     await this.send({
       to,
-      subject: 'Verifica tu correo · BoffMedia',
+      subject: copy.emailVerification.subject,
       html: this.layout(
-        'Verifica tu correo',
-        `¡Bienvenido a BoffMedia! Confirma tu dirección de correo para activar tu cuenta. Este enlace caduca en 24 horas.`,
-        'Verificar correo',
+        copy.emailVerification.heading,
+        copy.emailVerification.intro,
+        copy.emailVerification.cta,
         link,
-        'Si no creaste esta cuenta, puedes ignorar este correo.',
+        copy.emailVerification.footer,
+        copy.lang,
+        copy.fallbackLinkLabel,
       ),
-      text: `Verifica tu correo abriendo este enlace (caduca en 24 horas): ${link}\n\nSi no creaste esta cuenta, ignora este correo.`,
+      text: copy.emailVerification.text(link),
     });
   }
 
@@ -108,12 +139,14 @@ export class MailService {
     cta: string,
     link: string,
     footer: string,
+    lang: string,
+    fallbackLinkLabel: string,
   ): string {
     const logo = `${this.webUrl}/img/boff.png`;
     // Palette (BoffMedia v3): bg #0b0d11 · panel #13161c · line #262b35 ·
     // accent #ff5c0a · ink-on-accent #0b0d11 · text #eef0f3 · muted #9aa3b2.
     return `<!doctype html>
-<html lang="es">
+<html lang="${lang}">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -164,7 +197,7 @@ export class MailService {
           <!-- fallback link -->
           <tr>
             <td style="padding:0 34px 24px 34px;font-family:'Segoe UI',Arial,Helvetica,sans-serif;">
-              <p style="margin:0 0 6px 0;font-size:12px;line-height:1.5;color:#6b7280;">Si el botón no funciona, copia y pega este enlace en tu navegador:</p>
+              <p style="margin:0 0 6px 0;font-size:12px;line-height:1.5;color:#6b7280;">${fallbackLinkLabel}</p>
               <p style="margin:0;font-size:12px;line-height:1.5;word-break:break-all;"><a href="${link}" target="_blank" style="color:#ff7a33;text-decoration:underline;">${link}</a></p>
             </td>
           </tr>

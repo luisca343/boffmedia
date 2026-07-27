@@ -34,7 +34,7 @@ export function SpawnTable({ spawns }: { spawns: SpawnInfo[] }) {
           .map((biome) => ({ biome, translated: t(`${biome.replace(" ", "_").replace(":", "_")}`) }))
 
         const times = spawn.condition?.times?.map((time) => t(`${time.toLowerCase()}`)) || [t("spawn_any_time")]
-        const method = spawn.stringLocationTypes?.[0] || "Tierra"
+        const method = spawn.stringLocationTypes?.[0] || t("spawnTable.methodGround")
         const levels = `${spawn.minLevel}-${spawn.maxLevel}`
 
         return (
@@ -53,7 +53,7 @@ export function SpawnTable({ spawns }: { spawns: SpawnInfo[] }) {
               </div>
               <div className="flex flex-wrap gap-1.5">
                 <span className="inline-flex items-center gap-1 text-[11px] text-pk-surface-300 bg-white/[0.04] px-2 py-0.5 rounded">{method}</span>
-                <span className="inline-flex items-center gap-1 text-[11px] text-pk-surface-300 bg-white/[0.04] px-2 py-0.5 rounded">Nv. {levels}</span>
+                <span className="inline-flex items-center gap-1 text-[11px] text-pk-surface-300 bg-white/[0.04] px-2 py-0.5 rounded">{t("spawnTable.levelRange", { range: levels })}</span>
                 <span className="inline-flex items-center gap-1 text-[11px] text-pk-surface-300 bg-white/[0.04] px-2 py-0.5 rounded">{times.join(", ")}</span>
               </div>
             </div>
@@ -61,7 +61,7 @@ export function SpawnTable({ spawns }: { spawns: SpawnInfo[] }) {
             <div className="text-right">
               <div className="font-pk-mono text-[11px] text-pk-surface-500">{spawn.rarity}%</div>
               <div className="font-pk-display font-semibold text-[13px] uppercase tracking-wider" style={{ color: meta.fg }}>
-                {meta.label}
+                {t(meta.labelKey)}
               </div>
             </div>
           </div>

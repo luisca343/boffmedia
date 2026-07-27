@@ -15,6 +15,7 @@
       "trail": "Rastro"
     },
     "roster": {
+      "count": "{count, plural, one {{count} {singular}} other {{count} {label}}}",
       "searchPlaceholder": "Buscar en {category}…",
       "viewGrid": "Rejilla",
       "viewList": "Lista",
@@ -217,6 +218,48 @@
       "kind": "Tipo",
       "hp": "Salud",
       "faction": "Facción"
+    },
+    "cat": {
+      "items": {
+        "label": "Objetos",
+        "singular": "objeto",
+        "desc": "Armas, cabeza, cara, cuello, abalorios, consumibles, malditos y parásitos."
+      },
+      "characters": {
+        "label": "Bestiario",
+        "singular": "personaje",
+        "desc": "Enemigos, jefes, minijefes, kaijus, aliados y familiares."
+      },
+      "abilities": {
+        "label": "Habilidades",
+        "singular": "habilidad",
+        "desc": "Ataques y hechizos: coste, alcance, daño y efectos."
+      },
+      "passives": {
+        "label": "Pasivas",
+        "singular": "pasiva",
+        "desc": "Pasivas de clase y trastornos, con sus rangos."
+      },
+      "keywords": {
+        "label": "Estados",
+        "singular": "estado",
+        "desc": "Efectos de estado y palabras clave con sus reglas."
+      },
+      "events": {
+        "label": "Eventos",
+        "singular": "evento",
+        "desc": "Eventos de mapa: elecciones, chequeos de estadística y recompensas."
+      },
+      "classes": {
+        "label": "Clases",
+        "singular": "clase",
+        "desc": "Clases y clases avanzadas con sus reservas de habilidades."
+      },
+      "maps": {
+        "label": "Mapas",
+        "singular": "mapa",
+        "desc": "Áreas por acto y capítulo: enemigos, jefes, objetos y eventos."
+      }
     }
   }
 }

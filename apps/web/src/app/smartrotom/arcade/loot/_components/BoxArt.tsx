@@ -2,6 +2,7 @@
 
 import Image from "next/image"
 import { useState } from "react"
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { Icon } from "../../_components/ui"
 import type { ArTone } from "../../_components/ui"
@@ -32,6 +33,7 @@ const FALLBACK_TONE: Record<ArTone, string> = {
  * back on its own. See docs/smartrotom/deferred/arcade.md.
  */
 export function BoxArt({ boxId, size, tone, className }: BoxArtProps) {
+  const t = useTranslations("arcade")
   const [broken, setBroken] = useState(false)
   const file = boxId.split(":")[1] || boxId
 
@@ -41,7 +43,7 @@ export function BoxArt({ boxId, size, tone, className }: BoxArtProps) {
         className={cn("grid place-items-center rounded-2xl border", FALLBACK_TONE[tone], className)}
         style={{ width: size, height: size }}
         role="img"
-        aria-label="Caja sin ilustración"
+        aria-label={t("loot.boxArtAria")}
       >
         <Icon.Box s={Math.round(size * 0.5)} />
       </div>

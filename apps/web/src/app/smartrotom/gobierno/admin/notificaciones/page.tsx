@@ -2,6 +2,7 @@
 
 import { Suspense, useEffect, useState } from "react"
 import { useSearchParams } from "next/navigation"
+import { useTranslations } from "next-intl"
 import {
   Avatar,
   Bar,
@@ -19,14 +20,14 @@ import { ConsolaHero } from "../../_components/admin/ConsolaHero"
 import { useAdminUsers, useSendNotification } from "../../_components/admin/adminApi"
 import { TONES, type Tone } from "../../_utils/tones"
 
-const NOTIF_TYPES: { value: string; label: string; icon: IconName; tone: Tone }[] = [
-  { value: "system", label: "Sistema", icon: "server", tone: "poblacion" },
-  { value: "chatapp", label: "Mensajes", icon: "send", tone: "seguridad" },
-  { value: "starbank", label: "Banco", icon: "coins", tone: "hacienda" },
-  { value: "arcade", label: "Arcade", icon: "zap", tone: "justicia" },
-  { value: "misiones", label: "Misiones", icon: "star", tone: "gold" },
-  { value: "bidkea", label: "Subastas", icon: "gavel", tone: "urbanismo" },
-  { value: "admin", label: "Admin", icon: "lock", tone: "default" },
+const NOTIF_TYPES: { value: string; labelKey: string; icon: IconName; tone: Tone }[] = [
+  { value: "system", labelKey: "notificaciones.typeSistema", icon: "server", tone: "poblacion" },
+  { value: "chatapp", labelKey: "notificaciones.typeMensajes", icon: "send", tone: "seguridad" },
+  { value: "starbank", labelKey: "notificaciones.typeBanco", icon: "coins", tone: "hacienda" },
+  { value: "arcade", labelKey: "notificaciones.typeArcade", icon: "zap", tone: "justicia" },
+  { value: "misiones", labelKey: "notificaciones.typeMisiones", icon: "star", tone: "gold" },
+  { value: "bidkea", labelKey: "notificaciones.typeSubastas", icon: "gavel", tone: "urbanismo" },
+  { value: "admin", labelKey: "notificaciones.typeAdmin", icon: "lock", tone: "default" },
 ]
 
 // `useSearchParams` opts its subtree into Suspense at build time — without this
@@ -40,6 +41,7 @@ export default function NotificacionesPage() {
 }
 
 function NotificacionesScreen() {
+  const t = useTranslations("gobierno")
   const searchParams = useSearchParams()
   const presetUuid = searchParams.get("uuid")
 
@@ -83,18 +85,18 @@ function NotificacionesScreen() {
   return (
     <>
       <PageHead
-        kicker="Administración · Mensajería"
+        kicker={t("notificaciones.kicker")}
         dep="gold"
-        title="Notificaciones push"
-        sub="Envía avisos al SmartRotom de un jugador. Antes NotifyBell."
+        title={t("notificaciones.title")}
+        sub={t("notificaciones.sub")}
       />
-      <ConsolaHero title="NotifyBell" code="notificaciones" icon="bell" dep="gold" />
+      <ConsolaHero title={t("notificaciones.heroTitle")} code="notificaciones" icon="bell" dep="gold" />
 
       <div className="grid gap-4 lg:grid-cols-2">
         <div className="grid gap-4">
           <Card className="overflow-hidden">
             <Bar icon="users" dep="gold">
-              Destinatario
+              {t("notificaciones.destinatario")}
             </Bar>
             <div className="p-4">
               {usersLoading ? (
@@ -105,7 +107,7 @@ function NotificacionesScreen() {
                   icon="search"
                   value={query}
                   onChange={setQuery}
-                  placeholder="Buscar jugador por nombre o UUID…"
+                  placeholder={t("notificaciones.buscarPlaceholder")}
                 />
               )}
               {query && !tgt && (
@@ -130,7 +132,7 @@ function NotificacionesScreen() {
                       </button>
                     ))
                   ) : (
-                    <div className="px-3 py-2.5 text-xs text-gt-ink-400">Sin resultados</div>
+                    <div className="px-3 py-2.5 text-xs text-gt-ink-400">{t("common.noResults")}</div>
                   )}
                 </Sunken>
               )}
@@ -144,7 +146,7 @@ function NotificacionesScreen() {
                   <button
                     type="button"
                     onClick={() => setTarget("")}
-                    aria-label="Quitar destinatario"
+                    aria-label={t("notificaciones.quitarDestinatario")}
                     className="ml-auto text-gt-ink-400 hover:text-gt-ink-900"
                   >
                     <Icon name="x" size={15} />
@@ -156,24 +158,24 @@ function NotificacionesScreen() {
 
           <Card className="overflow-hidden">
             <Bar icon="layers" dep="gold">
-              Categoría
+              {t("notificaciones.categoria")}
             </Bar>
             <div className="grid grid-cols-2 gap-2 p-3.5 sm:grid-cols-3">
-              {NOTIF_TYPES.map((t) => {
-                const on = type === t.value
-                const tone = TONES[t.tone]
+              {NOTIF_TYPES.map((nt) => {
+                const on = type === nt.value
+                const tone = TONES[nt.tone]
                 return (
                   <button
-                    key={t.value}
+                    key={nt.value}
                     type="button"
-                    onClick={() => setType(t.value)}
+                    onClick={() => setType(nt.value)}
                     className={`flex items-center gap-2.5 rounded-gt border px-[11px] py-2.5 text-left transition-colors ${
                       on ? `${tone.softBg} ${tone.border} shadow-gt-sm` : "border-gt-line bg-gt-paper-0"
                     }`}
                   >
-                    <Icon name={t.icon} size={17} className={`flex-none ${on ? tone.text : "text-gt-ink-400"}`} />
+                    <Icon name={nt.icon} size={17} className={`flex-none ${on ? tone.text : "text-gt-ink-400"}`} />
                     <span className={`text-[12.5px] font-bold ${on ? "text-gt-ink-900" : "text-gt-ink-600"}`}>
-                      {t.label}
+                      {t(nt.labelKey)}
                     </span>
                   </button>
                 )
@@ -184,31 +186,31 @@ function NotificacionesScreen() {
 
         <Card className="h-fit overflow-hidden">
           <Bar icon="fileText" dep="gold">
-            Contenido
+            {t("notificaciones.contenido")}
           </Bar>
           <div className="p-4">
             <div className="mb-1.5 font-gt-mono text-[9px] font-bold uppercase tracking-[.12em] text-gt-ink-400">
-              Título *
+              {t("notificaciones.titulo")} *
             </div>
             <div className="mb-3.5">
-              <Field id="notif-title" value={title} onChange={setTitle} placeholder="Título de la notificación" />
+              <Field id="notif-title" value={title} onChange={setTitle} placeholder={t("notificaciones.tituloPlaceholder")} />
             </div>
             <div className="mb-1.5 font-gt-mono text-[9px] font-bold uppercase tracking-[.12em] text-gt-ink-400">
-              Mensaje *
+              {t("notificaciones.mensaje")} *
             </div>
             <div className="mb-3.5">
-              <TextArea id="notif-body" rows={3} value={body} onChange={setBody} placeholder="Cuerpo del mensaje…" />
+              <TextArea id="notif-body" rows={3} value={body} onChange={setBody} placeholder={t("notificaciones.mensajePlaceholder")} />
             </div>
             <div className="mb-1.5 font-gt-mono text-[9px] font-bold uppercase tracking-[.12em] text-gt-ink-400">
-              Enlace <span className="normal-case tracking-normal text-gt-ink-300">(opcional)</span>
+              {t("notificaciones.enlace")} <span className="normal-case tracking-normal text-gt-ink-300">{t("notificaciones.enlaceOpcional")}</span>
             </div>
             <div className="mb-4">
-              <Field id="notif-link" mono value={link} onChange={setLink} placeholder="app://…" />
+              <Field id="notif-link" mono value={link} onChange={setLink} placeholder={t("notificaciones.enlacePlaceholder")} />
             </div>
 
             <Sunken className="mb-3.5 px-[13px] py-[11px]">
               <div className="mb-2 font-gt-mono text-[8.5px] uppercase tracking-[.12em] text-gt-ink-400">
-                Vista previa
+                {t("notificaciones.vistaPrevia")}
               </div>
               <div className="flex items-start gap-2.5">
                 <div className={`grid h-[30px] w-[30px] flex-none place-items-center rounded-[7px] ${TONES[activeType.tone].softBg} border ${TONES[activeType.tone].softBorder}`}>
@@ -216,22 +218,22 @@ function NotificacionesScreen() {
                 </div>
                 <div className="min-w-0">
                   <div className="text-[13px] font-bold text-gt-ink-900">
-                    {title || <span className="text-gt-ink-300">Título…</span>}
+                    {title || <span className="text-gt-ink-300">{t("notificaciones.tituloPreview")}</span>}
                   </div>
                   <div className="mt-0.5 text-[12px] leading-normal text-gt-ink-500">
-                    {body || <span className="text-gt-ink-300">Mensaje…</span>}
+                    {body || <span className="text-gt-ink-300">{t("notificaciones.mensajePreview")}</span>}
                   </div>
                 </div>
               </div>
             </Sunken>
 
             <Button icon="send" tone="gold" className="w-full" disabled={!canSend} onClick={send}>
-              {sendNotification.isPending ? "Enviando…" : "Enviar notificación"}
+              {sendNotification.isPending ? t("common.sending") : t("notificaciones.enviarNotificacion")}
             </Button>
             <div className="mt-2.5 text-center font-gt-mono text-[10px] text-gt-ink-400">
               {target
-                ? "Llega a un único jugador — no existe un endpoint de difusión masiva."
-                : "Selecciona un destinatario para enviar"}
+                ? t("notificaciones.llegaUnico")
+                : t("notificaciones.seleccionaDestinatario")}
             </div>
           </div>
         </Card>

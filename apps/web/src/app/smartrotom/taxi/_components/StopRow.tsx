@@ -1,7 +1,8 @@
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { Icon, RegionTag } from "./ui"
 import { formatMoney, formatNum } from "../_utils/format"
-import { compassLabel } from "../_utils/geo"
+import { compassKey } from "../_utils/geo"
 import type { EnrichedStop } from "../_types"
 
 /**
@@ -24,6 +25,7 @@ export function StopRow({
   onSelect: (stop: EnrichedStop) => void
   onToggleFavorite: (id: string) => void
 }) {
+  const t = useTranslations("taxi")
   return (
     <div
       role="button"
@@ -74,7 +76,7 @@ export function StopRow({
               className="text-tx-accent"
               style={{ transform: `rotate(${stop.bearing}deg)` }}
             />
-            {compassLabel(stop.bearing)}
+            {t(`compass.${compassKey(stop.bearing)}`)}
           </span>
         </span>
       </span>
@@ -86,7 +88,11 @@ export function StopRow({
             e.stopPropagation()
             onToggleFavorite(stop.id)
           }}
-          aria-label={favorite ? `Quitar ${stop.id} de favoritos` : `Añadir ${stop.id} a favoritos`}
+          aria-label={
+            favorite
+              ? t("stopRow.removeFromFavorites", { name: stop.id })
+              : t("stopRow.addToFavorites", { name: stop.id })
+          }
           aria-pressed={favorite}
           className={cn(
             "grid h-[26px] w-[26px] place-items-center rounded-lg transition-[color,transform] duration-150 ease-tx",

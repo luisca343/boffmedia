@@ -211,16 +211,17 @@ export function HighwaySign({
   )
 }
 
-export const ROAD_TYPES: { value: CartelRoadType; label: string; example: string }[] = [
-  { value: "autopista", label: "Autopista", example: "A-2" },
-  { value: "nacional", label: "Nacional", example: "N-IV" },
-  { value: "comarcal", label: "Comarcal", example: "TE-12" },
-  { value: "rural", label: "Rural", example: "Camino del Bosque" },
+// `example` values are illustrative in-world route/road names, not chrome — never translated.
+export const ROAD_TYPES: { value: CartelRoadType; labelKey: string; example: string }[] = [
+  { value: "autopista", labelKey: "senalizacion.roadAutopista", example: "A-2" },
+  { value: "nacional", labelKey: "senalizacion.roadNacional", example: "N-IV" },
+  { value: "comarcal", labelKey: "senalizacion.roadComarcal", example: "TE-12" },
+  { value: "rural", labelKey: "senalizacion.roadRural", example: "Camino del Bosque" },
 ]
 
-export const DIR_OPTIONS: { value: CartelDirection; label: string }[] = [
-  { value: "recto", label: "↑ Recto" },
-  { value: "left", label: "← Izquierda" },
-  { value: "right", label: "→ Derecha" },
-  { value: "down", label: "↓ Salida" },
+export const DIR_OPTIONS: { value: CartelDirection; labelKey: string }[] = [
+  { value: "recto", labelKey: "senalizacion.dirRecto" },
+  { value: "left", labelKey: "senalizacion.dirIzquierda" },
+  { value: "right", labelKey: "senalizacion.dirDerecha" },
+  { value: "down", labelKey: "senalizacion.dirSalida" },
 ]

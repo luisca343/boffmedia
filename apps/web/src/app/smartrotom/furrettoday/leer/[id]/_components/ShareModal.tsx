@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 
 import { Button, Eyebrow, Modal, toast } from "../../../_components/ui";
 
@@ -18,6 +19,7 @@ export function ShareModal({
   onClose: () => void;
   title: string;
 }) {
+  const t = useTranslations("furrettoday.shareModal");
   const [copied, setCopied] = useState(false);
 
   // Read only once the dialog is actually open — i.e. after a real click,
@@ -31,14 +33,14 @@ export function ShareModal({
         setCopied(true);
         window.setTimeout(() => setCopied(false), 2000);
       })
-      .catch(() => toast.error("No se pudo copiar el enlace."));
+      .catch(() => toast.error(t("copyError")));
   }
 
   function copyForDiscord() {
     navigator.clipboard
       .writeText(url)
-      .then(() => toast("Enlace copiado. Pégalo en tu servidor de Discord."))
-      .catch(() => toast.error("No se pudo copiar el enlace."));
+      .then(() => toast(t("discordCopied")))
+      .catch(() => toast.error(t("copyError")));
   }
 
   function openIntent(href: string) {
@@ -49,12 +51,12 @@ export function ShareModal({
     <Modal
       open={open}
       onClose={onClose}
-      label="Compartir artículo"
+      label={t("title")}
       className="px-6 pb-6 pt-9"
     >
-      <Eyebrow className="text-ft-pink">COMPARTIR</Eyebrow>
+      <Eyebrow className="text-ft-pink">{t("eyebrow")}</Eyebrow>
       <h3 className="font-ft-display mb-4 mt-1 text-3xl leading-none">
-        Pasa la voz
+        {t("heading")}
       </h3>
       <div className="grid grid-cols-2 gap-2.5">
         <Button variant="default" onClick={copyForDiscord}>
@@ -81,7 +83,7 @@ export function ShareModal({
           Reddit
         </Button>
         <Button variant="primary" onClick={copyLink}>
-          {copied ? "✓ Copiado" : "Copiar enlace"}
+          {copied ? t("copied") : t("copyLink")}
         </Button>
       </div>
     </Modal>

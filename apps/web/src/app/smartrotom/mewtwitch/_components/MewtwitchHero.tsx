@@ -1,5 +1,8 @@
+"use client"
+
 import { useTranslations } from "next-intl"
 import { Avatar, Button, I, LivePill, PulseDot, Tag } from "@/components/smartrotom/media/ui"
+import { useFormat } from "@/lib/useFormat"
 
 export interface HeroData {
   href: string
@@ -16,6 +19,7 @@ export interface HeroData {
 /** Home hero — the featured live stream with a bled preview + viewer pulse. */
 export function MewtwitchHero({ data }: { data: HeroData }) {
   const t = useTranslations("twitch")
+  const { number } = useFormat()
 
   return (
     <section className="relative h-[480px] overflow-hidden">
@@ -34,7 +38,7 @@ export function MewtwitchHero({ data }: { data: HeroData }) {
       />
       <LivePill size="lg" className="absolute left-3 top-3 z-[3]" />
       <div className="absolute right-3 top-3 z-[3] inline-flex items-center gap-1.5 rounded-mw-pill border border-mw-line-strong bg-black/60 px-2.5 py-1 text-xs text-white backdrop-blur-[10px]">
-        <PulseDot /> <strong className="font-mono">{data.viewers.toLocaleString("es-ES")}</strong> {t("hero.viewingNow")}
+        <PulseDot /> <strong className="font-mono">{number(data.viewers)}</strong> {t("hero.viewingNow")}
       </div>
 
       <div className="relative z-[2] mx-auto flex h-full max-w-[1640px] flex-col justify-center px-6 md:px-10">

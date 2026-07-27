@@ -1,6 +1,6 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { Overlay, MODAL_PANEL, Icon } from "../ui";
 import { useRotomRequest } from "@/hooks/useRotomRequest";
 import { DocumentsService } from "@/services/api/smartrotom/documentsService";
@@ -18,6 +18,7 @@ export function VersionHistory({
   onRestore: (versionId: number) => void;
 }) {
   const t = useTranslations("notas");
+  const locale = useLocale();
   const { data, isLoading } = useRotomRequest<NoteVersion[]>(DocumentsService.getVersions, note.id);
   const versions = data ?? [];
 
@@ -58,7 +59,7 @@ export function VersionHistory({
                     </span>
                     <span className="text-[11px] tabular-nums text-nt-fg-subtle">{t("history.words", { count: v.words })}</span>
                   </div>
-                  <div className="mt-0.5 text-[11.5px] text-nt-fg-subtle">{fullDate(toMs(v.createdAt))}</div>
+                  <div className="mt-0.5 text-[11.5px] text-nt-fg-subtle">{fullDate(toMs(v.createdAt), locale)}</div>
                 </div>
                 {i !== 0 && (
                   <button

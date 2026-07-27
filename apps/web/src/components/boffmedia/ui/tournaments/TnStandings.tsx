@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { DkFlag, DkPin } from "@/components/boffmedia/ui/tools/datakit"
 import { TnAvatar } from "./TnEntrant"
@@ -39,24 +40,25 @@ const diff = (s: TnStanding) => (s.gf - s.ga > 0 ? "+" : "") + (s.gf - s.ga)
 
 // Round-robin mini group card. `.tn-group`
 export function TnGroupCard({ group, advance = 2, onOpen, pinned, onPin }: { group: TnGroup; advance?: number; onOpen?: (id: string) => void; pinned?: string | null; onPin?: (id: string) => void }) {
+  const t = useTranslations("torneos.standings")
   const th = "border-b border-solid border-line px-[10px] py-[7px] text-left font-mono text-[8.5px]/none font-bold uppercase tracking-[0.08em] text-txt-dim"
   const td = "border-b border-solid border-line px-[10px] py-[7px] text-[12.5px] [tr:last-child_&]:border-b-0"
   return (
     <div className="border border-solid border-line bg-panel">
       <div className="flex items-center justify-between border-b border-solid border-line bg-base-2 px-[13px] py-[9px]">
         <b className="font-display text-[14px]/none font-bold uppercase tracking-[0.03em]">{group.name}</b>
-        <span className="font-mono text-[9.5px]/none font-medium text-txt-dim">{group.done}/{group.total} jugados</span>
+        <span className="font-mono text-[9.5px]/none font-medium text-txt-dim">{t("playedOf", { done: group.done, total: group.total })}</span>
       </div>
       <div className="overflow-x-auto">
         <table className="w-full border-collapse">
           <thead>
             <tr>
               <th className={th} style={{ width: 30 }}>#</th>
-              <th className={th}>Competidor</th>
-              <th className={cn(th, "text-center")} style={{ width: 34 }}>PJ</th>
-              <th className={cn(th, "text-center")} style={{ width: 66 }}>V-E-D</th>
-              <th className={cn(th, "text-right")} style={{ width: 42 }}>Dif</th>
-              <th className={cn(th, "text-right")} style={{ width: 40 }}>Pts</th>
+              <th className={th}>{t("colCompetitor")}</th>
+              <th className={cn(th, "text-center")} style={{ width: 34 }}>{t("colPlayed")}</th>
+              <th className={cn(th, "text-center")} style={{ width: 66 }}>{t("colRecord")}</th>
+              <th className={cn(th, "text-right")} style={{ width: 42 }}>{t("colDiff")}</th>
+              <th className={cn(th, "text-right")} style={{ width: 40 }}>{t("colPoints")}</th>
             </tr>
           </thead>
           <tbody>
@@ -104,6 +106,7 @@ function WdlCell({ s }: { s: TnStanding }) {
 
 // Recent form pips from the crosstable. `.tn-form`
 export function TnForm({ c, league }: { c: TnCompetitor; league: TnLeague }) {
+  const t = useTranslations("torneos.standings")
   const { entrants, grid } = league.crosstable
   const i = entrants.findIndex((e) => e.id === c.id)
   const res: string[] = []
@@ -117,7 +120,7 @@ export function TnForm({ c, league }: { c: TnCompetitor; league: TnLeague }) {
         last.map((r, k) => (
           <span
             key={k}
-            title={r === "w" ? "Victoria" : r === "l" ? "Derrota" : "Empate"}
+            title={r === "w" ? t("resultWin") : r === "l" ? t("resultLoss") : t("resultDraw")}
             className={cn("inline-grid h-[18px] w-[18px] place-items-center font-mono text-[9px]/none font-extrabold text-white", r === "w" ? "bg-ok" : r === "l" ? "bg-bad" : "bg-[color:var(--dim)]")}
           >
             {r === "w" ? "V" : r === "l" ? "D" : "E"}
@@ -130,6 +133,7 @@ export function TnForm({ c, league }: { c: TnCompetitor; league: TnLeague }) {
 
 // League (round robin) table. `.tn-ltable` on `.dk-table`
 export function TnLeagueTable({ league, onOpen, pinned, onPin, promo = 4 }: { league: TnLeague; onOpen?: (id: string) => void; pinned?: string | null; onPin?: (id: string) => void; promo?: number }) {
+  const t = useTranslations("torneos.standings")
   const th = "sticky top-0 z-[2] border-b border-solid border-line-2 bg-base-2 px-3 py-2.5 text-left font-mono text-[9px]/none font-semibold uppercase tracking-[0.14em] text-txt-dim whitespace-nowrap"
   const td = "border-b border-solid border-[color:color-mix(in_srgb,var(--line)_60%,transparent)] px-3 py-[9px] font-body text-[13px]/[1.35] align-middle [tr:last-child_&]:border-b-0"
   const mono = "font-mono text-[12px]"
@@ -139,14 +143,14 @@ export function TnLeagueTable({ league, onOpen, pinned, onPin, promo = 4 }: { le
         <thead>
           <tr>
             <th className={th} style={{ width: 44 }}>#</th>
-            <th className={th}>Competidor</th>
-            <th className={cn(th, "text-center")} style={{ width: 40 }}>PJ</th>
-            <th className={cn(th, "text-center")} style={{ width: 40 }}>V</th>
-            <th className={cn(th, "text-center")} style={{ width: 40 }}>E</th>
-            <th className={cn(th, "text-center")} style={{ width: 40 }}>D</th>
-            <th className={cn(th, "text-right")} style={{ width: 64 }}>Dif</th>
-            <th className={th} style={{ width: 130 }}>Forma</th>
-            <th className={cn(th, "text-right")} style={{ width: 48 }}>Pts</th>
+            <th className={th}>{t("colCompetitor")}</th>
+            <th className={cn(th, "text-center")} style={{ width: 40 }}>{t("colPlayed")}</th>
+            <th className={cn(th, "text-center")} style={{ width: 40 }}>{t("colW")}</th>
+            <th className={cn(th, "text-center")} style={{ width: 40 }}>{t("colD")}</th>
+            <th className={cn(th, "text-center")} style={{ width: 40 }}>{t("colL")}</th>
+            <th className={cn(th, "text-right")} style={{ width: 64 }}>{t("colDiff")}</th>
+            <th className={th} style={{ width: 130 }}>{t("colForm")}</th>
+            <th className={cn(th, "text-right")} style={{ width: 48 }}>{t("colPoints")}</th>
           </tr>
         </thead>
         <tbody>
@@ -188,6 +192,7 @@ export function TnLeagueTable({ league, onOpen, pinned, onPin, promo = 4 }: { le
 
 // All-vs-all results matrix. `.tn-cross`
 export function TnCrosstable({ crosstable, onOpen }: { crosstable: TnCrosstableData; onOpen?: (id: string) => void }) {
+  const t = useTranslations("torneos.standings")
   const { entrants, grid } = crosstable
   const bordered = "border border-solid border-line text-center"
   return (
@@ -218,7 +223,7 @@ export function TnCrosstable({ crosstable, onOpen }: { crosstable: TnCrosstableD
                 return (
                   <td
                     key={f.id}
-                    title={g ? `${e.name} ${g.s} ${f.name}` : "Pendiente"}
+                    title={g ? `${e.name} ${g.s} ${f.name}` : t("pending")}
                     className={cn(
                       bordered,
                       "h-[34px] w-[42px] font-mono text-[10px]/none font-semibold text-txt-muted",

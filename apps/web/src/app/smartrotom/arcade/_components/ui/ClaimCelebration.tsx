@@ -1,7 +1,9 @@
 "use client"
 
 import { useEffect, type ReactNode } from "react"
+import { useTranslations } from "next-intl"
 import { useCountUp, prefersReducedMotion } from "../../_hooks/useCountUp"
+import { useFormat } from "@/lib/useFormat"
 import { raritySkin, type ArRarity } from "../../_utils/rarity"
 import { Corners } from "./Corners"
 
@@ -27,8 +29,10 @@ const PARTICLE_COUNT = 16
  * fixed overlay covers the viewport regardless (SMARTROTOM_V3.md §2).
  */
 export function ClaimCelebration({ reward, onClose }: ClaimCelebrationProps) {
+  const t = useTranslations("arcade")
   const reduce = prefersReducedMotion()
   const display = useCountUp(reward?.amount ?? 0, 900)
+  const { number } = useFormat()
 
   useEffect(() => {
     if (!reward) return
@@ -48,7 +52,7 @@ export function ClaimCelebration({ reward, onClose }: ClaimCelebrationProps) {
     <div
       role="dialog"
       aria-modal="true"
-      aria-label={`Recompensa obtenida: ${reward.name}`}
+      aria-label={t("celebration.ariaLabel", { name: reward.name })}
       onClick={onClose}
       className="fixed inset-0 z-[9999] grid cursor-pointer place-items-center bg-[rgb(4_2_14/.78)] backdrop-blur-lg"
     >
@@ -94,7 +98,7 @@ export function ClaimCelebration({ reward, onClose }: ClaimCelebrationProps) {
           className="relative mb-[18px] font-ar-mono text-[11px] font-bold uppercase tracking-[0.2em]"
           style={{ color: skin.fg }}
         >
-          ¡Recompensa obtenida!
+          {t("celebration.rewardObtained")}
         </div>
 
         <div
@@ -111,12 +115,12 @@ export function ClaimCelebration({ reward, onClose }: ClaimCelebrationProps) {
 
         {reward.amount != null && (
           <div className="mb-1.5 font-ar-display text-[30px] text-ar-ink">
-            {display.toLocaleString("es-ES")}
+            {number(display)}
           </div>
         )}
         <div className="font-ar text-base font-bold text-ar-ink">{reward.name}</div>
         <div className="mt-1.5 font-ar-mono text-xs uppercase" style={{ color: skin.fg }}>
-          {skin.name}
+          {t(skin.nameKey)}
         </div>
 
         <button
@@ -126,7 +130,7 @@ export function ClaimCelebration({ reward, onClose }: ClaimCelebrationProps) {
           className="ar-lift mt-[22px] w-full rounded-[10px] border border-white/[.18] p-3 font-ar text-xs font-extrabold uppercase tracking-[0.08em] text-[#0a0420]"
           style={{ background: `linear-gradient(180deg, ${skin.fg}, ${skin.bd})` }}
         >
-          ¡Genial!
+          {t("celebration.great")}
         </button>
       </div>
     </div>

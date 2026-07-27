@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { useLocale } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { MhWildsService } from '@/services/api/tools/mhWildsService';
 
 export interface WeaponTree {
@@ -9,6 +9,7 @@ export interface WeaponTree {
 
 export function useWeaponTreeData() {
   const locale = useLocale();
+  const t = useTranslations('mhwilds.tree');
   const [weaponTree, setWeaponTree] = useState<WeaponTree | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -45,7 +46,7 @@ export function useWeaponTreeData() {
       setError(null);
     } catch (err) {
       console.error('Error fetching weapon tree:', err);
-      setError('Error loading weapon tree data. Please try again.');
+      setError(t('loadErrorDetail'));
     } finally {
       setLoading(false);
     }

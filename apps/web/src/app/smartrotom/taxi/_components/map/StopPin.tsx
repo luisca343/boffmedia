@@ -1,3 +1,4 @@
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { Icon } from "../ui"
 import type { EnrichedStop } from "../../_types"
@@ -16,6 +17,7 @@ export function StopPin({
   selected: boolean
   onSelect: (stop: EnrichedStop) => void
 }) {
+  const t = useTranslations("taxi.map")
   return (
     <button
       type="button"
@@ -26,7 +28,7 @@ export function StopPin({
         e.stopPropagation()
         onSelect(stop)
       }}
-      aria-label={`Destino ${stop.id}`}
+      aria-label={t("destination", { name: stop.id })}
       aria-pressed={selected}
       className={cn(
         "absolute z-[12] inline-flex -translate-x-1/2 -translate-y-1/2 items-center gap-[7px]",
@@ -73,6 +75,7 @@ export function OffscreenPin({
   selected: boolean
   onSelect: (stop: EnrichedStop) => void
 }) {
+  const t = useTranslations("taxi.map")
   return (
     <button
       type="button"
@@ -83,7 +86,7 @@ export function OffscreenPin({
         onSelect(stop)
       }}
       title={stop.id}
-      aria-label={`Ir a ${stop.id}`}
+      aria-label={t("goTo", { name: stop.id })}
       className={cn(
         "absolute z-[18] grid h-[30px] w-[30px] -translate-x-1/2 -translate-y-1/2 place-items-center",
         "rounded-full border border-solid shadow-tx-1",
@@ -101,6 +104,7 @@ export function OffscreenPin({
 
 /** The player. Pings so you can find yourself on a busy map at a glance. */
 export function PlayerMarker({ x, y, reduceMotion }: { x: number; y: number; reduceMotion: boolean }) {
+  const t = useTranslations("taxi.map")
   return (
     <div
       className="pointer-events-none absolute z-20 -translate-x-1/2 -translate-y-1/2"
@@ -111,7 +115,7 @@ export function PlayerMarker({ x, y, reduceMotion }: { x: number; y: number; red
         <span className="absolute -inset-[14px] rounded-full bg-tx-blue-400 opacity-30 animate-tx-ping motion-reduce:animate-none" />
       )}
       <span className="relative grid h-[38px] w-[38px] place-items-center rounded-full border-[2.5px] border-solid border-white bg-[linear-gradient(140deg,rgb(var(--tx-blue-400)),rgb(var(--tx-blue-700)))] shadow-[0_0_16px_rgb(59_130_246/0.7)]">
-        <span className="text-[11px] font-extrabold tracking-[0.3px] text-white">TÚ</span>
+        <span className="text-[11px] font-extrabold tracking-[0.3px] text-white">{t("you")}</span>
       </span>
     </div>
   )

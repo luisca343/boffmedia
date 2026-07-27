@@ -3,6 +3,7 @@
 import * as React from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { Badge, Button, Empty, Icon, IconButton, Spinner } from "@/components/boffmedia/primitives"
 import { Byline, fmtNum, ForumComposer, ForumMarkdown } from "@/components/boffmedia/ui/community"
@@ -29,6 +30,7 @@ function ErrorNote({ children }: { children: React.ReactNode }) {
 }
 
 export function ForumThreadView({ threadId, cat }: { threadId: number; cat: string }) {
+  const t = useTranslations("foro.thread")
   const router = useRouter()
   const [now] = React.useState(() => new Date())
   const [limit, setLimit] = React.useState(PAGE)
@@ -66,9 +68,9 @@ export function ForumThreadView({ threadId, cat }: { threadId: number; cat: stri
   if (threadError || !thread) {
     return (
       <main data-ds="boffmedia" className="wrap">
-        <Empty icon="alert" title="Hilo no encontrado" lead="Este hilo no existe o ya no está disponible.">
+        <Empty icon="alert" title={t("notFoundTitle")} lead={t("notFoundLead")}>
           <Button variant="pri" icon="back" href={`/foro/${cat}`}>
-            Volver al tablón
+            {t("backToCat")}
           </Button>
         </Empty>
       </main>
@@ -147,7 +149,7 @@ export function ForumThreadView({ threadId, cat }: { threadId: number; cat: stri
   }
 
   const handleDelete = (postId: number) => {
-    if (typeof window !== "undefined" && !window.confirm("¿Eliminar este mensaje? Esta acción no se puede deshacer.")) return
+    if (typeof window !== "undefined" && !window.confirm(t("confirmDelete"))) return
     deletePost(postId).then((res) => {
       if (res) {
         refetchThread()
@@ -160,7 +162,7 @@ export function ForumThreadView({ threadId, cat }: { threadId: number; cat: stri
     <main data-ds="boffmedia" className="wrap pb-[90px] pt-6">
       <nav className="mb-5 flex flex-wrap items-center gap-2 font-mono text-[11px]/none font-semibold uppercase tracking-[0.1em] text-txt-dim">
         <Link href="/foro" className="no-underline transition-colors hover:text-txt">
-          Foro
+          {t("breadcrumb")}
         </Link>
         <span className="text-line-2">›</span>
         <Link href={`/foro/${thread.catSlug}`} className="no-underline transition-colors hover:text-txt">
@@ -172,25 +174,25 @@ export function ForumThreadView({ threadId, cat }: { threadId: number; cat: stri
 
       <header className="mb-6 border-b border-solid border-line pb-6">
         <div className="mb-3 flex flex-wrap items-center gap-2.5">
-          {thread.pinned && <Badge tone="new">Fijado</Badge>}
+          {thread.pinned && <Badge tone="new">{t("pinned")}</Badge>}
           {thread.locked && (
             <Badge>
               <span className="inline-flex items-center gap-1">
-                <Icon name="lock" size={11} /> Cerrado
+                <Icon name="lock" size={11} /> {t("locked")}
               </span>
             </Badge>
           )}
-          {thread.solved && <Badge tone="ok">Resuelto</Badge>}
+          {thread.solved && <Badge tone="ok">{t("solved")}</Badge>}
         </div>
         <h1 className="text-[clamp(28px,4vw,42px)]">{thread.title}</h1>
         <div className="mt-4 flex flex-wrap items-center gap-x-6 gap-y-3">
           <Byline author={toAuthor(thread.author)} when={thread.createdAt} now={now} link={false} />
           <span className="flex items-center gap-4 font-mono text-[11px]/none font-medium uppercase tracking-[0.08em] text-txt-muted">
             <span className="inline-flex items-center gap-1.5">
-              <Icon name="list" size={13} className="text-accent" /> {thread.replies} resp.
+              <Icon name="list" size={13} className="text-accent" /> {t("repliesCount", { count: thread.replies })}
             </span>
             <span className="inline-flex items-center gap-1.5">
-              <Icon name="eye" size={13} className="text-accent" /> {fmtNum(thread.views)} vistas
+              <Icon name="eye" size={13} className="text-accent" /> {t("viewsCount", { count: fmtNum(thread.views) })}
             </span>
           </span>
 
@@ -211,16 +213,16 @@ export function ForumThreadView({ threadId, cat }: { threadId: number; cat: stri
             >
               <Icon name="trending" size={14} />
               <span className="tabular-nums">{fmtNum(displayVotes)}</span>
-              <span>{hasVoted ? "Votado" : "Votar"}</span>
+              <span>{hasVoted ? t("voted") : t("vote")}</span>
             </button>
 
             {admin && (
               <>
                 <Button size="sm" icon="bookmark" onClick={handleTogglePin} loading={pinning}>
-                  {thread.pinned ? "Desfijar" : "Fijar"}
+                  {thread.pinned ? t("unpin") : t("pin")}
                 </Button>
                 <Button size="sm" icon="lock" onClick={handleToggleLock} loading={locking}>
-                  {thread.locked ? "Reabrir" : "Cerrar"}
+                  {thread.locked ? t("reopen") : t("close")}
                 </Button>
               </>
             )}
@@ -233,7 +235,7 @@ export function ForumThreadView({ threadId, cat }: { threadId: number; cat: stri
           <Spinner />
         </div>
       ) : items.length === 0 ? (
-        <Empty icon="mail" title="Sin mensajes" lead="Este hilo todavía no tiene respuestas." />
+        <Empty icon="mail" title={t("emptyTitle")} lead={t("emptyLead")} />
       ) : (
         <>
           <div className="grid gap-4">
@@ -255,8 +257,8 @@ export function ForumThreadView({ threadId, cat }: { threadId: number; cat: stri
                   <div className="mb-4 flex flex-wrap items-center justify-between gap-3 border-b border-solid border-line pb-3">
                     <Byline author={toAuthor(post.author)} when={post.createdAt} now={now} link={false} />
                     <span className="flex items-center gap-2">
-                      {post.isOp && <Badge tone="new">Tema</Badge>}
-                      {post.isSolution && <Badge tone="ok">Respuesta</Badge>}
+                      {post.isOp && <Badge tone="new">{t("op")}</Badge>}
+                      {post.isSolution && <Badge tone="ok">{t("solution")}</Badge>}
                     </span>
                   </div>
 
@@ -265,7 +267,7 @@ export function ForumThreadView({ threadId, cat }: { threadId: number; cat: stri
                       {editError && <ErrorNote>{editError}</ErrorNote>}
                       <ForumComposer
                         initialBody={post.body}
-                        submitLabel="Guardar"
+                        submitLabel={t("save")}
                         busy={editing}
                         onSubmit={(v) => handleEdit(post.id, v.body)}
                         onCancel={() => {
@@ -282,19 +284,19 @@ export function ForumThreadView({ threadId, cat }: { threadId: number; cat: stri
                     <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-solid border-line pt-3">
                       {showSolveMark && (
                         <Button size="sm" icon="check" onClick={() => handleSolve(post.id)} loading={solving}>
-                          Marcar como respuesta
+                          {t("markSolution")}
                         </Button>
                       )}
                       {showUnsolve && (
                         <Button size="sm" icon="x" onClick={handleUnsolve} loading={solving}>
-                          Quitar resuelto
+                          {t("unmarkSolution")}
                         </Button>
                       )}
                       {editable && (
                         <span className="ml-auto flex items-center gap-2">
                           <IconButton
                             name="edit"
-                            label="Editar"
+                            label={t("edit")}
                             size={15}
                             className="h-8 w-8"
                             onClick={() => {
@@ -305,7 +307,7 @@ export function ForumThreadView({ threadId, cat }: { threadId: number; cat: stri
                           {!post.isOp && (
                             <IconButton
                               name="trash"
-                              label="Eliminar"
+                              label={t("delete")}
                               size={15}
                               className="h-8 w-8 hover:border-bad hover:text-bad"
                               onClick={() => handleDelete(post.id)}
@@ -323,7 +325,7 @@ export function ForumThreadView({ threadId, cat }: { threadId: number; cat: stri
           {items.length < total && (
             <div className="mt-5 flex justify-center">
               <Button icon="chevronDown" onClick={() => setLimit((l) => l + PAGE)}>
-                Cargar más
+                {t("loadMore")}
               </Button>
             </div>
           )}
@@ -332,19 +334,19 @@ export function ForumThreadView({ threadId, cat }: { threadId: number; cat: stri
 
       {thread.locked ? (
         <div className="mt-8 flex items-center justify-center gap-2 border border-solid border-line bg-panel-2 py-4 px-5 cut-corner font-mono text-[12px] font-semibold uppercase tracking-[0.08em] text-txt-muted">
-          <Icon name="lock" size={14} /> Este hilo está cerrado
+          <Icon name="lock" size={14} /> {t("closedNotice")}
         </div>
       ) : loggedIn ? (
         <div className="mt-8">
-          <h2 className="mb-3 font-display text-[18px] font-bold uppercase not-italic tracking-[0.03em] text-txt">Responder</h2>
+          <h2 className="mb-3 font-display text-[18px] font-bold uppercase not-italic tracking-[0.03em] text-txt">{t("replyTitle")}</h2>
           {replyError && <ErrorNote>{replyError}</ErrorNote>}
-          <ForumComposer key={replyKey} submitLabel="Responder" busy={replying} onSubmit={handleReply} />
+          <ForumComposer key={replyKey} submitLabel={t("replySubmit")} busy={replying} onSubmit={handleReply} />
         </div>
       ) : (
         <div className="mt-8 flex flex-wrap items-center justify-center gap-3 border border-solid border-line bg-panel py-5 px-5 cut-corner text-center">
-          <span className="font-body text-[14px] text-txt-muted">Únete a la conversación.</span>
+          <span className="font-body text-[14px] text-txt-muted">{t("joinConversation")}</span>
           <Button variant="pri" size="sm" icon="user" href="/entrar">
-            Inicia sesión para responder
+            {t("loginToReply")}
           </Button>
         </div>
       )}

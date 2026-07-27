@@ -1,7 +1,7 @@
 "use client"
 
 import { useCallback, useEffect, useState } from "react"
-import { useLocale } from "next-intl"
+import { useLocale, useTranslations } from "next-intl"
 import { PtcgpService } from "@/services/api/boffmedia/ptcgpService"
 import { boffGET } from "@/services/boffAPI"
 import { useBoffSession } from "@/services/useBoffSession"
@@ -35,6 +35,7 @@ interface UseCollectionOpts {
 export function useCollection({ username, byId }: UseCollectionOpts) {
   const { session, status } = useBoffSession()
   const locale = useLocale()
+  const t = useTranslations("tcgpocket")
 
   const sessionUserId = session?.user?.id != null ? String(session.user.id) : null
   const target = username || sessionUserId // whose collection to load
@@ -126,13 +127,13 @@ export function useCollection({ username, byId }: UseCollectionOpts) {
       setRecent((r) => news.concat(r))
       setChanges({})
       await fetchOwned()
-      toast.success("Cambios guardados")
+      toast.success(t("app.coleccion.saveSuccess"))
     } catch {
-      toast.error("No se pudieron guardar los cambios")
+      toast.error(t("app.coleccion.saveError"))
     } finally {
       setSaving(false)
     }
-  }, [editable, sessionUserId, dirtyCount, changes, owned, byId, fetchOwned])
+  }, [editable, sessionUserId, dirtyCount, changes, owned, byId, fetchOwned, t])
 
   return {
     owned, changes, effective, setChange, dirtyCount, discard, save,

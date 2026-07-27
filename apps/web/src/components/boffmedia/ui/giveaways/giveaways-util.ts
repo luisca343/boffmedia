@@ -1,4 +1,5 @@
 import type { IconName } from "@/components/boffmedia/primitives"
+import { intlLocale } from "@/lib/locale"
 
 // v3 «Señal» — Sorteos (giveaways) shared types + helpers. Mirrors the window
 // helpers from v3-sorteos-data.jsx (srtStatus/srtHue/srtNum/srtOdds…). The
@@ -67,23 +68,25 @@ export interface Sorteo {
 
 export interface SrtStatus {
   key: SrtStatusKey
-  label: string
   tone: string
 }
 
-export const SRT_PRIZE: Record<SrtPrizeType, { label: string; icon: IconName }> = {
-  key: { label: "Clave de juego", icon: "key" },
-  item: { label: "Objeto in-game", icon: "gift" },
-  merch: { label: "Merchandising", icon: "shield" },
-  nitro: { label: "Suscripción", icon: "sparkles" },
-  pass: { label: "Pase de evento", icon: "trophy" },
-  cash: { label: "Saldo / tarjeta", icon: "star" },
+// Labels/descriptions live in locales/{es,en}/common.json under
+// common.giveaways.prize / .source / .status, keyed by these same type/key
+// values — components resolve them with t(`prize.${type}.label`) etc.
+export const SRT_PRIZE: Record<SrtPrizeType, { icon: IconName }> = {
+  key: { icon: "key" },
+  item: { icon: "gift" },
+  merch: { icon: "shield" },
+  nitro: { icon: "sparkles" },
+  pass: { icon: "trophy" },
+  cash: { icon: "star" },
 }
 
-export const SRT_SOURCE: Record<SrtSourceKey, { label: string; icon: IconName; desc: string }> = {
-  comunidad: { label: "Comunidad", icon: "users", desc: "Los miembros se apuntan cumpliendo los requisitos." },
-  twitch: { label: "Viewers de Twitch", icon: "message", desc: "Lista importada del chat en directo." },
-  manual: { label: "Lista manual", icon: "list", desc: "Participantes cargados a mano o por CSV." },
+export const SRT_SOURCE: Record<SrtSourceKey, { icon: IconName }> = {
+  comunidad: { icon: "users" },
+  twitch: { icon: "message" },
+  manual: { icon: "list" },
 }
 
 // Weighted-reel segment colours (mirrors SRT_REEL_COLORS).
@@ -96,18 +99,18 @@ export function srtStatus(g: Sorteo, now: Date = SRT_NOW): SrtStatus {
   const s = new Date(g.startDate).getTime()
   const e = new Date(g.endDate).getTime()
   const t = now.getTime()
-  if (g.winner) return { key: "announced", label: "Ganador anunciado", tone: "accent" }
-  if (t < s) return { key: "upcoming", label: "Próximo", tone: "info" }
-  if (t > e) return { key: "ended", label: "Sorteando", tone: "muted" }
-  return { key: "active", label: "En curso", tone: "live" }
+  if (g.winner) return { key: "announced", tone: "accent" }
+  if (t < s) return { key: "upcoming", tone: "info" }
+  if (t > e) return { key: "ended", tone: "muted" }
+  return { key: "active", tone: "live" }
 }
 
 export function srtHue(g: Sorteo): string {
   return g.hue || "var(--accent)"
 }
 
-export function srtNum(n?: number | null): string {
-  return (n || 0).toLocaleString("es-ES")
+export function srtNum(n?: number | null, locale?: string | null): string {
+  return (n || 0).toLocaleString(intlLocale(locale))
 }
 
 export function srtPrizeMeta(type: SrtPrizeType) {

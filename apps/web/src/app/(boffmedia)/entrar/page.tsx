@@ -1,11 +1,12 @@
 import { Suspense } from "react"
 import type { Metadata } from "next"
+import { getTranslations } from "next-intl/server"
 import { AuthScreen } from "@/components/boffmedia/ui/auth"
 import { discordEnabled, twitchEnabled } from "@/features/authOptions"
 
-export const metadata: Metadata = {
-  title: "Entrar · Boffmedia",
-  description: "Inicia sesión o crea tu cuenta en Boffmedia.",
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("pageMeta.auth")
+  return { title: t("entrar.title"), description: t("entrar.description") }
 }
 
 export default function EntrarPage() {

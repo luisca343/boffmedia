@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 
 import type { FtArticle } from "../_utils/article";
 import { Button, Card, HeroArt, Meta, Pill } from "./ui";
@@ -10,6 +11,7 @@ export function articleHref(id: number) {
 
 /** The standard grid card, shared by the cover screen and the browse screen. */
 export function ArticleCard({ article }: { article: FtArticle }) {
+  const t = useTranslations("furrettoday.articleCard");
   return (
     <Card lift className="relative flex h-full flex-col overflow-hidden">
       <div className="border-ft relative h-[180px] shrink-0 border-x-0 border-t-0 border-b-ft-ink">
@@ -49,7 +51,7 @@ export function ArticleCard({ article }: { article: FtArticle }) {
             {article.readTime}
           </Meta>
           <Button size="sm" tabIndex={-1} aria-hidden="true">
-            Leer →
+            {t("read")}
           </Button>
         </div>
       </div>

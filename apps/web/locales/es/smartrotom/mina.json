@@ -1,1 +1,43 @@
-{"mina":{"reclamar":{"notInMinecraft":"No estás en Minecraft","giveBoxError":"Error al dar la caja","claimSuccess":"Recompensas reclamadas correctamente","claimError":"Error al reclamar las recompensas","noRewards":"No hay recompensas que reclamar","claiming":"RECLAMANDO…","claimAll":"RECLAMAR TODO ({count} CAJAS)"}}}
+{
+  "mina": {
+    "reclamar": {
+      "notInMinecraft": "No estás en Minecraft",
+      "giveBoxError": "Error al dar la caja",
+      "claimSuccess": "Recompensas reclamadas correctamente",
+      "claimError": "Error al reclamar las recompensas",
+      "noRewards": "No hay recompensas que reclamar",
+      "claiming": "RECLAMANDO…",
+      "claimAll": "RECLAMAR TODO ({count} CAJAS)"
+    },
+    "menu": {
+      "title": "Mina 2.0",
+      "play": "Jugar",
+      "history": "Historial",
+      "ranking": "Ranking",
+      "drops": "Drops",
+      "claim": "Reclamar",
+      "exit": "Salir"
+    },
+    "energy": {
+      "nextRecharge": "Siguiente recarga en: {time}"
+    },
+    "drops": {
+      "title": "DROPS"
+    },
+    "history": {
+      "title": "HISTORIAL"
+    },
+    "ranking": {
+      "title": "RANKING",
+      "position": "Posición",
+      "player": "Jugador",
+      "points": "Puntos"
+    },
+    "play": {
+      "rewardsObtained": "Recompensas obtenidas",
+      "start": "Jugar",
+      "playAgain": "Volver a Jugar",
+      "close": "Cerrar"
+    }
+  }
+}

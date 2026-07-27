@@ -27,9 +27,9 @@ export function CommandPalette() {
     const needle = q.trim().toLowerCase()
     if (!needle) return modules
     return modules.filter(
-      (m) => m.label.toLowerCase().includes(needle) || m.group.toLowerCase().includes(needle),
+      (m) => t(m.labelKey).toLowerCase().includes(needle) || t(m.groupKey).toLowerCase().includes(needle),
     )
-  }, [q, modules])
+  }, [q, modules, t])
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -115,9 +115,9 @@ export function CommandPalette() {
                     }`}
                   >
                     <Icon name={m.icon} size={16} className={`flex-none ${tone.text}`} />
-                    <span className="flex-1 text-[13.5px] font-semibold text-gt-ink-900">{m.label}</span>
+                    <span className="flex-1 text-[13.5px] font-semibold text-gt-ink-900">{t(m.labelKey)}</span>
                     <span className="font-gt-mono text-[9.5px] uppercase tracking-[.12em] text-gt-ink-400">
-                      {m.group}
+                      {t(m.groupKey)}
                     </span>
                   </button>
                 )

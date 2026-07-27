@@ -257,7 +257,8 @@ export function useCanMove() {
       const shrinksParty = from.kind === "party" && to.kind === "box" && !destinationOccupied
       if (!shrinksParty) return null
       const filled = (party ?? []).filter(Boolean).length
-      return filled <= 1 ? "No puedes dejar el equipo completamente vacío" : null
+      // A `pc` message key, not copy — `useDrag` resolves it with `t(...)`.
+      return filled <= 1 ? "toast.partyEmpty" : null
     },
     [party],
   )

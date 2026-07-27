@@ -1,0 +1,31 @@
+{
+  "bidkea": {
+    "header": {
+      "logoAlt": "Bidkea Logo",
+      "searchPh": "Buscar productos..."
+    },
+    "catalog": {
+      "title": "Catálogo de Productos",
+      "addToCart": "Añadir al carrito",
+      "loading": "LOADING"
+    },
+    "footer": {
+      "rights": "© 2023 Bidkea. Todos los derechos reservados."
+    },
+    "items": {
+      "sayoriTitle": "Modelo de Sayori",
+      "sayoriDesc": "Un conjunto completo de Sayori, desde los pies a la cabeza.",
+      "lancerHelmetTitle": "Casco Lancero",
+      "lancerHelmetDesc": "Un casco de lancero con detalles en oro.",
+      "luffyTitle": "Monkey D Luffy",
+      "luffyDesc": "Un conjunto completo de Monkey D Luffy. Incluye su famoso sombrero de paja.",
+      "pianoTitle": "Piano",
+      "pianoDesc": "Un piano de cola de tamaño real."
+    },
+    "categories": {
+      "conjunto": "Conjunto",
+      "casco": "Casco",
+      "bloque": "Bloque"
+    }
+  }
+}

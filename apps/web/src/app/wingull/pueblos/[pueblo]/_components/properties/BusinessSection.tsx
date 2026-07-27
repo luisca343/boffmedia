@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { TownData, Property } from '../../types';
 import { PropertyCard } from './PropertyCard';
 import { SectionHeader } from '../shared/section/SectionHeader';
@@ -12,6 +13,7 @@ interface BusinessSectionProps {
 }
 
 export function BusinessSection({ townData, townName }: BusinessSectionProps) {
+  const t = useTranslations('wingull.business');
   const [expandedBusiness, setExpandedBusiness] = useState<number | null>(null);
   const [selectedImages, setSelectedImages] = useState<{ [key: number]: number }>({});
   const { colorClaro, colorMedio, colorOscuro, negocios, nombre } = townData.textos;
@@ -36,19 +38,18 @@ export function BusinessSection({ townData, townName }: BusinessSectionProps) {
         <SectionHeader
           title={
             <>
-              <span style={{color: colorClaro}}>Oportunidades</span>
-              <span className="text-yellow-400"> de Negocio</span>
+              <span style={{color: colorClaro}}>{t('titlePrimary')}</span>
+              <span className="text-yellow-400">{t('titleAccent')}</span>
             </>
           }
           subtitle={
             <span className="text-lg text-slate-300">
-              Oportunidades de negocio en {nombre}
+              {t('subtitle', { town: nombre })}
             </span>
           }
           description={
             <span>
-              Descubre las ubicaciones comerciales disponibles en {nombre} para 
-              establecer tu próximo emprendimiento en este próspero pueblo
+              {t('description', { town: nombre })}
             </span>
           }
           townName={nombre}
