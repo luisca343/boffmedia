@@ -3,7 +3,7 @@ import { NextRequest } from "next/server"
 import { proxy } from "./proxy"
 import { PATHNAME_HEADER } from "./i18n/scopes"
 import { ALL_NAMESPACES } from "./i18n/manifest.generated"
-import { namespacesFor } from "./i18n/scopes"
+import { namespacesFor, narrowNamespaces } from "./i18n/scopes"
 
 const request = (url: string, headers?: Record<string, string>) =>
   new NextRequest(new Request(url, { headers }))
@@ -31,9 +31,17 @@ describe("proxy", () => {
     expect(await proxy(request("https://boffmedia.es/_next/static/x"))).toBeUndefined()
   })
 
-  it("the published pathname narrows the namespace set", async () => {
+  it("publishes a pathname the scoping layer can narrow with", async () => {
+    // Scoping is DISABLED (see scopes.ts — the root-layout provider cannot deliver a
+    // per-route message set), so `namespacesFor` deliberately returns everything. What
+    // the proxy still owes is a usable pathname, which `narrowNamespaces` proves.
     const res = await proxy(request("https://boffmedia.es/torneos"))
-    const loaded = namespacesFor(publishedPathname(res) ?? "", ALL_NAMESPACES)
-    expect(loaded.length).toBeLessThan(ALL_NAMESPACES.length)
+    const pathname = publishedPathname(res) ?? ""
+    expect(pathname).toBe("/torneos")
+
+    expect(namespacesFor(pathname, ALL_NAMESPACES)).toEqual([...ALL_NAMESPACES])
+    expect(narrowNamespaces(pathname, ALL_NAMESPACES).length).toBeLessThan(
+      ALL_NAMESPACES.length,
+    )
   })
 })

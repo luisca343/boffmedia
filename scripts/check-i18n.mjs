@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// i18n guard. Seven checks, all failures:
+// i18n guard. Nine checks, all failures:
 //   1. es/en key parity (missing + orphan keys)
 //   2. ICU argument parity between locales for the same key
 //   3. manifest.generated.ts is in sync with the locales directory
@@ -7,6 +7,8 @@
 //   5. key-level reachability
 //   6. no BCP-47 locale literal outside the locale-resolution layer (ratcheted)
 //   7. hardcoded user-facing Spanish in files with no next-intl import (ratcheted)
+//   8. every static t("literal") resolves under the CALLING translator's scope (ratcheted)
+//   9. *Key / label string constants resolve to a defined key (ratcheted)
 import { readFileSync, readdirSync, statSync } from "node:fs";
 import { join } from "node:path";
 import { buildManifest, namespaceFiles, render } from "./generate-i18n-manifest.mjs";
@@ -24,6 +26,11 @@ const ORPHAN_BASELINE = 0;
 // docs/I18N_PLAN.md). Ratcheted at 0 after the 2026-07-27 formatting sweep —
 // the shared formatter takes the viewer's locale, so nothing else needs one.
 const LOCALE_LITERAL_BASELINE = 0;
+// Dangling key references (checks 8 and 9). Both start closed: a t() call or a
+// *Key constant naming a key that does not exist is a MISSING_MESSAGE in the
+// browser, so there is no tolerable non-zero level. Never raise these.
+const UNSCOPED_KEY_BASELINE = 0;
+const BAD_KEY_CONST_BASELINE = 0;
 const ROOT = "apps/web/locales";
 const SRC = "apps/web/src";
 const MANIFEST = "apps/web/src/i18n/manifest.generated.ts";
@@ -278,6 +285,97 @@ const rootTranslators = sources.filter((f) => {
   return src.includes("next-intl") && /(?:useTranslations|getTranslations)\(\s*(["'`])\1/.test(src);
 });
 
+// ── 8. static t("literal") resolves under the CALLING translator's scope ──────
+// Check 5 asks whether a key is loaded on the route, but accepts it under *any*
+// namespace the file declares. A file with two components — `useTranslations("taxi")`
+// and `useTranslations("taxi.navTabs")` — therefore passes even when a call sits in
+// the wrong one. next-intl resolves per declaration, so this check does too: a call
+// belongs to the nearest preceding declaration of that translator variable.
+const allKeys = new Set(files.flatMap((f) => [...fileKeys[f]]));
+
+const DECL_RE =
+  /(?:const|let)\s+(\w+)\s*=\s*(?:await\s+)?(?:useTranslations|getTranslations)\(\s*(?:(["'`])([^"'`]*)\2)?\s*\)/g;
+
+const unscopedKeys = [];
+for (const file of sources) {
+  const src = readFileSync(file, "utf8");
+  if (!src.includes("next-intl")) continue;
+
+  const decls = [...src.matchAll(DECL_RE)].map((m) => ({ v: m[1], ns: m[3] ?? "", at: m.index }));
+  if (!decls.length) continue;
+
+  for (const v of new Set(decls.map((d) => d.v))) {
+    const call = new RegExp(`\\b${v}(?:\\.rich|\\.markup|\\.raw)?\\(\\s*["'\`]([^"'\`$]+)["'\`]`, "g");
+    for (const m of src.matchAll(call)) {
+      let ns = null;
+      for (const d of decls) if (d.v === v && d.at < m.index) ns = d.ns;
+      // A call above every declaration is a module-scope helper that receives a
+      // translator as a parameter (zod schema builders, cell renderers): the caller's
+      // scope is whichever declaration is handed in, so accept any of them.
+      const candidates = ns !== null ? [ns] : decls.map((d) => d.ns);
+      const key = m[1];
+      if (candidates.some((n) => allKeys.has(n ? `${n}.${key}` : key)) || allKeys.has(key)) continue;
+      unscopedKeys.push(
+        `${file.replace(`${SRC}/`, "")}  ${v}("${key}") does not resolve under "${candidates[0]}" — ` +
+          `the translator's scope already covers that segment, or the key was never added`,
+      );
+    }
+  }
+}
+
+// ── 9. *Key / label constants resolve ─────────────────────────────────────────
+// Copy held in a plain constant and resolved later with `t(x)` is invisible to
+// checks 5 and 8 — it is what shipped `pokedex.tab_info` with no such key. The
+// constant carries no namespace, so a value passes if ANY defined key ends with it.
+const KEY_FIELD_RE =
+  /\b(labelKey|descKey|titleKey|groupKey|subsTitleKey|nameKey|placeholderKey|ariaKey|msgKey|textKey|label)\s*:\s*["'`]([A-Za-z0-9_][\w.]*)["'`]/g;
+
+const keySuffixes = new Set();
+for (const k of allKeys) {
+  const parts = k.split(".");
+  for (let i = 0; i < parts.length; i++) keySuffixes.add(parts.slice(i).join("."));
+}
+
+// `label:` is ambiguous — it is a message key in config objects and a literal in
+// display maps. Each false positive is waived by value, with the reason.
+const KEY_CONST_ALLOW = {
+  "components/boffmedia/ui/keys/keys-util.ts|macOS":
+    "kvPlatformMeta returns platform display names (Windows/macOS/Linux) — a rendered label, never passed to t()",
+};
+
+// Wider than `sources`: these constants also live in data/ and lib/.
+const allSources = [];
+const walkEverything = (dir) => {
+  for (const entry of readdirSync(dir)) {
+    if (entry === "node_modules") continue;
+    const path = join(dir, entry);
+    if (statSync(path).isDirectory()) walkEverything(path);
+    else if (/\.tsx?$/.test(entry) && !/\.(test|spec)\./.test(entry)) allSources.push(path);
+  }
+};
+walkEverything(SRC);
+
+// Same exclusion as check 7: the design-system showcases are developer specimens,
+// deliberately untranslated, and their demo data uses `label:` as display text.
+const SHOWCASE_DIRS = ["app/smartrotom/styles/", "app/(boffmedia)/styles/"];
+
+const badKeyConsts = [];
+for (const file of allSources) {
+  const rel = file.replace(/\\/g, "/").replace(`${SRC}/`, "");
+  if (SHOWCASE_DIRS.some((d) => rel.startsWith(d))) continue;
+  const src = readFileSync(file, "utf8");
+  for (const m of src.matchAll(KEY_FIELD_RE)) {
+    const [field, value] = [m[1], m[2]];
+    // Only a lowercase dotted identifier can be a key; anything else is display text.
+    if (field === "label" && !/^[a-z][\w]*(\.[\w]+)*$/.test(value)) continue;
+    if (KEY_CONST_ALLOW[`${rel}|${value}`]) continue;
+    if (keySuffixes.has(value)) continue;
+    badKeyConsts.push(
+      `${rel}  ${field}: "${value}" is resolved with t() but no locale file defines a key ending in it`,
+    );
+  }
+}
+
 // ── 6. locale literals ────────────────────────────────────────────────────────
 // A translated string next to a Spanish-formatted date is still a broken English
 // page. Nothing outside the locale-resolution layer may name a BCP-47 tag: take
@@ -421,6 +519,9 @@ if (hardcodedCount > HARDCODED_ES_BASELINE) {
   }
 }
 
+for (const v of unscopedKeys) violations.push(v);
+for (const v of badKeyConsts) violations.push(v);
+
 for (const [label, count, baseline, grew] of [
   ["missing", missing, MISSING_BASELINE, "new work must ship every locale; see the listing above"],
   ["orphan", orphan, ORPHAN_BASELINE, "new work must ship every locale; see the listing above"],
@@ -429,6 +530,18 @@ for (const [label, count, baseline, grew] of [
     localeLiterals,
     LOCALE_LITERAL_BASELINE,
     "new work must ship every locale; see the listing above",
+  ],
+  [
+    "unscoped_key",
+    unscopedKeys.length,
+    UNSCOPED_KEY_BASELINE,
+    "a t() call names a key that does not exist under its translator's scope — MISSING_MESSAGE at runtime",
+  ],
+  [
+    "bad_key_const",
+    badKeyConsts.length,
+    BAD_KEY_CONST_BASELINE,
+    "a *Key/label constant names a key no locale file defines — MISSING_MESSAGE at runtime",
   ],
   [
     "hardcoded_es",
@@ -450,6 +563,8 @@ console.log(
   `i18n: ${files.length} namespaces · ${missing}/${MISSING_BASELINE} missing key(s) · ` +
     `${orphan}/${ORPHAN_BASELINE} orphan key(s) · ${localeLiterals}/${LOCALE_LITERAL_BASELINE} locale literal(s) · ` +
     `${hardcodedCount}/${HARDCODED_ES_BASELINE} file(s) with hardcoded Spanish · ` +
+    `${unscopedKeys.length}/${UNSCOPED_KEY_BASELINE} dangling t() call(s) · ` +
+    `${badKeyConsts.length}/${BAD_KEY_CONST_BASELINE} dangling key constant(s) · ` +
     `${scoped.size} scoped namespace(s) · ` +
     `${rootTranslators.length} root-namespace translator(s)`,
 );
@@ -488,4 +603,6 @@ if (violations.length) {
   console.error("");
   process.exit(1);
 }
-console.log("✓ i18n: locales in parity, manifest current, every namespace reachable from its routes");
+console.log(
+  "✓ i18n: locales in parity, manifest current, every namespace reachable from its routes, every key reference resolves",
+);
