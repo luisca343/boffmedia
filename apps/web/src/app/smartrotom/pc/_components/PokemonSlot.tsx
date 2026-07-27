@@ -64,7 +64,7 @@ export const PokemonSlot = memo(function PokemonSlot({
   // Right-click is the favourite toggle — the one destructive-free action worth a
   // shortcut, and the only use we make of the context menu.
   const onContextMenu = (e: MouseEvent<HTMLButtonElement>) => {
-    if (!mon) return
+    if (!mon || setMark.isPending) return
     e.preventDefault()
     setMark.mutate({ key: mon.key, patch: { favorite: !favorite } })
   }

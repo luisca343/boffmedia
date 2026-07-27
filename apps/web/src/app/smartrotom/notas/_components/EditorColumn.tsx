@@ -17,6 +17,7 @@ interface EditorColumnProps extends PaneHandlers {
   onSelectTab: (id: number) => void;
   onCloseTab: (id: number) => void;
   onNewTab: () => void;
+  newBusy?: boolean;
   showCtx: boolean;
   onToggleCtx: () => void;
   onSplit: (id: number) => void;
@@ -69,6 +70,7 @@ export function EditorColumn(props: EditorColumnProps) {
           <div className="flex flex-wrap justify-center gap-2.5">
             <button
               onClick={props.onNew}
+              disabled={props.newBusy}
               className="inline-flex h-9 items-center gap-2 rounded-nt-md bg-gradient-to-b from-nt-500 to-nt-600 px-3.5 text-[13.5px] font-[550] text-white hover:brightness-[1.06]"
             >
               <Icon name="plus" size={15} /> {t("sidebar.newNote")}
@@ -134,6 +136,7 @@ export function EditorColumn(props: EditorColumnProps) {
         <button
           className="grid w-9 flex-none place-items-center text-nt-fg-subtle hover:bg-nt-hover hover:text-nt-fg"
           onClick={props.onNewTab}
+          disabled={props.newBusy}
           aria-label={t("editor.newTab")}
         >
           <Icon name="plus" size={16} />

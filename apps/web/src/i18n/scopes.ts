@@ -1,11 +1,10 @@
 import type { Namespace } from "./manifest.generated"
 
 /**
- * The header carrying the request pathname. NOTHING SETS IT TODAY — a Next 16
- * `middleware.ts` was tried and 404'd every route (Next 16 renamed the hook to
- * `proxy.ts`; see docs/I18N_PLAN.md §0). Until a proxy sets it, `namespacesFor`
- * sees no pathname and loads every namespace, which is the pre-2026-07-18
- * behaviour — correct, just not yet optimised.
+ * The header carrying the request pathname. Set by `src/proxy.ts` — Next 16 renamed
+ * the hook, so a `middleware.ts` here does NOT run and 404s every route (see
+ * docs/I18N_PLAN.md §0). It stays absent on requests the proxy skips (static files,
+ * `_next`), and `namespacesFor` then loads every namespace rather than guessing.
  */
 export const PATHNAME_HEADER = "x-pathname"
 
@@ -48,7 +47,7 @@ export const SCOPED_NAMESPACES: ReadonlyArray<{
 /**
  * Namespaces to load for a pathname: CORE plus anything scoped to it.
  *
- * An empty pathname means middleware did not run (it is the only source of the
+ * An empty pathname means the proxy did not run (it is the only source of the
  * URL here). That must load EVERYTHING — narrowing on an unknown route would
  * blank out exactly the scoped pages. Heavier, never broken.
  */

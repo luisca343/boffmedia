@@ -8,11 +8,13 @@ export function Toggle({
   label,
   tone,
   onChange,
+  disabled = false,
 }: {
   checked: boolean;
   label: string;
   tone: "cyan" | "pink";
   onChange: () => void;
+  disabled?: boolean;
 }) {
   const ON = {
     cyan: "bg-ft-cyan text-ft-ink",
@@ -22,7 +24,8 @@ export function Toggle({
   return (
     <label
       className={[
-        "font-ft-ui inline-flex cursor-pointer items-center gap-1.5",
+        "font-ft-ui inline-flex items-center gap-1.5",
+        disabled ? "cursor-not-allowed opacity-55" : "cursor-pointer",
         "rounded-ft-pill border-ft-hair border-ft-ink px-2.5 py-1",
         "text-[11px] font-bold uppercase tracking-[0.05em]",
         "focus-within:outline focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-ft-pink",
@@ -43,6 +46,7 @@ export function Toggle({
         type="checkbox"
         checked={checked}
         onChange={onChange}
+        disabled={disabled}
         className="sr-only"
       />
       {label}

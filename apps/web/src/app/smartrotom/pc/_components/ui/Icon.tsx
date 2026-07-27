@@ -1,4 +1,5 @@
-import type { CSSProperties } from "react"
+import type { ComponentProps } from "react"
+import { makeIconComponent } from "@/components/smartrotom/behavior/makeIconComponent"
 import {
   Search,
   SlidersVertical,
@@ -99,27 +100,6 @@ const MAP = {
 
 export type IconName = keyof typeof MAP
 
-export interface IconProps {
-  name: IconName
-  size?: number
-  stroke?: number
-  fill?: string
-  className?: string
-  style?: CSSProperties
-}
+export const Icon = makeIconComponent(MAP, { size: 18, strokeWidth: 2, fill: "none" })
 
-export function Icon({ name, size = 18, stroke = 2, fill = "none", className, style }: IconProps) {
-  const Glyph = MAP[name]
-  if (!Glyph) return null
-  return (
-    <Glyph
-      size={size}
-      strokeWidth={stroke}
-      fill={fill}
-      className={className}
-      style={style}
-      aria-hidden="true"
-      focusable="false"
-    />
-  )
-}
+export type IconProps = ComponentProps<typeof Icon>

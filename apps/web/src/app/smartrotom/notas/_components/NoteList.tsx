@@ -26,6 +26,7 @@ interface NoteListProps {
   activeId: number | null;
   onOpen: (id: number) => void;
   onNew: () => void;
+  newBusy?: boolean;
   onContext: (n: NoteVM, e: MouseEvent) => void;
 }
 
@@ -68,6 +69,7 @@ export function NoteList(props: NoteListProps) {
           <Tooltip label={t("sidebar.newNote")}>
             <button
               onClick={props.onNew}
+              disabled={props.newBusy}
               aria-label={t("sidebar.newNote")}
               className="inline-flex h-8 min-w-8 items-center justify-center rounded-nt-sm text-nt-fg-muted transition-all hover:bg-nt-hover-strong hover:text-nt-fg"
             >
@@ -132,6 +134,7 @@ export function NoteList(props: NoteListProps) {
               <button
                 className="mt-1.5 inline-flex h-9 items-center gap-2 rounded-nt-md border border-nt-border bg-nt-hover px-3.5 text-[13px] text-nt-fg-muted hover:bg-nt-hover-strong hover:text-nt-fg"
                 onClick={props.onNew}
+                disabled={props.newBusy}
               >
                 <Icon name="plus" size={14} /> {t("list.createNote")}
               </button>

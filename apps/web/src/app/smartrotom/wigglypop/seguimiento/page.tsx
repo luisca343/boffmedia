@@ -138,6 +138,7 @@ export default function WatchlistPage() {
                         variant="ghost"
                         iconOnly
                         aria-label={t("seguimiento.removeAria")}
+                        disabled={toggleWatch.isPending}
                         onClick={(e) => {
                           e.stopPropagation()
                           toggleWatch.mutate(L.id)

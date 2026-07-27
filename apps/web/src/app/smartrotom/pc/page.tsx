@@ -44,7 +44,7 @@ export default function PCPage() {
   const boxes = useBoxGrid(mons)
   const move = useMovePokemon()
   const canMove = useCanMove()
-  const { run } = useMoveQueue()
+  const { run, isRunning } = useMoveQueue()
 
   const activeBox = usePcUi((s) => s.activeBox)
   const multiMode = usePcUi((s) => s.multiMode)
@@ -71,12 +71,19 @@ export default function PCPage() {
     [boxes, mons],
   )
 
-  const onDropSingle = useCallback((from: SlotLoc, to: SlotLoc) => move.mutate({ from, to }), [move])
+  const onDropSingle = useCallback(
+    (from: SlotLoc, to: SlotLoc) => {
+      if (move.isPending) return
+      move.mutate({ from, to })
+    },
+    [move],
+  )
 
   // Dropping a whole selection into a box is N real `/pc/move` calls — there is no
   // batch endpoint — so the queue issues them in order and reports what actually landed.
   const onDropMany = useCallback(
     async (items: Mon[], box: number) => {
+      if (isRunning) return
       const { moves, placed, overflow } = planBulkMove(items, box, boxes[box] ?? [])
       if (moves.length === 0) {
         toast(overflow > 0 ? t("toast.boxFull") : t("toast.alreadyInBox"), "info")
@@ -89,7 +96,7 @@ export default function PCPage() {
         )
       }
     },
-    [boxes, run],
+    [boxes, run, isRunning],
   )
 
   useEffect(() => {

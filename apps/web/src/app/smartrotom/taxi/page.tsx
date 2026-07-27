@@ -90,7 +90,7 @@ export default function TaxiPage() {
   )
 
   const onConfirm = useCallback(() => {
-    if (!selectedLive) return
+    if (!selectedLive || teleport.isPending) return
     const stop = selectedLive
     setFlow("traveling")
     teleport.mutate(

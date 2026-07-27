@@ -146,6 +146,7 @@ export function StreakRail() {
   const claimedToday = streak.data?.claimedToday ?? false
 
   const onClaim = async () => {
+    if (claim.isPending) return
     const result = await claim.mutateAsync()
     const reward = result?.reward as DailyRewardItem | undefined
     if (!reward) return

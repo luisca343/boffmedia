@@ -268,6 +268,7 @@ export default function SellerDashboardPage() {
                             variant="ghost"
                             iconOnly
                             aria-label={t("anuncios.pauseAria")}
+                            disabled={update.isPending}
                             onClick={() =>
                               update.mutate(
                                 { id: L.id, patch: { status: "pausado" as WpListingStatus } },
@@ -283,6 +284,7 @@ export default function SellerDashboardPage() {
                             variant="ghost"
                             iconOnly
                             aria-label={t("anuncios.resumeAria")}
+                            disabled={update.isPending}
                             onClick={() =>
                               update.mutate(
                                 { id: L.id, patch: { status: "activo" as WpListingStatus } },

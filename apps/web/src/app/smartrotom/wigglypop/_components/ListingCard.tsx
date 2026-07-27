@@ -97,6 +97,7 @@ export interface ListingCardProps {
   variant?: "cozy" | "compact" | "list"
   watched: boolean
   onWatch: () => void
+  watchBusy?: boolean
   onOpen: () => void
 }
 
@@ -105,6 +106,7 @@ export function ListingCard({
   variant = "cozy",
   watched,
   onWatch,
+  watchBusy = false,
   onOpen,
 }: ListingCardProps) {
   const t = useTranslations("wigglypop")
@@ -122,9 +124,11 @@ export function ListingCard({
         e.stopPropagation()
         onWatch()
       }}
+      disabled={watchBusy}
       aria-label={watched ? t("common.unwatch") : t("common.watch")}
       aria-pressed={watched}
       className={cn(
+        "disabled:pointer-events-none disabled:opacity-60",
         "absolute right-2.5 top-2.5 z-[5] flex h-[34px] w-[34px] items-center justify-center rounded-wp-pill border-wp",
         "shadow-[0_4px_10px_-5px_rgba(120,70,100,.4)] transition-all duration-150 ease-wp",
         "hover:scale-110 motion-reduce:transform-none",

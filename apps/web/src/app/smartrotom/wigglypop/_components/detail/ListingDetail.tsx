@@ -113,9 +113,11 @@ export function ListingDetail({ id }: { id: number }) {
             <button
               type="button"
               onClick={() => toggleWatch.mutate(L.id)}
+              disabled={toggleWatch.isPending}
               aria-label={isWatched ? t("common.unwatch") : t("common.watch")}
               aria-pressed={isWatched}
               className={cn(
+                "disabled:pointer-events-none disabled:opacity-60",
                 "absolute right-[18px] top-4 z-[3] flex h-10 w-10 items-center justify-center rounded-wp-pill border-wp",
                 "transition-all duration-150 ease-wp hover:scale-110 motion-reduce:transform-none",
                 isWatched

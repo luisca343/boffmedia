@@ -208,6 +208,7 @@ export function Newsroom({ initialId = null }: { initialId?: number | null }) {
             onTogglePublished={onTogglePublished}
             onToggleFeatured={onToggleFeatured}
             onRequestDelete={setPendingDeleteId}
+            statusPending={updateStatus.isPending}
           />
 
           <EditorPane

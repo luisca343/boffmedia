@@ -32,6 +32,7 @@ export function InfoPanel({
   overlay,
   onClose,
   onStartCall,
+  callBusy,
   onOpenSearch,
   onOpenImage,
   onOpenMedia,
@@ -43,6 +44,7 @@ export function InfoPanel({
   overlay?: boolean;
   onClose: () => void;
   onStartCall: (kind: "voice" | "video") => void;
+  callBusy?: boolean;
   onOpenSearch: () => void;
   onOpenImage: (data: ImageMessageData) => void;
   onOpenMedia: () => void;
@@ -57,8 +59,8 @@ export function InfoPanel({
   const waypoints = sharedWaypoints(chat).slice(0, 2);
   const myUuid = getSmartRotomUser(session)?.uuid;
 
-  const Quick = ({ icon, label, onClick }: { icon: IconName; label: string; onClick?: () => void }) => (
-    <button onClick={onClick} className="flex flex-1 flex-col items-center gap-1.5 rounded-ca-lg py-[11px] text-[12px] text-ca-accent-soft transition-colors hover:bg-ca-accent/10">
+  const Quick = ({ icon, label, onClick, disabled }: { icon: IconName; label: string; onClick?: () => void; disabled?: boolean }) => (
+    <button onClick={onClick} disabled={disabled} className="flex flex-1 flex-col items-center gap-1.5 rounded-ca-lg py-[11px] text-[12px] text-ca-accent-soft transition-colors hover:bg-ca-accent/10 disabled:opacity-60">
       <Icon name={icon} size={19} />
       {label}
     </button>
@@ -81,8 +83,8 @@ export function InfoPanel({
         </div>
 
         <div className="flex gap-2 bg-ca-panel px-4 py-3.5">
-          <Quick icon="phone" label={t("actions.call")} onClick={() => onStartCall("voice")} />
-          <Quick icon="video" label={t("actions.video")} onClick={() => onStartCall("video")} />
+          <Quick icon="phone" label={t("actions.call")} onClick={() => onStartCall("voice")} disabled={callBusy} />
+          <Quick icon="video" label={t("actions.video")} onClick={() => onStartCall("video")} disabled={callBusy} />
           <Quick icon="search" label={t("common.search")} onClick={onOpenSearch} />
           <Quick icon={muted ? "belloff" : "bell"} label={muted ? t("actions.mute") : t("actions.unmute")} onClick={() => onToggleMute(!muted)} />
         </div>

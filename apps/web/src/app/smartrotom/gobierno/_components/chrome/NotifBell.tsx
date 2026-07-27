@@ -6,6 +6,7 @@ import Link from "next/link"
 import { useTranslations } from "next-intl"
 import type { NotificationsInboxDto } from "@boffmedia/shared"
 import { rotomGETOrThrow, rotomPATCHOrThrow, userMessageFrom } from "@/services/boffAPI"
+import { useGuardedSubmit } from "@/components/smartrotom/behavior/useGuardedSubmit"
 import { Icon, Empty, toast } from "../ui"
 import { useOfficer } from "../../_hooks/useOfficer"
 import { timeAgo } from "../../_utils/format"
@@ -52,7 +53,7 @@ export function NotifBell() {
     return () => document.removeEventListener("mousedown", onClick)
   }, [open])
 
-  const markAllRead = async () => {
+  const { submit: markAllRead, isPending: marking } = useGuardedSubmit(async () => {
     if (!unread) return
     try {
       // Invalidating unconditionally would clear the badge on a write the server rejected,
@@ -62,7 +63,7 @@ export function NotifBell() {
     } catch (e) {
       toast.error(userMessageFrom(e, t("campana.markError")))
     }
-  }
+  })
 
   return (
     <div className="relative" ref={ref}>
@@ -87,8 +88,9 @@ export function NotifBell() {
             {unread > 0 && (
               <button
                 type="button"
-                onClick={markAllRead}
-                className="font-gt-mono text-[9.5px] font-bold uppercase tracking-[.12em] text-gt-accent hover:underline"
+                onClick={() => void markAllRead()}
+                disabled={marking}
+                className="disabled:opacity-50 font-gt-mono text-[9.5px] font-bold uppercase tracking-[.12em] text-gt-accent hover:underline"
               >
                 {t("campana.marcarLeidas")}
               </button>

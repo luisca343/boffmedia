@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 import { getSmartRotomUser } from "@/lib/utils";
 import { useGetAllUsers } from "@/hooks/users/useGetAllUsers";
 import { useCreateChat } from "@/hooks/chatapp/useCreateChat";
+import { useGuardedSubmit } from "@/components/smartrotom/behavior/useGuardedSubmit";
 import { Avatar, Button, Field, Icon, Modal, ModalFoot, SearchBox } from "../ui";
 
 type Player = { uuid: string; username: string };
@@ -28,7 +29,7 @@ export function CreateGroupModal({ session, onClose, onCreated }: { session: unk
   const placeholder = sel.length > 1 ? t("createGroup.groupName") : sel.length === 1 ? sel[0].username : t("createGroup.savedMessages");
   const canCreate = sel.length === 1 || (sel.length > 1 && name.trim().length > 0);
 
-  const create = async () => {
+  const { submit: create, isPending: creating } = useGuardedSubmit(async () => {
     if (!canCreate || !myUuid) return;
     try {
       const res = (await createChat({ player: myUuid, users: sel.map((u) => u.uuid), name: name.trim() || placeholder })) as {
@@ -48,7 +49,7 @@ export function CreateGroupModal({ session, onClose, onCreated }: { session: unk
     } catch {
       toast.error(t("createGroup.createFailed"));
     }
-  };
+  });
 
   return (
     <Modal
@@ -58,7 +59,7 @@ export function CreateGroupModal({ session, onClose, onCreated }: { session: unk
       foot={
         <ModalFoot>
           <Button variant="ghost" onClick={onClose}>{t("common.cancel")}</Button>
-          <Button onClick={create} disabled={!canCreate || isLoading}>{t("createGroup.createChat")}</Button>
+          <Button onClick={() => void create()} disabled={!canCreate || isLoading || creating}>{t("createGroup.createChat")}</Button>
         </ModalFoot>
       }
     >

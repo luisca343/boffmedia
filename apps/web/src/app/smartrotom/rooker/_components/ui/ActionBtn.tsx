@@ -38,6 +38,8 @@ export interface ActionBtnProps {
   fillActive?: boolean
   label: string
   onClick?: () => void
+  /** Held while the action's mutation is in flight, so a double-tap cannot fire it twice. */
+  disabled?: boolean
 }
 
 export function ActionBtn({
@@ -48,6 +50,7 @@ export function ActionBtn({
   fillActive = true,
   label,
   onClick,
+  disabled = false,
 }: ActionBtnProps) {
   const { fmt } = useFormat()
   const t = TONE[tone]
@@ -60,13 +63,14 @@ export function ActionBtn({
         e.stopPropagation()
         onClick?.()
       }}
+      disabled={disabled}
       aria-label={label}
       aria-pressed={active}
       className={cn(
         "group inline-flex items-center gap-1.5 rounded-rk-pill p-[5px] text-[13px] font-semibold tabular-nums",
         "transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rk-accent",
         active ? ACTIVE[tone] : "text-rk-fg-subtle",
-        t.on,
+        disabled ? "cursor-not-allowed opacity-60" : t.on,
       )}
     >
       <span className={cn("grid h-[30px] w-[30px] place-items-center rounded-full transition-colors", t.wash)}>

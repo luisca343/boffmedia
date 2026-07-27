@@ -31,9 +31,10 @@ export interface ReactionControlProps {
   reactions: ReactionCounts
   mine: ReactionType | null
   onReact: (type: ReactionType) => void
+  disabled?: boolean
 }
 
-export function ReactionControl({ reactions, mine, onReact }: ReactionControlProps) {
+export function ReactionControl({ reactions, mine, onReact, disabled = false }: ReactionControlProps) {
   const t = useTranslations("rooker")
   const expressive = useDisplayStore((s) => s.reactions) === "expresivas"
   const [tray, setTray] = useState(false)
@@ -50,6 +51,7 @@ export function ReactionControl({ reactions, mine, onReact }: ReactionControlPro
   )
 
   const fire = (type: ReactionType) => {
+    if (disabled) return
     onReact(type)
     setBurst(type)
     if (burstTimer.current) clearTimeout(burstTimer.current)
@@ -77,6 +79,7 @@ export function ReactionControl({ reactions, mine, onReact }: ReactionControlPro
         active={Boolean(mine)}
         fillActive={false}
         count={total}
+        disabled={disabled}
         onClick={() => fire(mine ?? "heart")}
         icon={
           <span className="relative grid place-items-center">
@@ -110,6 +113,7 @@ export function ReactionControl({ reactions, mine, onReact }: ReactionControlPro
               title={t(`reactions.${r.type}`)}
               aria-label={t(`reactions.${r.type}`)}
               aria-pressed={mine === r.type}
+              disabled={disabled}
               onClick={(e) => {
                 e.stopPropagation()
                 fire(r.type)

@@ -1,0 +1,38 @@
+feature: gremio-mazmorra
+summary: Surface Pixelmon Teras dungeon runs in the web by folding them into the existing Misiones app, rebranded "Gremio de Exploradores". Add one dungeon screen (leaderboard + personal record) in the existing ms-* tavern look. No new design system, no API changes.
+
+decisions[6]{id,decision}:
+  D1,Fold into Misiones (not a standalone mz-* app, not Pasaporte). Keep internal ms-*/misiones route+i18n namespaces. Rebrand display identity only.
+  D2,Display name -> "Gremio de Exploradores". PMD framing dropped; guild fiction is generic-fantasy.
+  D3,Add a 6th SideRail screen at /smartrotom/misiones/mazmorra. FULL tavern look (ms-* tokens, font-ms). No new tokens, no PMD aesthetic.
+  D4,Backend is complete; frontend is read-only. No API/DB/service work (no cap-* skills needed).
+  D5,Remove the superseded standalone stub at app/smartrotom/mazmorra/ (page redirect + ranking + MenuWrapper).
+  D6,i18n mandatory: new misiones.mazmorra.* keys in all locales; also lift the hardcoded SideRail labels into i18n keys in the same pass.
+
+backend_contract[2]{endpoint,shape}:
+  GET /dungeons/ranking?limit,DungeonRankingEntry[] {rank,uuid,nombre,partidas,completadas,mejorEtapa,mejorPisos,mejorTiempoMs(number|null),muertes,abandonos}
+  GET /dungeons/stats/:uuid,DungeonPlayerStats = DungeonRankingEntry + mejorPartida:DungeonBestRun|null {etapaInicial,etapaFinal,pisosSuperados,completada,duracionMs,maldiciones[],fecha}
+
+existing_assets[4]{path,role}:
+  apps/web/src/services/api/smartrotom/mazmorraService.ts,MazmorraService.getRanking(limit) + getPlayerStats(uuid); read-only; already wired
+  apps/web/src/components/smartrotom/behavior/useRotomUuid.ts,current-player uuid hook (client)
+  apps/web/src/app/smartrotom/misiones/_components/SideRail.tsx,nav; screens are a plain array {href,label,short,glyph}; labels currently HARDCODED Spanish (i18n gap)
+  apps/web/src/app/smartrotom/misiones/layout.tsx,tavern shell; computed height calc(100dvh - 3rem); ms-tavern ms-app font-ms scope root
+
+to_locate[1]{what}:
+  Rotom launcher registry entry where the app is named "Misiones" (rebrand target -> "Gremio de Exploradores")
+
+rollback: Purely additive except the stub removal. Revert: new misiones/mazmorra/ route + hook + panels, SideRail 6th entry, misiones.mazmorra i18n keys, registry display name, and restore app/smartrotom/mazmorra/ if the stub removal needs undoing. No DB, no API, no migration.
+
+success_criteria[5]{id,criterion}:
+  S1,Opening /smartrotom/misiones/mazmorra renders the leaderboard in tavern style (medals top-3, current-player row highlight) from getRanking.
+  S2,A player with runs sees their best expedition (floors/stage/time/curses/coins) via getPlayerStats; the 404 renders a themed empty state, not an error.
+  S3,SideRail shows a 6th entry navigating to the dungeon screen; active-state highlight works.
+  S4,App identity displays as "Gremio de Exploradores"; SideRail labels resolve through i18n keys.
+  S5,pnpm type-check passes.
+
+constraints[4]{rule}:
+  Do NOT cross design systems: stay within ms-* (components/ tavern), never import Boffmedia primitives or SmartRotom other-DS tokens.
+  Reuse the existing computed shell height; do NOT use h-full (it silently collapses - known trap).
+  Default new components to the app's _components/ folder.
+  Never edit packages/shared/src (auto-generated); DungeonRankingEntry/DungeonPlayerStats already exist there.

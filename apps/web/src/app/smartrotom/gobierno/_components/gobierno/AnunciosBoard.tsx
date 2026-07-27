@@ -62,7 +62,7 @@ export function AnunciosBoard() {
       ) : (
         <>
           {pinned.map((a) => (
-            <AnuncioFeatured key={a.id} anuncio={a} onEdit={() => setEditing(a)} onDelete={() => handleDelete(a)} />
+            <AnuncioFeatured key={a.id} anuncio={a} onEdit={() => setEditing(a)} onDelete={() => handleDelete(a)} deleting={deleteAnuncio.isPending} />
           ))}
 
           {rest.length > 0 && (
@@ -70,7 +70,7 @@ export function AnunciosBoard() {
               {pinned.length > 0 && <Bar dep="gold">{t("anuncios.masPublicaciones")}</Bar>}
               <div className="mt-3 grid gap-4 [grid-template-columns:repeat(auto-fit,minmax(300px,1fr))]">
                 {rest.map((a) => (
-                  <AnuncioCard key={a.id} anuncio={a} onEdit={() => setEditing(a)} onDelete={() => handleDelete(a)} />
+                  <AnuncioCard key={a.id} anuncio={a} onEdit={() => setEditing(a)} onDelete={() => handleDelete(a)} deleting={deleteAnuncio.isPending} />
                 ))}
               </div>
             </>

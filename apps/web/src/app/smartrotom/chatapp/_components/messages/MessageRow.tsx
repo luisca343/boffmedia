@@ -4,6 +4,7 @@ import { toast } from "react-toastify";
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import { addWaypoint } from "@/services/mcef/mcefApi";
+import { useGuardedSubmit } from "@/components/smartrotom/behavior/useGuardedSubmit";
 import { Icon, MiniButton, Popover } from "../ui";
 import { ImageBubble } from "./ImageBubble";
 import type { ChatMessageVM, ChatVM, MessageStatus } from "../../_types/view";
@@ -106,15 +107,18 @@ function CardShell({ out, children }: { out: boolean; children: ReactNode }) {
 function WaypointInner({ content, out, time }: { content: string; out: boolean; time: string }) {
   const t = useTranslations("chatapp");
   const w = parseWaypoint(content);
-  if (!w) return null;
-  const color = w.color || "#f97316";
-  const copy = () => { navigator.clipboard.writeText(`${w.x} ${w.y} ${w.z}`); toast.success(t("message.coordinatesCopied")); };
-  const add = async () => {
-    try {
+  const color = w?.color || "#f97316";
+  // The hook must run before the `!w` bail-out, so the body re-checks instead.
+  const { submit: add, isPending: adding } = useGuardedSubmit(
+    async () => {
+      if (!w) return;
       const r = await addWaypoint({ name: w.name, x: w.x, y: w.y, z: w.z, color });
       r?.success ? toast.success(t("message.waypointAdded", { name: w.name })) : toast.error(r?.error || t("message.waypointError"));
-    } catch { toast.error(t("message.waypointError")); }
-  };
+    },
+    { onError: () => toast.error(t("message.waypointError")) },
+  );
+  if (!w) return null;
+  const copy = () => { navigator.clipboard.writeText(`${w.x} ${w.y} ${w.z}`); toast.success(t("message.coordinatesCopied")); };
   return (
     <CardShell out={out}>
       <div className="flex items-start gap-3 p-3">
@@ -129,7 +133,7 @@ function WaypointInner({ content, out, time }: { content: string; out: boolean; 
       </div>
       <div className="flex gap-2 px-3 pb-3">
         <MiniButton onClick={copy}><Icon name="copy" size={14} /> {t("message.copy")}</MiniButton>
-        <MiniButton accent onClick={add}><Icon name="plus" size={14} /> {t("message.addWaypoint")}</MiniButton>
+        <MiniButton accent onClick={() => void add()} disabled={adding} className="disabled:opacity-60"><Icon name="plus" size={14} /> {t("message.addWaypoint")}</MiniButton>
       </div>
       <div className="px-[13px] pb-2 text-[10.5px] text-ca-500" style={{ textAlign: out ? "right" : "left" }}>{time}</div>
     </CardShell>
@@ -183,7 +187,7 @@ function VideoInner({ content, out, time }: { content: string; out: boolean; tim
   );
 }
 
-function CallInner({ message, out, onCallback }: { message: ChatMessageVM; out: boolean; onCallback?: () => void }) {
+function CallInner({ message, out, onCallback, callBusy }: { message: ChatMessageVM; out: boolean; onCallback?: () => void; callBusy?: boolean }) {
   const t = useTranslations("chatapp");
   const c = parseCall(message.content);
   const missed = !c || c.duration <= 0;
@@ -201,7 +205,7 @@ function CallInner({ message, out, onCallback }: { message: ChatMessageVM; out: 
           </div>
           <div className="mt-px text-[12px] text-ca-400">{sub} · {timeOf(message.createdAt)}</div>
         </div>
-        <button onClick={onCallback} title={t("actions.call")} className="grid h-[38px] w-[38px] flex-none place-items-center rounded-full text-ca-accent-soft transition-colors hover:bg-ca-accent/[.14] active:scale-[.92]">
+        <button onClick={onCallback} disabled={callBusy} title={t("actions.call")} className="grid h-[38px] w-[38px] flex-none place-items-center rounded-full text-ca-accent-soft transition-colors hover:bg-ca-accent/[.14] active:scale-[.92] disabled:opacity-60">
           <Icon name="phone" size={17} />
         </button>
       </div>
@@ -220,6 +224,7 @@ export function MessageRow({
   onReply,
   onOpenImage,
   onCallback,
+  callBusy,
 }: {
   message: ChatMessageVM;
   prev?: ChatMessageVM;
@@ -231,13 +236,14 @@ export function MessageRow({
   onReply?: (m: ChatMessageVM) => void;
   onOpenImage?: (m: ChatMessageVM) => void;
   onCallback?: () => void;
+  callBusy?: boolean;
 }) {
   if (message.uuid === "system" || message.type === "system") {
     return <div className="my-1.5 self-center rounded-ca-md bg-ca-header px-[13px] py-[5px] text-[12.5px] text-ca-300 shadow-[0_1px_1px_rgba(0,0,0,.08)]">{message.content}</div>;
   }
 
   const out = message.uuid === myUuid;
-  if (message.type === "call") return <CallInner message={message} out={out} onCallback={onCallback} />;
+  if (message.type === "call") return <CallInner message={message} out={out} onCallback={onCallback} callBusy={callBusy} />;
 
   const notFlow = (m?: ChatMessageVM) => m && m.type !== "system" && m.type !== "call";
   const samePrev = notFlow(prev) && prev!.uuid === message.uuid;

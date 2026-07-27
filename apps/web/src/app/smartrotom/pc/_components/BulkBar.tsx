@@ -42,7 +42,8 @@ export function BulkBar() {
 
   const n = picked.length
   const keys = picked.map((m) => m.key)
-  const none = n === 0 || isRunning
+  const busy = isRunning || bulkMark.isPending
+  const none = n === 0 || busy
 
   const exit = () => {
     setMenu(null)
@@ -50,6 +51,7 @@ export function BulkBar() {
   }
 
   const favorite = () => {
+    if (busy) return
     bulkMark.mutate({ keys, favorite: true })
     toast(`${n} ${t("filters.statusToggles.favorite")}`, "success")
     setMenu(null)
@@ -57,7 +59,7 @@ export function BulkBar() {
 
   const addTag = (tag: string) => {
     const clean = tag.trim()
-    if (!clean) return
+    if (!clean || busy) return
     bulkMark.mutate({ keys, addTags: [clean] })
     toast(`${t("filters.tag")} «${clean}» ${n}`, "success")
     setTag("")
@@ -65,6 +67,7 @@ export function BulkBar() {
   }
 
   const moveTo = async (box: number) => {
+    if (busy) return
     setMenu(null)
     const { moves, placed, overflow } = planBulkMove(picked, box, boxes[box])
     if (!moves.length) {
@@ -120,7 +123,7 @@ export function BulkBar() {
                   value={tag}
                   onChange={(e) => setTag(e.target.value)}
                   onKeyDown={(e) => {
-                    if (e.key === "Enter") addTag(tag)
+                    if (e.key === "Enter" && !busy) addTag(tag)
                   }}
                   aria-label={t("filters.tag")}
                   placeholder={`${t("filters.tag")}…`}
@@ -129,7 +132,7 @@ export function BulkBar() {
                 />
                 <div className="flex flex-wrap gap-1.5">
                   {SUGGESTED_TAGS.map((t) => (
-                    <ChipButton key={t} onClick={() => addTag(t)}>
+                    <ChipButton key={t} disabled={busy} onClick={() => addTag(t)}>
                       {t}
                     </ChipButton>
                   ))}
@@ -152,7 +155,7 @@ export function BulkBar() {
                     <Button
                       key={i}
                       variant="ghost"
-                      disabled={free === 0}
+                      disabled={free === 0 || busy}
                       onClick={() => void moveTo(i)}
                       className="w-full justify-between"
                     >

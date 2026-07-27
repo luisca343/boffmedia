@@ -119,6 +119,7 @@ export function BoxHeader({
   }
 
   const organize = async (mode: OrganizeMode) => {
+    if (isRunning) return
     setMenu(false)
     const moves = planOrganize(box, contents, desiredOrder(mode, contents, speciesByDex))
     if (moves.length === 0) {

@@ -1,0 +1,122 @@
+feature: gremio-mazmorra
+
+meta:
+  id: gremio-mazmorra
+  title: Gremio de Exploradores — dungeon leaderboard + personal record screen in Misiones
+  intent: change
+  status: ready
+  stack: nextjs-app-router / smartrotom ms-* tavern design system (frontend-only)
+
+context:
+  problem: Pixelmon Teras dungeon runs (written by the mod) have a complete backend but no reachable web surface; the only prior frontend attempt is a superseded standalone stub in a different design system.
+  current_behavior: |
+    app/smartrotom/mazmorra/ exists as a dead-end stub — page.tsx redirects to ranking/page.tsx,
+    which renders a plain HTML table (bg-layer-1/edge classes, no ms-* tokens) via MenuWrapper.
+    It is not linked from anywhere reachable (not in SideRail, not in the app launcher grid) and
+    does not use useRotomUuid or getPlayerStats — ranking only, no personal record.
+  desired_behavior: A single new screen at /smartrotom/misiones/mazmorra, built in the existing ms-* tavern look, reachable as a 6th SideRail tab from inside Misiones. Shows the dungeon leaderboard (medals top-3, current-player row highlighted) and the signed-in player's personal best run (or a themed empty state if they have none).
+  in_scope:
+    - New route apps/web/src/app/smartrotom/misiones/mazmorra/page.tsx (+ its _components) inside the existing misiones/layout.tsx Tavern shell
+    - SideRail.tsx: 6th SECTIONS entry + i18n-ization of the existing hardcoded labels (both SideRail and MobileRail)
+    - New misiones.mazmorra.* i18n keys in apps/web/locales/{en,es}/smartrotom/misiones.json
+    - Deletion of apps/web/src/app/smartrotom/mazmorra/ (page.tsx, ranking/page.tsx, _components/MenuWrapper.tsx)
+  out_of_scope:
+    - Any API/DB/migration work (backend is complete and read-only from the web)
+    - New design system or new ms-* tokens
+    - Renaming the app launcher's display entry away from "Misiones" (see open_questions — it is not a code artifact)
+    - Any other Misiones screen (Tablón, Trama, Mapa, Mochila, Bitácora) beyond adding the nav entry
+  glossary:
+    - Mazmorra = dungeon run (Pixelmon Teras mod feature)
+    - Gremio de Exploradores = "Guild of Explorers", the new in-app display identity for the Misiones app (PMD framing dropped, generic-fantasy guild framing)
+    - ms-* = the Misiones/tavern design-system token+class namespace (font-ms, ms-wood, ms-tab, ms-gold-*, etc.)
+    - mejorPisos/mejorEtapa/mejorTiempoMs = personal-best floor count / stage / clear time, part of DungeonRankingEntry
+
+actors_and_permissions:
+  not_applicable: Any signed-in SmartRotom player can view; same no-extra-roles model as the rest of Misiones. Anonymous/no-uuid just can't resolve a personal record (handled as an empty/soft state, not a permission error).
+
+entry_point:
+  route: /smartrotom/misiones/mazmorra (new app-router page, server component fetching getRanking; a client sub-component resolves useRotomUuid() for the personal-record panel)
+  navigation: 6th entry in the shared SECTIONS array consumed by both SideRail (desktop) and MobileRail (mobile tab strip) in apps/web/src/app/smartrotom/misiones/_components/SideRail.tsx
+  shell: wrapped by the existing misiones/layout.tsx Tavern shell (BoardProvider + SideRail/MobileRail + computed-height main), same as the other 4 screens — no new layout needed
+
+behavior:
+  RF-01:
+    GIVEN the dungeon leaderboard has ranked players
+    WHEN a signed-in player opens /smartrotom/misiones/mazmorra
+    THEN the leaderboard renders in tavern (ms-*) style, top-3 rows get a medal treatment, and the row matching the current player's uuid is visually highlighted
+  RF-02 (empty leaderboard):
+    GIVEN getRanking returns an empty array
+    WHEN the player opens the screen
+    THEN a themed "nobody has entered yet" empty state renders instead of an empty table
+  RF-03:
+    GIVEN the signed-in player has at least one recorded dungeon run
+    WHEN the screen loads their personal-record panel via getPlayerStats(uuid)
+    THEN it shows their best expedition — floors, stage, clear time, curses, coin/rank summary — pulled from DungeonPlayerStats.mejorPartida
+  RF-04 (no runs yet, error path):
+    GIVEN the signed-in player has never completed/attempted a dungeon run
+    WHEN getPlayerStats(uuid) responds 404
+    THEN the personal-record panel renders a themed empty state ("no expeditions yet"), never a raw error or broken layout
+  RF-05:
+    GIVEN the player is anywhere inside the Misiones tavern shell
+    WHEN they look at SideRail (desktop) or MobileRail (mobile)
+    THEN a 6th entry for the dungeon screen is present, and it shows the active/current highlight when that route is open (same isCurrent() mechanism as the other 5)
+  RF-06:
+    GIVEN the i18n migration in this same pass
+    WHEN any Misiones page renders the SideRail/MobileRail labels or the new dungeon screen's copy
+    THEN every string resolves through i18n keys (existing SECTIONS labels lifted out of hardcoded Spanish; new misiones.mazmorra.* keys added) in both en and es locales — no hardcoded literal strings remain in the touched files
+  RF-07 (stub removal):
+    GIVEN the new /smartrotom/misiones/mazmorra screen is live
+    WHEN a request hits the old /smartrotom/mazmorra or /smartrotom/mazmorra/ranking routes
+    THEN they no longer resolve (directory removed) — no dangling redirect to a deleted page
+  RF-08 (build gate):
+    GIVEN all of the above changes are complete
+    WHEN `pnpm type-check` runs
+    THEN it exits clean (repo convention: next.config.mjs ignores TS build errors, so this is the only real type gate)
+
+inputs_and_validation:
+  not_applicable: Read-only screen, no form inputs. The only implicit "input" is the current player's uuid from useRotomUuid() (session-derived, already validated upstream by useBoffSession) used to key getPlayerStats.
+
+data_contract:
+  not_applicable: No DB, no migration — frontend-only, backend already complete. API contract below is for design/implementation reference, not a change being made.
+  backend_contract[2]{endpoint,shape}:
+    GET /dungeons/ranking?limit,"DungeonRankingEntry[] { rank, uuid, nombre, partidas, completadas, mejorEtapa, mejorPisos, mejorTiempoMs(number|null), muertes, abandonos }"
+    GET /dungeons/stats/:uuid,"DungeonPlayerStats = DungeonRankingEntry + mejorPartida: DungeonBestRun|null { etapaInicial, etapaFinal, pisosSuperados, completada, duracionMs, maldiciones[], fecha }; 404 when the player has no runs"
+  existing_client: apps/web/src/services/api/smartrotom/mazmorraService.ts — MazmorraService.getRanking(limit) / getPlayerStats(uuid), both wrapping rotomGET, already wired and read-only. Both DTOs (DungeonRankingEntry, DungeonPlayerStats) already exist in packages/shared/src — never edit that package.
+
+flow_and_collaborators:
+  new_page: misiones/mazmorra/page.tsx (server) calls MazmorraService.getRanking(limit) → renders leaderboard panel (ms-* styled, reusing the Tavern's card/board conventions from sibling screens, not the old MenuWrapper/bg-layer-1 stub styling)
+  personal_record: a client sub-component reads useRotomUuid() → MazmorraService.getPlayerStats(uuid) → renders best-run panel, or the themed empty state on null-uuid / 404
+  nav: SideRail.tsx's shared SECTIONS array (consumed by both SideRail and MobileRail) gets a 6th { href, label, short, glyph } entry; label/short move from string literals to i18n key lookups
+  layout: misiones/layout.tsx Tavern shell is unchanged — the new route is just another `children` page, same as trama/mapa/mochila/bitacora
+
+outputs_and_processes:
+  not_applicable: No reports, files, or batch processes; single read-only screen.
+
+integrations_and_config:
+  not_applicable: No new integration or env config. Reuses the existing rotomGET wrapper (services/boffAPI) and MazmorraService, both already deployed and working.
+
+sensitive_areas:
+  - SideRail.tsx / MobileRail: hardcoded Spanish strings in two places — the SECTIONS array (label/short per tab) AND the standalone "Misiones" header/brand text in each component's JSX (the h1 in SideRail, the "✦ Misiones" span in MobileRail) — both need i18n, not just the array
+  - i18n keys: new misiones.mazmorra.* namespace must land in BOTH apps/web/locales/en/smartrotom/misiones.json and .../es/smartrotom/misiones.json (only 2 locales exist); the lifted SideRail keys likewise need both
+  - Computed shell height: Tavern uses `h-[calc(100dvh_-_3rem)]`, explicitly NOT h-full (documented in-code as a known collapse trap for Starbank/Notas/Taxi/Misiones alike) — the new screen's root must fit this contract, not fight it
+  - Design-system boundary: the new screen must stay entirely within ms-* (tavern) styling; must NOT reuse anything from the deleted stub (which used Boffmedia-style bg-layer-1/edge classes) or from other SmartRotom sub-DS tokens
+  - Stub removal is a route deletion: anything still linking to /smartrotom/mazmorra or its ranking sub-route breaks after this change (none found in this pass — not reachable from SideRail or the app launcher grid today)
+  - packages/shared/src/models/{DungeonRankingEntry,DungeonPlayerStats}.ts are auto-generated; read but never edit
+
+target_capabilities:
+  not_applicable: Backend is complete and untouched (D4). This is a direct frontend component/route + i18n change; none of this repo's cap-* skills (cap-api-endpoint, cap-data-access, cap-service, cap-testing-strategy) are backend-shaped matches here — design/apply should proceed as a plain frontend implementation, no cap-* skill needed for the surface itself.
+
+success_criteria:
+  - S1 — leaderboard renders in tavern style with medals + current-player highlight (RF-01, RF-02)
+  - S2 — personal record shows on a hit, themed empty state on 404 (RF-03, RF-04)
+  - S3 — SideRail 6th entry present and active-highlighted (RF-05)
+  - S4 — app identity reads "Gremio de Exploradores"; SideRail labels resolve via i18n (RF-06) — scoped to in-app screens only, see open_questions on the launcher entry
+  - S5 — pnpm type-check passes (RF-08)
+  - stub cleanup — old routes gone (RF-07), implied by D5, not itemized as its own S-id in prepare.toon but required for the change to be complete
+
+rollback: Purely additive except the stub removal. Revert: new misiones/mazmorra/ route + its _components, the SideRail 6th entry + i18n-lift, the new misiones.mazmorra.* keys (both locales), and restore app/smartrotom/mazmorra/ (page.tsx, ranking/page.tsx, _components/MenuWrapper.tsx) from git history if the stub removal needs undoing. No DB, no API, no migration involved at any point.
+
+open_questions:
+  - Launcher display-name rebrand (D2, "Misiones" -> "Gremio de Exploradores" in the Rotom app launcher/grid): investigated and NOT a code registry. AppList → useGetAppsForPlayer → AppsService.getForPlayer resolves to the `SmartRotomApp` entity (apps/api/src/api/smartrotom/apps/entities/app.entity.ts, table behind apps.repository.ts), a full DB-backed CRUD resource already managed through the Gobierno admin panel (apps/web/src/app/smartrotom/gobierno/_components/admin/adminApi.ts → PATCH via AppsController.update). No frontend/source file holds that display string. Renaming it is a data edit via the existing admin UI (or a manual one-off update), not a file this spec can change, and doing it would be a DB write — out of scope per D4/no-migration. Recommend: this spec covers only the in-app rebrand (SideRail header, MobileRail brand text, i18n keys); the launcher-grid entry name is a separate, out-of-band admin action for the user, not a `design`/`tasks` deliverable. Flag to gatekeeper.
+  - Exact visual treatment for "medal" top-3 rows and the current-player highlight is not specified beyond "use ms-* tokens" (constraint) — left for `design` to pick from existing ms-gold-* tokens; no new tokens allowed.
+  - Personal-record panel placement (same page as leaderboard, two panels, vs. tabs) assumed to be one screen with both panels stacked/side-by-side, per prepare.toon's "one new screen ... leaderboard + personal-record panel" wording — `design` should confirm layout, not add a second route.

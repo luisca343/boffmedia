@@ -108,6 +108,9 @@ export function padNum(n: string | number): string {
   return s.padStart(3, "0")
 }
 
+/** Locale-aware relative time. Deliberately NOT `lib/format`'s `timeAgo`: that one
+ *  renders hardcoded Spanish, and this one is driven by the viewer's locale through
+ *  `Intl.RelativeTimeFormat`. Collapsing it would regress i18n here. */
 export function timeAgo(iso: string, locale: string): string {
   const d = new Date(iso)
   if (isNaN(d.getTime())) return ""
