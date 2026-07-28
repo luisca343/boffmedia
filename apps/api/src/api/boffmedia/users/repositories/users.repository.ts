@@ -8,8 +8,8 @@ import {
   boffMediaRoles,
   boffMediaUserRoles,
 } from '@/_db/schema/BoffMedia';
-import { smartrotomUsers } from '@/_db/schema/SmartRotom';
-import { boffMediaParticipants } from '@/_db/schema/Events';
+import { rotomUsers } from '@/_db/schema/SmartRotom';
+import { boffMediaParticipants } from '@/_db/schema/BoffMediaEvents';
 import {
   BoffMediaUserSafe,
   FullUserData,
@@ -56,12 +56,12 @@ export class BoffMediaUsersRepository implements IBoffMediaUsersRepository {
 
   private readonly fullUserSelectWithoutPassword = {
     boffmedia_users: this.userSelectWithoutPassword,
-    rotom_users: smartrotomUsers,
+    rotom_users: rotomUsers,
   };
 
   private readonly fullUserSelectWithPassword = {
     boffmedia_users: this.userSelectWithPassword,
-    rotom_users: smartrotomUsers,
+    rotom_users: rotomUsers,
   };
 
   // ==================== CREATE OPERATIONS ====================
@@ -337,8 +337,8 @@ export class BoffMediaUsersRepository implements IBoffMediaUsersRepository {
         .select(this.fullUserSelectWithPassword)
         .from(boffMediaUsers)
         .leftJoin(
-          smartrotomUsers,
-          eq(boffMediaUsers.uuid, smartrotomUsers.uuid),
+          rotomUsers,
+          eq(boffMediaUsers.uuid, rotomUsers.uuid),
         )
         .where(
           and(
@@ -375,8 +375,8 @@ export class BoffMediaUsersRepository implements IBoffMediaUsersRepository {
         .select(this.fullUserSelectWithoutPassword)
         .from(boffMediaUsers)
         .leftJoin(
-          smartrotomUsers,
-          eq(boffMediaUsers.uuid, smartrotomUsers.uuid),
+          rotomUsers,
+          eq(boffMediaUsers.uuid, rotomUsers.uuid),
         )
         .where(
           and(
@@ -410,12 +410,12 @@ export class BoffMediaUsersRepository implements IBoffMediaUsersRepository {
       const rows = await this.db
         .select({
           boffmedia_users: this.userSelectWithoutPassword,
-          rotom_users: smartrotomUsers,
+          rotom_users: rotomUsers,
         })
-        .from(smartrotomUsers)
-        .leftJoin(boffMediaUsers, eq(boffMediaUsers.uuid, smartrotomUsers.uuid))
+        .from(rotomUsers)
+        .leftJoin(boffMediaUsers, eq(boffMediaUsers.uuid, rotomUsers.uuid))
         .where(
-          and(eq(smartrotomUsers.uuid, uuid), isNull(boffMediaUsers.deletedAt)),
+          and(eq(rotomUsers.uuid, uuid), isNull(boffMediaUsers.deletedAt)),
         )
         .execute();
 
@@ -442,8 +442,8 @@ export class BoffMediaUsersRepository implements IBoffMediaUsersRepository {
         .select(this.fullUserSelectWithoutPassword)
         .from(boffMediaUsers)
         .leftJoin(
-          smartrotomUsers,
-          eq(boffMediaUsers.uuid, smartrotomUsers.uuid),
+          rotomUsers,
+          eq(boffMediaUsers.uuid, rotomUsers.uuid),
         )
         .where(
           and(

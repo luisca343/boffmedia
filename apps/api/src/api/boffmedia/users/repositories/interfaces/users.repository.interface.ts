@@ -1,5 +1,5 @@
 import { BoffMediaUser } from '@/_db/schema/BoffMedia';
-import { SmartRotomUser } from '@/_db/schema/SmartRotom';
+import { RotomUser } from '@/_db/schema/SmartRotom';
 import { CreateUserDto } from '../../dto/create-user.dto';
 
 // Entity types for responses (without password, the internal soft-delete marker,
@@ -15,12 +15,12 @@ export type BoffMediaUserSafe = Omit<
 // clause.
 export interface FullUserData {
   boffmedia_users: Omit<BoffMediaUser, 'deletedAt' | 'lastSeenAt'>;
-  rotom_users: SmartRotomUser | null;
+  rotom_users: RotomUser | null;
 }
 
 export interface FullUserDataSafe {
   boffmedia_users: BoffMediaUserSafe;
-  rotom_users: SmartRotomUser | null;
+  rotom_users: RotomUser | null;
 }
 
 export interface IBoffMediaUsersRepository {

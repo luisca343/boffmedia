@@ -3,11 +3,11 @@ import { MySql2Database } from 'drizzle-orm/mysql2';
 import { and, asc, between, desc, eq, sql } from 'drizzle-orm';
 import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
 import {
-  smartRotomAchievements,
-  smartRotomReplays,
-  smartRotomUserAchievements,
-  smartRotomUserReplays,
-  smartrotomUsers,
+  rotomAchievements,
+  rotomReplays,
+  rotomUserAchievements,
+  rotomUserReplays,
+  rotomUsers,
 } from '@/_db/schema/SmartRotom';
 import {
   NewPasaporteProfile,
@@ -42,12 +42,12 @@ export class PasaporteRepository {
   async findUser(uuid: string) {
     const rows = await this.db
       .select({
-        uuid: smartrotomUsers.uuid,
-        username: smartrotomUsers.username,
-        world: smartrotomUsers.world,
+        uuid: rotomUsers.uuid,
+        username: rotomUsers.username,
+        world: rotomUsers.world,
       })
-      .from(smartrotomUsers)
-      .where(eq(smartrotomUsers.uuid, uuid))
+      .from(rotomUsers)
+      .where(eq(rotomUsers.uuid, uuid))
       .limit(1);
     return rows[0] ?? null;
   }
@@ -84,24 +84,24 @@ export class PasaporteRepository {
     badges: number;
   }> {
     const [totalRows, completedRows] = await Promise.all([
-      this.db.select({ c: sql<number>`count(*)` }).from(smartRotomAchievements),
+      this.db.select({ c: sql<number>`count(*)` }).from(rotomAchievements),
       this.db
         .select({
           c: sql<number>`count(*)`,
-          badges: sql<number>`sum(case when ${smartRotomAchievements.category} = ${BADGE_CATEGORY} then 1 else 0 end)`,
+          badges: sql<number>`sum(case when ${rotomAchievements.category} = ${BADGE_CATEGORY} then 1 else 0 end)`,
         })
-        .from(smartRotomUserAchievements)
+        .from(rotomUserAchievements)
         .innerJoin(
-          smartRotomAchievements,
+          rotomAchievements,
           eq(
-            smartRotomAchievements.id,
-            smartRotomUserAchievements.achievementId,
+            rotomAchievements.id,
+            rotomUserAchievements.achievementId,
           ),
         )
         .where(
           and(
-            eq(smartRotomUserAchievements.uuid, uuid),
-            eq(smartRotomUserAchievements.completed, 1),
+            eq(rotomUserAchievements.uuid, uuid),
+            eq(rotomUserAchievements.completed, 1),
           ),
         ),
     ]);
@@ -119,13 +119,13 @@ export class PasaporteRepository {
   async firstActivityAt(uuid: string): Promise<Date | null> {
     const rows = await this.db
       .select({
-        at: sql<Date | null>`min(${smartRotomUserAchievements.completedAt})`,
+        at: sql<Date | null>`min(${rotomUserAchievements.completedAt})`,
       })
-      .from(smartRotomUserAchievements)
+      .from(rotomUserAchievements)
       .where(
         and(
-          eq(smartRotomUserAchievements.uuid, uuid),
-          eq(smartRotomUserAchievements.completed, 1),
+          eq(rotomUserAchievements.uuid, uuid),
+          eq(rotomUserAchievements.completed, 1),
         ),
       );
 
@@ -140,54 +140,54 @@ export class PasaporteRepository {
   async findLogros(uuid: string): Promise<LogroView[]> {
     const completions = this.db
       .select({
-        achievementId: smartRotomUserAchievements.achievementId,
+        achievementId: rotomUserAchievements.achievementId,
         players:
-          sql<number>`count(distinct ${smartRotomUserAchievements.uuid})`.as(
+          sql<number>`count(distinct ${rotomUserAchievements.uuid})`.as(
             'players',
           ),
       })
-      .from(smartRotomUserAchievements)
-      .where(eq(smartRotomUserAchievements.completed, 1))
-      .groupBy(smartRotomUserAchievements.achievementId)
+      .from(rotomUserAchievements)
+      .where(eq(rotomUserAchievements.completed, 1))
+      .groupBy(rotomUserAchievements.achievementId)
       .as('completions');
 
     const rows = await this.db
       .select({
-        id: smartRotomAchievements.id,
-        name: smartRotomAchievements.name,
-        description: smartRotomAchievements.description,
-        icon: smartRotomAchievements.icon,
-        category: smartRotomAchievements.category,
-        subcategory: smartRotomAchievements.subcategory,
-        target: smartRotomAchievements.target,
-        order: smartRotomAchievements.order,
-        points: smartRotomAchievements.points,
-        tier: smartRotomAchievements.tier,
-        progress: smartRotomUserAchievements.progress,
-        completed: smartRotomUserAchievements.completed,
-        completedAt: smartRotomUserAchievements.completedAt,
+        id: rotomAchievements.id,
+        name: rotomAchievements.name,
+        description: rotomAchievements.description,
+        icon: rotomAchievements.icon,
+        category: rotomAchievements.category,
+        subcategory: rotomAchievements.subcategory,
+        target: rotomAchievements.target,
+        order: rotomAchievements.order,
+        points: rotomAchievements.points,
+        tier: rotomAchievements.tier,
+        progress: rotomUserAchievements.progress,
+        completed: rotomUserAchievements.completed,
+        completedAt: rotomUserAchievements.completedAt,
         players: completions.players,
-        totalPlayers: sql<number>`(select count(distinct ua.uuid) from ${smartRotomUserAchievements} ua)`,
+        totalPlayers: sql<number>`(select count(distinct ua.uuid) from ${rotomUserAchievements} ua)`,
       })
-      .from(smartRotomAchievements)
+      .from(rotomAchievements)
       .leftJoin(
-        smartRotomUserAchievements,
+        rotomUserAchievements,
         and(
           eq(
-            smartRotomAchievements.id,
-            smartRotomUserAchievements.achievementId,
+            rotomAchievements.id,
+            rotomUserAchievements.achievementId,
           ),
-          eq(smartRotomUserAchievements.uuid, uuid),
+          eq(rotomUserAchievements.uuid, uuid),
         ),
       )
       .leftJoin(
         completions,
-        eq(completions.achievementId, smartRotomAchievements.id),
+        eq(completions.achievementId, rotomAchievements.id),
       )
       .orderBy(
-        asc(smartRotomAchievements.category),
-        asc(smartRotomAchievements.order),
-        asc(smartRotomAchievements.name),
+        asc(rotomAchievements.category),
+        asc(rotomAchievements.order),
+        asc(rotomAchievements.name),
       );
 
     return rows.map((r) => {
@@ -244,22 +244,22 @@ export class PasaporteRepository {
   ): Promise<SeasonBattle[]> {
     const rows = await this.db
       .select({
-        replayId: smartRotomReplays.id,
-        winner: smartRotomReplays.winner,
-        createdAt: smartRotomReplays.createdAt,
+        replayId: rotomReplays.id,
+        winner: rotomReplays.winner,
+        createdAt: rotomReplays.createdAt,
       })
-      .from(smartRotomUserReplays)
+      .from(rotomUserReplays)
       .innerJoin(
-        smartRotomReplays,
-        eq(smartRotomReplays.id, smartRotomUserReplays.replayId),
+        rotomReplays,
+        eq(rotomReplays.id, rotomUserReplays.replayId),
       )
       .where(
         and(
-          eq(smartRotomUserReplays.uuid, uuid),
-          between(smartRotomReplays.createdAt, startsAt, endsAt),
+          eq(rotomUserReplays.uuid, uuid),
+          between(rotomReplays.createdAt, startsAt, endsAt),
         ),
       )
-      .orderBy(asc(smartRotomReplays.createdAt), asc(smartRotomReplays.id));
+      .orderBy(asc(rotomReplays.createdAt), asc(rotomReplays.id));
 
     return rows.map((r) => ({
       replayId: r.replayId,
@@ -275,24 +275,24 @@ export class PasaporteRepository {
     startsAt: Date,
     endsAt: Date,
   ): Promise<{ uuid: string; lp: number }[]> {
-    const wins = sql<number>`sum(case when ${smartRotomReplays.winner} = ${smartrotomUsers.username} then 1 else 0 end)`;
-    const losses = sql<number>`sum(case when ${smartRotomReplays.winner} is null or ${smartRotomReplays.winner} <> ${smartrotomUsers.username} then 1 else 0 end)`;
+    const wins = sql<number>`sum(case when ${rotomReplays.winner} = ${rotomUsers.username} then 1 else 0 end)`;
+    const losses = sql<number>`sum(case when ${rotomReplays.winner} is null or ${rotomReplays.winner} <> ${rotomUsers.username} then 1 else 0 end)`;
     const lp = sql<number>`greatest(0, (${wins}) * 20 - (${losses}) * 12)`;
 
     const rows = await this.db
-      .select({ uuid: smartRotomUserReplays.uuid, lp })
-      .from(smartRotomUserReplays)
+      .select({ uuid: rotomUserReplays.uuid, lp })
+      .from(rotomUserReplays)
       .innerJoin(
-        smartRotomReplays,
-        eq(smartRotomReplays.id, smartRotomUserReplays.replayId),
+        rotomReplays,
+        eq(rotomReplays.id, rotomUserReplays.replayId),
       )
       .innerJoin(
-        smartrotomUsers,
-        eq(smartrotomUsers.uuid, smartRotomUserReplays.uuid),
+        rotomUsers,
+        eq(rotomUsers.uuid, rotomUserReplays.uuid),
       )
-      .where(between(smartRotomReplays.createdAt, startsAt, endsAt))
-      .groupBy(smartRotomUserReplays.uuid)
-      .orderBy(desc(lp), asc(smartRotomUserReplays.uuid));
+      .where(between(rotomReplays.createdAt, startsAt, endsAt))
+      .groupBy(rotomUserReplays.uuid)
+      .orderBy(desc(lp), asc(rotomUserReplays.uuid));
 
     return rows.map((r) => ({ uuid: r.uuid, lp: Number(r.lp ?? 0) }));
   }

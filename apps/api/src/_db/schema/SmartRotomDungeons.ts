@@ -28,7 +28,7 @@ export const dungeonRuns = mysqlTable('rotom_dungeon_runs', {
   createdAt: timestamp('created_at').default(sql`CURRENT_TIMESTAMP()`),
 });
 
-export type PartidaMazmorra = typeof dungeonRuns.$inferSelect;
+export type DungeonRun = typeof dungeonRuns.$inferSelect;
 
 /**
  * Deliberately no FK to `rotom_users`: a dungeon party is whoever walked in, and a player
@@ -56,4 +56,4 @@ export const dungeonRunPlayers = mysqlTable(
   ],
 );
 
-export type ParticipanteMazmorra = typeof dungeonRunPlayers.$inferSelect;
+export type DungeonRunPlayer = typeof dungeonRunPlayers.$inferSelect;

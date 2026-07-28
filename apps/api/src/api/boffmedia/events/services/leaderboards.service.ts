@@ -9,7 +9,7 @@ import {
   boffMediaEvents,
   boffMediaEventTeams,
   boffMediaEventTeamMembers,
-} from '@/_db/schema/Events';
+} from '@/_db/schema/BoffMediaEvents';
 import { LeaderboardEntry } from '../entities/leaderboard.entity';
 
 interface TeamLeaderboardEntry {

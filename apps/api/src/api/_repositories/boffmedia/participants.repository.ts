@@ -9,7 +9,7 @@ import {
   boffMediaAchievements,
   Participant,
   EventParticipant,
-} from '@/_db/schema/Events';
+} from '@/_db/schema/BoffMediaEvents';
 import { boffMediaUsers } from '@/_db/schema/BoffMedia';
 
 @Injectable()

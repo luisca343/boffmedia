@@ -6,7 +6,7 @@ import { alias } from 'drizzle-orm/mysql-core';
 import {
   starBankAccounts,
   starBankTransactions,
-  starBankUsersAccounts,
+  starBankUserAccounts,
 } from '@/_db/schema/SmartRotomStarBank';
 import { StarBankTransaction } from '../entities/starbank-transaction.entity';
 import { TransactionType } from '../enums/transaction-type.enum';
@@ -89,14 +89,14 @@ export class StarbankTransactionRepository implements IStarbankTransactionReposi
         const inserted = await tx
           .insert(starBankTransactions)
           .values({
-            from: fromId,
-            to: toId,
+            fromAccountId: fromId,
+            toAccountId: toId,
             amount,
             fromBalance,
             toBalance,
             reason: transactionData.reason,
             type: transactionData.type,
-            date: new Date().toISOString(),
+            date: new Date(),
           })
           .execute();
 
@@ -166,14 +166,14 @@ export class StarbankTransactionRepository implements IStarbankTransactionReposi
         await tx
           .insert(starBankTransactions)
           .values({
-            from: isMint ? 0 : accountId,
-            to: isMint ? accountId : 0,
+            fromAccountId: isMint ? 0 : accountId,
+            toAccountId: isMint ? accountId : 0,
             amount: Math.abs(delta),
             fromBalance: isMint ? 0 : targetBalance,
             toBalance: isMint ? targetBalance : 0,
             reason,
             type: TransactionType.AJUSTE,
-            date: new Date().toISOString(),
+            date: new Date(),
           })
           .execute();
 
@@ -194,9 +194,9 @@ export class StarbankTransactionRepository implements IStarbankTransactionReposi
   // listings returned the whole bank's rows.
   private ownedAccountIds(uuid: string) {
     return this.db
-      .select({ accountId: starBankUsersAccounts.accountId })
-      .from(starBankUsersAccounts)
-      .where(eq(starBankUsersAccounts.uuid, uuid));
+      .select({ accountId: starBankUserAccounts.accountId })
+      .from(starBankUserAccounts)
+      .where(eq(starBankUserAccounts.uuid, uuid));
   }
 
   async findByAccountId(
@@ -209,9 +209,9 @@ export class StarbankTransactionRepository implements IStarbankTransactionReposi
 
       const result = await this.db
         .select({
-          from: starBankTransactions.from,
-          to: starBankTransactions.to,
-          isPayer: eq(starBankTransactions.from, accountId),
+          from: starBankTransactions.fromAccountId,
+          to: starBankTransactions.toAccountId,
+          isPayer: eq(starBankTransactions.fromAccountId, accountId),
           amount: starBankTransactions.amount,
           reason: starBankTransactions.reason,
           fromBalance: starBankTransactions.fromBalance,
@@ -224,12 +224,12 @@ export class StarbankTransactionRepository implements IStarbankTransactionReposi
           date: starBankTransactions.date,
         })
         .from(starBankTransactions)
-        .innerJoin(toJoin, eq(starBankTransactions.to, toJoin.id))
-        .innerJoin(fromJoin, eq(starBankTransactions.from, fromJoin.id))
+        .innerJoin(toJoin, eq(starBankTransactions.toAccountId, toJoin.id))
+        .innerJoin(fromJoin, eq(starBankTransactions.fromAccountId, fromJoin.id))
         .where(
           or(
-            eq(starBankTransactions.from, accountId),
-            eq(starBankTransactions.to, accountId),
+            eq(starBankTransactions.fromAccountId, accountId),
+            eq(starBankTransactions.toAccountId, accountId),
           ),
         )
         .limit(limit)
@@ -257,9 +257,9 @@ export class StarbankTransactionRepository implements IStarbankTransactionReposi
 
       const result = await this.db
         .select({
-          from: starBankTransactions.from,
-          to: starBankTransactions.to,
-          isPayer: inArray(starBankTransactions.from, owned),
+          from: starBankTransactions.fromAccountId,
+          to: starBankTransactions.toAccountId,
+          isPayer: inArray(starBankTransactions.fromAccountId, owned),
           amount: starBankTransactions.amount,
           reason: starBankTransactions.reason,
           fromBalance: starBankTransactions.fromBalance,
@@ -272,12 +272,12 @@ export class StarbankTransactionRepository implements IStarbankTransactionReposi
           date: starBankTransactions.date,
         })
         .from(starBankTransactions)
-        .innerJoin(toJoin, eq(starBankTransactions.to, toJoin.id))
-        .innerJoin(fromJoin, eq(starBankTransactions.from, fromJoin.id))
+        .innerJoin(toJoin, eq(starBankTransactions.toAccountId, toJoin.id))
+        .innerJoin(fromJoin, eq(starBankTransactions.fromAccountId, fromJoin.id))
         .where(
           or(
-            inArray(starBankTransactions.from, owned),
-            inArray(starBankTransactions.to, owned),
+            inArray(starBankTransactions.fromAccountId, owned),
+            inArray(starBankTransactions.toAccountId, owned),
           ),
         )
         .limit(limit)
@@ -301,9 +301,9 @@ export class StarbankTransactionRepository implements IStarbankTransactionReposi
 
       const result = await this.db
         .select({
-          from: starBankTransactions.from,
-          to: starBankTransactions.to,
-          isPayer: eq(starBankTransactions.from, accountId),
+          from: starBankTransactions.fromAccountId,
+          to: starBankTransactions.toAccountId,
+          isPayer: eq(starBankTransactions.fromAccountId, accountId),
           amount: starBankTransactions.amount,
           reason: starBankTransactions.reason,
           fromBalance: starBankTransactions.fromBalance,
@@ -316,14 +316,14 @@ export class StarbankTransactionRepository implements IStarbankTransactionReposi
           date: starBankTransactions.date,
         })
         .from(starBankTransactions)
-        .innerJoin(toJoin, eq(starBankTransactions.to, toJoin.id))
-        .innerJoin(fromJoin, eq(starBankTransactions.from, fromJoin.id))
+        .innerJoin(toJoin, eq(starBankTransactions.toAccountId, toJoin.id))
+        .innerJoin(fromJoin, eq(starBankTransactions.fromAccountId, fromJoin.id))
         .where(
           and(
             eq(starBankTransactions.type, TransactionType.TRANSFERENCIA),
             or(
-              eq(starBankTransactions.from, accountId),
-              eq(starBankTransactions.to, accountId),
+              eq(starBankTransactions.fromAccountId, accountId),
+              eq(starBankTransactions.toAccountId, accountId),
             ),
           ),
         )
@@ -352,9 +352,9 @@ export class StarbankTransactionRepository implements IStarbankTransactionReposi
 
       const result = await this.db
         .select({
-          from: starBankTransactions.from,
-          to: starBankTransactions.to,
-          isPayer: inArray(starBankTransactions.from, owned),
+          from: starBankTransactions.fromAccountId,
+          to: starBankTransactions.toAccountId,
+          isPayer: inArray(starBankTransactions.fromAccountId, owned),
           amount: starBankTransactions.amount,
           reason: starBankTransactions.reason,
           fromBalance: starBankTransactions.fromBalance,
@@ -367,14 +367,14 @@ export class StarbankTransactionRepository implements IStarbankTransactionReposi
           date: starBankTransactions.date,
         })
         .from(starBankTransactions)
-        .innerJoin(toJoin, eq(starBankTransactions.to, toJoin.id))
-        .innerJoin(fromJoin, eq(starBankTransactions.from, fromJoin.id))
+        .innerJoin(toJoin, eq(starBankTransactions.toAccountId, toJoin.id))
+        .innerJoin(fromJoin, eq(starBankTransactions.fromAccountId, fromJoin.id))
         .where(
           and(
             eq(starBankTransactions.type, TransactionType.TRANSFERENCIA),
             or(
-              inArray(starBankTransactions.from, owned),
-              inArray(starBankTransactions.to, owned),
+              inArray(starBankTransactions.fromAccountId, owned),
+              inArray(starBankTransactions.toAccountId, owned),
             ),
           ),
         )
@@ -399,8 +399,8 @@ export class StarbankTransactionRepository implements IStarbankTransactionReposi
 
       const result = await this.db
         .select({
-          from: starBankTransactions.from,
-          to: starBankTransactions.to,
+          from: starBankTransactions.fromAccountId,
+          to: starBankTransactions.toAccountId,
           amount: starBankTransactions.amount,
           reason: starBankTransactions.reason,
           fromBalance: starBankTransactions.fromBalance,
@@ -413,8 +413,8 @@ export class StarbankTransactionRepository implements IStarbankTransactionReposi
           date: starBankTransactions.date,
         })
         .from(starBankTransactions)
-        .innerJoin(toJoin, eq(starBankTransactions.to, toJoin.id))
-        .innerJoin(fromJoin, eq(starBankTransactions.from, fromJoin.id))
+        .innerJoin(toJoin, eq(starBankTransactions.toAccountId, toJoin.id))
+        .innerJoin(fromJoin, eq(starBankTransactions.fromAccountId, fromJoin.id))
         .where(eq(starBankTransactions.type, type))
         .limit(limit)
         .orderBy(desc(starBankTransactions.date));

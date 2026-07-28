@@ -1,6 +1,7 @@
 import {
   bigint,
   boolean,
+  foreignKey,
   index,
   int,
   json,
@@ -11,7 +12,7 @@ import {
   uniqueIndex,
   varchar,
 } from 'drizzle-orm/mysql-core';
-import { smartrotomUsers } from './SmartRotom';
+import { rotomUsers } from './SmartRotom';
 import { starBankTransactions } from './SmartRotomStarBank';
 
 // The Pokémon on sale live on the Pixelmon game server and have NO id (see SmartRotomPc.ts).
@@ -29,15 +30,15 @@ const playerUuid = (name: string) => varchar(name, { length: 36 });
 
 // One row per thing for sale. `kind` says what is inside (a mon, a stack of items, or a
 // bundle of several), `format` says how it is sold (fixed price, auction, best-offer, trade).
-// The contents live in wigglypop_listing_mons / wigglypop_listing_items.
+// The contents live in rotom_wigglypop_listing_mons / rotom_wigglypop_listing_items.
 export const wigglypopListings = mysqlTable(
-  'wigglypop_listings',
+  'rotom_wigglypop_listings',
   {
     id: int('id').primaryKey().autoincrement(),
     code: varchar('code', { length: 24 }).notNull().unique(),
     sellerUuid: playerUuid('seller_uuid')
       .notNull()
-      .references(() => smartrotomUsers.uuid, {
+      .references(() => rotomUsers.uuid, {
         onDelete: 'cascade',
         onUpdate: 'cascade',
       }),
@@ -84,15 +85,12 @@ export type WigglypopListing = typeof wigglypopListings.$inferSelect;
 // A frozen copy of a Pokémon as it was when listed. A `mon` listing has exactly one row;
 // a `bundle` has N. Nothing here is re-read from the game server — it is the shop window.
 export const wigglypopListingMons = mysqlTable(
-  'wigglypop_listing_mons',
+  'rotom_wigglypop_listing_mons',
   {
     id: int('id').primaryKey().autoincrement(),
-    listingId: int('listing_id')
-      .notNull()
-      .references(() => wigglypopListings.id, {
-        onDelete: 'cascade',
-        onUpdate: 'cascade',
-      }),
+    // FK named explicitly below: the auto-generated name exceeds MySQL's
+    // 64-char identifier limit.
+    listingId: int('listing_id').notNull(),
     pokemonKey: pokemonKey().notNull(),
     sourceBox: int('source_box').notNull(),
     sourceIndex: int('source_index').notNull(),
@@ -121,57 +119,72 @@ export const wigglypopListingMons = mysqlTable(
   (t) => ({
     listingIdx: index('wp_lmons_listing_idx').on(t.listingId),
     dexIdx: index('wp_lmons_dex_idx').on(t.dex),
+    listingFk: foreignKey({
+      name: 'wp_lmons_listing_fk',
+      columns: [t.listingId],
+      foreignColumns: [wigglypopListings.id],
+    })
+      .onDelete('cascade')
+      .onUpdate('cascade'),
   }),
 );
 
 export type WigglypopListingMon = typeof wigglypopListingMons.$inferSelect;
 
 export const wigglypopListingItems = mysqlTable(
-  'wigglypop_listing_items',
+  'rotom_wigglypop_listing_items',
   {
     id: int('id').primaryKey().autoincrement(),
-    listingId: int('listing_id')
-      .notNull()
-      .references(() => wigglypopListings.id, {
-        onDelete: 'cascade',
-        onUpdate: 'cascade',
-      }),
+    // FK named explicitly below: the auto-generated name exceeds MySQL's
+    // 64-char identifier limit.
+    listingId: int('listing_id').notNull(),
     itemId: varchar('item_id', { length: 128 }).notNull(),
     itemName: varchar('item_name', { length: 128 }).notNull(),
     category: varchar('category', { length: 32 }),
     qty: int('qty').notNull().default(1),
     unitPrice: bigint('unit_price', { mode: 'number' }).notNull().default(0),
   },
-  (t) => ({ listingIdx: index('wp_litems_listing_idx').on(t.listingId) }),
+  (t) => ({
+    listingIdx: index('wp_litems_listing_idx').on(t.listingId),
+    listingFk: foreignKey({
+      name: 'wp_litems_listing_fk',
+      columns: [t.listingId],
+      foreignColumns: [wigglypopListings.id],
+    })
+      .onDelete('cascade')
+      .onUpdate('cascade'),
+  }),
 );
 
 export type WigglypopListingItem = typeof wigglypopListingItems.$inferSelect;
 
 // The reference price list. Seeded by the migration; an admin can retune ref_price later.
 // Item valuation is ref_price × qty and nothing else — there is no market model for items.
-export const wigglypopItemCatalog = mysqlTable('wigglypop_item_catalog', {
-  id: varchar('id', { length: 128 }).primaryKey(),
-  name: varchar('name', { length: 128 }).notNull(),
-  category: varchar('category', { length: 32 }).notNull().default('otros'),
-  refPrice: bigint('ref_price', { mode: 'number' }).notNull().default(0),
-  sprite: varchar('sprite', { length: 255 }),
-});
+export const wigglypopCatalogItems = mysqlTable(
+  'rotom_wigglypop_catalog_items',
+  {
+    id: varchar('id', { length: 128 }).primaryKey(),
+    name: varchar('name', { length: 128 }).notNull(),
+    category: varchar('category', { length: 32 }).notNull().default('otros'),
+    refPrice: bigint('ref_price', { mode: 'number' }).notNull().default(0),
+    sprite: varchar('sprite', { length: 255 }),
+  },
+);
 
-export type WigglypopItemCatalogEntry =
-  typeof wigglypopItemCatalog.$inferSelect;
+export type WigglypopCatalogItem = typeof wigglypopCatalogItems.$inferSelect;
 
 // ─── Orders ───────────────────────────────────────────────────────────────────
 
 // The buy. `escrow_tx_id` is the real StarBank transfer that moved the buyer's money into the
 // market's escrow account — not a bookkeeping row. The order cannot progress without it.
 export const wigglypopOrders = mysqlTable(
-  'wigglypop_orders',
+  'rotom_wigglypop_orders',
   {
     id: int('id').primaryKey().autoincrement(),
     code: varchar('code', { length: 24 }).notNull().unique(),
     buyerUuid: playerUuid('buyer_uuid')
       .notNull()
-      .references(() => smartrotomUsers.uuid, {
+      .references(() => rotomUsers.uuid, {
         onDelete: 'cascade',
         onUpdate: 'cascade',
       }),
@@ -179,28 +192,33 @@ export const wigglypopOrders = mysqlTable(
     fee: bigint('fee', { mode: 'number' }).notNull().default(0),
     total: bigint('total', { mode: 'number' }).notNull().default(0),
     status: varchar('status', { length: 16 }).notNull().default('escrow'),
-    escrowTxId: int('escrow_tx_id').references(() => starBankTransactions.id, {
-      onDelete: 'set null',
-      onUpdate: 'cascade',
-    }),
+    // FK named explicitly below: the auto-generated name exceeds MySQL's
+    // 64-char identifier limit.
+    escrowTxId: int('escrow_tx_id'),
     createdAt: timestamp('created_at').notNull().defaultNow(),
     updatedAt: timestamp('updated_at').notNull().defaultNow().onUpdateNow(),
   },
-  (t) => ({ buyerIdx: index('wp_orders_buyer_idx').on(t.buyerUuid) }),
+  (t) => ({
+    buyerIdx: index('wp_orders_buyer_idx').on(t.buyerUuid),
+    escrowFk: foreignKey({
+      name: 'wp_orders_escrow_fk',
+      columns: [t.escrowTxId],
+      foreignColumns: [starBankTransactions.id],
+    })
+      .onDelete('set null')
+      .onUpdate('cascade'),
+  }),
 );
 
 export type WigglypopOrder = typeof wigglypopOrders.$inferSelect;
 
 export const wigglypopOrderLines = mysqlTable(
-  'wigglypop_order_lines',
+  'rotom_wigglypop_order_lines',
   {
     id: int('id').primaryKey().autoincrement(),
-    orderId: int('order_id')
-      .notNull()
-      .references(() => wigglypopOrders.id, {
-        onDelete: 'cascade',
-        onUpdate: 'cascade',
-      }),
+    // FK named explicitly below: the auto-generated name exceeds MySQL's
+    // 64-char identifier limit.
+    orderId: int('order_id').notNull(),
     listingId: int('listing_id').notNull(),
     sellerUuid: playerUuid('seller_uuid').notNull(),
     kind: varchar('kind', { length: 16 }).notNull(),
@@ -211,10 +229,7 @@ export const wigglypopOrderLines = mysqlTable(
       .notNull()
       .default('pendiente'),
     // The escrow → seller transfer that paid this line out. Set once, at confirmation.
-    settleTxId: int('settle_tx_id').references(() => starBankTransactions.id, {
-      onDelete: 'set null',
-      onUpdate: 'cascade',
-    }),
+    settleTxId: int('settle_tx_id'),
     // ATOMIC custody only: what /takepokemon actually handed back (the pokespec) or what
     // /takeitems reported taking. Kept so a give-side failure can be replayed or refunded
     // against the real thing that left the seller's PC, instead of against the snapshot.
@@ -225,6 +240,20 @@ export const wigglypopOrderLines = mysqlTable(
     orderIdx: index('wp_olines_order_idx').on(t.orderId),
     sellerIdx: index('wp_olines_seller_idx').on(t.sellerUuid),
     listingIdx: index('wp_olines_listing_idx').on(t.listingId),
+    orderFk: foreignKey({
+      name: 'wp_olines_order_fk',
+      columns: [t.orderId],
+      foreignColumns: [wigglypopOrders.id],
+    })
+      .onDelete('cascade')
+      .onUpdate('cascade'),
+    settleFk: foreignKey({
+      name: 'wp_olines_settle_fk',
+      columns: [t.settleTxId],
+      foreignColumns: [starBankTransactions.id],
+    })
+      .onDelete('set null')
+      .onUpdate('cascade'),
   }),
 );
 
@@ -233,7 +262,7 @@ export type WigglypopOrderLine = typeof wigglypopOrderLines.$inferSelect;
 // ─── Bids / offers / trades ───────────────────────────────────────────────────
 
 export const wigglypopBids = mysqlTable(
-  'wigglypop_bids',
+  'rotom_wigglypop_bids',
   {
     id: int('id').primaryKey().autoincrement(),
     listingId: int('listing_id')
@@ -252,7 +281,7 @@ export const wigglypopBids = mysqlTable(
 export type WigglypopBid = typeof wigglypopBids.$inferSelect;
 
 export const wigglypopOffers = mysqlTable(
-  'wigglypop_offers',
+  'rotom_wigglypop_offers',
   {
     id: int('id').primaryKey().autoincrement(),
     listingId: int('listing_id')
@@ -277,18 +306,15 @@ export const wigglypopOffers = mysqlTable(
 export type WigglypopOffer = typeof wigglypopOffers.$inferSelect;
 
 // A trade proposal against a `format=trade` listing. The offered mon is snapshotted the same
-// way a listed one is (same shape as wigglypop_listing_mons, box/index included), so the
+// way a listed one is (same shape as rotom_wigglypop_listing_mons, box/index included), so the
 // proposer's side can be verified against their PC exactly like the seller's.
 export const wigglypopTradeOffers = mysqlTable(
-  'wigglypop_trade_offers',
+  'rotom_wigglypop_trade_offers',
   {
     id: int('id').primaryKey().autoincrement(),
-    listingId: int('listing_id')
-      .notNull()
-      .references(() => wigglypopListings.id, {
-        onDelete: 'cascade',
-        onUpdate: 'cascade',
-      }),
+    // FK named explicitly below: the auto-generated name exceeds MySQL's
+    // 64-char identifier limit.
+    listingId: int('listing_id').notNull(),
     proposerUuid: playerUuid('proposer_uuid').notNull(),
     offeredPokemonKey: pokemonKey('offered_pokemon_key').notNull(),
     offeredSnapshot: json('offered_snapshot'),
@@ -296,7 +322,16 @@ export const wigglypopTradeOffers = mysqlTable(
     createdAt: timestamp('created_at').notNull().defaultNow(),
     respondedAt: timestamp('responded_at'),
   },
-  (t) => ({ listingIdx: index('wp_trades_listing_idx').on(t.listingId) }),
+  (t) => ({
+    listingIdx: index('wp_trades_listing_idx').on(t.listingId),
+    listingFk: foreignKey({
+      name: 'wp_trades_listing_fk',
+      columns: [t.listingId],
+      foreignColumns: [wigglypopListings.id],
+    })
+      .onDelete('cascade')
+      .onUpdate('cascade'),
+  }),
 );
 
 export type WigglypopTradeOffer = typeof wigglypopTradeOffers.$inferSelect;
@@ -304,16 +339,13 @@ export type WigglypopTradeOffer = typeof wigglypopTradeOffers.$inferSelect;
 // ─── Watchlist / reviews ──────────────────────────────────────────────────────
 
 export const wigglypopWatchlist = mysqlTable(
-  'wigglypop_watchlist',
+  'rotom_wigglypop_watchlist',
   {
     id: int('id').primaryKey().autoincrement(),
     userUuid: playerUuid('user_uuid').notNull(),
-    listingId: int('listing_id')
-      .notNull()
-      .references(() => wigglypopListings.id, {
-        onDelete: 'cascade',
-        onUpdate: 'cascade',
-      }),
+    // FK named explicitly below: the auto-generated name exceeds MySQL's
+    // 64-char identifier limit.
+    listingId: int('listing_id').notNull(),
     createdAt: timestamp('created_at').notNull().defaultNow(),
   },
   (t) => ({
@@ -321,6 +353,13 @@ export const wigglypopWatchlist = mysqlTable(
       t.userUuid,
       t.listingId,
     ),
+    listingFk: foreignKey({
+      name: 'wp_watch_listing_fk',
+      columns: [t.listingId],
+      foreignColumns: [wigglypopListings.id],
+    })
+      .onDelete('cascade')
+      .onUpdate('cascade'),
   }),
 );
 
@@ -330,7 +369,7 @@ export type WigglypopWatch = typeof wigglypopWatchlist.$inferSelect;
 // rating/sales column anywhere. A seller with no sales has no rating, and the API says so
 // rather than inventing one.
 export const wigglypopReviews = mysqlTable(
-  'wigglypop_reviews',
+  'rotom_wigglypop_reviews',
   {
     id: int('id').primaryKey().autoincrement(),
     orderId: int('order_id')

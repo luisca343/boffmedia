@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { AchievementsRepository } from '../../../_repositories/boffmedia/achievements.repository';
-import { Achievement } from '@/_db/schema/Events';
+import { Achievement } from '@/_db/schema/BoffMediaEvents';
 import { CreateAchievementDto } from '../dto/create-achievement.dto';
 import { UpdateAchievementDto } from '../dto/update-achievement.dto';
 

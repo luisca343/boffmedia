@@ -3,7 +3,7 @@ import {
   standingsForEntrants,
   matchesForPhaseChain,
 } from './standings.util';
-import type { TournamentMatch } from '@/_db/schema/Tournaments';
+import type { TournamentMatch } from '@/_db/schema/BoffMediaTournaments';
 
 let seq = 1;
 function match(part: Partial<TournamentMatch>): TournamentMatch {

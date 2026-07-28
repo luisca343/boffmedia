@@ -93,7 +93,6 @@ export const vgcSmogonPokemon = mysqlTable(
       t.cutoff,
       t.speciesId,
     ),
-    index('vgc_smogon_snapshot_lookup_idx').on(t.formatId, t.month, t.cutoff),
   ],
 );
 
@@ -160,7 +159,6 @@ export const vgcPastesRepository = mysqlTable(
     fetchedAt: timestamp('fetched_at').notNull(),
   },
   (t) => [
-    index('vgc_pastes_repository_regulation_idx').on(t.regulationId),
     index('vgc_pastes_repository_regulation_paste_idx').on(
       t.regulationId,
       t.pasteId,
@@ -188,7 +186,6 @@ export const vgcLimitlessTournaments = mysqlTable(
     fetchedAt: timestamp('fetched_at').notNull(),
   },
   (t) => [
-    index('vgc_limitless_tournaments_regulation_idx').on(t.regulationId),
     index('vgc_limitless_tournaments_regulation_status_idx').on(
       t.regulationId,
       t.status,
@@ -216,7 +213,6 @@ export const vgcLimitlessTeams = mysqlTable(
     fetchedAt: timestamp('fetched_at').notNull(),
   },
   (t) => [
-    index('vgc_limitless_teams_tournament_idx').on(t.tournamentId),
     index('vgc_limitless_teams_tournament_player_idx').on(
       t.tournamentId,
       t.playerSlug,

@@ -1,17 +1,17 @@
-import { SmartRotomUser } from '@/_db/schema/SmartRotom';
+import { RotomUser } from '@/_db/schema/SmartRotom';
 import { CreateSmartrotomUserDto } from '../../dto/create-user.dto';
 import { UpdateSmartrotomUserDto } from '../../dto/update-user.dto';
 import { BaseRepository } from '@api/_utils/repositories/base-repository.interface';
 
 export interface IUsersRepository extends BaseRepository<
-  SmartRotomUser,
+  RotomUser,
   CreateSmartrotomUserDto,
   UpdateSmartrotomUserDto
 > {
-  findByUuid(uuid: string): Promise<SmartRotomUser | null>;
-  findByUsername(username: string): Promise<SmartRotomUser | null>;
+  findByUuid(uuid: string): Promise<RotomUser | null>;
+  findByUsername(username: string): Promise<RotomUser | null>;
   findByUuids(
     uuids: string[],
-  ): Promise<{ [uuid: string]: SmartRotomUser | null }>;
+  ): Promise<{ [uuid: string]: RotomUser | null }>;
   getUserCount(): Promise<number>;
 }

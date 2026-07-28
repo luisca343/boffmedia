@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEnum } from 'class-validator';
-import { TOURNAMENT_STATUS } from '@/_db/schema/Tournaments';
+import { TOURNAMENT_STATUS } from '@/_db/schema/BoffMediaTournaments';
 import type { TournamentStatus } from '../tournaments.types';
 
 export class SetStatusDto {

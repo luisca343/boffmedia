@@ -16,7 +16,7 @@ import {
   TOURNAMENT_FORMAT,
   COMPETITOR_KIND,
   TOURNAMENT_METRIC,
-} from '@/_db/schema/Tournaments';
+} from '@/_db/schema/BoffMediaTournaments';
 import type {
   TournamentFormat,
   CompetitorKind,

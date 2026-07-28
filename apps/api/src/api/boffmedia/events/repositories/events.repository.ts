@@ -3,7 +3,7 @@ import { MySql2Database } from 'drizzle-orm/mysql2';
 import { eq, and, isNull, or } from 'drizzle-orm';
 import { alias } from 'drizzle-orm/mysql-core';
 import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
-import { boffMediaEvents, boffMediaGames, Event } from '@/_db/schema/Events';
+import { boffMediaEvents, boffMediaGames, Event } from '@/_db/schema/BoffMediaEvents';
 
 export interface EventWithGameNameAndParent extends Event {
   gameName?: string;

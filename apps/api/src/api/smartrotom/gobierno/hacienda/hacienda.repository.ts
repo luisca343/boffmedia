@@ -188,8 +188,8 @@ export class HaciendaRepository {
       .from(starBankTransactions)
       .where(
         or(
-          eq(starBankTransactions.from, treasuryId),
-          eq(starBankTransactions.to, treasuryId),
+          eq(starBankTransactions.fromAccountId, treasuryId),
+          eq(starBankTransactions.toAccountId, treasuryId),
         ),
       );
   }

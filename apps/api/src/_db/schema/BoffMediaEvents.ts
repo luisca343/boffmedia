@@ -60,7 +60,7 @@ export const boffMediaEvents = mysqlTable(
       },
     ),
     title: varchar('title', { length: 255 }).notNull(),
-    gameId: int('game').references(() => boffMediaGames.id, {
+    gameId: int('game_id').references(() => boffMediaGames.id, {
       onDelete: 'cascade',
       onUpdate: 'cascade',
     }),
@@ -342,7 +342,6 @@ export const boffMediaParticipantProgress = mysqlTable(
       })
         .onDelete('cascade')
         .onUpdate('cascade'),
-      participantIdx: index('pp_participant_idx').on(table.participantId),
     };
   },
 );
@@ -362,10 +361,9 @@ export const boffMediaEventSuggestions = mysqlTable(
   'boffmedia_event_suggestions',
   {
     id: int('id').primaryKey().autoincrement(),
-    proposerUserId: int('proposer_user_id').references(
-      () => boffMediaUsers.id,
-      { onDelete: 'set null', onUpdate: 'cascade' },
-    ),
+    // FK declared table-level below: the auto-generated name is 66 chars and
+    // MySQL caps identifiers at 64, so the constraint could never be created.
+    proposerUserId: int('proposer_user_id'),
     title: varchar('title', { length: 255 }).notNull(),
     gameName: varchar('game_name', { length: 255 }).notNull(),
     type: varchar('type', { length: 64 }).notNull(),
@@ -392,6 +390,13 @@ export const boffMediaEventSuggestions = mysqlTable(
   (table) => {
     return {
       statusIdx: index('es_status_idx').on(table.status),
+      proposerFk: foreignKey({
+        name: 'es_proposer_fk',
+        columns: [table.proposerUserId],
+        foreignColumns: [boffMediaUsers.id],
+      })
+        .onDelete('set null')
+        .onUpdate('cascade'),
     };
   },
 );

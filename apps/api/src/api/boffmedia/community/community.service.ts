@@ -10,7 +10,7 @@ import {
   boffMediaParticipantProgress,
   boffMediaEventParticipants,
   EVENT_STATUS,
-} from '@/_db/schema/Events';
+} from '@/_db/schema/BoffMediaEvents';
 import {
   ActivityItemEntity,
   SiteStatsEntity,

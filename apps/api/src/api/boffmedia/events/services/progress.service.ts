@@ -7,7 +7,7 @@ import {
   boffMediaParticipants,
   ParticipantProgress,
   validateParticipantCanReceiveAchievement,
-} from '@/_db/schema/Events';
+} from '@/_db/schema/BoffMediaEvents';
 import { AchievementsService } from './achievements.service';
 import { TeamsService } from './teams.service';
 import { NotificationsService } from '@api/boffmedia/notifications/notifications.service';

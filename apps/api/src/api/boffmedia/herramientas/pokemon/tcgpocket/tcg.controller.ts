@@ -24,7 +24,7 @@ import { TcgCard } from './entities/tcg-card.entity';
 import { SeriesCardsGroup } from './entities/series-cards-grouped.entity';
 import { SuccessResponse } from '@api/_utils/entities/common-response.entity';
 import { AddUserCardDto, UpdateUserCardQuantityDto } from './dto/user-card.dto';
-import { UserCard, UserCardHistory } from './entities/user-card.entity';
+import { TcgUserCard, TcgUserCardHistory } from './entities/user-card.entity';
 import { Logger } from 'nestjs-pino';
 
 @ApiTags('BoffMedia 🛠 | Pokemon TCG Pocket')
@@ -430,9 +430,9 @@ export class TcgController {
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'User cards retrieved successfully.',
-    type: [UserCard],
+    type: [TcgUserCard],
   })
-  async getUserCards(@Param('userName') userName: string): Promise<UserCard[]> {
+  async getUserCards(@Param('userName') userName: string): Promise<TcgUserCard[]> {
     return this.tcgFacade.getUserCards(userName);
   }
 
@@ -500,11 +500,11 @@ export class TcgController {
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'User card history retrieved successfully.',
-    type: [UserCardHistory],
+    type: [TcgUserCardHistory],
   })
   async getUserCardHistory(
     @Param('userId') userId: number,
-  ): Promise<UserCardHistory[]> {
+  ): Promise<TcgUserCardHistory[]> {
     return this.tcgFacade.getUserCardHistory(userId);
   }
 

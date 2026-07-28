@@ -11,7 +11,7 @@ import {
   boffMediaAchievements,
   EventTeam,
   EventTeamMember,
-} from '@/_db/schema/Events';
+} from '@/_db/schema/BoffMediaEvents';
 
 @Injectable()
 export class TeamsRepository {

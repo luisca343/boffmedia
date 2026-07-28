@@ -15,6 +15,12 @@ import { sql } from 'drizzle-orm';
 // FK constraint names are set explicitly: Drizzle's auto-generated
 // `{table}_{col}_{reftable}_{col}_fk` overflows MySQL's 64-char identifier
 // limit when both table names are long (forum_threads → forum_categories).
+//
+// The FKs below deliberately omit onDelete/onUpdate, so MySQL applies RESTRICT.
+// That is intentional here and NOT the drift it looks like next to the
+// cascade/set-null used elsewhere: a forum post must never vanish because its
+// author row was removed, and users are only ever soft-deleted (scrubbed in
+// place, see users.repository.ts), so RESTRICT can never actually fire.
 
 export const boffMediaForumCategories = mysqlTable(
   'boffmedia_forum_categories',

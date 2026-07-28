@@ -20,8 +20,8 @@ import {
   TournamentPhase,
   TournamentPhaseEntrant,
   TournamentMatchMessage,
-} from '@/_db/schema/Tournaments';
-import { boffMediaGames } from '@/_db/schema/Events';
+} from '@/_db/schema/BoffMediaTournaments';
+import { boffMediaGames } from '@/_db/schema/BoffMediaEvents';
 import { boffMediaUsers } from '@/_db/schema/BoffMedia';
 import type {
   MatchSlot,

@@ -4,7 +4,7 @@ import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
 import {
   RotomChat,
   rotomChats,
-  rotomChatUsers,
+  rotomChatMembers,
 } from '@/_db/schema/SmartRotomChat';
 import { IChatRepository } from './interfaces/chat.repository.interface';
 import { eq } from 'drizzle-orm';
@@ -28,8 +28,8 @@ export class ChatRepository implements IChatRepository {
     return this.db
       .selectDistinct(params)
       .from(rotomChats)
-      .leftJoin(rotomChatUsers, eq(rotomChatUsers.chatId, rotomChats.id))
-      .where(eq(rotomChatUsers.uuid, uuid))
+      .leftJoin(rotomChatMembers, eq(rotomChatMembers.chatId, rotomChats.id))
+      .where(eq(rotomChatMembers.uuid, uuid))
       .union(
         this.db
           .select({ ...params })

@@ -35,7 +35,6 @@ export const rotomPcMarks = mysqlTable(
       t.userUuid,
       t.pokemonKey,
     ),
-    userIdx: index('rotom_pc_marks_user_idx').on(t.userUuid),
   }),
 );
 

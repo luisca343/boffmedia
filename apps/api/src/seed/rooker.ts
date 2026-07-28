@@ -5,7 +5,7 @@ import { drizzle } from 'drizzle-orm/mysql2';
 import * as mysql from 'mysql2/promise';
 import { env } from '@/config/env';
 
-import { smartrotomUsers } from '../_db/schema/SmartRotom';
+import { rotomUsers } from '../_db/schema/SmartRotom';
 import { rookerProfiles } from '../_db/schema/SmartRotomRooker';
 import pino from 'pino';
 
@@ -51,10 +51,10 @@ async function main() {
   const [users, existing] = await Promise.all([
     db
       .select({
-        uuid: smartrotomUsers.uuid,
-        username: smartrotomUsers.username,
+        uuid: rotomUsers.uuid,
+        username: rotomUsers.username,
       })
-      .from(smartrotomUsers),
+      .from(rotomUsers),
     db
       .select({ uuid: rookerProfiles.uuid, handle: rookerProfiles.handle })
       .from(rookerProfiles),

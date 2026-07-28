@@ -2,7 +2,7 @@ import { Injectable, Inject } from '@nestjs/common';
 import { MySql2Database } from 'drizzle-orm/mysql2';
 import { and, asc, desc, eq, isNull, sql } from 'drizzle-orm';
 import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
-import { boffMediaForumPosts } from '@/_db/schema/Forum';
+import { boffMediaForumPosts } from '@/_db/schema/BoffMediaForum';
 import { boffMediaUsers } from '@/_db/schema/BoffMedia';
 
 export interface PostRow {

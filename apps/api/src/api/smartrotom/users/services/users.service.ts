@@ -5,14 +5,14 @@ import {
   BadRequestException,
   Inject,
 } from '@nestjs/common';
-import { SmartRotomUser } from '@/_db/schema/SmartRotom';
+import { RotomUser } from '@/_db/schema/SmartRotom';
 import { CreateSmartrotomUserDto } from '../dto/create-user.dto';
 import { UpdateSmartrotomUserDto } from '../dto/update-user.dto';
 import { IUsersRepository } from '../repositories/interfaces/users-repository.interface';
 import { USERS_REPOSITORY_TOKEN } from '@api/_utils/repositories/interfaces/repository.token';
 
 export interface UserCreationResult {
-  user: SmartRotomUser;
+  user: RotomUser;
   isNew: boolean;
 }
 
@@ -25,11 +25,11 @@ export class UsersService {
 
   // ==================== USER MANAGEMENT ====================
 
-  async getAllUsers(): Promise<SmartRotomUser[]> {
+  async getAllUsers(): Promise<RotomUser[]> {
     return this.usersRepository.findAll();
   }
 
-  async getUserById(id: number): Promise<SmartRotomUser> {
+  async getUserById(id: number): Promise<RotomUser> {
     const user = await this.usersRepository.findById(id);
     if (!user) {
       throw new NotFoundException(`User with ID ${id} not found`);
@@ -37,14 +37,14 @@ export class UsersService {
     return user;
   }
 
-  async getUserByUuid(uuid: string): Promise<SmartRotomUser | null> {
+  async getUserByUuid(uuid: string): Promise<RotomUser | null> {
     this.validateUuid(uuid);
     return this.usersRepository.findByUuid(uuid);
   }
 
   async createUser(
     createUserDto: CreateSmartrotomUserDto,
-  ): Promise<SmartRotomUser> {
+  ): Promise<RotomUser> {
     // Check for duplicate UUID
     const existingUser = await this.usersRepository.findByUuid(
       createUserDto.uuid,
@@ -96,7 +96,7 @@ export class UsersService {
   async updateUser(
     id: number,
     updateUserDto: UpdateSmartrotomUserDto,
-  ): Promise<SmartRotomUser> {
+  ): Promise<RotomUser> {
     const existingUser = await this.getUserById(id);
 
     // Check for duplicate username if updating username
@@ -134,7 +134,7 @@ export class UsersService {
 
   async getMultipleUsers(
     uuids: string[],
-  ): Promise<{ [uuid: string]: SmartRotomUser | null }> {
+  ): Promise<{ [uuid: string]: RotomUser | null }> {
     if (!Array.isArray(uuids) || uuids.length === 0) {
       return {};
     }

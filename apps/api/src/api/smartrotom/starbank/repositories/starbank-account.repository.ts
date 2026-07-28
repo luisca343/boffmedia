@@ -6,7 +6,7 @@ import { RowDataPacket } from 'mysql2';
 import {
   StarBankAccount as DbStarBankAccount,
   starBankAccounts,
-  starBankUsersAccounts,
+  starBankUserAccounts,
 } from '@/_db/schema/SmartRotomStarBank';
 import { BaseRepositoryImpl } from '@api/_utils/repositories/base-repository';
 import { StarBankAccount } from '../entities/starbank-account.entity';
@@ -119,10 +119,10 @@ export class StarbankAccountRepository
         })
         .from(starBankAccounts)
         .innerJoin(
-          starBankUsersAccounts,
-          eq(starBankAccounts.id, starBankUsersAccounts.accountId),
+          starBankUserAccounts,
+          eq(starBankAccounts.id, starBankUserAccounts.accountId),
         )
-        .where(eq(starBankUsersAccounts.uuid, uuid))
+        .where(eq(starBankUserAccounts.uuid, uuid))
         .execute();
 
       return result.length > 0
@@ -212,7 +212,7 @@ export class StarbankAccountRepository
 
       // Link account to user
       await this.db
-        .insert(starBankUsersAccounts)
+        .insert(starBankUserAccounts)
         .values({
           uuid: accountData.uuid,
           accountId: accountId,
@@ -239,12 +239,12 @@ export class StarbankAccountRepository
           balance: starBankAccounts.balance,
           name: starBankAccounts.name,
           type: starBankAccounts.type,
-          uuid: starBankUsersAccounts.uuid,
+          uuid: starBankUserAccounts.uuid,
         })
         .from(starBankAccounts)
         .leftJoin(
-          starBankUsersAccounts,
-          eq(starBankAccounts.id, starBankUsersAccounts.accountId),
+          starBankUserAccounts,
+          eq(starBankAccounts.id, starBankUserAccounts.accountId),
         )
         .where(eq(starBankAccounts.id, accountId))
         .execute();
@@ -268,10 +268,10 @@ export class StarbankAccountRepository
         })
         .from(starBankAccounts)
         .innerJoin(
-          starBankUsersAccounts,
-          eq(starBankAccounts.id, starBankUsersAccounts.accountId),
+          starBankUserAccounts,
+          eq(starBankAccounts.id, starBankUserAccounts.accountId),
         )
-        .where(eq(starBankUsersAccounts.uuid, uuid))
+        .where(eq(starBankUserAccounts.uuid, uuid))
         .execute();
 
       return result.map(this.mapToEntity);

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { UsersService, UserCreationResult } from './services/users.service';
-import { SmartRotomUser } from '@/_db/schema/SmartRotom';
+import { RotomUser } from '@/_db/schema/SmartRotom';
 import { CreateSmartrotomUserDto } from './dto/create-user.dto';
 import { UpdateSmartrotomUserDto } from './dto/update-user.dto';
 import { StarbankFacadeService } from '../starbank/starbank.facade.service';
@@ -14,14 +14,14 @@ export interface UserInitializationData {
 }
 
 export interface InitializationResult {
-  user: SmartRotomUser;
+  user: RotomUser;
   accounts: any[];
   isNewUser: boolean;
   isNewAccount: boolean;
 }
 
 export interface UserWithAccounts {
-  user: SmartRotomUser;
+  user: RotomUser;
   accounts: any[];
 }
 
@@ -37,21 +37,21 @@ export class UsersFacadeService {
 
   // ==================== USER MANAGEMENT ====================
 
-  async getAllUsers(): Promise<SmartRotomUser[]> {
+  async getAllUsers(): Promise<RotomUser[]> {
     return this.usersService.getAllUsers();
   }
 
-  async getUserById(id: number): Promise<SmartRotomUser> {
+  async getUserById(id: number): Promise<RotomUser> {
     return this.usersService.getUserById(id);
   }
 
-  async getUserByUuid(uuid: string): Promise<SmartRotomUser | null> {
+  async getUserByUuid(uuid: string): Promise<RotomUser | null> {
     return this.usersService.getUserByUuid(uuid);
   }
 
   async createUser(
     createUserDto: CreateSmartrotomUserDto,
-  ): Promise<SmartRotomUser> {
+  ): Promise<RotomUser> {
     return this.usersService.createUser(createUserDto);
   }
 
@@ -64,7 +64,7 @@ export class UsersFacadeService {
   async updateUser(
     id: number,
     updateUserDto: UpdateSmartrotomUserDto,
-  ): Promise<SmartRotomUser> {
+  ): Promise<RotomUser> {
     return this.usersService.updateUser(id, updateUserDto);
   }
 
@@ -143,7 +143,7 @@ export class UsersFacadeService {
 
   async getMultipleUsers(
     uuids: string[],
-  ): Promise<{ [uuid: string]: SmartRotomUser | null }> {
+  ): Promise<{ [uuid: string]: RotomUser | null }> {
     return this.usersService.getMultipleUsers(uuids);
   }
 

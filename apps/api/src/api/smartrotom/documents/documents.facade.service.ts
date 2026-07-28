@@ -56,7 +56,7 @@ export class DocumentsFacadeService {
   // into the enriched NotePreview the client renders (sidebar + list) with no
   // per-note round-trips.
   //
-  // `rotom_documents_users` is the ACCESS list, and the author's own row lives
+  // `rotom_user_documents` is the ACCESS list, and the author's own row lives
   // in it too (createNoteWithUser writes it). `sharedWith` means "shared with
   // OTHERS", so the viewer's own row is dropped here — otherwise every note the
   // viewer owns looks shared with themselves.

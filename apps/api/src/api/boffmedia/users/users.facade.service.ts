@@ -12,7 +12,7 @@ import {
 import { UsersFacadeService as SmartRotomUsersFacadeService } from '@api/smartrotom/users/users.facade.service';
 import { StarbankFacadeService } from '@api/smartrotom/starbank/starbank.facade.service';
 import { BoffMediaUser } from '@/_db/schema/BoffMedia';
-import { SmartRotomUser } from '@/_db/schema/SmartRotom';
+import { RotomUser } from '@/_db/schema/SmartRotom';
 import {
   BoffMediaUserSafe,
   FullUserData,
@@ -39,7 +39,7 @@ export interface BoffMediaUserInitializationData {
 
 export interface IntegratedUserCreationResult {
   boffMediaUser: BoffMediaUserSafe;
-  smartRotomUser: SmartRotomUser | null;
+  smartRotomUser: RotomUser | null;
   starbankAccounts: any[];
   isNewBoffMediaUser: boolean;
   isNewSmartRotomUser: boolean;
@@ -47,7 +47,7 @@ export interface IntegratedUserCreationResult {
 
 export interface UserWithIntegrations {
   boffMediaUser: BoffMediaUserSafe;
-  smartRotomUser: SmartRotomUser | null;
+  smartRotomUser: RotomUser | null;
   starbankAccounts: any[];
   roles: string[];
 }
@@ -100,7 +100,7 @@ export class BoffMediaUsersFacadeService {
         email: data.email,
       });
 
-      let smartRotomUser: SmartRotomUser | null = null;
+      let smartRotomUser: RotomUser | null = null;
       let isNewSmartRotomUser = false;
       let starbankAccounts: any[] = [];
 
@@ -522,7 +522,7 @@ export class BoffMediaUsersFacadeService {
 
   async linkMinecraftAccount(linkData: MinecraftLinkData): Promise<{
     boffMediaUser: BoffMediaUserSafe;
-    smartRotomUser: SmartRotomUser;
+    smartRotomUser: RotomUser;
     starbankAccounts: any[];
   }> {
     try {

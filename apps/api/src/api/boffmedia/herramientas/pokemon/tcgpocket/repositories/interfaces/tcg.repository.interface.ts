@@ -1,5 +1,5 @@
 import { TcgSeriesDto } from '../../dto/tcg-series.dto';
-import { UserCard, UserCardHistory } from '@/_db/schema/TCG';
+import { TcgUserCard, TcgUserCardHistory } from '@/_db/schema/Tcg';
 
 export interface ITcgRepository {
   // ==================== SERIES OPERATIONS ====================
@@ -23,8 +23,8 @@ export interface ITcgRepository {
   checkExistingCards(setId: string): Promise<any[]>;
 
   // ==================== USER CARDS OPERATIONS ====================
-  getUserCards(userId: number): Promise<UserCard[]>;
-  getUserCard(userId: number, cardId: string): Promise<UserCard | null>;
+  getUserCards(userId: number): Promise<TcgUserCard[]>;
+  getUserCard(userId: number, cardId: string): Promise<TcgUserCard | null>;
   addUserCard(userId: number, cardId: string, quantity: number): Promise<void>;
   updateUserCardQuantity(
     userId: number,
@@ -32,7 +32,7 @@ export interface ITcgRepository {
     quantity: number,
   ): Promise<void>;
   removeUserCard(userId: number, cardId: string): Promise<void>;
-  getUserCardHistory(userId: number): Promise<UserCardHistory[]>;
+  getUserCardHistory(userId: number): Promise<TcgUserCardHistory[]>;
   addUserCardHistory(
     userId: number,
     cardId: string,

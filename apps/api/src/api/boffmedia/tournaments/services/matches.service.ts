@@ -4,7 +4,7 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { TournamentsRepository } from '../repositories/tournaments.repository';
-import { TournamentMatch } from '@/_db/schema/Tournaments';
+import { TournamentMatch } from '@/_db/schema/BoffMediaTournaments';
 import { ReportMatchDto } from '../dto/report-match.dto';
 import { effectiveBestOf } from '../match-report.util';
 import { TournamentNotificationsService } from './tournament-notifications.service';

@@ -6,11 +6,11 @@ import {
   TcgSeries,
   tcgCards,
   tcgSets,
-  userCards,
-  userCardHistory,
-  UserCard,
-  UserCardHistory,
-} from '@/_db/schema/TCG';
+  tcgUserCards,
+  tcgUserCardHistory,
+  TcgUserCard,
+  TcgUserCardHistory,
+} from '@/_db/schema/Tcg';
 import { ITcgRepository } from './interfaces/tcg.repository.interface';
 import { TcgSeriesDto } from '../dto/tcg-series.dto';
 import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
@@ -39,8 +39,8 @@ export class TcgRepository implements ITcgRepository {
       if (newSeries.length > 0) {
         const insertData = newSeries.map((s) => ({
           id: s.id,
-          name_en: s.name_en,
-          name_es: s.name_es,
+          nameEn: s.name_en,
+          nameEs: s.name_es,
           logo: s.logo || null,
         }));
         await this.db.insert(tcgSeries).values(insertData);
@@ -102,7 +102,7 @@ export class TcgRepository implements ITcgRepository {
       return await this.db
         .select()
         .from(tcgSets)
-        .where(eq(tcgSets.series_id, seriesId));
+        .where(eq(tcgSets.seriesId, seriesId));
     } catch (error: any) {
       this.logger.error(
         `[TcgRepository] Error getting sets for series ${seriesId}:`,
@@ -169,7 +169,7 @@ export class TcgRepository implements ITcgRepository {
       return await this.db
         .select({ id: tcgSets.id })
         .from(tcgSets)
-        .where(eq(tcgSets.series_id, seriesId));
+        .where(eq(tcgSets.seriesId, seriesId));
     } catch (error: any) {
       this.logger.error(
         `[TcgRepository] Error checking existing sets for series ${seriesId}:`,
@@ -183,21 +183,21 @@ export class TcgRepository implements ITcgRepository {
 
   private readonly cardSelect = {
     id: tcgCards.id,
-    setId: tcgCards.set_id,
-    localId: tcgCards.local_id,
-    set_name_en: tcgSets.name_en,
-    set_name_es: tcgSets.name_es,
-    name_en: tcgCards.name_en,
-    name_es: tcgCards.name_es,
-    image_en: tcgCards.image_local_en,
-    image_es: tcgCards.image_local_es,
+    setId: tcgCards.setId,
+    localId: tcgCards.localId,
+    set_name_en: tcgSets.nameEn,
+    set_name_es: tcgSets.nameEs,
+    name_en: tcgCards.nameEn,
+    name_es: tcgCards.nameEs,
+    image_en: tcgCards.imageLocalEn,
+    image_es: tcgCards.imageLocalEs,
     category: tcgCards.category,
     illustrator: tcgCards.illustrator,
     rarity: tcgCards.rarity,
     hp: tcgCards.hp,
     stage: tcgCards.stage,
-    description_en: tcgCards.description_en,
-    description_es: tcgCards.description_es,
+    description_en: tcgCards.descriptionEn,
+    description_es: tcgCards.descriptionEs,
     updated: tcgCards.updated,
     retreat: tcgCards.retreat,
 
@@ -214,8 +214,8 @@ export class TcgRepository implements ITcgRepository {
       return await this.db
         .select(this.cardSelect)
         .from(tcgCards)
-        .leftJoin(tcgSets, eq(tcgCards.set_id, tcgSets.id))
-        .where(eq(tcgCards.set_id, setId));
+        .leftJoin(tcgSets, eq(tcgCards.setId, tcgSets.id))
+        .where(eq(tcgCards.setId, setId));
     } catch (error: any) {
       this.logger.error(
         `[TcgRepository] Error getting cards for set ${setId}:`,
@@ -247,7 +247,7 @@ export class TcgRepository implements ITcgRepository {
       const result = await this.db
         .select(this.cardSelect)
         .from(tcgCards)
-        .leftJoin(tcgSets, eq(tcgCards.set_id, tcgSets.id))
+        .leftJoin(tcgSets, eq(tcgCards.setId, tcgSets.id))
         .where(eq(tcgCards.id, id))
         .limit(1);
 
@@ -283,7 +283,7 @@ export class TcgRepository implements ITcgRepository {
       return await this.db
         .select({ id: tcgCards.id })
         .from(tcgCards)
-        .where(eq(tcgCards.set_id, setId));
+        .where(eq(tcgCards.setId, setId));
     } catch (error: any) {
       this.logger.error(
         `[TcgRepository] Error checking existing cards for set ${setId}:`,
@@ -294,12 +294,12 @@ export class TcgRepository implements ITcgRepository {
   }
   // ==================== USER CARDS OPERATIONS ====================
 
-  async getUserCards(userId: number): Promise<UserCard[]> {
+  async getUserCards(userId: number): Promise<TcgUserCard[]> {
     try {
       return await this.db
         .select()
-        .from(userCards)
-        .where(eq(userCards.user_id, userId));
+        .from(tcgUserCards)
+        .where(eq(tcgUserCards.userId, userId));
     } catch (error: any) {
       this.logger.error(
         `[TcgRepository] Error getting user cards for user ${userId}:`,
@@ -309,13 +309,13 @@ export class TcgRepository implements ITcgRepository {
     }
   }
 
-  async getUserCard(userId: number, cardId: string): Promise<UserCard | null> {
+  async getUserCard(userId: number, cardId: string): Promise<TcgUserCard | null> {
     try {
       const result = await this.db
         .select()
-        .from(userCards)
+        .from(tcgUserCards)
         .where(
-          and(eq(userCards.user_id, userId), eq(userCards.card_id, cardId)),
+          and(eq(tcgUserCards.userId, userId), eq(tcgUserCards.cardId, cardId)),
         )
         .limit(1);
 
@@ -336,15 +336,15 @@ export class TcgRepository implements ITcgRepository {
   ): Promise<void> {
     try {
       const now = new Date();
-      await this.db.insert(userCards).values({
+      await this.db.insert(tcgUserCards).values({
         id: `${userId}_${cardId}`,
-        user_id: userId,
-        card_id: cardId,
+        userId: userId,
+        cardId: cardId,
         quantity: quantity,
-        acquired_date: now,
-        created_at: now,
-        updated_at: now,
-      } as UserCard);
+        acquiredDate: now,
+        createdAt: now,
+        updatedAt: now,
+      });
     } catch (error: any) {
       this.logger.error(
         `[TcgRepository] Error adding user card ${cardId} for user ${userId}:`,
@@ -361,13 +361,13 @@ export class TcgRepository implements ITcgRepository {
   ): Promise<void> {
     try {
       await this.db
-        .update(userCards)
+        .update(tcgUserCards)
         .set({
           quantity: quantity,
-          updated_at: new Date(),
-        } as Partial<UserCard>)
+          updatedAt: new Date(),
+        })
         .where(
-          and(eq(userCards.user_id, userId), eq(userCards.card_id, cardId)),
+          and(eq(tcgUserCards.userId, userId), eq(tcgUserCards.cardId, cardId)),
         );
     } catch (error: any) {
       this.logger.error(
@@ -381,9 +381,9 @@ export class TcgRepository implements ITcgRepository {
   async removeUserCard(userId: number, cardId: string): Promise<void> {
     try {
       await this.db
-        .delete(userCards)
+        .delete(tcgUserCards)
         .where(
-          and(eq(userCards.user_id, userId), eq(userCards.card_id, cardId)),
+          and(eq(tcgUserCards.userId, userId), eq(tcgUserCards.cardId, cardId)),
         );
     } catch (error: any) {
       this.logger.error(
@@ -394,12 +394,12 @@ export class TcgRepository implements ITcgRepository {
     }
   }
 
-  async getUserCardHistory(userId: number): Promise<UserCardHistory[]> {
+  async getUserCardHistory(userId: number): Promise<TcgUserCardHistory[]> {
     try {
       return await this.db
         .select()
-        .from(userCardHistory)
-        .where(eq(userCardHistory.user_id, userId));
+        .from(tcgUserCardHistory)
+        .where(eq(tcgUserCardHistory.userId, userId));
     } catch (error: any) {
       this.logger.error(
         `[TcgRepository] Error getting user card history for user ${userId}:`,
@@ -415,11 +415,11 @@ export class TcgRepository implements ITcgRepository {
     quantityChange: number,
   ): Promise<void> {
     try {
-      await this.db.insert(userCardHistory).values({
+      await this.db.insert(tcgUserCardHistory).values({
         id: `${userId}_${cardId}_${Date.now()}`,
-        user_id: userId,
-        card_id: cardId,
-        quantity_change: quantityChange,
+        userId: userId,
+        cardId: cardId,
+        quantityChange: quantityChange,
         date: new Date(),
       });
     } catch (error: any) {

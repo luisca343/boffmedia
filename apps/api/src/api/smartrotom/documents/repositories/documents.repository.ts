@@ -4,9 +4,9 @@ import { eq, and, desc, isNull, isNotNull, inArray } from 'drizzle-orm';
 import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
 import {
   rotomDocuments,
-  rotomDocumentsUsers,
+  rotomUserDocuments,
   RotomDocument,
-  RotomDocumentUser,
+  RotomUserDocument,
 } from '@/_db/schema/SmartRotomDocuments';
 import { IDocumentsRepository } from './interfaces/documents.repository.interface';
 
@@ -101,12 +101,12 @@ export class DocumentsRepository implements IDocumentsRepository {
       .select(NOTE_PREVIEW_COLUMNS)
       .from(rotomDocuments)
       .innerJoin(
-        rotomDocumentsUsers,
-        eq(rotomDocuments.id, rotomDocumentsUsers.documentId),
+        rotomUserDocuments,
+        eq(rotomDocuments.id, rotomUserDocuments.documentId),
       )
       .where(
         and(
-          eq(rotomDocumentsUsers.uuid, uuid),
+          eq(rotomUserDocuments.uuid, uuid),
           isNull(rotomDocuments.deletedAt),
         ),
       )
@@ -118,12 +118,12 @@ export class DocumentsRepository implements IDocumentsRepository {
       .select(NOTE_PREVIEW_COLUMNS)
       .from(rotomDocuments)
       .innerJoin(
-        rotomDocumentsUsers,
-        eq(rotomDocuments.id, rotomDocumentsUsers.documentId),
+        rotomUserDocuments,
+        eq(rotomDocuments.id, rotomUserDocuments.documentId),
       )
       .where(
         and(
-          eq(rotomDocumentsUsers.uuid, uuid),
+          eq(rotomUserDocuments.uuid, uuid),
           isNotNull(rotomDocuments.deletedAt),
         ),
       )
@@ -180,14 +180,14 @@ export class DocumentsRepository implements IDocumentsRepository {
   async findDocumentUserAssociation(
     documentId: number,
     uuid: string,
-  ): Promise<RotomDocumentUser | null> {
+  ): Promise<RotomUserDocument | null> {
     const result = await this.db
       .select()
-      .from(rotomDocumentsUsers)
+      .from(rotomUserDocuments)
       .where(
         and(
-          eq(rotomDocumentsUsers.documentId, documentId),
-          eq(rotomDocumentsUsers.uuid, uuid),
+          eq(rotomUserDocuments.documentId, documentId),
+          eq(rotomUserDocuments.uuid, uuid),
         ),
       )
       .limit(1);
@@ -197,32 +197,32 @@ export class DocumentsRepository implements IDocumentsRepository {
   async findDocumentShares(documentId: number): Promise<DocumentShare[]> {
     return this.db
       .select({
-        documentId: rotomDocumentsUsers.documentId,
-        uuid: rotomDocumentsUsers.uuid,
+        documentId: rotomUserDocuments.documentId,
+        uuid: rotomUserDocuments.uuid,
       })
-      .from(rotomDocumentsUsers)
-      .where(eq(rotomDocumentsUsers.documentId, documentId));
+      .from(rotomUserDocuments)
+      .where(eq(rotomUserDocuments.documentId, documentId));
   }
 
   async findSharesByDocumentIds(ids: number[]): Promise<DocumentShare[]> {
     if (ids.length === 0) return [];
     return this.db
       .select({
-        documentId: rotomDocumentsUsers.documentId,
-        uuid: rotomDocumentsUsers.uuid,
+        documentId: rotomUserDocuments.documentId,
+        uuid: rotomUserDocuments.uuid,
       })
-      .from(rotomDocumentsUsers)
-      .where(inArray(rotomDocumentsUsers.documentId, ids));
+      .from(rotomUserDocuments)
+      .where(inArray(rotomUserDocuments.documentId, ids));
   }
 
   async addDocumentToUser(
     documentId: number,
     uuid: string,
   ): Promise<{ insertId: number }> {
-    const result = await this.db.insert(rotomDocumentsUsers).values({
+    const result = await this.db.insert(rotomUserDocuments).values({
       documentId,
       uuid,
-    } as RotomDocumentUser);
+    } as RotomUserDocument);
     return { insertId: result[0].insertId };
   }
 
@@ -231,11 +231,11 @@ export class DocumentsRepository implements IDocumentsRepository {
     uuid: string,
   ): Promise<void> {
     await this.db
-      .delete(rotomDocumentsUsers)
+      .delete(rotomUserDocuments)
       .where(
         and(
-          eq(rotomDocumentsUsers.documentId, documentId),
-          eq(rotomDocumentsUsers.uuid, uuid),
+          eq(rotomUserDocuments.documentId, documentId),
+          eq(rotomUserDocuments.uuid, uuid),
         ),
       );
   }

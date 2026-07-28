@@ -5,7 +5,7 @@ import { TeamsService } from './teams.service';
 import { NotificationsService } from '@api/boffmedia/notifications/notifications.service';
 import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
 
-jest.mock('@/_db/schema/Events', () => ({
+jest.mock('@/_db/schema/BoffMediaEvents', () => ({
   boffMediaParticipantProgress: {
     participantId: 'participantId',
     achievementId: 'achievementId',
@@ -15,7 +15,7 @@ jest.mock('@/_db/schema/Events', () => ({
 
 const {
   validateParticipantCanReceiveAchievement,
-} = require('@/_db/schema/Events'); // eslint-disable-line @typescript-eslint/no-require-imports
+} = require('@/_db/schema/BoffMediaEvents'); // eslint-disable-line @typescript-eslint/no-require-imports
 
 const mockWhere = jest.fn();
 const mockFrom = jest.fn().mockReturnValue({ where: mockWhere });

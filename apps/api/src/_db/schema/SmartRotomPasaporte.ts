@@ -6,7 +6,7 @@ import {
   timestamp,
   varchar,
 } from 'drizzle-orm/mysql-core';
-import { smartrotomUsers } from './SmartRotom';
+import { rotomUsers } from './SmartRotom';
 
 // The carné. One row per trainer, created on first read of the passport — nothing
 // here is a score: `trainerId` is derived from the uuid and `region` from the world
@@ -15,7 +15,7 @@ import { smartrotomUsers } from './SmartRotom';
 export const pasaporteProfiles = mysqlTable('rotom_pasaporte_profiles', {
   uuid: char('uuid', { length: 36 })
     .primaryKey()
-    .references(() => smartrotomUsers.uuid, {
+    .references(() => rotomUsers.uuid, {
       onDelete: 'cascade',
       onUpdate: 'cascade',
     }),

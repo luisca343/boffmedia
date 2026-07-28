@@ -8,7 +8,7 @@ import {
   Tournament,
   TournamentPhase,
   boffMediaTournamentPhases,
-} from '@/_db/schema/Tournaments';
+} from '@/_db/schema/BoffMediaTournaments';
 import { CreatePhaseDto, UpdatePhaseDto } from '../dto/create-phase.dto';
 
 @Injectable()
