@@ -17,7 +17,6 @@ const mockLogger = {
 };
 
 const mockSmartrotomService = {
-  processRaceResult: jest.fn(),
   getArceuspeak: jest.fn(),
   createOrUpdateArceuspeak: jest.fn(),
 };
@@ -85,49 +84,6 @@ describe('SmartrotomController — integration (ValidationPipe + GlobalException
       );
       await request(app.getHttpServer())
         .get('/smartrotom/performance')
-        .expect(500);
-    });
-  });
-
-  // ── POST /smartrotom/karts/carrera ────────────────────────────────────────
-
-  describe('POST /smartrotom/karts/carrera', () => {
-    // ResultadoCarreraDto is fully validated (fecha/circuito/participantes),
-    // so the body must be complete — forbidNonWhitelisted rejects extras.
-    const validRaceResult = {
-      fecha: 1737200000000,
-      circuito: 'Rainbow Road',
-      participantes: [
-        { uuid: VALID_UUID, nombre: 'Ash', posicion: 1, tiempo: 90.5 },
-      ],
-    };
-
-    it('processes a valid race result and invokes the service', async () => {
-      mockSmartrotomService.processRaceResult.mockResolvedValue({ ok: true });
-      const res = await request(app.getHttpServer())
-        .post('/smartrotom/karts/carrera')
-        .send(validRaceResult);
-
-      expect(res.status).toBeLessThan(300);
-      expect(mockSmartrotomService.processRaceResult).toHaveBeenCalled();
-    });
-
-    it('rejects an incomplete body with 400 before reaching the service', async () => {
-      const res = await request(app.getHttpServer())
-        .post('/smartrotom/karts/carrera')
-        .send({});
-
-      expect(res.status).toBe(400);
-      expect(mockSmartrotomService.processRaceResult).not.toHaveBeenCalled();
-    });
-
-    it('returns 500 when service throws', async () => {
-      mockSmartrotomService.processRaceResult.mockRejectedValue(
-        new Error('db error'),
-      );
-      await request(app.getHttpServer())
-        .post('/smartrotom/karts/carrera')
-        .send(validRaceResult)
         .expect(500);
     });
   });

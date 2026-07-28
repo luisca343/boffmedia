@@ -4,7 +4,7 @@ import { useState } from "react"
 import { motion } from "framer-motion"
 import { CSS } from "@dnd-kit/utilities"
 import { InternalLink } from "../../ui/navigation/Link"
-import { SmartRotomApp } from "@boffmedia/shared"
+import { RotomApp as SmartRotomApp } from "@boffmedia/shared"
 
 interface AppIconProps {
   app: SmartRotomApp

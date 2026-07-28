@@ -1,5 +1,5 @@
 import { DefaultSession, DefaultUser } from "next-auth"
-import { SmartRotomApp, TaxiStop } from "@boffmedia/shared"
+import { RotomApp as SmartRotomApp, TaxiStop } from "@boffmedia/shared"
 import type { UserRole } from "@boffmedia/shared/roles"
 
 export type SmartRotomAppExtended = SmartRotomApp & { order?: number }

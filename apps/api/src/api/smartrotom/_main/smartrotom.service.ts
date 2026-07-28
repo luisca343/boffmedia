@@ -18,10 +18,6 @@ export class SmartrotomService {
     private starbankService: StarbankFacadeService,
   ) {}
 
-  async processRaceResult(result: any) {
-    this.logger.log(result);
-  }
-
   async getArceuspeak() {
     return await this.db.select().from(rotomArceuSpeak).execute();
   }

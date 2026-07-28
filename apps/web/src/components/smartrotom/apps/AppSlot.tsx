@@ -1,5 +1,5 @@
 import { memo, useState } from 'react'
-import { SmartRotomApp } from "@boffmedia/shared"
+import { RotomApp as SmartRotomApp } from "@boffmedia/shared"
 import { App } from "./App"
 import { motion } from "framer-motion"
 import { useSortable } from '@dnd-kit/sortable'

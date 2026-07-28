@@ -55,6 +55,7 @@ import { MhwildsModule } from './api/boffmedia/herramientas/mhwilds/mhwilds.modu
 import { WingullModule } from '@api/smartrotom/wingull/wingull.module';
 import { SmartRotomMineModule } from '@api/smartrotom/mine/mine.module';
 import { SmartRotomDungeonsModule } from '@api/smartrotom/dungeons/dungeons.module';
+import { SmartRotomKartsModule } from '@api/smartrotom/karts/karts.module';
 import { TcgModule } from '@api/boffmedia/herramientas/pokemon/tcgpocket/tcg.module';
 import { FicusAIModule } from '@api/smartrotom/ficusai/ficusai.module';
 import { AutomationModule } from './automation/automation.module';
@@ -123,6 +124,7 @@ import { WigglypopModule } from '@api/smartrotom/wigglypop/wigglypop.module';
     WingullModule,
     SmartRotomMineModule,
     SmartRotomDungeonsModule,
+    SmartRotomKartsModule,
     FicusAIModule,
     AutomationModule,
     PokemonLogModule,

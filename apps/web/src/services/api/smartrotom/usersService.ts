@@ -1,6 +1,6 @@
 import { rotomGET, rotomPOST, rotomPATCH, rotomAuthedDELETE, ApiResponse } from '@/services/boffAPI';
 import type { 
-  SmartRotomUser,
+  RotomUser as SmartRotomUser,
   CreateSmartrotomUserDto,
   UpdateSmartrotomUserDto,
   UserInitializationDataDto,
