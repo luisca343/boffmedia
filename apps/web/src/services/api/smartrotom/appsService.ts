@@ -1,5 +1,5 @@
 import { rotomGET, rotomPOST, rotomPATCH, rotomDELETE, ApiResponse } from '@/services/boffAPI';
-import type { SmartRotomApp, SuccessResponse, CreateAppDto, UpdateAppDto, OrderAppDto } from '@boffmedia/shared';
+import type { RotomApp as SmartRotomApp, SuccessResponse, CreateAppDto, UpdateAppDto, OrderAppDto } from '@boffmedia/shared';
 
 export class AppsService {
   /**

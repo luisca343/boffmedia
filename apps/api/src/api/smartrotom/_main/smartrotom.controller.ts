@@ -1,65 +1,11 @@
 import { SmartrotomService } from './smartrotom.service';
 import { Public } from '@api/_utils/decorators/public.decorator';
-import {
-  ApiTags,
-  ApiOperation,
-  ApiResponse,
-  ApiProperty,
-} from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { Body, Controller, Get, Post, HttpStatus } from '@nestjs/common';
 import { TeleportPlayerDto } from '../_dto/teleport-player.dto';
 import { WingullFacadeService } from '../wingull/wingull.facade.service';
 import { ArceuSpeakEntity } from './entities/arceuspeak.entity';
 import { ArceusspeakDto } from '../_dto/arceuspeak.dto';
-import { BaseDto } from '@api/_utils/dto/base.dto';
-import { Type } from 'class-transformer';
-import {
-  IsArray,
-  IsInt,
-  IsNotEmpty,
-  IsNumber,
-  IsString,
-  ValidateNested,
-} from 'class-validator';
-
-// Every property needs a validator: the global pipe runs with
-// `forbidNonWhitelisted`, so an undecorated property is rejected, not ignored.
-export class ParticipanteCarreraDto {
-  @ApiProperty()
-  @IsString()
-  @IsNotEmpty()
-  uuid: string;
-
-  @ApiProperty()
-  @IsString()
-  @IsNotEmpty()
-  nombre: string;
-
-  @ApiProperty()
-  @IsInt()
-  posicion: number;
-
-  @ApiProperty()
-  @IsNumber()
-  tiempo: number;
-}
-
-export class ResultadoCarreraDto extends BaseDto {
-  @ApiProperty()
-  @IsNumber()
-  fecha: number;
-
-  @ApiProperty()
-  @IsString()
-  @IsNotEmpty()
-  circuito: string;
-
-  @ApiProperty({ type: [ParticipanteCarreraDto] })
-  @IsArray()
-  @ValidateNested({ each: true })
-  @Type(() => ParticipanteCarreraDto)
-  participantes: ParticipanteCarreraDto[];
-}
 
 @ApiTags('Smartrotom')
 @Public()
@@ -82,20 +28,6 @@ export class SmartrotomController {
   })
   async getPerformance() {
     return await this.wingullService.getPerformance();
-  }
-
-  @Post('/karts/carrera')
-  @ApiOperation({ summary: 'Finalizar carrera' })
-  @ApiResponse({
-    status: HttpStatus.OK,
-    description: 'Carrera finalizada exitosamente.',
-  })
-  @ApiResponse({
-    status: HttpStatus.INTERNAL_SERVER_ERROR,
-    description: 'Error al finalizar la carrera.',
-  })
-  async finalizarCarrera(@Body() resultadoCarreraDto: ResultadoCarreraDto) {
-    return await this.smartrotomService.processRaceResult(resultadoCarreraDto);
   }
 
   @Get('arceuspeak')
