@@ -10,7 +10,7 @@ import {
   rotomNewsletterSubscribers,
   RotomNewsletterSubscriber,
 } from '@/_db/schema/SmartRotomDocuments';
-import { smartrotomUsers } from '@/_db/schema/SmartRotom';
+import { rotomUsers } from '@/_db/schema/SmartRotom';
 import {
   INewsRepository,
   NewsCommentRow,
@@ -42,7 +42,7 @@ const NEWS_COMMENT_COLUMNS = {
   id: rotomNewsComments.id,
   newsId: rotomNewsComments.newsId,
   uuid: rotomNewsComments.uuid,
-  username: smartrotomUsers.username,
+  username: rotomUsers.username,
   body: rotomNewsComments.body,
   createdAt: rotomNewsComments.createdAt,
 };
@@ -175,8 +175,8 @@ export class NewsRepository implements INewsRepository {
       .select(NEWS_COMMENT_COLUMNS)
       .from(rotomNewsComments)
       .innerJoin(
-        smartrotomUsers,
-        eq(rotomNewsComments.uuid, smartrotomUsers.uuid),
+        rotomUsers,
+        eq(rotomNewsComments.uuid, rotomUsers.uuid),
       )
       .where(eq(rotomNewsComments.newsId, newsId))
       .orderBy(
@@ -201,8 +201,8 @@ export class NewsRepository implements INewsRepository {
       .select(NEWS_COMMENT_COLUMNS)
       .from(rotomNewsComments)
       .innerJoin(
-        smartrotomUsers,
-        eq(rotomNewsComments.uuid, smartrotomUsers.uuid),
+        rotomUsers,
+        eq(rotomNewsComments.uuid, rotomUsers.uuid),
       )
       .where(eq(rotomNewsComments.id, insertId))
       .limit(1);

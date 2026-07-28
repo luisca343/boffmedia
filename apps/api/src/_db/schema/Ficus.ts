@@ -7,7 +7,7 @@ import {
   varchar,
 } from 'drizzle-orm/mysql-core';
 
-export const ficusFrases = mysqlTable('ficus_quotes', {
+export const ficusQuotes = mysqlTable('ficus_quotes', {
   id: int('id').primaryKey().autoincrement(),
   discordId: varchar('discord_id', { length: 32 })
     .notNull()
@@ -24,9 +24,9 @@ export const ficusFrases = mysqlTable('ficus_quotes', {
   updatedAt: timestamp('updated_at'),
 });
 
-export type FicusFrase = typeof ficusFrases.$inferSelect;
+export type FicusQuote = typeof ficusQuotes.$inferSelect;
 
-export const discordUsers = mysqlTable('discord_users', {
+export const discordUsers = mysqlTable('ficus_discord_users', {
   userId: varchar('user_id', { length: 32 }).notNull().primaryKey(),
   username: varchar('username', { length: 32 }).notNull(),
   avatar: varchar('avatar', { length: 255 }),

@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { AppStatus } from '../enums/app-status.enum';
 
-export class SmartRotomApp {
+export class RotomApp {
   @ApiProperty({
     example: 1,
     description: 'Unique identifier for the app',

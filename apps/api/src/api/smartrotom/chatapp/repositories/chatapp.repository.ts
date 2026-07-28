@@ -4,15 +4,15 @@ import { eq, asc, desc, and } from 'drizzle-orm';
 import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
 import {
   rotomChats,
-  rotomChatUsers,
+  rotomChatMembers,
   rotomChatMessages,
   rotomChatMessageReads,
   RotomChat,
-  RotomChatUser,
+  RotomChatMember,
   RotomChatMessage,
   RotomChatMessageRead,
 } from '@/_db/schema/SmartRotomChat';
-import { smartrotomUsers } from '@/_db/schema/SmartRotom';
+import { rotomUsers } from '@/_db/schema/SmartRotom';
 
 export interface ChatDetails {
   id: number;
@@ -64,8 +64,8 @@ export class ChatappRepository {
     return this.db
       .selectDistinct(params)
       .from(rotomChats)
-      .leftJoin(rotomChatUsers, eq(rotomChatUsers.chatId, rotomChats.id))
-      .where(eq(rotomChatUsers.uuid, uuid))
+      .leftJoin(rotomChatMembers, eq(rotomChatMembers.chatId, rotomChats.id))
+      .where(eq(rotomChatMembers.uuid, uuid))
       .union(
         this.db
           .select({ ...params })
@@ -146,16 +146,16 @@ export class ChatappRepository {
 
   async findChatMembers(chatId: number): Promise<ChatMember[]> {
     return this.db
-      .select({ uuid: rotomChatUsers.uuid })
-      .from(rotomChatUsers)
-      .where(eq(rotomChatUsers.chatId, chatId));
+      .select({ uuid: rotomChatMembers.uuid })
+      .from(rotomChatMembers)
+      .where(eq(rotomChatMembers.chatId, chatId));
   }
 
   async addChatMember(
     chatId: number,
     uuid: string,
   ): Promise<{ insertId: number }> {
-    const result = await this.db.insert(rotomChatUsers).values({
+    const result = await this.db.insert(rotomChatMembers).values({
       chatId,
       uuid,
     });
@@ -165,9 +165,9 @@ export class ChatappRepository {
 
   async removeChatMember(chatId: number, uuid: string): Promise<void> {
     await this.db
-      .delete(rotomChatUsers)
+      .delete(rotomChatMembers)
       .where(
-        and(eq(rotomChatUsers.chatId, chatId), eq(rotomChatUsers.uuid, uuid)),
+        and(eq(rotomChatMembers.chatId, chatId), eq(rotomChatMembers.uuid, uuid)),
       );
   }
 
@@ -176,10 +176,10 @@ export class ChatappRepository {
     uuid: string,
   ): Promise<ChatMember | null> {
     const result = await this.db
-      .select({ uuid: rotomChatUsers.uuid })
-      .from(rotomChatUsers)
+      .select({ uuid: rotomChatMembers.uuid })
+      .from(rotomChatMembers)
       .where(
-        and(eq(rotomChatUsers.chatId, chatId), eq(rotomChatUsers.uuid, uuid)),
+        and(eq(rotomChatMembers.chatId, chatId), eq(rotomChatMembers.uuid, uuid)),
       )
       .limit(1);
 
@@ -295,11 +295,11 @@ export class ChatappRepository {
   async findUserByUuid(uuid: string): Promise<UserProfile | null> {
     const result = await this.db
       .select({
-        uuid: smartrotomUsers.uuid,
-        username: smartrotomUsers.username,
+        uuid: rotomUsers.uuid,
+        username: rotomUsers.username,
       })
-      .from(smartrotomUsers)
-      .where(eq(smartrotomUsers.uuid, uuid))
+      .from(rotomUsers)
+      .where(eq(rotomUsers.uuid, uuid))
       .limit(1);
 
     return result[0] || null;

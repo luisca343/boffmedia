@@ -10,7 +10,7 @@ import {
   matchesForPhaseChain,
   standingsForEntrants,
 } from '../standings.util';
-import { TournamentMatch, TournamentPhase } from '@/_db/schema/Tournaments';
+import { TournamentMatch, TournamentPhase } from '@/_db/schema/BoffMediaTournaments';
 
 interface Ranked {
   participantId: number;
@@ -192,7 +192,7 @@ export class AdvancementService {
     phase: TournamentPhase,
     entrantIds: number[],
     allParticipantIds: number[],
-    chainMatches: import('@/_db/schema/Tournaments').TournamentMatch[],
+    chainMatches: import('@/_db/schema/BoffMediaTournaments').TournamentMatch[],
   ): Promise<Ranked[]> {
     if (phase.format === 'leaderboard') {
       const parts = await this.repo.listParticipants(phase.tournamentId);

@@ -2,7 +2,7 @@ import { Injectable, Inject } from '@nestjs/common';
 import { MySql2Database } from 'drizzle-orm/mysql2';
 import { eq } from 'drizzle-orm';
 import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
-import { smartrotomUsers } from '@/_db/schema/SmartRotom';
+import { rotomUsers } from '@/_db/schema/SmartRotom';
 
 @Injectable()
 export class ChatUserRepository {
@@ -13,11 +13,11 @@ export class ChatUserRepository {
   async findUserByUuid(uuid: string): Promise<any | null> {
     const result = await this.db
       .select({
-        uuid: smartrotomUsers.uuid,
-        username: smartrotomUsers.username,
+        uuid: rotomUsers.uuid,
+        username: rotomUsers.username,
       })
-      .from(smartrotomUsers)
-      .where(eq(smartrotomUsers.uuid, uuid))
+      .from(rotomUsers)
+      .where(eq(rotomUsers.uuid, uuid))
       .limit(1);
     return result[0] || null;
   }

@@ -5,7 +5,7 @@ import {
   BadRequestException,
   Inject,
 } from '@nestjs/common';
-import { SmartRotomApp } from '@/_db/schema/SmartRotom';
+import { RotomApp } from '@/_db/schema/SmartRotom';
 import { IUserAppsRepository } from '../repositories/interfaces/user-apps-repository.interface';
 import { IAppsRepository } from '../repositories/interfaces/apps-repository.interface';
 import {
@@ -25,7 +25,7 @@ export class UserAppsService {
 
   // ==================== PLAYER APP MANAGEMENT ====================
 
-  async getAppsForPlayer(uuid: string): Promise<SmartRotomApp[]> {
+  async getAppsForPlayer(uuid: string): Promise<RotomApp[]> {
     this.validateUuid(uuid);
     return this.userAppsRepository.getAppsForPlayer(uuid);
   }

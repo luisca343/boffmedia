@@ -1,8 +1,8 @@
 import {
   DiscordUser,
-  FicusFrase,
+  FicusQuote,
   discordUsers,
-  ficusFrases,
+  ficusQuotes,
 } from '@/_db/schema/Ficus';
 import { MySQL2Service } from '@/_utils/MySQL2Service';
 import { Injectable } from '@nestjs/common';
@@ -30,14 +30,14 @@ export class CommandsService {
     );
     let condition;
     if (guildID !== this.testServerGUID) {
-      condition = eq(ficusFrases.serverID, guildID);
+      condition = eq(ficusQuotes.serverID, guildID);
     }
 
     const finalCondition = userID
       ? and(
           condition,
           eq(
-            ficusFrases.discordId,
+            ficusQuotes.discordId,
             typeof userID === 'string' ? userID : userID.id,
           ),
         )
@@ -52,7 +52,7 @@ export class CommandsService {
       .select({
         count: sql`COUNT(*)`,
       })
-      .from(ficusFrases)
+      .from(ficusQuotes)
       .where(finalCondition);
 
     this.logger.log(`Total quotes found: ${totalCountQuery[0].count}`);
@@ -63,18 +63,18 @@ export class CommandsService {
     const query = await this.db
       .getDrizzle()
       .select({
-        id: ficusFrases.id,
-        quote: ficusFrases.quote,
-        comment: ficusFrases.comment,
+        id: ficusQuotes.id,
+        quote: ficusQuotes.quote,
+        comment: ficusQuotes.comment,
         discordId: discordUsers.userId,
         discordName: discordUsers.username,
-        serverID: ficusFrases.serverID,
+        serverID: ficusQuotes.serverID,
         color: discordUsers.color,
-        createdAt: ficusFrases.createdAt,
+        createdAt: ficusQuotes.createdAt,
         avatar: discordUsers.avatar,
       })
-      .from(ficusFrases)
-      .leftJoin(discordUsers, eq(ficusFrases.discordId, discordUsers.userId))
+      .from(ficusQuotes)
+      .leftJoin(discordUsers, eq(ficusQuotes.discordId, discordUsers.userId))
       .where(finalCondition)
       .limit(maxQuotes)
       .offset((page - 1) * maxQuotes);
@@ -111,13 +111,13 @@ export class CommandsService {
     // Insert quote
     const quoteInsert = await this.db
       .getDrizzle()
-      .insert(ficusFrases)
+      .insert(ficusQuotes)
       .values({
         discordId: user.id,
         serverID: guildID,
         quote: quote,
         comment: comment,
-      } as FicusFrase);
+      } as FicusQuote);
 
     this.logger.log(`Quote inserted: ${quoteInsert}`);
 
@@ -139,30 +139,30 @@ export class CommandsService {
       const queryBuilder = this.db
         .getDrizzle()
         .select({
-          id: ficusFrases.id,
-          quote: ficusFrases.quote,
-          comment: ficusFrases.comment,
+          id: ficusQuotes.id,
+          quote: ficusQuotes.quote,
+          comment: ficusQuotes.comment,
           discordId: discordUsers.userId,
           discordName: discordUsers.username,
-          serverID: ficusFrases.serverID,
+          serverID: ficusQuotes.serverID,
           color: discordUsers.color,
-          createdAt: ficusFrases.createdAt,
+          createdAt: ficusQuotes.createdAt,
           avatar: discordUsers.avatar,
         })
-        .from(ficusFrases)
-        .leftJoin(discordUsers, eq(ficusFrases.discordId, discordUsers.userId));
+        .from(ficusQuotes)
+        .leftJoin(discordUsers, eq(ficusQuotes.discordId, discordUsers.userId));
 
       if (userId && global) {
-        queryBuilder.where(eq(ficusFrases.discordId, userId));
+        queryBuilder.where(eq(ficusQuotes.discordId, userId));
       } else if (userId && !global) {
         queryBuilder.where(
           and(
-            eq(ficusFrases.serverID, guildID),
-            eq(ficusFrases.discordId, userId),
+            eq(ficusQuotes.serverID, guildID),
+            eq(ficusQuotes.discordId, userId),
           ),
         );
       } else {
-        queryBuilder.where(eq(ficusFrases.serverID, guildID));
+        queryBuilder.where(eq(ficusQuotes.serverID, guildID));
       }
 
       const query = await queryBuilder.orderBy(sql`RAND()`).limit(1);
@@ -172,30 +172,30 @@ export class CommandsService {
     const queryBuilder = this.db
       .getDrizzle()
       .select({
-        id: ficusFrases.id,
-        quote: ficusFrases.quote,
-        comment: ficusFrases.comment,
+        id: ficusQuotes.id,
+        quote: ficusQuotes.quote,
+        comment: ficusQuotes.comment,
         discordId: discordUsers.userId,
         discordName: discordUsers.username,
-        serverID: ficusFrases.serverID,
+        serverID: ficusQuotes.serverID,
         color: discordUsers.color,
-        createdAt: ficusFrases.createdAt,
+        createdAt: ficusQuotes.createdAt,
         avatar: discordUsers.avatar,
       })
-      .from(ficusFrases)
-      .leftJoin(discordUsers, eq(ficusFrases.discordId, discordUsers.userId));
+      .from(ficusQuotes)
+      .leftJoin(discordUsers, eq(ficusQuotes.discordId, discordUsers.userId));
 
     if (userId && global) {
-      queryBuilder.where(eq(ficusFrases.discordId, userId));
+      queryBuilder.where(eq(ficusQuotes.discordId, userId));
     } else if (userId && !global) {
       queryBuilder.where(
         and(
-          eq(ficusFrases.serverID, guildID),
-          eq(ficusFrases.discordId, userId),
+          eq(ficusQuotes.serverID, guildID),
+          eq(ficusQuotes.discordId, userId),
         ),
       );
     } else {
-      queryBuilder.where(eq(ficusFrases.serverID, guildID));
+      queryBuilder.where(eq(ficusQuotes.serverID, guildID));
     }
 
     const query = await queryBuilder.offset(quoteNum - 1).limit(1);

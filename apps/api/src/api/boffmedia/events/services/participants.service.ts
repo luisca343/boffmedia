@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { ParticipantsRepository } from '../../../_repositories/boffmedia/participants.repository';
-import { Participant, EventParticipant } from '@/_db/schema/Events';
+import { Participant, EventParticipant } from '@/_db/schema/BoffMediaEvents';
 import { JoinEventDto } from '../dto/join-event.dto';
 
 @Injectable()

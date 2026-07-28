@@ -8,10 +8,10 @@ import { CreateReplayFullDto } from '../dto/create-replay-full.dto';
 import { UpdateReplayDto } from '../dto/update-replay.dto';
 import { Replay } from '../entities/replay.entity';
 import {
-  SmartRotomReplay,
-  SmartRotomUserReplay,
-  smartRotomReplays,
-  smartRotomUserReplays,
+  RotomReplay,
+  RotomUserReplay,
+  rotomReplays,
+  rotomUserReplays,
 } from '@/_db/schema/SmartRotom';
 import { BaseInsertResponse } from '@api/_utils/dto/base-responses.dto';
 
@@ -21,35 +21,35 @@ export class ReplaysRepository
   implements IReplaysRepository
 {
   constructor(@Inject(DRIZZLE) db: MySql2Database<Record<string, never>>) {
-    super(db, smartRotomReplays);
+    super(db, rotomReplays);
   }
 
   async create(data: CreateReplayFullDto): Promise<Replay> {
     const result = await this.db
-      .insert(smartRotomReplays)
-      .values(data as SmartRotomReplay);
+      .insert(rotomReplays)
+      .values(data as RotomReplay);
     return this.findById(result[0].insertId) as Promise<Replay>;
   }
 
   async update(id: number, data: UpdateReplayDto): Promise<Replay> {
     await this.db
-      .update(smartRotomReplays)
+      .update(rotomReplays)
       .set(data)
-      .where(eq(smartRotomReplays.id, id));
+      .where(eq(rotomReplays.id, id));
     return this.findById(id) as Promise<Replay>;
   }
 
   async delete(id: number): Promise<boolean> {
     const result = await this.db
-      .delete(smartRotomReplays)
-      .where(eq(smartRotomReplays.id, id));
+      .delete(rotomReplays)
+      .where(eq(rotomReplays.id, id));
     return result[0].affectedRows > 0;
   }
 
   async createUserReplay(userReplayData: any): Promise<BaseInsertResponse> {
     const result = await this.db
-      .insert(smartRotomUserReplays)
-      .values(userReplayData as SmartRotomUserReplay);
+      .insert(rotomUserReplays)
+      .values(userReplayData as RotomUserReplay);
 
     return { insertId: result[0].insertId };
   }
@@ -57,24 +57,24 @@ export class ReplaysRepository
   async findUserReplay(uuid: string, replayId: number): Promise<any | null> {
     const result = await this.db
       .select({
-        id: smartRotomReplays.id,
-        team1: smartRotomReplays.team1,
-        team2: smartRotomReplays.team2,
-        replay: smartRotomReplays.replay,
-        winner: smartRotomReplays.winner,
-        side1: smartRotomReplays.side1,
-        side2: smartRotomReplays.side2,
-        date: smartRotomReplays.createdAt,
+        id: rotomReplays.id,
+        team1: rotomReplays.team1,
+        team2: rotomReplays.team2,
+        replay: rotomReplays.replay,
+        winner: rotomReplays.winner,
+        side1: rotomReplays.side1,
+        side2: rotomReplays.side2,
+        date: rotomReplays.createdAt,
       })
-      .from(smartRotomReplays)
+      .from(rotomReplays)
       .leftJoin(
-        smartRotomUserReplays,
+        rotomUserReplays,
         and(
-          eq(smartRotomUserReplays.replayId, smartRotomReplays.id),
-          eq(smartRotomUserReplays.uuid, uuid),
+          eq(rotomUserReplays.replayId, rotomReplays.id),
+          eq(rotomUserReplays.uuid, uuid),
         ),
       )
-      .where(eq(smartRotomReplays.id, replayId))
+      .where(eq(rotomReplays.id, replayId))
       .limit(1);
 
     return result[0] || null;

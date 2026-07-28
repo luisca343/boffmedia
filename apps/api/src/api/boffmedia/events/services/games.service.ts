@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { GamesRepository } from '../../../_repositories/boffmedia/games.repository';
-import { Game } from '@/_db/schema/Events';
+import { Game } from '@/_db/schema/BoffMediaEvents';
 import { CreateGameDto } from '../dto/create-game.dto';
 import { UpdateEventDto } from '../dto/update-event.dto';
 

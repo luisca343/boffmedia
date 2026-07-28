@@ -9,7 +9,7 @@ import {
   timestamp,
   varchar,
 } from 'drizzle-orm/mysql-core';
-import { smartRotomReplays, smartrotomUsers } from './SmartRotom';
+import { rotomReplays, rotomUsers } from './SmartRotom';
 import { pokedexRegistry } from './SmartRotomPokedex';
 
 export const ROOKER_POST_TYPES = [
@@ -32,7 +32,7 @@ export type RookerReactionType = (typeof ROOKER_REACTION_TYPES)[number];
 export const rookerProfiles = mysqlTable('rotom_rooker_profiles', {
   uuid: char('uuid', { length: 36 })
     .primaryKey()
-    .references(() => smartrotomUsers.uuid, {
+    .references(() => rotomUsers.uuid, {
       onDelete: 'cascade',
       onUpdate: 'cascade',
     }),
@@ -57,7 +57,7 @@ export const rookerPosts = mysqlTable(
     id: int('id').primaryKey().autoincrement(),
     uuid: char('uuid', { length: 36 })
       .notNull()
-      .references(() => smartrotomUsers.uuid, {
+      .references(() => rotomUsers.uuid, {
         onDelete: 'cascade',
         onUpdate: 'cascade',
       }),
@@ -70,7 +70,7 @@ export const rookerPosts = mysqlTable(
       onDelete: 'set null',
       onUpdate: 'cascade',
     }),
-    replayId: int('replay_id').references(() => smartRotomReplays.id, {
+    replayId: int('replay_id').references(() => rotomReplays.id, {
       onDelete: 'set null',
       onUpdate: 'cascade',
     }),
@@ -106,7 +106,7 @@ export const rookerReactions = mysqlTable(
       }),
     uuid: char('uuid', { length: 36 })
       .notNull()
-      .references(() => smartrotomUsers.uuid, {
+      .references(() => rotomUsers.uuid, {
         onDelete: 'cascade',
         onUpdate: 'cascade',
       }),
@@ -131,7 +131,7 @@ export const rookerRetrinos = mysqlTable(
       }),
     uuid: char('uuid', { length: 36 })
       .notNull()
-      .references(() => smartrotomUsers.uuid, {
+      .references(() => rotomUsers.uuid, {
         onDelete: 'cascade',
         onUpdate: 'cascade',
       }),
@@ -155,7 +155,7 @@ export const rookerBookmarks = mysqlTable(
       }),
     uuid: char('uuid', { length: 36 })
       .notNull()
-      .references(() => smartrotomUsers.uuid, {
+      .references(() => rotomUsers.uuid, {
         onDelete: 'cascade',
         onUpdate: 'cascade',
       }),
@@ -173,13 +173,13 @@ export const rookerFollows = mysqlTable(
   {
     followerUuid: char('follower_uuid', { length: 36 })
       .notNull()
-      .references(() => smartrotomUsers.uuid, {
+      .references(() => rotomUsers.uuid, {
         onDelete: 'cascade',
         onUpdate: 'cascade',
       }),
     followeeUuid: char('followee_uuid', { length: 36 })
       .notNull()
-      .references(() => smartrotomUsers.uuid, {
+      .references(() => rotomUsers.uuid, {
         onDelete: 'cascade',
         onUpdate: 'cascade',
       }),

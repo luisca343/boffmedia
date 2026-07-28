@@ -3,7 +3,7 @@ import {
   EventsRepository,
   FindEventsFilters,
 } from '../repositories/events.repository';
-import { Event } from '@/_db/schema/Events';
+import { Event } from '@/_db/schema/BoffMediaEvents';
 import { CreateEventDto } from '../dto/create-event.dto';
 import { UpdateEventDto } from '../dto/update-event.dto';
 

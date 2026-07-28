@@ -7,7 +7,7 @@ import {
   boffMediaEvents,
   Game,
   Event,
-} from '@/_db/schema/Events';
+} from '@/_db/schema/BoffMediaEvents';
 
 @Injectable()
 export class GamesRepository {

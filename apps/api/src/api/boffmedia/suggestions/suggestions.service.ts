@@ -2,7 +2,7 @@ import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { MySql2Database } from 'drizzle-orm/mysql2';
 import { desc, eq } from 'drizzle-orm';
 import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
-import { boffMediaEventSuggestions } from '@/_db/schema/Events';
+import { boffMediaEventSuggestions } from '@/_db/schema/BoffMediaEvents';
 import { CreateSuggestionDto } from './dto/create-suggestion.dto';
 import { ReviewSuggestionDto } from './dto/review-suggestion.dto';
 import { SuggestionEntity } from './entities/suggestion.entity';

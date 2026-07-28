@@ -2,7 +2,7 @@ import { Injectable, Inject } from '@nestjs/common';
 import { MySql2Database } from 'drizzle-orm/mysql2';
 import { eq, gt, inArray } from 'drizzle-orm';
 import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
-import { SmartRotomUser, smartrotomUsers } from '@/_db/schema/SmartRotom';
+import { RotomUser, rotomUsers } from '@/_db/schema/SmartRotom';
 import { CreateSmartrotomUserDto } from '../dto/create-user.dto';
 import { UpdateSmartrotomUserDto } from '../dto/update-user.dto';
 import { BaseRepositoryImpl } from '@api/_utils/repositories/base-repository';
@@ -11,83 +11,83 @@ import { IUsersRepository } from './interfaces/users-repository.interface';
 @Injectable()
 export class UsersRepository
   extends BaseRepositoryImpl<
-    SmartRotomUser,
+    RotomUser,
     CreateSmartrotomUserDto,
     UpdateSmartrotomUserDto
   >
   implements IUsersRepository
 {
   constructor(@Inject(DRIZZLE) db: MySql2Database<Record<string, never>>) {
-    super(db, smartrotomUsers);
+    super(db, rotomUsers);
   }
 
-  async findAll(): Promise<SmartRotomUser[]> {
+  async findAll(): Promise<RotomUser[]> {
     return this.db
       .select()
-      .from(smartrotomUsers)
-      .where(gt(smartrotomUsers.id, 0));
+      .from(rotomUsers)
+      .where(gt(rotomUsers.id, 0));
   }
 
   async create(
     createUserDto: CreateSmartrotomUserDto,
-  ): Promise<SmartRotomUser> {
-    const result = await this.db.insert(smartrotomUsers).values({
+  ): Promise<RotomUser> {
+    const result = await this.db.insert(rotomUsers).values({
       uuid: createUserDto.uuid,
       username: createUserDto.username,
       world: createUserDto.world,
-    } as SmartRotomUser);
+    } as RotomUser);
 
-    return this.findById(result[0].insertId) as Promise<SmartRotomUser>;
+    return this.findById(result[0].insertId) as Promise<RotomUser>;
   }
 
   async update(
     id: number,
     updateUserDto: UpdateSmartrotomUserDto,
-  ): Promise<SmartRotomUser> {
+  ): Promise<RotomUser> {
     await this.db
-      .update(smartrotomUsers)
+      .update(rotomUsers)
       .set({
         ...updateUserDto,
-      } as SmartRotomUser)
-      .where(eq(smartrotomUsers.id, id));
+      } as RotomUser)
+      .where(eq(rotomUsers.id, id));
 
-    return this.findById(id) as Promise<SmartRotomUser>;
+    return this.findById(id) as Promise<RotomUser>;
   }
 
   async delete(id: number): Promise<boolean> {
     const result = await this.db
-      .delete(smartrotomUsers)
-      .where(eq(smartrotomUsers.id, id));
+      .delete(rotomUsers)
+      .where(eq(rotomUsers.id, id));
     return result[0].affectedRows > 0;
   }
 
-  async findByUuid(uuid: string): Promise<SmartRotomUser | null> {
+  async findByUuid(uuid: string): Promise<RotomUser | null> {
     const result = await this.db
       .select()
-      .from(smartrotomUsers)
-      .where(eq(smartrotomUsers.uuid, uuid));
+      .from(rotomUsers)
+      .where(eq(rotomUsers.uuid, uuid));
     return result[0] || null;
   }
 
-  async findByUsername(username: string): Promise<SmartRotomUser | null> {
+  async findByUsername(username: string): Promise<RotomUser | null> {
     const result = await this.db
       .select()
-      .from(smartrotomUsers)
-      .where(eq(smartrotomUsers.username, username));
+      .from(rotomUsers)
+      .where(eq(rotomUsers.username, username));
     return result[0] || null;
   }
 
   async findByUuids(
     uuids: string[],
-  ): Promise<{ [uuid: string]: SmartRotomUser | null }> {
+  ): Promise<{ [uuid: string]: RotomUser | null }> {
     if (!uuids.length) return {};
 
     const results = await this.db
       .select()
-      .from(smartrotomUsers)
-      .where(inArray(smartrotomUsers.uuid, uuids));
+      .from(rotomUsers)
+      .where(inArray(rotomUsers.uuid, uuids));
 
-    const userMap: { [uuid: string]: SmartRotomUser | null } = {};
+    const userMap: { [uuid: string]: RotomUser | null } = {};
 
     // Initialize all UUIDs as null
     uuids.forEach((uuid) => (userMap[uuid] = null));

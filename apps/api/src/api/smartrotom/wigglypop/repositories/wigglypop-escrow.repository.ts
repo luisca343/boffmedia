@@ -11,7 +11,7 @@ export class WigglypopEscrowRepository {
   ) {}
 
   // Not StarbankAccountRepository.create(): that always links the new account to a player uuid
-  // in rotom_bank_users_accounts, and the escrow has no owner.
+  // in rotom_starbank_user_accounts, and the escrow has no owner.
   async createOwnerlessAccount(
     name: string,
     type: AccountType,

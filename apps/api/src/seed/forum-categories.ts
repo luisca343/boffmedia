@@ -6,7 +6,7 @@ import { drizzle } from 'drizzle-orm/mysql2';
 import * as mysql from 'mysql2/promise';
 import pino from 'pino';
 import { env } from '@/config/env';
-import { boffMediaForumCategories } from '../_db/schema/Forum';
+import { boffMediaForumCategories } from '../_db/schema/BoffMediaForum';
 
 const logger = pino({ name: 'seed-forum' });
 

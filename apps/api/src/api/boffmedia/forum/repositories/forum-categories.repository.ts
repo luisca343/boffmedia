@@ -7,7 +7,7 @@ import {
   boffMediaForumPosts,
   boffMediaForumThreads,
   ForumCategory as ForumCategoryRow,
-} from '@/_db/schema/Forum';
+} from '@/_db/schema/BoffMediaForum';
 import { boffMediaUsers } from '@/_db/schema/BoffMedia';
 
 export interface CategoryCount {

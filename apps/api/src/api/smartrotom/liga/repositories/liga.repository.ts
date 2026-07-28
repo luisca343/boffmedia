@@ -3,8 +3,8 @@ import { MySql2Database } from 'drizzle-orm/mysql2';
 import { eq, desc, inArray } from 'drizzle-orm';
 import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
 import {
-  smartRotomReplays,
-  smartRotomUserReplays,
+  rotomReplays,
+  rotomUserReplays,
 } from '@/_db/schema/SmartRotom';
 
 export interface LeagueReplay {
@@ -62,18 +62,18 @@ export class LigaRepository {
   async findReplayById(id: number): Promise<LeagueReplay | null> {
     const result = await this.db
       .select({
-        id: smartRotomReplays.id,
-        team1: smartRotomReplays.team1,
-        team2: smartRotomReplays.team2,
-        replay: smartRotomReplays.replay,
-        winner: smartRotomReplays.winner,
-        side1: smartRotomReplays.side1,
-        side2: smartRotomReplays.side2,
-        createdAt: smartRotomReplays.createdAt,
-        updatedAt: smartRotomReplays.updatedAt,
+        id: rotomReplays.id,
+        team1: rotomReplays.team1,
+        team2: rotomReplays.team2,
+        replay: rotomReplays.replay,
+        winner: rotomReplays.winner,
+        side1: rotomReplays.side1,
+        side2: rotomReplays.side2,
+        createdAt: rotomReplays.createdAt,
+        updatedAt: rotomReplays.updatedAt,
       })
-      .from(smartRotomReplays)
-      .where(eq(smartRotomReplays.id, id))
+      .from(rotomReplays)
+      .where(eq(rotomReplays.id, id))
       .limit(1);
 
     return (result[0] || null) as unknown as LeagueReplay | null;
@@ -82,41 +82,41 @@ export class LigaRepository {
   async findRecentReplays(limit: number = 10): Promise<LeagueReplay[]> {
     return this.db
       .select({
-        id: smartRotomReplays.id,
-        team1: smartRotomReplays.team1,
-        team2: smartRotomReplays.team2,
-        replay: smartRotomReplays.replay,
-        winner: smartRotomReplays.winner,
-        side1: smartRotomReplays.side1,
-        side2: smartRotomReplays.side2,
-        createdAt: smartRotomReplays.createdAt,
-        updatedAt: smartRotomReplays.updatedAt,
+        id: rotomReplays.id,
+        team1: rotomReplays.team1,
+        team2: rotomReplays.team2,
+        replay: rotomReplays.replay,
+        winner: rotomReplays.winner,
+        side1: rotomReplays.side1,
+        side2: rotomReplays.side2,
+        createdAt: rotomReplays.createdAt,
+        updatedAt: rotomReplays.updatedAt,
       })
-      .from(smartRotomReplays)
-      .orderBy(desc(smartRotomReplays.createdAt))
+      .from(rotomReplays)
+      .orderBy(desc(rotomReplays.createdAt))
       .limit(limit) as unknown as LeagueReplay[];
   }
 
   async findReplaysByPlayer(playerUuid: string): Promise<LeagueReplay[]> {
     return this.db
       .select({
-        id: smartRotomReplays.id,
-        team1: smartRotomReplays.team1,
-        team2: smartRotomReplays.team2,
-        replay: smartRotomReplays.replay,
-        winner: smartRotomReplays.winner,
-        side1: smartRotomReplays.side1,
-        side2: smartRotomReplays.side2,
-        createdAt: smartRotomReplays.createdAt,
-        updatedAt: smartRotomReplays.updatedAt,
+        id: rotomReplays.id,
+        team1: rotomReplays.team1,
+        team2: rotomReplays.team2,
+        replay: rotomReplays.replay,
+        winner: rotomReplays.winner,
+        side1: rotomReplays.side1,
+        side2: rotomReplays.side2,
+        createdAt: rotomReplays.createdAt,
+        updatedAt: rotomReplays.updatedAt,
       })
-      .from(smartRotomReplays)
+      .from(rotomReplays)
       .innerJoin(
-        smartRotomUserReplays,
-        eq(smartRotomReplays.id, smartRotomUserReplays.replayId),
+        rotomUserReplays,
+        eq(rotomReplays.id, rotomUserReplays.replayId),
       )
-      .where(eq(smartRotomUserReplays.uuid, playerUuid))
-      .orderBy(desc(smartRotomReplays.createdAt)) as unknown as LeagueReplay[];
+      .where(eq(rotomUserReplays.uuid, playerUuid))
+      .orderBy(desc(rotomReplays.createdAt)) as unknown as LeagueReplay[];
   }
 
   async findReplaysByPlayers(
@@ -125,23 +125,23 @@ export class LigaRepository {
   ): Promise<LeagueReplay[]> {
     return this.db
       .select({
-        id: smartRotomReplays.id,
-        team1: smartRotomReplays.team1,
-        team2: smartRotomReplays.team2,
-        replay: smartRotomReplays.replay,
-        winner: smartRotomReplays.winner,
-        side1: smartRotomReplays.side1,
-        side2: smartRotomReplays.side2,
-        createdAt: smartRotomReplays.createdAt,
-        updatedAt: smartRotomReplays.updatedAt,
+        id: rotomReplays.id,
+        team1: rotomReplays.team1,
+        team2: rotomReplays.team2,
+        replay: rotomReplays.replay,
+        winner: rotomReplays.winner,
+        side1: rotomReplays.side1,
+        side2: rotomReplays.side2,
+        createdAt: rotomReplays.createdAt,
+        updatedAt: rotomReplays.updatedAt,
       })
-      .from(smartRotomReplays)
+      .from(rotomReplays)
       .innerJoin(
-        smartRotomUserReplays,
-        eq(smartRotomReplays.id, smartRotomUserReplays.replayId),
+        rotomUserReplays,
+        eq(rotomReplays.id, rotomUserReplays.replayId),
       )
-      .where(inArray(smartRotomUserReplays.uuid, [player1, player2]))
-      .orderBy(desc(smartRotomReplays.createdAt)) as unknown as LeagueReplay[];
+      .where(inArray(rotomUserReplays.uuid, [player1, player2]))
+      .orderBy(desc(rotomReplays.createdAt)) as unknown as LeagueReplay[];
   }
 
   // ==================== STATISTICS OPERATIONS ====================

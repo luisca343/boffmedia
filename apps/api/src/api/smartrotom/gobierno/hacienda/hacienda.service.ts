@@ -260,7 +260,7 @@ export class HaciendaService {
 
     const byCode = new Map<string, number>();
     for (const t of tx) {
-      if (t.to !== treasuryId || t.type !== TransactionType.TASA) continue;
+      if (t.toAccountId !== treasuryId || t.type !== TransactionType.TASA) continue;
       const reason = t.reason ?? '';
       // The code is a short token (TAS-PARCELA); match it inside the free-text reason.
       const code = reason.match(/TAS-[A-Z0-9_-]+/)?.[0];
@@ -359,7 +359,7 @@ export class HaciendaService {
       const day = new Date(tx.date).toISOString().slice(0, 10);
       const bucket = seriesByDay.get(day) ?? { income: 0, expense: 0 };
 
-      if (tx.to === treasuryId) {
+      if (tx.toAccountId === treasuryId) {
         bucket.income += tx.amount;
         totalIncome += tx.amount;
         const t = incomeByType.get(tx.type) ?? { amount: 0, count: 0 };
@@ -367,7 +367,7 @@ export class HaciendaService {
         t.count += 1;
         incomeByType.set(tx.type, t);
       }
-      if (tx.from === treasuryId) {
+      if (tx.fromAccountId === treasuryId) {
         bucket.expense += tx.amount;
         totalExpense += tx.amount;
         const t = expenseByType.get(tx.type) ?? { amount: 0, count: 0 };

@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-export class SmartRotomUser {
+export class RotomUser {
   @ApiProperty({
     example: 1,
     description: 'Unique identifier for the user',

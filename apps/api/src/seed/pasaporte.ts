@@ -6,7 +6,7 @@ import { drizzle } from 'drizzle-orm/mysql2';
 import * as mysql from 'mysql2/promise';
 import { env } from '@/config/env';
 
-import { smartRotomAchievements } from '../_db/schema/SmartRotom';
+import { rotomAchievements } from '../_db/schema/SmartRotom';
 import { pasaporteSeasons } from '../_db/schema/SmartRotomPasaporte';
 import pino from 'pino';
 
@@ -70,14 +70,14 @@ async function main() {
   // ---- points / tier backfill ----
   const pending = await db
     .select({
-      id: smartRotomAchievements.id,
-      category: smartRotomAchievements.category,
+      id: rotomAchievements.id,
+      category: rotomAchievements.category,
     })
-    .from(smartRotomAchievements)
+    .from(rotomAchievements)
     .where(
       and(
-        eq(smartRotomAchievements.points, DEFAULT_POINTS),
-        eq(smartRotomAchievements.tier, DEFAULT_TIER),
+        eq(rotomAchievements.points, DEFAULT_POINTS),
+        eq(rotomAchievements.tier, DEFAULT_TIER),
       ),
     );
 
@@ -93,9 +93,9 @@ async function main() {
     }
 
     await db
-      .update(smartRotomAchievements)
+      .update(rotomAchievements)
       .set({ points: weight.points, tier: weight.tier })
-      .where(eq(smartRotomAchievements.id, achievement.id));
+      .where(eq(rotomAchievements.id, achievement.id));
     updated++;
   }
 

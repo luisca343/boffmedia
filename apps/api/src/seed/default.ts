@@ -12,7 +12,7 @@ import {
   boffMediaUserRoles,
   boffMediaUsers,
 } from '../_db/schema/BoffMedia';
-import { smartrotomApps, smartrotomUsers } from '../_db/schema/SmartRotom';
+import { rotomApps, rotomUsers } from '../_db/schema/SmartRotom';
 import pino from 'pino';
 
 const logger = pino({ name: 'util' });
@@ -37,7 +37,7 @@ async function main() {
   logger.info('Seeding rotom_users…');
   const ADMIN_UUID = '00000000-0000-0000-0000-000000000001';
   await db
-    .insert(smartrotomUsers)
+    .insert(rotomUsers)
     .values({ uuid: ADMIN_UUID, username: 'admin' })
     .onDuplicateKeyUpdate({ set: { username: sql`username` } });
 
@@ -89,11 +89,11 @@ async function main() {
   ];
   for (const app of apps) {
     const [existing] = await db
-      .select({ id: smartrotomApps.id })
-      .from(smartrotomApps)
-      .where(eq(smartrotomApps.name, app.name));
+      .select({ id: rotomApps.id })
+      .from(rotomApps)
+      .where(eq(rotomApps.name, app.name));
     if (!existing) {
-      await db.insert(smartrotomApps).values(app);
+      await db.insert(rotomApps).values(app);
     }
   }
 

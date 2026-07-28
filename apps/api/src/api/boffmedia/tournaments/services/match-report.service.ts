@@ -11,7 +11,7 @@ import {
   Tournament,
   TournamentMatch,
   TournamentParticipant,
-} from '@/_db/schema/Tournaments';
+} from '@/_db/schema/BoffMediaTournaments';
 import {
   effectiveBestOf,
   flipGames,

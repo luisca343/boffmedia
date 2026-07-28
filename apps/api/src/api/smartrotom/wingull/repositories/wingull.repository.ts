@@ -104,7 +104,7 @@ export class WingullRepository {
           if (town && type) {
             return {
               // The exact WorldGuard region identifier — this is the join key gobierno's
-              // parcela metadata keys off (`gobierno_parcelas.region_id`). Never rebuild it
+              // parcela metadata keys off (`rotom_gobierno_parcelas.region_id`). Never rebuild it
               // from town/type/number: zero-padding in the source string wouldn't round-trip.
               regionId: row.id,
               town,

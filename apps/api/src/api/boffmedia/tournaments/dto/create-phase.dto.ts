@@ -14,7 +14,7 @@ import {
   PHASE_FORMAT,
   ADVANCE_TYPE,
   TIEBREAK_PROFILE,
-} from '@/_db/schema/Tournaments';
+} from '@/_db/schema/BoffMediaTournaments';
 import type {
   PhaseFormat,
   AdvanceType,

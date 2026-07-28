@@ -27,7 +27,7 @@ const playerUuid = (name: string) => varchar(name, { length: 36 });
 
 // ─── Urbanismo ────────────────────────────────────────────────────────────────
 
-export const gobiernoZonas = mysqlTable('gobierno_zonas', {
+export const gobiernoZonas = mysqlTable('rotom_gobierno_zonas', {
   id: int('id').primaryKey().autoincrement(),
   town: varchar('town', { length: 64 }).notNull(),
   name: varchar('name', { length: 128 }).notNull(),
@@ -40,7 +40,7 @@ export const gobiernoZonas = mysqlTable('gobierno_zonas', {
 export type GobiernoZona = typeof gobiernoZonas.$inferSelect;
 
 export const gobiernoParcelas = mysqlTable(
-  'gobierno_parcelas',
+  'rotom_gobierno_parcelas',
   {
     id: int('id').primaryKey().autoincrement(),
     regionId: regionId().notNull(),
@@ -66,7 +66,7 @@ export const gobiernoParcelas = mysqlTable(
 export type GobiernoParcela = typeof gobiernoParcelas.$inferSelect;
 
 export const gobiernoParcelaHistorial = mysqlTable(
-  'gobierno_parcela_historial',
+  'rotom_gobierno_parcela_historial',
   {
     id: int('id').primaryKey().autoincrement(),
     regionId: regionId().notNull(),
@@ -83,33 +83,44 @@ export const gobiernoParcelaHistorial = mysqlTable(
 export type GobiernoParcelaHistorial =
   typeof gobiernoParcelaHistorial.$inferSelect;
 
-export const gobiernoSubastas = mysqlTable('gobierno_subastas', {
-  id: int('id').primaryKey().autoincrement(),
-  code: varchar('code', { length: 16 }).notNull().unique(),
-  regionId: regionId().notNull(),
-  town: varchar('town', { length: 64 }).notNull(),
-  number: int('number').notNull(),
-  startBid: bigint('start_bid', { mode: 'number' }).notNull(),
-  currentBid: bigint('current_bid', { mode: 'number' }).notNull(),
-  bidderUuid: playerUuid('bidder_uuid'),
-  bids: int('bids').notNull().default(0),
-  reason: varchar('reason', { length: 255 }),
-  status: varchar('status', { length: 16 }).notNull().default('live'),
-  endsAt: timestamp('ends_at').notNull(),
-  // The StarBank transfer that settled the auction — set once, when the winner is charged.
-  settledTxId: int('settled_tx_id').references(() => starBankTransactions.id, {
-    onDelete: 'set null',
-    onUpdate: 'cascade',
+export const gobiernoSubastas = mysqlTable(
+  'rotom_gobierno_subastas',
+  {
+    id: int('id').primaryKey().autoincrement(),
+    code: varchar('code', { length: 16 }).notNull().unique(),
+    regionId: regionId().notNull(),
+    town: varchar('town', { length: 64 }).notNull(),
+    number: int('number').notNull(),
+    startBid: bigint('start_bid', { mode: 'number' }).notNull(),
+    currentBid: bigint('current_bid', { mode: 'number' }).notNull(),
+    bidderUuid: playerUuid('bidder_uuid'),
+    bids: int('bids').notNull().default(0),
+    reason: varchar('reason', { length: 255 }),
+    status: varchar('status', { length: 16 }).notNull().default('live'),
+    endsAt: timestamp('ends_at').notNull(),
+    // The StarBank transfer that settled the auction — set once, when the winner is charged.
+    // FK named explicitly below: the auto-generated name exceeds MySQL's
+    // 64-char identifier limit.
+    settledTxId: int('settled_tx_id'),
+    createdBy: playerUuid('created_by').notNull(),
+    createdAt: timestamp('created_at').notNull().defaultNow(),
+    updatedAt: timestamp('updated_at').notNull().defaultNow().onUpdateNow(),
+  },
+  (t) => ({
+    settledFk: foreignKey({
+      name: 'gob_subastas_settled_fk',
+      columns: [t.settledTxId],
+      foreignColumns: [starBankTransactions.id],
+    })
+      .onDelete('set null')
+      .onUpdate('cascade'),
   }),
-  createdBy: playerUuid('created_by').notNull(),
-  createdAt: timestamp('created_at').notNull().defaultNow(),
-  updatedAt: timestamp('updated_at').notNull().defaultNow().onUpdateNow(),
-});
+);
 
 export type GobiernoSubasta = typeof gobiernoSubastas.$inferSelect;
 
 export const gobiernoPujas = mysqlTable(
-  'gobierno_pujas',
+  'rotom_gobierno_pujas',
   {
     id: int('id').primaryKey().autoincrement(),
     subastaId: int('subasta_id')
@@ -129,7 +140,7 @@ export type GobiernoPuja = typeof gobiernoPujas.$inferSelect;
 
 // ─── Seguridad ────────────────────────────────────────────────────────────────
 
-export const gobiernoDenuncias = mysqlTable('gobierno_denuncias', {
+export const gobiernoDenuncias = mysqlTable('rotom_gobierno_denuncias', {
   id: int('id').primaryKey().autoincrement(),
   code: varchar('code', { length: 16 }).notNull().unique(),
   town: varchar('town', { length: 64 }),
@@ -148,31 +159,42 @@ export const gobiernoDenuncias = mysqlTable('gobierno_denuncias', {
 
 export type GobiernoDenuncia = typeof gobiernoDenuncias.$inferSelect;
 
-export const gobiernoBuscados = mysqlTable('gobierno_buscados', {
-  id: int('id').primaryKey().autoincrement(),
-  code: varchar('code', { length: 16 }).notNull().unique(),
-  playerUuid: playerUuid('player_uuid').notNull(),
-  severity: varchar('severity', { length: 16 }).notNull(),
-  status: varchar('status', { length: 16 }).notNull().default('active'),
-  bounty: bigint('bounty', { mode: 'number' }).notNull().default(0),
-  offense: varchar('offense', { length: 255 }).notNull(),
-  reportedBy: playerUuid('reported_by').notNull(),
-  lastSeen: varchar('last_seen', { length: 128 }),
-  notes: text('notes'),
-  capturedBy: playerUuid('captured_by'),
-  capturedAt: timestamp('captured_at'),
-  // The StarBank transfer that paid the bounty out of the treasury to the captor.
-  payoutTxId: int('payout_tx_id').references(() => starBankTransactions.id, {
-    onDelete: 'set null',
-    onUpdate: 'cascade',
+export const gobiernoBuscados = mysqlTable(
+  'rotom_gobierno_buscados',
+  {
+    id: int('id').primaryKey().autoincrement(),
+    code: varchar('code', { length: 16 }).notNull().unique(),
+    playerUuid: playerUuid('player_uuid').notNull(),
+    severity: varchar('severity', { length: 16 }).notNull(),
+    status: varchar('status', { length: 16 }).notNull().default('active'),
+    bounty: bigint('bounty', { mode: 'number' }).notNull().default(0),
+    offense: varchar('offense', { length: 255 }).notNull(),
+    reportedBy: playerUuid('reported_by').notNull(),
+    lastSeen: varchar('last_seen', { length: 128 }),
+    notes: text('notes'),
+    capturedBy: playerUuid('captured_by'),
+    capturedAt: timestamp('captured_at'),
+    // The StarBank transfer that paid the bounty out of the treasury to the captor.
+    // FK named explicitly below: the auto-generated name exceeds MySQL's
+    // 64-char identifier limit.
+    payoutTxId: int('payout_tx_id'),
+    createdAt: timestamp('created_at').notNull().defaultNow(),
+    updatedAt: timestamp('updated_at').notNull().defaultNow().onUpdateNow(),
+  },
+  (t) => ({
+    payoutFk: foreignKey({
+      name: 'gob_buscados_payout_fk',
+      columns: [t.payoutTxId],
+      foreignColumns: [starBankTransactions.id],
+    })
+      .onDelete('set null')
+      .onUpdate('cascade'),
   }),
-  createdAt: timestamp('created_at').notNull().defaultNow(),
-  updatedAt: timestamp('updated_at').notNull().defaultNow().onUpdateNow(),
-});
+);
 
 export type GobiernoBuscado = typeof gobiernoBuscados.$inferSelect;
 
-export const gobiernoPatrullas = mysqlTable('gobierno_patrullas', {
+export const gobiernoPatrullas = mysqlTable('rotom_gobierno_patrullas', {
   id: int('id').primaryKey().autoincrement(),
   label: varchar('label', { length: 64 }).notNull(),
   fromTime: varchar('from_time', { length: 8 }).notNull(),
@@ -186,66 +208,94 @@ export const gobiernoPatrullas = mysqlTable('gobierno_patrullas', {
 export type GobiernoPatrulla = typeof gobiernoPatrullas.$inferSelect;
 
 export const gobiernoPatrullaOficiales = mysqlTable(
-  'gobierno_patrulla_oficiales',
+  'rotom_gobierno_patrulla_oficiales',
   {
     id: int('id').primaryKey().autoincrement(),
-    patrullaId: int('patrulla_id')
-      .notNull()
-      .references(() => gobiernoPatrullas.id, {
-        onDelete: 'cascade',
-        onUpdate: 'cascade',
-      }),
+    // FK named explicitly below: the auto-generated name exceeds MySQL's
+    // 64-char identifier limit.
+    patrullaId: int('patrulla_id').notNull(),
     uuid: playerUuid('uuid').notNull(),
   },
-  (t) => ({ patrullaIdx: index('gob_patoff_patrulla_idx').on(t.patrullaId) }),
+  (t) => ({
+    patrullaIdx: index('gob_patoff_patrulla_idx').on(t.patrullaId),
+    patrullaFk: foreignKey({
+      name: 'gob_patoff_patrulla_fk',
+      columns: [t.patrullaId],
+      foreignColumns: [gobiernoPatrullas.id],
+    })
+      .onDelete('cascade')
+      .onUpdate('cascade'),
+  }),
 );
 
 export type GobiernoPatrullaOficial =
   typeof gobiernoPatrullaOficiales.$inferSelect;
 
-export const gobiernoBitacora = mysqlTable('gobierno_bitacora', {
-  id: int('id').primaryKey().autoincrement(),
-  patrullaId: int('patrulla_id').references(() => gobiernoPatrullas.id, {
-    onDelete: 'set null',
-    onUpdate: 'cascade',
+export const gobiernoBitacora = mysqlTable(
+  'rotom_gobierno_bitacora',
+  {
+    id: int('id').primaryKey().autoincrement(),
+    // FK named explicitly below: the auto-generated name exceeds MySQL's
+    // 64-char identifier limit.
+    patrullaId: int('patrulla_id'),
+    uuid: playerUuid('uuid').notNull(),
+    text: text('text').notNull(),
+    tone: varchar('tone', { length: 16 }).notNull().default('info'),
+    createdAt: timestamp('created_at').notNull().defaultNow(),
+  },
+  (t) => ({
+    patrullaFk: foreignKey({
+      name: 'gob_bitacora_patrulla_fk',
+      columns: [t.patrullaId],
+      foreignColumns: [gobiernoPatrullas.id],
+    })
+      .onDelete('set null')
+      .onUpdate('cascade'),
   }),
-  uuid: playerUuid('uuid').notNull(),
-  text: text('text').notNull(),
-  tone: varchar('tone', { length: 16 }).notNull().default('info'),
-  createdAt: timestamp('created_at').notNull().defaultNow(),
-});
+);
 
 export type GobiernoBitacora = typeof gobiernoBitacora.$inferSelect;
 
 // ─── Hacienda ─────────────────────────────────────────────────────────────────
 
-export const gobiernoMultas = mysqlTable('gobierno_multas', {
-  id: int('id').primaryKey().autoincrement(),
-  code: varchar('code', { length: 16 }).notNull().unique(),
-  playerUuid: playerUuid('player_uuid').notNull(),
-  amount: bigint('amount', { mode: 'number' }).notNull(),
-  status: varchar('status', { length: 16 }).notNull().default('pending'),
-  reason: varchar('reason', { length: 255 }).notNull(),
-  issuedBy: playerUuid('issued_by').notNull(),
-  denunciaId: int('denuncia_id').references(() => gobiernoDenuncias.id, {
-    onDelete: 'set null',
-    onUpdate: 'cascade',
+export const gobiernoMultas = mysqlTable(
+  'rotom_gobierno_multas',
+  {
+    id: int('id').primaryKey().autoincrement(),
+    code: varchar('code', { length: 16 }).notNull().unique(),
+    playerUuid: playerUuid('player_uuid').notNull(),
+    amount: bigint('amount', { mode: 'number' }).notNull(),
+    status: varchar('status', { length: 16 }).notNull().default('pending'),
+    reason: varchar('reason', { length: 255 }).notNull(),
+    issuedBy: playerUuid('issued_by').notNull(),
+    denunciaId: int('denuncia_id').references(() => gobiernoDenuncias.id, {
+      onDelete: 'set null',
+      onUpdate: 'cascade',
+    }),
+    // The StarBank transfer that paid the fine into the treasury.
+    // FK named explicitly below: the auto-generated name exceeds MySQL's
+    // 64-char identifier limit.
+    paidTxId: int('paid_tx_id'),
+    paidAt: timestamp('paid_at'),
+    createdAt: timestamp('created_at').notNull().defaultNow(),
+    updatedAt: timestamp('updated_at').notNull().defaultNow().onUpdateNow(),
+  },
+  (t) => ({
+    paidFk: foreignKey({
+      name: 'gob_multas_paid_fk',
+      columns: [t.paidTxId],
+      foreignColumns: [starBankTransactions.id],
+    })
+      .onDelete('set null')
+      .onUpdate('cascade'),
   }),
-  // The StarBank transfer that paid the fine into the treasury.
-  paidTxId: int('paid_tx_id').references(() => starBankTransactions.id, {
-    onDelete: 'set null',
-    onUpdate: 'cascade',
-  }),
-  paidAt: timestamp('paid_at'),
-  createdAt: timestamp('created_at').notNull().defaultNow(),
-  updatedAt: timestamp('updated_at').notNull().defaultNow().onUpdateNow(),
-});
+);
 
 export type GobiernoMulta = typeof gobiernoMultas.$inferSelect;
 
 // Rate card only. What was actually collected derives from the StarBank ledger
 // (transactions of type TASA into the treasury) — never stored here.
-export const gobiernoTasas = mysqlTable('gobierno_tasas', {
+export const gobiernoTasas = mysqlTable('rotom_gobierno_tasas', {
   id: int('id').primaryKey().autoincrement(),
   code: varchar('code', { length: 16 }).notNull().unique(),
   concept: varchar('concept', { length: 128 }).notNull(),
@@ -261,7 +311,7 @@ export type GobiernoTasa = typeof gobiernoTasas.$inferSelect;
 
 // ─── Justicia ─────────────────────────────────────────────────────────────────
 
-export const gobiernoExpedientes = mysqlTable('gobierno_expedientes', {
+export const gobiernoExpedientes = mysqlTable('rotom_gobierno_expedientes', {
   id: int('id').primaryKey().autoincrement(),
   code: varchar('code', { length: 16 }).notNull().unique(),
   title: varchar('title', { length: 255 }).notNull(),
@@ -279,7 +329,7 @@ export const gobiernoExpedientes = mysqlTable('gobierno_expedientes', {
 export type GobiernoExpediente = typeof gobiernoExpedientes.$inferSelect;
 
 export const gobiernoExpedienteEventos = mysqlTable(
-  'gobierno_expediente_eventos',
+  'rotom_gobierno_expediente_eventos',
   {
     id: int('id').primaryKey().autoincrement(),
     expedienteId: int('expediente_id').notNull(),
@@ -304,35 +354,46 @@ export const gobiernoExpedienteEventos = mysqlTable(
 export type GobiernoExpedienteEvento =
   typeof gobiernoExpedienteEventos.$inferSelect;
 
-export const gobiernoApelaciones = mysqlTable('gobierno_apelaciones', {
-  id: int('id').primaryKey().autoincrement(),
-  code: varchar('code', { length: 16 }).notNull().unique(),
-  multaId: int('multa_id')
-    .notNull()
-    .references(() => gobiernoMultas.id, {
-      onDelete: 'cascade',
-      onUpdate: 'cascade',
-    }),
-  playerUuid: playerUuid('player_uuid').notNull(),
-  status: varchar('status', { length: 16 }).notNull().default('pending'),
-  grounds: text('grounds').notNull(),
-  reviewerUuid: playerUuid('reviewer_uuid'),
-  decision: text('decision'),
-  resolvedAt: timestamp('resolved_at'),
-  // Set when an overturned appeal refunds an already-paid fine out of the treasury.
-  refundTxId: int('refund_tx_id').references(() => starBankTransactions.id, {
-    onDelete: 'set null',
-    onUpdate: 'cascade',
+export const gobiernoApelaciones = mysqlTable(
+  'rotom_gobierno_apelaciones',
+  {
+    id: int('id').primaryKey().autoincrement(),
+    code: varchar('code', { length: 16 }).notNull().unique(),
+    multaId: int('multa_id')
+      .notNull()
+      .references(() => gobiernoMultas.id, {
+        onDelete: 'cascade',
+        onUpdate: 'cascade',
+      }),
+    playerUuid: playerUuid('player_uuid').notNull(),
+    status: varchar('status', { length: 16 }).notNull().default('pending'),
+    grounds: text('grounds').notNull(),
+    reviewerUuid: playerUuid('reviewer_uuid'),
+    decision: text('decision'),
+    resolvedAt: timestamp('resolved_at'),
+    // Set when an overturned appeal refunds an already-paid fine out of the treasury.
+    // FK named explicitly below: the auto-generated name exceeds MySQL's
+    // 64-char identifier limit.
+    refundTxId: int('refund_tx_id'),
+    createdAt: timestamp('created_at').notNull().defaultNow(),
+    updatedAt: timestamp('updated_at').notNull().defaultNow().onUpdateNow(),
+  },
+  (t) => ({
+    refundFk: foreignKey({
+      name: 'gob_apelaciones_refund_fk',
+      columns: [t.refundTxId],
+      foreignColumns: [starBankTransactions.id],
+    })
+      .onDelete('set null')
+      .onUpdate('cascade'),
   }),
-  createdAt: timestamp('created_at').notNull().defaultNow(),
-  updatedAt: timestamp('updated_at').notNull().defaultNow().onUpdateNow(),
-});
+);
 
 export type GobiernoApelacion = typeof gobiernoApelaciones.$inferSelect;
 
 // ─── Gobierno ─────────────────────────────────────────────────────────────────
 
-export const gobiernoAnuncios = mysqlTable('gobierno_anuncios', {
+export const gobiernoAnuncios = mysqlTable('rotom_gobierno_anuncios', {
   id: int('id').primaryKey().autoincrement(),
   kind: varchar('kind', { length: 16 }).notNull().default('anuncio'),
   title: varchar('title', { length: 255 }).notNull(),
@@ -351,7 +412,7 @@ export type GobiernoAnuncio = typeof gobiernoAnuncios.$inferSelect;
 // Append-only. Serves both «Auditoría» (Gobierno) and «Actividad» (Administración) —
 // the same log, filtered differently. Nothing updates or deletes a row here.
 export const gobiernoAuditoria = mysqlTable(
-  'gobierno_auditoria',
+  'rotom_gobierno_auditoria',
   {
     id: int('id').primaryKey().autoincrement(),
     actorUuid: playerUuid('actor_uuid').notNull(),
@@ -373,7 +434,7 @@ export type GobiernoAuditoria = typeof gobiernoAuditoria.$inferSelect;
 
 // Two event types share this table. `construccion` uses build*/rating* + obras + votos;
 // `caza` uses zone/coords/radius/opens/closes + especies + capturas.
-export const gobiernoEventos = mysqlTable('gobierno_eventos', {
+export const gobiernoEventos = mysqlTable('rotom_gobierno_eventos', {
   id: int('id').primaryKey().autoincrement(),
   code: varchar('code', { length: 16 }).notNull().unique(),
   type: varchar('type', { length: 16 }).notNull(),
@@ -403,22 +464,28 @@ export const gobiernoEventos = mysqlTable('gobierno_eventos', {
 export type GobiernoEvento = typeof gobiernoEventos.$inferSelect;
 
 export const gobiernoEventoObras = mysqlTable(
-  'gobierno_evento_obras',
+  'rotom_gobierno_evento_obras',
   {
     id: int('id').primaryKey().autoincrement(),
-    eventoId: int('evento_id')
-      .notNull()
-      .references(() => gobiernoEventos.id, {
-        onDelete: 'cascade',
-        onUpdate: 'cascade',
-      }),
+    // FK named explicitly below: the auto-generated name exceeds MySQL's
+    // 64-char identifier limit.
+    eventoId: int('evento_id').notNull(),
     town: varchar('town', { length: 64 }).notNull(),
     buildName: varchar('build_name', { length: 255 }).notNull(),
     description: text('description'),
     builders: json('builders'),
     createdAt: timestamp('created_at').notNull().defaultNow(),
   },
-  (t) => ({ eventoIdx: index('gob_obras_evento_idx').on(t.eventoId) }),
+  (t) => ({
+    eventoIdx: index('gob_obras_evento_idx').on(t.eventoId),
+    eventoFk: foreignKey({
+      name: 'gob_obras_evento_fk',
+      columns: [t.eventoId],
+      foreignColumns: [gobiernoEventos.id],
+    })
+      .onDelete('cascade')
+      .onUpdate('cascade'),
+  }),
 );
 
 export type GobiernoEventoObra = typeof gobiernoEventoObras.$inferSelect;
@@ -426,15 +493,12 @@ export type GobiernoEventoObra = typeof gobiernoEventoObras.$inferSelect;
 // One vote per player per build. The handoff's cats {diseno, ambicion, fidelidad}
 // are the average of these rows; stars / nota10 / nota100 / medallas all derive from that.
 export const gobiernoEventoVotos = mysqlTable(
-  'gobierno_evento_votos',
+  'rotom_gobierno_evento_votos',
   {
     id: int('id').primaryKey().autoincrement(),
-    obraId: int('obra_id')
-      .notNull()
-      .references(() => gobiernoEventoObras.id, {
-        onDelete: 'cascade',
-        onUpdate: 'cascade',
-      }),
+    // FK named explicitly below: the auto-generated name exceeds MySQL's
+    // 64-char identifier limit.
+    obraId: int('obra_id').notNull(),
     voterUuid: playerUuid('voter_uuid').notNull(),
     diseno: int('diseno').notNull(),
     ambicion: int('ambicion').notNull(),
@@ -452,15 +516,12 @@ export const gobiernoEventoVotos = mysqlTable(
 export type GobiernoEventoVoto = typeof gobiernoEventoVotos.$inferSelect;
 
 export const gobiernoEventoEspecies = mysqlTable(
-  'gobierno_evento_especies',
+  'rotom_gobierno_evento_especies',
   {
     id: int('id').primaryKey().autoincrement(),
-    eventoId: int('evento_id')
-      .notNull()
-      .references(() => gobiernoEventos.id, {
-        onDelete: 'cascade',
-        onUpdate: 'cascade',
-      }),
+    // FK named explicitly below: the auto-generated name exceeds MySQL's
+    // 64-char identifier limit.
+    eventoId: int('evento_id').notNull(),
     name: varchar('name', { length: 64 }).notNull(),
     rarity: varchar('rarity', { length: 32 }).notNull(),
     rarityPts: int('rarity_pts').notNull().default(0),
@@ -473,7 +534,16 @@ export const gobiernoEventoEspecies = mysqlTable(
     lvlMin: int('lvl_min').notNull().default(1),
     lvlMax: int('lvl_max').notNull().default(100),
   },
-  (t) => ({ eventoIdx: index('gob_especies_evento_idx').on(t.eventoId) }),
+  (t) => ({
+    eventoIdx: index('gob_especies_evento_idx').on(t.eventoId),
+    eventoFk: foreignKey({
+      name: 'gob_especies_evento_fk',
+      columns: [t.eventoId],
+      foreignColumns: [gobiernoEventos.id],
+    })
+      .onDelete('cascade')
+      .onUpdate('cascade'),
+  }),
 );
 
 export type GobiernoEventoEspecie = typeof gobiernoEventoEspecies.$inferSelect;
@@ -481,15 +551,12 @@ export type GobiernoEventoEspecie = typeof gobiernoEventoEspecies.$inferSelect;
 // A hunt is played blind: nobody may read another player's row until the event closes.
 // One registered capture per player — re-registering replaces it.
 export const gobiernoEventoCapturas = mysqlTable(
-  'gobierno_evento_capturas',
+  'rotom_gobierno_evento_capturas',
   {
     id: int('id').primaryKey().autoincrement(),
-    eventoId: int('evento_id')
-      .notNull()
-      .references(() => gobiernoEventos.id, {
-        onDelete: 'cascade',
-        onUpdate: 'cascade',
-      }),
+    // FK named explicitly below: the auto-generated name exceeds MySQL's
+    // 64-char identifier limit.
+    eventoId: int('evento_id').notNull(),
     uuid: playerUuid('uuid').notNull(),
     species: varchar('species', { length: 64 }).notNull(),
     level: int('level').notNull(),
@@ -505,6 +572,13 @@ export const gobiernoEventoCapturas = mysqlTable(
       t.eventoId,
       t.uuid,
     ),
+    eventoFk: foreignKey({
+      name: 'gob_capturas_evento_fk',
+      columns: [t.eventoId],
+      foreignColumns: [gobiernoEventos.id],
+    })
+      .onDelete('cascade')
+      .onUpdate('cascade'),
   }),
 );
 
@@ -512,7 +586,7 @@ export type GobiernoEventoCaptura = typeof gobiernoEventoCapturas.$inferSelect;
 
 // ─── Administración ───────────────────────────────────────────────────────────
 
-export const gobiernoNpcSkins = mysqlTable('gobierno_npc_skins', {
+export const gobiernoNpcSkins = mysqlTable('rotom_gobierno_npc_skins', {
   id: int('id').primaryKey().autoincrement(),
   skin: varchar('skin', { length: 64 }).notNull().unique(),
   npcs: json('npcs'),
@@ -527,7 +601,7 @@ export type GobiernoNpcSkin = typeof gobiernoNpcSkins.$inferSelect;
 
 // Broadcast history. The message itself goes out over wingull/globalchat; this is the record
 // of who said what as whom — the old ArceuSpeak admin tool had no such record.
-export const gobiernoMegafonia = mysqlTable('gobierno_megafonia', {
+export const gobiernoMegafonia = mysqlTable('rotom_gobierno_megafonia', {
   id: int('id').primaryKey().autoincrement(),
   speaker: varchar('speaker', { length: 64 }).notNull(),
   text: text('text').notNull(),
@@ -537,7 +611,7 @@ export const gobiernoMegafonia = mysqlTable('gobierno_megafonia', {
 
 export type GobiernoMegafonia = typeof gobiernoMegafonia.$inferSelect;
 
-export const gobiernoCarteles = mysqlTable('gobierno_carteles', {
+export const gobiernoCarteles = mysqlTable('rotom_gobierno_carteles', {
   id: int('id').primaryKey().autoincrement(),
   name: varchar('name', { length: 128 }).notNull(),
   highway: varchar('highway', { length: 64 }).notNull(),

@@ -8,7 +8,7 @@ import {
   boffMediaAchievements,
   boffMediaEventParticipants,
   boffMediaEvents,
-} from '@/_db/schema/Events';
+} from '@/_db/schema/BoffMediaEvents';
 
 export interface UserTrophy {
   id: number;

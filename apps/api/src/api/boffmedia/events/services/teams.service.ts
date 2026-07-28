@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { TeamsRepository } from '../../../_repositories/boffmedia/teams.repository';
 import { ParticipantsService } from './participants.service';
-import { EventTeam, EventTeamMember } from '@/_db/schema/Events';
+import { EventTeam, EventTeamMember } from '@/_db/schema/BoffMediaEvents';
 import { CreateTeamDto } from '../dto/create-team.dto';
 import { UpdateTeamDto } from '../dto/update-team.dto';
 

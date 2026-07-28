@@ -8,8 +8,8 @@ import { CreateArcadeStreakDto } from '../dto/create-arcade-streak.dto';
 import { UpdateArcadeStreakDto } from '../dto/update-arcade-streak.dto';
 import { ArcadeStreak } from '../entities/arcade-streak.entity';
 import {
-  SmartRotomArcadeStreak,
-  smartRotomArcadeStreaks,
+  RotomArcadeStreak,
+  rotomArcadeStreaks,
 } from '@/_db/schema/SmartRotom';
 
 @Injectable()
@@ -22,22 +22,22 @@ export class ArcadeStreakRepository
   implements IArcadeStreakRepository
 {
   constructor(@Inject(DRIZZLE) db: MySql2Database<Record<string, never>>) {
-    super(db, smartRotomArcadeStreaks);
+    super(db, rotomArcadeStreaks);
   }
 
   async create(data: CreateArcadeStreakDto): Promise<ArcadeStreak> {
-    const result = await this.db.insert(smartRotomArcadeStreaks).values({
+    const result = await this.db.insert(rotomArcadeStreaks).values({
       uuid: data.uuid,
       streak: data.streak || 0,
       lastClaimed: data.lastClaimed ? new Date(data.lastClaimed) : null,
       lastBanner: data.lastBanner || null,
       totalClaims: data.totalClaims || 0,
-    } as SmartRotomArcadeStreak);
+    } as RotomArcadeStreak);
     return this.findById(result[0].insertId) as Promise<ArcadeStreak>;
   }
 
   async update(id: number, data: UpdateArcadeStreakDto): Promise<ArcadeStreak> {
-    const updateData: Partial<SmartRotomArcadeStreak> = {};
+    const updateData: Partial<RotomArcadeStreak> = {};
     if (data.uuid) updateData.uuid = data.uuid;
     if (typeof data.streak !== 'undefined') updateData.streak = data.streak;
     if (data.lastClaimed) updateData.lastClaimed = new Date(data.lastClaimed);
@@ -46,30 +46,30 @@ export class ArcadeStreakRepository
       updateData.totalClaims = data.totalClaims;
 
     await this.db
-      .update(smartRotomArcadeStreaks)
+      .update(rotomArcadeStreaks)
       .set(updateData)
-      .where(eq(smartRotomArcadeStreaks.id, id));
+      .where(eq(rotomArcadeStreaks.id, id));
     return this.findById(id) as Promise<ArcadeStreak>;
   }
 
   async delete(id: number): Promise<boolean> {
     const result = await this.db
-      .delete(smartRotomArcadeStreaks)
-      .where(eq(smartRotomArcadeStreaks.id, id));
+      .delete(rotomArcadeStreaks)
+      .where(eq(rotomArcadeStreaks.id, id));
     return result[0].affectedRows > 0;
   }
 
-  async findByUuid(uuid: string): Promise<SmartRotomArcadeStreak> {
+  async findByUuid(uuid: string): Promise<RotomArcadeStreak> {
     const result = await this.db
       .select()
-      .from(smartRotomArcadeStreaks)
-      .where(eq(smartRotomArcadeStreaks.uuid, uuid))
+      .from(rotomArcadeStreaks)
+      .where(eq(rotomArcadeStreaks.uuid, uuid))
       .limit(1);
     return result[0] || null;
   }
 
   async createUserStreak(streakData: any): Promise<{ insertId: number }> {
-    const result = await this.db.insert(smartRotomArcadeStreaks).values({
+    const result = await this.db.insert(rotomArcadeStreaks).values({
       uuid: streakData.uuid,
       streak: streakData.streak || 0,
       lastClaimed: streakData.lastClaimed
@@ -77,15 +77,15 @@ export class ArcadeStreakRepository
         : null,
       lastBanner: streakData.lastBanner || null,
       totalClaims: streakData.totalClaims || 0,
-    } as SmartRotomArcadeStreak);
+    } as RotomArcadeStreak);
     return { insertId: result[0].insertId };
   }
 
   async updateUserStreak(
     uuid: string,
     streakData: any,
-  ): Promise<SmartRotomArcadeStreak> {
-    const updateData: Partial<SmartRotomArcadeStreak> = {};
+  ): Promise<RotomArcadeStreak> {
+    const updateData: Partial<RotomArcadeStreak> = {};
     if (typeof streakData.streak !== 'undefined')
       updateData.streak = streakData.streak;
     if (streakData.lastClaimed)
@@ -95,33 +95,33 @@ export class ArcadeStreakRepository
       updateData.totalClaims = streakData.totalClaims;
 
     await this.db
-      .update(smartRotomArcadeStreaks)
+      .update(rotomArcadeStreaks)
       .set(updateData)
-      .where(eq(smartRotomArcadeStreaks.uuid, uuid));
-    return this.findByUuid(uuid) as Promise<SmartRotomArcadeStreak>;
+      .where(eq(rotomArcadeStreaks.uuid, uuid));
+    return this.findByUuid(uuid) as Promise<RotomArcadeStreak>;
   }
 
   async resetStreak(uuid: string): Promise<boolean> {
     const result = await this.db
-      .update(smartRotomArcadeStreaks)
-      .set({
-        streak: 0,
-        lastClaimed: null,
-      } as SmartRotomArcadeStreak)
-      .where(eq(smartRotomArcadeStreaks.uuid, uuid));
+      .update(rotomArcadeStreaks)
+      // last_claimed is NOT NULL in the DB (and ON UPDATE CURRENT_TIMESTAMP),
+      // so the previous `lastClaimed: null` could only ever fail under strict
+      // mode. Resetting the streak is the counter; the timestamp refreshes.
+      .set({ streak: 0 })
+      .where(eq(rotomArcadeStreaks.uuid, uuid));
     return result[0].affectedRows > 0;
   }
 
-  async incrementStreak(uuid: string): Promise<SmartRotomArcadeStreak> {
+  async incrementStreak(uuid: string): Promise<RotomArcadeStreak> {
     await this.db
-      .update(smartRotomArcadeStreaks)
+      .update(rotomArcadeStreaks)
       .set({
-        streak: sql`${smartRotomArcadeStreaks.streak} + 1`,
+        streak: sql`${rotomArcadeStreaks.streak} + 1`,
         lastClaimed: new Date(),
-        totalClaims: sql`${smartRotomArcadeStreaks.totalClaims} + 1`,
+        totalClaims: sql`${rotomArcadeStreaks.totalClaims} + 1`,
       } as any)
-      .where(eq(smartRotomArcadeStreaks.uuid, uuid));
-    return this.findByUuid(uuid) as Promise<SmartRotomArcadeStreak>;
+      .where(eq(rotomArcadeStreaks.uuid, uuid));
+    return this.findByUuid(uuid) as Promise<RotomArcadeStreak>;
   }
 
   async canClaimToday(uuid: string): Promise<boolean> {
@@ -137,7 +137,7 @@ export class ArcadeStreakRepository
     return today.getTime() !== lastClaim.getTime();
   }
 
-  async getStreakStats(uuid: string): Promise<SmartRotomArcadeStreak | null> {
+  async getStreakStats(uuid: string): Promise<RotomArcadeStreak | null> {
     return this.findByUuid(uuid);
   }
 }

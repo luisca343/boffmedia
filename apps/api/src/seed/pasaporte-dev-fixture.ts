@@ -8,10 +8,10 @@ import pino from 'pino';
 import { env } from '@/config/env';
 
 import {
-  smartRotomAchievements,
-  smartRotomReplays,
-  smartRotomUserAchievements,
-  smartRotomUserReplays,
+  rotomAchievements,
+  rotomReplays,
+  rotomUserAchievements,
+  rotomUserReplays,
 } from '../_db/schema/SmartRotom';
 import { starBankTransactions } from '../_db/schema/SmartRotomStarBank';
 
@@ -190,28 +190,28 @@ async function main() {
 
   // --- teardown (also runs first on a normal pass, so the fixture is idempotent) ---
   const tagged = await db
-    .select({ id: smartRotomReplays.id })
-    .from(smartRotomReplays)
-    .where(eq(smartRotomReplays.side2, FIXTURE_TAG));
+    .select({ id: rotomReplays.id })
+    .from(rotomReplays)
+    .where(eq(rotomReplays.side2, FIXTURE_TAG));
   const ids = tagged.map((r) => r.id);
 
   if (ids.length) {
     await db
-      .delete(smartRotomUserReplays)
-      .where(inArray(smartRotomUserReplays.replayId, ids));
+      .delete(rotomUserReplays)
+      .where(inArray(rotomUserReplays.replayId, ids));
     await db
-      .delete(smartRotomReplays)
-      .where(inArray(smartRotomReplays.id, ids));
+      .delete(rotomReplays)
+      .where(inArray(rotomReplays.id, ids));
   }
   await db
-    .delete(smartRotomUserAchievements)
-    .where(eq(smartRotomUserAchievements.uuid, TRAINER_UUID));
+    .delete(rotomUserAchievements)
+    .where(eq(rotomUserAchievements.uuid, TRAINER_UUID));
   await db
     .delete(starBankTransactions)
     .where(
       and(
-        eq(starBankTransactions.to, TAXI_SERVICE_ACCOUNT),
-        eq(starBankTransactions.from, TRAINER_ACCOUNT),
+        eq(starBankTransactions.toAccountId, TAXI_SERVICE_ACCOUNT),
+        eq(starBankTransactions.fromAccountId, TRAINER_ACCOUNT),
         like(starBankTransactions.reason, 'Taxi a %'),
       ),
     );
@@ -229,7 +229,7 @@ async function main() {
   const replayIds: number[] = [];
   for (const [i, won] of BATTLE_RESULTS.entries()) {
     const when = day(80 - i * 4);
-    await db.insert(smartRotomReplays).values({
+    await db.insert(rotomReplays).values({
       side1: TRAINER_NAME,
       side2: FIXTURE_TAG,
       team1: WINNING_TEAM,
@@ -245,7 +245,7 @@ async function main() {
     const id = Number(row.id);
     replayIds.push(id);
     await db
-      .insert(smartRotomUserReplays)
+      .insert(rotomUserReplays)
       .values({ uuid: TRAINER_UUID, replayId: id, side: 1 });
   }
   const wins = BATTLE_RESULTS.filter(Boolean).length;
@@ -255,8 +255,8 @@ async function main() {
 
   // --- achievements. dataId points at a replay so the badge page can offer "Ver Repetición". ---
   const all = await db
-    .select({ id: smartRotomAchievements.id })
-    .from(smartRotomAchievements);
+    .select({ id: rotomAchievements.id })
+    .from(rotomAchievements);
   const known = new Set(all.map((a) => a.id));
 
   let earned = 0;
@@ -265,7 +265,7 @@ async function main() {
       logger.warn(`achievement "${id}" is not in this database — skipped`);
       continue;
     }
-    await db.insert(smartRotomUserAchievements).values({
+    await db.insert(rotomUserAchievements).values({
       achievementId: id,
       uuid: TRAINER_UUID,
       progress: 1,
@@ -282,14 +282,14 @@ async function main() {
   // --- taxi fares → the Bitácora's travel stamps ---
   for (const [stop, fare, daysAgo] of TRIPS) {
     await db.insert(starBankTransactions).values({
-      from: TRAINER_ACCOUNT,
-      to: TAXI_SERVICE_ACCOUNT,
+      fromAccountId: TRAINER_ACCOUNT,
+      toAccountId: TAXI_SERVICE_ACCOUNT,
       amount: fare,
       fromBalance: 1000,
       toBalance: 1000,
       reason: `Taxi a ${stop}`,
       type: 'TRANSFER',
-      date: day(daysAgo).toISOString(),
+      date: day(daysAgo),
     });
   }
   logger.info(

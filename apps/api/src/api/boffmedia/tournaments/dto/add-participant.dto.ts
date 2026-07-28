@@ -10,7 +10,7 @@ import {
   MaxLength,
   ValidateNested,
 } from 'class-validator';
-import { COMPETITOR_KIND } from '@/_db/schema/Tournaments';
+import { COMPETITOR_KIND } from '@/_db/schema/BoffMediaTournaments';
 import type { CompetitorKind } from '../tournaments.types';
 
 export class RosterMemberDto {

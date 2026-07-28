@@ -10,4 +10,4 @@ export const ficusMessages = mysqlTable('ficus_messages', {
   deletedAt: timestamp('deleted_at'),
 });
 
-export type FicusMensaje = typeof ficusMessages.$inferSelect;
+export type FicusMessage = typeof ficusMessages.$inferSelect;

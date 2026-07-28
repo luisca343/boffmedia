@@ -6,23 +6,23 @@ import {
   timestamp,
   varchar,
 } from 'drizzle-orm/mysql-core';
-import { smartrotomUsers } from './SmartRotom';
+import { rotomUsers } from './SmartRotom';
 
 export const mineGames = mysqlTable('rotom_mine_games', {
-  id: int('id').primaryKey().autoincrement().primaryKey(),
+  id: int('id').primaryKey().autoincrement(),
   uuid: char('uuid', { length: 36 })
     .notNull()
-    .references(() => smartrotomUsers.uuid, {
+    .references(() => rotomUsers.uuid, {
       onDelete: 'cascade',
       onUpdate: 'cascade',
     }),
   createdAt: timestamp('created_at').default(sql`CURRENT_TIMESTAMP()`),
 });
 
-export type PartidaMina = typeof mineGames.$inferSelect;
+export type MineGame = typeof mineGames.$inferSelect;
 
 export const mineRewards = mysqlTable('rotom_mine_rewards', {
-  id: int('id').primaryKey().autoincrement().primaryKey(),
+  id: int('id').primaryKey().autoincrement(),
   value: int('value').notNull(),
   name: varchar('name', { length: 32 }).notNull(),
   type: varchar('type', { length: 32 }).notNull(),
@@ -31,10 +31,10 @@ export const mineRewards = mysqlTable('rotom_mine_rewards', {
   height: int('height').notNull(),
 });
 
-export type RecompensaMina = typeof mineRewards.$inferSelect;
+export type MineReward = typeof mineRewards.$inferSelect;
 
-export const mineGamesDetail = mysqlTable('rotom_mine_games_detail', {
-  id: int('id').primaryKey().autoincrement().primaryKey(),
+export const mineGameRewards = mysqlTable('rotom_mine_game_rewards', {
+  id: int('id').primaryKey().autoincrement(),
   gameId: int('game_id')
     .notNull()
     .references(() => mineGames.id, {
@@ -50,4 +50,4 @@ export const mineGamesDetail = mysqlTable('rotom_mine_games_detail', {
   value: int('value').notNull(),
 });
 
-export type DetallePartidaMina = typeof mineGamesDetail.$inferSelect;
+export type MineGameReward = typeof mineGameRewards.$inferSelect;

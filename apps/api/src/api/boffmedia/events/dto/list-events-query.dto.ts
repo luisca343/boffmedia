@@ -1,7 +1,7 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { IsEnum, IsInt, IsOptional, Max, Min } from 'class-validator';
-import { EVENT_STATUS } from '@/_db/schema/Events';
+import { EVENT_STATUS } from '@/_db/schema/BoffMediaEvents';
 
 /**
  * Optional filters/pagination for `GET /events`. Every field is optional — with

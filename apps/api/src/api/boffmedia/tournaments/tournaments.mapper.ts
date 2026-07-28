@@ -1,7 +1,7 @@
 import {
   TournamentParticipant,
   TournamentRosterMember,
-} from '@/_db/schema/Tournaments';
+} from '@/_db/schema/BoffMediaTournaments';
 import { Competitor, RosterMember } from './entities/competitor.entity';
 
 /** ISO alpha-2 country code → regional-indicator flag emoji (null if invalid). */
