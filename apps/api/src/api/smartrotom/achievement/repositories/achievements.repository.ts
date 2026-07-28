@@ -8,12 +8,12 @@ import { CreateAchievementDto } from '../dto/create-achievement.dto';
 import { UpdateAchievementDto } from '../dto/update-achievement.dto';
 import { Achievement } from '../entities/achievement.entity';
 import {
-  SmartRotomAchievement,
-  SmartRotomUserAchievement,
-  smartRotomAchievements,
-  smartRotomReplays,
-  smartRotomUserAchievements,
-  smartRotomUserReplays,
+  RotomAchievement,
+  RotomUserAchievement,
+  rotomAchievements,
+  rotomReplays,
+  rotomUserAchievements,
+  rotomUserReplays,
 } from '@/_db/schema/SmartRotom';
 import { BaseInsertResponse } from '@api/_utils/dto/base-responses.dto';
 
@@ -27,13 +27,13 @@ export class AchievementsRepository
   implements IAchievementsRepository
 {
   constructor(@Inject(DRIZZLE) db: MySql2Database<Record<string, never>>) {
-    super(db, smartRotomAchievements);
+    super(db, rotomAchievements);
   }
 
   async create(data: CreateAchievementDto): Promise<Achievement> {
     await this.db
-      .insert(smartRotomAchievements)
-      .values(data as SmartRotomAchievement);
+      .insert(rotomAchievements)
+      .values(data as RotomAchievement);
     return this.findByStringId(data.id) as Promise<Achievement>;
   }
 
@@ -52,24 +52,24 @@ export class AchievementsRepository
     data: UpdateAchievementDto,
   ): Promise<Achievement> {
     await this.db
-      .update(smartRotomAchievements)
+      .update(rotomAchievements)
       .set(data)
-      .where(eq(smartRotomAchievements.id, id));
+      .where(eq(rotomAchievements.id, id));
     return this.findByStringId(id) as Promise<Achievement>;
   }
 
   async deleteByStringId(id: string): Promise<boolean> {
     const result = await this.db
-      .delete(smartRotomAchievements)
-      .where(eq(smartRotomAchievements.id, id));
+      .delete(rotomAchievements)
+      .where(eq(rotomAchievements.id, id));
     return result[0].affectedRows > 0;
   }
 
   async findByStringId(id: string): Promise<Achievement | null> {
     const result = await this.db
       .select()
-      .from(smartRotomAchievements)
-      .where(eq(smartRotomAchievements.id, id))
+      .from(rotomAchievements)
+      .where(eq(rotomAchievements.id, id))
       .limit(1);
     return (result[0] || null) as unknown as Achievement | null;
   }
@@ -77,53 +77,53 @@ export class AchievementsRepository
   async findUserAchievements(uuid: string): Promise<any[]> {
     return this.db
       .select({
-        id: smartRotomAchievements.id,
-        battleId: smartRotomUserAchievements.dataId,
-        name: smartRotomAchievements.name,
-        description: smartRotomAchievements.description,
-        icon: smartRotomAchievements.icon,
-        category: smartRotomAchievements.category,
-        subcategory: smartRotomAchievements.subcategory,
-        progress: smartRotomUserAchievements.progress,
-        completed: smartRotomUserAchievements.completed,
-        completedAt: smartRotomUserAchievements.completedAt,
-        uuid: smartRotomUserAchievements.uuid,
-        team: smartRotomReplays.team1,
-        replay: smartRotomReplays.replay,
-        target: smartRotomAchievements.target,
-        order: smartRotomAchievements.order,
+        id: rotomAchievements.id,
+        battleId: rotomUserAchievements.dataId,
+        name: rotomAchievements.name,
+        description: rotomAchievements.description,
+        icon: rotomAchievements.icon,
+        category: rotomAchievements.category,
+        subcategory: rotomAchievements.subcategory,
+        progress: rotomUserAchievements.progress,
+        completed: rotomUserAchievements.completed,
+        completedAt: rotomUserAchievements.completedAt,
+        uuid: rotomUserAchievements.uuid,
+        team: rotomReplays.team1,
+        replay: rotomReplays.replay,
+        target: rotomAchievements.target,
+        order: rotomAchievements.order,
       })
-      .from(smartRotomAchievements)
+      .from(rotomAchievements)
       .leftJoin(
-        smartRotomUserAchievements,
+        rotomUserAchievements,
         and(
           eq(
-            smartRotomAchievements.id,
-            smartRotomUserAchievements.achievementId,
+            rotomAchievements.id,
+            rotomUserAchievements.achievementId,
           ),
-          eq(smartRotomUserAchievements.uuid, uuid),
+          eq(rotomUserAchievements.uuid, uuid),
         ),
       )
       .leftJoin(
-        smartRotomUserReplays,
+        rotomUserReplays,
         and(
-          eq(smartRotomUserReplays.uuid, uuid),
-          eq(smartRotomUserReplays.replayId, smartRotomUserAchievements.dataId),
+          eq(rotomUserReplays.uuid, uuid),
+          eq(rotomUserReplays.replayId, rotomUserAchievements.dataId),
         ),
       )
       .leftJoin(
-        smartRotomReplays,
-        eq(smartRotomReplays.id, smartRotomUserReplays.replayId),
+        rotomReplays,
+        eq(rotomReplays.id, rotomUserReplays.replayId),
       )
       .orderBy(
         asc(
-          sql`CASE WHEN ${smartRotomUserAchievements.completedAt} IS NULL THEN 1 ELSE 0 END`,
+          sql`CASE WHEN ${rotomUserAchievements.completedAt} IS NULL THEN 1 ELSE 0 END`,
         ),
-        asc(smartRotomUserAchievements.completedAt),
-        asc(smartRotomAchievements.order),
-        asc(smartRotomAchievements.category),
-        asc(smartRotomAchievements.subcategory),
-        asc(smartRotomAchievements.name),
+        asc(rotomUserAchievements.completedAt),
+        asc(rotomAchievements.order),
+        asc(rotomAchievements.category),
+        asc(rotomAchievements.subcategory),
+        asc(rotomAchievements.name),
       );
   }
 
@@ -133,45 +133,45 @@ export class AchievementsRepository
   ): Promise<any | null> {
     const result = await this.db
       .select({
-        id: smartRotomAchievements.id,
-        battleId: smartRotomUserAchievements.dataId,
-        name: smartRotomAchievements.name,
-        description: smartRotomAchievements.description,
-        icon: smartRotomAchievements.icon,
-        category: smartRotomAchievements.category,
-        subcategory: smartRotomAchievements.subcategory,
-        progress: smartRotomUserAchievements.progress,
-        completed: smartRotomUserAchievements.completed,
-        completedAt: smartRotomUserAchievements.completedAt,
-        uuid: smartRotomUserAchievements.uuid,
-        team: smartRotomReplays.team1,
-        replay: smartRotomReplays.replay,
-        target: smartRotomAchievements.target,
-        order: smartRotomAchievements.order,
+        id: rotomAchievements.id,
+        battleId: rotomUserAchievements.dataId,
+        name: rotomAchievements.name,
+        description: rotomAchievements.description,
+        icon: rotomAchievements.icon,
+        category: rotomAchievements.category,
+        subcategory: rotomAchievements.subcategory,
+        progress: rotomUserAchievements.progress,
+        completed: rotomUserAchievements.completed,
+        completedAt: rotomUserAchievements.completedAt,
+        uuid: rotomUserAchievements.uuid,
+        team: rotomReplays.team1,
+        replay: rotomReplays.replay,
+        target: rotomAchievements.target,
+        order: rotomAchievements.order,
       })
-      .from(smartRotomAchievements)
+      .from(rotomAchievements)
       .leftJoin(
-        smartRotomUserAchievements,
+        rotomUserAchievements,
         and(
           eq(
-            smartRotomAchievements.id,
-            smartRotomUserAchievements.achievementId,
+            rotomAchievements.id,
+            rotomUserAchievements.achievementId,
           ),
-          eq(smartRotomUserAchievements.uuid, uuid),
+          eq(rotomUserAchievements.uuid, uuid),
         ),
       )
       .leftJoin(
-        smartRotomUserReplays,
+        rotomUserReplays,
         and(
-          eq(smartRotomUserReplays.uuid, uuid),
-          eq(smartRotomUserReplays.replayId, smartRotomUserAchievements.dataId),
+          eq(rotomUserReplays.uuid, uuid),
+          eq(rotomUserReplays.replayId, rotomUserAchievements.dataId),
         ),
       )
       .leftJoin(
-        smartRotomReplays,
-        eq(smartRotomReplays.id, smartRotomUserReplays.replayId),
+        rotomReplays,
+        eq(rotomReplays.id, rotomUserReplays.replayId),
       )
-      .where(eq(smartRotomAchievements.id, achievementId))
+      .where(eq(rotomAchievements.id, achievementId))
       .limit(1);
 
     return result[0] || null;
@@ -183,21 +183,21 @@ export class AchievementsRepository
   ): Promise<any | null> {
     const result = await this.db
       .select({
-        id: smartRotomAchievements.id,
-        completed: smartRotomUserAchievements.completed,
+        id: rotomAchievements.id,
+        completed: rotomUserAchievements.completed,
       })
-      .from(smartRotomAchievements)
+      .from(rotomAchievements)
       .leftJoin(
-        smartRotomUserAchievements,
+        rotomUserAchievements,
         and(
           eq(
-            smartRotomAchievements.id,
-            smartRotomUserAchievements.achievementId,
+            rotomAchievements.id,
+            rotomUserAchievements.achievementId,
           ),
-          eq(smartRotomUserAchievements.uuid, uuid),
+          eq(rotomUserAchievements.uuid, uuid),
         ),
       )
-      .where(eq(smartRotomAchievements.id, achievementId))
+      .where(eq(rotomAchievements.id, achievementId))
       .limit(1);
 
     return result[0] || null;
@@ -207,17 +207,17 @@ export class AchievementsRepository
     achievementData: any,
   ): Promise<BaseInsertResponse> {
     const result = await this.db
-      .insert(smartRotomUserAchievements)
-      .values(achievementData as SmartRotomUserAchievement);
+      .insert(rotomUserAchievements)
+      .values(achievementData as RotomUserAchievement);
 
     return { insertId: result[0].insertId };
   }
 
   async achievementExists(achievementId: string): Promise<boolean> {
     const result = await this.db
-      .select({ id: smartRotomAchievements.id })
-      .from(smartRotomAchievements)
-      .where(eq(smartRotomAchievements.id, achievementId))
+      .select({ id: rotomAchievements.id })
+      .from(rotomAchievements)
+      .where(eq(rotomAchievements.id, achievementId))
       .limit(1);
 
     return result.length > 0;

@@ -17,8 +17,8 @@ import {
 } from '../entities/arcade-inventory.entity';
 import { Logger } from 'nestjs-pino';
 import {
-  SmartRotomInventoryItem,
-  smartRotomInventory,
+  RotomInventoryItem,
+  rotomInventory,
 } from '@/_db/schema/SmartRotom';
 
 @Injectable()
@@ -34,11 +34,11 @@ export class ArcadeInventoryRepository
     private readonly logger: Logger,
     @Inject(DRIZZLE) db: MySql2Database<Record<string, never>>,
   ) {
-    super(db, smartRotomInventory);
+    super(db, rotomInventory);
   }
 
   async create(data: CreateInventoryItemDto): Promise<ArcadeInventoryItem> {
-    const result = await this.db.insert(smartRotomInventory).values({
+    const result = await this.db.insert(rotomInventory).values({
       uuid: data.uuid,
       itemId: data.itemId,
       itemData: data.itemData,
@@ -47,7 +47,7 @@ export class ArcadeInventoryRepository
       rarity: data.rarity || 'common',
       sourceType: data.sourceType,
       used: data.used || 0,
-    } as SmartRotomInventoryItem);
+    } as RotomInventoryItem);
     return this.findById(result[0].insertId) as Promise<ArcadeInventoryItem>;
   }
 
@@ -55,7 +55,7 @@ export class ArcadeInventoryRepository
     id: number,
     data: UpdateInventoryItemDto,
   ): Promise<ArcadeInventoryItem> {
-    const updateData: Partial<SmartRotomInventoryItem> = {};
+    const updateData: Partial<RotomInventoryItem> = {};
     if (data.itemId) updateData.itemId = data.itemId;
     if (data.itemData !== undefined) updateData.itemData = data.itemData;
     if (data.itemType) updateData.itemType = data.itemType;
@@ -65,25 +65,25 @@ export class ArcadeInventoryRepository
     if (typeof data.used !== 'undefined') updateData.used = data.used;
 
     await this.db
-      .update(smartRotomInventory)
+      .update(rotomInventory)
       .set(updateData)
-      .where(eq(smartRotomInventory.id, id));
+      .where(eq(rotomInventory.id, id));
     return this.findById(id) as Promise<ArcadeInventoryItem>;
   }
 
   async delete(id: number): Promise<boolean> {
     const result = await this.db
-      .delete(smartRotomInventory)
-      .where(eq(smartRotomInventory.id, id));
+      .delete(rotomInventory)
+      .where(eq(rotomInventory.id, id));
     return result[0].affectedRows > 0;
   }
 
   async findUserInventory(uuid: string): Promise<ArcadeInventoryItem[]> {
     return this.db
       .select()
-      .from(smartRotomInventory)
+      .from(rotomInventory)
       .where(
-        eq(smartRotomInventory.uuid, uuid),
+        eq(rotomInventory.uuid, uuid),
       ) as unknown as ArcadeInventoryItem[];
   }
 
@@ -93,11 +93,11 @@ export class ArcadeInventoryRepository
   ): Promise<ArcadeInventoryItem | null> {
     const result = await this.db
       .select()
-      .from(smartRotomInventory)
+      .from(rotomInventory)
       .where(
         and(
-          eq(smartRotomInventory.uuid, uuid),
-          eq(smartRotomInventory.itemId, itemId),
+          eq(rotomInventory.uuid, uuid),
+          eq(rotomInventory.itemId, itemId),
         ),
       )
       .limit(1);
@@ -107,7 +107,7 @@ export class ArcadeInventoryRepository
   async addItem(
     inventoryData: CreateInventoryItemDto,
   ): Promise<{ insertId: number }> {
-    const result = await this.db.insert(smartRotomInventory).values({
+    const result = await this.db.insert(rotomInventory).values({
       uuid: inventoryData.uuid,
       itemId: inventoryData.itemId,
       itemData: inventoryData.itemData,
@@ -116,7 +116,7 @@ export class ArcadeInventoryRepository
       rarity: inventoryData.rarity || 'common',
       sourceType: inventoryData.sourceType,
       used: inventoryData.used || 0,
-    } as SmartRotomInventoryItem);
+    } as RotomInventoryItem);
     return { insertId: result[0].insertId };
   }
 
@@ -126,12 +126,12 @@ export class ArcadeInventoryRepository
     amount: number,
   ): Promise<ArcadeInventoryItem> {
     await this.db
-      .update(smartRotomInventory)
-      .set({ amount } as SmartRotomInventoryItem)
+      .update(rotomInventory)
+      .set({ amount } as RotomInventoryItem)
       .where(
         and(
-          eq(smartRotomInventory.uuid, uuid),
-          eq(smartRotomInventory.itemId, itemId),
+          eq(rotomInventory.uuid, uuid),
+          eq(rotomInventory.itemId, itemId),
         ),
       );
     return this.findUserItem(uuid, itemId) as Promise<ArcadeInventoryItem>;
@@ -139,11 +139,11 @@ export class ArcadeInventoryRepository
 
   async removeItem(uuid: string, itemId: string): Promise<boolean> {
     const result = await this.db
-      .delete(smartRotomInventory)
+      .delete(rotomInventory)
       .where(
         and(
-          eq(smartRotomInventory.uuid, uuid),
-          eq(smartRotomInventory.itemId, itemId),
+          eq(rotomInventory.uuid, uuid),
+          eq(rotomInventory.itemId, itemId),
         ),
       );
     return result[0].affectedRows > 0;
@@ -161,15 +161,15 @@ export class ArcadeInventoryRepository
       // claims both read used=0, both write the same total, and both deliver.
       const items = await tx
         .select()
-        .from(smartRotomInventory)
+        .from(rotomInventory)
         .where(
           and(
-            eq(smartRotomInventory.uuid, uuid),
-            eq(smartRotomInventory.itemId, itemId),
-            gt(smartRotomInventory.amount, smartRotomInventory.used),
+            eq(rotomInventory.uuid, uuid),
+            eq(rotomInventory.itemId, itemId),
+            gt(rotomInventory.amount, rotomInventory.used),
           ),
         )
-        .orderBy(asc(smartRotomInventory.used), asc(smartRotomInventory.id))
+        .orderBy(asc(rotomInventory.used), asc(rotomInventory.id))
         .for('update');
 
       this.logger.log(`Found items for consumption:`, items);
@@ -209,12 +209,12 @@ export class ArcadeInventoryRepository
           );
 
           const [res] = await tx
-            .update(smartRotomInventory)
-            .set({ used: newUsedCount } as SmartRotomInventoryItem)
+            .update(rotomInventory)
+            .set({ used: newUsedCount } as RotomInventoryItem)
             .where(
               and(
-                eq(smartRotomInventory.id, item.id),
-                eq(smartRotomInventory.used, item.used ?? 0),
+                eq(rotomInventory.id, item.id),
+                eq(rotomInventory.used, item.used ?? 0),
               ),
             );
 
@@ -235,11 +235,11 @@ export class ArcadeInventoryRepository
 
       const updatedItems = await tx
         .select()
-        .from(smartRotomInventory)
+        .from(rotomInventory)
         .where(
           and(
-            eq(smartRotomInventory.uuid, uuid),
-            eq(smartRotomInventory.itemId, itemId),
+            eq(rotomInventory.uuid, uuid),
+            eq(rotomInventory.itemId, itemId),
           ),
         );
 
@@ -273,11 +273,11 @@ export class ArcadeInventoryRepository
   ): Promise<ArcadeInventoryItem[]> {
     return this.db
       .select()
-      .from(smartRotomInventory)
+      .from(rotomInventory)
       .where(
         and(
-          eq(smartRotomInventory.uuid, uuid),
-          eq(smartRotomInventory.itemType, type),
+          eq(rotomInventory.uuid, uuid),
+          eq(rotomInventory.itemType, type),
         ),
       ) as unknown as ArcadeInventoryItem[];
   }
@@ -288,11 +288,11 @@ export class ArcadeInventoryRepository
   ): Promise<ArcadeInventoryItem[]> {
     return this.db
       .select()
-      .from(smartRotomInventory)
+      .from(rotomInventory)
       .where(
         and(
-          eq(smartRotomInventory.uuid, uuid),
-          eq(smartRotomInventory.rarity, rarity),
+          eq(rotomInventory.uuid, uuid),
+          eq(rotomInventory.rarity, rarity),
         ),
       ) as unknown as ArcadeInventoryItem[];
   }

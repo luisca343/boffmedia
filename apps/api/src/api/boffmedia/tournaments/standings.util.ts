@@ -1,4 +1,4 @@
-import { TournamentMatch } from '@/_db/schema/Tournaments';
+import { TournamentMatch } from '@/_db/schema/BoffMediaTournaments';
 
 interface PhaseChainRef {
   id: number;

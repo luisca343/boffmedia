@@ -1,6 +1,7 @@
 import { sql } from 'drizzle-orm';
 import {
   boolean,
+  foreignKey,
   int,
   mysqlTable,
   primaryKey,
@@ -8,7 +9,7 @@ import {
   timestamp,
   varchar,
 } from 'drizzle-orm/mysql-core';
-import { smartrotomUsers } from './SmartRotom';
+import { rotomUsers } from './SmartRotom';
 
 export const rotomChats = mysqlTable('rotom_chats', {
   id: int('id').primaryKey().autoincrement(),
@@ -24,24 +25,32 @@ export const rotomChats = mysqlTable('rotom_chats', {
 
 export type RotomChat = typeof rotomChats.$inferSelect;
 
-export const rotomChatUsers = mysqlTable('rotom_chat_users', {
-  chatId: int('chat_id')
-    .notNull()
-    .references(() => rotomChats.id, {
-      onDelete: 'cascade',
-      onUpdate: 'cascade',
-    }),
-  uuid: varchar('uuid', { length: 36 })
-    .notNull()
-    .references(() => smartrotomUsers.uuid, {
-      onDelete: 'cascade',
-      onUpdate: 'cascade',
-    }),
-  pinned: boolean('pinned').notNull().default(false),
-  muted: boolean('muted').notNull().default(false),
-});
+export const rotomChatMembers = mysqlTable(
+  'rotom_chat_members',
+  {
+    chatId: int('chat_id')
+      .notNull()
+      .references(() => rotomChats.id, {
+        onDelete: 'cascade',
+        onUpdate: 'cascade',
+      }),
+    uuid: varchar('uuid', { length: 36 })
+      .notNull()
+      .references(() => rotomUsers.uuid, {
+        onDelete: 'cascade',
+        onUpdate: 'cascade',
+      }),
+    pinned: boolean('pinned').notNull().default(false),
+    muted: boolean('muted').notNull().default(false),
+  },
+  // One membership row per (chat, user) — same discipline the message reads got
+  // in 0033, which this table shipped without (migration 0036).
+  (table) => ({
+    pk: primaryKey({ columns: [table.chatId, table.uuid] }),
+  }),
+);
 
-export type RotomChatUser = typeof rotomChatUsers.$inferSelect;
+export type RotomChatMember = typeof rotomChatMembers.$inferSelect;
 
 export const rotomChatMessages = mysqlTable('rotom_chat_messages', {
   id: int('id').primaryKey().autoincrement(),
@@ -53,7 +62,7 @@ export const rotomChatMessages = mysqlTable('rotom_chat_messages', {
     }),
   senderUUID: varchar('sender_uuid', { length: 36 })
     .notNull()
-    .references(() => smartrotomUsers.uuid, {
+    .references(() => rotomUsers.uuid, {
       onDelete: 'cascade',
       onUpdate: 'cascade',
     }),
@@ -77,7 +86,7 @@ export const rotomChatMessageReads = mysqlTable(
       }),
     uuid: varchar('uuid', { length: 36 })
       .notNull()
-      .references(() => smartrotomUsers.uuid, {
+      .references(() => rotomUsers.uuid, {
         onDelete: 'cascade',
         onUpdate: 'cascade',
       }),
@@ -94,15 +103,11 @@ export type RotomChatMessageRead = typeof rotomChatMessageReads.$inferSelect;
 export const rotomChatMessageReactions = mysqlTable(
   'rotom_chat_message_reactions',
   {
-    messageId: int('message_id')
-      .notNull()
-      .references(() => rotomChatMessages.id, {
-        onDelete: 'cascade',
-        onUpdate: 'cascade',
-      }),
+    // Named explicitly: the auto-generated name is 65 chars, over MySQL's limit.
+    messageId: int('message_id').notNull(),
     uuid: varchar('uuid', { length: 36 })
       .notNull()
-      .references(() => smartrotomUsers.uuid, {
+      .references(() => rotomUsers.uuid, {
         onDelete: 'cascade',
         onUpdate: 'cascade',
       }),
@@ -110,6 +115,13 @@ export const rotomChatMessageReactions = mysqlTable(
   },
   (table) => ({
     pk: primaryKey({ columns: [table.messageId, table.uuid, table.emoji] }),
+    messageFk: foreignKey({
+      name: 'rcmr_message_fk',
+      columns: [table.messageId],
+      foreignColumns: [rotomChatMessages.id],
+    })
+      .onDelete('cascade')
+      .onUpdate('cascade'),
   }),
 );
 

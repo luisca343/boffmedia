@@ -27,7 +27,7 @@ import { CreateSmartrotomUserDto } from './dto/create-user.dto';
 import { UpdateSmartrotomUserDto } from './dto/update-user.dto';
 import { UserInitializationDataDto } from './dto/user-initialization-data.dto';
 import { BatchUsersRequestDto } from './dto/batch-users-request.dto';
-import { SmartRotomUser } from './entities/user.entity';
+import { RotomUser } from './entities/user.entity';
 import { InitializationResult } from './entities/initialization-result.entity';
 import { UserWithAccounts } from './entities/user-with-accounts.entity';
 import { FindOrCreateResult } from './entities/find-or-create-result.entity';
@@ -47,14 +47,14 @@ export class UsersController {
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Users retrieved successfully.',
-    type: [SmartRotomUser],
+    type: [RotomUser],
   })
   @ApiResponse({
     status: HttpStatus.INTERNAL_SERVER_ERROR,
     description: 'Failed to retrieve users.',
   })
-  async findAll(): Promise<SmartRotomUser[]> {
-    return this.usersFacadeService.getAllUsers() as unknown as SmartRotomUser[];
+  async findAll(): Promise<RotomUser[]> {
+    return this.usersFacadeService.getAllUsers() as unknown as RotomUser[];
   }
 
   @Public()
@@ -63,7 +63,7 @@ export class UsersController {
   @ApiResponse({
     status: HttpStatus.CREATED,
     description: 'User created successfully.',
-    type: SmartRotomUser,
+    type: RotomUser,
   })
   @ApiResponse({
     status: HttpStatus.CONFLICT,
@@ -79,10 +79,10 @@ export class UsersController {
   })
   async create(
     @Body() createUserDto: CreateSmartrotomUserDto,
-  ): Promise<SmartRotomUser> {
+  ): Promise<RotomUser> {
     return this.usersFacadeService.createUser(
       createUserDto,
-    ) as unknown as SmartRotomUser;
+    ) as unknown as RotomUser;
   }
 
   @Public()
@@ -91,7 +91,7 @@ export class UsersController {
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'User retrieved successfully.',
-    type: SmartRotomUser,
+    type: RotomUser,
   })
   @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'User not found.' })
   @ApiResponse({
@@ -101,8 +101,8 @@ export class UsersController {
   @ApiParam({ name: 'id', description: 'User ID', type: 'number' })
   async findOne(
     @Param('id', ParseIntPipe) id: number,
-  ): Promise<SmartRotomUser> {
-    return this.usersFacadeService.getUserById(id) as unknown as SmartRotomUser;
+  ): Promise<RotomUser> {
+    return this.usersFacadeService.getUserById(id) as unknown as RotomUser;
   }
 
   @Public()
@@ -111,7 +111,7 @@ export class UsersController {
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'User retrieved successfully.',
-    type: SmartRotomUser,
+    type: RotomUser,
   })
   @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'User not found.' })
   @ApiResponse({
@@ -119,12 +119,12 @@ export class UsersController {
     description: 'Invalid UUID format.',
   })
   @ApiParam({ name: 'uuid', description: 'User UUID' })
-  async findByUuid(@Param('uuid') uuid: string): Promise<SmartRotomUser> {
+  async findByUuid(@Param('uuid') uuid: string): Promise<RotomUser> {
     const user = await this.usersFacadeService.getUserByUuid(uuid);
     if (!user) {
       throw new Error('User not found');
     }
-    return user as unknown as SmartRotomUser;
+    return user as unknown as RotomUser;
   }
 
   @Public()
@@ -133,7 +133,7 @@ export class UsersController {
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'User updated successfully.',
-    type: SmartRotomUser,
+    type: RotomUser,
   })
   @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'User not found.' })
   @ApiResponse({
@@ -148,11 +148,11 @@ export class UsersController {
   async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateUserDto: UpdateSmartrotomUserDto,
-  ): Promise<SmartRotomUser> {
+  ): Promise<RotomUser> {
     return this.usersFacadeService.updateUser(
       id,
       updateUserDto,
-    ) as unknown as SmartRotomUser;
+    ) as unknown as RotomUser;
   }
 
   @Delete(':id')
@@ -269,7 +269,7 @@ export class UsersController {
       type: 'object',
       additionalProperties: {
         oneOf: [
-          { $ref: '#/components/schemas/SmartRotomUser' },
+          { $ref: '#/components/schemas/RotomUser' },
           { type: 'null' },
         ],
       },
@@ -281,10 +281,10 @@ export class UsersController {
   })
   async getMultipleUsers(
     @Body() request: BatchUsersRequestDto,
-  ): Promise<{ [uuid: string]: SmartRotomUser | null }> {
+  ): Promise<{ [uuid: string]: RotomUser | null }> {
     return this.usersFacadeService.getMultipleUsers(
       request.uuids,
-    ) as unknown as { [uuid: string]: SmartRotomUser | null };
+    ) as unknown as { [uuid: string]: RotomUser | null };
   }
 
   @Public()

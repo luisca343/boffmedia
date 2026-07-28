@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { NotificationsService } from '@api/boffmedia/notifications/notifications.service';
 import { TournamentsRepository } from '../repositories/tournaments.repository';
-import { Tournament, TournamentMatch } from '@/_db/schema/Tournaments';
+import { Tournament, TournamentMatch } from '@/_db/schema/BoffMediaTournaments';
 
 /**
  * Tournament notification producers. Every method is best-effort: a

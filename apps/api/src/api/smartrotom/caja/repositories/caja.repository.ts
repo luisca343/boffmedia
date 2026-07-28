@@ -4,8 +4,8 @@ import { MySql2Database } from 'drizzle-orm/mysql2';
 import { and, eq, gt, inArray, isNull, or, sql, SQL } from 'drizzle-orm';
 import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
 import {
-  smartRotomInventory,
-  SmartRotomInventoryItem,
+  rotomInventory,
+  RotomInventoryItem,
 } from '@/_db/schema/SmartRotom';
 import { CajaSource } from '../dto/claim-caja.dto';
 
@@ -36,8 +36,8 @@ export class CajaRepository {
     return await this.spendWhere(
       and(
         this.claimable(),
-        eq(smartRotomInventory.uuid, uuid),
-        eq(smartRotomInventory.sourceType, source),
+        eq(rotomInventory.uuid, uuid),
+        eq(rotomInventory.sourceType, source),
       ),
     );
   }
@@ -48,8 +48,8 @@ export class CajaRepository {
     return await this.spendWhere(
       and(
         this.claimable(),
-        eq(smartRotomInventory.uuid, uuid),
-        inArray(smartRotomInventory.id, ids),
+        eq(rotomInventory.uuid, uuid),
+        inArray(rotomInventory.id, ids),
       ),
     );
   }
@@ -58,7 +58,7 @@ export class CajaRepository {
     return await this.db.transaction(async (tx) => {
       const rows = await tx
         .select()
-        .from(smartRotomInventory)
+        .from(rotomInventory)
         .where(where)
         .for('update');
 
@@ -86,8 +86,8 @@ export class CajaRepository {
     return await this.reserveWhere(
       and(
         this.claimable(),
-        eq(smartRotomInventory.uuid, uuid),
-        eq(smartRotomInventory.sourceType, source),
+        eq(rotomInventory.uuid, uuid),
+        eq(rotomInventory.sourceType, source),
       ),
     );
   }
@@ -101,8 +101,8 @@ export class CajaRepository {
     return await this.reserveWhere(
       and(
         this.claimable(),
-        eq(smartRotomInventory.uuid, uuid),
-        inArray(smartRotomInventory.id, ids),
+        eq(rotomInventory.uuid, uuid),
+        inArray(rotomInventory.id, ids),
       ),
     );
   }
@@ -113,7 +113,7 @@ export class CajaRepository {
     return await this.db.transaction(async (tx) => {
       const rows = await tx
         .select()
-        .from(smartRotomInventory)
+        .from(rotomInventory)
         .where(where)
         .for('update');
 
@@ -121,14 +121,14 @@ export class CajaRepository {
 
       const reservationId = randomUUID();
       const [res] = await tx
-        .update(smartRotomInventory)
+        .update(rotomInventory)
         .set({
           reservationId,
           reservedAt: sql`NOW()`,
-        } as unknown as SmartRotomInventoryItem)
+        } as unknown as RotomInventoryItem)
         .where(
           inArray(
-            smartRotomInventory.id,
+            rotomInventory.id,
             rows.map((r) => r.id),
           ),
         );
@@ -148,17 +148,17 @@ export class CajaRepository {
    */
   async confirm(uuid: string, reservationId: string): Promise<number> {
     const [res] = await this.db
-      .update(smartRotomInventory)
+      .update(rotomInventory)
       .set({
-        used: sql`COALESCE(${smartRotomInventory.amount}, 1)`,
+        used: sql`COALESCE(${rotomInventory.amount}, 1)`,
         reservationId: null,
         reservedAt: null,
-      } as unknown as SmartRotomInventoryItem)
+      } as unknown as RotomInventoryItem)
       .where(
         and(
-          eq(smartRotomInventory.uuid, uuid),
-          eq(smartRotomInventory.reservationId, reservationId),
-          gt(smartRotomInventory.amount, smartRotomInventory.used),
+          eq(rotomInventory.uuid, uuid),
+          eq(rotomInventory.reservationId, reservationId),
+          gt(rotomInventory.amount, rotomInventory.used),
         ),
       );
     return res.affectedRows;
@@ -170,15 +170,15 @@ export class CajaRepository {
    */
   async sweepExpiredReservations(): Promise<number> {
     const [res] = await this.db
-      .update(smartRotomInventory)
+      .update(rotomInventory)
       .set({
         reservationId: null,
         reservedAt: null,
-      } as unknown as SmartRotomInventoryItem)
+      } as unknown as RotomInventoryItem)
       .where(
         and(
           this.reservationExpired(),
-          gt(smartRotomInventory.amount, smartRotomInventory.used),
+          gt(rotomInventory.amount, rotomInventory.used),
         ),
       );
     return res.affectedRows;
@@ -189,33 +189,33 @@ export class CajaRepository {
   /** A row that is still owed and not held by a live reservation. */
   private claimable(): SQL {
     return and(
-      gt(smartRotomInventory.amount, smartRotomInventory.used),
-      or(isNull(smartRotomInventory.reservationId), this.reservationExpired()),
+      gt(rotomInventory.amount, rotomInventory.used),
+      or(isNull(rotomInventory.reservationId), this.reservationExpired()),
     ) as SQL;
   }
 
   /** A reservation stamp older than the TTL — i.e. a stale hold, treated as free. */
   private reservationExpired(): SQL {
-    return sql`${smartRotomInventory.reservedAt} < (NOW() - INTERVAL ${sql.raw(
+    return sql`${rotomInventory.reservedAt} < (NOW() - INTERVAL ${sql.raw(
       String(RESERVATION_TTL_MINUTES),
     )} MINUTE)`;
   }
 
   private async markSpent(
     tx: Parameters<Parameters<MySql2Database['transaction']>[0]>[0],
-    row: SmartRotomInventoryItem,
+    row: RotomInventoryItem,
   ): Promise<void> {
     const [res] = await tx
-      .update(smartRotomInventory)
+      .update(rotomInventory)
       .set({
-        used: sql`COALESCE(${smartRotomInventory.amount}, 1)`,
+        used: sql`COALESCE(${rotomInventory.amount}, 1)`,
         reservationId: null,
         reservedAt: null,
-      } as unknown as SmartRotomInventoryItem)
+      } as unknown as RotomInventoryItem)
       .where(
         and(
-          eq(smartRotomInventory.id, row.id),
-          eq(smartRotomInventory.used, row.used ?? 0),
+          eq(rotomInventory.id, row.id),
+          eq(rotomInventory.used, row.used ?? 0),
         ),
       );
 
@@ -226,7 +226,7 @@ export class CajaRepository {
 }
 
 /** A granted row as the database has it — the only safe source for a payout. */
-function toClaimedRow(row: SmartRotomInventoryItem): ClaimedRow {
+function toClaimedRow(row: RotomInventoryItem): ClaimedRow {
   return {
     id: row.id,
     itemId: row.itemId,

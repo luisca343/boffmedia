@@ -238,12 +238,12 @@ export class TcgService {
 
       const userId = (await this.usersService.getUserByUsername(userName))!.id;
 
-      const userCards = await this.tcgRepository.getUserCards(userId);
+      const tcgUserCards = await this.tcgRepository.getUserCards(userId);
 
       // Enrich with card details
       /*
       const enrichedCards = [];
-      for (const userCard of userCards) {
+      for (const userCard of tcgUserCards) {
         try {
           const cardDetails = await this.tcgRepository.findCardById(userCard.card_id);
           enrichedCards.push({
@@ -263,7 +263,7 @@ export class TcgService {
         }
       }*/
 
-      return userCards;
+      return tcgUserCards;
     } catch (error: any) {
       if (error instanceof BadRequestException) {
         throw error;
@@ -438,7 +438,7 @@ export class TcgService {
       for (const historyEntry of history) {
         try {
           const cardDetails = await this.tcgRepository.findCardById(
-            historyEntry.card_id,
+            historyEntry.cardId,
           );
           enrichedHistory.push({
             ...historyEntry,

@@ -4,16 +4,16 @@ import { eq, and, desc, inArray, max, sql } from 'drizzle-orm';
 import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
 import {
   mineGames,
-  mineGamesDetail,
+  mineGameRewards,
   mineRewards,
-  PartidaMina,
-  DetallePartidaMina,
+  MineGame,
+  MineGameReward,
 } from '@/_db/schema/SmartRotomMine';
 import {
-  smartrotomUsers,
-  smartRotomInventory,
-  SmartRotomUser,
-  SmartRotomInventoryItem,
+  rotomUsers,
+  rotomInventory,
+  RotomUser,
+  RotomInventoryItem,
 } from '@/_db/schema/SmartRotom';
 import { ResultSetHeader } from 'mysql2';
 
@@ -84,9 +84,9 @@ export class MineRepository {
 
   async findPlayerEnergy(uuid: string): Promise<{ energy: number } | null> {
     const result = await this.db
-      .select({ energy: smartrotomUsers.energy })
-      .from(smartrotomUsers)
-      .where(eq(smartrotomUsers.uuid, uuid))
+      .select({ energy: rotomUsers.energy })
+      .from(rotomUsers)
+      .where(eq(rotomUsers.uuid, uuid))
       .limit(1);
 
     return (result[0] || null) as unknown as { energy: number } | null;
@@ -94,9 +94,9 @@ export class MineRepository {
 
   async findPlayerLastCharge(uuid: string): Promise<Date | null> {
     const result = await this.db
-      .select({ lastCharge: smartrotomUsers.lastCharge })
-      .from(smartrotomUsers)
-      .where(eq(smartrotomUsers.uuid, uuid))
+      .select({ lastCharge: rotomUsers.lastCharge })
+      .from(rotomUsers)
+      .where(eq(rotomUsers.uuid, uuid))
       .limit(1);
 
     return result[0]?.lastCharge || null;
@@ -107,15 +107,15 @@ export class MineRepository {
     energy: number,
     lastCharge?: Date,
   ): Promise<void> {
-    const updateData: Partial<SmartRotomUser> = { energy };
+    const updateData: Partial<RotomUser> = { energy };
     if (lastCharge) {
       updateData.lastCharge = lastCharge;
     }
 
     await this.db
-      .update(smartrotomUsers)
-      .set(updateData as SmartRotomUser)
-      .where(eq(smartrotomUsers.uuid, uuid));
+      .update(rotomUsers)
+      .set(updateData as RotomUser)
+      .where(eq(rotomUsers.uuid, uuid));
   }
 
   // ==================== GAME SESSION OPERATIONS ====================
@@ -123,7 +123,7 @@ export class MineRepository {
   async createGameSession(uuid: string): Promise<{ insertId: number }> {
     const result = (await this.db
       .insert(mineGames)
-      .values({ uuid } as PartidaMina)) as ResultSetHeader[];
+      .values({ uuid } as MineGame)) as ResultSetHeader[];
 
     return { insertId: result[0].insertId };
   }
@@ -202,14 +202,14 @@ export class MineRepository {
   ): Promise<void> {
     if (rewards.length === 0) return;
 
-    await this.db.insert(mineGamesDetail).values(
+    await this.db.insert(mineGameRewards).values(
       rewards.map(
         (reward) =>
           ({
             gameId,
             rewardId: reward.rewardId,
             value: reward.value,
-          }) as DetallePartidaMina,
+          }) as MineGameReward,
       ),
     );
   }
@@ -222,13 +222,13 @@ export class MineRepository {
         id: mineGames.id,
         itemId: mineRewards.itemId,
         itemName: mineRewards.name,
-        value: mineGamesDetail.value,
+        value: mineGameRewards.value,
         claimed: sql<number>`0`.as('claimed'), // Since claimed field doesn't exist in schema
         date: mineGames.createdAt,
       })
       .from(mineGames)
-      .leftJoin(mineGamesDetail, eq(mineGames.id, mineGamesDetail.gameId))
-      .leftJoin(mineRewards, eq(mineRewards.id, mineGamesDetail.rewardId))
+      .leftJoin(mineGameRewards, eq(mineGames.id, mineGameRewards.gameId))
+      .leftJoin(mineRewards, eq(mineRewards.id, mineGameRewards.rewardId))
       .where(eq(mineGames.uuid, uuid))
       .orderBy(desc(mineGames.createdAt)) as unknown as HistoryEntry[];
   }
@@ -238,21 +238,21 @@ export class MineRepository {
   async findTopPlayers(limit: number = 10): Promise<RankingEntry[]> {
     const result = await this.db
       .select({
-        uuid: smartrotomUsers.uuid,
-        username: smartrotomUsers.username,
-        totalValue: sql<number>`COALESCE(SUM(${mineGamesDetail.value}), 0)`.as(
+        uuid: rotomUsers.uuid,
+        username: rotomUsers.username,
+        totalValue: sql<number>`COALESCE(SUM(${mineGameRewards.value}), 0)`.as(
           'totalValue',
         ),
         gamesPlayed: sql<number>`COUNT(DISTINCT ${mineGames.id})`.as(
           'gamesPlayed',
         ),
       })
-      .from(smartrotomUsers)
-      .leftJoin(mineGames, eq(smartrotomUsers.uuid, mineGames.uuid))
-      .leftJoin(mineGamesDetail, eq(mineGamesDetail.gameId, mineGames.id))
-      .where(sql`${smartrotomUsers.username} IS NOT NULL`)
-      .groupBy(smartrotomUsers.uuid, smartrotomUsers.username)
-      .orderBy(desc(sql`COALESCE(SUM(${mineGamesDetail.value}), 0)`))
+      .from(rotomUsers)
+      .leftJoin(mineGames, eq(rotomUsers.uuid, mineGames.uuid))
+      .leftJoin(mineGameRewards, eq(mineGameRewards.gameId, mineGames.id))
+      .where(sql`${rotomUsers.username} IS NOT NULL`)
+      .groupBy(rotomUsers.uuid, rotomUsers.username)
+      .orderBy(desc(sql`COALESCE(SUM(${mineGameRewards.value}), 0)`))
       .limit(limit);
 
     return result.map((entry, index) => ({
@@ -284,7 +284,7 @@ export class MineRepository {
   async createInventoryEntries(entries: InventoryEntry[]): Promise<void> {
     if (entries.length === 0) return;
 
-    await this.db.insert(smartRotomInventory).values(
+    await this.db.insert(rotomInventory).values(
       entries.map(
         (entry) =>
           ({
@@ -296,7 +296,7 @@ export class MineRepository {
             used: entry.used,
             rarity: entry.rarity,
             createdAt: new Date(),
-          }) as SmartRotomInventoryItem,
+          }) as RotomInventoryItem,
       ),
     );
   }
@@ -306,16 +306,16 @@ export class MineRepository {
   ): Promise<{ id: number; itemId: string; type: string }[]> {
     return this.db
       .select({
-        id: smartRotomInventory.id,
-        itemId: smartRotomInventory.itemId,
-        type: smartRotomInventory.itemType,
+        id: rotomInventory.id,
+        itemId: rotomInventory.itemId,
+        type: rotomInventory.itemType,
       })
-      .from(smartRotomInventory)
+      .from(rotomInventory)
       .where(
         and(
-          eq(smartRotomInventory.uuid, uuid),
-          eq(smartRotomInventory.used, 0),
-          eq(smartRotomInventory.sourceType, 'mine'),
+          eq(rotomInventory.uuid, uuid),
+          eq(rotomInventory.used, 0),
+          eq(rotomInventory.sourceType, 'mine'),
         ),
       );
   }
@@ -332,20 +332,20 @@ export class MineRepository {
       // and MySQL's UPDATE cannot return the rows it touched.
       const rows = await tx
         .select({
-          id: smartRotomInventory.id,
-          itemId: smartRotomInventory.itemId,
-          type: smartRotomInventory.itemType,
+          id: rotomInventory.id,
+          itemId: rotomInventory.itemId,
+          type: rotomInventory.itemType,
           // Selected so the caller grants a real quantity. `findUnclaimedItems`
           // omits it, which left the page sending cantidad 0 and relying on the
           // mod clamping it back up to 1.
-          amount: smartRotomInventory.amount,
+          amount: rotomInventory.amount,
         })
-        .from(smartRotomInventory)
+        .from(rotomInventory)
         .where(
           and(
-            eq(smartRotomInventory.uuid, uuid),
-            eq(smartRotomInventory.used, 0),
-            eq(smartRotomInventory.sourceType, 'mine'),
+            eq(rotomInventory.uuid, uuid),
+            eq(rotomInventory.used, 0),
+            eq(rotomInventory.sourceType, 'mine'),
           ),
         )
         .for('update');
@@ -358,17 +358,17 @@ export class MineRepository {
       // amount 5 would leave the arcade offering the other 4. Setting used to the
       // full amount is correct under both readings.
       await tx
-        .update(smartRotomInventory)
+        .update(rotomInventory)
         .set({
-          used: sql`COALESCE(${smartRotomInventory.amount}, 1)`,
-        } as unknown as SmartRotomInventoryItem)
+          used: sql`COALESCE(${rotomInventory.amount}, 1)`,
+        } as unknown as RotomInventoryItem)
         .where(
           and(
             inArray(
-              smartRotomInventory.id,
+              rotomInventory.id,
               rows.map((r) => r.id),
             ),
-            eq(smartRotomInventory.used, 0),
+            eq(rotomInventory.used, 0),
           ),
         );
 
@@ -389,13 +389,13 @@ export class MineRepository {
         totalGames: sql<number>`COUNT(DISTINCT ${mineGames.id})`.as(
           'totalGames',
         ),
-        totalValue: sql<number>`COALESCE(SUM(${mineGamesDetail.value}), 0)`.as(
+        totalValue: sql<number>`COALESCE(SUM(${mineGameRewards.value}), 0)`.as(
           'totalValue',
         ),
         lastPlayed: sql<Date>`MAX(${mineGames.createdAt})`.as('lastPlayed'),
       })
       .from(mineGames)
-      .leftJoin(mineGamesDetail, eq(mineGamesDetail.gameId, mineGames.id))
+      .leftJoin(mineGameRewards, eq(mineGameRewards.gameId, mineGames.id))
       .where(eq(mineGames.uuid, uuid));
 
     const stats = result[0];

@@ -12,7 +12,7 @@ import {
 } from 'drizzle-orm/mysql-core';
 import { sql } from 'drizzle-orm';
 import { boffMediaUsers } from './BoffMedia';
-import { boffMediaGames, boffMediaEvents } from './Events';
+import { boffMediaGames, boffMediaEvents } from './BoffMediaEvents';
 
 export const TOURNAMENT_FORMAT = {
   SINGLE: 'single',
@@ -293,7 +293,6 @@ export const boffMediaTournamentParticipants = mysqlTable(
       .default(sql`CURRENT_TIMESTAMP() ON UPDATE CURRENT_TIMESTAMP()`),
   },
   (t) => ({
-    tournamentIdx: index('tp_tournament_idx').on(t.tournamentId),
     userIdx: index('tp_user_idx').on(t.userId),
     seedIdx: index('tp_seed_idx').on(t.tournamentId, t.seed),
     groupIdx: index('tp_group_idx').on(t.groupId),
@@ -451,7 +450,6 @@ export const boffMediaTournamentPhaseEntrants = mysqlTable(
       .default(sql`CURRENT_TIMESTAMP()`),
   },
   (t) => ({
-    phaseIdx: index('tpe_phase_idx').on(t.phaseId),
     unique: uniqueIndex('tpe_unique').on(t.phaseId, t.participantId),
     phaseFk: foreignKey({
       columns: [t.phaseId],
@@ -544,7 +542,6 @@ export const boffMediaTournamentMatches = mysqlTable(
       .default(sql`CURRENT_TIMESTAMP() ON UPDATE CURRENT_TIMESTAMP()`),
   },
   (t) => ({
-    tournamentIdx: index('tm_tournament_idx').on(t.tournamentId),
     phaseIdx: index('tm_phase_idx').on(t.phaseId),
     bracketIdx: index('tm_bracket_idx').on(
       t.tournamentId,

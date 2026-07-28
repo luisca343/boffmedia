@@ -80,7 +80,7 @@ async function main() {
 
   // ── Treasury account ─────────────────────────────────────────────────────────
   // No owning player, so it bypasses the normal StarBank account-creation flow (which always
-  // links to a uuid in rotom_bank_users_accounts). There is exactly one — check before insert.
+  // links to a uuid in rotom_starbank_user_accounts). There is exactly one — check before insert.
   logger.info('Seeding treasury account…');
   const [existingTreasury] = await db
     .select({ id: starBankAccounts.id })
@@ -96,7 +96,7 @@ async function main() {
   }
 
   // ── Tasas rate card ───────────────────────────────────────────────────────────
-  logger.info('Seeding gobierno_tasas…');
+  logger.info('Seeding rotom_gobierno_tasas…');
   for (const tasa of TASAS) {
     await db
       .insert(gobiernoTasas)

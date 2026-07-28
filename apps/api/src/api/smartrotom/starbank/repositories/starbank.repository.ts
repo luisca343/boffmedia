@@ -8,9 +8,9 @@ import {
   StarBankAccount,
   starBankAccounts,
   starBankTransactions,
-  starBankUsersAccounts,
+  starBankUserAccounts,
 } from '@/_db/schema/SmartRotomStarBank';
-import { smartrotomUsers } from '@/_db/schema/SmartRotom';
+import { rotomUsers } from '@/_db/schema/SmartRotom';
 import { Logger } from 'nestjs-pino';
 
 export interface CreateAccountData {
@@ -46,7 +46,10 @@ export interface TransactionDetails {
   fromBalance: number;
   toBalance: number;
   type: string;
-  date: string;
+  // Was `string`: the column held an ISO string. It is a real timestamp since
+  // migration 0036. The serialized JSON is byte-identical either way, so this is
+  // not a wire change — JSON.stringify(Date) emits the same ISO-8601 it did.
+  date: Date;
   fromName?: string;
   toName?: string;
   fromType?: string;
@@ -81,7 +84,7 @@ export class StarbankRepository {
 
       // Link account to user
       await this.db
-        .insert(starBankUsersAccounts)
+        .insert(starBankUserAccounts)
         .values({
           uuid: accountData.uuid,
           accountId: accountId,
@@ -106,13 +109,13 @@ export class StarbankRepository {
           balance: starBankAccounts.balance,
           name: starBankAccounts.name,
           type: starBankAccounts.type,
-          uuid: starBankUsersAccounts.uuid,
+          uuid: starBankUserAccounts.uuid,
           image: starBankAccounts.image,
         })
         .from(starBankAccounts)
         .leftJoin(
-          starBankUsersAccounts,
-          eq(starBankAccounts.id, starBankUsersAccounts.accountId),
+          starBankUserAccounts,
+          eq(starBankAccounts.id, starBankUserAccounts.accountId),
         )
         .where(eq(starBankAccounts.id, accountId))
         .execute();
@@ -135,10 +138,10 @@ export class StarbankRepository {
         })
         .from(starBankAccounts)
         .innerJoin(
-          starBankUsersAccounts,
-          eq(starBankAccounts.id, starBankUsersAccounts.accountId),
+          starBankUserAccounts,
+          eq(starBankAccounts.id, starBankUserAccounts.accountId),
         )
-        .where(eq(starBankUsersAccounts.uuid, uuid))
+        .where(eq(starBankUserAccounts.uuid, uuid))
         .execute();
 
       return result.length > 0
@@ -162,10 +165,10 @@ export class StarbankRepository {
         })
         .from(starBankAccounts)
         .innerJoin(
-          starBankUsersAccounts,
-          eq(starBankAccounts.id, starBankUsersAccounts.accountId),
+          starBankUserAccounts,
+          eq(starBankAccounts.id, starBankUserAccounts.accountId),
         )
-        .where(eq(starBankUsersAccounts.uuid, uuid))
+        .where(eq(starBankUserAccounts.uuid, uuid))
         .execute();
 
       return result as unknown as AccountInfo[];
@@ -265,14 +268,14 @@ export class StarbankRepository {
       await this.db
         .insert(starBankTransactions)
         .values({
-          from: transactionData.from,
-          to: transactionData.to,
+          fromAccountId: transactionData.from,
+          toAccountId: transactionData.to,
           amount: transactionData.amount,
           fromBalance,
           toBalance,
           reason: transactionData.reason,
           type: transactionData.type,
-          date: new Date().toISOString(),
+          date: new Date(),
         })
         .execute();
 
@@ -296,8 +299,8 @@ export class StarbankRepository {
 
       const result = await this.db
         .selectDistinct({
-          from: starBankTransactions.from,
-          to: starBankTransactions.to,
+          from: starBankTransactions.fromAccountId,
+          to: starBankTransactions.toAccountId,
           amount: starBankTransactions.amount,
           reason: starBankTransactions.reason,
           fromBalance: starBankTransactions.fromBalance,
@@ -310,19 +313,19 @@ export class StarbankRepository {
           date: starBankTransactions.date,
         })
         .from(starBankTransactions)
-        .innerJoin(toJoin, eq(starBankTransactions.to, toJoin.id))
-        .innerJoin(fromJoin, eq(starBankTransactions.from, fromJoin.id))
+        .innerJoin(toJoin, eq(starBankTransactions.toAccountId, toJoin.id))
+        .innerJoin(fromJoin, eq(starBankTransactions.fromAccountId, fromJoin.id))
         .leftJoin(
-          starBankUsersAccounts,
+          starBankUserAccounts,
           or(
-            eq(toJoin.id, starBankUsersAccounts.accountId),
-            eq(fromJoin.id, starBankUsersAccounts.accountId),
+            eq(toJoin.id, starBankUserAccounts.accountId),
+            eq(fromJoin.id, starBankUserAccounts.accountId),
           ),
         )
         .where(
           or(
-            eq(starBankTransactions.from, accountId),
-            eq(starBankTransactions.to, accountId),
+            eq(starBankTransactions.fromAccountId, accountId),
+            eq(starBankTransactions.toAccountId, accountId),
           ),
         )
         .limit(limit)
@@ -349,8 +352,8 @@ export class StarbankRepository {
 
       const result = await this.db
         .selectDistinct({
-          from: starBankTransactions.from,
-          to: starBankTransactions.to,
+          from: starBankTransactions.fromAccountId,
+          to: starBankTransactions.toAccountId,
           amount: starBankTransactions.amount,
           reason: starBankTransactions.reason,
           fromBalance: starBankTransactions.fromBalance,
@@ -363,16 +366,16 @@ export class StarbankRepository {
           date: starBankTransactions.date,
         })
         .from(starBankTransactions)
-        .innerJoin(toJoin, eq(starBankTransactions.to, toJoin.id))
-        .innerJoin(fromJoin, eq(starBankTransactions.from, fromJoin.id))
+        .innerJoin(toJoin, eq(starBankTransactions.toAccountId, toJoin.id))
+        .innerJoin(fromJoin, eq(starBankTransactions.fromAccountId, fromJoin.id))
         .leftJoin(
-          starBankUsersAccounts,
+          starBankUserAccounts,
           or(
-            eq(toJoin.id, starBankUsersAccounts.accountId),
-            eq(fromJoin.id, starBankUsersAccounts.accountId),
+            eq(toJoin.id, starBankUserAccounts.accountId),
+            eq(fromJoin.id, starBankUserAccounts.accountId),
           ),
         )
-        .leftJoin(smartrotomUsers, eq(starBankUsersAccounts.uuid, uuid))
+        .leftJoin(rotomUsers, eq(starBankUserAccounts.uuid, uuid))
         .limit(limit)
         .orderBy(desc(starBankTransactions.date))
         .execute();
@@ -394,8 +397,8 @@ export class StarbankRepository {
 
       const result = await this.db
         .selectDistinct({
-          from: starBankTransactions.from,
-          to: starBankTransactions.to,
+          from: starBankTransactions.fromAccountId,
+          to: starBankTransactions.toAccountId,
           amount: starBankTransactions.amount,
           reason: starBankTransactions.reason,
           fromBalance: starBankTransactions.fromBalance,
@@ -408,13 +411,13 @@ export class StarbankRepository {
           date: starBankTransactions.date,
         })
         .from(starBankTransactions)
-        .innerJoin(toJoin, eq(starBankTransactions.to, toJoin.id))
-        .innerJoin(fromJoin, eq(starBankTransactions.from, fromJoin.id))
+        .innerJoin(toJoin, eq(starBankTransactions.toAccountId, toJoin.id))
+        .innerJoin(fromJoin, eq(starBankTransactions.fromAccountId, fromJoin.id))
         .innerJoin(
-          starBankUsersAccounts,
+          starBankUserAccounts,
           or(
-            eq(toJoin.id, starBankUsersAccounts.accountId),
-            eq(fromJoin.id, starBankUsersAccounts.accountId),
+            eq(toJoin.id, starBankUserAccounts.accountId),
+            eq(fromJoin.id, starBankUserAccounts.accountId),
           ),
         )
         .where(eq(starBankTransactions.type, 'TRANSFERENCIA'))
@@ -442,8 +445,8 @@ export class StarbankRepository {
 
       const result = await this.db
         .select({
-          from: starBankTransactions.from,
-          to: starBankTransactions.to,
+          from: starBankTransactions.fromAccountId,
+          to: starBankTransactions.toAccountId,
           amount: starBankTransactions.amount,
           reason: starBankTransactions.reason,
           fromBalance: starBankTransactions.fromBalance,
@@ -456,16 +459,16 @@ export class StarbankRepository {
           date: starBankTransactions.date,
         })
         .from(starBankTransactions)
-        .innerJoin(toJoin, eq(starBankTransactions.to, toJoin.id))
-        .innerJoin(fromJoin, eq(starBankTransactions.from, fromJoin.id))
+        .innerJoin(toJoin, eq(starBankTransactions.toAccountId, toJoin.id))
+        .innerJoin(fromJoin, eq(starBankTransactions.fromAccountId, fromJoin.id))
         .innerJoin(
-          starBankUsersAccounts,
+          starBankUserAccounts,
           or(
-            eq(toJoin.id, starBankUsersAccounts.accountId),
-            eq(fromJoin.id, starBankUsersAccounts.accountId),
+            eq(toJoin.id, starBankUserAccounts.accountId),
+            eq(fromJoin.id, starBankUserAccounts.accountId),
           ),
         )
-        .innerJoin(smartrotomUsers, eq(starBankUsersAccounts.uuid, uuid))
+        .innerJoin(rotomUsers, eq(starBankUserAccounts.uuid, uuid))
         .where(eq(starBankTransactions.type, 'TRANSFERENCIA'))
         .limit(limit)
         .orderBy(desc(starBankTransactions.date))

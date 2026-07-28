@@ -15,7 +15,7 @@ import { toCompetitor } from '../tournaments.mapper';
 import {
   boffMediaTournamentParticipants,
   boffMediaTournamentRoster,
-} from '@/_db/schema/Tournaments';
+} from '@/_db/schema/BoffMediaTournaments';
 import { RosterMemberDto } from '../dto/add-participant.dto';
 
 @Injectable()

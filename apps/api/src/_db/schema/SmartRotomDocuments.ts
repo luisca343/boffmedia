@@ -2,11 +2,12 @@ import {
   AnyMySqlColumn,
   int,
   mysqlTable,
+  primaryKey,
   text,
   timestamp,
   varchar,
 } from 'drizzle-orm/mysql-core';
-import { smartrotomUsers } from './SmartRotom';
+import { rotomUsers } from './SmartRotom';
 
 // Note organization: folders form a self-referential tree per owner (uuid).
 // Defined before rotomDocuments so its folderId FK can reference it.
@@ -14,7 +15,7 @@ export const rotomNoteFolders = mysqlTable('rotom_note_folders', {
   id: int('id').primaryKey().autoincrement(),
   uuid: varchar('uuid', { length: 36 })
     .notNull()
-    .references(() => smartrotomUsers.uuid, {
+    .references(() => rotomUsers.uuid, {
       onDelete: 'cascade',
       onUpdate: 'cascade',
     }),
@@ -52,29 +53,36 @@ export const rotomDocuments = mysqlTable('rotom_documents', {
 
 export type RotomDocument = typeof rotomDocuments.$inferSelect;
 
-export const rotomDocumentsUsers = mysqlTable('rotom_documents_users', {
-  uuid: varchar('uuid', { length: 36 })
-    .notNull()
-    .references(() => smartrotomUsers.uuid, {
-      onDelete: 'cascade',
-      onUpdate: 'cascade',
-    }),
-  documentId: int('document_id')
-    .notNull()
-    .references(() => rotomDocuments.id, {
-      onDelete: 'cascade',
-      onUpdate: 'cascade',
-    }),
-});
+export const rotomUserDocuments = mysqlTable(
+  'rotom_user_documents',
+  {
+    uuid: varchar('uuid', { length: 36 })
+      .notNull()
+      .references(() => rotomUsers.uuid, {
+        onDelete: 'cascade',
+        onUpdate: 'cascade',
+      }),
+    documentId: int('document_id')
+      .notNull()
+      .references(() => rotomDocuments.id, {
+        onDelete: 'cascade',
+        onUpdate: 'cascade',
+      }),
+  },
+  // One access row per (user, document) — shipped without a PK (migration 0036).
+  (table) => ({
+    pk: primaryKey({ columns: [table.uuid, table.documentId] }),
+  }),
+);
 
-export type RotomDocumentUser = typeof rotomDocumentsUsers.$inferSelect;
+export type RotomUserDocument = typeof rotomUserDocuments.$inferSelect;
 
 // Per-owner tags, linked many-to-many to documents.
 export const rotomNoteTags = mysqlTable('rotom_note_tags', {
   id: int('id').primaryKey().autoincrement(),
   uuid: varchar('uuid', { length: 36 })
     .notNull()
-    .references(() => smartrotomUsers.uuid, {
+    .references(() => rotomUsers.uuid, {
       onDelete: 'cascade',
       onUpdate: 'cascade',
     }),
@@ -85,20 +93,27 @@ export const rotomNoteTags = mysqlTable('rotom_note_tags', {
 
 export type RotomNoteTag = typeof rotomNoteTags.$inferSelect;
 
-export const rotomNoteTagLinks = mysqlTable('rotom_note_tag_links', {
-  documentId: int('document_id')
-    .notNull()
-    .references(() => rotomDocuments.id, {
-      onDelete: 'cascade',
-      onUpdate: 'cascade',
-    }),
-  tagId: int('tag_id')
-    .notNull()
-    .references(() => rotomNoteTags.id, {
-      onDelete: 'cascade',
-      onUpdate: 'cascade',
-    }),
-});
+export const rotomNoteTagLinks = mysqlTable(
+  'rotom_note_tag_links',
+  {
+    documentId: int('document_id')
+      .notNull()
+      .references(() => rotomDocuments.id, {
+        onDelete: 'cascade',
+        onUpdate: 'cascade',
+      }),
+    tagId: int('tag_id')
+      .notNull()
+      .references(() => rotomNoteTags.id, {
+        onDelete: 'cascade',
+        onUpdate: 'cascade',
+      }),
+  },
+  // A tag applies to a document once — shipped without a PK (migration 0036).
+  (table) => ({
+    pk: primaryKey({ columns: [table.documentId, table.tagId] }),
+  }),
+);
 
 export type RotomNoteTagLink = typeof rotomNoteTagLinks.$inferSelect;
 
@@ -155,7 +170,7 @@ export const rotomNewsComments = mysqlTable('rotom_news_comments', {
     }),
   uuid: varchar('uuid', { length: 36 })
     .notNull()
-    .references(() => smartrotomUsers.uuid, {
+    .references(() => rotomUsers.uuid, {
       onDelete: 'cascade',
       onUpdate: 'cascade',
     }),

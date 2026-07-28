@@ -7,7 +7,7 @@ import {
   boffMediaForumCategories,
   boffMediaForumPosts,
   boffMediaForumThreads,
-} from '@/_db/schema/Forum';
+} from '@/_db/schema/BoffMediaForum';
 import { boffMediaUsers } from '@/_db/schema/BoffMedia';
 import { ThreadSort } from '../dto/list-threads-query.dto';
 

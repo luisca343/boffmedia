@@ -7,7 +7,7 @@ import {
   boffMediaEvents,
   Achievement,
   boffMediaParticipantProgress,
-} from '@/_db/schema/Events';
+} from '@/_db/schema/BoffMediaEvents';
 
 export interface AchievementWithEventName extends Achievement {
   eventName?: string;

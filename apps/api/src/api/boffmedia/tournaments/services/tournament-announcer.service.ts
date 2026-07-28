@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { Tournament } from '@/_db/schema/Tournaments';
+import { Tournament } from '@/_db/schema/BoffMediaTournaments';
 import { TournamentsRepository } from '../repositories/tournaments.repository';
 import { env } from '@/config/env';
 

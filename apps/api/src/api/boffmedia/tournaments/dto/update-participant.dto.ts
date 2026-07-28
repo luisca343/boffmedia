@@ -8,7 +8,7 @@ import {
   IsString,
   MaxLength,
 } from 'class-validator';
-import { TOURNAMENT_PARTICIPANT_STATUS } from '@/_db/schema/Tournaments';
+import { TOURNAMENT_PARTICIPANT_STATUS } from '@/_db/schema/BoffMediaTournaments';
 import type { ParticipantStatus } from '../tournaments.types';
 
 export class UpdateParticipantDto {

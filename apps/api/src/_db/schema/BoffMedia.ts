@@ -7,15 +7,18 @@ import {
   timestamp,
   varchar,
 } from 'drizzle-orm/mysql-core';
-import { smartrotomUsers } from './SmartRotom';
+import { rotomUsers } from './SmartRotom';
 
 export const boffMediaUsers = mysqlTable('boffmedia_users', {
   id: int('id').primaryKey().autoincrement(),
   username: varchar('username', { length: 32 }).notNull().unique(),
   // Nullable: OAuth-only accounts (Google/Discord/Steam) have no local password.
   password: varchar('password', { length: 255 }),
-  email: varchar('email', { length: 255 }).notNull(),
-  uuid: char('uuid', { length: 36 }).references(() => smartrotomUsers.uuid, {
+  // Unique: every credential flow (login, password reset, email verification)
+  // keys on it. Soft-delete scrubs the column to `deleted+<id>@deleted.invalid`,
+  // which is unique per row, so tombstones never collide here.
+  email: varchar('email', { length: 255 }).notNull().unique(),
+  uuid: char('uuid', { length: 36 }).references(() => rotomUsers.uuid, {
     onDelete: 'cascade',
     onUpdate: 'cascade',
   }),
@@ -36,8 +39,9 @@ export const boffMediaUsers = mysqlTable('boffmedia_users', {
   // to Spanish. Deliberately NOT request Accept-Language: that is wrong for
   // anything the user did not trigger from a browser.
   locale: varchar('locale', { length: 8 }),
-  createdAt: timestamp('created_at', { mode: 'date' }).defaultNow(),
+  createdAt: timestamp('created_at', { mode: 'date' }).notNull().defaultNow(),
   updatedAt: timestamp('updated_at', { mode: 'date' })
+    .notNull()
     .defaultNow()
     .onUpdateNow(),
   lastSeenAt: timestamp('last_seen_at'),

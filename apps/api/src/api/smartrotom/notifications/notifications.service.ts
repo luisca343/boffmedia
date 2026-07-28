@@ -1,7 +1,7 @@
 import { Injectable, Inject, Optional } from '@nestjs/common';
 import { NOTIFICATIONS_REPOSITORY_TOKEN } from '@api/_utils/repositories/interfaces/repository.token';
 import { INotificationsRepository } from './notifications.repository';
-import { SrNotification } from '@/_db/schema/SmartRotom';
+import { RotomNotification } from '@/_db/schema/SmartRotom';
 import { SocketsGateway } from '@api/_utils/sockets/sockets.gateway';
 
 export interface CreateNotificationInput {
@@ -24,7 +24,7 @@ export class NotificationsService {
 
   async createNotification(
     input: CreateNotificationInput,
-  ): Promise<SrNotification> {
+  ): Promise<RotomNotification> {
     const notification = await this.repo.create({
       userUuid: input.userUuid,
       type: input.type,
@@ -50,7 +50,7 @@ export class NotificationsService {
     userUuid: string,
     limit = 20,
     offset = 0,
-  ): Promise<{ items: SrNotification[]; total: number }> {
+  ): Promise<{ items: RotomNotification[]; total: number }> {
     return this.repo.findByUser(userUuid, limit, offset);
   }
 

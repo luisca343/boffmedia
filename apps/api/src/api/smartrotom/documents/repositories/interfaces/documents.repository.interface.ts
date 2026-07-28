@@ -1,6 +1,6 @@
 import {
   RotomDocument,
-  RotomDocumentUser,
+  RotomUserDocument,
 } from '@/_db/schema/SmartRotomDocuments';
 import { DocumentShare, NotePreview } from '../documents.repository';
 
@@ -31,7 +31,7 @@ export interface IDocumentsRepository {
   findDocumentUserAssociation(
     documentId: number,
     uuid: string,
-  ): Promise<RotomDocumentUser | null>;
+  ): Promise<RotomUserDocument | null>;
   findDocumentShares(documentId: number): Promise<DocumentShare[]>;
   findSharesByDocumentIds(ids: number[]): Promise<DocumentShare[]>;
   addDocumentToUser(

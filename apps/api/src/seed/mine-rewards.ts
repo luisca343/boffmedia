@@ -671,7 +671,7 @@ async function main() {
 
   // Idempotent by item_id, which is the natural key — the table's only unique index
   // is the surrogate id, so onDuplicateKeyUpdate has nothing to catch on. Rows are
-  // never deleted: rotom_mine_games_detail.reward_id references this table ON DELETE
+  // never deleted: rotom_mine_game_rewards.reward_id references this table ON DELETE
   // CASCADE, so clearing it to re-seed would take every player's game history and
   // ranking score with it.
   const existing = await db

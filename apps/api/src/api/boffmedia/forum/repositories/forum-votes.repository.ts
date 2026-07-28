@@ -2,7 +2,7 @@ import { Injectable, Inject } from '@nestjs/common';
 import { MySql2Database } from 'drizzle-orm/mysql2';
 import { and, eq } from 'drizzle-orm';
 import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
-import { boffMediaForumVotes } from '@/_db/schema/Forum';
+import { boffMediaForumVotes } from '@/_db/schema/BoffMediaForum';
 
 @Injectable()
 export class ForumVotesRepository {

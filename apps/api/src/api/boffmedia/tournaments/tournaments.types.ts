@@ -13,7 +13,7 @@ import {
   TIEBREAK_PROFILE,
   PROPOSAL_STATE,
   MATCH_MESSAGE_KIND,
-} from '@/_db/schema/Tournaments';
+} from '@/_db/schema/BoffMediaTournaments';
 
 export type TournamentFormat =
   (typeof TOURNAMENT_FORMAT)[keyof typeof TOURNAMENT_FORMAT];

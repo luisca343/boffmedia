@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { smartRotomArceuSpeak } from '@/_db/schema/SmartRotom';
+import { rotomArceuSpeak } from '@/_db/schema/SmartRotom';
 import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
 import { MySql2Database } from 'drizzle-orm/mysql2';
 import { StarbankFacadeService } from '../starbank/starbank.facade.service';
@@ -23,12 +23,12 @@ export class SmartrotomService {
   }
 
   async getArceuspeak() {
-    return await this.db.select().from(smartRotomArceuSpeak).execute();
+    return await this.db.select().from(rotomArceuSpeak).execute();
   }
 
   async createOrUpdateArceuspeak(name: string, value: string, format: string) {
     return await this.db
-      .insert(smartRotomArceuSpeak)
+      .insert(rotomArceuSpeak)
       .values({ name, value, format })
       .execute();
   }

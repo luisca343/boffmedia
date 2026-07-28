@@ -1,12 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { SmartRotomUser } from './user.entity';
+import { RotomUser } from './user.entity';
 
 export class UserCreationResult {
   @ApiProperty({
     description: 'The user data',
-    type: SmartRotomUser,
+    type: RotomUser,
   })
-  user: SmartRotomUser;
+  user: RotomUser;
 
   @ApiProperty({
     description: 'Whether this is a newly created user',

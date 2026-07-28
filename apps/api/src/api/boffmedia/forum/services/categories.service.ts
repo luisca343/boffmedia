@@ -4,7 +4,7 @@ import {
   CategoryCount,
   ForumCategoriesRepository,
 } from '../repositories/forum-categories.repository';
-import { ForumCategory as ForumCategoryRow } from '@/_db/schema/Forum';
+import { ForumCategory as ForumCategoryRow } from '@/_db/schema/BoffMediaForum';
 import { ForumCategory } from '../entities/forum-category.entity';
 import { toForumAuthor } from '../forum.mapper';
 

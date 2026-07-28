@@ -4,7 +4,7 @@ import {
   ConflictException,
   Inject,
 } from '@nestjs/common';
-import { SmartRotomApp } from '@/_db/schema/SmartRotom';
+import { RotomApp } from '@/_db/schema/SmartRotom';
 import { CreateAppDto } from '../dto/create-app.dto';
 import { UpdateAppDto } from '../dto/update-app.dto';
 import { IAppsRepository } from '../repositories/interfaces/apps-repository.interface';
@@ -19,11 +19,11 @@ export class AppsService {
 
   // ==================== APP MANAGEMENT ====================
 
-  async getAllApps(): Promise<SmartRotomApp[]> {
+  async getAllApps(): Promise<RotomApp[]> {
     return this.appsRepository.findAll();
   }
 
-  async getAppById(id: number): Promise<SmartRotomApp> {
+  async getAppById(id: number): Promise<RotomApp> {
     const app = await this.appsRepository.findById(id);
     if (!app) {
       throw new NotFoundException(`App with ID ${id} not found`);
@@ -31,15 +31,15 @@ export class AppsService {
     return app;
   }
 
-  async getActiveApps(): Promise<SmartRotomApp[]> {
+  async getActiveApps(): Promise<RotomApp[]> {
     return this.appsRepository.findActiveApps();
   }
 
-  async getInactiveApps(): Promise<SmartRotomApp[]> {
+  async getInactiveApps(): Promise<RotomApp[]> {
     return this.appsRepository.findByActive(0);
   }
 
-  async createApp(createAppDto: CreateAppDto): Promise<SmartRotomApp> {
+  async createApp(createAppDto: CreateAppDto): Promise<RotomApp> {
     // Check for duplicate URL if provided
     if (createAppDto.url) {
       const existingApp = await this.appsRepository.findByUrl(createAppDto.url);
@@ -56,7 +56,7 @@ export class AppsService {
   async updateApp(
     id: number,
     updateAppDto: UpdateAppDto,
-  ): Promise<SmartRotomApp> {
+  ): Promise<RotomApp> {
     const existingApp = await this.getAppById(id);
 
     // Check for duplicate URL if updating URL
@@ -86,11 +86,11 @@ export class AppsService {
 
   // ==================== APP STATUS MANAGEMENT ====================
 
-  async activateApp(id: number): Promise<SmartRotomApp> {
+  async activateApp(id: number): Promise<RotomApp> {
     return this.updateApp(id, { active: 1 });
   }
 
-  async deactivateApp(id: number): Promise<SmartRotomApp> {
+  async deactivateApp(id: number): Promise<RotomApp> {
     return this.updateApp(id, { active: 0 });
   }
 }

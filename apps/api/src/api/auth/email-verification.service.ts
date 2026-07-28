@@ -4,7 +4,7 @@ import { and, eq, isNull } from 'drizzle-orm';
 import * as crypto from 'crypto';
 import { Logger } from 'nestjs-pino';
 import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
-import { boffMediaEmailVerifications } from '@/_db/schema/Auth';
+import { boffMediaEmailVerifications } from '@/_db/schema/BoffMediaAuth';
 import { BoffMediaUsersRepository } from '@api/boffmedia/users/repositories/users.repository';
 import { MailService } from '@api/mail/mail.service';
 

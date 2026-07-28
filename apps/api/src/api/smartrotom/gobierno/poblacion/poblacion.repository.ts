@@ -2,7 +2,7 @@ import { Injectable, Inject } from '@nestjs/common';
 import { MySql2Database } from 'drizzle-orm/mysql2';
 import { and, eq, inArray, like, sql } from 'drizzle-orm';
 import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
-import { smartrotomUsers } from '@/_db/schema/SmartRotom';
+import { rotomUsers } from '@/_db/schema/SmartRotom';
 import {
   boffMediaRoles,
   boffMediaUserRoles,
@@ -24,22 +24,22 @@ export class PoblacionRepository {
 
   async listUsers(page: number, limit: number, search?: string) {
     const where = search
-      ? like(smartrotomUsers.username, `%${search}%`)
+      ? like(rotomUsers.username, `%${search}%`)
       : undefined;
     const [items, totalRows] = await Promise.all([
       this.db
         .select({
-          uuid: smartrotomUsers.uuid,
-          username: smartrotomUsers.username,
+          uuid: rotomUsers.uuid,
+          username: rotomUsers.username,
         })
-        .from(smartrotomUsers)
+        .from(rotomUsers)
         .where(where)
-        .orderBy(smartrotomUsers.username)
+        .orderBy(rotomUsers.username)
         .limit(limit)
         .offset((page - 1) * limit),
       this.db
         .select({ total: sql<number>`count(*)` })
-        .from(smartrotomUsers)
+        .from(rotomUsers)
         .where(where),
     ]);
     return { items, total: Number(totalRows[0]?.total ?? 0) };
@@ -52,16 +52,16 @@ export class PoblacionRepository {
    */
   async listAllUsers(search?: string) {
     const where = search
-      ? like(smartrotomUsers.username, `%${search}%`)
+      ? like(rotomUsers.username, `%${search}%`)
       : undefined;
     return this.db
       .select({
-        uuid: smartrotomUsers.uuid,
-        username: smartrotomUsers.username,
+        uuid: rotomUsers.uuid,
+        username: rotomUsers.username,
       })
-      .from(smartrotomUsers)
+      .from(rotomUsers)
       .where(where)
-      .orderBy(smartrotomUsers.username);
+      .orderBy(rotomUsers.username);
   }
 
   async findUserByUuid(
@@ -69,11 +69,11 @@ export class PoblacionRepository {
   ): Promise<{ uuid: string; username: string } | null> {
     const rows = await this.db
       .select({
-        uuid: smartrotomUsers.uuid,
-        username: smartrotomUsers.username,
+        uuid: rotomUsers.uuid,
+        username: rotomUsers.username,
       })
-      .from(smartrotomUsers)
-      .where(eq(smartrotomUsers.uuid, uuid));
+      .from(rotomUsers)
+      .where(eq(rotomUsers.uuid, uuid));
     return rows[0] ?? null;
   }
 

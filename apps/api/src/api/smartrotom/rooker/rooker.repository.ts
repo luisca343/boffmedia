@@ -14,9 +14,9 @@ import {
   sql,
 } from 'drizzle-orm';
 import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
-import { smartRotomReplays, smartrotomUsers } from '@/_db/schema/SmartRotom';
+import { rotomReplays, rotomUsers } from '@/_db/schema/SmartRotom';
 import { pokedexRegistry } from '@/_db/schema/SmartRotomPokedex';
-import { srNotifications } from '@/_db/schema/SmartRotom';
+import { rotomNotifications } from '@/_db/schema/SmartRotom';
 import {
   rookerBookmarks,
   rookerFollows,
@@ -278,15 +278,15 @@ export class RookerRepository {
     ] = await Promise.all([
       this.db
         .select({
-          uuid: smartrotomUsers.uuid,
-          username: smartrotomUsers.username,
+          uuid: rotomUsers.uuid,
+          username: rotomUsers.username,
           handle: rookerProfiles.handle,
           displayName: rookerProfiles.displayName,
           partnerPokemonId: rookerProfiles.partnerPokemonId,
         })
-        .from(smartrotomUsers)
-        .leftJoin(rookerProfiles, eq(rookerProfiles.uuid, smartrotomUsers.uuid))
-        .where(inArray(smartrotomUsers.uuid, authorUuids)),
+        .from(rotomUsers)
+        .leftJoin(rookerProfiles, eq(rookerProfiles.uuid, rotomUsers.uuid))
+        .where(inArray(rotomUsers.uuid, authorUuids)),
 
       this.db
         .select({ parentId: rookerPosts.parentId, c: sql<number>`count(*)` })
@@ -359,14 +359,14 @@ export class RookerRepository {
       replayIds.length > 0
         ? this.db
             .select({
-              id: smartRotomReplays.id,
-              side1: smartRotomReplays.side1,
-              side2: smartRotomReplays.side2,
-              winner: smartRotomReplays.winner,
-              createdAt: smartRotomReplays.createdAt,
+              id: rotomReplays.id,
+              side1: rotomReplays.side1,
+              side2: rotomReplays.side2,
+              winner: rotomReplays.winner,
+              createdAt: rotomReplays.createdAt,
             })
-            .from(smartRotomReplays)
-            .where(inArray(smartRotomReplays.id, replayIds))
+            .from(rotomReplays)
+            .where(inArray(rotomReplays.id, replayIds))
         : Promise.resolve([]),
 
       retrinoerUuids.length > 0
@@ -633,10 +633,10 @@ export class RookerRepository {
         link: rookerProfiles.link,
         partnerPokemonId: rookerProfiles.partnerPokemonId,
         createdAt: rookerProfiles.createdAt,
-        username: smartrotomUsers.username,
+        username: rotomUsers.username,
       })
       .from(rookerProfiles)
-      .innerJoin(smartrotomUsers, eq(smartrotomUsers.uuid, rookerProfiles.uuid))
+      .innerJoin(rotomUsers, eq(rotomUsers.uuid, rookerProfiles.uuid))
       .where(eq(rookerProfiles.handle, handle))
       .limit(1);
     return rows[0] ?? null;
@@ -745,11 +745,11 @@ export class RookerRepository {
         ),
       this.db
         .select({ c: sql<number>`count(*)` })
-        .from(smartRotomReplays)
+        .from(rotomReplays)
         .where(
           or(
-            eq(smartRotomReplays.side1, uuid),
-            eq(smartRotomReplays.side2, uuid),
+            eq(rotomReplays.side1, uuid),
+            eq(rotomReplays.side2, uuid),
           ),
         ),
       this.db
@@ -837,11 +837,11 @@ export class RookerRepository {
         handle: rookerProfiles.handle,
         displayName: rookerProfiles.displayName,
         partnerPokemonId: rookerProfiles.partnerPokemonId,
-        username: smartrotomUsers.username,
+        username: rotomUsers.username,
         followers: sql<number>`count(${rookerFollows.followerUuid})`,
       })
       .from(rookerProfiles)
-      .innerJoin(smartrotomUsers, eq(smartrotomUsers.uuid, rookerProfiles.uuid))
+      .innerJoin(rotomUsers, eq(rotomUsers.uuid, rookerProfiles.uuid))
       .leftJoin(
         rookerFollows,
         eq(rookerFollows.followeeUuid, rookerProfiles.uuid),
@@ -852,7 +852,7 @@ export class RookerRepository {
         rookerProfiles.handle,
         rookerProfiles.displayName,
         rookerProfiles.partnerPokemonId,
-        smartrotomUsers.username,
+        rotomUsers.username,
       )
       .orderBy(desc(sql`count(${rookerFollows.followerUuid})`))
       .limit(limit);
@@ -874,11 +874,11 @@ export class RookerRepository {
         handle: rookerProfiles.handle,
         displayName: rookerProfiles.displayName,
         partnerPokemonId: rookerProfiles.partnerPokemonId,
-        username: smartrotomUsers.username,
+        username: rotomUsers.username,
         followers: sql<number>`count(${rookerFollows.followerUuid})`,
       })
       .from(rookerProfiles)
-      .innerJoin(smartrotomUsers, eq(smartrotomUsers.uuid, rookerProfiles.uuid))
+      .innerJoin(rotomUsers, eq(rotomUsers.uuid, rookerProfiles.uuid))
       .leftJoin(
         rookerFollows,
         eq(rookerFollows.followeeUuid, rookerProfiles.uuid),
@@ -887,7 +887,7 @@ export class RookerRepository {
         or(
           like(rookerProfiles.handle, `%${term}%`),
           like(rookerProfiles.displayName, `%${term}%`),
-          like(smartrotomUsers.username, `%${term}%`),
+          like(rotomUsers.username, `%${term}%`),
         ),
       )
       .groupBy(
@@ -895,7 +895,7 @@ export class RookerRepository {
         rookerProfiles.handle,
         rookerProfiles.displayName,
         rookerProfiles.partnerPokemonId,
-        smartrotomUsers.username,
+        rotomUsers.username,
       )
       .limit(limit);
 
@@ -947,23 +947,23 @@ export class RookerRepository {
     const [items, total] = await Promise.all([
       this.db
         .select()
-        .from(srNotifications)
+        .from(rotomNotifications)
         .where(
           and(
-            eq(srNotifications.userUuid, uuid),
-            eq(srNotifications.type, 'rooker'),
+            eq(rotomNotifications.userUuid, uuid),
+            eq(rotomNotifications.type, 'rooker'),
           ),
         )
-        .orderBy(desc(srNotifications.createdAt))
+        .orderBy(desc(rotomNotifications.createdAt))
         .limit(limit)
         .offset(offset),
       this.db
         .select({ c: sql<number>`count(*)` })
-        .from(srNotifications)
+        .from(rotomNotifications)
         .where(
           and(
-            eq(srNotifications.userUuid, uuid),
-            eq(srNotifications.type, 'rooker'),
+            eq(rotomNotifications.userUuid, uuid),
+            eq(rotomNotifications.type, 'rooker'),
           ),
         ),
     ]);

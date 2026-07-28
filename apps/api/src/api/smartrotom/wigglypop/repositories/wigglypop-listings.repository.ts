@@ -1,20 +1,32 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { MySql2Database } from 'drizzle-orm/mysql2';
-import { and, asc, desc, eq, inArray, like, lte, or, sql } from 'drizzle-orm';
+import {
+  and,
+  asc,
+  desc,
+  eq,
+  inArray,
+  isNotNull,
+  like,
+  lte,
+  or,
+  sql,
+} from 'drizzle-orm';
 import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
 import {
-  wigglypopItemCatalog,
+  wigglypopCatalogItems,
   wigglypopListingItems,
   wigglypopListingMons,
   wigglypopListings,
   wigglypopOffers,
+  wigglypopOrderLines,
   wigglypopWatchlist,
-  WigglypopItemCatalogEntry,
+  WigglypopCatalogItem,
   WigglypopListing,
   WigglypopListingItem,
   WigglypopListingMon,
 } from '@/_db/schema/SmartRotomWigglypop';
-import { smartrotomUsers } from '@/_db/schema/SmartRotom';
+import { rotomUsers } from '@/_db/schema/SmartRotom';
 import { ListListingsQueryDto } from '../dto/wigglypop.dto';
 import { IV_TOTAL_MAX } from '../services/wigglypop-valuation.service';
 
@@ -399,12 +411,12 @@ export class WigglypopListingsRepository {
 
   async findCatalogEntries(
     ids: string[],
-  ): Promise<WigglypopItemCatalogEntry[]> {
+  ): Promise<WigglypopCatalogItem[]> {
     if (ids.length === 0) return [];
     return this.db
       .select()
-      .from(wigglypopItemCatalog)
-      .where(inArray(wigglypopItemCatalog.id, ids));
+      .from(wigglypopCatalogItems)
+      .where(inArray(wigglypopCatalogItems.id, ids));
   }
 
   /**
@@ -412,13 +424,13 @@ export class WigglypopListingsRepository {
    * to read a player's bag, so a seller DECLARES what they are selling by picking from this
    * list rather than from a real inventory.
    */
-  async listCatalog(): Promise<WigglypopItemCatalogEntry[]> {
+  async listCatalog(): Promise<WigglypopCatalogItem[]> {
     return this.db
       .select()
-      .from(wigglypopItemCatalog)
+      .from(wigglypopCatalogItems)
       .orderBy(
-        asc(wigglypopItemCatalog.category),
-        asc(wigglypopItemCatalog.name),
+        asc(wigglypopCatalogItems.category),
+        asc(wigglypopCatalogItems.name),
       );
   }
 
@@ -431,29 +443,35 @@ export class WigglypopListingsRepository {
    * The caller returns [] when there are fewer than 2 real sales.
    */
   async findSalePricesByDex(dex: number): Promise<number[]> {
+    // Built on the schema objects, not a raw-SQL string: hardcoded table names
+    // here silently survive a rename and only fail at runtime.
     const rows = await this.db
       .select({
-        unitPrice: sql<number>`ol.unit_price`,
-        confirmedAt: sql<Date>`ol.confirmed_at`,
+        unitPrice: wigglypopOrderLines.unitPrice,
+        confirmedAt: wigglypopOrderLines.confirmedAt,
       })
-      .from(sql`wigglypop_order_lines ol`)
+      .from(wigglypopOrderLines)
       .innerJoin(
-        sql`wigglypop_listing_mons lm`,
-        sql`lm.listing_id = ol.listing_id`,
+        wigglypopListingMons,
+        eq(wigglypopListingMons.listingId, wigglypopOrderLines.listingId),
       )
       .where(
-        sql`lm.dex = ${dex} AND ol.delivery_status = 'confirmado' AND ol.confirmed_at IS NOT NULL`,
+        and(
+          eq(wigglypopListingMons.dex, dex),
+          eq(wigglypopOrderLines.deliveryStatus, 'confirmado'),
+          isNotNull(wigglypopOrderLines.confirmedAt),
+        ),
       )
-      .orderBy(sql`ol.confirmed_at ASC`);
+      .orderBy(asc(wigglypopOrderLines.confirmedAt));
 
     return rows.map((r) => Number(r.unitPrice));
   }
 
   async findSellerUsername(uuid: string): Promise<string | null> {
     const rows = await this.db
-      .select({ username: smartrotomUsers.username })
-      .from(smartrotomUsers)
-      .where(eq(smartrotomUsers.uuid, uuid));
+      .select({ username: rotomUsers.username })
+      .from(rotomUsers)
+      .where(eq(rotomUsers.uuid, uuid));
     return rows[0]?.username ?? null;
   }
 
@@ -469,11 +487,11 @@ export class WigglypopListingsRepository {
     if (uuids.length === 0) return names;
     const rows = await this.db
       .select({
-        uuid: smartrotomUsers.uuid,
-        username: smartrotomUsers.username,
+        uuid: rotomUsers.uuid,
+        username: rotomUsers.username,
       })
-      .from(smartrotomUsers)
-      .where(inArray(smartrotomUsers.uuid, uuids));
+      .from(rotomUsers)
+      .where(inArray(rotomUsers.uuid, uuids));
     for (const r of rows) names.set(r.uuid, r.username ?? null);
     return names;
   }

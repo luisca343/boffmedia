@@ -246,6 +246,34 @@
       "when": 1785186754835,
       "tag": "0034_user_locale_preference",
       "breakpoints": true
+    },
+    {
+      "idx": 35,
+      "version": "5",
+      "when": 1785186755835,
+      "tag": "0035_table_naming_standardization",
+      "breakpoints": true
+    },
+    {
+      "idx": 36,
+      "version": "5",
+      "when": 1785186756835,
+      "tag": "0036_schema_correctness_fixes",
+      "breakpoints": true
+    },
+    {
+      "idx": 37,
+      "version": "5",
+      "when": 1785186757835,
+      "tag": "0037_production_readiness",
+      "breakpoints": true
+    },
+    {
+      "idx": 38,
+      "version": "5",
+      "when": 1785186758835,
+      "tag": "0038_fk_name_alignment",
+      "breakpoints": true
     }
   ]
 }

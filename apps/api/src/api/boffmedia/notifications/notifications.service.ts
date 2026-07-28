@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { MySql2Database } from 'drizzle-orm/mysql2';
 import { and, desc, eq, isNull, sql } from 'drizzle-orm';
 import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
-import { boffMediaNotifications } from '@/_db/schema/Notifications';
+import { boffMediaNotifications } from '@/_db/schema/BoffMediaNotifications';
 import { boffMediaUsers } from '@/_db/schema/BoffMedia';
 import { NotificationEntity } from './entities/notification.entity';
 import { CreateNotificationDto } from './dto/create-notification.dto';

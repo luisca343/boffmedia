@@ -3,10 +3,10 @@ import { MySql2Database } from 'drizzle-orm/mysql2';
 import { eq, and, sql, SQL } from 'drizzle-orm';
 import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
 import {
-  smartRotomArcadeStreaks,
-  smartRotomInventory,
-  smartrotomUsers,
-  SmartRotomInventoryItem,
+  rotomArcadeStreaks,
+  rotomInventory,
+  rotomUsers,
+  RotomInventoryItem,
 } from '@/_db/schema/SmartRotom';
 
 @Injectable()
@@ -18,13 +18,13 @@ export class ArcadeRepository {
   async findStreakByUuid(uuid: string) {
     const result = await this.db
       .select({
-        lastClaimed: smartRotomArcadeStreaks.lastClaimed,
-        streak: smartRotomArcadeStreaks.streak,
-        totalClaims: smartRotomArcadeStreaks.totalClaims,
-        lastBanner: smartRotomArcadeStreaks.lastBanner,
+        lastClaimed: rotomArcadeStreaks.lastClaimed,
+        streak: rotomArcadeStreaks.streak,
+        totalClaims: rotomArcadeStreaks.totalClaims,
+        lastBanner: rotomArcadeStreaks.lastBanner,
       })
-      .from(smartRotomArcadeStreaks)
-      .where(eq(smartRotomArcadeStreaks.uuid, uuid));
+      .from(rotomArcadeStreaks)
+      .where(eq(rotomArcadeStreaks.uuid, uuid));
 
     return result[0] || null;
   }
@@ -38,7 +38,7 @@ export class ArcadeRepository {
       lastBanner: string;
     },
   ) {
-    return this.db.insert(smartRotomArcadeStreaks).values({ uuid, ...data });
+    return this.db.insert(rotomArcadeStreaks).values({ uuid, ...data });
   }
 
   async updateStreak(
@@ -51,96 +51,96 @@ export class ArcadeRepository {
     },
   ) {
     return this.db
-      .update(smartRotomArcadeStreaks)
+      .update(rotomArcadeStreaks)
       .set(data as any)
-      .where(eq(smartRotomArcadeStreaks.uuid, uuid));
+      .where(eq(rotomArcadeStreaks.uuid, uuid));
   }
 
   async findInventoryByUuid(uuid: string, sourceType?: string) {
-    let condition = eq(smartRotomInventory.uuid, uuid);
+    let condition = eq(rotomInventory.uuid, uuid);
 
     if (sourceType) {
       condition = and(
         condition,
-        eq(smartRotomInventory.sourceType, sourceType),
+        eq(rotomInventory.sourceType, sourceType),
       ) as SQL<unknown>;
     }
 
     return this.db
       .select({
-        id: smartRotomInventory.id,
-        itemId: smartRotomInventory.itemId,
-        itemType: smartRotomInventory.itemType,
-        amount: smartRotomInventory.amount,
-        sourceType: smartRotomInventory.sourceType,
-        used: smartRotomInventory.used,
-        rarity: smartRotomInventory.rarity,
-        createdAt: smartRotomInventory.createdAt,
+        id: rotomInventory.id,
+        itemId: rotomInventory.itemId,
+        itemType: rotomInventory.itemType,
+        amount: rotomInventory.amount,
+        sourceType: rotomInventory.sourceType,
+        used: rotomInventory.used,
+        rarity: rotomInventory.rarity,
+        createdAt: rotomInventory.createdAt,
       })
-      .from(smartRotomInventory)
+      .from(rotomInventory)
       .where(condition);
   }
 
   async findAvailableBoxes(uuid: string, boxId: string) {
     return this.db
       .select({
-        id: smartRotomInventory.id,
-        itemId: smartRotomInventory.itemId,
-        amount: smartRotomInventory.amount,
-        used: smartRotomInventory.used,
+        id: rotomInventory.id,
+        itemId: rotomInventory.itemId,
+        amount: rotomInventory.amount,
+        used: rotomInventory.used,
       })
-      .from(smartRotomInventory)
+      .from(rotomInventory)
       .where(
         and(
-          eq(smartRotomInventory.uuid, uuid),
-          eq(smartRotomInventory.itemId, boxId),
-          sql`${smartRotomInventory.amount} > ${smartRotomInventory.used}`,
+          eq(rotomInventory.uuid, uuid),
+          eq(rotomInventory.itemId, boxId),
+          sql`${rotomInventory.amount} > ${rotomInventory.used}`,
         ),
       )
-      .orderBy(smartRotomInventory.createdAt);
+      .orderBy(rotomInventory.createdAt);
   }
 
   async findConsumableItems(uuid: string, itemId: string) {
     return this.db
       .select({
-        id: smartRotomInventory.id,
-        itemId: smartRotomInventory.itemId,
-        itemType: smartRotomInventory.itemType,
-        amount: smartRotomInventory.amount,
-        used: smartRotomInventory.used,
-        createdAt: smartRotomInventory.createdAt,
+        id: rotomInventory.id,
+        itemId: rotomInventory.itemId,
+        itemType: rotomInventory.itemType,
+        amount: rotomInventory.amount,
+        used: rotomInventory.used,
+        createdAt: rotomInventory.createdAt,
       })
-      .from(smartRotomInventory)
+      .from(rotomInventory)
       .where(
         and(
-          eq(smartRotomInventory.uuid, uuid),
-          eq(smartRotomInventory.itemId, itemId),
-          sql`${smartRotomInventory.amount} > ${smartRotomInventory.used}`,
+          eq(rotomInventory.uuid, uuid),
+          eq(rotomInventory.itemId, itemId),
+          sql`${rotomInventory.amount} > ${rotomInventory.used}`,
         ),
       )
-      .orderBy(smartRotomInventory.createdAt);
+      .orderBy(rotomInventory.createdAt);
   }
 
-  async addInventoryItem(data: Partial<SmartRotomInventoryItem>) {
-    return this.db.insert(smartRotomInventory).values({
+  async addInventoryItem(data: Partial<RotomInventoryItem>) {
+    return this.db.insert(rotomInventory).values({
       ...data,
       createdAt: new Date(),
       updatedAt: new Date(),
-    } as SmartRotomInventoryItem);
+    } as RotomInventoryItem);
   }
 
   async updateInventoryItemUsage(id: number, used: number) {
     return this.db
-      .update(smartRotomInventory)
-      .set({ used } as SmartRotomInventoryItem)
-      .where(eq(smartRotomInventory.id, id));
+      .update(rotomInventory)
+      .set({ used } as RotomInventoryItem)
+      .where(eq(rotomInventory.id, id));
   }
 
   async findUserByUuid(uuid: string) {
     const result = await this.db
-      .select({ id: smartrotomUsers.id })
-      .from(smartrotomUsers)
-      .where(eq(smartrotomUsers.uuid, uuid))
+      .select({ id: rotomUsers.id })
+      .from(rotomUsers)
+      .where(eq(rotomUsers.uuid, uuid))
       .limit(1);
 
     return result[0] || null;

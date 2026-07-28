@@ -16,7 +16,7 @@ import { CreateAppDto } from './dto/create-app.dto';
 import { OrderAppDto } from './dto/order-apps.dto';
 import { PlayerAppDto } from './dto/player-app.dto';
 import { GetPlayerAppsDto } from './dto/get-player-apps.dto';
-import { SmartRotomApp } from './entities/app.entity';
+import { RotomApp } from './entities/app.entity';
 import { SuccessResponse } from '@api/_utils/entities/common-response.entity';
 import { Logger } from 'nestjs-pino';
 
@@ -36,9 +36,9 @@ export class AppsController {
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Apps found successfully.',
-    type: [SmartRotomApp],
+    type: [RotomApp],
   })
-  async findAll(): Promise<SmartRotomApp[]> {
+  async findAll(): Promise<RotomApp[]> {
     return this.appsFacadeService.getApps();
   }
 
@@ -47,9 +47,9 @@ export class AppsController {
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Active apps found successfully.',
-    type: [SmartRotomApp],
+    type: [RotomApp],
   })
-  async findActive(): Promise<SmartRotomApp[]> {
+  async findActive(): Promise<RotomApp[]> {
     return this.appsFacadeService.getActiveApps();
   }
 
@@ -58,9 +58,9 @@ export class AppsController {
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Inactive apps found successfully.',
-    type: [SmartRotomApp],
+    type: [RotomApp],
   })
-  async findInactive(): Promise<SmartRotomApp[]> {
+  async findInactive(): Promise<RotomApp[]> {
     return this.appsFacadeService.getInactiveApps();
   }
 
@@ -69,13 +69,13 @@ export class AppsController {
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'App found successfully.',
-    type: SmartRotomApp,
+    type: RotomApp,
   })
   @ApiResponse({
     status: HttpStatus.NOT_FOUND,
     description: 'App not found.',
   })
-  async findOne(@Param('id') id: number): Promise<SmartRotomApp> {
+  async findOne(@Param('id') id: number): Promise<RotomApp> {
     return this.appsFacadeService.getApp(id);
   }
 
@@ -84,10 +84,10 @@ export class AppsController {
   @ApiResponse({
     status: HttpStatus.CREATED,
     description: 'App created successfully.',
-    type: SmartRotomApp,
+    type: RotomApp,
   })
   @ApiBody({ type: CreateAppDto })
-  async create(@Body() createAppDto: CreateAppDto): Promise<SmartRotomApp> {
+  async create(@Body() createAppDto: CreateAppDto): Promise<RotomApp> {
     return this.appsFacadeService.createApp(createAppDto);
   }
 
@@ -96,7 +96,7 @@ export class AppsController {
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'App updated successfully.',
-    type: SmartRotomApp,
+    type: RotomApp,
   })
   @ApiResponse({
     status: HttpStatus.NOT_FOUND,
@@ -106,7 +106,7 @@ export class AppsController {
   async update(
     @Param('id') id: number,
     @Body() updateAppDto: UpdateAppDto,
-  ): Promise<SmartRotomApp> {
+  ): Promise<RotomApp> {
     return this.appsFacadeService.updateApp(id, updateAppDto);
   }
 
@@ -132,13 +132,13 @@ export class AppsController {
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'App activated successfully.',
-    type: SmartRotomApp,
+    type: RotomApp,
   })
   @ApiResponse({
     status: HttpStatus.NOT_FOUND,
     description: 'App not found.',
   })
-  async activate(@Param('id') id: number): Promise<SmartRotomApp> {
+  async activate(@Param('id') id: number): Promise<RotomApp> {
     return this.appsFacadeService.activateApp(id);
   }
 
@@ -147,13 +147,13 @@ export class AppsController {
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'App deactivated successfully.',
-    type: SmartRotomApp,
+    type: RotomApp,
   })
   @ApiResponse({
     status: HttpStatus.NOT_FOUND,
     description: 'App not found.',
   })
-  async deactivate(@Param('id') id: number): Promise<SmartRotomApp> {
+  async deactivate(@Param('id') id: number): Promise<RotomApp> {
     return this.appsFacadeService.deactivateApp(id);
   }
 
@@ -164,12 +164,12 @@ export class AppsController {
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Apps found for player successfully.',
-    type: [SmartRotomApp],
+    type: [RotomApp],
   })
   @ApiBody({ type: GetPlayerAppsDto })
   async getForPlayer(
     @Body() { uuid }: GetPlayerAppsDto,
-  ): Promise<SmartRotomApp[]> {
+  ): Promise<RotomApp[]> {
     this.logger.log('Fetching apps for player:', uuid);
     return this.appsFacadeService.getAppsForPlayer(uuid);
   }

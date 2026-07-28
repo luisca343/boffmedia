@@ -1,8 +1,8 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { MySql2Database } from 'drizzle-orm/mysql2';
 import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
-import { rotomChatUsers, RotomChatUser } from '@/_db/schema/SmartRotomChat';
-import { smartrotomUsers } from '@/_db/schema/SmartRotom';
+import { rotomChatMembers, RotomChatMember } from '@/_db/schema/SmartRotomChat';
+import { rotomUsers } from '@/_db/schema/SmartRotom';
 import { IMemberRepository } from './interfaces/chat-member.repository.interface';
 import { and, eq } from 'drizzle-orm';
 import { ChatMember } from '../entities/chat.entity';
@@ -17,31 +17,31 @@ export class ChatMemberRepository implements IMemberRepository {
     if (chatId <= 0) {
       return this.db
         .select({
-          uuid: rotomChatUsers.uuid,
-          username: smartrotomUsers.username,
+          uuid: rotomChatMembers.uuid,
+          username: rotomUsers.username,
         })
-        .from(rotomChatUsers)
+        .from(rotomChatMembers)
         .leftJoin(
-          smartrotomUsers,
-          eq(rotomChatUsers.uuid, smartrotomUsers.uuid),
+          rotomUsers,
+          eq(rotomChatMembers.uuid, rotomUsers.uuid),
         ) as unknown as Promise<ChatMember[]>;
     }
 
     return this.db
       .select({
-        uuid: rotomChatUsers.uuid,
-        username: smartrotomUsers.username,
+        uuid: rotomChatMembers.uuid,
+        username: rotomUsers.username,
       })
-      .from(rotomChatUsers)
-      .leftJoin(smartrotomUsers, eq(rotomChatUsers.uuid, smartrotomUsers.uuid))
-      .where(eq(rotomChatUsers.chatId, chatId)) as unknown as ChatMember[];
+      .from(rotomChatMembers)
+      .leftJoin(rotomUsers, eq(rotomChatMembers.uuid, rotomUsers.uuid))
+      .where(eq(rotomChatMembers.chatId, chatId)) as unknown as ChatMember[];
   }
 
   async addChatMember(
     chatId: number,
     uuid: string,
   ): Promise<{ insertId: number }> {
-    const result = await this.db.insert(rotomChatUsers).values({
+    const result = await this.db.insert(rotomChatMembers).values({
       chatId,
       uuid,
     });
@@ -50,9 +50,9 @@ export class ChatMemberRepository implements IMemberRepository {
 
   async removeChatMember(chatId: number, uuid: string): Promise<void> {
     await this.db
-      .delete(rotomChatUsers)
+      .delete(rotomChatMembers)
       .where(
-        and(eq(rotomChatUsers.chatId, chatId), eq(rotomChatUsers.uuid, uuid)),
+        and(eq(rotomChatMembers.chatId, chatId), eq(rotomChatMembers.uuid, uuid)),
       );
   }
 
@@ -61,10 +61,10 @@ export class ChatMemberRepository implements IMemberRepository {
     uuid: string,
   ): Promise<ChatMember | null> {
     const result = await this.db
-      .select({ uuid: rotomChatUsers.uuid })
-      .from(rotomChatUsers)
+      .select({ uuid: rotomChatMembers.uuid })
+      .from(rotomChatMembers)
       .where(
-        and(eq(rotomChatUsers.chatId, chatId), eq(rotomChatUsers.uuid, uuid)),
+        and(eq(rotomChatMembers.chatId, chatId), eq(rotomChatMembers.uuid, uuid)),
       )
       .limit(1);
     return result[0] || null;
@@ -75,10 +75,10 @@ export class ChatMemberRepository implements IMemberRepository {
     uuid: string,
   ): Promise<{ pinned: boolean; muted: boolean }> {
     const result = await this.db
-      .select({ pinned: rotomChatUsers.pinned, muted: rotomChatUsers.muted })
-      .from(rotomChatUsers)
+      .select({ pinned: rotomChatMembers.pinned, muted: rotomChatMembers.muted })
+      .from(rotomChatMembers)
       .where(
-        and(eq(rotomChatUsers.chatId, chatId), eq(rotomChatUsers.uuid, uuid)),
+        and(eq(rotomChatMembers.chatId, chatId), eq(rotomChatMembers.uuid, uuid)),
       )
       .limit(1);
     return result[0] || { pinned: false, muted: false };
@@ -90,19 +90,19 @@ export class ChatMemberRepository implements IMemberRepository {
     pinned: boolean,
   ): Promise<void> {
     await this.db
-      .update(rotomChatUsers)
+      .update(rotomChatMembers)
       .set({ pinned })
       .where(
-        and(eq(rotomChatUsers.chatId, chatId), eq(rotomChatUsers.uuid, uuid)),
+        and(eq(rotomChatMembers.chatId, chatId), eq(rotomChatMembers.uuid, uuid)),
       );
   }
 
   async setMuted(chatId: number, uuid: string, muted: boolean): Promise<void> {
     await this.db
-      .update(rotomChatUsers)
+      .update(rotomChatMembers)
       .set({ muted })
       .where(
-        and(eq(rotomChatUsers.chatId, chatId), eq(rotomChatUsers.uuid, uuid)),
+        and(eq(rotomChatMembers.chatId, chatId), eq(rotomChatMembers.uuid, uuid)),
       );
   }
 }
