@@ -2,12 +2,12 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { SmartRotomUser } from './SmartRotomUser';
+import type { RotomUser } from './RotomUser';
 export type UserWithAccounts = {
     /**
      * The user data
      */
-    user: SmartRotomUser;
+    user: RotomUser;
     /**
      * User accounts data
      */

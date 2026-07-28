@@ -5,7 +5,7 @@ import { useTranslations } from "next-intl"
 import { rotomGETOrThrow, rotomPOSTOrThrow, userMessageFrom } from "@/services/boffAPI"
 import type { SendNotificationPayload } from "@/services/api/smartrotom/notificationsService"
 import type { NotificationResponseDto } from "@boffmedia/shared"
-import type { SmartRotomApp, SmartRotomUser } from "@boffmedia/shared"
+import type { RotomApp as SmartRotomApp, RotomUser as SmartRotomUser } from "@boffmedia/shared"
 import { toast } from "../ui"
 
 /**

@@ -43,14 +43,6 @@ describe('SmartrotomService', () => {
     expect(service).toBeDefined();
   });
 
-  describe('processRaceResult()', () => {
-    it('logs the result', async () => {
-      await service.processRaceResult({ time: 120, winner: 'Ash' });
-
-      expect(mockLogger.log).toHaveBeenCalledWith({ time: 120, winner: 'Ash' });
-    });
-  });
-
   describe('getArceuspeak()', () => {
     it('queries the arceuspeak table', async () => {
       const rows = [{ name: 'pikachu', value: 'Pika!', format: 'text' }];
