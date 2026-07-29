@@ -237,7 +237,20 @@
         "create": "Crear cuenta",
         "errorEmpty": "Introduce un nombre para la cuenta",
         "errorFailed": "No se pudo crear la cuenta",
-        "created": "Cuenta creada"
+        "created": "Cuenta creada",
+        "imageLabel": "Imagen (opcional)",
+        "imageChoose": "Elegir imagen",
+        "imageChange": "Cambiar imagen",
+        "imageRemove": "Quitar",
+        "imageHint": "JPG, PNG, GIF o WEBP. Máximo 5 MB.",
+        "imageFormat": "Formato no admitido. Usa JPG, PNG, GIF o WEBP.",
+        "imageTooBig": "La imagen ocupa más de 5 MB.",
+        "editEyebrow": "Cuenta secundaria",
+        "editTitle": "Editar cuenta",
+        "save": "Guardar",
+        "saving": "Guardando…",
+        "saved": "Cuenta actualizada",
+        "errorEditFailed": "No se pudo actualizar la cuenta"
       },
       "errorCarga": "No se pudieron cargar las cuentas."
     },

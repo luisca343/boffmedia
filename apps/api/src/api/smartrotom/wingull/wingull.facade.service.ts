@@ -7,6 +7,8 @@ import { WingullRepository } from './repositories/wingull.repository';
 import { WingullBalanceDto } from './dto/wingull-balance.dto';
 import { UpdateBattleTeamDto } from './dto/battle-team.dto';
 import { TaxiStop } from './entities/taxi-stop.entity';
+import { PlayerPosition } from './entities/player-position.entity';
+import { TeleportOutcome } from './entities/teleport-outcome.entity';
 import { PokemonW } from './entities/pokemon-w-.entity';
 import { PlayerStats } from './entities/player-stats.entity';
 import { Logger } from 'nestjs-pino';
@@ -292,13 +294,19 @@ export class WingullFacadeService {
     }
   }
 
-  async teleportPlayer(id: string, uuid: string): Promise<boolean> {
+  async getPlayerPosition(uuid: string): Promise<PlayerPosition> {
     try {
-      return await this.wingullTransportService.teleportPlayer(id, uuid);
+      return await this.wingullTransportService.getPlayerPosition(uuid);
     } catch (error: any) {
-      this.logger.error(`Error teleporting player ${uuid} to ${id}:`, error);
-      throw new Error(`Failed to teleport player: ${error.message}`);
+      this.logger.error(`Error reading the position of ${uuid}:`, error);
+      throw new Error(`Failed to read player position: ${error.message}`);
     }
+  }
+
+  // Not wrapped in a try/catch: a refusal is a value here, not an exception, and the caller
+  // decides whether it means "charge nothing" or "check whether it happened anyway".
+  async teleportPlayer(id: string, uuid: string): Promise<TeleportOutcome> {
+    return this.wingullTransportService.teleportPlayer(id, uuid);
   }
 
   async getPlayersOwnedRegions(uuid: string): Promise<

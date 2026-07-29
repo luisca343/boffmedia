@@ -19,6 +19,12 @@
     "BANK_TRANSFER_FAILED": "No se pudo completar la transferencia.",
     "BANK_NEGATIVE_BALANCE": "El saldo no puede ser negativo.",
     "BANK_BALANCE_ADJUST_FAILED": "No se pudo ajustar el saldo.",
-    "TOURNAMENT_CHECKIN_CLOSED": "El check-in no está abierto."
+    "TOURNAMENT_CHECKIN_CLOSED": "El check-in no está abierto.",
+    "TAXI_STOP_NOT_FOUND": "Esa parada de taxi ya no existe.",
+    "TAXI_PLAYER_OFFLINE": "Tienes que estar conectado al servidor para viajar.",
+    "TAXI_INSUFFICIENT_FUNDS": "No tienes saldo suficiente para este viaje.",
+    "TAXI_UNSAFE_ARRIVAL": "No hay un sitio seguro donde dejarte en esa parada.",
+    "TAXI_IN_DUNGEON_RUN": "No puedes coger un taxi durante una mazmorra.",
+    "TAXI_SERVER_BUSY": "El servidor no ha respondido a tiempo. No se te ha cobrado nada."
   }
 }

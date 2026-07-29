@@ -130,6 +130,23 @@ export async function multipartPOST<T>(
   fields: Record<string, any> = {},
   files: Record<string, File | Blob> = {}
 ): Promise<ApiResponse<T>> {
+  return multipartRequest<T>("POST", url, fields, files);
+}
+
+export async function multipartPATCH<T>(
+  url: string,
+  fields: Record<string, any> = {},
+  files: Record<string, File | Blob> = {}
+): Promise<ApiResponse<T>> {
+  return multipartRequest<T>("PATCH", url, fields, files);
+}
+
+async function multipartRequest<T>(
+  method: "POST" | "PATCH",
+  url: string,
+  fields: Record<string, any> = {},
+  files: Record<string, File | Blob> = {}
+): Promise<ApiResponse<T>> {
   const formData = new FormData();
 
   // Append text fields
@@ -148,17 +165,21 @@ export async function multipartPOST<T>(
 
   // Use API base URL if not absolute
   const fullUrl = url.startsWith('http') ? url : `${getApiUrl()}${url}`;
-  return await multipartPOSTRequest<T>(fullUrl, formData);
+  return await multipartPOSTRequest<T>(fullUrl, formData, method);
 }
 
-// Internal helper for multipart POST requests
-async function multipartPOSTRequest<T>(url: string, formData: FormData): Promise<ApiResponse<T>> {
+// Internal helper for multipart requests
+async function multipartPOSTRequest<T>(
+  url: string,
+  formData: FormData,
+  method: "POST" | "PATCH" = "POST"
+): Promise<ApiResponse<T>> {
   // Attach the session token when present — harmless on unguarded endpoints,
   // required for guarded ones (e.g. /upload).
   const token = await sessionToken();
   try {
     const res = await fetch(url, {
-      method: 'POST',
+      method,
       body: formData,
       headers: token ? { Authorization: `Bearer ${token}` } : undefined,
       next: { revalidate: 0 },

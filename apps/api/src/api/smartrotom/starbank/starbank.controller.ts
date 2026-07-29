@@ -3,6 +3,8 @@ import {
   Controller,
   Get,
   Param,
+  ParseIntPipe,
+  Patch,
   Post,
   Query,
   Req,
@@ -28,6 +30,7 @@ import {
   ApiQuery,
   ApiBody,
   ApiConsumes,
+  ApiBearerAuth,
 } from '@nestjs/swagger';
 import { StarbankFacadeService } from './starbank.facade.service';
 
@@ -43,8 +46,9 @@ import { SetBalanceDto } from './dto/set-balance.dto';
 import { StarBankAccount } from './entities/starbank-account.entity';
 import { StarBankTransaction } from './entities/starbank-transaction.entity';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { diskStorage } from 'multer';
 import { Logger } from 'nestjs-pino';
+import { USER_ROLES } from '@api/_utils/auth/roles.constants';
+import { ACCOUNT_IMAGE_UPLOAD, saveAccountImage } from './account-image';
 
 @ApiTags('SmartRotom | Starbank')
 @Public()
@@ -128,37 +132,7 @@ export class StarbankController {
     status: HttpStatus.INTERNAL_SERVER_ERROR,
     description: 'Failed to create account.',
   })
-  @UseInterceptors(
-    FileInterceptor('image', {
-      storage: diskStorage({
-        destination: (req, file, cb) => {
-          cb(null, 'public/smartrotom/img/apps/starbank/cuentas');
-        },
-        filename: (req, file, cb) => {
-          const name = req.body.name || 'profile';
-          const ext = file.originalname.substring(
-            file.originalname.lastIndexOf('.'),
-          );
-          cb(null, name + ext);
-        },
-      }),
-      // Cap size and restrict to images: the destination is web-served static,
-      // so an unbounded or non-image upload is a storage/abuse vector.
-      limits: { fileSize: 5 * 1024 * 1024, files: 1 },
-      fileFilter: (req, file, cb) => {
-        if (/^image\/(jpe?g|png|gif|webp)$/.test(file.mimetype)) {
-          cb(null, true);
-        } else {
-          cb(
-            new BadRequestException(
-              'Unsupported image format. Use jpg, jpeg, png, gif or webp.',
-            ),
-            false,
-          );
-        }
-      },
-    }),
-  )
+  @UseInterceptors(FileInterceptor('image', ACCOUNT_IMAGE_UPLOAD))
   async createAccount(
     @Body('uuid') uuid: string,
     @Body('name') name: string,
@@ -169,26 +143,75 @@ export class StarbankController {
     // their own account, the server Bearer may create any.
     assertActsAsSelf(uuid, resolveActor(req));
 
-    let imagePath: string | undefined;
-    if (image) {
-      // Remove 'public\\' from the start of the path and convert backslashes to forward slashes
-      const relativePath = image.path
-        .replace(/^public[\\/]/, '')
-        .replace(/\\/g, '/');
-      imagePath = `/${relativePath}`;
-      this.logger.log('Image saved:', {
-        filename: image.filename,
-        originalPath: image.path,
-        relativePath: imagePath,
-        size: image.size,
-        mimetype: image.mimetype,
-      });
-    }
+    const account = await this.starbankFacadeService.createAccount(uuid, name);
+    if (!image) return account;
 
-    return await this.starbankFacadeService.createAccount(
-      uuid,
-      name,
-      imagePath,
+    // Written after the insert, because the file is named after the account id — see
+    // account-image.ts for why it is no longer named after whatever the user typed.
+    const imagePath = await saveAccountImage(account.id, image);
+    return await this.starbankFacadeService.updateAccount(
+      account.id,
+      { image: imagePath },
+      null,
+    );
+  }
+
+  @Patch('accounts/:id')
+  @Public()
+  @UseGuards(GameOrUserAuthGuard)
+  @ApiBearerAuth()
+  @ApiConsumes('multipart/form-data')
+  @ApiOperation({
+    summary: 'Rename a secondary account and/or replace its picture',
+    description:
+      'Both fields are optional. Only SECONDARY accounts are editable: MAIN represents the ' +
+      'player and house accounts belong to nobody. The owner may edit their own; ROTOM_ADMIN ' +
+      'may edit any, so an inappropriate picture can be replaced without them.',
+  })
+  @ApiParam({ name: 'id', type: Number })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        name: { type: 'string', example: 'Ahorros' },
+        image: { type: 'string', format: 'binary' },
+      },
+    },
+  })
+  @ApiResponse({ status: HttpStatus.OK, type: StarBankAccount })
+  @ApiResponse({
+    status: HttpStatus.FORBIDDEN,
+    description: 'Not the owner, or not a secondary account.',
+  })
+  @UseInterceptors(FileInterceptor('image', ACCOUNT_IMAGE_UPLOAD))
+  async updateAccount(
+    @Param('id', ParseIntPipe) id: number,
+    @Body('name') name: string | undefined,
+    @Req() req: Request & { user?: { roles?: string[] } },
+    @UploadedFile() image?: Express.Multer.File,
+  ): Promise<StarBankAccount> {
+    const actor = resolveActor(req);
+    const context = actor.serverAuthed
+      ? null
+      : {
+          uuid: actor.mcUuid,
+          isAdmin: Boolean(req.user?.roles?.includes(USER_ROLES.ROTOM_ADMIN)),
+        };
+
+    // Ownership is checked before the file is written, so a caller who may not edit this
+    // account cannot leave an image on disk by trying.
+    const account = await this.starbankFacadeService.updateAccount(
+      id,
+      { name },
+      context,
+    );
+    if (!image) return account;
+
+    const imagePath = await saveAccountImage(id, image);
+    return await this.starbankFacadeService.updateAccount(
+      id,
+      { image: imagePath },
+      context,
     );
   }
   @ApiBody({

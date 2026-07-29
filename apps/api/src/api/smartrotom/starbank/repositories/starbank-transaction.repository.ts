@@ -9,6 +9,7 @@ import {
   starBankUserAccounts,
 } from '@/_db/schema/SmartRotomStarBank';
 import { StarBankTransaction } from '../entities/starbank-transaction.entity';
+import { AccountType } from '../enums/account-type.enum';
 import { TransactionType } from '../enums/transaction-type.enum';
 import { STARBANK_ACCOUNT_REPOSITORY_TOKEN } from '@api/_utils/repositories/interfaces/repository.token';
 import { IStarbankAccountRepository } from './interfaces/starbank-account.repository';
@@ -28,6 +29,30 @@ export class StarbankTransactionRepository implements IStarbankTransactionReposi
     private readonly accountRepository: IStarbankAccountRepository,
   ) {}
 
+  private cachedSystemAccountId: number | null = null;
+
+  /**
+   * The SYSTEM account's id, resolved inside the caller's transaction so a mint and the lock it
+   * takes stay in one atomic unit. Seeded by migration 0040; a missing row is a failed
+   * migration, and failing is better than writing an FK-violating ledger row.
+   */
+  private async systemAccountId(
+    tx: Pick<MySql2Database<Record<string, never>>, 'select'>,
+  ): Promise<number> {
+    if (this.cachedSystemAccountId) return this.cachedSystemAccountId;
+    const rows = await tx
+      .select({ id: starBankAccounts.id })
+      .from(starBankAccounts)
+      .where(eq(starBankAccounts.type, AccountType.SYSTEM));
+    if (!rows[0]) {
+      throw new Error(
+        'The SYSTEM StarBank account does not exist. Run the pending migrations.',
+      );
+    }
+    this.cachedSystemAccountId = rows[0].id;
+    return this.cachedSystemAccountId;
+  }
+
   // ==================== TRANSACTION REPOSITORY IMPLEMENTATION ====================
 
   async create(
@@ -39,15 +64,14 @@ export class StarbankTransactionRepository implements IStarbankTransactionReposi
       // balance read must hold a row lock until the write commits — otherwise
       // two concurrent transfers both read the same balance and the second
       // overwrite silently loses money. Everything runs on `tx`; `SELECT … FOR
-      // UPDATE` serialises transfers touching the same account. System account
-      // 0 is virtual (no row), so it is neither locked nor balance-checked.
+      // UPDATE` serialises transfers touching the same account.
       return await this.db.transaction(async (tx) => {
         const lockAccount = async (id: number) => {
-          if (id === 0) return null;
           const rows = await tx
             .select({
               id: starBankAccounts.id,
               balance: starBankAccounts.balance,
+              type: starBankAccounts.type,
             })
             .from(starBankAccounts)
             .where(eq(starBankAccounts.id, id))
@@ -58,33 +82,32 @@ export class StarbankTransactionRepository implements IStarbankTransactionReposi
         const fromAccount = await lockAccount(fromId);
         const toAccount = await lockAccount(toId);
 
-        if (fromId !== 0 && !fromAccount) {
+        if (!fromAccount) {
           return { success: false, message: 'Source account not found' };
         }
-        if (toId !== 0 && !toAccount) {
+        if (!toAccount) {
           return { success: false, message: 'Destination account not found' };
         }
-        if (fromAccount && (fromAccount.balance ?? 0) < amount) {
+        // SYSTEM is where money is minted from, so it is the one account that may go
+        // negative: its balance is the negative of all money in circulation.
+        if (
+          fromAccount.type !== AccountType.SYSTEM &&
+          (fromAccount.balance ?? 0) < amount
+        ) {
           return { success: false, message: 'Insufficient balance' };
         }
 
-        const fromBalance = fromAccount
-          ? (fromAccount.balance ?? 0) - amount
-          : 0;
-        const toBalance = toAccount ? (toAccount.balance ?? 0) + amount : 0;
+        const fromBalance = (fromAccount.balance ?? 0) - amount;
+        const toBalance = (toAccount.balance ?? 0) + amount;
 
-        if (fromAccount) {
-          await tx
-            .update(starBankAccounts)
-            .set({ balance: fromBalance })
-            .where(eq(starBankAccounts.id, fromId));
-        }
-        if (toAccount) {
-          await tx
-            .update(starBankAccounts)
-            .set({ balance: toBalance })
-            .where(eq(starBankAccounts.id, toId));
-        }
+        await tx
+          .update(starBankAccounts)
+          .set({ balance: fromBalance })
+          .where(eq(starBankAccounts.id, fromId));
+        await tx
+          .update(starBankAccounts)
+          .set({ balance: toBalance })
+          .where(eq(starBankAccounts.id, toId));
 
         const inserted = await tx
           .insert(starBankTransactions)
@@ -122,12 +145,6 @@ export class StarbankTransactionRepository implements IStarbankTransactionReposi
     delta?: number;
     newBalance?: number;
   }> {
-    if (accountId === 0) {
-      return {
-        success: false,
-        message: 'Cannot set the system account balance',
-      };
-    }
     if (targetBalance < 0) {
       return { success: false, message: 'Target balance must be non-negative' };
     }
@@ -135,6 +152,13 @@ export class StarbankTransactionRepository implements IStarbankTransactionReposi
       // FOR UPDATE holds the row lock until commit, so a concurrent transfer cannot
       // land between the read and the set and leave the balance off target. Mirrors `create`.
       return await this.db.transaction(async (tx) => {
+        const systemId = await this.systemAccountId(tx);
+        if (accountId === systemId) {
+          return {
+            success: false,
+            message: 'Cannot set the system account balance',
+          };
+        }
         const rows = await tx
           .select({
             id: starBankAccounts.id,
@@ -160,17 +184,31 @@ export class StarbankTransactionRepository implements IStarbankTransactionReposi
           .set({ balance: targetBalance })
           .where(eq(starBankAccounts.id, accountId));
 
-        // Ledger the correction as a system (0) mint/burn: delta>0 credits the account,
-        // delta<0 debits it. The account side records the post-set balance, the system side 0.
+        // Ledger the correction as a mint/burn against the SYSTEM account: delta>0 credits
+        // the account, delta<0 debits it. Both sides record their post-set balance, and the
+        // SYSTEM side moves the opposite way — it is the counterparty, not a placeholder.
+        // (It was the literal id 0 until migration 0040, which no row could ever have: both
+        // FKs point at rotom_starbank_accounts.id, so every AJUSTE insert failed.)
         const isMint = delta > 0;
+        const systemRows = await tx
+          .select({ balance: starBankAccounts.balance })
+          .from(starBankAccounts)
+          .where(eq(starBankAccounts.id, systemId))
+          .for('update');
+        const systemBalance = (systemRows[0]?.balance ?? 0) - delta;
+        await tx
+          .update(starBankAccounts)
+          .set({ balance: systemBalance })
+          .where(eq(starBankAccounts.id, systemId));
+
         await tx
           .insert(starBankTransactions)
           .values({
-            fromAccountId: isMint ? 0 : accountId,
-            toAccountId: isMint ? accountId : 0,
+            fromAccountId: isMint ? systemId : accountId,
+            toAccountId: isMint ? accountId : systemId,
             amount: Math.abs(delta),
-            fromBalance: isMint ? 0 : targetBalance,
-            toBalance: isMint ? targetBalance : 0,
+            fromBalance: isMint ? systemBalance : targetBalance,
+            toBalance: isMint ? targetBalance : systemBalance,
             reason,
             type: TransactionType.AJUSTE,
             date: new Date(),

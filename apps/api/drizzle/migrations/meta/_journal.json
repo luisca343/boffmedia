@@ -281,6 +281,13 @@
       "when": 1785268016141,
       "tag": "0039_kart_races",
       "breakpoints": true
+    },
+    {
+      "idx": 40,
+      "version": "5",
+      "when": 1785354016141,
+      "tag": "0040_house_accounts",
+      "breakpoints": true
     }
   ]
 }
