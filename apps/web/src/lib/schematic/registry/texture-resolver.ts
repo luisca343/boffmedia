@@ -1,4 +1,6 @@
 import type JSZip from "jszip";
+import { forgeRepresentative, isForgeBlockstate } from "./forge-blockstate";
+import { vanillaTextureUrl } from "../textures/blockTexture";
 
 /**
  * Resolve a representative block texture out of a mod JAR.
@@ -12,8 +14,9 @@ import type JSZip from "jszip";
  * are simply skipped — simple blocks carry their real texture refs on the child
  * model, which is what we need.
  *
- * All lookups are scoped to a single JAR's ZIP; cross-JAR/vanilla parents resolve
- * to nothing, which is fine (those blocks fall back to a colored placeholder).
+ * Model lookups are scoped to this JAR's ZIP, but the resolved *texture* may
+ * still be a vanilla one (a modded wall of a vanilla material), in which case
+ * the PNG is not here to extract and a CDN URL is returned instead.
  */
 
 interface ModelJson {
@@ -24,6 +27,20 @@ interface ModelJson {
 interface BlockstateJson {
   variants?: Record<string, unknown>;
   multipart?: Array<{ apply?: unknown }>;
+}
+
+/**
+ * Case-insensitive path index for one JAR (lowercased path -> real path).
+ *
+ * Forge lowercases resource paths at build time while the JSON that references
+ * them keeps its original casing — Mekanism asks for `blocks/OsmiumOre` and
+ * ships `blocks/osmiumore.png`. An exact ZIP lookup therefore misses on a whole
+ * class of mods, so misses are retried through this index.
+ */
+export type JarIndex = Map<string, string>;
+
+function fileAt(zip: JSZip, path: string, index?: JarIndex): JSZip.JSZipObject | null {
+  return zip.file(path) ?? (index ? (zip.file(index.get(path.toLowerCase()) ?? "") ?? null) : null);
 }
 
 /** Split a resource ref ("ns:block/foo" | "block/foo") into [namespace, path]. */
@@ -51,9 +68,18 @@ const TEXTURE_KEY_PRIORITY = [
   "torch",
 ];
 
-async function loadModel(zip: JSZip, ref: string): Promise<ModelJson | undefined> {
+async function loadModel(
+  zip: JSZip,
+  ref: string,
+  index?: JarIndex,
+): Promise<ModelJson | undefined> {
   const [ns, path] = splitRef(ref);
-  const file = zip.file(`assets/${ns}/models/${path}.json`);
+  // Pre-1.13 blockstates name models relative to `models/block/` ("red_wool"),
+  // modern ones spell the folder out ("minecraft:block/red_wool"). Try the ref
+  // as written first so a modern path can never be shadowed.
+  const file =
+    fileAt(zip, `assets/${ns}/models/${path}.json`, index) ??
+    (path.includes("/") ? null : fileAt(zip, `assets/${ns}/models/block/${path}.json`, index));
   if (!file) return undefined;
   try {
     return JSON.parse(await file.async("string")) as ModelJson;
@@ -66,12 +92,13 @@ async function loadModel(zip: JSZip, ref: string): Promise<ModelJson | undefined
 async function collectTextures(
   zip: JSZip,
   modelRef: string,
+  index?: JarIndex,
   depth = 0,
 ): Promise<Record<string, string>> {
   if (depth > 6) return {};
-  const model = await loadModel(zip, modelRef);
+  const model = await loadModel(zip, modelRef, index);
   if (!model) return {};
-  const parent = model.parent ? await collectTextures(zip, model.parent, depth + 1) : {};
+  const parent = model.parent ? await collectTextures(zip, model.parent, index, depth + 1) : {};
   return { ...parent, ...(model.textures ?? {}) };
 }
 
@@ -120,9 +147,10 @@ function modelFromBlockstate(bs: BlockstateJson): string | undefined {
 }
 
 /**
- * Resolve a block's representative texture to a `data:image/png;base64,…` URL,
- * given its already-parsed blockstate JSON. Returns `undefined` when the model
- * chain, texture ref, or PNG can't be resolved inside this JAR.
+ * Resolve a block's representative texture, given its already-parsed blockstate
+ * JSON: a `data:image/png;base64,…` URL when the PNG is in this JAR, a CDN URL
+ * when the model points at a vanilla texture, `undefined` when neither the model
+ * chain nor a texture ref resolves.
  *
  * `pngCache` (texture path → data URL) dedupes PNG reads across the many blocks
  * in a JAR that share a texture — and because JS strings are shared by reference,
@@ -132,11 +160,19 @@ export async function resolveBlockTexture(
   zip: JSZip,
   blockstate: BlockstateJson,
   pngCache: Map<string, string>,
+  version?: string,
+  index?: JarIndex,
 ): Promise<string | undefined> {
-  const modelRef = modelFromBlockstate(blockstate);
-  if (!modelRef) return undefined;
+  // Forge v1 usually points every variant at a shared vanilla parent
+  // (`cube_all`) and declares the block's real textures beside it, so the
+  // blockstate's own texture map has to override the model chain's.
+  const forge = isForgeBlockstate(blockstate) ? forgeRepresentative(blockstate) : undefined;
+  const modelRef = forge ? forge.model : modelFromBlockstate(blockstate);
+  const overrides = forge?.textures ?? {};
+  if (!modelRef && !Object.keys(overrides).length) return undefined;
 
-  const textures = await collectTextures(zip, modelRef);
+  const inherited = modelRef ? await collectTextures(zip, modelRef, index) : {};
+  const textures = { ...inherited, ...overrides };
   const textureRef = pickTexture(textures);
   if (!textureRef) return undefined;
 
@@ -146,8 +182,14 @@ export async function resolveBlockTexture(
   const cached = pngCache.get(pngPath);
   if (cached) return cached;
 
-  const file = zip.file(pngPath);
-  if (!file) return undefined;
+  const file = fileAt(zip, pngPath, index);
+  if (!file) {
+    // A mod block whose model points at a VANILLA texture — a modded wall or
+    // stair of a vanilla material reuses that material's PNG, which ships in the
+    // client jar, not in this JAR. Common enough that treating it as
+    // "no texture" leaves whole categories of mod blocks as blank placeholders.
+    return ns === "minecraft" ? vanillaTextureUrl(path, version) : undefined;
+  }
   const dataUrl = `data:image/png;base64,${await file.async("base64")}`;
   pngCache.set(pngPath, dataUrl);
   return dataUrl;

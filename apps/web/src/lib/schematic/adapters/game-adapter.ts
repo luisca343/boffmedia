@@ -5,6 +5,7 @@ import type {
   ScanOverride,
   ExportFormat,
   UnifiedBlock,
+  SchematicParseOptions,
 } from "../types";
 
 export type GameId = "minecraft" | "hytale";
@@ -124,8 +125,12 @@ export interface GameAdapter {
     options?: BuildRegistryOptions,
   ): Promise<BlockRegistry>;
 
-  /** Parse a schematic/structure file into the engine's neutral representation. */
-  parseSchematic(file: File): Promise<SchematicStructure>;
+  /**
+   * Parse a schematic/structure file into the engine's neutral representation.
+   * `options` carries inputs the file alone cannot supply (a pre-1.13 world's
+   * block-id table); adapters whose formats never need them ignore it.
+   */
+  parseSchematic(file: File, options?: SchematicParseOptions): Promise<SchematicStructure>;
 }
 
 /** Drives the game switcher in the UI. Order is display order. */

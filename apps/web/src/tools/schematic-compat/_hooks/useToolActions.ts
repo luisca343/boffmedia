@@ -29,7 +29,11 @@ export function useToolActions(api: Remote<CompatWorkerAPI> | null) {
     onGameChanged,
   } = useConversionActions(api);
 
-  const { loadSchematic } = useDocumentActions(useToolStore, api, { onDocumentChanged });
+  const { loadSchematic, attachWorldIds, clearWorldIds } = useDocumentActions(
+    useToolStore,
+    api,
+    { onDocumentChanged },
+  );
 
   const { scanInstance, changeGame, retryPendingScan, cancelPendingScan, loadVanillaEnv } =
     useEnvironmentActions(useToolStore, api, {
@@ -58,6 +62,8 @@ export function useToolActions(api: Remote<CompatWorkerAPI> | null) {
     changeSourceGame,
     changeTargetGame,
     loadSchematic,
+    attachWorldIds,
+    clearWorldIds,
     analyze,
     exportSchematic,
     exportRuleSet,

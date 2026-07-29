@@ -7,6 +7,7 @@ import {
   useEnvironmentActions,
   useSchematicPositions,
 } from "@/lib/schematic/actions";
+import type { EnvMode } from "@/lib/schematic/state";
 import type { ViewerWorkerAPI } from "../_lib/viewer-api";
 import { useViewerStore } from "../_store/viewer.store";
 
@@ -17,23 +18,40 @@ import { useViewerStore } from "../_store/viewer.store";
  * a new document could invalidate.
  */
 export function useViewerActions(api: Remote<ViewerWorkerAPI> | null, engineReady: boolean) {
-  const { loadSchematic } = useDocumentActions(useViewerStore, api);
-  const { loadVanillaEnv } = useEnvironmentActions(useViewerStore, api);
+  const { loadSchematic, attachWorldIds, clearWorldIds } = useDocumentActions(useViewerStore, api);
+  const { loadVanillaEnv, scanInstance } = useEnvironmentActions(useViewerStore, api);
   useSchematicPositions(useViewerStore, api);
 
   const version = useViewerStore((s) => s.envs.source.vanillaVersion);
+  const envMode = useViewerStore((s) => s.envs.source.envMode);
   const setVanillaVersion = useViewerStore((s) => s.setVanillaVersion);
+  const setEnvMode = useViewerStore((s) => s.setEnvMode);
 
-  // Picking a version IS the environment choice — there is no folder to select
-  // and no confirm step, so build the registry as soon as it changes.
+  // In vanilla mode picking a version IS the environment choice — there is no
+  // folder to select and no confirm step, so build the registry as soon as it
+  // changes. A scanned instance is driven by the folder pick instead.
   useEffect(() => {
-    if (engineReady) void loadVanillaEnv("source", version);
-  }, [engineReady, version, loadVanillaEnv]);
+    if (engineReady && envMode === "vanilla") void loadVanillaEnv("source", version);
+  }, [engineReady, envMode, version, loadVanillaEnv]);
 
   const changeVersion = useCallback(
     (v: string) => setVanillaVersion("source", v),
     [setVanillaVersion],
   );
 
-  return { loadSchematic, changeVersion };
+  const changeMode = useCallback((m: EnvMode) => setEnvMode("source", m), [setEnvMode]);
+
+  const scanEnvironment = useCallback(
+    (files: File[]) => void scanInstance("source", "minecraft", files),
+    [scanInstance],
+  );
+
+  return {
+    loadSchematic,
+    attachWorldIds,
+    clearWorldIds,
+    changeVersion,
+    changeMode,
+    scanEnvironment,
+  };
 }

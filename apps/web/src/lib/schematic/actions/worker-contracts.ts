@@ -5,6 +5,7 @@ import type {
   RegistryHandle,
   ScanOverride,
   SchematicSummary,
+  WorldIdSummary,
 } from "../types";
 
 /**
@@ -21,6 +22,12 @@ export interface ReleasableApi {
 
 export interface DocumentApi extends ReleasableApi {
   loadSchematic(file: File): Promise<SchematicSummary>;
+  /**
+   * Optional: attach the pre-1.13 world whose `level.dat` names the numeric
+   * block ids in legacy files. A tool that never opens legacy inputs omits it.
+   */
+  loadWorldIds?(file: File): Promise<WorldIdSummary>;
+  clearWorldIds?(): Promise<void>;
 }
 
 export interface EnvironmentApi extends ReleasableApi {

@@ -171,12 +171,13 @@ export async function buildScannedRegistry(
   const mods: ModInfo[] = [];
 
   const total = jarFiles.length;
+  let failedJars = 0;
   for (let i = 0; i < total; i++) {
     const jar = jarFiles[i];
     const pct = total ? 8 + Math.round(((i + 1) / total) * 88) : 96;
     onProgress(pct, `Scanning ${jar.name}… ${i + 1}/${total}`);
     try {
-      const scanned = await scanJar(jar);
+      const scanned = await scanJar(jar, info.version);
       if (scanned.mod) mods.push(scanned.mod);
       for (const [id, def] of scanned.blocks) registry.blocks.set(id, def);
       for (const [tagId, members] of scanned.tags) {
@@ -184,7 +185,10 @@ export async function buildScannedRegistry(
       }
       for (const [id, dataUrl] of scanned.textures) textures.set(id, dataUrl);
     } catch {
-      // A corrupt/non-JAR file in mods/ shouldn't abort the whole scan.
+      // A corrupt/unreadable JAR shouldn't abort the whole scan — but it must
+      // not be invisible either: every skipped jar is a mod whose blocks will
+      // render as placeholders, so the count surfaces in the registry handle.
+      failedJars++;
     }
   }
 
@@ -196,6 +200,7 @@ export async function buildScannedRegistry(
     version: info.version, // surface the real detected version, not the bundled base
     modLoader: info.modLoader,
     mods,
+    ...(failedJars ? { failedJars } : {}),
     tags,
     textures,
     snapshotHash: `scan-${info.version}-${mods.length}-${registry.blocks.size}`,

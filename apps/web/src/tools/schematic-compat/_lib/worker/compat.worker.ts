@@ -7,6 +7,7 @@ import type {
   UnifiedBlock,
   RegistryHandle,
   SchematicSummary,
+  WorldIdSummary,
   CompatDiff,
   ResolutionMap,
   RuleSet,
@@ -97,6 +98,10 @@ const api: CompatWorkerAPI = {
     core.getBlockModel(state, registryId, blockId, stateLabel, rotation),
 
   loadSchematic: (file: File): Promise<SchematicSummary> => core.loadSchematic(state, file),
+
+  loadWorldIds: (file: File): Promise<WorldIdSummary> => core.loadWorldIds(state, file),
+
+  clearWorldIds: (): Promise<void> => core.clearWorldIds(state),
 
   getSchematicBlockPositions: (schematicId: string): Promise<BlockPositionGroup[]> =>
     core.getSchematicBlockPositions(state, schematicId),

@@ -87,6 +87,8 @@ export function SchematicCompatTool() {
               onRetryPendingScan={actions.retryPendingScan}
               onCancelPendingScan={actions.cancelPendingScan}
               onPickSchematic={actions.loadSchematic}
+              onPickWorld={actions.attachWorldIds}
+              onDetachWorld={actions.clearWorldIds}
               onAnalyze={actions.analyze}
             />
           </aside>
