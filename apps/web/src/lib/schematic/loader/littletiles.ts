@@ -20,7 +20,13 @@
  */
 import { parseBlockState } from "../normalizer";
 import type { LegacyTables } from "./legacy/legacy-mapper";
-import type { TileEntity, UnifiedBlock, LittleTilesData, LittleTilesGroup } from "../types";
+import type {
+  TileEntity,
+  UnifiedBlock,
+  LittleTilesData,
+  LittleTilesGroup,
+  LittleTilesStructure,
+} from "../types";
 
 export function isLittleTilesEntity(te: TileEntity): boolean {
   return te.id.toLowerCase().includes("littletiles");
@@ -111,16 +117,42 @@ export function decodeTransformableCorners(box: number[]): Float32Array {
   return corners;
 }
 
+/**
+ * One `children` entry of a legacy TE: a single structure's content *in this
+ * block*. The main block's entry carries the `structure` compound; a member
+ * block's entry carries `coord` instead — the linkage pointer to the main
+ * (main = this TE's pos + coord, verified 33/33 on a real world). Tiles always
+ * belong to the owning TE's own cell. Nested entries are sub-structures.
+ */
+export interface LittleTilesChild {
+  tiles: LittleTilesTile[];
+  /** Raw `structure` compound — present only on the structure's MAIN entry. */
+  structure?: Record<string, unknown>;
+  /** Main-block linkage (relative) — present only on member entries. */
+  coord?: [number, number, number];
+  children?: LittleTilesChild[];
+}
+
 export interface LittleTilesEntity {
   pos: { x: number; y: number; z: number };
   grid: number;
+  /** Free tiles owned by this block (not part of any structure). */
   tiles: LittleTilesTile[];
-  /**
-   * The TE carried LT structures (doors, chairs, lights…). Their *geometry* is
-   * parsed — every tile belongs to this TE's own cell — but the structure
-   * behaviour (opening, toggling, linkage) is not represented.
-   */
+  /** Per-structure slices hosted in this block (see {@link LittleTilesChild}). */
+  children: LittleTilesChild[];
+  /** The TE carried LT structures (doors, chairs, lights…). */
   hasStructures: boolean;
+}
+
+/** Every tile of an entity — own free tiles plus all structure slices. */
+export function* eachTile(entity: LittleTilesEntity): Generator<LittleTilesTile> {
+  yield* entity.tiles;
+  const stack = [...entity.children];
+  while (stack.length) {
+    const child = stack.pop()!;
+    yield* child.tiles;
+    if (child.children) stack.push(...child.children);
+  }
 }
 
 /**
@@ -199,31 +231,38 @@ function parseLegacyTileList(
 }
 
 /**
- * Walk a content compound's `children`, accumulating their tiles.
- *
- * A child entry is one structure's content *in this block*. Its `coord`, when
- * present, points at the structure's MAIN block (relative to this TE) — it is
- * linkage, not placement: measured on a real 1.12 world, all 540 coords
- * resolved to another LT tile entity, and each of a door's 8 member blocks
- * carried exactly its own slice of the door in a coord child. So child tiles
- * always land in this TE's own cell and `coord` is deliberately ignored.
- * Bounded depth — a malformed file must not recurse forever.
+ * Parse a content compound's `children` list, keeping the per-structure
+ * topology: each entry's tiles stay attributed to it, the main entry keeps its
+ * raw `structure` compound and member entries their `coord` linkage (see
+ * {@link LittleTilesChild}; tiles always belong to the owning TE's own cell —
+ * `coord` is linkage, not placement, verified on a real world where all 540
+ * coords resolved to another LT tile entity). Bounded depth — a malformed file
+ * must not recurse forever.
  */
-function collectChildren(
+function parseChildren(
   content: Record<string, unknown>,
   tables: LegacyTables,
-  out: LittleTilesTile[],
   depth = 0,
-): boolean {
-  const children = Array.isArray(content.children) ? content.children : [];
-  if (children.length === 0 || depth > 4) return false;
-  for (const raw of children) {
-    if (typeof raw !== "object" || raw === null || Array.isArray(raw)) continue;
-    const child = raw as Record<string, unknown>;
-    parseLegacyTileList(child.tiles, tables, out);
-    collectChildren(child, tables, out, depth + 1);
+): LittleTilesChild[] {
+  const raw = Array.isArray(content.children) ? content.children : [];
+  if (raw.length === 0 || depth > 4) return [];
+  const out: LittleTilesChild[] = [];
+  for (const entry of raw) {
+    if (typeof entry !== "object" || entry === null || Array.isArray(entry)) continue;
+    const c = entry as Record<string, unknown>;
+    const child: LittleTilesChild = { tiles: [] };
+    parseLegacyTileList(c.tiles, tables, child.tiles);
+    if (typeof c.structure === "object" && c.structure !== null && !Array.isArray(c.structure)) {
+      child.structure = c.structure as Record<string, unknown>;
+    }
+    if (c.coord instanceof Int32Array && c.coord.length === 3) {
+      child.coord = [c.coord[0], c.coord[1], c.coord[2]];
+    }
+    const nested = parseChildren(c, tables, depth + 1);
+    if (nested.length > 0) child.children = nested;
+    if (child.tiles.length > 0 || child.structure || child.coord || child.children) out.push(child);
   }
-  return true;
+  return out;
 }
 
 /** Parse one legacy (1.12) LittleTiles TE, or `null` when it isn't one. */
@@ -234,16 +273,21 @@ export function parseLittleTilesEntity(
   if (!isLittleTilesEntity(te)) return null;
   const c = contentOf(te);
   if (!c) return null;
-  const grid = typeof c.grid === "number" && c.grid > 0 ? c.grid : 16;
+  // 1.12 saves the grid at the TE data ROOT (TileEntityLittleTiles.writeToNBT
+  // calls context.set(nbt) on the root compound), and only when it differs
+  // from the default 16 — a grid-2 build parsed as 16 shrinks every box to
+  // 1/8. content.grid is kept as a fallback for blueprint-style exports.
+  const rawGrid = typeof te.data.grid === "number" ? te.data.grid : c.grid;
+  const grid = typeof rawGrid === "number" && rawGrid > 0 ? rawGrid : 16;
 
   const tiles: LittleTilesTile[] = [];
   parseLegacyTileList(c.tiles, tables, tiles);
-  // Structure content lives here: a block whose tiles are all part of a
-  // structure (a door member, a light) keeps them under `children`, and its
-  // plain `tiles` list is empty — skipping children loses the whole structure.
-  const hasStructures = collectChildren(c, tables, tiles);
+  // Structure content lives in `children`: a block whose tiles are all part of
+  // a structure (a door member, a light) keeps them there, and its plain
+  // `tiles` list is empty — skipping children loses the whole structure.
+  const children = parseChildren(c, tables);
 
-  return { pos: te.pos, grid, tiles, hasStructures };
+  return { pos: te.pos, grid, tiles, children, hasStructures: children.length > 0 };
 }
 
 /** Parse one modern (1.18+) LittleTiles TE, or `null` when it isn't one. */
@@ -290,6 +334,9 @@ export function parseModernLittleTilesEntity(te: TileEntity): LittleTilesEntity 
     pos: te.pos,
     grid,
     tiles: tiles.filter((t) => t.boxes.length > 0),
+    // Modern structure topology isn't parsed yet — modern TEs pass through
+    // export byte-faithfully, so nothing is lost by leaving this empty.
+    children: [],
     hasStructures: Array.isArray(c.children) && c.children.length > 0,
   };
 }
@@ -327,9 +374,22 @@ function tileTint(raw: number): [number, number, number] | null {
   return [r / 255, g / 255, b / 255];
 }
 
+/** Structure instance under construction, keyed by its main block's position. */
+interface MutableStructure {
+  type: string;
+  name?: string;
+  mainPos: { x: number; y: number; z: number };
+  members: Set<string>;
+  tileCount: number;
+  boxes: number[]; // stride 9, same layout as LittleTilesGroup.boxes
+  corners: number[]; // 24 floats per transformable box
+}
+
 /**
- * Parse every LittleTiles TE into per-material box groups. Returns `undefined`
- * when the schematic has no LittleTiles content.
+ * Parse every LittleTiles TE into per-material box groups, plus one
+ * {@link LittleTilesStructure} per structure instance (main block's `structure`
+ * compound + members linked via `coord`). Returns `undefined` when the
+ * schematic has no LittleTiles content.
  */
 export function parseLittleTiles(
   tileEntities: TileEntity[],
@@ -339,51 +399,95 @@ export function parseLittleTiles(
     string,
     { block: UnifiedBlock; tileCount: number; boxes: RawBox[]; transformed: RawCorners[] }
   >();
+  const structures = new Map<string, MutableStructure>();
   let blockCount = 0;
   let tileCount = 0;
+
+  const structureAt = (pos: { x: number; y: number; z: number }): MutableStructure => {
+    const key = `${pos.x},${pos.y},${pos.z}`;
+    let s = structures.get(key);
+    if (!s) {
+      s = { type: "", mainPos: pos, members: new Set(), tileCount: 0, boxes: [], corners: [] };
+      structures.set(key, s);
+    }
+    return s;
+  };
+
+  const addTile = (
+    entity: LittleTilesEntity,
+    tile: LittleTilesTile,
+    struct: MutableStructure | null,
+  ): void => {
+    tileCount++;
+    let group = byMaterial.get(tile.block.id);
+    if (!group) {
+      group = { block: tile.block, tileCount: 0, boxes: [], transformed: [] };
+      byMaterial.set(tile.block.id, group);
+    }
+    group.tileCount++;
+    if (struct) struct.tileCount++;
+
+    const color = tileTint(tile.color);
+    const host = entity.pos;
+    for (const box of tile.boxes) {
+      if (isTransformableBox(box)) {
+        // Slope/wedge: resolve the 8 corners to absolute world coords now so
+        // the renderer builds geometry without knowing grids or hosts. Block
+        // cells are centred on integer coords (the same convention as the
+        // plain-box path: cell origin = host − 0.5).
+        const corners = decodeTransformableCorners(box);
+        for (let i = 0; i < 8; i++) {
+          corners[i * 3] = host.x - 0.5 + corners[i * 3] / entity.grid;
+          corners[i * 3 + 1] = host.y - 0.5 + corners[i * 3 + 1] / entity.grid;
+          corners[i * 3 + 2] = host.z - 0.5 + corners[i * 3 + 2] / entity.grid;
+        }
+        group.transformed.push({ by: host.y, corners, color });
+        if (struct) struct.corners.push(...corners);
+        continue;
+      }
+      const [x0, y0, z0, x1, y1, z1] = box;
+      const coords = [
+        host.x, host.y, host.z,
+        x0 / entity.grid, y0 / entity.grid, z0 / entity.grid,
+        x1 / entity.grid, y1 / entity.grid, z1 / entity.grid,
+      ];
+      group.boxes.push({ by: host.y, coords, color });
+      if (struct) struct.boxes.push(...coords);
+    }
+  };
+
+  const addChildTree = (
+    entity: LittleTilesEntity,
+    child: LittleTilesChild,
+    struct: MutableStructure | null,
+  ): void => {
+    for (const tile of child.tiles) addTile(entity, tile, struct);
+    // Nested entries are sub-structures; their geometry belongs to the same
+    // top-level instance for listing/highlight purposes.
+    for (const nested of child.children ?? []) addChildTree(entity, nested, struct);
+  };
 
   for (const te of tileEntities) {
     const entity = parseAnyLittleTilesEntity(te, tables);
     if (!entity) continue;
     blockCount++;
 
-    for (const tile of entity.tiles) {
-      tileCount++;
-      let group = byMaterial.get(tile.block.id);
-      if (!group) {
-        group = { block: tile.block, tileCount: 0, boxes: [], transformed: [] };
-        byMaterial.set(tile.block.id, group);
-      }
-      group.tileCount++;
-
-      const color = tileTint(tile.color);
-      const host = te.pos;
-      for (const box of tile.boxes) {
-        if (isTransformableBox(box)) {
-          // Slope/wedge: resolve the 8 corners to absolute world coords now so
-          // the renderer builds geometry without knowing grids or hosts. Block
-          // cells are centred on integer coords (the same convention as the
-          // plain-box path: cell origin = host − 0.5).
-          const corners = decodeTransformableCorners(box);
-          for (let i = 0; i < 8; i++) {
-            corners[i * 3] = host.x - 0.5 + corners[i * 3] / entity.grid;
-            corners[i * 3 + 1] = host.y - 0.5 + corners[i * 3 + 1] / entity.grid;
-            corners[i * 3 + 2] = host.z - 0.5 + corners[i * 3 + 2] / entity.grid;
-          }
-          group.transformed.push({ by: host.y, corners, color });
-          continue;
+    for (const tile of entity.tiles) addTile(entity, tile, null);
+    for (const child of entity.children) {
+      let struct: MutableStructure | null = null;
+      if (child.structure) {
+        struct = structureAt(entity.pos);
+        const id = child.structure.id;
+        struct.type = typeof id === "string" && id.length > 0 ? id : "unknown";
+        if (typeof child.structure.name === "string" && child.structure.name.length > 0) {
+          struct.name = child.structure.name;
         }
-        const [x0, y0, z0, x1, y1, z1] = box;
-        group.boxes.push({
-          by: host.y,
-          coords: [
-            host.x, host.y, host.z,
-            x0 / entity.grid, y0 / entity.grid, z0 / entity.grid,
-            x1 / entity.grid, y1 / entity.grid, z1 / entity.grid,
-          ],
-          color,
-        });
+      } else if (child.coord) {
+        const [cx, cy, cz] = child.coord;
+        struct = structureAt({ x: entity.pos.x + cx, y: entity.pos.y + cy, z: entity.pos.z + cz });
       }
+      struct?.members.add(`${entity.pos.x},${entity.pos.y},${entity.pos.z}`);
+      addChildTree(entity, child, struct);
     }
   }
 
@@ -425,5 +529,33 @@ export function parseLittleTiles(
     groups.push(group);
   }
 
-  return { blockCount, tileCount, groups };
+  const structureList: LittleTilesStructure[] = [...structures.values()]
+    .map((s) => {
+      const out: LittleTilesStructure = {
+        // A member whose main block lies outside the schematic never met its
+        // `structure` compound — surface it as "unknown" so the editor can warn.
+        type: s.type || "unknown",
+        mainPos: s.mainPos,
+        blockCount: s.members.size,
+        tileCount: s.tileCount,
+        boxes: Float32Array.from(s.boxes),
+      };
+      if (s.name) out.name = s.name;
+      if (s.corners.length > 0) out.corners = Float32Array.from(s.corners);
+      return out;
+    })
+    .sort(
+      (a, b) =>
+        a.type.localeCompare(b.type) ||
+        a.mainPos.y - b.mainPos.y ||
+        a.mainPos.z - b.mainPos.z ||
+        a.mainPos.x - b.mainPos.x,
+    );
+
+  return {
+    blockCount,
+    tileCount,
+    groups,
+    ...(structureList.length > 0 ? { structures: structureList } : {}),
+  };
 }

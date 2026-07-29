@@ -156,6 +156,17 @@
           "clearSelection": "Clear selection",
           "close": "Close"
         },
+        "structures": {
+          "header": "Structures",
+          "instances": "{count, plural, one {# instance} other {# instances}}",
+          "tiles": "{count, plural, one {# tile} other {# tiles}}",
+          "badgeConverts": "converts",
+          "badgeFlattens": "flattens",
+          "flattensUnsupportedHint": "This structure type exists in 1.21 but its behavior can't be converted yet — its tiles will be exported as plain static tiles.",
+          "flattensUnknownHint": "This structure can't be carried over (unknown type, or its main block lies outside the schematic) — its tiles will be exported as plain static tiles.",
+          "expand": "Show instances",
+          "collapse": "Hide instances"
+        },
         "guide": {
           "title": "How to use",
           "step1": "Pick the source environment folder — the Minecraft instance the schematic was built in.",

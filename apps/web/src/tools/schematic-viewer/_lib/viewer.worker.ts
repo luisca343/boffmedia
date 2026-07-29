@@ -32,6 +32,8 @@ const api: ViewerWorkerAPI = {
 
   getLittleTileBoxes: (schematicId: string) => core.getLittleTileBoxes(state, schematicId),
 
+  getLittleTileStructures: (schematicId: string) => core.getLittleTileStructures(state, schematicId),
+
   release: (id: string) => core.release(state, id),
 };
 

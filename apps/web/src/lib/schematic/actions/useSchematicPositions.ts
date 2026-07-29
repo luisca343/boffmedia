@@ -33,17 +33,20 @@ export function useSchematicPositions<S extends PositionsStore>(
     if (!api || !schematicId) {
       setBlockPositions([]);
       store.getState().setLittleTileGroups([]);
+      store.getState().setLittleTileStructures([]);
       setFetchingPositions(false);
       return;
     }
     let cancelled = false;
     setFetchingPositions(true);
     const boxes = api.getLittleTileBoxes?.(schematicId) ?? Promise.resolve([]);
-    Promise.all([api.getSchematicBlockPositions(schematicId), boxes])
-      .then(([groups, ltGroups]) => {
+    const structures = api.getLittleTileStructures?.(schematicId) ?? Promise.resolve([]);
+    Promise.all([api.getSchematicBlockPositions(schematicId), boxes, structures])
+      .then(([groups, ltGroups, ltStructures]) => {
         if (cancelled) return;
         setBlockPositions(groups);
         store.getState().setLittleTileGroups(ltGroups);
+        store.getState().setLittleTileStructures(ltStructures);
       })
       .catch(console.error)
       .finally(() => {

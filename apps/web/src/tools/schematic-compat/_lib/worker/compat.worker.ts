@@ -11,6 +11,7 @@ import type {
   SchematicSummary,
   WorldIdSummary,
   LittleTilesGroup,
+  LittleTilesStructure,
   CompatDiff,
   ResolutionMap,
   RuleSet,
@@ -111,6 +112,9 @@ const api: CompatWorkerAPI = {
 
   getLittleTileBoxes: (schematicId: string): Promise<LittleTilesGroup[]> =>
     core.getLittleTileBoxes(state, schematicId),
+
+  getLittleTileStructures: (schematicId: string): Promise<LittleTilesStructure[]> =>
+    core.getLittleTileStructures(state, schematicId),
 
   release: (id: string) => core.release(state, id),
 

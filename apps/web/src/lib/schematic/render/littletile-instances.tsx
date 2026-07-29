@@ -17,6 +17,12 @@ export interface LittleTileInstancesProps {
   /** Same gate the block meshes use: only orbit-mode cursor picks select. */
   cursorPickingRef: React.RefObject<boolean>;
   onSelect: (blockId: string) => void;
+  /** Block id whose texture to draw (a render plan's target); defaults to the
+   *  group's own material. Selection still keys on the group's id. */
+  textureId?: string;
+  /** States driving the texture lookup; defaults to the group block's own. */
+  states?: Record<string, string>;
+  kind?: "normal" | "changed" | "ghost" | "problem";
 }
 
 /** Last index whose Y (stride `stride`, offset `off`) is ≤ `maxY`, or −1. */
@@ -58,7 +64,7 @@ const QUADS: ReadonlyArray<readonly [number, number, number, number, number]> = 
  * absolute world coords, so UVs project straight from position and repeat
  * once per block, matching the texture scale of full blocks.
  */
-function buildTransformedGeometry(
+export function buildTransformedGeometry(
   corners: Float32Array,
   colors: Float32Array | undefined,
 ): THREE.BufferGeometry {
@@ -137,6 +143,9 @@ export function LittleTileInstances({
   textureLoader,
   cursorPickingRef,
   onSelect,
+  textureId,
+  states,
+  kind = "normal",
 }: LittleTileInstancesProps) {
   const meshRef = useRef<THREE.InstancedMesh>(null);
   const boxes = group.boxes;
@@ -191,13 +200,9 @@ export function LittleTileInstances({
     transformedGeo.setDrawRange(0, (last + 1) * 36);
   }, [transformedGeo, group.cornerHostY, transformedCount, maxLayerY]);
 
-  const texture = useBlockTexture(
-    group.block.id,
-    version,
-    registryId,
-    textureLoader,
-    metaOf(group.block.states),
-  );
+  const renderId = textureId ?? group.block.id;
+  const renderStates = states ?? group.block.states;
+  const texture = useBlockTexture(renderId, version, registryId, textureLoader, metaOf(renderStates));
   // World-coordinate UVs on the slope mesh run past [0,1]; the shared texture
   // must wrap for them (harmless for the cube path, whose UVs stay in range).
   useEffect(() => {
@@ -210,8 +215,8 @@ export function LittleTileInstances({
   }, [texture, transformedCount]);
 
   if (maxCount === 0 && transformedCount === 0) return null;
-  const sp = styleParams("normal", isSelected);
-  const color = surfaceColor(group.block.id, !!texture, null, sp.ghost);
+  const sp = styleParams(kind, isSelected);
+  const color = surfaceColor(renderId, !!texture, null, sp.ghost);
   const handleClick = (e: { stopPropagation: () => void }) => {
     if (!cursorPickingRef.current) return;
     e.stopPropagation();

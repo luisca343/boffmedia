@@ -23,6 +23,7 @@ export {
   type BlockVariant,
   type BlockVariantResolver,
 } from "./block-instances";
+export { LittleTileHighlight, type LittleTileHighlightProps } from "./littletile-highlight";
 export { CameraRig, FlyRig, type FlyRigProps } from "./camera-rigs";
 export { FlyHud, useFlyHud, type FlyHudLabels, type FlyHudRefs } from "./fly-hud";
 export { sourcePlan, type RenderKind, type RenderPlan } from "./render-plan";
