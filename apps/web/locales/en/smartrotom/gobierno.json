@@ -85,7 +85,8 @@
       "rendimiento": "Performance",
       "actividad": "Activity",
       "notificaciones": "Notifications",
-      "senalizacion": "Signage"
+      "senalizacion": "Signage",
+      "traslado": "Transfer"
     },
     "header": {
       "title": "Government of Teras",
@@ -1159,6 +1160,23 @@
     },
     "ui": {
       "sealAriaLabel": "Seal of the Government of Teras"
+    },
+    "traslado": {
+      "kicker": "Administration",
+      "title": "Transfer",
+      "sub": "Move a player to a taxi stop",
+      "heroTitle": "Player transfer",
+      "orden": "Transfer order",
+      "jugador": "Player",
+      "destino": "Destination",
+      "motivo": "Reason",
+      "motivoPlaceholder": "Optional — recorded and shown to the player",
+      "aviso": "Note",
+      "avisoTexto": "No fare and no money moves: this is not a trip and never appears in the player's passport. It is recorded in Activity and the player is told in-game.",
+      "trasladar": "Transfer",
+      "trasladando": "Transferring…",
+      "trasladado": "Player transferred",
+      "errorTrasladar": "Could not transfer the player"
     }
   }
 }

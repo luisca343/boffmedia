@@ -85,7 +85,8 @@
       "rendimiento": "Rendimiento",
       "actividad": "Actividad",
       "notificaciones": "Notificaciones",
-      "senalizacion": "Señalización"
+      "senalizacion": "Señalización",
+      "traslado": "Traslado"
     },
     "header": {
       "title": "Gobierno de Teras",
@@ -1159,6 +1160,23 @@
     },
     "ui": {
       "sealAriaLabel": "Sello del Gobierno de Teras"
+    },
+    "traslado": {
+      "kicker": "Administración",
+      "title": "Traslado",
+      "sub": "Mover a un jugador a una parada del taxi",
+      "heroTitle": "Traslado de jugadores",
+      "orden": "Orden de traslado",
+      "jugador": "Jugador",
+      "destino": "Destino",
+      "motivo": "Motivo",
+      "motivoPlaceholder": "Opcional — se registra y se le comunica al jugador",
+      "aviso": "Aviso",
+      "avisoTexto": "No hay tarifa ni movimiento de dinero: esto no es un viaje y no aparece en el pasaporte del jugador. Queda registrado en Actividad y se avisa al jugador en el juego.",
+      "trasladar": "Trasladar",
+      "trasladando": "Trasladando…",
+      "trasladado": "Jugador trasladado",
+      "errorTrasladar": "No se pudo trasladar al jugador"
     }
   }
 }

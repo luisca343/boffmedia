@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react"
 import { useTranslations } from "next-intl"
 import { useBoffSession } from "@/services/useBoffSession"
+import { useApiError } from "@/hooks/useApiError"
 import { useRotomUuid } from "@/components/smartrotom/behavior/useRotomUuid"
 import { MapCanvas } from "./_components/map/MapCanvas"
 import { DestinationsPanel } from "./_components/DestinationsPanel"
@@ -13,7 +14,15 @@ import { ConfirmModal, InsufficientModal } from "./_components/flows/ConfirmModa
 import { TravelingOverlay } from "./_components/flows/TravelingOverlay"
 import { WalletModal } from "./_components/flows/WalletModal"
 import { ToastHost, toast } from "./_components/ui"
-import { useBalance, useLedger, usePlayerPosition, useRegions, useStops, useTeleport } from "./_hooks/queries"
+import {
+  useBalance,
+  useLedger,
+  usePlayerPosition,
+  useRegions,
+  useStops,
+  useTaxiConfig,
+  useTeleport,
+} from "./_hooks/queries"
 import { useEnrichedStops } from "./_hooks/useEnrichedStops"
 import { useFavorites } from "./_hooks/useFavorites"
 import { useReducedMotion, useViewportHeight, useWide } from "./_hooks/useMediaQuery"
@@ -36,7 +45,9 @@ export default function TaxiPage() {
   const positionQuery = usePlayerPosition()
   const balanceQuery = useBalance(uuid)
   const ledgerQuery = useLedger(uuid)
+  const configQuery = useTaxiConfig()
   const teleport = useTeleport(uuid)
+  const apiError = useApiError()
 
   const wide = useWide()
   const reduceMotion = useReducedMotion()
@@ -57,7 +68,10 @@ export default function TaxiPage() {
   const stops = useEnrichedStops(stopsQuery.data ?? [], player, regionsQuery.data ?? [])
 
   // The passport and the "recientes" rail are the same ledger read, seen two ways.
-  const trips = useMemo(() => tripsFromTransactions(transactions), [transactions])
+  const trips = useMemo(
+    () => tripsFromTransactions(transactions, configQuery.data?.serviceAccountId),
+    [transactions, configQuery.data],
+  )
   const stats = useMemo(() => travelStats(trips), [trips])
 
   // The map is stale about the selected stop's fare the moment the player moves, so the
@@ -94,7 +108,7 @@ export default function TaxiPage() {
     const stop = selectedLive
     setFlow("traveling")
     teleport.mutate(
-      { stop, price: stop.price },
+      { stop },
       {
         onSuccess: () => {
           setFlow("idle")
@@ -107,13 +121,16 @@ export default function TaxiPage() {
             }),
           )
         },
+        // Every refusal now carries a code (offline, unsafe arrival, in a dungeon run, server
+        // busy) and none of them cost the player anything, so it is safe to say plainly what
+        // happened instead of the old "contact support".
         onError: (error) => {
           setFlow("idle")
-          toast.error(error instanceof Error ? error.message : t("errors.tripFailed"))
+          toast.error(apiError(error, t("errors.tripFailed")))
         },
       },
     )
-  }, [selectedLive, teleport])
+  }, [selectedLive, teleport, apiError, t])
 
   const openWallet = useCallback(() => {
     setFlow("idle")

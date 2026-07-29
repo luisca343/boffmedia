@@ -68,6 +68,7 @@ import { GobiernoModule } from '@api/smartrotom/gobierno/gobierno.module';
 import { RookerModule } from '@api/smartrotom/rooker/rooker.module';
 import { PasaporteModule } from '@api/smartrotom/pasaporte/pasaporte.module';
 import { WigglypopModule } from '@api/smartrotom/wigglypop/wigglypop.module';
+import { TaxiModule } from '@api/smartrotom/taxi/taxi.module';
 
 @Module({
   imports: [
@@ -136,6 +137,7 @@ import { WigglypopModule } from '@api/smartrotom/wigglypop/wigglypop.module';
     RookerModule,
     PasaporteModule,
     WigglypopModule,
+    TaxiModule,
   ],
   controllers: [AppController],
   providers: [
@@ -172,6 +174,12 @@ export class AppModule implements NestModule {
         // field. Must never inherit the public MC_WORLD tripwire.
         { path: 'smartrotom/starbank/set-balance', method: RequestMethod.POST },
         { path: 'smartrotom/starbank/accounts', method: RequestMethod.POST },
+        // Editing an account is multipart, so the middleware cannot see a `server` field at all
+        // — multer parses the body after it runs. GameOrUserAuthGuard owns this route's auth.
+        {
+          path: 'smartrotom/starbank/accounts/{*path}',
+          method: RequestMethod.PATCH,
+        },
         // Server-only money routes owning their own auth
         // (GameServerTransitionalAuthGuard: Bearer, or the tripwire only while
         // ENFORCE_MONEY_AUTH is off). The guard reads `body.server` itself, so
@@ -211,6 +219,9 @@ export class AppModule implements NestModule {
         { path: 'smartrotom/wigglypop/{*path}', method: RequestMethod.PATCH },
         { path: 'smartrotom/wigglypop/{*path}', method: RequestMethod.PUT },
         { path: 'smartrotom/wigglypop/{*path}', method: RequestMethod.DELETE },
+        // Same reason: the trip route carries GameOrUserAuthGuard, and a JWT caller sends
+        // no `server` field.
+        { path: 'smartrotom/taxi/{*path}', method: RequestMethod.POST },
       )
       .forRoutes('/smartrotom/');
   }

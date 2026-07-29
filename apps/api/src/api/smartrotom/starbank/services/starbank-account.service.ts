@@ -1,7 +1,15 @@
-import { Injectable, Inject } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+import { ApiErrorCode, userError } from '@/common/errors/user-error';
 import { STARBANK_ACCOUNT_REPOSITORY_TOKEN } from '@api/_utils/repositories/interfaces/repository.token';
 import { StarBankAccount } from '../entities/starbank-account.entity';
 import { AccountType } from '../enums/account-type.enum';
+import { isHouseAccountType } from '../house-accounts';
 import { CreateAccountDto } from '../dto/create-account.dto';
 import { IStarbankAccountRepository } from '../repositories/interfaces/starbank-account.repository';
 import { Logger } from 'nestjs-pino';
@@ -49,6 +57,60 @@ export class StarbankAccountService {
     return await this.accountRepository.create(accountData);
   }
 
+  /**
+   * Renames a secondary account and/or replaces its picture.
+   *
+   * Only SECONDARY accounts are editable, and that is enforced here rather than in the UI:
+   * MAIN is created by the server on first login and represents the player, and a house account
+   * (the treasury, the market escrow, the taxi's takings) is nobody's to rename.
+   *
+   * `actor` is null for the trusted game server, which may act on any account.
+   */
+  async updateAccount(
+    accountId: number,
+    details: { name?: string; image?: string },
+    actor: { uuid?: string; isAdmin: boolean } | null,
+  ): Promise<StarBankAccount> {
+    const account = await this.accountRepository.findById(accountId);
+    if (!account) {
+      throw new NotFoundException(`Account ${accountId} does not exist`);
+    }
+    if (isHouseAccountType(account.type)) {
+      throw new ForbiddenException('House accounts cannot be edited');
+    }
+    if (account.type !== AccountType.SECONDARY) {
+      throw new ForbiddenException('Only secondary accounts can be edited');
+    }
+
+    if (actor && !actor.isAdmin) {
+      const owner = await this.accountRepository.findAccountOwnerUuid(accountId);
+      if (!owner || owner !== actor.uuid) {
+        throw new ForbiddenException(
+          userError(
+            ApiErrorCode.ACTOR_NOT_SELF,
+            'Actor may only edit their own accounts',
+          ),
+        );
+      }
+    }
+
+    const name = details.name?.trim();
+    if (details.name !== undefined && !name) {
+      throw new BadRequestException('Account name cannot be empty');
+    }
+
+    await this.accountRepository.updateAccountDetails(accountId, {
+      name,
+      image: details.image,
+    });
+
+    const updated = await this.accountRepository.findById(accountId);
+    if (!updated) {
+      throw new NotFoundException(`Account ${accountId} does not exist`);
+    }
+    return updated;
+  }
+
   async createMainAccount(
     uuid: string,
     username: string,
@@ -69,8 +131,12 @@ export class StarbankAccountService {
     return await this.createAccount(createAccountDto);
   }
 
+  // House accounts are excluded: `GET /starbank/accounts` is @Public(), and the treasury,
+  // the market escrow and each service's takings are not a player-facing list. Read them
+  // through the owning domain service (TreasuryService, WigglypopEscrowService, …).
   async getAllAccounts(): Promise<StarBankAccount[]> {
-    return await this.accountRepository.findAll();
+    const accounts = await this.accountRepository.findAll();
+    return accounts.filter((account) => !isHouseAccountType(account.type));
   }
 
   async getUserAccounts(uuid: string): Promise<StarBankAccount[]> {

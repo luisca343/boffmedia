@@ -59,14 +59,16 @@ describe('WingullTransportService', () => {
     const stopId = 'pallet';
     const uuid = 'abc-123';
 
-    it('returns true when repo returns a truthy result', async () => {
-      mockRepo.teleportPlayerInAPI.mockResolvedValue({ success: true });
+    it('reports a successful teleport', async () => {
+      mockRepo.teleportPlayerInAPI.mockResolvedValue({ ok: true });
 
-      await expect(service.teleportPlayer(stopId, uuid)).resolves.toBe(true);
+      await expect(service.teleportPlayer(stopId, uuid)).resolves.toEqual({
+        ok: true,
+      });
     });
 
     it('constructs TeleportRequestDto with id and uuid', async () => {
-      mockRepo.teleportPlayerInAPI.mockResolvedValue(true);
+      mockRepo.teleportPlayerInAPI.mockResolvedValue({ ok: true });
 
       await service.teleportPlayer(stopId, uuid);
 
@@ -75,21 +77,21 @@ describe('WingullTransportService', () => {
       );
     });
 
-    it('returns false when repo returns a falsy result', async () => {
-      mockRepo.teleportPlayerInAPI.mockResolvedValue(null);
+    // The whole point of the outcome type: "offline, nothing happened" and "no answer, it may
+    // have happened" decide opposite things about the fare, so neither may be flattened.
+    it.each([
+      ['offline', 422],
+      ['unknown_stop', 404],
+      ['unsafe_arrival', 409],
+      ['in_dungeon_run', 409],
+      ['unresolved', 503],
+    ])('passes the %s refusal through untouched', async (reason, status) => {
+      const refusal = { ok: false, reason, status, message: 'nope' };
+      mockRepo.teleportPlayerInAPI.mockResolvedValue(refusal);
 
-      await expect(service.teleportPlayer(stopId, uuid)).resolves.toBe(false);
-    });
-
-    it('wraps and re-throws repo error', async () => {
-      mockRepo.teleportPlayerInAPI.mockRejectedValue(
-        new Error('player offline'),
+      await expect(service.teleportPlayer(stopId, uuid)).resolves.toEqual(
+        refusal,
       );
-
-      await expect(service.teleportPlayer(stopId, uuid)).rejects.toThrow(
-        'Player teleportation failed: player offline',
-      );
-      expect(mockLogger.error).toHaveBeenCalled();
     });
   });
 });

@@ -14,7 +14,7 @@ import { AuditoriaService } from './_shared/auditoria.service';
 import { PeopleRepository } from './_shared/people.repository';
 import { CountersRepository } from './_shared/counters.repository';
 import { CountersService } from './_shared/counters.service';
-import { TreasuryRepository } from './_shared/treasury.repository';
+import { StarbankHouseAccountService } from '../starbank/services/starbank-house-account.service';
 import { TreasuryService } from './_shared/treasury.service';
 
 // Urbanismo
@@ -86,7 +86,7 @@ import { AdministracionController } from './administracion/administracion.contro
     PeopleRepository,
     CountersRepository,
     CountersService,
-    TreasuryRepository,
+    StarbankHouseAccountService,
     TreasuryService,
 
     UrbanismoRepository,

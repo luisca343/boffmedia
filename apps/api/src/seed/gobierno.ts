@@ -7,13 +7,11 @@ import * as mysql from 'mysql2/promise';
 import { env } from '@/config/env';
 
 import { boffMediaRoles } from '../_db/schema/BoffMedia';
-import { starBankAccounts } from '../_db/schema/SmartRotomStarBank';
 import { gobiernoTasas } from '../_db/schema/SmartRotomGobierno';
+import { seedHouseAccounts } from './house-accounts';
 import pino from 'pino';
 
 const logger = pino({ name: 'gobierno-seed' });
-
-const TREASURY_NAME = 'Tesorería de Teras';
 
 // Idempotent rate card from the handoff. `code` carries the uniqueness — re-running this
 // script updates the existing rows in place rather than duplicating them. Percentage-based
@@ -79,21 +77,10 @@ async function main() {
   }
 
   // ── Treasury account ─────────────────────────────────────────────────────────
-  // No owning player, so it bypasses the normal StarBank account-creation flow (which always
-  // links to a uuid in rotom_starbank_user_accounts). There is exactly one — check before insert.
-  logger.info('Seeding treasury account…');
-  const [existingTreasury] = await db
-    .select({ id: starBankAccounts.id })
-    .from(starBankAccounts)
-    .where(eq(starBankAccounts.type, 'GOVERNMENT'));
-  if (!existingTreasury) {
-    await db
-      .insert(starBankAccounts)
-      .values({ name: TREASURY_NAME, balance: 0, type: 'GOVERNMENT' });
-    logger.info(`Created treasury account "${TREASURY_NAME}"`);
-  } else {
-    logger.info(`Treasury account already exists (#${existingTreasury.id})`);
-  }
+  // The treasury is one of the house accounts, so it is seeded with the rest of them from a
+  // single registry (starbank/house-accounts.ts) rather than by whichever app happens to need
+  // it first. Running the whole set here is harmless — it is idempotent.
+  await seedHouseAccounts(db);
 
   // ── Tasas rate card ───────────────────────────────────────────────────────────
   logger.info('Seeding rotom_gobierno_tasas…');

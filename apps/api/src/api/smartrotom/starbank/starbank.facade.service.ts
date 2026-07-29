@@ -51,6 +51,14 @@ export class StarbankFacadeService {
     return await this.accountService.createMainAccount(uuid, username);
   }
 
+  async updateAccount(
+    accountId: number,
+    details: { name?: string; image?: string },
+    actor: { uuid?: string; isAdmin: boolean } | null,
+  ): Promise<StarBankAccount> {
+    return await this.accountService.updateAccount(accountId, details, actor);
+  }
+
   async getAllAccounts(): Promise<StarBankAccount[]> {
     return await this.accountService.getAllAccounts();
   }

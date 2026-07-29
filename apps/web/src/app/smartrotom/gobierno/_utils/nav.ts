@@ -89,6 +89,7 @@ export const NAV_GROUPS: NavGroup[] = [
     items: [
       { slug: "admin/jugadores", labelKey: "nav.jugadores", icon: "users" },
       { slug: "admin/megafonia", labelKey: "nav.megafonia", icon: "megaphone" },
+      { slug: "admin/traslado", labelKey: "nav.traslado", icon: "mapPin" },
       { slug: "admin/notificaciones", labelKey: "nav.notificaciones", icon: "bell" },
       { slug: "admin/senalizacion", labelKey: "nav.senalizacion", icon: "signal" },
       { slug: "admin/skins", labelKey: "nav.skinsNpc", icon: "eye" },

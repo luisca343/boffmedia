@@ -133,8 +133,6 @@
     "errors": {
       "noPlayerPosition": "Sin posición del jugador",
       "loginRequired": "Necesitas iniciar sesión para viajar",
-      "chargeFailed": "No se pudo cobrar el viaje",
-      "teleportFailedAfterCharge": "Se cobró el viaje pero el teletransporte falló. Contacta con soporte.",
       "tripFailed": "No se pudo completar el viaje"
     },
     "compass": {

@@ -2,7 +2,12 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import type { CreateTransferDto, StarBankAccount, StarBankTransaction } from "@boffmedia/shared"
-import { rotomAuthedPOSTOrThrow, rotomGETOrThrow, rotomMultipartPOSTOrThrow } from "@/services/boffAPI"
+import {
+  rotomAuthedPOSTOrThrow,
+  rotomGETOrThrow,
+  rotomMultipartPATCHOrThrow,
+  rotomMultipartPOSTOrThrow,
+} from "@/services/boffAPI"
 import type { CreateAccountDto } from "@/types/dto/create-account-dto"
 
 export const starbankKeys = {
@@ -70,6 +75,38 @@ export function useCreateAccountMutation(uuid?: string | null) {
   return useMutation({
     mutationFn: ({ data, images }: { data: CreateAccountDto; images?: Record<string, File | Blob> }) =>
       rotomMultipartPOSTOrThrow<StarBankAccount>("/starbank/accounts", data, images ?? {}),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: starbankKeys.accounts(uuid) })
+      void qc.invalidateQueries({ queryKey: starbankKeys.allAccounts() })
+    },
+  })
+}
+
+/**
+ * Renames a secondary account and/or replaces its picture. Both fields are optional, and the
+ * API refuses anything that is not a secondary account the caller owns (or, for ROTOM_ADMIN,
+ * anyone's).
+ *
+ * Multipart even for a name-only edit, so one request covers both cases and the picture never
+ * needs a second round trip.
+ */
+export function useUpdateAccountMutation(uuid?: string | null) {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: ({
+      id,
+      name,
+      image,
+    }: {
+      id: number
+      name?: string
+      image?: File | Blob
+    }) =>
+      rotomMultipartPATCHOrThrow<StarBankAccount>(
+        `/starbank/accounts/${id}`,
+        name === undefined ? {} : { name },
+        image ? { image } : {},
+      ),
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: starbankKeys.accounts(uuid) })
       void qc.invalidateQueries({ queryKey: starbankKeys.allAccounts() })

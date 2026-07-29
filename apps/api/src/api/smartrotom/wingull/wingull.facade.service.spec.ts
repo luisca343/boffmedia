@@ -284,7 +284,7 @@ describe('WingullFacadeService', () => {
 
   describe('teleportPlayer', () => {
     it('should teleport player and return result', async () => {
-      transportService.teleportPlayer.mockResolvedValue(true);
+      transportService.teleportPlayer.mockResolvedValue({ ok: true });
 
       const result = await service.teleportPlayer('stop-1', 'test-uuid');
 
@@ -292,7 +292,23 @@ describe('WingullFacadeService', () => {
         'stop-1',
         'test-uuid',
       );
-      expect(result).toBe(true);
+      expect(result).toEqual({ ok: true });
+    });
+
+    // The refusal reason is what the taxi charges (or does not charge) on, so the facade must
+    // hand it back untouched rather than throwing or flattening it.
+    it('passes a refusal through with its reason', async () => {
+      const refusal = {
+        ok: false as const,
+        reason: 'offline' as const,
+        status: 422,
+        message: 'Player not online',
+      };
+      transportService.teleportPlayer.mockResolvedValue(refusal);
+
+      await expect(
+        service.teleportPlayer('stop-1', 'test-uuid'),
+      ).resolves.toEqual(refusal);
     });
   });
 
