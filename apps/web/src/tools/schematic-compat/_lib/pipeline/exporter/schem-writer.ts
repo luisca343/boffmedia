@@ -116,7 +116,14 @@ function writeSchemV2(structure: SchematicStructure): Uint8Array {
     BlockEntities: List(NBT_TAG.Compound, blockEntitiesV2(structure)),
     Metadata: metadataCompound(structure),
   };
-  return encodeNBT(root, { initialCapacity: capacityHint(structure, blockBytes) });
+  // The v2 spec names the ROOT compound "Schematic" (v3 instead nests an
+  // unnamed root's child). WorldEdit's format detection checks that name; an
+  // unnamed root makes it fall through to the v3 reader, which then dies on
+  // the missing `Schematic` child.
+  return encodeNBT(root, {
+    rootName: "Schematic",
+    initialCapacity: capacityHint(structure, blockBytes),
+  });
 }
 
 function writeSchemV3(structure: SchematicStructure): Uint8Array {

@@ -18,6 +18,7 @@ import type {
   ProgressCb,
   LegacyIdMap,
   LittleTilesGroup,
+  LittleTilesStructure,
   WorldIdSummary,
 } from "../types";
 import { parseLevelDat } from "../loader/level-dat";
@@ -205,6 +206,16 @@ export async function getLittleTileBoxes(
   const structure = state.schematics.get(schematicId);
   if (!structure) throw new Error(`Schematic not found: ${schematicId}`);
   return structure.littleTiles?.groups ?? [];
+}
+
+/** LittleTiles structure instances; empty when the schematic has none. */
+export async function getLittleTileStructures(
+  state: SchematicEngineState,
+  schematicId: string,
+): Promise<LittleTilesStructure[]> {
+  const structure = state.schematics.get(schematicId);
+  if (!structure) throw new Error(`Schematic not found: ${schematicId}`);
+  return structure.littleTiles?.structures ?? [];
 }
 
 export async function release(state: SchematicEngineState, id: string): Promise<void> {

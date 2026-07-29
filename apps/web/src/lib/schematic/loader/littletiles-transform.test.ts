@@ -47,8 +47,9 @@ describe("decodeTransformableCorners", () => {
 function legacyTE(
   pos: { x: number; y: number; z: number },
   content: Record<string, unknown>,
+  rootExtra: Record<string, unknown> = {},
 ): TileEntity {
-  return { pos, id: "minecraft:littletilestileentity", data: { content } };
+  return { pos, id: "minecraft:littletilestileentity", data: { ...rootExtra, content } };
 }
 
 describe("legacy structure placement", () => {
@@ -74,6 +75,71 @@ describe("legacy structure placement", () => {
     const boxes = lt.groups[0].boxes;
     for (let i = 0; i < boxes.length; i += 9) hosts.push(boxes[i]);
     expect(hosts.sort()).toEqual([5, 6]);
+  });
+
+  it("assembles a structure instance from its main block and coord-linked members", async () => {
+    const tables = await loadLegacyTables();
+    const tile = { block: "minecraft:stone", box: new Int32Array([0, 0, 0, 8, 8, 8]) };
+    const tes = [
+      legacyTE({ x: 5, y: 0, z: 0 }, {
+        tiles: [],
+        children: [{ tiles: [tile], structure: { id: "door", name: "front-door" } }],
+      }),
+      legacyTE({ x: 6, y: 0, z: 0 }, {
+        tiles: [],
+        children: [{ tiles: [tile], coord: new Int32Array([-1, 0, 0]) }],
+      }),
+      // A free-tile block: must not join any structure.
+      legacyTE({ x: 9, y: 0, z: 0 }, { tiles: [tile] }),
+    ];
+
+    const lt = parseLittleTiles(tes, tables)!;
+    expect(lt.structures).toHaveLength(1);
+    const s = lt.structures![0];
+    expect(s.type).toBe("door");
+    expect(s.name).toBe("front-door");
+    expect(s.mainPos).toEqual({ x: 5, y: 0, z: 0 });
+    expect(s.blockCount).toBe(2);
+    expect(s.tileCount).toBe(2);
+    // Two stride-9 boxes, hosted at x=5 and x=6 — the free tile at x=9 stays out.
+    expect(s.boxes.length).toBe(18);
+    expect([s.boxes[0], s.boxes[9]].sort()).toEqual([5, 6]);
+  });
+
+  it("marks a member whose main block is outside the schematic as unknown", async () => {
+    const tables = await loadLegacyTables();
+    const tile = { block: "minecraft:stone", box: new Int32Array([0, 0, 0, 8, 8, 8]) };
+    const tes = [
+      legacyTE({ x: 0, y: 0, z: 0 }, {
+        tiles: [],
+        children: [{ tiles: [tile], coord: new Int32Array([-5, 0, 0]) }],
+      }),
+    ];
+
+    const lt = parseLittleTiles(tes, tables)!;
+    expect(lt.structures).toHaveLength(1);
+    expect(lt.structures![0].type).toBe("unknown");
+    expect(lt.structures![0].mainPos).toEqual({ x: -5, y: 0, z: 0 });
+    expect(lt.structures![0].tileCount).toBe(1);
+  });
+
+  it("reads the 1.12 grid from the TE data root, where the mod saves it", async () => {
+    // TileEntityLittleTiles.writeToNBT writes the grid on the ROOT compound
+    // (context.set(nbt)) and only when non-default: a full grid-2 block read
+    // as grid 16 shrinks to 1/8 — that regression shipped once (LA_PUERTA).
+    const tables = await loadLegacyTables();
+    const tes = [
+      legacyTE(
+        { x: 0, y: 0, z: 0 },
+        { tiles: [{ block: "minecraft:brick_block", box: new Int32Array([0, 0, 0, 2, 2, 2]) }] },
+        { grid: 2 },
+      ),
+    ];
+
+    const boxes = parseLittleTiles(tes, tables)!.groups[0].boxes;
+    // Fractions span the full cell: [x0,y0,z0] = 0, [x1,y1,z1] = 2/2 = 1.
+    expect([boxes[3], boxes[4], boxes[5]]).toEqual([0, 0, 0]);
+    expect([boxes[6], boxes[7], boxes[8]]).toEqual([1, 1, 1]);
   });
 
   it("groups transformable boxes as world-space corners, not scaled cubes", async () => {

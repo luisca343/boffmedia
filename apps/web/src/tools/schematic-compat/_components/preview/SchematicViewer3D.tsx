@@ -29,6 +29,8 @@ export function SchematicViewer3D() {
   // out, and that must render an empty scene, not an empty state.
   const hasPositions = useToolStore((s) => s.blockPositions.length > 0);
   const littleTileGroups = useToolStore((s) => s.littleTileGroups);
+  const littleTileStructures = useToolStore((s) => s.littleTileStructures);
+  const selectedStructureIdx = useToolStore((s) => s.selectedStructureIdx);
   const selectedBlockId = useToolStore((s) => s.selectedBlockId);
   const layerY = useToolStore((s) => s.layerY);
   const navMode = useToolStore((s) => s.navMode);
@@ -73,6 +75,36 @@ export function SchematicViewer3D() {
     [setSelectedBlock],
   );
 
+  // Concat the selected structures' geometry into the single pair of arrays the
+  // store-free renderer expects. Small (a structure is tens of boxes), so
+  // rebuilding on selection change is cheap.
+  const structureHighlight = useMemo(() => {
+    if (!selectedStructureIdx || selectedStructureIdx.length === 0) return null;
+    const picked = selectedStructureIdx
+      .map((i) => littleTileStructures[i])
+      .filter((s) => s !== undefined);
+    if (picked.length === 0) return null;
+    let boxLen = 0;
+    let cornerLen = 0;
+    for (const s of picked) {
+      boxLen += s.boxes.length;
+      cornerLen += s.corners?.length ?? 0;
+    }
+    const boxes = new Float32Array(boxLen);
+    const corners = cornerLen > 0 ? new Float32Array(cornerLen) : undefined;
+    let bo = 0;
+    let co = 0;
+    for (const s of picked) {
+      boxes.set(s.boxes, bo);
+      bo += s.boxes.length;
+      if (corners && s.corners) {
+        corners.set(s.corners, co);
+        co += s.corners.length;
+      }
+    }
+    return { boxes, corners };
+  }, [selectedStructureIdx, littleTileStructures]);
+
   if (!schematic) return <Empty>{t("preview.emptyNoSchematic")}</Empty>;
   if (isFetchingPositions) return <Empty>{t("preview.preparing")}</Empty>;
   if (!hasPositions && littleTileGroups.length === 0)
@@ -82,6 +114,7 @@ export function SchematicViewer3D() {
     <SchematicView
       groups={groups}
       littleTiles={littleTileGroups}
+      structureHighlight={structureHighlight}
       dimensions={schematic.dimensions}
       layerY={layerY}
       selectedBlockId={selectedBlockId}

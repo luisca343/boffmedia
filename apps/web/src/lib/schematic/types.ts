@@ -197,12 +197,35 @@ export interface LittleTilesGroup {
   cornerColors?: Float32Array;
 }
 
+/**
+ * One LittleTiles structure instance (a door, chair, ladder…): the main block's
+ * `structure` compound plus every member block linked to it via `children.coord`
+ * (main = member pos + coord). Geometry is duplicated from the material groups
+ * so the 3D view can highlight a structure without re-deriving attribution:
+ * `boxes`/`corners` use the same layouts as {@link LittleTilesGroup}.
+ */
+export interface LittleTilesStructure {
+  /** `structure.id` from the NBT ("door", "chair"…); "unknown" for an orphan
+   *  member whose main block lies outside the schematic. */
+  type: string;
+  /** User-given name (`structure.name`), when present. */
+  name?: string;
+  mainPos: { x: number; y: number; z: number };
+  /** Member cells, main included. */
+  blockCount: number;
+  tileCount: number;
+  boxes: Float32Array;
+  corners?: Float32Array;
+}
+
 export interface LittleTilesData {
   /** Number of host LittleTiles blocks (tile entities). */
   blockCount: number;
   /** Total micro-tiles across all hosts (a tile can span several boxes). */
   tileCount: number;
   groups: LittleTilesGroup[];
+  /** Structure instances (legacy sources only, for now). */
+  structures?: LittleTilesStructure[];
   /**
    * Material id → replacement blockstate string, filled from the user's
    * resolutions when the worker applies them. Consumed by the modern-format

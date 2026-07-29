@@ -156,6 +156,17 @@
           "clearSelection": "Limpiar selección",
           "close": "Cerrar"
         },
+        "structures": {
+          "header": "Estructuras",
+          "instances": "{count, plural, one {# instancia} other {# instancias}}",
+          "tiles": "{count, plural, one {# tile} other {# tiles}}",
+          "badgeConverts": "se convierte",
+          "badgeFlattens": "se aplana",
+          "flattensUnsupportedHint": "Este tipo de estructura existe en 1.21 pero su comportamiento aún no se puede convertir — sus tiles se exportarán como tiles estáticos.",
+          "flattensUnknownHint": "Esta estructura no se puede conservar (tipo desconocido, o su bloque principal queda fuera del esquema) — sus tiles se exportarán como tiles estáticos.",
+          "expand": "Mostrar instancias",
+          "collapse": "Ocultar instancias"
+        },
         "guide": {
           "title": "Cómo usar",
           "step1": "Selecciona la carpeta del entorno origen — la instancia de Minecraft donde se construyó el esquema.",

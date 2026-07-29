@@ -7,6 +7,7 @@ import type { SchRing } from "@/components/boffmedia/ui/schematic";
 import { FilterChips } from "./FilterChips";
 import { MappingCard } from "./MappingCard";
 import { BulkRulesSheet } from "./BulkRulesSheet";
+import { StructuresSection } from "./StructuresSection";
 import type { BulkAction, SchDiffEntry, SchStatus } from "../ui/sch-tokens";
 import { selectEnv, useToolStore } from "../../_store/tool.store";
 import type { DiffEntry } from "@/lib/schematic/types";
@@ -228,6 +229,7 @@ export function DiffPanel() {
 
       {/* list */}
       <div ref={listRef} className="flex-1 min-h-0 overflow-y-auto py-3.5 px-4 flex flex-col gap-4">
+        <StructuresSection />
         {groups.length === 0 ? (
           <div className="text-center text-[13px] text-txt-dim py-[30px]">{t("diff.noMatching")}</div>
         ) : (

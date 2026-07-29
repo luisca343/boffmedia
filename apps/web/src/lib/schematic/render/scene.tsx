@@ -7,6 +7,7 @@ import type { NavMode } from "../state/types";
 import type { ModelLoader, TextureLoader } from "./assetLoaders";
 import { BlockInstances, type BlockVariantResolver } from "./block-instances";
 import { LittleTileInstances } from "./littletile-instances";
+import { LittleTileHighlight } from "./littletile-highlight";
 import { CameraRig, FlyRig } from "./camera-rigs";
 import type { FlyHudRefs } from "./fly-hud";
 import { buildPickIndex } from "./picking";
@@ -53,6 +54,12 @@ export interface SchematicSceneProps extends RenderOverrides {
    * content — omitting them hides LittleTiles entirely.
    */
   littleTiles?: LittleTilesGroup[];
+  /**
+   * LittleTiles geometry to wrap in a translucent accent shell (a selected
+   * structure). Same array layouts as {@link LittleTilesGroup}. Optional so
+   * hosts without structure selection never mention it.
+   */
+  structureHighlight?: { boxes: Float32Array; corners?: Float32Array } | null;
   dimensions?: { x: number; y: number; z: number };
   layerY: number;
   selectedBlockId?: string;
@@ -78,6 +85,7 @@ function defaultStates(block: UnifiedBlock, plan: RenderPlan): Record<string, st
 export function SchematicScene({
   groups,
   littleTiles,
+  structureHighlight,
   dimensions,
   layerY,
   selectedBlockId,
@@ -186,19 +194,31 @@ export function SchematicScene({
           </Fragment>
         );
       })}
-      {littleTiles?.map((g) => (
-        <LittleTileInstances
-          key={`lt-${g.block.id}`}
-          group={g}
-          isSelected={g.block.id === selectedBlockId}
-          maxLayerY={layerY}
-          version={source.version}
-          registryId={source.registryId}
-          textureLoader={loaders.texture}
-          cursorPickingRef={cursorPickingRef}
-          onSelect={handleSelect}
-        />
-      ))}
+      {littleTiles?.map((g) => {
+        // Same override contract as the block meshes: a conversion host's plan
+        // can re-texture a micro-tile material (resolved/renamed) or ghost it.
+        const plan = planFor ? planFor(g.block) : sourcePlan(g.block.id);
+        const states = statesFor ? statesFor(g.block, plan) : defaultStates(g.block, plan);
+        return (
+          <LittleTileInstances
+            key={`lt-${g.block.id}`}
+            group={g}
+            isSelected={g.block.id === selectedBlockId}
+            maxLayerY={layerY}
+            version={plan.useTarget ? (target?.version ?? source.version) : source.version}
+            registryId={plan.useTarget ? (target?.registryId ?? source.registryId) : source.registryId}
+            textureLoader={loaders.texture}
+            cursorPickingRef={cursorPickingRef}
+            onSelect={handleSelect}
+            textureId={plan.textureId}
+            states={states}
+            kind={plan.kind}
+          />
+        );
+      })}
+      {structureHighlight && (
+        <LittleTileHighlight boxes={structureHighlight.boxes} corners={structureHighlight.corners} />
+      )}
     </>
   );
 }

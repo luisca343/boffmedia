@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { gunzipSync } from "node:zlib";
 import { writeSchem } from "./schem-writer";
 import { writeLitematic } from "./litematic-writer";
 import { writeNbtStruct } from "./nbt-writer";
@@ -57,5 +58,28 @@ describe("export DataVersion", () => {
   it("falls back to a modern default when no version is known", () => {
     const root = parseNBT(writeSchem(structure(), 2));
     expect(asNumber(root.DataVersion, "DataVersion")).toBeGreaterThan(0);
+  });
+});
+
+/** Root-compound NAME of a gzip NBT buffer (byte 0 = tag id, then u16 length). */
+function rootNameOf(bytes: Uint8Array): string {
+  const raw = new Uint8Array(gunzipSync(bytes));
+  const len = (raw[1] << 8) | raw[2];
+  return new TextDecoder().decode(raw.subarray(3, 3 + len));
+}
+
+describe(".schem root compound naming", () => {
+  // WorldEdit's format detection keys on these: v2 = root NAMED "Schematic",
+  // v3 = unnamed root wrapping a "Schematic" child. An unnamed v2 root makes
+  // WorldEdit fall through to the v3 reader, which dies on the missing child —
+  // that regression shipped and broke every exported v2 file in-game.
+  it("names the v2 root compound Schematic", () => {
+    expect(rootNameOf(writeSchem(structure(), 2))).toBe("Schematic");
+  });
+
+  it("leaves the v3 root unnamed, wrapping the Schematic child", () => {
+    expect(rootNameOf(writeSchem(structure(), 3))).toBe("");
+    const root = parseNBT(writeSchem(structure(), 3));
+    expect(root.Schematic).toBeDefined();
   });
 });
