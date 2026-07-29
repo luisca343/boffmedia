@@ -9,6 +9,7 @@ import {
   Short,
   Str,
   ByteArr,
+  IntArr,
   type Tag,
 } from "../parsers/nbt-writer";
 import { NBT_TAG } from "../parsers/nbt";
@@ -32,7 +33,12 @@ function asFile(bytes: Uint8Array, name: string): File {
  * A pre-1.13 MCEdit file: flat `Blocks`/`Data` byte arrays, no palette.
  * `ids`/`metas` are per-cell; `add` supplies the high id nibbles when present.
  */
-function legacyBytes(ids: number[], metas?: number[], add?: Uint8Array): Uint8Array {
+function legacyBytes(
+  ids: number[],
+  metas?: number[],
+  add?: Uint8Array,
+  tileEntities?: Tag[],
+): Uint8Array {
   const root: Record<string, Tag> = {
     Width: Short(ids.length),
     Height: Short(1),
@@ -41,6 +47,7 @@ function legacyBytes(ids: number[], metas?: number[], add?: Uint8Array): Uint8Ar
     Blocks: ByteArr(Uint8Array.from(ids.map((i) => i & 0xff))),
     Data: ByteArr(Uint8Array.from(metas ?? ids.map(() => 0))),
     ...(add ? { AddBlocks: ByteArr(add) } : {}),
+    ...(tileEntities ? { TileEntities: List(NBT_TAG.Compound, tileEntities) } : {}),
   };
   return encodeNBT(root);
 }
@@ -111,6 +118,33 @@ describe("level.dat world id table", () => {
     expect(s.palette[0].source).toBe("mod");
     expect(s.palette[0].modId).toBe("rustic");
     expect(s.metadata.unknownLegacyIds).toEqual([]);
+  });
+
+  it("re-points a legacy LT host even when level.dat names it littletiles:blocklittletiles", async () => {
+    // The host block id resolving to a real littletiles:* name must not make it
+    // look "already modern": the block doesn't exist in 1.21 and the diff would
+    // otherwise list it as a plain grid row.
+    const table = parseLevelDat(levelDatBytes([["littletiles:blocklittletiles", 257]]));
+    const te = Compound({
+      id: Str("minecraft:littletilestileentity"),
+      x: Int(0),
+      y: Int(0),
+      z: Int(0),
+      content: Compound({
+        tiles: List(NBT_TAG.Compound, [
+          Compound({
+            block: Str("minecraft:stone"),
+            box: IntArr(Int32Array.of(0, 0, 0, 16, 8, 16)),
+          }),
+        ]),
+      }),
+    });
+    const s = await loadSchematicFile(
+      asFile(legacyBytes([0x01], [0], Uint8Array.of(0x01), [te]), "lt.schematic"),
+      { worldIds: table.ids },
+    );
+    expect(s.palette[s.blockData[0]].id).toBe("littletiles:tiles");
+    expect(s.littleTiles?.groups.length).toBeGreaterThan(0);
   });
 
   it("rejects a vanilla level.dat, which has no id table to read", () => {

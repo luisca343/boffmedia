@@ -8,6 +8,7 @@ import type {
   SchematicSummary,
   WorldIdSummary,
   LittleTilesGroup,
+  LittleTilesStructure,
   BlockPositionGroup,
   BlockDefinition,
   ProgressCb,
@@ -107,6 +108,9 @@ export interface CompatWorkerAPI {
 
   /** LittleTiles micro-box groups; empty when the document has none. */
   getLittleTileBoxes(schematicId: string): Promise<LittleTilesGroup[]>;
+
+  /** LittleTiles structure instances (doors, chairs…); empty when the document has none. */
+  getLittleTileStructures(schematicId: string): Promise<LittleTilesStructure[]>;
 
   /** Diff a cached schematic against cached source/target registries. */
   computeDiff(

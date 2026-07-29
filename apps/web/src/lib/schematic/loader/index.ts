@@ -5,7 +5,7 @@ import { loadNbtStruct } from "./nbt-struct";
 import { loadMca } from "./mca";
 import { loadPrefab } from "./prefab";
 import { parseNBT } from "../parsers/nbt";
-import { isLittleTilesEntity, parseLittleTiles } from "./littletiles";
+import { isLittleTilesEntity, isModernLittleTilesEntity, parseLittleTiles } from "./littletiles";
 import { loadLegacyTables } from "./legacy/legacy-mapper";
 import type { SchematicParseOptions, SchematicStructure, UnifiedBlock } from "../types";
 import { ERR, codedError } from "../errors";
@@ -18,9 +18,11 @@ import { ERR, codedError } from "../errors";
  * The re-pointing matters most for pre-1.13 inputs: a cell hosting an LT tile
  * entity is by definition the mod's host block, but its numeric id → name
  * mapping is per-world, so without it the cell reads `unknown:block_<id>`. The
- * TE id is a portable string, which makes it the reliable signal. Cells that
- * are already littletiles-namespaced (modern `.schem`) keep their palette entry
- * untouched, so a byte-faithful re-export stays byte-faithful.
+ * TE id is a portable string, which makes it the reliable signal. Only cells
+ * hosting a MODERN-format TE keep their palette entry untouched (byte-faithful
+ * re-export); a legacy host is re-pointed even when its id resolved to a real
+ * name like `littletiles:blocklittletiles` via the world's level.dat — that
+ * block no longer exists in modern versions and must not survive as a grid row.
  */
 async function attachLittleTiles(structure: SchematicStructure): Promise<SchematicStructure> {
   if (!structure.tileEntities.some(isLittleTilesEntity)) return structure;
@@ -34,7 +36,7 @@ async function attachLittleTiles(structure: SchematicStructure): Promise<Schemat
     const { x, y, z } = te.pos;
     if (x < 0 || y < 0 || z < 0 || x >= width || y >= height || z >= length) continue;
     const cell = (y * length + z) * width + x;
-    if (structure.palette[structure.blockData[cell]]?.namespace === "littletiles") continue;
+    if (isModernLittleTilesEntity(te)) continue;
     if (hostIdx === -1) {
       hostIdx = structure.palette.length;
       const marker: UnifiedBlock = {

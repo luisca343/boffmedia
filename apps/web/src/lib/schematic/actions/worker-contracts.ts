@@ -2,6 +2,7 @@ import type { GameId } from "../adapters/game-adapter";
 import type {
   BlockPositionGroup,
   LittleTilesGroup,
+  LittleTilesStructure,
   ProgressCb,
   RegistryHandle,
   ScanOverride,
@@ -52,4 +53,9 @@ export interface PositionsApi {
    * predate LT support simply omit it and the viewer renders no micro-boxes.
    */
   getLittleTileBoxes?(schematicId: string): Promise<LittleTilesGroup[]>;
+  /**
+   * Optional: LittleTiles structure instances (doors, chairs…) of the same
+   * document; empty when it has none.
+   */
+  getLittleTileStructures?(schematicId: string): Promise<LittleTilesStructure[]>;
 }

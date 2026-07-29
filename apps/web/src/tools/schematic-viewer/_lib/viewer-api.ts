@@ -2,6 +2,7 @@ import type { GameId } from "@/lib/schematic/adapters/game-adapter";
 import type {
   BlockPositionGroup,
   LittleTilesGroup,
+  LittleTilesStructure,
   ProgressCb,
   RegistryHandle,
   ScanOverride,
@@ -68,6 +69,9 @@ export interface ViewerWorkerAPI {
 
   /** LittleTiles micro-box groups; empty when the document has none. */
   getLittleTileBoxes(schematicId: string): Promise<LittleTilesGroup[]>;
+
+  /** LittleTiles structure instances (doors, chairs…); empty when the document has none. */
+  getLittleTileStructures(schematicId: string): Promise<LittleTilesStructure[]>;
 
   /** Free a cached schematic or registry. */
   release(id: string): Promise<void>;
