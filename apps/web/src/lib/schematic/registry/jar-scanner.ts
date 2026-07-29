@@ -1,7 +1,7 @@
 import JSZip from "jszip";
 import type { BlockDefinition, ModInfo } from "../types";
 import { parseBlockstateJson } from "./blockstate-parser";
-import { resolveBlockTexture, type JarIndex } from "./texture-resolver";
+import { resolveBlockTexture, resolveVariantTextures, type JarIndex } from "./texture-resolver";
 
 export interface ScannedJar {
   mod?: ModInfo;
@@ -11,6 +11,8 @@ export interface ScannedJar {
   /** block id -> representative texture: a `data:` URL from this JAR, or a
    *  CDN URL when the block's model reuses a vanilla texture. */
   textures: Map<string, string>;
+  /** block id -> one texture per declared variant, indexed by legacy metadata. */
+  variantTextures: Map<string, string[]>;
 }
 
 const BLOCKSTATE_RE = /^assets\/([^/]+)\/blockstates\/(.+)\.json$/;
@@ -99,6 +101,7 @@ export async function scanJar(file: File, version?: string): Promise<ScannedJar>
   const blocks = new Map<string, BlockDefinition>();
   const tags = new Map<string, string[]>();
   const textures = new Map<string, string>();
+  const variantTextures = new Map<string, string[]>();
   // texture file path -> data URL; dedupes PNG reads/encodes within this JAR.
   const pngCache = new Map<string, string>();
 
@@ -132,6 +135,11 @@ export async function scanJar(file: File, version?: string): Promise<ScannedJar>
           try {
             const dataUrl = await resolveBlockTexture(zip, json as never, pngCache, version, index);
             if (dataUrl) textures.set(id, dataUrl);
+            // Multi-variant blocks additionally keep a per-variant list, so a
+            // pre-flattening `id:meta` can pick its own colour instead of
+            // everything sharing variant 0's texture.
+            const variants = await resolveVariantTextures(zip, json as never, pngCache, version, index);
+            if (variants) variantTextures.set(id, variants);
           } catch {
             /* texture resolution is non-essential — skip on any failure */
           }
@@ -160,5 +168,5 @@ export async function scanJar(file: File, version?: string): Promise<ScannedJar>
   });
 
   await Promise.all(jobs);
-  return { mod, blocks, tags, textures };
+  return { mod, blocks, tags, textures, variantTextures };
 }

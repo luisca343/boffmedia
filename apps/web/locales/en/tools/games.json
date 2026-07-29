@@ -111,7 +111,9 @@
           "worldUnresolved": "{count} block ids are still unnamed — they were assigned by a different world.",
           "worldCaveat": "Pre-1.13 files store mod blocks as plain numbers, and only the world they were built in knows what those numbers mean. It must be that same world: another save assigns the same numbers to different blocks.",
           "worldDetach": "Detach world",
-          "worldNeeded": "{count} block types in this file are just numbers with no name — without the world's level.dat they cannot get a texture."
+          "worldNeeded": "{count} block types in this file are just numbers with no name — without the world's level.dat they cannot get a texture.",
+          "littleTiles": "LittleTiles",
+          "littleTilesCount": "{blocks} blocks · {tiles} tiles"
         },
         "diff": {
           "header": "Compatibility",
@@ -283,7 +285,9 @@
           "texturesLabel": "Textures",
           "failedJars": "{count} mod JARs could not be read — their blocks will show as colored placeholders.",
           "noTextures": "The scan produced no textures, so every mod block will render as a colored placeholder. Hard-reload the page (Ctrl+Shift+R) and scan again.",
-          "worldNeeded": "{count} block types in this file are just numbers with no name — without the world's level.dat they cannot get a texture."
+          "worldNeeded": "{count} block types in this file are just numbers with no name — without the world's level.dat they cannot get a texture.",
+          "littleTiles": "LittleTiles",
+          "littleTilesCount": "{blocks} blocks · {tiles} tiles"
         },
         "preview": {
           "title": "3D view",

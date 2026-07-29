@@ -21,6 +21,7 @@ export function SchematicViewer3D() {
   const schematic = useViewerStore((s) => s.schematic);
   const isFetchingPositions = useViewerStore((s) => s.isFetchingPositions);
   const groups = useViewerStore((s) => s.blockPositions);
+  const littleTileGroups = useViewerStore((s) => s.littleTileGroups);
   const selectedBlockId = useViewerStore((s) => s.selectedBlockId);
   const layerY = useViewerStore((s) => s.layerY);
   const navMode = useViewerStore((s) => s.navMode);
@@ -48,11 +49,13 @@ export function SchematicViewer3D() {
 
   if (!schematic) return <Empty>{t("preview.emptyNoSchematic")}</Empty>;
   if (isFetchingPositions) return <Empty>{t("preview.preparing")}</Empty>;
-  if (groups.length === 0) return <Empty>{t("preview.noBlocks")}</Empty>;
+  if (groups.length === 0 && littleTileGroups.length === 0)
+    return <Empty>{t("preview.noBlocks")}</Empty>;
 
   return (
     <SchematicView
       groups={groups}
+      littleTiles={littleTileGroups}
       dimensions={schematic.dimensions}
       layerY={layerY}
       selectedBlockId={selectedBlockId}

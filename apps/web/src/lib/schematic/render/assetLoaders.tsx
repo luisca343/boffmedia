@@ -5,7 +5,12 @@ import type { CompiledModel } from "../model/types";
 import type { BlockDefinition } from "../types";
 
 /** Loads a block's mod texture (data URL) from a worker-held registry, or null. */
-export type TextureLoader = (registryId: string, blockId: string) => Promise<string | null>;
+export type TextureLoader = (
+  registryId: string,
+  blockId: string,
+  /** Pre-flattening metadata: selects the block's variant texture. */
+  meta?: number,
+) => Promise<string | null>;
 
 /** Loads a block's compiled shaped-model geometry from a worker-held registry. */
 export type ModelLoader = (
@@ -51,12 +56,14 @@ export function SchematicAssetProvider({ getBlockTexture, getBlockModel, getBloc
   const connCache = useRef(new Map<string, Promise<BlockDefinition["connections"] | null>>());
 
   const loadTexture = useCallback<TextureLoader>(
-    (registryId, blockId) => {
+    (registryId, blockId, meta) => {
       if (!getBlockTexture) return Promise.resolve(null);
-      const key = `${registryId}:${blockId}`;
+      // The metadata is part of the identity: two metas of one block id are two
+      // different textures.
+      const key = `${registryId}:${blockId}:${meta ?? 0}`;
       let pending = texCache.current.get(key);
       if (!pending) {
-        pending = getBlockTexture(registryId, blockId).catch(() => null);
+        pending = getBlockTexture(registryId, blockId, meta).catch(() => null);
         texCache.current.set(key, pending);
       }
       return pending;

@@ -2,10 +2,11 @@
 
 import { Fragment, useCallback, useMemo, useRef } from "react";
 import { Grid, OrbitControls } from "@react-three/drei";
-import type { BlockPositionGroup, UnifiedBlock } from "../types";
+import type { BlockPositionGroup, LittleTilesGroup, UnifiedBlock } from "../types";
 import type { NavMode } from "../state/types";
 import type { ModelLoader, TextureLoader } from "./assetLoaders";
 import { BlockInstances, type BlockVariantResolver } from "./block-instances";
+import { LittleTileInstances } from "./littletile-instances";
 import { CameraRig, FlyRig } from "./camera-rigs";
 import type { FlyHudRefs } from "./fly-hud";
 import { buildPickIndex } from "./picking";
@@ -46,6 +47,12 @@ export interface RenderOverrides {
 export interface SchematicSceneProps extends RenderOverrides {
   /** Block instance data to draw. Filtering is the host's job. */
   groups: BlockPositionGroup[];
+  /**
+   * LittleTiles micro-box groups. Their host cells are excluded from `groups`
+   * worker-side (counted as air), so these meshes are the only render of that
+   * content — omitting them hides LittleTiles entirely.
+   */
+  littleTiles?: LittleTilesGroup[];
   dimensions?: { x: number; y: number; z: number };
   layerY: number;
   selectedBlockId?: string;
@@ -70,6 +77,7 @@ function defaultStates(block: UnifiedBlock, plan: RenderPlan): Record<string, st
  */
 export function SchematicScene({
   groups,
+  littleTiles,
   dimensions,
   layerY,
   selectedBlockId,
@@ -178,6 +186,19 @@ export function SchematicScene({
           </Fragment>
         );
       })}
+      {littleTiles?.map((g) => (
+        <LittleTileInstances
+          key={`lt-${g.block.id}`}
+          group={g}
+          isSelected={g.block.id === selectedBlockId}
+          maxLayerY={layerY}
+          version={source.version}
+          registryId={source.registryId}
+          textureLoader={loaders.texture}
+          cursorPickingRef={cursorPickingRef}
+          onSelect={handleSelect}
+        />
+      ))}
     </>
   );
 }

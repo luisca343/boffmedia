@@ -111,7 +111,9 @@
           "worldUnresolved": "{count} ids de bloque siguen sin nombre — los asignó otro mundo distinto.",
           "worldCaveat": "Los archivos anteriores a 1.13 guardan los bloques de mods como simples números, y solo el mundo en el que se construyeron sabe qué significan. Tiene que ser ese mismo mundo: otra partida asigna esos mismos números a bloques distintos.",
           "worldDetach": "Quitar mundo",
-          "worldNeeded": "{count} tipos de bloque de este archivo son solo números sin nombre — sin el level.dat del mundo no pueden tener textura."
+          "worldNeeded": "{count} tipos de bloque de este archivo son solo números sin nombre — sin el level.dat del mundo no pueden tener textura.",
+          "littleTiles": "LittleTiles",
+          "littleTilesCount": "{blocks} bloques · {tiles} tiles"
         },
         "diff": {
           "header": "Compatibilidad",
@@ -283,7 +285,9 @@
           "texturesLabel": "Texturas",
           "failedJars": "No se pudieron leer {count} JARs de mods — sus bloques se verán como cubos de color.",
           "noTextures": "El escaneo no produjo texturas, así que todos los bloques de mods se verán como cubos de color. Recarga la página a fondo (Ctrl+Shift+R) y vuelve a escanear.",
-          "worldNeeded": "{count} tipos de bloque de este archivo son solo números sin nombre — sin el level.dat del mundo no pueden tener textura."
+          "worldNeeded": "{count} tipos de bloque de este archivo son solo números sin nombre — sin el level.dat del mundo no pueden tener textura.",
+          "littleTiles": "LittleTiles",
+          "littleTilesCount": "{blocks} bloques · {tiles} tiles"
         },
         "preview": {
           "title": "Vista 3D",

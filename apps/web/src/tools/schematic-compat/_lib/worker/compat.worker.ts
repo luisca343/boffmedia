@@ -1,5 +1,7 @@
 import { expose } from "comlink";
 import type { CompatWorkerAPI } from "./worker-api";
+import { serializeBlockState } from "@/lib/schematic/normalizer";
+import { convertLittleTilesForExport } from "../pipeline/exporter/littletiles-writer";
 import type {
   BlockRegistry,
   BlockDefinition,
@@ -8,6 +10,7 @@ import type {
   RegistryHandle,
   SchematicSummary,
   WorldIdSummary,
+  LittleTilesGroup,
   CompatDiff,
   ResolutionMap,
   RuleSet,
@@ -91,8 +94,8 @@ const api: CompatWorkerAPI = {
 
   loadVanillaRegistry: (version: string) => core.loadVanillaRegistry(state, version),
 
-  getBlockTexture: (registryId: string, blockId: string) =>
-    core.getBlockTexture(state, registryId, blockId),
+  getBlockTexture: (registryId: string, blockId: string, meta?: number) =>
+    core.getBlockTexture(state, registryId, blockId, meta),
 
   getBlockModel: (registryId: string, blockId: string, stateLabel?: string, rotation?: number) =>
     core.getBlockModel(state, registryId, blockId, stateLabel, rotation),
@@ -105,6 +108,9 @@ const api: CompatWorkerAPI = {
 
   getSchematicBlockPositions: (schematicId: string): Promise<BlockPositionGroup[]> =>
     core.getSchematicBlockPositions(state, schematicId),
+
+  getLittleTileBoxes: (schematicId: string): Promise<LittleTilesGroup[]> =>
+    core.getLittleTileBoxes(state, schematicId),
 
   release: (id: string) => core.release(state, id),
 
@@ -183,7 +189,19 @@ const api: CompatWorkerAPI = {
     }
 
     const newId = state.nextId("schem");
-    const newStructure: SchematicStructure = { ...structure, palette: newPalette };
+    // Resolutions on LittleTiles material entries can't rewrite the palette
+    // (materials live inside TE NBT) — record them for the export writer.
+    let littleTiles = structure.littleTiles;
+    if (littleTiles) {
+      const materialMap: Record<string, string> = { ...littleTiles.materialMap };
+      for (const group of littleTiles.groups) {
+        const res = resolutions[group.block.id];
+        if (res) materialMap[group.block.id] = serializeBlockState(res.target);
+      }
+      if (Object.keys(materialMap).length > 0) littleTiles = { ...littleTiles, materialMap };
+    }
+
+    const newStructure: SchematicStructure = { ...structure, palette: newPalette, littleTiles };
     state.schematics.set(newId, newStructure);
 
     // Re-diff the modified schematic against the target registry
@@ -194,8 +212,15 @@ const api: CompatWorkerAPI = {
   },
 
   async export(schematicId: string, format: ExportFormat, dataVersion?: number): Promise<Blob> {
-    const structure = state.schematics.get(schematicId);
+    let structure = state.schematics.get(schematicId);
     if (!structure) throw new Error(`Schematic not found: ${schematicId}`);
+    // Legacy LittleTiles content converts to the modern mod format on .schem
+    // exports (the WorldEdit-paste flow); other formats leave the TEs alone.
+    // Runs before the foreign-block strip so the re-stamped host cells are what
+    // that pass sees.
+    if (format === "schem" || format === "schem3") {
+      structure = await convertLittleTilesForExport(structure);
+    }
     const targetGame = adapterForFormat(format).gameId;
     // Drop any block still foreign to the target game (unmapped in a cross-game
     // conversion) so its source id never lands in the written file.

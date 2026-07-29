@@ -29,6 +29,7 @@ interface SerializedRegistry {
   blocks: Record<string, BlockDefinition>;
   tags: Record<string, string[]>;
   textures?: Record<string, string>;
+  variantTextures?: Record<string, string[]>;
   snapshotHash: string;
   capturedAt: number;
   instanceName?: string;
@@ -78,8 +79,10 @@ function getDB(): RegistryCacheDB {
  * 2 — Forge blockstate v1 parsing, `mcmod.info` mod identity, vanilla-texture
  *     fallback for mod models, `models/block/` fallback for bare model refs.
  * 3 — v1 `"prop=value"` variant keys (list-valued), case-insensitive asset paths.
+ * 4 — per-variant texture lists, indexed by legacy metadata.
+ * 5 — `models/block/` retry for refs that contain folders (mod:category/name).
  */
-const SCANNER_VERSION = 3;
+const SCANNER_VERSION = 5;
 
 /**
  * Stable fingerprint from sorted file metadata. Incorporates both meta files
@@ -114,6 +117,9 @@ function serialize(reg: BlockRegistry): SerializedRegistry {
   const textures: Record<string, string> | undefined = reg.textures
     ? Object.fromEntries(reg.textures)
     : undefined;
+  const variantTextures: Record<string, string[]> | undefined = reg.variantTextures
+    ? Object.fromEntries(reg.variantTextures)
+    : undefined;
 
   return {
     gameId: reg.gameId,
@@ -125,6 +131,7 @@ function serialize(reg: BlockRegistry): SerializedRegistry {
     blocks,
     tags,
     textures,
+    variantTextures,
     snapshotHash: reg.snapshotHash,
     capturedAt: reg.capturedAt,
     instanceName: reg.instanceName,
@@ -135,6 +142,9 @@ function deserialize(s: SerializedRegistry): BlockRegistry {
   const blocks = new Map<string, BlockDefinition>(Object.entries(s.blocks));
   const tags = new Map<string, string[]>(Object.entries(s.tags));
   const textures = s.textures ? new Map<string, string>(Object.entries(s.textures)) : undefined;
+  const variantTextures = s.variantTextures
+    ? new Map<string, string[]>(Object.entries(s.variantTextures))
+    : undefined;
 
   return {
     gameId: s.gameId,
@@ -146,6 +156,7 @@ function deserialize(s: SerializedRegistry): BlockRegistry {
     blocks,
     tags,
     textures,
+    variantTextures,
     snapshotHash: s.snapshotHash,
     capturedAt: s.capturedAt,
     instanceName: s.instanceName,

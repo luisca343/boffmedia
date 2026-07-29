@@ -111,6 +111,35 @@ function firstVariantEntry(json: ForgeBlockstateJson): ForgeVariantEntry | undef
 }
 
 /**
+ * Every variant entry in DECLARATION ORDER, merged with `defaults`.
+ *
+ * Pre-flattening metadata usually indexes this list: `quark:crystal` declares
+ * `variant=crystal_white, crystal_red, crystal_orange, crystal_yellow,
+ * crystal_green…` and meta 4 is the green one. The real mapping lives in the
+ * mod's `getStateFromMeta`, so this is a heuristic — but it is right for the
+ * ordinary enum-property block, and the alternative is showing variant 0 for
+ * every metadata value (all 8 crystals white, all 16 wools the same).
+ */
+export function forgeVariantEntries(json: ForgeBlockstateJson): ForgeVariantEntry[] {
+  const out: ForgeVariantEntry[] = [];
+  const push = (candidate: unknown) => {
+    const entry = Array.isArray(candidate) ? candidate[0] : candidate;
+    if (!isPlainObject(entry)) return;
+    out.push({
+      model: (entry.model as string | undefined) ?? json.defaults?.model,
+      textures: { ...(json.defaults?.textures ?? {}), ...((entry.textures as Record<string, string>) ?? {}) },
+    });
+  };
+
+  for (const [key, value] of Object.entries(json.variants ?? {})) {
+    if (NON_PROPERTY_KEYS.has(key)) continue;
+    if (key.includes("=")) push(value);
+    else if (isPlainObject(value)) for (const v of Object.values(value)) push(v);
+  }
+  return out;
+}
+
+/**
  * The model ref and texture overrides that represent this block: `defaults`
  * merged with the first variant that names either (variant wins). Returning the
  * textures separately matters — in v1 the model is often a shared vanilla

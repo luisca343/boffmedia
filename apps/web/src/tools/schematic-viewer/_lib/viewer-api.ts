@@ -1,6 +1,7 @@
 import type { GameId } from "@/lib/schematic/adapters/game-adapter";
 import type {
   BlockPositionGroup,
+  LittleTilesGroup,
   ProgressCb,
   RegistryHandle,
   ScanOverride,
@@ -39,7 +40,7 @@ export interface ViewerWorkerAPI {
   ): Promise<RegistryHandle>;
 
   /** A block's texture as a data URL, or `null` for vanilla / unresolved blocks. */
-  getBlockTexture(registryId: string, blockId: string): Promise<string | null>;
+  getBlockTexture(registryId: string, blockId: string, meta?: number): Promise<string | null>;
 
   /** Baked geometry for a shaped (non-cube) block, or `null` for plain cubes. */
   getBlockModel(
@@ -64,6 +65,9 @@ export interface ViewerWorkerAPI {
 
   /** Per-block-type instance data for the 3D view. */
   getSchematicBlockPositions(schematicId: string): Promise<BlockPositionGroup[]>;
+
+  /** LittleTiles micro-box groups; empty when the document has none. */
+  getLittleTileBoxes(schematicId: string): Promise<LittleTilesGroup[]>;
 
   /** Free a cached schematic or registry. */
   release(id: string): Promise<void>;
