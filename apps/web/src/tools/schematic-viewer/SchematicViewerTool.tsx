@@ -26,8 +26,8 @@ export function SchematicViewerTool() {
   // Plain wrappers around the worker calls — never hand the Comlink proxy to
   // React as a prop (its dev-mode render logger can't serialize the proxy).
   const getBlockTexture = useCallback(
-    (registryId: string, blockId: string): Promise<string | null> =>
-      api ? api.getBlockTexture(registryId, blockId) : Promise.resolve(null),
+    (registryId: string, blockId: string, meta?: number): Promise<string | null> =>
+      api ? api.getBlockTexture(registryId, blockId, meta) : Promise.resolve(null),
     [api],
   );
 

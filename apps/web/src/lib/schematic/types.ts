@@ -104,6 +104,12 @@ export interface BlockRegistry {
    */
   textures?: Map<string, string>;
   /**
+   * Block id -> one texture per declared variant, in declaration order. Legacy
+   * `id:meta` materials index it directly (see `forgeVariantEntries`), which is
+   * what keeps 16 wool colours or 8 crystals from all rendering as variant 0.
+   */
+  variantTextures?: Map<string, string[]>;
+  /**
    * Lazy per-block texture resolver (worker-side only, never serialized). Used by
    * games whose textures are extracted on demand rather than prebuilt into
    * {@link textures} — e.g. Hytale pulls a block's icon PNG out of Assets.zip the
@@ -166,6 +172,46 @@ export interface WorldIdSummary {
   source: "registries" | "itemdata";
 }
 
+/**
+ * Micro-tile boxes of one LittleTiles material, extracted from LT tile
+ * entities (either generation — see loader/littletiles.ts). `boxes` is a flat
+ * Float32Array with stride 9: [bx, by, bz, x0, y0, z0, x1, y1, z1] per box —
+ * the host block cell plus the box min/max as 0..1 fractions within that cell.
+ * Sorted by host `by` so the preview's Y-layer cutoff can binary-search.
+ * `colors` (same box order, stride 3, RGB 0..1) is present only when at least
+ * one tile carries a colour tint.
+ */
+export interface LittleTilesGroup {
+  block: UnifiedBlock;
+  tileCount: number;
+  boxes: Float32Array;
+  colors?: Float32Array;
+  /**
+   * Transformable boxes (slopes/wedges), separate from `boxes` because they
+   * can't be drawn as scaled unit cubes: 8 corners × xyz per box, absolute
+   * world coords, host-Y sorted like `boxes`. `cornerHostY` (one Y per box)
+   * feeds the layer-cutoff binary search; `cornerColors` mirrors `colors`.
+   */
+  corners?: Float32Array;
+  cornerHostY?: Float32Array;
+  cornerColors?: Float32Array;
+}
+
+export interface LittleTilesData {
+  /** Number of host LittleTiles blocks (tile entities). */
+  blockCount: number;
+  /** Total micro-tiles across all hosts (a tile can span several boxes). */
+  tileCount: number;
+  groups: LittleTilesGroup[];
+  /**
+   * Material id → replacement blockstate string, filled from the user's
+   * resolutions when the worker applies them. Consumed by the modern-format
+   * export writer (convertLittleTilesForExport), which re-parses the original
+   * TEs and swaps materials by their original id.
+   */
+  materialMap?: Record<string, string>;
+}
+
 export interface SchematicRegion {
   name: string;
   dimensions: { x: number; y: number; z: number };
@@ -182,6 +228,8 @@ export interface SchematicStructure {
   tileEntities: TileEntity[];
   entities: Entity[];
   regions?: SchematicRegion[];
+  /** Parsed LittleTiles content, when the file carries LT tile entities. */
+  littleTiles?: LittleTilesData;
   metadata: Record<string, unknown>;
 }
 
@@ -200,6 +248,12 @@ export interface DiffEntry {
   instanceCount: number;
   autoCandidate?: UnifiedBlock;
   incompatibleStates?: string[];
+  /**
+   * Set when the block is not in the schematic's block grid but referenced as a
+   * LittleTiles micro-tile material. Informational: resolutions rewrite the
+   * palette, so they cannot apply to these entries (`instanceCount` = tiles).
+   */
+  context?: "littletiles";
 }
 
 export interface CompatDiff {
@@ -307,4 +361,6 @@ export interface SchematicSummary {
    * Only meaningful on a legacy document; drives the "attach a level.dat" hint.
    */
   unknownIdCount?: number;
+  /** Present when the schematic contains LittleTiles blocks. */
+  littleTiles?: { blockCount: number; tileCount: number };
 }

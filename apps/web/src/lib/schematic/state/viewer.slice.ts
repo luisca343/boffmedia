@@ -1,14 +1,17 @@
-import type { BlockPositionGroup, SchematicSummary } from "../types";
+import type { BlockPositionGroup, LittleTilesGroup, SchematicSummary } from "../types";
 import type { NavMode, SliceSet } from "./types";
 
 /** Everything the 3D view reads: instance data, selection, slicing, navigation. */
 export interface ViewerSlice {
   blockPositions: BlockPositionGroup[];
+  /** LittleTiles micro-boxes of the loaded document; empty when it has none. */
+  littleTileGroups: LittleTilesGroup[];
   isFetchingPositions: boolean;
   selectedBlockId?: string;
   layerY: number;
   navMode: NavMode;
   setBlockPositions: (groups: BlockPositionGroup[]) => void;
+  setLittleTileGroups: (groups: LittleTilesGroup[]) => void;
   setFetchingPositions: (v: boolean) => void;
   setSelectedBlock: (id: string | undefined) => void;
   setLayerY: (y: number) => void;
@@ -26,6 +29,7 @@ export interface ViewerSlice {
 
 const VIEWER_DEFAULTS = {
   blockPositions: [] as BlockPositionGroup[],
+  littleTileGroups: [] as LittleTilesGroup[],
   isFetchingPositions: false,
   selectedBlockId: undefined,
   layerY: 0,
@@ -36,6 +40,7 @@ export function createViewerSlice(set: SliceSet<ViewerSlice>): ViewerSlice {
   return {
     ...VIEWER_DEFAULTS,
     setBlockPositions: (groups) => set({ blockPositions: groups }),
+    setLittleTileGroups: (groups) => set({ littleTileGroups: groups }),
     setFetchingPositions: (v) => set({ isFetchingPositions: v }),
     setSelectedBlock: (id) => set({ selectedBlockId: id }),
     setLayerY: (y) => set({ layerY: y }),
@@ -43,6 +48,7 @@ export function createViewerSlice(set: SliceSet<ViewerSlice>): ViewerSlice {
     resetViewerFor: (schematic) =>
       set({
         blockPositions: [],
+        littleTileGroups: [],
         selectedBlockId: undefined,
         layerY: schematic ? schematic.dimensions.y - 1 : 0,
         isFetchingPositions: !!schematic,

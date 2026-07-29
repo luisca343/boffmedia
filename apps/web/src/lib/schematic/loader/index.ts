@@ -5,8 +5,53 @@ import { loadNbtStruct } from "./nbt-struct";
 import { loadMca } from "./mca";
 import { loadPrefab } from "./prefab";
 import { parseNBT } from "../parsers/nbt";
-import type { SchematicParseOptions, SchematicStructure } from "../types";
+import { isLittleTilesEntity, parseLittleTiles } from "./littletiles";
+import { loadLegacyTables } from "./legacy/legacy-mapper";
+import type { SchematicParseOptions, SchematicStructure, UnifiedBlock } from "../types";
 import { ERR, codedError } from "../errors";
+
+/**
+ * Post-parse step shared by every Minecraft loader: when a structure carries
+ * LittleTiles tile entities (either generation), parse them into per-material
+ * micro-box groups and re-point their host cells.
+ *
+ * The re-pointing matters most for pre-1.13 inputs: a cell hosting an LT tile
+ * entity is by definition the mod's host block, but its numeric id → name
+ * mapping is per-world, so without it the cell reads `unknown:block_<id>`. The
+ * TE id is a portable string, which makes it the reliable signal. Cells that
+ * are already littletiles-namespaced (modern `.schem`) keep their palette entry
+ * untouched, so a byte-faithful re-export stays byte-faithful.
+ */
+async function attachLittleTiles(structure: SchematicStructure): Promise<SchematicStructure> {
+  if (!structure.tileEntities.some(isLittleTilesEntity)) return structure;
+  const littleTiles = parseLittleTiles(structure.tileEntities, await loadLegacyTables());
+  if (!littleTiles) return structure;
+
+  const { x: width, y: height, z: length } = structure.dimensions;
+  let hostIdx = -1;
+  for (const te of structure.tileEntities) {
+    if (!isLittleTilesEntity(te)) continue;
+    const { x, y, z } = te.pos;
+    if (x < 0 || y < 0 || z < 0 || x >= width || y >= height || z >= length) continue;
+    const cell = (y * length + z) * width + x;
+    if (structure.palette[structure.blockData[cell]]?.namespace === "littletiles") continue;
+    if (hostIdx === -1) {
+      hostIdx = structure.palette.length;
+      const marker: UnifiedBlock = {
+        id: "littletiles:tiles",
+        namespace: "littletiles",
+        name: "tiles",
+        states: {},
+        tags: [],
+        source: "mod",
+        modId: "littletiles",
+      };
+      structure.palette.push(marker);
+    }
+    structure.blockData[cell] = hostIdx;
+  }
+  return { ...structure, littleTiles };
+}
 
 /**
  * Dispatch a schematic file to the right loader based on its extension.
@@ -35,18 +80,20 @@ export async function loadSchematicFile(
   }
   if (name.endsWith(".schem") || name.endsWith(".schematic")) {
     const root = parseNBT(buffer);
-    return isMceditSchematic(root)
-      ? loadMcedit(root, file.name, { worldIds: options?.worldIds })
-      : loadSchem(root, file.name);
+    return attachLittleTiles(
+      await (isMceditSchematic(root)
+        ? loadMcedit(root, file.name, { worldIds: options?.worldIds })
+        : loadSchem(root, file.name)),
+    );
   }
   if (name.endsWith(".litematic")) {
-    return loadLitematic(buffer, file.name);
+    return attachLittleTiles(loadLitematic(buffer, file.name));
   }
   if (name.endsWith(".nbt")) {
     return loadNbtStruct(buffer, file.name);
   }
   if (name.endsWith(".mca")) {
-    return loadMca(buffer, file.name, { worldIds: options?.worldIds });
+    return attachLittleTiles(await loadMca(buffer, file.name, { worldIds: options?.worldIds }));
   }
   throw codedError(ERR.schematicUnsupported, `Unsupported file type: ${file.name}`);
 }

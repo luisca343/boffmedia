@@ -1,5 +1,5 @@
 import type JSZip from "jszip";
-import { forgeRepresentative, isForgeBlockstate } from "./forge-blockstate";
+import { forgeRepresentative, forgeVariantEntries, isForgeBlockstate } from "./forge-blockstate";
 import { vanillaTextureUrl } from "../textures/blockTexture";
 
 /**
@@ -74,12 +74,18 @@ async function loadModel(
   index?: JarIndex,
 ): Promise<ModelJson | undefined> {
   const [ns, path] = splitRef(ref);
-  // Pre-1.13 blockstates name models relative to `models/block/` ("red_wool"),
-  // modern ones spell the folder out ("minecraft:block/red_wool"). Try the ref
-  // as written first so a modern path can never be shadowed.
+  // Pre-1.13 blockstates name models relative to `models/block/`, and that ref
+  // may itself contain folders: Dawn of Time asks for
+  // `dawnoftimebuilder:japanese/grey_roof_tiles` and ships
+  // `models/block/japanese/grey_roof_tiles.json`. So the `block/` retry applies
+  // to any ref that isn't already rooted at block/ or item/ — restricting it to
+  // slash-less refs (as before) missed every mod that groups models in
+  // subfolders, which is most of them. The ref as written is still tried first
+  // so a modern path can never be shadowed.
+  const rooted = path.startsWith("block/") || path.startsWith("item/");
   const file =
     fileAt(zip, `assets/${ns}/models/${path}.json`, index) ??
-    (path.includes("/") ? null : fileAt(zip, `assets/${ns}/models/block/${path}.json`, index));
+    (rooted ? null : fileAt(zip, `assets/${ns}/models/block/${path}.json`, index));
   if (!file) return undefined;
   try {
     return JSON.parse(await file.async("string")) as ModelJson;
@@ -156,6 +162,66 @@ function modelFromBlockstate(bs: BlockstateJson): string | undefined {
  * in a JAR that share a texture — and because JS strings are shared by reference,
  * blocks pointing at the same texture cost no extra memory.
  */
+async function textureFor(
+  zip: JSZip,
+  modelRef: string | undefined,
+  overrides: Record<string, string>,
+  pngCache: Map<string, string>,
+  version: string | undefined,
+  index: JarIndex | undefined,
+): Promise<string | undefined> {
+  if (!modelRef && !Object.keys(overrides).length) return undefined;
+
+  const inherited = modelRef ? await collectTextures(zip, modelRef, index) : {};
+  const textures = { ...inherited, ...overrides };
+  const textureRef = pickTexture(textures);
+  if (!textureRef) return undefined;
+
+  const [ns, path] = splitRef(textureRef);
+  const pngPath = `assets/${ns}/textures/${path}.png`;
+
+  const cached = pngCache.get(pngPath);
+  if (cached) return cached;
+
+  const file = fileAt(zip, pngPath, index);
+  if (!file) {
+    // A mod block whose model points at a VANILLA texture — a modded wall or
+    // stair of a vanilla material reuses that material's PNG, which ships in the
+    // client jar, not in this JAR. Common enough that treating it as
+    // "no texture" leaves whole categories of mod blocks as blank placeholders.
+    return ns === "minecraft" ? vanillaTextureUrl(path, version) : undefined;
+  }
+  const dataUrl = `data:image/png;base64,${await file.async("base64")}`;
+  pngCache.set(pngPath, dataUrl);
+  return dataUrl;
+}
+
+/**
+ * One texture per declared variant, in order, for a Forge v1 blockstate —
+ * indexed by pre-flattening metadata at render time. Returns `undefined` when
+ * the block has fewer than two variants (nothing to disambiguate).
+ */
+export async function resolveVariantTextures(
+  zip: JSZip,
+  blockstate: BlockstateJson,
+  pngCache: Map<string, string>,
+  version?: string,
+  index?: JarIndex,
+): Promise<string[] | undefined> {
+  if (!isForgeBlockstate(blockstate)) return undefined;
+  const entries = forgeVariantEntries(blockstate);
+  if (entries.length < 2) return undefined;
+
+  const out: string[] = [];
+  let resolved = 0;
+  for (const entry of entries) {
+    const url = await textureFor(zip, entry.model, entry.textures ?? {}, pngCache, version, index);
+    out.push(url ?? "");
+    if (url) resolved++;
+  }
+  return resolved > 0 ? out : undefined;
+}
+
 export async function resolveBlockTexture(
   zip: JSZip,
   blockstate: BlockstateJson,

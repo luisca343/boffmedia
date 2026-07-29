@@ -1,6 +1,7 @@
 import type { GameId } from "../adapters/game-adapter";
 import type {
   BlockPositionGroup,
+  LittleTilesGroup,
   ProgressCb,
   RegistryHandle,
   ScanOverride,
@@ -46,4 +47,9 @@ export interface EnvironmentApi extends ReleasableApi {
 
 export interface PositionsApi {
   getSchematicBlockPositions(schematicId: string): Promise<BlockPositionGroup[]>;
+  /**
+   * Optional: LittleTiles micro-box groups for the same document. Workers that
+   * predate LT support simply omit it and the viewer renders no micro-boxes.
+   */
+  getLittleTileBoxes?(schematicId: string): Promise<LittleTilesGroup[]>;
 }

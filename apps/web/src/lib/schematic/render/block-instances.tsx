@@ -7,7 +7,7 @@ import { fluidColor } from "./fluid-color";
 import type { ModelLoader, TextureLoader } from "./assetLoaders";
 import type { BuiltModel } from "./blockModelCache";
 import { useInstanceMatrices } from "./instance-matrices";
-import { makeMaterial, styleParams, surfaceColor } from "./material";
+import { makeMaterial, metaOf, styleParams, surfaceColor } from "./material";
 import { maxSliceCount } from "./picking";
 import type { RenderKind } from "./render-plan";
 import { useBlockModel } from "./useBlockModel";
@@ -97,6 +97,7 @@ function CubeInstances({
   slice,
   capacity,
   textureId,
+  states,
   kind,
   isSelected,
   maxLayerY,
@@ -109,7 +110,7 @@ function CubeInstances({
   const meshRef = useRef<THREE.InstancedMesh>(null);
   useInstanceMatrices(meshRef, positions, capacity, maxLayerY, "cube", slice);
 
-  const texture = useBlockTexture(textureId, version, registryId, textureLoader);
+  const texture = useBlockTexture(textureId, version, registryId, textureLoader, metaOf(states));
   if (capacity === 0) return null;
   const sp = styleParams(kind, isSelected);
 

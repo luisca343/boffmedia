@@ -127,6 +127,14 @@ export function SetupSidebar({
                 mono: true,
               },
               { label: t("setup.palette"), value: schematic.paletteSize.toLocaleString(), mono: true },
+              !!schematic.littleTiles && {
+                label: t("setup.littleTiles"),
+                value: t("setup.littleTilesCount", {
+                  blocks: schematic.littleTiles.blockCount,
+                  tiles: schematic.littleTiles.tileCount,
+                }),
+                mono: true,
+              },
             ]}
           />
         </div>

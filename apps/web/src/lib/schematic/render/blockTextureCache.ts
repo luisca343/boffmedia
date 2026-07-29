@@ -93,15 +93,16 @@ export function getBlockTexture(
   version: string | undefined,
   registryId: string | undefined,
   modLoader: TextureLoader | null,
+  meta?: number,
 ): Promise<THREE.Texture | null> {
-  const key = `${version ?? ""}|${registryId ?? ""}|${blockId}`;
+  const key = `${version ?? ""}|${registryId ?? ""}|${blockId}|${meta ?? 0}`;
   let pending = cache.get(key);
   if (pending) return pending;
 
   if (isVanillaId(blockId)) {
     pending = loadFromCandidates(blockTextureUrls(blockId, version));
   } else if (registryId && modLoader) {
-    pending = modLoader(registryId, blockId)
+    pending = modLoader(registryId, blockId, meta)
       .then((dataUrl) => (dataUrl ? loadUrl(dataUrl) : null))
       .catch(() => null);
   } else {

@@ -15,8 +15,8 @@ const api: ViewerWorkerAPI = {
   scanInstance: (gameId, files, onProgress, override) =>
     core.scanInstance(state, gameId, files, onProgress, { override }),
 
-  getBlockTexture: (registryId: string, blockId: string) =>
-    core.getBlockTexture(state, registryId, blockId),
+  getBlockTexture: (registryId: string, blockId: string, meta?: number) =>
+    core.getBlockTexture(state, registryId, blockId, meta),
 
   getBlockModel: (registryId: string, blockId: string, stateLabel?: string, rotation?: number) =>
     core.getBlockModel(state, registryId, blockId, stateLabel, rotation),
@@ -29,6 +29,8 @@ const api: ViewerWorkerAPI = {
 
   getSchematicBlockPositions: (schematicId: string) =>
     core.getSchematicBlockPositions(state, schematicId),
+
+  getLittleTileBoxes: (schematicId: string) => core.getLittleTileBoxes(state, schematicId),
 
   release: (id: string) => core.release(state, id),
 };
