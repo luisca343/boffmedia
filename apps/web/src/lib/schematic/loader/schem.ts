@@ -9,7 +9,6 @@
  *   index = (y * Length + z) * Width + x
  */
 import {
-  parseNBT,
   asCompound,
   asNumber,
   asByteArray,
@@ -79,9 +78,11 @@ function readTileEntities(root: NbtCompound, container: NbtCompound): TileEntity
   return out;
 }
 
-export function loadSchem(data: Uint8Array, fileName: string): SchematicStructure {
-  const root = parseNBT(data);
-
+/**
+ * Takes an already-parsed NBT root: `.schematic` is shared with the legacy
+ * MCEdit format, so the dispatcher has to parse before it can tell them apart.
+ */
+export function loadSchem(root: NbtCompound, fileName: string): SchematicStructure {
   // Some exporters wrap everything in a "Schematic" compound.
   const schem = (root.Schematic ? asCompound(root.Schematic, "Schematic") : root) as NbtCompound;
 

@@ -1,21 +1,27 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { Banner, DataList, Select, Spinner } from "@/components/boffmedia/primitives";
-import { SchematicFilePicker } from "@/components/boffmedia/ui/schematic";
-import { BUNDLED_VERSIONS } from "@/lib/schematic/versions";
-import { selectEnvironment, useViewerStore } from "../_store/viewer.store";
+import { Banner, DataList, Spinner } from "@/components/boffmedia/primitives";
+import { SchematicFilePicker, WorldIdPicker } from "@/components/boffmedia/ui/schematic";
+import type { EnvMode } from "@/lib/schematic/state";
+import { useViewerStore } from "../_store/viewer.store";
+import { EnvironmentPicker } from "./EnvironmentPicker";
 
 interface SetupSidebarProps {
   engineReady: boolean;
   onPickSchematic: (file: File) => void;
   onChangeVersion: (version: string) => void;
+  onPickWorld: (file: File) => void;
+  onDetachWorld: () => void;
+  onChangeMode: (mode: EnvMode) => void;
+  onScanInstance: (files: File[]) => void;
 }
 
 /** `error.*` message keys, by machine code. Uncoded failures show raw detail. */
 const ERROR_KEY: Record<string, string> = {
   E_SCHEMATIC_UNSUPPORTED: "error.schematicUnsupported",
-  E_SCHEMATIC_LEGACY: "error.schematicLegacy",
+  E_LEVELDAT_UNREADABLE: "error.levelDatUnreadable",
+  E_LEVELDAT_NO_REGISTRY: "error.levelDatNoRegistry",
 };
 
 function GroupHead({ title }: { title: string }) {
@@ -34,11 +40,15 @@ export function SetupSidebar({
   engineReady,
   onPickSchematic,
   onChangeVersion,
+  onPickWorld,
+  onDetachWorld,
+  onChangeMode,
+  onScanInstance,
 }: SetupSidebarProps) {
   const t = useTranslations("games.minecraft.schematicViewer");
-  const env = useViewerStore(selectEnvironment);
   const schematic = useViewerStore((s) => s.schematic);
   const isLoadingSchematic = useViewerStore((s) => s.isLoadingSchematic);
+  const worldIds = useViewerStore((s) => s.worldIds);
   const error = useViewerStore((s) => s.error);
   const errorCode = useViewerStore((s) => s.errorCode);
 
@@ -47,27 +57,13 @@ export function SetupSidebar({
   return (
     <div className="flex flex-col gap-4 p-4 pb-[22px]">
       <div className="flex flex-col gap-2.5">
-        <GroupHead title={t("setup.version")} />
-        <Select
-          value={env.vanillaVersion}
-          options={[...BUNDLED_VERSIONS]}
-          disabled={!engineReady || env.isLoading}
-          ariaLabel={t("setup.version")}
-          onChange={onChangeVersion}
+        <GroupHead title={t("setup.environment")} />
+        <EnvironmentPicker
+          engineReady={engineReady}
+          onChangeVersion={onChangeVersion}
+          onChangeMode={onChangeMode}
+          onScanInstance={onScanInstance}
         />
-        {env.isLoading ? (
-          <div className="flex items-center gap-2 font-mono text-[11px] text-txt-dim">
-            <Spinner size={13} />
-            {t("setup.loadingRegistry")}
-          </div>
-        ) : env.registry ? (
-          <DataList
-            rows={[
-              { label: t("setup.registry"), value: t("setup.vanillaRegistry") },
-              { label: t("setup.blocks"), value: env.registry.blockCount.toLocaleString(), mono: true },
-            ]}
-          />
-        ) : null}
       </div>
 
       <div className="flex flex-col gap-2.5">
@@ -90,6 +86,33 @@ export function SetupSidebar({
         <Banner tone="error" className="text-[12.5px]">
           {errorText}
         </Banner>
+      )}
+
+      {/* Only pre-flattening documents carry numeric ids, so this step exists
+          only for them — a modern file needs no world to be named. */}
+      {schematic?.legacy && (
+        <div className="flex flex-col gap-2.5">
+          <GroupHead title={t("setup.world")} />
+          <WorldIdPicker
+            worldIds={worldIds}
+            unknownIdCount={schematic.unknownIdCount ?? 0}
+            disabled={!engineReady || isLoadingSchematic}
+            labels={{
+              dropHere: t("setup.worldDropHere"),
+              hint: t("setup.worldHint"),
+              loaded: t("setup.loaded"),
+              world: t("setup.worldName"),
+              ids: t("setup.worldModdedIds"),
+              mods: t("setup.worldMods"),
+              unresolved: t("setup.worldUnresolved", { count: schematic.unknownIdCount ?? 0 }),
+              needed: t("setup.worldNeeded", { count: schematic.unknownIdCount ?? 0 }),
+              caveat: t("setup.worldCaveat"),
+              detach: t("setup.worldDetach"),
+            }}
+            onPick={onPickWorld}
+            onDetach={onDetachWorld}
+          />
+        </div>
       )}
 
       {schematic && (

@@ -21,6 +21,9 @@
  * Block-state bit-packing:
  *   1.16+  (DataVersion ≥ 2529): packed    — bitsPerEntry bits per entry, no crossing
  *   pre-1.16 (DataVersion < 2529): split   — same scheme as Litematica
+ *   pre-1.13 (DataVersion < 1519): no palette at all — a `Blocks` byte array of
+ *                                  numeric ids + `Data`/`Add` nibble arrays,
+ *                                  translated through the legacy table.
  */
 
 import { inflate, ungzip } from "pako";
@@ -35,12 +38,14 @@ import {
   type NbtValue,
 } from "../parsers/nbt";
 import { parsePaletteEntry, serializeBlockState } from "../normalizer";
-import type { SchematicStructure, UnifiedBlock, TileEntity } from "../types";
+import { loadLegacyTables, resolveLegacyBlock } from "./legacy/legacy-mapper";
+import type { LegacyIdMap, SchematicStructure, UnifiedBlock, TileEntity } from "../types";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
 const DATA_VERSION_1_18 = 2860;  // sections[] at top level
 const DATA_VERSION_1_16 = 2529;  // packed bit-packing
+const DATA_VERSION_1_13 = 1519;  // the flattening: below this, sections carry numeric ids
 
 // Safety cap: prevent allocating multi-GB blockData arrays for full flatworld regions
 const MAX_VOLUME = 50_000_000; // ~200 MB as Int32Array
@@ -162,13 +167,74 @@ function parseSectionPost118(sectionNbt: NbtValue, dataVersion: number): Section
   return { sectionY, palette, blockIndices };
 }
 
-function parseSectionPre118(sectionNbt: NbtValue, dataVersion: number): SectionData | null {
+/**
+ * Context for decoding pre-flattening sections: the WorldEdit legacy table plus
+ * the source world's `level.dat` id map, without which modded numeric ids have
+ * no name. Null when the region is 1.13+ and needs none of it.
+ */
+interface LegacyContext {
+  table: Record<string, string>;
+  worldIds?: LegacyIdMap;
+  unknownIds: Set<number>;
+}
+
+/** Nibble arrays pack two values per byte: even index → low nibble, odd → high. */
+function nibble(arr: Uint8Array, i: number): number {
+  const byte = arr[i >> 1] ?? 0;
+  return (i & 1) === 0 ? byte & 0x0f : byte >> 4;
+}
+
+/**
+ * Pre-1.13 section: `Blocks` (4096 bytes of low id bits), `Data` (nibbles of
+ * metadata) and an optional `Add` nibble array carrying id bits 8–11. Each
+ * distinct id:meta becomes a section-local palette entry; the caller merges
+ * section palettes into the structure's global one.
+ */
+function parseSectionPre113(sec: NbtCompound, legacy: LegacyContext): SectionData | null {
+  const blocks = sec.Blocks;
+  if (!ArrayBuffer.isView(blocks)) return null;
+  const blocksRaw = blocks as Uint8Array;
+  const dataRaw = ArrayBuffer.isView(sec.Data) ? (sec.Data as Uint8Array) : undefined;
+  const addRaw = ArrayBuffer.isView(sec.Add) ? (sec.Add as Uint8Array) : undefined;
+
+  const sectionY = asNumber(sec.Y, "Sections[].Y");
+  const palette: UnifiedBlock[] = [];
+  const byKey = new Map<number, number>();
+  const blockIndices = new Int32Array(4096);
+
+  for (let i = 0; i < 4096; i++) {
+    let id = blocksRaw[i] ?? 0;
+    if (addRaw) id |= nibble(addRaw, i) << 8;
+    const meta = dataRaw ? nibble(dataRaw, i) : 0;
+
+    const key = (id << 4) | meta;
+    let pi = byKey.get(key);
+    if (pi === undefined) {
+      pi = palette.length;
+      palette.push(
+        resolveLegacyBlock(id, meta, legacy.table, legacy.worldIds, undefined, legacy.unknownIds),
+      );
+      byKey.set(key, pi);
+    }
+    blockIndices[i] = pi;
+  }
+
+  return { sectionY, palette, blockIndices };
+}
+
+function parseSectionPre118(
+  sectionNbt: NbtValue,
+  dataVersion: number,
+  legacy: LegacyContext | null,
+): SectionData | null {
   const sec = asCompound(sectionNbt, "Sections entry");
 
   const sectionY = asNumber(sec.Y, "Sections[].Y");
 
   const paletteList = sec.Palette;
-  if (!paletteList) return null; // pre-1.13 section without palette (uses numeric IDs — unsupported)
+  // No palette → pre-flattening section: numeric ids, decodable only with the
+  // legacy table (and, for mod blocks, the source world's id map).
+  if (!paletteList) return legacy ? parseSectionPre113(sec, legacy) : null;
   const palette = asList(paletteList, "Sections[].Palette").map(entryToBlock);
 
   if (palette.length === 0) return null;
@@ -223,7 +289,7 @@ interface ParsedChunk {
   tileEntities: RawTileEntity[];
 }
 
-function parseChunkNbt(nbt: NbtCompound): ParsedChunk | null {
+function parseChunkNbt(nbt: NbtCompound, legacy: LegacyContext | null): ParsedChunk | null {
   const dataVersion =
     nbt.DataVersion !== undefined ? asNumber(nbt.DataVersion, "DataVersion") : 0;
 
@@ -260,7 +326,7 @@ function parseChunkNbt(nbt: NbtCompound): ParsedChunk | null {
     const sections: SectionData[] = [];
     for (const s of sectionsRaw) {
       try {
-        const sd = parseSectionPre118(s, dataVersion);
+        const sd = parseSectionPre118(s, dataVersion, legacy);
         if (sd) sections.push(sd);
       } catch {
         // Corrupt section — skip
@@ -276,12 +342,87 @@ function isAir(block: UnifiedBlock): boolean {
   return block.id.endsWith(":air") || block.id === "air";
 }
 
-export function loadMca(data: Uint8Array, fileName: string): SchematicStructure {
+/** Decompressed NBT bytes of one chunk slot; null when empty, corrupt or LZ4. */
+function readChunkBytes(
+  data: Uint8Array,
+  view: DataView,
+  cx: number,
+  cz: number,
+): Uint8Array | null {
+  const headerOff = 4 * (cz * 32 + cx);
+  const sectorOffset =
+    (view.getUint8(headerOff) << 16) |
+    (view.getUint8(headerOff + 1) << 8) |
+    view.getUint8(headerOff + 2);
+  const sectorCount = view.getUint8(headerOff + 3);
+
+  if (sectorOffset === 0 && sectorCount === 0) return null;
+
+  const chunkStart = sectorOffset * 4096;
+  if (chunkStart + 5 > data.length) return null;
+
+  const chunkLen = view.getUint32(chunkStart, false);
+  if (chunkLen < 1 || chunkStart + 4 + chunkLen > data.length) return null;
+
+  const compressionType = data[chunkStart + 4];
+  const compressed = data.subarray(chunkStart + 5, chunkStart + 4 + chunkLen);
+
+  try {
+    if (compressionType === 1) return ungzip(compressed);
+    if (compressionType === 2) return inflate(compressed);
+    if (compressionType === 3) return compressed;
+    return null; // LZ4 / unknown
+  } catch {
+    return null; // corrupt compressed data
+  }
+}
+
+/**
+ * Decide whether this region predates the flattening, from the first readable
+ * chunk's `DataVersion` — a world is written by one game version, so probing a
+ * single chunk avoids holding 1024 parsed chunk trees in memory just to choose
+ * a decoder. Chunks older than 1.9 carry no `DataVersion` at all, which reads
+ * as 0 and is likewise legacy.
+ */
+async function legacyContextFor(
+  data: Uint8Array,
+  view: DataView,
+  worldIds: LegacyIdMap | undefined,
+): Promise<LegacyContext | null> {
+  for (let cz = 0; cz < 32; cz++) {
+    for (let cx = 0; cx < 32; cx++) {
+      const raw = readChunkBytes(data, view, cx, cz);
+      if (!raw) continue;
+      let dataVersion = 0;
+      try {
+        const nbt = parseNBT(raw);
+        dataVersion = nbt.DataVersion !== undefined ? asNumber(nbt.DataVersion, "DataVersion") : 0;
+      } catch {
+        continue; // unreadable chunk — try the next slot
+      }
+      if (dataVersion >= DATA_VERSION_1_13) return null;
+      return { table: (await loadLegacyTables()).blocks, worldIds, unknownIds: new Set() };
+    }
+  }
+  return null;
+}
+
+export interface McaOptions {
+  /** `level.dat` id→name map of this world; only pre-1.13 regions consume it. */
+  worldIds?: LegacyIdMap;
+}
+
+export async function loadMca(
+  data: Uint8Array,
+  fileName: string,
+  options?: McaOptions,
+): Promise<SchematicStructure> {
   if (data.length < 8192) {
     throw new Error("File too small to be a valid .mca region file (expected ≥ 8 KB header)");
   }
 
   const view = new DataView(data.buffer, data.byteOffset, data.byteLength);
+  const legacy = await legacyContextFor(data, view, options?.worldIds);
 
   // ── Parse all chunks ────────────────────────────────────────────────────────
 
@@ -289,42 +430,12 @@ export function loadMca(data: Uint8Array, fileName: string): SchematicStructure 
 
   for (let cz = 0; cz < 32; cz++) {
     for (let cx = 0; cx < 32; cx++) {
-      const headerOff = 4 * (cz * 32 + cx);
-      const sectorOffset =
-        (view.getUint8(headerOff) << 16) |
-        (view.getUint8(headerOff + 1) << 8) |
-        view.getUint8(headerOff + 2);
-      const sectorCount = view.getUint8(headerOff + 3);
-
-      if (sectorOffset === 0 && sectorCount === 0) continue;
-
-      const chunkStart = sectorOffset * 4096;
-      if (chunkStart + 5 > data.length) continue;
-
-      const chunkLen = view.getUint32(chunkStart, false);
-      if (chunkLen < 1 || chunkStart + 4 + chunkLen > data.length) continue;
-
-      const compressionType = data[chunkStart + 4];
-      const compressed = data.subarray(chunkStart + 5, chunkStart + 4 + chunkLen);
-
-      let raw: Uint8Array;
-      try {
-        if (compressionType === 1) {
-          raw = ungzip(compressed);
-        } else if (compressionType === 2) {
-          raw = inflate(compressed);
-        } else if (compressionType === 3) {
-          raw = compressed;
-        } else {
-          continue; // LZ4 / unknown — skip
-        }
-      } catch {
-        continue; // corrupt compressed data
-      }
+      const raw = readChunkBytes(data, view, cx, cz);
+      if (!raw) continue;
 
       try {
         const nbt = parseNBT(raw);
-        const chunk = parseChunkNbt(nbt);
+        const chunk = parseChunkNbt(nbt, legacy);
         if (chunk) chunks.push(chunk);
       } catch {
         // corrupt NBT — skip chunk
@@ -479,6 +590,13 @@ export function loadMca(data: Uint8Array, fileName: string): SchematicStructure 
     metadata: {
       fileName,
       bounds: { minX: minBX, minY: minBY, minZ: minBZ, maxX: maxBX, maxY: maxBY, maxZ: maxBZ },
+      ...(legacy
+        ? {
+            legacy: true,
+            unknownLegacyIds: [...legacy.unknownIds].sort((a, b) => a - b),
+            worldIdsApplied: options?.worldIds?.size ?? 0,
+          }
+        : {}),
     },
   };
 }

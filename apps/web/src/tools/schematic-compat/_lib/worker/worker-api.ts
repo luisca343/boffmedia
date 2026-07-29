@@ -6,6 +6,7 @@ import type {
   DiffEntry,
   RegistryHandle,
   SchematicSummary,
+  WorldIdSummary,
   BlockPositionGroup,
   BlockDefinition,
   ProgressCb,
@@ -92,6 +93,16 @@ export interface CompatWorkerAPI {
 
   /** Parse a schematic file; caches it in the worker and returns a summary. */
   loadSchematic(file: File): Promise<SchematicSummary>;
+
+  /**
+   * Attach the `level.dat` of the pre-1.13 world a legacy file was cut from —
+   * the only place a modded numeric block id maps to a name. Applies to loads
+   * made after this call.
+   */
+  loadWorldIds(file: File): Promise<WorldIdSummary>;
+
+  /** Detach the world id table. */
+  clearWorldIds(): Promise<void>;
 
   /** Diff a cached schematic against cached source/target registries. */
   computeDiff(

@@ -14,7 +14,7 @@
  *
  * Run:  node generate-vanilla.mjs
  */
-import { writeFileSync } from "node:fs";
+import { readFileSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 import mcData from "minecraft-data";
@@ -23,6 +23,9 @@ const here = dirname(fileURLToPath(import.meta.url));
 
 /** Versions bundled offline. Keep in sync with BUNDLED_VERSIONS in ../../../versions.ts. */
 const VERSIONS = [
+  "1.13.2",
+  "1.14.4",
+  "1.15.2",
   "1.16.5",
   "1.17.1",
   "1.18",
@@ -95,9 +98,52 @@ function buildVersion(version) {
   };
 }
 
+/**
+ * 1.12.2 cannot come from `minecraft-data`: pre-flattening blocks have no
+ * `states` there (only metadata `variations`) and carry their old names, which
+ * would contradict the loader — the legacy `.schematic`/`.mca` path translates
+ * `id:meta` into *modern* blockstates via WorldEdit's table.
+ *
+ * So the 1.12.2 registry is exactly that table's reachable set: every modern
+ * block a 1.12 world can contain, with its state definitions borrowed from
+ * 1.16.5. That keeps the environment consistent with what the loader emits, and
+ * makes it a correct *source* for an upgrade diff. It is deliberately not a
+ * usable export target — nothing here writes pre-flattening files.
+ */
+function buildLegacy1122() {
+  const legacy = JSON.parse(readFileSync(join(here, "../../loader/legacy/1.12.json"), "utf8"));
+  const base = JSON.parse(readFileSync(join(here, "1.16.5.json"), "utf8"));
+
+  const blocks = {};
+  for (const stateString of Object.values(legacy.blocks)) {
+    const name = stateString.split("[")[0];
+    const def = base.blocks[name];
+    if (!def || blocks[name]) continue;
+    blocks[name] = def;
+  }
+
+  const sorted = {};
+  for (const id of Object.keys(blocks).sort()) sorted[id] = blocks[id];
+
+  return {
+    version: "1.12.2",
+    dataVersion: 1343,
+    blockCount: Object.keys(sorted).length,
+    blocks: sorted,
+  };
+}
+
 for (const version of VERSIONS) {
   const out = buildVersion(version);
   const file = join(here, `${version}.json`);
   writeFileSync(file, JSON.stringify(out, null, 0) + "\n");
   console.log(`wrote ${file} (${out.blockCount} blocks, dataVersion ${out.dataVersion})`);
 }
+
+// After 1.16.5 exists on disk — it is this one's source of state definitions.
+const legacyOut = buildLegacy1122();
+const legacyFile = join(here, "1.12.2.json");
+writeFileSync(legacyFile, JSON.stringify(legacyOut, null, 0) + "\n");
+console.log(
+  `wrote ${legacyFile} (${legacyOut.blockCount} blocks, dataVersion ${legacyOut.dataVersion})`,
+);

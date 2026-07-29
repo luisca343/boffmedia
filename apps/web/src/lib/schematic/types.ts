@@ -93,6 +93,8 @@ export interface BlockRegistry {
   dataVersion?: number;
   modLoader?: ModLoader;
   mods: ModInfo[];
+  /** Mod JARs that failed to read during the scan; absent on bundled registries. */
+  failedJars?: number;
   blocks: Map<string, BlockDefinition>;
   tags: Map<string, string[]>;
   /**
@@ -140,6 +142,30 @@ export interface Entity {
   data: Record<string, unknown>;
 }
 
+/**
+ * Numeric block id → `namespace:name`, as recorded by one specific pre-1.13
+ * world's `level.dat`. Modded ids are assigned per world, so a map from a
+ * different save names blocks wrongly rather than not at all.
+ */
+export type LegacyIdMap = Map<number, string>;
+
+/** Extra inputs a loader may need beyond the file itself. */
+export interface SchematicParseOptions {
+  /** Source world's id table; consumed only by pre-1.13 loaders. */
+  worldIds?: LegacyIdMap;
+}
+
+/** What the UI shows after a `level.dat` is attached — the map itself stays in the worker. */
+export interface WorldIdSummary {
+  /** Number of block ids the world assigned. */
+  idCount: number;
+  /** Ids above the vanilla range, i.e. the modded ones this map exists for. */
+  moddedCount: number;
+  worldName?: string;
+  modCount?: number;
+  source: "registries" | "itemdata";
+}
+
 export interface SchematicRegion {
   name: string;
   dimensions: { x: number; y: number; z: number };
@@ -148,7 +174,7 @@ export interface SchematicRegion {
 }
 
 export interface SchematicStructure {
-  format: "schem" | "litematic" | "nbt" | "mca" | "prefab";
+  format: "schem" | "mcedit" | "litematic" | "nbt" | "mca" | "prefab";
   formatVersion: number;
   dimensions: { x: number; y: number; z: number };
   palette: UnifiedBlock[];
@@ -246,6 +272,16 @@ export interface RegistryHandle {
   modLoader?: ModLoader;
   mods: ModInfo[];
   blockCount: number;
+  /**
+   * Blocks with a resolved representative texture. The one number that says
+   * whether mod blocks will render as textures or as placeholder cubes — a
+   * scanned 1.12 pack should be in the hundreds-to-thousands; 0 after a scan
+   * means the scan silently produced a texture-less registry (stale worker
+   * code, failed jar reads) and the UI must say so instead of hiding it.
+   */
+  textureCount: number;
+  /** Mod JARs that could not be read during the scan (corrupt file, OOM…). */
+  failedJars?: number;
   source: "bundled" | "scanned";
   /** Name of the scanned instance (from launcher metadata), when available. */
   instanceName?: string;
@@ -264,4 +300,11 @@ export interface SchematicSummary {
   blockCount: number;
   fileName: string;
   fileSize: number;
+  /** Pre-flattening source (MCEdit `.schematic`, pre-1.13 `.mca`). */
+  legacy?: boolean;
+  /**
+   * Numeric ids no table could name — mod blocks whose world was not attached.
+   * Only meaningful on a legacy document; drives the "attach a level.dat" hint.
+   */
+  unknownIdCount?: number;
 }

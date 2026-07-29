@@ -101,7 +101,17 @@
           "modeInstance": "Carpeta",
           "modeVanilla": "Vanilla",
           "vanillaVersion": "Versión de Minecraft",
-          "vanillaRegistry": "Registro vanilla"
+          "vanillaRegistry": "Registro vanilla",
+          "world": "Mundo de origen",
+          "worldDropHere": "Adjunta el level.dat del mundo",
+          "worldHint": "level.dat",
+          "worldName": "Mundo",
+          "worldModdedIds": "Bloques de mods",
+          "worldMods": "Mods",
+          "worldUnresolved": "{count} ids de bloque siguen sin nombre — los asignó otro mundo distinto.",
+          "worldCaveat": "Los archivos anteriores a 1.13 guardan los bloques de mods como simples números, y solo el mundo en el que se construyeron sabe qué significan. Tiene que ser ese mismo mundo: otra partida asigna esos mismos números a bloques distintos.",
+          "worldDetach": "Quitar mundo",
+          "worldNeeded": "{count} tipos de bloque de este archivo son solo números sin nombre — sin el level.dat del mundo no pueden tener textura."
         },
         "diff": {
           "header": "Compatibilidad",
@@ -225,8 +235,9 @@
         "error": {
           "instanceEmpty": "Esa carpeta no tiene metadatos de launcher ni mods. Elige una carpeta de instancia, o cambia este entorno a Vanilla.",
           "schematicUnsupported": "Tipo de archivo no admitido. Usa .schem, .litematic, .nbt, .mca o .prefab.json.",
-          "schematicLegacy": "Este es un schematic de MCEdit anterior a 1.13, que usa ids numéricos que esta herramienta aún no puede leer. Vuelve a guardarlo con un WorldEdit moderno como .schem.",
-          "exportTooLarge": "Este esquema es demasiado grande para el formato elegido. Exporta una región más pequeña, o elige .schem / .litematic."
+          "exportTooLarge": "Este esquema es demasiado grande para el formato elegido. Exporta una región más pequeña, o elige .schem / .litematic.",
+          "levelDatUnreadable": "No se pudo leer ese archivo como un level.dat.",
+          "levelDatNoRegistry": "Este level.dat no tiene registro de bloques de Forge, así que no hay ids de mods que resolver — o es un mundo vanilla o de una versión que los guarda en otro sitio."
         }
       },
       "schematicViewer": {
@@ -253,7 +264,26 @@
           "details": "Detalles",
           "format": "Formato",
           "size": "Tamaño",
-          "palette": "Paleta"
+          "palette": "Paleta",
+          "world": "Mundo de origen",
+          "worldDropHere": "Adjunta el level.dat del mundo",
+          "worldHint": "level.dat",
+          "worldName": "Mundo",
+          "worldModdedIds": "Bloques de mods",
+          "worldMods": "Mods",
+          "worldUnresolved": "{count} ids de bloque siguen sin nombre — los asignó otro mundo distinto.",
+          "worldCaveat": "Los archivos anteriores a 1.13 guardan los bloques de mods como simples números, y solo el mundo en el que se construyeron sabe qué significan. Tiene que ser ese mismo mundo: otra partida asigna esos mismos números a bloques distintos.",
+          "worldDetach": "Quitar mundo",
+          "environment": "Entorno",
+          "modeVanilla": "Vanilla",
+          "modeInstance": "Instancia",
+          "pickInstance": "Elige una carpeta de instancia…",
+          "instanceHint": "Las texturas de un mod viven dentro de su JAR, así que una construcción con mods solo se ve bien cuando el entorno es la instalación en la que se hizo.",
+          "mods": "Mods",
+          "texturesLabel": "Texturas",
+          "failedJars": "No se pudieron leer {count} JARs de mods — sus bloques se verán como cubos de color.",
+          "noTextures": "El escaneo no produjo texturas, así que todos los bloques de mods se verán como cubos de color. Recarga la página a fondo (Ctrl+Shift+R) y vuelve a escanear.",
+          "worldNeeded": "{count} tipos de bloque de este archivo son solo números sin nombre — sin el level.dat del mundo no pueden tener textura."
         },
         "preview": {
           "title": "Vista 3D",
@@ -275,7 +305,8 @@
         },
         "error": {
           "schematicUnsupported": "Tipo de archivo no admitido. Usa .schem, .litematic, .nbt, .mca o .prefab.json.",
-          "schematicLegacy": "Este es un schematic de MCEdit anterior a 1.13, que usa ids numéricos que esta herramienta aún no puede leer. Vuelve a guardarlo con un WorldEdit moderno como .schem."
+          "levelDatUnreadable": "No se pudo leer ese archivo como un level.dat.",
+          "levelDatNoRegistry": "Este level.dat no tiene registro de bloques de Forge, así que no hay ids de mods que resolver — o es un mundo vanilla o de una versión que los guarda en otro sitio."
         }
       }
     }

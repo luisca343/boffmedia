@@ -1,7 +1,11 @@
+import type { GameId } from "@/lib/schematic/adapters/game-adapter";
 import type {
   BlockPositionGroup,
+  ProgressCb,
   RegistryHandle,
+  ScanOverride,
   SchematicSummary,
+  WorldIdSummary,
 } from "@/lib/schematic/types";
 import type { CompiledModel } from "@/lib/schematic/model/types";
 
@@ -19,12 +23,20 @@ export interface ViewerWorkerAPI {
   /** Round-trip health check used to confirm the worker booted. */
   ping(): Promise<"pong">;
 
-  /**
-   * Load a bundled vanilla registry for a version — the viewer's only
-   * environment. Instance scanning is deliberately absent: `EnvironmentApi`
-   * makes it optional, so a read-only viewer never carries a scan it can't run.
-   */
+  /** Load a bundled vanilla registry for a version. */
   loadVanillaRegistry(version: string): Promise<RegistryHandle>;
+
+  /**
+   * Build a registry from a real install: vanilla base + every mod JAR's blocks
+   * and textures. Viewing a modded build needs this — a mod's textures live in
+   * its JAR and nowhere else, so without a scan those blocks are placeholders.
+   */
+  scanInstance(
+    gameId: GameId,
+    files: File[],
+    onProgress: ProgressCb,
+    override?: ScanOverride,
+  ): Promise<RegistryHandle>;
 
   /** A block's texture as a data URL, or `null` for vanilla / unresolved blocks. */
   getBlockTexture(registryId: string, blockId: string): Promise<string | null>;
@@ -39,6 +51,16 @@ export interface ViewerWorkerAPI {
 
   /** Parse a schematic file; caches it in the worker and returns a summary. */
   loadSchematic(file: File): Promise<SchematicSummary>;
+
+  /**
+   * Attach the `level.dat` of the pre-1.13 world a legacy file was cut from —
+   * the only place a modded numeric block id maps to a name. Applies to loads
+   * made after this call.
+   */
+  loadWorldIds(file: File): Promise<WorldIdSummary>;
+
+  /** Detach the world id table. */
+  clearWorldIds(): Promise<void>;
 
   /** Per-block-type instance data for the 3D view. */
   getSchematicBlockPositions(schematicId: string): Promise<BlockPositionGroup[]>;

@@ -14,8 +14,10 @@ export const ERR = {
   instanceEmpty: "E_INSTANCE_EMPTY",
   /** File extension isn't one of the supported schematic formats. */
   schematicUnsupported: "E_SCHEMATIC_UNSUPPORTED",
-  /** Pre-1.13 MCEdit `.schematic` — numeric block ids, needs a legacy pipeline. */
-  schematicLegacy: "E_SCHEMATIC_LEGACY",
+  /** Picked file isn't parseable as a `level.dat`. */
+  levelDatUnreadable: "E_LEVELDAT_UNREADABLE",
+  /** A `level.dat` with no Forge block registry — vanilla world, nothing to map. */
+  levelDatNoRegistry: "E_LEVELDAT_NO_REGISTRY",
   /** Structure exceeds a format's representable size (e.g. .schem's 65535 axis). */
   exportTooLarge: "E_EXPORT_TOO_LARGE",
 } as const;

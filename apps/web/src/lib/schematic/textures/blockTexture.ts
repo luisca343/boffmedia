@@ -21,10 +21,32 @@ const CDN_BASE = "https://cdn.jsdelivr.net/gh/InventivetalentDev/minecraft-asset
 // Refs we have confirmed exist on the mirror. An arbitrary detected version
 // (e.g. "1.20.1", "1.19.4") is snapped to the nearest of these; cross-patch
 // texture drift is visually negligible.
-const SAFE_REFS = ["1.16.5", "1.18.2", "1.20.1", "1.21.1"] as const;
+const SAFE_REFS = ["1.12.2", "1.13.2", "1.14.4", "1.15.2", "1.16.5", "1.18.2", "1.20.1", "1.21.1"] as const;
 
 /** Newest mirror ref — broadest block coverage; used as the fallback everywhere. */
 export const LATEST_TEXTURE_REF = SAFE_REFS[SAFE_REFS.length - 1];
+
+/**
+ * The flattening also renamed the texture folder: `textures/blocks/` up to
+ * 1.12, `textures/block/` from 1.13 on. Verified against the mirror — asking a
+ * 1.12.2 ref for `block/stone.png` 404s and vice versa.
+ */
+export function textureFolder(ref: string): "block" | "blocks" {
+  return ref === "1.12.2" ? "blocks" : "block";
+}
+
+/**
+ * CDN URL for a vanilla texture named by its full in-model path
+ * (`blocks/stonebrick`, `block/stone`) at a given game version.
+ *
+ * Used when a *mod* block's model points at a vanilla texture — extremely
+ * common, since a modded wall/stair/slab of a vanilla material just reuses that
+ * material's PNG. Those live in the client jar, so they cannot be extracted
+ * from the mod JAR and have to be sourced here instead.
+ */
+export function vanillaTextureUrl(texturePath: string, version: string | undefined): string {
+  return `${CDN_BASE}${normalizeTextureVersion(version)}/assets/minecraft/textures/${texturePath}.png`;
+}
 
 const WOOD_SPECIES = [
   "oak",
@@ -156,7 +178,9 @@ export function blockTextureUrls(blockId: string, version?: string): string[] {
   const refs = primary === LATEST_TEXTURE_REF ? [primary] : [primary, LATEST_TEXTURE_REF];
   const names = textureNameCandidates(name);
   return refs.flatMap((ref) =>
-    names.map((tex) => `${CDN_BASE}${ref}/assets/minecraft/textures/block/${tex}.png`),
+    names.map(
+      (tex) => `${CDN_BASE}${ref}/assets/minecraft/textures/${textureFolder(ref)}/${tex}.png`,
+    ),
   );
 }
 

@@ -10,6 +10,11 @@ export {
   type SchematicFilePickerLabels,
   type SchematicFilePickerProps,
 } from "./SchematicFilePicker"
+export {
+  WorldIdPicker,
+  type WorldIdPickerLabels,
+  type WorldIdPickerProps,
+} from "./WorldIdPicker"
 export { PreviewButton, SwitchGroup, SwitchSegment } from "./PreviewChrome"
 export type { PreviewButtonProps, SwitchSegmentProps } from "./PreviewChrome"
 export { PreviewShell, type PreviewShellLabels, type PreviewShellProps } from "./PreviewShell"

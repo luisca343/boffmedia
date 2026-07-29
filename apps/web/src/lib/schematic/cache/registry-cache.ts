@@ -25,6 +25,7 @@ interface SerializedRegistry {
   dataVersion?: number;
   modLoader?: "forge" | "fabric" | "neoforge";
   mods: ModInfo[];
+  failedJars?: number;
   blocks: Record<string, BlockDefinition>;
   tags: Record<string, string[]>;
   textures?: Record<string, string>;
@@ -65,10 +66,26 @@ function getDB(): RegistryCacheDB {
 // ─── Fingerprint ──────────────────────────────────────────────────────────────
 
 /**
+ * Bump whenever the scanner can produce a *different* registry from the same
+ * files — new blockstate formats, changed texture resolution, extra metadata.
+ *
+ * Without this the cache silently defeats scanner fixes: the folder hasn't
+ * changed, so the pre-fix registry keeps being served and the improvement never
+ * appears. That is exactly what happened when Forge-v1 blockstate parsing and
+ * vanilla-texture fallback landed — instances scanned earlier kept coming back
+ * with zero mod textures.
+ *
+ * 2 — Forge blockstate v1 parsing, `mcmod.info` mod identity, vanilla-texture
+ *     fallback for mod models, `models/block/` fallback for bare model refs.
+ * 3 — v1 `"prop=value"` variant keys (list-valued), case-insensitive asset paths.
+ */
+const SCANNER_VERSION = 3;
+
+/**
  * Stable fingerprint from sorted file metadata. Incorporates both meta files
- * (carry the instance version) and JAR files (carry the mod set), plus any
- * manual version/loader override — the same folder scanned as two different
- * versions must not collide on one cache entry.
+ * (carry the instance version) and JAR files (carry the mod set), the scanner
+ * version, plus any manual version/loader override — the same folder scanned as
+ * two different versions must not collide on one cache entry.
  */
 export function fingerprintFiles(
   metaFiles: File[],
@@ -79,7 +96,8 @@ export function fingerprintFiles(
     .sort((a, b) => a.name.localeCompare(b.name))
     .map((f) => `${f.name}:${f.size}:${f.lastModified}`)
     .join("|");
-  return override ? `${files}#${override.version}:${override.modLoader ?? ""}` : files;
+  const base = `v${SCANNER_VERSION}|${files}`;
+  return override ? `${base}#${override.version}:${override.modLoader ?? ""}` : base;
 }
 
 // ─── Serialization helpers ────────────────────────────────────────────────────
@@ -103,6 +121,7 @@ function serialize(reg: BlockRegistry): SerializedRegistry {
     dataVersion: reg.dataVersion,
     modLoader: reg.modLoader,
     mods: reg.mods,
+    failedJars: reg.failedJars,
     blocks,
     tags,
     textures,
@@ -123,6 +142,7 @@ function deserialize(s: SerializedRegistry): BlockRegistry {
     dataVersion: s.dataVersion,
     modLoader: s.modLoader,
     mods: s.mods,
+    failedJars: s.failedJars,
     blocks,
     tags,
     textures,

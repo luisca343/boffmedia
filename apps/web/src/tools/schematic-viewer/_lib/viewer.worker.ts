@@ -12,6 +12,9 @@ const api: ViewerWorkerAPI = {
 
   loadVanillaRegistry: (version: string) => core.loadVanillaRegistry(state, version),
 
+  scanInstance: (gameId, files, onProgress, override) =>
+    core.scanInstance(state, gameId, files, onProgress, { override }),
+
   getBlockTexture: (registryId: string, blockId: string) =>
     core.getBlockTexture(state, registryId, blockId),
 
@@ -19,6 +22,10 @@ const api: ViewerWorkerAPI = {
     core.getBlockModel(state, registryId, blockId, stateLabel, rotation),
 
   loadSchematic: (file: File) => core.loadSchematic(state, file),
+
+  loadWorldIds: (file: File) => core.loadWorldIds(state, file),
+
+  clearWorldIds: () => core.clearWorldIds(state),
 
   getSchematicBlockPositions: (schematicId: string) =>
     core.getSchematicBlockPositions(state, schematicId),

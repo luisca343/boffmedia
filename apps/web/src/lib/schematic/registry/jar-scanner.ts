@@ -1,14 +1,15 @@
 import JSZip from "jszip";
 import type { BlockDefinition, ModInfo } from "../types";
 import { parseBlockstateJson } from "./blockstate-parser";
-import { resolveBlockTexture } from "./texture-resolver";
+import { resolveBlockTexture, type JarIndex } from "./texture-resolver";
 
 export interface ScannedJar {
   mod?: ModInfo;
   blocks: Map<string, BlockDefinition>;
   /** tag id ("ns:path") -> member block ids */
   tags: Map<string, string[]>;
-  /** block id -> `data:image/png;base64,…` representative texture */
+  /** block id -> representative texture: a `data:` URL from this JAR, or a
+   *  CDN URL when the block's model reuses a vanilla texture. */
   textures: Map<string, string>;
 }
 
@@ -26,6 +27,23 @@ async function readModInfo(zip: JSZip, loader: ModInfo["loader"], path: string):
   const entry = zip.file(path);
   if (!entry) return undefined;
   const text = await entry.async("string");
+
+  if (path === "mcmod.info") {
+    // Forge ≤ 1.12: a JSON *array* of mod entries (or `{modListVersion, modList}`).
+    // Only the first entry identifies the JAR; the rest are bundled sub-mods.
+    try {
+      const data = JSON.parse(text);
+      const list = Array.isArray(data) ? data : data?.modList;
+      const first = Array.isArray(list) ? list[0] : undefined;
+      const id = first?.modid;
+      if (id) {
+        return { id, name: first.name ?? id, version: first.version ?? "0", loader };
+      }
+    } catch {
+      /* malformed metadata — fall through */
+    }
+    return undefined;
+  }
 
   if (path.endsWith(".json")) {
     // fabric.mod.json / quilt.mod.json
@@ -59,7 +77,10 @@ async function detectMod(zip: JSZip): Promise<ModInfo | undefined> {
     (await readModInfo(zip, "neoforge", "META-INF/neoforge.mods.toml")) ??
     (await readModInfo(zip, "forge", "META-INF/mods.toml")) ??
     (await readModInfo(zip, "fabric", "fabric.mod.json")) ??
-    (await readModInfo(zip, "fabric", "quilt.mod.json"))
+    (await readModInfo(zip, "fabric", "quilt.mod.json")) ??
+    // Forge ≤ 1.12 predates mods.toml; without this every 1.12 JAR scans as an
+    // anonymous mod (its blocks still register — those key off asset paths).
+    (await readModInfo(zip, "forge", "mcmod.info"))
   );
 }
 
@@ -69,8 +90,11 @@ async function detectMod(zip: JSZip): Promise<ModInfo | undefined> {
  * Blocks are keyed `<namespace>:<name>` from the `assets/<ns>/blockstates/*.json`
  * paths, so a JAR that ships assets for several namespaces is handled correctly
  * regardless of its declared mod id.
+ *
+ * `version` is the instance's game version; it only matters for blocks whose
+ * model reuses a vanilla texture, which is sourced per-version from the CDN.
  */
-export async function scanJar(file: File): Promise<ScannedJar> {
+export async function scanJar(file: File, version?: string): Promise<ScannedJar> {
   const zip = await JSZip.loadAsync(await file.arrayBuffer());
   const blocks = new Map<string, BlockDefinition>();
   const tags = new Map<string, string[]>();
@@ -80,9 +104,14 @@ export async function scanJar(file: File): Promise<ScannedJar> {
 
   const mod = await detectMod(zip);
 
+  // Lowercased path -> real path, for refs whose casing differs from the file's
+  // (see JarIndex). Built during the single pass we already make over the ZIP.
+  const index: JarIndex = new Map();
+
   const jobs: Promise<void>[] = [];
   zip.forEach((relPath, entry) => {
     if (entry.dir) return;
+    index.set(relPath.toLowerCase(), relPath);
 
     const bs = relPath.match(BLOCKSTATE_RE);
     if (bs) {
@@ -101,7 +130,7 @@ export async function scanJar(file: File): Promise<ScannedJar> {
           }
           // Resolve a representative texture from the model chain (best-effort).
           try {
-            const dataUrl = await resolveBlockTexture(zip, json as never, pngCache);
+            const dataUrl = await resolveBlockTexture(zip, json as never, pngCache, version, index);
             if (dataUrl) textures.set(id, dataUrl);
           } catch {
             /* texture resolution is non-essential — skip on any failure */
