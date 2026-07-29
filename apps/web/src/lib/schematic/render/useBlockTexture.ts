@@ -11,17 +11,18 @@ export function useBlockTexture(
   version: string | undefined,
   registryId: string | undefined,
   modLoader: TextureLoader | null,
+  meta?: number,
 ): THREE.Texture | null {
   const [tex, setTex] = useState<THREE.Texture | null>(null);
   useEffect(() => {
     let cancelled = false;
     setTex(null);
-    getBlockTexture(blockId, version, registryId, modLoader).then((t) => {
+    getBlockTexture(blockId, version, registryId, modLoader, meta).then((t) => {
       if (!cancelled) setTex(t);
     });
     return () => {
       cancelled = true;
     };
-  }, [blockId, version, registryId, modLoader]);
+  }, [blockId, version, registryId, modLoader, meta]);
   return tex;
 }

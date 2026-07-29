@@ -90,6 +90,89 @@ const STATUS_ORDER: Record<DiffEntry["status"], number> = {
  * Phase 1: safe / missing / mod-only
  * Phase 2: + renamed (known-renames + suffix match) + state-changed (invalid state values)
  */
+// Aggregate by block id: a palette can hold many entries that share an id but
+// differ only in state (e.g. byg:willow_leaves with each distance/waterlogged
+// combination). Resolutions are keyed per id, so the diff is too — one row per
+// block type, with instance counts summed and incompatible state keys unioned.
+interface Agg {
+  block: UnifiedBlock; // representative (states cleared — it spans every variant)
+  instanceCount: number;
+  targetDef?: BlockDefinition;
+  badKeys: Set<string>;
+  renamed: UnifiedBlock | null;
+}
+
+/**
+ * Classify one population of blocks against the target registry and append its
+ * entries. Runs once for the block grid and once for LittleTiles materials —
+ * the two populations stay separate on purpose: a material like
+ * `minecraft:stone` can also exist in the grid, and merging the rows would
+ * attach one resolution to two different rewrite mechanisms (palette rewrite vs
+ * TE material map).
+ */
+function diffPopulation(
+  blocks: Iterable<{ block: UnifiedBlock; count: number }>,
+  targetReg: BlockRegistry,
+  crossGame: Record<string, string> | null,
+  summary: DiffSummary,
+  entries: DiffEntry[],
+  context?: DiffEntry["context"],
+): void {
+  const byId = new Map<string, Agg>();
+
+  for (const { block, count } of blocks) {
+    if (count === 0 || block.name === "air") continue;
+
+    summary.total += count;
+
+    let agg = byId.get(block.id);
+    if (!agg) {
+      const targetDef = targetReg.blocks.get(block.id);
+      agg = {
+        block: { ...block, states: {} },
+        instanceCount: 0,
+        targetDef,
+        badKeys: new Set(),
+        renamed: targetDef ? null : detectRename(block, targetReg, crossGame),
+      };
+      byId.set(block.id, agg);
+    }
+
+    agg.instanceCount += count;
+    if (agg.targetDef) {
+      for (const key of incompatibleStateKeys(block, agg.targetDef)) agg.badKeys.add(key);
+    }
+  }
+
+  for (const agg of byId.values()) {
+    const { block, instanceCount } = agg;
+    if (agg.targetDef) {
+      if (agg.badKeys.size > 0) {
+        summary.stateChanged += instanceCount;
+        entries.push({
+          block,
+          status: "state-changed",
+          instanceCount,
+          incompatibleStates: [...agg.badKeys],
+          context,
+        });
+      } else {
+        summary.safe += instanceCount;
+        entries.push({ block, status: "safe", instanceCount, context });
+      }
+    } else if (agg.renamed) {
+      summary.renamed += instanceCount;
+      entries.push({ block, status: "renamed", instanceCount, autoCandidate: agg.renamed, context });
+    } else if (block.source === "mod") {
+      summary.modOnly += instanceCount;
+      entries.push({ block, status: "mod-only", instanceCount, context });
+    } else {
+      summary.missing += instanceCount;
+      entries.push({ block, status: "missing", instanceCount, context });
+    }
+  }
+}
+
 export function computeDiff(
   structure: SchematicStructure,
   sourceReg: BlockRegistry,
@@ -108,73 +191,28 @@ export function computeDiff(
     missing: 0,
     modOnly: 0,
   };
-
-  // Aggregate by block id: a palette can hold many entries that share an id but
-  // differ only in state (e.g. byg:willow_leaves with each distance/waterlogged
-  // combination). Resolutions are keyed per id, so the diff is too — one row per
-  // block type, with instance counts summed and incompatible state keys unioned.
-  interface Agg {
-    block: UnifiedBlock; // representative (states cleared — it spans every variant)
-    instanceCount: number;
-    targetDef?: BlockDefinition;
-    badKeys: Set<string>;
-    renamed: UnifiedBlock | null;
-  }
-  const byId = new Map<string, Agg>();
-
-  for (let i = 0; i < structure.palette.length; i++) {
-    const block = structure.palette[i];
-    const instanceCount = counts[i];
-    if (instanceCount === 0) continue;
-    if (block.name === "air") continue;
-
-    summary.total += instanceCount;
-
-    let agg = byId.get(block.id);
-    if (!agg) {
-      const targetDef = targetReg.blocks.get(block.id);
-      agg = {
-        block: { ...block, states: {} },
-        instanceCount: 0,
-        targetDef,
-        badKeys: new Set(),
-        renamed: targetDef ? null : detectRename(block, targetReg, crossGame),
-      };
-      byId.set(block.id, agg);
-    }
-
-    agg.instanceCount += instanceCount;
-    if (agg.targetDef) {
-      for (const key of incompatibleStateKeys(block, agg.targetDef)) agg.badKeys.add(key);
-    }
-  }
-
   const entries: DiffEntry[] = [];
-  for (const agg of byId.values()) {
-    const { block, instanceCount } = agg;
-    if (agg.targetDef) {
-      if (agg.badKeys.size > 0) {
-        summary.stateChanged += instanceCount;
-        entries.push({
-          block,
-          status: "state-changed",
-          instanceCount,
-          incompatibleStates: [...agg.badKeys],
-        });
-      } else {
-        summary.safe += instanceCount;
-        entries.push({ block, status: "safe", instanceCount });
-      }
-    } else if (agg.renamed) {
-      summary.renamed += instanceCount;
-      entries.push({ block, status: "renamed", instanceCount, autoCandidate: agg.renamed });
-    } else if (block.source === "mod") {
-      summary.modOnly += instanceCount;
-      entries.push({ block, status: "mod-only", instanceCount });
-    } else {
-      summary.missing += instanceCount;
-      entries.push({ block, status: "missing", instanceCount });
-    }
+
+  diffPopulation(
+    structure.palette.map((block, i) => ({ block, count: counts[i] })),
+    targetReg,
+    crossGame,
+    summary,
+    entries,
+  );
+
+  // LittleTiles materials live inside TE NBT, not in the block grid; their
+  // "instances" are micro-tiles. Resolutions on these rows travel through
+  // littleTiles.materialMap and are applied by the export writer.
+  if (structure.littleTiles) {
+    diffPopulation(
+      structure.littleTiles.groups.map((g) => ({ block: g.block, count: g.tileCount })),
+      targetReg,
+      crossGame,
+      summary,
+      entries,
+      "littletiles",
+    );
   }
 
   entries.sort((a, b) => {

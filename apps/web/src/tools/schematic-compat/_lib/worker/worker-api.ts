@@ -7,6 +7,7 @@ import type {
   RegistryHandle,
   SchematicSummary,
   WorldIdSummary,
+  LittleTilesGroup,
   BlockPositionGroup,
   BlockDefinition,
   ProgressCb,
@@ -64,7 +65,7 @@ export interface CompatWorkerAPI {
    * texture was resolved. Fetched lazily, one block at a time, so the texture
    * Map never crosses the boundary in bulk.
    */
-  getBlockTexture(registryId: string, blockId: string): Promise<string | null>;
+  getBlockTexture(registryId: string, blockId: string, meta?: number): Promise<string | null>;
 
   /**
    * Baked geometry for a block's shaped (non-cube) model, or `null` when the
@@ -103,6 +104,9 @@ export interface CompatWorkerAPI {
 
   /** Detach the world id table. */
   clearWorldIds(): Promise<void>;
+
+  /** LittleTiles micro-box groups; empty when the document has none. */
+  getLittleTileBoxes(schematicId: string): Promise<LittleTilesGroup[]>;
 
   /** Diff a cached schematic against cached source/target registries. */
   computeDiff(

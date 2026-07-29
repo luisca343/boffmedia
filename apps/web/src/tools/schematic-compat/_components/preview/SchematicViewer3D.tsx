@@ -28,6 +28,7 @@ export function SchematicViewer3D() {
   // Gates on the unfiltered set: "only changes" legitimately filters everything
   // out, and that must render an empty scene, not an empty state.
   const hasPositions = useToolStore((s) => s.blockPositions.length > 0);
+  const littleTileGroups = useToolStore((s) => s.littleTileGroups);
   const selectedBlockId = useToolStore((s) => s.selectedBlockId);
   const layerY = useToolStore((s) => s.layerY);
   const navMode = useToolStore((s) => s.navMode);
@@ -74,11 +75,13 @@ export function SchematicViewer3D() {
 
   if (!schematic) return <Empty>{t("preview.emptyNoSchematic")}</Empty>;
   if (isFetchingPositions) return <Empty>{t("preview.preparing")}</Empty>;
-  if (!hasPositions) return <Empty>{t("preview.noBlocks")}</Empty>;
+  if (!hasPositions && littleTileGroups.length === 0)
+    return <Empty>{t("preview.noBlocks")}</Empty>;
 
   return (
     <SchematicView
       groups={groups}
+      littleTiles={littleTileGroups}
       dimensions={schematic.dimensions}
       layerY={layerY}
       selectedBlockId={selectedBlockId}

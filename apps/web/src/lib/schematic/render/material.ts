@@ -1,5 +1,19 @@
 import * as THREE from "three";
 import { placeholderColor } from "../textures/blockTexture";
+
+/**
+ * Pre-flattening metadata carried on a block, or undefined.
+ *
+ * The legacy loaders keep a modded block's `id:meta` variant verbatim in
+ * `states.meta` (the property it maps to lives in the mod's Java, not its
+ * assets), and it is what selects the block's variant texture.
+ */
+export function metaOf(states: Record<string, string> | undefined): number | undefined {
+  const raw = states?.meta;
+  if (raw === undefined) return undefined;
+  const n = Number(raw);
+  return Number.isInteger(n) && n > 0 ? n : undefined;
+}
 import type { RenderKind } from "./render-plan";
 
 const CHANGED_GLOW = "#22c55e"; // green — this block was converted

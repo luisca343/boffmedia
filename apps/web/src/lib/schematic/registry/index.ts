@@ -168,6 +168,7 @@ export async function buildScannedRegistry(
   const registry = await loadBundledRegistry(info.version);
   const tags = new Map<string, string[]>();
   const textures = new Map<string, string>();
+  const variantTextures = new Map<string, string[]>();
   const mods: ModInfo[] = [];
 
   const total = jarFiles.length;
@@ -184,6 +185,7 @@ export async function buildScannedRegistry(
         tags.set(tagId, [...(tags.get(tagId) ?? []), ...members]);
       }
       for (const [id, dataUrl] of scanned.textures) textures.set(id, dataUrl);
+      for (const [id, list] of scanned.variantTextures) variantTextures.set(id, list);
     } catch {
       // A corrupt/unreadable JAR shouldn't abort the whole scan — but it must
       // not be invisible either: every skipped jar is a mod whose blocks will
@@ -203,6 +205,7 @@ export async function buildScannedRegistry(
     ...(failedJars ? { failedJars } : {}),
     tags,
     textures,
+    variantTextures,
     snapshotHash: `scan-${info.version}-${mods.length}-${registry.blocks.size}`,
     capturedAt: Date.now(),
     instanceName: info.instanceName,

@@ -17,6 +17,7 @@ import type {
   BlockPositionGroup,
   ProgressCb,
   LegacyIdMap,
+  LittleTilesGroup,
   WorldIdSummary,
 } from "../types";
 import { parseLevelDat } from "../loader/level-dat";
@@ -87,6 +88,9 @@ export function schematicSummary(
     ...(legacy
       ? { legacy, unknownIdCount: Array.isArray(unknownIds) ? unknownIds.length : 0 }
       : {}),
+    ...(s.littleTiles
+      ? { littleTiles: { blockCount: s.littleTiles.blockCount, tileCount: s.littleTiles.tileCount } }
+      : {}),
   };
 }
 
@@ -125,9 +129,17 @@ export async function getBlockTexture(
   state: SchematicEngineState,
   registryId: string,
   blockId: string,
+  meta?: number,
 ): Promise<string | null> {
   const reg = state.registries.get(registryId);
   if (!reg) return null;
+  // A pre-flattening block carries its variant as metadata, which indexes the
+  // per-variant list — without this every metadata value of a block shows
+  // variant 0 (all crystals white, every roof tile the first colour).
+  if (meta !== undefined && meta > 0) {
+    const variant = reg.variantTextures?.get(blockId)?.[meta];
+    if (variant) return variant;
+  }
   // Prebuilt textures (Minecraft mod JARs) first, then a lazy resolver if the
   // game extracts on demand (Hytale pulls the icon out of Assets.zip here).
   return reg.textures?.get(blockId) ?? (await reg.getTexture?.(blockId)) ?? null;
@@ -185,6 +197,16 @@ export async function clearWorldIds(state: SchematicEngineState): Promise<void> 
   state.worldIds = undefined;
 }
 
+/** Per-material LittleTiles micro-box groups; empty when the schematic has none. */
+export async function getLittleTileBoxes(
+  state: SchematicEngineState,
+  schematicId: string,
+): Promise<LittleTilesGroup[]> {
+  const structure = state.schematics.get(schematicId);
+  if (!structure) throw new Error(`Schematic not found: ${schematicId}`);
+  return structure.littleTiles?.groups ?? [];
+}
+
 export async function release(state: SchematicEngineState, id: string): Promise<void> {
   state.registries.delete(id);
   state.schematics.delete(id);
@@ -214,11 +236,14 @@ export async function getSchematicBlockPositions(
   const palLen = structure.palette.length;
   const sxsz = sx * sz;
 
-  // air (or out-of-range) palette indices → treated as empty space.
+  // air (or out-of-range) palette indices → treated as empty space. LittleTiles
+  // host blocks also count as empty: their visual content is the parsed
+  // micro-boxes (getLittleTileBoxes), and an opaque cube would occlude them.
   const airFlags = new Uint8Array(palLen);
   for (let i = 0; i < palLen; i++) {
-    const id = structure.palette[i].id;
-    if (id === "air" || id.endsWith(":air")) airFlags[i] = 1;
+    const block = structure.palette[i];
+    if (block.id === "air" || block.id.endsWith(":air")) airFlags[i] = 1;
+    else if (structure.littleTiles && block.namespace === "littletiles") airFlags[i] = 1;
   }
   // A neighbour cell is "open" when it's air or an invalid index (undefined
   // airFlags lookup → NaN-ish, so `!== 0` covers both air and out-of-range).
