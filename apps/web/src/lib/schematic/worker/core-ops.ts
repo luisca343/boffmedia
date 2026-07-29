@@ -16,7 +16,10 @@ import type {
   SchematicSummary,
   BlockPositionGroup,
   ProgressCb,
+  LegacyIdMap,
+  WorldIdSummary,
 } from "../types";
+import { parseLevelDat } from "../loader/level-dat";
 import type { CompiledModel } from "../model/types";
 import { getAdapter, adapterForFile, type GameId } from "../adapters";
 import type { BuildRegistryOptions } from "../adapters";
@@ -30,6 +33,12 @@ import { loadBundledRegistry } from "../registry";
 export interface SchematicEngineState {
   registries: Map<string, BlockRegistry>;
   schematics: Map<string, SchematicStructure>;
+  /**
+   * Block-id table of the pre-1.13 world the user attached, applied to every
+   * subsequent legacy load. Kept worker-side so a 2 700-entry map is sent in
+   * once instead of riding along with each parse call.
+   */
+  worldIds?: LegacyIdMap;
   nextId: (prefix: string) => string;
 }
 
@@ -51,6 +60,8 @@ export function registryHandle(id: string, reg: BlockRegistry): RegistryHandle {
     modLoader: reg.modLoader,
     mods: reg.mods,
     blockCount: reg.blocks.size,
+    textureCount: reg.textures?.size ?? 0,
+    failedJars: reg.failedJars,
     source: reg.snapshotHash.startsWith("vanilla-") ? "bundled" : "scanned",
     instanceName: reg.instanceName,
   };
@@ -62,6 +73,8 @@ export function schematicSummary(
   fileName: string,
   fileSize: number,
 ): SchematicSummary {
+  const unknownIds = s.metadata.unknownLegacyIds;
+  const legacy = s.format === "mcedit" || s.metadata.legacy === true;
   return {
     id,
     format: s.format,
@@ -71,6 +84,9 @@ export function schematicSummary(
     blockCount: s.dimensions.x * s.dimensions.y * s.dimensions.z,
     fileName,
     fileSize,
+    ...(legacy
+      ? { legacy, unknownIdCount: Array.isArray(unknownIds) ? unknownIds.length : 0 }
+      : {}),
   };
 }
 
@@ -134,10 +150,39 @@ export async function loadSchematic(
   state: SchematicEngineState,
   file: File,
 ): Promise<SchematicSummary> {
-  const structure = await adapterForFile(file.name).parseSchematic(file);
+  const structure = await adapterForFile(file.name).parseSchematic(file, {
+    worldIds: state.worldIds,
+  });
   const id = state.nextId("schem");
   state.schematics.set(id, structure);
   return schematicSummary(id, structure, file.name, file.size);
+}
+
+/**
+ * Attach a pre-1.13 world's `level.dat`, so legacy loads can name that world's
+ * modded blocks. Applies to schematics loaded *after* this call — the ids are
+ * baked into a structure's palette at parse time.
+ */
+export async function loadWorldIds(
+  state: SchematicEngineState,
+  file: File,
+): Promise<WorldIdSummary> {
+  const table = parseLevelDat(new Uint8Array(await file.arrayBuffer()));
+  state.worldIds = table.ids;
+  let moddedCount = 0;
+  for (const id of table.ids.keys()) if (id > 255) moddedCount++;
+  return {
+    idCount: table.ids.size,
+    moddedCount,
+    worldName: table.worldName,
+    modCount: table.modCount,
+    source: table.source,
+  };
+}
+
+/** Detach the world id table; later legacy loads fall back to unknown ids. */
+export async function clearWorldIds(state: SchematicEngineState): Promise<void> {
+  state.worldIds = undefined;
 }
 
 export async function release(state: SchematicEngineState, id: string): Promise<void> {

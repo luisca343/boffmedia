@@ -41,16 +41,35 @@ function isVersionLike(v: unknown): v is string {
 
 type Detector = (metas: Map<string, string>) => InstanceInfo | undefined;
 
-/** CurseForge runtime instance file. */
+/**
+ * CurseForge runtime instance file.
+ *
+ * `gameVersion` is empty on 1.12-era instances (it holds "Forge" or "" instead
+ * of a release), so the loader block is the reliable source there — verified on
+ * a real Forge 14.23.5.2860 pack, where only `baseModLoader.minecraftVersion`
+ * carried "1.12.2". Reading `gameVersion` alone made every such instance
+ * undetectable.
+ */
 const curseForgeInstance: Detector = (metas) => {
   const text = metas.get("minecraftinstance.json");
   if (!text) return undefined;
   const data = tryParse(text) as
-    | { gameVersion?: string; name?: string; baseModLoader?: { name?: string } }
+    | {
+        gameVersion?: string;
+        name?: string;
+        baseModLoader?: { name?: string; minecraftVersion?: string; forgeVersion?: string };
+      }
     | undefined;
-  if (!data?.gameVersion) return undefined;
+  if (!data) return undefined;
+  const version = isVersionLike(data.gameVersion)
+    ? data.gameVersion.trim()
+    : isVersionLike(data.baseModLoader?.minecraftVersion)
+      ? data.baseModLoader.minecraftVersion.trim()
+      : // "forge-1.12.2-14.23.5.2860" — the release sits between the dashes.
+        data.baseModLoader?.name?.match(/-(\d+\.\d+(?:\.\d+)?)-/)?.[1];
+  if (!version) return undefined;
   return {
-    version: data.gameVersion,
+    version,
     modLoader: normalizeLoader(data.baseModLoader?.name),
     instanceName: data.name,
     launcher: "CurseForge",

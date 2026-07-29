@@ -1,4 +1,5 @@
 import type { BlockDefinition } from "../types";
+import { forgeStateValues, isForgeBlockstate } from "./forge-blockstate";
 
 /**
  * A Minecraft blockstate definition file (`assets/<ns>/blockstates/<name>.json`).
@@ -56,7 +57,14 @@ function collectFromWhen(acc: Map<string, Set<string>>, when: unknown) {
 export function parseBlockstateJson(id: string, json: BlockstateJson): BlockDefinition {
   const acc = new Map<string, Set<string>>();
 
-  if (json.variants) {
+  // Forge v1 (1.8–1.12 mods) keys `variants` by property NAME, so the vanilla
+  // "prop=value" split below finds nothing in those files.
+  const forge = isForgeBlockstate(json) ? json : undefined;
+  if (forge) {
+    for (const [prop, values] of forgeStateValues(forge)) {
+      for (const value of values) add(acc, prop, value);
+    }
+  } else if (json.variants) {
     for (const key of Object.keys(json.variants)) collectFromVariantKey(acc, key);
   }
   if (json.multipart) {

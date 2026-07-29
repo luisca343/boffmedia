@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { useTranslations } from "next-intl";
 import { Button, Banner, Disclosure, Icon } from "@/components/boffmedia/primitives";
-import { SchematicFilePicker } from "@/components/boffmedia/ui/schematic";
+import { SchematicFilePicker, WorldIdPicker } from "@/components/boffmedia/ui/schematic";
 import { gameMeta, type GameId } from "@/lib/schematic/adapters/game-adapter";
 import { selectEnv, useToolStore, type EnvMode, type EnvRole } from "../../_store/tool.store";
 import { EnvPicker } from "./EnvPicker";
@@ -19,6 +19,8 @@ interface SetupPanelProps {
   onRetryPendingScan: (choice: ManualEnvChoice) => void;
   onCancelPendingScan: () => void;
   onPickSchematic: (file: File) => void;
+  onPickWorld: (file: File) => void;
+  onDetachWorld: () => void;
   onAnalyze: () => void;
 }
 
@@ -26,7 +28,8 @@ interface SetupPanelProps {
 const ERROR_KEY: Record<string, string> = {
   E_INSTANCE_EMPTY: "error.instanceEmpty",
   E_SCHEMATIC_UNSUPPORTED: "error.schematicUnsupported",
-  E_SCHEMATIC_LEGACY: "error.schematicLegacy",
+  E_LEVELDAT_UNREADABLE: "error.levelDatUnreadable",
+  E_LEVELDAT_NO_REGISTRY: "error.levelDatNoRegistry",
   E_EXPORT_TOO_LARGE: "error.exportTooLarge",
 };
 
@@ -49,6 +52,8 @@ export function SetupPanel({
   onRetryPendingScan,
   onCancelPendingScan,
   onPickSchematic,
+  onPickWorld,
+  onDetachWorld,
   onAnalyze,
 }: SetupPanelProps) {
   // Selectors, not a bare `useToolStore()`: an unselected subscription re-renders
@@ -56,6 +61,7 @@ export function SetupPanel({
   const source = useToolStore(selectEnv("source"));
   const target = useToolStore(selectEnv("target"));
   const schematic = useToolStore((s) => s.schematic);
+  const worldIds = useToolStore((s) => s.worldIds);
   const pendingScan = useToolStore((s) => s.pendingScan);
   const isAnalyzing = useToolStore((s) => s.isAnalyzing);
   const diff = useToolStore((s) => s.diff);
@@ -155,6 +161,33 @@ export function SetupPanel({
           onPick={onPickSchematic}
         />
       </div>
+
+      {/* Only pre-flattening documents carry numeric ids, so this step exists
+          only for them — a modern file needs no world to be named. */}
+      {schematic?.legacy && (
+        <div className="flex flex-col gap-2.5">
+          <GroupHead title={t("setup.world")} />
+          <WorldIdPicker
+            worldIds={worldIds}
+            unknownIdCount={schematic.unknownIdCount ?? 0}
+            disabled={!engineReady}
+            labels={{
+              dropHere: t("setup.worldDropHere"),
+              hint: t("setup.worldHint"),
+              loaded: t("setup.loaded"),
+              world: t("setup.worldName"),
+              ids: t("setup.worldModdedIds"),
+              mods: t("setup.worldMods"),
+              unresolved: t("setup.worldUnresolved", { count: schematic.unknownIdCount ?? 0 }),
+              needed: t("setup.worldNeeded", { count: schematic.unknownIdCount ?? 0 }),
+              caveat: t("setup.worldCaveat"),
+              detach: t("setup.worldDetach"),
+            }}
+            onPick={onPickWorld}
+            onDetach={onDetachWorld}
+          />
+        </div>
+      )}
 
       <Button variant="pri" icon="play" className="w-full justify-center mt-0.5" disabled={!canAnalyze} onClick={onAnalyze}>
         {isAnalyzing ? t("diff.analyzing") : analyzed ? t("setup.analyzed") : t("setup.analyzeCompat")}

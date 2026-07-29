@@ -4,6 +4,7 @@ import type {
   ProgressCb,
   ExportFormat,
   UnifiedBlock,
+  SchematicParseOptions,
 } from "../types";
 import { loadSchematicFile } from "../loader";
 import { buildScannedRegistry, isInstanceMetaFile } from "../registry";
@@ -59,7 +60,7 @@ export class MinecraftAdapter implements GameAdapter {
     return buildScannedRegistry(metaFiles, jarFiles, onProgress, options?.override);
   }
 
-  parseSchematic(file: File): Promise<SchematicStructure> {
-    return loadSchematicFile(file);
+  parseSchematic(file: File, options?: SchematicParseOptions): Promise<SchematicStructure> {
+    return loadSchematicFile(file, options);
   }
 }

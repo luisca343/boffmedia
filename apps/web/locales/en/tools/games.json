@@ -101,7 +101,17 @@
           "modeInstance": "Folder",
           "modeVanilla": "Vanilla",
           "vanillaVersion": "Minecraft version",
-          "vanillaRegistry": "Vanilla registry"
+          "vanillaRegistry": "Vanilla registry",
+          "world": "Source world",
+          "worldDropHere": "Attach the world's level.dat",
+          "worldHint": "level.dat",
+          "worldName": "World",
+          "worldModdedIds": "Mod blocks",
+          "worldMods": "Mods",
+          "worldUnresolved": "{count} block ids are still unnamed — they were assigned by a different world.",
+          "worldCaveat": "Pre-1.13 files store mod blocks as plain numbers, and only the world they were built in knows what those numbers mean. It must be that same world: another save assigns the same numbers to different blocks.",
+          "worldDetach": "Detach world",
+          "worldNeeded": "{count} block types in this file are just numbers with no name — without the world's level.dat they cannot get a texture."
         },
         "diff": {
           "header": "Compatibility",
@@ -225,8 +235,9 @@
         "error": {
           "instanceEmpty": "That folder has no launcher metadata and no mods. Pick a game instance folder, or switch this environment to Vanilla.",
           "schematicUnsupported": "Unsupported file type. Use .schem, .litematic, .nbt, .mca or .prefab.json.",
-          "schematicLegacy": "This is a pre-1.13 MCEdit schematic, which uses numeric block ids this tool cannot read yet. Re-save it with a modern WorldEdit as .schem.",
-          "exportTooLarge": "This schematic is too large for the selected format. Export a smaller region, or choose .schem / .litematic."
+          "exportTooLarge": "This schematic is too large for the selected format. Export a smaller region, or choose .schem / .litematic.",
+          "levelDatUnreadable": "That file could not be read as a level.dat.",
+          "levelDatNoRegistry": "This level.dat has no Forge block registry, so there are no mod ids to resolve — it is either a vanilla world or from a version that stores them elsewhere."
         }
       },
       "schematicViewer": {
@@ -253,7 +264,26 @@
           "details": "Details",
           "format": "Format",
           "size": "Size",
-          "palette": "Palette"
+          "palette": "Palette",
+          "world": "Source world",
+          "worldDropHere": "Attach the world's level.dat",
+          "worldHint": "level.dat",
+          "worldName": "World",
+          "worldModdedIds": "Mod blocks",
+          "worldMods": "Mods",
+          "worldUnresolved": "{count} block ids are still unnamed — they were assigned by a different world.",
+          "worldCaveat": "Pre-1.13 files store mod blocks as plain numbers, and only the world they were built in knows what those numbers mean. It must be that same world: another save assigns the same numbers to different blocks.",
+          "worldDetach": "Detach world",
+          "environment": "Environment",
+          "modeVanilla": "Vanilla",
+          "modeInstance": "Instance",
+          "pickInstance": "Choose an instance folder…",
+          "instanceHint": "A mod's textures live inside its JAR, so a modded build only looks right when the environment is the install it was built in.",
+          "mods": "Mods",
+          "texturesLabel": "Textures",
+          "failedJars": "{count} mod JARs could not be read — their blocks will show as colored placeholders.",
+          "noTextures": "The scan produced no textures, so every mod block will render as a colored placeholder. Hard-reload the page (Ctrl+Shift+R) and scan again.",
+          "worldNeeded": "{count} block types in this file are just numbers with no name — without the world's level.dat they cannot get a texture."
         },
         "preview": {
           "title": "3D view",
@@ -275,7 +305,8 @@
         },
         "error": {
           "schematicUnsupported": "Unsupported file type. Use .schem, .litematic, .nbt, .mca or .prefab.json.",
-          "schematicLegacy": "This is a pre-1.13 MCEdit schematic, which uses numeric ids this tool cannot read yet. Re-save it with a modern WorldEdit as .schem."
+          "levelDatUnreadable": "That file could not be read as a level.dat.",
+          "levelDatNoRegistry": "This level.dat has no Forge block registry, so there are no mod ids to resolve — it is either a vanilla world or from a version that stores them elsewhere."
         }
       }
     }

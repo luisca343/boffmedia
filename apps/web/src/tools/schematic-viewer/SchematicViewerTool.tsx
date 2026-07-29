@@ -14,13 +14,14 @@ export function SchematicViewerTool() {
   const t = useTranslations("games.minecraft.schematicViewer");
   const { api, status } = useViewerEngine();
   const engineReady = status === "ready" && api !== null;
-  const { loadSchematic, changeVersion } = useViewerActions(api, engineReady);
+  const { loadSchematic, attachWorldIds, clearWorldIds, changeVersion, changeMode, scanEnvironment } =
+    useViewerActions(api, engineReady);
 
   const registry = useViewerStore(selectEnvironment).registry;
   const schematic = useViewerStore((s) => s.schematic);
 
   const step = !registry ? 0 : !schematic ? 1 : 2;
-  const steps = [t("setup.version"), t("setup.schematic"), t("setup.view")];
+  const steps = [t("setup.environment"), t("setup.schematic"), t("setup.view")];
 
   // Plain wrappers around the worker calls — never hand the Comlink proxy to
   // React as a prop (its dev-mode render logger can't serialize the proxy).
@@ -74,6 +75,10 @@ export function SchematicViewerTool() {
               engineReady={engineReady}
               onPickSchematic={loadSchematic}
               onChangeVersion={changeVersion}
+              onPickWorld={attachWorldIds}
+              onDetachWorld={clearWorldIds}
+              onChangeMode={changeMode}
+              onScanInstance={scanEnvironment}
             />
           </aside>
           <main className="flex min-w-[360px] flex-1 flex-col bg-base">

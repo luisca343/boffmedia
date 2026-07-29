@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback } from "react";
+import { useCallback, useRef } from "react";
 import { errorCode, errorDetail } from "../errors";
 import type { SchematicSummary } from "../types";
 import type { DocumentSlice, ErrorSlice, StoreLike, ViewerSlice } from "../state";
@@ -30,6 +30,10 @@ export function useDocumentActions<S extends DocumentStore>(
 ) {
   const { onDocumentChanged } = options;
   const releaseHandle = useReleaseHandle(api);
+  // Kept so attaching a world after the fact can re-parse the same file: legacy
+  // ids are resolved into the palette at parse time, so a later id map only
+  // takes effect on a fresh parse.
+  const lastFile = useRef<File | null>(null);
 
   const applyDocument = useCallback(
     (summary: SchematicSummary | undefined) => {
@@ -46,6 +50,7 @@ export function useDocumentActions<S extends DocumentStore>(
       if (!api) return;
       const s = store.getState();
       const prevSchematicId = s.schematic?.id;
+      lastFile.current = file;
       s.setError(undefined);
       s.setLoadingSchematic(true);
       try {
@@ -62,5 +67,31 @@ export function useDocumentActions<S extends DocumentStore>(
     [api, store, releaseHandle, applyDocument],
   );
 
-  return { loadSchematic };
+  /**
+   * Attach the source world's `level.dat` so legacy files can name their modded
+   * blocks, then re-parse the open document with it.
+   */
+  const attachWorldIds = useCallback(
+    async (file: File) => {
+      if (!api?.loadWorldIds) return;
+      store.getState().setError(undefined);
+      try {
+        store.getState().setWorldIds(await api.loadWorldIds(file));
+      } catch (err) {
+        store.getState().setError(errorDetail(err), errorCode(err));
+        return;
+      }
+      if (lastFile.current) await loadSchematic(lastFile.current);
+    },
+    [api, store, loadSchematic],
+  );
+
+  const clearWorldIds = useCallback(async () => {
+    if (!api?.clearWorldIds) return;
+    await api.clearWorldIds();
+    store.getState().setWorldIds(undefined);
+    if (lastFile.current) await loadSchematic(lastFile.current);
+  }, [api, store, loadSchematic]);
+
+  return { loadSchematic, attachWorldIds, clearWorldIds };
 }
