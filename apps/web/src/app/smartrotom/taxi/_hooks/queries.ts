@@ -3,18 +3,33 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { useTranslations } from "next-intl"
 import type { Region, StarBankAccount, StarBankTransaction, TaxiStop } from "@boffmedia/shared"
-import { rotomAuthedPOSTOrThrow, rotomGETOrThrow, rotomPOSTOrThrow, wingullGETOrThrow } from "@/services/boffAPI"
+import { rotomAuthedPOSTOrThrow, rotomGETOrThrow, wingullGETOrThrow } from "@/services/boffAPI"
 import { getMcUserData } from "@/services/mcef/mcefApi"
-import { POSITION_REFRESH_INTERVAL, TAXI_SERVICE_ACCOUNT } from "../_utils/constants"
-import { TRIP_CONCEPT_PREFIX } from "../_utils/trips"
-import type { Position } from "../_types"
+import { POSITION_REFRESH_INTERVAL } from "../_utils/constants"
+import type { Position, TaxiConfig, TripResult } from "../_types"
 
 export const taxiKeys = {
   stops: ["taxi", "stops"] as const,
   regions: ["taxi", "regions"] as const,
   position: ["taxi", "position"] as const,
+  config: ["taxi", "config"] as const,
   balance: (uuid?: string) => ["taxi", "balance", uuid] as const,
   accounts: (uuid?: string) => ["taxi", "accounts", uuid] as const,
+}
+
+/**
+ * The fare model and the account fares are paid into.
+ *
+ * The account id is read rather than hardcoded: it is a seeded row, so its id is whatever the
+ * database assigned. The taxi previously hardcoded `0`, which is the virtual system account and
+ * could never hold a fare.
+ */
+export function useTaxiConfig() {
+  return useQuery({
+    queryKey: taxiKeys.config,
+    queryFn: () => rotomGETOrThrow<TaxiConfig>("/taxi/config"),
+    staleTime: Infinity,
+  })
 }
 
 /**
@@ -122,35 +137,25 @@ export function useBalance(uuid?: string) {
 }
 
 /**
- * Pay, then teleport. The order matters and is not reversible: the fare is transferred
- * first, and only a settled payment teleports the player. If the transfer fails nothing
- * moves; if the teleport fails after payment we surface it loudly rather than pretend
- * the trip happened.
+ * Travel, then pay — one server-side call.
+ *
+ * This used to transfer the fare from here and *then* ask for the teleport, which meant every
+ * ordinary failure (logged out, stop deleted, no safe arrival) left the player charged and
+ * standing where they were, with no refund path. `POST /smartrotom/taxi/trip` teleports first
+ * and charges only on a confirmed arrival, so a failed trip now costs nothing.
+ *
+ * The price is not sent: the server recomputes it from the player's live position, which is
+ * also what stops a crafted request from naming its own fare. What the page shows is an
+ * estimate from the same formula.
  */
 export function useTeleport(uuid?: string) {
   const qc = useQueryClient()
   const t = useTranslations("taxi.errors")
   return useMutation({
-    mutationFn: async ({ stop, price }: { stop: TaxiStop; price: number }) => {
+    mutationFn: async ({ stop }: { stop: TaxiStop }) => {
       if (!uuid) throw new Error(t("loginRequired"))
 
-      try {
-        await rotomAuthedPOSTOrThrow<void>("/starbank/transfer/from-main", {
-          uuid,
-          to: TAXI_SERVICE_ACCOUNT,
-          amount: price,
-          concept: `${TRIP_CONCEPT_PREFIX}${stop.id}`,
-        })
-      } catch {
-        throw new Error(t("chargeFailed"))
-      }
-
-      try {
-        await rotomPOSTOrThrow("/taxi/teleport", { id: stop.id, uuid })
-      } catch {
-        throw new Error(t("teleportFailedAfterCharge"))
-      }
-
+      await rotomAuthedPOSTOrThrow<TripResult>("/taxi/trip", { stopId: stop.id })
       return stop
     },
     onSuccess: () => {

@@ -42,6 +42,9 @@ import {
   Download,
   ScanLine,
   Menu,
+  Pencil,
+  ImagePlus,
+  Trash2,
   type LucideIcon,
 } from "lucide-react";
 
@@ -104,6 +107,9 @@ export const I = {
   download: make(Download),
   scan: make(ScanLine),
   menu: make(Menu),
+  pencil: make(Pencil),
+  imagePlus: make(ImagePlus),
+  trash: make(Trash2),
 };
 
 export type IconName = keyof typeof I;

@@ -133,8 +133,6 @@
     "errors": {
       "noPlayerPosition": "No player position",
       "loginRequired": "You need to sign in to travel",
-      "chargeFailed": "The fare could not be charged",
-      "teleportFailedAfterCharge": "The fare was charged but the teleport failed. Contact support.",
       "tripFailed": "The trip could not be completed"
     },
     "compass": {

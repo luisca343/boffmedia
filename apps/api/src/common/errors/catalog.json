@@ -9,36 +9,28 @@
       "es": "Usuario o contraseña incorrectos.",
       "where": "api/auth/auth.controller.ts"
     },
-    "CHAT_NOT_FOUND": {
-      "es": "No se encontró el chat.",
-      "where": "smartrotom/chatapp"
-    },
-    "CHAT_NOT_MEMBER": {
-      "es": "No formas parte de este chat.",
-      "where": "smartrotom/chatapp"
-    },
-    "CHAT_CALL_NO_PARTICIPANTS": {
-      "es": "No hay nadie más en el chat para llamar.",
-      "where": "smartrotom/chatapp/services/call.service.ts"
-    },
-    "CHAT_MESSAGE_NOT_EDITABLE": {
-      "es": "No puedes editar este mensaje.",
-      "where": "smartrotom/chatapp/services/message.service.ts"
-    },
-    "CHAT_MESSAGE_NOT_DELETABLE": {
-      "es": "No puedes eliminar este mensaje.",
-      "where": "smartrotom/chatapp/services/message.service.ts"
-    },
-    "CHAT_GROUP_NO_ACCESS": {
-      "es": "No tienes acceso a este grupo.",
-      "where": "smartrotom/chatapp/services/group.service.ts"
-    },
     "BANK_ACCOUNT_NOT_OWNED": {
       "es": "No puedes transferir desde una cuenta que no es tuya.",
       "where": "smartrotom/starbank"
     },
     "BANK_AMOUNT_NOT_POSITIVE": {
       "es": "El importe debe ser mayor que cero.",
+      "where": "smartrotom/starbank"
+    },
+    "BANK_BALANCE_ADJUST_FAILED": {
+      "es": "No se pudo ajustar el saldo.",
+      "where": "smartrotom/starbank"
+    },
+    "BANK_INSUFFICIENT_FUNDS": {
+      "es": "Saldo insuficiente.",
+      "where": "smartrotom/starbank"
+    },
+    "BANK_INSUFFICIENT_FUNDS_PURCHASE": {
+      "es": "Saldo insuficiente para la compra.",
+      "where": "smartrotom/starbank"
+    },
+    "BANK_NEGATIVE_BALANCE": {
+      "es": "El saldo no puede ser negativo.",
       "where": "smartrotom/starbank"
     },
     "BANK_SAME_ACCOUNT": {
@@ -53,25 +45,57 @@
       "es": "La cuenta de destino no existe.",
       "where": "smartrotom/starbank"
     },
-    "BANK_INSUFFICIENT_FUNDS": {
-      "es": "Saldo insuficiente.",
-      "where": "smartrotom/starbank"
-    },
-    "BANK_INSUFFICIENT_FUNDS_PURCHASE": {
-      "es": "Saldo insuficiente para la compra.",
-      "where": "smartrotom/starbank"
-    },
     "BANK_TRANSFER_FAILED": {
       "es": "No se pudo completar la transferencia.",
       "where": "smartrotom/starbank"
     },
-    "BANK_NEGATIVE_BALANCE": {
-      "es": "El saldo no puede ser negativo.",
-      "where": "smartrotom/starbank"
+    "CHAT_CALL_NO_PARTICIPANTS": {
+      "es": "No hay nadie más en el chat para llamar.",
+      "where": "smartrotom/chatapp/services/call.service.ts"
     },
-    "BANK_BALANCE_ADJUST_FAILED": {
-      "es": "No se pudo ajustar el saldo.",
-      "where": "smartrotom/starbank"
+    "CHAT_GROUP_NO_ACCESS": {
+      "es": "No tienes acceso a este grupo.",
+      "where": "smartrotom/chatapp/services/group.service.ts"
+    },
+    "CHAT_MESSAGE_NOT_DELETABLE": {
+      "es": "No puedes eliminar este mensaje.",
+      "where": "smartrotom/chatapp/services/message.service.ts"
+    },
+    "CHAT_MESSAGE_NOT_EDITABLE": {
+      "es": "No puedes editar este mensaje.",
+      "where": "smartrotom/chatapp/services/message.service.ts"
+    },
+    "CHAT_NOT_FOUND": {
+      "es": "No se encontró el chat.",
+      "where": "smartrotom/chatapp"
+    },
+    "CHAT_NOT_MEMBER": {
+      "es": "No formas parte de este chat.",
+      "where": "smartrotom/chatapp"
+    },
+    "TAXI_INSUFFICIENT_FUNDS": {
+      "es": "No tienes saldo suficiente para este viaje.",
+      "where": "smartrotom/taxi/taxi.service.ts"
+    },
+    "TAXI_IN_DUNGEON_RUN": {
+      "es": "No puedes coger un taxi durante una mazmorra.",
+      "where": "smartrotom/taxi/taxi.service.ts"
+    },
+    "TAXI_PLAYER_OFFLINE": {
+      "es": "Tienes que estar conectado al servidor para viajar.",
+      "where": "smartrotom/taxi/taxi.service.ts"
+    },
+    "TAXI_SERVER_BUSY": {
+      "es": "El servidor no ha respondido a tiempo. No se te ha cobrado nada.",
+      "where": "smartrotom/taxi/taxi.service.ts"
+    },
+    "TAXI_STOP_NOT_FOUND": {
+      "es": "Esa parada de taxi ya no existe.",
+      "where": "smartrotom/taxi/taxi.service.ts"
+    },
+    "TAXI_UNSAFE_ARRIVAL": {
+      "es": "No hay un sitio seguro donde dejarte en esa parada.",
+      "where": "smartrotom/taxi/taxi.service.ts"
     },
     "TOURNAMENT_CHECKIN_CLOSED": {
       "es": "El check-in no está abierto.",

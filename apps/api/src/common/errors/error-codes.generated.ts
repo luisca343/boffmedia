@@ -22,6 +22,12 @@ export const ApiErrorCode = {
   CHAT_MESSAGE_NOT_EDITABLE: 'CHAT_MESSAGE_NOT_EDITABLE',
   CHAT_NOT_FOUND: 'CHAT_NOT_FOUND',
   CHAT_NOT_MEMBER: 'CHAT_NOT_MEMBER',
+  TAXI_INSUFFICIENT_FUNDS: 'TAXI_INSUFFICIENT_FUNDS',
+  TAXI_IN_DUNGEON_RUN: 'TAXI_IN_DUNGEON_RUN',
+  TAXI_PLAYER_OFFLINE: 'TAXI_PLAYER_OFFLINE',
+  TAXI_SERVER_BUSY: 'TAXI_SERVER_BUSY',
+  TAXI_STOP_NOT_FOUND: 'TAXI_STOP_NOT_FOUND',
+  TAXI_UNSAFE_ARRIVAL: 'TAXI_UNSAFE_ARRIVAL',
   TOURNAMENT_CHECKIN_CLOSED: 'TOURNAMENT_CHECKIN_CLOSED',
 } as const;
 
@@ -48,5 +54,12 @@ export const API_ERROR_FALLBACK_ES: Record<ApiErrorCode, string> = {
   CHAT_MESSAGE_NOT_EDITABLE: 'No puedes editar este mensaje.',
   CHAT_NOT_FOUND: 'No se encontró el chat.',
   CHAT_NOT_MEMBER: 'No formas parte de este chat.',
+  TAXI_INSUFFICIENT_FUNDS: 'No tienes saldo suficiente para este viaje.',
+  TAXI_IN_DUNGEON_RUN: 'No puedes coger un taxi durante una mazmorra.',
+  TAXI_PLAYER_OFFLINE: 'Tienes que estar conectado al servidor para viajar.',
+  TAXI_SERVER_BUSY:
+    'El servidor no ha respondido a tiempo. No se te ha cobrado nada.',
+  TAXI_STOP_NOT_FOUND: 'Esa parada de taxi ya no existe.',
+  TAXI_UNSAFE_ARRIVAL: 'No hay un sitio seguro donde dejarte en esa parada.',
   TOURNAMENT_CHECKIN_CLOSED: 'El check-in no está abierto.',
 };

@@ -12,6 +12,7 @@ import {
   orThrow,
   sessionToken,
   multipartPOST,
+  multipartPATCH,
 } from "./core";
 import { apiGET, apiPOST, apiPUT, apiPATCH } from "./boff-client";
 
@@ -34,6 +35,17 @@ export async function rotomMultipartPOST<T>(
   files: Record<string, File | Blob> = {}
 ): Promise<ApiResponse<T>> {
   return multipartPOST<T>(`/smartrotom${url}`, { ...fields, server: getServer() }, files);
+}
+
+// `server` rides along like every other rotom mutation, even though the routes that take
+// multipart are excluded from MinecraftMiddleware — multer parses the body after it runs, so it
+// could never see the field anyway. Harmless, and it keeps one rule for the whole client.
+export async function rotomMultipartPATCH<T>(
+  url: string,
+  fields: Record<string, any> = {},
+  files: Record<string, File | Blob> = {}
+): Promise<ApiResponse<T>> {
+  return multipartPATCH<T>(`/smartrotom${url}`, { ...fields, server: getServer() }, files);
 }
 
 export async function rotomPUT<T>(url: string, data: any): Promise<ApiResponse<T>> {
@@ -116,4 +128,12 @@ export async function rotomMultipartPOSTOrThrow<T>(
   files: Record<string, File | Blob> = {}
 ): Promise<T> {
   return orThrow(rotomMultipartPOST<T>(url, fields, files));
+}
+
+export async function rotomMultipartPATCHOrThrow<T>(
+  url: string,
+  fields: Record<string, any> = {},
+  files: Record<string, File | Blob> = {}
+): Promise<T> {
+  return orThrow(rotomMultipartPATCH<T>(url, fields, files));
 }

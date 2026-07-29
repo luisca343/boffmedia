@@ -1,6 +1,5 @@
 import type { StarBankTransaction } from "@boffmedia/shared"
 import type { Trip } from "../_types"
-import { TAXI_SERVICE_ACCOUNT } from "./constants"
 import { blocksFromFare } from "./fare"
 
 /** The concept every taxi fare is written to the ledger with — see `useTeleport`. */
@@ -19,10 +18,21 @@ export const TRIP_CONCEPT_PREFIX = "Taxi a "
  * `GET /starbank/transactions/user/:uuid` does not populate it (verified against the
  * live API — every row comes back without the field). Filtering on it silently matched
  * nothing and the passport always read zero.
+ *
+ * `serviceAccountId` comes from `GET /smartrotom/taxi/config`, because the account is a
+ * seeded row whose id the database assigns. Callers that have no reason to fetch it (the
+ * pasaporte's bitácora) may omit it and match on the concept alone.
  */
-export function tripsFromTransactions(transactions: StarBankTransaction[]): Trip[] {
+export function tripsFromTransactions(
+  transactions: StarBankTransaction[],
+  serviceAccountId?: number,
+): Trip[] {
   return transactions
-    .filter((tx) => tx.to === TAXI_SERVICE_ACCOUNT && tx.reason?.startsWith(TRIP_CONCEPT_PREFIX))
+    .filter(
+      (tx) =>
+        (serviceAccountId === undefined || tx.to === serviceAccountId) &&
+        tx.reason?.startsWith(TRIP_CONCEPT_PREFIX),
+    )
     .map((tx, i) => {
       const ts = new Date(tx.date).getTime()
       return {

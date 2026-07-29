@@ -19,6 +19,12 @@
     "BANK_TRANSFER_FAILED": "The transfer couldn't be completed.",
     "BANK_NEGATIVE_BALANCE": "The balance can't be negative.",
     "BANK_BALANCE_ADJUST_FAILED": "The balance couldn't be adjusted.",
-    "TOURNAMENT_CHECKIN_CLOSED": "Check-in isn't open."
+    "TOURNAMENT_CHECKIN_CLOSED": "Check-in isn't open.",
+    "TAXI_STOP_NOT_FOUND": "That taxi stop no longer exists.",
+    "TAXI_PLAYER_OFFLINE": "You need to be connected to the server to travel.",
+    "TAXI_INSUFFICIENT_FUNDS": "You do not have enough balance for this trip.",
+    "TAXI_UNSAFE_ARRIVAL": "There is nowhere safe to drop you off at that stop.",
+    "TAXI_IN_DUNGEON_RUN": "You cannot take a taxi during a dungeon run.",
+    "TAXI_SERVER_BUSY": "The server did not answer in time. You have not been charged."
   }
 }

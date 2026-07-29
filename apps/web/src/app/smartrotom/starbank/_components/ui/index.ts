@@ -4,6 +4,7 @@ export { Card, SectionHead, CardBody } from "./Card";
 export { Button } from "./Button";
 export { Chip, CategoryChip } from "./Chip";
 export { Label, Input, Select } from "./Field";
+export { ImagePicker } from "./ImagePicker";
 export { Kpi } from "./Kpi";
 export { PageHeader } from "./PageHeader";
 export { Sparkline } from "./Sparkline";

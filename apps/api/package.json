@@ -25,6 +25,7 @@
     "test:cov": "NODE_OPTIONS='--max-old-space-size=4096' jest --coverage --runInBand",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "NODE_OPTIONS='--max-old-space-size=2048' jest --config ./test/jest-e2e.json --maxWorkers=1",
+    "seed:house-accounts": "node ../../node_modules/ts-node/dist/bin.js -r tsconfig-paths/register src/seed/house-accounts.ts",
     "generate": "drizzle-kit generate",
     "migrate": "drizzle-kit migrate",
     "push": "drizzle-kit push",

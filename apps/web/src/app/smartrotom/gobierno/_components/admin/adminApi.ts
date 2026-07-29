@@ -2,7 +2,8 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { useTranslations } from "next-intl"
-import { rotomGETOrThrow, rotomPOSTOrThrow, userMessageFrom } from "@/services/boffAPI"
+import { rotomAuthedPOSTOrThrow, rotomGETOrThrow, rotomPOSTOrThrow, userMessageFrom } from "@/services/boffAPI"
+import { useApiError } from "@/hooks/useApiError"
 import type { SendNotificationPayload } from "@/services/api/smartrotom/notificationsService"
 import type { NotificationResponseDto } from "@boffmedia/shared"
 import type { RotomApp as SmartRotomApp, RotomUser as SmartRotomUser } from "@boffmedia/shared"
@@ -73,6 +74,24 @@ export const useSendNotification = () => {
       rotomPOSTOrThrow<NotificationResponseDto>("/notifications/send", payload),
     onSuccess: () => toast.success(t("notificaciones.notifEnviada")),
     onError: (e: unknown) => toast.error(userMessageFrom(e, t("notificaciones.errorEnviar"))),
+  })
+}
+
+/**
+ * Move a player to a taxi stop. A moderation action, not a trip: no fare, no ledger row, and it
+ * never shows up in the player's passport. The API audits it and whispers the player.
+ *
+ * `rotomAuthedPOSTOrThrow`, not `rotomPOSTOrThrow`: the route is role-gated behind
+ * JwtAuthGuard + RolesGuard, and the plain helper sends no Bearer.
+ */
+export const useAdminTeleport = () => {
+  const t = useTranslations("gobierno")
+  const apiError = useApiError()
+  return useMutation({
+    mutationFn: (payload: { uuid: string; stopId: string; reason?: string }) =>
+      rotomAuthedPOSTOrThrow<void>("/taxi/admin/teleport", payload),
+    onSuccess: () => toast.success(t("traslado.trasladado")),
+    onError: (e: unknown) => toast.error(apiError(e, t("traslado.errorTrasladar"))),
   })
 }
 

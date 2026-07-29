@@ -237,7 +237,20 @@
         "create": "Create account",
         "errorEmpty": "Enter a name for the account",
         "errorFailed": "Could not create the account",
-        "created": "Account created"
+        "created": "Account created",
+        "imageLabel": "Image (optional)",
+        "imageChoose": "Choose image",
+        "imageChange": "Change image",
+        "imageRemove": "Remove",
+        "imageHint": "JPG, PNG, GIF or WEBP. 5 MB maximum.",
+        "imageFormat": "Unsupported format. Use JPG, PNG, GIF or WEBP.",
+        "imageTooBig": "That image is larger than 5 MB.",
+        "editEyebrow": "Secondary account",
+        "editTitle": "Edit account",
+        "save": "Save",
+        "saving": "Saving…",
+        "saved": "Account updated",
+        "errorEditFailed": "Could not update the account"
       },
       "errorCarga": "Your accounts could not be loaded."
     },

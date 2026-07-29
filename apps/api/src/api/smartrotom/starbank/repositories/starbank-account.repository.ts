@@ -1,7 +1,7 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
 import { MySql2Database } from 'drizzle-orm/mysql2';
-import { eq } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 import { RowDataPacket } from 'mysql2';
 import {
   StarBankAccount as DbStarBankAccount,
@@ -108,6 +108,82 @@ export class StarbankAccountRepository
     }
   }
 
+  /** Who owns an account, or null for a house account — those have no owner by design. */
+  async findAccountOwnerUuid(accountId: number): Promise<string | null> {
+    try {
+      const result = await this.db
+        .select({ uuid: starBankUserAccounts.uuid })
+        .from(starBankUserAccounts)
+        .where(eq(starBankUserAccounts.accountId, accountId));
+
+      return result.length > 0 ? result[0].uuid : null;
+    } catch (error: any) {
+      this.logger.error(`Failed to find the owner of account ${accountId}:`, error);
+      throw new Error(`Failed to find account owner: ${error.message}`);
+    }
+  }
+
+  // Deliberately narrow: name and image only. Balance moves through the ledger and nowhere
+  // else, and `type` is not something an edit form gets to change.
+  async updateAccountDetails(
+    accountId: number,
+    details: { name?: string; image?: string },
+  ): Promise<void> {
+    const changes: Partial<DbStarBankAccount> = {};
+    if (details.name !== undefined) changes.name = details.name;
+    if (details.image !== undefined) changes.image = details.image;
+    if (Object.keys(changes).length === 0) return;
+
+    try {
+      await this.db
+        .update(starBankAccounts)
+        .set(changes as DbStarBankAccount)
+        .where(eq(starBankAccounts.id, accountId))
+        .execute();
+    } catch (error: any) {
+      this.logger.error(`Failed to update account ${accountId}:`, error);
+      throw new Error(`Failed to update account: ${error.message}`);
+    }
+  }
+
+  async findHouseAccount(
+    type: AccountType,
+    name: string,
+  ): Promise<StarBankAccount | null> {
+    try {
+      const result = await this.db
+        .select({
+          id: starBankAccounts.id,
+          balance: starBankAccounts.balance,
+          name: starBankAccounts.name,
+          type: starBankAccounts.type,
+          image: starBankAccounts.image,
+        })
+        .from(starBankAccounts)
+        .where(
+          and(eq(starBankAccounts.type, type), eq(starBankAccounts.name, name)),
+        );
+
+      return result.length > 0 ? this.mapToEntity(result[0]) : null;
+    } catch (error: any) {
+      this.logger.error(`Failed to find house account ${type}/${name}:`, error);
+      throw new Error(`Failed to find house account: ${error.message}`);
+    }
+  }
+
+  // Not `create()`: that always links the new account to a player uuid in
+  // rotom_starbank_user_accounts, and a house account has no owner.
+  async createOwnerlessAccount(
+    name: string,
+    type: AccountType,
+  ): Promise<number> {
+    const result = await this.db
+      .insert(starBankAccounts)
+      .values({ name, balance: 0, type })
+      .execute();
+    return result[0].insertId;
+  }
+
   async findUserMainAccount(
     uuid: string,
   ): Promise<{ id: number; balance: number } | null> {
@@ -136,8 +212,6 @@ export class StarbankAccountRepository
 
   async updateBalance(accountId: number, newBalance: number): Promise<boolean> {
     try {
-      if (accountId === 0) return true; // System account
-
       await this.db
         .update(starBankAccounts)
         .set({ balance: newBalance } as DbStarBankAccount)
