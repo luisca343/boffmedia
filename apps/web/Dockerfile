@@ -12,6 +12,10 @@ WORKDIR /app
 # Copy workspace manifests for layer caching
 COPY package.json pnpm-workspace.yaml pnpm-lock.yaml ./
 COPY packages/shared/package.json ./packages/shared/
+COPY packages/ui/package.json ./packages/ui/
+COPY packages/tailwind-config/package.json ./packages/tailwind-config/
+# Whole package: its `prepare` script builds on install (see apps/api/Dockerfile).
+COPY packages/pack-schema ./packages/pack-schema
 COPY apps/web/package.json ./apps/web/
 
 RUN pnpm install --no-frozen-lockfile
@@ -21,6 +25,11 @@ FROM deps AS builder
 WORKDIR /app
 
 COPY packages/shared ./packages/shared
+# @boffmedia/ui ships TypeScript source (transpilePackages) and
+# @boffmedia/tailwind-config carries the v3 tokens AND the webfonts — without
+# it the build succeeds and every page renders in a fallback typeface.
+COPY packages/ui ./packages/ui
+COPY packages/tailwind-config ./packages/tailwind-config
 COPY apps/web ./apps/web
 
 ENV NEXT_TELEMETRY_DISABLED=1
