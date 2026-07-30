@@ -7,7 +7,10 @@ import {
   TournamentsRepository,
   TournamentListRow,
 } from '../repositories/tournaments.repository';
-import { Tournament, boffMediaTournaments } from '@/_db/schema/BoffMediaTournaments';
+import {
+  Tournament,
+  boffMediaTournaments,
+} from '@/_db/schema/BoffMediaTournaments';
 import { CreateTournamentDto } from '../dto/create-tournament.dto';
 import { UpdateTournamentDto } from '../dto/update-tournament.dto';
 import { TournamentSummary } from '../entities/tournament.entity';

@@ -167,9 +167,7 @@ export class AppsController {
     type: [RotomApp],
   })
   @ApiBody({ type: GetPlayerAppsDto })
-  async getForPlayer(
-    @Body() { uuid }: GetPlayerAppsDto,
-  ): Promise<RotomApp[]> {
+  async getForPlayer(@Body() { uuid }: GetPlayerAppsDto): Promise<RotomApp[]> {
     this.logger.log('Fetching apps for player:', uuid);
     return this.appsFacadeService.getAppsForPlayer(uuid);
   }

@@ -3,6 +3,7 @@
 import { useCallback } from "react";
 import { useTranslations } from "next-intl";
 import { Icon, Stepper } from "@/components/boffmedia/primitives";
+import { WorkbenchLayout } from "@/components/boffmedia/ui/schematic/WorkbenchLayout";
 import { SchematicAssetProvider } from "@/lib/schematic/render";
 import { useViewerEngine } from "./_hooks/useViewerEngine";
 import { useViewerActions } from "./_hooks/useViewerActions";
@@ -69,22 +70,39 @@ export function SchematicViewerTool() {
           <div className="min-w-2 flex-1" />
         </div>
 
-        <div className="flex min-h-0 flex-1">
-          <aside className="w-[336px] shrink-0 overflow-y-auto overflow-x-hidden border-r border-line bg-base-2 max-[1180px]:w-[300px]">
-            <SetupSidebar
-              engineReady={engineReady}
-              onPickSchematic={loadSchematic}
-              onChangeVersion={changeVersion}
-              onPickWorld={attachWorldIds}
-              onDetachWorld={clearWorldIds}
-              onChangeMode={changeMode}
-              onScanInstance={scanEnvironment}
-            />
-          </aside>
-          <main className="flex min-w-[360px] flex-1 flex-col bg-base">
-            <ViewerPreview />
-          </main>
-        </div>
+        {/* body: two columns above 820px, tabs at/below it (E-front) — this
+            tool's columns stop fitting earlier than compat's, hence the
+            lower tool-specific breakpoint. */}
+        <WorkbenchLayout
+          breakpoint={820}
+          panes={[
+            {
+              key: "setup",
+              label: t("workbench.setupTab"),
+              className:
+                "w-[336px] shrink-0 overflow-y-auto overflow-x-hidden border-r border-line bg-base-2 max-[1180px]:w-[300px]",
+              tabClassName: "overflow-y-auto overflow-x-hidden bg-base-2",
+              node: (
+                <SetupSidebar
+                  engineReady={engineReady}
+                  onPickSchematic={loadSchematic}
+                  onChangeVersion={changeVersion}
+                  onPickWorld={attachWorldIds}
+                  onDetachWorld={clearWorldIds}
+                  onChangeMode={changeMode}
+                  onScanInstance={scanEnvironment}
+                />
+              ),
+            },
+            {
+              key: "preview",
+              label: t("workbench.previewTab"),
+              className: "flex min-w-[360px] flex-1 flex-col bg-base",
+              tabClassName: "flex flex-col bg-base",
+              node: <ViewerPreview />,
+            },
+          ]}
+        />
       </div>
     </SchematicAssetProvider>
   );

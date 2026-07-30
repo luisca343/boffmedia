@@ -1,17 +1,12 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { ScanCard } from "./ScanCard";
-import type { SchRegistry } from "../ui/sch-tokens";
-import type { RegistryHandle } from "@/lib/schematic/types";
 import { gameMeta, type GameId } from "@/lib/schematic/adapters/game-adapter";
 import type { EnvMode } from "../../_store/tool.store";
 import { BUNDLED_VERSIONS } from "@/lib/schematic/versions";
-import {
-  collectFromDirectory,
-  collectFromFileList,
-  getDirectoryPicker,
-} from "@/lib/schematic/registry/instance-files";
+import { useInstanceFilePicker } from "@/lib/schematic/actions";
+import { ScanCard } from "./ScanCard";
+import type { SchRegistry } from "../ui/sch-tokens";
+import type { RegistryHandle } from "@/lib/schematic/types";
 
 interface ScanProgress {
   pct: number;
@@ -68,43 +63,15 @@ export function EnvPicker({
   vanillaVersion,
   onVanillaVersionChange,
 }: EnvPickerProps) {
-  const inputRef = useRef<HTMLInputElement>(null);
-  // Resolved after mount, never during render: reading `window` inline makes the
-  // server (always false) and the client (usually true) disagree on the input's
-  // `multiple`, which React reports as a hydration mismatch.
-  const [hasFsApi, setHasFsApi] = useState(false);
-  useEffect(() => {
-    setHasFsApi(!!getDirectoryPicker());
-  }, []);
+  const { inputRef, inputProps, pick } = useInstanceFilePicker({
+    game,
+    onPick,
+  });
   const meta = gameMeta(game);
-  const fallbackIsFolder = !hasFsApi && meta.pickerKind === "instance-folder";
-
-  useEffect(() => {
-    if (inputRef.current) {
-      if (fallbackIsFolder) {
-        inputRef.current.setAttribute("webkitdirectory", "");
-        inputRef.current.setAttribute("directory", "");
-      } else {
-        inputRef.current.removeAttribute("webkitdirectory");
-        inputRef.current.removeAttribute("directory");
-      }
-    }
-  }, [fallbackIsFolder]);
 
   async function handleClick() {
     if (disabled || loading) return;
-    if (hasFsApi) {
-      const picker = getDirectoryPicker();
-      if (!picker) return;
-      try {
-        const dir = await picker();
-        onPick(await collectFromDirectory(dir, game));
-      } catch {
-        // User dismissed the picker — nothing to do.
-      }
-      return;
-    }
-    inputRef.current?.click();
+    await pick();
   }
 
   return (
@@ -112,14 +79,8 @@ export function EnvPicker({
       <input
         ref={inputRef}
         type="file"
-        multiple={fallbackIsFolder}
-        accept={!hasFsApi ? meta.fallbackAccept : undefined}
+        {...inputProps}
         className="hidden"
-        onChange={(e) => {
-          const files = e.target.files;
-          if (files && files.length) onPick(collectFromFileList(files, game));
-          e.target.value = "";
-        }}
       />
       <ScanCard
         role={role}

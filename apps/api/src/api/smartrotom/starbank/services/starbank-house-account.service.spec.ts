@@ -9,7 +9,11 @@ import {
 import { WingullFacadeService } from '../../wingull/wingull.facade.service';
 import { AccountType } from '../enums/account-type.enum';
 import { TransactionType } from '../enums/transaction-type.enum';
-import { MARKET_ACCOUNT, TAXI_ACCOUNT, TREASURY_ACCOUNT } from '../house-accounts';
+import {
+  MARKET_ACCOUNT,
+  TAXI_ACCOUNT,
+  TREASURY_ACCOUNT,
+} from '../house-accounts';
 
 const PLAYER = 'player-uuid';
 const PLAYER_MAIN = { id: 5, balance: 1000 };
@@ -44,7 +48,10 @@ describe('StarbankHouseAccountService', () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         StarbankHouseAccountService,
-        { provide: Logger, useValue: { log: jest.fn(), warn: jest.fn(), error: jest.fn() } },
+        {
+          provide: Logger,
+          useValue: { log: jest.fn(), warn: jest.fn(), error: jest.fn() },
+        },
         {
           provide: STARBANK_ACCOUNT_REPOSITORY_TOKEN,
           useValue: accountRepository,
@@ -154,7 +161,13 @@ describe('StarbankHouseAccountService', () => {
       });
 
       await expect(
-        service.credit(TREASURY_ACCOUNT, PLAYER, 250, TransactionType.MULTA, 'x'),
+        service.credit(
+          TREASURY_ACCOUNT,
+          PLAYER,
+          250,
+          TransactionType.MULTA,
+          'x',
+        ),
       ).rejects.toThrow('Insufficient balance');
     });
 
@@ -162,7 +175,13 @@ describe('StarbankHouseAccountService', () => {
       wingull.updateBalance.mockRejectedValue(new Error('server offline'));
 
       await expect(
-        service.credit(TREASURY_ACCOUNT, PLAYER, 250, TransactionType.MULTA, 'x'),
+        service.credit(
+          TREASURY_ACCOUNT,
+          PLAYER,
+          250,
+          TransactionType.MULTA,
+          'x',
+        ),
       ).resolves.toBe(99);
     });
 
@@ -170,7 +189,13 @@ describe('StarbankHouseAccountService', () => {
       accountRepository.findUserMainAccount.mockResolvedValue(null);
 
       await expect(
-        service.credit(TREASURY_ACCOUNT, PLAYER, 250, TransactionType.MULTA, 'x'),
+        service.credit(
+          TREASURY_ACCOUNT,
+          PLAYER,
+          250,
+          TransactionType.MULTA,
+          'x',
+        ),
       ).rejects.toThrow(NotFoundException);
     });
   });

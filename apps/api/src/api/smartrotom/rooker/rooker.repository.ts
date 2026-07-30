@@ -746,12 +746,7 @@ export class RookerRepository {
       this.db
         .select({ c: sql<number>`count(*)` })
         .from(rotomReplays)
-        .where(
-          or(
-            eq(rotomReplays.side1, uuid),
-            eq(rotomReplays.side2, uuid),
-          ),
-        ),
+        .where(or(eq(rotomReplays.side1, uuid), eq(rotomReplays.side2, uuid))),
       this.db
         .select({
           c: sql<number>`count(distinct ${pokedexRegistry.pokemonId})`,

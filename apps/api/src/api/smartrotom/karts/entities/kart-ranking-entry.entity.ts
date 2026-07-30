@@ -20,14 +20,21 @@ export class KartRankingEntry {
   })
   nombre: string;
 
-  @ApiProperty({ description: 'Circuit the time was set on', example: 'Rainbow Road' })
+  @ApiProperty({
+    description: 'Circuit the time was set on',
+    example: 'Rainbow Road',
+  })
   circuito: string;
 
-  @ApiProperty({ description: 'Best full-distance time in milliseconds', example: 90500 })
+  @ApiProperty({
+    description: 'Best full-distance time in milliseconds',
+    example: 90500,
+  })
   tiempoMs: number;
 
   @ApiProperty({
-    description: 'Best lap seen for this player on this circuit; null if none recorded',
+    description:
+      'Best lap seen for this player on this circuit; null if none recorded',
     example: 29800,
     // Explicit: reflection cannot see through `number | null`, and without it the
     // generated shared type comes out as an object.

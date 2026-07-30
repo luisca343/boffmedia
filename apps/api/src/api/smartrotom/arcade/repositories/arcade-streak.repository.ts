@@ -7,10 +7,7 @@ import { IArcadeStreakRepository } from './interfaces/arcade-streak.repository.i
 import { CreateArcadeStreakDto } from '../dto/create-arcade-streak.dto';
 import { UpdateArcadeStreakDto } from '../dto/update-arcade-streak.dto';
 import { ArcadeStreak } from '../entities/arcade-streak.entity';
-import {
-  RotomArcadeStreak,
-  rotomArcadeStreaks,
-} from '@/_db/schema/SmartRotom';
+import { RotomArcadeStreak, rotomArcadeStreaks } from '@/_db/schema/SmartRotom';
 
 @Injectable()
 export class ArcadeStreakRepository

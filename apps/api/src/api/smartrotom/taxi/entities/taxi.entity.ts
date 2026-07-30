@@ -1,16 +1,25 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 export class TripResult {
-  @ApiProperty({ example: 'carretera', description: 'Where the player was taken' })
+  @ApiProperty({
+    example: 'carretera',
+    description: 'Where the player was taken',
+  })
   stopId: string;
 
-  @ApiProperty({ example: 254, description: 'What was charged, decided by the server' })
+  @ApiProperty({
+    example: 254,
+    description: 'What was charged, decided by the server',
+  })
   price: number;
 
   @ApiProperty({ example: 308.4, description: 'Blocks travelled, as priced' })
   distance: number;
 
-  @ApiProperty({ example: 1842, description: 'Ledger transaction id of the fare' })
+  @ApiProperty({
+    example: 1842,
+    description: 'Ledger transaction id of the fare',
+  })
   transactionId: number;
 
   @ApiProperty({

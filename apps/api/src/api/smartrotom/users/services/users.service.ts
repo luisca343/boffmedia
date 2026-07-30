@@ -42,9 +42,7 @@ export class UsersService {
     return this.usersRepository.findByUuid(uuid);
   }
 
-  async createUser(
-    createUserDto: CreateSmartrotomUserDto,
-  ): Promise<RotomUser> {
+  async createUser(createUserDto: CreateSmartrotomUserDto): Promise<RotomUser> {
     // Check for duplicate UUID
     const existingUser = await this.usersRepository.findByUuid(
       createUserDto.uuid,

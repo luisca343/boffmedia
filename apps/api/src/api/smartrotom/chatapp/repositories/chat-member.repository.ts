@@ -52,7 +52,10 @@ export class ChatMemberRepository implements IMemberRepository {
     await this.db
       .delete(rotomChatMembers)
       .where(
-        and(eq(rotomChatMembers.chatId, chatId), eq(rotomChatMembers.uuid, uuid)),
+        and(
+          eq(rotomChatMembers.chatId, chatId),
+          eq(rotomChatMembers.uuid, uuid),
+        ),
       );
   }
 
@@ -64,7 +67,10 @@ export class ChatMemberRepository implements IMemberRepository {
       .select({ uuid: rotomChatMembers.uuid })
       .from(rotomChatMembers)
       .where(
-        and(eq(rotomChatMembers.chatId, chatId), eq(rotomChatMembers.uuid, uuid)),
+        and(
+          eq(rotomChatMembers.chatId, chatId),
+          eq(rotomChatMembers.uuid, uuid),
+        ),
       )
       .limit(1);
     return result[0] || null;
@@ -75,10 +81,16 @@ export class ChatMemberRepository implements IMemberRepository {
     uuid: string,
   ): Promise<{ pinned: boolean; muted: boolean }> {
     const result = await this.db
-      .select({ pinned: rotomChatMembers.pinned, muted: rotomChatMembers.muted })
+      .select({
+        pinned: rotomChatMembers.pinned,
+        muted: rotomChatMembers.muted,
+      })
       .from(rotomChatMembers)
       .where(
-        and(eq(rotomChatMembers.chatId, chatId), eq(rotomChatMembers.uuid, uuid)),
+        and(
+          eq(rotomChatMembers.chatId, chatId),
+          eq(rotomChatMembers.uuid, uuid),
+        ),
       )
       .limit(1);
     return result[0] || { pinned: false, muted: false };
@@ -93,7 +105,10 @@ export class ChatMemberRepository implements IMemberRepository {
       .update(rotomChatMembers)
       .set({ pinned })
       .where(
-        and(eq(rotomChatMembers.chatId, chatId), eq(rotomChatMembers.uuid, uuid)),
+        and(
+          eq(rotomChatMembers.chatId, chatId),
+          eq(rotomChatMembers.uuid, uuid),
+        ),
       );
   }
 
@@ -102,7 +117,10 @@ export class ChatMemberRepository implements IMemberRepository {
       .update(rotomChatMembers)
       .set({ muted })
       .where(
-        and(eq(rotomChatMembers.chatId, chatId), eq(rotomChatMembers.uuid, uuid)),
+        and(
+          eq(rotomChatMembers.chatId, chatId),
+          eq(rotomChatMembers.uuid, uuid),
+        ),
       );
   }
 }

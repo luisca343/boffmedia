@@ -3,6 +3,7 @@
 import { useCallback } from "react";
 import { useTranslations } from "next-intl";
 import { Icon, Stepper } from "@/components/boffmedia/primitives";
+import { WorkbenchLayout } from "@/components/boffmedia/ui/schematic/WorkbenchLayout";
 import { useCompatEngine } from "./_hooks/useCompatEngine";
 import { useToolActions } from "./_hooks/useToolActions";
 import { useSchematicRender } from "./_hooks/useSchematicRender";
@@ -74,34 +75,52 @@ export function SchematicCompatTool() {
           <div className="flex-1 min-w-2" />
         </div>
 
-        {/* body: three columns */}
-        <div className="flex-1 min-h-0 flex">
-          <aside className="w-[336px] shrink-0 border-r border-line overflow-y-auto overflow-x-hidden bg-base-2 max-[1180px]:w-[320px]">
-            <SetupPanel
-              engineReady={engineReady}
-              onScanSource={actions.scanSourceInstance}
-              onScanTarget={actions.scanTargetInstance}
-              onChangeSourceGame={actions.changeSourceGame}
-              onChangeTargetGame={actions.changeTargetGame}
-              onLoadVanilla={actions.loadVanillaEnv}
-              onRetryPendingScan={actions.retryPendingScan}
-              onCancelPendingScan={actions.cancelPendingScan}
-              onPickSchematic={actions.loadSchematic}
-              onPickWorld={actions.attachWorldIds}
-              onDetachWorld={actions.clearWorldIds}
-              onAnalyze={actions.analyze}
-            />
-          </aside>
-          <main className="flex-1 min-w-[360px] flex flex-col border-r border-line bg-base">
-            <DiffPanel />
-          </main>
-          {/* The 3D preview takes a large, window-proportional share (was a fixed
-              372px) so big schematics are actually legible; capped so it never
-              starves the diff list on ultrawide displays. */}
-          <aside className="w-[42%] min-w-[420px] max-w-[900px] shrink-0 flex flex-col bg-base-2 max-[1180px]:min-w-[360px]">
-            <PreviewPanel />
-          </aside>
-        </div>
+        {/* body: three columns above 1180px, tabs at/below it (E-front) */}
+        <WorkbenchLayout
+          breakpoint={1180}
+          panes={[
+            {
+              key: "setup",
+              label: t("workbench.setupTab"),
+              className:
+                "w-[336px] shrink-0 border-r border-line overflow-y-auto overflow-x-hidden bg-base-2 max-[1180px]:w-[320px]",
+              tabClassName: "overflow-y-auto overflow-x-hidden bg-base-2",
+              node: (
+                <SetupPanel
+                  engineReady={engineReady}
+                  onScanSource={actions.scanSourceInstance}
+                  onScanTarget={actions.scanTargetInstance}
+                  onChangeSourceGame={actions.changeSourceGame}
+                  onChangeTargetGame={actions.changeTargetGame}
+                  onLoadVanilla={actions.loadVanillaEnv}
+                  onRetryPendingScan={actions.retryPendingScan}
+                  onCancelPendingScan={actions.cancelPendingScan}
+                  onPickSchematic={actions.loadSchematic}
+                  onPickWorld={actions.attachWorldIds}
+                  onDetachWorld={actions.clearWorldIds}
+                  onAnalyze={actions.analyze}
+                />
+              ),
+            },
+            {
+              key: "diff",
+              label: t("workbench.diffTab"),
+              className: "flex-1 min-w-[360px] flex flex-col border-r border-line bg-base",
+              tabClassName: "flex flex-col bg-base",
+              node: <DiffPanel />,
+            },
+            {
+              key: "preview",
+              label: t("workbench.previewTab"),
+              // The 3D preview takes a large, window-proportional share (was a fixed
+              // 372px) so big schematics are actually legible; capped so it never
+              // starves the diff list on ultrawide displays.
+              className: "w-[42%] min-w-[420px] max-w-[900px] shrink-0 flex flex-col bg-base-2 max-[1180px]:min-w-[360px]",
+              tabClassName: "flex flex-col bg-base-2",
+              node: <PreviewPanel />,
+            },
+          ]}
+        />
 
         {/* export footer */}
         <ExportBar

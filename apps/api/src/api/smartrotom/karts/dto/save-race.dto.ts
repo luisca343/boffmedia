@@ -63,7 +63,10 @@ export class RaceParticipantDto {
   @Min(0)
   vueltasCompletadas: number;
 
-  @ApiProperty({ description: 'Whether this racer did not finish', example: false })
+  @ApiProperty({
+    description: 'Whether this racer did not finish',
+    example: false,
+  })
   @IsBoolean()
   dnf: boolean;
 }

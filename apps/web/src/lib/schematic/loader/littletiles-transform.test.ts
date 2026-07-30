@@ -18,6 +18,12 @@ import type { TileEntity } from "../types";
 // (corner WUS, x); one data int packing shorts [+2, +2], HIGH half first.
 const WEDGE = [3, 8, 8, 5, 12, 9, 0x80009000 | 0, 0x00020002];
 
+// A 2-block ramp's western slice, as the mod's extractBox saves it: bounds
+// shrunk to one block but the ORIGINAL absolute corners kept — E corners sit
+// at x = 32, a full block past maxX = 16 (offsets +16 on EUN/EUS/EDN/EDS x,
+// −16 on WUN/WUS y). LittleTransformableBox renders hexahedron ∩ bounds.
+const RAMP_SLICE = [0, 0, 0, 16, 16, 16, 0x80012249 | 0, 0x00100010, 0x00100010, 0xfff0fff0 | 0];
+
 describe("decodeTransformableCorners", () => {
   it("detects the transformable marker", () => {
     expect(isTransformableBox(WEDGE)).toBe(true);
@@ -34,6 +40,14 @@ describe("decodeTransformableCorners", () => {
     expect([...c.slice(12, 18)]).toEqual([5, 12, 8, 5, 12, 9]);
     // WDN, WDS stay at the west-bottom bounds.
     expect([...c.slice(18, 24)]).toEqual([3, 8, 8, 3, 8, 9]);
+  });
+
+  it("preserves out-of-bounds corners of a split slope (extractBox keeps the original plane)", () => {
+    const c = decodeTransformableCorners(RAMP_SLICE);
+    // East corners a full block past maxX — faithful decode, no clamping.
+    expect([c[0], c[3], c[6], c[9]]).toEqual([32, 32, 32, 32]);
+    // West-up corners folded onto the bottom.
+    expect([c[13], c[16]]).toEqual([0, 0]);
   });
 
   it("sign-extends negative packed offsets", () => {
@@ -159,5 +173,29 @@ describe("legacy structure placement", () => {
     expect(g.corners![18]).toBeCloseTo(-0.5 + 3 / 16);
     expect(g.corners![19]).toBeCloseTo(-0.5 + 8 / 16);
     expect(g.corners![20]).toBeCloseTo(-0.5 + 8 / 16);
+    // The box's own min/max travel with the corners as the clip AABB.
+    expect([...g.cornerBounds!]).toEqual([
+      -0.5 + 3 / 16, -0.5 + 8 / 16, -0.5 + 8 / 16,
+      -0.5 + 5 / 16, -0.5 + 12 / 16, -0.5 + 9 / 16,
+    ]);
+  });
+
+  it("exposes world-space clip bounds for a slope slice whose corners spill past them", async () => {
+    const tables = await loadLegacyTables();
+    const tes = [
+      legacyTE({ x: 4, y: 10, z: -2 }, {
+        grid: 16,
+        tiles: [{ block: "minecraft:stone", box: new Int32Array(RAMP_SLICE) }],
+      }),
+    ];
+
+    const g = parseLittleTiles(tes, tables)!.groups[0];
+    // Corners stay the faithful decode — EUN reaches x = host + 1.5…
+    expect(g.corners![0]).toBeCloseTo(4 - 0.5 + 32 / 16);
+    // …while the clip AABB is exactly the host cell (bounds 0…16 at grid 16),
+    // which is what keeps the rendered slice from spilling into x = 5.
+    expect([...g.cornerBounds!]).toEqual([3.5, 9.5, -2.5, 4.5, 10.5, -1.5]);
+    const s = parseLittleTiles(tes, tables)!;
+    expect(s.groups[0].cornerBounds!.length).toBe((s.groups[0].corners!.length / 24) * 6);
   });
 });

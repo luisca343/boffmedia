@@ -63,6 +63,11 @@
           "preview3d": "Vista Previa 3D",
           "modSupport": "Soporte de Mods"
         },
+        "workbench": {
+          "setupTab": "Configuración",
+          "diffTab": "Mapeo",
+          "previewTab": "Vista previa"
+        },
         "game": {
           "title": "Juego",
           "minecraft": "Minecraft",
@@ -121,6 +126,7 @@
           "emptyPrompt": "Escanea ambos entornos, carga un esquema y pulsa Analizar.",
           "noMatching": "No hay bloques que coincidan",
           "searchPlaceholder": "Buscar bloques…",
+          "refineSearch": "{count, plural, one {# resultado más} other {# resultados más}} — afina tu búsqueda",
           "showSafe": "Mostrar compatibles",
           "hideSafe": "Ocultar compatibles",
           "replaceWith": "Reemplazar con…",
@@ -186,6 +192,12 @@
           "title": "Vista previa",
           "loading3d": "Cargando motor 3D…",
           "inspectorEmpty": "Selecciona un bloque del diff o de la vista 3D para inspeccionarlo.",
+          "locate": "Ubicar",
+          "prev": "Anterior",
+          "next": "Siguiente",
+          "isolate": "Aislar",
+          "stepper": "{index} / {navigable}",
+          "culledNote": "de {total} en total — algunos interiores ocultos",
           "modeSource": "Origen",
           "modeResult": "Resultado",
           "modeDiff": "Diff",
@@ -263,6 +275,10 @@
         },
         "appName": "Schematic Viewer",
         "appTagline": "Minecraft · Hytale",
+        "workbench": {
+          "setupTab": "Configuración",
+          "previewTab": "Visor"
+        },
         "setup": {
           "version": "Versión",
           "schematic": "Esquema",
@@ -316,7 +332,12 @@
           "preparing": "Preparando datos 3D…",
           "noBlocks": "Este esquema no tiene bloques que mostrar",
           "inspectorEmpty": "Haz clic en un bloque de la vista 3D para inspeccionarlo.",
-          "instances": "{count, plural, one {# instancia} other {# instancias}}"
+          "instances": "{count, plural, one {# instancia} other {# instancias}}",
+          "locate": "Ubicar",
+          "prev": "Anterior",
+          "next": "Siguiente",
+          "isolate": "Aislar",
+          "stepper": "{index} / {navigable}"
         },
         "error": {
           "schematicUnsupported": "Tipo de archivo no admitido. Usa .schem, .litematic, .nbt, .mca o .prefab.json.",

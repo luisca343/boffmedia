@@ -49,9 +49,7 @@ export class UsersFacadeService {
     return this.usersService.getUserByUuid(uuid);
   }
 
-  async createUser(
-    createUserDto: CreateSmartrotomUserDto,
-  ): Promise<RotomUser> {
+  async createUser(createUserDto: CreateSmartrotomUserDto): Promise<RotomUser> {
     return this.usersService.createUser(createUserDto);
   }
 

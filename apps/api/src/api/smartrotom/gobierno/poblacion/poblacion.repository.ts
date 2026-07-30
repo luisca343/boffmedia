@@ -23,9 +23,7 @@ export class PoblacionRepository {
   // ==================== CENSO ====================
 
   async listUsers(page: number, limit: number, search?: string) {
-    const where = search
-      ? like(rotomUsers.username, `%${search}%`)
-      : undefined;
+    const where = search ? like(rotomUsers.username, `%${search}%`) : undefined;
     const [items, totalRows] = await Promise.all([
       this.db
         .select({
@@ -51,9 +49,7 @@ export class PoblacionRepository {
    * clause — the rows have to exist before the predicate can be evaluated.
    */
   async listAllUsers(search?: string) {
-    const where = search
-      ? like(rotomUsers.username, `%${search}%`)
-      : undefined;
+    const where = search ? like(rotomUsers.username, `%${search}%`) : undefined;
     return this.db
       .select({
         uuid: rotomUsers.uuid,

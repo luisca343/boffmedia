@@ -28,6 +28,9 @@ export function SchematicViewer3D() {
   const setNavMode = useViewerStore((s) => s.setNavMode);
   const setSelectedBlock = useViewerStore((s) => s.setSelectedBlock);
   const registry = useViewerStore(selectEnvironment).registry;
+  const isolate = useViewerStore((s) => s.isolate);
+  const focusIndex = useViewerStore((s) => s.focusIndex);
+  const focusNonce = useViewerStore((s) => s.focusNonce);
 
   // Read outside the R3F <Canvas>: it runs its own reconciler, so context from
   // this tree does not reach components rendered inside it — pass values down.
@@ -45,6 +48,11 @@ export function SchematicViewer3D() {
   const flyLabels = useMemo(
     () => ({ clickToStart: t("preview.flyClickToStart"), controlsHint: t("preview.flyControlsHint") }),
     [t],
+  );
+  // Store meets renderer only here (store-free invariant).
+  const focus = useMemo(
+    () => (focusIndex !== null ? { index: focusIndex, nonce: focusNonce } : null),
+    [focusIndex, focusNonce],
   );
 
   if (!schematic) return <Empty>{t("preview.emptyNoSchematic")}</Empty>;
@@ -66,6 +74,8 @@ export function SchematicViewer3D() {
       loaders={loaders}
       flyLabels={flyLabels}
       stageId="schview-stage"
+      isolate={isolate}
+      focus={focus}
     />
   );
 }

@@ -23,6 +23,16 @@ export interface ViewerSlice {
   selectedStructureIdx: number[] | null;
   layerY: number;
   navMode: NavMode;
+  /** RF-05: dims every non-selected block group to the existing ghost look. */
+  isolate: boolean;
+  /**
+   * RF-01/02/03: the {@link FocusRequest} the renderer flies to — index into the
+   * active selection's combined instance list, plus a nonce that bumps on every
+   * locate/next/prev so re-requesting the same placement (wrap-around) still
+   * re-triggers the fly-to animation.
+   */
+  focusIndex: number | null;
+  focusNonce: number;
   setBlockPositions: (groups: BlockPositionGroup[]) => void;
   setLittleTileGroups: (groups: LittleTilesGroup[]) => void;
   setLittleTileStructures: (structures: LittleTilesStructure[]) => void;
@@ -31,6 +41,9 @@ export interface ViewerSlice {
   setSelectedStructureIdx: (idx: number[] | null) => void;
   setLayerY: (y: number) => void;
   setNavMode: (m: NavMode) => void;
+  setIsolate: (v: boolean) => void;
+  /** Bumps `focusNonce` so the same index re-flies; pass null to clear (no re-fly). */
+  setFocus: (index: number | null) => void;
   /**
    * Re-arm the viewer for a freshly loaded document: drop the previous
    * document's instance data and selection, and park the Y-slider at the top.
@@ -51,6 +64,9 @@ const VIEWER_DEFAULTS = {
   selectedStructureIdx: null,
   layerY: 0,
   navMode: "orbit" as NavMode,
+  isolate: false,
+  focusIndex: null as number | null,
+  focusNonce: 0,
 };
 
 export function createViewerSlice(set: SliceSet<ViewerSlice>): ViewerSlice {
@@ -61,10 +77,22 @@ export function createViewerSlice(set: SliceSet<ViewerSlice>): ViewerSlice {
     setLittleTileStructures: (structures) =>
       set({ littleTileStructures: structures, selectedStructureIdx: null }),
     setFetchingPositions: (v) => set({ isFetchingPositions: v }),
-    setSelectedBlock: (id) => set({ selectedBlockId: id, selectedStructureIdx: null }),
-    setSelectedStructureIdx: (idx) => set({ selectedStructureIdx: idx, selectedBlockId: undefined }),
+    // RF-07: clearing/replacing a selection also drops isolate and any pending
+    // focus request — same slice, same write, no separate cascade location.
+    setSelectedBlock: (id) =>
+      set({ selectedBlockId: id, selectedStructureIdx: null, isolate: false, focusIndex: null }),
+    setSelectedStructureIdx: (idx) =>
+      set({ selectedStructureIdx: idx, selectedBlockId: undefined, isolate: false, focusIndex: null }),
     setLayerY: (y) => set({ layerY: y }),
     setNavMode: (m) => set({ navMode: m }),
+    setIsolate: (v) => set({ isolate: v }),
+    setFocus: (index) =>
+      set((s) => ({
+        focusIndex: index,
+        // Bump even on a same-index re-request — that repeat is exactly what
+        // RF-03's wrap-around locate needs to re-trigger the fly-to animation.
+        focusNonce: index === null ? s.focusNonce : s.focusNonce + 1,
+      })),
     resetViewerFor: (schematic) =>
       set({
         blockPositions: [],
@@ -74,6 +102,9 @@ export function createViewerSlice(set: SliceSet<ViewerSlice>): ViewerSlice {
         selectedStructureIdx: null,
         layerY: schematic ? schematic.dimensions.y - 1 : 0,
         isFetchingPositions: !!schematic,
+        isolate: false,
+        focusIndex: null,
+        focusNonce: 0,
       }),
     resetViewer: () => set({ ...VIEWER_DEFAULTS }),
   };

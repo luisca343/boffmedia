@@ -10,7 +10,10 @@ import {
   matchesForPhaseChain,
   standingsForEntrants,
 } from '../standings.util';
-import { TournamentMatch, TournamentPhase } from '@/_db/schema/BoffMediaTournaments';
+import {
+  TournamentMatch,
+  TournamentPhase,
+} from '@/_db/schema/BoffMediaTournaments';
 
 interface Ranked {
   participantId: number;

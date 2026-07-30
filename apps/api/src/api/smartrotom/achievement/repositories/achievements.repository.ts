@@ -31,9 +31,7 @@ export class AchievementsRepository
   }
 
   async create(data: CreateAchievementDto): Promise<Achievement> {
-    await this.db
-      .insert(rotomAchievements)
-      .values(data as RotomAchievement);
+    await this.db.insert(rotomAchievements).values(data as RotomAchievement);
     return this.findByStringId(data.id) as Promise<Achievement>;
   }
 
@@ -97,10 +95,7 @@ export class AchievementsRepository
       .leftJoin(
         rotomUserAchievements,
         and(
-          eq(
-            rotomAchievements.id,
-            rotomUserAchievements.achievementId,
-          ),
+          eq(rotomAchievements.id, rotomUserAchievements.achievementId),
           eq(rotomUserAchievements.uuid, uuid),
         ),
       )
@@ -111,10 +106,7 @@ export class AchievementsRepository
           eq(rotomUserReplays.replayId, rotomUserAchievements.dataId),
         ),
       )
-      .leftJoin(
-        rotomReplays,
-        eq(rotomReplays.id, rotomUserReplays.replayId),
-      )
+      .leftJoin(rotomReplays, eq(rotomReplays.id, rotomUserReplays.replayId))
       .orderBy(
         asc(
           sql`CASE WHEN ${rotomUserAchievements.completedAt} IS NULL THEN 1 ELSE 0 END`,
@@ -153,10 +145,7 @@ export class AchievementsRepository
       .leftJoin(
         rotomUserAchievements,
         and(
-          eq(
-            rotomAchievements.id,
-            rotomUserAchievements.achievementId,
-          ),
+          eq(rotomAchievements.id, rotomUserAchievements.achievementId),
           eq(rotomUserAchievements.uuid, uuid),
         ),
       )
@@ -167,10 +156,7 @@ export class AchievementsRepository
           eq(rotomUserReplays.replayId, rotomUserAchievements.dataId),
         ),
       )
-      .leftJoin(
-        rotomReplays,
-        eq(rotomReplays.id, rotomUserReplays.replayId),
-      )
+      .leftJoin(rotomReplays, eq(rotomReplays.id, rotomUserReplays.replayId))
       .where(eq(rotomAchievements.id, achievementId))
       .limit(1);
 
@@ -190,10 +176,7 @@ export class AchievementsRepository
       .leftJoin(
         rotomUserAchievements,
         and(
-          eq(
-            rotomAchievements.id,
-            rotomUserAchievements.achievementId,
-          ),
+          eq(rotomAchievements.id, rotomUserAchievements.achievementId),
           eq(rotomUserAchievements.uuid, uuid),
         ),
       )

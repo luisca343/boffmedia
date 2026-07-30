@@ -79,7 +79,10 @@ describe('KartsService', () => {
       });
 
       const [, participants] = mockRepository.saveRace.mock.calls[0];
-      expect(participants[0]).toMatchObject({ tiempoMs: -1, mejorVueltaMs: -1 });
+      expect(participants[0]).toMatchObject({
+        tiempoMs: -1,
+        mejorVueltaMs: -1,
+      });
     });
   });
 
