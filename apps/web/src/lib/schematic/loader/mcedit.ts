@@ -183,6 +183,18 @@ export async function loadMcedit(
         y: typeof schem.WEOffsetY === "number" ? schem.WEOffsetY : 0,
         z: typeof schem.WEOffsetZ === "number" ? schem.WEOffsetZ : 0,
       },
+      // Only when WorldEdit actually recorded it — a defaulted 0,0,0 would read
+      // as a real world position and send the user to the wrong place.
+      origin:
+        typeof schem.WEOriginX === "number" ||
+        typeof schem.WEOriginY === "number" ||
+        typeof schem.WEOriginZ === "number"
+          ? {
+              x: typeof schem.WEOriginX === "number" ? schem.WEOriginX : 0,
+              y: typeof schem.WEOriginY === "number" ? schem.WEOriginY : 0,
+              z: typeof schem.WEOriginZ === "number" ? schem.WEOriginZ : 0,
+            }
+          : undefined,
     },
   };
 }

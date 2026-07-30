@@ -221,7 +221,14 @@
           "flyControlsHint": "WASD moverse · Espacio/Mayús subir/bajar · Rueda velocidad · Esc salir",
           "emptyNoSchematic": "Carga un esquema para ver la vista 3D",
           "preparing": "Preparando datos 3D…",
-          "noBlocks": "Este esquema no tiene bloques que mostrar"
+          "noBlocks": "Este esquema no tiene bloques que mostrar",
+          "originTitle": "Origen en el mundo",
+          "origin": "Esquina mín.",
+          "playerStand": "Posición del jugador",
+          "copyTp": "Copiar /tp",
+          "copied": "Copiado",
+          "north": "N ↑ Norte (-Z)",
+          "showMarker": "Marcador de origen en 3D"
         },
         "export": {
           "title": "Exportar",
@@ -337,7 +344,14 @@
           "prev": "Anterior",
           "next": "Siguiente",
           "isolate": "Aislar",
-          "stepper": "{index} / {navigable}"
+          "stepper": "{index} / {navigable}",
+          "originTitle": "Origen en el mundo",
+          "origin": "Esquina mín.",
+          "playerStand": "Posición del jugador",
+          "copyTp": "Copiar /tp",
+          "copied": "Copiado",
+          "north": "N ↑ Norte (-Z)",
+          "showMarker": "Marcador de origen en 3D"
         },
         "error": {
           "schematicUnsupported": "Tipo de archivo no admitido. Usa .schem, .litematic, .nbt, .mca o .prefab.json.",

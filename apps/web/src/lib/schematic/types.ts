@@ -395,4 +395,11 @@ export interface SchematicSummary {
   unknownIdCount?: number;
   /** Present when the schematic contains LittleTiles blocks. */
   littleTiles?: { blockCount: number; tileCount: number };
+  /**
+   * World coords of the schematic's min corner in the source world (WorldEdit
+   * `WEOrigin`). Absent for formats that never record it (.litematic, .nbt).
+   */
+  origin?: { x: number; y: number; z: number };
+  /** Paste offset relative to the player who copied it (WorldEdit `WEOffset`). */
+  offset?: { x: number; y: number; z: number };
 }

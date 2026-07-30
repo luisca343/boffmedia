@@ -69,6 +69,14 @@ export function registryHandle(id: string, reg: BlockRegistry): RegistryHandle {
   };
 }
 
+/** `metadata` is untyped NBT-derived data, so validate before it crosses Comlink. */
+function asVec3(v: unknown): { x: number; y: number; z: number } | undefined {
+  if (!v || typeof v !== "object") return undefined;
+  const { x, y, z } = v as Record<string, unknown>;
+  if (!Number.isFinite(x) || !Number.isFinite(y) || !Number.isFinite(z)) return undefined;
+  return { x: x as number, y: y as number, z: z as number };
+}
+
 export function schematicSummary(
   id: string,
   s: SchematicStructure,
@@ -77,6 +85,8 @@ export function schematicSummary(
 ): SchematicSummary {
   const unknownIds = s.metadata.unknownLegacyIds;
   const legacy = s.format === "mcedit" || s.metadata.legacy === true;
+  const origin = asVec3(s.metadata.origin);
+  const offset = asVec3(s.metadata.offset);
   return {
     id,
     format: s.format,
@@ -92,6 +102,8 @@ export function schematicSummary(
     ...(s.littleTiles
       ? { littleTiles: { blockCount: s.littleTiles.blockCount, tileCount: s.littleTiles.tileCount } }
       : {}),
+    ...(origin ? { origin } : {}),
+    ...(offset ? { offset } : {}),
   };
 }
 

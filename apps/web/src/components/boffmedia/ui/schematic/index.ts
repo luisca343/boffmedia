@@ -19,6 +19,11 @@ export { PreviewButton, SwitchGroup, SwitchSegment } from "./PreviewChrome"
 export type { PreviewButtonProps, SwitchSegmentProps } from "./PreviewChrome"
 export { PreviewShell, type PreviewShellLabels, type PreviewShellProps } from "./PreviewShell"
 export {
+  SourceAnchorInfo,
+  type SourceAnchorInfoLabels,
+  type SourceAnchorInfoProps,
+} from "./SourceAnchorInfo"
+export {
   SelectionLocateControls,
   type SelectionLocateControlsLabels,
   type SelectionLocateControlsProps,

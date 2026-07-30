@@ -85,23 +85,46 @@ export function useGridWindow(scrollRef: RefObject<HTMLElement | null>, options:
   const rangeRef = useRef(range);
   rangeRef.current = range;
 
+  const colsRef = useRef(columns);
+  colsRef.current = columns;
+
   const measure = useCallback(() => {
     const scrollEl = scrollRef.current;
     const gridEl = gridRef.current;
     if (!scrollEl || !gridEl) return;
     const cols = columnsFor(gridEl.clientWidth, minColWidth, gap);
     const rows = Math.max(1, Math.ceil(itemCount / cols));
-    // Offset of the grid's un-padded content top within the scroll container's
-    // content, undoing the padding this same hook applied on the prior pass.
-    const gridBoxTop = gridEl.getBoundingClientRect().top - scrollEl.getBoundingClientRect().top + scrollEl.scrollTop;
-    const contentTop = gridBoxTop - rangeRef.current.topPad;
+    // Top of the grid's *border box* within the scroll container's content.
+    // The padding this hook applies is inside that box, so the box top does not
+    // move with it — subtracting topPad here would double-count and make each
+    // pass drift further down (runaway scroll + unreachable rows).
+    const contentTop = gridEl.getBoundingClientRect().top - scrollEl.getBoundingClientRect().top + scrollEl.scrollTop;
     const relScrollTop = scrollEl.scrollTop - contentTop;
-    setColumns(cols);
-    setRange(visibleRange(relScrollTop, scrollEl.clientHeight, rowHeight, rows, overscan));
+    const next = visibleRange(relScrollTop, scrollEl.clientHeight, rowHeight, rows, overscan);
+    if (cols !== colsRef.current) {
+      colsRef.current = cols;
+      setColumns(cols);
+    }
+    const prev = rangeRef.current;
+    if (
+      next.startRow !== prev.startRow ||
+      next.endRow !== prev.endRow ||
+      next.topPad !== prev.topPad ||
+      next.bottomPad !== prev.bottomPad
+    ) {
+      rangeRef.current = next;
+      setRange(next);
+    }
   }, [scrollRef, itemCount, minColWidth, gap, rowHeight, overscan]);
 
+  // Runs after every commit: a sibling grid re-padding itself shifts this one's
+  // offset without resizing it, and no scroll/resize event fires for that.
+  // The equality guard above keeps this from looping.
   useLayoutEffect(() => {
     measure();
+  });
+
+  useLayoutEffect(() => {
     const scrollEl = scrollRef.current;
     if (!scrollEl) return;
     scrollEl.addEventListener("scroll", measure, { passive: true });
@@ -114,8 +137,7 @@ export function useGridWindow(scrollRef: RefObject<HTMLElement | null>, options:
       ro.disconnect();
       window.removeEventListener("resize", measure);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [measure]);
+  }, [scrollRef, measure]);
 
   const scrollToIndex = useCallback(
     (index: number) => {
@@ -124,8 +146,7 @@ export function useGridWindow(scrollRef: RefObject<HTMLElement | null>, options:
       if (!scrollEl || !gridEl) return;
       const cols = columns || 1;
       const row = rowOfIndex(index, cols);
-      const gridBoxTop = gridEl.getBoundingClientRect().top - scrollEl.getBoundingClientRect().top + scrollEl.scrollTop;
-      const contentTop = gridBoxTop - range.topPad;
+      const contentTop = gridEl.getBoundingClientRect().top - scrollEl.getBoundingClientRect().top + scrollEl.scrollTop;
       const rowTop = contentTop + row * rowHeight;
       const rowBottom = rowTop + rowHeight;
       if (rowTop < scrollEl.scrollTop) {
@@ -134,7 +155,7 @@ export function useGridWindow(scrollRef: RefObject<HTMLElement | null>, options:
         scrollEl.scrollTo({ top: rowBottom - scrollEl.clientHeight, behavior: "smooth" });
       }
     },
-    [scrollRef, columns, rowHeight, range.topPad],
+    [scrollRef, columns, rowHeight],
   );
 
   return { gridRef, columns, startRow: range.startRow, endRow: range.endRow, topPad: range.topPad, bottomPad: range.bottomPad, scrollToIndex };

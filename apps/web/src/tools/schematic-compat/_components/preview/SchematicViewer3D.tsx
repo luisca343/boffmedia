@@ -4,6 +4,7 @@ import { useCallback, useMemo } from "react";
 import { useTranslations } from "next-intl";
 import {
   SchematicView,
+  localPlayerPos,
   useConnectionsLoader,
   useModelLoader,
   useTextureLoader,
@@ -37,6 +38,7 @@ export function SchematicViewer3D() {
   const setNavMode = useToolStore((s) => s.setNavMode);
   const setSelectedBlock = useToolStore((s) => s.setSelectedBlock);
   const isolate = useToolStore((s) => s.isolate);
+  const showAnchor = useToolStore((s) => s.showAnchor);
   const focusIndex = useToolStore((s) => s.focusIndex);
   const focusNonce = useToolStore((s) => s.focusNonce);
   // Schematic blocks come from the source instance — resolve their textures
@@ -83,6 +85,10 @@ export function SchematicViewer3D() {
   const focus = useMemo(
     () => (focusIndex !== null ? { index: focusIndex, nonce: focusNonce } : null),
     [focusIndex, focusNonce],
+  );
+  const playerAnchor = useMemo(
+    () => (showAnchor ? (localPlayerPos(schematic?.offset) ?? null) : null),
+    [showAnchor, schematic?.offset],
   );
 
   // Concat the selected structures' geometry into the single pair of arrays the
@@ -144,6 +150,9 @@ export function SchematicViewer3D() {
       flyLabels={flyLabels}
       isolate={isolate}
       focus={focus}
+      playerAnchor={playerAnchor}
+      showNorth={showAnchor}
+      northLabel={t("preview.north")}
       {...overrides}
     />
   );
