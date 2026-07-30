@@ -99,9 +99,7 @@ export class UsersController {
     description: 'Invalid ID format.',
   })
   @ApiParam({ name: 'id', description: 'User ID', type: 'number' })
-  async findOne(
-    @Param('id', ParseIntPipe) id: number,
-  ): Promise<RotomUser> {
+  async findOne(@Param('id', ParseIntPipe) id: number): Promise<RotomUser> {
     return this.usersFacadeService.getUserById(id) as unknown as RotomUser;
   }
 
@@ -268,10 +266,7 @@ export class UsersController {
     schema: {
       type: 'object',
       additionalProperties: {
-        oneOf: [
-          { $ref: '#/components/schemas/RotomUser' },
-          { type: 'null' },
-        ],
+        oneOf: [{ $ref: '#/components/schemas/RotomUser' }, { type: 'null' }],
       },
     },
   })

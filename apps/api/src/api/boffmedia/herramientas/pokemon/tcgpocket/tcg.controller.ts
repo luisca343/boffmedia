@@ -432,7 +432,9 @@ export class TcgController {
     description: 'User cards retrieved successfully.',
     type: [TcgUserCard],
   })
-  async getUserCards(@Param('userName') userName: string): Promise<TcgUserCard[]> {
+  async getUserCards(
+    @Param('userName') userName: string,
+  ): Promise<TcgUserCard[]> {
     return this.tcgFacade.getUserCards(userName);
   }
 

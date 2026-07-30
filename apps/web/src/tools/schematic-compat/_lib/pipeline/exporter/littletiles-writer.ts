@@ -12,10 +12,12 @@
  *                           children: [ <one entry per structure here> ] } }
  *   tiles list          per tile: IntArray[1] = ARGB color (-1 untinted),
  *                       then one IntArray[7] per box = [faceCache, x0,y0,z0,
- *                       x1,y1,z1] in 1/grid units. faceCache 0 = "no cache";
- *                       the mod recomputes it lazily. The 7-int form is
- *                       mandatory — BETiles loads through createExtended, which
- *                       reads index 0 as the cache.
+ *                       x1,y1,z1] in 1/grid units. faceCache is precomputed
+ *                       here like a native save's (./littletiles-facecache) —
+ *                       lazy recompute (cache 0) races WorldEdit's paste order
+ *                       and freezes wrong culling on LT↔LT seams. The 7-int
+ *                       form is mandatory — BETiles loads through
+ *                       createExtended, which reads index 0 as the cache.
  *   children entry      { tiles: <same compound shape>, index: int, type: int,
  *                       structure: {…} (main block only) | coord: IntArray[3]
  *                       (member → main linkage, verbatim from 1.12 — never a
@@ -53,6 +55,7 @@ import {
 } from "@/lib/schematic/loader/littletiles-support";
 import { serializeBlockState, parseBlockState } from "@/lib/schematic/normalizer";
 import type { SchematicStructure, TileEntity, UnifiedBlock } from "@/lib/schematic/types";
+import { computeFaceCaches } from "./littletiles-facecache";
 import { convertLtStructure, hasNestedStructureLinks } from "./littletiles-structures";
 
 /** 1.12 LT-internal material blocks → their modern equivalents. */
@@ -494,6 +497,10 @@ export async function convertLittleTilesForExport(
     }
     for (const { cell, entry } of pending) cell.children.push(entry);
   }
+
+  // Cells are complete: stamp per-box face-culling caches so a WorldEdit
+  // paste renders correctly before any neighbour update (see the module doc).
+  computeFaceCaches(cells);
 
   const liveCells = new Set<string>();
   for (const cell of cells.values()) {

@@ -145,7 +145,12 @@ describe("LittleTiles 1.12 structure conversion", () => {
     expect(chair.occupied).toBe(0);
     expect(chair.sit).toBeUndefined();
     const chairTiles = chairMain.tiles["minecraft:stone"];
-    expect(chairTiles.map((a) => [...a])).toEqual([[-1], [0, 0, 0, 0, 16, 1, 16]]);
+    // Box arrays carry a computed faceCache at index 0 (littletiles-facecache).
+    expect(chairTiles.map((a) => (a.length === 1 ? [...a] : [...a].slice(1)))).toEqual([
+      [-1],
+      [0, 0, 0, 16, 1, 16],
+    ]);
+    expect(chairTiles[1][0]).not.toBe(0);
 
     const [chairMember] = childrenAt(out, 0, 0, 0);
     expect(chairMember.structure).toBeUndefined();
@@ -214,10 +219,9 @@ describe("LittleTiles 1.12 structure conversion", () => {
       children: unknown[];
     };
     expect(content.children).toEqual([]);
-    expect(content.tiles["minecraft:stone"].map((a) => [...a])).toEqual([
-      [-1],
-      [0, 0, 0, 0, 16, 16, 16],
-    ]);
+    expect(
+      content.tiles["minecraft:stone"].map((a) => (a.length === 1 ? [...a] : [...a].slice(1))),
+    ).toEqual([[-1], [0, 0, 0, 16, 16, 16]]);
     const warns = warningsOf(out);
     expect(warns).toHaveLength(1);
     expect(warns[0]).toContain('"mystery"');

@@ -10,7 +10,8 @@ import { ApiProperty } from '@nestjs/swagger';
 export class PlayerPosition {
   @ApiProperty({
     example: true,
-    description: 'False when the player is not on the server; coordinates are then meaningless.',
+    description:
+      'False when the player is not on the server; coordinates are then meaningless.',
   })
   online: boolean;
 

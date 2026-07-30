@@ -1,7 +1,8 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { BlockThumb } from "@/components/boffmedia/ui/schematic";
+import { BlockThumb, SelectionLocateControls } from "@/components/boffmedia/ui/schematic";
+import { useSelectionFocus } from "@/lib/schematic/actions";
 import { selectEnvironment, useViewerStore } from "../_store/viewer.store";
 
 /** Details for the selected block: texture, id, blockstates, instance count. */
@@ -10,6 +11,9 @@ export function BlockInspector() {
   const selectedBlockId = useViewerStore((s) => s.selectedBlockId);
   const blockPositions = useViewerStore((s) => s.blockPositions);
   const registry = useViewerStore(selectEnvironment).registry;
+  // No diff here — a read-only viewer's total is just the navigable count
+  // (RF-08's culled-interiors note never shows).
+  const focus = useSelectionFocus(useViewerStore);
 
   if (!selectedBlockId) {
     return (
@@ -19,10 +23,6 @@ export function BlockInspector() {
 
   const group = blockPositions.find((g) => g.block.id === selectedBlockId);
   const stateEntries = group ? Object.entries(group.block.states) : [];
-  // Both buckets are the same block type; interiors are simply drawn later.
-  const count = group
-    ? (group.positions.length + (group.interiorPositions?.length ?? 0)) / 3
-    : 0;
 
   return (
     <div className="flex gap-2.5">
@@ -47,7 +47,26 @@ export function BlockInspector() {
             ))}
           </div>
         )}
-        <p className="m-0 text-[11.5px] text-txt-dim">{t("preview.instances", { count })}</p>
+        <p className="m-0 text-[11.5px] text-txt-dim">
+          {t("preview.instances", { count: focus.counts.navigable })}
+        </p>
+        <SelectionLocateControls
+          className="mt-2"
+          labels={{
+            locate: t("preview.locate"),
+            prev: t("preview.prev"),
+            next: t("preview.next"),
+            isolate: t("preview.isolate"),
+            stepper: t("preview.stepper", { index: focus.index + 1, navigable: focus.counts.navigable }),
+          }}
+          canCycle={focus.canCycle}
+          culled={focus.counts.culled}
+          isolate={focus.isolate}
+          onLocate={focus.locate}
+          onNext={focus.next}
+          onPrev={focus.prev}
+          onToggleIsolate={focus.toggleIsolate}
+        />
       </div>
     </div>
   );

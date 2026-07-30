@@ -81,9 +81,9 @@ export class KartsRepository implements IKartsRepository {
         tiempoMs: BEST_TIME.as('tiempoMs'),
         mejorVueltaMs: BEST_LAP.as('mejorVueltaMs'),
         vueltas: atBestTime(kartRaces.vueltas).as('vueltas'),
-        fechaMs: atBestTime(
-          sql`UNIX_TIMESTAMP(${kartRaces.fecha}) * 1000`,
-        ).as('fechaMs'),
+        fechaMs: atBestTime(sql`UNIX_TIMESTAMP(${kartRaces.fecha}) * 1000`).as(
+          'fechaMs',
+        ),
       })
       .from(kartRacePlayers)
       .innerJoin(kartRaces, eq(kartRaces.id, kartRacePlayers.raceId))
@@ -141,7 +141,9 @@ export class KartsRepository implements IKartsRepository {
         carreras: sql<number>`COUNT(*)`.as('carreras'),
         // Scoped inside the aggregate rather than in WHERE: a player's race count for a
         // circuit should include the races their time is not comparable in.
-        mejorTiempoMs: sql<number | null>`MIN(CASE WHEN ${COMPARABLE_TIME} THEN ${kartRacePlayers.tiempoMs} END)`.as(
+        mejorTiempoMs: sql<
+          number | null
+        >`MIN(CASE WHEN ${COMPARABLE_TIME} THEN ${kartRacePlayers.tiempoMs} END)`.as(
           'mejorTiempoMs',
         ),
         mejorVueltaMs: BEST_LAP.as('mejorVueltaMs'),

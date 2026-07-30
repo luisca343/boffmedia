@@ -37,9 +37,7 @@ export class AppsRepository
   }
 
   async delete(id: number): Promise<boolean> {
-    const result = await this.db
-      .delete(rotomApps)
-      .where(eq(rotomApps.id, id));
+    const result = await this.db.delete(rotomApps).where(eq(rotomApps.id, id));
     return result[0].affectedRows > 0;
   }
 
@@ -52,16 +50,10 @@ export class AppsRepository
   }
 
   async findActiveApps(): Promise<RotomApp[]> {
-    return this.db
-      .select()
-      .from(rotomApps)
-      .where(eq(rotomApps.active, 1));
+    return this.db.select().from(rotomApps).where(eq(rotomApps.active, 1));
   }
 
   async findByActive(active: number): Promise<RotomApp[]> {
-    return this.db
-      .select()
-      .from(rotomApps)
-      .where(eq(rotomApps.active, active));
+    return this.db.select().from(rotomApps).where(eq(rotomApps.active, active));
   }
 }

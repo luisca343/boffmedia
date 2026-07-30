@@ -1,0 +1,14 @@
+identity: boffmedia — community platform (Boffmedia web portal + SmartRotom in-game suite + Wingull + battlesimulator)
+language: es
+stack: pnpm monorepo — Next.js 16.0.7 / React 19.2.3 (web) + NestJS 11.1.6 on Express 5 (api) + drizzle-orm 0.44 / mysql2 on MySQL
+stack_match: no
+stack_reason: cap-testing-strategy mandates Vitest but apps/api runs Jest 30 (150 *.spec.ts); cap-api-endpoint names Zod validation but the API validates with NestJS class-validator DTOs.
+naming: kebab-case suffix-typed files (*.controller.ts, *.facade.service.ts, *.repository.ts, *.dto.ts, *.module.ts), PascalCase classes and React components, useX.ts hooks, parenthesised Next.js route groups, PascalCase per-domain drizzle schema files
+test_framework: Jest 30 + ts-jest in apps/api (apps/api/jest.config.ts, `pnpm --filter api test`, e2e apps/api/test/jest-e2e.json); Vitest 4 in apps/web (apps/web/vitest.config.ts, node env, src/**/*.test.ts only, `pnpm --filter web test:unit`); Playwright 1.49 e2e (`pnpm --filter web test`). Reference only — the SDD cycle inspects, it never runs tests.
+modules[6]{name,path,role}:
+  web,apps/web,"Next.js App Router frontend: Boffmedia portal, herramientas, SmartRotom in-game apps, i18n content"
+  api,apps/api,"NestJS backend: REST API, Discord bot (necord), drizzle/MySQL data layer, migrations"
+  shared,packages/shared,"@boffmedia/shared — auto-generated OpenAPI models + roles + error codes; never hand-edited, never imported by apps/api"
+  tailwind-config,packages/tailwind-config,shared Tailwind configuration consumed by apps/web
+  scripts,scripts,"repo tooling chained into lint/type-check: check-v3-conventions, check-layering, check-i18n, generate-error-codes, generate-i18n-manifest, lint-sequential, typecheck-sequential"
+  docs,docs,"roadmaps, audits and wire-contract handoffs (DARCAJA.md, STARBANK.md, I18N_PLAN.md, audits/)"

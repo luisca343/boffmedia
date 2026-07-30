@@ -336,10 +336,7 @@ export class BoffMediaUsersRepository implements IBoffMediaUsersRepository {
       const rows = await this.db
         .select(this.fullUserSelectWithPassword)
         .from(boffMediaUsers)
-        .leftJoin(
-          rotomUsers,
-          eq(boffMediaUsers.uuid, rotomUsers.uuid),
-        )
+        .leftJoin(rotomUsers, eq(boffMediaUsers.uuid, rotomUsers.uuid))
         .where(
           and(
             eq(boffMediaUsers.username, username),
@@ -374,10 +371,7 @@ export class BoffMediaUsersRepository implements IBoffMediaUsersRepository {
       const rows = await this.db
         .select(this.fullUserSelectWithoutPassword)
         .from(boffMediaUsers)
-        .leftJoin(
-          rotomUsers,
-          eq(boffMediaUsers.uuid, rotomUsers.uuid),
-        )
+        .leftJoin(rotomUsers, eq(boffMediaUsers.uuid, rotomUsers.uuid))
         .where(
           and(
             eq(boffMediaUsers.username, username),
@@ -414,9 +408,7 @@ export class BoffMediaUsersRepository implements IBoffMediaUsersRepository {
         })
         .from(rotomUsers)
         .leftJoin(boffMediaUsers, eq(boffMediaUsers.uuid, rotomUsers.uuid))
-        .where(
-          and(eq(rotomUsers.uuid, uuid), isNull(boffMediaUsers.deletedAt)),
-        )
+        .where(and(eq(rotomUsers.uuid, uuid), isNull(boffMediaUsers.deletedAt)))
         .execute();
 
       if (rows.length === 0) return null;
@@ -441,10 +433,7 @@ export class BoffMediaUsersRepository implements IBoffMediaUsersRepository {
       const rows = await this.db
         .select(this.fullUserSelectWithoutPassword)
         .from(boffMediaUsers)
-        .leftJoin(
-          rotomUsers,
-          eq(boffMediaUsers.uuid, rotomUsers.uuid),
-        )
+        .leftJoin(rotomUsers, eq(boffMediaUsers.uuid, rotomUsers.uuid))
         .where(
           and(
             eq(boffMediaUsers.email, email),

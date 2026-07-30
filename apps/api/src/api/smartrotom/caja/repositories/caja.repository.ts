@@ -3,10 +3,7 @@ import { randomUUID } from 'crypto';
 import { MySql2Database } from 'drizzle-orm/mysql2';
 import { and, eq, gt, inArray, isNull, or, sql, SQL } from 'drizzle-orm';
 import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
-import {
-  rotomInventory,
-  RotomInventoryItem,
-} from '@/_db/schema/SmartRotom';
+import { rotomInventory, RotomInventoryItem } from '@/_db/schema/SmartRotom';
 import { CajaSource } from '../dto/claim-caja.dto';
 
 /** How long a reservation stays exclusive before its rows become reclaimable (DARCAJA.md §7). */

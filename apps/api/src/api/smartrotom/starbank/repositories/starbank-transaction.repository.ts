@@ -263,7 +263,10 @@ export class StarbankTransactionRepository implements IStarbankTransactionReposi
         })
         .from(starBankTransactions)
         .innerJoin(toJoin, eq(starBankTransactions.toAccountId, toJoin.id))
-        .innerJoin(fromJoin, eq(starBankTransactions.fromAccountId, fromJoin.id))
+        .innerJoin(
+          fromJoin,
+          eq(starBankTransactions.fromAccountId, fromJoin.id),
+        )
         .where(
           or(
             eq(starBankTransactions.fromAccountId, accountId),
@@ -311,7 +314,10 @@ export class StarbankTransactionRepository implements IStarbankTransactionReposi
         })
         .from(starBankTransactions)
         .innerJoin(toJoin, eq(starBankTransactions.toAccountId, toJoin.id))
-        .innerJoin(fromJoin, eq(starBankTransactions.fromAccountId, fromJoin.id))
+        .innerJoin(
+          fromJoin,
+          eq(starBankTransactions.fromAccountId, fromJoin.id),
+        )
         .where(
           or(
             inArray(starBankTransactions.fromAccountId, owned),
@@ -355,7 +361,10 @@ export class StarbankTransactionRepository implements IStarbankTransactionReposi
         })
         .from(starBankTransactions)
         .innerJoin(toJoin, eq(starBankTransactions.toAccountId, toJoin.id))
-        .innerJoin(fromJoin, eq(starBankTransactions.fromAccountId, fromJoin.id))
+        .innerJoin(
+          fromJoin,
+          eq(starBankTransactions.fromAccountId, fromJoin.id),
+        )
         .where(
           and(
             eq(starBankTransactions.type, TransactionType.TRANSFERENCIA),
@@ -406,7 +415,10 @@ export class StarbankTransactionRepository implements IStarbankTransactionReposi
         })
         .from(starBankTransactions)
         .innerJoin(toJoin, eq(starBankTransactions.toAccountId, toJoin.id))
-        .innerJoin(fromJoin, eq(starBankTransactions.fromAccountId, fromJoin.id))
+        .innerJoin(
+          fromJoin,
+          eq(starBankTransactions.fromAccountId, fromJoin.id),
+        )
         .where(
           and(
             eq(starBankTransactions.type, TransactionType.TRANSFERENCIA),
@@ -452,7 +464,10 @@ export class StarbankTransactionRepository implements IStarbankTransactionReposi
         })
         .from(starBankTransactions)
         .innerJoin(toJoin, eq(starBankTransactions.toAccountId, toJoin.id))
-        .innerJoin(fromJoin, eq(starBankTransactions.fromAccountId, fromJoin.id))
+        .innerJoin(
+          fromJoin,
+          eq(starBankTransactions.fromAccountId, fromJoin.id),
+        )
         .where(eq(starBankTransactions.type, type))
         .limit(limit)
         .orderBy(desc(starBankTransactions.date));

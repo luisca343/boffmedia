@@ -361,6 +361,7 @@ interface RawBox {
 interface RawCorners {
   by: number;
   corners: Float32Array; // 8 corners × xyz, absolute world coords
+  bounds: number[]; // world-space AABB of the box's stored min/max (6 floats)
   color: [number, number, number] | null;
 }
 
@@ -383,6 +384,7 @@ interface MutableStructure {
   tileCount: number;
   boxes: number[]; // stride 9, same layout as LittleTilesGroup.boxes
   corners: number[]; // 24 floats per transformable box
+  cornerBounds: number[]; // 6 floats per transformable box (clip AABB)
 }
 
 /**
@@ -407,7 +409,15 @@ export function parseLittleTiles(
     const key = `${pos.x},${pos.y},${pos.z}`;
     let s = structures.get(key);
     if (!s) {
-      s = { type: "", mainPos: pos, members: new Set(), tileCount: 0, boxes: [], corners: [] };
+      s = {
+        type: "",
+        mainPos: pos,
+        members: new Set(),
+        tileCount: 0,
+        boxes: [],
+        corners: [],
+        cornerBounds: [],
+      };
       structures.set(key, s);
     }
     return s;
@@ -434,15 +444,29 @@ export function parseLittleTiles(
         // Slope/wedge: resolve the 8 corners to absolute world coords now so
         // the renderer builds geometry without knowing grids or hosts. Block
         // cells are centred on integer coords (the same convention as the
-        // plain-box path: cell origin = host − 0.5).
+        // plain-box path: cell origin = host − 0.5). The box's stored min/max
+        // ride along as a world-space clip AABB: corners may legitimately lie
+        // OUTSIDE them (extractBox keeps a split slope's original corners) and
+        // the mod renders the hexahedron ∩ bounds intersection.
         const corners = decodeTransformableCorners(box);
         for (let i = 0; i < 8; i++) {
           corners[i * 3] = host.x - 0.5 + corners[i * 3] / entity.grid;
           corners[i * 3 + 1] = host.y - 0.5 + corners[i * 3 + 1] / entity.grid;
           corners[i * 3 + 2] = host.z - 0.5 + corners[i * 3 + 2] / entity.grid;
         }
-        group.transformed.push({ by: host.y, corners, color });
-        if (struct) struct.corners.push(...corners);
+        const bounds = [
+          host.x - 0.5 + box[0] / entity.grid,
+          host.y - 0.5 + box[1] / entity.grid,
+          host.z - 0.5 + box[2] / entity.grid,
+          host.x - 0.5 + box[3] / entity.grid,
+          host.y - 0.5 + box[4] / entity.grid,
+          host.z - 0.5 + box[5] / entity.grid,
+        ];
+        group.transformed.push({ by: host.y, corners, bounds, color });
+        if (struct) {
+          struct.corners.push(...corners);
+          struct.cornerBounds.push(...bounds);
+        }
         continue;
       }
       const [x0, y0, z0, x1, y1, z1] = box;
@@ -511,12 +535,15 @@ export function parseLittleTiles(
     if (transformed.length > 0) {
       transformed.sort((a, b) => a.by - b.by);
       const corners = new Float32Array(transformed.length * 24);
+      const cornerBounds = new Float32Array(transformed.length * 6);
       const hostY = new Float32Array(transformed.length);
       for (let i = 0; i < transformed.length; i++) {
         corners.set(transformed[i].corners, i * 24);
+        cornerBounds.set(transformed[i].bounds, i * 6);
         hostY[i] = transformed[i].by;
       }
       group.corners = corners;
+      group.cornerBounds = cornerBounds;
       group.cornerHostY = hostY;
       if (transformed.some((t) => t.color)) {
         const cc = new Float32Array(transformed.length * 3).fill(1);
@@ -541,7 +568,10 @@ export function parseLittleTiles(
         boxes: Float32Array.from(s.boxes),
       };
       if (s.name) out.name = s.name;
-      if (s.corners.length > 0) out.corners = Float32Array.from(s.corners);
+      if (s.corners.length > 0) {
+        out.corners = Float32Array.from(s.corners);
+        out.cornerBounds = Float32Array.from(s.cornerBounds);
+      }
       return out;
     })
     .sort(

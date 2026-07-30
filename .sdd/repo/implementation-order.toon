@@ -1,0 +1,15 @@
+order[6]{change_type,sequence}:
+  new-api-endpoint,"schema (only if new data) → repository → service → facade (only when the module has several services) → DTO (class-validator + @ApiProperty; extend BaseDto for non-GET /smartrotom/*) → controller (+ guards) → pnpm generate:shared → apps/web services/api client → TanStack hook → component → pnpm type-check → pnpm lint"
+  new-db-table-or-field,"edit apps/api/src/_db/schema/<Domain>.ts per .claude/context/db-naming.md → pnpm --filter api generate → read the emitted SQL (explicit DEFAULT NULL on nullable timestamps, explicit short FK name:, one composite primaryKey() per table) → pnpm --filter api migrate → repository → service → DTO/controller → pnpm generate:shared → client"
+  new-web-page-or-tool,"route folder under apps/web/src/app/(boffmedia)/(herramientas)/ or app/smartrotom/<app>/ → components in that route's _components/ (promote only with justification) → services/api/<zone> call (never inline fetch) → TanStack hook → locales/{es,en}/<namespace>.json → register the namespace in apps/web/src/i18n/request.ts (and scopes.ts at creation time if route-scoped) → pnpm generate:i18n → pnpm check:i18n → pnpm type-check"
+  new-shared-dto,"DTO on the server with class-validator + @ApiProperty/@ApiResponse → start the api on port 34301 → pnpm generate:shared (regenerates packages/shared/src/models + error codes) → import @boffmedia/shared on the web side ONLY (apps/api must never import it) → pnpm type-check both apps"
+  bugfix,"mimir search <topic> for a recorded gotcha → horus search|explore to locate, then targeted grep → fix at the owning layer (repository/service/controller, or component/hook on web) → if the touched service is LEGACY_DIRECT_DB, extract a repository, delete the marker and lower LEGACY_BASELINE in scripts/check-layering.mjs in the same change → pnpm type-check → pnpm lint → mimir save if reusable"
+  new-mcef-mod-call,"confirm the exact query name with the mod contract in docs/ (names are case-sensitive) → extend apps/web/src/services/mcef/mcefApi.ts using mcefQuery<T>() (never a new window.mcefQuery shape) → add the non-Minecraft fallback → guard call sites with isMinecraft() → pnpm type-check"
+commands[7]{purpose,command}:
+  type-check,pnpm type-check
+  lint,"pnpm lint (lint-sequential → check-v3-conventions → check-layering → check-i18n → generate-error-codes --check)"
+  build,pnpm build:web / pnpm build:api
+  test-api,pnpm --filter api test
+  test-web,"pnpm --filter web test:unit (vitest) / pnpm --filter web test (playwright)"
+  migrations,pnpm --filter api generate → pnpm --filter api migrate
+  regenerate-shared,pnpm generate:shared (requires the api running on port 34301)

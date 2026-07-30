@@ -7,6 +7,9 @@ import { Icon } from "@/components/boffmedia/primitives";
 import { AssetThumb, type ThumbRenderer } from "@/components/boffmedia/ui/schematic";
 import { POP_SHADOW } from "../ui/sch-tokens";
 
+/** Cap on rendered popover results — `options` can be a target registry with thousands of blocks. */
+const MAX_RESULTS = 60;
+
 interface PopPos {
   left: number;
   width: number;
@@ -41,6 +44,8 @@ export function ReplaceSelect({
     const s = q.trim().toLowerCase();
     return s ? options.filter((o) => o.toLowerCase().includes(s)) : options;
   }, [q, options]);
+  const visible = filtered.length > MAX_RESULTS ? filtered.slice(0, MAX_RESULTS) : filtered;
+  const truncatedCount = filtered.length - visible.length;
 
   function place() {
     const el = trigRef.current;
@@ -127,11 +132,11 @@ export function ReplaceSelect({
             />
           </div>
           <div className="flex-1 min-h-0 overflow-y-auto p-1.5">
-            {filtered.length === 0 ? (
+            {visible.length === 0 ? (
               <div className="p-4 text-center text-txt-dim text-[12px]">{t("diff.noResults")}</div>
             ) : (
               <div className="grid grid-cols-[repeat(auto-fill,minmax(92px,1fr))] gap-1.5">
-                {filtered.map((o) => {
+                {visible.map((o) => {
                   const name = o.includes(":") ? o.slice(o.indexOf(":") + 1) : o;
                   const sel = o === value;
                   return (
@@ -158,6 +163,11 @@ export function ReplaceSelect({
               </div>
             )}
           </div>
+          {truncatedCount > 0 ? (
+            <div className="shrink-0 p-2 text-center font-mono text-[10.5px] text-txt-dim border-0 border-t border-line">
+              {t("diff.refineSearch", { count: truncatedCount })}
+            </div>
+          ) : null}
           {value ? (
             <button
               type="button"

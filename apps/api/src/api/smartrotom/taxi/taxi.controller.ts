@@ -77,7 +77,8 @@ export class TaxiController {
   })
   @ApiResponse({
     status: HttpStatus.SERVICE_UNAVAILABLE,
-    description: 'The game server did not confirm the trip. Nothing was charged.',
+    description:
+      'The game server did not confirm the trip. Nothing was charged.',
   })
   async takeTrip(
     @Body() dto: TakeTripDto,

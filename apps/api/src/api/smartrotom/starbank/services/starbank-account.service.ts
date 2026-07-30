@@ -83,7 +83,8 @@ export class StarbankAccountService {
     }
 
     if (actor && !actor.isAdmin) {
-      const owner = await this.accountRepository.findAccountOwnerUuid(accountId);
+      const owner =
+        await this.accountRepository.findAccountOwnerUuid(accountId);
       if (!owner || owner !== actor.uuid) {
         throw new ForbiddenException(
           userError(

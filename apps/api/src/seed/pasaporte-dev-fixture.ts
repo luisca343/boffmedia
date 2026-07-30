@@ -199,9 +199,7 @@ async function main() {
     await db
       .delete(rotomUserReplays)
       .where(inArray(rotomUserReplays.replayId, ids));
-    await db
-      .delete(rotomReplays)
-      .where(inArray(rotomReplays.id, ids));
+    await db.delete(rotomReplays).where(inArray(rotomReplays.id, ids));
   }
   await db
     .delete(rotomUserAchievements)

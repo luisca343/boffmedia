@@ -409,9 +409,7 @@ export class WigglypopListingsRepository {
 
   // ─── Item catalog ───────────────────────────────────────────────────────────
 
-  async findCatalogEntries(
-    ids: string[],
-  ): Promise<WigglypopCatalogItem[]> {
+  async findCatalogEntries(ids: string[]): Promise<WigglypopCatalogItem[]> {
     if (ids.length === 0) return [];
     return this.db
       .select()

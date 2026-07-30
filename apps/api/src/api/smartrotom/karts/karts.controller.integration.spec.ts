@@ -153,9 +153,7 @@ describe('KartsController — integration (ValidationPipe + GlobalExceptionFilte
         .post('/smartrotom/karts/carrera')
         .send({
           ...VALID_RACE,
-          participantes: [
-            { ...VALID_RACE.participantes[0], tiempoMs: -2 },
-          ],
+          participantes: [{ ...VALID_RACE.participantes[0], tiempoMs: -2 }],
         });
 
       expect(res.status).toBe(400);

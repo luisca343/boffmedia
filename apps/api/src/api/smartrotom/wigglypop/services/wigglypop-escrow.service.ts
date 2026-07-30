@@ -21,7 +21,11 @@ export class WigglypopEscrowService {
   }
 
   /** Buyer → escrow. This is the leg that actually takes the buyer's money. */
-  async hold(buyerUuid: string, amount: number, reason: string): Promise<number> {
+  async hold(
+    buyerUuid: string,
+    amount: number,
+    reason: string,
+  ): Promise<number> {
     return this.houseAccounts.credit(
       MARKET_ACCOUNT,
       buyerUuid,

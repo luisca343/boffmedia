@@ -2,10 +2,7 @@ import { Injectable, Inject } from '@nestjs/common';
 import { MySql2Database } from 'drizzle-orm/mysql2';
 import { eq, desc, inArray } from 'drizzle-orm';
 import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
-import {
-  rotomReplays,
-  rotomUserReplays,
-} from '@/_db/schema/SmartRotom';
+import { rotomReplays, rotomUserReplays } from '@/_db/schema/SmartRotom';
 
 export interface LeagueReplay {
   id: number;

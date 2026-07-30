@@ -6,6 +6,7 @@ import type { LittleTilesGroup } from "../types";
 import type { TextureLoader } from "./assetLoaders";
 import { useBlockTexture } from "./useBlockTexture";
 import { metaOf, styleParams, surfaceColor } from "./material";
+import { buildTransformedArrays } from "./littletile-geometry";
 
 export interface LittleTileInstancesProps {
   group: LittleTilesGroup;
@@ -42,82 +43,26 @@ function lastWithinLayer(arr: Float32Array, count: number, stride: number, off: 
   return last;
 }
 
-/*
- * Hexahedron faces over the decoded corner order (EUN, EUS, EDN, EDS, WUN,
- * WUS, WDN, WDS), wound CCW-outward. The last entry picks the UV projection
- * plane: 0 = XZ (up/down), 1 = XY (north/south), 2 = ZY (west/east).
- */
-const QUADS: ReadonlyArray<readonly [number, number, number, number, number]> = [
-  [4, 5, 1, 0, 0], // up
-  [6, 2, 3, 7, 0], // down
-  [6, 4, 0, 2, 1], // north
-  [7, 3, 1, 5, 1], // south
-  [6, 7, 5, 4, 2], // west
-  [2, 0, 1, 3, 2], // east
-];
-
 /**
- * Merge every transformable box (8 explicit corners each) into one non-indexed
- * mesh: 6 quads → 36 vertices per box. A slope is a box with corners pulled
- * onto a face, so its collapsed side becomes zero-area triangles, which THREE
- * simply doesn't rasterize — no special-casing per shape. Corner positions are
- * absolute world coords, so UVs project straight from position and repeat
- * once per block, matching the texture scale of full blocks.
+ * Merge every transformable box into one non-indexed mesh. When `bounds` is
+ * given (6 floats per box, world space) each box is clipped to its own AABB
+ * the way the mod renders it — see littletile-geometry.ts. Corner positions
+ * are absolute world coords, so UVs project straight from position and repeat
+ * once per block, matching the texture scale of full blocks. The per-box
+ * cumulative vertex counts land in `geo.userData.boxVertEnd` for the layer
+ * cutoff (vertex counts vary once clipping kicks in).
  */
 export function buildTransformedGeometry(
   corners: Float32Array,
   colors: Float32Array | undefined,
+  bounds?: Float32Array,
 ): THREE.BufferGeometry {
-  const count = corners.length / 24;
-  const pos = new Float32Array(count * 36 * 3);
-  const uv = new Float32Array(count * 36 * 2);
-  const col = colors ? new Float32Array(count * 36 * 3) : null;
-  let p = 0;
-  let u = 0;
-  let c = 0;
-
-  for (let i = 0; i < count; i++) {
-    const r = colors ? colors[i * 3] : 1;
-    const g = colors ? colors[i * 3 + 1] : 1;
-    const b = colors ? colors[i * 3 + 2] : 1;
-    const vert = (ci: number, uvMode: number) => {
-      const o = i * 24 + ci * 3;
-      const x = corners[o];
-      const y = corners[o + 1];
-      const z = corners[o + 2];
-      pos[p++] = x;
-      pos[p++] = y;
-      pos[p++] = z;
-      if (uvMode === 0) {
-        uv[u++] = x;
-        uv[u++] = z;
-      } else if (uvMode === 1) {
-        uv[u++] = x;
-        uv[u++] = y;
-      } else {
-        uv[u++] = z;
-        uv[u++] = y;
-      }
-      if (col) {
-        col[c++] = r;
-        col[c++] = g;
-        col[c++] = b;
-      }
-    };
-    for (const [a, b2, c2, d, m] of QUADS) {
-      vert(a, m);
-      vert(b2, m);
-      vert(c2, m);
-      vert(a, m);
-      vert(c2, m);
-      vert(d, m);
-    }
-  }
-
+  const arrays = buildTransformedArrays(corners, colors, bounds);
   const geo = new THREE.BufferGeometry();
-  geo.setAttribute("position", new THREE.BufferAttribute(pos, 3));
-  geo.setAttribute("uv", new THREE.BufferAttribute(uv, 2));
-  if (col) geo.setAttribute("color", new THREE.BufferAttribute(col, 3));
+  geo.setAttribute("position", new THREE.BufferAttribute(arrays.positions, 3));
+  geo.setAttribute("uv", new THREE.BufferAttribute(arrays.uvs, 2));
+  if (arrays.colors) geo.setAttribute("color", new THREE.BufferAttribute(arrays.colors, 3));
+  geo.userData.boxVertEnd = arrays.boxVertEnd;
   geo.computeVertexNormals();
   return geo;
 }
@@ -188,16 +133,17 @@ export function LittleTileInstances({
   const transformedGeo = useMemo(
     () =>
       group.corners && transformedCount > 0
-        ? buildTransformedGeometry(group.corners, group.cornerColors)
+        ? buildTransformedGeometry(group.corners, group.cornerColors, group.cornerBounds)
         : null,
-    [group.corners, group.cornerColors, transformedCount],
+    [group.corners, group.cornerColors, group.cornerBounds, transformedCount],
   );
   useEffect(() => () => transformedGeo?.dispose(), [transformedGeo]);
 
   useEffect(() => {
     if (!transformedGeo || !group.cornerHostY) return;
     const last = lastWithinLayer(group.cornerHostY, transformedCount, 1, 0, maxLayerY);
-    transformedGeo.setDrawRange(0, (last + 1) * 36);
+    const ends = transformedGeo.userData.boxVertEnd as Uint32Array;
+    transformedGeo.setDrawRange(0, last < 0 ? 0 : ends[last]);
   }, [transformedGeo, group.cornerHostY, transformedCount, maxLayerY]);
 
   const renderId = textureId ?? group.block.id;

@@ -63,6 +63,11 @@
           "preview3d": "3D Preview",
           "modSupport": "Mod Support"
         },
+        "workbench": {
+          "setupTab": "Setup",
+          "diffTab": "Mapping",
+          "previewTab": "Preview"
+        },
         "game": {
           "title": "Game",
           "minecraft": "Minecraft",
@@ -121,6 +126,7 @@
           "emptyPrompt": "Scan both environments, load a schematic, then press Analyze.",
           "noMatching": "No matching blocks",
           "searchPlaceholder": "Search blocks…",
+          "refineSearch": "{count, plural, one {# more result} other {# more results}} — refine your search",
           "showSafe": "Show safe",
           "hideSafe": "Hide safe",
           "replaceWith": "Replace with…",
@@ -186,6 +192,12 @@
           "title": "Preview",
           "loading3d": "Loading 3D engine…",
           "inspectorEmpty": "Select a block from the diff or the 3D view to inspect it.",
+          "locate": "Locate",
+          "prev": "Previous",
+          "next": "Next",
+          "isolate": "Isolate",
+          "stepper": "{index} / {navigable}",
+          "culledNote": "of {total} total — some interiors hidden",
           "modeSource": "Source",
           "modeResult": "Result",
           "modeDiff": "Diff",
@@ -263,6 +275,10 @@
         },
         "appName": "Schematic Viewer",
         "appTagline": "Minecraft · Hytale",
+        "workbench": {
+          "setupTab": "Setup",
+          "previewTab": "Viewer"
+        },
         "setup": {
           "version": "Version",
           "schematic": "Schematic",
@@ -316,7 +332,12 @@
           "preparing": "Preparing 3D data…",
           "noBlocks": "This schematic has no blocks to show",
           "inspectorEmpty": "Click a block in the 3D view to inspect it.",
-          "instances": "{count, plural, one {# instance} other {# instances}}"
+          "instances": "{count, plural, one {# instance} other {# instances}}",
+          "locate": "Locate",
+          "prev": "Previous",
+          "next": "Next",
+          "isolate": "Isolate",
+          "stepper": "{index} / {navigable}"
         },
         "error": {
           "schematicUnsupported": "Unsupported file type. Use .schem, .litematic, .nbt, .mca or .prefab.json.",

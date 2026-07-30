@@ -20,14 +20,18 @@ export class TakeTripDto extends BaseDto {
 }
 
 export class AdminTeleportDto extends BaseDto {
-  @ApiProperty({ example: 'carretera', description: 'Taxi stop to move the player to' })
+  @ApiProperty({
+    example: 'carretera',
+    description: 'Taxi stop to move the player to',
+  })
   @IsString()
   @MaxLength(64)
   stopId: string;
 
   @ApiProperty({
     example: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4',
-    description: 'The player being moved. Required — this is not a self-service action.',
+    description:
+      'The player being moved. Required — this is not a self-service action.',
   })
   @IsUUID()
   uuid: string;

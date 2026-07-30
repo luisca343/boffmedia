@@ -118,7 +118,10 @@ export class StarbankAccountRepository
 
       return result.length > 0 ? result[0].uuid : null;
     } catch (error: any) {
-      this.logger.error(`Failed to find the owner of account ${accountId}:`, error);
+      this.logger.error(
+        `Failed to find the owner of account ${accountId}:`,
+        error,
+      );
       throw new Error(`Failed to find account owner: ${error.message}`);
     }
   }

@@ -32,10 +32,7 @@ export class ReplaysRepository
   }
 
   async update(id: number, data: UpdateReplayDto): Promise<Replay> {
-    await this.db
-      .update(rotomReplays)
-      .set(data)
-      .where(eq(rotomReplays.id, id));
+    await this.db.update(rotomReplays).set(data).where(eq(rotomReplays.id, id));
     return this.findById(id) as Promise<Replay>;
   }
 

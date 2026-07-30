@@ -11,6 +11,7 @@ import {
   type ViewerSlice,
 } from "@/lib/schematic/state";
 import { createConversionSlice, type ConversionSlice } from "./conversion.slice";
+import { createDiffUiSlice, type DiffUiSlice } from "./diff-ui.slice";
 
 export type { EnvMode, EnvRole, NavMode, PendingScan } from "@/lib/schematic/state";
 export type { PreviewMode } from "./conversion.slice";
@@ -18,7 +19,8 @@ export type { PreviewMode } from "./conversion.slice";
 /**
  * Composed from independent slices: document, viewer and environment come from
  * `lib/schematic/state` (a read-only viewer composes the same ones), conversion
- * is this tool's alone.
+ * and diff-ui are this tool's alone (diff-ui is separate from conversion so
+ * DiffPanel's filter state survives its own unmount — RF-12).
  *
  * No slice writes another slice's state. Loading a document does not silently
  * discard a diff — that cascade is orchestrated in the action layer, where it
@@ -29,7 +31,8 @@ export interface ToolState
     ViewerSlice,
     EnvironmentSlice,
     ErrorSlice,
-    ConversionSlice {
+    ConversionSlice,
+    DiffUiSlice {
   reset: () => void;
 }
 
@@ -39,6 +42,7 @@ export const useToolStore = create<ToolState>((set, get) => ({
   ...createEnvironmentSlice(set),
   ...createErrorSlice(set),
   ...createConversionSlice(set),
+  ...createDiffUiSlice(set),
 
   reset: () => {
     const s = get();
@@ -46,6 +50,7 @@ export const useToolStore = create<ToolState>((set, get) => ({
     s.resetViewer();
     s.resetEnvironments();
     s.resetConversion();
+    s.resetDiffUi();
     s.setError(undefined);
   },
 }));

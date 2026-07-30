@@ -1,14 +1,9 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Banner, DataList, Select, Seg, Spinner } from "@/components/boffmedia/primitives";
 import { BUNDLED_VERSIONS } from "@/lib/schematic/versions";
-import {
-  collectFromDirectory,
-  collectFromFileList,
-  getDirectoryPicker,
-} from "@/lib/schematic/registry/instance-files";
+import { useInstanceFilePicker } from "@/lib/schematic/actions";
 import { selectEnvironment, useViewerStore } from "../_store/viewer.store";
 import type { EnvMode } from "@/lib/schematic/state";
 
@@ -35,37 +30,16 @@ export function EnvironmentPicker({
 }: EnvironmentPickerProps) {
   const t = useTranslations("games.minecraft.schematicViewer");
   const env = useViewerStore(selectEnvironment);
-  const inputRef = useRef<HTMLInputElement>(null);
-
-  // Resolved after mount, never during render: reading `window` inline makes the
-  // server (always false) and the client (usually true) disagree on the input's
-  // attributes, which React reports as a hydration mismatch.
-  const [hasFsApi, setHasFsApi] = useState(false);
-  useEffect(() => {
-    setHasFsApi(!!getDirectoryPicker());
-  }, []);
-  useEffect(() => {
-    if (!hasFsApi && inputRef.current) {
-      inputRef.current.setAttribute("webkitdirectory", "");
-      inputRef.current.setAttribute("directory", "");
-    }
-  }, [hasFsApi]);
+  const { inputRef, inputProps, pick } = useInstanceFilePicker({
+    game: env.game,
+    onPick: onScanInstance,
+  });
 
   const busy = !engineReady || env.isLoading;
 
   async function pickInstance() {
     if (busy) return;
-    const picker = getDirectoryPicker();
-    if (!picker) {
-      inputRef.current?.click();
-      return;
-    }
-    try {
-      const dir = await picker();
-      onScanInstance(await collectFromDirectory(dir, env.game));
-    } catch {
-      // User dismissed the picker — nothing to do.
-    }
+    await pick();
   }
 
   return (
@@ -92,13 +66,8 @@ export function EnvironmentPicker({
           <input
             ref={inputRef}
             type="file"
-            multiple
+            {...inputProps}
             className="hidden"
-            onChange={(e) => {
-              const files = e.target.files;
-              if (files?.length) onScanInstance(collectFromFileList(files, env.game));
-              e.target.value = "";
-            }}
           />
           <button
             type="button"

@@ -174,10 +174,7 @@ export class NewsRepository implements INewsRepository {
     return this.db
       .select(NEWS_COMMENT_COLUMNS)
       .from(rotomNewsComments)
-      .innerJoin(
-        rotomUsers,
-        eq(rotomNewsComments.uuid, rotomUsers.uuid),
-      )
+      .innerJoin(rotomUsers, eq(rotomNewsComments.uuid, rotomUsers.uuid))
       .where(eq(rotomNewsComments.newsId, newsId))
       .orderBy(
         desc(rotomNewsComments.createdAt),
@@ -200,10 +197,7 @@ export class NewsRepository implements INewsRepository {
     const [row] = await this.db
       .select(NEWS_COMMENT_COLUMNS)
       .from(rotomNewsComments)
-      .innerJoin(
-        rotomUsers,
-        eq(rotomNewsComments.uuid, rotomUsers.uuid),
-      )
+      .innerJoin(rotomUsers, eq(rotomNewsComments.uuid, rotomUsers.uuid))
       .where(eq(rotomNewsComments.id, insertId))
       .limit(1);
 

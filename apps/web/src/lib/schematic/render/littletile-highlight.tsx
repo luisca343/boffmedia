@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef } from "react";
+import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 import { buildTransformedGeometry } from "./littletile-instances";
 
@@ -8,12 +9,16 @@ import { buildTransformedGeometry } from "./littletile-instances";
 const HIGHLIGHT_COLOR = "#ff5c0a";
 /** Wrap the real geometry with a little slack so the overlay never z-fights it. */
 const INFLATE = 1.03;
+const BASE_INTENSITY = 1.6;
+const BASE_OPACITY = 0.35;
 
 export interface LittleTileHighlightProps {
   /** Stride-9 layout of {@link LittleTilesGroup.boxes}: host cell + box min/max fractions. */
   boxes: Float32Array;
   /** 24 floats per transformable box (8 corners × xyz), absolute world coords. */
   corners?: Float32Array;
+  /** 6 floats per transformable box: its clip AABB ({@link LittleTilesStructure.cornerBounds}). */
+  cornerBounds?: Float32Array;
 }
 
 /**
@@ -22,10 +27,28 @@ export interface LittleTileHighlightProps {
  * (inflated slightly so it wraps the textured tiles), plus a merged hexahedron
  * mesh for transformable boxes. Pure overlay — no layer cutoff, no picking.
  */
-export function LittleTileHighlight({ boxes, corners }: LittleTileHighlightProps) {
+export function LittleTileHighlight({ boxes, corners, cornerBounds }: LittleTileHighlightProps) {
   const meshRef = useRef<THREE.InstancedMesh>(null);
+  const boxMatRef = useRef<THREE.MeshStandardMaterial>(null);
+  const cornerMatRef = useRef<THREE.MeshStandardMaterial>(null);
   const count = boxes.length / 9;
   const cornerCount = (corners?.length ?? 0) / 24;
+
+  // RF-06: pulse the same way SelectionOverlay pulses a selected block group,
+  // so a highlighted structure reads with the same "look here" cue.
+  useFrame(({ clock }) => {
+    const pulse = 0.5 + 0.5 * Math.sin(clock.getElapsedTime() * 4);
+    const intensity = BASE_INTENSITY - 0.5 + pulse * 1.0;
+    const opacity = BASE_OPACITY - 0.1 + pulse * 0.2;
+    if (boxMatRef.current) {
+      boxMatRef.current.emissiveIntensity = intensity;
+      boxMatRef.current.opacity = opacity;
+    }
+    if (cornerMatRef.current) {
+      cornerMatRef.current.emissiveIntensity = intensity;
+      cornerMatRef.current.opacity = opacity;
+    }
+  });
 
   useEffect(() => {
     const mesh = meshRef.current;
@@ -50,8 +73,9 @@ export function LittleTileHighlight({ boxes, corners }: LittleTileHighlightProps
   }, [boxes, count]);
 
   const cornerGeo = useMemo(
-    () => (corners && cornerCount > 0 ? buildTransformedGeometry(corners, undefined) : null),
-    [corners, cornerCount],
+    () =>
+      corners && cornerCount > 0 ? buildTransformedGeometry(corners, undefined, cornerBounds) : null,
+    [corners, cornerBounds, cornerCount],
   );
   useEffect(() => () => cornerGeo?.dispose(), [cornerGeo]);
 
@@ -60,9 +84,9 @@ export function LittleTileHighlight({ boxes, corners }: LittleTileHighlightProps
   const materialProps = {
     color: new THREE.Color(HIGHLIGHT_COLOR),
     emissive: new THREE.Color(HIGHLIGHT_COLOR),
-    emissiveIntensity: 1.6,
+    emissiveIntensity: BASE_INTENSITY,
     transparent: true,
-    opacity: 0.35,
+    opacity: BASE_OPACITY,
     depthWrite: false,
   };
 
@@ -71,12 +95,12 @@ export function LittleTileHighlight({ boxes, corners }: LittleTileHighlightProps
       {count > 0 && (
         <instancedMesh ref={meshRef} args={[undefined, undefined, count]} frustumCulled={false} raycast={() => null}>
           <boxGeometry args={[1, 1, 1]} />
-          <meshStandardMaterial {...materialProps} />
+          <meshStandardMaterial ref={boxMatRef} {...materialProps} />
         </instancedMesh>
       )}
       {cornerGeo && (
         <mesh geometry={cornerGeo} raycast={() => null}>
-          <meshStandardMaterial {...materialProps} side={THREE.DoubleSide} />
+          <meshStandardMaterial ref={cornerMatRef} {...materialProps} side={THREE.DoubleSide} />
         </mesh>
       )}
     </group>

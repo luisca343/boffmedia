@@ -195,6 +195,13 @@ export interface LittleTilesGroup {
   corners?: Float32Array;
   cornerHostY?: Float32Array;
   cornerColors?: Float32Array;
+  /**
+   * World-space AABB of each transformable box's stored min/max (6 floats per
+   * box, same order as `corners`). Corners may lie OUTSIDE these bounds — the
+   * mod splits multi-block slopes per block keeping the original corners — and
+   * the renderer clips each hexahedron to its bounds, as the mod does.
+   */
+  cornerBounds?: Float32Array;
 }
 
 /**
@@ -216,6 +223,8 @@ export interface LittleTilesStructure {
   tileCount: number;
   boxes: Float32Array;
   corners?: Float32Array;
+  /** Per-box clip AABBs mirroring {@link LittleTilesGroup.cornerBounds}. */
+  cornerBounds?: Float32Array;
 }
 
 export interface LittleTilesData {
