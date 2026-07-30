@@ -96,6 +96,7 @@ export function LittleTileInstances({
   const boxes = group.boxes;
   const maxCount = boxes.length / 9;
   const transformedCount = (group.corners?.length ?? 0) / 24;
+  const sp = styleParams(kind, isSelected);
 
   useEffect(() => {
     const mesh = meshRef.current;
@@ -115,13 +116,18 @@ export function LittleTileInstances({
       mat[b + 8] = 0;   mat[b + 9] = 0;   mat[b + 10] = sz; mat[b + 11] = 0;
       mat[b + 12] = tx; mat[b + 13] = ty; mat[b + 14] = tz; mat[b + 15] = 1;
     }
-    if (group.colors) {
+    // Per-tile colours are dropped while ghosting: multiplied into the grey
+    // ghost colour they would keep coloured LT tiles reading as coloured, and
+    // isolate needs everything unselected to look uniformly dimmed.
+    if (group.colors && !sp.ghost) {
       mesh.instanceColor = new THREE.InstancedBufferAttribute(group.colors, 3);
       mesh.instanceColor.needsUpdate = true;
+    } else {
+      mesh.instanceColor = null;
     }
     mesh.instanceMatrix.needsUpdate = true;
     mesh.count = maxCount;
-  }, [boxes, maxCount, group.colors]);
+  }, [boxes, maxCount, group.colors, sp.ghost]);
 
   // Layer cutoff on the host block's Y (offset 1 in the stride-9 layout).
   useEffect(() => {
@@ -161,7 +167,6 @@ export function LittleTileInstances({
   }, [texture, transformedCount]);
 
   if (maxCount === 0 && transformedCount === 0) return null;
-  const sp = styleParams(kind, isSelected);
   const color = surfaceColor(renderId, !!texture, null, sp.ghost);
   const handleClick = (e: { stopPropagation: () => void }) => {
     if (!cursorPickingRef.current) return;
@@ -191,7 +196,7 @@ export function LittleTileInstances({
         >
           <boxGeometry args={[1, 1, 1]} />
           <meshStandardMaterial
-            key={`${texture ? texture.uuid : "flat"}|${isSelected ? "sel" : ""}`}
+            key={`${texture ? texture.uuid : "flat"}|${kind}|${isSelected ? "sel" : ""}`}
             {...materialProps}
           />
         </instancedMesh>
@@ -199,9 +204,12 @@ export function LittleTileInstances({
       {transformedGeo && (
         <mesh geometry={transformedGeo} onClick={handleClick}>
           <meshStandardMaterial
-            key={`${texture ? texture.uuid : "flat"}|${isSelected ? "sel" : ""}|t`}
+            // Keyed on `kind` like the block meshes: toggling ghosting flips
+            // `transparent`/`depthWrite`, which an existing material would not
+            // recompile for.
+            key={`${texture ? texture.uuid : "flat"}|${kind}|${isSelected ? "sel" : ""}|t`}
             {...materialProps}
-            vertexColors={!!group.cornerColors}
+            vertexColors={!!group.cornerColors && !sp.ghost}
             // Slopes are single-sheet where a face collapses; render both sides
             // so a wedge viewed from its cut side doesn't vanish.
             side={THREE.DoubleSide}

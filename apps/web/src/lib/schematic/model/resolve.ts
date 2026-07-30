@@ -20,10 +20,16 @@ function statesKey(states: Record<string, string>): string {
 }
 
 async function build(
-  blockId: string,
-  states: Record<string, string>,
+  rawId: string,
+  rawStates: Record<string, string>,
   provider: AssetProvider,
 ): Promise<CompiledModel> {
+  // The asset tree may name this block differently than the loader does (a 1.12
+  // double slab is its own block, a 1.12 slab keys `half` not `type`).
+  const { blockId, states } = provider.adaptStates?.(rawId, rawStates) ?? {
+    blockId: rawId,
+    states: rawStates,
+  };
   const blockstate = await provider.getBlockstate(blockId);
   let instances: ModelInstance[] = [];
 
@@ -35,11 +41,13 @@ async function build(
 
   // Empty JSON model (block entity, parse miss) → curated shape if we have one.
   if (instances.length === 0) {
-    const synthetic = blockEntityModel(blockId, states);
+    const synthetic = blockEntityModel(rawId, rawStates);
     if (synthetic) instances = synthetic;
   }
 
-  return compileModel(instances, blockId, states);
+  // Tint and curated shapes key off the block the schematic actually holds, not
+  // the asset-tree alias it was resolved through.
+  return compileModel(instances, rawId, rawStates);
 }
 
 /**

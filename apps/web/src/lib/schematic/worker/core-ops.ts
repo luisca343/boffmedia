@@ -171,6 +171,23 @@ export async function getBlockModel(
   return (await reg.getModel(blockId, stateLabel, rotation)) ?? null;
 }
 
+/**
+ * Geometry for a MODDED Minecraft block, resolved from the instance's mod JARs
+ * for this exact blockstate. Null when the registry has no such resolver (a
+ * bundled vanilla registry, another game) — the UI keeps its cube fallback.
+ */
+export async function getModdedBlockModel(
+  state: SchematicEngineState,
+  registryId: string,
+  blockId: string,
+  states: Record<string, string>,
+): Promise<CompiledModel | null> {
+  const reg = state.registries.get(registryId);
+  if (!reg?.getModelForStates) return null;
+  // Compiled geometry (plain typed arrays) → safe to clone across postMessage.
+  return (await reg.getModelForStates(blockId, states)) ?? null;
+}
+
 export async function loadSchematic(
   state: SchematicEngineState,
   file: File,

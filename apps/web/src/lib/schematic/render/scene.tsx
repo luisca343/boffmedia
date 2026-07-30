@@ -4,7 +4,7 @@ import { Fragment, useCallback, useMemo, useRef } from "react";
 import { Grid, OrbitControls } from "@react-three/drei";
 import type { BlockPositionGroup, LittleTilesGroup, UnifiedBlock } from "../types";
 import type { NavMode } from "../state/types";
-import type { ModelLoader, TextureLoader } from "./assetLoaders";
+import type { ModdedModelLoader, ModelLoader, TextureLoader } from "./assetLoaders";
 import { BlockInstances, type BlockVariantResolver } from "./block-instances";
 import { LittleTileInstances } from "./littletile-instances";
 import { LittleTileHighlight } from "./littletile-highlight";
@@ -20,7 +20,8 @@ import {
 } from "./focus-target";
 import type { FlyHudRefs } from "./fly-hud";
 import { buildPickIndex } from "./picking";
-import { sourcePlan, type RenderPlan } from "./render-plan";
+import { buildBlockAt, partitionConnected } from "./connected-groups";
+import { isolatedKind, sourcePlan, type RenderPlan } from "./render-plan";
 
 const DEFAULT_DIMS = { x: 16, y: 16, z: 16 };
 const EMPTY_STATES: Record<string, string> = {};
@@ -34,6 +35,8 @@ export interface RenderEnvironment {
 export interface AssetLoaders {
   texture: TextureLoader | null;
   model: ModelLoader | null;
+  /** Modded Minecraft geometry, keyed by the full blockstate. Optional. */
+  moddedModel?: ModdedModelLoader | null;
 }
 
 /**
@@ -229,6 +232,11 @@ export function SchematicScene({
   // structure) to the existing ghost look — no change to material.ts.
   const isolateActive = isolate && (!!selectedBlockId || !!structureHighlight);
 
+  // Position → block id over the whole volume, for blocks whose shape is derived
+  // from their neighbours. Built once per document, and only walked for the few
+  // block types that actually have such a rule.
+  const blockAt = useMemo(() => buildBlockAt(groups), [groups]);
+
   // RF-01/02/03: resolve the {index,nonce} request into a world-space goal.
   // Block selections index the group's combined surface+interior positions;
   // structure selections fly to the merged selection's centroid (structures
@@ -302,18 +310,48 @@ export function SchematicScene({
           states,
           // RF-05: everything but the selection ghosts while isolate is on —
           // the existing dim path (opacity 0.3, depthWrite false), no new one.
-          kind: isolateActive && block.id !== selectedBlockId ? "ghost" : plan.kind,
+          kind: isolatedKind(plan.kind, isolateActive, block.id === selectedBlockId),
           isSelected: block.id === selectedBlockId,
           maxLayerY: layerY,
           version: plan.useTarget ? (target?.version ?? source.version) : source.version,
           registryId: plan.useTarget ? (target?.registryId ?? source.registryId) : source.registryId,
           textureLoader: loaders.texture,
           modelLoader: loaders.model,
+          moddedModelLoader: loaders.moddedModel ?? null,
           useTarget: plan.useTarget,
           resolveVariant,
           cursorPickingRef,
           onSelect: handleSelect,
         };
+        // A connected block's shape depends on its neighbours, so one instanced
+        // draw per type would show every instance the same. Split it into one
+        // draw per distinct derived state instead.
+        const connected = partitionConnected(group, states, blockAt);
+        if (connected) {
+          return (
+            <Fragment key={group.paletteIndex}>
+              {connected.map((sub) => (
+                <Fragment key={sub.key}>
+                  <BlockInstances
+                    {...shared}
+                    states={sub.states}
+                    positions={sub.positions}
+                    slice={false}
+                  />
+                  {sub.interiorPositions && sub.interiorPositions.length > 0 && (
+                    <BlockInstances
+                      {...shared}
+                      states={sub.states}
+                      positions={sub.interiorPositions}
+                      slice
+                    />
+                  )}
+                </Fragment>
+              ))}
+            </Fragment>
+          );
+        }
+
         return (
           <Fragment key={group.paletteIndex}>
             <BlockInstances {...shared} positions={group.positions} slice={false} />
@@ -328,11 +366,12 @@ export function SchematicScene({
         // can re-texture a micro-tile material (resolved/renamed) or ghost it.
         const plan = planFor ? planFor(g.block) : sourcePlan(g.block.id);
         const states = statesFor ? statesFor(g.block, plan) : defaultStates(g.block, plan);
+        const isSelected = g.block.id === selectedBlockId;
         return (
           <LittleTileInstances
             key={`lt-${g.block.id}`}
             group={g}
-            isSelected={g.block.id === selectedBlockId}
+            isSelected={isSelected}
             maxLayerY={layerY}
             version={plan.useTarget ? (target?.version ?? source.version) : source.version}
             registryId={plan.useTarget ? (target?.registryId ?? source.registryId) : source.registryId}
@@ -341,7 +380,12 @@ export function SchematicScene({
             onSelect={handleSelect}
             textureId={plan.textureId}
             states={states}
-            kind={plan.kind}
+            // RF-05: LT geometry ghosts under isolate exactly like the block
+            // meshes. A selected LT *structure* has no per-box attribution in
+            // these material groups, so its tiles ghost too — the pulsing
+            // LittleTileHighlight shell is what marks it, and against a fully
+            // ghosted build that reads as the isolated structure.
+            kind={isolatedKind(plan.kind, isolateActive, isSelected)}
           />
         );
       })}

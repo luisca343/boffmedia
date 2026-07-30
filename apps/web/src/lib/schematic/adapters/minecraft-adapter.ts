@@ -8,6 +8,7 @@ import type {
 } from "../types";
 import { loadSchematicFile } from "../loader";
 import { buildScannedRegistry, isInstanceMetaFile } from "../registry";
+import { createModdedModelResolver } from "../registry/modded-models";
 import type { BuildRegistryOptions, GameAdapter, GameMeta } from "./game-adapter";
 import { gameMeta } from "./game-adapter";
 
@@ -50,14 +51,20 @@ export class MinecraftAdapter implements GameAdapter {
     return this.formats.includes(format);
   }
 
-  buildRegistry(
+  async buildRegistry(
     files: File[],
     onProgress: ProgressCb,
     options?: BuildRegistryOptions,
   ): Promise<BlockRegistry> {
     const metaFiles = files.filter((f) => isInstanceMetaFile(f.name));
     const jarFiles = files.filter((f) => f.name.toLowerCase().endsWith(".jar"));
-    return buildScannedRegistry(metaFiles, jarFiles, onProgress, options?.override);
+    const registry = await buildScannedRegistry(metaFiles, jarFiles, onProgress, options?.override);
+    // Attached here, not inside the registry builder: that one short-circuits on
+    // an IndexedDB cache hit without ever opening a JAR, while `files` is present
+    // on every scan. The resolver holds the `File` handles (a lazy read, not a
+    // load) and is never part of the serialized registry.
+    registry.getModelForStates = createModdedModelResolver(jarFiles, registry.version);
+    return registry;
   }
 
   parseSchematic(file: File, options?: SchematicParseOptions): Promise<SchematicStructure> {
