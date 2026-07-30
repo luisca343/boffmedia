@@ -2,7 +2,13 @@
 
 import dynamic from "next/dynamic";
 import { useTranslations } from "next-intl";
-import { PreviewButton, PreviewEmptyStage, PreviewShell } from "@/components/boffmedia/ui/schematic";
+import {
+  PreviewButton,
+  PreviewEmptyStage,
+  PreviewShell,
+  SourceAnchorInfo,
+} from "@/components/boffmedia/ui/schematic";
+import { sourceAnchor } from "@/lib/schematic/render/originMath";
 import { useToolStore } from "../../_store/tool.store";
 import { Inspector } from "./Inspector";
 import { StageCaption } from "./StageCaption";
@@ -38,11 +44,14 @@ export function PreviewPanel() {
   const setHideUnchanged = useToolStore((s) => s.setHideUnchanged);
   const setPreviewMode = useToolStore((s) => s.setPreviewMode);
   const setNavMode = useToolStore((s) => s.setNavMode);
+  const showAnchor = useToolStore((s) => s.showAnchor);
+  const setShowAnchor = useToolStore((s) => s.setShowAnchor);
 
   useViewerShortcuts(useToolStore);
 
   const convertedView = previewMode === "converted" && !!diff;
   const resultView = previewMode === "result" && !!diff;
+  const anchor = sourceAnchor(schematic?.origin, schematic?.offset);
 
   return (
     <PreviewShell
@@ -81,7 +90,25 @@ export function PreviewPanel() {
           hasSelection={!!selectedBlockId}
         />
       }
-      inspector={<Inspector />}
+      inspector={
+        <div className="grid gap-2">
+          <SourceAnchorInfo
+            labels={{
+              title: t("preview.originTitle"),
+              origin: t("preview.origin"),
+              playerStand: t("preview.playerStand"),
+              copyTp: t("preview.copyTp"),
+              copied: t("preview.copied"),
+              showMarker: t("preview.showMarker"),
+            }}
+            origin={anchor.origin}
+            playerPos={anchor.playerPos}
+            showMarker={showAnchor}
+            onShowMarkerChange={setShowAnchor}
+          />
+          <Inspector />
+        </div>
+      }
     />
   );
 }

@@ -221,7 +221,14 @@
           "flyControlsHint": "WASD move · Space/Shift up/down · Scroll speed · Esc exit",
           "emptyNoSchematic": "Load a schematic to see the 3D preview",
           "preparing": "Preparing 3D data…",
-          "noBlocks": "This schematic has no renderable blocks"
+          "noBlocks": "This schematic has no renderable blocks",
+          "originTitle": "World origin",
+          "origin": "Min corner",
+          "playerStand": "Player position",
+          "copyTp": "Copy /tp",
+          "copied": "Copied",
+          "north": "N ↑ North (-Z)",
+          "showMarker": "Origin marker in 3D"
         },
         "export": {
           "title": "Export",
@@ -337,7 +344,14 @@
           "prev": "Previous",
           "next": "Next",
           "isolate": "Isolate",
-          "stepper": "{index} / {navigable}"
+          "stepper": "{index} / {navigable}",
+          "originTitle": "World origin",
+          "origin": "Min corner",
+          "playerStand": "Player position",
+          "copyTp": "Copy /tp",
+          "copied": "Copied",
+          "north": "N ↑ North (-Z)",
+          "showMarker": "Origin marker in 3D"
         },
         "error": {
           "schematicUnsupported": "Unsupported file type. Use .schem, .litematic, .nbt, .mca or .prefab.json.",

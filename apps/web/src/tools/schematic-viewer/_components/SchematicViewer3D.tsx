@@ -2,7 +2,7 @@
 
 import { useMemo } from "react";
 import { useTranslations } from "next-intl";
-import { SchematicView, useModelLoader, useTextureLoader } from "@/lib/schematic/render";
+import { SchematicView, localPlayerPos, useModelLoader, useTextureLoader } from "@/lib/schematic/render";
 import { selectEnvironment, useViewerStore } from "../_store/viewer.store";
 
 function Empty({ children }: { children: React.ReactNode }) {
@@ -29,6 +29,7 @@ export function SchematicViewer3D() {
   const setSelectedBlock = useViewerStore((s) => s.setSelectedBlock);
   const registry = useViewerStore(selectEnvironment).registry;
   const isolate = useViewerStore((s) => s.isolate);
+  const showAnchor = useViewerStore((s) => s.showAnchor);
   const focusIndex = useViewerStore((s) => s.focusIndex);
   const focusNonce = useViewerStore((s) => s.focusNonce);
 
@@ -54,6 +55,10 @@ export function SchematicViewer3D() {
     () => (focusIndex !== null ? { index: focusIndex, nonce: focusNonce } : null),
     [focusIndex, focusNonce],
   );
+  const playerAnchor = useMemo(
+    () => (showAnchor ? (localPlayerPos(schematic?.offset) ?? null) : null),
+    [showAnchor, schematic?.offset],
+  );
 
   if (!schematic) return <Empty>{t("preview.emptyNoSchematic")}</Empty>;
   if (isFetchingPositions) return <Empty>{t("preview.preparing")}</Empty>;
@@ -76,6 +81,9 @@ export function SchematicViewer3D() {
       stageId="schview-stage"
       isolate={isolate}
       focus={focus}
+      playerAnchor={playerAnchor}
+      showNorth={showAnchor}
+      northLabel={t("preview.north")}
     />
   );
 }

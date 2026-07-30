@@ -120,6 +120,19 @@ export function loadSchem(root: NbtCompound, fileName: string): SchematicStructu
     offsetZ = schem.Offset[2];
   }
 
+  // Sponge keeps the world origin in the optional `Metadata` compound. Read it
+  // without a throwing helper: a missing or malformed Metadata is legal.
+  const metaRaw = schem.Metadata ?? root.Metadata;
+  const meta =
+    metaRaw && typeof metaRaw === "object" && !ArrayBuffer.isView(metaRaw)
+      ? (metaRaw as Record<string, unknown>)
+      : undefined;
+  const hasOrigin =
+    !!meta &&
+    (typeof meta.WEOriginX === "number" ||
+      typeof meta.WEOriginY === "number" ||
+      typeof meta.WEOriginZ === "number");
+
   return {
     format: "schem",
     formatVersion: version,
@@ -132,6 +145,14 @@ export function loadSchem(root: NbtCompound, fileName: string): SchematicStructu
       fileName,
       dataVersion: schem.DataVersion !== undefined ? asNumber(schem.DataVersion, "DataVersion") : undefined,
       offset: { x: offsetX, y: offsetY, z: offsetZ },
+      origin:
+        hasOrigin && meta
+          ? {
+              x: typeof meta.WEOriginX === "number" ? meta.WEOriginX : 0,
+              y: typeof meta.WEOriginY === "number" ? meta.WEOriginY : 0,
+              z: typeof meta.WEOriginZ === "number" ? meta.WEOriginZ : 0,
+            }
+          : undefined,
     },
   };
 }
