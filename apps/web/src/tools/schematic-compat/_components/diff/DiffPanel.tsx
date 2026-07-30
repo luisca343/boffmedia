@@ -156,7 +156,14 @@ export function DiffPanel() {
       </div>
 
       {/* list */}
-      <div ref={listRef} className="flex-1 min-h-0 overflow-y-auto py-3.5 px-4 flex flex-col gap-4">
+      {/*
+        scrollbar-gutter:stable is a windowing invariant, not cosmetics: without
+        it this container's clientWidth changes when the scrollbar appears,
+        which changes each grid's column count, which changes its reserved
+        height, which decides whether the scrollbar is there at all
+        (useGridWindow's convergence note).
+      */}
+      <div ref={listRef} className="flex-1 min-h-0 overflow-y-auto [scrollbar-gutter:stable] py-3.5 px-4 flex flex-col gap-4">
         <StructuresSection />
         {groups.length === 0 ? (
           <div className="text-center text-[13px] text-txt-dim py-[30px]">{t("diff.noMatching")}</div>
@@ -221,7 +228,7 @@ function GroupGrid({
   onSelect: (id: string) => void;
   onResolve: (entry: DiffEntry, blockId: string, target: string) => void;
 }) {
-  const { gridRef, columns, startRow, endRow, topPad, bottomPad, scrollToIndex } = useGridWindow(scrollRef, {
+  const { gridRef, columns, startRow, endRow, topPad, bottomPad, reservedHeight, scrollToIndex } = useGridWindow(scrollRef, {
     itemCount: group.entries.length,
     rowHeight: MAPPING_CARD_HEIGHT + GRID_GAP,
     minColWidth: MIN_COL_WIDTH,
@@ -253,10 +260,18 @@ function GroupGrid({
         </span>
       </div>
       {/* 2–3 column grid (by available width) so block thumbnails get room. */}
+      {/*
+        `reservedHeight` pins the box while windowing so its height is a
+        function of (entry count, columns) only, never of the mounted row range
+        — that independence is what stops the measure loop. `content-start` is
+        required with it: a grid with an explicit height stretches its
+        auto-sized rows to fill the leftover space, which would inflate every
+        card past MAPPING_CARD_HEIGHT and break the row-stride arithmetic.
+      */}
       <div
         ref={gridRef}
-        style={{ paddingTop: topPad, paddingBottom: bottomPad }}
-        className="grid grid-cols-[repeat(auto-fill,minmax(260px,1fr))] gap-[0.5rem]"
+        style={{ paddingTop: topPad, paddingBottom: bottomPad, height: reservedHeight }}
+        className="grid grid-cols-[repeat(auto-fill,minmax(260px,1fr))] content-start gap-[0.5rem]"
       >
         {visible.map((entry) => {
           const sch = toSchEntry(entry);
