@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { useTranslations } from "next-intl"
-import { Button, Field, Input, Select, Icon, Spinner } from "@/components/boffmedia/primitives"
+import { Button, Field, Input, Select, Icon, Spinner } from "@boffmedia/ui"
 import { AvPanel, AvAlert } from "../ui/av-kit"
 import { ChampionsRegulation, SmogonSnapshot, VgcMetaService } from "@/services/api/boffmedia/vgcService"
 import { useBoffSession } from "@/services/useBoffSession"

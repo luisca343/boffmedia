@@ -3,7 +3,7 @@
 import { use } from 'react';
 import { useTranslations } from 'next-intl';
 import { useSingleSeries, useSessions } from '@/features/vgc-tracker/hooks/useVgcDb';
-import { Spinner } from "@/components/boffmedia/primitives"
+import { Spinner } from "@boffmedia/ui"
 import { SeriesWorkspace } from './_components/SeriesWorkspace';
 
 interface Props {

@@ -3,13 +3,13 @@
 import * as React from "react"
 import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
-import { Button, Chip } from "@/components/boffmedia/primitives"
+import { Button, Chip } from "@boffmedia/ui"
 import { Decode } from "../travesia-fx"
 import { TvCP } from "../TvCP"
 import { CTA_ROW, GLARE, HUD_FRAME, PRI_GLOW } from "../landing-shared"
 import { DISCORD, TV3_FEED } from "../landing-data"
 import { useSiteActivity, useSiteStats } from "@/hooks/community/useCommunity"
-import { useFormat } from "@/lib/useFormat"
+import { useFormat } from "@boffmedia/ui/useFormat"
 
 export function TvComunidad() {
   const t = useTranslations("boffmedia.landing.comunidad")

@@ -1,7 +1,7 @@
 "use client"
 
 import { useTranslations } from "next-intl"
-import { Icon } from "@/components/boffmedia/primitives"
+import { Icon } from "@boffmedia/ui"
 import { AdminCrud } from "../_components/ui/av-crud"
 import { AvSectionHead } from "../_components/ui/av-kit"
 import { useGetAchievements } from "@/hooks/events/useGetAchievements"

@@ -4,9 +4,9 @@ import * as React from "react"
 import Link from "next/link"
 import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
-import { Button, Empty, Icon, Spinner } from "@/components/boffmedia/primitives"
+import { Button, Empty, Icon, Spinner } from "@boffmedia/ui"
 import { useGetEvents } from "@/hooks/events/useGetEvents"
-import { useFormat } from "@/lib/useFormat"
+import { useFormat } from "@boffmedia/ui/useFormat"
 import { EventStatusChip, dayMonth, eventStatus, type EventLike } from "@/components/boffmedia/ui/events"
 
 export function CalendarView() {

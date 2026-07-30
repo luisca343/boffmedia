@@ -3,7 +3,7 @@
 import * as React from "react"
 import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
-import { Avatar, Button, Icon } from "@/components/boffmedia/primitives"
+import { Avatar, Button, Icon } from "@boffmedia/ui"
 import { Countdown } from "@/components/boffmedia/ui/events/Countdown"
 import { SrtPrizeTag, SrtSourceTag, SrtStatusChip } from "./SrtAtoms"
 import { srtHue, srtNum, srtPrizeMeta, srtStatus, type Sorteo } from "./giveaways-util"

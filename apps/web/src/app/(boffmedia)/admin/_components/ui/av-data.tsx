@@ -3,8 +3,8 @@
 import * as React from "react"
 import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
-import { Icon, Avatar, Badge, IconButton, Spinner, type IconName } from "@/components/boffmedia/primitives"
-import { useFormat } from "@/lib/useFormat"
+import { Icon, Avatar, Badge, IconButton, Spinner, type IconName } from "@boffmedia/ui"
+import { useFormat } from "@boffmedia/ui/useFormat"
 import { AvPill, AvLiveDot } from "./av-kit"
 
 /**

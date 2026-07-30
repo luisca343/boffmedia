@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Icon, IconButton, Avatar, type IconName } from "@/components/boffmedia/primitives"
+import { Icon, IconButton, Avatar, type IconName } from "@boffmedia/ui"
 import { initials, oddsOf, type Entrant } from "../../_lib/useSorteos"
 
 export const SRT_COLORS = [

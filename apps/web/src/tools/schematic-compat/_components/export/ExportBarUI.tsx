@@ -2,7 +2,7 @@
 
 import { useEffect, useState, type ReactNode } from "react";
 import { useTranslations } from "next-intl";
-import { Button } from "@/components/boffmedia/primitives";
+import { Button } from "@boffmedia/ui";
 import type { SchGame } from "../ui/sch-tokens";
 
 const FMT_KEYS: Record<SchGame, [string, string][]> = {

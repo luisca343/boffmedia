@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { Sample, Section } from "../showcase-shared"
-import { Icon } from "@/components/boffmedia/primitives"
+import { Icon } from "@boffmedia/ui"
 import {
   BxBench,
   BxBoost,

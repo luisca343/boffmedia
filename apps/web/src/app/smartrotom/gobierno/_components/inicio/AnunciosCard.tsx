@@ -6,7 +6,7 @@ import { Badge, Bar, Card, Empty, Skeleton, Sunken } from "../ui"
 import { useAnuncios } from "../../_hooks/queries"
 import { fmtDate } from "../../_utils/format"
 import { hrefOf } from "../../_utils/nav"
-import { useFormat } from "@/lib/useFormat"
+import { useFormat } from "@boffmedia/ui/useFormat"
 import type { Tone } from "../../_utils/tones"
 
 const KIND_TONE: Record<string, Tone> = { evento: "gold", anuncio: "civic", alerta: "danger" }

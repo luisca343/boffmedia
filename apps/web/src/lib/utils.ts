@@ -1,27 +1,9 @@
 import { SmartRotomUser } from "@/types"
-import { type ClassValue, clsx } from "clsx"
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
-import { twMerge } from "tailwind-merge"
 
-import { extendTailwindMerge } from 'tailwind-merge';
-
-const customTwMerge = extendTailwindMerge({
-  extend: {
-  classGroups: {
-    // @ts-ignore
-    'text-shadow': ['text-shadow-border1', 'text-shadow-border2', 'text-shadow-custom'],
-  },
-  conflictingClassGroups: {
-    // @ts-ignore
-    'text-color': ['text-shadow'],
-  }
-}
-});
-
-
-export function cn(...inputs: ClassValue[]) {
-  return customTwMerge(clsx(inputs))
-}
+// `cn` now lives in @boffmedia/ui so the design system can travel without the
+// app. Re-exported here because ~500 files import it from this path.
+export { cn } from "@boffmedia/ui/cn"
 
 export function strToDate(date: string) {
   if(!date) return ""

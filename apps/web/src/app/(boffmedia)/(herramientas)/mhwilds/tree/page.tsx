@@ -2,7 +2,7 @@
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { useTranslations } from "next-intl"
-import { Button, Chip, Empty, Icon, Select, Spinner } from "@/components/boffmedia/primitives"
+import { Button, Chip, Empty, Icon, Select, Spinner } from "@boffmedia/ui"
 import { useWeaponTreeData } from "./_hooks/useWeaponTreeData"
 import {
   MhApp, MhBar, MhBarSide, MhBody, MhWrap, MhSeal, MhModes, MhSrc, MhSearch,

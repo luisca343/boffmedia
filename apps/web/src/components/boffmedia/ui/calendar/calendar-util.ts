@@ -1,4 +1,4 @@
-import type { IconName } from "@/components/boffmedia/primitives"
+import type { IconName } from "@boffmedia/ui"
 
 // v3 «Señal» — Calendario de lanzamientos shared types + helpers. Mirrors the
 // LZ_* globals + date helpers from v3-calendario-data.jsx. All release data is

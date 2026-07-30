@@ -3,7 +3,7 @@
 import * as React from "react"
 import Link from "next/link"
 import { useTranslations } from "next-intl"
-import { Button, Empty, Icon, Spinner } from "@/components/boffmedia/primitives"
+import { Button, Empty, Icon, Spinner } from "@boffmedia/ui"
 import { EventCard, GameHero, type EventLike } from "@/components/boffmedia/ui/events"
 import { useGetGame } from "@/hooks/events/useGetGame"
 import { useGetEvents } from "@/hooks/events/useGetEvents"

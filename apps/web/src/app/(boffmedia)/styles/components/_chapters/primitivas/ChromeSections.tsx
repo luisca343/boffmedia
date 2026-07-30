@@ -1,7 +1,7 @@
 "use client"
 
 import { Sample, Section } from "../../showcase-shared"
-import { AuthProviderBtn, Badge, Clock, Divider, Field, PasswordField } from "@/components/boffmedia/primitives"
+import { AuthProviderBtn, Badge, Clock, Divider, Field, PasswordField } from "@boffmedia/ui"
 import { AuthScreen } from "@/components/boffmedia/ui/auth/AuthScreen"
 import { Footer, FooterCol, FooterSocial } from "@/components/boffmedia/ui/layout/Footer"
 

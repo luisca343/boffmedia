@@ -3,7 +3,7 @@
 import { useTranslations } from "next-intl"
 import { Stat } from "../ui"
 import { money } from "../../_utils/format"
-import { useFormat } from "@/lib/useFormat"
+import { useFormat } from "@boffmedia/ui/useFormat"
 import type { Tesoreria } from "../../_types"
 
 export function TesoreriaStats({ t: data }: { t: Tesoreria }) {

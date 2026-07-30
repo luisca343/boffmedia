@@ -3,7 +3,7 @@
 import { useTranslations } from "next-intl"
 import { Badge, Bar, Card, Empty, Table, THead, TBody, TH, TR, TD } from "../ui"
 import { money } from "../../_utils/format"
-import { useFormat } from "@/lib/useFormat"
+import { useFormat } from "@boffmedia/ui/useFormat"
 import type { Tasa } from "../../_types"
 
 // The handoff's mock had a "pendiente"/"cobro abierto" column — our real Tasa has no such

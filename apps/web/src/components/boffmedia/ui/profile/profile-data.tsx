@@ -1,5 +1,5 @@
 import type { ReactNode } from "react"
-import type { IconName } from "@/components/boffmedia/primitives"
+import type { IconName } from "@boffmedia/ui"
 
 // Demo content for the Sistema showcase ONLY. The real /perfil renders live
 // session data and omits every section without a backing API — see

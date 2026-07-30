@@ -1,6 +1,6 @@
 import type { News } from "@boffmedia/shared";
 
-import { intlLocale } from "@/lib/locale";
+import { intlLocale } from "@boffmedia/ui/locale";
 
 import { accentFor, type FtAccent } from "./accents";
 

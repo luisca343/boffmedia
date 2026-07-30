@@ -1,6 +1,6 @@
 import * as React from "react"
 import { useTranslations } from "next-intl"
-import { Button } from "@/components/boffmedia/primitives"
+import { Button } from "@boffmedia/ui"
 import { Decode } from "../travesia-fx"
 import { TvCP } from "../TvCP"
 import { CTA_ROW, PRI_GLOW } from "../landing-shared"

@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { Sample, Section } from "../showcase-shared"
-import { Icon, ChipGroup, DataList, SearchInput } from "@/components/boffmedia/primitives"
+import { Icon, ChipGroup, DataList, SearchInput } from "@boffmedia/ui"
 import {
   CxCard,
   MewEffects,

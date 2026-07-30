@@ -1,6 +1,14 @@
 import type { Metadata } from "next"
 import "./globals.css"
+// Must stay immediately after globals.css: it defines the v3 theme tokens that
+// used to live inside it, and the cascade position is load-bearing.
+import "@boffmedia/tailwind-config/base.css"
 import { env } from "@/config/env"
+
+// Registers the host's Link + translator with @boffmedia/ui in the server
+// graph; UiRuntimeClient does the same for the client bundle.
+import "@/lib/ui-runtime"
+import { UiRuntimeClient } from "@/lib/UiRuntimeClient"
 
 
 import { NextIntlClientProvider } from "next-intl"
@@ -47,6 +55,7 @@ export default async function RootLayout({
       </head>
       <body className="flex flex-col min-h-screen bg-transparent">
         <NextIntlClientProvider messages={messages} locale={locale}>
+          <UiRuntimeClient />
           {children}
         </NextIntlClientProvider>
       </body>

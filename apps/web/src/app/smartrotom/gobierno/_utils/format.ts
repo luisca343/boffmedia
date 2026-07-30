@@ -1,5 +1,5 @@
-export { timeAgo } from "@/lib/format"
-import { intlLocale } from "@/lib/locale"
+export { timeAgo } from "@boffmedia/ui/format"
+import { intlLocale } from "@boffmedia/ui/locale"
 
 export const money = (n: number | null | undefined, locale?: string | null): string =>
   Number(n ?? 0).toLocaleString(intlLocale(locale))

@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { cn } from "@/lib/utils"
-import { Avatar } from "@/components/boffmedia/primitives"
+import { Avatar } from "@boffmedia/ui"
 import { evHue, evNum, type PlayerLike } from "./events-util"
 
 // Ranking pieces reused across the global leaderboard, the game page and the

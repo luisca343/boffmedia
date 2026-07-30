@@ -1,7 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { Banner, DataList, Spinner } from "@/components/boffmedia/primitives";
+import { Banner, DataList, Spinner } from "@boffmedia/ui";
 import { SchematicFilePicker, WorldIdPicker } from "@/components/boffmedia/ui/schematic";
 import type { EnvMode } from "@/lib/schematic/state";
 import { useViewerStore } from "../_store/viewer.store";

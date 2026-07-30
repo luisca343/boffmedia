@@ -5,7 +5,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { usePvPMatchmaking } from '@/app/battlesim/_hooks/usePvPMatchmaking';
 import { BattleSession } from '@/app/battlesim/_utils/BattleSession';
-import { Panel, Button, Input, Select, Badge, Spinner } from '@/components/boffmedia/primitives';
+import { Panel, Button, Input, Select, Badge, Spinner } from '@boffmedia/ui';
 import { BSIM_FORMATS } from '../_lib/bsim-data';
 
 const STATUS_TONE: Record<string, 'ok' | 'warn' | 'info' | 'bad' | 'default'> = {

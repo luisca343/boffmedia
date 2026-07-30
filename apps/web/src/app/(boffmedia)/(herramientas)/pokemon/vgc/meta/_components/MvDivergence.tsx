@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react"
 import { useTranslations } from "next-intl"
-import { Icon } from "@/components/boffmedia/primitives"
+import { Icon } from "@boffmedia/ui"
 import { DkTable, DkSprite, DkEmpty, DkSkelList } from "@/components/boffmedia/ui/tools/datakit"
 import { spriteUrl, handleSpriteError } from "@/features/vgc-tracker/types"
 import type { DivergenceResult, PokeData } from "../_lib/meta-types"

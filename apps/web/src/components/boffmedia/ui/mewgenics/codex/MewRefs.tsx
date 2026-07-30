@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Icon, type IconName } from "@/components/boffmedia/primitives"
+import { Icon, type IconName } from "@boffmedia/ui"
 import { MewHoverCard, MewRefLink } from "../MewPop"
 import { MewRef as MewRefAtom } from "../MewAtoms"
 import { select } from "../mew-store"

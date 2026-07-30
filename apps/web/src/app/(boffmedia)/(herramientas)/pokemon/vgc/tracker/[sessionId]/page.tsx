@@ -18,7 +18,7 @@ import {
   DkEmpty,
 } from "@/components/boffmedia/ui/tools/datakit"
 import { DkSeg } from "@/components/boffmedia/ui/tools/datakit"
-import { Button, Modal, Field, Input, Spinner } from "@/components/boffmedia/primitives"
+import { Button, Modal, Field, Input, Spinner } from "@boffmedia/ui"
 import { useMatches, usePresets, useSeries, useSessions, usePreset } from "@/features/vgc-tracker/hooks/useVgcDb"
 import { emptySlots, slotsForGame, slotsFromPreset } from "@/features/vgc-tracker/types"
 import { parseMatchCsv } from "@/features/vgc-tracker/utils/importCsv"

@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { useTranslations } from "next-intl"
-import { Kicker, Icon, Button, Chip } from "@/components/boffmedia/primitives"
+import { Kicker, Icon, Button, Chip } from "@boffmedia/ui"
 import { GameLogo } from "./GameLogo"
 import { ToolGrid } from "./ToolGrid"
 import { TxSection } from "./TxSection"

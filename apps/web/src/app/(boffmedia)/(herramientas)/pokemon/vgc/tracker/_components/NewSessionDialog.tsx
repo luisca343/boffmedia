@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { useTranslations } from "next-intl"
-import { Modal, Field, Input, Select, Button, Icon } from "@/components/boffmedia/primitives"
+import { Modal, Field, Input, Select, Button, Icon } from "@boffmedia/ui"
 import { DkSeg } from "@/components/boffmedia/ui/tools/datakit"
 import { VgcService, ChampionsRegulation, LimitlessTournament } from "@/services/api/boffmedia/vgcService"
 import type { MatchFormat, Session, SessionType, TeamPreset } from "@/features/vgc-tracker/types"

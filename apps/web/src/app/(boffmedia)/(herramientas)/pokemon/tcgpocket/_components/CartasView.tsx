@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react"
 import { useTranslations } from "next-intl"
-import { Button, Select, Seg, Toggle, Empty, Icon } from "@/components/boffmedia/primitives"
+import { Button, Select, Seg, Toggle, Empty, Icon } from "@boffmedia/ui"
 import type { TcgCard } from "@boffmedia/shared"
 import type { TcgpData } from "../_lib/useTcgpCards"
 import { normType, rarityMeta, typeColor, cssVars, TYPE_ORDER } from "../_lib/tcgp-maps"

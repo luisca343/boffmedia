@@ -3,7 +3,7 @@
 import { useEffect, type ReactNode } from "react"
 import { useTranslations } from "next-intl"
 import { useCountUp, prefersReducedMotion } from "../../_hooks/useCountUp"
-import { useFormat } from "@/lib/useFormat"
+import { useFormat } from "@boffmedia/ui/useFormat"
 import { raritySkin, type ArRarity } from "../../_utils/rarity"
 import { Corners } from "./Corners"
 

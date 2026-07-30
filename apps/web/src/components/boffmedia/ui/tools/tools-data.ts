@@ -1,7 +1,7 @@
 import type * as React from "react"
 import { getGameEntry, getLandingItems } from "@/data/games"
 import { hubConfig } from "@/data/hub"
-import type { IconName } from "@/components/boffmedia/primitives"
+import type { IconName } from "@boffmedia/ui"
 
 /** Games shown in the v3 tools hub, in order. */
 export const HUB_SLUGS = ["pokemon", "mhwilds", "otros", "minecraft"] as const

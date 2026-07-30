@@ -11,7 +11,7 @@ import { DenunciaActionModal, type DenunciaActionKind } from "./DenunciaActionMo
 import { useDenuncias } from "../../_hooks/queries"
 import { DENUNCIA_CATEGORY, DENUNCIA_STATUS } from "../../_utils/tones"
 import { fmtDateTime, townName } from "../../_utils/format"
-import { useFormat } from "@/lib/useFormat"
+import { useFormat } from "@boffmedia/ui/useFormat"
 import type { Denuncia } from "../../_types"
 
 const FILTERS = ["all", "pending", "reviewing", "resolved", "dismissed"] as const

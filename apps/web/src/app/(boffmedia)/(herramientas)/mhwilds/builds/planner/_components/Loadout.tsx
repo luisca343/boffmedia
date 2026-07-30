@@ -1,7 +1,7 @@
 "use client"
 
 import { useTranslations } from "next-intl"
-import { Button } from "@/components/boffmedia/primitives"
+import { Button } from "@boffmedia/ui"
 import { BuildData, EquipmentType } from "@/types/tools/mhwilds"
 import { MhSlot, MhDecoSocket, MhRing } from "../../../_components/ui/mh-kit"
 import type { SlotDef } from "./PlannerView"

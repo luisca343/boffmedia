@@ -1,6 +1,6 @@
-import { intlLocale } from "@/lib/locale";
+import { intlLocale } from "@boffmedia/ui/locale";
 
-export { timeAgo, toMs } from "@/lib/format";
+export { timeAgo, toMs } from "@boffmedia/ui/format";
 
 export function fullDate(ts: number, locale?: string | null): string {
   return new Date(ts).toLocaleDateString(intlLocale(locale), {

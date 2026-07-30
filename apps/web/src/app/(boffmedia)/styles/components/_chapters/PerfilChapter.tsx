@@ -1,7 +1,7 @@
 "use client"
 
 import { Sample, Section } from "../showcase-shared"
-import { Badge, Button, Panel } from "@/components/boffmedia/primitives"
+import { Badge, Button, Panel } from "@boffmedia/ui"
 import { AccountForm, ActivityFeed, DEMO_ACTIVITY, DEMO_RANK, DEMO_STATS, DEMO_TOUR, DEMO_TROPHIES, LinkedAccountRow, LinkedAccounts, ProfileHero, ProfileNote, RankStrip, TourLive, TrophyCase } from "@/components/boffmedia/ui/profile"
 
 export function PerfilChapter() {

@@ -1,7 +1,7 @@
 import * as React from "react"
 import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
-import { Button, Icon } from "@/components/boffmedia/primitives"
+import { Button, Icon } from "@boffmedia/ui"
 import type { TourData } from "./profile-data"
 
 export interface TourLiveProps extends TourData {

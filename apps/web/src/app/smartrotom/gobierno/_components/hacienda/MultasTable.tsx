@@ -4,7 +4,7 @@ import { useTranslations } from "next-intl"
 import { Avatar, Badge, Button, Card, Empty, Table, THead, TBody, TH, TR, TD, TableSkeleton } from "../ui"
 import { MULTA_STATUS } from "../../_utils/tones"
 import { money, timeAgo } from "../../_utils/format"
-import { useFormat } from "@/lib/useFormat"
+import { useFormat } from "@boffmedia/ui/useFormat"
 import { useGobiernoUi } from "../../_stores/useGobiernoUi"
 import type { Multa } from "../../_types"
 

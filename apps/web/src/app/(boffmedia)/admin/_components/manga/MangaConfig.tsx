@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
-import { Button, Field, Input, Icon, Spinner, Toggle } from "@/components/boffmedia/primitives";
+import { Button, Field, Input, Icon, Spinner, Toggle } from "@boffmedia/ui";
 import { apiGET, apiPATCH, apiPOST } from "@/services/boffAPI";
 import { AvSectionHead, AvPanel, AvPill } from "../ui/av-kit";
 

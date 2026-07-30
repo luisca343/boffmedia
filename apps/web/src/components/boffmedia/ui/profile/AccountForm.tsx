@@ -3,7 +3,7 @@
 import * as React from "react"
 import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
-import { Field, Input, Textarea } from "@/components/boffmedia/primitives"
+import { Field, Input, Textarea } from "@boffmedia/ui"
 
 export interface AccountFormValues {
   name: string

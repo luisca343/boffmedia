@@ -3,8 +3,8 @@
 import * as React from "react"
 import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
-import { Icon } from "@/components/boffmedia/primitives"
-import { useFormat } from "@/lib/useFormat"
+import { Icon } from "@boffmedia/ui"
+import { useFormat } from "@boffmedia/ui/useFormat"
 import { kvCapsuleArt, kvHeaderArt, kvPlatformMeta, kvReviewColor, kvViaIcon, type KvPlatform, type KvViaKey } from "./keys-util"
 
 const ART_FB = "grid h-full w-full place-items-center text-line-2 [background:repeating-linear-gradient(-45deg,var(--bg-2)_0_10px,var(--panel-2)_10px_20px)]"

@@ -30,7 +30,7 @@ import {
   TypeBadge,
   ValueBox,
 } from "@/app/smartrotom/wigglypop/_components/ui"
-import { useFormat } from "@/lib/useFormat"
+import { useFormat } from "@boffmedia/ui/useFormat"
 import { Sample, Section } from "../showcase-shared"
 
 // Static sample copy — the app itself resolves these via next-intl.

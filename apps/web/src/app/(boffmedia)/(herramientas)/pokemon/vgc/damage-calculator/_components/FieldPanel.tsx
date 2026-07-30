@@ -3,7 +3,7 @@
 import * as React from "react"
 import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
-import { Icon } from "@/components/boffmedia/primitives"
+import { Icon } from "@boffmedia/ui"
 import { TogglePill, PillRow } from "./ui"
 import { ATK_COLOR, DEF_COLOR } from "./ui/theme"
 import type { CalcField, SideConditions } from "../_types/calculator"

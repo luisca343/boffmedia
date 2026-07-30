@@ -17,7 +17,7 @@ import { BattleLogPanel } from '@/app/battlesim/_components/BattleLogPanel';
 import { useFullscreen } from '@/app/battlesim/_hooks/useFullscreen';
 import { cn } from '@/lib/utils';
 import { DkSelect } from '@/components/boffmedia/ui/tools/datakit';
-import { Icon } from '@/components/boffmedia/primitives';
+import { Icon } from '@boffmedia/ui';
 import { BattleShell } from '../_components/BattleShell';
 import { BSIM_FORMATS } from '../_lib/bsim-data';
 

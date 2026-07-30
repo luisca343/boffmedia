@@ -4,7 +4,7 @@ import { useTranslations } from "next-intl"
 import { Bar, Card, Empty } from "../ui"
 import { DEPARTMENTS, TONES, type Department, type Tone } from "../../_utils/tones"
 import { money } from "../../_utils/format"
-import { useFormat } from "@/lib/useFormat"
+import { useFormat } from "@boffmedia/ui/useFormat"
 import type { Tesoreria } from "../../_types"
 
 // `gastos[].dep` is a free string off the ledger's memo, not a typed enum — fall back to

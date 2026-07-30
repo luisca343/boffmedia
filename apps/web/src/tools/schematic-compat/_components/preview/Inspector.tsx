@@ -1,7 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { Icon } from "@/components/boffmedia/primitives";
+import { Icon } from "@boffmedia/ui";
 import { SelectionLocateControls } from "@/components/boffmedia/ui/schematic";
 import { useSelectionFocus } from "@/lib/schematic/actions";
 import type { SchStatus } from "../ui/sch-tokens";

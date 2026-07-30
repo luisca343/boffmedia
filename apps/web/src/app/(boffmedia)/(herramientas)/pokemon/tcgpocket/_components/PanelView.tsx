@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react"
 import { useLocale, useTranslations } from "next-intl"
-import { Button, Panel, Kicker, Icon } from "@/components/boffmedia/primitives"
+import { Button, Panel, Kicker, Icon } from "@boffmedia/ui"
 import type { TcgpData } from "../_lib/useTcgpCards"
 import type { RecentUpdate } from "../_lib/useCollection"
 import { rarityMeta, timeAgo, padNum } from "../_lib/tcgp-maps"

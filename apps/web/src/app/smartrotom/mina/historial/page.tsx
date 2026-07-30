@@ -5,7 +5,7 @@ import MenuWrapper from "../_components/MenuWrapper";
 import { useGetHistory } from "@/hooks/mina/useGetHistory";
 import { useRotomUuid } from "@/components/smartrotom/behavior/useRotomUuid";
 import { useTranslations } from "next-intl";
-import { useFormat } from "@/lib/useFormat";
+import { useFormat } from "@boffmedia/ui/useFormat";
 
 export default function History() {
   const t = useTranslations("mina");

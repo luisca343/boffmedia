@@ -3,7 +3,7 @@
 import * as React from "react"
 import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
-import { Icon } from "@/components/boffmedia/primitives"
+import { Icon } from "@boffmedia/ui"
 
 // live / playing / pending / final / soon status pill. Mirrors `.dk-live`.
 const DK_LIVE: Record<string, [string, string, boolean]> = {

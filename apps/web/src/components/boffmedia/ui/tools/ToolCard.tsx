@@ -2,7 +2,7 @@ import * as React from "react"
 import Link from "next/link"
 import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
-import { Icon, Badge } from "@/components/boffmedia/primitives"
+import { Icon, Badge } from "@boffmedia/ui"
 import { hueStyle, type ToolCardData } from "./tools-data"
 
 // bottom-right diagonal cut (señal) / bottom-left (fila) — one-off clips.

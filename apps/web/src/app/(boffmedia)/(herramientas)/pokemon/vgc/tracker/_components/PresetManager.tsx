@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react"
 import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
-import { Modal, Field, Input, Textarea, Select, Button, Icon } from "@/components/boffmedia/primitives"
+import { Modal, Field, Input, Textarea, Select, Button, Icon } from "@boffmedia/ui"
 import { parseShowdownPaste, isValidPaste } from "@/features/vgc-tracker/showdown-parse"
 import { TrSprite, TrNone } from "./ui/tr-ui"
 import type { PresetSlot, TeamPreset } from "@/features/vgc-tracker/types"

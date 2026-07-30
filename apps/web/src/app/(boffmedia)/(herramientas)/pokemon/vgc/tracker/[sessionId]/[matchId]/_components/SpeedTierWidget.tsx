@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
-import { Icon } from "@/components/boffmedia/primitives"
+import { Icon } from "@boffmedia/ui"
 import type { MatchSlot } from '@/features/vgc-tracker/types';
 import { spriteUrl, handleSpriteError } from '@/features/vgc-tracker/types';
 import { useLegalPokemon } from '@/app/(boffmedia)/(herramientas)/pokemon/vgc/damage-calculator/_hooks/useLegalPokemon';

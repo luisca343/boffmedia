@@ -1,5 +1,5 @@
 import type * as React from "react"
-import type { IconName } from "@/components/boffmedia/primitives"
+import type { IconName } from "@boffmedia/ui"
 
 // v3 «Señal» — Mewgenics «Papel y tinta» Codex shared meta + pure helpers.
 // Two palettes ship as CSS-var bundles applied on a scope wrapper: MEW_VARS is

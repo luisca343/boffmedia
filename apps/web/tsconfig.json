@@ -28,6 +28,15 @@
       "@boffmedia/shared": [
         "../../packages/shared/src"
       ],
+      "@boffmedia/tailwind-config/*": [
+        "../../packages/tailwind-config/*"
+      ],
+      "@boffmedia/ui": [
+        "../../packages/ui/src"
+      ],
+      "@boffmedia/ui/*": [
+        "../../packages/ui/src/*"
+      ],
       "@boffmedia/shared/*": [
         "../../packages/shared/src/*"
       ]

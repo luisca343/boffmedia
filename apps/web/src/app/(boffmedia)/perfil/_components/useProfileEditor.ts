@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { useTranslations } from "next-intl"
-import { toast } from "@/components/boffmedia/primitives"
+import { toast } from "@boffmedia/ui"
 import { type AccountFormValues } from "@/components/boffmedia/ui/profile"
 import { UsersService } from "@/services/api/boffmedia/usersService"
 import { UploadService } from "@/services/api/smartrotom/uploadService"

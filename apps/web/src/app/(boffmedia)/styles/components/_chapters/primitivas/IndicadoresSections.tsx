@@ -3,7 +3,7 @@
 import * as React from "react"
 import { cn } from "@/lib/utils"
 import { MONO_LABEL, Sample, Section } from "../../showcase-shared"
-import { Badge, Button, Chip, Icon, IconButton, Kbd, Ring, Skeleton, Spinner, Tooltip } from "@/components/boffmedia/primitives"
+import { Badge, Button, Chip, Icon, IconButton, Kbd, Ring, Skeleton, Spinner, Tooltip } from "@boffmedia/ui"
 
 export function IndicadoresSections({ rng }: { rng: number }) {
   return (

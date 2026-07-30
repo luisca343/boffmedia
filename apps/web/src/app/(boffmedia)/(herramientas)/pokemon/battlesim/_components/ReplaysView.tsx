@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react"
 import { useSession } from "next-auth/react"
 import { useTranslations } from "next-intl"
-import { Icon } from "@/components/boffmedia/primitives"
+import { Icon } from "@boffmedia/ui"
 import { DkSearch, DkSeg, DkEmpty, DkSkelList } from "@/components/boffmedia/ui/tools/datakit"
 import { LigaService, type LeagueReplay } from "@/services/api/smartrotom/ligaService"
 import { cn } from "@/lib/utils"

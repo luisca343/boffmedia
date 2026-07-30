@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { useTranslations } from "next-intl"
-import { Icon } from "@/components/boffmedia/primitives"
+import { Icon } from "@boffmedia/ui"
 import { MewData } from "../mew-store"
 import { MEW, MEW_CATS, mewCatKey } from "../mew-util"
 import type { MewCodexModel } from "./useMewCodex"

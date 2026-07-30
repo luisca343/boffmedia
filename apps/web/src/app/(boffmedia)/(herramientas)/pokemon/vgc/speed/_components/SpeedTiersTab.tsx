@@ -3,7 +3,7 @@
 import { Fragment, useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
-import { Icon, Button } from "@/components/boffmedia/primitives"
+import { Icon, Button } from "@boffmedia/ui"
 import { DkTable, DkSprite, DkType, DkEmpty, DkSkelList } from "@/components/boffmedia/ui/tools/datakit";
 import { spriteUrl, handleSpriteError } from "@/features/vgc-tracker/types";
 import { SpeedTierEntry } from "@/services/api/boffmedia/vgcService";

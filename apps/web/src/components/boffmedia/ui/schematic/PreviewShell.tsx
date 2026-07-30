@@ -1,7 +1,7 @@
 "use client"
 
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react"
-import { Icon } from "@/components/boffmedia/primitives"
+import { Icon } from "@boffmedia/ui"
 import type { NavMode } from "@/lib/schematic/state"
 import { AxisSlider } from "./AxisSlider"
 import { PreviewButton, SwitchGroup, SwitchSegment } from "./PreviewChrome"

@@ -3,7 +3,7 @@
 import * as React from "react"
 import { cn } from "@/lib/utils"
 import { Sample, Section } from "../showcase-shared"
-import { Icon } from "@/components/boffmedia/primitives"
+import { Icon } from "@boffmedia/ui"
 import { MhFavStar, MhToolTabs } from "@/components/boffmedia/ui/mh-shell"
 import { MHDB } from "./mh-db-demo"
 

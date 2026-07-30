@@ -2,7 +2,7 @@
 
 import React, { useEffect, useMemo, useState } from "react"
 import { useTranslations } from "next-intl"
-import { Button, Empty, Icon, Select, Spinner } from "@/components/boffmedia/primitives"
+import { Button, Empty, Icon, Select, Spinner } from "@boffmedia/ui"
 import { ArmorPiece, BuildDataWithIds, Charm, Decoration, EquipmentType, Weapon } from "@/types/tools/mhwilds"
 import {
   MhDrawer, MhItem, MhRarity, MhTag, MhSlotPips, MhTypeChip, MhSearch, MhLabel,

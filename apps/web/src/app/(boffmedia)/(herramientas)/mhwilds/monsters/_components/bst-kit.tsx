@@ -1,7 +1,7 @@
 import * as React from "react"
 import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
-import { Icon, type IconName } from "@/components/boffmedia/primitives"
+import { Icon, type IconName } from "@boffmedia/ui"
 import { elementColor } from "../../_components/mh-helpers"
 import type { MhMonster, MhMonsterWeakness } from "@/types/tools/mhwilds"
 

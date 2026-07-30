@@ -13,7 +13,7 @@
 // the first place — the R3F <Canvas> in the preview pane always measures a
 // real size, tab-switch or not.
 import { useEffect, useState, type ReactNode } from "react";
-import { Tabs } from "@/components/boffmedia/primitives";
+import { Tabs } from "@boffmedia/ui";
 import { cn } from "@/lib/utils";
 
 export interface WorkbenchPane {

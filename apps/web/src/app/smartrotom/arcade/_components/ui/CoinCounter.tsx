@@ -1,7 +1,7 @@
 "use client"
 
 import { useCountUp } from "../../_hooks/useCountUp"
-import { useFormat } from "@/lib/useFormat"
+import { useFormat } from "@boffmedia/ui/useFormat"
 import { Icon } from "./Icon"
 
 export interface CoinCounterProps {

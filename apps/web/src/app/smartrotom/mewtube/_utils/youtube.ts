@@ -1,7 +1,7 @@
 import type { Video } from "../types"
 import type { VideoCardData } from "@/components/smartrotom/media/ui"
-import { timeAgoLong as relativeTime } from "@/lib/format"
-import { intlLocale } from "@/lib/locale"
+import { timeAgoLong as relativeTime } from "@boffmedia/ui/format"
+import { intlLocale } from "@boffmedia/ui/locale"
 
 export const MEWTUBE_BASE = "/smartrotom/mewtube"
 

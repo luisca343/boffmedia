@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
-import { Icon } from "@/components/boffmedia/primitives"
+import { Icon } from "@boffmedia/ui"
 import { DkApp, DkBar, DkBody, DkBack, DkTitle, DkSpacer, cssVars } from '@/components/boffmedia/ui/tools/datakit';
 import { usePokemonSearch } from '@/features/vgc-tracker/hooks/usePokemonSearch';
 import { NotesPanel, NotesPanelHandle } from './NotesPanel';

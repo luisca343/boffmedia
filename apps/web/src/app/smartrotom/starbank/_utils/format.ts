@@ -1,6 +1,6 @@
-import { intlLocale } from "@/lib/locale";
+import { intlLocale } from "@boffmedia/ui/locale";
 
-export { formatMoney } from "@/lib/format";
+export { formatMoney } from "@boffmedia/ui/format";
 
 /** Plain integer with the viewer's locale grouping, no currency (for the hero split ¥). */
 export function fmtInt(n: number, locale?: string | null): string {

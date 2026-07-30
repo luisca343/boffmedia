@@ -3,7 +3,7 @@
 import * as React from "react"
 import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
-import { Icon } from "@/components/boffmedia/primitives"
+import { Icon } from "@boffmedia/ui"
 import { CT_STATUS, CT_STATUS_ORDER, CtStore, useCtStatus, type CtStatusKey } from "./catalog-util"
 
 // Catálogo atoms: half-star rating, status pill, status menu + log button.

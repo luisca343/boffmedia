@@ -3,9 +3,9 @@
 import * as React from "react"
 import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
-import { Icon, Button, toast } from "@/components/boffmedia/primitives"
+import { Icon, Button, toast } from "@boffmedia/ui"
 import { DkFlag, DkLive, DkSprite, DkType } from "@/components/boffmedia/ui/tools/datakit"
-import { useFormat } from "@/lib/useFormat"
+import { useFormat } from "@boffmedia/ui/useFormat"
 import type { TnCompetitor } from "./tournaments-util"
 
 // Live self-report match table (LimitlessVGC model): round header, opponent card,

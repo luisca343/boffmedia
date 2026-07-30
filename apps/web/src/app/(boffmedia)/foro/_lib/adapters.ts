@@ -1,4 +1,4 @@
-import type { IconName } from "@/components/boffmedia/primitives"
+import type { IconName } from "@boffmedia/ui"
 import type {
   CmAuthor,
   CmTone,

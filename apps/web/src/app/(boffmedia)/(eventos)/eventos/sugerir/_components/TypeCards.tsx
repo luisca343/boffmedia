@@ -1,7 +1,7 @@
 "use client"
 
 import { useTranslations } from "next-intl"
-import { Icon, type IconName } from "@/components/boffmedia/primitives"
+import { Icon, type IconName } from "@boffmedia/ui"
 import { cn } from "@/lib/utils"
 
 const TYPES: { value: string; icon: IconName; key: "event" | "server" }[] = [

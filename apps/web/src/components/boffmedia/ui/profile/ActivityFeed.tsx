@@ -1,6 +1,6 @@
 import * as React from "react"
 import { cn } from "@/lib/utils"
-import { Icon } from "@/components/boffmedia/primitives"
+import { Icon } from "@boffmedia/ui"
 import type { ActivityData } from "./profile-data"
 
 export type ActivityRowProps = ActivityData & { className?: string }

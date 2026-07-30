@@ -2,7 +2,7 @@
 
 import React, { useEffect, useMemo, useState } from "react"
 import { useTranslations } from "next-intl"
-import { Icon, toast } from "@/components/boffmedia/primitives"
+import { Icon, toast } from "@boffmedia/ui"
 import { EquipmentType, Weapon, ArmorPiece, Charm, Decoration, MhMonster } from "@/types/tools/mhwilds"
 import { MhApp, MhBody, MhWrap } from "../../../_components/ui/mh-kit"
 import { weaponAttack } from "../../../_components/mh-helpers"

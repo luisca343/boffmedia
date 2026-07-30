@@ -3,7 +3,7 @@
 import * as React from "react"
 import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
-import { Icon, type IconName, Spinner } from "@/components/boffmedia/primitives"
+import { Icon, type IconName, Spinner } from "@boffmedia/ui"
 import { AvLiveDot } from "./av-kit"
 
 export interface AvNavItem {
