@@ -14,6 +14,11 @@ export type SchematicViewProps = Omit<
   /** Fly mode releases back to orbit whenever the pointer lock is lost. */
   onNavModeChange: (m: NavMode) => void;
   flyLabels: FlyHudLabels;
+  /**
+   * Already-translated caption for the scene's -Z north arrow. drei's <Text>
+   * would need a font asset/new dep, so the letter lives in this DOM layer.
+   */
+  northLabel?: string;
   /** Must be unique on the page — it doubles as the pointer-lock click target. */
   stageId?: string;
 };
@@ -29,6 +34,7 @@ export function SchematicView({
   navMode,
   onNavModeChange,
   flyLabels,
+  northLabel,
   stageId = "sch3d-stage",
   ...scene
 }: SchematicViewProps) {
@@ -59,6 +65,11 @@ export function SchematicView({
           onLockChange={handleLockChange}
         />
       </Canvas>
+      {northLabel && scene.showNorth !== false && (
+        <span className="pointer-events-none absolute bottom-2 right-2.5 font-mono text-[10px] tracking-[0.14em] uppercase text-[#4ade80]">
+          {northLabel}
+        </span>
+      )}
       {navMode === "fly" && <FlyHud hud={hud} locked={flyLocked} labels={flyLabels} />}
     </div>
   );

@@ -56,6 +56,7 @@ export {
   type PickIndex,
   type Vec3,
 } from "./picking";
+export { localPlayerPos, sourceAnchor, type SourceAnchor } from "./originMath";
 export { fluidColor } from "./fluid-color";
 export {
   SchematicAssetProvider,

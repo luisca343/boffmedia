@@ -2,8 +2,13 @@
 
 import dynamic from "next/dynamic";
 import { useTranslations } from "next-intl";
-import { PreviewEmptyStage, PreviewShell } from "@/components/boffmedia/ui/schematic";
+import {
+  PreviewEmptyStage,
+  PreviewShell,
+  SourceAnchorInfo,
+} from "@/components/boffmedia/ui/schematic";
 import { useViewerShortcuts } from "@/lib/schematic/actions";
+import { sourceAnchor } from "@/lib/schematic/render/originMath";
 import { useViewerStore } from "../_store/viewer.store";
 import { BlockInspector } from "./BlockInspector";
 
@@ -30,8 +35,12 @@ export function ViewerPreview() {
   const navMode = useViewerStore((s) => s.navMode);
   const setLayerY = useViewerStore((s) => s.setLayerY);
   const setNavMode = useViewerStore((s) => s.setNavMode);
+  const showAnchor = useViewerStore((s) => s.showAnchor);
+  const setShowAnchor = useViewerStore((s) => s.setShowAnchor);
 
   useViewerShortcuts(useViewerStore);
+
+  const anchor = sourceAnchor(schematic?.origin, schematic?.offset);
 
   return (
     <PreviewShell
@@ -53,7 +62,25 @@ export function ViewerPreview() {
       stage={
         schematic ? <SchematicViewer3D /> : <PreviewEmptyStage caption={t("preview.emptyCaption")} />
       }
-      inspector={<BlockInspector />}
+      inspector={
+        <div className="grid gap-2">
+          <SourceAnchorInfo
+            labels={{
+              title: t("preview.originTitle"),
+              origin: t("preview.origin"),
+              playerStand: t("preview.playerStand"),
+              copyTp: t("preview.copyTp"),
+              copied: t("preview.copied"),
+              showMarker: t("preview.showMarker"),
+            }}
+            origin={anchor.origin}
+            playerPos={anchor.playerPos}
+            showMarker={showAnchor}
+            onShowMarkerChange={setShowAnchor}
+          />
+          <BlockInspector />
+        </div>
+      }
     />
   );
 }

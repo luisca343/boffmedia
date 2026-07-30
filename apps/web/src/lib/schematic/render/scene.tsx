@@ -88,12 +88,73 @@ export interface SchematicSceneProps extends RenderOverrides {
   focus?: FocusRequest | null;
   /** RF-05: dims every non-selected block group to the existing ghost look. */
   isolate?: boolean;
+  /**
+   * Where the player stood when the build was copied, in schematic-LOCAL coords
+   * (see `localPlayerPos`). Draws a pin so the user can line the paste up.
+   */
+  playerAnchor?: { x: number; y: number; z: number } | null;
+  /** Grid-edge -Z arrow. Explicitly on by default — orientation always helps. */
+  showNorth?: boolean;
   source: RenderEnvironment;
   target?: RenderEnvironment;
   loaders: AssetLoaders;
   lockSelector: string;
   hud: FlyHudRefs;
   onLockChange: (locked: boolean) => void;
+}
+
+const NEVER_PICKABLE = () => null;
+const ANCHOR_COLOR = "#ff36c8";
+const NORTH_COLOR = "#4ade80";
+
+/**
+ * The copy-anchor pin plus a ground crosshair, drawn through solid geometry
+ * (depthTest off + a late renderOrder) and excluded from raycasting so it can
+ * never be selected. Fly-mode picking uses the DDA index, which only knows
+ * about block groups, so these meshes are invisible to it either way.
+ */
+function AnchorPin({ at, span }: { at: { x: number; y: number; z: number }; span: number }) {
+  // Capped, not just scaled: on a large build `span * k` grew the pin into a
+  // landmark that occluded the geometry it is meant to locate.
+  const h = Math.min(3, Math.max(1.2, span * 0.05));
+  const r = Math.min(0.06, Math.max(0.025, span * 0.0025));
+  const arm = Math.min(2, Math.max(0.8, span * 0.03));
+  return (
+    <group position={[at.x, at.y, at.z]} raycast={NEVER_PICKABLE} renderOrder={40}>
+      <mesh position={[0, h / 2, 0]} raycast={NEVER_PICKABLE} renderOrder={40}>
+        <cylinderGeometry args={[r, r, h, 8]} />
+        <meshBasicMaterial color={ANCHOR_COLOR} depthTest={false} toneMapped={false} />
+      </mesh>
+      <mesh position={[0, h, 0]} raycast={NEVER_PICKABLE} renderOrder={41}>
+        <sphereGeometry args={[r * 3, 12, 12]} />
+        <meshBasicMaterial color={ANCHOR_COLOR} depthTest={false} toneMapped={false} />
+      </mesh>
+      <mesh position={[0, 0.02, 0]} rotation={[-Math.PI / 2, 0, 0]} raycast={NEVER_PICKABLE} renderOrder={40}>
+        <planeGeometry args={[arm, r * 2]} />
+        <meshBasicMaterial color={ANCHOR_COLOR} depthTest={false} toneMapped={false} />
+      </mesh>
+      <mesh position={[0, 0.02, 0]} rotation={[-Math.PI / 2, 0, Math.PI / 2]} raycast={NEVER_PICKABLE} renderOrder={40}>
+        <planeGeometry args={[arm, r * 2]} />
+        <meshBasicMaterial color={ANCHOR_COLOR} depthTest={false} toneMapped={false} />
+      </mesh>
+    </group>
+  );
+}
+
+/** North in Minecraft is -Z: a cone at the grid's -Z edge, pointing that way. */
+function NorthArrow({ dims, span }: { dims: { x: number; y: number; z: number }; span: number }) {
+  const size = Math.min(1.2, Math.max(0.5, span * 0.025));
+  return (
+    <mesh
+      position={[dims.x / 2 - 0.5, -0.4, -span * 0.35]}
+      rotation={[-Math.PI / 2, 0, 0]}
+      raycast={NEVER_PICKABLE}
+      renderOrder={39}
+    >
+      <coneGeometry args={[size * 0.5, size * 1.6, 4]} />
+      <meshBasicMaterial color={NORTH_COLOR} depthTest={false} toneMapped={false} />
+    </mesh>
+  );
 }
 
 function defaultStates(block: UnifiedBlock, plan: RenderPlan): Record<string, string> {
@@ -124,6 +185,8 @@ export function SchematicScene({
   resolveVariant,
   focus = null,
   isolate = false,
+  playerAnchor = null,
+  showNorth = true,
 }: SchematicSceneProps) {
   // Read inside the frame loop and in click handlers, never during render.
   const layerYRef = useRef(layerY);
@@ -224,6 +287,8 @@ export function SchematicScene({
         infiniteGrid
         frustumCulled={false}
       />
+      {playerAnchor && <AnchorPin at={playerAnchor} span={span} />}
+      {showNorth && <NorthArrow dims={dims} span={span} />}
       <ambientLight intensity={0.55} />
       <directionalLight position={[10, 20, 10]} intensity={0.8} />
       <directionalLight position={[-6, 8, -8]} intensity={0.25} />

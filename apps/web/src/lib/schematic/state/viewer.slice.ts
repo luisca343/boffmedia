@@ -25,6 +25,8 @@ export interface ViewerSlice {
   navMode: NavMode;
   /** RF-05: dims every non-selected block group to the existing ghost look. */
   isolate: boolean;
+  /** Draws the copy-anchor pin and the north arrow in the 3D stage. */
+  showAnchor: boolean;
   /**
    * RF-01/02/03: the {@link FocusRequest} the renderer flies to — index into the
    * active selection's combined instance list, plus a nonce that bumps on every
@@ -42,6 +44,7 @@ export interface ViewerSlice {
   setLayerY: (y: number) => void;
   setNavMode: (m: NavMode) => void;
   setIsolate: (v: boolean) => void;
+  setShowAnchor: (v: boolean) => void;
   /** Bumps `focusNonce` so the same index re-flies; pass null to clear (no re-fly). */
   setFocus: (index: number | null) => void;
   /**
@@ -65,6 +68,7 @@ const VIEWER_DEFAULTS = {
   layerY: 0,
   navMode: "orbit" as NavMode,
   isolate: false,
+  showAnchor: true,
   focusIndex: null as number | null,
   focusNonce: 0,
 };
@@ -86,6 +90,9 @@ export function createViewerSlice(set: SliceSet<ViewerSlice>): ViewerSlice {
     setLayerY: (y) => set({ layerY: y }),
     setNavMode: (m) => set({ navMode: m }),
     setIsolate: (v) => set({ isolate: v }),
+    // Deliberately not reset by resetViewerFor: it is a view preference, not
+    // document state, so it survives loading another schematic.
+    setShowAnchor: (v) => set({ showAnchor: v }),
     setFocus: (index) =>
       set((s) => ({
         focusIndex: index,
