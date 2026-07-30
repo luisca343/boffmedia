@@ -288,6 +288,13 @@
       "when": 1785354016141,
       "tag": "0040_house_accounts",
       "breakpoints": true
+    },
+    {
+      "idx": 41,
+      "version": "5",
+      "when": 1785430796775,
+      "tag": "0041_happy_annihilus",
+      "breakpoints": true
     }
   ]
 }

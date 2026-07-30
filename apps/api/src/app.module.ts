@@ -69,6 +69,7 @@ import { RookerModule } from '@api/smartrotom/rooker/rooker.module';
 import { PasaporteModule } from '@api/smartrotom/pasaporte/pasaporte.module';
 import { WigglypopModule } from '@api/smartrotom/wigglypop/wigglypop.module';
 import { TaxiModule } from '@api/smartrotom/taxi/taxi.module';
+import { PacksModule } from './api/packs/packs.module';
 
 @Module({
   imports: [
@@ -138,6 +139,7 @@ import { TaxiModule } from '@api/smartrotom/taxi/taxi.module';
     PasaporteModule,
     WigglypopModule,
     TaxiModule,
+    PacksModule,
   ],
   controllers: [AppController],
   providers: [

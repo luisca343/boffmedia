@@ -39,6 +39,9 @@ onlyBuiltDependencies:
   - bcrypt
   - bufferutil
   - core-js
+  # apps/launcher — its postinstall is what downloads the Electron binary;
+  # without this the app installs but cannot start.
+  - electron
   - es5-ext
   - esbuild
   - necord

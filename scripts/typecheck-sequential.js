@@ -8,7 +8,16 @@
 const { spawn } = require('child_process');
 const path = require('path');
 
-const PACKAGES = ['apps/web', 'apps/api'];
+// Every workspace package with its own tsconfig. Keep this list in sync when
+// adding one — a missing entry makes `pnpm type-check` report green for code it
+// never looked at.
+const PACKAGES = [
+  'apps/web',
+  'apps/api',
+  'apps/launcher',
+  'packages/ui',
+  'packages/pack-schema',
+];
 const MEMORY_LIMIT = 2048; // MB per process
 
 function getAvailableMemoryMB() {

@@ -7,6 +7,7 @@ on:
     paths:
       - 'apps/api/**'
       - 'packages/shared/**'
+      - 'packages/pack-schema/**'
       - 'pnpm-lock.yaml'
       - 'pnpm-workspace.yaml'
 

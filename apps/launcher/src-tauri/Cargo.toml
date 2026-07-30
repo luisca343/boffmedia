@@ -1,0 +1,35 @@
+[package]
+name = "boff-launcher"
+version = "0.0.1"
+description = "Boff Launcher"
+authors = ["Boffmedia"]
+edition = "2021"
+rust-version = "1.77.2"
+
+[lib]
+# Tauri v2 keeps the app in a lib so mobile targets and integration tests can
+# reach it; main.rs is a thin shim over run().
+name = "boff_launcher_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+# Codegen for the pack manifest: JSON Schema (emitted from zod) -> Rust structs.
+typify = "0.2"
+schemars = "0.8"
+serde_json = "1"
+
+[dependencies]
+tauri = { version = "2", features = [] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+thiserror = "2"
+# HANDOFF §5/§6: msa auth, Forge AND NeoForge install, Java management.
+# The `forge` module's Loader enum selects Forge vs NeoForge.
+portablemc = "5.0"
+# §5.7 — the refresh token goes in the OS credential store, never a file.
+keyring = { version = "3", features = ["apple-native", "windows-native", "sync-secret-service"] }
+
+[features]
+# Enabled by `tauri build --debug`.
+default = []

@@ -6,7 +6,9 @@
   "types": "./base.ts",
   "exports": {
     "./base": "./base.ts",
-    "./base.css": "./base.css"
+    "./base.css": "./base.css",
+    "./fonts.css": "./fonts.css",
+    "./fonts/*": "./fonts/*"
   },
   "devDependencies": {
     "tailwindcss": "^3.4.0"
