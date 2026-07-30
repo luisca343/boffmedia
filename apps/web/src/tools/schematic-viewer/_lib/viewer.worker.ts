@@ -21,6 +21,9 @@ const api: ViewerWorkerAPI = {
   getBlockModel: (registryId: string, blockId: string, stateLabel?: string, rotation?: number) =>
     core.getBlockModel(state, registryId, blockId, stateLabel, rotation),
 
+  getModdedBlockModel: (registryId: string, blockId: string, states: Record<string, string>) =>
+    core.getModdedBlockModel(state, registryId, blockId, states),
+
   loadSchematic: (file: File) => core.loadSchematic(state, file),
 
   loadWorldIds: (file: File) => core.loadWorldIds(state, file),

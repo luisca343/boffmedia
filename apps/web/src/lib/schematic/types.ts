@@ -130,6 +130,18 @@ export interface BlockRegistry {
     stateLabel?: string,
     rotation?: number,
   ) => Promise<CompiledModel | null>;
+  /**
+   * Lazy geometry resolver for blocks whose shape comes from a full
+   * blockstate → model → textures chain (worker-side only, never serialized).
+   * Minecraft attaches it to a scanned instance so a MODDED block renders its
+   * real geometry, read on demand from the mod JAR that declares its namespace;
+   * the compiled model's texture refs are already loadable srcs. Returns `null`
+   * when nothing resolves, and the viewer falls back to a textured cube.
+   */
+  getModelForStates?: (
+    blockId: string,
+    states: Record<string, string>,
+  ) => Promise<CompiledModel | null>;
   snapshotHash: string;
   capturedAt: number;
   /** Name of the scanned instance (from launcher metadata), when available. */

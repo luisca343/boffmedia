@@ -65,9 +65,14 @@ export async function resolveModelInstance(
   const elements = findElements(chain);
   if (!elements || elements.length === 0) return null;
 
+  // Ref-level overrides sit above the whole chain, and must be merged in *before*
+  // `#var` flattening: the model's faces reference `#0`, and it is the override
+  // that says what `0` actually is.
+  const textures = { ...mergeTextures(chain), ...(ref.textures ?? {}) };
+
   return {
     model: { elements },
-    textures: resolveTextureRefs(mergeTextures(chain)),
+    textures: resolveTextureRefs(textures),
     x: ref.x ?? 0,
     y: ref.y ?? 0,
     uvlock: ref.uvlock ?? false,

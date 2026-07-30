@@ -44,6 +44,12 @@ export function SchematicCompatTool() {
     [api],
   );
 
+  const getModdedBlockModel = useCallback(
+    (registryId: string, blockId: string, states: Record<string, string>) =>
+      api ? api.getModdedBlockModel(registryId, blockId, states) : Promise.resolve(null),
+    [api],
+  );
+
   const getBlockConnections = useCallback(
     (registryId: string, blockId: string) =>
       api ? api.getBlockConnections(registryId, blockId) : Promise.resolve(null),
@@ -54,6 +60,7 @@ export function SchematicCompatTool() {
     <SchematicAssetProvider
       getBlockTexture={getBlockTexture}
       getBlockModel={getBlockModel}
+      getModdedBlockModel={getModdedBlockModel}
       getBlockConnections={getBlockConnections}
     >
       <div data-ds="boffmedia" className="flex min-h-0 flex-col overflow-hidden bg-base text-txt" style={{ height: "calc(100vh - var(--nav-h, 66px))" }}>

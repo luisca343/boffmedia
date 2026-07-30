@@ -10,6 +10,7 @@
 
 import type { AssetProvider, Blockstate, RawModel } from "../types";
 import { normalizeTextureVersion, LATEST_TEXTURE_REF } from "../../textures/blockTexture";
+import { adaptToLegacyAssets } from "../legacy-compat";
 import legacyAssets from "./1.12-assets.json";
 
 const CDN_BASE = "https://cdn.jsdelivr.net/gh/InventivetalentDev/minecraft-assets@";
@@ -89,5 +90,7 @@ export function createCdnProvider(version: string | undefined): AssetProvider {
       const [ns, path] = splitRef(textureRef);
       return refs.map((ref) => `${CDN_BASE}${ref}/assets/${ns}/textures/${path}.png`);
     },
+    // Only the pre-flattening tree disagrees with the loader's modern ids.
+    adaptStates: primary === LEGACY_REF ? adaptToLegacyAssets : undefined,
   };
 }

@@ -2,7 +2,13 @@
 
 import { useMemo } from "react";
 import { useTranslations } from "next-intl";
-import { SchematicView, localPlayerPos, useModelLoader, useTextureLoader } from "@/lib/schematic/render";
+import {
+  SchematicView,
+  localPlayerPos,
+  useModdedModelLoader,
+  useModelLoader,
+  useTextureLoader,
+} from "@/lib/schematic/render";
 import { selectEnvironment, useViewerStore } from "../_store/viewer.store";
 
 function Empty({ children }: { children: React.ReactNode }) {
@@ -37,10 +43,11 @@ export function SchematicViewer3D() {
   // this tree does not reach components rendered inside it — pass values down.
   const textureLoader = useTextureLoader();
   const modelLoader = useModelLoader();
+  const moddedModelLoader = useModdedModelLoader();
 
   const loaders = useMemo(
-    () => ({ texture: textureLoader, model: modelLoader }),
-    [textureLoader, modelLoader],
+    () => ({ texture: textureLoader, model: modelLoader, moddedModel: moddedModelLoader }),
+    [textureLoader, modelLoader, moddedModelLoader],
   );
   const source = useMemo(
     () => ({ version: registry?.version, registryId: registry?.id }),

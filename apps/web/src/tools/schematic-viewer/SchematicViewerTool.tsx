@@ -38,10 +38,17 @@ export function SchematicViewerTool() {
     [api],
   );
 
+  const getModdedBlockModel = useCallback(
+    (registryId: string, blockId: string, states: Record<string, string>) =>
+      api ? api.getModdedBlockModel(registryId, blockId, states) : Promise.resolve(null),
+    [api],
+  );
+
   return (
     <SchematicAssetProvider
       getBlockTexture={getBlockTexture}
       getBlockModel={getBlockModel}
+      getModdedBlockModel={getModdedBlockModel}
       // Connection shapes only matter when a block is re-targeted by a
       // conversion; this tool never re-targets anything.
       getBlockConnections={null}

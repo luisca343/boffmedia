@@ -83,6 +83,18 @@ export interface CompatWorkerAPI {
   ): Promise<CompiledModel | null>;
 
   /**
+   * Baked geometry for a modded Minecraft block in a given blockstate, resolved
+   * on demand from the instance's mod JARs (blockstate → model → textures, with
+   * texture refs already rewritten into loadable srcs). `null` for vanilla ids —
+   * the UI resolves those from the CDN mirror — and when nothing resolves.
+   */
+  getModdedBlockModel(
+    registryId: string,
+    blockId: string,
+    states: Record<string, string>
+  ): Promise<CompiledModel | null>;
+
+  /**
    * A connected block's shape → variant map (`connections`), or `null` when the
    * block isn't a connected block (fence/bars/wall). The 3D preview uses it to
    * resolve a converted block's corner/T/cross variant without pulling every

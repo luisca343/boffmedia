@@ -21,6 +21,12 @@ export interface ModelRef {
   y?: number;
   /** Keep UVs world-aligned despite x/y rotation. (Deferred — see compiler.) */
   uvlock?: boolean;
+  /**
+   * Texture overrides declared beside the ref rather than on the model. Vanilla
+   * has no such thing; Forge v1 relies on it — a modded block usually points
+   * every variant at one shared model and varies only this map.
+   */
+  textures?: Record<string, string>;
 }
 
 /** A blockstate `when` predicate: `{ key: "a|b" }` (OR within a value) or `{ OR: [...] }`. */
@@ -119,4 +125,14 @@ export interface AssetProvider {
    * a block fall back across version refs; a single source (mod JAR) returns one.
    */
   textureCandidates(ref: string): string[];
+  /**
+   * Rewrite a block id + states into the form this provider's asset tree uses,
+   * before any blockstate is fetched. Only the pre-flattening CDN tree needs it
+   * (see `legacy-compat.ts`); providers whose assets already match the loader's
+   * modern ids omit it.
+   */
+  adaptStates?(blockId: string, states: Record<string, string>): {
+    blockId: string;
+    states: Record<string, string>;
+  };
 }

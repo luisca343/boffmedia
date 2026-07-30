@@ -45,12 +45,54 @@ function dataVersionOf(structure: SchematicStructure): number {
   return typeof dv === "number" && dv > 0 ? dv : DEFAULT_DATA_VERSION;
 }
 
-function paletteCompound(structure: SchematicStructure): Tag {
+/**
+ * The palette as the format needs it: one entry per distinct blockstate string,
+ * numbered densely from 0, with `blockData` remapped onto the new numbering.
+ *
+ * The format's palette is an NBT *compound keyed by the blockstate string*, so
+ * two palette entries that serialize identically are the same key. Conversion
+ * produces such pairs routinely — several pre-flattening `id:meta` combinations
+ * collapse onto one modern state — and writing them straight out silently kept
+ * only the last one's index. Everything referencing the earlier index then
+ * pointed at a palette entry that no longer existed: WorldEdit rejects the file
+ * outright ("Block palette size does not match expected size", its check that
+ * `Palette` has exactly `PaletteMax` entries), and a reader that tolerated the
+ * count would still have lost those blocks.
+ *
+ * Deduplicating here rather than upstream keeps the structure's palette indices
+ * stable for everything else (block entities, the viewer, the diff) — this is a
+ * concern of the file format, not of the model.
+ */
+function canonicalPalette(structure: SchematicStructure): {
+  palette: Tag;
+  blockData: Int32Array;
+  size: number;
+} {
+  const indexOfState = new Map<string, number>();
+  const remap = new Int32Array(structure.palette.length);
   const paletteTag: Record<string, Tag> = {};
+
   structure.palette.forEach((block, i) => {
-    paletteTag[serializeBlockState(block)] = Int(i);
+    const state = serializeBlockState(block);
+    let index = indexOfState.get(state);
+    if (index === undefined) {
+      index = indexOfState.size;
+      indexOfState.set(state, index);
+      paletteTag[state] = Int(index);
+    }
+    remap[i] = index;
   });
-  return Compound(paletteTag);
+
+  const src = structure.blockData;
+  const blockData = new Int32Array(src.length);
+  for (let i = 0; i < src.length; i++) {
+    const old = src[i];
+    // An out-of-range index would otherwise become a silent 0 (usually air); the
+    // palette is built from the same structure, so this only guards corruption.
+    blockData[i] = old >= 0 && old < remap.length ? remap[old] : 0;
+  }
+
+  return { palette: Compound(paletteTag), blockData, size: indexOfState.size };
 }
 
 /** The TE's NBT compound minus Id/Pos (those are carried by dedicated keys). */
@@ -102,7 +144,8 @@ function capacityHint(structure: SchematicStructure, blockBytes: Uint8Array): nu
 function writeSchemV2(structure: SchematicStructure): Uint8Array {
   const { x: width, y: height, z: length } = structure.dimensions;
   const off = offsetOf(structure);
-  const blockBytes = encodeVarintArray(structure.blockData);
+  const { palette, blockData, size } = canonicalPalette(structure);
+  const blockBytes = encodeVarintArray(blockData);
   const root: Record<string, Tag> = {
     Version: Int(2),
     DataVersion: Int(dataVersionOf(structure)),
@@ -110,8 +153,9 @@ function writeSchemV2(structure: SchematicStructure): Uint8Array {
     Height: Short(height),
     Length: Short(length),
     Offset: IntArr(Int32Array.of(off.x, off.y, off.z)),
-    PaletteMax: Int(structure.palette.length),
-    Palette: paletteCompound(structure),
+    // Must equal the number of Palette entries, not the source palette's length.
+    PaletteMax: Int(size),
+    Palette: palette,
     BlockData: ByteArr(blockBytes),
     BlockEntities: List(NBT_TAG.Compound, blockEntitiesV2(structure)),
     Metadata: metadataCompound(structure),
@@ -130,10 +174,12 @@ function writeSchemV3(structure: SchematicStructure): Uint8Array {
   const { x: width, y: height, z: length } = structure.dimensions;
   const off = offsetOf(structure);
   // v3 nests block fields under `Blocks` and wraps the whole document in a
-  // `Schematic` compound at the (unnamed) root.
-  const blockBytes = encodeVarintArray(structure.blockData);
+  // `Schematic` compound at the (unnamed) root. v3 has no PaletteMax, but the
+  // duplicate-state collapse would lose blocks here just the same.
+  const { palette, blockData } = canonicalPalette(structure);
+  const blockBytes = encodeVarintArray(blockData);
   const blocks = Compound({
-    Palette: paletteCompound(structure),
+    Palette: palette,
     Data: ByteArr(blockBytes),
     BlockEntities: List(NBT_TAG.Compound, blockEntitiesV3(structure)),
   });

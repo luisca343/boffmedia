@@ -61,9 +61,11 @@ export { fluidColor } from "./fluid-color";
 export {
   SchematicAssetProvider,
   useConnectionsLoader,
+  useModdedModelLoader,
   useModelLoader,
   useTextureLoader,
   type ConnectionsLoader,
+  type ModdedModelLoader,
   type ModelLoader,
   type TextureLoader,
 } from "./assetLoaders";
