@@ -93,10 +93,7 @@ export class PasaporteRepository {
         .from(rotomUserAchievements)
         .innerJoin(
           rotomAchievements,
-          eq(
-            rotomAchievements.id,
-            rotomUserAchievements.achievementId,
-          ),
+          eq(rotomAchievements.id, rotomUserAchievements.achievementId),
         )
         .where(
           and(
@@ -141,10 +138,9 @@ export class PasaporteRepository {
     const completions = this.db
       .select({
         achievementId: rotomUserAchievements.achievementId,
-        players:
-          sql<number>`count(distinct ${rotomUserAchievements.uuid})`.as(
-            'players',
-          ),
+        players: sql<number>`count(distinct ${rotomUserAchievements.uuid})`.as(
+          'players',
+        ),
       })
       .from(rotomUserAchievements)
       .where(eq(rotomUserAchievements.completed, 1))
@@ -173,10 +169,7 @@ export class PasaporteRepository {
       .leftJoin(
         rotomUserAchievements,
         and(
-          eq(
-            rotomAchievements.id,
-            rotomUserAchievements.achievementId,
-          ),
+          eq(rotomAchievements.id, rotomUserAchievements.achievementId),
           eq(rotomUserAchievements.uuid, uuid),
         ),
       )
@@ -249,10 +242,7 @@ export class PasaporteRepository {
         createdAt: rotomReplays.createdAt,
       })
       .from(rotomUserReplays)
-      .innerJoin(
-        rotomReplays,
-        eq(rotomReplays.id, rotomUserReplays.replayId),
-      )
+      .innerJoin(rotomReplays, eq(rotomReplays.id, rotomUserReplays.replayId))
       .where(
         and(
           eq(rotomUserReplays.uuid, uuid),
@@ -282,14 +272,8 @@ export class PasaporteRepository {
     const rows = await this.db
       .select({ uuid: rotomUserReplays.uuid, lp })
       .from(rotomUserReplays)
-      .innerJoin(
-        rotomReplays,
-        eq(rotomReplays.id, rotomUserReplays.replayId),
-      )
-      .innerJoin(
-        rotomUsers,
-        eq(rotomUsers.uuid, rotomUserReplays.uuid),
-      )
+      .innerJoin(rotomReplays, eq(rotomReplays.id, rotomUserReplays.replayId))
+      .innerJoin(rotomUsers, eq(rotomUsers.uuid, rotomUserReplays.uuid))
       .where(between(rotomReplays.createdAt, startsAt, endsAt))
       .groupBy(rotomUserReplays.uuid)
       .orderBy(desc(lp), asc(rotomUserReplays.uuid));

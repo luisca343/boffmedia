@@ -36,6 +36,9 @@ export function SchematicViewer3D() {
   const navMode = useToolStore((s) => s.navMode);
   const setNavMode = useToolStore((s) => s.setNavMode);
   const setSelectedBlock = useToolStore((s) => s.setSelectedBlock);
+  const isolate = useToolStore((s) => s.isolate);
+  const focusIndex = useToolStore((s) => s.focusIndex);
+  const focusNonce = useToolStore((s) => s.focusNonce);
   // Schematic blocks come from the source instance — resolve their textures
   // against the source registry's version (vanilla CDN) and id (mod JARs).
   // In "converted" mode, changed blocks instead resolve against the target
@@ -74,6 +77,13 @@ export function SchematicViewer3D() {
     (id: string | undefined) => setSelectedBlock(id),
     [setSelectedBlock],
   );
+  // Store meets renderer only here (store-free invariant): the store's
+  // lightweight {index,nonce} focus request becomes the FocusRequest prop
+  // scene.tsx resolves into a world-space fly-to goal.
+  const focus = useMemo(
+    () => (focusIndex !== null ? { index: focusIndex, nonce: focusNonce } : null),
+    [focusIndex, focusNonce],
+  );
 
   // Concat the selected structures' geometry into the single pair of arrays the
   // store-free renderer expects. Small (a structure is tens of boxes), so
@@ -92,8 +102,11 @@ export function SchematicViewer3D() {
     }
     const boxes = new Float32Array(boxLen);
     const corners = cornerLen > 0 ? new Float32Array(cornerLen) : undefined;
+    // 6 bounds floats per 24 corner floats (one clip AABB per transformable box).
+    const cornerBounds = cornerLen > 0 ? new Float32Array(cornerLen / 4) : undefined;
     let bo = 0;
     let co = 0;
+    let cb = 0;
     for (const s of picked) {
       boxes.set(s.boxes, bo);
       bo += s.boxes.length;
@@ -101,8 +114,12 @@ export function SchematicViewer3D() {
         corners.set(s.corners, co);
         co += s.corners.length;
       }
+      if (cornerBounds && s.cornerBounds) {
+        cornerBounds.set(s.cornerBounds, cb);
+        cb += s.cornerBounds.length;
+      }
     }
-    return { boxes, corners };
+    return { boxes, corners, cornerBounds };
   }, [selectedStructureIdx, littleTileStructures]);
 
   if (!schematic) return <Empty>{t("preview.emptyNoSchematic")}</Empty>;
@@ -125,6 +142,8 @@ export function SchematicViewer3D() {
       target={target}
       loaders={loaders}
       flyLabels={flyLabels}
+      isolate={isolate}
+      focus={focus}
       {...overrides}
     />
   );

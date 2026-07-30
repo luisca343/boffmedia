@@ -53,10 +53,7 @@ export class AppsService {
     return this.appsRepository.create(createAppDto);
   }
 
-  async updateApp(
-    id: number,
-    updateAppDto: UpdateAppDto,
-  ): Promise<RotomApp> {
+  async updateApp(id: number, updateAppDto: UpdateAppDto): Promise<RotomApp> {
     const existingApp = await this.getAppById(id);
 
     // Check for duplicate URL if updating URL

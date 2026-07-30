@@ -25,6 +25,20 @@ export {
 } from "./block-instances";
 export { LittleTileHighlight, type LittleTileHighlightProps } from "./littletile-highlight";
 export { CameraRig, FlyRig, type FlyRigProps } from "./camera-rigs";
+export { FocusRig, type FocusGoal, type FocusRigProps } from "./focus-rig";
+export { SelectionOverlay, type SelectionOverlayProps } from "./selection-overlay";
+export {
+  FOCUS_SPAN,
+  cameraGoalFor,
+  cycleIndex,
+  instanceCenterAt,
+  instanceCenterInGroup,
+  instanceCounts,
+  navigableCount,
+  structureCenterOf,
+  type FocusRequest,
+  type InstanceCounts,
+} from "./focus-target";
 export { FlyHud, useFlyHud, type FlyHudLabels, type FlyHudRefs } from "./fly-hud";
 export { sourcePlan, type RenderKind, type RenderPlan } from "./render-plan";
 export { makeMaterial, styleParams, surfaceColor, type StyleParams } from "./material";

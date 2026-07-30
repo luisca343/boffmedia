@@ -260,7 +260,8 @@ export class HaciendaService {
 
     const byCode = new Map<string, number>();
     for (const t of tx) {
-      if (t.toAccountId !== treasuryId || t.type !== TransactionType.TASA) continue;
+      if (t.toAccountId !== treasuryId || t.type !== TransactionType.TASA)
+        continue;
       const reason = t.reason ?? '';
       // The code is a short token (TAS-PARCELA); match it inside the free-text reason.
       const code = reason.match(/TAS-[A-Z0-9_-]+/)?.[0];

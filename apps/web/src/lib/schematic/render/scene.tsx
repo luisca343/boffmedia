@@ -9,6 +9,15 @@ import { BlockInstances, type BlockVariantResolver } from "./block-instances";
 import { LittleTileInstances } from "./littletile-instances";
 import { LittleTileHighlight } from "./littletile-highlight";
 import { CameraRig, FlyRig } from "./camera-rigs";
+import { FocusRig, type FocusGoal } from "./focus-rig";
+import { SelectionOverlay } from "./selection-overlay";
+import {
+  cameraGoalFor,
+  instanceCenterInGroup,
+  structureCenterOf,
+  FOCUS_SPAN,
+  type FocusRequest,
+} from "./focus-target";
 import type { FlyHudRefs } from "./fly-hud";
 import { buildPickIndex } from "./picking";
 import { sourcePlan, type RenderPlan } from "./render-plan";
@@ -59,13 +68,26 @@ export interface SchematicSceneProps extends RenderOverrides {
    * structure). Same array layouts as {@link LittleTilesGroup}. Optional so
    * hosts without structure selection never mention it.
    */
-  structureHighlight?: { boxes: Float32Array; corners?: Float32Array } | null;
+  structureHighlight?: {
+    boxes: Float32Array;
+    corners?: Float32Array;
+    cornerBounds?: Float32Array;
+  } | null;
   dimensions?: { x: number; y: number; z: number };
   layerY: number;
   selectedBlockId?: string;
   navMode: NavMode;
   /** Toggling is handled here; the host just stores what it is told. */
   onSelect: (blockId: string | undefined) => void;
+  /**
+   * RF-01/02/03 fly-to request: an index into the active selection's combined
+   * instance list, resolved here (this component has `groups`/`structureHighlight`)
+   * into a world-space goal and handed to {@link FocusRig}. A nonce bump — not a
+   * position change — is what retriggers the animation (RF-03 wrap-around).
+   */
+  focus?: FocusRequest | null;
+  /** RF-05: dims every non-selected block group to the existing ghost look. */
+  isolate?: boolean;
   source: RenderEnvironment;
   target?: RenderEnvironment;
   loaders: AssetLoaders;
@@ -100,6 +122,8 @@ export function SchematicScene({
   planFor,
   statesFor,
   resolveVariant,
+  focus = null,
+  isolate = false,
 }: SchematicSceneProps) {
   // Read inside the frame loop and in click handlers, never during render.
   const layerYRef = useRef(layerY);
@@ -132,9 +156,42 @@ export function SchematicScene({
   // raycasting instanced meshes.
   const pickIndex = useMemo(() => (fly ? buildPickIndex(groups, dims) : null), [fly, groups, dims]);
 
+  // The selected block group, if any — shared by the RF-06 outline and the
+  // RF-01/02 focus resolution below.
+  const selectedGroup = useMemo(
+    () => (selectedBlockId ? groups.find((g) => g.block.id === selectedBlockId) : undefined),
+    [groups, selectedBlockId],
+  );
+  // RF-05: isolate dims every group but the current selection (block or LT
+  // structure) to the existing ghost look — no change to material.ts.
+  const isolateActive = isolate && (!!selectedBlockId || !!structureHighlight);
+
+  // RF-01/02/03: resolve the {index,nonce} request into a world-space goal.
+  // Block selections index the group's combined surface+interior positions;
+  // structure selections fly to the merged selection's centroid (structures
+  // aren't cycled today, so the index is unused there).
+  const focusGoal = useMemo<FocusGoal | null>(() => {
+    if (!focus) return null;
+    const center = selectedGroup
+      ? instanceCenterInGroup(selectedGroup, focus.index)
+      : structureHighlight
+        ? structureCenterOf(structureHighlight)
+        : null;
+    if (!center) return null;
+    const goal = cameraGoalFor(center, FOCUS_SPAN);
+    return { ...goal, nonce: focus.nonce };
+  }, [focus, selectedGroup, structureHighlight]);
+
   return (
     <>
       <CameraRig dimensions={dims} />
+      {selectedGroup && (
+        <SelectionOverlay
+          positions={selectedGroup.positions}
+          interiorPositions={selectedGroup.interiorPositions}
+          maxLayerY={layerY}
+        />
+      )}
       {fly ? (
         <FlyRig
           span={span}
@@ -148,6 +205,11 @@ export function SchematicScene({
       ) : (
         <OrbitControls makeDefault target={orbitTarget} />
       )}
+      {/* Must mount AFTER FlyRig: both subscribe useFrame at priority 0 (a
+          positive priority would switch R3F to manual rendering and blank the
+          canvas), so subscription order is what lets the focus animation win
+          over FlyRig's write within a frame. */}
+      <FocusRig focus={focusGoal} />
       {/* Distance fog is a fly-only horizon cue: at orbit distance (≈2.2×span)
           it would wash out the whole build. */}
       {fly && <fog attach="fog" args={["#0f172a", span * 1.6, span * 5.5]} />}
@@ -173,7 +235,9 @@ export function SchematicScene({
           group,
           textureId: plan.textureId,
           states,
-          kind: plan.kind,
+          // RF-05: everything but the selection ghosts while isolate is on —
+          // the existing dim path (opacity 0.3, depthWrite false), no new one.
+          kind: isolateActive && block.id !== selectedBlockId ? "ghost" : plan.kind,
           isSelected: block.id === selectedBlockId,
           maxLayerY: layerY,
           version: plan.useTarget ? (target?.version ?? source.version) : source.version,
@@ -217,7 +281,11 @@ export function SchematicScene({
         );
       })}
       {structureHighlight && (
-        <LittleTileHighlight boxes={structureHighlight.boxes} corners={structureHighlight.corners} />
+        <LittleTileHighlight
+          boxes={structureHighlight.boxes}
+          corners={structureHighlight.corners}
+          cornerBounds={structureHighlight.cornerBounds}
+        />
       )}
     </>
   );

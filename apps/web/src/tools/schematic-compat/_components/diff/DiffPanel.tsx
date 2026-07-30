@@ -1,72 +1,34 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode, type RefObject } from "react";
 import { useTranslations } from "next-intl";
 import { Button, Icon } from "@/components/boffmedia/primitives";
 import type { SchRing } from "@/components/boffmedia/ui/schematic";
 import { FilterChips } from "./FilterChips";
-import { MappingCard } from "./MappingCard";
+import { MappingCard, MAPPING_CARD_HEIGHT } from "./MappingCard";
 import { BulkRulesSheet } from "./BulkRulesSheet";
 import { StructuresSection } from "./StructuresSection";
-import type { BulkAction, SchDiffEntry, SchStatus } from "../ui/sch-tokens";
+import {
+  RING_CLASS,
+  STATUS_KEY,
+  buildBulkGroups,
+  buildGroups,
+  previewRowsFor,
+  remapSuffix,
+  toSchEntry,
+  type DiffGroup,
+} from "./diff-groups";
+import { entryMatches } from "./diff-search";
+import { useGridWindow } from "./grid-window";
+import type { BulkAction, SchStatus } from "../ui/sch-tokens";
 import { selectEnv, useToolStore } from "../../_store/tool.store";
+import type { ResolutionChoice } from "../../_store/conversion.slice";
 import type { DiffEntry } from "@/lib/schematic/types";
-import { BlockThumb, type PreviewRow } from "@/components/boffmedia/ui/schematic";
+import { BlockThumb } from "@/components/boffmedia/ui/schematic";
 
-// Missing and mod-only are merged into a single red "missing" group (mod-only
-// rows carry a "mod" pill), so mod-only is bucketed under "missing".
-const GROUP_ORDER: SchStatus[] = ["missing", "state-changed", "renamed", "safe"];
-
-/** Maps an engine status to its `diff.*` translation key. */
-const STATUS_KEY: Record<SchStatus, string> = {
-  safe: "diff.safe",
-  renamed: "diff.renamed",
-  "state-changed": "diff.stateChanged",
-  missing: "diff.missing",
-  "mod-only": "diff.missing",
-};
-
-/** Collapse mod-only into the missing bucket for grouping + filtering. */
-function bucketOf(status: SchStatus): SchStatus {
-  return status === "mod-only" ? "missing" : status;
-}
-
-const RING_CLASS: Record<Exclude<SchRing, null>, string> = {
-  safe: "ring-1 ring-ok/60",
-  warn: "ring-1 ring-warn/60",
-  bad: "ring-1 ring-bad/60",
-};
-
-/** Suffix-preserving remap: `create:oak_log` → `<targetNs>:oak_log`, if it exists. */
-function remapSuffix(blockId: string, targetSet: Set<string>, targetNs: string): string | null {
-  const colon = blockId.indexOf(":");
-  if (colon === -1) return null;
-  const candidate = `${targetNs}:${blockId.slice(colon + 1)}`;
-  return targetSet.has(candidate) ? candidate : null;
-}
-
-/** Rows shown in a source block's hover-preview card: status, count, then states. */
-function previewRowsFor(e: DiffEntry, t: (key: string) => string): PreviewRow[] {
-  const rows: PreviewRow[] = [
-    { label: t("diff.statusLabel"), value: t(STATUS_KEY[e.status]) },
-    { label: t("diff.instancesLabel"), value: e.instanceCount.toLocaleString() },
-  ];
-  for (const [k, v] of Object.entries(e.block.states ?? {})) {
-    rows.push({ label: k, value: String(v) });
-  }
-  return rows;
-}
-
-/** Adapt an engine DiffEntry to the presentational SchDiffEntry shape. */
-function toSchEntry(e: DiffEntry): SchDiffEntry {
-  return {
-    block: { id: e.block.id, namespace: e.block.namespace, states: e.block.states },
-    status: e.status,
-    instanceCount: e.instanceCount,
-    autoCandidate: e.autoCandidate?.id,
-    incompatibleStates: e.incompatibleStates,
-  };
-}
+/** Row stride for the windowed grids: card height + the grid's own row gap (`gap-[0.5rem]`). */
+const GRID_GAP = 8;
+const MIN_COL_WIDTH = 260;
 
 export function DiffPanel() {
   const t = useTranslations("games.minecraft.schematicCompat");
@@ -91,62 +53,28 @@ export function DiffPanel() {
   const targetNs = targetGame === "hytale" ? "hytale" : "minecraft";
   const airId = `${targetNs}:air`;
 
-  const [query, setQuery] = useState("");
-  const [showSafe, setShowSafe] = useState(false);
-  const [filter, setFilter] = useState<SchStatus | null>(null);
+  // RF-12: query/showSafe/filter live in their own slice so they survive
+  // DiffPanel unmounting under the E-front tabbed layout.
+  const query = useToolStore((s) => s.query);
+  const setQuery = useToolStore((s) => s.setQuery);
+  const showSafe = useToolStore((s) => s.showSafe);
+  const setShowSafe = useToolStore((s) => s.setShowSafe);
+  const filter = useToolStore((s) => s.filter);
+  const setFilter = useToolStore((s) => s.setFilter);
   const [sheet, setSheet] = useState(false);
   const listRef = useRef<HTMLDivElement>(null);
-
-  // Scroll to the selected entry when the 3D viewer selects a block.
-  useEffect(() => {
-    if (!selectedBlockId || !listRef.current) return;
-    const el = listRef.current.querySelector<HTMLElement>(`[data-block-id="${CSS.escape(selectedBlockId)}"]`);
-    el?.scrollIntoView({ behavior: "smooth", block: "nearest" });
-  }, [selectedBlockId]);
 
   const targetSet = useMemo(() => new Set(targetBlockIds), [targetBlockIds]);
 
   const groups = useMemo(() => {
-    if (!diff) return [];
     const q = query.trim().toLowerCase();
-    const byStatus = new Map<SchStatus, DiffEntry[]>();
-    for (const entry of diff.entries) {
-      const bucket = bucketOf(entry.status);
-      if (filter && bucket !== filter) continue;
-      if (!filter && !showSafe && entry.status === "safe") continue;
-      if (q && !entry.block.id.toLowerCase().includes(q)) continue;
-      const list = byStatus.get(bucket) ?? [];
-      list.push(entry);
-      byStatus.set(bucket, list);
-    }
-    return GROUP_ORDER.filter((s) => byStatus.has(s)).map((status) => {
-      let entries = byStatus.get(status)!;
-      if (status === "missing") {
-        entries = [...entries].sort((a, b) => b.instanceCount - a.instanceCount);
-      }
-      return { status, entries };
-    });
-  }, [diff, query, showSafe, filter]);
+    return buildGroups(diff, { filter, showSafe }, (entry) =>
+      entryMatches(entry, q, resolutions[entry.block.id]?.targetId ?? entry.autoCandidate?.id),
+    );
+    // resolutions is a dependency (previously omitted) so RF-11 target matching re-derives.
+  }, [diff, query, showSafe, filter, resolutions]);
 
-  // Unresolved missing / mod-only blocks grouped by namespace, for bulk rules.
-  const bulkGroups = useMemo(() => {
-    if (!diff) return [];
-    const byNs = new Map<string, DiffEntry[]>();
-    for (const entry of diff.entries) {
-      if (entry.status !== "missing" && entry.status !== "mod-only") continue;
-      if (resolutions[entry.block.id]) continue;
-      const list = byNs.get(entry.block.namespace) ?? [];
-      list.push(entry);
-      byNs.set(entry.block.namespace, list);
-    }
-    return [...byNs.entries()]
-      .sort(([a], [b]) => a.localeCompare(b))
-      .map(([namespace, entries]) => ({
-        namespace,
-        entries,
-        remap: entries.filter((e) => remapSuffix(e.block.id, targetSet, targetNs) !== null).length,
-      }));
-  }, [diff, resolutions, targetSet, targetNs]);
+  const bulkGroups = useMemo(() => buildBulkGroups(diff, resolutions, targetSet, targetNs), [diff, resolutions, targetSet, targetNs]);
 
   const unresolved = bulkGroups.reduce((s, g) => s + g.entries.length, 0);
 
@@ -191,7 +119,7 @@ export function DiffPanel() {
     <div className="flex h-full flex-col">
       {/* diff bar */}
       <div className="shrink-0 sticky top-0 z-[5] flex flex-col gap-[11px] py-[13px] px-4 border-b border-line bg-[color-mix(in_srgb,var(--bg)_88%,transparent)] backdrop-blur-[8px]">
-        <FilterChips chips={chips} active={filter} onToggle={(k) => setFilter((c) => (c === k ? null : k))} />
+        <FilterChips chips={chips} active={filter} onToggle={(k) => setFilter(filter === k ? null : k)} />
         <div className="flex items-center gap-2">
           <div className="flex-1 flex items-center gap-2 px-2.5 h-8 bg-panel border border-solid border-line text-txt-dim focus-within:border-accent-line focus-within:text-txt-muted">
             <Icon name="search" size={14} className="shrink-0" />
@@ -205,7 +133,7 @@ export function DiffPanel() {
           </div>
           <button
             type="button"
-            onClick={() => setShowSafe((v) => !v)}
+            onClick={() => setShowSafe(!showSafe)}
             disabled={filter !== null}
             className={
               "shrink-0 h-8 px-[11px] border border-solid font-mono text-[11px] cursor-pointer whitespace-nowrap transition-[color,border-color,background] duration-[140ms] disabled:opacity-40 disabled:cursor-default " +
@@ -233,65 +161,150 @@ export function DiffPanel() {
         {groups.length === 0 ? (
           <div className="text-center text-[13px] text-txt-dim py-[30px]">{t("diff.noMatching")}</div>
         ) : (
-          groups.map((group) => {
-            return (
-              <section key={group.status} className="flex flex-col gap-[7px]">
-                <div className="flex items-center gap-2 font-mono text-[10.5px] tracking-[0.12em] uppercase text-txt-muted">
-                  {t(STATUS_KEY[group.status])}
-                  <span className="grid place-items-center min-w-[18px] h-4 px-1 bg-panel-2 text-txt-dim font-semibold">
-                    {group.entries.length}
-                  </span>
-                </div>
-                {/* 2–3 column grid (by available width) so block thumbnails get room. */}
-                <div className="grid grid-cols-[repeat(auto-fill,minmax(260px,1fr))] gap-[0.5rem]">
-                  {group.entries.map((entry) => {
-                    const sch = toSchEntry(entry);
-                    const selected = selectedBlockId === entry.block.id;
-                    const onSelect = () => setSelectedBlock(selected ? undefined : entry.block.id);
-                    const onResolve = (blockId: string, target: string) => {
-                      if (target) setResolution(entry.block, target);
-                      else clearResolution(blockId);
-                    };
-                    const renderThumb = (id: string, size: number, ring?: SchRing): ReactNode => {
-                      const isSource = id === entry.block.id;
-                      return (
-                        <BlockThumb
-                          blockId={id}
-                          version={isSource ? sourceVersion : targetVersion}
-                          registryId={isSource ? sourceRegId : targetRegId}
-                          size={size}
-                          ringClassName={ring ? RING_CLASS[ring] : undefined}
-                          previewRows={isSource ? previewRowsFor(entry, t) : undefined}
-                          // Always lazy: the replacement dropdown renders the whole
-                          // target registry (thousands of blocks), so eager loading
-                          // would fire thousands of texture fetches on open. Visible
-                          // row/card thumbs still load immediately via the observer.
-                          lazy
-                        />
-                      );
-                    };
-                    return (
-                      <div key={entry.block.id} data-block-id={entry.block.id} className="min-w-0">
-                        <MappingCard
-                          entry={sch}
-                          options={targetBlockIds}
-                          resolution={resolutions[entry.block.id]?.targetId}
-                          onResolve={onResolve}
-                          selected={selected}
-                          onSelect={onSelect}
-                          renderThumb={renderThumb}
-                        />
-                      </div>
-                    );
-                  })}
-                </div>
-              </section>
-            );
-          })
+          groups.map((group) => (
+            <GroupGrid
+              key={group.status}
+              group={group}
+              scrollRef={listRef}
+              selectedBlockId={selectedBlockId}
+              targetBlockIds={targetBlockIds}
+              resolutions={resolutions}
+              sourceVersion={sourceVersion}
+              targetVersion={targetVersion}
+              sourceRegId={sourceRegId}
+              targetRegId={targetRegId}
+              t={t}
+              onSelect={(id) => setSelectedBlock(selectedBlockId === id ? undefined : id)}
+              onResolve={(entry, blockId, target) => {
+                if (target) setResolution(entry.block, target);
+                else clearResolution(blockId);
+              }}
+            />
+          ))
         )}
       </div>
 
       <BulkRulesSheet open={sheet} groups={bulkGroups} onClose={() => setSheet(false)} onApply={applyBulk} />
     </div>
+  );
+}
+
+/**
+ * One status section's grid, windowed independently (B2/RF-09). Rendered as a
+ * component (not a hook called inside the parent's .map()) so each section
+ * owns its own `useGridWindow` instance without breaking the rules of hooks.
+ */
+function GroupGrid({
+  group,
+  scrollRef,
+  selectedBlockId,
+  targetBlockIds,
+  resolutions,
+  sourceVersion,
+  targetVersion,
+  sourceRegId,
+  targetRegId,
+  t,
+  onSelect,
+  onResolve,
+}: {
+  group: DiffGroup;
+  scrollRef: RefObject<HTMLDivElement | null>;
+  selectedBlockId?: string;
+  targetBlockIds: string[];
+  resolutions: Record<string, ResolutionChoice>;
+  sourceVersion?: string;
+  targetVersion?: string;
+  sourceRegId?: string;
+  targetRegId?: string;
+  t: (key: string, values?: Record<string, string | number | Date>) => string;
+  onSelect: (id: string) => void;
+  onResolve: (entry: DiffEntry, blockId: string, target: string) => void;
+}) {
+  const { gridRef, columns, startRow, endRow, topPad, bottomPad, scrollToIndex } = useGridWindow(scrollRef, {
+    itemCount: group.entries.length,
+    rowHeight: MAPPING_CARD_HEIGHT + GRID_GAP,
+    minColWidth: MIN_COL_WIDTH,
+    gap: GRID_GAP,
+  });
+
+  // RF-10: fly the windowed grid to the selected entry's row when the 3D
+  // viewer selects a block that is off-screen (replaces the old
+  // querySelector(...).scrollIntoView effect, which cannot find a DOM node
+  // for a row that windowing never mounted).
+  useEffect(() => {
+    if (!selectedBlockId) return;
+    const index = group.entries.findIndex((e) => e.block.id === selectedBlockId);
+    if (index === -1) return;
+    scrollToIndex(index);
+  }, [selectedBlockId, group.entries, scrollToIndex]);
+
+  const cols = columns || 1;
+  const start = Math.min(startRow * cols, group.entries.length);
+  const end = Math.min((endRow + 1) * cols, group.entries.length);
+  const visible = group.entries.slice(start, end);
+
+  return (
+    <section className="flex flex-col gap-[7px]">
+      <div className="flex items-center gap-2 font-mono text-[10.5px] tracking-[0.12em] uppercase text-txt-muted">
+        {t(STATUS_KEY[group.status])}
+        <span className="grid place-items-center min-w-[18px] h-4 px-1 bg-panel-2 text-txt-dim font-semibold">
+          {group.entries.length}
+        </span>
+      </div>
+      {/* 2–3 column grid (by available width) so block thumbnails get room. */}
+      <div
+        ref={gridRef}
+        style={{ paddingTop: topPad, paddingBottom: bottomPad }}
+        className="grid grid-cols-[repeat(auto-fill,minmax(260px,1fr))] gap-[0.5rem]"
+      >
+        {visible.map((entry) => {
+          const sch = toSchEntry(entry);
+          const selected = selectedBlockId === entry.block.id;
+          const renderThumb = (id: string, size: number, ring?: SchRing): ReactNode => {
+            const isSource = id === entry.block.id;
+            return (
+              <BlockThumb
+                blockId={id}
+                version={isSource ? sourceVersion : targetVersion}
+                registryId={isSource ? sourceRegId : targetRegId}
+                size={size}
+                ringClassName={ring ? RING_CLASS[ring] : undefined}
+                previewRows={isSource ? previewRowsFor(entry, t) : undefined}
+                // Always lazy: the replacement dropdown renders the whole
+                // target registry (thousands of blocks), so eager loading
+                // would fire thousands of texture fetches on open. Visible
+                // row/card thumbs still load immediately via the observer.
+                lazy
+              />
+            );
+          };
+          // A block id is only unique WITHIN one diffPopulation() pass — the
+          // same id can get a second, separate DiffEntry when it also shows up
+          // as a LittleTiles material (see _lib/pipeline/diff.ts's two calls,
+          // one per population). `context` is what tells those apart, so it
+          // has to be part of the key; `data-block-id` stays id-only since
+          // RF-10's scrollToIndex/selection matching intentionally lands on
+          // the first entry with that id.
+          return (
+            <div
+              key={`${entry.context ?? "block"}:${entry.block.id}`}
+              data-block-id={entry.block.id}
+              className="min-w-0"
+            >
+              <MappingCard
+                entry={sch}
+                options={targetBlockIds}
+                resolution={resolutions[entry.block.id]?.targetId}
+                onResolve={(blockId, target) => onResolve(entry, blockId, target)}
+                selected={selected}
+                onSelect={() => onSelect(entry.block.id)}
+                renderThumb={renderThumb}
+              />
+            </div>
+          );
+        })}
+      </div>
+    </section>
   );
 }

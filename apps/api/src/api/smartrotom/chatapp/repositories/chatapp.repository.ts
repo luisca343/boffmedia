@@ -167,7 +167,10 @@ export class ChatappRepository {
     await this.db
       .delete(rotomChatMembers)
       .where(
-        and(eq(rotomChatMembers.chatId, chatId), eq(rotomChatMembers.uuid, uuid)),
+        and(
+          eq(rotomChatMembers.chatId, chatId),
+          eq(rotomChatMembers.uuid, uuid),
+        ),
       );
   }
 
@@ -179,7 +182,10 @@ export class ChatappRepository {
       .select({ uuid: rotomChatMembers.uuid })
       .from(rotomChatMembers)
       .where(
-        and(eq(rotomChatMembers.chatId, chatId), eq(rotomChatMembers.uuid, uuid)),
+        and(
+          eq(rotomChatMembers.chatId, chatId),
+          eq(rotomChatMembers.uuid, uuid),
+        ),
       )
       .limit(1);
 

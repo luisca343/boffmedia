@@ -16,10 +16,7 @@ import {
   ItemRarity,
 } from '../entities/arcade-inventory.entity';
 import { Logger } from 'nestjs-pino';
-import {
-  RotomInventoryItem,
-  rotomInventory,
-} from '@/_db/schema/SmartRotom';
+import { RotomInventoryItem, rotomInventory } from '@/_db/schema/SmartRotom';
 
 @Injectable()
 export class ArcadeInventoryRepository
@@ -82,9 +79,7 @@ export class ArcadeInventoryRepository
     return this.db
       .select()
       .from(rotomInventory)
-      .where(
-        eq(rotomInventory.uuid, uuid),
-      ) as unknown as ArcadeInventoryItem[];
+      .where(eq(rotomInventory.uuid, uuid)) as unknown as ArcadeInventoryItem[];
   }
 
   async findUserItem(
@@ -95,10 +90,7 @@ export class ArcadeInventoryRepository
       .select()
       .from(rotomInventory)
       .where(
-        and(
-          eq(rotomInventory.uuid, uuid),
-          eq(rotomInventory.itemId, itemId),
-        ),
+        and(eq(rotomInventory.uuid, uuid), eq(rotomInventory.itemId, itemId)),
       )
       .limit(1);
     return (result[0] || null) as unknown as ArcadeInventoryItem | null;
@@ -129,10 +121,7 @@ export class ArcadeInventoryRepository
       .update(rotomInventory)
       .set({ amount } as RotomInventoryItem)
       .where(
-        and(
-          eq(rotomInventory.uuid, uuid),
-          eq(rotomInventory.itemId, itemId),
-        ),
+        and(eq(rotomInventory.uuid, uuid), eq(rotomInventory.itemId, itemId)),
       );
     return this.findUserItem(uuid, itemId) as Promise<ArcadeInventoryItem>;
   }
@@ -141,10 +130,7 @@ export class ArcadeInventoryRepository
     const result = await this.db
       .delete(rotomInventory)
       .where(
-        and(
-          eq(rotomInventory.uuid, uuid),
-          eq(rotomInventory.itemId, itemId),
-        ),
+        and(eq(rotomInventory.uuid, uuid), eq(rotomInventory.itemId, itemId)),
       );
     return result[0].affectedRows > 0;
   }
@@ -237,10 +223,7 @@ export class ArcadeInventoryRepository
         .select()
         .from(rotomInventory)
         .where(
-          and(
-            eq(rotomInventory.uuid, uuid),
-            eq(rotomInventory.itemId, itemId),
-          ),
+          and(eq(rotomInventory.uuid, uuid), eq(rotomInventory.itemId, itemId)),
         );
 
       const totalRemaining = updatedItems.reduce(
@@ -275,10 +258,7 @@ export class ArcadeInventoryRepository
       .select()
       .from(rotomInventory)
       .where(
-        and(
-          eq(rotomInventory.uuid, uuid),
-          eq(rotomInventory.itemType, type),
-        ),
+        and(eq(rotomInventory.uuid, uuid), eq(rotomInventory.itemType, type)),
       ) as unknown as ArcadeInventoryItem[];
   }
 
@@ -290,10 +270,7 @@ export class ArcadeInventoryRepository
       .select()
       .from(rotomInventory)
       .where(
-        and(
-          eq(rotomInventory.uuid, uuid),
-          eq(rotomInventory.rarity, rarity),
-        ),
+        and(eq(rotomInventory.uuid, uuid), eq(rotomInventory.rarity, rarity)),
       ) as unknown as ArcadeInventoryItem[];
   }
 }

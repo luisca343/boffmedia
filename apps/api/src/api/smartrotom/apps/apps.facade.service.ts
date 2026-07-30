@@ -33,10 +33,7 @@ export class AppsFacadeService {
     return this.appsService.createApp(createAppDto);
   }
 
-  async updateApp(
-    id: number,
-    updateAppDto: UpdateAppDto,
-  ): Promise<RotomApp> {
+  async updateApp(id: number, updateAppDto: UpdateAppDto): Promise<RotomApp> {
     return this.appsService.updateApp(id, updateAppDto);
   }
 

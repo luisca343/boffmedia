@@ -25,7 +25,13 @@ const STOP = {
   world: 'minecraft:overworld',
 };
 // 300 blocks away on X, so the fare is deterministic: 100 + 300 * 0.5 = 250.
-const ORIGIN = { online: true, x: 100, y: 64, z: 0, dimension: 'minecraft:overworld' };
+const ORIGIN = {
+  online: true,
+  x: 100,
+  y: 64,
+  z: 0,
+  dimension: 'minecraft:overworld',
+};
 const EXPECTED_FARE = MINIMUM_FARE + 300 * PRICE_PER_BLOCK;
 
 describe('TaxiService', () => {
@@ -187,7 +193,11 @@ describe('TaxiService', () => {
     it('charges when the player turns out to be standing at the stop', async () => {
       wingull.getPlayerPosition
         .mockResolvedValueOnce(ORIGIN)
-        .mockResolvedValueOnce({ ...STOP, online: true, dimension: 'minecraft:overworld' });
+        .mockResolvedValueOnce({
+          ...STOP,
+          online: true,
+          dimension: 'minecraft:overworld',
+        });
 
       const result = await service.takeTrip(STOP.id, UUID);
 
@@ -298,9 +308,9 @@ describe('TaxiService', () => {
         message: 'Player not online',
       });
 
-      await expect(
-        service.adminTeleport(STOP.id, UUID, ADMIN),
-      ).rejects.toThrow(UnprocessableEntityException);
+      await expect(service.adminTeleport(STOP.id, UUID, ADMIN)).rejects.toThrow(
+        UnprocessableEntityException,
+      );
       expect(auditoria.log).not.toHaveBeenCalled();
       expect(wingull.sendMessage).not.toHaveBeenCalled();
     });
@@ -315,9 +325,9 @@ describe('TaxiService', () => {
       });
       wingull.getPlayerPosition.mockClear();
 
-      await expect(
-        service.adminTeleport(STOP.id, UUID, ADMIN),
-      ).rejects.toThrow(ServiceUnavailableException);
+      await expect(service.adminTeleport(STOP.id, UUID, ADMIN)).rejects.toThrow(
+        ServiceUnavailableException,
+      );
       expect(wingull.getPlayerPosition).not.toHaveBeenCalled();
     });
   });

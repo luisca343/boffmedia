@@ -10,8 +10,6 @@ export interface IUsersRepository extends BaseRepository<
 > {
   findByUuid(uuid: string): Promise<RotomUser | null>;
   findByUsername(username: string): Promise<RotomUser | null>;
-  findByUuids(
-    uuids: string[],
-  ): Promise<{ [uuid: string]: RotomUser | null }>;
+  findByUuids(uuids: string[]): Promise<{ [uuid: string]: RotomUser | null }>;
   getUserCount(): Promise<number>;
 }

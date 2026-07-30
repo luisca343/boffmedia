@@ -54,7 +54,8 @@ export class StarbankHouseAccountService {
     // Singleton types are identified by type alone, so an account seeded under an older name
     // is still the right one — matching on the name too would mint a duplicate treasury.
     if (!existing && account.type !== AccountType.SERVICE) {
-      existing = (await this.accountRepository.findByType(account.type))[0] ?? null;
+      existing =
+        (await this.accountRepository.findByType(account.type))[0] ?? null;
     }
     if (!existing) {
       throw new NotFoundException(
@@ -80,9 +81,14 @@ export class StarbankHouseAccountService {
     reason: string,
   ): Promise<number> {
     const to = await this.resolveAccountId(account);
-    return this.move(await this.mainAccountId(fromUuid), to, amount, type, reason, [
-      fromUuid,
-    ]);
+    return this.move(
+      await this.mainAccountId(fromUuid),
+      to,
+      amount,
+      type,
+      reason,
+      [fromUuid],
+    );
   }
 
   /** House account → player. */
@@ -94,9 +100,14 @@ export class StarbankHouseAccountService {
     reason: string,
   ): Promise<number> {
     const from = await this.resolveAccountId(account);
-    return this.move(from, await this.mainAccountId(toUuid), amount, type, reason, [
-      toUuid,
-    ]);
+    return this.move(
+      from,
+      await this.mainAccountId(toUuid),
+      amount,
+      type,
+      reason,
+      [toUuid],
+    );
   }
 
   /**

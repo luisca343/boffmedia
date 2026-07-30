@@ -7,6 +7,17 @@ import { AssetThumb, type SchRing, type ThumbRenderer } from "@/components/boffm
 import { STATUS_META, TONE, type SchDiffEntry } from "../ui/sch-tokens";
 import { ReplaceSelect } from "./ReplaceSelect";
 
+/** How many state chips render before collapsing into a "+N" overflow chip. */
+const MAX_VISIBLE_STATES = 3;
+
+/**
+ * Fixed card height (B4) — every row below is reserved regardless of content
+ * (effective-target line, state chips, replace footer), so this stays exact
+ * and `grid-window.ts`'s windowing arithmetic (which assumes a uniform row
+ * stride) is valid without a measurement library.
+ */
+export const MAPPING_CARD_HEIGHT = 148;
+
 /** Verbose mapping row: source → target thumb, states, and the replace control. */
 export function MappingCard({
   entry,
@@ -33,6 +44,8 @@ export function MappingCard({
   const replaceable = entry.status !== "safe";
   const isModOnly = entry.status === "mod-only";
   const stateKeys = Object.keys(entry.block.states || {});
+  const visibleStates = stateKeys.slice(0, MAX_VISIBLE_STATES);
+  const hiddenStates = stateKeys.length - visibleStates.length;
   const thumb = (id: string, size: number, ring?: SchRing) => renderThumb?.(id, size, ring) ?? <AssetThumb id={id} size={size} ring={ring} />;
 
   return (
@@ -41,9 +54,9 @@ export function MappingCard({
       tabIndex={0}
       onClick={onSelect}
       onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && (e.preventDefault(), onSelect?.())}
-      style={{ borderLeftColor: tone.cssVar }}
+      style={{ borderLeftColor: tone.cssVar, height: MAPPING_CARD_HEIGHT }}
       className={cn(
-        "p-2.5 border border-solid border-l-[3px] cursor-pointer transition-[background,border-color] duration-[140ms]",
+        "p-2.5 border border-solid border-l-[3px] cursor-pointer overflow-hidden transition-[background,border-color] duration-[140ms]",
         selected ? "border-accent bg-accent-soft shadow-[inset_0_0_0_1px_var(--accent-line)]" : "border-line bg-panel hover:bg-panel-2",
       )}
     >
@@ -66,43 +79,61 @@ export function MappingCard({
                 </span>
               ) : null}
             </div>
-            {effective ? (
-              <div className={cn("font-mono text-[11px] pl-[13px] mt-0.5 truncate", resolution ? "text-accent-bright" : "text-[color:color-mix(in_srgb,var(--ok)_85%,var(--text))]")}>
-                → {effective}
-                {resolution ? " · " + t("diff.manual") : ""}
-              </div>
-            ) : null}
+            {/* Reserved even when no effective target, so every card in a windowed row is the same height. */}
+            <div
+              className={cn(
+                "h-[15px] font-mono text-[11px] pl-[13px] mt-0.5 truncate",
+                effective ? (resolution ? "text-accent-bright" : "text-[color:color-mix(in_srgb,var(--ok)_85%,var(--text))]") : "",
+              )}
+            >
+              {effective ? (
+                <>
+                  → {effective}
+                  {resolution ? " · " + t("diff.manual") : ""}
+                </>
+              ) : null}
+            </div>
             <div className="pl-[13px] mt-[3px] text-[11px] text-txt-dim">{t("diff.instances", { count: entry.instanceCount })}</div>
-            {stateKeys.length > 0 ? (
-              <div className="flex flex-wrap gap-[5px] pl-[13px] mt-[7px]">
-                {stateKeys.map((k) => {
-                  const bad = entry.incompatibleStates?.includes(k);
-                  return (
-                    <span key={k} className={cn("py-[2px] px-1.5 font-mono text-[10px]", bad ? "bg-bad-soft text-bad" : "bg-panel-2 text-txt-muted")}>
-                      {k}={String(entry.block.states?.[k])}
-                    </span>
-                  );
-                })}
-              </div>
-            ) : null}
+            {/* Clamped to one row (+N overflow chip) so state count never grows the card. */}
+            <div className="h-[19px] flex items-center gap-[5px] pl-[13px] mt-[7px] overflow-hidden">
+              {visibleStates.map((k) => {
+                const bad = entry.incompatibleStates?.includes(k);
+                return (
+                  <span key={k} className={cn("shrink-0 whitespace-nowrap py-[2px] px-1.5 font-mono text-[10px]", bad ? "bg-bad-soft text-bad" : "bg-panel-2 text-txt-muted")}>
+                    {k}={String(entry.block.states?.[k])}
+                  </span>
+                );
+              })}
+              {hiddenStates > 0 ? (
+                <span
+                  className="shrink-0 whitespace-nowrap py-[2px] px-1.5 font-mono text-[10px] text-txt-dim"
+                  title={stateKeys.slice(MAX_VISIBLE_STATES).join(", ")}
+                >
+                  +{hiddenStates}
+                </span>
+              ) : null}
+            </div>
           </div>
         </div>
 
-        {replaceable ? (
-          <div className="flex items-center gap-2 pl-[13px]" onClick={(e) => e.stopPropagation()}>
-            <span className="font-mono text-[9.5px] tracking-[0.08em] uppercase text-txt-dim shrink-0">{t("diff.replace")}</span>
-            <ReplaceSelect fluid value={resolution} placeholder={auto || t("diff.choose")} options={options} onChange={(v) => onResolve(entry.block.id, v)} renderThumb={renderThumb} />
-            {resolution ? (
-              <button
-                type="button"
-                onClick={() => onResolve(entry.block.id, "")}
-                className="bg-transparent border-0 text-txt-dim font-mono text-[10px] cursor-pointer underline underline-offset-2 shrink-0 hover:text-txt-muted"
-              >
-                {auto ? t("diff.auto") : t("diff.clear")}
-              </button>
-            ) : null}
-          </div>
-        ) : null}
+        {/* Footer slot always reserved (fixed height) even for non-replaceable "safe" entries. */}
+        <div className="h-8 flex items-center gap-2 pl-[13px]" onClick={(e) => e.stopPropagation()}>
+          {replaceable ? (
+            <>
+              <span className="font-mono text-[9.5px] tracking-[0.08em] uppercase text-txt-dim shrink-0">{t("diff.replace")}</span>
+              <ReplaceSelect fluid value={resolution} placeholder={auto || t("diff.choose")} options={options} onChange={(v) => onResolve(entry.block.id, v)} renderThumb={renderThumb} />
+              {resolution ? (
+                <button
+                  type="button"
+                  onClick={() => onResolve(entry.block.id, "")}
+                  className="bg-transparent border-0 text-txt-dim font-mono text-[10px] cursor-pointer underline underline-offset-2 shrink-0 hover:text-txt-muted"
+                >
+                  {auto ? t("diff.auto") : t("diff.clear")}
+                </button>
+              ) : null}
+            </>
+          ) : null}
+        </div>
       </div>
     </div>
   );

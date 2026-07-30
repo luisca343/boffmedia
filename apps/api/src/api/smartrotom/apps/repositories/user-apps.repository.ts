@@ -25,19 +25,11 @@ export class UserAppsRepository implements IUserAppsRepository {
       .where(eq(rotomUserApps.uuid, uuid));
   }
 
-  async findUserApp(
-    uuid: string,
-    appId: number,
-  ): Promise<RotomUserApp | null> {
+  async findUserApp(uuid: string, appId: number): Promise<RotomUserApp | null> {
     const result = await this.db
       .select()
       .from(rotomUserApps)
-      .where(
-        and(
-          eq(rotomUserApps.uuid, uuid),
-          eq(rotomUserApps.appId, appId),
-        ),
-      );
+      .where(and(eq(rotomUserApps.uuid, uuid), eq(rotomUserApps.appId, appId)));
     return result[0] || null;
   }
 
@@ -62,12 +54,7 @@ export class UserAppsRepository implements IUserAppsRepository {
   async removeUserApp(uuid: string, appId: number): Promise<boolean> {
     const result = await this.db
       .delete(rotomUserApps)
-      .where(
-        and(
-          eq(rotomUserApps.uuid, uuid),
-          eq(rotomUserApps.appId, appId),
-        ),
-      );
+      .where(and(eq(rotomUserApps.uuid, uuid), eq(rotomUserApps.appId, appId)));
     return result[0].affectedRows > 0;
   }
 
@@ -75,12 +62,7 @@ export class UserAppsRepository implements IUserAppsRepository {
     await this.db
       .update(rotomUserApps)
       .set({ order } as RotomUserApp)
-      .where(
-        and(
-          eq(rotomUserApps.uuid, uuid),
-          eq(rotomUserApps.appId, appId),
-        ),
-      );
+      .where(and(eq(rotomUserApps.uuid, uuid), eq(rotomUserApps.appId, appId)));
   }
 
   async resetOrderExcept(uuid: string, excludeAppIds: number[]): Promise<void> {
@@ -128,9 +110,7 @@ export class UserAppsRepository implements IUserAppsRepository {
           eq(rotomUserApps.uuid, uuid),
         ),
       )
-      .where(
-        and(eq(rotomApps.active, 1), eq(rotomUserApps.uuid, uuid)),
-      )
+      .where(and(eq(rotomApps.active, 1), eq(rotomUserApps.uuid, uuid)))
       .orderBy(asc(rotomUserApps.order));
   }
 }

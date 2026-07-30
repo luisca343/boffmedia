@@ -1,7 +1,10 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { IsEnum, IsInt, IsOptional, IsString, Max, Min } from 'class-validator';
-import { TOURNAMENT_FORMAT, TOURNAMENT_STATUS } from '@/_db/schema/BoffMediaTournaments';
+import {
+  TOURNAMENT_FORMAT,
+  TOURNAMENT_STATUS,
+} from '@/_db/schema/BoffMediaTournaments';
 import type { TournamentFormat, TournamentStatus } from '../tournaments.types';
 
 /** Optional filters/pagination for `GET /tournaments`. */

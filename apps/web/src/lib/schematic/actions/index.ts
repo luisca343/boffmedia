@@ -18,3 +18,5 @@ export { useDocumentActions, type DocumentActionsOptions } from "./useDocumentAc
 export { useEnvironmentActions, type EnvironmentActionsOptions } from "./useEnvironmentActions";
 export { useSchematicPositions } from "./useSchematicPositions";
 export { useViewerShortcuts } from "./useViewerShortcuts";
+export { useSelectionFocus, type SelectionFocusResult } from "./useSelectionFocus";
+export { useInstanceFilePicker, type UseInstanceFilePickerReturn } from "./useInstanceFilePicker";

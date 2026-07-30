@@ -309,7 +309,10 @@ export class TcgRepository implements ITcgRepository {
     }
   }
 
-  async getUserCard(userId: number, cardId: string): Promise<TcgUserCard | null> {
+  async getUserCard(
+    userId: number,
+    cardId: string,
+  ): Promise<TcgUserCard | null> {
     try {
       const result = await this.db
         .select()

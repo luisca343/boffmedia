@@ -22,15 +22,10 @@ export class UsersRepository
   }
 
   async findAll(): Promise<RotomUser[]> {
-    return this.db
-      .select()
-      .from(rotomUsers)
-      .where(gt(rotomUsers.id, 0));
+    return this.db.select().from(rotomUsers).where(gt(rotomUsers.id, 0));
   }
 
-  async create(
-    createUserDto: CreateSmartrotomUserDto,
-  ): Promise<RotomUser> {
+  async create(createUserDto: CreateSmartrotomUserDto): Promise<RotomUser> {
     const result = await this.db.insert(rotomUsers).values({
       uuid: createUserDto.uuid,
       username: createUserDto.username,
