@@ -12,6 +12,10 @@ WORKDIR /app
 # Copy workspace manifests for layer caching
 COPY package.json pnpm-workspace.yaml pnpm-lock.yaml ./
 COPY packages/shared/package.json ./packages/shared/
+# pack-schema is copied WHOLE at this stage, not just its package.json: its
+# `prepare` script compiles the package on install, and with only a manifest
+# present that tsc invocation fails and takes the whole install down.
+COPY packages/pack-schema ./packages/pack-schema
 COPY apps/api/package.json ./apps/api/
 
 RUN pnpm install --no-frozen-lockfile

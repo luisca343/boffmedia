@@ -1,0 +1,32 @@
+{
+  "name": "@boffmedia/pack-schema",
+  "version": "0.0.1",
+  "private": true,
+  "main": "./dist/cjs/index.js",
+  "types": "./dist/cjs/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/cjs/index.d.ts",
+      "import": "./dist/esm/index.js",
+      "require": "./dist/cjs/index.js"
+    }
+  },
+  "scripts": {
+    "type-check": "tsc --noEmit --skipLibCheck",
+    "test": "vitest run",
+    "build": "tsc -p tsconfig.build.json && tsc -p tsconfig.build.esm.json && node write-pkg-type.mjs && node emit-schema.mjs",
+    "prepare": "tsc -p tsconfig.build.json && tsc -p tsconfig.build.esm.json && node write-pkg-type.mjs && node emit-schema.mjs",
+    "check:schema": "node emit-schema.mjs --check"
+  },
+  "dependencies": {
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.2",
+    "vitest": "^4.1.10"
+  },
+  "files": [
+    "dist"
+  ],
+  "module": "./dist/esm/index.js"
+}

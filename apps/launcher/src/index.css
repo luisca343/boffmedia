@@ -1,0 +1,42 @@
+/* Order matters: tokens and faces before Tailwind's layers, so utilities that
+   reference var(--accent) resolve and the display face is registered before
+   first paint. */
+@import "@boffmedia/tailwind-config/base.css";
+@import "@boffmedia/tailwind-config/fonts.css";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Desktop chrome, not a web page: no rubber-banding, no text selection on
+   labels, no drag-and-drop navigation away from the app. */
+body {
+  overflow: hidden;
+  user-select: none;
+}
+
+/* …but content the user genuinely needs to copy must stay selectable. Log
+   output and identifiers are the whole point of a diagnostics screen, and a
+   blanket user-select:none silently breaks "paste me the error". */
+code,
+pre,
+input,
+textarea,
+[data-selectable],
+.font-mono {
+  user-select: text;
+}

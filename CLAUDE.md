@@ -11,8 +11,10 @@ Domain context: `.claude/context/` — load the relevant file when switching dom
 - Never edit `packages/shared/src/` — auto-generated. Run `pnpm generate:shared` after adding server DTOs.
 - Run `pnpm type-check` before marking any task done (`next.config.mjs` ignores TS build errors).
 - Do NOT cross design systems: SmartRotom (`components/smartrotom/ui/`) ↔ Boffmedia v3 (`@boffmedia/ui`, in `packages/ui/`).
-- `@boffmedia/ui` must stay host-agnostic — no `next/*`, no `next-intl`, no `@/` imports. It is shared with the Minecraft launcher. Wire hosts via `configureUi()`.
+- `@boffmedia/ui` must stay host-agnostic — no `next/*`, no `next-intl`, no `@/` imports. It is shared with `apps/launcher` (Tauri v2). Wire hosts via `configureUi()`.
 - `components/ui/primitives/` is the LEGACY shadcn layer (33 files, 69 call sites). Do not add to it; no file imports both layers today.
+- `@boffmedia/pack-schema` is consumed by `apps/api` as **compiled CJS** — it must keep its dual build and must never be aliased to `src/` by a consumer. A TS-source import type-checks and then dies at runtime (`nest build` passes, Node cannot require a `.ts`).
+- Adding a workspace package? Add it to `PACKAGES` in `scripts/typecheck-sequential.js`, or `pnpm type-check` reports green for code it never read.
 - Do NOT invent new `window.mcefQuery` shapes — extend `mcefApi.ts` using `mcefQuery<T>()`.
 - For unfamiliar modules, use the `repo-explorer` subagent to avoid burning context on large directory trees.
 
@@ -199,3 +201,18 @@ A skill is a runtime contract for an LLM, not documentation. 200-450 tokens, max
 `description` = trigger words. Long content goes to `references/`. Common rules live here,
 never duplicated in the skills.
 <!-- janus:sdd END -->
+
+## apps/launcher (Tauri v2)
+
+- UI work needs no Rust: `pnpm --filter launcher dev:renderer` runs every screen in a browser.
+- `src/runtime.ts` is the ONLY module allowed to import `@tauri-apps/*`. Screens must stay browser-runnable.
+- Build the shell on **Windows** (WebView2 = what users run). WSL means WebKitGTK, which is the flaky path.
+- Forge/NeoForge: shell out to the official installer via the managed JRE (handoff §6.4). Never reimplement `install_profile.json` processors.
+- The handoff's §4.2 recommends Electron — **superseded**, see the note in that section.
+- Core crate is `portablemc` (msa auth + Forge/NeoForge install + Java). Not lyceris.
+- Changed a zod schema in `packages/pack-schema`? Run its build and commit
+  `schema/pack-manifest.schema.json` — `src-tauri/build.rs` generates Rust from it.
+  Added a `.superRefine`? Mirror it in `src-tauri/src/pack.rs`: JSON Schema drops
+  refinements silently, so nothing else will catch it.
+- The pack server (§7) lives in `apps/api` (Nest), not a separate Rust service —
+  `rotom_users.uuid` (the Minecraft UUID) is already an FK in 27 tables.
