@@ -4,10 +4,10 @@ import Link from "next/link"
 import { use, useState } from "react"
 import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
-import { Button, Field, Input, Modal, toast, Icon, Spinner } from "@/components/boffmedia/primitives"
+import { Button, Field, Input, Modal, toast, Icon, Spinner } from "@boffmedia/ui"
 import { TnFormatBadge, TnEntrant, TnPodium } from "@/components/boffmedia/ui/tournaments"
 import { useTournament } from "@/hooks/tournaments/useTournament"
-import { useFormat } from "@/lib/useFormat"
+import { useFormat } from "@boffmedia/ui/useFormat"
 import {
   TournamentsService,
   type TournamentDetailApi,

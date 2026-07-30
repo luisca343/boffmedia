@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import type { IconName } from "@/components/boffmedia/primitives"
+import type { IconName } from "@boffmedia/ui"
 import { useFormStore, type SkyFormData } from "@/tools/pmd-sky/store"
 import { useSkyFormHandlers } from "@/tools/pmd-sky/_hooks"
 import { generateWonderMail } from "@/tools/pmd-sky/Generate"

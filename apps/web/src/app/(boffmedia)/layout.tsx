@@ -6,7 +6,7 @@ import { BackToTop } from "@/components/ui/BackToTop";
 import '../globals.css'
 import { Navbar } from "@/components/boffmedia/ui/navigation/Navbar";
 import { Footer } from "@/components/boffmedia/ui/layout/Footer";
-import { ToastStack } from "@/components/boffmedia/primitives"
+import { ToastStack } from "@boffmedia/ui"
 
 export const metadata: Metadata = {
   title: env.NODE_ENV === 'production' ? "BoffMedia" : "FicusLab",

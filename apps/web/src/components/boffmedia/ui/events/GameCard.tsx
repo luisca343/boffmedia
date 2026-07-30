@@ -4,9 +4,9 @@ import * as React from "react"
 import Link from "next/link"
 import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
-import { Badge, Icon } from "@/components/boffmedia/primitives"
+import { Badge, Icon } from "@boffmedia/ui"
 import { ArtImage } from "@/components/boffmedia/ui/tools/ArtImage"
-import { useFormat } from "@/lib/useFormat"
+import { useFormat } from "@boffmedia/ui/useFormat"
 import { formatEventDate } from "./events-util"
 
 export interface GameLike {

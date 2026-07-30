@@ -68,7 +68,7 @@ export function escrowStep(status: WpOrderStatus): number {
 }
 
 // Every figure in the app goes through `fmt` (locale-aware grouping, no symbol).
-export { formatNumber as fmt, timeAgo } from "@/lib/format"
+export { formatNumber as fmt, timeAgo } from "@boffmedia/ui/format"
 
 /** An auction's remaining time. Under an hour it counts seconds and turns urgent.
  *  `overLabel` is the caller's translated string for the "ended" state. */

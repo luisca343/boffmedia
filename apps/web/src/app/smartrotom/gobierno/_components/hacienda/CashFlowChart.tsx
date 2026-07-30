@@ -4,7 +4,7 @@ import { useTranslations } from "next-intl"
 import { Bar, Card, Empty } from "../ui"
 import { TONES } from "../../_utils/tones"
 import { money } from "../../_utils/format"
-import { useFormat } from "@/lib/useFormat"
+import { useFormat } from "@boffmedia/ui/useFormat"
 import type { Tesoreria } from "../../_types"
 
 // The sanctioned inline-SVG exception (SMARTROTOM_V3 hard rule #3): fills are drawn from

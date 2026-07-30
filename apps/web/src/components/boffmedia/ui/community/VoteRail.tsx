@@ -3,7 +3,7 @@
 import * as React from "react"
 import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
-import { Icon } from "@/components/boffmedia/primitives"
+import { Icon } from "@boffmedia/ui"
 
 // Up/down vote control with a running count. `row` lays it out horizontally.
 // Mirrors .cm-vote from comunidad.css. Vote state is controlled by the parent.

@@ -12,7 +12,7 @@ import {
   Spinner,
   Icon,
   toast,
-} from "@/components/boffmedia/primitives"
+} from "@boffmedia/ui"
 import { AvPanel } from "./av-kit"
 
 export interface AvCrudColumn<T> {

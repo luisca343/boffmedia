@@ -13,7 +13,7 @@ import {
   Kicker,
   OptionGroup,
   Icon,
-} from "@/components/boffmedia/primitives"
+} from "@boffmedia/ui"
 import { getFloors } from "@/tools/pmd-sky/DungeonData"
 import { useWmV3 } from "../_lib/useWmV3"
 import { WmSection, WmStars, WmPokePicker, WmTicket, WmCombo } from "./ui/wm-kit"

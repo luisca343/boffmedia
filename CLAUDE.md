@@ -10,7 +10,9 @@ Domain context: `.claude/context/` — load the relevant file when switching dom
 - Default new components to `app/**/_components/`. Promote only with justification.
 - Never edit `packages/shared/src/` — auto-generated. Run `pnpm generate:shared` after adding server DTOs.
 - Run `pnpm type-check` before marking any task done (`next.config.mjs` ignores TS build errors).
-- Do NOT cross design systems: SmartRotom (`components/smartrotom/ui/`) ↔ Boffmedia (`components/ui/primitives/`).
+- Do NOT cross design systems: SmartRotom (`components/smartrotom/ui/`) ↔ Boffmedia v3 (`@boffmedia/ui`, in `packages/ui/`).
+- `@boffmedia/ui` must stay host-agnostic — no `next/*`, no `next-intl`, no `@/` imports. It is shared with the Minecraft launcher. Wire hosts via `configureUi()`.
+- `components/ui/primitives/` is the LEGACY shadcn layer (33 files, 69 call sites). Do not add to it; no file imports both layers today.
 - Do NOT invent new `window.mcefQuery` shapes — extend `mcefApi.ts` using `mcefQuery<T>()`.
 - For unfamiliar modules, use the `repo-explorer` subagent to avoid burning context on large directory trees.
 

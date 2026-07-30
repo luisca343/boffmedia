@@ -3,8 +3,8 @@
 import * as React from "react"
 import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
-import { Icon, type IconName } from "@/components/boffmedia/primitives"
-import { useDismiss } from "@/components/boffmedia/hooks/use-dismiss"
+import { Icon, type IconName } from "@boffmedia/ui"
+import { useDismiss } from "@boffmedia/ui/hooks/use-dismiss"
 
 export interface Notif {
   id: number

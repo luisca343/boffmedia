@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Icon } from "@/components/boffmedia/primitives"
+import { Icon } from "@boffmedia/ui"
 import { ScrapeService, type SearchConsoleResult } from "@/services/api/boffmedia/scrapeService"
 import { CONSOLES, type Manufacturer } from "../../../_components/consoles"
 

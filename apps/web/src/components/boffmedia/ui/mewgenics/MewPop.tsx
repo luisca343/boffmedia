@@ -3,7 +3,7 @@
 import * as React from "react"
 import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
-import { Icon, type IconName } from "@/components/boffmedia/primitives"
+import { Icon, type IconName } from "@boffmedia/ui"
 import { MewFaction, MewKind, MewRarity, MewStats, MewText, MewTile } from "./MewAtoms"
 import { MEW, MEW_KIND_LABEL, mewCatKey, mewClip, mewHueFor, mewHuman, type MewRec } from "./mew-util"
 

@@ -3,7 +3,7 @@
 import * as React from "react"
 import { lazy, Suspense, useState } from "react"
 import { useTranslations } from "next-intl"
-import { Tabs, Button, Spinner } from "@/components/boffmedia/primitives"
+import { Tabs, Button, Spinner } from "@boffmedia/ui"
 import { useCalculatorStore } from "./_store/calculatorStore"
 import { useChampionsRegulations } from "../meta/_hooks/useChampionsRegulations"
 import { useCalcUrlSync } from "./_hooks/useCalcUrlSync"

@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { Sample, Section } from "../../showcase-shared"
-import { Avatar, AvatarGroup, Badge, Button, Chip, ChipGroup, IconBox, IconButton, toast } from "@/components/boffmedia/primitives"
+import { Avatar, AvatarGroup, Badge, Button, Chip, ChipGroup, IconBox, IconButton, toast } from "@boffmedia/ui"
 
 export function BotonesChipsSections() {
   const [busy, setBusy] = React.useState(false)

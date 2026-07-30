@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from "react";
 import { useTranslations } from "next-intl";
-import { Kicker, Button, Icon, Input, Select, Disclosure, Banner, Empty } from "@/components/boffmedia/primitives";
+import { Kicker, Button, Icon, Input, Select, Disclosure, Banner, Empty } from "@boffmedia/ui";
 import {
   ScrapeService,
   CatalogResult, CatalogSearchConsoleResult, CatalogSearchResult,

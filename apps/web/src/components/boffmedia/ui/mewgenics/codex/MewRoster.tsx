@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { useTranslations } from "next-intl"
-import { ChipGroup, Empty, Icon, SearchInput, Select } from "@/components/boffmedia/primitives"
+import { ChipGroup, Empty, Icon, SearchInput, Select } from "@boffmedia/ui"
 import { CxCard } from "../MewPop"
 import { MewData } from "../mew-store"
 import { mewCatKey } from "../mew-util"

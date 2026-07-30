@@ -3,7 +3,7 @@
 import * as React from "react"
 import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
-import { Button, Icon } from "@/components/boffmedia/primitives"
+import { Button, Icon } from "@boffmedia/ui"
 import { SideDrawer } from "./ui/SideDrawer"
 import { Callout } from "./ui/Callout"
 import { PokemonSprite } from "./ui/PokemonSprite"

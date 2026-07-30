@@ -3,7 +3,7 @@
 import * as React from "react"
 import { cn } from "@/lib/utils"
 import { Sample, Section } from "../showcase-shared"
-import { DropZone, Icon, Stepper, type DropZoneFile } from "@/components/boffmedia/primitives"
+import { DropZone, Icon, Stepper, type DropZoneFile } from "@boffmedia/ui"
 import { AssetThumb, AxisSlider, PreviewShell, type SchRing } from "@/components/boffmedia/ui/schematic"
 import { ScanCard } from "@/tools/schematic-compat/_components/setup/ScanCard"
 import { FilterChips } from "@/tools/schematic-compat/_components/diff/FilterChips"

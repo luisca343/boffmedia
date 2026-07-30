@@ -1,6 +1,13 @@
 import type { Config } from "tailwindcss"
 import plugin from "tailwindcss/plugin"
 
+import {
+  colors as baseColors,
+  fontFamily as baseFontFamily,
+  geometry,
+  uiContent,
+} from "@boffmedia/tailwind-config/base"
+
 const config: Config = {
   darkMode: ["selector", '[data-theme="dark"]'],
   content: [
@@ -8,6 +15,9 @@ const config: Config = {
     "./components/**/*.{ts,tsx}",
     "./app/**/*.{ts,tsx}",
     "./src/**/*.{ts,tsx}",
+    // The v3 primitives live in @boffmedia/ui now — without these globs every
+    // class they own gets purged out of the build.
+    ...uiContent,
     "*.{js,ts,jsx,tsx,mdx}",
   ],
   prefix: "",
@@ -17,10 +27,8 @@ const config: Config = {
         vinque: ["Vinque", "sans-serif"],
         roboto: ["Roboto", "sans-serif"],
         bebas: ["Bebas Neue", "sans-serif"],
-        // Boffmedia type system (default)
-        display: ["Saira Condensed", "Arial Narrow", "sans-serif"],
-        body: ["Saira", "ui-sans-serif", "system-ui", "sans-serif"],
-        mono: ["IBM Plex Mono", "ui-monospace", "monospace"],
+        // Boffmedia type system (default) — shared with @boffmedia/ui's hosts
+        ...baseFontFamily,
         // Legacy family retained for not-yet-migrated components
         orbitron: ["Orbitron", "sans-serif"],
         // Starbank (SmartRotom) — fintech dual type system (self-hosted)
@@ -501,7 +509,6 @@ const config: Config = {
         // ── Semantic surface layers ───────────────────────────────────────────
         // bg-base, bg-layer-1, bg-layer-2, bg-layer-3
         // from-layer-1, to-layer-2, ring-offset-layer-1, etc.
-        base:      "var(--bg)",
         "layer-1": "var(--layer-1)",
         "layer-2": "var(--layer-2)",
         "layer-3": "var(--layer-3)",
@@ -649,57 +656,10 @@ const config: Config = {
         // brand accent · status ok/warn/bad/signal.
         // ════════════════════════════════════════════════════════════════════
 
-        // ── Surfaces ──────────────────────────────────────────────────────────
-        // bg-base (already defined → --bg), bg-base-2, bg-base-deep
-        "base-2":    "var(--bg-2)",
-        "base-deep": "var(--bg-deep)",
-        panel: {
-          DEFAULT: "var(--panel)",
-          2:       "var(--panel-2)",
-        },
-
-        // ── Hairlines / borders ───────────────────────────────────────────────
-        // border-line, border-line-2
-        line: {
-          DEFAULT: "var(--line)",
-          2:       "var(--line-2)",
-        },
-
-        // ── Text ──────────────────────────────────────────────────────────────
-        // text-txt, text-txt-muted, text-txt-dim
-        txt: {
-          DEFAULT: "var(--text)",
-          muted:   "var(--muted)",
-          dim:     "var(--dim)",
-        },
-
-        // ── Brand accent (orange) ─────────────────────────────────────────────
-        // bg-accent, text-accent, bg-accent-soft, border-accent-line
-        accent: {
-          DEFAULT: "var(--accent)",
-          bright:  "var(--accent-bright)",
-          soft:    "var(--accent-soft)",
-          line:    "var(--accent-line)",
-          ink:     "var(--naranja-ink)",
-        },
-
-        // ── Status ────────────────────────────────────────────────────────────
-        ok: {
-          DEFAULT: "var(--ok)",
-          soft:    "var(--ok-soft)",
-        },
-        warn: {
-          DEFAULT: "var(--warn)",
-          soft:    "var(--warn-soft)",
-        },
-        bad: {
-          DEFAULT: "var(--bad)",
-          soft:    "var(--bad-soft)",
-        },
-        signal: {
-          DEFAULT: "var(--info)",
-          soft:    "var(--info-soft)",
-        },
+        // ── Boffmedia v3 vocabulary ───────────────────────────────────────────
+        // surfaces base/base-2/base-deep/panel · hairlines line · text txt
+        // brand accent · status ok/warn/bad/signal. Shared with the launcher.
+        ...baseColors,
 
         // ════════════════════════════════════════════════════════════════════
         // SMARTROTOM v3 CHROME — SmartRotom-owned vocabulary, structurally a
@@ -1877,6 +1837,8 @@ const config: Config = {
     },
   },
   plugins: [
+    // Shared .cut/.cut-seal/.cut-corner/.cut-tag geometry.
+    geometry,
     require("tailwindcss-animate"),
     require("tailwindcss-textshadow"),
     // ── Boffmedia v3 design system ─────────────────────────────────────────
@@ -1913,25 +1875,8 @@ const config: Config = {
         },
       })
       addComponents({
-        // Diagonal cuts (size via --cut/--cut-lg tokens; override per-instance
-        // with e.g. `[--cut:4px]`, `[--cut-tag:9px]`).
-        ".cut": {
-          clipPath: "polygon(var(--cut) 0, 100% 0, calc(100% - var(--cut)) 100%, 0 100%)",
-        },
-        // Chamfered box: top-left + bottom-right corners cut, straight edges (seals,
-        // avatars, icon glyphs, game logos). Unlike `.cut` (a slanted parallelogram
-        // for pills/buttons), this keeps all four sides square.
-        ".cut-seal": {
-          clipPath:
-            "polygon(var(--cut) 0, 100% 0, 100% calc(100% - var(--cut)), calc(100% - var(--cut)) 100%, 0 100%, 0 var(--cut))",
-        },
-        ".cut-corner": {
-          clipPath: "polygon(0 0, calc(100% - var(--cut-lg)) 0, 100% var(--cut-lg), 100% 100%, 0 100%)",
-        },
-        ".cut-tag": {
-          clipPath:
-            "polygon(0 0, 100% 0, 100% calc(100% - var(--cut-tag, 8px)), calc(100% - var(--cut-tag, 8px)) 100%, 0 100%)",
-        },
+        // The .cut* geometry moved to @boffmedia/tailwind-config (the `geometry`
+        // plugin below) — shared with @boffmedia/ui and SmartRotom chrome alike.
         // Page gutter — fluid width capped at 1280px with 40px gutters.
         ".wrap": {
           width: "100%",

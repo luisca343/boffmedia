@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { useTranslations } from "next-intl"
-import { useFormat } from "@/lib/useFormat"
+import { useFormat } from "@boffmedia/ui/useFormat"
 import { Avatar, Badge, Card, Empty, Icon, Skeleton, TextArea, Button, type IconName } from "../ui"
 import { EXPEDIENTE_STATUS, SEVERITY, TONES, type Tone } from "../../_utils/tones"
 import { fmtDateTime } from "../../_utils/format"

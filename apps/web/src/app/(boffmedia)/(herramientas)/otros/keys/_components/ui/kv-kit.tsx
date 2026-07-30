@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { useTranslations } from "next-intl"
-import { Icon, Seg, Button, IconButton } from "@/components/boffmedia/primitives"
+import { Icon, Seg, Button, IconButton } from "@boffmedia/ui"
 import type { SteamGame, MediaItem } from "../../_hooks/useFetchSteamData"
 
 /* ── steam art with graceful fallback ─────────────────────────────────────── */

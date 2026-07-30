@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { useTranslations } from "next-intl"
-import { Button, Icon, Spinner } from "@/components/boffmedia/primitives"
+import { Button, Icon, Spinner } from "@boffmedia/ui"
 import { AvSectionHead, AvPanel, AvPill } from "../ui/av-kit"
 import { PtcgpService } from "@/services/api/boffmedia/ptcgpService"
 

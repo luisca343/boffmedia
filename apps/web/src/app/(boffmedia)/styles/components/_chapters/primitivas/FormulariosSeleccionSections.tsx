@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { Sample, Section } from "../../showcase-shared"
-import { Checkbox, Disclosure, Field, Input, OptionGroup, Progress, RadioGroup, SearchInput, Select, Slider, Textarea, Toggle } from "@/components/boffmedia/primitives"
+import { Checkbox, Disclosure, Field, Input, OptionGroup, Progress, RadioGroup, SearchInput, Select, Slider, Textarea, Toggle } from "@boffmedia/ui"
 
 export function FormulariosSeleccionSections({ rng, setRng }: { rng: number; setRng: React.Dispatch<React.SetStateAction<number>> }) {
   const [sq, setSq] = React.useState("")

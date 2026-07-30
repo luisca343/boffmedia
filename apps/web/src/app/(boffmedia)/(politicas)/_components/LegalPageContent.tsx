@@ -2,7 +2,7 @@
 
 import { useTranslations } from "next-intl"
 import { LegalDoc, type LegalSection } from "@/components/boffmedia/ui/legal"
-import { useFormat } from "@/lib/useFormat"
+import { useFormat } from "@boffmedia/ui/useFormat"
 
 type LegalPage = "cancelaciones" | "cookies" | "devoluciones" | "privacidad" | "reembolsos" | "terminos"
 

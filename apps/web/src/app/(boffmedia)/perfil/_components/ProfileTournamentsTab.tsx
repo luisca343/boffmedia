@@ -3,7 +3,7 @@
 import * as React from "react"
 import Link from "next/link"
 import { useLocale, useTranslations } from "next-intl"
-import { Button, Empty, Icon, Spinner } from "@/components/boffmedia/primitives"
+import { Button, Empty, Icon, Spinner } from "@boffmedia/ui"
 import { DkLive } from "@/components/boffmedia/ui/tools/datakit"
 import { TourLive } from "@/components/boffmedia/ui/profile"
 import type { MyTournamentApi } from "@/services/api/boffmedia/tournamentsService"

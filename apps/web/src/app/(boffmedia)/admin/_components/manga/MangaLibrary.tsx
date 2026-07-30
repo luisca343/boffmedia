@@ -4,7 +4,7 @@ import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "rea
 import { createPortal } from "react-dom";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { Button, Icon, Spinner, Checkbox, Empty } from "@/components/boffmedia/primitives";
+import { Button, Icon, Spinner, Checkbox, Empty } from "@boffmedia/ui";
 import { cn } from "@/lib/utils";
 import { ScrapeService } from "@/services/api/boffmedia/scrapeService";
 import { useMangaStore } from "@/stores/useMangaStore";

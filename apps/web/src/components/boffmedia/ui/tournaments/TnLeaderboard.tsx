@@ -3,7 +3,7 @@
 import * as React from "react"
 import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
-import { Icon } from "@/components/boffmedia/primitives"
+import { Icon } from "@boffmedia/ui"
 import { DkFlag, DkPin } from "@/components/boffmedia/ui/tools/datakit"
 import { TnAvatar } from "./TnEntrant"
 import type { TnCompetitor } from "./tournaments-util"

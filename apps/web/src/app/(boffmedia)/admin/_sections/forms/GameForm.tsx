@@ -2,7 +2,7 @@ import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
 import { useTranslations } from "next-intl"
-import { Button, Field, Input, Textarea } from "@/components/boffmedia/primitives"
+import { Button, Field, Input, Textarea } from "@boffmedia/ui"
 
 const gameSchema = z.object({
   id: z.number().optional(),

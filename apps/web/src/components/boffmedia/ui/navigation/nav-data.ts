@@ -1,7 +1,7 @@
 import { getGameEntry, getToolHref } from "@/data/games"
 import { hubConfig } from "@/data/hub"
 import { HUB_SLUGS } from "@/components/boffmedia/ui/tools/tools-data"
-import type { IconName } from "@/components/boffmedia/primitives"
+import type { IconName } from "@boffmedia/ui"
 
 export interface NavItem {
   label: string

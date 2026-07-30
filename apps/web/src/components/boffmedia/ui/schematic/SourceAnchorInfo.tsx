@@ -1,7 +1,7 @@
 "use client"
 
 import { useCallback, useEffect, useState } from "react"
-import { Icon } from "@/components/boffmedia/primitives"
+import { Icon } from "@boffmedia/ui"
 import { PreviewButton } from "./PreviewChrome"
 
 export interface SourceAnchorInfoLabels {

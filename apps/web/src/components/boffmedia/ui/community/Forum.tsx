@@ -3,7 +3,7 @@
 import * as React from "react"
 import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
-import { Badge, Icon, Panel } from "@/components/boffmedia/primitives"
+import { Badge, Icon, Panel } from "@boffmedia/ui"
 import { ArtImage } from "@/components/boffmedia/ui/tools/ArtImage"
 import { Byline, CmAvatar } from "./CmAvatar"
 import { fmtNum, timeAgo, type ForumCategoryLike, type ForumMember, type ForumStatsData, type ForumThreadLike } from "./community-util"

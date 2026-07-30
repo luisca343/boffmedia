@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { useTranslations } from "next-intl"
-import { Kicker, Button, Icon, Input, Disclosure, Banner, Empty } from "@/components/boffmedia/primitives"
+import { Kicker, Button, Icon, Input, Disclosure, Banner, Empty } from "@boffmedia/ui"
 import { CONSOLES, type Manufacturer } from "../../_components/consoles"
 import { useBiblioteca, COMMON_REGIONS } from "../_lib/useBiblioteca"
 import { CtChip, RegionChip, Kpi, ConsoleGroup, SkeletonGroup, MFR_DOT, MFR_ORDER } from "./ui/ct-kit"

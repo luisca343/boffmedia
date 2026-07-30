@@ -3,7 +3,7 @@
 import * as React from "react"
 import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
-import { Icon, Badge, Button, Toggle, type IconName } from "@/components/boffmedia/primitives"
+import { Icon, Badge, Button, Toggle, type IconName } from "@boffmedia/ui"
 
 // The operative strip that accompanies a legal document: export data, blocked
 // essential cookies, analytics/marketing switches and danger-toned deletion.

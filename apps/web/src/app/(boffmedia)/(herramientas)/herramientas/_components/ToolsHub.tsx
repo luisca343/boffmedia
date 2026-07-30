@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { useTranslations } from "next-intl"
-import { Kicker, Icon, Button, Empty } from "@/components/boffmedia/primitives"
+import { Kicker, Icon, Button, Empty } from "@boffmedia/ui"
 import { GameLogo, ToolGrid, TxSection, VideoHero, buildHubGames } from "@/components/boffmedia/ui/tools"
 
 const META = "inline-flex items-center gap-[9px] font-mono text-[12px] uppercase leading-none tracking-[0.08em] text-txt-muted [&_b]:font-bold [&_b]:text-txt [&_svg]:text-accent"

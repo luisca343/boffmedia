@@ -3,7 +3,7 @@
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { useFormat } from "@/lib/useFormat";
+import { useFormat } from "@boffmedia/ui/useFormat";
 import { useTranslations } from "next-intl";
 import { useQueryClient } from "@tanstack/react-query";
 import type { News, UpdateNewsDto } from "@boffmedia/shared";

@@ -5,7 +5,7 @@ import { useLocale, useTranslations } from "next-intl"
 import { PtcgpService } from "@/services/api/boffmedia/ptcgpService"
 import { boffGET } from "@/services/boffAPI"
 import { useBoffSession } from "@/services/useBoffSession"
-import { toast } from "@/components/boffmedia/primitives"
+import { toast } from "@boffmedia/ui"
 import type { TcgCard } from "@boffmedia/shared"
 
 export interface RecentUpdate {

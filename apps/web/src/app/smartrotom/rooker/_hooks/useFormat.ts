@@ -1,7 +1,7 @@
 "use client"
 
 import { useLocale, useTranslations } from "next-intl"
-import { intlLocale as resolveIntlLocale } from "@/lib/locale"
+import { intlLocale as resolveIntlLocale } from "@boffmedia/ui/locale"
 
 /** Locale-aware number/date formatting for the timeline (`rooker.format` messages). */
 export function useFormat() {

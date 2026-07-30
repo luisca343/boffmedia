@@ -5,7 +5,7 @@ import { createPortal } from "react-dom";
 import { useTranslations } from "next-intl";
 import {
   Button, Field, Input, Icon, Spinner, Toggle, Disclosure, Checkbox, SearchInput,
-} from "@/components/boffmedia/primitives";
+} from "@boffmedia/ui";
 import {
   ScrapeService,
   type BrowserConfig,

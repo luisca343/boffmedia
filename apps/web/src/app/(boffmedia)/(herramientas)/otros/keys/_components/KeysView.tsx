@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { useTranslations } from "next-intl"
-import { Kicker, SearchInput, Seg, Select, Empty, Button, Icon, Skeleton } from "@/components/boffmedia/primitives"
+import { Kicker, SearchInput, Seg, Select, Empty, Button, Icon, Skeleton } from "@boffmedia/ui"
 import { useKeysV3 } from "../_lib/useKeysV3"
 import { KvCard, KeyModal, type KvModalStrings } from "./ui/kv-kit"
 

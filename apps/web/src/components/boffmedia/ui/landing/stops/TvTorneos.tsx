@@ -3,14 +3,14 @@
 import * as React from "react"
 import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
-import { Button, CountUp } from "@/components/boffmedia/primitives"
+import { Button, CountUp } from "@boffmedia/ui"
 import { Decode } from "../travesia-fx"
 import { TvCP } from "../TvCP"
 import { CTA_ROW, GLARE, HUD_FRAME, PRI_GLOW, TvCountdown } from "../landing-shared"
 import { TV3_EVENT } from "../landing-data"
 import { useGetEvents } from "@/hooks/events/useGetEvents"
 import type { EventLike } from "@/components/boffmedia/ui/events"
-import { useFormat } from "@/lib/useFormat"
+import { useFormat } from "@boffmedia/ui/useFormat"
 
 export function TvTorneos() {
   const t = useTranslations("boffmedia.landing.torneos")

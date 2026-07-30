@@ -1,7 +1,7 @@
 "use client"
 
 import { useRef } from "react"
-import { Banner, DataList, DropZone } from "@/components/boffmedia/primitives"
+import { Banner, DataList, DropZone } from "@boffmedia/ui"
 import type { WorldIdSummary } from "@/lib/schematic/types"
 
 export interface WorldIdPickerLabels {

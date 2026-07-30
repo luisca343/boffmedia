@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { cn } from "@/lib/utils"
-import { useFormat } from "@/lib/useFormat"
+import { useFormat } from "@boffmedia/ui/useFormat"
 import { Avatar } from "./Avatar"
 import { Check } from "./Check"
 import { LivePill } from "./LivePill"

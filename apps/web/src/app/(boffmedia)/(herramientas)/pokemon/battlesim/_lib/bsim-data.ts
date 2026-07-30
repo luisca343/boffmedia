@@ -1,4 +1,4 @@
-import type { IconName } from "@/components/boffmedia/primitives"
+import type { IconName } from "@boffmedia/ui"
 
 export type BsimView = "lobby" | "equipos" | "repeticiones"
 export type BsimMode = "ia" | "pvp" | "showdown"

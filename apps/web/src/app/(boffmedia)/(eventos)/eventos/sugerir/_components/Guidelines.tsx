@@ -1,7 +1,7 @@
 "use client"
 
 import { useTranslations } from "next-intl"
-import { Panel, Icon } from "@/components/boffmedia/primitives"
+import { Panel, Icon } from "@boffmedia/ui"
 
 const ITEMS = ["g1", "g2", "g3", "g4"] as const
 

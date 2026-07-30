@@ -2,7 +2,7 @@
 
 import { useCallback } from "react";
 import { useTranslations } from "next-intl";
-import { Icon, Stepper } from "@/components/boffmedia/primitives";
+import { Icon, Stepper } from "@boffmedia/ui";
 import { WorkbenchLayout } from "@/components/boffmedia/ui/schematic/WorkbenchLayout";
 import { SchematicAssetProvider } from "@/lib/schematic/render";
 import { useViewerEngine } from "./_hooks/useViewerEngine";

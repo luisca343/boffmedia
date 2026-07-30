@@ -1,0 +1,103 @@
+/* The Boffmedia v3 token values. Pairs with base.ts, which only maps names to
+   these vars. Extracted verbatim from apps/web globals.css so the launcher and
+   the web app cannot drift.
+
+   CASCADE: must load AFTER any host block that defines the same names (in
+   apps/web an earlier :root aliases --accent to --secondary for not-yet-
+   migrated components). apps/web imports it after globals.css in layout.tsx. */
+
+/* ===========================================================================
+   BOFFMEDIA — theme tokens (default)
+   Graphite, steel, brand orange. Dark native, light variant.
+   Declared after the earlier blocks so shared token names (--bg, --text,
+   --accent, --font-*) resolve here. Legacy-only tokens (--layer-1, --secondary,
+   …) remain defined above for not-yet-migrated components during migration.
+   =========================================================================== */
+:root {
+  /* brand */
+  --naranja: #ff5c0a;
+  --naranja-bright: #ff7a33;
+  --naranja-ink: #0b0d11; /* text on orange */
+
+  /* type */
+  --font-display: "Saira Condensed", "Arial Narrow", sans-serif;
+  --font-body: "Saira", sans-serif;
+  --font-mono: "IBM Plex Mono", monospace;
+
+  /* geometry */
+  --cut: 10px;       /* diagonal corner cut for buttons/chips */
+  --cut-lg: 16px;    /* panels / heroes */
+  --bar: 4px;        /* accent side bar */
+
+  /* motion */
+  --t-fast: 140ms cubic-bezier(0.2, 0.7, 0.3, 1);
+  --t-med: 260ms cubic-bezier(0.2, 0.7, 0.3, 1);
+  --t-slow: 600ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+:root,
+[data-theme="dark"] {
+  --bg: #0b0d11;
+  --bg-2: #0d1015;         /* alternating section */
+  --bg-deep: #000000;      /* topbar / footer */
+  --panel: #13161c;
+  --panel-2: #181c24;      /* hover / nested */
+  --line: #262b35;
+  --line-2: #333a48;       /* emphasized borders */
+  --text: #f2f4f8;
+  --muted: #9aa3b2;
+  --dim: #5f6774;
+  --accent: var(--naranja);
+  --accent-bright: var(--naranja-bright);
+  --accent-soft: rgba(255, 92, 10, 0.13);
+  --accent-line: rgba(255, 92, 10, 0.45);
+  --ok: #34d377;
+  --warn: #ffb224;
+  --bad: #ff4d5e;
+  --info: #4da3ff;
+  --ok-soft: rgba(52, 211, 119, 0.13);
+  --warn-soft: rgba(255, 178, 36, 0.13);
+  --bad-soft: rgba(255, 77, 94, 0.13);
+  --info-soft: rgba(77, 163, 255, 0.13);
+  --shadow: 0 18px 50px rgba(0, 0, 0, 0.45);
+  --scrim: rgba(0, 0, 0, 0.6);
+  --stripe: rgba(255, 255, 255, 0.045);
+
+  /* scrollbar */
+  --sb-idle: rgba(154, 163, 178, 0.22);
+  --sb-hover: rgba(154, 163, 178, 0.48);
+  --sb-drag: var(--accent);
+}
+
+[data-theme="light"] {
+  --bg: #eef0f3;
+  --bg-2: #e7eaee;
+  --bg-deep: #101318;      /* topbar stays broadcast-black */
+  --panel: #ffffff;
+  --panel-2: #f5f6f8;
+  --line: #d5dae2;
+  --line-2: #b9c0cc;
+  --text: #14171c;
+  --muted: #5a6270;
+  --dim: #8b93a1;
+  --accent: #f04e00;
+  --accent-bright: #ff5c0a;
+  --accent-soft: rgba(240, 78, 0, 0.10);
+  --accent-line: rgba(240, 78, 0, 0.45);
+  --ok: #148947;
+  --warn: #a86a00;
+  --bad: #cf2438;
+  --info: #1668c7;
+  --ok-soft: rgba(20, 137, 71, 0.10);
+  --warn-soft: rgba(168, 106, 0, 0.12);
+  --bad-soft: rgba(207, 36, 56, 0.10);
+  --info-soft: rgba(22, 104, 199, 0.10);
+  --shadow: 0 18px 44px rgba(20, 23, 28, 0.14);
+  --scrim: rgba(20, 23, 28, 0.5);
+  --stripe: rgba(20, 23, 28, 0.05);
+
+  /* scrollbar */
+  --sb-idle: rgba(20, 23, 28, 0.20);
+  --sb-hover: rgba(20, 23, 28, 0.42);
+  --sb-drag: var(--accent);
+}

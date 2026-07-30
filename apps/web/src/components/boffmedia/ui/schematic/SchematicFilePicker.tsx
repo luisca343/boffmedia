@@ -1,7 +1,7 @@
 "use client"
 
 import { useRef } from "react"
-import { DropZone, type DropZoneFile } from "@/components/boffmedia/primitives"
+import { DropZone, type DropZoneFile } from "@boffmedia/ui"
 import { schematicAccept, schematicHint } from "@/lib/schematic/file-formats"
 import type { SchematicSummary } from "@/lib/schematic/types"
 

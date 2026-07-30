@@ -9,7 +9,7 @@ import { rotomGETOrThrow, rotomPATCHOrThrow, userMessageFrom } from "@/services/
 import { useGuardedSubmit } from "@/components/smartrotom/behavior/useGuardedSubmit"
 import { Icon, Empty, toast } from "../ui"
 import { useOfficer } from "../../_hooks/useOfficer"
-import { useFormat } from "@/lib/useFormat"
+import { useFormat } from "@boffmedia/ui/useFormat"
 import { TONES, type Tone } from "../../_utils/tones"
 
 // The officer's real SmartRotom inbox — the platform's notifications table, not a

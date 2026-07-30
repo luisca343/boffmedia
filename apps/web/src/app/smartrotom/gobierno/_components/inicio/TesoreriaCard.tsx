@@ -5,7 +5,7 @@ import { Bar, Card, Empty, Skeleton } from "../ui"
 import { TONES } from "../../_utils/tones"
 import { useTesoreria } from "../../_hooks/queries"
 import { money } from "../../_utils/format"
-import { useFormat } from "@/lib/useFormat"
+import { useFormat } from "@boffmedia/ui/useFormat"
 
 function SparkBars({
   series,

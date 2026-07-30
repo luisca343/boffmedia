@@ -3,7 +3,7 @@
 import * as React from "react"
 import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
-import { Icon } from "@/components/boffmedia/primitives"
+import { Icon } from "@boffmedia/ui"
 import { LzPlatformPills } from "@/components/boffmedia/ui/calendar"
 import { CtStars, CtLogButton, CtStatusPill } from "./CtAtoms"
 import { CT_GENRE_ICON, CT_STATUS, useCtRating, useCtStatus, type CtGame } from "./catalog-util"

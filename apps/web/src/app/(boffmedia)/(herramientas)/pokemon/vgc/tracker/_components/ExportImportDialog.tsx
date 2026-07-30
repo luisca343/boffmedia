@@ -3,7 +3,7 @@
 import { useRef, useState } from "react"
 import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
-import { Modal, Icon, type IconName } from "@/components/boffmedia/primitives"
+import { Modal, Icon, type IconName } from "@boffmedia/ui"
 import {
   downloadJson,
   exportAll,

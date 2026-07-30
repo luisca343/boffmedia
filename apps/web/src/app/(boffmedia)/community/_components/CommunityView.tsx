@@ -4,11 +4,11 @@ import * as React from "react"
 import Link from "next/link"
 import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
-import { Button, Icon, Panel, type IconName } from "@/components/boffmedia/primitives"
+import { Button, Icon, Panel, type IconName } from "@boffmedia/ui"
 import { EventCard, eventStatus, type EventLike } from "@/components/boffmedia/ui/events"
 import { useGetEvents } from "@/hooks/events/useGetEvents"
 import { useGetLeaderboards } from "@/hooks/events/useGetLeaderboards"
-import { useFormat } from "@/lib/useFormat"
+import { useFormat } from "@boffmedia/ui/useFormat"
 import { DISCORD } from "@/components/boffmedia/ui/landing/landing-data"
 
 const LINKS: { href: string; icon: IconName; key: "events" | "ranking" | "achievements" | "calendar" }[] = [

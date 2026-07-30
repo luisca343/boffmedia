@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { useTranslations } from "next-intl"
-import { Badge, Button, Panel } from "@/components/boffmedia/primitives"
+import { Badge, Button, Panel } from "@boffmedia/ui"
 import { LinkedAccounts, LinkedAccountRow } from "@/components/boffmedia/ui/profile"
 
 type Provider = "google" | "discord" | "steam" | "twitch"

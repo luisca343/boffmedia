@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { cn } from "@/lib/utils"
-import { DataList, type DataListProps } from "@/components/boffmedia/primitives"
+import { DataList, type DataListProps } from "@boffmedia/ui"
 import { MewText, MewTile } from "../../MewAtoms"
 import { MEW, type MewRec } from "../../mew-util"
 import type { NavFn } from "../MewRefs"

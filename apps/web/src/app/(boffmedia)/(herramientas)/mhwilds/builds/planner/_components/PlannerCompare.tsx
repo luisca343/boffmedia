@@ -3,7 +3,7 @@
 import * as React from "react"
 import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
-import { Button, Chip, Empty } from "@/components/boffmedia/primitives"
+import { Button, Chip, Empty } from "@boffmedia/ui"
 import { BuildDataWithIds, Skill } from "@/types/tools/mhwilds"
 import { MhLabel, MhTag } from "../../../_components/ui/mh-kit"
 import { elementColor } from "../../../_components/mh-helpers"

@@ -21,7 +21,7 @@ export function uptimeFrom(startedAt?: string): string {
 }
 
 // Spanish compact count: "32,4 K" · "1,2 M".
-export { formatCompact as compactCount } from "@/lib/format"
+export { formatCompact as compactCount } from "@boffmedia/ui/format"
 
 export function toStreamCard(s: TwitchStream): StreamCardData {
   return {

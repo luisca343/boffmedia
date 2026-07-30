@@ -24,7 +24,7 @@ import {
 import { useCloseSubasta, useCreateSubasta, useParcelas, usePuja, useSubastas } from "../../_hooks/queries"
 import { useOfficer } from "../../_hooks/useOfficer"
 import { useGobiernoUi } from "../../_stores/useGobiernoUi"
-import { useFormat } from "@/lib/useFormat"
+import { useFormat } from "@boffmedia/ui/useFormat"
 import { money, timeLeft, townName } from "../../_utils/format"
 import { SUBASTA_STATUS } from "../../_utils/tones"
 import type { Parcela, Subasta } from "../../_types"

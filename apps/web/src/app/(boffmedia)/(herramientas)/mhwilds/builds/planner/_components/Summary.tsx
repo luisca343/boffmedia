@@ -1,7 +1,7 @@
 "use client"
 
 import { useTranslations } from "next-intl"
-import { Banner, Empty } from "@/components/boffmedia/primitives"
+import { Banner, Empty } from "@boffmedia/ui"
 import { StatsData, Skill, Weapon } from "@/types/tools/mhwilds"
 import { getAllWeaponElements } from "./equipment-utils"
 import {

@@ -5,7 +5,7 @@ import { useTranslations } from "next-intl"
 import { Bar, Badge, Card, Empty, PageHead, Select, Skeleton } from "../ui"
 import { useHistorial } from "../../_hooks/queries"
 import { fmtDateTime, townName } from "../../_utils/format"
-import { useFormat } from "@/lib/useFormat"
+import { useFormat } from "@boffmedia/ui/useFormat"
 import { groupBy } from "./helpers"
 
 // One card per parcela, its ownership timeline newest-first. `useHistorial` is the hook

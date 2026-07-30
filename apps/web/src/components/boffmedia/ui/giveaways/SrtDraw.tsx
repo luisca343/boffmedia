@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { useTranslations } from "next-intl"
-import { Avatar, Button, Icon } from "@/components/boffmedia/primitives"
+import { Avatar, Button, Icon } from "@boffmedia/ui"
 import { SRT_REEL_COLORS, srtTotalTickets, type Sorteo, type SrtParticipant } from "./giveaways-util"
 
 interface ReelCell {

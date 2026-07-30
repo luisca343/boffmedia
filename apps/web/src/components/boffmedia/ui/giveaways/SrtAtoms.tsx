@@ -3,7 +3,7 @@
 import * as React from "react"
 import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
-import { Icon } from "@/components/boffmedia/primitives"
+import { Icon } from "@boffmedia/ui"
 import { srtSourceMeta, srtPrizeMeta, type SrtPrizeType, type SrtSourceKey, type SrtStatus, type SrtOrganizerData } from "./giveaways-util"
 
 // The giveaway atoms: status chip (4 lifecycle states), organizer seal, source

@@ -10,7 +10,7 @@ import { MultasTable } from "../_components/hacienda/MultasTable"
 import { ConfirmModal } from "../_components/hacienda/ConfirmModal"
 import { useMultas, useCreateMulta, usePayMulta, useCancelMulta } from "../_hooks/queries"
 import { money } from "../_utils/format"
-import { useFormat } from "@/lib/useFormat"
+import { useFormat } from "@boffmedia/ui/useFormat"
 import type { Multa } from "../_types"
 
 // Fetches one generous page rather than building real pagination: this government is

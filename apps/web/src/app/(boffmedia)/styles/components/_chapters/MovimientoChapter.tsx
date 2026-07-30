@@ -3,7 +3,7 @@
 import * as React from "react"
 import { cn } from "@/lib/utils"
 import { DISPLAY, HEAD4, Sample, Section } from "../showcase-shared"
-import { Button, Chip, CountUp, Kicker, Ticker } from "@/components/boffmedia/primitives"
+import { Button, Chip, CountUp, Kicker, Ticker } from "@boffmedia/ui"
 import { GLARE } from "@/components/boffmedia/ui/landing/landing-shared"
 import { Decode, Kinetic, useSignalFX } from "@/components/boffmedia/ui/landing/travesia-fx"
 import { Marquee } from "@/components/boffmedia/ui/layout/Marquee"

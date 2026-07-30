@@ -1,5 +1,5 @@
 import { getTranslations } from "next-intl/server"
-import { Empty, Button } from "@/components/boffmedia/primitives"
+import { Empty, Button } from "@boffmedia/ui"
 
 // Solo-battles data has no working backend yet (the /solobattles endpoint is
 // disabled and getBattleData is unimplemented), so this view is on hold.

@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
-import { Button, Icon } from "@/components/boffmedia/primitives";
+import { Button, Icon } from "@boffmedia/ui";
 import { AssetThumb } from "@/components/boffmedia/ui/schematic";
 import { POP_SHADOW, type BulkAction, type BulkNsGroup } from "../ui/sch-tokens";
 

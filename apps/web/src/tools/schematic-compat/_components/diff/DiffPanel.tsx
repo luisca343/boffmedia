@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState, type ReactNode, type RefObject } from "react";
 import { useTranslations } from "next-intl";
-import { Button, Icon } from "@/components/boffmedia/primitives";
+import { Button, Icon } from "@boffmedia/ui";
 import type { SchRing } from "@/components/boffmedia/ui/schematic";
 import { FilterChips } from "./FilterChips";
 import { MappingCard, MAPPING_CARD_HEIGHT } from "./MappingCard";

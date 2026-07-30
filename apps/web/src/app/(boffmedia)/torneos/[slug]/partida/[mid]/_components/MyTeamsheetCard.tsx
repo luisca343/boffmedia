@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { useTranslations } from "next-intl"
-import { Button, Icon, Modal, toast } from "@/components/boffmedia/primitives"
+import { Button, Icon, Modal, toast } from "@boffmedia/ui"
 import { TM_CARD, TM_CARD_HEAD, TM_CARD_H3 } from "@/components/boffmedia/ui/tournaments"
 import { TournamentsService, type TnMonApi } from "@/services/api/boffmedia/tournamentsService"
 import { parseShowdownPaste } from "@/features/vgc-tracker/showdown-parse"

@@ -1,7 +1,7 @@
 "use client"
 
 import { Sample, Section } from "../showcase-shared"
-import { Badge, Button, CodeBlock, DataList, Empty, Panel, Ph, Progress, Rank, RankRow, Skeleton, Stats, Table, Third } from "@/components/boffmedia/primitives"
+import { Badge, Button, CodeBlock, DataList, Empty, Panel, Ph, Progress, Rank, RankRow, Skeleton, Stats, Table, Third } from "@boffmedia/ui"
 
 export function PatronesChapter() {
 

@@ -9,7 +9,7 @@ import { useAuditoria, useOficiales } from "../../_hooks/queries"
 import { useGobiernoUi } from "../../_stores/useGobiernoUi"
 import { DEPARTMENTS, type Department, type Tone } from "../../_utils/tones"
 import { fmtDateTime } from "../../_utils/format"
-import { useFormat } from "@/lib/useFormat"
+import { useFormat } from "@boffmedia/ui/useFormat"
 
 const PAGE_SIZE = 30
 

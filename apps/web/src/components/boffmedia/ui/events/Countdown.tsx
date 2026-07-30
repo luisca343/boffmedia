@@ -3,7 +3,7 @@
 import * as React from "react"
 import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
-import { Icon } from "@/components/boffmedia/primitives"
+import { Icon } from "@boffmedia/ui"
 
 /** Live countdown to an event start. Renders nothing once the date has passed. */
 export function Countdown({ date, compact, className }: { date: string; compact?: boolean; className?: string }) {

@@ -5,7 +5,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useShowdownBattle } from '@/app/battlesim/_hooks/useShowdownBattle';
 import { ChatPanel } from '@/app/battlesim/_components/ChatPanel';
-import { Panel, Button, Input, Select, Badge } from '@/components/boffmedia/primitives';
+import { Panel, Button, Input, Select, Badge } from '@boffmedia/ui';
 import { cn } from '@/lib/utils';
 
 const STATUS_TONE: Record<string, 'ok' | 'warn' | 'info' | 'bad' | 'default'> = {

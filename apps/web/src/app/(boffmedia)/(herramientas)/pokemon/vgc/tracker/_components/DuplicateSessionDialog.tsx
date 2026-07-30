@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { useTranslations } from "next-intl"
-import { Modal, Field, Input, Button } from "@/components/boffmedia/primitives"
+import { Modal, Field, Input, Button } from "@boffmedia/ui"
 import { TrSub } from "./ui/tr-ui"
 import type { Session } from "@/features/vgc-tracker/types"
 

@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { useLocale, useTranslations } from "next-intl"
-import { Badge, Empty, Panel, Spinner, type IconName } from "@/components/boffmedia/primitives"
+import { Badge, Empty, Panel, Spinner, type IconName } from "@boffmedia/ui"
 import {
   ActivityFeed,
   ProfileHero,

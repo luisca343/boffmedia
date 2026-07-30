@@ -1,7 +1,7 @@
 "use client"
 
 import { useTranslations } from "next-intl"
-import { useFormat } from "@/lib/useFormat"
+import { useFormat } from "@boffmedia/ui/useFormat"
 import { Avatar, Badge, Button, Card, Icon, Sunken } from "../ui"
 import { APELACION_STATUS } from "../../_utils/tones"
 import { money, fmtDateTime } from "../../_utils/format"

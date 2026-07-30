@@ -1,4 +1,4 @@
-import { intlLocale } from "@/lib/locale"
+import { intlLocale } from "@boffmedia/ui/locale"
 
 /**
  * The document's dates.

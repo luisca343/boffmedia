@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react"
 import { useTranslations } from "next-intl"
-import { Panel, Button, Select, Spinner, toast } from "@/components/boffmedia/primitives"
+import { Panel, Button, Select, Spinner, toast } from "@boffmedia/ui"
 import { TnFormatBadge } from "@/components/boffmedia/ui/tournaments"
 import { useTournament } from "@/hooks/tournaments/useTournament"
 import { TorneoView } from "../../torneos/_components/TorneoView"

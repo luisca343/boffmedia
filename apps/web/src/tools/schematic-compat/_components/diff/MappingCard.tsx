@@ -2,7 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
-import { Icon } from "@/components/boffmedia/primitives";
+import { Icon } from "@boffmedia/ui";
 import { AssetThumb, type SchRing, type ThumbRenderer } from "@/components/boffmedia/ui/schematic";
 import { STATUS_META, TONE, type SchDiffEntry } from "../ui/sch-tokens";
 import { ReplaceSelect } from "./ReplaceSelect";
