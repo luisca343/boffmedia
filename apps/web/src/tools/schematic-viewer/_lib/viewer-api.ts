@@ -51,6 +51,17 @@ export interface ViewerWorkerAPI {
     rotation?: number,
   ): Promise<CompiledModel | null>;
 
+  /**
+   * Baked geometry for a modded Minecraft block in a given blockstate, read from
+   * the instance's mod JARs. `null` for vanilla ids (the UI resolves those from
+   * the CDN mirror) and when nothing resolves.
+   */
+  getModdedBlockModel(
+    registryId: string,
+    blockId: string,
+    states: Record<string, string>,
+  ): Promise<CompiledModel | null>;
+
   /** Parse a schematic file; caches it in the worker and returns a summary. */
   loadSchematic(file: File): Promise<SchematicSummary>;
 

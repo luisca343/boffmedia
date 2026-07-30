@@ -23,6 +23,13 @@
 export interface ForgeVariantEntry {
   model?: string;
   textures?: Record<string, string>;
+  x?: number;
+  y?: number;
+  uvlock?: boolean;
+  /** Item-display data (ground/gui/fixed); never affects the block in world. */
+  transform?: unknown;
+  /** Named extra models drawn on top of the base one; shape varies by mod. */
+  submodel?: unknown;
 }
 
 export interface ForgeBlockstateJson {

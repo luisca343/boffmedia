@@ -6,6 +6,7 @@ import {
   SchematicView,
   localPlayerPos,
   useConnectionsLoader,
+  useModdedModelLoader,
   useModelLoader,
   useTextureLoader,
 } from "@/lib/schematic/render";
@@ -55,13 +56,14 @@ export function SchematicViewer3D() {
   // We capture the loaders as values and pass them down as props instead.
   const textureLoader = useTextureLoader();
   const modelLoader = useModelLoader();
+  const moddedModelLoader = useModdedModelLoader();
   const connectionsLoader = useConnectionsLoader();
 
   const { groups, overrides } = useCompatRender(targetReg?.gameId, connectionsLoader);
 
   const loaders = useMemo(
-    () => ({ texture: textureLoader, model: modelLoader }),
-    [textureLoader, modelLoader],
+    () => ({ texture: textureLoader, model: modelLoader, moddedModel: moddedModelLoader }),
+    [textureLoader, modelLoader, moddedModelLoader],
   );
   const source = useMemo(
     () => ({ version: sourceReg?.version, registryId: sourceReg?.id }),

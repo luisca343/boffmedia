@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
 import type { BlockPositionGroup, UnifiedBlock } from "../types";
 import { fluidColor } from "./fluid-color";
-import type { ModelLoader, TextureLoader } from "./assetLoaders";
+import type { ModdedModelLoader, ModelLoader, TextureLoader } from "./assetLoaders";
 import type { BuiltModel } from "./blockModelCache";
 import { useInstanceMatrices } from "./instance-matrices";
 import { makeMaterial, metaOf, styleParams, surfaceColor } from "./material";
@@ -79,6 +79,8 @@ export interface BlockInstancesProps {
   registryId: string | undefined;
   textureLoader: TextureLoader | null;
   modelLoader: ModelLoader | null;
+  /** Resolves a modded Minecraft block's real geometry from the mod JARs. */
+  moddedModelLoader: ModdedModelLoader | null;
   /** True when rendering a converted target block (vs. the source block). */
   useTarget: boolean;
   resolveVariant?: BlockVariantResolver;
@@ -213,7 +215,14 @@ export function BlockInstances(props: BlockInstancesProps) {
   );
   const textureId = variant?.id ?? props.textureId;
   const states = variant?.states ?? props.states;
-  const built = useBlockModel(textureId, states, props.version, props.registryId, props.modelLoader);
+  const built = useBlockModel(
+    textureId,
+    states,
+    props.version,
+    props.registryId,
+    props.modelLoader,
+    props.moddedModelLoader,
+  );
   // Interior meshes only ever draw one Y-plane, so their GPU buffer is sized to
   // the largest plane, not the whole set.
   const capacity = useMemo(
