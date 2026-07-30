@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react"
 import { useTranslations } from "next-intl"
 import { userMessageFrom } from "@/services/boffAPI"
-import { useFormat } from "@/lib/useFormat"
+import { useFormat } from "@boffmedia/ui/useFormat"
 import { Badge, Bar, Button, Card, Empty, PageHead, Skeleton, TextArea } from "../ui"
 import { PlayerLink } from "./PlayerLink"
 import { NuevaPatrullaModal } from "./NuevaPatrullaModal"

@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { useTranslations } from "next-intl"
-import { Button, Icon } from "@/components/boffmedia/primitives"
+import { Button, Icon } from "@boffmedia/ui"
 import { MhMonster, Weapon } from "@/types/tools/mhwilds"
 import { MhPanel, MhLabel } from "../../../_components/ui/mh-kit"
 import { elementColor, weaponAttack } from "../../../_components/mh-helpers"

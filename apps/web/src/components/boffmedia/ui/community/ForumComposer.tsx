@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { useTranslations } from "next-intl"
-import { Button, Input, Textarea, Seg } from "@/components/boffmedia/primitives"
+import { Button, Input, Textarea, Seg } from "@boffmedia/ui"
 import { ForumMarkdown } from "./ForumMarkdown"
 
 // Matches the forum write DTOs (create-thread / create-post / edit-post).

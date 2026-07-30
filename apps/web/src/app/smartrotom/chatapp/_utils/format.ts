@@ -1,4 +1,4 @@
-import { intlLocale } from "@/lib/locale";
+import { intlLocale } from "@boffmedia/ui/locale";
 
 // Chat's day-separator helpers. Nothing here overlaps `lib/format` (relative time,
 // numbers, money) — these are absolute clock/calendar labels, so there is nothing to

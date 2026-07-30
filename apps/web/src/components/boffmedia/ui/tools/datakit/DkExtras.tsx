@@ -3,7 +3,7 @@
 import * as React from "react"
 import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
-import { Icon } from "@/components/boffmedia/primitives"
+import { Icon } from "@boffmedia/ui"
 import { DkFlag } from "./DkFlag"
 
 // Datakit extras: round stepper, country multi-filter and the toast hook.

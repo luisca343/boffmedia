@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { LivePill, PulseDot } from "@/components/smartrotom/media/ui"
-import { useFormat } from "@/lib/useFormat"
+import { useFormat } from "@boffmedia/ui/useFormat"
 
 /**
  * Twitch embed player (their player, our chrome — ToS-compliant) with a live

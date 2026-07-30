@@ -3,7 +3,7 @@
 import * as React from "react"
 import { cn } from "@/lib/utils"
 import { DISPLAY, DISPLAY_EM, HEAD4, MONO_LABEL, Sample, Section } from "../showcase-shared"
-import { Chip, Kicker, Panel } from "@/components/boffmedia/primitives"
+import { Chip, Kicker, Panel } from "@boffmedia/ui"
 
 export function BasesChapter() {
 

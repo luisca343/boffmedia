@@ -1,7 +1,7 @@
 "use client"
 
 import { cn } from "@/lib/utils"
-import { Icon } from "@/components/boffmedia/primitives"
+import { Icon } from "@boffmedia/ui"
 
 export interface NumberStepperProps {
   value: number

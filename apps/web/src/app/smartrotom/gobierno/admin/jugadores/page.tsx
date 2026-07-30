@@ -4,7 +4,7 @@ import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { useTranslations } from "next-intl"
 import { GOBIERNO_RANKS } from "@boffmedia/shared/roles"
-import { useFormat } from "@/lib/useFormat"
+import { useFormat } from "@boffmedia/ui/useFormat"
 import {
   Avatar,
   Badge,

@@ -19,6 +19,7 @@
   },
   "dependencies": {
     "@boffmedia/shared": "workspace:*",
+    "@boffmedia/ui": "workspace:*",
     "@ckeditor/ckeditor5-react": "^9.4.0",
     "@dnd-kit/core": "^6.1.0",
     "@dnd-kit/modifiers": "^9.0.0",
@@ -112,6 +113,7 @@
     "zustand": "^4.5.0"
   },
   "devDependencies": {
+    "@boffmedia/tailwind-config": "workspace:*",
     "@playwright/test": "^1.49.1",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",

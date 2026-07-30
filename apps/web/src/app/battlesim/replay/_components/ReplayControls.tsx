@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react';
 import { useTranslations } from 'next-intl';
-import { Icon, Input } from '@/components/boffmedia/primitives';
+import { Icon, Input } from '@boffmedia/ui';
 import { DkSeg } from '@/components/boffmedia/ui/tools/datakit';
 import ReplayControlsButton from './ReplayControlsButton';
 import { REPLAY_SPEEDS } from '../../_utils/replaySpeed';

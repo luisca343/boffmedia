@@ -1,6 +1,6 @@
 import * as React from "react"
 import { cn } from "@/lib/utils"
-import { Icon, type IconName } from "@/components/boffmedia/primitives"
+import { Icon, type IconName } from "@boffmedia/ui"
 
 /**
  * Admin «Señal» kit — the `av-*` broadcast control-room vocabulary from the

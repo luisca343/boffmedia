@@ -2,7 +2,7 @@
 
 import { useCallback } from "react";
 import { useTranslations } from "next-intl";
-import { Icon, Stepper } from "@/components/boffmedia/primitives";
+import { Icon, Stepper } from "@boffmedia/ui";
 import { WorkbenchLayout } from "@/components/boffmedia/ui/schematic/WorkbenchLayout";
 import { useCompatEngine } from "./_hooks/useCompatEngine";
 import { useToolActions } from "./_hooks/useToolActions";

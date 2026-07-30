@@ -1,7 +1,7 @@
 "use client"
 
 import { useTranslations } from "next-intl"
-import { useFormat } from "@/lib/useFormat"
+import { useFormat } from "@boffmedia/ui/useFormat"
 import { usePokedexData } from "@/hooks/usePokedexData"
 import { useRotomUuid } from "@/components/smartrotom/behavior/useRotomUuid"
 import { useGetRegistries } from "@/hooks/pokemon/useGetRegistries"

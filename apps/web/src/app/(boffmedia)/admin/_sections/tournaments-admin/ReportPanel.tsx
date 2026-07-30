@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from "react"
 import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
-import { Panel, Field, Input, Select, Button, toast, Spinner } from "@/components/boffmedia/primitives"
+import { Panel, Field, Input, Select, Button, toast, Spinner } from "@boffmedia/ui"
 import { TnFormatBadge } from "@/components/boffmedia/ui/tournaments"
 import { useTournaments } from "@/hooks/tournaments/useTournaments"
 import { UsersService } from "@/services/api/boffmedia/usersService"

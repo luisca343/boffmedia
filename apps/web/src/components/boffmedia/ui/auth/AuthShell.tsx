@@ -3,7 +3,7 @@
 import * as React from "react"
 import Link from "next/link"
 import { useTranslations } from "next-intl"
-import { Icon, Kicker } from "@/components/boffmedia/primitives"
+import { Icon, Kicker } from "@boffmedia/ui"
 
 const GRID_BG: React.CSSProperties = {
   backgroundImage: [

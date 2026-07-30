@@ -5,7 +5,7 @@
 import { useMemo } from "react"
 import { useTranslations } from "next-intl"
 import { userMessageFrom } from "@/services/boffAPI"
-import { useFormat } from "@/lib/useFormat"
+import { useFormat } from "@boffmedia/ui/useFormat"
 import { Avatar, Badge, Empty, Icon, Seal, Skeleton } from "../ui"
 import { useBuscados } from "../../_hooks/queries"
 import { useGobiernoUi } from "../../_stores/useGobiernoUi"

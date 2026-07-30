@@ -2,7 +2,7 @@ import { useForm, Controller } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
 import { useTranslations } from "next-intl"
-import { Button, Field, Input, Select } from "@/components/boffmedia/primitives"
+import { Button, Field, Input, Select } from "@boffmedia/ui"
 import { useGetEvents } from "@/hooks/events/useGetEvents"
 
 const teamSchema = z.object({

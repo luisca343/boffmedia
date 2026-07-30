@@ -11,7 +11,7 @@ import {
   Seg,
   Spinner,
   type IconName,
-} from "@/components/boffmedia/primitives"
+} from "@boffmedia/ui"
 import {
   AccountForm,
   ActivityFeed,

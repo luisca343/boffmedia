@@ -2,7 +2,7 @@
 
 import { useCallback, useMemo, useState } from "react"
 import { useTranslations } from "next-intl"
-import { Icon, Button } from "@/components/boffmedia/primitives"
+import { Icon, Button } from "@boffmedia/ui"
 import { DkTable, DkSearch, DkChip, DkTeam, DkCopy, DkEmpty, DkSkelList } from "@/components/boffmedia/ui/tools/datakit"
 import { spriteUrl, handleSpriteError } from "@/features/vgc-tracker/types"
 import type { PlayerEntry, TeamSlot } from "../_lib/meta-types"

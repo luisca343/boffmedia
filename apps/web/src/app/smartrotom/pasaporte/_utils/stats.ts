@@ -1,4 +1,4 @@
-import { intlLocale } from "@/lib/locale"
+import { intlLocale } from "@boffmedia/ui/locale"
 import type { MinecraftStats } from "@/services/api/smartrotom/playerService"
 import type { MovementRow } from "../_types"
 

@@ -5,7 +5,7 @@ import { useTranslations } from "next-intl"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { Button, Field, Icon, Input, toast } from "@/components/boffmedia/primitives"
+import { Button, Field, Icon, Input, toast } from "@boffmedia/ui"
 import { AuthService } from "@/services/api/boffmedia/authService"
 import { AuthShell } from "./AuthShell"
 

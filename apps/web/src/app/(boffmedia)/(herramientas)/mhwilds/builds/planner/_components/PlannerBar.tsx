@@ -1,7 +1,7 @@
 "use client"
 
 import { useTranslations } from "next-intl"
-import { Button, Icon, IconButton } from "@/components/boffmedia/primitives"
+import { Button, Icon, IconButton } from "@boffmedia/ui"
 import { MhBar, MhBarSide, MhModes, MhSeal } from "../../../_components/ui/mh-kit"
 
 export function PlannerBar({

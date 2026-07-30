@@ -2,7 +2,7 @@
 
 import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
-import { useFormat } from "@/lib/useFormat"
+import { useFormat } from "@boffmedia/ui/useFormat"
 import type { WpListing } from "../_types/market.types"
 import { FORMAT_ICON, FORMAT_LABEL_KEY, fmt } from "../_utils/format"
 import { RARITY_HOVER, RARITY_STRIP } from "../_utils/rarity"

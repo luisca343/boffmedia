@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { useTranslations } from "next-intl"
-import { Icon, type IconName } from "@/components/boffmedia/primitives"
+import { Icon, type IconName } from "@boffmedia/ui"
 import { cn } from "@/lib/utils"
 import { DkSelect } from "@/components/boffmedia/ui/tools/datakit"
 import { BSIM_MODES, BSIM_FORMATS, BSIM_FORMAT_KEY, type BsimMode, type BsimView } from "../_lib/bsim-data"

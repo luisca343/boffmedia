@@ -3,7 +3,7 @@
 import * as React from "react"
 import { useRouter } from "next/navigation"
 import { useTranslations } from "next-intl"
-import { Empty, Spinner } from "@/components/boffmedia/primitives"
+import { Empty, Spinner } from "@boffmedia/ui"
 import { CategoryTile, ForumStats, OnlineList } from "@/components/boffmedia/ui/community"
 import { useForumCategories } from "@/hooks/forum/useForumCategories"
 import { useForumOnline } from "@/hooks/forum/useForumOnline"

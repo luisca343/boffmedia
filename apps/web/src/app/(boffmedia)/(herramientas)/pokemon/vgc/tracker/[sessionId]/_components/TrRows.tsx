@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
-import { Icon } from "@/components/boffmedia/primitives"
+import { Icon } from "@boffmedia/ui"
 import { TrResult, TrBrought, trFmtTime } from "../../_components/ui/tr-ui"
 import { seriesScore } from "@/features/vgc-tracker/types"
 import type { Match, Series } from "@/features/vgc-tracker/types"

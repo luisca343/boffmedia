@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { useTranslations } from "next-intl"
-import { toast } from "@/components/boffmedia/primitives"
+import { toast } from "@boffmedia/ui"
 import { SuggestionsService, type CreateSuggestionPayload } from "@/services/api/boffmedia/suggestionsService"
 import { SuggestForm } from "./SuggestForm"
 import { SuggestSuccess } from "./SuggestSuccess"

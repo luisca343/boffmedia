@@ -8,7 +8,7 @@ import { useGobiernoUi } from "../../_stores/useGobiernoUi"
 import { useCiudadano, useBuscados, useDenuncias, useMultas } from "../../_hooks/queries"
 import { STANDING, MULTA_STATUS, BUSCADO_STATUS, DENUNCIA_STATUS } from "../../_utils/tones"
 import { fmtDate, money, townName } from "../../_utils/format"
-import { useFormat } from "@/lib/useFormat"
+import { useFormat } from "@boffmedia/ui/useFormat"
 
 /**
  * The citizen dossier: everything the government knows about one person, opened by clicking

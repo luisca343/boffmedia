@@ -12,6 +12,9 @@ const bundleAnalyzer = withBundleAnalyzer({
 const nextConfig = {
     reactStrictMode: false,
     output: "standalone",
+
+    // @boffmedia/ui ships TypeScript source, not a build.
+    transpilePackages: ['@boffmedia/ui'],
     typescript: {
         ignoreBuildErrors: true,
     },

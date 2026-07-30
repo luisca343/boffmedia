@@ -1,7 +1,7 @@
 import * as React from "react"
 import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
-import { Icon } from "@/components/boffmedia/primitives"
+import { Icon } from "@boffmedia/ui"
 import { evOrgMeta, EV_BOFF, type EventOrganizerData } from "./events-util"
 
 const SEAL = "grid place-items-center flex-none font-display font-bold leading-none cut-seal [--cut:5px]"

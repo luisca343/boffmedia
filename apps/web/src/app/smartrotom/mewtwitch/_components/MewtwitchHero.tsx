@@ -2,7 +2,7 @@
 
 import { useTranslations } from "next-intl"
 import { Avatar, Button, I, LivePill, PulseDot, Tag } from "@/components/smartrotom/media/ui"
-import { useFormat } from "@/lib/useFormat"
+import { useFormat } from "@boffmedia/ui/useFormat"
 
 export interface HeroData {
   href: string

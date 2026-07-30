@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { Sample, Section } from "../showcase-shared"
-import { Banner, CodeBlock, Disclosure, OptionGroup, Select, Toggle } from "@/components/boffmedia/primitives"
+import { Banner, CodeBlock, Disclosure, OptionGroup, Select, Toggle } from "@boffmedia/ui"
 
 const SEL_OPTS = [
   { value: "0", label: "Dinero" },

@@ -1,7 +1,7 @@
 "use client"
 
 import { useTranslations } from "next-intl"
-import { Banner, Empty } from "@/components/boffmedia/primitives"
+import { Banner, Empty } from "@boffmedia/ui"
 import { MEW_SENAL_VARS, mewCatKey } from "../mew-util"
 import { MewCatTabs, MewTopBar, MewTrail } from "./MewChrome"
 import { MewRoster } from "./MewRoster"

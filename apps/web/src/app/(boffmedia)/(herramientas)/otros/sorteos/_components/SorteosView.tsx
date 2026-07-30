@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { useTranslations } from "next-intl"
-import { Kicker, Button, Icon, Input, Textarea, Seg, Toggle, Avatar } from "@/components/boffmedia/primitives"
+import { Kicker, Button, Icon, Input, Textarea, Seg, Toggle, Avatar } from "@boffmedia/ui"
 import { useSorteos, oddsOf } from "../_lib/useSorteos"
 import { SrtWeight, SrtRow, SrtWinnerList, SrtSeedTag, SrtConfetti, SrtPanel, SrtPanelHead } from "./ui/srt-kit"
 // v3 «Señal» draw animation (horizontal reel), keeps the original tick/win sound.

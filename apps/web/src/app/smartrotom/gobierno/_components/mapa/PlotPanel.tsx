@@ -6,7 +6,7 @@ import { useHistorial } from "../../_hooks/queries"
 import { fmtDate, townName } from "../../_utils/format"
 import { townColor, type Pt } from "../../_utils/geo"
 import { useGobiernoUi } from "../../_stores/useGobiernoUi"
-import { useFormat } from "@/lib/useFormat"
+import { useFormat } from "@boffmedia/ui/useFormat"
 import type { Parcela } from "../../_types"
 
 export function PlotPanel({

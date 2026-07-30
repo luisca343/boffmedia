@@ -1,6 +1,6 @@
 import * as React from "react"
 import { useTranslations } from "next-intl"
-import { Clock, Ticker } from "@/components/boffmedia/primitives"
+import { Clock, Ticker } from "@boffmedia/ui"
 
 // Keys, not literals — a module-scope `t()` would freeze whichever locale loaded
 // first. `Ticker` renders each item as HTML, so the <em> stroke rides in the value.

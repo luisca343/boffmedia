@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { useTranslations } from "next-intl"
 import { DkApp, DkBar, DkBody, DkTitle, DkBack, DkSeg, DkEmpty } from "@/components/boffmedia/ui/tools/datakit"
-import { Button } from "@/components/boffmedia/primitives"
+import { Button } from "@boffmedia/ui"
 import { LobbyView } from "./LobbyView"
 import { ReplaysView } from "./ReplaysView"
 import { BSIM_TABS, type BsimView } from "../_lib/bsim-data"

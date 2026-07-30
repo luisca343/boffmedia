@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Icon } from "@/components/boffmedia/primitives"
+import { Icon } from "@boffmedia/ui"
 import { PokemonSprite } from "./ui/PokemonSprite"
 import { TypeBadge } from "./ui/TypeBadge"
 import { damageColor, type DamageTone } from "./ui/theme"

@@ -1,5 +1,5 @@
-import type { IconName } from "@/components/boffmedia/primitives"
-import { timeAgo as sharedTimeAgo } from "@/lib/format"
+import type { IconName } from "@boffmedia/ui"
+import { timeAgo as sharedTimeAgo } from "@boffmedia/ui/format"
 
 // v3 «Señal» — Comunidad (Blog + Foro) shared types + helpers. Mirrors the
 // window globals/helpers from comunidad-data.js + comunidad-kit.jsx, but the

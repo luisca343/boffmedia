@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react"
 import { useLocale, useTranslations } from "next-intl"
-import { Button, Panel, Select, Toggle, Banner, Empty, Icon } from "@/components/boffmedia/primitives"
+import { Button, Panel, Select, Toggle, Banner, Empty, Icon } from "@boffmedia/ui"
 import { useBoffSession } from "@/services/useBoffSession"
 import type { TcgCard } from "@boffmedia/shared"
 import type { TcgpData } from "../_lib/useTcgpCards"

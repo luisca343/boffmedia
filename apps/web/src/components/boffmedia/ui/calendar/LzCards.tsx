@@ -3,7 +3,7 @@
 import * as React from "react"
 import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
-import { Icon } from "@/components/boffmedia/primitives"
+import { Icon } from "@boffmedia/ui"
 import { LzCover, LzVersList, LzWishStar } from "./LzAtoms"
 import { LZ_GENRE_ICON, LZ_MONTHS, lzFollowers, lzParse, lzWdShort, type LzRelease } from "./calendar-util"
 

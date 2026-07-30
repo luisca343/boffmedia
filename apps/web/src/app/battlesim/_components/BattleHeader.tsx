@@ -4,7 +4,7 @@ import { useTranslations } from 'next-intl';
 
 import type { CSSProperties, ReactNode } from 'react';
 import Link from 'next/link';
-import { Icon } from '@/components/boffmedia/primitives';
+import { Icon } from '@boffmedia/ui';
 import { BxRing } from '@/app/(boffmedia)/(herramientas)/pokemon/battlesim/_components/ui/bx-kit';
 
 /** `labelKey` is a key id under `battlesim.header.modes` — never copy. */

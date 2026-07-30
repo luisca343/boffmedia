@@ -1,7 +1,7 @@
 import * as React from "react"
 import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
-import { Button } from "@/components/boffmedia/primitives"
+import { Button } from "@boffmedia/ui"
 import { FxParticles } from "./travesia-fx"
 import { BEAMS, Grain, PRI_GLOW } from "./landing-shared"
 import { DISCORD } from "./landing-data"

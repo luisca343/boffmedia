@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
-import { Icon } from "@/components/boffmedia/primitives";
+import { Icon } from "@boffmedia/ui";
 import { useToolStore } from "../../_store/tool.store";
 import { structureSupport } from "@/lib/schematic/loader/littletiles-support";
 import type { LittleTilesStructure } from "@/lib/schematic/types";

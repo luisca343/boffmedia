@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { useTranslations } from "next-intl";
-import { Button, Banner, Disclosure, Icon } from "@/components/boffmedia/primitives";
+import { Button, Banner, Disclosure, Icon } from "@boffmedia/ui";
 import { SchematicFilePicker, WorldIdPicker } from "@/components/boffmedia/ui/schematic";
 import { gameMeta, type GameId } from "@/lib/schematic/adapters/game-adapter";
 import { selectEnv, useToolStore, type EnvMode, type EnvRole } from "../../_store/tool.store";

@@ -3,9 +3,9 @@
 import * as React from "react"
 import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
-import { Button, Empty, IconButton, Pagination, SearchInput, Seg, Spinner } from "@/components/boffmedia/primitives"
+import { Button, Empty, IconButton, Pagination, SearchInput, Seg, Spinner } from "@boffmedia/ui"
 import { useGetLeaderboards } from "@/hooks/events/useGetLeaderboards"
-import { useFormat } from "@/lib/useFormat"
+import { useFormat } from "@boffmedia/ui/useFormat"
 import { LeaderRow, type LeaderRowData, type SortKey } from "./LeaderRow"
 
 const PER_PAGE = 12

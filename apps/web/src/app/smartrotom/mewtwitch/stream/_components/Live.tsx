@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { useTranslations } from "next-intl"
 import { Avatar, Button, Check, I, PillBtn, SectionHeader, StreamCard, Tag } from "@/components/smartrotom/media/ui"
-import { useFormat } from "@/lib/useFormat"
+import { useFormat } from "@boffmedia/ui/useFormat"
 import { useFollowerCount, useStreamByUser, useTopStreams, useUser } from "../../_hooks/useTwitch"
 import { compactCount, toStreamCard, twitchThumb, uptimeFrom } from "../../_utils/twitch"
 import { StreamPlayer } from "./StreamPlayer"

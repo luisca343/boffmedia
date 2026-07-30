@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { Sample, Section } from "../showcase-shared"
-import { Button } from "@/components/boffmedia/primitives"
+import { Button } from "@boffmedia/ui"
 import { SrtPanel, SrtPanelHead, SrtRow, SrtSeedTag, SrtWeight, SrtWinnerList } from "@/app/(boffmedia)/(herramientas)/otros/sorteos/_components/ui/srt-kit"
 import type { Entrant } from "@/app/(boffmedia)/(herramientas)/otros/sorteos/_lib/useSorteos"
 import SpinnerAnimation from "@/app/(boffmedia)/(herramientas)/otros/sorteos/_components/spinner/SpinnerAnimation"

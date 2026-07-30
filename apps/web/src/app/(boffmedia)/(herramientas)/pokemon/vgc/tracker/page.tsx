@@ -15,7 +15,7 @@ import {
   DkStat,
   DkTitle,
 } from "@/components/boffmedia/ui/tools/datakit"
-import { Button, Icon } from "@/components/boffmedia/primitives"
+import { Button, Icon } from "@boffmedia/ui"
 import { useSessions, usePresets } from "@/features/vgc-tracker/hooks/useVgcDb"
 import type { Session } from "@/features/vgc-tracker/types"
 import { TrSessionRow } from "./_components/TrSessionRow"

@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { useTranslations } from "next-intl"
-import { Seg } from "@/components/boffmedia/primitives"
+import { Seg } from "@boffmedia/ui"
 import { AvSectionHead } from "../ui/av-kit"
 import { VgcSmogonFetcher } from "./VgcSmogonFetcher"
 import { VgcChampionsFetcher } from "./VgcChampionsFetcher"

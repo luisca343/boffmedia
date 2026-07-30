@@ -3,7 +3,7 @@
 import * as React from "react"
 import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
-import { Icon, type IconName } from "@/components/boffmedia/primitives"
+import { Icon, type IconName } from "@boffmedia/ui"
 
 // v3 «Señal» — MH Wilds shared shell: persistent tool tabs + global favourite
 // star. Prefix mh-tabs-shell / mh-favstar in mh-shell.css. The favourites store

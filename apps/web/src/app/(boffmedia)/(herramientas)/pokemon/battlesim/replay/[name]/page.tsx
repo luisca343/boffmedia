@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { Game } from '@/app/battlesim/replay/_components/Game';
 import { LigaService } from '@/services/api/smartrotom/ligaService';
 import type { ReplayData } from '@/app/battlesim/types';
-import { Spinner } from "@/components/boffmedia/primitives"
+import { Spinner } from "@boffmedia/ui"
 
 export default function ReplayPage({ params }: { params: Promise<{ name: string }> }) {
   const { name } = use(params);

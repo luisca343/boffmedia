@@ -2,7 +2,7 @@
 
 import React, { useEffect } from "react"
 import { useTranslations } from "next-intl"
-import { Icon, IconButton, type IconName } from "@/components/boffmedia/primitives"
+import { Icon, IconButton, type IconName } from "@boffmedia/ui"
 import {
   MH_VARS, rarClamp, rarVar, rarInk, elementColor, SK_COLOR, skillCategory,
   SHARP_ORDER, RES_ORDER,

@@ -4,7 +4,7 @@ import { useTranslations } from "next-intl"
 import { Stat } from "../ui"
 import { useBuscados, useCenso, useOficiales, useParcelas, useTesoreria } from "../../_hooks/queries"
 import { money } from "../../_utils/format"
-import { useFormat } from "@/lib/useFormat"
+import { useFormat } from "@boffmedia/ui/useFormat"
 
 export function StatsRow() {
   const t = useTranslations("gobierno")

@@ -3,7 +3,7 @@
 import * as React from "react"
 import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
-import { Icon } from "@/components/boffmedia/primitives"
+import { Icon } from "@boffmedia/ui"
 import { KvPlatforms, KvReview, KvTags } from "./KvAtoms"
 import { kvMetaBand, kvMetaColor, kvReviewBand, type KvInfoData, type KvKey, type KvPriceData } from "./keys-util"
 

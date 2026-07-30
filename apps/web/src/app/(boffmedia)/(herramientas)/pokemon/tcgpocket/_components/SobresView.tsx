@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react"
 import { useTranslations } from "next-intl"
-import { Button, Panel, Empty } from "@/components/boffmedia/primitives"
+import { Button, Panel, Empty } from "@boffmedia/ui"
 import type { TcgCard } from "@boffmedia/shared"
 import type { TcgpData, TcgpSet } from "../_lib/useTcgpCards"
 import { typeColor } from "../_lib/tcgp-maps"

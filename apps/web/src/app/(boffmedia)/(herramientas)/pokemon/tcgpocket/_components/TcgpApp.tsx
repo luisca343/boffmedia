@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { useTranslations } from "next-intl"
-import { Icon, Spinner, Empty, type IconName } from "@/components/boffmedia/primitives"
+import { Icon, Spinner, Empty, type IconName } from "@boffmedia/ui"
 import { cn } from "@/lib/utils"
 import type { TcgCard } from "@boffmedia/shared"
 import { useTcgpCards } from "../_lib/useTcgpCards"

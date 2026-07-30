@@ -1,7 +1,7 @@
 "use client"
 import { Battle, Pokemon } from "@pkmn/client";
 import { useTranslations } from "next-intl";
-import { Spinner, Skeleton } from "@/components/boffmedia/primitives"
+import { Spinner, Skeleton } from "@boffmedia/ui"
 import { forwardRef, useCallback, useRef, memo } from "react";
 import { positionsP1, positionsP2, ASPECT_RATIO, getScaleMultiplier } from "../_utils/viewUtils";
 import { PokemonElement, PokemonRefType } from "./PokemonElement";

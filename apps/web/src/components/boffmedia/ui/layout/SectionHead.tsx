@@ -1,5 +1,5 @@
 import * as React from "react"
-import { Kicker } from "@/components/boffmedia/primitives"
+import { Kicker } from "@boffmedia/ui"
 
 export interface SectionHeadProps {
   kicker?: React.ReactNode

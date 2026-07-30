@@ -5,7 +5,7 @@ import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
 import { useTranslations } from "next-intl"
 import { signIn } from "next-auth/react"
-import { AuthProviderBtn, Divider, Icon, Kicker, toast } from "@/components/boffmedia/primitives"
+import { AuthProviderBtn, Divider, Icon, Kicker, toast } from "@boffmedia/ui"
 import { CredentialsForm } from "./CredentialsForm"
 
 const GRID_BG: React.CSSProperties = {

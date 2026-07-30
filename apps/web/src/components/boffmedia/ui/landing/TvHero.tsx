@@ -3,7 +3,7 @@
 import * as React from "react"
 import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
-import { Kicker, Button, CountUp } from "@/components/boffmedia/primitives"
+import { Kicker, Button, CountUp } from "@boffmedia/ui"
 import { Decode, FxParticles } from "./travesia-fx"
 import { BEAMS, Grain, LINE_INNER, LINE_MASK, PRI_GLOW, tvGoTo } from "./landing-shared"
 import { TV3_HUD } from "./landing-data"

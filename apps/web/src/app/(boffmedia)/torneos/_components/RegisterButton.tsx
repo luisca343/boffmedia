@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { useSession } from "next-auth/react"
 import { useTranslations } from "next-intl"
-import { Button, Field, Input, Modal, toast } from "@/components/boffmedia/primitives"
+import { Button, Field, Input, Modal, toast } from "@boffmedia/ui"
 import {
   TournamentsService,
   type TournamentDetailApi,

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { useTranslations } from "next-intl"
-import { useFormat } from "@/lib/useFormat"
+import { useFormat } from "@boffmedia/ui/useFormat"
 import { useGetPerformance } from "@/hooks/_main/useGetPerformance"
 import { Bar, Card, Icon, type IconName, PageHead, Skeleton } from "../../_components/ui"
 import { ConsolaHero } from "../../_components/admin/ConsolaHero"

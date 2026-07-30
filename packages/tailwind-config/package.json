@@ -1,0 +1,14 @@
+{
+  "name": "@boffmedia/tailwind-config",
+  "version": "0.0.1",
+  "private": true,
+  "main": "./base.ts",
+  "types": "./base.ts",
+  "exports": {
+    "./base": "./base.ts",
+    "./base.css": "./base.css"
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.4.0"
+  }
+}

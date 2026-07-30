@@ -2,7 +2,7 @@
 
 import { useMemo } from "react"
 import { useTranslations } from "next-intl"
-import { useFormat } from "@/lib/useFormat"
+import { useFormat } from "@boffmedia/ui/useFormat"
 import { TrophyIcon } from "lucide-react"
 import { useRotomUuid } from "@/components/smartrotom/behavior/useRotomUuid"
 import { useGetRegistries } from "@/hooks/pokemon/useGetRegistries"

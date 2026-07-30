@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 
 import { useBoffSession } from "@/services/useBoffSession";
-import { useFormat } from "@/lib/useFormat";
+import { useFormat } from "@boffmedia/ui/useFormat";
 
 import { articleHref } from "../../../_components/ArticleCard";
 import {

@@ -3,7 +3,7 @@
 import * as React from "react"
 import { cn } from "@/lib/utils"
 import { MONO_LABEL, Sample, Section } from "../../showcase-shared"
-import { Banner, Button, Checkbox, Field, IconButton, Input, Menu, Modal, Popover, Select, toast } from "@/components/boffmedia/primitives"
+import { Banner, Button, Checkbox, Field, IconButton, Input, Menu, Modal, Popover, Select, toast } from "@boffmedia/ui"
 
 export function MenusSections() {
   const [modalOpen, setModalOpen] = React.useState(false)

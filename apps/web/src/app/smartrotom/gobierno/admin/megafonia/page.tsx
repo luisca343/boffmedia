@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react"
 import { useTranslations } from "next-intl"
 import { useGetArceuSpeak } from "@/hooks/_main/useGetArceuSpeak"
-import { useFormat } from "@/lib/useFormat"
+import { useFormat } from "@boffmedia/ui/useFormat"
 import { Bar, Button, Card, Empty, PageHead, Select, Skeleton, Sunken, TextArea } from "../../_components/ui"
 import { ConsolaHero } from "../../_components/admin/ConsolaHero"
 import { MCText } from "../../_components/admin/MCText"

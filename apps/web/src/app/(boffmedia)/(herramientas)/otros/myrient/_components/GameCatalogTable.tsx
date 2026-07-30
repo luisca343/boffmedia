@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from "react";
 import { useTranslations } from "next-intl";
-import { Button, Icon, SearchInput } from "@/components/boffmedia/primitives";
+import { Button, Icon, SearchInput } from "@boffmedia/ui";
 import { GameFileEntry } from "@/services/api/boffmedia/scrapeService";
 import { MyFileRow } from "./ui/my-kit";
 

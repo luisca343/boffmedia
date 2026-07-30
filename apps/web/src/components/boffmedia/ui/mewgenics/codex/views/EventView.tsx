@@ -1,6 +1,6 @@
 "use client"
 
-import { Icon, type IconName } from "@/components/boffmedia/primitives"
+import { Icon, type IconName } from "@boffmedia/ui"
 import { useTranslations } from "next-intl"
 import { MewText, MewPanel } from "../../MewAtoms"
 import { mewHuman, type MewEventOption } from "../../mew-util"

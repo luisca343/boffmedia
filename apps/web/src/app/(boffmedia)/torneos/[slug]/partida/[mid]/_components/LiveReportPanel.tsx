@@ -3,7 +3,7 @@
 import * as React from "react"
 import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
-import { Button, Icon, toast } from "@/components/boffmedia/primitives"
+import { Button, Icon, toast } from "@boffmedia/ui"
 import { TM_CARD, TM_CARD_HEAD, TM_CARD_H3 } from "@/components/boffmedia/ui/tournaments"
 import { TournamentsService, type TnMatchDetailApi } from "@/services/api/boffmedia/tournamentsService"
 

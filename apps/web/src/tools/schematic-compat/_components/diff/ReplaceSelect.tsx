@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
-import { Icon } from "@/components/boffmedia/primitives";
+import { Icon } from "@boffmedia/ui";
 import { AssetThumb, type ThumbRenderer } from "@/components/boffmedia/ui/schematic";
 import { POP_SHADOW } from "../ui/sch-tokens";
 

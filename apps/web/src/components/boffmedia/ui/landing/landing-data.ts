@@ -1,6 +1,6 @@
 import { getLandingItems, getToolHref } from "@/data/games"
 import { HUB_SLUGS } from "@/components/boffmedia/ui/tools/tools-data"
-import type { IconName } from "@/components/boffmedia/primitives"
+import type { IconName } from "@boffmedia/ui"
 
 /* Journey palette — each stop tints the sky; color interpolates continuously
    between stops so there are no hard edges between sections. */

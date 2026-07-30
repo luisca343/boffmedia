@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
-import { Button, Field, Input, Select } from "@/components/boffmedia/primitives";
+import { Button, Field, Input, Select } from "@boffmedia/ui";
 import { useMangaStore, type EpubMetadata } from "@/stores/useMangaStore";
 
 const LANGUAGES = [

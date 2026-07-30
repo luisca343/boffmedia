@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { cn } from "@/lib/utils"
-import { Icon } from "@/components/boffmedia/primitives"
+import { Icon } from "@boffmedia/ui"
 import { CM_NOTE_ICON, CM_NOTE_TONE, type PostBlock } from "./community-util"
 
 // Renders an array of content blocks to «Señal» prose: italic display headings,

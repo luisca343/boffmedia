@@ -2,7 +2,7 @@ import * as React from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { useTranslations } from "next-intl"
-import { Icon, Clock, type IconName } from "@/components/boffmedia/primitives"
+import { Icon, Clock, type IconName } from "@boffmedia/ui"
 import { FOOTER_COLS, FOOTER_SOCIAL } from "@/components/boffmedia/ui/navigation/nav-data"
 
 /** A single footer link target (already resolved — label passed separately). */

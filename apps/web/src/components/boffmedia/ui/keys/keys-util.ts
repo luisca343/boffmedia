@@ -1,4 +1,4 @@
-import type { IconName } from "@/components/boffmedia/primitives"
+import type { IconName } from "@boffmedia/ui"
 
 // v3 «Señal» — Claves de Steam shared types + helpers. Mirrors v3-keys-data.jsx.
 // Each key reproduces the Steam `appdetails` shape (info · price · media). The

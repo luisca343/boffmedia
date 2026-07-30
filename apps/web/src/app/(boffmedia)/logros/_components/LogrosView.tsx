@@ -2,10 +2,10 @@
 
 import * as React from "react"
 import { useTranslations } from "next-intl"
-import { Button, Empty, SearchInput, Seg, Spinner } from "@/components/boffmedia/primitives"
+import { Button, Empty, SearchInput, Seg, Spinner } from "@boffmedia/ui"
 import { AchievementItem, type AchievementLike } from "@/components/boffmedia/ui/events"
 import { useGetAchievements } from "@/hooks/events/useGetAchievements"
-import { useFormat } from "@/lib/useFormat"
+import { useFormat } from "@boffmedia/ui/useFormat"
 
 const FILTERS = ["all", "achievement", "medal"] as const
 type Filter = (typeof FILTERS)[number]

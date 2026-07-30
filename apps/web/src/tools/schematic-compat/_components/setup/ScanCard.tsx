@@ -2,7 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
-import { Icon } from "@/components/boffmedia/primitives";
+import { Icon } from "@boffmedia/ui";
 import type { SchEnvMode, SchGame, SchRegistry } from "../ui/sch-tokens";
 
 const GAMES_LIST: { id: SchGame; labelKey: string; icon: "cube" | "gamepad" }[] = [

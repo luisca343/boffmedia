@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react"
 import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
-import { Icon, type IconName } from "@/components/boffmedia/primitives"
+import { Icon, type IconName } from "@boffmedia/ui"
 import type { TcgCard } from "@boffmedia/shared"
 import {
   cssVars, typeColor, typeGlyph, normType, normStage, rarityMeta, isPokemon, pct, padNum, localCardArt,

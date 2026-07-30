@@ -7,7 +7,7 @@ import { useBuscados } from "../../_hooks/queries"
 import { money } from "../../_utils/format"
 import { hrefOf } from "../../_utils/nav"
 import { useGobiernoUi } from "../../_stores/useGobiernoUi"
-import { useFormat } from "@/lib/useFormat"
+import { useFormat } from "@boffmedia/ui/useFormat"
 import { CitizenRow } from "./CitizenRow"
 
 export function MasBuscadosCard() {

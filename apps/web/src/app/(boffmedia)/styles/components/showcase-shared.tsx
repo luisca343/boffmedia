@@ -1,6 +1,6 @@
 import * as React from "react"
 import { cn } from "@/lib/utils"
-import { Kicker } from "@/components/boffmedia/primitives"
+import { Kicker } from "@boffmedia/ui"
 
 // Shared class fragments + specimen wrappers for the Sistema showcase.
 // Split out of the old monolithic page.tsx (convention §10).

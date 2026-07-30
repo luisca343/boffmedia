@@ -4,7 +4,7 @@ import * as React from "react"
 import Link from "next/link"
 import { use } from "react"
 import { useTranslations } from "next-intl"
-import { Button, Spinner } from "@/components/boffmedia/primitives"
+import { Button, Spinner } from "@boffmedia/ui"
 import {
   TmRoundHeader,
   TmOpponentCard,
