@@ -498,7 +498,33 @@
       "archive": "Archive",
       "unarchive": "Restore",
       "archiveFailed": "Could not archive",
-      "showArchived": "Show archived"
+      "showArchived": "Show archived",
+      "newVersion": "New version",
+      "versionName": "Version name",
+      "versionNameHint": "What players see: “1.4.2”, “Season 3”…",
+      "minecraft": "Minecraft version",
+      "loader": "Mod loader",
+      "loaderVersion": "Loader version",
+      "notes": "Notes",
+      "mods": "Mods (JSON)",
+      "modsHint": "PackFile array with a modrinth, curseforge or url source. Validated server-side with pack-schema.",
+      "modsInvalid": "This is not a valid JSON array",
+      "overrides": "Our own files",
+      "overridesHint": "Configs, scripts and resource packs we host. Uploaded to the content-addressed store before the version is created.",
+      "prefix": "Target folder",
+      "addFiles": "Add files",
+      "addFolder": "Add folder",
+      "blobFailed": "A file could not be uploaded",
+      "versionCreated": "Version created",
+      "versionFailed": "Could not create the version",
+      "uploadState": {
+        "pending": "Queued",
+        "hashing": "Hashing",
+        "uploading": "Uploading",
+        "reused": "Already stored",
+        "done": "Uploaded",
+        "error": "Failed"
+      }
     }
   },
   "tournaments": {

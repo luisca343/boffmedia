@@ -498,7 +498,33 @@
       "archive": "Archivar",
       "unarchive": "Restaurar",
       "archiveFailed": "No se pudo archivar",
-      "showArchived": "Ver archivados"
+      "showArchived": "Ver archivados",
+      "newVersion": "Nueva versión",
+      "versionName": "Nombre de la versión",
+      "versionNameHint": "Lo que ven los jugadores: «1.4.2», «Temporada 3»…",
+      "minecraft": "Versión de Minecraft",
+      "loader": "Mod loader",
+      "loaderVersion": "Versión del loader",
+      "notes": "Notas",
+      "mods": "Mods (JSON)",
+      "modsHint": "Array de PackFile con origen modrinth, curseforge o url. Se valida en el servidor con pack-schema.",
+      "modsInvalid": "Esto no es un array JSON válido",
+      "overrides": "Archivos propios",
+      "overridesHint": "Configs, scripts y resource packs que alojamos nosotros. Se suben al almacén por contenido antes de crear la versión.",
+      "prefix": "Carpeta destino",
+      "addFiles": "Añadir archivos",
+      "addFolder": "Añadir carpeta",
+      "blobFailed": "No se pudo subir un archivo",
+      "versionCreated": "Versión creada",
+      "versionFailed": "No se pudo crear la versión",
+      "uploadState": {
+        "pending": "En cola",
+        "hashing": "Calculando hash",
+        "uploading": "Subiendo",
+        "reused": "Ya estaba",
+        "done": "Subido",
+        "error": "Error"
+      }
     }
   },
   "tournaments": {

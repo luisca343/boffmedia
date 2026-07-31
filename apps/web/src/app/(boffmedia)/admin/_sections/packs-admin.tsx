@@ -15,6 +15,7 @@ import {
   toast,
 } from "@boffmedia/ui"
 import { AvKpi, AvKpis, AvPanel, AvPill, AvSectionHead } from "../_components/ui/av-kit"
+import { CreateVersionModal } from "../_components/packs/create-version-modal"
 import {
   type AccessRow,
   type AdminPack,
@@ -158,6 +159,7 @@ function VersionsTab({ pack, onChanged }: { pack: AdminPack; onChanged: () => vo
   const t = useTranslations("admin.packs")
   const [rows, setRows] = useState<PackVersionRow[] | null>(null)
   const [publishing, setPublishing] = useState<string | null>(null)
+  const [creating, setCreating] = useState(false)
 
   const load = useCallback(async () => {
     const res = await PacksService.versions(pack.id)
@@ -184,13 +186,39 @@ function VersionsTab({ pack, onChanged }: { pack: AdminPack; onChanged: () => vo
     }
   }
 
+  const modal = (
+    <CreateVersionModal
+      pack={pack}
+      open={creating}
+      onClose={() => setCreating(false)}
+      onCreated={() => {
+        void load()
+        onChanged()
+      }}
+    />
+  )
+
   if (!rows) return <Spinner />
   if (rows.length === 0) {
-    return <Empty icon="layers" title={t("noVersions")} lead={t("noVersionsLead")} />
+    return (
+      <>
+        <Empty icon="layers" title={t("noVersions")} lead={t("noVersionsLead")}>
+          <Button size="sm" variant="pri" icon="plus" onClick={() => setCreating(true)}>
+            {t("newVersion")}
+          </Button>
+        </Empty>
+        {modal}
+      </>
+    )
   }
 
   return (
     <div className="flex flex-col gap-2">
+      <div className="flex justify-end">
+        <Button size="sm" variant="pri" icon="plus" onClick={() => setCreating(true)}>
+          {t("newVersion")}
+        </Button>
+      </div>
       {rows.map((v) => (
         <div
           key={v.id}
@@ -228,6 +256,7 @@ function VersionsTab({ pack, onChanged }: { pack: AdminPack; onChanged: () => vo
           </span>
         </div>
       ))}
+      {modal}
     </div>
   )
 }
