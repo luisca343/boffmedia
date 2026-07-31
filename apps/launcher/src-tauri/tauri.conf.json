@@ -30,7 +30,7 @@
   },
   "plugins": {
     "updater": {
-      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEQ0ODMyMThDODIwQkRCODAKUldTQTJ3dUNqQ0dEMUgyOW9FOEhIZk11NzlJVmVYQkg0TDIvaUdNa1pXY3VUV3lmdWxoem0wbVcK",
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDM2MDlBNjU2QTdDNzFEQwpSV1RjY1h4cVpacGdBOFdJWE54ZTJ6TU1CUXAyNkFqb3phSWEwNG1vek02QXJoVkpSczZhOVdhSwo=",
       "endpoints": [
         "https://api.boffmedia.es/launcher/updates/{{target}}-{{arch}}/{{current_version}}"
       ]
@@ -38,7 +38,7 @@
   },
   "bundle": {
     "active": true,
-    "targets": "all",
+    "targets": ["nsis", "app", "dmg", "deb", "appimage"],
     "createUpdaterArtifacts": true,
     "icon": [
       "icons/32x32.png",
@@ -46,6 +46,25 @@
       "icons/128x128@2x.png",
       "icons/icon.icns",
       "icons/icon.ico"
-    ]
+    ],
+    "windows": {
+      "nsis": {
+        "installerIcon": "icons/icon.ico",
+        "uninstallerIcon": "icons/icon.ico",
+        "headerImage": "installer/nsis-header.bmp",
+        "uninstallerHeaderImage": "installer/nsis-header.bmp",
+        "sidebarImage": "installer/nsis-sidebar.bmp",
+        "installerHooks": "installer/hooks.nsh",
+        "languages": ["Spanish", "English"],
+        "customLanguageFiles": {
+          "Spanish": "installer/lang/Spanish.nsh",
+          "English": "installer/lang/English.nsh"
+        },
+        "displayLanguageSelector": false,
+        "startMenuFolder": "Boffmedia",
+        "compression": "lzma",
+        "installMode": "currentUser"
+      }
+    }
   }
 }

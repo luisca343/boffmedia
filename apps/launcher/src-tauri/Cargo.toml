@@ -64,6 +64,10 @@ open = "5"
 # Windows/macOS/Linux, and a target table here would make `updates.rs` fail to
 # compile for a mobile target that will never be built anyway.
 tauri-plugin-updater = "2"
+# A second launch must never start a second game-managing process: two instances
+# would race on the same instance dir, the same marker file and the same
+# credential entry. This one focuses the window that is already open instead.
+tauri-plugin-single-instance = "2"
 
 # §9's memory heuristic needs one number: total physical RAM. Both crates were
 # ALREADY in Cargo.lock as transitive dependencies of tauri, so neither adds a
