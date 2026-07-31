@@ -52,6 +52,7 @@ pub fn run() {
             auth::auth_await,
             auth::auth_restore,
             auth::auth_logout,
+            auth::auth_open_verification,
             api::packs_list,
             api::pack_manifest,
             api::invite_redeem,

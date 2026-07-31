@@ -72,12 +72,17 @@ Mojang) and the launcher session JWT (`api`, only ever sent to our API). Signing
 out and signing in both drop the second, or the next player inherits the previous
 player's entitlements.
 
-Point it at a local API with `BOFF_API_URL` (runtime env var wins over the
-compile-time value; the default is `https://api.boffmedia.es`):
+The base URL defaults to `https://api.boffmedia.es` — **production**, which is what
+a packaged build should carry. `BOFF_API_URL` overrides it at runtime, so pointing
+at the dev API needs no rebuild. The shell is built on Windows, so PowerShell (a
+bare `VAR=value` prefix is bash syntax and PowerShell rejects it):
 
-```bash
-BOFF_API_URL=http://localhost:34301 pnpm --filter launcher dev
+```powershell
+$env:BOFF_API_URL="https://api.ficuslab.es"; pnpm --filter launcher dev
 ```
+
+`api.ficuslab.es` is the dev API (`main.ts` declares both servers). A local Nest
+on `http://localhost:34301` works too.
 
 The listing is a *summary* — `fileCount`, not `files`, and never the allowlist
 UUIDs. The file list exists only in a manifest, which is fetched per install, and
