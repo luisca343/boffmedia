@@ -54,6 +54,19 @@ fn runtime_info(app: tauri::AppHandle) -> RuntimeInfo {
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
+        // MUST be the first plugin registered — it aborts the second process
+        // before any other plugin has set up state. The window is created
+        // hidden and only revealed by the renderer (`revealWindow`), so a
+        // second launch has to show() as well as focus: without it the user
+        // sees nothing happen and clicks again.
+        .plugin(tauri_plugin_single_instance::init(|app, _argv, _cwd| {
+            use tauri::Manager as _;
+            if let Some(window) = app.get_webview_window("main") {
+                let _ = window.show();
+                let _ = window.unminimize();
+                let _ = window.set_focus();
+            }
+        }))
         // The endpoint list from tauri.conf.json is only the default; every
         // check re-points it at `api::base_url()` (see updates.rs).
         .plugin(tauri_plugin_updater::Builder::new().build())

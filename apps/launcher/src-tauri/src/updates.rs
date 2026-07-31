@@ -69,8 +69,19 @@ fn updater(app: &tauri::AppHandle) -> Result<tauri_plugin_updater::Updater, Stri
 /// are up to date" (the feed answers 204) and, deliberately, nothing else —
 /// errors are returned so the caller can log them, but the renderer swallows
 /// them: a player who is offline must not see an error banner.
+/// A portable build (`BOFF_PORTABLE=1`, see scripts/portable.mjs) is a bare
+/// .exe sitting wherever the user dropped it. The updater only knows how to
+/// hand an .msi/.exe to Windows' installer, which would silently install a
+/// SECOND, installed copy next to the portable one and restart into it — so a
+/// portable build reports "up to date" forever and updates by re-downloading
+/// the zip.
+const PORTABLE: bool = option_env!("BOFF_PORTABLE").is_some();
+
 #[tauri::command]
 pub async fn updates_check(app: tauri::AppHandle) -> Result<Option<UpdateInfo>, String> {
+    if PORTABLE {
+        return Ok(None);
+    }
     let found = updater(&app)?
         .check()
         .await
@@ -95,6 +106,12 @@ pub async fn updates_check(app: tauri::AppHandle) -> Result<Option<UpdateInfo>, 
 /// build. Does not return on success: `app.restart()` replaces the process.
 #[tauri::command]
 pub async fn updates_install(app: tauri::AppHandle) -> Result<(), String> {
+    if PORTABLE {
+        return Err(
+            "Esta es la versión portable: descarga el nuevo .zip desde la web para actualizar."
+                .to_string(),
+        );
+    }
     let pending = app.state::<UpdateState>().pending.lock().await.clone();
     let update = match pending {
         Some(update) => update,
