@@ -124,8 +124,8 @@ const LOG_SEED: [LogLine["level"], LogLine["source"], string][] = [
   ["info", "game", "[Render thread/INFO] Created: 1024x512 textures-atlas"],
 ]
 
-/** TODO(rust): stream real lines over a Tauri event channel; the game writes to
- *  stdout continuously and buffering it all in the renderer would leak. */
+/** Browser-mode stand-in for the `game://log` stream. On desktop the real lines
+ *  arrive one at a time from the game's stdout. */
 export function mockLogs(): LogLine[] {
   const base = Date.now() - LOG_SEED.length * 1400
   return LOG_SEED.map(([level, source, text], i) => ({

@@ -1,0 +1,194 @@
+import { HttpService } from '@nestjs/axios';
+import {
+  BadGatewayException,
+  Injectable,
+  Logger,
+  NotFoundException,
+  ServiceUnavailableException,
+} from '@nestjs/common';
+import { createReadStream } from 'fs';
+import { stat } from 'fs/promises';
+import { join } from 'path';
+import type { Readable } from 'stream';
+import { firstValueFrom } from 'rxjs';
+import { env } from '@/config/env';
+
+// HANDOFF §4.5 — every CurseForge byte is proxied. The key stays here because an
+// embedded key is an extracted key, and an abused key is a revoked key, which
+// would break the launcher for every user at once. Modrinth and plain URLs are
+// NOT proxied: they need no key and the egress would be ours for nothing.
+
+const CF_API = 'https://api.curseforge.com/v1';
+
+/** §3.2 / §10 — as of 16 July 2026 `edge.forgecdn.net` answers 401 to any
+ *  request without this header. It is a header, never a query parameter; any
+ *  recipe older than mid-2026 is broken on exactly this. */
+const CF_KEY_HEADER = 'x-api-key';
+
+export interface ProxiedDownload {
+  stream: Readable;
+  contentType: string;
+  contentLength: number | null;
+  filename: string;
+}
+
+@Injectable()
+export class PacksDownloadsService {
+  private readonly logger = new Logger(PacksDownloadsService.name);
+
+  constructor(private readonly http: HttpService) {}
+
+  private get curseforgeKey(): string {
+    if (!env.CURSEFORGE_API_KEY) {
+      // A missing key is an operator problem, not a client one — say so as a 503
+      // rather than letting it surface as an opaque 401 from the CDN.
+      throw new ServiceUnavailableException({
+        message: 'CURSEFORGE_API_KEY is not configured',
+        userMessage:
+          'El servidor no puede descargar archivos de CurseForge ahora mismo. Avisa a un administrador.',
+      });
+    }
+    return env.CURSEFORGE_API_KEY;
+  }
+
+  /** Resolve the real CDN URL server-side and stream the bytes back. */
+  async curseforge(projectId: number, fileId: number): Promise<ProxiedDownload> {
+    const key = this.curseforgeKey;
+    const url = await this.resolveCurseforgeUrl(projectId, fileId, key);
+
+    const response = await firstValueFrom(
+      this.http.get<Readable>(url, {
+        responseType: 'stream',
+        // The CDN itself needs the key too, not just the API host (§10).
+        headers: { [CF_KEY_HEADER]: key },
+        timeout: 30_000,
+        maxRedirects: 5,
+        validateStatus: () => true,
+      }),
+    ).catch((error: unknown) => {
+      this.logger.error(`CDN de CurseForge inalcanzable (${url}): ${asMessage(error)}`);
+      throw new BadGatewayException({
+        message: 'curseforge cdn unreachable',
+        userMessage: 'No se ha podido contactar con CurseForge. Inténtalo de nuevo.',
+      });
+    });
+
+    if (response.status === 401 || response.status === 403) {
+      // Documented failure mode: the key was rejected or was not sent. Never a
+      // client fault, so never a 4xx to the launcher.
+      this.logger.error(
+        `edge.forgecdn.net devolvió ${response.status} para ${projectId}/${fileId} — clave rechazada o ausente`,
+      );
+      throw new ServiceUnavailableException({
+        message: `curseforge cdn rejected the api key (${response.status})`,
+        userMessage:
+          'CurseForge ha rechazado la clave del servidor. Avisa a un administrador.',
+      });
+    }
+    if (response.status >= 400) {
+      throw new BadGatewayException({
+        message: `curseforge cdn returned ${response.status}`,
+        userMessage: 'CurseForge no ha devuelto el archivo.',
+      });
+    }
+
+    const length = Number(response.headers['content-length']);
+    return {
+      stream: response.data,
+      contentType:
+        (response.headers['content-type'] as string | undefined) ??
+        'application/octet-stream',
+      contentLength: Number.isFinite(length) ? length : null,
+      filename: decodeURIComponent(url.split('/').pop() ?? `${fileId}.jar`),
+    };
+  }
+
+  private async resolveCurseforgeUrl(
+    projectId: number,
+    fileId: number,
+    key: string,
+  ): Promise<string> {
+    const response = await firstValueFrom(
+      this.http.get<{ data?: string | null }>(
+        `${CF_API}/mods/${projectId}/files/${fileId}/download-url`,
+        {
+          headers: { [CF_KEY_HEADER]: key, accept: 'application/json' },
+          timeout: 15_000,
+          validateStatus: () => true,
+        },
+      ),
+    ).catch((error: unknown) => {
+      this.logger.error(`API de CurseForge inalcanzable: ${asMessage(error)}`);
+      throw new BadGatewayException({
+        message: 'curseforge api unreachable',
+        userMessage: 'No se ha podido contactar con CurseForge. Inténtalo de nuevo.',
+      });
+    });
+
+    if (response.status === 401 || response.status === 403) {
+      this.logger.error(
+        `API de CurseForge devolvió ${response.status} para ${projectId}/${fileId}`,
+      );
+      throw new ServiceUnavailableException({
+        message: `curseforge api rejected the api key (${response.status})`,
+        userMessage:
+          'CurseForge ha rechazado la clave del servidor. Avisa a un administrador.',
+      });
+    }
+    if (response.status === 404 || !response.data?.data) {
+      // §3.2 — `allowModDistribution: false`. There is no programmatic download
+      // for these at all, so the launcher has to show a manual-download link.
+      // This is not an edge case; it happens in most large packs.
+      throw new NotFoundException({
+        message: 'curseforge refuses third-party distribution for this file',
+        userMessage:
+          'El autor de este mod no permite descargas automáticas. Tendrás que bajarlo a mano desde CurseForge.',
+      });
+    }
+    return response.data.data;
+  }
+
+  /**
+   * Override blobs. §7.2 asks for short-TTL presigned URLs, which presupposes
+   * object storage; we have none — blobs are plain files under PACK_BLOB_DIR —
+   * so there is nothing to presign and this streams them through the guard
+   * instead. Same property (never a public URL, always entitlement-checked),
+   * one fewer moving part. Swap this for a presign the day blobs move to S3.
+   */
+  async override(blobSha512: string): Promise<ProxiedDownload> {
+    // Caller-validated hex, but re-asserted here: this value becomes a path
+    // segment and a traversal would read arbitrary files.
+    if (!/^[a-f0-9]{128}$/.test(blobSha512)) {
+      throw new NotFoundException('Blob no encontrado');
+    }
+
+    const path = join(blobDir(), blobSha512.slice(0, 2), blobSha512.slice(2, 4), blobSha512);
+    const size = await stat(path).then(
+      (s) => s.size,
+      () => null,
+    );
+    if (size === null) {
+      throw new NotFoundException({
+        message: `override blob ${blobSha512.slice(0, 8)} is not on disk`,
+        userMessage: 'Ese archivo del pack no está disponible en el servidor.',
+      });
+    }
+
+    return {
+      stream: createReadStream(path),
+      contentType: 'application/octet-stream',
+      contentLength: size,
+      filename: blobSha512,
+    };
+  }
+}
+
+/** Content-addressed, sharded two levels so a pack with thousands of overrides
+ *  does not put thousands of entries in one directory. */
+function blobDir(): string {
+  return env.PACK_BLOB_DIR ?? join(process.cwd(), 'data', 'pack-blobs');
+}
+
+function asMessage(error: unknown): string {
+  return error instanceof Error ? error.message : String(error);
+}

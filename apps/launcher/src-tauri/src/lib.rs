@@ -6,16 +6,26 @@
 // ROADMAP (docs/LAUNCHER_HANDOFF.md):
 //   §5 auth chain      — MS device code → Xbox → XSTS → Minecraft → profile
 //   §6 install pipeline — version JSON, rules, natives, assets, Java, argv
-//   §6.4 Forge/NeoForge — shell out to the official installer with the managed
-//        JRE (`java -jar installer.jar --installClient`) via std::process,
-//        NOT tauri-plugin-shell: that plugin exists to give the *renderer*
-//        shell access, which this app deliberately does not want. Do not
-//        reimplement install_profile.json processors; delegating to Forge's
-//        own installer is what makes a Rust backend viable at all.
+//   §6.4 Forge/NeoForge — handled by `portablemc::forge` (forge/mod.rs:40),
+//        which downloads the official installer AND runs its
+//        install_profile.json processors itself. An earlier note here said to
+//        shell out to `java -jar installer.jar --installClient` by hand; that
+//        is STALE and was written before the crate was read. Doing it by hand
+//        now would mean re-solving library extraction, the processor graph and
+//        the sha1 checks that the crate already does. §6.4's real rule —
+//        "do not reimplement install_profile.json processors" — is satisfied by
+//        delegating to portablemc, which delegates to Forge.
+//
+//        Still true, and the reason no shell plugin is used anywhere: the game
+//        process is spawned with std::process from `install::process`, never
+//        tauri-plugin-shell, whose purpose is handing the *renderer* shell
+//        access — which this app deliberately does not want.
 
 pub mod api;
 pub mod auth;
+pub mod install;
 pub mod pack;
+pub mod settings;
 
 use serde::Serialize;
 
@@ -45,6 +55,7 @@ pub fn run() {
     tauri::Builder::default()
         .manage(auth::AuthState::default())
         .manage(api::ApiState::default())
+        .manage(install::InstallManager::default())
         .invoke_handler(tauri::generate_handler![
             runtime_info,
             auth::auth_begin,
@@ -55,6 +66,12 @@ pub fn run() {
             api::packs_list,
             api::pack_manifest,
             api::invite_redeem,
+            install::install_pack,
+            install::launch_pack,
+            install::stop_game,
+            install::instance_scan,
+            settings::settings_get,
+            settings::settings_set,
         ])
         .run(tauri::generate_context!())
         .expect("error while running the Boff Launcher");

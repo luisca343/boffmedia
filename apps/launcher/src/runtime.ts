@@ -1,5 +1,15 @@
 import { invoke } from "@tauri-apps/api/core"
+import { listen } from "@tauri-apps/api/event"
 import { getCurrentWindow } from "@tauri-apps/api/window"
+
+import { MOCK_SETTINGS, mockLogs } from "./services/mock"
+import type {
+  GameState,
+  InstallPhase,
+  InstallState,
+  LogLine,
+  Settings,
+} from "./services/types"
 
 // The single boundary between the renderer and the Rust shell. Keeping it in
 // one module means the six screens never import @tauri-apps directly, so they
@@ -249,6 +259,203 @@ export async function packManifest(
 export async function inviteRedeem(code: string): Promise<string> {
   try {
     return await invoke<string>("invite_redeem", { code })
+  } catch (err) {
+    throw asFailure(err)
+  }
+}
+
+// ── Install / launch (HANDOFF §6) ──────────────────────────────────────────
+// Progress and game output arrive as Tauri events, never as return values: an
+// install is minutes long and the renderer must paint while it runs.
+//
+// In a browser there is no Rust side, so the same event names are served by a
+// tiny in-process bus that the mock install and launch below publish to. The
+// reducer therefore has ONE code path, and `dev:renderer` keeps a moving
+// progress bar and a live log.
+
+export const EVENT_INSTALL_PROGRESS = "install://progress"
+export const EVENT_INSTALL_DONE = "install://done"
+export const EVENT_GAME_LOG = "game://log"
+export const EVENT_GAME_STATE = "game://state"
+
+export type InstallProgressEvent = {
+  packId: string
+  phase: InstallPhase
+  fraction: number
+  file: string
+  downloadedBytes: number
+  totalBytes: number
+}
+
+export type InstallDoneEvent = { packId: string }
+
+/** Everything `instance_scan` and `install_pack` can report. `installing` is
+ *  absent by design: only the renderer, which holds the progress events, can
+ *  know a pack is mid-install. */
+export type ScannedInstallState = Exclude<InstallState, { kind: "installing" }>
+
+export type Unsubscribe = () => void
+
+type Handler = (payload: never) => void
+
+const bus = new Map<string, Set<Handler>>()
+
+function busEmit<T>(event: string, payload: T): void {
+  for (const fn of bus.get(event) ?? []) (fn as (p: T) => void)(payload)
+}
+
+/** Subscribe to a shell event. The returned function is safe to call twice and
+ *  safe to call before the underlying `listen` has resolved — which is exactly
+ *  what React StrictMode does on every mount in dev. */
+function subscribe<T>(event: string, handler: (payload: T) => void): Unsubscribe {
+  if (!isDesktop()) {
+    const set = bus.get(event) ?? new Set<Handler>()
+    bus.set(event, set)
+    set.add(handler as Handler)
+    return () => {
+      set.delete(handler as Handler)
+    }
+  }
+
+  let stop: Unsubscribe | null = null
+  let cancelled = false
+  void listen<T>(event, (e) => {
+    if (!cancelled) handler(e.payload)
+  })
+    .then((unlisten) => {
+      if (cancelled) unlisten()
+      else stop = unlisten
+    })
+    .catch(() => {
+      /* no shell, no events — browser mode is a valid state */
+    })
+
+  return () => {
+    cancelled = true
+    stop?.()
+    stop = null
+  }
+}
+
+export const onInstallProgress = (fn: (e: InstallProgressEvent) => void) =>
+  subscribe<InstallProgressEvent>(EVENT_INSTALL_PROGRESS, fn)
+export const onInstallDone = (fn: (e: InstallDoneEvent) => void) =>
+  subscribe<InstallDoneEvent>(EVENT_INSTALL_DONE, fn)
+export const onGameLog = (fn: (line: LogLine) => void) =>
+  subscribe<LogLine>(EVENT_GAME_LOG, fn)
+export const onGameState = (fn: (state: GameState) => void) =>
+  subscribe<GameState>(EVENT_GAME_STATE, fn)
+
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms))
+
+const MOCK_PHASES: InstallPhase[] = [
+  "resolving",
+  "java",
+  "libraries",
+  "assets",
+  "loader",
+  "mods",
+  "overrides",
+  "verifying",
+]
+
+async function mockInstall(packId: string): Promise<ScannedInstallState> {
+  const total = 1_284_000_000
+  for (const [i, phase] of MOCK_PHASES.entries()) {
+    for (let step = 0; step < 4; step++) {
+      const fraction = (i * 4 + step + 1) / (MOCK_PHASES.length * 4)
+      busEmit<InstallProgressEvent>(EVENT_INSTALL_PROGRESS, {
+        packId,
+        phase,
+        fraction,
+        file: `${phase}/archivo-${step + 1}`,
+        downloadedBytes: Math.round(fraction * total),
+        totalBytes: total,
+      })
+      await sleep(110)
+    }
+  }
+  busEmit<InstallDoneEvent>(EVENT_INSTALL_DONE, { packId })
+  return { kind: "installed", versionId: "mock", sizeBytes: total }
+}
+
+/** Install or update a pack. `manifest` is what {@link packManifest} returned;
+ *  `packId` is only used to address the browser-mode simulation. */
+export async function installPack(
+  packId: string,
+  manifest: unknown,
+): Promise<ScannedInstallState> {
+  if (!isDesktop()) return mockInstall(packId)
+  try {
+    return await invoke<ScannedInstallState>("install_pack", { manifest })
+  } catch (err) {
+    throw asFailure(err)
+  }
+}
+
+/** Verify, then spawn. Resolves to the OS pid; `game://state` carries the rest,
+ *  including the crash exit code the pid alone cannot tell you about. */
+export async function launchPack(packId: string, manifest: unknown): Promise<number> {
+  if (!isDesktop()) {
+    busEmit<GameState>(EVENT_GAME_STATE, { kind: "preparing" })
+    await sleep(600)
+    await mockInstall(packId)
+    busEmit<GameState>(EVENT_GAME_STATE, { kind: "running", pid: 4821, since: Date.now() })
+    for (const line of mockLogs()) busEmit<LogLine>(EVENT_GAME_LOG, line)
+    return 4821
+  }
+  try {
+    return await invoke<number>("launch_pack", { manifest })
+  } catch (err) {
+    throw asFailure(err)
+  }
+}
+
+/** Idempotent: stopping a pack that already exited is the normal race. */
+export async function stopGame(packId: string): Promise<void> {
+  if (!isDesktop()) {
+    busEmit<GameState>(EVENT_GAME_STATE, { kind: "idle" })
+    return
+  }
+  try {
+    await invoke("stop_game", { packId })
+  } catch (err) {
+    throw asFailure(err)
+  }
+}
+
+/** What is on disk for one pack. `latestVersionId` is what turns `installed`
+ *  into `outdated`, so omitting it can never offer an update to nothing. */
+export async function instanceScan(
+  slug: string,
+  latestVersionId: string | null,
+): Promise<ScannedInstallState> {
+  if (!isDesktop()) return { kind: "not-installed" }
+  try {
+    return await invoke<ScannedInstallState>("instance_scan", {
+      slug,
+      latestVersionId,
+    })
+  } catch (err) {
+    throw asFailure(err)
+  }
+}
+
+// ── Settings ───────────────────────────────────────────────────────────────
+
+export async function settingsGet(): Promise<Settings> {
+  if (!isDesktop()) return MOCK_SETTINGS
+  try {
+    return await invoke<Settings>("settings_get")
+  } catch (err) {
+    throw asFailure(err)
+  }
+}
+
+export async function settingsSet(settings: Settings): Promise<Settings> {
+  if (!isDesktop()) return settings
+  try {
+    return await invoke<Settings>("settings_set", { settings })
   } catch (err) {
     throw asFailure(err)
   }
