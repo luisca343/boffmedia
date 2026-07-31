@@ -324,72 +324,81 @@ export function ModSelector({
   }
 
   return (
-    <div className="flex flex-col gap-4">
-      <ModBrowser
-        platform={platform}
-        onPlatformChange={setPlatform}
-        gameVersion={gameVersion}
-        loader={catalogLoader}
-        isAdded={isAdded}
-        onAdd={addPick}
-        busyKey={busyKey}
-      />
-
-      {progress && (
-        <span className="flex items-center gap-2 font-mono text-[11px] text-txt-dim">
-          <Spinner size={12} /> {progress}
-        </span>
-      )}
-
-      <div className="grid gap-3 sm:grid-cols-2">
-        <Field label={t("addByUrl")} hint={t("addByUrlHint")}>
-          <div className="flex gap-2">
-            <Input
-              value={url}
-              onChange={(e) => setUrl(e.target.value)}
-              placeholder="https://example.com/mod.jar"
-            />
-            <Button
-              size="sm"
-              icon="link"
-              loading={urlBusy}
-              disabled={urlBusy || !url.trim()}
-              onClick={() => void addByUrl()}
-            >
-              {t("add")}
-            </Button>
-          </div>
-        </Field>
-        <Field label={t("uploadJar")} hint={t("uploadJarHint")}>
-          <div>
-            <Button
-              size="sm"
-              icon="upload"
-              loading={uploadBusy}
-              disabled={uploadBusy}
-              onClick={() => uploadRef.current?.click()}
-            >
-              {t("chooseJars")}
-            </Button>
-            <input
-              ref={uploadRef}
-              type="file"
-              multiple
-              hidden
-              onChange={(e) => {
-                void addUploads(e.target.files)
-                e.target.value = ""
-              }}
-            />
-          </div>
-        </Field>
+    // Catalog on the left, the pack being assembled on the right — the two
+    // halves of the job, both visible at once instead of stacked.
+    <div className="flex h-full min-h-0 gap-4 max-[1200px]:flex-col">
+      <div className="flex min-h-0 min-w-0 flex-1 flex-col gap-2">
+        <ModBrowser
+          platform={platform}
+          onPlatformChange={setPlatform}
+          gameVersion={gameVersion}
+          loader={catalogLoader}
+          isAdded={isAdded}
+          onAdd={addPick}
+          busyKey={busyKey}
+        />
+        {progress && (
+          <span className="flex shrink-0 items-center gap-2 font-mono text-[11px] text-txt-dim">
+            <Spinner size={12} /> {progress}
+          </span>
+        )}
       </div>
 
-      <Field label={t("selectedMods", { count: value.length })}>
+      <aside className="flex min-h-0 shrink-0 flex-col gap-4 border-solid border-line max-[1200px]:border-t max-[1200px]:pt-4 min-[1201px]:w-[420px] min-[1201px]:border-l min-[1201px]:pl-4 2xl:min-[1201px]:w-[500px]">
+        <div className="grid shrink-0 gap-3 sm:grid-cols-2 min-[1201px]:grid-cols-1">
+          <Field label={t("addByUrl")} hint={t("addByUrlHint")}>
+            <div className="flex gap-2">
+              <Input
+                value={url}
+                onChange={(e) => setUrl(e.target.value)}
+                placeholder="https://example.com/mod.jar"
+              />
+              <Button
+                size="sm"
+                icon="link"
+                loading={urlBusy}
+                disabled={urlBusy || !url.trim()}
+                onClick={() => void addByUrl()}
+              >
+                {t("add")}
+              </Button>
+            </div>
+          </Field>
+          <Field label={t("uploadJar")} hint={t("uploadJarHint")}>
+            <div>
+              <Button
+                size="sm"
+                icon="upload"
+                loading={uploadBusy}
+                disabled={uploadBusy}
+                onClick={() => uploadRef.current?.click()}
+              >
+                {t("chooseJars")}
+              </Button>
+              <input
+                ref={uploadRef}
+                type="file"
+                multiple
+                hidden
+                onChange={(e) => {
+                  void addUploads(e.target.files)
+                  e.target.value = ""
+                }}
+              />
+            </div>
+          </Field>
+        </div>
+
+      {/* Field is a grid: pinning row 2 to minmax(0,1fr) is what lets the list
+          inside it scroll instead of pushing the sidebar taller. */}
+      <Field
+        label={t("selectedMods", { count: value.length })}
+        className="min-h-0 flex-1 [grid-template-rows:auto_minmax(0,1fr)]"
+      >
         {value.length === 0 ? (
           <p className="font-body text-[12px] text-txt-dim">{t("noModsSelected")}</p>
         ) : (
-          <ul className="flex max-h-[260px] flex-col gap-1 overflow-auto">
+          <ul className="bm-scroll flex min-h-0 flex-1 flex-col gap-1 overflow-auto pr-1">
             {value.map((mod) => {
               const duplicate =
                 (pathCounts.get(mod.path.toLowerCase().replace(/\\/g, "/")) ?? 0) > 1
@@ -416,7 +425,17 @@ export function ModSelector({
                       {formatSize(mod.fileSize)}
                     </span>
                   </span>
-                  <span className="w-[240px]">
+                  <button
+                    type="button"
+                    className="shrink-0 font-mono text-[11px] text-txt-dim hover:text-bad"
+                    aria-label={t("remove")}
+                    onClick={() => remove(mod.key)}
+                  >
+                    ×
+                  </button>
+                  {/* Full width on its own line: the target path is long and
+                      the sidebar is narrower than the old modal body. */}
+                  <span className="w-full basis-full">
                     <Input
                       value={mod.path}
                       onChange={(e) => setPath(mod.key, e.target.value)}
@@ -428,14 +447,6 @@ export function ModSelector({
                       </span>
                     )}
                   </span>
-                  <button
-                    type="button"
-                    className="shrink-0 font-mono text-[11px] text-txt-dim hover:text-bad"
-                    aria-label={t("remove")}
-                    onClick={() => remove(mod.key)}
-                  >
-                    ×
-                  </button>
                 </li>
               )
             })}
@@ -443,14 +454,15 @@ export function ModSelector({
         )}
       </Field>
 
-      {value.length > 0 && (
-        <p className="flex items-center gap-2 font-mono text-[11px] text-txt-dim">
-          <Icon name="info" size={12} />
-          {t("totalSize", {
-            size: formatSize(value.reduce((sum, m) => sum + m.fileSize, 0)),
-          })}
-        </p>
-      )}
+        {value.length > 0 && (
+          <p className="flex shrink-0 items-center gap-2 border-t border-solid border-line pt-3 font-mono text-[11px] text-txt-dim">
+            <Icon name="info" size={12} />
+            {t("totalSize", {
+              size: formatSize(value.reduce((sum, m) => sum + m.fileSize, 0)),
+            })}
+          </p>
+        )}
+      </aside>
     </div>
   )
 }

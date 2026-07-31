@@ -26,8 +26,8 @@ export default async function RootLayout({
       <div data-ds="boffmedia" className="contents">
         <ToastStack />
         <Navbar />
-        <section className="no-scrollbar flex-1 bg-base">
-            <section className="flex-1 [&>*]:min-h-[calc(100vh_-_22rem)]">
+        <section className="no-scrollbar flex-1 min-h-0 bg-base">
+            <section className="flex-1 min-h-0 [&>*]:min-h-[calc(100vh_-_22rem)]">
               {children}
             </section>
             <Footer />
