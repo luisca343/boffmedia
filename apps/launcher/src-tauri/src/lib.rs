@@ -14,7 +14,6 @@
 //        own installer is what makes a Rust backend viable at all.
 
 pub mod api;
-pub mod api;
 pub mod auth;
 pub mod pack;
 
