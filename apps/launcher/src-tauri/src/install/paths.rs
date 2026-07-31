@@ -29,6 +29,24 @@ use super::InstallFailure;
 /// pack that was already fine.
 pub const MARKER: &str = ".boff-install.json";
 
+/// §9 "pack version pinning + rollback" — the last N installed markers, newest
+/// first. Beside the marker rather than inside it: this is read only when the
+/// player opens the rollback list, and a corrupt history must never make an
+/// otherwise healthy instance unreadable.
+pub const HISTORY: &str = ".boff-history.json";
+
+/// §9 optional-mod toggles — which optional files the player switched OFF.
+/// Survives updates and reinstalls precisely because it is NOT in the marker,
+/// which every install overwrites.
+pub const OPTIONAL: &str = ".boff-optional.json";
+
+/// §9 "per-instance Java runtime + memory" — this pack's Java path and heap
+/// choice. Beside the marker, not inside it and not in the global settings: an
+/// install overwrites the marker, and a global blob cannot hold a per-pack
+/// answer. Absent on every instance installed before this build, which
+/// `RuntimeOverride::default()` reads as "inherit the global setting".
+pub const RUNTIME: &str = ".boff-runtime.json";
+
 #[derive(Debug, Clone)]
 pub struct Layout {
     root: PathBuf,
@@ -47,6 +65,16 @@ pub struct InstancePaths {
     pub config: PathBuf,
     pub bin: PathBuf,
     pub marker: PathBuf,
+    /// §9 — retained version markers. Never deleted by `repair_instance`: a
+    /// repair rebuilds what is on disk, it does not throw away the rollback
+    /// targets that are the reason the player is repairing at all.
+    pub history: PathBuf,
+    /// §9 — the player's optional-mod choices. Deliberately outside everything
+    /// an install or a repair rewrites; it is user state, not managed state.
+    pub optional: PathBuf,
+    /// §9 — the per-pack Java/memory override. User state like `optional`, so
+    /// an install, an update and a repair all leave it alone.
+    pub runtime: PathBuf,
 }
 
 impl Layout {
@@ -95,6 +123,9 @@ impl Layout {
             config: minecraft.join("config"),
             bin: root.join("bin"),
             marker: root.join(MARKER),
+            history: root.join(HISTORY),
+            optional: root.join(OPTIONAL),
+            runtime: root.join(RUNTIME),
             minecraft,
             root,
         }

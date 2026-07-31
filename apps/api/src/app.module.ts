@@ -70,6 +70,7 @@ import { PasaporteModule } from '@api/smartrotom/pasaporte/pasaporte.module';
 import { WigglypopModule } from '@api/smartrotom/wigglypop/wigglypop.module';
 import { TaxiModule } from '@api/smartrotom/taxi/taxi.module';
 import { PacksModule } from './api/packs/packs.module';
+import { LauncherUpdatesModule } from './api/launcher-updates/launcher-updates.module';
 
 @Module({
   imports: [
@@ -140,6 +141,7 @@ import { PacksModule } from './api/packs/packs.module';
     WigglypopModule,
     TaxiModule,
     PacksModule,
+    LauncherUpdatesModule,
   ],
   controllers: [AppController],
   providers: [

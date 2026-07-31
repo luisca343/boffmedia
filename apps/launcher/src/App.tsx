@@ -1,6 +1,7 @@
 import { ToastStack } from "@boffmedia/ui"
 
 import { Shell } from "./components/Shell"
+import { UpdateBanner } from "./components/UpdateBanner"
 import { Logs } from "./screens/Logs"
 import { PackDetail } from "./screens/PackDetail"
 import { Packs } from "./screens/Packs"
@@ -31,8 +32,13 @@ function Router() {
 export function App() {
   return (
     <LauncherProvider>
-      <div className="h-full bg-base text-txt">
-        <Router />
+      <div className="flex h-full flex-col bg-base text-txt">
+        {/* Above the router on purpose: an update is worth showing on the
+            sign-in screen too, and the check never blocks it. */}
+        <UpdateBanner />
+        <div className="min-h-0 flex-1">
+          <Router />
+        </div>
       </div>
       <ToastStack />
     </LauncherProvider>

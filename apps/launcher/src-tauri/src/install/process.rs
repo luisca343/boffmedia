@@ -16,6 +16,7 @@ use std::sync::{Arc, Mutex};
 use serde::Serialize;
 use tauri::Emitter;
 
+use super::crash::{diagnose, Diagnosis, LogTail};
 use super::progress::{log, EVENT_GAME_STATE};
 use super::InstallFailure;
 
@@ -32,6 +33,10 @@ enum GameStatePayload {
     #[serde(rename_all = "camelCase")]
     Crashed {
         exit_code: i32,
+        /// §9 — the plain-language verdict, when the log tail matched a known
+        /// signature. `None` (null in JSON) means "it crashed and we do not
+        /// know why", which the UI must say instead of inventing a cause.
+        diagnosis: Option<Diagnosis>,
     },
 }
 
@@ -103,17 +108,21 @@ pub fn spawn(
     let pid = child.id();
     let since = now_ms();
 
+    // One buffer fed by BOTH readers: a modded crash prints its cause on stderr
+    // and its context on stdout, and classifying half of it gets it wrong.
+    let tail = LogTail::new();
+
     if let Some(stdout) = child.stdout.take() {
-        pump(app.clone(), stdout, "info");
+        pump(app.clone(), stdout, "info", tail.clone());
     }
     if let Some(stderr) = child.stderr.take() {
-        pump(app.clone(), stderr, "error");
+        pump(app.clone(), stderr, "error", tail.clone());
     }
 
     let child = Arc::new(Mutex::new(child));
     let _ = app.emit(EVENT_GAME_STATE, GameStatePayload::Running { pid, since });
 
-    watch_exit(app.clone(), Arc::clone(&child));
+    watch_exit(app.clone(), Arc::clone(&child), tail);
 
     Ok(RunningGame { pid, since, child })
 }
@@ -121,11 +130,17 @@ pub fn spawn(
 /// One reader thread per stream. std::thread rather than a tokio task: this is
 /// a blocking read that lives for the whole session, which is precisely what an
 /// async runtime's worker threads must not be used for.
-fn pump<R: std::io::Read + Send + 'static>(app: tauri::AppHandle, stream: R, level: &'static str) {
+fn pump<R: std::io::Read + Send + 'static>(
+    app: tauri::AppHandle,
+    stream: R,
+    level: &'static str,
+    tail: LogTail,
+) {
     std::thread::spawn(move || {
         let reader = BufReader::new(stream);
         for line in reader.lines() {
             let Ok(line) = line else { break };
+            tail.push(&line);
             // Minecraft writes its own severity into the line; trusting the
             // stream alone would mark every log4j INFO on stderr as an error.
             let level = if line.contains("/ERROR]") || line.contains("Exception") {
@@ -143,31 +158,42 @@ fn pump<R: std::io::Read + Send + 'static>(app: tauri::AppHandle, stream: R, lev
 /// Reports the exit code as `GameState`. A non-zero exit is `crashed` even when
 /// the player closed the window, because the game itself does not distinguish
 /// the two and pretending otherwise hides real crashes.
-fn watch_exit(app: tauri::AppHandle, child: Arc<Mutex<Child>>) {
+fn watch_exit(app: tauri::AppHandle, child: Arc<Mutex<Child>>, tail: LogTail) {
     std::thread::spawn(move || {
         loop {
-            {
+            let exit_code = {
                 let Ok(mut guard) = child.lock() else { return };
                 match guard.try_wait() {
-                    Ok(Some(status)) => {
-                        let code = status.code().unwrap_or(-1);
-                        let payload = if code == 0 {
-                            GameStatePayload::Idle
-                        } else {
-                            GameStatePayload::Crashed { exit_code: code }
-                        };
-                        log(
-                            &app,
-                            if code == 0 { "info" } else { "error" },
-                            "launcher",
-                            &format!("El juego terminó con código {code}."),
-                        );
-                        let _ = app.emit(EVENT_GAME_STATE, payload);
-                        return;
-                    }
-                    Ok(None) => {}
+                    Ok(Some(status)) => Some(status.code().unwrap_or(-1)),
+                    Ok(None) => None,
                     Err(_) => return,
                 }
+            };
+
+            if let Some(code) = exit_code {
+                // The reader threads are still draining the pipe when the
+                // process dies, and the crash report is the LAST thing written.
+                // Diagnosing immediately would classify a log that is missing
+                // its own cause.
+                if code != 0 {
+                    std::thread::sleep(std::time::Duration::from_millis(600));
+                }
+                let payload = if code == 0 {
+                    GameStatePayload::Idle
+                } else {
+                    GameStatePayload::Crashed {
+                        exit_code: code,
+                        diagnosis: diagnose(code, &tail.snapshot()),
+                    }
+                };
+                log(
+                    &app,
+                    if code == 0 { "info" } else { "error" },
+                    "launcher",
+                    &format!("El juego terminó con código {code}."),
+                );
+                let _ = app.emit(EVENT_GAME_STATE, payload);
+                return;
             }
             // Polling rather than a blocking `wait()` so the mutex is free for
             // `kill()` between checks; a blocking wait would hold it forever.
@@ -201,9 +227,25 @@ mod tests {
         assert!(running.contains(r#""kind":"running""#));
         assert!(running.contains(r#""pid":42"#));
 
-        let crashed = serde_json::to_string(&GameStatePayload::Crashed { exit_code: 1 }).unwrap();
+        let crashed = serde_json::to_string(&GameStatePayload::Crashed {
+            exit_code: 1,
+            diagnosis: None,
+        })
+        .unwrap();
         assert!(crashed.contains(r#""kind":"crashed""#));
         assert!(crashed.contains(r#""exitCode":1"#));
+        // Null, not absent: the renderer's `diagnosis` field is not optional.
+        assert!(crashed.contains(r#""diagnosis":null"#));
+
+        let diagnosed = serde_json::to_string(&GameStatePayload::Crashed {
+            exit_code: 1,
+            diagnosis: super::diagnose(
+                1,
+                &["java.lang.OutOfMemoryError: Java heap space".to_string()],
+            ),
+        })
+        .unwrap();
+        assert!(diagnosed.contains(r#""kind":"out-of-memory""#));
 
         assert_eq!(
             serde_json::to_string(&GameStatePayload::Idle).unwrap(),

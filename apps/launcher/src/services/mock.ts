@@ -1,5 +1,6 @@
 import type {
   Account,
+  CrashDiagnosis,
   DeviceCode,
   LogLine,
   PackEntry,
@@ -85,6 +86,8 @@ export const MOCK_SETTINGS: Settings = {
   gameDir: "C:\\Users\\luisca\\AppData\\Roaming\\.boff",
   closeOnLaunch: false,
   keepLogs: true,
+  retainVersions: 3,
+  memoryAuto: false,
 }
 
 /** Browser-mode library. The desktop equivalent is `loadPackEntries`, which
@@ -123,6 +126,33 @@ const LOG_SEED: [LogLine["level"], LogLine["source"], string][] = [
   ["error", "game", "[Worker-2/ERROR] No se pudo cargar la textura boff:items/missing"],
   ["info", "game", "[Render thread/INFO] Created: 1024x512 textures-atlas"],
 ]
+
+/** Browser-mode stand-in for the tail of a crashed session, plus the verdict
+ *  `install/crash.rs` produces for exactly these lines. Keeping the two in one
+ *  place is what makes `dev:renderer` a real preview of the crash UI (§9). */
+export const MOCK_CRASH_LOG: [LogLine["level"], LogLine["source"], string][] = [
+  ["error", "game", "[main/ERROR] Incompatible mods found!"],
+  [
+    "error",
+    "game",
+    "net.fabricmc.loader.impl.FormattedException: Some of your mods are incompatible!",
+  ],
+  [
+    "error",
+    "game",
+    "\tMod 'Sodium' (sodium) 0.5.8 requires any version of fabric api, which is missing!",
+  ],
+]
+
+export const MOCK_DIAGNOSIS: CrashDiagnosis = {
+  kind: "missing-dependency",
+  title: "Falta Fabric API",
+  explanation: "Uno de los mods necesita Fabric API y no está instalado en esta instancia.",
+  action:
+    "Repara la instalación desde la ficha del pack; si el problema sigue, avisa a los " +
+    "administradores del pack: falta un mod obligatorio en el manifiesto.",
+  evidence: [MOCK_CRASH_LOG[2][2].trim()],
+}
 
 /** Browser-mode stand-in for the `game://log` stream. On desktop the real lines
  *  arrive one at a time from the game's stdout. */

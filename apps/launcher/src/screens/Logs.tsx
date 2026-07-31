@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react"
 
 import { Badge, Button, Empty, Kicker, Panel, Seg, Toggle } from "@boffmedia/ui"
 
+import { CrashDiagnosisCard } from "../components/CrashDiagnosis"
 import type { LogLine } from "../services/types"
 import { useLauncher } from "../state/launcher"
 import { formatClock } from "../utils/format"
@@ -14,7 +15,7 @@ const LEVEL_CLASS: Record<LogLine["level"], string> = {
 }
 
 export function Logs() {
-  const { logs, clearLogs } = useLauncher()
+  const { logs, clearLogs, game } = useLauncher()
   const [filter, setFilter] = useState("all")
   const [follow, setFollow] = useState(true)
   const endRef = useRef<HTMLDivElement>(null)
@@ -65,6 +66,14 @@ export function Logs() {
           </Button>
         </div>
       </header>
+
+      {/* §9 — above the log, not inside it: the whole point is that the player
+          never has to read the 4000 lines below to know what happened. */}
+      {game.kind === "crashed" && (
+        <div className="mb-4">
+          <CrashDiagnosisCard diagnosis={game.diagnosis} />
+        </div>
+      )}
 
       <Panel flat bodyClassName="p-0" className="flex min-h-0 flex-1 flex-col">
         {shown.length === 0 ? (

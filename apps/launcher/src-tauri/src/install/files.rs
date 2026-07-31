@@ -51,7 +51,10 @@ pub fn hex(bytes: &[u8]) -> String {
 
 /// Hash a file that is already on disk. Returns None when it cannot be read at
 /// all, which the callers treat as "missing" rather than as an error.
-fn sha512_of(path: &Path) -> Option<String> {
+/// Also the sweep's only test of "is this still the file we installed?" — see
+/// `instance::sweep_with`. A file that no longer hashes to the marker's value
+/// belongs to the player now and is never deleted.
+pub fn sha512_of(path: &Path) -> Option<String> {
     let mut file = std::fs::File::open(path).ok()?;
     let mut hasher = Sha512::new();
     std::io::copy(&mut file, &mut hasher).ok()?;
