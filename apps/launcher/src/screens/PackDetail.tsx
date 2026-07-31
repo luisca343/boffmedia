@@ -14,6 +14,8 @@ import {
   Stepper,
 } from "@boffmedia/ui"
 
+import { CrashDiagnosisCard } from "../components/CrashDiagnosis"
+import { InstanceSpace } from "../components/InstanceSpace"
 import { useLauncher } from "../state/launcher"
 import { formatBytes, formatDuration, formatWhen } from "../utils/format"
 import { LOADER_LABEL, PHASE_LABEL, STEP_GROUPS } from "../utils/labels"
@@ -30,7 +32,7 @@ function useNow(active: boolean): number {
 }
 
 export function PackDetail() {
-  const { selected, install, play, repair, stop, game, go, logs } = useLauncher()
+  const { selected, install, play, repair, stop, game, go, logs, reloadPacks } = useLauncher()
   const now = useNow(game.kind === "running")
 
   if (!selected) {
@@ -168,6 +170,9 @@ export function PackDetail() {
           aside={<Badge tone="bad">Código {game.exitCode}</Badge>}
           className="mb-4"
         >
+          {/* §9 — the verdict first. The raw lines stay underneath: a wrong
+              diagnosis must never hide the evidence that disproves it. */}
+          <CrashDiagnosisCard diagnosis={game.diagnosis} className="mb-3" />
           {crashLines.length > 0 ? (
             <pre className="max-h-[180px] overflow-auto rounded-sm border border-line bg-black/30 p-3 font-mono text-[11px] leading-relaxed text-txt-muted">
               {crashLines.map((line) => line.text).join("\n")}
@@ -255,6 +260,11 @@ export function PackDetail() {
           </p>
         </Panel>
       </div>
+
+      {/* §9 — optional-mod toggles and one-click rollback. Below the fold on
+          purpose: both only make sense once the pack is installed, and neither
+          should compete with the single primary action in the header. */}
+      <InstanceSpace slug={pack.slug} onChanged={reloadPacks} />
     </div>
   )
 }

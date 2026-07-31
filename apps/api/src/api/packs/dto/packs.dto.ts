@@ -1,4 +1,9 @@
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import {
+  ApiExtraModels,
+  ApiProperty,
+  ApiPropertyOptional,
+  getSchemaPath,
+} from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {
   IsArray,
@@ -324,14 +329,18 @@ export class UrlSourceDto {
   url!: string;
 }
 
+// A DTO reached ONLY through a raw $ref is never registered by Swagger: the
+// schema is emitted with a dangling pointer and `pnpm generate:shared` dies on
+// it. @ApiExtraModels is what puts these three in components/schemas.
+@ApiExtraModels(CurseforgeSourceDto, ModrinthSourceDto, UrlSourceDto)
 export class ResolveFileDto {
   @ApiProperty({
     description:
       'FileSource de @boffmedia/pack-schema — {kind:"curseforge"|"modrinth"|"url", …}',
     oneOf: [
-      { $ref: '#/components/schemas/CurseforgeSourceDto' },
-      { $ref: '#/components/schemas/ModrinthSourceDto' },
-      { $ref: '#/components/schemas/UrlSourceDto' },
+      { $ref: getSchemaPath(CurseforgeSourceDto) },
+      { $ref: getSchemaPath(ModrinthSourceDto) },
+      { $ref: getSchemaPath(UrlSourceDto) },
     ],
   })
   @ValidateNested()

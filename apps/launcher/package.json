@@ -3,9 +3,11 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "dev": "tauri dev",
+    "dev": "node scripts/profile.mjs dev dev",
+    "dev:prod": "node scripts/profile.mjs prod dev",
     "dev:renderer": "vite",
-    "build": "tauri build",
+    "build": "node scripts/profile.mjs dev build",
+    "build:prod": "node scripts/profile.mjs prod build",
     "build:renderer": "vite build",
     "preview": "vite preview",
     "tauri": "tauri",
