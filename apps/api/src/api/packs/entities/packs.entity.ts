@@ -86,6 +86,61 @@ export class BlobUploadEntity {
   @ApiProperty() size!: number;
 }
 
+export class ModSearchHitEntity {
+  @ApiProperty({ enum: ['curseforge', 'modrinth'] })
+  platform!: 'curseforge' | 'modrinth';
+
+  /** String on both platforms even though CurseForge's is numeric — the picker
+   *  treats them uniformly and narrows only when building the FileSource. */
+  @ApiProperty() projectId!: string;
+  @ApiProperty() slug!: string;
+  @ApiProperty() name!: string;
+  @ApiProperty() summary!: string;
+  @ApiPropertyOptional() iconUrl?: string;
+  @ApiProperty() downloads!: number;
+  @ApiPropertyOptional() author?: string;
+}
+
+export class ModFileEntity {
+  @ApiProperty({ enum: ['curseforge', 'modrinth'] })
+  platform!: 'curseforge' | 'modrinth';
+
+  /** CurseForge file id, or the Modrinth *version* id. */
+  @ApiProperty() fileId!: string;
+
+  @ApiPropertyOptional({ description: 'Solo Modrinth' }) versionNumber?: string;
+  @ApiProperty() displayName!: string;
+  @ApiProperty() fileName!: string;
+  @ApiProperty() fileSize!: number;
+  @ApiProperty({ type: [String] }) gameVersions!: string[];
+  @ApiProperty({ enum: ['release', 'beta', 'alpha'] })
+  releaseType!: 'release' | 'beta' | 'alpha';
+  @ApiProperty({ description: 'ISO-8601' }) datePublished!: string;
+
+  /** Always null on CurseForge (its API exposes only sha1/md5); use the resolve
+   *  route, which hashes the bytes, to get the value the manifest needs. */
+  @ApiPropertyOptional({ nullable: true }) sha512!: string | null;
+
+  /** False when CurseForge reports a null downloadUrl — the author forbids
+   *  third-party distribution and no automatic install is possible. */
+  @ApiProperty() downloadable!: boolean;
+}
+
+export class ResolvedFileEntity {
+  @ApiProperty({ description: '128 hex — calculado por el servidor' })
+  sha512!: string;
+
+  @ApiProperty() fileSize!: number;
+  @ApiProperty() fileName!: string;
+
+  @ApiProperty({
+    description: 'El FileSource listo para el manifiesto',
+    type: 'object',
+    additionalProperties: true,
+  })
+  source!: Record<string, unknown> | object;
+}
+
 export class AccessRowEntity {
   @ApiProperty() uuid!: string;
   @ApiProperty() grantedAt!: Date;
