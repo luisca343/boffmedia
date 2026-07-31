@@ -22,16 +22,19 @@ function StateBadge({ state }: { state: InstallState }) {
 }
 
 function AccessBadge({ entry }: { entry: PackEntry }) {
-  const a = entry.pack.access
-  if (a.kind === "public") return <Badge>Público</Badge>
-  if (a.kind === "password") return <Badge tone="info">Con contraseña</Badge>
+  const kind = entry.pack.accessKind
+  if (kind === "public") return <Badge>Público</Badge>
+  if (kind === "password") return <Badge tone="info">Con contraseña</Badge>
   return <Badge tone="live">Acceso concedido</Badge>
 }
 
 function PackCard({ entry }: { entry: PackEntry }) {
   const { go, install } = useLauncher()
   const { pack, latest, state } = entry
-  const needsInstall = state.kind === "not-installed" || state.kind === "outdated"
+  // A pack with no published version is listed but cannot be installed —
+  // offering the button anyway would produce a 404 the player cannot act on.
+  const needsInstall =
+    !!latest && (state.kind === "not-installed" || state.kind === "outdated")
 
   return (
     <Panel
@@ -46,7 +49,9 @@ function PackCard({ entry }: { entry: PackEntry }) {
       <div className="mb-4 flex flex-wrap items-center gap-2">
         <AccessBadge entry={entry} />
         <span className="font-mono text-[11px] text-txt-dim">
-          {latest.dependencies.minecraft} · {latest.files.length} archivos
+          {latest
+            ? `${latest.minecraft} · ${latest.fileCount} archivos`
+            : "Sin versión publicada"}
         </span>
       </div>
 
@@ -62,13 +67,20 @@ function PackCard({ entry }: { entry: PackEntry }) {
           variant={needsInstall ? "default" : "pri"}
           icon={needsInstall ? "download" : "play"}
           loading={state.kind === "installing"}
+          disabled={!latest}
           onClick={(e) => {
             e.stopPropagation()
             if (needsInstall) void install(pack.id)
             else go("pack", pack.id)
           }}
         >
-          {state.kind === "outdated" ? "Actualizar" : needsInstall ? "Instalar" : "Jugar"}
+          {!latest
+            ? "No disponible"
+            : state.kind === "outdated"
+              ? "Actualizar"
+              : needsInstall
+                ? "Instalar"
+                : "Jugar"}
         </Button>
       </div>
     </Panel>
@@ -76,7 +88,7 @@ function PackCard({ entry }: { entry: PackEntry }) {
 }
 
 export function Packs() {
-  const { packs } = useLauncher()
+  const { packs, packsLoading, packsError, reloadPacks } = useLauncher()
   const [query, setQuery] = useState("")
 
   const shown = useMemo(() => {
@@ -104,7 +116,23 @@ export function Packs() {
         </div>
       </header>
 
-      {packs.length === 0 && (
+      {/* Three distinct states, deliberately not collapsed into one: a server
+          that cannot be reached is not the same as a library that is empty,
+          and telling a player to ask for an invite when the API is down is how
+          support tickets get filed against the wrong thing. */}
+      {packsError && (
+        <Empty icon="alert" title="No se pudo cargar tu biblioteca" lead={packsError}>
+          <Button size="sm" icon="refresh" onClick={reloadPacks}>
+            Reintentar
+          </Button>
+        </Empty>
+      )}
+
+      {!packsError && packsLoading && packs.length === 0 && (
+        <Empty icon="cube" title="Cargando tus packs…" lead="Consultando el registro." />
+      )}
+
+      {!packsError && !packsLoading && packs.length === 0 && (
         <Empty
           icon="cube"
           title="No hay packs disponibles"

@@ -1,0 +1,405 @@
+// The pack registry client (HANDOFF §7). Lives in Rust rather than the renderer
+// for one reason: minting a pack session needs the MINECRAFT access token to
+// complete Mojang's `join` handshake, and that token never leaves `auth`. Doing
+// the HTTP here also sidesteps CORS entirely — this is not a browser.
+//
+// Two tokens, never confused:
+//   * the Minecraft access token — auth::AuthState, used only against Mojang.
+//   * the LAUNCHER session JWT   — this module, used only against our API.
+
+use serde::{Deserialize, Serialize};
+use tokio::sync::Mutex;
+
+use crate::auth::{AuthState, AuthFailure};
+
+const JOIN_URL: &str = "https://sessionserver.mojang.com/session/minecraft/join";
+
+/// Where the pack registry lives. A runtime env var wins so a QA build can be
+/// pointed at a staging API without a rebuild; the compile-time value is what
+/// packaged builds carry.
+fn base_url() -> String {
+    if let Ok(url) = std::env::var("BOFF_API_URL") {
+        if !url.trim().is_empty() {
+            return url.trim_end_matches('/').to_string();
+        }
+    }
+    option_env!("BOFF_API_URL")
+        .unwrap_or("https://api.boffmedia.es")
+        .trim_end_matches('/')
+        .to_string()
+}
+
+/// The launcher session. Held in memory only: it is derived from the Minecraft
+/// session in a couple of round-trips, so persisting it would buy nothing and
+/// widen the blast radius of a stolen profile directory.
+pub struct ApiState {
+    http: reqwest::Client,
+    token: Mutex<Option<String>>,
+}
+
+impl Default for ApiState {
+    fn default() -> Self {
+        Self {
+            http: reqwest::Client::builder()
+                .user_agent(concat!("BoffLauncher/", env!("CARGO_PKG_VERSION")))
+                .build()
+                .unwrap_or_default(),
+            token: Mutex::new(None),
+        }
+    }
+}
+
+impl ApiState {
+    /// Called on sign-out: the next request must not reuse the previous
+    /// player's entitlements.
+    pub async fn forget_session(&self) {
+        *self.token.lock().await = None;
+    }
+}
+
+// ── Wire types ─────────────────────────────────────────────────────────────
+// Every successful response is wrapped by the API's global ResponseInterceptor
+// as `{ success, statusCode, data }`. Errors are NOT wrapped — the exception
+// filter writes its own body — so the two are decoded separately.
+
+#[derive(Deserialize)]
+struct Envelope<T> {
+    data: T,
+}
+
+#[derive(Deserialize)]
+struct ApiErrorBody {
+    #[serde(default)]
+    #[serde(rename = "userMessage")]
+    user_message: Option<String>,
+    #[serde(default)]
+    message: Option<serde_json::Value>,
+}
+
+#[derive(Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct JoinChallenge {
+    server_id: String,
+}
+
+#[derive(Deserialize)]
+struct LauncherSession {
+    token: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct LauncherVersion {
+    pub id: String,
+    pub name: String,
+    pub minecraft: String,
+    pub loader: Option<String>,
+    pub loader_version: Option<String>,
+    pub file_count: u32,
+    pub created_at: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct LauncherPack {
+    pub id: String,
+    pub slug: String,
+    pub name: String,
+    pub summary: Option<String>,
+    pub icon_url: Option<String>,
+    pub access_kind: String,
+    pub latest_version: Option<LauncherVersion>,
+}
+
+#[derive(Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct RedeemResult {
+    pack_id: String,
+}
+
+// ── Errors ─────────────────────────────────────────────────────────────────
+
+#[derive(Debug)]
+pub enum ApiError {
+    /// No Minecraft session, or the server rejected the one we proved.
+    NeedsSignin(String),
+    /// Authenticated fine; this player simply is not entitled.
+    Denied(String),
+    Message(String),
+}
+
+impl From<reqwest::Error> for ApiError {
+    fn from(err: reqwest::Error) -> Self {
+        // Network failures are the common case here (the player is offline, or
+        // the API is down) and must never read as "you were kicked out".
+        ApiError::Message(format!("No se pudo contactar con el servidor: {err}"))
+    }
+}
+
+impl From<ApiError> for AuthFailure {
+    fn from(err: ApiError) -> Self {
+        match err {
+            ApiError::NeedsSignin(message) => AuthFailure {
+                message,
+                needs_signin: true,
+            },
+            ApiError::Denied(message) | ApiError::Message(message) => AuthFailure {
+                message,
+                needs_signin: false,
+            },
+        }
+    }
+}
+
+impl serde::Serialize for ApiError {
+    fn serialize<S: serde::Serializer>(&self, s: S) -> Result<S::Ok, S::Error> {
+        AuthFailure::from(match self {
+            ApiError::NeedsSignin(m) => ApiError::NeedsSignin(m.clone()),
+            ApiError::Denied(m) => ApiError::Denied(m.clone()),
+            ApiError::Message(m) => ApiError::Message(m.clone()),
+        })
+        .serialize(s)
+    }
+}
+
+/// Pull the most human sentence out of an error body. `userMessage` is the only
+/// field the API marks as safe to show verbatim; `message` is developer text
+/// and is used solely as a last resort so a failure is never a blank dialog.
+async fn error_message(res: reqwest::Response, fallback: &str) -> String {
+    let Ok(body) = res.json::<ApiErrorBody>().await else {
+        return fallback.to_string();
+    };
+    if let Some(text) = body.user_message {
+        return text;
+    }
+    match body.message {
+        Some(serde_json::Value::String(text)) => text,
+        // class-validator returns an array of strings for a 400.
+        Some(serde_json::Value::Array(items)) => items
+            .into_iter()
+            .filter_map(|v| v.as_str().map(str::to_string))
+            .next()
+            .unwrap_or_else(|| fallback.to_string()),
+        _ => fallback.to_string(),
+    }
+}
+
+// ── Session ────────────────────────────────────────────────────────────────
+
+/// §7.2 in three hops: ask our API for a serverId, prove it to Mojang with the
+/// Minecraft access token, then exchange it for a launcher JWT. Our API never
+/// sees a Microsoft or Minecraft token — only a username and the serverId it
+/// issued itself.
+async fn mint_session(api: &ApiState, auth: &AuthState) -> Result<String, ApiError> {
+    let session = auth.session().await.ok_or_else(|| {
+        ApiError::NeedsSignin("Inicia sesión con tu cuenta de Minecraft para ver tus packs.".into())
+    })?;
+
+    let base = base_url();
+
+    let res = api
+        .http
+        .post(format!("{base}/packs/launcher/auth/challenge"))
+        .send()
+        .await?;
+    if !res.status().is_success() {
+        return Err(ApiError::Message(
+            error_message(res, "El servidor de packs no está disponible.").await,
+        ));
+    }
+    let challenge: Envelope<JoinChallenge> = res.json().await?;
+    let server_id = challenge.data.server_id;
+
+    // Mojang wants the profile id UNDASHED here, unlike everywhere else in this
+    // launcher — auth::msa normalises to dashed on arrival because that is what
+    // our own char(36) columns hold.
+    let join = api
+        .http
+        .post(JOIN_URL)
+        .json(&serde_json::json!({
+            "accessToken": session.access_token,
+            "selectedProfile": session.uuid.replace('-', ""),
+            "serverId": server_id,
+        }))
+        .send()
+        .await?;
+    if !join.status().is_success() {
+        // 403 here means the Minecraft token is stale or the account is not
+        // entitled to the game; either way signing in again is the fix.
+        return Err(ApiError::NeedsSignin(
+            "Mojang rechazó tu sesión. Vuelve a iniciar sesión.".into(),
+        ));
+    }
+
+    let res = api
+        .http
+        .post(format!("{base}/packs/launcher/auth/verify"))
+        .json(&serde_json::json!({
+            "username": session.username,
+            "serverId": server_id,
+        }))
+        .send()
+        .await?;
+    if !res.status().is_success() {
+        return Err(ApiError::NeedsSignin(
+            error_message(res, "No se pudo verificar tu sesión con Boffmedia.").await,
+        ));
+    }
+    let verified: Envelope<LauncherSession> = res.json().await?;
+
+    *api.token.lock().await = Some(verified.data.token.clone());
+    Ok(verified.data.token)
+}
+
+async fn current_token(api: &ApiState, auth: &AuthState) -> Result<String, ApiError> {
+    if let Some(token) = api.token.lock().await.clone() {
+        return Ok(token);
+    }
+    mint_session(api, auth).await
+}
+
+/// Send an authenticated request, re-minting the session ONCE on a 401. The
+/// launcher session is short-lived and the app stays open for hours, so an
+/// expired token is the normal case, not an error worth showing anyone.
+async fn authed(
+    api: &ApiState,
+    auth: &AuthState,
+    build: impl Fn(&reqwest::Client, &str) -> reqwest::RequestBuilder,
+) -> Result<reqwest::Response, ApiError> {
+    let token = current_token(api, auth).await?;
+    let res = build(&api.http, &base_url())
+        .bearer_auth(&token)
+        .send()
+        .await?;
+
+    if res.status() != reqwest::StatusCode::UNAUTHORIZED {
+        return Ok(res);
+    }
+
+    *api.token.lock().await = None;
+    let token = mint_session(api, auth).await?;
+    Ok(build(&api.http, &base_url())
+        .bearer_auth(&token)
+        .send()
+        .await?)
+}
+
+// ── Commands ───────────────────────────────────────────────────────────────
+
+/// The packs this UUID may see. Access filtering is the server's job — a pack
+/// the player cannot install must never reach this list in the first place.
+#[tauri::command]
+pub async fn packs_list(
+    api: tauri::State<'_, ApiState>,
+    auth: tauri::State<'_, AuthState>,
+) -> Result<Vec<LauncherPack>, ApiError> {
+    let res = authed(&api, &auth, |http, base| {
+        http.get(format!("{base}/packs/launcher/packs"))
+    })
+    .await?;
+
+    if !res.status().is_success() {
+        return Err(ApiError::Message(
+            error_message(res, "No se pudo cargar la lista de packs.").await,
+        ));
+    }
+    let body: Envelope<Vec<LauncherPack>> = res.json().await?;
+    Ok(body.data)
+}
+
+/// The manifest to install from. Returned to the renderer as raw JSON on
+/// purpose: it is validated here with the generated types + the hand-mirrored
+/// refinements, and the installer (§6) will read it from the same bytes.
+#[tauri::command]
+pub async fn pack_manifest(
+    pack_id: String,
+    password: Option<String>,
+    api: tauri::State<'_, ApiState>,
+    auth: tauri::State<'_, AuthState>,
+) -> Result<serde_json::Value, ApiError> {
+    let query: Vec<(String, String)> = password
+        .filter(|p| !p.is_empty())
+        .map(|p| vec![("password".to_string(), p)])
+        .unwrap_or_default();
+
+    let res = authed(&api, &auth, |http, base| {
+        http.get(format!("{base}/packs/launcher/packs/{pack_id}/manifest"))
+            .query(&query)
+    })
+    .await?;
+
+    let status = res.status();
+    if !status.is_success() {
+        let message = error_message(res, "No se pudo obtener el manifiesto.").await;
+        return Err(if status == reqwest::StatusCode::FORBIDDEN {
+            ApiError::Denied(message)
+        } else {
+            ApiError::Message(message)
+        });
+    }
+
+    let body: Envelope<serde_json::Value> = res.json().await?;
+
+    // Validate before it reaches the renderer or the installer: a manifest that
+    // fails here is a server bug, and failing at the boundary is the only place
+    // it is debuggable.
+    let raw = serde_json::to_string(&body.data)
+        .map_err(|e| ApiError::Message(format!("Manifiesto ilegible: {e}")))?;
+    crate::pack::parse_manifest(&raw)
+        .map_err(|e| ApiError::Message(format!("El manifiesto del pack no es válido: {e}")))?;
+
+    Ok(body.data)
+}
+
+/// Redeem an invite code (§7.3). Returns the pack it unlocked so the UI can
+/// jump straight to it.
+#[tauri::command]
+pub async fn invite_redeem(
+    code: String,
+    api: tauri::State<'_, ApiState>,
+    auth: tauri::State<'_, AuthState>,
+) -> Result<String, ApiError> {
+    let payload = serde_json::json!({ "code": code });
+    let res = authed(&api, &auth, |http, base| {
+        http.post(format!("{base}/packs/launcher/invites/redeem"))
+            .json(&payload)
+    })
+    .await?;
+
+    if !res.status().is_success() {
+        return Err(ApiError::Message(
+            error_message(res, "No se pudo canjear el código.").await,
+        ));
+    }
+    let body: Envelope<RedeemResult> = res.json().await?;
+    Ok(body.data.pack_id)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn base_url_has_no_trailing_slash() {
+        // Every call site interpolates `{base}/packs/...`; a trailing slash
+        // would produce `//packs` and a 404 that looks like a routing bug.
+        std::env::set_var("BOFF_API_URL", "https://example.test/");
+        assert_eq!(base_url(), "https://example.test");
+        std::env::remove_var("BOFF_API_URL");
+    }
+
+    #[test]
+    fn blank_env_falls_back_to_the_built_in_url() {
+        std::env::set_var("BOFF_API_URL", "   ");
+        assert!(base_url().starts_with("https://"));
+        std::env::remove_var("BOFF_API_URL");
+    }
+
+    #[test]
+    fn api_errors_carry_the_signin_hint() {
+        let failure = AuthFailure::from(ApiError::NeedsSignin("x".into()));
+        assert!(failure.needs_signin);
+        let failure = AuthFailure::from(ApiError::Denied("x".into()));
+        assert!(!failure.needs_signin, "denial is not fixed by signing in again");
+    }
+}

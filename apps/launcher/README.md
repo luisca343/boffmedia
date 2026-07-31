@@ -50,10 +50,42 @@ The screens are complete and driven by mock data. Replacing a mock with a real
 Tauri command should not require touching a screen — if it does, the seam is in
 the wrong place.
 
+## Auth (§5) — built, hand-rolled
+
+`src-tauri/src/auth/` implements the Microsoft → Xbox → XSTS → Minecraft chain
+directly rather than via `portablemc::msa`: that crate's `Account` exposes no
+refresh token and is not serde-serializable, so its only persistence is a
+file-backed database — and §5.7 requires the refresh token in the OS credential
+store, because a refresh token *is* the account. `portablemc` still owns all of §6.
+
+Only the refresh token is persisted, via `keyring`. The Minecraft access token
+lives in Rust memory and never reaches the renderer or the disk.
+
+## Pack registry (§7) — wired
+
+`src-tauri/src/api.rs` is the client. The HTTP lives in Rust for a reason: minting
+a pack session needs the *Minecraft* access token to complete Mojang's `join`
+handshake, and that token never crosses into the renderer. It also means no CORS.
+
+Two tokens, never confused — the Minecraft access token (`auth`, only ever sent to
+Mojang) and the launcher session JWT (`api`, only ever sent to our API). Signing
+out and signing in both drop the second, or the next player inherits the previous
+player's entitlements.
+
+Point it at a local API with `BOFF_API_URL` (runtime env var wins over the
+compile-time value; the default is `https://api.boffmedia.es`):
+
+```bash
+BOFF_API_URL=http://localhost:34301 pnpm --filter launcher dev
+```
+
+The listing is a *summary* — `fileCount`, not `files`, and never the allowlist
+UUIDs. The file list exists only in a manifest, which is fetched per install, and
+sending the allowlist would let one member enumerate everyone with access.
+
 ## Not built yet
 
-The Rust side: the pack registry (§7), the auth chain (§5) and the install
-pipeline (§6).
+The install pipeline (§6). The pack registry (§7) is built — in `apps/api`.
 `mc_auth.py` and `mc_install.py` in `docs/` are working references to port.
 
 Dependencies are chosen (verified 2026-07-30): **`portablemc` 5.0** (Apache-2.0) covers
@@ -78,3 +110,8 @@ are *silently dropped*. Every refinement in `boffmedia.ts` must be mirrored by h
 installer half-checked.
 
 `pnpm check:schema` fails the build when the committed JSON Schema is stale.
+
+**Generated code needs helper crates.** typify emits references to `regress` (for
+`pattern`), `uuid` (`format: uuid`) and `chrono` (`format: date-time`) without adding
+them — they are typify's own dev-dependencies, and `src-tauri/Cargo.toml` declares them.
+Pin `regress = "0.10"`; 0.11 changed the API the generated code uses.

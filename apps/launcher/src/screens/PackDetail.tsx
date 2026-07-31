@@ -40,6 +40,15 @@ const PHASE_LABEL: Record<InstallPhase, string> = {
   verifying: "Verificando",
 }
 
+// The registry stores the loader under its dependency key, which is also what
+// the version JSON uses; these are just the display names.
+const LOADER_LABEL: Record<string, string> = {
+  neoforge: "NeoForge",
+  forge: "Forge",
+  "fabric-loader": "Fabric",
+  quilt: "Quilt",
+}
+
 /** Ticks once a second so the running-time readout advances. */
 function useNow(active: boolean): number {
   const [now, setNow] = useState(() => Date.now())
@@ -73,15 +82,13 @@ export function PackDetail() {
 
   const { pack, latest, state } = selected
   const installing = state.kind === "installing"
-  const needsInstall = state.kind === "not-installed" || state.kind === "outdated"
+  // No published version means nothing to install, whatever the disk says.
+  const needsInstall =
+    !!latest && (state.kind === "not-installed" || state.kind === "outdated")
   const running = game.kind === "running"
-  const loader = latest.dependencies.neoforge
-    ? `NeoForge ${latest.dependencies.neoforge}`
-    : latest.dependencies.forge
-      ? `Forge ${latest.dependencies.forge}`
-      : latest.dependencies["fabric-loader"]
-        ? `Fabric ${latest.dependencies["fabric-loader"]}`
-        : "Vanilla"
+  const loader = !latest?.loader
+    ? "Vanilla"
+    : `${LOADER_LABEL[latest.loader] ?? latest.loader} ${latest.loaderVersion ?? ""}`.trim()
 
   return (
     <div className="px-8 py-7">
@@ -178,11 +185,11 @@ export function PackDetail() {
         <Panel title="Versión">
           <DataList
             rows={[
-              { label: "Última", value: latest.name, mono: true },
-              { label: "Publicada", value: formatWhen(latest.createdAt) },
-              { label: "Minecraft", value: latest.dependencies.minecraft, mono: true },
+              { label: "Última", value: latest?.name ?? "—", mono: true },
+              { label: "Publicada", value: latest ? formatWhen(latest.createdAt) : "—" },
+              { label: "Minecraft", value: latest?.minecraft ?? "—", mono: true },
               { label: "Loader", value: loader, mono: true },
-              { label: "Archivos", value: latest.files.length },
+              { label: "Archivos", value: latest?.fileCount ?? 0 },
               (state.kind === "installed" || state.kind === "outdated") && {
                 label: "En disco",
                 value: formatBytes(state.sizeBytes),
@@ -202,16 +209,19 @@ export function PackDetail() {
               {
                 label: "Tipo",
                 value:
-                  pack.access.kind === "allowlist"
+                  pack.accessKind === "allowlist"
                     ? "Lista de permitidos"
-                    : pack.access.kind === "password"
+                    : pack.accessKind === "password"
                       ? "Contraseña"
                       : "Público",
-                icon: pack.access.kind === "public" ? "globe" : "lock",
+                icon: pack.accessKind === "public" ? "globe" : "lock",
               },
-              pack.access.kind === "allowlist" && {
-                label: "Cuentas",
-                value: pack.access.uuids.length,
+              // No member count: the registry deliberately never sends the
+              // allowlist to a launcher, since one member could otherwise
+              // enumerate everyone else with access to the pack.
+              pack.accessKind === "allowlist" && {
+                label: "Tu acceso",
+                value: "Concedido",
               },
             ]}
           />

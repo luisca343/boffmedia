@@ -3,7 +3,6 @@ import {
   Controller,
   Delete,
   Get,
-  HttpCode,
   HttpStatus,
   Param,
   Patch,
@@ -72,14 +71,14 @@ export class PacksController {
   }
 
   @Patch(':id')
-  @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Actualizar un pack' })
   async update(
     @Param('id') id: string,
     @Body() dto: UpdatePackDto,
     @Req() req: { user?: { userId?: number } },
-  ): Promise<void> {
+  ): Promise<{ success: true }> {
     await this.packs.updatePack(id, dto, this.actorId(req));
+    return { success: true };
   }
 
   // ── Versions ─────────────────────────────────────────────────────────────
@@ -107,7 +106,6 @@ export class PacksController {
   }
 
   @Post(':id/versions/:versionId/publish')
-  @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({
     summary: 'Publicar una versión',
     description: 'La hace visible a los launchers y la marca como la última del pack.',
@@ -116,8 +114,9 @@ export class PacksController {
     @Param('id') id: string,
     @Param('versionId') versionId: string,
     @Req() req: { user?: { userId?: number } },
-  ): Promise<void> {
+  ): Promise<{ success: true }> {
     await this.packs.publishVersion(id, versionId, this.actorId(req));
+    return { success: true };
   }
 
   // ── Access ───────────────────────────────────────────────────────────────
@@ -130,25 +129,25 @@ export class PacksController {
   }
 
   @Post(':id/access')
-  @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Conceder acceso a un UUID' })
   async grant(
     @Param('id') id: string,
     @Body() dto: GrantAccessDto,
     @Req() req: { user?: { userId?: number } },
-  ): Promise<void> {
+  ): Promise<{ success: true }> {
     await this.packs.grant(id, dto.uuid, this.actorId(req));
+    return { success: true };
   }
 
   @Delete(':id/access/:uuid')
-  @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Revocar el acceso de un UUID' })
   async revoke(
     @Param('id') id: string,
     @Param('uuid') uuid: string,
     @Req() req: { user?: { userId?: number } },
-  ): Promise<void> {
+  ): Promise<{ success: true }> {
     await this.packs.revoke(id, uuid, this.actorId(req));
+    return { success: true };
   }
 
   // ── Invites ──────────────────────────────────────────────────────────────
@@ -176,10 +175,10 @@ export class PacksController {
   }
 
   @Delete('invites/:code')
-  @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Revocar una invitación' })
-  async revokeInvite(@Param('code') code: string): Promise<void> {
+  async revokeInvite(@Param('code') code: string): Promise<{ success: true }> {
     await this.packs.revokeInvite(code);
+    return { success: true };
   }
 
   // ── Audit ────────────────────────────────────────────────────────────────
