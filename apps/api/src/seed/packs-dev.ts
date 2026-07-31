@@ -1,7 +1,10 @@
 import * as dotenv from 'dotenv';
 dotenv.config();
 
-import { randomBytes } from 'crypto';
+import { createHash, randomBytes } from 'crypto';
+import { mkdir, writeFile } from 'fs/promises';
+import { dirname, join } from 'path';
+import * as bcrypt from 'bcrypt';
 import { MySql2Database, drizzle } from 'drizzle-orm/mysql2';
 import { eq } from 'drizzle-orm';
 import * as mysql from 'mysql2/promise';
@@ -9,17 +12,13 @@ import pino from 'pino';
 import { PackManifest } from '@boffmedia/pack-schema';
 import { env } from '@/config/env';
 
-import { packVersions, packs } from '../_db/schema/Packs';
+import { packInvites, packVersions, packs } from '../_db/schema/Packs';
 
 const logger = pino({ name: 'packs-dev-seed' });
 
-// Test fixtures for the launcher's install+launch path. Both packs are `public`
-// so no ACL grant or invite is needed to see them — the point here is to
-// exercise download → install → launch, not the entitlement gate (§7.2, which
-// has its own tests).
-//
-// Deliberately no `override` files: no blob upload route exists yet
-// (TODO(pack-blob-upload)), so an override source would 404 mid-install.
+// Test fixtures for the launcher's install+launch path. The first two are public
+// smoke-test packs; the gated fixtures exercise the same access and override
+// paths a real private pack uses. The script is idempotent by slug.
 
 const MINECRAFT = '1.21.4';
 
@@ -35,10 +34,43 @@ function newId(): string {
   return randomBytes(16).toString('hex');
 }
 
-async function getJson<T>(url: string): Promise<T> {
-  const res = await fetch(url, { headers: { 'User-Agent': 'boffmedia/packs-dev-seed' } });
+async function getJson<T>(url: string, headers?: Record<string, string>): Promise<T> {
+  const res = await fetch(url, {
+    headers: { 'User-Agent': 'boffmedia/packs-dev-seed', ...headers },
+  });
   if (!res.ok) throw new Error(`${res.status} ${res.statusText} for ${url}`);
   return (await res.json()) as T;
+}
+
+async function optionalCurseforgeFile(): Promise<unknown | null> {
+  const key = env.CURSEFORGE_API_KEY;
+  const projectId = Number(env.PACKS_DEV_CURSEFORGE_PROJECT_ID);
+  const fileId = Number(env.PACKS_DEV_CURSEFORGE_FILE_ID);
+  if (!key || !Number.isInteger(projectId) || !Number.isInteger(fileId)) {
+    logger.info('no CurseForge fixture ids configured, skipping optional CF file');
+    return null;
+  }
+
+  const headers = { 'x-api-key': key, accept: 'application/json' };
+  const metadata = await getJson<{
+    data: { fileName: string; fileLength: number };
+  }>(`https://api.curseforge.com/v1/mods/${projectId}/files/${fileId}`, headers);
+  const download = await getJson<{ data: string }>(
+    `https://api.curseforge.com/v1/mods/${projectId}/files/${fileId}/download-url`,
+    headers,
+  );
+  const response = await fetch(download.data, { headers: { 'x-api-key': key } });
+  if (!response.ok) throw new Error(`${response.status} ${response.statusText} for CurseForge file`);
+  const bytes = Buffer.from(await response.arrayBuffer());
+  const sha512 = createHash('sha512').update(bytes).digest('hex');
+  logger.info({ projectId, fileId, fileName: metadata.data.fileName }, 'resolved optional CF file');
+  return {
+    path: `mods/${metadata.data.fileName}`,
+    sha512,
+    fileSize: bytes.length || metadata.data.fileLength,
+    env: { client: 'required' as const, server: 'unsupported' as const },
+    source: { kind: 'curseforge' as const, projectId, fileId },
+  };
 }
 
 async function latestFabricLoader(): Promise<string> {
@@ -90,21 +122,39 @@ type SeedPack = {
   versionName: string;
   loader?: 'fabric-loader';
   loaderVersion?: string;
+  accessKind?: 'public' | 'password' | 'allowlist';
+  password?: string;
   files: unknown[];
 };
+
+async function seedBlob(content: string): Promise<{ sha512: string; fileSize: number }> {
+  const bytes = Buffer.from(content, 'utf8');
+  const sha512 = createHash('sha512').update(bytes).digest('hex');
+  const root = env.PACK_BLOB_DIR ?? join(process.cwd(), 'data', 'pack-blobs');
+  const path = join(root, sha512.slice(0, 2), sha512.slice(2, 4), sha512);
+  await mkdir(dirname(path), { recursive: true });
+  try {
+    await writeFile(path, bytes, { flag: 'wx' });
+  } catch (error: unknown) {
+    if ((error as NodeJS.ErrnoException).code !== 'EEXIST') throw error;
+  }
+  return { sha512, fileSize: bytes.length };
+}
 
 async function seedPack(
   db: MySql2Database,
   spec: SeedPack,
-): Promise<void> {
+): Promise<string> {
   const [existing] = await db.select().from(packs).where(eq(packs.slug, spec.slug)).limit(1);
   if (existing) {
     logger.info({ slug: spec.slug }, 'pack already exists, skipping');
-    return;
+    return existing.id;
   }
 
   const packId = newId();
   const versionId = newId();
+
+  const accessKind = spec.accessKind ?? 'public';
 
   // Same shape PacksService.createVersion builds, validated with the same
   // schema — a fixture that the API would have rejected is worse than none.
@@ -115,7 +165,12 @@ async function seedPack(
       slug: spec.slug,
       name: spec.name,
       summary: spec.summary,
-      access: { kind: 'public' as const },
+      access:
+        accessKind === 'public'
+          ? { kind: 'public' as const }
+          : accessKind === 'password'
+            ? { kind: 'password' as const }
+            : { kind: 'allowlist' as const, uuids: [] },
       latestVersionId: versionId,
     },
     version: {
@@ -140,7 +195,8 @@ async function seedPack(
     slug: spec.slug,
     name: spec.name,
     summary: spec.summary,
-    accessKind: 'public',
+    accessKind,
+    passwordHash: spec.password ? await bcrypt.hash(spec.password, 10) : null,
     latestVersionId: versionId,
   });
   await db.insert(packVersions).values({
@@ -156,6 +212,14 @@ async function seedPack(
   });
 
   logger.info({ slug: spec.slug, packId, versionId, files: spec.files.length }, 'pack seeded');
+  return packId;
+}
+
+async function seedInvite(db: MySql2Database, packId: string, code: string): Promise<void> {
+  const [existing] = await db.select().from(packInvites).where(eq(packInvites.code, code)).limit(1);
+  if (existing) return;
+  await db.insert(packInvites).values({ code, packId, maxUses: 20 });
+  logger.info({ code, packId }, 'invite seeded');
 }
 
 async function main() {
@@ -187,6 +251,46 @@ async function main() {
       loaderVersion,
       files,
     });
+
+    const override = await seedBlob(
+      '# Boff private fixture\n# This file verifies the authenticated override route.\n',
+    );
+    const curseforgeFile = await optionalCurseforgeFile();
+    const privateFiles = [
+      ...files,
+      ...(curseforgeFile ? [curseforgeFile] : []),
+      {
+        path: 'config/boff-test/options.txt',
+        sha512: override.sha512,
+        fileSize: override.fileSize,
+        env: { client: 'required' as const, server: 'unsupported' as const },
+        source: { kind: 'override' as const, blobSha512: override.sha512 },
+      },
+    ];
+
+    await seedPack(db, {
+      slug: 'boff-password-test',
+      name: 'Boff Private (contraseña)',
+      summary: 'Pack de prueba con contraseña, mods de Modrinth y un override privado.',
+      versionName: '1.0-private',
+      loader: 'fabric-loader',
+      loaderVersion,
+      accessKind: 'password',
+      password: 'boff-test-password',
+      files: privateFiles,
+    });
+
+    const invitePackId = await seedPack(db, {
+      slug: 'boff-invite-test',
+      name: 'Boff Private (invitación)',
+      summary: 'Pack de prueba con acceso por invitación y el mismo override privado.',
+      versionName: '1.0-invite',
+      loader: 'fabric-loader',
+      loaderVersion,
+      accessKind: 'allowlist',
+      files: privateFiles,
+    });
+    await seedInvite(db, invitePackId, 'boff-test-invite');
   } finally {
     await connection.end();
   }

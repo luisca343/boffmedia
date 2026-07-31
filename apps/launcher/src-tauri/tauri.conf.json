@@ -31,6 +31,10 @@
   "bundle": {
     "active": true,
     "targets": "all",
+    "windows": {
+      "digestAlgorithm": "sha256",
+      "timestampUrl": "http://timestamp.digicert.com"
+    },
     "icon": [
       "icons/32x32.png",
       "icons/128x128.png",
@@ -38,5 +42,13 @@
       "icons/icon.icns",
       "icons/icon.ico"
     ]
+  },
+  "plugins": {
+    "updater": {
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDIxRjMzRUEyQTMzMzYxOTMKUldTVFlUT2pvajd6SWNEZWFVbWUrQWV5RFRkUWRJc3h2UzFNakwycG5YdFduQXI5RTZhdlFrSXcK",
+      "endpoints": [
+        "https://github.com/luisca343/boffmedia/releases/latest/download/latest.json"
+      ]
+    }
   }
 }

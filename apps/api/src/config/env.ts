@@ -90,6 +90,10 @@ export const env = z
     // OUTSIDE PUBLIC_DIR: overrides are gated by the pack ACL, and anything under
     // the static root would be world-readable by URL.
     PACK_BLOB_DIR: z.string().optional(),
+    // Optional inputs for `seed:packs-dev` to add one real CurseForge file to
+    // the gated fixture. The seed skips that file when these are absent.
+    PACKS_DEV_CURSEFORGE_PROJECT_ID: z.string().optional(),
+    PACKS_DEV_CURSEFORGE_FILE_ID: z.string().optional(),
 
     // Browser / manga scraper
     CHROME_PATH: z.string().optional(),

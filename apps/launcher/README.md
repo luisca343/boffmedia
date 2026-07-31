@@ -88,10 +88,12 @@ The listing is a *summary* — `fileCount`, not `files`, and never the allowlist
 UUIDs. The file list exists only in a manifest, which is fetched per install, and
 sending the allowlist would let one member enumerate everyone with access.
 
-## Not built yet
+## Current status
 
-The install pipeline (§6). The pack registry (§7) is built — in `apps/api`.
-`mc_auth.py` and `mc_install.py` in `docs/` are working references to port.
+Auth, the pack registry, install/update/launch, SHA-512 verification, content-addressed
+downloads, password/invite access flows, and crash diagnosis are implemented. The
+remaining release work is Windows end-to-end verification, production CurseForge
+configuration, and signed distribution. See [`docs/RELEASE.md`](docs/RELEASE.md).
 
 Dependencies are chosen (verified 2026-07-30): **`portablemc` 5.0** (Apache-2.0) covers
 all of it — its `msa` module is the Microsoft auth chain (§5), its `forge` module installs
@@ -120,3 +122,15 @@ installer half-checked.
 `pattern`), `uuid` (`format: uuid`) and `chrono` (`format: date-time`) without adding
 them — they are typify's own dev-dependencies, and `src-tauri/Cargo.toml` declares them.
 Pin `regress = "0.10"`; 0.11 changed the API the generated code uses.
+
+## Development fixtures
+
+`pnpm --filter api seed:packs-dev` creates public vanilla/Fabric smoke packs plus
+two gated packs. The password fixture uses `boff-test-password`; the invite
+fixture uses `boff-test-invite`. The latter also contains a small hosted override
+blob, so these fixtures exercise password, invite, and authenticated blob
+downloads without needing a real pack upload first. To add a real CurseForge
+artifact to the gated fixture, also set `CURSEFORGE_API_KEY`,
+`PACKS_DEV_CURSEFORGE_PROJECT_ID`, and `PACKS_DEV_CURSEFORGE_FILE_ID` before
+running the seed; the script downloads and hashes that file once, while the
+launcher fetches it through the API proxy.

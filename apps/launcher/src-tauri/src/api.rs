@@ -459,8 +459,8 @@ fn missing_fallback(file: &PackFile) -> String {
                 .to_string()
         }
         // Distinguishable on purpose: this is overwhelmingly "nobody has
-        // uploaded the blob yet", not a network fault. See the TODO in
-        // install/files.rs.
+        // uploaded the blob yet", not a network fault. The admin dashboard
+        // uploads these content-addressed files before publishing a version.
         PackFile::Override { sha512 } => format!(
             "El servidor no tiene el archivo de configuración {}… de este pack. Falta subirlo.",
             &sha512[..8.min(sha512.len())]

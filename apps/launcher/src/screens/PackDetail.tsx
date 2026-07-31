@@ -15,6 +15,7 @@ import {
 } from "@boffmedia/ui"
 
 import { useLauncher } from "../state/launcher"
+import { diagnoseCrash } from "../utils/crash"
 import { formatBytes, formatDuration, formatWhen } from "../utils/format"
 import { LOADER_LABEL, PHASE_LABEL, STEP_GROUPS } from "../utils/labels"
 
@@ -53,6 +54,7 @@ export function PackDetail() {
   // The tail is where the stack trace ends up; a crash log's first lines are
   // just the JVM banner.
   const crashLines = logs.filter((line) => line.level === "error").slice(-12)
+  const diagnosis = game.kind === "crashed" ? diagnoseCrash(logs) : null
   const installing = state.kind === "installing"
   // No published version means nothing to install, whatever the disk says.
   const needsInstall =
@@ -176,6 +178,15 @@ export function PackDetail() {
             <p className="text-sm text-txt-muted">
               No se registró ningún error antes del cierre.
             </p>
+          )}
+          {diagnosis && (
+            <div className="mt-3 border-l-2 border-accent bg-accent-soft px-3 py-2">
+              <p className="font-display text-sm font-bold uppercase tracking-[0.06em] text-accent-bright">
+                {diagnosis.title}
+              </p>
+              <p className="mt-1 text-xs text-txt-muted">{diagnosis.message}</p>
+              <p className="mt-1 text-xs text-txt-dim">{diagnosis.action}</p>
+            </div>
           )}
           <div className="mt-3 flex items-center gap-2">
             <Button size="sm" icon="list" onClick={() => go("logs")}>

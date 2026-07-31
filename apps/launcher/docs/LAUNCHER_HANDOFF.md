@@ -30,9 +30,9 @@ hard requirement.
 | Azure app registration | **Approved.** Full auth chain works end to end. |
 | Client ID | `72c3e158-bb47-4ef7-a50c-f3ce51698108` (not a secret; safe to commit) |
 | Auth chain (`mc_auth.py`) | **Working.** Signs in, returns profile, stores refresh token. |
-| Install + launch (`mc_install.py`) | Written and logic-tested. Download paths not yet exercised against Mojang. |
-| Fabric / NeoForge | Not started. `resolve_version()` already handles `inheritsFrom`. |
-| Pack server / ACL | Not started. No external dependencies — can begin immediately. |
+| Install + launch | Rust/Tauri pipeline built and smoke-tested with vanilla and a custom NeoForge/Pixelmon pack. |
+| Fabric / NeoForge | Implemented through `portablemc`; real-pack verification is ongoing. |
+| Pack server / ACL | NestJS registry, launcher auth, ACLs, invites, overrides, and admin authoring are built. |
 | CurseForge API key | Not yet applied for. |
 
 Two Python scripts exist as **reference implementations / prototypes**, not as
@@ -444,8 +444,9 @@ Do Fabric end-to-end before touching NeoForge.
 
 ## 7. Pack format and access control
 
-Not yet built. This is the differentiating work and has **no external
-dependencies** — it can start immediately, in parallel with launcher work.
+Built in the existing NestJS app and consumed by the Tauri launcher. The admin
+dashboard authors and publishes manifests; the launcher revalidates access on
+the manifest and every payload request.
 
 ### 7.1 Pack format — extend, don't invent
 
@@ -496,14 +497,10 @@ get wasted on a worse product.
 ## 8. Roadmap
 
 1. ~~Submit Azure app registration~~ **done, approved**
-2. ~~CLI that authenticates and launches vanilla~~ **auth done; launch untested against Mojang**
-3. **Fabric**, then Java auto-install (Adoptium)
-4. Apply for the CurseForge API key (reviewed, so start early)
-5. Instance management + real UI. Importers: `.mrpack`, CF zips, Prism/MultiMC exports
-6. Modrinth integration, then CurseForge with the blocked-mod fallback UX
-7. Pack server: manifest hosting, `hasJoined` auth, UUID ACLs, delta updates
-8. NeoForge
-9. Code signing, auto-update, crash parsing, polish
+2. ~~Authenticate and launch vanilla/NeoForge~~ **done; continue real-pack smoke tests**
+3. ~~Pack server, ACLs, invites, and admin authoring~~ **done**
+4. **Exercise password, invite, override, and CurseForge paths against production-like packs**
+5. **Windows release: code signing, signed auto-update, crash diagnosis, and polish**
 
 **The honest failure mode for this project is not technical difficulty — it's
 that steps 2–6 are ~80% of the work and 0% of what the maintainer actually

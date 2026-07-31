@@ -232,11 +232,9 @@ async fn install_minecraft(
 /// Download the pack payload: mods and overrides as two phases, then a verify
 /// pass and the marker.
 ///
-/// TODO(pack-blob-upload): a pack published with an `override` source will 404
-/// here until the API gains an admin route to UPLOAD blobs into PACK_BLOB_DIR
-/// (nothing under apps/api/src/api/packs/packs.controller.ts writes one today —
-/// the launcher-side download route exists, its counterpart does not). The
-/// failure is deliberately worded as "falta subirlo" by
+/// A pack published with an `override` source still 404s if its blob was not
+/// uploaded before publishing. The admin upload route now exists, but the
+/// launcher keeps the failure deliberately worded as "falta subirlo" by
 /// `api::missing_fallback`, so it reads as a publishing gap rather than as a
 /// network fault; do not soften it into a retry.
 async fn install_payload(

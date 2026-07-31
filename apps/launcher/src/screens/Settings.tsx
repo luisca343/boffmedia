@@ -1,5 +1,8 @@
+import { useState } from "react"
+
 import { Badge, Button, DataList, Divider, Field, Input, Kicker, Panel, Slider, Toggle } from "@boffmedia/ui"
 
+import { updateCheck, updateInstall, type UpdateInfo } from "../runtime"
 import { useLauncher } from "../state/launcher"
 import { formatBytes } from "../utils/format"
 
@@ -8,6 +11,35 @@ import { formatBytes } from "../utils/format"
 
 export function Settings() {
   const { settings, patchSettings, account } = useLauncher()
+  const [update, setUpdate] = useState<UpdateInfo | null>(null)
+  const [checking, setChecking] = useState(false)
+  const [installing, setInstalling] = useState(false)
+  const [updateError, setUpdateError] = useState<string | null>(null)
+
+  const checkUpdates = async () => {
+    if (checking || installing) return
+    setChecking(true)
+    setUpdateError(null)
+    try {
+      setUpdate(await updateCheck())
+    } catch (error) {
+      setUpdateError((error as { message?: string })?.message ?? "No se pudo comprobar si hay actualizaciones.")
+    } finally {
+      setChecking(false)
+    }
+  }
+
+  const installUpdate = async () => {
+    if (!update || installing) return
+    setInstalling(true)
+    setUpdateError(null)
+    try {
+      await updateInstall()
+    } catch (error) {
+      setUpdateError((error as { message?: string })?.message ?? "No se pudo instalar la actualización.")
+      setInstalling(false)
+    }
+  }
 
   return (
     <div className="px-8 py-7">
@@ -97,6 +129,25 @@ export function Settings() {
             <Button size="sm" variant="ghost" icon="refresh">
               Revalidar sesión
             </Button>
+          </div>
+        </Panel>
+
+        <Panel title="Launcher">
+          <div className="flex items-center gap-2">
+            <Badge tone={update ? "info" : "ok"}>{update ? `v${update.version} disponible` : "Actualizado"}</Badge>
+            <span className="text-xs text-txt-dim">Las actualizaciones se verifican con firma digital.</span>
+          </div>
+          {update?.body && <p className="mt-3 text-xs text-txt-muted">{update.body}</p>}
+          {updateError && <p className="mt-3 text-xs text-bad">{updateError}</p>}
+          <div className="mt-4 flex flex-wrap gap-2">
+            <Button size="sm" variant="ghost" icon="refresh" loading={checking} onClick={() => void checkUpdates()}>
+              Buscar actualizaciones
+            </Button>
+            {update && (
+              <Button size="sm" variant="pri" icon="download" loading={installing} onClick={() => void installUpdate()}>
+                Instalar y reiniciar
+              </Button>
+            )}
           </div>
         </Panel>
       </div>

@@ -1,6 +1,8 @@
 import { invoke } from "@tauri-apps/api/core"
 import { listen } from "@tauri-apps/api/event"
 import { getCurrentWindow } from "@tauri-apps/api/window"
+import { relaunch } from "@tauri-apps/plugin-process"
+import { check } from "@tauri-apps/plugin-updater"
 
 import { MOCK_SETTINGS, mockLogs } from "./services/mock"
 import type {
@@ -228,6 +230,7 @@ export async function packManifest(
 
 /** Redeem an invite code (§7.3); resolves to the pack id it unlocked. */
 export async function inviteRedeem(code: string): Promise<string> {
+  if (!isDesktop()) return code ? "mock-invite-pack" : ""
   try {
     return await invoke<string>("invite_redeem", { code })
   } catch (err) {
@@ -355,10 +358,14 @@ async function mockInstall(packId: string): Promise<ScannedInstallState> {
 export async function installPack(
   packId: string,
   manifest: unknown,
+  password?: string,
 ): Promise<ScannedInstallState> {
   if (!isDesktop()) return mockInstall(packId)
   try {
-    return await invoke<ScannedInstallState>("install_pack", { manifest })
+    return await invoke<ScannedInstallState>("install_pack", {
+      manifest,
+      password: password ?? null,
+    })
   } catch (err) {
     throw asFailure(err)
   }
@@ -366,7 +373,11 @@ export async function installPack(
 
 /** Verify, then spawn. Resolves to the OS pid; `game://state` carries the rest,
  *  including the crash exit code the pid alone cannot tell you about. */
-export async function launchPack(packId: string, manifest: unknown): Promise<number> {
+export async function launchPack(
+  packId: string,
+  manifest: unknown,
+  password?: string,
+): Promise<number> {
   if (!isDesktop()) {
     busEmit<GameState>(EVENT_GAME_STATE, { kind: "preparing" })
     await sleep(600)
@@ -376,7 +387,10 @@ export async function launchPack(packId: string, manifest: unknown): Promise<num
     return 4821
   }
   try {
-    return await invoke<number>("launch_pack", { manifest })
+    return await invoke<number>("launch_pack", {
+      manifest,
+      password: password ?? null,
+    })
   } catch (err) {
     throw asFailure(err)
   }
@@ -452,4 +466,33 @@ export async function revealWindow(): Promise<void> {
   } catch {
     /* a visible window is not worth crashing over */
   }
+}
+
+// The updater object owns the signed artifact handle. Keep it here rather than
+// exposing a plugin object to screens, and require a fresh check after restart.
+export type UpdateInfo = {
+  version: string
+  date: string | null
+  body: string | null
+}
+
+let pendingUpdate: Awaited<ReturnType<typeof check>> = null
+
+export async function updateCheck(): Promise<UpdateInfo | null> {
+  if (!isDesktop()) return null
+  pendingUpdate = await check()
+  if (!pendingUpdate?.available) return null
+  return {
+    version: pendingUpdate.version,
+    date: pendingUpdate.date ?? null,
+    body: pendingUpdate.body ?? null,
+  }
+}
+
+export async function updateInstall(): Promise<void> {
+  if (!isDesktop()) return
+  const update = pendingUpdate ?? (await check())
+  if (!update?.available) return
+  await update.downloadAndInstall()
+  await relaunch()
 }
