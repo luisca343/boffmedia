@@ -1,12 +1,10 @@
-import { isDesktop, packsList, type LauncherPack } from "../runtime"
+import { instanceScan, isDesktop, packsList, type LauncherPack } from "../runtime"
 import { mockPackEntries } from "./mock"
-import type { PackEntry, PackVersionSummary } from "./types"
+import type { InstallState, PackEntry, PackVersionSummary } from "./types"
 
 // The bridge between the registry's wire shape (§7.2) and what this machine
 // knows about each pack. The server decides WHICH packs exist for this player;
-// only the InstallState is ours to compute, and until §6 lands there is nothing
-// on disk to reconcile against — so every pack reads as not-installed rather
-// than pretending otherwise.
+// the InstallState is ours, and comes from scanning the instance directory.
 
 function toVersion(pack: LauncherPack): PackVersionSummary | null {
   const v = pack.latestVersion
@@ -32,19 +30,30 @@ export async function loadPackEntries(): Promise<PackEntry[]> {
   if (!isDesktop()) return mockPackEntries()
 
   const packs = await packsList()
-  return packs.map((pack) => ({
-    pack: {
-      id: pack.id,
-      slug: pack.slug,
-      name: pack.name,
-      summary: pack.summary,
-      iconUrl: pack.iconUrl,
-      accessKind: pack.accessKind,
-    },
-    latest: toVersion(pack),
-    // TODO(§6): read the instance directory and report installed/outdated by
-    // comparing the version on disk against `latest`.
-    state: { kind: "not-installed" },
-    lastPlayed: null,
-  }))
+  return Promise.all(
+    packs.map(async (pack) => {
+      const latest = toVersion(pack)
+      // A scan is a few stat() calls; one unreadable instance must not take the
+      // whole library down with it, so it degrades to "not installed".
+      let state: InstallState = { kind: "not-installed" }
+      try {
+        state = await instanceScan(pack.slug, latest?.id ?? null)
+      } catch {
+        /* keep the listing usable */
+      }
+      return {
+        pack: {
+          id: pack.id,
+          slug: pack.slug,
+          name: pack.name,
+          summary: pack.summary,
+          iconUrl: pack.iconUrl,
+          accessKind: pack.accessKind,
+        },
+        latest,
+        state,
+        lastPlayed: null,
+      }
+    }),
+  )
 }

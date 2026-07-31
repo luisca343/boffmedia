@@ -4,7 +4,11 @@ version = "0.0.1"
 description = "Boff Launcher"
 authors = ["Boffmedia"]
 edition = "2021"
-rust-version = "1.77.2"
+# portablemc 5.0.4 is edition 2024 and declares rust-version 1.88.0, so the
+# previous 1.77.2 here was already unachievable — cargo would have refused the
+# dependency long before anything in this crate mattered. This crate's own
+# sources stay on edition 2021; only the toolchain floor moves.
+rust-version = "1.88.0"
 
 [lib]
 # Tauri v2 keeps the app in a lib so mobile targets and integration tests can
@@ -35,7 +39,9 @@ thiserror = "2"
 # Removing a `.regex()`, `z.uuid()` or `z.iso.datetime()` from the zod schema
 # would make the matching crate unused here, not the other way round.
 regress = "0.10"
-uuid = { version = "1", features = ["serde"] }
+# `v4` is not typify's doing: §6 needs a unique name for each partial download
+# in the content-addressed cache (install/files.rs).
+uuid = { version = "1", features = ["serde", "v4"] }
 chrono = { version = "0.4", features = ["serde"] }
 # HANDOFF §5/§6: msa auth, Forge AND NeoForge install, Java management.
 # The `forge` module's Loader enum selects Forge vs NeoForge.
@@ -46,6 +52,10 @@ keyring = { version = "3", features = ["apple-native", "windows-native", "sync-s
 # token for the keychain), so the launcher makes these calls itself.
 reqwest = { version = "0.12", features = ["json"] }
 tokio = { version = "1", features = ["time", "sync"] }
+# §6 file verification. portablemc's downloader only checks sha1, but every file
+# in a Boffmedia manifest carries a mandatory sha512 (packages/pack-schema), so
+# the pack payload is downloaded and verified by install/files.rs instead.
+sha2 = "0.10"
 # §5.1 — the device-code page must open in the SYSTEM browser. A narrow command
 # using this beats tauri-plugin-opener, whose purpose is handing the RENDERER a
 # general opener; see `auth::auth_open_verification`.

@@ -80,6 +80,17 @@ export const env = z
     // Third-party APIs
     GEMINI_API_KEY: z.string().optional(),
 
+    // Launcher pack distribution (HANDOFF §4.5). The CurseForge key never
+    // reaches the launcher: since 16 July 2026 edge.forgecdn.net 401s without an
+    // `x-api-key` header, and an embedded key is an extracted key, so every CF
+    // byte is proxied by us. Optional so dev/tests boot without it — the proxy
+    // route reports 503 while it is unset instead of failing obscurely.
+    CURSEFORGE_API_KEY: z.string().optional(),
+    // Where override blobs live, content-addressed by their sha512. Deliberately
+    // OUTSIDE PUBLIC_DIR: overrides are gated by the pack ACL, and anything under
+    // the static root would be world-readable by URL.
+    PACK_BLOB_DIR: z.string().optional(),
+
     // Browser / manga scraper
     CHROME_PATH: z.string().optional(),
     MANGA_BROWSER_WS_ENDPOINT: z.string().optional(),

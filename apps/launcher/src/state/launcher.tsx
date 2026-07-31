@@ -1,8 +1,26 @@
 import * as React from "react"
 
-import { MOCK_ACCOUNT, MOCK_DEVICE_CODE, MOCK_SETTINGS, mockLogs } from "../services/mock"
+import { MOCK_ACCOUNT, MOCK_DEVICE_CODE, MOCK_SETTINGS } from "../services/mock"
 import { loadPackEntries } from "../services/packs"
-import { authBegin, authAwait, authLogout, authRestore, isDesktop } from "../runtime"
+import {
+  authBegin,
+  authAwait,
+  authLogout,
+  authRestore,
+  installPack,
+  instanceScan,
+  isDesktop,
+  launchPack,
+  onGameLog,
+  onGameState,
+  onInstallDone,
+  onInstallProgress,
+  packManifest,
+  settingsGet,
+  settingsSet,
+  stopGame,
+  type ScannedInstallState,
+} from "../runtime"
 import type {
   Account,
   DeviceCode,
@@ -46,23 +64,21 @@ type Action =
   | { type: "packs/load"; packs: PackEntry[] }
   | { type: "packs/error"; message: string }
   | { type: "view"; view: View; packId?: string }
-  | { type: "install/progress"; packId: string; phase: InstallPhase; fraction: number; file: string }
-  | { type: "install/done"; packId: string }
+  | { type: "install/start"; packId: string }
+  | {
+      type: "install/progress"
+      packId: string
+      phase: InstallPhase
+      fraction: number
+      file: string
+      downloadedBytes: number
+      totalBytes: number
+    }
+  | { type: "install/state"; packId: string; state: ScannedInstallState }
   | { type: "game/state"; game: GameState }
   | { type: "log"; line: LogLine }
   | { type: "logs/clear" }
-  | { type: "settings"; patch: Partial<Settings> }
-
-const PHASE_ORDER: InstallPhase[] = [
-  "resolving",
-  "java",
-  "libraries",
-  "assets",
-  "loader",
-  "mods",
-  "overrides",
-  "verifying",
-]
+  | { type: "settings"; settings: Settings }
 
 function reducer(s: State, a: Action): State {
   switch (a.type) {
@@ -96,44 +112,52 @@ function reducer(s: State, a: Action): State {
       return { ...s, packsLoading: false, packsError: a.message }
     case "view":
       return { ...s, view: a.view, selectedPackId: a.packId ?? s.selectedPackId }
-    case "install/progress":
-      return {
-        ...s,
-        packs: s.packs.map((p) => {
-          if (p.pack.id !== a.packId) return p
-          // Byte totals are still an estimate from the file COUNT: real sizes
-          // live in the manifest, which §6 fetches when the install starts.
-          const total = (p.latest?.fileCount ?? 0) * 1_400_000
-          return {
-            ...p,
-            state: {
-              kind: "installing",
-              progress: {
-                phase: a.phase,
-                fraction: a.fraction,
-                currentFile: a.file,
-                downloadedBytes: Math.round(a.fraction * total),
-                totalBytes: total,
-              },
-            },
-          }
-        }),
-      }
-    case "install/done":
+    case "install/start":
       return {
         ...s,
         packs: s.packs.map((p) =>
-          p.pack.id !== a.packId || !p.latest
+          p.pack.id !== a.packId
             ? p
             : {
                 ...p,
                 state: {
-                  kind: "installed",
-                  versionId: p.latest.id,
-                  sizeBytes: p.latest.fileCount * 1_400_000,
+                  kind: "installing",
+                  progress: {
+                    phase: "resolving",
+                    fraction: 0,
+                    currentFile: "",
+                    downloadedBytes: 0,
+                    totalBytes: 0,
+                  },
                 },
               },
         ),
+      }
+    case "install/progress":
+      return {
+        ...s,
+        packs: s.packs.map((p) =>
+          p.pack.id !== a.packId
+            ? p
+            : {
+                ...p,
+                state: {
+                  kind: "installing",
+                  progress: {
+                    phase: a.phase,
+                    fraction: a.fraction,
+                    currentFile: a.file,
+                    downloadedBytes: a.downloadedBytes,
+                    totalBytes: a.totalBytes,
+                  },
+                },
+              },
+        ),
+      }
+    case "install/state":
+      return {
+        ...s,
+        packs: s.packs.map((p) => (p.pack.id !== a.packId ? p : { ...p, state: a.state })),
       }
     case "game/state":
       return { ...s, game: a.game }
@@ -143,7 +167,7 @@ function reducer(s: State, a: Action): State {
     case "logs/clear":
       return { ...s, logs: [] }
     case "settings":
-      return { ...s, settings: { ...s.settings, ...a.patch } }
+      return { ...s, settings: a.settings }
     default:
       return s
   }
@@ -191,9 +215,33 @@ export function LauncherProvider({ children }: { children: React.ReactNode }) {
   const busy = React.useRef<Set<string>>(new Set())
   // Survives StrictMode's double mount — see the restore effect below.
   const restoreStarted = React.useRef(false)
+  const settingsLoaded = React.useRef(false)
+  // Which pack the running game belongs to; `stop_game` is keyed on it and the
+  // Stop button has no pack in hand.
+  const runningPackId = React.useRef<string | null>(null)
+  const stopping = React.useRef(false)
+  // Read inside callbacks that must not re-create on every list change.
+  const packsRef = React.useRef<PackEntry[]>(state.packs)
+  packsRef.current = state.packs
+  const settingsRef = React.useRef<Settings>(state.settings)
+  settingsRef.current = state.settings
+  const saveTimer = React.useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const log = React.useCallback((line: Omit<LogLine, "ts">) => {
     dispatch({ type: "log", line: { ...line, ts: Date.now() } })
+  }, [])
+
+  /** Re-read what is on disk for one pack. Cheap, and the only way the UI
+   *  learns that an install left the pack outdated or broken. */
+  const refreshInstallState = React.useCallback(async (packId: string) => {
+    const entry = packsRef.current.find((p) => p.pack.id === packId)
+    if (!entry) return
+    try {
+      const state = await instanceScan(entry.pack.slug, entry.latest?.id ?? null)
+      dispatch({ type: "install/state", packId, state })
+    } catch {
+      /* the listing stays as it was rather than flickering to not-installed */
+    }
   }, [])
 
   // §5. In a browser there is no Rust side, so the mock flow runs instead —
@@ -300,49 +348,165 @@ export function LauncherProvider({ children }: { children: React.ReactNode }) {
     }
   }, [accountUuid, log, reloadToken])
 
-  // TODO(rust): `install_pack` — portablemc resolves the version + loader and
-  // downloads; pack files come from the manifest (§7.1) verified by sha512.
-  // Progress arrives as Tauri events, not a return value.
+  // Shell events. Every one of these is a fire-and-forget stream from Rust, so
+  // the reducer is the only thing that has to be correct here — and the
+  // unsubscribes make StrictMode's second mount a no-op rather than a doubled
+  // log line.
+  React.useEffect(() => {
+    const offs = [
+      onInstallProgress((e) =>
+        dispatch({
+          type: "install/progress",
+          packId: e.packId,
+          phase: e.phase,
+          fraction: e.fraction,
+          file: e.file,
+          downloadedBytes: e.downloadedBytes,
+          totalBytes: e.totalBytes,
+        }),
+      ),
+      onInstallDone(() =>
+        log({ level: "info", source: "launcher", text: "Instalación completada" }),
+      ),
+      onGameLog((line) => dispatch({ type: "log", line })),
+      onGameState((game) => {
+        // A killed process exits non-zero, so the Rust watcher reports the
+        // player's own "stop" as a crash. Only the renderer knows it was
+        // deliberate.
+        if (game.kind === "crashed" && stopping.current) {
+          stopping.current = false
+          dispatch({ type: "game/state", game: { kind: "idle" } })
+          return
+        }
+        if (game.kind !== "running") stopping.current = false
+        dispatch({ type: "game/state", game })
+        if (game.kind === "crashed") {
+          log({
+            level: "error",
+            source: "launcher",
+            text: `El juego se cerró con el código ${game.exitCode}.`,
+          })
+        }
+      }),
+    ]
+    return () => {
+      for (const off of offs) off()
+    }
+  }, [log])
+
+  // §6. The manifest is fetched here rather than in Rust because the password
+  // path (§7.1) is a UI decision; install_pack re-validates whatever it gets.
+  const manifestFor = React.useCallback(async (packId: string) => {
+    if (!isDesktop()) return null
+    return packManifest(packId)
+  }, [])
+
   const install = React.useCallback(
     async (packId: string) => {
+      // The Rust side refuses a concurrent install of the same pack too; this
+      // just avoids the round trip and the "ya se está instalando" toast that a
+      // StrictMode double-invoke would otherwise produce.
       if (busy.current.has(packId)) return
       busy.current.add(packId)
+      dispatch({ type: "install/start", packId })
       try {
-        for (const [i, phase] of PHASE_ORDER.entries()) {
-          for (let step = 0; step < 4; step++) {
-            const fraction = (i * 4 + step + 1) / (PHASE_ORDER.length * 4)
-            dispatch({
-              type: "install/progress",
-              packId,
-              phase,
-              fraction,
-              file: `${phase}/archivo-${step + 1}`,
-            })
-            await sleep(110)
-          }
-        }
-        dispatch({ type: "install/done", packId })
-        log({ level: "info", source: "launcher", text: "Instalación completada" })
+        const state = await installPack(packId, await manifestFor(packId))
+        dispatch({ type: "install/state", packId, state })
+      } catch (err) {
+        const message = (err as { message?: string })?.message ?? "No se pudo instalar el pack."
+        // Broken, not not-installed: files may already be on disk, and hiding
+        // that would offer a fresh install over a half-written instance.
+        dispatch({ type: "install/state", packId, state: { kind: "broken", reason: message } })
+        log({ level: "error", source: "launcher", text: message })
       } finally {
         busy.current.delete(packId)
       }
     },
-    [log],
+    [log, manifestFor],
   )
 
-  // TODO(rust): `launch_pack` — build argv (§6.2) and spawn. Stdout streams
-  // back as events; the process handle stays in Rust.
   const play = React.useCallback(
     async (packId: string) => {
+      if (busy.current.has(packId)) return
+      busy.current.add(packId)
       dispatch({ type: "game/state", game: { kind: "preparing" } })
       log({ level: "info", source: "launcher", text: "Preparando lanzamiento…" })
-      await sleep(900)
-      dispatch({ type: "game/state", game: { kind: "running", pid: 4821, since: Date.now() } })
-      for (const line of mockLogs()) dispatch({ type: "log", line: { ...line, ts: Date.now() } })
-      void packId
+      try {
+        // A launch re-verifies, so it emits install progress as well; the pack
+        // card shows that until `game://state` flips to running.
+        // The pid is already on its way as a `game://state` running event, and
+        // that event is authoritative — a crash can beat this resolve, and
+        // dispatching "running" here would paper over it.
+        await launchPack(packId, await manifestFor(packId))
+        runningPackId.current = packId
+        void refreshInstallState(packId)
+      } catch (err) {
+        const message = (err as { message?: string })?.message ?? "No se pudo iniciar el juego."
+        dispatch({ type: "game/state", game: { kind: "idle" } })
+        log({ level: "error", source: "launcher", text: message })
+      } finally {
+        busy.current.delete(packId)
+      }
+    },
+    [log, manifestFor, refreshInstallState],
+  )
+
+  // Preferences live in a JSON file on the Rust side; the mock defaults only
+  // ever stand in for the first paint and for browser mode.
+  React.useEffect(() => {
+    if (settingsLoaded.current) return
+    settingsLoaded.current = true
+    void settingsGet()
+      .then((settings) => dispatch({ type: "settings", settings }))
+      .catch(() => {
+        /* defaults are a working launcher; a read failure is not fatal */
+      })
+  }, [])
+
+  // Debounced because the memory slider fires per pixel and each save is a file
+  // write. The in-memory state updates immediately either way.
+  const patchSettings = React.useCallback(
+    (patch: Partial<Settings>) => {
+      const next = { ...settingsRef.current, ...patch }
+      settingsRef.current = next
+      dispatch({ type: "settings", settings: next })
+      if (saveTimer.current) clearTimeout(saveTimer.current)
+      saveTimer.current = setTimeout(() => {
+        void settingsSet(next).catch((err: { message?: string }) => {
+          log({
+            level: "error",
+            source: "launcher",
+            text: err?.message ?? "No se pudieron guardar los ajustes.",
+          })
+        })
+      }, 300)
     },
     [log],
   )
+
+  React.useEffect(
+    () => () => {
+      if (saveTimer.current) clearTimeout(saveTimer.current)
+    },
+    [],
+  )
+
+  const stop = React.useCallback(() => {
+    const packId = runningPackId.current
+    stopping.current = true
+    log({ level: "warn", source: "launcher", text: "Juego detenido por el usuario" })
+    if (!packId) {
+      dispatch({ type: "game/state", game: { kind: "idle" } })
+      return
+    }
+    void stopGame(packId)
+      .catch(() => {
+        /* idempotent by contract; the state event still lands */
+      })
+      .finally(() => {
+        runningPackId.current = null
+      })
+  }, [log])
 
   const value: Ctx = {
     ...state,
@@ -357,12 +521,9 @@ export function LauncherProvider({ children }: { children: React.ReactNode }) {
     reloadPacks: () => setReloadToken((n) => n + 1),
     install,
     play,
-    stop: () => {
-      dispatch({ type: "game/state", game: { kind: "idle" } })
-      log({ level: "warn", source: "launcher", text: "Juego detenido por el usuario" })
-    },
+    stop,
     clearLogs: () => dispatch({ type: "logs/clear" }),
-    patchSettings: (patch) => dispatch({ type: "settings", patch }),
+    patchSettings,
   }
 
   return <LauncherContext.Provider value={value}>{children}</LauncherContext.Provider>

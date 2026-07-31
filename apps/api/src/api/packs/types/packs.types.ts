@@ -52,6 +52,23 @@ export interface PackVersionView {
   createdAt: string;
 }
 
+/**
+ * The stored shape of one entry in `pack_versions.files`. Structural on purpose:
+ * the column is `json().$type<unknown[]>()` and every write went through
+ * `PackManifest.safeParse`, so these fields are guaranteed present — but the TS
+ * types from @boffmedia/pack-schema must not be imported here (see the header).
+ */
+export interface StoredPackFile {
+  path: string;
+  sha512: string;
+  fileSize: number;
+  source:
+    | { kind: 'modrinth'; projectId: string; versionId: string }
+    | { kind: 'curseforge'; projectId: number; fileId: number }
+    | { kind: 'url'; url: string }
+    | { kind: 'override'; blobSha512: string };
+}
+
 /** A launcher session, minted only after `hasJoined` proved UUID ownership. */
 export interface LauncherPrincipal {
   uuid: string;
@@ -76,6 +93,7 @@ export const AUDIT = {
   INVITE_REDEEMED: 'invite.redeemed',
   LAUNCHER_AUTH: 'launcher.auth',
   MANIFEST_SERVED: 'manifest.served',
+  FILE_SERVED: 'file.served',
 } as const;
 
 export type AuditAction = (typeof AUDIT)[keyof typeof AUDIT];
