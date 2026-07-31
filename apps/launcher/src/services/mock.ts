@@ -1,39 +1,44 @@
-import type { Pack, PackVersion } from "@boffmedia/pack-schema"
+import type {
+  Account,
+  DeviceCode,
+  LogLine,
+  PackEntry,
+  PackSummary,
+  PackVersionSummary,
+  Settings,
+} from "./types"
 
-import type { Account, DeviceCode, LogLine, PackEntry, Settings } from "./types"
+// Stand-in data so every screen is real and demoable WITHOUT the Rust side —
+// which is the whole point: `pnpm dev:renderer` runs in a browser, where there
+// are no Tauri commands and no pack registry to talk to. On desktop these are
+// replaced by the real calls in services/packs.ts.
 
-// Stand-in data so every screen is real and demoable before the Rust side
-// exists. Each function here maps to a Tauri command that portablemc will back
-// — see the TODO on each. Keeping them in one module means the swap is
-// mechanical and the screens never change.
-
-const sha = (c: string) => c.repeat(128)
-
-function version(id: string, name: string, createdAt: string, files: number): PackVersion {
+function version(
+  id: string,
+  name: string,
+  createdAt: string,
+  fileCount: number,
+): PackVersionSummary {
   return {
     id,
     name,
     createdAt,
-    dependencies: { minecraft: "1.21.4", neoforge: "21.4.30" },
-    files: Array.from({ length: files }, (_, i) => ({
-      path: `mods/mod-${i}.jar`,
-      sha512: sha(String.fromCharCode(97 + (i % 26))),
-      fileSize: 1_200_000 + i * 40_000,
-      env: { client: "required" as const, server: "required" as const },
-      source: { kind: "modrinth" as const, projectId: `proj${i}`, versionId: `ver${i}` },
-    })),
+    minecraft: "1.21.4",
+    loader: "neoforge",
+    loaderVersion: "21.4.30",
+    fileCount,
   }
 }
 
-const PACKS: { pack: Pack; latest: PackVersion }[] = [
+const PACKS: { pack: PackSummary; latest: PackVersionSummary }[] = [
   {
     pack: {
       id: "pk_smp",
       slug: "boff-smp",
       name: "Boff SMP",
       summary: "El pack principal del servidor. Pixelmon, LittleTiles y utilidades.",
-      access: { kind: "allowlist", uuids: ["069a79f4-44e9-4726-a5be-fca90e38aaf5"] },
-      latestVersionId: "v_smp_5",
+      iconUrl: null,
+      accessKind: "allowlist",
     },
     latest: version("v_smp_5", "1.4.2", "2026-07-28T18:04:00Z", 84),
   },
@@ -43,8 +48,8 @@ const PACKS: { pack: Pack; latest: PackVersion }[] = [
       slug: "boff-creativo",
       name: "Boff Creativo",
       summary: "Construcción: WorldEdit, LittleTiles y esquemas compartidos.",
-      access: { kind: "password" },
-      latestVersionId: "v_cre_2",
+      iconUrl: null,
+      accessKind: "password",
     },
     latest: version("v_cre_2", "0.9.0", "2026-07-11T09:30:00Z", 31),
   },
@@ -54,8 +59,8 @@ const PACKS: { pack: Pack; latest: PackVersion }[] = [
       slug: "boff-eventos",
       name: "Eventos",
       summary: "Pack ligero para torneos y minijuegos puntuales.",
-      access: { kind: "public" },
-      latestVersionId: "v_evt_1",
+      iconUrl: null,
+      accessKind: "public",
     },
     latest: version("v_evt_1", "2026.7", "2026-07-02T20:00:00Z", 12),
   },
@@ -82,9 +87,9 @@ export const MOCK_SETTINGS: Settings = {
   keepLogs: true,
 }
 
-/** TODO(rust): `list_packs` — GET the registry (§7), reconcile against the
- *  instances on disk. Access filtering is the SERVER's job; a pack the user
- *  cannot see must never reach this list. */
+/** Browser-mode library. The desktop equivalent is `loadPackEntries`, which
+ *  goes through the Rust client — access filtering is the SERVER's job, so a
+ *  pack the user cannot see never reaches that list in the first place. */
 export function mockPackEntries(): PackEntry[] {
   return [
     {

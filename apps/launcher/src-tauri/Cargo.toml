@@ -24,11 +24,28 @@ tauri = { version = "2", features = [] }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 thiserror = "2"
+
+# ── Required by the code typify generates in build.rs ──────────────────────
+# typify emits references to these but does NOT add them for you; they are its
+# own dev-dependencies precisely because that is what compiling generated code
+# needs. Versions track typify 0.2's:
+#   `pattern`          -> regress   (0.10 API — NOT 0.11, which changed it)
+#   `format: uuid`     -> uuid
+#   `format: date-time`-> chrono
+# Removing a `.regex()`, `z.uuid()` or `z.iso.datetime()` from the zod schema
+# would make the matching crate unused here, not the other way round.
+regress = "0.10"
+uuid = { version = "1", features = ["serde"] }
+chrono = { version = "0.4", features = ["serde"] }
 # HANDOFF §5/§6: msa auth, Forge AND NeoForge install, Java management.
 # The `forge` module's Loader enum selects Forge vs NeoForge.
 portablemc = "5.0"
 # §5.7 — the refresh token goes in the OS credential store, never a file.
 keyring = { version = "3", features = ["apple-native", "windows-native", "sync-secret-service"] }
+# §5's auth chain is hand-rolled (portablemc::msa cannot surface the refresh
+# token for the keychain), so the launcher makes these calls itself.
+reqwest = { version = "0.12", features = ["json"] }
+tokio = { version = "1", features = ["time", "sync"] }
 
 [features]
 # Enabled by `tauri build --debug`.

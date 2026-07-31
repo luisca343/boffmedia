@@ -26,9 +26,13 @@ setup("authenticate", async ({ page }) => {
   })
 
   await page.goto("/auth")
-  await page.getByPlaceholder("Enter your username").fill(username)
-  await page.getByPlaceholder("Enter your password").fill(password)
-  await page.getByRole("button", { name: "Sign In", exact: true }).click()
+  // Located by form-field name, not placeholder text: AuthForm's placeholders and
+  // its submit label are translated (t('fields.usernamePh'), t('submit.login')),
+  // so any English locator here breaks the moment the default locale is not en.
+  // The Google button is type="button", so button[type=submit] is unambiguous.
+  await page.locator('input[name="username"]').fill(username)
+  await page.locator('input[name="password"]').fill(password)
+  await page.locator('button[type="submit"]').click()
 
   // If the login API rejected the credentials, the form shows a native alert.
   // Playwright auto-accepts it; we surface the message here immediately.
