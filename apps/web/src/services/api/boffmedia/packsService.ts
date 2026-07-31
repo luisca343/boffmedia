@@ -106,6 +106,14 @@ export type ModPlatform = 'curseforge' | 'modrinth';
  *  ("fabric-loader"/"quilt-loader"), which is why callers must map. */
 export type CatalogLoader = 'forge' | 'neoforge' | 'fabric' | 'quilt';
 
+/** What a pack can contain besides jars. Each platform files these separately,
+ *  so the picker has to ask for one type at a time. */
+export type CatalogProjectType = 'mod' | 'resourcepack' | 'shader' | 'datapack'
+
+export type CatalogSort = 'relevance' | 'downloads' | 'updated' | 'name' | 'follows'
+
+export type SideSupport = 'required' | 'optional' | 'unsupported' | 'unknown'
+
 export interface ModSearchHit {
   platform: ModPlatform;
   /** String on both platforms; CurseForge's is numeric and is narrowed only
@@ -117,6 +125,58 @@ export interface ModSearchHit {
   iconUrl?: string;
   downloads: number;
   author?: string;
+  categories: string[];
+  updatedAt?: string;
+  clientSide?: SideSupport;
+  serverSide?: SideSupport;
+}
+
+export interface ModSearchPage {
+  hits: ModSearchHit[];
+  total: number;
+}
+
+export interface ModProject extends ModSearchHit {
+  /** Markdown on Modrinth, HTML on CurseForge. */
+  description: string;
+  gameVersions: string[];
+  loaders: string[];
+  gallery: string[];
+  sourceUrl?: string;
+  issuesUrl?: string;
+  websiteUrl?: string;
+  clientSide: SideSupport;
+  serverSide: SideSupport;
+}
+
+export interface CatalogCategory {
+  id: string;
+  name: string;
+  iconUrl?: string;
+}
+
+export interface ModDependency {
+  platform: ModPlatform;
+  projectId: string;
+  relation: 'required' | 'optional' | 'incompatible' | 'embedded';
+  versionId?: string;
+  name?: string;
+  slug?: string;
+  iconUrl?: string;
+}
+
+export interface GameVersion {
+  id: string;
+  type: 'release' | 'snapshot' | 'old_beta' | 'old_alpha';
+  releaseTime: string;
+  latest: boolean;
+}
+
+export interface LoaderVersion {
+  version: string;
+  stable: boolean;
+  latest: boolean;
+  recommended: boolean;
 }
 
 export interface ModFile {
@@ -134,6 +194,10 @@ export interface ModFile {
   /** False when CurseForge's author forbids third-party distribution: the
    *  launcher can never fetch that file automatically. */
   downloadable: boolean;
+  loaders: string[];
+  /** What must ship alongside this file. Skipping the required ones is what
+   *  makes a pack crash at launch with a missing-library error. */
+  dependencies: ModDependency[];
 }
 
 export interface ResolvedFile {
@@ -156,6 +220,10 @@ export interface ModSearchInput {
   loader?: CatalogLoader;
   page?: number;
   pageSize?: number;
+  projectType?: CatalogProjectType;
+  sort?: CatalogSort;
+  /** CurseForge category id, or Modrinth category name. */
+  category?: string;
 }
 
 function queryString(params: Record<string, string | number | undefined>): string {
@@ -193,6 +261,24 @@ export class PacksService {
     return apiAuthedAutoPOST<{ id: string }>(`/packs/admin/${packId}/versions`, input);
   }
 
+  /** The only call that returns a version's `files` — the list endpoint omits
+   *  them. This is what "clone" and "edit draft" start from. */
+  static versionDetail(packId: string, versionId: string) {
+    return apiAuthedAutoGET<PackVersionRow & { files: unknown[] }>(
+      `/packs/admin/${packId}/versions/${versionId}`,
+    );
+  }
+
+  /** Drafts only: the API refuses to rewrite a published version, because
+   *  launchers have already installed against its manifest. */
+  static updateVersion(packId: string, versionId: string, input: CreateVersionInput) {
+    return apiAuthedAutoPATCH<void>(`/packs/admin/${packId}/versions/${versionId}`, input);
+  }
+
+  static deleteVersion(packId: string, versionId: string) {
+    return apiAuthedAutoDELETE<void>(`/packs/admin/${packId}/versions/${versionId}`);
+  }
+
   /** Publishing also makes this the pack's latest version — one step, so the
    *  two can never disagree. */
   static publishVersion(packId: string, versionId: string) {
@@ -224,8 +310,10 @@ export class PacksService {
 
   // ── Mod catalog ──────────────────────────────────────────────────────────
 
+  /** With no `query` this browses the catalog by `sort` — that is what lets the
+   *  picker show something before the admin has typed anything. */
   static searchMods(input: ModSearchInput) {
-    return apiAuthedAutoGET<ModSearchHit[]>(
+    return apiAuthedAutoGET<ModSearchPage>(
       `/packs/admin/catalog/search${queryString({
         platform: input.platform,
         query: input.query,
@@ -233,7 +321,41 @@ export class PacksService {
         loader: input.loader,
         page: input.page,
         pageSize: input.pageSize,
+        projectType: input.projectType,
+        sort: input.sort,
+        category: input.category,
       })}`,
+    );
+  }
+
+  static categories(platform: ModPlatform, projectType: CatalogProjectType = 'mod') {
+    return apiAuthedAutoGET<CatalogCategory[]>(
+      `/packs/admin/catalog/categories${queryString({ platform, projectType })}`,
+    );
+  }
+
+  static project(platform: ModPlatform, projectId: string) {
+    return apiAuthedAutoGET<ModProject>(`/packs/admin/catalog/${platform}/${projectId}`);
+  }
+
+  /** One batched call per platform — this is how a dependency list gets names
+   *  and icons instead of bare ids. */
+  static projectSummaries(platform: ModPlatform, ids: string[]) {
+    return apiAuthedAutoGET<ModSearchHit[]>(
+      `/packs/admin/catalog/projects${queryString({ platform, ids: ids.join(',') })}`,
+    );
+  }
+
+  // ── Version metadata (autocompletion) ────────────────────────────────────
+
+  static minecraftVersions() {
+    return apiAuthedAutoGET<GameVersion[]>('/packs/admin/meta/minecraft');
+  }
+
+  /** `loader` is the MANIFEST id ("fabric-loader"), not the catalog id. */
+  static loaderVersions(loader: PackLoader, minecraft: string) {
+    return apiAuthedAutoGET<LoaderVersion[]>(
+      `/packs/admin/meta/loader${queryString({ loader, minecraft })}`,
     );
   }
 

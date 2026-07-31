@@ -21,7 +21,8 @@ export type BlobUploadResult =
  *  under us mid-upload, and referencing the local one would ship a manifest the
  *  launcher can never verify. */
 export async function uploadOverrideBlob(
-  file: File,
+  // Blob, not File: entries read out of an imported .mrpack/.zip are Blobs.
+  file: Blob,
   onState?: (state: "hashing" | "uploading") => void,
 ): Promise<BlobUploadResult> {
   onState?.("hashing")

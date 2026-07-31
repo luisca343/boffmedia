@@ -86,6 +86,8 @@ export const AUDIT = {
   PACK_UPDATED: 'pack.updated',
   PACK_ARCHIVED: 'pack.archived',
   VERSION_CREATED: 'version.created',
+  VERSION_UPDATED: 'version.updated',
+  VERSION_DELETED: 'version.deleted',
   VERSION_PUBLISHED: 'version.published',
   ACCESS_GRANTED: 'access.granted',
   ACCESS_REVOKED: 'access.revoked',

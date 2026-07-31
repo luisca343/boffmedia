@@ -155,11 +155,26 @@ function CreatePackModal({
   )
 }
 
-function VersionsTab({ pack, onChanged }: { pack: AdminPack; onChanged: () => void }) {
+function VersionsTab({
+  pack,
+  onChanged,
+  onNewVersion,
+  onCloneVersion,
+  onEditVersion,
+  reloadToken,
+}: {
+  pack: AdminPack
+  onChanged: () => void
+  onNewVersion: () => void
+  onCloneVersion: (versionId: string) => void
+  onEditVersion: (versionId: string) => void
+  /** Bumped by the version modal so the list reloads after a create or edit. */
+  reloadToken: number
+}) {
   const t = useTranslations("admin.packs")
   const [rows, setRows] = useState<PackVersionRow[] | null>(null)
   const [publishing, setPublishing] = useState<string | null>(null)
-  const [creating, setCreating] = useState(false)
+  const [deleting, setDeleting] = useState<string | null>(null)
 
   const load = useCallback(async () => {
     const res = await PacksService.versions(pack.id)
@@ -168,7 +183,23 @@ function VersionsTab({ pack, onChanged }: { pack: AdminPack; onChanged: () => vo
 
   useEffect(() => {
     void load()
-  }, [load])
+  }, [load, reloadToken])
+
+  const remove = async (versionId: string) => {
+    setDeleting(versionId)
+    try {
+      const res = await PacksService.deleteVersion(pack.id, versionId)
+      if (!res.success) {
+        toast({ tone: "bad", title: t("deleteFailed"), msg: res.userMessage })
+        return
+      }
+      toast({ tone: "ok", title: t("versionDeleted") })
+      await load()
+      onChanged()
+    } finally {
+      setDeleting(null)
+    }
+  }
 
   const publish = async (versionId: string) => {
     setPublishing(versionId)
@@ -186,28 +217,15 @@ function VersionsTab({ pack, onChanged }: { pack: AdminPack; onChanged: () => vo
     }
   }
 
-  const modal = (
-    <CreateVersionModal
-      pack={pack}
-      open={creating}
-      onClose={() => setCreating(false)}
-      onCreated={() => {
-        void load()
-        onChanged()
-      }}
-    />
-  )
-
   if (!rows) return <Spinner />
   if (rows.length === 0) {
     return (
       <>
         <Empty icon="layers" title={t("noVersions")} lead={t("noVersionsLead")}>
-          <Button size="sm" variant="pri" icon="plus" onClick={() => setCreating(true)}>
+          <Button size="sm" variant="pri" icon="plus" onClick={onNewVersion}>
             {t("newVersion")}
           </Button>
         </Empty>
-        {modal}
       </>
     )
   }
@@ -215,7 +233,7 @@ function VersionsTab({ pack, onChanged }: { pack: AdminPack; onChanged: () => vo
   return (
     <div className="flex flex-col gap-2">
       <div className="flex justify-end">
-        <Button size="sm" variant="pri" icon="plus" onClick={() => setCreating(true)}>
+        <Button size="sm" variant="pri" icon="plus" onClick={onNewVersion}>
           {t("newVersion")}
         </Button>
       </div>
@@ -242,21 +260,39 @@ function VersionsTab({ pack, onChanged }: { pack: AdminPack; onChanged: () => vo
             <span className="font-mono text-[11px] text-txt-dim">
               {new Date(v.createdAt).toLocaleDateString()}
             </span>
+            {/* Cloning is the normal way to cut the next version: same mods,
+                bump what changed. */}
+            <Button size="sm" variant="ghost" icon="copy" onClick={() => onCloneVersion(v.id)}>
+              {t("clone")}
+            </Button>
             {!v.published && (
-              <Button
-                size="sm"
-                variant="pri"
-                icon="check"
-                loading={publishing === v.id}
-                onClick={() => void publish(v.id)}
-              >
-                {t("publish")}
-              </Button>
+              <>
+                <Button size="sm" variant="ghost" icon="edit" onClick={() => onEditVersion(v.id)}>
+                  {t("edit")}
+                </Button>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  icon="trash"
+                  loading={deleting === v.id}
+                  onClick={() => void remove(v.id)}
+                >
+                  {t("delete")}
+                </Button>
+                <Button
+                  size="sm"
+                  variant="pri"
+                  icon="check"
+                  loading={publishing === v.id}
+                  onClick={() => void publish(v.id)}
+                >
+                  {t("publish")}
+                </Button>
+              </>
             )}
           </span>
         </div>
       ))}
-      {modal}
     </div>
   )
 }
@@ -487,6 +523,12 @@ export function PacksAdmin() {
   const [packs, setPacks] = useState<AdminPack[] | null>(null)
   const [selected, setSelected] = useState<string | null>(null)
   const [creating, setCreating] = useState(false)
+  const [creatingVersion, setCreatingVersion] = useState(false)
+  const [versionEditor, setVersionEditor] = useState<{
+    mode: "create" | "clone" | "edit"
+    versionId?: string
+  }>({ mode: "create" })
+  const [versionsToken, setVersionsToken] = useState(0)
   const [tab, setTab] = useState("versions")
 
   const load = useCallback(async () => {
@@ -606,7 +648,25 @@ export function PacksAdmin() {
               ]}
             />
             <div className="mt-4">
-              {tab === "versions" && <VersionsTab pack={pack} onChanged={load} />}
+              {tab === "versions" && (
+                <VersionsTab
+                  pack={pack}
+                  onChanged={load}
+                  reloadToken={versionsToken}
+                  onNewVersion={() => {
+                    setVersionEditor({ mode: "create" })
+                    setCreatingVersion(true)
+                  }}
+                  onCloneVersion={(versionId) => {
+                    setVersionEditor({ mode: "clone", versionId })
+                    setCreatingVersion(true)
+                  }}
+                  onEditVersion={(versionId) => {
+                    setVersionEditor({ mode: "edit", versionId })
+                    setCreatingVersion(true)
+                  }}
+                />
+              )}
               {tab === "access" && <AccessTab pack={pack} />}
               {tab === "invites" && <InvitesTab pack={pack} />}
               {tab === "audit" && <AuditTab pack={pack} />}
@@ -620,6 +680,22 @@ export function PacksAdmin() {
       </div>
 
       <CreatePackModal open={creating} onClose={() => setCreating(false)} onCreated={load} />
+      {pack && (
+        <CreateVersionModal
+          // Remounted per target: the modal prefills on open, and reusing one
+          // instance would carry the previous version's mods into the next.
+          key={`${versionEditor.mode}:${versionEditor.versionId ?? "new"}`}
+          pack={pack}
+          open={creatingVersion}
+          mode={versionEditor.mode}
+          sourceVersionId={versionEditor.versionId}
+          onClose={() => setCreatingVersion(false)}
+          onCreated={() => {
+            setVersionsToken((n) => n + 1)
+            void load()
+          }}
+        />
+      )}
     </div>
   )
 }

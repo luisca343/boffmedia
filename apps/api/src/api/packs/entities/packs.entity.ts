@@ -99,6 +99,41 @@ export class ModSearchHitEntity {
   @ApiPropertyOptional() iconUrl?: string;
   @ApiProperty() downloads!: number;
   @ApiPropertyOptional() author?: string;
+  @ApiProperty({ type: [String] }) categories!: string[];
+  @ApiPropertyOptional({ description: 'ISO-8601' }) updatedAt?: string;
+
+  @ApiPropertyOptional({ enum: ['required', 'optional', 'unsupported', 'unknown'] })
+  clientSide?: 'required' | 'optional' | 'unsupported' | 'unknown';
+
+  @ApiPropertyOptional({ enum: ['required', 'optional', 'unsupported', 'unknown'] })
+  serverSide?: 'required' | 'optional' | 'unsupported' | 'unknown';
+}
+
+export class ModSearchPageEntity {
+  @ApiProperty({ type: [ModSearchHitEntity] }) hits!: ModSearchHitEntity[];
+
+  /** Total matches upstream reports, so the picker can page instead of
+   *  guessing when the list has run out. */
+  @ApiProperty() total!: number;
+}
+
+// Declared before ModFileEntity on purpose: @ApiProperty({ type: [X] }) reads
+// the class at decoration time, so a forward reference is a runtime TDZ crash.
+export class ModDependencyEntity {
+  @ApiProperty({ enum: ['curseforge', 'modrinth'] })
+  platform!: 'curseforge' | 'modrinth';
+
+  @ApiProperty() projectId!: string;
+
+  @ApiProperty({ enum: ['required', 'optional', 'incompatible', 'embedded'] })
+  relation!: 'required' | 'optional' | 'incompatible' | 'embedded';
+
+  @ApiPropertyOptional({ description: 'Versión concreta exigida, si la hay' })
+  versionId?: string;
+
+  @ApiPropertyOptional() name?: string;
+  @ApiPropertyOptional() slug?: string;
+  @ApiPropertyOptional() iconUrl?: string;
 }
 
 export class ModFileEntity {
@@ -124,6 +159,70 @@ export class ModFileEntity {
   /** False when CurseForge reports a null downloadUrl — the author forbids
    *  third-party distribution and no automatic install is possible. */
   @ApiProperty() downloadable!: boolean;
+
+  @ApiProperty({ type: [String] }) loaders!: string[];
+
+  /** What this file needs alongside it. A pack that skips these installs and
+   *  then crashes at launch with a missing-library error. */
+  @ApiProperty({ type: [ModDependencyEntity] })
+  dependencies!: ModDependencyEntity[];
+}
+
+export class GameVersionEntity {
+  @ApiProperty({ example: '1.21.4' }) id!: string;
+
+  @ApiProperty({ enum: ['release', 'snapshot', 'old_beta', 'old_alpha'] })
+  type!: 'release' | 'snapshot' | 'old_beta' | 'old_alpha';
+
+  @ApiProperty({ description: 'ISO-8601' }) releaseTime!: string;
+
+  /** True for the newest release and the newest snapshot. */
+  @ApiProperty() latest!: boolean;
+}
+
+export class LoaderVersionEntity {
+  @ApiProperty({ example: '21.4.30' }) version!: string;
+  @ApiProperty() stable!: boolean;
+  @ApiProperty() latest!: boolean;
+
+  /** Forge names one build per Minecraft version as "recommended"; for the
+   *  others this is the newest stable build. */
+  @ApiProperty() recommended!: boolean;
+}
+
+export class ModProjectEntity {
+  @ApiProperty({ enum: ['curseforge', 'modrinth'] })
+  platform!: 'curseforge' | 'modrinth';
+
+  @ApiProperty() projectId!: string;
+  @ApiProperty() slug!: string;
+  @ApiProperty() name!: string;
+  @ApiProperty() summary!: string;
+
+  /** Markdown (Modrinth) or HTML (CurseForge) — the picker renders it as text. */
+  @ApiProperty() description!: string;
+  @ApiPropertyOptional() iconUrl?: string;
+  @ApiProperty() downloads!: number;
+  @ApiPropertyOptional() author?: string;
+  @ApiProperty({ type: [String] }) categories!: string[];
+  @ApiProperty({ type: [String] }) gameVersions!: string[];
+  @ApiProperty({ type: [String] }) loaders!: string[];
+  @ApiProperty({ type: [String] }) gallery!: string[];
+  @ApiPropertyOptional() sourceUrl?: string;
+  @ApiPropertyOptional() issuesUrl?: string;
+  @ApiPropertyOptional() websiteUrl?: string;
+
+  @ApiProperty({ enum: ['required', 'optional', 'unsupported', 'unknown'] })
+  clientSide!: 'required' | 'optional' | 'unsupported' | 'unknown';
+
+  @ApiProperty({ enum: ['required', 'optional', 'unsupported', 'unknown'] })
+  serverSide!: 'required' | 'optional' | 'unsupported' | 'unknown';
+}
+
+export class CategoryEntity {
+  @ApiProperty() id!: string;
+  @ApiProperty() name!: string;
+  @ApiPropertyOptional() iconUrl?: string;
 }
 
 export class ResolvedFileEntity {
