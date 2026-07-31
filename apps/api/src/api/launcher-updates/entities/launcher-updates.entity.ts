@@ -53,7 +53,7 @@ export class LauncherReleaseEntity {
 
   @ApiPropertyOptional({ nullable: true }) notes!: string | null;
 
-  @ApiProperty({ example: 'boff-launcher_1.4.0_x64_en-US.msi.zip' })
+  @ApiProperty({ example: 'boff-launcher_1.4.0_x64_en-US.msi' })
   artifactName!: string;
 
   @ApiProperty({ description: 'Calculado por el servidor sobre los bytes recibidos' })

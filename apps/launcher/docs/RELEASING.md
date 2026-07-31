@@ -84,7 +84,7 @@ shell gana sobre el perfil.
 | Archivo | Variables |
 |---|---|
 | `apps/api/.env` (prod: el entorno del contenedor) | `LAUNCHER_RELEASE_DIR`, `LAUNCHER_UPDATE_BASE_URL`, `PACK_BLOB_DIR` |
-| `apps/launcher/.env` (nuevo, sólo para firmar y publicar) | `TAURI_SIGNING_PRIVATE_KEY`, `TAURI_SIGNING_PRIVATE_KEY_PASSWORD`, `BOFF_ADMIN_USERNAME`/`BOFF_ADMIN_PASSWORD`, `BOFF_API_URL` |
+| `apps/launcher/.env` (nuevo, sólo para firmar y publicar por CLI/API) | `TAURI_SIGNING_PRIVATE_KEY`, `TAURI_SIGNING_PRIVATE_KEY_PASSWORD`, `BOFF_ADMIN_USERNAME`/`BOFF_ADMIN_PASSWORD`, `BOFF_API_URL` |
 | `apps/web/.env*` | **nada** — el panel no habla con el updater; todo pasa por la API |
 | GitHub Actions secrets | sólo si se construye en CI (§3.3) |
 
@@ -113,10 +113,20 @@ Cada despliegue de la API apunta a sí mismo, así que el valor cambia por
 entorno:
 
 ```
+# API local en WSL (con `pnpm setup`):
+LAUNCHER_RELEASE_DIR=./laboon/launcher-releases
+
+# API en el contenedor de producción:
 LAUNCHER_RELEASE_DIR=/app/laboon/launcher-releases
 LAUNCHER_UPDATE_BASE_URL=https://api.ficuslab.es   # dev/pre-producción
 # LAUNCHER_UPDATE_BASE_URL=https://api.boffmedia.es  # producción
 ```
+
+En local, `pnpm setup` crea `laboon/` en la raíz del repositorio y enlaza
+`apps/api/laboon` hacia ella. En producción, `/app/laboon` debe ser el volumen
+persistente montado en el contenedor. `laboon` está fuera de `public` a
+propósito: los blobs y los bundles se sirven detrás de la API, no como
+archivos públicos estáticos.
 
 | Variable | Obligatoria | Qué hace |
 |---|---|---|
@@ -159,6 +169,11 @@ pnpm build          # dev/ficuslab · pnpm build:prod para producción
 ```
 
 ### 3.3 La credencial de admin
+
+Si publicas desde el portal de administración, no necesitas configurar
+`BOFF_ADMIN_USERNAME`/`BOFF_ADMIN_PASSWORD`: el portal reutiliza la sesión del
+administrador y envía el JWT automáticamente. Esta sección solo aplica al
+flujo por `curl`, CLI o CI.
 
 **No existe ninguna API key ni cuenta de servicio en este proyecto.** El
 único credencial que pasa `@Roles(BOFF_ADMIN)` es un JWT de un usuario real
@@ -267,14 +282,33 @@ pnpm --filter launcher tauri build
 `bundle.createUpdaterArtifacts` ya está en `true`, así que salen en
 `src-tauri/target/release/bundle/`:
 
-- `msi/BoffLauncher_<v>_x64_en-US.msi` + `.msi.zip` + `.msi.zip.sig`
-- `nsis/BoffLauncher_<v>_x64-setup.exe` + `.nsis.zip` + `.nsis.zip.sig`
+- `msi/BoffLauncher_<v>_x64_en-US.msi` + `.msi.sig`
+- `nsis/BoffLauncher_<v>_x64-setup.exe` + `.exe.sig`
 
-**Lo que se sube es el `.zip`, no el `.msi`/`.exe`**, y la firma es el
-contenido del `.sig` que lo acompaña. La extensión es significativa: el
-updater elige cómo instalar a partir de ella.
+Con `createUpdaterArtifacts: true`, Tauri 2 usa el formato nativo: se sube el
+`.msi` o `.exe` y la firma es el contenido del `.sig` que lo acompaña. La
+extensión es significativa: el updater elige cómo instalar a partir de ella.
+Los `.zip` solo se generan si se configura `createUpdaterArtifacts` como
+`v1Compatible`.
 
 ### 4.3 Subir el artefacto
+
+#### Desde el portal de administración
+
+La forma normal para una publicación manual es `Boffmedia → Administración →
+Launcher → Releases`. La pantalla usa la sesión del administrador que ya está
+iniciada: no hay que copiar ni generar ningún bearer token, ni crear una cuenta
+de servicio.
+
+Selecciona el bundle generado por Tauri (`.msi` o `.exe`), su `.sig`, la versión, la plataforma y
+las notas. **Subir borrador** guarda el artefacto sin ofrecerlo todavía a los
+launchers. Cuando hayas revisado la fila, pulsa **Publicar**. El botón
+**Despublicar** lo saca del feed sin borrar el artefacto.
+
+La API sigue comprobando `BOFF_ADMIN` y registra el usuario de la sesión como
+`uploaded_by`; el portal solo evita gestionar el JWT manualmente.
+
+#### Desde la API (alternativa)
 
 Cuerpo binario en crudo, sin multipart (`express.json()` está condicionado
 al content-type, así que el cuerpo llega sin consumir y va directo a
@@ -284,9 +318,9 @@ disco). El sha512 lo calcula el servidor: no se acepta del cliente.
 curl -X POST "$API/launcher/admin/releases?version=0.1.0&target=windows-x86_64&notes=Arreglado%20el%20crash%20al%20revertir" \
   -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/octet-stream" \
-  -H "X-Updater-Signature: $(cat BoffLauncher_0.1.0_x64_en-US.msi.zip.sig)" \
-  -H "X-Artifact-Filename: BoffLauncher_0.1.0_x64_en-US.msi.zip" \
-  --data-binary @BoffLauncher_0.1.0_x64_en-US.msi.zip
+  -H "X-Updater-Signature: $(cat BoffLauncher_0.1.0_x64_en-US.msi.sig)" \
+  -H "X-Artifact-Filename: BoffLauncher_0.1.0_x64_en-US.msi" \
+  --data-binary @BoffLauncher_0.1.0_x64_en-US.msi
 ```
 
 `target` es la clave `{os}-{arch}` de Tauri: `windows-x86_64`,
