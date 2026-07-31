@@ -13,14 +13,17 @@ import {
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
+  ApiConsumes,
   ApiOperation,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
+import type { Request } from 'express';
 import { JwtAuthGuard } from '@api/auth/jwt-auth.guard';
 import { RolesGuard } from '@api/_utils/guards/roles.guard';
 import { Roles } from '@api/_utils/decorators/roles.decorator';
 import { USER_ROLES } from '@api/_utils/auth/roles.constants';
+import { PacksDownloadsService } from './packs-downloads.service';
 import { PacksService } from './packs.service';
 import {
   CreateInviteDto,
@@ -32,6 +35,7 @@ import {
 import {
   AccessRowEntity,
   AdminPackEntity,
+  BlobUploadEntity,
   InviteCodeEntity,
   PackIdEntity,
   PackVersionEntity,
@@ -47,7 +51,10 @@ import {
 @Roles(USER_ROLES.BOFF_ADMIN)
 @ApiBearerAuth('JWT')
 export class PacksController {
-  constructor(private readonly packs: PacksService) {}
+  constructor(
+    private readonly packs: PacksService,
+    private readonly downloads: PacksDownloadsService,
+  ) {}
 
   private actorId(req: { user?: { userId?: number } }): number | null {
     return req.user?.userId ?? null;
@@ -79,6 +86,36 @@ export class PacksController {
   ): Promise<{ success: true }> {
     await this.packs.updatePack(id, dto, this.actorId(req));
     return { success: true };
+  }
+
+  // ── Override blobs ───────────────────────────────────────────────────────
+  // Content-addressed and deliberately NOT scoped to a pack: two packs shipping
+  // the same config file are the same bytes, and the launcher only ever asks
+  // for a sha512. A version manifest referencing a blob that was never uploaded
+  // is what made `override` files 404 at install time.
+
+  @Get('blobs/:sha512')
+  @ApiOperation({
+    summary: '¿Está ya este blob en el servidor?',
+    description: 'Permite al dashboard saltarse la subida de un archivo ya presente.',
+  })
+  async blobStatus(
+    @Param('sha512') sha512: string,
+  ): Promise<{ present: boolean; sizeBytes: number | null }> {
+    const size = await this.downloads.blobSize(sha512.toLowerCase());
+    return { present: size !== null, sizeBytes: size };
+  }
+
+  @Post('blobs')
+  @ApiOperation({
+    summary: 'Subir un blob de override',
+    description:
+      'Cuerpo binario en crudo (application/octet-stream). El sha512 lo calcula el servidor a partir de los bytes recibidos; no se acepta el del cliente.',
+  })
+  @ApiConsumes('application/octet-stream')
+  @ApiResponse({ status: HttpStatus.CREATED, type: BlobUploadEntity })
+  async uploadBlob(@Req() req: Request): Promise<BlobUploadEntity> {
+    return this.downloads.storeBlob(req);
   }
 
   // ── Versions ─────────────────────────────────────────────────────────────

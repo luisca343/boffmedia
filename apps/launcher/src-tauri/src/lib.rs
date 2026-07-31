@@ -70,8 +70,10 @@ pub fn run() {
             install::launch_pack,
             install::stop_game,
             install::instance_scan,
+            install::repair_instance,
             settings::settings_get,
             settings::settings_set,
+            settings::plays_get,
         ])
         .run(tauri::generate_context!())
         .expect("error while running the Boff Launcher");

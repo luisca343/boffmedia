@@ -1,4 +1,5 @@
 import {
+  apiAuthedAutoBinaryPOST,
   apiAuthedAutoDELETE,
   apiAuthedAutoGET,
   apiAuthedAutoPATCH,
@@ -130,6 +131,26 @@ export class PacksService {
     return apiAuthedAutoPOST<void>(
       `/packs/admin/${packId}/versions/${versionId}/publish`,
       {},
+    );
+  }
+
+  // ── Override blobs ───────────────────────────────────────────────────────
+
+  /** Is this content already stored? Blobs are content-addressed, so a hit
+   *  means the exact bytes are there and the upload can be skipped. */
+  static blobStatus(sha512: string) {
+    return apiAuthedAutoGET<{ present: boolean; sizeBytes: number | null }>(
+      `/packs/admin/blobs/${sha512}`,
+    );
+  }
+
+  /** Upload one override file. The returned sha512 is the SERVER's hash of the
+   *  bytes it received — that is the value a manifest must reference, never one
+   *  computed here, or the launcher's verification fails after download. */
+  static uploadBlob(file: Blob) {
+    return apiAuthedAutoBinaryPOST<{ sha512: string; size: number }>(
+      '/packs/admin/blobs',
+      file,
     );
   }
 

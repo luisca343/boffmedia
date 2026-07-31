@@ -188,54 +188,25 @@ export type LauncherPack = {
   latestVersion: LauncherVersion | null
 }
 
-/** Rust serialises these with serde's snake_case field names. */
-type RawVersion = {
-  id: string
-  name: string
-  minecraft: string
-  loader: string | null
-  loader_version: string | null
-  file_count: number
-  created_at: string
-}
-
-type RawPack = {
-  id: string
-  slug: string
-  name: string
-  summary: string | null
-  icon_url: string | null
-  access_kind: LauncherPack["accessKind"]
-  latest_version: RawVersion | null
-}
-
-function toPack(raw: RawPack): LauncherPack {
-  return {
-    id: raw.id,
-    slug: raw.slug,
-    name: raw.name,
-    summary: raw.summary,
-    iconUrl: raw.icon_url,
-    accessKind: raw.access_kind,
-    latestVersion: raw.latest_version && {
-      id: raw.latest_version.id,
-      name: raw.latest_version.name,
-      minecraft: raw.latest_version.minecraft,
-      loader: raw.latest_version.loader,
-      loaderVersion: raw.latest_version.loader_version,
-      fileCount: raw.latest_version.file_count,
-      createdAt: raw.latest_version.created_at,
-    },
+/** Every pack this UUID may install. Throws an {@link AuthFailure}.
+ *  `LauncherPack`/`LauncherVersion` carry `#[serde(rename_all = "camelCase")]`
+ *  on the Rust side, so the payload is already in this shape — mapping it from
+ *  snake_case silently produced a library of packs with no version. */
+export async function packsList(): Promise<LauncherPack[]> {
+  try {
+    return await invoke<LauncherPack[]>("packs_list")
+  } catch (err) {
+    throw asFailure(err)
   }
 }
 
-/** Every pack this UUID may install. Throws an {@link AuthFailure}. */
-export async function packsList(): Promise<LauncherPack[]> {
+/** ISO timestamps of the last launch, keyed by pack id. Never throws: a
+ *  missing play history is cosmetic. */
+export async function playsGet(): Promise<Record<string, string>> {
   try {
-    const raw = await invoke<RawPack[]>("packs_list")
-    return raw.map(toPack)
-  } catch (err) {
-    throw asFailure(err)
+    return await invoke<Record<string, string>>("plays_get")
+  } catch {
+    return {}
   }
 }
 
@@ -436,6 +407,17 @@ export async function instanceScan(
       slug,
       latestVersionId,
     })
+  } catch (err) {
+    throw asFailure(err)
+  }
+}
+
+/** Drop the managed files (mods, config, bin, marker) so the next install
+ *  rebuilds them. Saves and options are left alone by the Rust side. */
+export async function repairInstance(slug: string): Promise<ScannedInstallState> {
+  if (!isDesktop()) return { kind: "not-installed" }
+  try {
+    return await invoke<ScannedInstallState>("repair_instance", { slug })
   } catch (err) {
     throw asFailure(err)
   }

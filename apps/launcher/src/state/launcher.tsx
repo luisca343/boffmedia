@@ -16,6 +16,7 @@ import {
   onInstallDone,
   onInstallProgress,
   packManifest,
+  repairInstance,
   settingsGet,
   settingsSet,
   stopGame,
@@ -75,6 +76,7 @@ type Action =
       totalBytes: number
     }
   | { type: "install/state"; packId: string; state: ScannedInstallState }
+  | { type: "pack/played"; packId: string; at: string }
   | { type: "game/state"; game: GameState }
   | { type: "log"; line: LogLine }
   | { type: "logs/clear" }
@@ -159,6 +161,13 @@ function reducer(s: State, a: Action): State {
         ...s,
         packs: s.packs.map((p) => (p.pack.id !== a.packId ? p : { ...p, state: a.state })),
       }
+    case "pack/played":
+      // Mirrors what Rust just wrote to plays.json, so the card stops saying
+      // "Nunca jugado" without a full re-listing.
+      return {
+        ...s,
+        packs: s.packs.map((p) => (p.pack.id !== a.packId ? p : { ...p, lastPlayed: a.at })),
+      }
     case "game/state":
       return { ...s, game: a.game }
     case "log":
@@ -195,6 +204,7 @@ type Ctx = State & {
   go: (view: View, packId?: string) => void
   reloadPacks: () => void
   install: (packId: string) => Promise<void>
+  repair: (packId: string) => Promise<void>
   play: (packId: string) => Promise<void>
   stop: () => void
   clearLogs: () => void
@@ -425,6 +435,27 @@ export function LauncherProvider({ children }: { children: React.ReactNode }) {
     [log, manifestFor],
   )
 
+  /** Wipe the managed files and install again. One action rather than two
+   *  buttons: a player looking at "Dañado" wants a working pack, not a choice
+   *  between two verbs whose difference only makes sense to us. */
+  const repair = React.useCallback(
+    async (packId: string) => {
+      const entry = packsRef.current.find((p) => p.pack.id === packId)
+      if (!entry || busy.current.has(packId)) return
+      log({ level: "info", source: "launcher", text: `Reparando ${entry.pack.name}…` })
+      try {
+        const state = await repairInstance(entry.pack.slug)
+        dispatch({ type: "install/state", packId, state })
+      } catch (err) {
+        const message = (err as { message?: string })?.message ?? "No se pudo reparar el pack."
+        log({ level: "error", source: "launcher", text: message })
+        return
+      }
+      await install(packId)
+    },
+    [install, log],
+  )
+
   const play = React.useCallback(
     async (packId: string) => {
       if (busy.current.has(packId)) return
@@ -439,6 +470,7 @@ export function LauncherProvider({ children }: { children: React.ReactNode }) {
         // dispatching "running" here would paper over it.
         await launchPack(packId, await manifestFor(packId))
         runningPackId.current = packId
+        dispatch({ type: "pack/played", packId, at: new Date().toISOString() })
         void refreshInstallState(packId)
       } catch (err) {
         const message = (err as { message?: string })?.message ?? "No se pudo iniciar el juego."
@@ -520,6 +552,7 @@ export function LauncherProvider({ children }: { children: React.ReactNode }) {
     go: (view, packId) => dispatch({ type: "view", view, packId }),
     reloadPacks: () => setReloadToken((n) => n + 1),
     install,
+    repair,
     play,
     stop,
     clearLogs: () => dispatch({ type: "logs/clear" }),
