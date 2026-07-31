@@ -9,9 +9,11 @@ import {
   IsOptional,
   IsString,
   Matches,
+  Max,
   MaxLength,
   Min,
   MinLength,
+  ValidateNested,
 } from 'class-validator';
 
 const ACCESS_KINDS = ['public', 'password', 'allowlist'] as const;
@@ -152,6 +154,143 @@ export class CreateInviteDto {
   @Type(() => Date)
   @IsDate()
   expiresAt?: Date;
+}
+
+// ── Mod catalog (admin picker) ─────────────────────────────────────────────
+
+const PLATFORMS = ['curseforge', 'modrinth'] as const;
+/** The loader names both APIs understand; CurseForge maps them to its numeric
+ *  modLoaderType, Modrinth uses them verbatim as category facets. */
+const CATALOG_LOADERS = ['forge', 'neoforge', 'fabric', 'quilt'] as const;
+
+export class CatalogSearchQueryDto {
+  @ApiProperty({ enum: PLATFORMS })
+  @IsIn(PLATFORMS)
+  platform!: (typeof PLATFORMS)[number];
+
+  @ApiPropertyOptional({ example: 'jei' })
+  @IsOptional()
+  @IsString()
+  @MaxLength(128)
+  query?: string;
+
+  @ApiPropertyOptional({ example: '1.21.4' })
+  @IsOptional()
+  @IsString()
+  @MaxLength(32)
+  gameVersion?: string;
+
+  @ApiPropertyOptional({ enum: CATALOG_LOADERS })
+  @IsOptional()
+  @IsIn(CATALOG_LOADERS)
+  loader?: (typeof CATALOG_LOADERS)[number];
+
+  @ApiPropertyOptional({ default: 0 })
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(0)
+  page?: number;
+
+  @ApiPropertyOptional({ default: 20, maximum: 50 })
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  @Max(50)
+  pageSize?: number;
+}
+
+export class CatalogFilesQueryDto {
+  @ApiPropertyOptional({ example: '1.21.4' })
+  @IsOptional()
+  @IsString()
+  @MaxLength(32)
+  gameVersion?: string;
+
+  @ApiPropertyOptional({ enum: CATALOG_LOADERS })
+  @IsOptional()
+  @IsIn(CATALOG_LOADERS)
+  loader?: (typeof CATALOG_LOADERS)[number];
+
+  @ApiPropertyOptional({ default: 30, maximum: 50 })
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  @Max(50)
+  pageSize?: number;
+}
+
+export class CurseforgeSourceDto {
+  @ApiProperty({ enum: ['curseforge'] })
+  @IsIn(['curseforge'])
+  kind!: 'curseforge';
+
+  @ApiProperty()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  projectId!: number;
+
+  @ApiProperty()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  fileId!: number;
+}
+
+export class ModrinthSourceDto {
+  @ApiProperty({ enum: ['modrinth'] })
+  @IsIn(['modrinth'])
+  kind!: 'modrinth';
+
+  @ApiProperty()
+  @IsString()
+  @MinLength(1)
+  projectId!: string;
+
+  @ApiProperty()
+  @IsString()
+  @MinLength(1)
+  versionId!: string;
+}
+
+export class UrlSourceDto {
+  @ApiProperty({ enum: ['url'] })
+  @IsIn(['url'])
+  kind!: 'url';
+
+  @ApiProperty({ example: 'https://example.com/mod.jar' })
+  @IsString()
+  @Matches(/^https?:\/\//i, { message: 'La URL debe empezar por http:// o https://' })
+  @MaxLength(2048)
+  url!: string;
+}
+
+export class ResolveFileDto {
+  @ApiProperty({
+    description:
+      'FileSource de @boffmedia/pack-schema — {kind:"curseforge"|"modrinth"|"url", …}',
+    oneOf: [
+      { $ref: '#/components/schemas/CurseforgeSourceDto' },
+      { $ref: '#/components/schemas/ModrinthSourceDto' },
+      { $ref: '#/components/schemas/UrlSourceDto' },
+    ],
+  })
+  @ValidateNested()
+  @Type(() => Object, {
+    discriminator: {
+      property: 'kind',
+      subTypes: [
+        { value: CurseforgeSourceDto, name: 'curseforge' },
+        { value: ModrinthSourceDto, name: 'modrinth' },
+        { value: UrlSourceDto, name: 'url' },
+      ],
+    },
+    keepDiscriminatorProperty: true,
+  })
+  source!: CurseforgeSourceDto | ModrinthSourceDto | UrlSourceDto;
 }
 
 // ── Launcher-facing ────────────────────────────────────────────────────────

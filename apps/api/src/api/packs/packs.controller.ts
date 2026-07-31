@@ -25,11 +25,15 @@ import { Roles } from '@api/_utils/decorators/roles.decorator';
 import { USER_ROLES } from '@api/_utils/auth/roles.constants';
 import { PacksDownloadsService } from './packs-downloads.service';
 import { PacksService } from './packs.service';
+import { PacksCatalogService } from './packs-catalog.service';
 import {
+  CatalogFilesQueryDto,
+  CatalogSearchQueryDto,
   CreateInviteDto,
   CreatePackDto,
   CreateVersionDto,
   GrantAccessDto,
+  ResolveFileDto,
   UpdatePackDto,
 } from './dto/packs.dto';
 import {
@@ -37,8 +41,11 @@ import {
   AdminPackEntity,
   BlobUploadEntity,
   InviteCodeEntity,
+  ModFileEntity,
+  ModSearchHitEntity,
   PackIdEntity,
   PackVersionEntity,
+  ResolvedFileEntity,
 } from './entities/packs.entity';
 
 // The dashboard's surface — HANDOFF §4.1 puts pack authoring in the web app,
@@ -54,6 +61,7 @@ export class PacksController {
   constructor(
     private readonly packs: PacksService,
     private readonly downloads: PacksDownloadsService,
+    private readonly catalog: PacksCatalogService,
   ) {}
 
   private actorId(req: { user?: { userId?: number } }): number | null {
@@ -116,6 +124,57 @@ export class PacksController {
   @ApiResponse({ status: HttpStatus.CREATED, type: BlobUploadEntity })
   async uploadBlob(@Req() req: Request): Promise<BlobUploadEntity> {
     return this.downloads.storeBlob(req);
+  }
+
+  // ── Mod catalog ──────────────────────────────────────────────────────────
+
+  @Get('catalog/search')
+  @ApiOperation({ summary: 'Buscar mods en CurseForge o Modrinth' })
+  @ApiResponse({ status: HttpStatus.OK, type: [ModSearchHitEntity] })
+  async catalogSearch(
+    @Query() query: CatalogSearchQueryDto,
+  ): Promise<ModSearchHitEntity[]> {
+    return this.catalog.search(query);
+  }
+
+  @Get('catalog/curseforge/:projectId/files')
+  @ApiOperation({
+    summary: 'Archivos de un mod de CurseForge',
+    description:
+      'downloadable=false significa que el autor no permite distribución por terceros: ese archivo no se puede instalar automáticamente.',
+  })
+  @ApiResponse({ status: HttpStatus.OK, type: [ModFileEntity] })
+  async curseforgeFiles(
+    @Param('projectId') projectId: string,
+    @Query() query: CatalogFilesQueryDto,
+  ): Promise<ModFileEntity[]> {
+    return this.catalog.curseforgeFiles(
+      projectId,
+      query.gameVersion,
+      query.loader,
+      query.pageSize ?? 30,
+    );
+  }
+
+  @Get('catalog/modrinth/:projectId/versions')
+  @ApiOperation({ summary: 'Versiones de un proyecto de Modrinth' })
+  @ApiResponse({ status: HttpStatus.OK, type: [ModFileEntity] })
+  async modrinthVersions(
+    @Param('projectId') projectId: string,
+    @Query() query: CatalogFilesQueryDto,
+  ): Promise<ModFileEntity[]> {
+    return this.catalog.modrinthVersions(projectId, query.gameVersion, query.loader);
+  }
+
+  @Post('catalog/resolve')
+  @ApiOperation({
+    summary: 'Resolver un origen a sha512 + tamaño',
+    description:
+      'PackFile.sha512 es obligatorio, pero CurseForge solo publica sha1/md5: para esos orígenes (y para url) el servidor descarga los bytes y los hashea. Puede tardar en archivos grandes.',
+  })
+  @ApiResponse({ status: HttpStatus.CREATED, type: ResolvedFileEntity })
+  async resolveFile(@Body() dto: ResolveFileDto): Promise<ResolvedFileEntity> {
+    return this.catalog.resolve(dto);
   }
 
   // ── Versions ─────────────────────────────────────────────────────────────

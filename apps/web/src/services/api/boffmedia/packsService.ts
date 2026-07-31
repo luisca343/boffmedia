@@ -100,6 +100,74 @@ export interface CreateVersionInput {
   files: unknown[];
 }
 
+export type ModPlatform = 'curseforge' | 'modrinth';
+
+/** The loader names both catalogs understand — not the manifest's loader ids
+ *  ("fabric-loader"/"quilt-loader"), which is why callers must map. */
+export type CatalogLoader = 'forge' | 'neoforge' | 'fabric' | 'quilt';
+
+export interface ModSearchHit {
+  platform: ModPlatform;
+  /** String on both platforms; CurseForge's is numeric and is narrowed only
+   *  when a FileSource is built. */
+  projectId: string;
+  slug: string;
+  name: string;
+  summary: string;
+  iconUrl?: string;
+  downloads: number;
+  author?: string;
+}
+
+export interface ModFile {
+  platform: ModPlatform;
+  /** CurseForge file id, or the Modrinth *version* id. */
+  fileId: string;
+  versionNumber?: string;
+  displayName: string;
+  fileName: string;
+  fileSize: number;
+  gameVersions: string[];
+  releaseType: 'release' | 'beta' | 'alpha';
+  datePublished: string;
+  sha512: string | null;
+  /** False when CurseForge's author forbids third-party distribution: the
+   *  launcher can never fetch that file automatically. */
+  downloadable: boolean;
+}
+
+export interface ResolvedFile {
+  sha512: string;
+  fileSize: number;
+  fileName: string;
+  /** The FileSource ready for the manifest. */
+  source: unknown;
+}
+
+export type ResolveSource =
+  | { kind: 'curseforge'; projectId: number; fileId: number }
+  | { kind: 'modrinth'; projectId: string; versionId: string }
+  | { kind: 'url'; url: string };
+
+export interface ModSearchInput {
+  platform: ModPlatform;
+  query?: string;
+  gameVersion?: string;
+  loader?: CatalogLoader;
+  page?: number;
+  pageSize?: number;
+}
+
+function queryString(params: Record<string, string | number | undefined>): string {
+  const search = new URLSearchParams();
+  for (const [key, value] of Object.entries(params)) {
+    if (value === undefined || value === '') continue;
+    search.set(key, String(value));
+  }
+  const encoded = search.toString();
+  return encoded ? `?${encoded}` : '';
+}
+
 export class PacksService {
   static list(includeArchived = false) {
     return apiAuthedAutoGET<AdminPack[]>(
@@ -152,6 +220,52 @@ export class PacksService {
       '/packs/admin/blobs',
       file,
     );
+  }
+
+  // ── Mod catalog ──────────────────────────────────────────────────────────
+
+  static searchMods(input: ModSearchInput) {
+    return apiAuthedAutoGET<ModSearchHit[]>(
+      `/packs/admin/catalog/search${queryString({
+        platform: input.platform,
+        query: input.query,
+        gameVersion: input.gameVersion,
+        loader: input.loader,
+        page: input.page,
+        pageSize: input.pageSize,
+      })}`,
+    );
+  }
+
+  static curseforgeFiles(
+    projectId: string,
+    filters: { gameVersion?: string; loader?: CatalogLoader; pageSize?: number } = {},
+  ) {
+    return apiAuthedAutoGET<ModFile[]>(
+      `/packs/admin/catalog/curseforge/${projectId}/files${queryString({
+        gameVersion: filters.gameVersion,
+        loader: filters.loader,
+        pageSize: filters.pageSize,
+      })}`,
+    );
+  }
+
+  static modrinthVersions(
+    projectId: string,
+    filters: { gameVersion?: string; loader?: CatalogLoader } = {},
+  ) {
+    return apiAuthedAutoGET<ModFile[]>(
+      `/packs/admin/catalog/modrinth/${projectId}/versions${queryString({
+        gameVersion: filters.gameVersion,
+        loader: filters.loader,
+      })}`,
+    );
+  }
+
+  /** CurseForge publishes only sha1/md5, so the server downloads and hashes the
+   *  bytes for `curseforge` and `url` sources — this call can take seconds. */
+  static resolveFile(source: ResolveSource) {
+    return apiAuthedAutoPOST<ResolvedFile>('/packs/admin/catalog/resolve', { source });
   }
 
   // ── Access ───────────────────────────────────────────────────────────────

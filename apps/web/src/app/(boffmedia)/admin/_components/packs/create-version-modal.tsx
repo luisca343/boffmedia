@@ -1,13 +1,25 @@
 "use client"
 
-import { useRef, useState } from "react"
+import { useCallback, useRef, useState } from "react"
 import { useTranslations } from "next-intl"
-import { Badge, Button, Field, Input, Modal, Select, Textarea, toast } from "@boffmedia/ui"
+import {
+  Badge,
+  Button,
+  Disclosure,
+  Field,
+  Input,
+  Modal,
+  Select,
+  Textarea,
+  toast,
+} from "@boffmedia/ui"
 import {
   type AdminPack,
   type PackLoader,
   PacksService,
 } from "@/services/api/boffmedia/packsService"
+import { ModSelector, type SelectedMod } from "./mod-selector"
+import { overrideFileEntry, uploadOverrideBlob } from "./upload-blob"
 
 // Cutting a version is the one authoring step the launcher cannot do for you:
 // mods come from CurseForge/Modrinth by id, but configs, scripts and resource
@@ -29,18 +41,6 @@ type Upload = {
   path: string
   state: "pending" | "hashing" | "uploading" | "reused" | "done" | "error"
   detail?: string
-}
-
-/** Content hash of the file as the launcher will check it. Computed here as
- *  well as server-side so an already-stored blob can be skipped without
- *  uploading it first; the server still hashes what it receives, so a mismatch
- *  is impossible to sneak past. Reads the file whole — override files are
- *  configs and scripts, not the 200 MB jars, which come from CF/Modrinth. */
-async function sha512Hex(file: File): Promise<string> {
-  const digest = await crypto.subtle.digest("SHA-512", await file.arrayBuffer())
-  return Array.from(new Uint8Array(digest))
-    .map((b) => b.toString(16).padStart(2, "0"))
-    .join("")
 }
 
 /** `webkitRelativePath` starts at the folder the admin picked, which is almost
@@ -74,7 +74,8 @@ export function CreateVersionModal({
   const [notes, setNotes] = useState("")
   const [prefix, setPrefix] = useState("config")
   const [uploads, setUploads] = useState<Upload[]>([])
-  const [modsJson, setModsJson] = useState("")
+  const [mods, setMods] = useState<SelectedMod[]>([])
+  const [extraJson, setExtraJson] = useState("")
   const [busy, setBusy] = useState(false)
   const filesRef = useRef<HTMLInputElement>(null)
   const folderRef = useRef<HTMLInputElement>(null)
@@ -100,54 +101,55 @@ export function CreateVersionModal({
 
   /** Parsed only to catch a typo before anything uploads — the authority is the
    *  API's zod pass, so this deliberately does not re-implement the schema. */
-  const parseMods = (): unknown[] | null => {
-    if (!modsJson.trim()) return []
+  const parseExtra = (): unknown[] | null => {
+    if (!extraJson.trim()) return []
     try {
-      const parsed: unknown = JSON.parse(modsJson)
+      const parsed: unknown = JSON.parse(extraJson)
       return Array.isArray(parsed) ? parsed : null
     } catch {
       return null
     }
   }
 
-  const modsValid = parseMods() !== null
+  const extraValid = parseExtra() !== null
   const canSubmit =
     name.trim().length > 0 &&
     minecraft.trim().length > 0 &&
-    modsValid &&
+    extraValid &&
     (!loader || loaderVersion.trim().length > 0) &&
     !busy
 
+  const onModsChange = useCallback((next: SelectedMod[]) => setMods(next), [])
+
   const submit = async () => {
-    const mods = parseMods()
-    if (!mods) return
+    if (busy) return
+    const extra = parseExtra()
+    if (!extra) return
     setBusy(true)
     try {
       const overrides: unknown[] = []
       for (const upload of uploads) {
         patch(upload.path, { state: "hashing", detail: undefined })
-        const sha512 = await sha512Hex(upload.file)
-
-        const status = await PacksService.blobStatus(sha512)
-        const present = status.success && status.data?.present
-        if (!present) {
-          patch(upload.path, { state: "uploading" })
-          const res = await PacksService.uploadBlob(upload.file)
-          if (!res.success || !res.data) {
-            patch(upload.path, { state: "error", detail: res.userMessage })
-            toast({ tone: "bad", title: t("blobFailed"), msg: upload.path })
-            return
-          }
-          // The server's hash wins. If it disagrees with ours the file changed
-          // under us mid-upload, and referencing the local one would ship a
-          // manifest the launcher can never verify.
-          overrides.push(fileEntry(upload.path, res.data.sha512, res.data.size))
-          patch(upload.path, { state: "done" })
-          continue
+        const result = await uploadOverrideBlob(upload.file, (state) =>
+          patch(upload.path, { state }),
+        )
+        if (!result.ok) {
+          patch(upload.path, { state: "error", detail: result.message })
+          toast({ tone: "bad", title: t("blobFailed"), msg: upload.path })
+          return
         }
-        overrides.push(fileEntry(upload.path, sha512, upload.file.size))
-        patch(upload.path, { state: "reused" })
+        overrides.push(overrideFileEntry(upload.path, result.sha512, result.fileSize))
+        patch(upload.path, { state: result.reused ? "reused" : "done" })
       }
+
+      // The mods are already resolved (sha512 + size came back from the catalog
+      // resolve route), so submit does no per-mod work here.
+      const modFiles = mods.map((mod) => ({
+        path: mod.path,
+        sha512: mod.sha512,
+        fileSize: mod.fileSize,
+        source: mod.source,
+      }))
 
       const res = await PacksService.createVersion(pack.id, {
         name: name.trim(),
@@ -155,7 +157,7 @@ export function CreateVersionModal({
         loader: (loader || undefined) as PackLoader | undefined,
         loaderVersion: loader ? loaderVersion.trim() : undefined,
         notes: notes.trim() || undefined,
-        files: [...mods, ...overrides],
+        files: [...modFiles, ...overrides, ...extra],
       })
       if (!res.success) {
         toast({ tone: "bad", title: t("versionFailed"), msg: res.userMessage ?? res.message })
@@ -177,7 +179,8 @@ export function CreateVersionModal({
     setLoaderVersion("")
     setNotes("")
     setUploads([])
-    setModsJson("")
+    setMods([])
+    setExtraJson("")
   }
 
   return (
@@ -233,15 +236,12 @@ export function CreateVersionModal({
           <Input value={notes} onChange={(e) => setNotes(e.target.value)} />
         </Field>
 
-        <Field label={t("mods")} hint={t("modsHint")} error={modsValid ? undefined : t("modsInvalid")}>
-          <Textarea
-            rows={6}
-            className="font-mono text-[12px]"
-            value={modsJson}
-            onChange={(e) => setModsJson(e.target.value)}
-            placeholder={
-              '[{"path":"mods/sodium.jar","sha512":"…","fileSize":123,"source":{"kind":"modrinth","projectId":"AANobbMI","versionId":"…"}}]'
-            }
+        <Field label={t("mods")} hint={t("modsHint")}>
+          <ModSelector
+            value={mods}
+            onChange={onModsChange}
+            minecraft={minecraft}
+            loader={loader}
           />
         </Field>
 
@@ -319,16 +319,19 @@ export function CreateVersionModal({
             )}
           </div>
         </Field>
+
+        <Disclosure title={t("advancedJson")} sub={t("advancedJsonHint")} icon="code">
+          <Field error={extraValid ? undefined : t("modsInvalid")}>
+            <Textarea
+              rows={5}
+              className="font-mono text-[12px]"
+              value={extraJson}
+              onChange={(e) => setExtraJson(e.target.value)}
+              placeholder='[{"path":"mods/sodium.jar","sha512":"…","fileSize":123,"source":{"kind":"modrinth","projectId":"AANobbMI","versionId":"…"}}]'
+            />
+          </Field>
+        </Disclosure>
       </div>
     </Modal>
   )
-}
-
-function fileEntry(path: string, sha512: string, fileSize: number) {
-  return {
-    path,
-    sha512,
-    fileSize,
-    source: { kind: "override" as const, blobSha512: sha512 },
-  }
 }
