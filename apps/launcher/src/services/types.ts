@@ -1,11 +1,34 @@
-import type { Pack, PackVersion } from "@boffmedia/pack-schema"
-
 // The launcher's own view models. Deliberately separate from the wire types in
 // @boffmedia/pack-schema: a Pack is what the server publishes, an InstalledPack
 // is what this machine knows about it, and conflating the two is how launchers
 // end up unable to tell "not installed" from "server unreachable".
 
-export type { Pack, PackVersion }
+export type PackAccessKind = "public" | "password" | "allowlist"
+
+/** What the LISTING (§7.2) knows about a pack. Note what is absent: the
+ *  allowlist UUIDs are never sent to any launcher, since one member could
+ *  otherwise enumerate the whole membership of a pack they can read. */
+export type PackSummary = {
+  id: string
+  slug: string
+  name: string
+  summary: string | null
+  iconUrl: string | null
+  accessKind: PackAccessKind
+}
+
+/** The listing's view of a version. The file list lives only in a MANIFEST,
+ *  which is fetched per-install — never for a list of packs. */
+export type PackVersionSummary = {
+  id: string
+  name: string
+  minecraft: string
+  /** "neoforge" | "forge" | "fabric-loader", or null for vanilla. */
+  loader: string | null
+  loaderVersion: string | null
+  fileCount: number
+  createdAt: string
+}
 
 /** Where a pack stands on THIS machine. */
 export type InstallState =
@@ -36,8 +59,10 @@ export type InstallProgress = {
 }
 
 export type PackEntry = {
-  pack: Pack
-  latest: PackVersion
+  pack: PackSummary
+  /** Null when the pack exists but has no PUBLISHED version — a real state on
+   *  a freshly created pack, and one the UI must not render as "installable". */
+  latest: PackVersionSummary | null
   state: InstallState
   /** Null until the pack has been launched at least once. */
   lastPlayed: string | null

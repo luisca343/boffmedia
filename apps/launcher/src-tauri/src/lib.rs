@@ -13,6 +13,9 @@
 //        reimplement install_profile.json processors; delegating to Forge's
 //        own installer is what makes a Rust backend viable at all.
 
+pub mod api;
+pub mod api;
+pub mod auth;
 pub mod pack;
 
 use serde::Serialize;
@@ -30,22 +33,29 @@ pub struct RuntimeInfo {
 /// so this must stay infallible.
 #[tauri::command]
 fn runtime_info(app: tauri::AppHandle) -> RuntimeInfo {
-    use tauri::Manager;
     RuntimeInfo {
         platform: std::env::consts::OS.to_string(),
         arch: std::env::consts::ARCH.to_string(),
         tauri: tauri::VERSION.to_string(),
-        app_version: app
-            .package_info()
-            .version
-            .to_string(),
+        app_version: app.package_info().version.to_string(),
     }
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
-        .invoke_handler(tauri::generate_handler![runtime_info])
+        .manage(auth::AuthState::default())
+        .manage(api::ApiState::default())
+        .invoke_handler(tauri::generate_handler![
+            runtime_info,
+            auth::auth_begin,
+            auth::auth_await,
+            auth::auth_restore,
+            auth::auth_logout,
+            api::packs_list,
+            api::pack_manifest,
+            api::invite_redeem,
+        ])
         .run(tauri::generate_context!())
         .expect("error while running the Boff Launcher");
 }
