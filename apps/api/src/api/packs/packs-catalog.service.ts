@@ -13,13 +13,64 @@ import { firstValueFrom } from 'rxjs';
 import { env } from '@/config/env';
 import { PacksDownloadsService } from './packs-downloads.service';
 import type { CatalogSearchQueryDto, ResolveFileDto } from './dto/packs.dto';
-import type { ModFileEntity, ModSearchHitEntity, ResolvedFileEntity } from './entities/packs.entity';
+import type {
+  CategoryEntity,
+  ModDependencyEntity,
+  ModFileEntity,
+  ModProjectEntity,
+  ModSearchHitEntity,
+  ModSearchPageEntity,
+  ResolvedFileEntity,
+} from './entities/packs.entity';
 
 const CF_API = 'https://api.curseforge.com/v1';
 const CF_KEY_HEADER = 'x-api-key';
-/** Minecraft, and the "Mc-Mods" class inside it. */
+/** Minecraft. */
 const CF_GAME_ID = 432;
-const CF_CLASS_ID = 6;
+
+/** CurseForge classIds per project type. A pack ships more than jars: resource
+ *  packs, shaders and datapacks all belong in `files` too. */
+const CF_CLASS: Record<string, number> = {
+  mod: 6,
+  resourcepack: 12,
+  shader: 6552,
+  datapack: 6945,
+};
+
+/** Modrinth calls the same thing `project_type`. */
+const MODRINTH_TYPE: Record<string, string> = {
+  mod: 'mod',
+  resourcepack: 'resourcepack',
+  shader: 'shader',
+  datapack: 'datapack',
+};
+
+/** CurseForge sortField ⇄ Modrinth index. Relevance is CF's "Featured" (1);
+ *  there is no true relevance sort in its API. */
+const CF_SORT: Record<string, number> = {
+  relevance: 1,
+  downloads: 6,
+  updated: 3,
+  name: 4,
+  follows: 2,
+};
+const MODRINTH_SORT: Record<string, string> = {
+  relevance: 'relevance',
+  downloads: 'downloads',
+  updated: 'updated',
+  name: 'relevance',
+  follows: 'follows',
+};
+
+/** CurseForge relationType enum → our relation names. 2/5 are the soft ones. */
+const CF_RELATION: Record<number, ModDependencyEntity['relation'] | undefined> = {
+  1: 'embedded',
+  2: 'optional',
+  3: 'required',
+  4: undefined, // tool
+  5: 'incompatible',
+  6: undefined, // include
+};
 
 const MODRINTH_API = 'https://api.modrinth.com/v2';
 /** Modrinth's API rules require a descriptive, contactable User-Agent; generic
@@ -43,8 +94,17 @@ interface CfModSearchItem {
   name: string;
   summary?: string | null;
   downloadCount?: number;
+  dateModified?: string;
   logo?: { thumbnailUrl?: string | null; url?: string | null } | null;
   authors?: { name?: string }[];
+  categories?: { id?: number; name?: string; slug?: string; iconUrl?: string }[];
+  latestFilesIndexes?: { gameVersion?: string; modLoader?: number }[];
+  links?: {
+    websiteUrl?: string | null;
+    sourceUrl?: string | null;
+    issuesUrl?: string | null;
+  } | null;
+  screenshots?: { url?: string; thumbnailUrl?: string }[];
 }
 
 interface CfFileItem {
@@ -56,6 +116,7 @@ interface CfFileItem {
   releaseType?: number;
   fileDate?: string;
   downloadUrl?: string | null;
+  dependencies?: { modId?: number; relationType?: number }[];
 }
 
 interface ModrinthSearchHit {
@@ -66,6 +127,29 @@ interface ModrinthSearchHit {
   icon_url?: string | null;
   downloads?: number;
   author?: string | null;
+  categories?: string[];
+  date_modified?: string;
+  client_side?: string;
+  server_side?: string;
+}
+
+interface ModrinthProject {
+  id: string;
+  slug: string;
+  title: string;
+  description?: string | null;
+  body?: string | null;
+  icon_url?: string | null;
+  downloads?: number;
+  categories?: string[];
+  game_versions?: string[];
+  loaders?: string[];
+  gallery?: { url?: string }[];
+  source_url?: string | null;
+  issues_url?: string | null;
+  wiki_url?: string | null;
+  client_side?: string;
+  server_side?: string;
 }
 
 interface ModrinthVersionFile {
@@ -82,8 +166,14 @@ interface ModrinthVersion {
   version_number: string;
   version_type?: string;
   game_versions?: string[];
+  loaders?: string[];
   date_published?: string;
   files: ModrinthVersionFile[];
+  dependencies?: {
+    project_id?: string | null;
+    version_id?: string | null;
+    dependency_type?: string;
+  }[];
 }
 
 @Injectable()
@@ -95,6 +185,9 @@ export class PacksCatalogService {
    *  Bounded so a long-lived process cannot grow without limit. */
   private readonly resolveCache = new Map<string, ResolvedFileEntity>();
   private static readonly CACHE_MAX = 500;
+
+  /** Category lists change about once a year; one fetch per process is plenty. */
+  private readonly categoryCache = new Map<string, CategoryEntity[]>();
 
   constructor(
     private readonly http: HttpService,
@@ -112,60 +205,209 @@ export class PacksCatalogService {
     return env.CURSEFORGE_API_KEY;
   }
 
-  async search(query: CatalogSearchQueryDto): Promise<ModSearchHitEntity[]> {
+  async search(query: CatalogSearchQueryDto): Promise<ModSearchPageEntity> {
     return query.platform === 'curseforge'
       ? this.searchCurseforge(query)
       : this.searchModrinth(query);
   }
 
-  private async searchCurseforge(q: CatalogSearchQueryDto): Promise<ModSearchHitEntity[]> {
+  private async searchCurseforge(q: CatalogSearchQueryDto): Promise<ModSearchPageEntity> {
     const pageSize = Math.min(q.pageSize ?? 20, 50);
     const params: Record<string, string | number> = {
       gameId: CF_GAME_ID,
-      classId: CF_CLASS_ID,
+      classId: CF_CLASS[q.projectType ?? 'mod'] ?? CF_CLASS.mod,
       index: (q.page ?? 0) * pageSize,
       pageSize,
-      sortField: 2,
-      sortOrder: 'desc',
+      sortField: CF_SORT[q.sort ?? 'downloads'] ?? CF_SORT.downloads,
+      sortOrder: q.sort === 'name' ? 'asc' : 'desc',
     };
     if (q.query) params.searchFilter = q.query;
     if (q.gameVersion) params.gameVersion = q.gameVersion;
     if (q.loader && CF_LOADER[q.loader] !== undefined) params.modLoaderType = CF_LOADER[q.loader];
+    // CurseForge takes ONE category id per search, not a list.
+    if (q.category) params.categoryId = q.category;
 
-    const data = await this.cfGet<{ data?: CfModSearchItem[] }>(`${CF_API}/mods/search`, params);
-    return (data.data ?? []).map((m) => ({
-      platform: 'curseforge' as const,
-      projectId: String(m.id),
-      slug: m.slug,
-      name: m.name,
-      summary: m.summary ?? '',
-      iconUrl: m.logo?.thumbnailUrl ?? m.logo?.url ?? undefined,
-      downloads: m.downloadCount ?? 0,
-      author: m.authors?.[0]?.name ?? undefined,
-    }));
+    const data = await this.cfGet<{
+      data?: CfModSearchItem[];
+      pagination?: { totalCount?: number };
+    }>(`${CF_API}/mods/search`, params);
+
+    return {
+      hits: (data.data ?? []).map((m) => cfHit(m)),
+      // CurseForge caps the reported total at 10 000 and refuses index>10 000
+      // regardless; paging past that is upstream-impossible, not a bug here.
+      total: Math.min(data.pagination?.totalCount ?? 0, 10_000),
+    };
   }
 
-  private async searchModrinth(q: CatalogSearchQueryDto): Promise<ModSearchHitEntity[]> {
+  private async searchModrinth(q: CatalogSearchQueryDto): Promise<ModSearchPageEntity> {
     const pageSize = Math.min(q.pageSize ?? 20, 50);
-    const facets: string[][] = [['project_type:mod']];
+    const facets: string[][] = [
+      [`project_type:${MODRINTH_TYPE[q.projectType ?? 'mod'] ?? 'mod'}`],
+    ];
     if (q.gameVersion) facets.push([`versions:${q.gameVersion}`]);
     if (q.loader) facets.push([`categories:${q.loader}`]);
+    if (q.category) facets.push([`categories:${q.category}`]);
 
-    const data = await this.modrinthGet<{ hits?: ModrinthSearchHit[] }>(`${MODRINTH_API}/search`, {
-      query: q.query ?? '',
-      limit: pageSize,
-      offset: (q.page ?? 0) * pageSize,
-      facets: JSON.stringify(facets),
+    const data = await this.modrinthGet<{ hits?: ModrinthSearchHit[]; total_hits?: number }>(
+      `${MODRINTH_API}/search`,
+      {
+        query: q.query ?? '',
+        limit: pageSize,
+        offset: (q.page ?? 0) * pageSize,
+        index: MODRINTH_SORT[q.sort ?? 'downloads'] ?? 'downloads',
+        facets: JSON.stringify(facets),
+      },
+    );
+    return {
+      hits: (data.hits ?? []).map((h) => ({
+        platform: 'modrinth' as const,
+        projectId: h.project_id,
+        slug: h.slug,
+        name: h.title,
+        summary: h.description ?? '',
+        iconUrl: h.icon_url ?? undefined,
+        downloads: h.downloads ?? 0,
+        author: h.author ?? undefined,
+        categories: h.categories ?? [],
+        updatedAt: h.date_modified,
+        clientSide: side(h.client_side),
+        serverSide: side(h.server_side),
+      })),
+      total: data.total_hits ?? 0,
+    };
+  }
+
+  /** The category sidebar. Both lists are small and near-static, so they are
+   *  cached for the life of the process. */
+  async categories(platform: string, projectType = 'mod'): Promise<CategoryEntity[]> {
+    const key = `${platform}:${projectType}`;
+    const hit = this.categoryCache.get(key);
+    if (hit) return hit;
+
+    let list: CategoryEntity[];
+    if (platform === 'curseforge') {
+      const data = await this.cfGet<{ data?: { id: number; name: string; iconUrl?: string }[] }>(
+        `${CF_API}/categories`,
+        { gameId: CF_GAME_ID, classId: CF_CLASS[projectType] ?? CF_CLASS.mod },
+      );
+      list = (data.data ?? []).map((c) => ({
+        id: String(c.id),
+        name: c.name,
+        iconUrl: c.iconUrl,
+      }));
+    } else {
+      const data = await this.modrinthGet<
+        { name: string; project_type: string; icon?: string }[]
+      >(`${MODRINTH_API}/tag/category`, {});
+      const wanted = MODRINTH_TYPE[projectType] ?? 'mod';
+      list = (data ?? [])
+        .filter((c) => c.project_type === wanted)
+        .map((c) => ({ id: c.name, name: c.name }));
+    }
+    list.sort((a, b) => a.name.localeCompare(b.name));
+    this.categoryCache.set(key, list);
+    return list;
+  }
+
+  /** The detail panel: full description, gallery, links and side support. */
+  async project(platform: string, projectId: string): Promise<ModProjectEntity> {
+    if (platform === 'curseforge') {
+      const [detail, description] = await Promise.all([
+        this.cfGet<{ data?: CfModSearchItem }>(
+          `${CF_API}/mods/${encodeURIComponent(projectId)}`,
+          {},
+        ),
+        this.cfGet<{ data?: string }>(
+          `${CF_API}/mods/${encodeURIComponent(projectId)}/description`,
+          {},
+        ).catch(() => ({ data: '' })),
+      ]);
+      const mod = detail.data;
+      if (!mod) {
+        throw new BadGatewayException({
+          message: `curseforge project ${projectId} not found`,
+          userMessage: 'CurseForge no ha devuelto ese proyecto.',
+        });
+      }
+      const base = cfHit(mod);
+      return {
+        ...base,
+        description: description.data ?? '',
+        gameVersions: unique(
+          (mod.latestFilesIndexes ?? []).map((i) => i.gameVersion ?? '').filter(Boolean),
+        ),
+        loaders: unique(
+          (mod.latestFilesIndexes ?? [])
+            .map((i) => cfLoaderName(i.modLoader))
+            .filter((v): v is string => Boolean(v)),
+        ),
+        gallery: (mod.screenshots ?? [])
+          .map((s) => s.url ?? s.thumbnailUrl ?? '')
+          .filter(Boolean),
+        sourceUrl: mod.links?.sourceUrl ?? undefined,
+        issuesUrl: mod.links?.issuesUrl ?? undefined,
+        websiteUrl: mod.links?.websiteUrl ?? undefined,
+        // CurseForge does not publish client/server support at project level.
+        clientSide: 'unknown',
+        serverSide: 'unknown',
+      };
+    }
+
+    const project = await this.modrinthGet<ModrinthProject>(
+      `${MODRINTH_API}/project/${encodeURIComponent(projectId)}`,
+      {},
+    );
+    return {
+      platform: 'modrinth',
+      projectId: project.id,
+      slug: project.slug,
+      name: project.title,
+      summary: project.description ?? '',
+      description: project.body ?? '',
+      iconUrl: project.icon_url ?? undefined,
+      downloads: project.downloads ?? 0,
+      categories: project.categories ?? [],
+      gameVersions: project.game_versions ?? [],
+      loaders: project.loaders ?? [],
+      gallery: (project.gallery ?? []).map((g) => g.url ?? '').filter(Boolean),
+      sourceUrl: project.source_url ?? undefined,
+      issuesUrl: project.issues_url ?? undefined,
+      websiteUrl: project.wiki_url ?? undefined,
+      clientSide: side(project.client_side),
+      serverSide: side(project.server_side),
+    };
+  }
+
+  /** Names and icons for a set of project ids, so a dependency list can be
+   *  shown as mods rather than as bare numbers. One batched call per platform. */
+  async projectSummaries(platform: string, ids: string[]): Promise<ModSearchHitEntity[]> {
+    const wanted = unique(ids).slice(0, 100);
+    if (wanted.length === 0) return [];
+
+    if (platform === 'curseforge') {
+      const numeric = wanted.map(Number).filter((n) => Number.isFinite(n));
+      if (numeric.length === 0) return [];
+      const data = await this.cfPost<{ data?: CfModSearchItem[] }>(`${CF_API}/mods`, {
+        modIds: numeric,
+      });
+      return (data.data ?? []).map((m) => cfHit(m));
+    }
+
+    const data = await this.modrinthGet<ModrinthProject[]>(`${MODRINTH_API}/projects`, {
+      ids: JSON.stringify(wanted),
     });
-    return (data.hits ?? []).map((h) => ({
+    return (data ?? []).map((p) => ({
       platform: 'modrinth' as const,
-      projectId: h.project_id,
-      slug: h.slug,
-      name: h.title,
-      summary: h.description ?? '',
-      iconUrl: h.icon_url ?? undefined,
-      downloads: h.downloads ?? 0,
-      author: h.author ?? undefined,
+      projectId: p.id,
+      slug: p.slug,
+      name: p.title,
+      summary: p.description ?? '',
+      iconUrl: p.icon_url ?? undefined,
+      downloads: p.downloads ?? 0,
+      categories: p.categories ?? [],
+      clientSide: side(p.client_side),
+      serverSide: side(p.server_side),
     }));
   }
 
@@ -199,6 +441,22 @@ export class PacksCatalogService {
       // distribution. The file is unusable in a pack, so the picker must show it
       // as such rather than silently offering it.
       downloadable: Boolean(f.downloadUrl),
+      loaders: unique(
+        (f.gameVersions ?? [])
+          .map((v) => v.toLowerCase())
+          .filter((v) => ['forge', 'neoforge', 'fabric', 'quilt'].includes(v)),
+      ),
+      dependencies: (f.dependencies ?? [])
+        .map((d): ModDependencyEntity | null => {
+          const relation = CF_RELATION[d.relationType ?? 0];
+          if (!relation || !d.modId) return null;
+          return {
+            platform: 'curseforge' as const,
+            projectId: String(d.modId),
+            relation,
+          };
+        })
+        .filter((d): d is ModDependencyEntity => d !== null),
     }));
   }
 
@@ -229,6 +487,19 @@ export class PacksCatalogService {
         datePublished: v.date_published ?? '',
         sha512: file?.hashes?.sha512 ?? null,
         downloadable: true,
+        loaders: v.loaders ?? [],
+        dependencies: (v.dependencies ?? [])
+          .map((d): ModDependencyEntity | null => {
+            const relation = modrinthRelation(d.dependency_type);
+            if (!relation || !d.project_id) return null;
+            return {
+              platform: 'modrinth' as const,
+              projectId: d.project_id,
+              relation,
+              versionId: d.version_id ?? undefined,
+            };
+          })
+          .filter((d): d is ModDependencyEntity => d !== null),
       };
     });
   }
@@ -407,6 +678,35 @@ export class PacksCatalogService {
     return response.data;
   }
 
+  /** CurseForge's batch project lookup is POST-only. */
+  private async cfPost<T>(url: string, body: unknown): Promise<T> {
+    const key = this.curseforgeKey;
+    const response = await firstValueFrom(
+      this.http.post<T>(url, body, {
+        headers: {
+          [CF_KEY_HEADER]: key,
+          accept: 'application/json',
+          'content-type': 'application/json',
+        },
+        timeout: 15_000,
+        validateStatus: () => true,
+      }),
+    ).catch((error: unknown) => {
+      this.logger.error(`API de CurseForge inalcanzable: ${asMessage(error)}`);
+      throw new BadGatewayException({
+        message: 'curseforge api unreachable',
+        userMessage: 'No se ha podido contactar con CurseForge. Inténtalo de nuevo.',
+      });
+    });
+    if (response.status >= 400) {
+      throw new BadGatewayException({
+        message: `curseforge api returned ${response.status}`,
+        userMessage: 'CurseForge no ha devuelto resultados.',
+      });
+    }
+    return response.data;
+  }
+
   private async modrinthGet<T>(url: string, params: Record<string, string | number>): Promise<T> {
     const response = await firstValueFrom(
       this.http.get<T>(url, {
@@ -437,6 +737,44 @@ export class PacksCatalogService {
     }
     return response.data;
   }
+}
+
+function cfHit(m: CfModSearchItem): ModSearchHitEntity {
+  return {
+    platform: 'curseforge',
+    projectId: String(m.id),
+    slug: m.slug,
+    name: m.name,
+    summary: m.summary ?? '',
+    iconUrl: m.logo?.thumbnailUrl ?? m.logo?.url ?? undefined,
+    downloads: m.downloadCount ?? 0,
+    author: m.authors?.[0]?.name ?? undefined,
+    categories: (m.categories ?? []).map((c) => c.name ?? '').filter(Boolean),
+    updatedAt: m.dateModified,
+  };
+}
+
+/** Inverse of CF_LOADER — CurseForge's file index reports the numeric enum. */
+function cfLoaderName(value: number | undefined): string | undefined {
+  return Object.keys(CF_LOADER).find((name) => CF_LOADER[name] === value);
+}
+
+function modrinthRelation(value: string | undefined): ModDependencyEntity['relation'] | null {
+  if (value === 'required') return 'required';
+  if (value === 'optional') return 'optional';
+  if (value === 'incompatible') return 'incompatible';
+  if (value === 'embedded') return 'embedded';
+  return null;
+}
+
+function side(value: string | undefined): 'required' | 'optional' | 'unsupported' | 'unknown' {
+  return value === 'required' || value === 'optional' || value === 'unsupported'
+    ? value
+    : 'unknown';
+}
+
+function unique(values: string[]): string[] {
+  return [...new Set(values)];
 }
 
 function primaryFile(version: ModrinthVersion): ModrinthVersionFile | undefined {

@@ -8,7 +8,7 @@ import * as bcrypt from 'bcrypt';
 import { randomBytes } from 'crypto';
 import { PackManifest } from '@boffmedia/pack-schema';
 import { PacksRepository } from './packs.repository';
-import type { PackLoader } from '@/_db/schema/Packs';
+import type { PackAccessKind, PackLoader } from '@/_db/schema/Packs';
 import {
   AUDIT,
   AdminPackView,
@@ -277,6 +277,116 @@ export class PacksService {
     }));
   }
 
+  /** A version WITH its files — what "clone" and "edit draft" both start from.
+   *  The list endpoint deliberately omits `files`, which can be thousands of
+   *  entries across a pack's history. */
+  async versionDetail(
+    packId: string,
+    versionId: string,
+  ): Promise<PackVersionView & { files: unknown[] }> {
+    const version = await this.repo.findVersion(versionId);
+    if (!version || version.packId !== packId) {
+      throw new NotFoundException('Versión no encontrada');
+    }
+    return {
+      id: version.id,
+      packId: version.packId,
+      name: version.name,
+      minecraft: version.minecraft,
+      loader: version.loader,
+      loaderVersion: version.loaderVersion,
+      fileCount: version.files.length,
+      published: version.published,
+      notes: version.notes,
+      createdAt: version.createdAt.toISOString(),
+      files: version.files,
+    };
+  }
+
+  /** Editing is draft-only. A published version is what launchers have already
+   *  installed from: changing its files under them would leave every existing
+   *  install disagreeing with the manifest it verified against. */
+  async updateVersion(
+    packId: string,
+    versionId: string,
+    dto: CreateVersionDto,
+    actorId: number | null,
+  ): Promise<void> {
+    const existing = await this.repo.findVersion(versionId);
+    if (!existing || existing.packId !== packId) {
+      throw new NotFoundException('Versión no encontrada');
+    }
+    if (existing.published) {
+      throw new BadRequestException(
+        'Una versión publicada no se puede editar; crea una nueva a partir de ella',
+      );
+    }
+    const parsed = this.parseManifest(await this.requirePack(packId), versionId, dto);
+    await this.repo.updateVersion(versionId, {
+      name: dto.name,
+      minecraft: dto.minecraft,
+      loader: (dto.loader as PackLoader) ?? null,
+      loaderVersion: dto.loaderVersion ?? null,
+      files: parsed.version.files,
+      notes: dto.notes ?? null,
+    });
+    await this.repo.audit(AUDIT.VERSION_UPDATED, packId, null, { actorId, versionId });
+  }
+
+  async deleteVersion(packId: string, versionId: string, actorId: number | null): Promise<void> {
+    const existing = await this.repo.findVersion(versionId);
+    if (!existing || existing.packId !== packId) {
+      throw new NotFoundException('Versión no encontrada');
+    }
+    if (existing.published) {
+      throw new BadRequestException('Una versión publicada no se puede borrar');
+    }
+    await this.repo.deleteVersion(versionId);
+    await this.repo.audit(AUDIT.VERSION_DELETED, packId, null, { actorId, versionId });
+  }
+
+  private async requirePack(packId: string) {
+    const pack = await this.repo.findById(packId);
+    if (!pack) throw new NotFoundException('Pack no encontrado');
+    return pack;
+  }
+
+  /** Create and edit share this: both must reject exactly what the launcher
+   *  would refuse to parse, and by construction they cannot drift. */
+  private parseManifest(
+    pack: { id: string; slug: string; name: string; accessKind: PackAccessKind },
+    versionId: string,
+    dto: CreateVersionDto,
+  ) {
+    const candidate = {
+      formatVersion: 1 as const,
+      pack: {
+        id: pack.id,
+        slug: pack.slug,
+        name: pack.name,
+        access: this.accessPayload(pack.accessKind),
+      },
+      version: {
+        id: versionId,
+        name: dto.name,
+        createdAt: new Date().toISOString(),
+        dependencies: {
+          minecraft: dto.minecraft,
+          ...(dto.loader && dto.loaderVersion ? { [dto.loader]: dto.loaderVersion } : {}),
+        },
+        files: dto.files,
+      },
+    };
+    const parsed = PackManifest.safeParse(candidate);
+    if (!parsed.success) {
+      const issue = parsed.error.issues[0];
+      throw new BadRequestException(
+        `Manifiesto no válido en ${issue?.path.join('.') || 'raíz'}: ${issue?.message}`,
+      );
+    }
+    return parsed.data;
+  }
+
   /**
    * Creating a version validates the whole manifest through the SAME zod schema
    * the launcher generates its Rust types from. A version that would not parse
@@ -287,37 +397,9 @@ export class PacksService {
     dto: CreateVersionDto,
     actorId: number | null,
   ): Promise<{ id: string }> {
-    const pack = await this.repo.findById(packId);
-    if (!pack) throw new NotFoundException('Pack no encontrado');
-
+    const pack = await this.requirePack(packId);
     const id = this.newId();
-    const candidate = {
-      formatVersion: 1 as const,
-      pack: {
-        id: pack.id,
-        slug: pack.slug,
-        name: pack.name,
-        access: this.accessPayload(pack.accessKind),
-      },
-      version: {
-        id,
-        name: dto.name,
-        createdAt: new Date().toISOString(),
-        dependencies: {
-          minecraft: dto.minecraft,
-          ...(dto.loader && dto.loaderVersion ? { [dto.loader]: dto.loaderVersion } : {}),
-        },
-        files: dto.files,
-      },
-    };
-
-    const parsed = PackManifest.safeParse(candidate);
-    if (!parsed.success) {
-      const issue = parsed.error.issues[0];
-      throw new BadRequestException(
-        `Manifiesto no válido en ${issue?.path.join('.') || 'raíz'}: ${issue?.message}`,
-      );
-    }
+    const parsed = this.parseManifest(pack, id, dto);
 
     await this.repo.insertVersion({
       id,
@@ -326,7 +408,7 @@ export class PacksService {
       minecraft: dto.minecraft,
       loader: (dto.loader as PackLoader) ?? null,
       loaderVersion: dto.loaderVersion ?? null,
-      files: parsed.data.version.files,
+      files: parsed.version.files,
       notes: dto.notes ?? null,
       published: false,
     });

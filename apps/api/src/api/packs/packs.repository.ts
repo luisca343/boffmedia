@@ -118,6 +118,14 @@ export class PacksRepository {
     await this.db.insert(packVersions).values(row);
   }
 
+  async updateVersion(id: string, patch: Partial<NewPackVersion>): Promise<void> {
+    await this.db.update(packVersions).set(patch).where(eq(packVersions.id, id));
+  }
+
+  async deleteVersion(id: string): Promise<void> {
+    await this.db.delete(packVersions).where(eq(packVersions.id, id));
+  }
+
   async publishVersion(id: string): Promise<void> {
     await this.db
       .update(packVersions)

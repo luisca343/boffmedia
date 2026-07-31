@@ -7,6 +7,7 @@ import { LauncherController } from './launcher.controller';
 import { PacksAuthService } from './packs-auth.service';
 import { PacksCatalogService } from './packs-catalog.service';
 import { PacksDownloadsService } from './packs-downloads.service';
+import { PacksMetaService } from './packs-meta.service';
 import { PacksController } from './packs.controller';
 import { PacksRepository } from './packs.repository';
 import { PacksService } from './packs.service';
@@ -28,6 +29,7 @@ import { PacksService } from './packs.service';
     PacksAuthService,
     PacksDownloadsService,
     PacksCatalogService,
+    PacksMetaService,
     LauncherAuthGuard,
   ],
   exports: [PacksService],

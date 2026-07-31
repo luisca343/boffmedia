@@ -562,7 +562,78 @@
         "reused": "Already stored",
         "done": "Uploaded",
         "error": "Failed"
-      }
+      },
+      "minecraftHint": "From Mojang's official manifest",
+      "releasesOnly": "Releases only",
+      "includeSnapshots": "With snapshots",
+      "noLoaderBuilds": "No builds for that Minecraft version",
+      "noVersionsFound": "No matches",
+      "tagLatest": "latest",
+      "tagRecommended": "recommended",
+      "tagSnapshot": "snapshot",
+      "loading": "Loading…",
+      "projectType": "Type",
+      "type": {
+        "mod": "Mods",
+        "resourcepack": "Resource packs",
+        "shader": "Shaders",
+        "datapack": "Datapacks"
+      },
+      "sort": "Sort",
+      "sortBy": {
+        "downloads": "Downloads",
+        "follows": "Follows",
+        "updated": "Updated",
+        "relevance": "Relevance",
+        "name": "Name"
+      },
+      "categories": "Categories",
+      "allCategories": "All",
+      "added": "Added",
+      "loadMore": "Load more ({shown}/{total})",
+      "close": "Close",
+      "compatibleOnly": "Compatible",
+      "allFiles": "All",
+      "depsCount": "{count} dep.",
+      "linkSource": "Source",
+      "linkIssues": "Issues",
+      "linkWebsite": "Website",
+      "side": {
+        "client": {
+          "required": "Client: required",
+          "optional": "Client: optional",
+          "unsupported": "Server only"
+        },
+        "server": {
+          "required": "Server: required",
+          "optional": "Server: optional",
+          "unsupported": "Client only"
+        }
+      },
+      "viaDependency": "dependency",
+      "totalSize": "Total size: {size}",
+      "resolvingDependency": "Resolving dependency: {name}",
+      "depsSkipped": "Dependencies with no compatible version",
+      "depsAdded": "{count} dependencies added",
+      "importTitle": "Import",
+      "importArchive": "Import .mrpack or .zip",
+      "importHint": "A CurseForge pack is downloaded in full to compute its hashes: this can take a while.",
+      "importReading": "Reading archive…",
+      "importError": {
+        "notAZip": "That file is not a valid zip",
+        "unknownFormat": "Unrecognised pack format"
+      },
+      "importSkipped": "{count} files could not be imported",
+      "importDone": "{count} files imported",
+      "editVersion": "Edit version",
+      "cloneVersion": "Clone version",
+      "versionUpdated": "Version updated",
+      "versionDeleted": "Version deleted",
+      "cloneFailed": "Could not load the source version",
+      "deleteFailed": "Could not delete",
+      "clone": "Clone",
+      "edit": "Edit",
+      "delete": "Delete"
     }
   },
   "tournaments": {

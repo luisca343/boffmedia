@@ -562,7 +562,78 @@
         "reused": "Ya estaba",
         "done": "Subido",
         "error": "Error"
-      }
+      },
+      "minecraftHint": "Desde el manifiesto oficial de Mojang",
+      "releasesOnly": "Solo releases",
+      "includeSnapshots": "Con snapshots",
+      "noLoaderBuilds": "No hay builds para esa versión de Minecraft",
+      "noVersionsFound": "Sin coincidencias",
+      "tagLatest": "última",
+      "tagRecommended": "recomendada",
+      "tagSnapshot": "snapshot",
+      "loading": "Cargando…",
+      "projectType": "Tipo",
+      "type": {
+        "mod": "Mods",
+        "resourcepack": "Recursos",
+        "shader": "Shaders",
+        "datapack": "Datapacks"
+      },
+      "sort": "Orden",
+      "sortBy": {
+        "downloads": "Descargas",
+        "follows": "Seguidores",
+        "updated": "Actualizado",
+        "relevance": "Relevancia",
+        "name": "Nombre"
+      },
+      "categories": "Categorías",
+      "allCategories": "Todas",
+      "added": "Añadido",
+      "loadMore": "Ver más ({shown}/{total})",
+      "close": "Cerrar",
+      "compatibleOnly": "Compatibles",
+      "allFiles": "Todos",
+      "depsCount": "{count} dep.",
+      "linkSource": "Código",
+      "linkIssues": "Incidencias",
+      "linkWebsite": "Web",
+      "side": {
+        "client": {
+          "required": "Cliente: obligatorio",
+          "optional": "Cliente: opcional",
+          "unsupported": "Solo servidor"
+        },
+        "server": {
+          "required": "Servidor: obligatorio",
+          "optional": "Servidor: opcional",
+          "unsupported": "Solo cliente"
+        }
+      },
+      "viaDependency": "dependencia",
+      "totalSize": "Tamaño total: {size}",
+      "resolvingDependency": "Resolviendo dependencia: {name}",
+      "depsSkipped": "Dependencias sin versión compatible",
+      "depsAdded": "{count} dependencias añadidas",
+      "importTitle": "Importar",
+      "importArchive": "Importar .mrpack o .zip",
+      "importHint": "Un pack de CurseForge se descarga entero para calcular sus hashes: puede tardar.",
+      "importReading": "Leyendo el archivo…",
+      "importError": {
+        "notAZip": "Ese archivo no es un zip válido",
+        "unknownFormat": "Formato de pack no reconocido"
+      },
+      "importSkipped": "{count} archivos no se han podido importar",
+      "importDone": "{count} archivos importados",
+      "editVersion": "Editar versión",
+      "cloneVersion": "Clonar versión",
+      "versionUpdated": "Versión actualizada",
+      "versionDeleted": "Versión borrada",
+      "cloneFailed": "No se ha podido cargar la versión de origen",
+      "deleteFailed": "No se ha podido borrar",
+      "clone": "Clonar",
+      "edit": "Editar",
+      "delete": "Borrar"
     }
   },
   "tournaments": {
