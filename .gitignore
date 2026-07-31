@@ -20,6 +20,7 @@ apps/api/*.json
 /public/
 apps/*/public/
 laboon/
+apps/*/laboon
 
 # API runtime cache (imageCache.json etc.) — regenerable, never commit
 apps/api/var/

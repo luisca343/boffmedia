@@ -94,11 +94,13 @@ export async function apiMultipartPOST<T>(
 export async function apiAuthedAutoBinaryPOST<T>(
   url: string,
   body: Blob | ArrayBuffer,
+  extraHeaders?: Record<string, string>,
 ): Promise<ApiResponse<T>> {
   const res = await fetch(`${getApiUrl()}${url}`, {
     method: "POST",
     headers: {
       "Content-Type": "application/octet-stream",
+      ...extraHeaders,
       Authorization: `Bearer ${await sessionToken()}`,
     },
     body,

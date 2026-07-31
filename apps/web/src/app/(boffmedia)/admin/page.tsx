@@ -13,6 +13,7 @@ import { TeamsAdmin } from "./_sections/teams-admin"
 import { AchievementsAdmin } from "./_sections/achievements-admin"
 import { TournamentsAdmin } from "./_sections/tournaments-admin"
 import { PacksAdmin } from "./_sections/packs-admin"
+import { LauncherReleasesAdmin } from "./_sections/launcher-releases-admin"
 import { TcgpScraper } from "./_components/tools/TcgpScraper"
 import { VgcMetaPanel } from "./_components/tools/VgcMetaPanel"
 import MangaDownloader from "./_components/manga/MangaDownloader"
@@ -35,6 +36,7 @@ const NAV_META: { labelKey: string; items: { id: string; labelKey: string; icon:
     labelKey: "launcher",
     items: [
       { id: "packs", labelKey: "packs", icon: "cube" },
+      { id: "releases", labelKey: "releases", icon: "upload" },
     ],
   },
   {
@@ -96,6 +98,7 @@ function AdminContent() {
       {section === "achievements"      && <AchievementsAdmin />}
       {section === "tournaments"       && <TournamentsAdmin />}
       {section === "packs"             && <PacksAdmin />}
+      {section === "releases"          && <LauncherReleasesAdmin />}
       {section === "tcgp"              && <TcgpScraper />}
       {section === "vgc-meta"          && <VgcMetaPanel />}
       {section === "manga-downloader"  && <MangaDownloader />}
