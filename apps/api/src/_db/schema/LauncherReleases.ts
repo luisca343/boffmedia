@@ -37,8 +37,9 @@ export const launcherReleases = mysqlTable(
     /** Release notes shown in the updater dialog. Markdown, user-facing. */
     notes: text('notes'),
     /** File name on disk AND the name Tauri sees. The extension is load-bearing:
-     *  the updater picks its install strategy from it (.msi.zip, .nsis.zip,
-     *  .AppImage.tar.gz, .app.tar.gz), so it is never normalised away. */
+     *  the updater picks its install strategy from it (.msi, .exe, .msi.zip,
+     *  .nsis.zip, .AppImage.tar.gz, .app.tar.gz), so it is never normalised
+     *  away. */
     artifactName: varchar('artifact_name', { length: 255 }).notNull(),
     /** Computed from the bytes as they land, never taken from the client. */
     artifactSha512: char('artifact_sha512', { length: 128 }).notNull(),

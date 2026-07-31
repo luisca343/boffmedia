@@ -20,8 +20,21 @@ const linkType = isWindows ? 'junction' : 'dir';
 for (const link of links) {
   if (fs.existsSync(link)) {
     const stat = fs.lstatSync(link);
-    if (stat.isSymbolicLink() || (isWindows && stat.isDirectory())) {
+    const pointsToTarget = stat.isDirectory() && (() => {
+      try {
+        const current = fs.statSync(link);
+        const targetStat = fs.statSync(target);
+        return current.dev === targetStat.dev && current.ino === targetStat.ino;
+      } catch {
+        return false;
+      }
+    })();
+    if (stat.isSymbolicLink() || (isWindows && stat.isDirectory()) || pointsToTarget) {
       console.log(`✔  Already linked: ${link}`);
+      continue;
+    }
+    if (stat.isDirectory()) {
+      console.warn(`⚠  Existing directory is not linked, leaving untouched: ${link}`);
       continue;
     }
     // Plain file placeholder (e.g. committed via git) — remove it
@@ -31,4 +44,25 @@ for (const link of links) {
 
   fs.symlinkSync(target, link, linkType);
   console.log(`✔  Created ${isWindows ? 'junction' : 'symlink'}: ${link} → ${target}`);
+}
+
+// Launcher artifacts and pack override blobs are private API storage, not
+// public assets. Keep one ignored root shared directory so local WSL runs and
+// operator tooling use the same persistent paths without exposing them to the
+// web app.
+const laboon = path.join(root, 'laboon');
+fs.mkdirSync(path.join(laboon, 'pack-blobs'), { recursive: true });
+fs.mkdirSync(path.join(laboon, 'launcher-releases'), { recursive: true });
+
+const apiLaboon = path.join(root, 'apps', 'api', 'laboon');
+if (fs.existsSync(apiLaboon)) {
+  const stat = fs.lstatSync(apiLaboon);
+  if (stat.isSymbolicLink() || (isWindows && stat.isDirectory())) {
+    console.log(`✔  Already linked: ${apiLaboon}`);
+  } else {
+    console.warn(`⚠  Not a link, leaving untouched: ${apiLaboon}`);
+  }
+} else {
+  fs.symlinkSync(laboon, apiLaboon, linkType);
+  console.log(`✔  Created ${isWindows ? 'junction' : 'symlink'}: ${apiLaboon} → ${laboon}`);
 }
