@@ -14,6 +14,7 @@ import {
   AdminPackView,
   LauncherPackView,
   PackVersionView,
+  StoredPackFile,
 } from './types/packs.types';
 import { CreatePackDto, CreateVersionDto, UpdatePackDto } from './dto/packs.dto';
 
@@ -131,6 +132,47 @@ export class PacksService {
       );
     }
     return parsed.data;
+  }
+
+  /**
+   * The file-level gate behind every download route.
+   *
+   * Re-checks entitlement exactly like `manifestFor` does — the manifest and the
+   * download are separate requests and access can be revoked between them — and
+   * then requires the requested file to actually BE in that pack's published
+   * version. Without the second half the CurseForge proxy would be an open relay
+   * for our API key: anyone with a launcher session could name any projectId and
+   * make us fetch it.
+   */
+  async entitledFile(
+    uuid: string,
+    packId: string,
+    password: string | null,
+    match: (file: StoredPackFile) => boolean,
+  ): Promise<StoredPackFile> {
+    const pack = await this.repo.findById(packId);
+    if (!pack || pack.archived) throw new NotFoundException('Pack no encontrado');
+
+    await this.assertAccess(pack.id, pack.accessKind, pack.passwordHash, uuid, password);
+
+    const version = pack.latestVersionId
+      ? await this.repo.findVersion(pack.latestVersionId)
+      : null;
+    if (!version || !version.published) {
+      throw new NotFoundException('Este pack todavía no tiene ninguna versión publicada');
+    }
+
+    const file = (version.files as StoredPackFile[]).find(match);
+    if (!file) {
+      throw new NotFoundException('Ese archivo no pertenece a esta versión del pack');
+    }
+
+    await this.repo.audit(AUDIT.FILE_SERVED, pack.id, uuid, {
+      versionId: version.id,
+      path: file.path,
+      source: file.source.kind,
+    });
+    return file;
   }
 
   async redeemInvite(uuid: string, code: string): Promise<{ packId: string }> {

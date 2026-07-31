@@ -177,6 +177,10 @@ export class ManifestQueryDto {
   password?: string;
 }
 
+/** The download routes re-check entitlement exactly like the manifest route
+ *  does, so a password pack needs the password on every one of them too. */
+export class DownloadQueryDto extends ManifestQueryDto {}
+
 export class RedeemInviteDto {
   @ApiProperty()
   @IsString()

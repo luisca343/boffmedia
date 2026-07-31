@@ -5,6 +5,7 @@ import { AuthModule } from '@api/auth/auth.module';
 import { LauncherAuthGuard } from './guards/launcher-auth.guard';
 import { LauncherController } from './launcher.controller';
 import { PacksAuthService } from './packs-auth.service';
+import { PacksDownloadsService } from './packs-downloads.service';
 import { PacksController } from './packs.controller';
 import { PacksRepository } from './packs.repository';
 import { PacksService } from './packs.service';
@@ -16,11 +17,17 @@ import { PacksService } from './packs.service';
     // JwtModule — registering a second one here would put two JwtService
     // providers in scope for the same secret.
     AuthModule,
-    // Mojang's sessionserver — the hasJoined call in §7.2.
+    // Mojang's sessionserver (§7.2) and the CurseForge API/CDN proxy (§4.5).
     HttpModule,
   ],
   controllers: [PacksController, LauncherController],
-  providers: [PacksRepository, PacksService, PacksAuthService, LauncherAuthGuard],
+  providers: [
+    PacksRepository,
+    PacksService,
+    PacksAuthService,
+    PacksDownloadsService,
+    LauncherAuthGuard,
+  ],
   exports: [PacksService],
 })
 export class PacksModule {}

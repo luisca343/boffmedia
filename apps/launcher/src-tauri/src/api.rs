@@ -351,6 +351,123 @@ pub async fn pack_manifest(
     Ok(body.data)
 }
 
+// ── Payload downloads (§4.5, §7.2) ─────────────────────────────────────────
+
+/// Which of the two streaming routes to hit. Kept as an enum rather than a raw
+/// path so the 404 case can say something true: the two routes fail for very
+/// different reasons and the player can only act on one of them.
+#[derive(Debug, Clone)]
+pub enum PackFile {
+    /// §4.5 — proxied because edge.forgecdn.net 401s without `x-api-key`, and a
+    /// key shipped in the launcher is a key that gets extracted and revoked.
+    Curseforge { project_id: i64, file_id: i64 },
+    /// §7.2 — an authenticated stream, NOT a presigned URL. The blobs live on
+    /// the API's disk (PACK_BLOB_DIR); there is no object storage, so there is
+    /// nothing to sign and no indirection to build.
+    Override { sha512: String },
+}
+
+impl PackFile {
+    fn route(&self) -> String {
+        match self {
+            PackFile::Curseforge {
+                project_id,
+                file_id,
+            } => format!("curseforge/{project_id}/{file_id}"),
+            PackFile::Override { sha512 } => format!("override/{sha512}"),
+        }
+    }
+}
+
+/// Fetch one pack payload file, authenticated with the launcher session.
+///
+/// Returns the RAW response for streaming. These routes answer with bytes —
+/// `StreamableFile` passes through the global ResponseInterceptor untouched —
+/// so there is no `{ success, data }` envelope, and trying to decode one on
+/// success would consume the body and fail on the first jar.
+///
+/// Takes an `AppHandle` rather than `tauri::State` so a download task can own
+/// it: `authed` re-mints an expired session on a 401, and a multi-minute
+/// install is long enough for the launcher JWT to expire mid-batch.
+pub async fn fetch_pack_file(
+    app: &tauri::AppHandle,
+    pack_id: &str,
+    password: Option<&str>,
+    file: &PackFile,
+) -> Result<reqwest::Response, ApiError> {
+    use tauri::Manager;
+
+    let api = app.state::<ApiState>();
+    let auth = app.state::<AuthState>();
+
+    // Same precedent as the manifest call: a password gates the whole pack, so
+    // it has to ride on every download too, not just the first request.
+    let query: Vec<(String, String)> = password
+        .map(str::trim)
+        .filter(|p| !p.is_empty())
+        .map(|p| vec![("password".to_string(), p.to_string())])
+        .unwrap_or_default();
+
+    let route = file.route();
+    let res = authed(&api, &auth, |http, base| {
+        http.get(format!("{base}/packs/launcher/packs/{pack_id}/files/{route}"))
+            .query(&query)
+    })
+    .await?;
+
+    let status = res.status();
+    if status.is_success() {
+        return Ok(res);
+    }
+
+    Err(match status {
+        // The 404 body carries an actionable `userMessage` — for CurseForge it
+        // is the `allowModDistribution: false` case, where the ONLY fix is the
+        // player downloading the file by hand. Surfacing a generic "not found"
+        // instead would strand them with no idea what to do.
+        reqwest::StatusCode::NOT_FOUND => ApiError::Message(
+            error_message(res, &missing_fallback(file)).await,
+        ),
+        // Entitlement revoked between listing and download — §7.4's whole
+        // point. A hard failure, but not one that signing in again fixes.
+        reqwest::StatusCode::FORBIDDEN => ApiError::Denied(
+            error_message(res, "Ya no tienes acceso a este pack.").await,
+        ),
+        // Our CurseForge key is missing or was rejected: a server-side problem
+        // the player can do nothing about except retry later.
+        reqwest::StatusCode::SERVICE_UNAVAILABLE => ApiError::Message(
+            error_message(
+                res,
+                "El servidor no puede descargar de CurseForge ahora mismo. Inténtalo más tarde.",
+            )
+            .await,
+        ),
+        reqwest::StatusCode::BAD_GATEWAY => ApiError::Message(
+            error_message(res, "CurseForge no responde. Inténtalo más tarde.").await,
+        ),
+        other => ApiError::Message(
+            error_message(res, &format!("La descarga falló ({other})."))
+                .await,
+        ),
+    })
+}
+
+fn missing_fallback(file: &PackFile) -> String {
+    match file {
+        PackFile::Curseforge { .. } => {
+            "El servidor no encuentra este archivo de CurseForge para esta versión del pack."
+                .to_string()
+        }
+        // Distinguishable on purpose: this is overwhelmingly "nobody has
+        // uploaded the blob yet", not a network fault. See the TODO in
+        // install/files.rs.
+        PackFile::Override { sha512 } => format!(
+            "El servidor no tiene el archivo de configuración {}… de este pack. Falta subirlo.",
+            &sha512[..8.min(sha512.len())]
+        ),
+    }
+}
+
 /// Redeem an invite code (§7.3). Returns the pack it unlocked so the UI can
 /// jump straight to it.
 #[tauri::command]

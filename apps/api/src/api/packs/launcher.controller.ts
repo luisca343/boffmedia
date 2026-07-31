@@ -5,11 +5,15 @@ import {
   HttpCode,
   HttpStatus,
   Param,
+  ParseIntPipe,
   Post,
   Query,
   Req,
+  Res,
+  StreamableFile,
   UseGuards,
 } from '@nestjs/common';
+import { Response } from 'express';
 import {
   ApiBearerAuth,
   ApiOperation,
@@ -20,7 +24,13 @@ import { Public } from '@api/_utils/decorators/public.decorator';
 import { LauncherAuthGuard, LauncherRequest } from './guards/launcher-auth.guard';
 import { PacksAuthService } from './packs-auth.service';
 import { PacksService } from './packs.service';
-import { ManifestQueryDto, RedeemInviteDto, VerifyJoinDto } from './dto/packs.dto';
+import { PacksDownloadsService, ProxiedDownload } from './packs-downloads.service';
+import {
+  DownloadQueryDto,
+  ManifestQueryDto,
+  RedeemInviteDto,
+  VerifyJoinDto,
+} from './dto/packs.dto';
 import {
   JoinChallengeEntity,
   LauncherPackEntity,
@@ -40,6 +50,7 @@ export class LauncherController {
   constructor(
     private readonly auth: PacksAuthService,
     private readonly packs: PacksService,
+    private readonly downloads: PacksDownloadsService,
   ) {}
 
   @Post('auth/challenge')
@@ -96,6 +107,82 @@ export class LauncherController {
     @Req() req: LauncherRequest,
   ): Promise<unknown> {
     return this.packs.manifestFor(req.launcher!.uuid, id, query.password ?? null);
+  }
+
+  // ── Downloads (§6 installs are blocked without these) ────────────────────
+
+  @Get('packs/:id/files/curseforge/:projectId/:fileId')
+  @Public()
+  @UseGuards(LauncherAuthGuard)
+  @ApiBearerAuth('JWT')
+  @ApiOperation({
+    summary: 'Proxy de descarga de CurseForge',
+    description:
+      '§4.5 — la clave de CurseForge nunca sale del servidor: edge.forgecdn.net devuelve 401 sin x-api-key desde el 16/07/2026 y una clave incrustada acaba extraída. Revalida el acceso y exige que el archivo pertenezca a la versión publicada del pack.',
+  })
+  async curseforge(
+    @Param('id') id: string,
+    @Param('projectId', ParseIntPipe) projectId: number,
+    @Param('fileId', ParseIntPipe) fileId: number,
+    @Query() query: DownloadQueryDto,
+    @Req() req: LauncherRequest,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<StreamableFile> {
+    await this.packs.entitledFile(
+      req.launcher!.uuid,
+      id,
+      query.password ?? null,
+      (file) =>
+        file.source.kind === 'curseforge' &&
+        file.source.projectId === projectId &&
+        file.source.fileId === fileId,
+    );
+
+    return this.stream(res, await this.downloads.curseforge(projectId, fileId));
+  }
+
+  @Get('packs/:id/files/override/:sha512')
+  @Public()
+  @UseGuards(LauncherAuthGuard)
+  @ApiBearerAuth('JWT')
+  @ApiOperation({
+    summary: 'Descargar un blob de override',
+    description:
+      '§7.2 pide una URL firmada de corta duración, lo que presupone almacenamiento de objetos; los blobs viven en disco (PACK_BLOB_DIR), así que no hay nada que firmar y se sirven aquí, detrás del mismo guard. Nunca hay una URL pública.',
+  })
+  async override(
+    @Param('id') id: string,
+    @Param('sha512') sha512: string,
+    @Query() query: DownloadQueryDto,
+    @Req() req: LauncherRequest,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<StreamableFile> {
+    const blob = sha512.toLowerCase();
+    await this.packs.entitledFile(
+      req.launcher!.uuid,
+      id,
+      query.password ?? null,
+      (file) => file.source.kind === 'override' && file.source.blobSha512 === blob,
+    );
+
+    return this.stream(res, await this.downloads.override(blob));
+  }
+
+  /** The ResponseInterceptor passes a StreamableFile through untouched, so these
+   *  routes return raw bytes rather than the usual `{ success, data }` envelope
+   *  — the launcher writes them straight to disk and hashes them. */
+  private stream(res: Response, download: ProxiedDownload): StreamableFile {
+    res.setHeader('Content-Type', download.contentType);
+    if (download.contentLength !== null) {
+      // Without this the launcher cannot show a progress bar, which for a
+      // 200 MB modpack is the whole difference between "working" and "frozen".
+      res.setHeader('Content-Length', String(download.contentLength));
+    }
+    res.setHeader(
+      'Content-Disposition',
+      `attachment; filename="${download.filename.replace(/"/g, '')}"`,
+    );
+    return new StreamableFile(download.stream);
   }
 
   @Post('invites/redeem')
