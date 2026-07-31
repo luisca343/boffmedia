@@ -84,21 +84,34 @@ export class PacksRepository {
 
   // ── Versions ─────────────────────────────────────────────────────────────
 
+  /**
+   * MariaDB implements JSON as a LONGTEXT alias, so mysql2 hands `files` back as
+   * a raw string instead of the array `json()` types it as. Every read goes
+   * through here so the service can trust the declared type: without it the
+   * manifest fails its own schema validation with "expected array, received
+   * string" on a perfectly good row.
+   */
+  private hydrate(row: PackVersion): PackVersion {
+    if (typeof row.files !== 'string') return row;
+    return { ...row, files: JSON.parse(row.files) as unknown[] };
+  }
+
   async findVersion(id: string): Promise<PackVersion | null> {
     const [row] = await this.db
       .select()
       .from(packVersions)
       .where(eq(packVersions.id, id))
       .limit(1);
-    return row ?? null;
+    return row ? this.hydrate(row) : null;
   }
 
   async listVersions(packId: string): Promise<PackVersion[]> {
-    return this.db
+    const rows = await this.db
       .select()
       .from(packVersions)
       .where(eq(packVersions.packId, packId))
       .orderBy(desc(packVersions.createdAt));
+    return rows.map((row) => this.hydrate(row));
   }
 
   async insertVersion(row: NewPackVersion): Promise<void> {
