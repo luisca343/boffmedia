@@ -111,6 +111,48 @@ export async function authLogout(): Promise<void> {
   await invoke("auth_logout")
 }
 
+/** Open Microsoft's page in the SYSTEM browser, with the code pre-filled.
+ *  Never navigate the launcher window there: an embedded Microsoft login is
+ *  precisely what the device-code flow exists to avoid. */
+export async function authOpenVerification(fallbackUrl: string): Promise<void> {
+  if (!isDesktop()) {
+    window.open(fallbackUrl, "_blank", "noopener,noreferrer")
+    return
+  }
+  try {
+    await invoke("auth_open_verification")
+  } catch (err) {
+    throw asFailure(err)
+  }
+}
+
+/** Copy text, working in the Tauri webview and in a plain browser tab.
+ *  Returns false rather than throwing so the UI can just say "copy failed"
+ *  next to a code the user can still select by hand. */
+export async function copyText(text: string): Promise<boolean> {
+  try {
+    // Requires a secure context; tauri://localhost qualifies, but a plain
+    // http:// dev server on a LAN address does not — hence the fallback.
+    await navigator.clipboard.writeText(text)
+    return true
+  } catch {
+    try {
+      const el = document.createElement("textarea")
+      el.value = text
+      el.setAttribute("readonly", "")
+      el.style.position = "fixed"
+      el.style.opacity = "0"
+      document.body.appendChild(el)
+      el.select()
+      const ok = document.execCommand("copy")
+      document.body.removeChild(el)
+      return ok
+    } catch {
+      return false
+    }
+  }
+}
+
 // ── Pack registry (HANDOFF §7) ─────────────────────────────────────────────
 // The HTTP lives in Rust: minting a pack session needs the Minecraft access
 // token for Mojang's join handshake, and that token never crosses this

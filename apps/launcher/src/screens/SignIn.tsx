@@ -1,6 +1,31 @@
+import { useState } from "react"
+
 import { Badge, Button, Icon, Kicker, Panel, Spinner } from "@boffmedia/ui"
 
+import { authOpenVerification, copyText } from "../runtime"
 import { useLauncher } from "../state/launcher"
+
+/** A button that reports what happened, because a copy that silently does
+ *  nothing is worse than no button at all. */
+function CopyButton({ value, label }: { value: string; label: string }) {
+  const [state, setState] = useState<"idle" | "ok" | "fail">("idle")
+
+  return (
+    <Button
+      size="sm"
+      variant="ghost"
+      icon={state === "ok" ? "check" : "copy"}
+      onClick={() => {
+        void copyText(value).then((ok) => {
+          setState(ok ? "ok" : "fail")
+          setTimeout(() => setState("idle"), 2000)
+        })
+      }}
+    >
+      {state === "ok" ? "Copiado" : state === "fail" ? "No se pudo" : label}
+    </Button>
+  )
+}
 
 // HANDOFF §5.1 — the Microsoft device-code flow. The user reads a short code
 // here and types it into microsoft.com/link in a real browser; we poll until
@@ -57,14 +82,17 @@ export function SignIn() {
                 <span className="cut-seal grid h-6 w-6 shrink-0 place-items-center bg-accent text-[12px] font-bold text-accent-ink [--cut:5px]">
                   1
                 </span>
-                <div className="min-w-0">
-                  <p className="text-sm text-txt">Abre esta dirección en tu navegador:</p>
-                  <a
-                    href={deviceCode.verificationUri}
-                    className="font-mono text-sm text-accent-bright underline"
-                  >
-                    {deviceCode.verificationUri}
-                  </a>
+                <div className="min-w-0 flex-1">
+                  <p className="mb-2 text-sm text-txt">
+                    Copia este código — lo necesitarás en el navegador:
+                  </p>
+                  {/* Selectable, so it works even if the clipboard is denied. */}
+                  <div className="cut select-text border-2 border-solid border-accent-line bg-base-deep px-5 py-3 text-center font-display text-[30px]/none font-bold tracking-[0.24em] text-accent-bright">
+                    {deviceCode.userCode}
+                  </div>
+                  <div className="mt-2 flex justify-center">
+                    <CopyButton value={deviceCode.userCode} label="Copiar código" />
+                  </div>
                 </div>
               </li>
               <li className="flex gap-3">
@@ -72,10 +100,27 @@ export function SignIn() {
                   2
                 </span>
                 <div className="min-w-0 flex-1">
-                  <p className="mb-2 text-sm text-txt">Introduce este código:</p>
-                  <div className="cut border-2 border-solid border-accent-line bg-base-deep px-5 py-3 text-center font-display text-[30px]/none font-bold tracking-[0.24em] text-accent-bright">
-                    {deviceCode.userCode}
+                  <p className="text-sm text-txt">
+                    Abre Microsoft en tu navegador. El código va ya incluido en el enlace.
+                  </p>
+                  <div className="mt-2 flex flex-wrap items-center gap-2">
+                    <Button
+                      size="sm"
+                      variant="pri"
+                      icon="external"
+                      onClick={() => {
+                        void authOpenVerification(deviceCode.verificationUri).catch(
+                          () => undefined,
+                        )
+                      }}
+                    >
+                      Abrir en el navegador
+                    </Button>
+                    <CopyButton value={deviceCode.verificationUri} label="Copiar enlace" />
                   </div>
+                  <p className="mt-2 select-text font-mono text-[11px] text-txt-dim">
+                    {deviceCode.verificationUri}
+                  </p>
                 </div>
               </li>
             </ol>

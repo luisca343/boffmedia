@@ -189,6 +189,8 @@ export function LauncherProvider({ children }: { children: React.ReactNode }) {
   // Guards the install/play simulations against double-invocation; also the
   // hook the real implementation uses to abort in-flight work on unmount.
   const busy = React.useRef<Set<string>>(new Set())
+  // Survives StrictMode's double mount — see the restore effect below.
+  const restoreStarted = React.useRef(false)
 
   const log = React.useCallback((line: Omit<LogLine, "ts">) => {
     dispatch({ type: "log", line: { ...line, ts: Date.now() } })
@@ -235,11 +237,20 @@ export function LauncherProvider({ children }: { children: React.ReactNode }) {
     }
   }, [log])
 
-  // Silent sign-in on start. A THROW here is a credential-store failure, which
-  // §5.7 says must never be mistaken for a first run — so it is logged loudly
-  // rather than swallowed into "please sign in".
+  // Silent sign-in on start. A THROW here is a real failure — a credential
+  // store that could not be read, or Minecraft refusing the chain — and §5.7
+  // says it must never be swallowed into "please sign in". The Rust side
+  // already writes each of those as a sentence for a player, so it is logged
+  // VERBATIM: wrapping it in "no se pudo leer el almacén de credenciales" was
+  // how a Minecraft 429 came to be reported as a keychain problem.
   React.useEffect(() => {
     if (!isDesktop()) return
+    // StrictMode mounts this effect twice in dev. Two restores in flight means
+    // two runs of the four-hop chain, and Minecraft rate-limits the second.
+    // The Rust side serialises them too; this just avoids the round trip.
+    if (restoreStarted.current) return
+    restoreStarted.current = true
+
     void authRestore()
       .then((account) => {
         if (!account) return
@@ -250,7 +261,7 @@ export function LauncherProvider({ children }: { children: React.ReactNode }) {
         log({
           level: "error",
           source: "launcher",
-          text: `No se pudo leer el almacén de credenciales: ${err?.message ?? "desconocido"}`,
+          text: err?.message ?? "No se pudo restaurar la sesión.",
         })
       })
   }, [log])

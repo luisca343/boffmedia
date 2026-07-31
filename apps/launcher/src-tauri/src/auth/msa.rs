@@ -57,6 +57,12 @@ pub enum AuthError {
     #[error("el registro de la aplicación no está aprobado por Microsoft")]
     AppNotApproved,
 
+    /// Minecraft's services rate-limit per account, and the whole chain runs
+    /// again on every restore. Signing in again does NOT fix this — waiting
+    /// does — so it must never be reported as a session problem.
+    #[error("Minecraft está limitando las peticiones de tu cuenta. Espera un minuto y vuelve a intentarlo.")]
+    RateLimited,
+
     #[error("respuesta inesperada de {0}: {1}")]
     Unexpected(&'static str, String),
 }
@@ -311,6 +317,9 @@ pub async fn minecraft_session(
         if status == reqwest::StatusCode::FORBIDDEN {
             return Err(AuthError::AppNotApproved);
         }
+        if status == reqwest::StatusCode::TOO_MANY_REQUESTS {
+            return Err(AuthError::RateLimited);
+        }
         if !status.is_success() {
             return Err(AuthError::Unexpected("login_with_xbox", body));
         }
@@ -329,6 +338,9 @@ pub async fn minecraft_session(
             .bearer_auth(&mc_access_token)
             .send()
             .await?;
+        if res.status() == reqwest::StatusCode::TOO_MANY_REQUESTS {
+            return Err(AuthError::RateLimited);
+        }
         if res.status() == reqwest::StatusCode::NOT_FOUND {
             return Err(AuthError::NoProfile(
                 "Esta cuenta no tiene un perfil de Minecraft: Java Edition. \

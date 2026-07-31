@@ -46,6 +46,10 @@ keyring = { version = "3", features = ["apple-native", "windows-native", "sync-s
 # token for the keychain), so the launcher makes these calls itself.
 reqwest = { version = "0.12", features = ["json"] }
 tokio = { version = "1", features = ["time", "sync"] }
+# §5.1 — the device-code page must open in the SYSTEM browser. A narrow command
+# using this beats tauri-plugin-opener, whose purpose is handing the RENDERER a
+# general opener; see `auth::auth_open_verification`.
+open = "5"
 
 [features]
 # Enabled by `tauri build --debug`.
