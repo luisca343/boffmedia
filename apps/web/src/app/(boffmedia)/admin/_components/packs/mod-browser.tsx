@@ -141,8 +141,10 @@ export function ModBrowser({
   }
 
   return (
-    <div className="flex flex-col gap-3">
-      <div className="flex flex-wrap items-center gap-2">
+    // flex-1 rather than h-full: the selector column also holds a progress
+    // line, and 100% height would overflow it whenever that line shows.
+    <div className="flex min-h-0 flex-1 flex-col gap-3">
+      <div className="flex flex-wrap items-center gap-2 shrink-0">
         <Seg
           value={platform}
           onChange={(v) => {
@@ -191,12 +193,14 @@ export function ModBrowser({
         {loading && <Spinner size={16} className="text-txt-muted" />}
       </div>
 
-      <div className="flex gap-3">
-        <aside className="hidden w-[170px] shrink-0 flex-col gap-1 md:flex">
-          <span className="font-display text-[11px] font-bold uppercase tracking-[0.08em] text-txt-dim">
+      {/* The three panes each own their scroll, so the page itself never grows:
+          categories · results · the selected project. */}
+      <div className="flex min-h-0 flex-1 gap-3">
+        <aside className="hidden w-[180px] shrink-0 flex-col gap-1 md:flex">
+          <span className="shrink-0 font-display text-[11px] font-bold uppercase tracking-[0.08em] text-txt-dim">
             {t("categories")}
           </span>
-          <ul className="flex max-h-[420px] flex-col overflow-auto">
+          <ul className="bm-scroll flex min-h-0 flex-1 flex-col overflow-auto">
             <li>
               <button
                 type="button"
@@ -226,23 +230,25 @@ export function ModBrowser({
           </ul>
         </aside>
 
-        <div className="min-w-0 flex-1">
+        <div className="flex min-h-0 min-w-0 flex-1 flex-col">
           {hits.length === 0 && !loading ? (
             <p className="border border-solid border-line bg-panel px-3 py-4 font-body text-[12px] text-txt-dim">
               {t("noModResults")}
             </p>
           ) : (
             <>
-              <ul className="grid max-h-[420px] gap-2 overflow-auto sm:grid-cols-2">
+              {/* auto-fill, not a fixed column count: a 2560px screen shows five
+                  cards per row instead of two very wide ones. */}
+              <ul className="bm-scroll grid min-h-0 flex-1 auto-rows-min content-start gap-2 overflow-auto pr-1 [grid-template-columns:repeat(auto-fill,minmax(260px,1fr))]">
                 {hits.map((hit) => {
                   const added = isAdded(hit.platform, hit.projectId)
                   return (
-                    <li key={`${hit.platform}:${hit.projectId}`}>
+                    <li key={`${hit.platform}:${hit.projectId}`} className="h-full">
                       <button
                         type="button"
                         onClick={() => setSelected(hit)}
                         className={cn(
-                          "flex w-full items-start gap-2 border border-solid bg-panel px-2 py-2 text-left",
+                          "flex h-full w-full items-start gap-2 border border-solid bg-panel px-2 py-2 text-left",
                           selected?.projectId === hit.projectId ? "border-acc" : "border-line",
                         )}
                       >
@@ -271,10 +277,10 @@ export function ModBrowser({
                               </Badge>
                             )}
                           </span>
-                          <span className="line-clamp-2 font-body text-[11px] text-txt-dim">
+                          <span className="line-clamp-1 font-body text-[11px] text-txt-dim">
                             {hit.summary}
                           </span>
-                          <span className="flex items-center gap-2 font-mono text-[10px] text-txt-muted">
+                          <span className="mt-auto flex items-center gap-2 font-mono text-[10px] text-txt-muted">
                             <Icon name="download" size={11} />
                             {compactCount(hit.downloads)}
                             {hit.author ? ` · ${hit.author}` : ""}
@@ -286,7 +292,7 @@ export function ModBrowser({
                 })}
               </ul>
               {canLoadMore && (
-                <div className="mt-2 flex justify-center">
+                <div className="mt-2 flex shrink-0 justify-center">
                   <Button size="sm" variant="ghost" onClick={() => setPage((p) => p + 1)}>
                     {t("loadMore", { shown: hits.length, total })}
                   </Button>
@@ -295,17 +301,34 @@ export function ModBrowser({
             </>
           )}
         </div>
+
+        {selected && (
+          <div className="bm-scroll hidden min-h-0 w-[400px] shrink-0 overflow-auto lg:block 2xl:w-[480px]">
+            <ProjectDetail
+              hit={selected}
+              gameVersion={gameVersion}
+              loader={projectType === "mod" ? loader : undefined}
+              onClose={() => setSelected(null)}
+              onAdd={onAdd}
+              busyKey={busyKey}
+            />
+          </div>
+        )}
       </div>
 
+      {/* Below lg there is no room for a third pane, so the detail goes back
+          under the results rather than vanishing. */}
       {selected && (
-        <ProjectDetail
-          hit={selected}
-          gameVersion={gameVersion}
-          loader={projectType === "mod" ? loader : undefined}
-          onClose={() => setSelected(null)}
-          onAdd={onAdd}
-          busyKey={busyKey}
-        />
+        <div className="shrink-0 lg:hidden">
+          <ProjectDetail
+            hit={selected}
+            gameVersion={gameVersion}
+            loader={projectType === "mod" ? loader : undefined}
+            onClose={() => setSelected(null)}
+            onAdd={onAdd}
+            busyKey={busyKey}
+          />
+        </div>
       )}
     </div>
   )

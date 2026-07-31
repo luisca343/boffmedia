@@ -81,7 +81,15 @@ function AdminContent() {
   }
 
   return (
-    <AvShell nav={nav} section={section} onNavigate={navigate} loading={status === "loading"}>
+    <AvShell
+      nav={nav}
+      section={section}
+      onNavigate={navigate}
+      loading={status === "loading"}
+      // Packs is an app, not a document: it wants the whole viewport and
+      // manages its own scrolling. The rest keep the reading measure.
+      fluid={section === "packs"}
+    >
       {section === "games"             && <GamesAdmin />}
       {section === "events"            && <EventsAdmin />}
       {section === "teams"             && <TeamsAdmin />}
