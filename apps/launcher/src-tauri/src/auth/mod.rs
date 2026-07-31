@@ -40,6 +40,13 @@ impl From<&McSession> for AccountView {
 pub struct AuthState {
     pending: Mutex<Option<DeviceCode>>,
     session: Mutex<Option<McSession>>,
+    /// Serialises `auth_restore`. React StrictMode invokes the restore effect
+    /// TWICE in dev, and two concurrent runs of the four-hop chain get the
+    /// second one rate-limited by Minecraft (429 TOO_MANY_REQUESTS) — which
+    /// then surfaced as a bogus "the credential store failed". Guarding here
+    /// rather than only in the renderer means a window reload, a retry and a
+    /// future caller are all covered by the same lock.
+    restoring: Mutex<()>,
 }
 
 impl AuthState {
@@ -125,6 +132,40 @@ pub async fn auth_await(
     Ok(view)
 }
 
+/// Open Microsoft's verification page in the SYSTEM browser.
+///
+/// Takes no URL from the renderer on purpose: it can only ever open the code
+/// currently pending, so it cannot be turned into a general "open any URL"
+/// primitive. That is also why `tauri-plugin-opener` is not used — the plugin
+/// exists to give the *renderer* an opener, which this app does not want.
+///
+/// Letting the `<a href>` navigate instead put Microsoft's login inside our own
+/// window, which is exactly the embedded-webview sign-in §5.1 rules out.
+#[tauri::command]
+pub async fn auth_open_verification(state: tauri::State<'_, AuthState>) -> Result<(), AuthFailure> {
+    let code = state
+        .pending
+        .lock()
+        .await
+        .clone()
+        .ok_or_else(|| AuthFailure {
+            message: "No hay ningún acceso en curso.".into(),
+            needs_signin: true,
+        })?;
+
+    // `?otc=` pre-fills the code on microsoft.com/link, so the common path is
+    // one click rather than transcribing the code by hand. An endpoint that
+    // does not understand the parameter just shows its normal entry form.
+    let url = format!("{}?otc={}", code.verification_uri, code.user_code);
+
+    // Detached: `open::that` waits on the spawned process, which would hold
+    // this command open for as long as the browser runs.
+    open::that_detached(&url).map_err(|e| AuthFailure {
+        message: format!("No se pudo abrir el navegador: {e}"),
+        needs_signin: false,
+    })
+}
+
 /// Silent sign-in on launch. `Ok(None)` means "no stored session, show the
 /// sign-in screen"; an Err means the credential store itself failed, which
 /// §5.7 insists must not be mistaken for a first run.
@@ -132,6 +173,15 @@ pub async fn auth_await(
 pub async fn auth_restore(
     state: tauri::State<'_, AuthState>,
 ) -> Result<Option<AccountView>, AuthFailure> {
+    // Only one restore may be in flight; a second caller waits here rather than
+    // starting a competing chain that Minecraft would rate-limit.
+    let _restoring = state.restoring.lock().await;
+
+    // Whoever we queued behind may have already finished the work.
+    if let Some(session) = state.session.lock().await.as_ref() {
+        return Ok(Some(AccountView::from(session)));
+    }
+
     let Some(refresh) = store::load_refresh_token()? else {
         return Ok(None);
     };
