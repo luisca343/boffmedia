@@ -162,6 +162,11 @@ const PLATFORMS = ['curseforge', 'modrinth'] as const;
 /** The loader names both APIs understand; CurseForge maps them to its numeric
  *  modLoaderType, Modrinth uses them verbatim as category facets. */
 const CATALOG_LOADERS = ['forge', 'neoforge', 'fabric', 'quilt'] as const;
+/** A pack ships more than jars, and each platform files these separately. */
+const PROJECT_TYPES = ['mod', 'resourcepack', 'shader', 'datapack'] as const;
+const CATALOG_SORTS = ['relevance', 'downloads', 'updated', 'name', 'follows'] as const;
+/** The manifest's loader ids — NOT the catalog ones. */
+const META_LOADERS = ['forge', 'neoforge', 'fabric-loader', 'quilt-loader'] as const;
 
 export class CatalogSearchQueryDto {
   @ApiProperty({ enum: PLATFORMS })
@@ -199,6 +204,57 @@ export class CatalogSearchQueryDto {
   @Min(1)
   @Max(50)
   pageSize?: number;
+
+  @ApiPropertyOptional({ enum: PROJECT_TYPES, default: 'mod' })
+  @IsOptional()
+  @IsIn(PROJECT_TYPES)
+  projectType?: (typeof PROJECT_TYPES)[number];
+
+  @ApiPropertyOptional({ enum: CATALOG_SORTS, default: 'downloads' })
+  @IsOptional()
+  @IsIn(CATALOG_SORTS)
+  sort?: (typeof CATALOG_SORTS)[number];
+
+  @ApiPropertyOptional({
+    description: 'Id de categoría de CurseForge, o nombre de categoría de Modrinth',
+  })
+  @IsOptional()
+  @IsString()
+  @MaxLength(64)
+  category?: string;
+}
+
+export class CatalogCategoriesQueryDto {
+  @ApiProperty({ enum: PLATFORMS })
+  @IsIn(PLATFORMS)
+  platform!: (typeof PLATFORMS)[number];
+
+  @ApiPropertyOptional({ enum: PROJECT_TYPES, default: 'mod' })
+  @IsOptional()
+  @IsIn(PROJECT_TYPES)
+  projectType?: (typeof PROJECT_TYPES)[number];
+}
+
+export class CatalogProjectsQueryDto {
+  @ApiProperty({ enum: PLATFORMS })
+  @IsIn(PLATFORMS)
+  platform!: (typeof PLATFORMS)[number];
+
+  @ApiProperty({ description: 'Ids separados por coma' })
+  @IsString()
+  @MaxLength(2048)
+  ids!: string;
+}
+
+export class LoaderVersionsQueryDto {
+  @ApiProperty({ enum: META_LOADERS })
+  @IsIn(META_LOADERS)
+  loader!: (typeof META_LOADERS)[number];
+
+  @ApiProperty({ example: '1.21.4' })
+  @IsString()
+  @MaxLength(32)
+  minecraft!: string;
 }
 
 export class CatalogFilesQueryDto {

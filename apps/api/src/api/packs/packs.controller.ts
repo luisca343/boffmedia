@@ -26,9 +26,13 @@ import { USER_ROLES } from '@api/_utils/auth/roles.constants';
 import { PacksDownloadsService } from './packs-downloads.service';
 import { PacksService } from './packs.service';
 import { PacksCatalogService } from './packs-catalog.service';
+import { PacksMetaService } from './packs-meta.service';
 import {
+  CatalogCategoriesQueryDto,
   CatalogFilesQueryDto,
+  CatalogProjectsQueryDto,
   CatalogSearchQueryDto,
+  LoaderVersionsQueryDto,
   CreateInviteDto,
   CreatePackDto,
   CreateVersionDto,
@@ -40,9 +44,14 @@ import {
   AccessRowEntity,
   AdminPackEntity,
   BlobUploadEntity,
+  CategoryEntity,
+  GameVersionEntity,
   InviteCodeEntity,
+  LoaderVersionEntity,
   ModFileEntity,
+  ModProjectEntity,
   ModSearchHitEntity,
+  ModSearchPageEntity,
   PackIdEntity,
   PackVersionEntity,
   ResolvedFileEntity,
@@ -62,6 +71,7 @@ export class PacksController {
     private readonly packs: PacksService,
     private readonly downloads: PacksDownloadsService,
     private readonly catalog: PacksCatalogService,
+    private readonly meta: PacksMetaService,
   ) {}
 
   private actorId(req: { user?: { userId?: number } }): number | null {
@@ -129,12 +139,71 @@ export class PacksController {
   // ── Mod catalog ──────────────────────────────────────────────────────────
 
   @Get('catalog/search')
-  @ApiOperation({ summary: 'Buscar mods en CurseForge o Modrinth' })
-  @ApiResponse({ status: HttpStatus.OK, type: [ModSearchHitEntity] })
-  async catalogSearch(
-    @Query() query: CatalogSearchQueryDto,
-  ): Promise<ModSearchHitEntity[]> {
+  @ApiOperation({
+    summary: 'Buscar proyectos en CurseForge o Modrinth',
+    description:
+      'Sin `query` devuelve el catálogo ordenado por `sort`, que es lo que permite navegar sin buscar.',
+  })
+  @ApiResponse({ status: HttpStatus.OK, type: ModSearchPageEntity })
+  async catalogSearch(@Query() query: CatalogSearchQueryDto): Promise<ModSearchPageEntity> {
     return this.catalog.search(query);
+  }
+
+  @Get('catalog/categories')
+  @ApiOperation({ summary: 'Categorías de la plataforma' })
+  @ApiResponse({ status: HttpStatus.OK, type: [CategoryEntity] })
+  async catalogCategories(
+    @Query() query: CatalogCategoriesQueryDto,
+  ): Promise<CategoryEntity[]> {
+    return this.catalog.categories(query.platform, query.projectType ?? 'mod');
+  }
+
+  @Get('catalog/:platform/:projectId')
+  @ApiOperation({ summary: 'Ficha completa de un proyecto' })
+  @ApiResponse({ status: HttpStatus.OK, type: ModProjectEntity })
+  async catalogProject(
+    @Param('platform') platform: string,
+    @Param('projectId') projectId: string,
+  ): Promise<ModProjectEntity> {
+    return this.catalog.project(platform, projectId);
+  }
+
+  @Get('catalog/projects')
+  @ApiOperation({
+    summary: 'Resumen de varios proyectos por id',
+    description: 'Una sola llamada por plataforma: es como se nombran las dependencias.',
+  })
+  @ApiResponse({ status: HttpStatus.OK, type: [ModSearchHitEntity] })
+  async catalogProjects(
+    @Query() query: CatalogProjectsQueryDto,
+  ): Promise<ModSearchHitEntity[]> {
+    return this.catalog.projectSummaries(
+      query.platform,
+      query.ids.split(',').map((id) => id.trim()).filter(Boolean),
+    );
+  }
+
+  // ── Version metadata ─────────────────────────────────────────────────────
+
+  @Get('meta/minecraft')
+  @ApiOperation({
+    summary: 'Versiones de Minecraft',
+    description: 'Desde el manifiesto de Mojang, cacheado en el servidor.',
+  })
+  @ApiResponse({ status: HttpStatus.OK, type: [GameVersionEntity] })
+  async minecraftVersions(): Promise<GameVersionEntity[]> {
+    return this.meta.gameVersions();
+  }
+
+  @Get('meta/loader')
+  @ApiOperation({
+    summary: 'Versiones de un modloader para una versión de Minecraft',
+    description:
+      'Forge y NeoForge publican maven XML sin CORS, así que el proxy del servidor es obligatorio.',
+  })
+  @ApiResponse({ status: HttpStatus.OK, type: [LoaderVersionEntity] })
+  async loaderVersions(@Query() query: LoaderVersionsQueryDto): Promise<LoaderVersionEntity[]> {
+    return this.meta.loaderVersions(query.loader, query.minecraft);
   }
 
   @Get('catalog/curseforge/:projectId/files')
@@ -199,6 +268,47 @@ export class PacksController {
     @Req() req: { user?: { userId?: number } },
   ): Promise<PackIdEntity> {
     return this.packs.createVersion(id, dto, this.actorId(req));
+  }
+
+  @Get(':id/versions/:versionId')
+  @ApiOperation({
+    summary: 'Una versión con sus archivos',
+    description: 'Es el punto de partida de "clonar" y de la edición de borradores.',
+  })
+  async versionDetail(
+    @Param('id') id: string,
+    @Param('versionId') versionId: string,
+  ): Promise<PackVersionEntity & { files: unknown[] }> {
+    return this.packs.versionDetail(id, versionId) as Promise<
+      PackVersionEntity & { files: unknown[] }
+    >;
+  }
+
+  @Patch(':id/versions/:versionId')
+  @ApiOperation({
+    summary: 'Editar una versión en borrador',
+    description:
+      'Solo borradores: una versión publicada ya está instalada en los launchers y cambiar sus archivos rompería esas instalaciones.',
+  })
+  async updateVersion(
+    @Param('id') id: string,
+    @Param('versionId') versionId: string,
+    @Body() dto: CreateVersionDto,
+    @Req() req: { user?: { userId?: number } },
+  ): Promise<{ success: true }> {
+    await this.packs.updateVersion(id, versionId, dto, this.actorId(req));
+    return { success: true };
+  }
+
+  @Delete(':id/versions/:versionId')
+  @ApiOperation({ summary: 'Borrar una versión en borrador' })
+  async deleteVersion(
+    @Param('id') id: string,
+    @Param('versionId') versionId: string,
+    @Req() req: { user?: { userId?: number } },
+  ): Promise<{ success: true }> {
+    await this.packs.deleteVersion(id, versionId, this.actorId(req));
+    return { success: true };
   }
 
   @Post(':id/versions/:versionId/publish')
