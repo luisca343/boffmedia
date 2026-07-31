@@ -60,6 +60,20 @@ sha2 = "0.10"
 # using this beats tauri-plugin-opener, whose purpose is handing the RENDERER a
 # general opener; see `auth::auth_open_verification`.
 open = "5"
+# Auto-update. Not gated behind a desktop `cfg`: this launcher only ever targets
+# Windows/macOS/Linux, and a target table here would make `updates.rs` fail to
+# compile for a mobile target that will never be built anyway.
+tauri-plugin-updater = "2"
+
+# §9's memory heuristic needs one number: total physical RAM. Both crates were
+# ALREADY in Cargo.lock as transitive dependencies of tauri, so neither adds a
+# package to the build — which is why `sysinfo` was not reached for: it would
+# pull a whole process/disk/network enumerator in for a single sysconf call.
+[target.'cfg(unix)'.dependencies]
+libc = "0.2"
+
+[target.'cfg(windows)'.dependencies]
+windows-sys = { version = "0.59", features = ["Win32_System_SystemInformation"] }
 
 [features]
 # Enabled by `tauri build --debug`.

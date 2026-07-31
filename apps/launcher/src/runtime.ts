@@ -2,14 +2,31 @@ import { invoke } from "@tauri-apps/api/core"
 import { listen } from "@tauri-apps/api/event"
 import { getCurrentWindow } from "@tauri-apps/api/window"
 
-import { MOCK_SETTINGS, mockLogs } from "./services/mock"
+import { MOCK_CRASH_LOG, MOCK_DIAGNOSIS, MOCK_SETTINGS, mockLogs } from "./services/mock"
 import type {
   GameState,
   InstallPhase,
   InstallState,
+  InstanceRuntime,
+  JavaChoice,
   LogLine,
+  MemoryChoice,
+  OptionalFile,
+  ResolvedRuntime,
+  RetainedVersion,
+  RuntimeSource,
   Settings,
 } from "./services/types"
+
+export type {
+  InstanceRuntime,
+  JavaChoice,
+  MemoryChoice,
+  OptionalFile,
+  ResolvedRuntime,
+  RetainedVersion,
+  RuntimeSource,
+}
 
 // The single boundary between the renderer and the Rust shell. Keeping it in
 // one module means the six screens never import @tauri-apps directly, so they
@@ -373,6 +390,22 @@ export async function launchPack(packId: string, manifest: unknown): Promise<num
     await mockInstall(packId)
     busEmit<GameState>(EVENT_GAME_STATE, { kind: "running", pid: 4821, since: Date.now() })
     for (const line of mockLogs()) busEmit<LogLine>(EVENT_GAME_LOG, line)
+    // §9 — `?crash=1` replays a crashed session so the diagnosis UI is
+    // developable in a browser. Opt-in, because the default mock must still
+    // exercise the running state.
+    if (new URLSearchParams(location.search).get("crash") === "1") {
+      void (async () => {
+        await sleep(1200)
+        for (const [level, source, text] of MOCK_CRASH_LOG) {
+          busEmit<LogLine>(EVENT_GAME_LOG, { ts: Date.now(), level, source, text })
+        }
+        busEmit<GameState>(EVENT_GAME_STATE, {
+          kind: "crashed",
+          exitCode: 1,
+          diagnosis: MOCK_DIAGNOSIS,
+        })
+      })()
+    }
     return 4821
   }
   try {
@@ -422,6 +455,250 @@ export async function repairInstance(slug: string): Promise<ScannedInstallState>
     throw asFailure(err)
   }
 }
+
+// ── §9: locked vs. user space, and version rollback ────────────────────────
+// The Rust side keeps a MANAGED file set in the instance marker: everything the
+// launcher installed. Anything else under `.minecraft` is the player's and is
+// never touched, which is what lets an update delete a mod that left the pack
+// without eating the minimap they added themselves.
+//
+// Browser mode gets a module-scoped simulation rather than a constant, so the
+// toggle and revert screens are actually developable in `dev:renderer`.
+
+const mockOptional: OptionalFile[] = [
+  { path: "mods/journeymap.jar", name: "journeymap.jar", size: 4_200_000, enabled: true },
+  { path: "mods/shaders.jar", name: "shaders.jar", size: 1_800_000, enabled: false },
+]
+
+const mockVersions: RetainedVersion[] = [
+  {
+    versionId: "mock-3",
+    versionName: "1.4.0",
+    minecraft: "1.21.4",
+    loader: "neoforge",
+    loaderVersion: "21.4.30",
+    installedAt: new Date(Date.now() - 3_600_000).toISOString(),
+    fileCount: 182,
+    current: true,
+    revertible: true,
+  },
+  {
+    versionId: "mock-2",
+    versionName: "1.3.2",
+    minecraft: "1.21.4",
+    loader: "neoforge",
+    loaderVersion: "21.4.30",
+    installedAt: new Date(Date.now() - 86_400_000).toISOString(),
+    fileCount: 180,
+    current: false,
+    revertible: true,
+  },
+]
+
+/** Versions still on this machine, newest first. Never throws: an empty
+ *  rollback list is a normal state, not an error worth a red banner. */
+export async function instanceVersions(slug: string): Promise<RetainedVersion[]> {
+  if (!isDesktop()) return mockVersions
+  try {
+    return await invoke<RetainedVersion[]>("instance_versions", { slug })
+  } catch {
+    return []
+  }
+}
+
+/** One-click rollback. Replays the retained version's recorded file list from
+ *  the content-addressed cache, and PINS the instance so the next Play does not
+ *  quietly reinstall the version that broke. */
+export async function instanceRevert(
+  slug: string,
+  versionId: string,
+  password?: string,
+): Promise<ScannedInstallState> {
+  if (!isDesktop()) {
+    for (const v of mockVersions) v.current = v.versionId === versionId
+    return { kind: "installed", versionId, sizeBytes: 1_284_000_000 }
+  }
+  try {
+    return await invoke<ScannedInstallState>("instance_revert", {
+      slug,
+      versionId,
+      password: password ?? null,
+    })
+  } catch (err) {
+    throw asFailure(err)
+  }
+}
+
+/** Follow the server's latest version again. */
+export async function instanceUnpin(slug: string): Promise<ScannedInstallState> {
+  if (!isDesktop()) return { kind: "not-installed" }
+  try {
+    return await invoke<ScannedInstallState>("instance_unpin", { slug })
+  } catch (err) {
+    throw asFailure(err)
+  }
+}
+
+/** The pack's optional files. Empty before the first install — optional-ness
+ *  is a manifest fact the marker remembers, not something the disk can show. */
+export async function instanceOptional(slug: string): Promise<OptionalFile[]> {
+  if (!isDesktop()) return mockOptional.map((f) => ({ ...f }))
+  try {
+    return await invoke<OptionalFile[]>("instance_optional", { slug })
+  } catch {
+    return []
+  }
+}
+
+/** Switch one optional file on or off. Applied by the next install, update or
+ *  launch — all three run the same payload pass, so there is no apply button. */
+export async function instanceOptionalSet(
+  slug: string,
+  path: string,
+  enabled: boolean,
+): Promise<OptionalFile[]> {
+  if (!isDesktop()) {
+    const hit = mockOptional.find((f) => f.path === path)
+    if (hit) hit.enabled = enabled
+    return mockOptional.map((f) => ({ ...f }))
+  }
+  try {
+    return await invoke<OptionalFile[]>("instance_optional_set", { slug, path, enabled })
+  } catch (err) {
+    throw asFailure(err)
+  }
+}
+
+// ── §9: per-instance Java runtime + memory ─────────────────────────────────
+// The numbers are decided in Rust (install/runtime.rs), which is the only side
+// that can read physical RAM and the instance marker. What follows is the
+// bridge, plus a browser-mode simulation faithful enough that the three-state
+// panel is developable in `dev:renderer` — the mock mirrors the SAME formula so
+// the UI never learns to expect numbers the shell would not produce.
+
+const MOCK_TOTAL_RAM_MIB = 16384
+
+/** Mirrors `recommended_heap_mib` in src-tauri/src/install/runtime.rs. Browser
+ *  mode only — the desktop build never runs this, and the Rust unit tests are
+ *  the authority on the formula. */
+function mockRecommend(modCount: number, totalRamMib: number): number {
+  const want = 2560 + 12 * Math.min(modCount, 4096)
+  const ceiling = Math.min(Math.floor((totalRamMib * 3) / 5), totalRamMib - 2048)
+  const chosen = Math.min(want, ceiling, 16384)
+  return Math.max(Math.floor(chosen / 512) * 512, 1024)
+}
+
+const mockRuntime: { memory: MemoryChoice; java: JavaChoice } = {
+  memory: { mode: "inherit" },
+  java: { mode: "inherit" },
+}
+
+function mockResolve(): InstanceRuntime {
+  const modCount = 214
+  const recommendedMib = mockRecommend(modCount, MOCK_TOTAL_RAM_MIB)
+  const globalMemoryMib = MOCK_SETTINGS.memoryMib
+
+  const [heapMib, memorySource]: [number, RuntimeSource] =
+    mockRuntime.memory.mode === "fixed"
+      ? [mockRuntime.memory.mib, "override"]
+      : mockRuntime.memory.mode === "auto"
+        ? [recommendedMib, "auto"]
+        : MOCK_SETTINGS.memoryAuto
+          ? [recommendedMib, "auto"]
+          : [globalMemoryMib, "global"]
+
+  const [javaPath, javaSource]: [string | null, RuntimeSource] =
+    mockRuntime.java.mode === "custom"
+      ? [mockRuntime.java.path.trim() || null, "override"]
+      : mockRuntime.java.mode === "auto"
+        ? [null, "override"]
+        : [MOCK_SETTINGS.javaPath, "global"]
+
+  return {
+    over: { ...mockRuntime },
+    effective: {
+      heapMib,
+      memorySource,
+      javaPath,
+      javaSource,
+      modCount,
+      totalRamMib: MOCK_TOTAL_RAM_MIB,
+      recommendedMib,
+    },
+    globalMemoryMib,
+    globalMemoryAuto: MOCK_SETTINGS.memoryAuto,
+    globalJavaPath: MOCK_SETTINGS.javaPath,
+  }
+}
+
+/** This pack's Java/memory choice and what it currently resolves to. Never
+ *  throws: a runtime panel that cannot render is worse than one showing the
+ *  inherited defaults. */
+export async function instanceRuntime(slug: string): Promise<InstanceRuntime> {
+  if (!isDesktop()) return mockResolve()
+  try {
+    return await invoke<InstanceRuntime>("instance_runtime", { slug })
+  } catch {
+    return mockResolve()
+  }
+}
+
+/** Set this pack's Java and memory choice. Applied by the next install, update
+ *  or launch — all three re-resolve, so there is no apply button. */
+export async function instanceRuntimeSet(
+  slug: string,
+  memory: MemoryChoice,
+  java: JavaChoice,
+): Promise<InstanceRuntime> {
+  if (!isDesktop()) {
+    mockRuntime.memory = memory
+    mockRuntime.java = java
+    return mockResolve()
+  }
+  try {
+    return await invoke<InstanceRuntime>("instance_runtime_set", { slug, memory, java })
+  } catch (err) {
+    throw asFailure(err)
+  }
+}
+
+// ── Auto-update ────────────────────────────────────────────────────────────
+// The whole updater lives in Rust (src-tauri/src/updates.rs) so the feed host
+// can follow BOFF_API_URL like every other API call does. Here there is only
+// the bridge.
+
+export const EVENT_UPDATE_PROGRESS = "update://progress"
+
+export type UpdateInfo = {
+  version: string
+  currentVersion: string
+  notes: string | null
+  date: string | null
+}
+
+export type UpdateProgressEvent = {
+  downloadedBytes: number
+  /** null until the server's Content-Length is known. */
+  totalBytes: number | null
+}
+
+/** `null` = up to date (the feed answers 204) or no shell. THROWS a string when
+ *  the check itself failed — the startup path swallows that so an offline
+ *  player sees nothing, while a manual check can say so. */
+export async function updatesCheck(): Promise<UpdateInfo | null> {
+  if (!isDesktop()) return null
+  return await invoke<UpdateInfo | null>("updates_check")
+}
+
+/** Download + verify + install + relaunch. Never resolves on success — the
+ *  process is replaced. Throws a plain string message on failure. */
+export async function updatesInstall(): Promise<void> {
+  if (!isDesktop()) throw "Las actualizaciones solo funcionan en la aplicación de escritorio."
+  await invoke("updates_install")
+}
+
+export const onUpdateProgress = (fn: (e: UpdateProgressEvent) => void) =>
+  subscribe<UpdateProgressEvent>(EVENT_UPDATE_PROGRESS, fn)
 
 // ── Settings ───────────────────────────────────────────────────────────────
 

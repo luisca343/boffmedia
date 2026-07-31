@@ -34,6 +34,19 @@ impl LoaderKind {
             LoaderKind::QuiltLoader => "quilt-loader",
         }
     }
+
+    /// Inverse of `key()`. Needed by §9's rollback: a retained marker stores
+    /// the loader as the wire string, and reverting has to install THAT loader
+    /// rather than whatever the current manifest asks for.
+    pub fn from_key(key: &str) -> Option<Self> {
+        Some(match key {
+            "forge" => LoaderKind::Forge,
+            "neoforge" => LoaderKind::NeoForge,
+            "fabric-loader" => LoaderKind::FabricLoader,
+            "quilt-loader" => LoaderKind::QuiltLoader,
+            _ => return None,
+        })
+    }
 }
 
 /// How a planned file is obtained. Modrinth needs one API round-trip to turn a
@@ -62,6 +75,10 @@ pub struct PlannedFile {
     /// Configs and scripts go in the `overrides` phase, mods in `mods`; the two
     /// are separate bars in the UI and separate weights in progress.rs.
     pub is_mod: bool,
+    /// §9's optional-mod toggles. `env.client == "optional"` in `.mrpack`, so
+    /// this needs no addition to `packages/pack-schema` — `EnvSupport` already
+    /// has the three values and the manifest already carries them.
+    pub optional: bool,
 }
 
 #[derive(Debug, Clone)]
@@ -115,6 +132,7 @@ pub fn plan(manifest: &PackManifest) -> Result<InstallPlan, InstallFailure> {
         let normalised = path.replace('\\', "/").to_lowercase();
         files.push(PlannedFile {
             is_mod: normalised.starts_with("mods/"),
+            optional: file.env.client == EnvClient::Optional,
             path,
             sha512: file.sha512.to_string(),
             size,
@@ -201,6 +219,19 @@ mod tests {
     }
 
     #[test]
+    fn loader_keys_round_trip_so_a_retained_marker_reinstalls_the_same_loader() {
+        for kind in [
+            LoaderKind::Forge,
+            LoaderKind::NeoForge,
+            LoaderKind::FabricLoader,
+            LoaderKind::QuiltLoader,
+        ] {
+            assert_eq!(LoaderKind::from_key(kind.key()), Some(kind));
+        }
+        assert!(LoaderKind::from_key("liteloader").is_none());
+    }
+
+    #[test]
     fn vanilla_packs_have_no_loader() {
         let m = manifest(
             r#"{"minecraft":"1.21.4"}"#,
@@ -237,6 +268,25 @@ mod tests {
         let plan = plan(&m).unwrap();
         assert!(plan.files[0].is_mod);
         assert!(!plan.files[1].is_mod);
+    }
+
+    #[test]
+    fn optional_client_files_are_planned_and_flagged_not_skipped() {
+        // §9's toggles are a per-instance CHOICE, so the plan must still carry
+        // the file. Skipping it here (as `unsupported` is skipped) would make
+        // an optional mod impossible to enable at all.
+        let m = manifest(
+            r#"{"minecraft":"1.21.4"}"#,
+            &format!(
+                "{},{}",
+                file("mods/required.jar", "required", r#"{"kind":"url","url":"https://x.test/a"}"#),
+                file("mods/minimap.jar", "optional", r#"{"kind":"url","url":"https://x.test/b"}"#)
+            ),
+        );
+        let plan = plan(&m).unwrap();
+        assert_eq!(plan.files.len(), 2);
+        assert!(!plan.files[0].optional);
+        assert!(plan.files[1].optional);
     }
 
     #[test]

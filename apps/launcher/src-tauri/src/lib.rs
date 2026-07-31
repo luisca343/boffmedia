@@ -26,6 +26,7 @@ pub mod auth;
 pub mod install;
 pub mod pack;
 pub mod settings;
+pub mod updates;
 
 use serde::Serialize;
 
@@ -53,6 +54,10 @@ fn runtime_info(app: tauri::AppHandle) -> RuntimeInfo {
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
+        // The endpoint list from tauri.conf.json is only the default; every
+        // check re-points it at `api::base_url()` (see updates.rs).
+        .plugin(tauri_plugin_updater::Builder::new().build())
+        .manage(updates::UpdateState::default())
         .manage(auth::AuthState::default())
         .manage(api::ApiState::default())
         .manage(install::InstallManager::default())
@@ -71,9 +76,20 @@ pub fn run() {
             install::stop_game,
             install::instance_scan,
             install::repair_instance,
+            // §9 — locked vs. user space, and version rollback.
+            install::instance_versions,
+            install::instance_revert,
+            install::instance_unpin,
+            install::instance_optional,
+            install::instance_optional_set,
+            // §9 — per-instance Java runtime + memory.
+            install::instance_runtime,
+            install::instance_runtime_set,
             settings::settings_get,
             settings::settings_set,
             settings::plays_get,
+            updates::updates_check,
+            updates::updates_install,
         ])
         .run(tauri::generate_context!())
         .expect("error while running the Boff Launcher");

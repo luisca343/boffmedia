@@ -17,7 +17,7 @@ const JOIN_URL: &str = "https://sessionserver.mojang.com/session/minecraft/join"
 /// Where the pack registry lives. A runtime env var wins so a QA build can be
 /// pointed at a staging API without a rebuild; the compile-time value is what
 /// packaged builds carry.
-fn base_url() -> String {
+pub fn base_url() -> String {
     if let Ok(url) = std::env::var("BOFF_API_URL") {
         if !url.trim().is_empty() {
             return url.trim_end_matches('/').to_string();
@@ -458,9 +458,8 @@ fn missing_fallback(file: &PackFile) -> String {
             "El servidor no encuentra este archivo de CurseForge para esta versión del pack."
                 .to_string()
         }
-        // Distinguishable on purpose: this is overwhelmingly "nobody has
-        // uploaded the blob yet", not a network fault. See the TODO in
-        // install/files.rs.
+        // Distinguishable on purpose: this is overwhelmingly "nobody ran the
+        // admin blob upload for this version yet", not a network fault.
         PackFile::Override { sha512 } => format!(
             "El servidor no tiene el archivo de configuración {}… de este pack. Falta subirlo.",
             &sha512[..8.min(sha512.len())]

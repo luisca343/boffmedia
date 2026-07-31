@@ -7,6 +7,11 @@ use std::{env, fs, path::PathBuf};
 //
 // The schema file is committed, so this builds without Node installed.
 fn main() {
+    // api.rs bakes this in with option_env!, and cargo does NOT track env vars
+    // read that way on its own. Without this line, switching build profiles
+    // reuses the previous binary and silently ships the wrong API host.
+    println!("cargo:rerun-if-env-changed=BOFF_API_URL");
+
     let schema_path = PathBuf::from("../../../packages/pack-schema/schema/pack-manifest.schema.json");
     println!("cargo:rerun-if-changed={}", schema_path.display());
 

@@ -26,6 +26,24 @@ pub struct Settings {
     pub game_dir: String,
     pub close_on_launch: bool,
     pub keep_logs: bool,
+    /// §9 — how many previous versions stay revertible. Cheap: a retained
+    /// version is one marker (~40 KB of JSON), never a copy of the instance
+    /// tree, because the blobs it names already live in the shared
+    /// content-addressed cache. `#[serde(default)]` so a settings.json written
+    /// by the previous build loads instead of resetting every preference.
+    #[serde(default = "default_retain")]
+    pub retain_versions: u32,
+    /// §9 — when true, `memory_mib` is ignored and the heap is sized by
+    /// `install::runtime::recommended_heap_mib` from the pack's mod count and
+    /// this machine's RAM. A separate flag rather than a sentinel value in
+    /// `memory_mib` so switching automatic OFF restores the number the player
+    /// had chosen instead of resetting the slider.
+    #[serde(default)]
+    pub memory_auto: bool,
+}
+
+fn default_retain() -> u32 {
+    crate::install::instance::DEFAULT_RETAIN as u32
 }
 
 impl Default for Settings {
@@ -40,6 +58,11 @@ impl Default for Settings {
             game_dir: String::new(),
             close_on_launch: false,
             keep_logs: true,
+            retain_versions: default_retain(),
+            // Off by default: the launcher must not silently change a heap size
+            // a player already tuned. The per-pack panel is where §9's heuristic
+            // is offered, and Ajustes can opt the global default into it.
+            memory_auto: false,
         }
     }
 }
@@ -54,6 +77,12 @@ impl Settings {
 
     pub fn java_path(&self) -> Option<&str> {
         self.java_path.as_deref().map(str::trim).filter(|p| !p.is_empty())
+    }
+
+    /// Clamped: 0 would make every install unrevertable the instant it lands,
+    /// and an absurd number turns the history file into a log nobody prunes.
+    pub fn retain_versions(&self) -> usize {
+        self.retain_versions.clamp(1, 20) as usize
     }
 
     pub fn game_dir(&self) -> Option<&str> {
@@ -171,9 +200,45 @@ mod tests {
     }
 
     #[test]
+    fn a_settings_file_from_the_previous_build_keeps_its_preferences() {
+        // The trap: a missing `retainVersions` making the whole parse fail,
+        // which `load()` swallows into Settings::default() — silently resetting
+        // the player's memory slider and java path.
+        let raw = r#"{"memoryMib":8192,"javaPath":"/opt/jdk/bin/java","gameDir":"",
+            "closeOnLaunch":true,"keepLogs":false}"#;
+        let s: Settings = serde_json::from_str(raw).expect("an old settings.json must still load");
+        assert_eq!(s.memory_mib, 8192);
+        assert_eq!(s.retain_versions(), 3);
+        assert_eq!(s.java_path(), Some("/opt/jdk/bin/java"));
+        // §9's automatic sizing must default OFF for an existing player: an
+        // update that silently re-sizes a heap they tuned is a regression they
+        // cannot explain.
+        assert!(!s.memory_auto);
+    }
+
+    #[test]
+    fn retention_is_clamped_so_zero_never_means_unrevertable() {
+        let with = |retain_versions| Settings {
+            retain_versions,
+            ..Settings::default()
+        };
+        assert_eq!(with(0).retain_versions(), 1);
+        assert_eq!(with(5).retain_versions(), 5);
+        assert_eq!(with(9_999).retain_versions(), 20);
+    }
+
+    #[test]
     fn the_wire_shape_is_camel_case() {
         let raw = serde_json::to_string(&Settings::default()).unwrap();
-        for key in ["memoryMib", "javaPath", "gameDir", "closeOnLaunch", "keepLogs"] {
+        for key in [
+            "memoryMib",
+            "javaPath",
+            "gameDir",
+            "closeOnLaunch",
+            "keepLogs",
+            "retainVersions",
+            "memoryAuto",
+        ] {
             assert!(raw.contains(key), "missing {key} in {raw}");
         }
     }

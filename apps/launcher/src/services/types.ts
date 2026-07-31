@@ -84,11 +84,34 @@ export type DeviceCode = {
   expiresInSeconds: number
 }
 
+/** HANDOFF §9 — what the Rust classifier (`install/crash.rs`) recognised in the
+ *  tail of the game log. Mirrors `CrashKind`; kebab-case on the wire. */
+export type CrashKind =
+  | "missing-dependency"
+  | "loader-mismatch"
+  | "mixin-failure"
+  | "out-of-memory"
+  | "wrong-java"
+  | "corrupt-mod-jar"
+  | "duplicate-mod"
+
+export type CrashDiagnosis = {
+  kind: CrashKind
+  title: string
+  explanation: string
+  action: string
+  /** The verbatim log lines that produced the verdict. Always rendered: a
+   *  diagnosis with no evidence is unfalsifiable and unescalatable. */
+  evidence: string[]
+}
+
 export type GameState =
   | { kind: "idle" }
   | { kind: "preparing" }
   | { kind: "running"; pid: number; since: number }
-  | { kind: "crashed"; exitCode: number }
+  /** `diagnosis` is null when the crash matched no known signature — the UI
+   *  must then say so rather than guess. */
+  | { kind: "crashed"; exitCode: number; diagnosis: CrashDiagnosis | null }
 
 export type LogLine = {
   ts: number
@@ -104,4 +127,80 @@ export type Settings = {
   gameDir: string
   closeOnLaunch: boolean
   keepLogs: boolean
+  /** HANDOFF §9 — how many previous versions stay one-click revertible.
+   *  Cheap: a retained version is one marker, never a copy of the instance. */
+  retainVersions: number
+  /** HANDOFF §9 — when on, `memoryMib` is ignored and the heap is sized from
+   *  the pack's mod count and this machine's RAM. A separate flag rather than a
+   *  sentinel in `memoryMib`, so turning it off restores the chosen number. */
+  memoryAuto: boolean
+}
+
+/** HANDOFF §9 — why a resolved value is what it is. Mirrors Rust's
+ *  `install::runtime::RuntimeSource`. */
+export type RuntimeSource = "global" | "override" | "auto"
+
+/** This pack's heap choice. Three states, not two: "heredar" and "automático"
+ *  are different intents, and a null could only express one of them. */
+export type MemoryChoice =
+  | { mode: "inherit" }
+  | { mode: "auto" }
+  | { mode: "fixed"; mib: number }
+
+/** This pack's Java choice. `auto` is NOT `inherit`: it means "ignore the
+ *  global path for this pack", which is the fix for a Java 8 path kept for one
+ *  old pack breaking every new one. */
+export type JavaChoice =
+  | { mode: "inherit" }
+  | { mode: "auto" }
+  | { mode: "custom"; path: string }
+
+/** What a launch would actually use, plus what fed the heuristic. */
+export type ResolvedRuntime = {
+  heapMib: number
+  memorySource: RuntimeSource
+  /** Null = the launcher installs and manages the JVM (§6.3). */
+  javaPath: string | null
+  javaSource: RuntimeSource
+  modCount: number
+  totalRamMib: number
+  /** What the heuristic would pick even when an explicit value won. */
+  recommendedMib: number
+}
+
+/** HANDOFF §9 — the per-pack runtime panel's whole state. Mirrors Rust's
+ *  `install::InstanceRuntime`. */
+export type InstanceRuntime = {
+  over: { memory: MemoryChoice; java: JavaChoice }
+  effective: ResolvedRuntime
+  globalMemoryMib: number
+  globalMemoryAuto: boolean
+  globalJavaPath: string | null
+}
+
+/** HANDOFF §9 — a version this machine can roll back to. Mirrors Rust's
+ *  `instance::RetainedVersion`. */
+export type RetainedVersion = {
+  versionId: string
+  versionName: string
+  minecraft: string
+  loader: string | null
+  loaderVersion: string | null
+  installedAt: string
+  fileCount: number
+  /** The version currently on disk; never offered as a revert target. */
+  current: boolean
+  /** False for a version installed before the launcher recorded file lists —
+   *  there is nothing to replay, so the UI must not offer the button. */
+  revertible: boolean
+}
+
+/** HANDOFF §9 — one `env.client: "optional"` file and whether it is switched
+ *  on. Optional-ness comes from the manifest, so this is empty until the pack
+ *  has been installed once. */
+export type OptionalFile = {
+  path: string
+  name: string
+  size: number
+  enabled: boolean
 }

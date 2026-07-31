@@ -1,5 +1,8 @@
 import { Badge, Button, DataList, Divider, Field, Input, Kicker, Panel, Slider, Toggle } from "@boffmedia/ui"
+import { useEffect, useState } from "react"
 
+import { getRuntimeInfo } from "../runtime"
+import { checkForUpdates, useUpdates } from "../services/updates"
 import { useLauncher } from "../state/launcher"
 import { formatBytes } from "../utils/format"
 
@@ -8,6 +11,15 @@ import { formatBytes } from "../utils/format"
 
 export function Settings() {
   const { settings, patchSettings, account } = useLauncher()
+  const { phase, update, error } = useUpdates()
+  const [version, setVersion] = useState<string | null>(null)
+
+  useEffect(() => {
+    // Null in a browser tab, where there is no shell to ask.
+    void getRuntimeInfo().then((info) => setVersion(info?.appVersion ?? null))
+  }, [])
+
+  const checking = phase === "checking"
 
   return (
     <div className="px-8 py-7">
@@ -19,20 +31,35 @@ export function Settings() {
       </header>
 
       <div className="grid max-w-[900px] gap-4 [grid-template-columns:repeat(auto-fit,minmax(340px,1fr))]">
-        <Panel title="Rendimiento">
-          <Slider
-            label="Memoria asignada"
-            min={2048}
-            max={16384}
-            step={512}
-            value={settings.memoryMib}
-            unit=" MiB"
-            onChange={(memoryMib) => patchSettings({ memoryMib })}
+        <Panel
+          title="Rendimiento"
+          aside={<Badge tone={settings.memoryAuto ? "ok" : "info"}>
+            {settings.memoryAuto ? "Automático" : "Manual"}
+          </Badge>}
+        >
+          {/* §9 — the global default. Each pack can still inherit this, override
+              it, or size itself; the per-pack control lives in su ficha. */}
+          <Toggle
+            on={settings.memoryAuto}
+            onChange={(memoryAuto) => patchSettings({ memoryAuto })}
+            label="Calcular la memoria automáticamente"
           />
+          <div className="mt-4">
+            <Slider
+              label="Memoria asignada"
+              min={2048}
+              max={16384}
+              step={512}
+              value={settings.memoryMib}
+              unit=" MiB"
+              disabled={settings.memoryAuto}
+              onChange={(memoryMib) => patchSettings({ memoryMib })}
+            />
+          </div>
           <p className="mt-2 text-xs text-txt-dim">
-            {formatBytes(settings.memoryMib * 1024 * 1024)} para la JVM. Asignar más memoria de
-            la que tiene el equipo hace que el juego no arranque — deja al menos 2 GB al
-            sistema.
+            {settings.memoryAuto
+              ? "Se calcula por pack, con su número de mods y la RAM del equipo, sin pasar nunca del 60 % de la memoria física. Un pack concreto puede fijar el suyo desde su ficha."
+              : `${formatBytes(settings.memoryMib * 1024 * 1024)} para la JVM. Asignar más memoria de la que tiene el equipo no hace que el juego falle: hace que el sistema empiece a usar el disco y se quede colgado. Deja al menos 2 GB al sistema.`}
           </p>
         </Panel>
 
@@ -66,6 +93,20 @@ export function Settings() {
               onChange={(e) => patchSettings({ gameDir: e.target.value })}
             />
           </Field>
+          {/* §9 — rollback depth. Almost free: a retained version is its file
+              list, and the .jar it names lives once in the shared cache however
+              many versions reference it. */}
+          <Field label="Versiones que se conservan">
+            <Input
+              type="number"
+              min={1}
+              max={20}
+              value={settings.retainVersions}
+              onChange={(e) =>
+                patchSettings({ retainVersions: Number(e.target.value) || 1 })
+              }
+            />
+          </Field>
           <Divider className="my-4" />
           <div className="flex flex-col gap-3">
             <Toggle
@@ -78,6 +119,36 @@ export function Settings() {
               onChange={(keepLogs) => patchSettings({ keepLogs })}
               label="Conservar el registro entre sesiones"
             />
+          </div>
+        </Panel>
+
+        <Panel title="Actualizaciones">
+          <DataList
+            rows={[
+              { label: "Versión instalada", value: version ?? "Modo navegador", mono: true },
+            ]}
+          />
+          <div className="mt-4 flex items-center gap-3">
+            <Button
+              size="sm"
+              variant="ghost"
+              icon="refresh"
+              disabled={checking}
+              onClick={() => {
+                void checkForUpdates(true)
+              }}
+            >
+              {checking ? "Buscando…" : "Buscar actualizaciones"}
+            </Button>
+            <span className="text-xs text-txt-dim">
+              {error
+                ? error
+                : update
+                  ? `Disponible la ${update.version}. Actualiza desde el aviso de arriba.`
+                  : checking
+                    ? "Comprobando con el servidor…"
+                    : "El launcher lo comprueba solo al arrancar."}
+            </span>
           </div>
         </Panel>
 

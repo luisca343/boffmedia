@@ -15,26 +15,33 @@
 // stylistic — it is the difference between the installer working and the app
 // aborting.
 
+pub mod crash;
 pub mod files;
 pub mod game;
+pub mod instance;
 pub mod paths;
 pub mod process;
 pub mod progress;
 pub mod resolve;
+/// §9 — per-instance Java runtime + memory, and the sizing heuristic.
+pub mod runtime;
 pub mod session;
 
 use std::collections::{HashMap, HashSet};
 use std::sync::{Arc, Mutex as StdMutex};
 
-use serde::{Deserialize, Serialize};
+use serde::Serialize;
 use tokio::sync::Mutex;
 
 use crate::auth::AuthState;
 use crate::settings;
 
+use instance::{History, Marker, OptionalFile, OptionalState, RetainedVersion};
 use paths::{InstancePaths, Layout};
 use process::RunningGame;
 use progress::{Phase, Reporter};
+use resolve::PlannedFile;
+use runtime::{JavaChoice, MemoryChoice, ResolvedRuntime, RuntimeOverride};
 
 /// Serialisable failure for the renderer.
 ///
@@ -108,19 +115,10 @@ pub enum InstallStatus {
     },
 }
 
-/// The marker file left in an instance root. Its whole job is to answer
-/// "installed, and of what version?" without walking 400 files.
-#[derive(Debug, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-struct Marker {
-    version_id: String,
-    version_name: String,
-    minecraft: String,
-    loader: Option<String>,
-    loader_version: Option<String>,
-    installed_at: String,
-    file_count: usize,
-}
+// The marker (`instance::Marker`) answers "installed, and of what version?"
+// without walking 400 files, and since §9 it also records WHICH files the
+// launcher owns — see instance.rs for why that set is the whole locked-vs-user
+// distinction.
 
 /// Per-pack runtime state. One game at a time per pack; the map is keyed on
 /// pack id so two different packs can run side by side.
@@ -203,6 +201,12 @@ async fn prepare(
         .build()
         .map_err(|e| InstallFailure::message(format!("No se pudo crear el cliente HTTP: {e}")))?;
 
+    // §9 — the heap and JVM this pack will actually use. Resolved once, here,
+    // so install and launch can never disagree, and computed from the pack's
+    // OWN mod count: the plan on a first install, the marker afterwards (which
+    // knows which of the installed files are mods).
+    let runtime = resolve_runtime(&settings, &instance, plan.files.iter().filter(|f| f.is_mod).count());
+
     Ok((
         game::Prepared {
             layout,
@@ -210,9 +214,57 @@ async fn prepare(
             plan,
             settings,
             session,
+            runtime,
         },
         http,
     ))
+}
+
+/// Fold the global settings and this instance's override into the values a
+/// launch uses. `planned_mods` is the fallback mod count for a pack that has
+/// never been installed and therefore has no marker to count.
+fn resolve_runtime(
+    settings: &settings::Settings,
+    instance: &InstancePaths,
+    planned_mods: usize,
+) -> ResolvedRuntime {
+    let mod_count = read_marker(instance)
+        .map(|m| runtime::mod_count_of(&m))
+        .filter(|n| *n > 0)
+        .unwrap_or(planned_mods);
+    runtime::resolve(
+        settings,
+        &read_runtime_override(instance),
+        mod_count,
+        runtime::total_ram_mib_or_assumed(),
+    )
+}
+
+/// Never fails: a corrupt or absent override file means "inherit", which is
+/// exactly what every instance installed before §9 should do.
+fn read_runtime_override(instance: &InstancePaths) -> RuntimeOverride {
+    std::fs::read_to_string(&instance.runtime)
+        .ok()
+        .and_then(|raw| serde_json::from_str(&raw).ok())
+        .unwrap_or_default()
+}
+
+fn write_runtime_override(
+    instance: &InstancePaths,
+    over: &RuntimeOverride,
+) -> Result<(), InstallFailure> {
+    if let Some(parent) = instance.runtime.parent() {
+        let _ = std::fs::create_dir_all(parent);
+    }
+    let raw = serde_json::to_string_pretty(over).map_err(|e| {
+        InstallFailure::message(format!("No se pudo serializar la configuración: {e}"))
+    })?;
+    std::fs::write(&instance.runtime, raw).map_err(|e| {
+        InstallFailure::message(format!(
+            "No se pudo escribir {}: {e}",
+            instance.runtime.display()
+        ))
+    })
 }
 
 /// Run the blocking portablemc pass off the async runtime. `Prepared` is moved
@@ -232,11 +284,8 @@ async fn install_minecraft(
 /// Download the pack payload: mods and overrides as two phases, then a verify
 /// pass and the marker.
 ///
-/// TODO(pack-blob-upload): a pack published with an `override` source will 404
-/// here until the API gains an admin route to UPLOAD blobs into PACK_BLOB_DIR
-/// (nothing under apps/api/src/api/packs/packs.controller.ts writes one today —
-/// the launcher-side download route exists, its counterpart does not). The
-/// failure is deliberately worded as "falta subirlo" by
+/// An `override` file whose blob was never uploaded (admin `POST packs/admin/blobs`)
+/// 404s here. That failure is deliberately worded as "falta subirlo" by
 /// `api::missing_fallback`, so it reads as a publishing gap rather than as a
 /// network fault; do not soften it into a retry.
 async fn install_payload(
@@ -246,12 +295,23 @@ async fn install_payload(
     password: Option<&str>,
     reporter: &Reporter,
 ) -> Result<(), InstallFailure> {
-    let (mods, overrides): (Vec<_>, Vec<_>) = prepared
+    // §9 — an optional file the player switched off is never fetched. The
+    // alternative convention, renaming to `<name>.jar.disabled`, is a
+    // Forge/NeoForge behaviour: Fabric and Quilt ignore the suffix, so on two
+    // of the four loaders this launcher supports the "disabled" mod would load
+    // anyway. Not downloading it is loader-agnostic, and it also honours §9's
+    // delta-update goal — you do not pay bytes for a mod you declined. Turning
+    // it back on is a copy out of the content-addressed cache, not a download.
+    let disabled = read_optional_state(&prepared.instance);
+    let wanted: Vec<PlannedFile> = prepared
         .plan
         .files
         .iter()
+        .filter(|f| !(f.optional && disabled.is_disabled(&f.path)))
         .cloned()
-        .partition(|f| f.is_mod);
+        .collect();
+
+    let (mods, overrides): (Vec<_>, Vec<_>) = wanted.iter().cloned().partition(|f| f.is_mod);
 
     files::download_all(
         app,
@@ -280,31 +340,96 @@ async fn install_payload(
     .await?;
 
     reporter.emit(Phase::Verifying, 0.5, "", 0, 0);
-    write_marker(prepared)?;
+
+    // §9 "locked vs. user space". The previous marker is the ONLY authority on
+    // what the launcher owns, so a mod dropped from the pack is removed here
+    // and a jar the player added themselves — never recorded, therefore never
+    // stale — is not a candidate. Before this the old jar simply stayed
+    // forever, which is how a removed-but-still-loaded mod crashes a pack that
+    // "updated fine".
+    let previous = read_marker(&prepared.instance);
+    let mut marker = build_marker(prepared, &wanted);
+    // A pin survives a re-verify of the SAME version (every launch does one)
+    // and is cleared by an install of a different one — which is only ever an
+    // explicit "Actualizar" click.
+    marker.pinned = previous
+        .as_ref()
+        .is_some_and(|p| p.pinned && p.version_id == marker.version_id);
+    // A pinned relaunch rebuilds the plan from `managed`, which by construction
+    // holds only the ENABLED optional files — so the catalogue would shrink to
+    // the mods that are already on, and a switched-off one could never be
+    // switched back on. Same version, same catalogue: inherit it.
+    if marker.optional_files.is_empty() {
+        if let Some(prev) = previous.as_ref().filter(|p| p.version_id == marker.version_id) {
+            marker.optional_files = prev.optional_files.clone();
+        }
+    }
+    if let Some(previous) = &previous {
+        let stale = instance::stale_files(&previous.managed, &marker.managed_paths());
+        for (path, outcome) in
+            instance::sweep_with(&prepared.instance.minecraft, &stale, files::sha512_of)
+        {
+            match outcome {
+                instance::SweepOutcome::Removed => {
+                    reporter.log("info", &format!("Eliminado «{path}» (ya no está en el pack)."))
+                }
+                instance::SweepOutcome::Modified => reporter.log(
+                    "warn",
+                    &format!("«{path}» ya no está en el pack pero lo has modificado; se conserva."),
+                ),
+                _ => {}
+            }
+        }
+    }
+
+    write_marker(&prepared.instance, &marker)?;
+    retain_version(&prepared.instance, &marker, prepared.settings.retain_versions());
+
     reporter.emit(Phase::Verifying, 1.0, "", 0, 0);
     Ok(())
 }
 
-fn write_marker(prepared: &game::Prepared) -> Result<(), InstallFailure> {
+/// The marker for what was just installed. `installed` is the files actually
+/// written, which for §9 excludes the optional ones the player switched off —
+/// recording those as managed would make the next update "clean up" files that
+/// were never there.
+fn build_marker(prepared: &game::Prepared, installed: &[PlannedFile]) -> Marker {
     let plan = &prepared.plan;
-    let marker = Marker {
+    Marker {
         version_id: plan.version_id.clone(),
         version_name: plan.version_name.clone(),
         minecraft: plan.minecraft.clone(),
         loader: plan.loader.as_ref().map(|(k, _)| k.key().to_string()),
         loader_version: plan.loader.as_ref().map(|(_, v)| v.clone()),
         installed_at: chrono::Utc::now().to_rfc3339(),
-        file_count: plan.files.len(),
-    };
-    let raw = serde_json::to_string_pretty(&marker)
+        file_count: installed.len(),
+        pack_id: plan.pack_id.clone(),
+        managed: installed.iter().map(instance::ManagedFile::from_planned).collect(),
+        // The full catalogue, enabled or not: the toggle UI reads this, and a
+        // disabled mod that vanished from the list could never be switched back
+        // on without a reinstall.
+        optional_files: plan
+            .files
+            .iter()
+            .filter(|f| f.optional)
+            .map(instance::ManagedFile::from_planned)
+            .collect(),
+        // A forward install always clears the pin: the player asked for this
+        // version explicitly.
+        pinned: false,
+    }
+}
+
+fn write_marker(instance: &InstancePaths, marker: &Marker) -> Result<(), InstallFailure> {
+    let raw = serde_json::to_string_pretty(marker)
         .map_err(|e| InstallFailure::message(format!("No se pudo serializar el estado: {e}")))?;
     // Written LAST, after every file verified. Its presence is the definition
     // of "installed", so writing it early would make an interrupted install
     // look complete.
-    std::fs::write(&prepared.instance.marker, raw).map_err(|e| {
+    std::fs::write(&instance.marker, raw).map_err(|e| {
         InstallFailure::message(format!(
             "No se pudo escribir {}: {e}",
-            prepared.instance.marker.display()
+            instance.marker.display()
         ))
     })
 }
@@ -312,6 +437,74 @@ fn write_marker(prepared: &game::Prepared) -> Result<(), InstallFailure> {
 fn read_marker(instance: &InstancePaths) -> Option<Marker> {
     let raw = std::fs::read_to_string(&instance.marker).ok()?;
     serde_json::from_str(&raw).ok()
+}
+
+fn read_history(instance: &InstancePaths) -> History {
+    std::fs::read_to_string(&instance.history)
+        .ok()
+        .and_then(|raw| serde_json::from_str(&raw).ok())
+        .unwrap_or_default()
+}
+
+/// Best-effort by design: failing to record a rollback point must never fail
+/// the install that just succeeded. The player would rather have the pack.
+fn retain_version(instance: &InstancePaths, marker: &Marker, keep: usize) {
+    let mut history = read_history(instance);
+    history.push(marker, keep);
+    if let Ok(raw) = serde_json::to_string_pretty(&history) {
+        let _ = std::fs::write(&instance.history, raw);
+    }
+}
+
+fn read_optional_state(instance: &InstancePaths) -> OptionalState {
+    std::fs::read_to_string(&instance.optional)
+        .ok()
+        .and_then(|raw| serde_json::from_str(&raw).ok())
+        .unwrap_or_default()
+}
+
+fn write_optional_state(
+    instance: &InstancePaths,
+    state: &OptionalState,
+) -> Result<(), InstallFailure> {
+    if let Some(parent) = instance.optional.parent() {
+        let _ = std::fs::create_dir_all(parent);
+    }
+    let raw = serde_json::to_string_pretty(state)
+        .map_err(|e| InstallFailure::message(format!("No se pudo serializar la selección: {e}")))?;
+    std::fs::write(&instance.optional, raw).map_err(|e| {
+        InstallFailure::message(format!(
+            "No se pudo escribir {}: {e}",
+            instance.optional.display()
+        ))
+    })
+}
+
+/// Rewrite the plan to the pinned version recorded on disk. Returns the version
+/// name when a pin was applied, `None` when there is nothing to pin to.
+///
+/// Refuses to act on a marker with no managed list — a pre-§9 install, or a
+/// hand-edited one. There is nothing to replay, and launching with an EMPTY
+/// file list would present a modpack with no mods as a successful launch.
+fn apply_pin(prepared: &mut game::Prepared) -> Option<String> {
+    let marker = read_marker(&prepared.instance)?;
+    if !marker.pinned
+        || marker.managed.is_empty()
+        || marker.version_id == prepared.plan.version_id
+    {
+        return None;
+    }
+    let plan = &mut prepared.plan;
+    plan.version_id = marker.version_id.clone();
+    plan.version_name = marker.version_name.clone();
+    plan.minecraft = marker.minecraft.clone();
+    plan.loader = match (&marker.loader, &marker.loader_version) {
+        (Some(key), Some(version)) => resolve::LoaderKind::from_key(key).map(|k| (k, version.clone())),
+        _ => None,
+    };
+    plan.files = marker.managed.iter().map(instance::ManagedFile::to_planned).collect();
+    plan.total_bytes = plan.files.iter().map(|f| f.size).sum();
+    Some(marker.version_name)
 }
 
 // ── Commands ───────────────────────────────────────────────────────────────
@@ -355,6 +548,11 @@ pub async fn install_pack(
         ),
     );
 
+    // §9 — the resolved heap and JVM go in the log too, not only in the UI: a
+    // player pasting a crash log into a support thread brings the number with
+    // them, which is half of every out-of-memory diagnosis.
+    reporter.log("info", &prepared.runtime.summary());
+
     let (prepared, _game) = install_minecraft(prepared, reporter.clone()).await?;
     install_payload(&app, &prepared, &http, password.as_deref(), &reporter).await?;
 
@@ -395,6 +593,24 @@ pub async fn launch_pack(
     process::emit_preparing(&app);
 
     let reporter = Reporter::new(app.clone(), &pack_id);
+
+    // §9 pinning. `launch_pack` re-verifies against the manifest it was handed,
+    // which is always the LATEST — so without this a revert would be undone by
+    // the very next click of Play, silently and with a progress bar that looks
+    // like a normal launch. The retained marker carries the version's minecraft,
+    // loader and complete file list, so the pin is applied to the whole plan and
+    // not just to the payload: installing the latest loader under the old mods
+    // is exactly the loader-mismatch crash rollback exists to escape.
+    let mut prepared = prepared;
+    if let Some(pinned) = apply_pin(&mut prepared) {
+        reporter.log(
+            "info",
+            &format!("Este pack está anclado a «{pinned}». No se actualizará al iniciar."),
+        );
+    }
+
+    reporter.log("info", &prepared.runtime.summary());
+
     let (prepared, game) = install_minecraft(prepared, reporter.clone()).await?;
 
     if let Err(err) = install_payload(&app, &prepared, &http, password.as_deref(), &reporter).await {
@@ -515,6 +731,305 @@ pub async fn repair_instance(
     let _ = std::fs::remove_file(&instance.marker);
 
     Ok(InstallStatus::NotInstalled)
+}
+
+// ── §9: locked vs. user space, and version rollback ────────────────────────
+
+/// The versions this machine can still roll back to, newest first.
+///
+/// Cheap by construction: each entry is one retained MARKER, not a copy of the
+/// instance. The jars it names live once in `shared/cache`, keyed by sha512, so
+/// retaining three versions of a 400-mod pack costs three JSON files plus
+/// whatever blobs the player already had.
+#[tauri::command]
+pub async fn instance_versions(
+    slug: String,
+    app: tauri::AppHandle,
+) -> Result<Vec<RetainedVersion>, InstallFailure> {
+    let settings = settings::load(&app);
+    let layout = Layout::new(&app, settings.game_dir())?;
+    let instance = layout.instance(&slug);
+
+    let current = read_marker(&instance).map(|m| m.version_id);
+    Ok(read_history(&instance)
+        .versions
+        .iter()
+        .map(|v| RetainedVersion {
+            version_id: v.version_id.clone(),
+            version_name: v.version_name.clone(),
+            minecraft: v.minecraft.clone(),
+            loader: v.loader.clone(),
+            loader_version: v.loader_version.clone(),
+            installed_at: v.installed_at.clone(),
+            file_count: v.file_count,
+            current: current.as_deref() == Some(v.version_id.as_str()),
+            // A pre-§9 entry carries no file list, so there is nothing to
+            // replay and offering a revert to it would be a lie.
+            revertible: !v.managed.is_empty(),
+        })
+        .collect())
+}
+
+/// One-click rollback (§9). Replays a retained version's recorded file list
+/// through the same content-addressed download path an install uses, then
+/// sweeps whatever the current version added.
+///
+/// No manifest is fetched: the server may already have replaced the version, and
+/// "the update bricked it mid-session" is precisely when the network is the
+/// thing you cannot rely on. Everything needed is in the retained marker.
+///
+/// The reverted instance is PINNED, so the next Play launches this version
+/// instead of quietly reinstalling the one that broke.
+#[tauri::command]
+pub async fn instance_revert(
+    slug: String,
+    version_id: String,
+    password: Option<String>,
+    app: tauri::AppHandle,
+    manager: tauri::State<'_, InstallManager>,
+) -> Result<InstallStatus, InstallFailure> {
+    let settings = settings::load(&app);
+    let layout = Layout::new(&app, settings.game_dir())?;
+    let instance = layout.instance(&slug);
+
+    if manager
+        .running
+        .lock()
+        .await
+        .values()
+        .any(|game| !game.has_exited())
+    {
+        return Err(InstallFailure::message(
+            "Cierra el juego antes de volver a una versión anterior.".to_string(),
+        ));
+    }
+
+    let history = read_history(&instance);
+    let target = history.find(&version_id).cloned().ok_or_else(|| {
+        InstallFailure::message(
+            "Esa versión ya no se conserva en este equipo. Instala el pack de nuevo.".to_string(),
+        )
+    })?;
+    if target.managed.is_empty() {
+        return Err(InstallFailure::message(
+            "Esa versión se instaló con una versión antigua del launcher y no guarda su lista de \
+             archivos. Instálala desde el servidor."
+                .to_string(),
+        ));
+    }
+
+    let pack_id = if target.pack_id.is_empty() {
+        return Err(InstallFailure::message(
+            "Esa versión no registra a qué pack pertenece. Instálala desde el servidor.".to_string(),
+        ));
+    } else {
+        target.pack_id.clone()
+    };
+
+    let _guard = manager.begin_install(&pack_id)?;
+    layout.prepare(&instance)?;
+
+    let http = reqwest::Client::builder()
+        .user_agent(concat!("BoffLauncher/", env!("CARGO_PKG_VERSION")))
+        .build()
+        .map_err(|e| InstallFailure::message(format!("No se pudo crear el cliente HTTP: {e}")))?;
+
+    let reporter = Reporter::new(app.clone(), &pack_id);
+    reporter.log(
+        "info",
+        &format!("Volviendo a «{}» de «{slug}».", target.version_name),
+    );
+
+    let disabled = read_optional_state(&instance);
+    let wanted: Vec<PlannedFile> = target
+        .managed
+        .iter()
+        .map(instance::ManagedFile::to_planned)
+        .filter(|f| !(f.optional && disabled.is_disabled(&f.path)))
+        .collect();
+    let (mods, overrides): (Vec<_>, Vec<_>) = wanted.iter().cloned().partition(|f| f.is_mod);
+
+    for (batch, phase) in [(&mods, Phase::Mods), (&overrides, Phase::Overrides)] {
+        files::download_all(
+            &app,
+            &http,
+            &layout,
+            &instance.minecraft,
+            &pack_id,
+            password.as_deref(),
+            batch,
+            phase,
+            &reporter,
+        )
+        .await?;
+    }
+
+    reporter.emit(Phase::Verifying, 0.5, "", 0, 0);
+
+    let mut marker = target.clone();
+    marker.managed = wanted.iter().map(instance::ManagedFile::from_planned).collect();
+    marker.file_count = marker.managed.len();
+    marker.installed_at = chrono::Utc::now().to_rfc3339();
+    marker.pinned = true;
+
+    // Same rule as an update: only files the CURRENT marker claims, and only
+    // those still byte-identical to what we installed. A mod the player added
+    // themselves is not in that set and survives the rollback.
+    if let Some(current) = read_marker(&instance) {
+        let stale = instance::stale_files(&current.managed, &marker.managed_paths());
+        for (path, outcome) in instance::sweep_with(&instance.minecraft, &stale, files::sha512_of) {
+            if outcome == instance::SweepOutcome::Removed {
+                reporter.log("info", &format!("Eliminado «{path}» (no está en esta versión)."));
+            }
+        }
+    }
+
+    write_marker(&instance, &marker)?;
+    // Re-push so the version you just rolled back to is the newest retained
+    // entry — otherwise three reverts in a row would evict it.
+    retain_version(&instance, &marker, settings.retain_versions());
+    reporter.emit(Phase::Verifying, 1.0, "", 0, 0);
+    reporter.done();
+
+    Ok(InstallStatus::Installed {
+        version_id: marker.version_id,
+        size_bytes: paths::dir_size(&instance.root),
+    })
+}
+
+/// Release a pin so the pack follows the server's latest version again.
+#[tauri::command]
+pub async fn instance_unpin(
+    slug: String,
+    app: tauri::AppHandle,
+) -> Result<InstallStatus, InstallFailure> {
+    let settings = settings::load(&app);
+    let layout = Layout::new(&app, settings.game_dir())?;
+    let instance = layout.instance(&slug);
+
+    let Some(mut marker) = read_marker(&instance) else {
+        return Ok(InstallStatus::NotInstalled);
+    };
+    marker.pinned = false;
+    write_marker(&instance, &marker)?;
+    Ok(InstallStatus::Installed {
+        version_id: marker.version_id,
+        size_bytes: paths::dir_size(&instance.root),
+    })
+}
+
+/// The optional files this pack declares, and whether each is switched on.
+/// Empty before the first install: optional-ness comes from the manifest, and
+/// the marker is where the launcher remembers it.
+#[tauri::command]
+pub async fn instance_optional(
+    slug: String,
+    app: tauri::AppHandle,
+) -> Result<Vec<OptionalFile>, InstallFailure> {
+    let settings = settings::load(&app);
+    let layout = Layout::new(&app, settings.game_dir())?;
+    let instance = layout.instance(&slug);
+
+    let catalogue = read_marker(&instance)
+        .map(|m| m.optional_files)
+        .unwrap_or_default();
+    Ok(instance::optional_list(&catalogue, &read_optional_state(&instance)))
+}
+
+/// Switch one optional file on or off.
+///
+/// Takes effect on the next install, update or launch — all three run the same
+/// payload pass, and a launch re-verifies, so the player never has to hunt for
+/// a separate "apply" button. Switching one OFF does not delete it here: the
+/// stale sweep does that on the next pass, under the same
+/// only-if-you-have-not-touched-it rule as everything else the launcher owns.
+#[tauri::command]
+pub async fn instance_optional_set(
+    slug: String,
+    path: String,
+    enabled: bool,
+    app: tauri::AppHandle,
+) -> Result<Vec<OptionalFile>, InstallFailure> {
+    let settings = settings::load(&app);
+    let layout = Layout::new(&app, settings.game_dir())?;
+    let instance = layout.instance(&slug);
+
+    let mut state = read_optional_state(&instance);
+    state.set(&path, enabled);
+    write_optional_state(&instance, &state)?;
+
+    let catalogue = read_marker(&instance)
+        .map(|m| m.optional_files)
+        .unwrap_or_default();
+    Ok(instance::optional_list(&catalogue, &state))
+}
+
+// ── §9: per-instance Java runtime + memory ─────────────────────────────────
+
+/// What the runtime panel renders: the player's choice, what it resolves to,
+/// and the global values it would fall back to.
+#[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct InstanceRuntime {
+    /// The stored per-pack choice, `inherit`/`inherit` when nothing was set.
+    pub over: RuntimeOverride,
+    /// What a launch right now would actually use.
+    pub effective: ResolvedRuntime,
+    /// So the UI can label the inherit option "heredar (6 GB)" instead of
+    /// making the player open Ajustes to find out what they are inheriting.
+    pub global_memory_mib: u32,
+    pub global_memory_auto: bool,
+    pub global_java_path: Option<String>,
+}
+
+fn instance_runtime_view(
+    settings: &settings::Settings,
+    instance: &InstancePaths,
+) -> InstanceRuntime {
+    InstanceRuntime {
+        over: read_runtime_override(instance),
+        // No plan here, so a pack that has never been installed reports 0 mods
+        // and gets the vanilla floor — which is honest: there is nothing on disk
+        // to size for yet, and the first install recomputes it from the plan.
+        effective: resolve_runtime(settings, instance, 0),
+        global_memory_mib: settings.memory_mib,
+        global_memory_auto: settings.memory_auto,
+        global_java_path: settings.java_path().map(str::to_string),
+    }
+}
+
+/// §9 — the effective Java and heap for one pack, surfaced BEFORE launch so a
+/// player reads "6,0 GB (automático, 214 mods)" rather than guessing.
+#[tauri::command]
+pub async fn instance_runtime(
+    slug: String,
+    app: tauri::AppHandle,
+) -> Result<InstanceRuntime, InstallFailure> {
+    let settings = settings::load(&app);
+    let layout = Layout::new(&app, settings.game_dir())?;
+    Ok(instance_runtime_view(&settings, &layout.instance(&slug)))
+}
+
+/// Set this pack's Java and memory choice. Both arguments are the full
+/// three-state enum, so "heredar" is an explicit value the player can return to
+/// rather than something they have to reconstruct by clearing a field.
+///
+/// Takes effect on the next install, update or launch, all of which re-resolve
+/// through `prepare()`. Nothing on disk changes here — a heap size is an argv
+/// flag, not a file.
+#[tauri::command]
+pub async fn instance_runtime_set(
+    slug: String,
+    memory: MemoryChoice,
+    java: JavaChoice,
+    app: tauri::AppHandle,
+) -> Result<InstanceRuntime, InstallFailure> {
+    let settings = settings::load(&app);
+    let layout = Layout::new(&app, settings.game_dir())?;
+    let instance = layout.instance(&slug);
+
+    write_runtime_override(&instance, &RuntimeOverride { memory, java })?;
+    Ok(instance_runtime_view(&settings, &instance))
 }
 
 #[cfg(test)]

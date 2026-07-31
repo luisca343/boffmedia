@@ -15,6 +15,7 @@ use crate::settings::Settings;
 use super::paths::{InstancePaths, Layout};
 use super::progress::{InstallWatcher, Reporter};
 use super::resolve::{InstallPlan, LoaderKind};
+use super::runtime::ResolvedRuntime;
 use super::session::{self, GameSession};
 use super::InstallFailure;
 
@@ -26,6 +27,11 @@ pub struct Prepared {
     pub plan: InstallPlan,
     pub settings: Settings,
     pub session: GameSession,
+    /// §9 — the heap and JVM for THIS pack, already folded from the global
+    /// settings, the per-instance override and the sizing heuristic. Everything
+    /// below reads this rather than `settings`, so a pack-level choice cannot be
+    /// bypassed by a code path that forgot about it.
+    pub runtime: ResolvedRuntime,
 }
 
 /// Install (or verify) the Minecraft side of the pack and produce a launchable
@@ -106,8 +112,10 @@ pub fn install(prepared: &Prepared, reporter: &Reporter) -> Result<base::Game, I
         )));
     }
 
-    // -Xmx last so it wins over anything the version metadata set.
-    game.jvm_args.push(prepared.settings.xmx_arg());
+    // -Xmx last so it wins over anything the version metadata set. §9: this is
+    // the RESOLVED value — the pack's own override, the heuristic, or the global
+    // setting, in that order — not the global slider.
+    game.jvm_args.push(prepared.runtime.xmx_arg());
     session::patch_game_args(&mut game, &prepared.session);
 
     Ok(game)
@@ -117,15 +125,20 @@ fn configure(base: &mut base::Installer, prepared: &Prepared) {
     prepared.layout.apply(base, &prepared.instance);
     base.set_launcher_name("boff-launcher")
         .set_launcher_version(env!("CARGO_PKG_VERSION"))
-        .set_jvm_policy(jvm_policy(&prepared.settings));
+        .set_jvm_policy(jvm_policy(&prepared.runtime));
 }
 
 /// §6.3. A path the player chose is used verbatim — silently falling back to a
 /// different JVM would make "I set Java 21 and it still crashes" unanswerable.
 /// Otherwise Mojang's own runtime is preferred over whatever is on PATH,
 /// because the system JVM is the usual source of a version mismatch.
-fn jvm_policy(settings: &Settings) -> base::JvmPolicy {
-    match settings.java_path() {
+///
+/// §9: the path comes from the RESOLVED runtime, so a pack that sets Java to
+/// "automático" escapes a global path that is wrong for it — the exact case
+/// where one player keeps a Java 8 path for an old pack and every new pack then
+/// refuses to start.
+fn jvm_policy(runtime: &ResolvedRuntime) -> base::JvmPolicy {
+    match runtime.java_path.as_deref() {
         Some(path) => base::JvmPolicy::Static(path.into()),
         None => base::JvmPolicy::MojangThenSystem,
     }
