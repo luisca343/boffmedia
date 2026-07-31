@@ -1,4 +1,4 @@
-import { instanceScan, isDesktop, packsList, type LauncherPack } from "../runtime"
+import { instanceScan, isDesktop, packsList, playsGet, type LauncherPack } from "../runtime"
 import { mockPackEntries } from "./mock"
 import type { InstallState, PackEntry, PackVersionSummary } from "./types"
 
@@ -29,7 +29,7 @@ function toVersion(pack: LauncherPack): PackVersionSummary | null {
 export async function loadPackEntries(): Promise<PackEntry[]> {
   if (!isDesktop()) return mockPackEntries()
 
-  const packs = await packsList()
+  const [packs, plays] = await Promise.all([packsList(), playsGet()])
   return Promise.all(
     packs.map(async (pack) => {
       const latest = toVersion(pack)
@@ -52,7 +52,7 @@ export async function loadPackEntries(): Promise<PackEntry[]> {
         },
         latest,
         state,
-        lastPlayed: null,
+        lastPlayed: plays[pack.id] ?? null,
       }
     }),
   )

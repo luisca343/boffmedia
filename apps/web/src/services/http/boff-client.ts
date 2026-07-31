@@ -88,6 +88,25 @@ export async function apiMultipartPOST<T>(
   return multipartPOST<T>(url, fields, files);
 }
 
+// Raw binary upload. Not multipart on purpose: the pack blob store is
+// content-addressed, so there is exactly one file and no fields, and a
+// multipart wrapper would only add a boundary the server has to parse back off.
+export async function apiAuthedAutoBinaryPOST<T>(
+  url: string,
+  body: Blob | ArrayBuffer,
+): Promise<ApiResponse<T>> {
+  const res = await fetch(`${getApiUrl()}${url}`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/octet-stream",
+      Authorization: `Bearer ${await sessionToken()}`,
+    },
+    body,
+  });
+  if (!res.ok) return parseErrorEnvelope<T>(res);
+  return (await res.json()) as ApiResponse<T>;
+}
+
 export async function boffGET<T>(url: string): Promise<ApiResponse<T>> {
   return apiGET<T>(url);
 }

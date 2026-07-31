@@ -1,15 +1,18 @@
 import { HttpService } from '@nestjs/axios';
 import {
   BadGatewayException,
+  BadRequestException,
   Injectable,
   Logger,
   NotFoundException,
   ServiceUnavailableException,
 } from '@nestjs/common';
-import { createReadStream } from 'fs';
-import { stat } from 'fs/promises';
-import { join } from 'path';
+import { createHash, randomUUID } from 'crypto';
+import { createReadStream, createWriteStream } from 'fs';
+import { mkdir, rename, rm, stat } from 'fs/promises';
+import { dirname, join } from 'path';
 import type { Readable } from 'stream';
+import { pipeline } from 'stream/promises';
 import { firstValueFrom } from 'rxjs';
 import { env } from '@/config/env';
 
@@ -162,7 +165,7 @@ export class PacksDownloadsService {
       throw new NotFoundException('Blob no encontrado');
     }
 
-    const path = join(blobDir(), blobSha512.slice(0, 2), blobSha512.slice(2, 4), blobSha512);
+    const path = blobPath(blobSha512);
     const size = await stat(path).then(
       (s) => s.size,
       () => null,
@@ -181,12 +184,75 @@ export class PacksDownloadsService {
       filename: blobSha512,
     };
   }
+
+  /** Size of a blob already on disk, or null. Lets the dashboard skip uploading
+   *  a file the server already has — the same content hash is the same bytes. */
+  async blobSize(blobSha512: string): Promise<number | null> {
+    if (!/^[a-f0-9]{128}$/.test(blobSha512)) return null;
+    return stat(blobPath(blobSha512)).then(
+      (s) => s.size,
+      () => null,
+    );
+  }
+
+  /**
+   * Ingest an override blob. The hash is computed from the bytes as they land —
+   * never taken from the client — so the name of the file on disk is always a
+   * true digest of its contents, which is the only reason the launcher's
+   * post-download sha512 check means anything.
+   *
+   * Writes to a temp file and renames: a half-written blob under its final
+   * (correct-looking) name would be served forever and fail verification on
+   * every machine.
+   */
+  async storeBlob(source: Readable): Promise<{ sha512: string; size: number }> {
+    const dir = blobDir();
+    await mkdir(join(dir, 'tmp'), { recursive: true });
+    const temp = join(dir, 'tmp', `${randomUUID()}.part`);
+
+    const hash = createHash('sha512');
+    let size = 0;
+    source.on('data', (chunk: Buffer) => {
+      hash.update(chunk);
+      size += chunk.length;
+    });
+
+    try {
+      await pipeline(source, createWriteStream(temp));
+    } catch (error: unknown) {
+      await rm(temp, { force: true });
+      throw new BadRequestException({
+        message: `blob upload failed: ${asMessage(error)}`,
+        userMessage: 'La subida se ha interrumpido. Inténtalo de nuevo.',
+      });
+    }
+
+    if (size === 0) {
+      await rm(temp, { force: true });
+      throw new BadRequestException({
+        message: 'empty blob upload',
+        userMessage: 'El archivo está vacío.',
+      });
+    }
+
+    const sha512 = hash.digest('hex');
+    const path = blobPath(sha512);
+    await mkdir(dirname(path), { recursive: true });
+    // rename over an existing blob is a no-op in content terms (same hash, same
+    // bytes) and keeps re-uploads idempotent.
+    await rename(temp, path);
+    return { sha512, size };
+  }
 }
 
 /** Content-addressed, sharded two levels so a pack with thousands of overrides
  *  does not put thousands of entries in one directory. */
 function blobDir(): string {
   return env.PACK_BLOB_DIR ?? join(process.cwd(), 'data', 'pack-blobs');
+}
+
+function blobPath(sha512: string): string {
+  return join(blobDir(), sha512.slice(0, 2), sha512.slice(2, 4), sha512);
 }
 
 function asMessage(error: unknown): string {

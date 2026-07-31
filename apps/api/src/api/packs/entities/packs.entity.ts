@@ -79,6 +79,13 @@ export class InviteCodeEntity {
   @ApiProperty() code!: string;
 }
 
+export class BlobUploadEntity {
+  /** Computed by the server from the bytes it received — the manifest must use
+   *  this value, not whatever the uploader believed the hash to be. */
+  @ApiProperty() sha512!: string;
+  @ApiProperty() size!: number;
+}
+
 export class AccessRowEntity {
   @ApiProperty() uuid!: string;
   @ApiProperty() grantedAt!: Date;

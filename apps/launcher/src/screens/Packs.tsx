@@ -1,10 +1,11 @@
 import { useMemo, useState } from "react"
 
-import { Badge, Button, Empty, Icon, Kicker, Panel, SearchInput } from "@boffmedia/ui"
+import { Badge, Button, Empty, Icon, Kicker, Panel, Progress, SearchInput } from "@boffmedia/ui"
 
 import type { InstallState, PackEntry } from "../services/types"
 import { useLauncher } from "../state/launcher"
 import { formatBytes, formatWhen } from "../utils/format"
+import { PHASE_LABEL } from "../utils/labels"
 
 function StateBadge({ state }: { state: InstallState }) {
   switch (state.kind) {
@@ -29,8 +30,9 @@ function AccessBadge({ entry }: { entry: PackEntry }) {
 }
 
 function PackCard({ entry }: { entry: PackEntry }) {
-  const { go, install } = useLauncher()
+  const { go, install, play, repair, game } = useLauncher()
   const { pack, latest, state } = entry
+  const busy = game.kind === "preparing" || game.kind === "running"
   // A pack with no published version is listed but cannot be installed —
   // offering the button anyway would produce a 404 the player cannot act on.
   const needsInstall =
@@ -45,6 +47,25 @@ function PackCard({ entry }: { entry: PackEntry }) {
       onClick={() => go("pack", pack.id)}
     >
       <p className="mb-4 min-h-[40px] text-sm text-txt-muted">{pack.summary}</p>
+
+      {/* An install runs for minutes; a card that only says "Instalando" makes
+          the player click through to the detail view to learn whether anything
+          is happening. */}
+      {state.kind === "installing" && (
+        <div className="mb-4">
+          <Progress value={state.progress.fraction * 100} />
+          <p className="mt-1.5 truncate font-mono text-[11px] text-txt-dim">
+            {PHASE_LABEL[state.progress.phase]}
+            {state.progress.currentFile ? ` · ${state.progress.currentFile}` : ""}
+          </p>
+        </div>
+      )}
+
+      {state.kind === "broken" && (
+        <p className="mb-4 rounded-sm border border-bad/40 bg-bad/10 px-2.5 py-2 text-[11px] text-txt-muted">
+          {state.reason}
+        </p>
+      )}
 
       <div className="mb-4 flex flex-wrap items-center gap-2">
         <AccessBadge entry={entry} />
@@ -62,26 +83,46 @@ function PackCard({ entry }: { entry: PackEntry }) {
             ? ` · ${formatBytes(state.sizeBytes)}`
             : ""}
         </span>
-        <Button
-          size="sm"
-          variant={needsInstall ? "default" : "pri"}
-          icon={needsInstall ? "download" : "play"}
-          loading={state.kind === "installing"}
-          disabled={!latest}
-          onClick={(e) => {
-            e.stopPropagation()
-            if (needsInstall) void install(pack.id)
-            else go("pack", pack.id)
-          }}
-        >
-          {!latest
-            ? "No disponible"
-            : state.kind === "outdated"
-              ? "Actualizar"
-              : needsInstall
-                ? "Instalar"
-                : "Jugar"}
-        </Button>
+        {state.kind === "broken" ? (
+          <Button
+            size="sm"
+            variant="default"
+            icon="refresh"
+            disabled={!latest}
+            onClick={(e) => {
+              e.stopPropagation()
+              void repair(pack.id)
+            }}
+          >
+            Reparar
+          </Button>
+        ) : (
+          <Button
+            size="sm"
+            variant={needsInstall ? "default" : "pri"}
+            icon={needsInstall ? "download" : "play"}
+            loading={state.kind === "installing" || (!needsInstall && game.kind === "preparing")}
+            disabled={!latest || (!needsInstall && busy)}
+            onClick={(e) => {
+              e.stopPropagation()
+              // Launching from the card is the whole point of the library
+              // screen; sending the player to the detail view to press a second
+              // button is what made every pack look unplayable from here.
+              if (needsInstall) void install(pack.id)
+              else void play(pack.id)
+            }}
+          >
+            {!latest
+              ? "No disponible"
+              : state.kind === "outdated"
+                ? "Actualizar"
+                : needsInstall
+                  ? "Instalar"
+                  : game.kind === "running"
+                    ? "En ejecución"
+                    : "Jugar"}
+          </Button>
+        )}
       </div>
     </Panel>
   )

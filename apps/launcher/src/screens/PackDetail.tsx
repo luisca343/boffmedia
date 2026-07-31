@@ -14,40 +14,9 @@ import {
   Stepper,
 } from "@boffmedia/ui"
 
-import type { InstallPhase } from "../services/types"
 import { useLauncher } from "../state/launcher"
 import { formatBytes, formatDuration, formatWhen } from "../utils/format"
-
-// Rust reports eight fine-grained phases; the user gets four. Eight steps is
-// both too granular to be meaningful and too wide for the content area — the
-// Stepper hides its labels below a 1100px *viewport*, which never triggers here
-// because the 228px sidebar eats the space instead.
-const STEP_GROUPS: { label: string; phases: InstallPhase[] }[] = [
-  { label: "Preparando", phases: ["resolving", "java"] },
-  { label: "Descargando", phases: ["libraries", "assets"] },
-  { label: "Instalando", phases: ["loader", "mods", "overrides"] },
-  { label: "Verificando", phases: ["verifying"] },
-]
-
-const PHASE_LABEL: Record<InstallPhase, string> = {
-  resolving: "Resolviendo versión",
-  java: "Comprobando Java",
-  libraries: "Librerías",
-  assets: "Assets",
-  loader: "Mod loader",
-  mods: "Mods",
-  overrides: "Configuración",
-  verifying: "Verificando",
-}
-
-// The registry stores the loader under its dependency key, which is also what
-// the version JSON uses; these are just the display names.
-const LOADER_LABEL: Record<string, string> = {
-  neoforge: "NeoForge",
-  forge: "Forge",
-  "fabric-loader": "Fabric",
-  quilt: "Quilt",
-}
+import { LOADER_LABEL, PHASE_LABEL, STEP_GROUPS } from "../utils/labels"
 
 /** Ticks once a second so the running-time readout advances. */
 function useNow(active: boolean): number {
@@ -61,7 +30,7 @@ function useNow(active: boolean): number {
 }
 
 export function PackDetail() {
-  const { selected, install, play, stop, game, go } = useLauncher()
+  const { selected, install, play, repair, stop, game, go, logs } = useLauncher()
   const now = useNow(game.kind === "running")
 
   if (!selected) {
@@ -81,6 +50,9 @@ export function PackDetail() {
   }
 
   const { pack, latest, state } = selected
+  // The tail is where the stack trace ends up; a crash log's first lines are
+  // just the JVM banner.
+  const crashLines = logs.filter((line) => line.level === "error").slice(-12)
   const installing = state.kind === "installing"
   // No published version means nothing to install, whatever the disk says.
   const needsInstall =
@@ -115,6 +87,16 @@ export function PackDetail() {
           {running ? (
             <Button variant="danger" icon="pause" onClick={stop}>
               Detener
+            </Button>
+          ) : state.kind === "broken" ? (
+            <Button
+              variant="pri"
+              size="lg"
+              icon="refresh"
+              disabled={!latest}
+              onClick={() => void repair(pack.id)}
+            >
+              Reparar
             </Button>
           ) : installing ? (
             // Not `loading`: that primitive hides its label behind the spinner,
@@ -162,6 +144,46 @@ export function PackDetail() {
                 {formatBytes(state.progress.totalBytes)}
               </span>
             </div>
+          </div>
+        </Panel>
+      )}
+
+      {state.kind === "broken" && (
+        <Panel title="Instalación dañada" aside={<Badge tone="bad">Dañado</Badge>} className="mb-4">
+          <p className="text-sm text-txt-muted">{state.reason}</p>
+          <p className="mt-2 text-xs text-txt-dim">
+            Reparar borra los mods, la configuración y el loader gestionados por el
+            launcher, y los vuelve a descargar. Tus mundos, capturas y opciones no se
+            tocan.
+          </p>
+        </Panel>
+      )}
+
+      {/* A crash the player cannot read is a support ticket. The last error
+          lines are what actually names the culprit mod, so they go here rather
+          than only in the log screen nobody opens. */}
+      {game.kind === "crashed" && (
+        <Panel
+          title="El juego se cerró inesperadamente"
+          aside={<Badge tone="bad">Código {game.exitCode}</Badge>}
+          className="mb-4"
+        >
+          {crashLines.length > 0 ? (
+            <pre className="max-h-[180px] overflow-auto rounded-sm border border-line bg-black/30 p-3 font-mono text-[11px] leading-relaxed text-txt-muted">
+              {crashLines.map((line) => line.text).join("\n")}
+            </pre>
+          ) : (
+            <p className="text-sm text-txt-muted">
+              No se registró ningún error antes del cierre.
+            </p>
+          )}
+          <div className="mt-3 flex items-center gap-2">
+            <Button size="sm" icon="list" onClick={() => go("logs")}>
+              Ver registro completo
+            </Button>
+            <Button size="sm" variant="pri" icon="play" onClick={() => void play(pack.id)}>
+              Reintentar
+            </Button>
           </div>
         </Panel>
       )}

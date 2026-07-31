@@ -405,6 +405,7 @@ pub async fn launch_pack(
 
     let running = process::spawn(&app, &game)?;
     let pid = running.pid;
+    settings::record_play(&app, &pack_id);
     manager.running.lock().await.insert(pack_id, running);
     Ok(pid)
 }
@@ -469,6 +470,51 @@ pub async fn instance_scan(
             size_bytes,
         },
     })
+}
+
+/// Throw away the managed half of an instance so the next install rebuilds it
+/// from the manifest.
+///
+/// Deliberately narrow: `mods/`, `config/`, `bin/` and the marker are ours and
+/// are re-derived from the manifest, but the rest of `.minecraft` — saves,
+/// screenshots, options.txt — belongs to the player. A "repair" that eats a
+/// world is not a repair, and there is no undo for it.
+#[tauri::command]
+pub async fn repair_instance(
+    slug: String,
+    app: tauri::AppHandle,
+    manager: tauri::State<'_, InstallManager>,
+) -> Result<InstallStatus, InstallFailure> {
+    let settings = settings::load(&app);
+    let layout = Layout::new(&app, settings.game_dir())?;
+    let instance = layout.instance(&slug);
+
+    // Removing files under a running game is how you get a half-loaded modpack
+    // and a crash report nobody can read.
+    if manager
+        .running
+        .lock()
+        .await
+        .values()
+        .any(|game| !game.has_exited())
+    {
+        return Err(InstallFailure::message(
+            "Cierra el juego antes de reparar la instalación.".to_string(),
+        ));
+    }
+
+    for dir in [&instance.mods, &instance.config, &instance.bin] {
+        if dir.is_dir() {
+            std::fs::remove_dir_all(dir).map_err(|e| {
+                InstallFailure::message(format!("No se pudo borrar {}: {e}", dir.display()))
+            })?;
+        }
+    }
+    // Last, so an interrupted repair still reads as broken rather than as a
+    // healthy install missing its mods.
+    let _ = std::fs::remove_file(&instance.marker);
+
+    Ok(InstallStatus::NotInstalled)
 }
 
 #[cfg(test)]

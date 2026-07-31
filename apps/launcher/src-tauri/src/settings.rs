@@ -13,6 +13,7 @@ use tauri::Manager;
 use crate::install::InstallFailure;
 
 const FILE: &str = "settings.json";
+const PLAYS_FILE: &str = "plays.json";
 
 /// Matches types.ts's `Settings` field for field. `gameDir` empty means "use the
 /// default app-data location" — an absent field and a blank one must mean the
@@ -61,11 +62,48 @@ impl Settings {
     }
 }
 
-fn file_path(app: &tauri::AppHandle) -> Result<PathBuf, InstallFailure> {
+fn config_path(app: &tauri::AppHandle, name: &str) -> Result<PathBuf, InstallFailure> {
     let dir = app.path().app_config_dir().map_err(|e| {
         InstallFailure::message(format!("No se pudo localizar la carpeta de ajustes: {e}"))
     })?;
-    Ok(dir.join(FILE))
+    Ok(dir.join(name))
+}
+
+fn file_path(app: &tauri::AppHandle) -> Result<PathBuf, InstallFailure> {
+    config_path(app, FILE)
+}
+
+/// When each pack was last launched, keyed by pack id. Kept out of
+/// `settings.json` because it is a log, not a preference: a corrupt entry here
+/// must never cost the player their memory slider.
+pub type Plays = std::collections::HashMap<String, String>;
+
+pub fn plays_load(app: &tauri::AppHandle) -> Plays {
+    config_path(app, PLAYS_FILE)
+        .ok()
+        .and_then(|path| std::fs::read_to_string(path).ok())
+        .and_then(|raw| serde_json::from_str(&raw).ok())
+        .unwrap_or_default()
+}
+
+/// Best-effort by design: failing to note a launch must never fail the launch.
+pub fn record_play(app: &tauri::AppHandle, pack_id: &str) {
+    let mut plays = plays_load(app);
+    plays.insert(pack_id.to_string(), chrono::Utc::now().to_rfc3339());
+    let Ok(path) = config_path(app, PLAYS_FILE) else {
+        return;
+    };
+    if let Some(parent) = path.parent() {
+        let _ = std::fs::create_dir_all(parent);
+    }
+    if let Ok(raw) = serde_json::to_string_pretty(&plays) {
+        let _ = std::fs::write(path, raw);
+    }
+}
+
+#[tauri::command]
+pub fn plays_get(app: tauri::AppHandle) -> Plays {
+    plays_load(&app)
 }
 
 /// Never fails on a missing or unreadable file: settings are a convenience, and
