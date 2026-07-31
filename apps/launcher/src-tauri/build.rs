@@ -11,6 +11,10 @@ fn main() {
     // read that way on its own. Without this line, switching build profiles
     // reuses the previous binary and silently ships the wrong API host.
     println!("cargo:rerun-if-env-changed=BOFF_API_URL");
+    // Same trap, same fix: updates.rs reads this with option_env!, so without
+    // the line a portable build reuses an installed build's object files (or
+    // the other way round) and ships with the wrong updater behaviour.
+    println!("cargo:rerun-if-env-changed=BOFF_PORTABLE");
 
     let schema_path = PathBuf::from("../../../packages/pack-schema/schema/pack-manifest.schema.json");
     println!("cargo:rerun-if-changed={}", schema_path.display());

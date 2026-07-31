@@ -282,14 +282,87 @@ pnpm --filter launcher tauri build
 `bundle.createUpdaterArtifacts` ya está en `true`, así que salen en
 `src-tauri/target/release/bundle/`:
 
-- `msi/BoffLauncher_<v>_x64_en-US.msi` + `.msi.sig`
 - `nsis/BoffLauncher_<v>_x64-setup.exe` + `.exe.sig`
 
+**Ya no se genera `.msi`.** `bundle.targets` excluye `msi` a propósito: WiX no
+deja personalizar los diálogos sin reescribir su UI entera, y su plantilla
+arranca la app como **proceso hijo de `msiexec`** desde el botón *Finish*
+(`<CustomAction Id="LaunchApplication" … Return="asyncNoWait">`), que es lo que
+ataba el cierre del launcher a un diálogo «Setup was interrupted». NSIS lanza el
+binario con `nsis_tauri_utils::RunAsUser`, fuera de la sesión del instalador.
+
 Con `createUpdaterArtifacts: true`, Tauri 2 usa el formato nativo: se sube el
-`.msi` o `.exe` y la firma es el contenido del `.sig` que lo acompaña. La
-extensión es significativa: el updater elige cómo instalar a partir de ella.
-Los `.zip` solo se generan si se configura `createUpdaterArtifacts` como
-`v1Compatible`.
+`.exe` y la firma es el contenido del `.sig` que lo acompaña. La extensión es
+significativa: el updater elige cómo instalar a partir de ella. Los `.zip` solo
+se generan si se configura `createUpdaterArtifacts` como `v1Compatible`.
+
+Si alguna vez vuelve a hacer falta el `.msi`, basta con añadir `"msi"` a
+`bundle.targets`; la personalización de `bundle.windows.wix` habría que
+rehacerla (se retiró en su momento).
+
+### 4.2.1 Personalizar el instalador
+
+Todo vive en `src-tauri/installer/` y se cablea desde
+`bundle.windows.nsis` en `tauri.conf.json`.
+
+| Fichero | Qué controla |
+|---|---|
+| `nsis-header.bmp` · `nsis-sidebar.bmp` | Imágenes del asistente y del desinstalador |
+| `hooks.nsh` | Estructura y comportamiento del asistente (`!define MUI_*`) |
+| `lang/Spanish.nsh` · `lang/English.nsh` | **Todos** los textos |
+
+**Imágenes.** Se generan a partir de `src-tauri/icons/icon.png`:
+
+```bash
+pnpm --filter launcher gen:installer-art
+```
+
+BMP de 24 bits con tamaños exactos (150×57 la cabecera, 164×314 el sidebar); si
+no cuadran, NSIS los ignora sin avisar. Si cambias el logo, regenéralos y
+**commitea los `.bmp`**: el build de Windows no ejecuta el script. La cabecera
+lleva texto negro encima, por eso la banda oscura solo cubre su tercio derecho.
+
+**Estructura (`hooks.nsh`).** Tauri hace `!include` de este fichero justo
+después de `MUI2.nsh` y **antes** de insertar las páginas, así que un `!define
+MUI_*` aquí llega a tiempo y se personaliza el asistente entero sin forkear la
+plantilla con `nsis.template` (que habría que rebasar en cada actualización de
+Tauri). La regla: solo se puede definir lo que la plantilla no define ya — un
+`!define` repetido es un **error de compilación**. Lo que la plantilla ya fija
+(iconos, imágenes, `MUI_FINISHPAGE_RUN`, `MUI_FINISHPAGE_SHOWREADME`) se toca
+desde `tauri.conf.json`, no desde aquí.
+
+**Textos (`lang/*.nsh`).** Un fichero en `customLanguageFiles` **reemplaza** por
+completo al de Tauri, no lo extiende: si falta una de las 27 LangStrings que
+`installer.nsi` referencia, NSIS no compila. Como se incluyen *después* de
+`!insertmacro MUI_LANGUAGE`, redefinir aquí una `MUI_TEXT_*`/`MUI_UNTEXT_*` gana
+sobre la traducción de MUI — es la única forma de tocar las páginas estándar.
+Usa `${PRODUCTNAME}`/`${VERSION}`, nunca `{{...}}`: estos ficheros se copian tal
+cual, sin pasar por el motor de plantillas.
+
+Con dos idiomas y `displayLanguageSelector: false`, NSIS elige por el idioma del
+sistema y cae al primero de la lista (español).
+
+NSIS se instala en modo `currentUser` (`%LOCALAPPDATA%`), así que no pide UAC ni
+al instalar ni al actualizar. La casilla de «abrir al terminar» sale
+**desmarcada** (`MUI_FINISHPAGE_RUN_NOTCHECKED`).
+
+### 4.2.2 Versión portable (sin instalador)
+
+```powershell
+pnpm --filter launcher build:portable
+```
+
+Deja `src-tauri/target/portable/BoffLauncher_<v>_portable_x64.zip` con el `.exe`
+suelto. El binario ya es autocontenido (el frontend va incrustado); lo único
+externo es el runtime de WebView2, presente de serie desde Windows 10 1803.
+
+Se compila con `BOFF_PORTABLE=1`, que **desactiva la auto-actualización**: el
+updater solo sabe entregar un instalador `.exe` a Windows, así que instalaría una
+copia paralela y reiniciaría en ella dejando la portable huérfana. La portable
+se actualiza volviendo a descargar el zip, y **no se sube al feed de releases**.
+
+Ojo: "portable" es solo el ejecutable. Las instancias, la caché y las
+credenciales siguen en las rutas de usuario de siempre, no junto al `.exe`.
 
 ### 4.3 Subir el artefacto
 
@@ -300,7 +373,7 @@ Launcher → Releases`. La pantalla usa la sesión del administrador que ya est�
 iniciada: no hay que copiar ni generar ningún bearer token, ni crear una cuenta
 de servicio.
 
-Selecciona el bundle generado por Tauri (`.msi` o `.exe`), su `.sig`, la versión, la plataforma y
+Selecciona el `-setup.exe` generado por Tauri, su `.sig`, la versión, la plataforma y
 las notas. **Subir borrador** guarda el artefacto sin ofrecerlo todavía a los
 launchers. Cuando hayas revisado la fila, pulsa **Publicar**. El botón
 **Despublicar** lo saca del feed sin borrar el artefacto.
@@ -318,9 +391,9 @@ disco). El sha512 lo calcula el servidor: no se acepta del cliente.
 curl -X POST "$API/launcher/admin/releases?version=0.1.0&target=windows-x86_64&notes=Arreglado%20el%20crash%20al%20revertir" \
   -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/octet-stream" \
-  -H "X-Updater-Signature: $(cat BoffLauncher_0.1.0_x64_en-US.msi.sig)" \
-  -H "X-Artifact-Filename: BoffLauncher_0.1.0_x64_en-US.msi" \
-  --data-binary @BoffLauncher_0.1.0_x64_en-US.msi
+  -H "X-Updater-Signature: $(cat BoffLauncher_0.1.0_x64-setup.exe.sig)" \
+  -H "X-Artifact-Filename: BoffLauncher_0.1.0_x64-setup.exe" \
+  --data-binary @BoffLauncher_0.1.0_x64-setup.exe
 ```
 
 `target` es la clave `{os}-{arch}` de Tauri: `windows-x86_64`,
