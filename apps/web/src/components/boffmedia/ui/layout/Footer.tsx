@@ -89,7 +89,7 @@ export function Footer() {
   return (
     // Full-height layouts opt out of the top gap by putting `data-footer-flush`
     // on their root (landing, tool shell) — the footer never needs to know them.
-    <footer className="relative mt-[90px] border-t-2 border-accent bg-base-2 text-txt-muted transition-[background,border-color] duration-[260ms] [body:has([data-footer-flush])_&]:mt-0">
+    <footer className="relative border-t-2 border-accent bg-base-2 text-txt-muted transition-[background,border-color] duration-[260ms] [body:has([data-footer-flush])_&]:mt-0">
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 opacity-50 [background:repeating-linear-gradient(180deg,var(--stripe)_0_1px,transparent_1px_3px)]"

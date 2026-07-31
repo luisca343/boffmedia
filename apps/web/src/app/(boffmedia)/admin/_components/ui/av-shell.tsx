@@ -24,23 +24,26 @@ interface AvShellProps {
   onNavigate: (id: string) => void
   children: React.ReactNode
   loading?: boolean
+  /** Drops the reading-measure cap and hands the section the full viewport
+   *  height, for app-like sections (Packs) rather than document-like ones. */
+  fluid?: boolean
 }
 
-export function AvShell({ nav, section, onNavigate, children, loading }: AvShellProps) {
+export function AvShell({ nav, section, onNavigate, children, loading, fluid }: AvShellProps) {
   const t = useTranslations("admin.shell")
   const allItems = nav.flatMap((g) => g.items)
   const active = allItems.find((i) => i.id === section)
 
   return (
-    <div className="grid min-h-screen items-start [grid-template-columns:1fr] md:[grid-template-columns:244px_minmax(0,1fr)] bg-base">
+    <div className="grid h-full [grid-template-columns:1fr] md:[grid-template-columns:244px_minmax(0,1fr)] bg-base">
       {/* Desktop rail */}
-      <aside className="hidden md:flex sticky top-0 self-start h-screen overflow-y-auto flex-col border-r border-solid border-line bg-base-2 pb-6 bm-scroll">
-        <div className="sticky top-0 z-[2] flex items-center gap-[11px] py-[18px_20px] px-5 border-b border-solid border-line bg-base-2">
+      <aside className="hidden md:flex sticky top-0 self-start h-full overflow-y-auto flex-col border-r border-solid border-line bg-base-2 pb-6 bm-scroll">
+        <div className="sticky top-0 z-[2] flex items-center gap-[11px] pt-[18px] pb-[20px] px-5 border-b border-solid border-line bg-base-2">
           <span className="cut-seal [--cut:7px] grid place-items-center w-[30px] h-[30px] bg-accent text-accent-ink shrink-0">
             <Icon name="bolt" size={17} />
           </span>
           <span className="font-display text-[20px] font-extrabold italic leading-none uppercase tracking-[0.01em]">
-            {t("brand")}<b className="text-accent not-italic font-extrabold">·</b>
+            {t("brand")}
           </span>
         </div>
 
@@ -75,7 +78,9 @@ export function AvShell({ nav, section, onNavigate, children, loading }: AvShell
         </nav>
       </aside>
 
-      <div className="min-w-0">
+      {/* h-full, not h-screen: the parent layout already sizes the section
+          to fill the viewport minus the Navbar. h-screen would overflow. */}
+      <div className={cn("min-w-0", fluid && "flex h-full min-h-0 flex-col overflow-hidden")}>
         {/* Mobile section tabs */}
         <div className="md:hidden flex gap-1 overflow-x-auto py-2.5 px-4 border-b border-solid border-line bg-base-2 sticky top-0 z-[4] [scrollbar-width:none]">
           {allItems.map(({ id, label, icon }) => {
@@ -108,7 +113,14 @@ export function AvShell({ nav, section, onNavigate, children, loading }: AvShell
           </span>
         </div>
 
-        <div className="p-[26px] max-w-[1180px] max-md:p-[18px_16px]">
+        <div
+          className={cn(
+            "p-[26px] max-md:p-[18px_16px]",
+            // min-h-0 is what lets a fluid child actually scroll inside the
+            // column instead of stretching it past the viewport.
+            fluid ? "flex min-h-0 flex-1 flex-col" : "max-w-[1180px]",
+          )}
+        >
           {loading ? (
             <div className="flex items-center justify-center min-h-[60vh]">
               <Spinner size={30} className="text-accent" />
