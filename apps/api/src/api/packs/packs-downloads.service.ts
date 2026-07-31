@@ -106,6 +106,12 @@ export class PacksDownloadsService {
     };
   }
 
+  /** The CDN URL alone, without streaming it. The catalog service hashes the
+   *  bytes itself, so it needs the URL but not this class's response handling. */
+  async curseforgeDownloadUrl(projectId: number, fileId: number): Promise<string> {
+    return this.resolveCurseforgeUrl(projectId, fileId, this.curseforgeKey);
+  }
+
   private async resolveCurseforgeUrl(
     projectId: number,
     fileId: number,

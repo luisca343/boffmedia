@@ -5,6 +5,7 @@ import { AuthModule } from '@api/auth/auth.module';
 import { LauncherAuthGuard } from './guards/launcher-auth.guard';
 import { LauncherController } from './launcher.controller';
 import { PacksAuthService } from './packs-auth.service';
+import { PacksCatalogService } from './packs-catalog.service';
 import { PacksDownloadsService } from './packs-downloads.service';
 import { PacksController } from './packs.controller';
 import { PacksRepository } from './packs.repository';
@@ -26,6 +27,7 @@ import { PacksService } from './packs.service';
     PacksService,
     PacksAuthService,
     PacksDownloadsService,
+    PacksCatalogService,
     LauncherAuthGuard,
   ],
   exports: [PacksService],
