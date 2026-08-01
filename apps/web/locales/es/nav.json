@@ -162,14 +162,16 @@
       "delete": "Eliminar",
       "sections": {
         "competition": "Competición",
-        "participate": "Participa"
+        "participate": "Participa",
+        "play": "Jugar"
       },
       "items": {
         "games": "Juegos",
         "ranking": "Clasificación",
         "events": "Eventos",
         "raffles": "Sorteos",
-        "tournaments": "Torneos"
+        "tournaments": "Torneos",
+        "launcher": "Boff Launcher"
       },
       "footer": {
         "tagline": "Comunidad gaming: torneos, servidores, herramientas competitivas y una temporada siempre en marcha.",
@@ -186,7 +188,8 @@
         "admin": "Admin",
         "privacy": "Privacidad",
         "web": "Web",
-        "discord": "Discord"
+        "discord": "Discord",
+        "launcher": "Descargar el launcher"
       }
     }
   }

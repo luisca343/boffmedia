@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { DrizzleModule } from '@api/_utils/drizzle/drizzle.module';
 import { AuthModule } from '@api/auth/auth.module';
+import { LauncherDownloadsController } from './launcher-downloads.controller';
 import { LauncherUpdatesAdminController } from './launcher-updates-admin.controller';
 import { LauncherUpdatesController } from './launcher-updates.controller';
 import { LauncherUpdatesService } from './launcher-updates.service';
@@ -8,7 +9,11 @@ import { LauncherReleasesRepository } from './repositories/launcher-releases.rep
 
 @Module({
   imports: [DrizzleModule, AuthModule],
-  controllers: [LauncherUpdatesController, LauncherUpdatesAdminController],
+  controllers: [
+    LauncherUpdatesController,
+    LauncherDownloadsController,
+    LauncherUpdatesAdminController,
+  ],
   providers: [LauncherUpdatesService, LauncherReleasesRepository],
   exports: [LauncherUpdatesService],
 })

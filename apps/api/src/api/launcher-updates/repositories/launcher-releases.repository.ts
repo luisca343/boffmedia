@@ -50,6 +50,16 @@ export class LauncherReleasesRepository {
       .orderBy(desc(launcherReleases.publishedAt));
   }
 
+  /** Every published row, all targets. Same caveat as above: the ordering is a
+   *  tiebreaker, not the semver answer. */
+  async listPublished(): Promise<LauncherRelease[]> {
+    return this.db
+      .select()
+      .from(launcherReleases)
+      .where(eq(launcherReleases.published, true))
+      .orderBy(desc(launcherReleases.publishedAt));
+  }
+
   async listAll(): Promise<LauncherRelease[]> {
     return this.db.select().from(launcherReleases).orderBy(desc(launcherReleases.createdAt));
   }
