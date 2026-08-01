@@ -229,7 +229,7 @@ async fn fetch_one(
 
 /// Turn a `Fetch` into a URL. Only Modrinth needs a round-trip: the manifest
 /// stores a version id, and the CDN path is not derivable from it.
-async fn resolve_url(http: &reqwest::Client, file: &PlannedFile) -> Result<String, InstallFailure> {
+pub(crate) async fn resolve_url(http: &reqwest::Client, file: &PlannedFile) -> Result<String, InstallFailure> {
     match &file.fetch {
         Fetch::Direct(url) => Ok(url.clone()),
         // Unreachable by construction: `fetch_one` routes these to the API

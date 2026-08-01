@@ -24,8 +24,10 @@
 pub mod api;
 pub mod auth;
 pub mod install;
+pub mod local_packs;
 pub mod pack;
 pub mod settings;
+pub mod status;
 pub mod updates;
 
 use serde::Serialize;
@@ -70,6 +72,8 @@ pub fn run() {
         // The endpoint list from tauri.conf.json is only the default; every
         // check re-points it at `api::base_url()` (see updates.rs).
         .plugin(tauri_plugin_updater::Builder::new().build())
+        // RF-06/RF-07 file pickers for local pack export/import.
+        .plugin(tauri_plugin_dialog::init())
         .manage(updates::UpdateState::default())
         .manage(auth::AuthState::default())
         .manage(api::ApiState::default())
@@ -103,6 +107,13 @@ pub fn run() {
             settings::plays_get,
             updates::updates_check,
             updates::updates_install,
+            status::server_status,
+            local_packs::local_packs_list,
+            local_packs::local_pack_get,
+            local_packs::local_pack_save,
+            local_packs::local_pack_delete,
+            local_packs::export_mrpack,
+            local_packs::import_mrpack,
         ])
         .run(tauri::generate_context!())
         .expect("error while running the Boff Launcher");

@@ -2,7 +2,16 @@ import { invoke } from "@tauri-apps/api/core"
 import { listen } from "@tauri-apps/api/event"
 import { getCurrentWindow } from "@tauri-apps/api/window"
 
-import { MOCK_CRASH_LOG, MOCK_DIAGNOSIS, MOCK_SETTINGS, mockLogs } from "./services/mock"
+import {
+  MOCK_CRASH_LOG,
+  MOCK_DIAGNOSIS,
+  MOCK_SETTINGS,
+  mockLocalPacks,
+  mockLogs,
+  mockServerStatus,
+} from "./services/mock"
+import type { PackManifest } from "@boffmedia/pack-schema"
+
 import type {
   GameState,
   InstallPhase,
@@ -15,6 +24,7 @@ import type {
   ResolvedRuntime,
   RetainedVersion,
   RuntimeSource,
+  ServerStatus,
   Settings,
 } from "./services/types"
 
@@ -23,9 +33,11 @@ export type {
   JavaChoice,
   MemoryChoice,
   OptionalFile,
+  PackManifest,
   ResolvedRuntime,
   RetainedVersion,
   RuntimeSource,
+  ServerStatus,
 }
 
 // The single boundary between the renderer and the Rust shell. Keeping it in
@@ -728,5 +740,94 @@ export async function revealWindow(): Promise<void> {
     await getCurrentWindow().show()
   } catch {
     /* a visible window is not worth crashing over */
+  }
+}
+
+// ── Server List Ping (RF-03/RF-04) ─────────────────────────────────────────
+// Rust never throws here (status.rs folds every failure into `online: false`),
+// so the bridge does not either — a card that cannot ping shows offline, not
+// an error state.
+
+export async function serverStatus(host: string, port?: number): Promise<ServerStatus> {
+  if (!isDesktop()) return mockServerStatus(host)
+  try {
+    return await invoke<ServerStatus>("server_status", { host, port: port ?? null })
+  } catch {
+    return { online: false, players: null, motd: null, latencyMs: null }
+  }
+}
+
+// ── Local packs (RF-05..RF-10) ──────────────────────────────────────────────
+// A local pack is a full PackManifest, the same document a managed pack
+// downloads (spec D3) — install_pack/launch_pack take it as-is. `slug` always
+// carries the reserved `local-` prefix (local_packs.rs), which is what keeps
+// a local pack from ever addressing a managed one.
+
+export async function localPacksList(): Promise<PackManifest[]> {
+  if (!isDesktop()) return mockLocalPacks()
+  try {
+    return await invoke<PackManifest[]>("local_packs_list")
+  } catch {
+    return []
+  }
+}
+
+export async function localPackGet(slug: string): Promise<PackManifest | null> {
+  if (!isDesktop()) return mockLocalPacks().find((m) => m.pack.slug === slug) ?? null
+  try {
+    return await invoke<PackManifest>("local_pack_get", { slug })
+  } catch (err) {
+    throw asFailure(err)
+  }
+}
+
+/** Create (no existing local slug) or save-in-place (an existing one). The
+ *  Rust side assigns a fresh, collision-free `local-` slug for a new pack. */
+export async function localPackSave(manifest: unknown): Promise<PackManifest> {
+  if (!isDesktop()) return manifest as PackManifest
+  try {
+    return await invoke<PackManifest>("local_pack_save", { manifest })
+  } catch (err) {
+    throw asFailure(err)
+  }
+}
+
+export async function localPackDelete(slug: string): Promise<void> {
+  if (!isDesktop()) return
+  try {
+    await invoke("local_pack_delete", { slug })
+  } catch (err) {
+    throw asFailure(err)
+  }
+}
+
+/** Opens the native save dialog itself (no file-picker plugin on this side of
+ *  the boundary); resolves to the chosen path, or throws if the player
+ *  cancelled. */
+export async function exportMrpack(slug: string): Promise<string> {
+  if (!isDesktop()) throw asFailure({ message: "La exportación solo funciona en la aplicación de escritorio." })
+  try {
+    return await invoke<string>("export_mrpack", { slug })
+  } catch (err) {
+    throw asFailure(err)
+  }
+}
+
+export type ImportMrpackResult = {
+  manifest: PackManifest
+  /** True when the imported pack's name collided with one already in the
+   *  library and was renamed with a suffix (spec D4) — show a non-blocking
+   *  notice, never a silent rename. */
+  renamed: boolean
+}
+
+/** Opens the native file-picker itself; throws if the player cancelled, the
+ *  file was not a valid Boffmedia .mrpack, or its loader is unsupported. */
+export async function importMrpack(): Promise<ImportMrpackResult> {
+  if (!isDesktop()) throw asFailure({ message: "La importación solo funciona en la aplicación de escritorio." })
+  try {
+    return await invoke<ImportMrpackResult>("import_mrpack")
+  } catch (err) {
+    throw asFailure(err)
   }
 }

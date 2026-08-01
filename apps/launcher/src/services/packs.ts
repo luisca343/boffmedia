@@ -1,4 +1,13 @@
-import { instanceScan, isDesktop, packsList, playsGet, type LauncherPack } from "../runtime"
+import type { PackManifest } from "@boffmedia/pack-schema"
+
+import {
+  instanceScan,
+  isDesktop,
+  localPacksList,
+  packsList,
+  playsGet,
+  type LauncherPack,
+} from "../runtime"
 import { mockPackEntries } from "./mock"
 import type { InstallState, PackEntry, PackVersionSummary } from "./types"
 
@@ -20,17 +29,63 @@ function toVersion(pack: LauncherPack): PackVersionSummary | null {
   }
 }
 
+/** A local pack has no separate "listing" shape — it IS the manifest — so this
+ *  derives the same view model a managed pack's `LauncherPack` gives, straight
+ *  from the document `local_packs_list` returns. */
+function toLocalEntry(manifest: PackManifest): PackEntry {
+  const loaderEntry = Object.entries(manifest.version.dependencies).find(
+    ([key]) => key !== "minecraft",
+  )
+  return {
+    pack: {
+      id: manifest.pack.id,
+      slug: manifest.pack.slug,
+      name: manifest.pack.name,
+      summary: manifest.pack.summary ?? null,
+      iconUrl: manifest.pack.iconUrl ?? null,
+      accessKind: manifest.pack.access.kind,
+    },
+    latest: {
+      id: manifest.version.id,
+      name: manifest.version.name,
+      minecraft: manifest.version.dependencies.minecraft,
+      loader: loaderEntry?.[0] ?? null,
+      loaderVersion: loaderEntry?.[1] ?? null,
+      fileCount: manifest.version.files.length,
+      createdAt: manifest.version.createdAt,
+    },
+    // A local pack is always "on disk" as a document; install/launch runs the
+    // same verify-then-install pass a managed pack does, so its files are
+    // "installed" only once that has actually happened. Scanned below like
+    // any other slug.
+    state: { kind: "not-installed" },
+    lastPlayed: null,
+    origin: "local",
+    server: manifest.pack.server,
+  }
+}
+
 /**
  * Load the player's library. In a browser there is no Rust side, so the mock
  * list stands in — that is what keeps `pnpm dev:renderer` a complete UI
  * environment. Throws an AuthFailure on desktop; the caller decides whether
  * that means "sign in again" or "the server is down".
+ *
+ * Managed and local packs are merged by slug; a local pack can never win that
+ * merge over a managed one, because every local slug carries the reserved
+ * `local-` prefix a managed slug never has (RF-10, spec D3) — so there is
+ * nothing here for a collision to resolve.
  */
 export async function loadPackEntries(): Promise<PackEntry[]> {
   if (!isDesktop()) return mockPackEntries()
 
-  const [packs, plays] = await Promise.all([packsList(), playsGet()])
-  return Promise.all(
+  const [packs, plays, localManifests] = await Promise.all([
+    packsList(),
+    playsGet(),
+    localPacksList(),
+  ])
+
+  const managed = await Promise.all(
     packs.map(async (pack) => {
       const latest = toVersion(pack)
       // A scan is a few stat() calls; one unreadable instance must not take the
@@ -41,7 +96,7 @@ export async function loadPackEntries(): Promise<PackEntry[]> {
       } catch {
         /* keep the listing usable */
       }
-      return {
+      const entry: PackEntry = {
         pack: {
           id: pack.id,
           slug: pack.slug,
@@ -53,7 +108,24 @@ export async function loadPackEntries(): Promise<PackEntry[]> {
         latest,
         state,
         lastPlayed: plays[pack.id] ?? null,
+        origin: "managed",
       }
+      return entry
     }),
   )
+
+  const local = await Promise.all(
+    localManifests.map(async (manifest) => {
+      const entry = toLocalEntry(manifest)
+      try {
+        entry.state = await instanceScan(entry.pack.slug, null)
+      } catch {
+        /* keep the listing usable */
+      }
+      return entry
+    }),
+  )
+
+  const managedSlugs = new Set(managed.map((e) => e.pack.slug))
+  return [...managed, ...local.filter((e) => !managedSlugs.has(e.pack.slug))]
 }

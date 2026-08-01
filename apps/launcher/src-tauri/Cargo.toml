@@ -51,7 +51,15 @@ keyring = { version = "3", features = ["apple-native", "windows-native", "sync-s
 # §5's auth chain is hand-rolled (portablemc::msa cannot surface the refresh
 # token for the keychain), so the launcher makes these calls itself.
 reqwest = { version = "0.12", features = ["json"] }
-tokio = { version = "1", features = ["time", "sync"] }
+# "net" + "io-util": the hand-rolled SLP client (status.rs) opens a raw
+# TcpStream and writes/reads varints over it directly, no HTTP involved.
+tokio = { version = "1", features = ["time", "sync", "net", "io-util"] }
+# Packs locales: export_mrpack/import_mrpack read and write the .mrpack zip
+# container (local_packs.rs).
+zip = "2"
+# RF-06/RF-07 file pickers (export destination, import source). No dialog
+# plugin existed before this feature.
+tauri-plugin-dialog = "2"
 # §6 file verification. portablemc's downloader only checks sha1, but every file
 # in a Boffmedia manifest carries a mandatory sha512 (packages/pack-schema), so
 # the pack payload is downloaded and verified by install/files.rs instead.

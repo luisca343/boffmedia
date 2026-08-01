@@ -1,11 +1,56 @@
-import { useMemo, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 
-import { Badge, Button, Empty, Icon, Kicker, Panel, Progress, SearchInput } from "@boffmedia/ui"
+import {
+  Badge,
+  Button,
+  Empty,
+  Field,
+  Icon,
+  Input,
+  Kicker,
+  Modal,
+  Panel,
+  Progress,
+  SearchInput,
+  Select,
+  toast,
+} from "@boffmedia/ui"
 
-import type { InstallState, PackEntry } from "../services/types"
+import { importMrpack, localPackSave, serverStatus } from "../runtime"
+import type { InstallState, PackEntry, ServerStatus } from "../services/types"
 import { useLauncher } from "../state/launcher"
 import { formatBytes, formatWhen } from "../utils/format"
 import { PHASE_LABEL } from "../utils/labels"
+
+/** RF-03/RF-04: pings once on mount, only when the pack declares a server, and
+ *  degrades silently to offline — there is no error state to render, so a
+ *  ping that throws is caught and folded into the same offline badge a timeout
+ *  produces. */
+function ServerStatusBadge({ host, port }: { host: string; port: number }) {
+  const [status, setStatus] = useState<ServerStatus | null>(null)
+
+  useEffect(() => {
+    let cancelled = false
+    void serverStatus(host, port)
+      .then((s) => {
+        if (!cancelled) setStatus(s)
+      })
+      .catch(() => {
+        if (!cancelled) setStatus({ online: false, players: null, motd: null, latencyMs: null })
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [host, port])
+
+  if (!status) return <Badge tone="info">Consultando…</Badge>
+  if (!status.online) return <Badge tone="bad">Servidor offline</Badge>
+  return (
+    <Badge tone="ok">
+      {status.players ? `${status.players.online}/${status.players.max} jugadores` : "En línea"}
+    </Badge>
+  )
+}
 
 function StateBadge({ state }: { state: InstallState }) {
   switch (state.kind) {
@@ -69,6 +114,8 @@ function PackCard({ entry }: { entry: PackEntry }) {
 
       <div className="mb-4 flex flex-wrap items-center gap-2">
         <AccessBadge entry={entry} />
+        {/* RF-02: nothing renders here at all when the pack has no server. */}
+        {entry.server && <ServerStatusBadge host={entry.server.host} port={entry.server.port} />}
         <span className="font-mono text-[11px] text-txt-dim">
           {latest
             ? `${latest.minecraft} · ${latest.fileCount} archivos`
@@ -128,9 +175,102 @@ function PackCard({ entry }: { entry: PackEntry }) {
   )
 }
 
+const MC_VERSIONS = ["1.21.4", "1.21.1", "1.20.4", "1.20.1", "1.19.4"]
+const LOADERS = [
+  { value: "", label: "Vanilla" },
+  { value: "forge", label: "Forge" },
+  { value: "neoforge", label: "NeoForge" },
+  { value: "fabric-loader", label: "Fabric" },
+  { value: "quilt-loader", label: "Quilt" },
+]
+
+/** RF-05: a minimal creation form — name, Minecraft version and loader. Mods
+ *  are added afterwards from the pack's own detail view; this only needs to
+ *  produce a valid, empty PackManifest for `local_pack_save` to persist. */
+function CreateLocalPackModal({ open, onClose, onCreated }: { open: boolean; onClose: () => void; onCreated: () => void }) {
+  const [name, setName] = useState("")
+  const [minecraft, setMinecraft] = useState(MC_VERSIONS[0])
+  const [loader, setLoader] = useState("")
+  const [saving, setSaving] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  const create = async () => {
+    if (!name.trim()) {
+      setError("Ponle un nombre al pack.")
+      return
+    }
+    setSaving(true)
+    setError(null)
+    try {
+      const dependencies: Record<string, string> = { minecraft }
+      if (loader) dependencies[loader] = "latest"
+      await localPackSave({
+        formatVersion: 1,
+        pack: { id: "", slug: "", name: name.trim(), access: { kind: "public" } },
+        version: {
+          id: "local-v1",
+          name: "local",
+          createdAt: new Date().toISOString(),
+          dependencies,
+          files: [],
+        },
+      })
+      setName("")
+      onCreated()
+      onClose()
+    } catch (err) {
+      setError((err as { message?: string })?.message ?? "No se pudo crear el pack.")
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  return (
+    <Modal open={open} onClose={onClose} title="Crear pack local">
+      <div className="flex flex-col gap-4">
+        <Field label="Nombre">
+          <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Mi pack" />
+        </Field>
+        <Select label="Minecraft" value={minecraft} onChange={setMinecraft} options={MC_VERSIONS} />
+        <Select label="Loader" value={loader} onChange={setLoader} options={LOADERS} />
+        {error && <p className="text-xs text-bad">{error}</p>}
+        <div className="flex justify-end gap-2">
+          <Button size="sm" onClick={onClose}>
+            Cancelar
+          </Button>
+          <Button size="sm" variant="pri" loading={saving} onClick={() => void create()}>
+            Crear
+          </Button>
+        </div>
+      </div>
+    </Modal>
+  )
+}
+
 export function Packs() {
   const { packs, packsLoading, packsError, reloadPacks } = useLauncher()
   const [query, setQuery] = useState("")
+  const [creating, setCreating] = useState(false)
+  const [importing, setImporting] = useState(false)
+
+  const doImport = async () => {
+    setImporting(true)
+    try {
+      const { manifest, renamed } = await importMrpack()
+      reloadPacks()
+      // RF-09: a non-blocking notice, never a silent rename.
+      toast.success(
+        renamed
+          ? `Importado como «${manifest.pack.name}» (había un pack con ese nombre).`
+          : `Pack «${manifest.pack.name}» importado.`,
+      )
+    } catch (err) {
+      const message = (err as { message?: string })?.message ?? "No se pudo importar el .mrpack."
+      toast.error(message)
+    } finally {
+      setImporting(false)
+    }
+  }
 
   const shown = useMemo(() => {
     const q = query.trim().toLowerCase()
@@ -152,10 +292,27 @@ export function Packs() {
             Packs
           </h1>
         </div>
-        <div className="w-[280px]">
-          <SearchInput value={query} onChange={setQuery} placeholder="Buscar pack…" size="sm" />
+        <div className="flex items-end gap-3">
+          <div className="w-[280px]">
+            <SearchInput value={query} onChange={setQuery} placeholder="Buscar pack…" size="sm" />
+          </div>
+          <Button size="sm" icon="upload" loading={importing} onClick={() => void doImport()}>
+            Importar .mrpack
+          </Button>
+          <Button size="sm" variant="pri" icon="plus" onClick={() => setCreating(true)}>
+            Crear pack local
+          </Button>
         </div>
       </header>
+
+      <CreateLocalPackModal
+        open={creating}
+        onClose={() => setCreating(false)}
+        onCreated={() => {
+          reloadPacks()
+          toast.success("Pack local creado.")
+        }}
+      />
 
       {/* Three distinct states, deliberately not collapsed into one: a server
           that cannot be reached is not the same as a library that is empty,

@@ -1,6 +1,6 @@
 import * as React from "react"
 
-import { MOCK_ACCOUNT, MOCK_DEVICE_CODE, MOCK_SETTINGS } from "../services/mock"
+import { MOCK_ACCOUNT, MOCK_DEVICE_CODE, MOCK_SETTINGS, mockLocalPacks } from "../services/mock"
 import { loadPackEntries } from "../services/packs"
 import {
   authBegin,
@@ -11,6 +11,7 @@ import {
   instanceScan,
   isDesktop,
   launchPack,
+  localPackGet,
   onGameLog,
   onGameState,
   onInstallDone,
@@ -406,8 +407,23 @@ export function LauncherProvider({ children }: { children: React.ReactNode }) {
 
   // §6. The manifest is fetched here rather than in Rust because the password
   // path (§7.1) is a UI decision; install_pack re-validates whatever it gets.
+  //
+  // A local pack IS its manifest (spec D3), so there is no registry call for
+  // it — `packManifest` only ever knows a managed pack's server-issued id.
+  // Branching on `origin` is what lets install()/play() work unchanged for
+  // both: the manifest itself is the only thing that differs.
   const manifestFor = React.useCallback(async (packId: string) => {
-    if (!isDesktop()) return null
+    const entry = packsRef.current.find((p) => p.pack.id === packId)
+    const isLocal = entry?.origin === "local"
+
+    if (!isDesktop()) {
+      if (!isLocal) return null
+      // dev:renderer has no Rust side to ask, so the same mock library
+      // `local_packs_list`'s browser stand-in serves is looked up by id.
+      return mockLocalPacks().find((m) => m.pack.id === packId) ?? null
+    }
+
+    if (isLocal && entry) return localPackGet(entry.pack.slug)
     return packManifest(packId)
   }, [])
 

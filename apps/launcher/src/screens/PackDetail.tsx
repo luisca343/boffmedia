@@ -6,16 +6,22 @@ import {
   DataList,
   Divider,
   Empty,
+  Field,
   Icon,
+  Input,
   Kicker,
+  Modal,
   Panel,
   Progress,
+  Select,
   Stats,
   Stepper,
+  toast,
 } from "@boffmedia/ui"
 
 import { CrashDiagnosisCard } from "../components/CrashDiagnosis"
 import { InstanceSpace } from "../components/InstanceSpace"
+import { exportMrpack, localPackGet, localPackSave } from "../runtime"
 import { useLauncher } from "../state/launcher"
 import { formatBytes, formatDuration, formatWhen } from "../utils/format"
 import { LOADER_LABEL, PHASE_LABEL, STEP_GROUPS } from "../utils/labels"
@@ -31,9 +37,96 @@ function useNow(active: boolean): number {
   return now
 }
 
+const MC_VERSIONS = ["1.21.4", "1.21.1", "1.20.4", "1.20.1", "1.19.4"]
+const LOADERS = [
+  { value: "", label: "Vanilla" },
+  { value: "forge", label: "Forge" },
+  { value: "neoforge", label: "NeoForge" },
+  { value: "fabric-loader", label: "Fabric" },
+  { value: "quilt-loader", label: "Quilt" },
+]
+
+/** RF-10: edit is only ever offered for a local pack, and only ever writes
+ *  back to that SAME slug — `localPackSave` overwrites in place when the slug
+ *  it is given already exists under `local-packs/`, so this can never create
+ *  a second pack or touch a managed one. */
+function EditLocalPackModal({
+  open,
+  onClose,
+  onSaved,
+  pack,
+  latest,
+}: {
+  open: boolean
+  onClose: () => void
+  onSaved: () => void
+  pack: { id: string; slug: string; name: string }
+  latest: { minecraft: string; loader: string | null } | null
+}) {
+  const [name, setName] = useState(pack.name)
+  const [minecraft, setMinecraft] = useState(latest?.minecraft ?? MC_VERSIONS[0])
+  const [loader, setLoader] = useState(latest?.loader ?? "")
+  const [saving, setSaving] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    setName(pack.name)
+    setMinecraft(latest?.minecraft ?? MC_VERSIONS[0])
+    setLoader(latest?.loader ?? "")
+  }, [open, pack.name, latest?.minecraft, latest?.loader])
+
+  const save = async () => {
+    if (!name.trim()) {
+      setError("Ponle un nombre al pack.")
+      return
+    }
+    setSaving(true)
+    setError(null)
+    try {
+      const current = await localPackGet(pack.slug)
+      const dependencies: Record<string, string> = { minecraft }
+      if (loader) dependencies[loader] = "latest"
+      await localPackSave({
+        ...current,
+        pack: { ...(current?.pack ?? { id: pack.id, slug: pack.slug, access: { kind: "public" } }), name: name.trim(), slug: pack.slug },
+        version: { ...(current?.version ?? { id: "local-v1", name: "local", createdAt: new Date().toISOString(), files: [] }), dependencies },
+      })
+      onSaved()
+      onClose()
+    } catch (err) {
+      setError((err as { message?: string })?.message ?? "No se pudo guardar el pack.")
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  return (
+    <Modal open={open} onClose={onClose} title="Editar pack local">
+      <div className="flex flex-col gap-4">
+        <Field label="Nombre">
+          <Input value={name} onChange={(e) => setName(e.target.value)} />
+        </Field>
+        <Select label="Minecraft" value={minecraft} onChange={setMinecraft} options={MC_VERSIONS} />
+        <Select label="Loader" value={loader} onChange={setLoader} options={LOADERS} />
+        {error && <p className="text-xs text-bad">{error}</p>}
+        <div className="flex justify-end gap-2">
+          <Button size="sm" onClick={onClose}>
+            Cancelar
+          </Button>
+          <Button size="sm" variant="pri" loading={saving} onClick={() => void save()}>
+            Guardar
+          </Button>
+        </div>
+      </div>
+    </Modal>
+  )
+}
+
 export function PackDetail() {
   const { selected, install, play, repair, stop, game, go, logs, reloadPacks } = useLauncher()
   const now = useNow(game.kind === "running")
+  const [editing, setEditing] = useState(false)
+  const [exporting, setExporting] = useState(false)
 
   if (!selected) {
     return (
@@ -51,7 +144,24 @@ export function PackDetail() {
     )
   }
 
-  const { pack, latest, state } = selected
+  const { pack, latest, state, origin } = selected
+  const isLocal = origin === "local"
+
+  const doExport = async () => {
+    setExporting(true)
+    try {
+      await exportMrpack(pack.slug)
+      toast.success("Pack exportado.")
+    } catch (err) {
+      const message = (err as { message?: string })?.message
+      if (message !== "Exportación cancelada.") {
+        toast.error(message ?? "No se pudo exportar el pack.")
+      }
+    } finally {
+      setExporting(false)
+    }
+  }
+
   // The tail is where the stack trace ends up; a crash log's first lines are
   // just the JVM banner.
   const crashLines = logs.filter((line) => line.level === "error").slice(-12)
@@ -84,6 +194,18 @@ export function PackDetail() {
         </div>
 
         <div className="flex items-center gap-2">
+          {/* RF-10: a managed pack never shows these — editing or exporting it
+              is not a flow this launcher offers, anywhere. */}
+          {isLocal && (
+            <>
+              <Button size="sm" icon="edit" onClick={() => setEditing(true)}>
+                Editar
+              </Button>
+              <Button size="sm" icon="upload" loading={exporting} onClick={() => void doExport()}>
+                Exportar
+              </Button>
+            </>
+          )}
           {/* Exactly one action, chosen by the state machine. Never offer Play
               while an install is in flight — the jars on disk are incomplete. */}
           {running ? (
@@ -265,6 +387,19 @@ export function PackDetail() {
           purpose: both only make sense once the pack is installed, and neither
           should compete with the single primary action in the header. */}
       <InstanceSpace slug={pack.slug} onChanged={reloadPacks} />
+
+      {isLocal && (
+        <EditLocalPackModal
+          open={editing}
+          onClose={() => setEditing(false)}
+          onSaved={() => {
+            reloadPacks()
+            toast.success("Pack guardado.")
+          }}
+          pack={pack}
+          latest={latest}
+        />
+      )}
     </div>
   )
 }

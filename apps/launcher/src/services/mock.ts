@@ -1,3 +1,5 @@
+import type { PackManifest } from "@boffmedia/pack-schema"
+
 import type {
   Account,
   CrashDiagnosis,
@@ -6,6 +8,7 @@ import type {
   PackEntry,
   PackSummary,
   PackVersionSummary,
+  ServerStatus,
   Settings,
 } from "./types"
 
@@ -31,7 +34,15 @@ function version(
   }
 }
 
-const PACKS: { pack: PackSummary; latest: PackVersionSummary }[] = [
+// RF-01/RF-03: boff-smp declares a server so the Quick Play flag and the
+// status badge are both demoable from `pnpm dev:renderer`.
+const SMP_SERVER = { host: "play.boffmedia.es", port: 25565 }
+
+const PACKS: {
+  pack: PackSummary
+  latest: PackVersionSummary
+  server?: { host: string; port: number }
+}[] = [
   {
     pack: {
       id: "pk_smp",
@@ -42,6 +53,7 @@ const PACKS: { pack: PackSummary; latest: PackVersionSummary }[] = [
       accessKind: "allowlist",
     },
     latest: version("v_smp_5", "1.4.2", "2026-07-28T18:04:00Z", 84),
+    server: SMP_SERVER,
   },
   {
     pack: {
@@ -104,14 +116,78 @@ export function mockPackEntries(): PackEntry[] {
         sizeBytes: 1_284_000_000,
       },
       lastPlayed: "2026-07-29T21:12:00Z",
+      origin: "managed",
     },
     {
       ...PACKS[1],
       state: { kind: "installed", versionId: "v_cre_2", sizeBytes: 612_000_000 },
       lastPlayed: "2026-07-20T17:45:00Z",
+      origin: "managed",
     },
-    { ...PACKS[2], state: { kind: "not-installed" }, lastPlayed: null },
+    { ...PACKS[2], state: { kind: "not-installed" }, lastPlayed: null, origin: "managed" },
+    ...mockLocalPacks().map((manifest) => ({
+      pack: {
+        id: manifest.pack.id,
+        slug: manifest.pack.slug,
+        name: manifest.pack.name,
+        summary: manifest.pack.summary ?? null,
+        iconUrl: manifest.pack.iconUrl ?? null,
+        accessKind: manifest.pack.access.kind,
+      },
+      latest: {
+        id: manifest.version.id,
+        name: manifest.version.name,
+        minecraft: manifest.version.dependencies.minecraft,
+        loader: null,
+        loaderVersion: null,
+        fileCount: manifest.version.files.length,
+        createdAt: manifest.version.createdAt,
+      },
+      state: { kind: "not-installed" as const },
+      lastPlayed: null,
+      origin: "local" as const,
+      server: manifest.pack.server,
+    })),
   ]
+}
+
+/** RF-05..RF-09 in browser mode: a small in-memory library so the create/edit,
+ *  export and import flows are all developable from `pnpm dev:renderer`. */
+const localLibrary: PackManifest[] = [
+  {
+    formatVersion: 1,
+    pack: {
+      id: "local:local-mi-pack",
+      slug: "local-mi-pack",
+      name: "Mi pack",
+      access: { kind: "public" },
+    },
+    version: {
+      id: "local-v1",
+      name: "local",
+      createdAt: "2026-07-15T10:00:00Z",
+      dependencies: { minecraft: "1.21.4" },
+      files: [],
+    },
+  },
+]
+
+export function mockLocalPacks(): PackManifest[] {
+  return localLibrary.map((m) => structuredClone(m))
+}
+
+/** RF-03/RF-04 in browser mode: one clearly online server (players + MOTD) and
+ *  one offline one, so both badge states are visible without a real ping. */
+export function mockServerStatus(host: string): ServerStatus {
+  if (host === SMP_SERVER.host) {
+    return {
+      online: true,
+      players: { online: 10, max: 32 },
+      motd: "Test Server",
+      latencyMs: 34,
+    }
+  }
+  return { online: false, players: null, motd: null, latencyMs: null }
 }
 
 const LOG_SEED: [LogLine["level"], LogLine["source"], string][] = [

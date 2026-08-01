@@ -91,8 +91,15 @@ fn now_ms() -> u64 {
 pub fn spawn(
     app: &tauri::AppHandle,
     game: &portablemc::base::Game,
+    quick_play: Option<&str>,
 ) -> Result<RunningGame, InstallFailure> {
     let mut command: Command = game.command();
+    // RF-01/RF-02: only appended when the pack declares a server AND the pack's
+    // Minecraft version supports it (resolve::supports_quick_play); absent, the
+    // command is byte-for-byte what it was before this feature.
+    if let Some(target) = quick_play {
+        command.arg("--quickPlayMultiplayer").arg(target);
+    }
     command.stdout(Stdio::piped()).stderr(Stdio::piped());
     // The game reads nothing from stdin; leaving it inherited keeps a handle to
     // the launcher's own console alive on Windows.

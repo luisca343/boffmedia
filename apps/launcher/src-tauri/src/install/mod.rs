@@ -619,7 +619,7 @@ pub async fn launch_pack(
     }
     reporter.done();
 
-    let running = process::spawn(&app, &game)?;
+    let running = process::spawn(&app, &game, prepared.plan.quick_play.as_deref())?;
     let pid = running.pid;
     settings::record_play(&app, &pack_id);
     manager.running.lock().await.insert(pack_id, running);

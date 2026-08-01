@@ -66,6 +66,29 @@ export type PackEntry = {
   state: InstallState
   /** Null until the pack has been launched at least once. */
   lastPlayed: string | null
+  /** RF-10: "managed" comes from the Boffmedia registry and is read-only in
+   *  this launcher; "local" was created/imported on this machine and can be
+   *  edited or exported. */
+  origin: "managed" | "local"
+  /** RF-01/RF-02: present only when the pack's manifest declares one — its
+   *  absence is what keeps a pack without a server looking exactly as it did
+   *  before this feature. */
+  server?: { host: string; port: number }
+}
+
+// ── Server List Ping (RF-03/RF-04) ──────────────────────────────────────────
+// Mirrors Rust's `status::ServerStatus`, camelCase on the wire.
+
+export type ServerPlayers = {
+  online: number
+  max: number
+}
+
+export type ServerStatus = {
+  online: boolean
+  players: ServerPlayers | null
+  motd: string | null
+  latencyMs: number | null
 }
 
 export type Account = {
