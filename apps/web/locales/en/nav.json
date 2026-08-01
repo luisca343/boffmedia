@@ -162,14 +162,16 @@
       "delete": "Delete",
       "sections": {
         "competition": "Competition",
-        "participate": "Take part"
+        "participate": "Take part",
+        "play": "Play"
       },
       "items": {
         "games": "Games",
         "ranking": "Ranking",
         "events": "Events",
         "raffles": "Raffles",
-        "tournaments": "Tournaments"
+        "tournaments": "Tournaments",
+        "launcher": "Boff Launcher"
       },
       "footer": {
         "tagline": "Gaming community: tournaments, servers, competitive tools and a season that never stops.",
@@ -186,7 +188,8 @@
         "admin": "Admin",
         "privacy": "Privacy",
         "web": "Web",
-        "discord": "Discord"
+        "discord": "Discord",
+        "launcher": "Download the launcher"
       }
     }
   }

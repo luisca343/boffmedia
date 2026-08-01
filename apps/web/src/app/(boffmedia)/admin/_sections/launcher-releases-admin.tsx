@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState, type FormEvent } from "react"
 import { useTranslations } from "next-intl"
-import { Button, Empty, Field, Input, Select, Spinner, Textarea, toast } from "@boffmedia/ui"
+import { Button, Empty, Field, Icon, Input, Select, Spinner, Textarea, toast } from "@boffmedia/ui"
 import type { LauncherReleaseEntity } from "@boffmedia/shared"
 
 import {
@@ -144,6 +144,15 @@ export function LauncherReleasesAdmin() {
     }
   }
 
+  const copyHash = async (hash: string) => {
+    try {
+      await navigator.clipboard.writeText(hash)
+      toast({ tone: "ok", title: t("hashCopied") })
+    } catch {
+      toast({ tone: "bad", title: t("hashCopyFailed") })
+    }
+  }
+
   const publishedCount = rows.filter((release) => release.published).length
 
   return (
@@ -262,9 +271,19 @@ export function LauncherReleasesAdmin() {
                             {release.artifactName}
                           </div>
                           <div className="mt-1 text-[12px] text-txt-dim">{formatBytes(release.sizeBytes)}</div>
-                          <code className="mt-1 block font-mono text-[10px] text-txt-dim" title={release.artifactSha512}>
+                          {/* El hash completo se publica en /launcher para que la
+                              gente verifique su descarga, así que tiene que poder
+                              copiarse entero: seleccionarlo a mano de un <code>
+                              truncado no es copiarlo. */}
+                          <button
+                            type="button"
+                            title={release.artifactSha512}
+                            onClick={() => void copyHash(release.artifactSha512)}
+                            className="mt-1 flex items-center gap-1.5 font-mono text-[10px] text-txt-dim transition-colors hover:text-accent"
+                          >
+                            <Icon name="copy" size={11} />
                             {release.artifactSha512.slice(0, 12)}…
-                          </code>
+                          </button>
                         </td>
                         <td className="px-2 py-3 align-top">
                           <AvPill tone={release.published ? "green" : "amber"} icon={release.published ? "check" : "bookmark"}>

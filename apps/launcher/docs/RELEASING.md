@@ -19,6 +19,13 @@ Se confunden constantemente y resuelven problemas distintos:
 Lo de abajo es todo la primera. La segunda se compra cuando toque y se
 conecta en `bundle.windows.certificateThumbprint` / la config de macOS.
 
+**La firma minisign no sustituye al code signing.** Solo la comprueba un
+launcher *ya instalado*, al aplicarse una actualización; Windows no la mira
+nunca, así que no hace nada por la primera instalación. Mientras no haya
+certificado, lo que cubre ese hueco es el **SHA-512 publicado** en la página
+de descargas (§4.4.1): no evita el aviso de SmartScreen, pero permite a
+cualquiera verificar que el archivo que tiene es el que publicamos.
+
 ---
 
 ## 2. La clave privada del updater
@@ -411,6 +418,44 @@ curl -X POST "$API/launcher/admin/releases/$ID/publish" -H "Authorization: Beare
 ```
 
 `GET /launcher/admin/releases` lista todo con sus ids.
+
+### 4.4.1 El hash publicado
+
+Al publicar, la versión aparece automáticamente en la **página pública de
+descargas** (`/launcher` en la web) con su tamaño y su **SHA-512**.
+
+Ese hash **no hay que calcularlo a mano ni pegarlo en ningún sitio**: lo
+calcula `LauncherUpdatesService.publishArtifact` sobre los bytes según
+entran, se guarda en `launcher_releases.artifact_sha512` y es el mismo valor
+que sirven el panel de admin y la web. No hay ninguna ruta por la que el
+cliente pueda proponerlo, que es justo lo que hace que valga como
+verificación.
+
+Por qué importa mientras no haya code signing (§1): al no ir firmado con
+Authenticode, Windows dice «editor desconocido» y no hay nada en el archivo
+que identifique quién lo hizo. El hash publicado es lo único que permite a
+alguien comprobar que el `.exe` que se ha bajado es el que publicamos —
+sobre todo si le llega reenviado por Discord en vez de desde la web.
+
+**Comprobarlo tú antes de anunciar la versión** (en la máquina de build, con
+el artefacto que acabas de subir):
+
+```powershell
+Get-FileHash -Algorithm SHA512 .\BoffLauncher_0.0.2_x64-setup.exe
+```
+
+```bash
+sha512sum BoffLauncher_0.0.2_x64-setup.exe   # Linux / macOS
+```
+
+Si no coincide con el que muestra `/launcher`, la subida se corrompió: hay
+que despublicar (§4.5) y volver a subir el artefacto, **no** editar el hash.
+
+En el panel de admin el hash se copia entero pulsándolo; la tabla solo
+enseña los 12 primeros caracteres para que quepa.
+
+La versión **portable** (§4.2.2) no pasa por aquí: no se sube al feed, así
+que si la distribuyes, publica su hash a mano junto al enlace.
 
 ### 4.5 Si sale mal
 

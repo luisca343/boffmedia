@@ -14,6 +14,7 @@ import { env } from '@/config/env';
 import { LauncherRelease } from '@/_db/schema/LauncherReleases';
 import { LauncherReleasesRepository } from './repositories/launcher-releases.repository';
 import {
+  LauncherDownloadEntity,
   LauncherReleaseEntity,
   UpdaterFeedEntity,
 } from './entities/launcher-updates.entity';
@@ -76,6 +77,39 @@ export class LauncherUpdatesService {
         best === null || compareVersions(row.version, best.version) > 0 ? row : best,
       null,
     );
+  }
+
+  // ── Public download listing ──────────────────────────────────────────────
+
+  /**
+   * The newest published build per target, for the public download page.
+   *
+   * Deliberately NOT the updater feed: that one is keyed by the caller's current
+   * version and returns 204 once you are up to date, which would make the page
+   * empty for anyone who already has the launcher. This always lists whatever is
+   * newest, and adds the size/hash the feed has no reason to carry.
+   */
+  async downloads(baseUrl: string): Promise<LauncherDownloadEntity[]> {
+    const byTarget = new Map<string, LauncherRelease>();
+    for (const row of await this.releases.listPublished()) {
+      const best = byTarget.get(row.target);
+      if (!best || compareVersions(row.version, best.version) > 0) {
+        byTarget.set(row.target, row);
+      }
+    }
+
+    return [...byTarget.values()]
+      .sort((a, b) => a.target.localeCompare(b.target))
+      .map((row) => ({
+        target: row.target,
+        version: row.version,
+        artifactName: row.artifactName,
+        url: `${baseUrl}/launcher/updates/download/${row.version}/${row.target}`,
+        sha512: row.artifactSha512,
+        sizeBytes: row.sizeBytes,
+        notes: row.notes,
+        publishedAt: (row.publishedAt ?? row.createdAt).toISOString(),
+      }));
   }
 
   // ── Artifact bytes ───────────────────────────────────────────────────────

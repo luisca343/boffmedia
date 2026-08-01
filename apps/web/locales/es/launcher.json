@@ -1,0 +1,61 @@
+{
+  "launcher": {
+    "kicker": "Boff Launcher",
+    "title": "Descarga el launcher",
+    "lead": "Un solo launcher para todos los packs de Boffmedia: instala, actualiza y lanza Minecraft con los mods ya configurados. Sin copiar carpetas a mano.",
+    "download": "Descargar",
+    "primaryTitle": "Boff Launcher para {platform}",
+    "meta": "Versión {version} · {size} · publicado el {date}",
+    "loadFailedTitle": "No se han podido cargar las descargas",
+    "loadFailedLead": "Vuelve a intentarlo en unos minutos. Si sigue fallando, avísanos en Discord.",
+    "emptyTitle": "Todavía no hay descargas publicadas",
+    "emptyLead": "Estamos preparando la primera versión pública. Vuelve pronto.",
+    "smartscreenTitle": "Windows te avisará de «editor desconocido»",
+    "smartscreenLead": "El launcher aún no lleva certificado de firma de código, así que SmartScreen muestra un aviso la primera vez que lo instalas: pulsa «Más información» y luego «Ejecutar de todas formas». Puedes comprobar que el archivo es el nuestro con el hash de abajo.",
+    "verifyTitle": "Verifica lo que te has descargado",
+    "verifyLead": "Estos hashes los calcula nuestro servidor sobre los bytes que publicamos. Si el del archivo que tienes coincide, es exactamente el mismo archivo.",
+    "verifyHow": "Para calcular el hash de tu descarga:",
+    "otherTitle": "Otras plataformas",
+    "requirementsTitle": "Requisitos",
+    "requirements": {
+      "os": "Windows 10 (1803 o superior) o Windows 11, 64 bits.",
+      "webview": "WebView2, ya incluido en Windows 10 1803+ y Windows 11.",
+      "ram": "8 GB de RAM para packs pequeños; 16 GB recomendados para packs grandes.",
+      "account": "Una cuenta de Minecraft: Java Edition (se inicia sesión con Microsoft)."
+    },
+    "notesTitle": "Novedades de la versión {version}",
+    "featuresTitle": "Qué hace por ti",
+    "features": {
+      "delta": {
+        "title": "Actualizaciones incrementales",
+        "lead": "Cuando cambian tres mods se descargan tres mods, no el pack entero."
+      },
+      "mods": {
+        "title": "Tus mods sobreviven",
+        "lead": "Una carpeta aparte para lo tuyo: el minimapa que añadas no lo borra la siguiente actualización."
+      },
+      "versions": {
+        "title": "Historial y vuelta atrás",
+        "lead": "Si una actualización rompe el pack, se vuelve a la versión anterior con un clic."
+      },
+      "auth": {
+        "title": "Acceso con tu cuenta",
+        "lead": "Inicio de sesión con Microsoft y packs privados que solo ven quienes tienen acceso."
+      },
+      "java": {
+        "title": "Java y memoria automáticos",
+        "lead": "Instala el Java que necesite cada pack y ajusta la memoria por instancia."
+      },
+      "crash": {
+        "title": "Errores en cristiano",
+        "lead": "Lee el informe de fallo y te dice qué ha pasado: falta una dependencia, se ha quedado sin memoria…"
+      }
+    },
+    "platforms": {
+      "windows": "Windows",
+      "linux": "Linux",
+      "macIntel": "macOS (Intel)",
+      "macApple": "macOS (Apple Silicon)"
+    }
+  }
+}
