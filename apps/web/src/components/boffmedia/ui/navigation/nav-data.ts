@@ -86,6 +86,11 @@ export function buildComunidadSections(t: T): NavSection[] {
         { label: t("nav.v3.items.raffles"), href: getToolHref("otros", "sorteos"), icon: "gift" },
       ],
     },
+    {
+      title: t("nav.v3.sections.play"),
+      href: "/launcher",
+      items: [{ label: t("nav.v3.items.launcher"), href: "/launcher", icon: "download" }],
+    },
   ]
 }
 
@@ -104,6 +109,7 @@ export const FOOTER_COLS: { titleKey: string; links: FooterLink[] }[] = [
       { route: "/juegos", labelKey: "games" },
       { route: "/herramientas", labelKey: "tools" },
       { route: "/clasificacion", labelKey: "ranking" },
+      { route: "/launcher", labelKey: "launcher" },
     ],
   },
   {

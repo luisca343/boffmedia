@@ -41,6 +41,47 @@ export class UpdaterFeedEntity {
   platforms!: Record<string, UpdaterPlatformEntity>;
 }
 
+/**
+ * Una descarga pública del launcher: lo que la web enseña en /launcher.
+ *
+ * Lleva el SHA-512 a propósito. El binario NO va firmado con Authenticode, así
+ * que Windows avisa de «editor desconocido» en la primera instalación y el hash
+ * publicado es lo único que permite a alguien comprobar que el archivo que se ha
+ * bajado es el que publicamos. Lo calcula el servidor sobre los bytes recibidos
+ * (nunca lo manda el cliente), y es el mismo valor que verifica el instalador.
+ */
+export class LauncherDownloadEntity {
+  @ApiProperty({ example: 'windows-x86_64' })
+  target!: string;
+
+  @ApiProperty({ example: '0.0.2' })
+  version!: string;
+
+  @ApiProperty({ example: 'BoffLauncher_0.0.2_x64-setup.exe' })
+  artifactName!: string;
+
+  @ApiProperty({ description: 'URL absoluta de descarga directa' })
+  url!: string;
+
+  @ApiProperty({ description: 'SHA-512 en hex, calculado por el servidor' })
+  sha512!: string;
+
+  @ApiProperty() sizeBytes!: number;
+
+  // `type: String` es obligatorio: sin él Swagger no puede inferir el tipo de una
+  // propiedad opcional y emite un objeto libre, que `generate:shared` traduce a
+  // Record<string, any> y no se puede ni pintar en un JSX.
+  @ApiPropertyOptional({
+    type: String,
+    nullable: true,
+    description: 'Notas de versión (markdown)',
+  })
+  notes!: string | null;
+
+  @ApiProperty({ description: 'RFC 3339' })
+  publishedAt!: string;
+}
+
 /** Una release en el panel de administración. La firma no se devuelve aquí. */
 export class LauncherReleaseEntity {
   @ApiProperty() id!: number;
@@ -51,7 +92,7 @@ export class LauncherReleaseEntity {
   @ApiProperty({ example: 'windows-x86_64' })
   target!: string;
 
-  @ApiPropertyOptional({ nullable: true }) notes!: string | null;
+  @ApiPropertyOptional({ type: String, nullable: true }) notes!: string | null;
 
   @ApiProperty({ example: 'boff-launcher_1.4.0_x64_en-US.msi' })
   artifactName!: string;
@@ -64,7 +105,7 @@ export class LauncherReleaseEntity {
   @ApiProperty({ description: 'Solo las publicadas aparecen en el feed' })
   published!: boolean;
 
-  @ApiPropertyOptional({ nullable: true }) publishedAt!: string | null;
+  @ApiPropertyOptional({ type: String, nullable: true }) publishedAt!: string | null;
 
   @ApiProperty() createdAt!: string;
 }

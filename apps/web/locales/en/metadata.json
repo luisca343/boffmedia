@@ -103,6 +103,12 @@
         "title": "Arcade · SmartRotom",
         "description": "Minigames, daily streak and crates from the SmartRotom server."
       }
+    },
+    "launcher": {
+      "index": {
+        "title": "Boff Launcher · Boffmedia",
+        "description": "Download the Boffmedia launcher: install, update and launch the community Minecraft packs."
+      }
     }
   }
 }

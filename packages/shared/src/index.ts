@@ -284,6 +284,7 @@ export type { JoinTeamDto } from './models/JoinTeamDto';
 export type { KartCircuitBest } from './models/KartCircuitBest';
 export type { KartPlayerStats } from './models/KartPlayerStats';
 export type { KartRankingEntry } from './models/KartRankingEntry';
+export type { LauncherDownloadEntity } from './models/LauncherDownloadEntity';
 export { LauncherPackEntity } from './models/LauncherPackEntity';
 export type { LauncherReleaseEntity } from './models/LauncherReleaseEntity';
 export type { LauncherSessionEntity } from './models/LauncherSessionEntity';

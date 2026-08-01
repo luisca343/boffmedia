@@ -732,7 +732,9 @@
       "published": "Release published",
       "unpublished": "Release unpublished",
       "publishFailed": "Could not publish",
-      "unpublishFailed": "Could not unpublish"
+      "unpublishFailed": "Could not unpublish",
+      "hashCopied": "Hash copied",
+      "hashCopyFailed": "Could not copy the hash"
     }
   },
   "tournaments": {
