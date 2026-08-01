@@ -264,7 +264,7 @@ export function PackDetail() {
       {/* §9 — optional-mod toggles and one-click rollback. Below the fold on
           purpose: both only make sense once the pack is installed, and neither
           should compete with the single primary action in the header. */}
-      <InstanceSpace slug={pack.slug} onChanged={reloadPacks} />
+      <InstanceSpace packId={pack.id} slug={pack.slug} onChanged={reloadPacks} />
     </div>
   )
 }

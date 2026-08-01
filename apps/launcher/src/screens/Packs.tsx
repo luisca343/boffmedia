@@ -1,6 +1,18 @@
-import { useMemo, useState } from "react"
+import { useMemo, useState, type FormEvent } from "react"
 
-import { Badge, Button, Empty, Icon, Kicker, Panel, Progress, SearchInput } from "@boffmedia/ui"
+import {
+  Badge,
+  Button,
+  Empty,
+  Field,
+  Icon,
+  Input,
+  Kicker,
+  Modal,
+  Panel,
+  Progress,
+  SearchInput,
+} from "@boffmedia/ui"
 
 import type { InstallState, PackEntry } from "../services/types"
 import { useLauncher } from "../state/launcher"
@@ -129,8 +141,28 @@ function PackCard({ entry }: { entry: PackEntry }) {
 }
 
 export function Packs() {
-  const { packs, packsLoading, packsError, reloadPacks } = useLauncher()
+  const { packs, packsLoading, packsError, reloadPacks, redeemInvite } = useLauncher()
   const [query, setQuery] = useState("")
+  const [inviteOpen, setInviteOpen] = useState(false)
+  const [inviteCode, setInviteCode] = useState("")
+  const [inviteError, setInviteError] = useState<string | null>(null)
+  const [redeeming, setRedeeming] = useState(false)
+
+  const submitInvite = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    if (!inviteCode.trim() || redeeming) return
+    setRedeeming(true)
+    setInviteError(null)
+    try {
+      await redeemInvite(inviteCode)
+      setInviteOpen(false)
+      setInviteCode("")
+    } catch (error) {
+      setInviteError((error as { message?: string })?.message ?? "No se pudo canjear el código.")
+    } finally {
+      setRedeeming(false)
+    }
+  }
 
   const shown = useMemo(() => {
     const q = query.trim().toLowerCase()
@@ -152,8 +184,20 @@ export function Packs() {
             Packs
           </h1>
         </div>
-        <div className="w-[280px]">
-          <SearchInput value={query} onChange={setQuery} placeholder="Buscar pack…" size="sm" />
+        <div className="flex flex-wrap items-center justify-end gap-2">
+          <Button
+            size="sm"
+            icon="key"
+            onClick={() => {
+              setInviteError(null)
+              setInviteOpen(true)
+            }}
+          >
+            Canjear invitación
+          </Button>
+          <div className="w-[280px]">
+            <SearchInput value={query} onChange={setQuery} placeholder="Buscar pack…" size="sm" />
+          </div>
         </div>
       </header>
 
@@ -197,6 +241,47 @@ export function Packs() {
           Solo se listan los packs a los que tu UUID tiene acceso.
         </p>
       )}
+
+      <Modal
+        open={inviteOpen}
+        onClose={redeeming ? () => undefined : () => setInviteOpen(false)}
+        title="Canjear invitación"
+        size="sm"
+        footer={
+          <>
+            <Button variant="ghost" disabled={redeeming} onClick={() => setInviteOpen(false)}>
+              Cancelar
+            </Button>
+            <Button
+              variant="pri"
+              icon="key"
+              type="submit"
+              form="invite-form"
+              loading={redeeming}
+              disabled={!inviteCode.trim()}
+            >
+              Canjear código
+            </Button>
+          </>
+        }
+      >
+        <form id="invite-form" className="grid gap-4" onSubmit={(event) => void submitInvite(event)}>
+          <p className="text-sm leading-relaxed text-txt-muted">
+            Introduce el código que te ha dado el administrador del pack. Después de canjearlo,
+            la biblioteca se actualizará automáticamente.
+          </p>
+          <Field label="Código de invitación" error={inviteError}>
+            <Input
+              autoFocus
+              value={inviteCode}
+              onChange={(event) => setInviteCode(event.target.value)}
+              placeholder="Pega el código aquí"
+              autoComplete="off"
+              spellCheck={false}
+            />
+          </Field>
+        </form>
+      </Modal>
     </div>
   )
 }

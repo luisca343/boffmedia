@@ -10,9 +10,12 @@ import { formatBytes } from "../utils/format"
 // ticket." Hence the explicit, visible Java row rather than silent detection.
 
 export function Settings() {
-  const { settings, patchSettings, account } = useLauncher()
+  const { settings, patchSettings, account, revalidateSession } = useLauncher()
   const { phase, update, error } = useUpdates()
   const [version, setVersion] = useState<string | null>(null)
+  const [revalidating, setRevalidating] = useState(false)
+  const [revalidationError, setRevalidationError] = useState<string | null>(null)
+  const [revalidated, setRevalidated] = useState(false)
 
   useEffect(() => {
     // Null in a browser tab, where there is no shell to ask.
@@ -20,6 +23,20 @@ export function Settings() {
   }, [])
 
   const checking = phase === "checking"
+
+  const revalidate = async () => {
+    if (revalidating) return
+    setRevalidating(true)
+    setRevalidationError(null)
+    setRevalidated(false)
+    try {
+      if (await revalidateSession()) setRevalidated(true)
+    } catch (error) {
+      setRevalidationError((error as { message?: string })?.message ?? "No se pudo revalidar la sesión.")
+    } finally {
+      setRevalidating(false)
+    }
+  }
 
   return (
     <div className="px-8 py-7">
@@ -165,9 +182,21 @@ export function Settings() {
             acceso a Minecraft dura unas 24 h y se vuelve a pedir en cada sesión.
           </p>
           <div className="mt-4">
-            <Button size="sm" variant="ghost" icon="refresh">
-              Revalidar sesión
+            <Button
+              size="sm"
+              variant="ghost"
+              icon="refresh"
+              loading={revalidating}
+              disabled={revalidating}
+              onClick={() => void revalidate()}
+            >
+              {revalidating ? "Revalidando…" : "Revalidar sesión"}
             </Button>
+            {(revalidationError || revalidated) && (
+              <p className={`mt-2 text-xs ${revalidationError ? "text-bad" : "text-ok"}`}>
+                {revalidationError ?? "Sesión actualizada."}
+              </p>
+            )}
           </div>
         </Panel>
       </div>

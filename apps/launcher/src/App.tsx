@@ -1,5 +1,6 @@
 import { ToastStack } from "@boffmedia/ui"
 
+import { PackAccessModal } from "./components/PackAccessModal"
 import { Shell } from "./components/Shell"
 import { UpdateBanner } from "./components/UpdateBanner"
 import { Logs } from "./screens/Logs"
@@ -40,6 +41,7 @@ export function App() {
           <Router />
         </div>
       </div>
+      <PackAccessModal />
       <ToastStack />
     </LauncherProvider>
   )

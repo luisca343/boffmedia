@@ -16,7 +16,6 @@ import {
 import {
   instanceOptional,
   instanceOptionalSet,
-  instanceRevert,
   instanceRuntime,
   instanceRuntimeSet,
   instanceVersions,
@@ -27,22 +26,21 @@ import {
   type RetainedVersion,
   type RuntimeSource,
 } from "../runtime"
+import { useLauncher } from "../state/launcher"
 import { formatBytes, formatWhen } from "../utils/format"
 
 // HANDOFF §9 — "locked vs. user space" and "pack version pinning + rollback".
 //
-// A separate component rather than more of PackDetail: both features read the
-// instance marker on the Rust side and neither belongs to the install state
-// machine in state/launcher.tsx, which owns progress events and nothing else.
+// A separate component rather than more of PackDetail: these panels read the
+// instance marker on the Rust side while the provider owns access orchestration
+// and the install state machine.
 //
 // Everything here goes through runtime.ts, so `dev:renderer` renders it against
 // the in-process simulation and the screen stays browser-runnable.
 
 type Props = {
+  packId: string
   slug: string
-  /** Pack password, if any — a revert re-downloads through the same
-   *  entitlement-checked route an install uses (§7.4). */
-  password?: string
   /** Called after a revert so the library's install state stops claiming the
    *  version that was just rolled back. */
   onChanged?: () => void
@@ -65,7 +63,8 @@ const SOURCE_TONE: Record<RuntimeSource, "info" | "warn" | "ok"> = {
 
 const gib = (mib: number) => `${(mib / 1024).toFixed(1).replace(".", ",")} GB`
 
-export function InstanceSpace({ slug, password, onChanged }: Props) {
+export function InstanceSpace({ packId, slug, onChanged }: Props) {
+  const { revert: revertPack } = useLauncher()
   const [optional, setOptional] = useState<OptionalFile[] | null>(null)
   const [versions, setVersions] = useState<RetainedVersion[] | null>(null)
   const [runtime, setRuntime] = useState<InstanceRuntime | null>(null)
@@ -96,9 +95,10 @@ export function InstanceSpace({ slug, password, onChanged }: Props) {
     setError(null)
     setBusy(version.versionId)
     try {
-      await instanceRevert(slug, version.versionId, password)
-      refresh()
-      onChanged?.()
+      if (await revertPack(packId, version.versionId)) {
+        refresh()
+        onChanged?.()
+      }
     } catch (err) {
       setError((err as { message?: string })?.message ?? "No se pudo volver a esa versión.")
     } finally {

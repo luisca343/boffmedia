@@ -6,7 +6,10 @@ import {
   authBegin,
   authAwait,
   authLogout,
+  authRevalidate,
   authRestore,
+  instanceRevert,
+  inviteRedeem,
   installPack,
   instanceScan,
   isDesktop,
@@ -43,6 +46,7 @@ type State = {
   account: Account | null
   deviceCode: DeviceCode | null
   signingIn: boolean
+  accessPrompt: AccessPrompt | null
   view: View
   selectedPackId: string | null
   packs: PackEntry[]
@@ -55,12 +59,20 @@ type State = {
   settings: Settings
 }
 
+type AccessPrompt = {
+  packId: string
+  action: "install" | "play" | "revert"
+  versionId?: string
+}
+
 type Action =
   | { type: "signin/start" }
   | { type: "signin/code"; code: DeviceCode }
   | { type: "signin/done"; account: Account }
   | { type: "signin/cancel" }
   | { type: "signout" }
+  | { type: "access/open"; prompt: AccessPrompt }
+  | { type: "access/close" }
   | { type: "packs/loading" }
   | { type: "packs/load"; packs: PackEntry[] }
   | { type: "packs/error"; message: string }
@@ -98,12 +110,17 @@ function reducer(s: State, a: Action): State {
       return {
         ...s,
         account: null,
+        accessPrompt: null,
         packs: [],
         packsError: null,
         packsLoading: false,
         view: "packs",
         selectedPackId: null,
       }
+    case "access/open":
+      return { ...s, accessPrompt: a.prompt }
+    case "access/close":
+      return { ...s, accessPrompt: null }
     case "packs/loading":
       return { ...s, packsLoading: true, packsError: null }
     case "packs/load":
@@ -186,6 +203,7 @@ const initial: State = {
   account: null,
   deviceCode: null,
   signingIn: false,
+  accessPrompt: null,
   view: "packs",
   selectedPackId: null,
   packs: [],
@@ -206,6 +224,11 @@ type Ctx = State & {
   install: (packId: string) => Promise<void>
   repair: (packId: string) => Promise<void>
   play: (packId: string) => Promise<void>
+  revert: (packId: string, versionId: string) => Promise<boolean>
+  submitAccessPassword: (password: string) => Promise<void>
+  cancelAccessPrompt: () => void
+  redeemInvite: (code: string) => Promise<string>
+  revalidateSession: () => Promise<boolean>
   stop: () => void
   clearLogs: () => void
   patchSettings: (patch: Partial<Settings>) => void
@@ -223,6 +246,9 @@ export function LauncherProvider({ children }: { children: React.ReactNode }) {
   // Guards the install/play simulations against double-invocation; also the
   // hook the real implementation uses to abort in-flight work on unmount.
   const busy = React.useRef<Set<string>>(new Set())
+  // Password-pack credentials live only for this process. They are sent on
+  // every manifest and payload request, but never enter settings.json.
+  const accessPasswords = React.useRef<Map<string, string>>(new Map())
   // Survives StrictMode's double mount — see the restore effect below.
   const restoreStarted = React.useRef(false)
   const settingsLoaded = React.useRef(false)
@@ -293,6 +319,23 @@ export function LauncherProvider({ children }: { children: React.ReactNode }) {
         text: failure?.message ?? "No se pudo iniciar sesión.",
       })
     }
+  }, [log])
+
+  /** Force a fresh Microsoft refresh-token exchange from Settings. */
+  const revalidateSession = React.useCallback(async () => {
+    if (!isDesktop()) return true
+
+    const account = await authRevalidate()
+    if (!account) {
+      accessPasswords.current.clear()
+      dispatch({ type: "signout" })
+      return false
+    }
+
+    dispatch({ type: "signin/done", account: { ...account, avatarUrl: "", expiresAt: "" } })
+    setReloadToken((n) => n + 1)
+    log({ level: "info", source: "launcher", text: `Sesión revalidada: ${account.username}` })
+    return true
   }, [log])
 
   // Silent sign-in on start. A THROW here is a real failure — a credential
@@ -406,27 +449,45 @@ export function LauncherProvider({ children }: { children: React.ReactNode }) {
 
   // §6. The manifest is fetched here rather than in Rust because the password
   // path (§7.1) is a UI decision; install_pack re-validates whatever it gets.
-  const manifestFor = React.useCallback(async (packId: string) => {
+  const manifestFor = React.useCallback(async (packId: string, password?: string) => {
     if (!isDesktop()) return null
-    return packManifest(packId)
+    return packManifest(packId, password)
   }, [])
 
   const install = React.useCallback(
-    async (packId: string) => {
+    async (packId: string, passwordOverride?: string) => {
+      const entry = packsRef.current.find((p) => p.pack.id === packId)
+      const password = passwordOverride ?? accessPasswords.current.get(packId)
+      if (entry?.pack.accessKind === "password" && !password) {
+        dispatch({
+          type: "access/open",
+          prompt: { packId, action: "install" },
+        })
+        return
+      }
+
       // The Rust side refuses a concurrent install of the same pack too; this
       // just avoids the round trip and the "ya se está instalando" toast that a
       // StrictMode double-invoke would otherwise produce.
       if (busy.current.has(packId)) return
       busy.current.add(packId)
-      dispatch({ type: "install/start", packId })
+      let installStarted = false
       try {
-        const state = await installPack(packId, await manifestFor(packId))
+        // Access failures happen before anything touches disk. Do not mark an
+        // otherwise healthy instance as broken because a password was wrong.
+        const manifest = await manifestFor(packId, password)
+        dispatch({ type: "install/start", packId })
+        installStarted = true
+        const state = await installPack(packId, manifest, password)
         dispatch({ type: "install/state", packId, state })
       } catch (err) {
+        if (password) accessPasswords.current.delete(packId)
         const message = (err as { message?: string })?.message ?? "No se pudo instalar el pack."
-        // Broken, not not-installed: files may already be on disk, and hiding
-        // that would offer a fresh install over a half-written instance.
-        dispatch({ type: "install/state", packId, state: { kind: "broken", reason: message } })
+        // A failed manifest gate has not started an install; only an installer
+        // failure after the start can leave partial files on disk.
+        if (installStarted) {
+          dispatch({ type: "install/state", packId, state: { kind: "broken", reason: message } })
+        }
         log({ level: "error", source: "launcher", text: message })
       } finally {
         busy.current.delete(packId)
@@ -457,7 +518,17 @@ export function LauncherProvider({ children }: { children: React.ReactNode }) {
   )
 
   const play = React.useCallback(
-    async (packId: string) => {
+    async (packId: string, passwordOverride?: string) => {
+      const entry = packsRef.current.find((p) => p.pack.id === packId)
+      const password = passwordOverride ?? accessPasswords.current.get(packId)
+      if (entry?.pack.accessKind === "password" && !password) {
+        dispatch({
+          type: "access/open",
+          prompt: { packId, action: "play" },
+        })
+        return
+      }
+
       if (busy.current.has(packId)) return
       busy.current.add(packId)
       dispatch({ type: "game/state", game: { kind: "preparing" } })
@@ -468,7 +539,7 @@ export function LauncherProvider({ children }: { children: React.ReactNode }) {
         // The pid is already on its way as a `game://state` running event, and
         // that event is authoritative — a crash can beat this resolve, and
         // dispatching "running" here would paper over it.
-        await launchPack(packId, await manifestFor(packId))
+        await launchPack(packId, await manifestFor(packId, password), password)
         runningPackId.current = packId
         dispatch({ type: "pack/played", packId, at: new Date().toISOString() })
         void refreshInstallState(packId)
@@ -481,6 +552,60 @@ export function LauncherProvider({ children }: { children: React.ReactNode }) {
       }
     },
     [log, manifestFor, refreshInstallState],
+  )
+
+  const revert = React.useCallback(
+    async (packId: string, versionId: string, passwordOverride?: string) => {
+      const entry = packsRef.current.find((p) => p.pack.id === packId)
+      if (!entry) return false
+      const password = passwordOverride ?? accessPasswords.current.get(packId)
+      if (entry.pack.accessKind === "password" && !password) {
+        dispatch({
+          type: "access/open",
+          prompt: { packId, action: "revert", versionId },
+        })
+        return false
+      }
+      if (busy.current.has(packId)) return false
+      busy.current.add(packId)
+      try {
+        const state = await instanceRevert(entry.pack.slug, versionId, password)
+        dispatch({ type: "install/state", packId, state })
+        return true
+      } catch (err) {
+        if (password) accessPasswords.current.delete(packId)
+        const message = (err as { message?: string })?.message ?? "No se pudo volver a esa versión."
+        log({ level: "error", source: "launcher", text: message })
+        throw new Error(message)
+      } finally {
+        busy.current.delete(packId)
+      }
+    },
+    [log],
+  )
+
+  const submitAccessPassword = React.useCallback(
+    async (password: string) => {
+      const prompt = state.accessPrompt
+      const value = password.trim()
+      if (!prompt || !value) return
+      accessPasswords.current.set(prompt.packId, value)
+      dispatch({ type: "access/close" })
+      if (prompt.action === "install") await install(prompt.packId, value)
+      else if (prompt.action === "play") await play(prompt.packId, value)
+      else if (prompt.versionId) await revert(prompt.packId, prompt.versionId, value)
+    },
+    [install, play, revert, state.accessPrompt],
+  )
+
+  const redeemInvite = React.useCallback(
+    async (code: string) => {
+      const packId = await inviteRedeem(code.trim().toLowerCase())
+      log({ level: "info", source: "launcher", text: "Invitación canjeada correctamente." })
+      setReloadToken((n) => n + 1)
+      return packId
+    },
+    [log],
   )
 
   // Preferences live in a JSON file on the Rust side; the mock defaults only
@@ -547,6 +672,7 @@ export function LauncherProvider({ children }: { children: React.ReactNode }) {
     cancelSignIn: () => dispatch({ type: "signin/cancel" }),
     signOut: () => {
       void authLogout()
+      accessPasswords.current.clear()
       dispatch({ type: "signout" })
     },
     go: (view, packId) => dispatch({ type: "view", view, packId }),
@@ -554,6 +680,11 @@ export function LauncherProvider({ children }: { children: React.ReactNode }) {
     install,
     repair,
     play,
+    revert,
+    submitAccessPassword,
+    cancelAccessPrompt: () => dispatch({ type: "access/close" }),
+    redeemInvite,
+    revalidateSession,
     stop,
     clearLogs: () => dispatch({ type: "logs/clear" }),
     patchSettings,

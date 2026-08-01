@@ -207,6 +207,43 @@ pub async fn auth_restore(
     Ok(Some(view))
 }
 
+/// Force a fresh refresh-token exchange for the account settings screen. Unlike
+/// `auth_restore`, this deliberately bypasses the in-process session cache so a
+/// launcher that has been open all day can renew both its Minecraft and pack
+/// sessions on demand.
+#[tauri::command]
+pub async fn auth_revalidate(
+    state: tauri::State<'_, AuthState>,
+    api: tauri::State<'_, crate::api::ApiState>,
+) -> Result<Option<AccountView>, AuthFailure> {
+    let _restoring = state.restoring.lock().await;
+
+    let Some(refresh) = store::load_refresh_token()? else {
+        *state.session.lock().await = None;
+        api.forget_session().await;
+        return Ok(None);
+    };
+
+    let (ms_access, new_refresh) = match msa::refresh_tokens(&refresh).await {
+        Ok(pair) => pair,
+        Err(msa::AuthError::Expired) => {
+            store::clear_refresh_token()?;
+            *state.session.lock().await = None;
+            api.forget_session().await;
+            return Ok(None);
+        }
+        Err(err) => return Err(err.into()),
+    };
+
+    let session = msa::minecraft_session(&ms_access, new_refresh).await?;
+    store::save_refresh_token(&session.refresh_token)?;
+    api.forget_session().await;
+
+    let view = AccountView::from(&session);
+    *state.session.lock().await = Some(session);
+    Ok(Some(view))
+}
+
 /// Signing out drops the launcher session as well as the Minecraft one: the two
 /// are separate tokens (see `api`), and keeping the pack JWT would leave the
 /// next player able to list the previous player's packs.

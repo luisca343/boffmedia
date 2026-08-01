@@ -79,6 +79,7 @@ pub fn run() {
             auth::auth_begin,
             auth::auth_await,
             auth::auth_restore,
+            auth::auth_revalidate,
             auth::auth_logout,
             auth::auth_open_verification,
             api::packs_list,
