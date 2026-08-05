@@ -3,12 +3,19 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <!-- No remote origins: the CSP forbids them, and every asset (fonts
-         included) is bundled from @boffmedia/tailwind-config. -->
-    <meta
-      http-equiv="Content-Security-Policy"
-      content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:"
-    />
+    <!-- The CSP lives in tauri.conf.json (`app.security.csp`) and NOWHERE else.
+         There used to be a <meta http-equiv="Content-Security-Policy"> here as
+         well, and it was silently the effective policy: when a page carries two
+         policies, a resource must satisfy BOTH, and this one predated the icon
+         cache. Its `img-src 'self' data:` therefore vetoed the `asset:` and
+         `http://asset.localhost` origins the Tauri config grants, so every mod
+         icon and every player head rendered as a blank square in the built app
+         — with no error visible anywhere, because Tauri's own CSP looked
+         correct. Do not reintroduce a second policy here; widen the config one.
+
+         `pnpm dev:renderer` (plain Vite, no Tauri) consequently runs with no
+         CSP at all. That is deliberate: it is a UI sandbox, and the policy that
+         matters is the one the shipped webview enforces. -->
     <title>Boff Launcher</title>
   </head>
   <body>

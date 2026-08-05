@@ -23,10 +23,18 @@
 
 pub mod api;
 pub mod auth;
+pub mod backups;
+pub mod browse;
+pub mod catalog;
+pub mod datadir;
+pub mod icons;
 pub mod install;
 pub mod local_packs;
+pub mod meta;
+pub mod mrpack;
 pub mod pack;
 pub mod settings;
+pub mod worlds;
 pub mod status;
 pub mod updates;
 
@@ -74,6 +82,46 @@ pub fn run() {
         .plugin(tauri_plugin_updater::Builder::new().build())
         // RF-06/RF-07 file pickers for local pack export/import.
         .plugin(tauri_plugin_dialog::init())
+        .setup(|app| {
+            // Before anything reads the tree: move an install made by an
+            // earlier build into `%APPDATA%\BoffLauncher[ Dev]` and flatten
+            // away the old `<instance>/.minecraft` level.
+            let handle = app.handle().clone();
+            datadir::migrate(&handle);
+            // The static `$APPDATA/icon-cache/**` scope in tauri.conf.json
+            // resolves to the IDENTIFIER directory, which is no longer where
+            // the cache lives — grant the real one at runtime or every icon
+            // renders as a blank square.
+            use tauri::Manager as _;
+            if let Ok(root) = datadir::data_root(&handle) {
+                let cache = root.join("icon-cache");
+                let _ = std::fs::create_dir_all(&cache);
+                app.asset_protocol_scope().allow_directory(&cache, true)?;
+
+                // Verify rather than assume. `allow_directory` returning Ok
+                // only means the pattern was accepted, NOT that a real file
+                // under it matches — and the difference is invisible from the
+                // renderer, where a denied path and a missing file both render
+                // as a blank square. The data root contains a SPACE on the dev
+                // profile ("BoffLauncher Dev"), which is exactly the kind of
+                // thing that quietly breaks pattern matching, so ask the scope
+                // about a concrete path shaped like a real cached icon.
+                let probe = cache.join("0000000000000000000000000000000000000000000000000000000000000000.png");
+                // stderr rather than a log crate: this project has none, and
+                // `tauri dev` puts Rust's stderr straight in the terminal.
+                if app.asset_protocol_scope().is_allowed(&probe) {
+                    eprintln!("[icons] asset scope OK for {}", cache.display());
+                } else {
+                    // Loud on purpose: every icon in the app is broken when
+                    // this happens, and it has no other symptom.
+                    eprintln!(
+                        "[icons] asset protocol scope REFUSES {} — every cached icon will fail to render",
+                        probe.display()
+                    );
+                }
+            }
+            Ok(())
+        })
         .manage(updates::UpdateState::default())
         .manage(auth::AuthState::default())
         .manage(api::ApiState::default())
@@ -84,6 +132,10 @@ pub fn run() {
             auth::auth_await,
             auth::auth_restore,
             auth::auth_logout,
+            auth::auth_accounts,
+            auth::auth_offline,
+            auth::auth_switch,
+            auth::auth_remove,
             auth::auth_open_verification,
             api::packs_list,
             api::pack_manifest,
@@ -112,8 +164,32 @@ pub fn run() {
             local_packs::local_pack_get,
             local_packs::local_pack_save,
             local_packs::local_pack_delete,
+            local_packs::local_pack_duplicate,
+            backups::backup_create,
+            backups::backup_list,
+            backups::backup_restore,
+            backups::backup_delete,
             local_packs::export_mrpack,
             local_packs::import_mrpack,
+            local_packs::import_mrpack_url,
+            // Version pickers for local packs. Upstream-direct: the API's own
+            // meta routes are admin-only (see meta.rs).
+            meta::meta_minecraft_versions,
+            meta::meta_loader_versions,
+            catalog::catalog_search,
+            catalog::catalog_categories,
+            catalog::catalog_project,
+            catalog::catalog_project_summaries,
+            catalog::catalog_versions,
+            catalog::catalog_resolve_modrinth,
+            catalog::catalog_resolve_url,
+            icons::icon_cache,
+            catalog::catalog_versions_by_ids,
+            install::instance_content,
+            browse::instance_browse,
+            browse::instance_delete_path,
+            browse::instance_reveal,
+            worlds::instance_worlds,
         ])
         .run(tauri::generate_context!())
         .expect("error while running the Boff Launcher");

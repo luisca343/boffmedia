@@ -19,7 +19,6 @@
 use std::path::{Path, PathBuf};
 
 use serde::Serialize;
-use tauri::Manager;
 use tauri_plugin_dialog::DialogExt;
 
 use crate::install::files::resolve_url;
@@ -31,9 +30,7 @@ const LOCAL_PREFIX: &str = "local-";
 const MANIFEST_FILE: &str = "manifest.json";
 
 fn local_packs_dir(app: &tauri::AppHandle) -> Result<PathBuf, InstallFailure> {
-    let root = app.path().app_data_dir().map_err(|e| {
-        InstallFailure::message(format!("No se pudo localizar la carpeta de datos: {e}"))
-    })?;
+    let root = crate::datadir::data_root(app).map_err(InstallFailure::message)?;
     Ok(root.join("local-packs"))
 }
 
@@ -199,7 +196,18 @@ pub async fn local_pack_save(
 
     if let Some(pack) = manifest.get_mut("pack").and_then(|p| p.as_object_mut()) {
         pack.insert("slug".to_string(), serde_json::Value::String(slug.clone()));
-        pack.entry("id").or_insert_with(|| serde_json::Value::String(format!("local:{slug}")));
+        // The creation form has no id to give and sends "", which is NOT the
+        // same as absent: the schema requires a non-empty string, so
+        // `or_insert` would leave the empty one in place and the manifest would
+        // fail to parse with a message about JSON. Treat empty as missing.
+        let has_id = pack
+            .get("id")
+            .and_then(|v| v.as_str())
+            .map(|s| !s.trim().is_empty())
+            .unwrap_or(false);
+        if !has_id {
+            pack.insert("id".to_string(), serde_json::Value::String(format!("local:{slug}")));
+        }
         pack.entry("access")
             .or_insert_with(|| serde_json::json!({ "kind": "public" }));
     }
@@ -210,7 +218,9 @@ pub async fn local_pack_save(
         manifest["version"] = serde_json::json!({
             "id": format!("local-v1-{slug}"),
             "name": "local",
-            "createdAt": chrono::Utc::now().to_rfc3339(),
+            // Z-suffixed, not "+00:00": the schema's date-time pattern only
+            // accepts the Z form.
+            "createdAt": chrono::Utc::now().to_rfc3339_opts(chrono::SecondsFormat::Millis, true),
             "dependencies": { "minecraft": "1.21.4" },
             "files": [],
         });
@@ -223,6 +233,106 @@ pub async fn local_pack_save(
 
     let dir = safe_local_dir(&app, &slug)?;
     write_manifest_atomic(&dir, &parsed)?;
+    Ok(parsed)
+}
+
+/// Copy `from` into `to`, skipping `skip_at_root` at the top level only.
+///
+/// Not `fs::copy` on the directory (no such thing) and not a rename: the
+/// original must survive untouched, which is the entire point of duplicating.
+fn copy_tree(from: &Path, to: &Path, skip_at_root: &[&str]) -> Result<(), InstallFailure> {
+    std::fs::create_dir_all(to)
+        .map_err(|e| InstallFailure::message(format!("No se pudo crear {}: {e}", to.display())))?;
+    let entries = std::fs::read_dir(from)
+        .map_err(|e| InstallFailure::message(format!("No se pudo leer {}: {e}", from.display())))?;
+
+    for entry in entries.flatten() {
+        let name = entry.file_name().to_string_lossy().to_string();
+        if skip_at_root.contains(&name.as_str()) {
+            continue;
+        }
+        let src = entry.path();
+        let dest = to.join(&name);
+        let Ok(kind) = entry.file_type() else { continue };
+        if kind.is_dir() {
+            copy_tree(&src, &dest, &[])?;
+        } else if kind.is_file() {
+            std::fs::copy(&src, &dest).map_err(|e| {
+                InstallFailure::message(format!("No se pudo copiar «{name}»: {e}"))
+            })?;
+        }
+    }
+    Ok(())
+}
+
+/// Fork a local pack: a new manifest under a fresh slug, plus a copy of the
+/// instance directory when the source is installed.
+///
+/// Local packs only. A MANAGED pack's slug and manifest belong to the server —
+/// duplicating one would produce a second instance claiming to be the same
+/// server-side pack, which the install pass would then fight over on every
+/// launch. Forking a managed pack into an editable local one is a genuinely
+/// useful thing, but it is a different feature: it has to decide what happens
+/// to the pack's identity, and it is not this one.
+#[tauri::command]
+pub async fn local_pack_duplicate(
+    app: tauri::AppHandle,
+    slug: String,
+    name: String,
+) -> Result<PackManifest, InstallFailure> {
+    let source_dir = safe_local_dir(&app, &slug)?;
+    let manifest = read_manifest(&source_dir)?;
+
+    let label = {
+        let trimmed = name.trim();
+        if trimmed.is_empty() {
+            format!("{} (copia)", manifest.pack.name.to_string())
+        } else {
+            trimmed.to_string()
+        }
+    };
+
+    let base = local_packs_dir(&app)?;
+    let new_slug = free_slug(&base, &format!("{LOCAL_PREFIX}{}", slugify(&label)));
+
+    // Round-tripped through JSON rather than mutated in place: `pack.id` and
+    // `pack.slug` are typed as non-empty by the schema, so there is no way to
+    // express "unset" on the parsed struct.
+    let mut value = serde_json::to_value(&manifest)
+        .map_err(|e| InstallFailure::message(format!("No se pudo copiar el pack: {e}")))?;
+    if let Some(pack) = value.get_mut("pack").and_then(|p| p.as_object_mut()) {
+        pack.insert("slug".into(), serde_json::Value::String(new_slug.clone()));
+        pack.insert("id".into(), serde_json::Value::String(format!("local:{new_slug}")));
+        pack.insert("name".into(), serde_json::Value::String(label));
+    }
+
+    let raw = serde_json::to_string(&value)
+        .map_err(|e| InstallFailure::message(format!("No se pudo copiar el pack: {e}")))?;
+    let parsed = parse_manifest(&raw)
+        .map_err(|e| InstallFailure::message(format!("La copia no es válida: {e}")))?;
+
+    let dest_dir = safe_local_dir(&app, &new_slug)?;
+    write_manifest_atomic(&dest_dir, &parsed)?;
+
+    // The installed files, when there are any. Natives are skipped: they are
+    // re-extracted on launch, and copying them doubles the work for bytes the
+    // next run overwrites anyway. The install marker IS copied, so the clone
+    // starts out "installed" instead of re-downloading a tree it already has.
+    let settings = crate::settings::load(&app);
+    let layout = crate::install::paths::Layout::new(&app, settings.game_dir())?;
+    let from = layout.instance(&slug).minecraft;
+    if from.is_dir() {
+        let to = layout.instance(&new_slug).minecraft;
+        if let Err(e) = copy_tree(&from, &to, &[crate::install::paths::BIN]) {
+            // The manifest is already written; leaving a pack with no files is
+            // recoverable (the player installs it), but leaving a half-copied
+            // instance that claims to be installed is not.
+            let _ = std::fs::remove_dir_all(&to);
+            let _ = std::fs::remove_dir_all(&dest_dir);
+            return Err(e);
+        }
+    }
+
     Ok(parsed)
 }
 
@@ -284,6 +394,10 @@ struct MrpackIndex<'a> {
 /// zip bytes under `overrides/<path>`.
 struct EmbedFile {
     path: String,
+    /// Carried so the export can look the bytes up in the local blob store
+    /// before falling back to the API — an imported pack's overrides have no
+    /// server-side copy at all.
+    sha512: String,
     pack_file: crate::api::PackFile,
 }
 
@@ -329,7 +443,11 @@ async fn resolve_mrpack_files(
                         "No se pudo resolver la descarga de «{path}»."
                     )));
                 };
-                to_embed.push(EmbedFile { path, pack_file });
+                to_embed.push(EmbedFile {
+                    path,
+                    sha512: sha512.to_lowercase(),
+                    pack_file,
+                });
             }
         }
     }
@@ -381,20 +499,40 @@ pub async fn export_mrpack(app: tauri::AppHandle, slug: String) -> Result<String
     // leaving the file out of the pack (RF-06).
     let (mrpack_files, to_embed) = resolve_mrpack_files(&http, &manifest).await?;
 
+    let settings = crate::settings::load(&app);
+    let layout = crate::install::paths::Layout::new(&app, settings.game_dir())?;
+
     for embed in to_embed {
-        let response =
-            crate::api::fetch_pack_file(&app, &manifest.pack.id.to_string(), None, &embed.pack_file)
+        // An override belonging to an IMPORTED pack exists only on this
+        // machine — the API never hosted it, so asking the API for it would
+        // 404 and make the pack un-exportable. Local blob first, API second.
+        let local = crate::install::files::local_blob_path(&layout, &embed.sha512);
+        let bytes = if local.is_file() {
+            std::fs::read(&local).map_err(|e| {
+                InstallFailure::message(format!("No se pudo leer «{}»: {e}", embed.path))
+            })?
+        } else {
+            let response = crate::api::fetch_pack_file(
+                &app,
+                &manifest.pack.id.to_string(),
+                None,
+                &embed.pack_file,
+            )
+            .await
+            .map_err(|e| {
+                InstallFailure::message(format!(
+                    "No se pudo empaquetar «{}» (sin URL pública): {e:?}",
+                    embed.path
+                ))
+            })?;
+            response
+                .bytes()
                 .await
                 .map_err(|e| {
-                    InstallFailure::message(format!(
-                        "No se pudo empaquetar «{}» (sin URL pública): {e:?}",
-                        embed.path
-                    ))
-                })?;
-        let bytes = response
-            .bytes()
-            .await
-            .map_err(|e| InstallFailure::message(format!("No se pudo leer «{}»: {e}", embed.path)))?;
+                    InstallFailure::message(format!("No se pudo leer «{}»: {e}", embed.path))
+                })?
+                .to_vec()
+        };
         zip.start_file(format!("overrides/{}", embed.path), options)
             .map_err(|e| InstallFailure::message(format!("No se pudo escribir «{}»: {e}", embed.path)))?;
         zip.write_all(&bytes)
@@ -488,48 +626,107 @@ pub async fn import_mrpack(app: tauri::AppHandle) -> Result<ImportResult, Instal
         .into_path()
         .map_err(|e| InstallFailure::message(format!("Ruta de origen inválida: {e}")))?;
 
-    // RF-08: any failure below — corrupt zip, invalid JSON, unsupported
-    // loader — returns before a single byte is written under local-packs/.
-    let file = std::fs::File::open(&source)
+    let bytes = std::fs::read(&source)
         .map_err(|e| InstallFailure::message(format!("No se pudo abrir el archivo: {e}")))?;
-    let mut archive = zip::ZipArchive::new(file)
+    import_mrpack_bytes(&app, bytes).await
+}
+
+/// The shared body of every import route (file picker, pasted URL, in-app
+/// browse). Takes the whole zip in memory: an .mrpack is an index plus configs,
+/// so it is measured in megabytes, and holding it means the seekable reader the
+/// override pass needs comes for free.
+///
+/// RF-08 — no partial state: every failure below returns before a single byte
+/// is written under `local-packs/`. The local BLOB store is the one exception
+/// and is intentional; it is content-addressed, so a blob written by an import
+/// that later failed is unreferenced, harmless, and reused if the player
+/// retries.
+pub async fn import_mrpack_bytes(
+    app: &tauri::AppHandle,
+    bytes: Vec<u8>,
+) -> Result<ImportResult, InstallFailure> {
+    let mut archive = zip::ZipArchive::new(std::io::Cursor::new(bytes))
         .map_err(|e| InstallFailure::message(format!("El .mrpack no es un zip válido: {e}")))?;
-    let mut index_entry = archive.by_name("modrinth.index.json").map_err(|_| {
-        InstallFailure::message("El .mrpack no contiene modrinth.index.json.".to_string())
-    })?;
     let mut raw = String::new();
-    use std::io::Read as _;
-    index_entry
-        .read_to_string(&mut raw)
-        .map_err(|e| InstallFailure::message(format!("No se pudo leer el índice: {e}")))?;
-    drop(index_entry);
+    {
+        let mut index_entry = archive.by_name("modrinth.index.json").map_err(|_| {
+            InstallFailure::message("El .mrpack no contiene modrinth.index.json.".to_string())
+        })?;
+        use std::io::Read as _;
+        index_entry
+            .read_to_string(&mut raw)
+            .map_err(|e| InstallFailure::message(format!("No se pudo leer el índice: {e}")))?;
+    }
 
     let index: serde_json::Value = serde_json::from_str(&raw)
         .map_err(|e| InstallFailure::message(format!("El índice del .mrpack no es JSON válido: {e}")))?;
 
-    // Own export round-trips the full manifest under `boffmedia:manifest`; a
-    // plain Modrinth pack has no such key and no PackManifest to build one
-    // from without a mod resolver this launcher does not have.
-    let Some(manifest_value) = index.get("boffmedia:manifest").cloned() else {
-        return Err(InstallFailure::message(
-            "Este .mrpack no es un pack de Boffmedia exportado por el launcher.".to_string(),
-        ));
-    };
+    let base = local_packs_dir(app)?;
 
-    let manifest_raw = serde_json::to_string(&manifest_value)
-        .map_err(|e| InstallFailure::message(format!("Manifiesto ilegible: {e}")))?;
-    let mut manifest = parse_manifest(&manifest_raw).map_err(|e| match e {
-        ManifestError::Json(err) => {
-            InstallFailure::message(format!("El manifiesto del pack no es válido: {err}"))
+    // Two kinds of .mrpack reach this point. Our own export round-trips the
+    // whole PackManifest under `boffmedia:manifest`, so importing it back is a
+    // deserialize and nothing is lost. A pack from Modrinth (or Prism, or
+    // packwiz) has no such key and is CONVERTED — see mrpack.rs. The Boffmedia
+    // key is preferred when present because it is strictly richer: the standard
+    // index cannot express a CurseForge source or a pack server.
+    let mut manifest = match index.get("boffmedia:manifest").cloned() {
+        Some(manifest_value) => {
+            let manifest_raw = serde_json::to_string(&manifest_value)
+                .map_err(|e| InstallFailure::message(format!("Manifiesto ilegible: {e}")))?;
+            parse_manifest(&manifest_raw).map_err(|e| match e {
+                ManifestError::Json(err) => {
+                    InstallFailure::message(format!("El manifiesto del pack no es válido: {err}"))
+                }
+                other => {
+                    InstallFailure::message(format!("El manifiesto del pack no es válido: {other}"))
+                }
+            })?
         }
-        other => InstallFailure::message(format!("El manifiesto del pack no es válido: {other}")),
-    })?;
+        None => {
+            let parsed: crate::mrpack::MrIndex = serde_json::from_str(&raw).map_err(|e| {
+                InstallFailure::message(format!("El índice del .mrpack no es válido: {e}"))
+            })?;
+            let name = if parsed.name.trim().is_empty() {
+                "Pack importado".to_string()
+            } else {
+                parsed.name.trim().to_string()
+            };
+            // The slug is settled BEFORE conversion because the manifest's own
+            // `pack.id`/`pack.slug` are derived from it, and rewriting them
+            // afterwards is how the two drift apart.
+            let candidate = format!("{LOCAL_PREFIX}{}", slugify(&name));
+            let slug = free_slug(&base, &candidate);
+            // Same visible rule as the Boffmedia path below: a collision is
+            // renamed, never silent, so two imports of the same pack are
+            // distinguishable in the library and not just on disk.
+            let name = if slug == candidate {
+                name
+            } else {
+                format!("{name} ({})", slug.rsplit('-').next().unwrap_or("2"))
+            };
+            let settings = crate::settings::load(app);
+            let layout = crate::install::paths::Layout::new(app, settings.game_dir())?;
+            let http = reqwest::Client::builder()
+                .user_agent(concat!("BoffLauncher/", env!("CARGO_PKG_VERSION")))
+                .build()
+                .map_err(|e| {
+                    InstallFailure::message(format!("No se pudo crear el cliente HTTP: {e}"))
+                })?;
+            let manifest =
+                crate::mrpack::manifest_from_index(&parsed, &mut archive, &layout, &http, &slug, &name)
+                    .await?;
+            reject_ambiguous_or_unsupported_loader(&manifest)?;
+            let renamed = slug != candidate;
+            let dir = safe_local_dir(app, &slug)?;
+            write_manifest_atomic(&dir, &manifest)?;
+            return Ok(ImportResult { manifest, renamed });
+        }
+    };
 
     // RF-08: reject an unsupported/ambiguous loader HERE, before a single byte
     // lands under `local-packs/`.
     reject_ambiguous_or_unsupported_loader(&manifest)?;
 
-    let base = local_packs_dir(&app)?;
     let requested = slugify(&manifest.pack.name);
     let candidate = format!("{LOCAL_PREFIX}{requested}");
     let final_slug = free_slug(&base, &candidate);
@@ -557,10 +754,48 @@ pub async fn import_mrpack(app: tauri::AppHandle) -> Result<ImportResult, Instal
             })?;
     }
 
-    let dir = safe_local_dir(&app, &final_slug)?;
+    let dir = safe_local_dir(app, &final_slug)?;
     write_manifest_atomic(&dir, &manifest)?;
 
     Ok(ImportResult { manifest, renamed })
+}
+
+/// Import straight from Modrinth: a project page URL, a version URL, or a bare
+/// project id/slug. Also accepts a direct link to a `.mrpack`, since a player
+/// who has the download URL should not have to save the file first.
+///
+/// A project reference (no explicit version) resolves to the pack's LATEST
+/// release. Picking a version is what the in-app browser is for; a pasted link
+/// is a "just get me this pack" gesture and asking a second question there
+/// would be noise.
+#[tauri::command]
+pub async fn import_mrpack_url(
+    app: tauri::AppHandle,
+    url: String,
+) -> Result<ImportResult, InstallFailure> {
+    let http = reqwest::Client::builder()
+        .user_agent(concat!("BoffLauncher/", env!("CARGO_PKG_VERSION")))
+        .build()
+        .map_err(|e| InstallFailure::message(format!("No se pudo crear el cliente HTTP: {e}")))?;
+
+    let download = crate::mrpack::resolve_pack_download(&http, url.trim()).await?;
+    let res = http
+        .get(&download)
+        .send()
+        .await
+        .map_err(|e| InstallFailure::message(format!("No se pudo descargar el pack: {e}")))?;
+    if !res.status().is_success() {
+        return Err(InstallFailure::message(format!(
+            "No se pudo descargar el pack: el servidor respondió {}.",
+            res.status()
+        )));
+    }
+    let bytes = res
+        .bytes()
+        .await
+        .map_err(|e| InstallFailure::message(format!("No se pudo leer el pack: {e}")))?;
+
+    import_mrpack_bytes(&app, bytes.to_vec()).await
 }
 
 #[cfg(test)]

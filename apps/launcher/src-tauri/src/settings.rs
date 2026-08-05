@@ -8,7 +8,6 @@
 use std::path::PathBuf;
 
 use serde::{Deserialize, Serialize};
-use tauri::Manager;
 
 use crate::install::InstallFailure;
 
@@ -91,10 +90,17 @@ impl Settings {
     }
 }
 
+/// Settings live in the SAME root as everything else (`datadir::data_root`),
+/// not in Tauri's `app_config_dir()`.
+///
+/// On Windows those two used to be the identical directory, so the move to
+/// `%APPDATA%\BoffLauncher` would have carried `settings.json` off to a folder
+/// nothing read any more — the player's memory slider and game-dir override
+/// silently back to defaults. Pointing both at one root is what keeps the
+/// migration honest, and it means "the launcher's folder" is one place a
+/// player can back up or delete.
 fn config_path(app: &tauri::AppHandle, name: &str) -> Result<PathBuf, InstallFailure> {
-    let dir = app.path().app_config_dir().map_err(|e| {
-        InstallFailure::message(format!("No se pudo localizar la carpeta de ajustes: {e}"))
-    })?;
+    let dir = crate::datadir::data_root(app).map_err(InstallFailure::message)?;
     Ok(dir.join(name))
 }
 

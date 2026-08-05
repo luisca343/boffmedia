@@ -1,6 +1,6 @@
 [package]
 name = "boff-launcher"
-version = "0.0.1"
+version = "0.0.2"
 description = "Boff Launcher"
 authors = ["Boffmedia"]
 edition = "2021"
@@ -24,7 +24,10 @@ schemars = "0.8"
 serde_json = "1"
 
 [dependencies]
-tauri = { version = "2", features = [] }
+# protocol-asset: icons.rs caches catalog art on disk and the renderer loads it
+# over asset:. The feature and tauri.conf.json's assetProtocol block must be
+# enabled together — the build script rejects one without the other.
+tauri = { version = "2", features = ["protocol-asset"] }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 thiserror = "2"
@@ -57,6 +60,9 @@ tokio = { version = "1", features = ["time", "sync", "net", "io-util"] }
 # Packs locales: export_mrpack/import_mrpack read and write the .mrpack zip
 # container (local_packs.rs).
 zip = "2"
+# worlds.rs: level.dat is gzipped NBT. Already in the tree via `zip`; named here
+# because this crate uses GzDecoder directly.
+flate2 = "1"
 # RF-06/RF-07 file pickers (export destination, import source). No dialog
 # plugin existed before this feature.
 tauri-plugin-dialog = "2"

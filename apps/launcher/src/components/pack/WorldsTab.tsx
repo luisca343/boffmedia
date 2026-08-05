@@ -1,0 +1,137 @@
+import { useEffect, useState } from "react"
+
+import { Badge, Button, Empty, Icon, Spinner, toast } from "@boffmedia/ui"
+
+import { type World, instanceDeletePath, instanceReveal, instanceWorlds } from "../../runtime"
+import { formatBytes, formatWhen } from "../../utils/format"
+
+// Singleplayer worlds, read straight out of each save's level.dat (worlds.rs).
+//
+// Deleting a world is the most destructive thing this launcher can do and there
+// is no undo, so it takes a second click on a row that has armed itself rather
+// than a single trash icon next to four harmless ones.
+
+const MODE_LABEL: Record<World["gameMode"], string> = {
+  survival: "Supervivencia",
+  creative: "Creativo",
+  adventure: "Aventura",
+  spectator: "Espectador",
+  unknown: "Desconocido",
+}
+
+export function WorldsTab({ slug }: { slug: string }) {
+  const [worlds, setWorlds] = useState<World[]>([])
+  const [loading, setLoading] = useState(true)
+  const [confirming, setConfirming] = useState<string | null>(null)
+  const [nonce, setNonce] = useState(0)
+
+  useEffect(() => {
+    let live = true
+    setLoading(true)
+    void instanceWorlds(slug).then((list) => {
+      if (!live) return
+      setWorlds(list)
+      setLoading(false)
+    })
+    return () => {
+      live = false
+    }
+  }, [slug, nonce])
+
+  // Disarm when the player looks away rather than leaving a primed delete
+  // button sitting there for the rest of the session.
+  useEffect(() => {
+    if (!confirming) return
+    const timer = setTimeout(() => setConfirming(null), 5000)
+    return () => clearTimeout(timer)
+  }, [confirming])
+
+  const remove = async (world: World) => {
+    setConfirming(null)
+    try {
+      await instanceDeletePath(slug, `saves/${world.folder}`)
+      toast.success(`«${world.name}» eliminado.`)
+      setNonce((n) => n + 1)
+    } catch (err) {
+      toast.error((err as { message?: string })?.message ?? "No se pudo eliminar el mundo.")
+    }
+  }
+
+  if (loading) {
+    return (
+      <span className="flex items-center gap-2 py-6 font-mono text-[11px] text-txt-dim">
+        <Spinner size={12} /> Leyendo los mundos…
+      </span>
+    )
+  }
+
+  if (worlds.length === 0) {
+    return (
+      <Empty
+        icon="globe"
+        title="Sin mundos"
+        lead="Cuando juegues una partida individual, aparecerá aquí."
+      />
+    )
+  }
+
+  return (
+    <div className="flex flex-col gap-4">
+      <div className="flex items-center justify-between gap-2">
+        <span className="font-mono text-[11px] text-txt-dim">
+          {worlds.length} mundo(s) ·{" "}
+          {formatBytes(worlds.reduce((sum, w) => sum + w.sizeBytes, 0))}
+        </span>
+        <Button size="sm" icon="external" onClick={() => void instanceReveal(slug, "saves")}>
+          Abrir carpeta
+        </Button>
+      </div>
+
+      <ul className="grid gap-3 [grid-template-columns:repeat(auto-fill,minmax(280px,1fr))]">
+        {worlds.map((world) => (
+          <li
+            key={world.folder}
+            className="flex flex-col gap-2 border border-solid border-line bg-panel px-3 py-3"
+          >
+            <div className="flex items-start gap-2">
+              <span className="grid size-10 shrink-0 place-items-center border border-solid border-line text-txt-dim">
+                <Icon name="globe" size={18} />
+              </span>
+              <div className="min-w-0 flex-1">
+                <p className="truncate font-display text-[14px] font-bold uppercase tracking-[0.03em]">
+                  {world.name}
+                </p>
+                <p className="truncate font-mono text-[11px] text-txt-dim">{world.folder}</p>
+              </div>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-1">
+              <Badge tone="info">{MODE_LABEL[world.gameMode]}</Badge>
+              {world.hardcore && <Badge tone="bad">Hardcore</Badge>}
+              {world.version && <Badge tone="ok">{world.version}</Badge>}
+            </div>
+
+            <p className="font-mono text-[11px] text-txt-dim">
+              {formatBytes(world.sizeBytes)} ·{" "}
+              {world.lastPlayed
+                ? formatWhen(new Date(world.lastPlayed).toISOString())
+                : "nunca jugado"}
+            </p>
+
+            <div className="mt-auto flex justify-end pt-1">
+              {confirming === world.folder ? (
+                <Button size="sm" variant="danger" icon="trash" onClick={() => void remove(world)}>
+                  Confirmar borrado
+                </Button>
+              ) : (
+                <Button size="sm" icon="trash" onClick={() => setConfirming(world.folder)}>
+                  Eliminar
+                </Button>
+              )}
+            </div>
+          </li>
+        ))}
+      </ul>
+    </div>
+  )
+}

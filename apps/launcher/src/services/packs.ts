@@ -15,6 +15,15 @@ import type { InstallState, PackEntry, PackVersionSummary } from "./types"
 // knows about each pack. The server decides WHICH packs exist for this player;
 // the InstallState is ours, and comes from scanning the instance directory.
 
+/** What a load produced. `registryError` is set when the MANAGED half failed
+ *  but the local half did not — a partial library, which is a very different
+ *  thing from an empty one and must not be reported as either an error or a
+ *  complete list. */
+export type PackLibrary = {
+  entries: PackEntry[]
+  registryError: string | null
+}
+
 function toVersion(pack: LauncherPack): PackVersionSummary | null {
   const v = pack.latestVersion
   if (!v) return null
@@ -76,14 +85,26 @@ function toLocalEntry(manifest: PackManifest): PackEntry {
  * `local-` prefix a managed slug never has (RF-10, spec D3) — so there is
  * nothing here for a collision to resolve.
  */
-export async function loadPackEntries(): Promise<PackEntry[]> {
-  if (!isDesktop()) return mockPackEntries()
+export async function loadPackEntries(): Promise<PackLibrary> {
+  if (!isDesktop()) return { entries: mockPackEntries(), registryError: null }
 
-  const [packs, plays, localManifests] = await Promise.all([
-    packsList(),
-    playsGet(),
-    localPacksList(),
+  // The registry is the ONLY part of this that needs a network, and it used to
+  // be able to sink the whole load: one `Promise.all` meant an unreachable
+  // server also threw away the local packs and the play history, which live
+  // entirely on this disk. A player on a train got an error screen instead of
+  // the packs sitting in front of them.
+  const [managedResult, plays, localManifests] = await Promise.all([
+    packsList().then(
+      (packs) => ({ packs, error: null as string | null }),
+      (err: { message?: string }) => ({
+        packs: [] as LauncherPack[],
+        error: err?.message ?? "No se pudo contactar con el servidor de packs.",
+      }),
+    ),
+    playsGet().catch(() => ({}) as Record<string, string>),
+    localPacksList().catch(() => []),
   ])
+  const packs = managedResult.packs
 
   const managed = await Promise.all(
     packs.map(async (pack) => {
@@ -127,5 +148,8 @@ export async function loadPackEntries(): Promise<PackEntry[]> {
   )
 
   const managedSlugs = new Set(managed.map((e) => e.pack.slug))
-  return [...managed, ...local.filter((e) => !managedSlugs.has(e.pack.slug))]
+  return {
+    entries: [...managed, ...local.filter((e) => !managedSlugs.has(e.pack.slug))],
+    registryError: managedResult.error,
+  }
 }

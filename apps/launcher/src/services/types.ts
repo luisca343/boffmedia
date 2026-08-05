@@ -94,10 +94,10 @@ export type ServerStatus = {
 export type Account = {
   uuid: string
   username: string
-  /** Mojang skin head, 8×8 scaled — rendered from the UUID. */
-  avatarUrl: string
-  /** Only ever a display hint; the token itself lives in the OS keychain. */
-  expiresAt: string
+  /** The player's ACTIVE skin sheet on textures.minecraft.net — the whole 64×64
+   *  PNG, not a head render. `<PlayerHead>` crops the head out of it in CSS.
+   *  Empty when the account has never set a skin. */
+  skinUrl: string
 }
 
 /** HANDOFF §5.1 — the device-code flow the user completes in a browser. */
@@ -226,4 +226,24 @@ export type OptionalFile = {
   name: string
   size: number
   enabled: boolean
+}
+
+// ── Version metadata (local pack pickers) ──────────────────────────────────
+
+/** One entry of Mojang's version manifest. `latest` marks Mojang's own latest
+ *  release AND latest snapshot, so at most two entries carry it. */
+export type GameVersion = {
+  id: string
+  type: "release" | "snapshot" | "old_beta" | "old_alpha"
+  releaseTime: string
+  latest: boolean
+}
+
+/** One build of a modloader for a given Minecraft version, newest first.
+ *  `recommended` is the one the picker should preselect. */
+export type LoaderVersion = {
+  version: string
+  stable: boolean
+  latest: boolean
+  recommended: boolean
 }

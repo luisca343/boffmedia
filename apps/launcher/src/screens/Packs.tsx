@@ -12,11 +12,13 @@ import {
   Panel,
   Progress,
   SearchInput,
-  Select,
   toast,
 } from "@boffmedia/ui"
 
-import { importMrpack, localPackSave, serverStatus } from "../runtime"
+import { VersionPicker, dependenciesOf } from "../components/VersionPicker"
+import type { VersionChoice } from "../components/VersionPicker"
+import { localPackSave, serverStatus } from "../runtime"
+import { ImportPackPage } from "../components/pack/ImportPackPage"
 import type { InstallState, PackEntry, ServerStatus } from "../services/types"
 import { useLauncher } from "../state/launcher"
 import { formatBytes, formatWhen } from "../utils/format"
@@ -75,7 +77,7 @@ function AccessBadge({ entry }: { entry: PackEntry }) {
 }
 
 function PackCard({ entry }: { entry: PackEntry }) {
-  const { go, install, play, repair, game } = useLauncher()
+  const { go, install, play, repair, game, offline } = useLauncher()
   const { pack, latest, state } = entry
   const busy = game.kind === "preparing" || game.kind === "running"
   // A pack with no published version is listed but cannot be installed —
@@ -135,7 +137,9 @@ function PackCard({ entry }: { entry: PackEntry }) {
             size="sm"
             variant="default"
             icon="refresh"
-            disabled={!latest}
+            // Repair re-downloads the broken files, so it needs a network too.
+            disabled={!latest || offline}
+            title={offline ? "Reparar necesita conexión" : undefined}
             onClick={(e) => {
               e.stopPropagation()
               void repair(pack.id)
@@ -149,7 +153,11 @@ function PackCard({ entry }: { entry: PackEntry }) {
             variant={needsInstall ? "default" : "pri"}
             icon={needsInstall ? "download" : "play"}
             loading={state.kind === "installing" || (!needsInstall && game.kind === "preparing")}
-            disabled={!latest || (!needsInstall && busy)}
+            // Offline, installing is impossible — but PLAYING an already
+            // installed pack is exactly what offline mode exists for, so only
+            // the install half is disabled.
+            disabled={!latest || (needsInstall && offline) || (!needsInstall && busy)}
+            title={needsInstall && offline ? "Instalar necesita conexión" : undefined}
             onClick={(e) => {
               e.stopPropagation()
               // Launching from the card is the whole point of the library
@@ -175,22 +183,15 @@ function PackCard({ entry }: { entry: PackEntry }) {
   )
 }
 
-const MC_VERSIONS = ["1.21.4", "1.21.1", "1.20.4", "1.20.1", "1.19.4"]
-const LOADERS = [
-  { value: "", label: "Vanilla" },
-  { value: "forge", label: "Forge" },
-  { value: "neoforge", label: "NeoForge" },
-  { value: "fabric-loader", label: "Fabric" },
-  { value: "quilt-loader", label: "Quilt" },
-]
-
 /** RF-05: a minimal creation form — name, Minecraft version and loader. Mods
  *  are added afterwards from the pack's own detail view; this only needs to
  *  produce a valid, empty PackManifest for `local_pack_save` to persist. */
 function CreateLocalPackModal({ open, onClose, onCreated }: { open: boolean; onClose: () => void; onCreated: () => void }) {
   const [name, setName] = useState("")
-  const [minecraft, setMinecraft] = useState(MC_VERSIONS[0])
-  const [loader, setLoader] = useState("")
+  // Empty minecraft on purpose: the picker fills it with Mojang's latest
+  // release once the real list arrives.
+  const [choice, setChoice] = useState<VersionChoice>({ minecraft: "", loader: "", loaderVersion: "" })
+  const [loadingVersions, setLoadingVersions] = useState(true)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -199,19 +200,27 @@ function CreateLocalPackModal({ open, onClose, onCreated }: { open: boolean; onC
       setError("Ponle un nombre al pack.")
       return
     }
+    if (!choice.minecraft) {
+      setError("Elige una versión de Minecraft.")
+      return
+    }
+    if (choice.loader && !choice.loaderVersion) {
+      setError("Elige una versión del loader.")
+      return
+    }
     setSaving(true)
     setError(null)
     try {
-      const dependencies: Record<string, string> = { minecraft }
-      if (loader) dependencies[loader] = "latest"
       await localPackSave({
         formatVersion: 1,
-        pack: { id: "", slug: "", name: name.trim(), access: { kind: "public" } },
+        // No `id` at all rather than "": the schema requires a non-empty
+        // string, and Rust only fills in what is absent.
+        pack: { name: name.trim(), access: { kind: "public" } },
         version: {
           id: "local-v1",
           name: "local",
           createdAt: new Date().toISOString(),
-          dependencies,
+          dependencies: dependenciesOf(choice),
           files: [],
         },
       })
@@ -231,14 +240,19 @@ function CreateLocalPackModal({ open, onClose, onCreated }: { open: boolean; onC
         <Field label="Nombre">
           <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Mi pack" />
         </Field>
-        <Select label="Minecraft" value={minecraft} onChange={setMinecraft} options={MC_VERSIONS} />
-        <Select label="Loader" value={loader} onChange={setLoader} options={LOADERS} />
+        <VersionPicker value={choice} onChange={setChoice} onLoadingChange={setLoadingVersions} />
         {error && <p className="text-xs text-bad">{error}</p>}
         <div className="flex justify-end gap-2">
           <Button size="sm" onClick={onClose}>
             Cancelar
           </Button>
-          <Button size="sm" variant="pri" loading={saving} onClick={() => void create()}>
+          <Button
+            size="sm"
+            variant="pri"
+            loading={saving}
+            disabled={loadingVersions}
+            onClick={() => void create()}
+          >
             Crear
           </Button>
         </div>
@@ -253,25 +267,6 @@ export function Packs() {
   const [creating, setCreating] = useState(false)
   const [importing, setImporting] = useState(false)
 
-  const doImport = async () => {
-    setImporting(true)
-    try {
-      const { manifest, renamed } = await importMrpack()
-      reloadPacks()
-      // RF-09: a non-blocking notice, never a silent rename.
-      toast.success(
-        renamed
-          ? `Importado como «${manifest.pack.name}» (había un pack con ese nombre).`
-          : `Pack «${manifest.pack.name}» importado.`,
-      )
-    } catch (err) {
-      const message = (err as { message?: string })?.message ?? "No se pudo importar el .mrpack."
-      toast.error(message)
-    } finally {
-      setImporting(false)
-    }
-  }
-
   const shown = useMemo(() => {
     const q = query.trim().toLowerCase()
     if (!q) return packs
@@ -282,6 +277,20 @@ export function Packs() {
         p.pack.slug.includes(q),
     )
   }, [packs, query])
+
+  // The import page owns the whole screen while it is open: it hosts the mod
+  // browser, which is three panes wide and does not fit beside the library.
+  if (importing) {
+    return (
+      <ImportPackPage
+        onBack={() => setImporting(false)}
+        onImported={() => {
+          reloadPacks()
+          setImporting(false)
+        }}
+      />
+    )
+  }
 
   return (
     <div className="px-8 py-7">
@@ -296,8 +305,8 @@ export function Packs() {
           <div className="w-[280px]">
             <SearchInput value={query} onChange={setQuery} placeholder="Buscar pack…" size="sm" />
           </div>
-          <Button size="sm" icon="upload" loading={importing} onClick={() => void doImport()}>
-            Importar .mrpack
+          <Button size="sm" icon="upload" onClick={() => setImporting(true)}>
+            Importar modpack
           </Button>
           <Button size="sm" variant="pri" icon="plus" onClick={() => setCreating(true)}>
             Crear pack local

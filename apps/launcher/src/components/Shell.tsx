@@ -1,6 +1,7 @@
-import { Badge, Icon, IconButton, type IconName, Kicker } from "@boffmedia/ui"
+import { Badge, Banner, Button, Icon, type IconName, Kicker } from "@boffmedia/ui"
 
 import { type View, useLauncher } from "../state/launcher"
+import { AccountSwitcher } from "./AccountSwitcher"
 
 const NAV: { view: View; label: string; icon: IconName }[] = [
   { view: "packs", label: "Packs", icon: "cube" },
@@ -8,8 +9,41 @@ const NAV: { view: View; label: string; icon: IconName }[] = [
   { view: "settings", label: "Ajustes", icon: "sliders" },
 ]
 
+// Two different degradations, and conflating them would mislead:
+//
+//   offline      — no network at all. The identity came from the roster, so
+//                  only packs already on disk can be played.
+//   packsPartial — we ARE online and signed in, but the pack registry did not
+//                  answer. Local packs are all that loaded.
+//
+// Neither is an error: in both cases what is on screen works. The banner exists
+// so a player does not think their packs have vanished.
+function OfflineNotice() {
+  const { offline, packsPartial, reloadPacks, packsLoading } = useLauncher()
+
+  if (!offline && !packsPartial) return null
+
+  return (
+    <Banner
+      tone="warn"
+      icon="alert"
+      title={offline ? "Sin conexión" : "No se pudo cargar toda tu biblioteca"}
+      className="m-4 mb-0"
+      actions={
+        <Button size="sm" variant="ghost" icon="refresh" disabled={packsLoading} onClick={reloadPacks}>
+          Reintentar
+        </Button>
+      }
+    >
+      {offline
+        ? "Puedes jugar a los packs que ya tengas instalados. Instalar, actualizar y descargar packs necesita conexión."
+        : "Se muestran tus packs locales. Los packs del servidor volverán a aparecer cuando se restablezca la conexión."}
+    </Banner>
+  )
+}
+
 export function Shell({ children }: { children: React.ReactNode }) {
-  const { view, go, account, signOut, game, logs } = useLauncher()
+  const { view, go, game, logs } = useLauncher()
 
   const errorCount = logs.filter((l) => l.level === "error").length
 
@@ -63,25 +97,13 @@ export function Shell({ children }: { children: React.ReactNode }) {
           </div>
         )}
 
-        {account && (
-          <div className="flex items-center gap-3 border-t border-line px-4 py-3">
-            <span className="cut-seal grid h-8 w-8 place-items-center bg-accent text-accent-ink">
-              <Icon name="user" size={16} />
-            </span>
-            <span className="min-w-0 flex-1">
-              <span className="block truncate text-[13px] font-semibold text-txt">
-                {account.username}
-              </span>
-              <span className="block truncate font-mono text-[10px] text-txt-dim">
-                {account.uuid.slice(0, 13)}…
-              </span>
-            </span>
-            <IconButton name="logout" label="Cerrar sesión" size={16} onClick={signOut} />
-          </div>
-        )}
+        <AccountSwitcher />
       </nav>
 
-      <main className="min-w-0 flex-1 overflow-y-auto">{children}</main>
+      <div className="flex min-w-0 flex-1 flex-col">
+        <OfflineNotice />
+        <main className="min-w-0 flex-1 overflow-y-auto">{children}</main>
+      </div>
     </div>
   )
 }

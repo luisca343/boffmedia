@@ -40,3 +40,23 @@ textarea,
 .font-mono {
   user-select: text;
 }
+
+/* Boot splash sweep. An indeterminate bar, because sign-in restore has no
+   honest percentage. Reduced-motion parks it as a static full-width bar rather
+   than removing the only cue that the launcher is doing something. */
+@keyframes splash-sweep {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(250%); }
+}
+
+.splash-sweep {
+  animation: splash-sweep 1.15s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .splash-sweep {
+    animation: none;
+    width: 100%;
+    opacity: 0.55;
+  }
+}

@@ -1,27 +1,56 @@
 "use client"
 
-import { useCallback, useEffect, useRef, useState } from "react"
-import { useTranslations } from "next-intl"
-import { Badge, Button, Icon, Input, Select, Seg, Spinner, cn } from "@boffmedia/ui"
-import {
-  type CatalogCategory,
-  type CatalogLoader,
-  type CatalogProjectType,
-  type CatalogSort,
-  type ModFile,
-  type ModPlatform,
-  type ModProject,
-  type ModSearchHit,
-  PacksService,
-} from "@/services/api/boffmedia/packsService"
+import { useEffect, useRef, useState } from "react"
+
+import { cn } from "../cn"
+import type { Translate } from "../i18n"
+import { Badge } from "../primitives/badge"
+import { Button } from "../primitives/button"
+import { Icon } from "../primitives/icon"
+import { Input } from "../primitives/input"
+import { Seg } from "../primitives/seg"
+import { Select } from "../primitives/select"
+import { Spinner } from "../primitives/spinner"
+import { CatalogIcon } from "./CatalogIcon"
+import { getCatalog } from "./client"
+import type {
+  CatalogCategory,
+  CatalogLoader,
+  CatalogProjectType,
+  CatalogSort,
+  ModFile,
+  ModPlatform,
+  ModProject,
+  ModSearchHit,
+} from "./types"
 
 // The browse half of the picker: catalog on the left, project detail on the
-// right. Everything is filtered by the version's Minecraft/loader pair, which
-// is the whole reason a mod picked here is guaranteed to be installable.
+// right. Everything is filtered by the pack's Minecraft/loader pair, which is
+// the whole reason a mod picked here is guaranteed to be installable.
+//
+// `t` is a prop rather than `useT()` on purpose: the ui runtime's translator is
+// bound to the primitives namespace, and these strings live in each host's own
+// namespace (or, in the launcher, in a plain dictionary).
 
-const PAGE_SIZE = 20
+// 50, not 20: at ~260px per card a wide window fits three or four per row, so
+// twenty results left the grid visibly half-empty and made the first scroll a
+// click. Modrinth's own ceiling is 100, but that is 100 icon fetches on a cold
+// cache for results most players never scroll to.
+const PAGE_SIZE = 50
 
-export type BrowsePick = { hit: ModSearchHit; file: ModFile }
+const ALL_PLATFORMS: ModPlatform[] = ["modrinth", "curseforge"]
+const ALL_SORTS: CatalogSort[] = ["downloads", "follows", "updated", "relevance", "name"]
+const ALL_TYPES: CatalogProjectType[] = ["mod", "resourcepack", "shader", "datapack"]
+
+/** `projectType` is the browser's current tab, carried on the pick because the
+ *  target folder cannot be derived from the file alone: a shader and a resource
+ *  pack are both a `.zip`, and only the tab the player picked from says which
+ *  one this is. */
+export type BrowsePick = {
+  hit: ModSearchHit
+  file: ModFile
+  projectType: CatalogProjectType
+}
 
 function formatSize(bytes: number): string {
   if (bytes >= 1024 * 1024) return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
@@ -46,27 +75,41 @@ function toPlainText(value: string): string {
 }
 
 export function ModBrowser({
+  t,
   platform,
   onPlatformChange,
+  platforms = ALL_PLATFORMS,
+  sorts = ALL_SORTS,
+  projectTypes = ALL_TYPES,
   gameVersion,
   loader,
   isAdded,
   onAdd,
   busyKey,
 }: {
+  t: Translate
   platform: ModPlatform
   onPlatformChange: (platform: ModPlatform) => void
+  /** Which platforms this host can actually reach. With one entry the toggle
+   *  is hidden rather than rendered as a single dead button — the launcher
+   *  only ever speaks to Modrinth. */
+  platforms?: ModPlatform[]
+  /** Not every platform supports every sort (Modrinth has no name sort), so
+   *  the host narrows the list instead of the browser offering a dead option. */
+  sorts?: CatalogSort[]
+  projectTypes?: CatalogProjectType[]
+  /** The pack's target Minecraft version. Required for every type except
+   *  `modpack`, which brings its own — see `needsGameVersion`. */
   gameVersion: string
   loader?: CatalogLoader
   isAdded: (platform: ModPlatform, projectId: string) => boolean
   onAdd: (pick: BrowsePick) => void | Promise<void>
   busyKey: string | null
 }) {
-  const t = useTranslations("admin.packs")
   const [query, setQuery] = useState("")
   const [debounced, setDebounced] = useState("")
-  const [projectType, setProjectType] = useState<CatalogProjectType>("mod")
-  const [sort, setSort] = useState<CatalogSort>("downloads")
+  const [projectType, setProjectType] = useState<CatalogProjectType>(projectTypes[0] ?? "mod")
+  const [sort, setSort] = useState<CatalogSort>(sorts[0] ?? "downloads")
   const [category, setCategory] = useState("")
   const [categories, setCategories] = useState<CatalogCategory[]>([])
   const [hits, setHits] = useState<ModSearchHit[]>([])
@@ -92,47 +135,93 @@ export function ModBrowser({
   useEffect(() => {
     setCategory("")
     let live = true
-    void PacksService.categories(platform, projectType).then((res) => {
-      if (!live) return
-      setCategories(res.success && res.data ? res.data : [])
-    })
+    void getCatalog()
+      .categories(platform, projectType)
+      .then((res) => {
+        if (live) setCategories(res)
+      })
+      .catch(() => {
+        if (live) setCategories([])
+      })
     return () => {
       live = false
     }
   }, [platform, projectType])
 
+  // A modpack DEFINES its Minecraft version rather than targeting one, so it
+  // is the one type that can be browsed before a version is chosen. Everything
+  // else filters by it, and searching without it returns mods that will not
+  // load.
+  const needsGameVersion = projectType !== "modpack"
+
   useEffect(() => {
-    if (!gameVersion) {
+    if (needsGameVersion && !gameVersion) {
       setHits([])
       setTotal(0)
       return
     }
     const seq = ++searchSeq.current
     setLoading(true)
-    void PacksService.searchMods({
-      platform,
-      query: debounced || undefined,
-      gameVersion,
-      // Resource packs and shaders have no loader, and sending one filters
-      // every result away.
-      loader: projectType === "mod" ? loader : undefined,
-      sort,
-      category: category || undefined,
-      projectType,
-      page,
-      pageSize: PAGE_SIZE,
-    }).then((res) => {
-      if (seq !== searchSeq.current) return
-      const data = res.success && res.data ? res.data : { hits: [], total: 0 }
-      setHits((current) => (page === 0 ? data.hits : [...current, ...data.hits]))
-      setTotal(data.total)
-      setLoading(false)
-    })
-  }, [platform, debounced, gameVersion, loader, sort, category, projectType, page])
+    void getCatalog()
+      .search({
+        platform,
+        query: debounced || undefined,
+        gameVersion: gameVersion || undefined,
+        // Resource packs and shaders have no loader, and sending one filters
+        // every result away.
+        loader: projectType === "mod" ? loader : undefined,
+        sort,
+        category: category || undefined,
+        projectType,
+        page,
+        pageSize: PAGE_SIZE,
+      })
+      .catch(() => ({ hits: [], total: 0 }))
+      .then((data) => {
+        if (seq !== searchSeq.current) return
+        setHits((current) => (page === 0 ? data.hits : [...current, ...data.hits]))
+        setTotal(data.total)
+        setLoading(false)
+      })
+  }, [platform, debounced, gameVersion, loader, sort, category, projectType, page, needsGameVersion])
+
+  // ProjectDetail knows the hit and the file but not which tab they came from,
+  // so the browser stamps the type on the way out. One place, rather than a
+  // prop threaded through both ProjectDetail mounts.
+  const addPick = (pick: { hit: ModSearchHit; file: ModFile }) =>
+    onAdd({ ...pick, projectType })
 
   const canLoadMore = hits.length > 0 && hits.length < total && !loading
 
-  if (!gameVersion) {
+  // Infinite scroll. The sentinel sits after the last card INSIDE the grid,
+  // which is the element that actually scrolls (the page itself never grows),
+  // so that element has to be the observer root — against the viewport the
+  // sentinel would never intersect and the grid would simply stop at page 1.
+  //
+  // `canLoadMore` is in the dependency list rather than read inside the
+  // callback: it is what goes false the moment a page starts loading, and
+  // re-running the effect is what disconnects the observer for the duration.
+  // Without that, one flick of the wheel queues three pages at once.
+  const listRef = useRef<HTMLUListElement | null>(null)
+  const sentinelRef = useRef<HTMLLIElement | null>(null)
+
+  useEffect(() => {
+    const root = listRef.current
+    const target = sentinelRef.current
+    if (!root || !target || !canLoadMore) return
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((e) => e.isIntersecting)) setPage((p) => p + 1)
+      },
+      // A page ahead of the fold, so the next batch is usually already there
+      // by the time the player reaches the bottom.
+      { root, rootMargin: "600px 0px" },
+    )
+    observer.observe(target)
+    return () => observer.disconnect()
+  }, [canLoadMore])
+
+  if (needsGameVersion && !gameVersion) {
     return (
       <p className="border border-solid border-line bg-panel px-3 py-4 font-body text-[12px] text-txt-dim">
         {t("needMinecraftLead")}
@@ -145,17 +234,19 @@ export function ModBrowser({
     // line, and 100% height would overflow it whenever that line shows.
     <div className="flex min-h-0 flex-1 flex-col gap-3">
       <div className="flex flex-wrap items-center gap-2 shrink-0">
-        <Seg
-          value={platform}
-          onChange={(v) => {
-            onPlatformChange(v as ModPlatform)
-            setSelected(null)
-          }}
-          options={[
-            { value: "modrinth", label: t("platformModrinth") },
-            { value: "curseforge", label: t("platformCurseforge") },
-          ]}
-        />
+        {platforms.length > 1 && (
+          <Seg
+            value={platform}
+            onChange={(v) => {
+              onPlatformChange(v as ModPlatform)
+              setSelected(null)
+            }}
+            options={platforms.map((p) => ({
+              value: p,
+              label: p === "modrinth" ? t("platformModrinth") : t("platformCurseforge"),
+            }))}
+          />
+        )}
         <div className="min-w-[200px] flex-1">
           <Input
             value={query}
@@ -163,31 +254,22 @@ export function ModBrowser({
             placeholder={t("modSearchPlaceholder")}
           />
         </div>
-        <div className="w-[150px]">
-          <Select
-            value={projectType}
-            onChange={(v) => setProjectType(v as CatalogProjectType)}
-            ariaLabel={t("projectType")}
-            options={[
-              { value: "mod", label: t("type.mod") },
-              { value: "resourcepack", label: t("type.resourcepack") },
-              { value: "shader", label: t("type.shader") },
-              { value: "datapack", label: t("type.datapack") },
-            ]}
-          />
-        </div>
+        {projectTypes.length > 1 && (
+          <div className="w-[150px]">
+            <Select
+              value={projectType}
+              onChange={(v) => setProjectType(v as CatalogProjectType)}
+              ariaLabel={t("projectType")}
+              options={projectTypes.map((p) => ({ value: p, label: t(`type.${p}`) }))}
+            />
+          </div>
+        )}
         <div className="w-[150px]">
           <Select
             value={sort}
             onChange={(v) => setSort(v as CatalogSort)}
             ariaLabel={t("sort")}
-            options={[
-              { value: "downloads", label: t("sortBy.downloads") },
-              { value: "follows", label: t("sortBy.follows") },
-              { value: "updated", label: t("sortBy.updated") },
-              { value: "relevance", label: t("sortBy.relevance") },
-              { value: "name", label: t("sortBy.name") },
-            ]}
+            options={sorts.map((s) => ({ value: s, label: t(`sortBy.${s}`) }))}
           />
         </div>
         {loading && <Spinner size={16} className="text-txt-muted" />}
@@ -239,7 +321,10 @@ export function ModBrowser({
             <>
               {/* auto-fill, not a fixed column count: a 2560px screen shows five
                   cards per row instead of two very wide ones. */}
-              <ul className="bm-scroll grid min-h-0 flex-1 auto-rows-min content-start gap-2 overflow-auto pr-1 [grid-template-columns:repeat(auto-fill,minmax(260px,1fr))]">
+              <ul
+                ref={listRef}
+                className="bm-scroll grid min-h-0 flex-1 auto-rows-min content-start gap-2 overflow-auto pr-1 [grid-template-columns:repeat(auto-fill,minmax(260px,1fr))]"
+              >
                 {hits.map((hit) => {
                   const added = isAdded(hit.platform, hit.projectId)
                   return (
@@ -252,20 +337,7 @@ export function ModBrowser({
                           selected?.projectId === hit.projectId ? "border-acc" : "border-line",
                         )}
                       >
-                        {hit.iconUrl ? (
-                          // Remote catalog art: no next/image loader is
-                          // configured for the CurseForge/Modrinth CDNs.
-                          // eslint-disable-next-line @next/next/no-img-element
-                          <img
-                            src={hit.iconUrl}
-                            alt=""
-                            className="size-10 shrink-0 border border-solid border-line object-cover"
-                          />
-                        ) : (
-                          <span className="grid size-10 shrink-0 place-items-center border border-solid border-line text-txt-dim">
-                            <Icon name="cube" size={16} />
-                          </span>
-                        )}
+                        <CatalogIcon src={hit.iconUrl} size={40} />
                         <span className="flex min-w-0 flex-1 flex-col gap-[2px]">
                           <span className="flex items-center gap-2">
                             <span className="min-w-0 flex-1 truncate font-display text-[13px] font-bold uppercase tracking-[0.03em]">
@@ -290,12 +362,24 @@ export function ModBrowser({
                     </li>
                   )
                 })}
+                {/* Zero-height and spanning every column so it never disturbs
+                    the grid's flow, but still a real box the observer can see. */}
+                <li ref={sentinelRef} aria-hidden className="col-span-full h-px" />
               </ul>
+              {/* Kept as a fallback, not as the primary affordance: the
+                  observer normally fires first, and this is what a player who
+                  reaches the bottom mid-fetch (or on a host without
+                  IntersectionObserver) still has to click. */}
               {canLoadMore && (
                 <div className="mt-2 flex shrink-0 justify-center">
                   <Button size="sm" variant="ghost" onClick={() => setPage((p) => p + 1)}>
                     {t("loadMore", { shown: hits.length, total })}
                   </Button>
+                </div>
+              )}
+              {loading && hits.length > 0 && (
+                <div className="mt-2 flex shrink-0 justify-center">
+                  <Spinner size={14} />
                 </div>
               )}
             </>
@@ -305,11 +389,12 @@ export function ModBrowser({
         {selected && (
           <div className="bm-scroll hidden min-h-0 w-[400px] shrink-0 overflow-auto lg:block 2xl:w-[480px]">
             <ProjectDetail
+              t={t}
               hit={selected}
-              gameVersion={gameVersion}
+              gameVersion={needsGameVersion ? gameVersion : ""}
               loader={projectType === "mod" ? loader : undefined}
               onClose={() => setSelected(null)}
-              onAdd={onAdd}
+              onAdd={addPick}
               busyKey={busyKey}
             />
           </div>
@@ -321,11 +406,12 @@ export function ModBrowser({
       {selected && (
         <div className="shrink-0 lg:hidden">
           <ProjectDetail
+            t={t}
             hit={selected}
-            gameVersion={gameVersion}
+            gameVersion={needsGameVersion ? gameVersion : ""}
             loader={projectType === "mod" ? loader : undefined}
             onClose={() => setSelected(null)}
-            onAdd={onAdd}
+            onAdd={addPick}
             busyKey={busyKey}
           />
         </div>
@@ -335,6 +421,7 @@ export function ModBrowser({
 }
 
 function ProjectDetail({
+  t,
   hit,
   gameVersion,
   loader,
@@ -342,14 +429,17 @@ function ProjectDetail({
   onAdd,
   busyKey,
 }: {
+  t: Translate
   hit: ModSearchHit
   gameVersion: string
   loader?: CatalogLoader
   onClose: () => void
-  onAdd: (pick: BrowsePick) => void | Promise<void>
+  /** Deliberately narrower than `BrowsePick`: the detail pane has no idea which
+   *  tab it was opened from, and the browser stamps `projectType` on before
+   *  handing the pick to the host. */
+  onAdd: (pick: { hit: ModSearchHit; file: ModFile }) => void | Promise<void>
   busyKey: string | null
 }) {
-  const t = useTranslations("admin.packs")
   const [project, setProject] = useState<ModProject | null>(null)
   const [files, setFiles] = useState<ModFile[]>([])
   const [loading, setLoading] = useState(true)
@@ -360,26 +450,25 @@ function ProjectDetail({
     setLoading(true)
     setProject(null)
     setFiles([])
-    const filesRequest =
-      hit.platform === "curseforge"
-        ? PacksService.curseforgeFiles(hit.projectId, {
-            gameVersion: showAllFiles ? undefined : gameVersion,
-            loader: showAllFiles ? undefined : loader,
-            pageSize: 50,
-          })
-        : PacksService.modrinthVersions(hit.projectId, {
-            gameVersion: showAllFiles ? undefined : gameVersion,
-            loader: showAllFiles ? undefined : loader,
-          })
+    const catalog = getCatalog()
 
-    void Promise.all([PacksService.project(hit.platform, hit.projectId), filesRequest]).then(
-      ([detail, fileRes]) => {
-        if (!live) return
-        setProject(detail.success && detail.data ? detail.data : null)
-        setFiles(fileRes.success && fileRes.data ? fileRes.data : [])
-        setLoading(false)
-      },
-    )
+    void Promise.all([
+      catalog.project(hit.platform, hit.projectId).catch(() => null),
+      catalog
+        .files(hit.platform, hit.projectId, {
+          // An empty string is "no target version" (a modpack browse), not a
+          // version to match — sending it would filter every file away.
+          gameVersion: showAllFiles ? undefined : gameVersion || undefined,
+          loader: showAllFiles ? undefined : loader,
+          pageSize: 50,
+        })
+        .catch(() => [] as ModFile[]),
+    ]).then(([detail, fileList]) => {
+      if (!live) return
+      setProject(detail)
+      setFiles(fileList)
+      setLoading(false)
+    })
     return () => {
       live = false
     }
@@ -390,14 +479,7 @@ function ProjectDetail({
   return (
     <div className="flex flex-col gap-3 border border-solid border-acc bg-panel px-3 py-3">
       <div className="flex items-start gap-3">
-        {hit.iconUrl && (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={hit.iconUrl}
-            alt=""
-            className="size-12 shrink-0 border border-solid border-line object-cover"
-          />
-        )}
+        <CatalogIcon src={hit.iconUrl} size={48} />
         <div className="min-w-0 flex-1">
           <h3 className="truncate font-display text-[15px] font-bold uppercase tracking-[0.03em]">
             {hit.name}
@@ -496,7 +578,10 @@ function ProjectDetail({
                 </span>
                 {showAllFiles && (
                   <span className="shrink-0 font-mono text-[10px] text-txt-dim">
-                    {file.gameVersions.filter((v) => /^\d/.test(v)).slice(0, 3).join(", ")}
+                    {file.gameVersions
+                      .filter((v) => /^\d/.test(v))
+                      .slice(0, 3)
+                      .join(", ")}
                   </span>
                 )}
                 {requiredDeps > 0 && (

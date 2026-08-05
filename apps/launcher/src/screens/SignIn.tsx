@@ -1,6 +1,6 @@
 import { useState } from "react"
 
-import { Badge, Button, Icon, Kicker, Panel, Spinner } from "@boffmedia/ui"
+import { Badge, Banner, Button, Icon, Kicker, Panel, Spinner } from "@boffmedia/ui"
 
 import { authOpenVerification, copyText } from "../runtime"
 import { useLauncher } from "../state/launcher"
@@ -34,7 +34,10 @@ function CopyButton({ value, label }: { value: string; label: string }) {
 // thing Microsoft's terms discourage.
 
 export function SignIn() {
-  const { signIn, cancelSignIn, signingIn, deviceCode } = useLauncher()
+  const { signIn, cancelSignIn, signingIn, deviceCode, restoreError, goOffline } = useLauncher()
+  // Latched so the button cannot be hammered while the roster is being read;
+  // released again if there turned out to be no account to fall back to.
+  const [offlineTried, setOfflineTried] = useState(false)
 
   return (
     <div className="grid h-full place-items-center px-8 py-10">
@@ -49,6 +52,48 @@ export function SignIn() {
             contraseña — la sesión se abre en tu navegador.
           </p>
         </div>
+
+        {/* Why we are asking again. A player who was signed in yesterday and
+            is staring at this screen today deserves the reason, and the two
+            reasons need different words: `needsSignin` means the token is
+            genuinely dead (act now), anything else is transient (the button
+            below will likely fail too — say so instead of implying otherwise). */}
+        {restoreError && !signingIn && (
+          <Banner
+            tone={restoreError.needsSignin ? "warn" : "error"}
+            title={
+              restoreError.needsSignin
+                ? "Tu sesión caducó"
+                : "No pudimos recuperar tu sesión"
+            }
+            className="mb-4"
+          >
+            {restoreError.needsSignin
+              ? "Vuelve a entrar con Microsoft para seguir jugando."
+              : `${restoreError.message} Comprueba tu conexión e inténtalo de nuevo.`}
+            {/* Only for the transient case, and only when there is actually an
+                account to fall back to. Offered rather than forced: the player
+                may simply want to wait for the network and sign in properly. */}
+            {!restoreError.needsSignin && (
+              <div className="mt-3">
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  icon="play"
+                  disabled={offlineTried}
+                  onClick={() => {
+                    setOfflineTried(true)
+                    void goOffline().then((ok) => {
+                      if (!ok) setOfflineTried(false)
+                    })
+                  }}
+                >
+                  Jugar sin conexión
+                </Button>
+              </div>
+            )}
+          </Banner>
+        )}
 
         {!signingIn && (
           <Panel>

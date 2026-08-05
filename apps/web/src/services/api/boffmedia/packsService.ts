@@ -100,70 +100,41 @@ export interface CreateVersionInput {
   files: unknown[];
 }
 
-export type ModPlatform = 'curseforge' | 'modrinth';
+// The catalog vocabulary is shared with apps/launcher, which browses mods too
+// but reaches Modrinth directly instead of through these routes. It lives in
+// @boffmedia/ui next to the <ModBrowser> that renders it; a second copy here
+// is how the two ends start disagreeing about a field. Re-exported so existing
+// `from '@/services/api/boffmedia/packsService'` imports keep working.
+export type {
+  CatalogCategory,
+  CatalogLoader,
+  CatalogProjectType,
+  CatalogSort,
+  ModDependency,
+  ModFile,
+  ModPlatform,
+  ModProject,
+  ModSearchHit,
+  ModSearchInput,
+  ModSearchPage,
+  ResolveSource,
+  ResolvedFile,
+  SideSupport,
+} from '@boffmedia/ui';
 
-/** The loader names both catalogs understand — not the manifest's loader ids
- *  ("fabric-loader"/"quilt-loader"), which is why callers must map. */
-export type CatalogLoader = 'forge' | 'neoforge' | 'fabric' | 'quilt';
-
-/** What a pack can contain besides jars. Each platform files these separately,
- *  so the picker has to ask for one type at a time. */
-export type CatalogProjectType = 'mod' | 'resourcepack' | 'shader' | 'datapack'
-
-export type CatalogSort = 'relevance' | 'downloads' | 'updated' | 'name' | 'follows'
-
-export type SideSupport = 'required' | 'optional' | 'unsupported' | 'unknown'
-
-export interface ModSearchHit {
-  platform: ModPlatform;
-  /** String on both platforms; CurseForge's is numeric and is narrowed only
-   *  when a FileSource is built. */
-  projectId: string;
-  slug: string;
-  name: string;
-  summary: string;
-  iconUrl?: string;
-  downloads: number;
-  author?: string;
-  categories: string[];
-  updatedAt?: string;
-  clientSide?: SideSupport;
-  serverSide?: SideSupport;
-}
-
-export interface ModSearchPage {
-  hits: ModSearchHit[];
-  total: number;
-}
-
-export interface ModProject extends ModSearchHit {
-  /** Markdown on Modrinth, HTML on CurseForge. */
-  description: string;
-  gameVersions: string[];
-  loaders: string[];
-  gallery: string[];
-  sourceUrl?: string;
-  issuesUrl?: string;
-  websiteUrl?: string;
-  clientSide: SideSupport;
-  serverSide: SideSupport;
-}
-
-export interface CatalogCategory {
-  id: string;
-  name: string;
-  iconUrl?: string;
-}
-
-export interface ModDependency {
-  platform: ModPlatform;
-  projectId: string;
-  relation: 'required' | 'optional' | 'incompatible' | 'embedded';
-  versionId?: string;
-  name?: string;
-  slug?: string;
-  iconUrl?: string;
-}
+import type {
+  CatalogCategory,
+  CatalogLoader,
+  CatalogProjectType,
+  ModFile,
+  ModPlatform,
+  ModProject,
+  ModSearchHit,
+  ModSearchInput,
+  ModSearchPage,
+  ResolveSource,
+  ResolvedFile,
+} from '@boffmedia/ui';
 
 export interface GameVersion {
   id: string;
@@ -177,53 +148,6 @@ export interface LoaderVersion {
   stable: boolean;
   latest: boolean;
   recommended: boolean;
-}
-
-export interface ModFile {
-  platform: ModPlatform;
-  /** CurseForge file id, or the Modrinth *version* id. */
-  fileId: string;
-  versionNumber?: string;
-  displayName: string;
-  fileName: string;
-  fileSize: number;
-  gameVersions: string[];
-  releaseType: 'release' | 'beta' | 'alpha';
-  datePublished: string;
-  sha512: string | null;
-  /** False when CurseForge's author forbids third-party distribution: the
-   *  launcher can never fetch that file automatically. */
-  downloadable: boolean;
-  loaders: string[];
-  /** What must ship alongside this file. Skipping the required ones is what
-   *  makes a pack crash at launch with a missing-library error. */
-  dependencies: ModDependency[];
-}
-
-export interface ResolvedFile {
-  sha512: string;
-  fileSize: number;
-  fileName: string;
-  /** The FileSource ready for the manifest. */
-  source: unknown;
-}
-
-export type ResolveSource =
-  | { kind: 'curseforge'; projectId: number; fileId: number }
-  | { kind: 'modrinth'; projectId: string; versionId: string }
-  | { kind: 'url'; url: string };
-
-export interface ModSearchInput {
-  platform: ModPlatform;
-  query?: string;
-  gameVersion?: string;
-  loader?: CatalogLoader;
-  page?: number;
-  pageSize?: number;
-  projectType?: CatalogProjectType;
-  sort?: CatalogSort;
-  /** CurseForge category id, or Modrinth category name. */
-  category?: string;
 }
 
 function queryString(params: Record<string, string | number | undefined>): string {

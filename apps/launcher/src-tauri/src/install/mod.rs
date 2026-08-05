@@ -295,19 +295,32 @@ async fn install_payload(
     password: Option<&str>,
     reporter: &Reporter,
 ) -> Result<(), InstallFailure> {
-    // §9 — an optional file the player switched off is never fetched. The
-    // alternative convention, renaming to `<name>.jar.disabled`, is a
-    // Forge/NeoForge behaviour: Fabric and Quilt ignore the suffix, so on two
-    // of the four loaders this launcher supports the "disabled" mod would load
-    // anyway. Not downloading it is loader-agnostic, and it also honours §9's
-    // delta-update goal — you do not pay bytes for a mod you declined. Turning
-    // it back on is a copy out of the content-addressed cache, not a download.
+    // A file the player switched off is never fetched.
+    //
+    // This comment used to claim that the `<name>.jar.disabled` convention was
+    // Forge/NeoForge-only and that Fabric and Quilt would load the mod anyway.
+    // That is not so: all four loaders discover mods by scanning for files
+    // ending in `.jar`, so all four skip a `.disabled` one — which is why Prism
+    // and the Modrinth app use the suffix across every loader. The launcher now
+    // does the same (instance::set_enabled_on_disk), because parking the file
+    // makes re-enabling instant and leaves the mods folder legible to a player
+    // who opens it by hand.
+    //
+    // The state file remains the INTENT and this filter remains the mechanism
+    // that stops a download: the rename only exists once the bytes are on disk,
+    // and the very first install has to know not to fetch them at all.
+    //
+    // `optional` is deliberately not consulted. It gates whether the pack
+    // OFFERS the choice, not whether the launcher honours one already made —
+    // requiring it here is what let a disabled non-optional mod come back on
+    // the next launch, since the file was re-fetched into the path the rename
+    // had just vacated.
     let disabled = read_optional_state(&prepared.instance);
     let wanted: Vec<PlannedFile> = prepared
         .plan
         .files
         .iter()
-        .filter(|f| !(f.optional && disabled.is_disabled(&f.path)))
+        .filter(|f| !disabled.is_disabled(&f.path))
         .cloned()
         .collect();
 
@@ -668,11 +681,10 @@ pub async fn instance_scan(
         });
     };
 
-    if !instance.minecraft.is_dir() {
-        return Ok(InstallStatus::Broken {
-            reason: "Falta la carpeta del juego. Vuelve a instalar el pack.".to_string(),
-        });
-    }
+    // There used to be a separate `instance.minecraft.is_dir()` check here. The
+    // instance directory IS the game directory now, so `instance.root.is_dir()`
+    // above already answers it — a second copy would be dead code that reads
+    // like a real guard.
 
     let size_bytes = paths::dir_size(&instance.root);
     Ok(match latest_version_id {
@@ -845,7 +857,9 @@ pub async fn instance_revert(
         .managed
         .iter()
         .map(instance::ManagedFile::to_planned)
-        .filter(|f| !(f.optional && disabled.is_disabled(&f.path)))
+        // Same rule as the install pass: a revert must not silently re-enable
+        // what the player switched off.
+        .filter(|f| !disabled.is_disabled(&f.path))
         .collect();
     let (mods, overrides): (Vec<_>, Vec<_>) = wanted.iter().cloned().partition(|f| f.is_mod);
 
@@ -936,13 +950,82 @@ pub async fn instance_optional(
     Ok(instance::optional_list(&catalogue, &read_optional_state(&instance)))
 }
 
-/// Switch one optional file on or off.
+/// One row of the Content tab.
+#[derive(Debug, Clone, serde::Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ContentFile {
+    pub path: String,
+    pub size: u64,
+    pub is_mod: bool,
+    /// The pack marks this as something the player may switch off. Not the same
+    /// as `enabled` — this is whether the choice is OFFERED.
+    pub optional: bool,
+    pub enabled: bool,
+    /// True when the bytes are on disk under either name. False means the pack
+    /// declares the file but this instance has not installed it yet.
+    pub installed: bool,
+    pub source: instance::ManagedSource,
+}
+
+/// Everything the Content tab renders for one instance: the pack's files, each
+/// with its on-disk and enabled status.
 ///
-/// Takes effect on the next install, update or launch — all three run the same
-/// payload pass, and a launch re-verifies, so the player never has to hunt for
-/// a separate "apply" button. Switching one OFF does not delete it here: the
-/// stale sweep does that on the next pass, under the same
-/// only-if-you-have-not-touched-it rule as everything else the launcher owns.
+/// Built from the marker rather than the manifest so it describes what this
+/// INSTANCE actually has. The renderer layers the pack's own declared files on
+/// top for a local pack that has never been installed, where there is no marker
+/// to read at all.
+#[tauri::command]
+pub async fn instance_content(
+    slug: String,
+    app: tauri::AppHandle,
+) -> Result<Vec<ContentFile>, InstallFailure> {
+    let settings = settings::load(&app);
+    let layout = Layout::new(&app, settings.game_dir())?;
+    let instance = layout.instance(&slug);
+
+    let Some(marker) = read_marker(&instance) else {
+        return Ok(Vec::new());
+    };
+    let state = read_optional_state(&instance);
+
+    // `managed` holds what is installed; `optional_files` is the full
+    // catalogue including the ones switched off. Union, deduped by path, or a
+    // disabled mod disappears from the list it is meant to be toggled from.
+    let mut seen: HashSet<String> = HashSet::new();
+    let mut out = Vec::new();
+    for file in marker.managed.iter().chain(marker.optional_files.iter()) {
+        let path = instance::normalise(&file.path);
+        if !seen.insert(path.clone()) {
+            continue;
+        }
+        let active = instance::safe_join(&instance.minecraft, &path)
+            .map(|p| p.is_file())
+            .unwrap_or(false);
+        let parked = instance::is_parked(&instance.minecraft, &path);
+        out.push(ContentFile {
+            size: file.size,
+            is_mod: file.is_mod,
+            optional: file.optional,
+            enabled: !state.is_disabled(&path),
+            installed: active || parked,
+            source: file.source.clone(),
+            path,
+        });
+    }
+    out.sort_by(|a, b| a.path.to_lowercase().cmp(&b.path.to_lowercase()));
+    Ok(out)
+}
+
+/// Switch one file on or off.
+///
+/// Two things happen, and both are needed. The state file records the INTENT,
+/// which is what survives a reinstall and what the plan filter reads before any
+/// bytes exist. The rename applies it to the copy already on disk, so the
+/// change is visible in-game on the very next launch without a download — and
+/// reversible just as cheaply.
+///
+/// A file that is not on disk yet is not an error: the intent is stored and the
+/// next install pass honours it by never fetching the file.
 #[tauri::command]
 pub async fn instance_optional_set(
     slug: String,
@@ -957,6 +1040,10 @@ pub async fn instance_optional_set(
     let mut state = read_optional_state(&instance);
     state.set(&path, enabled);
     write_optional_state(&instance, &state)?;
+
+    instance::set_enabled_on_disk(&instance.minecraft, &path, enabled).map_err(|e| {
+        InstallFailure::message(format!("No se pudo {} «{path}»: {e}", if enabled { "activar" } else { "desactivar" }))
+    })?;
 
     let catalogue = read_marker(&instance)
         .map(|m| m.optional_files)

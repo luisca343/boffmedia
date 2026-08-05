@@ -1,9 +1,21 @@
 import type { PackManifest } from "@boffmedia/pack-schema"
+import type { ContentFile, DirEntry, World } from "../runtime"
+import type {
+  CatalogCategory,
+  ModFile,
+  ModProject,
+  ModSearchHit,
+  ModSearchPage,
+  ResolveSource,
+  ResolvedFile,
+} from "@boffmedia/ui"
 
 import type {
   Account,
   CrashDiagnosis,
   DeviceCode,
+  GameVersion,
+  LoaderVersion,
   LogLine,
   PackEntry,
   PackSummary,
@@ -82,8 +94,9 @@ const PACKS: {
 export const MOCK_ACCOUNT: Account = {
   uuid: "069a79f4-44e9-4726-a5be-fca90e38aaf5",
   username: "Luisca",
-  avatarUrl: "",
-  expiresAt: "2026-07-31T16:00:00Z",
+  // Notch's skin — a real textures.minecraft.net URL, so dev:renderer exercises
+  // the actual crop path rather than only the no-skin fallback.
+  skinUrl: "https://textures.minecraft.net/texture/292009a4925b58f02c77dadc3ecef07ea4c7472f64e0fdc32ce5522489362680",
 }
 
 export const MOCK_DEVICE_CODE: DeviceCode = {
@@ -176,6 +189,26 @@ export function mockLocalPacks(): PackManifest[] {
   return localLibrary.map((m) => structuredClone(m))
 }
 
+/** Browser mode has no Rust to reach Mojang, so the pickers get a short,
+ *  static list — enough to exercise both selects without a network call. */
+export function mockGameVersions(): GameVersion[] {
+  return [
+    { id: "1.21.4", type: "release", releaseTime: "2024-12-03T10:00:00Z", latest: true },
+    { id: "1.21.1", type: "release", releaseTime: "2024-08-08T10:00:00Z", latest: false },
+    { id: "1.20.4", type: "release", releaseTime: "2023-12-07T10:00:00Z", latest: false },
+    { id: "1.20.1", type: "release", releaseTime: "2023-06-12T10:00:00Z", latest: false },
+    { id: "1.19.4", type: "release", releaseTime: "2023-03-14T10:00:00Z", latest: false },
+  ]
+}
+
+export function mockLoaderVersions(): LoaderVersion[] {
+  return [
+    { version: "21.4.30", stable: true, latest: true, recommended: true },
+    { version: "21.4.29", stable: true, latest: false, recommended: false },
+    { version: "21.4.28-beta", stable: false, latest: false, recommended: false },
+  ]
+}
+
 /** RF-03/RF-04 in browser mode: one clearly online server (players + MOTD) and
  *  one offline one, so both badge states are visible without a real ping. */
 export function mockServerStatus(host: string): ServerStatus {
@@ -240,4 +273,212 @@ export function mockLogs(): LogLine[] {
     source,
     text,
   }))
+}
+
+// ── Mod catalog ────────────────────────────────────────────────────────────
+// `pnpm --filter launcher dev:renderer` has no Rust and therefore no Modrinth.
+// These fixtures are what let the whole picker — browse, detail, files,
+// dependency resolution — be built and reviewed in a plain browser tab.
+
+const catalogHits: ModSearchHit[] = [
+  {
+    platform: "modrinth",
+    projectId: "P7dR8mSH",
+    slug: "fabric-api",
+    iconUrl: "https://cdn.modrinth.com/data/P7dR8mSH/icon.png",
+    name: "Fabric API",
+    summary: "Lightweight and modular API providing common hooks and intercompatibility.",
+    downloads: 4_200_000,
+    author: "modmuss50",
+    categories: ["library", "fabric"],
+    updatedAt: "2026-06-01T10:00:00Z",
+    clientSide: "required",
+    serverSide: "required",
+  },
+  {
+    platform: "modrinth",
+    projectId: "AANobbMI",
+    slug: "sodium",
+    iconUrl: "https://cdn.modrinth.com/data/AANobbMI/icon.png",
+    name: "Sodium",
+    summary: "A modern rendering engine that greatly improves frame rates.",
+    downloads: 3_100_000,
+    author: "jellysquid3",
+    categories: ["optimization", "fabric"],
+    updatedAt: "2026-05-20T10:00:00Z",
+    clientSide: "required",
+    serverSide: "unsupported",
+  },
+  {
+    platform: "modrinth",
+    projectId: "gvQqBUqZ",
+    slug: "lithium",
+    iconUrl: "https://cdn.modrinth.com/data/gvQqBUqZ/icon.png",
+    name: "Lithium",
+    summary: "No-compromises game logic and server optimisation mod.",
+    downloads: 1_800_000,
+    author: "jellysquid3",
+    categories: ["optimization", "fabric"],
+    updatedAt: "2026-04-11T10:00:00Z",
+    clientSide: "optional",
+    serverSide: "optional",
+  },
+]
+
+export function mockCatalogSearch(query?: string): ModSearchPage {
+  const needle = (query ?? "").trim().toLowerCase()
+  const hits = needle
+    ? catalogHits.filter((h) => h.name.toLowerCase().includes(needle))
+    : catalogHits
+  return { hits: structuredClone(hits), total: hits.length }
+}
+
+export function mockCatalogCategories(): CatalogCategory[] {
+  return [
+    { id: "optimization", name: "optimization" },
+    { id: "library", name: "library" },
+    { id: "adventure", name: "adventure" },
+  ]
+}
+
+export function mockCatalogProject(projectId: string): ModProject | null {
+  const hit = catalogHits.find((h) => h.projectId === projectId)
+  if (!hit) return null
+  return {
+    ...structuredClone(hit),
+    description: `${hit.summary}\n\nFixture description for browser mode.`,
+    gameVersions: ["1.21.4", "1.21.1"],
+    loaders: ["fabric", "quilt"],
+    gallery: [],
+    sourceUrl: `https://github.com/example/${hit.slug}`,
+    clientSide: hit.clientSide ?? "unknown",
+    serverSide: hit.serverSide ?? "unknown",
+  }
+}
+
+export function mockCatalogVersions(projectId: string): ModFile[] {
+  const hit = catalogHits.find((h) => h.projectId === projectId)
+  if (!hit) return []
+  // Sodium depends on Fabric API here so the dependency walk has something to
+  // walk in browser mode.
+  const dependencies =
+    projectId === "AANobbMI"
+      ? [{ platform: "modrinth" as const, projectId: "P7dR8mSH", relation: "required" as const }]
+      : []
+  return [
+    {
+      platform: "modrinth",
+      fileId: `${projectId}-v1`,
+      versionNumber: "1.0.0",
+      displayName: `${hit.name} 1.0.0`,
+      fileName: `${hit.slug}-1.0.0.jar`,
+      fileSize: 512 * 1024,
+      gameVersions: ["1.21.4"],
+      releaseType: "release",
+      datePublished: "2026-06-01T10:00:00Z",
+      sha512: "a".repeat(128),
+      downloadable: true,
+      loaders: ["fabric"],
+      dependencies,
+    },
+  ]
+}
+
+export function mockCatalogResolve(source: ResolveSource): ResolvedFile | null {
+  if (source.kind === "curseforge") return null
+  const fileName =
+    source.kind === "url"
+      ? (source.url.split("?")[0].split("/").filter(Boolean).pop() ?? "file.jar")
+      : `${source.versionId}.jar`
+  return { sha512: "a".repeat(128), fileSize: 512 * 1024, fileName, source }
+}
+
+// ── Instance content / files / worlds ──────────────────────────────────────
+// Browser mode has no instance on disk, so these stand in for one that is
+// installed, has a disabled mod, and has been played.
+
+export function mockContent(): ContentFile[] {
+  return [
+    {
+      path: "mods/fabric-api-0.115.0.jar",
+      size: 2_100_000,
+      isMod: true,
+      optional: false,
+      enabled: true,
+      installed: true,
+      source: { kind: "modrinth", versionId: "P7dR8mSH-v1" },
+    },
+    {
+      path: "mods/sodium-0.6.0.jar",
+      size: 1_400_000,
+      isMod: true,
+      optional: true,
+      // Disabled on purpose: the toggle's "off" rendering is otherwise never
+      // exercised in browser mode.
+      enabled: false,
+      installed: true,
+      source: { kind: "modrinth", versionId: "AANobbMI-v1" },
+    },
+    {
+      path: "config/sodium-options.json",
+      size: 4_200,
+      isMod: false,
+      optional: false,
+      enabled: true,
+      installed: true,
+      source: { kind: "override", sha512: "b".repeat(128) },
+    },
+    {
+      path: "mods/legacy-tweaks.jar",
+      size: 380_000,
+      isMod: true,
+      optional: false,
+      enabled: true,
+      installed: false,
+      source: { kind: "url", url: "https://example.com/legacy-tweaks.jar" },
+    },
+  ]
+}
+
+export function mockDirEntries(rel: string): DirEntry[] {
+  if (rel === "") {
+    return [
+      { path: "config", name: "config", isDir: true, size: 0, modified: 1_760_000_000_000 },
+      { path: "mods", name: "mods", isDir: true, size: 0, modified: 1_760_000_000_000 },
+      { path: "saves", name: "saves", isDir: true, size: 0, modified: 1_762_000_000_000 },
+      { path: "options.txt", name: "options.txt", isDir: false, size: 3_400, modified: 1_761_000_000_000 },
+    ]
+  }
+  if (rel === "mods") {
+    return [
+      { path: "mods/fabric-api-0.115.0.jar", name: "fabric-api-0.115.0.jar", isDir: false, size: 2_100_000, modified: 1_760_000_000_000 },
+      { path: "mods/sodium-0.6.0.jar.disabled", name: "sodium-0.6.0.jar.disabled", isDir: false, size: 1_400_000, modified: 1_760_000_000_000 },
+    ]
+  }
+  return []
+}
+
+export function mockWorlds(): World[] {
+  return [
+    {
+      folder: "Nuevo-mundo",
+      name: "Nuevo mundo",
+      lastPlayed: 1_762_000_000_000,
+      sizeBytes: 184_000_000,
+      gameMode: "survival",
+      hardcore: false,
+      version: "1.21.4",
+      hasIcon: false,
+    },
+    {
+      folder: "creativo",
+      name: "Pruebas creativo",
+      lastPlayed: 0,
+      sizeBytes: 12_000_000,
+      gameMode: "creative",
+      hardcore: false,
+      version: "1.21.4",
+      hasIcon: false,
+    },
+  ]
 }

@@ -68,6 +68,40 @@ fn cache_path(layout: &Layout, sha512: &str) -> PathBuf {
     layout.cache_dir().join(prefix).join(sha512)
 }
 
+/// Same addressing as `cache_path`, in the store that is never purged — see
+/// `Layout::local_blobs_dir`. This is where an imported `.mrpack`'s overrides
+/// live, and it is the only copy of them.
+pub fn local_blob_path(layout: &Layout, sha512: &str) -> PathBuf {
+    let prefix = &sha512[..2.min(sha512.len())];
+    layout.local_blobs_dir().join(prefix).join(sha512)
+}
+
+/// Store `bytes` in the local blob store under their own sha512, and return
+/// that hash. Content-addressed, so re-importing the same pack twice writes
+/// nothing the second time and two packs sharing a config share one blob.
+pub fn put_local_blob(layout: &Layout, bytes: &[u8]) -> Result<String, InstallFailure> {
+    let mut hasher = Sha512::new();
+    hasher.update(bytes);
+    let sha512 = hex(&hasher.finalize());
+    let dest = local_blob_path(layout, &sha512);
+    if dest.is_file() {
+        return Ok(sha512);
+    }
+    if let Some(parent) = dest.parent() {
+        std::fs::create_dir_all(parent).map_err(|e| {
+            InstallFailure::message(format!("No se pudo crear el almacén local: {e}"))
+        })?;
+    }
+    // tmp + rename so a crash mid-write cannot leave a truncated file sitting
+    // at an address that says it is complete.
+    let tmp = dest.with_extension("part");
+    std::fs::write(&tmp, bytes)
+        .map_err(|e| InstallFailure::message(format!("No se pudo guardar el archivo: {e}")))?;
+    std::fs::rename(&tmp, &dest)
+        .map_err(|e| InstallFailure::message(format!("No se pudo guardar el archivo: {e}")))?;
+    Ok(sha512)
+}
+
 /// Download every planned file into `dest_root`, verifying sha512.
 ///
 /// `phase` selects which slice of the progress bar this batch moves — mods and
@@ -193,6 +227,18 @@ async fn fetch_one(
     //    version? Copy rather than re-download.
     if blob.is_file() && sha512_of(&blob).as_deref() == Some(sha512.as_str()) {
         return place(&blob, &dest);
+    }
+
+    // 2b. In the local blob store? This is how an imported third-party
+    //     `.mrpack`'s overrides install: they are `source: override` entries
+    //     that the API has never heard of, so the only copy is the one the
+    //     import extracted out of the zip. Checked AFTER the cache and with the
+    //     same hash verification — a blob that does not hash to its own address
+    //     is treated as missing and falls through to the network, which will
+    //     then fail loudly rather than install corrupt bytes.
+    let local = local_blob_path(layout, &sha512);
+    if local.is_file() && sha512_of(&local).as_deref() == Some(sha512.as_str()) {
+        return place(&local, &dest);
     }
 
     // 3. Actually fetch it. Public sources are one GET; the proxied ones go
