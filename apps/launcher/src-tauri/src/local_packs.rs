@@ -659,13 +659,21 @@ async fn export_mrpack_impl(
         }
     }
 
+    // `.mrpack` is a Minecraft interchange format — an emulator pack has no
+    // representation in it. Local packs are Minecraft-only today, so this only
+    // triggers on a hand-crafted manifest.
+    let dependencies = manifest.version.dependencies.clone().ok_or_else(|| {
+        InstallFailure::message(
+            "Solo los packs de Minecraft pueden exportarse como .mrpack.".to_string(),
+        )
+    })?;
     let index = MrpackIndex {
         format_version: 1,
         game: "minecraft",
         version_id: manifest.version.id.to_string(),
         name: manifest.pack.name.to_string(),
         files: mrpack_files,
-        dependencies: manifest.version.dependencies.clone(),
+        dependencies,
         boffmedia_manifest: &manifest,
     };
     let index_json = serde_json::to_vec_pretty(&index)
@@ -693,7 +701,10 @@ async fn export_mrpack_impl(
 /// loader key added to the schema without a matching `LoaderKind` variant
 /// fails the import instead of installing silently as vanilla.
 fn reject_ambiguous_or_unsupported_loader(manifest: &PackManifest) -> Result<(), InstallFailure> {
-    let deps = &manifest.version.dependencies;
+    // No dependencies block means a non-Minecraft pack: nothing to check.
+    let Some(deps) = manifest.version.dependencies.as_ref() else {
+        return Ok(());
+    };
     let declared_loaders = [
         deps.forge.is_some(),
         deps.neoforge.is_some(),
@@ -1598,7 +1609,7 @@ mod tests {
             version_id: manifest.version.id.to_string(),
             name: manifest.pack.name.to_string(),
             files,
-            dependencies: manifest.version.dependencies.clone(),
+            dependencies: manifest.version.dependencies.clone().expect("fixture is a minecraft pack"),
             boffmedia_manifest: &manifest,
         };
         let value = serde_json::to_value(&index).unwrap();

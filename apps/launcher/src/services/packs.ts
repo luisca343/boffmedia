@@ -43,9 +43,10 @@ function toVersion(pack: LauncherPack): PackVersionSummary | null {
  *  derives the same view model a managed pack's `LauncherPack` gives, straight
  *  from the document `local_packs_list` returns. */
 function toLocalEntry(manifest: PackManifest): PackEntry {
-  const loaderEntry = Object.entries(manifest.version.dependencies).find(
-    ([key]) => key !== "minecraft",
-  )
+  // Local packs are Minecraft-only today, but `dependencies` became optional
+  // with multi-game — guard rather than crash on a hand-crafted manifest.
+  const dependencies = manifest.version.dependencies
+  const loaderEntry = Object.entries(dependencies ?? {}).find(([key]) => key !== "minecraft")
   return {
     pack: {
       id: manifest.pack.id,
@@ -58,11 +59,12 @@ function toLocalEntry(manifest: PackManifest): PackEntry {
       // manifest, so the listing carries none — GalleryTab reads it by slug.
       gallery: [],
       accessKind: manifest.pack.access.kind,
+      gameType: manifest.pack.gameType ?? "minecraft",
     },
     latest: {
       id: manifest.version.id,
       name: manifest.version.name,
-      minecraft: manifest.version.dependencies.minecraft,
+      minecraft: dependencies?.minecraft ?? null,
       loader: loaderEntry?.[0] ?? null,
       loaderVersion: loaderEntry?.[1] ?? null,
       fileCount: manifest.version.files.length,
@@ -133,6 +135,7 @@ export async function loadPackEntries(): Promise<PackLibrary> {
           iconUrl: pack.iconUrl,
           gallery: (pack.gallery ?? []).map((g) => ({ url: g.url, alt: g.alt ?? null })),
           accessKind: pack.accessKind,
+          gameType: pack.gameType ?? "minecraft",
         },
         latest,
         state,

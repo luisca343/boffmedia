@@ -22,7 +22,8 @@ export class LauncherSessionEntity {
 export class LauncherVersionEntity {
   @ApiProperty() id!: string;
   @ApiProperty() name!: string;
-  @ApiProperty() minecraft!: string;
+  @ApiPropertyOptional({ nullable: true, description: 'Null para packs que no son de Minecraft' })
+  minecraft!: string | null;
   @ApiPropertyOptional({ nullable: true }) loader!: string | null;
   @ApiPropertyOptional({ nullable: true }) loaderVersion!: string | null;
   @ApiProperty() fileCount!: number;
@@ -54,6 +55,9 @@ export class LauncherPackEntity {
   @ApiProperty({ enum: ['public', 'password', 'allowlist'] })
   accessKind!: string;
 
+  @ApiProperty({ enum: ['minecraft', 'emulator'] })
+  gameType!: string;
+
   @ApiPropertyOptional({ type: PackServerEntity, nullable: true })
   server?: PackServerEntity | null;
 
@@ -68,6 +72,7 @@ export class AdminPackEntity {
   @ApiPropertyOptional({ nullable: true }) summary!: string | null;
   @ApiPropertyOptional({ nullable: true }) iconUrl!: string | null;
   @ApiProperty() accessKind!: string;
+  @ApiProperty({ enum: ['minecraft', 'emulator'] }) gameType!: string;
   @ApiPropertyOptional({ type: PackServerEntity, nullable: true })
   server?: PackServerEntity | null;
   @ApiProperty() archived!: boolean;
@@ -83,9 +88,16 @@ export class PackVersionEntity {
   @ApiProperty() id!: string;
   @ApiProperty() packId!: string;
   @ApiProperty() name!: string;
-  @ApiProperty() minecraft!: string;
+  @ApiPropertyOptional({ nullable: true, description: 'Null para packs que no son de Minecraft' })
+  minecraft!: string | null;
   @ApiPropertyOptional({ nullable: true }) loader!: string | null;
   @ApiPropertyOptional({ nullable: true }) loaderVersion!: string | null;
+  @ApiPropertyOptional({
+    type: 'object',
+    additionalProperties: true,
+    description: 'EmulatorSpec (kind/executable/rom/args) para packs de emulador',
+  })
+  emulator?: Record<string, unknown>;
   @ApiProperty() fileCount!: number;
   @ApiProperty() worldCount!: number;
   @ApiProperty() published!: boolean;

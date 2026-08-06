@@ -263,7 +263,7 @@ function LibraryCard({ entry }: { entry: PackEntry }) {
             <AccessBadge entry={entry} />
             <span className="font-mono text-[11px] text-txt-dim">
               {latest
-                ? `${latest.minecraft} · ${t("filesCount", { count: latest.fileCount })}`
+                ? `${latest.minecraft ?? t("emulatorBadge")} · ${t("filesCount", { count: latest.fileCount })}`
                 : t("noPublishedVersion")}
             </span>
           </>

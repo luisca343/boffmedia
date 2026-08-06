@@ -125,6 +125,9 @@ pub fn run() {
             // §9 — per-instance Java runtime + memory.
             install::instance_runtime,
             install::instance_runtime_set,
+            // Multi-game — files the player supplies (ROM dumps).
+            install::instance_user_files,
+            install::instance_provide_user_file,
             settings::settings_get,
             settings::settings_set,
             settings::plays_get,

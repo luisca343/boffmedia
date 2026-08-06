@@ -86,21 +86,49 @@ fn now_ms() -> u64 {
         .unwrap_or_default()
 }
 
+/// What `spawn` runs. Minecraft carries portablemc's ready-made `Game`; an
+/// emulator is a plain executable + args, already verified on disk by
+/// `emulator::launchable`. Everything downstream — piped output, exit watching,
+/// playtime — is identical for both.
+pub enum Launchable {
+    Minecraft(portablemc::base::Game),
+    Emulator {
+        exe: std::path::PathBuf,
+        args: Vec<String>,
+        rom: std::path::PathBuf,
+        cwd: std::path::PathBuf,
+    },
+}
+
 /// Spawn the game and wire up its output. Returns as soon as the process is
 /// alive; everything after that arrives as `game://log` and `game://state`.
 pub fn spawn(
     app: &tauri::AppHandle,
-    game: &portablemc::base::Game,
+    launchable: &Launchable,
     quick_play: Option<&str>,
     pack_id: String,
 ) -> Result<RunningGame, InstallFailure> {
-    let mut command: Command = game.command();
-    // RF-01/RF-02: only appended when the pack declares a server AND the pack's
-    // Minecraft version supports it (resolve::supports_quick_play); absent, the
-    // command is byte-for-byte what it was before this feature.
-    if let Some(target) = quick_play {
-        command.arg("--quickPlayMultiplayer").arg(target);
-    }
+    let (mut command, exe_label): (Command, String) = match launchable {
+        Launchable::Minecraft(game) => {
+            let mut command: Command = game.command();
+            // RF-01/RF-02: only appended when the pack declares a server AND the
+            // pack's Minecraft version supports it (resolve::supports_quick_play);
+            // absent, the command is byte-for-byte what it was before this feature.
+            if let Some(target) = quick_play {
+                command.arg("--quickPlayMultiplayer").arg(target);
+            }
+            (command, game.jvm_file.display().to_string())
+        }
+        Launchable::Emulator { exe, args, rom, cwd } => {
+            let mut command = Command::new(exe);
+            command.args(args).arg(rom).current_dir(cwd);
+            (command, exe.display().to_string())
+        }
+    };
+    // §9 — crash-signature parsing is Minecraft log analysis; an emulator's exit
+    // gets the honest "it crashed and we do not know why" instead of a Minecraft
+    // diagnosis that cannot apply.
+    let diagnose_crashes = matches!(launchable, Launchable::Minecraft(_));
     command.stdout(Stdio::piped()).stderr(Stdio::piped());
     // The game reads nothing from stdin; leaving it inherited keeps a handle to
     // the launcher's own console alive on Windows.
@@ -108,8 +136,7 @@ pub fn spawn(
 
     let mut child = command.spawn().map_err(|e| {
         InstallFailure::message(format!(
-            "No se pudo iniciar el juego con {}: {e}",
-            game.jvm_file.display()
+            "No se pudo iniciar el juego con {exe_label}: {e}"
         ))
     })?;
 
@@ -130,7 +157,7 @@ pub fn spawn(
     let child = Arc::new(Mutex::new(child));
     let _ = app.emit(EVENT_GAME_STATE, GameStatePayload::Running { pid, since });
 
-    watch_exit(app.clone(), Arc::clone(&child), tail, pack_id, since);
+    watch_exit(app.clone(), Arc::clone(&child), tail, pack_id, since, diagnose_crashes);
 
     Ok(RunningGame { pid, since, child })
 }
@@ -172,6 +199,7 @@ fn watch_exit(
     tail: LogTail,
     pack_id: String,
     since: u64,
+    diagnose_crashes: bool,
 ) {
     std::thread::spawn(move || {
         loop {
@@ -197,7 +225,11 @@ fn watch_exit(
                 } else {
                     GameStatePayload::Crashed {
                         exit_code: code,
-                        diagnosis: diagnose(code, &tail.snapshot()),
+                        diagnosis: if diagnose_crashes {
+                            diagnose(code, &tail.snapshot())
+                        } else {
+                            None
+                        },
                     }
                 };
                 log(

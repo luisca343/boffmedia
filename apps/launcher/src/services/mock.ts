@@ -66,6 +66,7 @@ const PACKS: {
       iconUrl: null,
       gallery: [],
       accessKind: "allowlist",
+      gameType: "minecraft",
     },
     latest: version("v_smp_5", "1.4.2", "2026-07-28T18:04:00Z", 84),
     server: SMP_SERVER,
@@ -80,6 +81,7 @@ const PACKS: {
       iconUrl: null,
       gallery: [],
       accessKind: "password",
+      gameType: "minecraft",
     },
     latest: version("v_cre_2", "0.9.0", "2026-07-11T09:30:00Z", 31),
   },
@@ -93,8 +95,35 @@ const PACKS: {
       iconUrl: null,
       gallery: [],
       accessKind: "public",
+      gameType: "minecraft",
     },
     latest: version("v_evt_1", "2026.7", "2026-07-02T20:00:00Z", 12),
+  },
+  // An emulator pack, so dev:renderer exercises the multi-game UI: no
+  // Minecraft/loader metadata, no Worlds/Screenshots tabs, and the
+  // user-provided-files checklist (empty in browser mode, where the Rust
+  // command is absent).
+  {
+    pack: {
+      id: "pk_esmeralda",
+      slug: "boff-esmeralda",
+      name: "Nuzlocke Esmeralda",
+      summary: "Reto Nuzlocke comunitario en mGBA con partida guardada inicial.",
+      description: null,
+      iconUrl: null,
+      gallery: [],
+      accessKind: "allowlist",
+      gameType: "emulator",
+    },
+    latest: {
+      id: "v_esm_1",
+      name: "Temporada 1",
+      minecraft: null,
+      loader: null,
+      loaderVersion: null,
+      fileCount: 3,
+      createdAt: "2026-08-01T10:00:00Z",
+    },
   },
 ]
 
@@ -159,11 +188,12 @@ export function mockPackEntries(): PackEntry[] {
         iconUrl: manifest.pack.iconUrl ?? null,
         gallery: [],
         accessKind: manifest.pack.access.kind,
+        gameType: manifest.pack.gameType ?? ("minecraft" as const),
       },
       latest: {
         id: manifest.version.id,
         name: manifest.version.name,
-        minecraft: manifest.version.dependencies.minecraft,
+        minecraft: manifest.version.dependencies?.minecraft ?? null,
         loader: null,
         loaderVersion: null,
         fileCount: manifest.version.files.length,

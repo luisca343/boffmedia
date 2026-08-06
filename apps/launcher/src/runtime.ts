@@ -279,7 +279,8 @@ export async function copyText(text: string): Promise<boolean> {
 export type LauncherVersion = {
   id: string
   name: string
-  minecraft: string
+  /** Null for a non-Minecraft version. */
+  minecraft: string | null
   loader: string | null
   loaderVersion: string | null
   fileCount: number
@@ -300,6 +301,8 @@ export type LauncherPack = {
   iconUrl: string | null
   gallery?: LauncherGalleryImage[]
   accessKind: "public" | "password" | "allowlist"
+  /** Always sent by the Rust side (defaulted to "minecraft" for an older API). */
+  gameType: "minecraft" | "emulator"
   /** The Quick Play target — set only for server packs (from the registry).
    *  `port` is absent for a bare SRV host; `host` can be absent on a legacy
    *  `{}` row, which still counts as a server pack (shown "unavailable"). */
@@ -1027,6 +1030,46 @@ export type ContentFile = {
     | { kind: "modrinth"; versionId: string }
     | { kind: "curseforge"; projectId: number; fileId: number }
     | { kind: "override"; sha512: string }
+    | { kind: "userProvided"; hint: string }
+}
+
+/** One file the pack expects the player to supply (a ROM dump). Mirrors Rust's
+ *  `install::UserFile`. */
+export type UserFile = {
+  path: string
+  hint: string
+  sha512: string
+  size: number
+  satisfied: boolean
+}
+
+/** The `user-provided` files this manifest declares, with their local status.
+ *  Empty for every Minecraft pack published so far, so callers can gate the
+ *  whole section on `length > 0`. */
+export async function instanceUserFiles(manifest: unknown): Promise<UserFile[]> {
+  if (!isDesktop()) return []
+  try {
+    return await invoke<UserFile[]>("instance_user_files", { manifest })
+  } catch {
+    return []
+  }
+}
+
+/** Ask the player for one `user-provided` file. The native picker opens on the
+ *  Rust side (like every picker in this app); the file is hash-verified there
+ *  and rejected with a clear message when it is the wrong dump. Resolves to the
+ *  refreshed checklist. */
+export async function instanceProvideUserFile(
+  manifest: unknown,
+  path: string,
+): Promise<UserFile[]> {
+  if (!isDesktop())
+    throw asFailure({ message: "Aportar archivos solo funciona en la aplicación de escritorio." })
+  try {
+    return await invoke<UserFile[]>("instance_provide_user_file", { manifest, path })
+  } catch (err) {
+    throw asFailure(err)
+  }
 }
 
 export type DirEntry = {

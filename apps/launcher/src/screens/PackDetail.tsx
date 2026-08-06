@@ -34,6 +34,7 @@ import { ContentTab } from "../components/pack/ContentTab"
 import { FilesTab } from "../components/pack/FilesTab"
 import { GalleryTab } from "../components/pack/GalleryTab"
 import { ScreenshotsTab } from "../components/pack/ScreenshotsTab"
+import { UserFilesPanel } from "../components/pack/UserFilesPanel"
 import { WorldsTab } from "../components/pack/WorldsTab"
 import { LogPanel } from "../components/pack/LogPanel"
 import {
@@ -75,7 +76,7 @@ function useNow(active: boolean): number {
 /** The pack's own version, as the picker's shape. A pack with no version yet
  *  leaves `minecraft` empty so the picker fills it with Mojang's latest. */
 function choiceOf(
-  latest: { minecraft: string; loader: string | null; loaderVersion: string | null } | null,
+  latest: { minecraft: string | null; loader: string | null; loaderVersion: string | null } | null,
 ): VersionChoice {
   return {
     minecraft: latest?.minecraft ?? "",
@@ -105,7 +106,7 @@ function EditLocalPackModal({
   pack: { id: string; slug: string; name: string; summary: string | null; description: string | null }
   latest: {
     name: string
-    minecraft: string
+    minecraft: string | null
     loader: string | null
     loaderVersion: string | null
   } | null
@@ -266,7 +267,7 @@ export function PackDetail() {
   // The delete / uninstall / open-folder actions are library vocabulary shared
   // with the packs screen, so their labels live in the `packs` namespace.
   const tk = useT("packs")
-  const { selected, install, play, repair, stop, game, go, logs, reloadPacks, offline, editIntent, clearEditIntent } =
+  const { selected, install, play, repair, stop, game, go, logs, reloadPacks, offline, editIntent, clearEditIntent, manifestFor } =
     useLauncher()
   const now = useNow(game.kind === "running")
   const [editing, setEditing] = useState(false)
@@ -323,6 +324,10 @@ export function PackDetail() {
 
   const { pack, latest, state, origin } = selected
   const isLocal = origin === "local"
+  // Everything Minecraft-shaped (worlds, screenshots dir, loader metadata, the
+  // JVM runtime panel, the crash diagnoser's output) gates on this. An absent
+  // gameType is a pre-multi-game pack, i.e. Minecraft.
+  const isMinecraft = (pack.gameType ?? "minecraft") === "minecraft"
 
   /** Copies the manifest AND the installed files, so the clone is playable
    *  immediately rather than needing a full reinstall. That copy is the slow
@@ -455,12 +460,20 @@ export function PackDetail() {
             {/* The reference's metadata strip: the three facts a player checks
                 before pressing Play, on one line instead of in a panel. */}
             <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 font-mono text-[11px] text-txt-muted">
-              <span className="flex items-center gap-1.5">
-                <Icon name="gamepad" size={12} /> Minecraft {latest?.minecraft ?? "—"}
-              </span>
-              <span className="flex items-center gap-1.5">
-                <Icon name="puzzle" size={12} /> {loader}
-              </span>
+              {isMinecraft ? (
+                <>
+                  <span className="flex items-center gap-1.5">
+                    <Icon name="gamepad" size={12} /> Minecraft {latest?.minecraft ?? "—"}
+                  </span>
+                  <span className="flex items-center gap-1.5">
+                    <Icon name="puzzle" size={12} /> {loader}
+                  </span>
+                </>
+              ) : (
+                <span className="flex items-center gap-1.5">
+                  <Icon name="gamepad" size={12} /> {t("emulatorPack")}
+                </span>
+              )}
               <span className="flex items-center gap-1.5">
                 <Icon name="clock" size={12} />
                 {state.kind === "installed" || state.kind === "outdated"
@@ -603,13 +616,23 @@ export function PackDetail() {
             items={[
               { n: formatDuration(now - game.since), l: t("elapsedTime") },
               { n: game.pid, l: t("pid") },
-              { n: loader, l: t("loader") },
+              ...(isMinecraft ? [{ n: loader, l: t("loader") }] : []),
             ]}
           />
           <p className="mt-3 text-xs text-txt-dim">
             {t("launcherClosable")}
           </p>
         </Panel>
+      )}
+
+      {/* ROM dumps and other files only the player can supply. Renders nothing
+          when the pack declares none, i.e. on every Minecraft pack. */}
+      {!isMinecraft && (
+        <UserFilesPanel
+          packId={pack.id}
+          manifestFor={manifestFor}
+          onChanged={reloadPacks}
+        />
       )}
 
       {/* ── Tabs ─────────────────────────────────────────────────────────── */}
@@ -621,9 +644,15 @@ export function PackDetail() {
         tabs={[
           { value: "content", label: t("tabs.content") },
           { value: "files", label: t("tabs.files") },
-          { value: "worlds", label: t("tabs.worlds") },
-          { value: "gallery", label: t("galleryTab") },
-          { value: "screenshots", label: t("tabs.screenshots") },
+          // Worlds parse level.dat and screenshots read Minecraft's convention
+          // dir — neither exists for any other game.
+          ...(isMinecraft
+            ? [
+                { value: "worlds", label: t("tabs.worlds") },
+                { value: "gallery", label: t("galleryTab") },
+                { value: "screenshots", label: t("tabs.screenshots") },
+              ]
+            : [{ value: "gallery", label: t("galleryTab") }]),
           { value: "backups", label: t("tabs.backups") },
           { value: "logs", label: t("tabs.logs") },
           { value: "info", label: t("tabs.info") },
@@ -644,7 +673,7 @@ export function PackDetail() {
 
       {tab === "files" && <FilesTab slug={pack.slug} />}
 
-      {tab === "worlds" && (
+      {tab === "worlds" && isMinecraft && (
         <WorldsTab slug={pack.slug} isLocal={isLocal} onChanged={reloadPacks} />
       )}
 
@@ -657,7 +686,7 @@ export function PackDetail() {
         />
       )}
 
-      {tab === "screenshots" && <ScreenshotsTab slug={pack.slug} />}
+      {tab === "screenshots" && isMinecraft && <ScreenshotsTab slug={pack.slug} />}
 
       {/* Available for managed packs too: a backup only ever reads the
           instance, so nothing here can put a server-managed pack out of sync
@@ -679,8 +708,12 @@ export function PackDetail() {
                 rows={[
                   { label: t("info.latest"), value: latest?.name ?? "—", mono: true },
                   { label: t("info.published"), value: latest ? formatWhen(latest.createdAt) : "—" },
-                  { label: t("info.minecraft"), value: latest?.minecraft ?? "—", mono: true },
-                  { label: t("info.loaderLabel"), value: loader, mono: true },
+                  ...(isMinecraft
+                    ? [
+                        { label: t("info.minecraft"), value: latest?.minecraft ?? "—", mono: true },
+                        { label: t("info.loaderLabel"), value: loader, mono: true },
+                      ]
+                    : [{ label: t("info.gameLabel"), value: t("emulatorPack") }]),
                   { label: t("info.filesLabel"), value: latest?.fileCount ?? 0 },
                   (state.kind === "installed" || state.kind === "outdated") && {
                     label: t("info.diskLabel"),
@@ -725,8 +758,9 @@ export function PackDetail() {
           </div>
 
           {/* §9 — rollback and the per-instance runtime. Reference material,
-              which is exactly what this tab is for. */}
-          <InstanceSpace slug={pack.slug} onChanged={reloadPacks} />
+              which is exactly what this tab is for. Minecraft-only: the runtime
+              panel is JVM sizing, and rollback replays a Minecraft marker. */}
+          {isMinecraft && <InstanceSpace slug={pack.slug} onChanged={reloadPacks} />}
         </div>
       )}
 

@@ -23,6 +23,8 @@ import {
 
 const ACCESS_KINDS = ['public', 'password', 'allowlist'] as const;
 const LOADERS = ['forge', 'neoforge', 'fabric-loader', 'quilt-loader'] as const;
+const GAME_TYPES = ['minecraft', 'emulator'] as const;
+const EMULATOR_KINDS = ['mgba', 'melonds'] as const;
 
 /** Dashed lowercase UUID — the form `rotom_users.uuid` stores. */
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -114,6 +116,16 @@ export class CreatePackDto {
   @ValidateNested()
   @Type(() => PackServerDto)
   server?: PackServerDto;
+
+  @ApiPropertyOptional({
+    enum: GAME_TYPES,
+    default: 'minecraft',
+    description:
+      'Fijo tras la creación: cambiar el juego de un pack con versiones publicadas rompería cada instalación existente',
+  })
+  @IsOptional()
+  @IsIn(GAME_TYPES)
+  gameType?: (typeof GAME_TYPES)[number];
 }
 
 export class UpdatePackDto {
@@ -183,6 +195,33 @@ export class UpdatePackDto {
   archived?: boolean;
 }
 
+/** Mirrors EmulatorSpec in @boffmedia/pack-schema — how an emulator pack
+ *  launches. The final validation is the shared zod schema; this class only
+ *  gives Swagger a shape and rejects the obviously malformed early. */
+export class EmulatorSpecDto {
+  @ApiProperty({ enum: EMULATOR_KINDS })
+  @IsIn(EMULATOR_KINDS)
+  kind!: (typeof EMULATOR_KINDS)[number];
+
+  @ApiProperty({ example: 'emulator/mGBA/mGBA.exe' })
+  @IsString()
+  @MinLength(1)
+  @MaxLength(512)
+  executable!: string;
+
+  @ApiProperty({ example: 'roms/game.gba' })
+  @IsString()
+  @MinLength(1)
+  @MaxLength(512)
+  rom!: string;
+
+  @ApiPropertyOptional({ type: 'array', items: { type: 'string' } })
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  args?: string[];
+}
+
 export class CreateVersionDto {
   @ApiProperty({ example: '1.4.2' })
   @IsString()
@@ -190,10 +229,23 @@ export class CreateVersionDto {
   @MaxLength(64)
   name!: string;
 
-  @ApiProperty({ example: '1.21.4' })
+  @ApiPropertyOptional({
+    example: '1.21.4',
+    description: 'Obligatorio para packs de Minecraft; ausente para el resto',
+  })
+  @IsOptional()
   @IsString()
   @MaxLength(32)
-  minecraft!: string;
+  minecraft?: string;
+
+  @ApiPropertyOptional({
+    type: EmulatorSpecDto,
+    description: 'Obligatorio para packs de emulador; ausente para el resto',
+  })
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => EmulatorSpecDto)
+  emulator?: EmulatorSpecDto;
 
   @ApiPropertyOptional({ enum: LOADERS })
   @IsOptional()

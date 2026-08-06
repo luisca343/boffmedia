@@ -7,6 +7,10 @@ import type { AppLocale } from "@boffmedia/ui"
 
 export type PackAccessKind = "public" | "password" | "allowlist"
 
+/** Which game a pack targets. Mirrors GameType in @boffmedia/pack-schema;
+ *  absent on the wire means "minecraft" (every pre-multi-game pack). */
+export type GameType = "minecraft" | "emulator"
+
 /** A promotional gallery image attached to a pack (shown pre-install). For a
  *  managed pack these are public URLs from the registry; for a local pack the
  *  gallery lives on disk (a convention dir), so this stays empty and the
@@ -31,6 +35,7 @@ export type PackSummary = {
    *  disk); the GalleryTab branches on `origin`. */
   gallery: PackGalleryImage[]
   accessKind: PackAccessKind
+  gameType: GameType
 }
 
 /** The listing's view of a version. The file list lives only in a MANIFEST,
@@ -38,12 +43,23 @@ export type PackSummary = {
 export type PackVersionSummary = {
   id: string
   name: string
-  minecraft: string
+  /** Null for a non-Minecraft version. */
+  minecraft: string | null
   /** "neoforge" | "forge" | "fabric-loader", or null for vanilla. */
   loader: string | null
   loaderVersion: string | null
   fileCount: number
   createdAt: string
+}
+
+/** One file the pack expects the player to supply (a ROM dump), and whether it
+ *  is already available on this machine. Mirrors Rust's `install::UserFile`. */
+export type UserFile = {
+  path: string
+  hint: string
+  sha512: string
+  size: number
+  satisfied: boolean
 }
 
 /** Where a pack stands on THIS machine. */

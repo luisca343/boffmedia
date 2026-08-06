@@ -333,6 +333,10 @@ type Ctx = State & {
   stop: () => void
   clearLogs: () => void
   patchSettings: (patch: Partial<Settings>) => void
+  /** The manifest install/play would use — local packs ARE their manifest,
+   *  managed ones fetch it. Exposed for the user-provided-files checklist,
+   *  which needs the same document those commands validate against. */
+  manifestFor: (packId: string) => Promise<unknown>
 }
 
 const LauncherContext = React.createContext<Ctx | null>(null)
@@ -954,6 +958,7 @@ export function LauncherProvider({ children }: { children: React.ReactNode }) {
     stop,
     clearLogs: () => dispatch({ type: "logs/clear" }),
     patchSettings,
+    manifestFor,
   }
 
   return <LauncherContext.Provider value={value}>{children}</LauncherContext.Provider>

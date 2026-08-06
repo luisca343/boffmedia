@@ -96,7 +96,9 @@ struct LauncherSession {
 pub struct LauncherVersion {
     pub id: String,
     pub name: String,
-    pub minecraft: String,
+    /// Null for a non-Minecraft version.
+    #[serde(default)]
+    pub minecraft: Option<String>,
     pub loader: Option<String>,
     pub loader_version: Option<String>,
     pub file_count: u32,
@@ -140,9 +142,16 @@ pub struct LauncherPack {
     #[serde(default)]
     pub gallery: Vec<LauncherGalleryImage>,
     pub access_kind: String,
+    /// Defaulted so an older API (which never sends it) lists as Minecraft.
+    #[serde(default = "default_game_type")]
+    pub game_type: String,
     #[serde(default)]
     pub server: Option<LauncherServer>,
     pub latest_version: Option<LauncherVersion>,
+}
+
+fn default_game_type() -> String {
+    "minecraft".to_string()
 }
 
 #[derive(Deserialize)]
@@ -347,6 +356,10 @@ pub async fn packs_list(
 ) -> Result<Vec<LauncherPack>, ApiError> {
     let res = authed(&api, &auth, |http, base| {
         http.get(format!("{base}/packs/launcher/packs"))
+            // What this build can install. The server filters the listing by it,
+            // so an old launcher (which never sends the header) keeps seeing
+            // only Minecraft packs — the ones it knows how to parse.
+            .header("X-Boff-Game-Types", "minecraft,emulator")
     })
     .await?;
 

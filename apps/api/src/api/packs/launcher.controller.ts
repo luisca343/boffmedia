@@ -86,10 +86,29 @@ export class LauncherController {
   @Public()
   @UseGuards(LauncherAuthGuard)
   @ApiBearerAuth('JWT')
-  @ApiOperation({ summary: 'Los packs a los que este UUID tiene acceso' })
+  @ApiOperation({
+    summary: 'Los packs a los que este UUID tiene acceso',
+    description:
+      'La cabecera X-Boff-Game-Types (lista separada por comas) declara qué juegos soporta el launcher; sin ella solo se listan packs de Minecraft, para que un launcher antiguo nunca vea un pack que no sabe instalar.',
+  })
   @ApiResponse({ status: HttpStatus.OK, type: [LauncherPackEntity] })
   async list(@Req() req: LauncherRequest): Promise<LauncherPackEntity[]> {
-    return this.packs.listForLauncher(req.launcher!.uuid) as Promise<LauncherPackEntity[]>;
+    return this.packs.listForLauncher(
+      req.launcher!.uuid,
+      this.supportedGameTypes(req),
+    ) as Promise<LauncherPackEntity[]>;
+  }
+
+  /** Parse X-Boff-Game-Types. Unknown names are dropped rather than erroring —
+   *  a NEWER launcher talking to an older API must not lose its whole listing —
+   *  and minecraft is always included: every launcher build can install it. */
+  private supportedGameTypes(req: LauncherRequest): ('minecraft' | 'emulator')[] {
+    const raw = String(req.headers['x-boff-game-types'] ?? '');
+    const declared = raw
+      .split(',')
+      .map((s) => s.trim().toLowerCase())
+      .filter((s): s is 'minecraft' | 'emulator' => s === 'minecraft' || s === 'emulator');
+    return [...new Set<'minecraft' | 'emulator'>(['minecraft', ...declared])];
   }
 
   @Get('packs/:id/manifest')

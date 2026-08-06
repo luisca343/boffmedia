@@ -8,7 +8,7 @@ import * as bcrypt from 'bcrypt';
 import { randomBytes } from 'crypto';
 import { PackManifest } from '@boffmedia/pack-schema';
 import { PacksRepository } from './packs.repository';
-import type { PackAccessKind, PackLoader } from '@/_db/schema/Packs';
+import type { PackAccessKind, PackGameType, PackLoader } from '@/_db/schema/Packs';
 import {
   AUDIT,
   AdminPackView,
@@ -32,9 +32,19 @@ export class PacksService {
   // ── Launcher-facing ──────────────────────────────────────────────────────
 
   /** Packs this UUID may see. The filtering is a single repository query so
-   *  there is exactly one place that can leak a pack. */
-  async listForLauncher(uuid: string): Promise<LauncherPackView[]> {
-    const rows = await this.repo.listVisibleTo(uuid);
+   *  there is exactly one place that can leak a pack.
+   *
+   *  `supportedGameTypes` comes from the launcher's own declaration (a request
+   *  header): a pre-multi-game launcher sends none and is served only Minecraft
+   *  packs, so it can never list — let alone try to install — a pack whose
+   *  manifest it cannot parse. */
+  async listForLauncher(
+    uuid: string,
+    supportedGameTypes: PackGameType[],
+  ): Promise<LauncherPackView[]> {
+    const rows = (await this.repo.listVisibleTo(uuid)).filter((pack) =>
+      supportedGameTypes.includes(pack.gameType),
+    );
 
     return Promise.all(
       rows.map(async (pack) => {
@@ -54,6 +64,7 @@ export class PacksService {
           // the server for its live status.
           ...(pack.server ? { server: pack.server } : {}),
           accessKind: pack.accessKind,
+          gameType: pack.gameType,
           latestVersion:
             version && version.published
               ? {
@@ -121,17 +132,27 @@ export class PacksService {
         ...(pack.server?.host ? { server: pack.server } : {}),
         access: this.accessPayload(pack.accessKind),
         latestVersionId: version.id,
+        // Only when non-default, so a pre-multi-game launcher parsing this
+        // manifest sees exactly the bytes it always saw.
+        ...(pack.gameType !== 'minecraft' ? { gameType: pack.gameType } : {}),
       },
       version: {
         id: version.id,
         name: version.name,
         createdAt: version.createdAt.toISOString(),
-        dependencies: {
-          minecraft: version.minecraft,
-          ...(version.loader && version.loaderVersion
-            ? { [version.loader]: version.loaderVersion }
-            : {}),
-        },
+        // Minecraft carries dependencies, an emulator pack its spec; the shared
+        // schema's cross-field rules reject any other combination below.
+        ...(version.minecraft
+          ? {
+              dependencies: {
+                minecraft: version.minecraft,
+                ...(version.loader && version.loaderVersion
+                  ? { [version.loader]: version.loaderVersion }
+                  : {}),
+              },
+            }
+          : {}),
+        ...(version.emulator ? { emulator: version.emulator } : {}),
         files: version.files,
         ...(version.worlds && version.worlds.length > 0 ? { worlds: version.worlds } : {}),
       },
@@ -215,6 +236,7 @@ export class PacksService {
         summary: pack.summary,
         iconUrl: pack.iconUrl,
         accessKind: pack.accessKind,
+        gameType: pack.gameType,
         ...(pack.server ? { server: pack.server } : {}),
         archived: pack.archived,
         hasPassword: !!pack.passwordHash,
@@ -260,6 +282,10 @@ export class PacksService {
       gallery: dto.gallery ?? null,
       server: this.normalizeServer(dto.server),
       accessKind: dto.accessKind,
+      // Creation-only: there is deliberately no update path for gameType — a
+      // pack that switched games under its installed instances would break
+      // every one of them.
+      gameType: dto.gameType ?? 'minecraft',
       passwordHash: dto.password ? await bcrypt.hash(dto.password, 10) : null,
     });
     await this.repo.audit(AUDIT.PACK_CREATED, id, null, { actorId, slug: dto.slug });
@@ -332,6 +358,7 @@ export class PacksService {
       minecraft: version.minecraft,
       loader: version.loader,
       loaderVersion: version.loaderVersion,
+      ...(version.emulator ? { emulator: version.emulator as any } : {}),
       fileCount: version.files.length,
       worldCount: version.worlds?.length ?? 0,
       published: version.published,
@@ -363,9 +390,10 @@ export class PacksService {
     const parsed = this.parseManifest(await this.requirePack(packId), versionId, dto);
     await this.repo.updateVersion(versionId, {
       name: dto.name,
-      minecraft: dto.minecraft,
+      minecraft: dto.minecraft ?? null,
       loader: (dto.loader as PackLoader) ?? null,
       loaderVersion: dto.loaderVersion ?? null,
+      emulator: (parsed.version as any).emulator ?? null,
       files: parsed.version.files,
       worlds: (parsed.version as any).worlds ?? null,
       notes: dto.notes ?? null,
@@ -392,9 +420,17 @@ export class PacksService {
   }
 
   /** Create and edit share this: both must reject exactly what the launcher
-   *  would refuse to parse, and by construction they cannot drift. */
+   *  would refuse to parse, and by construction they cannot drift. The shared
+   *  schema's game-type cross-field rules run here too, so an emulator version
+   *  on a minecraft pack (or vice versa) dies as a 400, not on a player's disk. */
   private parseManifest(
-    pack: { id: string; slug: string; name: string; accessKind: PackAccessKind },
+    pack: {
+      id: string;
+      slug: string;
+      name: string;
+      accessKind: PackAccessKind;
+      gameType: PackGameType;
+    },
     versionId: string,
     dto: CreateVersionDto,
   ) {
@@ -405,15 +441,21 @@ export class PacksService {
         slug: pack.slug,
         name: pack.name,
         access: this.accessPayload(pack.accessKind),
+        ...(pack.gameType !== 'minecraft' ? { gameType: pack.gameType } : {}),
       },
       version: {
         id: versionId,
         name: dto.name,
         createdAt: new Date().toISOString(),
-        dependencies: {
-          minecraft: dto.minecraft,
-          ...(dto.loader && dto.loaderVersion ? { [dto.loader]: dto.loaderVersion } : {}),
-        },
+        ...(dto.minecraft
+          ? {
+              dependencies: {
+                minecraft: dto.minecraft,
+                ...(dto.loader && dto.loaderVersion ? { [dto.loader]: dto.loaderVersion } : {}),
+              },
+            }
+          : {}),
+        ...(dto.emulator ? { emulator: dto.emulator } : {}),
         files: dto.files,
         ...(dto.worlds && dto.worlds.length > 0 ? { worlds: dto.worlds } : {}),
       },
@@ -446,9 +488,10 @@ export class PacksService {
       id,
       packId,
       name: dto.name,
-      minecraft: dto.minecraft,
+      minecraft: dto.minecraft ?? null,
       loader: (dto.loader as PackLoader) ?? null,
       loaderVersion: dto.loaderVersion ?? null,
+      emulator: (parsed.version as any).emulator ?? null,
       files: parsed.version.files,
       worlds: (parsed.version as any).worlds ?? null,
       notes: dto.notes ?? null,

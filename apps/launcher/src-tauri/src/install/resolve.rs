@@ -9,11 +9,49 @@
 // launcher installs another.
 
 use crate::pack::{
-    PackManifest, PackManifestVersionFilesItemEnvClient as EnvClient,
+    PackManifest, PackManifestPackGameType as GameType,
+    PackManifestVersionFilesItemEnvClient as EnvClient,
     PackManifestVersionFilesItemSource as Source,
 };
 
 use super::InstallFailure;
+
+/// Emulators the launcher knows how to launch in portable mode. Mirrors
+/// `EmulatorKind` in packages/pack-schema/src/boffmedia.ts.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum EmulatorKind {
+    Mgba,
+    MelonDs,
+}
+
+impl EmulatorKind {
+    /// The wire name — the schema's enum value.
+    pub fn key(self) -> &'static str {
+        match self {
+            EmulatorKind::Mgba => "mgba",
+            EmulatorKind::MelonDs => "melonds",
+        }
+    }
+}
+
+/// Which game this plan installs and how it launches. `Minecraft` keeps its
+/// details in the plan's own `minecraft`/`loader`/`quick_play` fields (they
+/// predate multi-game and the marker serialises them); everything emulator
+/// lives here.
+#[derive(Debug, Clone)]
+pub enum PlannedGame {
+    Minecraft,
+    Emulator {
+        kind: EmulatorKind,
+        /// Instance-relative path of the executable, verified by the schema to
+        /// be a `files[]` entry — so it arrives hash-checked like any mod.
+        executable: String,
+        /// Instance-relative path of the ROM, typically a `user-provided` file.
+        rom: String,
+        /// Extra CLI args inserted before the ROM path.
+        args: Vec<String>,
+    },
+}
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum LoaderKind {
@@ -62,6 +100,11 @@ pub enum Fetch {
     /// CurseForge because its CDN needs a key we refuse to ship (§4.5), and
     /// overrides because they are our blobs and never public (§7.2).
     Proxied(crate::api::PackFile),
+    /// Never fetched from anywhere: the player supplies the file (a ROM dump)
+    /// and `instance_provide_user_file` verifies it into the local blob store,
+    /// after which the ordinary cache path installs it. `hint` is what the
+    /// prompt shows.
+    UserProvided { hint: String },
 }
 
 #[derive(Debug, Clone)]
@@ -87,8 +130,10 @@ pub struct InstallPlan {
     pub slug: String,
     pub version_id: String,
     pub version_name: String,
+    /// Empty for a non-Minecraft pack — read `game` before this field.
     pub minecraft: String,
     pub loader: Option<(LoaderKind, String)>,
+    pub game: PlannedGame,
     pub files: Vec<PlannedFile>,
     /// Sum of `fileSize` across planned files. The manifest's own numbers, not
     /// Content-Length: a real total is needed before the first byte arrives.
@@ -118,8 +163,9 @@ fn supports_quick_play(minecraft: &str) -> bool {
 }
 
 /// Mirrors `loaderOf()` — first key present wins, in this fixed order.
+/// `None` for a manifest with no dependencies block (a non-Minecraft pack).
 pub fn loader_of(manifest: &PackManifest) -> Option<(LoaderKind, String)> {
-    let deps = &manifest.version.dependencies;
+    let deps = manifest.version.dependencies.as_ref()?;
     if let Some(v) = &deps.forge {
         return Some((LoaderKind::Forge, v.to_string()));
     }
@@ -162,7 +208,47 @@ pub fn plan(manifest: &PackManifest) -> Result<InstallPlan, InstallFailure> {
         });
     }
 
-    let minecraft = manifest.version.dependencies.minecraft.to_string();
+    // `pack::parse_manifest` already enforced the game-type cross-field rules,
+    // so a missing block here is a programmer error, not a data error — but the
+    // plan still fails softly rather than panicking on a manifest that bypassed
+    // full validation.
+    let game_type = manifest
+        .pack
+        .game_type
+        .clone()
+        .unwrap_or(GameType::Minecraft);
+
+    let (game, minecraft) = match game_type {
+        GameType::Minecraft => {
+            let deps = manifest.version.dependencies.as_ref().ok_or_else(|| {
+                InstallFailure::message(
+                    "El manifiesto no declara la versión de Minecraft.".to_string(),
+                )
+            })?;
+            (PlannedGame::Minecraft, deps.minecraft.to_string())
+        }
+        GameType::Emulator => {
+            let emu = manifest.version.emulator.as_ref().ok_or_else(|| {
+                InstallFailure::message(
+                    "El manifiesto no declara qué emulador usar.".to_string(),
+                )
+            })?;
+            let kind = match emu.kind {
+                crate::pack::PackManifestVersionEmulatorKind::Mgba => EmulatorKind::Mgba,
+                crate::pack::PackManifestVersionEmulatorKind::Melonds => EmulatorKind::MelonDs,
+            };
+            (
+                PlannedGame::Emulator {
+                    kind,
+                    executable: emu.executable.to_string(),
+                    rom: emu.rom.to_string(),
+                    args: emu.args.iter().map(|a| a.to_string()).collect(),
+                },
+                String::new(),
+            )
+        }
+    };
+
     let quick_play = manifest.pack.server.as_ref().and_then(|server| {
         if supports_quick_play(&minecraft) {
             // No port → hand Minecraft the bare host so its own SRV lookup finds
@@ -183,6 +269,7 @@ pub fn plan(manifest: &PackManifest) -> Result<InstallPlan, InstallFailure> {
         version_name: manifest.version.name.to_string(),
         minecraft,
         loader: loader_of(manifest),
+        game,
         files,
         total_bytes,
         quick_play,
@@ -213,6 +300,10 @@ pub(crate) fn fetch_for(source: &Source, _path: &str) -> Result<Fetch, InstallFa
             // guarantees lowercase hex; normalising is belt and braces.
             sha512: blob_sha512.to_string().to_lowercase(),
         }),
+
+        // The player's own file. Nothing to fetch: files.rs installs it from
+        // the local blob store once `instance_provide_user_file` verified it.
+        Source::UserProvided { hint } => Fetch::UserProvided { hint: hint.to_string() },
     })
 }
 

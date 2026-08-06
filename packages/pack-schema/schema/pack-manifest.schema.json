@@ -131,6 +131,13 @@
             "host"
           ],
           "additionalProperties": false
+        },
+        "gameType": {
+          "type": "string",
+          "enum": [
+            "minecraft",
+            "emulator"
+          ]
         }
       },
       "required": [
@@ -319,6 +326,25 @@
                       "blobSha512"
                     ],
                     "additionalProperties": false
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "kind": {
+                        "type": "string",
+                        "const": "user-provided"
+                      },
+                      "hint": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 256
+                      }
+                    },
+                    "required": [
+                      "kind",
+                      "hint"
+                    ],
+                    "additionalProperties": false
                   }
                 ]
               }
@@ -429,6 +455,25 @@
                       "blobSha512"
                     ],
                     "additionalProperties": false
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "kind": {
+                        "type": "string",
+                        "const": "user-provided"
+                      },
+                      "hint": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 256
+                      }
+                    },
+                    "required": [
+                      "kind",
+                      "hint"
+                    ],
+                    "additionalProperties": false
                   }
                 ]
               },
@@ -450,13 +495,45 @@
             ],
             "additionalProperties": false
           }
+        },
+        "emulator": {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "enum": [
+                "mgba",
+                "melonds"
+              ]
+            },
+            "executable": {
+              "type": "string",
+              "minLength": 1
+            },
+            "rom": {
+              "type": "string",
+              "minLength": 1
+            },
+            "args": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          "required": [
+            "kind",
+            "executable",
+            "rom"
+          ],
+          "additionalProperties": false
         }
       },
       "required": [
         "id",
         "name",
         "createdAt",
-        "dependencies",
         "files"
       ],
       "additionalProperties": false

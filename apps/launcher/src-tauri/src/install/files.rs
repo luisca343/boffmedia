@@ -76,6 +76,54 @@ pub fn local_blob_path(layout: &Layout, sha512: &str) -> PathBuf {
     layout.local_blobs_dir().join(prefix).join(sha512)
 }
 
+/// Copy a file from anywhere on disk into the local blob store, streaming — a
+/// 3DS ROM can be gigabytes, so the bytes never pass through memory whole. The
+/// caller has already verified `sha512` matches the file (that check is the
+/// whole point of the provide flow); this only files it under that address.
+pub fn import_local_blob(
+    layout: &Layout,
+    source: &Path,
+    sha512: &str,
+) -> Result<PathBuf, InstallFailure> {
+    let dest = local_blob_path(layout, sha512);
+    if dest.is_file() {
+        return Ok(dest);
+    }
+    if let Some(parent) = dest.parent() {
+        std::fs::create_dir_all(parent).map_err(|e| {
+            InstallFailure::message(format!("No se pudo crear el almacén local: {e}"))
+        })?;
+    }
+    let tmp = dest.with_extension("part");
+    std::fs::copy(source, &tmp)
+        .map_err(|e| InstallFailure::message(format!("No se pudo copiar el archivo: {e}")))?;
+    std::fs::rename(&tmp, &dest)
+        .map_err(|e| InstallFailure::message(format!("No se pudo guardar el archivo: {e}")))?;
+    Ok(dest)
+}
+
+/// True when a planned file can be produced without asking the player: already
+/// correct at its destination, or present in either blob store. This is what
+/// decides whether a user-provided file still needs a prompt.
+pub fn is_satisfied(layout: &Layout, dest_root: &Path, file: &PlannedFile) -> bool {
+    let sha512 = file.sha512.to_lowercase();
+    let dest = dest_root.join(file.path.replace('\\', "/"));
+    if let Ok(meta) = std::fs::metadata(&dest) {
+        if meta.is_file()
+            && (file.size == 0 || meta.len() == file.size)
+            && sha512_of(&dest).as_deref() == Some(sha512.as_str())
+        {
+            return true;
+        }
+    }
+    for blob in [cache_path(layout, &sha512), local_blob_path(layout, &sha512)] {
+        if blob.is_file() && sha512_of(&blob).as_deref() == Some(sha512.as_str()) {
+            return true;
+        }
+    }
+    false
+}
+
 /// Store `bytes` in the local blob store under their own sha512, and return
 /// that hash. Content-addressed, so re-importing the same pack twice writes
 /// nothing the second time and two packs sharing a config share one blob.
@@ -265,7 +313,18 @@ async fn fetch_one(
         return place(&local, &dest);
     }
 
-    // 3. Actually fetch it, retrying the network leg a few times. The cache
+    // 3. A user-provided file has no origin to fetch from. Reaching this point
+    //    means it is neither on disk nor in any blob store — the player has to
+    //    supply it (instance_provide_user_file), so the honest outcome is a
+    //    prompt, not a retry loop.
+    if let Fetch::UserProvided { hint } = &file.fetch {
+        return Err(InstallFailure::message(format!(
+            "Falta «{}»: {hint}. Aporta el archivo desde la ficha del pack.",
+            file.path
+        )));
+    }
+
+    // 4. Actually fetch it, retrying the network leg a few times. The cache
     //    checks above are deterministic and are never part of the retry; only
     //    the parts that touch the network are.
     let mut attempt = 0;
@@ -352,6 +411,12 @@ pub(crate) async fn resolve_url(http: &reqwest::Client, file: &PlannedFile) -> R
         // before it ever asks for a URL, because there is no public one.
         Fetch::Proxied(_) => Err(InstallFailure::message(format!(
             "«{}» solo puede descargarse a través del servidor de Boffmedia.",
+            file.path
+        ))),
+        // Also unreachable: `fetch_one` turns a missing user-provided file into
+        // a prompt before the network leg is ever attempted.
+        Fetch::UserProvided { hint } => Err(InstallFailure::message(format!(
+            "Falta «{}»: {hint}.",
             file.path
         ))),
         Fetch::ModrinthVersion { version_id } => {
@@ -472,6 +537,11 @@ async fn stream_to_cache(
             blob.display()
         )))
     })
+}
+
+/// `place` for callers outside this module (the provide-user-file command).
+pub(crate) fn place_blob(blob: &Path, dest: &Path) -> Result<(), InstallFailure> {
+    place(blob, dest)
 }
 
 /// Put a verified blob at its target path. A copy, not a hard link: configs are

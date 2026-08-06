@@ -46,6 +46,10 @@ pub enum ManagedSource {
     Curseforge { project_id: i64, file_id: i64 },
     #[serde(rename_all = "camelCase")]
     Override { sha512: String },
+    /// The player supplied this file (a ROM dump). Recorded so a revert can
+    /// re-place it from the local blob store and the UI can label it.
+    #[serde(rename_all = "camelCase")]
+    UserProvided { hint: String },
 }
 
 impl ManagedSource {
@@ -65,6 +69,7 @@ impl ManagedSource {
             Fetch::Proxied(crate::api::PackFile::Override { sha512 }) => ManagedSource::Override {
                 sha512: sha512.clone(),
             },
+            Fetch::UserProvided { hint } => ManagedSource::UserProvided { hint: hint.clone() },
         }
     }
 
@@ -86,6 +91,7 @@ impl ManagedSource {
                     sha512: sha512.clone(),
                 })
             }
+            ManagedSource::UserProvided { hint } => Fetch::UserProvided { hint: hint.clone() },
         }
     }
 }

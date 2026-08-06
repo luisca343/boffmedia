@@ -6,6 +6,12 @@ import { EnvSupport, FileEnv, InstancePath, MrpackDependencies, loaderOf } from 
 // third-party tool (Prism, packwiz) ignores them and the pack still installs.
 // HANDOFF §7.1: per file — source, SHA-512, target path, env.
 
+/** Which game a pack targets. Absent means `minecraft` — every manifest that
+ *  existed before multi-game support is a Minecraft pack and must keep
+ *  validating unchanged. */
+export const GameType = z.enum(["minecraft", "emulator"])
+export type GameType = z.infer<typeof GameType>
+
 /** Where a file comes from. §7.1 lists exactly three sources; §4.5 explains why
  *  CurseForge is proxied rather than fetched directly (an embedded CF key gets
  *  extracted, and an abused key is a revoked key). Modrinth is primary and goes
@@ -30,6 +36,16 @@ export const FileSource = z.discriminatedUnion("kind", [
   z.object({
     kind: z.literal("override"),
     blobSha512: z.string().regex(/^[a-f0-9]{128}$/, "blobSha512 must be 128 lowercase hex chars"),
+  }),
+  /** A file the server never distributes: the user supplies it locally (a ROM
+   *  dump, a BIOS) and the launcher verifies it against the entry's mandatory
+   *  sha512/fileSize before copying it into the instance. This is what keeps
+   *  packs distributable when their content is not. */
+  z.object({
+    kind: z.literal("user-provided"),
+    /** Shown to the user when prompting for the file, e.g. "Pokémon Emerald
+     *  (USA) cartridge dump (.gba)". */
+    hint: z.string().min(1).max(256),
   }),
 ])
 export type FileSource = z.infer<typeof FileSource>
@@ -82,16 +98,40 @@ export const BundledWorld = z.object({
 })
 export type BundledWorld = z.infer<typeof BundledWorld>
 
+/** Emulators the launcher knows how to configure in portable mode. */
+export const EmulatorKind = z.enum(["mgba", "melonds"])
+export type EmulatorKind = z.infer<typeof EmulatorKind>
+
+/** How an emulator pack launches. The emulator binaries and the ROM are
+ *  ordinary `files` entries (the ROM typically `user-provided`); this block
+ *  names which of those paths to spawn and which to pass as the game. */
+export const EmulatorSpec = z.object({
+  kind: EmulatorKind,
+  /** Instance-relative path of the emulator executable to spawn. Must match a
+   *  `files` entry (enforced by PackManifest). */
+  executable: InstancePath,
+  /** Instance-relative path of the ROM handed to the emulator. Must match a
+   *  `files` entry (enforced by PackManifest). */
+  rom: InstancePath,
+  /** Extra CLI args inserted before the ROM path. */
+  args: z.array(z.string().min(1)).optional(),
+})
+export type EmulatorSpec = z.infer<typeof EmulatorSpec>
+
 export const PackVersion = z.object({
   /** Opaque, server-assigned. Not semver — packs version on their own clock. */
   id: z.string().min(1),
   /** What users see: "1.4.2", "Season 3", whatever the owner types. */
   name: z.string().min(1),
   createdAt: z.iso.datetime(),
-  dependencies: MrpackDependencies,
+  /** Minecraft + loader pins. Required for Minecraft packs, absent for every
+   *  other game (enforced by PackManifest, which owns cross-field rules). */
+  dependencies: MrpackDependencies.optional(),
   files: z.array(PackFile),
   /** Worlds shipped with this version, installed first-time-only. */
   worlds: z.array(BundledWorld).optional(),
+  /** Present exactly when the pack's gameType is `emulator`. */
+  emulator: EmulatorSpec.optional(),
 })
 export type PackVersion = z.infer<typeof PackVersion>
 
@@ -135,8 +175,16 @@ export const Pack = z.object({
   access: PackAccess,
   latestVersionId: z.string().min(1).optional(),
   server: PackServer.optional(),
+  /** Absent on every pre-multi-game manifest, so absent means `minecraft`. Use
+   *  `gameTypeOf(pack)` instead of reading this field directly. */
+  gameType: GameType.optional(),
 })
 export type Pack = z.infer<typeof Pack>
+
+/** The one place the "absent means minecraft" rule is written down. */
+export function gameTypeOf(pack: Pick<Pack, "gameType">): GameType {
+  return pack.gameType ?? "minecraft"
+}
 
 /** The full document the dashboard publishes and the launcher consumes. This is
  *  the object the whole package exists for: one schema, both ends. */
@@ -147,8 +195,65 @@ export const PackManifest = z
     version: PackVersion,
   })
   .superRefine((m, ctx) => {
-    // Vanilla packs (no loader at all) are legal, so dependencies get no
-    // further check here beyond MrpackDependencies' own.
+    // Cross-field game-type rules live here, not in Pack/PackVersion, because
+    // they span both halves of the document.
+    const gameType = gameTypeOf(m.pack)
+    if (gameType === "minecraft") {
+      // Vanilla packs (no loader at all) are legal, so dependencies get no
+      // further check here beyond MrpackDependencies' own.
+      if (!m.version.dependencies) {
+        ctx.addIssue({
+          code: "custom",
+          path: ["version", "dependencies"],
+          message: "a minecraft pack must declare dependencies",
+        })
+      }
+      if (m.version.emulator) {
+        ctx.addIssue({
+          code: "custom",
+          path: ["version", "emulator"],
+          message: "a minecraft pack must not declare an emulator block",
+        })
+      }
+    } else if (gameType === "emulator") {
+      if (m.version.dependencies) {
+        ctx.addIssue({
+          code: "custom",
+          path: ["version", "dependencies"],
+          message: "an emulator pack must not declare minecraft dependencies",
+        })
+      }
+      if (!m.version.emulator) {
+        ctx.addIssue({
+          code: "custom",
+          path: ["version", "emulator"],
+          message: "an emulator pack must declare an emulator block",
+        })
+      }
+      if (m.version.worlds?.length) {
+        ctx.addIssue({
+          code: "custom",
+          path: ["version", "worlds"],
+          message: "bundled worlds are minecraft-only; ship emulator saves as files",
+        })
+      }
+      if (m.version.emulator) {
+        // Both paths must be real entries in `files` so they carry a sha512 —
+        // the executable arrives verified and the ROM prompt knows its hash.
+        const filePaths = new Set(m.version.files.map((f) => f.path.toLowerCase().replace(/\\/g, "/")))
+        for (const field of ["executable", "rom"] as const) {
+          const p = m.version.emulator[field].toLowerCase().replace(/\\/g, "/")
+          if (!filePaths.has(p)) {
+            ctx.addIssue({
+              code: "custom",
+              path: ["version", "emulator", field],
+              message: `emulator.${field} must match the path of a files[] entry`,
+            })
+          }
+        }
+      }
+    }
+
     const seen = new Set<string>()
     for (const [i, file] of m.version.files.entries()) {
       const key = file.path.toLowerCase().replace(/\\/g, "/")

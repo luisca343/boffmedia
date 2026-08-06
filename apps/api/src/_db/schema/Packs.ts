@@ -24,6 +24,10 @@ export type PackAccessKind = 'public' | 'password' | 'allowlist';
 /** Mirrors MrpackDependencies' loader keys. Null = vanilla. */
 export type PackLoader = 'forge' | 'neoforge' | 'fabric-loader' | 'quilt-loader';
 
+/** Mirrors GameType in @boffmedia/pack-schema. Every pre-multi-game row is
+ *  'minecraft', which is what the column default backfills. */
+export type PackGameType = 'minecraft' | 'emulator';
+
 export const packs = mysqlTable(
   'packs',
   {
@@ -41,6 +45,13 @@ export const packs = mysqlTable(
     // `port` is optional (a bare host behind an SRV record declares none). Typed
     // loosely because the column can also hold a legacy/malformed `{}`.
     server: json('server').$type<{ host?: string; port?: number }>(),
+    // Which game this pack targets. The launcher's listing is filtered by the
+    // game types it declares support for, so an old launcher never sees a pack
+    // it cannot install.
+    gameType: varchar('game_type', { length: 16 })
+      .$type<PackGameType>()
+      .notNull()
+      .default('minecraft'),
     accessKind: varchar('access_kind', { length: 16 })
       .$type<PackAccessKind>()
       .notNull()
@@ -74,9 +85,13 @@ export const packVersions = mysqlTable(
     packId: varchar('pack_id', { length: 32 }).notNull(),
     /** User-facing label: "1.4.2", "Season 3". Not semver, not ordered. */
     name: varchar('name', { length: 64 }).notNull(),
-    minecraft: varchar('minecraft', { length: 32 }).notNull(),
+    /** Null for a non-Minecraft version (the pack's gameType says which). */
+    minecraft: varchar('minecraft', { length: 32 }),
     loader: varchar('loader', { length: 20 }).$type<PackLoader>(),
     loaderVersion: varchar('loader_version', { length: 64 }),
+    // The EmulatorSpec payload (kind/executable/rom/args) for emulator packs,
+    // validated against @boffmedia/pack-schema on write. Null for Minecraft.
+    emulator: json('emulator').$type<Record<string, unknown>>(),
     // The PackFile[] payload, validated against @boffmedia/pack-schema on write.
     // Stored whole rather than normalised: nothing queries an individual file,
     // and delta computation reads the entire list anyway.

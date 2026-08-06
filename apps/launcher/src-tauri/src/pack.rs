@@ -30,6 +30,26 @@ pub enum ManifestError {
     WorldFolderSegment(String),
     #[error("two bundled worlds target the same save folder (case-insensitively): {0}")]
     DuplicateWorldFolder(String),
+    #[error("a minecraft pack must declare dependencies")]
+    MissingDependencies,
+    #[error("a minecraft pack must not declare an emulator block")]
+    UnexpectedEmulator,
+    #[error("an emulator pack must not declare minecraft dependencies")]
+    UnexpectedDependencies,
+    #[error("an emulator pack must declare an emulator block")]
+    MissingEmulator,
+    #[error("bundled worlds are minecraft-only")]
+    WorldsOnEmulatorPack,
+    #[error("emulator.{0} must match the path of a files[] entry")]
+    EmulatorPathNotInFiles(&'static str),
+}
+
+/// The one place the "absent means minecraft" rule is written down on the Rust
+/// side. Mirrors `gameTypeOf()` in boffmedia.ts.
+pub fn game_type_of(pack: &PackManifestPack) -> PackManifestPackGameType {
+    pack.game_type
+        .clone()
+        .unwrap_or(PackManifestPackGameType::Minecraft)
 }
 
 /// Parse and fully validate a manifest — schema-level via serde, plus the
@@ -39,7 +59,51 @@ pub fn parse_manifest(raw: &str) -> Result<PackManifest, ManifestError> {
     let manifest: PackManifest = serde_json::from_str(raw)?;
     validate_paths(&manifest)?;
     validate_worlds(&manifest)?;
+    validate_game_type(&manifest)?;
     Ok(manifest)
+}
+
+/// Mirrors the game-type cross-field rules in boffmedia.ts's `.superRefine`.
+/// A minecraft pack (the default when `gameType` is absent) must carry
+/// dependencies and nothing emulator; an emulator pack is the inverse, plus its
+/// executable/rom must be real `files[]` entries so both arrive hash-verified.
+fn validate_game_type(manifest: &PackManifest) -> Result<(), ManifestError> {
+    match game_type_of(&manifest.pack) {
+        PackManifestPackGameType::Minecraft => {
+            if manifest.version.dependencies.is_none() {
+                return Err(ManifestError::MissingDependencies);
+            }
+            if manifest.version.emulator.is_some() {
+                return Err(ManifestError::UnexpectedEmulator);
+            }
+        }
+        PackManifestPackGameType::Emulator => {
+            if manifest.version.dependencies.is_some() {
+                return Err(ManifestError::UnexpectedDependencies);
+            }
+            if !manifest.version.worlds.is_empty() {
+                return Err(ManifestError::WorldsOnEmulatorPack);
+            }
+            let Some(emulator) = manifest.version.emulator.as_ref() else {
+                return Err(ManifestError::MissingEmulator);
+            };
+            let paths: HashSet<String> = manifest
+                .version
+                .files
+                .iter()
+                .map(|f| f.path.to_lowercase().replace('\\', "/"))
+                .collect();
+            for (field, value) in [
+                ("executable", emulator.executable.as_str()),
+                ("rom", emulator.rom.as_str()),
+            ] {
+                if !paths.contains(&value.to_lowercase().replace('\\', "/")) {
+                    return Err(ManifestError::EmulatorPathNotInFiles(field));
+                }
+            }
+        }
+    }
+    Ok(())
 }
 
 /// Mirrors the `.superRefine` in packages/pack-schema/src/boffmedia.ts, plus a
@@ -193,5 +257,47 @@ mod tests {
         ));
         let err = parse_manifest(&json).unwrap_err();
         assert!(matches!(err, ManifestError::DuplicateWorldFolder(_)));
+    }
+
+    // Mirrors of the game-type superRefine in boffmedia.ts — same fixtures as
+    // the vitest side, same rejections.
+    fn emulator_manifest(rom_path: &str) -> String {
+        format!(
+            r#"{{"formatVersion":1,
+                "pack":{{"id":"pk","slug":"poke-esmeralda","name":"Esmeralda","access":{{"kind":"public"}},"gameType":"emulator"}},
+                "version":{{"id":"v1","name":"1.0","createdAt":"2026-07-30T12:00:00Z",
+                  "files":[
+                    {{"path":"emulator/mgba.exe","sha512":"{s}","fileSize":10,
+                      "env":{{"client":"required","server":"unsupported"}},
+                      "source":{{"kind":"url","url":"https://x.test/mgba.exe"}}}},
+                    {{"path":"roms/game.gba","sha512":"{s}","fileSize":10,
+                      "env":{{"client":"required","server":"unsupported"}},
+                      "source":{{"kind":"user-provided","hint":"Pokémon Esmeralda (EUR) .gba"}}}}],
+                  "emulator":{{"kind":"mgba","executable":"emulator/mgba.exe","rom":"{rom_path}"}}}}}}"#,
+            s = "a".repeat(128)
+        )
+    }
+
+    #[test]
+    fn accepts_an_emulator_manifest_with_a_user_provided_rom() {
+        let manifest = parse_manifest(&emulator_manifest("roms/game.gba")).unwrap();
+        assert!(matches!(
+            game_type_of(&manifest.pack),
+            PackManifestPackGameType::Emulator
+        ));
+    }
+
+    #[test]
+    fn rejects_an_emulator_rom_that_is_not_a_files_entry() {
+        let err = parse_manifest(&emulator_manifest("roms/other.gba")).unwrap_err();
+        assert!(matches!(err, ManifestError::EmulatorPathNotInFiles("rom")));
+    }
+
+    #[test]
+    fn a_minecraft_manifest_without_dependencies_is_rejected() {
+        let json = manifest_json("mods/sodium.jar", None)
+            .replace(r#""dependencies":{"minecraft":"1.21.4","neoforge":"21.4.30"},"#, "");
+        let err = parse_manifest(&json).unwrap_err();
+        assert!(matches!(err, ManifestError::MissingDependencies));
     }
 }

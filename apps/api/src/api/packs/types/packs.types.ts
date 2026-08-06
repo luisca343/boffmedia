@@ -4,9 +4,9 @@
 // TypeScript types. The zod schema itself IS imported, as compiled CJS, because
 // validation has to be the same code the dashboard runs.
 
-import type { PackAccessKind, PackLoader } from '@/_db/schema/Packs';
+import type { PackAccessKind, PackGameType, PackLoader } from '@/_db/schema/Packs';
 
-export type { PackAccessKind, PackLoader };
+export type { PackAccessKind, PackGameType, PackLoader };
 
 /** What a launcher is told about a pack it can see. Never includes the password
  *  hash, the ACL, or unpublished versions. */
@@ -19,12 +19,14 @@ export interface LauncherPackView {
   description?: string;
   gallery?: StoredPackGalleryImage[];
   accessKind: PackAccessKind;
+  gameType: PackGameType;
   /** Present only for "server packs" — the Quick Play target. */
   server?: StoredPackServer;
   latestVersion: {
     id: string;
     name: string;
-    minecraft: string;
+    /** Null for a non-Minecraft version. */
+    minecraft: string | null;
     loader: PackLoader | null;
     loaderVersion: string | null;
     fileCount: number;
@@ -58,14 +60,26 @@ export interface PackVersionView {
   id: string;
   packId: string;
   name: string;
-  minecraft: string;
+  /** Null for a non-Minecraft version. */
+  minecraft: string | null;
   loader: PackLoader | null;
   loaderVersion: string | null;
+  /** The EmulatorSpec payload, for emulator packs. */
+  emulator?: StoredEmulatorSpec;
   fileCount: number;
   worldCount: number;
   published: boolean;
   notes: string | null;
   createdAt: string;
+}
+
+/** The stored shape of `pack_versions.emulator`. Mirrors EmulatorSpec in
+ *  @boffmedia/pack-schema (whose TS types must not be imported here). */
+export interface StoredEmulatorSpec {
+  kind: 'mgba' | 'melonds';
+  executable: string;
+  rom: string;
+  args?: string[];
 }
 
 /**
@@ -82,7 +96,8 @@ export interface StoredPackFile {
     | { kind: 'modrinth'; projectId: string; versionId: string }
     | { kind: 'curseforge'; projectId: number; fileId: number }
     | { kind: 'url'; url: string }
-    | { kind: 'override'; blobSha512: string };
+    | { kind: 'override'; blobSha512: string }
+    | { kind: 'user-provided'; hint: string };
 }
 
 export interface StoredPackGalleryImage {

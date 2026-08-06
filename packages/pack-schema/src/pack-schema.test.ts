@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest"
 import type { z } from "zod"
 
-import { PackManifest, loaderOf } from "./index.js"
+import { PackManifest, gameTypeOf, loaderOf } from "./index.js"
 
 const sha512 = "a".repeat(128)
 
@@ -30,6 +30,28 @@ const manifest = (): z.input<typeof PackManifest> => ({
     ],
   },
 })
+
+const emulatorManifest = (): z.input<typeof PackManifest> => {
+  const m = manifest()
+  m.pack.gameType = "emulator"
+  delete m.version.dependencies
+  m.version.files = [
+    {
+      path: "emulator/mgba.exe",
+      sha512,
+      fileSize: 5678,
+      source: { kind: "url" as const, url: "https://example.com/mgba.exe" },
+    },
+    {
+      path: "roms/game.gba",
+      sha512,
+      fileSize: 4321,
+      source: { kind: "user-provided" as const, hint: "Pokémon Emerald (USA) dump (.gba)" },
+    },
+  ]
+  m.version.emulator = { kind: "mgba" as const, executable: "emulator/mgba.exe", rom: "roms/game.gba" }
+  return m
+}
 
 describe("PackManifest", () => {
   it("accepts a well-formed manifest and defaults env to required on both sides", () => {
@@ -99,7 +121,49 @@ describe("PackManifest", () => {
   it("accepts a vanilla pack with no loader", () => {
     const m = manifest()
     m.version.dependencies = { minecraft: "1.21.4" }
-    expect(loaderOf(PackManifest.parse(m).version.dependencies)).toBeNull()
+    expect(loaderOf(PackManifest.parse(m).version.dependencies!)).toBeNull()
+  })
+
+  it("treats a manifest without gameType as minecraft and requires dependencies", () => {
+    const m = manifest()
+    expect(gameTypeOf(PackManifest.parse(m).pack)).toBe("minecraft")
+    delete m.version.dependencies
+    expect(() => PackManifest.parse(m)).toThrow(/must declare dependencies/)
+  })
+
+  it("rejects an emulator block on a minecraft pack", () => {
+    const m = manifest()
+    m.version.emulator = { kind: "mgba", executable: "emulator/mgba.exe", rom: "roms/game.gba" }
+    expect(() => PackManifest.parse(m)).toThrow(/must not declare an emulator block/)
+  })
+
+  it("accepts a well-formed emulator manifest with a user-provided ROM", () => {
+    const m = emulatorManifest()
+    const parsed = PackManifest.parse(m)
+    expect(gameTypeOf(parsed.pack)).toBe("emulator")
+    expect(parsed.version.emulator?.kind).toBe("mgba")
+  })
+
+  it("rejects an emulator pack whose rom/executable is not a files[] entry", () => {
+    const m = emulatorManifest()
+    m.version.emulator!.rom = "roms/other.gba"
+    expect(() => PackManifest.parse(m)).toThrow(/emulator.rom must match/)
+  })
+
+  it("rejects minecraft dependencies, missing emulator block, and worlds on an emulator pack", () => {
+    const deps = emulatorManifest()
+    deps.version.dependencies = { minecraft: "1.21.4" }
+    expect(() => PackManifest.parse(deps)).toThrow(/must not declare minecraft dependencies/)
+
+    const noEmu = emulatorManifest()
+    delete noEmu.version.emulator
+    expect(() => PackManifest.parse(noEmu)).toThrow(/must declare an emulator block/)
+
+    const worlds = emulatorManifest()
+    worlds.version.worlds = [
+      { folder: "w", sha512, sizeBytes: 1, source: { kind: "override" as const, blobSha512: "b".repeat(128) } },
+    ]
+    expect(() => PackManifest.parse(worlds)).toThrow(/minecraft-only/)
   })
 })
 

@@ -78,6 +78,7 @@ export class PacksRepository {
         gallery: packs.gallery,
         server: packs.server,
         accessKind: packs.accessKind,
+        gameType: packs.gameType,
         passwordHash: packs.passwordHash,
         latestVersionId: packs.latestVersionId,
         archived: packs.archived,
@@ -123,6 +124,9 @@ export class PacksRepository {
     }
     if (typeof hydrated.worlds === 'string') {
       hydrated.worlds = JSON.parse(hydrated.worlds) as unknown[];
+    }
+    if (typeof hydrated.emulator === 'string') {
+      hydrated.emulator = JSON.parse(hydrated.emulator) as Record<string, unknown>;
     }
     return hydrated;
   }

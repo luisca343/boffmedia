@@ -567,8 +567,9 @@ mod tests {
         .unwrap();
 
         assert_eq!(manifest.pack.slug.to_string(), "local-cool-pack");
-        assert_eq!(manifest.version.dependencies.minecraft.to_string(), "1.21.4");
-        assert!(manifest.version.dependencies.fabric_loader.is_some());
+        let deps = manifest.version.dependencies.as_ref().expect("import always sets dependencies");
+        assert_eq!(deps.minecraft.to_string(), "1.21.4");
+        assert!(deps.fabric_loader.is_some());
         assert_eq!(manifest.version.files.len(), 2);
         // The header icon the caller fetched from the project is stamped in, so
         // an imported pack shows real art instead of the placeholder cube.

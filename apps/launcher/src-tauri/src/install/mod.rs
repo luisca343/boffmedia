@@ -16,6 +16,7 @@
 // aborting.
 
 pub mod crash;
+pub mod emulator;
 pub mod files;
 pub mod game;
 pub mod instance;
@@ -449,16 +450,25 @@ fn extract_world_zip(
     Ok(())
 }
 
-async fn install_minecraft(
+/// Install (or verify) the game runtime, when the game HAS one to install.
+/// Minecraft goes through the blocking portablemc pass; an emulator pack has no
+/// runtime step at all — its executable arrives with the payload — so this
+/// returns `None` and the launch path builds its command after the payload.
+async fn install_runtime(
     prepared: game::Prepared,
     reporter: Reporter,
-) -> Result<(game::Prepared, portablemc::base::Game), InstallFailure> {
-    tauri::async_runtime::spawn_blocking(move || {
-        let game = game::install(&prepared, &reporter)?;
-        Ok((prepared, game))
-    })
-    .await
-    .map_err(|e| InstallFailure::message(format!("La instalación se interrumpió: {e}")))?
+) -> Result<(game::Prepared, Option<portablemc::base::Game>), InstallFailure> {
+    match prepared.plan.game {
+        resolve::PlannedGame::Minecraft => {
+            tauri::async_runtime::spawn_blocking(move || {
+                let game = game::install(&prepared, &reporter)?;
+                Ok((prepared, Some(game)))
+            })
+            .await
+            .map_err(|e| InstallFailure::message(format!("La instalación se interrumpió: {e}")))?
+        }
+        resolve::PlannedGame::Emulator { .. } => Ok((prepared, None)),
+    }
 }
 
 /// Download the pack payload: mods and overrides as two phases, then a verify
@@ -742,23 +752,20 @@ pub async fn install_pack(
     reporter.log(
         "info",
         &format!(
-            "Instalando «{}» {} (Minecraft {}{}).",
+            "Instalando «{}» {} ({}).",
             prepared.plan.slug,
             prepared.plan.version_name,
-            prepared.plan.minecraft,
-            prepared
-                .plan
-                .loader
-                .as_ref()
-                .map(|(k, v)| format!(", {} {v}", k.key()))
-                .unwrap_or_default()
+            describe_game(&prepared.plan),
         ),
     );
 
     // §9 — the resolved heap and JVM go in the log too, not only in the UI: a
     // player pasting a crash log into a support thread brings the number with
-    // them, which is half of every out-of-memory diagnosis.
-    reporter.log("info", &prepared.runtime.summary());
+    // them, which is half of every out-of-memory diagnosis. Meaningless for an
+    // emulator pack, which has no JVM to size.
+    if matches!(prepared.plan.game, resolve::PlannedGame::Minecraft) {
+        reporter.log("info", &prepared.runtime.summary());
+    }
 
     // Check if we need to backup before updating.
     if prepared.instance.root.is_dir() {
@@ -778,7 +785,7 @@ pub async fn install_pack(
         }
     }
 
-    let (prepared, _game) = install_minecraft(prepared, reporter.clone()).await?;
+    let (prepared, _game) = install_runtime(prepared, reporter.clone()).await?;
 
     // Parse the manifest for world extraction (needed by install_payload)
     let manifest_raw = serde_json::to_string(&manifest)
@@ -793,6 +800,21 @@ pub async fn install_pack(
         version_id: prepared.plan.version_id.clone(),
         size_bytes: paths::dir_size(&prepared.instance.root),
     })
+}
+
+/// One human-readable line for the install log: what game, what version.
+fn describe_game(plan: &resolve::InstallPlan) -> String {
+    match &plan.game {
+        resolve::PlannedGame::Minecraft => format!(
+            "Minecraft {}{}",
+            plan.minecraft,
+            plan.loader
+                .as_ref()
+                .map(|(k, v)| format!(", {} {v}", k.key()))
+                .unwrap_or_default()
+        ),
+        resolve::PlannedGame::Emulator { kind, .. } => format!("emulador {}", kind.key()),
+    }
 }
 
 /// Verify-then-launch. The install pass runs again on every launch on purpose:
@@ -841,9 +863,11 @@ pub async fn launch_pack(
         );
     }
 
-    reporter.log("info", &prepared.runtime.summary());
+    if matches!(prepared.plan.game, resolve::PlannedGame::Minecraft) {
+        reporter.log("info", &prepared.runtime.summary());
+    }
 
-    let (prepared, game) = install_minecraft(prepared, reporter.clone()).await?;
+    let (prepared, game) = install_runtime(prepared, reporter.clone()).await?;
 
     // Parse the manifest for world extraction
     let manifest_raw = serde_json::to_string(&manifest)
@@ -857,7 +881,20 @@ pub async fn launch_pack(
     }
     reporter.done();
 
-    let running = process::spawn(&app, &game, prepared.plan.quick_play.as_deref(), pack_id.clone())?;
+    // Minecraft's command comes from portablemc; an emulator's is built here,
+    // after the payload, because that is when its executable and ROM exist.
+    let launchable = match game {
+        Some(game) => process::Launchable::Minecraft(game),
+        None => match emulator::launchable(&prepared) {
+            Ok(launchable) => launchable,
+            Err(err) => {
+                process::emit_idle(&app);
+                return Err(err);
+            }
+        },
+    };
+
+    let running = process::spawn(&app, &launchable, prepared.plan.quick_play.as_deref(), pack_id.clone())?;
     let pid = running.pid;
     settings::record_play(&app, &pack_id);
     manager.running.lock().await.insert(pack_id, running);
@@ -1274,6 +1311,145 @@ pub async fn instance_optional_set(
         .map(|m| m.optional_files)
         .unwrap_or_default();
     Ok(instance::optional_list(&catalogue, &state))
+}
+
+// ── User-provided files (ROM dumps and the like) ───────────────────────────
+
+/// One file the pack expects the player to supply, and whether it is already
+/// available (on disk or in a blob store) so the UI knows to stop prompting.
+#[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct UserFile {
+    pub path: String,
+    pub hint: String,
+    pub sha512: String,
+    pub size: u64,
+    pub satisfied: bool,
+}
+
+/// Parse a manifest and enumerate its `user-provided` files. No session
+/// needed: this reads the manifest the renderer already holds and the local
+/// disk, never the API.
+fn user_files_view(
+    app: &tauri::AppHandle,
+    manifest: &serde_json::Value,
+) -> Result<(Layout, InstancePaths, Vec<UserFile>), InstallFailure> {
+    let raw = serde_json::to_string(manifest)
+        .map_err(|e| InstallFailure::message(format!("Manifiesto ilegible: {e}")))?;
+    let parsed = crate::pack::parse_manifest(&raw)
+        .map_err(|e| InstallFailure::message(format!("El manifiesto del pack no es válido: {e}")))?;
+    let plan = resolve::plan(&parsed)?;
+
+    let settings = settings::load(app);
+    let layout = Layout::new(app, settings.game_dir())?;
+    let instance = layout.instance(&plan.slug);
+
+    let files = plan
+        .files
+        .iter()
+        .filter_map(|f| match &f.fetch {
+            resolve::Fetch::UserProvided { hint } => Some(UserFile {
+                path: f.path.clone(),
+                hint: hint.clone(),
+                sha512: f.sha512.clone(),
+                size: f.size,
+                satisfied: files::is_satisfied(&layout, &instance.minecraft, f),
+            }),
+            _ => None,
+        })
+        .collect();
+    Ok((layout, instance, files))
+}
+
+/// The files this pack needs the player to supply, with their current status.
+/// The renderer calls this before offering install/play on an emulator pack,
+/// and after each `instance_provide_user_file` to refresh the checklist.
+#[tauri::command]
+pub async fn instance_user_files(
+    manifest: serde_json::Value,
+    app: tauri::AppHandle,
+) -> Result<Vec<UserFile>, InstallFailure> {
+    Ok(user_files_view(&app, &manifest)?.2)
+}
+
+/// Take the player's file for one `user-provided` entry: open the native
+/// picker (dialogs live on the Rust side of the boundary, like every other
+/// picker in this app), verify the choice against the manifest's sha512/size,
+/// file it in the local blob store (so a reinstall or repair never asks again),
+/// and place it at its instance path.
+///
+/// The hash check is the contract: a wrong dump is rejected HERE, with a clear
+/// message, rather than surfacing later as a corrupt-download error mid-install.
+#[tauri::command]
+pub async fn instance_provide_user_file(
+    manifest: serde_json::Value,
+    path: String,
+    app: tauri::AppHandle,
+) -> Result<Vec<UserFile>, InstallFailure> {
+    use tauri_plugin_dialog::DialogExt;
+
+    let (layout, instance, files) = user_files_view(&app, &manifest)?;
+    let wanted = files
+        .iter()
+        .find(|f| f.path.eq_ignore_ascii_case(&path))
+        .ok_or_else(|| {
+            InstallFailure::message("El pack no espera ese archivo.".to_string())
+        })?;
+
+    let dialog = app.dialog().clone();
+    let title = wanted.hint.clone();
+    let chosen = tauri::async_runtime::spawn_blocking(move || {
+        dialog.file().set_title(&title).blocking_pick_file()
+    })
+    .await
+    .map_err(|e| InstallFailure::message(format!("La selección se interrumpió: {e}")))?;
+    let Some(picked) = chosen else {
+        return Err(InstallFailure::message("Selección cancelada.".to_string()));
+    };
+    let source = picked
+        .into_path()
+        .map_err(|e| InstallFailure::message(format!("Ruta de origen inválida: {e}")))?;
+
+    // Hashing and copying a ROM can take seconds — off the async runtime, like
+    // every other blocking file pass in this module.
+    let expected_sha512 = wanted.sha512.clone();
+    let expected_size = wanted.size;
+    let dest_path = wanted.path.clone();
+    tauri::async_runtime::spawn_blocking(move || {
+        let meta = std::fs::metadata(&source).map_err(|e| {
+            InstallFailure::message(format!("No se pudo leer el archivo seleccionado: {e}"))
+        })?;
+        if expected_size > 0 && meta.len() != expected_size {
+            return Err(InstallFailure::message(format!(
+                "El archivo no coincide con el que espera el pack ({} bytes en lugar de {}). \
+                 Comprueba que es el volcado correcto.",
+                meta.len(),
+                expected_size
+            )));
+        }
+        let actual = files::sha512_of(&source).ok_or_else(|| {
+            InstallFailure::message("No se pudo leer el archivo seleccionado.".to_string())
+        })?;
+        if !actual.eq_ignore_ascii_case(&expected_sha512) {
+            return Err(InstallFailure::message(
+                "El archivo no coincide con el que espera el pack (hash distinto). Comprueba que \
+                 es el volcado correcto, sin modificar."
+                    .to_string(),
+            ));
+        }
+
+        let blob = files::import_local_blob(&layout, &source, &actual)?;
+        // Place it at its instance path too, so a pack already installed gets
+        // the file without another install pass.
+        if let Some(dest) = instance::safe_join(&instance.minecraft, &dest_path) {
+            files::place_blob(&blob, &dest)?;
+        }
+        Ok(())
+    })
+    .await
+    .map_err(|e| InstallFailure::message(format!("La verificación se interrumpió: {e}")))??;
+
+    Ok(user_files_view(&app, &manifest)?.2)
 }
 
 // ── §9: per-instance Java runtime + memory ─────────────────────────────────
