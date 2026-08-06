@@ -34,10 +34,13 @@ export interface LauncherPackView {
 }
 
 /** The stored shape of `packs.server`. Mirrors PackServer in
- *  @boffmedia/pack-schema (whose TS types must not be imported here). */
+ *  @boffmedia/pack-schema (whose TS types must not be imported here). `port` is
+ *  optional (a bare SRV host declares none), and `host` is optional too so a
+ *  legacy/malformed `{}` row still types — the listing surfaces it as a server
+ *  pack with an unavailable status rather than dropping or crashing it. */
 export interface StoredPackServer {
-  host: string;
-  port: number;
+  host?: string;
+  port?: number;
 }
 
 /** The admin view: everything, including who has access. */

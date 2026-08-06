@@ -116,7 +116,9 @@ export class PacksService {
         ...(pack.gallery ? { gallery: pack.gallery } : {}),
         // Carried into the manifest too, so the installed pack can Quick Play
         // into the server offline (the listing is not consulted at launch).
-        ...(pack.server ? { server: pack.server } : {}),
+        // Only when it has a host: a legacy `{}` must not fail PackManifest
+        // validation and block the whole install — it just means "no server".
+        ...(pack.server?.host ? { server: pack.server } : {}),
         access: this.accessPayload(pack.accessKind),
         latestVersionId: version.id,
       },
@@ -225,16 +227,18 @@ export class PacksService {
     );
   }
 
-  /** Fill the vanilla port when the admin left it blank, so the stored value —
-   *  and everything derived from it (the listing, the Rust struct, the manifest)
-   *  — always carries a concrete port. `pack-schema`'s zod default only applies
-   *  when the manifest is re-parsed; the listing is not, so the default has to
-   *  land here at write time. */
+  /** A server pack must have a host; anything hostless (including a stray `{}`)
+   *  stores as null — a client pack — so a malformed row is never created here.
+   *  The port is left OUT when the admin gives none: a bare host is an SRV host,
+   *  and Minecraft (join) and the launcher's own SRV lookup (status ping) find
+   *  the real port. Only a port the admin actually typed is stored. */
   private normalizeServer(
-    server?: { host: string; port?: number | null } | null,
-  ): { host: string; port: number } | null {
-    if (!server) return null;
-    return { host: server.host, port: server.port ?? 25565 };
+    server?: { host?: string; port?: number | null } | null,
+  ): { host: string; port?: number } | null {
+    if (!server?.host) return null;
+    return server.port != null
+      ? { host: server.host, port: server.port }
+      : { host: server.host };
   }
 
   async createPack(dto: CreatePackDto, actorId: number | null): Promise<{ id: string }> {

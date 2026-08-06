@@ -95,17 +95,18 @@ export const PackVersion = z.object({
 })
 export type PackVersion = z.infer<typeof PackVersion>
 
-/** Quick Play target for this pack (RF-01/RF-03). No SRV resolution here — the
- *  ping needs a real port to open a socket, and Minecraft itself resolves SRV
- *  when it connects with --quickPlayMultiplayer, so a host behind SRV just
- *  needs to declare its real port for the badge to be right (spec D1). */
+/** Quick Play target for this pack (RF-01/RF-03). `port` is OPTIONAL: a bare
+ *  host (e.g. `play.example.com` behind a Minecraft SRV record) declares no
+ *  port, and both the join (Minecraft resolves SRV from --quickPlayMultiplayer)
+ *  and the status ping (the launcher does its own SRV lookup) find the real
+ *  port. When a port IS given it is used verbatim and SRV is skipped. */
 export const PackServer = z.object({
   host: z
     .string()
     .min(1)
     .max(255)
     .regex(/^[^/\\]+$/, "host must not contain a scheme or a slash"),
-  port: z.number().int().min(1).max(65535).default(25565),
+  port: z.number().int().min(1).max(65535).optional(),
 })
 export type PackServer = z.infer<typeof PackServer>
 

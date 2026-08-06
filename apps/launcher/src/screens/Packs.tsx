@@ -40,11 +40,16 @@ import { PHASE_LABEL } from "../utils/labels"
  *  degrades silently to offline — there is no error state to render, so a
  *  ping that throws is caught and folded into the same offline badge a timeout
  *  produces. */
-function ServerStatusBadge({ host, port }: { host: string; port: number }) {
+function ServerStatusBadge({ server }: { server: { host?: string | null; port?: number | null } }) {
   const t = useT("packs")
   const [status, setStatus] = useState<ServerStatus | null>(null)
+  const host = server.host ?? ""
+  // A port is optional: a bare host is behind an SRV record, and the native ping
+  // resolves the real port itself, so pass undefined (never 25565) to let it.
+  const port = server.port ?? undefined
 
   useEffect(() => {
+    if (!host) return
     let cancelled = false
     void serverStatus(host, port)
       .then((s) => {
@@ -58,6 +63,9 @@ function ServerStatusBadge({ host, port }: { host: string; port: number }) {
     }
   }, [host, port])
 
+  // A server pack with no usable host (a legacy `{}` row): still a server pack,
+  // but there is nothing to ping.
+  if (!host) return <Badge tone="warn">{t("serverUnavailable")}</Badge>
   if (!status) return <Badge tone="info">{t("consulting")}</Badge>
   if (!status.online) return <Badge tone="bad">{t("serverOffline")}</Badge>
   return (
@@ -234,10 +242,9 @@ function LibraryCard({ entry }: { entry: PackEntry }) {
         title={pack.name}
         stateBadge={<StateBadge state={state} />}
         type={entry.server ? "server" : "client"}
-        // RF-02: the status ping only ever runs when the pack declares a server.
-        serverStatus={
-          entry.server ? <ServerStatusBadge host={entry.server.host} port={entry.server.port} /> : undefined
-        }
+        // RF-02: the banner (and this status) render only when the pack declares
+        // a server — including a legacy hostless one, which shows "unavailable".
+        serverStatus={entry.server ? <ServerStatusBadge server={entry.server} /> : undefined}
         summary={pack.summary}
         progress={
           state.kind === "installing" ? (

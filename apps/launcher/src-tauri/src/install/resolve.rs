@@ -165,7 +165,12 @@ pub fn plan(manifest: &PackManifest) -> Result<InstallPlan, InstallFailure> {
     let minecraft = manifest.version.dependencies.minecraft.to_string();
     let quick_play = manifest.pack.server.as_ref().and_then(|server| {
         if supports_quick_play(&minecraft) {
-            Some(format!("{}:{}", server.host.to_string(), server.port))
+            // No port → hand Minecraft the bare host so its own SRV lookup finds
+            // the real one (a host behind an SRV record declares no port).
+            Some(match server.port {
+                Some(port) => format!("{}:{}", server.host.to_string(), port),
+                None => server.host.to_string(),
+            })
         } else {
             None
         }
@@ -394,6 +399,16 @@ mod tests {
         assert_eq!(
             plan(&m).unwrap().quick_play,
             Some("play.boffmedia.es:25566".to_string())
+        );
+    }
+
+    #[test]
+    fn quick_play_uses_the_bare_host_when_no_port_is_declared() {
+        // SRV case: Minecraft resolves the port itself from the bare host.
+        let m = manifest_with_server("1.20.1", Some(r#"{"host":"wingull.boffmedia.es"}"#));
+        assert_eq!(
+            plan(&m).unwrap().quick_play,
+            Some("wingull.boffmedia.es".to_string())
         );
     }
 

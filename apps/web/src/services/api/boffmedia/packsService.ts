@@ -32,7 +32,7 @@ export interface AdminPack {
   summary: string | null;
   iconUrl: string | null;
   accessKind: PackAccessKind;
-  server?: { host: string; port: number } | null;
+  server?: { host?: string; port?: number } | null;
   archived: boolean;
   hasPassword: boolean;
   aclCount: number;

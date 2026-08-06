@@ -122,15 +122,13 @@
               "pattern": "^[^/\\\\]+$"
             },
             "port": {
-              "default": 25565,
               "type": "integer",
               "minimum": 1,
               "maximum": 65535
             }
           },
           "required": [
-            "host",
-            "port"
+            "host"
           ],
           "additionalProperties": false
         }

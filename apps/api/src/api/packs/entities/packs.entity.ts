@@ -30,10 +30,12 @@ export class LauncherVersionEntity {
   @ApiProperty() createdAt!: string;
 }
 
-/** A pack's Quick Play target — present only for "server packs". */
+/** A pack's Quick Play target — present only for "server packs". `port` is
+ *  omitted for a bare SRV host; both fields are optional so a legacy `{}` row
+ *  still documents. */
 export class PackServerEntity {
-  @ApiProperty({ example: 'play.example.com' }) host!: string;
-  @ApiProperty({ example: 25565 }) port!: number;
+  @ApiPropertyOptional({ example: 'play.example.com' }) host?: string;
+  @ApiPropertyOptional({ example: 25565 }) port?: number;
 }
 
 export class LauncherPackEntity {

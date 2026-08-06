@@ -89,10 +89,12 @@ export type PackEntry = {
    *  this launcher; "local" was created/imported on this machine and can be
    *  edited or exported. */
   origin: "managed" | "local"
-  /** RF-01/RF-02: present only when the pack's manifest declares one — its
-   *  absence is what keeps a pack without a server looking exactly as it did
-   *  before this feature. */
-  server?: { host: string; port: number }
+  /** RF-01/RF-02: present only when the pack declares one — its absence is what
+   *  keeps a pack without a server looking exactly as it did before this
+   *  feature. `port` is absent for a bare SRV host (the status ping resolves it
+   *  via SRV); `host` can be absent on a legacy `{}` row, which still counts as
+   *  a server pack but renders as "unavailable". */
+  server?: { host?: string | null; port?: number | null }
 }
 
 // ── Server List Ping (RF-03/RF-04) ──────────────────────────────────────────

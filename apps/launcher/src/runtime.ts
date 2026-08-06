@@ -300,8 +300,10 @@ export type LauncherPack = {
   iconUrl: string | null
   gallery?: LauncherGalleryImage[]
   accessKind: "public" | "password" | "allowlist"
-  /** The Quick Play target — set only for server packs (from the registry). */
-  server?: { host: string; port: number } | null
+  /** The Quick Play target — set only for server packs (from the registry).
+   *  `port` is absent for a bare SRV host; `host` can be absent on a legacy
+   *  `{}` row, which still counts as a server pack (shown "unavailable"). */
+  server?: { host?: string | null; port?: number | null } | null
   latestVersion: LauncherVersion | null
 }
 

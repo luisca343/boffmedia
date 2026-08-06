@@ -57,6 +57,11 @@ reqwest = { version = "0.12", features = ["json"] }
 # "net" + "io-util": the hand-rolled SLP client (status.rs) opens a raw
 # TcpStream and writes/reads varints over it directly, no HTTP involved.
 tokio = { version = "1", features = ["time", "sync", "net", "io-util"] }
+# status.rs: a pack that declares a bare host (no port) is behind a Minecraft
+# SRV record; the ping resolves `_minecraft._tcp.<host>` to the real host+port.
+# The SLP wire is hand-rolled, but SRV needs a real DNS resolver, and rolling
+# DNS packet parsing (EDNS, TCP fallback on truncation) by hand is not worth it.
+hickory-resolver = "0.24"
 # Packs locales: export_mrpack/import_mrpack read and write the .mrpack zip
 # container (local_packs.rs).
 zip = "2"

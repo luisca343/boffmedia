@@ -118,18 +118,45 @@ fn write_string(buf: &mut Vec<u8>, s: &str) {
     buf.extend_from_slice(s.as_bytes());
 }
 
-async fn ping(host: &str, port: u16) -> std::io::Result<ServerStatus> {
+/// Where to actually open the socket. An explicit port is used verbatim and SRV
+/// is skipped (this matches Minecraft: an address with a port never does an SRV
+/// lookup). With no port we resolve the Minecraft SRV record
+/// `_minecraft._tcp.<host>`; if one exists we use its target host + port,
+/// otherwise we fall back to the vanilla 25565. The ORIGINAL host still goes
+/// into the SLP handshake address (proxies like Velocity/BungeeCord key their
+/// virtual hosts on it), so only the socket destination changes.
+async fn resolve_target(host: &str, port: Option<u16>) -> (String, u16) {
+    if let Some(p) = port {
+        return (host.to_string(), p);
+    }
+    if let Ok(resolver) = hickory_resolver::TokioAsyncResolver::tokio_from_system_conf() {
+        let query = format!("_minecraft._tcp.{host}.");
+        if let Ok(lookup) = resolver.srv_lookup(query).await {
+            if let Some(srv) = lookup.iter().next() {
+                let target = srv.target().to_utf8();
+                let target = target.trim_end_matches('.').to_string();
+                if !target.is_empty() {
+                    return (target, srv.port());
+                }
+            }
+        }
+    }
+    (host.to_string(), 25565)
+}
+
+async fn ping(connect_host: &str, connect_port: u16, address: &str) -> std::io::Result<ServerStatus> {
     let started = std::time::Instant::now();
-    let mut stream = TcpStream::connect((host, port)).await?;
+    let mut stream = TcpStream::connect((connect_host, connect_port)).await?;
 
     // Handshake packet: id 0x00, protocol version -1 (unspecified — a status
     // ping does not need to match a real protocol version), server address,
-    // port, next_state = 1 (status).
+    // port, next_state = 1 (status). `address` is the host the player typed, not
+    // the SRV-resolved target, so a proxy resolves the right backend.
     let mut handshake = Vec::new();
     handshake.push(0x00u8);
     write_varint(&mut handshake, -1);
-    write_string(&mut handshake, host);
-    handshake.extend_from_slice(&port.to_be_bytes());
+    write_string(&mut handshake, address);
+    handshake.extend_from_slice(&connect_port.to_be_bytes());
     write_varint(&mut handshake, 1);
 
     let mut handshake_packet = Vec::new();
@@ -169,8 +196,13 @@ async fn ping(host: &str, port: u16) -> std::io::Result<ServerStatus> {
 /// connection or a malformed response all fold into `online: false`.
 #[tauri::command]
 pub async fn server_status(host: String, port: Option<u16>) -> ServerStatus {
-    let port = port.unwrap_or(25565);
-    match timeout(TOTAL_TIMEOUT, ping(&host, port)).await {
+    // SRV resolution shares the same budget as the ping: a slow DNS answer and a
+    // slow read are the same "give up" to the player.
+    let run = async {
+        let (target, target_port) = resolve_target(&host, port).await;
+        ping(&target, target_port, &host).await
+    };
+    match timeout(TOTAL_TIMEOUT, run).await {
         Ok(Ok(status)) => status,
         Ok(Err(_)) | Err(_) => ServerStatus::offline(),
     }

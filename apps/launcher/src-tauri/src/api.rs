@@ -113,12 +113,18 @@ pub struct LauncherGalleryImage {
 }
 
 /** The Quick Play target, mirrored from the registry's pack listing. Present
- *  only for "server packs". */
+ *  only for "server packs". Both fields are optional and defaulted: `port` is
+ *  absent for a bare SRV host, and a malformed/empty `{}` (legacy data) must
+ *  deserialize to a hostless server rather than failing the WHOLE packs_list —
+ *  one bad row used to blank the entire managed library. A hostless server is
+ *  still a server pack; the renderer shows it as "unavailable". */
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct LauncherServer {
-    pub host: String,
-    pub port: u16,
+    #[serde(default)]
+    pub host: Option<String>,
+    #[serde(default)]
+    pub port: Option<u16>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
