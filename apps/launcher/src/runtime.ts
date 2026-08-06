@@ -1072,6 +1072,65 @@ export async function instanceProvideUserFile(
   }
 }
 
+export type UserFilesScan = { files: UserFile[]; found: number }
+
+/** Plug-and-play ROM discovery: sweeps the player's ROM library (their own
+ *  dirs + EmuDeck's `Emulation/roms/<system>` folders) matching by size then
+ *  the pinned sha512. Cheap enough to run on pack open. */
+export async function instanceUserFilesScan(manifest: unknown): Promise<UserFilesScan> {
+  if (!isDesktop()) return { files: [], found: 0 }
+  try {
+    return await invoke<UserFilesScan>("instance_user_files_scan", { manifest })
+  } catch {
+    return { files: [], found: 0 }
+  }
+}
+
+// ── Emulators (multi-game) ─────────────────────────────────────────────────
+// A pack never ships an emulator: the Rust side resolves the player's own
+// install (settings override → EmuDeck → common locations → PATH).
+
+export type EmulatorSource = "override" | "emudeck" | "system" | "path"
+
+export type EmulatorStatus = {
+  kind: string
+  /** Null = not found anywhere we know to look. */
+  path: string | null
+  source: EmulatorSource | null
+}
+
+export async function emulatorStatus(kind: string): Promise<EmulatorStatus> {
+  if (!isDesktop()) return { kind, path: null, source: null }
+  try {
+    return await invoke<EmulatorStatus>("emulator_status", { kind })
+  } catch {
+    return { kind, path: null, source: null }
+  }
+}
+
+/** Native picker → store the chosen executable as this emulator's global
+ *  override. Throws on cancel (same convention as every Rust-side picker). */
+export async function emulatorSetPath(kind: string): Promise<EmulatorStatus> {
+  if (!isDesktop())
+    throw asFailure({ message: "Solo disponible en la aplicación de escritorio." })
+  try {
+    return await invoke<EmulatorStatus>("emulator_set_path", { kind })
+  } catch (err) {
+    throw asFailure(err)
+  }
+}
+
+/** Drop the override and go back to auto-detection. */
+export async function emulatorClearPath(kind: string): Promise<EmulatorStatus> {
+  if (!isDesktop())
+    throw asFailure({ message: "Solo disponible en la aplicación de escritorio." })
+  try {
+    return await invoke<EmulatorStatus>("emulator_clear_path", { kind })
+  } catch (err) {
+    throw asFailure(err)
+  }
+}
+
 export type DirEntry = {
   path: string
   name: string

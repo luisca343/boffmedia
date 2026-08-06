@@ -33,6 +33,7 @@ export function PackForm({
   const [description, setDescription] = useState("")
   const [iconUrl, setIconUrl] = useState("")
   const [gallery, setGallery] = useState<GalleryImage[]>([])
+  const [gameType, setGameType] = useState<"minecraft" | "emulator">("minecraft")
   const [accessKind, setAccessKind] = useState<AdminPack["accessKind"]>("allowlist")
   const [password, setPassword] = useState("")
   const [serverHost, setServerHost] = useState("")
@@ -53,6 +54,7 @@ export function PackForm({
         description: description || undefined,
         iconUrl: iconUrl || undefined,
         gallery: gallery.length > 0 ? gallery : undefined,
+        gameType,
         accessKind,
         password: accessKind === "password" ? password : undefined,
         // A host makes it a server pack; a blank port lets the API default to
@@ -182,6 +184,43 @@ export function PackForm({
                     placeholder="boff-smp"
                     className="font-mono"
                   />
+                </Field>
+              </div>
+
+              <div className="grid gap-4 sm:grid-cols-2">
+                <Field label={t("gameType")} hint={t("gameTypeHint")}>
+                  <div role="radiogroup" aria-label={t("gameType")} className="flex gap-3">
+                    <button
+                      type="button"
+                      role="radio"
+                      aria-checked={gameType === "minecraft"}
+                      onClick={() => setGameType("minecraft")}
+                      className={[
+                        "cut flex items-center gap-2 border-2 border-solid px-4 py-2 transition-colors duration-[140ms]",
+                        gameType === "minecraft"
+                          ? "border-accent bg-accent-soft"
+                          : "border-line hover:border-line-2 hover:bg-panel",
+                      ].join(" ")}
+                    >
+                      <span className="text-[14px] font-bold">{t("gameTypeMinecraft")}</span>
+                      {gameType === "minecraft" && <Icon name="check" size={14} className="text-accent" />}
+                    </button>
+                    <button
+                      type="button"
+                      role="radio"
+                      aria-checked={gameType === "emulator"}
+                      onClick={() => setGameType("emulator")}
+                      className={[
+                        "cut flex items-center gap-2 border-2 border-solid px-4 py-2 transition-colors duration-[140ms]",
+                        gameType === "emulator"
+                          ? "border-accent bg-accent-soft"
+                          : "border-line hover:border-line-2 hover:bg-panel",
+                      ].join(" ")}
+                    >
+                      <span className="text-[14px] font-bold">{t("gameTypeEmulator")}</span>
+                      {gameType === "emulator" && <Icon name="check" size={14} className="text-accent" />}
+                    </button>
+                  </div>
                 </Field>
               </div>
 

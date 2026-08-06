@@ -74,10 +74,11 @@ export interface PackVersionView {
 }
 
 /** The stored shape of `pack_versions.emulator`. Mirrors EmulatorSpec in
- *  @boffmedia/pack-schema (whose TS types must not be imported here). */
+ *  @boffmedia/pack-schema (whose TS types must not be imported here). The
+ *  emulator binary is never part of a pack — the launcher resolves the
+ *  player's own install. */
 export interface StoredEmulatorSpec {
   kind: 'mgba' | 'melonds';
-  executable: string;
   rom: string;
   args?: string[];
 }

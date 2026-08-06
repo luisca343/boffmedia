@@ -40,8 +40,8 @@ pub enum ManifestError {
     MissingEmulator,
     #[error("bundled worlds are minecraft-only")]
     WorldsOnEmulatorPack,
-    #[error("emulator.{0} must match the path of a files[] entry")]
-    EmulatorPathNotInFiles(&'static str),
+    #[error("emulator.rom must match the path of a files[] entry")]
+    EmulatorRomNotInFiles,
 }
 
 /// The one place the "absent means minecraft" rule is written down on the Rust
@@ -87,19 +87,17 @@ fn validate_game_type(manifest: &PackManifest) -> Result<(), ManifestError> {
             let Some(emulator) = manifest.version.emulator.as_ref() else {
                 return Err(ManifestError::MissingEmulator);
             };
+            // The ROM must be a real `files[]` entry so it carries the sha512
+            // the provide/scan flow verifies dumps against. The emulator itself
+            // is never a pack file — the launcher resolves the player's own.
             let paths: HashSet<String> = manifest
                 .version
                 .files
                 .iter()
                 .map(|f| f.path.to_lowercase().replace('\\', "/"))
                 .collect();
-            for (field, value) in [
-                ("executable", emulator.executable.as_str()),
-                ("rom", emulator.rom.as_str()),
-            ] {
-                if !paths.contains(&value.to_lowercase().replace('\\', "/")) {
-                    return Err(ManifestError::EmulatorPathNotInFiles(field));
-                }
+            if !paths.contains(&emulator.rom.to_lowercase().replace('\\', "/")) {
+                return Err(ManifestError::EmulatorRomNotInFiles);
             }
         }
     }
@@ -267,13 +265,10 @@ mod tests {
                 "pack":{{"id":"pk","slug":"poke-esmeralda","name":"Esmeralda","access":{{"kind":"public"}},"gameType":"emulator"}},
                 "version":{{"id":"v1","name":"1.0","createdAt":"2026-07-30T12:00:00Z",
                   "files":[
-                    {{"path":"emulator/mgba.exe","sha512":"{s}","fileSize":10,
-                      "env":{{"client":"required","server":"unsupported"}},
-                      "source":{{"kind":"url","url":"https://x.test/mgba.exe"}}}},
                     {{"path":"roms/game.gba","sha512":"{s}","fileSize":10,
                       "env":{{"client":"required","server":"unsupported"}},
                       "source":{{"kind":"user-provided","hint":"Pokémon Esmeralda (EUR) .gba"}}}}],
-                  "emulator":{{"kind":"mgba","executable":"emulator/mgba.exe","rom":"{rom_path}"}}}}}}"#,
+                  "emulator":{{"kind":"mgba","rom":"{rom_path}"}}}}}}"#,
             s = "a".repeat(128)
         )
     }
@@ -290,7 +285,7 @@ mod tests {
     #[test]
     fn rejects_an_emulator_rom_that_is_not_a_files_entry() {
         let err = parse_manifest(&emulator_manifest("roms/other.gba")).unwrap_err();
-        assert!(matches!(err, ManifestError::EmulatorPathNotInFiles("rom")));
+        assert!(matches!(err, ManifestError::EmulatorRomNotInFiles));
     }
 
     #[test]

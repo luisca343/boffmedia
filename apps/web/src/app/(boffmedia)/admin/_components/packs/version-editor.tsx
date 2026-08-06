@@ -48,6 +48,13 @@ const LOADERS: { value: string; label: string }[] = [
 const STEPS = ["metadata", "mods", "files", "worlds", "review"] as const
 type Step = (typeof STEPS)[number]
 
+type RomFile = {
+  sha512: string
+  fileSize: number
+  filename: string
+  hint?: string
+}
+
 type Upload = {
   file: File
   /** Target path inside the instance, forward slashes, no leading "./". */
@@ -108,6 +115,7 @@ function StepRail({
   onGo,
   reachable,
   stepValid,
+  steps = STEPS,
 }: {
   step: Step
   onGo: (next: Step) => void
@@ -115,13 +123,14 @@ function StepRail({
   reachable: number
   /** Whether a given step's required fields are currently valid. */
   stepValid: (s: Step) => boolean
+  steps?: readonly Step[] | Step[]
 }) {
   const t = useTranslations("admin.packs")
   return (
     <ol className="flex flex-wrap items-center gap-1">
-      {STEPS.map((s, i) => {
+      {steps.map((s, i) => {
         const current = s === step
-        const done = stepValid(s) && i < STEPS.indexOf(step)
+        const done = stepValid(s) && i < steps.indexOf(step)
         const enabled = i <= reachable
         return (
           <li key={s} className="flex items-center gap-1">
@@ -143,7 +152,7 @@ function StepRail({
                 {t(`step.${s}`)}
               </span>
             </button>
-            {i < STEPS.length - 1 && <span className="text-txt-muted">·</span>}
+            {i < steps.length - 1 && <span className="text-txt-muted">·</span>}
           </li>
         )
       })}
@@ -184,9 +193,18 @@ export function VersionEditor({
   const [showSnapshots, setShowSnapshots] = useState(false)
   const [prefilling, setPrefilling] = useState(false)
   const [importing, setImporting] = useState<string | null>(null)
+  const [emulatorKind, setEmulatorKind] = useState<"mgba" | "melonds">("mgba")
+  const [emulatorRom, setEmulatorRom] = useState<RomFile | null>(null)
+  const [emulatorArgs, setEmulatorArgs] = useState("")
+  const [emulatorRomHint, setEmulatorRomHint] = useState("")
+  const [hashingRom, setHashingRom] = useState(false)
   const filesRef = useRef<HTMLInputElement>(null)
   const folderRef = useRef<HTMLInputElement>(null)
   const archiveRef = useRef<HTMLInputElement>(null)
+  const romRef = useRef<HTMLInputElement>(null)
+
+  // Check if this is an emulator pack
+  const isEmulatorPack = pack.gameType === "emulator"
 
   // Changing loader or Minecraft version invalidates whatever build was chosen:
   // a Forge build for 1.21.4 is not a legal value for 1.21.5, and leaving it
@@ -208,19 +226,41 @@ export function VersionEditor({
       }
       const version = res.data
       setName(mode === "edit" ? version.name : `${version.name}-copy`)
-      setMinecraft(version.minecraft)
+      setMinecraft(version.minecraft ?? "")
       setLoader(version.loader ?? "")
       setLoaderVersion(version.loaderVersion ?? "")
       // Claim the pair before the reset effect sees it change, or the loader
       // build we just restored is wiped and replaced by "recommended".
-      lastPair.current = `${version.loader ?? ""}:${version.minecraft}`
+      lastPair.current = `${version.loader ?? ""}:${version.minecraft ?? ""}`
       setNotes(version.notes ?? "")
+
+      // Handle emulator-specific fields
+      if (isEmulatorPack && (version as any).emulator) {
+        const emulator = (version as any).emulator
+        setEmulatorKind(emulator.kind ?? "mgba")
+        setEmulatorArgs(emulator.args ? emulator.args.join(", ") : "")
+
+        // Restore ROM from files if present
+        const files = (version.files || []) as unknown[]
+        const romEntry = (files as any[])?.find(
+          (f) => f?.source?.kind === "user-provided" && f?.path?.startsWith("roms/")
+        )
+        if (romEntry) {
+          setEmulatorRom({
+            sha512: romEntry.sha512,
+            fileSize: romEntry.fileSize,
+            filename: romEntry.path.split("/").pop() ?? romEntry.path,
+          })
+          setEmulatorRomHint(romEntry.source?.hint ?? "")
+        }
+      }
+
       setMods(toSelected(version.files))
     })
     return () => {
       live = false
     }
-  }, [sourceVersionId, pack.id, mode, t])
+  }, [sourceVersionId, pack.id, mode, t, isEmulatorPack])
 
   const { versions: gameVersions, loading: loadingGame } = useGameVersions()
   const { versions: loaderVersions, loading: loadingLoader } = useLoaderVersions(
@@ -301,12 +341,12 @@ export function VersionEditor({
   }
 
   const extraValid = parseExtra() !== null
+  const emulatorRomValid = !isEmulatorPack || (emulatorRom !== null && emulatorRomHint.trim().length > 0)
   const metadataValid =
     name.trim().length > 0 &&
-    minecraft.trim().length > 0 &&
-    (!loader || loaderVersion.trim().length > 0)
+    (isEmulatorPack ? emulatorRomValid : minecraft.trim().length > 0 && (!loader || loaderVersion.trim().length > 0))
   // Index of the furthest step the current input justifies reaching.
-  const reachable = !metadataValid ? 0 : !extraValid ? 2 : STEPS.length - 1
+  const reachable = !metadataValid ? 0 : !extraValid ? (isEmulatorPack ? 1 : 2) : STEPS.length - 1
   const canSubmit = metadataValid && extraValid && !busy
 
   /** Whether a step's required fields are currently filled in correctly. */
@@ -319,10 +359,38 @@ export function VersionEditor({
     return false
   }
 
-  const stepIndex = STEPS.indexOf(step)
+  // Compute effective steps for emulator vs minecraft packs
+  const effectiveSteps: readonly Step[] = isEmulatorPack
+    ? (["metadata", "files", "review"] as const)
+    : STEPS
+
+  const stepIndex = effectiveSteps.indexOf(step as any)
   const canAdvance = stepIndex <= reachable - 1
 
   const onModsChange = useCallback((next: SelectedMod[]) => setMods(next), [])
+
+  // Hash and read a ROM file
+  const handleRomPicked = async (file: File | undefined) => {
+    if (!file) return
+    setHashingRom(true)
+    try {
+      const buffer = await file.arrayBuffer()
+      const hashBuffer = await crypto.subtle.digest("SHA-512", buffer)
+      const hashArray = Array.from(new Uint8Array(hashBuffer))
+      const sha512 = hashArray.map((b) => b.toString(16).padStart(2, "0")).join("")
+
+      setEmulatorRom({
+        sha512,
+        fileSize: file.size,
+        filename: file.name,
+      })
+      toast({ tone: "ok", title: t("romHashed") })
+    } catch (e) {
+      toast({ tone: "bad", title: t("romHashFailed") })
+    } finally {
+      setHashingRom(false)
+    }
+  }
 
   /** Import a .mrpack or a CurseForge export zip. A CurseForge archive costs a
    *  server-side download per mod (its manifest has no sha512), so this can run
@@ -384,22 +452,55 @@ export function VersionEditor({
 
       // The mods are already resolved (sha512 + size came back from the catalog
       // resolve route), so submit does no per-mod work here.
-      const modFiles = mods.map((mod) => ({
-        path: mod.path,
-        sha512: mod.sha512,
-        fileSize: mod.fileSize,
-        source: mod.source,
-      }))
+      const modFiles = isEmulatorPack
+        ? []
+        : mods.map((mod) => ({
+            path: mod.path,
+            sha512: mod.sha512,
+            fileSize: mod.fileSize,
+            source: mod.source,
+          }))
 
-      const payload = {
-        name: name.trim(),
-        minecraft: minecraft.trim(),
-        loader: (loader || undefined) as PackLoader | undefined,
-        loaderVersion: loader ? loaderVersion.trim() : undefined,
-        notes: notes.trim() || undefined,
-        files: [...modFiles, ...overrides, ...extra],
-        worlds: worlds.length > 0 ? worlds : undefined,
+      // For emulator packs: build the files list with ROM (user-provided) + overrides
+      let romFiles: unknown[] = []
+      if (isEmulatorPack && emulatorRom) {
+        const romPath = `roms/${emulatorRom.filename}`
+        romFiles = [
+          {
+            path: romPath,
+            sha512: emulatorRom.sha512,
+            fileSize: emulatorRom.fileSize,
+            env: { client: "required", server: "unsupported" },
+            source: { kind: "user-provided", hint: emulatorRomHint },
+          },
+        ]
       }
+
+      const payload: any = {
+        name: name.trim(),
+        notes: notes.trim() || undefined,
+        files: [...romFiles, ...modFiles, ...overrides, ...extra],
+      }
+
+      // Add minecraft-specific fields only for minecraft packs
+      if (!isEmulatorPack) {
+        payload.minecraft = minecraft.trim()
+        payload.loader = (loader || undefined) as PackLoader | undefined
+        payload.loaderVersion = loader ? loaderVersion.trim() : undefined
+        if (worlds.length > 0) payload.worlds = worlds
+      } else {
+        // Add emulator-specific fields
+        const args = emulatorArgs
+          .split(/[,\s]+/)
+          .map((s) => s.trim())
+          .filter((s) => s.length > 0)
+        payload.emulator = {
+          kind: emulatorKind,
+          rom: `roms/${emulatorRom?.filename}`,
+          ...(args.length > 0 && { args }),
+        }
+      }
+
       const res =
         mode === "edit" && sourceVersionId
           ? await PacksService.updateVersion(pack.id, sourceVersionId, payload)
@@ -432,9 +533,9 @@ export function VersionEditor({
     >
       <div className="flex min-h-0 flex-1 flex-col gap-5">
         <div className="flex shrink-0 flex-wrap items-center justify-between gap-3 border-b border-line pb-4">
-          <StepRail step={step} onGo={setStep} reachable={reachable} stepValid={stepValid} />
+          <StepRail step={step} onGo={setStep} reachable={reachable} stepValid={stepValid} steps={effectiveSteps} />
           <span className="font-mono text-[11px] text-txt-dim">
-            {t("stepOf", { n: stepIndex + 1, total: STEPS.length })}
+            {t("stepOf", { n: effectiveSteps.indexOf(step) + 1, total: effectiveSteps.length })}
           </span>
         </div>
 
@@ -492,59 +593,177 @@ export function VersionEditor({
               </div>
             </section>
 
-            <section className="cut border border-solid border-line bg-panel-2 p-4">
-              <div className="mb-4 flex items-start gap-3">
-                <span className="grid size-8 shrink-0 place-items-center border border-solid border-line-2 bg-panel text-accent">
-                  <Icon name="settings" size={15} />
-                </span>
-                <div>
-                  <h3 className="font-display text-[14px] font-bold uppercase tracking-[0.08em] text-txt">
-                    {t("runtimeSection")}
-                  </h3>
-                  <p className="mt-1 text-[12px] leading-[1.45] text-txt-dim">
-                    {t("runtimeSectionLead")}
-                  </p>
-                </div>
-              </div>
-
-              <div className="grid gap-4 lg:grid-cols-3">
-                <Field label={t("minecraft")} hint={t("minecraftHint")}>
-                  <div className="flex flex-col gap-2">
-                    <VersionCombobox
-                      value={minecraft}
-                      onChange={setMinecraft}
-                      options={minecraftOptions}
-                      loading={loadingGame}
-                      placeholder="1.21.4"
-                    />
-                    <Seg
-                      value={showSnapshots ? "all" : "release"}
-                      onChange={(v) => setShowSnapshots(v === "all")}
-                      options={[
-                        { value: "release", label: t("releasesOnly") },
-                        { value: "all", label: t("includeSnapshots") },
-                      ]}
-                    />
+            {!isEmulatorPack ? (
+              <section className="cut border border-solid border-line bg-panel-2 p-4">
+                <div className="mb-4 flex items-start gap-3">
+                  <span className="grid size-8 shrink-0 place-items-center border border-solid border-line-2 bg-panel text-accent">
+                    <Icon name="settings" size={15} />
+                  </span>
+                  <div>
+                    <h3 className="font-display text-[14px] font-bold uppercase tracking-[0.08em] text-txt">
+                      {t("runtimeSection")}
+                    </h3>
+                    <p className="mt-1 text-[12px] leading-[1.45] text-txt-dim">
+                      {t("runtimeSectionLead")}
+                    </p>
                   </div>
-                </Field>
-                <Field label={t("loader")}>
-                  <Select value={loader} options={LOADERS} onChange={setLoader} />
-                </Field>
-                <Field
-                  label={t("loaderVersion")}
-                  hint={loaderVersions.length === 0 && !loadingLoader ? t("noLoaderBuilds") : undefined}
-                >
-                  <VersionCombobox
-                    value={loaderVersion}
-                    onChange={setLoaderVersion}
-                    options={loaderOptions}
-                    loading={loadingLoader}
-                    disabled={!loader || !minecraft.trim()}
-                    placeholder="21.4.30"
-                  />
-                </Field>
-              </div>
-            </section>
+                </div>
+
+                <div className="grid gap-4 lg:grid-cols-3">
+                  <Field label={t("minecraft")} hint={t("minecraftHint")}>
+                    <div className="flex flex-col gap-2">
+                      <VersionCombobox
+                        value={minecraft}
+                        onChange={setMinecraft}
+                        options={minecraftOptions}
+                        loading={loadingGame}
+                        placeholder="1.21.4"
+                      />
+                      <Seg
+                        value={showSnapshots ? "all" : "release"}
+                        onChange={(v) => setShowSnapshots(v === "all")}
+                        options={[
+                          { value: "release", label: t("releasesOnly") },
+                          { value: "all", label: t("includeSnapshots") },
+                        ]}
+                      />
+                    </div>
+                  </Field>
+                  <Field label={t("loader")}>
+                    <Select value={loader} options={LOADERS} onChange={setLoader} />
+                  </Field>
+                  <Field
+                    label={t("loaderVersion")}
+                    hint={loaderVersions.length === 0 && !loadingLoader ? t("noLoaderBuilds") : undefined}
+                  >
+                    <VersionCombobox
+                      value={loaderVersion}
+                      onChange={setLoaderVersion}
+                      options={loaderOptions}
+                      loading={loadingLoader}
+                      disabled={!loader || !minecraft.trim()}
+                      placeholder="21.4.30"
+                    />
+                  </Field>
+                </div>
+              </section>
+            ) : (
+              <section className="cut border border-solid border-line bg-panel-2 p-4">
+                <div className="mb-4 flex items-start gap-3">
+                  <span className="grid size-8 shrink-0 place-items-center border border-solid border-line-2 bg-panel text-accent">
+                    <Icon name="gamepad" size={15} />
+                  </span>
+                  <div>
+                    <h3 className="font-display text-[14px] font-bold uppercase tracking-[0.08em] text-txt">
+                      {t("emulatorSection")}
+                    </h3>
+                    <p className="mt-1 text-[12px] leading-[1.45] text-txt-dim">
+                      {t("emulatorSectionLead")}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="grid gap-4">
+                  <Field label={t("emulatorKind")}>
+                    <div role="radiogroup" aria-label={t("emulatorKind")} className="flex gap-3">
+                      {[
+                        { value: "mgba" as const, label: "mGBA (Game Boy Advance)" },
+                        { value: "melonds" as const, label: "melonDS (Nintendo DS)" },
+                      ].map((opt) => (
+                        <button
+                          key={opt.value}
+                          type="button"
+                          role="radio"
+                          aria-checked={emulatorKind === opt.value}
+                          onClick={() => setEmulatorKind(opt.value)}
+                          className={[
+                            "cut flex items-center gap-2 border-2 border-solid px-4 py-2 transition-colors duration-[140ms]",
+                            emulatorKind === opt.value
+                              ? "border-accent bg-accent-soft"
+                              : "border-line hover:border-line-2 hover:bg-panel",
+                          ].join(" ")}
+                        >
+                          <span className="text-[14px] font-bold">{opt.label}</span>
+                          {emulatorKind === opt.value && <Icon name="check" size={14} className="text-accent" />}
+                        </button>
+                      ))}
+                    </div>
+                  </Field>
+
+                  <Field label={t("romFile")} hint={t("romFileHint")}>
+                    <div className="flex flex-col gap-3">
+                      {emulatorRom && (
+                        <div className="flex flex-col gap-2 border border-solid border-line bg-panel p-3">
+                          <div className="flex items-center justify-between">
+                            <span className="truncate font-mono text-[12px] text-txt">{emulatorRom.filename}</span>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              icon="trash"
+                              onClick={() => {
+                                setEmulatorRom(null)
+                                setEmulatorRomHint("")
+                              }}
+                            >
+                              {t("remove")}
+                            </Button>
+                          </div>
+                          <div className="text-[11px] text-txt-dim">
+                            <div>SHA-512: {emulatorRom.sha512.slice(0, 32)}…</div>
+                            <div>{Math.max(1, Math.round(emulatorRom.fileSize / (1024 * 1024)))} MB</div>
+                          </div>
+                        </div>
+                      )}
+                      <Button
+                        size="sm"
+                        icon={hashingRom ? undefined : "upload"}
+                        loading={hashingRom}
+                        disabled={hashingRom}
+                        onClick={() => romRef.current?.click()}
+                      >
+                        {emulatorRom ? t("changeRom") : t("pickRom")}
+                      </Button>
+                      <input
+                        ref={romRef}
+                        type="file"
+                        accept=".gba,.nds"
+                        hidden
+                        onChange={(e) => {
+                          void handleRomPicked(e.target.files?.[0])
+                          e.target.value = ""
+                        }}
+                      />
+                    </div>
+                  </Field>
+
+                  <Field
+                    label={t("romHint")}
+                    hint={t("romHintHint")}
+                    error={emulatorRom && !emulatorRomHint.trim() ? t("romHintRequired") : undefined}
+                  >
+                    <Textarea
+                      rows={2}
+                      value={emulatorRomHint}
+                      onChange={(e) => setEmulatorRomHint(e.target.value.slice(0, 256))}
+                      placeholder={t("romHintPlaceholder")}
+                      maxLength={256}
+                    />
+                    <div className="mt-1 font-mono text-[10px] text-txt-dim">
+                      {emulatorRomHint.length} / 256
+                    </div>
+                  </Field>
+
+                  <Field label={t("emulatorArgs")} hint={t("emulatorArgsHint")}>
+                    <Textarea
+                      rows={2}
+                      value={emulatorArgs}
+                      onChange={(e) => setEmulatorArgs(e.target.value)}
+                      placeholder={t("emulatorArgsPlaceholder")}
+                    />
+                  </Field>
+                </div>
+              </section>
+            )}
 
             <section className="cut flex flex-wrap items-center gap-3 border border-dashed border-line-2 bg-panel-2 px-4 py-3">
               <span className="grid size-8 shrink-0 place-items-center border border-solid border-line-2 bg-panel text-accent">
@@ -581,7 +800,7 @@ export function VersionEditor({
           </div>
         )}
 
-        {step === "mods" && (
+        {!isEmulatorPack && step === "mods" && (
           <div className="flex min-h-0 flex-1 flex-col gap-2">
             <p className="shrink-0 font-body text-[12px] text-txt-dim">{t("modsHint")}</p>
             <div className="min-h-0 flex-1">
@@ -688,7 +907,7 @@ export function VersionEditor({
           </div>
         )}
 
-        {step === "worlds" && (
+        {!isEmulatorPack && step === "worlds" && (
           <div className="flex flex-col gap-5">
             <div className="cut-tag flex gap-3 border border-solid border-accent-line bg-accent-soft px-4 py-4">
               <span className="grid size-8 shrink-0 place-items-center border border-solid border-accent-line bg-panel text-accent">
@@ -712,15 +931,24 @@ export function VersionEditor({
 
         {step === "review" && (
           <dl className="grid gap-3 [grid-template-columns:repeat(auto-fit,minmax(300px,1fr))]">
-            {[
-              [t("versionName"), name],
-              [t("minecraft"), minecraft],
-              [t("loader"), loader ? `${loader} ${loaderVersion}` : t("vanilla")],
-              [t("mods"), String(mods.length)],
-              [t("overrides"), String(uploads.length)],
-              [t("worlds.label"), String(worlds.length)],
-              [t("notes"), notes || "—"],
-            ].map(([label, value]) => (
+            {(isEmulatorPack
+              ? [
+                  [t("versionName"), name],
+                  [t("emulatorKind"), emulatorKind === "mgba" ? "mGBA" : "melonDS"],
+                  [t("romFile"), emulatorRom?.filename || "—"],
+                  [t("overrides"), String(uploads.length)],
+                  [t("notes"), notes || "—"],
+                ]
+              : [
+                  [t("versionName"), name],
+                  [t("minecraft"), minecraft],
+                  [t("loader"), loader ? `${loader} ${loaderVersion}` : t("vanilla")],
+                  [t("mods"), String(mods.length)],
+                  [t("overrides"), String(uploads.length)],
+                  [t("worlds.label"), String(worlds.length)],
+                  [t("notes"), notes || "—"],
+                ]
+            ).map(([label, value]) => (
               <div
                 key={label}
                 className="flex items-center gap-3 border border-solid border-line bg-panel px-3 py-2"
@@ -746,7 +974,10 @@ export function VersionEditor({
             variant="ghost"
             icon="back"
             disabled={stepIndex === 0}
-            onClick={() => setStep(STEPS[stepIndex - 1])}
+            onClick={() => {
+              const prevStep = effectiveSteps[stepIndex - 1]
+              if (prevStep) setStep(prevStep)
+            }}
           >
             {t("back")}
           </Button>
@@ -769,7 +1000,10 @@ export function VersionEditor({
                 variant="pri"
                 icon="chevronRight"
                 disabled={!canAdvance}
-                onClick={() => setStep(STEPS[stepIndex + 1])}
+                onClick={() => {
+                  const nextStep = effectiveSteps[stepIndex + 1]
+                  if (nextStep) setStep(nextStep)
+                }}
               >
                 {t("continue")}
               </Button>

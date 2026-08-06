@@ -506,10 +506,6 @@
                 "melonds"
               ]
             },
-            "executable": {
-              "type": "string",
-              "minLength": 1
-            },
             "rom": {
               "type": "string",
               "minLength": 1
@@ -524,7 +520,6 @@
           },
           "required": [
             "kind",
-            "executable",
             "rom"
           ],
           "additionalProperties": false

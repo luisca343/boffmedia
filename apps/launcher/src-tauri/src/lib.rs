@@ -27,6 +27,7 @@ pub mod backups;
 pub mod browse;
 pub mod catalog;
 pub mod datadir;
+pub mod emulators;
 pub mod icons;
 pub mod install;
 pub mod local_packs;
@@ -128,6 +129,11 @@ pub fn run() {
             // Multi-game — files the player supplies (ROM dumps).
             install::instance_user_files,
             install::instance_provide_user_file,
+            install::instance_user_files_scan,
+            // Multi-game — where the player's own emulators live.
+            emulators::emulator_status,
+            emulators::emulator_set_path,
+            emulators::emulator_clear_path,
             settings::settings_get,
             settings::settings_set,
             settings::plays_get,

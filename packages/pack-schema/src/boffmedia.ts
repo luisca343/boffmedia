@@ -102,14 +102,13 @@ export type BundledWorld = z.infer<typeof BundledWorld>
 export const EmulatorKind = z.enum(["mgba", "melonds"])
 export type EmulatorKind = z.infer<typeof EmulatorKind>
 
-/** How an emulator pack launches. The emulator binaries and the ROM are
- *  ordinary `files` entries (the ROM typically `user-provided`); this block
- *  names which of those paths to spawn and which to pass as the game. */
+/** How an emulator pack launches. The pack never ships the emulator itself —
+ *  the launcher resolves the PLAYER'S OWN install (a settings override, then
+ *  EmuDeck's conventional paths, then common install locations), so their
+ *  controls, shaders and config apply untouched. The ROM is an ordinary
+ *  `files` entry, typically `user-provided`. */
 export const EmulatorSpec = z.object({
   kind: EmulatorKind,
-  /** Instance-relative path of the emulator executable to spawn. Must match a
-   *  `files` entry (enforced by PackManifest). */
-  executable: InstancePath,
   /** Instance-relative path of the ROM handed to the emulator. Must match a
    *  `files` entry (enforced by PackManifest). */
   rom: InstancePath,
@@ -238,18 +237,16 @@ export const PackManifest = z
         })
       }
       if (m.version.emulator) {
-        // Both paths must be real entries in `files` so they carry a sha512 —
-        // the executable arrives verified and the ROM prompt knows its hash.
+        // The ROM must be a real entry in `files` so it carries a sha512 —
+        // that hash is what the launcher verifies the player's dump against.
         const filePaths = new Set(m.version.files.map((f) => f.path.toLowerCase().replace(/\\/g, "/")))
-        for (const field of ["executable", "rom"] as const) {
-          const p = m.version.emulator[field].toLowerCase().replace(/\\/g, "/")
-          if (!filePaths.has(p)) {
-            ctx.addIssue({
-              code: "custom",
-              path: ["version", "emulator", field],
-              message: `emulator.${field} must match the path of a files[] entry`,
-            })
-          }
+        const rom = m.version.emulator.rom.toLowerCase().replace(/\\/g, "/")
+        if (!filePaths.has(rom)) {
+          ctx.addIssue({
+            code: "custom",
+            path: ["version", "emulator", "rom"],
+            message: "emulator.rom must match the path of a files[] entry",
+          })
         }
       }
     }

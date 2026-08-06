@@ -560,17 +560,17 @@ pub async fn invite_redeem(
 mod tests {
     use super::*;
 
+    // ONE test, deliberately: both cases mutate the process-global
+    // BOFF_API_URL, and cargo runs tests in parallel threads that share it —
+    // as two tests they race each other and fail flakily depending on
+    // scheduling. Sequential within a single test, the mutation is safe.
     #[test]
-    fn base_url_has_no_trailing_slash() {
+    fn base_url_env_override_trims_and_blank_falls_back() {
         // Every call site interpolates `{base}/packs/...`; a trailing slash
         // would produce `//packs` and a 404 that looks like a routing bug.
         std::env::set_var("BOFF_API_URL", "https://example.test/");
         assert_eq!(base_url(), "https://example.test");
-        std::env::remove_var("BOFF_API_URL");
-    }
 
-    #[test]
-    fn blank_env_falls_back_to_the_built_in_url() {
         std::env::set_var("BOFF_API_URL", "   ");
         assert!(base_url().starts_with("https://"));
         std::env::remove_var("BOFF_API_URL");

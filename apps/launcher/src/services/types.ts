@@ -201,6 +201,12 @@ export type Settings = {
   locale: AppLocale
   /** Whether to automatically backup saves/config before updating a pack. */
   backupBeforeUpdate: boolean
+  /** Per-emulator executable overrides, keyed by emulator kind ("mgba",
+   *  "melonds"). Empty = auto-detect (EmuDeck first). */
+  emulatorPaths: Record<string, string>
+  /** Extra directories the ROM auto-scan searches, besides the detected
+   *  EmuDeck folders. */
+  romDirs: string[]
 }
 
 /** Total playtime in milliseconds per pack, keyed by pack id. */

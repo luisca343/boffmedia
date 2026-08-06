@@ -642,6 +642,7 @@ export function PacksAdmin() {
                 </span>
                 <span className="mt-3 flex items-center gap-2 border-t border-line pt-2">
                   <AccessPill kind={p.accessKind} />
+                  {p.gameType === "emulator" && <AvPill tone="info">{t("emulator")}</AvPill>}
                   <AvPill tone={p.latestVersionId ? "ok" : "warn"}>
                     {p.latestVersionId ? t("live") : t("noPublished")}
                   </AvPill>

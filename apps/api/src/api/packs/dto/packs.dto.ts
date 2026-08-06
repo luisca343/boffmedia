@@ -203,13 +203,11 @@ export class EmulatorSpecDto {
   @IsIn(EMULATOR_KINDS)
   kind!: (typeof EMULATOR_KINDS)[number];
 
-  @ApiProperty({ example: 'emulator/mGBA/mGBA.exe' })
-  @IsString()
-  @MinLength(1)
-  @MaxLength(512)
-  executable!: string;
-
-  @ApiProperty({ example: 'roms/game.gba' })
+  @ApiProperty({
+    example: 'roms/game.gba',
+    description:
+      'Ruta del ROM dentro de la instancia; debe coincidir con una entrada de files[]. El emulador nunca se distribuye: el launcher usa el del jugador.',
+  })
   @IsString()
   @MinLength(1)
   @MaxLength(512)

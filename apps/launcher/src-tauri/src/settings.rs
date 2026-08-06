@@ -50,6 +50,17 @@ pub struct Settings {
     /// `#[serde(default = "default_true")]` so old files keep the feature enabled.
     #[serde(default = "default_true")]
     pub backup_before_update: bool,
+    /// Per-emulator executable overrides, keyed by EmulatorKind wire name
+    /// ("mgba", "melonds"). Empty = auto-detect (EmuDeck first, then common
+    /// install paths, then PATH) — see `emulators::resolve`. A path the player
+    /// set is used verbatim, same policy as `java_path`.
+    #[serde(default)]
+    pub emulator_paths: std::collections::HashMap<String, String>,
+    /// Extra directories the ROM auto-scan searches, besides the detected
+    /// EmuDeck `Emulation/roms/<system>` folders. The player's library is
+    /// wherever it is — the launcher never forces a folder.
+    #[serde(default)]
+    pub rom_dirs: Vec<String>,
 }
 
 fn default_true() -> bool {
@@ -84,6 +95,8 @@ impl Default for Settings {
             locale: default_locale(),
             // On by default: a safety net before major updates.
             backup_before_update: true,
+            emulator_paths: Default::default(),
+            rom_dirs: Vec::new(),
         }
     }
 }

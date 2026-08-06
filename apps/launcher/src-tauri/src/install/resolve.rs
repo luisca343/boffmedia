@@ -43,10 +43,9 @@ pub enum PlannedGame {
     Minecraft,
     Emulator {
         kind: EmulatorKind,
-        /// Instance-relative path of the executable, verified by the schema to
-        /// be a `files[]` entry — so it arrives hash-checked like any mod.
-        executable: String,
         /// Instance-relative path of the ROM, typically a `user-provided` file.
+        /// The emulator executable is NOT part of the plan: the launcher
+        /// resolves the player's own install at launch (emulators::resolve).
         rom: String,
         /// Extra CLI args inserted before the ROM path.
         args: Vec<String>,
@@ -240,7 +239,6 @@ pub fn plan(manifest: &PackManifest) -> Result<InstallPlan, InstallFailure> {
             (
                 PlannedGame::Emulator {
                     kind,
-                    executable: emu.executable.to_string(),
                     rom: emu.rom.to_string(),
                     args: emu.args.iter().map(|a| a.to_string()).collect(),
                 },

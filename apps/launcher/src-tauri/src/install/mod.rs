@@ -1333,7 +1333,7 @@ pub struct UserFile {
 fn user_files_view(
     app: &tauri::AppHandle,
     manifest: &serde_json::Value,
-) -> Result<(Layout, InstancePaths, Vec<UserFile>), InstallFailure> {
+) -> Result<(Layout, InstancePaths, resolve::InstallPlan, Vec<UserFile>), InstallFailure> {
     let raw = serde_json::to_string(manifest)
         .map_err(|e| InstallFailure::message(format!("Manifiesto ilegible: {e}")))?;
     let parsed = crate::pack::parse_manifest(&raw)
@@ -1358,7 +1358,7 @@ fn user_files_view(
             _ => None,
         })
         .collect();
-    Ok((layout, instance, files))
+    Ok((layout, instance, plan, files))
 }
 
 /// The files this pack needs the player to supply, with their current status.
@@ -1369,7 +1369,90 @@ pub async fn instance_user_files(
     manifest: serde_json::Value,
     app: tauri::AppHandle,
 ) -> Result<Vec<UserFile>, InstallFailure> {
-    Ok(user_files_view(&app, &manifest)?.2)
+    Ok(user_files_view(&app, &manifest)?.3)
+}
+
+/// What a scan produced: the refreshed checklist plus how many files it found
+/// on its own, so the UI can say "encontrada automáticamente" or fall back to
+/// the manual picker without guessing.
+#[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct UserFilesScan {
+    pub files: Vec<UserFile>,
+    pub found: u32,
+}
+
+/// Plug-and-play ROM discovery: sweep the player's ROM library (their own
+/// configured dirs, then EmuDeck's `Emulation/roms/<system>` folders on every
+/// drive) for files matching each missing entry. Size is the prefilter, the
+/// pinned sha512 is the judge — so a renamed file is found, and a wrong-region
+/// dump is never silently accepted.
+#[tauri::command]
+pub async fn instance_user_files_scan(
+    manifest: serde_json::Value,
+    app: tauri::AppHandle,
+) -> Result<UserFilesScan, InstallFailure> {
+    let (layout, instance, plan, files) = user_files_view(&app, &manifest)?;
+    let settings = settings::load(&app);
+
+    // Non-emulator packs have no conventional library to sweep beyond the
+    // player's own dirs; today only emulator packs declare user files anyway.
+    let scan_dirs = match &plan.game {
+        resolve::PlannedGame::Emulator { kind, .. } => {
+            crate::emulators::rom_scan_dirs(*kind, &settings)
+        }
+        resolve::PlannedGame::Minecraft => settings
+            .rom_dirs
+            .iter()
+            .map(std::path::PathBuf::from)
+            .filter(|d| d.is_dir())
+            .collect(),
+    };
+
+    let mut found = 0u32;
+    let pending: Vec<UserFile> = files.iter().filter(|f| !f.satisfied).cloned().collect();
+    if !pending.is_empty() && !scan_dirs.is_empty() {
+        let layout_bg = layout.clone();
+        let instance_bg = instance.clone();
+        found = tauri::async_runtime::spawn_blocking(move || {
+            let mut found = 0u32;
+            for wanted in &pending {
+                if wanted.size == 0 {
+                    continue;
+                }
+                let mut candidates = Vec::new();
+                for dir in &scan_dirs {
+                    crate::emulators::size_matches_under(dir, wanted.size, 2, &mut candidates);
+                }
+                for candidate in candidates {
+                    let Some(hash) = files::sha512_of(&candidate) else { continue };
+                    if !hash.eq_ignore_ascii_case(&wanted.sha512) {
+                        continue;
+                    }
+                    if files::import_local_blob(&layout_bg, &candidate, &hash).is_ok() {
+                        if let Some(dest) =
+                            instance::safe_join(&instance_bg.minecraft, &wanted.path)
+                        {
+                            let _ = files::place_blob(
+                                &files::local_blob_path(&layout_bg, &hash),
+                                &dest,
+                            );
+                        }
+                        found += 1;
+                    }
+                    break;
+                }
+            }
+            found
+        })
+        .await
+        .map_err(|e| InstallFailure::message(format!("La búsqueda se interrumpió: {e}")))?;
+    }
+
+    Ok(UserFilesScan {
+        files: user_files_view(&app, &manifest)?.3,
+        found,
+    })
 }
 
 /// Take the player's file for one `user-provided` entry: open the native
@@ -1388,7 +1471,7 @@ pub async fn instance_provide_user_file(
 ) -> Result<Vec<UserFile>, InstallFailure> {
     use tauri_plugin_dialog::DialogExt;
 
-    let (layout, instance, files) = user_files_view(&app, &manifest)?;
+    let (layout, instance, _plan, files) = user_files_view(&app, &manifest)?;
     let wanted = files
         .iter()
         .find(|f| f.path.eq_ignore_ascii_case(&path))
@@ -1449,7 +1532,7 @@ pub async fn instance_provide_user_file(
     .await
     .map_err(|e| InstallFailure::message(format!("La verificación se interrumpió: {e}")))??;
 
-    Ok(user_files_view(&app, &manifest)?.2)
+    Ok(user_files_view(&app, &manifest)?.3)
 }
 
 // ── §9: per-instance Java runtime + memory ─────────────────────────────────

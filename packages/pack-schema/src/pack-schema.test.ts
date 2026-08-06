@@ -37,19 +37,13 @@ const emulatorManifest = (): z.input<typeof PackManifest> => {
   delete m.version.dependencies
   m.version.files = [
     {
-      path: "emulator/mgba.exe",
-      sha512,
-      fileSize: 5678,
-      source: { kind: "url" as const, url: "https://example.com/mgba.exe" },
-    },
-    {
       path: "roms/game.gba",
       sha512,
       fileSize: 4321,
       source: { kind: "user-provided" as const, hint: "Pokémon Emerald (USA) dump (.gba)" },
     },
   ]
-  m.version.emulator = { kind: "mgba" as const, executable: "emulator/mgba.exe", rom: "roms/game.gba" }
+  m.version.emulator = { kind: "mgba" as const, rom: "roms/game.gba" }
   return m
 }
 
@@ -133,7 +127,7 @@ describe("PackManifest", () => {
 
   it("rejects an emulator block on a minecraft pack", () => {
     const m = manifest()
-    m.version.emulator = { kind: "mgba", executable: "emulator/mgba.exe", rom: "roms/game.gba" }
+    m.version.emulator = { kind: "mgba", rom: "roms/game.gba" }
     expect(() => PackManifest.parse(m)).toThrow(/must not declare an emulator block/)
   })
 
@@ -144,7 +138,7 @@ describe("PackManifest", () => {
     expect(parsed.version.emulator?.kind).toBe("mgba")
   })
 
-  it("rejects an emulator pack whose rom/executable is not a files[] entry", () => {
+  it("rejects an emulator pack whose rom is not a files[] entry", () => {
     const m = emulatorManifest()
     m.version.emulator!.rom = "roms/other.gba"
     expect(() => PackManifest.parse(m)).toThrow(/emulator.rom must match/)

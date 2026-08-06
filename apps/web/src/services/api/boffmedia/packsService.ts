@@ -40,6 +40,8 @@ export interface AdminPack {
   latestVersionId: string | null;
   createdAt: string;
   updatedAt: string;
+  // TODO: remove after `pnpm generate:shared` regenerates packages/shared
+  gameType?: 'minecraft' | 'emulator';
 }
 
 export interface PackVersionRow {
@@ -95,6 +97,8 @@ export interface CreatePackInput {
   accessKind: PackAccessKind;
   password?: string;
   server?: ServerAddress;
+  // TODO: remove after `pnpm generate:shared` regenerates packages/shared
+  gameType?: 'minecraft' | 'emulator';
 }
 
 export interface BundledWorld {
@@ -122,13 +126,19 @@ export interface UpdatePackInput {
 
 export interface CreateVersionInput {
   name: string;
-  minecraft: string;
+  minecraft?: string;
   loader?: PackLoader;
   loaderVersion?: string;
   notes?: string;
   /** PackFile[] — the API validates this with @boffmedia/pack-schema. */
   files: unknown[];
   worlds?: BundledWorld[];
+  // TODO: remove after `pnpm generate:shared` regenerates packages/shared
+  emulator?: {
+    kind: 'mgba' | 'melonds';
+    rom: string;
+    args?: string[];
+  };
 }
 
 // The catalog vocabulary is shared with apps/launcher, which browses mods too

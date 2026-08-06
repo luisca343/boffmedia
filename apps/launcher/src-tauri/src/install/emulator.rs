@@ -1,66 +1,50 @@
-// The emulator side of multi-game: no runtime to install (the emulator binary
-// ships as ordinary pack files, hash-verified like any mod), so the whole job
-// is to verify the pieces are on disk, pin the emulator to portable mode, and
-// hand process.rs a command to spawn.
+// The emulator side of multi-game. A pack never ships the emulator — the
+// launcher resolves the PLAYER'S OWN install (emulators::resolve: settings
+// override → EmuDeck → common locations → PATH), so their controls, shaders
+// and config apply untouched and we never write into an install we do not own.
+// The only pack payload is the ROM (and any extra override files), so the
+// whole job here is: find their emulator, verify the ROM is in place, and hand
+// process.rs a command to spawn.
 
 use super::game::Prepared;
 use super::instance;
 use super::process::Launchable;
-use super::resolve::{EmulatorKind, PlannedGame};
+use super::resolve::PlannedGame;
 use super::InstallFailure;
 
 /// Build the launch command for an emulator pack. Called AFTER the payload
-/// phase, because unlike Minecraft (whose runtime portablemc installs first)
-/// the executable and the ROM only exist once the pack's files are placed.
+/// phase — the ROM only exists once the pack's files are placed (or provided).
 pub fn launchable(prepared: &Prepared) -> Result<Launchable, InstallFailure> {
-    let PlannedGame::Emulator { kind, executable, rom, args } = &prepared.plan.game else {
+    let PlannedGame::Emulator { kind, rom, args } = &prepared.plan.game else {
         return Err(InstallFailure::message(
             "Este pack no es un pack de emulador.".to_string(),
         ));
     };
 
-    let exe = resolve_instance_file(prepared, executable, "el emulador")?;
-    let rom = resolve_instance_file(prepared, rom, "la ROM")?;
+    let (exe, _source) = crate::emulators::resolve(*kind, &prepared.settings).ok_or_else(|| {
+        InstallFailure::message(format!(
+            "No se encontró {} en este equipo. Instálalo (recomendamos EmuDeck) o indica su ruta \
+             en Ajustes.",
+            kind.key()
+        ))
+    })?;
 
-    ensure_portable(*kind, &exe);
+    let rom_path = instance::safe_join(&prepared.instance.minecraft, rom).ok_or_else(|| {
+        InstallFailure::message(format!("La ruta de la ROM no es válida: {rom}"))
+    })?;
+    if !rom_path.is_file() {
+        return Err(InstallFailure::message(format!(
+            "No se encontró la ROM en «{rom}». Apórtala desde la ficha del pack."
+        )));
+    }
 
+    // cwd is the instance so anything the emulator writes relative to the ROM
+    // (mGBA's default .sav beside it, screenshots, savestates configured
+    // relatively) stays inside the instance and inside the Backups tab's reach.
     Ok(Launchable::Emulator {
         exe,
         args: args.clone(),
-        rom,
+        rom: rom_path,
         cwd: prepared.instance.root.clone(),
     })
-}
-
-fn resolve_instance_file(
-    prepared: &Prepared,
-    rel: &str,
-    label: &str,
-) -> Result<std::path::PathBuf, InstallFailure> {
-    let path = instance::safe_join(&prepared.instance.minecraft, rel).ok_or_else(|| {
-        InstallFailure::message(format!("La ruta de {label} no es válida: {rel}"))
-    })?;
-    if !path.is_file() {
-        return Err(InstallFailure::message(format!(
-            "No se encontró {label} en «{rel}». Reinstala el pack o aporta el archivo que falta."
-        )));
-    }
-    Ok(path)
-}
-
-/// Pin the emulator's config to the instance instead of the user's profile.
-/// Both mGBA and melonDS switch to portable mode when their config file exists
-/// beside the executable, so an empty file is enough — and an existing one
-/// (shipped by the pack, or written by the emulator itself) is never touched.
-/// Best-effort: a failure here means the emulator falls back to its global
-/// config, which launches fine and is not worth failing the play button over.
-fn ensure_portable(kind: EmulatorKind, exe: &std::path::Path) {
-    let Some(dir) = exe.parent() else { return };
-    let marker = match kind {
-        EmulatorKind::Mgba => dir.join("portable.ini"),
-        EmulatorKind::MelonDs => dir.join("melonDS.ini"),
-    };
-    if !marker.exists() {
-        let _ = std::fs::write(&marker, b"");
-    }
 }

@@ -151,6 +151,8 @@ export const MOCK_SETTINGS: Settings = {
   memoryAuto: false,
   locale: "es",
   backupBeforeUpdate: true,
+  emulatorPaths: {},
+  romDirs: [],
 }
 
 /** Browser-mode library. The desktop equivalent is `loadPackEntries`, which

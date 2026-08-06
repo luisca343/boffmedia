@@ -34,7 +34,7 @@ import { ContentTab } from "../components/pack/ContentTab"
 import { FilesTab } from "../components/pack/FilesTab"
 import { GalleryTab } from "../components/pack/GalleryTab"
 import { ScreenshotsTab } from "../components/pack/ScreenshotsTab"
-import { UserFilesPanel } from "../components/pack/UserFilesPanel"
+import { EmulatorSetupPanel } from "../components/pack/EmulatorSetupPanel"
 import { WorldsTab } from "../components/pack/WorldsTab"
 import { LogPanel } from "../components/pack/LogPanel"
 import {
@@ -625,10 +625,10 @@ export function PackDetail() {
         </Panel>
       )}
 
-      {/* ROM dumps and other files only the player can supply. Renders nothing
-          when the pack declares none, i.e. on every Minecraft pack. */}
+      {/* Emulator packs: which emulator will launch (the player's own — a
+          pack never ships one) and the ROM dumps only they can supply. */}
       {!isMinecraft && (
-        <UserFilesPanel
+        <EmulatorSetupPanel
           packId={pack.id}
           manifestFor={manifestFor}
           onChanged={reloadPacks}
