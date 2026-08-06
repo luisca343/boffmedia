@@ -40,7 +40,7 @@ docs/vgc_data/
 training/.venv/
 training/__pycache__/
 training/configs/
-models/
+training/models/
 *.pyc
 *.pyo
 __pycache__/
