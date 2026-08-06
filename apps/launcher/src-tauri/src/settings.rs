@@ -8,12 +8,12 @@
 use std::path::PathBuf;
 
 use serde::{Deserialize, Serialize};
-use tauri::Manager;
 
 use crate::install::InstallFailure;
 
 const FILE: &str = "settings.json";
 const PLAYS_FILE: &str = "plays.json";
+const PLAYTIME_FILE: &str = "playtime.json";
 
 /// Matches types.ts's `Settings` field for field. `gameDir` empty means "use the
 /// default app-data location" — an absent field and a blank one must mean the
@@ -40,10 +40,28 @@ pub struct Settings {
     /// had chosen instead of resetting the slider.
     #[serde(default)]
     pub memory_auto: bool,
+    /// UI language ("es" | "en"). Rust never reads it — the renderer's i18n store
+    /// owns the choice — but it round-trips through here so it persists in the
+    /// same settings.json as everything else. `#[serde(default)]` fills a file
+    /// written before i18n with "es".
+    #[serde(default = "default_locale")]
+    pub locale: String,
+    /// Whether to automatically backup saves/config before updating a pack.
+    /// `#[serde(default = "default_true")]` so old files keep the feature enabled.
+    #[serde(default = "default_true")]
+    pub backup_before_update: bool,
+}
+
+fn default_true() -> bool {
+    true
 }
 
 fn default_retain() -> u32 {
     crate::install::instance::DEFAULT_RETAIN as u32
+}
+
+fn default_locale() -> String {
+    "es".to_string()
 }
 
 impl Default for Settings {
@@ -63,6 +81,9 @@ impl Default for Settings {
             // a player already tuned. The per-pack panel is where §9's heuristic
             // is offered, and Ajustes can opt the global default into it.
             memory_auto: false,
+            locale: default_locale(),
+            // On by default: a safety net before major updates.
+            backup_before_update: true,
         }
     }
 }
@@ -91,10 +112,17 @@ impl Settings {
     }
 }
 
+/// Settings live in the SAME root as everything else (`datadir::data_root`),
+/// not in Tauri's `app_config_dir()`.
+///
+/// On Windows those two used to be the identical directory, so the move to
+/// `%APPDATA%\BoffLauncher` would have carried `settings.json` off to a folder
+/// nothing read any more — the player's memory slider and game-dir override
+/// silently back to defaults. Pointing both at one root is what keeps the
+/// migration honest, and it means "the launcher's folder" is one place a
+/// player can back up or delete.
 fn config_path(app: &tauri::AppHandle, name: &str) -> Result<PathBuf, InstallFailure> {
-    let dir = app.path().app_config_dir().map_err(|e| {
-        InstallFailure::message(format!("No se pudo localizar la carpeta de ajustes: {e}"))
-    })?;
+    let dir = crate::datadir::data_root(app).map_err(InstallFailure::message)?;
     Ok(dir.join(name))
 }
 
@@ -133,6 +161,40 @@ pub fn record_play(app: &tauri::AppHandle, pack_id: &str) {
 #[tauri::command]
 pub fn plays_get(app: tauri::AppHandle) -> Plays {
     plays_load(&app)
+}
+
+/// Total playtime per pack in milliseconds, kept out of `settings.json` for the
+/// same reason as plays.json: it is a log, not a preference.
+pub type Playtime = std::collections::HashMap<String, u64>;
+
+pub fn playtime_load(app: &tauri::AppHandle) -> Playtime {
+    config_path(app, PLAYTIME_FILE)
+        .ok()
+        .and_then(|path| std::fs::read_to_string(path).ok())
+        .and_then(|raw| serde_json::from_str(&raw).ok())
+        .unwrap_or_default()
+}
+
+/// Best-effort accumulation of playtime. Failures are silently ignored to keep
+/// the exit path clean.
+pub fn add_playtime(app: &tauri::AppHandle, pack_id: &str, ms: u64) {
+    let mut playtime = playtime_load(app);
+    let current = playtime.entry(pack_id.to_string()).or_insert(0);
+    *current = current.saturating_add(ms);
+    let Ok(path) = config_path(app, PLAYTIME_FILE) else {
+        return;
+    };
+    if let Some(parent) = path.parent() {
+        let _ = std::fs::create_dir_all(parent);
+    }
+    if let Ok(raw) = serde_json::to_string_pretty(&playtime) {
+        let _ = std::fs::write(path, raw);
+    }
+}
+
+#[tauri::command]
+pub fn playtime_get(app: tauri::AppHandle) -> Playtime {
+    playtime_load(&app)
 }
 
 /// Never fails on a missing or unreadable file: settings are a convenience, and
@@ -238,6 +300,7 @@ mod tests {
             "keepLogs",
             "retainVersions",
             "memoryAuto",
+            "backupBeforeUpdate",
         ] {
             assert!(raw.contains(key), "missing {key} in {raw}");
         }

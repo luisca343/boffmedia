@@ -27,6 +27,7 @@ import {
   type RetainedVersion,
   type RuntimeSource,
 } from "../runtime"
+import { useT } from "../i18n"
 import { formatBytes, formatWhen } from "../utils/format"
 
 // HANDOFF §9 — "locked vs. user space" and "pack version pinning + rollback".
@@ -51,11 +52,6 @@ type Props = {
 // §9 — "per-instance Java runtime + memory, with a sane heuristic". Three
 // states, three badges: what the player picked must be readable at a glance, or
 // "why is this pack using 4 GB?" becomes a support ticket.
-const SOURCE_LABEL: Record<RuntimeSource, string> = {
-  global: "Heredado",
-  override: "Este pack",
-  auto: "Automático",
-}
 
 const SOURCE_TONE: Record<RuntimeSource, "info" | "warn" | "ok"> = {
   global: "info",
@@ -66,11 +62,18 @@ const SOURCE_TONE: Record<RuntimeSource, "info" | "warn" | "ok"> = {
 const gib = (mib: number) => `${(mib / 1024).toFixed(1).replace(".", ",")} GB`
 
 export function InstanceSpace({ slug, password, onChanged }: Props) {
+  const t = useT("instanceSpace")
   const [optional, setOptional] = useState<OptionalFile[] | null>(null)
   const [versions, setVersions] = useState<RetainedVersion[] | null>(null)
   const [runtime, setRuntime] = useState<InstanceRuntime | null>(null)
   const [busy, setBusy] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
+
+  const SOURCE_LABEL: Record<RuntimeSource, string> = {
+    global: t("sourceGlobal"),
+    override: t("sourceOverride"),
+    auto: t("sourceAuto"),
+  }
 
   const refresh = useCallback(() => {
     void instanceOptional(slug).then(setOptional)
@@ -86,7 +89,7 @@ export function InstanceSpace({ slug, password, onChanged }: Props) {
     try {
       setOptional(await instanceOptionalSet(slug, file.path, !file.enabled))
     } catch (err) {
-      setError((err as { message?: string })?.message ?? "No se pudo guardar la selección.")
+      setError((err as { message?: string })?.message ?? t("saveSelectionError"))
     } finally {
       setBusy(null)
     }
@@ -100,7 +103,7 @@ export function InstanceSpace({ slug, password, onChanged }: Props) {
       refresh()
       onChanged?.()
     } catch (err) {
-      setError((err as { message?: string })?.message ?? "No se pudo volver a esa versión.")
+      setError((err as { message?: string })?.message ?? t("revertError"))
     } finally {
       setBusy(null)
     }
@@ -114,7 +117,7 @@ export function InstanceSpace({ slug, password, onChanged }: Props) {
     try {
       setRuntime(await instanceRuntimeSet(slug, memory, java))
     } catch (err) {
-      setError((err as { message?: string })?.message ?? "No se pudo guardar la configuración.")
+      setError((err as { message?: string })?.message ?? t("saveConfigError"))
       void instanceRuntime(slug).then(setRuntime)
     }
   }
@@ -124,16 +127,16 @@ export function InstanceSpace({ slug, password, onChanged }: Props) {
   return (
     <div className="mt-4 grid gap-4 [grid-template-columns:repeat(auto-fit,minmax(320px,1fr))]">
       <Panel
-        title="Mods opcionales"
+        title={t("optionalMods")}
         aside={optional?.length ? <Badge tone="info">{optional.length}</Badge> : null}
       >
         {optional === null ? (
-          <p className="text-sm text-txt-muted">Cargando…</p>
+          <p className="text-sm text-txt-muted">{t("loading")}</p>
         ) : optional.length === 0 ? (
           <Empty
             icon="cube"
-            title="Sin mods opcionales"
-            lead="Este pack no marca ningún archivo como opcional, o aún no lo has instalado."
+            title={t("noOptional")}
+            lead={t("noOptionalDetail")}
           />
         ) : (
           <ul className="flex flex-col gap-2">
@@ -148,27 +151,23 @@ export function InstanceSpace({ slug, password, onChanged }: Props) {
             ))}
           </ul>
         )}
-        <Divider label="tu espacio" className="my-4" />
+        <Divider label={t("spaceDivider")} className="my-4" />
         {/* The single most important thing this panel can say. Players assume
             an update wipes the folder, and then never add anything to it. */}
-        <p className="text-xs text-txt-dim">
-          Los mods que añadas tú a <code className="font-mono">mods/</code> sobreviven a las
-          actualizaciones: el launcher solo borra archivos que instaló él y que no has
-          modificado. Un opcional desactivado no se descarga.
-        </p>
+        <p className="text-xs text-txt-dim" dangerouslySetInnerHTML={{ __html: t("spaceWarning") }} />
       </Panel>
 
       <Panel
-        title="Versiones guardadas"
+        title={t("savedVersions")}
         aside={pinned ? <Badge tone="ok">{pinned.versionName}</Badge> : null}
       >
         {versions === null ? (
-          <p className="text-sm text-txt-muted">Cargando…</p>
+          <p className="text-sm text-txt-muted">{t("loading")}</p>
         ) : versions.length === 0 ? (
           <Empty
             icon="clock"
-            title="Sin historial"
-            lead="Se guardan las últimas versiones instaladas para poder volver atrás."
+            title={t("noVersions")}
+            lead={t("noVersionsDetail")}
           />
         ) : (
           <ul className="flex flex-col gap-2">
@@ -179,12 +178,12 @@ export function InstanceSpace({ slug, password, onChanged }: Props) {
                     {version.versionName}
                     {version.current && (
                       <span className="ml-2 text-[11px] uppercase tracking-[0.1em] text-txt-dim">
-                        actual
+                        {t("currentVersion")}
                       </span>
                     )}
                   </p>
                   <p className="text-[11px] text-txt-dim">
-                    {formatWhen(version.installedAt)} · {version.fileCount} archivos ·{" "}
+                    {formatWhen(version.installedAt)} · {t("versionFileCount", { count: version.fileCount })} ·{" "}
                     {version.minecraft}
                   </p>
                 </div>
@@ -199,18 +198,15 @@ export function InstanceSpace({ slug, password, onChanged }: Props) {
                     loading={busy === version.versionId}
                     onClick={() => void revert(version)}
                   >
-                    Volver
+                    {t("revertButton")}
                   </Button>
                 )}
               </li>
             ))}
           </ul>
         )}
-        <Divider label="coste" className="my-4" />
-        <p className="text-xs text-txt-dim">
-          Una versión guardada es solo su lista de archivos: los .jar viven una sola vez en la
-          caché compartida, así que conservar varias no ocupa varias copias del pack.
-        </p>
+        <Divider label={t("costDivider")} className="my-4" />
+        <p className="text-xs text-txt-dim" dangerouslySetInnerHTML={{ __html: t("costWarning") }} />
       </Panel>
 
       {/* §9 — per-instance Java runtime + memory. The resolved values sit at the
@@ -218,7 +214,7 @@ export function InstanceSpace({ slug, password, onChanged }: Props) {
           question the panel exists to answer, and "6,0 GB (automático, 214
           mods)" beats a slider the player has to interpret. */}
       <Panel
-        title="Java y memoria"
+        title={`${t("memory")} · Java`}
         aside={
           runtime ? (
             <Badge tone={SOURCE_TONE[runtime.effective.memorySource]}>
@@ -228,7 +224,7 @@ export function InstanceSpace({ slug, password, onChanged }: Props) {
         }
       >
         {runtime === null ? (
-          <p className="text-sm text-txt-muted">Cargando…</p>
+          <p className="text-sm text-txt-muted">{t("loading")}</p>
         ) : (
           <>
             <p className="text-sm text-txt">
@@ -238,27 +234,26 @@ export function InstanceSpace({ slug, password, onChanged }: Props) {
               <span className="text-txt-muted">
                 (
                 {runtime.effective.memorySource === "auto"
-                  ? `automático, ${runtime.effective.modCount} mods`
+                  ? t("memoryAutoDetail", { count: runtime.effective.modCount })
                   : runtime.effective.memorySource === "override"
-                    ? "definido para este pack"
-                    : "de los ajustes generales"}
+                    ? t("memoryOverrideDetail")
+                    : t("memoryGlobalDetail")}
                 )
               </span>
             </p>
             <p className="mt-1 text-xs text-txt-dim">
               {runtime.effective.javaPath
-                ? `Java: ${runtime.effective.javaPath}`
-                : "Java: el que instala y gestiona el launcher"}{" "}
-              · {SOURCE_LABEL[runtime.effective.javaSource].toLowerCase()} · equipo con{" "}
-              {gib(runtime.effective.totalRamMib)} de RAM
+                ? t("javaPath", { path: runtime.effective.javaPath })
+                : t("javaManagedJava")}{" "}
+              · {SOURCE_LABEL[runtime.effective.javaSource].toLowerCase()} · {t("javaRAM", { gib: gib(runtime.effective.totalRamMib) })}
             </p>
 
-            <Divider label="memoria" className="my-4" />
+            <Divider label={t("memoryDivider")} className="my-4" />
             <Seg
               options={[
-                { value: "inherit", label: "Heredar" },
-                { value: "auto", label: "Automático" },
-                { value: "fixed", label: "Manual" },
+                { value: "inherit", label: t("inherit") },
+                { value: "auto", label: t("auto") },
+                { value: "fixed", label: t("manual") },
               ]}
               value={runtime.over.memory.mode}
               onChange={(mode) =>
@@ -275,7 +270,7 @@ export function InstanceSpace({ slug, password, onChanged }: Props) {
             {runtime.over.memory.mode === "fixed" ? (
               <div className="mt-3">
                 <Slider
-                  label="Memoria de este pack"
+                  label={t("memory")}
                   min={1024}
                   max={16384}
                   step={512}
@@ -284,27 +279,25 @@ export function InstanceSpace({ slug, password, onChanged }: Props) {
                   onChange={(mib) => void saveRuntime({ mode: "fixed", mib }, runtime.over.java)}
                 />
                 <p className="mt-2 text-xs text-txt-dim">
-                  Recomendado para este pack: {gib(runtime.effective.recommendedMib)}. Pasar de
-                  ahí no acelera el juego: lo que sobra del montón no se usa, y el sistema se
-                  queda sin memoria.
+                  {t("recommendedMemory", { gib: gib(runtime.effective.recommendedMib) })}
                 </p>
               </div>
             ) : (
               <p className="mt-3 text-xs text-txt-dim">
                 {runtime.over.memory.mode === "auto"
-                  ? `Se calcula con los mods del pack (${runtime.effective.modCount}) y la RAM del equipo, sin pasar nunca del 60 %.`
+                  ? t("autoMemory", { count: runtime.effective.modCount })
                   : runtime.globalMemoryAuto
-                    ? "Los ajustes generales están en automático."
-                    : `Se usa lo que digan los ajustes generales (${gib(runtime.globalMemoryMib)}).`}
+                    ? t("globalMemoryAuto")
+                    : t("globalMemoryMib", { gib: gib(runtime.globalMemoryMib) })}
               </p>
             )}
 
-            <Divider label="java" className="my-4" />
+            <Divider label={t("javaDivider")} className="my-4" />
             <Seg
               options={[
-                { value: "inherit", label: "Heredar" },
-                { value: "auto", label: "Automático" },
-                { value: "custom", label: "Ruta" },
+                { value: "inherit", label: t("inherit") },
+                { value: "auto", label: t("auto") },
+                { value: "custom", label: t("customJavaLabel") },
               ]}
               value={runtime.over.java.mode}
               onChange={(mode) =>
@@ -321,12 +314,12 @@ export function InstanceSpace({ slug, password, onChanged }: Props) {
             {runtime.over.java.mode === "custom" ? (
               <Field
                 className="mt-3"
-                label="Ruta del ejecutable"
-                hint="Se usa tal cual, aunque no sea compatible con el pack"
+                label={t("customJavaLabel")}
+                hint={t("customJavaHint")}
               >
                 <Input
                   value={runtime.over.java.path}
-                  placeholder="/ruta/a/bin/java"
+                  placeholder={t("customJavaPlaceholder")}
                   onChange={(e) =>
                     void saveRuntime(runtime.over.memory, {
                       mode: "custom",
@@ -338,10 +331,10 @@ export function InstanceSpace({ slug, password, onChanged }: Props) {
             ) : (
               <p className="mt-3 text-xs text-txt-dim">
                 {runtime.over.java.mode === "auto"
-                  ? "Este pack ignora la ruta de los ajustes y usa la versión de Java que pida."
+                  ? t("javaAuto")
                   : runtime.globalJavaPath
-                    ? `Se usa la ruta de los ajustes generales (${runtime.globalJavaPath}).`
-                    : "Los ajustes generales dejan que el launcher gestione Java."}
+                    ? t("javaGlobal", { path: runtime.globalJavaPath })
+                    : t("javaManaged")}
               </p>
             )}
           </>

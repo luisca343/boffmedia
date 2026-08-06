@@ -60,6 +60,28 @@ export const PackAccess = z.discriminatedUnion("kind", [
 ])
 export type PackAccess = z.infer<typeof PackAccess>
 
+/** A world bundled INTO the pack: a zipped save the launcher extracts into
+ *  `saves/<folder>` on install. First-install-only — an update never overwrites
+ *  a save that already exists on disk, so a player's progress is safe. That is
+ *  why a world is NOT a plain PackFile: files re-verify and re-download on every
+ *  update, which would clobber a played world. The zip is content-addressed
+ *  through the same blob store as override files (`source`); `sha512` is the
+ *  hash of the zip, verified before extraction. */
+export const BundledWorld = z.object({
+  /** A single save-directory name under `saves/`. One path segment, no
+   *  separators and no traversal — this value names a directory we create. */
+  folder: z
+    .string()
+    .min(1)
+    .max(64)
+    .regex(/^[^/\\]+$/, "folder must be a single path segment")
+    .refine((f) => f !== "." && f !== "..", "folder must not be '.' or '..'"),
+  source: FileSource,
+  sizeBytes: z.number().int().nonnegative(),
+  sha512: z.string().regex(/^[a-f0-9]{128}$/, "sha512 must be 128 lowercase hex chars"),
+})
+export type BundledWorld = z.infer<typeof BundledWorld>
+
 export const PackVersion = z.object({
   /** Opaque, server-assigned. Not semver — packs version on their own clock. */
   id: z.string().min(1),
@@ -68,8 +90,36 @@ export const PackVersion = z.object({
   createdAt: z.iso.datetime(),
   dependencies: MrpackDependencies,
   files: z.array(PackFile),
+  /** Worlds shipped with this version, installed first-time-only. */
+  worlds: z.array(BundledWorld).optional(),
 })
 export type PackVersion = z.infer<typeof PackVersion>
+
+/** Quick Play target for this pack (RF-01/RF-03). `port` is OPTIONAL: a bare
+ *  host (e.g. `play.example.com` behind a Minecraft SRV record) declares no
+ *  port, and both the join (Minecraft resolves SRV from --quickPlayMultiplayer)
+ *  and the status ping (the launcher does its own SRV lookup) find the real
+ *  port. When a port IS given it is used verbatim and SRV is skipped. */
+export const PackServer = z.object({
+  host: z
+    .string()
+    .min(1)
+    .max(255)
+    .regex(/^[^/\\]+$/, "host must not contain a scheme or a slash"),
+  port: z.number().int().min(1).max(65535).optional(),
+})
+export type PackServer = z.infer<typeof PackServer>
+
+/** A promotional gallery image shown before install (pack detail, browse). Not
+ *  a game file — never installed — so it lives on the Pack, not in `files`. For
+ *  managed packs `url` is a public upload URL; for local packs the gallery is
+ *  kept out of the manifest entirely (a convention dir on disk), so this array
+ *  is empty there. */
+export const PackGalleryImage = z.object({
+  url: z.url(),
+  alt: z.string().max(256).optional(),
+})
+export type PackGalleryImage = z.infer<typeof PackGalleryImage>
 
 export const Pack = z.object({
   id: z.string().min(1),
@@ -78,9 +128,13 @@ export const Pack = z.object({
     .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "slug must be lowercase kebab-case"),
   name: z.string().min(1),
   summary: z.string().max(512).optional(),
+  /** Long-form plain-text description shown on the pack's info panel. */
+  description: z.string().max(2048).optional(),
   iconUrl: z.url().optional(),
+  gallery: z.array(PackGalleryImage).optional(),
   access: PackAccess,
   latestVersionId: z.string().min(1).optional(),
+  server: PackServer.optional(),
 })
 export type Pack = z.infer<typeof Pack>
 
@@ -108,6 +162,22 @@ export const PackManifest = z
         })
       }
       seen.add(key)
+    }
+
+    // Two bundled worlds targeting the same save folder would race to write the
+    // same directory — reject case-insensitively for the same per-platform
+    // reason the file check does.
+    const worldFolders = new Set<string>()
+    for (const [i, world] of (m.version.worlds ?? []).entries()) {
+      const key = world.folder.toLowerCase()
+      if (worldFolders.has(key)) {
+        ctx.addIssue({
+          code: "custom",
+          path: ["version", "worlds", i, "folder"],
+          message: `duplicate world folder: ${world.folder}`,
+        })
+      }
+      worldFolders.add(key)
     }
   })
 export type PackManifest = z.infer<typeof PackManifest>

@@ -68,6 +68,40 @@ fn cache_path(layout: &Layout, sha512: &str) -> PathBuf {
     layout.cache_dir().join(prefix).join(sha512)
 }
 
+/// Same addressing as `cache_path`, in the store that is never purged — see
+/// `Layout::local_blobs_dir`. This is where an imported `.mrpack`'s overrides
+/// live, and it is the only copy of them.
+pub fn local_blob_path(layout: &Layout, sha512: &str) -> PathBuf {
+    let prefix = &sha512[..2.min(sha512.len())];
+    layout.local_blobs_dir().join(prefix).join(sha512)
+}
+
+/// Store `bytes` in the local blob store under their own sha512, and return
+/// that hash. Content-addressed, so re-importing the same pack twice writes
+/// nothing the second time and two packs sharing a config share one blob.
+pub fn put_local_blob(layout: &Layout, bytes: &[u8]) -> Result<String, InstallFailure> {
+    let mut hasher = Sha512::new();
+    hasher.update(bytes);
+    let sha512 = hex(&hasher.finalize());
+    let dest = local_blob_path(layout, &sha512);
+    if dest.is_file() {
+        return Ok(sha512);
+    }
+    if let Some(parent) = dest.parent() {
+        std::fs::create_dir_all(parent).map_err(|e| {
+            InstallFailure::message(format!("No se pudo crear el almacén local: {e}"))
+        })?;
+    }
+    // tmp + rename so a crash mid-write cannot leave a truncated file sitting
+    // at an address that says it is complete.
+    let tmp = dest.with_extension("part");
+    std::fs::write(&tmp, bytes)
+        .map_err(|e| InstallFailure::message(format!("No se pudo guardar el archivo: {e}")))?;
+    std::fs::rename(&tmp, &dest)
+        .map_err(|e| InstallFailure::message(format!("No se pudo guardar el archivo: {e}")))?;
+    Ok(sha512)
+}
+
 /// Download every planned file into `dest_root`, verifying sha512.
 ///
 /// `phase` selects which slice of the progress bar this batch moves — mods and
@@ -163,6 +197,30 @@ pub async fn download_all(
     Ok(())
 }
 
+/// A download failed part-way. `Transient` errors — a dropped connection, a
+/// 5xx, a 429, a truncated transfer — are worth retrying; `Permanent` ones — a
+/// 404, a hash mismatch, a disk error — are not, because a second attempt fails
+/// the same way and only delays the honest error the player needs to see.
+enum FetchError {
+    Transient(InstallFailure),
+    Permanent(InstallFailure),
+}
+
+/// Total attempts for the network leg of one file (1 try + 2 retries). One flaky
+/// mod out of 400 should not fail the whole install when a retry would land it.
+const MAX_ATTEMPTS: u32 = 3;
+
+/// Exponential backoff with a little jitter, so the 6 concurrent downloads that
+/// all hit the same 429 do not then retry in lockstep. ~400ms, then ~800ms.
+fn backoff_delay(attempt: u32) -> std::time::Duration {
+    let base = 400u64.saturating_mul(2u64.saturating_pow(attempt - 1));
+    let jitter = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .map(|d| u64::from(d.subsec_nanos()) % 250)
+        .unwrap_or(0);
+    std::time::Duration::from_millis(base + jitter)
+}
+
 #[allow(clippy::too_many_arguments)]
 async fn fetch_one(
     app: &tauri::AppHandle,
@@ -195,25 +253,84 @@ async fn fetch_one(
         return place(&blob, &dest);
     }
 
-    // 3. Actually fetch it. Public sources are one GET; the proxied ones go
-    //    through the launcher session so the API can re-check entitlement —
-    //    §7.4, the listing and the download are separate requests and access
-    //    can be revoked between them.
+    // 2b. In the local blob store? This is how an imported third-party
+    //     `.mrpack`'s overrides install: they are `source: override` entries
+    //     that the API has never heard of, so the only copy is the one the
+    //     import extracted out of the zip. Checked AFTER the cache and with the
+    //     same hash verification — a blob that does not hash to its own address
+    //     is treated as missing and falls through to the network, which will
+    //     then fail loudly rather than install corrupt bytes.
+    let local = local_blob_path(layout, &sha512);
+    if local.is_file() && sha512_of(&local).as_deref() == Some(sha512.as_str()) {
+        return place(&local, &dest);
+    }
+
+    // 3. Actually fetch it, retrying the network leg a few times. The cache
+    //    checks above are deterministic and are never part of the retry; only
+    //    the parts that touch the network are.
+    let mut attempt = 0;
+    loop {
+        attempt += 1;
+        match fetch_and_stream(app, http, pack_id, password, file, &blob, &sha512).await {
+            Ok(()) => break,
+            Err(FetchError::Permanent(failure)) => return Err(failure),
+            Err(FetchError::Transient(failure)) => {
+                if attempt >= MAX_ATTEMPTS {
+                    return Err(failure);
+                }
+                tokio::time::sleep(backoff_delay(attempt)).await;
+            }
+        }
+    }
+    place(&blob, &dest)
+}
+
+/// The network leg of one download: acquire the response, then stream+verify it
+/// into the content-addressed cache. Separated from `fetch_one` so the retry
+/// loop there wraps exactly the fallible-over-the-wire part and nothing else.
+async fn fetch_and_stream(
+    app: &tauri::AppHandle,
+    http: &reqwest::Client,
+    pack_id: &str,
+    password: Option<&str>,
+    file: &PlannedFile,
+    blob: &Path,
+    sha512: &str,
+) -> Result<(), FetchError> {
+    // Public sources are one GET; the proxied ones go through the launcher
+    // session so the API can re-check entitlement — §7.4, the listing and the
+    // download are separate requests and access can be revoked between them.
     let response = match &file.fetch {
         Fetch::Proxied(pack_file) => {
-            crate::api::fetch_pack_file(app, pack_id, password, pack_file).await?
+            // The proxy re-mints an expired session internally, so a failure
+            // here is most often a network blip; let the loop try again.
+            crate::api::fetch_pack_file(app, pack_id, password, pack_file)
+                .await
+                .map_err(|e| FetchError::Transient(InstallFailure::from(e)))?
         }
         _ => {
-            let url = resolve_url(http, file).await?;
+            let url = resolve_url(http, file).await.map_err(FetchError::Transient)?;
             let res = http.get(&url).send().await.map_err(|e| {
-                InstallFailure::message(format!("No se pudo descargar «{}»: {e}", file.path))
+                FetchError::Transient(InstallFailure::message(format!(
+                    "No se pudo descargar «{}»: {e}",
+                    file.path
+                )))
             })?;
-            if !res.status().is_success() {
-                return Err(InstallFailure::message(format!(
+            let status = res.status();
+            if !status.is_success() {
+                let failure = InstallFailure::message(format!(
                     "No se pudo descargar «{}»: el servidor respondió {}.",
-                    file.path,
-                    res.status()
-                )));
+                    file.path, status
+                ));
+                // 5xx and 429 are worth another go; a 404/403 will not fix
+                // itself, so fail it now rather than three times.
+                return Err(
+                    if status.is_server_error() || status == reqwest::StatusCode::TOO_MANY_REQUESTS {
+                        FetchError::Transient(failure)
+                    } else {
+                        FetchError::Permanent(failure)
+                    },
+                );
             }
             res
         }
@@ -223,13 +340,12 @@ async fn fetch_one(
     // the bytes proves who may have them, not that they arrived intact — and
     // for a CurseForge proxy it is also the only thing verifying what upstream
     // actually served.
-    stream_to_cache(response, &blob, &sha512, &file.path).await?;
-    place(&blob, &dest)
+    stream_to_cache(response, blob, sha512, &file.path).await
 }
 
 /// Turn a `Fetch` into a URL. Only Modrinth needs a round-trip: the manifest
 /// stores a version id, and the CDN path is not derivable from it.
-async fn resolve_url(http: &reqwest::Client, file: &PlannedFile) -> Result<String, InstallFailure> {
+pub(crate) async fn resolve_url(http: &reqwest::Client, file: &PlannedFile) -> Result<String, InstallFailure> {
     match &file.fetch {
         Fetch::Direct(url) => Ok(url.clone()),
         // Unreachable by construction: `fetch_one` routes these to the API
@@ -295,10 +411,13 @@ async fn stream_to_cache(
     blob: &Path,
     expected: &str,
     label: &str,
-) -> Result<(), InstallFailure> {
+) -> Result<(), FetchError> {
     let parent = blob.parent().unwrap_or(blob);
     std::fs::create_dir_all(parent).map_err(|e| {
-        InstallFailure::message(format!("No se pudo crear {}: {e}", parent.display()))
+        FetchError::Permanent(InstallFailure::message(format!(
+            "No se pudo crear {}: {e}",
+            parent.display()
+        )))
     })?;
 
     let temp = parent.join(format!("{}.part", uuid::Uuid::new_v4()));
@@ -306,15 +425,33 @@ async fn stream_to_cache(
     let mut hasher = Sha512::new();
     {
         let mut out = std::fs::File::create(&temp).map_err(|e| {
-            InstallFailure::message(format!("No se pudo escribir {}: {e}", temp.display()))
+            FetchError::Permanent(InstallFailure::message(format!(
+                "No se pudo escribir {}: {e}",
+                temp.display()
+            )))
         })?;
-        while let Some(chunk) = res.chunk().await.map_err(|e| {
-            InstallFailure::message(format!("Se cortó la descarga de «{label}»: {e}"))
-        })? {
-            hasher.update(&chunk);
-            out.write_all(&chunk).map_err(|e| {
-                InstallFailure::message(format!("No se pudo escribir {}: {e}", temp.display()))
-            })?;
+        // A cut connection mid-stream leaves a `.part` behind: drop it before
+        // bubbling the transient error so the retry starts from a clean slate.
+        loop {
+            match res.chunk().await {
+                Ok(Some(chunk)) => {
+                    hasher.update(&chunk);
+                    out.write_all(&chunk).map_err(|e| {
+                        FetchError::Permanent(InstallFailure::message(format!(
+                            "No se pudo escribir {}: {e}",
+                            temp.display()
+                        )))
+                    })?;
+                }
+                Ok(None) => break,
+                Err(e) => {
+                    drop(out);
+                    let _ = std::fs::remove_file(&temp);
+                    return Err(FetchError::Transient(InstallFailure::message(format!(
+                        "Se cortó la descarga de «{label}»: {e}"
+                    ))));
+                }
+            }
         }
         out.flush().ok();
     }
@@ -322,15 +459,18 @@ async fn stream_to_cache(
     let actual = hex(&hasher.finalize());
     if actual != expected {
         let _ = std::fs::remove_file(&temp);
-        return Err(InstallFailure::message(format!(
+        return Err(FetchError::Permanent(InstallFailure::message(format!(
             "«{label}» no coincide con el hash del manifiesto. La descarga está corrupta o el \
              archivo ha cambiado en el origen."
-        )));
+        ))));
     }
 
     std::fs::rename(&temp, blob).map_err(|e| {
         let _ = std::fs::remove_file(&temp);
-        InstallFailure::message(format!("No se pudo guardar {}: {e}", blob.display()))
+        FetchError::Permanent(InstallFailure::message(format!(
+            "No se pudo guardar {}: {e}",
+            blob.display()
+        )))
     })
 }
 

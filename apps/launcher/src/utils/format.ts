@@ -41,3 +41,16 @@ export function formatDuration(ms: number): string {
   const pad = (n: number) => String(n).padStart(2, "0")
   return h > 0 ? `${h}:${pad(m)}:${pad(s)}` : `${m}:${pad(s)}`
 }
+
+/** Cumulative playtime, rounded to whole minutes/hours. Unlike `formatDuration`
+ *  (a running H:MM:SS clock), this reads as a summary: "12 h 34 min", "45 min".
+ *  Anything under a minute is "< 1 min" rather than "0 min", so a pack launched
+ *  once never looks like it was never played. */
+export function formatPlaytime(ms: number): string {
+  const mins = Math.floor(ms / 60_000)
+  if (mins < 1) return "< 1 min"
+  const h = Math.floor(mins / 60)
+  const m = mins % 60
+  if (h < 1) return `${m} min`
+  return m > 0 ? `${h} h ${m} min` : `${h} h`
+}

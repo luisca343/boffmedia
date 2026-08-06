@@ -1,116 +1,61 @@
-import { useEffect, useMemo, useRef, useState } from "react"
+import { useEffect, useState } from "react"
 
-import { Badge, Button, Empty, Kicker, Panel, Seg, Toggle } from "@boffmedia/ui"
+import { Button, Kicker } from "@boffmedia/ui"
 
+import { useT } from "../i18n"
 import { CrashDiagnosisCard } from "../components/CrashDiagnosis"
-import type { LogLine } from "../services/types"
+import { LogPanel } from "../components/pack/LogPanel"
+import { getRuntimeInfo, type RuntimeInfo } from "../runtime"
 import { useLauncher } from "../state/launcher"
-import { formatClock } from "../utils/format"
-
-const LEVEL_CLASS: Record<LogLine["level"], string> = {
-  debug: "text-txt-dim",
-  info: "text-txt-muted",
-  warn: "text-warn",
-  error: "text-bad",
-}
+import { buildSupportReport } from "../utils/report"
 
 export function Logs() {
-  const { logs, clearLogs, game } = useLauncher()
-  const [filter, setFilter] = useState("all")
-  const [follow, setFollow] = useState(true)
-  const endRef = useRef<HTMLDivElement>(null)
+  const t = useT("logs")
+  const { logs, clearLogs, game, selected, settings } = useLauncher()
+  const [runtime, setRuntime] = useState<RuntimeInfo | null>(null)
+  const [copied, setCopied] = useState(false)
 
-  const shown = useMemo(() => {
-    if (filter === "all") return logs
-    if (filter === "problems") return logs.filter((l) => l.level === "warn" || l.level === "error")
-    return logs.filter((l) => l.source === filter)
-  }, [logs, filter])
-
-  // Only auto-scroll while following, so reading scrollback isn't yanked away
-  // every time the game emits a line.
   useEffect(() => {
-    if (follow) endRef.current?.scrollIntoView({ block: "end" })
-  }, [shown.length, follow])
+    void getRuntimeInfo().then(setRuntime)
+  }, [])
 
-  const copyAll = () => {
-    const text = shown.map((l) => `${formatClock(l.ts)} [${l.level}] ${l.text}`).join("\n")
-    void navigator.clipboard?.writeText(text)
+  const copyReport = async () => {
+    const report = buildSupportReport({ runtime, pack: selected, game, settings, logs })
+    const ok = await navigator.clipboard
+      ?.writeText(report)
+      .then(() => true)
+      .catch(() => false)
+    if (ok) {
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    }
   }
 
   return (
     <div className="flex h-full min-h-0 flex-col px-8 py-7">
-      <header className="mb-5 flex flex-wrap items-end justify-between gap-4">
+      <header className="mb-5 flex items-start justify-between gap-4">
         <div>
-          <Kicker>Diagnóstico</Kicker>
+          <Kicker>{t("sectionTitle")}</Kicker>
           <h1 className="font-display text-[30px]/none font-bold uppercase tracking-[0.06em] text-txt">
-            Registro
+            {t("title")}
           </h1>
         </div>
-        <div className="flex flex-wrap items-center gap-3">
-          <Seg
-            value={filter}
-            onChange={setFilter}
-            options={[
-              { value: "all", label: "Todo" },
-              { value: "launcher", label: "Launcher" },
-              { value: "game", label: "Juego" },
-              { value: "problems", label: "Problemas" },
-            ]}
-          />
-          <Toggle on={follow} onChange={setFollow} label="Seguir" />
-          <Button size="sm" icon="copy" onClick={copyAll} disabled={shown.length === 0}>
-            Copiar
-          </Button>
-          <Button size="sm" variant="ghost" icon="trash" onClick={clearLogs}>
-            Limpiar
-          </Button>
-        </div>
+        {/* §9 — one paste with the launcher/pack/Java context on top, so a report
+            is a block of text a player can send, not a screenshot of scrollback. */}
+        <Button size="sm" icon="copy" onClick={() => void copyReport()} disabled={logs.length === 0}>
+          {copied ? t("copied") : t("copyReportButton")}
+        </Button>
       </header>
 
       {/* §9 — above the log, not inside it: the whole point is that the player
           never has to read the 4000 lines below to know what happened. */}
       {game.kind === "crashed" && (
         <div className="mb-4">
-          <CrashDiagnosisCard diagnosis={game.diagnosis} />
+          <CrashDiagnosisCard diagnosis={game.diagnosis} onCopyReport={() => void copyReport()} />
         </div>
       )}
 
-      <Panel flat bodyClassName="p-0" className="flex min-h-0 flex-1 flex-col">
-        {shown.length === 0 ? (
-          <Empty
-            icon="list"
-            title="Sin registro"
-            lead="Aquí aparecerá la salida del launcher y del juego."
-          />
-        ) : (
-          <div className="min-h-0 flex-1 overflow-auto bg-base-deep p-3">
-            <table className="w-full border-collapse font-mono text-[12px] leading-[1.55]">
-              <tbody>
-                {shown.map((line, i) => (
-                  <tr key={`${line.ts}-${i}`} className="align-top">
-                    <td className="w-[74px] select-none pr-3 text-txt-dim">
-                      {formatClock(line.ts)}
-                    </td>
-                    <td className="w-[64px] select-none pr-3">
-                      <span className={LEVEL_CLASS[line.level]}>{line.level}</span>
-                    </td>
-                    <td className="w-[70px] select-none pr-3 text-txt-dim">{line.source}</td>
-                    <td className={`whitespace-pre-wrap ${LEVEL_CLASS[line.level]}`}>
-                      {line.text}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-            <div ref={endRef} />
-          </div>
-        )}
-      </Panel>
-
-      <p className="mt-3 flex items-center gap-2 text-xs text-txt-dim">
-        <Badge tone="info">{shown.length}</Badge>
-        líneas mostradas · se conservan las últimas 2000
-      </p>
+      <LogPanel lines={logs} onClear={clearLogs} className="flex min-h-0 flex-1 flex-col" />
     </div>
   )
 }

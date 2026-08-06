@@ -457,6 +457,16 @@
         "password": "Los jugadores introducen una contraseña compartida antes de instalarlo.",
         "allowlist": "Solo las cuentas de Minecraft autorizadas pueden instalarlo."
       },
+      "serverSection": "Dirección del servidor",
+      "serverSectionLead": "Pon un host para convertirlo en un pack de servidor: el launcher muestra el estado del servidor y puede conectarse solo al iniciar.",
+      "serverHost": "Host",
+      "serverHostHint": "Nombre de host o IP, sin esquema (p. ej. play.example.com). Déjalo vacío para un pack de cliente.",
+      "serverPort": "Puerto",
+      "serverPortHint": "Por defecto 25565",
+      "serverSave": "Guardar servidor",
+      "serverSaved": "Dirección del servidor guardada",
+      "serverCleared": "Dirección del servidor eliminada",
+      "serverSaveFailed": "No se pudo guardar la dirección del servidor",
       "slugPending": "Slug pendiente",
       "slugPreview": "Identificador permanente del launcher",
       "access": {
@@ -664,11 +674,44 @@
       "vanilla": "Vanilla",
       "saveVersion": "Guardar cambios",
       "stepOf": "Paso {n} de {total}",
+      "description": {
+        "label": "Descripción",
+        "placeholder": "Una descripción más larga y detallada de lo que contiene este pack…"
+      },
+      "descriptionCharCount": "{current} / {max}",
+      "icon": {
+        "label": "Icono del pack",
+        "upload": "Subir imagen",
+        "urlFallback": "O pegar una URL"
+      },
+      "gallery": {
+        "label": "Galería",
+        "add": "Añadir imagen",
+        "alt": "Texto alternativo",
+        "altPlaceholder": "Describe esta imagen para accesibilidad…",
+        "remove": "Quitar",
+        "maxAlt": "Máximo 256 caracteres",
+        "uploadFailed": "No se pudo subir la imagen."
+      },
+      "worlds": {
+        "label": "Mundos incluidos",
+        "folder": "Nombre de la carpeta de guardado",
+        "folderPlaceholder": "p.ej. Dimension 12, World Nether",
+        "folderHint": "No distingue mayúsculas; debe ser único en esta versión",
+        "folderRequired": "Escribe un nombre de carpeta",
+        "help": "Para el MVP: máximo 1 mundo por versión. Sube el .zip de tu carpeta de guardado de Minecraft.",
+        "none": "Aún no se han añadido mundos.",
+        "upload": "Subir mundo .zip",
+        "remove": "Quitar",
+        "duplicateFolder": "Nombre de carpeta ya en uso",
+        "worldsEdited": "Mundos actualizados"
+      },
       "step": {
         "metadata": "Datos",
         "loader": "Loader",
         "mods": "Mods",
         "files": "Archivos",
+        "worlds": "Mundos",
         "review": "Revisión"
       },
       "reviewLead": "El servidor valida el manifiesto completo con pack-schema antes de guardarlo.",

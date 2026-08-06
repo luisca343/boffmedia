@@ -84,7 +84,9 @@
       "hide": "Hide",
       "pagination": "Pagination",
       "previousPage": "Previous page",
-      "nextPage": "Next page"
+      "nextPage": "Next page",
+      "serverPack": "Server pack",
+      "clientPack": "Client pack"
     },
     "construction": {
       "title": "Page under construction",

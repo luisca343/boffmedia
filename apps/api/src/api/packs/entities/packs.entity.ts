@@ -26,7 +26,16 @@ export class LauncherVersionEntity {
   @ApiPropertyOptional({ nullable: true }) loader!: string | null;
   @ApiPropertyOptional({ nullable: true }) loaderVersion!: string | null;
   @ApiProperty() fileCount!: number;
+  @ApiProperty() worldCount!: number;
   @ApiProperty() createdAt!: string;
+}
+
+/** A pack's Quick Play target — present only for "server packs". `port` is
+ *  omitted for a bare SRV host; both fields are optional so a legacy `{}` row
+ *  still documents. */
+export class PackServerEntity {
+  @ApiPropertyOptional({ example: 'play.example.com' }) host?: string;
+  @ApiPropertyOptional({ example: 25565 }) port?: number;
 }
 
 export class LauncherPackEntity {
@@ -34,9 +43,19 @@ export class LauncherPackEntity {
   @ApiProperty() slug!: string;
   @ApiProperty() name!: string;
   @ApiPropertyOptional({ nullable: true }) summary!: string | null;
+  @ApiPropertyOptional({ nullable: true }) description!: string | null;
   @ApiPropertyOptional({ nullable: true }) iconUrl!: string | null;
+  @ApiPropertyOptional({
+    type: 'array',
+    items: { type: 'object' },
+    nullable: true,
+  })
+  gallery?: unknown[];
   @ApiProperty({ enum: ['public', 'password', 'allowlist'] })
   accessKind!: string;
+
+  @ApiPropertyOptional({ type: PackServerEntity, nullable: true })
+  server?: PackServerEntity | null;
 
   @ApiPropertyOptional({ type: LauncherVersionEntity, nullable: true })
   latestVersion!: LauncherVersionEntity | null;
@@ -49,6 +68,8 @@ export class AdminPackEntity {
   @ApiPropertyOptional({ nullable: true }) summary!: string | null;
   @ApiPropertyOptional({ nullable: true }) iconUrl!: string | null;
   @ApiProperty() accessKind!: string;
+  @ApiPropertyOptional({ type: PackServerEntity, nullable: true })
+  server?: PackServerEntity | null;
   @ApiProperty() archived!: boolean;
   @ApiProperty() hasPassword!: boolean;
   @ApiProperty() aclCount!: number;
@@ -66,6 +87,7 @@ export class PackVersionEntity {
   @ApiPropertyOptional({ nullable: true }) loader!: string | null;
   @ApiPropertyOptional({ nullable: true }) loaderVersion!: string | null;
   @ApiProperty() fileCount!: number;
+  @ApiProperty() worldCount!: number;
   @ApiProperty() published!: boolean;
   @ApiPropertyOptional({ nullable: true }) notes!: string | null;
   @ApiProperty() createdAt!: string;

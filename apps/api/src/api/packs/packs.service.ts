@@ -48,6 +48,11 @@ export class PacksService {
           name: pack.name,
           summary: pack.summary,
           iconUrl: pack.iconUrl,
+          ...(pack.description ? { description: pack.description } : {}),
+          ...(pack.gallery ? { gallery: pack.gallery as any } : {}),
+          // The card reads this to mark the pack as a server pack and to ping
+          // the server for its live status.
+          ...(pack.server ? { server: pack.server } : {}),
           accessKind: pack.accessKind,
           latestVersion:
             version && version.published
@@ -58,6 +63,7 @@ export class PacksService {
                   loader: version.loader,
                   loaderVersion: version.loaderVersion,
                   fileCount: version.files.length,
+                  worldCount: version.worlds?.length ?? 0,
                   createdAt: version.createdAt.toISOString(),
                 }
               : null,
@@ -105,7 +111,14 @@ export class PacksService {
         slug: pack.slug,
         name: pack.name,
         ...(pack.summary ? { summary: pack.summary } : {}),
+        ...(pack.description ? { description: pack.description } : {}),
         ...(pack.iconUrl ? { iconUrl: pack.iconUrl } : {}),
+        ...(pack.gallery ? { gallery: pack.gallery } : {}),
+        // Carried into the manifest too, so the installed pack can Quick Play
+        // into the server offline (the listing is not consulted at launch).
+        // Only when it has a host: a legacy `{}` must not fail PackManifest
+        // validation and block the whole install — it just means "no server".
+        ...(pack.server?.host ? { server: pack.server } : {}),
         access: this.accessPayload(pack.accessKind),
         latestVersionId: version.id,
       },
@@ -120,6 +133,7 @@ export class PacksService {
             : {}),
         },
         files: version.files,
+        ...(version.worlds && version.worlds.length > 0 ? { worlds: version.worlds } : {}),
       },
     };
 
@@ -201,6 +215,7 @@ export class PacksService {
         summary: pack.summary,
         iconUrl: pack.iconUrl,
         accessKind: pack.accessKind,
+        ...(pack.server ? { server: pack.server } : {}),
         archived: pack.archived,
         hasPassword: !!pack.passwordHash,
         aclCount: await this.repo.countAcl(pack.id),
@@ -210,6 +225,20 @@ export class PacksService {
         updatedAt: pack.updatedAt.toISOString(),
       })),
     );
+  }
+
+  /** A server pack must have a host; anything hostless (including a stray `{}`)
+   *  stores as null — a client pack — so a malformed row is never created here.
+   *  The port is left OUT when the admin gives none: a bare host is an SRV host,
+   *  and Minecraft (join) and the launcher's own SRV lookup (status ping) find
+   *  the real port. Only a port the admin actually typed is stored. */
+  private normalizeServer(
+    server?: { host?: string; port?: number | null } | null,
+  ): { host: string; port?: number } | null {
+    if (!server?.host) return null;
+    return server.port != null
+      ? { host: server.host, port: server.port }
+      : { host: server.host };
   }
 
   async createPack(dto: CreatePackDto, actorId: number | null): Promise<{ id: string }> {
@@ -226,7 +255,10 @@ export class PacksService {
       slug: dto.slug,
       name: dto.name,
       summary: dto.summary ?? null,
+      description: dto.description ?? null,
       iconUrl: dto.iconUrl ?? null,
+      gallery: dto.gallery ?? null,
+      server: this.normalizeServer(dto.server),
       accessKind: dto.accessKind,
       passwordHash: dto.password ? await bcrypt.hash(dto.password, 10) : null,
     });
@@ -241,7 +273,11 @@ export class PacksService {
     const patch: Record<string, unknown> = {};
     if (dto.name !== undefined) patch.name = dto.name;
     if (dto.summary !== undefined) patch.summary = dto.summary;
+    if (dto.description !== undefined) patch.description = dto.description;
+    if (dto.gallery !== undefined) patch.gallery = dto.gallery;
     if (dto.iconUrl !== undefined) patch.iconUrl = dto.iconUrl;
+    // `null` clears the server (back to a client pack); an object sets it.
+    if (dto.server !== undefined) patch.server = this.normalizeServer(dto.server);
     if (dto.archived !== undefined) patch.archived = dto.archived;
     if (dto.accessKind !== undefined) patch.accessKind = dto.accessKind;
     if (dto.password !== undefined) {
@@ -271,6 +307,7 @@ export class PacksService {
       loader: v.loader,
       loaderVersion: v.loaderVersion,
       fileCount: v.files.length,
+      worldCount: v.worlds?.length ?? 0,
       published: v.published,
       notes: v.notes,
       createdAt: v.createdAt.toISOString(),
@@ -283,7 +320,7 @@ export class PacksService {
   async versionDetail(
     packId: string,
     versionId: string,
-  ): Promise<PackVersionView & { files: unknown[] }> {
+  ): Promise<PackVersionView & { files: unknown[]; worlds?: unknown[] }> {
     const version = await this.repo.findVersion(versionId);
     if (!version || version.packId !== packId) {
       throw new NotFoundException('Versión no encontrada');
@@ -296,10 +333,12 @@ export class PacksService {
       loader: version.loader,
       loaderVersion: version.loaderVersion,
       fileCount: version.files.length,
+      worldCount: version.worlds?.length ?? 0,
       published: version.published,
       notes: version.notes,
       createdAt: version.createdAt.toISOString(),
       files: version.files,
+      ...(version.worlds ? { worlds: version.worlds } : {}),
     };
   }
 
@@ -328,6 +367,7 @@ export class PacksService {
       loader: (dto.loader as PackLoader) ?? null,
       loaderVersion: dto.loaderVersion ?? null,
       files: parsed.version.files,
+      worlds: (parsed.version as any).worlds ?? null,
       notes: dto.notes ?? null,
     });
     await this.repo.audit(AUDIT.VERSION_UPDATED, packId, null, { actorId, versionId });
@@ -375,6 +415,7 @@ export class PacksService {
           ...(dto.loader && dto.loaderVersion ? { [dto.loader]: dto.loaderVersion } : {}),
         },
         files: dto.files,
+        ...(dto.worlds && dto.worlds.length > 0 ? { worlds: dto.worlds } : {}),
       },
     };
     const parsed = PackManifest.safeParse(candidate);
@@ -409,6 +450,7 @@ export class PacksService {
       loader: (dto.loader as PackLoader) ?? null,
       loaderVersion: dto.loaderVersion ?? null,
       files: parsed.version.files,
+      worlds: (parsed.version as any).worlds ?? null,
       notes: dto.notes ?? null,
       published: false,
     });

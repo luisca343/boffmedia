@@ -1,6 +1,6 @@
 [package]
 name = "boff-launcher"
-version = "0.0.1"
+version = "0.0.2"
 description = "Boff Launcher"
 authors = ["Boffmedia"]
 edition = "2021"
@@ -25,6 +25,9 @@ serde_json = "1"
 
 [dependencies]
 tauri = { version = "2", features = [] }
+# icons.rs hands catalog art to the renderer as data: URLs — the asset protocol
+# (and its scope, which never matched the custom data root) is gone on purpose.
+base64 = "0.22"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 thiserror = "2"
@@ -51,7 +54,23 @@ keyring = { version = "3", features = ["apple-native", "windows-native", "sync-s
 # §5's auth chain is hand-rolled (portablemc::msa cannot surface the refresh
 # token for the keychain), so the launcher makes these calls itself.
 reqwest = { version = "0.12", features = ["json"] }
-tokio = { version = "1", features = ["time", "sync"] }
+# "net" + "io-util": the hand-rolled SLP client (status.rs) opens a raw
+# TcpStream and writes/reads varints over it directly, no HTTP involved.
+tokio = { version = "1", features = ["time", "sync", "net", "io-util"] }
+# status.rs: a pack that declares a bare host (no port) is behind a Minecraft
+# SRV record; the ping resolves `_minecraft._tcp.<host>` to the real host+port.
+# The SLP wire is hand-rolled, but SRV needs a real DNS resolver, and rolling
+# DNS packet parsing (EDNS, TCP fallback on truncation) by hand is not worth it.
+hickory-resolver = "0.24"
+# Packs locales: export_mrpack/import_mrpack read and write the .mrpack zip
+# container (local_packs.rs).
+zip = "2"
+# worlds.rs: level.dat is gzipped NBT. Already in the tree via `zip`; named here
+# because this crate uses GzDecoder directly.
+flate2 = "1"
+# RF-06/RF-07 file pickers (export destination, import source). No dialog
+# plugin existed before this feature.
+tauri-plugin-dialog = "2"
 # §6 file verification. portablemc's downloader only checks sha1, but every file
 # in a Boffmedia manifest carries a mandatory sha512 (packages/pack-schema), so
 # the pack payload is downloaded and verified by install/files.rs instead.

@@ -40,3 +40,102 @@ textarea,
 .font-mono {
   user-select: text;
 }
+
+/* ── Boot splash ────────────────────────────────────────────────────────────
+   The FIRST paint. Every animation here is generated (no asset can arrive a
+   frame late and flash), token-driven, and parked under prefers-reduced-motion
+   to a legible static state — never removed outright, since the motion is the
+   only signal that the four-hop silent sign-in is still working. */
+
+/* Indeterminate progress bar, because sign-in restore has no honest percentage. */
+@keyframes splash-sweep {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(250%); }
+}
+
+/* Brand seal entrance: chamfer springs in from slightly small + low. */
+@keyframes splash-mark-in {
+  0% { opacity: 0; transform: translateY(10px) scale(0.86); }
+  60% { opacity: 1; }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Slow breathing halo behind the seal — presence without impatience. */
+@keyframes splash-pulse {
+  0%, 100% { opacity: 0.35; transform: scale(1); }
+  50% { opacity: 0.7; transform: scale(1.08); }
+}
+
+/* Conic glow ring sweeping around the seal. */
+@keyframes splash-ring {
+  to { transform: rotate(360deg); }
+}
+
+/* Play glyph strokes itself in, then the fill fades up under it. */
+@keyframes splash-glyph-draw {
+  to { stroke-dashoffset: 0; }
+}
+@keyframes splash-glyph-fill {
+  to { fill-opacity: 1; }
+}
+
+/* Wordmark + tagline rise into place, staggered after the seal lands. */
+@keyframes splash-rise {
+  0% { opacity: 0; transform: translateY(8px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+/* Corner brackets slide out from the seal, framing it like broadcast chrome. */
+@keyframes splash-bracket-tl {
+  0% { opacity: 0; transform: translate(6px, 6px); }
+  100% { opacity: 1; transform: translate(0, 0); }
+}
+@keyframes splash-bracket-br {
+  0% { opacity: 0; transform: translate(-6px, -6px); }
+  100% { opacity: 1; transform: translate(0, 0); }
+}
+
+/* Faint diagonal stripe wash drifting behind everything. */
+@keyframes splash-drift {
+  0% { background-position: 0 0; }
+  100% { background-position: 64px 0; }
+}
+
+.splash-sweep { animation: splash-sweep 1.15s ease-in-out infinite; }
+.splash-backdrop {
+  background-image: repeating-linear-gradient(
+    -55deg, transparent 0 22px, var(--stripe) 22px 23px);
+  animation: splash-drift 3.2s linear infinite;
+}
+.splash-mark { animation: splash-mark-in 620ms cubic-bezier(0.16, 1, 0.3, 1) both; }
+.splash-halo { animation: splash-pulse 2.6s ease-in-out infinite; }
+.splash-ring { animation: splash-ring 5.5s linear infinite; }
+.splash-glyph-stroke {
+  stroke-dasharray: 120;
+  stroke-dashoffset: 120;
+  animation: splash-glyph-draw 620ms ease-out 180ms forwards;
+}
+.splash-glyph-fill {
+  fill-opacity: 0;
+  animation: splash-glyph-fill 420ms ease-out 620ms forwards;
+}
+.splash-word { animation: splash-rise 560ms cubic-bezier(0.16, 1, 0.3, 1) 200ms both; }
+.splash-tag { animation: splash-rise 560ms cubic-bezier(0.16, 1, 0.3, 1) 340ms both; }
+.splash-bar { animation: splash-rise 560ms cubic-bezier(0.16, 1, 0.3, 1) 440ms both; }
+.splash-bracket-tl { animation: splash-bracket-tl 520ms cubic-bezier(0.16, 1, 0.3, 1) 380ms both; }
+.splash-bracket-br { animation: splash-bracket-br 520ms cubic-bezier(0.16, 1, 0.3, 1) 460ms both; }
+
+@media (prefers-reduced-motion: reduce) {
+  .splash-sweep { animation: none; width: 100%; opacity: 0.55; }
+  .splash-backdrop,
+  .splash-halo,
+  .splash-ring { animation: none; }
+  .splash-mark,
+  .splash-word,
+  .splash-tag,
+  .splash-bar,
+  .splash-bracket-tl,
+  .splash-bracket-br { animation: none; opacity: 1; transform: none; }
+  .splash-glyph-stroke { animation: none; stroke-dashoffset: 0; }
+  .splash-glyph-fill { animation: none; fill-opacity: 1; }
+}

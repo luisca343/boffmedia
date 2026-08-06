@@ -2,16 +2,30 @@
 
 import { useCallback, useRef, useState } from "react"
 import { useTranslations } from "next-intl"
-import { Badge, Button, Field, Icon, Input, Spinner, toast } from "@boffmedia/ui"
 import {
-  type CatalogLoader,
+  Badge,
+  type BrowsePick,
+  type CatalogProjectType,
+  Button,
+  Field,
+  Icon,
+  Input,
+  ModBrowser,
   type ModFile,
   type ModPlatform,
   type ModSearchHit,
-  PacksService,
-  type ResolveSource,
-} from "@/services/api/boffmedia/packsService"
-import { ModBrowser, type BrowsePick } from "./mod-browser"
+  Spinner,
+  bestFile,
+  catalogLoaderOf,
+  defaultFolder,
+  getCatalog,
+  resolveSourceOf,
+  toast,
+} from "@boffmedia/ui"
+// Registers the catalog client the browser reads. Imported for the side effect
+// only, and from the one component that mounts it, so the wiring cannot be
+// forgotten by a future caller.
+import "@/lib/catalog-runtime"
 import { overrideFileEntry, uploadOverrideBlob } from "./upload-blob"
 
 /** A resolved PackFile plus the display metadata the picker needs. `path` is
@@ -32,24 +46,6 @@ export type SelectedMod = {
   projectId?: string
 }
 
-/** The catalogs speak "fabric"/"quilt"; the manifest speaks "fabric-loader"/
- *  "quilt-loader". Sending the manifest id straight through returns nothing. */
-export function catalogLoaderOf(loader: string): CatalogLoader | undefined {
-  if (loader === "forge" || loader === "neoforge") return loader
-  if (loader === "fabric-loader") return "fabric"
-  if (loader === "quilt-loader") return "quilt"
-  return undefined
-}
-
-/** Where a file belongs inside the instance. Shaders and resource packs in
- *  mods/ are simply not loaded by the game. */
-function defaultFolder(fileName: string): string {
-  const lower = fileName.toLowerCase()
-  if (lower.endsWith(".jar")) return "mods"
-  if (lower.endsWith(".zip")) return "resourcepacks"
-  return "mods"
-}
-
 function formatSize(bytes: number): string {
   if (bytes >= 1024 * 1024) return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
   return `${Math.max(1, Math.round(bytes / 1024))} KB`
@@ -58,19 +54,6 @@ function formatSize(bytes: number): string {
 function fileNameOfUrl(url: string): string {
   const tail = url.split("?")[0].split("/").filter(Boolean).pop()
   return tail || "file.jar"
-}
-
-function sourceOf(platform: ModPlatform, projectId: string, fileId: string): ResolveSource {
-  return platform === "curseforge"
-    ? { kind: "curseforge", projectId: Number(projectId), fileId: Number(fileId) }
-    : { kind: "modrinth", projectId, versionId: fileId }
-}
-
-/** Newest downloadable file wins; the lists come back newest-first from both
- *  platforms, and a non-downloadable CurseForge file can never be installed. */
-function bestFile(files: ModFile[]): ModFile | undefined {
-  return files.find((f) => f.downloadable && f.releaseType === "release") ??
-    files.find((f) => f.downloadable)
 }
 
 export function ModSelector({
@@ -125,16 +108,19 @@ export function ModSelector({
       file: ModFile,
       name: string,
       viaDependency: boolean,
+      projectType: CatalogProjectType,
     ): Promise<SelectedMod | null> => {
-      const res = await PacksService.resolveFile(sourceOf(hitPlatform, projectId, file.fileId))
-      if (!res.success || !res.data) return null
-      const fileName = res.data.fileName || file.fileName
+      const resolved = await getCatalog().resolve(
+        resolveSourceOf(hitPlatform, projectId, file.fileId),
+      )
+      if (!resolved) return null
+      const fileName = resolved.fileName || file.fileName
       return {
         key: `${hitPlatform}:${projectId}:${file.fileId}`,
-        path: `${defaultFolder(fileName)}/${fileName}`,
-        sha512: res.data.sha512,
-        fileSize: res.data.fileSize,
-        source: res.data.source,
+        path: `${defaultFolder(fileName, projectType)}/${fileName}`,
+        sha512: resolved.sha512,
+        fileSize: resolved.fileSize,
+        source: resolved.source,
         name,
         platform: hitPlatform,
         fileName,
@@ -165,40 +151,30 @@ export function ModSelector({
         frontier = []
         if (pending.length === 0) break
 
-        const summaries = await PacksService.projectSummaries(
+        const summaries = await getCatalog().projectSummaries(
           hitPlatform,
           pending.map((d) => d.projectId),
         )
-        const names = new Map<string, ModSearchHit>(
-          (summaries.success && summaries.data ? summaries.data : []).map((s) => [
-            s.projectId,
-            s,
-          ]),
-        )
+        const names = new Map<string, ModSearchHit>(summaries.map((s) => [s.projectId, s]))
 
         for (const dep of pending) {
           known.add(`${dep.platform}:${dep.projectId}`)
           const name = names.get(dep.projectId)?.name ?? dep.projectId
           setProgress(t("resolvingDependency", { name }))
 
-          const listRes =
-            hitPlatform === "curseforge"
-              ? await PacksService.curseforgeFiles(dep.projectId, {
-                  gameVersion,
-                  loader: catalogLoader,
-                  pageSize: 30,
-                })
-              : await PacksService.modrinthVersions(dep.projectId, {
-                  gameVersion,
-                  loader: catalogLoader,
-                })
-          const files = listRes.success && listRes.data ? listRes.data : []
+          const files = await getCatalog().files(hitPlatform, dep.projectId, {
+            gameVersion,
+            loader: catalogLoader,
+            pageSize: 30,
+          })
           const pick = bestFile(files)
           if (!pick) {
             skipped.push(name)
             continue
           }
-          const entry = await resolveEntry(hitPlatform, dep.projectId, pick, name, true)
+          // Always "mod": a required dependency is a loadable jar whatever
+          // depends on it — a shader's dependency is Iris, which is a mod.
+          const entry = await resolveEntry(hitPlatform, dep.projectId, pick, name, true, "mod")
           if (!entry) {
             skipped.push(name)
             continue
@@ -213,13 +189,20 @@ export function ModSelector({
   )
 
   const addPick = useCallback(
-    async ({ hit, file }: BrowsePick) => {
+    async ({ hit, file, projectType }: BrowsePick) => {
       const key = `${hit.platform}:${hit.projectId}:${file.fileId}`
       if (busyKey) return
       setBusyKey(key)
       setProgress(t("resolving"))
       try {
-        const entry = await resolveEntry(hit.platform, hit.projectId, file, hit.name, false)
+        const entry = await resolveEntry(
+          hit.platform,
+          hit.projectId,
+          file,
+          hit.name,
+          false,
+          projectType,
+        )
         if (!entry) {
           toast({ tone: "bad", title: t("resolveFailed"), msg: file.fileName })
           return
@@ -251,19 +234,19 @@ export function ModSelector({
     if (!trimmed || urlBusy) return
     setUrlBusy(true)
     try {
-      const res = await PacksService.resolveFile({ kind: "url", url: trimmed })
-      if (!res.success || !res.data) {
+      const resolved = await getCatalog().resolve({ kind: "url", url: trimmed })
+      if (!resolved) {
         toast({ tone: "bad", title: t("resolveFailed"), msg: trimmed })
         return
       }
-      const name = res.data.fileName || fileNameOfUrl(trimmed)
+      const name = resolved.fileName || fileNameOfUrl(trimmed)
       appendAll([
         {
           key: `url:${trimmed}`,
           path: `${defaultFolder(name)}/${name}`,
-          sha512: res.data.sha512,
-          fileSize: res.data.fileSize,
-          source: res.data.source,
+          sha512: resolved.sha512,
+          fileSize: resolved.fileSize,
+          source: resolved.source,
           name,
           platform: "url",
           fileName: name,
@@ -329,6 +312,7 @@ export function ModSelector({
     <div className="flex h-full min-h-0 gap-4 max-[1200px]:flex-col">
       <div className="flex min-h-0 min-w-0 flex-1 flex-col gap-2">
         <ModBrowser
+          t={t}
           platform={platform}
           onPlatformChange={setPlatform}
           gameVersion={gameVersion}
