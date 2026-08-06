@@ -1,0 +1,15 @@
+/* generated using openapi-typescript-codegen -- do not edit */
+/* istanbul ignore file */
+/* tslint:disable */
+/* eslint-disable */
+export type ChangePasswordDto = {
+    /**
+     * The user's current password
+     */
+    currentPassword: string;
+    /**
+     * The new password
+     */
+    newPassword: string;
+};
+
