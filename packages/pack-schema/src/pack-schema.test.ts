@@ -71,6 +71,31 @@ describe("PackManifest", () => {
     expect(() => PackManifest.parse(m)).toThrow()
   })
 
+  it("rejects two bundled worlds whose folders collide only by case", () => {
+    const m = manifest()
+    const world = {
+      folder: "world",
+      sha512,
+      sizeBytes: 10,
+      source: { kind: "override" as const, blobSha512: "b".repeat(128) },
+    }
+    m.version.worlds = [world, { ...world, folder: "World" }]
+    expect(() => PackManifest.parse(m)).toThrow(/duplicate world folder/)
+  })
+
+  it("rejects a bundled world folder that is a path segment", () => {
+    const m = manifest()
+    m.version.worlds = [
+      {
+        folder: "../evil",
+        sha512,
+        sizeBytes: 10,
+        source: { kind: "override" as const, blobSha512: "b".repeat(128) },
+      },
+    ]
+    expect(() => PackManifest.parse(m)).toThrow(/single path segment/)
+  })
+
   it("accepts a vanilla pack with no loader", () => {
     const m = manifest()
     m.version.dependencies = { minecraft: "1.21.4" }

@@ -2,30 +2,67 @@ import { invoke } from "@tauri-apps/api/core"
 import { listen } from "@tauri-apps/api/event"
 import { getCurrentWindow } from "@tauri-apps/api/window"
 
-import { MOCK_CRASH_LOG, MOCK_DIAGNOSIS, MOCK_SETTINGS, mockLogs } from "./services/mock"
+import {
+  MOCK_ACCOUNT,
+  MOCK_CRASH_LOG,
+  MOCK_DIAGNOSIS,
+  MOCK_SETTINGS,
+  mockCatalogCategories,
+  mockContent,
+  mockDirEntries,
+  mockWorlds,
+  mockCatalogProject,
+  mockCatalogResolve,
+  mockCatalogSearch,
+  mockCatalogVersions,
+  mockGameVersions,
+  mockLoaderVersions,
+  mockLocalPacks,
+  mockLogs,
+  mockServerStatus,
+} from "./services/mock"
+import type { PackManifest } from "@boffmedia/pack-schema"
 import type {
+  CatalogCategory,
+  ModFile,
+  ModProject,
+  ModSearchHit,
+  ModSearchPage,
+  ResolveSource,
+  ResolvedFile,
+} from "@boffmedia/ui"
+
+import type {
+  Account,
   GameState,
+  GameVersion,
   InstallPhase,
   InstallState,
   InstanceRuntime,
   JavaChoice,
+  LoaderVersion,
   LogLine,
   MemoryChoice,
   OptionalFile,
   ResolvedRuntime,
   RetainedVersion,
   RuntimeSource,
+  ServerStatus,
   Settings,
 } from "./services/types"
 
 export type {
+  GameVersion,
   InstanceRuntime,
   JavaChoice,
+  LoaderVersion,
   MemoryChoice,
   OptionalFile,
+  PackManifest,
   ResolvedRuntime,
   RetainedVersion,
   RuntimeSource,
+  ServerStatus,
 }
 
 // The single boundary between the renderer and the Rust shell. Keeping it in
@@ -77,10 +114,11 @@ export type DeviceCode = {
   expiresIn: number
 }
 
-export type Account = {
-  uuid: string
-  username: string
-}
+// Re-exported rather than redeclared. Two separate definitions of "an account"
+// had already drifted apart — this one lacked the skin the other required — and
+// the only reason it type-checked was that every call site rebuilt the object
+// by hand. There is one wire shape; this is it.
+export type { Account }
 
 /** Rust serialises with serde's snake_case field names. */
 type RawDeviceCode = {
@@ -133,9 +171,62 @@ export async function authRestore(): Promise<Account | null> {
   }
 }
 
+/** Enter offline mode as the last active account. Only succeeds when that
+ *  account really signed in on this machine before — the Rust side checks the
+ *  credential store, see `auth_offline`. The session it returns can launch
+ *  installed packs into singleplayer and nothing else. */
+export async function authOffline(): Promise<Account> {
+  if (!isDesktop()) return MOCK_ACCOUNT
+  try {
+    return await invoke<Account>("auth_offline")
+  } catch (err) {
+    throw asFailure(err)
+  }
+}
+
+/** Signs out of EVERY account and forgets them. Per-account sign-out is
+ *  `authRemove`. */
 export async function authLogout(): Promise<void> {
   if (!isDesktop()) return
   await invoke("auth_logout")
+}
+
+/** A row in the account switcher. Only the `active` one has a live session
+ *  behind it; the rest are names the launcher can resolve on demand. */
+export type AccountEntry = Account & { active: boolean }
+
+/** Offline and cheap — reads the roster, never the network. */
+export async function authAccounts(): Promise<AccountEntry[]> {
+  if (!isDesktop()) return []
+  try {
+    return await invoke<AccountEntry[]>("auth_accounts")
+  } catch {
+    // The switcher degrades to "just the account you are signed in as" rather
+    // than blocking the whole shell on a roster it could not read.
+    return []
+  }
+}
+
+/** Make a known account active. Runs the full refresh chain, so it is as slow
+ *  as a silent sign-in — the caller should show progress. */
+export async function authSwitch(uuid: string): Promise<Account> {
+  if (!isDesktop()) throw asFailure({ message: "Cambiar de cuenta solo funciona en la aplicación de escritorio." })
+  try {
+    return await invoke<Account>("auth_switch", { uuid })
+  } catch (err) {
+    throw asFailure(err)
+  }
+}
+
+/** Forget one account. Resolves to whoever is active afterwards, or null when
+ *  that was the last one and the sign-in screen is due. */
+export async function authRemove(uuid: string): Promise<Account | null> {
+  if (!isDesktop()) throw asFailure({ message: "Quitar cuentas solo funciona en la aplicación de escritorio." })
+  try {
+    return await invoke<Account | null>("auth_remove", { uuid })
+  } catch (err) {
+    throw asFailure(err)
+  }
 }
 
 /** Open Microsoft's page in the SYSTEM browser, with the code pre-filled.
@@ -195,13 +286,24 @@ export type LauncherVersion = {
   createdAt: string
 }
 
+export type LauncherGalleryImage = {
+  url: string
+  alt?: string | null
+}
+
 export type LauncherPack = {
   id: string
   slug: string
   name: string
   summary: string | null
+  description?: string | null
   iconUrl: string | null
+  gallery?: LauncherGalleryImage[]
   accessKind: "public" | "password" | "allowlist"
+  /** The Quick Play target — set only for server packs (from the registry).
+   *  `port` is absent for a bare SRV host; `host` can be absent on a legacy
+   *  `{}` row, which still counts as a server pack (shown "unavailable"). */
+  server?: { host?: string | null; port?: number | null } | null
   latestVersion: LauncherVersion | null
 }
 
@@ -222,6 +324,16 @@ export async function packsList(): Promise<LauncherPack[]> {
 export async function playsGet(): Promise<Record<string, string>> {
   try {
     return await invoke<Record<string, string>>("plays_get")
+  } catch {
+    return {}
+  }
+}
+
+/** Total playtime in milliseconds per pack. Never throws: missing playtime is
+ *  cosmetic. */
+export async function playtimeGet(): Promise<Record<string, number>> {
+  try {
+    return await invoke<Record<string, number>>("playtime_get")
   } catch {
     return {}
   }
@@ -728,5 +840,612 @@ export async function revealWindow(): Promise<void> {
     await getCurrentWindow().show()
   } catch {
     /* a visible window is not worth crashing over */
+  }
+}
+
+// ── Server List Ping (RF-03/RF-04) ─────────────────────────────────────────
+// Rust never throws here (status.rs folds every failure into `online: false`),
+// so the bridge does not either — a card that cannot ping shows offline, not
+// an error state.
+
+export async function serverStatus(host: string, port?: number): Promise<ServerStatus> {
+  if (!isDesktop()) return mockServerStatus(host)
+  try {
+    return await invoke<ServerStatus>("server_status", { host, port: port ?? null })
+  } catch {
+    return { online: false, players: null, motd: null, latencyMs: null }
+  }
+}
+
+// ── Local packs (RF-05..RF-10) ──────────────────────────────────────────────
+// A local pack is a full PackManifest, the same document a managed pack
+// downloads (spec D3) — install_pack/launch_pack take it as-is. `slug` always
+// carries the reserved `local-` prefix (local_packs.rs), which is what keeps
+// a local pack from ever addressing a managed one.
+
+export async function localPacksList(): Promise<PackManifest[]> {
+  if (!isDesktop()) return mockLocalPacks()
+  try {
+    return await invoke<PackManifest[]>("local_packs_list")
+  } catch {
+    return []
+  }
+}
+
+export async function localPackGet(slug: string): Promise<PackManifest | null> {
+  if (!isDesktop()) return mockLocalPacks().find((m) => m.pack.slug === slug) ?? null
+  try {
+    return await invoke<PackManifest>("local_pack_get", { slug })
+  } catch (err) {
+    throw asFailure(err)
+  }
+}
+
+/** Create (no existing local slug) or save-in-place (an existing one). The
+ *  Rust side assigns a fresh, collision-free `local-` slug for a new pack. */
+export async function localPackSave(manifest: unknown): Promise<PackManifest> {
+  if (!isDesktop()) return manifest as PackManifest
+  try {
+    return await invoke<PackManifest>("local_pack_save", { manifest })
+  } catch (err) {
+    throw asFailure(err)
+  }
+}
+
+export async function localPackDelete(slug: string): Promise<void> {
+  if (!isDesktop()) return
+  try {
+    await invoke("local_pack_delete", { slug })
+  } catch (err) {
+    throw asFailure(err)
+  }
+}
+
+// ── Version metadata (local pack pickers) ──────────────────────────────────
+// Rust talks to Mojang/Fabric/Quilt/Forge/NeoForge directly — see meta.rs for
+// why this does not go through the API like the dashboard's picker does.
+
+export async function minecraftVersions(): Promise<GameVersion[]> {
+  if (!isDesktop()) return mockGameVersions()
+  try {
+    return await invoke<GameVersion[]>("meta_minecraft_versions")
+  } catch (err) {
+    throw asFailure(err)
+  }
+}
+
+export async function loaderVersions(loader: string, minecraft: string): Promise<LoaderVersion[]> {
+  if (!loader) return []
+  if (!isDesktop()) return mockLoaderVersions()
+  try {
+    return await invoke<LoaderVersion[]>("meta_loader_versions", { loader, minecraft })
+  } catch (err) {
+    throw asFailure(err)
+  }
+}
+
+// ── Mod catalog (RF-11) ────────────────────────────────────────────────────
+// Modrinth only, and reached from Rust rather than from here — see catalog.rs
+// for why CurseForge cannot be offered to a desktop client at all, and why the
+// User-Agent Modrinth asks for is impossible to set from a webview.
+
+export async function catalogSearch(input: {
+  query?: string
+  gameVersion?: string
+  loader?: string
+  projectType?: string
+  sort?: string
+  category?: string
+  page?: number
+  pageSize?: number
+}): Promise<ModSearchPage> {
+  if (!isDesktop()) return mockCatalogSearch(input.query)
+  try {
+    return await invoke<ModSearchPage>("catalog_search", input)
+  } catch {
+    return { hits: [], total: 0 }
+  }
+}
+
+export async function catalogCategories(projectType: string): Promise<CatalogCategory[]> {
+  if (!isDesktop()) return mockCatalogCategories()
+  try {
+    return await invoke<CatalogCategory[]>("catalog_categories", { projectType })
+  } catch {
+    return []
+  }
+}
+
+export async function catalogProject(projectId: string): Promise<ModProject | null> {
+  if (!isDesktop()) return mockCatalogProject(projectId)
+  try {
+    return await invoke<ModProject>("catalog_project", { projectId })
+  } catch {
+    return null
+  }
+}
+
+export async function catalogProjectSummaries(ids: string[]): Promise<ModSearchHit[]> {
+  if (!isDesktop()) return mockCatalogSearch().hits.filter((h) => ids.includes(h.projectId))
+  try {
+    return await invoke<ModSearchHit[]>("catalog_project_summaries", { ids })
+  } catch {
+    return []
+  }
+}
+
+export async function catalogVersions(
+  projectId: string,
+  filters: { gameVersion?: string; loader?: string },
+): Promise<ModFile[]> {
+  if (!isDesktop()) return mockCatalogVersions(projectId)
+  try {
+    return await invoke<ModFile[]>("catalog_versions", { projectId, ...filters })
+  } catch {
+    return []
+  }
+}
+
+/** Modrinth publishes sha512 and size with the version, so this costs one
+ *  metadata request. A raw URL has no hash to borrow and must be downloaded to
+ *  be hashed, which is why it is a separate, slower command. */
+export async function catalogResolve(source: ResolveSource): Promise<ResolvedFile | null> {
+  if (!isDesktop()) return mockCatalogResolve(source)
+  try {
+    if (source.kind === "modrinth") {
+      return await invoke<ResolvedFile>("catalog_resolve_modrinth", {
+        projectId: source.projectId,
+        versionId: source.versionId,
+      })
+    }
+    if (source.kind === "url") {
+      return await invoke<ResolvedFile>("catalog_resolve_url", { url: source.url })
+    }
+    // CurseForge never reaches this launcher: it has no key and must not have
+    // one. The dashboard authors those entries.
+    return null
+  } catch (err) {
+    throw asFailure(err)
+  }
+}
+
+// ── Instance content, files and worlds (pack detail tabs) ──────────────────
+
+/** A file the pack declares, with this instance's view of it. `installed` and
+ *  `enabled` are independent: a file can be declared but not yet downloaded,
+ *  or downloaded and switched off. */
+export type ContentFile = {
+  path: string
+  size: number
+  isMod: boolean
+  /** Whether the pack OFFERS the choice — not whether it is currently on. */
+  optional: boolean
+  enabled: boolean
+  installed: boolean
+  source:
+    | { kind: "url"; url: string }
+    | { kind: "modrinth"; versionId: string }
+    | { kind: "curseforge"; projectId: number; fileId: number }
+    | { kind: "override"; sha512: string }
+}
+
+export type DirEntry = {
+  path: string
+  name: string
+  isDir: boolean
+  size: number
+  modified: number
+}
+
+export type World = {
+  folder: string
+  name: string
+  lastPlayed: number
+  sizeBytes: number
+  gameMode: "survival" | "creative" | "adventure" | "spectator" | "unknown"
+  hardcore: boolean
+  version: string | null
+  hasIcon: boolean
+}
+
+/** What the Content tab renders. Empty before the first install — there is no
+ *  marker to read, and a LOCAL pack's own manifest is the fallback the caller
+ *  layers on top. */
+export async function instanceContent(slug: string): Promise<ContentFile[]> {
+  if (!isDesktop()) return mockContent()
+  try {
+    return await invoke<ContentFile[]>("instance_content", { slug })
+  } catch {
+    return []
+  }
+}
+
+export async function instanceBrowse(slug: string, rel: string): Promise<DirEntry[]> {
+  if (!isDesktop()) return mockDirEntries(rel)
+  try {
+    return await invoke<DirEntry[]>("instance_browse", { slug, rel })
+  } catch (err) {
+    throw asFailure(err)
+  }
+}
+
+export async function instanceDeletePath(slug: string, rel: string): Promise<void> {
+  if (!isDesktop()) return
+  try {
+    await invoke("instance_delete_path", { slug, rel })
+  } catch (err) {
+    throw asFailure(err)
+  }
+}
+
+/** Reveal a path in the OS file manager. `rel` may be "" for the game folder. */
+export async function instanceReveal(slug: string, rel: string): Promise<void> {
+  if (!isDesktop()) return
+  try {
+    await invoke("instance_reveal", { slug, rel })
+  } catch (err) {
+    throw asFailure(err)
+  }
+}
+
+/** Uninstall a MANAGED pack: delete its instance directory so the next library
+ *  scan reports it "not installed" again. The pack stays in the library and its
+ *  backups are kept — this is not the whole-pack deletion `localPackDelete` is.
+ *  The caller must not offer this while the game is running. */
+export async function instanceDelete(slug: string): Promise<void> {
+  if (!isDesktop()) return
+  try {
+    await invoke("instance_delete", { slug })
+  } catch (err) {
+    throw asFailure(err)
+  }
+}
+
+/** A screenshot on disk. `rel` is the handle `screenshotImage` takes back. */
+export type Screenshot = {
+  name: string
+  rel: string
+  size: number
+  modified: number
+}
+
+/** Every screenshot in this instance, newest first. */
+export async function instanceScreenshots(slug: string): Promise<Screenshot[]> {
+  if (!isDesktop()) return []
+  try {
+    return await invoke<Screenshot[]>("instance_screenshots", { slug })
+  } catch {
+    return []
+  }
+}
+
+/** One screenshot as a data: URL, or null if it is gone. Never throws — a
+ *  thumbnail that will not load is cosmetic. */
+export async function screenshotImage(slug: string, rel: string): Promise<string | null> {
+  if (!isDesktop()) return rel
+  try {
+    return await invoke<string | null>("screenshot_image", { slug, rel })
+  } catch {
+    return null
+  }
+}
+
+export async function instanceWorlds(slug: string): Promise<World[]> {
+  if (!isDesktop()) return mockWorlds()
+  try {
+    return await invoke<World[]>("instance_worlds", { slug })
+  } catch {
+    return []
+  }
+}
+
+/** Fetch a world's icon as a data: URL, or null if not present. Never throws:
+ *  a missing icon is cosmetic. */
+export async function worldIcon(slug: string, folder: string): Promise<string | null> {
+  if (!isDesktop()) return null
+  try {
+    return await invoke<string | null>("world_icon", { slug, folder })
+  } catch {
+    return null
+  }
+}
+
+/** Map Modrinth version ids back to their projects. The install marker records
+ *  a version id and nothing else, so this is the only way an installed managed
+ *  pack can show a mod's name, icon or author. */
+export async function catalogVersionsByIds(ids: string[]): Promise<ModFile[]> {
+  if (!isDesktop() || ids.length === 0) return []
+  try {
+    return await invoke<ModFile[]>("catalog_versions_by_ids", { ids })
+  } catch {
+    return []
+  }
+}
+
+/** Cache a remote icon on disk and return an `asset:` URL the webview may
+ *  actually render. In browser mode there is no CSP to work around, so the
+ *  original URL is already correct and is handed straight back. Never throws:
+ *  a missing icon is cosmetic and the caller falls back on its own. */
+/** Where icon failures go. The provider points this at the launcher log; until
+ *  it does, and in the browser, it is a no-op.
+ *
+ *  This exists because a release build has NO devtools: `console.error` is
+ *  written to a console nobody can open, so "the icons are blank" had no
+ *  observable cause at all. The Logs screen is the diagnostic surface a player
+ *  (and whoever is debugging their report) can actually reach. */
+let iconFailureSink: ((message: string) => void) | null = null
+
+export function setIconFailureSink(sink: ((message: string) => void) | null): void {
+  iconFailureSink = sink
+}
+
+/** Reports an icon the WEBVIEW refused, as opposed to one the cache could not
+ *  produce. Deliberately separate from the failure above: the cache writing the
+ *  file and the webview agreeing to render it are different things, and a bug
+ *  in either one shows up as the same blank square. */
+export function reportIconFailure(attemptedSrc: string, remoteUrl: string): void {
+  // A data: URL carries the whole image; log its head, never the payload.
+  const shown = attemptedSrc.length > 120 ? `${attemptedSrc.slice(0, 120)}…` : attemptedSrc
+  iconFailureSink?.(
+    `El webview rechazó el icono. URL generada: ${shown || "(vacía)"} — origen: ${remoteUrl || "(desconocido)"}`,
+  )
+}
+
+/** Logged once per session so the shape of the generated URL is on the record.
+ *  Every remaining explanation for "the bytes exist but nothing renders" is a
+ *  property of this string — the scheme, the MIME — and it has never been
+ *  visible anywhere. */
+let loggedFirstIconUrl = false
+
+/** Resolves catalog art to a `data:` URL via the on-disk cache (icons.rs).
+ *  Nothing here touches the asset protocol: data: URLs need no scope, which is
+ *  the property the previous two icon systems lacked. */
+export async function iconSrc(url: string): Promise<string | null> {
+  if (!isDesktop()) return url
+  try {
+    const data = await invoke<string>("icon_cache", { url })
+    if (!loggedFirstIconUrl) {
+      loggedFirstIconUrl = true
+      const head = data.slice(0, data.indexOf(",") + 1)
+      iconFailureSink?.(`Diagnóstico: primer icono servido como ${head}… (${data.length} caracteres)`)
+    }
+    return data
+  } catch (err) {
+    // Non-fatal — the caller falls back to the remote URL — but no longer
+    // invisible. Three different faults (the command missing, the download
+    // failing, the cache being unwritable) all used to look like a blank
+    // square, and only this message tells them apart.
+    const detail = (err as { message?: string })?.message ?? String(err)
+    console.error("icon_cache failed for", url, err)
+    iconFailureSink?.(`No se pudo cachear el icono ${url}: ${detail}`)
+    return null
+  }
+}
+
+/** Opens the native save dialog itself (no file-picker plugin on this side of
+ *  the boundary); resolves to the chosen path, or throws if the player
+ *  cancelled. */
+export async function exportMrpack(slug: string): Promise<string> {
+  if (!isDesktop()) throw asFailure({ message: "La exportación solo funciona en la aplicación de escritorio." })
+  try {
+    return await invoke<string>("export_mrpack", { slug })
+  } catch (err) {
+    throw asFailure(err)
+  }
+}
+
+/** Like {@link exportMrpack}, but drops every file whose `env.server` is
+ *  "unsupported" — a server-ready pack minus the client-only mods. Same native
+ *  save dialog; resolves to the chosen path, or throws if cancelled. */
+export async function exportServerMrpack(slug: string): Promise<string> {
+  if (!isDesktop()) throw asFailure({ message: "La exportación solo funciona en la aplicación de escritorio." })
+  try {
+    return await invoke<string>("export_server_mrpack", { slug })
+  } catch (err) {
+    throw asFailure(err)
+  }
+}
+
+/** Fork a local pack: new manifest, new slug, and a copy of the installed
+ *  files. Local packs only — see the Rust side for why a managed pack cannot
+ *  be duplicated in place. */
+export async function localPackDuplicate(slug: string, name: string): Promise<PackManifest> {
+  if (!isDesktop()) throw asFailure({ message: "Duplicar solo funciona en la aplicación de escritorio." })
+  try {
+    return await invoke<PackManifest>("local_pack_duplicate", { slug, name })
+  } catch (err) {
+    throw asFailure(err)
+  }
+}
+
+export type Backup = {
+  id: string
+  kind: "instance" | "world"
+  label: string
+  createdAt: string
+  world?: string
+  sizeBytes: number
+}
+
+/** Snapshot the whole instance, or one world when `world` names a save folder. */
+export async function backupCreate(
+  slug: string,
+  label: string,
+  world?: string,
+): Promise<Backup> {
+  if (!isDesktop()) throw asFailure({ message: "Las copias solo funcionan en la aplicación de escritorio." })
+  try {
+    return await invoke<Backup>("backup_create", { slug, world: world ?? null, label })
+  } catch (err) {
+    throw asFailure(err)
+  }
+}
+
+export async function backupList(slug: string): Promise<Backup[]> {
+  if (!isDesktop()) return []
+  try {
+    return await invoke<Backup[]>("backup_list", { slug })
+  } catch {
+    // A listing that throws would leave the panel stuck on its spinner; an
+    // empty list at least renders the "no backups yet" state.
+    return []
+  }
+}
+
+export async function backupRestore(slug: string, id: string): Promise<void> {
+  if (!isDesktop()) throw asFailure({ message: "Las copias solo funcionan en la aplicación de escritorio." })
+  try {
+    await invoke("backup_restore", { slug, id })
+  } catch (err) {
+    throw asFailure(err)
+  }
+}
+
+export async function backupDelete(slug: string, id: string): Promise<void> {
+  if (!isDesktop()) throw asFailure({ message: "Las copias solo funcionan en la aplicación de escritorio." })
+  try {
+    await invoke("backup_delete", { slug, id })
+  } catch (err) {
+    throw asFailure(err)
+  }
+}
+
+export type ImportMrpackResult = {
+  manifest: PackManifest
+  /** True when the imported pack's name collided with one already in the
+   *  library and was renamed with a suffix (spec D4) — show a non-blocking
+   *  notice, never a silent rename. */
+  renamed: boolean
+}
+
+/** Opens the native file-picker itself; throws if the player cancelled, the
+ *  file was not a valid .mrpack, or its loader is unsupported. Accepts both a
+ *  pack this launcher exported and a plain Modrinth one, which the Rust side
+ *  converts. */
+export async function importMrpack(): Promise<ImportMrpackResult> {
+  if (!isDesktop()) throw asFailure({ message: "La importación solo funciona en la aplicación de escritorio." })
+  try {
+    return await invoke<ImportMrpackResult>("import_mrpack")
+  } catch (err) {
+    throw asFailure(err)
+  }
+}
+
+/** Import straight off Modrinth. `source` may be a modpack page URL, a version
+ *  URL, a bare project slug, or a direct link to a .mrpack. Downloading happens
+ *  on the Rust side, so no CSP allowance is needed for the CDN. */
+export async function importMrpackUrl(source: string): Promise<ImportMrpackResult> {
+  if (!isDesktop()) throw asFailure({ message: "La importación solo funciona en la aplicación de escritorio." })
+  try {
+    return await invoke<ImportMrpackResult>("import_mrpack_url", { url: source })
+  } catch (err) {
+    throw asFailure(err)
+  }
+}
+
+// ── Local pack metadata (icon & gallery) ──────────────────────────────────
+
+/** Open the native image picker and set a local pack's icon. Resolves to
+ *  `true` when a file was chosen, `false` if the player cancelled. */
+export async function localPackIconSet(slug: string): Promise<boolean> {
+  if (!isDesktop()) return false
+  try {
+    return await invoke<boolean>("local_pack_icon_set", { slug })
+  } catch (err) {
+    throw asFailure(err)
+  }
+}
+
+/** Clear a local pack's icon. */
+export async function localPackIconClear(slug: string): Promise<void> {
+  if (!isDesktop()) return
+  try {
+    await invoke("local_pack_icon_clear", { slug })
+  } catch (err) {
+    throw asFailure(err)
+  }
+}
+
+/** Get a local pack's icon as a data: URL, or null if not set. */
+export async function localPackIcon(slug: string): Promise<string | null> {
+  if (!isDesktop()) return null
+  try {
+    return await invoke<string | null>("local_pack_icon", { slug })
+  } catch {
+    return null
+  }
+}
+
+/** List gallery images for a local pack (filenames in gallery/ dir). */
+export async function localPackGalleryList(slug: string): Promise<string[]> {
+  if (!isDesktop()) return []
+  try {
+    return await invoke<string[]>("local_pack_gallery_list", { slug })
+  } catch {
+    return []
+  }
+}
+
+/** Open the native image picker and add the chosen image to a local pack's
+ *  gallery. Resolves to the stored filename, or `null` if cancelled. */
+export async function localPackGalleryAdd(slug: string): Promise<string | null> {
+  if (!isDesktop()) throw asFailure({ message: "Solo funciona en la aplicación de escritorio." })
+  try {
+    return await invoke<string | null>("local_pack_gallery_add", { slug })
+  } catch (err) {
+    throw asFailure(err)
+  }
+}
+
+/** Remove an image from a local pack's gallery. */
+export async function localPackGalleryRemove(slug: string, filename: string): Promise<void> {
+  if (!isDesktop()) return
+  try {
+    await invoke("local_pack_gallery_remove", { slug, filename })
+  } catch (err) {
+    throw asFailure(err)
+  }
+}
+
+/** Get a gallery image as a data: URL, or null if not found. */
+export async function localPackGalleryImage(slug: string, filename: string): Promise<string | null> {
+  if (!isDesktop()) return null
+  try {
+    return await invoke<string | null>("local_pack_gallery_image", { slug, filename })
+  } catch {
+    return null
+  }
+}
+
+// ── Local pack worlds (bundled in pack, extracted on first install) ───────
+
+/** Open the native .zip picker and add the chosen archive as a bundled world
+ *  under `folder`. Resolves to `true` when added, `false` if cancelled. */
+export async function localPackWorldAddZip(slug: string, folder: string): Promise<boolean> {
+  if (!isDesktop()) throw asFailure({ message: "Solo funciona en la aplicación de escritorio." })
+  try {
+    return await invoke<boolean>("local_pack_world_add_zip", { slug, folder })
+  } catch (err) {
+    throw asFailure(err)
+  }
+}
+
+/** Promote an installed world into a local pack's bundled worlds. */
+export async function localPackWorldPromote(slug: string, worldFolder: string): Promise<void> {
+  if (!isDesktop()) throw asFailure({ message: "Solo funciona en la aplicación de escritorio." })
+  try {
+    await invoke("local_pack_world_promote", { slug, worldFolder })
+  } catch (err) {
+    throw asFailure(err)
+  }
+}
+
+/** Remove a bundled world from a local pack. */
+export async function localPackWorldRemove(slug: string, folder: string): Promise<void> {
+  if (!isDesktop()) return
+  try {
+    await invoke("local_pack_world_remove", { slug, folder })
+  } catch (err) {
+    throw asFailure(err)
   }
 }

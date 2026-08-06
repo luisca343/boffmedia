@@ -23,9 +23,19 @@
 
 pub mod api;
 pub mod auth;
+pub mod backups;
+pub mod browse;
+pub mod catalog;
+pub mod datadir;
+pub mod icons;
 pub mod install;
+pub mod local_packs;
+pub mod meta;
+pub mod mrpack;
 pub mod pack;
 pub mod settings;
+pub mod worlds;
+pub mod status;
 pub mod updates;
 
 use serde::Serialize;
@@ -70,6 +80,19 @@ pub fn run() {
         // The endpoint list from tauri.conf.json is only the default; every
         // check re-points it at `api::base_url()` (see updates.rs).
         .plugin(tauri_plugin_updater::Builder::new().build())
+        // RF-06/RF-07 file pickers for local pack export/import.
+        .plugin(tauri_plugin_dialog::init())
+        .setup(|app| {
+            // Before anything reads the tree: move an install made by an
+            // earlier build into `%APPDATA%\BoffLauncher[ Dev]` and flatten
+            // away the old `<instance>/.minecraft` level.
+            let handle = app.handle().clone();
+            datadir::migrate(&handle);
+            // Icons need no setup here: icon_cache returns data: URLs, so
+            // there is no asset-protocol scope to align with the custom data
+            // root (an alignment that silently broke twice — see icons.rs).
+            Ok(())
+        })
         .manage(updates::UpdateState::default())
         .manage(auth::AuthState::default())
         .manage(api::ApiState::default())
@@ -80,6 +103,10 @@ pub fn run() {
             auth::auth_await,
             auth::auth_restore,
             auth::auth_logout,
+            auth::auth_accounts,
+            auth::auth_offline,
+            auth::auth_switch,
+            auth::auth_remove,
             auth::auth_open_verification,
             api::packs_list,
             api::pack_manifest,
@@ -101,8 +128,55 @@ pub fn run() {
             settings::settings_get,
             settings::settings_set,
             settings::plays_get,
+            settings::playtime_get,
             updates::updates_check,
             updates::updates_install,
+            status::server_status,
+            local_packs::local_packs_list,
+            local_packs::local_pack_get,
+            local_packs::local_pack_save,
+            local_packs::local_pack_delete,
+            local_packs::local_pack_duplicate,
+            local_packs::local_pack_icon_set,
+            local_packs::local_pack_icon_clear,
+            local_packs::local_pack_icon,
+            local_packs::local_pack_gallery_list,
+            local_packs::local_pack_gallery_add,
+            local_packs::local_pack_gallery_remove,
+            local_packs::local_pack_gallery_image,
+            local_packs::local_pack_world_add_zip,
+            local_packs::local_pack_world_promote,
+            local_packs::local_pack_world_remove,
+            backups::backup_create,
+            backups::backup_list,
+            backups::backup_restore,
+            backups::backup_delete,
+            local_packs::export_mrpack,
+            local_packs::export_server_mrpack,
+            local_packs::import_mrpack,
+            local_packs::import_mrpack_url,
+            // Version pickers for local packs. Upstream-direct: the API's own
+            // meta routes are admin-only (see meta.rs).
+            meta::meta_minecraft_versions,
+            meta::meta_loader_versions,
+            catalog::catalog_search,
+            catalog::catalog_categories,
+            catalog::catalog_project,
+            catalog::catalog_project_summaries,
+            catalog::catalog_versions,
+            catalog::catalog_resolve_modrinth,
+            catalog::catalog_resolve_url,
+            icons::icon_cache,
+            catalog::catalog_versions_by_ids,
+            install::instance_content,
+            browse::instance_browse,
+            browse::instance_delete_path,
+            browse::instance_delete,
+            browse::instance_reveal,
+            browse::instance_screenshots,
+            browse::screenshot_image,
+            worlds::instance_worlds,
+            worlds::world_icon,
         ])
         .run(tauri::generate_context!())
         .expect("error while running the Boff Launcher");

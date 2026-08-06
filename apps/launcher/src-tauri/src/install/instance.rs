@@ -6,7 +6,7 @@
 //   "how many?" and nothing else. It now records the managed SET — path, size,
 //   sha512 and the source it came from. That set is the launcher's property:
 //   it may replace it, and it may DELETE from it when a mod leaves the pack.
-//   Anything under `.minecraft` that is not in the set is the player's (the
+//   Anything in the game directory that is not in the set is the player's (the
 //   minimap they dropped into `mods/`), and is never touched. Without the set
 //   there is no way to tell those apart, so "remove mods dropped from the pack"
 //   was simply not implemented — an update left the old jar behind forever.
@@ -383,6 +383,49 @@ fn prune_empty_dirs(root: &Path, mut dir: Option<&Path>) {
     }
 }
 
+/// The suffix every launcher uses to park a mod without deleting it. Fabric,
+/// Quilt, Forge and NeoForge all discover mods by scanning for files ending in
+/// `.jar`, so a file ending in `.disabled` is skipped by all four.
+pub const DISABLED_SUFFIX: &str = ".disabled";
+
+/// Flip one managed file between `<path>` and `<path>.disabled` on disk.
+///
+/// Returns Ok(()) when the instance ends up in the requested state, INCLUDING
+/// when neither name exists yet: a file can be switched off before it has ever
+/// been installed, and the install pass is what honours that later. Only a
+/// rename that was possible and failed is an error.
+pub fn set_enabled_on_disk(minecraft: &Path, rel: &str, enabled: bool) -> std::io::Result<()> {
+    let Some(active) = safe_join(minecraft, rel) else {
+        return Ok(());
+    };
+    let parked = PathBuf::from(format!("{}{DISABLED_SUFFIX}", active.display()));
+
+    let (from, to) = if enabled {
+        (&parked, &active)
+    } else {
+        (&active, &parked)
+    };
+    if !from.is_file() {
+        return Ok(());
+    }
+    // A leftover at the destination would make the rename fail on Windows,
+    // which refuses to overwrite. The source is the one the player just asked
+    // for, so it wins.
+    if to.is_file() {
+        let _ = std::fs::remove_file(to);
+    }
+    std::fs::rename(from, to)
+}
+
+/// True when `<path>.disabled` is sitting on disk. What makes a disabled file
+/// distinguishable from a missing one — without this, the install pass sees a
+/// gap and re-downloads the mod the player just switched off.
+pub fn is_parked(minecraft: &Path, rel: &str) -> bool {
+    safe_join(minecraft, rel)
+        .map(|p| PathBuf::from(format!("{}{DISABLED_SUFFIX}", p.display())).is_file())
+        .unwrap_or(false)
+}
+
 /// Merge the marker's optional catalogue with the player's disabled set.
 pub fn optional_list(catalogue: &[ManagedFile], state: &OptionalState) -> Vec<OptionalFile> {
     let mut seen: HashMap<String, ()> = HashMap::new();
@@ -638,6 +681,67 @@ mod tests {
         state.set("mods/minimap.jar", false);
         state.set("mods/minimap.jar", true);
         assert!(state.disabled.is_empty());
+    }
+
+    #[test]
+    fn disabling_parks_the_file_and_enabling_brings_it_back() {
+        let dir = std::env::temp_dir().join(format!("boff-park-{}", uuid::Uuid::new_v4()));
+        std::fs::create_dir_all(dir.join("mods")).unwrap();
+        let jar = dir.join("mods/sodium.jar");
+        std::fs::write(&jar, b"bytes").unwrap();
+
+        set_enabled_on_disk(&dir, "mods/sodium.jar", false).unwrap();
+        assert!(!jar.is_file(), "the active name must be gone");
+        assert!(is_parked(&dir, "mods/sodium.jar"));
+
+        set_enabled_on_disk(&dir, "mods/sodium.jar", true).unwrap();
+        assert!(jar.is_file(), "re-enabling must not need a download");
+        assert!(!is_parked(&dir, "mods/sodium.jar"));
+        // The bytes are the ORIGINAL ones: a rename, never a re-fetch.
+        assert_eq!(std::fs::read(&jar).unwrap(), b"bytes");
+
+        std::fs::remove_dir_all(&dir).ok();
+    }
+
+    #[test]
+    fn toggling_a_file_that_is_not_on_disk_is_not_an_error() {
+        // The intent is stored before the first install, when there is nothing
+        // to rename. Failing here would make switching a mod off in a pack you
+        // have not installed yet look broken.
+        let dir = std::env::temp_dir().join(format!("boff-park-{}", uuid::Uuid::new_v4()));
+        std::fs::create_dir_all(&dir).unwrap();
+        assert!(set_enabled_on_disk(&dir, "mods/absent.jar", false).is_ok());
+        assert!(set_enabled_on_disk(&dir, "mods/absent.jar", true).is_ok());
+        std::fs::remove_dir_all(&dir).ok();
+    }
+
+    #[test]
+    fn parking_over_a_leftover_disabled_copy_overwrites_it() {
+        // Windows refuses to rename onto an existing file, so a stale parked
+        // copy would otherwise make every subsequent disable fail.
+        let dir = std::env::temp_dir().join(format!("boff-park-{}", uuid::Uuid::new_v4()));
+        std::fs::create_dir_all(dir.join("mods")).unwrap();
+        std::fs::write(dir.join("mods/a.jar"), b"new").unwrap();
+        std::fs::write(dir.join("mods/a.jar.disabled"), b"stale").unwrap();
+
+        set_enabled_on_disk(&dir, "mods/a.jar", false).unwrap();
+        assert_eq!(
+            std::fs::read(dir.join("mods/a.jar.disabled")).unwrap(),
+            b"new",
+            "the file the player just disabled must win over the leftover"
+        );
+        std::fs::remove_dir_all(&dir).ok();
+    }
+
+    #[test]
+    fn a_traversing_path_cannot_park_a_file_outside_the_instance() {
+        let dir = std::env::temp_dir().join(format!("boff-park-{}", uuid::Uuid::new_v4()));
+        std::fs::create_dir_all(&dir).unwrap();
+        // safe_join refuses, so this is a no-op rather than a rename in the
+        // parent directory.
+        assert!(set_enabled_on_disk(&dir, "../../escape.jar", false).is_ok());
+        assert!(!dir.parent().unwrap().join("escape.jar.disabled").exists());
+        std::fs::remove_dir_all(&dir).ok();
     }
 
     #[test]

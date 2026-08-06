@@ -9,6 +9,7 @@
 //
 // The second is derived from the first and is the only one our server sees.
 
+pub mod accounts;
 pub mod msa;
 pub mod store;
 
@@ -20,9 +21,27 @@ use msa::{DeviceCode, McSession};
 /// Everything the renderer is allowed to know about the signed-in player.
 /// Tokens are deliberately absent — see the `skip_serializing` on McSession.
 #[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct AccountView {
     pub uuid: String,
     pub username: String,
+    /// Full skin sheet URL, empty when the player has no skin. See McSession.
+    pub skin_url: String,
+}
+
+/// A roster row for the switcher. Separate from `AccountView` because it
+/// describes an account the launcher merely KNOWS about — only the active one
+/// has a live session behind it.
+#[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct AccountEntry {
+    pub uuid: String,
+    pub username: String,
+    pub active: bool,
+    /// From the roster, so the switcher shows a face for accounts that have no
+    /// live session — the whole point of a switcher is the accounts you are NOT
+    /// currently signed in as, and none of those can be asked for a profile.
+    pub skin_url: String,
 }
 
 impl From<&McSession> for AccountView {
@@ -30,6 +49,7 @@ impl From<&McSession> for AccountView {
         Self {
             uuid: s.uuid.clone(),
             username: s.username.clone(),
+            skin_url: s.skin_url.clone(),
         }
     }
 }
@@ -102,6 +122,7 @@ pub async fn auth_begin(state: tauri::State<'_, AuthState>) -> Result<DeviceCode
 /// chain. Long-running by nature — the code is valid for ~15 minutes.
 #[tauri::command]
 pub async fn auth_await(
+    app: tauri::AppHandle,
     state: tauri::State<'_, AuthState>,
     api: tauri::State<'_, crate::api::ApiState>,
 ) -> Result<AccountView, AuthFailure> {
@@ -120,8 +141,15 @@ pub async fn auth_await(
 
     // Persist ONLY the refresh token, and only after the whole chain succeeded —
     // storing earlier would leave a token behind for an account that turned out
-    // to have no Java profile.
-    store::save_refresh_token(&session.refresh_token)?;
+    // to have no Java profile. Keyed by UUID, so signing in as a second player
+    // ADDS an account instead of evicting the first.
+    store::save_refresh_token_for(&session.uuid, &session.refresh_token)?;
+    let mut roster = accounts::load(&app);
+    accounts::upsert_active(&mut roster, &session.uuid, &session.username, &session.skin_url);
+    accounts::save(&app, &roster).map_err(|message| AuthFailure {
+        message,
+        needs_signin: false,
+    })?;
 
     *state.pending.lock().await = None;
     // A sign-in may be a DIFFERENT account than the one this process last held,
@@ -171,6 +199,7 @@ pub async fn auth_open_verification(state: tauri::State<'_, AuthState>) -> Resul
 /// §5.7 insists must not be mistaken for a first run.
 #[tauri::command]
 pub async fn auth_restore(
+    app: tauri::AppHandle,
     state: tauri::State<'_, AuthState>,
 ) -> Result<Option<AccountView>, AuthFailure> {
     // Only one restore may be in flight; a second caller waits here rather than
@@ -182,8 +211,28 @@ pub async fn auth_restore(
         return Ok(Some(AccountView::from(session)));
     }
 
-    let Some(refresh) = store::load_refresh_token()? else {
-        return Ok(None);
+    let mut roster = accounts::load(&app);
+
+    // Which token to restore: the active account's, or — on the first run of a
+    // multi-account build — the single legacy entry, whose UUID is not known
+    // until the chain below resolves. `migrating` carries that distinction to
+    // the migration step at the end.
+    let (refresh, migrating) = match roster.active.clone() {
+        Some(uuid) => match store::load_refresh_token_for(&uuid)? {
+            Some(token) => (token, false),
+            None => {
+                // Roster and keychain disagree (see accounts.rs): the account is
+                // listed but its token is gone. Prune it rather than reporting a
+                // failure the player cannot act on.
+                accounts::remove(&mut roster, &uuid);
+                let _ = accounts::save(&app, &roster);
+                return Ok(None);
+            }
+        },
+        None => match store::load_refresh_token()? {
+            Some(token) => (token, true),
+            None => return Ok(None),
+        },
     };
 
     let (ms_access, new_refresh) = match msa::refresh_tokens(&refresh).await {
@@ -191,7 +240,13 @@ pub async fn auth_restore(
         Err(msa::AuthError::Expired) => {
             // Revoked by a password change or MFA reset. Drop it rather than
             // retrying forever on every start.
-            store::clear_refresh_token()?;
+            if migrating {
+                store::clear_refresh_token()?;
+            } else if let Some(uuid) = roster.active.clone() {
+                store::clear_refresh_token_for(&uuid)?;
+                accounts::remove(&mut roster, &uuid);
+                let _ = accounts::save(&app, &roster);
+            }
             return Ok(None);
         }
         Err(err) => return Err(err.into()),
@@ -200,22 +255,225 @@ pub async fn auth_restore(
     let session = msa::minecraft_session(&ms_access, new_refresh).await?;
     // Microsoft rotates refresh tokens; persisting the new one is what keeps
     // silent sign-in working past the first refresh.
-    store::save_refresh_token(&session.refresh_token)?;
+    store::save_refresh_token_for(&session.uuid, &session.refresh_token)?;
+
+    // The UUID is only knowable here, which is why the legacy entry cannot be
+    // migrated at startup: it is an opaque token until the chain resolves it.
+    // Clearing it last means an interrupted migration retries next launch
+    // instead of stranding the account with no token under either key.
+    accounts::upsert_active(&mut roster, &session.uuid, &session.username, &session.skin_url);
+    accounts::save(&app, &roster).map_err(|message| AuthFailure {
+        message,
+        needs_signin: false,
+    })?;
+    if migrating {
+        store::clear_refresh_token()?;
+    }
 
     let view = AccountView::from(&session);
     *state.session.lock().await = Some(session);
     Ok(Some(view))
 }
 
-/// Signing out drops the launcher session as well as the Minecraft one: the two
-/// are separate tokens (see `api`), and keeping the pack JWT would leave the
-/// next player able to list the previous player's packs.
+/// Every account this launcher knows about. Cheap and offline: it reads the
+/// roster, never the network, so the switcher can render instantly.
+#[tauri::command]
+pub async fn auth_accounts(app: tauri::AppHandle) -> Result<Vec<AccountEntry>, AuthFailure> {
+    let roster = accounts::load(&app);
+    Ok(roster
+        .accounts
+        .iter()
+        .map(|a| AccountEntry {
+            uuid: a.uuid.clone(),
+            username: a.username.clone(),
+            active: roster.active.as_deref() == Some(a.uuid.as_str()),
+            skin_url: a.skin_url.clone(),
+        })
+        .collect())
+}
+
+/// Enter OFFLINE mode as the last active account.
+///
+/// What this is for: a player with no connection currently cannot get past the
+/// sign-in screen, because the silent restore needs four network hops to
+/// succeed. Everything they might actually want to do — launch a pack that is
+/// already fully installed on their disk — needs none of them.
+///
+/// What makes this safe rather than an authentication bypass:
+///
+///   * It requires a refresh token to be present in the OS credential store
+///     for that UUID. That token can only get there by a real, completed
+///     Microsoft sign-in on this machine, so this proves prior authentication;
+///     it does not grant new access. Someone typing a stranger's username gets
+///     nothing, because there is no roster entry and no keychain entry.
+///   * The session it builds has an EMPTY access token. That is precisely
+///     portablemc's offline configuration (install/session.rs), so the game
+///     launches into singleplayer and every online server rejects it — the
+///     server, not us, enforces that. Nothing here mints a credential.
+///   * It never touches the pack API: a launcher session (§7.2) needs Mojang's
+///     hasJoined handshake, which is exactly the network this mode does not
+///     have. Offline means locally installed packs only.
+#[tauri::command]
+pub async fn auth_offline(
+    app: tauri::AppHandle,
+    state: tauri::State<'_, AuthState>,
+) -> Result<AccountView, AuthFailure> {
+    let roster = accounts::load(&app);
+    let uuid = roster.active.clone().ok_or_else(|| AuthFailure {
+        message: "No hay ninguna cuenta guardada en este equipo.".into(),
+        needs_signin: true,
+    })?;
+    let entry = roster
+        .accounts
+        .iter()
+        .find(|a| a.uuid == uuid)
+        .ok_or_else(|| AuthFailure {
+            message: "No hay ninguna cuenta guardada en este equipo.".into(),
+            needs_signin: true,
+        })?;
+
+    // The proof. Without a stored token this account was never really signed in
+    // here, and offline mode must not invent an identity.
+    if store::load_refresh_token_for(&uuid)?.is_none() {
+        return Err(AuthFailure {
+            message: "Necesitas iniciar sesión al menos una vez con conexión antes de \
+                      jugar sin ella."
+                .into(),
+            needs_signin: true,
+        });
+    }
+
+    let session = McSession {
+        uuid: entry.uuid.clone(),
+        username: entry.username.clone(),
+        skin_url: entry.skin_url.clone(),
+        // Empty on purpose — see the doc comment. This is the offline launch.
+        access_token: String::new(),
+        xuid: String::new(),
+        refresh_token: String::new(),
+    };
+
+    let view = AccountView::from(&session);
+    *state.session.lock().await = Some(session);
+    Ok(view)
+}
+
+/// Make a known account the active one, resolving its Minecraft session.
+///
+/// The full refresh chain runs here rather than being cached per account: a
+/// Minecraft access token lasts ~24h and holding several live sessions in
+/// memory would mean refreshing all of them on a schedule, for accounts the
+/// player is not using.
+#[tauri::command]
+pub async fn auth_switch(
+    app: tauri::AppHandle,
+    uuid: String,
+    state: tauri::State<'_, AuthState>,
+    api: tauri::State<'_, crate::api::ApiState>,
+) -> Result<AccountView, AuthFailure> {
+    let _restoring = state.restoring.lock().await;
+
+    let mut roster = accounts::load(&app);
+    let Some(refresh) = store::load_refresh_token_for(&uuid)? else {
+        accounts::remove(&mut roster, &uuid);
+        let _ = accounts::save(&app, &roster);
+        return Err(AuthFailure {
+            message: "Esa cuenta ya no tiene sesión guardada. Vuelve a añadirla.".into(),
+            needs_signin: true,
+        });
+    };
+
+    let (ms_access, new_refresh) = match msa::refresh_tokens(&refresh).await {
+        Ok(pair) => pair,
+        Err(msa::AuthError::Expired) => {
+            store::clear_refresh_token_for(&uuid)?;
+            accounts::remove(&mut roster, &uuid);
+            let _ = accounts::save(&app, &roster);
+            return Err(AuthFailure {
+                message: "La sesión de esa cuenta ha caducado. Vuelve a añadirla.".into(),
+                needs_signin: true,
+            });
+        }
+        Err(err) => return Err(err.into()),
+    };
+
+    let session = msa::minecraft_session(&ms_access, new_refresh).await?;
+    store::save_refresh_token_for(&session.uuid, &session.refresh_token)?;
+    accounts::upsert_active(&mut roster, &session.uuid, &session.username, &session.skin_url);
+    accounts::save(&app, &roster).map_err(|message| AuthFailure {
+        message,
+        needs_signin: false,
+    })?;
+
+    // The launcher JWT belongs to the PREVIOUS uuid; keeping it would let the
+    // new account list the old one's packs (the same reason sign-out drops it).
+    api.forget_session().await;
+    let view = AccountView::from(&session);
+    *state.session.lock().await = Some(session);
+    Ok(view)
+}
+
+/// Forget one account. Returns the account that is active afterwards, or None
+/// when that was the last one and the sign-in screen is due.
+///
+/// Removing the ACTIVE account has to resolve a session for whoever is promoted
+/// in its place — otherwise the launcher would show a signed-in username in the
+/// switcher while holding no session to launch the game with.
+#[tauri::command]
+pub async fn auth_remove(
+    app: tauri::AppHandle,
+    uuid: String,
+    state: tauri::State<'_, AuthState>,
+    api: tauri::State<'_, crate::api::ApiState>,
+) -> Result<Option<AccountView>, AuthFailure> {
+    let mut roster = accounts::load(&app);
+    let was_active = roster.active.as_deref() == Some(uuid.as_str());
+    store::clear_refresh_token_for(&uuid)?;
+    let next = accounts::remove(&mut roster, &uuid);
+    accounts::save(&app, &roster).map_err(|message| AuthFailure {
+        message,
+        needs_signin: false,
+    })?;
+
+    if !was_active {
+        // Someone else is still signed in and their session is untouched.
+        return Ok(state.session.lock().await.as_ref().map(AccountView::from));
+    }
+
+    *state.session.lock().await = None;
+    api.forget_session().await;
+
+    match next {
+        Some(next_uuid) => auth_switch(app, next_uuid, state, api).await.map(Some),
+        None => Ok(None),
+    }
+}
+
+/// Sign out of EVERY account, and forget them all.
+///
+/// Kept as the "leave this machine clean" action now that `auth_remove` covers
+/// signing out of one account: on a shared PC, "cerrar sesión" that silently
+/// left three other accounts signed in would be a nasty surprise.
+///
+/// Dropping the launcher session as well as the Minecraft one is deliberate:
+/// the two are separate tokens (see `api`), and keeping the pack JWT would
+/// leave the next player able to list the previous player's packs.
 #[tauri::command]
 pub async fn auth_logout(
+    app: tauri::AppHandle,
     state: tauri::State<'_, AuthState>,
     api: tauri::State<'_, crate::api::ApiState>,
 ) -> Result<(), AuthFailure> {
+    let roster = accounts::load(&app);
+    for account in &roster.accounts {
+        // Best-effort per account: one keychain entry that refuses to delete
+        // must not leave the other accounts signed in.
+        let _ = store::clear_refresh_token_for(&account.uuid);
+    }
+    // The pre-migration entry too, in case this build never restored it.
     store::clear_refresh_token()?;
+    let _ = accounts::save(&app, &accounts::Roster::default());
+
     *state.session.lock().await = None;
     *state.pending.lock().await = None;
     api.forget_session().await;

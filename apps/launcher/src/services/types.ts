@@ -3,7 +3,18 @@
 // is what this machine knows about it, and conflating the two is how launchers
 // end up unable to tell "not installed" from "server unreachable".
 
+import type { AppLocale } from "@boffmedia/ui"
+
 export type PackAccessKind = "public" | "password" | "allowlist"
+
+/** A promotional gallery image attached to a pack (shown pre-install). For a
+ *  managed pack these are public URLs from the registry; for a local pack the
+ *  gallery lives on disk (a convention dir), so this stays empty and the
+ *  GalleryTab reads the files directly. */
+export type PackGalleryImage = {
+  url: string
+  alt?: string | null
+}
 
 /** What the LISTING (§7.2) knows about a pack. Note what is absent: the
  *  allowlist UUIDs are never sent to any launcher, since one member could
@@ -13,7 +24,12 @@ export type PackSummary = {
   slug: string
   name: string
   summary: string | null
+  /** Long-form plain-text description shown on the Info panel. */
+  description: string | null
   iconUrl: string | null
+  /** Managed-pack gallery URLs. Empty for local packs (their gallery is on
+   *  disk); the GalleryTab branches on `origin`. */
+  gallery: PackGalleryImage[]
   accessKind: PackAccessKind
 }
 
@@ -66,15 +82,43 @@ export type PackEntry = {
   state: InstallState
   /** Null until the pack has been launched at least once. */
   lastPlayed: string | null
+  /** Total time played, in milliseconds, accumulated across every session.
+   *  0 (or absent) until the pack has been launched. */
+  playMs?: number
+  /** RF-10: "managed" comes from the Boffmedia registry and is read-only in
+   *  this launcher; "local" was created/imported on this machine and can be
+   *  edited or exported. */
+  origin: "managed" | "local"
+  /** RF-01/RF-02: present only when the pack declares one — its absence is what
+   *  keeps a pack without a server looking exactly as it did before this
+   *  feature. `port` is absent for a bare SRV host (the status ping resolves it
+   *  via SRV); `host` can be absent on a legacy `{}` row, which still counts as
+   *  a server pack but renders as "unavailable". */
+  server?: { host?: string | null; port?: number | null }
+}
+
+// ── Server List Ping (RF-03/RF-04) ──────────────────────────────────────────
+// Mirrors Rust's `status::ServerStatus`, camelCase on the wire.
+
+export type ServerPlayers = {
+  online: number
+  max: number
+}
+
+export type ServerStatus = {
+  online: boolean
+  players: ServerPlayers | null
+  motd: string | null
+  latencyMs: number | null
 }
 
 export type Account = {
   uuid: string
   username: string
-  /** Mojang skin head, 8×8 scaled — rendered from the UUID. */
-  avatarUrl: string
-  /** Only ever a display hint; the token itself lives in the OS keychain. */
-  expiresAt: string
+  /** The player's ACTIVE skin sheet on textures.minecraft.net — the whole 64×64
+   *  PNG, not a head render. `<PlayerHead>` crops the head out of it in CSS.
+   *  Empty when the account has never set a skin. */
+  skinUrl: string
 }
 
 /** HANDOFF §5.1 — the device-code flow the user completes in a browser. */
@@ -96,6 +140,7 @@ export type CrashKind =
   | "duplicate-mod"
 
 export type CrashDiagnosis = {
+  id: string
   kind: CrashKind
   title: string
   explanation: string
@@ -134,7 +179,16 @@ export type Settings = {
    *  the pack's mod count and this machine's RAM. A separate flag rather than a
    *  sentinel in `memoryMib`, so turning it off restores the chosen number. */
   memoryAuto: boolean
+  /** UI language. Persisted so the choice survives a relaunch; applied on boot
+   *  through the i18n store. Absent in a settings.json from before i18n, which
+   *  the Rust `#[serde(default)]` fills with "es". */
+  locale: AppLocale
+  /** Whether to automatically backup saves/config before updating a pack. */
+  backupBeforeUpdate: boolean
 }
+
+/** Total playtime in milliseconds per pack, keyed by pack id. */
+export type Playtime = Record<string, number>
 
 /** HANDOFF §9 — why a resolved value is what it is. Mirrors Rust's
  *  `install::runtime::RuntimeSource`. */
@@ -203,4 +257,24 @@ export type OptionalFile = {
   name: string
   size: number
   enabled: boolean
+}
+
+// ── Version metadata (local pack pickers) ──────────────────────────────────
+
+/** One entry of Mojang's version manifest. `latest` marks Mojang's own latest
+ *  release AND latest snapshot, so at most two entries carry it. */
+export type GameVersion = {
+  id: string
+  type: "release" | "snapshot" | "old_beta" | "old_alpha"
+  releaseTime: string
+  latest: boolean
+}
+
+/** One build of a modloader for a given Minecraft version, newest first.
+ *  `recommended` is the one the picker should preselect. */
+export type LoaderVersion = {
+  version: string
+  stable: boolean
+  latest: boolean
+  recommended: boolean
 }

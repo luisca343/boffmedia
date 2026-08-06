@@ -94,6 +94,11 @@ pub struct McSession {
     pub xuid: String,
     #[serde(skip_serializing)]
     pub refresh_token: String,
+    /// The player's ACTIVE skin PNG on textures.minecraft.net. Empty when the
+    /// account has never set one. Not a head render — the full 64×64 sheet; the
+    /// renderer crops the head out of it in CSS, which is why nothing here
+    /// needs an image library or a third-party avatar service.
+    pub skin_url: String,
 }
 
 #[derive(Deserialize)]
@@ -151,6 +156,31 @@ struct McLoginResponse {
 struct ProfileResponse {
     id: String,
     name: String,
+    /// Present on every real profile, but `default` anyway: a player who has
+    /// never set a skin is a legitimate account, and losing the whole sign-in
+    /// over a missing cosmetic would be absurd.
+    #[serde(default)]
+    skins: Vec<ProfileSkin>,
+}
+
+#[derive(Deserialize)]
+struct ProfileSkin {
+    /// "ACTIVE" or "INACTIVE" — the array carries the player's skin HISTORY,
+    /// not just what they are wearing, so taking `[0]` puts old skins on faces.
+    #[serde(default)]
+    state: String,
+    url: String,
+}
+
+impl ProfileResponse {
+    /// The skin the player is actually wearing, if any.
+    fn active_skin(&self) -> String {
+        self.skins
+            .iter()
+            .find(|s| s.state.eq_ignore_ascii_case("ACTIVE"))
+            .map(|s| s.url.clone())
+            .unwrap_or_default()
+    }
 }
 
 fn client() -> Result<reqwest::Client, AuthError> {
@@ -365,6 +395,7 @@ pub async fn minecraft_session(
 
     Ok(McSession {
         uuid: dash_uuid(&profile.id),
+        skin_url: profile.active_skin(),
         username: profile.name,
         access_token: mc_access_token,
         xuid,
@@ -474,6 +505,29 @@ fn dash_uuid(raw: &str) -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn picks_the_active_skin_not_the_first_one() {
+        // The profile carries the player's skin HISTORY. Taking [0] is how a
+        // player ends up wearing a skin they replaced two years ago.
+        let raw = br#"{
+            "id": "069a79f444e94726a5befca90e38aaf5",
+            "name": "Steve",
+            "skins": [
+                {"state": "INACTIVE", "url": "https://textures.test/old"},
+                {"state": "ACTIVE", "url": "https://textures.test/current"}
+            ]
+        }"#;
+        let profile: ProfileResponse = serde_json::from_slice(raw).unwrap();
+        assert_eq!(profile.active_skin(), "https://textures.test/current");
+    }
+
+    #[test]
+    fn a_profile_with_no_skin_is_still_a_valid_profile() {
+        let raw = br#"{"id": "069a79f444e94726a5befca90e38aaf5", "name": "Steve"}"#;
+        let profile: ProfileResponse = serde_json::from_slice(raw).unwrap();
+        assert_eq!(profile.active_skin(), "");
+    }
 
     #[test]
     fn dashes_a_bare_mojang_uuid() {

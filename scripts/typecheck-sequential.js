@@ -6,6 +6,7 @@
  */
 
 const { spawn } = require('child_process');
+const os = require('os');
 const path = require('path');
 
 // Every workspace package with its own tsconfig. Keep this list in sync when
@@ -18,17 +19,26 @@ const PACKAGES = [
   'packages/ui',
   'packages/pack-schema',
 ];
-const MEMORY_LIMIT = 2048; // MB per process
-
 function getAvailableMemoryMB() {
   try {
+    // Linux/WSL: MemAvailable is the honest number — it accounts for reclaimable
+    // page cache, which os.freemem() reports as "used".
     const meminfo = require('fs').readFileSync('/proc/meminfo', 'utf8');
     const match = meminfo.match(/MemAvailable:\s+(\d+)\s+kB/);
-    return match ? Math.floor(parseInt(match[1]) / 1024) : 4096;
+    if (match) return Math.floor(parseInt(match[1]) / 1024);
   } catch {
-    return 4096;
+    /* not Linux — fall through */
   }
+  // Everywhere else (Windows, macOS) /proc does not exist. This used to return a
+  // hardcoded 4096, which made the printed figure fiction on every dev machine.
+  return Math.floor(os.freemem() / 1024 / 1024);
 }
+
+// apps/api is a large NestJS graph and OOMs at 2048MB; that failure was
+// invisible while the runner itself was broken. Take half of what is actually
+// free, clamped — the whole point of running sequentially is that one process
+// may use a lot, and a fixed cap sized for the smallest package defeats it.
+const MEMORY_LIMIT = Math.min(8192, Math.max(4096, Math.floor(getAvailableMemoryMB() / 2)));
 
 async function runTypeCheck(pkg) {
   const pkgDir = path.resolve(__dirname, '..', pkg);
@@ -39,8 +49,21 @@ async function runTypeCheck(pkg) {
   console.log(`Memory available: ${getAvailableMemoryMB()}MB`);
   console.log(`${'='.repeat(60)}\n`);
 
+  // Run tsc's own JS entry point under THIS node rather than shelling out to
+  // `npx`. On Windows `npx` is a .cmd shim, and spawn() without shell:true
+  // cannot execute it — the whole run died with `spawn npx ENOENT` and, because
+  // a failed package only sets a flag, reported "some packages failed" for code
+  // it had never read. Resolving the binary is also a good deal faster than npx.
+  let tscPath;
+  try {
+    tscPath = require.resolve('typescript/bin/tsc', { paths: [pkgDir] });
+  } catch {
+    console.error(`\n❌ ${pkgName}: typescript is not installed for this package`);
+    return Promise.reject(new Error(`typescript not resolvable from ${pkgDir}`));
+  }
+
   return new Promise((resolve, reject) => {
-    const child = spawn('npx', ['tsc', '--noEmit', '--skipLibCheck'], {
+    const child = spawn(process.execPath, [tscPath, '--noEmit', '--skipLibCheck'], {
       cwd: pkgDir,
       stdio: 'inherit',
       env: {

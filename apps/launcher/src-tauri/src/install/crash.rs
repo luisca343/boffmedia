@@ -43,6 +43,7 @@ pub enum CrashKind {
 #[derive(Clone, Debug, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Diagnosis {
+    pub id: String,
     pub kind: CrashKind,
     pub title: String,
     pub explanation: String,
@@ -53,6 +54,7 @@ pub struct Diagnosis {
 }
 
 struct Rule {
+    id: &'static str,
     kind: CrashKind,
     /// Every needle must appear in the same line (already lowercased here).
     all: &'static [&'static str],
@@ -65,6 +67,7 @@ struct Rule {
 const RULES: &[Rule] = &[
     // ── Missing dependencies ───────────────────────────────────────────────
     Rule {
+        id: "fabric-api-missing",
         kind: CrashKind::MissingDependency,
         all: &["requires", "fabric api"],
         title: "Falta Fabric API",
@@ -74,6 +77,7 @@ const RULES: &[Rule] = &[
                  los administradores del pack: falta un mod obligatorio en el manifiesto.",
     },
     Rule {
+        id: "missing-unsupported-mods",
         kind: CrashKind::MissingDependency,
         all: &["missing or unsupported mods"],
         title: "Faltan mods obligatorios",
@@ -84,6 +88,7 @@ const RULES: &[Rule] = &[
                  el pack tiene una dependencia sin publicar: pásale estas líneas al equipo.",
     },
     Rule {
+        id: "missing-mods",
         kind: CrashKind::MissingDependency,
         all: &["missing mods"],
         title: "Faltan mods obligatorios",
@@ -93,6 +98,7 @@ const RULES: &[Rule] = &[
                  estas líneas.",
     },
     Rule {
+        id: "mod-resolution-failed",
         kind: CrashKind::MissingDependency,
         all: &["mod resolution failed"],
         title: "No se pudieron resolver los mods",
@@ -103,6 +109,7 @@ const RULES: &[Rule] = &[
                  con el equipo del pack.",
     },
     Rule {
+        id: "missing-mod-required",
         kind: CrashKind::MissingDependency,
         all: &["requires", "which is missing"],
         title: "Falta un mod requerido",
@@ -110,6 +117,7 @@ const RULES: &[Rule] = &[
         action: "Repara la instalación desde la ficha del pack.",
     },
     Rule {
+        id: "unmet-dependency",
         kind: CrashKind::MissingDependency,
         all: &["unmet dependency"],
         title: "Dependencia sin cumplir",
@@ -118,6 +126,7 @@ const RULES: &[Rule] = &[
     },
     // ── Loader / Minecraft version mismatch ────────────────────────────────
     Rule {
+        id: "requires-minecraft",
         kind: CrashKind::LoaderMismatch,
         all: &["requires minecraft"],
         title: "Mod para otra versión de Minecraft",
@@ -129,6 +138,7 @@ const RULES: &[Rule] = &[
                  instalación para dejar el pack en su versión publicada.",
     },
     Rule {
+        id: "requires-fabricloader",
         kind: CrashKind::LoaderMismatch,
         all: &["requires fabricloader"],
         title: "Versión del cargador incorrecta",
@@ -137,6 +147,7 @@ const RULES: &[Rule] = &[
         action: "Repara la instalación para reinstalar el cargador en la versión del pack.",
     },
     Rule {
+        id: "incompatible-mods",
         kind: CrashKind::LoaderMismatch,
         all: &["incompatible mods found"],
         title: "Mods incompatibles entre sí",
@@ -146,6 +157,7 @@ const RULES: &[Rule] = &[
         action: "Repara la instalación y no vuelvas a copiar mods sueltos en la carpeta de mods.",
     },
     Rule {
+        id: "not-compatible-minecraft",
         kind: CrashKind::LoaderMismatch,
         all: &["is not compatible with the current minecraft version"],
         title: "Mod incompatible con esta versión",
@@ -153,6 +165,7 @@ const RULES: &[Rule] = &[
         action: "Repara la instalación para volver al conjunto de mods publicado.",
     },
     Rule {
+        id: "classnotfoundexception",
         kind: CrashKind::LoaderMismatch,
         all: &["classnotfoundexception", "net.minecraft.client.main.main"],
         title: "Instalación de Minecraft incompleta",
@@ -164,6 +177,7 @@ const RULES: &[Rule] = &[
     },
     // ── Mixins ─────────────────────────────────────────────────────────────
     Rule {
+        id: "mixin-apply-failed",
         kind: CrashKind::MixinFailure,
         all: &["mixin apply failed"],
         title: "Conflicto entre mods (mixin)",
@@ -174,6 +188,7 @@ const RULES: &[Rule] = &[
                  aparece en estas líneas y repórtalo: es un conflicto del pack, no de tu equipo.",
     },
     Rule {
+        id: "invalidinjectionexception",
         kind: CrashKind::MixinFailure,
         all: &["invalidinjectionexception"],
         title: "Conflicto entre mods (mixin)",
@@ -183,6 +198,7 @@ const RULES: &[Rule] = &[
         action: "Repara la instalación y reporta estas líneas si vuelve a ocurrir.",
     },
     Rule {
+        id: "mixintransformererror",
         kind: CrashKind::MixinFailure,
         all: &["mixintransformererror"],
         title: "Conflicto entre mods (mixin)",
@@ -190,6 +206,7 @@ const RULES: &[Rule] = &[
         action: "Repara la instalación y reporta estas líneas si vuelve a ocurrir.",
     },
     Rule {
+        id: "mixin-spongepowered",
         kind: CrashKind::MixinFailure,
         all: &["org.spongepowered.asm.mixin"],
         title: "Conflicto entre mods (mixin)",
@@ -200,6 +217,7 @@ const RULES: &[Rule] = &[
     },
     // ── Memoria ────────────────────────────────────────────────────────────
     Rule {
+        id: "outofmemoryerror",
         kind: CrashKind::OutOfMemory,
         all: &["outofmemoryerror"],
         title: "El juego se quedó sin memoria",
@@ -210,6 +228,7 @@ const RULES: &[Rule] = &[
                  RAM de tu equipo: el sistema también necesita la suya.",
     },
     Rule {
+        id: "java-heap-space",
         kind: CrashKind::OutOfMemory,
         all: &["java heap space"],
         title: "El juego se quedó sin memoria",
@@ -217,6 +236,7 @@ const RULES: &[Rule] = &[
         action: "Aumenta la memoria asignada en Ajustes.",
     },
     Rule {
+        id: "gc-overhead-limit",
         kind: CrashKind::OutOfMemory,
         all: &["gc overhead limit exceeded"],
         title: "Memoria insuficiente",
@@ -227,6 +247,7 @@ const RULES: &[Rule] = &[
     },
     // ── Java ───────────────────────────────────────────────────────────────
     Rule {
+        id: "unsupportedclassversionerror",
         kind: CrashKind::WrongJava,
         all: &["unsupportedclassversionerror"],
         title: "Versión de Java incorrecta",
@@ -237,6 +258,7 @@ const RULES: &[Rule] = &[
                  correcta automáticamente.",
     },
     Rule {
+        id: "has-been-compiled-more-recent",
         kind: CrashKind::WrongJava,
         all: &["has been compiled by a more recent version of the java runtime"],
         title: "Versión de Java incorrecta",
@@ -244,6 +266,7 @@ const RULES: &[Rule] = &[
         action: "En Ajustes, deja la ruta de Java vacía para que el lanzador use la adecuada.",
     },
     Rule {
+        id: "unrecognized-option",
         kind: CrashKind::WrongJava,
         all: &["unrecognized option"],
         title: "Java no acepta los argumentos de arranque",
@@ -254,6 +277,7 @@ const RULES: &[Rule] = &[
     },
     // ── Archivos ───────────────────────────────────────────────────────────
     Rule {
+        id: "duplicate-mods-found",
         kind: CrashKind::DuplicateMod,
         all: &["duplicate mods found"],
         title: "Hay mods duplicados",
@@ -263,6 +287,7 @@ const RULES: &[Rule] = &[
         action: "Borra las copias que hayas añadido tú y repara la instalación.",
     },
     Rule {
+        id: "found-duplicate-mod",
         kind: CrashKind::DuplicateMod,
         all: &["found a duplicate mod"],
         title: "Hay mods duplicados",
@@ -270,6 +295,7 @@ const RULES: &[Rule] = &[
         action: "Elimina el duplicado y repara la instalación.",
     },
     Rule {
+        id: "zipexception",
         kind: CrashKind::CorruptModJar,
         all: &["zipexception"],
         title: "Un archivo de mod está dañado",
@@ -278,6 +304,7 @@ const RULES: &[Rule] = &[
         action: "Repara la instalación para volver a descargar los archivos.",
     },
     Rule {
+        id: "invalid-corrupt-jarfile",
         kind: CrashKind::CorruptModJar,
         all: &["invalid or corrupt jarfile"],
         title: "Un archivo de mod está dañado",
@@ -285,6 +312,7 @@ const RULES: &[Rule] = &[
         action: "Repara la instalación para descargarlo de nuevo.",
     },
     Rule {
+        id: "error-loading-mod-file",
         kind: CrashKind::CorruptModJar,
         all: &["error loading mod file"],
         title: "Un archivo de mod está dañado",
@@ -314,6 +342,7 @@ pub fn diagnose(exit_code: i32, tail: &[String]) -> Option<Diagnosis> {
             continue;
         }
         return Some(Diagnosis {
+            id: rule.id.to_string(),
             kind: rule.kind,
             title: rule.title.to_string(),
             explanation: rule.explanation.to_string(),
@@ -495,6 +524,7 @@ mod tests {
     fn the_verdict_matches_the_renderers_union() {
         // types.ts — kebab-case `kind`, camelCase fields.
         let json = serde_json::to_string(&Diagnosis {
+            id: "test-id".into(),
             kind: CrashKind::CorruptModJar,
             title: "t".into(),
             explanation: "e".into(),
@@ -502,6 +532,7 @@ mod tests {
             evidence: vec!["l".into()],
         })
         .unwrap();
+        assert!(json.contains(r#""id":"test-id""#));
         assert!(json.contains(r#""kind":"corrupt-mod-jar""#));
         assert!(json.contains(r#""evidence":["l"]"#));
     }

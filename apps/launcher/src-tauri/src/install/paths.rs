@@ -8,19 +8,23 @@
 // disposable, `shared/` is the expensive part and is never keyed on a pack.
 //
 //   <app-data>/
-//     instances/<slug>/
-//       .minecraft/          the game's working directory
-//         mods/  config/     where the manifest's files land
-//       bin/                 extracted natives (legacy versions)
+//     instances/<slug>/      the game's working directory ITSELF
+//       mods/  config/       where the manifest's files land
+//       saves/ options.txt   whatever the game writes
+//       .boff-bin/           extracted natives (legacy versions)
 //       .boff-install.json   what this machine believes is installed
 //     shared/
+//
+// There is deliberately no `.minecraft` level: it buys nothing (the launcher
+// state beside it is all dot-prefixed and hidden from the Files tab) and costs
+// the player one confusing directory on every "open pack folder". Instances
+// created by an earlier build are flattened by `datadir::migrate`.
 //       versions/ libraries/ assets/ jvm/
 //       cache/               content-addressed blobs, keyed by sha512
 
 use std::path::{Path, PathBuf};
 
 use portablemc::base;
-use tauri::Manager;
 
 use super::InstallFailure;
 
@@ -47,6 +51,11 @@ pub const OPTIONAL: &str = ".boff-optional.json";
 /// `RuntimeOverride::default()` reads as "inherit the global setting".
 pub const RUNTIME: &str = ".boff-runtime.json";
 
+/// Extracted natives. Dot-prefixed since it now shares a directory with the
+/// game's own tree — a plain `bin/` would sit among `mods/` and `saves/` and
+/// read as something the player put there.
+pub const BIN: &str = ".boff-bin";
+
 #[derive(Debug, Clone)]
 pub struct Layout {
     root: PathBuf,
@@ -56,10 +65,10 @@ pub struct Layout {
 #[derive(Debug, Clone)]
 pub struct InstancePaths {
     pub root: PathBuf,
-    /// The game's working directory. NOTE: `mods/` and `config/` live INSIDE
-    /// this, not beside it — the game only ever looks for them relative to its
-    /// own game directory, so a sibling `instances/<slug>/mods` would install
-    /// correctly and then load nothing.
+    /// The game's working directory — now the same path as `root`. Kept as its
+    /// own field because every caller that means "the directory the game runs
+    /// in" reads this one, and that intent should survive the day a future
+    /// layout separates them again.
     pub minecraft: PathBuf,
     pub mods: PathBuf,
     pub config: PathBuf,
@@ -86,9 +95,7 @@ impl Layout {
                 root: PathBuf::from(dir),
             });
         }
-        let root = app.path().app_data_dir().map_err(|e| {
-            InstallFailure::message(format!("No se pudo localizar la carpeta de datos: {e}"))
-        })?;
+        let root = crate::datadir::data_root(app).map_err(InstallFailure::message)?;
         Ok(Self { root })
     }
 
@@ -115,13 +122,32 @@ impl Layout {
         self.shared_dir().join("cache")
     }
 
+    /// Blobs that exist ONLY on this machine, keyed by sha512 exactly like the
+    /// cache above.
+    ///
+    /// An imported third-party `.mrpack` carries its `overrides/` (configs,
+    /// resource packs, scripts) as bytes inside the zip. Those become
+    /// `source: override` entries in the manifest, and an `override` normally
+    /// means "stream it from the Boffmedia API" (§7.2) — which for a pack the
+    /// player imported off Modrinth would 404, because we never hosted it.
+    ///
+    /// Separate from `cache_dir()` on purpose: the cache is disposable by
+    /// definition (anything in it can be re-fetched) and a future cache purge
+    /// must not be able to destroy the only copy of a file that has no origin
+    /// to re-fetch from.
+    pub fn local_blobs_dir(&self) -> PathBuf {
+        self.root.join("local-blobs")
+    }
+
     pub fn instance(&self, slug: &str) -> InstancePaths {
         let root = self.instances_dir().join(sanitize_slug(slug));
-        let minecraft = root.join(".minecraft");
+        // The instance directory IS the game directory (see the header): no
+        // `.minecraft` level, so `mods/` and `config/` are direct children.
+        let minecraft = root.clone();
         InstancePaths {
             mods: minecraft.join("mods"),
             config: minecraft.join("config"),
-            bin: root.join("bin"),
+            bin: root.join(BIN),
             marker: root.join(MARKER),
             history: root.join(HISTORY),
             optional: root.join(OPTIONAL),
@@ -225,5 +251,19 @@ mod tests {
         let instance = layout.instance("boff-smp");
         assert!(instance.mods.starts_with(&instance.minecraft));
         assert!(instance.config.starts_with(&instance.minecraft));
+    }
+
+    #[test]
+    fn the_instance_directory_is_the_game_directory() {
+        let layout = Layout::for_tests(PathBuf::from("/tmp/boff"));
+        let instance = layout.instance("boff-smp");
+        assert_eq!(instance.minecraft, instance.root);
+        assert_eq!(instance.mods, instance.root.join("mods"));
+        // Every launcher-owned entry is dot-prefixed, which is what lets the
+        // Files tab hide the lot with one rule.
+        for path in [&instance.marker, &instance.history, &instance.optional, &instance.runtime, &instance.bin] {
+            let name = path.file_name().unwrap().to_string_lossy().to_string();
+            assert!(name.starts_with(".boff-"), "{name} must be hidden");
+        }
     }
 }

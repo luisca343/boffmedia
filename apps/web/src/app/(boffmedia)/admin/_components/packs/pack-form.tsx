@@ -1,10 +1,11 @@
 "use client"
 
-import { useState } from "react"
+import { useRef, useState } from "react"
 import { useTranslations } from "next-intl"
 import { Button, Field, Icon, Input, Modal, Textarea, toast } from "@boffmedia/ui"
 import { AvPanel, AvPill } from "../ui/av-kit"
-import { type AdminPack, PacksService } from "@/services/api/boffmedia/packsService"
+import { type AdminPack, type GalleryImage, PacksService } from "@/services/api/boffmedia/packsService"
+import { apiUpload } from "@/services/http/boff-client"
 
 const ACCESS_OPTIONS: {
   value: AdminPack["accessKind"]
@@ -29,9 +30,18 @@ export function PackForm({
   const [slug, setSlug] = useState("")
   const [name, setName] = useState("")
   const [summary, setSummary] = useState("")
+  const [description, setDescription] = useState("")
+  const [iconUrl, setIconUrl] = useState("")
+  const [gallery, setGallery] = useState<GalleryImage[]>([])
   const [accessKind, setAccessKind] = useState<AdminPack["accessKind"]>("allowlist")
   const [password, setPassword] = useState("")
+  const [serverHost, setServerHost] = useState("")
+  const [serverPort, setServerPort] = useState("")
   const [busy, setBusy] = useState(false)
+  const [uploadingIcon, setUploadingIcon] = useState(false)
+  const [uploadingGallery, setUploadingGallery] = useState(false)
+  const iconInputRef = useRef<HTMLInputElement>(null)
+  const galleryInputRef = useRef<HTMLInputElement>(null)
 
   const submit = async () => {
     setBusy(true)
@@ -40,8 +50,16 @@ export function PackForm({
         slug,
         name,
         summary: summary || undefined,
+        description: description || undefined,
+        iconUrl: iconUrl || undefined,
+        gallery: gallery.length > 0 ? gallery : undefined,
         accessKind,
         password: accessKind === "password" ? password : undefined,
+        // A host makes it a server pack; a blank port lets the API default to
+        // the vanilla 25565.
+        server: serverHost.trim()
+          ? { host: serverHost.trim(), port: serverPort.trim() ? Number(serverPort) : undefined }
+          : undefined,
       })
       // The envelope reports 201 on POST, so `success` is the only safe check.
       if (!res.success) {
@@ -55,9 +73,55 @@ export function PackForm({
     }
   }
 
+  const uploadIcon = async (file: File) => {
+    setUploadingIcon(true)
+    try {
+      const res = await apiUpload(file)
+      if (!res.success || !res.data?.url) {
+        toast({ tone: "bad", title: t("icon.label"), msg: res.userMessage })
+        return
+      }
+      setIconUrl(res.data.url)
+    } catch (e) {
+      toast({ tone: "bad", title: t("icon.label"), msg: "Upload failed" })
+    } finally {
+      setUploadingIcon(false)
+    }
+  }
+
+  const addGalleryImage = async (file: File) => {
+    if (gallery.length >= 15) {
+      toast({ tone: "warn", title: t("gallery.label"), msg: "Maximum 15 images" })
+      return
+    }
+    setUploadingGallery(true)
+    try {
+      // Upload using the image upload endpoint
+      const res = await apiUpload(file)
+      const url = res.data?.url
+      if (!res.success || !url) {
+        toast({ tone: "bad", title: t("gallery.label"), msg: res.userMessage })
+        return
+      }
+      setGallery((current) => [...current, { url, alt: undefined }])
+    } catch (e) {
+      toast({ tone: "bad", title: t("gallery.label"), msg: t("gallery.uploadFailed") })
+    } finally {
+      setUploadingGallery(false)
+    }
+  }
+
   const slugValid = /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug)
+  const portNum = serverPort.trim() ? Number(serverPort) : null
+  const serverValid =
+    !serverHost.trim() ||
+    portNum === null ||
+    (Number.isInteger(portNum) && portNum >= 1 && portNum <= 65535)
   const canSubmit =
-    slugValid && name.trim().length > 0 && (accessKind !== "password" || password.length >= 4)
+    slugValid &&
+    name.trim().length > 0 &&
+    (accessKind !== "password" || password.length >= 4) &&
+    serverValid
 
   return (
     <AvPanel
@@ -129,6 +193,128 @@ export function PackForm({
                   placeholder={t("summaryPlaceholder")}
                 />
               </Field>
+
+              <Field label={t("description.label")} className="mt-4">
+                <Textarea
+                  rows={4}
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value.slice(0, 2048))}
+                  placeholder={t("description.placeholder")}
+                  maxLength={2048}
+                />
+                <div className="mt-1 font-mono text-[10px] text-txt-dim">
+                  {t("descriptionCharCount", { current: description.length, max: 2048 })}
+                </div>
+              </Field>
+
+              <div className="mt-4 grid gap-4 sm:grid-cols-2">
+                <Field label={t("icon.label")}>
+                  <div className="flex flex-col gap-2">
+                    {iconUrl && (
+                      <img
+                        src={iconUrl}
+                        alt=""
+                        className="h-24 w-24 rounded border border-solid border-line object-cover"
+                      />
+                    )}
+                    <div className="flex flex-wrap items-end gap-2">
+                      <div className="flex-1">
+                        <Input
+                          type="text"
+                          value={iconUrl}
+                          onChange={(e) => setIconUrl(e.target.value)}
+                          placeholder={t("icon.urlFallback")}
+                        />
+                      </div>
+                      <Button
+                        size="sm"
+                        icon="upload"
+                        loading={uploadingIcon}
+                        onClick={() => iconInputRef.current?.click()}
+                      >
+                        {t("icon.upload")}
+                      </Button>
+                      <input
+                        ref={iconInputRef}
+                        type="file"
+                        accept="image/*"
+                        hidden
+                        onChange={(e) => {
+                          const file = e.target.files?.[0]
+                          if (file) {
+                            void uploadIcon(file)
+                          }
+                          e.target.value = ""
+                        }}
+                      />
+                    </div>
+                  </div>
+                </Field>
+              </div>
+
+              <Field label={t("gallery.label")} className="mt-4">
+                <div className="flex flex-col gap-3">
+                  <Button
+                    size="sm"
+                    variant="default"
+                    icon="plus"
+                    loading={uploadingGallery}
+                    onClick={() => galleryInputRef.current?.click()}
+                  >
+                    {t("gallery.add")}
+                  </Button>
+                  <input
+                    ref={galleryInputRef}
+                    type="file"
+                    accept="image/*"
+                    hidden
+                    onChange={(e) => {
+                      const file = e.target.files?.[0]
+                      if (file) {
+                        void addGalleryImage(file)
+                      }
+                      e.target.value = ""
+                    }}
+                  />
+                  {gallery.length > 0 && (
+                    <div className="bm-scroll max-h-[40vh] flex flex-col gap-2 overflow-auto pr-1">
+                      {gallery.map((img, idx) => (
+                        <div key={idx} className="flex items-start gap-2 border border-solid border-line bg-panel p-2">
+                          <img
+                            src={img.url}
+                            alt={img.alt}
+                            className="h-16 w-16 shrink-0 rounded border border-solid border-line object-cover"
+                          />
+                          <div className="min-w-0 flex-1">
+                            <Input
+                              type="text"
+                              value={img.alt ?? ""}
+                              onChange={(e) => {
+                                const updated = [...gallery]
+                                updated[idx] = { ...img, alt: e.target.value.slice(0, 256) }
+                                setGallery(updated)
+                              }}
+                              placeholder={t("gallery.altPlaceholder")}
+                              maxLength={256}
+                            />
+                            <div className="mt-1 font-mono text-[9px] text-txt-dim">
+                              {(img.alt?.length ?? 0)} / 256
+                            </div>
+                          </div>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            icon="trash"
+                            onClick={() => setGallery((current) => current.filter((_, i) => i !== idx))}
+                          >
+                            {t("gallery.remove")}
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </Field>
             </section>
 
             <section className="cut border border-solid border-line bg-panel-2 p-4">
@@ -199,6 +385,42 @@ export function PackForm({
                   </Field>
                 </div>
               )}
+            </section>
+
+            <section className="cut border border-solid border-line bg-panel-2 p-4">
+              <div className="mb-4 flex items-start gap-3">
+                <span className="grid size-8 shrink-0 place-items-center border border-solid border-line-2 bg-panel text-accent">
+                  <Icon name="server" size={15} />
+                </span>
+                <div>
+                  <h3 className="font-display text-[14px] font-bold uppercase tracking-[0.08em] text-txt">
+                    {t("serverSection")}
+                  </h3>
+                  <p className="mt-1 text-[12px] leading-[1.45] text-txt-dim">
+                    {t("serverSectionLead")}
+                  </p>
+                </div>
+              </div>
+
+              <div className="grid max-w-[520px] gap-3 sm:grid-cols-[1fr_140px]">
+                <Field label={t("serverHost")} hint={t("serverHostHint")}>
+                  <Input
+                    value={serverHost}
+                    placeholder="play.example.com"
+                    onChange={(e) => setServerHost(e.target.value)}
+                  />
+                </Field>
+                <Field label={t("serverPort")} hint={t("serverPortHint")}>
+                  <Input
+                    type="number"
+                    min={1}
+                    max={65535}
+                    value={serverPort}
+                    placeholder="25565"
+                    onChange={(e) => setServerPort(e.target.value)}
+                  />
+                </Field>
+              </div>
             </section>
           </div>
         </div>

@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { createPortal } from "react-dom"
 import { cn } from "../cn"
 import { useT } from "../i18n"
 import { useDismiss } from "../hooks/use-dismiss"
@@ -33,6 +34,11 @@ export interface MenuProps {
 
 const POP_SHADOW = "0 1px 0 var(--accent-line), 0 18px 40px -18px rgba(0,0,0,0.7)"
 
+// Position before paint on the client (no flash at 0,0); degrade to a passive
+// effect on the server, where useLayoutEffect warns and the popup never renders
+// open anyway.
+const useIsoLayoutEffect = typeof window !== "undefined" ? React.useLayoutEffect : React.useEffect
+
 export function Menu({
   trigger,
   label,
@@ -48,7 +54,13 @@ export function Menu({
   const [open, setOpen] = React.useState(false)
   const [active, setActive] = React.useState(-1)
   const rootRef = React.useRef<HTMLSpanElement>(null)
+  // The popup is rendered in a portal (below), so it escapes any ancestor's
+  // clip-path or overflow — a card whose `.cut-corner` clip used to swallow the
+  // menu whole no longer can. Its own ref keeps outside-click dismissal from
+  // treating a click on a menu item as a click "outside" the menu.
+  const menuRef = React.useRef<HTMLDivElement>(null)
   const itemRefs = React.useRef<(HTMLButtonElement | null)[]>([])
+  const [coords, setCoords] = React.useState<{ top?: number; bottom?: number; left?: number; right?: number }>({})
   const acting = items
     .map((it, i) => (it.sep || it.node || it.header || it.disabled ? null : i))
     .filter((i): i is number => i != null)
@@ -62,7 +74,36 @@ export function Menu({
       if (reason === "escape") focusTrigger()
     },
     open,
+    menuRef,
   )
+
+  // Anchor the fixed popup to the trigger, and re-anchor as the page scrolls (a
+  // menu opened from a card in a scrolling grid must track its trigger). Flips
+  // above the trigger when there is not enough room below.
+  useIsoLayoutEffect(() => {
+    if (!open) return
+    const place = () => {
+      const trig = rootRef.current?.querySelector<HTMLElement>("[data-menu-trigger]")
+      if (!trig) return
+      const r = trig.getBoundingClientRect()
+      const estHeight = acting.length * 40 + 24
+      const openUp = r.bottom + estHeight > window.innerHeight - 8 && r.top - estHeight > 8
+      setCoords({
+        top: openUp ? undefined : r.bottom + 6,
+        bottom: openUp ? window.innerHeight - r.top + 6 : undefined,
+        ...(align === "end"
+          ? { right: Math.max(8, window.innerWidth - r.right) }
+          : { left: Math.max(8, r.left) }),
+      })
+    }
+    place()
+    window.addEventListener("resize", place)
+    window.addEventListener("scroll", place, true)
+    return () => {
+      window.removeEventListener("resize", place)
+      window.removeEventListener("scroll", place, true)
+    }
+  }, [open, align, acting.length])
 
   React.useEffect(() => {
     if (open && active >= 0) itemRefs.current[active]?.focus()
@@ -138,18 +179,20 @@ export function Menu({
           {resolvedLabel}
         </Button>
       )}
-      {open && (
-        <div
-          role="menu"
-          aria-label={typeof (ariaLabel || resolvedLabel) === "string" ? (ariaLabel as string) || (resolvedLabel as string) : undefined}
-          onKeyDown={onItemKey}
-          style={{ boxShadow: POP_SHADOW }}
-          className={cn(
-            "absolute top-[calc(100%_+_6px)] z-[60] min-w-[216px] flex flex-col p-[6px] bg-panel border border-solid border-line-2",
-            "cut-tag [--cut-tag:9px] animate-[bm-menu-in_0.12s_ease-out] motion-reduce:animate-none",
-            align === "end" ? "right-0" : "left-0",
-          )}
-        >
+      {open &&
+        typeof document !== "undefined" &&
+        createPortal(
+          <div
+            ref={menuRef}
+            role="menu"
+            aria-label={typeof (ariaLabel || resolvedLabel) === "string" ? (ariaLabel as string) || (resolvedLabel as string) : undefined}
+            onKeyDown={onItemKey}
+            style={{ boxShadow: POP_SHADOW, position: "fixed", top: coords.top, bottom: coords.bottom, left: coords.left, right: coords.right }}
+            className={cn(
+              "z-[500] min-w-[216px] flex flex-col p-[6px] bg-panel border border-solid border-line-2",
+              "cut-tag [--cut-tag:9px] animate-[bm-menu-in_0.12s_ease-out] motion-reduce:animate-none",
+            )}
+          >
           {items.map((it, i) =>
             it.sep ? (
               <span key={"s" + i} role="separator" className="h-px my-[5px] mx-1 bg-line" />
@@ -194,8 +237,9 @@ export function Menu({
               </button>
             ),
           )}
-        </div>
-      )}
+          </div>,
+          document.body,
+        )}
     </span>
   )
 }

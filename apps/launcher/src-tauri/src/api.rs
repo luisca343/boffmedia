@@ -35,6 +35,9 @@ pub fn base_url() -> String {
 pub struct ApiState {
     http: reqwest::Client,
     token: Mutex<Option<String>>,
+    /// Held across the whole mint, unlike `token` which is only held long
+    /// enough to read or write it. See `current_token`.
+    minting: Mutex<()>,
 }
 
 impl Default for ApiState {
@@ -45,6 +48,7 @@ impl Default for ApiState {
                 .build()
                 .unwrap_or_default(),
             token: Mutex::new(None),
+            minting: Mutex::new(()),
         }
     }
 }
@@ -99,6 +103,30 @@ pub struct LauncherVersion {
     pub created_at: String,
 }
 
+/** A promotional gallery image, mirrored from the registry's pack listing. */
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct LauncherGalleryImage {
+    pub url: String,
+    #[serde(default)]
+    pub alt: Option<String>,
+}
+
+/** The Quick Play target, mirrored from the registry's pack listing. Present
+ *  only for "server packs". Both fields are optional and defaulted: `port` is
+ *  absent for a bare SRV host, and a malformed/empty `{}` (legacy data) must
+ *  deserialize to a hostless server rather than failing the WHOLE packs_list —
+ *  one bad row used to blank the entire managed library. A hostless server is
+ *  still a server pack; the renderer shows it as "unavailable". */
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct LauncherServer {
+    #[serde(default)]
+    pub host: Option<String>,
+    #[serde(default)]
+    pub port: Option<u16>,
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct LauncherPack {
@@ -106,8 +134,14 @@ pub struct LauncherPack {
     pub slug: String,
     pub name: String,
     pub summary: Option<String>,
+    #[serde(default)]
+    pub description: Option<String>,
     pub icon_url: Option<String>,
+    #[serde(default)]
+    pub gallery: Vec<LauncherGalleryImage>,
     pub access_kind: String,
+    #[serde(default)]
+    pub server: Option<LauncherServer>,
     pub latest_version: Option<LauncherVersion>,
 }
 
@@ -255,6 +289,21 @@ async fn current_token(api: &ApiState, auth: &AuthState) -> Result<String, ApiEr
     if let Some(token) = api.token.lock().await.clone() {
         return Ok(token);
     }
+
+    // Minting is SERIALISED. The handshake in `mint_session` is stateful on
+    // Mojang's side: a serverId is proven by a `hasJoined` call against the
+    // player's profile, and a second concurrent join overwrites the first, so
+    // whichever challenge our API then tries to verify has already been
+    // invalidated. Two callers arriving here at once — the pack list and
+    // anything else authenticated — both saw `None` above and both minted, and
+    // one of them failed with "Mojang rechazó tu sesión" or "no se pudo
+    // verificar tu sesión". Intermittent, and entirely a race.
+    let _minting = api.minting.lock().await;
+
+    // Whoever we queued behind may have already minted one for us.
+    if let Some(token) = api.token.lock().await.clone() {
+        return Ok(token);
+    }
     mint_session(api, auth).await
 }
 
@@ -276,8 +325,11 @@ async fn authed(
         return Ok(res);
     }
 
+    // Through `current_token`, not `mint_session` directly: the expiry that
+    // produced this 401 hits every in-flight request at once, so this is
+    // precisely where several callers would otherwise mint in parallel.
     *api.token.lock().await = None;
-    let token = mint_session(api, auth).await?;
+    let token = current_token(api, auth).await?;
     Ok(build(&api.http, &base_url())
         .bearer_auth(&token)
         .send()

@@ -1,17 +1,54 @@
-import { Badge, Icon, IconButton, type IconName, Kicker } from "@boffmedia/ui"
+import { Badge, Banner, Button, Icon, type IconName, Kicker } from "@boffmedia/ui"
 
+import { useT } from "../i18n"
 import { type View, useLauncher } from "../state/launcher"
+import { AccountSwitcher } from "./AccountSwitcher"
 
-const NAV: { view: View; label: string; icon: IconName }[] = [
-  { view: "packs", label: "Packs", icon: "cube" },
-  { view: "logs", label: "Registro", icon: "list" },
-  { view: "settings", label: "Ajustes", icon: "sliders" },
-]
+// Two different degradations, and conflating them would mislead:
+//
+//   offline      — no network at all. The identity came from the roster, so
+//                  only packs already on disk can be played.
+//   packsPartial — we ARE online and signed in, but the pack registry did not
+//                  answer. Local packs are all that loaded.
+//
+// Neither is an error: in both cases what is on screen works. The banner exists
+// so a player does not think their packs have vanished.
+function OfflineNotice() {
+  const t = useT("shell")
+  const { offline, packsPartial, reloadPacks, packsLoading } = useLauncher()
+
+  if (!offline && !packsPartial) return null
+
+  return (
+    <Banner
+      tone="warn"
+      icon="alert"
+      title={offline ? t("offlineTitle") : t("partialTitle")}
+      className="m-4 mb-0"
+      actions={
+        <Button size="sm" variant="ghost" icon="refresh" disabled={packsLoading} onClick={reloadPacks}>
+          {t("retryButton")}
+        </Button>
+      }
+    >
+      {offline
+        ? t("offlineMessage")
+        : t("partialMessage")}
+    </Banner>
+  )
+}
 
 export function Shell({ children }: { children: React.ReactNode }) {
-  const { view, go, account, signOut, game, logs } = useLauncher()
+  const t = useT("shell")
+  const { view, go, game, logs } = useLauncher()
 
   const errorCount = logs.filter((l) => l.level === "error").length
+
+  const NAV: { view: View; label: string; icon: IconName }[] = [
+    { view: "packs", label: t("navPacks"), icon: "cube" },
+    { view: "logs", label: t("navLogs"), icon: "list" },
+    { view: "settings", label: t("navSettings"), icon: "sliders" },
+  ]
 
   return (
     <div className="flex h-full min-h-0">
@@ -57,31 +94,19 @@ export function Shell({ children }: { children: React.ReactNode }) {
           <div className="mx-3 mb-3 border-2 border-solid border-ok/40 bg-ok-soft px-3 py-2">
             <div className="flex items-center gap-2 text-[12px]/none font-semibold uppercase tracking-[0.1em] text-ok">
               <Icon name="play" size={12} />
-              En ejecución
+              {t("running")}
             </div>
             <div className="mt-1 font-mono text-[11px] text-txt-dim">pid {game.pid}</div>
           </div>
         )}
 
-        {account && (
-          <div className="flex items-center gap-3 border-t border-line px-4 py-3">
-            <span className="cut-seal grid h-8 w-8 place-items-center bg-accent text-accent-ink">
-              <Icon name="user" size={16} />
-            </span>
-            <span className="min-w-0 flex-1">
-              <span className="block truncate text-[13px] font-semibold text-txt">
-                {account.username}
-              </span>
-              <span className="block truncate font-mono text-[10px] text-txt-dim">
-                {account.uuid.slice(0, 13)}…
-              </span>
-            </span>
-            <IconButton name="logout" label="Cerrar sesión" size={16} onClick={signOut} />
-          </div>
-        )}
+        <AccountSwitcher />
       </nav>
 
-      <main className="min-w-0 flex-1 overflow-y-auto">{children}</main>
+      <div className="flex min-w-0 flex-1 flex-col">
+        <OfflineNotice />
+        <main className="min-w-0 flex-1 overflow-y-auto">{children}</main>
+      </div>
     </div>
   )
 }

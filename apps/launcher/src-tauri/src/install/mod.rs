@@ -34,6 +34,7 @@ use serde::Serialize;
 use tokio::sync::Mutex;
 
 use crate::auth::AuthState;
+use crate::backups;
 use crate::settings;
 
 use instance::{History, Marker, OptionalFile, OptionalState, RetainedVersion};
@@ -269,6 +270,185 @@ fn write_runtime_override(
 
 /// Run the blocking portablemc pass off the async runtime. `Prepared` is moved
 /// in and back out because it owns the plan every later step needs.
+/// Extract bundled worlds from the manifest (version.worlds[]). First-install-only:
+/// if saves/<folder> already exists, skip (never overwrite played saves). For each
+/// world: fetch zip bytes (local blob store for local packs; existing override
+/// download path for managed packs), verify sha512, extract with ZIP-SLIP
+/// protection. Best-effort: failures log but do not block launch.
+async fn extract_bundled_worlds(
+    app: &tauri::AppHandle,
+    prepared: &game::Prepared,
+    http: &reqwest::Client,
+    password: Option<&str>,
+    reporter: &Reporter,
+    manifest: &crate::pack::PackManifest,
+) {
+    let saves_dir = prepared.instance.minecraft.join("saves");
+    for world in &manifest.version.worlds {
+        let world_folder = world.folder.as_str();
+        let world_path = saves_dir.join(world_folder);
+
+        // First-install-only: skip if the world already exists
+        if world_path.is_dir() {
+            reporter.log(
+                "info",
+                &format!("Mundo «{world_folder}» ya existe; se conserva."),
+            );
+            continue;
+        }
+
+        // Fetch the world zip bytes
+        let zip_bytes = match &prepared.plan.pack_id {
+            pack_id if pack_id.starts_with("local-") => {
+                // Local pack: fetch from local blob store
+                let layout = &prepared.layout;
+                let local_blob_path = files::local_blob_path(layout, &world.sha512);
+                match std::fs::read(&local_blob_path) {
+                    Ok(bytes) => bytes,
+                    Err(e) => {
+                        reporter.log(
+                            "warn",
+                            &format!(
+                                "No se pudo leer el mundo «{world_folder}» del almacén local: {e}"
+                            ),
+                        );
+                        continue;
+                    }
+                }
+            }
+            _ => {
+                // Managed pack: fetch from override using existing path
+                match fetch_world_bytes(app, prepared, http, password, world).await {
+                    Ok(bytes) => bytes,
+                    Err(e) => {
+                        reporter.log(
+                            "warn",
+                            &format!("No se pudo descargar el mundo «{world_folder}\": {e:?}"),
+                        );
+                        continue;
+                    }
+                }
+            }
+        };
+
+        // Verify sha512 before extracting
+        let actual_sha512 = {
+            use sha2::{Digest, Sha512};
+            let mut hasher = Sha512::new();
+            hasher.update(&zip_bytes);
+            files::hex(&hasher.finalize())
+        };
+        if actual_sha512 != world.sha512.as_str() {
+            reporter.log(
+                "warn",
+                &format!(
+                    "El mundo «{world_folder}» está dañado (SHA-512 incorrecto); se omite."
+                ),
+            );
+            continue;
+        }
+
+        // Extract with ZIP-SLIP protection
+        if let Err(e) = extract_world_zip(&zip_bytes, &saves_dir, world_folder, reporter) {
+            reporter.log(
+                "warn",
+                &format!("No se pudo extraer el mundo «{world_folder}\": {e}"),
+            );
+        }
+    }
+}
+
+/// Fetch world zip bytes from override for a managed pack.
+async fn fetch_world_bytes(
+    app: &tauri::AppHandle,
+    prepared: &game::Prepared,
+    _http: &reqwest::Client,
+    password: Option<&str>,
+    world: &crate::pack::PackManifestVersionWorldsItem,
+) -> Result<Vec<u8>, String> {
+    // Worlds for managed packs are stored as overrides in the blob store
+    let pack_file = crate::api::PackFile::Override {
+        sha512: world.sha512.as_str().to_string(),
+    };
+    let response = crate::api::fetch_pack_file(
+        app,
+        &prepared.plan.pack_id,
+        password,
+        &pack_file,
+    )
+    .await
+    .map_err(|e| format!("{e:?}"))?;
+    let bytes = response.bytes().await.map_err(|e| e.to_string())?;
+    Ok(bytes.to_vec())
+}
+
+/// Extract a world zip with ZIP-SLIP protection. Rejects entries that are
+/// absolute paths or contain `..`, and verifies canonical paths stay under
+/// saves/<folder>.
+fn extract_world_zip(
+    zip_bytes: &[u8],
+    saves_dir: &std::path::Path,
+    folder: &str,
+    _reporter: &Reporter,
+) -> Result<(), String> {
+    let mut archive = zip::ZipArchive::new(std::io::Cursor::new(zip_bytes))
+        .map_err(|e| format!("Zip inválido: {e}"))?;
+
+    let target_dir = saves_dir.join(folder);
+    std::fs::create_dir_all(&target_dir).map_err(|e| format!("No se pudo crear carpeta: {e}"))?;
+    // Canonicalize the destination ONCE, up front: it exists, so this succeeds,
+    // and it resolves any symlink in the path so the per-entry parent check
+    // below compares like against like.
+    let canonical_target =
+        target_dir.canonicalize().map_err(|e| format!("No se pudo resolver destino: {e}"))?;
+
+    for i in 0..archive.len() {
+        let mut file = archive.by_index(i)
+            .map_err(|e| format!("Error leyendo zip: {e}"))?;
+
+        let path_str = file.name();
+        // ZIP-SLIP, first line: reject absolute paths or any `..` segment. On its
+        // own this already guarantees a `target_dir.join(path)` stays under
+        // target_dir; the parent canonicalization below is defence-in-depth
+        // against a symlinked entry.
+        if path_str.starts_with('/')
+            || path_str.starts_with('\\')
+            || path_str.split(['/', '\\']).any(|seg| seg == "..")
+        {
+            return Err(format!("Ruta sospechosa en el zip: {path_str}"));
+        }
+
+        let full_path = target_dir.join(path_str);
+
+        if file.is_dir() {
+            std::fs::create_dir_all(&full_path)
+                .map_err(|e| format!("No se pudo crear directorio: {e}"))?;
+            continue;
+        }
+
+        // Create the parent, then canonicalize IT (a real, existing dir —
+        // `full_path` itself does not exist yet, so canonicalizing it would
+        // always fail) and confirm it is inside the destination.
+        let parent = full_path
+            .parent()
+            .ok_or_else(|| format!("Ruta sin carpeta padre: {path_str}"))?;
+        std::fs::create_dir_all(parent)
+            .map_err(|e| format!("No se pudo crear directorio padre: {e}"))?;
+        let canonical_parent =
+            parent.canonicalize().map_err(|e| format!("No se pudo resolver ruta: {e}"))?;
+        if !canonical_parent.starts_with(&canonical_target) {
+            return Err(format!("Ruta fuera del directorio de destino: {path_str}"));
+        }
+
+        let mut outfile = std::fs::File::create(&full_path)
+            .map_err(|e| format!("No se pudo crear archivo: {e}"))?;
+        std::io::copy(&mut file, &mut outfile)
+            .map_err(|e| format!("No se pudo escribir archivo: {e}"))?;
+    }
+
+    Ok(())
+}
+
 async fn install_minecraft(
     prepared: game::Prepared,
     reporter: Reporter,
@@ -294,20 +474,34 @@ async fn install_payload(
     http: &reqwest::Client,
     password: Option<&str>,
     reporter: &Reporter,
+    manifest: &crate::pack::PackManifest,
 ) -> Result<(), InstallFailure> {
-    // §9 — an optional file the player switched off is never fetched. The
-    // alternative convention, renaming to `<name>.jar.disabled`, is a
-    // Forge/NeoForge behaviour: Fabric and Quilt ignore the suffix, so on two
-    // of the four loaders this launcher supports the "disabled" mod would load
-    // anyway. Not downloading it is loader-agnostic, and it also honours §9's
-    // delta-update goal — you do not pay bytes for a mod you declined. Turning
-    // it back on is a copy out of the content-addressed cache, not a download.
+    // A file the player switched off is never fetched.
+    //
+    // This comment used to claim that the `<name>.jar.disabled` convention was
+    // Forge/NeoForge-only and that Fabric and Quilt would load the mod anyway.
+    // That is not so: all four loaders discover mods by scanning for files
+    // ending in `.jar`, so all four skip a `.disabled` one — which is why Prism
+    // and the Modrinth app use the suffix across every loader. The launcher now
+    // does the same (instance::set_enabled_on_disk), because parking the file
+    // makes re-enabling instant and leaves the mods folder legible to a player
+    // who opens it by hand.
+    //
+    // The state file remains the INTENT and this filter remains the mechanism
+    // that stops a download: the rename only exists once the bytes are on disk,
+    // and the very first install has to know not to fetch them at all.
+    //
+    // `optional` is deliberately not consulted. It gates whether the pack
+    // OFFERS the choice, not whether the launcher honours one already made —
+    // requiring it here is what let a disabled non-optional mod come back on
+    // the next launch, since the file was re-fetched into the path the rename
+    // had just vacated.
     let disabled = read_optional_state(&prepared.instance);
     let wanted: Vec<PlannedFile> = prepared
         .plan
         .files
         .iter()
-        .filter(|f| !(f.optional && disabled.is_disabled(&f.path)))
+        .filter(|f| !disabled.is_disabled(&f.path))
         .cloned()
         .collect();
 
@@ -338,6 +532,19 @@ async fn install_payload(
         reporter,
     )
     .await?;
+
+    // Extract bundled worlds (first-install-only). Best-effort: a failure logs
+    // but does not block the install. Worlds are only installed if saves/<folder>
+    // does not already exist.
+    extract_bundled_worlds(
+        app,
+        prepared,
+        http,
+        password,
+        reporter,
+        manifest,
+    )
+    .await;
 
     reporter.emit(Phase::Verifying, 0.5, "", 0, 0);
 
@@ -553,8 +760,33 @@ pub async fn install_pack(
     // them, which is half of every out-of-memory diagnosis.
     reporter.log("info", &prepared.runtime.summary());
 
+    // Check if we need to backup before updating.
+    if prepared.instance.root.is_dir() {
+        let previous = read_marker(&prepared.instance);
+        if let Some(prev) = previous {
+            if prev.version_id != prepared.plan.version_id {
+                // Version is changing; try to create a pre-update backup.
+                if backups::backup_before_update(
+                    &app,
+                    &prepared.layout,
+                    &prepared.plan.slug,
+                    &prepared.plan.version_id,
+                ) {
+                    reporter.log("info", "Copia de seguridad creada antes de la actualización.");
+                }
+            }
+        }
+    }
+
     let (prepared, _game) = install_minecraft(prepared, reporter.clone()).await?;
-    install_payload(&app, &prepared, &http, password.as_deref(), &reporter).await?;
+
+    // Parse the manifest for world extraction (needed by install_payload)
+    let manifest_raw = serde_json::to_string(&manifest)
+        .map_err(|e| InstallFailure::message(format!("Manifiesto ilegible: {e}")))?;
+    let parsed_manifest = crate::pack::parse_manifest(&manifest_raw)
+        .map_err(|e| InstallFailure::message(format!("El manifiesto del pack no es válido: {e}")))?;
+
+    install_payload(&app, &prepared, &http, password.as_deref(), &reporter, &parsed_manifest).await?;
 
     reporter.done();
     Ok(InstallStatus::Installed {
@@ -613,13 +845,19 @@ pub async fn launch_pack(
 
     let (prepared, game) = install_minecraft(prepared, reporter.clone()).await?;
 
-    if let Err(err) = install_payload(&app, &prepared, &http, password.as_deref(), &reporter).await {
+    // Parse the manifest for world extraction
+    let manifest_raw = serde_json::to_string(&manifest)
+        .map_err(|e| InstallFailure::message(format!("Manifiesto ilegible: {e}")))?;
+    let parsed_manifest = crate::pack::parse_manifest(&manifest_raw)
+        .map_err(|e| InstallFailure::message(format!("El manifiesto del pack no es válido: {e}")))?;
+
+    if let Err(err) = install_payload(&app, &prepared, &http, password.as_deref(), &reporter, &parsed_manifest).await {
         process::emit_idle(&app);
         return Err(err);
     }
     reporter.done();
 
-    let running = process::spawn(&app, &game)?;
+    let running = process::spawn(&app, &game, prepared.plan.quick_play.as_deref(), pack_id.clone())?;
     let pid = running.pid;
     settings::record_play(&app, &pack_id);
     manager.running.lock().await.insert(pack_id, running);
@@ -668,11 +906,10 @@ pub async fn instance_scan(
         });
     };
 
-    if !instance.minecraft.is_dir() {
-        return Ok(InstallStatus::Broken {
-            reason: "Falta la carpeta del juego. Vuelve a instalar el pack.".to_string(),
-        });
-    }
+    // There used to be a separate `instance.minecraft.is_dir()` check here. The
+    // instance directory IS the game directory now, so `instance.root.is_dir()`
+    // above already answers it — a second copy would be dead code that reads
+    // like a real guard.
 
     let size_bytes = paths::dir_size(&instance.root);
     Ok(match latest_version_id {
@@ -845,7 +1082,9 @@ pub async fn instance_revert(
         .managed
         .iter()
         .map(instance::ManagedFile::to_planned)
-        .filter(|f| !(f.optional && disabled.is_disabled(&f.path)))
+        // Same rule as the install pass: a revert must not silently re-enable
+        // what the player switched off.
+        .filter(|f| !disabled.is_disabled(&f.path))
         .collect();
     let (mods, overrides): (Vec<_>, Vec<_>) = wanted.iter().cloned().partition(|f| f.is_mod);
 
@@ -936,13 +1175,82 @@ pub async fn instance_optional(
     Ok(instance::optional_list(&catalogue, &read_optional_state(&instance)))
 }
 
-/// Switch one optional file on or off.
+/// One row of the Content tab.
+#[derive(Debug, Clone, serde::Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ContentFile {
+    pub path: String,
+    pub size: u64,
+    pub is_mod: bool,
+    /// The pack marks this as something the player may switch off. Not the same
+    /// as `enabled` — this is whether the choice is OFFERED.
+    pub optional: bool,
+    pub enabled: bool,
+    /// True when the bytes are on disk under either name. False means the pack
+    /// declares the file but this instance has not installed it yet.
+    pub installed: bool,
+    pub source: instance::ManagedSource,
+}
+
+/// Everything the Content tab renders for one instance: the pack's files, each
+/// with its on-disk and enabled status.
 ///
-/// Takes effect on the next install, update or launch — all three run the same
-/// payload pass, and a launch re-verifies, so the player never has to hunt for
-/// a separate "apply" button. Switching one OFF does not delete it here: the
-/// stale sweep does that on the next pass, under the same
-/// only-if-you-have-not-touched-it rule as everything else the launcher owns.
+/// Built from the marker rather than the manifest so it describes what this
+/// INSTANCE actually has. The renderer layers the pack's own declared files on
+/// top for a local pack that has never been installed, where there is no marker
+/// to read at all.
+#[tauri::command]
+pub async fn instance_content(
+    slug: String,
+    app: tauri::AppHandle,
+) -> Result<Vec<ContentFile>, InstallFailure> {
+    let settings = settings::load(&app);
+    let layout = Layout::new(&app, settings.game_dir())?;
+    let instance = layout.instance(&slug);
+
+    let Some(marker) = read_marker(&instance) else {
+        return Ok(Vec::new());
+    };
+    let state = read_optional_state(&instance);
+
+    // `managed` holds what is installed; `optional_files` is the full
+    // catalogue including the ones switched off. Union, deduped by path, or a
+    // disabled mod disappears from the list it is meant to be toggled from.
+    let mut seen: HashSet<String> = HashSet::new();
+    let mut out = Vec::new();
+    for file in marker.managed.iter().chain(marker.optional_files.iter()) {
+        let path = instance::normalise(&file.path);
+        if !seen.insert(path.clone()) {
+            continue;
+        }
+        let active = instance::safe_join(&instance.minecraft, &path)
+            .map(|p| p.is_file())
+            .unwrap_or(false);
+        let parked = instance::is_parked(&instance.minecraft, &path);
+        out.push(ContentFile {
+            size: file.size,
+            is_mod: file.is_mod,
+            optional: file.optional,
+            enabled: !state.is_disabled(&path),
+            installed: active || parked,
+            source: file.source.clone(),
+            path,
+        });
+    }
+    out.sort_by(|a, b| a.path.to_lowercase().cmp(&b.path.to_lowercase()));
+    Ok(out)
+}
+
+/// Switch one file on or off.
+///
+/// Two things happen, and both are needed. The state file records the INTENT,
+/// which is what survives a reinstall and what the plan filter reads before any
+/// bytes exist. The rename applies it to the copy already on disk, so the
+/// change is visible in-game on the very next launch without a download — and
+/// reversible just as cheaply.
+///
+/// A file that is not on disk yet is not an error: the intent is stored and the
+/// next install pass honours it by never fetching the file.
 #[tauri::command]
 pub async fn instance_optional_set(
     slug: String,
@@ -957,6 +1265,10 @@ pub async fn instance_optional_set(
     let mut state = read_optional_state(&instance);
     state.set(&path, enabled);
     write_optional_state(&instance, &state)?;
+
+    instance::set_enabled_on_disk(&instance.minecraft, &path, enabled).map_err(|e| {
+        InstallFailure::message(format!("No se pudo {} «{path}»: {e}", if enabled { "activar" } else { "desactivar" }))
+    })?;
 
     let catalogue = read_marker(&instance)
         .map(|m| m.optional_files)

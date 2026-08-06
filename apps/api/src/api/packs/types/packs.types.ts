@@ -16,7 +16,11 @@ export interface LauncherPackView {
   name: string;
   summary: string | null;
   iconUrl: string | null;
+  description?: string;
+  gallery?: StoredPackGalleryImage[];
   accessKind: PackAccessKind;
+  /** Present only for "server packs" — the Quick Play target. */
+  server?: StoredPackServer;
   latestVersion: {
     id: string;
     name: string;
@@ -24,8 +28,19 @@ export interface LauncherPackView {
     loader: PackLoader | null;
     loaderVersion: string | null;
     fileCount: number;
+    worldCount: number;
     createdAt: string;
   } | null;
+}
+
+/** The stored shape of `packs.server`. Mirrors PackServer in
+ *  @boffmedia/pack-schema (whose TS types must not be imported here). `port` is
+ *  optional (a bare SRV host declares none), and `host` is optional too so a
+ *  legacy/malformed `{}` row still types — the listing surfaces it as a server
+ *  pack with an unavailable status rather than dropping or crashing it. */
+export interface StoredPackServer {
+  host?: string;
+  port?: number;
 }
 
 /** The admin view: everything, including who has access. */
@@ -47,6 +62,7 @@ export interface PackVersionView {
   loader: PackLoader | null;
   loaderVersion: string | null;
   fileCount: number;
+  worldCount: number;
   published: boolean;
   notes: string | null;
   createdAt: string;
@@ -67,6 +83,22 @@ export interface StoredPackFile {
     | { kind: 'curseforge'; projectId: number; fileId: number }
     | { kind: 'url'; url: string }
     | { kind: 'override'; blobSha512: string };
+}
+
+export interface StoredPackGalleryImage {
+  url: string;
+  alt?: string;
+}
+
+export interface StoredBundledWorld {
+  folder: string;
+  source:
+    | { kind: 'modrinth'; projectId: string; versionId: string }
+    | { kind: 'curseforge'; projectId: number; fileId: number }
+    | { kind: 'url'; url: string }
+    | { kind: 'override'; blobSha512: string };
+  sizeBytes: number;
+  sha512: string;
 }
 
 /** A launcher session, minted only after `hasJoined` proved UUID ownership. */

@@ -6,6 +6,7 @@ import { useTranslations } from "next-intl"
 import { Badge, Button, Empty, Field, Icon, Input, Spinner, Tabs, toast } from "@boffmedia/ui"
 import { AvMetric, AvPanel, AvPill, AvSectionHead } from "../_components/ui/av-kit"
 import { ConfirmModal, PackForm } from "../_components/packs/pack-form"
+import { PackServerEditor } from "../_components/packs/pack-server-editor"
 import { VersionEditor } from "../_components/packs/version-editor"
 import {
   type AccessRow,
@@ -730,6 +731,9 @@ export function PacksAdmin() {
                </div>
                 <AvMetric value={pack.versionCount} label={t("tabVersions")} tone="accent" />
                 <AvMetric value={pack.aclCount} label={t("tabAccess")} />
+             </div>
+             <div className="mb-4 shrink-0">
+               <PackServerEditor key={pack.id} pack={pack} onSaved={load} />
              </div>
              <div className="shrink-0">
                <Tabs
