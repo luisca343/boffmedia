@@ -375,6 +375,8 @@ export type { OrderAppDto } from './models/OrderAppDto';
 export type { OrderItemDto } from './models/OrderItemDto';
 export type { OrderLineInputDto } from './models/OrderLineInputDto';
 export type { PackIdEntity } from './models/PackIdEntity';
+export type { PackServerDto } from './models/PackServerDto';
+export type { PackServerEntity } from './models/PackServerEntity';
 export type { PackVersionEntity } from './models/PackVersionEntity';
 export { Participant } from './models/Participant';
 export type { PasaporteLadderRungEntity } from './models/PasaporteLadderRungEntity';
