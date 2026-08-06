@@ -171,6 +171,7 @@ pub fn run() {
             install::instance_content,
             browse::instance_browse,
             browse::instance_delete_path,
+            browse::instance_delete,
             browse::instance_reveal,
             browse::instance_screenshots,
             browse::screenshot_image,

@@ -27,6 +27,29 @@ const LOADERS = ['forge', 'neoforge', 'fabric-loader', 'quilt-loader'] as const;
 /** Dashed lowercase UUID — the form `rotom_users.uuid` stores. */
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
+/** A pack's Quick Play target. Mirrors PackServer in @boffmedia/pack-schema so
+ *  the stored manifest validates against the same rules the launcher enforces:
+ *  `host` is a bare hostname or IP (no scheme, no slash), `port` defaults to the
+ *  vanilla 25565. Present = this is a "server pack". */
+export class PackServerDto {
+  @ApiProperty({ example: 'play.example.com' })
+  @IsString()
+  @MinLength(1)
+  @MaxLength(255)
+  @Matches(/^[^/\\]+$/, {
+    message: 'El host no debe incluir esquema ni barras',
+  })
+  host!: string;
+
+  @ApiPropertyOptional({ example: 25565, default: 25565 })
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  @Max(65535)
+  port?: number;
+}
+
 export class CreatePackDto {
   @ApiProperty({ example: 'boff-smp' })
   @IsString()
@@ -85,6 +108,12 @@ export class CreatePackDto {
   @IsString()
   @MinLength(4)
   password?: string;
+
+  @ApiPropertyOptional({ type: PackServerDto })
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => PackServerDto)
+  server?: PackServerDto;
 }
 
 export class UpdatePackDto {
@@ -137,6 +166,16 @@ export class UpdatePackDto {
   @IsOptional()
   @IsString()
   password?: string;
+
+  @ApiPropertyOptional({
+    type: PackServerDto,
+    nullable: true,
+    description: 'null para dejar de ser un pack de servidor',
+  })
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => PackServerDto)
+  server?: PackServerDto | null;
 
   @ApiPropertyOptional()
   @IsOptional()

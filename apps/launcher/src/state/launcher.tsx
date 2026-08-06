@@ -71,6 +71,10 @@ type State = {
   restoreError: { message: string; needsSignin: boolean } | null
   view: View
   selectedPackId: string | null
+  /** One-shot: set when navigation asked the pack detail to open its edit form
+   *  straight away (the library card's "Edit" action). The detail consumes and
+   *  clears it on mount, so it never re-fires on a later plain visit. */
+  editIntent: boolean
   packs: PackEntry[]
   packsLoading: boolean
   /** Set when the registry could not be reached or refused us. Distinct from an
@@ -98,7 +102,8 @@ type Action =
   | { type: "packs/loading" }
   | { type: "packs/load"; packs: PackEntry[]; registryError: string | null }
   | { type: "packs/error"; message: string }
-  | { type: "view"; view: View; packId?: string }
+  | { type: "view"; view: View; packId?: string; edit?: boolean }
+  | { type: "editIntent/clear" }
   | { type: "install/start"; packId: string }
   | {
       type: "install/progress"
@@ -195,7 +200,14 @@ function reducer(s: State, a: Action): State {
       // empty a library the player was just looking at.
       return { ...s, packsLoading: false, packsError: a.message }
     case "view":
-      return { ...s, view: a.view, selectedPackId: a.packId ?? s.selectedPackId }
+      return {
+        ...s,
+        view: a.view,
+        selectedPackId: a.packId ?? s.selectedPackId,
+        editIntent: a.edit ?? false,
+      }
+    case "editIntent/clear":
+      return { ...s, editIntent: false }
     case "install/start":
       return {
         ...s,
@@ -276,6 +288,7 @@ const initial: State = {
   offline: false,
   view: "packs",
   selectedPackId: null,
+  editIntent: false,
   packs: [],
   packsLoading: false,
   packsError: null,
@@ -308,7 +321,11 @@ type Ctx = State & {
   revalidate: () => Promise<void>
   /** True while {@link revalidate} runs — same cost as a silent sign-in. */
   revalidating: boolean
-  go: (view: View, packId?: string) => void
+  go: (view: View, packId?: string, opts?: { edit?: boolean }) => void
+  /** True when the pack detail was opened with a request to edit immediately.
+   *  Read once, then cleared via {@link clearEditIntent}. */
+  editIntent: boolean
+  clearEditIntent: () => void
   reloadPacks: () => void
   install: (packId: string) => Promise<void>
   repair: (packId: string) => Promise<void>
@@ -927,7 +944,9 @@ export function LauncherProvider({ children }: { children: React.ReactNode }) {
     removeAccount,
     revalidate,
     revalidating,
-    go: (view, packId) => dispatch({ type: "view", view, packId }),
+    go: (view, packId, opts) => dispatch({ type: "view", view, packId, edit: opts?.edit }),
+    editIntent: state.editIntent,
+    clearEditIntent: () => dispatch({ type: "editIntent/clear" }),
     reloadPacks: () => setReloadToken((n) => n + 1),
     install,
     repair,

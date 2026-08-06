@@ -142,6 +142,27 @@ pub async fn instance_delete_path(
     result.map_err(|e| InstallFailure::message(format!("No se pudo borrar «{rel}»: {e}")))
 }
 
+/// Uninstall a pack by deleting its whole instance directory, so the next
+/// library scan reports it as "not installed" again. Unlike `local_pack_delete`
+/// this is for MANAGED packs — the pack itself stays in the registry-backed
+/// library and can be reinstalled, so backups under `backups/<slug>/` are left
+/// untouched: an uninstall is not a "throw the snapshots away too" decision the
+/// way deleting a player-authored pack is. Refusing to run while the game is
+/// live is the renderer's job (it disables the action); by the time this runs
+/// the process is expected to be gone.
+#[tauri::command]
+pub async fn instance_delete(slug: String, app: tauri::AppHandle) -> Result<(), InstallFailure> {
+    let settings = settings::load(&app);
+    let layout = Layout::new(&app, settings.game_dir())?;
+    let root = layout.instance(&slug).root;
+    if root.exists() {
+        std::fs::remove_dir_all(&root).map_err(|e| {
+            InstallFailure::message(format!("No se pudo desinstalar el pack: {e}"))
+        })?;
+    }
+    Ok(())
+}
+
 /// Reveal a path in the OS file manager. `rel` may be "" for the game folder.
 #[tauri::command]
 pub async fn instance_reveal(

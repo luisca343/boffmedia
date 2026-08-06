@@ -48,7 +48,7 @@ pub struct Backup {
     pub size_bytes: u64,
 }
 
-fn backups_dir(layout: &Layout, slug: &str) -> PathBuf {
+pub(crate) fn backups_dir(layout: &Layout, slug: &str) -> PathBuf {
     layout
         .root()
         .join("backups")

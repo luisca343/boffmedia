@@ -28,11 +28,18 @@ export class PacksRepository {
    * the launcher's serde, `PackManifest.safeParse` — ever sees a string where it
    * expects `{ url, alt }[]`.
    */
-  private hydratePack<T extends { gallery?: unknown }>(row: T): T {
-    if (typeof row.gallery === 'string') {
-      return { ...row, gallery: JSON.parse(row.gallery) as unknown[] };
+  private hydratePack<T extends { gallery?: unknown; server?: unknown }>(row: T): T {
+    let out = row;
+    if (typeof out.gallery === 'string') {
+      out = { ...out, gallery: JSON.parse(out.gallery) as unknown[] };
     }
-    return row;
+    // Same MariaDB-returns-json-as-string trap as gallery: without this the
+    // manifest and the launcher listing carry `server` as a raw string, and
+    // PackManifest.safeParse rejects it as "expected object, received string".
+    if (typeof out.server === 'string') {
+      out = { ...out, server: JSON.parse(out.server) as unknown };
+    }
+    return out;
   }
 
   async findById(id: string): Promise<Pack | null> {
@@ -69,6 +76,7 @@ export class PacksRepository {
         description: packs.description,
         iconUrl: packs.iconUrl,
         gallery: packs.gallery,
+        server: packs.server,
         accessKind: packs.accessKind,
         passwordHash: packs.passwordHash,
         latestVersionId: packs.latestVersionId,

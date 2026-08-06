@@ -35,6 +35,8 @@ export function PackForm({
   const [gallery, setGallery] = useState<GalleryImage[]>([])
   const [accessKind, setAccessKind] = useState<AdminPack["accessKind"]>("allowlist")
   const [password, setPassword] = useState("")
+  const [serverHost, setServerHost] = useState("")
+  const [serverPort, setServerPort] = useState("")
   const [busy, setBusy] = useState(false)
   const [uploadingIcon, setUploadingIcon] = useState(false)
   const [uploadingGallery, setUploadingGallery] = useState(false)
@@ -53,6 +55,11 @@ export function PackForm({
         gallery: gallery.length > 0 ? gallery : undefined,
         accessKind,
         password: accessKind === "password" ? password : undefined,
+        // A host makes it a server pack; a blank port lets the API default to
+        // the vanilla 25565.
+        server: serverHost.trim()
+          ? { host: serverHost.trim(), port: serverPort.trim() ? Number(serverPort) : undefined }
+          : undefined,
       })
       // The envelope reports 201 on POST, so `success` is the only safe check.
       if (!res.success) {
@@ -105,8 +112,16 @@ export function PackForm({
   }
 
   const slugValid = /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug)
+  const portNum = serverPort.trim() ? Number(serverPort) : null
+  const serverValid =
+    !serverHost.trim() ||
+    portNum === null ||
+    (Number.isInteger(portNum) && portNum >= 1 && portNum <= 65535)
   const canSubmit =
-    slugValid && name.trim().length > 0 && (accessKind !== "password" || password.length >= 4)
+    slugValid &&
+    name.trim().length > 0 &&
+    (accessKind !== "password" || password.length >= 4) &&
+    serverValid
 
   return (
     <AvPanel
@@ -370,6 +385,42 @@ export function PackForm({
                   </Field>
                 </div>
               )}
+            </section>
+
+            <section className="cut border border-solid border-line bg-panel-2 p-4">
+              <div className="mb-4 flex items-start gap-3">
+                <span className="grid size-8 shrink-0 place-items-center border border-solid border-line-2 bg-panel text-accent">
+                  <Icon name="server" size={15} />
+                </span>
+                <div>
+                  <h3 className="font-display text-[14px] font-bold uppercase tracking-[0.08em] text-txt">
+                    {t("serverSection")}
+                  </h3>
+                  <p className="mt-1 text-[12px] leading-[1.45] text-txt-dim">
+                    {t("serverSectionLead")}
+                  </p>
+                </div>
+              </div>
+
+              <div className="grid max-w-[520px] gap-3 sm:grid-cols-[1fr_140px]">
+                <Field label={t("serverHost")} hint={t("serverHostHint")}>
+                  <Input
+                    value={serverHost}
+                    placeholder="play.example.com"
+                    onChange={(e) => setServerHost(e.target.value)}
+                  />
+                </Field>
+                <Field label={t("serverPort")} hint={t("serverPortHint")}>
+                  <Input
+                    type="number"
+                    min={1}
+                    max={65535}
+                    value={serverPort}
+                    placeholder="25565"
+                    onChange={(e) => setServerPort(e.target.value)}
+                  />
+                </Field>
+              </div>
             </section>
           </div>
         </div>

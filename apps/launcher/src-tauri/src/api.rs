@@ -112,6 +112,15 @@ pub struct LauncherGalleryImage {
     pub alt: Option<String>,
 }
 
+/** The Quick Play target, mirrored from the registry's pack listing. Present
+ *  only for "server packs". */
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct LauncherServer {
+    pub host: String,
+    pub port: u16,
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct LauncherPack {
@@ -125,6 +134,8 @@ pub struct LauncherPack {
     #[serde(default)]
     pub gallery: Vec<LauncherGalleryImage>,
     pub access_kind: String,
+    #[serde(default)]
+    pub server: Option<LauncherServer>,
     pub latest_version: Option<LauncherVersion>,
 }
 

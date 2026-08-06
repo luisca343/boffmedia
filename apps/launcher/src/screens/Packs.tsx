@@ -9,18 +9,28 @@ import {
   Icon,
   Input,
   Kicker,
+  Menu,
   Modal,
-  Panel,
+  PackCard,
   Progress,
   SearchInput,
   toast,
 } from "@boffmedia/ui"
+import type { MenuItem } from "@boffmedia/ui"
 
 import { useT } from "../i18n"
 import { VersionPicker, dependenciesOf } from "../components/VersionPicker"
 import type { VersionChoice } from "../components/VersionPicker"
-import { localPackSave, serverStatus } from "../runtime"
+import {
+  exportMrpack,
+  exportServerMrpack,
+  instanceReveal,
+  localPackDuplicate,
+  localPackSave,
+  serverStatus,
+} from "../runtime"
 import { ImportPackPage } from "../components/pack/ImportPackPage"
+import { DeleteLocalPackModal, UninstallPackModal } from "../components/pack/PackDeleteDialogs"
 import type { InstallState, PackEntry, ServerStatus } from "../services/types"
 import { useLauncher } from "../state/launcher"
 import { formatBytes, formatPlaytime, formatWhen } from "../utils/format"
@@ -81,113 +91,222 @@ function AccessBadge({ entry }: { entry: PackEntry }) {
   return <Badge tone="live">{t("grantedAccess")}</Badge>
 }
 
-function PackCard({ entry }: { entry: PackEntry }) {
+/** A library card. The visual chassis (header, server/client banner, footer,
+ *  geometry) lives in the shared `@boffmedia/ui` PackCard; this wires the
+ *  launcher-specific pieces into its slots — the live server-status ping, the
+ *  state-driven action button, and the kebab of per-pack actions — and owns the
+ *  destructive-action modals.
+ *
+ *  Menu vocabulary is split across two namespaces on purpose: the edit /
+ *  duplicate / export labels and their result toasts already exist under
+ *  `packDetail` (the detail screen offers the same actions), so the card reuses
+ *  them via `tp` rather than cloning the strings; only the library-only actions
+ *  (delete, uninstall, open folder) are new `packs` keys. */
+function LibraryCard({ entry }: { entry: PackEntry }) {
   const t = useT("packs")
-  const { go, install, play, repair, game, offline } = useLauncher()
+  const tp = useT("packDetail")
+  const { go, install, play, repair, game, offline, reloadPacks } = useLauncher()
   const { pack, latest, state } = entry
   const busy = game.kind === "preparing" || game.kind === "running"
+  const running = game.kind === "running"
   // A pack with no published version is listed but cannot be installed —
   // offering the button anyway would produce a 404 the player cannot act on.
   const needsInstall =
     !!latest && (state.kind === "not-installed" || state.kind === "outdated")
+  const isLocal = entry.origin === "local"
+  // "Has files on disk", the condition for Open folder / Uninstall — a broken
+  // install still has a directory to open and to remove.
+  const installed =
+    state.kind === "installed" || state.kind === "outdated" || state.kind === "broken"
+  const showMenu = isLocal || installed
+
+  const [deleting, setDeleting] = useState(false)
+  const [uninstalling, setUninstalling] = useState(false)
+  const [duplicating, setDuplicating] = useState(false)
+
+  const doDuplicate = async () => {
+    setDuplicating(true)
+    try {
+      const copy = await localPackDuplicate(pack.slug, "")
+      toast.success(tp("duplicateSuccess", { name: copy.pack.name }))
+      reloadPacks()
+    } catch (err) {
+      toast.error((err as { message?: string })?.message ?? tp("duplicateError"))
+    } finally {
+      setDuplicating(false)
+    }
+  }
+
+  const doExport = async (serverOnly: boolean) => {
+    try {
+      await (serverOnly ? exportServerMrpack : exportMrpack)(pack.slug)
+      toast.success(tp("exportSuccess"))
+    } catch (err) {
+      const message = (err as { message?: string })?.message
+      if (message !== tp("exportCancelled")) toast.error(message ?? tp("exportError"))
+    }
+  }
+
+  const openFolder: MenuItem = {
+    label: t("openInstanceFolder"),
+    icon: "folder",
+    onSelect: () => void instanceReveal(pack.slug, ""),
+  }
+  const menuItems: MenuItem[] = isLocal
+    ? [
+        { label: tp("editLocalMenu"), icon: "edit", onSelect: () => go("pack", pack.id, { edit: true }) },
+        {
+          label: duplicating ? tp("duplicatingMenu") : tp("duplicateLocalMenu"),
+          icon: "copy",
+          onSelect: () => void doDuplicate(),
+        },
+        { label: tp("exportMenu"), icon: "upload", onSelect: () => void doExport(false) },
+        { label: tp("exportServerMenu"), icon: "upload", onSelect: () => void doExport(true) },
+        ...(installed ? [openFolder] : []),
+        { sep: true },
+        {
+          label: t("deleteLocalMenu"),
+          icon: "trash",
+          danger: true,
+          disabled: state.kind === "installing",
+          onSelect: () => setDeleting(true),
+        },
+      ]
+    : [
+        openFolder,
+        {
+          label: t("uninstallMenu"),
+          icon: "trash",
+          danger: true,
+          disabled: state.kind === "installing",
+          onSelect: () => setUninstalling(true),
+        },
+      ]
+
+  const actions =
+    state.kind === "broken" ? (
+      <Button
+        size="sm"
+        variant="default"
+        icon="refresh"
+        // Repair re-downloads the broken files, so it needs a network too.
+        disabled={!latest || offline}
+        title={offline ? t("repairOfflineTitle") : undefined}
+        onClick={() => void repair(pack.id)}
+      >
+        {t("repair")}
+      </Button>
+    ) : (
+      <Button
+        size="sm"
+        variant={needsInstall ? "default" : "pri"}
+        icon={needsInstall ? "download" : "play"}
+        loading={state.kind === "installing" || (!needsInstall && game.kind === "preparing")}
+        // Offline, installing is impossible — but PLAYING an already installed
+        // pack is exactly what offline mode exists for, so only the install half
+        // is disabled.
+        disabled={!latest || (needsInstall && offline) || (!needsInstall && busy)}
+        title={needsInstall && offline ? t("installOfflineTitle") : undefined}
+        onClick={() => {
+          // Launching from the card is the whole point of the library screen;
+          // sending the player to the detail view to press a second button is
+          // what made every pack look unplayable from here.
+          if (needsInstall) void install(pack.id)
+          else void play(pack.id)
+        }}
+      >
+        {!latest
+          ? t("notAvailable")
+          : state.kind === "outdated"
+            ? t("update")
+            : needsInstall
+              ? t("install")
+              : running
+                ? t("running")
+                : t("play")}
+      </Button>
+    )
 
   return (
-    <Panel
-      hover
-      media={<CatalogIcon src={pack.iconUrl ?? undefined} size={28} />}
-      title={pack.name}
-      aside={<StateBadge state={state} />}
-      className="cursor-pointer"
-      onClick={() => go("pack", pack.id)}
-    >
-      <p className="mb-4 min-h-[40px] text-sm text-txt-muted">{pack.summary}</p>
-
-      {/* An install runs for minutes; a card that only says "Instalando" makes
-          the player click through to the detail view to learn whether anything
-          is happening. */}
-      {state.kind === "installing" && (
-        <div className="mb-4">
-          <Progress value={state.progress.fraction * 100} />
-          <p className="mt-1.5 truncate font-mono text-[11px] text-txt-dim">
-            {PHASE_LABEL[state.progress.phase]}
-            {state.progress.currentFile ? ` · ${state.progress.currentFile}` : ""}
-          </p>
-        </div>
+    <>
+      <PackCard
+        icon={<CatalogIcon src={pack.iconUrl ?? undefined} size={28} />}
+        title={pack.name}
+        stateBadge={<StateBadge state={state} />}
+        type={entry.server ? "server" : "client"}
+        // RF-02: the status ping only ever runs when the pack declares a server.
+        serverStatus={
+          entry.server ? <ServerStatusBadge host={entry.server.host} port={entry.server.port} /> : undefined
+        }
+        summary={pack.summary}
+        progress={
+          state.kind === "installing" ? (
+            <>
+              <Progress value={state.progress.fraction * 100} />
+              <p className="mt-1.5 truncate font-mono text-[11px] text-txt-dim">
+                {PHASE_LABEL[state.progress.phase]}
+                {state.progress.currentFile ? ` · ${state.progress.currentFile}` : ""}
+              </p>
+            </>
+          ) : undefined
+        }
+        error={state.kind === "broken" ? state.reason : undefined}
+        badges={
+          <>
+            <AccessBadge entry={entry} />
+            <span className="font-mono text-[11px] text-txt-dim">
+              {latest
+                ? `${latest.minecraft} · ${t("filesCount", { count: latest.fileCount })}`
+                : t("noPublishedVersion")}
+            </span>
+          </>
+        }
+        footerMeta={
+          <>
+            {entry.lastPlayed ? t("lastPlayed", { when: formatWhen(entry.lastPlayed) }) : t("neverPlayed")}
+            {entry.playMs ? ` · ${t("playtime", { time: formatPlaytime(entry.playMs) })}` : ""}
+            {state.kind === "installed" || state.kind === "outdated"
+              ? ` · ${formatBytes(state.sizeBytes)}`
+              : ""}
+          </>
+        }
+        actions={actions}
+        menu={
+          showMenu ? (
+            <Menu
+              align="end"
+              ariaLabel={tp("moreActions")}
+              items={menuItems}
+              trigger={
+                <span className="inline-flex h-8 w-8 items-center justify-center border border-solid border-line text-txt-muted transition-colors hover:border-accent-line hover:text-accent-bright cut-tag [--cut-tag:6px]">
+                  <Icon name="more" size={16} />
+                </span>
+              }
+            />
+          ) : undefined
+        }
+        onOpen={() => go("pack", pack.id)}
+      />
+      {isLocal && (
+        <DeleteLocalPackModal
+          open={deleting}
+          slug={pack.slug}
+          name={pack.name}
+          onClose={() => setDeleting(false)}
+          onDone={reloadPacks}
+        />
       )}
-
-      {state.kind === "broken" && (
-        <p className="mb-4 rounded-sm border border-bad/40 bg-bad/10 px-2.5 py-2 text-[11px] text-txt-muted">
-          {state.reason}
-        </p>
+      {!isLocal && (
+        <UninstallPackModal
+          open={uninstalling}
+          slug={pack.slug}
+          name={pack.name}
+          blocked={running}
+          onClose={() => setUninstalling(false)}
+          onDone={reloadPacks}
+        />
       )}
-
-      <div className="mb-4 flex flex-wrap items-center gap-2">
-        <AccessBadge entry={entry} />
-        {/* RF-02: nothing renders here at all when the pack has no server. */}
-        {entry.server && <ServerStatusBadge host={entry.server.host} port={entry.server.port} />}
-        <span className="font-mono text-[11px] text-txt-dim">
-          {latest
-            ? `${latest.minecraft} · ${t("filesCount", { count: latest.fileCount })}`
-            : t("noPublishedVersion")}
-        </span>
-      </div>
-
-      <div className="flex items-center justify-between gap-3 border-t border-line pt-3">
-        <span className="text-xs text-txt-dim">
-          {entry.lastPlayed ? t("lastPlayed", { when: formatWhen(entry.lastPlayed) }) : t("neverPlayed")}
-          {entry.playMs ? ` · ${t("playtime", { time: formatPlaytime(entry.playMs) })}` : ""}
-          {state.kind === "installed" || state.kind === "outdated"
-            ? ` · ${formatBytes(state.sizeBytes)}`
-            : ""}
-        </span>
-        {state.kind === "broken" ? (
-          <Button
-            size="sm"
-            variant="default"
-            icon="refresh"
-            // Repair re-downloads the broken files, so it needs a network too.
-            disabled={!latest || offline}
-            title={offline ? t("repairOfflineTitle") : undefined}
-            onClick={(e) => {
-              e.stopPropagation()
-              void repair(pack.id)
-            }}
-          >
-            {t("repair")}
-          </Button>
-        ) : (
-          <Button
-            size="sm"
-            variant={needsInstall ? "default" : "pri"}
-            icon={needsInstall ? "download" : "play"}
-            loading={state.kind === "installing" || (!needsInstall && game.kind === "preparing")}
-            // Offline, installing is impossible — but PLAYING an already
-            // installed pack is exactly what offline mode exists for, so only
-            // the install half is disabled.
-            disabled={!latest || (needsInstall && offline) || (!needsInstall && busy)}
-            title={needsInstall && offline ? t("installOfflineTitle") : undefined}
-            onClick={(e) => {
-              e.stopPropagation()
-              // Launching from the card is the whole point of the library
-              // screen; sending the player to the detail view to press a second
-              // button is what made every pack look unplayable from here.
-              if (needsInstall) void install(pack.id)
-              else void play(pack.id)
-            }}
-          >
-            {!latest
-              ? t("notAvailable")
-              : state.kind === "outdated"
-                ? t("update")
-                : needsInstall
-                  ? t("install")
-                  : game.kind === "running"
-                    ? t("running")
-                    : t("play")}
-          </Button>
-        )}
-      </div>
-    </Panel>
+    </>
   )
 }
 
@@ -363,7 +482,7 @@ export function Packs() {
 
       <div className="grid gap-4 [grid-template-columns:repeat(auto-fill,minmax(320px,1fr))]">
         {shown.map((entry) => (
-          <PackCard key={entry.pack.id} entry={entry} />
+          <LibraryCard key={entry.pack.id} entry={entry} />
         ))}
       </div>
 

@@ -27,6 +27,8 @@ const es = {
       clearSearch: "Borrar búsqueda",
       loading: "Cargando…",
       notifications: "Notificaciones",
+      serverPack: "Pack de servidor",
+      clientPack: "Pack de cliente",
     },
   },
 
@@ -322,6 +324,24 @@ const es = {
     repairOfflineTitle: "Reparar necesita conexión",
     installOfflineTitle: "Instalar necesita conexión",
     filesCount: "{count} archivos",
+    openInstanceFolder: "Abrir carpeta",
+    deleteLocalMenu: "Eliminar pack",
+    deleteLocalTitle: "Eliminar pack local",
+    deleteLocalWarning: "Se eliminará «{name}» y todos sus archivos instalados.",
+    deleteLocalDetail:
+      "Se borrarán de forma permanente la definición del pack, la instancia instalada y sus copias de seguridad. Esta acción no se puede deshacer.",
+    deleteLocalSuccess: "«{name}» eliminado.",
+    deleteLocalError: "No se pudo eliminar el pack.",
+    deleteButton: "Eliminar",
+    uninstallMenu: "Desinstalar",
+    uninstallTitle: "Desinstalar pack",
+    uninstallWarning: "Se borrarán los archivos instalados de «{name}».",
+    uninstallDetail:
+      "El pack seguirá en tu biblioteca y podrás volver a instalarlo cuando quieras. Las copias de seguridad se conservan.",
+    uninstallSuccess: "«{name}» desinstalado.",
+    uninstallError: "No se pudo desinstalar el pack.",
+    uninstallButton: "Desinstalar",
+    cannotWhileRunning: "No puedes hacerlo mientras el juego está en ejecución.",
   },
 
   packDetail: {
@@ -806,6 +826,8 @@ const en = {
       clearSearch: "Clear search",
       loading: "Loading…",
       notifications: "Notifications",
+      serverPack: "Server pack",
+      clientPack: "Client pack",
     },
   },
 
@@ -1100,6 +1122,24 @@ const en = {
     repairOfflineTitle: "Repair requires connection",
     installOfflineTitle: "Install requires connection",
     filesCount: "{count} files",
+    openInstanceFolder: "Open folder",
+    deleteLocalMenu: "Delete pack",
+    deleteLocalTitle: "Delete local pack",
+    deleteLocalWarning: "This deletes “{name}” and all of its installed files.",
+    deleteLocalDetail:
+      "The pack definition, the installed instance and its backups are removed permanently. This cannot be undone.",
+    deleteLocalSuccess: "“{name}” deleted.",
+    deleteLocalError: "Could not delete the pack.",
+    deleteButton: "Delete",
+    uninstallMenu: "Uninstall",
+    uninstallTitle: "Uninstall pack",
+    uninstallWarning: "This deletes the installed files of “{name}”.",
+    uninstallDetail:
+      "The pack stays in your library and can be reinstalled at any time. Backups are kept.",
+    uninstallSuccess: "“{name}” uninstalled.",
+    uninstallError: "Could not uninstall the pack.",
+    uninstallButton: "Uninstall",
+    cannotWhileRunning: "You can’t do this while the game is running.",
   },
 
   packDetail: {

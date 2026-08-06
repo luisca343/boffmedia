@@ -21,6 +21,7 @@ import {
   Textarea,
   toast,
 } from "@boffmedia/ui"
+import type { MenuItem } from "@boffmedia/ui"
 
 import { useT } from "../i18n"
 import { CrashDiagnosisCard } from "../components/CrashDiagnosis"
@@ -38,6 +39,7 @@ import { LogPanel } from "../components/pack/LogPanel"
 import {
   exportMrpack,
   exportServerMrpack,
+  instanceReveal,
   localPackDuplicate,
   localPackGet,
   localPackIcon,
@@ -45,6 +47,7 @@ import {
   localPackIconSet,
   localPackSave,
 } from "../runtime"
+import { DeleteLocalPackModal, UninstallPackModal } from "../components/pack/PackDeleteDialogs"
 import { useLauncher } from "../state/launcher"
 import { formatBytes, formatDuration, formatWhen } from "../utils/format"
 import { LOADER_LABEL, PHASE_LABEL, STEP_GROUPS } from "../utils/labels"
@@ -260,13 +263,18 @@ type TabKey = "content" | "files" | "worlds" | "gallery" | "screenshots" | "back
 
 export function PackDetail() {
   const t = useT("packDetail")
-  const { selected, install, play, repair, stop, game, go, logs, reloadPacks, offline } =
+  // The delete / uninstall / open-folder actions are library vocabulary shared
+  // with the packs screen, so their labels live in the `packs` namespace.
+  const tk = useT("packs")
+  const { selected, install, play, repair, stop, game, go, logs, reloadPacks, offline, editIntent, clearEditIntent } =
     useLauncher()
   const now = useNow(game.kind === "running")
   const [editing, setEditing] = useState(false)
   const [exporting, setExporting] = useState(false)
   const [exportingServer, setExportingServer] = useState(false)
   const [duplicating, setDuplicating] = useState(false)
+  const [showDelete, setShowDelete] = useState(false)
+  const [showUninstall, setShowUninstall] = useState(false)
   const [tab, setTab] = useState<TabKey>("content")
   const [browsing, setBrowsing] = useState(false)
   const [contentNonce, setContentNonce] = useState(0)
@@ -288,6 +296,14 @@ export function PackDetail() {
       alive = false
     }
   }, [localSlug, contentNonce])
+
+  // The library card's "Edit" navigates here asking the form to open straight
+  // away. Consume the one-shot intent (only a local pack has an edit form) and
+  // clear it, so a later plain visit to the same pack does not reopen the modal.
+  useEffect(() => {
+    if (editIntent && localSlug) setEditing(true)
+    if (editIntent) clearEditIntent()
+  }, [editIntent, localSlug, clearEditIntent])
 
   if (!selected) {
     return (
@@ -352,6 +368,49 @@ export function PackDetail() {
   const loader = !latest?.loader
     ? "Vanilla"
     : `${LOADER_LABEL[latest.loader] ?? latest.loader} ${latest.loaderVersion ?? ""}`.trim()
+
+  // "Has files on disk": a broken install still has a directory to open and
+  // remove, so Open folder / Delete / Uninstall are all offered on it.
+  const hasFiles =
+    state.kind === "installed" || state.kind === "outdated" || state.kind === "broken"
+  const openFolder: MenuItem = {
+    label: tk("openInstanceFolder"),
+    icon: "folder",
+    onSelect: () => void instanceReveal(pack.slug, ""),
+  }
+  const localMenuItems: MenuItem[] = [
+    { label: t("editLocalMenu"), icon: "edit", onSelect: () => setEditing(true) },
+    {
+      label: duplicating ? t("duplicatingMenu") : t("duplicateLocalMenu"),
+      icon: "plus",
+      onSelect: () => void doDuplicate(),
+    },
+    { label: exporting ? t("exportingMenu") : t("exportMenu"), icon: "upload", onSelect: () => void doExport(false) },
+    {
+      label: exportingServer ? t("exportingServerMenu") : t("exportServerMenu"),
+      icon: "upload",
+      onSelect: () => void doExport(true),
+    },
+    ...(hasFiles ? [openFolder] : []),
+    { sep: true },
+    {
+      label: tk("deleteLocalMenu"),
+      icon: "trash",
+      danger: true,
+      disabled: installing,
+      onSelect: () => setShowDelete(true),
+    },
+  ]
+  const managedMenuItems: MenuItem[] = [
+    openFolder,
+    {
+      label: tk("uninstallMenu"),
+      icon: "trash",
+      danger: true,
+      disabled: installing,
+      onSelect: () => setShowUninstall(true),
+    },
+  ]
 
   // Browsing takes over the whole page rather than opening a dialog: the
   // catalog is three panes wide and adding several mods in a row should not
@@ -463,30 +522,13 @@ export function PackDetail() {
             </Button>
           )}
 
-          {/* RF-10: a managed pack never shows these — editing or exporting it
-              is not a flow this launcher offers, anywhere. */}
-          {isLocal && (
-            <Menu
-              label={t("moreActions")}
-              items={[
-                { label: t("editLocalMenu"), icon: "edit", onSelect: () => setEditing(true) },
-                {
-                  label: duplicating ? t("duplicatingMenu") : t("duplicateLocalMenu"),
-                  icon: "plus",
-                  onSelect: () => void doDuplicate(),
-                },
-                {
-                  label: exporting ? t("exportingMenu") : t("exportMenu"),
-                  icon: "upload",
-                  onSelect: () => void doExport(false),
-                },
-                {
-                  label: exportingServer ? t("exportingServerMenu") : t("exportServerMenu"),
-                  icon: "upload",
-                  onSelect: () => void doExport(true),
-                },
-              ]}
-            />
+          {/* RF-10: a managed pack never shows the local-authoring actions
+              (edit / duplicate / export) — but it CAN be opened on disk and
+              uninstalled once it has files, so it gets its own menu. */}
+          {isLocal ? (
+            <Menu label={t("moreActions")} items={localMenuItems} />
+          ) : (
+            hasFiles && <Menu label={t("moreActions")} items={managedMenuItems} />
           )}
         </div>
       </header>
@@ -699,6 +741,32 @@ export function PackDetail() {
           onIconChanged={() => setContentNonce((n) => n + 1)}
           pack={pack}
           latest={latest}
+        />
+      )}
+
+      {isLocal ? (
+        <DeleteLocalPackModal
+          open={showDelete}
+          slug={pack.slug}
+          name={pack.name}
+          onClose={() => setShowDelete(false)}
+          // The pack no longer exists after this, so there is nothing to return
+          // to — send the player back to the library.
+          onDone={() => {
+            reloadPacks()
+            go("packs")
+          }}
+        />
+      ) : (
+        <UninstallPackModal
+          open={showUninstall}
+          slug={pack.slug}
+          name={pack.name}
+          blocked={running}
+          onClose={() => setShowUninstall(false)}
+          // The pack stays in the library, and this screen stays open — a
+          // reload flips it to its "not installed" state in place.
+          onDone={reloadPacks}
         />
       )}
     </div>

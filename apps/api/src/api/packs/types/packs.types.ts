@@ -19,6 +19,8 @@ export interface LauncherPackView {
   description?: string;
   gallery?: StoredPackGalleryImage[];
   accessKind: PackAccessKind;
+  /** Present only for "server packs" — the Quick Play target. */
+  server?: StoredPackServer;
   latestVersion: {
     id: string;
     name: string;
@@ -29,6 +31,13 @@ export interface LauncherPackView {
     worldCount: number;
     createdAt: string;
   } | null;
+}
+
+/** The stored shape of `packs.server`. Mirrors PackServer in
+ *  @boffmedia/pack-schema (whose TS types must not be imported here). */
+export interface StoredPackServer {
+  host: string;
+  port: number;
 }
 
 /** The admin view: everything, including who has access. */

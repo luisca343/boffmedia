@@ -36,6 +36,11 @@ export const packs = mysqlTable(
     iconUrl: varchar('icon_url', { length: 512 }),
     description: text('description'),
     gallery: json('gallery').$type<unknown[]>(),
+    // The Quick Play target (host + port) when this pack is a "server pack".
+    // Null = a client/singleplayer pack. Mirrors PackServer in
+    // @boffmedia/pack-schema; the launcher reads it to show the pack's type and
+    // to auto-join the server on launch.
+    server: json('server').$type<{ host: string; port: number }>(),
     accessKind: varchar('access_kind', { length: 16 })
       .$type<PackAccessKind>()
       .notNull()

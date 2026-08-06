@@ -457,6 +457,16 @@
         "password": "Los jugadores introducen una contraseña compartida antes de instalarlo.",
         "allowlist": "Solo las cuentas de Minecraft autorizadas pueden instalarlo."
       },
+      "serverSection": "Dirección del servidor",
+      "serverSectionLead": "Pon un host para convertirlo en un pack de servidor: el launcher muestra el estado del servidor y puede conectarse solo al iniciar.",
+      "serverHost": "Host",
+      "serverHostHint": "Nombre de host o IP, sin esquema (p. ej. play.example.com). Déjalo vacío para un pack de cliente.",
+      "serverPort": "Puerto",
+      "serverPortHint": "Por defecto 25565",
+      "serverSave": "Guardar servidor",
+      "serverSaved": "Dirección del servidor guardada",
+      "serverCleared": "Dirección del servidor eliminada",
+      "serverSaveFailed": "No se pudo guardar la dirección del servidor",
       "slugPending": "Slug pendiente",
       "slugPreview": "Identificador permanente del launcher",
       "access": {

@@ -300,6 +300,8 @@ export type LauncherPack = {
   iconUrl: string | null
   gallery?: LauncherGalleryImage[]
   accessKind: "public" | "password" | "allowlist"
+  /** The Quick Play target — set only for server packs (from the registry). */
+  server?: { host: string; port: number } | null
   latestVersion: LauncherVersion | null
 }
 
@@ -1079,6 +1081,19 @@ export async function instanceReveal(slug: string, rel: string): Promise<void> {
   if (!isDesktop()) return
   try {
     await invoke("instance_reveal", { slug, rel })
+  } catch (err) {
+    throw asFailure(err)
+  }
+}
+
+/** Uninstall a MANAGED pack: delete its instance directory so the next library
+ *  scan reports it "not installed" again. The pack stays in the library and its
+ *  backups are kept — this is not the whole-pack deletion `localPackDelete` is.
+ *  The caller must not offer this while the game is running. */
+export async function instanceDelete(slug: string): Promise<void> {
+  if (!isDesktop()) return
+  try {
+    await invoke("instance_delete", { slug })
   } catch (err) {
     throw asFailure(err)
   }

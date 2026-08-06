@@ -345,6 +345,24 @@ pub async fn local_pack_delete(app: tauri::AppHandle, slug: String) -> Result<()
         std::fs::remove_dir_all(&dir)
             .map_err(|e| InstallFailure::message(format!("No se pudo borrar el pack: {e}")))?;
     }
+    // Deleting a local pack removes it whole: leaving the installed instance or
+    // its backups behind would make the pack vanish from the library while its
+    // files (often the largest thing on disk) sit under instances/<slug>/ and
+    // backups/<slug>/ with nothing left in the UI that points at them.
+    let settings = crate::settings::load(&app);
+    let layout = crate::install::paths::Layout::new(&app, settings.game_dir())?;
+    let instance = layout.instance(&slug).root;
+    if instance.exists() {
+        std::fs::remove_dir_all(&instance).map_err(|e| {
+            InstallFailure::message(format!("No se pudieron borrar los archivos instalados: {e}"))
+        })?;
+    }
+    let backups = crate::backups::backups_dir(&layout, &slug);
+    if backups.exists() {
+        std::fs::remove_dir_all(&backups).map_err(|e| {
+            InstallFailure::message(format!("No se pudieron borrar las copias de seguridad: {e}"))
+        })?;
+    }
     Ok(())
 }
 

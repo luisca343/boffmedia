@@ -139,6 +139,10 @@ export async function loadPackEntries(): Promise<PackLibrary> {
         lastPlayed: plays[pack.id] ?? null,
         playMs: playtime[pack.id] ?? 0,
         origin: "managed",
+        // A managed pack is a server pack when the registry declares a Quick
+        // Play target for it — the same signal a local pack carries in its
+        // manifest, so the card treats both identically.
+        server: pack.server ?? undefined,
       }
       return entry
     }),

@@ -30,6 +30,12 @@ export class LauncherVersionEntity {
   @ApiProperty() createdAt!: string;
 }
 
+/** A pack's Quick Play target — present only for "server packs". */
+export class PackServerEntity {
+  @ApiProperty({ example: 'play.example.com' }) host!: string;
+  @ApiProperty({ example: 25565 }) port!: number;
+}
+
 export class LauncherPackEntity {
   @ApiProperty() id!: string;
   @ApiProperty() slug!: string;
@@ -46,6 +52,9 @@ export class LauncherPackEntity {
   @ApiProperty({ enum: ['public', 'password', 'allowlist'] })
   accessKind!: string;
 
+  @ApiPropertyOptional({ type: PackServerEntity, nullable: true })
+  server?: PackServerEntity | null;
+
   @ApiPropertyOptional({ type: LauncherVersionEntity, nullable: true })
   latestVersion!: LauncherVersionEntity | null;
 }
@@ -57,6 +66,8 @@ export class AdminPackEntity {
   @ApiPropertyOptional({ nullable: true }) summary!: string | null;
   @ApiPropertyOptional({ nullable: true }) iconUrl!: string | null;
   @ApiProperty() accessKind!: string;
+  @ApiPropertyOptional({ type: PackServerEntity, nullable: true })
+  server?: PackServerEntity | null;
   @ApiProperty() archived!: boolean;
   @ApiProperty() hasPassword!: boolean;
   @ApiProperty() aclCount!: number;

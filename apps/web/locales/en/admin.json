@@ -457,6 +457,16 @@
         "password": "Players enter a shared password before installing.",
         "allowlist": "Only granted Minecraft accounts can install it."
       },
+      "serverSection": "Server address",
+      "serverSectionLead": "Set a host to make this a server pack — the launcher shows the server status and can auto-join on launch.",
+      "serverHost": "Host",
+      "serverHostHint": "Hostname or IP, no scheme (e.g. play.example.com). Leave blank for a client pack.",
+      "serverPort": "Port",
+      "serverPortHint": "Defaults to 25565",
+      "serverSave": "Save server",
+      "serverSaved": "Server address saved",
+      "serverCleared": "Server address removed",
+      "serverSaveFailed": "Could not save the server address",
       "slugPending": "Slug pending",
       "slugPreview": "Permanent launcher identifier",
       "access": {

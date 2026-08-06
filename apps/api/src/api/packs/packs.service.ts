@@ -50,6 +50,9 @@ export class PacksService {
           iconUrl: pack.iconUrl,
           ...(pack.description ? { description: pack.description } : {}),
           ...(pack.gallery ? { gallery: pack.gallery as any } : {}),
+          // The card reads this to mark the pack as a server pack and to ping
+          // the server for its live status.
+          ...(pack.server ? { server: pack.server } : {}),
           accessKind: pack.accessKind,
           latestVersion:
             version && version.published
@@ -111,6 +114,9 @@ export class PacksService {
         ...(pack.description ? { description: pack.description } : {}),
         ...(pack.iconUrl ? { iconUrl: pack.iconUrl } : {}),
         ...(pack.gallery ? { gallery: pack.gallery } : {}),
+        // Carried into the manifest too, so the installed pack can Quick Play
+        // into the server offline (the listing is not consulted at launch).
+        ...(pack.server ? { server: pack.server } : {}),
         access: this.accessPayload(pack.accessKind),
         latestVersionId: version.id,
       },
@@ -207,6 +213,7 @@ export class PacksService {
         summary: pack.summary,
         iconUrl: pack.iconUrl,
         accessKind: pack.accessKind,
+        ...(pack.server ? { server: pack.server } : {}),
         archived: pack.archived,
         hasPassword: !!pack.passwordHash,
         aclCount: await this.repo.countAcl(pack.id),
@@ -216,6 +223,18 @@ export class PacksService {
         updatedAt: pack.updatedAt.toISOString(),
       })),
     );
+  }
+
+  /** Fill the vanilla port when the admin left it blank, so the stored value —
+   *  and everything derived from it (the listing, the Rust struct, the manifest)
+   *  — always carries a concrete port. `pack-schema`'s zod default only applies
+   *  when the manifest is re-parsed; the listing is not, so the default has to
+   *  land here at write time. */
+  private normalizeServer(
+    server?: { host: string; port?: number | null } | null,
+  ): { host: string; port: number } | null {
+    if (!server) return null;
+    return { host: server.host, port: server.port ?? 25565 };
   }
 
   async createPack(dto: CreatePackDto, actorId: number | null): Promise<{ id: string }> {
@@ -235,6 +254,7 @@ export class PacksService {
       description: dto.description ?? null,
       iconUrl: dto.iconUrl ?? null,
       gallery: dto.gallery ?? null,
+      server: this.normalizeServer(dto.server),
       accessKind: dto.accessKind,
       passwordHash: dto.password ? await bcrypt.hash(dto.password, 10) : null,
     });
@@ -252,6 +272,8 @@ export class PacksService {
     if (dto.description !== undefined) patch.description = dto.description;
     if (dto.gallery !== undefined) patch.gallery = dto.gallery;
     if (dto.iconUrl !== undefined) patch.iconUrl = dto.iconUrl;
+    // `null` clears the server (back to a client pack); an object sets it.
+    if (dto.server !== undefined) patch.server = this.normalizeServer(dto.server);
     if (dto.archived !== undefined) patch.archived = dto.archived;
     if (dto.accessKind !== undefined) patch.accessKind = dto.accessKind;
     if (dto.password !== undefined) {

@@ -18,6 +18,13 @@ import {
 export type PackAccessKind = 'public' | 'password' | 'allowlist';
 export type PackLoader = 'forge' | 'neoforge' | 'fabric-loader' | 'quilt-loader';
 
+/** A pack's Quick Play target — present only for "server packs". Port defaults
+ *  to the vanilla 25565 when omitted. */
+export interface ServerAddress {
+  host: string;
+  port?: number;
+}
+
 export interface AdminPack {
   id: string;
   slug: string;
@@ -25,6 +32,7 @@ export interface AdminPack {
   summary: string | null;
   iconUrl: string | null;
   accessKind: PackAccessKind;
+  server?: { host: string; port: number } | null;
   archived: boolean;
   hasPassword: boolean;
   aclCount: number;
@@ -86,6 +94,7 @@ export interface CreatePackInput {
   gallery?: GalleryImage[];
   accessKind: PackAccessKind;
   password?: string;
+  server?: ServerAddress;
 }
 
 export interface BundledWorld {
@@ -106,6 +115,8 @@ export interface UpdatePackInput {
   gallery?: GalleryImage[];
   accessKind?: PackAccessKind;
   password?: string;
+  /** `null` clears it (back to a client pack); an object sets it. */
+  server?: ServerAddress | null;
   archived?: boolean;
 }
 
