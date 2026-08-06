@@ -21,14 +21,28 @@ export class PacksRepository {
 
   // ── Packs ────────────────────────────────────────────────────────────────
 
+  /**
+   * MariaDB implements JSON as a LONGTEXT alias, so mysql2 hands `gallery` back
+   * as a raw string instead of the array `json()` types it (the same trap that
+   * bites `pack_versions.files`). Parse it on every read so nothing downstream —
+   * the launcher's serde, `PackManifest.safeParse` — ever sees a string where it
+   * expects `{ url, alt }[]`.
+   */
+  private hydratePack<T extends { gallery?: unknown }>(row: T): T {
+    if (typeof row.gallery === 'string') {
+      return { ...row, gallery: JSON.parse(row.gallery) as unknown[] };
+    }
+    return row;
+  }
+
   async findById(id: string): Promise<Pack | null> {
     const [row] = await this.db.select().from(packs).where(eq(packs.id, id)).limit(1);
-    return row ?? null;
+    return row ? this.hydratePack(row) : null;
   }
 
   async findBySlug(slug: string): Promise<Pack | null> {
     const [row] = await this.db.select().from(packs).where(eq(packs.slug, slug)).limit(1);
-    return row ?? null;
+    return row ? this.hydratePack(row) : null;
   }
 
   async listAll(includeArchived: boolean): Promise<Pack[]> {
@@ -36,7 +50,7 @@ export class PacksRepository {
     const rows = includeArchived
       ? await q.orderBy(desc(packs.createdAt))
       : await q.where(eq(packs.archived, false)).orderBy(desc(packs.createdAt));
-    return rows;
+    return rows.map((row) => this.hydratePack(row));
   }
 
   /**
@@ -46,13 +60,15 @@ export class PacksRepository {
    * one query that can leak a pack, and it is this one.
    */
   async listVisibleTo(uuid: string): Promise<Pack[]> {
-    return this.db
+    const rows = await this.db
       .select({
         id: packs.id,
         slug: packs.slug,
         name: packs.name,
         summary: packs.summary,
+        description: packs.description,
         iconUrl: packs.iconUrl,
+        gallery: packs.gallery,
         accessKind: packs.accessKind,
         passwordHash: packs.passwordHash,
         latestVersionId: packs.latestVersionId,
@@ -72,6 +88,7 @@ export class PacksRepository {
         ),
       )
       .orderBy(desc(packs.createdAt));
+    return rows.map((row) => this.hydratePack(row));
   }
 
   async insertPack(row: typeof packs.$inferInsert): Promise<void> {
@@ -85,15 +102,21 @@ export class PacksRepository {
   // ── Versions ─────────────────────────────────────────────────────────────
 
   /**
-   * MariaDB implements JSON as a LONGTEXT alias, so mysql2 hands `files` back as
-   * a raw string instead of the array `json()` types it as. Every read goes
-   * through here so the service can trust the declared type: without it the
+   * MariaDB implements JSON as a LONGTEXT alias, so mysql2 hands fields back as
+   * raw strings instead of the arrays/objects `json()` types them. Every read goes
+   * through here so the service can trust the declared types: without it the
    * manifest fails its own schema validation with "expected array, received
-   * string" on a perfectly good row.
+   * string" on perfectly good rows.
    */
   private hydrate(row: PackVersion): PackVersion {
-    if (typeof row.files !== 'string') return row;
-    return { ...row, files: JSON.parse(row.files) as unknown[] };
+    const hydrated: PackVersion = { ...row };
+    if (typeof hydrated.files === 'string') {
+      hydrated.files = JSON.parse(hydrated.files) as unknown[];
+    }
+    if (typeof hydrated.worlds === 'string') {
+      hydrated.worlds = JSON.parse(hydrated.worlds) as unknown[];
+    }
+    return hydrated;
   }
 
   async findVersion(id: string): Promise<PackVersion | null> {

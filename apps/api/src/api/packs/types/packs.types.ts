@@ -16,6 +16,8 @@ export interface LauncherPackView {
   name: string;
   summary: string | null;
   iconUrl: string | null;
+  description?: string;
+  gallery?: StoredPackGalleryImage[];
   accessKind: PackAccessKind;
   latestVersion: {
     id: string;
@@ -24,6 +26,7 @@ export interface LauncherPackView {
     loader: PackLoader | null;
     loaderVersion: string | null;
     fileCount: number;
+    worldCount: number;
     createdAt: string;
   } | null;
 }
@@ -47,6 +50,7 @@ export interface PackVersionView {
   loader: PackLoader | null;
   loaderVersion: string | null;
   fileCount: number;
+  worldCount: number;
   published: boolean;
   notes: string | null;
   createdAt: string;
@@ -67,6 +71,22 @@ export interface StoredPackFile {
     | { kind: 'curseforge'; projectId: number; fileId: number }
     | { kind: 'url'; url: string }
     | { kind: 'override'; blobSha512: string };
+}
+
+export interface StoredPackGalleryImage {
+  url: string;
+  alt?: string;
+}
+
+export interface StoredBundledWorld {
+  folder: string;
+  source:
+    | { kind: 'modrinth'; projectId: string; versionId: string }
+    | { kind: 'curseforge'; projectId: number; fileId: number }
+    | { kind: 'url'; url: string }
+    | { kind: 'override'; blobSha512: string };
+  sizeBytes: number;
+  sha512: string;
 }
 
 /** A launcher session, minted only after `hasJoined` proved UUID ownership. */

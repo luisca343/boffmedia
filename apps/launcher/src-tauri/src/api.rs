@@ -103,6 +103,15 @@ pub struct LauncherVersion {
     pub created_at: String,
 }
 
+/** A promotional gallery image, mirrored from the registry's pack listing. */
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct LauncherGalleryImage {
+    pub url: String,
+    #[serde(default)]
+    pub alt: Option<String>,
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct LauncherPack {
@@ -110,7 +119,11 @@ pub struct LauncherPack {
     pub slug: String,
     pub name: String,
     pub summary: Option<String>,
+    #[serde(default)]
+    pub description: Option<String>,
     pub icon_url: Option<String>,
+    #[serde(default)]
+    pub gallery: Vec<LauncherGalleryImage>,
     pub access_kind: String,
     pub latest_version: Option<LauncherVersion>,
 }

@@ -195,6 +195,129 @@ pub async fn backup_create(
     Ok(record)
 }
 
+/// Create a pre-update backup of saves/, config/, and options.txt only.
+/// Best-effort: failures are logged but do not abort the update.
+/// Returns true if the backup succeeded, false if skipped or failed.
+pub fn backup_before_update(
+    app: &tauri::AppHandle,
+    layout: &Layout,
+    slug: &str,
+    version_id: &str,
+) -> bool {
+    let instance = match layout.instance(slug).minecraft.canonicalize() {
+        Ok(p) => p,
+        Err(_) => return false,
+    };
+
+    let settings = settings::load(app);
+    if !settings.backup_before_update {
+        return false;
+    }
+
+    // Create label with the version being updated to.
+    let label = format!("Antes de actualizar a {}", version_id);
+
+    let dir = backups_dir(layout, slug);
+    if let Err(_) = std::fs::create_dir_all(&dir) {
+        return false;
+    }
+
+    let id = format!("pre-update-{}", timestamp_id("pre-update"));
+    let zip_path = dir.join(format!("{}.zip", id));
+    let temp = dir.join(format!("{}.part", id));
+
+    // Create the zip with only selective subdirs.
+    if let Ok(file) = std::fs::File::create(&temp) {
+        let mut zip = zip::ZipWriter::new(file);
+        let options = zip::write::SimpleFileOptions::default()
+            .compression_method(zip::CompressionMethod::Deflated);
+
+        // Add saves/ if it exists.
+        let saves_path = instance.join("saves");
+        if saves_path.is_dir() {
+            let _ = add_dir(&mut zip, &saves_path, "saves", &[]);
+        }
+
+        // Add config/ if it exists.
+        let config_path = instance.join("config");
+        if config_path.is_dir() {
+            let _ = add_dir(&mut zip, &config_path, "config", &[]);
+        }
+
+        // Add options.txt if it exists.
+        let options_path = instance.join("options.txt");
+        if options_path.is_file() {
+            if let Ok(bytes) = std::fs::read(&options_path) {
+                let _ = zip.start_file("options.txt", options);
+                let _ = zip.write_all(&bytes);
+            }
+        }
+
+        if zip.finish().is_ok() {
+            // Rename to finalize.
+            if std::fs::rename(&temp, &zip_path).is_ok() {
+                // Write sidecar.
+                let record = Backup {
+                    size_bytes: std::fs::metadata(&zip_path).map(|m| m.len()).unwrap_or(0),
+                    id: id.clone(),
+                    kind: "pre-update".to_string(),
+                    label,
+                    created_at: chrono::Utc::now()
+                        .to_rfc3339_opts(chrono::SecondsFormat::Millis, true),
+                    world: None,
+                };
+                if let Ok(json) = serde_json::to_vec_pretty(&record) {
+                    if std::fs::write(dir.join(format!("{}.json", id)), json).is_ok() {
+                        // Prune old pre-update backups: keep only the last N (e.g. 5).
+                        let _ = prune_pre_update_backups(layout, slug);
+                        return true;
+                    }
+                }
+            }
+        }
+    }
+
+    // Clean up failed temp file.
+    let _ = std::fs::remove_file(&temp);
+    false
+}
+
+/// Remove old pre-update backups, keeping only the most recent ones.
+fn prune_pre_update_backups(layout: &Layout, slug: &str) -> Result<(), InstallFailure> {
+    let dir = backups_dir(layout, slug);
+    let retain_count = 3;
+
+    let Ok(entries) = std::fs::read_dir(&dir) else {
+        return Ok(());
+    };
+
+    let mut pre_updates: Vec<(String, String)> = Vec::new();
+    for entry in entries.flatten() {
+        let path = entry.path();
+        if path.extension().and_then(|e| e.to_str()) != Some("json") {
+            continue;
+        }
+        let Some(stem) = path.file_stem().and_then(|s| s.to_str()) else {
+            continue;
+        };
+        if !stem.starts_with("pre-update-") {
+            continue;
+        }
+        if let Ok(raw) = std::fs::read(&path) {
+            if let Ok(record) = serde_json::from_slice::<Backup>(&raw) {
+                pre_updates.push((record.created_at, stem.to_string()));
+            }
+        }
+    }
+
+    pre_updates.sort_by(|a, b| b.0.cmp(&a.0));
+    for (_, stem) in pre_updates.iter().skip(retain_count) {
+        let _ = std::fs::remove_file(dir.join(format!("{}.zip", stem)));
+        let _ = std::fs::remove_file(dir.join(format!("{}.json", stem)));
+    }
+    Ok(())
+}
+
 /// Every snapshot for this pack, newest first.
 #[tauri::command]
 pub async fn backup_list(slug: String, app: tauri::AppHandle) -> Result<Vec<Backup>, InstallFailure> {

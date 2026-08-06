@@ -664,11 +664,44 @@
       "vanilla": "Vanilla",
       "saveVersion": "Save changes",
       "stepOf": "Step {n} of {total}",
+      "description": {
+        "label": "Description",
+        "placeholder": "A longer, more detailed description of what this pack contains…"
+      },
+      "descriptionCharCount": "{current} / {max}",
+      "icon": {
+        "label": "Pack icon",
+        "upload": "Upload image",
+        "urlFallback": "Or paste a URL"
+      },
+      "gallery": {
+        "label": "Gallery",
+        "add": "Add image",
+        "alt": "Alt text",
+        "altPlaceholder": "Describe this image for accessibility…",
+        "remove": "Remove",
+        "maxAlt": "Max 256 characters",
+        "uploadFailed": "Could not upload the image."
+      },
+      "worlds": {
+        "label": "Bundled worlds",
+        "folder": "Save folder name",
+        "folderPlaceholder": "e.g. Dimension 12, World Nether",
+        "folderHint": "Case-insensitive, must be unique in this version",
+        "folderRequired": "Enter a folder name",
+        "help": "For MVP: maximum 1 world per version. Upload the .zip of your Minecraft save folder.",
+        "none": "No worlds added yet.",
+        "upload": "Upload .zip world",
+        "remove": "Remove",
+        "duplicateFolder": "Folder name already in use",
+        "worldsEdited": "Worlds updated"
+      },
       "step": {
         "metadata": "Metadata",
         "loader": "Loader",
         "mods": "Mods",
         "files": "Files",
+        "worlds": "Worlds",
         "review": "Review"
       },
       "reviewLead": "The server validates the whole manifest with pack-schema before storing it.",

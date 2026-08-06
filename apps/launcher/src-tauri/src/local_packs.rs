@@ -20,6 +20,7 @@ use std::path::{Path, PathBuf};
 
 use serde::Serialize;
 use tauri_plugin_dialog::DialogExt;
+use base64::Engine;
 
 use crate::install::files::resolve_url;
 use crate::install::resolve::{fetch_for, Fetch, PlannedFile};
@@ -572,6 +573,74 @@ async fn export_mrpack_impl(
             .map_err(|e| InstallFailure::message(format!("No se pudo escribir «{}»: {e}", embed.path)))?;
     }
 
+    // Export bundled worlds to overrides/saves/<folder>/ (Prism-compatible)
+    for world in &manifest.version.worlds {
+        let world_folder = world.folder.as_str();
+        let local = crate::install::files::local_blob_path(&layout, &world.sha512.as_str());
+        let world_zip_bytes = if local.is_file() {
+            std::fs::read(&local).ok()
+        } else {
+            // For managed packs, try to fetch from the API
+            crate::api::fetch_pack_file(
+                &app,
+                &manifest.pack.id.to_string(),
+                None,
+                &crate::api::PackFile::Override {
+                    sha512: world.sha512.as_str().to_string(),
+                },
+            )
+            .await
+            .ok()
+            .and_then(|r| tokio::runtime::Handle::current().block_on(r.bytes()).ok())
+            .map(|b| b.to_vec())
+        };
+
+        if let Some(bytes) = world_zip_bytes {
+            // Extract the zip contents directly into overrides/saves/<folder>/
+            if let Ok(mut world_archive) = zip::ZipArchive::new(std::io::Cursor::new(&bytes)) {
+                for i in 0..world_archive.len() {
+                    if let Ok(mut file) = world_archive.by_index(i) {
+                        let file_path = file.name();
+                        if !file_path.is_empty() {
+                            let entry_path = format!("overrides/saves/{}/{}", world_folder, file_path);
+                            let _ = zip.start_file(&entry_path, options);
+                            let _ = std::io::copy(&mut file, &mut zip);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // Export icon to boffmedia/icon if present
+    if let Ok(icon_file) = icon_path(&dir) {
+        if let Ok(icon_bytes) = std::fs::read(&icon_file) {
+            if let Some(filename) = icon_file.file_name().and_then(|n| n.to_str()) {
+                let _ = zip.start_file(&format!("boffmedia/{}", filename), options);
+                let _ = zip.write_all(&icon_bytes);
+            }
+        }
+    }
+
+    // Export gallery images to boffmedia/gallery/
+    let gallery_dir = dir.join("gallery");
+    if gallery_dir.is_dir() {
+        if let Ok(entries) = std::fs::read_dir(&gallery_dir) {
+            for entry in entries.flatten() {
+                if let Ok(metadata) = entry.metadata() {
+                    if metadata.is_file() {
+                        if let Some(filename) = entry.file_name().to_str() {
+                            if let Ok(bytes) = std::fs::read(entry.path()) {
+                                let _ = zip.start_file(&format!("boffmedia/gallery/{}", filename), options);
+                                let _ = zip.write_all(&bytes);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     let index = MrpackIndex {
         format_version: 1,
         game: "minecraft",
@@ -765,6 +834,10 @@ pub async fn import_mrpack_bytes(
             let renamed = slug != candidate;
             let dir = safe_local_dir(app, &slug)?;
             write_manifest_atomic(&dir, &manifest)?;
+
+            // Extract icon and gallery from boffmedia/ if present
+            let _ = extract_mrpack_metadata(&mut archive, &dir);
+
             return Ok(ImportResult { manifest, renamed });
         }
     };
@@ -802,6 +875,9 @@ pub async fn import_mrpack_bytes(
 
     let dir = safe_local_dir(app, &final_slug)?;
     write_manifest_atomic(&dir, &manifest)?;
+
+    // Extract icon and gallery from boffmedia/ if present
+    let _ = extract_mrpack_metadata(&mut archive, &dir);
 
     Ok(ImportResult { manifest, renamed })
 }
@@ -845,6 +921,601 @@ pub async fn import_mrpack_url(
         .map_err(|e| InstallFailure::message(format!("No se pudo leer el pack: {e}")))?;
 
     import_mrpack_bytes(&app, bytes.to_vec(), icon_url).await
+}
+
+// ── Local pack icon & gallery (metadata, not installed) ──────────────────────
+// Icons and gallery images are stored on disk but NOT in the manifest to avoid
+// bloating local_packs_list loads. They are stored in convention dirs under the
+// pack's directory: `<slug>/icon.<ext>` and `<slug>/gallery/<sha256>.<ext>`.
+
+fn icon_path(dir: &Path) -> Result<PathBuf, InstallFailure> {
+    let entries = std::fs::read_dir(dir)
+        .map_err(|e| InstallFailure::message(format!("No se pudo leer la carpeta: {e}")))?;
+
+    for entry in entries.flatten() {
+        let name = entry.file_name();
+        let name_str = name.to_string_lossy();
+        if name_str.starts_with("icon.") && entry.file_type().ok().map(|ft| ft.is_file()).unwrap_or(false) {
+            return Ok(entry.path());
+        }
+    }
+    Err(InstallFailure::message("No hay icono".to_string()))
+}
+
+/// Opens the native image picker (no file-picker plugin on the JS side of the
+/// boundary — the same reason import/export open their dialogs here). Resolves
+/// to the chosen path, or `None` if the player cancelled.
+async fn pick_image(app: &tauri::AppHandle) -> Result<Option<PathBuf>, InstallFailure> {
+    let dialog = app.dialog().clone();
+    let chosen = tauri::async_runtime::spawn_blocking(move || {
+        dialog
+            .file()
+            .add_filter("Imagen", &["png", "jpg", "jpeg", "webp", "gif"])
+            .blocking_pick_file()
+    })
+    .await
+    .map_err(|e| InstallFailure::message(format!("El selector se interrumpió: {e}")))?;
+
+    match chosen {
+        Some(picked) => Ok(Some(
+            picked
+                .into_path()
+                .map_err(|e| InstallFailure::message(format!("Ruta de origen inválida: {e}")))?,
+        )),
+        None => Ok(None),
+    }
+}
+
+/// Opens the native image picker and copies the chosen file to
+/// `<slug>/icon.<ext>`. Returns `false` if the player cancelled — the caller
+/// treats that as a no-op, never an error.
+#[tauri::command]
+pub async fn local_pack_icon_set(
+    app: tauri::AppHandle,
+    slug: String,
+) -> Result<bool, InstallFailure> {
+    let dir = safe_local_dir(&app, &slug)?;
+    let Some(source) = pick_image(&app).await? else {
+        return Ok(false);
+    };
+
+    let ext = source
+        .extension()
+        .and_then(|e| e.to_str())
+        .unwrap_or("png");
+    // A pack keeps exactly one icon; drop any prior one so an old png does not
+    // shadow a new jpg (icon_path returns the first icon.* it finds).
+    if let Ok(prior) = icon_path(&dir) {
+        let _ = std::fs::remove_file(&prior);
+    }
+    let icon = dir.join(format!("icon.{ext}"));
+
+    std::fs::copy(&source, &icon)
+        .map_err(|e| InstallFailure::message(format!("No se pudo guardar el icono: {e}")))?;
+    Ok(true)
+}
+
+#[tauri::command]
+pub async fn local_pack_icon_clear(app: tauri::AppHandle, slug: String) -> Result<(), InstallFailure> {
+    let dir = safe_local_dir(&app, &slug)?;
+    if let Ok(icon) = icon_path(&dir) {
+        std::fs::remove_file(&icon)
+            .map_err(|e| InstallFailure::message(format!("No se pudo eliminar el icono: {e}")))?;
+    }
+    Ok(())
+}
+
+#[tauri::command]
+pub async fn local_pack_icon(
+    app: tauri::AppHandle,
+    slug: String,
+) -> Result<Option<String>, InstallFailure> {
+    let dir = safe_local_dir(&app, &slug)?;
+    let icon_file = match icon_path(&dir) {
+        Ok(p) => p,
+        Err(_) => return Ok(None),
+    };
+
+    let bytes = std::fs::read(&icon_file)
+        .map_err(|e| InstallFailure::message(format!("No se pudo leer el icono: {e}")))?;
+
+    // Limit to 4MB like icon_cache does
+    const MAX_ICON_BYTES: usize = 4 * 1024 * 1024;
+    if bytes.len() > MAX_ICON_BYTES {
+        return Err(InstallFailure::message(format!(
+            "El icono es demasiado grande ({} MB, máx 4 MB)",
+            bytes.len() / (1024 * 1024)
+        )));
+    }
+
+    // Guess MIME type from extension
+    let mime = icon_file
+        .extension()
+        .and_then(|e| e.to_str())
+        .and_then(|ext| match ext.to_lowercase().as_str() {
+            "png" => Some("image/png"),
+            "jpg" | "jpeg" => Some("image/jpeg"),
+            "webp" => Some("image/webp"),
+            "gif" => Some("image/gif"),
+            _ => None,
+        })
+        .unwrap_or("image/png");
+
+    let b64 = base64::engine::general_purpose::STANDARD.encode(&bytes);
+    Ok(Some(format!("data:{mime};base64,{b64}")))
+}
+
+#[tauri::command]
+pub async fn local_pack_gallery_list(
+    app: tauri::AppHandle,
+    slug: String,
+) -> Result<Vec<String>, InstallFailure> {
+    let dir = safe_local_dir(&app, &slug)?;
+    let gallery_dir = dir.join("gallery");
+    if !gallery_dir.is_dir() {
+        return Ok(Vec::new());
+    }
+
+    let mut names = Vec::new();
+    let entries = std::fs::read_dir(&gallery_dir)
+        .map_err(|e| InstallFailure::message(format!("No se pudo leer la galería: {e}")))?;
+
+    for entry in entries.flatten() {
+        if entry.file_type().ok().map(|ft| ft.is_file()).unwrap_or(false) {
+            if let Some(name) = entry.file_name().to_str() {
+                names.push(name.to_string());
+            }
+        }
+    }
+    names.sort();
+    Ok(names)
+}
+
+/// Opens the native image picker and copies the chosen file into the gallery
+/// dir as `<sha256>.<ext>`. Returns the stored filename, or `None` if the
+/// player cancelled.
+#[tauri::command]
+pub async fn local_pack_gallery_add(
+    app: tauri::AppHandle,
+    slug: String,
+) -> Result<Option<String>, InstallFailure> {
+    let dir = safe_local_dir(&app, &slug)?;
+    let Some(source) = pick_image(&app).await? else {
+        return Ok(None);
+    };
+
+    let bytes = std::fs::read(&source)
+        .map_err(|e| InstallFailure::message(format!("No se pudo leer el archivo: {e}")))?;
+
+    // Hash to derive filename
+    use sha2::{Digest, Sha256};
+    let mut hasher = Sha256::new();
+    hasher.update(&bytes);
+    let hash = format!("{:x}", hasher.finalize());
+
+    let ext = source
+        .extension()
+        .and_then(|e| e.to_str())
+        .unwrap_or("png");
+    let filename = format!("{}.{}", hash, ext);
+
+    let gallery_dir = dir.join("gallery");
+    std::fs::create_dir_all(&gallery_dir)
+        .map_err(|e| InstallFailure::message(format!("No se pudo crear la galería: {e}")))?;
+
+    let dest = gallery_dir.join(&filename);
+    std::fs::copy(&source, &dest)
+        .map_err(|e| InstallFailure::message(format!("No se pudo guardar la imagen: {e}")))?;
+
+    Ok(Some(filename))
+}
+
+#[tauri::command]
+pub async fn local_pack_gallery_remove(
+    app: tauri::AppHandle,
+    slug: String,
+    filename: String,
+) -> Result<(), InstallFailure> {
+    let dir = safe_local_dir(&app, &slug)?;
+    let gallery_dir = dir.join("gallery");
+    let path = gallery_dir.join(&filename);
+
+    // Guard against path traversal
+    if path.canonicalize().ok().map(|p| !p.starts_with(gallery_dir.canonicalize().unwrap_or_default())).unwrap_or(true) {
+        return Err(InstallFailure::message("Ruta inválida".to_string()));
+    }
+
+    if path.is_file() {
+        std::fs::remove_file(&path)
+            .map_err(|e| InstallFailure::message(format!("No se pudo eliminar: {e}")))?;
+    }
+    Ok(())
+}
+
+#[tauri::command]
+pub async fn local_pack_gallery_image(
+    app: tauri::AppHandle,
+    slug: String,
+    filename: String,
+) -> Result<Option<String>, InstallFailure> {
+    let dir = safe_local_dir(&app, &slug)?;
+    let gallery_dir = dir.join("gallery");
+    let path = gallery_dir.join(&filename);
+
+    // Guard against path traversal
+    if path.canonicalize().ok().map(|p| !p.starts_with(gallery_dir.canonicalize().unwrap_or_default())).unwrap_or(true) {
+        return Err(InstallFailure::message("Ruta inválida".to_string()));
+    }
+
+    if !path.is_file() {
+        return Ok(None);
+    }
+
+    let bytes = std::fs::read(&path)
+        .map_err(|e| InstallFailure::message(format!("No se pudo leer la imagen: {e}")))?;
+
+    const MAX_IMAGE_BYTES: usize = 10 * 1024 * 1024;
+    if bytes.len() > MAX_IMAGE_BYTES {
+        return Err(InstallFailure::message(format!(
+            "La imagen es demasiado grande ({} MB, máx 10 MB)",
+            bytes.len() / (1024 * 1024)
+        )));
+    }
+
+    let mime = path
+        .extension()
+        .and_then(|e| e.to_str())
+        .and_then(|ext| match ext.to_lowercase().as_str() {
+            "png" => Some("image/png"),
+            "jpg" | "jpeg" => Some("image/jpeg"),
+            "webp" => Some("image/webp"),
+            "gif" => Some("image/gif"),
+            _ => None,
+        })
+        .unwrap_or("image/png");
+
+    let b64 = base64::engine::general_purpose::STANDARD.encode(&bytes);
+    Ok(Some(format!("data:{mime};base64,{b64}")))
+}
+
+// ── Local pack worlds (bundled in pack, installed on first launch) ────────────
+// Worlds are stored as zips in the local blob store and referenced from the
+// manifest's `version.worlds[]` array. Unlike files, worlds are ONLY installed
+// if saves/<folder> does not already exist (first-install-only, never overwrite).
+
+/// Opens the native `.zip` picker, stores the chosen save archive in the local
+/// blob store, and appends a `version.worlds[]` entry under `folder`. Returns
+/// `false` if the player cancelled. Bumps the version id so the instance
+/// re-syncs the new world on next install.
+#[tauri::command]
+pub async fn local_pack_world_add_zip(
+    app: tauri::AppHandle,
+    slug: String,
+    folder: String,
+) -> Result<bool, InstallFailure> {
+    let dir = safe_local_dir(&app, &slug)?;
+
+    // Validate folder name: single segment, no path traversal
+    if folder.contains('/') || folder.contains('\\') || folder.contains("..") || folder.is_empty() {
+        return Err(InstallFailure::message(
+            "El nombre de la carpeta debe ser un único segmento, sin espacios o símbolos especiales.".to_string(),
+        ));
+    }
+
+    let dialog = app.dialog().clone();
+    let chosen = tauri::async_runtime::spawn_blocking(move || {
+        dialog.file().add_filter("Mundo (.zip)", &["zip"]).blocking_pick_file()
+    })
+    .await
+    .map_err(|e| InstallFailure::message(format!("El selector se interrumpió: {e}")))?;
+
+    let Some(picked) = chosen else {
+        return Ok(false);
+    };
+    let source = picked
+        .into_path()
+        .map_err(|e| InstallFailure::message(format!("Ruta de origen inválida: {e}")))?;
+
+    let bytes = std::fs::read(&source)
+        .map_err(|e| InstallFailure::message(format!("No se pudo leer el archivo: {e}")))?;
+
+    // Compute sha512 of the zip
+    use sha2::{Digest, Sha512};
+    let mut hasher = Sha512::new();
+    hasher.update(&bytes);
+    let sha512 = crate::install::files::hex(&hasher.finalize());
+
+    // Store in local blob store
+    let settings = crate::settings::load(&app);
+    let layout = crate::install::paths::Layout::new(&app, settings.game_dir())?;
+    let blob_sha = crate::install::files::put_local_blob(&layout, &bytes)?;
+
+    // Round-trip through JSON like local_pack_save does
+    let mut value = serde_json::json!({});
+    let current = read_manifest(&dir).ok();
+    if let Some(m) = current {
+        value = serde_json::to_value(&m)
+            .map_err(|e| InstallFailure::message(format!("No se pudo procesar el pack: {e}")))?;
+    }
+
+    // Check for duplicates in the JSON
+    if let Some(version) = value.get("version").and_then(|v| v.get("worlds")) {
+        if let Some(worlds) = version.as_array() {
+            if worlds.iter().any(|w| w.get("folder").and_then(|f| f.as_str()) == Some(&folder)) {
+                return Err(InstallFailure::message(
+                    "Ya hay un mundo con ese nombre en el pack.".to_string(),
+                ));
+            }
+        }
+    }
+
+    // Add the new world to the manifest JSON
+    if let Some(version) = value.get_mut("version") {
+        if !version["worlds"].is_array() {
+            version["worlds"] = serde_json::json!([]);
+        }
+        if let Some(worlds) = version["worlds"].as_array_mut() {
+            worlds.push(serde_json::json!({
+                "folder": folder,
+                "sizeBytes": bytes.len() as i64,
+                "sha512": sha512,
+                "source": { "kind": "override", "blobSha512": blob_sha },
+            }));
+        }
+    }
+
+    // Mint new version id
+    if let Some(version) = value.get_mut("version") {
+        let current_id = version.get("id").and_then(|v| v.as_str()).unwrap_or("local-v1");
+        let next_num = current_id.split('-').nth(2).and_then(|s| s.parse::<u32>().ok()).unwrap_or(0) + 1;
+        version["id"] = serde_json::Value::String(format!(
+            "local-v{}-{}-{}",
+            next_num,
+            chrono::Utc::now().timestamp(),
+            slug
+        ));
+    }
+
+    let raw = serde_json::to_string(&value)
+        .map_err(|e| InstallFailure::message(format!("No se pudo guardar: {e}")))?;
+    let manifest = crate::pack::parse_manifest(&raw)
+        .map_err(|e| InstallFailure::message(format!("El pack no es válido: {e}")))?;
+
+    write_manifest_atomic(&dir, &manifest)?;
+    Ok(true)
+}
+
+#[tauri::command]
+pub async fn local_pack_world_promote(
+    app: tauri::AppHandle,
+    slug: String,
+    world_folder: String,
+) -> Result<(), InstallFailure> {
+    let dir = safe_local_dir(&app, &slug)?;
+
+    // Validate folder name same as add_zip
+    if world_folder.contains('/') || world_folder.contains('\\') || world_folder.contains("..") || world_folder.is_empty() {
+        return Err(InstallFailure::message(
+            "El nombre de la carpeta debe ser un único segmento.".to_string(),
+        ));
+    }
+
+    let settings = crate::settings::load(&app);
+    let layout = crate::install::paths::Layout::new(&app, settings.game_dir())?;
+    let instance = layout.instance(&slug);
+    let world_path = instance.minecraft.join("saves").join(&world_folder);
+
+    if !world_path.is_dir() {
+        return Err(InstallFailure::message(format!(
+            "El mundo «{}» no existe",
+            world_folder
+        )));
+    }
+
+    // Zip the world directory
+    let zip_bytes = zip_directory(&world_path)?;
+
+    // Compute sha512
+    use sha2::{Digest, Sha512};
+    let mut hasher = Sha512::new();
+    hasher.update(&zip_bytes);
+    let sha512 = crate::install::files::hex(&hasher.finalize());
+
+    // Store in local blob store
+    let blob_sha = crate::install::files::put_local_blob(&layout, &zip_bytes)?;
+
+    // Round-trip through JSON
+    let manifest = read_manifest(&dir)?;
+    let mut value = serde_json::to_value(&manifest)
+        .map_err(|e| InstallFailure::message(format!("No se pudo procesar el pack: {e}")))?;
+
+    // Check for duplicates in the JSON
+    if let Some(version) = value.get("version").and_then(|v| v.get("worlds")) {
+        if let Some(worlds) = version.as_array() {
+            if worlds.iter().any(|w| w.get("folder").and_then(|f| f.as_str()) == Some(&world_folder)) {
+                return Err(InstallFailure::message(
+                    "Ya hay un mundo con ese nombre en el pack.".to_string(),
+                ));
+            }
+        }
+    }
+
+    // Add the promoted world to the manifest JSON
+    if let Some(version) = value.get_mut("version") {
+        if !version["worlds"].is_array() {
+            version["worlds"] = serde_json::json!([]);
+        }
+        if let Some(worlds) = version["worlds"].as_array_mut() {
+            worlds.push(serde_json::json!({
+                "folder": world_folder,
+                "sizeBytes": zip_bytes.len() as i64,
+                "sha512": sha512,
+                "source": { "kind": "override", "blobSha512": blob_sha },
+            }));
+        }
+    }
+
+    // Mint new version id
+    if let Some(version) = value.get_mut("version") {
+        let current_id = version.get("id").and_then(|v| v.as_str()).unwrap_or("local-v1");
+        let next_num = current_id.split('-').nth(2).and_then(|s| s.parse::<u32>().ok()).unwrap_or(0) + 1;
+        version["id"] = serde_json::Value::String(format!(
+            "local-v{}-{}-{}",
+            next_num,
+            chrono::Utc::now().timestamp(),
+            slug
+        ));
+    }
+
+    let raw = serde_json::to_string(&value)
+        .map_err(|e| InstallFailure::message(format!("No se pudo guardar: {e}")))?;
+    let parsed = crate::pack::parse_manifest(&raw)
+        .map_err(|e| InstallFailure::message(format!("El pack no es válido: {e}")))?;
+
+    write_manifest_atomic(&dir, &parsed)?;
+    Ok(())
+}
+
+#[tauri::command]
+pub async fn local_pack_world_remove(
+    app: tauri::AppHandle,
+    slug: String,
+    folder: String,
+) -> Result<(), InstallFailure> {
+    let dir = safe_local_dir(&app, &slug)?;
+    let manifest = read_manifest(&dir)?;
+    let mut value = serde_json::to_value(&manifest)
+        .map_err(|e| InstallFailure::message(format!("No se pudo procesar el pack: {e}")))?;
+
+    // Find and remove the world entry
+    let mut found = false;
+    if let Some(version) = value.get_mut("version").and_then(|v| v.get_mut("worlds")) {
+        if let Some(worlds) = version.as_array_mut() {
+            let original_len = worlds.len();
+            worlds.retain(|w| w.get("folder").and_then(|f| f.as_str()) != Some(&folder));
+            found = worlds.len() < original_len;
+        }
+    }
+
+    if !found {
+        return Err(InstallFailure::message("Mundo no encontrado".to_string()));
+    }
+
+    // Mint new version id
+    if let Some(version) = value.get_mut("version") {
+        let current_id = version.get("id").and_then(|v| v.as_str()).unwrap_or("local-v1");
+        let next_num = current_id.split('-').nth(2).and_then(|s| s.parse::<u32>().ok()).unwrap_or(0) + 1;
+        version["id"] = serde_json::Value::String(format!(
+            "local-v{}-{}-{}",
+            next_num,
+            chrono::Utc::now().timestamp(),
+            slug
+        ));
+    }
+
+    let raw = serde_json::to_string(&value)
+        .map_err(|e| InstallFailure::message(format!("No se pudo guardar: {e}")))?;
+    let parsed = crate::pack::parse_manifest(&raw)
+        .map_err(|e| InstallFailure::message(format!("El pack no es válido: {e}")))?;
+
+    write_manifest_atomic(&dir, &parsed)?;
+    Ok(())
+}
+
+/// Extract icon and gallery from boffmedia/ directory in an imported .mrpack.
+/// Best-effort: failures do not block the import.
+fn extract_mrpack_metadata<R: std::io::Read + std::io::Seek>(
+    archive: &mut zip::ZipArchive<R>,
+    pack_dir: &Path,
+) -> Result<(), String> {
+    // Collect entries first to avoid borrow issues
+    let mut entries = Vec::new();
+    for i in 0..archive.len() {
+        if let Ok(entry) = archive.by_index(i) {
+            entries.push((
+                entry.name().to_string(),
+                entry.is_dir(),
+            ));
+        }
+    }
+
+    // Extract icon from boffmedia/icon.*
+    for (name, is_dir) in &entries {
+        if name.starts_with("boffmedia/icon.") && !is_dir {
+            if let Ok(mut entry) = archive.by_name(name) {
+                let filename = name.split('/').last().unwrap_or("icon.png");
+                let dest = pack_dir.join(filename);
+                let mut buf = Vec::new();
+                let _ = std::io::Read::read_to_end(&mut entry, &mut buf);
+                let _ = std::fs::write(&dest, &buf);
+            }
+        }
+    }
+
+    // Extract gallery images from boffmedia/gallery/
+    let gallery_dir = pack_dir.join("gallery");
+    for (name, is_dir) in &entries {
+        if name.starts_with("boffmedia/gallery/") && !is_dir {
+            if let Ok(mut entry) = archive.by_name(name) {
+                let filename = name.split('/').last().unwrap_or("image.png");
+                let _ = std::fs::create_dir_all(&gallery_dir);
+                let mut buf = Vec::new();
+                let _ = std::io::Read::read_to_end(&mut entry, &mut buf);
+                let _ = std::fs::write(gallery_dir.join(filename), &buf);
+            }
+        }
+    }
+
+    Ok(())
+}
+
+/// Zip a directory recursively
+fn zip_directory(dir: &Path) -> Result<Vec<u8>, InstallFailure> {
+    use std::io::Write;
+    let mut zip_data = Vec::new();
+    {
+        let mut zip = zip::ZipWriter::new(std::io::Cursor::new(&mut zip_data));
+        let options = zip::write::SimpleFileOptions::default()
+            .compression_method(zip::CompressionMethod::Deflated);
+
+        fn add_dir(
+            zip: &mut zip::ZipWriter<std::io::Cursor<&mut Vec<u8>>>,
+            dir: &Path,
+            prefix: &str,
+            options: zip::write::SimpleFileOptions,
+        ) -> Result<(), InstallFailure> {
+            for entry in std::fs::read_dir(dir)
+                .map_err(|e| InstallFailure::message(format!("Error leyendo directorio: {e}")))?
+                .flatten()
+            {
+                let path = entry.path();
+                let name = entry.file_name();
+                let name_str = name.to_string_lossy();
+                let entry_path = if prefix.is_empty() {
+                    name_str.to_string()
+                } else {
+                    format!("{}/{}", prefix, name_str)
+                };
+
+                if path.is_dir() {
+                    add_dir(zip, &path, &entry_path, options)?;
+                } else {
+                    zip.start_file(&entry_path, options)
+                        .map_err(|e| InstallFailure::message(format!("Error en zip: {e}")))?;
+                    let data = std::fs::read(&path)
+                        .map_err(|e| InstallFailure::message(format!("Error leyendo archivo: {e}")))?;
+                    zip.write_all(&data)
+                        .map_err(|e| InstallFailure::message(format!("Error escribiendo zip: {e}")))?;
+                }
+            }
+            Ok(())
+        }
+
+        add_dir(&mut zip, dir, "", options)?;
+        zip.finish()
+            .map_err(|e| InstallFailure::message(format!("Error finalizando zip: {e}")))?;
+    }
+    Ok(zip_data)
 }
 
 #[cfg(test)]

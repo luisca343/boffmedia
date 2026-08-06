@@ -6,6 +6,7 @@ import {
   localPacksList,
   packsList,
   playsGet,
+  playtimeGet,
   type LauncherPack,
 } from "../runtime"
 import { mockPackEntries } from "./mock"
@@ -51,7 +52,11 @@ function toLocalEntry(manifest: PackManifest): PackEntry {
       slug: manifest.pack.slug,
       name: manifest.pack.name,
       summary: manifest.pack.summary ?? null,
+      description: manifest.pack.description ?? null,
       iconUrl: manifest.pack.iconUrl ?? null,
+      // A local pack's gallery lives on disk (convention dir), not in the
+      // manifest, so the listing carries none — GalleryTab reads it by slug.
+      gallery: [],
       accessKind: manifest.pack.access.kind,
     },
     latest: {
@@ -93,7 +98,7 @@ export async function loadPackEntries(): Promise<PackLibrary> {
   // server also threw away the local packs and the play history, which live
   // entirely on this disk. A player on a train got an error screen instead of
   // the packs sitting in front of them.
-  const [managedResult, plays, localManifests] = await Promise.all([
+  const [managedResult, plays, playtime, localManifests] = await Promise.all([
     packsList().then(
       (packs) => ({ packs, error: null as string | null }),
       (err: { message?: string }) => ({
@@ -102,6 +107,7 @@ export async function loadPackEntries(): Promise<PackLibrary> {
       }),
     ),
     playsGet().catch(() => ({}) as Record<string, string>),
+    playtimeGet().catch(() => ({}) as Record<string, number>),
     localPacksList().catch(() => []),
   ])
   const packs = managedResult.packs
@@ -123,12 +129,15 @@ export async function loadPackEntries(): Promise<PackLibrary> {
           slug: pack.slug,
           name: pack.name,
           summary: pack.summary,
+          description: pack.description ?? null,
           iconUrl: pack.iconUrl,
+          gallery: (pack.gallery ?? []).map((g) => ({ url: g.url, alt: g.alt ?? null })),
           accessKind: pack.accessKind,
         },
         latest,
         state,
         lastPlayed: plays[pack.id] ?? null,
+        playMs: playtime[pack.id] ?? 0,
         origin: "managed",
       }
       return entry
@@ -138,6 +147,8 @@ export async function loadPackEntries(): Promise<PackLibrary> {
   const local = await Promise.all(
     localManifests.map(async (manifest) => {
       const entry = toLocalEntry(manifest)
+      entry.lastPlayed = plays[manifest.pack.id] ?? null
+      entry.playMs = playtime[manifest.pack.id] ?? 0
       try {
         entry.state = await instanceScan(entry.pack.slug, null)
       } catch {

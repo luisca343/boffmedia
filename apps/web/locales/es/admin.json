@@ -664,11 +664,44 @@
       "vanilla": "Vanilla",
       "saveVersion": "Guardar cambios",
       "stepOf": "Paso {n} de {total}",
+      "description": {
+        "label": "Descripción",
+        "placeholder": "Una descripción más larga y detallada de lo que contiene este pack…"
+      },
+      "descriptionCharCount": "{current} / {max}",
+      "icon": {
+        "label": "Icono del pack",
+        "upload": "Subir imagen",
+        "urlFallback": "O pegar una URL"
+      },
+      "gallery": {
+        "label": "Galería",
+        "add": "Añadir imagen",
+        "alt": "Texto alternativo",
+        "altPlaceholder": "Describe esta imagen para accesibilidad…",
+        "remove": "Quitar",
+        "maxAlt": "Máximo 256 caracteres",
+        "uploadFailed": "No se pudo subir la imagen."
+      },
+      "worlds": {
+        "label": "Mundos incluidos",
+        "folder": "Nombre de la carpeta de guardado",
+        "folderPlaceholder": "p.ej. Dimension 12, World Nether",
+        "folderHint": "No distingue mayúsculas; debe ser único en esta versión",
+        "folderRequired": "Escribe un nombre de carpeta",
+        "help": "Para el MVP: máximo 1 mundo por versión. Sube el .zip de tu carpeta de guardado de Minecraft.",
+        "none": "Aún no se han añadido mundos.",
+        "upload": "Subir mundo .zip",
+        "remove": "Quitar",
+        "duplicateFolder": "Nombre de carpeta ya en uso",
+        "worldsEdited": "Mundos actualizados"
+      },
       "step": {
         "metadata": "Datos",
         "loader": "Loader",
         "mods": "Mods",
         "files": "Archivos",
+        "worlds": "Mundos",
         "review": "Revisión"
       },
       "reviewLead": "El servidor valida el manifiesto completo con pack-schema antes de guardarlo.",

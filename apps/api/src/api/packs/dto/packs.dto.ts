@@ -51,8 +51,30 @@ export class CreatePackDto {
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()
+  @MaxLength(2048)
+  description?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
   @MaxLength(512)
   iconUrl?: string;
+
+  @ApiPropertyOptional({
+    type: 'array',
+    items: {
+      type: 'object',
+      properties: {
+        url: { type: 'string' },
+        alt: { type: 'string' },
+      },
+    },
+  })
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => Object)
+  gallery?: unknown[];
 
   @ApiProperty({ enum: ACCESS_KINDS, default: 'allowlist' })
   @IsIn(ACCESS_KINDS)
@@ -81,8 +103,30 @@ export class UpdatePackDto {
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()
+  @MaxLength(2048)
+  description?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
   @MaxLength(512)
   iconUrl?: string;
+
+  @ApiPropertyOptional({
+    type: 'array',
+    items: {
+      type: 'object',
+      properties: {
+        url: { type: 'string' },
+        alt: { type: 'string' },
+      },
+    },
+  })
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => Object)
+  gallery?: unknown[];
 
   @ApiPropertyOptional({ enum: ACCESS_KINDS })
   @IsOptional()
@@ -136,6 +180,16 @@ export class CreateVersionDto {
   })
   @IsArray()
   files!: unknown[];
+
+  @ApiPropertyOptional({
+    description:
+      'BundledWorld[] — validado con @boffmedia/pack-schema',
+    type: 'array',
+    items: { type: 'object' },
+  })
+  @IsOptional()
+  @IsArray()
+  worlds?: unknown[];
 }
 
 export class GrantAccessDto {

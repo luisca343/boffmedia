@@ -15,6 +15,7 @@ use std::collections::HashMap;
 use std::io::Read;
 use std::path::Path;
 
+use base64::Engine;
 use serde::Serialize;
 
 use crate::install::paths::Layout;
@@ -271,6 +272,54 @@ pub async fn instance_worlds(
     // floating to the top as "oldest".
     out.sort_by(|a, b| b.last_played.cmp(&a.last_played));
     Ok(out)
+}
+
+/// Fetch a world's icon.png as a data: URL, or None if it doesn't exist.
+/// Reuses the base64 approach from icons.rs with the same 4MB cap.
+#[tauri::command]
+pub async fn world_icon(
+    slug: String,
+    folder: String,
+    app: tauri::AppHandle,
+) -> Result<Option<String>, InstallFailure> {
+    let settings = settings::load(&app);
+    let layout = Layout::new(&app, settings.game_dir())?;
+    let saves = layout.instance(&slug).minecraft.join("saves");
+
+    // Safe path construction: join saves with the folder name.
+    let world_dir =
+        crate::install::instance::safe_join(&saves, &folder).ok_or_else(|| {
+            InstallFailure::message("Invalid world folder.".to_string())
+        })?;
+
+    let icon_path = world_dir.join("icon.png");
+
+    // Check if icon exists and is a file.
+    if !icon_path.is_file() {
+        return Ok(None);
+    }
+
+    // Read the icon, capped at 4MB (same as icons.rs).
+    const MAX_ICON_BYTES: u64 = 4 * 1024 * 1024;
+    let metadata = std::fs::metadata(&icon_path)
+        .map_err(|e| InstallFailure::message(format!("Could not read icon metadata: {e}")))?;
+
+    if metadata.len() > MAX_ICON_BYTES {
+        return Err(InstallFailure::message("World icon is too large.".to_string()));
+    }
+
+    let bytes = std::fs::read(&icon_path)
+        .map_err(|e| InstallFailure::message(format!("Could not read world icon: {e}")))?;
+
+    // PNG sniff and base64 encode.
+    if bytes.starts_with(b"\x89PNG\r\n\x1a\n") {
+        let encoded = base64::engine::general_purpose::STANDARD.encode(&bytes);
+        Ok(Some(format!("data:image/png;base64,{}", encoded)))
+    } else {
+        Err(InstallFailure::message(
+            "World icon is not a valid PNG file.".to_string(),
+        ))
+    }
 }
 
 #[cfg(test)]

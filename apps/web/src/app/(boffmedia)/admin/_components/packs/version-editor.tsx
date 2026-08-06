@@ -25,6 +25,8 @@ import { ModSelector, type SelectedMod } from "./mod-selector"
 import { overrideFileEntry, uploadOverrideBlob } from "./upload-blob"
 import { useGameVersions, useLoaderVersions } from "./use-version-meta"
 import { VersionCombobox, type ComboOption } from "./version-combobox"
+import { BundledWorldsEditor } from "./bundled-worlds-editor"
+import { type BundledWorld } from "@/services/api/boffmedia/packsService"
 
 // Cutting a version is the one authoring step the launcher cannot do for you:
 // mods come from CurseForge/Modrinth by id, but configs, scripts and resource
@@ -43,7 +45,7 @@ const LOADERS: { value: string; label: string }[] = [
   { value: "quilt-loader", label: "Quilt" },
 ]
 
-const STEPS = ["metadata", "mods", "files", "review"] as const
+const STEPS = ["metadata", "mods", "files", "worlds", "review"] as const
 type Step = (typeof STEPS)[number]
 
 type Upload = {
@@ -176,6 +178,7 @@ export function VersionEditor({
   const [prefix, setPrefix] = useState("config")
   const [uploads, setUploads] = useState<Upload[]>([])
   const [mods, setMods] = useState<SelectedMod[]>([])
+  const [worlds, setWorlds] = useState<BundledWorld[]>([])
   const [extraJson, setExtraJson] = useState("")
   const [busy, setBusy] = useState(false)
   const [showSnapshots, setShowSnapshots] = useState(false)
@@ -311,6 +314,7 @@ export function VersionEditor({
     if (s === "metadata") return metadataValid
     if (s === "mods") return true
     if (s === "files") return extraValid
+    if (s === "worlds") return true
     if (s === "review") return canSubmit
     return false
   }
@@ -394,6 +398,7 @@ export function VersionEditor({
         loaderVersion: loader ? loaderVersion.trim() : undefined,
         notes: notes.trim() || undefined,
         files: [...modFiles, ...overrides, ...extra],
+        worlds: worlds.length > 0 ? worlds : undefined,
       }
       const res =
         mode === "edit" && sourceVersionId
@@ -683,6 +688,28 @@ export function VersionEditor({
           </div>
         )}
 
+        {step === "worlds" && (
+          <div className="flex flex-col gap-5">
+            <div className="cut-tag flex gap-3 border border-solid border-accent-line bg-accent-soft px-4 py-4">
+              <span className="grid size-8 shrink-0 place-items-center border border-solid border-accent-line bg-panel text-accent">
+                <span className="font-mono text-[12px] font-bold">04</span>
+              </span>
+              <div className="min-w-0">
+                <p className="font-display text-[15px] font-bold uppercase tracking-[0.04em] text-txt">
+                  {t("worlds.label")}
+                </p>
+                <p className="mt-1 max-w-[66ch] text-[13px] leading-[1.5] text-txt-dim">
+                  Optionally include pre-generated Minecraft worlds with this version.
+                </p>
+              </div>
+            </div>
+
+            <section className="cut border border-solid border-line bg-panel-2 p-4">
+              <BundledWorldsEditor value={worlds} onChange={setWorlds} />
+            </section>
+          </div>
+        )}
+
         {step === "review" && (
           <dl className="grid gap-3 [grid-template-columns:repeat(auto-fit,minmax(300px,1fr))]">
             {[
@@ -691,6 +718,7 @@ export function VersionEditor({
               [t("loader"), loader ? `${loader} ${loaderVersion}` : t("vanilla")],
               [t("mods"), String(mods.length)],
               [t("overrides"), String(uploads.length)],
+              [t("worlds.label"), String(worlds.length)],
               [t("notes"), notes || "—"],
             ].map(([label, value]) => (
               <div

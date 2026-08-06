@@ -23,7 +23,7 @@ import { localPackSave, serverStatus } from "../runtime"
 import { ImportPackPage } from "../components/pack/ImportPackPage"
 import type { InstallState, PackEntry, ServerStatus } from "../services/types"
 import { useLauncher } from "../state/launcher"
-import { formatBytes, formatWhen } from "../utils/format"
+import { formatBytes, formatPlaytime, formatWhen } from "../utils/format"
 import { PHASE_LABEL } from "../utils/labels"
 
 /** RF-03/RF-04: pings once on mount, only when the pack declares a server, and
@@ -135,6 +135,7 @@ function PackCard({ entry }: { entry: PackEntry }) {
       <div className="flex items-center justify-between gap-3 border-t border-line pt-3">
         <span className="text-xs text-txt-dim">
           {entry.lastPlayed ? t("lastPlayed", { when: formatWhen(entry.lastPlayed) }) : t("neverPlayed")}
+          {entry.playMs ? ` · ${t("playtime", { time: formatPlaytime(entry.playMs) })}` : ""}
           {state.kind === "installed" || state.kind === "outdated"
             ? ` · ${formatBytes(state.sizeBytes)}`
             : ""}

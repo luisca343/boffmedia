@@ -18,6 +18,7 @@ import {
   Stats,
   Stepper,
   Tabs,
+  Textarea,
   toast,
 } from "@boffmedia/ui"
 
@@ -30,9 +31,20 @@ import { BrowsePage } from "../components/pack/BrowsePage"
 import { BackupsTab } from "../components/pack/BackupsTab"
 import { ContentTab } from "../components/pack/ContentTab"
 import { FilesTab } from "../components/pack/FilesTab"
+import { GalleryTab } from "../components/pack/GalleryTab"
+import { ScreenshotsTab } from "../components/pack/ScreenshotsTab"
 import { WorldsTab } from "../components/pack/WorldsTab"
 import { LogPanel } from "../components/pack/LogPanel"
-import { exportMrpack, exportServerMrpack, localPackDuplicate, localPackGet, localPackSave } from "../runtime"
+import {
+  exportMrpack,
+  exportServerMrpack,
+  localPackDuplicate,
+  localPackGet,
+  localPackIcon,
+  localPackIconClear,
+  localPackIconSet,
+  localPackSave,
+} from "../runtime"
 import { useLauncher } from "../state/launcher"
 import { formatBytes, formatDuration, formatWhen } from "../utils/format"
 import { LOADER_LABEL, PHASE_LABEL, STEP_GROUPS } from "../utils/labels"
@@ -77,26 +89,66 @@ function EditLocalPackModal({
   open,
   onClose,
   onSaved,
+  onIconChanged,
   pack,
   latest,
 }: {
   open: boolean
   onClose: () => void
   onSaved: () => void
-  pack: { id: string; slug: string; name: string }
-  latest: { minecraft: string; loader: string | null; loaderVersion: string | null } | null
+  /** Icon edits land on disk immediately (a file dialog, not the Save button),
+   *  so the header must re-resolve its icon without waiting for a manifest save. */
+  onIconChanged: () => void
+  pack: { id: string; slug: string; name: string; summary: string | null; description: string | null }
+  latest: {
+    name: string
+    minecraft: string
+    loader: string | null
+    loaderVersion: string | null
+  } | null
 }) {
   const t = useT("packDetail")
   const [name, setName] = useState(pack.name)
+  const [summary, setSummary] = useState(pack.summary ?? "")
+  const [description, setDescription] = useState(pack.description ?? "")
+  const [versionName, setVersionName] = useState(latest?.name ?? "")
   const [choice, setChoice] = useState<VersionChoice>(() => choiceOf(latest))
   const [loadingVersions, setLoadingVersions] = useState(true)
   const [saving, setSaving] = useState(false)
+  const [settingIcon, setSettingIcon] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     setName(pack.name)
+    setSummary(pack.summary ?? "")
+    setDescription(pack.description ?? "")
+    setVersionName(latest?.name ?? "")
     setChoice(choiceOf(latest))
-  }, [open, pack.name, latest?.minecraft, latest?.loader, latest?.loaderVersion])
+  }, [open, pack.name, pack.summary, pack.description, latest?.name, latest?.minecraft, latest?.loader, latest?.loaderVersion])
+
+  const changeIcon = async () => {
+    setSettingIcon(true)
+    try {
+      const changed = await localPackIconSet(pack.slug)
+      if (changed) {
+        toast.success(t("iconSetSuccess"))
+        onIconChanged()
+      }
+    } catch (err) {
+      toast.error((err as { message?: string })?.message ?? t("iconSetError"))
+    } finally {
+      setSettingIcon(false)
+    }
+  }
+
+  const clearIcon = async () => {
+    try {
+      await localPackIconClear(pack.slug)
+      onIconChanged()
+    } catch (err) {
+      toast.error((err as { message?: string })?.message ?? t("iconClearError"))
+    }
+  }
 
   const save = async () => {
     if (!name.trim()) {
@@ -112,10 +164,22 @@ function EditLocalPackModal({
     try {
       const current = await localPackGet(pack.slug)
       const dependencies = dependenciesOf(choice)
+      const summaryValue = summary.trim() || undefined
+      const descriptionValue = description.trim() || undefined
       await localPackSave({
         ...current,
-        pack: { ...(current?.pack ?? { id: pack.id, slug: pack.slug, access: { kind: "public" } }), name: name.trim(), slug: pack.slug },
-        version: { ...(current?.version ?? { id: "local-v1", name: "local", createdAt: new Date().toISOString(), files: [] }), dependencies },
+        pack: {
+          ...(current?.pack ?? { id: pack.id, slug: pack.slug, access: { kind: "public" } }),
+          name: name.trim(),
+          slug: pack.slug,
+          summary: summaryValue,
+          description: descriptionValue,
+        },
+        version: {
+          ...(current?.version ?? { id: "local-v1", name: "local", createdAt: new Date().toISOString(), files: [] }),
+          name: versionName.trim() || current?.version?.name || "1.0",
+          dependencies,
+        },
       })
       onSaved()
       onClose()
@@ -131,6 +195,40 @@ function EditLocalPackModal({
       <div className="flex flex-col gap-4">
         <Field label={t("nameField")}>
           <Input value={name} onChange={(e) => setName(e.target.value)} />
+        </Field>
+        <Field label={t("iconLabel")}>
+          <div className="flex items-center gap-2">
+            <Button size="sm" icon="upload" loading={settingIcon} onClick={() => void changeIcon()}>
+              {t("iconSetButton")}
+            </Button>
+            <Button size="sm" onClick={() => void clearIcon()}>
+              {t("iconClearButton")}
+            </Button>
+          </div>
+        </Field>
+        <Field label={t("summaryLabel")}>
+          <Input
+            value={summary}
+            maxLength={512}
+            placeholder={t("summaryPlaceholder")}
+            onChange={(e) => setSummary(e.target.value)}
+          />
+        </Field>
+        <Field label={t("descriptionLabel")}>
+          <Textarea
+            rows={4}
+            value={description}
+            maxLength={2048}
+            placeholder={t("descriptionPlaceholder")}
+            onChange={(e) => setDescription(e.target.value)}
+          />
+        </Field>
+        <Field label={t("versionNameLabel")}>
+          <Input
+            value={versionName}
+            placeholder={t("versionNamePlaceholder")}
+            onChange={(e) => setVersionName(e.target.value)}
+          />
         </Field>
         <VersionPicker
           key={pack.slug}
@@ -158,7 +256,7 @@ function EditLocalPackModal({
   )
 }
 
-type TabKey = "content" | "files" | "worlds" | "backups" | "logs" | "info"
+type TabKey = "content" | "files" | "worlds" | "gallery" | "screenshots" | "backups" | "logs" | "info"
 
 export function PackDetail() {
   const t = useT("packDetail")
@@ -172,6 +270,24 @@ export function PackDetail() {
   const [tab, setTab] = useState<TabKey>("content")
   const [browsing, setBrowsing] = useState(false)
   const [contentNonce, setContentNonce] = useState(0)
+  // A local pack's icon is a file on disk (a data: URL), not the manifest's
+  // iconUrl; resolve it here so the header prefers it. Re-runs when contentNonce
+  // bumps after an icon edit.
+  const [localIcon, setLocalIcon] = useState<string | null>(null)
+  const localSlug = selected?.origin === "local" ? selected.pack.slug : null
+  useEffect(() => {
+    if (!localSlug) {
+      setLocalIcon(null)
+      return
+    }
+    let alive = true
+    void localPackIcon(localSlug).then((data) => {
+      if (alive) setLocalIcon(data)
+    })
+    return () => {
+      alive = false
+    }
+  }, [localSlug, contentNonce])
 
   if (!selected) {
     return (
@@ -271,7 +387,7 @@ export function PackDetail() {
 
       <header className="mb-5 flex flex-wrap items-start justify-between gap-4">
         <div className="flex min-w-0 items-start gap-4">
-          <CatalogIcon src={pack.iconUrl ?? undefined} size={64} />
+          <CatalogIcon src={localIcon ?? pack.iconUrl ?? undefined} size={64} />
           <div className="min-w-0">
             <Kicker>{pack.slug}</Kicker>
             <h1 className="font-display text-[30px]/none font-bold uppercase tracking-[0.06em] text-txt">
@@ -464,6 +580,8 @@ export function PackDetail() {
           { value: "content", label: t("tabs.content") },
           { value: "files", label: t("tabs.files") },
           { value: "worlds", label: t("tabs.worlds") },
+          { value: "gallery", label: t("galleryTab") },
+          { value: "screenshots", label: t("tabs.screenshots") },
           { value: "backups", label: t("tabs.backups") },
           { value: "logs", label: t("tabs.logs") },
           { value: "info", label: t("tabs.info") },
@@ -484,7 +602,20 @@ export function PackDetail() {
 
       {tab === "files" && <FilesTab slug={pack.slug} />}
 
-      {tab === "worlds" && <WorldsTab slug={pack.slug} />}
+      {tab === "worlds" && (
+        <WorldsTab slug={pack.slug} isLocal={isLocal} onChanged={reloadPacks} />
+      )}
+
+      {tab === "gallery" && (
+        <GalleryTab
+          slug={pack.slug}
+          isLocal={isLocal}
+          managedGallery={pack.gallery}
+          contentNonce={contentNonce}
+        />
+      )}
+
+      {tab === "screenshots" && <ScreenshotsTab slug={pack.slug} />}
 
       {/* Available for managed packs too: a backup only ever reads the
           instance, so nothing here can put a server-managed pack out of sync
@@ -495,6 +626,11 @@ export function PackDetail() {
 
       {tab === "info" && (
         <div className="flex flex-col gap-4">
+          {pack.description && (
+            <Panel title={t("descriptionTitle")}>
+              <p className="whitespace-pre-wrap text-sm text-txt-muted">{pack.description}</p>
+            </Panel>
+          )}
           <div className="grid gap-4 [grid-template-columns:repeat(auto-fit,minmax(320px,1fr))]">
             <Panel title={t("info.version")}>
               <DataList
@@ -560,6 +696,7 @@ export function PackDetail() {
             reloadPacks()
             toast.success(t("saveSuccess"))
           }}
+          onIconChanged={() => setContentNonce((n) => n + 1)}
           pack={pack}
           latest={latest}
         />

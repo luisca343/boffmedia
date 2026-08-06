@@ -34,6 +34,7 @@ use serde::Serialize;
 use tokio::sync::Mutex;
 
 use crate::auth::AuthState;
+use crate::backups;
 use crate::settings;
 
 use instance::{History, Marker, OptionalFile, OptionalState, RetainedVersion};
@@ -269,6 +270,185 @@ fn write_runtime_override(
 
 /// Run the blocking portablemc pass off the async runtime. `Prepared` is moved
 /// in and back out because it owns the plan every later step needs.
+/// Extract bundled worlds from the manifest (version.worlds[]). First-install-only:
+/// if saves/<folder> already exists, skip (never overwrite played saves). For each
+/// world: fetch zip bytes (local blob store for local packs; existing override
+/// download path for managed packs), verify sha512, extract with ZIP-SLIP
+/// protection. Best-effort: failures log but do not block launch.
+async fn extract_bundled_worlds(
+    app: &tauri::AppHandle,
+    prepared: &game::Prepared,
+    http: &reqwest::Client,
+    password: Option<&str>,
+    reporter: &Reporter,
+    manifest: &crate::pack::PackManifest,
+) {
+    let saves_dir = prepared.instance.minecraft.join("saves");
+    for world in &manifest.version.worlds {
+        let world_folder = world.folder.as_str();
+        let world_path = saves_dir.join(world_folder);
+
+        // First-install-only: skip if the world already exists
+        if world_path.is_dir() {
+            reporter.log(
+                "info",
+                &format!("Mundo «{world_folder}» ya existe; se conserva."),
+            );
+            continue;
+        }
+
+        // Fetch the world zip bytes
+        let zip_bytes = match &prepared.plan.pack_id {
+            pack_id if pack_id.starts_with("local-") => {
+                // Local pack: fetch from local blob store
+                let layout = &prepared.layout;
+                let local_blob_path = files::local_blob_path(layout, &world.sha512);
+                match std::fs::read(&local_blob_path) {
+                    Ok(bytes) => bytes,
+                    Err(e) => {
+                        reporter.log(
+                            "warn",
+                            &format!(
+                                "No se pudo leer el mundo «{world_folder}» del almacén local: {e}"
+                            ),
+                        );
+                        continue;
+                    }
+                }
+            }
+            _ => {
+                // Managed pack: fetch from override using existing path
+                match fetch_world_bytes(app, prepared, http, password, world).await {
+                    Ok(bytes) => bytes,
+                    Err(e) => {
+                        reporter.log(
+                            "warn",
+                            &format!("No se pudo descargar el mundo «{world_folder}\": {e:?}"),
+                        );
+                        continue;
+                    }
+                }
+            }
+        };
+
+        // Verify sha512 before extracting
+        let actual_sha512 = {
+            use sha2::{Digest, Sha512};
+            let mut hasher = Sha512::new();
+            hasher.update(&zip_bytes);
+            files::hex(&hasher.finalize())
+        };
+        if actual_sha512 != world.sha512.as_str() {
+            reporter.log(
+                "warn",
+                &format!(
+                    "El mundo «{world_folder}» está dañado (SHA-512 incorrecto); se omite."
+                ),
+            );
+            continue;
+        }
+
+        // Extract with ZIP-SLIP protection
+        if let Err(e) = extract_world_zip(&zip_bytes, &saves_dir, world_folder, reporter) {
+            reporter.log(
+                "warn",
+                &format!("No se pudo extraer el mundo «{world_folder}\": {e}"),
+            );
+        }
+    }
+}
+
+/// Fetch world zip bytes from override for a managed pack.
+async fn fetch_world_bytes(
+    app: &tauri::AppHandle,
+    prepared: &game::Prepared,
+    _http: &reqwest::Client,
+    password: Option<&str>,
+    world: &crate::pack::PackManifestVersionWorldsItem,
+) -> Result<Vec<u8>, String> {
+    // Worlds for managed packs are stored as overrides in the blob store
+    let pack_file = crate::api::PackFile::Override {
+        sha512: world.sha512.as_str().to_string(),
+    };
+    let response = crate::api::fetch_pack_file(
+        app,
+        &prepared.plan.pack_id,
+        password,
+        &pack_file,
+    )
+    .await
+    .map_err(|e| format!("{e:?}"))?;
+    let bytes = response.bytes().await.map_err(|e| e.to_string())?;
+    Ok(bytes.to_vec())
+}
+
+/// Extract a world zip with ZIP-SLIP protection. Rejects entries that are
+/// absolute paths or contain `..`, and verifies canonical paths stay under
+/// saves/<folder>.
+fn extract_world_zip(
+    zip_bytes: &[u8],
+    saves_dir: &std::path::Path,
+    folder: &str,
+    _reporter: &Reporter,
+) -> Result<(), String> {
+    let mut archive = zip::ZipArchive::new(std::io::Cursor::new(zip_bytes))
+        .map_err(|e| format!("Zip inválido: {e}"))?;
+
+    let target_dir = saves_dir.join(folder);
+    std::fs::create_dir_all(&target_dir).map_err(|e| format!("No se pudo crear carpeta: {e}"))?;
+    // Canonicalize the destination ONCE, up front: it exists, so this succeeds,
+    // and it resolves any symlink in the path so the per-entry parent check
+    // below compares like against like.
+    let canonical_target =
+        target_dir.canonicalize().map_err(|e| format!("No se pudo resolver destino: {e}"))?;
+
+    for i in 0..archive.len() {
+        let mut file = archive.by_index(i)
+            .map_err(|e| format!("Error leyendo zip: {e}"))?;
+
+        let path_str = file.name();
+        // ZIP-SLIP, first line: reject absolute paths or any `..` segment. On its
+        // own this already guarantees a `target_dir.join(path)` stays under
+        // target_dir; the parent canonicalization below is defence-in-depth
+        // against a symlinked entry.
+        if path_str.starts_with('/')
+            || path_str.starts_with('\\')
+            || path_str.split(['/', '\\']).any(|seg| seg == "..")
+        {
+            return Err(format!("Ruta sospechosa en el zip: {path_str}"));
+        }
+
+        let full_path = target_dir.join(path_str);
+
+        if file.is_dir() {
+            std::fs::create_dir_all(&full_path)
+                .map_err(|e| format!("No se pudo crear directorio: {e}"))?;
+            continue;
+        }
+
+        // Create the parent, then canonicalize IT (a real, existing dir —
+        // `full_path` itself does not exist yet, so canonicalizing it would
+        // always fail) and confirm it is inside the destination.
+        let parent = full_path
+            .parent()
+            .ok_or_else(|| format!("Ruta sin carpeta padre: {path_str}"))?;
+        std::fs::create_dir_all(parent)
+            .map_err(|e| format!("No se pudo crear directorio padre: {e}"))?;
+        let canonical_parent =
+            parent.canonicalize().map_err(|e| format!("No se pudo resolver ruta: {e}"))?;
+        if !canonical_parent.starts_with(&canonical_target) {
+            return Err(format!("Ruta fuera del directorio de destino: {path_str}"));
+        }
+
+        let mut outfile = std::fs::File::create(&full_path)
+            .map_err(|e| format!("No se pudo crear archivo: {e}"))?;
+        std::io::copy(&mut file, &mut outfile)
+            .map_err(|e| format!("No se pudo escribir archivo: {e}"))?;
+    }
+
+    Ok(())
+}
+
 async fn install_minecraft(
     prepared: game::Prepared,
     reporter: Reporter,
@@ -294,6 +474,7 @@ async fn install_payload(
     http: &reqwest::Client,
     password: Option<&str>,
     reporter: &Reporter,
+    manifest: &crate::pack::PackManifest,
 ) -> Result<(), InstallFailure> {
     // A file the player switched off is never fetched.
     //
@@ -351,6 +532,19 @@ async fn install_payload(
         reporter,
     )
     .await?;
+
+    // Extract bundled worlds (first-install-only). Best-effort: a failure logs
+    // but does not block the install. Worlds are only installed if saves/<folder>
+    // does not already exist.
+    extract_bundled_worlds(
+        app,
+        prepared,
+        http,
+        password,
+        reporter,
+        manifest,
+    )
+    .await;
 
     reporter.emit(Phase::Verifying, 0.5, "", 0, 0);
 
@@ -566,8 +760,33 @@ pub async fn install_pack(
     // them, which is half of every out-of-memory diagnosis.
     reporter.log("info", &prepared.runtime.summary());
 
+    // Check if we need to backup before updating.
+    if prepared.instance.root.is_dir() {
+        let previous = read_marker(&prepared.instance);
+        if let Some(prev) = previous {
+            if prev.version_id != prepared.plan.version_id {
+                // Version is changing; try to create a pre-update backup.
+                if backups::backup_before_update(
+                    &app,
+                    &prepared.layout,
+                    &prepared.plan.slug,
+                    &prepared.plan.version_id,
+                ) {
+                    reporter.log("info", "Copia de seguridad creada antes de la actualización.");
+                }
+            }
+        }
+    }
+
     let (prepared, _game) = install_minecraft(prepared, reporter.clone()).await?;
-    install_payload(&app, &prepared, &http, password.as_deref(), &reporter).await?;
+
+    // Parse the manifest for world extraction (needed by install_payload)
+    let manifest_raw = serde_json::to_string(&manifest)
+        .map_err(|e| InstallFailure::message(format!("Manifiesto ilegible: {e}")))?;
+    let parsed_manifest = crate::pack::parse_manifest(&manifest_raw)
+        .map_err(|e| InstallFailure::message(format!("El manifiesto del pack no es válido: {e}")))?;
+
+    install_payload(&app, &prepared, &http, password.as_deref(), &reporter, &parsed_manifest).await?;
 
     reporter.done();
     Ok(InstallStatus::Installed {
@@ -626,13 +845,19 @@ pub async fn launch_pack(
 
     let (prepared, game) = install_minecraft(prepared, reporter.clone()).await?;
 
-    if let Err(err) = install_payload(&app, &prepared, &http, password.as_deref(), &reporter).await {
+    // Parse the manifest for world extraction
+    let manifest_raw = serde_json::to_string(&manifest)
+        .map_err(|e| InstallFailure::message(format!("Manifiesto ilegible: {e}")))?;
+    let parsed_manifest = crate::pack::parse_manifest(&manifest_raw)
+        .map_err(|e| InstallFailure::message(format!("El manifiesto del pack no es válido: {e}")))?;
+
+    if let Err(err) = install_payload(&app, &prepared, &http, password.as_deref(), &reporter, &parsed_manifest).await {
         process::emit_idle(&app);
         return Err(err);
     }
     reporter.done();
 
-    let running = process::spawn(&app, &game, prepared.plan.quick_play.as_deref())?;
+    let running = process::spawn(&app, &game, prepared.plan.quick_play.as_deref(), pack_id.clone())?;
     let pid = running.pid;
     settings::record_play(&app, &pack_id);
     manager.running.lock().await.insert(pack_id, running);

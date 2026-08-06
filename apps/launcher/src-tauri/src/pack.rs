@@ -26,6 +26,10 @@ pub enum ManifestError {
     AbsolutePath(String),
     #[error("file path must not escape the instance directory: {0}")]
     PathTraversal(String),
+    #[error("world folder must be a single path segment: {0}")]
+    WorldFolderSegment(String),
+    #[error("two bundled worlds target the same save folder (case-insensitively): {0}")]
+    DuplicateWorldFolder(String),
 }
 
 /// Parse and fully validate a manifest — schema-level via serde, plus the
@@ -34,6 +38,7 @@ pub enum ManifestError {
 pub fn parse_manifest(raw: &str) -> Result<PackManifest, ManifestError> {
     let manifest: PackManifest = serde_json::from_str(raw)?;
     validate_paths(&manifest)?;
+    validate_worlds(&manifest)?;
     Ok(manifest)
 }
 
@@ -67,6 +72,28 @@ fn validate_paths(manifest: &PackManifest) -> Result<(), ManifestError> {
         let key = path.to_lowercase().replace('\\', "/");
         if !seen.insert(key) {
             return Err(ManifestError::DuplicatePath(path.to_string()));
+        }
+    }
+
+    Ok(())
+}
+
+/// Mirrors the bundled-world refinements in boffmedia.ts. A world's `folder`
+/// names a directory we CREATE under `saves/`, so a separator or a `..` here is
+/// exactly the traversal we cannot let the extractor act on. Duplicate folders
+/// race to write the same save; reject them case-insensitively like file paths.
+fn validate_worlds(manifest: &PackManifest) -> Result<(), ManifestError> {
+    let mut seen: HashSet<String> = HashSet::new();
+    for world in &manifest.version.worlds {
+        let folder = world.folder.as_str();
+
+        if folder == "." || folder == ".." || folder.contains('/') || folder.contains('\\') {
+            return Err(ManifestError::WorldFolderSegment(folder.to_string()));
+        }
+
+        let key = folder.to_lowercase();
+        if !seen.insert(key) {
+            return Err(ManifestError::DuplicateWorldFolder(folder.to_string()));
         }
     }
 
@@ -123,5 +150,48 @@ mod tests {
         let err =
             parse_manifest(&manifest_json("mods/sodium.jar", Some("mods/Sodium.jar"))).unwrap_err();
         assert!(matches!(err, ManifestError::DuplicatePath(_)));
+    }
+
+    fn manifest_with_worlds(worlds_json: &str) -> String {
+        format!(
+            r#"{{"formatVersion":1,
+                "pack":{{"id":"pk","slug":"boff-smp","name":"Boff SMP","access":{{"kind":"public"}}}},
+                "version":{{"id":"v1","name":"1.0","createdAt":"2026-07-30T12:00:00Z",
+                  "dependencies":{{"minecraft":"1.21.4","neoforge":"21.4.30"}},
+                  "files":[],
+                  "worlds":{worlds_json}}}}}"#
+        )
+    }
+
+    fn world_entry(folder: &str) -> String {
+        format!(
+            r#"{{"folder":"{folder}","sizeBytes":10,"sha512":"{s}","source":{{"kind":"override","blobSha512":"{s}"}}}}"#,
+            s = "b".repeat(128)
+        )
+    }
+
+    #[test]
+    fn accepts_a_bundled_world() {
+        let json = manifest_with_worlds(&format!("[{}]", world_entry("world")));
+        assert!(parse_manifest(&json).is_ok());
+    }
+
+    #[test]
+    fn rejects_world_folder_with_separator() {
+        let json = manifest_with_worlds(&format!("[{}]", world_entry("saves/world")));
+        // A separator in the folder is rejected by the generated pattern (serde)
+        // or, if it slips through, by validate_worlds — either is a rejection.
+        assert!(parse_manifest(&json).is_err());
+    }
+
+    #[test]
+    fn rejects_case_only_duplicate_world_folders() {
+        let json = manifest_with_worlds(&format!(
+            "[{},{}]",
+            world_entry("world"),
+            world_entry("World")
+        ));
+        let err = parse_manifest(&json).unwrap_err();
+        assert!(matches!(err, ManifestError::DuplicateWorldFolder(_)));
     }
 }

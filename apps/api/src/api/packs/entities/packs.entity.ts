@@ -26,6 +26,7 @@ export class LauncherVersionEntity {
   @ApiPropertyOptional({ nullable: true }) loader!: string | null;
   @ApiPropertyOptional({ nullable: true }) loaderVersion!: string | null;
   @ApiProperty() fileCount!: number;
+  @ApiProperty() worldCount!: number;
   @ApiProperty() createdAt!: string;
 }
 
@@ -34,7 +35,14 @@ export class LauncherPackEntity {
   @ApiProperty() slug!: string;
   @ApiProperty() name!: string;
   @ApiPropertyOptional({ nullable: true }) summary!: string | null;
+  @ApiPropertyOptional({ nullable: true }) description!: string | null;
   @ApiPropertyOptional({ nullable: true }) iconUrl!: string | null;
+  @ApiPropertyOptional({
+    type: 'array',
+    items: { type: 'object' },
+    nullable: true,
+  })
+  gallery?: unknown[];
   @ApiProperty({ enum: ['public', 'password', 'allowlist'] })
   accessKind!: string;
 
@@ -66,6 +74,7 @@ export class PackVersionEntity {
   @ApiPropertyOptional({ nullable: true }) loader!: string | null;
   @ApiPropertyOptional({ nullable: true }) loaderVersion!: string | null;
   @ApiProperty() fileCount!: number;
+  @ApiProperty() worldCount!: number;
   @ApiProperty() published!: boolean;
   @ApiPropertyOptional({ nullable: true }) notes!: string | null;
   @ApiProperty() createdAt!: string;

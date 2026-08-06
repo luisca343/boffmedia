@@ -61,7 +61,10 @@ const PACKS: {
       slug: "boff-smp",
       name: "Boff SMP",
       summary: "El pack principal del servidor. Pixelmon, LittleTiles y utilidades.",
+      description:
+        "El pack insignia de Boffmedia: una experiencia de supervivencia con Pixelmon, construcción avanzada con LittleTiles y decenas de utilidades afinadas por el equipo.",
       iconUrl: null,
+      gallery: [],
       accessKind: "allowlist",
     },
     latest: version("v_smp_5", "1.4.2", "2026-07-28T18:04:00Z", 84),
@@ -73,7 +76,9 @@ const PACKS: {
       slug: "boff-creativo",
       name: "Boff Creativo",
       summary: "Construcción: WorldEdit, LittleTiles y esquemas compartidos.",
+      description: null,
       iconUrl: null,
+      gallery: [],
       accessKind: "password",
     },
     latest: version("v_cre_2", "0.9.0", "2026-07-11T09:30:00Z", 31),
@@ -84,7 +89,9 @@ const PACKS: {
       slug: "boff-eventos",
       name: "Eventos",
       summary: "Pack ligero para torneos y minijuegos puntuales.",
+      description: null,
       iconUrl: null,
+      gallery: [],
       accessKind: "public",
     },
     latest: version("v_evt_1", "2026.7", "2026-07-02T20:00:00Z", 12),
@@ -114,6 +121,7 @@ export const MOCK_SETTINGS: Settings = {
   retainVersions: 3,
   memoryAuto: false,
   locale: "es",
+  backupBeforeUpdate: true,
 }
 
 /** Browser-mode library. The desktop equivalent is `loadPackEntries`, which
@@ -130,12 +138,14 @@ export function mockPackEntries(): PackEntry[] {
         sizeBytes: 1_284_000_000,
       },
       lastPlayed: "2026-07-29T21:12:00Z",
+      playMs: 45_300_000,
       origin: "managed",
     },
     {
       ...PACKS[1],
       state: { kind: "installed", versionId: "v_cre_2", sizeBytes: 612_000_000 },
       lastPlayed: "2026-07-20T17:45:00Z",
+      playMs: 8_700_000,
       origin: "managed",
     },
     { ...PACKS[2], state: { kind: "not-installed" }, lastPlayed: null, origin: "managed" },
@@ -145,7 +155,9 @@ export function mockPackEntries(): PackEntry[] {
         slug: manifest.pack.slug,
         name: manifest.pack.name,
         summary: manifest.pack.summary ?? null,
+        description: manifest.pack.description ?? null,
         iconUrl: manifest.pack.iconUrl ?? null,
+        gallery: [],
         accessKind: manifest.pack.access.kind,
       },
       latest: {
@@ -483,4 +495,49 @@ export function mockWorlds(): World[] {
       hasIcon: false,
     },
   ]
+}
+
+// ── Local pack metadata mocks ──────────────────────────────────────────────
+
+/** Mock data for local pack icons (maps slug to data URL or null). */
+const mockPackIcons = new Map<string, string | null>()
+
+/** Mock data for gallery images (maps slug to list of filenames). */
+const mockPackGalleries = new Map<string, string[]>()
+
+export function mockLocalPackIcon(slug: string): string | null {
+  return mockPackIcons.get(slug) ?? null
+}
+
+export function mockSetLocalPackIcon(slug: string, dataUrl: string | null): void {
+  if (dataUrl === null) {
+    mockPackIcons.delete(slug)
+  } else {
+    mockPackIcons.set(slug, dataUrl)
+  }
+}
+
+export function mockLocalPackGalleryList(slug: string): string[] {
+  return mockPackGalleries.get(slug) ?? []
+}
+
+export function mockAddGalleryImage(slug: string): string {
+  const filename = `gallery-image-${Date.now()}.png`
+  const images = mockPackGalleries.get(slug) ?? []
+  images.push(filename)
+  mockPackGalleries.set(slug, images)
+  return filename
+}
+
+export function mockLocalPackGalleryImage(slug: string, filename: string): string | null {
+  const images = mockPackGalleries.get(slug) ?? []
+  if (!images.includes(filename)) return null
+  // Return a simple placeholder image
+  return "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=="
+}
+
+export function mockRemoveGalleryImage(slug: string, filename: string): void {
+  const images = mockPackGalleries.get(slug) ?? []
+  const filtered = images.filter((f) => f !== filename)
+  mockPackGalleries.set(slug, filtered)
 }

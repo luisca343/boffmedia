@@ -92,6 +92,7 @@ pub fn spawn(
     app: &tauri::AppHandle,
     game: &portablemc::base::Game,
     quick_play: Option<&str>,
+    pack_id: String,
 ) -> Result<RunningGame, InstallFailure> {
     let mut command: Command = game.command();
     // RF-01/RF-02: only appended when the pack declares a server AND the pack's
@@ -129,7 +130,7 @@ pub fn spawn(
     let child = Arc::new(Mutex::new(child));
     let _ = app.emit(EVENT_GAME_STATE, GameStatePayload::Running { pid, since });
 
-    watch_exit(app.clone(), Arc::clone(&child), tail);
+    watch_exit(app.clone(), Arc::clone(&child), tail, pack_id, since);
 
     Ok(RunningGame { pid, since, child })
 }
@@ -165,7 +166,13 @@ fn pump<R: std::io::Read + Send + 'static>(
 /// Reports the exit code as `GameState`. A non-zero exit is `crashed` even when
 /// the player closed the window, because the game itself does not distinguish
 /// the two and pretending otherwise hides real crashes.
-fn watch_exit(app: tauri::AppHandle, child: Arc<Mutex<Child>>, tail: LogTail) {
+fn watch_exit(
+    app: tauri::AppHandle,
+    child: Arc<Mutex<Child>>,
+    tail: LogTail,
+    pack_id: String,
+    since: u64,
+) {
     std::thread::spawn(move || {
         loop {
             let exit_code = {
@@ -200,6 +207,11 @@ fn watch_exit(app: tauri::AppHandle, child: Arc<Mutex<Child>>, tail: LogTail) {
                     &format!("El juego terminó con código {code}."),
                 );
                 let _ = app.emit(EVENT_GAME_STATE, payload);
+
+                // Record playtime: best-effort, never fail the exit path.
+                let elapsed = now_ms().saturating_sub(since);
+                crate::settings::add_playtime(&app, &pack_id, elapsed);
+
                 return;
             }
             // Polling rather than a blocking `wait()` so the mutex is free for

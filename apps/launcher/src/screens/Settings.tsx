@@ -116,6 +116,16 @@ export function Settings() {
               onChange={(keepLogs) => patchSettings({ keepLogs })}
               label={t("install.keepLogs")}
             />
+            <div className="flex flex-col gap-1">
+              <Toggle
+                on={settings.backupBeforeUpdate}
+                onChange={(backupBeforeUpdate) => patchSettings({ backupBeforeUpdate })}
+                label={t("install.backupBeforeUpdate")}
+              />
+              <p className="pl-[52px] text-[11px] text-txt-dim">
+                {t("install.backupBeforeUpdateHint")}
+              </p>
+            </div>
           </div>
         </Panel>
 

@@ -7,6 +7,15 @@ import type { AppLocale } from "@boffmedia/ui"
 
 export type PackAccessKind = "public" | "password" | "allowlist"
 
+/** A promotional gallery image attached to a pack (shown pre-install). For a
+ *  managed pack these are public URLs from the registry; for a local pack the
+ *  gallery lives on disk (a convention dir), so this stays empty and the
+ *  GalleryTab reads the files directly. */
+export type PackGalleryImage = {
+  url: string
+  alt?: string | null
+}
+
 /** What the LISTING (§7.2) knows about a pack. Note what is absent: the
  *  allowlist UUIDs are never sent to any launcher, since one member could
  *  otherwise enumerate the whole membership of a pack they can read. */
@@ -15,7 +24,12 @@ export type PackSummary = {
   slug: string
   name: string
   summary: string | null
+  /** Long-form plain-text description shown on the Info panel. */
+  description: string | null
   iconUrl: string | null
+  /** Managed-pack gallery URLs. Empty for local packs (their gallery is on
+   *  disk); the GalleryTab branches on `origin`. */
+  gallery: PackGalleryImage[]
   accessKind: PackAccessKind
 }
 
@@ -68,6 +82,9 @@ export type PackEntry = {
   state: InstallState
   /** Null until the pack has been launched at least once. */
   lastPlayed: string | null
+  /** Total time played, in milliseconds, accumulated across every session.
+   *  0 (or absent) until the pack has been launched. */
+  playMs?: number
   /** RF-10: "managed" comes from the Boffmedia registry and is read-only in
    *  this launcher; "local" was created/imported on this machine and can be
    *  edited or exported. */
@@ -164,7 +181,12 @@ export type Settings = {
    *  through the i18n store. Absent in a settings.json from before i18n, which
    *  the Rust `#[serde(default)]` fills with "es". */
   locale: AppLocale
+  /** Whether to automatically backup saves/config before updating a pack. */
+  backupBeforeUpdate: boolean
 }
+
+/** Total playtime in milliseconds per pack, keyed by pack id. */
+export type Playtime = Record<string, number>
 
 /** HANDOFF §9 — why a resolved value is what it is. Mirrors Rust's
  *  `install::runtime::RuntimeSource`. */

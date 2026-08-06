@@ -286,12 +286,19 @@ export type LauncherVersion = {
   createdAt: string
 }
 
+export type LauncherGalleryImage = {
+  url: string
+  alt?: string | null
+}
+
 export type LauncherPack = {
   id: string
   slug: string
   name: string
   summary: string | null
+  description?: string | null
   iconUrl: string | null
+  gallery?: LauncherGalleryImage[]
   accessKind: "public" | "password" | "allowlist"
   latestVersion: LauncherVersion | null
 }
@@ -313,6 +320,16 @@ export async function packsList(): Promise<LauncherPack[]> {
 export async function playsGet(): Promise<Record<string, string>> {
   try {
     return await invoke<Record<string, string>>("plays_get")
+  } catch {
+    return {}
+  }
+}
+
+/** Total playtime in milliseconds per pack. Never throws: missing playtime is
+ *  cosmetic. */
+export async function playtimeGet(): Promise<Record<string, number>> {
+  try {
+    return await invoke<Record<string, number>>("playtime_get")
   } catch {
     return {}
   }
@@ -1067,12 +1084,52 @@ export async function instanceReveal(slug: string, rel: string): Promise<void> {
   }
 }
 
+/** A screenshot on disk. `rel` is the handle `screenshotImage` takes back. */
+export type Screenshot = {
+  name: string
+  rel: string
+  size: number
+  modified: number
+}
+
+/** Every screenshot in this instance, newest first. */
+export async function instanceScreenshots(slug: string): Promise<Screenshot[]> {
+  if (!isDesktop()) return []
+  try {
+    return await invoke<Screenshot[]>("instance_screenshots", { slug })
+  } catch {
+    return []
+  }
+}
+
+/** One screenshot as a data: URL, or null if it is gone. Never throws — a
+ *  thumbnail that will not load is cosmetic. */
+export async function screenshotImage(slug: string, rel: string): Promise<string | null> {
+  if (!isDesktop()) return rel
+  try {
+    return await invoke<string | null>("screenshot_image", { slug, rel })
+  } catch {
+    return null
+  }
+}
+
 export async function instanceWorlds(slug: string): Promise<World[]> {
   if (!isDesktop()) return mockWorlds()
   try {
     return await invoke<World[]>("instance_worlds", { slug })
   } catch {
     return []
+  }
+}
+
+/** Fetch a world's icon as a data: URL, or null if not present. Never throws:
+ *  a missing icon is cosmetic. */
+export async function worldIcon(slug: string, folder: string): Promise<string | null> {
+  if (!isDesktop()) return null
+  try {
+    return await invoke<string | null>("world_icon", { slug, folder })
+  } catch {
+    return null
   }
 }
 
@@ -1264,6 +1321,113 @@ export async function importMrpackUrl(source: string): Promise<ImportMrpackResul
   if (!isDesktop()) throw asFailure({ message: "La importación solo funciona en la aplicación de escritorio." })
   try {
     return await invoke<ImportMrpackResult>("import_mrpack_url", { url: source })
+  } catch (err) {
+    throw asFailure(err)
+  }
+}
+
+// ── Local pack metadata (icon & gallery) ──────────────────────────────────
+
+/** Open the native image picker and set a local pack's icon. Resolves to
+ *  `true` when a file was chosen, `false` if the player cancelled. */
+export async function localPackIconSet(slug: string): Promise<boolean> {
+  if (!isDesktop()) return false
+  try {
+    return await invoke<boolean>("local_pack_icon_set", { slug })
+  } catch (err) {
+    throw asFailure(err)
+  }
+}
+
+/** Clear a local pack's icon. */
+export async function localPackIconClear(slug: string): Promise<void> {
+  if (!isDesktop()) return
+  try {
+    await invoke("local_pack_icon_clear", { slug })
+  } catch (err) {
+    throw asFailure(err)
+  }
+}
+
+/** Get a local pack's icon as a data: URL, or null if not set. */
+export async function localPackIcon(slug: string): Promise<string | null> {
+  if (!isDesktop()) return null
+  try {
+    return await invoke<string | null>("local_pack_icon", { slug })
+  } catch {
+    return null
+  }
+}
+
+/** List gallery images for a local pack (filenames in gallery/ dir). */
+export async function localPackGalleryList(slug: string): Promise<string[]> {
+  if (!isDesktop()) return []
+  try {
+    return await invoke<string[]>("local_pack_gallery_list", { slug })
+  } catch {
+    return []
+  }
+}
+
+/** Open the native image picker and add the chosen image to a local pack's
+ *  gallery. Resolves to the stored filename, or `null` if cancelled. */
+export async function localPackGalleryAdd(slug: string): Promise<string | null> {
+  if (!isDesktop()) throw asFailure({ message: "Solo funciona en la aplicación de escritorio." })
+  try {
+    return await invoke<string | null>("local_pack_gallery_add", { slug })
+  } catch (err) {
+    throw asFailure(err)
+  }
+}
+
+/** Remove an image from a local pack's gallery. */
+export async function localPackGalleryRemove(slug: string, filename: string): Promise<void> {
+  if (!isDesktop()) return
+  try {
+    await invoke("local_pack_gallery_remove", { slug, filename })
+  } catch (err) {
+    throw asFailure(err)
+  }
+}
+
+/** Get a gallery image as a data: URL, or null if not found. */
+export async function localPackGalleryImage(slug: string, filename: string): Promise<string | null> {
+  if (!isDesktop()) return null
+  try {
+    return await invoke<string | null>("local_pack_gallery_image", { slug, filename })
+  } catch {
+    return null
+  }
+}
+
+// ── Local pack worlds (bundled in pack, extracted on first install) ───────
+
+/** Open the native .zip picker and add the chosen archive as a bundled world
+ *  under `folder`. Resolves to `true` when added, `false` if cancelled. */
+export async function localPackWorldAddZip(slug: string, folder: string): Promise<boolean> {
+  if (!isDesktop()) throw asFailure({ message: "Solo funciona en la aplicación de escritorio." })
+  try {
+    return await invoke<boolean>("local_pack_world_add_zip", { slug, folder })
+  } catch (err) {
+    throw asFailure(err)
+  }
+}
+
+/** Promote an installed world into a local pack's bundled worlds. */
+export async function localPackWorldPromote(slug: string, worldFolder: string): Promise<void> {
+  if (!isDesktop()) throw asFailure({ message: "Solo funciona en la aplicación de escritorio." })
+  try {
+    await invoke("local_pack_world_promote", { slug, worldFolder })
+  } catch (err) {
+    throw asFailure(err)
+  }
+}
+
+/** Remove a bundled world from a local pack. */
+export async function localPackWorldRemove(slug: string, folder: string): Promise<void> {
+  if (!isDesktop()) return
+  try {
+    await invoke("local_pack_world_remove", { slug, folder })
   } catch (err) {
     throw asFailure(err)
   }

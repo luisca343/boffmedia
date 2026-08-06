@@ -72,19 +72,38 @@ export interface AuditRow {
   at: string;
 }
 
+export interface GalleryImage {
+  url: string;
+  alt?: string;
+}
+
 export interface CreatePackInput {
   slug: string;
   name: string;
   summary?: string;
+  description?: string;
   iconUrl?: string;
+  gallery?: GalleryImage[];
   accessKind: PackAccessKind;
   password?: string;
+}
+
+export interface BundledWorld {
+  folder: string;
+  source: {
+    kind: 'override';
+    blobSha512: string;
+  };
+  sizeBytes: number;
+  sha512: string;
 }
 
 export interface UpdatePackInput {
   name?: string;
   summary?: string;
+  description?: string;
   iconUrl?: string;
+  gallery?: GalleryImage[];
   accessKind?: PackAccessKind;
   password?: string;
   archived?: boolean;
@@ -98,6 +117,7 @@ export interface CreateVersionInput {
   notes?: string;
   /** PackFile[] — the API validates this with @boffmedia/pack-schema. */
   files: unknown[];
+  worlds?: BundledWorld[];
 }
 
 // The catalog vocabulary is shared with apps/launcher, which browses mods too

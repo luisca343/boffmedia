@@ -13,6 +13,7 @@ use crate::install::InstallFailure;
 
 const FILE: &str = "settings.json";
 const PLAYS_FILE: &str = "plays.json";
+const PLAYTIME_FILE: &str = "playtime.json";
 
 /// Matches types.ts's `Settings` field for field. `gameDir` empty means "use the
 /// default app-data location" — an absent field and a blank one must mean the
@@ -45,6 +46,14 @@ pub struct Settings {
     /// written before i18n with "es".
     #[serde(default = "default_locale")]
     pub locale: String,
+    /// Whether to automatically backup saves/config before updating a pack.
+    /// `#[serde(default = "default_true")]` so old files keep the feature enabled.
+    #[serde(default = "default_true")]
+    pub backup_before_update: bool,
+}
+
+fn default_true() -> bool {
+    true
 }
 
 fn default_retain() -> u32 {
@@ -73,6 +82,8 @@ impl Default for Settings {
             // is offered, and Ajustes can opt the global default into it.
             memory_auto: false,
             locale: default_locale(),
+            // On by default: a safety net before major updates.
+            backup_before_update: true,
         }
     }
 }
@@ -150,6 +161,40 @@ pub fn record_play(app: &tauri::AppHandle, pack_id: &str) {
 #[tauri::command]
 pub fn plays_get(app: tauri::AppHandle) -> Plays {
     plays_load(&app)
+}
+
+/// Total playtime per pack in milliseconds, kept out of `settings.json` for the
+/// same reason as plays.json: it is a log, not a preference.
+pub type Playtime = std::collections::HashMap<String, u64>;
+
+pub fn playtime_load(app: &tauri::AppHandle) -> Playtime {
+    config_path(app, PLAYTIME_FILE)
+        .ok()
+        .and_then(|path| std::fs::read_to_string(path).ok())
+        .and_then(|raw| serde_json::from_str(&raw).ok())
+        .unwrap_or_default()
+}
+
+/// Best-effort accumulation of playtime. Failures are silently ignored to keep
+/// the exit path clean.
+pub fn add_playtime(app: &tauri::AppHandle, pack_id: &str, ms: u64) {
+    let mut playtime = playtime_load(app);
+    let current = playtime.entry(pack_id.to_string()).or_insert(0);
+    *current = current.saturating_add(ms);
+    let Ok(path) = config_path(app, PLAYTIME_FILE) else {
+        return;
+    };
+    if let Some(parent) = path.parent() {
+        let _ = std::fs::create_dir_all(parent);
+    }
+    if let Ok(raw) = serde_json::to_string_pretty(&playtime) {
+        let _ = std::fs::write(path, raw);
+    }
+}
+
+#[tauri::command]
+pub fn playtime_get(app: tauri::AppHandle) -> Playtime {
+    playtime_load(&app)
 }
 
 /// Never fails on a missing or unreadable file: settings are a convenience, and
@@ -255,6 +300,7 @@ mod tests {
             "keepLogs",
             "retainVersions",
             "memoryAuto",
+            "backupBeforeUpdate",
         ] {
             assert!(raw.contains(key), "missing {key} in {raw}");
         }

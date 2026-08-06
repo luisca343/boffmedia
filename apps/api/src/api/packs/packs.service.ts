@@ -48,6 +48,8 @@ export class PacksService {
           name: pack.name,
           summary: pack.summary,
           iconUrl: pack.iconUrl,
+          ...(pack.description ? { description: pack.description } : {}),
+          ...(pack.gallery ? { gallery: pack.gallery as any } : {}),
           accessKind: pack.accessKind,
           latestVersion:
             version && version.published
@@ -58,6 +60,7 @@ export class PacksService {
                   loader: version.loader,
                   loaderVersion: version.loaderVersion,
                   fileCount: version.files.length,
+                  worldCount: version.worlds?.length ?? 0,
                   createdAt: version.createdAt.toISOString(),
                 }
               : null,
@@ -105,7 +108,9 @@ export class PacksService {
         slug: pack.slug,
         name: pack.name,
         ...(pack.summary ? { summary: pack.summary } : {}),
+        ...(pack.description ? { description: pack.description } : {}),
         ...(pack.iconUrl ? { iconUrl: pack.iconUrl } : {}),
+        ...(pack.gallery ? { gallery: pack.gallery } : {}),
         access: this.accessPayload(pack.accessKind),
         latestVersionId: version.id,
       },
@@ -120,6 +125,7 @@ export class PacksService {
             : {}),
         },
         files: version.files,
+        ...(version.worlds && version.worlds.length > 0 ? { worlds: version.worlds } : {}),
       },
     };
 
@@ -226,7 +232,9 @@ export class PacksService {
       slug: dto.slug,
       name: dto.name,
       summary: dto.summary ?? null,
+      description: dto.description ?? null,
       iconUrl: dto.iconUrl ?? null,
+      gallery: dto.gallery ?? null,
       accessKind: dto.accessKind,
       passwordHash: dto.password ? await bcrypt.hash(dto.password, 10) : null,
     });
@@ -241,6 +249,8 @@ export class PacksService {
     const patch: Record<string, unknown> = {};
     if (dto.name !== undefined) patch.name = dto.name;
     if (dto.summary !== undefined) patch.summary = dto.summary;
+    if (dto.description !== undefined) patch.description = dto.description;
+    if (dto.gallery !== undefined) patch.gallery = dto.gallery;
     if (dto.iconUrl !== undefined) patch.iconUrl = dto.iconUrl;
     if (dto.archived !== undefined) patch.archived = dto.archived;
     if (dto.accessKind !== undefined) patch.accessKind = dto.accessKind;
@@ -271,6 +281,7 @@ export class PacksService {
       loader: v.loader,
       loaderVersion: v.loaderVersion,
       fileCount: v.files.length,
+      worldCount: v.worlds?.length ?? 0,
       published: v.published,
       notes: v.notes,
       createdAt: v.createdAt.toISOString(),
@@ -283,7 +294,7 @@ export class PacksService {
   async versionDetail(
     packId: string,
     versionId: string,
-  ): Promise<PackVersionView & { files: unknown[] }> {
+  ): Promise<PackVersionView & { files: unknown[]; worlds?: unknown[] }> {
     const version = await this.repo.findVersion(versionId);
     if (!version || version.packId !== packId) {
       throw new NotFoundException('Versión no encontrada');
@@ -296,10 +307,12 @@ export class PacksService {
       loader: version.loader,
       loaderVersion: version.loaderVersion,
       fileCount: version.files.length,
+      worldCount: version.worlds?.length ?? 0,
       published: version.published,
       notes: version.notes,
       createdAt: version.createdAt.toISOString(),
       files: version.files,
+      ...(version.worlds ? { worlds: version.worlds } : {}),
     };
   }
 
@@ -328,6 +341,7 @@ export class PacksService {
       loader: (dto.loader as PackLoader) ?? null,
       loaderVersion: dto.loaderVersion ?? null,
       files: parsed.version.files,
+      worlds: (parsed.version as any).worlds ?? null,
       notes: dto.notes ?? null,
     });
     await this.repo.audit(AUDIT.VERSION_UPDATED, packId, null, { actorId, versionId });
@@ -375,6 +389,7 @@ export class PacksService {
           ...(dto.loader && dto.loaderVersion ? { [dto.loader]: dto.loaderVersion } : {}),
         },
         files: dto.files,
+        ...(dto.worlds && dto.worlds.length > 0 ? { worlds: dto.worlds } : {}),
       },
     };
     const parsed = PackManifest.safeParse(candidate);
@@ -409,6 +424,7 @@ export class PacksService {
       loader: (dto.loader as PackLoader) ?? null,
       loaderVersion: dto.loaderVersion ?? null,
       files: parsed.version.files,
+      worlds: (parsed.version as any).worlds ?? null,
       notes: dto.notes ?? null,
       published: false,
     });

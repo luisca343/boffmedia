@@ -28,9 +28,33 @@
           "type": "string",
           "maxLength": 512
         },
+        "description": {
+          "type": "string",
+          "maxLength": 2048
+        },
         "iconUrl": {
           "type": "string",
           "format": "uri"
+        },
+        "gallery": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "url": {
+                "type": "string",
+                "format": "uri"
+              },
+              "alt": {
+                "type": "string",
+                "maxLength": 256
+              }
+            },
+            "required": [
+              "url"
+            ],
+            "additionalProperties": false
+          }
         },
         "access": {
           "oneOf": [
@@ -307,6 +331,124 @@
               "fileSize",
               "env",
               "source"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "worlds": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "folder": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 64,
+                "pattern": "^[^/\\\\]+$"
+              },
+              "source": {
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "kind": {
+                        "type": "string",
+                        "const": "modrinth"
+                      },
+                      "projectId": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "versionId": {
+                        "type": "string",
+                        "minLength": 1
+                      }
+                    },
+                    "required": [
+                      "kind",
+                      "projectId",
+                      "versionId"
+                    ],
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "kind": {
+                        "type": "string",
+                        "const": "curseforge"
+                      },
+                      "projectId": {
+                        "type": "integer",
+                        "exclusiveMinimum": 0,
+                        "maximum": 9007199254740991
+                      },
+                      "fileId": {
+                        "type": "integer",
+                        "exclusiveMinimum": 0,
+                        "maximum": 9007199254740991
+                      }
+                    },
+                    "required": [
+                      "kind",
+                      "projectId",
+                      "fileId"
+                    ],
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "kind": {
+                        "type": "string",
+                        "const": "url"
+                      },
+                      "url": {
+                        "type": "string",
+                        "format": "uri"
+                      }
+                    },
+                    "required": [
+                      "kind",
+                      "url"
+                    ],
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "kind": {
+                        "type": "string",
+                        "const": "override"
+                      },
+                      "blobSha512": {
+                        "type": "string",
+                        "pattern": "^[a-f0-9]{128}$"
+                      }
+                    },
+                    "required": [
+                      "kind",
+                      "blobSha512"
+                    ],
+                    "additionalProperties": false
+                  }
+                ]
+              },
+              "sizeBytes": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              "sha512": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{128}$"
+              }
+            },
+            "required": [
+              "folder",
+              "source",
+              "sizeBytes",
+              "sha512"
             ],
             "additionalProperties": false
           }

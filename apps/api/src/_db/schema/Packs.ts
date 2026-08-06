@@ -34,6 +34,8 @@ export const packs = mysqlTable(
     name: varchar('name', { length: 128 }).notNull(),
     summary: varchar('summary', { length: 512 }),
     iconUrl: varchar('icon_url', { length: 512 }),
+    description: text('description'),
+    gallery: json('gallery').$type<unknown[]>(),
     accessKind: varchar('access_kind', { length: 16 })
       .$type<PackAccessKind>()
       .notNull()
@@ -74,6 +76,8 @@ export const packVersions = mysqlTable(
     // Stored whole rather than normalised: nothing queries an individual file,
     // and delta computation reads the entire list anyway.
     files: json('files').$type<unknown[]>().notNull(),
+    // The BundledWorld[] payload, validated against @boffmedia/pack-schema on write.
+    worlds: json('worlds').$type<unknown[]>(),
     /** Draft versions are invisible to launchers — publishing is a deliberate act. */
     published: boolean('published').notNull().default(false),
     notes: text('notes'),
