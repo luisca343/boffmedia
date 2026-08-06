@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react"
 
 import { Badge, Button, Empty, Icon, Spinner, toast } from "@boffmedia/ui"
 
+import { useT } from "../../i18n"
 import {
   type Backup,
   type World,
@@ -25,6 +26,7 @@ function formatWhen(iso: string): string {
 }
 
 export function BackupsTab({ slug, packName }: { slug: string; packName: string }) {
+  const t = useT("backups")
   const [backups, setBackups] = useState<Backup[]>([])
   const [worlds, setWorlds] = useState<World[]>([])
   const [loading, setLoading] = useState(true)
@@ -45,10 +47,10 @@ export function BackupsTab({ slug, packName }: { slug: string; packName: string 
     setBusy(world ? `world:${world.folder}` : "instance")
     try {
       await backupCreate(slug, world ? world.name : packName, world?.folder)
-      toast.success(world ? `Copia de «${world.name}» creada.` : "Copia del pack creada.")
+      toast.success(world ? t("worldSuccess", { name: world.name }) : t("packSuccess"))
       await reload()
     } catch (err) {
-      toast.error((err as { message?: string })?.message ?? "No se pudo crear la copia.")
+      toast.error((err as { message?: string })?.message ?? t("error"))
     } finally {
       setBusy(null)
     }
@@ -57,21 +59,21 @@ export function BackupsTab({ slug, packName }: { slug: string; packName: string 
   const restore = async (backup: Backup) => {
     const warning =
       backup.kind === "world"
-        ? `Se reemplazará el mundo «${backup.label}» por completo. El estado actual se perderá.`
-        : `Se sobrescribirán los archivos del pack con los de esta copia.`
+        ? t("restoreWarningWorld", { name: backup.label })
+        : t("restoreWarningPack")
     // window.confirm rather than a Modal: this is the one action in the tab
     // that destroys player data, and it must not be possible to trigger it by
     // clicking through a dialog that looks like every other dialog.
-    if (!window.confirm(`${warning}\n\n¿Restaurar la copia del ${formatWhen(backup.createdAt)}?`)) {
+    if (!window.confirm(`${warning}\n\n${t("restoreConfirm", { date: formatWhen(backup.createdAt) })}`)) {
       return
     }
     setBusy(backup.id)
     try {
       await backupRestore(slug, backup.id)
-      toast.success("Copia restaurada.")
+      toast.success(t("restoreSuccess"))
       await reload()
     } catch (err) {
-      toast.error((err as { message?: string })?.message ?? "No se pudo restaurar.")
+      toast.error((err as { message?: string })?.message ?? t("restoreError"))
     } finally {
       setBusy(null)
     }
@@ -83,7 +85,7 @@ export function BackupsTab({ slug, packName }: { slug: string; packName: string 
       await backupDelete(slug, backup.id)
       await reload()
     } catch (err) {
-      toast.error((err as { message?: string })?.message ?? "No se pudo borrar la copia.")
+      toast.error((err as { message?: string })?.message ?? t("deleteError"))
     } finally {
       setBusy(null)
     }
@@ -92,7 +94,7 @@ export function BackupsTab({ slug, packName }: { slug: string; packName: string 
   if (loading) {
     return (
       <span className="flex items-center gap-2 py-6 font-mono text-[11px] text-txt-dim">
-        <Spinner size={12} /> Leyendo las copias…
+        <Spinner size={12} /> {t("reading")}
       </span>
     )
   }

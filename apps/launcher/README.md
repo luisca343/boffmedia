@@ -42,7 +42,7 @@ src/services/   types + mock data. Every mock carries a TODO(rust) naming the
                 Tauri command that replaces it
 src/runtime.ts  the ONLY module that imports @tauri-apps/*, so screens stay
                 browser-runnable
-src-tauri/      Rust: window, commands, and eventually §5 auth + §6 install
+src-tauri/      Rust: window, commands, §5 auth, §6 install + launch
 docs/           handoff + the Python reference implementations
 ```
 
@@ -88,10 +88,14 @@ The listing is a *summary* — `fileCount`, not `files`, and never the allowlist
 UUIDs. The file list exists only in a manifest, which is fetched per install, and
 sending the allowlist would let one member enumerate everyone with access.
 
-## Not built yet
+## Install pipeline (§6) — built
 
-The install pipeline (§6). The pack registry (§7) is built — in `apps/api`.
-`mc_auth.py` and `mc_install.py` in `docs/` are working references to port.
+The full install + launch pipeline is implemented in `src-tauri/src/install/` and
+validated in-game (NeoForge 1.21.1 + Pixelmon, ~400 mods). All five loaders —
+vanilla, Fabric, Quilt, Forge, NeoForge — install through `portablemc`, Java
+runtimes auto-install to `shared/jvm/`, and the SHA-512 content-addressed cache
+gives true delta updates. `mc_auth.py` and `mc_install.py` in `docs/` remain as
+the reference implementations the Rust was ported from.
 
 Dependencies are chosen (verified 2026-07-30): **`portablemc` 5.0** (Apache-2.0) covers
 all of it — its `msa` module is the Microsoft auth chain (§5), its `forge` module installs

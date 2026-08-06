@@ -2,12 +2,14 @@ import { useState } from "react"
 
 import { Badge, Banner, Button, Icon, Kicker, Panel, Spinner } from "@boffmedia/ui"
 
+import { useT } from "../i18n"
 import { authOpenVerification, copyText } from "../runtime"
 import { useLauncher } from "../state/launcher"
 
 /** A button that reports what happened, because a copy that silently does
  *  nothing is worse than no button at all. */
 function CopyButton({ value, label }: { value: string; label: string }) {
+  const t = useT("signin")
   const [state, setState] = useState<"idle" | "ok" | "fail">("idle")
 
   return (
@@ -22,7 +24,7 @@ function CopyButton({ value, label }: { value: string; label: string }) {
         })
       }}
     >
-      {state === "ok" ? "Copiado" : state === "fail" ? "No se pudo" : label}
+      {state === "ok" ? t("copied") : state === "fail" ? t("copyFailed") : label}
     </Button>
   )
 }
@@ -35,6 +37,7 @@ function CopyButton({ value, label }: { value: string; label: string }) {
 
 export function SignIn() {
   const { signIn, cancelSignIn, signingIn, deviceCode, restoreError, goOffline } = useLauncher()
+  const t = useT("signin")
   // Latched so the button cannot be hammered while the roster is being read;
   // released again if there turned out to be no account to fall back to.
   const [offlineTried, setOfflineTried] = useState(false)
@@ -45,11 +48,10 @@ export function SignIn() {
         <div className="mb-6 text-center">
           <Kicker>Boff Launcher</Kicker>
           <h1 className="font-display text-[34px]/none font-bold uppercase tracking-[0.06em] text-txt">
-            Inicia sesión
+            {t("title")}
           </h1>
           <p className="mt-3 text-sm text-txt-muted">
-            Necesitas una cuenta de Minecraft con Java Edition. El launcher nunca ve tu
-            contraseña — la sesión se abre en tu navegador.
+            {t("subtitle")}
           </p>
         </div>
 
@@ -63,14 +65,14 @@ export function SignIn() {
             tone={restoreError.needsSignin ? "warn" : "error"}
             title={
               restoreError.needsSignin
-                ? "Tu sesión caducó"
-                : "No pudimos recuperar tu sesión"
+                ? t("sessionExpired")
+                : t("restoreFailed")
             }
             className="mb-4"
           >
             {restoreError.needsSignin
-              ? "Vuelve a entrar con Microsoft para seguir jugando."
-              : `${restoreError.message} Comprueba tu conexión e inténtalo de nuevo.`}
+              ? t("sessionExpiredAction")
+              : `${restoreError.message} ${t("restoreFailedAction")}`}
             {/* Only for the transient case, and only when there is actually an
                 account to fall back to. Offered rather than forced: the player
                 may simply want to wait for the network and sign in properly. */}
@@ -88,7 +90,7 @@ export function SignIn() {
                     })
                   }}
                 >
-                  Jugar sin conexión
+                  {t("offlineMode")}
                 </Button>
               </div>
             )}
@@ -102,11 +104,10 @@ export function SignIn() {
                 <Icon name="key" size={26} />
               </span>
               <Button variant="pri" size="lg" icon="external" onClick={() => void signIn()}>
-                Entrar con Microsoft
+                {t("button")}
               </Button>
               <p className="max-w-[380px] text-center text-xs text-txt-dim">
-                Guardamos únicamente el token de actualización, en el almacén de credenciales
-                del sistema. Nunca en un archivo de texto.
+                {t("securityNote")}
               </p>
             </div>
           </Panel>
@@ -115,13 +116,13 @@ export function SignIn() {
         {signingIn && !deviceCode && (
           <Panel>
             <div className="flex items-center justify-center gap-3 py-8 text-sm text-txt-muted">
-              <Spinner /> Contactando con Microsoft…
+              <Spinner /> {t("consulting")}
             </div>
           </Panel>
         )}
 
         {signingIn && deviceCode && (
-          <Panel title="Completa el acceso" aside={<Badge tone="warn">Esperando</Badge>}>
+          <Panel title={t("complete")} aside={<Badge tone="warn">{t("waiting")}</Badge>}>
             <ol className="flex flex-col gap-4">
               <li className="flex gap-3">
                 <span className="cut-seal grid h-6 w-6 shrink-0 place-items-center bg-accent text-[12px] font-bold text-accent-ink [--cut:5px]">
@@ -129,14 +130,14 @@ export function SignIn() {
                 </span>
                 <div className="min-w-0 flex-1">
                   <p className="mb-2 text-sm text-txt">
-                    Copia este código — lo necesitarás en el navegador:
+                    {t("copyCodeLabel")}
                   </p>
                   {/* Selectable, so it works even if the clipboard is denied. */}
                   <div className="cut select-text border-2 border-solid border-accent-line bg-base-deep px-5 py-3 text-center font-display text-[30px]/none font-bold tracking-[0.24em] text-accent-bright">
                     {deviceCode.userCode}
                   </div>
                   <div className="mt-2 flex justify-center">
-                    <CopyButton value={deviceCode.userCode} label="Copiar código" />
+                    <CopyButton value={deviceCode.userCode} label={t("copyCodeButton")} />
                   </div>
                 </div>
               </li>
@@ -146,7 +147,7 @@ export function SignIn() {
                 </span>
                 <div className="min-w-0 flex-1">
                   <p className="text-sm text-txt">
-                    Abre Microsoft en tu navegador. El código va ya incluido en el enlace.
+                    {t("browserStep")}
                   </p>
                   <div className="mt-2 flex flex-wrap items-center gap-2">
                     <Button
@@ -159,9 +160,9 @@ export function SignIn() {
                         )
                       }}
                     >
-                      Abrir en el navegador
+                      {t("browserButton")}
                     </Button>
-                    <CopyButton value={deviceCode.verificationUri} label="Copiar enlace" />
+                    <CopyButton value={deviceCode.verificationUri} label={t("linkButton")} />
                   </div>
                   <p className="mt-2 select-text font-mono text-[11px] text-txt-dim">
                     {deviceCode.verificationUri}
@@ -171,10 +172,10 @@ export function SignIn() {
             </ol>
             <div className="mt-5 flex items-center justify-between gap-3 border-t border-line pt-4">
               <span className="flex items-center gap-2 text-xs text-txt-dim">
-                <Spinner size={12} /> Esperando confirmación…
+                <Spinner size={12} /> {t("confirmWaiting")}
               </span>
               <Button size="sm" variant="ghost" onClick={cancelSignIn}>
-                Cancelar
+                {t("cancelButton")}
               </Button>
             </div>
           </Panel>

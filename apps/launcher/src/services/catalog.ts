@@ -35,7 +35,7 @@ configureCatalog({
   projectSummaries: (_platform, ids) => catalogProjectSummaries(ids),
   resolve: (source) => catalogResolve(source),
   // The webview's CSP will not load arbitrary remote art; icons.rs caches the
-  // bytes and this hands back the asset: URL for the cached copy.
+  // bytes and this hands back a data: URL for the cached copy.
   iconSrc: (url) => iconSrc(url),
   // The other half of the diagnosis: `iconSrc` succeeding only proves the file
   // was written, not that the webview will render it. This fires when the <img>

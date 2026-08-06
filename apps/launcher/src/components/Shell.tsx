@@ -1,13 +1,8 @@
 import { Badge, Banner, Button, Icon, type IconName, Kicker } from "@boffmedia/ui"
 
+import { useT } from "../i18n"
 import { type View, useLauncher } from "../state/launcher"
 import { AccountSwitcher } from "./AccountSwitcher"
-
-const NAV: { view: View; label: string; icon: IconName }[] = [
-  { view: "packs", label: "Packs", icon: "cube" },
-  { view: "logs", label: "Registro", icon: "list" },
-  { view: "settings", label: "Ajustes", icon: "sliders" },
-]
 
 // Two different degradations, and conflating them would mislead:
 //
@@ -19,6 +14,7 @@ const NAV: { view: View; label: string; icon: IconName }[] = [
 // Neither is an error: in both cases what is on screen works. The banner exists
 // so a player does not think their packs have vanished.
 function OfflineNotice() {
+  const t = useT("shell")
   const { offline, packsPartial, reloadPacks, packsLoading } = useLauncher()
 
   if (!offline && !packsPartial) return null
@@ -27,25 +23,32 @@ function OfflineNotice() {
     <Banner
       tone="warn"
       icon="alert"
-      title={offline ? "Sin conexión" : "No se pudo cargar toda tu biblioteca"}
+      title={offline ? t("offlineTitle") : t("partialTitle")}
       className="m-4 mb-0"
       actions={
         <Button size="sm" variant="ghost" icon="refresh" disabled={packsLoading} onClick={reloadPacks}>
-          Reintentar
+          {t("retryButton")}
         </Button>
       }
     >
       {offline
-        ? "Puedes jugar a los packs que ya tengas instalados. Instalar, actualizar y descargar packs necesita conexión."
-        : "Se muestran tus packs locales. Los packs del servidor volverán a aparecer cuando se restablezca la conexión."}
+        ? t("offlineMessage")
+        : t("partialMessage")}
     </Banner>
   )
 }
 
 export function Shell({ children }: { children: React.ReactNode }) {
+  const t = useT("shell")
   const { view, go, game, logs } = useLauncher()
 
   const errorCount = logs.filter((l) => l.level === "error").length
+
+  const NAV: { view: View; label: string; icon: IconName }[] = [
+    { view: "packs", label: t("navPacks"), icon: "cube" },
+    { view: "logs", label: t("navLogs"), icon: "list" },
+    { view: "settings", label: t("navSettings"), icon: "sliders" },
+  ]
 
   return (
     <div className="flex h-full min-h-0">
@@ -91,7 +94,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
           <div className="mx-3 mb-3 border-2 border-solid border-ok/40 bg-ok-soft px-3 py-2">
             <div className="flex items-center gap-2 text-[12px]/none font-semibold uppercase tracking-[0.1em] text-ok">
               <Icon name="play" size={12} />
-              En ejecución
+              {t("running")}
             </div>
             <div className="mt-1 font-mono text-[11px] text-txt-dim">pid {game.pid}</div>
           </div>

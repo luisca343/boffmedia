@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react"
 
 import { Icon, IconButton, Spinner } from "@boffmedia/ui"
 
+import { useT } from "../i18n"
 import { PlayerHead } from "./PlayerHead"
 import { useLauncher } from "../state/launcher"
 
@@ -13,6 +14,7 @@ import { useLauncher } from "../state/launcher"
 // forty lines below.
 
 export function AccountSwitcher() {
+  const t = useT("accountSwitcher")
   const { account, accounts, switchAccount, removeAccount, switchingAccount, signIn, signOut } =
     useLauncher()
   const [open, setOpen] = useState(false)
@@ -63,8 +65,8 @@ export function AccountSwitcher() {
                 </button>
                 <button
                   type="button"
-                  aria-label={`Quitar ${entry.username}`}
-                  title="Quitar cuenta"
+                  aria-label={t("removeLabel", { username: entry.username })}
+                  title={t("removeTitle")}
                   disabled={switchingAccount}
                   onClick={() => void removeAccount(entry.uuid)}
                   className="p-1 text-txt-dim hover:text-bad disabled:opacity-50"
@@ -86,7 +88,7 @@ export function AccountSwitcher() {
                 }}
                 className="flex w-full items-center gap-2 px-3 py-2 text-left text-[12px] text-txt-dim hover:bg-panel-2 hover:text-txt disabled:opacity-50"
               >
-                <Icon name="plus" size={13} /> Añadir cuenta
+                <Icon name="plus" size={13} /> {t("addAccount")}
               </button>
             </li>
             <li className="border-t border-solid border-line">
@@ -98,7 +100,7 @@ export function AccountSwitcher() {
                 }}
                 className="flex w-full items-center gap-2 px-3 py-2 text-left text-[12px] text-txt-dim hover:bg-panel-2 hover:text-bad"
               >
-                <Icon name="logout" size={13} /> Cerrar todas las sesiones
+                <Icon name="logout" size={13} /> {t("signOutAll")}
               </button>
             </li>
           </ul>
@@ -127,7 +129,7 @@ export function AccountSwitcher() {
             {account.username}
           </span>
           <span className="block truncate font-mono text-[10px] text-txt-dim">
-            {switchingAccount ? "Cambiando…" : `${account.uuid.slice(0, 13)}…`}
+            {switchingAccount ? t("switching") : `${account.uuid.slice(0, 13)}…`}
           </span>
         </button>
         {/* One glyph, flipped: the icon set has no chevron-up, and rotating
@@ -135,7 +137,7 @@ export function AccountSwitcher() {
         <span className={open ? "rotate-180" : undefined}>
           <IconButton
             name="chevronDown"
-            label="Cambiar de cuenta"
+            label={t("switchLabel")}
             size={16}
             onClick={() => setOpen((v) => !v)}
           />

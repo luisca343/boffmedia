@@ -24,10 +24,10 @@ schemars = "0.8"
 serde_json = "1"
 
 [dependencies]
-# protocol-asset: icons.rs caches catalog art on disk and the renderer loads it
-# over asset:. The feature and tauri.conf.json's assetProtocol block must be
-# enabled together — the build script rejects one without the other.
-tauri = { version = "2", features = ["protocol-asset"] }
+tauri = { version = "2", features = [] }
+# icons.rs hands catalog art to the renderer as data: URLs — the asset protocol
+# (and its scope, which never matched the custom data root) is gone on purpose.
+base64 = "0.22"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 thiserror = "2"

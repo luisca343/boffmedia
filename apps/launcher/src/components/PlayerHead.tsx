@@ -13,7 +13,7 @@ import { iconSrc } from "../runtime"
 //
 // Instead the skin sheet comes from the profile call we already make during
 // sign-in, goes through `icon_cache` — the same on-disk cache the mod icons
-// use, which is why the `asset:` scheme is already allowed by the CSP — and is
+// use, arriving as a `data:` URL the CSP already allows — and is
 // cropped here in pure CSS. No image library, no extra request, and a cached
 // face survives having no connection at all.
 //

@@ -3,6 +3,8 @@
 // is what this machine knows about it, and conflating the two is how launchers
 // end up unable to tell "not installed" from "server unreachable".
 
+import type { AppLocale } from "@boffmedia/ui"
+
 export type PackAccessKind = "public" | "password" | "allowlist"
 
 /** What the LISTING (§7.2) knows about a pack. Note what is absent: the
@@ -119,6 +121,7 @@ export type CrashKind =
   | "duplicate-mod"
 
 export type CrashDiagnosis = {
+  id: string
   kind: CrashKind
   title: string
   explanation: string
@@ -157,6 +160,10 @@ export type Settings = {
    *  the pack's mod count and this machine's RAM. A separate flag rather than a
    *  sentinel in `memoryMib`, so turning it off restores the chosen number. */
   memoryAuto: boolean
+  /** UI language. Persisted so the choice survives a relaunch; applied on boot
+   *  through the i18n store. Absent in a settings.json from before i18n, which
+   *  the Rust `#[serde(default)]` fills with "es". */
+  locale: AppLocale
 }
 
 /** HANDOFF §9 — why a resolved value is what it is. Mirrors Rust's

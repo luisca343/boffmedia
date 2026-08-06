@@ -39,10 +39,20 @@ pub struct Settings {
     /// had chosen instead of resetting the slider.
     #[serde(default)]
     pub memory_auto: bool,
+    /// UI language ("es" | "en"). Rust never reads it — the renderer's i18n store
+    /// owns the choice — but it round-trips through here so it persists in the
+    /// same settings.json as everything else. `#[serde(default)]` fills a file
+    /// written before i18n with "es".
+    #[serde(default = "default_locale")]
+    pub locale: String,
 }
 
 fn default_retain() -> u32 {
     crate::install::instance::DEFAULT_RETAIN as u32
+}
+
+fn default_locale() -> String {
+    "es".to_string()
 }
 
 impl Default for Settings {
@@ -62,6 +72,7 @@ impl Default for Settings {
             // a player already tuned. The per-pack panel is where §9's heuristic
             // is offered, and Ajustes can opt the global default into it.
             memory_auto: false,
+            locale: default_locale(),
         }
     }
 }

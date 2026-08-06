@@ -151,6 +151,35 @@ async fn hash_of_url(http: &reqwest::Client, url: &str) -> Result<(String, i64),
     ))
 }
 
+/// Modrinth's CDN encodes the file's identity in its download URL:
+/// `https://cdn.modrinth.com/data/{projectId}/versions/{versionId}/{name}`.
+fn modrinth_ids_of(url: &str) -> Option<(&str, &str)> {
+    let rest = url.strip_prefix("https://cdn.modrinth.com/data/")?;
+    let mut parts = rest.split('/');
+    let project = parts.next()?;
+    let literal_versions = parts.next()?;
+    let version = parts.next()?;
+    // A fourth segment (the filename) must exist, or this is some other CDN
+    // path that merely resembles the shape.
+    let file = parts.next()?;
+    (literal_versions == "versions" && !project.is_empty() && !version.is_empty() && !file.is_empty())
+        .then_some((project, version))
+}
+
+/// The manifest source for one indexed download. A Modrinth CDN URL becomes a
+/// `modrinth` source rather than a bare `url`: keeping it as a URL threw the
+/// project identity away, which left every mod in an imported pack with no
+/// name, no author and no icon in the Content tab — and made its updates
+/// undiscoverable. Anything else stays a plain URL source.
+fn source_of(url: &str) -> serde_json::Value {
+    match modrinth_ids_of(url) {
+        Some((project, version)) => serde_json::json!({
+            "kind": "modrinth", "projectId": project, "versionId": version,
+        }),
+        None => serde_json::json!({ "kind": "url", "url": url }),
+    }
+}
+
 const MODRINTH: &str = "https://api.modrinth.com/v2";
 
 #[derive(Debug, Deserialize)]
@@ -289,6 +318,37 @@ pub async fn resolve_pack_download(
         })
 }
 
+#[derive(Debug, Deserialize)]
+struct MrProject {
+    #[serde(default)]
+    icon_url: Option<String>,
+}
+
+/// Best-effort fetch of a Modrinth project's icon, to stamp onto an imported
+/// pack's header — the `.mrpack` index itself carries no icon, so this is the
+/// only source. Cosmetic, so EVERY failure resolves to `None` rather than
+/// failing the import: a direct `.mrpack` link with no project behind it, a
+/// network error, or a project that simply has no icon all land here.
+///
+/// The reference is parsed the same way `resolve_pack_download` parses it, so a
+/// project URL, a version URL and a bare slug all reach the project endpoint;
+/// a cdn `.mrpack` link resolves through its embedded project id for free.
+pub async fn project_icon_url(http: &reqwest::Client, input: &str) -> Option<String> {
+    let (project, _version) = parse_modrinth_ref(input)?;
+    let res = http
+        .get(format!("{MODRINTH}/project/{project}"))
+        .send()
+        .await
+        .ok()?;
+    if !res.status().is_success() {
+        return None;
+    }
+    let project: MrProject = res.json().await.ok()?;
+    project
+        .icon_url
+        .filter(|u| u.starts_with("http://") || u.starts_with("https://"))
+}
+
 /// Convert a parsed index plus its zip into a `PackManifest`.
 ///
 /// `slug` must already carry the `local-` prefix and be free — the caller owns
@@ -300,6 +360,10 @@ pub async fn manifest_from_index<R: std::io::Read + std::io::Seek>(
     http: &reqwest::Client,
     slug: &str,
     name: &str,
+    // The pack header icon, fetched by the caller from the Modrinth project
+    // (see `project_icon_url`). `None` for a file-picker import, which has no
+    // project behind it.
+    icon_url: Option<&str>,
 ) -> Result<PackManifest, InstallFailure> {
     if !index.game.is_empty() && index.game != "minecraft" {
         return Err(InstallFailure::message(format!(
@@ -354,7 +418,7 @@ pub async fn manifest_from_index<R: std::io::Read + std::io::Seek>(
                 "client": client,
                 "server": env_value(file.env.as_ref().and_then(|e| e.server.as_ref())),
             },
-            "source": { "kind": "url", "url": url },
+            "source": source_of(url),
         }));
     }
 
@@ -417,6 +481,11 @@ pub async fn manifest_from_index<R: std::io::Read + std::io::Seek>(
     });
     if let Some(summary) = index.summary.as_ref().filter(|s| !s.trim().is_empty()) {
         pack["summary"] = serde_json::Value::String(summary.trim().to_string());
+    }
+    // A valid http(s) URL only: `iconUrl` is `z.url()` in the schema, so a
+    // malformed value would fail the whole manifest for a cosmetic field.
+    if let Some(icon) = icon_url.filter(|u| u.starts_with("http://") || u.starts_with("https://")) {
+        pack["iconUrl"] = serde_json::Value::String(icon.to_string());
     }
 
     let value = serde_json::json!({
@@ -492,6 +561,7 @@ mod tests {
             &reqwest::Client::new(),
             "local-cool-pack",
             "Cool Pack",
+            Some("https://cdn.modrinth.com/data/AANobbMI/icon.png"),
         )
         .await
         .unwrap();
@@ -500,6 +570,12 @@ mod tests {
         assert_eq!(manifest.version.dependencies.minecraft.to_string(), "1.21.4");
         assert!(manifest.version.dependencies.fabric_loader.is_some());
         assert_eq!(manifest.version.files.len(), 2);
+        // The header icon the caller fetched from the project is stamped in, so
+        // an imported pack shows real art instead of the placeholder cube.
+        assert_eq!(
+            manifest.pack.icon_url.as_ref().map(|u| u.to_string()),
+            Some("https://cdn.modrinth.com/data/AANobbMI/icon.png".to_string())
+        );
 
         // The mod keeps its public URL; the override is backed by a local blob
         // that must actually exist on disk, or the install would 404 against an
@@ -513,6 +589,55 @@ mod tests {
         let blob = crate::install::files::local_blob_path(&layout, &over.sha512.to_string());
         assert!(blob.is_file(), "the override's bytes must be stored locally");
 
+        let _ = std::fs::remove_dir_all(layout.root());
+    }
+
+    #[test]
+    fn a_modrinth_cdn_download_keeps_its_identity() {
+        // The whole reason imported packs had nameless, iconless content rows:
+        // the project/version ids were in the URL and got thrown away.
+        assert_eq!(
+            modrinth_ids_of("https://cdn.modrinth.com/data/AANobbMI/versions/xyzXYZ12/sodium.jar"),
+            Some(("AANobbMI", "xyzXYZ12"))
+        );
+        let source = source_of("https://cdn.modrinth.com/data/AANobbMI/versions/xyzXYZ12/sodium.jar");
+        assert_eq!(source["kind"], "modrinth");
+        assert_eq!(source["projectId"], "AANobbMI");
+        assert_eq!(source["versionId"], "xyzXYZ12");
+    }
+
+    #[test]
+    fn a_non_modrinth_download_stays_a_plain_url() {
+        for url in [
+            "https://cdn.modrinth.com/sodium.jar",
+            "https://cdn.modrinth.com/data/AANobbMI/other/xyz/sodium.jar",
+            "https://cdn.modrinth.com/data/AANobbMI/versions/xyz",
+            "https://example.com/data/AANobbMI/versions/xyz/sodium.jar",
+        ] {
+            assert_eq!(modrinth_ids_of(url), None, "{url}");
+            assert_eq!(source_of(url)["kind"], "url", "{url}");
+        }
+    }
+
+    #[tokio::test]
+    async fn a_bogus_icon_is_filtered_rather_than_failing_the_import() {
+        // iconUrl is `z.url()`; a non-URL value must be dropped, not stamped,
+        // or one odd project icon would sink the whole import.
+        let index = index_json("", r#"{"minecraft":"1.21.4"}"#);
+        let mut zip = zip_with(&[]);
+        let layout = test_layout();
+        let manifest = manifest_from_index(
+            &index,
+            &mut zip,
+            &layout,
+            &reqwest::Client::new(),
+            "local-p",
+            "P",
+            Some("not-a-url"),
+        )
+        .await
+        .unwrap();
+        assert!(manifest.pack.icon_url.is_none());
         let _ = std::fs::remove_dir_all(layout.root());
     }
 
@@ -532,7 +657,7 @@ mod tests {
         let mut zip = zip_with(&[]);
         let layout = test_layout();
         let manifest =
-            manifest_from_index(&index, &mut zip, &layout, &reqwest::Client::new(), "local-p", "P")
+            manifest_from_index(&index, &mut zip, &layout, &reqwest::Client::new(), "local-p", "P", None)
                 .await
                 .unwrap();
         assert_eq!(manifest.version.files.len(), 1);
@@ -553,7 +678,7 @@ mod tests {
         let mut zip = zip_with(&[]);
         let layout = test_layout();
         assert!(
-            manifest_from_index(&index, &mut zip, &layout, &reqwest::Client::new(), "local-p", "P")
+            manifest_from_index(&index, &mut zip, &layout, &reqwest::Client::new(), "local-p", "P", None)
                 .await
                 .is_err()
         );
@@ -569,7 +694,7 @@ mod tests {
         ]);
         let layout = test_layout();
         let manifest =
-            manifest_from_index(&index, &mut zip, &layout, &reqwest::Client::new(), "local-p", "P")
+            manifest_from_index(&index, &mut zip, &layout, &reqwest::Client::new(), "local-p", "P", None)
                 .await
                 .unwrap();
 

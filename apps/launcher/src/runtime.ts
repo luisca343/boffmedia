@@ -1,4 +1,4 @@
-import { convertFileSrc, invoke } from "@tauri-apps/api/core"
+import { invoke } from "@tauri-apps/api/core"
 import { listen } from "@tauri-apps/api/event"
 import { getCurrentWindow } from "@tauri-apps/api/window"
 
@@ -1110,26 +1110,32 @@ export function setIconFailureSink(sink: ((message: string) => void) | null): vo
  *  file and the webview agreeing to render it are different things, and a bug
  *  in either one shows up as the same blank square. */
 export function reportIconFailure(attemptedSrc: string, remoteUrl: string): void {
+  // A data: URL carries the whole image; log its head, never the payload.
+  const shown = attemptedSrc.length > 120 ? `${attemptedSrc.slice(0, 120)}…` : attemptedSrc
   iconFailureSink?.(
-    `El webview rechazó el icono. URL generada: ${attemptedSrc || "(vacía)"} — origen: ${remoteUrl || "(desconocido)"}`,
+    `El webview rechazó el icono. URL generada: ${shown || "(vacía)"} — origen: ${remoteUrl || "(desconocido)"}`,
   )
 }
 
-/** Logged once per session so the exact generated URL is on the record. Every
- *  remaining explanation for "the file is on disk but nothing renders" is a
- *  property of this string — the protocol, the host, the encoding — and it has
- *  never been visible anywhere. */
-let loggedFirstAssetUrl = false
+/** Logged once per session so the shape of the generated URL is on the record.
+ *  Every remaining explanation for "the bytes exist but nothing renders" is a
+ *  property of this string — the scheme, the MIME — and it has never been
+ *  visible anywhere. */
+let loggedFirstIconUrl = false
 
+/** Resolves catalog art to a `data:` URL via the on-disk cache (icons.rs).
+ *  Nothing here touches the asset protocol: data: URLs need no scope, which is
+ *  the property the previous two icon systems lacked. */
 export async function iconSrc(url: string): Promise<string | null> {
   if (!isDesktop()) return url
   try {
-    const asset = convertFileSrc(await invoke<string>("icon_cache", { url }))
-    if (!loggedFirstAssetUrl) {
-      loggedFirstAssetUrl = true
-      iconFailureSink?.(`Diagnóstico: primer icono cacheado servido como ${asset}`)
+    const data = await invoke<string>("icon_cache", { url })
+    if (!loggedFirstIconUrl) {
+      loggedFirstIconUrl = true
+      const head = data.slice(0, data.indexOf(",") + 1)
+      iconFailureSink?.(`Diagnóstico: primer icono servido como ${head}… (${data.length} caracteres)`)
     }
-    return asset
+    return data
   } catch (err) {
     // Non-fatal — the caller falls back to the remote URL — but no longer
     // invisible. Three different faults (the command missing, the download
@@ -1149,6 +1155,18 @@ export async function exportMrpack(slug: string): Promise<string> {
   if (!isDesktop()) throw asFailure({ message: "La exportación solo funciona en la aplicación de escritorio." })
   try {
     return await invoke<string>("export_mrpack", { slug })
+  } catch (err) {
+    throw asFailure(err)
+  }
+}
+
+/** Like {@link exportMrpack}, but drops every file whose `env.server` is
+ *  "unsupported" — a server-ready pack minus the client-only mods. Same native
+ *  save dialog; resolves to the chosen path, or throws if cancelled. */
+export async function exportServerMrpack(slug: string): Promise<string> {
+  if (!isDesktop()) throw asFailure({ message: "La exportación solo funciona en la aplicación de escritorio." })
+  try {
+    return await invoke<string>("export_server_mrpack", { slug })
   } catch (err) {
     throw asFailure(err)
   }

@@ -8,9 +8,9 @@ import { getCatalog } from "./client"
 
 // Catalog art is the one thing in the browser that a host cannot always render
 // from the URL alone: a Tauri webview's CSP refuses arbitrary remote hosts, so
-// the launcher resolves each icon through `iconSrc()` to a locally cached
-// `asset:` URL. A browser host leaves `iconSrc` undefined and this degrades to
-// a plain <img src>.
+// the launcher resolves each icon through `iconSrc()` to a locally cached copy
+// (a `data:` URL). A browser host leaves `iconSrc` undefined and this degrades
+// to a plain <img src>.
 //
 // Never next/image: this package is shared with a non-Next host, and no image
 // loader is configured for the CurseForge/Modrinth CDNs anyway.

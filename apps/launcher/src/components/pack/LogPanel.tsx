@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react"
 
 import { Badge, Button, Empty, Panel, Seg, Toggle } from "@boffmedia/ui"
 
+import { useT } from "../../i18n"
 import type { LogLine } from "../../services/types"
 import { formatClock } from "../../utils/format"
 
@@ -27,6 +28,7 @@ export function LogPanel({
   onClear?: () => void
   className?: string
 }) {
+  const t = useT("logPanel")
   const [filter, setFilter] = useState("all")
   const [follow, setFollow] = useState(true)
   const endRef = useRef<HTMLDivElement>(null)
@@ -55,20 +57,20 @@ export function LogPanel({
           value={filter}
           onChange={setFilter}
           options={[
-            { value: "all", label: "Todo" },
-            { value: "launcher", label: "Launcher" },
-            { value: "game", label: "Juego" },
-            { value: "problems", label: "Problemas" },
+            { value: "all", label: t("allLogs") },
+            { value: "launcher", label: t("launcher") },
+            { value: "game", label: t("game") },
+            { value: "problems", label: t("problems") },
           ]}
         />
-        <Toggle on={follow} onChange={setFollow} label="Seguir" />
+        <Toggle on={follow} onChange={setFollow} label={t("follow")} />
         <span className="flex-1" />
         <Button size="sm" icon="copy" onClick={copyAll} disabled={shown.length === 0}>
-          Copiar
+          {t("copyButton")}
         </Button>
         {onClear && (
           <Button size="sm" variant="ghost" icon="trash" onClick={onClear}>
-            Limpiar
+            {t("clearButton")}
           </Button>
         )}
       </div>
@@ -77,8 +79,8 @@ export function LogPanel({
         {shown.length === 0 ? (
           <Empty
             icon="list"
-            title="Sin registro"
-            lead="Aquí aparecerá la salida del launcher y del juego."
+            title={t("noLogs")}
+            lead={t("noLogsDetail")}
           />
         ) : (
           <div className="max-h-[520px] min-h-0 flex-1 overflow-auto bg-base-deep p-3">
@@ -107,7 +109,7 @@ export function LogPanel({
 
       <p className="mt-3 flex items-center gap-2 text-xs text-txt-dim">
         <Badge tone="info">{shown.length}</Badge>
-        líneas mostradas · se conservan las últimas 2000
+        {t("linesSummary", { shown: shown.length })}
       </p>
     </div>
   )

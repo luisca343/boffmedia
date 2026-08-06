@@ -2,6 +2,7 @@ import { useEffect, useState } from "react"
 
 import { Badge, Button, Empty, Icon, Spinner, toast } from "@boffmedia/ui"
 
+import { useT } from "../../i18n"
 import { type World, instanceDeletePath, instanceReveal, instanceWorlds } from "../../runtime"
 import { formatBytes, formatWhen } from "../../utils/format"
 
@@ -11,16 +12,17 @@ import { formatBytes, formatWhen } from "../../utils/format"
 // is no undo, so it takes a second click on a row that has armed itself rather
 // than a single trash icon next to four harmless ones.
 
-const MODE_LABEL: Record<World["gameMode"], string> = {
-  survival: "Supervivencia",
-  creative: "Creativo",
-  adventure: "Aventura",
-  spectator: "Espectador",
-  unknown: "Desconocido",
-}
-
 export function WorldsTab({ slug }: { slug: string }) {
+  const t = useT("worlds")
   const [worlds, setWorlds] = useState<World[]>([])
+
+  const MODE_LABEL: Record<World["gameMode"], string> = {
+    survival: t("gameMode.survival"),
+    creative: t("gameMode.creative"),
+    adventure: t("gameMode.adventure"),
+    spectator: t("gameMode.spectator"),
+    unknown: t("gameMode.unknown"),
+  }
   const [loading, setLoading] = useState(true)
   const [confirming, setConfirming] = useState<string | null>(null)
   const [nonce, setNonce] = useState(0)
@@ -50,17 +52,17 @@ export function WorldsTab({ slug }: { slug: string }) {
     setConfirming(null)
     try {
       await instanceDeletePath(slug, `saves/${world.folder}`)
-      toast.success(`«${world.name}» eliminado.`)
+      toast.success(t("deleteSuccess", { name: world.name }))
       setNonce((n) => n + 1)
     } catch (err) {
-      toast.error((err as { message?: string })?.message ?? "No se pudo eliminar el mundo.")
+      toast.error((err as { message?: string })?.message ?? t("deleteError"))
     }
   }
 
   if (loading) {
     return (
       <span className="flex items-center gap-2 py-6 font-mono text-[11px] text-txt-dim">
-        <Spinner size={12} /> Leyendo los mundos…
+        <Spinner size={12} /> {t("reading")}
       </span>
     )
   }
@@ -69,8 +71,8 @@ export function WorldsTab({ slug }: { slug: string }) {
     return (
       <Empty
         icon="globe"
-        title="Sin mundos"
-        lead="Cuando juegues una partida individual, aparecerá aquí."
+        title={t("noWorlds")}
+        lead={t("noWorldsDetail")}
       />
     )
   }
@@ -79,11 +81,11 @@ export function WorldsTab({ slug }: { slug: string }) {
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between gap-2">
         <span className="font-mono text-[11px] text-txt-dim">
-          {worlds.length} mundo(s) ·{" "}
+          {t("worldCount", { count: worlds.length })} ·{" "}
           {formatBytes(worlds.reduce((sum, w) => sum + w.sizeBytes, 0))}
         </span>
         <Button size="sm" icon="external" onClick={() => void instanceReveal(slug, "saves")}>
-          Abrir carpeta
+          {t("openFolder")}
         </Button>
       </div>
 
@@ -107,7 +109,7 @@ export function WorldsTab({ slug }: { slug: string }) {
 
             <div className="flex flex-wrap items-center gap-1">
               <Badge tone="info">{MODE_LABEL[world.gameMode]}</Badge>
-              {world.hardcore && <Badge tone="bad">Hardcore</Badge>}
+              {world.hardcore && <Badge tone="bad">{t("hardcore")}</Badge>}
               {world.version && <Badge tone="ok">{world.version}</Badge>}
             </div>
 
@@ -115,17 +117,17 @@ export function WorldsTab({ slug }: { slug: string }) {
               {formatBytes(world.sizeBytes)} ·{" "}
               {world.lastPlayed
                 ? formatWhen(new Date(world.lastPlayed).toISOString())
-                : "nunca jugado"}
+                : t("neverPlayed")}
             </p>
 
             <div className="mt-auto flex justify-end pt-1">
               {confirming === world.folder ? (
                 <Button size="sm" variant="danger" icon="trash" onClick={() => void remove(world)}>
-                  Confirmar borrado
+                  {t("confirmDelete")}
                 </Button>
               ) : (
                 <Button size="sm" icon="trash" onClick={() => setConfirming(world.folder)}>
-                  Eliminar
+                  {t("deleteButton")}
                 </Button>
               )}
             </div>

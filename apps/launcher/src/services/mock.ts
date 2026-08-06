@@ -113,6 +113,7 @@ export const MOCK_SETTINGS: Settings = {
   keepLogs: true,
   retainVersions: 3,
   memoryAuto: false,
+  locale: "es",
 }
 
 /** Browser-mode library. The desktop equivalent is `loadPackEntries`, which
@@ -254,6 +255,7 @@ export const MOCK_CRASH_LOG: [LogLine["level"], LogLine["source"], string][] = [
 ]
 
 export const MOCK_DIAGNOSIS: CrashDiagnosis = {
+  id: "fabric-api-missing",
   kind: "missing-dependency",
   title: "Falta Fabric API",
   explanation: "Uno de los mods necesita Fabric API y no está instalado en esta instancia.",

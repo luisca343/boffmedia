@@ -2,6 +2,7 @@ import { useEffect, useState } from "react"
 
 import { Checkbox, Select } from "@boffmedia/ui"
 
+import { useT } from "../i18n"
 import { loaderVersions, minecraftVersions } from "../runtime"
 import type { GameVersion, LoaderVersion } from "../runtime"
 
@@ -32,11 +33,6 @@ function preferred(list: LoaderVersion[]): string {
   return (list.find((v) => v.recommended) ?? list.find((v) => v.latest) ?? list[0])?.version ?? ""
 }
 
-function loaderLabel(v: LoaderVersion): string {
-  const tags = [v.recommended ? "recomendada" : null, v.latest ? "última" : null].filter(Boolean)
-  return tags.length ? `${v.version} (${tags.join(", ")})` : v.version
-}
-
 export function VersionPicker({
   value,
   onChange,
@@ -48,12 +44,18 @@ export function VersionPicker({
    *  in flight — saving mid-load would write an empty loader version. */
   onLoadingChange?: (loading: boolean) => void
 }) {
+  const t = useT("versionPicker")
   const [games, setGames] = useState<GameVersion[]>([])
   const [snapshots, setSnapshots] = useState(false)
   const [builds, setBuilds] = useState<LoaderVersion[]>([])
   const [loadingGames, setLoadingGames] = useState(true)
   const [loadingBuilds, setLoadingBuilds] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  const loaderLabel = (v: LoaderVersion): string => {
+    const tags = [v.recommended ? t("recommendedTag") : null, v.latest ? t("latestTag") : null].filter(Boolean)
+    return tags.length ? `${v.version} (${tags.join(", ")})` : v.version
+  }
 
   useEffect(() => {
     let cancelled = false
@@ -70,7 +72,7 @@ export function VersionPicker({
         }
       })
       .catch((err: { message?: string }) => {
-        if (!cancelled) setError(err?.message ?? "No se han podido cargar las versiones.")
+        if (!cancelled) setError(err?.message ?? t("minecraftVersionsError"))
       })
       .finally(() => {
         if (!cancelled) setLoadingGames(false)
@@ -98,7 +100,7 @@ export function VersionPicker({
         onChange({ ...value, loaderVersion: keep ? value.loaderVersion : preferred(list) })
       })
       .catch((err: { message?: string }) => {
-        if (!cancelled) setError(err?.message ?? "No se han podido cargar las versiones del loader.")
+        if (!cancelled) setError(err?.message ?? t("loaderVersionsError"))
       })
       .finally(() => {
         if (!cancelled) setLoadingBuilds(false)
@@ -117,7 +119,7 @@ export function VersionPicker({
   const shown = games.filter((v) => (snapshots ? true : v.type === "release"))
   const options = shown.map((v) => ({
     value: v.id,
-    label: v.latest ? `${v.id} (última)` : v.id,
+    label: v.latest ? `${v.id} (${t("latestTag")})` : v.id,
   }))
   // A version already saved on the pack must stay selectable even when it is a
   // snapshot and the toggle is off, or opening "editar" would silently move
@@ -131,7 +133,7 @@ export function VersionPicker({
   return (
     <>
       <Select
-        label="Minecraft"
+        label={t("minecraftLabel")}
         value={value.minecraft}
         onChange={(minecraft) => onChange({ ...value, minecraft })}
         options={options}
@@ -140,26 +142,26 @@ export function VersionPicker({
       <Checkbox
         checked={snapshots}
         onChange={setSnapshots}
-        label="Mostrar snapshots y versiones antiguas"
+        label={t("snapshotsLabel")}
       />
       <Select
-        label="Loader"
+        label={t("loaderLabel")}
         value={value.loader}
         onChange={(loader) => onChange({ ...value, loader, loaderVersion: "" })}
         options={LOADERS}
       />
       {value.loader && (
         <Select
-          label="Versión del loader"
+          label={t("loaderVersionLabel")}
           value={value.loaderVersion}
           onChange={(loaderVersion) => onChange({ ...value, loaderVersion })}
           options={builds.map((v) => ({ value: v.version, label: loaderLabel(v) }))}
           disabled={loadingBuilds || builds.length === 0}
           hint={
             loadingBuilds
-              ? "Cargando versiones…"
+              ? t("loadingVersions")
               : noBuilds
-                ? "Este loader no publica versiones para esa versión de Minecraft."
+                ? t("noVersionsHint")
                 : undefined
           }
         />

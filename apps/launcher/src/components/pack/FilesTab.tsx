@@ -2,6 +2,7 @@ import { useEffect, useState } from "react"
 
 import { Button, Empty, Icon, Spinner, toast } from "@boffmedia/ui"
 
+import { useT } from "../../i18n"
 import { type DirEntry, instanceBrowse, instanceDeletePath, instanceReveal } from "../../runtime"
 import { formatBytes, formatWhen } from "../../utils/format"
 
@@ -13,6 +14,7 @@ import { formatBytes, formatWhen } from "../../utils/format"
 // turning this into a delete-anything tool.
 
 export function FilesTab({ slug }: { slug: string }) {
+  const t = useT("files")
   const [rel, setRel] = useState("")
   const [entries, setEntries] = useState<DirEntry[]>([])
   const [loading, setLoading] = useState(true)
@@ -38,10 +40,10 @@ export function FilesTab({ slug }: { slug: string }) {
   const remove = async (entry: DirEntry) => {
     try {
       await instanceDeletePath(slug, entry.path)
-      toast.success(`«${entry.name}» eliminado.`)
+      toast.success(t("deleteSuccess", { name: entry.name }))
       setNonce((n) => n + 1)
     } catch (err) {
-      toast.error((err as { message?: string })?.message ?? "No se pudo eliminar.")
+      toast.error((err as { message?: string })?.message ?? t("deleteError"))
     }
   }
 
@@ -80,23 +82,23 @@ export function FilesTab({ slug }: { slug: string }) {
           icon="external"
           onClick={() => {
             void instanceReveal(slug, rel).catch((err) =>
-              toast.error((err as { message?: string })?.message ?? "No se pudo abrir."),
+              toast.error((err as { message?: string })?.message ?? t("openError")),
             )
           }}
         >
-          Abrir carpeta
+          {t("openFolder")}
         </Button>
       </div>
 
       {loading ? (
         <span className="flex items-center gap-2 py-6 font-mono text-[11px] text-txt-dim">
-          <Spinner size={12} /> Leyendo…
+          <Spinner size={12} /> {t("reading")}
         </span>
       ) : entries.length === 0 ? (
         <Empty
           icon="folder"
-          title="Carpeta vacía"
-          lead={rel === "" ? "El pack todavía no se ha instalado." : "Aquí no hay nada."}
+          title={t("emptyFolder")}
+          lead={rel === "" ? t("emptyNotInstalled") : t("emptyDefault")}
         />
       ) : (
         <ul className="flex flex-col">
@@ -131,8 +133,8 @@ export function FilesTab({ slug }: { slug: string }) {
               </span>
               <button
                 type="button"
-                aria-label={`Eliminar ${entry.name}`}
-                title="Eliminar"
+                aria-label={t("deleteAriaLabel", { name: entry.name })}
+                title={t("deleteTitle")}
                 onClick={() => void remove(entry)}
                 className="shrink-0 p-1 text-txt-dim hover:text-bad"
               >

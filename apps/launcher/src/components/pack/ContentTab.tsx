@@ -14,6 +14,7 @@ import {
   toast,
 } from "@boffmedia/ui"
 
+import { useT } from "../../i18n"
 import { instanceOptionalSet } from "../../runtime"
 import { removeFile, replaceFile } from "../../services/localPackEdit"
 import { formatBytes } from "../../utils/format"
@@ -35,20 +36,6 @@ import {
 // is worse than not offering it. The optional-file toggles are the one
 // exception, because the manifest itself declares those as the player's choice.
 
-const CATEGORY_LABEL: Record<Exclude<ContentCategory, "all">, string> = {
-  mod: "Mods",
-  shader: "Shaders",
-  resourcepack: "Recursos",
-  update: "Actualizaciones",
-}
-
-const KIND_LABEL: Record<ContentRow["kind"], string> = {
-  modrinth: "Modrinth",
-  curseforge: "CurseForge",
-  url: "Enlace",
-  override: "Archivo",
-}
-
 export function ContentTab({
   slug,
   isLocal,
@@ -64,7 +51,22 @@ export function ContentTab({
   onBrowse: () => void
   onChanged: () => void
 }) {
+  const t = useT("content")
   const { rows, loading, reload, setRows } = usePackContent(slug, isLocal, true)
+
+  const CATEGORY_LABEL: Record<Exclude<ContentCategory, "all">, string> = {
+    mod: t("categories.mod"),
+    shader: t("categories.shader"),
+    resourcepack: t("categories.resourcepack"),
+    update: t("categories.update"),
+  }
+
+  const KIND_LABEL: Record<ContentRow["kind"], string> = {
+    modrinth: t("kinds.modrinth"),
+    curseforge: t("kinds.curseforge"),
+    url: t("kinds.url"),
+    override: t("kinds.override"),
+  }
   const [query, setQuery] = useState("")
   const [category, setCategory] = useState<ContentCategory>("all")
   const [busyPath, setBusyPath] = useState<string | null>(null)
@@ -98,11 +100,11 @@ export function ContentTab({
       setRows(rows.map((r) => ({ ...r, update: found.get(r.path) })))
       toast.success(
         found.size === 0
-          ? "Todo está al día."
-          : `${found.size} mod(s) con actualización disponible.`,
+          ? t("noUpdates")
+          : t("updateAvailable", { count: found.size }),
       )
     } catch {
-      toast.error("No se pudieron comprobar las actualizaciones.")
+      toast.error(t("updateCheckError"))
     } finally {
       setCheckingUpdates(false)
     }
@@ -132,11 +134,11 @@ export function ContentTab({
     setBusyPath(row.path)
     try {
       await applyUpdate(row)
-      toast.success(`${row.name} actualizado.`)
+      toast.success(t("updated", { name: row.name }))
       reload()
       onChanged()
     } catch (err) {
-      toast.error((err as { message?: string })?.message ?? "No se pudo actualizar.")
+      toast.error((err as { message?: string })?.message ?? t("updateError"))
     } finally {
       setBusyPath(null)
     }
@@ -160,9 +162,9 @@ export function ContentTab({
           failed.push(row.name)
         }
       }
-      if (done > 0) toast.success(`${done} mod(s) actualizados.`)
+      if (done > 0) toast.success(t("updateSuccess", { count: done }))
       if (failed.length > 0) {
-        toast({ tone: "warn", title: "No se pudieron actualizar", msg: failed.join(", ") })
+        toast({ tone: "warn", title: t("updateWarning"), msg: failed.join(", ") })
       }
       setReviewing(false)
       reload()
@@ -183,7 +185,7 @@ export function ContentTab({
       onChanged()
     } catch (err) {
       setRows(rows.map((r) => (r.path === row.path ? { ...r, enabled: row.enabled } : r)))
-      toast.error((err as { message?: string })?.message ?? "No se pudo cambiar el estado.")
+      toast.error((err as { message?: string })?.message ?? t("toggleError"))
     } finally {
       setBusyPath(null)
     }
@@ -193,11 +195,11 @@ export function ContentTab({
     setBusyPath(row.path)
     try {
       await removeFile(slug, row.path)
-      toast.success(`${row.name} eliminado del pack.`)
+      toast.success(t("removed", { name: row.name }))
       reload()
       onChanged()
     } catch (err) {
-      toast.error((err as { message?: string })?.message ?? "No se pudo eliminar.")
+      toast.error((err as { message?: string })?.message ?? t("removeError"))
     } finally {
       setBusyPath(null)
     }
@@ -206,7 +208,7 @@ export function ContentTab({
   if (loading) {
     return (
       <span className="flex items-center gap-2 py-6 font-mono text-[11px] text-txt-dim">
-        <Spinner size={12} /> Leyendo el contenido del pack…
+        <Spinner size={12} /> {t("loading")}
       </span>
     )
   }
@@ -227,12 +229,12 @@ export function ContentTab({
           <Input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder={`Buscar en ${rows.length} archivo(s)…`}
+            placeholder={t("search", { count: rows.length })}
           />
         </div>
         {isLocal && (
           <Button size="sm" variant="pri" icon="plus" onClick={onBrowse}>
-            Añadir contenido
+            {t("addContent")}
           </Button>
         )}
       </div>
@@ -242,7 +244,7 @@ export function ContentTab({
           value={category}
           onChange={(v) => setCategory(v as ContentCategory)}
           options={[
-            { value: "all", label: "Todo" },
+            { value: "all", label: t("everything") },
             { value: "mod", label: CATEGORY_LABEL.mod },
             { value: "shader", label: CATEGORY_LABEL.shader },
             { value: "resourcepack", label: CATEGORY_LABEL.resourcepack },
@@ -264,7 +266,7 @@ export function ContentTab({
                 disabled={updatingAll || busyPath !== null}
                 onClick={() => setReviewing(true)}
               >
-                Revisar {updateCount} actualización(es)
+                {t("reviewUpdates", { count: updateCount })}
               </Button>
             )}
             <Button
@@ -275,7 +277,7 @@ export function ContentTab({
               disabled={checkingUpdates}
               onClick={() => void checkUpdates()}
             >
-              Buscar actualizaciones
+              {t("checkUpdates")}
             </Button>
           </>
         )}
@@ -284,18 +286,18 @@ export function ContentTab({
       {visible.length === 0 ? (
         <Empty
           icon="cube"
-          title="Nada que mostrar"
+          title={t("nothingToShow")}
           lead={
             rows.length === 0
               ? isLocal
-                ? "Este pack aún no tiene contenido."
-                : "El pack no declara archivos."
-              : "Ningún archivo coincide con el filtro."
+                ? t("emptyLocal")
+                : t("emptyManaged")
+              : t("nothingMatches")
           }
         >
           {isLocal && rows.length === 0 && (
             <Button size="sm" variant="pri" icon="plus" onClick={onBrowse}>
-              Añadir contenido
+              {t("addContent")}
             </Button>
           )}
         </Empty>

@@ -197,6 +197,30 @@ pub async fn download_all(
     Ok(())
 }
 
+/// A download failed part-way. `Transient` errors — a dropped connection, a
+/// 5xx, a 429, a truncated transfer — are worth retrying; `Permanent` ones — a
+/// 404, a hash mismatch, a disk error — are not, because a second attempt fails
+/// the same way and only delays the honest error the player needs to see.
+enum FetchError {
+    Transient(InstallFailure),
+    Permanent(InstallFailure),
+}
+
+/// Total attempts for the network leg of one file (1 try + 2 retries). One flaky
+/// mod out of 400 should not fail the whole install when a retry would land it.
+const MAX_ATTEMPTS: u32 = 3;
+
+/// Exponential backoff with a little jitter, so the 6 concurrent downloads that
+/// all hit the same 429 do not then retry in lockstep. ~400ms, then ~800ms.
+fn backoff_delay(attempt: u32) -> std::time::Duration {
+    let base = 400u64.saturating_mul(2u64.saturating_pow(attempt - 1));
+    let jitter = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .map(|d| u64::from(d.subsec_nanos()) % 250)
+        .unwrap_or(0);
+    std::time::Duration::from_millis(base + jitter)
+}
+
 #[allow(clippy::too_many_arguments)]
 async fn fetch_one(
     app: &tauri::AppHandle,
@@ -241,25 +265,72 @@ async fn fetch_one(
         return place(&local, &dest);
     }
 
-    // 3. Actually fetch it. Public sources are one GET; the proxied ones go
-    //    through the launcher session so the API can re-check entitlement —
-    //    §7.4, the listing and the download are separate requests and access
-    //    can be revoked between them.
+    // 3. Actually fetch it, retrying the network leg a few times. The cache
+    //    checks above are deterministic and are never part of the retry; only
+    //    the parts that touch the network are.
+    let mut attempt = 0;
+    loop {
+        attempt += 1;
+        match fetch_and_stream(app, http, pack_id, password, file, &blob, &sha512).await {
+            Ok(()) => break,
+            Err(FetchError::Permanent(failure)) => return Err(failure),
+            Err(FetchError::Transient(failure)) => {
+                if attempt >= MAX_ATTEMPTS {
+                    return Err(failure);
+                }
+                tokio::time::sleep(backoff_delay(attempt)).await;
+            }
+        }
+    }
+    place(&blob, &dest)
+}
+
+/// The network leg of one download: acquire the response, then stream+verify it
+/// into the content-addressed cache. Separated from `fetch_one` so the retry
+/// loop there wraps exactly the fallible-over-the-wire part and nothing else.
+async fn fetch_and_stream(
+    app: &tauri::AppHandle,
+    http: &reqwest::Client,
+    pack_id: &str,
+    password: Option<&str>,
+    file: &PlannedFile,
+    blob: &Path,
+    sha512: &str,
+) -> Result<(), FetchError> {
+    // Public sources are one GET; the proxied ones go through the launcher
+    // session so the API can re-check entitlement — §7.4, the listing and the
+    // download are separate requests and access can be revoked between them.
     let response = match &file.fetch {
         Fetch::Proxied(pack_file) => {
-            crate::api::fetch_pack_file(app, pack_id, password, pack_file).await?
+            // The proxy re-mints an expired session internally, so a failure
+            // here is most often a network blip; let the loop try again.
+            crate::api::fetch_pack_file(app, pack_id, password, pack_file)
+                .await
+                .map_err(|e| FetchError::Transient(InstallFailure::from(e)))?
         }
         _ => {
-            let url = resolve_url(http, file).await?;
+            let url = resolve_url(http, file).await.map_err(FetchError::Transient)?;
             let res = http.get(&url).send().await.map_err(|e| {
-                InstallFailure::message(format!("No se pudo descargar «{}»: {e}", file.path))
+                FetchError::Transient(InstallFailure::message(format!(
+                    "No se pudo descargar «{}»: {e}",
+                    file.path
+                )))
             })?;
-            if !res.status().is_success() {
-                return Err(InstallFailure::message(format!(
+            let status = res.status();
+            if !status.is_success() {
+                let failure = InstallFailure::message(format!(
                     "No se pudo descargar «{}»: el servidor respondió {}.",
-                    file.path,
-                    res.status()
-                )));
+                    file.path, status
+                ));
+                // 5xx and 429 are worth another go; a 404/403 will not fix
+                // itself, so fail it now rather than three times.
+                return Err(
+                    if status.is_server_error() || status == reqwest::StatusCode::TOO_MANY_REQUESTS {
+                        FetchError::Transient(failure)
+                    } else {
+                        FetchError::Permanent(failure)
+                    },
+                );
             }
             res
         }
@@ -269,8 +340,7 @@ async fn fetch_one(
     // the bytes proves who may have them, not that they arrived intact — and
     // for a CurseForge proxy it is also the only thing verifying what upstream
     // actually served.
-    stream_to_cache(response, &blob, &sha512, &file.path).await?;
-    place(&blob, &dest)
+    stream_to_cache(response, blob, sha512, &file.path).await
 }
 
 /// Turn a `Fetch` into a URL. Only Modrinth needs a round-trip: the manifest
@@ -341,10 +411,13 @@ async fn stream_to_cache(
     blob: &Path,
     expected: &str,
     label: &str,
-) -> Result<(), InstallFailure> {
+) -> Result<(), FetchError> {
     let parent = blob.parent().unwrap_or(blob);
     std::fs::create_dir_all(parent).map_err(|e| {
-        InstallFailure::message(format!("No se pudo crear {}: {e}", parent.display()))
+        FetchError::Permanent(InstallFailure::message(format!(
+            "No se pudo crear {}: {e}",
+            parent.display()
+        )))
     })?;
 
     let temp = parent.join(format!("{}.part", uuid::Uuid::new_v4()));
@@ -352,15 +425,33 @@ async fn stream_to_cache(
     let mut hasher = Sha512::new();
     {
         let mut out = std::fs::File::create(&temp).map_err(|e| {
-            InstallFailure::message(format!("No se pudo escribir {}: {e}", temp.display()))
+            FetchError::Permanent(InstallFailure::message(format!(
+                "No se pudo escribir {}: {e}",
+                temp.display()
+            )))
         })?;
-        while let Some(chunk) = res.chunk().await.map_err(|e| {
-            InstallFailure::message(format!("Se cortó la descarga de «{label}»: {e}"))
-        })? {
-            hasher.update(&chunk);
-            out.write_all(&chunk).map_err(|e| {
-                InstallFailure::message(format!("No se pudo escribir {}: {e}", temp.display()))
-            })?;
+        // A cut connection mid-stream leaves a `.part` behind: drop it before
+        // bubbling the transient error so the retry starts from a clean slate.
+        loop {
+            match res.chunk().await {
+                Ok(Some(chunk)) => {
+                    hasher.update(&chunk);
+                    out.write_all(&chunk).map_err(|e| {
+                        FetchError::Permanent(InstallFailure::message(format!(
+                            "No se pudo escribir {}: {e}",
+                            temp.display()
+                        )))
+                    })?;
+                }
+                Ok(None) => break,
+                Err(e) => {
+                    drop(out);
+                    let _ = std::fs::remove_file(&temp);
+                    return Err(FetchError::Transient(InstallFailure::message(format!(
+                        "Se cortó la descarga de «{label}»: {e}"
+                    ))));
+                }
+            }
         }
         out.flush().ok();
     }
@@ -368,15 +459,18 @@ async fn stream_to_cache(
     let actual = hex(&hasher.finalize());
     if actual != expected {
         let _ = std::fs::remove_file(&temp);
-        return Err(InstallFailure::message(format!(
+        return Err(FetchError::Permanent(InstallFailure::message(format!(
             "«{label}» no coincide con el hash del manifiesto. La descarga está corrupta o el \
              archivo ha cambiado en el origen."
-        )));
+        ))));
     }
 
     std::fs::rename(&temp, blob).map_err(|e| {
         let _ = std::fs::remove_file(&temp);
-        InstallFailure::message(format!("No se pudo guardar {}: {e}", blob.display()))
+        FetchError::Permanent(InstallFailure::message(format!(
+            "No se pudo guardar {}: {e}",
+            blob.display()
+        )))
     })
 }
 

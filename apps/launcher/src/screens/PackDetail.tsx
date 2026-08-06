@@ -21,6 +21,7 @@ import {
   toast,
 } from "@boffmedia/ui"
 
+import { useT } from "../i18n"
 import { CrashDiagnosisCard } from "../components/CrashDiagnosis"
 import { VersionPicker, dependenciesOf } from "../components/VersionPicker"
 import type { VersionChoice } from "../components/VersionPicker"
@@ -31,7 +32,7 @@ import { ContentTab } from "../components/pack/ContentTab"
 import { FilesTab } from "../components/pack/FilesTab"
 import { WorldsTab } from "../components/pack/WorldsTab"
 import { LogPanel } from "../components/pack/LogPanel"
-import { exportMrpack, localPackDuplicate, localPackGet, localPackSave } from "../runtime"
+import { exportMrpack, exportServerMrpack, localPackDuplicate, localPackGet, localPackSave } from "../runtime"
 import { useLauncher } from "../state/launcher"
 import { formatBytes, formatDuration, formatWhen } from "../utils/format"
 import { LOADER_LABEL, PHASE_LABEL, STEP_GROUPS } from "../utils/labels"
@@ -85,6 +86,7 @@ function EditLocalPackModal({
   pack: { id: string; slug: string; name: string }
   latest: { minecraft: string; loader: string | null; loaderVersion: string | null } | null
 }) {
+  const t = useT("packDetail")
   const [name, setName] = useState(pack.name)
   const [choice, setChoice] = useState<VersionChoice>(() => choiceOf(latest))
   const [loadingVersions, setLoadingVersions] = useState(true)
@@ -98,11 +100,11 @@ function EditLocalPackModal({
 
   const save = async () => {
     if (!name.trim()) {
-      setError("Ponle un nombre al pack.")
+      setError(t("nameError"))
       return
     }
     if (choice.loader && !choice.loaderVersion) {
-      setError("Elige una versión del loader.")
+      setError(t("loaderVersionError"))
       return
     }
     setSaving(true)
@@ -118,16 +120,16 @@ function EditLocalPackModal({
       onSaved()
       onClose()
     } catch (err) {
-      setError((err as { message?: string })?.message ?? "No se pudo guardar el pack.")
+      setError((err as { message?: string })?.message ?? t("saveError"))
     } finally {
       setSaving(false)
     }
   }
 
   return (
-    <Modal open={open} onClose={onClose} title="Editar pack local">
+    <Modal open={open} onClose={onClose} title={t("editModal")}>
       <div className="flex flex-col gap-4">
-        <Field label="Nombre">
+        <Field label={t("nameField")}>
           <Input value={name} onChange={(e) => setName(e.target.value)} />
         </Field>
         <VersionPicker
@@ -139,7 +141,7 @@ function EditLocalPackModal({
         {error && <p className="text-xs text-bad">{error}</p>}
         <div className="flex justify-end gap-2">
           <Button size="sm" onClick={onClose}>
-            Cancelar
+            {t("cancelButton")}
           </Button>
           <Button
             size="sm"
@@ -148,7 +150,7 @@ function EditLocalPackModal({
             disabled={loadingVersions}
             onClick={() => void save()}
           >
-            Guardar
+            {t("saveButton")}
           </Button>
         </div>
       </div>
@@ -159,11 +161,13 @@ function EditLocalPackModal({
 type TabKey = "content" | "files" | "worlds" | "backups" | "logs" | "info"
 
 export function PackDetail() {
+  const t = useT("packDetail")
   const { selected, install, play, repair, stop, game, go, logs, reloadPacks, offline } =
     useLauncher()
   const now = useNow(game.kind === "running")
   const [editing, setEditing] = useState(false)
   const [exporting, setExporting] = useState(false)
+  const [exportingServer, setExportingServer] = useState(false)
   const [duplicating, setDuplicating] = useState(false)
   const [tab, setTab] = useState<TabKey>("content")
   const [browsing, setBrowsing] = useState(false)
@@ -174,11 +178,11 @@ export function PackDetail() {
       <div className="px-8 py-7">
         <Empty
           icon="cube"
-          title="Ningún pack seleccionado"
-          lead="Elige un pack de la biblioteca."
+          title={t("noPackTitle")}
+          lead={t("noPackLead")}
         >
           <Button size="sm" icon="back" onClick={() => go("packs")}>
-            Volver
+            {t("backButton")}
           </Button>
         </Empty>
       </div>
@@ -196,27 +200,28 @@ export function PackDetail() {
     setDuplicating(true)
     try {
       const copy = await localPackDuplicate(pack.slug, "")
-      toast.success(`«${copy.pack.name}» creado.`)
+      toast.success(t("duplicateSuccess", { name: copy.pack.name }))
       reloadPacks()
     } catch (err) {
-      toast.error((err as { message?: string })?.message ?? "No se pudo duplicar el pack.")
+      toast.error((err as { message?: string })?.message ?? t("duplicateError"))
     } finally {
       setDuplicating(false)
     }
   }
 
-  const doExport = async () => {
-    setExporting(true)
+  const doExport = async (serverOnly: boolean) => {
+    const setFlag = serverOnly ? setExportingServer : setExporting
+    setFlag(true)
     try {
-      await exportMrpack(pack.slug)
-      toast.success("Pack exportado.")
+      await (serverOnly ? exportServerMrpack : exportMrpack)(pack.slug)
+      toast.success(t("exportSuccess"))
     } catch (err) {
       const message = (err as { message?: string })?.message
-      if (message !== "Exportación cancelada.") {
-        toast.error(message ?? "No se pudo exportar el pack.")
+      if (message !== t("exportCancelled")) {
+        toast.error(message ?? t("exportError"))
       }
     } finally {
-      setExporting(false)
+      setFlag(false)
     }
   }
 
@@ -236,8 +241,12 @@ export function PackDetail() {
   // catalog is three panes wide and adding several mods in a row should not
   // mean reopening a modal each time.
   if (browsing && isLocal && latest?.minecraft) {
+    // h-full, not min-h: ModBrowser's result grid owns its scroll, and it can
+    // only do that when this page is exactly the shell's height. With min-h the
+    // grid grows instead of scrolling, so its infinite-scroll sentinel never
+    // leaves view and pages chain-load forever.
     return (
-      <div className="flex min-h-[calc(100dvh-2rem)] flex-col px-8 py-7">
+      <div className="flex h-full flex-col px-8 py-7">
         <BrowsePage
           slug={pack.slug}
           minecraft={latest.minecraft}
@@ -257,7 +266,7 @@ export function PackDetail() {
         onClick={() => go("packs")}
         className="mb-4 flex items-center gap-1.5 text-xs uppercase tracking-[0.1em] text-txt-muted hover:text-accent-bright"
       >
-        <Icon name="back" size={13} /> Biblioteca
+        <Icon name="back" size={13} /> {t("libraryBack")}
       </button>
 
       <header className="mb-5 flex flex-wrap items-start justify-between gap-4">
@@ -281,7 +290,7 @@ export function PackDetail() {
                 <Icon name="clock" size={12} />
                 {state.kind === "installed" || state.kind === "outdated"
                   ? formatBytes(state.sizeBytes)
-                  : "sin instalar"}
+                  : t("uninstalled")}
               </span>
               {isLocal && <Badge tone="info">Local</Badge>}
             </div>
@@ -297,7 +306,7 @@ export function PackDetail() {
               incomplete. */}
           {running ? (
             <Button variant="danger" icon="pause" onClick={stop}>
-              Detener
+              {t("stop")}
             </Button>
           ) : state.kind === "broken" ? (
             <Button
@@ -307,13 +316,13 @@ export function PackDetail() {
               disabled={!latest}
               onClick={() => void repair(pack.id)}
             >
-              Reparar
+              {t("repair")}
             </Button>
           ) : installing ? (
             // Not `loading`: that primitive hides its label behind the spinner,
             // and a blank orange box during a multi-minute install reads broken.
             <Button variant="pri" size="lg" icon="download" disabled>
-              Instalando {Math.round(state.progress.fraction * 100)}%
+              {t("installingPercent", { percent: Math.round(state.progress.fraction * 100) })}
             </Button>
           ) : needsInstall ? (
             <Button
@@ -321,10 +330,10 @@ export function PackDetail() {
               size="lg"
               icon="download"
               disabled={offline}
-              title={offline ? "Instalar necesita conexión" : undefined}
+              title={offline ? t("installOfflineTitle") : undefined}
               onClick={() => void install(pack.id)}
             >
-              {state.kind === "outdated" ? "Actualizar" : "Instalar"}
+              {state.kind === "outdated" ? t("update") : t("install")}
             </Button>
           ) : (
             <Button
@@ -334,7 +343,7 @@ export function PackDetail() {
               loading={game.kind === "preparing"}
               onClick={() => void play(pack.id)}
             >
-              Jugar
+              {t("play")}
             </Button>
           )}
 
@@ -342,18 +351,23 @@ export function PackDetail() {
               is not a flow this launcher offers, anywhere. */}
           {isLocal && (
             <Menu
-              label="Más acciones"
+              label={t("moreActions")}
               items={[
-                { label: "Editar pack", icon: "edit", onSelect: () => setEditing(true) },
+                { label: t("editLocalMenu"), icon: "edit", onSelect: () => setEditing(true) },
                 {
-                  label: duplicating ? "Duplicando…" : "Duplicar pack",
+                  label: duplicating ? t("duplicatingMenu") : t("duplicateLocalMenu"),
                   icon: "plus",
                   onSelect: () => void doDuplicate(),
                 },
                 {
-                  label: exporting ? "Exportando…" : "Exportar .mrpack",
+                  label: exporting ? t("exportingMenu") : t("exportMenu"),
                   icon: "upload",
-                  onSelect: () => void doExport(),
+                  onSelect: () => void doExport(false),
+                },
+                {
+                  label: exportingServer ? t("exportingServerMenu") : t("exportServerMenu"),
+                  icon: "upload",
+                  onSelect: () => void doExport(true),
                 },
               ]}
             />
@@ -364,7 +378,7 @@ export function PackDetail() {
       {/* ── Live state: never behind a tab ────────────────────────────────── */}
 
       {installing && (
-        <Panel title="Instalando" aside={<Badge tone="info">En curso</Badge>} className="mb-4">
+        <Panel title={t("installingPanel")} aside={<Badge tone="info">{t("inProgress")}</Badge>} className="mb-4">
           <Stepper
             steps={STEP_GROUPS.map((g) => g.label)}
             current={STEP_GROUPS.findIndex((g) => g.phases.includes(state.progress.phase))}
@@ -385,12 +399,10 @@ export function PackDetail() {
       )}
 
       {state.kind === "broken" && (
-        <Panel title="Instalación dañada" aside={<Badge tone="bad">Dañado</Badge>} className="mb-4">
+        <Panel title={t("damagedTitle")} aside={<Badge tone="bad">{t("damaged")}</Badge>} className="mb-4">
           <p className="text-sm text-txt-muted">{state.reason}</p>
           <p className="mt-2 text-xs text-txt-dim">
-            Reparar borra los mods, la configuración y el loader gestionados por el
-            launcher, y los vuelve a descargar. Tus mundos, capturas y opciones no se
-            tocan.
+            {t("damageExplanation")}
           </p>
         </Panel>
       )}
@@ -400,8 +412,8 @@ export function PackDetail() {
           than only in the log tab nobody opens. */}
       {game.kind === "crashed" && (
         <Panel
-          title="El juego se cerró inesperadamente"
-          aside={<Badge tone="bad">Código {game.exitCode}</Badge>}
+          title={t("crashedTitle")}
+          aside={<Badge tone="bad">{t("crashCode", { code: game.exitCode })}</Badge>}
           className="mb-4"
         >
           {/* §9 — the verdict first. The raw lines stay underneath: a wrong
@@ -413,31 +425,31 @@ export function PackDetail() {
             </pre>
           ) : (
             <p className="text-sm text-txt-muted">
-              No se registró ningún error antes del cierre.
+              {t("noErrorLines")}
             </p>
           )}
           <div className="mt-3 flex items-center gap-2">
             <Button size="sm" icon="list" onClick={() => setTab("logs")}>
-              Ver registro completo
+              {t("viewLogs")}
             </Button>
             <Button size="sm" variant="pri" icon="play" onClick={() => void play(pack.id)}>
-              Reintentar
+              {t("retry")}
             </Button>
           </div>
         </Panel>
       )}
 
       {running && (
-        <Panel title="Sesión" aside={<Badge tone="ok">En ejecución</Badge>} className="mb-4">
+        <Panel title={t("sessionPanel")} aside={<Badge tone="ok">{t("running")}</Badge>} className="mb-4">
           <Stats
             items={[
-              { n: formatDuration(now - game.since), l: "tiempo" },
-              { n: game.pid, l: "pid" },
-              { n: loader, l: "loader" },
+              { n: formatDuration(now - game.since), l: t("elapsedTime") },
+              { n: game.pid, l: t("pid") },
+              { n: loader, l: t("loader") },
             ]}
           />
           <p className="mt-3 text-xs text-txt-dim">
-            El launcher puede cerrarse sin afectar a la partida.
+            {t("launcherClosable")}
           </p>
         </Panel>
       )}
@@ -449,12 +461,12 @@ export function PackDetail() {
         value={tab}
         onChange={(v) => setTab(v as TabKey)}
         tabs={[
-          { value: "content", label: "Contenido" },
-          { value: "files", label: "Archivos" },
-          { value: "worlds", label: "Mundos" },
-          { value: "backups", label: "Copias" },
-          { value: "logs", label: "Registro" },
-          { value: "info", label: "Info" },
+          { value: "content", label: t("tabs.content") },
+          { value: "files", label: t("tabs.files") },
+          { value: "worlds", label: t("tabs.worlds") },
+          { value: "backups", label: t("tabs.backups") },
+          { value: "logs", label: t("tabs.logs") },
+          { value: "info", label: t("tabs.info") },
         ]}
       />
 
@@ -484,20 +496,20 @@ export function PackDetail() {
       {tab === "info" && (
         <div className="flex flex-col gap-4">
           <div className="grid gap-4 [grid-template-columns:repeat(auto-fit,minmax(320px,1fr))]">
-            <Panel title="Versión">
+            <Panel title={t("info.version")}>
               <DataList
                 rows={[
-                  { label: "Última", value: latest?.name ?? "—", mono: true },
-                  { label: "Publicada", value: latest ? formatWhen(latest.createdAt) : "—" },
-                  { label: "Minecraft", value: latest?.minecraft ?? "—", mono: true },
-                  { label: "Loader", value: loader, mono: true },
-                  { label: "Archivos", value: latest?.fileCount ?? 0 },
+                  { label: t("info.latest"), value: latest?.name ?? "—", mono: true },
+                  { label: t("info.published"), value: latest ? formatWhen(latest.createdAt) : "—" },
+                  { label: t("info.minecraft"), value: latest?.minecraft ?? "—", mono: true },
+                  { label: t("info.loaderLabel"), value: loader, mono: true },
+                  { label: t("info.filesLabel"), value: latest?.fileCount ?? 0 },
                   (state.kind === "installed" || state.kind === "outdated") && {
-                    label: "En disco",
+                    label: t("info.diskLabel"),
                     value: formatBytes(state.sizeBytes),
                   },
                   state.kind === "outdated" && {
-                    label: "Instalada",
+                    label: t("info.installedLabel"),
                     value: state.versionId,
                     mono: true,
                   },
@@ -505,33 +517,31 @@ export function PackDetail() {
               />
             </Panel>
 
-            <Panel title="Acceso">
+            <Panel title={t("info.accessTitle")}>
               <DataList
                 rows={[
                   {
-                    label: "Tipo",
+                    label: t("info.type"),
                     value:
                       pack.accessKind === "allowlist"
-                        ? "Lista de permitidos"
+                        ? t("info.allowlist")
                         : pack.accessKind === "password"
-                          ? "Contraseña"
-                          : "Público",
+                          ? t("info.password")
+                          : t("info.public"),
                     icon: pack.accessKind === "public" ? "globe" : "lock",
                   },
                   // No member count: the registry deliberately never sends the
                   // allowlist to a launcher, since one member could otherwise
                   // enumerate everyone else with access to the pack.
                   pack.accessKind === "allowlist" && {
-                    label: "Tu acceso",
-                    value: "Concedido",
+                    label: t("info.yourAccess"),
+                    value: t("info.granted"),
                   },
                 ]}
               />
-              <Divider label="integridad" className="my-4" />
+              <Divider label={t("info.integrityLabel")} className="my-4" />
               <p className="text-xs text-txt-dim">
-                Cada archivo se verifica por SHA-512 antes de escribirse. Un archivo que no
-                coincide se vuelve a descargar; si vuelve a fallar, la instalación se marca como
-                dañada en lugar de lanzarse.
+                {t("info.integrityDescription")}
               </p>
             </Panel>
           </div>
@@ -548,7 +558,7 @@ export function PackDetail() {
           onClose={() => setEditing(false)}
           onSaved={() => {
             reloadPacks()
-            toast.success("Pack guardado.")
+            toast.success(t("saveSuccess"))
           }}
           pack={pack}
           latest={latest}

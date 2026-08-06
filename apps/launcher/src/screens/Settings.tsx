@@ -1,6 +1,7 @@
-import { Badge, Button, DataList, Divider, Field, Input, Kicker, Panel, Slider, Toggle } from "@boffmedia/ui"
+import { Badge, Button, DataList, Divider, Field, Input, Kicker, Panel, Seg, Slider, Toggle } from "@boffmedia/ui"
 import { useEffect, useState } from "react"
 
+import { useT } from "../i18n"
 import { getRuntimeInfo } from "../runtime"
 import { checkForUpdates, useUpdates } from "../services/updates"
 import { useLauncher } from "../state/launcher"
@@ -10,8 +11,9 @@ import { formatBytes } from "../utils/format"
 // ticket." Hence the explicit, visible Java row rather than silent detection.
 
 export function Settings() {
-  const { settings, patchSettings, account } = useLauncher()
+  const { settings, patchSettings, account, revalidate, revalidating } = useLauncher()
   const { phase, update, error } = useUpdates()
+  const t = useT("settings")
   const [version, setVersion] = useState<string | null>(null)
 
   useEffect(() => {
@@ -24,17 +26,17 @@ export function Settings() {
   return (
     <div className="px-8 py-7">
       <header className="mb-6">
-        <Kicker>Preferencias</Kicker>
+        <Kicker>{t("kicker")}</Kicker>
         <h1 className="font-display text-[30px]/none font-bold uppercase tracking-[0.06em] text-txt">
-          Ajustes
+          {t("title")}
         </h1>
       </header>
 
       <div className="grid max-w-[900px] gap-4 [grid-template-columns:repeat(auto-fit,minmax(340px,1fr))]">
         <Panel
-          title="Rendimiento"
+          title={t("performance.title")}
           aside={<Badge tone={settings.memoryAuto ? "ok" : "info"}>
-            {settings.memoryAuto ? "Automático" : "Manual"}
+            {settings.memoryAuto ? t("performance.auto") : t("performance.manual")}
           </Badge>}
         >
           {/* §9 — the global default. Each pack can still inherit this, override
@@ -42,11 +44,11 @@ export function Settings() {
           <Toggle
             on={settings.memoryAuto}
             onChange={(memoryAuto) => patchSettings({ memoryAuto })}
-            label="Calcular la memoria automáticamente"
+            label={t("performance.autoToggle")}
           />
           <div className="mt-4">
             <Slider
-              label="Memoria asignada"
+              label={t("performance.slider")}
               min={2048}
               max={16384}
               step={512}
@@ -58,36 +60,31 @@ export function Settings() {
           </div>
           <p className="mt-2 text-xs text-txt-dim">
             {settings.memoryAuto
-              ? "Se calcula por pack, con su número de mods y la RAM del equipo, sin pasar nunca del 60 % de la memoria física. Un pack concreto puede fijar el suyo desde su ficha."
-              : `${formatBytes(settings.memoryMib * 1024 * 1024)} para la JVM. Asignar más memoria de la que tiene el equipo no hace que el juego falle: hace que el sistema empiece a usar el disco y se quede colgado. Deja al menos 2 GB al sistema.`}
+              ? t("performance.autoHint")
+              : t("performance.manualHint", { size: formatBytes(settings.memoryMib * 1024 * 1024) })}
           </p>
         </Panel>
 
-        <Panel title="Java">
-          <Field
-            label="Ruta del ejecutable"
-            hint="Vacío = usar el runtime que gestiona el launcher (recomendado)"
-          >
+        <Panel title={t("java.title")}>
+          <Field label={t("java.pathLabel")} hint={t("java.pathHint")}>
             <Input
               value={settings.javaPath ?? ""}
-              placeholder="Detección automática"
+              placeholder={t("java.placeholder")}
               onChange={(e) => patchSettings({ javaPath: e.target.value || null })}
             />
           </Field>
           <div className="mt-3 flex items-center gap-2">
             <Badge tone={settings.javaPath ? "warn" : "ok"}>
-              {settings.javaPath ? "Manual" : "Automático"}
+              {settings.javaPath ? t("java.manual") : t("java.auto")}
             </Badge>
             <span className="text-xs text-txt-dim">
-              {settings.javaPath
-                ? "Se usará esta ruta aunque no sea compatible con el pack."
-                : "Se descargará la versión que pida cada pack."}
+              {settings.javaPath ? t("java.manualHint") : t("java.autoHint")}
             </span>
           </div>
         </Panel>
 
-        <Panel title="Instalación">
-          <Field label="Carpeta de juego">
+        <Panel title={t("install.title")}>
+          <Field label={t("install.gameDir")}>
             <Input
               value={settings.gameDir}
               onChange={(e) => patchSettings({ gameDir: e.target.value })}
@@ -96,7 +93,7 @@ export function Settings() {
           {/* §9 — rollback depth. Almost free: a retained version is its file
               list, and the .jar it names lives once in the shared cache however
               many versions reference it. */}
-          <Field label="Versiones que se conservan">
+          <Field label={t("install.retain")}>
             <Input
               type="number"
               min={1}
@@ -112,20 +109,33 @@ export function Settings() {
             <Toggle
               on={settings.closeOnLaunch}
               onChange={(closeOnLaunch) => patchSettings({ closeOnLaunch })}
-              label="Cerrar el launcher al iniciar el juego"
+              label={t("install.closeOnLaunch")}
             />
             <Toggle
               on={settings.keepLogs}
               onChange={(keepLogs) => patchSettings({ keepLogs })}
-              label="Conservar el registro entre sesiones"
+              label={t("install.keepLogs")}
             />
           </div>
         </Panel>
 
-        <Panel title="Actualizaciones">
+        <Panel title={t("language.title")}>
+          <Field label={t("language.label")}>
+            <Seg
+              value={settings.locale}
+              onChange={(locale) => patchSettings({ locale: locale as typeof settings.locale })}
+              options={[
+                { value: "es", label: t("language.es") },
+                { value: "en", label: t("language.en") },
+              ]}
+            />
+          </Field>
+        </Panel>
+
+        <Panel title={t("updates.title")}>
           <DataList
             rows={[
-              { label: "Versión instalada", value: version ?? "Modo navegador", mono: true },
+              { label: t("updates.installed"), value: version ?? t("updates.browserMode"), mono: true },
             ]}
           />
           <div className="mt-4 flex items-center gap-3">
@@ -138,36 +148,42 @@ export function Settings() {
                 void checkForUpdates(true)
               }}
             >
-              {checking ? "Buscando…" : "Buscar actualizaciones"}
+              {checking ? t("updates.checking") : t("updates.check")}
             </Button>
             <span className="text-xs text-txt-dim">
               {error
                 ? error
                 : update
-                  ? `Disponible la ${update.version}. Actualiza desde el aviso de arriba.`
+                  ? t("updates.availableHint", { version: update.version })
                   : checking
-                    ? "Comprobando con el servidor…"
-                    : "El launcher lo comprueba solo al arrancar."}
+                    ? t("updates.checkingHint")
+                    : t("updates.idleHint")}
             </span>
           </div>
         </Panel>
 
-        <Panel title="Cuenta">
+        <Panel title={t("account.title")}>
           <DataList
             rows={[
-              { label: "Usuario", value: account?.username ?? "—" },
-              { label: "UUID", value: account?.uuid ?? "—", mono: true, wide: true },
-              { label: "Token", value: "Almacén de credenciales del sistema", icon: "lock" },
+              { label: t("account.user"), value: account?.username ?? "—" },
+              { label: t("account.uuid"), value: account?.uuid ?? "—", mono: true, wide: true },
+              { label: t("account.token"), value: t("account.tokenValue"), icon: "lock" },
             ]}
           />
-          <p className="mt-3 text-xs text-txt-dim">
-            Solo se guarda el token de actualización, y nunca en texto plano. El token de
-            acceso a Minecraft dura unas 24 h y se vuelve a pedir en cada sesión.
-          </p>
-          <div className="mt-4">
-            <Button size="sm" variant="ghost" icon="refresh">
-              Revalidar sesión
+          <p className="mt-3 text-xs text-txt-dim">{t("account.note")}</p>
+          <div className="mt-4 flex items-center gap-3">
+            <Button
+              size="sm"
+              variant="ghost"
+              icon="refresh"
+              disabled={!account || revalidating}
+              onClick={() => {
+                void revalidate()
+              }}
+            >
+              {revalidating ? t("account.revalidating") : t("account.revalidate")}
             </Button>
+            <span className="text-xs text-txt-dim">{t("account.revalidateHint")}</span>
           </div>
         </Panel>
       </div>

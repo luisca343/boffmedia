@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react"
 
 import { catalogLoaderOf } from "@boffmedia/ui"
 
+import { useT } from "../../i18n"
 import {
   type ContentFile,
   catalogProjectSummaries,
@@ -63,15 +64,29 @@ function fileNameOf(path: string): string {
   return path.split("/").filter(Boolean).pop() ?? path
 }
 
+/** Modrinth's CDN encodes the file's identity in its download URL. Packs
+ *  imported before the importer learned to keep that identity (mrpack.rs
+ *  `source_of`) still carry plain `url` sources; deriving the ids here is what
+ *  gives those EXISTING packs names, icons and update checks without asking
+ *  the player to re-import anything. */
+const MODRINTH_CDN = /^https:\/\/cdn\.modrinth\.com\/data\/([^/]+)\/versions\/([^/]+)\/./
+
+function modrinthIdsOf(url: unknown): { projectId: string; versionId: string } | null {
+  if (typeof url !== "string") return null
+  const match = MODRINTH_CDN.exec(url)
+  return match ? { projectId: match[1], versionId: match[2] } : null
+}
+
 /** Manifest entries the marker does not know about — a pack file that has not
  *  been installed yet. Typed loosely because this is the raw manifest shape. */
 type ManifestFile = {
   path: string
   fileSize: number
-  source: { kind: string; projectId?: unknown; versionId?: unknown }
+  source: { kind: string; projectId?: unknown; versionId?: unknown; url?: unknown }
 }
 
 export function usePackContent(slug: string, isLocal: boolean, active: boolean) {
+  const t = useT("content")
   const [rows, setRows] = useState<ContentRow[]>([])
   const [loading, setLoading] = useState(true)
   const [nonce, setNonce] = useState(0)
@@ -105,6 +120,7 @@ export function usePackContent(slug: string, isLocal: boolean, active: boolean) 
         const manifest = await localPackGet(slug).catch(() => null)
         for (const raw of (manifest?.version?.files ?? []) as unknown as ManifestFile[]) {
           const path = raw.path.replace(/\\/g, "/")
+          const derived = raw.source?.kind === "url" ? modrinthIdsOf(raw.source.url) : null
           push({
             path,
             fileName: fileNameOf(path),
@@ -113,11 +129,15 @@ export function usePackContent(slug: string, isLocal: boolean, active: boolean) 
             optional: false,
             enabled: true,
             installed: false,
-            kind: (raw.source?.kind ?? "url") as ContentRow["kind"],
+            kind: derived ? "modrinth" : ((raw.source?.kind ?? "url") as ContentRow["kind"]),
             projectId:
-              raw.source?.projectId === undefined ? undefined : String(raw.source.projectId),
+              raw.source?.projectId === undefined
+                ? derived?.projectId
+                : String(raw.source.projectId),
             versionId:
-              raw.source?.versionId === undefined ? undefined : String(raw.source.versionId),
+              raw.source?.versionId === undefined
+                ? derived?.versionId
+                : String(raw.source.versionId),
             name: fileNameOf(path),
           })
         }
@@ -172,6 +192,10 @@ export function usePackContent(slug: string, isLocal: boolean, active: boolean) 
 function rowOf(file: ContentFile): ContentRow {
   const path = file.path.replace(/\\/g, "/")
   const kind = file.source.kind as ContentRow["kind"]
+  // Same derivation as the manifest pass: an instance installed from a
+  // pre-`source_of` import carries `url` markers for what are really
+  // Modrinth files.
+  const derived = file.source.kind === "url" ? modrinthIdsOf(file.source.url) : null
   return {
     path,
     fileName: fileNameOf(path),
@@ -180,10 +204,11 @@ function rowOf(file: ContentFile): ContentRow {
     optional: file.optional,
     enabled: file.enabled,
     installed: file.installed,
-    kind,
-    versionId: file.source.kind === "modrinth" ? file.source.versionId : undefined,
+    kind: derived ? "modrinth" : kind,
+    versionId:
+      file.source.kind === "modrinth" ? file.source.versionId : derived?.versionId,
     projectId:
-      file.source.kind === "curseforge" ? String(file.source.projectId) : undefined,
+      file.source.kind === "curseforge" ? String(file.source.projectId) : derived?.projectId,
     name: fileNameOf(path),
   }
 }

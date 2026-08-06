@@ -12,7 +12,6 @@ import {
   type ModPlatform,
   type ModSearchHit,
   Spinner,
-  type Translate,
   bestFile,
   catalogLoaderOf,
   defaultFolder,
@@ -23,6 +22,7 @@ import {
 // Registers the Modrinth-backed catalog client the browser reads. Side-effect
 // import, from the one component that mounts it.
 import "../../services/catalog"
+import { useT } from "../../i18n"
 import { addFiles } from "../../services/localPackEdit"
 
 // "Añadir contenido" — the catalog, full page.
@@ -35,63 +35,6 @@ import { addFiles } from "../../services/localPackEdit"
 //
 // Modrinth only — see catalog.rs for why a desktop client cannot carry a
 // CurseForge key.
-
-const LABELS: Record<string, string> = {
-  needMinecraftLead: "Elige primero una versión de Minecraft para el pack.",
-  platformModrinth: "Modrinth",
-  platformCurseforge: "CurseForge",
-  modSearchPlaceholder: "Buscar mods…",
-  projectType: "Tipo",
-  "type.mod": "Mods",
-  "type.resourcepack": "Recursos",
-  "type.shader": "Shaders",
-  "type.datapack": "Datapacks",
-  sort: "Orden",
-  "sortBy.downloads": "Descargas",
-  "sortBy.follows": "Seguidores",
-  "sortBy.updated": "Actualizado",
-  "sortBy.relevance": "Relevancia",
-  "sortBy.name": "Nombre",
-  categories: "Categorías",
-  allCategories: "Todas",
-  noModResults: "Ningún mod coincide con la búsqueda.",
-  added: "Añadido",
-  close: "Cerrar",
-  linkSource: "Código",
-  linkIssues: "Incidencias",
-  linkWebsite: "Web",
-  files: "Archivos",
-  compatibleOnly: "Compatibles",
-  allFiles: "Todos",
-  loadingFiles: "Cargando archivos…",
-  noCompatibleFiles: "No hay archivos para esta versión de Minecraft y este loader.",
-  "releaseType.release": "Estable",
-  "releaseType.beta": "Beta",
-  "releaseType.alpha": "Alpha",
-  resolving: "Añadiendo…",
-  addMod: "Añadir",
-  notDistributable: "No descargable",
-  notDistributableLead: "El autor no permite la descarga automática de estos archivos.",
-  "side.client.required": "Cliente",
-  "side.client.optional": "Cliente opcional",
-  "side.client.unsupported": "Solo servidor",
-  "side.server.required": "Servidor",
-  "side.server.optional": "Servidor opcional",
-  "side.server.unsupported": "Solo cliente",
-}
-
-/** The launcher has no i18n runtime yet, so the shared browser gets a plain
- *  dictionary. Its `t` is a prop precisely so a host without next-intl can do
- *  this instead of shipping one. */
-const t: Translate = (key, values) => {
-  const template = LABELS[key]
-  if (template === undefined) {
-    if (key === "loadMore") return `Cargar más (${values?.shown}/${values?.total})`
-    if (key === "depsCount") return `${values?.count} dep.`
-    return key
-  }
-  return template
-}
 
 type PendingEntry = {
   path: string
@@ -122,6 +65,10 @@ export function BrowsePage({
   onBack: () => void
   onChanged: () => void
 }) {
+  const t = useT("browse")
+  // The shared ModBrowser resolves its OWN key set (type.*, sortBy.*, side.* …)
+  // from the labels sub-namespace; the component's `t` above is for its own text.
+  const browserLabels = useT("browse.labels")
   const [busyKey, setBusyKey] = useState<string | null>(null)
   const [progress, setProgress] = useState<string | null>(null)
   const [url, setUrl] = useState("")
@@ -185,7 +132,7 @@ export function BrowsePage({
         for (const dep of pending) {
           known.add(dep.projectId)
           const name = names.get(dep.projectId)?.name ?? dep.projectId
-          setProgress(`Resolviendo dependencia: ${name}`)
+          setProgress(t("resolvingDep", { name }))
 
           const files = await getCatalog().files("modrinth", dep.projectId, {
             gameVersion: minecraft,
@@ -210,7 +157,7 @@ export function BrowsePage({
       }
       return { found, skipped }
     },
-    [catalogLoader, minecraft, resolveEntry],
+    [catalogLoader, minecraft, resolveEntry, t],
   )
 
   const addPick = useCallback(
@@ -218,11 +165,11 @@ export function BrowsePage({
       const key = `${hit.platform}:${hit.projectId}:${file.fileId}`
       if (busyKey) return
       setBusyKey(key)
-      setProgress("Añadiendo…")
+      setProgress(t("adding"))
       try {
         const entry = await resolveEntry(hit.projectId, file, projectType)
         if (!entry) {
-          toast.error(`No se pudo añadir ${file.fileName}.`)
+          toast.error(t("addError", { file: file.fileName }))
           return
         }
         const known = new Set(addedRef.current)
@@ -235,23 +182,23 @@ export function BrowsePage({
         setAdded([...addedRef.current, entry.projectId, ...found.map((f) => f.projectId)])
 
         if (skipped.length > 0) {
-          toast({ tone: "warn", title: "Sin versión compatible", msg: skipped.join(", ") })
+          toast({ tone: "warn", title: t("incompatibleWarning"), msg: skipped.join(", ") })
         } else if (found.length > 0) {
-          toast.success(`${hit.name} y ${found.length} dependencia(s) añadidas.`)
+          toast.success(t("addedWithDepsMessage", { name: hit.name, count: found.length }))
         } else {
-          toast.success(`${hit.name} añadido.`)
+          toast.success(t("addedMessage", { name: hit.name }))
         }
         onChanged()
       } catch (err) {
         // ModBrowser calls this as `void onAdd(...)`, so anything thrown here
         // would otherwise become an unhandled rejection with no visible cause.
-        toast.error((err as { message?: string })?.message ?? "No se pudo añadir el mod.")
+        toast.error((err as { message?: string })?.message ?? t("addModError"))
       } finally {
         setBusyKey(null)
         setProgress(null)
       }
     },
-    [busyKey, collectDependencies, onChanged, resolveEntry, slug],
+    [busyKey, collectDependencies, onChanged, resolveEntry, slug, t],
   )
 
   /** The one path that must download to add: a raw URL has no published hash to
@@ -260,11 +207,11 @@ export function BrowsePage({
     const trimmed = url.trim()
     if (!trimmed || urlBusy) return
     setUrlBusy(true)
-    setProgress("Descargando para calcular el hash…")
+    setProgress(t("hashProgress"))
     try {
       const resolved = await getCatalog().resolve({ kind: "url", url: trimmed })
       if (!resolved) {
-        toast.error("No se pudo añadir el enlace.")
+        toast.error(t("addLinkError"))
         return
       }
       const name = resolved.fileName || fileNameOfUrl(trimmed)
@@ -277,15 +224,15 @@ export function BrowsePage({
         },
       ])
       setUrl("")
-      toast.success(`${name} añadido.`)
+      toast.success(t("addedMessage", { name }))
       onChanged()
     } catch (err) {
-      toast.error((err as { message?: string })?.message ?? "No se pudo añadir el enlace.")
+      toast.error((err as { message?: string })?.message ?? t("addLinkError"))
     } finally {
       setUrlBusy(false)
       setProgress(null)
     }
-  }, [onChanged, slug, url, urlBusy])
+  }, [onChanged, slug, t, url, urlBusy])
 
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-4">
@@ -295,16 +242,16 @@ export function BrowsePage({
           onClick={onBack}
           className="flex items-center gap-1.5 text-xs uppercase tracking-[0.1em] text-txt-muted hover:text-accent-bright"
         >
-          <Icon name="back" size={13} /> Volver al pack
+          <Icon name="back" size={13} /> {t("backButton")}
         </button>
         <span className="flex-1" />
         <div className="w-full max-w-[420px]">
-          <Field label="Añadir por enlace" hint="Se descarga una vez para calcular su SHA-512.">
+          <Field label={t("linkLabel")} hint={t("linkHint")}>
             <div className="flex gap-2">
               <Input
                 value={url}
                 onChange={(e) => setUrl(e.target.value)}
-                placeholder="https://ejemplo.com/mod.jar"
+                placeholder={t("urlPlaceholder")}
               />
               <Button
                 size="sm"
@@ -313,7 +260,7 @@ export function BrowsePage({
                 disabled={urlBusy || !url.trim()}
                 onClick={() => void addByUrl()}
               >
-                Añadir
+                {t("addButton")}
               </Button>
             </div>
           </Field>
@@ -321,7 +268,7 @@ export function BrowsePage({
       </div>
 
       <ModBrowser
-        t={t}
+        t={browserLabels}
         platform="modrinth"
         onPlatformChange={() => {}}
         // One platform, so the toggle is hidden rather than rendered as a

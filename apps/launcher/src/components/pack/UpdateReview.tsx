@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react"
 
 import { Button, CatalogIcon, Checkbox, Modal, Spinner } from "@boffmedia/ui"
 
+import { useT } from "../../i18n"
 import type { ContentRow } from "./usePackContent"
 
 // The review step between "Buscar actualizaciones" and the manifest actually
@@ -31,6 +32,7 @@ export function UpdateReview({
   onCancel: () => void
   onConfirm: (chosen: ContentRow[]) => void
 }) {
+  const t = useT("updateReview")
   const [skipped, setSkipped] = useState<Set<string>>(new Set())
 
   // A fresh check produces a different set of rows, and carrying the previous

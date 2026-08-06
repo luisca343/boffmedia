@@ -1,5 +1,6 @@
 import * as React from "react"
 
+import { setLocale } from "../i18n"
 import { MOCK_ACCOUNT, MOCK_DEVICE_CODE, MOCK_SETTINGS, mockLocalPacks } from "../services/mock"
 import { loadPackEntries } from "../services/packs"
 import {
@@ -302,6 +303,11 @@ type Ctx = State & {
   /** True while a switch is resolving — it runs the full refresh chain and is
    *  as slow as a silent sign-in. */
   switchingAccount: boolean
+  /** Force a re-mint of the CURRENT session (refresh tokens + new launcher JWT),
+   *  for when the stored token went stale mid-session. */
+  revalidate: () => Promise<void>
+  /** True while {@link revalidate} runs — same cost as a silent sign-in. */
+  revalidating: boolean
   go: (view: View, packId?: string) => void
   reloadPacks: () => void
   install: (packId: string) => Promise<void>
@@ -813,6 +819,7 @@ export function LauncherProvider({ children }: { children: React.ReactNode }) {
   // three events (sign-in, switch, remove) which all reload it explicitly.
   const [accounts, setAccounts] = React.useState<AccountEntry[]>([])
   const [switchingAccount, setSwitchingAccount] = React.useState(false)
+  const [revalidating, setRevalidating] = React.useState(false)
 
   const reloadAccounts = React.useCallback(() => {
     void authAccounts().then(setAccounts)
@@ -874,6 +881,35 @@ export function LauncherProvider({ children }: { children: React.ReactNode }) {
     [log, reloadAccounts],
   )
 
+  // Re-mint the CURRENT session: run the full refresh chain again and drop the
+  // stale launcher JWT (auth_switch does both, even for the already-active uuid,
+  // which is why revalidating is just a switch to yourself). Fixes the "packs
+  // won't load / 401" state after a refresh token silently went stale mid-session
+  // without making the player sign out and back in.
+  const revalidate = React.useCallback(async () => {
+    const uuid = state.account?.uuid
+    if (!uuid || revalidating || switchingAccount) return
+    setRevalidating(true)
+    try {
+      const account = await authSwitch(uuid)
+      dispatch({ type: "account/switched", account })
+      log({ level: "info", source: "launcher", text: "Sesión revalidada." })
+    } catch (err) {
+      const message = (err as { message?: string })?.message ?? "No se pudo revalidar la sesión."
+      log({ level: "error", source: "launcher", text: message })
+      reloadAccounts()
+    } finally {
+      setRevalidating(false)
+    }
+  }, [state.account?.uuid, revalidating, switchingAccount, log, reloadAccounts])
+
+  // The i18n store is a module-level signal, not React state, so the language
+  // is applied by pushing settings.locale into it whenever it changes — the boot
+  // load and the Settings selector both flow through here.
+  React.useEffect(() => {
+    setLocale(state.settings.locale)
+  }, [state.settings.locale])
+
   const value: Ctx = {
     ...state,
     booting: !(state.bootAuthDone && state.bootSettingsDone && state.bootPacksDone),
@@ -889,6 +925,8 @@ export function LauncherProvider({ children }: { children: React.ReactNode }) {
     switchingAccount,
     switchAccount,
     removeAccount,
+    revalidate,
+    revalidating,
     go: (view, packId) => dispatch({ type: "view", view, packId }),
     reloadPacks: () => setReloadToken((n) => n + 1),
     install,

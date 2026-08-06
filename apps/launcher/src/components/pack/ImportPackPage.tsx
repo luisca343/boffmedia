@@ -8,13 +8,13 @@ import {
   Input,
   ModBrowser,
   Spinner,
-  type Translate,
   toast,
 } from "@boffmedia/ui"
 
 // Registers the Modrinth-backed catalog client. Side-effect import, same as the
 // mod browser's.
 import "../../services/catalog"
+import { useT } from "../../i18n"
 import { importMrpack, importMrpackUrl } from "../../runtime"
 
 // "Importar un modpack" — the three ways in, on one page.
@@ -30,55 +30,6 @@ import { importMrpack, importMrpackUrl } from "../../runtime"
 // A page rather than a modal, for the same reason the mod browser is one: the
 // browser is three panes wide and the results list is the whole point.
 
-const LABELS: Record<string, string> = {
-  platformModrinth: "Modrinth",
-  platformCurseforge: "CurseForge",
-  modSearchPlaceholder: "Buscar modpacks…",
-  projectType: "Tipo",
-  "type.modpack": "Modpacks",
-  sort: "Orden",
-  "sortBy.downloads": "Descargas",
-  "sortBy.follows": "Seguidores",
-  "sortBy.updated": "Actualizado",
-  "sortBy.relevance": "Relevancia",
-  categories: "Categorías",
-  allCategories: "Todas",
-  noModResults: "Ningún modpack coincide con la búsqueda.",
-  added: "Importado",
-  close: "Cerrar",
-  linkSource: "Código",
-  linkIssues: "Incidencias",
-  linkWebsite: "Web",
-  files: "Versiones",
-  compatibleOnly: "Compatibles",
-  allFiles: "Todas",
-  loadingFiles: "Cargando versiones…",
-  noCompatibleFiles: "Este proyecto no publica ninguna versión descargable.",
-  "releaseType.release": "Estable",
-  "releaseType.beta": "Beta",
-  "releaseType.alpha": "Alpha",
-  resolving: "Importando…",
-  addMod: "Importar",
-  notDistributable: "No descargable",
-  notDistributableLead: "El autor no permite la descarga automática de estos archivos.",
-  "side.client.required": "Cliente",
-  "side.client.optional": "Cliente opcional",
-  "side.client.unsupported": "Solo servidor",
-  "side.server.required": "Servidor",
-  "side.server.optional": "Servidor opcional",
-  "side.server.unsupported": "Solo cliente",
-}
-
-const t: Translate = (key, values) => {
-  const template = LABELS[key]
-  if (template === undefined) {
-    if (key === "loadMore") return `Cargar más (${values?.shown}/${values?.total})`
-    if (key === "depsCount") return `${values?.count} dep.`
-    return key
-  }
-  return template
-}
-
 export function ImportPackPage({
   onBack,
   onImported,
@@ -87,6 +38,9 @@ export function ImportPackPage({
   /** Reload the library; the caller also decides whether to leave this page. */
   onImported: () => void
 }) {
+  const t = useT("importPack")
+  // The shared ModBrowser resolves its own key set from the labels sub-namespace.
+  const browserLabels = useT("importPack.labels")
   const [busyKey, setBusyKey] = useState<string | null>(null)
   const [progress, setProgress] = useState<string | null>(null)
   const [url, setUrl] = useState("")
@@ -100,12 +54,12 @@ export function ImportPackPage({
     (result: { manifest: { pack: { name: string } }; renamed: boolean }) => {
       toast.success(
         result.renamed
-          ? `Importado como «${result.manifest.pack.name}» (había un pack con ese nombre).`
-          : `Pack «${result.manifest.pack.name}» importado.`,
+          ? t("importedRenamedMessage", { name: result.manifest.pack.name })
+          : t("importedMessage", { name: result.manifest.pack.name }),
       )
       onImported()
     },
-    [onImported],
+    [onImported, t],
   )
 
   const importPick = useCallback(
@@ -113,7 +67,7 @@ export function ImportPackPage({
       const key = `${hit.platform}:${hit.projectId}:${file.fileId}`
       if (busyKey) return
       setBusyKey(key)
-      setProgress(`Descargando ${hit.name}…`)
+      setProgress(t("downloadingPack", { name: hit.name }))
       try {
         // A version URL rather than a bare id: the Rust resolver matches on
         // both the version number and the version id, and this shape is the one
@@ -122,30 +76,30 @@ export function ImportPackPage({
       } catch (err) {
         // ModBrowser calls this as `void onAdd(...)`, so a throw here would
         // otherwise surface as an unhandled rejection with no visible cause.
-        toast.error((err as { message?: string })?.message ?? "No se pudo importar el modpack.")
+        toast.error((err as { message?: string })?.message ?? t("importPackError"))
       } finally {
         setBusyKey(null)
         setProgress(null)
       }
     },
-    [announce, busyKey],
+    [announce, busyKey, t],
   )
 
   const importByUrl = useCallback(async () => {
     const trimmed = url.trim()
     if (!trimmed || urlBusy) return
     setUrlBusy(true)
-    setProgress("Descargando el pack…")
+    setProgress(t("downloadingFile"))
     try {
       announce(await importMrpackUrl(trimmed))
       setUrl("")
     } catch (err) {
-      toast.error((err as { message?: string })?.message ?? "No se pudo importar el enlace.")
+      toast.error((err as { message?: string })?.message ?? t("importLinkError"))
     } finally {
       setUrlBusy(false)
       setProgress(null)
     }
-  }, [announce, url, urlBusy])
+  }, [announce, t, url, urlBusy])
 
   const importFromFile = useCallback(async () => {
     if (fileBusy) return
@@ -153,38 +107,41 @@ export function ImportPackPage({
     try {
       announce(await importMrpack())
     } catch (err) {
-      const message = (err as { message?: string })?.message ?? "No se pudo importar el .mrpack."
-      // Cancelling the native picker is not a failure worth shouting about.
+      const message = (err as { message?: string })?.message ?? t("importFileError")
+      // Cancelling the native picker is not a failure worth shouting about. The
+      // Rust side emits this cancel message in Spanish regardless of UI locale,
+      // so the guard matches the Spanish string on purpose.
       if (!message.startsWith("Importación cancelada")) toast.error(message)
     } finally {
       setFileBusy(false)
     }
-  }, [announce, fileBusy])
+  }, [announce, fileBusy, t])
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col gap-4 px-8 py-7">
+    // h-full, not flex-1: this renders straight into the shell's <main>, which
+    // is a block scroll container — flex-1 does nothing there and the page just
+    // grows, which keeps ModBrowser's infinite-scroll sentinel in view and
+    // chain-loads pages forever. Bounded, the result grid scrolls instead.
+    <div className="flex h-full flex-col gap-4 px-8 py-7">
       <div className="flex flex-wrap items-end gap-3">
         <button
           type="button"
           onClick={onBack}
           className="mb-1 flex items-center gap-1.5 text-xs uppercase tracking-[0.1em] text-txt-muted hover:text-accent-bright"
         >
-          <Icon name="back" size={13} /> Volver a la biblioteca
+          <Icon name="back" size={13} /> {t("backButton")}
         </button>
         <span className="flex-1" />
         <Button size="sm" icon="upload" loading={fileBusy} onClick={() => void importFromFile()}>
-          Desde archivo .mrpack
+          {t("fileButton")}
         </Button>
         <div className="w-full max-w-[440px]">
-          <Field
-            label="Importar por enlace"
-            hint="Página del modpack en Modrinth, una versión concreta o un .mrpack directo."
-          >
+          <Field label={t("linkLabel")} hint={t("linkHint")}>
             <div className="flex gap-2">
               <Input
                 value={url}
                 onChange={(e) => setUrl(e.target.value)}
-                placeholder="https://modrinth.com/modpack/…"
+                placeholder={t("urlPlaceholder")}
               />
               <Button
                 size="sm"
@@ -193,7 +150,7 @@ export function ImportPackPage({
                 disabled={urlBusy || !url.trim()}
                 onClick={() => void importByUrl()}
               >
-                Importar
+                {t("importButton")}
               </Button>
             </div>
           </Field>
@@ -201,7 +158,7 @@ export function ImportPackPage({
       </div>
 
       <ModBrowser
-        t={t}
+        t={browserLabels}
         platform="modrinth"
         onPlatformChange={() => {}}
         platforms={["modrinth"]}

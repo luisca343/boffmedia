@@ -88,38 +88,9 @@ pub fn run() {
             // away the old `<instance>/.minecraft` level.
             let handle = app.handle().clone();
             datadir::migrate(&handle);
-            // The static `$APPDATA/icon-cache/**` scope in tauri.conf.json
-            // resolves to the IDENTIFIER directory, which is no longer where
-            // the cache lives — grant the real one at runtime or every icon
-            // renders as a blank square.
-            use tauri::Manager as _;
-            if let Ok(root) = datadir::data_root(&handle) {
-                let cache = root.join("icon-cache");
-                let _ = std::fs::create_dir_all(&cache);
-                app.asset_protocol_scope().allow_directory(&cache, true)?;
-
-                // Verify rather than assume. `allow_directory` returning Ok
-                // only means the pattern was accepted, NOT that a real file
-                // under it matches — and the difference is invisible from the
-                // renderer, where a denied path and a missing file both render
-                // as a blank square. The data root contains a SPACE on the dev
-                // profile ("BoffLauncher Dev"), which is exactly the kind of
-                // thing that quietly breaks pattern matching, so ask the scope
-                // about a concrete path shaped like a real cached icon.
-                let probe = cache.join("0000000000000000000000000000000000000000000000000000000000000000.png");
-                // stderr rather than a log crate: this project has none, and
-                // `tauri dev` puts Rust's stderr straight in the terminal.
-                if app.asset_protocol_scope().is_allowed(&probe) {
-                    eprintln!("[icons] asset scope OK for {}", cache.display());
-                } else {
-                    // Loud on purpose: every icon in the app is broken when
-                    // this happens, and it has no other symptom.
-                    eprintln!(
-                        "[icons] asset protocol scope REFUSES {} — every cached icon will fail to render",
-                        probe.display()
-                    );
-                }
-            }
+            // Icons need no setup here: icon_cache returns data: URLs, so
+            // there is no asset-protocol scope to align with the custom data
+            // root (an alignment that silently broke twice — see icons.rs).
             Ok(())
         })
         .manage(updates::UpdateState::default())
@@ -170,6 +141,7 @@ pub fn run() {
             backups::backup_restore,
             backups::backup_delete,
             local_packs::export_mrpack,
+            local_packs::export_server_mrpack,
             local_packs::import_mrpack,
             local_packs::import_mrpack_url,
             // Version pickers for local packs. Upstream-direct: the API's own

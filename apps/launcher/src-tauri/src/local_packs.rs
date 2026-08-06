@@ -23,6 +23,7 @@ use tauri_plugin_dialog::DialogExt;
 
 use crate::install::files::resolve_url;
 use crate::install::resolve::{fetch_for, Fetch, PlannedFile};
+use crate::pack::PackManifestVersionFilesItemEnvServer as EnvServer;
 use crate::install::InstallFailure;
 use crate::pack::{parse_manifest, ManifestError, PackManifest};
 
@@ -409,11 +410,19 @@ struct EmbedFile {
 async fn resolve_mrpack_files(
     http: &reqwest::Client,
     manifest: &PackManifest,
+    server_only: bool,
 ) -> Result<(Vec<MrpackFile>, Vec<EmbedFile>), InstallFailure> {
     let mut files = Vec::with_capacity(manifest.version.files.len());
     let mut to_embed = Vec::new();
 
     for f in &manifest.version.files {
+        // A server pack drops the client-only files (shaders, minimaps, a
+        // client-side HUD): env.server == "unsupported" means the mod cannot even
+        // load on a server. Mirrors install/resolve.rs, which drops the reverse
+        // (env.client == "unsupported") for the client.
+        if server_only && f.env.server == EnvServer::Unsupported {
+            continue;
+        }
         let path = f.path.to_string();
         let sha512 = f.sha512.to_string();
         let fetch = fetch_for(&f.source, &path)?;
@@ -457,11 +466,35 @@ async fn resolve_mrpack_files(
 
 #[tauri::command]
 pub async fn export_mrpack(app: tauri::AppHandle, slug: String) -> Result<String, InstallFailure> {
+    export_mrpack_impl(app, slug, false).await
+}
+
+/// A server-only export: the same `.mrpack`, minus every file whose
+/// `env.server` is `unsupported`. HANDOFF §9 ("server pack generation from the
+/// same manifest"). The output is a standard Modrinth pack a server installer
+/// (mrpack-install and friends) consumes directly — what it saves the admin is
+/// having to strip the client-only mods by hand, and shipping a shader pack to a
+/// headless server. It does NOT bundle a loader server jar: the admin installs
+/// the matching Forge/NeoForge/Fabric server, then applies this pack's mods.
+#[tauri::command]
+pub async fn export_server_mrpack(
+    app: tauri::AppHandle,
+    slug: String,
+) -> Result<String, InstallFailure> {
+    export_mrpack_impl(app, slug, true).await
+}
+
+async fn export_mrpack_impl(
+    app: tauri::AppHandle,
+    slug: String,
+    server_only: bool,
+) -> Result<String, InstallFailure> {
     let dir = safe_local_dir(&app, &slug)?;
     let manifest = read_manifest(&dir)?;
 
     let dialog = app.dialog().clone();
-    let file_name = format!("{}.mrpack", manifest.pack.slug.to_string());
+    let suffix = if server_only { "-server" } else { "" };
+    let file_name = format!("{}{suffix}.mrpack", manifest.pack.slug.to_string());
     let chosen = tauri::async_runtime::spawn_blocking(move || {
         dialog
             .file()
@@ -497,7 +530,7 @@ pub async fn export_mrpack(app: tauri::AppHandle, slug: String) -> Result<String
     // `override` source has NO public URL by construction (§4.5/§7.2), which
     // `resolve_mrpack_files` reports back as `ToEmbed` instead of silently
     // leaving the file out of the pack (RF-06).
-    let (mrpack_files, to_embed) = resolve_mrpack_files(&http, &manifest).await?;
+    let (mrpack_files, to_embed) = resolve_mrpack_files(&http, &manifest, server_only).await?;
 
     let settings = crate::settings::load(&app);
     let layout = crate::install::paths::Layout::new(&app, settings.game_dir())?;
@@ -628,7 +661,8 @@ pub async fn import_mrpack(app: tauri::AppHandle) -> Result<ImportResult, Instal
 
     let bytes = std::fs::read(&source)
         .map_err(|e| InstallFailure::message(format!("No se pudo abrir el archivo: {e}")))?;
-    import_mrpack_bytes(&app, bytes).await
+    // A file on disk has no project behind it, so no header icon to fetch.
+    import_mrpack_bytes(&app, bytes, None).await
 }
 
 /// The shared body of every import route (file picker, pasted URL, in-app
@@ -644,6 +678,11 @@ pub async fn import_mrpack(app: tauri::AppHandle) -> Result<ImportResult, Instal
 pub async fn import_mrpack_bytes(
     app: &tauri::AppHandle,
     bytes: Vec<u8>,
+    // The pack header icon the caller resolved from Modrinth, stamped onto a
+    // CONVERTED pack (a plain `.mrpack` has no icon of its own). `None` for a
+    // file-picker import, and ignored for our own round-tripped manifests,
+    // which already carry their icon.
+    icon_url: Option<String>,
 ) -> Result<ImportResult, InstallFailure> {
     let mut archive = zip::ZipArchive::new(std::io::Cursor::new(bytes))
         .map_err(|e| InstallFailure::message(format!("El .mrpack no es un zip válido: {e}")))?;
@@ -712,9 +751,16 @@ pub async fn import_mrpack_bytes(
                 .map_err(|e| {
                     InstallFailure::message(format!("No se pudo crear el cliente HTTP: {e}"))
                 })?;
-            let manifest =
-                crate::mrpack::manifest_from_index(&parsed, &mut archive, &layout, &http, &slug, &name)
-                    .await?;
+            let manifest = crate::mrpack::manifest_from_index(
+                &parsed,
+                &mut archive,
+                &layout,
+                &http,
+                &slug,
+                &name,
+                icon_url.as_deref(),
+            )
+            .await?;
             reject_ambiguous_or_unsupported_loader(&manifest)?;
             let renamed = slug != candidate;
             let dir = safe_local_dir(app, &slug)?;
@@ -779,6 +825,9 @@ pub async fn import_mrpack_url(
         .map_err(|e| InstallFailure::message(format!("No se pudo crear el cliente HTTP: {e}")))?;
 
     let download = crate::mrpack::resolve_pack_download(&http, url.trim()).await?;
+    // Best-effort header icon from the Modrinth project the link points at. A
+    // direct `.mrpack` on some other host has no project, and resolves to None.
+    let icon_url = crate::mrpack::project_icon_url(&http, url.trim()).await;
     let res = http
         .get(&download)
         .send()
@@ -795,7 +844,7 @@ pub async fn import_mrpack_url(
         .await
         .map_err(|e| InstallFailure::message(format!("No se pudo leer el pack: {e}")))?;
 
-    import_mrpack_bytes(&app, bytes.to_vec()).await
+    import_mrpack_bytes(&app, bytes.to_vec(), icon_url).await
 }
 
 #[cfg(test)]
@@ -842,7 +891,7 @@ mod tests {
             r#"{"kind":"url","url":"https://cdn.example.test/sodium.jar"}"#,
         );
         let http = reqwest::Client::new();
-        let (files, to_embed) = resolve_mrpack_files(&http, &manifest).await.unwrap();
+        let (files, to_embed) = resolve_mrpack_files(&http, &manifest, false).await.unwrap();
 
         assert!(to_embed.is_empty(), "a `url` source is always public");
         assert_eq!(files.len(), 1);
@@ -873,13 +922,33 @@ mod tests {
     }
 
     #[tokio::test]
+    async fn server_export_drops_client_only_files() {
+        // The fixture's one file is env.server == "unsupported" (a client-only
+        // mod), so the server export must leave it out entirely — a server that
+        // tried to load it would crash, which is the whole reason for the filter.
+        let manifest = manifest_with_file(
+            r#"{"minecraft":"1.21.4","neoforge":"21.4.30"}"#,
+            r#"{"kind":"url","url":"https://cdn.example.test/sodium.jar"}"#,
+        );
+        let http = reqwest::Client::new();
+        let (files, to_embed) = resolve_mrpack_files(&http, &manifest, true).await.unwrap();
+        assert!(files.is_empty(), "a server-unsupported file must be dropped");
+        assert!(to_embed.is_empty());
+
+        // …and the CLIENT export of the same manifest still keeps it, so the
+        // filter is genuinely conditional on server_only and not a global drop.
+        let (client_files, _) = resolve_mrpack_files(&http, &manifest, false).await.unwrap();
+        assert_eq!(client_files.len(), 1);
+    }
+
+    #[tokio::test]
     async fn a_proxied_source_is_reported_for_embedding_never_dropped() {
         let manifest = manifest_with_file(
             r#"{"minecraft":"1.21.4"}"#,
             &format!(r#"{{"kind":"override","blobSha512":"{}"}}"#, "b".repeat(128)),
         );
         let http = reqwest::Client::new();
-        let (files, to_embed) = resolve_mrpack_files(&http, &manifest).await.unwrap();
+        let (files, to_embed) = resolve_mrpack_files(&http, &manifest, false).await.unwrap();
 
         assert!(files.is_empty(), "an override has no public URL to list");
         assert_eq!(to_embed.len(), 1);

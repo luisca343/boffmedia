@@ -1,5 +1,6 @@
 import { Button, Icon, Kicker, Panel, Spinner } from "@boffmedia/ui"
 
+import { useT } from "../i18n"
 import { PlayerHead } from "../components/PlayerHead"
 import { useLauncher } from "../state/launcher"
 
@@ -19,6 +20,7 @@ import { useLauncher } from "../state/launcher"
 export function AccountPicker() {
   const { accounts, switchAccount, removeAccount, switchingAccount, signIn, restoreError } =
     useLauncher()
+  const t = useT("accountPicker")
 
   return (
     <div className="grid h-full place-items-center px-8 py-10">
@@ -26,14 +28,14 @@ export function AccountPicker() {
         <div className="mb-6 text-center">
           <Kicker>Boff Launcher</Kicker>
           <h1 className="font-display text-[34px]/none font-bold uppercase tracking-[0.06em] text-txt">
-            Elige tu cuenta
+            {t("title")}
           </h1>
           <p className="mt-3 text-sm text-txt-muted">
             {/* When we know WHY the session ended, say so here rather than in a
                 separate banner — on this screen it is the only message. */}
             {restoreError?.needsSignin
-              ? "La sesión de tu última cuenta caducó. Puedes entrar con otra o volver a autorizarla."
-              : "Estas son las cuentas guardadas en este equipo."}
+              ? t("lastSessionExpired")
+              : t("savedAccounts")}
           </p>
         </div>
 
@@ -67,8 +69,8 @@ export function AccountPicker() {
                 </button>
                 <button
                   type="button"
-                  aria-label={`Quitar ${entry.username}`}
-                  title="Quitar cuenta"
+                  aria-label={t("removeAccountLabel", { username: entry.username })}
+                  title={t("removeAccountTitle")}
                   disabled={switchingAccount}
                   onClick={() => void removeAccount(entry.uuid)}
                   className="p-1 text-txt-dim hover:text-bad disabled:opacity-50"
@@ -87,7 +89,7 @@ export function AccountPicker() {
               disabled={switchingAccount}
               onClick={() => void signIn()}
             >
-              Entrar con otra cuenta
+              {t("addAccount")}
             </Button>
           </div>
         </Panel>

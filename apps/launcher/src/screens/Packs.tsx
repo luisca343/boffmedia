@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from "react"
 import {
   Badge,
   Button,
+  CatalogIcon,
   Empty,
   Field,
   Icon,
@@ -15,6 +16,7 @@ import {
   toast,
 } from "@boffmedia/ui"
 
+import { useT } from "../i18n"
 import { VersionPicker, dependenciesOf } from "../components/VersionPicker"
 import type { VersionChoice } from "../components/VersionPicker"
 import { localPackSave, serverStatus } from "../runtime"
@@ -29,6 +31,7 @@ import { PHASE_LABEL } from "../utils/labels"
  *  ping that throws is caught and folded into the same offline badge a timeout
  *  produces. */
 function ServerStatusBadge({ host, port }: { host: string; port: number }) {
+  const t = useT("packs")
   const [status, setStatus] = useState<ServerStatus | null>(null)
 
   useEffect(() => {
@@ -45,38 +48,41 @@ function ServerStatusBadge({ host, port }: { host: string; port: number }) {
     }
   }, [host, port])
 
-  if (!status) return <Badge tone="info">Consultando…</Badge>
-  if (!status.online) return <Badge tone="bad">Servidor offline</Badge>
+  if (!status) return <Badge tone="info">{t("consulting")}</Badge>
+  if (!status.online) return <Badge tone="bad">{t("serverOffline")}</Badge>
   return (
     <Badge tone="ok">
-      {status.players ? `${status.players.online}/${status.players.max} jugadores` : "En línea"}
+      {status.players ? t("playersOnline", { online: status.players.online, max: status.players.max }) : t("serverOnline")}
     </Badge>
   )
 }
 
 function StateBadge({ state }: { state: InstallState }) {
+  const t = useT("packs")
   switch (state.kind) {
     case "installed":
-      return <Badge tone="ok">Instalado</Badge>
+      return <Badge tone="ok">{t("installedState")}</Badge>
     case "outdated":
-      return <Badge tone="warn">Actualización</Badge>
+      return <Badge tone="warn">{t("outdatedState")}</Badge>
     case "installing":
-      return <Badge tone="info">Instalando</Badge>
+      return <Badge tone="info">{t("installingState")}</Badge>
     case "broken":
-      return <Badge tone="bad">Dañado</Badge>
+      return <Badge tone="bad">{t("brokenState")}</Badge>
     default:
-      return <Badge>No instalado</Badge>
+      return <Badge>{t("notAvailable")}</Badge>
   }
 }
 
 function AccessBadge({ entry }: { entry: PackEntry }) {
+  const t = useT("packs")
   const kind = entry.pack.accessKind
-  if (kind === "public") return <Badge>Público</Badge>
-  if (kind === "password") return <Badge tone="info">Con contraseña</Badge>
-  return <Badge tone="live">Acceso concedido</Badge>
+  if (kind === "public") return <Badge>{t("publicAccess")}</Badge>
+  if (kind === "password") return <Badge tone="info">{t("passwordAccess")}</Badge>
+  return <Badge tone="live">{t("grantedAccess")}</Badge>
 }
 
 function PackCard({ entry }: { entry: PackEntry }) {
+  const t = useT("packs")
   const { go, install, play, repair, game, offline } = useLauncher()
   const { pack, latest, state } = entry
   const busy = game.kind === "preparing" || game.kind === "running"
@@ -88,6 +94,7 @@ function PackCard({ entry }: { entry: PackEntry }) {
   return (
     <Panel
       hover
+      media={<CatalogIcon src={pack.iconUrl ?? undefined} size={28} />}
       title={pack.name}
       aside={<StateBadge state={state} />}
       className="cursor-pointer"
@@ -120,14 +127,14 @@ function PackCard({ entry }: { entry: PackEntry }) {
         {entry.server && <ServerStatusBadge host={entry.server.host} port={entry.server.port} />}
         <span className="font-mono text-[11px] text-txt-dim">
           {latest
-            ? `${latest.minecraft} · ${latest.fileCount} archivos`
-            : "Sin versión publicada"}
+            ? `${latest.minecraft} · ${t("filesCount", { count: latest.fileCount })}`
+            : t("noPublishedVersion")}
         </span>
       </div>
 
       <div className="flex items-center justify-between gap-3 border-t border-line pt-3">
         <span className="text-xs text-txt-dim">
-          {entry.lastPlayed ? `Jugado ${formatWhen(entry.lastPlayed)}` : "Nunca jugado"}
+          {entry.lastPlayed ? t("lastPlayed", { when: formatWhen(entry.lastPlayed) }) : t("neverPlayed")}
           {state.kind === "installed" || state.kind === "outdated"
             ? ` · ${formatBytes(state.sizeBytes)}`
             : ""}
@@ -139,13 +146,13 @@ function PackCard({ entry }: { entry: PackEntry }) {
             icon="refresh"
             // Repair re-downloads the broken files, so it needs a network too.
             disabled={!latest || offline}
-            title={offline ? "Reparar necesita conexión" : undefined}
+            title={offline ? t("repairOfflineTitle") : undefined}
             onClick={(e) => {
               e.stopPropagation()
               void repair(pack.id)
             }}
           >
-            Reparar
+            {t("repair")}
           </Button>
         ) : (
           <Button
@@ -157,7 +164,7 @@ function PackCard({ entry }: { entry: PackEntry }) {
             // installed pack is exactly what offline mode exists for, so only
             // the install half is disabled.
             disabled={!latest || (needsInstall && offline) || (!needsInstall && busy)}
-            title={needsInstall && offline ? "Instalar necesita conexión" : undefined}
+            title={needsInstall && offline ? t("installOfflineTitle") : undefined}
             onClick={(e) => {
               e.stopPropagation()
               // Launching from the card is the whole point of the library
@@ -168,14 +175,14 @@ function PackCard({ entry }: { entry: PackEntry }) {
             }}
           >
             {!latest
-              ? "No disponible"
+              ? t("notAvailable")
               : state.kind === "outdated"
-                ? "Actualizar"
+                ? t("update")
                 : needsInstall
-                  ? "Instalar"
+                  ? t("install")
                   : game.kind === "running"
-                    ? "En ejecución"
-                    : "Jugar"}
+                    ? t("running")
+                    : t("play")}
           </Button>
         )}
       </div>
@@ -187,6 +194,7 @@ function PackCard({ entry }: { entry: PackEntry }) {
  *  are added afterwards from the pack's own detail view; this only needs to
  *  produce a valid, empty PackManifest for `local_pack_save` to persist. */
 function CreateLocalPackModal({ open, onClose, onCreated }: { open: boolean; onClose: () => void; onCreated: () => void }) {
+  const t = useT("packs")
   const [name, setName] = useState("")
   // Empty minecraft on purpose: the picker fills it with Mojang's latest
   // release once the real list arrives.
@@ -197,15 +205,15 @@ function CreateLocalPackModal({ open, onClose, onCreated }: { open: boolean; onC
 
   const create = async () => {
     if (!name.trim()) {
-      setError("Ponle un nombre al pack.")
+      setError(t("nameRequired"))
       return
     }
     if (!choice.minecraft) {
-      setError("Elige una versión de Minecraft.")
+      setError(t("versionRequired"))
       return
     }
     if (choice.loader && !choice.loaderVersion) {
-      setError("Elige una versión del loader.")
+      setError(t("loaderVersionRequired"))
       return
     }
     setSaving(true)
@@ -228,23 +236,23 @@ function CreateLocalPackModal({ open, onClose, onCreated }: { open: boolean; onC
       onCreated()
       onClose()
     } catch (err) {
-      setError((err as { message?: string })?.message ?? "No se pudo crear el pack.")
+      setError((err as { message?: string })?.message ?? t("createLocalError"))
     } finally {
       setSaving(false)
     }
   }
 
   return (
-    <Modal open={open} onClose={onClose} title="Crear pack local">
+    <Modal open={open} onClose={onClose} title={t("modalTitle")}>
       <div className="flex flex-col gap-4">
-        <Field label="Nombre">
-          <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Mi pack" />
+        <Field label={t("nameField")}>
+          <Input value={name} onChange={(e) => setName(e.target.value)} placeholder={t("namePlaceholder")} />
         </Field>
         <VersionPicker value={choice} onChange={setChoice} onLoadingChange={setLoadingVersions} />
         {error && <p className="text-xs text-bad">{error}</p>}
         <div className="flex justify-end gap-2">
           <Button size="sm" onClick={onClose}>
-            Cancelar
+            {t("cancelButton")}
           </Button>
           <Button
             size="sm"
@@ -253,7 +261,7 @@ function CreateLocalPackModal({ open, onClose, onCreated }: { open: boolean; onC
             disabled={loadingVersions}
             onClick={() => void create()}
           >
-            Crear
+            {t("createButton")}
           </Button>
         </div>
       </div>
@@ -262,6 +270,7 @@ function CreateLocalPackModal({ open, onClose, onCreated }: { open: boolean; onC
 }
 
 export function Packs() {
+  const t = useT("packs")
   const { packs, packsLoading, packsError, reloadPacks } = useLauncher()
   const [query, setQuery] = useState("")
   const [creating, setCreating] = useState(false)
@@ -296,20 +305,20 @@ export function Packs() {
     <div className="px-8 py-7">
       <header className="mb-6 flex flex-wrap items-end justify-between gap-4">
         <div>
-          <Kicker>Tu biblioteca</Kicker>
+          <Kicker>{t("librarySectionTitle")}</Kicker>
           <h1 className="font-display text-[30px]/none font-bold uppercase tracking-[0.06em] text-txt">
-            Packs
+            {t("title")}
           </h1>
         </div>
         <div className="flex items-end gap-3">
           <div className="w-[280px]">
-            <SearchInput value={query} onChange={setQuery} placeholder="Buscar pack…" size="sm" />
+            <SearchInput value={query} onChange={setQuery} placeholder={t("search")} size="sm" />
           </div>
           <Button size="sm" icon="upload" onClick={() => setImporting(true)}>
-            Importar modpack
+            {t("importButton")}
           </Button>
           <Button size="sm" variant="pri" icon="plus" onClick={() => setCreating(true)}>
-            Crear pack local
+            {t("createLocalButton")}
           </Button>
         </div>
       </header>
@@ -319,7 +328,7 @@ export function Packs() {
         onClose={() => setCreating(false)}
         onCreated={() => {
           reloadPacks()
-          toast.success("Pack local creado.")
+          toast.success(t("createLocalSuccess"))
         }}
       />
 
@@ -328,27 +337,27 @@ export function Packs() {
           and telling a player to ask for an invite when the API is down is how
           support tickets get filed against the wrong thing. */}
       {packsError && (
-        <Empty icon="alert" title="No se pudo cargar tu biblioteca" lead={packsError}>
+        <Empty icon="alert" title={t("libraryLoadError")} lead={packsError}>
           <Button size="sm" icon="refresh" onClick={reloadPacks}>
-            Reintentar
+            {t("libraryErrorAction")}
           </Button>
         </Empty>
       )}
 
       {!packsError && packsLoading && packs.length === 0 && (
-        <Empty icon="cube" title="Cargando tus packs…" lead="Consultando el registro." />
+        <Empty icon="cube" title={t("loadingPacks")} lead={t("loadingPacaksDetail")} />
       )}
 
       {!packsError && !packsLoading && packs.length === 0 && (
         <Empty
           icon="cube"
-          title="No hay packs disponibles"
-          lead="Tu cuenta no tiene acceso a ningún pack todavía. Pide una invitación al administrador."
+          title={t("noPacksAvailable")}
+          lead={t("noPacksDetail")}
         />
       )}
 
       {packs.length > 0 && shown.length === 0 && (
-        <Empty icon="search" title="Sin resultados" lead={`Nada coincide con «${query}».`} />
+        <Empty icon="search" title={t("searchNoResultsTitle")} lead={t("searchNoResults", { query })} />
       )}
 
       <div className="grid gap-4 [grid-template-columns:repeat(auto-fill,minmax(320px,1fr))]">
@@ -360,7 +369,7 @@ export function Packs() {
       {packs.length > 0 && (
         <p className="mt-6 flex items-center gap-2 text-xs text-txt-dim">
           <Icon name="shield" size={13} />
-          Solo se listan los packs a los que tu UUID tiene acceso.
+          {t("accessInfo")}
         </p>
       )}
     </div>

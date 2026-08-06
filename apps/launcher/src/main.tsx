@@ -2,12 +2,14 @@ import { StrictMode } from "react"
 import { createRoot } from "react-dom/client"
 
 import { App } from "./App"
+import "./i18n"
 import "./index.css"
 import { revealWindow } from "./runtime"
 
-// No configureUi() call. @boffmedia/ui's defaults already do the right thing
-// here: Link falls back to a plain anchor and useT() echoes its key. When the
-// launcher grows real translations, this is the one place that changes.
+// Importing "./i18n" for its side effect: it calls configureUi() at module load,
+// wiring @boffmedia/ui's primitives to the launcher's message store. The launcher
+// screens use the same store through useT("<namespace>"). Locale is applied from
+// settings.locale by the launcher store once settings load.
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
