@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ConflictException,
   ForbiddenException,
   Injectable,
   NotFoundException,
@@ -8,7 +9,7 @@ import * as bcrypt from 'bcrypt';
 import { randomBytes } from 'crypto';
 import { PackManifest } from '@boffmedia/pack-schema';
 import { PacksRepository } from './packs.repository';
-import type { PackAccessKind, PackLoader } from '@/_db/schema/Packs';
+import type { GameType, PackAccessKind, PackLoader } from '@/_db/schema/Packs';
 import {
   AUDIT,
   AdminPackView,
@@ -31,13 +32,26 @@ export class PacksService {
 
   // ── Launcher-facing ──────────────────────────────────────────────────────
 
-  /** Packs this UUID may see. The filtering is a single repository query so
-   *  there is exactly one place that can leak a pack. */
-  async listForLauncher(uuid: string): Promise<LauncherPackView[]> {
-    const rows = await this.repo.listVisibleTo(uuid);
+  /** NULL column → 'minecraft'. One place owns the default so no consumer
+   *  re-implements it. */
+  private resolveGameType(gameType: GameType | null | undefined): GameType {
+    return gameType ?? 'minecraft';
+  }
 
-    return Promise.all(
+  /** Packs this UUID may see AND this launcher can parse. Access filtering is a
+   *  single repository query (one place can leak a pack); capability filtering
+   *  is layered on top — a launcher that does not declare a game type never
+   *  lists a pack of that type. `capabilities` is the parsed X-Boff-Game-Types
+   *  set (absent header → ['minecraft'], §3.1). */
+  async listForLauncher(uuid: string, capabilities: string[]): Promise<LauncherPackView[]> {
+    const rows = await this.repo.listVisibleTo(uuid);
+    const canParse = new Set(capabilities);
+
+    const views = await Promise.all(
       rows.map(async (pack) => {
+        const gameType = this.resolveGameType(pack.gameType);
+        if (!canParse.has(gameType)) return null;
+
         const version = pack.latestVersionId
           ? await this.repo.findVersion(pack.latestVersionId)
           : null;
@@ -45,6 +59,7 @@ export class PacksService {
         return {
           id: pack.id,
           slug: pack.slug,
+          gameType,
           name: pack.name,
           summary: pack.summary,
           iconUrl: pack.iconUrl,
@@ -67,9 +82,43 @@ export class PacksService {
                   createdAt: version.createdAt.toISOString(),
                 }
               : null,
-        };
+        } satisfies LauncherPackView;
       }),
     );
+    return views.filter((v): v is LauncherPackView => v !== null);
+  }
+
+  /** The game-type-specific half of a version block, shared by the served
+   *  manifest and the create/edit validator so the two can never disagree.
+   *  Minecraft gets `dependencies` (+ optional `worlds`); a non-MC game gets its
+   *  own spec block. `initialFiles` is game-agnostic. Anything absent is omitted
+   *  so a minecraft manifest stays byte-identical to the pre-multi-game shape. */
+  private versionGameFields(
+    gameType: GameType,
+    v: {
+      minecraft?: string | null;
+      loader?: string | null;
+      loaderVersion?: string | null;
+      worlds?: unknown[] | null;
+      emulator?: unknown;
+      zomboid?: unknown;
+      stardew?: unknown;
+      initialFiles?: unknown[] | null;
+    },
+  ): Record<string, unknown> {
+    const out: Record<string, unknown> = {};
+    if (gameType === 'minecraft') {
+      out.dependencies = {
+        minecraft: v.minecraft,
+        ...(v.loader && v.loaderVersion ? { [v.loader]: v.loaderVersion } : {}),
+      };
+      if (v.worlds && v.worlds.length > 0) out.worlds = v.worlds;
+    } else {
+      const spec = v[gameType];
+      if (spec !== undefined && spec !== null) out[gameType] = spec;
+    }
+    if (v.initialFiles && v.initialFiles.length > 0) out.initialFiles = v.initialFiles;
+    return out;
   }
 
   /**
@@ -77,14 +126,29 @@ export class PacksService {
    * re-checked here rather than trusted from the listing, because the listing
    * and the download are separate requests and access can be revoked between
    * them (§7.4 — revocation is the whole point).
+   *
+   * `capabilities` is the parsed X-Boff-Game-Types set. A pack whose game type
+   * the caller cannot parse returns 409 (not 404): the pack exists, the client
+   * is what is lacking, so the launcher can surface "update to play this". This
+   * closes the side-door a shared id / redeemed invite would otherwise open.
    */
   async manifestFor(
     uuid: string,
     packId: string,
     password: string | null,
+    capabilities: string[],
   ): Promise<unknown> {
     const pack = await this.repo.findById(packId);
     if (!pack || pack.archived) throw new NotFoundException('Pack no encontrado');
+
+    const gameType = this.resolveGameType(pack.gameType);
+    if (!capabilities.includes(gameType)) {
+      throw new ConflictException({
+        error: 'needs_newer_launcher',
+        gameType,
+        message: 'Este pack necesita una versión más reciente del launcher',
+      });
+    }
 
     await this.assertAccess(pack.id, pack.accessKind, pack.passwordHash, uuid, password);
 
@@ -109,6 +173,9 @@ export class PacksService {
       pack: {
         id: pack.id,
         slug: pack.slug,
+        // Omitted for minecraft (absent = minecraft) so a MC manifest is
+        // byte-identical to the pre-multi-game shape; present for non-MC.
+        ...(gameType !== 'minecraft' ? { gameType } : {}),
         name: pack.name,
         ...(pack.summary ? { summary: pack.summary } : {}),
         ...(pack.description ? { description: pack.description } : {}),
@@ -126,14 +193,8 @@ export class PacksService {
         id: version.id,
         name: version.name,
         createdAt: version.createdAt.toISOString(),
-        dependencies: {
-          minecraft: version.minecraft,
-          ...(version.loader && version.loaderVersion
-            ? { [version.loader]: version.loaderVersion }
-            : {}),
-        },
         files: version.files,
-        ...(version.worlds && version.worlds.length > 0 ? { worlds: version.worlds } : {}),
+        ...this.versionGameFields(gameType, version),
       },
     };
 
@@ -211,6 +272,7 @@ export class PacksService {
       rows.map(async (pack) => ({
         id: pack.id,
         slug: pack.slug,
+        gameType: this.resolveGameType(pack.gameType),
         name: pack.name,
         summary: pack.summary,
         iconUrl: pack.iconUrl,
@@ -250,9 +312,14 @@ export class PacksService {
     }
 
     const id = this.newId();
+    // NULL = minecraft (zero-backfill semantics): an explicit 'minecraft' is
+    // normalized to NULL so the stored value matches every pre-multi-game row.
+    const gameType =
+      dto.gameType && dto.gameType !== 'minecraft' ? (dto.gameType as GameType) : null;
     await this.repo.insertPack({
       id,
       slug: dto.slug,
+      gameType,
       name: dto.name,
       summary: dto.summary ?? null,
       description: dto.description ?? null,
@@ -262,7 +329,11 @@ export class PacksService {
       accessKind: dto.accessKind,
       passwordHash: dto.password ? await bcrypt.hash(dto.password, 10) : null,
     });
-    await this.repo.audit(AUDIT.PACK_CREATED, id, null, { actorId, slug: dto.slug });
+    await this.repo.audit(AUDIT.PACK_CREATED, id, null, {
+      actorId,
+      slug: dto.slug,
+      gameType: this.resolveGameType(gameType),
+    });
     return { id };
   }
 
@@ -320,7 +391,16 @@ export class PacksService {
   async versionDetail(
     packId: string,
     versionId: string,
-  ): Promise<PackVersionView & { files: unknown[]; worlds?: unknown[] }> {
+  ): Promise<
+    PackVersionView & {
+      files: unknown[];
+      worlds?: unknown[];
+      emulator?: unknown;
+      zomboid?: unknown;
+      stardew?: unknown;
+      initialFiles?: unknown[];
+    }
+  > {
     const version = await this.repo.findVersion(versionId);
     if (!version || version.packId !== packId) {
       throw new NotFoundException('Versión no encontrada');
@@ -339,6 +419,10 @@ export class PacksService {
       createdAt: version.createdAt.toISOString(),
       files: version.files,
       ...(version.worlds ? { worlds: version.worlds } : {}),
+      ...(version.emulator ? { emulator: version.emulator } : {}),
+      ...(version.zomboid ? { zomboid: version.zomboid } : {}),
+      ...(version.stardew ? { stardew: version.stardew } : {}),
+      ...(version.initialFiles ? { initialFiles: version.initialFiles } : {}),
     };
   }
 
@@ -361,13 +445,18 @@ export class PacksService {
       );
     }
     const parsed = this.parseManifest(await this.requirePack(packId), versionId, dto);
+    const pv = parsed.version as any;
     await this.repo.updateVersion(versionId, {
       name: dto.name,
-      minecraft: dto.minecraft,
+      minecraft: dto.minecraft ?? null,
       loader: (dto.loader as PackLoader) ?? null,
       loaderVersion: dto.loaderVersion ?? null,
       files: parsed.version.files,
-      worlds: (parsed.version as any).worlds ?? null,
+      worlds: pv.worlds ?? null,
+      emulator: pv.emulator ?? null,
+      zomboid: pv.zomboid ?? null,
+      stardew: pv.stardew ?? null,
+      initialFiles: pv.initialFiles ?? null,
       notes: dto.notes ?? null,
     });
     await this.repo.audit(AUDIT.VERSION_UPDATED, packId, null, { actorId, versionId });
@@ -392,17 +481,28 @@ export class PacksService {
   }
 
   /** Create and edit share this: both must reject exactly what the launcher
-   *  would refuse to parse, and by construction they cannot drift. */
+   *  would refuse to parse, and by construction they cannot drift. Branches on
+   *  the pack's game type (immutable, set at creation) so a non-MC version is
+   *  validated against its own spec block — a mismatch fails here as a 400, never
+   *  on a player's machine. */
   private parseManifest(
-    pack: { id: string; slug: string; name: string; accessKind: PackAccessKind },
+    pack: {
+      id: string;
+      slug: string;
+      name: string;
+      accessKind: PackAccessKind;
+      gameType?: GameType | null;
+    },
     versionId: string,
     dto: CreateVersionDto,
   ) {
+    const gameType = this.resolveGameType(pack.gameType);
     const candidate = {
       formatVersion: 1 as const,
       pack: {
         id: pack.id,
         slug: pack.slug,
+        ...(gameType !== 'minecraft' ? { gameType } : {}),
         name: pack.name,
         access: this.accessPayload(pack.accessKind),
       },
@@ -410,12 +510,17 @@ export class PacksService {
         id: versionId,
         name: dto.name,
         createdAt: new Date().toISOString(),
-        dependencies: {
-          minecraft: dto.minecraft,
-          ...(dto.loader && dto.loaderVersion ? { [dto.loader]: dto.loaderVersion } : {}),
-        },
         files: dto.files,
-        ...(dto.worlds && dto.worlds.length > 0 ? { worlds: dto.worlds } : {}),
+        ...this.versionGameFields(gameType, {
+          minecraft: dto.minecraft,
+          loader: dto.loader,
+          loaderVersion: dto.loaderVersion,
+          worlds: dto.worlds,
+          emulator: dto.emulator,
+          zomboid: dto.zomboid,
+          stardew: dto.stardew,
+          initialFiles: dto.initialFiles,
+        }),
       },
     };
     const parsed = PackManifest.safeParse(candidate);
@@ -441,16 +546,21 @@ export class PacksService {
     const pack = await this.requirePack(packId);
     const id = this.newId();
     const parsed = this.parseManifest(pack, id, dto);
+    const pv = parsed.version as any;
 
     await this.repo.insertVersion({
       id,
       packId,
       name: dto.name,
-      minecraft: dto.minecraft,
+      minecraft: dto.minecraft ?? null,
       loader: (dto.loader as PackLoader) ?? null,
       loaderVersion: dto.loaderVersion ?? null,
       files: parsed.version.files,
-      worlds: (parsed.version as any).worlds ?? null,
+      worlds: pv.worlds ?? null,
+      emulator: pv.emulator ?? null,
+      zomboid: pv.zomboid ?? null,
+      stardew: pv.stardew ?? null,
+      initialFiles: pv.initialFiles ?? null,
       notes: dto.notes ?? null,
       published: false,
     });
@@ -466,9 +576,14 @@ export class PacksService {
     if (!version || version.packId !== packId) {
       throw new NotFoundException('Versión no encontrada');
     }
+    const pack = await this.repo.findById(packId);
     await this.repo.publishVersion(versionId);
     await this.repo.updatePack(packId, { latestVersionId: versionId });
-    await this.repo.audit(AUDIT.VERSION_PUBLISHED, packId, null, { actorId, versionId });
+    await this.repo.audit(AUDIT.VERSION_PUBLISHED, packId, null, {
+      actorId,
+      versionId,
+      gameType: this.resolveGameType(pack?.gameType),
+    });
   }
 
   async listAccess(packId: string) {

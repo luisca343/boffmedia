@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  Headers,
   HttpCode,
   HttpStatus,
   Param,
@@ -82,14 +83,32 @@ export class LauncherController {
     };
   }
 
+  /** The launcher declares which game types it can parse via X-Boff-Game-Types
+   *  (e.g. `minecraft,emulator`). Absent header (every launcher shipped before
+   *  multi-game) → minecraft only: an old launcher can never list, or fetch the
+   *  manifest of, a pack it cannot handle. Unknown values are ignored. */
+  private capabilitiesFrom(header?: string): string[] {
+    if (header === undefined) return ['minecraft'];
+    return header
+      .split(',')
+      .map((s) => s.trim().toLowerCase())
+      .filter(Boolean);
+  }
+
   @Get('packs')
   @Public()
   @UseGuards(LauncherAuthGuard)
   @ApiBearerAuth('JWT')
   @ApiOperation({ summary: 'Los packs a los que este UUID tiene acceso' })
   @ApiResponse({ status: HttpStatus.OK, type: [LauncherPackEntity] })
-  async list(@Req() req: LauncherRequest): Promise<LauncherPackEntity[]> {
-    return this.packs.listForLauncher(req.launcher!.uuid) as Promise<LauncherPackEntity[]>;
+  async list(
+    @Req() req: LauncherRequest,
+    @Headers('x-boff-game-types') gameTypes?: string,
+  ): Promise<LauncherPackEntity[]> {
+    return this.packs.listForLauncher(
+      req.launcher!.uuid,
+      this.capabilitiesFrom(gameTypes),
+    ) as Promise<LauncherPackEntity[]>;
   }
 
   @Get('packs/:id/manifest')
@@ -99,14 +118,20 @@ export class LauncherController {
   @ApiOperation({
     summary: 'El manifiesto a instalar',
     description:
-      'Revalida el acceso: el listado y la descarga son peticiones distintas y el acceso puede revocarse entre ambas.',
+      'Revalida el acceso: el listado y la descarga son peticiones distintas y el acceso puede revocarse entre ambas. Devuelve 409 si el pack usa un juego que este launcher no sabe interpretar (X-Boff-Game-Types).',
   })
   async manifest(
     @Param('id') id: string,
     @Query() query: ManifestQueryDto,
     @Req() req: LauncherRequest,
+    @Headers('x-boff-game-types') gameTypes?: string,
   ): Promise<unknown> {
-    return this.packs.manifestFor(req.launcher!.uuid, id, query.password ?? null);
+    return this.packs.manifestFor(
+      req.launcher!.uuid,
+      id,
+      query.password ?? null,
+      this.capabilitiesFrom(gameTypes),
+    );
   }
 
   // ── Downloads (§6 installs are blocked without these) ────────────────────

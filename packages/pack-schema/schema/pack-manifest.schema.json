@@ -20,6 +20,15 @@
           "type": "string",
           "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
         },
+        "gameType": {
+          "type": "string",
+          "enum": [
+            "minecraft",
+            "emulator",
+            "zomboid",
+            "stardew"
+          ]
+        },
         "name": {
           "type": "string",
           "minLength": 1
@@ -319,6 +328,25 @@
                       "blobSha512"
                     ],
                     "additionalProperties": false
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "kind": {
+                        "type": "string",
+                        "const": "user-provided"
+                      },
+                      "hint": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 512
+                      }
+                    },
+                    "required": [
+                      "kind",
+                      "hint"
+                    ],
+                    "additionalProperties": false
                   }
                 ]
               }
@@ -429,6 +457,25 @@
                       "blobSha512"
                     ],
                     "additionalProperties": false
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "kind": {
+                        "type": "string",
+                        "const": "user-provided"
+                      },
+                      "hint": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 512
+                      }
+                    },
+                    "required": [
+                      "kind",
+                      "hint"
+                    ],
+                    "additionalProperties": false
                   }
                 ]
               },
@@ -450,13 +497,181 @@
             ],
             "additionalProperties": false
           }
+        },
+        "emulator": {},
+        "zomboid": {},
+        "stardew": {},
+        "initialFiles": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string",
+                "minLength": 1
+              },
+              "sha512": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{128}$"
+              },
+              "fileSize": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              "env": {
+                "default": {
+                  "client": "required",
+                  "server": "required"
+                },
+                "type": "object",
+                "properties": {
+                  "client": {
+                    "type": "string",
+                    "enum": [
+                      "required",
+                      "optional",
+                      "unsupported"
+                    ]
+                  },
+                  "server": {
+                    "type": "string",
+                    "enum": [
+                      "required",
+                      "optional",
+                      "unsupported"
+                    ]
+                  }
+                },
+                "required": [
+                  "client",
+                  "server"
+                ],
+                "additionalProperties": false
+              },
+              "source": {
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "kind": {
+                        "type": "string",
+                        "const": "modrinth"
+                      },
+                      "projectId": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "versionId": {
+                        "type": "string",
+                        "minLength": 1
+                      }
+                    },
+                    "required": [
+                      "kind",
+                      "projectId",
+                      "versionId"
+                    ],
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "kind": {
+                        "type": "string",
+                        "const": "curseforge"
+                      },
+                      "projectId": {
+                        "type": "integer",
+                        "exclusiveMinimum": 0,
+                        "maximum": 9007199254740991
+                      },
+                      "fileId": {
+                        "type": "integer",
+                        "exclusiveMinimum": 0,
+                        "maximum": 9007199254740991
+                      }
+                    },
+                    "required": [
+                      "kind",
+                      "projectId",
+                      "fileId"
+                    ],
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "kind": {
+                        "type": "string",
+                        "const": "url"
+                      },
+                      "url": {
+                        "type": "string",
+                        "format": "uri"
+                      }
+                    },
+                    "required": [
+                      "kind",
+                      "url"
+                    ],
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "kind": {
+                        "type": "string",
+                        "const": "override"
+                      },
+                      "blobSha512": {
+                        "type": "string",
+                        "pattern": "^[a-f0-9]{128}$"
+                      }
+                    },
+                    "required": [
+                      "kind",
+                      "blobSha512"
+                    ],
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "kind": {
+                        "type": "string",
+                        "const": "user-provided"
+                      },
+                      "hint": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 512
+                      }
+                    },
+                    "required": [
+                      "kind",
+                      "hint"
+                    ],
+                    "additionalProperties": false
+                  }
+                ]
+              }
+            },
+            "required": [
+              "path",
+              "sha512",
+              "fileSize",
+              "env",
+              "source"
+            ],
+            "additionalProperties": false
+          }
         }
       },
       "required": [
         "id",
         "name",
         "createdAt",
-        "dependencies",
         "files"
       ],
       "additionalProperties": false

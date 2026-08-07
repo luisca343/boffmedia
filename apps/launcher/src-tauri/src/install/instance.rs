@@ -25,6 +25,14 @@ use serde::{Deserialize, Serialize};
 
 use super::resolve::{Fetch, PlannedFile};
 
+/// The game type that an instance targets. Cycle 1 only handles Minecraft;
+/// later cycles add emulator, Zomboid, Stardew, etc.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub enum GameType {
+    Minecraft,
+}
+
 /// Retained-version cap when settings say nothing. Three is "the one that broke
 /// it, the one before, and one more" — enough for a mid-session rollback,
 /// small enough that the history file stays a file and not a database.
@@ -46,6 +54,10 @@ pub enum ManagedSource {
     Curseforge { project_id: i64, file_id: i64 },
     #[serde(rename_all = "camelCase")]
     Override { sha512: String },
+    /// User-provided file (§4.3): the player supplies it locally. The launcher
+    /// never downloads this, only verifies it after the player provides it.
+    #[serde(rename_all = "camelCase")]
+    UserProvided { hint: String },
 }
 
 impl ManagedSource {
@@ -64,6 +76,9 @@ impl ManagedSource {
             },
             Fetch::Proxied(crate::api::PackFile::Override { sha512 }) => ManagedSource::Override {
                 sha512: sha512.clone(),
+            },
+            Fetch::UserProvided { hint } => ManagedSource::UserProvided {
+                hint: hint.clone(),
             },
         }
     }
@@ -86,6 +101,9 @@ impl ManagedSource {
                     sha512: sha512.clone(),
                 })
             }
+            ManagedSource::UserProvided { hint } => Fetch::UserProvided {
+                hint: hint.clone(),
+            },
         }
     }
 }
@@ -170,6 +188,16 @@ pub struct Marker {
     /// of at whatever the server currently calls latest.
     #[serde(default)]
     pub pinned: bool,
+    /// Game type this instance targets. Defaults to Minecraft if absent
+    /// (backwards compatible with old markers that predate this field).
+    #[serde(default = "default_game_type")]
+    pub game_type: GameType,
+}
+
+/// Default game type for backwards compatibility: old markers without this
+/// field implicitly target Minecraft.
+fn default_game_type() -> GameType {
+    GameType::Minecraft
 }
 
 impl Marker {
@@ -570,6 +598,7 @@ mod tests {
             managed: vec![managed("mods/a.jar", "aa")],
             optional_files: vec![],
             pinned: false,
+            game_type: GameType::Minecraft,
         }
     }
 

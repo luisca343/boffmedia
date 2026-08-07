@@ -18,6 +18,7 @@
 pub mod crash;
 pub mod files;
 pub mod game;
+pub mod initial;
 pub mod instance;
 pub mod paths;
 pub mod process;
@@ -30,14 +31,14 @@ pub mod session;
 use std::collections::{HashMap, HashSet};
 use std::sync::{Arc, Mutex as StdMutex};
 
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use tokio::sync::Mutex;
 
 use crate::auth::AuthState;
 use crate::backups;
 use crate::settings;
 
-use instance::{History, Marker, OptionalFile, OptionalState, RetainedVersion};
+use instance::{History, ManagedSource, Marker, OptionalFile, OptionalState, RetainedVersion};
 use paths::{InstancePaths, Layout};
 use process::RunningGame;
 use progress::{Phase, Reporter};
@@ -103,17 +104,67 @@ pub enum InstallStatus {
     Installed {
         version_id: String,
         size_bytes: u64,
+        #[serde(skip_serializing_if = "Vec::is_empty", default)]
+        missing_user_files: Vec<MissingUserFile>,
     },
     #[serde(rename_all = "camelCase")]
     Outdated {
         version_id: String,
         latest_version_id: String,
         size_bytes: u64,
+        #[serde(skip_serializing_if = "Vec::is_empty", default)]
+        missing_user_files: Vec<MissingUserFile>,
     },
     #[serde(rename_all = "camelCase")]
     Broken {
         reason: String,
     },
+}
+
+/// A user-provided file that is required but not yet satisfied.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct MissingUserFile {
+    pub path: String,
+    pub hint: String,
+    pub file_size: u64,
+}
+
+/// The required `user-provided` files this instance still lacks. Read from the
+/// marker (which records every managed file, including the ones we never fetch),
+/// so it works from a plain library scan with no manifest in hand.
+///
+/// Cheap by design — no hashing: the local blob store is content-addressed, so
+/// the mere presence of `<sha512>` there means a reinstall would place the file;
+/// and a file already at the instance path was hash-verified when it was placed.
+/// Optional entries (`env.client == optional`) never block and are skipped.
+fn compute_missing_user_files(
+    layout: &Layout,
+    instance: &InstancePaths,
+    marker: &Marker,
+) -> Vec<MissingUserFile> {
+    let mut missing = Vec::new();
+    for file in &marker.managed {
+        if file.optional {
+            continue;
+        }
+        let ManagedSource::UserProvided { hint } = &file.source else {
+            continue;
+        };
+        let sha512 = file.sha512.to_lowercase();
+        let in_blob = files::local_blob_path(layout, &sha512).is_file();
+        let on_disk = std::fs::metadata(instance.minecraft.join(file.path.replace('\\', "/")))
+            .map(|m| m.is_file() && (file.size == 0 || m.len() == file.size))
+            .unwrap_or(false);
+        if !in_blob && !on_disk {
+            missing.push(MissingUserFile {
+                path: file.path.clone(),
+                hint: hint.clone(),
+                file_size: file.size,
+            });
+        }
+    }
+    missing
 }
 
 // The marker (`instance::Marker`) answers "installed, and of what version?"
@@ -183,7 +234,10 @@ async fn prepare(
         .map_err(|e| InstallFailure::message(format!("Manifiesto ilegible: {e}")))?;
     let parsed = crate::pack::parse_manifest(&raw)
         .map_err(|e| InstallFailure::message(format!("El manifiesto del pack no es válido: {e}")))?;
-    let plan = resolve::plan(&parsed)?;
+    let planned_game = resolve::plan(&parsed)?;
+    let plan = match planned_game {
+        resolve::PlannedGame::Minecraft(mc_plan) => mc_plan,
+    };
 
     let mc = auth.session().await.ok_or_else(|| {
         InstallFailure::needs_signin(
@@ -546,6 +600,11 @@ async fn install_payload(
     )
     .await;
 
+    // First-install-only seeds (a starting `.sav`, a default options file).
+    // Same "written once, then owned by the player" contract as worlds, and
+    // likewise best-effort — a failed seed never blocks the install.
+    initial::seed_initial_files(app, prepared, http, password, reporter, manifest).await;
+
     reporter.emit(Phase::Verifying, 0.5, "", 0, 0);
 
     // §9 "locked vs. user space". The previous marker is the ONLY authority on
@@ -624,6 +683,8 @@ fn build_marker(prepared: &game::Prepared, installed: &[PlannedFile]) -> Marker 
         // A forward install always clears the pin: the player asked for this
         // version explicitly.
         pinned: false,
+        // Cycle 1 only handles Minecraft; later cycles will add other game types.
+        game_type: instance::GameType::Minecraft,
     }
 }
 
@@ -788,10 +849,19 @@ pub async fn install_pack(
 
     install_payload(&app, &prepared, &http, password.as_deref(), &reporter, &parsed_manifest).await?;
 
+    // The marker install_payload just wrote is the authority on what this pack
+    // owns; any required user-provided file it still lacks is reported so the
+    // pack shows as installed-but-not-launchable and the required-files panel
+    // can prompt for it.
+    let missing_user_files = read_marker(&prepared.instance)
+        .map(|m| compute_missing_user_files(&prepared.layout, &prepared.instance, &m))
+        .unwrap_or_default();
+
     reporter.done();
     Ok(InstallStatus::Installed {
         version_id: prepared.plan.version_id.clone(),
         size_bytes: paths::dir_size(&prepared.instance.root),
+        missing_user_files,
     })
 }
 
@@ -857,6 +927,23 @@ pub async fn launch_pack(
     }
     reporter.done();
 
+    // Defence in depth: the UI disables Play while required player-supplied files
+    // are missing, but the backend must never launch a pack that lacks them.
+    let missing = read_marker(&prepared.instance)
+        .map(|m| compute_missing_user_files(&prepared.layout, &prepared.instance, &m))
+        .unwrap_or_default();
+    if !missing.is_empty() {
+        process::emit_idle(&app);
+        let names = missing
+            .iter()
+            .map(|f| f.path.as_str())
+            .collect::<Vec<_>>()
+            .join(", ");
+        return Err(InstallFailure::message(format!(
+            "Faltan archivos que debes proporcionar tú antes de jugar: {names}."
+        )));
+    }
+
     let running = process::spawn(&app, &game, prepared.plan.quick_play.as_deref(), pack_id.clone())?;
     let pid = running.pid;
     settings::record_play(&app, &pack_id);
@@ -912,15 +999,18 @@ pub async fn instance_scan(
     // like a real guard.
 
     let size_bytes = paths::dir_size(&instance.root);
+    let missing_user_files = compute_missing_user_files(&layout, &instance, &marker);
     Ok(match latest_version_id {
         Some(latest) if latest != marker.version_id => InstallStatus::Outdated {
             version_id: marker.version_id,
             latest_version_id: latest,
             size_bytes,
+            missing_user_files,
         },
         _ => InstallStatus::Installed {
             version_id: marker.version_id,
             size_bytes,
+            missing_user_files,
         },
     })
 }
@@ -1133,6 +1223,7 @@ pub async fn instance_revert(
     Ok(InstallStatus::Installed {
         version_id: marker.version_id,
         size_bytes: paths::dir_size(&instance.root),
+        missing_user_files: vec![],
     })
 }
 
@@ -1154,6 +1245,7 @@ pub async fn instance_unpin(
     Ok(InstallStatus::Installed {
         version_id: marker.version_id,
         size_bytes: paths::dir_size(&instance.root),
+        missing_user_files: vec![],
     })
 }
 
@@ -1344,6 +1436,157 @@ pub async fn instance_runtime_set(
     Ok(instance_runtime_view(&settings, &instance))
 }
 
+// ── User-provided files (§4.3) ───────────────────────────────────────────────
+
+/// Response types for instance_provide_file.
+#[derive(Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ProvideFileOk {
+    pub satisfied: bool,
+}
+
+#[derive(Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ProvideFileError {
+    pub code: String,
+    pub expected_hint: Option<String>,
+    pub message: String,
+}
+
+/// Accept a user-provided file for an instance. The file must match the
+/// expected sha512+fileSize for its entry in the pack. On match, it is
+/// imported to the local blob store and placed at the instance path.
+/// slug is the pack's slug (instance name).
+#[tauri::command]
+pub async fn instance_provide_file(
+    pack_id: String,
+    slug: String,
+    path: String,
+    source_file: String,
+    app: tauri::AppHandle,
+    api: tauri::State<'_, crate::api::ApiState>,
+    auth: tauri::State<'_, AuthState>,
+) -> Result<ProvideFileOk, ProvideFileError> {
+    let source_path = std::path::PathBuf::from(&source_file);
+    if !source_path.is_file() {
+        return Err(ProvideFileError {
+            code: "not_found".to_string(),
+            expected_hint: None,
+            message: "El archivo no existe.".to_string(),
+        });
+    }
+
+    // Hash the source file
+    let actual_hash = files::sha512_of(&source_path)
+        .ok_or_else(|| ProvideFileError {
+            code: "io".to_string(),
+            expected_hint: None,
+            message: "No se pudo leer el archivo.".to_string(),
+        })?;
+
+    let actual_file_size = std::fs::metadata(&source_path)
+        .map_err(|e| ProvideFileError {
+            code: "io".to_string(),
+            expected_hint: None,
+            message: format!("No se pudo obtener el tamaño del archivo: {e}"),
+        })?
+        .len();
+
+    // Get current manifest from API to find the entry
+    let manifest_json = crate::api::pack_manifest(pack_id.clone(), None, api.clone(), auth.clone())
+        .await
+        .map_err(|_| ProvideFileError {
+            code: "not_found".to_string(),
+            expected_hint: None,
+            message: "No se pudo obtener el manifiesto del pack.".to_string(),
+        })?;
+
+    let manifest = crate::pack::parse_manifest(&serde_json::to_string(&manifest_json).unwrap())
+        .map_err(|_| ProvideFileError {
+            code: "not_found".to_string(),
+            expected_hint: None,
+            message: "El manifiesto no es válido.".to_string(),
+        })?;
+
+    // Find the entry in files or initialFiles
+    let mut expected_hint = String::new();
+    let mut expected_sha512 = String::new();
+    let mut file_size = 0u64;
+
+    let _entry_found = manifest.version.files
+        .iter()
+        .find(|f| f.path.as_str() == path.as_str())
+        .map(|f| {
+            expected_sha512 = f.sha512.to_string().to_lowercase();
+            file_size = f.file_size as u64;
+            if let crate::pack::PackManifestVersionFilesItemSource::UserProvided { hint } = &f.source {
+                expected_hint = hint.to_string();
+            }
+            true
+        })
+        .or_else(|| {
+            manifest.version.initial_files
+                .iter()
+                .find(|f| f.path.as_str() == path.as_str())
+                .map(|f| {
+                    expected_sha512 = f.sha512.to_string().to_lowercase();
+                    file_size = f.file_size as u64;
+                    if let crate::pack::PackManifestVersionInitialFilesItemSource::UserProvided { hint } = &f.source {
+                        expected_hint = hint.to_string();
+                    }
+                    true
+                })
+        })
+        .ok_or_else(|| ProvideFileError {
+            code: "not_found".to_string(),
+            expected_hint: None,
+            message: format!("El archivo «{}» no está en el pack.", path),
+        })?;
+
+    if actual_hash != expected_sha512 || actual_file_size != file_size {
+        return Err(ProvideFileError {
+            code: "wrong_hash".to_string(),
+            expected_hint: Some(expected_hint),
+            message: format!(
+                "El archivo no coincide. Se esperaba: {} ({} bytes), pero se obtuvo: {} ({} bytes)",
+                expected_sha512, file_size, actual_hash, actual_file_size
+            ),
+        });
+    }
+
+    // Import to local blob store and place at instance
+    let settings = settings::load(&app);
+    let layout = Layout::new(&app, settings.game_dir())
+        .map_err(|e| ProvideFileError {
+            code: "io".to_string(),
+            expected_hint: None,
+            message: format!("Error al acceder a la configuración: {}", e.message),
+        })?;
+
+    let blob_path = files::local_blob_path(&layout, &actual_hash.to_lowercase());
+    if let Some(parent) = blob_path.parent() {
+        let _ = std::fs::create_dir_all(parent);
+    }
+    std::fs::copy(&source_path, &blob_path).map_err(|e| ProvideFileError {
+        code: "io".to_string(),
+        expected_hint: None,
+        message: format!("No se pudo copiar al almacén: {e}"),
+    })?;
+
+    let instance = layout.instance(&slug);
+    let dest = instance.minecraft.join(path.replace('\\', "/"));
+    if let Some(parent) = dest.parent() {
+        let _ = std::fs::create_dir_all(parent);
+    }
+    std::fs::copy(&blob_path, &dest).map_err(|e| ProvideFileError {
+        code: "io".to_string(),
+        expected_hint: None,
+        message: format!("No se pudo guardar el archivo: {e}"),
+    })?;
+
+    Ok(ProvideFileOk { satisfied: true })
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -1358,6 +1601,7 @@ mod tests {
             version_id: "v1".into(),
             latest_version_id: "v2".into(),
             size_bytes: 10,
+            missing_user_files: vec![],
         })
         .unwrap();
         assert!(raw.contains(r#""kind":"outdated""#));

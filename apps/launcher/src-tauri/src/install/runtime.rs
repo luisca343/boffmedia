@@ -334,7 +334,7 @@ pub fn total_ram_mib_or_assumed() -> u64 {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::install::instance::{ManagedFile, ManagedSource};
+    use crate::install::instance::{GameType, ManagedFile, ManagedSource};
 
     fn settings(memory_mib: u32, java: Option<&str>, auto: bool) -> Settings {
         Settings {
@@ -599,6 +599,7 @@ mod tests {
             ],
             optional_files: vec![],
             pinned: false,
+            game_type: GameType::Minecraft,
         };
         assert_eq!(mod_count_of(&marker), 2, "configs are not mods");
 

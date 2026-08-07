@@ -44,6 +44,8 @@ import type {
   LogLine,
   MemoryChoice,
   OptionalFile,
+  ProvideFileError,
+  ProvideFileResult,
   ResolvedRuntime,
   RetainedVersion,
   RuntimeSource,
@@ -300,6 +302,8 @@ export type LauncherPack = {
   iconUrl: string | null
   gallery?: LauncherGalleryImage[]
   accessKind: "public" | "password" | "allowlist"
+  /** The game type this pack targets. Always present — the API resolves it. */
+  gameType?: "minecraft" | "emulator" | "zomboid" | "stardew"
   /** The Quick Play target — set only for server packs (from the registry).
    *  `port` is absent for a bare SRV host; `host` can be absent on a legacy
    *  `{}` row, which still counts as a server pack (shown "unavailable"). */
@@ -1098,6 +1102,32 @@ export async function instanceDelete(slug: string): Promise<void> {
     await invoke("instance_delete", { slug })
   } catch (err) {
     throw asFailure(err)
+  }
+}
+
+/** Provide a user-required file (e.g., a ROM) to a pack instance. */
+export async function provideFile(
+  packId: string,
+  path: string,
+  sourceFile: string,
+): Promise<ProvideFileResult> {
+  if (!isDesktop()) {
+    // Browser mode: mock behavior for testing. If sourceFile contains "wrong",
+    // simulate a hash mismatch error.
+    if (sourceFile.toLowerCase().includes("wrong")) {
+      const err: ProvideFileError = {
+        code: "wrong_hash",
+        expectedHint: "Test file hint",
+        message: "Hash mismatch",
+      }
+      throw err
+    }
+    return { satisfied: true }
+  }
+  try {
+    return await invoke<ProvideFileResult>("instance_provide_file", { packId, path, sourceFile })
+  } catch (err) {
+    throw err as ProvideFileError
   }
 }
 

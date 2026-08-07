@@ -450,6 +450,22 @@
       "identitySection": "Identidad del pack",
       "identitySectionLead": "Elige el nombre que reconocerán los jugadores y el identificador permanente del launcher.",
       "summaryPlaceholder": "Una descripción breve para el launcher y otros administradores…",
+      "gameTypeSection": "Tipo de juego",
+      "gameTypeSectionLead": "Elige el juego para el que es este pack. El tipo es permanente y no se puede cambiar después de crear el pack.",
+      "gameType": {
+        "minecraft": "Minecraft",
+        "emulator": "Emulador",
+        "zomboid": "Project Zomboid",
+        "stardew": "Stardew Valley"
+      },
+      "gameTypeLead": {
+        "minecraft": "Mods, loaders y servidores multijugador.",
+        "emulator": "Juegos basados en ROM con emuladores configurables.",
+        "zomboid": "Supervivencia y construcción de bases con mods.",
+        "stardew": "Juego de granja con packs comunitarios y mods de contenido."
+      },
+      "gameTypePermanent": "El tipo de juego es permanente y no se puede cambiar después de crear el pack.",
+      "comingSoon": "próximamente",
       "accessSection": "Acceso a la instalación",
       "accessSectionLead": "Decide quién puede instalar este pack. Después podrás gestionar invitaciones y accesos.",
       "accessLead": {
@@ -660,6 +676,8 @@
       "importDone": "{count} archivos importados",
       "editVersion": "Editar versión",
       "cloneVersion": "Clonar versión",
+      "editorNotYetAvailable": "Editor de versión no disponible todavía",
+      "editorComingSoon": "El editor de versiones para packs de {gameType} estará disponible en una próxima versión.",
       "versionUpdated": "Versión actualizada",
       "versionDeleted": "Versión borrada",
       "cloneFailed": "No se ha podido cargar la versión de origen",

@@ -265,6 +265,16 @@ async fn fetch_one(
         return place(&local, &dest);
     }
 
+    // 2c. A user-provided file the checks above did not satisfy is NOT an install
+    //     failure: the server never hosts its bytes (a ROM, a BIOS), so there is
+    //     nothing to fetch. The player supplies it later via `instance_provide_file`
+    //     and the install result reports it through `missingUserFiles`. Skipping
+    //     here — rather than erroring in `resolve_url` — is what lets the rest of
+    //     the pack install and stay merely "not launchable yet".
+    if matches!(file.fetch, Fetch::UserProvided { .. }) {
+        return Ok(());
+    }
+
     // 3. Actually fetch it, retrying the network leg a few times. The cache
     //    checks above are deterministic and are never part of the retry; only
     //    the parts that touch the network are.
@@ -353,6 +363,12 @@ pub(crate) async fn resolve_url(http: &reqwest::Client, file: &PlannedFile) -> R
         Fetch::Proxied(_) => Err(InstallFailure::message(format!(
             "«{}» solo puede descargarse a través del servidor de Boffmedia.",
             file.path
+        ))),
+        // User-provided files are never downloaded; they are provided by the
+        // player and this error should never occur.
+        Fetch::UserProvided { hint } => Err(InstallFailure::message(format!(
+            "«{}» debe ser proporcionado por el jugador ({}); el launcher no puede descargarlo.",
+            file.path, hint
         ))),
         Fetch::ModrinthVersion { version_id } => {
             let res = http

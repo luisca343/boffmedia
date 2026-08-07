@@ -6,6 +6,16 @@ import { EnvSupport, FileEnv, InstancePath, MrpackDependencies, loaderOf } from 
 // third-party tool (Prism, packwiz) ignores them and the pack still installs.
 // HANDOFF §7.1: per file — source, SHA-512, target path, env.
 
+/** Which game a pack targets. Absent on a pack means `minecraft` (back-compat:
+ *  every pack authored before multi-game had no `gameType`). All four values
+ *  are declared in Cycle 1 even though only `minecraft` is playable — the
+ *  discriminator, filtering, and validation skeleton land once; each game cycle
+ *  lights up its own spec block (§PackVersion) and its own launcher arm.
+ *  `gameType` is immutable after pack creation (enforced in the API): a pack
+ *  that changed games would break every installed instance. */
+export const GameType = z.enum(["minecraft", "emulator", "zomboid", "stardew"])
+export type GameType = z.infer<typeof GameType>
+
 /** Where a file comes from. §7.1 lists exactly three sources; §4.5 explains why
  *  CurseForge is proxied rather than fetched directly (an embedded CF key gets
  *  extracted, and an abused key is a revoked key). Modrinth is primary and goes
@@ -30,6 +40,15 @@ export const FileSource = z.discriminatedUnion("kind", [
   z.object({
     kind: z.literal("override"),
     blobSha512: z.string().regex(/^[a-f0-9]{128}$/, "blobSha512 must be 128 lowercase hex chars"),
+  }),
+  /** A file the server NEVER stores: the player supplies it locally and the
+   *  launcher verifies it against the entry's mandatory `sha512` + `fileSize`
+   *  before placing it. Game-agnostic by design (ROMs, BIOS files, anything
+   *  undistributable). `hint` is what the player sees when asked for the file —
+   *  authors must write it precisely (region/revision matter). */
+  z.object({
+    kind: z.literal("user-provided"),
+    hint: z.string().min(1).max(512),
   }),
 ])
 export type FileSource = z.infer<typeof FileSource>
@@ -88,12 +107,36 @@ export const PackVersion = z.object({
   /** What users see: "1.4.2", "Season 3", whatever the owner types. */
   name: z.string().min(1),
   createdAt: z.iso.datetime(),
-  dependencies: MrpackDependencies,
+  /** Minecraft loader/version set. OPTIONAL as of multi-game: required iff the
+   *  pack is `minecraft` (enforced in PackManifest.superRefine), forbidden
+   *  otherwise. */
+  dependencies: MrpackDependencies.optional(),
   files: z.array(PackFile),
-  /** Worlds shipped with this version, installed first-time-only. */
+  /** Worlds shipped with this version, installed first-time-only. Minecraft-only
+   *  (forbidden on any other gameType — superRefine). */
   worlds: z.array(BundledWorld).optional(),
+  /** Per-game spec blocks — exactly one is present, matching the pack's
+   *  gameType (superRefine). Content schemas land per game cycle; Cycle 1
+   *  defines only the slots and the exclusivity rule, so they are typed loosely
+   *  here and tightened when their cycle ships (emulator → Cycle 2, etc.). */
+  emulator: z.unknown().optional(),
+  zomboid: z.unknown().optional(),
+  stardew: z.unknown().optional(),
+  /** First-install-only files (a starting `.sav`, a default options file):
+   *  written only if the target path does not already exist, then owned by the
+   *  player — never re-verified or overwritten on update/repair. Same shape as
+   *  `files[]`, but `user-provided` sources are forbidden (we would prompt for a
+   *  file only to never check it again) and paths must not collide with
+   *  `files[]` (superRefine). Generalizes the bundled-worlds idea without
+   *  touching the `worlds` mechanism. */
+  initialFiles: z.array(PackFile).optional(),
 })
 export type PackVersion = z.infer<typeof PackVersion>
+
+/** The resolved game type of a pack: the stored value, or `minecraft` when
+ *  absent (a pack authored before multi-game). One place owns the default so no
+ *  consumer re-implements it. */
+export const gameTypeOf = (pack: Pack): GameType => pack.gameType ?? "minecraft"
 
 /** Quick Play target for this pack (RF-01/RF-03). `port` is OPTIONAL: a bare
  *  host (e.g. `play.example.com` behind a Minecraft SRV record) declares no
@@ -126,6 +169,9 @@ export const Pack = z.object({
   slug: z
     .string()
     .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "slug must be lowercase kebab-case"),
+  /** Which game this pack targets. Absent = `minecraft` (back-compat). Use
+   *  `gameTypeOf(pack)` to read it with the default applied. */
+  gameType: GameType.optional(),
   name: z.string().min(1),
   summary: z.string().max(512).optional(),
   /** Long-form plain-text description shown on the pack's info panel. */
@@ -147,28 +193,33 @@ export const PackManifest = z
     version: PackVersion,
   })
   .superRefine((m, ctx) => {
-    // Vanilla packs (no loader at all) are legal, so dependencies get no
-    // further check here beyond MrpackDependencies' own.
+    const v = m.version
+    const gameType = gameTypeOf(m.pack)
+
+    // A normalized, case-insensitive view of a target path: Windows and macOS
+    // would silently overwrite one file with the other while Linux installs
+    // both, so collisions are judged case-insensitively with separators unified.
+    const norm = (p: string) => p.toLowerCase().replace(/\\/g, "/")
+
+    // ---- duplicate target paths within files[] ----
     const seen = new Set<string>()
-    for (const [i, file] of m.version.files.entries()) {
-      const key = file.path.toLowerCase().replace(/\\/g, "/")
+    for (const [i, file] of v.files.entries()) {
+      const key = norm(file.path)
       if (seen.has(key)) {
         ctx.addIssue({
           code: "custom",
           path: ["version", "files", i, "path"],
-          // Case-insensitively, because Windows and macOS would silently
-          // overwrite one file with the other while Linux installs both.
           message: `duplicate target path: ${file.path}`,
         })
       }
       seen.add(key)
     }
 
+    // ---- duplicate bundled-world folders ----
     // Two bundled worlds targeting the same save folder would race to write the
-    // same directory — reject case-insensitively for the same per-platform
-    // reason the file check does.
+    // same directory — reject case-insensitively for the same per-platform reason.
     const worldFolders = new Set<string>()
-    for (const [i, world] of (m.version.worlds ?? []).entries()) {
+    for (const [i, world] of (v.worlds ?? []).entries()) {
       const key = world.folder.toLowerCase()
       if (worldFolders.has(key)) {
         ctx.addIssue({
@@ -178,6 +229,91 @@ export const PackManifest = z
         })
       }
       worldFolders.add(key)
+    }
+
+    // ---- game-type exclusivity rule engine ----
+    // Exactly one shape per gameType. Minecraft is the only arm that ships live
+    // in Cycle 1 (its spec blocks are the loosely-typed slots above); each game
+    // cycle tightens its own block and reuses this exclusivity check unchanged.
+    const specSlots = { emulator: v.emulator, zomboid: v.zomboid, stardew: v.stardew } as const
+    const forbidSpec = (kind: keyof typeof specSlots) => {
+      if (specSlots[kind] !== undefined) {
+        ctx.addIssue({
+          code: "custom",
+          path: ["version", kind],
+          message: `\`${kind}\` is only allowed when gameType is "${kind}"`,
+        })
+      }
+    }
+
+    if (gameType === "minecraft") {
+      if (v.dependencies === undefined) {
+        ctx.addIssue({
+          code: "custom",
+          path: ["version", "dependencies"],
+          message: "minecraft packs require a `dependencies` block",
+        })
+      }
+      forbidSpec("emulator")
+      forbidSpec("zomboid")
+      forbidSpec("stardew")
+    } else {
+      // Non-Minecraft: exactly its own spec block, and nothing Minecraft-shaped.
+      if (v.dependencies !== undefined) {
+        ctx.addIssue({
+          code: "custom",
+          path: ["version", "dependencies"],
+          message: `\`dependencies\` is minecraft-only (gameType is "${gameType}")`,
+        })
+      }
+      if (v.worlds !== undefined) {
+        ctx.addIssue({
+          code: "custom",
+          path: ["version", "worlds"],
+          message: `\`worlds\` is minecraft-only (gameType is "${gameType}")`,
+        })
+      }
+      if (specSlots[gameType] === undefined) {
+        ctx.addIssue({
+          code: "custom",
+          path: ["version", gameType],
+          message: `gameType "${gameType}" requires its \`${gameType}\` spec block`,
+        })
+      }
+      for (const kind of ["emulator", "zomboid", "stardew"] as const) {
+        if (kind !== gameType) forbidSpec(kind)
+      }
+    }
+
+    // ---- initialFiles rules ----
+    // First-install-only files: distributable sources only (a `user-provided`
+    // file would be prompted for then never checked again — nonsensical), and no
+    // path collision with files[] (the two mechanisms would fight over the path).
+    const initialSeen = new Set<string>()
+    for (const [i, file] of (v.initialFiles ?? []).entries()) {
+      if (file.source.kind !== "override" && file.source.kind !== "url") {
+        ctx.addIssue({
+          code: "custom",
+          path: ["version", "initialFiles", i, "source"],
+          message: `initialFiles source must be "override" or "url" (got "${file.source.kind}")`,
+        })
+      }
+      const key = norm(file.path)
+      if (seen.has(key)) {
+        ctx.addIssue({
+          code: "custom",
+          path: ["version", "initialFiles", i, "path"],
+          message: `initialFiles path collides with a files[] entry: ${file.path}`,
+        })
+      }
+      if (initialSeen.has(key)) {
+        ctx.addIssue({
+          code: "custom",
+          path: ["version", "initialFiles", i, "path"],
+          message: `duplicate initialFiles path: ${file.path}`,
+        })
+      }
+      initialSeen.add(key)
     }
   })
 export type PackManifest = z.infer<typeof PackManifest>

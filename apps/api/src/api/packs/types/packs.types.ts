@@ -4,9 +4,9 @@
 // TypeScript types. The zod schema itself IS imported, as compiled CJS, because
 // validation has to be the same code the dashboard runs.
 
-import type { PackAccessKind, PackLoader } from '@/_db/schema/Packs';
+import type { GameType, PackAccessKind, PackLoader } from '@/_db/schema/Packs';
 
-export type { PackAccessKind, PackLoader };
+export type { GameType, PackAccessKind, PackLoader };
 
 /** What a launcher is told about a pack it can see. Never includes the password
  *  hash, the ACL, or unpublished versions. */
@@ -14,6 +14,9 @@ export interface LauncherPackView {
   id: string;
   slug: string;
   name: string;
+  /** Resolved, never null — the API translates a NULL column to 'minecraft' so
+   *  clients never re-implement the default. */
+  gameType: GameType;
   summary: string | null;
   iconUrl: string | null;
   description?: string;
@@ -24,7 +27,8 @@ export interface LauncherPackView {
   latestVersion: {
     id: string;
     name: string;
-    minecraft: string;
+    /** Null for non-minecraft packs. */
+    minecraft: string | null;
     loader: PackLoader | null;
     loaderVersion: string | null;
     fileCount: number;
@@ -58,7 +62,8 @@ export interface PackVersionView {
   id: string;
   packId: string;
   name: string;
-  minecraft: string;
+  /** Null for non-minecraft packs. */
+  minecraft: string | null;
   loader: PackLoader | null;
   loaderVersion: string | null;
   fileCount: number;
@@ -82,7 +87,8 @@ export interface StoredPackFile {
     | { kind: 'modrinth'; projectId: string; versionId: string }
     | { kind: 'curseforge'; projectId: number; fileId: number }
     | { kind: 'url'; url: string }
-    | { kind: 'override'; blobSha512: string };
+    | { kind: 'override'; blobSha512: string }
+    | { kind: 'user-provided'; hint: string };
 }
 
 export interface StoredPackGalleryImage {
@@ -96,7 +102,8 @@ export interface StoredBundledWorld {
     | { kind: 'modrinth'; projectId: string; versionId: string }
     | { kind: 'curseforge'; projectId: number; fileId: number }
     | { kind: 'url'; url: string }
-    | { kind: 'override'; blobSha512: string };
+    | { kind: 'override'; blobSha512: string }
+    | { kind: 'user-provided'; hint: string };
   sizeBytes: number;
   sha512: string;
 }

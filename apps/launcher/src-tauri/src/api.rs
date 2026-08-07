@@ -347,6 +347,7 @@ pub async fn packs_list(
 ) -> Result<Vec<LauncherPack>, ApiError> {
     let res = authed(&api, &auth, |http, base| {
         http.get(format!("{base}/packs/launcher/packs"))
+            .header("X-Boff-Game-Types", "minecraft")
     })
     .await?;
 
@@ -376,6 +377,7 @@ pub async fn pack_manifest(
 
     let res = authed(&api, &auth, |http, base| {
         http.get(format!("{base}/packs/launcher/packs/{pack_id}/manifest"))
+            .header("X-Boff-Game-Types", "minecraft")
             .query(&query)
     })
     .await?;
@@ -385,6 +387,10 @@ pub async fn pack_manifest(
         let message = error_message(res, "No se pudo obtener el manifiesto.").await;
         return Err(if status == reqwest::StatusCode::FORBIDDEN {
             ApiError::Denied(message)
+        } else if status == reqwest::StatusCode::CONFLICT {
+            ApiError::Message(format!(
+                "Este pack necesita una versión más reciente del launcher. Por favor, actualiza el launcher desde el sitio oficial."
+            ))
         } else {
             ApiError::Message(message)
         });

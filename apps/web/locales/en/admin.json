@@ -450,6 +450,22 @@
       "identitySection": "Pack identity",
       "identitySectionLead": "Choose the name players will recognise and the permanent launcher identifier.",
       "summaryPlaceholder": "A short description for the launcher and other admins…",
+      "gameTypeSection": "Game type",
+      "gameTypeSectionLead": "Choose the game this pack is for. The type is permanent and cannot be changed after creation.",
+      "gameType": {
+        "minecraft": "Minecraft",
+        "emulator": "Emulator",
+        "zomboid": "Project Zomboid",
+        "stardew": "Stardew Valley"
+      },
+      "gameTypeLead": {
+        "minecraft": "Mods, loaders, and multiplayer servers.",
+        "emulator": "ROM-based games with configurable emulators.",
+        "zomboid": "Survival and base-building with mods.",
+        "stardew": "Farming game with community packs and content mods."
+      },
+      "gameTypePermanent": "The game type is permanent and cannot be changed after creating the pack.",
+      "comingSoon": "próximamente",
       "accessSection": "Installation access",
       "accessSectionLead": "Decide who can install this pack. You can manage invitations and grants after creation.",
       "accessLead": {
@@ -660,6 +676,8 @@
       "importDone": "{count} files imported",
       "editVersion": "Edit version",
       "cloneVersion": "Clone version",
+      "editorNotYetAvailable": "Version editor not yet available",
+      "editorComingSoon": "The version editor for {gameType} packs will be available in an upcoming release.",
       "versionUpdated": "Version updated",
       "versionDeleted": "Version deleted",
       "cloneFailed": "Could not load the source version",

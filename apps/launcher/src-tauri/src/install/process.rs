@@ -10,6 +10,7 @@
 // per stream, always, even when the log panel is closed.
 
 use std::io::{BufRead, BufReader};
+use std::path::PathBuf;
 use std::process::{Child, Command, Stdio};
 use std::sync::{Arc, Mutex};
 
@@ -19,6 +20,20 @@ use tauri::Emitter;
 use super::crash::{diagnose, Diagnosis, LogTail};
 use super::progress::{log, EVENT_GAME_STATE};
 use super::InstallFailure;
+
+/// A game ready to be launched. Cycle 1 only handles Minecraft; Cycle 2+
+/// will add emulator and other game types.
+#[derive(Debug, Clone)]
+pub enum Launchable {
+    /// Minecraft via portablemc.
+    Minecraft(portablemc::base::Game),
+    /// External executable (Cycle 2+): scaffolding for non-Minecraft games.
+    External {
+        exe: PathBuf,
+        args: Vec<String>,
+        cwd: PathBuf,
+    },
+}
 
 #[derive(Clone, Serialize)]
 #[serde(tag = "kind", rename_all = "camelCase")]
