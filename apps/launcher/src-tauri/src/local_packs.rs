@@ -665,7 +665,9 @@ async fn export_mrpack_impl(
         version_id: manifest.version.id.to_string(),
         name: manifest.pack.name.to_string(),
         files: mrpack_files,
-        dependencies: manifest.version.dependencies.clone(),
+        dependencies: manifest.version.dependencies.clone().ok_or_else(|| {
+            InstallFailure::message("El pack debe incluir dependencias de Minecraft.".to_string())
+        })?,
         boffmedia_manifest: &manifest,
     };
     let index_json = serde_json::to_vec_pretty(&index)
@@ -693,7 +695,11 @@ async fn export_mrpack_impl(
 /// loader key added to the schema without a matching `LoaderKind` variant
 /// fails the import instead of installing silently as vanilla.
 fn reject_ambiguous_or_unsupported_loader(manifest: &PackManifest) -> Result<(), InstallFailure> {
-    let deps = &manifest.version.dependencies;
+    let Some(deps) = &manifest.version.dependencies else {
+        // Non-Minecraft packs have no dependencies, so nothing to check
+        return Ok(());
+    };
+
     let declared_loaders = [
         deps.forge.is_some(),
         deps.neoforge.is_some(),
@@ -1598,7 +1604,7 @@ mod tests {
             version_id: manifest.version.id.to_string(),
             name: manifest.pack.name.to_string(),
             files,
-            dependencies: manifest.version.dependencies.clone(),
+            dependencies: manifest.version.dependencies.as_ref().expect("test manifest must have dependencies").clone(),
             boffmedia_manifest: &manifest,
         };
         let value = serde_json::to_value(&index).unwrap();

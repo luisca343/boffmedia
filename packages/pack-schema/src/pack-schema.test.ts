@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest"
 import type { z } from "zod"
 
-import { PackManifest, loaderOf } from "./index.js"
+import { PackManifest, gameTypeOf, loaderOf } from "./index.js"
 
 const sha512 = "a".repeat(128)
 
@@ -99,7 +99,130 @@ describe("PackManifest", () => {
   it("accepts a vanilla pack with no loader", () => {
     const m = manifest()
     m.version.dependencies = { minecraft: "1.21.4" }
-    expect(loaderOf(PackManifest.parse(m).version.dependencies)).toBeNull()
+    const deps = PackManifest.parse(m).version.dependencies
+    expect(deps).toBeDefined()
+    expect(loaderOf(deps!)).toBeNull()
+  })
+})
+
+describe("gameType", () => {
+  it("defaults to minecraft when absent and parses byte-identically to a legacy manifest", () => {
+    const parsed = PackManifest.parse(manifest())
+    // A pre-multi-game manifest carries no gameType; the field stays absent and
+    // nothing else in the shape changes.
+    expect(parsed.pack.gameType).toBeUndefined()
+    expect(gameTypeOf(parsed.pack)).toBe("minecraft")
+  })
+
+  it("requires dependencies for a minecraft pack", () => {
+    const m = manifest()
+    delete m.version.dependencies
+    expect(() => PackManifest.parse(m)).toThrow(/require a `dependencies` block/)
+  })
+
+  it("forbids a minecraft pack from carrying a non-mc spec block", () => {
+    const m = manifest()
+    m.version.emulator = { kind: "mgba" }
+    expect(() => PackManifest.parse(m)).toThrow(/only allowed when gameType is/)
+  })
+
+  it("accepts a non-mc pack: its own spec block, no dependencies, no worlds", () => {
+    const m = manifest()
+    m.pack.gameType = "emulator"
+    delete m.version.dependencies
+    m.version.emulator = { kind: "mgba", rom: "roms/x.gba" }
+    m.version.files[0] = {
+      path: "roms/x.gba",
+      sha512,
+      fileSize: 100,
+      source: { kind: "user-provided", hint: "Pokémon Esmeralda (EUR) — tu propio volcado .gba" },
+    }
+    const parsed = PackManifest.parse(m)
+    expect(gameTypeOf(parsed.pack)).toBe("emulator")
+    expect(parsed.version.dependencies).toBeUndefined()
+  })
+
+  it("rejects a non-mc pack that declares dependencies", () => {
+    const m = manifest()
+    m.pack.gameType = "emulator"
+    m.version.emulator = { kind: "mgba" }
+    expect(() => PackManifest.parse(m)).toThrow(/`dependencies` is minecraft-only/)
+  })
+
+  it("rejects a non-mc pack that declares worlds", () => {
+    const m = manifest()
+    m.pack.gameType = "emulator"
+    delete m.version.dependencies
+    m.version.emulator = { kind: "mgba" }
+    m.version.worlds = [
+      { folder: "world", sha512, sizeBytes: 10, source: { kind: "override", blobSha512: "b".repeat(128) } },
+    ]
+    expect(() => PackManifest.parse(m)).toThrow(/`worlds` is minecraft-only/)
+  })
+
+  it("rejects a non-mc pack missing its own spec block", () => {
+    const m = manifest()
+    m.pack.gameType = "emulator"
+    delete m.version.dependencies
+    expect(() => PackManifest.parse(m)).toThrow(/requires its `emulator` spec block/)
+  })
+
+  it("rejects an unknown gameType value", () => {
+    const m = manifest()
+    // @ts-expect-error deliberately invalid enum value
+    m.pack.gameType = "playstation"
+    expect(() => PackManifest.parse(m)).toThrow()
+  })
+})
+
+describe("user-provided source", () => {
+  it("accepts a user-provided file with a hint", () => {
+    const m = manifest()
+    m.version.files[0].source = { kind: "user-provided", hint: "your own dump" }
+    expect(PackManifest.parse(m).version.files[0].source).toEqual({
+      kind: "user-provided",
+      hint: "your own dump",
+    })
+  })
+
+  it("rejects a user-provided file with an empty hint", () => {
+    const m = manifest()
+    m.version.files[0].source = { kind: "user-provided", hint: "" }
+    expect(() => PackManifest.parse(m)).toThrow()
+  })
+})
+
+describe("initialFiles", () => {
+  const initial = (over = {}) => ({
+    path: "roms/emerald.sav",
+    sha512,
+    fileSize: 10,
+    source: { kind: "override" as const, blobSha512: "b".repeat(128) },
+    ...over,
+  })
+
+  it("accepts an override-sourced initial file", () => {
+    const m = manifest()
+    m.version.initialFiles = [initial()]
+    expect(PackManifest.parse(m).version.initialFiles).toHaveLength(1)
+  })
+
+  it("rejects a user-provided initial file", () => {
+    const m = manifest()
+    m.version.initialFiles = [initial({ source: { kind: "user-provided", hint: "x" } })]
+    expect(() => PackManifest.parse(m)).toThrow(/initialFiles source must be/)
+  })
+
+  it("rejects an initial file whose path collides with files[]", () => {
+    const m = manifest()
+    m.version.initialFiles = [initial({ path: m.version.files[0].path })]
+    expect(() => PackManifest.parse(m)).toThrow(/collides with a files\[\] entry/)
+  })
+
+  it("rejects two initial files whose paths collide by case", () => {
+    const m = manifest()
+    m.version.initialFiles = [initial(), initial({ path: "roms/Emerald.SAV" })]
+    expect(() => PackManifest.parse(m)).toThrow(/duplicate initialFiles path/)
   })
 })
 

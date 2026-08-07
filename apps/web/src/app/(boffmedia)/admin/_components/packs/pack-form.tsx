@@ -4,7 +4,7 @@ import { useRef, useState } from "react"
 import { useTranslations } from "next-intl"
 import { Button, Field, Icon, Input, Modal, Textarea, toast } from "@boffmedia/ui"
 import { AvPanel, AvPill } from "../ui/av-kit"
-import { type AdminPack, type GalleryImage, PacksService } from "@/services/api/boffmedia/packsService"
+import { type AdminPack, type GalleryImage, type GameType, PacksService } from "@/services/api/boffmedia/packsService"
 import { apiUpload } from "@/services/http/boff-client"
 
 const ACCESS_OPTIONS: {
@@ -33,6 +33,7 @@ export function PackForm({
   const [description, setDescription] = useState("")
   const [iconUrl, setIconUrl] = useState("")
   const [gallery, setGallery] = useState<GalleryImage[]>([])
+  const [gameType, setGameType] = useState<GameType>("minecraft")
   const [accessKind, setAccessKind] = useState<AdminPack["accessKind"]>("allowlist")
   const [password, setPassword] = useState("")
   const [serverHost, setServerHost] = useState("")
@@ -53,6 +54,7 @@ export function PackForm({
         description: description || undefined,
         iconUrl: iconUrl || undefined,
         gallery: gallery.length > 0 ? gallery : undefined,
+        gameType,
         accessKind,
         password: accessKind === "password" ? password : undefined,
         // A host makes it a server pack; a blank port lets the API default to
@@ -315,6 +317,79 @@ export function PackForm({
                   )}
                 </div>
               </Field>
+            </section>
+
+            <section className="cut border border-solid border-line bg-panel-2 p-4">
+              <div className="mb-4 flex items-start gap-3">
+                <span className="grid size-8 shrink-0 place-items-center border border-solid border-line-2 bg-panel text-accent">
+                  <Icon name="layers" size={15} />
+                </span>
+                <div>
+                  <h3 className="font-display text-[14px] font-bold uppercase tracking-[0.08em] text-txt">
+                    {t("gameTypeSection")}
+                  </h3>
+                  <p className="mt-1 text-[12px] leading-[1.45] text-txt-dim">
+                    {t("gameTypeSectionLead")}
+                  </p>
+                </div>
+              </div>
+
+              <div role="radiogroup" aria-label={t("gameType")} className="grid gap-2 md:grid-cols-2">
+                {(["minecraft", "emulator", "zomboid", "stardew"] as const).map((gt) => {
+                  const selected = gameType === gt
+                  const disabled = gt !== "minecraft"
+                  return (
+                    <button
+                      key={gt}
+                      type="button"
+                      role="radio"
+                      aria-checked={selected}
+                      disabled={disabled}
+                      onClick={() => !disabled && setGameType(gt)}
+                      className={[
+                        "cut flex min-h-[96px] items-start gap-3 border-2 border-solid p-3 text-left transition-colors duration-[140ms]",
+                        disabled
+                          ? "cursor-not-allowed opacity-60 border-line-2 hover:border-line-2 bg-panel-2"
+                          : selected
+                            ? "border-accent bg-accent-soft cursor-pointer"
+                            : "border-line hover:border-line-2 hover:bg-panel cursor-pointer",
+                      ].join(" ")}
+                    >
+                      <span
+                        className={[
+                          "grid size-8 shrink-0 place-items-center border border-solid",
+                          selected
+                            ? "border-accent bg-accent text-accent-ink"
+                            : "border-line-2 bg-panel text-txt-dim",
+                        ].join(" ")}
+                      >
+                        <Icon name="cube" size={15} />
+                      </span>
+                      <span className="min-w-0 flex-1">
+                        <span className="block font-display text-[13px] font-bold uppercase tracking-[0.04em] text-txt">
+                          {t(`gameType.${gt}`)}
+                        </span>
+                        <span className="mt-1 block text-[11px] leading-[1.4] text-txt-dim">
+                          {t(`gameTypeLead.${gt}`)}
+                        </span>
+                        {disabled && (
+                          <span className="mt-2 inline-flex items-center gap-1 rounded-sm bg-warn/20 px-2 py-1 text-[11px] font-bold uppercase tracking-[0.04em] text-warn">
+                            <Icon name="clock" size={12} />
+                            {t("comingSoon")}
+                          </span>
+                        )}
+                      </span>
+                      {selected && <Icon name="check" size={14} className="shrink-0 text-accent" />}
+                    </button>
+                  )
+                })}
+              </div>
+
+              <div className="mt-4 rounded-sm border border-solid border-info-line bg-info-soft px-3 py-2">
+                <p className="text-[12px] leading-[1.5] text-txt-dim">
+                  {t("gameTypePermanent")}
+                </p>
+              </div>
             </section>
 
             <section className="cut border border-solid border-line bg-panel-2 p-4">

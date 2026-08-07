@@ -19,10 +19,12 @@ export class LauncherSessionEntity {
   username!: string;
 }
 
+const GAME_TYPES = ['minecraft', 'emulator', 'zomboid', 'stardew'] as const;
+
 export class LauncherVersionEntity {
   @ApiProperty() id!: string;
   @ApiProperty() name!: string;
-  @ApiProperty() minecraft!: string;
+  @ApiPropertyOptional({ nullable: true }) minecraft!: string | null;
   @ApiPropertyOptional({ nullable: true }) loader!: string | null;
   @ApiPropertyOptional({ nullable: true }) loaderVersion!: string | null;
   @ApiProperty() fileCount!: number;
@@ -42,6 +44,8 @@ export class LauncherPackEntity {
   @ApiProperty() id!: string;
   @ApiProperty() slug!: string;
   @ApiProperty() name!: string;
+  @ApiProperty({ enum: GAME_TYPES, description: 'Resuelto: NULL en BD → minecraft' })
+  gameType!: (typeof GAME_TYPES)[number];
   @ApiPropertyOptional({ nullable: true }) summary!: string | null;
   @ApiPropertyOptional({ nullable: true }) description!: string | null;
   @ApiPropertyOptional({ nullable: true }) iconUrl!: string | null;
@@ -65,6 +69,8 @@ export class AdminPackEntity {
   @ApiProperty() id!: string;
   @ApiProperty() slug!: string;
   @ApiProperty() name!: string;
+  @ApiProperty({ enum: GAME_TYPES, description: 'Resuelto: NULL en BD → minecraft' })
+  gameType!: (typeof GAME_TYPES)[number];
   @ApiPropertyOptional({ nullable: true }) summary!: string | null;
   @ApiPropertyOptional({ nullable: true }) iconUrl!: string | null;
   @ApiProperty() accessKind!: string;
@@ -83,7 +89,7 @@ export class PackVersionEntity {
   @ApiProperty() id!: string;
   @ApiProperty() packId!: string;
   @ApiProperty() name!: string;
-  @ApiProperty() minecraft!: string;
+  @ApiPropertyOptional({ nullable: true }) minecraft!: string | null;
   @ApiPropertyOptional({ nullable: true }) loader!: string | null;
   @ApiPropertyOptional({ nullable: true }) loaderVersion!: string | null;
   @ApiProperty() fileCount!: number;

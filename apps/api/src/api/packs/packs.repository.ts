@@ -71,6 +71,7 @@ export class PacksRepository {
       .select({
         id: packs.id,
         slug: packs.slug,
+        gameType: packs.gameType,
         name: packs.name,
         summary: packs.summary,
         description: packs.description,
@@ -123,6 +124,20 @@ export class PacksRepository {
     }
     if (typeof hydrated.worlds === 'string') {
       hydrated.worlds = JSON.parse(hydrated.worlds) as unknown[];
+    }
+    // Same MariaDB-returns-json-as-string trap as files/worlds, for the
+    // per-game spec blocks and first-install-only files.
+    if (typeof hydrated.emulator === 'string') {
+      hydrated.emulator = JSON.parse(hydrated.emulator) as Record<string, unknown>;
+    }
+    if (typeof hydrated.zomboid === 'string') {
+      hydrated.zomboid = JSON.parse(hydrated.zomboid) as Record<string, unknown>;
+    }
+    if (typeof hydrated.stardew === 'string') {
+      hydrated.stardew = JSON.parse(hydrated.stardew) as Record<string, unknown>;
+    }
+    if (typeof hydrated.initialFiles === 'string') {
+      hydrated.initialFiles = JSON.parse(hydrated.initialFiles) as unknown[];
     }
     return hydrated;
   }

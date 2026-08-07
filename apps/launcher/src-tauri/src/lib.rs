@@ -125,6 +125,8 @@ pub fn run() {
             // §9 — per-instance Java runtime + memory.
             install::instance_runtime,
             install::instance_runtime_set,
+            // §4.3 — user-provided files.
+            install::instance_provide_file,
             settings::settings_get,
             settings::settings_set,
             settings::plays_get,

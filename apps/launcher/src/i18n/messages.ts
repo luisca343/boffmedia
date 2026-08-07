@@ -30,6 +30,14 @@ const es = {
       serverPack: "Pack de servidor",
       clientPack: "Pack de cliente",
     },
+    systems: {
+      minecraft: "Minecraft",
+      emulator: "Emulador",
+      gba: "Game Boy Advance",
+      nds: "Nintendo DS",
+      zomboid: "Project Zomboid",
+      stardew: "Stardew Valley",
+    },
   },
 
   settings: {
@@ -807,6 +815,20 @@ const es = {
     loading: "Cargando…",
     versionFileCount: "{count} archivos",
   },
+
+  pack: {
+    requiredFiles: {
+      title: "Archivos requeridos",
+      selectFile: "Seleccionar archivo",
+      wrongHash: "El archivo no coincide",
+      wrongHashHint: "Se esperaba: {hint}",
+      missingFiles: "Falta {count} archivo requerido",
+    },
+  },
+
+  errors: {
+    needsNewerLauncher: "Esta función necesita una versión más nueva del launcher.",
+  },
 } as const
 
 const en = {
@@ -829,6 +851,14 @@ const en = {
       notifications: "Notifications",
       serverPack: "Server pack",
       clientPack: "Client pack",
+    },
+    systems: {
+      minecraft: "Minecraft",
+      emulator: "Emulator",
+      gba: "Game Boy Advance",
+      nds: "Nintendo DS",
+      zomboid: "Project Zomboid",
+      stardew: "Stardew Valley",
     },
   },
 
@@ -1605,6 +1635,20 @@ const en = {
     saveConfigError: "Could not save the configuration.",
     loading: "Loading…",
     versionFileCount: "{count} files",
+  },
+
+  pack: {
+    requiredFiles: {
+      title: "Required files",
+      selectFile: "Select file",
+      wrongHash: "File does not match",
+      wrongHashHint: "Expected: {hint}",
+      missingFiles: "{count} required file missing",
+    },
+  },
+
+  errors: {
+    needsNewerLauncher: "This feature requires a newer version of the launcher.",
   },
 } as const
 

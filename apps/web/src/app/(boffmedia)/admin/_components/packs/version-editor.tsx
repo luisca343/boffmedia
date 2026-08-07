@@ -418,6 +418,9 @@ export function VersionEditor({
   const title =
     mode === "edit" ? t("editVersion") : mode === "clone" ? t("cloneVersion") : t("newVersion")
 
+  // Non-Minecraft packs show a placeholder in Cycle 1
+  const isNonMc = pack.gameType !== "minecraft"
+
   return (
     <AvPanel
       title={title}
@@ -430,6 +433,24 @@ export function VersionEditor({
         ) : undefined
       }
     >
+      {isNonMc ? (
+        <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-5 pb-16">
+          <div className="flex flex-col items-center gap-3">
+            <span className="grid size-16 place-items-center rounded-lg border-2 border-dashed border-line-2 bg-panel text-txt-muted">
+              <Icon name="lock" size={32} />
+            </span>
+            <h2 className="font-display text-lg font-bold text-txt">
+              {t("editorNotYetAvailable")}
+            </h2>
+            <p className="max-w-[50ch] text-center text-sm text-txt-dim">
+              {t("editorComingSoon", { gameType: t(`gameType.${pack.gameType}`) })}
+            </p>
+          </div>
+          <Button variant="ghost" onClick={onClose}>
+            {t("cancel")}
+          </Button>
+        </div>
+      ) : (
       <div className="flex min-h-0 flex-1 flex-col gap-5">
         <div className="flex shrink-0 flex-wrap items-center justify-between gap-3 border-b border-line pb-4">
           <StepRail step={step} onGo={setStep} reachable={reachable} stepValid={stepValid} />
@@ -777,6 +798,7 @@ export function VersionEditor({
           </span>
         </div>
       </div>
+      )}
     </AvPanel>
   )
 }

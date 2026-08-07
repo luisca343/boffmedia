@@ -11,6 +11,7 @@ import {
   IsDate,
   IsIn,
   IsInt,
+  IsObject,
   IsOptional,
   IsString,
   Matches,
@@ -23,6 +24,7 @@ import {
 
 const ACCESS_KINDS = ['public', 'password', 'allowlist'] as const;
 const LOADERS = ['forge', 'neoforge', 'fabric-loader', 'quilt-loader'] as const;
+const GAME_TYPES = ['minecraft', 'emulator', 'zomboid', 'stardew'] as const;
 
 /** Dashed lowercase UUID — the form `rotom_users.uuid` stores. */
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -64,6 +66,16 @@ export class CreatePackDto {
   @MinLength(1)
   @MaxLength(128)
   name!: string;
+
+  @ApiPropertyOptional({
+    enum: GAME_TYPES,
+    default: 'minecraft',
+    description:
+      'Qué juego usa el pack. PERMANENTE: no se puede cambiar tras crear el pack (rompería toda instancia instalada). Ausente = minecraft.',
+  })
+  @IsOptional()
+  @IsIn(GAME_TYPES)
+  gameType?: (typeof GAME_TYPES)[number];
 
   @ApiPropertyOptional()
   @IsOptional()
@@ -190,10 +202,14 @@ export class CreateVersionDto {
   @MaxLength(64)
   name!: string;
 
-  @ApiProperty({ example: '1.21.4' })
+  // Minecraft/loader are OPTIONAL as of multi-game: required iff the pack is
+  // `minecraft` (the shared zod schema is the real gate — see parseManifest).
+  // A non-MC version leaves these null.
+  @ApiPropertyOptional({ example: '1.21.4' })
+  @IsOptional()
   @IsString()
   @MaxLength(32)
-  minecraft!: string;
+  minecraft?: string;
 
   @ApiPropertyOptional({ enum: LOADERS })
   @IsOptional()
@@ -222,13 +238,41 @@ export class CreateVersionDto {
 
   @ApiPropertyOptional({
     description:
-      'BundledWorld[] — validado con @boffmedia/pack-schema',
+      'BundledWorld[] — validado con @boffmedia/pack-schema (solo minecraft)',
     type: 'array',
     items: { type: 'object' },
   })
   @IsOptional()
   @IsArray()
   worlds?: unknown[];
+
+  // Per-game spec blocks — exactly one present, matching the pack's gameType.
+  // Shape is validated by the shared zod schema in parseManifest; here they are
+  // opaque passthrough objects (content schemas land per game cycle).
+  @ApiPropertyOptional({ type: 'object', additionalProperties: true })
+  @IsOptional()
+  @IsObject()
+  emulator?: Record<string, unknown>;
+
+  @ApiPropertyOptional({ type: 'object', additionalProperties: true })
+  @IsOptional()
+  @IsObject()
+  zomboid?: Record<string, unknown>;
+
+  @ApiPropertyOptional({ type: 'object', additionalProperties: true })
+  @IsOptional()
+  @IsObject()
+  stardew?: Record<string, unknown>;
+
+  @ApiPropertyOptional({
+    description:
+      'PackFile[] instalados solo en la primera instalación (initialFiles) — validado con @boffmedia/pack-schema',
+    type: 'array',
+    items: { type: 'object' },
+  })
+  @IsOptional()
+  @IsArray()
+  initialFiles?: unknown[];
 }
 
 export class GrantAccessDto {

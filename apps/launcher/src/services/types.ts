@@ -7,6 +7,8 @@ import type { AppLocale } from "@boffmedia/ui"
 
 export type PackAccessKind = "public" | "password" | "allowlist"
 
+export type GameType = "minecraft" | "emulator" | "zomboid" | "stardew"
+
 /** A promotional gallery image attached to a pack (shown pre-install). For a
  *  managed pack these are public URLs from the registry; for a local pack the
  *  gallery lives on disk (a convention dir), so this stays empty and the
@@ -31,6 +33,8 @@ export type PackSummary = {
    *  disk); the GalleryTab branches on `origin`. */
   gallery: PackGalleryImage[]
   accessKind: PackAccessKind
+  /** The type of game this pack targets. Always present — the API resolves it. */
+  gameType: GameType
 }
 
 /** The listing's view of a version. The file list lives only in a MANIFEST,
@@ -38,7 +42,7 @@ export type PackSummary = {
 export type PackVersionSummary = {
   id: string
   name: string
-  minecraft: string
+  minecraft: string | null
   /** "neoforge" | "forge" | "fabric-loader", or null for vanilla. */
   loader: string | null
   loaderVersion: string | null
@@ -46,12 +50,31 @@ export type PackVersionSummary = {
   createdAt: string
 }
 
+/** A file the pack requires the user to provide (e.g., a ROM). */
+export type MissingUserFile = {
+  path: string
+  hint: string
+  fileSize: number
+}
+
+/** Result of successfully providing a user file. */
+export type ProvideFileResult = {
+  satisfied: true
+}
+
+/** Error when providing a user file. */
+export type ProvideFileError = {
+  code: "wrong_hash" | "io" | "not_found" | string
+  expectedHint?: string
+  message: string
+}
+
 /** Where a pack stands on THIS machine. */
 export type InstallState =
   | { kind: "not-installed" }
-  | { kind: "installed"; versionId: string; sizeBytes: number }
+  | { kind: "installed"; versionId: string; sizeBytes: number; missingUserFiles?: MissingUserFile[] }
   /** Installed, but the server has a newer version. */
-  | { kind: "outdated"; versionId: string; latestVersionId: string; sizeBytes: number }
+  | { kind: "outdated"; versionId: string; latestVersionId: string; sizeBytes: number; missingUserFiles?: MissingUserFile[] }
   | { kind: "installing"; progress: InstallProgress }
   | { kind: "broken"; reason: string }
 

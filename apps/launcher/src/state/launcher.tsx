@@ -39,6 +39,7 @@ import type {
   PackEntry,
   Settings,
 } from "../services/types"
+import type { SystemId } from "../services/systems"
 
 // One store for the whole app. A reducer rather than scattered useState because
 // install and launch are state MACHINES — "installing" and "running" must be
@@ -86,6 +87,8 @@ type State = {
   game: GameState
   logs: LogLine[]
   settings: Settings
+  /** Currently selected system filter. "All" shows all packs, or a specific SystemId. */
+  selectedSystem: SystemId | "All"
 }
 
 type Action =
@@ -120,6 +123,7 @@ type Action =
   | { type: "log"; line: LogLine }
   | { type: "logs/clear" }
   | { type: "settings"; settings: Settings }
+  | { type: "system/select"; system: SystemId | "All" }
 
 function reducer(s: State, a: Action): State {
   switch (a.type) {
@@ -271,6 +275,14 @@ function reducer(s: State, a: Action): State {
       return { ...s, logs: [] }
     case "settings":
       return { ...s, settings: a.settings }
+    case "system/select":
+      // Persist selection to localStorage
+      try {
+        localStorage.setItem("launcher:selectedSystem", a.system)
+      } catch {
+        /* storage error is non-fatal */
+      }
+      return { ...s, selectedSystem: a.system }
     default:
       return s
   }
@@ -296,6 +308,7 @@ const initial: State = {
   game: { kind: "idle" },
   logs: [],
   settings: MOCK_SETTINGS,
+  selectedSystem: "All",
 }
 
 type Ctx = State & {

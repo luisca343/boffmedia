@@ -62,6 +62,9 @@ pub enum Fetch {
     /// CurseForge because its CDN needs a key we refuse to ship (§4.5), and
     /// overrides because they are our blobs and never public (§7.2).
     Proxied(crate::api::PackFile),
+    /// User-provided file (§4.3): the player supplies it locally. The hint
+    /// tells the player what to look for. Never automatically downloaded.
+    UserProvided { hint: String },
 }
 
 #[derive(Debug, Clone)]
@@ -81,8 +84,19 @@ pub struct PlannedFile {
     pub optional: bool,
 }
 
+/// The result of resolving a manifest: the game type and game-specific plan.
+/// Cycle 1 only has the Minecraft arm; each game cycle adds its variant.
 #[derive(Debug, Clone)]
-pub struct InstallPlan {
+pub enum PlannedGame {
+    /// Minecraft pack: requires dependencies, optional loaders, and a Minecraft version.
+    /// Cycle 2: Emulator(EmulatorPlan)
+    /// Cycle 3: Zomboid(ZomboidPlan)
+    /// Cycle 4: Stardew(StardewPlan)
+    Minecraft(PlannedMinecraft),
+}
+
+#[derive(Debug, Clone)]
+pub struct PlannedMinecraft {
     pub pack_id: String,
     pub slug: String,
     pub version_id: String,
@@ -100,6 +114,9 @@ pub struct InstallPlan {
     /// menu is better than a launch the client refuses to parse).
     pub quick_play: Option<String>,
 }
+
+/// Backward-compat alias for Minecraft plans.
+pub type InstallPlan = PlannedMinecraft;
 
 /// Best-effort `major.minor` compare against 1.20. A pack's `minecraft` string
 /// is normally "1.20.1"-shaped; anything that does not parse that way is
@@ -119,7 +136,10 @@ fn supports_quick_play(minecraft: &str) -> bool {
 
 /// Mirrors `loaderOf()` — first key present wins, in this fixed order.
 pub fn loader_of(manifest: &PackManifest) -> Option<(LoaderKind, String)> {
-    let deps = &manifest.version.dependencies;
+    let deps = match &manifest.version.dependencies {
+        Some(d) => d,
+        None => return None,
+    };
     if let Some(v) = &deps.forge {
         return Some((LoaderKind::Forge, v.to_string()));
     }
@@ -135,7 +155,30 @@ pub fn loader_of(manifest: &PackManifest) -> Option<(LoaderKind, String)> {
     None
 }
 
-pub fn plan(manifest: &PackManifest) -> Result<InstallPlan, InstallFailure> {
+/// Resolve a manifest into a game-specific install plan. Cycle 1 only handles
+/// Minecraft (the non-MC arms return early in validate_game_type).
+pub fn plan(manifest: &PackManifest) -> Result<PlannedGame, InstallFailure> {
+    // Determine game type (defaulting to minecraft per §4.1 pack.rs)
+    let is_minecraft = manifest
+        .pack
+        .game_type
+        .as_ref()
+        .map(|gt| matches!(gt, crate::pack::PackManifestPackGameType::Minecraft))
+        .unwrap_or(true);
+
+    match is_minecraft {
+        true => plan_minecraft(manifest).map(PlannedGame::Minecraft),
+        false => {
+            // Cycle 2+: each game type has its own arm.
+            Err(InstallFailure::message(
+                "Este tipo de juego no es soportado en esta versión del launcher."
+                    .to_string(),
+            ))
+        }
+    }
+}
+
+fn plan_minecraft(manifest: &PackManifest) -> Result<PlannedMinecraft, InstallFailure> {
     let mut files = Vec::with_capacity(manifest.version.files.len());
     let mut total_bytes: u64 = 0;
 
@@ -162,7 +205,10 @@ pub fn plan(manifest: &PackManifest) -> Result<InstallPlan, InstallFailure> {
         });
     }
 
-    let minecraft = manifest.version.dependencies.minecraft.to_string();
+    let deps = manifest.version.dependencies.as_ref().ok_or_else(|| {
+        InstallFailure::message("El paquete no declara dependencias de Minecraft")
+    })?;
+    let minecraft = deps.minecraft.to_string();
     let quick_play = manifest.pack.server.as_ref().and_then(|server| {
         if supports_quick_play(&minecraft) {
             // No port → hand Minecraft the bare host so its own SRV lookup finds
@@ -176,7 +222,7 @@ pub fn plan(manifest: &PackManifest) -> Result<InstallPlan, InstallFailure> {
         }
     });
 
-    Ok(InstallPlan {
+    Ok(PlannedMinecraft {
         pack_id: manifest.pack.id.to_string(),
         slug: manifest.pack.slug.to_string(),
         version_id: manifest.version.id.to_string(),
@@ -213,6 +259,14 @@ pub(crate) fn fetch_for(source: &Source, _path: &str) -> Result<Fetch, InstallFa
             // guarantees lowercase hex; normalising is belt and braces.
             sha512: blob_sha512.to_string().to_lowercase(),
         }),
+
+        // §4.3 — user-provided files: planned but not fetched from any source.
+        // The frontend will show the hint and ask for the file. We return a
+        // placeholder Fetch that signals this is user-provided, never actually
+        // invoked by the download phase.
+        Source::UserProvided { hint } => Fetch::UserProvided {
+            hint: hint.to_string(),
+        },
     })
 }
 
@@ -287,7 +341,7 @@ mod tests {
                 file("mods/server-only.jar", "unsupported", r#"{"kind":"url","url":"https://x.test/b"}"#)
             ),
         );
-        let plan = plan(&m).unwrap();
+        let PlannedGame::Minecraft(plan) = plan(&m).unwrap();
         assert_eq!(plan.files.len(), 1);
         assert_eq!(plan.total_bytes, 10, "a skipped file must not inflate the bar");
     }
@@ -302,7 +356,7 @@ mod tests {
                 file("config/a.toml", "required", r#"{"kind":"url","url":"https://x.test/b"}"#)
             ),
         );
-        let plan = plan(&m).unwrap();
+        let PlannedGame::Minecraft(plan) = plan(&m).unwrap();
         assert!(plan.files[0].is_mod);
         assert!(!plan.files[1].is_mod);
     }
@@ -320,7 +374,7 @@ mod tests {
                 file("mods/minimap.jar", "optional", r#"{"kind":"url","url":"https://x.test/b"}"#)
             ),
         );
-        let plan = plan(&m).unwrap();
+        let PlannedGame::Minecraft(plan) = plan(&m).unwrap();
         assert_eq!(plan.files.len(), 2);
         assert!(!plan.files[0].optional);
         assert!(plan.files[1].optional);
@@ -338,7 +392,7 @@ mod tests {
                 r#"{"kind":"curseforge","projectId":123,"fileId":456}"#,
             ),
         );
-        let plan = plan(&m).unwrap();
+        let PlannedGame::Minecraft(plan) = plan(&m).unwrap();
         match &plan.files[0].fetch {
             Fetch::Proxied(crate::api::PackFile::Curseforge {
                 project_id,
@@ -360,7 +414,10 @@ mod tests {
                 &format!(r#"{{"kind":"override","blobSha512":"{}"}}"#, "b".repeat(128)),
             ),
         );
-        let plan = plan(&m).unwrap();
+        let planned_game = plan(&m).unwrap();
+        let plan = match planned_game {
+            PlannedGame::Minecraft(p) => p,
+        };
         match &plan.files[0].fetch {
             Fetch::Proxied(crate::api::PackFile::Override { sha512 }) => {
                 assert_eq!(*sha512, "b".repeat(128));
@@ -390,14 +447,16 @@ mod tests {
     #[test]
     fn quick_play_is_none_without_a_declared_server() {
         let m = manifest_with_server("1.21.4", None);
-        assert_eq!(plan(&m).unwrap().quick_play, None);
+        let PlannedGame::Minecraft(plan) = plan(&m).unwrap();
+        assert_eq!(plan.quick_play, None);
     }
 
     #[test]
     fn quick_play_targets_the_declared_server_on_1_20_plus() {
         let m = manifest_with_server("1.20.1", Some(r#"{"host":"play.boffmedia.es","port":25566}"#));
+        let PlannedGame::Minecraft(plan) = plan(&m).unwrap();
         assert_eq!(
-            plan(&m).unwrap().quick_play,
+            plan.quick_play,
             Some("play.boffmedia.es:25566".to_string())
         );
     }
@@ -406,8 +465,9 @@ mod tests {
     fn quick_play_uses_the_bare_host_when_no_port_is_declared() {
         // SRV case: Minecraft resolves the port itself from the bare host.
         let m = manifest_with_server("1.20.1", Some(r#"{"host":"wingull.boffmedia.es"}"#));
+        let PlannedGame::Minecraft(plan) = plan(&m).unwrap();
         assert_eq!(
-            plan(&m).unwrap().quick_play,
+            plan.quick_play,
             Some("wingull.boffmedia.es".to_string())
         );
     }
@@ -415,12 +475,14 @@ mod tests {
     #[test]
     fn quick_play_is_suppressed_below_1_20_even_with_a_server() {
         let m = manifest_with_server("1.19.4", Some(r#"{"host":"play.boffmedia.es","port":25565}"#));
-        assert_eq!(plan(&m).unwrap().quick_play, None);
+        let PlannedGame::Minecraft(plan) = plan(&m).unwrap();
+        assert_eq!(plan.quick_play, None);
     }
 
     #[test]
     fn an_unparseable_minecraft_version_is_treated_as_pre_1_20() {
         let m = manifest_with_server("snapshot", Some(r#"{"host":"play.boffmedia.es","port":25565}"#));
-        assert_eq!(plan(&m).unwrap().quick_play, None);
+        let PlannedGame::Minecraft(plan) = plan(&m).unwrap();
+        assert_eq!(plan.quick_play, None);
     }
 }

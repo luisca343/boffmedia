@@ -642,6 +642,11 @@ export function PacksAdmin() {
                 </span>
                 <span className="mt-3 flex items-center gap-2 border-t border-line pt-2">
                   <AccessPill kind={p.accessKind} />
+                  {p.gameType !== "minecraft" && (
+                    <AvPill tone="info" icon="layers">
+                      {t(`gameType.${p.gameType}`)}
+                    </AvPill>
+                  )}
                   <AvPill tone={p.latestVersionId ? "ok" : "warn"}>
                     {p.latestVersionId ? t("live") : t("noPublished")}
                   </AvPill>
@@ -694,6 +699,11 @@ export function PacksAdmin() {
             bodyClassName="flex min-h-0 flex-1 flex-col"
             aside={
               <span className="flex items-center gap-2">
+                {pack.gameType !== "minecraft" && (
+                  <Badge tone="info">
+                    {t(`gameType.${pack.gameType}`)}
+                  </Badge>
+                )}
                 <Badge tone={pack.latestVersionId ? "ok" : "warn"}>
                   {pack.latestVersionId ? t("live") : t("noPublished")}
                 </Badge>

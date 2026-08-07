@@ -1,4 +1,4 @@
-import { ForbiddenException, NotFoundException } from '@nestjs/common';
+import { ConflictException, ForbiddenException, NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import * as bcrypt from 'bcrypt';
 import { PacksRepository } from './packs.repository';
@@ -11,6 +11,9 @@ import { PacksService } from './packs.service';
 const UUID = '069a79f4-44e9-4726-a5be-fca90e38aaf5';
 const OTHER = '11111111-2222-3333-4444-555555555555';
 const sha512 = 'a'.repeat(128);
+
+// A launcher that can only parse minecraft (the pre-multi-game capability set).
+const MC = ['minecraft'];
 
 const pack = (over: Record<string, unknown> = {}) => ({
   id: 'pk1',
@@ -83,7 +86,7 @@ describe('PacksService', () => {
       repo.hasAccess.mockResolvedValue(true);
       repo.findVersion.mockResolvedValue(version() as never);
 
-      const manifest = (await service.manifestFor(UUID, 'pk1', null)) as {
+      const manifest = (await service.manifestFor(UUID, 'pk1', null, MC)) as {
         version: { files: unknown[] };
       };
       expect(manifest.version.files).toHaveLength(1);
@@ -94,7 +97,7 @@ describe('PacksService', () => {
       repo.findById.mockResolvedValue(pack() as never);
       repo.hasAccess.mockResolvedValue(false);
 
-      await expect(service.manifestFor(OTHER, 'pk1', null)).rejects.toThrow(
+      await expect(service.manifestFor(OTHER, 'pk1', null, MC)).rejects.toThrow(
         ForbiddenException,
       );
     });
@@ -105,7 +108,7 @@ describe('PacksService', () => {
       repo.hasAccess.mockResolvedValue(false);
       repo.findVersion.mockResolvedValue(version() as never);
 
-      await expect(service.manifestFor(UUID, 'pk1', null)).rejects.toThrow(
+      await expect(service.manifestFor(UUID, 'pk1', null, MC)).rejects.toThrow(
         ForbiddenException,
       );
       // Rejected before the version was ever loaded.
@@ -116,7 +119,7 @@ describe('PacksService', () => {
       repo.findById.mockResolvedValue(pack({ accessKind: 'public' }) as never);
       repo.findVersion.mockResolvedValue(version() as never);
 
-      await service.manifestFor(OTHER, 'pk1', null);
+      await service.manifestFor(OTHER, 'pk1', null, MC);
       expect(repo.hasAccess).not.toHaveBeenCalled();
     });
 
@@ -127,13 +130,13 @@ describe('PacksService', () => {
       );
       repo.findVersion.mockResolvedValue(version() as never);
 
-      await expect(service.manifestFor(UUID, 'pk1', 'incorrecta')).rejects.toThrow(
+      await expect(service.manifestFor(UUID, 'pk1', 'incorrecta', MC)).rejects.toThrow(
         ForbiddenException,
       );
-      await expect(service.manifestFor(UUID, 'pk1', null)).rejects.toThrow(
+      await expect(service.manifestFor(UUID, 'pk1', null, MC)).rejects.toThrow(
         ForbiddenException,
       );
-      await expect(service.manifestFor(UUID, 'pk1', 'correcta')).resolves.toBeDefined();
+      await expect(service.manifestFor(UUID, 'pk1', 'correcta', MC)).resolves.toBeDefined();
     });
 
     it('never leaks the allowlist membership in the manifest', async () => {
@@ -141,7 +144,7 @@ describe('PacksService', () => {
       repo.hasAccess.mockResolvedValue(true);
       repo.findVersion.mockResolvedValue(version() as never);
 
-      const manifest = (await service.manifestFor(UUID, 'pk1', null)) as {
+      const manifest = (await service.manifestFor(UUID, 'pk1', null, MC)) as {
         pack: { access: { kind: string; uuids?: string[] } };
       };
       expect(manifest.pack.access.kind).toBe('allowlist');
@@ -150,7 +153,7 @@ describe('PacksService', () => {
 
     it('hides an archived pack', async () => {
       repo.findById.mockResolvedValue(pack({ archived: true }) as never);
-      await expect(service.manifestFor(UUID, 'pk1', null)).rejects.toThrow(
+      await expect(service.manifestFor(UUID, 'pk1', null, MC)).rejects.toThrow(
         NotFoundException,
       );
     });
@@ -160,7 +163,7 @@ describe('PacksService', () => {
       repo.hasAccess.mockResolvedValue(true);
       repo.findVersion.mockResolvedValue(version({ published: false }) as never);
 
-      await expect(service.manifestFor(UUID, 'pk1', null)).rejects.toThrow(
+      await expect(service.manifestFor(UUID, 'pk1', null, MC)).rejects.toThrow(
         NotFoundException,
       );
     });
@@ -229,6 +232,109 @@ describe('PacksService', () => {
 
       await expect(service.redeemInvite(UUID, 'abc')).rejects.toThrow(ForbiddenException);
       expect(repo.grant).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('multi-game', () => {
+    it('lists a pack only to a launcher that declares its game type', async () => {
+      repo.listVisibleTo.mockResolvedValue([
+        pack({ id: 'mc', gameType: null, latestVersionId: null }),
+        pack({ id: 'emu', gameType: 'emulator', latestVersionId: null }),
+      ] as never);
+
+      const mcOnly = await service.listForLauncher(UUID, ['minecraft']);
+      expect(mcOnly.map((p) => p.id)).toEqual(['mc']);
+      // NULL column resolves to minecraft for the client.
+      expect(mcOnly[0].gameType).toBe('minecraft');
+
+      const both = await service.listForLauncher(UUID, ['minecraft', 'emulator']);
+      expect(both.map((p) => p.id).sort()).toEqual(['emu', 'mc']);
+    });
+
+    it('409s the manifest of a pack whose game type the caller cannot parse', async () => {
+      repo.findById.mockResolvedValue(pack({ gameType: 'emulator' }) as never);
+      await expect(service.manifestFor(UUID, 'pk1', null, MC)).rejects.toThrow(
+        ConflictException,
+      );
+      // Rejected before any access or version work.
+      expect(repo.hasAccess).not.toHaveBeenCalled();
+      expect(repo.findVersion).not.toHaveBeenCalled();
+    });
+
+    it('serves a minecraft manifest with no gameType field (byte-identical shape)', async () => {
+      repo.findById.mockResolvedValue(pack({ accessKind: 'public' }) as never);
+      repo.findVersion.mockResolvedValue(version() as never);
+      const m = (await service.manifestFor(OTHER, 'pk1', null, MC)) as {
+        pack: Record<string, unknown>;
+        version: Record<string, unknown>;
+      };
+      expect('gameType' in m.pack).toBe(false);
+      expect(m.version.dependencies).toBeDefined();
+    });
+
+    it('defaults gameType to minecraft on create and stores NULL', async () => {
+      repo.findBySlug.mockResolvedValue(null as never);
+      await service.createPack(
+        { slug: 'x', name: 'X', accessKind: 'public' } as never,
+        1,
+      );
+      expect(repo.insertPack).toHaveBeenCalledWith(
+        expect.objectContaining({ gameType: null }),
+      );
+      expect(repo.audit).toHaveBeenCalledWith(
+        'pack.created',
+        expect.any(String),
+        null,
+        expect.objectContaining({ gameType: 'minecraft' }),
+      );
+    });
+
+    it('rejects a non-mc version missing its own spec block', async () => {
+      repo.findById.mockResolvedValue(pack({ gameType: 'emulator' }) as never);
+      await expect(
+        service.createVersion(
+          'pk1',
+          {
+            name: '1.0',
+            files: [
+              {
+                path: 'roms/x.gba',
+                sha512,
+                fileSize: 1,
+                source: { kind: 'user-provided', hint: 'tu volcado' },
+              },
+            ],
+          } as never,
+          null,
+        ),
+      ).rejects.toThrow(/no válido/i);
+      expect(repo.insertVersion).not.toHaveBeenCalled();
+    });
+
+    it('accepts a well-formed emulator version and stores the spec block, minecraft NULL', async () => {
+      repo.findById.mockResolvedValue(pack({ gameType: 'emulator' }) as never);
+      await service.createVersion(
+        'pk1',
+        {
+          name: '1.0',
+          emulator: { kind: 'mgba', rom: 'roms/x.gba' },
+          files: [
+            {
+              path: 'roms/x.gba',
+              sha512,
+              fileSize: 1,
+              source: { kind: 'user-provided', hint: 'tu volcado' },
+            },
+          ],
+        } as never,
+        null,
+      );
+      expect(repo.insertVersion).toHaveBeenCalledWith(
+        expect.objectContaining({
+          minecraft: null,
+          emulator: { kind: 'mgba', rom: 'roms/x.gba' },
+        }),
+      );
     });
   });
 });

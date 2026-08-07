@@ -24,6 +24,12 @@ export type PackAccessKind = 'public' | 'password' | 'allowlist';
 /** Mirrors MrpackDependencies' loader keys. Null = vanilla. */
 export type PackLoader = 'forge' | 'neoforge' | 'fabric-loader' | 'quilt-loader';
 
+/** Which game a pack targets — mirrors GameType in @boffmedia/pack-schema.
+ *  NULL in the column means `minecraft` (every pack authored before multi-game
+ *  had no game type); the API resolves NULL → 'minecraft' so clients never
+ *  re-implement the default. Immutable after creation (enforced in the service). */
+export type GameType = 'minecraft' | 'emulator' | 'zomboid' | 'stardew';
+
 export const packs = mysqlTable(
   'packs',
   {
@@ -31,6 +37,8 @@ export const packs = mysqlTable(
     // launcher caches on disk, and a sequential integer leaks how many packs exist.
     id: varchar('id', { length: 32 }).primaryKey(),
     slug: varchar('slug', { length: 64 }).notNull().unique(),
+    // NULL = 'minecraft' (back-compat, zero backfill). Immutable after creation.
+    gameType: varchar('game_type', { length: 32 }).$type<GameType>(),
     name: varchar('name', { length: 128 }).notNull(),
     summary: varchar('summary', { length: 512 }),
     iconUrl: varchar('icon_url', { length: 512 }),
@@ -74,7 +82,10 @@ export const packVersions = mysqlTable(
     packId: varchar('pack_id', { length: 32 }).notNull(),
     /** User-facing label: "1.4.2", "Season 3". Not semver, not ordered. */
     name: varchar('name', { length: 64 }).notNull(),
-    minecraft: varchar('minecraft', { length: 32 }).notNull(),
+    // Nullable as of multi-game: only meaningful for `minecraft` packs (the
+    // shared zod schema requires it iff the pack is minecraft). Non-MC versions
+    // leave it, `loader`, and `loader_version` NULL.
+    minecraft: varchar('minecraft', { length: 32 }),
     loader: varchar('loader', { length: 20 }).$type<PackLoader>(),
     loaderVersion: varchar('loader_version', { length: 64 }),
     // The PackFile[] payload, validated against @boffmedia/pack-schema on write.
@@ -83,6 +94,15 @@ export const packVersions = mysqlTable(
     files: json('files').$type<unknown[]>().notNull(),
     // The BundledWorld[] payload, validated against @boffmedia/pack-schema on write.
     worlds: json('worlds').$type<unknown[]>(),
+    // Per-game spec blocks — exactly one non-null per version, matching the
+    // pack's gameType (validated by the shared zod schema on write; the DB does
+    // not constrain their shape). Content schemas land per game cycle.
+    emulator: json('emulator').$type<Record<string, unknown>>(),
+    zomboid: json('zomboid').$type<Record<string, unknown>>(),
+    stardew: json('stardew').$type<Record<string, unknown>>(),
+    // The PackFile[] of first-install-only files (§initialFiles), validated
+    // against @boffmedia/pack-schema on write.
+    initialFiles: json('initial_files').$type<unknown[]>(),
     /** Draft versions are invisible to launchers — publishing is a deliberate act. */
     published: boolean('published').notNull().default(false),
     notes: text('notes'),

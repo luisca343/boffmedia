@@ -46,6 +46,7 @@ import {
   localPackIconClear,
   localPackIconSet,
   localPackSave,
+  provideFile,
 } from "../runtime"
 import { DeleteLocalPackModal, UninstallPackModal } from "../components/pack/PackDeleteDialogs"
 import { useLauncher } from "../state/launcher"
@@ -75,7 +76,7 @@ function useNow(active: boolean): number {
 /** The pack's own version, as the picker's shape. A pack with no version yet
  *  leaves `minecraft` empty so the picker fills it with Mojang's latest. */
 function choiceOf(
-  latest: { minecraft: string; loader: string | null; loaderVersion: string | null } | null,
+  latest: { minecraft: string | null; loader: string | null; loaderVersion: string | null } | null,
 ): VersionChoice {
   return {
     minecraft: latest?.minecraft ?? "",
@@ -105,7 +106,7 @@ function EditLocalPackModal({
   pack: { id: string; slug: string; name: string; summary: string | null; description: string | null }
   latest: {
     name: string
-    minecraft: string
+    minecraft: string | null
     loader: string | null
     loaderVersion: string | null
   } | null
@@ -278,6 +279,8 @@ export function PackDetail() {
   const [tab, setTab] = useState<TabKey>("content")
   const [browsing, setBrowsing] = useState(false)
   const [contentNonce, setContentNonce] = useState(0)
+  const [providingFile, setProvidingFile] = useState<string | null>(null)
+  const [fileError, setFileError] = useState<{ path: string; message: string } | null>(null)
   // A local pack's icon is a file on disk (a data: URL), not the manifest's
   // iconUrl; resolve it here so the header prefers it. Re-runs when contentNonce
   // bumps after an icon edit.
@@ -357,6 +360,30 @@ export function PackDetail() {
     }
   }
 
+  const handleProvideFile = async (filePath: string) => {
+    setProvidingFile(filePath)
+    setFileError(null)
+    try {
+      // In a real implementation, this would open a file picker.
+      // For now, we throw an error to simulate the browser-mode behavior.
+      throw new Error("File picker not implemented in browser mode")
+    } catch (err) {
+      const errObj = err as { code?: string; message?: string; expectedHint?: string }
+      if (errObj.code === "wrong_hash") {
+        setFileError({
+          path: filePath,
+          message: errObj.expectedHint
+            ? t("pack.requiredFiles.wrongHashHint", { hint: errObj.expectedHint })
+            : errObj.message ?? t("pack.requiredFiles.wrongHash"),
+        })
+      } else {
+        toast.error((err as { message?: string })?.message ?? "Could not provide file")
+      }
+    } finally {
+      setProvidingFile(null)
+    }
+  }
+
   // The tail is where the stack trace ends up; a crash log's first lines are
   // just the JVM banner.
   const crashLines = logs.filter((line) => line.level === "error").slice(-12)
@@ -373,6 +400,13 @@ export function PackDetail() {
   // remove, so Open folder / Delete / Uninstall are all offered on it.
   const hasFiles =
     state.kind === "installed" || state.kind === "outdated" || state.kind === "broken"
+
+  // Check if there are unsatisfied required user files
+  const hasMissingUserFiles =
+    (state.kind === "installed" || state.kind === "outdated") &&
+    state.missingUserFiles &&
+    state.missingUserFiles.length > 0
+
   const openFolder: MenuItem = {
     label: tk("openInstanceFolder"),
     icon: "folder",
@@ -414,8 +448,8 @@ export function PackDetail() {
 
   // Browsing takes over the whole page rather than opening a dialog: the
   // catalog is three panes wide and adding several mods in a row should not
-  // mean reopening a modal each time.
-  if (browsing && isLocal && latest?.minecraft) {
+  // mean reopening a modal each time. Only available for Minecraft packs.
+  if (browsing && isLocal && latest?.minecraft && pack.gameType === "minecraft") {
     // h-full, not min-h: ModBrowser's result grid owns its scroll, and it can
     // only do that when this page is exactly the shell's height. With min-h the
     // grid grows instead of scrolling, so its infinite-scroll sentinel never
@@ -455,12 +489,16 @@ export function PackDetail() {
             {/* The reference's metadata strip: the three facts a player checks
                 before pressing Play, on one line instead of in a panel. */}
             <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 font-mono text-[11px] text-txt-muted">
-              <span className="flex items-center gap-1.5">
-                <Icon name="gamepad" size={12} /> Minecraft {latest?.minecraft ?? "—"}
-              </span>
-              <span className="flex items-center gap-1.5">
-                <Icon name="puzzle" size={12} /> {loader}
-              </span>
+              {pack.gameType === "minecraft" && (
+                <>
+                  <span className="flex items-center gap-1.5">
+                    <Icon name="gamepad" size={12} /> Minecraft {latest?.minecraft ?? "—"}
+                  </span>
+                  <span className="flex items-center gap-1.5">
+                    <Icon name="puzzle" size={12} /> {loader}
+                  </span>
+                </>
+              )}
               <span className="flex items-center gap-1.5">
                 <Icon name="clock" size={12} />
                 {state.kind === "installed" || state.kind === "outdated"
@@ -516,6 +554,8 @@ export function PackDetail() {
               size="lg"
               icon="play"
               loading={game.kind === "preparing"}
+              disabled={hasMissingUserFiles}
+              title={hasMissingUserFiles ? t("pack.requiredFiles.title") : undefined}
               onClick={() => void play(pack.id)}
             >
               {t("play")}
@@ -567,8 +607,8 @@ export function PackDetail() {
 
       {/* A crash the player cannot read is a support ticket. The last error
           lines are what actually names the culprit mod, so they go here rather
-          than only in the log tab nobody opens. */}
-      {game.kind === "crashed" && (
+          than only in the log tab nobody opens. Minecraft-only in Cycle 1. */}
+      {pack.gameType === "minecraft" && game.kind === "crashed" && (
         <Panel
           title={t("crashedTitle")}
           aside={<Badge tone="bad">{t("crashCode", { code: game.exitCode })}</Badge>}
@@ -612,25 +652,79 @@ export function PackDetail() {
         </Panel>
       )}
 
+      {/* Required user-provided files panel — shown when present and not empty. */}
+      {(state.kind === "installed" || state.kind === "outdated") && state.missingUserFiles && state.missingUserFiles.length > 0 && (
+        <Panel
+          title={t("pack.requiredFiles.title")}
+          aside={<Badge tone="info">{state.missingUserFiles.length}</Badge>}
+          className="mb-4"
+        >
+          <div className="space-y-3">
+            {state.missingUserFiles.map((file) => (
+              <div key={file.path} className="rounded border border-line bg-surface-bright p-3">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <p className="text-sm font-medium">{file.hint}</p>
+                    <p className="text-xs text-txt-muted">{file.path}</p>
+                    <p className="text-xs text-txt-dim">{formatBytes(file.fileSize)}</p>
+                  </div>
+                  <Button
+                    size="sm"
+                    loading={providingFile === file.path}
+                    onClick={() => void handleProvideFile(file.path)}
+                  >
+                    {t("pack.requiredFiles.selectFile")}
+                  </Button>
+                </div>
+                {fileError?.path === file.path && (
+                  <p className="mt-2 text-xs text-bad">
+                    {t("pack.requiredFiles.wrongHash")}{fileError.message ? `: ${fileError.message}` : ""}
+                  </p>
+                )}
+              </div>
+            ))}
+          </div>
+        </Panel>
+      )}
+
       {/* ── Tabs ─────────────────────────────────────────────────────────── */}
 
-      <Tabs
-        className="mb-5"
-        value={tab}
-        onChange={(v) => setTab(v as TabKey)}
-        tabs={[
-          { value: "content", label: t("tabs.content") },
-          { value: "files", label: t("tabs.files") },
-          { value: "worlds", label: t("tabs.worlds") },
+      {/* Build tabs array based on game type. Minecraft packs show all tabs;
+          other types show only generic tabs. */}
+      {(() => {
+        const baseTabs = [
           { value: "gallery", label: t("galleryTab") },
-          { value: "screenshots", label: t("tabs.screenshots") },
-          { value: "backups", label: t("tabs.backups") },
           { value: "logs", label: t("tabs.logs") },
           { value: "info", label: t("tabs.info") },
-        ]}
-      />
+        ]
+        const mcTabs = pack.gameType === "minecraft"
+          ? [
+              { value: "content", label: t("tabs.content") },
+              { value: "files", label: t("tabs.files") },
+              { value: "worlds", label: t("tabs.worlds") },
+              { value: "screenshots", label: t("tabs.screenshots") },
+              { value: "backups", label: t("tabs.backups") },
+            ]
+          : []
+        return (
+          <Tabs
+            className="mb-5"
+            value={tab}
+            onChange={(v) => {
+              const newTab = v as TabKey
+              // If switching to a hidden tab, reset to the first available
+              if (mcTabs.length === 0 && ["content", "files", "worlds", "screenshots", "backups"].includes(newTab)) {
+                setTab("gallery")
+              } else {
+                setTab(newTab)
+              }
+            }}
+            tabs={[...mcTabs, ...baseTabs]}
+          />
+        )
+      })()}
 
-      {tab === "content" && (
+      {pack.gameType === "minecraft" && tab === "content" && (
         <ContentTab
           key={contentNonce}
           slug={pack.slug}
@@ -642,9 +736,9 @@ export function PackDetail() {
         />
       )}
 
-      {tab === "files" && <FilesTab slug={pack.slug} />}
+      {pack.gameType === "minecraft" && tab === "files" && <FilesTab slug={pack.slug} />}
 
-      {tab === "worlds" && (
+      {pack.gameType === "minecraft" && tab === "worlds" && (
         <WorldsTab slug={pack.slug} isLocal={isLocal} onChanged={reloadPacks} />
       )}
 
@@ -657,12 +751,12 @@ export function PackDetail() {
         />
       )}
 
-      {tab === "screenshots" && <ScreenshotsTab slug={pack.slug} />}
+      {pack.gameType === "minecraft" && tab === "screenshots" && <ScreenshotsTab slug={pack.slug} />}
 
       {/* Available for managed packs too: a backup only ever reads the
           instance, so nothing here can put a server-managed pack out of sync
           the way editing its file list would. */}
-      {tab === "backups" && <BackupsTab slug={pack.slug} packName={pack.name} />}
+      {pack.gameType === "minecraft" && tab === "backups" && <BackupsTab slug={pack.slug} packName={pack.name} />}
 
       {tab === "logs" && <LogPanel lines={logs} />}
 
@@ -679,8 +773,8 @@ export function PackDetail() {
                 rows={[
                   { label: t("info.latest"), value: latest?.name ?? "—", mono: true },
                   { label: t("info.published"), value: latest ? formatWhen(latest.createdAt) : "—" },
-                  { label: t("info.minecraft"), value: latest?.minecraft ?? "—", mono: true },
-                  { label: t("info.loaderLabel"), value: loader, mono: true },
+                  pack.gameType === "minecraft" && { label: t("info.minecraft"), value: latest?.minecraft ?? "—", mono: true },
+                  pack.gameType === "minecraft" && { label: t("info.loaderLabel"), value: loader, mono: true },
                   { label: t("info.filesLabel"), value: latest?.fileCount ?? 0 },
                   (state.kind === "installed" || state.kind === "outdated") && {
                     label: t("info.diskLabel"),
@@ -725,8 +819,8 @@ export function PackDetail() {
           </div>
 
           {/* §9 — rollback and the per-instance runtime. Reference material,
-              which is exactly what this tab is for. */}
-          <InstanceSpace slug={pack.slug} onChanged={reloadPacks} />
+              which is exactly what this tab is for. Minecraft-only. */}
+          {pack.gameType === "minecraft" && <InstanceSpace slug={pack.slug} onChanged={reloadPacks} />}
         </div>
       )}
 

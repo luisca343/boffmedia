@@ -18,6 +18,10 @@ import {
 export type PackAccessKind = 'public' | 'password' | 'allowlist';
 export type PackLoader = 'forge' | 'neoforge' | 'fabric-loader' | 'quilt-loader';
 
+// Cycle 1 §3: gameType is now part of admin types. These will be reconciled
+// with @boffmedia/pack-schema via `pnpm generate:shared` once the API DTO is live.
+export type GameType = 'minecraft' | 'emulator' | 'zomboid' | 'stardew';
+
 /** A pack's Quick Play target — present only for "server packs". Port defaults
  *  to the vanilla 25565 when omitted. */
 export interface ServerAddress {
@@ -38,6 +42,7 @@ export interface AdminPack {
   aclCount: number;
   versionCount: number;
   latestVersionId: string | null;
+  gameType: GameType;
   createdAt: string;
   updatedAt: string;
 }
@@ -52,6 +57,7 @@ export interface PackVersionRow {
   fileCount: number;
   published: boolean;
   notes: string | null;
+  gameType: GameType;
   createdAt: string;
 }
 
@@ -92,6 +98,7 @@ export interface CreatePackInput {
   description?: string;
   iconUrl?: string;
   gallery?: GalleryImage[];
+  gameType?: GameType;
   accessKind: PackAccessKind;
   password?: string;
   server?: ServerAddress;
