@@ -21,6 +21,7 @@ import type { MenuItem } from "@boffmedia/ui"
 import { useT } from "../i18n"
 import { VersionPicker, dependenciesOf } from "../components/VersionPicker"
 import type { VersionChoice } from "../components/VersionPicker"
+import { GameSidebar } from "../components/nav/GameSidebar"
 import {
   exportMrpack,
   exportServerMrpack,
@@ -32,6 +33,8 @@ import {
 import { ImportPackPage } from "../components/pack/ImportPackPage"
 import { DeleteLocalPackModal, UninstallPackModal } from "../components/pack/PackDeleteDialogs"
 import type { InstallState, PackEntry, ServerStatus } from "../services/types"
+import type { SystemId } from "../services/systems"
+import { systemOfEntry } from "../services/systems"
 import { useLauncher } from "../state/launcher"
 import { formatBytes, formatPlaytime, formatWhen } from "../utils/format"
 import { PHASE_LABEL } from "../utils/labels"
@@ -402,17 +405,38 @@ export function Packs() {
   const [query, setQuery] = useState("")
   const [creating, setCreating] = useState(false)
   const [importing, setImporting] = useState(false)
+  const [selectedSystem, setSelectedSystem] = useState<SystemId | "All">("All")
+
+  // Collect unique systems from all packs
+  const systems = useMemo(() => {
+    const seen = new Set<SystemId>()
+    packs.forEach((p) => {
+      seen.add(systemOfEntry(p))
+    })
+    return Array.from(seen).sort()
+  }, [packs])
 
   const shown = useMemo(() => {
+    let result = packs
+
+    // Filter by selected system
+    if (selectedSystem !== "All") {
+      result = result.filter((p) => systemOfEntry(p) === selectedSystem)
+    }
+
+    // Filter by search query
     const q = query.trim().toLowerCase()
-    if (!q) return packs
-    return packs.filter(
-      (p) =>
-        p.pack.name.toLowerCase().includes(q) ||
-        (p.pack.summary ?? "").toLowerCase().includes(q) ||
-        p.pack.slug.includes(q),
-    )
-  }, [packs, query])
+    if (q) {
+      result = result.filter(
+        (p) =>
+          p.pack.name.toLowerCase().includes(q) ||
+          (p.pack.summary ?? "").toLowerCase().includes(q) ||
+          p.pack.slug.includes(q),
+      )
+    }
+
+    return result
+  }, [packs, query, selectedSystem])
 
   // The import page owns the whole screen while it is open: it hosts the mod
   // browser, which is three panes wide and does not fit beside the library.
@@ -429,8 +453,12 @@ export function Packs() {
   }
 
   return (
-    <div className="px-8 py-7">
-      <header className="mb-6 flex flex-wrap items-end justify-between gap-4">
+    <div className="flex min-h-0 flex-1">
+      {/* Game system sidebar — hidden when only one system exists */}
+      <GameSidebar systems={systems} selected={selectedSystem} onSelect={setSelectedSystem} />
+
+      <div className="flex min-w-0 flex-1 flex-col overflow-y-auto px-8 py-7">
+        <header className="mb-6 flex flex-wrap items-end justify-between gap-4">
         <div>
           <Kicker>{t("librarySectionTitle")}</Kicker>
           <h1 className="font-display text-[30px]/none font-bold uppercase tracking-[0.06em] text-txt">
@@ -499,6 +527,7 @@ export function Packs() {
           {t("accessInfo")}
         </p>
       )}
+      </div>
     </div>
   )
 }

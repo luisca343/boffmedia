@@ -31,6 +31,10 @@ use super::resolve::{Fetch, PlannedFile};
 #[serde(rename_all = "camelCase")]
 pub enum GameType {
     Minecraft,
+    /// Emulator pack (Cycle 2). A launch refuses if the binary has no arm for a
+    /// marker's game type, so this variant must exist before an emulator marker
+    /// can be read back.
+    Emulator,
 }
 
 /// Retained-version cap when settings say nothing. Three is "the one that broke
@@ -58,6 +62,15 @@ pub enum ManagedSource {
     /// never downloads this, only verifies it after the player provides it.
     #[serde(rename_all = "camelCase")]
     UserProvided { hint: String },
+    /// A romhack (§4.1): reproducible from its base + patch, so repair
+    /// re-materializes it rather than re-downloading. `format` is the wire value
+    /// (`bps`/`ups`) so old markers stay legible.
+    #[serde(rename_all = "camelCase")]
+    Patched {
+        base: String,
+        patch: String,
+        format: String,
+    },
 }
 
 impl ManagedSource {
@@ -79,6 +92,18 @@ impl ManagedSource {
             },
             Fetch::UserProvided { hint } => ManagedSource::UserProvided {
                 hint: hint.clone(),
+            },
+            Fetch::Patched {
+                base,
+                patch,
+                format,
+            } => ManagedSource::Patched {
+                base: base.clone(),
+                patch: patch.clone(),
+                format: match format {
+                    crate::install::patch::PatchFormat::Bps => "bps".to_string(),
+                    crate::install::patch::PatchFormat::Ups => "ups".to_string(),
+                },
             },
         }
     }
@@ -103,6 +128,22 @@ impl ManagedSource {
             }
             ManagedSource::UserProvided { hint } => Fetch::UserProvided {
                 hint: hint.clone(),
+            },
+            ManagedSource::Patched {
+                base,
+                patch,
+                format,
+            } => Fetch::Patched {
+                base: base.clone(),
+                patch: patch.clone(),
+                // Unknown/legacy formats fall back to bps; the file is re-verified
+                // against its pinned sha512 regardless, so a wrong guess just fails
+                // loudly rather than installing corrupt bytes.
+                format: if format == "ups" {
+                    crate::install::patch::PatchFormat::Ups
+                } else {
+                    crate::install::patch::PatchFormat::Bps
+                },
             },
         }
     }

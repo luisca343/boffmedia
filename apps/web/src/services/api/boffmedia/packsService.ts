@@ -58,6 +58,8 @@ export interface PackVersionRow {
   published: boolean;
   notes: string | null;
   gameType: GameType;
+  // Emulator pack fields (Cycle 2, awaiting reconciliation via pnpm generate:shared)
+  emulatorKind?: 'mgba' | 'melonds';
   createdAt: string;
 }
 
@@ -129,13 +131,16 @@ export interface UpdatePackInput {
 
 export interface CreateVersionInput {
   name: string;
-  minecraft: string;
+  minecraft?: string;
   loader?: PackLoader;
   loaderVersion?: string;
   notes?: string;
   /** PackFile[] — the API validates this with @boffmedia/pack-schema. */
   files: unknown[];
   worlds?: BundledWorld[];
+  // Emulator pack fields (Cycle 2, awaiting reconciliation via pnpm generate:shared)
+  emulator?: { kind: 'mgba' | 'melonds'; rom: string; args?: string[] };
+  initialFiles?: unknown[];
 }
 
 // The catalog vocabulary is shared with apps/launcher, which browses mods too

@@ -251,6 +251,23 @@ describe('PacksService', () => {
       expect(both.map((p) => p.id).sort()).toEqual(['emu', 'mc']);
     });
 
+    it('surfaces emulatorKind on the launcher list from the stored emulator block', async () => {
+      repo.listVisibleTo.mockResolvedValue([
+        pack({ id: 'emu', gameType: 'emulator', latestVersionId: 'ev' }),
+      ] as never);
+      repo.findVersion.mockResolvedValue(
+        version({
+          id: 'ev',
+          minecraft: null,
+          loader: null,
+          emulator: { kind: 'mgba', rom: 'roms/x.gba' },
+        }) as never,
+      );
+      const [entry] = await service.listForLauncher(UUID, ['minecraft', 'emulator']);
+      expect(entry.latestVersion?.emulatorKind).toBe('mgba');
+      expect(entry.latestVersion?.minecraft).toBeNull();
+    });
+
     it('409s the manifest of a pack whose game type the caller cannot parse', async () => {
       repo.findById.mockResolvedValue(pack({ gameType: 'emulator' }) as never);
       await expect(service.manifestFor(UUID, 'pk1', null, MC)).rejects.toThrow(
@@ -323,6 +340,8 @@ describe('PacksService', () => {
               path: 'roms/x.gba',
               sha512,
               fileSize: 1,
+              // Cycle 2: the ROM entry must be client-required / server-unsupported.
+              env: { client: 'required', server: 'unsupported' },
               source: { kind: 'user-provided', hint: 'tu volcado' },
             },
           ],

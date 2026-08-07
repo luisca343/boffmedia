@@ -50,6 +50,17 @@ pub struct Settings {
     /// `#[serde(default = "default_true")]` so old files keep the feature enabled.
     #[serde(default = "default_true")]
     pub backup_before_update: bool,
+    /// §5 (Cycle 2) — per-emulator-kind exe path overrides (`"mgba"` → path).
+    /// A manual "Locate…" writes here; detection falls back to EmuDeck/common
+    /// dirs/PATH when a kind has no override. `#[serde(default)]` so a
+    /// pre-emulator settings.json loads unchanged.
+    #[serde(default)]
+    pub emulator_paths: std::collections::HashMap<String, String>,
+    /// §3/§5 (Cycle 2) — the player's ROM-library roots, searched first by the
+    /// auto-scan. EmuDeck prompts the user for this folder, so a manual list is
+    /// the primary path (with the EmuDeck-layout drive scan only as a fallback).
+    #[serde(default)]
+    pub rom_dirs: Vec<String>,
 }
 
 fn default_true() -> bool {
@@ -84,6 +95,8 @@ impl Default for Settings {
             locale: default_locale(),
             // On by default: a safety net before major updates.
             backup_before_update: true,
+            emulator_paths: std::collections::HashMap::new(),
+            rom_dirs: Vec::new(),
         }
     }
 }
@@ -233,6 +246,38 @@ pub fn settings_get(app: tauri::AppHandle) -> Settings {
 pub fn settings_set(app: tauri::AppHandle, settings: Settings) -> Result<Settings, InstallFailure> {
     save(&app, &settings)?;
     Ok(settings)
+}
+
+// ── ROM library roots (§5, Cycle 2) ──────────────────────────────────────────
+
+#[tauri::command]
+pub fn rom_dirs_get(app: tauri::AppHandle) -> Vec<String> {
+    load(&app).rom_dirs
+}
+
+/// Add a player-picked ROM folder. Validates it is a real directory and
+/// de-duplicates. Returns the updated list.
+#[tauri::command]
+pub fn rom_dirs_add(app: tauri::AppHandle, dir: String) -> Result<Vec<String>, InstallFailure> {
+    if !PathBuf::from(&dir).is_dir() {
+        return Err(InstallFailure::message(format!(
+            "No existe una carpeta en «{dir}»."
+        )));
+    }
+    let mut s = load(&app);
+    if !s.rom_dirs.iter().any(|d| d == &dir) {
+        s.rom_dirs.push(dir);
+    }
+    save(&app, &s)?;
+    Ok(s.rom_dirs)
+}
+
+#[tauri::command]
+pub fn rom_dirs_remove(app: tauri::AppHandle, dir: String) -> Result<Vec<String>, InstallFailure> {
+    let mut s = load(&app);
+    s.rom_dirs.retain(|d| d != &dir);
+    save(&app, &s)?;
+    Ok(s.rom_dirs)
 }
 
 #[cfg(test)]

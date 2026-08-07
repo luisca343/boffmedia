@@ -34,6 +34,7 @@ function toVersion(pack: LauncherPack): PackVersionSummary | null {
     minecraft: v.minecraft,
     loader: v.loader,
     loaderVersion: v.loaderVersion,
+    emulatorKind: (pack as any).emulatorKind ?? null,
     fileCount: v.fileCount,
     createdAt: v.createdAt,
   }
@@ -66,6 +67,7 @@ function toLocalEntry(manifest: PackManifest): PackEntry {
       minecraft: (manifest.version.dependencies ?? {}).minecraft ?? null,
       loader: loaderEntry?.[0] ?? null,
       loaderVersion: loaderEntry?.[1] ?? null,
+      emulatorKind: null,
       fileCount: manifest.version.files.length,
       createdAt: manifest.version.createdAt,
     },

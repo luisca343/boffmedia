@@ -1,8 +1,18 @@
-import { Badge, Button, DataList, Divider, Field, Input, Kicker, Panel, Seg, Slider, Toggle } from "@boffmedia/ui"
+import { Badge, Button, DataList, Divider, Field, Input, Kicker, Panel, Seg, Slider, Toggle, toast } from "@boffmedia/ui"
 import { useEffect, useState } from "react"
 
 import { useT } from "../i18n"
-import { getRuntimeInfo } from "../runtime"
+import {
+  getRuntimeInfo,
+  emulatorStatus,
+  emulatorSetPath,
+  emulatorClearPath,
+  romDirsGet,
+  romDirsAdd,
+  romDirsRemove,
+  filePicker,
+  folderPicker,
+} from "../runtime"
 import { checkForUpdates, useUpdates } from "../services/updates"
 import { useLauncher } from "../state/launcher"
 import { formatBytes } from "../utils/format"
@@ -15,13 +25,102 @@ export function Settings() {
   const { phase, update, error } = useUpdates()
   const t = useT("settings")
   const [version, setVersion] = useState<string | null>(null)
+  const [mgbaStatus, setMgbaStatus] = useState<any>(null)
+  const [melondsStatus, setMelondsStatus] = useState<any>(null)
+  const [romFolders, setRomFolders] = useState<string[]>([])
+  const [loadingEmulators, setLoadingEmulators] = useState(false)
 
   useEffect(() => {
     // Null in a browser tab, where there is no shell to ask.
     void getRuntimeInfo().then((info) => setVersion(info?.appVersion ?? null))
   }, [])
 
+  useEffect(() => {
+    // Load emulator status and ROM folders on mount
+    setLoadingEmulators(true)
+    Promise.all([
+      emulatorStatus("mgba").then((s) => setMgbaStatus(s)).catch(() => {}),
+      emulatorStatus("melonds").then((s) => setMelondsStatus(s)).catch(() => {}),
+      romDirsGet().then((dirs) => setRomFolders(dirs)).catch(() => {}),
+    ]).finally(() => setLoadingEmulators(false))
+  }, [])
+
   const checking = phase === "checking"
+
+  const handleEmulatorLocate = async (kind: "mgba" | "melonds") => {
+    const path = await filePicker()
+    if (!path) return
+    try {
+      const newStatus = await emulatorSetPath(kind, path)
+      if (kind === "mgba") setMgbaStatus(newStatus)
+      else setMelondsStatus(newStatus)
+      toast.success(t("emulators.emulatorPathSet"))
+    } catch (err) {
+      toast.error((err as { message?: string })?.message ?? t("emulators.emulatorPathError"))
+    }
+  }
+
+  const handleEmulatorClear = async (kind: "mgba" | "melonds") => {
+    try {
+      const newStatus = await emulatorClearPath(kind)
+      if (kind === "mgba") setMgbaStatus(newStatus)
+      else setMelondsStatus(newStatus)
+      toast.success(t("emulators.emulatorPathCleared"))
+    } catch (err) {
+      toast.error((err as { message?: string })?.message ?? t("emulators.emulatorPathError"))
+    }
+  }
+
+  const handleAddRomFolder = async () => {
+    const dir = await folderPicker()
+    if (!dir) return
+    try {
+      const updated = await romDirsAdd(dir)
+      setRomFolders(updated)
+      toast.success(t("emulators.addFolder"))
+    } catch (err) {
+      toast.error((err as { message?: string })?.message ?? t("emulators.addFolder"))
+    }
+  }
+
+  const handleRemoveRomFolder = async (dir: string) => {
+    try {
+      const updated = await romDirsRemove(dir)
+      setRomFolders(updated)
+      toast.success(t("emulators.removeFolder"))
+    } catch (err) {
+      toast.error((err as { message?: string })?.message ?? t("emulators.removeFolder"))
+    }
+  }
+
+  const formatEmulatorStatus = (status: any, kind: "mgba" | "melonds") => {
+    if (!status) return null
+    const kindLabel = kind === "mgba" ? t("emulators.mgba") : t("emulators.melonds")
+    if (status.staleOverride) {
+      return {
+        label: kindLabel,
+        value: t("emulators.staleOverrideWarning"),
+        warning: true,
+      }
+    }
+    if (!status.resolved) {
+      return {
+        label: kindLabel,
+        value: t("emulators.notFound"),
+        warning: false,
+      }
+    }
+    const sourceLabel = status.resolved.source === "emudeck"
+      ? "EmuDeck"
+      : status.resolved.source === "override"
+        ? t("emulators.resolved")
+        : t("emulators.detected")
+    return {
+      label: kindLabel,
+      value: `${status.resolved.path} · ${sourceLabel}`,
+      warning: false,
+    }
+  }
 
   return (
     <div className="px-8 py-7">
@@ -81,6 +180,125 @@ export function Settings() {
               {settings.javaPath ? t("java.manualHint") : t("java.autoHint")}
             </span>
           </div>
+        </Panel>
+
+        <Panel title={t("emulators.title")}>
+          {/* Emulator status rows */}
+          <div className="space-y-4">
+            {/* mGBA row */}
+            {mgbaStatus && (() => {
+              const status = formatEmulatorStatus(mgbaStatus, "mgba")
+              return (
+                <div className="rounded border border-line bg-surface-bright p-3">
+                  <div className="flex items-start justify-between">
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-medium">{status?.label}</p>
+                      <p className={`text-xs ${status?.warning ? "text-warn" : "text-txt-muted"}`}>
+                        {status?.value}
+                      </p>
+                    </div>
+                    <div className="ml-3 flex shrink-0 gap-2">
+                      {!mgbaStatus.resolved && !mgbaStatus.staleOverride ? (
+                        <Button size="sm" onClick={() => void handleEmulatorLocate("mgba")}>
+                          {t("emulators.locate")}
+                        </Button>
+                      ) : (
+                        <>
+                          <Button size="sm" variant="ghost" onClick={() => void handleEmulatorLocate("mgba")}>
+                            {t("emulators.change")}
+                          </Button>
+                          <Button size="sm" variant="ghost" onClick={() => void handleEmulatorClear("mgba")}>
+                            {t("emulators.clear")}
+                          </Button>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )
+            })()}
+
+            {/* melonDS row */}
+            {melondsStatus && (() => {
+              const status = formatEmulatorStatus(melondsStatus, "melonds")
+              return (
+                <div className="rounded border border-line bg-surface-bright p-3">
+                  <div className="flex items-start justify-between">
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-medium">{status?.label}</p>
+                      <p className={`text-xs ${status?.warning ? "text-warn" : "text-txt-muted"}`}>
+                        {status?.value}
+                      </p>
+                    </div>
+                    <div className="ml-3 flex shrink-0 gap-2">
+                      {!melondsStatus.resolved && !melondsStatus.staleOverride ? (
+                        <Button size="sm" onClick={() => void handleEmulatorLocate("melonds")}>
+                          {t("emulators.locate")}
+                        </Button>
+                      ) : (
+                        <>
+                          <Button size="sm" variant="ghost" onClick={() => void handleEmulatorLocate("melonds")}>
+                            {t("emulators.change")}
+                          </Button>
+                          <Button size="sm" variant="ghost" onClick={() => void handleEmulatorClear("melonds")}>
+                            {t("emulators.clear")}
+                          </Button>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )
+            })()}
+          </div>
+
+          <Divider className="my-4" />
+
+          {/* ROM folders section */}
+          <div className="flex items-center justify-between mb-3">
+            <p className="font-medium text-sm">{t("emulators.romFolders")}</p>
+            <Button size="sm" icon="plus" onClick={() => void handleAddRomFolder()}>
+              {t("emulators.addFolder")}
+            </Button>
+          </div>
+
+          {romFolders.length === 0 ? (
+            <p className="text-xs text-txt-dim">{t("emulators.noFolders")}</p>
+          ) : (
+            <div className="space-y-2">
+              {romFolders.map((folder) => (
+                <div key={folder} className="flex items-center justify-between rounded bg-surface-bright p-2 text-sm">
+                  <span className="truncate font-mono text-xs">{folder}</span>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => void handleRemoveRomFolder(folder)}
+                  >
+                    {t("emulators.removeFolder")}
+                  </Button>
+                </div>
+              ))}
+            </div>
+          )}
+
+          <Divider className="my-4" />
+
+          {/* EmuDeck recommendation */}
+          <div className="space-y-2">
+            <p className="text-xs font-medium">{t("emulators.emudeckRecommendation")}</p>
+            <a
+              href="https://www.emudeck.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-xs text-accent-bright hover:underline"
+            >
+              https://www.emudeck.com/
+            </a>
+          </div>
+
+          <p className="mt-4 text-[11px] text-txt-dim italic">
+            {t("emulators.packPagePrimary")}
+          </p>
         </Panel>
 
         <Panel title={t("install.title")}>

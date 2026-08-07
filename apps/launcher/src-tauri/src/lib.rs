@@ -27,6 +27,7 @@ pub mod backups;
 pub mod browse;
 pub mod catalog;
 pub mod datadir;
+pub mod emulators;
 pub mod icons;
 pub mod install;
 pub mod local_packs;
@@ -127,6 +128,14 @@ pub fn run() {
             install::instance_runtime_set,
             // §4.3 — user-provided files.
             install::instance_provide_file,
+            // Cycle 2 — emulator ROM library sweep + resolution + settings.
+            install::instance_user_files_scan,
+            emulators::emulator_status,
+            emulators::emulator_set_path,
+            emulators::emulator_clear_path,
+            settings::rom_dirs_get,
+            settings::rom_dirs_add,
+            settings::rom_dirs_remove,
             settings::settings_get,
             settings::settings_set,
             settings::plays_get,

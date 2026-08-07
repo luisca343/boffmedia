@@ -36,6 +36,7 @@ import { GalleryTab } from "../components/pack/GalleryTab"
 import { ScreenshotsTab } from "../components/pack/ScreenshotsTab"
 import { WorldsTab } from "../components/pack/WorldsTab"
 import { LogPanel } from "../components/pack/LogPanel"
+import { EmulatorSetupPanel } from "../components/pack/EmulatorSetupPanel"
 import {
   exportMrpack,
   exportServerMrpack,
@@ -685,6 +686,20 @@ export function PackDetail() {
             ))}
           </div>
         </Panel>
+      )}
+
+      {/* Emulator setup panel — shown for emulator packs. */}
+      {pack.gameType === "emulator" && (state.kind === "installed" || state.kind === "outdated") && (
+        <EmulatorSetupPanel
+          slug={pack.slug}
+          emulatorKind={latest?.emulatorKind}
+          missingFiles={state.missingUserFiles ?? []}
+          onFileProvided={() => {
+            setContentNonce((n) => n + 1)
+            reloadPacks()
+          }}
+          className="mb-4"
+        />
       )}
 
       {/* ── Tabs ─────────────────────────────────────────────────────────── */}

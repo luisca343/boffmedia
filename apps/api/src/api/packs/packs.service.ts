@@ -38,6 +38,16 @@ export class PacksService {
     return gameType ?? 'minecraft';
   }
 
+  /** The emulator kind stored in the version's `emulator` json block, if any —
+   *  surfaced on list/summary views so the launcher maps a pack to its system
+   *  (Game Boy Advance / Nintendo DS) without fetching the manifest. */
+  private emulatorKind(
+    emulator: Record<string, unknown> | null | undefined,
+  ): 'mgba' | 'melonds' | null {
+    const kind = emulator?.kind;
+    return kind === 'mgba' || kind === 'melonds' ? kind : null;
+  }
+
   /** Packs this UUID may see AND this launcher can parse. Access filtering is a
    *  single repository query (one place can leak a pack); capability filtering
    *  is layered on top — a launcher that does not declare a game type never
@@ -48,7 +58,7 @@ export class PacksService {
     const canParse = new Set(capabilities);
 
     const views = await Promise.all(
-      rows.map(async (pack) => {
+      rows.map(async (pack): Promise<LauncherPackView | null> => {
         const gameType = this.resolveGameType(pack.gameType);
         if (!canParse.has(gameType)) return null;
 
@@ -79,10 +89,11 @@ export class PacksService {
                   loaderVersion: version.loaderVersion,
                   fileCount: version.files.length,
                   worldCount: version.worlds?.length ?? 0,
+                  emulatorKind: this.emulatorKind(version.emulator),
                   createdAt: version.createdAt.toISOString(),
                 }
               : null,
-        } satisfies LauncherPackView;
+        };
       }),
     );
     return views.filter((v): v is LauncherPackView => v !== null);
@@ -379,6 +390,7 @@ export class PacksService {
       loaderVersion: v.loaderVersion,
       fileCount: v.files.length,
       worldCount: v.worlds?.length ?? 0,
+      emulatorKind: this.emulatorKind(v.emulator),
       published: v.published,
       notes: v.notes,
       createdAt: v.createdAt.toISOString(),
@@ -414,6 +426,7 @@ export class PacksService {
       loaderVersion: version.loaderVersion,
       fileCount: version.files.length,
       worldCount: version.worlds?.length ?? 0,
+      emulatorKind: this.emulatorKind(version.emulator),
       published: version.published,
       notes: version.notes,
       createdAt: version.createdAt.toISOString(),

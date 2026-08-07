@@ -11,16 +11,20 @@
 //! content); the schema and `pack.rs` forbid `user-provided`/`modrinth`/
 //! `curseforge` here, so those arms are unreachable in a validated manifest.
 
-use super::game;
+use super::paths::{InstancePaths, Layout};
 use super::progress::Reporter;
 use crate::install::files;
 use crate::pack::{PackManifest, PackManifestVersionInitialFilesItem};
 use crate::pack::PackManifestVersionInitialFilesItemSource as Source;
 
 /// Seed the version's `initialFiles` into the instance, first-install-only.
+/// Game-agnostic: takes the instance/layout/pack-id directly so both the
+/// Minecraft and emulator install paths can call it.
 pub async fn seed_initial_files(
     app: &tauri::AppHandle,
-    prepared: &game::Prepared,
+    instance: &InstancePaths,
+    layout: &Layout,
+    pack_id: &str,
     http: &reqwest::Client,
     password: Option<&str>,
     reporter: &Reporter,
@@ -28,7 +32,7 @@ pub async fn seed_initial_files(
 ) {
     for file in &manifest.version.initial_files {
         let rel = file.path.as_str().replace('\\', "/");
-        let dest = prepared.instance.minecraft.join(&rel);
+        let dest = instance.minecraft.join(&rel);
 
         // First-install-only: an existing path belongs to the player now.
         if dest.exists() {
@@ -36,7 +40,7 @@ pub async fn seed_initial_files(
             continue;
         }
 
-        let bytes = match fetch_initial_bytes(app, prepared, http, password, file).await {
+        let bytes = match fetch_initial_bytes(app, layout, pack_id, http, password, file).await {
             Ok(bytes) => bytes,
             Err(e) => {
                 reporter.log("warn", &format!("No se pudo obtener «{rel}»: {e}"));
@@ -72,7 +76,8 @@ pub async fn seed_initial_files(
 
 async fn fetch_initial_bytes(
     app: &tauri::AppHandle,
-    prepared: &game::Prepared,
+    layout: &Layout,
+    pack_id: &str,
     http: &reqwest::Client,
     password: Option<&str>,
     file: &PackManifestVersionInitialFilesItem,
@@ -83,13 +88,13 @@ async fn fetch_initial_bytes(
             // Local packs keep their override bytes only in the local blob store;
             // managed packs stream them through the entitlement-checked proxy —
             // the same split bundled worlds make.
-            if prepared.plan.pack_id.starts_with("local-") {
-                let path = files::local_blob_path(&prepared.layout, &sha512);
+            if pack_id.starts_with("local-") {
+                let path = files::local_blob_path(layout, &sha512);
                 std::fs::read(&path).map_err(|e| e.to_string())
             } else {
                 let pack_file = crate::api::PackFile::Override { sha512 };
                 let response =
-                    crate::api::fetch_pack_file(app, &prepared.plan.pack_id, password, &pack_file)
+                    crate::api::fetch_pack_file(app, pack_id, password, &pack_file)
                         .await
                         .map_err(|e| format!("{e:?}"))?;
                 let bytes = response.bytes().await.map_err(|e| e.to_string())?;

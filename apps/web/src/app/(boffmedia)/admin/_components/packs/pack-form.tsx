@@ -337,7 +337,7 @@ export function PackForm({
               <div role="radiogroup" aria-label={t("gameType")} className="grid gap-2 md:grid-cols-2">
                 {(["minecraft", "emulator", "zomboid", "stardew"] as const).map((gt) => {
                   const selected = gameType === gt
-                  const disabled = gt !== "minecraft"
+                  const disabled = gt !== "minecraft" && gt !== "emulator"
                   return (
                     <button
                       key={gt}

@@ -26,6 +26,7 @@ import { overrideFileEntry, uploadOverrideBlob } from "./upload-blob"
 import { useGameVersions, useLoaderVersions } from "./use-version-meta"
 import { VersionCombobox, type ComboOption } from "./version-combobox"
 import { BundledWorldsEditor } from "./bundled-worlds-editor"
+import { EmulatorEditor, type EmulatorKind } from "./emulator-editor"
 import { type BundledWorld } from "@/services/api/boffmedia/packsService"
 
 // Cutting a version is the one authoring step the launcher cannot do for you:
@@ -184,6 +185,14 @@ export function VersionEditor({
   const [showSnapshots, setShowSnapshots] = useState(false)
   const [prefilling, setPrefilling] = useState(false)
   const [importing, setImporting] = useState<string | null>(null)
+  // Emulator pack data
+  const [emulatorData, setEmulatorData] = useState<{
+    kind: EmulatorKind
+    rom: string
+    args?: string[]
+    files: unknown[]
+    initialFiles?: unknown[]
+  } | null>(null)
   const filesRef = useRef<HTMLInputElement>(null)
   const folderRef = useRef<HTMLInputElement>(null)
   const archiveRef = useRef<HTMLInputElement>(null)
@@ -391,14 +400,41 @@ export function VersionEditor({
         source: mod.source,
       }))
 
-      const payload = {
+      const payload: {
+        name: string
+        minecraft?: string
+        loader?: PackLoader
+        loaderVersion?: string
+        notes?: string
+        files: unknown[]
+        worlds?: BundledWorld[]
+        emulator?: { kind: EmulatorKind; rom: string; args?: string[] }
+        initialFiles?: unknown[]
+      } = {
         name: name.trim(),
-        minecraft: minecraft.trim(),
-        loader: (loader || undefined) as PackLoader | undefined,
-        loaderVersion: loader ? loaderVersion.trim() : undefined,
-        notes: notes.trim() || undefined,
         files: [...modFiles, ...overrides, ...extra],
         worlds: worlds.length > 0 ? worlds : undefined,
+      }
+
+      // Minecraft-specific fields
+      if (!emulatorData) {
+        payload.minecraft = minecraft.trim()
+        payload.loader = (loader || undefined) as PackLoader | undefined
+        payload.loaderVersion = loader ? loaderVersion.trim() : undefined
+        payload.notes = notes.trim() || undefined
+      }
+
+      // Emulator-specific fields
+      if (emulatorData) {
+        payload.files = emulatorData.files
+        payload.emulator = {
+          kind: emulatorData.kind,
+          rom: emulatorData.rom,
+          args: emulatorData.args,
+        }
+        if (emulatorData.initialFiles && emulatorData.initialFiles.length > 0) {
+          payload.initialFiles = emulatorData.initialFiles
+        }
       }
       const res =
         mode === "edit" && sourceVersionId
@@ -418,8 +454,9 @@ export function VersionEditor({
   const title =
     mode === "edit" ? t("editVersion") : mode === "clone" ? t("cloneVersion") : t("newVersion")
 
-  // Non-Minecraft packs show a placeholder in Cycle 1
-  const isNonMc = pack.gameType !== "minecraft"
+  // Emulator packs use a dedicated editor
+  const isEmulator = pack.gameType === "emulator"
+  const isNonMc = pack.gameType !== "minecraft" && !isEmulator
 
   return (
     <AvPanel
@@ -450,6 +487,16 @@ export function VersionEditor({
             {t("cancel")}
           </Button>
         </div>
+      ) : isEmulator ? (
+      <div className="flex min-h-0 flex-1 flex-col gap-5 bm-scroll overflow-auto pr-1 pb-4">
+        <EmulatorEditor
+          onSave={(data) => {
+            setEmulatorData(data)
+            setStep("review")
+          }}
+          previousKind={undefined}
+        />
+      </div>
       ) : (
       <div className="flex min-h-0 flex-1 flex-col gap-5">
         <div className="flex shrink-0 flex-wrap items-center justify-between gap-3 border-b border-line pb-4">

@@ -14,6 +14,12 @@ use crate::auth::{AuthState, AuthFailure};
 
 const JOIN_URL: &str = "https://sessionserver.mojang.com/session/minecraft/join";
 
+/// The game types THIS binary can parse and launch, sent on every pack list /
+/// manifest call so the server never hands us a pack we cannot handle. This is
+/// the truthful capability set of the build, never aspirational: `emulator`
+/// joins it in the Cycle 2 release that can actually launch emulator packs.
+const GAME_TYPES_HEADER: &str = "minecraft,emulator";
+
 /// Where the pack registry lives. A runtime env var wins so a QA build can be
 /// pointed at a staging API without a rebuild; the compile-time value is what
 /// packaged builds carry.
@@ -96,10 +102,17 @@ struct LauncherSession {
 pub struct LauncherVersion {
     pub id: String,
     pub name: String,
-    pub minecraft: String,
+    /// Null for non-minecraft packs — the API sends null and the renderer's
+    /// `PackVersionSummary.minecraft` is nullable to match.
+    #[serde(default)]
+    pub minecraft: Option<String>,
     pub loader: Option<String>,
     pub loader_version: Option<String>,
     pub file_count: u32,
+    /// Present for emulator packs (`"mgba"`/`"melonds"`) so the library sidebar
+    /// can map the pack to its system without a manifest fetch.
+    #[serde(default)]
+    pub emulator_kind: Option<String>,
     pub created_at: String,
 }
 
@@ -347,7 +360,7 @@ pub async fn packs_list(
 ) -> Result<Vec<LauncherPack>, ApiError> {
     let res = authed(&api, &auth, |http, base| {
         http.get(format!("{base}/packs/launcher/packs"))
-            .header("X-Boff-Game-Types", "minecraft")
+            .header("X-Boff-Game-Types", GAME_TYPES_HEADER)
     })
     .await?;
 
@@ -377,7 +390,7 @@ pub async fn pack_manifest(
 
     let res = authed(&api, &auth, |http, base| {
         http.get(format!("{base}/packs/launcher/packs/{pack_id}/manifest"))
-            .header("X-Boff-Game-Types", "minecraft")
+            .header("X-Boff-Game-Types", GAME_TYPES_HEADER)
             .query(&query)
     })
     .await?;

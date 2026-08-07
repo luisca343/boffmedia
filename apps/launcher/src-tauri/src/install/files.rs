@@ -370,6 +370,13 @@ pub(crate) async fn resolve_url(http: &reqwest::Client, file: &PlannedFile) -> R
             "«{}» debe ser proporcionado por el jugador ({}); el launcher no puede descargarlo.",
             file.path, hint
         ))),
+        // Patched files are materialized in a dedicated pass (materialize_patched)
+        // after the normal downloads, never fetched by URL. Unreachable in
+        // practice — install_payload excludes them from download_all.
+        Fetch::Patched { .. } => Err(InstallFailure::message(format!(
+            "«{}» es un romhack; se genera localmente, no se descarga.",
+            file.path
+        ))),
         Fetch::ModrinthVersion { version_id } => {
             let res = http
                 .get(format!("{MODRINTH_API}/version/{version_id}"))
@@ -502,6 +509,101 @@ fn place(blob: &Path, dest: &Path) -> Result<(), InstallFailure> {
     std::fs::copy(blob, dest)
         .map(|_| ())
         .map_err(|e| InstallFailure::message(format!("No se pudo instalar {}: {e}", dest.display())))
+}
+
+/// Materialize `patched` (romhack) files (§4.1) AFTER the normal downloads, so
+/// each hack's `base` (a user-provided dump) and `patch` (a downloaded blob) are
+/// already on disk. Applies the patch in Rust, verifies the output against the
+/// entry's pinned sha512, caches the (reproducible) result content-addressed,
+/// and places it. A base/patch not yet present is skipped, not an error — the
+/// missing base surfaces via `missingUserFiles` and blocks launch until supplied.
+pub fn materialize_patched(
+    layout: &Layout,
+    dest_root: &Path,
+    files: &[PlannedFile],
+    reporter: &Reporter,
+) -> Result<(), InstallFailure> {
+    for file in files {
+        let Fetch::Patched {
+            base,
+            patch,
+            format,
+        } = &file.fetch
+        else {
+            continue;
+        };
+        let dest = dest_root.join(file.path.replace('\\', "/"));
+        let sha512 = file.sha512.to_lowercase();
+
+        // Already correct on disk, or reproducible from the content cache.
+        if let Ok(meta) = std::fs::metadata(&dest) {
+            if meta.is_file()
+                && (file.size == 0 || meta.len() == file.size)
+                && sha512_of(&dest).as_deref() == Some(sha512.as_str())
+            {
+                continue;
+            }
+        }
+        let cached = cache_path(layout, &sha512);
+        if cached.is_file() && sha512_of(&cached).as_deref() == Some(sha512.as_str()) {
+            place(&cached, &dest)?;
+            continue;
+        }
+
+        let base_path = dest_root.join(base.replace('\\', "/"));
+        let patch_path = dest_root.join(patch.replace('\\', "/"));
+        let (Ok(base_bytes), Ok(patch_bytes)) =
+            (std::fs::read(&base_path), std::fs::read(&patch_path))
+        else {
+            reporter.log(
+                "info",
+                &format!(
+                    "«{}» aún no se puede generar: falta el ROM base o el parche.",
+                    file.path
+                ),
+            );
+            continue;
+        };
+
+        // A base-CRC failure here is the player's dump being the wrong revision —
+        // a distinct, actionable error, not a transient one.
+        let output = crate::install::patch::apply(*format, &base_bytes, &patch_bytes).map_err(
+            |e| {
+                InstallFailure::message(format!(
+                    "No se pudo aplicar el parche a «{}»: {e}",
+                    file.path
+                ))
+            },
+        )?;
+
+        // The entry pins the PATCHED output; a mismatch is a pack-authoring error
+        // (the manifest declared a different result than the patch produces).
+        let actual = {
+            use sha2::{Digest, Sha512};
+            let mut hasher = Sha512::new();
+            hasher.update(&output);
+            hex(&hasher.finalize())
+        };
+        if actual != sha512 {
+            return Err(InstallFailure::message(format!(
+                "El parche de «{}» no produjo el resultado que el pack esperaba (error de autoría).",
+                file.path
+            )));
+        }
+
+        if let Some(parent) = cached.parent() {
+            let _ = std::fs::create_dir_all(parent);
+        }
+        let _ = std::fs::write(&cached, &output);
+        if let Some(parent) = dest.parent() {
+            let _ = std::fs::create_dir_all(parent);
+        }
+        std::fs::write(&dest, &output).map_err(|e| {
+            InstallFailure::message(format!("No se pudo escribir «{}»: {e}", file.path))
+        })?;
+        reporter.log("info", &format!("Romhack «{}» generado.", file.path));
+    }
+    Ok(())
 }
 
 #[cfg(test)]

@@ -34,6 +34,7 @@ import type {
 
 import type {
   Account,
+  EmulatorStatus,
   GameState,
   GameVersion,
   InstallPhase,
@@ -48,12 +49,14 @@ import type {
   ProvideFileResult,
   ResolvedRuntime,
   RetainedVersion,
+  RomScanResult,
   RuntimeSource,
   ServerStatus,
   Settings,
 } from "./services/types"
 
 export type {
+  EmulatorStatus,
   GameVersion,
   InstanceRuntime,
   JavaChoice,
@@ -63,6 +66,7 @@ export type {
   PackManifest,
   ResolvedRuntime,
   RetainedVersion,
+  RomScanResult,
   RuntimeSource,
   ServerStatus,
 }
@@ -1478,4 +1482,130 @@ export async function localPackWorldRemove(slug: string, folder: string): Promis
   } catch (err) {
     throw asFailure(err)
   }
+}
+
+// ── Emulators (Cycle 2) ────────────────────────────────────────────────────
+
+/** Get the current status of an emulator (resolved path and source, or stale override). */
+export async function emulatorStatus(kind: "mgba" | "melonds"): Promise<any> {
+  if (!isDesktop()) return mockEmulatorStatus(kind)
+  try {
+    return await invoke("emulator_status", { kind })
+  } catch (err) {
+    throw asFailure(err)
+  }
+}
+
+/** Set an override path for an emulator. */
+export async function emulatorSetPath(kind: "mgba" | "melonds", path: string): Promise<any> {
+  if (!isDesktop()) return mockEmulatorStatus(kind)
+  try {
+    return await invoke("emulator_set_path", { kind, path })
+  } catch (err) {
+    throw asFailure(err)
+  }
+}
+
+/** Clear the override path for an emulator (fall back to auto-detection). */
+export async function emulatorClearPath(kind: "mgba" | "melonds"): Promise<any> {
+  if (!isDesktop()) return mockEmulatorStatus(kind)
+  try {
+    return await invoke("emulator_clear_path", { kind })
+  } catch (err) {
+    throw asFailure(err)
+  }
+}
+
+/** Get the list of configured ROM directories. */
+export async function romDirsGet(): Promise<string[]> {
+  if (!isDesktop()) return mockRomDirs
+  try {
+    return await invoke<string[]>("rom_dirs_get")
+  } catch {
+    return []
+  }
+}
+
+/** Add a ROM directory to the search list. */
+export async function romDirsAdd(dir: string): Promise<string[]> {
+  if (!isDesktop()) {
+    if (!mockRomDirs.includes(dir)) mockRomDirs.push(dir)
+    return [...mockRomDirs]
+  }
+  try {
+    return await invoke<string[]>("rom_dirs_add", { dir })
+  } catch (err) {
+    throw asFailure(err)
+  }
+}
+
+/** Remove a ROM directory from the search list. */
+export async function romDirsRemove(dir: string): Promise<string[]> {
+  if (!isDesktop()) {
+    const idx = mockRomDirs.indexOf(dir)
+    if (idx >= 0) mockRomDirs.splice(idx, 1)
+    return [...mockRomDirs]
+  }
+  try {
+    return await invoke<string[]>("rom_dirs_remove", { dir })
+  } catch (err) {
+    throw asFailure(err)
+  }
+}
+
+/** Scan for user-provided files in the player's ROM library. */
+export async function instanceUserFilesScan(slug: string): Promise<any> {
+  if (!isDesktop()) return mockInstanceUserFilesScan(slug)
+  try {
+    return await invoke("instance_user_files_scan", { slug })
+  } catch (err) {
+    throw asFailure(err)
+  }
+}
+
+/** Open a native file picker. Resolves to the chosen file path, or null if cancelled. */
+export async function filePicker(): Promise<string | null> {
+  if (!isDesktop()) return null
+  try {
+    return await invoke<string | null>("file_picker")
+  } catch {
+    return null
+  }
+}
+
+/** Open a native folder picker. Resolves to the chosen folder path, or null if cancelled. */
+export async function folderPicker(): Promise<string | null> {
+  if (!isDesktop()) return null
+  try {
+    return await invoke<string | null>("folder_picker")
+  } catch {
+    return null
+  }
+}
+
+// ── Mock emulator functions (browser mode) ─────────────────────────────────
+
+let mockRomDirs: string[] = []
+
+function mockEmulatorStatus(kind: "mgba" | "melonds"): any {
+  if (kind === "melonds") {
+    return {
+      resolved: {
+        path: "C:\\Games\\EmuDeck\\Emulators\\melonDS\\melonDS.exe",
+        source: "emudeck",
+      },
+    }
+  }
+  // mgba: unresolved for demo purposes
+  return {}
+}
+
+function mockInstanceUserFilesScan(slug: string): any {
+  if (slug === "test-emulator") {
+    return {
+      satisfied: [],
+      stillMissing: ["roms/pokered.gba"],
+    }
+  }
+  return { satisfied: [], stillMissing: [] }
 }

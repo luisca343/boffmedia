@@ -65,6 +65,15 @@ pub enum Fetch {
     /// User-provided file (§4.3): the player supplies it locally. The hint
     /// tells the player what to look for. Never automatically downloaded.
     UserProvided { hint: String },
+    /// A romhack (§4.1): materialized locally by applying `patch` to `base`
+    /// (both other files[] entries, by instance-relative path), then verified
+    /// against this entry's own sha512. Materialized in a dedicated pass AFTER
+    /// the normal downloads, so its base and patch are already on disk.
+    Patched {
+        base: String,
+        patch: String,
+        format: crate::install::patch::PatchFormat,
+    },
 }
 
 #[derive(Debug, Clone)]
@@ -89,10 +98,28 @@ pub struct PlannedFile {
 #[derive(Debug, Clone)]
 pub enum PlannedGame {
     /// Minecraft pack: requires dependencies, optional loaders, and a Minecraft version.
-    /// Cycle 2: Emulator(EmulatorPlan)
-    /// Cycle 3: Zomboid(ZomboidPlan)
-    /// Cycle 4: Stardew(StardewPlan)
     Minecraft(PlannedMinecraft),
+    /// Emulator pack (Cycle 2): a ROM (user-provided or patched) run on the
+    /// player's own mGBA/melonDS. No loaders, no Java — installs are payload-only.
+    Emulator(PlannedEmulator),
+    // Cycle 3: Zomboid(ZomboidPlan)
+    // Cycle 4: Stardew(StardewPlan)
+}
+
+#[derive(Debug, Clone)]
+pub struct PlannedEmulator {
+    pub pack_id: String,
+    pub slug: String,
+    pub version_id: String,
+    pub version_name: String,
+    /// Wire kind (`"mgba"` | `"melonds"`) — resolved to an executable at launch.
+    pub kind: String,
+    /// Instance-relative path of the ROM handed to the emulator.
+    pub rom: String,
+    /// Extra CLI flags, placed BEFORE the ROM path.
+    pub args: Vec<String>,
+    pub files: Vec<PlannedFile>,
+    pub total_bytes: u64,
 }
 
 #[derive(Debug, Clone)]
@@ -166,19 +193,21 @@ pub fn plan(manifest: &PackManifest) -> Result<PlannedGame, InstallFailure> {
         .map(|gt| matches!(gt, crate::pack::PackManifestPackGameType::Minecraft))
         .unwrap_or(true);
 
-    match is_minecraft {
-        true => plan_minecraft(manifest).map(PlannedGame::Minecraft),
-        false => {
-            // Cycle 2+: each game type has its own arm.
-            Err(InstallFailure::message(
-                "Este tipo de juego no es soportado en esta versión del launcher."
-                    .to_string(),
-            ))
-        }
+    if is_minecraft {
+        return plan_minecraft(manifest).map(PlannedGame::Minecraft);
     }
+    if manifest.version.emulator.is_some() {
+        return plan_emulator(manifest).map(PlannedGame::Emulator);
+    }
+    // Cycle 3+: zomboid/stardew arms land with their cycles.
+    Err(InstallFailure::message(
+        "Este tipo de juego no es soportado en esta versión del launcher.".to_string(),
+    ))
 }
 
-fn plan_minecraft(manifest: &PackManifest) -> Result<PlannedMinecraft, InstallFailure> {
+/// The file list is game-agnostic: skip client-unsupported entries, resolve each
+/// source to a `Fetch`. Shared by every game plan.
+fn plan_files(manifest: &PackManifest) -> Result<(Vec<PlannedFile>, u64), InstallFailure> {
     let mut files = Vec::with_capacity(manifest.version.files.len());
     let mut total_bytes: u64 = 0;
 
@@ -204,6 +233,32 @@ fn plan_minecraft(manifest: &PackManifest) -> Result<PlannedMinecraft, InstallFa
             fetch,
         });
     }
+    Ok((files, total_bytes))
+}
+
+fn plan_emulator(manifest: &PackManifest) -> Result<PlannedEmulator, InstallFailure> {
+    let (files, total_bytes) = plan_files(manifest)?;
+    let emu = manifest.version.emulator.as_ref().ok_or_else(|| {
+        InstallFailure::message("El pack de emulador no declara su bloque `emulator`")
+    })?;
+    Ok(PlannedEmulator {
+        pack_id: manifest.pack.id.to_string(),
+        slug: manifest.pack.slug.to_string(),
+        version_id: manifest.version.id.to_string(),
+        version_name: manifest.version.name.to_string(),
+        kind: match emu.kind {
+            crate::pack::PackManifestVersionEmulatorKind::Mgba => "mgba".to_string(),
+            crate::pack::PackManifestVersionEmulatorKind::Melonds => "melonds".to_string(),
+        },
+        rom: emu.rom.to_string(),
+        args: emu.args.iter().map(|a| a.to_string()).collect(),
+        files,
+        total_bytes,
+    })
+}
+
+fn plan_minecraft(manifest: &PackManifest) -> Result<PlannedMinecraft, InstallFailure> {
+    let (files, total_bytes) = plan_files(manifest)?;
 
     let deps = manifest.version.dependencies.as_ref().ok_or_else(|| {
         InstallFailure::message("El paquete no declara dependencias de Minecraft")
@@ -267,12 +322,39 @@ pub(crate) fn fetch_for(source: &Source, _path: &str) -> Result<Fetch, InstallFa
         Source::UserProvided { hint } => Fetch::UserProvided {
             hint: hint.to_string(),
         },
+
+        // §4.1 — a romhack. The base/patch references are validated by
+        // pack::parse_manifest; here they are just carried through for the
+        // dedicated materialization pass.
+        Source::Patched {
+            base,
+            patch,
+            format,
+        } => Fetch::Patched {
+            base: base.to_string(),
+            patch: patch.to_string(),
+            format: match format {
+                crate::pack::PackManifestVersionFilesItemSourceFormat::Bps => {
+                    crate::install::patch::PatchFormat::Bps
+                }
+                crate::pack::PackManifestVersionFilesItemSourceFormat::Ups => {
+                    crate::install::patch::PatchFormat::Ups
+                }
+            },
+        },
     })
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    fn expect_minecraft(g: PlannedGame) -> PlannedMinecraft {
+        match g {
+            PlannedGame::Minecraft(p) => p,
+            other => panic!("expected a minecraft plan, got {other:?}"),
+        }
+    }
 
     fn manifest(deps: &str, files: &str) -> PackManifest {
         let raw = format!(
@@ -341,7 +423,7 @@ mod tests {
                 file("mods/server-only.jar", "unsupported", r#"{"kind":"url","url":"https://x.test/b"}"#)
             ),
         );
-        let PlannedGame::Minecraft(plan) = plan(&m).unwrap();
+        let plan = expect_minecraft(plan(&m).unwrap());
         assert_eq!(plan.files.len(), 1);
         assert_eq!(plan.total_bytes, 10, "a skipped file must not inflate the bar");
     }
@@ -356,7 +438,7 @@ mod tests {
                 file("config/a.toml", "required", r#"{"kind":"url","url":"https://x.test/b"}"#)
             ),
         );
-        let PlannedGame::Minecraft(plan) = plan(&m).unwrap();
+        let plan = expect_minecraft(plan(&m).unwrap());
         assert!(plan.files[0].is_mod);
         assert!(!plan.files[1].is_mod);
     }
@@ -374,7 +456,7 @@ mod tests {
                 file("mods/minimap.jar", "optional", r#"{"kind":"url","url":"https://x.test/b"}"#)
             ),
         );
-        let PlannedGame::Minecraft(plan) = plan(&m).unwrap();
+        let plan = expect_minecraft(plan(&m).unwrap());
         assert_eq!(plan.files.len(), 2);
         assert!(!plan.files[0].optional);
         assert!(plan.files[1].optional);
@@ -392,7 +474,7 @@ mod tests {
                 r#"{"kind":"curseforge","projectId":123,"fileId":456}"#,
             ),
         );
-        let PlannedGame::Minecraft(plan) = plan(&m).unwrap();
+        let plan = expect_minecraft(plan(&m).unwrap());
         match &plan.files[0].fetch {
             Fetch::Proxied(crate::api::PackFile::Curseforge {
                 project_id,
@@ -414,10 +496,7 @@ mod tests {
                 &format!(r#"{{"kind":"override","blobSha512":"{}"}}"#, "b".repeat(128)),
             ),
         );
-        let planned_game = plan(&m).unwrap();
-        let plan = match planned_game {
-            PlannedGame::Minecraft(p) => p,
-        };
+        let plan = expect_minecraft(plan(&m).unwrap());
         match &plan.files[0].fetch {
             Fetch::Proxied(crate::api::PackFile::Override { sha512 }) => {
                 assert_eq!(*sha512, "b".repeat(128));
@@ -447,14 +526,14 @@ mod tests {
     #[test]
     fn quick_play_is_none_without_a_declared_server() {
         let m = manifest_with_server("1.21.4", None);
-        let PlannedGame::Minecraft(plan) = plan(&m).unwrap();
+        let plan = expect_minecraft(plan(&m).unwrap());
         assert_eq!(plan.quick_play, None);
     }
 
     #[test]
     fn quick_play_targets_the_declared_server_on_1_20_plus() {
         let m = manifest_with_server("1.20.1", Some(r#"{"host":"play.boffmedia.es","port":25566}"#));
-        let PlannedGame::Minecraft(plan) = plan(&m).unwrap();
+        let plan = expect_minecraft(plan(&m).unwrap());
         assert_eq!(
             plan.quick_play,
             Some("play.boffmedia.es:25566".to_string())
@@ -465,7 +544,7 @@ mod tests {
     fn quick_play_uses_the_bare_host_when_no_port_is_declared() {
         // SRV case: Minecraft resolves the port itself from the bare host.
         let m = manifest_with_server("1.20.1", Some(r#"{"host":"wingull.boffmedia.es"}"#));
-        let PlannedGame::Minecraft(plan) = plan(&m).unwrap();
+        let plan = expect_minecraft(plan(&m).unwrap());
         assert_eq!(
             plan.quick_play,
             Some("wingull.boffmedia.es".to_string())
@@ -475,14 +554,14 @@ mod tests {
     #[test]
     fn quick_play_is_suppressed_below_1_20_even_with_a_server() {
         let m = manifest_with_server("1.19.4", Some(r#"{"host":"play.boffmedia.es","port":25565}"#));
-        let PlannedGame::Minecraft(plan) = plan(&m).unwrap();
+        let plan = expect_minecraft(plan(&m).unwrap());
         assert_eq!(plan.quick_play, None);
     }
 
     #[test]
     fn an_unparseable_minecraft_version_is_treated_as_pre_1_20() {
         let m = manifest_with_server("snapshot", Some(r#"{"host":"play.boffmedia.es","port":25565}"#));
-        let PlannedGame::Minecraft(plan) = plan(&m).unwrap();
+        let plan = expect_minecraft(plan(&m).unwrap());
         assert_eq!(plan.quick_play, None);
     }
 }

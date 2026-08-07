@@ -33,6 +33,8 @@ export interface LauncherPackView {
     loaderVersion: string | null;
     fileCount: number;
     worldCount: number;
+    /** Present for emulator packs — the library sidebar's system mapping. */
+    emulatorKind?: 'mgba' | 'melonds' | null;
     createdAt: string;
   } | null;
 }
@@ -68,6 +70,7 @@ export interface PackVersionView {
   loaderVersion: string | null;
   fileCount: number;
   worldCount: number;
+  emulatorKind?: 'mgba' | 'melonds' | null;
   published: boolean;
   notes: string | null;
   createdAt: string;

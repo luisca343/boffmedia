@@ -16,10 +16,12 @@
 // aborting.
 
 pub mod crash;
+pub mod emulator;
 pub mod files;
 pub mod game;
 pub mod initial;
 pub mod instance;
+pub mod patch;
 pub mod paths;
 pub mod process;
 pub mod progress;
@@ -222,6 +224,18 @@ impl Drop for InstallGuard {
 
 // ── Shared setup ───────────────────────────────────────────────────────────
 
+/// Parse+fully-validate the manifest value the renderer handed us. The renderer
+/// is the one thing between the API and the disk we do not control, so this is
+/// re-checked rather than trusted.
+fn parse_manifest_value(
+    manifest: &serde_json::Value,
+) -> Result<crate::pack::PackManifest, InstallFailure> {
+    let raw = serde_json::to_string(manifest)
+        .map_err(|e| InstallFailure::message(format!("Manifiesto ilegible: {e}")))?;
+    crate::pack::parse_manifest(&raw)
+        .map_err(|e| InstallFailure::message(format!("El manifiesto del pack no es válido: {e}")))
+}
+
 /// Everything a command needs before it can do anything: settings, layout, the
 /// signed-in session, and the plan. Shared by install and launch so the two can
 /// never disagree about where a pack lives or who is playing.
@@ -230,13 +244,16 @@ async fn prepare(
     auth: &AuthState,
     manifest: &serde_json::Value,
 ) -> Result<(game::Prepared, reqwest::Client), InstallFailure> {
-    let raw = serde_json::to_string(manifest)
-        .map_err(|e| InstallFailure::message(format!("Manifiesto ilegible: {e}")))?;
-    let parsed = crate::pack::parse_manifest(&raw)
-        .map_err(|e| InstallFailure::message(format!("El manifiesto del pack no es válido: {e}")))?;
-    let planned_game = resolve::plan(&parsed)?;
-    let plan = match planned_game {
+    let parsed = parse_manifest_value(manifest)?;
+    let plan = match resolve::plan(&parsed)? {
         resolve::PlannedGame::Minecraft(mc_plan) => mc_plan,
+        // The command dispatches non-Minecraft packs before ever calling
+        // prepare(); reaching here with one is an internal bug.
+        _ => {
+            return Err(InstallFailure::message(
+                "interno: prepare() sólo maneja packs de Minecraft".to_string(),
+            ))
+        }
     };
 
     let mc = auth.session().await.ok_or_else(|| {
@@ -600,10 +617,29 @@ async fn install_payload(
     )
     .await;
 
+    // Romhacks: materialize any patched files now that their base + patch are on
+    // disk (Minecraft packs never carry these, but the pass is a cheap no-op).
+    let patched: Vec<PlannedFile> = wanted
+        .iter()
+        .filter(|f| matches!(f.fetch, resolve::Fetch::Patched { .. }))
+        .cloned()
+        .collect();
+    files::materialize_patched(&prepared.layout, &prepared.instance.minecraft, &patched, reporter)?;
+
     // First-install-only seeds (a starting `.sav`, a default options file).
     // Same "written once, then owned by the player" contract as worlds, and
     // likewise best-effort — a failed seed never blocks the install.
-    initial::seed_initial_files(app, prepared, http, password, reporter, manifest).await;
+    initial::seed_initial_files(
+        app,
+        &prepared.instance,
+        &prepared.layout,
+        &prepared.plan.pack_id,
+        http,
+        password,
+        reporter,
+        manifest,
+    )
+    .await;
 
     reporter.emit(Phase::Verifying, 0.5, "", 0, 0);
 
@@ -794,6 +830,12 @@ pub async fn install_pack(
     auth: tauri::State<'_, AuthState>,
     manager: tauri::State<'_, InstallManager>,
 ) -> Result<InstallStatus, InstallFailure> {
+    // Dispatch by game type. Emulator packs take an entirely separate, Java-free
+    // path; everything below is the Minecraft arm, unchanged.
+    if let resolve::PlannedGame::Emulator(plan) = resolve::plan(&parse_manifest_value(&manifest)?)? {
+        return emulator::install(&app, &manager, plan, &manifest, password.as_deref()).await;
+    }
+
     let (prepared, http) = prepare(&app, &auth, &manifest).await?;
     let pack_id = prepared.plan.pack_id.clone();
     let _guard = manager.begin_install(&pack_id)?;
@@ -876,6 +918,12 @@ pub async fn launch_pack(
     auth: tauri::State<'_, AuthState>,
     manager: tauri::State<'_, InstallManager>,
 ) -> Result<u32, InstallFailure> {
+    // Emulator packs launch an external process, not the JVM — a wholly separate
+    // path. Everything below is the Minecraft arm, unchanged.
+    if let resolve::PlannedGame::Emulator(plan) = resolve::plan(&parse_manifest_value(&manifest)?)? {
+        return emulator::launch(&app, &manager, plan, &manifest, password.as_deref()).await;
+    }
+
     let (prepared, http) = prepare(&app, &auth, &manifest).await?;
     let pack_id = prepared.plan.pack_id.clone();
 
@@ -1585,6 +1633,164 @@ pub async fn instance_provide_file(
     })?;
 
     Ok(ProvideFileOk { satisfied: true })
+}
+
+/// The result of a ROM-library sweep (§3): which required user-provided files it
+/// found and imported, and which are still missing.
+#[derive(Debug, Clone, Default, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct UserFileScan {
+    pub satisfied: Vec<String>,
+    pub still_missing: Vec<String>,
+}
+
+/// "Plug and play" (§3): sweep the player's ROM library for any unsatisfied
+/// required `user-provided` file of an installed pack, matching by size then
+/// streamed SHA-512, and import+place every hit (the `instance_provide_file`
+/// flow, without a prompt). Also user-invokable ("Scan my library").
+#[tauri::command]
+pub async fn instance_user_files_scan(
+    slug: String,
+    app: tauri::AppHandle,
+) -> Result<UserFileScan, InstallFailure> {
+    let settings = settings::load(&app);
+    let layout = Layout::new(&app, settings.game_dir())?;
+    let instance = layout.instance(&slug);
+    let Some(marker) = read_marker(&instance) else {
+        return Ok(UserFileScan::default());
+    };
+
+    // Required, still-unsatisfied user-provided entries: (rel path, sha512, size).
+    let mut remaining: Vec<(String, String, u64)> = marker
+        .managed
+        .iter()
+        .filter(|f| !f.optional && matches!(f.source, ManagedSource::UserProvided { .. }))
+        .filter_map(|f| {
+            let sha = f.sha512.to_lowercase();
+            let in_blob = files::local_blob_path(&layout, &sha).is_file();
+            let on_disk = std::fs::metadata(instance.minecraft.join(f.path.replace('\\', "/")))
+                .map(|m| m.is_file() && (f.size == 0 || m.len() == f.size))
+                .unwrap_or(false);
+            if in_blob || on_disk {
+                None
+            } else {
+                Some((f.path.clone(), sha, f.size))
+            }
+        })
+        .collect();
+
+    if remaining.is_empty() {
+        return Ok(UserFileScan::default());
+    }
+
+    // Cheap prefilter: only files whose exact size matches a missing entry are
+    // ever hashed. A renamed dump is still found; a wrong-region dump never
+    // silently accepted (the SHA-512 is the judge).
+    let sizes: HashSet<u64> = remaining.iter().map(|(_, _, size)| *size).collect();
+
+    let mut satisfied = Vec::new();
+    'roots: for root in rom_search_roots(&settings) {
+        for candidate in walk_files(&root, 2) {
+            if remaining.is_empty() {
+                break 'roots;
+            }
+            let Ok(meta) = std::fs::metadata(&candidate) else {
+                continue;
+            };
+            if !meta.is_file() || !sizes.contains(&meta.len()) {
+                continue;
+            }
+            let Some(hash) = files::sha512_of(&candidate) else {
+                continue;
+            };
+            let Some(pos) = remaining
+                .iter()
+                .position(|(_, sha, size)| *size == meta.len() && *sha == hash)
+            else {
+                continue;
+            };
+            let (path, sha, _) = remaining.remove(pos);
+            if import_user_file(&layout, &instance, &candidate, &sha, &path).is_ok() {
+                satisfied.push(path);
+            }
+        }
+    }
+
+    Ok(UserFileScan {
+        satisfied,
+        still_missing: remaining.into_iter().map(|(path, _, _)| path).collect(),
+    })
+}
+
+/// Search roots in priority order: the player's own list first (EmuDeck prompts
+/// for this folder, so it is the primary path), then the EmuDeck default layout
+/// on every drive, then the user profile.
+fn rom_search_roots(settings: &settings::Settings) -> Vec<std::path::PathBuf> {
+    use std::path::PathBuf;
+    let mut roots: Vec<PathBuf> = settings.rom_dirs.iter().map(PathBuf::from).collect();
+
+    #[cfg(windows)]
+    for letter in b'A'..=b'Z' {
+        let drive = format!("{}:\\Emulation\\roms", letter as char);
+        let p = PathBuf::from(drive);
+        if p.is_dir() {
+            roots.push(p);
+        }
+    }
+
+    if let Some(profile) = std::env::var_os("USERPROFILE").or_else(|| std::env::var_os("HOME")) {
+        let p = PathBuf::from(profile).join("Emulation").join("roms");
+        if p.is_dir() {
+            roots.push(p);
+        }
+    }
+    roots
+}
+
+/// Collect files under `root` up to `max_depth` levels deep (root files = depth
+/// 0). Bounded and dumb by design (§3): the size+hash match is the judge, so no
+/// extension filter that could miss a renamed dump.
+fn walk_files(root: &std::path::Path, max_depth: usize) -> Vec<std::path::PathBuf> {
+    let mut out = Vec::new();
+    let mut stack = vec![(root.to_path_buf(), 0usize)];
+    while let Some((dir, depth)) = stack.pop() {
+        let Ok(entries) = std::fs::read_dir(&dir) else {
+            continue;
+        };
+        for entry in entries.flatten() {
+            let path = entry.path();
+            if path.is_dir() {
+                if depth < max_depth {
+                    stack.push((path, depth + 1));
+                }
+            } else if path.is_file() {
+                out.push(path);
+            }
+        }
+    }
+    out
+}
+
+/// Import a verified user-provided file into the never-purged local blob store
+/// (so reinstall/repair never re-prompts) and place it at the instance path.
+fn import_user_file(
+    layout: &Layout,
+    instance: &InstancePaths,
+    source: &std::path::Path,
+    sha512: &str,
+    rel_path: &str,
+) -> std::io::Result<()> {
+    let blob = files::local_blob_path(layout, sha512);
+    if let Some(parent) = blob.parent() {
+        std::fs::create_dir_all(parent)?;
+    }
+    std::fs::copy(source, &blob)?;
+    let dest = instance.minecraft.join(rel_path.replace('\\', "/"));
+    if let Some(parent) = dest.parent() {
+        std::fs::create_dir_all(parent)?;
+    }
+    std::fs::copy(&blob, &dest)?;
+    Ok(())
 }
 
 #[cfg(test)]

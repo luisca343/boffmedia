@@ -29,6 +29,8 @@ export class LauncherVersionEntity {
   @ApiPropertyOptional({ nullable: true }) loaderVersion!: string | null;
   @ApiProperty() fileCount!: number;
   @ApiProperty() worldCount!: number;
+  @ApiPropertyOptional({ enum: ['mgba', 'melonds'], nullable: true })
+  emulatorKind?: 'mgba' | 'melonds' | null;
   @ApiProperty() createdAt!: string;
 }
 
@@ -94,6 +96,8 @@ export class PackVersionEntity {
   @ApiPropertyOptional({ nullable: true }) loaderVersion!: string | null;
   @ApiProperty() fileCount!: number;
   @ApiProperty() worldCount!: number;
+  @ApiPropertyOptional({ enum: ['mgba', 'melonds'], nullable: true })
+  emulatorKind?: 'mgba' | 'melonds' | null;
   @ApiProperty() published!: boolean;
   @ApiPropertyOptional({ nullable: true }) notes!: string | null;
   @ApiProperty() createdAt!: string;

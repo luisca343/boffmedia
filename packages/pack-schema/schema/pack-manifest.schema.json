@@ -347,6 +347,37 @@
                       "hint"
                     ],
                     "additionalProperties": false
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "kind": {
+                        "type": "string",
+                        "const": "patched"
+                      },
+                      "base": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "patch": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "format": {
+                        "type": "string",
+                        "enum": [
+                          "bps",
+                          "ups"
+                        ]
+                      }
+                    },
+                    "required": [
+                      "kind",
+                      "base",
+                      "patch",
+                      "format"
+                    ],
+                    "additionalProperties": false
                   }
                 ]
               }
@@ -476,6 +507,37 @@
                       "hint"
                     ],
                     "additionalProperties": false
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "kind": {
+                        "type": "string",
+                        "const": "patched"
+                      },
+                      "base": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "patch": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "format": {
+                        "type": "string",
+                        "enum": [
+                          "bps",
+                          "ups"
+                        ]
+                      }
+                    },
+                    "required": [
+                      "kind",
+                      "base",
+                      "patch",
+                      "format"
+                    ],
+                    "additionalProperties": false
                   }
                 ]
               },
@@ -498,7 +560,35 @@
             "additionalProperties": false
           }
         },
-        "emulator": {},
+        "emulator": {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "enum": [
+                "mgba",
+                "melonds"
+              ]
+            },
+            "rom": {
+              "type": "string",
+              "minLength": 1
+            },
+            "args": {
+              "maxItems": 32,
+              "type": "array",
+              "items": {
+                "type": "string",
+                "maxLength": 256
+              }
+            }
+          },
+          "required": [
+            "kind",
+            "rom"
+          ],
+          "additionalProperties": false
+        },
         "zomboid": {},
         "stardew": {},
         "initialFiles": {
@@ -651,6 +741,37 @@
                     "required": [
                       "kind",
                       "hint"
+                    ],
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "kind": {
+                        "type": "string",
+                        "const": "patched"
+                      },
+                      "base": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "patch": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "format": {
+                        "type": "string",
+                        "enum": [
+                          "bps",
+                          "ups"
+                        ]
+                      }
+                    },
+                    "required": [
+                      "kind",
+                      "base",
+                      "patch",
+                      "format"
                     ],
                     "additionalProperties": false
                   }

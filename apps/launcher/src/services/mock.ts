@@ -34,6 +34,7 @@ function version(
   name: string,
   createdAt: string,
   fileCount: number,
+  emulatorKind?: "mgba" | "melonds" | null,
 ): PackVersionSummary {
   return {
     id,
@@ -42,6 +43,7 @@ function version(
     minecraft: "1.21.4",
     loader: "neoforge",
     loaderVersion: "21.4.30",
+    emulatorKind: emulatorKind ?? null,
     fileCount,
   }
 }
@@ -118,6 +120,7 @@ const PACKS: {
       minecraft: null,
       loader: null,
       loaderVersion: null,
+      emulatorKind: "mgba",
       fileCount: 1,
     },
   },
@@ -626,4 +629,31 @@ export function mockRemoveGalleryImage(slug: string, filename: string): void {
   const images = mockPackGalleries.get(slug) ?? []
   const filtered = images.filter((f) => f !== filename)
   mockPackGalleries.set(slug, filtered)
+}
+
+// ── Emulator mocks (Cycle 2) ──────────────────────────────────────────────
+
+/** Mock emulator status lookup. */
+export function mockEmulatorStatus(kind: "mgba" | "melonds"): any {
+  if (kind === "melonds") {
+    return {
+      resolved: {
+        path: "C:\\Games\\EmuDeck\\Emulators\\melonDS\\melonDS.exe",
+        source: "emudeck",
+      },
+    }
+  }
+  // mgba: unresolved for demo purposes
+  return {}
+}
+
+/** Mock ROM scan result for an instance. */
+export function mockInstanceUserFilesScan(slug: string): any {
+  if (slug === "test-emulator") {
+    return {
+      satisfied: [],
+      stillMissing: ["roms/pokered.gba"],
+    }
+  }
+  return { satisfied: [], stillMissing: [] }
 }

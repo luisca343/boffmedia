@@ -122,7 +122,7 @@ describe("gameType", () => {
 
   it("forbids a minecraft pack from carrying a non-mc spec block", () => {
     const m = manifest()
-    m.version.emulator = { kind: "mgba" }
+    m.version.emulator = { kind: "mgba", rom: "roms/x.gba" }
     expect(() => PackManifest.parse(m)).toThrow(/only allowed when gameType is/)
   })
 
@@ -135,6 +135,7 @@ describe("gameType", () => {
       path: "roms/x.gba",
       sha512,
       fileSize: 100,
+      env: { client: "required", server: "unsupported" },
       source: { kind: "user-provided", hint: "Pokémon Esmeralda (EUR) — tu propio volcado .gba" },
     }
     const parsed = PackManifest.parse(m)
@@ -145,7 +146,7 @@ describe("gameType", () => {
   it("rejects a non-mc pack that declares dependencies", () => {
     const m = manifest()
     m.pack.gameType = "emulator"
-    m.version.emulator = { kind: "mgba" }
+    m.version.emulator = { kind: "mgba", rom: "roms/x.gba" }
     expect(() => PackManifest.parse(m)).toThrow(/`dependencies` is minecraft-only/)
   })
 
@@ -153,7 +154,7 @@ describe("gameType", () => {
     const m = manifest()
     m.pack.gameType = "emulator"
     delete m.version.dependencies
-    m.version.emulator = { kind: "mgba" }
+    m.version.emulator = { kind: "mgba", rom: "roms/x.gba" }
     m.version.worlds = [
       { folder: "world", sha512, sizeBytes: 10, source: { kind: "override", blobSha512: "b".repeat(128) } },
     ]
@@ -189,6 +190,130 @@ describe("user-provided source", () => {
     const m = manifest()
     m.version.files[0].source = { kind: "user-provided", hint: "" }
     expect(() => PackManifest.parse(m)).toThrow()
+  })
+})
+
+describe("emulator packs", () => {
+  const rom = (over = {}) => ({
+    path: "roms/emerald.gba",
+    sha512,
+    fileSize: 100,
+    env: { client: "required" as const, server: "unsupported" as const },
+    source: { kind: "user-provided" as const, hint: "Pokémon Esmeralda (EUR) — tu volcado .gba" },
+    ...over,
+  })
+  const emu = (): z.input<typeof PackManifest> => {
+    const m = manifest()
+    m.pack.gameType = "emulator"
+    delete m.version.dependencies
+    m.version.emulator = { kind: "mgba", rom: "roms/emerald.gba" }
+    m.version.files = [rom()]
+    return m
+  }
+
+  it("accepts a well-formed mgba pack with a user-provided ROM", () => {
+    const parsed = PackManifest.parse(emu())
+    expect(parsed.version.emulator).toEqual({ kind: "mgba", rom: "roms/emerald.gba" })
+  })
+
+  it("rejects an unknown emulator kind", () => {
+    const m = emu()
+    // @ts-expect-error invalid kind
+    m.version.emulator = { kind: "snes9x", rom: "roms/emerald.gba" }
+    expect(() => PackManifest.parse(m)).toThrow()
+  })
+
+  it("rejects a rom that does not match any files[] entry", () => {
+    const m = emu()
+    m.version.emulator = { kind: "mgba", rom: "roms/missing.gba" }
+    expect(() => PackManifest.parse(m)).toThrow(/must match a files\[\] entry/)
+  })
+
+  it("rejects a ROM entry with the wrong env", () => {
+    const m = emu()
+    m.version.files = [rom({ env: { client: "required", server: "required" } })]
+    expect(() => PackManifest.parse(m)).toThrow(/must have env.client/)
+  })
+
+  it("rejects a blob-hosted ROM (the server never hosts ROM bytes)", () => {
+    const m = emu()
+    m.version.files = [rom({ source: { kind: "override", blobSha512: "a".repeat(128) } })]
+    expect(() => PackManifest.parse(m)).toThrow(/user-provided or patched/)
+  })
+
+  it("accepts a patched (romhack) ROM referencing a user-provided base and a blob patch", () => {
+    const m = emu()
+    m.version.emulator = { kind: "mgba", rom: "roms/hack.gba" }
+    m.version.files = [
+      rom(), // the clean base (user-provided)
+      {
+        path: "roms/patch.bps",
+        sha512,
+        fileSize: 5,
+        env: { client: "required", server: "unsupported" },
+        source: { kind: "override", blobSha512: "b".repeat(128) },
+      },
+      {
+        path: "roms/hack.gba",
+        sha512: "c".repeat(128),
+        fileSize: 100,
+        env: { client: "required", server: "unsupported" },
+        source: { kind: "patched", base: "roms/emerald.gba", patch: "roms/patch.bps", format: "bps" },
+      },
+    ]
+    expect(() => PackManifest.parse(m)).not.toThrow()
+  })
+
+  it("rejects a patched ROM whose base is not user-provided", () => {
+    const m = emu()
+    m.version.emulator = { kind: "mgba", rom: "roms/hack.gba" }
+    m.version.files = [
+      {
+        path: "roms/emerald.gba",
+        sha512,
+        fileSize: 100,
+        env: { client: "required", server: "unsupported" },
+        source: { kind: "override", blobSha512: "a".repeat(128) },
+      },
+      {
+        path: "roms/patch.bps",
+        sha512,
+        fileSize: 5,
+        env: { client: "required", server: "unsupported" },
+        source: { kind: "override", blobSha512: "b".repeat(128) },
+      },
+      {
+        path: "roms/hack.gba",
+        sha512: "c".repeat(128),
+        fileSize: 100,
+        env: { client: "required", server: "unsupported" },
+        source: { kind: "patched", base: "roms/emerald.gba", patch: "roms/patch.bps", format: "bps" },
+      },
+    ]
+    expect(() => PackManifest.parse(m)).toThrow(/patched.base must reference a user-provided file/)
+  })
+
+  it("rejects a patched ROM whose patch is user-provided rather than distributable", () => {
+    const m = emu()
+    m.version.emulator = { kind: "mgba", rom: "roms/hack.gba" }
+    m.version.files = [
+      rom(),
+      {
+        path: "roms/patch.bps",
+        sha512,
+        fileSize: 5,
+        env: { client: "required", server: "unsupported" },
+        source: { kind: "user-provided", hint: "your patch" },
+      },
+      {
+        path: "roms/hack.gba",
+        sha512: "c".repeat(128),
+        fileSize: 100,
+        env: { client: "required", server: "unsupported" },
+        source: { kind: "patched", base: "roms/emerald.gba", patch: "roms/patch.bps", format: "bps" },
+      },
+    ]
+    expect(() => PackManifest.parse(m)).toThrow(/patched.patch must reference an override or url file/)
   })
 })
 

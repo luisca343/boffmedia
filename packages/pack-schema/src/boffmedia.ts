@@ -50,6 +50,22 @@ export const FileSource = z.discriminatedUnion("kind", [
     kind: z.literal("user-provided"),
     hint: z.string().min(1).max(512),
   }),
+  /** A romhack: the file materializes LOCALLY by applying `patch` to `base`,
+   *  then is verified like any other file against the entry's own `sha512` +
+   *  `fileSize` (which pin the PATCHED output). The pipeline stays uniform —
+   *  every file has a way to materialize and a pinned hash. `base` must point at
+   *  a `user-provided` files[] entry (the player's clean dump — the server never
+   *  hosts ROM bytes, D3); `patch` at a distributable files[] entry
+   *  (`override`/`url` — patches are freely redistributable). No `patched` entry
+   *  may itself be the `base` of another (no chains in v1). Cross-field rules
+   *  live in the superRefine and are mirrored in `pack.rs`. `.ips` is excluded:
+   *  no embedded checksums. `.bps`/`.ups` both carry source/target CRC32s. */
+  z.object({
+    kind: z.literal("patched"),
+    base: InstancePath,
+    patch: InstancePath,
+    format: z.enum(["bps", "ups"]),
+  }),
 ])
 export type FileSource = z.infer<typeof FileSource>
 
@@ -64,6 +80,24 @@ export const PackFile = z.object({
   source: FileSource,
 })
 export type PackFile = z.infer<typeof PackFile>
+
+/** The emulator systems supported in Cycle 2 (D2). Azahar/3DS is deferred
+ *  (decrypted dumps + keys); no RetroArch. */
+export const EmulatorKind = z.enum(["mgba", "melonds"])
+export type EmulatorKind = z.infer<typeof EmulatorKind>
+
+/** The per-game spec block for `gameType: "emulator"`. `rom` names the file
+ *  handed to the emulator at launch — it MUST equal the `path` of a `files[]`
+ *  entry whose source is `user-provided` or `patched` (the server never hosts
+ *  ROM bytes, D3) and whose env is client:required / server:unsupported. `args`
+ *  are extra CLI flags placed BEFORE the ROM path. Cross-field rules live in the
+ *  PackManifest superRefine and are mirrored in `pack.rs`. */
+export const EmulatorSpec = z.object({
+  kind: EmulatorKind,
+  rom: InstancePath,
+  args: z.array(z.string().max(256)).max(32).optional(),
+})
+export type EmulatorSpec = z.infer<typeof EmulatorSpec>
 
 /** §7.3: a password gates composition and configs, not the mods themselves —
  *  those come from public CF/Modrinth URLs. §7.4: this is distribution control
@@ -116,10 +150,9 @@ export const PackVersion = z.object({
    *  (forbidden on any other gameType — superRefine). */
   worlds: z.array(BundledWorld).optional(),
   /** Per-game spec blocks — exactly one is present, matching the pack's
-   *  gameType (superRefine). Content schemas land per game cycle; Cycle 1
-   *  defines only the slots and the exclusivity rule, so they are typed loosely
-   *  here and tightened when their cycle ships (emulator → Cycle 2, etc.). */
-  emulator: z.unknown().optional(),
+   *  gameType (superRefine). `emulator` is tightened to its real shape as of
+   *  Cycle 2; `zomboid`/`stardew` stay loose slots until their cycles ship. */
+  emulator: EmulatorSpec.optional(),
   zomboid: z.unknown().optional(),
   stardew: z.unknown().optional(),
   /** First-install-only files (a starting `.sav`, a default options file):
@@ -314,6 +347,76 @@ export const PackManifest = z
         })
       }
       initialSeen.add(key)
+    }
+
+    // ---- `patched` (romhack) cross-field rules (game-agnostic, Cycle 2) ----
+    // A patched file references two other files[] entries by path: its clean
+    // `base` (must be user-provided — the server never hosts ROM bytes) and its
+    // `patch` (must be distributable). Requiring the base to be user-provided
+    // also forbids chains (a base can never itself be a patched entry).
+    const fileByPath = new Map<string, (typeof v.files)[number]>()
+    for (const file of v.files) fileByPath.set(norm(file.path), file)
+    for (const [i, file] of v.files.entries()) {
+      if (file.source.kind !== "patched") continue
+      const base = fileByPath.get(norm(file.source.base))
+      if (!base) {
+        ctx.addIssue({
+          code: "custom",
+          path: ["version", "files", i, "source", "base"],
+          message: `patched.base must reference a files[] entry: ${file.source.base}`,
+        })
+      } else if (base.source.kind !== "user-provided") {
+        ctx.addIssue({
+          code: "custom",
+          path: ["version", "files", i, "source", "base"],
+          message: `patched.base must reference a user-provided file (no blob-hosted or chained ROMs)`,
+        })
+      }
+      const patch = fileByPath.get(norm(file.source.patch))
+      if (!patch) {
+        ctx.addIssue({
+          code: "custom",
+          path: ["version", "files", i, "source", "patch"],
+          message: `patched.patch must reference a files[] entry: ${file.source.patch}`,
+        })
+      } else if (patch.source.kind !== "override" && patch.source.kind !== "url") {
+        ctx.addIssue({
+          code: "custom",
+          path: ["version", "files", i, "source", "patch"],
+          message: `patched.patch must reference an override or url file (patches are distributable)`,
+        })
+      }
+    }
+
+    // ---- emulator arm (Cycle 2) ----
+    // The generic engine above already enforces block-presence/exclusivity; this
+    // adds the emulator-internal rules. `emulator.rom` must name a real files[]
+    // entry that is a player-supplied dump (user-provided) or a locally patched
+    // ROM, client-required and server-unsupported.
+    if (gameType === "emulator" && v.emulator) {
+      const romFile = fileByPath.get(norm(v.emulator.rom))
+      if (!romFile) {
+        ctx.addIssue({
+          code: "custom",
+          path: ["version", "emulator", "rom"],
+          message: `emulator.rom must match a files[] entry path: ${v.emulator.rom}`,
+        })
+      } else {
+        if (romFile.env.client !== "required" || romFile.env.server !== "unsupported") {
+          ctx.addIssue({
+            code: "custom",
+            path: ["version", "emulator", "rom"],
+            message: `the ROM entry must have env.client "required" and env.server "unsupported"`,
+          })
+        }
+        if (romFile.source.kind !== "user-provided" && romFile.source.kind !== "patched") {
+          ctx.addIssue({
+            code: "custom",
+            path: ["version", "emulator", "rom"],
+            message: `the ROM must be user-provided or patched (the server never hosts ROM bytes)`,
+          })
+        }
+      }
     }
   })
 export type PackManifest = z.infer<typeof PackManifest>

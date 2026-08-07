@@ -17,7 +17,7 @@ use std::sync::{Arc, Mutex};
 use serde::Serialize;
 use tauri::Emitter;
 
-use super::crash::{diagnose, Diagnosis, LogTail};
+use super::crash::{diagnose as diagnose_crash, Diagnosis, LogTail};
 use super::progress::{log, EVENT_GAME_STATE};
 use super::InstallFailure;
 
@@ -121,13 +121,53 @@ pub fn spawn(
     // the launcher's own console alive on Windows.
     command.stdin(Stdio::null());
 
-    let mut child = command.spawn().map_err(|e| {
+    let child = command.spawn().map_err(|e| {
         InstallFailure::message(format!(
             "No se pudo iniciar el juego con {}: {e}",
             game.jvm_file.display()
         ))
     })?;
 
+    // Minecraft: crash diagnosis is on (crash.rs signature matching).
+    Ok(wire_child(app, child, pack_id, true))
+}
+
+/// Launch an external game executable (Cycle 2: an emulator). Shares all of the
+/// piped-output / exit-watch / playtime machinery with the Minecraft path; the
+/// only difference is that crash *diagnosis* is off — an emulator's nonzero exit
+/// is reported generically ("process exited with code N"), never run through
+/// Minecraft's signature table.
+pub fn spawn_external(
+    app: &tauri::AppHandle,
+    exe: &std::path::Path,
+    args: &[String],
+    cwd: &std::path::Path,
+    pack_id: String,
+) -> Result<RunningGame, InstallFailure> {
+    let mut command = Command::new(exe);
+    command.args(args).current_dir(cwd);
+    command.stdout(Stdio::piped()).stderr(Stdio::piped());
+    command.stdin(Stdio::null());
+
+    let child = command.spawn().map_err(|e| {
+        InstallFailure::message(format!(
+            "No se pudo iniciar el emulador ({}): {e}",
+            exe.display()
+        ))
+    })?;
+
+    Ok(wire_child(app, child, pack_id, false))
+}
+
+/// The shared post-spawn wiring: pipe both streams into one log tail, emit
+/// Running, and start the exit watcher. `diagnose` gates crash-signature
+/// matching to the Minecraft arm.
+fn wire_child(
+    app: &tauri::AppHandle,
+    mut child: Child,
+    pack_id: String,
+    diagnose: bool,
+) -> RunningGame {
     let pid = child.id();
     let since = now_ms();
 
@@ -145,9 +185,9 @@ pub fn spawn(
     let child = Arc::new(Mutex::new(child));
     let _ = app.emit(EVENT_GAME_STATE, GameStatePayload::Running { pid, since });
 
-    watch_exit(app.clone(), Arc::clone(&child), tail, pack_id, since);
+    watch_exit(app.clone(), Arc::clone(&child), tail, pack_id, since, diagnose);
 
-    Ok(RunningGame { pid, since, child })
+    RunningGame { pid, since, child }
 }
 
 /// One reader thread per stream. std::thread rather than a tokio task: this is
@@ -187,6 +227,7 @@ fn watch_exit(
     tail: LogTail,
     pack_id: String,
     since: u64,
+    diagnose: bool,
 ) {
     std::thread::spawn(move || {
         loop {
@@ -212,7 +253,13 @@ fn watch_exit(
                 } else {
                     GameStatePayload::Crashed {
                         exit_code: code,
-                        diagnosis: diagnose(code, &tail.snapshot()),
+                        // Signature matching is Minecraft-only; an external game's
+                        // nonzero exit is reported generically (null diagnosis).
+                        diagnosis: if diagnose {
+                            diagnose_crash(code, &tail.snapshot())
+                        } else {
+                            None
+                        },
                     }
                 };
                 log(
@@ -273,7 +320,7 @@ mod tests {
 
         let diagnosed = serde_json::to_string(&GameStatePayload::Crashed {
             exit_code: 1,
-            diagnosis: super::diagnose(
+            diagnosis: super::diagnose_crash(
                 1,
                 &["java.lang.OutOfMemoryError: Java heap space".to_string()],
             ),

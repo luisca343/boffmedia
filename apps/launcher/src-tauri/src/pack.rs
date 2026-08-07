@@ -48,6 +48,20 @@ pub enum ManifestError {
     InitialFileAbsolutePath(String),
     #[error("initialFile path must not escape the instance directory: {0}")]
     InitialFilePathTraversal(String),
+    #[error("emulator.rom does not match any files[] entry: {0}")]
+    EmulatorRomNotInFiles(String),
+    #[error("the ROM entry must have env.client required and env.server unsupported")]
+    EmulatorRomEnv,
+    #[error("the ROM must be user-provided or patched (the server never hosts ROM bytes)")]
+    EmulatorRomSource,
+    #[error("patched.base does not reference a files[] entry: {0}")]
+    PatchedBaseMissing(String),
+    #[error("patched.base must reference a user-provided file: {0}")]
+    PatchedBaseNotUserProvided(String),
+    #[error("patched.patch does not reference a files[] entry: {0}")]
+    PatchedPatchMissing(String),
+    #[error("patched.patch must reference an override or url file: {0}")]
+    PatchedPatchNotDistributable(String),
 }
 
 /// Parse and fully validate a manifest — schema-level via serde, plus the
@@ -58,7 +72,98 @@ pub fn parse_manifest(raw: &str) -> Result<PackManifest, ManifestError> {
     validate_paths(&manifest)?;
     validate_worlds(&manifest)?;
     validate_game_type(&manifest)?;
+    validate_patched(&manifest)?;
+    validate_emulator(&manifest)?;
     Ok(manifest)
+}
+
+/// Case-insensitive, separator-normalized path key — the same normalization the
+/// zod superRefine uses so both ends judge references identically.
+fn norm_path(p: &str) -> String {
+    p.to_lowercase().replace('\\', "/")
+}
+
+/// Mirrors the `patched` cross-field rules in boffmedia.ts: a romhack's `base`
+/// must be a user-provided files[] entry (the server never hosts ROM bytes, and
+/// this also forbids chains) and its `patch` a distributable one (override/url).
+fn validate_patched(manifest: &PackManifest) -> Result<(), ManifestError> {
+    let files = &manifest.version.files;
+    let find = |path: &str| {
+        let key = norm_path(path);
+        files.iter().find(move |f| norm_path(f.path.as_str()) == key)
+    };
+    for file in files {
+        let PackManifestVersionFilesItemSource::Patched { base, patch, .. } = &file.source else {
+            continue;
+        };
+        match find(base.as_str()) {
+            None => return Err(ManifestError::PatchedBaseMissing(base.as_str().to_string())),
+            Some(base_file) => {
+                if !matches!(
+                    base_file.source,
+                    PackManifestVersionFilesItemSource::UserProvided { .. }
+                ) {
+                    return Err(ManifestError::PatchedBaseNotUserProvided(
+                        base.as_str().to_string(),
+                    ));
+                }
+            }
+        }
+        match find(patch.as_str()) {
+            None => return Err(ManifestError::PatchedPatchMissing(patch.as_str().to_string())),
+            Some(patch_file) => {
+                if !matches!(
+                    patch_file.source,
+                    PackManifestVersionFilesItemSource::Override { .. }
+                        | PackManifestVersionFilesItemSource::Url { .. }
+                ) {
+                    return Err(ManifestError::PatchedPatchNotDistributable(
+                        patch.as_str().to_string(),
+                    ));
+                }
+            }
+        }
+    }
+    Ok(())
+}
+
+/// Mirrors the emulator arm in boffmedia.ts: `emulator.rom` must name a files[]
+/// entry that is a player-supplied dump (user-provided) or a locally patched
+/// ROM, client-required and server-unsupported.
+fn validate_emulator(manifest: &PackManifest) -> Result<(), ManifestError> {
+    let Some(emu) = &manifest.version.emulator else {
+        return Ok(());
+    };
+    let rom_key = norm_path(emu.rom.as_str());
+    let rom_file = manifest
+        .version
+        .files
+        .iter()
+        .find(|f| norm_path(f.path.as_str()) == rom_key);
+    let Some(rom_file) = rom_file else {
+        return Err(ManifestError::EmulatorRomNotInFiles(
+            emu.rom.as_str().to_string(),
+        ));
+    };
+    let client_required = matches!(
+        rom_file.env.client,
+        PackManifestVersionFilesItemEnvClient::Required
+    );
+    let server_unsupported = matches!(
+        rom_file.env.server,
+        PackManifestVersionFilesItemEnvServer::Unsupported
+    );
+    if !client_required || !server_unsupported {
+        return Err(ManifestError::EmulatorRomEnv);
+    }
+    if !matches!(
+        rom_file.source,
+        PackManifestVersionFilesItemSource::UserProvided { .. }
+            | PackManifestVersionFilesItemSource::Patched { .. }
+    ) {
+        return Err(ManifestError::EmulatorRomSource);
+    }
+    Ok(())
 }
 
 /// Mirrors the `.superRefine` in packages/pack-schema/src/boffmedia.ts, plus a
@@ -345,18 +450,18 @@ mod tests {
         let json = r#"{"formatVersion":1,
             "pack":{"id":"pk","slug":"boff-smp","name":"Boff SMP","access":{"kind":"public"}},
             "version":{"id":"v1","name":"1.0","createdAt":"2026-07-30T12:00:00Z",
-              "dependencies":{"minecraft":"1.21.4"},"files":[],"emulator":{}}}"#;
+              "dependencies":{"minecraft":"1.21.4"},"files":[],"emulator":{"kind":"mgba","rom":"roms/x.gba"}}}"#;
         let err = parse_manifest(json).unwrap_err();
         assert!(matches!(err, ManifestError::UnexpectedSpecBlock));
     }
 
     #[test]
     fn accepts_emulator_manifest_with_spec_block() {
-        let json = r#"{"formatVersion":1,
-            "pack":{"id":"pk","slug":"boff-gba","name":"Boff GBA","gameType":"emulator","access":{"kind":"public"}},
-            "version":{"id":"v1","name":"1.0","createdAt":"2026-07-30T12:00:00Z",
-              "dependencies":null,"files":[],"emulator":{}}}"#;
-        assert!(parse_manifest(json).is_ok());
+        let json = emu_manifest(
+            r#"{"kind":"mgba","rom":"roms/x.gba"}"#,
+            &user_rom("roms/x.gba"),
+        );
+        assert!(parse_manifest(&json).is_ok());
     }
 
     #[test]
@@ -374,7 +479,7 @@ mod tests {
         let json = r#"{"formatVersion":1,
             "pack":{"id":"pk","slug":"boff-gba","name":"Boff GBA","gameType":"emulator","access":{"kind":"public"}},
             "version":{"id":"v1","name":"1.0","createdAt":"2026-07-30T12:00:00Z",
-              "dependencies":{"minecraft":"1.21.4"},"files":[],"emulator":{}}}"#;
+              "dependencies":{"minecraft":"1.21.4"},"files":[],"emulator":{"kind":"mgba","rom":"roms/x.gba"}}}"#;
         let err = parse_manifest(json).unwrap_err();
         assert!(matches!(err, ManifestError::ForbiddenForNonMinecraft));
     }
@@ -391,7 +496,7 @@ mod tests {
             r#"{{"formatVersion":1,
             "pack":{{"id":"pk","slug":"boff-gba","name":"Boff GBA","gameType":"emulator","access":{{"kind":"public"}}}},
             "version":{{"id":"v1","name":"1.0","createdAt":"2026-07-30T12:00:00Z",
-              "dependencies":null,"files":[],"emulator":{{}},"worlds":[{world_entry}]}}}}"#
+              "dependencies":null,"files":[],"emulator":{{"kind":"mgba","rom":"roms/x.gba"}},"worlds":[{world_entry}]}}}}"#
         );
         let err = parse_manifest(&json).unwrap_err();
         assert!(matches!(err, ManifestError::ForbiddenForNonMinecraft));
@@ -424,16 +529,6 @@ mod tests {
         assert!(parse_manifest(json).is_err());
     }
 
-    fn manifest_with_initial_files(initial_files_json: &str) -> String {
-        format!(
-            r#"{{"formatVersion":1,
-                "pack":{{"id":"pk","slug":"boff-smp","name":"Boff SMP","access":{{"kind":"public"}}}},
-                "version":{{"id":"v1","name":"1.0","createdAt":"2026-07-30T12:00:00Z",
-                  "dependencies":{{"minecraft":"1.21.4"}},"files":[],
-                  "initialFiles":{initial_files_json}}}}}"#
-        )
-    }
-
     fn initial_file(path: &str, extra_file: Option<&str>) -> String {
         let s = "a".repeat(128);  // Generate proper 128-char hex
         let second = extra_file
@@ -450,10 +545,15 @@ mod tests {
         )
     }
 
-    fn file_entry(path: &str, client: &str, source: &str) -> String {
+    /// A minecraft manifest with an explicit files[] and initialFiles[] — for the
+    /// collision checks that need both halves populated.
+    fn manifest_with_files_and_initial(files_json: &str, initial_json: &str) -> String {
         format!(
-            r#"{{"path":"{path}","sha512":"{}","fileSize":10,"env":{{"client":"{client}","server":"required"}},"source":{source}}}"#,
-            "a".repeat(128)
+            r#"{{"formatVersion":1,
+                "pack":{{"id":"pk","slug":"boff-smp","name":"Boff SMP","access":{{"kind":"public"}}}},
+                "version":{{"id":"v1","name":"1.0","createdAt":"2026-07-30T12:00:00Z",
+                  "dependencies":{{"minecraft":"1.21.4"}},"files":[{files_json}],
+                  "initialFiles":[{initial_json}]}}}}"#
         )
     }
 
@@ -462,6 +562,101 @@ mod tests {
         // This test would require initialFiles to have a user-provided source, which the schema forbids.
         // The validation would fail at schema level, so we skip this test as it's a schema-level rule.
         // Cycle 1 relies on the schema to forbid this; the launcher validator mirrors it for defense-in-depth.
+    }
+
+    // ── emulator arm (Cycle 2) ──────────────────────────────────────────────
+
+    fn emu_manifest(emulator: &str, files: &str) -> String {
+        format!(
+            r#"{{"formatVersion":1,
+                "pack":{{"id":"pk","slug":"boff-gba","name":"Boff GBA","gameType":"emulator","access":{{"kind":"public"}}}},
+                "version":{{"id":"v1","name":"1.0","createdAt":"2026-07-30T12:00:00Z",
+                  "files":[{files}],"emulator":{emulator}}}}}"#
+        )
+    }
+
+    fn user_rom(path: &str) -> String {
+        format!(
+            r#"{{"path":"{path}","sha512":"{s}","fileSize":100,"env":{{"client":"required","server":"unsupported"}},"source":{{"kind":"user-provided","hint":"tu volcado"}}}}"#,
+            s = "a".repeat(128)
+        )
+    }
+
+    #[test]
+    fn accepts_a_well_formed_emulator_pack() {
+        let json = emu_manifest(
+            r#"{"kind":"mgba","rom":"roms/emerald.gba"}"#,
+            &user_rom("roms/emerald.gba"),
+        );
+        assert!(parse_manifest(&json).is_ok());
+    }
+
+    #[test]
+    fn rejects_emulator_rom_not_in_files() {
+        let json = emu_manifest(
+            r#"{"kind":"mgba","rom":"roms/missing.gba"}"#,
+            &user_rom("roms/emerald.gba"),
+        );
+        let err = parse_manifest(&json).unwrap_err();
+        assert!(matches!(err, ManifestError::EmulatorRomNotInFiles(_)));
+    }
+
+    #[test]
+    fn rejects_emulator_rom_with_wrong_env() {
+        let rom = format!(
+            r#"{{"path":"roms/emerald.gba","sha512":"{s}","fileSize":100,"env":{{"client":"required","server":"required"}},"source":{{"kind":"user-provided","hint":"x"}}}}"#,
+            s = "a".repeat(128)
+        );
+        let json = emu_manifest(r#"{"kind":"mgba","rom":"roms/emerald.gba"}"#, &rom);
+        let err = parse_manifest(&json).unwrap_err();
+        assert!(matches!(err, ManifestError::EmulatorRomEnv));
+    }
+
+    #[test]
+    fn rejects_blob_hosted_rom() {
+        let rom = format!(
+            r#"{{"path":"roms/emerald.gba","sha512":"{s}","fileSize":100,"env":{{"client":"required","server":"unsupported"}},"source":{{"kind":"override","blobSha512":"{s}"}}}}"#,
+            s = "a".repeat(128)
+        );
+        let json = emu_manifest(r#"{"kind":"mgba","rom":"roms/emerald.gba"}"#, &rom);
+        let err = parse_manifest(&json).unwrap_err();
+        assert!(matches!(err, ManifestError::EmulatorRomSource));
+    }
+
+    #[test]
+    fn accepts_a_patched_romhack() {
+        let base = user_rom("roms/emerald.gba");
+        let patch = format!(
+            r#"{{"path":"roms/hack.bps","sha512":"{s}","fileSize":5,"env":{{"client":"required","server":"unsupported"}},"source":{{"kind":"override","blobSha512":"{s}"}}}}"#,
+            s = "b".repeat(128)
+        );
+        let hacked = format!(
+            r#"{{"path":"roms/hack.gba","sha512":"{s}","fileSize":100,"env":{{"client":"required","server":"unsupported"}},"source":{{"kind":"patched","base":"roms/emerald.gba","patch":"roms/hack.bps","format":"bps"}}}}"#,
+            s = "c".repeat(128)
+        );
+        let files = format!("{base},{patch},{hacked}");
+        let json = emu_manifest(r#"{"kind":"mgba","rom":"roms/hack.gba"}"#, &files);
+        assert!(parse_manifest(&json).is_ok(), "{:?}", parse_manifest(&json).err());
+    }
+
+    #[test]
+    fn rejects_patched_base_not_user_provided() {
+        let base = format!(
+            r#"{{"path":"roms/emerald.gba","sha512":"{s}","fileSize":100,"env":{{"client":"required","server":"unsupported"}},"source":{{"kind":"override","blobSha512":"{s}"}}}}"#,
+            s = "a".repeat(128)
+        );
+        let patch = format!(
+            r#"{{"path":"roms/hack.bps","sha512":"{s}","fileSize":5,"env":{{"client":"required","server":"unsupported"}},"source":{{"kind":"override","blobSha512":"{s}"}}}}"#,
+            s = "b".repeat(128)
+        );
+        let hacked = format!(
+            r#"{{"path":"roms/hack.gba","sha512":"{s}","fileSize":100,"env":{{"client":"required","server":"unsupported"}},"source":{{"kind":"patched","base":"roms/emerald.gba","patch":"roms/hack.bps","format":"bps"}}}}"#,
+            s = "c".repeat(128)
+        );
+        let files = format!("{base},{patch},{hacked}");
+        let json = emu_manifest(r#"{"kind":"mgba","rom":"roms/hack.gba"}"#, &files);
+        let err = parse_manifest(&json).unwrap_err();
+        assert!(matches!(err, ManifestError::PatchedBaseNotUserProvided(_)));
     }
 
     #[test]
@@ -482,14 +677,26 @@ mod tests {
 
     #[test]
     fn initial_files_path_collision_with_files_is_rejected() {
-        let json = manifest_with_initial_files("[]");  // Empty for now; full test would require files + initialFiles conflict
-        // For now, we rely on the schema validation to catch this. Real test would be complex with multiple fields.
-    }
+        let url_file = |path: &str| {
+            format!(
+                r#"{{"path":"{path}","sha512":"{s}","fileSize":10,"env":{{"client":"required","server":"required"}},"source":{{"kind":"url","url":"https://x.test/o"}}}}"#,
+                s = "a".repeat(128)
+            )
+        };
+        let override_initial = |path: &str| {
+            format!(
+                r#"{{"path":"{path}","sha512":"{s}","fileSize":10,"env":{{"client":"required","server":"required"}},"source":{{"kind":"override","blobSha512":"{s}"}}}}"#,
+                s = "b".repeat(128)
+            )
+        };
+        let json = manifest_with_files_and_initial(&url_file("options.txt"), &override_initial("options.txt"));
+        let err = parse_manifest(&json).unwrap_err();
+        assert!(matches!(err, ManifestError::InitialFilesPathCollision(_)));
 
-    #[test]
-    fn initial_files_case_insensitive_collision_is_rejected() {
-        // This test is complex because it requires both files[] and initialFiles[] with same-name paths.
-        // The current JSON helper functions make this cumbersome. The validation works; the test is correct in principle.
+        // Case-insensitive: Windows/macOS would overwrite one with the other.
+        let json = manifest_with_files_and_initial(&url_file("Options.txt"), &override_initial("options.txt"));
+        let err = parse_manifest(&json).unwrap_err();
+        assert!(matches!(err, ManifestError::InitialFilesPathCollision(_)));
     }
 
     #[test]
