@@ -145,6 +145,13 @@ pub struct LauncherServer {
 pub struct LauncherPack {
     pub id: String,
     pub slug: String,
+    /// The pack's game type, resolved by the API (NULL column → "minecraft").
+    /// WITHOUT this field serde silently drops the API's `gameType`, and every
+    /// pack — emulator included — reads back as minecraft in the library. The
+    /// renderer's `PackSummary.gameType` is populated from here. `#[serde(default)]`
+    /// keeps an old API's response (no gameType) deserializing as minecraft.
+    #[serde(default)]
+    pub game_type: Option<String>,
     pub name: String,
     pub summary: Option<String>,
     #[serde(default)]
@@ -565,9 +572,15 @@ pub async fn invite_redeem(
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::sync::Mutex;
+
+    // BOFF_API_URL is process-global; two tests mutating it in parallel race and
+    // one reads the other's value. Serialise every env-touching test on this lock.
+    static ENV_LOCK: Mutex<()> = Mutex::new(());
 
     #[test]
     fn base_url_has_no_trailing_slash() {
+        let _guard = ENV_LOCK.lock().unwrap_or_else(|p| p.into_inner());
         // Every call site interpolates `{base}/packs/...`; a trailing slash
         // would produce `//packs` and a 404 that looks like a routing bug.
         std::env::set_var("BOFF_API_URL", "https://example.test/");
@@ -577,9 +590,44 @@ mod tests {
 
     #[test]
     fn blank_env_falls_back_to_the_built_in_url() {
+        let _guard = ENV_LOCK.lock().unwrap_or_else(|p| p.into_inner());
         std::env::set_var("BOFF_API_URL", "   ");
         assert!(base_url().starts_with("https://"));
         std::env::remove_var("BOFF_API_URL");
+    }
+
+    #[test]
+    fn launcher_pack_deserializes_game_type_and_emulator_kind() {
+        // Regression: without `game_type` on LauncherPack, serde silently drops
+        // the API's `gameType` and every pack reads back as minecraft — an
+        // emulator pack then shows in the library as "Minecraft Vanilla".
+        let json = r#"{
+            "id":"pk","slug":"esmeralda","name":"Esmeralda","summary":null,
+            "iconUrl":null,"accessKind":"public","gameType":"emulator",
+            "latestVersion":{"id":"v1","name":"1.0","minecraft":null,"loader":null,
+              "loaderVersion":null,"fileCount":1,"emulatorKind":"mgba",
+              "createdAt":"2026-08-07T00:00:00Z"}
+        }"#;
+        let pack: LauncherPack = serde_json::from_str(json).unwrap();
+        assert_eq!(pack.game_type.as_deref(), Some("emulator"));
+        let version = pack.latest_version.unwrap();
+        assert_eq!(version.minecraft, None);
+        assert_eq!(version.emulator_kind.as_deref(), Some("mgba"));
+    }
+
+    #[test]
+    fn a_minecraft_pack_without_game_type_still_deserializes() {
+        // An older API (or a plain minecraft pack) sends no gameType — it must
+        // deserialize (as None → resolved to minecraft downstream), never fail.
+        let json = r#"{
+            "id":"pk","slug":"smp","name":"SMP","summary":null,"iconUrl":null,
+            "accessKind":"public",
+            "latestVersion":{"id":"v1","name":"1.0","minecraft":"1.21.4","loader":null,
+              "loaderVersion":null,"fileCount":1,"createdAt":"2026-08-07T00:00:00Z"}
+        }"#;
+        let pack: LauncherPack = serde_json::from_str(json).unwrap();
+        assert_eq!(pack.game_type, None);
+        assert_eq!(pack.latest_version.unwrap().minecraft.as_deref(), Some("1.21.4"));
     }
 
     #[test]
