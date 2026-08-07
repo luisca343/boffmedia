@@ -8,7 +8,7 @@ interface InfoTooltipProps {
 }
 
 export function InfoTooltip({ tipKey }: InfoTooltipProps) {
-  const t = useTranslations("admin.randomizer")
+  const t = useTranslations("randomizer")
 
   if (!tipKey) return null
 

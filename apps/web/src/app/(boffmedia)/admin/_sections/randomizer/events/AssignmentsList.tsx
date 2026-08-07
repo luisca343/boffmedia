@@ -20,7 +20,7 @@ interface AssignmentsListProps {
 }
 
 export function AssignmentsList({ event, onClose }: AssignmentsListProps) {
-  const t = useTranslations("admin.randomizer.events")
+  const t = useTranslations("randomizer.events")
   const [assignments, setAssignments] = useState<RandomizerAssignment[] | null>(null)
   const [loading, setLoading] = useState(false)
   const [logModalOpen, setLogModalOpen] = useState(false)

@@ -37,17 +37,19 @@ const FVX_GAMES = [
   { value: "POKÉMON_LEAFGREEN", label: "Pokémon LeafGreen" },
 ]
 
+// Labels resolve from `randomizer.tabs.*` at render time; the array carries the
+// order and the id (which is also the translation key).
 const RANDOMIZER_TABS = [
-  { value: "traits", label: "Rasgos" },
-  { value: "starters", label: "Iniciales/Estáticos/Intercambios" },
-  { value: "moves", label: "Movimientos" },
-  { value: "foes", label: "Rivales" },
-  { value: "wild", label: "Salvajes" },
-  { value: "tmhm", label: "MT/MO/Tutores" },
-  { value: "items", label: "Objetos" },
-  { value: "types", label: "Tipos" },
-  { value: "graphics", label: "Gráficos" },
-  { value: "misc", label: "Ajustes varios" },
+  { value: "traits" },
+  { value: "starters" },
+  { value: "moves" },
+  { value: "foes" },
+  { value: "wild" },
+  { value: "tmhm" },
+  { value: "items" },
+  { value: "types" },
+  { value: "graphics" },
+  { value: "misc" },
 ] as const
 
 
@@ -55,6 +57,7 @@ const RANDOMIZER_TABS = [
  * File input for ROM selection and dry-run.
  */
 function RomFileSelector({ onDryRun }: { onDryRun: (file: File) => Promise<void> }) {
+  const t = useTranslations("randomizer")
   const [loading, setLoading] = useState(false)
 
   const handleFileClick = () => {
@@ -83,7 +86,7 @@ function RomFileSelector({ onDryRun }: { onDryRun: (file: File) => Promise<void>
       className="w-full flex flex-col items-center gap-2 py-8 px-4 rounded border-2 border-dashed border-line hover:border-accent hover:bg-panel-2 transition-colors disabled:opacity-50"
     >
       <Icon name="upload" size={24} className="text-txt-muted" />
-      <p className="text-sm text-txt-muted">Drop .gba/.nds ROM here or click to browse</p>
+      <p className="text-sm text-txt-muted">{t("chrome.dryRunDropZone")}</p>
     </button>
   )
 }
@@ -92,7 +95,7 @@ function RomFileSelector({ onDryRun }: { onDryRun: (file: File) => Promise<void>
  * General options panel with top-level toggles (shell — per-control wiring in later pass).
  */
 function GeneralOptionsPanel({ limitPokemon }: { limitPokemon: boolean }) {
-  const t = useTranslations("admin.randomizer")
+  const t = useTranslations("randomizer")
 
   return (
     <AvPanel title={t("chrome.generalOptions")} icon="sliders">
@@ -100,7 +103,7 @@ function GeneralOptionsPanel({ limitPokemon }: { limitPokemon: boolean }) {
         <div className="flex items-center justify-between">
           <div>
             <p className="text-sm font-medium">{t("chrome.limitPokemon")}</p>
-            <p className="text-xs text-txt-muted">Only use Pokémon from selected generations</p>
+            <p className="text-xs text-txt-muted">{t("chrome.limitPokemonSub")}</p>
           </div>
           <Toggle on={false} onChange={() => {}} />
         </div>
@@ -108,7 +111,7 @@ function GeneralOptionsPanel({ limitPokemon }: { limitPokemon: boolean }) {
         <div className="flex items-center justify-between">
           <div>
             <p className="text-sm font-medium">{t("chrome.banIrregularAltFormes")}</p>
-            <p className="text-xs text-txt-muted">Prevent irregular alternate forms</p>
+            <p className="text-xs text-txt-muted">{t("chrome.banIrregularAltFormesSub")}</p>
           </div>
           <Toggle on={false} onChange={() => {}} />
         </div>
@@ -116,7 +119,7 @@ function GeneralOptionsPanel({ limitPokemon }: { limitPokemon: boolean }) {
         <div className="flex items-center justify-between">
           <div>
             <p className="text-sm font-medium">{t("chrome.banPrematureEvos")}</p>
-            <p className="text-xs text-txt-muted">Prevent pre-mature evolutions</p>
+            <p className="text-xs text-txt-muted">{t("chrome.banPrematureEvosSub")}</p>
           </div>
           <Toggle on={false} onChange={() => {}} />
         </div>
@@ -124,7 +127,7 @@ function GeneralOptionsPanel({ limitPokemon }: { limitPokemon: boolean }) {
         <div className="flex items-center justify-between">
           <div>
             <p className="text-sm font-medium">{t("chrome.randomizeIntroMon")}</p>
-            <p className="text-xs text-txt-muted">Randomize the intro Pokémon</p>
+            <p className="text-xs text-txt-muted">{t("chrome.randomizeIntroMonSub")}</p>
           </div>
           <Toggle on={false} onChange={() => {}} />
         </div>
@@ -132,7 +135,7 @@ function GeneralOptionsPanel({ limitPokemon }: { limitPokemon: boolean }) {
         <div className="flex items-center justify-between">
           <div>
             <p className="text-sm font-medium">{t("chrome.raceMode")}</p>
-            <p className="text-xs text-txt-muted">Enable race mode (deterministic, no spoiler log)</p>
+            <p className="text-xs text-txt-muted">{t("chrome.raceModeSub")}</p>
           </div>
           <Toggle on={false} onChange={() => {}} />
         </div>
@@ -161,7 +164,7 @@ function PresetBar({ onSave, onDryRun, onImport, onExport }: {
   onImport: (file: File) => Promise<void>
   onExport: () => void
 }) {
-  const t = useTranslations("admin.randomizer")
+  const t = useTranslations("randomizer")
   const [showDryRun, setShowDryRun] = useState(false)
 
   return (
@@ -229,7 +232,7 @@ function PresetBar({ onSave, onDryRun, onImport, onExport }: {
  * Editor shell: form setup + tabs + toggles + validation.
  */
 export function RandomizerEditor() {
-  const t = useTranslations("admin.randomizer")
+  const t = useTranslations("randomizer")
   const [activeTab, setActiveTab] = useState<(typeof RANDOMIZER_TABS)[number]["value"]>("traits")
   const [selectedGame, setSelectedGame] = useState<string>("")
   const [limitPokemon, setLimitPokemon] = useState(false)
@@ -289,7 +292,7 @@ export function RandomizerEditor() {
           <Tabs
             value={activeTab}
             onChange={(value) => setActiveTab(value as any)}
-            tabs={RANDOMIZER_TABS.map((tab) => ({ value: tab.value, label: tab.label }))}
+            tabs={RANDOMIZER_TABS.map((tab) => ({ value: tab.value, label: t(`tabs.${tab.value}`) }))}
           />
         </AvPanel>
 

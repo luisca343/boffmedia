@@ -30,7 +30,7 @@ export function EventsList({
   onEdit,
   onShowAssignments,
 }: EventsListProps) {
-  const t = useTranslations("admin.randomizer.events")
+  const t = useTranslations("randomizer.events")
   const [events, setEvents] = useState<RandomizerEvent[] | null>(null)
   const [loading, setLoading] = useState(false)
   const [searchTerm, setSearchTerm] = useState("")

@@ -25,7 +25,7 @@ export function SliderRow({
   unit,
   disabled,
 }: SliderRowProps) {
-  const t = useTranslations("admin.randomizer")
+  const t = useTranslations("randomizer")
   const form = useFormContext<RandomizerSettings>()
 
   return (

@@ -6,7 +6,7 @@ import { AvPanel } from "../../../_components/ui/av-kit"
 import { RandomizerSettings } from "@boffmedia/pack-schema"
 
 export default function ItemsTab() {
-  const t = useTranslations("admin.randomizer")
+  const t = useTranslations("randomizer")
   const form = useFormContext<RandomizerSettings>()
 
   return (

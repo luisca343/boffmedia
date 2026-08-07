@@ -21,7 +21,7 @@ export function ToggleRow({
   polarity = "direct",
   disabled,
 }: ToggleRowProps) {
-  const t = useTranslations("admin.randomizer")
+  const t = useTranslations("randomizer")
   const form = useFormContext<RandomizerSettings>()
 
   return (

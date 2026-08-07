@@ -36,7 +36,7 @@ export function EventEditor({
   onSave,
   onCancel,
 }: EventEditorProps) {
-  const t = useTranslations("admin.randomizer.events")
+  const t = useTranslations("randomizer.events")
   const [presets, setPresets] = useState<RandomizerPreset[]>([])
   const [packs, setPacks] = useState<AdminPack[]>([])
   const [loadingPresets, setLoadingPresets] = useState(false)

@@ -26,7 +26,7 @@ export function SelectRow({
   options,
   disabled,
 }: SelectRowProps) {
-  const t = useTranslations("admin.randomizer")
+  const t = useTranslations("randomizer")
   const form = useFormContext<RandomizerSettings>()
 
   const selectOptions = options.map((opt) => ({

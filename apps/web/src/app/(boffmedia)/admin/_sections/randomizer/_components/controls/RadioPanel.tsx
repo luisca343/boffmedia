@@ -25,7 +25,7 @@ export function RadioPanel({
   options,
   disabled,
 }: RadioPanelProps) {
-  const t = useTranslations("admin.randomizer")
+  const t = useTranslations("randomizer")
   const form = useFormContext<RandomizerSettings>()
 
   const radioOptions: RadioOption[] = options.map((opt) => ({

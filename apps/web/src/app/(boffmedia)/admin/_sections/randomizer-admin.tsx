@@ -18,7 +18,7 @@ import { AssignmentsList } from "./randomizer/events/AssignmentsList"
  * Events management view with tournament selection, event list/edit, and assignments.
  */
 function EventsView() {
-  const t = useTranslations("admin.randomizer.events")
+  const t = useTranslations("randomizer.events")
   const [tournaments, setTournaments] = useState<TournamentSummaryApi[]>([])
   const [selectedTournamentId, setSelectedTournamentId] = useState<string | null>(null)
   const [loadingTournaments, setLoadingTournaments] = useState(false)
@@ -112,7 +112,7 @@ function EventsView() {
  * Presets list view with create/edit/delete/import/export actions.
  */
 function PresetsView() {
-  const t = useTranslations("admin.randomizer")
+  const t = useTranslations("randomizer")
   const [presets, setPresets] = useState<RandomizerPreset[] | null>(null)
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState("")
@@ -250,7 +250,7 @@ function PresetsView() {
  * Main section: routes between Presets, Editor, and Events based on ?view=
  */
 export function RandomizerAdmin() {
-  const t = useTranslations("admin.randomizer")
+  const t = useTranslations("randomizer")
   const searchParams = useSearchParams()
   const router = useRouter()
 

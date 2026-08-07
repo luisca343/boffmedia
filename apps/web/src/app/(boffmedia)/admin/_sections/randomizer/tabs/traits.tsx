@@ -11,7 +11,7 @@ import { SliderRow } from "../_components/controls/SliderRow"
 import { RandomizerSettings } from "@boffmedia/pack-schema"
 
 export default function TraitsTab() {
-  const t = useTranslations("admin.randomizer")
+  const t = useTranslations("randomizer")
   const form = useFormContext<RandomizerSettings>()
 
   // Watch fields to compute greying state

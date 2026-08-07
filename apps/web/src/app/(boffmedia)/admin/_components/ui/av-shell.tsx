@@ -117,8 +117,9 @@ export function AvShell({ nav, section, onNavigate, children, loading, fluid }: 
           className={cn(
             "p-[26px] max-md:p-[18px_16px]",
             // min-h-0 is what lets a fluid child actually scroll inside the
-            // column instead of stretching it past the viewport.
-            fluid ? "flex min-h-0 flex-1 flex-col" : "max-w-[1180px]",
+            // column instead of stretching it past the viewport. Every section
+            // spans the full column width now — no reading-measure cap.
+            fluid && "flex min-h-0 flex-1 flex-col",
           )}
         >
           {loading ? (
