@@ -44,7 +44,7 @@ export interface AvPanelProps extends Omit<React.HTMLAttributes<HTMLElement>, "t
 
 export function AvPanel({ title, icon, aside, flush, className, bodyClassName, children, ...rest }: AvPanelProps) {
   return (
-    <section className={cn("cut-corner bg-panel border border-solid border-line mb-[18px]", className)} {...rest}>
+    <section className={cn("bg-panel border border-solid border-line mb-[18px]", className)} {...rest}>
       {title && (
         <header className="flex items-center gap-[9px] py-3 px-4 border-b border-solid border-line font-mono text-[11px] font-semibold leading-none uppercase tracking-[0.12em] text-txt-muted">
           {icon && <Icon name={icon} size={15} className="text-accent shrink-0" />}
@@ -88,7 +88,7 @@ export function AvKpi({
   return (
     <div
       className={cn(
-        "cut bg-panel border border-solid border-line border-t-[3px] p-[14px_15px] flex flex-col gap-[9px] min-w-0",
+        "bg-panel border border-solid border-line border-t-[3px] p-[14px_15px] flex flex-col gap-[9px] min-w-0",
         live ? "border-t-accent" : "border-t-line-2",
       )}
     >
@@ -97,7 +97,7 @@ export function AvKpi({
           {label}
         </span>
         {icon && (
-          <span className="cut-seal [--cut:6px] grid place-items-center w-[26px] h-[26px] text-accent bg-accent-soft shrink-0">
+          <span className="grid place-items-center w-[26px] h-[26px] text-accent bg-accent-soft shrink-0">
             <Icon name={icon} size={14} />
           </span>
         )}
@@ -135,7 +135,7 @@ export function AvPill({
   return (
     <span
       className={cn(
-        "cut [--cut:4px] inline-flex items-center gap-[5px] font-mono text-[9.5px] font-bold leading-none uppercase tracking-[0.08em] py-[5px] px-[9px] whitespace-nowrap border border-solid",
+        "inline-flex items-center gap-[5px] font-mono text-[9.5px] font-bold leading-none uppercase tracking-[0.08em] py-[5px] px-[9px] whitespace-nowrap border border-solid",
         PILL_TONES[tone],
         className,
       )}
@@ -170,7 +170,7 @@ export function AvAlert({
   return (
     <div
       className={cn(
-        "cut-tag flex gap-3 py-[13px] px-4 border border-solid border-line-2 border-l-[3px] bg-panel",
+        "flex gap-3 py-[13px] px-4 border border-solid border-line-2 border-l-[3px] bg-panel",
         t.bar,
         className,
       )}

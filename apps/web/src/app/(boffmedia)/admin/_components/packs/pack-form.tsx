@@ -138,7 +138,7 @@ export function PackForm({
       }
     >
       <div className="flex min-h-0 flex-1 flex-col gap-5">
-        <div className="cut-tag flex gap-3 border border-solid border-accent-line bg-accent-soft px-4 py-4">
+        <div className="flex gap-3 border border-solid border-accent-line bg-accent-soft px-4 py-4">
           <span className="grid size-8 shrink-0 place-items-center border border-solid border-accent-line bg-panel text-accent">
             <span className="font-mono text-[12px] font-bold">01</span>
           </span>
@@ -154,7 +154,7 @@ export function PackForm({
 
         <div className="bm-scroll min-h-0 flex-1 overflow-auto pr-1">
           <div className="flex flex-col gap-5 pb-1">
-            <section className="cut border border-solid border-line bg-panel-2 p-4">
+            <section className="border border-solid border-line bg-panel-2 p-4">
               <div className="mb-4 flex items-start gap-3">
                 <span className="grid size-8 shrink-0 place-items-center border border-solid border-line-2 bg-panel text-accent">
                   <Icon name="edit" size={15} />
@@ -319,7 +319,7 @@ export function PackForm({
               </Field>
             </section>
 
-            <section className="cut border border-solid border-line bg-panel-2 p-4">
+            <section className="border border-solid border-line bg-panel-2 p-4">
               <div className="mb-4 flex items-start gap-3">
                 <span className="grid size-8 shrink-0 place-items-center border border-solid border-line-2 bg-panel text-accent">
                   <Icon name="layers" size={15} />
@@ -347,7 +347,7 @@ export function PackForm({
                       disabled={disabled}
                       onClick={() => !disabled && setGameType(gt)}
                       className={[
-                        "cut flex min-h-[96px] items-start gap-3 border-2 border-solid p-3 text-left transition-colors duration-[140ms]",
+                        "flex min-h-[96px] items-start gap-3 border-2 border-solid p-3 text-left transition-colors duration-[140ms]",
                         disabled
                           ? "cursor-not-allowed opacity-60 border-line-2 hover:border-line-2 bg-panel-2"
                           : selected
@@ -392,7 +392,7 @@ export function PackForm({
               </div>
             </section>
 
-            <section className="cut border border-solid border-line bg-panel-2 p-4">
+            <section className="border border-solid border-line bg-panel-2 p-4">
               <div className="mb-4 flex items-start gap-3">
                 <span className="grid size-8 shrink-0 place-items-center border border-solid border-line-2 bg-panel text-accent">
                   <Icon name="shield" size={15} />
@@ -418,7 +418,7 @@ export function PackForm({
                       aria-checked={selected}
                       onClick={() => setAccessKind(option.value)}
                       className={[
-                        "cut flex min-h-[108px] items-start gap-3 border-2 border-solid p-3 text-left transition-colors duration-[140ms]",
+                        "flex min-h-[108px] items-start gap-3 border-2 border-solid p-3 text-left transition-colors duration-[140ms]",
                         selected
                           ? "border-accent bg-accent-soft"
                           : "border-line hover:border-line-2 hover:bg-panel",
@@ -462,7 +462,7 @@ export function PackForm({
               )}
             </section>
 
-            <section className="cut border border-solid border-line bg-panel-2 p-4">
+            <section className="border border-solid border-line bg-panel-2 p-4">
               <div className="mb-4 flex items-start gap-3">
                 <span className="grid size-8 shrink-0 place-items-center border border-solid border-line-2 bg-panel text-accent">
                   <Icon name="server" size={15} />

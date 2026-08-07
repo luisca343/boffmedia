@@ -17,7 +17,7 @@ import { AvPill, AvLiveDot } from "./av-kit"
 /* ---- resource row + actions ------------------------------------------------ */
 
 const AV_ROW =
-  "flex items-center gap-[14px] border border-solid border-line border-l-4 border-l-line-2 bg-panel px-[15px] py-3 transition-[border-color,background] duration-[140ms] hover:border-line-2 hover:border-l-accent hover:bg-panel-2 [clip-path:polygon(0_0,100%_0,calc(100%_-_12px)_100%,0_100%)]"
+  "flex items-center gap-[14px] border border-solid border-line border-l-[3px] border-l-line-2 bg-panel px-[15px] py-3 transition-[border-color,background] duration-[140ms] hover:border-line-2 hover:border-l-accent hover:bg-panel-2"
 
 export function AvRow({ off, className, children }: { off?: boolean; className?: string; children: React.ReactNode }) {
   return <div className={cn(AV_ROW, off && "opacity-55 hover:opacity-80", className)}>{children}</div>
@@ -48,7 +48,7 @@ export function AvResourceRow({
 }) {
   return (
     <AvRow off={off}>
-      <span className="grid h-10 w-10 flex-none place-items-center border border-solid border-accent-line bg-accent-soft text-accent cut [--cut:8px]">
+      <span className="grid h-10 w-10 flex-none place-items-center border border-solid border-accent-line bg-accent-soft text-accent">
         <Icon name={icon} size={18} />
       </span>
       <div className="min-w-0 flex-1">

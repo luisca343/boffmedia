@@ -39,7 +39,7 @@ export function AvShell({ nav, section, onNavigate, children, loading, fluid }: 
       {/* Desktop rail */}
       <aside className="hidden md:flex sticky top-0 self-start h-full overflow-y-auto flex-col border-r border-solid border-line bg-base-2 pb-6 bm-scroll">
         <div className="sticky top-0 z-[2] flex items-center gap-[11px] pt-[18px] pb-[20px] px-5 border-b border-solid border-line bg-base-2">
-          <span className="cut-seal [--cut:7px] grid place-items-center w-[30px] h-[30px] bg-accent text-accent-ink shrink-0">
+          <span className="grid place-items-center w-[30px] h-[30px] bg-accent text-accent-ink shrink-0">
             <Icon name="bolt" size={17} />
           </span>
           <span className="font-display text-[20px] font-extrabold italic leading-none uppercase tracking-[0.01em]">
@@ -90,7 +90,7 @@ export function AvShell({ nav, section, onNavigate, children, loading, fluid }: 
                 key={id}
                 onClick={() => onNavigate(id)}
                 className={cn(
-                  "cut-tag [--cut-tag:6px] inline-flex items-center gap-1.5 py-2 px-3 whitespace-nowrap font-mono text-[12px] font-semibold leading-none uppercase tracking-[0.05em] border border-solid shrink-0",
+                  "inline-flex items-center gap-1.5 py-2 px-3 whitespace-nowrap font-mono text-[12px] font-semibold leading-none uppercase tracking-[0.05em] border border-solid shrink-0",
                   on ? "text-accent border-accent-line bg-accent-soft" : "text-txt-muted border-line",
                 )}
               >

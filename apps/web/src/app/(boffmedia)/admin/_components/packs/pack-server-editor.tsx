@@ -46,7 +46,7 @@ export function PackServerEditor({ pack, onSaved }: { pack: AdminPack; onSaved: 
   }
 
   return (
-    <section className="cut-tag border border-solid border-line bg-panel-2 p-3">
+    <section className="border border-solid border-line bg-panel-2 p-3">
       <div className="mb-3 flex items-center gap-2">
         <Icon name="server" size={14} className="text-accent" />
         <h3 className="font-display text-[12px] font-bold uppercase tracking-[0.08em] text-txt">

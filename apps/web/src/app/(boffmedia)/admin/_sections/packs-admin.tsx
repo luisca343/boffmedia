@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { useTranslations } from "next-intl"
-import { Badge, Button, Empty, Field, Icon, Input, Spinner, Tabs, toast } from "@boffmedia/ui"
+import { Badge, Button, Empty, Field, Icon, Input, PackListItem, Spinner, Tabs, toast, VersionRow } from "@boffmedia/ui"
 import { AvMetric, AvPanel, AvPill, AvSectionHead } from "../_components/ui/av-kit"
 import { ConfirmModal, PackForm } from "../_components/packs/pack-form"
 import { PackServerEditor } from "../_components/packs/pack-server-editor"
@@ -126,72 +126,26 @@ function VersionsTab({
             </Button>
           </div>
           {rows.map((v) => (
-            <article
+            <VersionRow
               key={v.id}
-              className="cut border border-solid border-line bg-panel-2 p-3 transition-[border-color,background] duration-[140ms] hover:border-line-2 hover:bg-panel"
-            >
-              <div className="flex items-start gap-3">
-                <span className="grid size-9 shrink-0 place-items-center border border-solid border-accent-line bg-accent-soft text-accent">
-                  <Icon name={v.published ? "check" : "layers"} size={16} />
-                </span>
-                <div className="min-w-0 flex-1">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <span className="font-display text-[15px] font-bold uppercase tracking-[0.06em] text-txt">
-                      {v.name}
-                    </span>
-                    {v.published ? (
-                      <AvPill tone="ok">{t("publishedPill")}</AvPill>
-                    ) : (
-                      <AvPill tone="warn">{t("draft")}</AvPill>
-                    )}
-                    {pack.latestVersionId === v.id && <AvPill tone="accent">{t("latest")}</AvPill>}
-                  </div>
-                  <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 font-mono text-[11px] text-txt-dim">
-                    <span>{v.minecraft}</span>
-                    <span>{v.loader ? `${v.loader} ${v.loaderVersion ?? ""}` : t("vanilla")}</span>
-                    <span>{v.fileCount} {t("files")}</span>
-                  </div>
-                  {v.notes && <p className="mt-2 line-clamp-2 text-[12px] leading-[1.4] text-txt-muted">{v.notes}</p>}
-                </div>
-              </div>
-
-              <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-line pt-3">
-                <span className="font-mono text-[10px] text-txt-dim">
-                  {new Date(v.createdAt).toLocaleDateString()}
-                </span>
-                <span className="ml-auto flex flex-wrap items-center justify-end gap-2">
-                  {/* Cloning is the normal way to cut the next version: same mods,
-                      bump what changed. */}
-                  <Button size="sm" variant="ghost" icon="copy" onClick={() => onCloneVersion(v.id)}>
-                    {t("clone")}
-                  </Button>
-                  {!v.published && (
-                    <>
-                      <Button size="sm" variant="ghost" icon="edit" onClick={() => onEditVersion(v.id)}>
-                        {t("edit")}
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        icon="trash"
-                        onClick={() => setConfirmDelete(v)}
-                      >
-                        {t("delete")}
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="pri"
-                        icon="check"
-                        loading={publishing === v.id}
-                        onClick={() => void publish(v.id)}
-                      >
-                        {t("publish")}
-                      </Button>
-                    </>
-                  )}
-                </span>
-              </div>
-            </article>
+              status={v.published ? "live" : "draft"}
+              statusIcon={<Icon name={v.published ? "check" : "layers"} size={16} />}
+              version={v.name}
+              badges={<>
+                {v.published ? <AvPill tone="ok">{t("publishedPill")}</AvPill> : <AvPill tone="warn">{t("draft")}</AvPill>}
+                {pack.latestVersionId === v.id && <AvPill tone="accent">{t("latest")}</AvPill>}
+              </>}
+              meta={<>{v.minecraft} · {v.loader ? `${v.loader} ${v.loaderVersion ?? ""}` : t("vanilla")} · {v.fileCount} {t("files")}</>}
+              date={new Date(v.createdAt).toLocaleDateString()}
+              actions={<>
+                <Button size="sm" variant="ghost" icon="copy" onClick={() => onCloneVersion(v.id)}>{t("clone")}</Button>
+                {!v.published && <>
+                  <Button size="sm" variant="ghost" icon="edit" onClick={() => onEditVersion(v.id)}>{t("edit")}</Button>
+                  <Button size="sm" variant="ghost" icon="trash" onClick={() => setConfirmDelete(v)}>{t("delete")}</Button>
+                  <Button size="sm" variant="pri" icon="check" loading={publishing === v.id} onClick={() => void publish(v.id)}>{t("publish")}</Button>
+                </>}
+              </>}
+            />
           ))}
         </div>
       )}
@@ -604,57 +558,22 @@ export function PacksAdmin() {
           )}
           <div className="bm-scroll flex min-h-0 flex-1 flex-col gap-1 overflow-auto pr-1">
             {filtered.map((p) => (
-              <button
+              <PackListItem
                 key={p.id}
-                type="button"
+                selected={p.slug === packSlug}
                 onClick={() => go({ pack: p.slug, view: null, version: null })}
-                className={[
-                  "cut border-2 border-solid px-3 py-3 text-left transition-[border-color,background] duration-[140ms]",
-                  p.slug === packSlug
-                    ? "border-accent bg-accent-soft"
-                    : "border-transparent hover:border-line-2 hover:bg-panel-2",
-                ].join(" ")}
-              >
-                <span className="flex min-w-0 items-start gap-3">
-                  <span className="grid size-9 shrink-0 place-items-center border border-solid border-accent-line bg-panel text-accent">
-                    {p.iconUrl ? (
-                      // Remote pack art is optional and not handled by Next's image loader.
-                      <img src={p.iconUrl} alt="" className="size-full object-cover" />
-                    ) : (
-                      <Icon name="cube" size={16} />
-                    )}
-                  </span>
-                  <span className="min-w-0 flex-1">
-                    <span className="flex items-center gap-2">
-                      <span className="min-w-0 truncate font-display text-[14px] font-bold uppercase tracking-[0.06em] text-txt">
-                        {p.name}
-                      </span>
-                      {p.archived && <AvPill tone="bad">{t("archived")}</AvPill>}
-                    </span>
-                    <span className="mt-1 block truncate font-mono text-[10px] text-txt-dim">{p.slug}</span>
-                    {p.summary && (
-                      <span className="mt-2 line-clamp-2 block text-[12px] leading-[1.4] text-txt-muted">
-                        {p.summary}
-                      </span>
-                    )}
-                  </span>
-                  <Icon name="chevronRight" size={14} className="mt-1 shrink-0 text-txt-dim" />
-                </span>
-                <span className="mt-3 flex items-center gap-2 border-t border-line pt-2">
+                media={p.iconUrl ? <img src={p.iconUrl} alt="" className="size-full object-cover" /> : <Icon name="cube" size={16} />}
+                name={p.name}
+                slug={p.slug}
+                summary={p.summary || undefined}
+                badges={<>
                   <AccessPill kind={p.accessKind} />
-                  {p.gameType !== "minecraft" && (
-                    <AvPill tone="info" icon="layers">
-                      {t(`gameType.${p.gameType}`)}
-                    </AvPill>
-                  )}
-                  <AvPill tone={p.latestVersionId ? "ok" : "warn"}>
-                    {p.latestVersionId ? t("live") : t("noPublished")}
-                  </AvPill>
-                  <span className="ml-auto font-mono text-[10px] text-txt-dim">
-                    {p.versionCount} {t("versionsShort")} · {p.aclCount} {t("grantsShort")}
-                  </span>
-                </span>
-              </button>
+                  {p.gameType !== "minecraft" && <AvPill tone="info" icon="layers">{t(`gameType.${p.gameType}`)}</AvPill>}
+                  <AvPill tone={p.latestVersionId ? "ok" : "warn"}>{p.latestVersionId ? t("live") : t("noPublished")}</AvPill>
+                  {p.archived && <AvPill tone="bad">{t("archived")}</AvPill>}
+                </>}
+                count={<>{p.versionCount} {t("versionsShort")} · {p.aclCount} {t("grantsShort")}</>}
+              />
             ))}
           </div>
         </AvPanel>
@@ -730,7 +649,7 @@ export function PacksAdmin() {
              }
            >
              <div className="mb-4 grid shrink-0 gap-2 sm:grid-cols-[minmax(0,1fr)_120px_120px]">
-               <div className="cut-tag min-w-0 border border-solid border-line bg-panel-2 p-3">
+               <div className="min-w-0 border border-solid border-line bg-panel-2 p-3">
                  <div className="flex flex-wrap items-center gap-2">
                    <AccessPill kind={pack.accessKind} />
                    <span className="font-mono text-[10px] text-txt-dim">{pack.slug}</span>

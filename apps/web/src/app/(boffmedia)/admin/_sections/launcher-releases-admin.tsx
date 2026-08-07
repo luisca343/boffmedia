@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState, type FormEvent } from "react"
 import { useTranslations } from "next-intl"
-import { Button, Empty, Field, Icon, Input, Select, Spinner, Textarea, toast } from "@boffmedia/ui"
+import { Button, Empty, Field, Icon, Input, ReleaseRow, Select, Spinner, Textarea, toast } from "@boffmedia/ui"
 import type { LauncherReleaseEntity } from "@boffmedia/shared"
 
 import {
@@ -245,68 +245,29 @@ export function LauncherReleasesAdmin() {
           ) : rows.length === 0 ? (
             <Empty icon="download" title={t("emptyTitle")} lead={t("emptyLead")} />
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full min-w-[720px] border-collapse text-left">
-                <thead>
-                  <tr className="border-b border-line text-txt-dim">
-                    <th className="px-2 py-2 font-mono text-[10px] uppercase tracking-[0.1em]">{t("colRelease")}</th>
-                    <th className="px-2 py-2 font-mono text-[10px] uppercase tracking-[0.1em]">{t("colArtifact")}</th>
-                    <th className="px-2 py-2 font-mono text-[10px] uppercase tracking-[0.1em]">{t("colStatus")}</th>
-                    <th className="px-2 py-2 text-right font-mono text-[10px] uppercase tracking-[0.1em]">{t("colActions")}</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {rows.map((release) => {
-                    const publishedAt = asText(release.publishedAt)
-                    const notesText = asText(release.notes)
-                    return (
-                      <tr key={release.id} className="border-b border-line last:border-0">
-                        <td className="px-2 py-3 align-top">
-                          <div className="font-display text-[15px] font-bold text-txt">{release.version}</div>
-                          <div className="mt-1 font-mono text-[10px] text-txt-dim">{release.target}</div>
-                          {notesText && <p className="mt-2 max-w-[260px] text-[12px] leading-[1.4] text-txt-muted">{notesText}</p>}
-                        </td>
-                        <td className="px-2 py-3 align-top">
-                          <div className="max-w-[260px] truncate font-mono text-[11px] text-txt" title={release.artifactName}>
-                            {release.artifactName}
-                          </div>
-                          <div className="mt-1 text-[12px] text-txt-dim">{formatBytes(release.sizeBytes)}</div>
-                          {/* El hash completo se publica en /launcher para que la
-                              gente verifique su descarga, así que tiene que poder
-                              copiarse entero: seleccionarlo a mano de un <code>
-                              truncado no es copiarlo. */}
-                          <button
-                            type="button"
-                            title={release.artifactSha512}
-                            onClick={() => void copyHash(release.artifactSha512)}
-                            className="mt-1 flex items-center gap-1.5 font-mono text-[10px] text-txt-dim transition-colors hover:text-accent"
-                          >
-                            <Icon name="copy" size={11} />
-                            {release.artifactSha512.slice(0, 12)}…
-                          </button>
-                        </td>
-                        <td className="px-2 py-3 align-top">
-                          <AvPill tone={release.published ? "green" : "amber"} icon={release.published ? "check" : "bookmark"}>
-                            {release.published ? t("publishedStatus") : t("draftStatus")}
-                          </AvPill>
-                          {publishedAt && <time className="mt-2 block text-[11px] text-txt-dim" dateTime={publishedAt}>{new Date(publishedAt).toLocaleString()}</time>}
-                        </td>
-                        <td className="px-2 py-3 text-right align-top">
-                          <Button
-                            size="sm"
-                            variant={release.published ? "ghost" : "pri"}
-                            icon={release.published ? "x" : "check"}
-                            loading={busyId === release.id}
-                            onClick={() => void togglePublished(release)}
-                          >
-                            {release.published ? t("unpublish") : t("publish")}
-                          </Button>
-                        </td>
-                      </tr>
-                    )
-                  })}
-                </tbody>
-              </table>
+            <div className="flex flex-col gap-2">
+              {rows.map((release) => {
+                const publishedAt = asText(release.publishedAt)
+                return (
+                  <ReleaseRow
+                    key={release.id}
+                    published={release.published}
+                    version={release.version}
+                    target={release.target}
+                    meta={<>{release.artifactName} · {formatBytes(release.sizeBytes)}</>}
+                    hashShort={`${release.artifactSha512.slice(0, 12)}…`}
+                    hashFull={release.artifactSha512}
+                    onCopyHash={() => void copyHash(release.artifactSha512)}
+                    copyLabel={t("hashCopied")}
+                    date={publishedAt ? new Date(publishedAt).toLocaleDateString() : undefined}
+                    actions={
+                      <Button size="sm" variant={release.published ? "ghost" : "pri"} icon={release.published ? "x" : "check"} loading={busyId === release.id} onClick={() => void togglePublished(release)}>
+                        {release.published ? t("unpublish") : t("publish")}
+                      </Button>
+                    }
+                  />
+                )
+              })}
             </div>
           )}
         </AvPanel>

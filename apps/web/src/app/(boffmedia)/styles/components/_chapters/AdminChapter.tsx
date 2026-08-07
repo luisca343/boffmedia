@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { cn } from "@/lib/utils"
-import { Button, Modal, toast } from "@boffmedia/ui"
+import { Badge, Button, DropZone, FeatureToggle, Field, Icon, Input, Modal, PackListItem, ReleaseRow, SelectCard, toast, VersionCard, VersionRow } from "@boffmedia/ui"
 import { MONO_LABEL, Sample, Section } from "../showcase-shared"
 import { AV_CHART_C, DEMO_MEMBERS, DEMO_PIPELINE, aiCurve } from "../showcase-data"
 import {
@@ -242,6 +242,221 @@ export function AdminChapter() {
           </Button>
         </div>
       </Modal>
+
+      <Section
+        id="packlistitem"
+        kicker="Packs"
+        title="PackListItem"
+        lead={<><code>&lt;PackListItem&gt;</code> es un botón que muestra un paquete en formato de fila seleccionable — con media, nombre, slug, insignias y metadatos.</>}
+      >
+        <Sample title="Variantes selección y outline" code="PackListItem · bar|outline" col grid>
+          <PackListItem
+            selected
+            variant="bar"
+            media={<Icon name="cube" size={16} />}
+            name="Minecraft: Java Edition"
+            slug="minecraft-java"
+            badges={
+              <div className="flex gap-1">
+                <Badge tone="ok">Instalado</Badge>
+                <Badge>v1.21.1</Badge>
+              </div>
+            }
+            count="4 versiones · 2 accesos"
+          />
+          <PackListItem
+            variant="bar"
+            media={<Icon name="cube" size={16} />}
+            name="Modpack Custom"
+            slug="modpack-custom"
+            badges={<Badge tone="new">Beta</Badge>}
+            count="1 versión · sin acceso"
+          />
+          <PackListItem
+            selected
+            variant="outline"
+            media={<Icon name="cube" size={16} />}
+            name="Fabric Server"
+            slug="fabric-server"
+            badges={
+              <div className="flex gap-1">
+                <Badge tone="live">En directo</Badge>
+              </div>
+            }
+            count="2 versiones · 5 accesos"
+          />
+        </Sample>
+      </Section>
+
+      <Section
+        id="versions"
+        kicker="Packs"
+        title="Versiones · Row y Card"
+        lead={<><code>&lt;VersionRow&gt;</code> es una fila compacta con estado, versión, insignias y acciones. <code>&lt;VersionCard&gt;</code> es su variante de tarjeta estructurada con notas opcionales.</>}
+      >
+        <Sample title="VersionRow · estados" code="VersionRow · live|draft" col>
+          <div className="w-full grid gap-3">
+            <VersionRow
+              status="live"
+              statusIcon={<Icon name="check" size={16} />}
+              version="1.21.1"
+              badges={
+                <div className="flex gap-1">
+                  <Badge tone="ok">Publicada</Badge>
+                  <Badge tone="live">Última</Badge>
+                </div>
+              }
+              meta="Fabric 0.16 · 40 archivos"
+              date="14 Jun 2026"
+              actions={<Button variant="ghost" size="sm" icon="copy">Clonar</Button>}
+            />
+            <VersionRow
+              status="draft"
+              statusIcon={<Icon name="layers" size={16} />}
+              version="1.21.2"
+              badges={<Badge tone="new">Borrador</Badge>}
+              meta="Fabric 0.17 · 42 archivos"
+              date="18 Jun 2026"
+              actions={
+                <div className="flex gap-1">
+                  <Button variant="ghost" size="sm" icon="edit">Editar</Button>
+                  <Button variant="ghost" size="sm" icon="trash">Borrar</Button>
+                  <Button variant="ghost" size="sm">Publicar</Button>
+                </div>
+              }
+            />
+          </div>
+        </Sample>
+        <Sample title="VersionCard · con notas" code="VersionCard · card variant" col grid>
+          <VersionCard
+            status="live"
+            statusIcon={<Icon name="check" size={16} />}
+            version="1.21.1"
+            badges={
+              <div className="flex gap-1">
+                <Badge tone="ok">Publicada</Badge>
+              </div>
+            }
+            meta="Fabric 0.16 · 40 archivos"
+            notes="Cambios: mejor rendimiento, soporte para Sodium, correcciones de bugs."
+            date="14 Jun 2026"
+          />
+          <VersionCard
+            status="draft"
+            statusIcon={<Icon name="layers" size={16} />}
+            version="1.21.2"
+            badges={<Badge tone="new">Borrador</Badge>}
+            meta="Fabric 0.17"
+            notes="WIP: testeando nuevos mods de calidad de vida."
+            date="18 Jun 2026"
+          />
+        </Sample>
+      </Section>
+
+      <Section
+        id="releases"
+        kicker="Launcher"
+        title="ReleaseRow"
+        lead={<><code>&lt;ReleaseRow&gt;</code> es la fila del lanzador — versión, target (SO/arch), metadatos de archivo, hash, fecha y acciones de publicación.</>}
+      >
+        <Sample title="Publicadas y borradores" code="ReleaseRow · published|draft" col>
+          <div className="w-full grid gap-3">
+            <ReleaseRow
+              published
+              version="2.0.1"
+              target="win-x64"
+              meta="boff-launcher.msi · 62 MB"
+              hashShort="3af0c1…9e2"
+              hashFull="3af0c1a8b2d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6a7b8c9e2"
+              date="18 Jun 2026"
+              actions={<Button variant="ghost" size="sm" icon="upload">Despublicar</Button>}
+              onCopyHash={() => toast({ tone: "ok", title: "Hash copiado", msg: "SHA256 en el portapapeles" })}
+              copyLabel="Copiar"
+            />
+            <ReleaseRow
+              version="2.0.2"
+              target="macOS-arm64"
+              meta="boff-launcher-arm64.dmg · 71 MB"
+              hashShort="f2e1d0…c9b"
+              hashFull="f2e1d0c9b8a7z6y5x4w3v2u1t0s9r8q7p6o5n4m3l2k1j0i9h8g7f6e5d4c3b2a1"
+              date="19 Jun 2026"
+              actions={<Button variant="pri" size="sm" icon="upload">Publicar</Button>}
+              onCopyHash={() => toast({ tone: "ok", title: "Hash copiado", msg: "SHA256 en el portapapeles" })}
+              copyLabel="Copiar"
+            />
+          </div>
+        </Sample>
+      </Section>
+
+      <Section
+        id="featuretoggle"
+        kicker="Admin"
+        title="FeatureToggle"
+        lead={<><code>&lt;FeatureToggle&gt;</code> activa/desactiva configuraciones — el cuerpo (children) se revela solo cuando está activado. Interactivo con estado local.</>}
+      >
+        <Sample title="Toggle con control de estado" code="FeatureToggle · controlled" col>
+          <FeatureToggleSample />
+        </Sample>
+      </Section>
+
+      <Section
+        id="selectcard"
+        kicker="Admin"
+        title="SelectCard"
+        lead={<><code>&lt;SelectCard&gt;</code> es una tarjeta seleccionable — check visual + título + descripción. Grupo de tres para selección múltiple o alternativa.</>}
+      >
+        <Sample title="Selección de opciones" code="SelectCard · selection group" col grid>
+          <SelectCardGroup />
+        </Sample>
+      </Section>
     </>
+  )
+}
+
+function FeatureToggleSample() {
+  const [on, setOn] = React.useState(false)
+  return (
+    <FeatureToggle
+      icon={<Icon name="shield" size={20} />}
+      title="Whitelist de acceso"
+      description="Limita quién puede acceder a este paquete"
+      on={on}
+      onChange={setOn}
+    >
+      <Field className="mt-4">
+        <label className="block text-[13px] font-medium text-txt-muted mb-2">Usuarios autorizados</label>
+        <DropZone label="Subir lista de UUIDs" hint=".txt" loadedLabel="Archivo cargado" onPick={() => {}} className="mb-3" />
+        <Input placeholder="O pega aquí una lista de UUIDs..." />
+      </Field>
+    </FeatureToggle>
+  )
+}
+
+function SelectCardGroup() {
+  const [selected, setSelected] = React.useState("fabric")
+  return (
+    <div className="grid gap-3 w-full">
+      <SelectCard
+        selected={selected === "fabric"}
+        onChange={() => setSelected("fabric")}
+        icon={<Icon name="cube" size={20} />}
+        title="Fabric Loader"
+        description="Modding framework ligero y rápido"
+      />
+      <SelectCard
+        selected={selected === "forge"}
+        onChange={() => setSelected("forge")}
+        icon={<Icon name="layers" size={20} />}
+        title="Forge"
+        description="Ecosistema maduro de mods para Minecraft"
+      />
+      <SelectCard
+        selected={selected === "neoforge"}
+        onChange={() => setSelected("neoforge")}
+        icon={<Icon name="layers" size={20} />}
+        title="NeoForge"
+        description="Continuación mantenida de Forge"
+      />
+    </div>
   )
 }

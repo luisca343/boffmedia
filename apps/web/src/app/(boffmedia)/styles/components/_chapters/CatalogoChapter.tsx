@@ -4,6 +4,7 @@ import * as React from "react"
 import { Sample, Section } from "../showcase-shared"
 import { CtActivityRow, CtCover, CtGameCard, CtListCard, CtLogButton, CtRatingBars, CtStars, CtStatusPill, CT_STATUS_ORDER } from "@/components/boffmedia/ui/catalog"
 import { CT_BY_ID, CT_DEMO_LIST, CT_GAMES } from "./catalogo-demo"
+import { Badge, Button, Icon, PackCard, Progress, ServerStatus } from "@boffmedia/ui"
 
 const noop = () => {}
 
@@ -113,6 +114,139 @@ export function CatalogoChapter() {
               <CtActivityRow item={{ user: "davidlvl99", gameId: g2.id, status: "playing", rating: 4.5, time: "hace 5 h" }} game={g2} onOpen={noop} />
             </div>
           </div>
+        </Sample>
+      </Section>
+
+      <Section
+        id="packcard"
+        kicker="Launcher"
+        title="PackCard · estados"
+        lead={
+          <>
+            <code>&lt;PackCard&gt;</code> muestra un paquete con arte de portada, estado, servidor y acciones. Aquí están los ocho estados principales del lanzador con sus variantes de icono y acción.
+          </>
+        }
+      >
+        <Sample title="Listo para jugar" code="PackCard · ready" col>
+          <PackCard
+            title="Minecraft: Java Edition"
+            slug="minecraft-java"
+            icon={<Icon name="cube" size={24} />}
+            stateBadge={<Badge tone="ok">Listo</Badge>}
+            badges={<span className="text-txt-muted text-[13px]">1.21.1</span>}
+            footerMeta="Hace 2 días"
+            actions={<Button variant="pri" size="sm" icon="play">Jugar</Button>}
+            className="w-full max-w-[320px]"
+          />
+        </Sample>
+        <Sample title="Actualización disponible" code="PackCard · update" col>
+          <PackCard
+            title="Minecraft: Java Edition"
+            slug="minecraft-java"
+            icon={<Icon name="cube" size={24} />}
+            stateBadge={<Badge tone="new">v2 lista</Badge>}
+            badges={<span className="text-txt-muted text-[13px]">1.20.1 → 1.21.1</span>}
+            actions={<Button variant="pri" size="sm" icon="refresh">Actualizar</Button>}
+            className="w-full max-w-[320px]"
+          />
+        </Sample>
+        <Sample title="Instalando" code="PackCard · installing" col>
+          <PackCard
+            title="Minecraft: Java Edition"
+            slug="minecraft-java"
+            icon={<Icon name="cube" size={24} />}
+            stateBadge={<Badge tone="live">Instalando</Badge>}
+            progress={<Progress value={62} />}
+            footerMeta="148/240 MB · 62%"
+            actions={<Button variant="default" size="sm">Cancelar</Button>}
+            className="w-full max-w-[320px]"
+          />
+        </Sample>
+        <Sample title="Sin acceso" code="PackCard · locked" col>
+          <PackCard
+            title="Servidor privado"
+            slug="private-server"
+            icon={<Icon name="cube" size={24} />}
+            stateBadge={<Badge tone="bad">Sin acceso</Badge>}
+            locked
+            actions={<Button variant="pri" size="sm" icon="shield">Solicitar acceso</Button>}
+            className="w-full max-w-[320px]"
+          />
+        </Sample>
+        <Sample title="Servidor en línea" code="PackCard · online" col>
+          <PackCard
+            title="Minecraft Multijugador"
+            slug="mc-multi"
+            icon={<Icon name="cube" size={24} />}
+            stateBadge={<Badge tone="ok">Listo</Badge>}
+            serverStatus={<ServerStatus status="online" label="Online · 24/60" address="play.boff.gg" />}
+            actions={<Button variant="pri" size="sm">Jugar y conectar</Button>}
+            className="w-full max-w-[320px]"
+          />
+        </Sample>
+        <Sample title="Servidor offline" code="PackCard · offline" col>
+          <PackCard
+            title="Minecraft Multijugador"
+            slug="mc-multi"
+            icon={<Icon name="cube" size={24} />}
+            stateBadge={<Badge tone="ok">Listo</Badge>}
+            serverStatus={<ServerStatus status="offline" label="Servidor offline" />}
+            actions={<Button variant="default" size="sm">Jugar sin conectar</Button>}
+            className="w-full max-w-[320px]"
+          />
+        </Sample>
+        <Sample title="Nunca jugado" code="PackCard · new" col>
+          <PackCard
+            title="Nueva colección"
+            slug="new-pack"
+            icon={<Icon name="cube" size={24} />}
+            stateBadge={<Badge>Nuevo</Badge>}
+            footerMeta="Nunca jugado"
+            actions={<Button variant="pri" size="sm" icon="download">Instalar</Button>}
+            className="w-full max-w-[320px]"
+          />
+        </Sample>
+        <Sample title="Con metadatos completos" code="PackCard · full-meta" col>
+          <PackCard
+            title="Fabricaciones avanzadas"
+            slug="fabric-craft"
+            icon={<Icon name="cube" size={24} />}
+            stateBadge={<Badge tone="ok">Listo</Badge>}
+            badges={<span className="text-txt-muted text-[13px]">1.21.1 · Fabric 0.16 · 1.4 GB · 487 archivos</span>}
+            actions={<Button variant="pri" size="sm" icon="play">Jugar</Button>}
+            className="w-full max-w-[320px]"
+          />
+        </Sample>
+        <Sample title="Layout horizontal" code="PackCard · row layout" col>
+          <div className="w-full max-w-[680px]">
+            <PackCard
+              title="Minecraft: Java Edition"
+              slug="minecraft-java"
+              icon={<Icon name="cube" size={24} />}
+              layout="row"
+              stateBadge={<Badge tone="ok">Listo</Badge>}
+              badges={<span className="text-txt-muted text-[13px]">1.21.1</span>}
+              footerMeta="Hace 2 días"
+              actions={<Button variant="pri" size="sm" icon="play">Jugar</Button>}
+            />
+          </div>
+        </Sample>
+      </Section>
+
+      <Section
+        id="serverstatus"
+        kicker="Launcher"
+        title="ServerStatus"
+        lead={<>Indicador del estado del servidor multijugador: <code>&lt;ServerStatus&gt;</code> muestra online/offline/desconocido con barra de acento de color y dirección del servidor.</>}
+      >
+        <Sample title="En línea" code="ServerStatus · online">
+          <ServerStatus status="online" label="Online · 24/60" address="play.boff.gg" />
+        </Sample>
+        <Sample title="Offline" code="ServerStatus · offline">
+          <ServerStatus status="offline" label="Servidor offline" />
+        </Sample>
+        <Sample title="Desconocido" code="ServerStatus · unknown">
+          <ServerStatus status="unknown" label="Estado desconocido" />
         </Sample>
       </Section>
     </>

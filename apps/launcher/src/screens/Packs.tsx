@@ -240,8 +240,11 @@ function LibraryCard({ entry }: { entry: PackEntry }) {
   return (
     <>
       <PackCard
-        icon={<CatalogIcon src={pack.iconUrl ?? undefined} size={28} />}
+        // Real pack art fills the 16:9 hero (centered square); packs with no
+        // iconUrl fall through to the card's striped placeholder + cube glyph.
+        art={pack.iconUrl ? <CatalogIcon src={pack.iconUrl} size={72} /> : undefined}
         title={pack.name}
+        slug={pack.slug}
         stateBadge={<StateBadge state={state} />}
         type={entry.server ? "server" : "client"}
         // RF-02: the banner (and this status) render only when the pack declares
@@ -287,7 +290,7 @@ function LibraryCard({ entry }: { entry: PackEntry }) {
               ariaLabel={tp("moreActions")}
               items={menuItems}
               trigger={
-                <span className="inline-flex h-8 w-8 items-center justify-center border border-solid border-line text-txt-muted transition-colors hover:border-accent-line hover:text-accent-bright cut-tag [--cut-tag:6px]">
+                <span className="inline-flex h-8 w-8 items-center justify-center border border-solid border-line text-txt-muted transition-colors hover:border-accent-line hover:text-accent-bright">
                   <Icon name="more" size={16} />
                 </span>
               }

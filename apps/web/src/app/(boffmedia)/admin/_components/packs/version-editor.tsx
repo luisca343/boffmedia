@@ -131,7 +131,7 @@ function StepRail({
               disabled={!enabled}
               onClick={() => onGo(s)}
               className={[
-                "cut flex items-center gap-2 border-2 border-solid px-3 py-1.5 transition-colors duration-[140ms]",
+                "flex items-center gap-2 border-2 border-solid px-3 py-1.5 transition-colors duration-[140ms]",
                 current
                   ? "border-accent bg-accent-soft text-txt"
                   : enabled
@@ -516,7 +516,7 @@ export function VersionEditor({
         >
         {step === "metadata" && (
           <div className="flex flex-col gap-5">
-            <div className="cut-tag flex gap-3 border border-solid border-accent-line bg-accent-soft px-4 py-4">
+            <div className="flex gap-3 border border-solid border-accent-line bg-accent-soft px-4 py-4">
               <span className="grid size-8 shrink-0 place-items-center border border-solid border-accent-line bg-panel text-accent">
                 <span className="font-mono text-[12px] font-bold">01</span>
               </span>
@@ -530,7 +530,7 @@ export function VersionEditor({
               </div>
             </div>
 
-            <section className="cut border border-solid border-line bg-panel-2 p-4">
+            <section className="border border-solid border-line bg-panel-2 p-4">
               <div className="mb-4 flex items-start gap-3">
                 <span className="grid size-8 shrink-0 place-items-center border border-solid border-line-2 bg-panel text-accent">
                   <Icon name="edit" size={15} />
@@ -560,7 +560,7 @@ export function VersionEditor({
               </div>
             </section>
 
-            <section className="cut border border-solid border-line bg-panel-2 p-4">
+            <section className="border border-solid border-line bg-panel-2 p-4">
               <div className="mb-4 flex items-start gap-3">
                 <span className="grid size-8 shrink-0 place-items-center border border-solid border-line-2 bg-panel text-accent">
                   <Icon name="settings" size={15} />
@@ -614,7 +614,7 @@ export function VersionEditor({
               </div>
             </section>
 
-            <section className="cut flex flex-wrap items-center gap-3 border border-dashed border-line-2 bg-panel-2 px-4 py-3">
+            <section className="flex flex-wrap items-center gap-3 border border-dashed border-line-2 bg-panel-2 px-4 py-3">
               <span className="grid size-8 shrink-0 place-items-center border border-solid border-line-2 bg-panel text-accent">
                 <Icon name="upload" size={15} />
               </span>
@@ -758,7 +758,7 @@ export function VersionEditor({
 
         {step === "worlds" && (
           <div className="flex flex-col gap-5">
-            <div className="cut-tag flex gap-3 border border-solid border-accent-line bg-accent-soft px-4 py-4">
+            <div className="flex gap-3 border border-solid border-accent-line bg-accent-soft px-4 py-4">
               <span className="grid size-8 shrink-0 place-items-center border border-solid border-accent-line bg-panel text-accent">
                 <span className="font-mono text-[12px] font-bold">04</span>
               </span>
@@ -772,7 +772,7 @@ export function VersionEditor({
               </div>
             </div>
 
-            <section className="cut border border-solid border-line bg-panel-2 p-4">
+            <section className="border border-solid border-line bg-panel-2 p-4">
               <BundledWorldsEditor value={worlds} onChange={setWorlds} />
             </section>
           </div>

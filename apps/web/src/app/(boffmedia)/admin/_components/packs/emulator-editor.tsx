@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react"
 import { useTranslations } from "next-intl"
-import { Badge, Button, Field, Icon, Input, Select, Textarea, toast } from "@boffmedia/ui"
+import { Badge, Button, FeatureToggle, Field, Icon, Input, Select, Textarea, toast } from "@boffmedia/ui"
 import { cn } from "@/lib/utils"
 import { AvPanel, AvPill } from "../ui/av-kit"
 import { sha512Hex, uploadOverrideBlob } from "./upload-blob"
@@ -251,7 +251,7 @@ export function EmulatorEditor({ onSave, previousKind }: EmulatorEditorProps) {
 
   return (
     <div className="flex flex-col gap-5">
-      <section className="cut border border-solid border-line bg-panel-2 p-4">
+      <section className="border border-solid border-line bg-panel-2 p-4">
         <div className="mb-4 flex items-start gap-3">
           <span className="grid size-8 shrink-0 place-items-center border border-solid border-line-2 bg-panel text-accent">
             <Icon name="gamepad" size={15} />
@@ -278,7 +278,7 @@ export function EmulatorEditor({ onSave, previousKind }: EmulatorEditorProps) {
         </Field>
       </section>
 
-      <section className="cut border border-solid border-line bg-panel-2 p-4">
+      <section className="border border-solid border-line bg-panel-2 p-4">
         <div className="mb-4 flex items-start gap-3">
           <span className="grid size-8 shrink-0 place-items-center border border-solid border-line-2 bg-panel text-accent">
             <Icon name="cube" size={15} />
@@ -349,181 +349,123 @@ export function EmulatorEditor({ onSave, previousKind }: EmulatorEditorProps) {
         </div>
       </section>
 
-      {useRomhack && (
-        <section className="cut border border-solid border-line bg-panel-2 p-4">
-          <div className="mb-4 flex items-start gap-3">
-            <span className="grid size-8 shrink-0 place-items-center border border-solid border-line-2 bg-panel text-accent">
-              <Icon name="copy" size={15} />
-            </span>
-            <div>
-              <h3 className="font-display text-[14px] font-bold uppercase tracking-[0.08em] text-txt">
-                {t("emulator.romhackSection")}
-              </h3>
-              <p className="mt-1 text-[12px] leading-[1.45] text-txt-dim">
-                {t("emulator.romhackSectionLead")}
-              </p>
-            </div>
-          </div>
-
-          <div className="grid gap-4">
-            <div className="flex flex-wrap items-end gap-3">
-              <div className="flex-1 min-w-[200px]">
-                <Field label={t("emulator.baseFile")}>
-                  <div className="rounded border border-solid border-line bg-panel px-3 py-2 font-mono text-[11px] text-txt-dim truncate">
-                    {baseFile?.file.name || "No file selected"}
-                  </div>
-                </Field>
+      <FeatureToggle
+        icon={<Icon name="copy" size={18} />}
+        title={t("emulator.romhackToggle")}
+        description={t("emulator.romhackToggleLead")}
+        on={useRomhack}
+        onChange={(on) => setUseRomhack(on)}
+      >
+        <div className="flex flex-wrap items-end gap-3">
+          <div className="flex-1 min-w-[200px]">
+            <Field label={t("emulator.baseFile")}>
+              <div className="rounded border border-solid border-line bg-panel px-3 py-2 font-mono text-[11px] text-txt-dim truncate">
+                {baseFile?.file.name || "No file selected"}
               </div>
-              <Button
-                size="sm"
-                icon="upload"
-                loading={hashing}
-                onClick={() => baseInputRef.current?.click()}
-              >
-                {t("emulator.selectFile")}
-              </Button>
-              <input
-                ref={baseInputRef}
-                type="file"
-                hidden
-                onChange={(e) => {
-                  void handleBasePick(e.target.files?.[0])
-                  e.target.value = ""
-                }}
-              />
-            </div>
-
-            <div className="flex flex-wrap items-end gap-3">
-              <div className="flex-1 min-w-[200px]">
-                <Field label={t("emulator.patchFile")}>
-                  <div className="rounded border border-solid border-line bg-panel px-3 py-2 font-mono text-[11px] text-txt-dim truncate">
-                    {patchFile?.name || "No file selected"}
-                  </div>
-                </Field>
-              </div>
-              <Button
-                size="sm"
-                icon="upload"
-                onClick={() => patchInputRef.current?.click()}
-              >
-                {t("emulator.selectFile")}
-              </Button>
-              <input
-                ref={patchInputRef}
-                type="file"
-                accept=".bps,.ups"
-                hidden
-                onChange={(e) => {
-                  handlePatchPick(e.target.files?.[0])
-                  e.target.value = ""
-                }}
-              />
-            </div>
-
-            <Field label={t("emulator.patchFormat")}>
-              <Select
-                value={patchFormat}
-                onChange={(v) => setPatchFormat(v as "bps" | "ups")}
-                options={[
-                  { value: "bps", label: "BPS (Binary Patch Set)" },
-                  { value: "ups", label: "UPS (Universal Patch Script)" },
-                ]}
-              />
-            </Field>
-
-            <div className="flex flex-wrap items-end gap-3">
-              <div className="flex-1 min-w-[200px]">
-                <Field label={t("emulator.patchedFile")}>
-                  <div className="rounded border border-solid border-line bg-panel px-3 py-2 font-mono text-[11px] text-txt-dim truncate">
-                    {patchedRomFile?.file.name || "No file selected"}
-                  </div>
-                </Field>
-              </div>
-              <Button
-                size="sm"
-                icon="upload"
-                loading={hashing}
-                onClick={() => patchedInputRef.current?.click()}
-              >
-                {t("emulator.selectFile")}
-              </Button>
-              <input
-                ref={patchedInputRef}
-                type="file"
-                hidden
-                onChange={(e) => {
-                  void handlePatchedPick(e.target.files?.[0])
-                  e.target.value = ""
-                }}
-              />
-            </div>
-
-            <Field label={t("emulator.patchedPath")}>
-              <Input
-                value={patchedRomPath}
-                onChange={(e) => setPatchedRomPath(e.target.value)}
-                placeholder="roms/emerald-hack.gba"
-              />
             </Field>
           </div>
-        </section>
-      )}
-
-      <section className="cut border border-solid border-line bg-panel-2 p-4">
-        <button
-          type="button"
-          onClick={() => setUseRomhack(!useRomhack)}
-          className="mb-4 flex items-start gap-3 w-full"
-        >
-          <span
-            className={cn(
-              "grid size-8 shrink-0 place-items-center border border-solid",
-              useRomhack
-                ? "border-accent bg-accent text-accent-ink"
-                : "border-line-2 bg-panel text-txt-dim"
-            )}
+          <Button
+            size="sm"
+            icon="upload"
+            loading={hashing}
+            onClick={() => baseInputRef.current?.click()}
           >
-            <Icon name={useRomhack ? "check" : "cube"} size={15} />
-          </span>
-          <div className="text-left">
-            <h3 className="font-display text-[14px] font-bold uppercase tracking-[0.08em] text-txt">
-              {t("emulator.romhackToggle")}
-            </h3>
-            <p className="mt-1 text-[12px] leading-[1.45] text-txt-dim">
-              {t("emulator.romhackToggleLead")}
-            </p>
-          </div>
-        </button>
-      </section>
+            {t("emulator.selectFile")}
+          </Button>
+          <input
+            ref={baseInputRef}
+            type="file"
+            hidden
+            onChange={(e) => {
+              void handleBasePick(e.target.files?.[0])
+              e.target.value = ""
+            }}
+          />
+        </div>
 
-      <section className="cut border border-solid border-line bg-panel-2 p-4">
-        <button
-          type="button"
-          onClick={() => setStartingSave(startingSave ? null : { file: new File([], ""), name: "" })}
-          className="mb-4 flex items-start gap-3 w-full"
-        >
-          <span
-            className={cn(
-              "grid size-8 shrink-0 place-items-center border border-solid",
-              startingSave
-                ? "border-accent bg-accent text-accent-ink"
-                : "border-line-2 bg-panel text-txt-dim"
-            )}
+        <div className="flex flex-wrap items-end gap-3">
+          <div className="flex-1 min-w-[200px]">
+            <Field label={t("emulator.patchFile")}>
+              <div className="rounded border border-solid border-line bg-panel px-3 py-2 font-mono text-[11px] text-txt-dim truncate">
+                {patchFile?.name || "No file selected"}
+              </div>
+            </Field>
+          </div>
+          <Button
+            size="sm"
+            icon="upload"
+            onClick={() => patchInputRef.current?.click()}
           >
-            <Icon name={startingSave ? "check" : "cube"} size={15} />
-          </span>
-          <div className="text-left">
-            <h3 className="font-display text-[14px] font-bold uppercase tracking-[0.08em] text-txt">
-              {t("emulator.saveToggle")}
-            </h3>
-            <p className="mt-1 text-[12px] leading-[1.45] text-txt-dim">
-              {t("emulator.saveToggleLead")}
-            </p>
-          </div>
-        </button>
+            {t("emulator.selectFile")}
+          </Button>
+          <input
+            ref={patchInputRef}
+            type="file"
+            accept=".bps,.ups"
+            hidden
+            onChange={(e) => {
+              handlePatchPick(e.target.files?.[0])
+              e.target.value = ""
+            }}
+          />
+        </div>
 
+        <Field label={t("emulator.patchFormat")}>
+          <Select
+            value={patchFormat}
+            onChange={(v) => setPatchFormat(v as "bps" | "ups")}
+            options={[
+              { value: "bps", label: "BPS (Binary Patch Set)" },
+              { value: "ups", label: "UPS (Universal Patch Script)" },
+            ]}
+          />
+        </Field>
+
+        <div className="flex flex-wrap items-end gap-3">
+          <div className="flex-1 min-w-[200px]">
+            <Field label={t("emulator.patchedFile")}>
+              <div className="rounded border border-solid border-line bg-panel px-3 py-2 font-mono text-[11px] text-txt-dim truncate">
+                {patchedRomFile?.file.name || "No file selected"}
+              </div>
+            </Field>
+          </div>
+          <Button
+            size="sm"
+            icon="upload"
+            loading={hashing}
+            onClick={() => patchedInputRef.current?.click()}
+          >
+            {t("emulator.selectFile")}
+          </Button>
+          <input
+            ref={patchedInputRef}
+            type="file"
+            hidden
+            onChange={(e) => {
+              void handlePatchedPick(e.target.files?.[0])
+              e.target.value = ""
+            }}
+          />
+        </div>
+
+        <Field label={t("emulator.patchedPath")}>
+          <Input
+            value={patchedRomPath}
+            onChange={(e) => setPatchedRomPath(e.target.value)}
+            placeholder="roms/emerald-hack.gba"
+          />
+        </Field>
+      </FeatureToggle>
+
+      <FeatureToggle
+        icon={<Icon name="download" size={18} />}
+        title={t("emulator.saveToggle")}
+        description={t("emulator.saveToggleLead")}
+        on={startingSave !== null}
+        onChange={(on) => setStartingSave(on ? { file: new File([], ""), name: "" } : null)}
+      >
         {startingSave && startingSave.file.size !== 0 && (
-          <div className="grid gap-3">
+          <>
             <div className="flex flex-wrap items-end gap-3">
               <div className="flex-1 min-w-[200px]">
                 <Field label={t("emulator.saveFile")}>
@@ -558,11 +500,11 @@ export function EmulatorEditor({ onSave, previousKind }: EmulatorEditorProps) {
                 placeholder="roms/save.sav"
               />
             </Field>
-          </div>
+          </>
         )}
-      </section>
+      </FeatureToggle>
 
-      <section className="cut border border-solid border-line bg-panel-2 p-4">
+      <section className="border border-solid border-line bg-panel-2 p-4">
         <div className="mb-4 flex items-start gap-3">
           <span className="grid size-8 shrink-0 place-items-center border border-solid border-line-2 bg-panel text-accent">
             <Icon name="sliders" size={15} />
@@ -586,7 +528,7 @@ export function EmulatorEditor({ onSave, previousKind }: EmulatorEditorProps) {
         </Field>
       </section>
 
-      <section className="cut border border-solid border-line bg-panel-2 p-4">
+      <section className="border border-solid border-line bg-panel-2 p-4">
         <div className="mb-4 flex items-start gap-3">
           <span className="grid size-8 shrink-0 place-items-center border border-solid border-line-2 bg-panel text-accent">
             <Icon name="gift" size={15} />

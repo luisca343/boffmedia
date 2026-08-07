@@ -137,7 +137,7 @@ export function AdminCrud<T extends { id: number | string }>({
     return (
       <AvPanel>
         <div className="text-center py-10">
-          <span className="cut-seal grid place-items-center w-12 h-12 mx-auto mb-4 text-accent bg-accent-soft border border-solid border-accent-line">
+          <span className="grid place-items-center w-12 h-12 mx-auto mb-4 text-accent bg-accent-soft border border-solid border-accent-line">
             <Icon name="alert" size={24} />
           </span>
           <h3 className="text-lg font-bold mb-2">{t("errorTitle", { plural })}</h3>
@@ -186,7 +186,7 @@ export function AdminCrud<T extends { id: number | string }>({
           )}
         </Empty>
       ) : (
-        <div className="cut-corner border border-solid border-line bg-panel overflow-x-auto">
+        <div className="border border-solid border-line bg-panel overflow-x-auto">
           <table className="w-full border-collapse text-sm min-w-[560px]">
             <thead>
               <tr className="bg-panel-2">
@@ -226,7 +226,7 @@ export function AdminCrud<T extends { id: number | string }>({
                           setSelected(item)
                           setEditOpen(true)
                         }}
-                        className="cut-tag [--cut-tag:5px] grid place-items-center w-8 h-8 border border-solid border-line-2 text-txt-muted hover:text-accent hover:border-accent-line transition-colors"
+                        className="grid place-items-center w-8 h-8 border border-solid border-line-2 text-txt-muted hover:text-accent hover:border-accent-line transition-colors"
                       >
                         <Icon name="edit" size={15} />
                       </button>
@@ -236,7 +236,7 @@ export function AdminCrud<T extends { id: number | string }>({
                           setSelected(item)
                           setDeleteOpen(true)
                         }}
-                        className="cut-tag [--cut-tag:5px] grid place-items-center w-8 h-8 border border-solid border-line-2 text-txt-muted hover:text-bad hover:border-bad transition-colors"
+                        className="grid place-items-center w-8 h-8 border border-solid border-line-2 text-txt-muted hover:text-bad hover:border-bad transition-colors"
                       >
                         <Icon name="trash" size={15} />
                       </button>

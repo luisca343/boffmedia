@@ -128,8 +128,8 @@ export function LauncherDownloadView() {
       ) : (
         <>
           {primary && (
-            <div className="mb-8 flex flex-wrap items-center gap-6 border border-solid border-accent-line border-l-4 border-l-accent bg-[linear-gradient(120deg,var(--accent-soft),var(--panel)_60%)] px-7 py-7 cut-corner">
-              <span className="grid h-[58px] w-[58px] flex-none place-items-center bg-accent text-accent-ink [clip-path:polygon(50%_0,100%_50%,50%_100%,0_50%)]">
+            <div className="mb-8 flex flex-wrap items-center gap-6 border border-solid border-accent-line border-l-4 border-l-accent bg-[linear-gradient(120deg,var(--accent-soft),var(--panel)_60%)] px-7 py-7">
+              <span className="grid h-[58px] w-[58px] flex-none place-items-center bg-accent text-accent-ink">
                 <Icon name={PLATFORMS[primary.target]?.icon ?? "download"} size={26} />
               </span>
               <div className="min-w-0 flex-1">
@@ -197,7 +197,7 @@ export function LauncherDownloadView() {
                       <a
                         key={row.target}
                         href={row.url}
-                        className="group flex items-center gap-3 border border-solid border-line bg-base px-4 py-3 no-underline cut-tag transition-[border-color,background] duration-[140ms] hover:border-accent-line hover:bg-panel-2"
+                        className="group flex items-center gap-3 border border-solid border-line bg-base px-4 py-3 no-underline transition-[border-color,background] duration-[140ms] hover:border-accent-line hover:bg-panel-2"
                       >
                         <Icon
                           name={PLATFORMS[row.target]?.icon ?? "download"}
