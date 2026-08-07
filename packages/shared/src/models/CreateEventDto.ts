@@ -4,60 +4,32 @@
 /* eslint-disable */
 export type CreateEventDto = {
     /**
-     * The ID of the parent event, if any
+     * Tournament ID
      */
-    parentId?: number;
+    tournamentId: number;
     /**
-     * The title of the event
+     * Game platform
      */
-    title: string;
+    gamePlatform: string;
     /**
-     * The description of the event
+     * FVX game identifier
      */
-    description: string;
+    gameTitle: string;
     /**
-     * The game ID
+     * SHA-512 of settings blob
      */
-    gameId: number;
+    settingsBlobSha512: string;
     /**
-     * The start date of the event
+     * SHA-512 of FVX jar
      */
-    startDate: string;
+    fvxJarSha512: string;
     /**
-     * The end date of the event
+     * SHA-512 of clean ROM
      */
-    endDate?: string;
+    cleanRomSha512: string;
     /**
-     * The visibility of the event
+     * Human-readable ROM hint
      */
-    visibility: CreateEventDto.visibility;
-    /**
-     * The type of event
-     */
-    type: CreateEventDto.type;
-    /**
-     * The icon of the event
-     */
-    icon: string;
-    /**
-     * The banner of the event
-     */
-    banner?: string;
+    romHint: string;
 };
-export namespace CreateEventDto {
-    /**
-     * The visibility of the event
-     */
-    export enum visibility {
-        PUBLIC = 'public',
-        PRIVATE = 'private',
-    }
-    /**
-     * The type of event
-     */
-    export enum type {
-        EVENT = 'event',
-        SERVER = 'server',
-    }
-}
 

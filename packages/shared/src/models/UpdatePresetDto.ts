@@ -2,10 +2,10 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export type CreatePresetDto = {
-    name: string;
+export type UpdatePresetDto = {
+    name?: string;
     description?: string;
     gameScope?: string;
-    settingsJson: Record<string, any>;
+    settingsJson?: Record<string, any>;
 };
 

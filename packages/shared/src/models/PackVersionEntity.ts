@@ -11,8 +11,15 @@ export type PackVersionEntity = {
     loaderVersion?: Record<string, any> | null;
     fileCount: number;
     worldCount: number;
+    emulatorKind?: PackVersionEntity.emulatorKind | null;
     published: boolean;
     notes?: Record<string, any> | null;
     createdAt: string;
 };
+export namespace PackVersionEntity {
+    export enum emulatorKind {
+        MGBA = 'mgba',
+        MELONDS = 'melonds',
+    }
+}
 

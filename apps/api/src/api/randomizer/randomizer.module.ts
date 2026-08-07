@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { LoggerModule } from '@api/_utils/logger/logger.module';
 import { DrizzleModule } from '@api/_utils/drizzle/drizzle.module';
-import { ConfigService } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { Logger } from 'nestjs-pino';
 
 // Repository
@@ -29,7 +29,7 @@ import { RandomizerLauncherController } from './randomizer-launcher.controller';
 import { PacksModule } from '@api/packs/packs.module';
 
 @Module({
-  imports: [LoggerModule, DrizzleModule, PacksModule],
+  imports: [ConfigModule, LoggerModule, DrizzleModule, PacksModule],
   providers: [
     // Repository with token binding
     {

@@ -32,6 +32,11 @@ import { PacksService } from './packs.service';
     PacksMetaService,
     LauncherAuthGuard,
   ],
-  exports: [PacksService],
+  exports: [
+    PacksService,
+    PacksDownloadsService,
+    LauncherAuthGuard,
+    PacksAuthService,
+  ],
 })
 export class PacksModule {}

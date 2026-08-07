@@ -66,7 +66,14 @@ export class RandomizerLauncherController {
     summary: 'Subir ROM parcheada y descargar ROM aleatorizada',
   })
   @ApiConsumes('multipart/form-data')
-  @ApiResponse({ status: 200, type: 'application/octet-stream' })
+  @ApiResponse({
+    status: 200,
+    content: {
+      'application/octet-stream': {
+        schema: { type: 'string', format: 'binary' },
+      },
+    },
+  })
   async patchRom(
     @Param('eventId') eventId: string,
     @Req() req: LauncherRequest,
