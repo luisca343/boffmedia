@@ -43,6 +43,7 @@ export class EventsService {
     fvxJarSha512: string;
     cleanRomSha512: string;
     romHint?: string;
+    packId?: string;
   }): Promise<RandomizerEvent> {
     if (!data.tournamentId || data.tournamentId <= 0) {
       throw new BadRequestException('Valid tournamentId is required');
@@ -57,6 +58,7 @@ export class EventsService {
         fvxJarSha512: data.fvxJarSha512,
         cleanRomSha512: data.cleanRomSha512,
         romHint: data.romHint || null,
+        packId: data.packId || null,
         status: 'draft',
       } as NewRandomizerEvent);
 
@@ -109,7 +111,7 @@ export class EventsService {
    */
   async updateEvent(
     eventId: number,
-    patch: { romHint?: string },
+    patch: { romHint?: string; packId?: string },
   ): Promise<RandomizerEvent> {
     if (!eventId || eventId <= 0) {
       throw new BadRequestException('Valid eventId is required');
@@ -125,6 +127,7 @@ export class EventsService {
 
     await this.repository.updateEvent(eventId, {
       romHint: patch.romHint !== undefined ? patch.romHint : event.romHint,
+      packId: patch.packId !== undefined ? patch.packId : event.packId,
     });
 
     return this.getEvent(eventId);

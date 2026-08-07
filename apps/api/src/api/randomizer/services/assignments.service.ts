@@ -160,12 +160,14 @@ export class AssignmentsService {
 
     // Return sealed DTO (NEVER include seed)
     return {
+      eventId: event.id,
       status: assignment.status as RandomizerAssignmentStatus,
       gamePlatform: event.gamePlatform,
       gameTitle: event.gameTitle,
       cleanRomSha512: event.cleanRomSha512,
       romHint: event.romHint,
       eventStatus: event.status as RandomizerEventStatus,
+      outputSha512: assignment.outputSha512,
     };
   }
 

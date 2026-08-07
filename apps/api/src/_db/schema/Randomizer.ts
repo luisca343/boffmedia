@@ -18,6 +18,7 @@ import {
   boffMediaTournamentParticipants,
 } from './BoffMediaTournaments';
 import { boffMediaUsers } from './BoffMedia';
+import { packs } from './Packs';
 
 /** Status of a randomizer event: draft | locked | running | finished */
 export type RandomizerEventStatus = 'draft' | 'locked' | 'running' | 'finished';
@@ -50,6 +51,7 @@ export const randomizerEvents = mysqlTable(
     fvxJarSha512: char('fvx_jar_sha512', { length: 128 }).notNull(), // pinned jar patches
     cleanRomSha512: char('clean_rom_sha512', { length: 128 }).notNull(), // No-Intro clean-dump hash
     romHint: varchar('rom_hint', { length: 255 }), // human hint (e.g. "Pokémon FireRed (Spain)")
+    packId: varchar('pack_id', { length: 32 }), // nullable FK to packs
     status: varchar('status', { length: 16 }).notNull().default('draft'), // draft | locked | running | finished
     createdAt: timestamp('created_at')
       .notNull()
@@ -64,7 +66,13 @@ export const randomizerEvents = mysqlTable(
       columns: [table.tournamentId],
       foreignColumns: [boffMediaTournaments.id],
     }).onDelete('cascade'),
+    packFk: foreignKey({
+      name: 're_pack_fk',
+      columns: [table.packId],
+      foreignColumns: [packs.id],
+    }).onDelete('set null'),
     tournamentIdx: index('re_tournament_idx').on(table.tournamentId),
+    packIdx: index('re_pack_idx').on(table.packId),
   }),
 );
 

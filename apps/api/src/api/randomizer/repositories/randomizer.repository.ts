@@ -1,6 +1,6 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { MySql2Database } from 'drizzle-orm/mysql2';
-import { and, eq, isNotNull } from 'drizzle-orm';
+import { and, eq, isNotNull, inArray, or } from 'drizzle-orm';
 import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
 import {
   randomizerEvents,
@@ -63,6 +63,50 @@ export class RandomizerRepository {
     } catch (error: any) {
       this.logger.error(`Failed to get event by ID ${id}:`, error);
       throw new Error(`Event retrieval failed: ${error.message}`);
+    }
+  }
+
+  async findActiveEventByPackId(packId: string): Promise<RandomizerEvent | null> {
+    if (!packId) {
+      return null;
+    }
+
+    try {
+      // Find events with this packId that are in an active state (locked or running).
+      // Players can only claim assignments once seeds exist (locked or running).
+      // Draft events have no seeds; finished events are closed to new claims.
+      const rows = await this.db
+        .select()
+        .from(randomizerEvents)
+        .where(
+          and(
+            eq(randomizerEvents.packId, packId),
+            or(
+              eq(randomizerEvents.status, 'locked'),
+              eq(randomizerEvents.status, 'running'),
+            ),
+          ),
+        )
+        .execute();
+
+      if (rows.length === 0) {
+        return null;
+      }
+
+      // If multiple active events for the same pack, prefer locked over running,
+      // then return the first one (should not occur in normal operation).
+      const lockedEvent = rows.find((e) => e.status === 'locked');
+      if (lockedEvent) {
+        return lockedEvent;
+      }
+
+      return rows[0];
+    } catch (error: any) {
+      this.logger.error(
+        `Failed to find active event for pack ${packId}:`,
+        error,
+      );
+      throw new Error(`Active event lookup failed: ${error.message}`);
     }
   }
 

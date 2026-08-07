@@ -140,4 +140,25 @@ export class RandomizerService {
   static listAssignments(id: string) {
     return apiAuthedAutoGET<RandomizerAssignment[]>(`/randomizer/events/${id}/assignments`)
   }
+
+  /**
+   * Get a specific assignment by ID.
+   */
+  static getAssignment(id: string) {
+    return apiAuthedAutoGET<RandomizerAssignment>(`/randomizer/assignments/${id}`)
+  }
+
+  /**
+   * Read the admin log for an assignment (judge log).
+   */
+  static readLog(assignmentId: string) {
+    return apiAuthedAutoGET<string>(`/randomizer/assignments/${assignmentId}/log`)
+  }
+
+  /**
+   * Delete an event.
+   */
+  static deleteEvent(id: string) {
+    return apiAuthedAutoDELETE<void>(`/randomizer/events/${id}`)
+  }
 }

@@ -38,6 +38,7 @@ import { ScreenshotsTab } from "../components/pack/ScreenshotsTab"
 import { WorldsTab } from "../components/pack/WorldsTab"
 import { LogPanel } from "../components/pack/LogPanel"
 import { EmulatorSetupPanel } from "../components/pack/EmulatorSetupPanel"
+import { RandomizerPanel } from "../components/pack/RandomizerPanel"
 import {
   exportMrpack,
   exportServerMrpack,
@@ -714,6 +715,16 @@ export function PackDetail() {
             setContentNonce((n) => n + 1)
             reloadPacks()
           }}
+          className="mb-4"
+        />
+      )}
+
+      {/* Randomizer panel — shown for emulator packs with an active event. */}
+      {module.supportsSetupPanel && (state.kind === "installed" || state.kind === "outdated") && (
+        <RandomizerPanel
+          slug={pack.slug}
+          packId={pack.id}
+          missingFiles={state.missingUserFiles ?? []}
           className="mb-4"
         />
       )}

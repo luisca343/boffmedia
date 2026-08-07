@@ -65,6 +65,12 @@ impl ApiState {
     pub async fn forget_session(&self) {
         *self.token.lock().await = None;
     }
+
+    /// Get or mint the current launcher session JWT.
+    /// Used by randomizer and other authenticated endpoints.
+    pub async fn current_token(&self, auth: &AuthState) -> Result<String, ApiError> {
+        current_token(self, auth).await
+    }
 }
 
 // ── Wire types ─────────────────────────────────────────────────────────────

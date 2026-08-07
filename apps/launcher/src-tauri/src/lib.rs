@@ -35,6 +35,7 @@ pub mod local_packs;
 pub mod meta;
 pub mod mrpack;
 pub mod pack;
+pub mod randomizer;
 pub mod settings;
 pub mod worlds;
 pub mod status;
@@ -191,6 +192,11 @@ pub fn run() {
             browse::screenshot_image,
             worlds::instance_worlds,
             worlds::world_icon,
+            // Randomizer commands
+            randomizer::randomizer_get_assignment,
+            randomizer::hash_file,
+            randomizer::randomizer_patch_rom,
+            randomizer::randomizer_update_expected_hash,
         ])
         .run(tauri::generate_context!())
         .expect("error while running the Boff Launcher");

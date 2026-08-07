@@ -929,6 +929,22 @@ const es = {
     provideFileError: "No se pudo proporcionar el archivo",
   },
 
+  randomlocke: {
+    panelTitle: "Randomizer",
+    pickRom: "Elige tu ROM limpia para generar una versión randomizada personalizada.",
+    wrongHashError: "La ROM no coincide. Verifica que hayas elegido la ROM correcta.",
+    uploading: "Subiendo ROM…",
+    uploadButton: "Elegir ROM",
+    generating: "Generando ROM randomizada…",
+    noRomSlot: "No se pudo determinar la ranura de ROM de este pack.",
+    readyToPlay: "Listo para jugar",
+    eventLink: "Ver evento",
+    statusPending: "Pendiente",
+    statusClaimed: "Reclamado",
+    statusPatched: "Randomizado",
+    statusVerified: "Verificado",
+  },
+
   errors: {
     needsNewerLauncher: "Esta función necesita una versión más nueva del launcher.",
   },
@@ -1851,6 +1867,22 @@ const en = {
     fileProvided: "File provided",
     wrongHashError: "File does not match. Expected: {hint}",
     provideFileError: "Could not provide file",
+  },
+
+  randomlocke: {
+    panelTitle: "Randomizer",
+    pickRom: "Select your clean ROM to generate a custom randomized version.",
+    wrongHashError: "ROM does not match. Please verify you selected the correct ROM.",
+    uploading: "Uploading ROM…",
+    uploadButton: "Select ROM",
+    generating: "Generating randomized ROM…",
+    noRomSlot: "Could not determine this pack's ROM slot.",
+    readyToPlay: "Ready to play",
+    eventLink: "View event",
+    statusPending: "Pending",
+    statusClaimed: "Claimed",
+    statusPatched: "Randomized",
+    statusVerified: "Verified",
   },
 
   errors: {

@@ -54,6 +54,15 @@ export class CreateEventDto {
   @IsOptional()
   @IsString()
   romHint?: string;
+
+  @ApiProperty({
+    example: 'pack-uuid-1234',
+    description: 'Pack ID for randomlocke event linkage',
+    required: false,
+  })
+  @IsOptional()
+  @IsString()
+  packId?: string;
 }
 
 export class UpdateEventDto {
@@ -61,6 +70,15 @@ export class UpdateEventDto {
   @IsOptional()
   @IsString()
   romHint?: string;
+
+  @ApiProperty({
+    example: 'pack-uuid-1234',
+    description: 'Pack ID for randomlocke event linkage',
+    required: false,
+  })
+  @IsOptional()
+  @IsString()
+  packId?: string;
 }
 
 export class EventResponseDto {
@@ -88,6 +106,9 @@ export class EventResponseDto {
   @ApiProperty()
   romHint: string | null;
 
+  @ApiProperty({ example: 'pack-uuid-1234', required: false })
+  packId: string | null;
+
   @ApiProperty({
     example: 'draft',
     enum: ['draft', 'locked', 'running', 'finished'],
@@ -104,6 +125,9 @@ export class EventResponseDto {
 // ==================== ASSIGNMENT DTOS ====================
 
 export class AssignmentClaimedDto {
+  @ApiProperty({ example: 1 })
+  eventId: number;
+
   @ApiProperty({
     example: 'pending',
     enum: ['pending', 'claimed', 'patched', 'verified'],
@@ -124,6 +148,12 @@ export class AssignmentClaimedDto {
 
   @ApiProperty({ example: 'draft' })
   eventStatus: RandomizerEventStatus;
+
+  @ApiProperty({
+    description: 'SHA-512 of randomized output ROM; present only if patched',
+    nullable: true,
+  })
+  outputSha512: string | null;
 }
 
 export class AssignmentAdminDto {

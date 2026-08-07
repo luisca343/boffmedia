@@ -1644,6 +1644,96 @@ export async function folderPicker(): Promise<string | null> {
   }
 }
 
+// ── Randomizer Functions ───────────────────────────────────────────────────
+
+export type RandomizerAssignment = {
+  eventId: string
+  status: "pending" | "claimed" | "patched" | "verified"
+  cleanRomSha512: string
+  outputSha512?: string
+}
+
+/** Get the player's assignment for a pack's active randomizer event.
+ *  Returns null if the pack has no active event (404).
+ *  Status comes back as pending/claimed on first call, automatically claimed. */
+export async function getRandomizerAssignment(packId: string): Promise<RandomizerAssignment | null> {
+  if (!isDesktop()) {
+    return {
+      eventId: "mock-event-123",
+      status: "claimed",
+      cleanRomSha512: "abc123def456",
+      outputSha512: undefined,
+    }
+  }
+  try {
+    return await invoke<RandomizerAssignment>("randomizer_get_assignment", { packId })
+  } catch (err: any) {
+    // 404 means no active event for this pack
+    if (err?.code === "not_found" || err?.message?.includes("404")) {
+      return null
+    }
+    throw err
+  }
+}
+
+/** Hash a file locally (SHA-512). */
+export async function hashFile(filePath: string): Promise<string> {
+  if (!isDesktop()) {
+    // Browser mock: return a dummy hash
+    return "a".repeat(128)
+  }
+  try {
+    return await invoke<string>("hash_file", { path: filePath })
+  } catch (err) {
+    throw err
+  }
+}
+
+export type RandomizerRomResult = {
+  outputPath: string
+  outputSha512: string
+}
+
+/** Upload a clean ROM and download the randomized version.
+ *  Shows upload/download progress via the callback.
+ *  Returns the path to the output ROM file and its SHA-512 hash. */
+export async function patchRandomizerRom(
+  eventId: string,
+  romPath: string,
+  onProgress: (progress: { phase: "uploading" | "downloading"; fraction: number }) => void,
+): Promise<RandomizerRomResult> {
+  if (!isDesktop()) {
+    // Browser mock
+    onProgress({ phase: "uploading", fraction: 1 })
+    onProgress({ phase: "downloading", fraction: 1 })
+    return {
+      outputPath: romPath,
+      outputSha512: "b".repeat(128),
+    }
+  }
+  try {
+    return await invoke<RandomizerRomResult>("randomizer_patch_rom", { eventId, romPath })
+  } catch (err) {
+    throw err
+  }
+}
+
+/** Update the instance marker's expected hash for a file path.
+ *  Used by randomizer to mark a ROM slot as expecting the output ROM hash
+ *  instead of the clean ROM hash. */
+export async function updateRandomizerExpectedHash(
+  slug: string,
+  path: string,
+  sha512: string,
+): Promise<void> {
+  if (!isDesktop()) return
+  try {
+    await invoke("randomizer_update_expected_hash", { slug, path, sha512 })
+  } catch (err) {
+    throw err
+  }
+}
+
 // ── Mock emulator functions (browser mode) ─────────────────────────────────
 
 let mockRomDirs: string[] = []
