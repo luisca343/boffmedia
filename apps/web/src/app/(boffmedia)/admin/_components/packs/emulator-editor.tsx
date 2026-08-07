@@ -24,6 +24,7 @@ interface FileEntry {
 
 interface EmulatorEditorProps {
   onSave: (data: {
+    name: string
     kind: EmulatorKind
     rom: string
     args?: string[]
@@ -31,6 +32,7 @@ interface EmulatorEditorProps {
     initialFiles?: FileEntry[]
   }) => void
   previousKind?: EmulatorKind
+  initialName?: string
 }
 
 /** In-browser SHA-512 hash of a file. */
@@ -47,9 +49,10 @@ async function sha512File(file: File): Promise<{ sha512: string; size: number }>
  *  - Extra user-provided files (BIOS/firmware)
  *  - Advanced args
  */
-export function EmulatorEditor({ onSave, previousKind }: EmulatorEditorProps) {
+export function EmulatorEditor({ onSave, previousKind, initialName }: EmulatorEditorProps) {
   const t = useTranslations("admin.packs")
 
+  const [name, setName] = useState(initialName ?? "")
   const [kind, setKind] = useState<EmulatorKind>(previousKind ?? "mgba")
   const [romHint, setRomHint] = useState("")
   const [romFile, setRomFile] = useState<{ file: File; sha512: string; size: number } | null>(null)
@@ -145,6 +148,7 @@ export function EmulatorEditor({ onSave, previousKind }: EmulatorEditorProps) {
   }
 
   const canSubmit =
+    name.trim().length > 0 &&
     romHint.trim().length > 0 &&
     romFile !== null &&
     (!useRomhack || (baseFile !== null && patchFile !== null && patchedRomFile !== null)) &&
@@ -238,6 +242,7 @@ export function EmulatorEditor({ onSave, previousKind }: EmulatorEditorProps) {
       }
 
       onSave({
+        name: name.trim(),
         kind,
         rom: useRomhack ? patchedRomPath : romPath,
         args: args.trim().length > 0 ? args.trim().split(/\s+/) : undefined,
@@ -251,6 +256,25 @@ export function EmulatorEditor({ onSave, previousKind }: EmulatorEditorProps) {
 
   return (
     <div className="flex flex-col gap-5">
+      <section className="border border-solid border-line bg-panel-2 p-4">
+        <div className="mb-4 flex items-start gap-3">
+          <span className="grid size-8 shrink-0 place-items-center border border-solid border-line-2 bg-panel text-accent">
+            <Icon name="edit" size={15} />
+          </span>
+          <div>
+            <h3 className="font-display text-[14px] font-bold uppercase tracking-[0.08em] text-txt">
+              {t("versionIdentity")}
+            </h3>
+            <p className="mt-1 text-[12px] leading-[1.45] text-txt-dim">
+              {t("versionIdentityLead")}
+            </p>
+          </div>
+        </div>
+        <Field label={t("versionName")} hint={t("versionNameHint")}>
+          <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="1.4.2" />
+        </Field>
+      </section>
+
       <section className="border border-solid border-line bg-panel-2 p-4">
         <div className="mb-4 flex items-start gap-3">
           <span className="grid size-8 shrink-0 place-items-center border border-solid border-line-2 bg-panel text-accent">
