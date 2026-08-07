@@ -5,7 +5,7 @@
 export type LauncherVersionEntity = {
     id: string;
     name: string;
-    minecraft: string;
+    minecraft?: Record<string, any> | null;
     loader?: Record<string, any> | null;
     loaderVersion?: Record<string, any> | null;
     fileCount: number;

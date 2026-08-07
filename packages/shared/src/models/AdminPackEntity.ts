@@ -7,6 +7,10 @@ export type AdminPackEntity = {
     id: string;
     slug: string;
     name: string;
+    /**
+     * Resuelto: NULL en BD → minecraft
+     */
+    gameType: AdminPackEntity.gameType;
     summary?: Record<string, any> | null;
     iconUrl?: Record<string, any> | null;
     accessKind: string;
@@ -19,4 +23,15 @@ export type AdminPackEntity = {
     createdAt: string;
     updatedAt: string;
 };
+export namespace AdminPackEntity {
+    /**
+     * Resuelto: NULL en BD → minecraft
+     */
+    export enum gameType {
+        MINECRAFT = 'minecraft',
+        EMULATOR = 'emulator',
+        ZOMBOID = 'zomboid',
+        STARDEW = 'stardew',
+    }
+}
 

@@ -6,7 +6,7 @@ export type PackVersionEntity = {
     id: string;
     packId: string;
     name: string;
-    minecraft: string;
+    minecraft?: Record<string, any> | null;
     loader?: Record<string, any> | null;
     loaderVersion?: Record<string, any> | null;
     fileCount: number;

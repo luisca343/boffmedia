@@ -18,7 +18,7 @@ export type { AddMemberDto } from './models/AddMemberDto';
 export type { AddNoteToUserDto } from './models/AddNoteToUserDto';
 export { AddParticipantDto } from './models/AddParticipantDto';
 export type { AddUserCardDto } from './models/AddUserCardDto';
-export type { AdminPackEntity } from './models/AdminPackEntity';
+export { AdminPackEntity } from './models/AdminPackEntity';
 export type { AdminTeleportDto } from './models/AdminTeleportDto';
 export type { ApiResponseEntity } from './models/ApiResponseEntity';
 export { ArcadeInventoryItem } from './models/ArcadeInventoryItem';

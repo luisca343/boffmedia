@@ -4,7 +4,7 @@
 /* eslint-disable */
 export type CreateVersionDto = {
     name: string;
-    minecraft: string;
+    minecraft?: string;
     loader?: CreateVersionDto.loader;
     loaderVersion?: string;
     notes?: string;
@@ -13,9 +13,16 @@ export type CreateVersionDto = {
      */
     files: Array<Record<string, any>>;
     /**
-     * BundledWorld[] — validado con @boffmedia/pack-schema
+     * BundledWorld[] — validado con @boffmedia/pack-schema (solo minecraft)
      */
     worlds?: Array<Record<string, any>>;
+    emulator?: Record<string, any>;
+    zomboid?: Record<string, any>;
+    stardew?: Record<string, any>;
+    /**
+     * PackFile[] instalados solo en la primera instalación (initialFiles) — validado con @boffmedia/pack-schema
+     */
+    initialFiles?: Array<Record<string, any>>;
 };
 export namespace CreateVersionDto {
     export enum loader {
