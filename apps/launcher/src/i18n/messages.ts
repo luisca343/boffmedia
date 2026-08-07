@@ -31,6 +31,7 @@ const es = {
       clientPack: "Pack de cliente",
     },
     systems: {
+      all: "Todos",
       minecraft: "Minecraft",
       emulator: "Emulador",
       gba: "Game Boy Advance",
@@ -116,9 +117,25 @@ const es = {
       emudeckRecommendation: "Descarga EmuDeck para una instalación rápida:",
       romFolders: "Carpetas de ROMs",
       addFolder: "Añadir carpeta",
+      addFolderSuccess: "Carpeta añadida",
+      addFolderError: "No se pudo añadir la carpeta",
       noFolders: "Sin carpetas configuradas",
       removeFolder: "Quitar",
+      removeFolderSuccess: "Carpeta eliminada",
+      removeFolderError: "No se pudo eliminar la carpeta",
+      viaRetroarch: "vía RetroArch ({source})",
       packPagePrimary: "La página del pack es el flujo principal; estos ajustes son la opción global de reserva.",
+      loadError: "No se pudieron cargar los emuladores",
+      emulatorPathSet: "Ruta del emulador guardada",
+      emulatorPathChanged: "Ruta del emulador actualizada",
+      emulatorPathCleared: "Ruta del emulador eliminada",
+      emulatorPathError: "No se pudo actualizar la ruta del emulador",
+      source: {
+        override: "Personalizado",
+        emudeck: "EmuDeck",
+        system: "Sistema",
+        path: "PATH",
+      },
     },
   },
 
@@ -162,6 +179,13 @@ const es = {
     signOutAll: "Cerrar todas las sesiones",
     switching: "Cambiando…",
     switchLabel: "Cambiar de cuenta",
+  },
+
+  titlebar: {
+    minimize: "Minimizar",
+    maximize: "Maximizar",
+    restore: "Restaurar",
+    close: "Cerrar",
   },
 
   updateBanner: {
@@ -492,6 +516,10 @@ const es = {
     addBundledWorldModalTitle: "Añadir mundo al pack",
     worldFolderConfirm: "Elegir .zip",
     alreadyBundled: "Ya en el pack",
+  },
+
+  gameSidebar: {
+    allSystemsTooltip: "Ver todos los sistemas",
   },
 
   logs: {
@@ -842,10 +870,15 @@ const es = {
       wrongHash: "El archivo no coincide",
       wrongHashHint: "Se esperaba: {hint}",
       missingFiles: "Falta {count} archivo requerido",
+      couldNotProvide: "No se pudo proporcionar el archivo",
     },
   },
 
   emulatorSetup: {
+    emulatorNames: {
+      mgba: "mGBA",
+      melonds: "melonDS",
+    },
     emulatorRow: {
       title: "Emulador",
       locate: "Localizar…",
@@ -910,6 +943,7 @@ const en = {
       clientPack: "Client pack",
     },
     systems: {
+      all: "All",
       minecraft: "Minecraft",
       emulator: "Emulator",
       gba: "Game Boy Advance",
@@ -994,9 +1028,25 @@ const en = {
       emudeckRecommendation: "Download EmuDeck for quick setup:",
       romFolders: "ROM folders",
       addFolder: "Add folder",
+      addFolderSuccess: "Folder added",
+      addFolderError: "Could not add folder",
       noFolders: "No folders configured",
       removeFolder: "Remove",
+      removeFolderSuccess: "Folder removed",
+      removeFolderError: "Could not remove folder",
+      viaRetroarch: "via RetroArch ({source})",
       packPagePrimary: "The pack page is the primary flow; these settings are the global fallback.",
+      loadError: "Could not load emulators",
+      emulatorPathSet: "Emulator path saved",
+      emulatorPathChanged: "Emulator path updated",
+      emulatorPathCleared: "Emulator path cleared",
+      emulatorPathError: "Could not update emulator path",
+      source: {
+        override: "Custom",
+        emudeck: "EmuDeck",
+        system: "System",
+        path: "PATH",
+      },
     },
   },
 
@@ -1040,6 +1090,13 @@ const en = {
     signOutAll: "Sign out all sessions",
     switching: "Switching…",
     switchLabel: "Switch account",
+  },
+
+  titlebar: {
+    minimize: "Minimize",
+    maximize: "Maximize",
+    restore: "Restore",
+    close: "Close",
   },
 
   updateBanner: {
@@ -1370,6 +1427,10 @@ const en = {
     addBundledWorldModalTitle: "Add world to pack",
     worldFolderConfirm: "Choose .zip",
     alreadyBundled: "Already in pack",
+  },
+
+  gameSidebar: {
+    allSystemsTooltip: "View all systems",
   },
 
   logs: {
@@ -1720,10 +1781,15 @@ const en = {
       wrongHash: "File does not match",
       wrongHashHint: "Expected: {hint}",
       missingFiles: "{count} required file missing",
+      couldNotProvide: "Could not provide file",
     },
   },
 
   emulatorSetup: {
+    emulatorNames: {
+      mgba: "mGBA",
+      melonds: "melonDS",
+    },
     emulatorRow: {
       title: "Emulator",
       locate: "Locate…",

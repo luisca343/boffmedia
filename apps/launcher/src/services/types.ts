@@ -74,12 +74,17 @@ export type ProvideFileError = {
 /** Where an emulator was found and how it was resolved. */
 export type EmulatorSource = "override" | "emudeck" | "system" | "path"
 
+/** How an emulator was invoked. */
+export type EmulatorVia = "standalone" | "retroarch"
+
 /** The resolved status of an emulator (mGBA or melonDS). */
 export type EmulatorStatus = {
   /** The emulator was found at this path. */
   resolved?: {
     path: string
     source: EmulatorSource
+    via: EmulatorVia
+    core?: string
   }
   /** An override path was set but is no longer valid. Falls through to detection. */
   staleOverride?: string

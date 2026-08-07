@@ -40,7 +40,7 @@ export function EmulatorSetupPanel({
   const [satisfiedFiles, setSatisfiedFiles] = useState<string[]>([])
   const [stillMissing, setStillMissing] = useState<MissingUserFile[]>(missingFiles)
 
-  const emulatorLabel = emulatorKind === "mgba" ? "mGBA" : emulatorKind === "melonds" ? "melonDS" : "Unknown"
+  const emulatorLabel = t(`emulatorSetup.emulatorNames.${emulatorKind}`) ?? "Unknown"
 
   // Load emulator status on mount
   useEffect(() => {
@@ -51,10 +51,11 @@ export function EmulatorSetupPanel({
     })
   }, [emulatorKind])
 
-  // Scan for ROMs on mount
+  // Scan for ROMs on mount and when missingFiles changes
   useEffect(() => {
+    setStillMissing(missingFiles)
     void scanForFiles()
-  }, [slug])
+  }, [slug, missingFiles])
 
   const scanForFiles = async () => {
     setScanning(true)

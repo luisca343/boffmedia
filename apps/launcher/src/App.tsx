@@ -1,6 +1,7 @@
 import { ToastStack } from "@boffmedia/ui"
 
 import { Shell } from "./components/Shell"
+import { Titlebar } from "./components/Titlebar"
 import { UpdateBanner } from "./components/UpdateBanner"
 import { AccountPicker } from "./screens/AccountPicker"
 import { Logs } from "./screens/Logs"
@@ -57,6 +58,10 @@ export function App() {
   return (
     <LauncherProvider>
       <div className="flex h-full flex-col bg-base text-txt">
+        {/* Above everything, always: with native decorations off, this bar is
+            the only drag region and the only close button — the splash and
+            sign-in screens need it as much as the shell does. */}
+        <Titlebar />
         {/* Above the router on purpose: an update is worth showing on the
             sign-in screen too, and the check never blocks it. Suppressed only
             during boot, where it would push the splash off-centre. */}

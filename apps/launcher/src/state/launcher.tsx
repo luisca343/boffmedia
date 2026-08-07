@@ -340,6 +340,8 @@ type Ctx = State & {
   editIntent: boolean
   clearEditIntent: () => void
   reloadPacks: () => void
+  /** Select a system filter. Dispatches system/select action; persists to localStorage. */
+  selectSystem: (system: SystemId | "All") => void
   install: (packId: string) => Promise<void>
   repair: (packId: string) => Promise<void>
   play: (packId: string) => Promise<void>
@@ -961,6 +963,7 @@ export function LauncherProvider({ children }: { children: React.ReactNode }) {
     editIntent: state.editIntent,
     clearEditIntent: () => dispatch({ type: "editIntent/clear" }),
     reloadPacks: () => setReloadToken((n) => n + 1),
+    selectSystem: (system) => dispatch({ type: "system/select", system }),
     install,
     repair,
     play,

@@ -1,8 +1,8 @@
-import { Badge, Banner, Button, Icon, type IconName, Kicker } from "@boffmedia/ui"
+import { Banner, Button } from "@boffmedia/ui"
 
 import { useT } from "../i18n"
-import { type View, useLauncher } from "../state/launcher"
-import { AccountSwitcher } from "./AccountSwitcher"
+import { useLauncher } from "../state/launcher"
+import { GameRail } from "./nav/GameSidebar"
 
 // Two different degradations, and conflating them would mislead:
 //
@@ -38,72 +38,19 @@ function OfflineNotice() {
   )
 }
 
+// The Titlebar is NOT rendered here — it lives at the App root so the splash
+// and sign-in screens (which render outside Shell) keep a drag region and a
+// close button on the frameless window.
 export function Shell({ children }: { children: React.ReactNode }) {
-  const t = useT("shell")
-  const { view, go, game, logs } = useLauncher()
-
-  const errorCount = logs.filter((l) => l.level === "error").length
-
-  const NAV: { view: View; label: string; icon: IconName }[] = [
-    { view: "packs", label: t("navPacks"), icon: "cube" },
-    { view: "logs", label: t("navLogs"), icon: "list" },
-    { view: "settings", label: t("navSettings"), icon: "sliders" },
-  ]
-
   return (
-    <div className="flex h-full min-h-0">
-      <nav className="flex w-[228px] shrink-0 flex-col border-r border-line bg-base-deep">
-        <div className="px-5 py-5">
-          <Kicker>Boff</Kicker>
-          <div className="font-display text-[22px]/none font-bold uppercase tracking-[0.06em] text-txt">
-            Launcher
-          </div>
-        </div>
+    <div className="flex h-full min-h-0 bg-base-deep">
+      <GameRail />
 
-        <div className="flex flex-1 flex-col gap-1 px-3">
-          {NAV.map((item) => {
-            const active = view === item.view || (item.view === "packs" && view === "pack")
-            return (
-              <button
-                key={item.view}
-                type="button"
-                onClick={() => go(item.view)}
-                aria-current={active ? "page" : undefined}
-                className={[
-                  "cut flex items-center gap-3 px-3 py-2.5 text-left",
-                  "font-display text-[14px]/none font-bold uppercase tracking-[0.08em]",
-                  "border-2 border-solid transition-colors duration-[140ms]",
-                  active
-                    ? "border-accent bg-accent-soft text-accent-bright"
-                    : "border-transparent text-txt-muted hover:text-txt",
-                ].join(" ")}
-              >
-                <Icon name={item.icon} size={16} />
-                {item.label}
-                {item.view === "logs" && errorCount > 0 && (
-                  <span className="ml-auto">
-                    <Badge tone="bad">{errorCount}</Badge>
-                  </span>
-                )}
-              </button>
-            )
-          })}
-        </div>
-
-        {game.kind === "running" && (
-          <div className="mx-3 mb-3 border-2 border-solid border-ok/40 bg-ok-soft px-3 py-2">
-            <div className="flex items-center gap-2 text-[12px]/none font-semibold uppercase tracking-[0.1em] text-ok">
-              <Icon name="play" size={12} />
-              {t("running")}
-            </div>
-            <div className="mt-1 font-mono text-[11px] text-txt-dim">pid {game.pid}</div>
-          </div>
-        )}
-
-        <AccountSwitcher />
-      </nav>
-
-      <div className="flex min-w-0 flex-1 flex-col">
+      {/* The single line between frame and content lives HERE, not on the
+          titlebar or the rail — that is what makes the L-frame corner
+          seamless: titlebar and rail share one unbroken surface, and the
+          content reads as an inset panel with a rounded corner. */}
+      <div className="flex min-w-0 flex-1 flex-col overflow-hidden rounded-tl-lg border-l border-t border-line bg-base">
         <OfflineNotice />
         <main className="min-w-0 flex-1 overflow-y-auto">{children}</main>
       </div>

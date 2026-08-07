@@ -157,9 +157,9 @@ impl Layout {
         }
     }
 
-    /// Create the directories an install writes into. Called once, before
-    /// anything downloads, so a permissions problem surfaces as "cannot create
-    /// the folder" rather than as a failed download 200 files in.
+    /// Create the directories a MINECRAFT install writes into. Called once,
+    /// before anything downloads, so a permissions problem surfaces as "cannot
+    /// create the folder" rather than as a failed download 200 files in.
     pub fn prepare(&self, instance: &InstancePaths) -> Result<(), InstallFailure> {
         for dir in [
             &self.cache_dir(),
@@ -171,6 +171,24 @@ impl Layout {
             &instance.mods,
             &instance.config,
             &instance.bin,
+        ] {
+            std::fs::create_dir_all(dir).map_err(|e| {
+                InstallFailure::message(format!("No se pudo crear {}: {e}", dir.display()))
+            })?;
+        }
+        Ok(())
+    }
+
+    /// The EMULATOR variant of `prepare`: per-game folder standards mean an
+    /// emulator instance never grows `mods/`, `config/`, `bin/` or the shared
+    /// JVM tree — only the cache, its own root, and its save/state dirs. The
+    /// pack payload (`roms/…`) creates its parents on placement.
+    pub fn prepare_emulator(&self, instance: &InstancePaths) -> Result<(), InstallFailure> {
+        for dir in [
+            &self.cache_dir(),
+            &instance.root,
+            &instance.root.join("saves"),
+            &instance.root.join("states"),
         ] {
             std::fs::create_dir_all(dir).map_err(|e| {
                 InstallFailure::message(format!("No se pudo crear {}: {e}", dir.display()))

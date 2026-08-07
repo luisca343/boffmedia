@@ -27,6 +27,7 @@ pub mod backups;
 pub mod browse;
 pub mod catalog;
 pub mod datadir;
+pub mod dialogs;
 pub mod emulators;
 pub mod icons;
 pub mod install;
@@ -130,6 +131,8 @@ pub fn run() {
             install::instance_provide_file,
             // Cycle 2 — emulator ROM library sweep + resolution + settings.
             install::instance_user_files_scan,
+            dialogs::file_picker,
+            dialogs::folder_picker,
             emulators::emulator_status,
             emulators::emulator_set_path,
             emulators::emulator_clear_path,

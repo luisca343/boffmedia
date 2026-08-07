@@ -34,7 +34,9 @@ function toVersion(pack: LauncherPack): PackVersionSummary | null {
     minecraft: v.minecraft,
     loader: v.loader,
     loaderVersion: v.loaderVersion,
-    emulatorKind: (pack as any).emulatorKind ?? null,
+    // emulatorKind lives on the VERSION, not the pack — reading it off `pack`
+    // left it perpetually null, so an emulator pack could never resolve its kind.
+    emulatorKind: v.emulatorKind ?? null,
     fileCount: v.fileCount,
     createdAt: v.createdAt,
   }

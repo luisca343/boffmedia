@@ -26,7 +26,8 @@ fn prepare(app: &tauri::AppHandle, plan: PlannedEmulator) -> Result<EmulatorPrep
     let settings = settings::load(app);
     let layout = Layout::new(app, settings.game_dir())?;
     let instance = layout.instance(&plan.slug);
-    layout.prepare(&instance)?;
+    // Per-game folder standard: no mods/config/bin/JVM dirs for an emulator.
+    layout.prepare_emulator(&instance)?;
     Ok(EmulatorPrepared {
         layout,
         instance,
@@ -110,7 +111,12 @@ async fn install_payload(
     reporter.emit(Phase::Verifying, 0.5, "", 0, 0);
 
     let previous = super::read_marker(&prepared.instance);
-    let marker = build_marker(&prepared.plan, &wanted);
+    let mut marker = build_marker(&prepared.plan, &wanted);
+    // A pin survives a re-verify of the SAME version (every launch does one)
+    // and is cleared by an install of a different one — an explicit update.
+    marker.pinned = previous
+        .as_ref()
+        .is_some_and(|p| p.pinned && p.version_id == marker.version_id);
     if let Some(previous) = &previous {
         let stale = instance::stale_files(&previous.managed, &marker.managed_paths());
         for (path, outcome) in
@@ -155,7 +161,34 @@ fn build_marker(plan: &PlannedEmulator, installed: &[PlannedFile]) -> Marker {
             .collect(),
         pinned: false,
         game_type: GameType::Emulator,
+        emulator: Some(instance::EmulatorMarker {
+            kind: plan.kind.clone(),
+            rom: plan.rom.clone(),
+            args: plan.args.clone(),
+        }),
     }
+}
+
+/// §9 pinning for the emulator path. `launch` re-verifies against the manifest
+/// it was handed — always the LATEST — so without this a revert would be undone
+/// by the very next Play. The retained marker carries the version's kind, rom,
+/// args and complete file list, so the pin rewrites the WHOLE plan.
+fn apply_pin(prepared: &mut EmulatorPrepared) -> Option<String> {
+    let marker = super::read_marker(&prepared.instance)?;
+    if !marker.pinned || marker.managed.is_empty() || marker.version_id == prepared.plan.version_id
+    {
+        return None;
+    }
+    let emu = marker.emulator.as_ref()?;
+    let plan = &mut prepared.plan;
+    plan.version_id = marker.version_id.clone();
+    plan.version_name = marker.version_name.clone();
+    plan.kind = emu.kind.clone();
+    plan.rom = emu.rom.clone();
+    plan.args = emu.args.clone();
+    plan.files = marker.managed.iter().map(ManagedFile::to_planned).collect();
+    plan.total_bytes = plan.files.iter().map(|f| f.size).sum();
+    Some(marker.version_name)
 }
 
 /// Install or update an emulator pack. Mirrors `install_pack`'s Minecraft arm:
@@ -164,15 +197,14 @@ pub async fn install(
     app: &tauri::AppHandle,
     manager: &InstallManager,
     plan: PlannedEmulator,
-    manifest_value: &serde_json::Value,
+    manifest: &PackManifest,
     password: Option<&str>,
 ) -> Result<InstallStatus, InstallFailure> {
-    let manifest = super::parse_manifest_value(manifest_value)?;
     let prepared = prepare(app, plan)?;
     let pack_id = prepared.plan.pack_id.clone();
     let _guard = manager.begin_install(&pack_id)?;
 
-    let reporter = Reporter::new(app.clone(), &pack_id);
+    let reporter = Reporter::for_emulator(app.clone(), &pack_id);
     reporter.emit(Phase::Resolving, 0.0, &prepared.plan.version_name, 0, 0);
     reporter.log(
         "info",
@@ -198,7 +230,7 @@ pub async fn install(
     }
 
     let http = build_client()?;
-    install_payload(app, &prepared, &http, password, &reporter, &manifest).await?;
+    install_payload(app, &prepared, &http, password, &reporter, manifest).await?;
 
     let missing_user_files = super::read_marker(&prepared.instance)
         .map(|m| super::compute_missing_user_files(&prepared.layout, &prepared.instance, &m))
@@ -220,10 +252,9 @@ pub async fn launch(
     app: &tauri::AppHandle,
     manager: &InstallManager,
     plan: PlannedEmulator,
-    manifest_value: &serde_json::Value,
+    manifest: &PackManifest,
     password: Option<&str>,
 ) -> Result<u32, InstallFailure> {
-    let manifest = super::parse_manifest_value(manifest_value)?;
     let prepared = prepare(app, plan)?;
     let pack_id = prepared.plan.pack_id.clone();
 
@@ -239,10 +270,20 @@ pub async fn launch(
 
     let _guard = manager.begin_install(&pack_id)?;
     process::emit_preparing(app);
-    let reporter = Reporter::new(app.clone(), &pack_id);
+    let reporter = Reporter::for_emulator(app.clone(), &pack_id);
+
+    // §9 pinning — same contract as the Minecraft path: a reverted pack must
+    // not be silently re-upgraded by the next Play.
+    let mut prepared = prepared;
+    if let Some(pinned) = apply_pin(&mut prepared) {
+        reporter.log(
+            "info",
+            &format!("Este pack está anclado a «{pinned}». No se actualizará al iniciar."),
+        );
+    }
 
     let http = build_client()?;
-    if let Err(err) = install_payload(app, &prepared, &http, password, &reporter, &manifest).await {
+    if let Err(err) = install_payload(app, &prepared, &http, password, &reporter, manifest).await {
         process::emit_idle(app);
         return Err(err);
     }
@@ -275,7 +316,8 @@ fn spawn(app: &tauri::AppHandle, prepared: &EmulatorPrepared) -> Result<RunningG
     let kind = crate::emulators::EmulatorKind::parse(&prepared.plan.kind).ok_or_else(|| {
         InstallFailure::message(format!("Emulador desconocido: {}", prepared.plan.kind))
     })?;
-    let exe = crate::emulators::resolve_exe(kind, &prepared.settings).map_err(InstallFailure::message)?;
+    let method = crate::emulators::resolve_method(kind, &prepared.settings)
+        .map_err(InstallFailure::message)?;
 
     let rom = prepared
         .instance
@@ -288,9 +330,50 @@ fn spawn(app: &tauri::AppHandle, prepared: &EmulatorPrepared) -> Result<RunningG
         )));
     }
 
-    // Extra flags first, then the absolute ROM path (the emulator's positional arg).
-    let mut args = prepared.plan.args.clone();
-    args.push(rom.to_string_lossy().into_owned());
+    // Saves live INSIDE the instance (owner decision): two packs of the same
+    // game never share progress, and the Backups tab can protect it. EmuDeck
+    // configs redirect saves to the player's Emulation tree, so relying on
+    // cwd alone is not enough — each method gets an explicit redirection.
+    let saves_dir = prepared.instance.root.join("saves");
+    let states_dir = prepared.instance.root.join("states");
+    let _ = std::fs::create_dir_all(&saves_dir);
+    let _ = std::fs::create_dir_all(&states_dir);
+
+    let (exe, args) = match method {
+        crate::emulators::LaunchMethod::RetroArch { exe, core } => {
+            // Per-launch config overlay: RetroArch merges `--appendconfig` over
+            // the player's own retroarch.cfg, so ONLY the save/state dirs change
+            // — their shaders, controls and hotkeys all still apply (D4).
+            let overlay = prepared.instance.root.join("retroarch-boff.cfg");
+            let cfg = format!(
+                "savefile_directory = \"{}\"\nsavestate_directory = \"{}\"\n",
+                saves_dir.display(),
+                states_dir.display()
+            );
+            std::fs::write(&overlay, cfg).map_err(|e| {
+                InstallFailure::message(format!("No se pudo preparar la configuración: {e}"))
+            })?;
+
+            let mut args = vec![
+                "--appendconfig".to_string(),
+                overlay.to_string_lossy().into_owned(),
+                "-L".to_string(),
+                core.to_string_lossy().into_owned(),
+            ];
+            args.extend(prepared.plan.args.iter().cloned());
+            args.push(rom.to_string_lossy().into_owned());
+            (exe, args)
+        }
+        crate::emulators::LaunchMethod::Standalone { exe } => {
+            // Standalones default to writing the .sav beside the ROM, which is
+            // already inside the instance (`roms/`). An EmuDeck-configured
+            // standalone may redirect saves in its own config; VT-2 tracks
+            // verifying melonDS and adding a per-kind save flag if needed.
+            let mut args = prepared.plan.args.clone();
+            args.push(rom.to_string_lossy().into_owned());
+            (exe, args)
+        }
+    };
 
     process::spawn_external(
         app,

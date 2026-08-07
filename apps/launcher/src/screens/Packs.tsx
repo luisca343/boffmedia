@@ -21,7 +21,6 @@ import type { MenuItem } from "@boffmedia/ui"
 import { useT } from "../i18n"
 import { VersionPicker, dependenciesOf } from "../components/VersionPicker"
 import type { VersionChoice } from "../components/VersionPicker"
-import { GameSidebar } from "../components/nav/GameSidebar"
 import {
   exportMrpack,
   exportServerMrpack,
@@ -32,9 +31,9 @@ import {
 } from "../runtime"
 import { ImportPackPage } from "../components/pack/ImportPackPage"
 import { DeleteLocalPackModal, UninstallPackModal } from "../components/pack/PackDeleteDialogs"
-import type { InstallState, PackEntry, ServerStatus } from "../services/types"
-import type { SystemId } from "../services/systems"
+import type { GameType, InstallState, PackEntry, ServerStatus } from "../services/types"
 import { systemOfEntry } from "../services/systems"
+import { getModule } from "../services/gameModules"
 import { useLauncher } from "../state/launcher"
 import { formatBytes, formatPlaytime, formatWhen } from "../utils/format"
 import { PHASE_LABEL } from "../utils/labels"
@@ -401,20 +400,10 @@ function CreateLocalPackModal({ open, onClose, onCreated }: { open: boolean; onC
 
 export function Packs() {
   const t = useT("packs")
-  const { packs, packsLoading, packsError, reloadPacks } = useLauncher()
+  const { packs, packsLoading, packsError, reloadPacks, selectedSystem } = useLauncher()
   const [query, setQuery] = useState("")
   const [creating, setCreating] = useState(false)
   const [importing, setImporting] = useState(false)
-  const [selectedSystem, setSelectedSystem] = useState<SystemId | "All">("All")
-
-  // Collect unique systems from all packs
-  const systems = useMemo(() => {
-    const seen = new Set<SystemId>()
-    packs.forEach((p) => {
-      seen.add(systemOfEntry(p))
-    })
-    return Array.from(seen).sort()
-  }, [packs])
 
   const shown = useMemo(() => {
     let result = packs
@@ -453,11 +442,7 @@ export function Packs() {
   }
 
   return (
-    <div className="flex min-h-0 flex-1">
-      {/* Game system sidebar — hidden when only one system exists */}
-      <GameSidebar systems={systems} selected={selectedSystem} onSelect={setSelectedSystem} />
-
-      <div className="flex min-w-0 flex-1 flex-col overflow-y-auto px-8 py-7">
+    <div className="flex h-full min-h-0 flex-col overflow-y-auto px-8 py-7">
         <header className="mb-6 flex flex-wrap items-end justify-between gap-4">
         <div>
           <Kicker>{t("librarySectionTitle")}</Kicker>
@@ -469,12 +454,29 @@ export function Packs() {
           <div className="w-[280px]">
             <SearchInput value={query} onChange={setQuery} placeholder={t("search")} size="sm" />
           </div>
-          <Button size="sm" icon="upload" onClick={() => setImporting(true)}>
-            {t("importButton")}
-          </Button>
-          <Button size="sm" variant="pri" icon="plus" onClick={() => setCreating(true)}>
-            {t("createLocalButton")}
-          </Button>
+          {(() => {
+            // Determine the gameType for the selected system to check module capabilities
+            const gameType =
+              selectedSystem === "All" ? "minecraft" :
+              selectedSystem === "minecraft" ? "minecraft" :
+              selectedSystem === "emulator" || selectedSystem === "gba" || selectedSystem === "nds" ? "emulator" :
+              selectedSystem as GameType
+            const module = getModule(gameType)
+            return (
+              <>
+                {module.canImport && (
+                  <Button size="sm" icon="upload" onClick={() => setImporting(true)}>
+                    {t("importButton")}
+                  </Button>
+                )}
+                {module.canCreate && (
+                  <Button size="sm" variant="pri" icon="plus" onClick={() => setCreating(true)}>
+                    {t("createLocalButton")}
+                  </Button>
+                )}
+              </>
+            )
+          })()}
         </div>
       </header>
 
@@ -527,7 +529,6 @@ export function Packs() {
           {t("accessInfo")}
         </p>
       )}
-      </div>
     </div>
   )
 }

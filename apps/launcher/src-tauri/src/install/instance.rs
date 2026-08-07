@@ -149,6 +149,20 @@ impl ManagedSource {
     }
 }
 
+/// The emulator half of a marker (game_type == Emulator): what §9 rollback
+/// needs to replay THIS version without the (always-latest) manifest — the
+/// managed file list alone cannot say which ROM to hand the emulator or with
+/// which flags. Absent on minecraft markers and on emulator markers written
+/// before this field existed (those simply cannot pin, same as pre-§9 MC).
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct EmulatorMarker {
+    pub kind: String,
+    pub rom: String,
+    #[serde(default)]
+    pub args: Vec<String>,
+}
+
 /// One file the launcher owns, as recorded in the marker.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -233,6 +247,9 @@ pub struct Marker {
     /// (backwards compatible with old markers that predate this field).
     #[serde(default = "default_game_type")]
     pub game_type: GameType,
+    /// Present only on emulator markers — see [`EmulatorMarker`].
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub emulator: Option<EmulatorMarker>,
 }
 
 /// Default game type for backwards compatibility: old markers without this
@@ -640,6 +657,7 @@ mod tests {
             optional_files: vec![],
             pinned: false,
             game_type: GameType::Minecraft,
+            emulator: None,
         }
     }
 

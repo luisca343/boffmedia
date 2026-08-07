@@ -285,9 +285,12 @@ export async function copyText(text: string): Promise<boolean> {
 export type LauncherVersion = {
   id: string
   name: string
-  minecraft: string
+  /** Null for non-minecraft packs (the API sends null). */
+  minecraft: string | null
   loader: string | null
   loaderVersion: string | null
+  /** Present for emulator packs — the system the pack targets. */
+  emulatorKind?: "mgba" | "melonds" | null
   fileCount: number
   createdAt: string
 }
@@ -851,6 +854,62 @@ export async function revealWindow(): Promise<void> {
   }
 }
 
+/** Minimize the window. No-op in a browser. */
+export async function minimizeWindow(): Promise<void> {
+  if (!isDesktop()) return
+  try {
+    await getCurrentWindow().minimize()
+  } catch {
+    /* window control failures are non-fatal */
+  }
+}
+
+/** Maximize the window. No-op in a browser. */
+export async function maximizeWindow(): Promise<void> {
+  if (!isDesktop()) return
+  try {
+    await getCurrentWindow().maximize()
+  } catch {
+    /* window control failures are non-fatal */
+  }
+}
+
+/** Toggle between maximized and restored state. No-op in a browser. */
+export async function toggleMaximize(): Promise<void> {
+  if (!isDesktop()) return
+  try {
+    const win = getCurrentWindow()
+    const isMaximized = await win.isMaximized()
+    if (isMaximized) {
+      await win.unmaximize()
+    } else {
+      await win.maximize()
+    }
+  } catch {
+    /* window control failures are non-fatal */
+  }
+}
+
+/** Close the window. No-op in a browser. */
+export async function closeWindow(): Promise<void> {
+  if (!isDesktop()) return
+  try {
+    await getCurrentWindow().close()
+  } catch {
+    /* window control failures are non-fatal */
+  }
+}
+
+/** Check if the window is maximized. Returns false in a browser. */
+export async function isMaximized(): Promise<boolean> {
+  if (!isDesktop()) return false
+  try {
+    return await getCurrentWindow().isMaximized()
+  } catch {
+    return false
+  }
+}
+
 // ── Server List Ping (RF-03/RF-04) ─────────────────────────────────────────
 // Rust never throws here (status.rs folds every failure into `online: false`),
 // so the bridge does not either — a card that cannot ping shows offline, not
@@ -1111,7 +1170,7 @@ export async function instanceDelete(slug: string): Promise<void> {
 
 /** Provide a user-required file (e.g., a ROM) to a pack instance. */
 export async function provideFile(
-  packId: string,
+  slug: string,
   path: string,
   sourceFile: string,
 ): Promise<ProvideFileResult> {
@@ -1129,7 +1188,9 @@ export async function provideFile(
     return { satisfied: true }
   }
   try {
-    return await invoke<ProvideFileResult>("instance_provide_file", { packId, path, sourceFile })
+    // The Rust command reads the expected hash/hint from the instance marker,
+    // keyed by slug — no pack id or session needed.
+    return await invoke<ProvideFileResult>("instance_provide_file", { slug, path, sourceFile })
   } catch (err) {
     throw err as ProvideFileError
   }

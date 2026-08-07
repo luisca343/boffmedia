@@ -600,6 +600,7 @@ mod tests {
             optional_files: vec![],
             pinned: false,
             game_type: GameType::Minecraft,
+            emulator: None,
         };
         assert_eq!(mod_count_of(&marker), 2, "configs are not mods");
 

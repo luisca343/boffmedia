@@ -721,6 +721,7 @@ fn build_marker(prepared: &game::Prepared, installed: &[PlannedFile]) -> Marker 
         pinned: false,
         // Cycle 1 only handles Minecraft; later cycles will add other game types.
         game_type: instance::GameType::Minecraft,
+        emulator: None,
     }
 }
 
@@ -832,8 +833,11 @@ pub async fn install_pack(
 ) -> Result<InstallStatus, InstallFailure> {
     // Dispatch by game type. Emulator packs take an entirely separate, Java-free
     // path; everything below is the Minecraft arm, unchanged.
-    if let resolve::PlannedGame::Emulator(plan) = resolve::plan(&parse_manifest_value(&manifest)?)? {
-        return emulator::install(&app, &manager, plan, &manifest, password.as_deref()).await;
+    {
+        let parsed = parse_manifest_value(&manifest)?;
+        if let resolve::PlannedGame::Emulator(plan) = resolve::plan(&parsed)? {
+            return emulator::install(&app, &manager, plan, &parsed, password.as_deref()).await;
+        }
     }
 
     let (prepared, http) = prepare(&app, &auth, &manifest).await?;
@@ -920,8 +924,11 @@ pub async fn launch_pack(
 ) -> Result<u32, InstallFailure> {
     // Emulator packs launch an external process, not the JVM — a wholly separate
     // path. Everything below is the Minecraft arm, unchanged.
-    if let resolve::PlannedGame::Emulator(plan) = resolve::plan(&parse_manifest_value(&manifest)?)? {
-        return emulator::launch(&app, &manager, plan, &manifest, password.as_deref()).await;
+    {
+        let parsed = parse_manifest_value(&manifest)?;
+        if let resolve::PlannedGame::Emulator(plan) = resolve::plan(&parsed)? {
+            return emulator::launch(&app, &manager, plan, &parsed, password.as_deref()).await;
+        }
     }
 
     let (prepared, http) = prepare(&app, &auth, &manifest).await?;
@@ -1094,11 +1101,31 @@ pub async fn repair_instance(
         ));
     }
 
-    for dir in [&instance.mods, &instance.config, &instance.bin] {
-        if dir.is_dir() {
-            std::fs::remove_dir_all(dir).map_err(|e| {
-                InstallFailure::message(format!("No se pudo borrar {}: {e}", dir.display()))
-            })?;
+    // Game-type-aware: what "repair" may delete differs per game. Minecraft
+    // owns mods/config/bin wholesale; an emulator instance has no such dirs —
+    // there, only the RE-FETCHABLE managed files are removed. The player's ROM
+    // (user-provided; re-satisfied from the local blob store without a prompt)
+    // and their saves/states are NEVER repair casualties.
+    let marker = read_marker(&instance);
+    let is_emulator = marker
+        .as_ref()
+        .is_some_and(|m| m.game_type == instance::GameType::Emulator);
+    if is_emulator {
+        if let Some(marker) = &marker {
+            for file in &marker.managed {
+                if matches!(file.source, ManagedSource::UserProvided { .. }) {
+                    continue;
+                }
+                let _ = std::fs::remove_file(instance.minecraft.join(file.path.replace('\\', "/")));
+            }
+        }
+    } else {
+        for dir in [&instance.mods, &instance.config, &instance.bin] {
+            if dir.is_dir() {
+                std::fs::remove_dir_all(dir).map_err(|e| {
+                    InstallFailure::message(format!("No se pudo borrar {}: {e}", dir.display()))
+                })?;
+            }
         }
     }
     // Last, so an interrupted repair still reads as broken rather than as a
@@ -1202,7 +1229,12 @@ pub async fn instance_revert(
     };
 
     let _guard = manager.begin_install(&pack_id)?;
-    layout.prepare(&instance)?;
+    // Per-game folder standard: the retained marker knows which game this is.
+    if target.game_type == instance::GameType::Emulator {
+        layout.prepare_emulator(&instance)?;
+    } else {
+        layout.prepare(&instance)?;
+    }
 
     let http = reqwest::Client::builder()
         .user_agent(concat!("BoffLauncher/", env!("CARGO_PKG_VERSION")))
@@ -1501,19 +1533,18 @@ pub struct ProvideFileError {
     pub message: String,
 }
 
-/// Accept a user-provided file for an instance. The file must match the
-/// expected sha512+fileSize for its entry in the pack. On match, it is
-/// imported to the local blob store and placed at the instance path.
-/// slug is the pack's slug (instance name).
+/// Accept a player-supplied file for an installed instance. The file must match
+/// the expected sha512+fileSize recorded for its entry in the instance MARKER
+/// (which already carries every managed user-provided file's hash + hint from
+/// install time). On match it is imported to the never-purged local blob store
+/// and placed at the instance path. Marker-based on purpose: no API round-trip,
+/// so it works offline and needs only the pack's slug — not its id or a session.
 #[tauri::command]
 pub async fn instance_provide_file(
-    pack_id: String,
     slug: String,
     path: String,
     source_file: String,
     app: tauri::AppHandle,
-    api: tauri::State<'_, crate::api::ApiState>,
-    auth: tauri::State<'_, AuthState>,
 ) -> Result<ProvideFileOk, ProvideFileError> {
     let source_path = std::path::PathBuf::from(&source_file);
     if !source_path.is_file() {
@@ -1540,56 +1571,43 @@ pub async fn instance_provide_file(
         })?
         .len();
 
-    // Get current manifest from API to find the entry
-    let manifest_json = crate::api::pack_manifest(pack_id.clone(), None, api.clone(), auth.clone())
-        .await
-        .map_err(|_| ProvideFileError {
-            code: "not_found".to_string(),
-            expected_hint: None,
-            message: "No se pudo obtener el manifiesto del pack.".to_string(),
-        })?;
+    let settings = settings::load(&app);
+    let layout = Layout::new(&app, settings.game_dir()).map_err(|e| ProvideFileError {
+        code: "io".to_string(),
+        expected_hint: None,
+        message: format!("Error al acceder a la configuración: {}", e.message),
+    })?;
+    let instance = layout.instance(&slug);
 
-    let manifest = crate::pack::parse_manifest(&serde_json::to_string(&manifest_json).unwrap())
-        .map_err(|_| ProvideFileError {
-            code: "not_found".to_string(),
-            expected_hint: None,
-            message: "El manifiesto no es válido.".to_string(),
-        })?;
-
-    // Find the entry in files or initialFiles
-    let mut expected_hint = String::new();
-    let mut expected_sha512 = String::new();
-    let mut file_size = 0u64;
-
-    let _entry_found = manifest.version.files
+    // The marker is the authority on what this instance expects. Find the managed
+    // user-provided entry whose path matches (case-insensitively, like the
+    // installer), and read its pinned sha512 + size + hint from there.
+    let norm = |p: &str| p.to_lowercase().replace('\\', "/");
+    let target = norm(&path);
+    let marker = read_marker(&instance).ok_or_else(|| ProvideFileError {
+        code: "not_found".to_string(),
+        expected_hint: None,
+        message: "El pack no está instalado.".to_string(),
+    })?;
+    let entry = marker
+        .managed
         .iter()
-        .find(|f| f.path.as_str() == path.as_str())
-        .map(|f| {
-            expected_sha512 = f.sha512.to_string().to_lowercase();
-            file_size = f.file_size as u64;
-            if let crate::pack::PackManifestVersionFilesItemSource::UserProvided { hint } = &f.source {
-                expected_hint = hint.to_string();
-            }
-            true
-        })
-        .or_else(|| {
-            manifest.version.initial_files
-                .iter()
-                .find(|f| f.path.as_str() == path.as_str())
-                .map(|f| {
-                    expected_sha512 = f.sha512.to_string().to_lowercase();
-                    file_size = f.file_size as u64;
-                    if let crate::pack::PackManifestVersionInitialFilesItemSource::UserProvided { hint } = &f.source {
-                        expected_hint = hint.to_string();
-                    }
-                    true
-                })
-        })
+        .find(|f| norm(&f.path) == target)
         .ok_or_else(|| ProvideFileError {
             code: "not_found".to_string(),
             expected_hint: None,
             message: format!("El archivo «{}» no está en el pack.", path),
         })?;
+    let expected_sha512 = entry.sha512.to_lowercase();
+    let file_size = entry.size;
+    let expected_hint = match &entry.source {
+        ManagedSource::UserProvided { hint } => hint.clone(),
+        _ => String::new(),
+    };
+    // Place at the MARKER's recorded path, not the caller's spelling — the
+    // match above is case-insensitive, and on a case-sensitive filesystem the
+    // two could otherwise land at different paths.
+    let path = entry.path.clone();
 
     if actual_hash != expected_sha512 || actual_file_size != file_size {
         return Err(ProvideFileError {
@@ -1602,15 +1620,8 @@ pub async fn instance_provide_file(
         });
     }
 
-    // Import to local blob store and place at instance
-    let settings = settings::load(&app);
-    let layout = Layout::new(&app, settings.game_dir())
-        .map_err(|e| ProvideFileError {
-            code: "io".to_string(),
-            expected_hint: None,
-            message: format!("Error al acceder a la configuración: {}", e.message),
-        })?;
-
+    // Import to the never-purged local blob store (reinstall/repair never
+    // re-prompts) and place at the instance path.
     let blob_path = files::local_blob_path(&layout, &actual_hash.to_lowercase());
     if let Some(parent) = blob_path.parent() {
         let _ = std::fs::create_dir_all(parent);
@@ -1621,7 +1632,6 @@ pub async fn instance_provide_file(
         message: format!("No se pudo copiar al almacén: {e}"),
     })?;
 
-    let instance = layout.instance(&slug);
     let dest = instance.minecraft.join(path.replace('\\', "/"));
     if let Some(parent) = dest.parent() {
         let _ = std::fs::create_dir_all(parent);
@@ -1722,18 +1732,26 @@ pub async fn instance_user_files_scan(
     })
 }
 
-/// Search roots in priority order: the player's own list first (EmuDeck prompts
-/// for this folder, so it is the primary path), then the EmuDeck default layout
-/// on every drive, then the user profile.
+/// Search roots in priority order: the player's own list first, then the
+/// Emulation folder EmuDeck's own settings.json names (`storagePath` — no
+/// guessing, no asking), then a drive sweep as a last resort, then the profile.
 fn rom_search_roots(settings: &settings::Settings) -> Vec<std::path::PathBuf> {
     use std::path::PathBuf;
     let mut roots: Vec<PathBuf> = settings.rom_dirs.iter().map(PathBuf::from).collect();
 
+    // EmuDeck knows where its Emulation folder is — read it rather than scan.
+    if let Some(root) = crate::emulators::emudeck_info().and_then(|d| d.emulation_root()) {
+        roots.push(root.join("roms"));
+    }
+
+    // Fallback sweep for a moved/hand-made layout. C: onward only — touching
+    // A:/B: can stall for seconds while Windows interrogates a phantom floppy
+    // controller, from what is effectively a UI-blocking call.
     #[cfg(windows)]
-    for letter in b'A'..=b'Z' {
+    for letter in b'C'..=b'Z' {
         let drive = format!("{}:\\Emulation\\roms", letter as char);
         let p = PathBuf::from(drive);
-        if p.is_dir() {
+        if p.is_dir() && !roots.contains(&p) {
             roots.push(p);
         }
     }
@@ -1744,12 +1762,15 @@ fn rom_search_roots(settings: &settings::Settings) -> Vec<std::path::PathBuf> {
             roots.push(p);
         }
     }
+    roots.dedup();
     roots
 }
 
-/// Collect files under `root` up to `max_depth` levels deep (root files = depth
-/// 0). Bounded and dumb by design (§3): the size+hash match is the judge, so no
-/// extension filter that could miss a renamed dump.
+/// Collect files under `root`, traversing up to and including `max_depth`
+/// directory levels (root files = depth 0). Bounded and dumb by design (§3):
+/// the size+hash match is the judge, so no extension filter that could miss a
+/// renamed dump. Uses the dirent's own file type — which does NOT follow
+/// symlinks — so a link loop inside a ROM library cannot trap the walk.
 fn walk_files(root: &std::path::Path, max_depth: usize) -> Vec<std::path::PathBuf> {
     let mut out = Vec::new();
     let mut stack = vec![(root.to_path_buf(), 0usize)];
@@ -1758,12 +1779,13 @@ fn walk_files(root: &std::path::Path, max_depth: usize) -> Vec<std::path::PathBu
             continue;
         };
         for entry in entries.flatten() {
+            let Ok(kind) = entry.file_type() else { continue };
             let path = entry.path();
-            if path.is_dir() {
+            if kind.is_dir() {
                 if depth < max_depth {
                     stack.push((path, depth + 1));
                 }
-            } else if path.is_file() {
+            } else if kind.is_file() {
                 out.push(path);
             }
         }

@@ -43,12 +43,16 @@ export function systemOfEntry(entry: PackEntry): SystemId {
   }
 }
 
-/** System metadata for UI rendering. */
+/** System metadata for UI rendering. `labelKey` is RELATIVE to the `common`
+ *  namespace (consumers call `useT("common")`), so it must not repeat the
+ *  prefix — `common.systems.x` resolved as `common.common.systems.x` and
+ *  rendered the raw dotted key. Icons are the dedicated system glyphs in
+ *  @boffmedia/ui (original line drawings; real console logos are trademarks). */
 export const SYSTEMS: Array<{ id: SystemId; labelKey: string; icon: IconName }> = [
-  { id: "minecraft", labelKey: "common.systems.minecraft", icon: "gamepad" },
-  { id: "emulator", labelKey: "common.systems.emulator", icon: "database" },
-  { id: "gba", labelKey: "common.systems.gba", icon: "database" },
-  { id: "nds", labelKey: "common.systems.nds", icon: "server" },
-  { id: "zomboid", labelKey: "common.systems.zomboid", icon: "shield" },
-  { id: "stardew", labelKey: "common.systems.stardew", icon: "tree" },
+  { id: "minecraft", labelKey: "systems.minecraft", icon: "cube" },
+  { id: "emulator", labelKey: "systems.emulator", icon: "handheld" },
+  { id: "gba", labelKey: "systems.gba", icon: "handheld" },
+  { id: "nds", labelKey: "systems.nds", icon: "dualscreen" },
+  { id: "zomboid", labelKey: "systems.zomboid", icon: "skull" },
+  { id: "stardew", labelKey: "systems.stardew", icon: "tree" },
 ]

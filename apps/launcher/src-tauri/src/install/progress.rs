@@ -74,6 +74,39 @@ impl Phase {
     }
 }
 
+/// Which install shape the bar describes. The weights above are MINECRAFT
+/// weights (Java/Libraries/Assets/Loader own 66% of the bar); an emulator
+/// install runs none of those phases, so mapping it through the same table
+/// left the bar parked at ~94% for the whole install. Each profile owns its
+/// own offsets over the SAME phase names the renderer already knows.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub enum ProgressProfile {
+    #[default]
+    Minecraft,
+    /// Payload-only installs: Resolving → Overrides (the whole payload) →
+    /// Verifying. Phases outside this plan clamp into it harmlessly.
+    Emulator,
+}
+
+impl ProgressProfile {
+    fn overall(self, phase: Phase, within: f32) -> f32 {
+        match self {
+            ProgressProfile::Minecraft => phase.overall(within),
+            ProgressProfile::Emulator => {
+                let within = within.clamp(0.0, 1.0);
+                let (offset, weight) = match phase {
+                    Phase::Resolving => (0.0, 0.05),
+                    Phase::Overrides | Phase::Mods => (0.05, 0.80),
+                    Phase::Verifying => (0.85, 0.15),
+                    // Never emitted on this path; render as "almost done".
+                    _ => (0.85, 0.0),
+                };
+                (offset + weight * within).clamp(0.0, 1.0)
+            }
+        }
+    }
+}
+
 #[derive(Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
 struct ProgressPayload<'a> {
@@ -128,6 +161,7 @@ pub fn log(app: &tauri::AppHandle, level: &str, source: &str, text: &str) {
 pub struct Reporter {
     app: tauri::AppHandle,
     pack_id: String,
+    profile: ProgressProfile,
 }
 
 impl Reporter {
@@ -135,6 +169,16 @@ impl Reporter {
         Self {
             app,
             pack_id: pack_id.into(),
+            profile: ProgressProfile::Minecraft,
+        }
+    }
+
+    /// The emulator-install bar shape (payload-only phases).
+    pub fn for_emulator(app: tauri::AppHandle, pack_id: impl Into<String>) -> Self {
+        Self {
+            app,
+            pack_id: pack_id.into(),
+            profile: ProgressProfile::Emulator,
         }
     }
 
@@ -144,7 +188,7 @@ impl Reporter {
             ProgressPayload {
                 pack_id: &self.pack_id,
                 phase,
-                fraction: phase.overall(within),
+                fraction: self.profile.overall(phase, within),
                 file,
                 downloaded_bytes: downloaded,
                 total_bytes: total,

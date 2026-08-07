@@ -12,6 +12,11 @@ const ICONS = {
   sun: <g><circle cx="12" cy="12" r="4.5" /><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2" /></g>,
   moon: <path d="M20 14.5A8.5 8.5 0 0 1 9.5 4 8.5 8.5 0 1 0 20 14.5" />,
   gamepad: <g><path d="M6 9h12a4 4 0 0 1 4 4v3a3 3 0 0 1-5.5 1.7L15 16H9l-1.5 1.7A3 3 0 0 1 2 16v-3a4 4 0 0 1 4-4Z" /><path d="M8 11.5v3M6.5 13h3" /><circle cx="16" cy="12" r="0.8" /><circle cx="18.5" cy="14" r="0.8" /></g>,
+  // System glyphs for the multi-game rail (cube + skull already exist below).
+  // Original line drawings on purpose: real console logos are trademarks, and
+  // strokes tint via currentColor.
+  handheld: <g><rect x="2.5" y="6.5" width="19" height="11" rx="3.5" /><rect x="9.5" y="9" width="5" height="6" /><path d="M5.75 10.5v3M4.25 12h3" /><circle cx="18" cy="10.5" r="0.8" /><circle cx="18" cy="13.5" r="0.8" /></g>,
+  dualscreen: <g><rect x="5" y="3.5" width="14" height="8" rx="1.5" /><rect x="5" y="13" width="14" height="7.5" rx="1.5" /><rect x="7.5" y="5.5" width="9" height="4" /><path d="M9.5 16.5v2M8.5 17.5h2" /><circle cx="15.5" cy="17.5" r="0.6" /></g>,
   trophy: <g><path d="M8 4h8v6a4 4 0 0 1-8 0zM8 5H4.5c0 4 1.5 5.5 3.5 5.5M16 5h3.5c0 4-1.5 5.5-3.5 5.5" /><path d="M12 14v3m-4 4c.5-2.5 2-4 4-4s3.5 1.5 4 4z" /></g>,
   calc: <g><rect x="5" y="3" width="14" height="18" /><path d="M8.5 7.5h7M8.5 12h.01M12 12h.01M15.5 12h.01M8.5 15.5h.01M12 15.5h.01M15.5 15.5h.01" /></g>,
   sword: <path d="m4 20 4-1 11-11-3-3L5 16zm10-15 5 5M3 21l2-2" />,

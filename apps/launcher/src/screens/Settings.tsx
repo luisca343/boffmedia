@@ -29,6 +29,7 @@ export function Settings() {
   const [melondsStatus, setMelondsStatus] = useState<any>(null)
   const [romFolders, setRomFolders] = useState<string[]>([])
   const [loadingEmulators, setLoadingEmulators] = useState(false)
+  const [loadError, setLoadError] = useState<string | null>(null)
 
   useEffect(() => {
     // Null in a browser tab, where there is no shell to ask.
@@ -38,10 +39,20 @@ export function Settings() {
   useEffect(() => {
     // Load emulator status and ROM folders on mount
     setLoadingEmulators(true)
+    setLoadError(null)
     Promise.all([
-      emulatorStatus("mgba").then((s) => setMgbaStatus(s)).catch(() => {}),
-      emulatorStatus("melonds").then((s) => setMelondsStatus(s)).catch(() => {}),
-      romDirsGet().then((dirs) => setRomFolders(dirs)).catch(() => {}),
+      emulatorStatus("mgba").then((s) => setMgbaStatus(s)).catch((err) => {
+        console.error("Failed to load mGBA status:", err)
+        setLoadError(t("emulators.loadError"))
+      }),
+      emulatorStatus("melonds").then((s) => setMelondsStatus(s)).catch((err) => {
+        console.error("Failed to load melonDS status:", err)
+        setLoadError(t("emulators.loadError"))
+      }),
+      romDirsGet().then((dirs) => setRomFolders(dirs)).catch((err) => {
+        console.error("Failed to load ROM folders:", err)
+        setLoadError(t("emulators.loadError"))
+      }),
     ]).finally(() => setLoadingEmulators(false))
   }, [])
 
@@ -77,9 +88,9 @@ export function Settings() {
     try {
       const updated = await romDirsAdd(dir)
       setRomFolders(updated)
-      toast.success(t("emulators.addFolder"))
+      toast.success(t("emulators.addFolderSuccess"))
     } catch (err) {
-      toast.error((err as { message?: string })?.message ?? t("emulators.addFolder"))
+      toast.error((err as { message?: string })?.message ?? t("emulators.addFolderError"))
     }
   }
 
@@ -87,9 +98,9 @@ export function Settings() {
     try {
       const updated = await romDirsRemove(dir)
       setRomFolders(updated)
-      toast.success(t("emulators.removeFolder"))
+      toast.success(t("emulators.removeFolderSuccess"))
     } catch (err) {
-      toast.error((err as { message?: string })?.message ?? t("emulators.removeFolder"))
+      toast.error((err as { message?: string })?.message ?? t("emulators.removeFolderError"))
     }
   }
 
@@ -110,14 +121,15 @@ export function Settings() {
         warning: false,
       }
     }
-    const sourceLabel = status.resolved.source === "emudeck"
-      ? "EmuDeck"
-      : status.resolved.source === "override"
-        ? t("emulators.resolved")
-        : t("emulators.detected")
+    // Source + method labels come from i18n — "vía RetroArch" is copy, not code.
+    const sourceLabel = t(`emulators.source.${status.resolved.source}`)
+    const value =
+      status.resolved.via === "retroarch"
+        ? `${status.resolved.path} · ${t("emulators.viaRetroarch", { source: sourceLabel })}`
+        : `${status.resolved.path} · ${sourceLabel}`
     return {
       label: kindLabel,
-      value: `${status.resolved.path} · ${sourceLabel}`,
+      value,
       warning: false,
     }
   }
@@ -131,7 +143,7 @@ export function Settings() {
         </h1>
       </header>
 
-      <div className="grid max-w-[900px] gap-4 [grid-template-columns:repeat(auto-fit,minmax(340px,1fr))]">
+      <div className="grid max-w-[1600px] gap-4 [grid-template-columns:repeat(auto-fit,minmax(340px,1fr))]">
         <Panel
           title={t("performance.title")}
           aside={<Badge tone={settings.memoryAuto ? "ok" : "info"}>
@@ -183,6 +195,14 @@ export function Settings() {
         </Panel>
 
         <Panel title={t("emulators.title")}>
+          {loadError && (
+            <div className="mb-4 flex items-center justify-between rounded border border-warn bg-surface-warn-dim p-3">
+              <p className="text-sm text-warn">{loadError}</p>
+              <Button size="sm" variant="ghost" onClick={() => setLoadError(null)}>
+                {t("common.primitives.dismiss")}
+              </Button>
+            </div>
+          )}
           {/* Emulator status rows */}
           <div className="space-y-4">
             {/* mGBA row */}
