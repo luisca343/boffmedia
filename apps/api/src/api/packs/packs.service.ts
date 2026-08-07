@@ -17,7 +17,11 @@ import {
   PackVersionView,
   StoredPackFile,
 } from './types/packs.types';
-import { CreatePackDto, CreateVersionDto, UpdatePackDto } from './dto/packs.dto';
+import {
+  CreatePackDto,
+  CreateVersionDto,
+  UpdatePackDto,
+} from './dto/packs.dto';
 
 const ID_BYTES = 12;
 const INVITE_BYTES = 8;
@@ -53,7 +57,10 @@ export class PacksService {
    *  is layered on top — a launcher that does not declare a game type never
    *  lists a pack of that type. `capabilities` is the parsed X-Boff-Game-Types
    *  set (absent header → ['minecraft'], §3.1). */
-  async listForLauncher(uuid: string, capabilities: string[]): Promise<LauncherPackView[]> {
+  async listForLauncher(
+    uuid: string,
+    capabilities: string[],
+  ): Promise<LauncherPackView[]> {
     const rows = await this.repo.listVisibleTo(uuid);
     const canParse = new Set(capabilities);
 
@@ -128,7 +135,8 @@ export class PacksService {
       const spec = v[gameType];
       if (spec !== undefined && spec !== null) out[gameType] = spec;
     }
-    if (v.initialFiles && v.initialFiles.length > 0) out.initialFiles = v.initialFiles;
+    if (v.initialFiles && v.initialFiles.length > 0)
+      out.initialFiles = v.initialFiles;
     return out;
   }
 
@@ -150,7 +158,8 @@ export class PacksService {
     capabilities: string[],
   ): Promise<unknown> {
     const pack = await this.repo.findById(packId);
-    if (!pack || pack.archived) throw new NotFoundException('Pack no encontrado');
+    if (!pack || pack.archived)
+      throw new NotFoundException('Pack no encontrado');
 
     const gameType = this.resolveGameType(pack.gameType);
     if (!capabilities.includes(gameType)) {
@@ -161,14 +170,24 @@ export class PacksService {
       });
     }
 
-    await this.assertAccess(pack.id, pack.accessKind, pack.passwordHash, uuid, password);
+    await this.assertAccess(
+      pack.id,
+      pack.accessKind,
+      pack.passwordHash,
+      uuid,
+      password,
+    );
 
     if (!pack.latestVersionId) {
-      throw new NotFoundException('Este pack todavía no tiene ninguna versión publicada');
+      throw new NotFoundException(
+        'Este pack todavía no tiene ninguna versión publicada',
+      );
     }
     const version = await this.repo.findVersion(pack.latestVersionId);
     if (!version || !version.published) {
-      throw new NotFoundException('Este pack todavía no tiene ninguna versión publicada');
+      throw new NotFoundException(
+        'Este pack todavía no tiene ninguna versión publicada',
+      );
     }
 
     await this.repo.audit(AUDIT.MANIFEST_SERVED, pack.id, uuid, {
@@ -237,20 +256,31 @@ export class PacksService {
     match: (file: StoredPackFile) => boolean,
   ): Promise<StoredPackFile> {
     const pack = await this.repo.findById(packId);
-    if (!pack || pack.archived) throw new NotFoundException('Pack no encontrado');
+    if (!pack || pack.archived)
+      throw new NotFoundException('Pack no encontrado');
 
-    await this.assertAccess(pack.id, pack.accessKind, pack.passwordHash, uuid, password);
+    await this.assertAccess(
+      pack.id,
+      pack.accessKind,
+      pack.passwordHash,
+      uuid,
+      password,
+    );
 
     const version = pack.latestVersionId
       ? await this.repo.findVersion(pack.latestVersionId)
       : null;
     if (!version || !version.published) {
-      throw new NotFoundException('Este pack todavía no tiene ninguna versión publicada');
+      throw new NotFoundException(
+        'Este pack todavía no tiene ninguna versión publicada',
+      );
     }
 
     const file = (version.files as StoredPackFile[]).find(match);
     if (!file) {
-      throw new NotFoundException('Ese archivo no pertenece a esta versión del pack');
+      throw new NotFoundException(
+        'Ese archivo no pertenece a esta versión del pack',
+      );
     }
 
     await this.repo.audit(AUDIT.FILE_SERVED, pack.id, uuid, {
@@ -314,19 +344,27 @@ export class PacksService {
       : { host: server.host };
   }
 
-  async createPack(dto: CreatePackDto, actorId: number | null): Promise<{ id: string }> {
+  async createPack(
+    dto: CreatePackDto,
+    actorId: number | null,
+  ): Promise<{ id: string }> {
     const existing = await this.repo.findBySlug(dto.slug);
-    if (existing) throw new BadRequestException('Ya existe un pack con ese slug');
+    if (existing)
+      throw new BadRequestException('Ya existe un pack con ese slug');
 
     if (dto.accessKind === 'password' && !dto.password) {
-      throw new BadRequestException('Un pack con contraseña necesita una contraseña');
+      throw new BadRequestException(
+        'Un pack con contraseña necesita una contraseña',
+      );
     }
 
     const id = this.newId();
     // NULL = minecraft (zero-backfill semantics): an explicit 'minecraft' is
     // normalized to NULL so the stored value matches every pre-multi-game row.
     const gameType =
-      dto.gameType && dto.gameType !== 'minecraft' ? (dto.gameType as GameType) : null;
+      dto.gameType && dto.gameType !== 'minecraft'
+        ? (dto.gameType as GameType)
+        : null;
     await this.repo.insertPack({
       id,
       slug: dto.slug,
@@ -348,7 +386,11 @@ export class PacksService {
     return { id };
   }
 
-  async updatePack(id: string, dto: UpdatePackDto, actorId: number | null): Promise<void> {
+  async updatePack(
+    id: string,
+    dto: UpdatePackDto,
+    actorId: number | null,
+  ): Promise<void> {
     const pack = await this.repo.findById(id);
     if (!pack) throw new NotFoundException('Pack no encontrado');
 
@@ -359,24 +401,32 @@ export class PacksService {
     if (dto.gallery !== undefined) patch.gallery = dto.gallery;
     if (dto.iconUrl !== undefined) patch.iconUrl = dto.iconUrl;
     // `null` clears the server (back to a client pack); an object sets it.
-    if (dto.server !== undefined) patch.server = this.normalizeServer(dto.server);
+    if (dto.server !== undefined)
+      patch.server = this.normalizeServer(dto.server);
     if (dto.archived !== undefined) patch.archived = dto.archived;
     if (dto.accessKind !== undefined) patch.accessKind = dto.accessKind;
     if (dto.password !== undefined) {
       // An explicit empty string clears the password; undefined leaves it alone.
-      patch.passwordHash = dto.password ? await bcrypt.hash(dto.password, 10) : null;
+      patch.passwordHash = dto.password
+        ? await bcrypt.hash(dto.password, 10)
+        : null;
     }
 
     const targetAccess = dto.accessKind ?? pack.accessKind;
     const targetHash =
       dto.password !== undefined ? patch.passwordHash : pack.passwordHash;
     if (targetAccess === 'password' && !targetHash) {
-      throw new BadRequestException('Un pack con contraseña necesita una contraseña');
+      throw new BadRequestException(
+        'Un pack con contraseña necesita una contraseña',
+      );
     }
 
     if (Object.keys(patch).length === 0) return;
     await this.repo.updatePack(id, patch);
-    await this.repo.audit(AUDIT.PACK_UPDATED, id, null, { actorId, fields: Object.keys(patch) });
+    await this.repo.audit(AUDIT.PACK_UPDATED, id, null, {
+      actorId,
+      fields: Object.keys(patch),
+    });
   }
 
   async listVersions(packId: string): Promise<PackVersionView[]> {
@@ -457,7 +507,11 @@ export class PacksService {
         'Una versión publicada no se puede editar; crea una nueva a partir de ella',
       );
     }
-    const parsed = this.parseManifest(await this.requirePack(packId), versionId, dto);
+    const parsed = this.parseManifest(
+      await this.requirePack(packId),
+      versionId,
+      dto,
+    );
     const pv = parsed.version as any;
     await this.repo.updateVersion(versionId, {
       name: dto.name,
@@ -472,10 +526,17 @@ export class PacksService {
       initialFiles: pv.initialFiles ?? null,
       notes: dto.notes ?? null,
     });
-    await this.repo.audit(AUDIT.VERSION_UPDATED, packId, null, { actorId, versionId });
+    await this.repo.audit(AUDIT.VERSION_UPDATED, packId, null, {
+      actorId,
+      versionId,
+    });
   }
 
-  async deleteVersion(packId: string, versionId: string, actorId: number | null): Promise<void> {
+  async deleteVersion(
+    packId: string,
+    versionId: string,
+    actorId: number | null,
+  ): Promise<void> {
     const existing = await this.repo.findVersion(versionId);
     if (!existing || existing.packId !== packId) {
       throw new NotFoundException('Versión no encontrada');
@@ -484,7 +545,10 @@ export class PacksService {
       throw new BadRequestException('Una versión publicada no se puede borrar');
     }
     await this.repo.deleteVersion(versionId);
-    await this.repo.audit(AUDIT.VERSION_DELETED, packId, null, { actorId, versionId });
+    await this.repo.audit(AUDIT.VERSION_DELETED, packId, null, {
+      actorId,
+      versionId,
+    });
   }
 
   private async requirePack(packId: string) {
@@ -577,14 +641,21 @@ export class PacksService {
       notes: dto.notes ?? null,
       published: false,
     });
-    await this.repo.audit(AUDIT.VERSION_CREATED, packId, null, { actorId, versionId: id });
+    await this.repo.audit(AUDIT.VERSION_CREATED, packId, null, {
+      actorId,
+      versionId: id,
+    });
     return { id };
   }
 
   /** Publishing is what makes a version visible to launchers, and it is also
    *  what makes it the pack's `latestVersionId`. One step, so the two can never
    *  disagree. */
-  async publishVersion(packId: string, versionId: string, actorId: number | null): Promise<void> {
+  async publishVersion(
+    packId: string,
+    versionId: string,
+    actorId: number | null,
+  ): Promise<void> {
     const version = await this.repo.findVersion(versionId);
     if (!version || version.packId !== packId) {
       throw new NotFoundException('Versión no encontrada');
@@ -603,16 +674,28 @@ export class PacksService {
     return this.repo.listAcl(packId);
   }
 
-  async grant(packId: string, uuid: string, actorId: number | null): Promise<void> {
+  async grant(
+    packId: string,
+    uuid: string,
+    actorId: number | null,
+  ): Promise<void> {
     const pack = await this.repo.findById(packId);
     if (!pack) throw new NotFoundException('Pack no encontrado');
     await this.repo.grant(packId, uuid.toLowerCase(), actorId, null);
-    await this.repo.audit(AUDIT.ACCESS_GRANTED, packId, uuid.toLowerCase(), { actorId });
+    await this.repo.audit(AUDIT.ACCESS_GRANTED, packId, uuid.toLowerCase(), {
+      actorId,
+    });
   }
 
-  async revoke(packId: string, uuid: string, actorId: number | null): Promise<void> {
+  async revoke(
+    packId: string,
+    uuid: string,
+    actorId: number | null,
+  ): Promise<void> {
     await this.repo.revoke(packId, uuid.toLowerCase());
-    await this.repo.audit(AUDIT.ACCESS_REVOKED, packId, uuid.toLowerCase(), { actorId });
+    await this.repo.audit(AUDIT.ACCESS_REVOKED, packId, uuid.toLowerCase(), {
+      actorId,
+    });
   }
 
   async createInvite(
@@ -625,8 +708,18 @@ export class PacksService {
     if (!pack) throw new NotFoundException('Pack no encontrado');
 
     const code = randomBytes(INVITE_BYTES).toString('hex');
-    await this.repo.insertInvite({ code, packId, createdBy: actorId, maxUses, expiresAt });
-    await this.repo.audit(AUDIT.INVITE_CREATED, packId, null, { actorId, code, maxUses });
+    await this.repo.insertInvite({
+      code,
+      packId,
+      createdBy: actorId,
+      maxUses,
+      expiresAt,
+    });
+    await this.repo.audit(AUDIT.INVITE_CREATED, packId, null, {
+      actorId,
+      code,
+      maxUses,
+    });
     return { code };
   }
 
@@ -663,7 +756,8 @@ export class PacksService {
     if (accessKind === 'public') return;
 
     if (accessKind === 'password') {
-      if (!passwordHash) throw new ForbiddenException('Este pack no está configurado');
+      if (!passwordHash)
+        throw new ForbiddenException('Este pack no está configurado');
       if (!password || !(await bcrypt.compare(password, passwordHash))) {
         throw new ForbiddenException('Contraseña incorrecta');
       }

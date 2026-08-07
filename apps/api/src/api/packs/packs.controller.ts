@@ -82,7 +82,9 @@ export class PacksController {
   @ApiOperation({ summary: 'Todos los packs' })
   @ApiResponse({ status: HttpStatus.OK, type: [AdminPackEntity] })
   async list(@Query('archived') archived?: string): Promise<AdminPackEntity[]> {
-    return this.packs.listForAdmin(archived === 'true') as Promise<AdminPackEntity[]>;
+    return this.packs.listForAdmin(archived === 'true') as Promise<
+      AdminPackEntity[]
+    >;
   }
 
   @Post()
@@ -115,7 +117,8 @@ export class PacksController {
   @Get('blobs/:sha512')
   @ApiOperation({
     summary: '¿Está ya este blob en el servidor?',
-    description: 'Permite al dashboard saltarse la subida de un archivo ya presente.',
+    description:
+      'Permite al dashboard saltarse la subida de un archivo ya presente.',
   })
   async blobStatus(
     @Param('sha512') sha512: string,
@@ -145,7 +148,9 @@ export class PacksController {
       'Sin `query` devuelve el catálogo ordenado por `sort`, que es lo que permite navegar sin buscar.',
   })
   @ApiResponse({ status: HttpStatus.OK, type: ModSearchPageEntity })
-  async catalogSearch(@Query() query: CatalogSearchQueryDto): Promise<ModSearchPageEntity> {
+  async catalogSearch(
+    @Query() query: CatalogSearchQueryDto,
+  ): Promise<ModSearchPageEntity> {
     return this.catalog.search(query);
   }
 
@@ -171,7 +176,8 @@ export class PacksController {
   @Get('catalog/projects')
   @ApiOperation({
     summary: 'Resumen de varios proyectos por id',
-    description: 'Una sola llamada por plataforma: es como se nombran las dependencias.',
+    description:
+      'Una sola llamada por plataforma: es como se nombran las dependencias.',
   })
   @ApiResponse({ status: HttpStatus.OK, type: [ModSearchHitEntity] })
   async catalogProjects(
@@ -179,7 +185,10 @@ export class PacksController {
   ): Promise<ModSearchHitEntity[]> {
     return this.catalog.projectSummaries(
       query.platform,
-      query.ids.split(',').map((id) => id.trim()).filter(Boolean),
+      query.ids
+        .split(',')
+        .map((id) => id.trim())
+        .filter(Boolean),
     );
   }
 
@@ -202,7 +211,9 @@ export class PacksController {
       'Forge y NeoForge publican maven XML sin CORS, así que el proxy del servidor es obligatorio.',
   })
   @ApiResponse({ status: HttpStatus.OK, type: [LoaderVersionEntity] })
-  async loaderVersions(@Query() query: LoaderVersionsQueryDto): Promise<LoaderVersionEntity[]> {
+  async loaderVersions(
+    @Query() query: LoaderVersionsQueryDto,
+  ): Promise<LoaderVersionEntity[]> {
     return this.meta.loaderVersions(query.loader, query.minecraft);
   }
 
@@ -232,7 +243,11 @@ export class PacksController {
     @Param('projectId') projectId: string,
     @Query() query: CatalogFilesQueryDto,
   ): Promise<ModFileEntity[]> {
-    return this.catalog.modrinthVersions(projectId, query.gameVersion, query.loader);
+    return this.catalog.modrinthVersions(
+      projectId,
+      query.gameVersion,
+      query.loader,
+    );
   }
 
   @Post('catalog/resolve')
@@ -273,7 +288,8 @@ export class PacksController {
   @Get(':id/versions/:versionId')
   @ApiOperation({
     summary: 'Una versión con sus archivos',
-    description: 'Es el punto de partida de "clonar" y de la edición de borradores.',
+    description:
+      'Es el punto de partida de "clonar" y de la edición de borradores.',
   })
   async versionDetail(
     @Param('id') id: string,
@@ -314,7 +330,8 @@ export class PacksController {
   @Post(':id/versions/:versionId/publish')
   @ApiOperation({
     summary: 'Publicar una versión',
-    description: 'La hace visible a los launchers y la marca como la última del pack.',
+    description:
+      'La hace visible a los launchers y la marca como la última del pack.',
   })
   async publish(
     @Param('id') id: string,

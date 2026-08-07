@@ -22,10 +22,16 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { Public } from '@api/_utils/decorators/public.decorator';
-import { LauncherAuthGuard, LauncherRequest } from './guards/launcher-auth.guard';
+import {
+  LauncherAuthGuard,
+  LauncherRequest,
+} from './guards/launcher-auth.guard';
 import { PacksAuthService } from './packs-auth.service';
 import { PacksService } from './packs.service';
-import { PacksDownloadsService, ProxiedDownload } from './packs-downloads.service';
+import {
+  PacksDownloadsService,
+  ProxiedDownload,
+} from './packs-downloads.service';
 import {
   DownloadQueryDto,
   ManifestQueryDto,
@@ -187,7 +193,8 @@ export class LauncherController {
       req.launcher!.uuid,
       id,
       query.password ?? null,
-      (file) => file.source.kind === 'override' && file.source.blobSha512 === blob,
+      (file) =>
+        file.source.kind === 'override' && file.source.blobSha512 === blob,
     );
 
     return this.stream(res, await this.downloads.override(blob));

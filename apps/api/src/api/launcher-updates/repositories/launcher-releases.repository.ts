@@ -29,7 +29,10 @@ export class LauncherReleasesRepository {
       .select()
       .from(launcherReleases)
       .where(
-        and(eq(launcherReleases.version, version), eq(launcherReleases.target, target)),
+        and(
+          eq(launcherReleases.version, version),
+          eq(launcherReleases.target, target),
+        ),
       )
       .limit(1);
     return row ?? null;
@@ -45,7 +48,10 @@ export class LauncherReleasesRepository {
       .select()
       .from(launcherReleases)
       .where(
-        and(eq(launcherReleases.target, target), eq(launcherReleases.published, true)),
+        and(
+          eq(launcherReleases.target, target),
+          eq(launcherReleases.published, true),
+        ),
       )
       .orderBy(desc(launcherReleases.publishedAt));
   }
@@ -61,7 +67,10 @@ export class LauncherReleasesRepository {
   }
 
   async listAll(): Promise<LauncherRelease[]> {
-    return this.db.select().from(launcherReleases).orderBy(desc(launcherReleases.createdAt));
+    return this.db
+      .select()
+      .from(launcherReleases)
+      .orderBy(desc(launcherReleases.createdAt));
   }
 
   /** Idempotent by (version, target): a re-upload replaces the artifact row so

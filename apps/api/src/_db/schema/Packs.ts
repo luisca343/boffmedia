@@ -22,7 +22,11 @@ import {
 export type PackAccessKind = 'public' | 'password' | 'allowlist';
 
 /** Mirrors MrpackDependencies' loader keys. Null = vanilla. */
-export type PackLoader = 'forge' | 'neoforge' | 'fabric-loader' | 'quilt-loader';
+export type PackLoader =
+  | 'forge'
+  | 'neoforge'
+  | 'fabric-loader'
+  | 'quilt-loader';
 
 /** Which game a pack targets — mirrors GameType in @boffmedia/pack-schema.
  *  NULL in the column means `minecraft` (every pack authored before multi-game

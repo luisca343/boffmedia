@@ -55,7 +55,10 @@ export class PacksDownloadsService {
   }
 
   /** Resolve the real CDN URL server-side and stream the bytes back. */
-  async curseforge(projectId: number, fileId: number): Promise<ProxiedDownload> {
+  async curseforge(
+    projectId: number,
+    fileId: number,
+  ): Promise<ProxiedDownload> {
     const key = this.curseforgeKey;
     const url = await this.resolveCurseforgeUrl(projectId, fileId, key);
 
@@ -69,10 +72,13 @@ export class PacksDownloadsService {
         validateStatus: () => true,
       }),
     ).catch((error: unknown) => {
-      this.logger.error(`CDN de CurseForge inalcanzable (${url}): ${asMessage(error)}`);
+      this.logger.error(
+        `CDN de CurseForge inalcanzable (${url}): ${asMessage(error)}`,
+      );
       throw new BadGatewayException({
         message: 'curseforge cdn unreachable',
-        userMessage: 'No se ha podido contactar con CurseForge. Inténtalo de nuevo.',
+        userMessage:
+          'No se ha podido contactar con CurseForge. Inténtalo de nuevo.',
       });
     });
 
@@ -108,7 +114,10 @@ export class PacksDownloadsService {
 
   /** The CDN URL alone, without streaming it. The catalog service hashes the
    *  bytes itself, so it needs the URL but not this class's response handling. */
-  async curseforgeDownloadUrl(projectId: number, fileId: number): Promise<string> {
+  async curseforgeDownloadUrl(
+    projectId: number,
+    fileId: number,
+  ): Promise<string> {
     return this.resolveCurseforgeUrl(projectId, fileId, this.curseforgeKey);
   }
 
@@ -130,7 +139,8 @@ export class PacksDownloadsService {
       this.logger.error(`API de CurseForge inalcanzable: ${asMessage(error)}`);
       throw new BadGatewayException({
         message: 'curseforge api unreachable',
-        userMessage: 'No se ha podido contactar con CurseForge. Inténtalo de nuevo.',
+        userMessage:
+          'No se ha podido contactar con CurseForge. Inténtalo de nuevo.',
       });
     });
 

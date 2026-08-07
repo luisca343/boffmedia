@@ -63,14 +63,15 @@ const MODRINTH_SORT: Record<string, string> = {
 };
 
 /** CurseForge relationType enum → our relation names. 2/5 are the soft ones. */
-const CF_RELATION: Record<number, ModDependencyEntity['relation'] | undefined> = {
-  1: 'embedded',
-  2: 'optional',
-  3: 'required',
-  4: undefined, // tool
-  5: 'incompatible',
-  6: undefined, // include
-};
+const CF_RELATION: Record<number, ModDependencyEntity['relation'] | undefined> =
+  {
+    1: 'embedded',
+    2: 'optional',
+    3: 'required',
+    4: undefined, // tool
+    5: 'incompatible',
+    6: undefined, // include
+  };
 
 const MODRINTH_API = 'https://api.modrinth.com/v2';
 /** Modrinth's API rules require a descriptive, contactable User-Agent; generic
@@ -97,7 +98,12 @@ interface CfModSearchItem {
   dateModified?: string;
   logo?: { thumbnailUrl?: string | null; url?: string | null } | null;
   authors?: { name?: string }[];
-  categories?: { id?: number; name?: string; slug?: string; iconUrl?: string }[];
+  categories?: {
+    id?: number;
+    name?: string;
+    slug?: string;
+    iconUrl?: string;
+  }[];
   latestFilesIndexes?: { gameVersion?: string; modLoader?: number }[];
   links?: {
     websiteUrl?: string | null;
@@ -211,7 +217,9 @@ export class PacksCatalogService {
       : this.searchModrinth(query);
   }
 
-  private async searchCurseforge(q: CatalogSearchQueryDto): Promise<ModSearchPageEntity> {
+  private async searchCurseforge(
+    q: CatalogSearchQueryDto,
+  ): Promise<ModSearchPageEntity> {
     const pageSize = Math.min(q.pageSize ?? 20, 50);
     const params: Record<string, string | number> = {
       gameId: CF_GAME_ID,
@@ -223,7 +231,8 @@ export class PacksCatalogService {
     };
     if (q.query) params.searchFilter = q.query;
     if (q.gameVersion) params.gameVersion = q.gameVersion;
-    if (q.loader && CF_LOADER[q.loader] !== undefined) params.modLoaderType = CF_LOADER[q.loader];
+    if (q.loader && CF_LOADER[q.loader] !== undefined)
+      params.modLoaderType = CF_LOADER[q.loader];
     // CurseForge takes ONE category id per search, not a list.
     if (q.category) params.categoryId = q.category;
 
@@ -240,7 +249,9 @@ export class PacksCatalogService {
     };
   }
 
-  private async searchModrinth(q: CatalogSearchQueryDto): Promise<ModSearchPageEntity> {
+  private async searchModrinth(
+    q: CatalogSearchQueryDto,
+  ): Promise<ModSearchPageEntity> {
     const pageSize = Math.min(q.pageSize ?? 20, 50);
     const facets: string[][] = [
       [`project_type:${MODRINTH_TYPE[q.projectType ?? 'mod'] ?? 'mod'}`],
@@ -249,16 +260,16 @@ export class PacksCatalogService {
     if (q.loader) facets.push([`categories:${q.loader}`]);
     if (q.category) facets.push([`categories:${q.category}`]);
 
-    const data = await this.modrinthGet<{ hits?: ModrinthSearchHit[]; total_hits?: number }>(
-      `${MODRINTH_API}/search`,
-      {
-        query: q.query ?? '',
-        limit: pageSize,
-        offset: (q.page ?? 0) * pageSize,
-        index: MODRINTH_SORT[q.sort ?? 'downloads'] ?? 'downloads',
-        facets: JSON.stringify(facets),
-      },
-    );
+    const data = await this.modrinthGet<{
+      hits?: ModrinthSearchHit[];
+      total_hits?: number;
+    }>(`${MODRINTH_API}/search`, {
+      query: q.query ?? '',
+      limit: pageSize,
+      offset: (q.page ?? 0) * pageSize,
+      index: MODRINTH_SORT[q.sort ?? 'downloads'] ?? 'downloads',
+      facets: JSON.stringify(facets),
+    });
     return {
       hits: (data.hits ?? []).map((h) => ({
         platform: 'modrinth' as const,
@@ -280,17 +291,22 @@ export class PacksCatalogService {
 
   /** The category sidebar. Both lists are small and near-static, so they are
    *  cached for the life of the process. */
-  async categories(platform: string, projectType = 'mod'): Promise<CategoryEntity[]> {
+  async categories(
+    platform: string,
+    projectType = 'mod',
+  ): Promise<CategoryEntity[]> {
     const key = `${platform}:${projectType}`;
     const hit = this.categoryCache.get(key);
     if (hit) return hit;
 
     let list: CategoryEntity[];
     if (platform === 'curseforge') {
-      const data = await this.cfGet<{ data?: { id: number; name: string; iconUrl?: string }[] }>(
-        `${CF_API}/categories`,
-        { gameId: CF_GAME_ID, classId: CF_CLASS[projectType] ?? CF_CLASS.mod },
-      );
+      const data = await this.cfGet<{
+        data?: { id: number; name: string; iconUrl?: string }[];
+      }>(`${CF_API}/categories`, {
+        gameId: CF_GAME_ID,
+        classId: CF_CLASS[projectType] ?? CF_CLASS.mod,
+      });
       list = (data.data ?? []).map((c) => ({
         id: String(c.id),
         name: c.name,
@@ -311,7 +327,10 @@ export class PacksCatalogService {
   }
 
   /** The detail panel: full description, gallery, links and side support. */
-  async project(platform: string, projectId: string): Promise<ModProjectEntity> {
+  async project(
+    platform: string,
+    projectId: string,
+  ): Promise<ModProjectEntity> {
     if (platform === 'curseforge') {
       const [detail, description] = await Promise.all([
         this.cfGet<{ data?: CfModSearchItem }>(
@@ -335,7 +354,9 @@ export class PacksCatalogService {
         ...base,
         description: description.data ?? '',
         gameVersions: unique(
-          (mod.latestFilesIndexes ?? []).map((i) => i.gameVersion ?? '').filter(Boolean),
+          (mod.latestFilesIndexes ?? [])
+            .map((i) => i.gameVersion ?? '')
+            .filter(Boolean),
         ),
         loaders: unique(
           (mod.latestFilesIndexes ?? [])
@@ -381,22 +402,31 @@ export class PacksCatalogService {
 
   /** Names and icons for a set of project ids, so a dependency list can be
    *  shown as mods rather than as bare numbers. One batched call per platform. */
-  async projectSummaries(platform: string, ids: string[]): Promise<ModSearchHitEntity[]> {
+  async projectSummaries(
+    platform: string,
+    ids: string[],
+  ): Promise<ModSearchHitEntity[]> {
     const wanted = unique(ids).slice(0, 100);
     if (wanted.length === 0) return [];
 
     if (platform === 'curseforge') {
       const numeric = wanted.map(Number).filter((n) => Number.isFinite(n));
       if (numeric.length === 0) return [];
-      const data = await this.cfPost<{ data?: CfModSearchItem[] }>(`${CF_API}/mods`, {
-        modIds: numeric,
-      });
+      const data = await this.cfPost<{ data?: CfModSearchItem[] }>(
+        `${CF_API}/mods`,
+        {
+          modIds: numeric,
+        },
+      );
       return (data.data ?? []).map((m) => cfHit(m));
     }
 
-    const data = await this.modrinthGet<ModrinthProject[]>(`${MODRINTH_API}/projects`, {
-      ids: JSON.stringify(wanted),
-    });
+    const data = await this.modrinthGet<ModrinthProject[]>(
+      `${MODRINTH_API}/projects`,
+      {
+        ids: JSON.stringify(wanted),
+      },
+    );
     return (data ?? []).map((p) => ({
       platform: 'modrinth' as const,
       projectId: p.id,
@@ -417,9 +447,12 @@ export class PacksCatalogService {
     loader?: string,
     pageSize = 30,
   ): Promise<ModFileEntity[]> {
-    const params: Record<string, string | number> = { pageSize: Math.min(pageSize, 50) };
+    const params: Record<string, string | number> = {
+      pageSize: Math.min(pageSize, 50),
+    };
     if (gameVersion) params.gameVersion = gameVersion;
-    if (loader && CF_LOADER[loader] !== undefined) params.modLoaderType = CF_LOADER[loader];
+    if (loader && CF_LOADER[loader] !== undefined)
+      params.modLoaderType = CF_LOADER[loader];
 
     const data = await this.cfGet<{ data?: CfFileItem[] }>(
       `${CF_API}/mods/${encodeURIComponent(projectId)}/files`,
@@ -520,7 +553,10 @@ export class PacksCatalogService {
     if (source.kind === 'modrinth') {
       resolved = await this.resolveModrinth(source.projectId, source.versionId);
     } else if (source.kind === 'curseforge') {
-      const url = await this.downloads.curseforgeDownloadUrl(source.projectId, source.fileId);
+      const url = await this.downloads.curseforgeDownloadUrl(
+        source.projectId,
+        source.fileId,
+      );
       const { sha512, fileSize } = await this.hashRemote(url, {
         [CF_KEY_HEADER]: this.curseforgeKey,
       });
@@ -533,7 +569,12 @@ export class PacksCatalogService {
         });
       }
       const { sha512, fileSize } = await this.hashRemote(source.url, {});
-      resolved = { sha512, fileSize, fileName: fileNameFromUrl(source.url), source };
+      resolved = {
+        sha512,
+        fileSize,
+        fileName: fileNameFromUrl(source.url),
+        source,
+      };
     }
 
     if (this.resolveCache.size >= PacksCatalogService.CACHE_MAX) {
@@ -586,17 +627,21 @@ export class PacksCatalogService {
         validateStatus: () => true,
       }),
     ).catch((error: unknown) => {
-      this.logger.error(`No se ha podido descargar ${url}: ${asMessage(error)}`);
+      this.logger.error(
+        `No se ha podido descargar ${url}: ${asMessage(error)}`,
+      );
       throw new BadGatewayException({
         message: 'file source unreachable',
-        userMessage: 'No se ha podido descargar el archivo para calcular su hash.',
+        userMessage:
+          'No se ha podido descargar el archivo para calcular su hash.',
       });
     });
 
     if (response.status === 401 || response.status === 403) {
       throw new ServiceUnavailableException({
         message: `file source rejected the request (${response.status})`,
-        userMessage: 'El origen del archivo ha rechazado la petición del servidor.',
+        userMessage:
+          'El origen del archivo ha rechazado la petición del servidor.',
       });
     }
     if (response.status >= 400) {
@@ -618,7 +663,8 @@ export class PacksCatalogService {
           reject(
             new PayloadTooLargeException({
               message: `file exceeds ${MAX_RESOLVE_BYTES} bytes`,
-              userMessage: 'Ese archivo es demasiado grande para procesarlo (máx. 512 MB).',
+              userMessage:
+                'Ese archivo es demasiado grande para procesarlo (máx. 512 MB).',
             }),
           );
           return;
@@ -645,7 +691,10 @@ export class PacksCatalogService {
     return { sha512: hash.digest('hex'), fileSize };
   }
 
-  private async cfGet<T>(url: string, params: Record<string, string | number>): Promise<T> {
+  private async cfGet<T>(
+    url: string,
+    params: Record<string, string | number>,
+  ): Promise<T> {
     const key = this.curseforgeKey;
     const response = await firstValueFrom(
       this.http.get<T>(url, {
@@ -658,15 +707,19 @@ export class PacksCatalogService {
       this.logger.error(`API de CurseForge inalcanzable: ${asMessage(error)}`);
       throw new BadGatewayException({
         message: 'curseforge api unreachable',
-        userMessage: 'No se ha podido contactar con CurseForge. Inténtalo de nuevo.',
+        userMessage:
+          'No se ha podido contactar con CurseForge. Inténtalo de nuevo.',
       });
     });
 
     if (response.status === 401 || response.status === 403) {
-      this.logger.error(`API de CurseForge devolvió ${response.status} para ${url}`);
+      this.logger.error(
+        `API de CurseForge devolvió ${response.status} para ${url}`,
+      );
       throw new ServiceUnavailableException({
         message: `curseforge api rejected the api key (${response.status})`,
-        userMessage: 'CurseForge ha rechazado la clave del servidor. Avisa a un administrador.',
+        userMessage:
+          'CurseForge ha rechazado la clave del servidor. Avisa a un administrador.',
       });
     }
     if (response.status >= 400) {
@@ -695,7 +748,8 @@ export class PacksCatalogService {
       this.logger.error(`API de CurseForge inalcanzable: ${asMessage(error)}`);
       throw new BadGatewayException({
         message: 'curseforge api unreachable',
-        userMessage: 'No se ha podido contactar con CurseForge. Inténtalo de nuevo.',
+        userMessage:
+          'No se ha podido contactar con CurseForge. Inténtalo de nuevo.',
       });
     });
     if (response.status >= 400) {
@@ -707,7 +761,10 @@ export class PacksCatalogService {
     return response.data;
   }
 
-  private async modrinthGet<T>(url: string, params: Record<string, string | number>): Promise<T> {
+  private async modrinthGet<T>(
+    url: string,
+    params: Record<string, string | number>,
+  ): Promise<T> {
     const response = await firstValueFrom(
       this.http.get<T>(url, {
         params,
@@ -719,14 +776,16 @@ export class PacksCatalogService {
       this.logger.error(`API de Modrinth inalcanzable: ${asMessage(error)}`);
       throw new BadGatewayException({
         message: 'modrinth api unreachable',
-        userMessage: 'No se ha podido contactar con Modrinth. Inténtalo de nuevo.',
+        userMessage:
+          'No se ha podido contactar con Modrinth. Inténtalo de nuevo.',
       });
     });
 
     if (response.status === 401 || response.status === 403) {
       throw new ServiceUnavailableException({
         message: `modrinth api rejected the request (${response.status})`,
-        userMessage: 'Modrinth ha rechazado la petición del servidor. Avisa a un administrador.',
+        userMessage:
+          'Modrinth ha rechazado la petición del servidor. Avisa a un administrador.',
       });
     }
     if (response.status >= 400) {
@@ -759,7 +818,9 @@ function cfLoaderName(value: number | undefined): string | undefined {
   return Object.keys(CF_LOADER).find((name) => CF_LOADER[name] === value);
 }
 
-function modrinthRelation(value: string | undefined): ModDependencyEntity['relation'] | null {
+function modrinthRelation(
+  value: string | undefined,
+): ModDependencyEntity['relation'] | null {
   if (value === 'required') return 'required';
   if (value === 'optional') return 'optional';
   if (value === 'incompatible') return 'incompatible';
@@ -767,7 +828,9 @@ function modrinthRelation(value: string | undefined): ModDependencyEntity['relat
   return null;
 }
 
-function side(value: string | undefined): 'required' | 'optional' | 'unsupported' | 'unknown' {
+function side(
+  value: string | undefined,
+): 'required' | 'optional' | 'unsupported' | 'unknown' {
   return value === 'required' || value === 'optional' || value === 'unsupported'
     ? value
     : 'unknown';
@@ -777,15 +840,21 @@ function unique(values: string[]): string[] {
   return [...new Set(values)];
 }
 
-function primaryFile(version: ModrinthVersion): ModrinthVersionFile | undefined {
+function primaryFile(
+  version: ModrinthVersion,
+): ModrinthVersionFile | undefined {
   return version.files?.find((f) => f.primary) ?? version.files?.[0];
 }
 
-function cfReleaseType(value: number | undefined): 'release' | 'beta' | 'alpha' {
+function cfReleaseType(
+  value: number | undefined,
+): 'release' | 'beta' | 'alpha' {
   return value === 2 ? 'beta' : value === 3 ? 'alpha' : 'release';
 }
 
-function modrinthReleaseType(value: string | undefined): 'release' | 'beta' | 'alpha' {
+function modrinthReleaseType(
+  value: string | undefined,
+): 'release' | 'beta' | 'alpha' {
   return value === 'beta' ? 'beta' : value === 'alpha' ? 'alpha' : 'release';
 }
 

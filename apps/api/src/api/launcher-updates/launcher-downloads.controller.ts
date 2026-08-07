@@ -37,7 +37,9 @@ function baseUrl(req: Request): string {
   if (env.LAUNCHER_UPDATE_BASE_URL) {
     return env.LAUNCHER_UPDATE_BASE_URL.replace(/\/+$/, '');
   }
-  const proto = (req.headers['x-forwarded-proto'] as string | undefined) ?? req.protocol;
-  const host = (req.headers['x-forwarded-host'] as string | undefined) ?? req.get('host');
+  const proto =
+    (req.headers['x-forwarded-proto'] as string | undefined) ?? req.protocol;
+  const host =
+    (req.headers['x-forwarded-host'] as string | undefined) ?? req.get('host');
   return `${proto.split(',')[0]}://${host}`;
 }

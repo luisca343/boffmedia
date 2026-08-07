@@ -47,3 +47,4 @@ export const FICUSAI_REPOSITORY_TOKEN = Symbol('FICUSAI_REPOSITORY_TOKEN');
 export const NOTIFICATIONS_REPOSITORY_TOKEN = Symbol(
   'INotificationsRepository',
 );
+export const RANDOMIZER_REPOSITORY_TOKEN = Symbol('RANDOMIZER_REPOSITORY');

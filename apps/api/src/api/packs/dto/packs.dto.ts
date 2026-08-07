@@ -27,7 +27,8 @@ const LOADERS = ['forge', 'neoforge', 'fabric-loader', 'quilt-loader'] as const;
 const GAME_TYPES = ['minecraft', 'emulator', 'zomboid', 'stardew'] as const;
 
 /** Dashed lowercase UUID — the form `rotom_users.uuid` stores. */
-const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const UUID_RE =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 /** A pack's Quick Play target. Mirrors PackServer in @boffmedia/pack-schema so
  *  the stored manifest validates against the same rules the launcher enforces:
@@ -115,7 +116,9 @@ export class CreatePackDto {
   @IsIn(ACCESS_KINDS)
   accessKind!: (typeof ACCESS_KINDS)[number];
 
-  @ApiPropertyOptional({ description: 'Obligatoria cuando accessKind es "password"' })
+  @ApiPropertyOptional({
+    description: 'Obligatoria cuando accessKind es "password"',
+  })
   @IsOptional()
   @IsString()
   @MinLength(4)
@@ -174,7 +177,9 @@ export class UpdatePackDto {
   @IsIn(ACCESS_KINDS)
   accessKind?: (typeof ACCESS_KINDS)[number];
 
-  @ApiPropertyOptional({ description: 'Cadena vacía para quitar la contraseña' })
+  @ApiPropertyOptional({
+    description: 'Cadena vacía para quitar la contraseña',
+  })
   @IsOptional()
   @IsString()
   password?: string;
@@ -306,9 +311,20 @@ const PLATFORMS = ['curseforge', 'modrinth'] as const;
 const CATALOG_LOADERS = ['forge', 'neoforge', 'fabric', 'quilt'] as const;
 /** A pack ships more than jars, and each platform files these separately. */
 const PROJECT_TYPES = ['mod', 'resourcepack', 'shader', 'datapack'] as const;
-const CATALOG_SORTS = ['relevance', 'downloads', 'updated', 'name', 'follows'] as const;
+const CATALOG_SORTS = [
+  'relevance',
+  'downloads',
+  'updated',
+  'name',
+  'follows',
+] as const;
 /** The manifest's loader ids — NOT the catalog ones. */
-const META_LOADERS = ['forge', 'neoforge', 'fabric-loader', 'quilt-loader'] as const;
+const META_LOADERS = [
+  'forge',
+  'neoforge',
+  'fabric-loader',
+  'quilt-loader',
+] as const;
 
 export class CatalogSearchQueryDto {
   @ApiProperty({ enum: PLATFORMS })
@@ -358,7 +374,8 @@ export class CatalogSearchQueryDto {
   sort?: (typeof CATALOG_SORTS)[number];
 
   @ApiPropertyOptional({
-    description: 'Id de categoría de CurseForge, o nombre de categoría de Modrinth',
+    description:
+      'Id de categoría de CurseForge, o nombre de categoría de Modrinth',
   })
   @IsOptional()
   @IsString()
@@ -461,7 +478,9 @@ export class UrlSourceDto {
 
   @ApiProperty({ example: 'https://example.com/mod.jar' })
   @IsString()
-  @Matches(/^https?:\/\//i, { message: 'La URL debe empezar por http:// o https://' })
+  @Matches(/^https?:\/\//i, {
+    message: 'La URL debe empezar por http:// o https://',
+  })
   @MaxLength(2048)
   url!: string;
 }
@@ -504,7 +523,9 @@ export class VerifyJoinDto {
   @MaxLength(32)
   username!: string;
 
-  @ApiProperty({ description: 'El serverId devuelto por /packs/auth/challenge' })
+  @ApiProperty({
+    description: 'El serverId devuelto por /packs/auth/challenge',
+  })
   @IsString()
   @MinLength(8)
   @MaxLength(64)
@@ -512,7 +533,9 @@ export class VerifyJoinDto {
 }
 
 export class ManifestQueryDto {
-  @ApiPropertyOptional({ description: 'Solo para packs protegidos con contraseña' })
+  @ApiPropertyOptional({
+    description: 'Solo para packs protegidos con contraseña',
+  })
   @IsOptional()
   @IsString()
   password?: string;

@@ -20,7 +20,8 @@
       "mangaConfig": "Config",
       "launcher": "Launcher",
       "packs": "Packs",
-      "releases": "Releases"
+      "releases": "Releases",
+      "randomizer": "Randomizer"
     },
     "crud": {
       "count": "{count} {plural}",
@@ -997,6 +998,235 @@
     "pipelineActive": "Active",
     "pipelineQueued": "Queued",
     "from": "from"
+  },
+  "randomizer": {
+    "title": "Randomizer Manager",
+    "desc": "Manage Randomizer presets, events, and assignments for competitive runs.",
+    "tabs": {
+      "traits": "Traits",
+      "starters": "Starters/Static/Trades",
+      "moves": "Moves",
+      "foes": "Foes",
+      "wild": "Wild",
+      "tmhm": "TM/HM/Tutors",
+      "items": "Items",
+      "types": "Types",
+      "graphics": "Graphics",
+      "misc": "Misc Settings"
+    },
+    "chrome": {
+      "presets": "Presets",
+      "editor": "Editor",
+      "loadPreset": "Load preset…",
+      "newPreset": "New preset",
+      "importRnqs": "Import .rnqs",
+      "exportRnqs": "Export .rnqs",
+      "save": "Save",
+      "cancel": "Cancel",
+      "dryRun": "Dry-run",
+      "gameSelector": "Game selector",
+      "selectGame": "Select a game…",
+      "generalOptions": "General options",
+      "limitPokemon": "Limit Pokémon",
+      "banIrregularAltFormes": "Ban irregular alternate forms",
+      "banPrematureEvos": "Ban premature evolutions",
+      "randomizeIntroMon": "Randomize intro Pokémon",
+      "raceMode": "Race mode",
+      "limitPokemonModal": "Limit Pokémon settings",
+      "limitPokemonDesc": "Select generations and restrictions",
+      "dryRunDropZone": "Drop .gba/.nds ROM here",
+      "loadingPresets": "Loading presets…",
+      "searchPresets": "Search presets…",
+      "noPresets": "No presets",
+      "noPresetsDesc": "Create or import a preset to get started",
+      "load": "Load",
+      "presetDeleted": "Preset deleted",
+      "deleteError": "Failed to delete preset",
+      "errorLoadingPresets": "Failed to load presets",
+      "refresh": "Refresh",
+      "validationError": "Validation error",
+      "dirty": "Unsaved changes"
+    },
+    "panels": {
+      "baseStatistics": "Pokemon Base Statistics",
+      "baseStatisticsMode": "Base Statistics Mode",
+      "bstMode": "BST Mode",
+      "types": "Pokemon Types",
+      "typesMode": "Species Types Mode",
+      "abilities": "Pokemon Abilities",
+      "abilitiesMode": "Abilities Mode",
+      "evolutions": "Pokemon Evolutions",
+      "evolutionsMode": "Evolutions Mode",
+      "expCurves": "EXP Curves",
+      "expCurveMode": "EXP Curve Mode"
+    },
+    "opt": {
+      "baseStatisticsMod": {
+        "UNCHANGED": "Unchanged",
+        "SHUFFLE": "Shuffle",
+        "RANDOM": "Random"
+      },
+      "bstMod": {
+        "UNCHANGED": "Unchanged",
+        "RANDOM_BUFF_NERF": "Random Buff/Nerf",
+        "SHUFFLE": "Shuffle",
+        "RANDOM": "Random"
+      },
+      "baseStatsFollowEvolutions": {
+        "label": "Base Stats Follow Evolutions",
+        "tip": "Make evolution stats follow base stats changes"
+      },
+      "baseStatsFollowMegaEvolutions": {
+        "label": "Base Stats Follow Mega Evolutions",
+        "tip": "Make mega evolution stats follow base stats changes"
+      },
+      "assignEvoStatsRandomly": {
+        "label": "Assign Evolution Stats Randomly",
+        "tip": "Randomly assign stats for evolved forms"
+      },
+      "updateBaseStats": {
+        "label": "Update Base Stats",
+        "tip": "Update base stats to a specific generation"
+      },
+      "updateBaseStatsToGeneration": {
+        "label": "Update Base Stats to Generation",
+        "tip": "Select the target generation for base stats updates"
+      },
+      "bstFollowEvolutions": {
+        "label": "BST Follow Evolutions",
+        "tip": "Make evolution BST changes follow evolution stats"
+      },
+      "bstShuffleSwapLegendaries": {
+        "label": "BST Shuffle Swap Legendaries",
+        "tip": "Treat legendaries specially during BST shuffle"
+      },
+      "speciesTypesMod": {
+        "UNCHANGED": "Unchanged",
+        "RANDOM_FOLLOW_EVOLUTIONS": "Random Follow Evolutions",
+        "COMPLETELY_RANDOM": "Completely Random"
+      },
+      "typesFollowMegaEvolutions": {
+        "label": "Types Follow Mega Evolutions",
+        "tip": "Make mega evolution types follow base types"
+      },
+      "dualTypeOnly": {
+        "label": "Dual Type Only",
+        "tip": "Only allow dual-type pokemon"
+      },
+      "abilitiesMod": {
+        "UNCHANGED": "Unchanged",
+        "RANDOMIZE": "Randomize"
+      },
+      "allowWonderGuard": {
+        "label": "Allow Wonder Guard",
+        "tip": "Allow Wonder Guard ability in randomization"
+      },
+      "banBadAbilities": {
+        "label": "Ban Bad Abilities",
+        "tip": "Prevent weak abilities from being assigned"
+      },
+      "banTrappingAbilities": {
+        "label": "Ban Trapping Abilities",
+        "tip": "Prevent trapping abilities like Mean Look"
+      },
+      "banNegativeAbilities": {
+        "label": "Ban Negative Abilities",
+        "tip": "Prevent abilities with negative effects"
+      },
+      "weighDuplicateAbilitiesTogether": {
+        "label": "Weigh Duplicate Abilities Together",
+        "tip": "Treat duplicate abilities as one option"
+      },
+      "abilitiesFollowEvolutions": {
+        "label": "Abilities Follow Evolutions",
+        "tip": "Make evolution abilities follow base abilities"
+      },
+      "abilitiesFollowMegaEvolutions": {
+        "label": "Abilities Follow Mega Evolutions",
+        "tip": "Make mega evolution abilities follow base abilities"
+      },
+      "evolutionsMod": {
+        "UNCHANGED": "Unchanged",
+        "RANDOM": "Random",
+        "RANDOM_EVERY_LEVEL": "Random Every Level"
+      },
+      "evosAllowAltFormes": {
+        "label": "Evolutions Allow Alternate Formes",
+        "tip": "Allow alternate formes in evolution chains"
+      },
+      "evosForceChange": {
+        "label": "Evolutions Force Change",
+        "tip": "Force all pokemon to have different evolved forms"
+      },
+      "changeImpossibleEvolutions": {
+        "label": "Change Impossible Evolutions",
+        "tip": "Replace impossible evolutions with alternatives"
+      },
+      "makeEvolutionsEasier": {
+        "label": "Make Evolutions Easier",
+        "tip": "Reduce evolution requirements"
+      },
+      "evosMaxThreeStages": {
+        "label": "Evolutions Max Three Stages",
+        "tip": "Limit evolution chains to 3 stages maximum"
+      },
+      "evosForceGrowth": {
+        "label": "Evolutions Force Growth",
+        "tip": "Force evolution growth in randomized forms"
+      },
+      "evosNoConvergence": {
+        "label": "Evolutions No Convergence",
+        "tip": "Prevent multiple pokemon from evolving into the same form"
+      },
+      "evosSameTyping": {
+        "label": "Evolutions Same Typing",
+        "tip": "Keep evolution types similar to base forms"
+      },
+      "evosSimilarStrength": {
+        "label": "Evolutions Similar Strength",
+        "tip": "Keep evolution stats similar to base stats"
+      },
+      "removeTimeBasedEvolutions": {
+        "label": "Remove Time-Based Evolutions",
+        "tip": "Replace time-based evolutions with alternatives"
+      },
+      "adjustEvolutionLevels": {
+        "label": "Adjust Evolution Levels",
+        "tip": "Randomize evolution level requirements"
+      },
+      "expCurveMod": {
+        "LEGENDARIES": "Legendaries",
+        "STRONG_LEGENDARIES": "Strong Legendaries",
+        "ALL": "All"
+      },
+      "standardizeEXPCurves": {
+        "label": "Standardize EXP Curves",
+        "tip": "Use a single EXP curve for selected pokemon"
+      },
+      "selectedEXPCurve": {
+        "label": "Selected EXP Curve",
+        "tip": "Choose which EXP curve to standardize to"
+      },
+      "generations": {
+        "gen1": "Generation 1",
+        "gen2": "Generation 2",
+        "gen3": "Generation 3",
+        "gen4": "Generation 4",
+        "gen5": "Generation 5",
+        "gen6": "Generation 6",
+        "gen7": "Generation 7",
+        "gen8": "Generation 8",
+        "gen9": "Generation 9"
+      },
+      "expCurves": {
+        "FLAT": "Flat",
+        "MEDIUM_FAST": "Medium Fast",
+        "MEDIUM_SLOW": "Medium Slow",
+        "SLOW": "Slow",
+        "FAST": "Fast",
+        "SLOW_THEN_VERY_FAST": "Slow then Very Fast"
+      }
+    }
   },
   "validation": {
     "titleMin": "Title must be at least 3 characters",

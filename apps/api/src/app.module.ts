@@ -71,6 +71,7 @@ import { WigglypopModule } from '@api/smartrotom/wigglypop/wigglypop.module';
 import { TaxiModule } from '@api/smartrotom/taxi/taxi.module';
 import { PacksModule } from './api/packs/packs.module';
 import { LauncherUpdatesModule } from './api/launcher-updates/launcher-updates.module';
+import { RandomizerModule } from '@api/randomizer/randomizer.module';
 
 @Module({
   imports: [
@@ -142,6 +143,7 @@ import { LauncherUpdatesModule } from './api/launcher-updates/launcher-updates.m
     TaxiModule,
     PacksModule,
     LauncherUpdatesModule,
+    RandomizerModule,
   ],
   controllers: [AppController],
   providers: [

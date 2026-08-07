@@ -28,7 +28,9 @@ export class PacksRepository {
    * the launcher's serde, `PackManifest.safeParse` — ever sees a string where it
    * expects `{ url, alt }[]`.
    */
-  private hydratePack<T extends { gallery?: unknown; server?: unknown }>(row: T): T {
+  private hydratePack<T extends { gallery?: unknown; server?: unknown }>(
+    row: T,
+  ): T {
     let out = row;
     if (typeof out.gallery === 'string') {
       out = { ...out, gallery: JSON.parse(out.gallery) as unknown[] };
@@ -43,12 +45,20 @@ export class PacksRepository {
   }
 
   async findById(id: string): Promise<Pack | null> {
-    const [row] = await this.db.select().from(packs).where(eq(packs.id, id)).limit(1);
+    const [row] = await this.db
+      .select()
+      .from(packs)
+      .where(eq(packs.id, id))
+      .limit(1);
     return row ? this.hydratePack(row) : null;
   }
 
   async findBySlug(slug: string): Promise<Pack | null> {
-    const [row] = await this.db.select().from(packs).where(eq(packs.slug, slug)).limit(1);
+    const [row] = await this.db
+      .select()
+      .from(packs)
+      .where(eq(packs.slug, slug))
+      .limit(1);
     return row ? this.hydratePack(row) : null;
   }
 
@@ -86,7 +96,10 @@ export class PacksRepository {
         updatedAt: packs.updatedAt,
       })
       .from(packs)
-      .leftJoin(packAcl, and(eq(packAcl.packId, packs.id), eq(packAcl.uuid, uuid)))
+      .leftJoin(
+        packAcl,
+        and(eq(packAcl.packId, packs.id), eq(packAcl.uuid, uuid)),
+      )
       .where(
         and(
           eq(packs.archived, false),
@@ -104,7 +117,10 @@ export class PacksRepository {
     await this.db.insert(packs).values(row);
   }
 
-  async updatePack(id: string, patch: Partial<typeof packs.$inferInsert>): Promise<void> {
+  async updatePack(
+    id: string,
+    patch: Partial<typeof packs.$inferInsert>,
+  ): Promise<void> {
     await this.db.update(packs).set(patch).where(eq(packs.id, id));
   }
 
@@ -128,13 +144,22 @@ export class PacksRepository {
     // Same MariaDB-returns-json-as-string trap as files/worlds, for the
     // per-game spec blocks and first-install-only files.
     if (typeof hydrated.emulator === 'string') {
-      hydrated.emulator = JSON.parse(hydrated.emulator) as Record<string, unknown>;
+      hydrated.emulator = JSON.parse(hydrated.emulator) as Record<
+        string,
+        unknown
+      >;
     }
     if (typeof hydrated.zomboid === 'string') {
-      hydrated.zomboid = JSON.parse(hydrated.zomboid) as Record<string, unknown>;
+      hydrated.zomboid = JSON.parse(hydrated.zomboid) as Record<
+        string,
+        unknown
+      >;
     }
     if (typeof hydrated.stardew === 'string') {
-      hydrated.stardew = JSON.parse(hydrated.stardew) as Record<string, unknown>;
+      hydrated.stardew = JSON.parse(hydrated.stardew) as Record<
+        string,
+        unknown
+      >;
     }
     if (typeof hydrated.initialFiles === 'string') {
       hydrated.initialFiles = JSON.parse(hydrated.initialFiles) as unknown[];
@@ -164,8 +189,14 @@ export class PacksRepository {
     await this.db.insert(packVersions).values(row);
   }
 
-  async updateVersion(id: string, patch: Partial<NewPackVersion>): Promise<void> {
-    await this.db.update(packVersions).set(patch).where(eq(packVersions.id, id));
+  async updateVersion(
+    id: string,
+    patch: Partial<NewPackVersion>,
+  ): Promise<void> {
+    await this.db
+      .update(packVersions)
+      .set(patch)
+      .where(eq(packVersions.id, id));
   }
 
   async deleteVersion(id: string): Promise<void> {
@@ -270,7 +301,10 @@ export class PacksRepository {
           eq(packInvites.code, code),
           eq(packInvites.revoked, false),
           sql`${packInvites.uses} < ${packInvites.maxUses}`,
-          or(isNull(packInvites.expiresAt), sql`${packInvites.expiresAt} > CURRENT_TIMESTAMP()`),
+          or(
+            isNull(packInvites.expiresAt),
+            sql`${packInvites.expiresAt} > CURRENT_TIMESTAMP()`,
+          ),
         ),
       );
     // 0 rows means one of the guards in the WHERE rejected it — expired,
@@ -279,7 +313,10 @@ export class PacksRepository {
   }
 
   async revokeInvite(code: string): Promise<void> {
-    await this.db.update(packInvites).set({ revoked: true }).where(eq(packInvites.code, code));
+    await this.db
+      .update(packInvites)
+      .set({ revoked: true })
+      .where(eq(packInvites.code, code));
   }
 
   // ── Audit ────────────────────────────────────────────────────────────────
@@ -290,7 +327,9 @@ export class PacksRepository {
     uuid: string | null,
     meta?: Record<string, unknown>,
   ): Promise<void> {
-    await this.db.insert(packAudit).values({ action, packId, uuid, meta: meta ?? null });
+    await this.db
+      .insert(packAudit)
+      .values({ action, packId, uuid, meta: meta ?? null });
   }
 
   async listAudit(packId: string, limit: number) {

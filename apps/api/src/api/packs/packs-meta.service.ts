@@ -1,7 +1,10 @@
 import { HttpService } from '@nestjs/axios';
 import { BadGatewayException, Injectable, Logger } from '@nestjs/common';
 import { firstValueFrom } from 'rxjs';
-import type { GameVersionEntity, LoaderVersionEntity } from './entities/packs.entity';
+import type {
+  GameVersionEntity,
+  LoaderVersionEntity,
+} from './entities/packs.entity';
 
 // Version autocompletion. Every list here comes from an upstream that is slow,
 // rate-limited or both, and none of them change more than a few times a day, so
@@ -9,10 +12,12 @@ import type { GameVersionEntity, LoaderVersionEntity } from './entities/packs.en
 // these upstreams directly: Forge and NeoForge serve maven metadata as XML with
 // no CORS headers.
 
-const PISTON_MANIFEST = 'https://piston-meta.mojang.com/mc/game/version_manifest_v2.json';
+const PISTON_MANIFEST =
+  'https://piston-meta.mojang.com/mc/game/version_manifest_v2.json';
 const FABRIC_META = 'https://meta.fabricmc.net/v2';
 const QUILT_META = 'https://meta.quiltmc.org/v3';
-const NEOFORGE_MAVEN = 'https://maven.neoforged.net/api/maven/versions/releases';
+const NEOFORGE_MAVEN =
+  'https://maven.neoforged.net/api/maven/versions/releases';
 const FORGE_METADATA =
   'https://maven.minecraftforge.net/net/minecraftforge/forge/maven-metadata.xml';
 const FORGE_PROMOTIONS =
@@ -58,14 +63,21 @@ export class PacksMetaService {
   }
 
   /** `loader` is the MANIFEST id ("fabric-loader"), not the catalog id. */
-  async loaderVersions(loader: string, minecraft: string): Promise<LoaderVersionEntity[]> {
+  async loaderVersions(
+    loader: string,
+    minecraft: string,
+  ): Promise<LoaderVersionEntity[]> {
     const key = `loader:${loader}:${minecraft}`;
     return this.cached(key, async () => {
       switch (loader) {
         case 'fabric-loader':
-          return this.fabricLike(`${FABRIC_META}/versions/loader/${encodeURIComponent(minecraft)}`);
+          return this.fabricLike(
+            `${FABRIC_META}/versions/loader/${encodeURIComponent(minecraft)}`,
+          );
         case 'quilt-loader':
-          return this.fabricLike(`${QUILT_META}/versions/loader/${encodeURIComponent(minecraft)}`);
+          return this.fabricLike(
+            `${QUILT_META}/versions/loader/${encodeURIComponent(minecraft)}`,
+          );
         case 'neoforge':
           return this.neoforge(minecraft);
         case 'forge':
@@ -82,7 +94,9 @@ export class PacksMetaService {
     let stableSeen = false;
     return (entries ?? [])
       .map((e) => e.loader)
-      .filter((l): l is NonNullable<FabricLoaderEntry['loader']> => Boolean(l?.version))
+      .filter((l): l is NonNullable<FabricLoaderEntry['loader']> =>
+        Boolean(l?.version),
+      )
       .map((l, index) => {
         // Fabric publishes `stable`; Quilt does not, so fall back to the version
         // string — without this every Quilt build would look unstable.
@@ -133,9 +147,10 @@ export class PacksMetaService {
   private async forge(minecraft: string): Promise<LoaderVersionEntity[]> {
     const [xml, promos] = await Promise.all([
       this.getText(FORGE_METADATA),
-      this.getJson<{ promos?: Record<string, string> }>(FORGE_PROMOTIONS, {}).catch(
-        (): { promos?: Record<string, string> } => ({}),
-      ),
+      this.getJson<{ promos?: Record<string, string> }>(
+        FORGE_PROMOTIONS,
+        {},
+      ).catch((): { promos?: Record<string, string> } => ({})),
     ]);
 
     const prefix = `${minecraft}-`;
@@ -173,7 +188,10 @@ export class PacksMetaService {
     return promise;
   }
 
-  private async getJson<T>(url: string, params: Record<string, string>): Promise<T> {
+  private async getJson<T>(
+    url: string,
+    params: Record<string, string>,
+  ): Promise<T> {
     const response = await firstValueFrom(
       this.http.get<T>(url, {
         params,
@@ -182,10 +200,13 @@ export class PacksMetaService {
         validateStatus: () => true,
       }),
     ).catch((error: unknown) => {
-      this.logger.error(`Metadatos inalcanzables en ${url}: ${asMessage(error)}`);
+      this.logger.error(
+        `Metadatos inalcanzables en ${url}: ${asMessage(error)}`,
+      );
       throw new BadGatewayException({
         message: 'version metadata source unreachable',
-        userMessage: 'No se han podido cargar las versiones. Inténtalo de nuevo.',
+        userMessage:
+          'No se han podido cargar las versiones. Inténtalo de nuevo.',
       });
     });
     if (response.status >= 400) {
@@ -205,10 +226,13 @@ export class PacksMetaService {
         validateStatus: () => true,
       }),
     ).catch((error: unknown) => {
-      this.logger.error(`Metadatos inalcanzables en ${url}: ${asMessage(error)}`);
+      this.logger.error(
+        `Metadatos inalcanzables en ${url}: ${asMessage(error)}`,
+      );
       throw new BadGatewayException({
         message: 'version metadata source unreachable',
-        userMessage: 'No se han podido cargar las versiones. Inténtalo de nuevo.',
+        userMessage:
+          'No se han podido cargar las versiones. Inténtalo de nuevo.',
       });
     });
     if (response.status >= 400 || typeof response.data !== 'string') {
@@ -221,8 +245,12 @@ export class PacksMetaService {
   }
 }
 
-function gameVersionType(value: string): 'release' | 'snapshot' | 'old_beta' | 'old_alpha' {
-  return value === 'release' || value === 'snapshot' || value === 'old_beta' ? value : 'old_alpha';
+function gameVersionType(
+  value: string,
+): 'release' | 'snapshot' | 'old_beta' | 'old_alpha' {
+  return value === 'release' || value === 'snapshot' || value === 'old_beta'
+    ? value
+    : 'old_alpha';
 }
 
 function asMessage(error: unknown): string {

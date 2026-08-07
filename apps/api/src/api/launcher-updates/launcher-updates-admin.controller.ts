@@ -56,7 +56,7 @@ export class LauncherUpdatesAdminController {
   @ApiOperation({
     summary: 'Subir el bundle de una versión',
     description:
-       'Cuerpo binario en crudo (application/octet-stream), sin multipart: `express.json()` está condicionado al content-type, así que el cuerpo llega sin consumir y va directo a disco. La firma viaja en la cabecera X-Updater-Signature y el nombre del archivo en X-Artifact-Filename; la extensión es significativa (.msi, .exe, .msi.zip, .nsis.zip, .AppImage.tar.gz) porque el updater elige su estrategia de instalación a partir de ella. El sha512 lo calcula el servidor. Re-subir la misma versión+plataforma reemplaza el artefacto. La release nace en borrador: hay que publicarla aparte.',
+      'Cuerpo binario en crudo (application/octet-stream), sin multipart: `express.json()` está condicionado al content-type, así que el cuerpo llega sin consumir y va directo a disco. La firma viaja en la cabecera X-Updater-Signature y el nombre del archivo en X-Artifact-Filename; la extensión es significativa (.msi, .exe, .msi.zip, .nsis.zip, .AppImage.tar.gz) porque el updater elige su estrategia de instalación a partir de ella. El sha512 lo calcula el servidor. Re-subir la misma versión+plataforma reemplaza el artefacto. La release nace en borrador: hay que publicarla aparte.',
   })
   @ApiConsumes('application/octet-stream')
   @ApiHeader({
@@ -97,7 +97,9 @@ export class LauncherUpdatesAdminController {
       'Hasta aquí es borrador: subir el bundle de Windows no debe ofrecer la actualización a máquinas cuyo bundle todavía no está subido.',
   })
   @ApiResponse({ status: HttpStatus.OK, type: LauncherReleaseEntity })
-  async publish(@Param('id', ParseIntPipe) id: number): Promise<LauncherReleaseEntity> {
+  async publish(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<LauncherReleaseEntity> {
     return this.updates.setPublished(id, true);
   }
 
@@ -105,16 +107,21 @@ export class LauncherUpdatesAdminController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Despublicar una release',
-    description: 'La saca del feed. Los launchers que ya se actualizaron no vuelven atrás.',
+    description:
+      'La saca del feed. Los launchers que ya se actualizaron no vuelven atrás.',
   })
   @ApiResponse({ status: HttpStatus.OK, type: LauncherReleaseEntity })
-  async unpublish(@Param('id', ParseIntPipe) id: number): Promise<LauncherReleaseEntity> {
+  async unpublish(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<LauncherReleaseEntity> {
     return this.updates.setPublished(id, false);
   }
 
   @Delete(':id')
   @ApiOperation({ summary: 'Borrar una release y su artefacto' })
-  async remove(@Param('id', ParseIntPipe) id: number): Promise<{ success: true }> {
+  async remove(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<{ success: true }> {
     await this.updates.remove(id);
     return { success: true };
   }

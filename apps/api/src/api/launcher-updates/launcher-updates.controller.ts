@@ -7,7 +7,12 @@ import {
   Res,
   StreamableFile,
 } from '@nestjs/common';
-import { ApiExcludeEndpoint, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiExcludeEndpoint,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import type { Request, Response } from 'express';
 import { Public } from '@api/_utils/decorators/public.decorator';
 import { SkipEnvelope } from '@/common/decorators/skip-envelope.decorator';
@@ -38,7 +43,10 @@ export class LauncherUpdatesController {
       'Configúralo en tauri.conf.json como `.../launcher/updates/{{target}}-{{arch}}/{{current_version}}`. Devuelve 204 sin cuerpo cuando ya está actualizado, y el JSON de Tauri v2 (version, notes, pub_date, platforms) cuando hay algo más nuevo. Sin sobre `{success,data}`: Tauri deserializa el cuerpo tal cual.',
   })
   @ApiResponse({ status: HttpStatus.OK, type: UpdaterFeedEntity })
-  @ApiResponse({ status: HttpStatus.NO_CONTENT, description: 'Ya está actualizado' })
+  @ApiResponse({
+    status: HttpStatus.NO_CONTENT,
+    description: 'Ya está actualizado',
+  })
   async feed(
     @Param('target') target: string,
     @Param('currentVersion') currentVersion: string,
@@ -104,7 +112,9 @@ function baseUrl(req: Request): string {
   if (env.LAUNCHER_UPDATE_BASE_URL) {
     return env.LAUNCHER_UPDATE_BASE_URL.replace(/\/+$/, '');
   }
-  const proto = (req.headers['x-forwarded-proto'] as string | undefined) ?? req.protocol;
-  const host = (req.headers['x-forwarded-host'] as string | undefined) ?? req.get('host');
+  const proto =
+    (req.headers['x-forwarded-proto'] as string | undefined) ?? req.protocol;
+  const host =
+    (req.headers['x-forwarded-host'] as string | undefined) ?? req.get('host');
   return `${proto.split(',')[0]}://${host}`;
 }

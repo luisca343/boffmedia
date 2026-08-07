@@ -62,7 +62,7 @@ export type Namespace = (typeof ALL_NAMESPACES)[number];
 
 /** Top-level message keys each file contributes — used by check:i18n to verify scoping. */
 export const NAMESPACE_ROOTS: Record<Namespace, readonly string[]> = {
-  "admin.json": ["admin","tournaments","data","validation"],
+  "admin.json": ["admin","tournaments","data","randomizer","validation"],
   "auth.json": ["auth"],
   "battlesim.json": ["battlesim"],
   "boffmedia.json": ["boffmedia"],

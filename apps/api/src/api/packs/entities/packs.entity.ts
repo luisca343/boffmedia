@@ -46,7 +46,10 @@ export class LauncherPackEntity {
   @ApiProperty() id!: string;
   @ApiProperty() slug!: string;
   @ApiProperty() name!: string;
-  @ApiProperty({ enum: GAME_TYPES, description: 'Resuelto: NULL en BD → minecraft' })
+  @ApiProperty({
+    enum: GAME_TYPES,
+    description: 'Resuelto: NULL en BD → minecraft',
+  })
   gameType!: (typeof GAME_TYPES)[number];
   @ApiPropertyOptional({ nullable: true }) summary!: string | null;
   @ApiPropertyOptional({ nullable: true }) description!: string | null;
@@ -71,7 +74,10 @@ export class AdminPackEntity {
   @ApiProperty() id!: string;
   @ApiProperty() slug!: string;
   @ApiProperty() name!: string;
-  @ApiProperty({ enum: GAME_TYPES, description: 'Resuelto: NULL en BD → minecraft' })
+  @ApiProperty({
+    enum: GAME_TYPES,
+    description: 'Resuelto: NULL en BD → minecraft',
+  })
   gameType!: (typeof GAME_TYPES)[number];
   @ApiPropertyOptional({ nullable: true }) summary!: string | null;
   @ApiPropertyOptional({ nullable: true }) iconUrl!: string | null;
@@ -134,10 +140,14 @@ export class ModSearchHitEntity {
   @ApiProperty({ type: [String] }) categories!: string[];
   @ApiPropertyOptional({ description: 'ISO-8601' }) updatedAt?: string;
 
-  @ApiPropertyOptional({ enum: ['required', 'optional', 'unsupported', 'unknown'] })
+  @ApiPropertyOptional({
+    enum: ['required', 'optional', 'unsupported', 'unknown'],
+  })
   clientSide?: 'required' | 'optional' | 'unsupported' | 'unknown';
 
-  @ApiPropertyOptional({ enum: ['required', 'optional', 'unsupported', 'unknown'] })
+  @ApiPropertyOptional({
+    enum: ['required', 'optional', 'unsupported', 'unknown'],
+  })
   serverSide?: 'required' | 'optional' | 'unsupported' | 'unknown';
 }
 

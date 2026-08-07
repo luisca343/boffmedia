@@ -20,7 +20,8 @@
       "mangaConfig": "Config",
       "launcher": "Launcher",
       "packs": "Packs",
-      "releases": "Releases"
+      "releases": "Releases",
+      "randomizer": "Randomizer"
     },
     "crud": {
       "count": "{count} {plural}",
@@ -997,6 +998,235 @@
     "pipelineActive": "Activo",
     "pipelineQueued": "En cola",
     "from": "desde"
+  },
+  "randomizer": {
+    "title": "Gestor de Randomizer",
+    "desc": "Administra presets de Randomizer, eventos y asignaciones para carreras competitivas.",
+    "tabs": {
+      "traits": "Rasgos",
+      "starters": "Iniciales/Estáticos/Intercambios",
+      "moves": "Movimientos",
+      "foes": "Rivales",
+      "wild": "Salvajes",
+      "tmhm": "MT/MO/Tutores",
+      "items": "Objetos",
+      "types": "Tipos",
+      "graphics": "Gráficos",
+      "misc": "Ajustes varios"
+    },
+    "chrome": {
+      "presets": "Presets",
+      "editor": "Editor",
+      "loadPreset": "Cargar preset…",
+      "newPreset": "Nuevo preset",
+      "importRnqs": "Importar .rnqs",
+      "exportRnqs": "Exportar .rnqs",
+      "save": "Guardar",
+      "cancel": "Cancelar",
+      "dryRun": "Dry-run",
+      "gameSelector": "Selector de juego",
+      "selectGame": "Selecciona un juego…",
+      "generalOptions": "Opciones generales",
+      "limitPokemon": "Limitar Pokémon",
+      "banIrregularAltFormes": "Prohibir formas alternativas irregulares",
+      "banPrematureEvos": "Prohibir evoluciones prematuras",
+      "randomizeIntroMon": "Aleatorizar Pokémon intro",
+      "raceMode": "Modo carrera",
+      "limitPokemonModal": "Configuración de Límite Pokémon",
+      "limitPokemonDesc": "Selecciona generaciones y restricciones",
+      "dryRunDropZone": "Arrastra aquí .gba/.nds ROM",
+      "loadingPresets": "Cargando presets…",
+      "searchPresets": "Buscar presets…",
+      "noPresets": "Sin presets",
+      "noPresetsDesc": "Crea o importa un preset para comenzar",
+      "load": "Cargar",
+      "presetDeleted": "Preset eliminado",
+      "deleteError": "Error al eliminar preset",
+      "errorLoadingPresets": "Error al cargar presets",
+      "refresh": "Actualizar",
+      "validationError": "Error de validación",
+      "dirty": "Cambios sin guardar"
+    },
+    "panels": {
+      "baseStatistics": "Estadísticas Base de Pokémon",
+      "baseStatisticsMode": "Modo Estadísticas Base",
+      "bstMode": "Modo BST",
+      "types": "Tipos de Pokémon",
+      "typesMode": "Modo Tipos de Especie",
+      "abilities": "Habilidades de Pokémon",
+      "abilitiesMode": "Modo Habilidades",
+      "evolutions": "Evoluciones de Pokémon",
+      "evolutionsMode": "Modo Evoluciones",
+      "expCurves": "Curvas de Experiencia",
+      "expCurveMode": "Modo Curva de Experiencia"
+    },
+    "opt": {
+      "baseStatisticsMod": {
+        "UNCHANGED": "Sin cambios",
+        "SHUFFLE": "Barajar",
+        "RANDOM": "Aleatorio"
+      },
+      "bstMod": {
+        "UNCHANGED": "Sin cambios",
+        "RANDOM_BUFF_NERF": "Buff/Nerf Aleatorio",
+        "SHUFFLE": "Barajar",
+        "RANDOM": "Aleatorio"
+      },
+      "baseStatsFollowEvolutions": {
+        "label": "Estadísticas Base Siguen Evoluciones",
+        "tip": "Hacer que las estadísticas de evolución sigan los cambios de estadísticas base"
+      },
+      "baseStatsFollowMegaEvolutions": {
+        "label": "Estadísticas Base Siguen Megaevoluciones",
+        "tip": "Hacer que las estadísticas de megaevolución sigan los cambios de estadísticas base"
+      },
+      "assignEvoStatsRandomly": {
+        "label": "Asignar Estadísticas de Evolución Aleatoriamente",
+        "tip": "Asignar aleatoriamente estadísticas para formas evolucionadas"
+      },
+      "updateBaseStats": {
+        "label": "Actualizar Estadísticas Base",
+        "tip": "Actualizar estadísticas base a una generación específica"
+      },
+      "updateBaseStatsToGeneration": {
+        "label": "Actualizar Estadísticas Base a Generación",
+        "tip": "Selecciona la generación objetivo para las actualizaciones de estadísticas base"
+      },
+      "bstFollowEvolutions": {
+        "label": "BST Sigue Evoluciones",
+        "tip": "Hacer que los cambios de BST de evolución sigan las estadísticas de evolución"
+      },
+      "bstShuffleSwapLegendaries": {
+        "label": "BST Barajar Intercambiar Legendarios",
+        "tip": "Tratar legendarios especialmente durante el barajado de BST"
+      },
+      "speciesTypesMod": {
+        "UNCHANGED": "Sin cambios",
+        "RANDOM_FOLLOW_EVOLUTIONS": "Aleatorio Siguiendo Evoluciones",
+        "COMPLETELY_RANDOM": "Completamente Aleatorio"
+      },
+      "typesFollowMegaEvolutions": {
+        "label": "Tipos Siguen Megaevoluciones",
+        "tip": "Hacer que los tipos de megaevolución sigan los tipos base"
+      },
+      "dualTypeOnly": {
+        "label": "Solo Tipo Dual",
+        "tip": "Permitir solo pokémon de tipo dual"
+      },
+      "abilitiesMod": {
+        "UNCHANGED": "Sin cambios",
+        "RANDOMIZE": "Aleatorizar"
+      },
+      "allowWonderGuard": {
+        "label": "Permitir Manto Espectral",
+        "tip": "Permitir la habilidad Manto Espectral en la aleatorización"
+      },
+      "banBadAbilities": {
+        "label": "Prohibir Habilidades Malas",
+        "tip": "Prevenir que se asignen habilidades débiles"
+      },
+      "banTrappingAbilities": {
+        "label": "Prohibir Habilidades de Atrapamiento",
+        "tip": "Prevenir habilidades de atrapamiento como Mirada Malvada"
+      },
+      "banNegativeAbilities": {
+        "label": "Prohibir Habilidades Negativas",
+        "tip": "Prevenir habilidades con efectos negativos"
+      },
+      "weighDuplicateAbilitiesTogether": {
+        "label": "Ponderar Habilidades Duplicadas Juntas",
+        "tip": "Tratar habilidades duplicadas como una opción"
+      },
+      "abilitiesFollowEvolutions": {
+        "label": "Habilidades Siguen Evoluciones",
+        "tip": "Hacer que las habilidades de evolución sigan las habilidades base"
+      },
+      "abilitiesFollowMegaEvolutions": {
+        "label": "Habilidades Siguen Megaevoluciones",
+        "tip": "Hacer que las habilidades de megaevolución sigan las habilidades base"
+      },
+      "evolutionsMod": {
+        "UNCHANGED": "Sin cambios",
+        "RANDOM": "Aleatorio",
+        "RANDOM_EVERY_LEVEL": "Aleatorio Cada Nivel"
+      },
+      "evosAllowAltFormes": {
+        "label": "Evoluciones Permiten Formas Alternativas",
+        "tip": "Permitir formas alternativas en cadenas de evolución"
+      },
+      "evosForceChange": {
+        "label": "Evoluciones Fuerzan Cambio",
+        "tip": "Forzar que todos los pokémon tengan formas evolucionadas diferentes"
+      },
+      "changeImpossibleEvolutions": {
+        "label": "Cambiar Evoluciones Imposibles",
+        "tip": "Reemplazar evoluciones imposibles con alternativas"
+      },
+      "makeEvolutionsEasier": {
+        "label": "Hacer Evoluciones Más Fáciles",
+        "tip": "Reducir los requisitos de evolución"
+      },
+      "evosMaxThreeStages": {
+        "label": "Evoluciones Máximo Tres Etapas",
+        "tip": "Limitar cadenas de evolución a máximo 3 etapas"
+      },
+      "evosForceGrowth": {
+        "label": "Evoluciones Fuerzan Crecimiento",
+        "tip": "Forzar crecimiento de evolución en formas aleatorizadas"
+      },
+      "evosNoConvergence": {
+        "label": "Evoluciones Sin Convergencia",
+        "tip": "Prevenir que múltiples pokémon evolucionen a la misma forma"
+      },
+      "evosSameTyping": {
+        "label": "Evoluciones Mismo Tipado",
+        "tip": "Mantener tipos de evolución similares a las formas base"
+      },
+      "evosSimilarStrength": {
+        "label": "Evoluciones Fuerza Similar",
+        "tip": "Mantener estadísticas de evolución similares a las estadísticas base"
+      },
+      "removeTimeBasedEvolutions": {
+        "label": "Eliminar Evoluciones Basadas en Tiempo",
+        "tip": "Reemplazar evoluciones basadas en tiempo con alternativas"
+      },
+      "adjustEvolutionLevels": {
+        "label": "Ajustar Niveles de Evolución",
+        "tip": "Aleatorizar requisitos de nivel de evolución"
+      },
+      "expCurveMod": {
+        "LEGENDARIES": "Legendarios",
+        "STRONG_LEGENDARIES": "Legendarios Fuertes",
+        "ALL": "Todos"
+      },
+      "standardizeEXPCurves": {
+        "label": "Estandarizar Curvas de Experiencia",
+        "tip": "Usar una única curva de experiencia para los pokémon seleccionados"
+      },
+      "selectedEXPCurve": {
+        "label": "Curva de Experiencia Seleccionada",
+        "tip": "Elige qué curva de experiencia estandarizar"
+      },
+      "generations": {
+        "gen1": "Generación 1",
+        "gen2": "Generación 2",
+        "gen3": "Generación 3",
+        "gen4": "Generación 4",
+        "gen5": "Generación 5",
+        "gen6": "Generación 6",
+        "gen7": "Generación 7",
+        "gen8": "Generación 8",
+        "gen9": "Generación 9"
+      },
+      "expCurves": {
+        "FLAT": "Plano",
+        "MEDIUM_FAST": "Rápido Medio",
+        "MEDIUM_SLOW": "Lento Medio",
+        "SLOW": "Lento",
+        "FAST": "Rápido",
+        "SLOW_THEN_VERY_FAST": "Lento Luego Muy Rápido"
+      }
+    }
   },
   "validation": {
     "titleMin": "El título debe tener al menos 3 caracteres",

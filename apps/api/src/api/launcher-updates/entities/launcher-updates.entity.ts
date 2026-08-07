@@ -10,7 +10,9 @@ export class UpdaterPlatformEntity {
   @ApiProperty({ description: 'Firma minisign del artefacto (tauri signer)' })
   signature!: string;
 
-  @ApiProperty({ description: 'URL absoluta desde la que el updater descarga el bundle' })
+  @ApiProperty({
+    description: 'URL absoluta desde la que el updater descarga el bundle',
+  })
   url!: string;
 }
 
@@ -34,7 +36,8 @@ export class UpdaterFeedEntity {
   pub_date!: string;
 
   @ApiProperty({
-    description: 'Clave `{os}-{arch}`: windows-x86_64, darwin-aarch64, linux-x86_64…',
+    description:
+      'Clave `{os}-{arch}`: windows-x86_64, darwin-aarch64, linux-x86_64…',
     type: 'object',
     additionalProperties: { $ref: getSchemaPath(UpdaterPlatformEntity) },
   })
@@ -97,7 +100,9 @@ export class LauncherReleaseEntity {
   @ApiProperty({ example: 'boff-launcher_1.4.0_x64_en-US.msi' })
   artifactName!: string;
 
-  @ApiProperty({ description: 'Calculado por el servidor sobre los bytes recibidos' })
+  @ApiProperty({
+    description: 'Calculado por el servidor sobre los bytes recibidos',
+  })
   artifactSha512!: string;
 
   @ApiProperty() sizeBytes!: number;
@@ -105,7 +110,9 @@ export class LauncherReleaseEntity {
   @ApiProperty({ description: 'Solo las publicadas aparecen en el feed' })
   published!: boolean;
 
-  @ApiPropertyOptional({ type: String, nullable: true }) publishedAt!: string | null;
+  @ApiPropertyOptional({ type: String, nullable: true }) publishedAt!:
+    | string
+    | null;
 
   @ApiProperty() createdAt!: string;
 }

@@ -53,9 +53,12 @@ export class LauncherUpdatesService {
     baseUrl: string,
   ): Promise<UpdaterFeedEntity | null> {
     const platform = this.assertTarget(target);
-    const newest = this.newest(await this.releases.listPublishedForTarget(platform));
+    const newest = this.newest(
+      await this.releases.listPublishedForTarget(platform),
+    );
     if (!newest) return null;
-    if (compareVersions(newest.version, stripV(currentVersion)) <= 0) return null;
+    if (compareVersions(newest.version, stripV(currentVersion)) <= 0)
+      return null;
 
     return {
       version: newest.version,
@@ -74,7 +77,9 @@ export class LauncherUpdatesService {
   private newest(rows: LauncherRelease[]): LauncherRelease | null {
     return rows.reduce<LauncherRelease | null>(
       (best, row) =>
-        best === null || compareVersions(row.version, best.version) > 0 ? row : best,
+        best === null || compareVersions(row.version, best.version) > 0
+          ? row
+          : best,
       null,
     );
   }
@@ -134,14 +139,20 @@ export class LauncherUpdatesService {
     if (size === null) {
       // A published row whose bytes are gone is an operator problem; say so in
       // the log, because the launcher will only ever see a 404.
-      this.logger.error(`Falta en disco el artefacto ${row.version}/${row.target}`);
+      this.logger.error(
+        `Falta en disco el artefacto ${row.version}/${row.target}`,
+      );
       throw new NotFoundException({
         message: `artifact for ${row.version}/${row.target} is missing on disk`,
         userMessage: 'Esa versión del launcher no está disponible.',
       });
     }
 
-    return { stream: createReadStream(path), contentLength: size, filename: row.artifactName };
+    return {
+      stream: createReadStream(path),
+      contentLength: size,
+      filename: row.artifactName,
+    };
   }
 
   // ── Publishing ───────────────────────────────────────────────────────────
@@ -235,7 +246,10 @@ export class LauncherUpdatesService {
     return (await this.releases.listAll()).map(toEntity);
   }
 
-  async setPublished(id: number, published: boolean): Promise<LauncherReleaseEntity> {
+  async setPublished(
+    id: number,
+    published: boolean,
+  ): Promise<LauncherReleaseEntity> {
     const row = await this.releases.findById(id);
     if (!row) throw new NotFoundException('Release no encontrada');
     await this.releases.setPublished(id, published);
@@ -250,7 +264,9 @@ export class LauncherUpdatesService {
     const row = await this.releases.findById(id);
     if (!row) throw new NotFoundException('Release no encontrada');
     await this.releases.remove(id);
-    await rm(artifactPath(row.version, row.target, row.artifactName), { force: true });
+    await rm(artifactPath(row.version, row.target, row.artifactName), {
+      force: true,
+    });
   }
 
   private assertTarget(target: string): string {
@@ -292,13 +308,19 @@ function toEntity(row: LauncherRelease): LauncherReleaseEntity {
 }
 
 function releaseDir(): string {
-  return env.LAUNCHER_RELEASE_DIR ?? join(process.cwd(), 'data', 'launcher-releases');
+  return (
+    env.LAUNCHER_RELEASE_DIR ?? join(process.cwd(), 'data', 'launcher-releases')
+  );
 }
 
 /** `<dir>/<version>/<target>/<artifactName>` — one directory per release so an
  *  operator can drop or archive a whole version by hand. Every segment is
  *  validated by the caller; nothing here re-derives a path from user input. */
-function artifactPath(version: string, target: string, filename: string): string {
+function artifactPath(
+  version: string,
+  target: string,
+  filename: string,
+): string {
   return join(releaseDir(), version, target, filename);
 }
 
@@ -324,5 +346,8 @@ function compareVersions(a: string, b: string): number {
 
 function splitPre(version: string): [number[], string] {
   const [core, ...rest] = version.split('-');
-  return [core.split('.').map((n) => Number.parseInt(n, 10) || 0), rest.join('-')];
+  return [
+    core.split('.').map((n) => Number.parseInt(n, 10) || 0),
+    rest.join('-'),
+  ];
 }

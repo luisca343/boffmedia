@@ -106,5 +106,16 @@ export const env = z
     MANGA_BROWSER_WS_ENDPOINT: z.string().optional(),
     MANGA_SCRAPER_PROXY: z.string().optional(),
     MANGA_SCRAPER_PROXY_LIST_URL: z.string().optional(),
+
+    // Randomizer (FVX jar runner)
+    RANDOMIZER_JAR: z.string().optional(),
+    RANDOMIZER_JAVA: z.string().default('java'),
+    RANDOMIZER_SCRATCH_DIR: z.string().optional(),
+    RANDOMIZER_MAX_CONCURRENCY: z.coerce.number().default(2),
+    RANDOMIZER_TIMEOUT_MS: z.coerce.number().default(180000),
+    // Settings shim (JSON ↔ .rnqs converter)
+    RANDOMIZER_SHIM_JAR: z.string().optional(),
+    RANDOMIZER_SHIM_MAX_CONCURRENCY: z.coerce.number().default(2),
+    RANDOMIZER_SHIM_TIMEOUT_MS: z.coerce.number().default(30000),
   })
   .parse(process.env);

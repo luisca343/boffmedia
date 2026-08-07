@@ -1,4 +1,8 @@
-import { ConflictException, ForbiddenException, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  ForbiddenException,
+  NotFoundException,
+} from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import * as bcrypt from 'bcrypt';
 import { PacksRepository } from './packs.repository';
@@ -73,7 +77,10 @@ describe('PacksService', () => {
     };
 
     const module: TestingModule = await Test.createTestingModule({
-      providers: [PacksService, { provide: PacksRepository, useValue: mockRepo }],
+      providers: [
+        PacksService,
+        { provide: PacksRepository, useValue: mockRepo },
+      ],
     }).compile();
 
     service = module.get(PacksService);
@@ -130,13 +137,15 @@ describe('PacksService', () => {
       );
       repo.findVersion.mockResolvedValue(version() as never);
 
-      await expect(service.manifestFor(UUID, 'pk1', 'incorrecta', MC)).rejects.toThrow(
-        ForbiddenException,
-      );
+      await expect(
+        service.manifestFor(UUID, 'pk1', 'incorrecta', MC),
+      ).rejects.toThrow(ForbiddenException);
       await expect(service.manifestFor(UUID, 'pk1', null, MC)).rejects.toThrow(
         ForbiddenException,
       );
-      await expect(service.manifestFor(UUID, 'pk1', 'correcta', MC)).resolves.toBeDefined();
+      await expect(
+        service.manifestFor(UUID, 'pk1', 'correcta', MC),
+      ).resolves.toBeDefined();
     });
 
     it('never leaks the allowlist membership in the manifest', async () => {
@@ -161,7 +170,9 @@ describe('PacksService', () => {
     it('does not serve an unpublished version', async () => {
       repo.findById.mockResolvedValue(pack() as never);
       repo.hasAccess.mockResolvedValue(true);
-      repo.findVersion.mockResolvedValue(version({ published: false }) as never);
+      repo.findVersion.mockResolvedValue(
+        version({ published: false }) as never,
+      );
 
       await expect(service.manifestFor(UUID, 'pk1', null, MC)).rejects.toThrow(
         NotFoundException,
@@ -219,18 +230,28 @@ describe('PacksService', () => {
 
   describe('redeemInvite', () => {
     it('grants access when the code is consumable', async () => {
-      repo.findInvite.mockResolvedValue({ code: 'abc', packId: 'pk1' } as never);
+      repo.findInvite.mockResolvedValue({
+        code: 'abc',
+        packId: 'pk1',
+      } as never);
       repo.consumeInvite.mockResolvedValue(true);
 
-      await expect(service.redeemInvite(UUID, 'abc')).resolves.toEqual({ packId: 'pk1' });
+      await expect(service.redeemInvite(UUID, 'abc')).resolves.toEqual({
+        packId: 'pk1',
+      });
       expect(repo.grant).toHaveBeenCalledWith('pk1', UUID, null, 'abc');
     });
 
     it('grants nothing when the code is exhausted, expired or revoked', async () => {
-      repo.findInvite.mockResolvedValue({ code: 'abc', packId: 'pk1' } as never);
+      repo.findInvite.mockResolvedValue({
+        code: 'abc',
+        packId: 'pk1',
+      } as never);
       repo.consumeInvite.mockResolvedValue(false);
 
-      await expect(service.redeemInvite(UUID, 'abc')).rejects.toThrow(ForbiddenException);
+      await expect(service.redeemInvite(UUID, 'abc')).rejects.toThrow(
+        ForbiddenException,
+      );
       expect(repo.grant).not.toHaveBeenCalled();
     });
   });
@@ -247,7 +268,10 @@ describe('PacksService', () => {
       // NULL column resolves to minecraft for the client.
       expect(mcOnly[0].gameType).toBe('minecraft');
 
-      const both = await service.listForLauncher(UUID, ['minecraft', 'emulator']);
+      const both = await service.listForLauncher(UUID, [
+        'minecraft',
+        'emulator',
+      ]);
       expect(both.map((p) => p.id).sort()).toEqual(['emu', 'mc']);
     });
 
@@ -263,7 +287,10 @@ describe('PacksService', () => {
           emulator: { kind: 'mgba', rom: 'roms/x.gba' },
         }) as never,
       );
-      const [entry] = await service.listForLauncher(UUID, ['minecraft', 'emulator']);
+      const [entry] = await service.listForLauncher(UUID, [
+        'minecraft',
+        'emulator',
+      ]);
       expect(entry.latestVersion?.emulatorKind).toBe('mgba');
       expect(entry.latestVersion?.minecraft).toBeNull();
     });
