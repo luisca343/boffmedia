@@ -233,6 +233,8 @@ export type Settings = {
    *  through the i18n store. Absent in a settings.json from before i18n, which
    *  the Rust `#[serde(default)]` fills with "es". */
   locale: AppLocale
+  /** Pack-grid layout. A view preference; persisted with the rest so it survives relaunch. */
+  packLayout: "card" | "compact" | "row"
   /** Whether to automatically backup saves/config before updating a pack. */
   backupBeforeUpdate: boolean
 }

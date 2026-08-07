@@ -14,6 +14,7 @@ import {
   PackCard,
   Progress,
   SearchInput,
+  Seg,
   toast,
 } from "@boffmedia/ui"
 import type { MenuItem } from "@boffmedia/ui"
@@ -112,7 +113,7 @@ function AccessBadge({ entry }: { entry: PackEntry }) {
  *  `packDetail` (the detail screen offers the same actions), so the card reuses
  *  them via `tp` rather than cloning the strings; only the library-only actions
  *  (delete, uninstall, open folder) are new `packs` keys. */
-function LibraryCard({ entry }: { entry: PackEntry }) {
+function LibraryCard({ entry, layout }: { entry: PackEntry; layout?: "card" | "compact" | "row" }) {
   const t = useT("packs")
   const tp = useT("packDetail")
   const { go, install, play, repair, game, offline, reloadPacks } = useLauncher()
@@ -237,12 +238,24 @@ function LibraryCard({ entry }: { entry: PackEntry }) {
       </Button>
     )
 
+  // Fallback chain for art: iconUrl → module default → undefined (striped placeholder)
+  const module = getModule(pack.gameType)
+  const artUrl = pack.iconUrl
+    ? pack.iconUrl
+    : module.defaultArtUrl
+      ? module.defaultArtUrl
+      : undefined
+  const art = pack.iconUrl ? (
+    <CatalogIcon src={pack.iconUrl} size={72} />
+  ) : artUrl ? (
+    <img src={artUrl} alt="" className="size-full object-cover" />
+  ) : undefined
+
   return (
     <>
       <PackCard
-        // Real pack art fills the 16:9 hero (centered square); packs with no
-        // iconUrl fall through to the card's striped placeholder + cube glyph.
-        art={pack.iconUrl ? <CatalogIcon src={pack.iconUrl} size={72} /> : undefined}
+        art={art}
+        layout={layout}
         title={pack.name}
         slug={pack.slug}
         stateBadge={<StateBadge state={state} />}
@@ -403,7 +416,8 @@ function CreateLocalPackModal({ open, onClose, onCreated }: { open: boolean; onC
 
 export function Packs() {
   const t = useT("packs")
-  const { packs, packsLoading, packsError, reloadPacks, selectedSystem } = useLauncher()
+  const tSettings = useT("settings")
+  const { packs, packsLoading, packsError, reloadPacks, selectedSystem, settings, patchSettings } = useLauncher()
   const [query, setQuery] = useState("")
   const [creating, setCreating] = useState(false)
   const [importing, setImporting] = useState(false)
@@ -457,6 +471,15 @@ export function Packs() {
           <div className="w-[280px]">
             <SearchInput value={query} onChange={setQuery} placeholder={t("search")} size="sm" />
           </div>
+          <Seg
+            value={settings.packLayout}
+            onChange={(layout) => patchSettings({ packLayout: layout as typeof settings.packLayout })}
+            options={[
+              { value: "card", label: t("layout.card") },
+              { value: "compact", label: t("layout.compact") },
+              { value: "row", label: t("layout.row") },
+            ]}
+          />
           {(() => {
             // Determine the gameType for the selected system to check module capabilities
             const gameType =
@@ -520,9 +543,15 @@ export function Packs() {
         <Empty icon="search" title={t("searchNoResultsTitle")} lead={t("searchNoResults", { query })} />
       )}
 
-      <div className="grid gap-4 [grid-template-columns:repeat(auto-fill,minmax(320px,1fr))]">
+      <div
+        className={
+          settings.packLayout === "row"
+            ? "flex flex-col gap-3"
+            : "grid gap-4 [grid-template-columns:repeat(auto-fill,minmax(320px,1fr))]"
+        }
+      >
         {shown.map((entry) => (
-          <LibraryCard key={entry.pack.id} entry={entry} />
+          <LibraryCard key={entry.pack.id} entry={entry} layout={settings.packLayout} />
         ))}
       </div>
 

@@ -46,6 +46,11 @@ pub struct Settings {
     /// written before i18n with "es".
     #[serde(default = "default_locale")]
     pub locale: String,
+    /// Pack-grid layout ("card" | "compact" | "row"). Rust never reads it — the
+    /// renderer owns the choice — but it persists in the same settings.json.
+    /// `#[serde(default = "default_pack_layout")]` so an older file loads unchanged.
+    #[serde(default = "default_pack_layout")]
+    pub pack_layout: String,
     /// Whether to automatically backup saves/config before updating a pack.
     /// `#[serde(default = "default_true")]` so old files keep the feature enabled.
     #[serde(default = "default_true")]
@@ -75,6 +80,10 @@ fn default_locale() -> String {
     "es".to_string()
 }
 
+fn default_pack_layout() -> String {
+    "card".to_string()
+}
+
 impl Default for Settings {
     fn default() -> Self {
         Self {
@@ -93,6 +102,7 @@ impl Default for Settings {
             // is offered, and Ajustes can opt the global default into it.
             memory_auto: false,
             locale: default_locale(),
+            pack_layout: default_pack_layout(),
             // On by default: a safety net before major updates.
             backup_before_update: true,
             emulator_paths: std::collections::HashMap::new(),
@@ -345,6 +355,7 @@ mod tests {
             "keepLogs",
             "retainVersions",
             "memoryAuto",
+            "packLayout",
             "backupBeforeUpdate",
         ] {
             assert!(raw.contains(key), "missing {key} in {raw}");

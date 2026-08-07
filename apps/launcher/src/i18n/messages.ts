@@ -90,6 +90,13 @@ const es = {
       es: "Español",
       en: "English",
     },
+    packLayout: {
+      title: "Biblioteca",
+      label: "Vista de packs",
+      card: "Tarjeta",
+      compact: "Compacta",
+      row: "Lista",
+    },
     account: {
       title: "Cuenta",
       user: "Usuario",
@@ -394,6 +401,12 @@ const es = {
     uninstallError: "No se pudo desinstalar el pack.",
     uninstallButton: "Desinstalar",
     cannotWhileRunning: "No puedes hacerlo mientras el juego está en ejecución.",
+    layout: {
+      label: "Vista",
+      card: "Tarjeta",
+      compact: "Compacta",
+      row: "Lista",
+    },
   },
 
   packDetail: {
@@ -1002,6 +1015,13 @@ const en = {
       es: "Español",
       en: "English",
     },
+    packLayout: {
+      title: "Library",
+      label: "Pack view",
+      card: "Card",
+      compact: "Compact",
+      row: "List",
+    },
     account: {
       title: "Account",
       user: "User",
@@ -1305,6 +1325,12 @@ const en = {
     uninstallError: "Could not uninstall the pack.",
     uninstallButton: "Uninstall",
     cannotWhileRunning: "You can’t do this while the game is running.",
+    layout: {
+      label: "View",
+      card: "Card",
+      compact: "Compact",
+      row: "List",
+    },
   },
 
   packDetail: {

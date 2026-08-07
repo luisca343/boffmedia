@@ -1,4 +1,4 @@
-import { Badge, Button, DataList, Divider, Field, Input, Kicker, Panel, Seg, Slider, Toggle, toast } from "@boffmedia/ui"
+import { Badge, Button, DataList, Divider, Field, IconButton, Input, Kicker, Panel, Seg, Slider, Toggle, toast } from "@boffmedia/ui"
 import { useEffect, useState } from "react"
 
 import { useT } from "../i18n"
@@ -15,7 +15,7 @@ import {
 } from "../runtime"
 import { checkForUpdates, useUpdates } from "../services/updates"
 import { useLauncher } from "../state/launcher"
-import { formatBytes } from "../utils/format"
+import { elidePath, formatBytes } from "../utils/format"
 
 // HANDOFF §6.3: "Wrong Java version is the single most common launcher support
 // ticket." Hence the explicit, visible Java row rather than silent detection.
@@ -104,32 +104,38 @@ export function Settings() {
     }
   }
 
-  const formatEmulatorStatus = (status: any, kind: "mgba" | "melonds") => {
+  const formatEmulatorStatus = (
+    status: any,
+    kind: "mgba" | "melonds",
+  ): { label: string; path?: string; method?: string; detail?: string; warning: boolean } | null => {
     if (!status) return null
     const kindLabel = kind === "mgba" ? t("emulators.mgba") : t("emulators.melonds")
     if (status.staleOverride) {
       return {
         label: kindLabel,
-        value: t("emulators.staleOverrideWarning"),
+        detail: t("emulators.staleOverrideWarning"),
         warning: true,
       }
     }
     if (!status.resolved) {
       return {
         label: kindLabel,
-        value: t("emulators.notFound"),
+        detail: t("emulators.notFound"),
         warning: false,
       }
     }
     // Source + method labels come from i18n — "vía RetroArch" is copy, not code.
+    // Path and method are returned separately so the view can truncate the long
+    // path on one line without hiding how it was resolved.
     const sourceLabel = t(`emulators.source.${status.resolved.source}`)
-    const value =
+    const method =
       status.resolved.via === "retroarch"
-        ? `${status.resolved.path} · ${t("emulators.viaRetroarch", { source: sourceLabel })}`
-        : `${status.resolved.path} · ${sourceLabel}`
+        ? t("emulators.viaRetroarch", { source: sourceLabel })
+        : sourceLabel
     return {
       label: kindLabel,
-      value,
+      path: status.resolved.path as string,
+      method,
       warning: false,
     }
   }
@@ -213,9 +219,18 @@ export function Settings() {
                   <div className="flex items-start justify-between">
                     <div className="min-w-0 flex-1">
                       <p className="text-sm font-medium">{status?.label}</p>
-                      <p className={`text-xs ${status?.warning ? "text-warn" : "text-txt-muted"}`}>
-                        {status?.value}
-                      </p>
+                      {status?.path ? (
+                        <>
+                          <p className="truncate font-mono text-[11px] text-txt-muted" title={status.path}>
+                            {elidePath(status.path)}
+                          </p>
+                          <p className="truncate text-[11px] text-txt-dim">{status.method}</p>
+                        </>
+                      ) : (
+                        <p className={`text-xs ${status?.warning ? "text-warn" : "text-txt-muted"}`}>
+                          {status?.detail}
+                        </p>
+                      )}
                     </div>
                     <div className="ml-3 flex shrink-0 gap-2">
                       {!mgbaStatus.resolved && !mgbaStatus.staleOverride ? (
@@ -224,12 +239,8 @@ export function Settings() {
                         </Button>
                       ) : (
                         <>
-                          <Button size="sm" variant="ghost" onClick={() => void handleEmulatorLocate("mgba")}>
-                            {t("emulators.change")}
-                          </Button>
-                          <Button size="sm" variant="ghost" onClick={() => void handleEmulatorClear("mgba")}>
-                            {t("emulators.clear")}
-                          </Button>
+                          <IconButton name="folder" label={t("emulators.change")} size={15} className="!h-8 !w-8" onClick={() => void handleEmulatorLocate("mgba")} />
+                          <IconButton name="x" label={t("emulators.clear")} size={15} className="!h-8 !w-8" onClick={() => void handleEmulatorClear("mgba")} />
                         </>
                       )}
                     </div>
@@ -246,9 +257,18 @@ export function Settings() {
                   <div className="flex items-start justify-between">
                     <div className="min-w-0 flex-1">
                       <p className="text-sm font-medium">{status?.label}</p>
-                      <p className={`text-xs ${status?.warning ? "text-warn" : "text-txt-muted"}`}>
-                        {status?.value}
-                      </p>
+                      {status?.path ? (
+                        <>
+                          <p className="truncate font-mono text-[11px] text-txt-muted" title={status.path}>
+                            {elidePath(status.path)}
+                          </p>
+                          <p className="truncate text-[11px] text-txt-dim">{status.method}</p>
+                        </>
+                      ) : (
+                        <p className={`text-xs ${status?.warning ? "text-warn" : "text-txt-muted"}`}>
+                          {status?.detail}
+                        </p>
+                      )}
                     </div>
                     <div className="ml-3 flex shrink-0 gap-2">
                       {!melondsStatus.resolved && !melondsStatus.staleOverride ? (
@@ -257,12 +277,8 @@ export function Settings() {
                         </Button>
                       ) : (
                         <>
-                          <Button size="sm" variant="ghost" onClick={() => void handleEmulatorLocate("melonds")}>
-                            {t("emulators.change")}
-                          </Button>
-                          <Button size="sm" variant="ghost" onClick={() => void handleEmulatorClear("melonds")}>
-                            {t("emulators.clear")}
-                          </Button>
+                          <IconButton name="folder" label={t("emulators.change")} size={15} className="!h-8 !w-8" onClick={() => void handleEmulatorLocate("melonds")} />
+                          <IconButton name="x" label={t("emulators.clear")} size={15} className="!h-8 !w-8" onClick={() => void handleEmulatorClear("melonds")} />
                         </>
                       )}
                     </div>
@@ -287,15 +303,17 @@ export function Settings() {
           ) : (
             <div className="space-y-2">
               {romFolders.map((folder) => (
-                <div key={folder} className="flex items-center justify-between rounded bg-surface-bright p-2 text-sm">
-                  <span className="truncate font-mono text-xs">{folder}</span>
-                  <Button
-                    size="sm"
-                    variant="ghost"
+                <div key={folder} className="flex items-center justify-between gap-2 rounded bg-surface-bright p-2 text-sm">
+                  <span className="truncate font-mono text-xs" title={folder}>
+                    {elidePath(folder)}
+                  </span>
+                  <IconButton
+                    name="x"
+                    label={t("emulators.removeFolder")}
+                    size={15}
+                    className="!h-8 !w-8 shrink-0"
                     onClick={() => void handleRemoveRomFolder(folder)}
-                  >
-                    {t("emulators.removeFolder")}
-                  </Button>
+                  />
                 </div>
               ))}
             </div>
@@ -331,7 +349,7 @@ export function Settings() {
           {/* §9 — rollback depth. Almost free: a retained version is its file
               list, and the .jar it names lives once in the shared cache however
               many versions reference it. */}
-          <Field label={t("install.retain")}>
+          <Field label={t("install.retain")} className="mt-4">
             <Input
               type="number"
               min={1}
@@ -370,11 +388,27 @@ export function Settings() {
         <Panel title={t("language.title")}>
           <Field label={t("language.label")}>
             <Seg
+              className="justify-self-start"
               value={settings.locale}
               onChange={(locale) => patchSettings({ locale: locale as typeof settings.locale })}
               options={[
                 { value: "es", label: t("language.es") },
                 { value: "en", label: t("language.en") },
+              ]}
+            />
+          </Field>
+        </Panel>
+
+        <Panel title={t("packLayout.title")}>
+          <Field label={t("packLayout.label")}>
+            <Seg
+              className="justify-self-start"
+              value={settings.packLayout}
+              onChange={(packLayout) => patchSettings({ packLayout: packLayout as typeof settings.packLayout })}
+              options={[
+                { value: "card", label: t("packLayout.card") },
+                { value: "compact", label: t("packLayout.compact") },
+                { value: "row", label: t("packLayout.row") },
               ]}
             />
           </Field>

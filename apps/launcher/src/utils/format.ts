@@ -54,3 +54,25 @@ export function formatPlaytime(ms: number): string {
   if (h < 1) return `${m} min`
   return m > 0 ? `${h} h ${m} min` : `${h} h`
 }
+
+/** Middle-elide a filesystem path: keep the root and as many TRAILING segments
+ *  as fit. The interesting part of a resolved emulator/tool path is its end
+ *  (the executable and its parent folders); a plain CSS `truncate` ellipsis
+ *  hides exactly that, and the un-truncated path blows the row open. */
+export function elidePath(path: string, max = 60): string {
+  if (path.length <= max) return path
+  const sep = path.includes("\\") ? "\\" : "/"
+  const parts = path.split(sep).filter(Boolean)
+  // Degenerate: one huge segment (or two) — keep the tail, it names the file.
+  if (parts.length < 3) return `…${path.slice(-(max - 1))}`
+  // filter(Boolean) ate the empty segment a leading "/" produces — restore it.
+  const head = (path.startsWith(sep) ? sep : "") + parts[0]
+  let tail = parts[parts.length - 1]
+  for (let i = parts.length - 2; i >= 1; i--) {
+    const candidate = `${parts[i]}${sep}${tail}`
+    // +3 ≈ the two separators around the ellipsis plus the ellipsis itself.
+    if (head.length + candidate.length + 3 > max) break
+    tail = candidate
+  }
+  return `${head}${sep}…${sep}${tail}`
+}

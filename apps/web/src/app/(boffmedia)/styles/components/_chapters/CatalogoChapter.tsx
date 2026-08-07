@@ -231,6 +231,49 @@ export function CatalogoChapter() {
             />
           </div>
         </Sample>
+        <Sample title="Una tarjeta, tres vistas" code="PackCard · layout" col note="El mismo contenido renderizado en tres variantes: <code>layout=&quot;card&quot;</code> (portada estándar), <code>layout=&quot;compact&quot;</code> (sin arte, sello en cabecera) y <code>layout=&quot;row&quot;</code> (horizontal, 120px de arte). El cuerpo sigue el mismo orden: cabecera → resumen → servidor → progreso → error → línea de metadatos → pie.">
+          <div className="flex flex-col gap-6 w-full max-w-[680px]">
+            <PackCard
+              title="Boff Vanilla (prueba)"
+              slug="boff-vanilla-test"
+              icon={<Icon name="cube" size={24} />}
+              layout="card"
+              stateBadge={<Badge tone="ok">Instalado</Badge>}
+              summary="Minecraft 1.21.4 sin mods. Prueba mínima de instalación y arranque."
+              serverStatus={<ServerStatus status="offline" label="Servidor offline" address="play.boff.gg" />}
+              badges={<><span>Público</span><span className="text-txt">1.21.4</span><span>0 archivos</span><span>72 MB</span></>}
+              footerMeta="Nunca jugado"
+              actions={<Button variant="pri" size="sm" icon="play">Jugar</Button>}
+              menu={<Button variant="ghost" size="sm" icon="more" aria-label="Más" />}
+            />
+            <PackCard
+              title="Boff Vanilla (prueba)"
+              slug="boff-vanilla-test"
+              icon={<Icon name="cube" size={24} />}
+              layout="compact"
+              stateBadge={<Badge tone="ok">Instalado</Badge>}
+              summary="Minecraft 1.21.4 sin mods. Prueba mínima de instalación y arranque."
+              serverStatus={<ServerStatus status="offline" label="Servidor offline" address="play.boff.gg" />}
+              badges={<><span>Público</span><span className="text-txt">1.21.4</span><span>0 archivos</span><span>72 MB</span></>}
+              footerMeta="Nunca jugado"
+              actions={<Button variant="pri" size="sm" icon="play">Jugar</Button>}
+              menu={<Button variant="ghost" size="sm" icon="more" aria-label="Más" />}
+            />
+            <PackCard
+              title="Boff Vanilla (prueba)"
+              slug="boff-vanilla-test"
+              icon={<Icon name="cube" size={24} />}
+              layout="row"
+              stateBadge={<Badge tone="ok">Instalado</Badge>}
+              summary="Minecraft 1.21.4 sin mods. Prueba mínima de instalación y arranque."
+              serverStatus={<ServerStatus status="offline" label="Servidor offline" address="play.boff.gg" />}
+              badges={<><span>Público</span><span className="text-txt">1.21.4</span><span>0 archivos</span><span>72 MB</span></>}
+              footerMeta="Nunca jugado"
+              actions={<Button variant="pri" size="sm" icon="play">Jugar</Button>}
+              menu={<Button variant="ghost" size="sm" icon="more" aria-label="Más" />}
+            />
+          </div>
+        </Sample>
       </Section>
 
       <Section

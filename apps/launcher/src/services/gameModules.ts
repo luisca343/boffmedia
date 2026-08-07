@@ -1,4 +1,5 @@
 import type { GameType } from "./types"
+import minecraftDefaultArt from "../assets/default-art/minecraft.webp"
 
 /** Detail tab definition. */
 export type DetailTab = {
@@ -34,6 +35,9 @@ export type GameModule = {
 
   /** Whether this module shows the setup panel (e.g., EmulatorSetupPanel). */
   supportsSetupPanel?: boolean
+
+  /** Bundled default cover art shown when a pack has no iconUrl. */
+  defaultArtUrl?: string
 }
 
 /** Minecraft module: all MC-specific tabs, components, and actions. */
@@ -45,6 +49,7 @@ const minecraftModule: GameModule = {
   supportsBrowse: true,
   supportsCrashDiagnosis: true,
   supportsInstanceSpace: true,
+  defaultArtUrl: minecraftDefaultArt,
   detailTabs: [
     { value: "content", label: "tabs.content" },
     { value: "files", label: "tabs.files" },

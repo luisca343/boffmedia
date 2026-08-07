@@ -835,7 +835,8 @@
       "publishFailed": "No se pudo publicar",
       "unpublishFailed": "No se pudo despublicar",
       "hashCopied": "Hash copiado",
-      "hashCopyFailed": "No se ha podido copiar el hash"
+      "hashCopyFailed": "No se ha podido copiar el hash",
+      "copyHash": "Copiar hash"
     }
   },
   "tournaments": {

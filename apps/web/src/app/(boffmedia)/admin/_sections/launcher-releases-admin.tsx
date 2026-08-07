@@ -258,7 +258,7 @@ export function LauncherReleasesAdmin() {
                     hashShort={`${release.artifactSha512.slice(0, 12)}…`}
                     hashFull={release.artifactSha512}
                     onCopyHash={() => void copyHash(release.artifactSha512)}
-                    copyLabel={t("hashCopied")}
+                    copyLabel={t("copyHash")}
                     date={publishedAt ? new Date(publishedAt).toLocaleDateString() : undefined}
                     actions={
                       <Button size="sm" variant={release.published ? "ghost" : "pri"} icon={release.published ? "x" : "check"} loading={busyId === release.id} onClick={() => void togglePublished(release)}>

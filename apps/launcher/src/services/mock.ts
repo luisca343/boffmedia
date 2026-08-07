@@ -193,6 +193,7 @@ export const MOCK_SETTINGS: Settings = {
   retainVersions: 3,
   memoryAuto: false,
   locale: "es",
+  packLayout: "card",
   backupBeforeUpdate: true,
 }
 
