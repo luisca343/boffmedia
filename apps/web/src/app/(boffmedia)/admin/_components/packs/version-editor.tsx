@@ -49,6 +49,17 @@ const LOADERS: { value: string; label: string }[] = [
 const STEPS = ["metadata", "mods", "files", "worlds", "review"] as const
 type Step = (typeof STEPS)[number]
 
+/** Everything the EmulatorEditor produces for a version. An emulator pack has no
+ *  stepped form, so its whole spec — name included — arrives in one onSave. */
+type EmulatorVersionData = {
+  name: string
+  kind: EmulatorKind
+  rom: string
+  args?: string[]
+  files: unknown[]
+  initialFiles?: unknown[]
+}
+
 type Upload = {
   file: File
   /** Target path inside the instance, forward slashes, no leading "./". */
@@ -186,13 +197,7 @@ export function VersionEditor({
   const [prefilling, setPrefilling] = useState(false)
   const [importing, setImporting] = useState<string | null>(null)
   // Emulator pack data
-  const [emulatorData, setEmulatorData] = useState<{
-    kind: EmulatorKind
-    rom: string
-    args?: string[]
-    files: unknown[]
-    initialFiles?: unknown[]
-  } | null>(null)
+  const [emulatorData, setEmulatorData] = useState<EmulatorVersionData | null>(null)
   const filesRef = useRef<HTMLInputElement>(null)
   const folderRef = useRef<HTMLInputElement>(null)
   const archiveRef = useRef<HTMLInputElement>(null)
@@ -370,7 +375,10 @@ export function VersionEditor({
     }
   }
 
-  const submit = async () => {
+  // `emu` is passed explicitly by the EmulatorEditor's onSave so the create fires
+  // in the same tick it produces its data — reading `emulatorData` from state here
+  // would see the pre-`setEmulatorData` value and submit an empty payload.
+  const submit = async (emu: EmulatorVersionData | null = emulatorData) => {
     if (busy) return
     const extra = parseExtra()
     if (!extra) return
@@ -411,13 +419,13 @@ export function VersionEditor({
         emulator?: { kind: EmulatorKind; rom: string; args?: string[] }
         initialFiles?: unknown[]
       } = {
-        name: name.trim(),
+        name: (emu ? emu.name : name).trim(),
         files: [...modFiles, ...overrides, ...extra],
         worlds: worlds.length > 0 ? worlds : undefined,
       }
 
       // Minecraft-specific fields
-      if (!emulatorData) {
+      if (!emu) {
         payload.minecraft = minecraft.trim()
         payload.loader = (loader || undefined) as PackLoader | undefined
         payload.loaderVersion = loader ? loaderVersion.trim() : undefined
@@ -425,15 +433,15 @@ export function VersionEditor({
       }
 
       // Emulator-specific fields
-      if (emulatorData) {
-        payload.files = emulatorData.files
+      if (emu) {
+        payload.files = emu.files
         payload.emulator = {
-          kind: emulatorData.kind,
-          rom: emulatorData.rom,
-          args: emulatorData.args,
+          kind: emu.kind,
+          rom: emu.rom,
+          args: emu.args,
         }
-        if (emulatorData.initialFiles && emulatorData.initialFiles.length > 0) {
-          payload.initialFiles = emulatorData.initialFiles
+        if (emu.initialFiles && emu.initialFiles.length > 0) {
+          payload.initialFiles = emu.initialFiles
         }
       }
       const res =
@@ -490,9 +498,11 @@ export function VersionEditor({
       ) : isEmulator ? (
       <div className="flex min-h-0 flex-1 flex-col gap-5 bm-scroll overflow-auto pr-1 pb-4">
         <EmulatorEditor
+          initialName={name}
           onSave={(data) => {
+            setName(data.name)
             setEmulatorData(data)
-            setStep("review")
+            void submit(data)
           }}
           previousKind={undefined}
         />
