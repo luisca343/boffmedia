@@ -13,16 +13,16 @@ export type PackCardLayout = "card" | "compact" | "row"
  *  runtime, so it renders identically in the launcher, in web admin and in the
  *  styleguide.
  *
- *  One component, three shells behind `layout` (PACK_CARD_LAYOUTS.md):
- *  - `card`    — 16:9 cover art on top (~300px). Store / discovery grids.
- *  - `compact` — no art; the header gains a seal with the `icon` glyph (~300px,
- *                shorter). Installed lists where placeholder art adds nothing.
- *  - `row`     — horizontal, 120px art rail (~520px). Dense library lists.
+ *  One component, three FIXED-HEIGHT shells behind `layout`
+ *  (PACK_CARD_FIXED_HEIGHT.md — every card in a grid is pixel-identical in height):
+ *  - `card`    — 150px cover art on top, 420px tall. Store / discovery grids.
+ *  - `compact` — no art; the header gains a seal with the `icon` glyph. 272px tall.
+ *  - `row`     — horizontal, 150px art rail, 150px tall. Dense library lists.
  *
- *  The cleanup rules bake into every layout: ONE state signal (`stateBadge`),
- *  server status demoted to the tenue `serverStatus` strip, a single wrapping
- *  meta line (`badges` + `footerMeta`, never truncated), one hairline (above
- *  meta), and a full-width rectangular primary action. */
+ *  Equal-height rule: the shell has an explicit height, every internal region is
+ *  flex:none with a reserved size (title & description clamp to 2 lines but also
+ *  min-height 2 lines; the signal slot is always ≥40px; the meta line never
+ *  wraps), and only the footer's mt-auto absorbs the slack. */
 export interface PackCardProps {
   /** Full-bleed cover art — e.g. a `<CatalogIcon/>` or `<img>`. Ignored by
    *  `layout="compact"`. */
@@ -30,25 +30,28 @@ export interface PackCardProps {
   /** Glyph for the art placeholder (card/row) or the header seal (compact). */
   icon?: React.ReactNode
   title: React.ReactNode
-  /** Mono slug under the title. */
+  /** Mono slug under the title. One line, ellipsized. */
   slug?: React.ReactNode
   /** Header aside — the single install-state badge. One signal: anything else
    *  (server health, progress) has its own quieter slot. */
   stateBadge?: React.ReactNode
   type?: PackCardType
   layout?: PackCardLayout
-  /** The online/offline `ServerStatus` strip. Typically only for server packs. */
+  /** The online/offline `ServerStatus` strip. Typically only for server packs.
+   *  Renders inside the fixed-height signal slot; a live `progress` outranks it. */
   serverStatus?: React.ReactNode
   summary?: React.ReactNode
-  /** Install progress region (bar + phase text), composed by the host. */
+  /** Install progress region (bar + phase text), composed by the host. Highest
+   *  priority occupant of the signal slot. */
   progress?: React.ReactNode
-  /** Broken-state message, composed by the host. */
+  /** Broken-state message, composed by the host. Shown as a one-line note in the
+   *  signal slot when neither `progress` nor `serverStatus` claim it. */
   error?: React.ReactNode
   /** Entries of the single mono meta line — access · version · files · size.
-   *  Wraps, never truncates. */
+   *  ONE line: truncates, never wraps. */
   badges?: React.ReactNode
-  /** Last-played / playtime. Renders as a full-width dim line INSIDE the meta
-   *  block (mock fix #4: it no longer fights the button for footer space). */
+  /** Last-played / playtime. Pinned to the right end of the meta line, never
+   *  wrapped below it. */
   footerMeta?: React.ReactNode
   /** Corner note over the cover art — e.g. the slug. Card/row only. */
   artNote?: React.ReactNode
@@ -71,6 +74,15 @@ export interface PackCardProps {
 const STRIPE: React.CSSProperties = {
   backgroundImage: "repeating-linear-gradient(135deg, var(--panel-2) 0 10px, transparent 10px 20px)",
   backgroundColor: "var(--bg-2)",
+}
+
+// Shell heights per layout — the single tunable of the equal-height rule. The
+// reserved regions below must keep summing to ≤ these (with the footer's mt-auto
+// absorbing the slack), or overflow-hidden would clip the footer.
+const SHELL: Record<PackCardLayout, string> = {
+  card: "h-[420px] w-[300px] flex-col",
+  compact: "h-[272px] w-[300px] flex-col",
+  row: "h-[150px] w-full flex-row items-stretch",
 }
 
 export function PackCard({
@@ -101,8 +113,8 @@ export function PackCard({
   const cover = compact ? null : (
     <div
       className={cn(
-        "relative grid place-items-center overflow-hidden border-solid border-line",
-        row ? "w-[120px] shrink-0 border-r" : "aspect-[16/9] border-b",
+        "relative grid shrink-0 place-items-center overflow-hidden border-solid border-line",
+        row ? "w-[150px] border-r" : "h-[150px] border-b",
       )}
       style={art == null ? STRIPE : undefined}
     >
@@ -127,21 +139,35 @@ export function PackCard({
     </div>
   )
 
+  // The polymorphic signal slot: exactly one occupant — a live install progress,
+  // else the server strip, else a one-line broken note, else reserved emptiness.
+  // The wrapper keeps its 40px floor in every case so cards never disagree.
+  const signal =
+    progress != null ? (
+      <div>{progress}</div>
+    ) : serverStatus != null ? (
+      <div>{serverStatus}</div>
+    ) : error != null ? (
+      <div className="truncate border border-solid border-bad/40 bg-bad-soft px-2.5 py-2 text-[11px] text-txt-muted">
+        {error}
+      </div>
+    ) : null
+
   return (
     <div
       role={onOpen ? "button" : undefined}
       onClick={onOpen}
       className={cn(
-        "flex border border-solid border-line bg-panel transition-[border-color] duration-[140ms]",
-        row ? "w-[520px] flex-row items-stretch" : "w-[300px] flex-col",
+        "flex overflow-hidden border border-solid border-line bg-panel transition-[border-color] duration-[140ms]",
+        SHELL[layout],
         onOpen && "cursor-pointer hover:border-line-2",
         className,
       )}
     >
       {cover}
 
-      <div className={cn("flex flex-col p-3.5", compact ? "gap-[13px]" : "gap-3", row && "flex-1 justify-center")}>
-        <div className="flex items-start gap-2.5">
+      <div className="flex min-h-0 min-w-0 flex-1 flex-col gap-[10px] p-3.5">
+        <div className="flex shrink-0 items-start gap-2.5">
           {compact && (
             // No art region in compact, so the lock cue moves into the seal —
             // without this, `locked` would read only from the state badge.
@@ -157,41 +183,42 @@ export function PackCard({
           <div className="min-w-0 flex-1">
             <div
               className={cn(
-                "line-clamp-2 font-display font-extrabold italic uppercase leading-[0.95] tracking-[0.01em] text-txt",
+                "font-display font-extrabold italic uppercase leading-[1.02] tracking-[0.01em] text-txt",
                 compact ? "text-[17px]" : "text-[19px]",
+                // A 1-line title occupies the same box as a 2-line one — the
+                // min-height is 2 line-boxes (2 × 1.02em), not the content.
+                row ? "line-clamp-1" : "line-clamp-2 min-h-[2.04em]",
               )}
             >
               {title}
             </div>
             {slug != null && (
-              <div className="mt-[3px] font-mono text-[10px] tracking-[0.06em] text-txt-dim">{slug}</div>
+              <div className="mt-[3px] truncate font-mono text-[10px] tracking-[0.06em] text-txt-dim">{slug}</div>
             )}
           </div>
           {stateBadge != null && <span className="shrink-0">{stateBadge}</span>}
         </div>
 
-        {summary != null && <div className="text-[13.5px] leading-[1.5] text-txt-muted">{summary}</div>}
-
-        {serverStatus != null && <div>{serverStatus}</div>}
-
-        {progress != null && <div>{progress}</div>}
-
-        {error != null && (
-          <div className="border border-solid border-bad/40 bg-bad-soft px-2.5 py-2 text-[11px] text-txt-muted">
-            {error}
+        {!row && (
+          // Reserved even when empty: a short or missing description still holds
+          // its 2-line box (2 × 1.5em) so the regions below never shift.
+          <div className="line-clamp-2 min-h-[3em] shrink-0 text-[13.5px] leading-[1.5] text-txt-muted">
+            {summary}
           </div>
         )}
 
+        {!row && <div className="flex min-h-[40px] shrink-0 flex-col justify-center">{signal}</div>}
+
         {(badges != null || footerMeta != null) && (
-          <div className="flex flex-wrap items-center gap-x-3.5 gap-y-1.5 border-t border-solid border-line pt-3 font-mono text-[11px] text-txt-muted">
-            {badges}
-            {footerMeta != null && <span className="w-full text-txt-dim">{footerMeta}</span>}
+          <div className="flex shrink-0 items-center gap-3 overflow-hidden whitespace-nowrap border-t border-solid border-line pt-3 font-mono text-[11px] text-txt-muted">
+            <span className="flex min-w-0 items-center gap-2.5 overflow-hidden">{badges}</span>
+            {footerMeta != null && <span className="ml-auto shrink-0 text-txt-dim">{footerMeta}</span>}
           </div>
         )}
 
         {(actions != null || menu != null) && (
           <div
-            className="mt-auto flex items-stretch gap-2.5"
+            className="mt-auto flex shrink-0 items-stretch gap-2.5"
             // A click on the button OR the kebab must not bubble to onOpen —
             // otherwise every menu open also navigates away.
             onClick={(e) => e.stopPropagation()}
