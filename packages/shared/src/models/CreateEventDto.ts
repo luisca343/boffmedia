@@ -31,5 +31,9 @@ export type CreateEventDto = {
      * Human-readable ROM hint
      */
     romHint: string;
+    /**
+     * Pack ID for randomlocke event linkage
+     */
+    packId?: string;
 };
 

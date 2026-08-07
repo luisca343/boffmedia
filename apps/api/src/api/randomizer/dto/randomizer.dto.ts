@@ -106,7 +106,12 @@ export class EventResponseDto {
   @ApiProperty()
   romHint: string | null;
 
-  @ApiProperty({ example: 'pack-uuid-1234', required: false })
+  @ApiProperty({
+    type: String,
+    example: 'pack-uuid-1234',
+    required: false,
+    nullable: true,
+  })
   packId: string | null;
 
   @ApiProperty({
@@ -150,6 +155,7 @@ export class AssignmentClaimedDto {
   eventStatus: RandomizerEventStatus;
 
   @ApiProperty({
+    type: String,
     description: 'SHA-512 of randomized output ROM; present only if patched',
     nullable: true,
   })

@@ -1,0 +1,21 @@
+diff --git a/random/src/main/java/com/uprfvx/random/cli/CliRandomizer.java b/random/src/main/java/com/uprfvx/random/cli/CliRandomizer.java
+index b9dc066d..8b0be21e 100644
+--- a/random/src/main/java/com/uprfvx/random/cli/CliRandomizer.java
++++ b/random/src/main/java/com/uprfvx/random/cli/CliRandomizer.java
+@@ -166,7 +166,7 @@ public class CliRandomizer {
+         String updateFilePath = null;
+         boolean saveLog = false;
+ 
+-        List<String> allowedFlags = Arrays.asList("-i", "-o", "-s", "-S", "-z", "-c", "-d", "-u", "-l", "-h", "--help");
++        List<String> allowedFlags = Arrays.asList("-i", "-o", "-s", "-S", "-z", "--seed", "-c", "-d", "-u", "-l", "-h", "--help");
+         for (int i = 0; i < args.length; i++) {
+             if (allowedFlags.contains(args[i])) {
+                 switch (args[i]) {
+@@ -183,6 +183,7 @@ public class CliRandomizer {
+                         settingsString = args[i + 1];
+                         break;
+                     case "-z":
++                    case "--seed":
+                         seedString = args[i + 1];
+                         break;
+                     case "-c":

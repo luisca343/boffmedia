@@ -4,5 +4,9 @@
 /* eslint-disable */
 export type UpdateEventDto = {
     romHint?: string;
+    /**
+     * Pack ID for randomlocke event linkage
+     */
+    packId?: string;
 };
 
