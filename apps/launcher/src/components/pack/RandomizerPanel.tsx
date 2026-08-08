@@ -45,6 +45,7 @@ export function RandomizerPanel({
   const [uploadProgress, setUploadProgress] = useState(0)
   const [uploadPhase, setUploadPhase] = useState<"idle" | "uploading" | "downloading">("idle")
   const [error, setError] = useState<string | null>(null)
+  const [loadError, setLoadError] = useState<string | null>(null)
 
   // Load the assignment on mount
   useEffect(() => {
@@ -52,8 +53,13 @@ export function RandomizerPanel({
       try {
         const result = await getRandomizerAssignment(packId)
         setAssignment(result)
+        setLoadError(null)
       } catch (err) {
+        // A null result (404 → no active event) legitimately hides the panel.
+        // A thrown error (401/403/5xx) must be shown, not swallowed — otherwise
+        // "not registered", "no session", etc. look identical to "no event".
         console.error("Failed to load randomizer assignment:", err)
+        setLoadError((err as { message?: string })?.message ?? t("loadError"))
         setAssignment(null)
       }
     }
@@ -117,6 +123,15 @@ export function RandomizerPanel({
       setUploadPhase("idle")
       setUploadProgress(0)
     }
+  }
+
+  // A real error (not a plain 404) is shown so the failing gate is visible.
+  if (assignment === null && loadError) {
+    return (
+      <Panel title={t("panelTitle")} className={className}>
+        <p className="text-sm text-bad">{loadError}</p>
+      </Panel>
+    )
   }
 
   // Don't render if no assignment (404 means no active event)

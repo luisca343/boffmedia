@@ -2174,6 +2174,7 @@
       "romHint": "ROM Hint",
       "romHintPlaceholder": "e.g., 'Pokémon Emerald v1.0, USA'",
       "packLabel": "Emulator Pack",
+      "packHint": "Links the event to the launcher",
       "selectPack": "Select a pack…",
       "optional": "optional",
       "errorLoading": "Failed to load data",

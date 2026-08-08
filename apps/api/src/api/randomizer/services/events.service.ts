@@ -163,6 +163,7 @@ export class EventsService {
     gameTitle: string;
     presetId: number;
     cleanRomSha512: string;
+    packId: string;
     romHint?: string;
   }): Promise<RandomizerConfig> {
     if (!data.eventId || data.eventId <= 0) {
@@ -177,6 +178,11 @@ export class EventsService {
       throw new BadRequestException(`Preset ${data.presetId} not found`);
     }
 
+    // The pack is what makes the config reachable in the launcher (pack → event
+    // → config). Validate it up front and attach it to the event in the same
+    // transaction as the insert, so a config can never exist unreachable.
+    await this.assertPackAttachable(data.packId, data.eventId);
+
     // Pin the settings snapshot: SHA-512 over a stable serialization of the preset's JSON.
     const settingsBlobSha512 = createHash('sha512')
       .update(stableStringify(asSettingsObject(preset.settingsJson)))
@@ -184,8 +190,8 @@ export class EventsService {
 
     const fvxJarSha512 = this.getFvxJarSha512();
 
-    try {
-      const configId = await this.repository.createConfig({
+    const configId = await this.repository.createConfigAndAttachPack(
+      {
         eventId: data.eventId,
         gamePlatform: data.gamePlatform,
         gameTitle: data.gameTitle,
@@ -194,20 +200,46 @@ export class EventsService {
         cleanRomSha512: data.cleanRomSha512,
         romHint: data.romHint || null,
         status: 'draft',
-      } as NewRandomizerConfig);
+      } as NewRandomizerConfig,
+      data.packId,
+    );
 
-      const config = await this.repository.getConfigById(configId);
-      if (!config) {
-        throw new Error('Failed to retrieve created config');
-      }
+    const config = await this.repository.getConfigById(configId);
+    if (!config) {
+      throw new Error('Failed to retrieve created config');
+    }
 
-      this.logger.debug(
-        `Created randomizer config ${configId} for event ${data.eventId}`,
+    this.logger.debug(
+      `Created randomizer config ${configId} for event ${data.eventId}, pack ${data.packId}`,
+    );
+    return config;
+  }
+
+  /**
+   * Validate that a pack can be attached to an event: it must exist, be an
+   * emulator pack, and not already be claimed by a different event (the launcher
+   * resolves a pack to a single event).
+   */
+  private async assertPackAttachable(
+    packId: string,
+    eventId: number,
+  ): Promise<void> {
+    if (!packId) {
+      throw new BadRequestException('A pack is required');
+    }
+    const pack = await this.repository.getEmulatorPack(packId);
+    if (!pack) {
+      throw new BadRequestException(
+        `Pack ${packId} not found or is not an emulator pack`,
       );
-      return config;
-    } catch (error: any) {
-      this.logger.error('Failed to create config:', error);
-      throw error;
+    }
+    const other = await this.repository.findEventHoldingPack(packId, eventId);
+    if (other !== null) {
+      throw new ConflictException({
+        message: `Pack ${packId} is already attached to event ${other}`,
+        userMessage:
+          'Este pack ya está vinculado a otro evento. Elige un pack distinto.',
+      });
     }
   }
 
@@ -257,7 +289,7 @@ export class EventsService {
    */
   async updateConfig(
     configId: number,
-    patch: { romHint?: string },
+    patch: { romHint?: string; packId?: string },
   ): Promise<RandomizerConfig> {
     if (!configId || configId <= 0) {
       throw new BadRequestException('Valid configId is required');
@@ -269,6 +301,12 @@ export class EventsService {
       throw new ConflictException(
         `Cannot update config ${configId}: status is ${config.status}, not draft`,
       );
+    }
+
+    // Re-attach to a different pack if asked (validated the same as create).
+    if (patch.packId !== undefined) {
+      await this.assertPackAttachable(patch.packId, config.eventId);
+      await this.repository.attachPackToEvent(config.eventId, patch.packId);
     }
 
     await this.repository.updateConfig(configId, {
@@ -294,9 +332,26 @@ export class EventsService {
       );
     }
 
+    // Opening is the admin's "go live" action, so it also activates the event —
+    // the last gate the launcher needs (pack + active event + open config). The
+    // event must already have a pack (attached at create); guard so we never
+    // open a config that can't actually be reached.
+    const ev = await this.repository.getEventPackAndStatus(config.eventId);
+    if (!ev?.packId) {
+      throw new ConflictException({
+        message: `Event ${config.eventId} has no pack attached`,
+        userMessage:
+          'El evento no tiene un pack vinculado. Vuelve a guardar la configuración con un pack.',
+      });
+    }
+
     await this.repository.updateConfig(configId, {
       status: 'open' as RandomizerConfigStatus,
     });
+
+    if (ev.status !== 'active') {
+      await this.repository.setEventStatus(config.eventId, 'active');
+    }
 
     await this.repository.appendAudit({
       configId,
@@ -304,7 +359,9 @@ export class EventsService {
       actor: actor || 'system',
     });
 
-    this.logger.debug(`Opened config ${configId}`);
+    this.logger.debug(
+      `Opened config ${configId} and activated event ${config.eventId}`,
+    );
 
     return this.getConfig(configId);
   }

@@ -1,6 +1,7 @@
-import { Injectable, Inject } from '@nestjs/common';
+import { Injectable, Inject, ConflictException } from '@nestjs/common';
 import { MySql2Database } from 'drizzle-orm/mysql2';
-import { and, eq, isNotNull, inArray } from 'drizzle-orm';
+import { and, eq, ne, isNotNull, inArray } from 'drizzle-orm';
+import { packs } from '@/_db/schema/Packs';
 import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
 import {
   randomizerConfigs,
@@ -45,8 +46,121 @@ export class RandomizerRepository {
       return result[0].insertId;
     } catch (error: any) {
       this.logger.error('Failed to create randomizer config:', error);
+      // event_id is unique: one config per event. Surface the collision as a
+      // 409 instead of an opaque 500 so the admin UI can tell the user a config
+      // already exists (and to edit/delete it instead of re-creating).
+      if (error?.code === 'ER_DUP_ENTRY') {
+        throw new ConflictException({
+          message: `A randomizer config already exists for event ${data.eventId}`,
+          userMessage:
+            'Ya existe una configuración para este evento. Edítala o elimínala antes de crear otra.',
+        });
+      }
       throw new Error(`Config creation failed: ${error.message}`);
     }
+  }
+
+  /**
+   * Insert a config AND attach its pack to the event in one transaction, so a
+   * config can never exist without its event being resolvable-by-pack.
+   */
+  async createConfigAndAttachPack(
+    data: NewRandomizerConfig,
+    packId: string,
+  ): Promise<number> {
+    try {
+      return await this.db.transaction(async (tx) => {
+        const result = await tx
+          .insert(randomizerConfigs)
+          .values(data)
+          .execute();
+        await tx
+          .update(boffMediaEvents)
+          .set({ packId })
+          .where(eq(boffMediaEvents.id, data.eventId))
+          .execute();
+        return result[0].insertId;
+      });
+    } catch (error: any) {
+      this.logger.error('Failed to create randomizer config:', error);
+      if (error?.code === 'ER_DUP_ENTRY') {
+        throw new ConflictException({
+          message: `A randomizer config already exists for event ${data.eventId}`,
+          userMessage:
+            'Ya existe una configuración para este evento. Edítala o elimínala antes de crear otra.',
+        });
+      }
+      throw new Error(`Config creation failed: ${error.message}`);
+    }
+  }
+
+  /** Return the pack iff it exists and is an emulator pack; else null. */
+  async getEmulatorPack(
+    packId: string,
+  ): Promise<{ id: string; name: string } | null> {
+    if (!packId) return null;
+    const rows = await this.db
+      .select({ id: packs.id, name: packs.name })
+      .from(packs)
+      .where(and(eq(packs.id, packId), eq(packs.gameType, 'emulator')))
+      .execute();
+    return rows.length > 0 ? rows[0] : null;
+  }
+
+  /**
+   * The launcher resolves a pack to at most one event (getConfigByPackId takes
+   * the first row), so a pack must map to a single event. Return the id of any
+   * OTHER event already holding this pack, or null.
+   */
+  async findEventHoldingPack(
+    packId: string,
+    exceptEventId: number,
+  ): Promise<number | null> {
+    if (!packId) return null;
+    const rows = await this.db
+      .select({ id: boffMediaEvents.id })
+      .from(boffMediaEvents)
+      .where(
+        and(
+          eq(boffMediaEvents.packId, packId),
+          ne(boffMediaEvents.id, exceptEventId),
+        ),
+      )
+      .execute();
+    return rows.length > 0 ? rows[0].id : null;
+  }
+
+  /** Attach (or re-attach) a pack to an event. */
+  async attachPackToEvent(eventId: number, packId: string): Promise<void> {
+    await this.db
+      .update(boffMediaEvents)
+      .set({ packId })
+      .where(eq(boffMediaEvents.id, eventId))
+      .execute();
+  }
+
+  /** Set an event's lifecycle status (used to activate on config open). */
+  async setEventStatus(eventId: number, status: string): Promise<void> {
+    await this.db
+      .update(boffMediaEvents)
+      .set({ status: status as any })
+      .where(eq(boffMediaEvents.id, eventId))
+      .execute();
+  }
+
+  /** Read an event's pack + status (for launcher-resolvability enrichment). */
+  async getEventPackAndStatus(
+    eventId: number,
+  ): Promise<{ packId: string | null; status: string } | null> {
+    const rows = await this.db
+      .select({
+        packId: boffMediaEvents.packId,
+        status: boffMediaEvents.status,
+      })
+      .from(boffMediaEvents)
+      .where(eq(boffMediaEvents.id, eventId))
+      .execute();
+    return rows.length > 0 ? rows[0] : null;
   }
 
   async getConfigById(id: number): Promise<RandomizerConfig | null> {

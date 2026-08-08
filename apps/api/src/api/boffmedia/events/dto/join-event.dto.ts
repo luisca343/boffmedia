@@ -2,9 +2,12 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsInt, IsOptional, IsString, MaxLength } from 'class-validator';
 
 export class JoinEventDto {
-  @ApiProperty({ description: 'The user ID trying to join the event' })
+  // Identity is injected from the JWT in the controller, never trusted from the
+  // body. Kept optional so an empty request body passes validation before the
+  // handler overwrites it with req.user.userId.
+  @IsOptional()
   @IsInt()
-  userId: number;
+  userId?: number;
 
   @ApiProperty({
     description: 'Optional nickname for the participant',

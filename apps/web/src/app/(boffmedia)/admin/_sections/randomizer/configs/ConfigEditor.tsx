@@ -54,7 +54,11 @@ export function ConfigEditor({
     reset,
   } = useForm<ConfigFormData>({
     resolver: zodResolver(makeConfigSchema(t)),
-    defaultValues: config
+    // Branch on an actual saved config (id), not truthiness: the "create" path
+    // passes an empty {} sentinel, which is truthy and would otherwise take the
+    // existing-config branch — leaving gamePlatform undefined and failing the
+    // enum validation silently (that Select has no error slot).
+    defaultValues: config?.id
       ? {
           gameTitle: config.gameTitle,
           gamePlatform: config.gamePlatform,
@@ -127,12 +131,17 @@ export function ConfigEditor({
           toast({ tone: "bad", title: t("selectPreset") })
           return
         }
+        if (!data.packId) {
+          toast({ tone: "bad", title: t("selectPack") })
+          return
+        }
         const res = await RandomizerService.createConfig({
           eventId,
           gamePlatform: data.gamePlatform,
           gameTitle: data.gameTitle,
           presetId: Number(data.presetId),
           cleanRomSha512: data.cleanRomSha512,
+          packId: data.packId,
           romHint: data.romHint || "",
         })
         if (res.success) {
@@ -168,7 +177,15 @@ export function ConfigEditor({
       />
 
       <AvPanel>
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+        <form
+          onSubmit={handleSubmit(onSubmit, (errs) => {
+            // Some fields (e.g. the platform Select) have no inline error slot;
+            // surface a toast so a blocked submit never looks like a dead button.
+            const firstMsg = Object.values(errs).find((e) => e?.message)?.message
+            toast({ tone: "bad", title: t("createError"), msg: firstMsg })
+          })}
+          className="space-y-5"
+        >
           {/* Game Title */}
           <Field label={t("title")} error={errors.gameTitle?.message}>
             <Input
@@ -234,14 +251,15 @@ export function ConfigEditor({
             />
           </Field>
 
-          {/* Pack Selector */}
+          {/* Pack Selector — required: this is what links the event to the
+              launcher (pack → event → config). */}
           <Controller
             control={control}
             name="packId"
             render={({ field }) => (
               <Select
                 label={t("packLabel")}
-                hint={t("optional")}
+                hint={t("packHint")}
                 value={field.value || ""}
                 options={[
                   { value: "", label: t("selectPack") },

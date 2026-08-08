@@ -829,11 +829,21 @@ describe('EventsController — integration (ValidationPipe + GlobalExceptionFilt
       );
     });
 
-    it('returns 400 when userId is missing', async () => {
+    it('accepts an empty body and joins via the JWT identity', async () => {
+      // userId is never taken from the body — the client sends {} and the
+      // handler injects req.user.userId. Requiring it in the DTO used to 400
+      // every real join request.
+      mockFacade.joinEvent.mockResolvedValue({ success: true });
+
       const res = await request(app.getHttpServer())
         .post('/events/join/5')
         .send({});
-      expect(res.status).toBe(400);
+
+      expect(res.status).toBe(201);
+      expect(mockFacade.joinEvent).toHaveBeenCalledWith(
+        5,
+        expect.objectContaining({ userId: 1 }),
+      );
     });
 
     it('accepts optional nickname and avatar fields', async () => {

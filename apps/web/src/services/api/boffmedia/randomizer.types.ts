@@ -69,6 +69,7 @@ export interface CreateConfigDto {
   gamePlatform: "gba" | "nds"
   gameTitle: string
   cleanRomSha512: string
+  packId: string
   romHint?: string
 }
 

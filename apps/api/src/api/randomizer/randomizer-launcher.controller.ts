@@ -23,13 +23,18 @@ import {
   LauncherAuthGuard,
   LauncherRequest,
 } from '@api/packs/guards/launcher-auth.guard';
+import { Public } from '@api/_utils/decorators/public.decorator';
 import { AssignmentsService } from './services/assignments.service';
 import { AssignmentClaimedDto } from './dto/randomizer.dto';
 import { RandomizerRepository } from './repositories/randomizer.repository';
 import { RANDOMIZER_REPOSITORY_TOKEN } from '@api/_utils/repositories/interfaces/repository.token';
 
 // Launcher endpoints for randomizer claim and ROM patching.
-// All routes require launcher authentication.
+// Each route is @Public() (per-route, never on the class — a class-level
+// @Public would also neuter the guard) so the global JwtAuthGuard lets the
+// launcher token through; LauncherAuthGuard then authenticates it. Without the
+// @Public the global website guard 401s every launcher call before this guard
+// runs — which silently killed all randomizer minting.
 @ApiTags('Randomizer | Launcher')
 @Controller('randomizer/launcher')
 @UseGuards(LauncherAuthGuard)
@@ -55,6 +60,7 @@ export class RandomizerLauncherController {
    * - If no assignment found AND config.status!=='open' → 404 (claims closed)
    * - If assignment found → return it (sealed DTO)
    */
+  @Public()
   @Get('packs/:packId/my-assignment')
   @ApiOperation({
     summary: 'Get my randomizer assignment for a pack',
@@ -94,6 +100,7 @@ export class RandomizerLauncherController {
    * Keyed by eventId to keep the launcher contract stable (the sealed assignment
    * DTO exposes eventId, not configId). Resolves event -> config internally.
    */
+  @Public()
   @Post('events/:eventId/rom')
   @ApiOperation({
     summary: 'Upload clean ROM and receive randomized ROM',
@@ -162,6 +169,7 @@ export class RandomizerLauncherController {
    *
    * Returns sealed DTO (no seed, no log, status only).
    */
+  @Public()
   @Get('configs/:configId/my-assignment')
   @ApiOperation({
     summary: 'Get my randomizer assignment for a config',

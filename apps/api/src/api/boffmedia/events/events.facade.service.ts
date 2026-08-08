@@ -431,6 +431,12 @@ export class EventsFacadeService {
       throw new Error('Event not found');
     }
 
+    // userId is injected from the JWT by the controller; guard narrows the
+    // now-optional DTO field and fails loudly if identity is ever missing.
+    if (joinEventDto.userId == null) {
+      throw new Error('Missing authenticated user');
+    }
+
     // Get or create participant
     const participant =
       await this.participantsService.getOrCreateParticipantByUserId(

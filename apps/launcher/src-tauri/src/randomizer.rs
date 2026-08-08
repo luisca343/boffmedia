@@ -72,6 +72,24 @@ pub async fn randomizer_get_assignment(
         });
     }
 
+    // Any other non-success status (401 no session, 403 not entitled, 5xx) must
+    // surface the server's reason rather than being masked as a parse error when
+    // the error envelope has no `data` field.
+    if !res.status().is_success() {
+        let status = res.status().as_u16();
+        let body: serde_json::Value = res.json().await.unwrap_or_default();
+        let reason = body
+            .get("userMessage")
+            .or_else(|| body.get("message"))
+            .and_then(|v| v.as_str())
+            .unwrap_or("Request failed")
+            .to_string();
+        return Err(RandomizerError {
+            code: "http_error".to_string(),
+            message: format!("{} ({})", reason, status),
+        });
+    }
+
     let body: serde_json::Value = res.json().await
         .map_err(|e| RandomizerError {
             code: "parse_error".to_string(),

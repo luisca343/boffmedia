@@ -48,6 +48,15 @@ export class CreateConfigDto {
   cleanRomSha512: string;
 
   @ApiProperty({
+    example: '5b1f88208cfdad6834c7bbec',
+    description:
+      'Emulator pack to attach to the event. The launcher resolves pack → event → config, so this is what makes the config reachable in the launcher.',
+  })
+  @IsNotEmpty()
+  @IsString()
+  packId: string;
+
+  @ApiProperty({
     example: 'Pokémon FireRed (Spain)',
     description: 'Human-readable ROM hint',
   })
@@ -61,6 +70,15 @@ export class UpdateConfigDto {
   @IsOptional()
   @IsString()
   romHint?: string;
+
+  @ApiProperty({
+    example: '5b1f88208cfdad6834c7bbec',
+    required: false,
+    description: 'Re-attach the event to a different emulator pack (draft only)',
+  })
+  @IsOptional()
+  @IsString()
+  packId?: string;
 }
 
 export class ConfigResponseDto {
@@ -93,6 +111,31 @@ export class ConfigResponseDto {
     enum: ['draft', 'open', 'closed', 'published'],
   })
   status: RandomizerConfigStatus;
+
+  @ApiProperty({
+    example: '5b1f88208cfdad6834c7bbec',
+    nullable: true,
+    required: false,
+    description: 'Emulator pack attached to this config’s event (event.pack_id)',
+  })
+  packId?: string | null;
+
+  @ApiProperty({
+    example: true,
+    required: false,
+    description:
+      'Whether the full launcher chain resolves: event has a pack, event is active, and config is open.',
+  })
+  launcherResolvable?: boolean;
+
+  @ApiProperty({
+    example: 'event-not-active',
+    nullable: true,
+    required: false,
+    enum: ['no-pack', 'event-not-active', 'config-not-open', null],
+    description: 'The first broken gate, or null when launcherResolvable.',
+  })
+  resolutionIssue?: string | null;
 
   @ApiProperty()
   createdAt: Date;

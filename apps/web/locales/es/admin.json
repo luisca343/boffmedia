@@ -2174,6 +2174,7 @@
       "romHint": "Pista de ROM",
       "romHintPlaceholder": "p.ej., 'Pokémon Esmeralda v1.0, USA'",
       "packLabel": "Pack de Emulador",
+      "packHint": "Vincula el evento al launcher",
       "selectPack": "Selecciona un pack…",
       "optional": "opcional",
       "errorLoading": "Error al cargar datos",
