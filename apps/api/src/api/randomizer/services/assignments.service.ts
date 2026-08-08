@@ -23,11 +23,16 @@ import {
   type RandomizeJob,
 } from '../ports/randomizer-runner.port';
 import {
+  SETTINGS_SHIM_TOKEN,
+  type ISettingsShim,
+} from '../ports/settings-shim.port';
+import {
   RandomizerAssignmentStatus,
   RandomizerConfigStatus,
   type RandomizerAssignment,
   type RandomizerConfig,
 } from '@/_db/schema/Randomizer';
+import { EventsService } from './events.service';
 
 @Injectable()
 export class AssignmentsService {
@@ -38,6 +43,9 @@ export class AssignmentsService {
     private readonly blobStorage: PacksDownloadsService,
     @Inject(RANDOMIZER_RUNNER_TOKEN)
     private readonly runner: IRandomizerRunner,
+    @Inject(SETTINGS_SHIM_TOKEN)
+    private readonly settingsShim: ISettingsShim,
+    private readonly eventsService: EventsService,
   ) {}
 
   /**
@@ -228,38 +236,13 @@ export class AssignmentsService {
             meta: { uploadedSha512 },
           });
 
-          // Fetch settings blob from disk via PacksDownloadsService.override()
-          if (!config.settingsBlobSha512) {
-            throw new Error(
-              `Config ${configId} has no settings blob SHA512 — config is not ready for randomization`,
-            );
-          }
+          // Fetch settings JSON bytes (with heal-on-miss logic)
+          const settingsJsonBytes = await this.eventsService.settingsJsonBytesForConfig(config);
 
-          let settingsRnqs: Buffer;
-          try {
-            const { stream: settingsStream } = await this.blobStorage.override(
-              config.settingsBlobSha512,
-            );
-            const settingsChunks: Buffer[] = [];
-
-            await new Promise<void>((resolve, reject) => {
-              settingsStream.on('data', (chunk: Buffer) => {
-                settingsChunks.push(chunk);
-              });
-              settingsStream.on('end', () => {
-                resolve();
-              });
-              settingsStream.on('error', (err) => {
-                reject(err);
-              });
-            });
-
-            settingsRnqs = Buffer.concat(settingsChunks);
-          } catch (err) {
-            throw new Error(
-              `Failed to fetch settings blob ${config.settingsBlobSha512}: ${(err as Error).message}`,
-            );
-          }
+          // Encode settings JSON to .rnqs
+          const settingsRnqs = await this.settingsShim.encode(
+            JSON.parse(settingsJsonBytes.toString('utf-8')),
+          );
 
           const job: RandomizeJob = {
             romStream: Readable.from(chunks),

@@ -26,6 +26,7 @@ import {
   type ISettingsShim,
 } from '../ports/settings-shim.port';
 import { Readable } from 'stream';
+import { PacksDownloadsService } from '@api/packs/packs-downloads.service';
 
 /**
  * The `settings_json` column is a MySQL `json` column, but the driver hands it back
@@ -74,6 +75,7 @@ export class EventsService {
     private readonly runner: IRandomizerRunner,
     @Inject(SETTINGS_SHIM_TOKEN)
     private readonly settingsShim: ISettingsShim,
+    private readonly blobStorage: PacksDownloadsService,
   ) {}
 
   /**
@@ -184,9 +186,23 @@ export class EventsService {
     await this.assertPackAttachable(data.packId, data.eventId);
 
     // Pin the settings snapshot: SHA-512 over a stable serialization of the preset's JSON.
-    const settingsBlobSha512 = createHash('sha512')
-      .update(stableStringify(asSettingsObject(preset.settingsJson)))
+    const settingsJsonString = stableStringify(asSettingsObject(preset.settingsJson));
+    const computedSha512 = createHash('sha512')
+      .update(settingsJsonString)
       .digest('hex');
+
+    // Persist the settings JSON bytes to blob storage
+    const { sha512: storedSha512 } = await this.blobStorage.storeBlob(
+      Readable.from([Buffer.from(settingsJsonString)]),
+    );
+
+    // Verify the stored hash matches the computed hash (content-addressed integrity check)
+    if (storedSha512 !== computedSha512) {
+      this.logger.error(
+        `Settings blob hash mismatch: computed ${computedSha512}, stored ${storedSha512}`,
+      );
+      throw new Error('Settings blob hash mismatch (integrity check failed)');
+    }
 
     const fvxJarSha512 = this.getFvxJarSha512();
 
@@ -195,7 +211,7 @@ export class EventsService {
         eventId: data.eventId,
         gamePlatform: data.gamePlatform,
         gameTitle: data.gameTitle,
-        settingsBlobSha512,
+        settingsBlobSha512: storedSha512,
         fvxJarSha512,
         cleanRomSha512: data.cleanRomSha512,
         romHint: data.romHint || null,
@@ -213,6 +229,87 @@ export class EventsService {
       `Created randomizer config ${configId} for event ${data.eventId}, pack ${data.packId}`,
     );
     return config;
+  }
+
+  /**
+   * Helper: fetch settings JSON bytes for a config, with heal-on-miss logic.
+   *
+   * Try to read the blob from disk; if not found, scan all presets, compute each
+   * preset's stable-JSON hash, and if one matches config.settingsBlobSha512, store
+   * the blob (healing the config) and return the bytes. If no preset matches, throw
+   * a ConflictException with a clear message.
+   *
+   * This heals configs that were created before settings blobs were persisted.
+   */
+  async settingsJsonBytesForConfig(config: RandomizerConfig): Promise<Buffer> {
+    if (!config.settingsBlobSha512) {
+      throw new BadRequestException(
+        `Config ${config.id} has no settings blob SHA512`,
+      );
+    }
+
+    // Try to read the blob from disk
+    try {
+      const { stream } = await this.blobStorage.override(
+        config.settingsBlobSha512,
+      );
+      const chunks: Buffer[] = [];
+
+      return new Promise((resolve, reject) => {
+        stream.on('data', (chunk: Buffer) => {
+          chunks.push(chunk);
+        });
+
+        stream.on('end', () => {
+          resolve(Buffer.concat(chunks));
+        });
+
+        stream.on('error', (err) => {
+          reject(err);
+        });
+      });
+    } catch (err: unknown) {
+      this.logger.debug(
+        `Settings blob ${config.settingsBlobSha512} not found; scanning presets for heal...`,
+      );
+
+      // Blob not found. Scan all presets to find a match by hash.
+      const presets = await this.repository.listPresets();
+
+      for (const preset of presets) {
+        const presetJsonString = stableStringify(asSettingsObject(preset.settingsJson));
+        const presetSha512 = createHash('sha512')
+          .update(presetJsonString)
+          .digest('hex');
+
+        if (presetSha512 === config.settingsBlobSha512) {
+          // Found a matching preset. Store the blob and return the bytes.
+          this.logger.debug(
+            `Found matching preset ${preset.id} for config ${config.id}; healing blob...`,
+          );
+
+          const { sha512: storedSha512 } = await this.blobStorage.storeBlob(
+            Readable.from([Buffer.from(presetJsonString)]),
+          );
+
+          if (storedSha512 !== config.settingsBlobSha512) {
+            this.logger.error(
+              `Heal: preset ${preset.id} blob hash mismatch: expected ${config.settingsBlobSha512}, got ${storedSha512}`,
+            );
+            throw new Error('Settings blob hash mismatch during heal');
+          }
+
+          return Buffer.from(presetJsonString);
+        }
+      }
+
+      // No matching preset found
+      throw new ConflictException({
+        message: `Config ${config.id}: settings blob missing and no preset matches SHA512 ${config.settingsBlobSha512}. The config is corrupted and cannot be recovered.`,
+        userMessage:
+          'La configuración está corrupta y no se puede recuperar. Contacta al administrador.',
+      });
+    }
   }
 
   /**
@@ -443,11 +540,17 @@ export class EventsService {
       throw new NotFoundException(`Config ${configId} not found`);
     }
 
-    // TODO: fetch settings blob from disk (storeBlob managed PacksDownloadsService)
-    // For now, just call runner with stub data to trigger the ServiceUnavailableException
+    // Fetch settings JSON bytes (with heal-on-miss)
+    const settingsJsonBytes = await this.settingsJsonBytesForConfig(config);
+
+    // Encode settings JSON to .rnqs
+    const settingsRnqs = await this.settingsShim.encode(
+      JSON.parse(settingsJsonBytes.toString('utf-8')),
+    );
+
     const job: RandomizeJob = {
       romStream,
-      settingsRnqs: Buffer.alloc(0), // Stub
+      settingsRnqs,
       seed: 0,
       gamePlatform: config.gamePlatform as 'gba' | 'nds',
       jarSha512: config.fvxJarSha512,
@@ -456,7 +559,7 @@ export class EventsService {
     const result = await this.runner.randomize(job);
 
     return {
-      randomizedRom: Readable.from(Buffer.alloc(0)), // Stub: would be the ROM bytes
+      randomizedRom: Readable.from(result.romBytes),
       logBytes: result.logBytes,
     };
   }
