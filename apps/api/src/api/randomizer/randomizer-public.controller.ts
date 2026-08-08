@@ -8,6 +8,7 @@ import {
   StreamableFile,
 } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Public } from '@api/_utils/decorators/public.decorator';
 import { EventsService } from './services/events.service';
 import { AssignmentsService } from './services/assignments.service';
 import {
@@ -43,6 +44,7 @@ export class RandomizerPublicController {
    * Includes: id, eventId, gamePlatform, gameTitle, romHint, cleanRomSha512, fvxJarSha512, status.
    * ONLY when published: settingsBlobSha512.
    */
+  @Public()
   @Get('events/:eventId/config')
   @ApiOperation({
     summary: 'Get randomizer config for an event (public)',
@@ -84,6 +86,7 @@ export class RandomizerPublicController {
    *
    * Enforced at the service layer to prevent accidental exposure.
    */
+  @Public()
   @Get('events/:eventId/assignments')
   @ApiOperation({
     summary: 'List event assignments with status (public)',
@@ -105,6 +108,7 @@ export class RandomizerPublicController {
    * ONLY available when config.status === 'published'.
    * Returns 403 if not published, 404 if not found.
    */
+  @Public()
   @Get('events/:eventId/settings')
   @ApiOperation({
     summary: 'Download event settings file (.rnqs)',
@@ -130,6 +134,7 @@ export class RandomizerPublicController {
    * ONLY available when config.status === 'published'.
    * Returns 403 if not published, 404 if not found.
    */
+  @Public()
   @Get('events/:eventId/assignments/:assignmentId/log')
   @ApiOperation({
     summary: 'Download assignment log file (public)',

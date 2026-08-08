@@ -143,6 +143,14 @@ export function ConfigEditor({
           toast({ tone: "bad", title: t("createError"), msg: res.userMessage })
         }
       }
+    } catch (err) {
+      // Surface backend/network failures instead of silently swallowing them
+      // (a thrown error here previously made the button look dead).
+      toast({
+        tone: "bad",
+        title: isExisting ? t("updateError") : t("createError"),
+        msg: (err as { message?: string })?.message ?? String(err),
+      })
     } finally {
       setSubmitting(false)
     }
