@@ -1644,6 +1644,17 @@ export async function folderPicker(): Promise<string | null> {
   }
 }
 
+/** Get the emulator ROM slot's instance-relative path for a pack.
+ *  Returns null for non-emulator packs or when the marker is not yet written. */
+export async function instanceRomSlot(slug: string): Promise<string | null> {
+  if (!isDesktop()) return null
+  try {
+    return await invoke<string | null>("instance_rom_slot", { slug })
+  } catch {
+    return null
+  }
+}
+
 // ── Randomizer Functions ───────────────────────────────────────────────────
 
 export type RandomizerAssignment = {

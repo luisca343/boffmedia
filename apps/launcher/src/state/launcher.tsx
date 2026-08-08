@@ -344,6 +344,8 @@ type Ctx = State & {
   selectSystem: (system: SystemId | "All") => void
   install: (packId: string) => Promise<void>
   repair: (packId: string) => Promise<void>
+  /** Re-scan one pack's on-disk state (missing user files, randomizer gate). */
+  refreshInstallState: (packId: string) => Promise<void>
   play: (packId: string) => Promise<void>
   stop: () => void
   clearLogs: () => void
@@ -713,7 +715,14 @@ export function LauncherProvider({ children }: { children: React.ReactNode }) {
         const state = await installPack(packId, await manifestFor(packId))
         dispatch({ type: "install/state", packId, state })
       } catch (err) {
-        const message = (err as { message?: string })?.message ?? "No se pudo instalar el pack."
+        const errObj = err as { message?: string; code?: string }
+        let message = errObj.message ?? "No se pudo instalar el pack."
+        // Map specific error codes to localized messages (randomizer errors)
+        if (errObj.code === "randomizer_not_patched") {
+          message = "Este pack está vinculado a un evento de randomizador que requiere que parches el ROM antes de jugar."
+        } else if (errObj.code === "randomizer_rom_mismatch") {
+          message = "El ROM no coincide con el esperado. Asegúrate de que has descargado la versión correcta randomizada."
+        }
         // Broken, not not-installed: files may already be on disk, and hiding
         // that would offer a fresh install over a half-written instance.
         dispatch({ type: "install/state", packId, state: { kind: "broken", reason: message } })
@@ -773,7 +782,14 @@ export function LauncherProvider({ children }: { children: React.ReactNode }) {
         dispatch({ type: "pack/played", packId, at: new Date().toISOString() })
         void refreshInstallState(packId)
       } catch (err) {
-        const message = (err as { message?: string })?.message ?? "No se pudo iniciar el juego."
+        const errObj = err as { message?: string; code?: string }
+        let message = errObj.message ?? "No se pudo iniciar el juego."
+        // Map specific error codes to localized messages (randomizer errors)
+        if (errObj.code === "randomizer_not_patched") {
+          message = "Este pack está vinculado a un evento de randomizador que requiere que parches el ROM antes de jugar."
+        } else if (errObj.code === "randomizer_rom_mismatch") {
+          message = "El ROM no coincide con el esperado. Asegúrate de que has descargado la versión correcta randomizada."
+        }
         dispatch({ type: "game/state", game: { kind: "idle" } })
         log({ level: "error", source: "launcher", text: message })
       } finally {
@@ -966,6 +982,7 @@ export function LauncherProvider({ children }: { children: React.ReactNode }) {
     selectSystem: (system) => dispatch({ type: "system/select", system }),
     install,
     repair,
+    refreshInstallState,
     play,
     stop,
     clearLogs: () => dispatch({ type: "logs/clear" }),

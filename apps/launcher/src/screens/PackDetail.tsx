@@ -413,6 +413,10 @@ export function PackDetail() {
     state.missingUserFiles &&
     state.missingUserFiles.length > 0
 
+  // Check if the pack's randomizer ROM is not yet patched
+  const randomizerBlocked =
+    (state.kind === "installed" || state.kind === "outdated") && state.randomizerBlocked === true
+
   const openFolder: MenuItem = {
     label: tk("openInstanceFolder"),
     icon: "folder",
@@ -570,8 +574,14 @@ export function PackDetail() {
               size="lg"
               icon="play"
               loading={game.kind === "preparing"}
-              disabled={hasMissingUserFiles}
-              title={hasMissingUserFiles ? t("pack.requiredFiles.title") : undefined}
+              disabled={hasMissingUserFiles || randomizerBlocked}
+              title={
+                randomizerBlocked
+                  ? t("randomlocke.playBlockedRandomizeFirst")
+                  : hasMissingUserFiles
+                    ? t("pack.requiredFiles.title")
+                    : undefined
+              }
               onClick={() => void play(pack.id)}
             >
               {t("play")}

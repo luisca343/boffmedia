@@ -250,6 +250,10 @@ pub struct Marker {
     /// Present only on emulator markers — see [`EmulatorMarker`].
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub emulator: Option<EmulatorMarker>,
+    /// Randomizer event gate: present when this pack is linked to an active
+    /// randomizer event. Populated from the manifest's randomizer block.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub randomizer: Option<RandomizerGate>,
 }
 
 /// Default game type for backwards compatibility: old markers without this
@@ -354,6 +358,18 @@ pub struct OptionalFile {
     pub name: String,
     pub size: u64,
     pub enabled: bool,
+}
+
+/// Randomizer event gating for a pack linked to an active randomizer.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct RandomizerGate {
+    /// The event ID this pack is linked to.
+    pub event_id: i64,
+    /// The SHA-512 of the clean ROM. Launch checks the managed entry's
+    /// expected sha512 against this: if they match, the player never patched
+    /// the ROM and launch fails with RandomizerNotPatched.
+    pub clean_rom_sha512: String,
 }
 
 // ── The managed / user partition ───────────────────────────────────────────

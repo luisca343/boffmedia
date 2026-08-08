@@ -132,6 +132,7 @@ pub fn run() {
             install::instance_provide_file,
             // Cycle 2 — emulator ROM library sweep + resolution + settings.
             install::instance_user_files_scan,
+            install::instance_rom_slot,
             dialogs::file_picker,
             dialogs::folder_picker,
             emulators::emulator_status,

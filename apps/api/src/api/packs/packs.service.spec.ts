@@ -74,6 +74,7 @@ describe('PacksService', () => {
       findInvite: jest.fn(),
       consumeInvite: jest.fn(),
       audit: jest.fn(),
+      getRandomizerConfigByPackId: jest.fn(),
     };
 
     const module: TestingModule = await Test.createTestingModule({
@@ -92,6 +93,7 @@ describe('PacksService', () => {
       repo.findById.mockResolvedValue(pack() as never);
       repo.hasAccess.mockResolvedValue(true);
       repo.findVersion.mockResolvedValue(version() as never);
+      repo.getRandomizerConfigByPackId.mockResolvedValue(null);
 
       const manifest = (await service.manifestFor(UUID, 'pk1', null, MC)) as {
         version: { files: unknown[] };
@@ -125,6 +127,7 @@ describe('PacksService', () => {
     it('serves a public pack without consulting the ACL at all', async () => {
       repo.findById.mockResolvedValue(pack({ accessKind: 'public' }) as never);
       repo.findVersion.mockResolvedValue(version() as never);
+      repo.getRandomizerConfigByPackId.mockResolvedValue(null);
 
       await service.manifestFor(OTHER, 'pk1', null, MC);
       expect(repo.hasAccess).not.toHaveBeenCalled();
@@ -136,6 +139,7 @@ describe('PacksService', () => {
         pack({ accessKind: 'password', passwordHash }) as never,
       );
       repo.findVersion.mockResolvedValue(version() as never);
+      repo.getRandomizerConfigByPackId.mockResolvedValue(null);
 
       await expect(
         service.manifestFor(UUID, 'pk1', 'incorrecta', MC),
@@ -152,6 +156,7 @@ describe('PacksService', () => {
       repo.findById.mockResolvedValue(pack() as never);
       repo.hasAccess.mockResolvedValue(true);
       repo.findVersion.mockResolvedValue(version() as never);
+      repo.getRandomizerConfigByPackId.mockResolvedValue(null);
 
       const manifest = (await service.manifestFor(UUID, 'pk1', null, MC)) as {
         pack: { access: { kind: string; uuids?: string[] } };
@@ -173,10 +178,103 @@ describe('PacksService', () => {
       repo.findVersion.mockResolvedValue(
         version({ published: false }) as never,
       );
+      repo.getRandomizerConfigByPackId.mockResolvedValue(null);
 
       await expect(service.manifestFor(UUID, 'pk1', null, MC)).rejects.toThrow(
         NotFoundException,
       );
+    });
+  });
+
+  describe('manifestFor — randomizer block injection', () => {
+    it('injects randomizer block when pack is linked to open config', async () => {
+      repo.findById.mockResolvedValue(pack() as never);
+      repo.hasAccess.mockResolvedValue(true);
+      repo.findVersion.mockResolvedValue(version() as never);
+      repo.getRandomizerConfigByPackId.mockResolvedValue({
+        id: 1,
+        eventId: 42,
+        gamePlatform: 'gba',
+        gameTitle: 'pokered',
+        settingsBlobSha512: 'b'.repeat(128),
+        fvxJarSha512: 'c'.repeat(128),
+        cleanRomSha512: 'd'.repeat(128),
+        romHint: 'Pokémon FireRed (Spain)',
+        status: 'open',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      } as never);
+
+      const manifest = (await service.manifestFor(UUID, 'pk1', null, MC)) as {
+        randomizer?: { eventId: number; cleanRomSha512: string };
+      };
+      expect(manifest.randomizer).toEqual({
+        eventId: 42,
+        cleanRomSha512: 'd'.repeat(128),
+      });
+    });
+
+    it('injects randomizer block when pack is linked to closed config', async () => {
+      repo.findById.mockResolvedValue(pack() as never);
+      repo.hasAccess.mockResolvedValue(true);
+      repo.findVersion.mockResolvedValue(version() as never);
+      repo.getRandomizerConfigByPackId.mockResolvedValue({
+        id: 2,
+        eventId: 99,
+        gamePlatform: 'gba',
+        gameTitle: 'pokered',
+        settingsBlobSha512: 'b'.repeat(128),
+        fvxJarSha512: 'c'.repeat(128),
+        cleanRomSha512: 'e'.repeat(128),
+        romHint: null,
+        status: 'closed',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      } as never);
+
+      const manifest = (await service.manifestFor(UUID, 'pk1', null, MC)) as {
+        randomizer?: { eventId: number; cleanRomSha512: string };
+      };
+      expect(manifest.randomizer).toEqual({
+        eventId: 99,
+        cleanRomSha512: 'e'.repeat(128),
+      });
+    });
+
+    it('does NOT inject randomizer block when config is draft', async () => {
+      repo.findById.mockResolvedValue(pack() as never);
+      repo.hasAccess.mockResolvedValue(true);
+      repo.findVersion.mockResolvedValue(version() as never);
+      repo.getRandomizerConfigByPackId.mockResolvedValue({
+        id: 3,
+        eventId: 123,
+        gamePlatform: 'gba',
+        gameTitle: 'pokered',
+        settingsBlobSha512: 'b'.repeat(128),
+        fvxJarSha512: 'c'.repeat(128),
+        cleanRomSha512: 'f'.repeat(128),
+        romHint: null,
+        status: 'draft',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      } as never);
+
+      const manifest = (await service.manifestFor(UUID, 'pk1', null, MC)) as {
+        randomizer?: unknown;
+      };
+      expect(manifest.randomizer).toBeUndefined();
+    });
+
+    it('does NOT inject randomizer block when pack has no linked config', async () => {
+      repo.findById.mockResolvedValue(pack() as never);
+      repo.hasAccess.mockResolvedValue(true);
+      repo.findVersion.mockResolvedValue(version() as never);
+      repo.getRandomizerConfigByPackId.mockResolvedValue(null);
+
+      const manifest = (await service.manifestFor(UUID, 'pk1', null, MC)) as {
+        randomizer?: unknown;
+      };
+      expect(manifest.randomizer).toBeUndefined();
     });
   });
 

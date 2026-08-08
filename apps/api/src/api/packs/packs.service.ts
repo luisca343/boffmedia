@@ -194,11 +194,16 @@ export class PacksService {
       versionId: version.id,
     });
 
+    // Fetch randomizer config if this pack is linked to an active event
+    const randomizerConfig = await this.repo.getRandomizerConfigByPackId(
+      pack.id,
+    );
+
     // Built to the shape @boffmedia/pack-schema defines and validated with it
     // before leaving the server: the launcher parses these exact bytes with the
     // Rust types generated from the same schema, so a malformed manifest must
     // fail here, where it is debuggable, not there.
-    const manifest = {
+    const manifest: any = {
       formatVersion: 1 as const,
       pack: {
         id: pack.id,
@@ -226,6 +231,16 @@ export class PacksService {
         files: version.files,
         ...this.versionGameFields(gameType, version),
       },
+      // Inject randomizer block if the pack is linked to an active, non-draft config.
+      // This linkage is pack-level and injected at serve time (never stored in manifests).
+      ...(randomizerConfig && randomizerConfig.status !== 'draft'
+        ? {
+            randomizer: {
+              eventId: randomizerConfig.eventId,
+              cleanRomSha512: randomizerConfig.cleanRomSha512,
+            },
+          }
+        : {}),
     };
 
     const parsed = PackManifest.safeParse(manifest);

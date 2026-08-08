@@ -944,6 +944,9 @@ const es = {
     statusClaimed: "Reclamado",
     statusPatched: "Randomizado",
     statusVerified: "Verificado",
+    playBlockedRandomizeFirst: "Tienes que parchar el ROM en el randomizer antes de jugar.",
+    launchErrorNotPatched: "Este pack está vinculado a un evento de randomizador que requiere que parches el ROM antes de jugar.",
+    launchErrorRomMismatch: "El ROM no coincide con el esperado. Asegúrate de que has descargado la versión correcta randomizada.",
   },
 
   errors: {
@@ -1885,6 +1888,9 @@ const en = {
     statusClaimed: "Claimed",
     statusPatched: "Randomized",
     statusVerified: "Verified",
+    playBlockedRandomizeFirst: "You must patch the ROM in the randomizer before playing.",
+    launchErrorNotPatched: "This pack is linked to a randomizer event that requires you to patch the ROM before playing.",
+    launchErrorRomMismatch: "The ROM does not match the expected one. Make sure you downloaded the correct randomized version.",
   },
 
   errors: {

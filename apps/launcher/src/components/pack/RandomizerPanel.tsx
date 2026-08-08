@@ -10,9 +10,11 @@ import {
   provideFile,
   updateRandomizerExpectedHash,
   instanceUserFilesScan,
+  instanceRomSlot,
   type RandomizerAssignment,
 } from "../../runtime"
 import type { MissingUserFile } from "../../services/types"
+import { useLauncher } from "../../state/launcher"
 
 /** The emulator ROM slot within an instance, matched by extension. */
 async function resolveRomSlotPath(slug: string, missingFiles: MissingUserFile[]): Promise<string | null> {
@@ -40,6 +42,7 @@ export function RandomizerPanel({
   className?: string
 }) {
   const t = useT("randomlocke")
+  const { refreshInstallState } = useLauncher()
   const [assignment, setAssignment] = useState<RandomizerAssignment | null | "loading">("loading")
   const [romPath, setRomPath] = useState<string | null>(null)
   const [uploadProgress, setUploadProgress] = useState(0)
@@ -88,8 +91,11 @@ export function RandomizerPanel({
         return
       }
 
-      // Resolve the emulator ROM slot from the pack's user files (no hardcoded name)
-      const slotPath = await resolveRomSlotPath(slug, missingFiles)
+      // Resolve the emulator ROM slot: try instanceRomSlot first, fall back to heuristic
+      let slotPath = await instanceRomSlot(slug)
+      if (!slotPath) {
+        slotPath = await resolveRomSlotPath(slug, missingFiles)
+      }
       if (!slotPath) {
         toast.error(t("noRomSlot"))
         setUploadPhase("idle")
@@ -117,6 +123,9 @@ export function RandomizerPanel({
       setRomPath(result.outputPath)
       setUploadPhase("idle")
       setUploadProgress(0)
+      // The Play gate reads the scanned install state — re-scan so it opens now,
+      // not on the next visit to this screen.
+      void refreshInstallState(packId)
       toast.success(t("readyToPlay"))
     } catch (err) {
       setError((err as { message?: string })?.message ?? t("wrongHashError"))

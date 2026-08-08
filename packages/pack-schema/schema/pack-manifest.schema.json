@@ -796,6 +796,25 @@
         "files"
       ],
       "additionalProperties": false
+    },
+    "randomizer": {
+      "type": "object",
+      "properties": {
+        "eventId": {
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "maximum": 9007199254740991
+        },
+        "cleanRomSha512": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{128}$"
+        }
+      },
+      "required": [
+        "eventId",
+        "cleanRomSha512"
+      ],
+      "additionalProperties": false
     }
   },
   "required": [

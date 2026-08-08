@@ -224,6 +224,16 @@ export const PackManifest = z
     formatVersion: z.literal(1),
     pack: Pack,
     version: PackVersion,
+    /** OPTIONAL randomizer linkage: injected dynamically by the API at manifest-serve
+     *  time when the pack is linked to an active randomizer event. Never stored in the
+     *  manifest itself; authored manifests have this omitted. Launcher uses `eventId`
+     *  to route the user to the randomizer feature if gated. */
+    randomizer: z
+      .object({
+        eventId: z.number().int().positive(),
+        cleanRomSha512: z.string().regex(/^[a-f0-9]{128}$/, "cleanRomSha512 must be 128 lowercase hex chars"),
+      })
+      .optional(),
   })
   .superRefine((m, ctx) => {
     const v = m.version

@@ -13,7 +13,10 @@ import {
   packVersions,
   packs,
 } from '@/_db/schema/Packs';
+import { randomizerConfigs } from '@/_db/schema/Randomizer';
+import { boffMediaEvents, EVENT_STATUS } from '@/_db/schema/BoffMediaEvents';
 import type { AuditAction } from './types/packs.types';
+import type { RandomizerConfig } from '@/_db/schema/Randomizer';
 
 @Injectable()
 export class PacksRepository {
@@ -317,6 +320,47 @@ export class PacksRepository {
       .update(packInvites)
       .set({ revoked: true })
       .where(eq(packInvites.code, code));
+  }
+
+  // ── Randomizer ───────────────────────────────────────────────────────────
+
+  /**
+   * Resolve a pack to its randomizer config: the config of the ACTIVE
+   * community event that has this pack attached. Returns null if no such
+   * event/config exists. Mirrors RandomizerRepository.getConfigByPackId but
+   * lives here to avoid circular module dependencies (RandomizerModule imports
+   * PacksModule, so PacksModule cannot import RandomizerModule).
+   */
+  async getRandomizerConfigByPackId(
+    packId: string,
+  ): Promise<RandomizerConfig | null> {
+    if (!packId) {
+      return null;
+    }
+
+    try {
+      const rows = await this.db
+        .select({ config: randomizerConfigs })
+        .from(boffMediaEvents)
+        .innerJoin(
+          randomizerConfigs,
+          eq(randomizerConfigs.eventId, boffMediaEvents.id),
+        )
+        .where(
+          and(
+            eq(boffMediaEvents.packId, packId),
+            eq(boffMediaEvents.status, EVENT_STATUS.ACTIVE),
+          ),
+        )
+        .execute();
+
+      return rows.length > 0 ? rows[0].config : null;
+    } catch (error: any) {
+      // Log but don't throw — a randomizer lookup failure should not block
+      // manifest serving; just means no randomizer block in the manifest.
+      console.error(`Failed to get randomizer config for pack ${packId}:`, error);
+      return null;
+    }
   }
 
   // ── Audit ────────────────────────────────────────────────────────────────

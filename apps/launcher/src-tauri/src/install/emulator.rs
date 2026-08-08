@@ -111,7 +111,7 @@ async fn install_payload(
     reporter.emit(Phase::Verifying, 0.5, "", 0, 0);
 
     let previous = super::read_marker(&prepared.instance);
-    let mut marker = build_marker(&prepared.plan, &wanted);
+    let mut marker = build_marker(&prepared.plan, &wanted, manifest);
     // A pin survives a re-verify of the SAME version (every launch does one)
     // and is cleared by an install of a different one — an explicit update.
     marker.pinned = previous
@@ -141,7 +141,7 @@ async fn install_payload(
     Ok(())
 }
 
-fn build_marker(plan: &PlannedEmulator, installed: &[PlannedFile]) -> Marker {
+fn build_marker(plan: &PlannedEmulator, installed: &[PlannedFile], manifest: &PackManifest) -> Marker {
     Marker {
         version_id: plan.version_id.clone(),
         version_name: plan.version_name.clone(),
@@ -165,6 +165,11 @@ fn build_marker(plan: &PlannedEmulator, installed: &[PlannedFile]) -> Marker {
             kind: plan.kind.clone(),
             rom: plan.rom.clone(),
             args: plan.args.clone(),
+        }),
+        // Populate randomizer gate from manifest, if present
+        randomizer: manifest.randomizer.as_ref().map(|r| instance::RandomizerGate {
+            event_id: r.event_id,
+            clean_rom_sha512: r.clean_rom_sha512.to_string(),
         }),
     }
 }
@@ -232,8 +237,12 @@ pub async fn install(
     let http = build_client()?;
     install_payload(app, &prepared, &http, password, &reporter, manifest).await?;
 
-    let missing_user_files = super::read_marker(&prepared.instance)
-        .map(|m| super::compute_missing_user_files(&prepared.layout, &prepared.instance, &m))
+    let (missing_user_files, randomizer_blocked) = super::read_marker(&prepared.instance)
+        .map(|m| {
+            let missing = super::compute_missing_user_files(&prepared.layout, &prepared.instance, &m);
+            let blocked = super::compute_randomizer_blocked(&m);
+            (missing, blocked)
+        })
         .unwrap_or_default();
 
     reporter.done();
@@ -241,6 +250,7 @@ pub async fn install(
         version_id: prepared.plan.version_id.clone(),
         size_bytes: super::paths::dir_size(&prepared.instance.root),
         missing_user_files,
+        randomizer_blocked,
     })
 }
 
@@ -328,6 +338,43 @@ fn spawn(app: &tauri::AppHandle, prepared: &EmulatorPrepared) -> Result<RunningG
             "No se encontró el ROM «{}». Proporciónalo antes de jugar.",
             prepared.plan.rom
         )));
+    }
+
+    // Randomizer event gate: if this pack is linked to an active randomizer,
+    // verify the ROM has been patched (expected sha512 != clean_rom_sha512).
+    if let Some(marker) = super::read_marker(&prepared.instance) {
+        if let Some(gate) = &marker.randomizer {
+            // Find the ROM's managed entry to get its expected sha512
+            let norm = |p: &str| p.to_lowercase().replace('\\', "/");
+            let rom_key = norm(&prepared.plan.rom);
+            if let Some(rom_entry) = marker
+                .managed
+                .iter()
+                .find(|f| norm(&f.path) == rom_key)
+            {
+                let expected_sha512 = &rom_entry.sha512;
+                // If expected == clean, the player never patched the ROM
+                if expected_sha512.eq_ignore_ascii_case(&gate.clean_rom_sha512) {
+                    return Err(InstallFailure::with_code(
+                        "Este pack está vinculado a un evento de randomizador que requiere que parches el ROM antes de jugar.",
+                        "randomizer_not_patched",
+                    ));
+                }
+                // Otherwise, verify the actual file matches the expected hash
+                if let Some(actual_sha512) = files::sha512_of(&rom) {
+                    if !actual_sha512.eq_ignore_ascii_case(expected_sha512) {
+                        return Err(InstallFailure::with_code(
+                            "El ROM no coincide con el esperado. Asegúrate de que has descargado la versión correcta randomizada.",
+                            "randomizer_rom_mismatch",
+                        ));
+                    }
+                } else {
+                    return Err(InstallFailure::message(
+                        "No se pudo verificar la integridad del ROM."
+                    ));
+                }
+            }
+        }
     }
 
     // Saves live INSIDE the instance (owner decision): two packs of the same

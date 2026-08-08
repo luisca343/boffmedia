@@ -99,9 +99,9 @@ export type RomScanResult = {
 /** Where a pack stands on THIS machine. */
 export type InstallState =
   | { kind: "not-installed" }
-  | { kind: "installed"; versionId: string; sizeBytes: number; missingUserFiles?: MissingUserFile[] }
+  | { kind: "installed"; versionId: string; sizeBytes: number; missingUserFiles?: MissingUserFile[]; randomizerBlocked?: boolean }
   /** Installed, but the server has a newer version. */
-  | { kind: "outdated"; versionId: string; latestVersionId: string; sizeBytes: number; missingUserFiles?: MissingUserFile[] }
+  | { kind: "outdated"; versionId: string; latestVersionId: string; sizeBytes: number; missingUserFiles?: MissingUserFile[]; randomizerBlocked?: boolean }
   | { kind: "installing"; progress: InstallProgress }
   | { kind: "broken"; reason: string }
 

@@ -49,14 +49,17 @@ use runtime::{JavaChoice, MemoryChoice, ResolvedRuntime, RuntimeOverride};
 
 /// Serialisable failure for the renderer.
 ///
-/// The shape ({ message, needs_signin }) is NOT incidental: runtime.ts's
-/// `asFailure()` reads exactly these two fields, and anything else renders as
-/// "Error inesperado". Kept identical to `auth::AuthFailure` and `api::ApiError`
-/// so the renderer needs one error path, not three.
+/// The shape ({ message, needs_signin, code }) is NOT incidental: runtime.ts's
+/// `asFailure()` reads these fields, and anything else renders as
+/// "Error inesperado". Kept similar to `auth::AuthFailure` and `api::ApiError`
+/// so the renderer needs one error path, not three. The optional `code` field
+/// allows UI-specific error handling (e.g., randomizer-specific messages).
 #[derive(Debug, Clone, Serialize)]
 pub struct InstallFailure {
     pub message: String,
     pub needs_signin: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub code: Option<String>,
 }
 
 impl InstallFailure {
@@ -64,6 +67,7 @@ impl InstallFailure {
         Self {
             message: message.into(),
             needs_signin: false,
+            code: None,
         }
     }
 
@@ -74,6 +78,16 @@ impl InstallFailure {
         Self {
             message: message.into(),
             needs_signin: true,
+            code: None,
+        }
+    }
+
+    /// Create a failure with an error code for UI-specific handling.
+    pub fn with_code(message: impl Into<String>, code: impl Into<String>) -> Self {
+        Self {
+            message: message.into(),
+            needs_signin: false,
+            code: Some(code.into()),
         }
     }
 }
@@ -83,6 +97,7 @@ impl From<crate::auth::AuthFailure> for InstallFailure {
         Self {
             message: err.message,
             needs_signin: err.needs_signin,
+            code: None,
         }
     }
 }
@@ -108,6 +123,10 @@ pub enum InstallStatus {
         size_bytes: u64,
         #[serde(skip_serializing_if = "Vec::is_empty", default)]
         missing_user_files: Vec<MissingUserFile>,
+        /// True when the pack is linked to a randomizer event and the ROM has
+        /// not yet been patched (expected sha512 == clean_rom_sha512).
+        #[serde(skip_serializing_if = "is_false", default)]
+        randomizer_blocked: bool,
     },
     #[serde(rename_all = "camelCase")]
     Outdated {
@@ -116,11 +135,20 @@ pub enum InstallStatus {
         size_bytes: u64,
         #[serde(skip_serializing_if = "Vec::is_empty", default)]
         missing_user_files: Vec<MissingUserFile>,
+        /// True when the pack is linked to a randomizer event and the ROM has
+        /// not yet been patched (expected sha512 == clean_rom_sha512).
+        #[serde(skip_serializing_if = "is_false", default)]
+        randomizer_blocked: bool,
     },
     #[serde(rename_all = "camelCase")]
     Broken {
         reason: String,
     },
+}
+
+/// Helper for skip_serializing_if to omit false booleans.
+fn is_false(b: &bool) -> bool {
+    !b
 }
 
 /// A user-provided file that is required but not yet satisfied.
@@ -140,7 +168,7 @@ pub struct MissingUserFile {
 /// the mere presence of `<sha512>` there means a reinstall would place the file;
 /// and a file already at the instance path was hash-verified when it was placed.
 /// Optional entries (`env.client == optional`) never block and are skipped.
-fn compute_missing_user_files(
+pub fn compute_missing_user_files(
     layout: &Layout,
     instance: &InstancePaths,
     marker: &Marker,
@@ -167,6 +195,32 @@ fn compute_missing_user_files(
         }
     }
     missing
+}
+
+/// True when the pack is linked to a randomizer event and the ROM has not yet
+/// been patched (i.e., the expected sha512 in the managed entry still equals
+/// the clean_rom_sha512 from the gate). Cheap by design: no hashing, just
+/// marker field comparison.
+pub fn compute_randomizer_blocked(marker: &Marker) -> bool {
+    let Some(gate) = &marker.randomizer else {
+        return false;
+    };
+    // Find the ROM file in the managed list (for emulator packs only)
+    if marker.game_type != instance::GameType::Emulator {
+        return false;
+    }
+    let Some(emulator) = &marker.emulator else {
+        return false;
+    };
+    // Find the ROM's managed entry
+    let norm = |p: &str| p.to_lowercase().replace('\\', "/");
+    let rom_key = norm(&emulator.rom);
+    if let Some(rom_entry) = marker.managed.iter().find(|f| norm(&f.path) == rom_key) {
+        // Blocked if expected sha512 == clean_rom_sha512 (player never patched)
+        rom_entry.sha512.eq_ignore_ascii_case(&gate.clean_rom_sha512)
+    } else {
+        false
+    }
 }
 
 // The marker (`instance::Marker`) answers "installed, and of what version?"
@@ -650,7 +704,7 @@ async fn install_payload(
     // forever, which is how a removed-but-still-loaded mod crashes a pack that
     // "updated fine".
     let previous = read_marker(&prepared.instance);
-    let mut marker = build_marker(prepared, &wanted);
+    let mut marker = build_marker(prepared, &wanted, &manifest);
     // A pin survives a re-verify of the SAME version (every launch does one)
     // and is cleared by an install of a different one — which is only ever an
     // explicit "Actualizar" click.
@@ -695,7 +749,11 @@ async fn install_payload(
 /// written, which for §9 excludes the optional ones the player switched off —
 /// recording those as managed would make the next update "clean up" files that
 /// were never there.
-fn build_marker(prepared: &game::Prepared, installed: &[PlannedFile]) -> Marker {
+///
+/// If the manifest carries a `randomizer` block, populate the marker's randomizer
+/// field; otherwise clear it (e.g., if the pack is no longer linked to an active
+/// randomizer event).
+fn build_marker(prepared: &game::Prepared, installed: &[PlannedFile], manifest: &crate::pack::PackManifest) -> Marker {
     let plan = &prepared.plan;
     Marker {
         version_id: plan.version_id.clone(),
@@ -722,6 +780,11 @@ fn build_marker(prepared: &game::Prepared, installed: &[PlannedFile]) -> Marker 
         // Cycle 1 only handles Minecraft; later cycles will add other game types.
         game_type: instance::GameType::Minecraft,
         emulator: None,
+        // Populate randomizer gate from manifest, if present
+        randomizer: manifest.randomizer.as_ref().map(|r| instance::RandomizerGate {
+            event_id: r.event_id,
+            clean_rom_sha512: r.clean_rom_sha512.to_string(),
+        }),
     }
 }
 
@@ -899,8 +962,12 @@ pub async fn install_pack(
     // owns; any required user-provided file it still lacks is reported so the
     // pack shows as installed-but-not-launchable and the required-files panel
     // can prompt for it.
-    let missing_user_files = read_marker(&prepared.instance)
-        .map(|m| compute_missing_user_files(&prepared.layout, &prepared.instance, &m))
+    let (missing_user_files, randomizer_blocked) = read_marker(&prepared.instance)
+        .map(|m| {
+            let missing = compute_missing_user_files(&prepared.layout, &prepared.instance, &m);
+            let blocked = compute_randomizer_blocked(&m);
+            (missing, blocked)
+        })
         .unwrap_or_default();
 
     reporter.done();
@@ -908,6 +975,7 @@ pub async fn install_pack(
         version_id: prepared.plan.version_id.clone(),
         size_bytes: paths::dir_size(&prepared.instance.root),
         missing_user_files,
+        randomizer_blocked,
     })
 }
 
@@ -1055,17 +1123,20 @@ pub async fn instance_scan(
 
     let size_bytes = paths::dir_size(&instance.root);
     let missing_user_files = compute_missing_user_files(&layout, &instance, &marker);
+    let randomizer_blocked = compute_randomizer_blocked(&marker);
     Ok(match latest_version_id {
         Some(latest) if latest != marker.version_id => InstallStatus::Outdated {
             version_id: marker.version_id,
             latest_version_id: latest,
             size_bytes,
             missing_user_files,
+            randomizer_blocked,
         },
         _ => InstallStatus::Installed {
             version_id: marker.version_id,
             size_bytes,
             missing_user_files,
+            randomizer_blocked,
         },
     })
 }
@@ -1300,10 +1371,12 @@ pub async fn instance_revert(
     reporter.emit(Phase::Verifying, 1.0, "", 0, 0);
     reporter.done();
 
+    let randomizer_blocked = compute_randomizer_blocked(&marker);
     Ok(InstallStatus::Installed {
         version_id: marker.version_id,
         size_bytes: paths::dir_size(&instance.root),
         missing_user_files: vec![],
+        randomizer_blocked,
     })
 }
 
@@ -1322,10 +1395,12 @@ pub async fn instance_unpin(
     };
     marker.pinned = false;
     write_marker(&instance, &marker)?;
+    let randomizer_blocked = compute_randomizer_blocked(&marker);
     Ok(InstallStatus::Installed {
         version_id: marker.version_id,
         size_bytes: paths::dir_size(&instance.root),
         missing_user_files: vec![],
+        randomizer_blocked,
     })
 }
 
@@ -1732,6 +1807,32 @@ pub async fn instance_user_files_scan(
     })
 }
 
+/// Return the emulator ROM slot's instance-relative path, if this is an emulator
+/// pack with a marker. Returns None for non-emulator packs or when the marker
+/// is not yet written.
+#[tauri::command]
+pub fn instance_rom_slot(
+    slug: String,
+    app: tauri::AppHandle,
+) -> Result<Option<String>, InstallFailure> {
+    let settings = settings::load(&app);
+    let layout = Layout::new(&app, settings.game_dir())?;
+    let instance = layout.instance(&slug);
+
+    let marker = match read_marker(&instance) {
+        Some(m) => m,
+        None => return Ok(None),
+    };
+
+    // Only emulator packs have ROM slots
+    if marker.game_type != instance::GameType::Emulator {
+        return Ok(None);
+    }
+
+    // Return the ROM path from the emulator marker
+    Ok(marker.emulator.as_ref().map(|e| e.rom.clone()))
+}
+
 /// Search roots in priority order: the player's own list first, then the
 /// Emulation folder EmuDeck's own settings.json names (`storagePath` — no
 /// guessing, no asking), then a drive sweep as a last resort, then the profile.
@@ -1830,6 +1931,7 @@ mod tests {
             latest_version_id: "v2".into(),
             size_bytes: 10,
             missing_user_files: vec![],
+            randomizer_blocked: false,
         })
         .unwrap();
         assert!(raw.contains(r#""kind":"outdated""#));
