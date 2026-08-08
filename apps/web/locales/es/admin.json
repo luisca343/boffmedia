@@ -1045,6 +1045,9 @@
       "searchPresets": "Buscar presets…",
       "noPresets": "Sin presets",
       "noPresetsDesc": "Crea o importa un preset para comenzar",
+      "deleteConfirmTitle": "Eliminar preset",
+      "deleteConfirmMsg": "¿Eliminar «{name}»? Esta acción no se puede deshacer.",
+      "confirmDelete": "Eliminar",
       "load": "Cargar",
       "presetDeleted": "Preset eliminado",
       "deleteError": "Error al eliminar preset",
@@ -1176,6 +1179,26 @@
       "pickupItemsMode": "Modo de Objetos de Recogida"
     },
     "opt": {
+      "limitPokemon": {
+        "label": "Limitar Pokémon",
+        "tip": "Usar solo Pokémon de las generaciones seleccionadas"
+      },
+      "banIrregularAltFormes": {
+        "label": "Prohibir formas alternativas irregulares",
+        "tip": "Evitar que aparezcan formas alternativas irregulares"
+      },
+      "banPrematureEvos": {
+        "label": "Prohibir evoluciones prematuras",
+        "tip": "Evitar que aparezcan Pokémon evolucionados antes de su nivel de evolución"
+      },
+      "randomizeIntroMon": {
+        "label": "Aleatorizar Pokémon de la intro",
+        "tip": "Aleatorizar el Pokémon que aparece en la intro del juego"
+      },
+      "raceMode": {
+        "label": "Modo carrera",
+        "tip": "Semilla determinista sin registro de spoilers: todos compiten con la misma ROM"
+      },
       "baseStatisticsMod": {
         "UNCHANGED": "Sin cambios",
         "SHUFFLE": "Barajar",
@@ -2088,6 +2111,16 @@
       "status_claimed": "Reclamado",
       "status_patched": "Parcheado",
       "status_verified": "Verificado",
+      "titleRequired": "El título del juego es obligatorio",
+      "romHashRequired": "El hash de la ROM es obligatorio",
+      "lockConfirmTitle": "Bloquear evento",
+      "lockConfirmMsg": "¿Bloquear «{name}»? Sus ajustes y hash de ROM quedarán fijados y los participantes podrán reclamar semillas.",
+      "finishConfirmTitle": "Finalizar evento",
+      "finishConfirmMsg": "¿Finalizar «{name}»? Los resultados pasarán a ser públicos y no se admitirán más partidas.",
+      "deleteConfirmTitle": "Eliminar evento",
+      "deleteConfirmMsg": "¿Eliminar «{name}»? Esta acción no se puede deshacer.",
+      "confirm": "Confirmar",
+      "unknownError": "Error desconocido",
       "refresh": "Actualizar",
       "edit": "Editar",
       "lock": "Bloquear",

@@ -56,7 +56,7 @@ export function AssignmentsList({ event, onClose }: AssignmentsListProps) {
         setSelectedLog(res.data)
         setLogModalOpen(true)
       } else {
-        toast({ tone: "bad", title: t("errorLoadingLog"), msg: res.userMessage || "Unknown error" })
+        toast({ tone: "bad", title: t("errorLoadingLog"), msg: res.userMessage || t("unknownError") })
       }
     } catch (err) {
       toast({ tone: "bad", title: t("errorLoadingLog"), msg: String(err) })

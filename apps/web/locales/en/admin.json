@@ -1045,6 +1045,9 @@
       "searchPresets": "Search presets…",
       "noPresets": "No presets",
       "noPresetsDesc": "Create or import a preset to get started",
+      "deleteConfirmTitle": "Delete preset",
+      "deleteConfirmMsg": "Delete “{name}”? This cannot be undone.",
+      "confirmDelete": "Delete",
       "load": "Load",
       "presetDeleted": "Preset deleted",
       "deleteError": "Failed to delete preset",
@@ -1176,6 +1179,26 @@
       "pickupItemsMode": "Pickup Items Mode"
     },
     "opt": {
+      "limitPokemon": {
+        "label": "Limit Pokémon",
+        "tip": "Only use Pokémon from selected generations"
+      },
+      "banIrregularAltFormes": {
+        "label": "Ban irregular alternate forms",
+        "tip": "Prevent irregular alternate forms from appearing"
+      },
+      "banPrematureEvos": {
+        "label": "Ban premature evolutions",
+        "tip": "Prevent evolved Pokémon from appearing before their evolution level"
+      },
+      "randomizeIntroMon": {
+        "label": "Randomize intro Pokémon",
+        "tip": "Randomize the Pokémon shown in the game intro"
+      },
+      "raceMode": {
+        "label": "Race mode",
+        "tip": "Deterministic seed with no spoiler log — everyone races the same ROM"
+      },
       "baseStatisticsMod": {
         "UNCHANGED": "Unchanged",
         "SHUFFLE": "Shuffle",
@@ -2088,6 +2111,16 @@
       "status_claimed": "Claimed",
       "status_patched": "Patched",
       "status_verified": "Verified",
+      "titleRequired": "Game title is required",
+      "romHashRequired": "ROM hash is required",
+      "lockConfirmTitle": "Lock event",
+      "lockConfirmMsg": "Lock “{name}”? Its settings and ROM hash become final and participants can start claiming seeds.",
+      "finishConfirmTitle": "Finish event",
+      "finishConfirmMsg": "Finish “{name}”? Results become public and no more runs can be submitted.",
+      "deleteConfirmTitle": "Delete event",
+      "deleteConfirmMsg": "Delete “{name}”? This cannot be undone.",
+      "confirm": "Confirm",
+      "unknownError": "Unknown error",
       "refresh": "Refresh",
       "edit": "Edit",
       "lock": "Lock",

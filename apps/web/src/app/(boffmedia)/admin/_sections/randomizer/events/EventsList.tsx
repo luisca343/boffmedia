@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useTranslations } from "next-intl"
-import { Button, Icon, Input, Spinner, Empty, toast } from "@boffmedia/ui"
+import { Button, Icon, Input, Modal, Spinner, Empty, toast } from "@boffmedia/ui"
 import { AvPanel, AvSectionHead, AvPill } from "../../../_components/ui/av-kit"
 import { RandomizerService } from "@/services/api/boffmedia/randomizerService"
 import type { RandomizerEvent } from "@/services/api/boffmedia/randomizer.types"
@@ -35,6 +35,10 @@ export function EventsList({
   const [loading, setLoading] = useState(false)
   const [searchTerm, setSearchTerm] = useState("")
   const [actionInProgress, setActionInProgress] = useState<string | null>(null)
+  const [confirming, setConfirming] = useState<{
+    action: "lock" | "finish" | "delete"
+    event: RandomizerEvent
+  } | null>(null)
 
   useEffect(() => {
     if (tournamentId) {
@@ -60,6 +64,7 @@ export function EventsList({
 
   const handleLock = async (event: RandomizerEvent) => {
     if (event.status !== "draft") return
+    setConfirming(null)
     setActionInProgress(event.id)
     try {
       const res = await RandomizerService.lockEvent(event.id)
@@ -76,6 +81,7 @@ export function EventsList({
 
   const handleFinish = async (event: RandomizerEvent) => {
     if (event.status !== "locked" && event.status !== "running") return
+    setConfirming(null)
     setActionInProgress(event.id)
     try {
       const res = await RandomizerService.finishEvent(event.id)
@@ -92,6 +98,7 @@ export function EventsList({
 
   const handleDelete = async (event: RandomizerEvent) => {
     if (event.status !== "draft") return
+    setConfirming(null)
     setActionInProgress(event.id)
     try {
       const res = await RandomizerService.deleteEvent(event.id)
@@ -209,7 +216,7 @@ export function EventsList({
                           <Button
                             size="sm"
                             variant="ghost"
-                            onClick={() => handleLock(event)}
+                            onClick={() => setConfirming({ action: "lock", event })}
                             disabled={actionInProgress === event.id}
                           >
                             {actionInProgress === event.id ? (
@@ -223,7 +230,7 @@ export function EventsList({
                           <Button
                             size="sm"
                             variant="ghost"
-                            onClick={() => handleFinish(event)}
+                            onClick={() => setConfirming({ action: "finish", event })}
                             disabled={actionInProgress === event.id}
                           >
                             {actionInProgress === event.id ? (
@@ -237,7 +244,8 @@ export function EventsList({
                           <Button
                             size="sm"
                             variant="ghost"
-                            onClick={() => handleDelete(event)}
+                            title={t("delete")}
+                            onClick={() => setConfirming({ action: "delete", event })}
                             disabled={actionInProgress === event.id}
                           >
                             <Icon name="trash" size={14} />
@@ -252,6 +260,37 @@ export function EventsList({
           </div>
         </AvPanel>
       )}
+
+      <Modal
+        open={confirming !== null}
+        onClose={() => setConfirming(null)}
+        size="sm"
+        title={confirming ? t(`${confirming.action}ConfirmTitle`) : ""}
+        footer={
+          <>
+            <Button variant="ghost" onClick={() => setConfirming(null)}>
+              {t("cancel")}
+            </Button>
+            <Button
+              variant={confirming?.action === "delete" ? "danger" : "pri"}
+              onClick={() => {
+                if (!confirming) return
+                if (confirming.action === "lock") handleLock(confirming.event)
+                else if (confirming.action === "finish") handleFinish(confirming.event)
+                else handleDelete(confirming.event)
+              }}
+            >
+              {t("confirm")}
+            </Button>
+          </>
+        }
+      >
+        <p className="text-[14px] leading-[1.5] text-txt-muted">
+          {confirming
+            ? t(`${confirming.action}ConfirmMsg`, { name: confirming.event.gameTitle })
+            : ""}
+        </p>
+      </Modal>
     </div>
   )
 }

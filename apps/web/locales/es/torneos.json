@@ -46,7 +46,16 @@
       "randomlockeDownload": "Descargar",
       "randomlockeVerifyTitle": "Verificar resultados",
       "randomlockeVerifyHint": "Re-ejecuta FVX con la semilla y los ajustes publicados en una ROM limpia y compara el hash de salida.",
-      "randomlockeVerifyCommand": "Comando FVX:"
+      "randomlockeVerifyCommand": "Comando FVX:",
+      "randomlockeStatusPending": "Pendiente",
+      "randomlockeStatusClaimed": "Reclamado",
+      "randomlockeStatusPatched": "Parcheado",
+      "randomlockeStatusVerified": "Verificado",
+      "randomlockeLoadError": "No se pudieron cargar los eventos randomlocke",
+      "randomlockeDownloadError": "Error al descargar",
+      "randomlockeCopy": "Clic para copiar",
+      "randomlockeCopied": "Copiado",
+      "randomlockeParticipants": "{count, plural, one {# participante} other {# participantes}}"
     },
     "checkin": {
       "doCheckin": "Registrarse",

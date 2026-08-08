@@ -12,17 +12,18 @@ import { PacksService } from "@/services/api/boffmedia/packsService"
 import type { RandomizerEvent, RandomizerPreset } from "@/services/api/boffmedia/randomizer.types"
 import type { AdminPack } from "@/services/api/boffmedia/packsService"
 
-const eventSchema = z.object({
-  gameTitle: z.string().min(1, "Game title is required"),
-  gamePlatform: z.enum(["gba", "nds"]),
-  // presetId is required on create (its settings snapshot pins the event); enforced in onSubmit.
-  presetId: z.string().optional(),
-  cleanRomSha512: z.string().min(1, "ROM hash is required"),
-  romHint: z.string().optional().default(""),
-  packId: z.string().optional(),
-})
+const makeEventSchema = (t: (key: string) => string) =>
+  z.object({
+    gameTitle: z.string().min(1, t("titleRequired")),
+    gamePlatform: z.enum(["gba", "nds"]),
+    // presetId is required on create (its settings snapshot pins the event); enforced in onSubmit.
+    presetId: z.string().optional(),
+    cleanRomSha512: z.string().min(1, t("romHashRequired")),
+    romHint: z.string().optional().default(""),
+    packId: z.string().optional(),
+  })
 
-type EventFormData = z.infer<typeof eventSchema>
+type EventFormData = z.infer<ReturnType<typeof makeEventSchema>>
 
 interface EventEditorProps {
   event?: RandomizerEvent | null
@@ -52,7 +53,7 @@ export function EventEditor({
     formState: { errors },
     reset,
   } = useForm<EventFormData>({
-    resolver: zodResolver(eventSchema),
+    resolver: zodResolver(makeEventSchema(t)),
     defaultValues: event
       ? {
           gameTitle: event.gameTitle,

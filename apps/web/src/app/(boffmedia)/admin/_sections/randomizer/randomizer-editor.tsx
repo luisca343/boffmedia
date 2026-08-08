@@ -14,7 +14,6 @@ import {
   Icon,
   Input,
   Modal,
-  Popover,
   SearchInput,
   Seg,
   Select,
@@ -29,12 +28,12 @@ import { QuickRandomizeModal } from "./QuickRandomizeModal"
 import {
   RandomizerUiProvider,
   useRandomizerUi,
-  type RzLayout,
+  type RzDensity,
 } from "./_components/RandomizerUiContext"
 import { computeWarnings } from "./_components/validation"
 import { CategoryRail } from "./_components/CategoryRail"
 import { CategoryContent } from "./_components/CategoryContent"
-import { SummaryColumn, SummaryDrawer } from "./_components/Summary"
+import { SummaryDrawer } from "./_components/Summary"
 import { totalChanged } from "./_components/catalog-view"
 
 /** Supported FVX games (flat list; scope for saved presets). */
@@ -75,58 +74,36 @@ const RANDOMIZE_ALL: Partial<RandomizerSettings> = {
   fieldItemsMod: "RANDOM",
 }
 
-const GRID_COLUMNS: Record<RzLayout, string> = {
-  rail: "196px minmax(0,1fr) 300px",
-  tabs: "minmax(0,1fr) 300px",
-  detail: "196px minmax(0,1fr)",
-  scroll: "minmax(0,1fr)",
-}
-
 /* -------------------------------------------------------------------------- */
 /* Toolbar                                                                     */
 /* -------------------------------------------------------------------------- */
 
-function ViewMenu() {
+function DensitySeg() {
   const t = useTranslations("randomizer")
   const ui = useRandomizerUi()
   return (
-    <Popover
-      align="end"
-      trigger={
-        <Button variant="default" size="sm" icon="grid">
-          {t("chrome.view")}
-        </Button>
-      }
-    >
-      <div className="w-[248px] bg-panel border border-solid border-line-2 p-2.5 shadow-xl">
-        <p className="font-mono text-[9.5px] uppercase tracking-[0.12em] text-txt-dim mb-1.5">
-          {t("chrome.layout")}
-        </p>
-        <Seg
-          className="w-full mb-3 flex-wrap"
-          value={ui.layout}
-          onChange={(v) => ui.setLayout(v as RzLayout)}
-          options={[
-            { value: "rail", label: t("chrome.layoutRail") },
-            { value: "tabs", label: t("chrome.layoutTabs") },
-            { value: "detail", label: t("chrome.layoutDetail") },
-            { value: "scroll", label: t("chrome.layoutScroll") },
-          ]}
-        />
-        <p className="font-mono text-[9.5px] uppercase tracking-[0.12em] text-txt-dim mb-1.5">
-          {t("chrome.density")}
-        </p>
-        <Seg
-          className="w-full"
-          value={ui.density}
-          onChange={(v) => ui.setDensity(v as "comfortable" | "compact")}
-          options={[
-            { value: "comfortable", label: t("chrome.comfortable") },
-            { value: "compact", label: t("chrome.compact") },
-          ]}
-        />
-      </div>
-    </Popover>
+    <Seg
+      value={ui.density}
+      onChange={(v) => ui.setDensity(v as RzDensity)}
+      options={[
+        {
+          value: "compact",
+          label: (
+            <span title={t("chrome.compact")} className="grid place-items-center">
+              <Icon name="menu" size={14} />
+            </span>
+          ),
+        },
+        {
+          value: "comfortable",
+          label: (
+            <span title={t("chrome.comfortable")} className="grid place-items-center">
+              <Icon name="list" size={14} />
+            </span>
+          ),
+        },
+      ]}
+    />
   )
 }
 
@@ -153,19 +130,50 @@ function Toolbar({
 }) {
   const t = useTranslations("randomizer")
   const ui = useRandomizerUi()
-  const isDrawer = ui.layout === "detail" || ui.layout === "scroll"
+  const form = useFormContext<RandomizerSettings>()
+  const values = (useWatch({ control: form.control }) as Record<string, unknown>) ?? {}
+  const count = totalChanged(values)
 
   return (
-    <div className="sticky top-0 z-40 flex flex-wrap items-center gap-3 p-3.5 border border-solid border-line bg-panel mb-[18px]">
-      <div className="min-w-[190px]">
-        <Select
-          value={selectedGame}
-          onChange={onGame}
-          options={[{ value: "", label: t("chrome.selectGame") }, ...FVX_GAMES]}
-        />
+    <div className="flex flex-wrap items-center gap-x-3 gap-y-2.5 p-3.5 border border-solid border-line bg-panel">
+      <div className="flex flex-wrap items-center gap-2">
+        <div className="min-w-[180px]">
+          <Select
+            value={selectedGame}
+            onChange={onGame}
+            options={[{ value: "", label: t("chrome.selectGame") }, ...FVX_GAMES]}
+          />
+        </div>
+        <div className="min-w-[170px]">
+          <Select
+            value=""
+            onChange={onQuickApply}
+            options={[
+              { value: "", label: t("chrome.quickApply") },
+              ...presets.map((p) => ({ value: p.id, label: p.name })),
+            ]}
+          />
+        </div>
+        <div className="flex items-stretch">
+          <Input
+            id="rz-seed"
+            className="w-[130px] font-mono text-[12px]"
+            placeholder={t("chrome.seedPlaceholder")}
+            value={seed}
+            onChange={(e) => onSeed(e.currentTarget.value)}
+          />
+          <Button
+            variant="default"
+            size="sm"
+            icon="dice"
+            title={t("chrome.rollSeed")}
+            className="border-l-0"
+            onClick={() => onSeed(String(Math.floor(Math.random() * 9e9)))}
+          />
+        </div>
       </div>
 
-      <div id="rz-search-box" className="relative flex-1 min-w-[220px]">
+      <div id="rz-search-box" className="relative flex-1 min-w-[200px]">
         <SearchInput
           value={ui.query}
           onChange={ui.setQuery}
@@ -173,47 +181,21 @@ function Toolbar({
         />
       </div>
 
-      <div className="min-w-[180px]">
-        <Select
-          value=""
-          onChange={onQuickApply}
-          options={[
-            { value: "", label: t("chrome.quickApply") },
-            ...presets.map((p) => ({ value: p.id, label: p.name })),
-          ]}
-        />
-      </div>
+      <div className="w-px self-stretch bg-line max-md:hidden" />
 
-      <div className="flex items-stretch">
-        <Input
-          id="rz-seed"
-          className="w-[150px] font-mono text-[12px]"
-          placeholder={t("chrome.seedPlaceholder")}
-          value={seed}
-          onChange={(e) => onSeed(e.currentTarget.value)}
-        />
-        <Button
-          variant="default"
-          size="sm"
-          icon="dice"
-          title={t("chrome.rollSeed")}
-          className="border-l-0"
-          onClick={() => onSeed(String(Math.floor(Math.random() * 9e9)))}
-        />
-      </div>
-
-      <div className="w-px self-stretch bg-line" />
-
-      <div className="flex gap-2 flex-wrap">
+      <div className="flex flex-wrap items-center gap-2">
         <Button variant="default" size="sm" icon="sparkles" onClick={onRandomizeAll}>
           {t("chrome.randomizeAll")}
         </Button>
-        <ViewMenu />
-        {isDrawer && (
-          <Button variant="default" size="sm" icon="sliders" onClick={() => ui.setSummaryOpen(true)}>
-            {t("chrome.summary")}
-          </Button>
-        )}
+        <DensitySeg />
+        <Button variant="default" size="sm" icon="sliders" onClick={() => ui.setSummaryOpen(true)}>
+          {t("chrome.summary")}
+          {count > 0 && (
+            <span className="grid place-items-center min-w-[18px] h-4 px-1 bg-accent text-accent-ink font-mono text-[9.5px] font-bold">
+              {count}
+            </span>
+          )}
+        </Button>
         <Button variant="default" size="sm" onClick={onSave}>
           {t("chrome.save")}
         </Button>
@@ -221,44 +203,6 @@ function Toolbar({
           {t("chrome.run")}
         </Button>
       </div>
-    </div>
-  )
-}
-
-/* -------------------------------------------------------------------------- */
-/* Floating dock (master-detail / single-scroll)                              */
-/* -------------------------------------------------------------------------- */
-
-function Dock({ onRun }: { onRun: () => void }) {
-  const t = useTranslations("randomizer")
-  const ui = useRandomizerUi()
-  const form = useFormContext<RandomizerSettings>()
-  const values = (useWatch({ control: form.control }) as Record<string, unknown>) ?? {}
-  const count = totalChanged(values)
-
-  if (ui.layout !== "detail" && ui.layout !== "scroll") return null
-
-  return (
-    <div className="fixed right-[22px] bottom-[22px] z-[55] flex gap-2">
-      <button
-        type="button"
-        onClick={() => ui.setSummaryOpen(true)}
-        className="inline-flex items-center gap-2 h-[42px] px-4 border border-solid border-accent-line bg-panel text-txt font-display font-bold uppercase tracking-[0.06em] text-[13px] cursor-pointer shadow-lg"
-      >
-        <Icon name="sliders" size={16} />
-        {t("chrome.changes")}
-        <span className="grid place-items-center min-w-5 h-[18px] px-1.5 bg-accent text-accent-ink font-mono text-[10px]">
-          {count}
-        </span>
-      </button>
-      <button
-        type="button"
-        onClick={onRun}
-        className="inline-flex items-center gap-2 h-[42px] px-4 border border-solid border-accent bg-accent text-accent-ink font-display font-bold uppercase tracking-[0.06em] text-[13px] cursor-pointer shadow-lg"
-      >
-        <Icon name="play" size={16} />
-        {t("chrome.run")}
-      </button>
     </div>
   )
 }
@@ -378,21 +322,29 @@ function EditorShell() {
     <RandomizerUiProvider deps={{ warnings }}>
       <KeyboardShortcuts />
 
-      <Toolbar
-        selectedGame={selectedGame}
-        onGame={setSelectedGame}
-        seed={seed}
-        onSeed={setSeed}
-        presets={presets}
-        onQuickApply={applyPreset}
-        onRandomizeAll={randomizeAll}
-        onSave={openSave}
-        onRun={openRun}
-      />
+      {/* Sticky offsets: the site Navbar (--nav-h) + the AvShell top bar sit
+          above this section, so the toolbar + tab bar pin below them as one
+          sticky unit. */}
+      <div className="[--rz-chrome-top:calc(var(--nav-h)_+_49px)] md:[--rz-chrome-top:calc(var(--nav-h)_+_55px)]">
+        <div className="sticky top-[var(--rz-chrome-top)] z-40 mb-[18px]">
+          <Toolbar
+            selectedGame={selectedGame}
+            onGame={setSelectedGame}
+            seed={seed}
+            onSeed={setSeed}
+            presets={presets}
+            onQuickApply={applyPreset}
+            onRandomizeAll={randomizeAll}
+            onSave={openSave}
+            onRun={openRun}
+          />
+          <CategoryRail />
+        </div>
 
-      <LayoutGrid onSave={openSave} onRun={openRun} />
+        <CategoryContent />
+      </div>
 
-      <Dock onRun={openRun} />
+      <SummaryDrawer onSave={openSave} onRun={openRun} />
 
       <Modal
         open={saveOpen}
@@ -454,41 +406,11 @@ function EditorShell() {
 }
 
 /* -------------------------------------------------------------------------- */
-/* Layout grid                                                                */
-/* -------------------------------------------------------------------------- */
-
-function LayoutGrid({ onSave, onRun }: { onSave: () => void; onRun: () => void }) {
-  const ui = useRandomizerUi()
-  const showRail = ui.layout === "rail" || ui.layout === "detail"
-  const showColumn = ui.layout === "rail" || ui.layout === "tabs"
-  const isDrawer = ui.layout === "detail" || ui.layout === "scroll"
-
-  return (
-    <>
-      {ui.layout === "tabs" && (
-        <div className="mb-[18px]">
-          <CategoryRail variant="tabs" />
-        </div>
-      )}
-      <div className="grid gap-[18px] items-start" style={{ gridTemplateColumns: GRID_COLUMNS[ui.layout] }}>
-        {showRail && <CategoryRail variant="rail" />}
-        <section className={ui.layout === "scroll" ? "max-w-[880px] w-full mx-auto" : "min-w-0"}>
-          <CategoryContent />
-        </section>
-        {showColumn && <SummaryColumn onSave={onSave} onRun={onRun} />}
-      </div>
-      {isDrawer && <SummaryDrawer onSave={onSave} onRun={onRun} />}
-    </>
-  )
-}
-
-/* -------------------------------------------------------------------------- */
 /* Public entry                                                               */
 /* -------------------------------------------------------------------------- */
 
 export function RandomizerEditor({ initialSettings }: { initialSettings?: RandomizerSettings }) {
   const form = useForm<RandomizerSettings>({
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     resolver: zodResolver(RandomizerSettings as any) as any,
     defaultValues: (initialSettings ?? defaultSettings) as never,
     mode: "onBlur",

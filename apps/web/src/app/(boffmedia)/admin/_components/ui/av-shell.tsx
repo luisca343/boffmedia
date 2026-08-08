@@ -37,7 +37,10 @@ export function AvShell({ nav, section, onNavigate, children, loading, fluid }: 
   return (
     <div className="grid h-full [grid-template-columns:1fr] md:[grid-template-columns:244px_minmax(0,1fr)] bg-base">
       {/* Desktop rail */}
-      <aside className="hidden md:flex sticky top-0 self-start h-full overflow-y-auto flex-col border-r border-solid border-line bg-base-2 pb-6 bm-scroll">
+      {/* The site Navbar is sticky at top 0, so all shell chrome pins below it
+          (var(--nav-h)); the rail gets a viewport-bounded height and scrolls
+          internally instead of scrolling away with the document. */}
+      <aside className="hidden md:flex sticky top-[var(--nav-h)] self-start h-[calc(100dvh_-_var(--nav-h))] overflow-y-auto flex-col border-r border-solid border-line bg-base-2 pb-6 bm-scroll">
         <div className="sticky top-0 z-[2] flex items-center gap-[11px] pt-[18px] pb-[20px] px-5 border-b border-solid border-line bg-base-2">
           <span className="grid place-items-center w-[30px] h-[30px] bg-accent text-accent-ink shrink-0">
             <Icon name="bolt" size={17} />
@@ -82,7 +85,7 @@ export function AvShell({ nav, section, onNavigate, children, loading, fluid }: 
           to fill the viewport minus the Navbar. h-screen would overflow. */}
       <div className={cn("min-w-0", fluid && "flex h-full min-h-0 flex-col overflow-hidden")}>
         {/* Mobile section tabs */}
-        <div className="md:hidden flex gap-1 overflow-x-auto py-2.5 px-4 border-b border-solid border-line bg-base-2 sticky top-0 z-[4] [scrollbar-width:none]">
+        <div className="md:hidden flex gap-1 overflow-x-auto py-2.5 px-4 border-b border-solid border-line bg-base-2 sticky top-[var(--nav-h)] z-[4] [scrollbar-width:none]">
           {allItems.map(({ id, label, icon }) => {
             const on = id === section
             return (
@@ -102,7 +105,7 @@ export function AvShell({ nav, section, onNavigate, children, loading, fluid }: 
         </div>
 
         {/* Top bar (desktop) */}
-        <div className="hidden md:flex sticky top-0 z-[5] items-center gap-4 py-[15px] px-[26px] border-b border-solid border-line bg-[color-mix(in_srgb,var(--bg)_88%,transparent)] backdrop-blur-[8px]">
+        <div className="hidden md:flex sticky top-[var(--nav-h)] z-[5] items-center gap-4 py-[15px] px-[26px] border-b border-solid border-line bg-[color-mix(in_srgb,var(--bg)_88%,transparent)] backdrop-blur-[8px]">
           <span className="inline-flex items-center gap-2.5 font-display text-[24px] font-extrabold italic uppercase leading-none">
             {active && <Icon name={active.icon} size={20} className="text-accent" />}
             {active?.label ?? t("brand")}

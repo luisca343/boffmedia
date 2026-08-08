@@ -46,7 +46,16 @@
       "randomlockeDownload": "Download",
       "randomlockeVerifyTitle": "Verify results",
       "randomlockeVerifyHint": "Re-run FVX with the published seed and settings on a clean dump and compare the output hash.",
-      "randomlockeVerifyCommand": "FVX command:"
+      "randomlockeVerifyCommand": "FVX command:",
+      "randomlockeStatusPending": "Pending",
+      "randomlockeStatusClaimed": "Claimed",
+      "randomlockeStatusPatched": "Patched",
+      "randomlockeStatusVerified": "Verified",
+      "randomlockeLoadError": "Could not load the randomlocke events",
+      "randomlockeDownloadError": "Download failed",
+      "randomlockeCopy": "Click to copy",
+      "randomlockeCopied": "Copied",
+      "randomlockeParticipants": "{count, plural, one {# participant} other {# participants}}"
     },
     "checkin": {
       "doCheckin": "Check in",

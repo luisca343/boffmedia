@@ -26,7 +26,6 @@ import defaultSettings from "../default-settings"
  * ------------------------------------------------------------------------- */
 
 export type RzDensity = "comfortable" | "compact"
-export type RzLayout = "rail" | "tabs" | "detail" | "scroll"
 
 export interface RzWarning {
   /** `bad` = error, `warn` = warning, `info` = advisory. */
@@ -53,8 +52,6 @@ interface RandomizerUiValue {
 
   density: RzDensity
   setDensity: (d: RzDensity) => void
-  layout: RzLayout
-  setLayout: (l: RzLayout) => void
 
   activeCat: string
   setActiveCat: (id: string) => void
@@ -117,21 +114,38 @@ function sameAsDefault(field: string, value: unknown): boolean {
 export function RandomizerUiProvider({
   children,
   deps,
-  initialLayout = "detail",
   initialDensity = "compact",
   initialCat = "general",
 }: {
   children: ReactNode
   deps: RandomizerUiDeps
-  initialLayout?: RzLayout
   initialDensity?: RzDensity
   initialCat?: string
 }) {
   const form = useFormContext<RandomizerSettings>()
 
   const [changed, setChanged] = useState<Set<string>>(() => new Set())
-  const [density, setDensity] = useState<RzDensity>(initialDensity)
-  const [layout, setLayout] = useState<RzLayout>(initialLayout)
+  const [density, setDensityState] = useState<RzDensity>(initialDensity)
+
+  // Restore the admin's last density after mount (not in the initializer —
+  // this component is SSR'd, so reading localStorage there would mismatch).
+  useEffect(() => {
+    try {
+      const d = window.localStorage.getItem("rz.density")
+      if (d === "comfortable" || d === "compact") setDensityState(d)
+    } catch {
+      /* storage unavailable */
+    }
+  }, [])
+
+  const setDensity = useCallback((d: RzDensity) => {
+    setDensityState(d)
+    try {
+      window.localStorage.setItem("rz.density", d)
+    } catch {
+      /* storage unavailable */
+    }
+  }, [])
   const [activeCat, setActiveCat] = useState<string>(initialCat)
   const [query, setQuery] = useState("")
   const [summaryOpen, setSummaryOpen] = useState(false)
@@ -210,8 +224,6 @@ export function RandomizerUiProvider({
       changedCount: changed.size,
       density,
       setDensity,
-      layout,
-      setLayout,
       activeCat,
       setActiveCat,
       query,
@@ -229,7 +241,7 @@ export function RandomizerUiProvider({
     [
       changed,
       density,
-      layout,
+      setDensity,
       activeCat,
       query,
       summaryOpen,

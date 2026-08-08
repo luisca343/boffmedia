@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import { useSearchParams, useRouter } from "next/navigation"
 import { useTranslations } from "next-intl"
-import { Button, Empty, Icon, Input, Spinner, toast, Select } from "@boffmedia/ui"
+import { Button, Empty, Icon, Input, Modal, Spinner, toast, Select } from "@boffmedia/ui"
 import { AvPanel, AvSectionHead } from "../_components/ui/av-kit"
 import { RandomizerService } from "@/services/api/boffmedia/randomizerService"
 import { TournamentsService } from "@/services/api/boffmedia/tournamentsService"
@@ -119,6 +119,7 @@ function PresetsView({ onLoad }: { onLoad: (preset: RandomizerPreset) => void })
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState("")
   const [deleting, setDeleting] = useState<string | null>(null)
+  const [presetToDelete, setPresetToDelete] = useState<RandomizerPreset | null>(null)
   const [randomizing, setRandomizing] = useState<RandomizerPreset | null>(null)
 
   const handleExport = async (preset: RandomizerPreset) => {
@@ -155,6 +156,7 @@ function PresetsView({ onLoad }: { onLoad: (preset: RandomizerPreset) => void })
   }
 
   const handleDelete = async (id: string) => {
+    setPresetToDelete(null)
     setDeleting(id)
     try {
       const res = await RandomizerService.deletePreset(id)
@@ -251,7 +253,7 @@ function PresetsView({ onLoad }: { onLoad: (preset: RandomizerPreset) => void })
                     variant="ghost"
                     icon="trash"
                     title={t("chrome.delete")}
-                    onClick={() => handleDelete(preset.id)}
+                    onClick={() => setPresetToDelete(preset)}
                     disabled={deleting === preset.id}
                   />
                 </div>
@@ -267,6 +269,31 @@ function PresetsView({ onLoad }: { onLoad: (preset: RandomizerPreset) => void })
           onClose={() => setRandomizing(null)}
         />
       )}
+
+      <Modal
+        open={presetToDelete !== null}
+        onClose={() => setPresetToDelete(null)}
+        size="sm"
+        title={t("chrome.deleteConfirmTitle")}
+        footer={
+          <>
+            <Button variant="ghost" onClick={() => setPresetToDelete(null)}>
+              {t("chrome.cancel")}
+            </Button>
+            <Button
+              variant="danger"
+              icon="trash"
+              onClick={() => presetToDelete && handleDelete(presetToDelete.id)}
+            >
+              {t("chrome.confirmDelete")}
+            </Button>
+          </>
+        }
+      >
+        <p className="text-[14px] leading-[1.5] text-txt-muted">
+          {t("chrome.deleteConfirmMsg", { name: presetToDelete?.name ?? "" })}
+        </p>
+      </Modal>
     </div>
   )
 }

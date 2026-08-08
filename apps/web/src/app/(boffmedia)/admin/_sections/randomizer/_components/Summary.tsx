@@ -24,7 +24,7 @@ function jumpTo(field: string) {
   }, 60)
 }
 
-function SummaryBody({ onSave, onRun, showClose }: { onSave: () => void; onRun: () => void; showClose?: boolean }) {
+function SummaryBody({ onSave, onRun }: { onSave: () => void; onRun: () => void }) {
   const t = useTranslations("randomizer")
   const ui = useRandomizerUi()
   const form = useFormContext<RandomizerSettings>()
@@ -44,6 +44,7 @@ function SummaryBody({ onSave, onRun, showClose }: { onSave: () => void; onRun: 
   const goToField = (catId: string, field: string) => {
     ui.setQuery("")
     ui.setActiveCat(catId)
+    ui.setSummaryOpen(false)
     ui.requestFlash(field)
     jumpTo(field)
   }
@@ -56,16 +57,14 @@ function SummaryBody({ onSave, onRun, showClose }: { onSave: () => void; onRun: 
         <span className="ml-auto grid place-items-center min-w-[22px] h-5 px-1.5 bg-accent text-accent-ink text-[11px] font-bold">
           {rows.length}
         </span>
-        {showClose && (
-          <button
-            type="button"
-            onClick={() => ui.setSummaryOpen(false)}
-            className="grid place-items-center border-0 bg-transparent text-txt-dim hover:text-txt cursor-pointer"
-            aria-label={t("chrome.close")}
-          >
-            <Icon name="x" size={16} />
-          </button>
-        )}
+        <button
+          type="button"
+          onClick={() => ui.setSummaryOpen(false)}
+          className="grid place-items-center border-0 bg-transparent text-txt-dim hover:text-txt cursor-pointer"
+          aria-label={t("chrome.close")}
+        >
+          <Icon name="x" size={16} />
+        </button>
       </div>
 
       {ui.warnings.length > 0 && (
@@ -147,16 +146,7 @@ function SummaryBody({ onSave, onRun, showClose }: { onSave: () => void; onRun: 
   )
 }
 
-/** Inline sticky column (rail / tabs layouts). */
-export function SummaryColumn({ onSave, onRun }: { onSave: () => void; onRun: () => void }) {
-  return (
-    <aside className="sticky top-[84px] self-start flex flex-col border border-solid border-line bg-panel max-h-[calc(100vh-104px)]">
-      <SummaryBody onSave={onSave} onRun={onRun} />
-    </aside>
-  )
-}
-
-/** Right-edge drawer (master-detail / single-scroll layouts). */
+/** Right-edge drawer listing every changed setting, with jump/reset/run. */
 export function SummaryDrawer({ onSave, onRun }: { onSave: () => void; onRun: () => void }) {
   const ui = useRandomizerUi()
   return (
@@ -175,7 +165,7 @@ export function SummaryDrawer({ onSave, onRun }: { onSave: () => void; onRun: ()
           ui.summaryOpen ? "translate-x-0" : "translate-x-[105%]",
         )}
       >
-        <SummaryBody onSave={onSave} onRun={onRun} showClose />
+        <SummaryBody onSave={onSave} onRun={onRun} />
       </aside>
     </>
   )

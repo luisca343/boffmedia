@@ -60,31 +60,32 @@ export function RandomlockeSection({ tournamentId }: { tournamentId: number }) {
         const eventList = eventResponse.data as RandomizerEvent[]
         setEvents(eventList)
 
-        // Load assignments for each event
         const assignmentsMap = new Map<number, RandomizerAssignment[]>()
-        for (const event of eventList) {
-          try {
-            const assignResponse = await RandomizerService.listPublicAssignments(
-              String(event.id),
-            )
-            if (assignResponse.success && "data" in assignResponse && assignResponse.data) {
-              assignmentsMap.set(event.id, assignResponse.data as RandomizerAssignment[])
+        await Promise.all(
+          eventList.map(async (event) => {
+            try {
+              const assignResponse = await RandomizerService.listPublicAssignments(
+                String(event.id),
+              )
+              if (assignResponse.success && "data" in assignResponse && assignResponse.data) {
+                assignmentsMap.set(event.id, assignResponse.data as RandomizerAssignment[])
+              }
+            } catch (err) {
+              console.error(`Failed to load assignments for event ${event.id}:`, err)
             }
-          } catch (err) {
-            console.error(`Failed to load assignments for event ${event.id}:`, err)
-          }
-        }
+          }),
+        )
         setAssignments(assignmentsMap)
       } catch (err) {
         console.error("Failed to load randomlocke events:", err)
-        setError(err instanceof Error ? err.message : "Failed to load events")
+        setError(t("randomlockeLoadError"))
       } finally {
         setLoading(false)
       }
     }
 
     loadEvents()
-  }, [tournamentId])
+  }, [tournamentId, t])
 
   if (loading) {
     return (
@@ -142,17 +143,27 @@ function RandomlockeEvent({
     <div className="mb-6 border border-solid border-line bg-panel overflow-hidden">
       {/* Header */}
       <div className="px-4 py-3 border-b border-line bg-panel-alt">
-        <div className="flex items-center justify-between mb-2">
+        <div className="flex items-center justify-between gap-3 mb-2">
           <h3 className="font-mono text-[12px] font-semibold uppercase text-txt">
             {event.gameTitle} ({event.gamePlatform.toUpperCase()})
           </h3>
-          <span
-            className={`font-mono text-[10px] font-semibold uppercase tracking-[0.08em] ${
-              isFinished ? "text-ok" : "text-txt-dim"
-            }`}
-          >
-            {statusTitle}
-          </span>
+          <div className="flex items-center gap-3 shrink-0">
+            {assignments.length > 0 && (
+              <span className="font-mono text-[10px] text-txt-dim">
+                {t("randomlockeParticipants", { count: assignments.length })}
+              </span>
+            )}
+            <span
+              className={`inline-flex items-center gap-1.5 font-mono text-[10px] font-semibold uppercase tracking-[0.08em] ${
+                isFinished ? "text-ok" : "text-accent-bright"
+              }`}
+            >
+              <span
+                className={`w-1.5 h-1.5 rounded-full ${isFinished ? "bg-ok" : "bg-accent animate-pulse"}`}
+              />
+              {statusTitle}
+            </span>
+          </div>
         </div>
         {event.romHint && (
           <p className="font-body text-[11px] text-txt-muted">{event.romHint}</p>
@@ -247,7 +258,7 @@ function RandomlockeFinishedView({
       document.body.removeChild(a)
       URL.revokeObjectURL(url)
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Download failed")
+      toast.error(err instanceof Error ? err.message : t("randomlockeDownloadError"))
     } finally {
       setDownloadingSettings(false)
     }
@@ -344,6 +355,8 @@ function StatusBadge({
 }: {
   status: "pending" | "claimed" | "patched" | "verified"
 }) {
+  const t = useTranslations("torneos.detail")
+
   const colors: Record<typeof status, string> = {
     pending: "bg-panel-alt text-txt-dim",
     claimed: "bg-accent-soft text-accent-bright",
@@ -352,10 +365,10 @@ function StatusBadge({
   }
 
   const labels: Record<typeof status, string> = {
-    pending: "Pendiente",
-    claimed: "Reclamado",
-    patched: "Parcheado",
-    verified: "Verificado",
+    pending: t("randomlockeStatusPending"),
+    claimed: t("randomlockeStatusClaimed"),
+    patched: t("randomlockeStatusPatched"),
+    verified: t("randomlockeStatusVerified"),
   }
 
   return (
@@ -368,6 +381,7 @@ function StatusBadge({
 }
 
 function CopyableText({ text, full }: { text: string; full?: string }) {
+  const t = useTranslations("torneos.detail")
   const [copied, setCopied] = useState(false)
 
   const handleCopy = () => {
@@ -378,14 +392,19 @@ function CopyableText({ text, full }: { text: string; full?: string }) {
   }
 
   return (
-    <span
+    <button
+      type="button"
       onClick={handleCopy}
-      className="cursor-pointer hover:text-accent-bright transition-colors"
-      title={full ? `Click to copy: ${full}` : "Click to copy"}
+      className="inline-flex items-center gap-1 border-0 bg-transparent p-0 font-mono text-inherit cursor-pointer hover:text-accent-bright transition-colors"
+      title={copied ? t("randomlockeCopied") : full ? `${t("randomlockeCopy")}: ${full}` : t("randomlockeCopy")}
     >
       {text}
-      {copied && <span className="ml-1 text-ok">✓</span>}
-    </span>
+      {copied ? (
+        <span className="text-ok">✓</span>
+      ) : (
+        <Icon name="copy" size={11} className="text-txt-dim" />
+      )}
+    </button>
   )
 }
 
@@ -415,7 +434,7 @@ function LogDownloadButton({
       document.body.removeChild(a)
       URL.revokeObjectURL(url)
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Download failed")
+      toast.error(err instanceof Error ? err.message : t("randomlockeDownloadError"))
     } finally {
       setLoading(false)
     }

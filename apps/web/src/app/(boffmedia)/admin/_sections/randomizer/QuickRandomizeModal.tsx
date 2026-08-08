@@ -2,8 +2,7 @@
 
 import { useState } from "react"
 import { useTranslations } from "next-intl"
-import { Button, Field, Icon, Input, Select, Spinner, toast } from "@boffmedia/ui"
-import { AvPanel } from "../../_components/ui/av-kit"
+import { Button, Field, Icon, Input, Modal, Select, Spinner, toast } from "@boffmedia/ui"
 import { RandomizerService } from "@/services/api/boffmedia/randomizerService"
 import type { RandomizerPreset } from "@/services/api/boffmedia/randomizer.types"
 
@@ -72,66 +71,57 @@ export function QuickRandomizeModal({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-      <AvPanel className="max-w-md w-full">
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <h3 className="font-semibold">{t("title")}</h3>
-            <p className="text-xs text-txt-muted">{preset.name}</p>
-          </div>
-          <button
-            onClick={onClose}
-            disabled={running}
-            className="text-txt-dim hover:text-txt disabled:opacity-50"
-          >
-            <Icon name="x" size={18} />
-          </button>
-        </div>
+    <Modal
+      open
+      onClose={() => !running && onClose()}
+      size="sm"
+      title={t("title")}
+      aside={<span className="font-mono text-[11px] text-txt-muted truncate">{preset.name}</span>}
+      footer={
+        <>
+          <Button variant="ghost" onClick={onClose} disabled={running}>
+            {t("cancel")}
+          </Button>
+          <Button variant="pri" icon={running ? undefined : "play"} onClick={handleRun} disabled={running || !file}>
+            {running && <Spinner size={16} />}
+            {running ? t("running") : t("run")}
+          </Button>
+        </>
+      }
+    >
+      <div className="space-y-4">
+        <button
+          type="button"
+          onClick={pickFile}
+          disabled={running}
+          className="w-full flex flex-col items-center gap-2 py-6 px-4 border-2 border-dashed border-line hover:border-accent hover:bg-panel-2 transition-colors disabled:opacity-50 cursor-pointer bg-transparent"
+        >
+          <Icon name="upload" size={22} className="text-txt-muted" />
+          <p className="text-sm text-txt-muted">
+            {file ? file.name : t("dropZone")}
+          </p>
+        </button>
 
-        <div className="space-y-4">
-          <button
-            type="button"
-            onClick={pickFile}
-            disabled={running}
-            className="w-full flex flex-col items-center gap-2 py-6 px-4 rounded border-2 border-dashed border-line hover:border-accent hover:bg-panel-2 transition-colors disabled:opacity-50"
-          >
-            <Icon name="upload" size={22} className="text-txt-muted" />
-            <p className="text-sm text-txt-muted">
-              {file ? file.name : t("dropZone")}
-            </p>
-          </button>
+        <Select
+          label={t("platform")}
+          value={platform}
+          options={[
+            { value: "gba", label: "GBA" },
+            { value: "nds", label: "NDS" },
+          ]}
+          disabled={running}
+          onChange={(v) => setPlatform(v as "gba" | "nds")}
+        />
 
-          <Select
-            label={t("platform")}
-            value={platform}
-            options={[
-              { value: "gba", label: "GBA" },
-              { value: "nds", label: "NDS" },
-            ]}
+        <Field label={t("seed")} hint={t("seedHint")}>
+          <Input
+            placeholder={t("seedPlaceholder")}
+            value={seed}
             disabled={running}
-            onChange={(v) => setPlatform(v as "gba" | "nds")}
+            onChange={(e) => setSeed(e.currentTarget.value)}
           />
-
-          <Field label={t("seed")} hint={t("seedHint")}>
-            <Input
-              placeholder={t("seedPlaceholder")}
-              value={seed}
-              disabled={running}
-              onChange={(e) => setSeed(e.currentTarget.value)}
-            />
-          </Field>
-
-          <div className="flex gap-3 pt-1">
-            <Button onClick={handleRun} disabled={running || !file} className="flex-1">
-              {running && <Spinner size={16} />}
-              {running ? t("running") : t("run")}
-            </Button>
-            <Button variant="ghost" onClick={onClose} disabled={running}>
-              {t("cancel")}
-            </Button>
-          </div>
-        </div>
-      </AvPanel>
-    </div>
+        </Field>
+      </div>
+    </Modal>
   )
 }
