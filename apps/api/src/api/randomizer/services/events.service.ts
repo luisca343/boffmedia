@@ -12,10 +12,9 @@ import { Logger } from 'nestjs-pino';
 import { RandomizerRepository } from '../repositories/randomizer.repository';
 import { RANDOMIZER_REPOSITORY_TOKEN } from '@api/_utils/repositories/interfaces/repository.token';
 import type {
-  RandomizerEvent,
-  NewRandomizerEvent,
-  RandomizerEventStatus,
-  NewRandomizerAssignment,
+  RandomizerConfig,
+  NewRandomizerConfig,
+  RandomizerConfigStatus,
 } from '@/_db/schema/Randomizer';
 import {
   RANDOMIZER_RUNNER_TOKEN,
@@ -80,7 +79,7 @@ export class EventsService {
   /**
    * Direct, event-less randomization: encode a preset's settings to .rnqs, run the
    * FVX jar against an uploaded ROM, and return the randomized ROM bytes. This is the
-   * "use the randomizer program directly" path — no event, assignment, or persistence.
+   * "use the randomizer program directly" path — no config, assignment, or persistence.
    */
   async quickRandomize(params: {
     presetId: number;
@@ -126,7 +125,7 @@ export class EventsService {
   }
 
   /**
-   * SHA-512 (hex) of the configured FVX jar. The event pins the jar version used;
+   * SHA-512 (hex) of the configured FVX jar. The config pins the jar version used;
    * the jar itself is server-configured via env.RANDOMIZER_JAR, never sent by the client.
    */
   private getFvxJarSha512(): string {
@@ -153,22 +152,21 @@ export class EventsService {
   }
 
   /**
-   * Create a new randomizer event in draft status.
+   * Create a new randomizer config in draft status for an existing event.
    *
    * The client picks a preset (whose settings snapshot is hashed into settingsBlobSha512)
    * and the server pins the configured jar (fvxJarSha512). Neither hash is client-supplied.
    */
-  async createEvent(data: {
-    tournamentId: number;
+  async createConfig(data: {
+    eventId: number;
     gamePlatform: string;
     gameTitle: string;
     presetId: number;
     cleanRomSha512: string;
     romHint?: string;
-    packId?: string;
-  }): Promise<RandomizerEvent> {
-    if (!data.tournamentId || data.tournamentId <= 0) {
-      throw new BadRequestException('Valid tournamentId is required');
+  }): Promise<RandomizerConfig> {
+    if (!data.eventId || data.eventId <= 0) {
+      throw new BadRequestException('Valid eventId is required');
     }
     if (!data.presetId || data.presetId <= 0) {
       throw new BadRequestException('Valid presetId is required');
@@ -187,190 +185,185 @@ export class EventsService {
     const fvxJarSha512 = this.getFvxJarSha512();
 
     try {
-      const eventId = await this.repository.createEvent({
-        tournamentId: data.tournamentId,
+      const configId = await this.repository.createConfig({
+        eventId: data.eventId,
         gamePlatform: data.gamePlatform,
         gameTitle: data.gameTitle,
         settingsBlobSha512,
         fvxJarSha512,
         cleanRomSha512: data.cleanRomSha512,
         romHint: data.romHint || null,
-        packId: data.packId || null,
         status: 'draft',
-      } as NewRandomizerEvent);
+      } as NewRandomizerConfig);
 
-      const event = await this.repository.getEventById(eventId);
-      if (!event) {
-        throw new Error('Failed to retrieve created event');
+      const config = await this.repository.getConfigById(configId);
+      if (!config) {
+        throw new Error('Failed to retrieve created config');
       }
 
       this.logger.debug(
-        `Created randomizer event ${eventId} for tournament ${data.tournamentId}`,
+        `Created randomizer config ${configId} for event ${data.eventId}`,
       );
-      return event;
+      return config;
     } catch (error: any) {
-      this.logger.error('Failed to create event:', error);
+      this.logger.error('Failed to create config:', error);
       throw error;
     }
   }
 
   /**
-   * Get an event by ID.
+   * Get a config by ID.
    */
-  async getEvent(eventId: number): Promise<RandomizerEvent> {
+  async getConfig(configId: number): Promise<RandomizerConfig> {
+    if (!configId || configId <= 0) {
+      throw new BadRequestException('Valid configId is required');
+    }
+
+    const config = await this.repository.getConfigById(configId);
+    if (!config) {
+      throw new NotFoundException(`Config ${configId} not found`);
+    }
+
+    return config;
+  }
+
+  /**
+   * Get a config by event ID.
+   */
+  async getConfigByEventId(eventId: number): Promise<RandomizerConfig> {
     if (!eventId || eventId <= 0) {
       throw new BadRequestException('Valid eventId is required');
     }
 
-    const event = await this.repository.getEventById(eventId);
-    if (!event) {
-      throw new NotFoundException(`Event ${eventId} not found`);
+    const config = await this.repository.getConfigByEventId(eventId);
+    if (!config) {
+      throw new NotFoundException(
+        `No config found for event ${eventId}`,
+      );
     }
 
-    return event;
+    return config;
   }
 
   /**
-   * List all events for a tournament.
+   * List all configs.
    */
-  async listEventsByTournament(
-    tournamentId: number,
-  ): Promise<RandomizerEvent[]> {
-    if (!tournamentId || tournamentId <= 0) {
-      throw new BadRequestException('Valid tournamentId is required');
-    }
-
-    return this.repository.listEventsByTournament(tournamentId);
+  async listConfigs(): Promise<RandomizerConfig[]> {
+    return this.repository.listConfigs();
   }
 
   /**
-   * Update an event (only when status=draft).
+   * Update a config (only when status=draft).
    */
-  async updateEvent(
-    eventId: number,
-    patch: { romHint?: string; packId?: string },
-  ): Promise<RandomizerEvent> {
-    if (!eventId || eventId <= 0) {
-      throw new BadRequestException('Valid eventId is required');
+  async updateConfig(
+    configId: number,
+    patch: { romHint?: string },
+  ): Promise<RandomizerConfig> {
+    if (!configId || configId <= 0) {
+      throw new BadRequestException('Valid configId is required');
     }
 
-    const event = await this.getEvent(eventId);
+    const config = await this.getConfig(configId);
 
-    if (event.status !== 'draft') {
+    if (config.status !== 'draft') {
       throw new ConflictException(
-        `Cannot update event ${eventId}: status is ${event.status}, not draft`,
+        `Cannot update config ${configId}: status is ${config.status}, not draft`,
       );
     }
 
-    await this.repository.updateEvent(eventId, {
-      romHint: patch.romHint !== undefined ? patch.romHint : event.romHint,
-      packId: patch.packId !== undefined ? patch.packId : event.packId,
+    await this.repository.updateConfig(configId, {
+      romHint: patch.romHint !== undefined ? patch.romHint : config.romHint,
     });
 
-    return this.getEvent(eventId);
+    return this.getConfig(configId);
   }
 
   /**
-   * Lock an event: generate seeds, create assignments, audit.
-   *
-   * - Loads checked-in participants for the tournament
-   * - Generates ONE cryptographically-safe seed per participant in range [0, MAX_SAFE_INTEGER)
-   * - Creates assignments with status=pending
-   * - Sets event.status=locked
-   * - Audits SEED_GENERATED
+   * Open a config: transitions draft → open, allowing claims to begin.
    */
-  async lockEvent(eventId: number, actor?: string): Promise<RandomizerEvent> {
-    if (!eventId || eventId <= 0) {
-      throw new BadRequestException('Valid eventId is required');
+  async openConfig(configId: number, actor?: string): Promise<RandomizerConfig> {
+    if (!configId || configId <= 0) {
+      throw new BadRequestException('Valid configId is required');
     }
 
-    const event = await this.getEvent(eventId);
+    const config = await this.getConfig(configId);
 
-    if (event.status !== 'draft') {
+    if (config.status !== 'draft') {
       throw new ConflictException(
-        `Cannot lock event ${eventId}: status is ${event.status}, not draft`,
+        `Cannot open config ${configId}: status is ${config.status}, not draft`,
       );
     }
 
-    // Load checked-in participants
-    const participants = await this.repository.listCheckedInParticipants(
-      event.tournamentId,
-    );
-
-    if (participants.length === 0) {
-      throw new BadRequestException(
-        `No checked-in participants for tournament ${event.tournamentId}`,
-      );
-    }
-
-    // Generate one seed per participant using cryptographically-safe randomness
-    const assignments: NewRandomizerAssignment[] = participants.map(
-      (participant) => {
-        // Generate random bytes and convert to safe integer [0, MAX_SAFE_INTEGER)
-        // Use 6 bytes = 48 bits, then mask to ensure it's < MAX_SAFE_INTEGER (2^53 - 1)
-        const randomBytes6 = randomBytes(6);
-        const seed = randomBytes6.readUintBE(0, 6) % Number.MAX_SAFE_INTEGER;
-
-        return {
-          eventId,
-          participantId: participant.id,
-          mcUuid: null,
-          seed,
-          status: 'pending' as const,
-        } as NewRandomizerAssignment;
-      },
-    );
-
-    // Create assignments
-    await this.repository.createAssignments(assignments);
-
-    // Set event status to locked
-    await this.repository.updateEvent(eventId, {
-      status: 'locked' as RandomizerEventStatus,
-    });
-
-    // Audit
-    await this.repository.appendAudit({
-      eventId,
-      action: 'SEED_GENERATED',
-      actor: actor || 'system',
-      meta: { participantCount: participants.length },
-    });
-
-    this.logger.debug(
-      `Locked event ${eventId} with ${participants.length} seeds generated`,
-    );
-
-    return this.getEvent(eventId);
-  }
-
-  /**
-   * Finish an event: set status=finished, audit UNSEALED.
-   */
-  async finishEvent(eventId: number, actor?: string): Promise<RandomizerEvent> {
-    if (!eventId || eventId <= 0) {
-      throw new BadRequestException('Valid eventId is required');
-    }
-
-    const event = await this.getEvent(eventId);
-
-    if (event.status === 'finished') {
-      throw new ConflictException(`Event ${eventId} is already finished`);
-    }
-
-    await this.repository.updateEvent(eventId, {
-      status: 'finished' as RandomizerEventStatus,
+    await this.repository.updateConfig(configId, {
+      status: 'open' as RandomizerConfigStatus,
     });
 
     await this.repository.appendAudit({
-      eventId,
-      action: 'UNSEALED',
+      configId,
+      action: 'CONFIG_OPENED',
       actor: actor || 'system',
     });
 
-    this.logger.debug(`Finished event ${eventId}`);
+    this.logger.debug(`Opened config ${configId}`);
 
-    return this.getEvent(eventId);
+    return this.getConfig(configId);
+  }
+
+  /**
+   * Close a config: transitions open → closed, stopping new claims but allowing patching/verify.
+   */
+  async closeConfig(configId: number, actor?: string): Promise<RandomizerConfig> {
+    if (!configId || configId <= 0) {
+      throw new BadRequestException('Valid configId is required');
+    }
+
+    const config = await this.getConfig(configId);
+
+    if (config.status !== 'open') {
+      throw new ConflictException(
+        `Cannot close config ${configId}: status is ${config.status}, not open`,
+      );
+    }
+
+    await this.repository.updateConfig(configId, {
+      status: 'closed' as RandomizerConfigStatus,
+    });
+
+    await this.repository.appendAudit({
+      configId,
+      action: 'CONFIG_CLOSED',
+      actor: actor || 'system',
+    });
+
+    this.logger.debug(`Closed config ${configId}`);
+
+    return this.getConfig(configId);
+  }
+
+  /**
+   * Publish a config: transitions any status → published, making seeds/settings/logs public.
+   */
+  async publishConfig(configId: number, actor?: string): Promise<RandomizerConfig> {
+    if (!configId || configId <= 0) {
+      throw new BadRequestException('Valid configId is required');
+    }
+
+    const config = await this.getConfig(configId);
+
+    // Can publish from any state
+    await this.repository.updateConfig(configId, {
+      status: 'published' as RandomizerConfigStatus,
+    });
+
+    await this.repository.appendAudit({
+      configId,
+      action: 'CONFIG_OPENED', // Reuse audit action for now; consider adding 'CONFIG_PUBLISHED' if needed
+      actor: actor || 'system',
+    });
+
+    this.logger.debug(`Published config ${configId}`);
+
+    return this.getConfig(configId);
   }
 
   /**
@@ -380,17 +373,17 @@ export class EventsService {
    * Throws if runner is not wired (Phase 0).
    */
   async dryRunRandomization(
-    eventId: number,
+    configId: number,
     romStream: Readable,
   ): Promise<{ randomizedRom: Readable; logBytes: Buffer }> {
-    if (!eventId || eventId <= 0) {
-      throw new BadRequestException('Valid eventId is required');
+    if (!configId || configId <= 0) {
+      throw new BadRequestException('Valid configId is required');
     }
 
-    const event = await this.getEvent(eventId);
+    const config = await this.getConfig(configId);
 
-    if (!event) {
-      throw new NotFoundException(`Event ${eventId} not found`);
+    if (!config) {
+      throw new NotFoundException(`Config ${configId} not found`);
     }
 
     // TODO: fetch settings blob from disk (storeBlob managed PacksDownloadsService)
@@ -399,8 +392,8 @@ export class EventsService {
       romStream,
       settingsRnqs: Buffer.alloc(0), // Stub
       seed: 0,
-      gamePlatform: event.gamePlatform as 'gba' | 'nds',
-      jarSha512: event.fvxJarSha512,
+      gamePlatform: config.gamePlatform as 'gba' | 'nds',
+      jarSha512: config.fvxJarSha512,
     };
 
     const result = await this.runner.randomize(job);

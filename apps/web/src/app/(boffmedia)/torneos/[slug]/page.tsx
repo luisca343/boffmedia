@@ -14,7 +14,6 @@ import {
 } from "@/services/api/boffmedia/tournamentsService"
 import { TorneoView } from "../_components/TorneoView"
 import { RegisterButton } from "../_components/RegisterButton"
-import { RandomlockeSection } from "./_components/RandomlockeSection"
 import * as A from "../_lib/adapt"
 
 const STATUS_TONE: Record<string, string> = {
@@ -135,8 +134,6 @@ export default function TorneoPage({
       )}
 
       {preStart ? <RegistrationRoster detail={tn} /> : <TorneoView detail={tn} />}
-
-      <RandomlockeSection tournamentId={tn.id} />
     </main>
   )
 }

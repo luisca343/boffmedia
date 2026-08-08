@@ -8,17 +8,17 @@ import {
   IsIn,
 } from 'class-validator';
 import {
-  RandomizerEventStatus,
+  RandomizerConfigStatus,
   RandomizerAssignmentStatus,
 } from '@/_db/schema/Randomizer';
 
-// ==================== EVENT DTOS ====================
+// ==================== CONFIG DTOS ====================
 
-export class CreateEventDto {
-  @ApiProperty({ example: 1, description: 'Tournament ID' })
+export class CreateConfigDto {
+  @ApiProperty({ example: 1, description: 'BoffMedia Event ID' })
   @IsNotEmpty()
   @IsInt()
-  tournamentId: number;
+  eventId: number;
 
   @ApiProperty({ example: 'gba', description: 'Game platform' })
   @IsNotEmpty()
@@ -33,7 +33,7 @@ export class CreateEventDto {
   @ApiProperty({
     example: 1,
     description:
-      'Preset whose settings snapshot pins the event (settingsBlobSha512 is derived from it)',
+      'Preset whose settings snapshot pins the config (settingsBlobSha512 is derived from it)',
   })
   @IsNotEmpty()
   @IsInt()
@@ -54,39 +54,21 @@ export class CreateEventDto {
   @IsOptional()
   @IsString()
   romHint?: string;
-
-  @ApiProperty({
-    example: 'pack-uuid-1234',
-    description: 'Pack ID for randomlocke event linkage',
-    required: false,
-  })
-  @IsOptional()
-  @IsString()
-  packId?: string;
 }
 
-export class UpdateEventDto {
+export class UpdateConfigDto {
   @ApiProperty({ example: 'Pokémon FireRed (Spain)', required: false })
   @IsOptional()
   @IsString()
   romHint?: string;
-
-  @ApiProperty({
-    example: 'pack-uuid-1234',
-    description: 'Pack ID for randomlocke event linkage',
-    required: false,
-  })
-  @IsOptional()
-  @IsString()
-  packId?: string;
 }
 
-export class EventResponseDto {
+export class ConfigResponseDto {
   @ApiProperty({ example: 1 })
   id: number;
 
   @ApiProperty({ example: 1 })
-  tournamentId: number;
+  eventId: number;
 
   @ApiProperty({ example: 'gba' })
   gamePlatform: string;
@@ -107,18 +89,10 @@ export class EventResponseDto {
   romHint: string | null;
 
   @ApiProperty({
-    type: String,
-    example: 'pack-uuid-1234',
-    required: false,
-    nullable: true,
-  })
-  packId: string | null;
-
-  @ApiProperty({
     example: 'draft',
-    enum: ['draft', 'locked', 'running', 'finished'],
+    enum: ['draft', 'open', 'closed', 'published'],
   })
-  status: RandomizerEventStatus;
+  status: RandomizerConfigStatus;
 
   @ApiProperty()
   createdAt: Date;
@@ -134,8 +108,8 @@ export class AssignmentClaimedDto {
   eventId: number;
 
   @ApiProperty({
-    example: 'pending',
-    enum: ['pending', 'claimed', 'patched', 'verified'],
+    example: 'claimed',
+    enum: ['claimed', 'patched', 'verified'],
   })
   status: RandomizerAssignmentStatus;
 
@@ -151,8 +125,8 @@ export class AssignmentClaimedDto {
   @ApiProperty()
   romHint: string | null;
 
-  @ApiProperty({ example: 'draft' })
-  eventStatus: RandomizerEventStatus;
+  @ApiProperty({ example: 'open' })
+  configStatus: RandomizerConfigStatus;
 
   @ApiProperty({
     type: String,
@@ -167,15 +141,15 @@ export class AssignmentAdminDto {
   id: number;
 
   @ApiProperty({ example: 1 })
-  eventId: number;
+  configId: number;
 
-  @ApiProperty({ example: 1 })
-  participantId: number;
+  @ApiProperty({ type: Number, nullable: true, description: 'BoffMedia User ID if linked' })
+  boffmediaUserId: number | null;
 
   @ApiProperty()
-  mcUuid: string | null;
+  mcUuid: string;
 
-  @ApiProperty({ description: 'Only present if event.status === finished' })
+  @ApiProperty({ description: 'Only present if config.status === published' })
   seed?: number;
 
   @ApiProperty()
@@ -276,14 +250,18 @@ export class PresetResponseDto {
   updatedAt: Date;
 }
 
-// ==================== LOCK/FINISH DTOS ====================
+// ==================== CONFIG LIFECYCLE DTOS ====================
 
-export class LockEventDto {
-  // No additional fields needed — lock uses checked-in participants
+export class OpenConfigDto {
+  // No additional fields needed
 }
 
-export class FinishEventDto {
-  // No additional fields needed for basic finish
+export class CloseConfigDto {
+  // No additional fields needed
+}
+
+export class PublishConfigDto {
+  // No additional fields needed
 }
 
 export class DryRunDto {
@@ -321,15 +299,15 @@ export class QuickRandomizeDto {
 // ==================== PUBLIC DTOS (No Auth) ====================
 
 /**
- * Public event listing for tournaments (pre-finish: no seeds).
- * Matches the admin EventResponseDto but always excludes seed.
+ * Public config listing for events (pre-publish: no seeds).
+ * Matches the admin ConfigResponseDto but excludes seed.
  */
-export class PublicEventDto {
+export class PublicConfigDto {
   @ApiProperty({ example: 1 })
   id: number;
 
   @ApiProperty({ example: 1 })
-  tournamentId: number;
+  eventId: number;
 
   @ApiProperty({ example: 'gba' })
   gamePlatform: string;
@@ -349,22 +327,15 @@ export class PublicEventDto {
   @ApiProperty({
     type: String,
     nullable: true,
-    description: 'Only included when event status is finished',
+    description: 'Only included when config status is published',
   })
   settingsBlobSha512?: string | null;
 
   @ApiProperty({
     example: 'draft',
-    enum: ['draft', 'locked', 'running', 'finished'],
+    enum: ['draft', 'open', 'closed', 'published'],
   })
-  status: RandomizerEventStatus;
-
-  @ApiProperty({
-    type: String,
-    nullable: true,
-    example: 'pack-uuid-1234',
-  })
-  packId: string | null;
+  status: RandomizerConfigStatus;
 
   @ApiProperty()
   createdAt: Date;
@@ -372,29 +343,29 @@ export class PublicEventDto {
 
 /**
  * Public assignment listing (per-participant row).
- * Seed only visible when event status === finished.
+ * Seed only visible when config status === published.
  */
 export class PublicAssignmentDto {
   @ApiProperty({ example: 1 })
   id: number;
 
   @ApiProperty({ example: 1 })
-  eventId: number;
+  configId: number;
 
-  @ApiProperty({ description: 'Participant display name' })
+  @ApiProperty({ description: 'User display name (from boffMediaUsers)' })
   @IsString()
-  participantName: string;
+  displayName: string;
 
   @ApiProperty({
-    example: 'pending',
-    enum: ['pending', 'claimed', 'patched', 'verified'],
+    example: 'claimed',
+    enum: ['claimed', 'patched', 'verified'],
   })
   status: RandomizerAssignmentStatus;
 
   @ApiProperty({
     type: String,
     nullable: true,
-    description: 'Only present if event.status === finished',
+    description: 'Only present if config.status === published',
   })
   seed?: number | null;
 

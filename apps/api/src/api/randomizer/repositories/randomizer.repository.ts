@@ -1,14 +1,14 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { MySql2Database } from 'drizzle-orm/mysql2';
-import { and, eq, isNotNull, inArray, or } from 'drizzle-orm';
+import { and, eq, isNotNull, inArray } from 'drizzle-orm';
 import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
 import {
-  randomizerEvents,
+  randomizerConfigs,
   randomizerAssignments,
   randomizerAudit,
   randomizerPresets,
-  RandomizerEvent,
-  NewRandomizerEvent,
+  RandomizerConfig,
+  NewRandomizerConfig,
   RandomizerAssignment,
   NewRandomizerAssignment,
   RandomizerAuditRow,
@@ -16,11 +16,13 @@ import {
   NewRandomizerPreset,
   RandomizerAuditAction,
 } from '@/_db/schema/Randomizer';
-import {
-  boffMediaTournamentParticipants,
-  TournamentParticipant,
-} from '@/_db/schema/BoffMediaTournaments';
 import { boffMediaUsers } from '@/_db/schema/BoffMedia';
+import {
+  boffMediaParticipants,
+  boffMediaEventParticipants,
+  boffMediaEvents,
+  EVENT_STATUS,
+} from '@/_db/schema/BoffMediaEvents';
 import { Logger } from 'nestjs-pino';
 
 @Injectable()
@@ -31,23 +33,23 @@ export class RandomizerRepository {
     @Inject(DRIZZLE) private db: MySql2Database<Record<string, never>>,
   ) {}
 
-  // ==================== EVENTS ====================
+  // ==================== CONFIGS ====================
 
-  async createEvent(data: NewRandomizerEvent): Promise<number> {
+  async createConfig(data: NewRandomizerConfig): Promise<number> {
     try {
       const result = await this.db
-        .insert(randomizerEvents)
+        .insert(randomizerConfigs)
         .values(data)
         .execute();
 
       return result[0].insertId;
     } catch (error: any) {
-      this.logger.error('Failed to create randomizer event:', error);
-      throw new Error(`Event creation failed: ${error.message}`);
+      this.logger.error('Failed to create randomizer config:', error);
+      throw new Error(`Config creation failed: ${error.message}`);
     }
   }
 
-  async getEventById(id: number): Promise<RandomizerEvent | null> {
+  async getConfigById(id: number): Promise<RandomizerConfig | null> {
     if (!id || id <= 0) {
       return null;
     }
@@ -55,153 +57,123 @@ export class RandomizerRepository {
     try {
       const rows = await this.db
         .select()
-        .from(randomizerEvents)
-        .where(eq(randomizerEvents.id, id))
+        .from(randomizerConfigs)
+        .where(eq(randomizerConfigs.id, id))
         .execute();
 
       return rows.length > 0 ? rows[0] : null;
     } catch (error: any) {
-      this.logger.error(`Failed to get event by ID ${id}:`, error);
-      throw new Error(`Event retrieval failed: ${error.message}`);
+      this.logger.error(`Failed to get config by ID ${id}:`, error);
+      throw new Error(`Config retrieval failed: ${error.message}`);
     }
   }
 
-  async findActiveEventByPackId(packId: string): Promise<RandomizerEvent | null> {
+  /**
+   * Resolve a pack to its randomizer config: the config of the ACTIVE
+   * community event that has this pack attached. Returns null if no such
+   * event/config (→ launcher renders no panel). Config-status gating
+   * (open/closed/published) is left to the caller (getMyAssignment).
+   */
+  async getConfigByPackId(packId: string): Promise<RandomizerConfig | null> {
     if (!packId) {
       return null;
     }
 
     try {
-      // Find events with this packId that are in an active state (locked or running).
-      // Players can only claim assignments once seeds exist (locked or running).
-      // Draft events have no seeds; finished events are closed to new claims.
       const rows = await this.db
-        .select()
-        .from(randomizerEvents)
+        .select({ config: randomizerConfigs })
+        .from(boffMediaEvents)
+        .innerJoin(
+          randomizerConfigs,
+          eq(randomizerConfigs.eventId, boffMediaEvents.id),
+        )
         .where(
           and(
-            eq(randomizerEvents.packId, packId),
-            or(
-              eq(randomizerEvents.status, 'locked'),
-              eq(randomizerEvents.status, 'running'),
-            ),
+            eq(boffMediaEvents.packId, packId),
+            eq(boffMediaEvents.status, EVENT_STATUS.ACTIVE),
           ),
         )
         .execute();
 
-      if (rows.length === 0) {
-        return null;
-      }
-
-      // If multiple active events for the same pack, prefer locked over running,
-      // then return the first one (should not occur in normal operation).
-      const lockedEvent = rows.find((e) => e.status === 'locked');
-      if (lockedEvent) {
-        return lockedEvent;
-      }
-
-      return rows[0];
+      return rows.length > 0 ? rows[0].config : null;
     } catch (error: any) {
-      this.logger.error(
-        `Failed to find active event for pack ${packId}:`,
-        error,
-      );
-      throw new Error(`Active event lookup failed: ${error.message}`);
+      this.logger.error(`Failed to get config by pack ${packId}:`, error);
+      throw new Error(`Config retrieval failed: ${error.message}`);
     }
   }
 
-  async listEventsByTournament(
-    tournamentId: number,
-  ): Promise<RandomizerEvent[]> {
-    if (!tournamentId || tournamentId <= 0) {
-      return [];
-    }
-
-    try {
-      return await this.db
-        .select()
-        .from(randomizerEvents)
-        .where(eq(randomizerEvents.tournamentId, tournamentId))
-        .execute();
-    } catch (error: any) {
-      this.logger.error(
-        `Failed to list events for tournament ${tournamentId}:`,
-        error,
-      );
-      throw new Error(`Events listing failed: ${error.message}`);
-    }
-  }
-
-  async updateEvent(
-    id: number,
-    patch: Partial<NewRandomizerEvent>,
-  ): Promise<void> {
-    if (!id || id <= 0) {
-      throw new Error('Valid event ID is required');
-    }
-
-    try {
-      await this.db
-        .update(randomizerEvents)
-        .set(patch)
-        .where(eq(randomizerEvents.id, id))
-        .execute();
-    } catch (error: any) {
-      this.logger.error(`Failed to update event ${id}:`, error);
-      throw new Error(`Event update failed: ${error.message}`);
-    }
-  }
-
-  // ==================== ASSIGNMENTS ====================
-
-  async createAssignments(rows: NewRandomizerAssignment[]): Promise<void> {
-    if (rows.length === 0) {
-      return;
-    }
-
-    try {
-      await this.db.insert(randomizerAssignments).values(rows).execute();
-    } catch (error: any) {
-      this.logger.error('Failed to create randomizer assignments:', error);
-      throw new Error(`Assignments creation failed: ${error.message}`);
-    }
-  }
-
-  async getAssignment(
-    eventId: number,
-    participantId: number,
-  ): Promise<RandomizerAssignment | null> {
-    if (!eventId || !participantId) {
+  async getConfigByEventId(eventId: number): Promise<RandomizerConfig | null> {
+    if (!eventId || eventId <= 0) {
       return null;
     }
 
     try {
       const rows = await this.db
         .select()
-        .from(randomizerAssignments)
-        .where(
-          and(
-            eq(randomizerAssignments.eventId, eventId),
-            eq(randomizerAssignments.participantId, participantId),
-          ),
-        )
+        .from(randomizerConfigs)
+        .where(eq(randomizerConfigs.eventId, eventId))
         .execute();
 
       return rows.length > 0 ? rows[0] : null;
     } catch (error: any) {
       this.logger.error(
-        `Failed to get assignment for event ${eventId}, participant ${participantId}:`,
+        `Failed to get config for event ${eventId}:`,
         error,
       );
-      throw new Error(`Assignment retrieval failed: ${error.message}`);
+      throw new Error(`Config retrieval failed: ${error.message}`);
     }
   }
 
-  async getAssignmentByMcUuid(
-    eventId: number,
+  async listConfigs(): Promise<RandomizerConfig[]> {
+    try {
+      return await this.db.select().from(randomizerConfigs).execute();
+    } catch (error: any) {
+      this.logger.error('Failed to list configs:', error);
+      throw new Error(`Configs listing failed: ${error.message}`);
+    }
+  }
+
+  async updateConfig(
+    id: number,
+    patch: Partial<NewRandomizerConfig>,
+  ): Promise<void> {
+    if (!id || id <= 0) {
+      throw new Error('Valid config ID is required');
+    }
+
+    try {
+      await this.db
+        .update(randomizerConfigs)
+        .set(patch)
+        .where(eq(randomizerConfigs.id, id))
+        .execute();
+    } catch (error: any) {
+      this.logger.error(`Failed to update config ${id}:`, error);
+      throw new Error(`Config update failed: ${error.message}`);
+    }
+  }
+
+  // ==================== ASSIGNMENTS ====================
+
+  async createAssignment(data: NewRandomizerAssignment): Promise<number> {
+    try {
+      const result = await this.db
+        .insert(randomizerAssignments)
+        .values(data)
+        .execute();
+
+      return result[0].insertId;
+    } catch (error: any) {
+      this.logger.error('Failed to create randomizer assignment:', error);
+      throw new Error(`Assignment creation failed: ${error.message}`);
+    }
+  }
+
+  async getAssignmentByConfigAndMcUuid(
+    configId: number,
     mcUuid: string,
   ): Promise<RandomizerAssignment | null> {
-    if (!eventId || !mcUuid) {
+    if (!configId || !mcUuid) {
       return null;
     }
 
@@ -211,7 +183,7 @@ export class RandomizerRepository {
         .from(randomizerAssignments)
         .where(
           and(
-            eq(randomizerAssignments.eventId, eventId),
+            eq(randomizerAssignments.configId, configId),
             eq(randomizerAssignments.mcUuid, mcUuid),
           ),
         )
@@ -220,7 +192,7 @@ export class RandomizerRepository {
       return rows.length > 0 ? rows[0] : null;
     } catch (error: any) {
       this.logger.error(
-        `Failed to get assignment for event ${eventId}, MC UUID ${mcUuid}:`,
+        `Failed to get assignment for config ${configId}, MC UUID ${mcUuid}:`,
         error,
       );
       throw new Error(`Assignment retrieval failed: ${error.message}`);
@@ -251,10 +223,10 @@ export class RandomizerRepository {
     }
   }
 
-  async listAssignmentsByEvent(
-    eventId: number,
+  async listAssignmentsByConfig(
+    configId: number,
   ): Promise<RandomizerAssignment[]> {
-    if (!eventId || eventId <= 0) {
+    if (!configId || configId <= 0) {
       return [];
     }
 
@@ -262,11 +234,11 @@ export class RandomizerRepository {
       return await this.db
         .select()
         .from(randomizerAssignments)
-        .where(eq(randomizerAssignments.eventId, eventId))
+        .where(eq(randomizerAssignments.configId, configId))
         .execute();
     } catch (error: any) {
       this.logger.error(
-        `Failed to list assignments for event ${eventId}:`,
+        `Failed to list assignments for config ${configId}:`,
         error,
       );
       throw new Error(`Assignments listing failed: ${error.message}`);
@@ -293,80 +265,75 @@ export class RandomizerRepository {
     }
   }
 
-  // ==================== PARTICIPANTS ====================
-
-  async listCheckedInParticipants(
-    tournamentId: number,
-  ): Promise<TournamentParticipant[]> {
-    if (!tournamentId || tournamentId <= 0) {
-      return [];
-    }
-
-    try {
-      return await this.db
-        .select()
-        .from(boffMediaTournamentParticipants)
-        .where(
-          and(
-            eq(boffMediaTournamentParticipants.tournamentId, tournamentId),
-            isNotNull(boffMediaTournamentParticipants.checkedInAt),
-          ),
-        )
-        .execute();
-    } catch (error: any) {
-      this.logger.error(
-        `Failed to list checked-in participants for tournament ${tournamentId}:`,
-        error,
-      );
-      throw new Error(`Participants listing failed: ${error.message}`);
-    }
-  }
+  // ==================== ENTITLEMENT RESOLUTION ====================
 
   /**
-   * Resolve a participant ID via the identity chain:
+   * Resolve boffmedia user ID and event participant status via the identity chain:
    * mcUuid → boffMediaUsers (uuid = mcUuid)
-   *       → boffMediaTournamentParticipants (userId = users.id AND tournamentId)
-   *       → participant.id
+   *       → boffMediaParticipants (userId)
+   *       → boffMediaEventParticipants (participantId, eventId)
    *
-   * Returns the participant ID if found, or null if the user is not linked
-   * or is not a participant in the tournament.
+   * Returns { boffmediaUserId, status } if registered/confirmed, or null if not eligible.
    */
-  async resolveParticipantId(
-    tournamentId: number,
+  async resolveEventEntitlement(
+    eventId: number,
     mcUuid: string,
-  ): Promise<number | null> {
-    if (!tournamentId || tournamentId <= 0 || !mcUuid) {
+  ): Promise<{ boffmediaUserId: number; status: string } | null> {
+    if (!eventId || eventId <= 0 || !mcUuid) {
       return null;
     }
 
     try {
       const rows = await this.db
-        .select({ participantId: boffMediaTournamentParticipants.id })
+        .select({
+          boffmediaUserId: boffMediaUsers.id,
+          status: boffMediaEventParticipants.status,
+        })
         .from(boffMediaUsers)
         .innerJoin(
-          boffMediaTournamentParticipants,
+          boffMediaParticipants,
+          eq(boffMediaParticipants.userId, boffMediaUsers.id),
+        )
+        .innerJoin(
+          boffMediaEventParticipants,
           and(
-            eq(boffMediaTournamentParticipants.userId, boffMediaUsers.id),
-            eq(boffMediaTournamentParticipants.tournamentId, tournamentId),
+            eq(
+              boffMediaEventParticipants.participantId,
+              boffMediaParticipants.id,
+            ),
+            eq(boffMediaEventParticipants.eventId, eventId),
           ),
         )
         .where(eq(boffMediaUsers.uuid, mcUuid))
         .execute();
 
-      return rows.length > 0 ? rows[0].participantId : null;
+      if (rows.length === 0) {
+        return null;
+      }
+
+      const row = rows[0];
+      // Only 'registered' or 'confirmed' are eligible
+      if (row.status !== 'registered' && row.status !== 'confirmed') {
+        return null;
+      }
+
+      return {
+        boffmediaUserId: row.boffmediaUserId,
+        status: row.status,
+      };
     } catch (error: any) {
       this.logger.error(
-        `Failed to resolve participant ID for tournament ${tournamentId}, MC UUID ${mcUuid}:`,
+        `Failed to resolve entitlement for event ${eventId}, MC UUID ${mcUuid}:`,
         error,
       );
-      throw new Error(`Participant ID resolution failed: ${error.message}`);
+      throw new Error(`Entitlement resolution failed: ${error.message}`);
     }
   }
 
   // ==================== AUDIT ====================
 
   async appendAudit(row: {
-    eventId?: number | null;
+    configId?: number | null;
     assignmentId?: number | null;
     action: RandomizerAuditAction;
     actor?: string | null;
@@ -376,7 +343,7 @@ export class RandomizerRepository {
       await this.db
         .insert(randomizerAudit)
         .values({
-          eventId: row.eventId || null,
+          configId: row.configId || null,
           assignmentId: row.assignmentId || null,
           action: row.action,
           actor: row.actor || null,
@@ -390,16 +357,15 @@ export class RandomizerRepository {
   }
 
   /**
-   * List all assignments for an event with participant display names (public view).
-   * Joins to get the participant name from the tournament participants table.
-   * Includes participant name in the result.
+   * List all assignments for a config with user display names (public view).
+   * Joins to get the user display name from boffMediaUsers via boffMediaParticipants.
    */
-  async listAssignmentsByEventWithParticipantNames(
-    eventId: number,
+  async listAssignmentsByConfigWithDisplayNames(
+    configId: number,
   ): Promise<
-    (RandomizerAssignment & { participantName: string })[]
+    (RandomizerAssignment & { displayName: string })[]
   > {
-    if (!eventId || eventId <= 0) {
+    if (!configId || configId <= 0) {
       return [];
     }
 
@@ -407,26 +373,23 @@ export class RandomizerRepository {
       const rows = await this.db
         .select({
           a: randomizerAssignments,
-          participantName: boffMediaTournamentParticipants.name,
+          displayName: boffMediaUsers.username,
         })
         .from(randomizerAssignments)
-        .innerJoin(
-          boffMediaTournamentParticipants,
-          eq(
-            boffMediaTournamentParticipants.id,
-            randomizerAssignments.participantId,
-          ),
+        .leftJoin(
+          boffMediaUsers,
+          eq(boffMediaUsers.id, randomizerAssignments.boffmediaUserId),
         )
-        .where(eq(randomizerAssignments.eventId, eventId))
+        .where(eq(randomizerAssignments.configId, configId))
         .execute();
 
       return rows.map((row) => ({
         ...row.a,
-        participantName: row.participantName,
+        displayName: row.displayName || 'Anonymous',
       }));
     } catch (error: any) {
       this.logger.error(
-        `Failed to list assignments with names for event ${eventId}:`,
+        `Failed to list assignments with names for config ${configId}:`,
         error,
       );
       throw new Error(

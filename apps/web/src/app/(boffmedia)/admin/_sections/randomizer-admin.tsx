@@ -7,52 +7,56 @@ import { Button, Empty, Icon, Input, Modal, Spinner, toast, Select } from "@boff
 import { AvPanel, AvSectionHead } from "../_components/ui/av-kit"
 import { RandomizerService } from "@/services/api/boffmedia/randomizerService"
 import { TournamentsService } from "@/services/api/boffmedia/tournamentsService"
-import type { RandomizerPreset, RandomizerEvent } from "@/services/api/boffmedia/randomizer.types"
+import type { RandomizerPreset, RandomizerConfig } from "@/services/api/boffmedia/randomizer.types"
 import type { TournamentSummaryApi } from "@/services/api/boffmedia/tournamentsService"
 import { RandomizerEditor } from "./randomizer/randomizer-editor"
 import { QuickRandomizeModal } from "./randomizer/QuickRandomizeModal"
 import { totalChanged } from "./randomizer/_components/catalog-view"
-import { EventsList } from "./randomizer/events/EventsList"
-import { EventEditor } from "./randomizer/events/EventEditor"
-import { AssignmentsList } from "./randomizer/events/AssignmentsList"
+import { ConfigsList } from "./randomizer/configs/ConfigsList"
+import { ConfigEditor } from "./randomizer/configs/ConfigEditor"
+import { ConfigAssignmentsList } from "./randomizer/configs/ConfigAssignmentsList"
 
 /**
- * Events management view with tournament selection, event list/edit, and assignments.
+ * Configs management view with community event selection, config list/edit, and assignments.
+ * Replaces tournament-based event management with event-based config management.
  */
-function EventsView() {
+function ConfigsView() {
   const t = useTranslations("randomizer.events")
-  const [tournaments, setTournaments] = useState<TournamentSummaryApi[]>([])
-  const [selectedTournamentId, setSelectedTournamentId] = useState<string | null>(null)
-  const [loadingTournaments, setLoadingTournaments] = useState(false)
-  const [editingEvent, setEditingEvent] = useState<RandomizerEvent | null>(null)
-  const [showAssignments, setShowAssignments] = useState<RandomizerEvent | null>(null)
+  const [events, setEvents] = useState<any[]>([])
+  const [selectedEventId, setSelectedEventId] = useState<string | null>(null)
+  const [loadingEvents, setLoadingEvents] = useState(false)
+  const [editingConfig, setEditingConfig] = useState<RandomizerConfig | null>(null)
+  const [showAssignments, setShowAssignments] = useState<RandomizerConfig | null>(null)
 
   useEffect(() => {
-    loadTournaments()
+    loadEvents()
   }, [])
 
-  const loadTournaments = async () => {
-    setLoadingTournaments(true)
+  const loadEvents = async () => {
+    setLoadingEvents(true)
     try {
-      const res = await TournamentsService.list()
-      setTournaments(res.success ? res.data || [] : [])
+      // Load community events with emulator packs attached
+      const res = await TournamentsService.list() // Temporary: reusing tournaments service
+      // TODO: Once EventsService gains a list method for admin, use EventsService.getEvents()
+      setEvents(res.success ? res.data || [] : [])
     } catch (err) {
-      toast({ tone: "bad", title: t("errorLoadingTournaments"), msg: String(err) })
+      toast({ tone: "bad", title: t("errorLoadingEvents"), msg: String(err) })
     } finally {
-      setLoadingTournaments(false)
+      setLoadingEvents(false)
     }
   }
 
-  // If editing an event, show the editor
-  if (editingEvent !== null) {
+  // If editing a config, show the editor
+  if (editingConfig !== null) {
     return (
-      <EventEditor
-        event={editingEvent}
-        tournamentId={selectedTournamentId}
+      <ConfigEditor
+        config={editingConfig}
+        eventId={selectedEventId ? Number(selectedEventId) : null}
         onSave={() => {
-          setEditingEvent(null)
+          setEditingConfig(null)
+          // Refresh configs list
         }}
-        onCancel={() => setEditingEvent(null)}
+        onCancel={() => setEditingConfig(null)}
       />
     )
   }
@@ -60,48 +64,48 @@ function EventsView() {
   // If viewing assignments, show the assignments list
   if (showAssignments) {
     return (
-      <AssignmentsList
-        event={showAssignments}
+      <ConfigAssignmentsList
+        config={showAssignments}
         onClose={() => setShowAssignments(null)}
       />
     )
   }
 
-  // Main events view with tournament selector
+  // Main configs view with event selector
   return (
     <div className="space-y-5">
       <AvPanel>
         <div className="space-y-3">
           <Select
-            label={t("selectTournament")}
-            value={selectedTournamentId || ""}
+            label={t("selectEvent")}
+            value={selectedEventId || ""}
             options={[
-              { value: "", label: t("chooseTournament") },
-              ...tournaments.map((tn) => ({
-                value: String(tn.id),
-                label: tn.name,
+              { value: "", label: t("chooseEvent") },
+              ...events.map((ev) => ({
+                value: String(ev.id),
+                label: ev.name,
               })),
             ]}
-            disabled={loadingTournaments}
-            onChange={(v) => setSelectedTournamentId(v || null)}
+            disabled={loadingEvents}
+            onChange={(v) => setSelectedEventId(v || null)}
           />
         </div>
       </AvPanel>
 
-      {selectedTournamentId && (
+      {selectedEventId && (
         <div>
           <AvPanel className="mb-5">
             <Button
-              onClick={() => setEditingEvent({ id: "", tournamentId: selectedTournamentId, gameTitle: "", gamePlatform: "gba", settingsBlobSha512: "", fvxJarSha512: "", cleanRomSha512: "", romHint: "", status: "draft", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() } as any)}
+              onClick={() => setEditingConfig({} as any)}
               className="w-full"
             >
               <Icon name="plus" size={16} />
-              {t("createEvent")}
+              {t("createConfig")}
             </Button>
           </AvPanel>
-          <EventsList
-            tournamentId={selectedTournamentId}
-            onEdit={setEditingEvent}
+          <ConfigsList
+            eventId={Number(selectedEventId)}
+            onEdit={setEditingConfig}
             onShowAssignments={setShowAssignments}
           />
         </div>
@@ -338,11 +342,11 @@ export function RandomizerAdmin() {
               {t("chrome.editor")}
             </Button>
             <Button
-              variant={view === "events" ? "pri" : "ghost"}
+              variant={view === "configs" ? "pri" : "ghost"}
               size="sm"
-              onClick={() => handleViewChange("events")}
+              onClick={() => handleViewChange("configs")}
             >
-              {t("chrome.events")}
+              {t("chrome.configs")}
             </Button>
           </div>
         }
@@ -356,7 +360,7 @@ export function RandomizerAdmin() {
             initialSettings={presetToLoad?.settingsJson}
           />
         )}
-        {view === "events" && <EventsView />}
+        {view === "configs" && <ConfigsView />}
       </div>
     </div>
   )

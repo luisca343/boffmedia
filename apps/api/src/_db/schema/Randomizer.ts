@@ -1,7 +1,6 @@
 import { sql } from 'drizzle-orm';
 import {
   bigint,
-  boolean,
   char,
   foreignKey,
   index,
@@ -13,46 +12,39 @@ import {
   uniqueIndex,
   varchar,
 } from 'drizzle-orm/mysql-core';
-import {
-  boffMediaTournaments,
-  boffMediaTournamentParticipants,
-} from './BoffMediaTournaments';
 import { boffMediaUsers } from './BoffMedia';
-import { packs } from './Packs';
+import { boffMediaEvents } from './BoffMediaEvents';
 
-/** Status of a randomizer event: draft | locked | running | finished */
-export type RandomizerEventStatus = 'draft' | 'locked' | 'running' | 'finished';
+/** Status of a randomizer config: draft | open | closed | published */
+export type RandomizerConfigStatus = 'draft' | 'open' | 'closed' | 'published';
 
-/** Status of a participant assignment: pending | claimed | patched | verified */
-export type RandomizerAssignmentStatus =
-  | 'pending'
-  | 'claimed'
-  | 'patched'
-  | 'verified';
+/** Status of an assignment: claimed | patched | verified */
+export type RandomizerAssignmentStatus = 'claimed' | 'patched' | 'verified';
 
-/** Audit action for randomizer events and assignments */
+/** Audit action for randomizer configs and assignments */
 export type RandomizerAuditAction =
   | 'ROM_RECEIVED'
   | 'PATCHED'
   | 'LOG_SEALED'
-  | 'UNSEALED'
-  | 'SEED_GENERATED'
+  | 'VERIFY_PASSED'
+  | 'VERIFY_FAILED'
   | 'CLAIMED'
-  | 'VERIFY_FAILED';
+  | 'SEED_MINTED'
+  | 'CONFIG_OPENED'
+  | 'CONFIG_CLOSED';
 
-export const randomizerEvents = mysqlTable(
-  'randomizer_events',
+export const randomizerConfigs = mysqlTable(
+  'randomizer_configs',
   {
     id: int('id').primaryKey().autoincrement(),
-    tournamentId: int('tournament_id').notNull(),
+    eventId: int('event_id').notNull().unique(),
     gamePlatform: varchar('game_platform', { length: 8 }).notNull(), // "gba" | "nds"
     gameTitle: varchar('game_title', { length: 64 }).notNull(), // FVX game identifier
     settingsBlobSha512: char('settings_blob_sha512', { length: 128 }).notNull(), // .rnqs settings snapshot
     fvxJarSha512: char('fvx_jar_sha512', { length: 128 }).notNull(), // pinned jar patches
     cleanRomSha512: char('clean_rom_sha512', { length: 128 }).notNull(), // No-Intro clean-dump hash
     romHint: varchar('rom_hint', { length: 255 }), // human hint (e.g. "Pokémon FireRed (Spain)")
-    packId: varchar('pack_id', { length: 32 }), // nullable FK to packs
-    status: varchar('status', { length: 16 }).notNull().default('draft'), // draft | locked | running | finished
+    status: varchar('status', { length: 16 }).notNull().default('draft'), // draft | open | closed | published
     createdAt: timestamp('created_at')
       .notNull()
       .default(sql`CURRENT_TIMESTAMP()`),
@@ -61,36 +53,31 @@ export const randomizerEvents = mysqlTable(
       .default(sql`CURRENT_TIMESTAMP() ON UPDATE CURRENT_TIMESTAMP()`),
   },
   (table) => ({
-    tournamentFk: foreignKey({
-      name: 're_tournament_fk',
-      columns: [table.tournamentId],
-      foreignColumns: [boffMediaTournaments.id],
+    eventFk: foreignKey({
+      name: 'rc_event_fk',
+      columns: [table.eventId],
+      foreignColumns: [boffMediaEvents.id],
     }).onDelete('cascade'),
-    packFk: foreignKey({
-      name: 're_pack_fk',
-      columns: [table.packId],
-      foreignColumns: [packs.id],
-    }).onDelete('set null'),
-    tournamentIdx: index('re_tournament_idx').on(table.tournamentId),
-    packIdx: index('re_pack_idx').on(table.packId),
+    eventIdx: index('rc_event_idx').on(table.eventId),
+    statusIdx: index('rc_status_idx').on(table.status),
   }),
 );
 
-export type RandomizerEvent = typeof randomizerEvents.$inferSelect;
-export type NewRandomizerEvent = typeof randomizerEvents.$inferInsert;
+export type RandomizerConfig = typeof randomizerConfigs.$inferSelect;
+export type NewRandomizerConfig = typeof randomizerConfigs.$inferInsert;
 
 export const randomizerAssignments = mysqlTable(
   'randomizer_assignments',
   {
     id: int('id').primaryKey().autoincrement(),
-    eventId: int('event_id').notNull(),
-    participantId: int('participant_id').notNull(),
-    mcUuid: char('mc_uuid', { length: 36 }), // bound at first authenticated claim; nullable until claim
+    configId: int('config_id').notNull(),
+    boffmediaUserId: int('boffmedia_user_id'),
+    mcUuid: char('mc_uuid', { length: 36 }).notNull(), // minted at claim; immutable
     seed: bigint('seed', { mode: 'number' }).notNull(),
-    status: varchar('status', { length: 16 }).notNull().default('pending'), // pending | claimed | patched | verified
+    status: varchar('status', { length: 16 }).notNull().default('claimed'), // claimed | patched | verified
     outputSha512: char('output_sha512', { length: 128 }), // sha512 of randomized output ROM
     logBlobSha512: char('log_blob_sha512', { length: 128 }), // sealed spoiler log blob ref
-    claimedAt: timestamp('claimed_at'),
+    claimedAt: timestamp('claimed_at').defaultNow(),
     patchedAt: timestamp('patched_at'),
     verifiedAt: timestamp('verified_at'),
     createdAt: timestamp('created_at')
@@ -101,22 +88,24 @@ export const randomizerAssignments = mysqlTable(
       .default(sql`CURRENT_TIMESTAMP() ON UPDATE CURRENT_TIMESTAMP()`),
   },
   (table) => ({
-    eventFk: foreignKey({
-      name: 'rass_event_fk',
-      columns: [table.eventId],
-      foreignColumns: [randomizerEvents.id],
+    configFk: foreignKey({
+      name: 'rass_config_fk',
+      columns: [table.configId],
+      foreignColumns: [randomizerConfigs.id],
     }).onDelete('cascade'),
-    participantFk: foreignKey({
-      name: 'rass_participant_fk',
-      columns: [table.participantId],
-      foreignColumns: [boffMediaTournamentParticipants.id],
-    }).onDelete('cascade'),
-    eventParticipantUnique: uniqueIndex('rass_event_participant_unique').on(
-      table.eventId,
-      table.participantId,
+    userFk: foreignKey({
+      name: 'rass_user_fk',
+      columns: [table.boffmediaUserId],
+      foreignColumns: [boffMediaUsers.id],
+    }).onDelete('set null'),
+    configMcUuidUnique: uniqueIndex('rass_config_mcuuid_unique').on(
+      table.configId,
+      table.mcUuid,
     ),
-    eventIdx: index('rass_event_idx').on(table.eventId),
+    configIdx: index('rass_config_idx').on(table.configId),
     mcUuidIdx: index('rass_mc_uuid_idx').on(table.mcUuid),
+    userIdx: index('rass_user_idx').on(table.boffmediaUserId),
+    statusIdx: index('rass_status_idx').on(table.status),
   }),
 );
 
@@ -127,27 +116,29 @@ export const randomizerAudit = mysqlTable(
   'randomizer_audit',
   {
     id: int('id').primaryKey().autoincrement(),
-    eventId: int('event_id'),
+    configId: int('config_id'),
     assignmentId: int('assignment_id'),
-    action: varchar('action', { length: 32 }).notNull(), // ROM_RECEIVED, PATCHED, LOG_SEALED, etc.
-    actor: varchar('actor', { length: 64 }), // admin id / mc_uuid / 'system'
+    action: varchar('action', { length: 32 }).notNull(), // ROM_RECEIVED, PATCHED, LOG_SEALED, VERIFY_PASSED, etc.
+    actor: varchar('actor', { length: 64 }), // admin id / launcher:{mc_uuid} / 'system'
     meta: json('meta').$type<Record<string, unknown>>(), // additional context
     createdAt: timestamp('created_at')
       .notNull()
       .default(sql`CURRENT_TIMESTAMP()`),
   },
   (table) => ({
-    eventFk: foreignKey({
-      name: 'raud_event_fk',
-      columns: [table.eventId],
-      foreignColumns: [randomizerEvents.id],
+    configFk: foreignKey({
+      name: 'raud_config_fk',
+      columns: [table.configId],
+      foreignColumns: [randomizerConfigs.id],
     }).onDelete('set null'),
     assignmentFk: foreignKey({
       name: 'raud_assignment_fk',
       columns: [table.assignmentId],
       foreignColumns: [randomizerAssignments.id],
     }).onDelete('set null'),
-    eventIdx: index('raud_event_idx').on(table.eventId),
+    configIdx: index('raud_config_idx').on(table.configId),
+    assignmentIdx: index('raud_assignment_idx').on(table.assignmentId),
+    actionIdx: index('raud_action_idx').on(table.action),
   }),
 );
 

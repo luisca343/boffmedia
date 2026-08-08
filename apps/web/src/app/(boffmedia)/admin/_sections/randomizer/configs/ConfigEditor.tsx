@@ -9,37 +9,37 @@ import { Button, Field, Input, Select, Spinner, toast } from "@boffmedia/ui"
 import { AvPanel, AvSectionHead } from "../../../_components/ui/av-kit"
 import { RandomizerService } from "@/services/api/boffmedia/randomizerService"
 import { PacksService } from "@/services/api/boffmedia/packsService"
-import type { RandomizerEvent, RandomizerPreset } from "@/services/api/boffmedia/randomizer.types"
+import type { RandomizerConfig, RandomizerPreset } from "@/services/api/boffmedia/randomizer.types"
 import type { AdminPack } from "@/services/api/boffmedia/packsService"
 
-const makeEventSchema = (t: (key: string) => string) =>
+const makeConfigSchema = (t: (key: string) => string) =>
   z.object({
     gameTitle: z.string().min(1, t("titleRequired")),
     gamePlatform: z.enum(["gba", "nds"]),
-    // presetId is required on create (its settings snapshot pins the event); enforced in onSubmit.
+    // presetId is required on create; enforced in onSubmit
     presetId: z.string().optional(),
     cleanRomSha512: z.string().min(1, t("romHashRequired")),
     romHint: z.string().optional().default(""),
     packId: z.string().optional(),
   })
 
-type EventFormData = z.infer<ReturnType<typeof makeEventSchema>>
+type ConfigFormData = z.infer<ReturnType<typeof makeConfigSchema>>
 
-interface EventEditorProps {
-  event?: RandomizerEvent | null
-  tournamentId: string | null
+interface ConfigEditorProps {
+  config?: RandomizerConfig | null
+  eventId: number | null
   onSave: () => void
   onCancel: () => void
 }
 
-export function EventEditor({
-  event,
-  tournamentId,
+export function ConfigEditor({
+  config,
+  eventId,
   onSave,
   onCancel,
-}: EventEditorProps) {
+}: ConfigEditorProps) {
   const t = useTranslations("randomizer.events")
-  const isExisting = Boolean(event?.id)
+  const isExisting = Boolean(config?.id)
   const [presets, setPresets] = useState<RandomizerPreset[]>([])
   const [packs, setPacks] = useState<AdminPack[]>([])
   const [loadingPresets, setLoadingPresets] = useState(false)
@@ -52,16 +52,16 @@ export function EventEditor({
     handleSubmit,
     formState: { errors },
     reset,
-  } = useForm<EventFormData>({
-    resolver: zodResolver(makeEventSchema(t)),
-    defaultValues: event
+  } = useForm<ConfigFormData>({
+    resolver: zodResolver(makeConfigSchema(t)),
+    defaultValues: config
       ? {
-          gameTitle: event.gameTitle,
-          gamePlatform: event.gamePlatform,
+          gameTitle: config.gameTitle,
+          gamePlatform: config.gamePlatform,
           presetId: undefined, // not returned by the API; only chosen on create
-          cleanRomSha512: event.cleanRomSha512,
-          romHint: event.romHint ?? "",
-          packId: event.packId ?? undefined,
+          cleanRomSha512: config.cleanRomSha512,
+          romHint: config.romHint ?? "",
+          packId: config.packId ?? undefined,
         }
       : {
           gamePlatform: "gba",
@@ -102,23 +102,22 @@ export function EventEditor({
     }
   }
 
-  const onSubmit = async (data: EventFormData) => {
-    if (!tournamentId) {
-      toast({ tone: "bad", title: t("selectTournament") })
+  const onSubmit = async (data: ConfigFormData) => {
+    if (!eventId) {
+      toast({ tone: "bad", title: t("selectEvent") })
       return
     }
 
     setSubmitting(true)
     try {
-      if (isExisting && event) {
-        // Only romHint and packId are editable once an event exists (everything
-        // else is pinned) — the API's UpdateEventDto rejects any other property.
-        const res = await RandomizerService.updateEvent(event.id, {
+      if (isExisting && config) {
+        // Only romHint and packId are editable once a config exists
+        const res = await RandomizerService.updateConfig(config.id, {
           romHint: data.romHint,
           packId: data.packId || undefined,
         })
         if (res.success) {
-          toast({ tone: "ok", title: t("eventUpdated") })
+          toast({ tone: "ok", title: t("configUpdated") })
           onSave()
         } else {
           toast({ tone: "bad", title: t("updateError"), msg: res.userMessage })
@@ -128,17 +127,16 @@ export function EventEditor({
           toast({ tone: "bad", title: t("selectPreset") })
           return
         }
-        const res = await RandomizerService.createEvent({
-          tournamentId: Number(tournamentId),
+        const res = await RandomizerService.createConfig({
+          eventId,
           gamePlatform: data.gamePlatform,
           gameTitle: data.gameTitle,
           presetId: Number(data.presetId),
           cleanRomSha512: data.cleanRomSha512,
           romHint: data.romHint || "",
-          packId: data.packId || undefined,
         })
         if (res.success) {
-          toast({ tone: "ok", title: t("eventCreated") })
+          toast({ tone: "ok", title: t("configCreated") })
           reset()
           onSave()
         } else {
@@ -153,7 +151,7 @@ export function EventEditor({
   return (
     <div className="space-y-5">
       <AvSectionHead
-        title={isExisting ? t("editEvent") : t("createEvent")}
+        title={isExisting ? t("editConfig") : t("createConfig")}
         actions={
           <Button onClick={onCancel} variant="ghost" size="sm">
             {t("cancel")}
@@ -163,7 +161,7 @@ export function EventEditor({
 
       <AvPanel>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-          {/* Game Title (FVX game identifier) */}
+          {/* Game Title */}
           <Field label={t("title")} error={errors.gameTitle?.message}>
             <Input
               placeholder={t("titlePlaceholder")}

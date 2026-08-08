@@ -31,19 +31,20 @@ import { EventsService } from './services/events.service';
 import { AssignmentsService } from './services/assignments.service';
 import { PresetsService } from './services/presets.service';
 import {
-  CreateEventDto,
-  UpdateEventDto,
-  EventResponseDto,
+  CreateConfigDto,
+  UpdateConfigDto,
+  ConfigResponseDto,
   AssignmentAdminDto,
   CreatePresetDto,
   UpdatePresetDto,
   PresetResponseDto,
-  LockEventDto,
-  FinishEventDto,
+  OpenConfigDto,
+  CloseConfigDto,
+  PublishConfigDto,
   QuickRandomizeDto,
 } from './dto/randomizer.dto';
 
-// Admin panel for randomizer events, assignments, and presets.
+// Admin panel for randomizer configs, assignments, and presets.
 // All routes require JWT + BOFF_ADMIN role.
 @ApiTags('Randomizer | Admin')
 @Controller('randomizer/admin')
@@ -62,79 +63,89 @@ export class RandomizerController {
     return userId ? `user:${userId}` : null;
   }
 
-  // ==================== EVENTS ====================
+  // ==================== CONFIGS ====================
 
-  @Post('events')
-  @ApiOperation({ summary: 'Crear un evento de randomizer' })
-  @ApiResponse({ status: HttpStatus.CREATED, type: EventResponseDto })
-  async createEvent(@Body() dto: CreateEventDto): Promise<EventResponseDto> {
-    return this.events.createEvent(dto) as Promise<EventResponseDto>;
+  @Post('configs')
+  @ApiOperation({ summary: 'Create a randomizer config for an event' })
+  @ApiResponse({ status: HttpStatus.CREATED, type: ConfigResponseDto })
+  async createConfig(@Body() dto: CreateConfigDto): Promise<ConfigResponseDto> {
+    return this.events.createConfig(dto) as Promise<ConfigResponseDto>;
   }
 
-  @Get('events/:id')
-  @ApiOperation({ summary: 'Obtener un evento por ID' })
-  @ApiResponse({ status: HttpStatus.OK, type: EventResponseDto })
-  async getEvent(@Param('id') id: string): Promise<EventResponseDto> {
-    return this.events.getEvent(Number(id)) as Promise<EventResponseDto>;
+  @Get('configs/:id')
+  @ApiOperation({ summary: 'Get a config by ID' })
+  @ApiResponse({ status: HttpStatus.OK, type: ConfigResponseDto })
+  async getConfig(@Param('id') id: string): Promise<ConfigResponseDto> {
+    return this.events.getConfig(Number(id)) as Promise<ConfigResponseDto>;
   }
 
-  @Get('tournaments/:tournamentId/events')
-  @ApiOperation({ summary: 'Listar eventos de un torneo' })
-  @ApiResponse({ status: HttpStatus.OK, type: [EventResponseDto] })
-  async listEventsByTournament(
-    @Param('tournamentId') tournamentId: string,
-  ): Promise<EventResponseDto[]> {
-    return this.events.listEventsByTournament(Number(tournamentId)) as Promise<
-      EventResponseDto[]
-    >;
+  @Get('configs')
+  @ApiOperation({ summary: 'List all configs' })
+  @ApiResponse({ status: HttpStatus.OK, type: [ConfigResponseDto] })
+  async listConfigs(): Promise<ConfigResponseDto[]> {
+    return this.events.listConfigs() as Promise<ConfigResponseDto[]>;
   }
 
-  @Patch('events/:id')
-  @ApiOperation({ summary: 'Actualizar un evento (solo en draft)' })
-  @ApiResponse({ status: HttpStatus.OK, type: EventResponseDto })
-  async updateEvent(
+  @Patch('configs/:id')
+  @ApiOperation({ summary: 'Update a config (only in draft)' })
+  @ApiResponse({ status: HttpStatus.OK, type: ConfigResponseDto })
+  async updateConfig(
     @Param('id') id: string,
-    @Body() dto: UpdateEventDto,
-  ): Promise<EventResponseDto> {
-    return this.events.updateEvent(
+    @Body() dto: UpdateConfigDto,
+  ): Promise<ConfigResponseDto> {
+    return this.events.updateConfig(
       Number(id),
       dto,
-    ) as Promise<EventResponseDto>;
+    ) as Promise<ConfigResponseDto>;
   }
 
-  @Post('events/:id/lock')
+  @Post('configs/:id/open')
   @ApiOperation({
-    summary: 'Bloquear evento y generar seeds (draft → locked)',
+    summary: 'Open config for claims (draft → open)',
   })
-  @ApiResponse({ status: HttpStatus.OK, type: EventResponseDto })
-  async lockEvent(
+  @ApiResponse({ status: HttpStatus.OK, type: ConfigResponseDto })
+  async openConfig(
     @Param('id') id: string,
-    @Body() dto: LockEventDto,
+    @Body() dto: OpenConfigDto,
     @Req() req: any,
-  ): Promise<EventResponseDto> {
-    return this.events.lockEvent(
+  ): Promise<ConfigResponseDto> {
+    return this.events.openConfig(
       Number(id),
       this.actorId(req) || undefined,
-    ) as Promise<EventResponseDto>;
+    ) as Promise<ConfigResponseDto>;
   }
 
-  @Post('events/:id/finish')
-  @ApiOperation({ summary: 'Finalizar evento (cualquier status → finished)' })
-  @ApiResponse({ status: HttpStatus.OK, type: EventResponseDto })
-  async finishEvent(
+  @Post('configs/:id/close')
+  @ApiOperation({ summary: 'Close config (open → closed; stops new claims)' })
+  @ApiResponse({ status: HttpStatus.OK, type: ConfigResponseDto })
+  async closeConfig(
     @Param('id') id: string,
-    @Body() dto: FinishEventDto,
+    @Body() dto: CloseConfigDto,
     @Req() req: any,
-  ): Promise<EventResponseDto> {
-    return this.events.finishEvent(
+  ): Promise<ConfigResponseDto> {
+    return this.events.closeConfig(
       Number(id),
       this.actorId(req) || undefined,
-    ) as Promise<EventResponseDto>;
+    ) as Promise<ConfigResponseDto>;
   }
 
-  @Post('events/:id/dry-run')
+  @Post('configs/:id/publish')
+  @ApiOperation({ summary: 'Publish config (seeds/settings/logs become public)' })
+  @ApiResponse({ status: HttpStatus.OK, type: ConfigResponseDto })
+  async publishConfig(
+    @Param('id') id: string,
+    @Body() dto: PublishConfigDto,
+    @Req() req: any,
+  ): Promise<ConfigResponseDto> {
+    return this.events.publishConfig(
+      Number(id),
+      this.actorId(req) || undefined,
+    ) as Promise<ConfigResponseDto>;
+  }
+
+  @Post('configs/:id/dry-run')
   @ApiOperation({
-    summary: 'Randomizar una ROM sin guardarla (prueba)',
+    summary: 'Dry-run randomization (test only, no persistence)',
   })
   @ApiConsumes('multipart/form-data')
   @ApiResponse({ status: HttpStatus.OK })
@@ -151,7 +162,7 @@ export class RandomizerController {
 
   @Post('quick-randomize')
   @ApiOperation({
-    summary: 'Randomizar una ROM al vuelo con un preset (descarga directa)',
+    summary: 'Quick randomize ROM with preset (direct, no event)',
   })
   @ApiConsumes('multipart/form-data')
   @ApiResponse({ status: HttpStatus.OK })
@@ -180,24 +191,24 @@ export class RandomizerController {
 
   // ==================== ASSIGNMENTS ====================
 
-  @Get('events/:eventId/assignments')
-  @ApiOperation({ summary: 'Listar todas las asignaciones de un evento' })
+  @Get('configs/:configId/assignments')
+  @ApiOperation({ summary: 'List all assignments for a config' })
   @ApiResponse({ status: HttpStatus.OK, type: [AssignmentAdminDto] })
   async listAssignments(
-    @Param('eventId') eventId: string,
+    @Param('configId') configId: string,
   ): Promise<AssignmentAdminDto[]> {
-    return this.assignments.listAssignmentsForAdmin(Number(eventId));
+    return this.assignments.listAssignmentsForAdmin(Number(configId));
   }
 
-  @Get('events/:eventId/assignments/:assignmentId/log')
-  @ApiOperation({ summary: 'Ver el registro sellado de una asignación' })
+  @Get('configs/:configId/assignments/:assignmentId/log')
+  @ApiOperation({ summary: 'Download sealed log for an assignment' })
   @ApiResponse({ status: HttpStatus.OK })
   async getAssignmentLog(
-    @Param('eventId') eventId: string,
+    @Param('configId') configId: string,
     @Param('assignmentId') assignmentId: string,
   ): Promise<StreamableFile> {
     const logBlob = await this.assignments.getAssignmentLog(
-      Number(eventId),
+      Number(configId),
       Number(assignmentId),
     );
     return new StreamableFile(logBlob, {
@@ -209,7 +220,7 @@ export class RandomizerController {
   // ==================== PRESETS ====================
 
   @Post('presets')
-  @ApiOperation({ summary: 'Crear un preset de configuración' })
+  @ApiOperation({ summary: 'Create a preset' })
   @ApiResponse({ status: HttpStatus.CREATED, type: PresetResponseDto })
   async createPreset(
     @Body() dto: CreatePresetDto,
@@ -222,21 +233,21 @@ export class RandomizerController {
   }
 
   @Get('presets/:id')
-  @ApiOperation({ summary: 'Obtener un preset por ID' })
+  @ApiOperation({ summary: 'Get a preset by ID' })
   @ApiResponse({ status: HttpStatus.OK, type: PresetResponseDto })
   async getPreset(@Param('id') id: string): Promise<PresetResponseDto> {
     return this.presets.getPreset(Number(id));
   }
 
   @Get('presets')
-  @ApiOperation({ summary: 'Listar todos los presets' })
+  @ApiOperation({ summary: 'List all presets' })
   @ApiResponse({ status: HttpStatus.OK, type: [PresetResponseDto] })
   async listPresets(): Promise<PresetResponseDto[]> {
     return this.presets.listPresets();
   }
 
   @Patch('presets/:id')
-  @ApiOperation({ summary: 'Actualizar un preset' })
+  @ApiOperation({ summary: 'Update a preset' })
   @ApiResponse({ status: HttpStatus.OK, type: PresetResponseDto })
   async updatePreset(
     @Param('id') id: string,
@@ -250,14 +261,14 @@ export class RandomizerController {
   }
 
   @Delete('presets/:id')
-  @ApiOperation({ summary: 'Eliminar un preset' })
+  @ApiOperation({ summary: 'Delete a preset' })
   @ApiResponse({ status: HttpStatus.NO_CONTENT })
   async deletePreset(@Param('id') id: string): Promise<void> {
     await this.presets.deletePreset(Number(id));
   }
 
   @Post('presets/:id/export')
-  @ApiOperation({ summary: 'Exportar preset como .rnqs' })
+  @ApiOperation({ summary: 'Export preset as .rnqs file' })
   @ApiResponse({ status: HttpStatus.OK })
   async exportPreset(@Param('id') id: string): Promise<StreamableFile> {
     const rnqs = await this.presets.exportPreset(Number(id));
@@ -268,7 +279,7 @@ export class RandomizerController {
   }
 
   @Post('presets/import')
-  @ApiOperation({ summary: 'Importar preset desde .rnqs' })
+  @ApiOperation({ summary: 'Import preset from .rnqs file' })
   @ApiConsumes('multipart/form-data')
   @ApiResponse({ status: HttpStatus.CREATED, type: PresetResponseDto })
   async importPreset(): Promise<PresetResponseDto> {

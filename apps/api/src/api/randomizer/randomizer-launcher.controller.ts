@@ -42,45 +42,28 @@ export class RandomizerLauncherController {
   ) {}
 
   /**
-   * GET /events/:eventId/assignment
-   *
-   * Get the current launcher user's assignment for an event.
-   * Returns sealed DTO (no seed, no log, status only).
-   * On first call, binds the launcher's UUID and marks as claimed.
-   */
-  @Get('events/:eventId/assignment')
-  @ApiOperation({ summary: 'Obtener mi asignación en un evento' })
-  @ApiResponse({ status: 200, type: AssignmentClaimedDto })
-  async getMyAssignment(
-    @Param('eventId') eventId: string,
-    @Req() req: LauncherRequest,
-  ): Promise<AssignmentClaimedDto> {
-    if (!req.launcher) {
-      throw new Error('Launcher principal not found');
-    }
-
-    return this.assignments.getMyAssignment(Number(eventId), req.launcher);
-  }
-
-  /**
    * GET /packs/:packId/my-assignment
    *
-   * Get the current launcher user's assignment for a pack's active randomizer event.
-   * Resolves the pack to its active event (locked or running status),
-   * then returns the user's assignment via claim-on-first-fetch semantics.
-   * Returns sealed DTO (no seed, no log, status only).
+   * Resolve packId → boffMediaEvent (WHERE packId) → randomizerConfig (WHERE eventId).
+   * Then mint-on-claim or return existing assignment.
    *
-   * Active event rule: an event is claimable if it has status 'locked' or 'running'
-   * (seeds exist). Draft events have no seeds; finished events are closed.
-   *
-   * Returns 404 if no active event exists for this pack.
+   * - If no event found with this packId → 404
+   * - If no config found for event → 404 (event has no randomizer setup)
+   * - If config status not in ('open', 'closed', 'published') → 404 (claims not possible)
+   * - If user not registered/confirmed for event → 403 (not eligible)
+   * - If no assignment found AND config.status==='open' → MINT seed, create assignment, return sealed DTO
+   * - If no assignment found AND config.status!=='open' → 404 (claims closed)
+   * - If assignment found → return it (sealed DTO)
    */
   @Get('packs/:packId/my-assignment')
   @ApiOperation({
-    summary: 'Obtener mi asignación en un evento aleatorio de un pack',
+    summary: 'Get my randomizer assignment for a pack',
+    description:
+      'Resolves pack to its active randomizer config. Mints seed on first claim if open.',
   })
   @ApiResponse({ status: 200, type: AssignmentClaimedDto })
-  @ApiResponse({ status: 404, description: 'No active event found for pack' })
+  @ApiResponse({ status: 404, description: 'No active config found for pack' })
+  @ApiResponse({ status: 403, description: 'Not registered for this event' })
   async getMyAssignmentByPack(
     @Param('packId') packId: string,
     @Req() req: LauncherRequest,
@@ -89,16 +72,16 @@ export class RandomizerLauncherController {
       throw new Error('Launcher principal not found');
     }
 
-    // Resolve pack to its active event (locked or running status)
-    const event = await this.repository.findActiveEventByPackId(packId);
-    if (!event) {
+    // Resolve pack -> active event -> randomizer config, then delegate to the
+    // same mint-on-claim path. 404 (no config) leaves the launcher panel hidden.
+    const config = await this.repository.getConfigByPackId(packId);
+    if (!config) {
       throw new NotFoundException(
-        `No active randomizer event found for pack ${packId}`,
+        `No active randomizer config found for pack ${packId}`,
       );
     }
 
-    // Delegate to getMyAssignment for claim-on-first-fetch semantics
-    return this.assignments.getMyAssignment(event.id, req.launcher);
+    return this.assignments.getMyAssignment(config.id, req.launcher);
   }
 
   /**
@@ -106,12 +89,14 @@ export class RandomizerLauncherController {
    *
    * Upload a clean ROM: hash, verify, randomize, store log, return randomized ROM.
    * - Request body: the clean ROM as a raw application/octet-stream body
-   *   (the launcher uploads raw bytes — see apps/launcher/src-tauri/src/randomizer.rs).
    * - Response: streams the randomized ROM back.
+   *
+   * Keyed by eventId to keep the launcher contract stable (the sealed assignment
+   * DTO exposes eventId, not configId). Resolves event -> config internally.
    */
   @Post('events/:eventId/rom')
   @ApiOperation({
-    summary: 'Subir ROM parcheada y descargar ROM aleatorizada',
+    summary: 'Upload clean ROM and receive randomized ROM',
   })
   @ApiConsumes('application/octet-stream')
   @ApiResponse({
@@ -128,6 +113,13 @@ export class RandomizerLauncherController {
   ): Promise<StreamableFile> {
     if (!req.launcher) {
       throw new Error('Launcher principal not found');
+    }
+
+    const config = await this.repository.getConfigByEventId(Number(eventId));
+    if (!config) {
+      throw new NotFoundException(
+        `No randomizer config found for event ${eventId}`,
+      );
     }
 
     // The clean ROM arrives as a raw octet-stream body. express.json() only
@@ -150,7 +142,7 @@ export class RandomizerLauncherController {
     }
 
     const { randomizedRom } = await this.assignments.patchRom(
-      Number(eventId),
+      config.id,
       req.launcher,
       Readable.from(romBuffer),
     );
@@ -160,5 +152,32 @@ export class RandomizerLauncherController {
       type: 'application/octet-stream',
       disposition: 'attachment; filename="randomized.gba"',
     });
+  }
+
+  /**
+   * GET /configs/:configId/my-assignment
+   *
+   * Get the current launcher user's assignment for a config.
+   * Mint-on-claim or return existing.
+   *
+   * Returns sealed DTO (no seed, no log, status only).
+   */
+  @Get('configs/:configId/my-assignment')
+  @ApiOperation({
+    summary: 'Get my randomizer assignment for a config',
+    description: 'Mints seed on first claim if config is open.',
+  })
+  @ApiResponse({ status: 200, type: AssignmentClaimedDto })
+  @ApiResponse({ status: 404, description: 'Config not found or not accepting claims' })
+  @ApiResponse({ status: 403, description: 'Not registered for this event' })
+  async getMyAssignment(
+    @Param('configId') configId: string,
+    @Req() req: LauncherRequest,
+  ): Promise<AssignmentClaimedDto> {
+    if (!req.launcher) {
+      throw new Error('Launcher principal not found');
+    }
+
+    return this.assignments.getMyAssignment(Number(configId), req.launcher);
   }
 }

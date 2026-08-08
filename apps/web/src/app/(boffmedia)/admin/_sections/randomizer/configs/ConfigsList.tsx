@@ -5,13 +5,13 @@ import { useTranslations } from "next-intl"
 import { Button, Icon, Input, Modal, Spinner, Empty, toast } from "@boffmedia/ui"
 import { AvPanel, AvSectionHead, AvPill } from "../../../_components/ui/av-kit"
 import { RandomizerService } from "@/services/api/boffmedia/randomizerService"
-import type { RandomizerEvent } from "@/services/api/boffmedia/randomizer.types"
+import type { RandomizerConfig } from "@/services/api/boffmedia/randomizer.types"
 
 const STATUS_TONE: Record<string, "amber" | "green" | "muted" | "warn"> = {
   draft: "amber",
-  locked: "warn",
-  running: "green",
-  finished: "muted",
+  open: "warn",
+  closed: "green",
+  published: "muted",
 }
 
 const PLATFORM_LABELS: Record<"gba" | "nds", string> = {
@@ -19,92 +19,111 @@ const PLATFORM_LABELS: Record<"gba" | "nds", string> = {
   nds: "NDS",
 }
 
-interface EventsListProps {
-  tournamentId: string | null
-  onEdit: (event: RandomizerEvent) => void
-  onShowAssignments: (event: RandomizerEvent) => void
+interface ConfigsListProps {
+  eventId: number
+  onEdit: (config: RandomizerConfig) => void
+  onShowAssignments: (config: RandomizerConfig) => void
 }
 
-export function EventsList({
-  tournamentId,
+export function ConfigsList({
+  eventId,
   onEdit,
   onShowAssignments,
-}: EventsListProps) {
+}: ConfigsListProps) {
   const t = useTranslations("randomizer.events")
-  const [events, setEvents] = useState<RandomizerEvent[] | null>(null)
+  const [configs, setConfigs] = useState<RandomizerConfig[] | null>(null)
   const [loading, setLoading] = useState(false)
   const [searchTerm, setSearchTerm] = useState("")
   const [actionInProgress, setActionInProgress] = useState<string | null>(null)
   const [confirming, setConfirming] = useState<{
-    action: "lock" | "finish" | "delete"
-    event: RandomizerEvent
+    action: "open" | "close" | "publish" | "delete"
+    config: RandomizerConfig
   } | null>(null)
 
   useEffect(() => {
-    if (tournamentId) {
-      loadEvents()
+    if (eventId) {
+      loadConfigs()
     } else {
-      setEvents(null)
+      setConfigs(null)
     }
-  }, [tournamentId])
+  }, [eventId])
 
-  const loadEvents = async () => {
-    if (!tournamentId) return
+  const loadConfigs = async () => {
+    if (!eventId) return
     setLoading(true)
     try {
-      const res = await RandomizerService.listEvents(tournamentId)
-      setEvents(res.success ? res.data || [] : [])
+      // TODO: Once backend has GET /randomizer/admin/events/:id/configs endpoint
+      // const res = await RandomizerService.listEventConfigs(String(eventId))
+      setConfigs([])
+      // setConfigs(res.success ? res.data || [] : [])
     } catch (err) {
       toast({ tone: "bad", title: t("errorLoading"), msg: String(err) })
-      setEvents([])
+      setConfigs([])
     } finally {
       setLoading(false)
     }
   }
 
-  const handleLock = async (event: RandomizerEvent) => {
-    if (event.status !== "draft") return
+  const handleOpen = async (config: RandomizerConfig) => {
+    if (config.status !== "draft") return
     setConfirming(null)
-    setActionInProgress(event.id)
+    setActionInProgress(config.id)
     try {
-      const res = await RandomizerService.lockEvent(event.id)
+      const res = await RandomizerService.openConfig(config.id)
       if (res.success) {
-        toast({ tone: "ok", title: t("eventLocked") })
-        await loadEvents()
+        toast({ tone: "ok", title: t("configOpened") })
+        await loadConfigs()
       } else {
-        toast({ tone: "bad", title: t("lockError"), msg: res.userMessage })
+        toast({ tone: "bad", title: t("openError"), msg: res.userMessage })
       }
     } finally {
       setActionInProgress(null)
     }
   }
 
-  const handleFinish = async (event: RandomizerEvent) => {
-    if (event.status !== "locked" && event.status !== "running") return
+  const handleClose = async (config: RandomizerConfig) => {
+    if (config.status !== "open") return
     setConfirming(null)
-    setActionInProgress(event.id)
+    setActionInProgress(config.id)
     try {
-      const res = await RandomizerService.finishEvent(event.id)
+      const res = await RandomizerService.closeConfig(config.id)
       if (res.success) {
-        toast({ tone: "ok", title: t("eventFinished") })
-        await loadEvents()
+        toast({ tone: "ok", title: t("configClosed") })
+        await loadConfigs()
       } else {
-        toast({ tone: "bad", title: t("finishError"), msg: res.userMessage })
+        toast({ tone: "bad", title: t("closeError"), msg: res.userMessage })
       }
     } finally {
       setActionInProgress(null)
     }
   }
 
-  const handleDelete = async (event: RandomizerEvent) => {
-    if (event.status !== "draft") return
+  const handlePublish = async (config: RandomizerConfig) => {
+    if (config.status !== "closed") return
     setConfirming(null)
-    setActionInProgress(event.id)
+    setActionInProgress(config.id)
     try {
-      const res = await RandomizerService.deleteEvent(event.id)
+      const res = await RandomizerService.publishConfig(config.id)
       if (res.success) {
-        toast({ tone: "ok", title: t("eventDeleted") })
-        await loadEvents()
+        toast({ tone: "ok", title: t("configPublished") })
+        await loadConfigs()
+      } else {
+        toast({ tone: "bad", title: t("publishError"), msg: res.userMessage })
+      }
+    } finally {
+      setActionInProgress(null)
+    }
+  }
+
+  const handleDelete = async (config: RandomizerConfig) => {
+    if (config.status !== "draft") return
+    setConfirming(null)
+    setActionInProgress(config.id)
+    try {
+      const res = await RandomizerService.deleteConfig(config.id)
+      if (res.success) {
+        toast({ tone: "ok", title: t("configDeleted") })
+        await loadConfigs()
       } else {
         toast({ tone: "bad", title: t("deleteError"), msg: res.userMessage })
       }
@@ -113,17 +132,17 @@ export function EventsList({
     }
   }
 
-  const filtered = (events ?? []).filter(
-    (e) =>
-      e.gameTitle.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      e.gamePlatform.toLowerCase().includes(searchTerm.toLowerCase())
+  const filtered = (configs ?? []).filter(
+    (c) =>
+      c.gameTitle.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      c.gamePlatform.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
-  if (!tournamentId) {
+  if (!eventId) {
     return (
       <Empty
-        title={t("selectTournament")}
-        lead={t("selectTournamentDesc")}
+        title={t("selectEvent")}
+        lead={t("selectEventDesc")}
         icon="home"
       />
     )
@@ -132,9 +151,9 @@ export function EventsList({
   return (
     <div className="space-y-5">
       <AvSectionHead
-        title={t("events")}
+        title={t("configs")}
         actions={
-          <Button onClick={() => loadEvents()} disabled={loading}>
+          <Button onClick={() => loadConfigs()} disabled={loading}>
             {loading ? <Spinner size={16} /> : <Icon name="refresh" size={16} />}
             {t("refresh")}
           </Button>
@@ -143,23 +162,23 @@ export function EventsList({
 
       <AvPanel>
         <Input
-          placeholder={t("searchEvents")}
+          placeholder={t("searchConfigs")}
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.currentTarget.value)}
         />
       </AvPanel>
 
-      {loading && !events ? (
+      {loading && !configs ? (
         <AvPanel>
           <div className="flex items-center justify-center py-8 gap-2">
             <Spinner />
-            <span className="text-txt-muted">{t("loadingEvents")}</span>
+            <span className="text-txt-muted">{t("loadingConfigs")}</span>
           </div>
         </AvPanel>
       ) : filtered.length === 0 ? (
         <Empty
-          title={t("noEvents")}
-          lead={t("noEventsDesc")}
+          title={t("noConfigs")}
+          lead={t("noConfigsDesc")}
           icon="calendar"
         />
       ) : (
@@ -176,77 +195,91 @@ export function EventsList({
                 </tr>
               </thead>
               <tbody>
-                {filtered.map((event) => (
+                {filtered.map((config) => (
                   <tr
-                    key={event.id}
+                    key={config.id}
                     className="border-b border-line hover:bg-panel-2 transition-colors"
                   >
                     <td className="px-3 py-2">
-                      <AvPill tone={STATUS_TONE[event.status] ?? "muted"}>
-                        {t(`status_${event.status}`)}
+                      <AvPill tone={STATUS_TONE[config.status] ?? "muted"}>
+                        {t(`status_${config.status}`)}
                       </AvPill>
                     </td>
                     <td className="px-3 py-2">
                       <span className="text-txt-muted font-mono">
-                        {PLATFORM_LABELS[event.gamePlatform] || event.gamePlatform}
+                        {PLATFORM_LABELS[config.gamePlatform] || config.gamePlatform}
                       </span>
                     </td>
-                    <td className="px-3 py-2 font-medium">{event.gameTitle}</td>
+                    <td className="px-3 py-2 font-medium">{config.gameTitle}</td>
                     <td className="px-3 py-2 text-txt-muted">
-                      {new Date(event.createdAt).toLocaleDateString()}
+                      {new Date(config.createdAt).toLocaleDateString()}
                     </td>
                     <td className="px-3 py-2">
                       <div className="flex gap-2">
                         <Button
                           size="sm"
                           variant="ghost"
-                          onClick={() => onEdit(event)}
-                          disabled={event.status !== "draft"}
+                          onClick={() => onEdit(config)}
+                          disabled={config.status !== "draft"}
                         >
                           {t("edit")}
                         </Button>
                         <Button
                           size="sm"
                           variant="ghost"
-                          onClick={() => onShowAssignments(event)}
+                          onClick={() => onShowAssignments(config)}
                         >
                           {t("assignments")}
                         </Button>
-                        {event.status === "draft" && (
+                        {config.status === "draft" && (
                           <Button
                             size="sm"
                             variant="ghost"
-                            onClick={() => setConfirming({ action: "lock", event })}
-                            disabled={actionInProgress === event.id}
+                            onClick={() => setConfirming({ action: "open", config })}
+                            disabled={actionInProgress === config.id}
                           >
-                            {actionInProgress === event.id ? (
+                            {actionInProgress === config.id ? (
                               <Spinner size={14} />
                             ) : (
-                              t("lock")
+                              t("open")
                             )}
                           </Button>
                         )}
-                        {(event.status === "locked" || event.status === "running") && (
+                        {config.status === "open" && (
                           <Button
                             size="sm"
                             variant="ghost"
-                            onClick={() => setConfirming({ action: "finish", event })}
-                            disabled={actionInProgress === event.id}
+                            onClick={() => setConfirming({ action: "close", config })}
+                            disabled={actionInProgress === config.id}
                           >
-                            {actionInProgress === event.id ? (
+                            {actionInProgress === config.id ? (
                               <Spinner size={14} />
                             ) : (
-                              t("finish")
+                              t("close")
                             )}
                           </Button>
                         )}
-                        {event.status === "draft" && (
+                        {config.status === "closed" && (
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => setConfirming({ action: "publish", config })}
+                            disabled={actionInProgress === config.id}
+                          >
+                            {actionInProgress === config.id ? (
+                              <Spinner size={14} />
+                            ) : (
+                              t("publish")
+                            )}
+                          </Button>
+                        )}
+                        {config.status === "draft" && (
                           <Button
                             size="sm"
                             variant="ghost"
                             title={t("delete")}
-                            onClick={() => setConfirming({ action: "delete", event })}
-                            disabled={actionInProgress === event.id}
+                            onClick={() => setConfirming({ action: "delete", config })}
+                            disabled={actionInProgress === config.id}
                           >
                             <Icon name="trash" size={14} />
                           </Button>
@@ -275,9 +308,10 @@ export function EventsList({
               variant={confirming?.action === "delete" ? "danger" : "pri"}
               onClick={() => {
                 if (!confirming) return
-                if (confirming.action === "lock") handleLock(confirming.event)
-                else if (confirming.action === "finish") handleFinish(confirming.event)
-                else handleDelete(confirming.event)
+                if (confirming.action === "open") handleOpen(confirming.config)
+                else if (confirming.action === "close") handleClose(confirming.config)
+                else if (confirming.action === "publish") handlePublish(confirming.config)
+                else handleDelete(confirming.config)
               }}
             >
               {t("confirm")}
@@ -287,7 +321,7 @@ export function EventsList({
       >
         <p className="text-[14px] leading-[1.5] text-txt-muted">
           {confirming
-            ? t(`${confirming.action}ConfirmMsg`, { name: confirming.event.gameTitle })
+            ? t(`${confirming.action}ConfirmMsg`, { name: confirming.config.gameTitle })
             : ""}
         </p>
       </Modal>

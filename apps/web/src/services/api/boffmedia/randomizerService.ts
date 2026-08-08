@@ -15,11 +15,10 @@ import type {
   RandomizerPreset,
   CreatePresetDto,
   UpdatePresetDto,
-  RandomizerEvent,
-  CreateEventDto,
-  UpdateEventDto,
+  RandomizerConfig,
+  CreateConfigDto,
+  UpdateConfigDto,
   RandomizerAssignment,
-  DryRunResult,
 } from "./randomizer.types"
 import type { ApiResponse } from "@/services/http/core"
 
@@ -122,93 +121,82 @@ export class RandomizerService {
     return response.blob()
   }
 
-  // ==================== EVENT OPERATIONS ====================
+  // ==================== CONFIG OPERATIONS (Event-based, Phase 2) ====================
 
   /**
-   * List events for a tournament.
+   * Create a new randomizer config for a community event.
+   * Body: { eventId, presetId, gamePlatform, gameTitle, cleanRomSha512, romHint? }
+   * Server derives settingsBlobSha512 from the preset.
    */
-  static listEvents(tournamentId: string) {
-    return apiAuthedAutoGET<RandomizerEvent[]>(`${BASE}/tournaments/${tournamentId}/events`)
+  static createConfig(data: CreateConfigDto) {
+    return apiAuthedAutoPOST<RandomizerConfig>(`${BASE}/configs`, data)
   }
 
   /**
-   * Get a specific event by ID.
+   * Get a specific config by ID.
    */
-  static getEvent(id: string) {
-    return apiAuthedAutoGET<RandomizerEvent>(`${BASE}/events/${id}`)
+  static getConfig(id: string) {
+    return apiAuthedAutoGET<RandomizerConfig>(`${BASE}/configs/${id}`)
   }
 
   /**
-   * Create a new randomizer event.
+   * Update a config (draft only; only romHint + packId editable).
    */
-  static createEvent(data: CreateEventDto) {
-    return apiAuthedAutoPOST<RandomizerEvent>(`${BASE}/events`, data)
+  static updateConfig(id: string, data: UpdateConfigDto) {
+    return apiAuthedAutoPATCH<RandomizerConfig>(`${BASE}/configs/${id}`, data)
   }
 
   /**
-   * Update an event.
+   * Transition config from draft → open.
    */
-  static updateEvent(id: string, data: UpdateEventDto) {
-    return apiAuthedAutoPATCH<RandomizerEvent>(`${BASE}/events/${id}`, data)
+  static openConfig(id: string) {
+    return apiAuthedAutoPOST<RandomizerConfig>(`${BASE}/configs/${id}/open`, {})
   }
 
   /**
-   * Lock an event (prevent further edits).
+   * Transition config from open → closed.
    */
-  static lockEvent(id: string) {
-    return apiAuthedAutoPOST<RandomizerEvent>(`${BASE}/events/${id}/lock`, {})
+  static closeConfig(id: string) {
+    return apiAuthedAutoPOST<RandomizerConfig>(`${BASE}/configs/${id}/close`, {})
   }
 
   /**
-   * Finish an event (mark as completed).
+   * Transition config from closed → published (seeds + settings become public).
    */
-  static finishEvent(id: string) {
-    return apiAuthedAutoPOST<RandomizerEvent>(`${BASE}/events/${id}/finish`, {})
+  static publishConfig(id: string) {
+    return apiAuthedAutoPOST<RandomizerConfig>(`${BASE}/configs/${id}/publish`, {})
   }
 
   /**
-   * Perform a dry-run: test settings + ROM for seed generation.
+   * List all assignments for a config.
    */
-  static async dryRun(id: string, romFile: File): Promise<ApiResponse<DryRunResult>> {
-    const formData = new FormData()
-    formData.append("rom", romFile)
-    return apiAuthedAutoPOST<DryRunResult>(`${BASE}/events/${id}/dry-run`, formData)
-  }
-
-  // ==================== ASSIGNMENT OPERATIONS ====================
-
-  /**
-   * List all assignments for an event.
-   */
-  static listAssignments(id: string) {
-    return apiAuthedAutoGET<RandomizerAssignment[]>(`${BASE}/events/${id}/assignments`)
+  static listConfigAssignments(configId: string) {
+    return apiAuthedAutoGET<RandomizerAssignment[]>(`${BASE}/configs/${configId}/assignments`)
   }
 
   /**
-   * Read the admin log for an assignment (judge log).
-   * Backend route is nested under the event: events/:eventId/assignments/:assignmentId/log.
+   * Read the admin log for an assignment.
+   * Backend route: configs/:configId/assignments/:assignmentId/log
    */
-  static readLog(eventId: string, assignmentId: string) {
-    return apiAuthedAutoGET<string>(`${BASE}/events/${eventId}/assignments/${assignmentId}/log`)
+  static readConfigLog(configId: string, assignmentId: string) {
+    return apiAuthedAutoGET<string>(`${BASE}/configs/${configId}/assignments/${assignmentId}/log`)
   }
 
   /**
-   * Delete an event.
+   * Delete a config (draft only).
    */
-  static deleteEvent(id: string) {
-    return apiAuthedAutoDELETE<void>(`${BASE}/events/${id}`)
+  static deleteConfig(id: string) {
+    return apiAuthedAutoDELETE<void>(`${BASE}/configs/${id}`)
   }
 
   // ==================== PUBLIC OPERATIONS (No Auth) ====================
 
   /**
-   * List events for a tournament (public — no auth required).
-   * Settings blob hash only included when event.status === 'finished'.
+   * Get the config for a community event (public — no auth required).
+   * Settings blob hash only included when config.status === 'published'.
    */
-  static listPublicEvents(tournamentId: string) {
-    return fetch(
-      `${getApiUrl()}/randomizer/public/tournaments/${tournamentId}/events`,
-    )
+  static getEventConfig(eventId: number) {
+    return fetch(`${getApiUrl()}/randomizer/public/events/${eventId}/config`)
       .then((r) => (r.ok ? r.json() : Promise.reject(r)))
       .then((resp) => ({
         success: true,
@@ -218,15 +206,15 @@ export class RandomizerService {
       .catch((err) => ({
         success: false,
         statusCode: err.status || 500,
-        error: err.statusText || 'Failed to fetch events',
+        error: err.statusText || 'Failed to fetch config',
       }))
   }
 
   /**
-   * List assignments for an event (public — no auth required).
-   * Seed only included when event.status === 'finished'.
+   * List assignments for a community event config (public — no auth required).
+   * Seed only included when config.status === 'published'.
    */
-  static listPublicAssignments(eventId: string) {
+  static getPublicAssignments(eventId: number) {
     return fetch(`${getApiUrl()}/randomizer/public/events/${eventId}/assignments`)
       .then((r) => (r.ok ? r.json() : Promise.reject(r)))
       .then((resp) => ({
@@ -242,10 +230,10 @@ export class RandomizerService {
   }
 
   /**
-   * Download event settings file (.rnqs) — public.
-   * Only available when event.status === 'finished'.
+   * Download event config settings file (.rnqs) — public.
+   * Only available when config.status === 'published'.
    */
-  static async downloadEventSettings(eventId: string): Promise<Blob> {
+  static async downloadConfigSettings(eventId: number): Promise<Blob> {
     const response = await fetch(
       `${getApiUrl()}/randomizer/public/events/${eventId}/settings`,
     )
@@ -260,10 +248,10 @@ export class RandomizerService {
 
   /**
    * Download assignment log file — public.
-   * Only available when event.status === 'finished'.
+   * Only available when config.status === 'published'.
    */
   static async downloadPublicLog(
-    eventId: string,
+    eventId: number,
     assignmentId: string,
   ): Promise<Blob> {
     const response = await fetch(
@@ -277,4 +265,5 @@ export class RandomizerService {
     }
     return response.blob()
   }
+
 }

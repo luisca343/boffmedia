@@ -1,6 +1,8 @@
 /**
  * Randomizer API DTOs and response types.
- * Matching Phase-1 API routes for presets, events, and assignments.
+ * Matching Phase-2 API routes for presets, configs, and assignments.
+ * Note: "Config" is the randomizer entity for a community event;
+ * legacy "Event" refers to tournament-based randomizer events (deprecated).
  */
 
 import type { RandomizerSettings } from "@boffmedia/pack-schema"
@@ -8,10 +10,10 @@ import type { RandomizerSettings } from "@boffmedia/pack-schema"
 // Request DTOs come straight from the API's generated OpenAPI models so the
 // frontend and backend can never drift. Do NOT redeclare these locally.
 export type {
-  CreateEventDto,
-  UpdateEventDto,
   CreatePresetDto,
   UpdatePresetDto,
+  CreateEventDto,
+  UpdateEventDto,
 } from "@boffmedia/shared"
 
 // Preset view-model — mirrors the API's PresetResponseDto fields. Kept as a clean
@@ -26,9 +28,25 @@ export interface RandomizerPreset {
   updatedAt: string
 }
 
-// Event view-model — mirrors the API's EventResponseDto fields (the response the
-// admin UI renders). Kept as a clean local shape because the generated
-// EventResponseDto types nullable strings as `Record<string, any>`.
+// Config view-model — randomizer config for a community event.
+// Mirrors the API's ConfigResponseDto fields. Status lifecycle: draft → open → closed → published.
+export interface RandomizerConfig {
+  id: string
+  eventId: number
+  gamePlatform: "gba" | "nds"
+  gameTitle: string
+  settingsBlobSha512: string
+  fvxJarSha512: string
+  cleanRomSha512: string
+  romHint: string | null
+  packId?: string | null
+  status: "draft" | "open" | "closed" | "published"
+  createdAt: string
+  updatedAt: string
+}
+
+// Legacy event view-model (tournament-based, deprecated).
+// Kept for backward compatibility during migration.
 export interface RandomizerEvent {
   id: string
   tournamentId: string
@@ -44,6 +62,22 @@ export interface RandomizerEvent {
   updatedAt: string
 }
 
+// Config creation DTO (client sends eventId + presetId; server derives settingsBlobSha512).
+export interface CreateConfigDto {
+  eventId: number
+  presetId: number
+  gamePlatform: "gba" | "nds"
+  gameTitle: string
+  cleanRomSha512: string
+  romHint?: string
+}
+
+// Config update DTO (draft only; only romHint + packId editable).
+export interface UpdateConfigDto {
+  romHint?: string
+  packId?: string | null
+}
+
 export interface RandomizerAssignment {
   id: string
   eventId: string
@@ -53,6 +87,7 @@ export interface RandomizerAssignment {
   seed?: string
   seedSealed?: boolean
   outputHash?: string
+  outputSha512?: string
   spoilerLog?: string
   createdAt: string
 }

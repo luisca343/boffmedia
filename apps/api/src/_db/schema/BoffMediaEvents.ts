@@ -12,6 +12,7 @@ import {
   AnyMySqlColumn,
 } from 'drizzle-orm/mysql-core';
 import { boffMediaUsers } from './BoffMedia';
+import { packs } from './Packs';
 import { sql } from 'drizzle-orm';
 
 export const EVENT_STATUS = {
@@ -83,6 +84,7 @@ export const boffMediaEvents = mysqlTable(
       .notNull()
       .default(VISIBILITY_STATUS.PRIVATE),
     type: mysqlEnum('type', ['event', 'server']).notNull(),
+    packId: varchar('pack_id', { length: 32 }),
     createdAt: timestamp('created_at')
       .notNull()
       .default(sql`CURRENT_TIMESTAMP()`),
@@ -97,6 +99,12 @@ export const boffMediaEvents = mysqlTable(
       statusIdx: index('event_status_idx').on(table.status),
       visibilityIdx: index('event_visibility_idx').on(table.visibility),
       typeIdx: index('event_type_idx').on(table.type),
+      packFk: foreignKey({
+        name: 'be_pack_fk',
+        columns: [table.packId],
+        foreignColumns: [packs.id],
+      }).onDelete('set null'),
+      packIdx: index('be_pack_idx').on(table.packId),
     };
   },
 );

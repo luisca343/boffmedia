@@ -12,6 +12,7 @@ import { useGetLeaderboard } from "@/hooks/events/useGetLeaderboard"
 import { useCurrentParticipant } from "@/hooks/events/useCurrentParticipant"
 import { useBoffSession } from "@/services/useBoffSession"
 import { EventsService } from "@/services/api/boffmedia/eventsService"
+import { RandomlockeSection } from "./RandomlockeSection"
 
 export function EventDetailView({ id }: { id: number }) {
   const t = useTranslations("events")
@@ -157,6 +158,9 @@ export function EventDetailView({ id }: { id: number }) {
           </Panel>
         </div>
       </div>
+
+      {/* Randomlocke transparency section (if config exists) */}
+      <RandomlockeSection eventId={id} />
     </main>
   )
 }

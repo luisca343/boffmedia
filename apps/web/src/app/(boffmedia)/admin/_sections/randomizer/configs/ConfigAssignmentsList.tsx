@@ -5,7 +5,7 @@ import { useTranslations } from "next-intl"
 import { Button, Icon, Spinner, Empty, toast } from "@boffmedia/ui"
 import { AvPanel, AvSectionHead, AvPill } from "../../../_components/ui/av-kit"
 import { RandomizerService } from "@/services/api/boffmedia/randomizerService"
-import type { RandomizerEvent, RandomizerAssignment } from "@/services/api/boffmedia/randomizer.types"
+import type { RandomizerConfig, RandomizerAssignment } from "@/services/api/boffmedia/randomizer.types"
 
 const STATUS_TONE: Record<string, "amber" | "green" | "muted" | "warn"> = {
   pending: "amber",
@@ -14,12 +14,12 @@ const STATUS_TONE: Record<string, "amber" | "green" | "muted" | "warn"> = {
   verified: "muted",
 }
 
-interface AssignmentsListProps {
-  event: RandomizerEvent | null
+interface ConfigAssignmentsListProps {
+  config: RandomizerConfig | null
   onClose: () => void
 }
 
-export function AssignmentsList({ event, onClose }: AssignmentsListProps) {
+export function ConfigAssignmentsList({ config, onClose }: ConfigAssignmentsListProps) {
   const t = useTranslations("randomizer.events")
   const [assignments, setAssignments] = useState<RandomizerAssignment[] | null>(null)
   const [loading, setLoading] = useState(false)
@@ -28,16 +28,16 @@ export function AssignmentsList({ event, onClose }: AssignmentsListProps) {
   const [loadingLog, setLoadingLog] = useState(false)
 
   useEffect(() => {
-    if (event) {
+    if (config) {
       loadAssignments()
     }
-  }, [event])
+  }, [config])
 
   const loadAssignments = async () => {
-    if (!event) return
+    if (!config) return
     setLoading(true)
     try {
-      const res = await RandomizerService.listAssignments(event.id)
+      const res = await RandomizerService.listConfigAssignments(config.id)
       setAssignments(res.success ? res.data || [] : [])
     } catch (err) {
       toast({ tone: "bad", title: t("errorLoading"), msg: String(err) })
@@ -48,10 +48,10 @@ export function AssignmentsList({ event, onClose }: AssignmentsListProps) {
   }
 
   const handleViewLog = async (assignment: RandomizerAssignment) => {
-    if (!event) return
+    if (!config) return
     setLoadingLog(true)
     try {
-      const res = await RandomizerService.readLog(event.id, assignment.id)
+      const res = await RandomizerService.readConfigLog(config.id, assignment.id)
       if (res.success && res.data) {
         setSelectedLog(res.data)
         setLogModalOpen(true)
@@ -65,11 +65,11 @@ export function AssignmentsList({ event, onClose }: AssignmentsListProps) {
     }
   }
 
-  if (!event) {
+  if (!config) {
     return (
       <Empty
-        title={t("selectEvent")}
-        lead={t("selectEventDesc")}
+        title={t("selectConfig")}
+        lead={t("selectConfigDesc")}
         icon="calendar"
       />
     )
@@ -78,7 +78,7 @@ export function AssignmentsList({ event, onClose }: AssignmentsListProps) {
   return (
     <div className="space-y-5">
       <AvSectionHead
-        title={t("assignmentsFor", { event: event.gameTitle })}
+        title={t("assignmentsFor", { event: config.gameTitle })}
         actions={
           <Button onClick={onClose} variant="ghost" size="sm">
             {t("back")}
@@ -134,9 +134,9 @@ export function AssignmentsList({ event, onClose }: AssignmentsListProps) {
                       )}
                     </td>
                     <td className="px-3 py-2">
-                      {assignment.outputHash ? (
+                      {assignment.outputHash || assignment.outputSha512 ? (
                         <code className="text-xs bg-panel-2 px-2 py-1 rounded">
-                          {assignment.outputHash.slice(0, 16)}…
+                          {(assignment.outputHash || assignment.outputSha512)!.slice(0, 16)}…
                         </code>
                       ) : (
                         <span className="text-txt-dim text-xs">—</span>

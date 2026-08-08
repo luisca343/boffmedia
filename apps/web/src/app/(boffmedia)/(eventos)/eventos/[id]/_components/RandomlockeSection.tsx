@@ -4,88 +4,71 @@ import { useEffect, useState } from "react"
 import { useTranslations } from "next-intl"
 import { Button, Icon, toast, Spinner } from "@boffmedia/ui"
 import { RandomizerService } from "@/services/api/boffmedia/randomizerService"
+import type { RandomizerConfig, RandomizerAssignment } from "@/services/api/boffmedia/randomizer.types"
 
-export interface RandomizerEvent {
-  id: number
-  tournamentId: number
+export interface EventConfig {
+  id: string
+  eventId: number
   gamePlatform: string
   gameTitle: string
   cleanRomSha512: string
   romHint: string | null
   fvxJarSha512: string
   settingsBlobSha512?: string | null
-  status: "draft" | "locked" | "running" | "finished"
-  packId: string | null
+  status: "draft" | "open" | "closed" | "published"
   createdAt: string
 }
 
-export interface RandomizerAssignment {
-  id: number
+export interface ConfigAssignment {
+  id: string
   eventId: number
   participantName: string
   status: "pending" | "claimed" | "patched" | "verified"
-  seed?: number | null
+  seed?: string | number | null
   outputSha512: string | null
-  claimedAt: string | null
-  patchedAt: string | null
-  verifiedAt: string | null
+  outputHash?: string | null
   createdAt: string
 }
 
-export function RandomlockeSection({ tournamentId }: { tournamentId: number }) {
-  const t = useTranslations("torneos.detail")
-  const [events, setEvents] = useState<RandomizerEvent[]>([])
-  const [assignments, setAssignments] = useState<Map<number, RandomizerAssignment[]>>(
-    new Map(),
-  )
+export function RandomlockeSection({ eventId }: { eventId: number }) {
+  const t = useTranslations("events.detail")
+  const [config, setConfig] = useState<EventConfig | null>(null)
+  const [assignments, setAssignments] = useState<ConfigAssignment[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    const loadEvents = async () => {
+    const loadConfig = async () => {
       try {
         setLoading(true)
         setError(null)
 
-        const eventResponse = await RandomizerService.listPublicEvents(
-          String(tournamentId),
-        )
+        const configResponse = await RandomizerService.getEventConfig(eventId)
 
-        if (!eventResponse.success || !("data" in eventResponse) || !eventResponse.data) {
-          setEvents([])
+        if (!configResponse.success || !("data" in configResponse) || !configResponse.data) {
+          // No config for this event — that's OK, just hide the section
+          setConfig(null)
           setLoading(false)
           return
         }
 
-        const eventList = eventResponse.data as RandomizerEvent[]
-        setEvents(eventList)
+        const cfg = configResponse.data as EventConfig
+        setConfig(cfg)
 
-        const assignmentsMap = new Map<number, RandomizerAssignment[]>()
-        await Promise.all(
-          eventList.map(async (event) => {
-            try {
-              const assignResponse = await RandomizerService.listPublicAssignments(
-                String(event.id),
-              )
-              if (assignResponse.success && "data" in assignResponse && assignResponse.data) {
-                assignmentsMap.set(event.id, assignResponse.data as RandomizerAssignment[])
-              }
-            } catch (err) {
-              console.error(`Failed to load assignments for event ${event.id}:`, err)
-            }
-          }),
-        )
-        setAssignments(assignmentsMap)
+        const assignResponse = await RandomizerService.getPublicAssignments(eventId)
+        if (assignResponse.success && "data" in assignResponse && assignResponse.data) {
+          setAssignments(assignResponse.data as ConfigAssignment[])
+        }
       } catch (err) {
-        console.error("Failed to load randomlocke events:", err)
+        console.error("Failed to load randomlocke config:", err)
         setError(t("randomlockeLoadError"))
       } finally {
         setLoading(false)
       }
     }
 
-    loadEvents()
-  }, [tournamentId, t])
+    loadConfig()
+  }, [eventId, t])
 
   if (loading) {
     return (
@@ -100,7 +83,7 @@ export function RandomlockeSection({ tournamentId }: { tournamentId: number }) {
     )
   }
 
-  if (events.length === 0) {
+  if (!config) {
     return null
   }
 
@@ -116,28 +99,22 @@ export function RandomlockeSection({ tournamentId }: { tournamentId: number }) {
         </div>
       )}
 
-      {events.map((event) => (
-        <RandomlockeEvent
-          key={event.id}
-          event={event}
-          assignments={assignments.get(event.id) || []}
-        />
-      ))}
+      <RandomlockeConfig config={config} assignments={assignments} />
     </section>
   )
 }
 
-function RandomlockeEvent({
-  event,
+function RandomlockeConfig({
+  config,
   assignments,
 }: {
-  event: RandomizerEvent
-  assignments: RandomizerAssignment[]
+  config: EventConfig
+  assignments: ConfigAssignment[]
 }) {
-  const t = useTranslations("torneos.detail")
-  const isFinished = event.status === "finished"
+  const t = useTranslations("events.detail")
+  const isPublished = config.status === "published"
 
-  const statusTitle = isFinished ? t("randomlockeFinished") : t("randomlockeRunning")
+  const statusTitle = isPublished ? t("randomlockeFinished") : t("randomlockeRunning")
 
   return (
     <div className="mb-6 border border-solid border-line bg-panel overflow-hidden">
@@ -145,7 +122,7 @@ function RandomlockeEvent({
       <div className="px-4 py-3 border-b border-line bg-panel-alt">
         <div className="flex items-center justify-between gap-3 mb-2">
           <h3 className="font-mono text-[12px] font-semibold uppercase text-txt">
-            {event.gameTitle} ({event.gamePlatform.toUpperCase()})
+            {config.gameTitle} ({config.gamePlatform.toUpperCase()})
           </h3>
           <div className="flex items-center gap-3 shrink-0">
             {assignments.length > 0 && (
@@ -155,24 +132,24 @@ function RandomlockeEvent({
             )}
             <span
               className={`inline-flex items-center gap-1.5 font-mono text-[10px] font-semibold uppercase tracking-[0.08em] ${
-                isFinished ? "text-ok" : "text-accent-bright"
+                isPublished ? "text-ok" : "text-accent-bright"
               }`}
             >
               <span
-                className={`w-1.5 h-1.5 rounded-full ${isFinished ? "bg-ok" : "bg-accent animate-pulse"}`}
+                className={`w-1.5 h-1.5 rounded-full ${isPublished ? "bg-ok" : "bg-accent animate-pulse"}`}
               />
               {statusTitle}
             </span>
           </div>
         </div>
-        {event.romHint && (
-          <p className="font-body text-[11px] text-txt-muted">{event.romHint}</p>
+        {config.romHint && (
+          <p className="font-body text-[11px] text-txt-muted">{config.romHint}</p>
         )}
       </div>
 
-      {/* Status table or finished results */}
-      {isFinished ? (
-        <RandomlockeFinishedView event={event} assignments={assignments} />
+      {/* Status table or published results */}
+      {isPublished ? (
+        <RandomlockePublishedView config={config} assignments={assignments} />
       ) : (
         <RandomlockeRunningView assignments={assignments} />
       )}
@@ -183,9 +160,9 @@ function RandomlockeEvent({
 function RandomlockeRunningView({
   assignments,
 }: {
-  assignments: RandomizerAssignment[]
+  assignments: ConfigAssignment[]
 }) {
-  const t = useTranslations("torneos.detail")
+  const t = useTranslations("events.detail")
 
   if (assignments.length === 0) {
     return (
@@ -225,14 +202,14 @@ function RandomlockeRunningView({
   )
 }
 
-function RandomlockeFinishedView({
-  event,
+function RandomlockePublishedView({
+  config,
   assignments,
 }: {
-  event: RandomizerEvent
-  assignments: RandomizerAssignment[]
+  config: EventConfig
+  assignments: ConfigAssignment[]
 }) {
-  const t = useTranslations("torneos.detail")
+  const t = useTranslations("events.detail")
   const [downloadingSettings, setDownloadingSettings] = useState(false)
 
   if (assignments.length === 0) {
@@ -248,11 +225,11 @@ function RandomlockeFinishedView({
   const handleDownloadSettings = async () => {
     try {
       setDownloadingSettings(true)
-      const blob = await RandomizerService.downloadEventSettings(String(event.id))
+      const blob = await RandomizerService.downloadConfigSettings(config.eventId)
       const url = URL.createObjectURL(blob)
       const a = document.createElement("a")
       a.href = url
-      a.download = `settings-${event.id}.rnqs`
+      a.download = `settings-${config.id}.rnqs`
       document.body.appendChild(a)
       a.click()
       document.body.removeChild(a)
@@ -296,14 +273,17 @@ function RandomlockeFinishedView({
                   )}
                 </td>
                 <td className="px-4 py-2 font-mono text-txt-muted text-[11px]">
-                  {a.outputSha512 ? (
-                    <CopyableText text={a.outputSha512.substring(0, 16)} full={a.outputSha512} />
+                  {a.outputSha512 || a.outputHash ? (
+                    <CopyableText
+                      text={(a.outputSha512 || a.outputHash)!.substring(0, 16)}
+                      full={(a.outputSha512 || a.outputHash) ?? undefined}
+                    />
                   ) : (
                     <span className="text-txt-dim">—</span>
                   )}
                 </td>
                 <td className="px-4 py-2">
-                  <LogDownloadButton eventId={event.id} assignmentId={a.id} />
+                  <LogDownloadButton eventId={config.eventId} assignmentId={a.id} />
                 </td>
               </tr>
             ))}
@@ -330,7 +310,7 @@ function RandomlockeFinishedView({
               </code>
             </div>
 
-            {event.settingsBlobSha512 && (
+            {config.settingsBlobSha512 && (
               <div className="pt-2">
                 <Button
                   size="sm"
@@ -355,7 +335,7 @@ function StatusBadge({
 }: {
   status: "pending" | "claimed" | "patched" | "verified"
 }) {
-  const t = useTranslations("torneos.detail")
+  const t = useTranslations("events.detail")
 
   const colors: Record<typeof status, string> = {
     pending: "bg-panel-alt text-txt-dim",
@@ -381,7 +361,7 @@ function StatusBadge({
 }
 
 function CopyableText({ text, full }: { text: string; full?: string }) {
-  const t = useTranslations("torneos.detail")
+  const t = useTranslations("events.detail")
   const [copied, setCopied] = useState(false)
 
   const handleCopy = () => {
@@ -413,18 +393,15 @@ function LogDownloadButton({
   assignmentId,
 }: {
   eventId: number
-  assignmentId: number
+  assignmentId: string
 }) {
-  const t = useTranslations("torneos.detail")
+  const t = useTranslations("events.detail")
   const [loading, setLoading] = useState(false)
 
   const handleDownload = async () => {
     try {
       setLoading(true)
-      const blob = await RandomizerService.downloadPublicLog(
-        String(eventId),
-        String(assignmentId),
-      )
+      const blob = await RandomizerService.downloadPublicLog(eventId, assignmentId)
       const url = URL.createObjectURL(blob)
       const a = document.createElement("a")
       a.href = url
