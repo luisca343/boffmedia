@@ -147,8 +147,11 @@ export class ConfigResponseDto {
 // ==================== ASSIGNMENT DTOS ====================
 
 export class AssignmentClaimedDto {
-  @ApiProperty({ example: 1 })
-  eventId: number;
+  // Serialized as a string: the launcher (and web) treat eventId as an opaque
+  // id (URL path param for the ROM patch), and the launcher's Rust struct
+  // deserializes it as a String. Sending a JSON number breaks that parse.
+  @ApiProperty({ example: '1' })
+  eventId: string;
 
   @ApiProperty({
     example: 'claimed',

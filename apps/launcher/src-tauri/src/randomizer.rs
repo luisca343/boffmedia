@@ -1,15 +1,28 @@
 // Randomizer ROM flow: claim assignment, hash ROM locally, upload and download randomized version.
 
-use serde::{Deserialize, Serialize};
+use serde::{Deserialize, Deserializer, Serialize};
 
 use crate::api::{self, ApiState};
 use crate::auth::AuthState;
 use crate::install;
 use crate::settings;
 
+/// eventId is an opaque id we only ever use as a URL path segment. The API may
+/// send it as a JSON number or string, so accept either and normalise to String.
+fn de_id_as_string<'de, D: Deserializer<'de>>(d: D) -> Result<String, D::Error> {
+    match serde_json::Value::deserialize(d)? {
+        serde_json::Value::String(s) => Ok(s),
+        serde_json::Value::Number(n) => Ok(n.to_string()),
+        other => Err(serde::de::Error::custom(format!(
+            "expected string or number for eventId, got {other}"
+        ))),
+    }
+}
+
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct RandomizerAssignment {
+    #[serde(deserialize_with = "de_id_as_string")]
     pub event_id: String,
     pub status: String, // "pending" | "claimed" | "patched" | "verified"
     pub clean_rom_sha512: String,

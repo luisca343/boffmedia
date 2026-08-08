@@ -140,7 +140,7 @@ export class AssignmentsService {
     config: RandomizerConfig,
   ): AssignmentClaimedDto {
     return {
-      eventId: config.eventId,
+      eventId: String(config.eventId),
       status: assignment.status as RandomizerAssignmentStatus,
       gamePlatform: config.gamePlatform,
       gameTitle: config.gameTitle,
