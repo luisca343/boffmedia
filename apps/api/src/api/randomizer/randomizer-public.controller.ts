@@ -54,6 +54,11 @@ export class RandomizerPublicController {
     @Param('eventId') eventId: string,
   ): Promise<PublicConfigDto> {
     const config = await this.events.getConfigByEventId(Number(eventId));
+    if (!config) {
+      throw new NotFoundException(
+        `No randomizer config found for event ${eventId}`,
+      );
+    }
 
     return {
       id: config.id,

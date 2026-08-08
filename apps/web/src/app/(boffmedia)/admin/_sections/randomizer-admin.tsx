@@ -6,9 +6,8 @@ import { useTranslations } from "next-intl"
 import { Button, Empty, Icon, Input, Modal, Spinner, toast, Select } from "@boffmedia/ui"
 import { AvPanel, AvSectionHead } from "../_components/ui/av-kit"
 import { RandomizerService } from "@/services/api/boffmedia/randomizerService"
-import { TournamentsService } from "@/services/api/boffmedia/tournamentsService"
+import { EventsService } from "@/services/api/boffmedia/eventsService"
 import type { RandomizerPreset, RandomizerConfig } from "@/services/api/boffmedia/randomizer.types"
-import type { TournamentSummaryApi } from "@/services/api/boffmedia/tournamentsService"
 import { RandomizerEditor } from "./randomizer/randomizer-editor"
 import { QuickRandomizeModal } from "./randomizer/QuickRandomizeModal"
 import { totalChanged } from "./randomizer/_components/catalog-view"
@@ -35,9 +34,10 @@ function ConfigsView() {
   const loadEvents = async () => {
     setLoadingEvents(true)
     try {
-      // Load community events with emulator packs attached
-      const res = await TournamentsService.list() // Temporary: reusing tournaments service
-      // TODO: Once EventsService gains a list method for admin, use EventsService.getEvents()
+      // Load community events (any game). createConfig validates emulator-pack
+      // attachment server-side; listing all events keeps this independent of the
+      // shared Event type exposing packId (pre generate:shared).
+      const res = await EventsService.getEvents()
       setEvents(res.success ? res.data || [] : [])
     } catch (err) {
       toast({ tone: "bad", title: t("errorLoadingEvents"), msg: String(err) })
@@ -83,7 +83,7 @@ function ConfigsView() {
               { value: "", label: t("chooseEvent") },
               ...events.map((ev) => ({
                 value: String(ev.id),
-                label: ev.name,
+                label: ev.title ?? ev.name ?? `#${ev.id}`,
               })),
             ]}
             disabled={loadingEvents}

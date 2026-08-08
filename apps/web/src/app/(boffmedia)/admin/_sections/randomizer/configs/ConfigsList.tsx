@@ -52,10 +52,12 @@ export function ConfigsList({
     if (!eventId) return
     setLoading(true)
     try {
-      // TODO: Once backend has GET /randomizer/admin/events/:id/configs endpoint
-      // const res = await RandomizerService.listEventConfigs(String(eventId))
-      setConfigs([])
-      // setConfigs(res.success ? res.data || [] : [])
+      // A config is 1:1 with an event, so "the list" is at most one row.
+      // getEventConfig returns the config for any status (settings gated to
+      // published, which the list doesn't display); success:false => no config.
+      const res = await RandomizerService.getEventConfig(eventId)
+      const cfg = res.success && "data" in res ? (res.data as RandomizerConfig) : null
+      setConfigs(cfg ? [cfg] : [])
     } catch (err) {
       toast({ tone: "bad", title: t("errorLoading"), msg: String(err) })
       setConfigs([])
