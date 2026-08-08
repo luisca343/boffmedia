@@ -1,29 +1,43 @@
 "use client"
 
-import { useState, useCallback } from "react"
-import { useForm, FormProvider, useFormContext, useWatch, Controller } from "react-hook-form"
+import { useCallback, useEffect, useMemo, useState } from "react"
+import {
+  FormProvider,
+  useForm,
+  useFormContext,
+  useWatch,
+} from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useTranslations } from "next-intl"
 import {
   Button,
-  Tabs,
-  Select,
-  Toggle,
-  Input,
   Icon,
+  Input,
+  Modal,
+  Popover,
+  SearchInput,
+  Seg,
+  Select,
   Spinner,
   toast,
 } from "@boffmedia/ui"
-import { AvPanel, AvSectionHead, AvAlert } from "../../_components/ui/av-kit"
 import { RandomizerSettings } from "@boffmedia/pack-schema"
 import { RandomizerService } from "@/services/api/boffmedia/randomizerService"
+import type { RandomizerPreset } from "@/services/api/boffmedia/randomizer.types"
 import defaultSettings from "./default-settings"
-import { TAB_REGISTRY } from "./tabs"
+import { QuickRandomizeModal } from "./QuickRandomizeModal"
+import {
+  RandomizerUiProvider,
+  useRandomizerUi,
+  type RzLayout,
+} from "./_components/RandomizerUiContext"
+import { computeWarnings } from "./_components/validation"
+import { CategoryRail } from "./_components/CategoryRail"
+import { CategoryContent } from "./_components/CategoryContent"
+import { SummaryColumn, SummaryDrawer } from "./_components/Summary"
+import { totalChanged } from "./_components/catalog-view"
 
-/**
- * Supported FVX games, grouped by generation.
- * This is a static list for now; later passes can make it dynamic.
- */
+/** Supported FVX games (flat list; scope for saved presets). */
 const FVX_GAMES = [
   { value: "POKÉMON_RED", label: "Pokémon Red" },
   { value: "POKÉMON_BLUE", label: "Pokémon Blue" },
@@ -38,248 +52,288 @@ const FVX_GAMES = [
   { value: "POKÉMON_LEAFGREEN", label: "Pokémon LeafGreen" },
 ]
 
-// Labels resolve from `randomizer.tabs.*` at render time; the array carries the
-// order and the id (which is also the translation key).
-const RANDOMIZER_TABS = [
-  { value: "traits" },
-  { value: "starters" },
-  { value: "moves" },
-  { value: "foes" },
-  { value: "wild" },
-  { value: "tmhm" },
-  { value: "items" },
-  { value: "types" },
-  { value: "graphics" },
-  { value: "misc" },
-] as const
+/** A curated balanced full-random spread, mapped to real RandomizerSettings. */
+const RANDOMIZE_ALL: Partial<RandomizerSettings> = {
+  startersMod: "COMPLETELY_RANDOM",
+  startersNoLegendaries: true,
+  speciesTypesMod: "COMPLETELY_RANDOM",
+  abilitiesMod: "RANDOMIZE",
+  banNegativeAbilities: true,
+  evolutionsMod: "RANDOM",
+  evosSimilarStrength: true,
+  movesetsMod: "RANDOM_PREFER_SAME_TYPE",
+  blockBrokenMovesetMoves: true,
+  trainersMod: "DISTRIBUTED",
+  trainersUsePokemonOfSimilarStrength: true,
+  trainersBlockLegendaries: true,
+  randomizeWildPokemon: true,
+  similarStrengthEncounters: true,
+  tmsMod: "RANDOM",
+  tmsHmsCompatibilityMod: "RANDOM_PREFER_TYPE",
+  moveTutorMovesMod: "RANDOM",
+  staticPokemonMod: "SIMILAR_STRENGTH",
+  fieldItemsMod: "RANDOM",
+}
 
+const GRID_COLUMNS: Record<RzLayout, string> = {
+  rail: "196px minmax(0,1fr) 300px",
+  tabs: "minmax(0,1fr) 300px",
+  detail: "196px minmax(0,1fr)",
+  scroll: "minmax(0,1fr)",
+}
 
-/**
- * File input for ROM selection and dry-run.
- */
-function RomFileSelector({ onDryRun }: { onDryRun: (file: File) => Promise<void> }) {
+/* -------------------------------------------------------------------------- */
+/* Toolbar                                                                     */
+/* -------------------------------------------------------------------------- */
+
+function ViewMenu() {
   const t = useTranslations("randomizer")
-  const [loading, setLoading] = useState(false)
+  const ui = useRandomizerUi()
+  return (
+    <Popover
+      align="end"
+      trigger={
+        <Button variant="default" size="sm" icon="grid">
+          {t("chrome.view")}
+        </Button>
+      }
+    >
+      <div className="w-[248px] bg-panel border border-solid border-line-2 p-2.5 shadow-xl">
+        <p className="font-mono text-[9.5px] uppercase tracking-[0.12em] text-txt-dim mb-1.5">
+          {t("chrome.layout")}
+        </p>
+        <Seg
+          className="w-full mb-3 flex-wrap"
+          value={ui.layout}
+          onChange={(v) => ui.setLayout(v as RzLayout)}
+          options={[
+            { value: "rail", label: t("chrome.layoutRail") },
+            { value: "tabs", label: t("chrome.layoutTabs") },
+            { value: "detail", label: t("chrome.layoutDetail") },
+            { value: "scroll", label: t("chrome.layoutScroll") },
+          ]}
+        />
+        <p className="font-mono text-[9.5px] uppercase tracking-[0.12em] text-txt-dim mb-1.5">
+          {t("chrome.density")}
+        </p>
+        <Seg
+          className="w-full"
+          value={ui.density}
+          onChange={(v) => ui.setDensity(v as "comfortable" | "compact")}
+          options={[
+            { value: "comfortable", label: t("chrome.comfortable") },
+            { value: "compact", label: t("chrome.compact") },
+          ]}
+        />
+      </div>
+    </Popover>
+  )
+}
 
-  const handleFileClick = () => {
-    const input = document.createElement("input")
-    input.type = "file"
-    input.accept = ".gba,.nds"
-    input.onchange = async (e) => {
-      const file = (e.target as HTMLInputElement).files?.[0]
-      if (file) {
-        setLoading(true)
-        try {
-          await onDryRun(file)
-        } finally {
-          setLoading(false)
-        }
+function Toolbar({
+  selectedGame,
+  onGame,
+  seed,
+  onSeed,
+  presets,
+  onQuickApply,
+  onRandomizeAll,
+  onSave,
+  onRun,
+}: {
+  selectedGame: string
+  onGame: (v: string) => void
+  seed: string
+  onSeed: (v: string) => void
+  presets: RandomizerPreset[]
+  onQuickApply: (id: string) => void
+  onRandomizeAll: () => void
+  onSave: () => void
+  onRun: () => void
+}) {
+  const t = useTranslations("randomizer")
+  const ui = useRandomizerUi()
+  const isDrawer = ui.layout === "detail" || ui.layout === "scroll"
+
+  return (
+    <div className="sticky top-0 z-40 flex flex-wrap items-center gap-3 p-3.5 border border-solid border-line bg-panel mb-[18px]">
+      <div className="min-w-[190px]">
+        <Select
+          value={selectedGame}
+          onChange={onGame}
+          options={[{ value: "", label: t("chrome.selectGame") }, ...FVX_GAMES]}
+        />
+      </div>
+
+      <div id="rz-search-box" className="relative flex-1 min-w-[220px]">
+        <SearchInput
+          value={ui.query}
+          onChange={ui.setQuery}
+          placeholder={t("chrome.searchAll")}
+        />
+      </div>
+
+      <div className="min-w-[180px]">
+        <Select
+          value=""
+          onChange={onQuickApply}
+          options={[
+            { value: "", label: t("chrome.quickApply") },
+            ...presets.map((p) => ({ value: p.id, label: p.name })),
+          ]}
+        />
+      </div>
+
+      <div className="flex items-stretch">
+        <Input
+          id="rz-seed"
+          className="w-[150px] font-mono text-[12px]"
+          placeholder={t("chrome.seedPlaceholder")}
+          value={seed}
+          onChange={(e) => onSeed(e.currentTarget.value)}
+        />
+        <Button
+          variant="default"
+          size="sm"
+          icon="dice"
+          title={t("chrome.rollSeed")}
+          className="border-l-0"
+          onClick={() => onSeed(String(Math.floor(Math.random() * 9e9)))}
+        />
+      </div>
+
+      <div className="w-px self-stretch bg-line" />
+
+      <div className="flex gap-2 flex-wrap">
+        <Button variant="default" size="sm" icon="sparkles" onClick={onRandomizeAll}>
+          {t("chrome.randomizeAll")}
+        </Button>
+        <ViewMenu />
+        {isDrawer && (
+          <Button variant="default" size="sm" icon="sliders" onClick={() => ui.setSummaryOpen(true)}>
+            {t("chrome.summary")}
+          </Button>
+        )}
+        <Button variant="default" size="sm" onClick={onSave}>
+          {t("chrome.save")}
+        </Button>
+        <Button variant="pri" size="sm" icon="play" onClick={onRun}>
+          {t("chrome.run")}
+        </Button>
+      </div>
+    </div>
+  )
+}
+
+/* -------------------------------------------------------------------------- */
+/* Floating dock (master-detail / single-scroll)                              */
+/* -------------------------------------------------------------------------- */
+
+function Dock({ onRun }: { onRun: () => void }) {
+  const t = useTranslations("randomizer")
+  const ui = useRandomizerUi()
+  const form = useFormContext<RandomizerSettings>()
+  const values = (useWatch({ control: form.control }) as Record<string, unknown>) ?? {}
+  const count = totalChanged(values)
+
+  if (ui.layout !== "detail" && ui.layout !== "scroll") return null
+
+  return (
+    <div className="fixed right-[22px] bottom-[22px] z-[55] flex gap-2">
+      <button
+        type="button"
+        onClick={() => ui.setSummaryOpen(true)}
+        className="inline-flex items-center gap-2 h-[42px] px-4 border border-solid border-accent-line bg-panel text-txt font-display font-bold uppercase tracking-[0.06em] text-[13px] cursor-pointer shadow-lg"
+      >
+        <Icon name="sliders" size={16} />
+        {t("chrome.changes")}
+        <span className="grid place-items-center min-w-5 h-[18px] px-1.5 bg-accent text-accent-ink font-mono text-[10px]">
+          {count}
+        </span>
+      </button>
+      <button
+        type="button"
+        onClick={onRun}
+        className="inline-flex items-center gap-2 h-[42px] px-4 border border-solid border-accent bg-accent text-accent-ink font-display font-bold uppercase tracking-[0.06em] text-[13px] cursor-pointer shadow-lg"
+      >
+        <Icon name="play" size={16} />
+        {t("chrome.run")}
+      </button>
+    </div>
+  )
+}
+
+/* -------------------------------------------------------------------------- */
+/* Keyboard shortcuts (inside the provider so it can reach ui)                 */
+/* -------------------------------------------------------------------------- */
+
+function KeyboardShortcuts() {
+  const ui = useRandomizerUi()
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      const tag = (document.activeElement?.tagName ?? "").toLowerCase()
+      if (e.key === "/" && tag !== "input" && tag !== "select" && tag !== "textarea") {
+        e.preventDefault()
+        document.querySelector<HTMLInputElement>("#rz-search-box input")?.focus()
+      } else if (e.key === "Escape") {
+        if (ui.query) ui.setQuery("")
+        else if (ui.summaryOpen) ui.setSummaryOpen(false)
       }
     }
-    input.click()
-  }
-
-  return (
-    <button
-      type="button"
-      onClick={handleFileClick}
-      disabled={loading}
-      className="w-full flex flex-col items-center gap-2 py-8 px-4 rounded border-2 border-dashed border-line hover:border-accent hover:bg-panel-2 transition-colors disabled:opacity-50"
-    >
-      <Icon name="upload" size={24} className="text-txt-muted" />
-      <p className="text-sm text-txt-muted">{t("chrome.dryRunDropZone")}</p>
-    </button>
-  )
+    document.addEventListener("keydown", onKey)
+    return () => document.removeEventListener("keydown", onKey)
+  }, [ui])
+  return null
 }
 
-/**
- * A top-level general option: label + sub-text on the left, form-bound toggle on
- * the right. Binds directly to a boolean RandomizerSettings field.
- */
-function GeneralOptionToggle({
-  field,
-  labelKey,
-  subKey,
-}: {
-  field: keyof RandomizerSettings
-  labelKey: string
-  subKey: string
-}) {
+/* -------------------------------------------------------------------------- */
+/* Editor shell (inside FormProvider)                                         */
+/* -------------------------------------------------------------------------- */
+
+function EditorShell() {
   const t = useTranslations("randomizer")
   const form = useFormContext<RandomizerSettings>()
-  return (
-    <Controller
-      control={form.control}
-      name={field}
-      render={({ field: { value, onChange } }) => (
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-sm font-medium">{t(labelKey)}</p>
-            <p className="text-xs text-txt-muted">{t(subKey)}</p>
-          </div>
-          <Toggle on={Boolean(value)} onChange={onChange} />
-        </div>
-      )}
-    />
-  )
-}
+  const values = (useWatch({ control: form.control }) as Record<string, unknown>) ?? {}
+  const warnings = useMemo(() => computeWarnings(values, t), [values, t])
 
-/**
- * General options panel — the top-level toggles, wired to the form.
- * The Limit Pokémon full modal (per-gen picker) is a later pass; here the
- * boolean persists and reveals a summary sub-panel.
- */
-function GeneralOptionsPanel() {
-  const t = useTranslations("randomizer")
-  const form = useFormContext<RandomizerSettings>()
-  const limitPokemon = useWatch({ control: form.control, name: "limitPokemon" })
-
-  return (
-    <AvPanel title={t("chrome.generalOptions")} icon="sliders">
-      <div className="space-y-4">
-        <GeneralOptionToggle
-          field="limitPokemon"
-          labelKey="chrome.limitPokemon"
-          subKey="chrome.limitPokemonSub"
-        />
-        <GeneralOptionToggle
-          field="banIrregularAltFormes"
-          labelKey="chrome.banIrregularAltFormes"
-          subKey="chrome.banIrregularAltFormesSub"
-        />
-        <GeneralOptionToggle
-          field="banPrematureEvos"
-          labelKey="chrome.banPrematureEvos"
-          subKey="chrome.banPrematureEvosSub"
-        />
-        <GeneralOptionToggle
-          field="randomizeIntroMon"
-          labelKey="chrome.randomizeIntroMon"
-          subKey="chrome.randomizeIntroMonSub"
-        />
-        <GeneralOptionToggle
-          field="raceMode"
-          labelKey="chrome.raceMode"
-          subKey="chrome.raceModeSub"
-        />
-
-        {limitPokemon && (
-          <AvPanel
-            title={t("chrome.limitPokemonModal")}
-            className="mt-2 border-l-[3px] border-l-accent bg-accent-soft/5"
-          >
-            <p className="text-sm text-txt-muted">
-              {t("chrome.limitPokemonDesc")}
-            </p>
-          </AvPanel>
-        )}
-      </div>
-    </AvPanel>
-  )
-}
-
-/**
- * Top preset bar: load, import, export, save, dry-run.
- */
-function PresetBar({ onSave, onDryRun, onImport, onExport }: {
-  onSave: () => void
-  onDryRun: (file: File) => Promise<void>
-  onImport: (file: File) => Promise<void>
-  onExport: () => void
-}) {
-  const t = useTranslations("randomizer")
-  const [showDryRun, setShowDryRun] = useState(false)
-
-  return (
-    <AvPanel flush className="mb-5 flex flex-wrap gap-3 items-center">
-      <Select
-        value="new"
-        options={[{ value: "new", label: t("chrome.newPreset") }]}
-        onChange={() => {}}
-      />
-
-      <Button
-        variant="ghost"
-        size="sm"
-        onClick={() => {
-          const input = document.createElement("input")
-          input.type = "file"
-          input.accept = ".rnqs"
-          input.onchange = async (e) => {
-            const file = (e.target as HTMLInputElement).files?.[0]
-            if (file) await onImport(file)
-          }
-          input.click()
-        }}
-      >
-        {t("chrome.importRnqs")}
-      </Button>
-
-      <Button
-        variant="ghost"
-        size="sm"
-        onClick={onExport}
-      >
-        {t("chrome.exportRnqs")}
-      </Button>
-
-      <Button
-        variant="ghost"
-        size="sm"
-        onClick={() => setShowDryRun(true)}
-      >
-        {t("chrome.dryRun")}
-      </Button>
-
-      {showDryRun && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <AvPanel className="max-w-md">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="font-semibold">{t("chrome.dryRun")}</h3>
-              <button onClick={() => setShowDryRun(false)} className="text-txt-dim hover:text-txt">
-                <Icon name="x" size={18} />
-              </button>
-            </div>
-            <RomFileSelector onDryRun={async (file) => {
-              await onDryRun(file)
-              setShowDryRun(false)
-            }} />
-          </AvPanel>
-        </div>
-      )}
-    </AvPanel>
-  )
-}
-
-/**
- * Editor shell: form setup + tabs + toggles + validation.
- */
-export function RandomizerEditor() {
-  const t = useTranslations("randomizer")
-  const [activeTab, setActiveTab] = useState<(typeof RANDOMIZER_TABS)[number]["value"]>("traits")
-  const [selectedGame, setSelectedGame] = useState<string>("")
-  const [saveModalOpen, setSaveModalOpen] = useState(false)
+  const [selectedGame, setSelectedGame] = useState("")
+  const [seed, setSeed] = useState("")
+  const [presets, setPresets] = useState<RandomizerPreset[]>([])
+  const [saveOpen, setSaveOpen] = useState(false)
   const [presetName, setPresetName] = useState("")
   const [presetDescription, setPresetDescription] = useState("")
   const [saving, setSaving] = useState(false)
+  const [savedPreset, setSavedPreset] = useState<RandomizerPreset | null>(null)
+  const [runPreset, setRunPreset] = useState<RandomizerPreset | null>(null)
 
-  const form = useForm<any>({
-    resolver: zodResolver(RandomizerSettings as any) as any,
-    defaultValues: defaultSettings as any,
-    mode: "onBlur" as const,
-  })
+  useEffect(() => {
+    RandomizerService.listPresets()
+      .then((res) => setPresets(res.success ? res.data ?? [] : []))
+      .catch(() => setPresets([]))
+  }, [])
 
-  const isDirty = form.formState.isDirty
-  const isValid = form.formState.isValid
-  const errors = Object.keys(form.formState.errors)
+  const applyPreset = useCallback(
+    async (id: string) => {
+      if (!id) return
+      const res = await RandomizerService.getPreset(id)
+      if (res.success && res.data?.settingsJson) {
+        form.reset(res.data.settingsJson as never)
+        setSavedPreset(res.data)
+        toast({ tone: "ok", title: t("chrome.presetApplied", { name: res.data.name }) })
+      } else {
+        toast({ tone: "bad", title: t("chrome.errorLoadingPresets") })
+      }
+    },
+    [form, t],
+  )
 
-  const handleSave = useCallback(async () => {
-    if (!isValid) {
-      toast({ tone: "bad", title: t("chrome.validationError"), msg: "Please fix errors before saving" })
-      return
-    }
-    setSaveModalOpen(true)
-  }, [isValid, t])
+  const randomizeAll = useCallback(() => {
+    form.reset({ ...(defaultSettings as RandomizerSettings), ...RANDOMIZE_ALL } as never)
+    setSavedPreset(null)
+    toast({ tone: "ok", title: t("chrome.randomizeAllDone") })
+  }, [form, t])
+
+  const openSave = useCallback(() => setSaveOpen(true), [])
 
   const confirmSave = useCallback(async () => {
     if (!presetName.trim()) {
@@ -296,9 +350,13 @@ export function RandomizerEditor() {
       })
       if (res.success) {
         toast({ tone: "ok", title: t("chrome.presetSaved") })
-        setSaveModalOpen(false)
+        setSaveOpen(false)
         setPresetName("")
         setPresetDescription("")
+        if (res.data) {
+          setSavedPreset(res.data)
+          setPresets((prev) => [res.data as RandomizerPreset, ...prev])
+        }
       } else {
         toast({ tone: "bad", title: t("chrome.saveError"), msg: res.userMessage })
       }
@@ -307,122 +365,138 @@ export function RandomizerEditor() {
     }
   }, [presetName, presetDescription, selectedGame, form, t])
 
-  const handleDryRun = useCallback(async (romFile: File) => {
-    toast({ tone: "info", title: "Dry-run", msg: "Placeholder (wired in later pass)" })
-  }, [])
+  const openRun = useCallback(() => {
+    if (savedPreset) {
+      setRunPreset(savedPreset)
+    } else {
+      toast({ tone: "info", title: t("chrome.saveBeforeRun") })
+      setSaveOpen(true)
+    }
+  }, [savedPreset, t])
 
-  const handleImport = useCallback(async (file: File) => {
-    toast({ tone: "info", title: "Import", msg: "Placeholder (wired in later pass)" })
-  }, [])
+  return (
+    <RandomizerUiProvider deps={{ warnings }}>
+      <KeyboardShortcuts />
 
-  const handleExport = useCallback(async () => {
-    toast({ tone: "info", title: "Export", msg: "Placeholder (wired in later pass)" })
-  }, [])
+      <Toolbar
+        selectedGame={selectedGame}
+        onGame={setSelectedGame}
+        seed={seed}
+        onSeed={setSeed}
+        presets={presets}
+        onQuickApply={applyPreset}
+        onRandomizeAll={randomizeAll}
+        onSave={openSave}
+        onRun={openRun}
+      />
 
-  const TabComp = TAB_REGISTRY[activeTab]
+      <LayoutGrid onSave={openSave} onRun={openRun} />
+
+      <Dock onRun={openRun} />
+
+      <Modal
+        open={saveOpen}
+        onClose={() => setSaveOpen(false)}
+        title={t("chrome.savePreset")}
+        footer={
+          <>
+            <Button variant="pri" className="flex-1" onClick={confirmSave} disabled={saving}>
+              {saving && <Spinner size={16} />}
+              {t("chrome.save")}
+            </Button>
+            <Button variant="ghost" onClick={() => setSaveOpen(false)} disabled={saving}>
+              {t("chrome.cancel")}
+            </Button>
+          </>
+        }
+      >
+        <div className="grid gap-3.5">
+          <span className="inline-flex items-center gap-1.5 self-start py-1.5 px-2.5 border border-solid border-accent-line bg-accent-soft text-accent font-mono text-[11px] font-semibold">
+            <Icon name="check" size={12} />
+            {t("chrome.settingsChanged", { count: totalChanged(values) })}
+          </span>
+          <label className="grid gap-1.5">
+            <span className="font-mono text-[10px] uppercase tracking-[0.1em] text-txt-muted">
+              {t("chrome.presetNameLabel")}
+            </span>
+            <Input
+              placeholder={t("chrome.namePlaceholder")}
+              value={presetName}
+              onChange={(e) => setPresetName(e.currentTarget.value)}
+            />
+          </label>
+          <label className="grid gap-1.5">
+            <span className="font-mono text-[10px] uppercase tracking-[0.1em] text-txt-muted">
+              {t("chrome.presetDescLabel")}
+            </span>
+            <Input
+              placeholder={t("chrome.descriptionPlaceholder")}
+              value={presetDescription}
+              onChange={(e) => setPresetDescription(e.currentTarget.value)}
+            />
+          </label>
+          <label className="grid gap-1.5">
+            <span className="font-mono text-[10px] uppercase tracking-[0.1em] text-txt-muted">
+              {t("chrome.gameScope")}
+            </span>
+            <Select
+              value={selectedGame}
+              onChange={setSelectedGame}
+              options={[{ value: "", label: t("chrome.allGames") }, ...FVX_GAMES]}
+            />
+          </label>
+        </div>
+      </Modal>
+
+      {runPreset && <QuickRandomizeModal preset={runPreset} initialSeed={seed} onClose={() => setRunPreset(null)} />}
+    </RandomizerUiProvider>
+  )
+}
+
+/* -------------------------------------------------------------------------- */
+/* Layout grid                                                                */
+/* -------------------------------------------------------------------------- */
+
+function LayoutGrid({ onSave, onRun }: { onSave: () => void; onRun: () => void }) {
+  const ui = useRandomizerUi()
+  const showRail = ui.layout === "rail" || ui.layout === "detail"
+  const showColumn = ui.layout === "rail" || ui.layout === "tabs"
+  const isDrawer = ui.layout === "detail" || ui.layout === "scroll"
+
+  return (
+    <>
+      {ui.layout === "tabs" && (
+        <div className="mb-[18px]">
+          <CategoryRail variant="tabs" />
+        </div>
+      )}
+      <div className="grid gap-[18px] items-start" style={{ gridTemplateColumns: GRID_COLUMNS[ui.layout] }}>
+        {showRail && <CategoryRail variant="rail" />}
+        <section className={ui.layout === "scroll" ? "max-w-[880px] w-full mx-auto" : "min-w-0"}>
+          <CategoryContent />
+        </section>
+        {showColumn && <SummaryColumn onSave={onSave} onRun={onRun} />}
+      </div>
+      {isDrawer && <SummaryDrawer onSave={onSave} onRun={onRun} />}
+    </>
+  )
+}
+
+/* -------------------------------------------------------------------------- */
+/* Public entry                                                               */
+/* -------------------------------------------------------------------------- */
+
+export function RandomizerEditor({ initialSettings }: { initialSettings?: RandomizerSettings }) {
+  const form = useForm<RandomizerSettings>({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    resolver: zodResolver(RandomizerSettings as any) as any,
+    defaultValues: (initialSettings ?? defaultSettings) as never,
+    mode: "onBlur",
+  })
 
   return (
     <FormProvider {...form}>
-      <div className="space-y-5">
-        {/* Preset Bar */}
-        <PresetBar onSave={handleSave} onDryRun={handleDryRun} onImport={handleImport} onExport={handleExport} />
-
-        {/* Game Selector */}
-        <AvPanel title={t("chrome.gameSelector")} icon="gamepad">
-          <Select
-            value={selectedGame}
-            options={[{ value: "", label: t("chrome.selectGame") }, ...FVX_GAMES]}
-            onChange={(v) => setSelectedGame(v)}
-          />
-        </AvPanel>
-
-        {/* General Options */}
-        <GeneralOptionsPanel />
-
-        {/* Settings Tabs */}
-        <AvPanel className="mb-5">
-          <Tabs
-            value={activeTab}
-            onChange={(value) => setActiveTab(value as any)}
-            tabs={RANDOMIZER_TABS.map((tab) => ({ value: tab.value, label: t(`tabs.${tab.value}`) }))}
-          />
-        </AvPanel>
-
-        {activeTab && <TabComp />}
-
-        {/* Sticky Footer: Validation + Actions */}
-        <div className="space-y-3 border-t border-line pt-5">
-          {errors.length > 0 && (
-            <AvAlert tone="bad" title={t("chrome.validationError")}>
-              {errors.length} field{errors.length > 1 ? "s" : ""} have errors
-            </AvAlert>
-          )}
-
-          {isDirty && !isValid && (
-            <AvAlert tone="info">
-              {t("chrome.dirty")}
-            </AvAlert>
-          )}
-
-          <div className="flex gap-3">
-            <Button
-              onClick={handleSave}
-              disabled={!isValid}
-            >
-              {t("chrome.save")}
-            </Button>
-            <Button
-              variant="ghost"
-              onClick={() => form.reset()}
-              disabled={!isDirty}
-            >
-              {t("chrome.cancel")}
-            </Button>
-          </div>
-        </div>
-
-        {/* Save-preset modal */}
-        {saveModalOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-            <AvPanel className="max-w-md w-full">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="font-semibold">{t("chrome.savePreset")}</h3>
-                <button
-                  onClick={() => setSaveModalOpen(false)}
-                  className="text-txt-dim hover:text-txt"
-                >
-                  <Icon name="x" size={18} />
-                </button>
-              </div>
-              <div className="space-y-3">
-                <Input
-                  placeholder={t("chrome.namePlaceholder")}
-                  value={presetName}
-                  onChange={(e) => setPresetName(e.currentTarget.value)}
-                />
-                <Input
-                  placeholder={t("chrome.descriptionPlaceholder")}
-                  value={presetDescription}
-                  onChange={(e) => setPresetDescription(e.currentTarget.value)}
-                />
-                <div className="flex gap-3 pt-2">
-                  <Button onClick={confirmSave} disabled={saving} className="flex-1">
-                    {saving && <Spinner size={16} />}
-                    {t("chrome.save")}
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    onClick={() => setSaveModalOpen(false)}
-                    disabled={saving}
-                  >
-                    {t("chrome.cancel")}
-                  </Button>
-                </div>
-              </div>
-            </AvPanel>
-          </div>
-        )}
-      </div>
+      <EditorShell />
     </FormProvider>
   )
 }

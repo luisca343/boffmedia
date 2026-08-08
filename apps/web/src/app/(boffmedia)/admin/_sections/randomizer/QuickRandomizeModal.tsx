@@ -13,14 +13,16 @@ import type { RandomizerPreset } from "@/services/api/boffmedia/randomizer.types
  */
 export function QuickRandomizeModal({
   preset,
+  initialSeed,
   onClose,
 }: {
   preset: RandomizerPreset
+  initialSeed?: string
   onClose: () => void
 }) {
   const t = useTranslations("randomizer.quick")
   const [platform, setPlatform] = useState<"gba" | "nds">("gba")
-  const [seed, setSeed] = useState("")
+  const [seed, setSeed] = useState(initialSeed ?? "")
   const [file, setFile] = useState<File | null>(null)
   const [running, setRunning] = useState(false)
 

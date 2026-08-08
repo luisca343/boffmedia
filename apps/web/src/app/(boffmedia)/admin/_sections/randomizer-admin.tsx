@@ -11,6 +11,7 @@ import type { RandomizerPreset, RandomizerEvent } from "@/services/api/boffmedia
 import type { TournamentSummaryApi } from "@/services/api/boffmedia/tournamentsService"
 import { RandomizerEditor } from "./randomizer/randomizer-editor"
 import { QuickRandomizeModal } from "./randomizer/QuickRandomizeModal"
+import { totalChanged } from "./randomizer/_components/catalog-view"
 import { EventsList } from "./randomizer/events/EventsList"
 import { EventEditor } from "./randomizer/events/EventEditor"
 import { AssignmentsList } from "./randomizer/events/AssignmentsList"
@@ -112,13 +113,29 @@ function EventsView() {
 /**
  * Presets list view with create/edit/delete/import/export actions.
  */
-function PresetsView() {
+function PresetsView({ onLoad }: { onLoad: (preset: RandomizerPreset) => void }) {
   const t = useTranslations("randomizer")
   const [presets, setPresets] = useState<RandomizerPreset[] | null>(null)
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState("")
   const [deleting, setDeleting] = useState<string | null>(null)
   const [randomizing, setRandomizing] = useState<RandomizerPreset | null>(null)
+
+  const handleExport = async (preset: RandomizerPreset) => {
+    try {
+      const blob = await RandomizerService.exportRnqs(preset.id)
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement("a")
+      a.href = url
+      a.download = `${preset.name}.rnqs`
+      document.body.appendChild(a)
+      a.click()
+      a.remove()
+      URL.revokeObjectURL(url)
+    } catch (err) {
+      toast({ tone: "bad", title: t("chrome.exportError"), msg: String(err) })
+    }
+  }
 
   useEffect(() => {
     loadPresets()
@@ -193,64 +210,55 @@ function PresetsView() {
           icon="puzzle"
         />
       ) : (
-        <AvPanel>
-          <div className="space-y-2">
-            {filtered.map((preset) => (
-              <div
+        <div className="grid gap-4 [grid-template-columns:repeat(auto-fill,minmax(300px,1fr))]">
+          {filtered.map((preset) => {
+            const count = totalChanged(preset.settingsJson as unknown as Record<string, unknown>)
+            return (
+              <article
                 key={preset.id}
-                className="flex items-start justify-between gap-3 p-3 rounded border border-line hover:bg-panel-2 transition-colors"
+                className="flex flex-col border border-solid border-line bg-panel transition-colors hover:border-line-2"
               >
-                <div className="flex-1 min-w-0">
-                  <p className="font-semibold text-sm">{preset.name}</p>
+                <div className="p-4 flex-1">
+                  <h4 className="font-display font-extrabold italic uppercase text-[19px] tracking-[0.01em] leading-tight">
+                    {preset.name}
+                  </h4>
                   {preset.description && (
-                    <p className="text-xs text-txt-muted truncate">{preset.description}</p>
+                    <p className="mt-2 text-txt-muted text-[13px] leading-[1.45]">{preset.description}</p>
                   )}
-                  <p className="text-xs text-txt-dim mt-1">
-                    {new Date(preset.updatedAt).toLocaleString()}
-                  </p>
+                  <div className="flex items-center gap-1.5 mt-3 font-mono text-[11px] text-txt-dim">
+                    <Icon name="settings" size={13} />
+                    <span>{t("chrome.nSettings", { count })}</span>
+                    <span className="text-line-2">·</span>
+                    <span>{new Date(preset.updatedAt).toLocaleDateString()}</span>
+                  </div>
                 </div>
-                <div className="flex gap-2 shrink-0">
-                  <Button
-                    size="sm"
-                    variant="pri"
-                    onClick={() => setRandomizing(preset)}
-                  >
-                    <Icon name="dice" size={16} />
+                <div className="flex items-center gap-1.5 p-3 border-t border-solid border-line bg-panel-2">
+                  <Button size="sm" variant="pri" icon="play" onClick={() => setRandomizing(preset)}>
                     {t("quick.run")}
                   </Button>
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={() => {
-                      // Later: load and switch to editor
-                      toast({ tone: "info", title: "Load", msg: "Placeholder (wired in later pass)" })
-                    }}
-                  >
+                  <Button size="sm" variant="default" className="mr-auto" onClick={() => onLoad(preset)}>
                     {t("chrome.load")}
                   </Button>
                   <Button
                     size="sm"
                     variant="ghost"
-                    onClick={() => {
-                      // Later: download .rnqs
-                      toast({ tone: "info", title: "Export", msg: "Placeholder (wired in later pass)" })
-                    }}
-                  >
-                    <Icon name="download" size={16} />
-                  </Button>
+                    icon="download"
+                    title={t("chrome.exportRnqs")}
+                    onClick={() => handleExport(preset)}
+                  />
                   <Button
                     size="sm"
                     variant="ghost"
+                    icon="trash"
+                    title={t("chrome.delete")}
                     onClick={() => handleDelete(preset.id)}
                     disabled={deleting === preset.id}
-                  >
-                    <Icon name="trash" size={16} />
-                  </Button>
+                  />
                 </div>
-              </div>
-            ))}
-          </div>
-        </AvPanel>
+              </article>
+            )
+          })}
+        </div>
       )}
 
       {randomizing && (
@@ -270,6 +278,7 @@ export function RandomizerAdmin() {
   const t = useTranslations("randomizer")
   const searchParams = useSearchParams()
   const router = useRouter()
+  const [presetToLoad, setPresetToLoad] = useState<RandomizerPreset | null>(null)
 
   const view = searchParams.get("view") ?? "presets"
 
@@ -277,6 +286,12 @@ export function RandomizerAdmin() {
     const params = new URLSearchParams(searchParams.toString())
     params.set("view", newView)
     router.replace(`?${params.toString()}`, { scroll: false })
+  }
+
+  const handleLoadPreset = (preset: RandomizerPreset) => {
+    setPresetToLoad(preset)
+    handleViewChange("editor")
+    toast({ tone: "ok", title: t("chrome.presetApplied", { name: preset.name }) })
   }
 
   return (
@@ -312,8 +327,13 @@ export function RandomizerAdmin() {
       />
 
       <div className="mt-5">
-        {view === "presets" && <PresetsView />}
-        {view === "editor" && <RandomizerEditor />}
+        {view === "presets" && <PresetsView onLoad={handleLoadPreset} />}
+        {view === "editor" && (
+          <RandomizerEditor
+            key={presetToLoad?.id ?? "blank"}
+            initialSettings={presetToLoad?.settingsJson}
+          />
+        )}
         {view === "events" && <EventsView />}
       </div>
     </div>
