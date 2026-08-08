@@ -317,3 +317,103 @@ export class QuickRandomizeDto {
   @IsInt()
   seed?: number;
 }
+
+// ==================== PUBLIC DTOS (No Auth) ====================
+
+/**
+ * Public event listing for tournaments (pre-finish: no seeds).
+ * Matches the admin EventResponseDto but always excludes seed.
+ */
+export class PublicEventDto {
+  @ApiProperty({ example: 1 })
+  id: number;
+
+  @ApiProperty({ example: 1 })
+  tournamentId: number;
+
+  @ApiProperty({ example: 'gba' })
+  gamePlatform: string;
+
+  @ApiProperty({ example: 'pokered' })
+  gameTitle: string;
+
+  @ApiProperty()
+  cleanRomSha512: string;
+
+  @ApiProperty({ type: String, nullable: true })
+  romHint: string | null;
+
+  @ApiProperty()
+  fvxJarSha512: string;
+
+  @ApiProperty({
+    type: String,
+    nullable: true,
+    description: 'Only included when event status is finished',
+  })
+  settingsBlobSha512?: string | null;
+
+  @ApiProperty({
+    example: 'draft',
+    enum: ['draft', 'locked', 'running', 'finished'],
+  })
+  status: RandomizerEventStatus;
+
+  @ApiProperty({
+    type: String,
+    nullable: true,
+    example: 'pack-uuid-1234',
+  })
+  packId: string | null;
+
+  @ApiProperty()
+  createdAt: Date;
+}
+
+/**
+ * Public assignment listing (per-participant row).
+ * Seed only visible when event status === finished.
+ */
+export class PublicAssignmentDto {
+  @ApiProperty({ example: 1 })
+  id: number;
+
+  @ApiProperty({ example: 1 })
+  eventId: number;
+
+  @ApiProperty({ description: 'Participant display name' })
+  @IsString()
+  participantName: string;
+
+  @ApiProperty({
+    example: 'pending',
+    enum: ['pending', 'claimed', 'patched', 'verified'],
+  })
+  status: RandomizerAssignmentStatus;
+
+  @ApiProperty({
+    type: String,
+    nullable: true,
+    description: 'Only present if event.status === finished',
+  })
+  seed?: number | null;
+
+  @ApiProperty({
+    type: String,
+    nullable: true,
+    description: 'Sha512 of the randomized ROM output',
+  })
+  outputSha512: string | null;
+
+  @ApiProperty({ type: Date, nullable: true })
+  claimedAt: Date | null;
+
+  @ApiProperty({ type: Date, nullable: true })
+  patchedAt: Date | null;
+
+  @ApiProperty({ type: Date, nullable: true })
+  verifiedAt: Date | null;
+
+  @ApiProperty()
+  createdAt: Date;
+}

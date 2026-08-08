@@ -43,6 +43,10 @@ export default function TraitsTab() {
     control: form.control,
     name: "standardizeEXPCurves",
   })
+  const makeEvolutionsEasier = useWatch({
+    control: form.control,
+    name: "makeEvolutionsEasier",
+  })
 
   // Generation options for updateBaseStatsToGeneration
   const generations = [
@@ -57,14 +61,15 @@ export default function TraitsTab() {
     { value: "9", labelKey: "opt.generations.gen9" },
   ]
 
-  // EXP Curve options for selectedEXPCurve
+  // EXP Curve options for selectedEXPCurve — values MUST match the schema enum
+  // (SLOW | MEDIUM_SLOW | MEDIUM_FAST | FAST | ERRATIC | FLUCTUATING).
   const expCurves = [
-    { value: "FLAT", labelKey: "opt.expCurves.FLAT" },
-    { value: "MEDIUM_FAST", labelKey: "opt.expCurves.MEDIUM_FAST" },
-    { value: "MEDIUM_SLOW", labelKey: "opt.expCurves.MEDIUM_SLOW" },
     { value: "SLOW", labelKey: "opt.expCurves.SLOW" },
+    { value: "MEDIUM_SLOW", labelKey: "opt.expCurves.MEDIUM_SLOW" },
+    { value: "MEDIUM_FAST", labelKey: "opt.expCurves.MEDIUM_FAST" },
     { value: "FAST", labelKey: "opt.expCurves.FAST" },
-    { value: "SLOW_THEN_VERY_FAST", labelKey: "opt.expCurves.SLOW_THEN_VERY_FAST" },
+    { value: "ERRATIC", labelKey: "opt.expCurves.ERRATIC" },
+    { value: "FLUCTUATING", labelKey: "opt.expCurves.FLUCTUATING" },
   ]
 
   return (
@@ -129,6 +134,7 @@ export default function TraitsTab() {
             labelKey="opt.updateBaseStatsToGeneration.label"
             tipKey="opt.updateBaseStatsToGeneration.tip"
             options={generations}
+            valueType="number"
             disabled={baseStatisticsMod === "UNCHANGED" || !updateBaseStats}
           />
 
@@ -144,6 +150,15 @@ export default function TraitsTab() {
               labelKey="opt.bstShuffleSwapLegendaries.label"
               tipKey="opt.bstShuffleSwapLegendaries.tip"
               disabled={bstMod === "UNCHANGED"}
+            />
+            <SliderRow
+              field="bstBuffNerfMaxPercentage"
+              labelKey="opt.bstBuffNerfMaxPercentage.label"
+              tipKey="opt.bstBuffNerfMaxPercentage.tip"
+              min={10}
+              max={50}
+              unit="%"
+              disabled={bstMod !== "RANDOM_BUFF_NERF"}
             />
           </AvPanel>
         </div>
@@ -243,6 +258,12 @@ export default function TraitsTab() {
               tipKey="opt.abilitiesFollowMegaEvolutions.tip"
               disabled={abilitiesMod === "UNCHANGED"}
             />
+            <ToggleRow
+              field="ensureTwoAbilities"
+              labelKey="opt.ensureTwoAbilities.label"
+              tipKey="opt.ensureTwoAbilities.tip"
+              disabled={abilitiesMod === "UNCHANGED"}
+            />
           </AvPanel>
         </div>
       </AvPanel>
@@ -329,6 +350,19 @@ export default function TraitsTab() {
               labelKey="opt.adjustEvolutionLevels.label"
               tipKey="opt.adjustEvolutionLevels.tip"
               disabled={evolutionsMod === "UNCHANGED"}
+            />
+            <ToggleRow
+              field="estimateLevelForEvolutionImprovements"
+              labelKey="opt.estimateLevelForEvolutionImprovements.label"
+              tipKey="opt.estimateLevelForEvolutionImprovements.tip"
+            />
+            <SliderRow
+              field="makeEvolutionsEasierLvl"
+              labelKey="opt.makeEvolutionsEasierLvl.label"
+              tipKey="opt.makeEvolutionsEasierLvl.tip"
+              min={20}
+              max={65}
+              disabled={!makeEvolutionsEasier}
             />
           </AvPanel>
         </div>

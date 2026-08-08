@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useCallback } from "react"
-import { useForm, FormProvider } from "react-hook-form"
+import { useForm, FormProvider, useFormContext, useWatch, Controller } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useTranslations } from "next-intl"
 import {
@@ -93,53 +93,75 @@ function RomFileSelector({ onDryRun }: { onDryRun: (file: File) => Promise<void>
 }
 
 /**
- * General options panel with top-level toggles (shell — per-control wiring in later pass).
+ * A top-level general option: label + sub-text on the left, form-bound toggle on
+ * the right. Binds directly to a boolean RandomizerSettings field.
  */
-function GeneralOptionsPanel({ limitPokemon }: { limitPokemon: boolean }) {
+function GeneralOptionToggle({
+  field,
+  labelKey,
+  subKey,
+}: {
+  field: keyof RandomizerSettings
+  labelKey: string
+  subKey: string
+}) {
   const t = useTranslations("randomizer")
+  const form = useFormContext<RandomizerSettings>()
+  return (
+    <Controller
+      control={form.control}
+      name={field}
+      render={({ field: { value, onChange } }) => (
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-sm font-medium">{t(labelKey)}</p>
+            <p className="text-xs text-txt-muted">{t(subKey)}</p>
+          </div>
+          <Toggle on={Boolean(value)} onChange={onChange} />
+        </div>
+      )}
+    />
+  )
+}
+
+/**
+ * General options panel — the top-level toggles, wired to the form.
+ * The Limit Pokémon full modal (per-gen picker) is a later pass; here the
+ * boolean persists and reveals a summary sub-panel.
+ */
+function GeneralOptionsPanel() {
+  const t = useTranslations("randomizer")
+  const form = useFormContext<RandomizerSettings>()
+  const limitPokemon = useWatch({ control: form.control, name: "limitPokemon" })
 
   return (
     <AvPanel title={t("chrome.generalOptions")} icon="sliders">
       <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-sm font-medium">{t("chrome.limitPokemon")}</p>
-            <p className="text-xs text-txt-muted">{t("chrome.limitPokemonSub")}</p>
-          </div>
-          <Toggle on={false} onChange={() => {}} />
-        </div>
-
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-sm font-medium">{t("chrome.banIrregularAltFormes")}</p>
-            <p className="text-xs text-txt-muted">{t("chrome.banIrregularAltFormesSub")}</p>
-          </div>
-          <Toggle on={false} onChange={() => {}} />
-        </div>
-
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-sm font-medium">{t("chrome.banPrematureEvos")}</p>
-            <p className="text-xs text-txt-muted">{t("chrome.banPrematureEvosSub")}</p>
-          </div>
-          <Toggle on={false} onChange={() => {}} />
-        </div>
-
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-sm font-medium">{t("chrome.randomizeIntroMon")}</p>
-            <p className="text-xs text-txt-muted">{t("chrome.randomizeIntroMonSub")}</p>
-          </div>
-          <Toggle on={false} onChange={() => {}} />
-        </div>
-
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-sm font-medium">{t("chrome.raceMode")}</p>
-            <p className="text-xs text-txt-muted">{t("chrome.raceModeSub")}</p>
-          </div>
-          <Toggle on={false} onChange={() => {}} />
-        </div>
+        <GeneralOptionToggle
+          field="limitPokemon"
+          labelKey="chrome.limitPokemon"
+          subKey="chrome.limitPokemonSub"
+        />
+        <GeneralOptionToggle
+          field="banIrregularAltFormes"
+          labelKey="chrome.banIrregularAltFormes"
+          subKey="chrome.banIrregularAltFormesSub"
+        />
+        <GeneralOptionToggle
+          field="banPrematureEvos"
+          labelKey="chrome.banPrematureEvos"
+          subKey="chrome.banPrematureEvosSub"
+        />
+        <GeneralOptionToggle
+          field="randomizeIntroMon"
+          labelKey="chrome.randomizeIntroMon"
+          subKey="chrome.randomizeIntroMonSub"
+        />
+        <GeneralOptionToggle
+          field="raceMode"
+          labelKey="chrome.raceMode"
+          subKey="chrome.raceModeSub"
+        />
 
         {limitPokemon && (
           <AvPanel
@@ -236,7 +258,6 @@ export function RandomizerEditor() {
   const t = useTranslations("randomizer")
   const [activeTab, setActiveTab] = useState<(typeof RANDOMIZER_TABS)[number]["value"]>("traits")
   const [selectedGame, setSelectedGame] = useState<string>("")
-  const [limitPokemon, setLimitPokemon] = useState(false)
   const [saveModalOpen, setSaveModalOpen] = useState(false)
   const [presetName, setPresetName] = useState("")
   const [presetDescription, setPresetDescription] = useState("")
@@ -316,7 +337,7 @@ export function RandomizerEditor() {
         </AvPanel>
 
         {/* General Options */}
-        <GeneralOptionsPanel limitPokemon={limitPokemon} />
+        <GeneralOptionsPanel />
 
         {/* Settings Tabs */}
         <AvPanel className="mb-5">

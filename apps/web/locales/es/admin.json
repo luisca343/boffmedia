@@ -1055,7 +1055,8 @@
       "namePlaceholder": "Nombre del preset",
       "descriptionPlaceholder": "Descripción (opcional)",
       "presetSaved": "Preset guardado",
-      "saveError": "No se pudo guardar el preset"
+      "saveError": "No se pudo guardar el preset",
+      "cpgStub": "Gráficos de jugador personalizado — próximamente."
     },
     "quick": {
       "title": "Randomizar ROM",
@@ -1082,7 +1083,55 @@
       "evolutions": "Evoluciones de Pokémon",
       "evolutionsMode": "Modo Evoluciones",
       "expCurves": "Curvas de Experiencia",
-      "expCurveMode": "Modo Curva de Experiencia"
+      "expCurveMode": "Modo Curva de Experiencia",
+      "pokemonPalettes": "Paletas de Pokémon",
+      "pokemonPalettesMode": "Modo Paletas de Pokémon",
+      "customPlayerGraphics": "Gráficos de Jugador Personalizados",
+      "moveData": "Datos de Movimientos",
+      "pokemonMovesets": "Movesets de Pokémon",
+      "pokemonMovesetsMode": "Modo de Movesets",
+      "wildPokemon": "Pokémon Salvaje",
+      "wildTypeRestrictions": "Restricciones de Tipo",
+      "wildTypeRestrictionsMode": "Modo de Restricción de Tipo",
+      "encounterGrouping": "Pokémon Salvaje — Agrupación",
+      "encounterGroupingMode": "Modo de Agrupación de Encuentros",
+      "evolutionRestrictions": "Restricciones de Evolución",
+      "evolutionRestrictionsMode": "Modo de Restricciones de Evolución",
+      "wildCatchLevel": "Pokémon Salvaje — Captura y Nivel",
+      "tmMoves": "Movimientos de MT",
+      "tmMovesMode": "Modo de Movimientos de MT",
+      "tmHmCompatibility": "Compatibilidad MT/HM",
+      "tmHmCompatibilityMode": "Modo de Compatibilidad MT/HM",
+      "tutorMoves": "Movimientos de Tutor",
+      "tutorMovesMode": "Modo de Movimientos de Tutor",
+      "tutorMovesCompatibility": "Compatibilidad de Tutor",
+      "tutorMovesCompatibilityMode": "Modo de Compatibilidad de Tutor",
+      "typeEffectiveness": "Efectividad de Tipos",
+      "typeEffectivenessMode": "Modo de Efectividad de Tipos",
+      "miscTweaks": "Ajustes Varios",
+      "starterPokemon": "Pokémon Iniciales",
+      "starterMode": "Modo de Iniciales",
+      "typeRestrictions": "Restricciones de Tipo",
+      "typeRestrictionsMode": "Modo de Restricciones de Tipo",
+      "starterModifiers": "Modificadores de Iniciales",
+      "staticPokemon": "Pokémon Estáticos",
+      "staticPokemonMode": "Modo de Pokémon Estáticos",
+      "inGameTrades": "Intercambios del Juego",
+      "inGameTradesMode": "Modo de Intercambios del Juego",
+      "trainerPokemon": "Pokémon de Entrenadores",
+      "battleStyle": "Estilo de Combate",
+      "battleStyleMode": "Modo de Estilo de Combate",
+      "totemPokemon": "Pokémon Tótem / Aliados / Auras",
+      "totemMode": "Modo de Pokémon Tótem",
+      "allyMode": "Modo de Pokémon Aliado",
+      "auraMode": "Modo de Aura",
+      "fieldItems": "Objetos de Campo",
+      "fieldItemsMode": "Modo de Objetos de Campo",
+      "specialShopItems": "Objetos de Tiendas Especiales",
+      "specialShopItemsMode": "Modo de Objetos de Tiendas Especiales",
+      "shopItems": "Objetos de Tiendas",
+      "pickupItems": "Objetos de Recogida",
+      "pickupItemsMode": "Modo de Objetos de Recogida"
     },
     "opt": {
       "baseStatisticsMod": {
@@ -1243,12 +1292,729 @@
         "gen9": "Generación 9"
       },
       "expCurves": {
-        "FLAT": "Plano",
-        "MEDIUM_FAST": "Rápido Medio",
-        "MEDIUM_SLOW": "Lento Medio",
+        "MEDIUM_FAST": "Medio Rápido",
+        "MEDIUM_SLOW": "Medio Lento",
         "SLOW": "Lento",
         "FAST": "Rápido",
-        "SLOW_THEN_VERY_FAST": "Lento Luego Muy Rápido"
+        "ERRATIC": "Errático",
+        "FLUCTUATING": "Fluctuante"
+      },
+      "pokemonPalettesMod": {
+        "UNCHANGED": "Sin cambios",
+        "RANDOM": "Aleatorio"
+      },
+      "pokemonPalettesFollowTypes": {
+        "label": "Seguir Tipos",
+        "tip": "Cuando se selecciona, los colores de Pokémon dependerán del tipo. Por ejemplo, un Bulbasaur de tipo Fuego podría ser rojo, y un Groudon de tipo Planta podría ser verde."
+      },
+      "pokemonPalettesFollowEvolutions": {
+        "label": "Seguir Evoluciones",
+        "tip": "Cada especie de Pokémon tendrá colores similares a los que evoluciona hacia/desde. Cuando las evoluciones son aleatorizadas, los Pokémon obtienen colores similares a sus nuevas evoluciones/preevoluciones."
+      },
+      "pokemonPalettesShinyFromNormal": {
+        "label": "Shiny desde Normal",
+        "tip": "Los colores brillantes de cada especie de Pokémon se convierten en los colores que normalmente tendría, si las paletas no fueran aleatorizadas."
+      },
+      "randomizeMovePowers": {
+        "label": "Aleatorizar Poder del Movimiento",
+        "tip": "Aleatorizar el poder de movimientos dañinos entre 20 y 150."
+      },
+      "randomizeMoveAccuracies": {
+        "label": "Aleatorizar Precisión del Movimiento",
+        "tip": "Aleatorizar precisión de movimientos con restricciones para evitar movimientos rotos."
+      },
+      "randomizeMovePPs": {
+        "label": "Aleatorizar PP del Movimiento",
+        "tip": "Aleatorizar el PP de cada movimiento en múltiplos de 5 (5-40)."
+      },
+      "randomizeMoveTypes": {
+        "label": "Aleatorizar Tipos de Movimiento",
+        "tip": "Aleatorizar el tipo de la mayoría de movimientos."
+      },
+      "randomizeMoveNames": {
+        "label": "Aleatorizar Nombres de Movimientos",
+        "tip": "Aleatorizar nombres de movimientos basados en su tipo (solo Gen 3+)."
+      },
+      "randomizeMoveCategory": {
+        "label": "Aleatorizar Categoría de Movimiento",
+        "tip": "Aleatorizar la categoría de movimientos dañinos entre Físico y Especial (Gen 4+)."
+      },
+      "updateMoves": {
+        "label": "Actualizar Movimientos a Generación",
+        "tip": "Actualizar estadísticas de movimientos a sus valores en la generación seleccionada."
+      },
+      "updateMovesToGeneration": {
+        "label": "Generación",
+        "tip": "Selecciona la generación para actualizar estadísticas de movimientos."
+      },
+      "startWithGuaranteedMoves": {
+        "label": "Movimientos Garantizados en Nivel 1",
+        "tip": "Cada Pokémon obtiene una cantidad garantizada de movimientos en nivel 1; establece el contador con el deslizador."
+      },
+      "guaranteedMoveCount": {
+        "label": "Cantidad de Movimientos Garantizados",
+        "tip": "Número de movimientos garantizados en nivel 1 (1-4; 4 = moveset completo)."
+      },
+      "reorderDamagingMoves": {
+        "label": "Reordenar Movimientos Dañinos",
+        "tip": "Reordena los movimientos para que los menos poderosos se aprendan antes que los poderosos."
+      },
+      "blockBrokenMovesetMoves": {
+        "label": "Sin Movimientos Rotos",
+        "tip": "Batea movimientos que pueden romper el juego de los movesets aleatorios."
+      },
+      "movesetsForceGoodDamaging": {
+        "label": "Forzar % de Movimientos Dañinos Buenos",
+        "tip": "Fuerza un porcentaje de movesets aleatorios para incluir buenos movimientos dañinos."
+      },
+      "movesetsGoodDamagingPercent": {
+        "label": "% Dañinos Buenos",
+        "tip": "Porcentaje de movimientos forzados a ser buenos movimientos dañinos."
+      },
+      "evolutionMovesForAll": {
+        "label": "Movimientos de Evolución para Todos",
+        "tip": "Cada Pokémon aprende un movimiento al evolucionar."
+      },
+      "movesetsMod": {
+        "UNCHANGED": "Sin cambios",
+        "RANDOM_PREFER_SAME_TYPE": "Aleatorio (prefiriendo mismo tipo)",
+        "COMPLETELY_RANDOM": "Completamente aleatorio",
+        "METRONOME_ONLY": "Solo Metronoma"
+      },
+      "randomizeWildPokemon": {
+        "label": "Randomizar Pokémon Salvajes",
+        "tip": "Determina si se deben randomizar los encuentros de Pokémon salvajes."
+      },
+      "useTimeBasedEncounters": {
+        "label": "Usar Encuentros Basados en Tiempo",
+        "tip": "Afecta a juegos que tienen estaciones o encuentros de mañana/día/noche. Si está marcado, cada uno de estos conjuntos se tratará como un área separada. Si no está marcado, la mañana/día/noche y todas las estaciones usarán los mismos datos de encuentro."
+      },
+      "blockWildLegendaries": {
+        "label": "No Usar Legendarios",
+        "tip": "Evita que Pokémon legendarios aparezcan como encuentros salvajes."
+      },
+      "randomizeWildPokemonHeldItems": {
+        "label": "Randomizar Objetos Sostenidos",
+        "tip": "Randomizar los objetos sostenidos por Pokémon salvajes, incluyendo si pueden tener uno o no."
+      },
+      "banBadRandomWildPokemonHeldItems": {
+        "label": "Prohibir Objetos Malos",
+        "tip": "Eliminar objetos 'malos' que no hacen mucho del conjunto de posibles objetos aleatorios para Pokémon salvajes, como bayas y cartas."
+      },
+      "allowWildAltFormes": {
+        "label": "Permitir Formas Alternativas",
+        "tip": "Permitir que formas alternativas de Pokémon, como las diversas formas de Rotom o Deoxys, aparezcan como Pokémon salvajes."
+      },
+      "keepWildTypeThemes": {
+        "label": "Mantener Temas de Conjunto/Zona",
+        "tip": "Todos los conjuntos de encuentros que originalmente tenían un tema de tipo mantendrán ese tema de tipo."
+      },
+      "splitWildZoneByEncounterTypes": {
+        "label": "Dividir por Tipos de Encuentro",
+        "tip": "Dividir el juego, mapa o ubicación por tipos de encuentro, como caminata, surf, pesca y golpe de roca."
+      },
+      "keepWildEvolutionFamilies": {
+        "label": "Mantener Relaciones",
+        "tip": "Si múltiples Pokémon relacionados por evolución aparecen en la misma zona, sus reemplazos también estarán relacionados de la misma manera."
+      },
+      "useMinimumCatchRate": {
+        "label": "Establecer Tasa de Captura Mínima",
+        "tip": "Si está seleccionado, cada Pokémon en el juego con una tasa de captura inferior a cierto nivel tendrá su tasa de captura aumentada."
+      },
+      "minimumCatchRateLevel": {
+        "label": "Nivel de Tasa de Captura",
+        "tip": "Selecciona el nivel de tasa de captura mínima: Nivel 1 (Normal ~10-18%), Nivel 2 (Mejorado ~17-26%), Nivel 3 (Super ~27-37%), Nivel 4 (Ultra ~34-44%), o Nivel 5 (Garantizado)."
+      },
+      "wildLevelsModified": {
+        "label": "Modificador de Nivel por Porcentaje",
+        "tip": "Aplicar un modificador de nivel basado en porcentaje para cada Pokémon salvaje en el juego."
+      },
+      "wildLevelModifier": {
+        "label": "Modificador de Nivel %",
+        "tip": "Ajustar los niveles de Pokémon salvajes por este porcentaje (p. ej., -50% a +50%)."
+      },
+      "catchEmAllEncounters": {
+        "label": "Modo Atrapalos Todos",
+        "tip": "Cada Pokémon aleatorio elegido para reemplazar un encuentro será uno que no haya sido elegido antes. Una vez que se haya elegido cada Pokémon una vez, cualquier Pokémon puede ser elegido."
+      },
+      "similarStrengthEncounters": {
+        "label": "Fortaleza Similar",
+        "tip": "El Pokémon aleatorio que reemplaza cada Pokémon será de poder similar al original."
+      },
+      "balanceShakingGrass": {
+        "label": "Equilibrar Encuentros de Bajo Nivel",
+        "tip": "Establecer un límite superior para el total de estadísticas base de Pokémon salvajes basado en su nivel al usar la configuración de Fortaleza Similar."
+      },
+      "wildPokemonTypeMod": {
+        "NONE": "Ninguno",
+        "KEEP_PRIMARY": "Mantener Tipo Primario",
+        "RANDOM_THEMES": "Temas de Zona Aleatorios"
+      },
+      "wildPokemonZoneMod": {
+        "NONE": "Máximo Posible",
+        "GAME": "1 En Todo el Juego",
+        "NAMED_LOCATION": "1 Por Ubicación Nombrada",
+        "MAP": "1 Por Mapa",
+        "ENCOUNTER_SET": "1 Por Conjunto de Encuentro"
+      },
+      "wildPokemonEvolutionMod": {
+        "NONE": "Ninguno",
+        "BASIC_ONLY": "Solo Pokémon Básicos",
+        "KEEP_STAGE": "Mismo Estadio de Evolución"
+      },
+      "tmsMod": {
+        "UNCHANGED": "Sin cambios",
+        "RANDOM": "Aleatorio"
+      },
+      "blockBrokenTMMoves": {
+        "label": "Sin Movimientos Rotos",
+        "tip": "Activar esta casilla bloqueará los movimientos que pueden romper el juego temprano o tardíamente en los MT aleatorizados. En juegos de primera generación, Dragon Rage, SonicBoom, Spore y todos los movimientos OHKO están prohibidos. A partir de la segunda generación en adelante, solo SonicBoom y Dragon Rage están prohibidos (porque los movimientos OHKO y dormir son significativamente menos peligrosos)."
+      },
+      "keepFieldMoveTMs": {
+        "label": "Mantener Movimientos de Campo en MT",
+        "tip": "Si seleccionas esto, los MT que contienen movimientos de uso en campo se dejarán sin cambios. Esto incluye movimientos como Dig y Teleport, pero no movimientos de curación (Softboiled)."
+      },
+      "tmsForceGoodDamaging": {
+        "label": "Forzar % de Movimientos de Daño Útiles",
+        "tip": "Seleccionar esta opción te permitirá usar el deslizador de abajo para elegir un porcentaje de MT aleatorizados que serán forzados a ser movimientos de daño útiles. Ten en cuenta que otros MT pueden ser seleccionados como movimientos de daño útiles aleatoriamente, esto es simplemente una oportunidad adicional."
+      },
+      "tmsGoodDamagingPercent": {
+        "label": "% de Movimientos de Daño Útiles",
+        "tip": "El porcentaje de MT aleatorizados que serán forzados a ser movimientos de daño útiles."
+      },
+      "tmsHmsCompatibilityMod": {
+        "UNCHANGED": "Sin cambios",
+        "RANDOM_PREFER_TYPE": "Aleatorio (preferir mismo tipo)",
+        "COMPLETELY_RANDOM": "Aleatorio (completamente)",
+        "FULL": "Compatibilidad Total"
+      },
+      "tmsFollowEvolutions": {
+        "label": "Seguir Evoluciones",
+        "tip": "Cuando esto está seleccionado y la compatibilidad de MT es aleatorizada, las evoluciones de un Pokémon heredarán las compatibilidades de MT de ese Pokémon. Además, cuando un Pokémon evoluciona, cada MT tendrá: Aleatorio (preferir mismo tipo): 90% de probabilidad de volverse aprendible si el Pokémon acaba de ganar su tipo a través de la evolución, 10% de otro modo. Aleatorio (completamente): 25% de probabilidad de volverse aprendible sin importar el tipo."
+      },
+      "tmLevelUpMoveSanity": {
+        "label": "Cordura de Movimientos MT/Nivel",
+        "tip": "Si seleccionas esta opción, entonces los Pokémon garantizados aprenderán MT de movimientos que aprenden por nivel. De otro modo, la compatibilidad de movimientos se dejará sin cambios o se decidirá aleatoriamente, dependiendo de tus otras opciones."
+      },
+      "fullHMCompat": {
+        "label": "Compatibilidad Total de HM",
+        "tip": "Si seleccionas esta opción, entonces cada Pokémon aprenderá cada HM, sin importar ninguna otra opción que verifiques."
+      },
+      "moveTutorMovesMod": {
+        "UNCHANGED": "Sin cambios",
+        "RANDOM": "Aleatorio"
+      },
+      "blockBrokenTutorMoves": {
+        "label": "Sin Movimientos Rotos",
+        "tip": "Activar esta casilla bloqueará los movimientos que pueden romper el juego temprano o tardíamente en los tutores aleatorizados. En juegos de primera generación, Dragon Rage, SonicBoom, Spore y todos los movimientos OHKO están prohibidos. A partir de la segunda generación en adelante, solo SonicBoom y Dragon Rage están prohibidos (porque los movimientos OHKO y dormir son significativamente menos peligrosos)."
+      },
+      "keepFieldMoveTutors": {
+        "label": "Mantener Movimientos de Campo en Tutor",
+        "tip": "Si seleccionas esto, los tutores que contienen movimientos de uso en campo se dejarán sin cambios. Esto incluye movimientos como Headbutt, pero no movimientos de curación (Softboiled)."
+      },
+      "tutorsForceGoodDamaging": {
+        "label": "Forzar % de Movimientos de Daño Útiles",
+        "tip": "Seleccionar esta opción te permitirá usar el deslizador de abajo para elegir un porcentaje de tutores aleatorizados que serán forzados a ser movimientos de daño útiles. Ten en cuenta que otros tutores pueden ser seleccionados como movimientos de daño útiles aleatoriamente, esto es simplemente una oportunidad adicional."
+      },
+      "tutorsGoodDamagingPercent": {
+        "label": "% de Movimientos de Daño Útiles",
+        "tip": "El porcentaje de tutores de movimientos aleatorizados que serán forzados a ser movimientos de daño útiles."
+      },
+      "moveTutorsCompatibilityMod": {
+        "UNCHANGED": "Sin cambios",
+        "RANDOM_PREFER_TYPE": "Aleatorio (preferir mismo tipo)",
+        "COMPLETELY_RANDOM": "Aleatorio (completamente)",
+        "FULL": "Compatibilidad Total"
+      },
+      "tutorFollowEvolutions": {
+        "label": "Seguir Evoluciones",
+        "tip": "Cuando esto está seleccionado y la compatibilidad del tutor de movimientos es aleatorizada, las evoluciones de un Pokémon heredarán las compatibilidades del tutor de movimientos de ese Pokémon. Además, cuando un Pokémon evoluciona, cada movimiento tendrá: Aleatorio (preferir mismo tipo): 90% de probabilidad de volverse aprendible si el Pokémon acaba de ganar su tipo a través de la evolución, 10% de otro modo. Aleatorio (completamente): 25% de probabilidad de volverse aprendible sin importar el tipo."
+      },
+      "tutorLevelUpMoveSanity": {
+        "label": "Cordura de Movimientos Tutor/Nivel",
+        "tip": "Si seleccionas esta opción, entonces los Pokémon garantizados aprenderán tutores de movimientos que aprenden por nivel. De otro modo, la compatibilidad de movimientos se dejará sin cambios o se decidirá aleatoriamente, dependiendo de tus otras opciones."
+      },
+      "bstBuffNerfMaxPercentage": {
+        "label": "Buff/Nerf Aleatorio (%)",
+        "tip": "Cambio máximo del BST en porcentaje al usar Buff/Nerf Aleatorio (p. ej. 20 = 80–120 % del BST original)."
+      },
+      "ensureTwoAbilities": {
+        "label": "Garantizar Dos Habilidades",
+        "tip": "Al aleatorizar habilidades, garantiza que cada Pokémon tenga dos habilidades."
+      },
+      "estimateLevelForEvolutionImprovements": {
+        "label": "Usar Niveles de Evolución Estimados",
+        "tip": "Las evoluciones modificadas por 'Cambiar Evoluciones Imposibles' o 'Facilitar Evoluciones' usarán niveles estimados a partir del resto de evoluciones del juego en vez de niveles predefinidos."
+      },
+      "makeEvolutionsEasierLvl": {
+        "label": "Evolucionar Antes del Nivel",
+        "tip": "Nivel al que cada Pokémon debería alcanzar su etapa final cuando 'Facilitar Evoluciones' está activo. En el valor máximo no se cambian los niveles (las demás mejoras siguen aplicándose)."
+      },
+      "typeEffectivenessMod": {
+        "UNCHANGED": "Sin cambios",
+        "RANDOM": "Aleatorio",
+        "RANDOM_BALANCED": "Aleatorio (equilibrado)",
+        "KEEP_IDENTITIES": "Mantener Identidades de Tipo",
+        "INVERSE": "Inverso"
+      },
+      "inverseTypesRandomImmunities": {
+        "label": "Añadir Inmunidades Aleatorias",
+        "tip": "Algunas debilidades se convierten en inmunidades. La cantidad de inmunidades añadidas coincide con la del juego base."
+      },
+      "updateTypeEffectiveness": {
+        "label": "Actualizar Efectividad de Tipos",
+        "tip": "Actualiza debilidades/resistencias/inmunidades a sus valores de Gen 6+ antes de aleatorizar. No añade el tipo Hada."
+      },
+      "miscBWExpPatch": {
+        "label": "Parche EXP de B/N",
+        "tip": "Adapta R/A/Am y O/P/C al sistema de EXP de Blanco/Negro (solo en inglés)."
+      },
+      "miscNerfXAccuracy": {
+        "label": "Debilitar Precisión X",
+        "tip": "Evita que Precisión X de Gen 1 funcione con movimientos de sueño, atrapado y de KO directo."
+      },
+      "miscFixCritRate": {
+        "label": "\"Corregir\" Ratio de Crítico",
+        "tip": "Fija el ratio de crítico de Gen 1 en 1/16 en vez de depender de la Velocidad; Foco Energía/Aumento Crítico y los movimientos de alto crítico se comportan como en juegos posteriores."
+      },
+      "miscFastestText": {
+        "label": "Texto Más Rápido",
+        "tip": "Todos los cuadros de texto aparecen con el mínimo retardo, sin importar la velocidad de texto configurada."
+      },
+      "miscRunningShoesIndoors": {
+        "label": "Zapatillas de Correr en Interiores",
+        "tip": "Permite usar las Zapatillas de Correr en cualquier lugar, como en juegos posteriores."
+      },
+      "miscRandomizePCPotion": {
+        "label": "Aleatorizar Poción del PC",
+        "tip": "Aleatoriza la Poción inicial del PC de objetos por otro objeto útil."
+      },
+      "miscAllowPikachuEvolution": {
+        "label": "Permitir Evolución de Pikachu",
+        "tip": "Permite evolucionar Pikachu a Raichu con una Piedra Trueno (Amarillo)."
+      },
+      "miscGiveNationalDexAt": {
+        "label": "Dar Pokédex Nacional al Inicio",
+        "tip": "Otorga la Pokédex Nacional al inicio junto con la Pokédex regional."
+      },
+      "miscForceChallengeMode": {
+        "label": "Forzar Modo Reto",
+        "tip": "Activa a la fuerza el Modo Reto, ignorando el Sistema de Claves (BW2). No podrás acceder a Fácil o Normal."
+      },
+      "miscLowerCasePokemonNames": {
+        "label": "Nombres de Pokémon en Minúsculas",
+        "tip": "Muestra los nombres de Pokémon en formato Camel Case (p. ej. VENUSAUR pasa a Venusaur)."
+      },
+      "miscRandomizeCatchingTutorial": {
+        "label": "Aleatorizar Tutorial de Captura",
+        "tip": "Aleatoriza el Pokémon que aparece en el tutorial de captura del juego."
+      },
+      "miscBanLuckyEgg": {
+        "label": "Prohibir Huevo Suerte",
+        "tip": "Impide que el Huevo Suerte aparezca como objeto aleatorizado."
+      },
+      "miscNoFreeLuckyEgg": {
+        "label": "Sin Huevo Suerte Gratis",
+        "tip": "Evita que el profesor regale un Huevo Suerte gratis (BW/BW2)."
+      },
+      "miscBanBigMoneyManiac": {
+        "label": "Prohibir Objetos de Maníaco Caros",
+        "tip": "Prohíbe objetos de maníaco con valor superior a 10.000 $ en los grupos de objetos aleatorizados."
+      },
+      "miscSOSBattles": {
+        "label": "Todos los Pokémon Salvajes Pueden Pedir Ayuda",
+        "tip": "Permite que cualquier Pokémon salvaje pida ayuda (combates SOS), no solo los que podían originalmente."
+      },
+      "miscBalanceStaticLevels": {
+        "label": "Equilibrar Niveles de Pokémon Estáticos",
+        "tip": "Reequilibra los niveles de los Pokémon estáticos (fósiles en RF/VH y BW1)."
+      },
+      "miscRetainAltFormes": {
+        "label": "No Revertir Formas Alternativas Temporales",
+        "tip": "Los Pokémon del equipo conservan su forma alternativa tras un reinicio/combate en vez de revertir."
+      },
+      "miscRunWithoutRunningShoes": {
+        "label": "Correr Sin Zapatillas de Correr",
+        "tip": "Permite correr antes de conseguir las Zapatillas de Correr."
+      },
+      "miscFasterHPAndEXPBars": {
+        "label": "Barras de PS y EXP Más Rápidas",
+        "tip": "Duplica la velocidad de las barras de PS y EXP en combate."
+      },
+      "miscFastDistortionWorld": {
+        "label": "Mundo Distorsión Rápido",
+        "tip": "Omite la mayor parte del Mundo Distorsión y te lleva directo al combate con Helio (Platino)."
+      },
+      "miscUpdateRotomFormeTyping": {
+        "label": "Actualizar Tipos de las Formas de Rotom",
+        "tip": "Actualiza las formas electrodoméstico de Rotom a sus tipos de Gen 5+ (p. ej. Rotom Lavadora pasa a Eléctrico/Agua)."
+      },
+      "miscDisableLowHPMusic": {
+        "label": "Desactivar Música de PS Bajos",
+        "tip": "Desactiva la música de advertencia de PS bajos para que siga sonando la pista actual."
+      },
+      "startersMod": {
+        "UNCHANGED": "Sin cambios",
+        "CUSTOM": "Personalizado",
+        "COMPLETELY_RANDOM": "Aleatorio (completo)",
+        "RANDOM_WITH_TWO_EVOLUTIONS": "Aleatorio (básico con 2 evoluciones)",
+        "RANDOM_BASIC": "Aleatorio (cualquier básico)"
+      },
+      "customStarter": {
+        "label1": "Inicial Personalizado 1",
+        "label2": "Inicial Personalizado 2",
+        "label3": "Inicial Personalizado 3",
+        "tip": "ID de especie del inicial personalizado. El editor web aún no dispone de lista de nombres, así que introduce el índice de especie de FVX (se conserva correctamente al exportar)."
+      },
+      "startersTypeMod": {
+        "NONE": "Ninguna",
+        "FIRE_WATER_GRASS": "Fuego, Agua, Planta",
+        "TRIANGLE": "Triángulo de Tipos",
+        "UNIQUE": "Únicos",
+        "SINGLE_TYPE": "Tipo Único"
+      },
+      "startersSingleType": {
+        "label": "Tipo Único",
+        "tip": "Todos los iniciales aleatorios serán de este tipo; 'Aleatorio' elige un tipo para todos.",
+        "RANDOM": "Aleatorio"
+      },
+      "pokemonTypes": {
+        "NORMAL": "Normal",
+        "FIGHTING": "Lucha",
+        "FLYING": "Volador",
+        "GRASS": "Planta",
+        "WATER": "Agua",
+        "FIRE": "Fuego",
+        "ROCK": "Roca",
+        "GROUND": "Tierra",
+        "PSYCHIC": "Psíquico",
+        "BUG": "Bicho",
+        "DRAGON": "Dragón",
+        "ELECTRIC": "Eléctrico",
+        "GHOST": "Fantasma",
+        "POISON": "Veneno",
+        "ICE": "Hielo",
+        "STEEL": "Acero",
+        "DARK": "Siniestro",
+        "FAIRY": "Hada"
+      },
+      "startersNoDualTypes": {
+        "label": "Sin Tipos Dobles",
+        "tip": "Los iniciales elegidos no serán de tipo doble (aún pueden evolucionar a tipos dobles)."
+      },
+      "allowStarterAltFormes": {
+        "label": "Permitir Formas Alternativas",
+        "tip": "Permite que formas alternativas (p. ej. Rotom, Deoxys) aparezcan como iniciales."
+      },
+      "startersNoLegendaries": {
+        "label": "No Usar Legendarios",
+        "tip": "Los Pokémon legendarios no serán elegidos como iniciales."
+      },
+      "startersBSTMinimum": {
+        "label": "BST Mínimo",
+        "tip": "Ningún Pokémon con un BST inferior a este valor podrá ser inicial."
+      },
+      "startersBSTMaximum": {
+        "label": "BST Máximo",
+        "tip": "Ningún Pokémon con un BST superior a este valor podrá ser inicial."
+      },
+      "randomizeStartersHeldItems": {
+        "label": "Aleatorizar Objetos de Iniciales",
+        "tip": "Aleatoriza los objetos que llevan los iniciales cuando sea posible."
+      },
+      "banBadRandomStarterHeldItems": {
+        "label": "Prohibir Objetos Malos",
+        "tip": "Elimina objetos de bajo valor (bayas, correo) del grupo de objetos aleatorios de iniciales."
+      },
+      "staticPokemonMod": {
+        "UNCHANGED": "Sin cambios",
+        "RANDOM_MATCHING": "Cambiar Legendarios y Cambiar Normales",
+        "COMPLETELY_RANDOM": "Aleatorio (completo)",
+        "SIMILAR_STRENGTH": "Aleatorio (fuerza similar)"
+      },
+      "swapStaticMegaEvos": {
+        "label": "Cambiar Mega-Evolucionables",
+        "tip": "Cambia Pokémon estáticos capaces de Mega-Evolución por otros que también puedan."
+      },
+      "limit600": {
+        "label": "Aleatorizar BST 600+",
+        "tip": "Fuerza aleatorización pura en todos los Pokémon estáticos con BST de 600 o más."
+      },
+      "allowStaticAltFormes": {
+        "label": "Permitir Formas Alternativas",
+        "tip": "Permite que formas alternativas aparezcan como Pokémon estáticos."
+      },
+      "limitMainGameLegendaries": {
+        "label": "Limitar Legendarios de la Historia",
+        "tip": "Evita que los legendarios de la historia principal sean reemplazados por Pokémon con mayor BST."
+      },
+      "correctStaticMusic": {
+        "label": "Corregir Música",
+        "tip": "Reproduce la música especial correcta en los encuentros estáticos aleatorizados."
+      },
+      "staticLevelModified": {
+        "label": "Modificador de Nivel Porcentual",
+        "tip": "Activa un modificador de nivel porcentual para cada Pokémon estático."
+      },
+      "staticLevelModifier": {
+        "label": "Modificador de Nivel Estático",
+        "tip": "Cambio porcentual aplicado a los niveles de los Pokémon estáticos."
+      },
+      "inGameTradesMod": {
+        "UNCHANGED": "Sin cambios",
+        "RANDOMIZE_GIVEN": "Aleatorizar Solo el Pokémon Recibido",
+        "RANDOMIZE_GIVEN_AND_REQUESTED": "Aleatorizar Recibido y Solicitado"
+      },
+      "randomizeInGameTradesNicknames": {
+        "label": "Aleatorizar Apodos",
+        "tip": "Aleatoriza los apodos de los Pokémon recibidos en intercambios."
+      },
+      "randomizeInGameTradesOTs": {
+        "label": "Aleatorizar EOs",
+        "tip": "Aleatoriza el Entrenador Original (ID y nombre) de los Pokémon recibidos."
+      },
+      "randomizeInGameTradesIVs": {
+        "label": "Aleatorizar IVs",
+        "tip": "Aleatoriza los IVs de los Pokémon recibidos en intercambios."
+      },
+      "randomizeInGameTradesItems": {
+        "label": "Aleatorizar Objetos",
+        "tip": "Da a cada Pokémon recibido en intercambio un objeto aleatorio."
+      },
+      "trainersMod": {
+        "label": "Pokémon de Entrenadores",
+        "tip": "Cómo se aleatorizan los Pokémon de los entrenadores.",
+        "UNCHANGED": "Sin cambios",
+        "RANDOM": "Aleatorio",
+        "DISTRIBUTED": "Aleatorio (distribución uniforme)",
+        "MAINPLAYTHROUGH": "Aleatorio (distribución uniforme, historia principal)",
+        "TYPE_THEMED": "Temático por Tipo",
+        "TYPE_THEMED_ELITE4_GYMS": "Temático por Tipo (Alto Mando/Gimnasios)",
+        "KEEP_THEMED": "Mantener Temática",
+        "KEEP_THEME_OR_PRIMARY": "Mantener Temática o Tipo Primario"
+      },
+      "battleStyleMod": {
+        "UNCHANGED": "Sin cambios",
+        "RANDOM": "Aleatorio",
+        "SINGLE_STYLE": "Estilo Único"
+      },
+      "battleStyleStyle": {
+        "label": "Estilo de Combate",
+        "tip": "Cuando se elige 'Estilo Único', fija todos los combates de entrenador a este estilo.",
+        "SINGLE_BATTLE": "Combates Individuales",
+        "DOUBLE_BATTLE": "Combates Dobles",
+        "TRIPLE_BATTLE": "Combates Triples",
+        "ROTATION_BATTLE": "Combates de Rotación"
+      },
+      "rivalCarriesStarterThroughout": {
+        "label": "El Rival Conserva su Inicial",
+        "tip": "El rival mantiene su inicial (evolucionado según corresponda) en cada combate."
+      },
+      "trainersUsePokemonOfSimilarStrength": {
+        "label": "Usar Pokémon de Fuerza Similar",
+        "tip": "Los Pokémon de reemplazo tienen una potencia similar al original."
+      },
+      "trainersAvoidDuplicates": {
+        "label": "Evitar Duplicados",
+        "tip": "Los Pokémon aleatorizados de un entrenador son distintos entre sí cuando es posible."
+      },
+      "trainersMatchTypingDistribution": {
+        "label": "Ponderar Tipos por Nº de Pokémon",
+        "tip": "Ajusta el número de entrenadores de cada tipo al número de Pokémon de ese tipo."
+      },
+      "trainersUseLocalPokemon": {
+        "label": "Usar Pokémon Locales",
+        "tip": "Los entrenadores usan solo Pokémon que aparecen en estado salvaje y sus parientes evolutivos."
+      },
+      "trainersBlockLegendaries": {
+        "label": "No Usar Legendarios",
+        "tip": "Los Pokémon legendarios no se asignarán a los entrenadores."
+      },
+      "trainersBlockEarlyWonderGuard": {
+        "label": "Sin Superguarda Temprana",
+        "tip": "Ningún entrenador por debajo del nivel 20 recibirá un Pokémon con Superguarda."
+      },
+      "allowTrainerAlternateFormes": {
+        "label": "Permitir Formas Alternativas",
+        "tip": "Permite que los entrenadores tengan formas alternativas de Pokémon."
+      },
+      "swapTrainerMegaEvos": {
+        "label": "Cambiar Mega-Evolucionables",
+        "tip": "Cambia Pokémon de entrenador que llevan Mega-Piedra por otros que también puedan Mega-Evolucionar."
+      },
+      "shinyChance": {
+        "label": "Pokémon de Entrenador Variocolor Aleatorio",
+        "tip": "Da una probabilidad de 1/256 de que los Pokémon de entrenador sean variocolor."
+      },
+      "randomizeTrainerNames": {
+        "label": "Aleatorizar Nombres de Entrenadores",
+        "tip": "Aleatoriza los nombres de los entrenadores."
+      },
+      "randomizeTrainerClassNames": {
+        "label": "Aleatorizar Nombres de Clase",
+        "tip": "Aleatoriza los nombres de clase de entrenador (p. ej. 'Joven' pasa a 'Inadaptado')."
+      },
+      "trainersEvolveTheirPokemon": {
+        "label": "Los Entrenadores Evolucionan sus Pokémon",
+        "tip": "Garantiza que los Pokémon de entrenador estén evolucionados lo máximo posible para su nivel."
+      },
+      "trainersEvolutionLevelModifier": {
+        "label": "Modificador de Nivel de Evolución",
+        "tip": "Modificador porcentual aplicado a los niveles a los que evolucionan los Pokémon de entrenador."
+      },
+      "trainersLevelModified": {
+        "label": "Modificador de Nivel Porcentual",
+        "tip": "Activa un modificador de nivel porcentual para cada Pokémon de entrenador enemigo."
+      },
+      "trainersLevelModifier": {
+        "label": "Modificador de Nivel de Entrenador",
+        "tip": "Cambio porcentual aplicado a los niveles de los Pokémon de entrenador."
+      },
+      "eliteFourUniquePokemonNumber": {
+        "label": "El Alto Mando Tiene Pokémon Únicos",
+        "tip": "Los entrenadores del Alto Mando/Campeón reciben esta cantidad de Pokémon únicos que no aparecen en ningún otro entrenador."
+      },
+      "additionalBossTrainerPokemon": {
+        "label": "Añadir Pokémon a Entrenadores Jefe",
+        "tip": "Añade esta cantidad de Pokémon a los entrenadores Jefe (máximo 6 en total)."
+      },
+      "additionalImportantTrainerPokemon": {
+        "label": "Añadir Pokémon a Entrenadores Importantes",
+        "tip": "Añade esta cantidad de Pokémon a los entrenadores Importantes (máximo 6 en total)."
+      },
+      "additionalRegularTrainerPokemon": {
+        "label": "Añadir Pokémon a Entrenadores Normales",
+        "tip": "Añade esta cantidad de Pokémon a los entrenadores normales (máximo 6 en total)."
+      },
+      "randomizeHeldItemsForBossTrainerPokemon": {
+        "label": "Objetos — Entrenadores Jefe",
+        "tip": "Añade o reemplaza objetos para los Pokémon de los entrenadores Jefe."
+      },
+      "randomizeHeldItemsForImportantTrainerPokemon": {
+        "label": "Objetos — Entrenadores Importantes",
+        "tip": "Añade o reemplaza objetos para los Pokémon de los entrenadores Importantes."
+      },
+      "randomizeHeldItemsForRegularTrainerPokemon": {
+        "label": "Objetos — Entrenadores Normales",
+        "tip": "Añade o reemplaza objetos para los Pokémon de los entrenadores normales."
+      },
+      "consumableItemsOnlyForTrainerPokemon": {
+        "label": "Solo Consumibles",
+        "tip": "Los objetos de entrenador se eligen entre objetos de un solo uso (sobre todo bayas)."
+      },
+      "sensibleItemsOnlyForTrainerPokemon": {
+        "label": "Objetos Sensatos",
+        "tip": "Los objetos de entrenador se eligen entre objetos que tienen sentido para ese Pokémon."
+      },
+      "highestLevelOnlyGetsItemsForTrainerPokemon": {
+        "label": "Solo el de Mayor Nivel",
+        "tip": "Solo el Pokémon de mayor nivel del entrenador recibe un objeto."
+      },
+      "diverseTypesForBossTrainers": {
+        "label": "Diversidad de Tipos — Entrenadores Jefe",
+        "tip": "Los entrenadores Jefe evitan usar varios Pokémon del mismo tipo."
+      },
+      "diverseTypesForImportantTrainers": {
+        "label": "Diversidad de Tipos — Entrenadores Importantes",
+        "tip": "Los entrenadores Importantes evitan usar varios Pokémon del mismo tipo."
+      },
+      "diverseTypesForRegularTrainers": {
+        "label": "Diversidad de Tipos — Entrenadores Normales",
+        "tip": "Los entrenadores normales evitan usar varios Pokémon del mismo tipo."
+      },
+      "betterBossTrainerMovesets": {
+        "label": "Mejores Movimientos — Entrenadores Jefe",
+        "tip": "Da a los entrenadores Jefe mejores conjuntos de movimientos (MT/tutor/huevo y sinergia)."
+      },
+      "betterImportantTrainerMovesets": {
+        "label": "Mejores Movimientos — Entrenadores Importantes",
+        "tip": "Da a los entrenadores Importantes mejores conjuntos de movimientos (MT/tutor/huevo y sinergia)."
+      },
+      "betterRegularTrainerMovesets": {
+        "label": "Mejores Movimientos — Entrenadores Normales",
+        "tip": "Da a los entrenadores normales mejores conjuntos de movimientos (MT/tutor/huevo y sinergia)."
+      },
+      "totemPokemonMod": {
+        "UNCHANGED": "Sin cambios",
+        "RANDOM": "Aleatorio",
+        "SIMILAR_STRENGTH": "Aleatorio (fuerza similar)"
+      },
+      "allyPokemonMod": {
+        "UNCHANGED": "Sin cambios",
+        "RANDOM": "Aleatorio",
+        "SIMILAR_STRENGTH": "Aleatorio (fuerza similar)"
+      },
+      "auraMod": {
+        "UNCHANGED": "Sin cambios",
+        "RANDOM": "Aleatorio",
+        "SAME_STRENGTH": "Aleatorio (misma fuerza)"
+      },
+      "randomizeTotemHeldItems": {
+        "label": "Aleatorizar Objetos",
+        "tip": "Reemplaza los objetos de los Pokémon Tótem por objetos consumibles."
+      },
+      "allowTotemAltFormes": {
+        "label": "Permitir Formas Alternativas",
+        "tip": "Permite que formas alternativas aparezcan como Pokémon Tótem/Aliados."
+      },
+      "totemLevelsModified": {
+        "label": "Modificador de Nivel Porcentual",
+        "tip": "Activa un modificador de nivel porcentual para los Pokémon Tótem/Aliados."
+      },
+      "totemLevelModifier": {
+        "label": "Modificador de Nivel Tótem",
+        "tip": "Cambio porcentual aplicado a los niveles de los Pokémon Tótem/Aliados."
+      },
+      "fieldItemsMod": {
+        "UNCHANGED": "Sin cambios",
+        "SHUFFLE": "Mezclar",
+        "RANDOM": "Aleatorio",
+        "RANDOM_EVEN": "Aleatorio (distribución uniforme)"
+      },
+      "banBadRandomFieldItems": {
+        "label": "Prohibir Objetos Malos",
+        "tip": "Elimina objetos \"malos\" que no son muy útiles del conjunto de objetos aleatorios de campo, como bayas y correos."
+      },
+      "shopItemsMod": {
+        "UNCHANGED": "Sin cambios",
+        "SHUFFLE": "Mezclar",
+        "RANDOM": "Aleatorio"
+      },
+      "banBadRandomShopItems": {
+        "label": "Prohibir Objetos Malos",
+        "tip": "Elimina objetos \"malos\" que no son muy útiles del conjunto de objetos aleatorios de tienda, como bayas y correos."
+      },
+      "banRegularShopItems": {
+        "label": "Prohibir Objetos Normales de Tienda",
+        "tip": "Elimina objetos normales de tienda del conjunto de posibles objetos aleatorios para tiendas."
+      },
+      "guaranteeEvolutionItems": {
+        "label": "Garantizar Objetos de Evolución",
+        "tip": "Asegura que todos los objetos de evolución aparezcan en las tiendas."
+      },
+      "guaranteeXItems": {
+        "label": "Garantizar Objetos X",
+        "tip": "Asegura que todos los objetos X (incluyendo Protección y Golpe Crítico) aparezcan en las tiendas."
+      },
+      "banOPShopItems": {
+        "label": "Prohibir Objetos Rotos de Tienda",
+        "tip": "Elimina objetos rotos del conjunto, como el Huevo de Suerte y objetos que se venden por precios muy altos."
+      },
+      "balanceShopPrices": {
+        "label": "Equilibrar Precios de Objetos",
+        "tip": "Cambia los precios de muchos objetos para hacerlos más equilibrados. Nota: sin esta opción, algunos precios están seriamente desequilibrados."
+      },
+      "addCheapRareCandiesToShops": {
+        "label": "Añadir Caramelos Raros Baratos",
+        "tip": "Añade Caramelos Raros baratos a todas las tiendas. (Con algunas excepciones, como las tiendas del Pentatlón de HGSS.)"
+      },
+      "pickupItemsMod": {
+        "UNCHANGED": "Sin cambios",
+        "RANDOM": "Aleatorio"
+      },
+      "banBadRandomPickupItems": {
+        "label": "Prohibir Objetos Malos",
+        "tip": "Elimina objetos \"malos\" que no son muy útiles del conjunto de objetos de Recogida, como bayas y correos."
       }
     },
     "events": {

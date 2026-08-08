@@ -76,13 +76,15 @@ const STRIPE: React.CSSProperties = {
   backgroundColor: "var(--bg-2)",
 }
 
-// Shell heights per layout — the single tunable of the equal-height rule. The
-// reserved regions below must keep summing to ≤ these (with the footer's mt-auto
-// absorbing the slack), or overflow-hidden would clip the footer.
+// Shell heights per layout — the floor of the equal-height rule. Every internal
+// region is flex:none with a reserved size, so the natural content height is
+// already uniform across a grid; `min-h` pins that floor without ever clipping
+// the footer when the reserved regions (+ the button's shadow) sum a hair over.
+// Grid rows then stretch every card to the tallest, keeping bottoms flush.
 const SHELL: Record<PackCardLayout, string> = {
-  card: "h-[420px] w-[300px] flex-col",
-  compact: "h-[272px] w-[300px] flex-col",
-  row: "h-[150px] w-full flex-row items-stretch",
+  card: "min-h-[420px] w-[300px] flex-col",
+  compact: "min-h-[272px] w-[300px] flex-col",
+  row: "min-h-[150px] w-full flex-row items-stretch",
 }
 
 export function PackCard({

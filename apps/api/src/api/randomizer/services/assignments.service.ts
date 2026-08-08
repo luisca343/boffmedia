@@ -451,4 +451,163 @@ export class AssignmentsService {
       });
     });
   }
+
+  /**
+   * PUBLIC: List all assignments for an event with participant names.
+   * Seed is ONLY exposed when event.status === 'finished'.
+   * Enforced at service layer for defense-in-depth.
+   */
+  async listAssignmentsForPublic(
+    eventId: number,
+  ): Promise<any[]> {
+    if (!eventId || eventId <= 0) {
+      throw new BadRequestException('Valid eventId is required');
+    }
+
+    const event = await this.repository.getEventById(eventId);
+    if (!event) {
+      throw new NotFoundException(`Event ${eventId} not found`);
+    }
+
+    const assignmentsWithNames =
+      await this.repository.listAssignmentsByEventWithParticipantNames(eventId);
+
+    return assignmentsWithNames.map(
+      (a) =>
+        ({
+          id: a.id,
+          eventId: a.eventId,
+          participantName: a.participantName,
+          status: a.status,
+          outputSha512: a.outputSha512,
+          claimedAt: a.claimedAt,
+          patchedAt: a.patchedAt,
+          verifiedAt: a.verifiedAt,
+          createdAt: a.createdAt,
+          // Only expose seed when event is finished
+          ...(event.status === 'finished' && { seed: a.seed }),
+        }) as any,
+    );
+  }
+
+  /**
+   * PUBLIC: Get event settings blob (download).
+   * ONLY available when event.status === 'finished'.
+   * Enforced at service layer.
+   */
+  async getEventSettingsBlob(eventId: number): Promise<Buffer> {
+    if (!eventId || eventId <= 0) {
+      throw new BadRequestException('Valid eventId is required');
+    }
+
+    const event = await this.repository.getEventById(eventId);
+    if (!event) {
+      throw new NotFoundException(`Event ${eventId} not found`);
+    }
+
+    // Gate on finished status
+    if (event.status !== 'finished') {
+      throw new ForbiddenException(
+        'Settings are only available after the event is finished.',
+      );
+    }
+
+    if (!event.settingsBlobSha512) {
+      throw new NotFoundException(`No settings blob found for event ${eventId}`);
+    }
+
+    // Fetch settings blob from disk
+    const { stream } = await this.blobStorage.override(
+      event.settingsBlobSha512,
+    );
+
+    // Read stream into buffer
+    const chunks: Buffer[] = [];
+    return new Promise((resolve, reject) => {
+      stream.on('data', (chunk: Buffer) => {
+        chunks.push(chunk);
+      });
+
+      stream.on('end', () => {
+        resolve(Buffer.concat(chunks));
+      });
+
+      stream.on('error', (error) => {
+        this.logger.error('Failed to read settings blob:', error);
+        reject(
+          new NotFoundException({
+            message: `Could not read settings blob ${event.settingsBlobSha512}`,
+            userMessage:
+              'No se ha podido acceder a los ajustes del torneo.',
+          }),
+        );
+      });
+    });
+  }
+
+  /**
+   * PUBLIC: Get assignment log (download).
+   * ONLY available when event.status === 'finished'.
+   * Enforced at service layer.
+   */
+  async getPublicAssignmentLog(
+    eventId: number,
+    assignmentId: number,
+  ): Promise<Buffer> {
+    if (!eventId || eventId <= 0 || !assignmentId || assignmentId <= 0) {
+      throw new BadRequestException('Valid eventId and assignmentId required');
+    }
+
+    const event = await this.repository.getEventById(eventId);
+    if (!event) {
+      throw new NotFoundException(`Event ${eventId} not found`);
+    }
+
+    // Gate on finished status
+    if (event.status !== 'finished') {
+      throw new ForbiddenException(
+        'Logs are only available after the event is finished.',
+      );
+    }
+
+    const assignment = await this.repository.getAssignmentById(assignmentId);
+    if (!assignment || assignment.eventId !== eventId) {
+      throw new NotFoundException(
+        `Assignment ${assignmentId} not found for event ${eventId}`,
+      );
+    }
+
+    if (!assignment.logBlobSha512) {
+      throw new NotFoundException(
+        `No log found for assignment ${assignmentId}`,
+      );
+    }
+
+    // Fetch log blob from disk
+    const { stream } = await this.blobStorage.override(
+      assignment.logBlobSha512,
+    );
+
+    // Read stream into buffer
+    const chunks: Buffer[] = [];
+    return new Promise((resolve, reject) => {
+      stream.on('data', (chunk: Buffer) => {
+        chunks.push(chunk);
+      });
+
+      stream.on('end', () => {
+        resolve(Buffer.concat(chunks));
+      });
+
+      stream.on('error', (error) => {
+        this.logger.error('Failed to read public log blob:', error);
+        reject(
+          new NotFoundException({
+            message: `Could not read log blob ${assignment.logBlobSha512}`,
+            userMessage: 'No se ha podido acceder al registro de ese jugador.',
+          }),
+        );
+      });
+    });
+  }
 }

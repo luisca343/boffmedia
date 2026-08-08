@@ -24,6 +24,7 @@ import { FvxSettingsShim } from './shim/fvx-settings-shim';
 // Controllers
 import { RandomizerController } from './randomizer.controller';
 import { RandomizerLauncherController } from './randomizer-launcher.controller';
+import { RandomizerPublicController } from './randomizer-public.controller';
 
 // External dependencies
 import { PacksModule } from '@api/packs/packs.module';
@@ -82,7 +83,11 @@ import { PacksModule } from '@api/packs/packs.module';
       inject: [ConfigService, Logger],
     },
   ],
-  controllers: [RandomizerController, RandomizerLauncherController],
+  controllers: [
+    RandomizerController,
+    RandomizerLauncherController,
+    RandomizerPublicController,
+  ],
   exports: [RANDOMIZER_REPOSITORY_TOKEN, RandomizerRepository],
 })
 export class RandomizerModule {}

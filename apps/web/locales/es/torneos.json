@@ -32,7 +32,21 @@
       "myMatchBanner": "Tu partida está lista — únete a la mesa para jugar y reportar el resultado.",
       "myMatchCta": "Ir a mi partida →",
       "rosterEmpty": "Sin participantes aún. ¡Sé el primero!",
-      "rosterTitle": "Participantes · {count}"
+      "rosterTitle": "Participantes · {count}",
+      "randomlockeTitle": "Randomlocke",
+      "randomlockeRunning": "Estado de preparación",
+      "randomlockeFinished": "Resultados verificables",
+      "randomlockeStatus": "Estado",
+      "randomlockeEmpty": "Este torneo no tiene eventos de randomizer.",
+      "randomlockeParticipant": "Participante",
+      "randomlockeSeed": "Semilla",
+      "randomlockeOutput": "Hash verificación",
+      "randomlockeLog": "Log",
+      "randomlockeSettings": "Descargar ajustes (.rnqs)",
+      "randomlockeDownload": "Descargar",
+      "randomlockeVerifyTitle": "Verificar resultados",
+      "randomlockeVerifyHint": "Re-ejecuta FVX con la semilla y los ajustes publicados en una ROM limpia y compara el hash de salida.",
+      "randomlockeVerifyCommand": "Comando FVX:"
     },
     "checkin": {
       "doCheckin": "Registrarse",

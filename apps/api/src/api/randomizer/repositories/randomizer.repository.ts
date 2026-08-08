@@ -389,6 +389,52 @@ export class RandomizerRepository {
     }
   }
 
+  /**
+   * List all assignments for an event with participant display names (public view).
+   * Joins to get the participant name from the tournament participants table.
+   * Includes participant name in the result.
+   */
+  async listAssignmentsByEventWithParticipantNames(
+    eventId: number,
+  ): Promise<
+    (RandomizerAssignment & { participantName: string })[]
+  > {
+    if (!eventId || eventId <= 0) {
+      return [];
+    }
+
+    try {
+      const rows = await this.db
+        .select({
+          a: randomizerAssignments,
+          participantName: boffMediaTournamentParticipants.name,
+        })
+        .from(randomizerAssignments)
+        .innerJoin(
+          boffMediaTournamentParticipants,
+          eq(
+            boffMediaTournamentParticipants.id,
+            randomizerAssignments.participantId,
+          ),
+        )
+        .where(eq(randomizerAssignments.eventId, eventId))
+        .execute();
+
+      return rows.map((row) => ({
+        ...row.a,
+        participantName: row.participantName,
+      }));
+    } catch (error: any) {
+      this.logger.error(
+        `Failed to list assignments with names for event ${eventId}:`,
+        error,
+      );
+      throw new Error(
+        `Assignments listing with names failed: ${error.message}`,
+      );
+    }
+  }
+
   // ==================== PRESETS ====================
 
   async createPreset(data: NewRandomizerPreset): Promise<number> {

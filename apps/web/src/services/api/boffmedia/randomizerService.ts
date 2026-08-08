@@ -198,4 +198,83 @@ export class RandomizerService {
   static deleteEvent(id: string) {
     return apiAuthedAutoDELETE<void>(`${BASE}/events/${id}`)
   }
+
+  // ==================== PUBLIC OPERATIONS (No Auth) ====================
+
+  /**
+   * List events for a tournament (public — no auth required).
+   * Settings blob hash only included when event.status === 'finished'.
+   */
+  static listPublicEvents(tournamentId: string) {
+    return fetch(
+      `${getApiUrl()}/randomizer/public/tournaments/${tournamentId}/events`,
+    )
+      .then((r) => (r.ok ? r.json() : Promise.reject(r)))
+      .then((resp) => ({
+        success: true,
+        data: resp.data || resp,
+        statusCode: 200,
+      }))
+      .catch((err) => ({
+        success: false,
+        statusCode: err.status || 500,
+        error: err.statusText || 'Failed to fetch events',
+      }))
+  }
+
+  /**
+   * List assignments for an event (public — no auth required).
+   * Seed only included when event.status === 'finished'.
+   */
+  static listPublicAssignments(eventId: string) {
+    return fetch(`${getApiUrl()}/randomizer/public/events/${eventId}/assignments`)
+      .then((r) => (r.ok ? r.json() : Promise.reject(r)))
+      .then((resp) => ({
+        success: true,
+        data: resp.data || resp,
+        statusCode: 200,
+      }))
+      .catch((err) => ({
+        success: false,
+        statusCode: err.status || 500,
+        error: err.statusText || 'Failed to fetch assignments',
+      }))
+  }
+
+  /**
+   * Download event settings file (.rnqs) — public.
+   * Only available when event.status === 'finished'.
+   */
+  static async downloadEventSettings(eventId: string): Promise<Blob> {
+    const response = await fetch(
+      `${getApiUrl()}/randomizer/public/events/${eventId}/settings`,
+    )
+    if (!response.ok) {
+      const body = await response.json().catch(() => ({}))
+      throw new Error(
+        body.userMessage || `Settings download failed: ${response.statusText}`,
+      )
+    }
+    return response.blob()
+  }
+
+  /**
+   * Download assignment log file — public.
+   * Only available when event.status === 'finished'.
+   */
+  static async downloadPublicLog(
+    eventId: string,
+    assignmentId: string,
+  ): Promise<Blob> {
+    const response = await fetch(
+      `${getApiUrl()}/randomizer/public/events/${eventId}/assignments/${assignmentId}/log`,
+    )
+    if (!response.ok) {
+      const body = await response.json().catch(() => ({}))
+      throw new Error(
+        body.userMessage || `Log download failed: ${response.statusText}`,
+      )
+    }
+    return response.blob()
+  }
 }

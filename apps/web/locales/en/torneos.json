@@ -32,7 +32,21 @@
       "myMatchBanner": "Your match is ready — join the table to play and report the result.",
       "myMatchCta": "Go to my match →",
       "rosterEmpty": "No participants yet. Be the first!",
-      "rosterTitle": "Participants · {count}"
+      "rosterTitle": "Participants · {count}",
+      "randomlockeTitle": "Randomlocke",
+      "randomlockeRunning": "Preparation status",
+      "randomlockeFinished": "Verifiable results",
+      "randomlockeStatus": "Status",
+      "randomlockeEmpty": "This tournament has no randomizer events.",
+      "randomlockeParticipant": "Participant",
+      "randomlockeSeed": "Seed",
+      "randomlockeOutput": "Verification hash",
+      "randomlockeLog": "Log",
+      "randomlockeSettings": "Download settings (.rnqs)",
+      "randomlockeDownload": "Download",
+      "randomlockeVerifyTitle": "Verify results",
+      "randomlockeVerifyHint": "Re-run FVX with the published seed and settings on a clean dump and compare the output hash.",
+      "randomlockeVerifyCommand": "FVX command:"
     },
     "checkin": {
       "doCheckin": "Check in",

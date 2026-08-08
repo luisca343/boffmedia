@@ -1055,7 +1055,8 @@
       "namePlaceholder": "Preset name",
       "descriptionPlaceholder": "Description (optional)",
       "presetSaved": "Preset saved",
-      "saveError": "Failed to save preset"
+      "saveError": "Failed to save preset",
+      "cpgStub": "Custom player graphics — coming in a later pass."
     },
     "quick": {
       "title": "Randomize ROM",
@@ -1082,7 +1083,55 @@
       "evolutions": "Pokemon Evolutions",
       "evolutionsMode": "Evolutions Mode",
       "expCurves": "EXP Curves",
-      "expCurveMode": "EXP Curve Mode"
+      "expCurveMode": "EXP Curve Mode",
+      "pokemonPalettes": "Pokémon Palettes",
+      "pokemonPalettesMode": "Pokémon Palettes Mode",
+      "customPlayerGraphics": "Custom Player Graphics",
+      "moveData": "Move Data",
+      "pokemonMovesets": "Pokémon Movesets",
+      "pokemonMovesetsMode": "Movesets Mode",
+      "wildPokemon": "Wild Pokémon",
+      "wildTypeRestrictions": "Type Restrictions",
+      "wildTypeRestrictionsMode": "Type Restriction Mode",
+      "encounterGrouping": "Wild Pokémon — Grouping",
+      "encounterGroupingMode": "Encounter Grouping Mode",
+      "evolutionRestrictions": "Evolution Restrictions",
+      "evolutionRestrictionsMode": "Evolution Restrictions Mode",
+      "wildCatchLevel": "Wild Pokémon — Catch & Level",
+      "tmMoves": "TM Moves",
+      "tmMovesMode": "TM Moves Mode",
+      "tmHmCompatibility": "TM/HM Compatibility",
+      "tmHmCompatibilityMode": "TM/HM Compatibility Mode",
+      "tutorMoves": "Move Tutor Moves",
+      "tutorMovesMode": "Move Tutor Moves Mode",
+      "tutorMovesCompatibility": "Move Tutor Compatibility",
+      "tutorMovesCompatibilityMode": "Move Tutor Compatibility Mode",
+      "typeEffectiveness": "Type Effectiveness",
+      "typeEffectivenessMode": "Type Effectiveness Mode",
+      "miscTweaks": "Misc. Tweaks",
+      "starterPokemon": "Starter Pokémon",
+      "starterMode": "Starter Mode",
+      "typeRestrictions": "Type Restrictions",
+      "typeRestrictionsMode": "Type Restrictions Mode",
+      "starterModifiers": "Starter Pokémon Modifiers",
+      "staticPokemon": "Static Pokémon",
+      "staticPokemonMode": "Static Pokémon Mode",
+      "inGameTrades": "In-Game Trades",
+      "inGameTradesMode": "In-Game Trades Mode",
+      "trainerPokemon": "Trainer Pokémon",
+      "battleStyle": "Battle Style",
+      "battleStyleMode": "Battle Style Mode",
+      "totemPokemon": "Totem / Ally / Aura Pokémon",
+      "totemMode": "Totem Pokémon Mode",
+      "allyMode": "Ally Pokémon Mode",
+      "auraMode": "Aura Mode",
+      "fieldItems": "Field Items",
+      "fieldItemsMode": "Field Items Mode",
+      "specialShopItems": "Special Shop Items",
+      "specialShopItemsMode": "Special Shop Items Mode",
+      "shopItems": "Shop Items",
+      "pickupItems": "Pickup Items",
+      "pickupItemsMode": "Pickup Items Mode"
     },
     "opt": {
       "baseStatisticsMod": {
@@ -1243,12 +1292,729 @@
         "gen9": "Generation 9"
       },
       "expCurves": {
-        "FLAT": "Flat",
         "MEDIUM_FAST": "Medium Fast",
         "MEDIUM_SLOW": "Medium Slow",
         "SLOW": "Slow",
         "FAST": "Fast",
-        "SLOW_THEN_VERY_FAST": "Slow then Very Fast"
+        "ERRATIC": "Erratic",
+        "FLUCTUATING": "Fluctuating"
+      },
+      "pokemonPalettesMod": {
+        "UNCHANGED": "Unchanged",
+        "RANDOM": "Random"
+      },
+      "pokemonPalettesFollowTypes": {
+        "label": "Follow Types",
+        "tip": "When selected, Pokémon colors will depend on type. For example, a Fire-type Bulbasaur might be red, and a Grass-type Groudon might be green."
+      },
+      "pokemonPalettesFollowEvolutions": {
+        "label": "Follow Evolutions",
+        "tip": "Each Pokémon species will have colors similar to those it evolves to/from. When evolutions are randomized, Pokémon get colors similar to their new evolutions/prevolutions."
+      },
+      "pokemonPalettesShinyFromNormal": {
+        "label": "Shiny From Normal",
+        "tip": "The shiny colors of each Pokémon species become the colors it would normally have, if palettes were not randomized."
+      },
+      "randomizeMovePowers": {
+        "label": "Randomize Move Power",
+        "tip": "Randomize power of damaging moves between 20 and 150."
+      },
+      "randomizeMoveAccuracies": {
+        "label": "Randomize Move Accuracy",
+        "tip": "Randomize move accuracy with restrictions to prevent broken moves."
+      },
+      "randomizeMovePPs": {
+        "label": "Randomize Move PP",
+        "tip": "Randomize the PP of each move in multiples of 5 (5-40)."
+      },
+      "randomizeMoveTypes": {
+        "label": "Randomize Move Types",
+        "tip": "Randomize the type of most moves."
+      },
+      "randomizeMoveNames": {
+        "label": "Randomize Move Names",
+        "tip": "Randomize move names based on their type (Gen 3+ only)."
+      },
+      "randomizeMoveCategory": {
+        "label": "Randomize Move Category",
+        "tip": "Randomize category of damaging moves between Physical and Special (Gen 4+)."
+      },
+      "updateMoves": {
+        "label": "Update Moves to Generation",
+        "tip": "Update move stats to their values in the selected generation."
+      },
+      "updateMovesToGeneration": {
+        "label": "Generation",
+        "tip": "Select the generation for move stat updates."
+      },
+      "startWithGuaranteedMoves": {
+        "label": "Guaranteed Level 1 Moves",
+        "tip": "Every Pokémon gets a guaranteed amount of moves at level 1; set the count with the slider."
+      },
+      "guaranteedMoveCount": {
+        "label": "Guaranteed Move Count",
+        "tip": "Number of moves guaranteed at level 1 (1-4; 4 = full moveset)."
+      },
+      "reorderDamagingMoves": {
+        "label": "Reorder Damaging Moves",
+        "tip": "Reorder moves so less powerful damaging moves are learned before powerful ones."
+      },
+      "blockBrokenMovesetMoves": {
+        "label": "No Game-Breaking Moves",
+        "tip": "Ban moves that can break early/late game from randomized movesets."
+      },
+      "movesetsForceGoodDamaging": {
+        "label": "Force % of Good Damaging Moves",
+        "tip": "Force a percentage of randomized movesets to include good damaging moves."
+      },
+      "movesetsGoodDamagingPercent": {
+        "label": "Good Damaging %",
+        "tip": "Percentage of moves forced to be good damaging moves."
+      },
+      "evolutionMovesForAll": {
+        "label": "Evolution Moves for All Pokémon",
+        "tip": "Every Pokémon learns a move upon evolution."
+      },
+      "movesetsMod": {
+        "UNCHANGED": "Unchanged",
+        "RANDOM_PREFER_SAME_TYPE": "Random (preferring same type)",
+        "COMPLETELY_RANDOM": "Completely random",
+        "METRONOME_ONLY": "Metronome only"
+      },
+      "randomizeWildPokemon": {
+        "label": "Randomize Wild Pokémon",
+        "tip": "Whether to randomize wild Pokémon encounters."
+      },
+      "useTimeBasedEncounters": {
+        "label": "Use Time-Based Encounters",
+        "tip": "This affects games that have either seasons or morning/day/night encounter sets. If checked, each of these sets will be treated as a separate area. If unchecked, morning/day/night and all seasons will use the same encounter data."
+      },
+      "blockWildLegendaries": {
+        "label": "Don't Use Legendaries",
+        "tip": "Prevent legendary Pokémon from appearing as wild encounters."
+      },
+      "randomizeWildPokemonHeldItems": {
+        "label": "Randomize Held Items",
+        "tip": "Randomize the items held by Pokémon in the wild, including whether they can have one at all or not."
+      },
+      "banBadRandomWildPokemonHeldItems": {
+        "label": "Ban Bad Items",
+        "tip": "Remove 'bad' items that don't do much from the set of possible random items for wild Pokémon, such as berries and mail."
+      },
+      "allowWildAltFormes": {
+        "label": "Allow Alternate Formes",
+        "tip": "Allow alternate formes of Pokémon, such as the various formes of Rotom or Deoxys, to appear as wild Pokémon."
+      },
+      "keepWildTypeThemes": {
+        "label": "Keep Set/Zone Themes",
+        "tip": "All encounter sets that originally had a type theme will keep that type theme."
+      },
+      "splitWildZoneByEncounterTypes": {
+        "label": "Split by Encounter Types",
+        "tip": "Split the game, map, or location by encounter types, such as walking, Surfing, fishing, and Rock Smash."
+      },
+      "keepWildEvolutionFamilies": {
+        "label": "Keep Relations",
+        "tip": "If multiple Pokémon related by evolution appear in the same zone, their replacements will also be related in the same way."
+      },
+      "useMinimumCatchRate": {
+        "label": "Set Minimum Catch Rate",
+        "tip": "If selected, every Pokémon in the game with a catch rate below a certain level will have its catch rate increased."
+      },
+      "minimumCatchRateLevel": {
+        "label": "Catch Rate Level",
+        "tip": "Select the minimum catch rate level: Level 1 (Normal ~10-18%), Level 2 (Buffed ~17-26%), Level 3 (Super ~27-37%), Level 4 (Ultra ~34-44%), or Level 5 (Guaranteed)."
+      },
+      "wildLevelsModified": {
+        "label": "Percentage Level Modifier",
+        "tip": "Apply a percentage-based level modifier for every wild Pokémon in the game."
+      },
+      "wildLevelModifier": {
+        "label": "Level Modifier %",
+        "tip": "Adjust wild Pokémon levels by this percentage (e.g., -50% to +50%)."
+      },
+      "catchEmAllEncounters": {
+        "label": "Catch 'Em All Mode",
+        "tip": "Every random Pokémon chosen to replace an encounter will be one that hasn't been chosen before. Once every Pokémon has been chosen once, any Pokémon may be chosen."
+      },
+      "similarStrengthEncounters": {
+        "label": "Similar Strength",
+        "tip": "The random Pokémon that replaces each Pokémon will be of similar power to the original."
+      },
+      "balanceShakingGrass": {
+        "label": "Balance Low Level Encounters",
+        "tip": "Set an upper limit for the base stat total of wild Pokémon based on their level when using the Similar Strength setting."
+      },
+      "wildPokemonTypeMod": {
+        "NONE": "None",
+        "KEEP_PRIMARY": "Keep Primary Type",
+        "RANDOM_THEMES": "Random Zone Themes"
+      },
+      "wildPokemonZoneMod": {
+        "NONE": "Maximum Possible",
+        "GAME": "1 In Whole Game",
+        "NAMED_LOCATION": "1 Per Named Location",
+        "MAP": "1 Per Map",
+        "ENCOUNTER_SET": "1 Per Encounter Set"
+      },
+      "wildPokemonEvolutionMod": {
+        "NONE": "None",
+        "BASIC_ONLY": "Only Basic Pokémon",
+        "KEEP_STAGE": "Same Evolution Stage"
+      },
+      "tmsMod": {
+        "UNCHANGED": "Unchanged",
+        "RANDOM": "Random"
+      },
+      "blockBrokenTMMoves": {
+        "label": "No Game-Breaking Moves",
+        "tip": "Checking this checkbox will stop moves that can break early/late games being available in randomized TMs. In first generation games, Dragon Rage, SonicBoom, Spore, and every OHKO move are banned. In second generation onwards, only SonicBoom and Dragon Rage are banned (because OHKO moves and sleep are significantly less broken)."
+      },
+      "keepFieldMoveTMs": {
+        "label": "Keep Field Move TMs",
+        "tip": "If you select this, TMs that contain field-use moves will be left alone. This includes things like Dig & Teleport, but not healing moves (Softboiled)."
+      },
+      "tmsForceGoodDamaging": {
+        "label": "Force % of Good Damaging Moves",
+        "tip": "Selecting this option will allow you to use the slider below to select a proportion of the randomized TMs to be forced to be good damaging moves. Note that other TMs can still be selected as good damaging moves randomly, this is simply an additional chance."
+      },
+      "tmsGoodDamagingPercent": {
+        "label": "Good Damaging Moves %",
+        "tip": "The percentage of randomized TMs that will be forced to be good damaging moves."
+      },
+      "tmsHmsCompatibilityMod": {
+        "UNCHANGED": "Unchanged",
+        "RANDOM_PREFER_TYPE": "Random (prefer same type)",
+        "COMPLETELY_RANDOM": "Random (completely)",
+        "FULL": "Full Compatibility"
+      },
+      "tmsFollowEvolutions": {
+        "label": "Follow Evolutions",
+        "tip": "When this is selected and TM compatibility is randomized, evolutions of a Pokemon will inherit that Pokemon's TM compatibilities. Additionally, when a Pokemon evolves, each TM will have: Random (prefer same type): A 90% chance of becoming learnable if the Pokemon just gained its type through evolution, a 10% chance otherwise. Random (completely): A 25% chance of becoming learnable regardless of type."
+      },
+      "tmLevelUpMoveSanity": {
+        "label": "TM/Level-up Move Sanity",
+        "tip": "If you select this option, then Pokemon will be guaranteed to learn TMs of moves that they learn by levelup. Otherwise, move compatibility will be left alone or decided randomly, depending on your other choices."
+      },
+      "fullHMCompat": {
+        "label": "Full HM Compatibility",
+        "tip": "If you select this option, then every Pokemon will learn every HM, regardless of any other options you check."
+      },
+      "moveTutorMovesMod": {
+        "UNCHANGED": "Unchanged",
+        "RANDOM": "Random"
+      },
+      "blockBrokenTutorMoves": {
+        "label": "No Game-Breaking Moves",
+        "tip": "Checking this checkbox will stop moves that can break early/late games being available in randomized move tutors. In first generation games, Dragon Rage, SonicBoom, Spore, and every OHKO move are banned. In second generation onwards, only SonicBoom and Dragon Rage are banned (because OHKO moves and sleep are significantly less broken)."
+      },
+      "keepFieldMoveTutors": {
+        "label": "Keep Field Move Tutors",
+        "tip": "If you select this, move tutors that contain field-use moves will be left alone. This includes things like Headbutt, but not healing moves (Softboiled)."
+      },
+      "tutorsForceGoodDamaging": {
+        "label": "Force % of Good Damaging Moves",
+        "tip": "Selecting this option will allow you to use the slider below to select a proportion of the randomized tutors to be forced to be good damaging moves. Note that other tutors can still be selected as good damaging moves randomly, this is simply an additional chance."
+      },
+      "tutorsGoodDamagingPercent": {
+        "label": "Good Damaging Moves %",
+        "tip": "The percentage of randomized move tutors that will be forced to be good damaging moves."
+      },
+      "moveTutorsCompatibilityMod": {
+        "UNCHANGED": "Unchanged",
+        "RANDOM_PREFER_TYPE": "Random (prefer same type)",
+        "COMPLETELY_RANDOM": "Random (completely)",
+        "FULL": "Full Compatibility"
+      },
+      "tutorFollowEvolutions": {
+        "label": "Follow Evolutions",
+        "tip": "When this is selected and move tutor compatibility is randomized, evolutions of a Pokemon will inherit that Pokemon's move tutor compatibilities. Additionally, when a Pokemon evolves, each move will have: Random (prefer same type): A 90% chance of becoming learnable if the Pokemon just gained its type through evolution, a 10% chance otherwise. Random (completely): A 25% chance of becoming learnable regardless of type."
+      },
+      "tutorLevelUpMoveSanity": {
+        "label": "Tutor/Level-up Move Sanity",
+        "tip": "If you select this option, then Pokemon will be guaranteed to learn move tutors of moves that they learn by levelup. Otherwise, move compatibility will be left alone or decided randomly, depending on your other choices."
+      },
+      "bstBuffNerfMaxPercentage": {
+        "label": "Random Buff/Nerf (%)",
+        "tip": "Maximum BST change in percent when using Random Buff/Nerf (e.g. 20 = 80–120% of the original BST)."
+      },
+      "ensureTwoAbilities": {
+        "label": "Ensure Two Abilities",
+        "tip": "When abilities are randomized, ensure each Pokémon has two abilities."
+      },
+      "estimateLevelForEvolutionImprovements": {
+        "label": "Use Estimated Evolution Levels",
+        "tip": "Evolutions changed by 'Change Impossible Evolutions' or 'Make Evolutions Easier' use levels estimated from the game's other evolutions instead of preset levels."
+      },
+      "makeEvolutionsEasierLvl": {
+        "label": "Evolve By Level",
+        "tip": "The level by which every Pokémon should reach its final stage when 'Make Evolutions Easier' is on. At the maximum, evolution levels are unchanged (other improvements still apply)."
+      },
+      "typeEffectivenessMod": {
+        "UNCHANGED": "Unchanged",
+        "RANDOM": "Random",
+        "RANDOM_BALANCED": "Random (balanced)",
+        "KEEP_IDENTITIES": "Keep Type Identities",
+        "INVERSE": "Inverse"
+      },
+      "inverseTypesRandomImmunities": {
+        "label": "Add Random Immunities",
+        "tip": "A few weaknesses become immunities instead. The number of immunities added matches the base game."
+      },
+      "updateTypeEffectiveness": {
+        "label": "Update Type Effectiveness",
+        "tip": "Update type weaknesses/resistances/immunities to their Gen 6+ values before any randomization. Does not add the Fairy type."
+      },
+      "miscBWExpPatch": {
+        "label": "B/W Exp Patch",
+        "tip": "Patches R/B/Y and G/S/C to use the Black/White XP gain system (English only)."
+      },
+      "miscNerfXAccuracy": {
+        "label": "Nerf X Accuracy",
+        "tip": "Stops Gen 1 X Accuracy from working on sleep, trapping and one-hit-KO moves."
+      },
+      "miscFixCritRate": {
+        "label": "\"Fix\" Crit Rate",
+        "tip": "Fixes Gen 1's critical-hit rate to 1/16 instead of being Speed-based; Focus Energy/Dire Hit and high-crit moves behave like later games."
+      },
+      "miscFastestText": {
+        "label": "Fastest Text",
+        "tip": "All text boxes show with minimum delay regardless of the in-game text-speed setting."
+      },
+      "miscRunningShoesIndoors": {
+        "label": "Running Shoes Indoors",
+        "tip": "Lets you use the Running Shoes in any location, like later games."
+      },
+      "miscRandomizePCPotion": {
+        "label": "Randomize PC Potion",
+        "tip": "Randomizes the starting item-PC Potion to another useful item."
+      },
+      "miscAllowPikachuEvolution": {
+        "label": "Allow Pikachu Evolution",
+        "tip": "Lets Pikachu evolve into Raichu with a Thunder Stone (Yellow)."
+      },
+      "miscGiveNationalDexAt": {
+        "label": "Give National Dex at Start",
+        "tip": "Gives the National Dex at the start alongside the regional Pokédex."
+      },
+      "miscForceChallengeMode": {
+        "label": "Force Challenge Mode",
+        "tip": "Forcibly enables Challenge Mode, bypassing the Key System (BW2). Easy/Normal become inaccessible."
+      },
+      "miscLowerCasePokemonNames": {
+        "label": "Lower Case Pokémon Names",
+        "tip": "Renders Pokémon names in Camel Case (e.g. VENUSAUR becomes Venusaur)."
+      },
+      "miscRandomizeCatchingTutorial": {
+        "label": "Randomize Catching Tutorial",
+        "tip": "Randomizes the Pokémon shown in the game's catching tutorial."
+      },
+      "miscBanLuckyEgg": {
+        "label": "Ban Lucky Egg",
+        "tip": "Bans Lucky Egg from appearing as any randomized item."
+      },
+      "miscNoFreeLuckyEgg": {
+        "label": "No Free Lucky Egg",
+        "tip": "Stops the professor from giving a free Lucky Egg (BW/BW2)."
+      },
+      "miscBanBigMoneyManiac": {
+        "label": "Ban Big Money Maniac Items",
+        "tip": "Bans maniac items worth more than $10,000 from randomized item pools."
+      },
+      "miscSOSBattles": {
+        "label": "All Wild Pokémon Can Call Allies",
+        "tip": "Lets every wild Pokémon call for help (SOS battles), not just those that could originally."
+      },
+      "miscBalanceStaticLevels": {
+        "label": "Balance Static Pokémon Levels",
+        "tip": "Rebalances static Pokémon levels (fossils in FRLG/BW1)."
+      },
+      "miscRetainAltFormes": {
+        "label": "Don't Revert Temporary Alt Formes",
+        "tip": "Party Pokémon keep their alternate forme after a reset/battle instead of reverting."
+      },
+      "miscRunWithoutRunningShoes": {
+        "label": "Run Without Running Shoes",
+        "tip": "Lets you run before acquiring the Running Shoes."
+      },
+      "miscFasterHPAndEXPBars": {
+        "label": "Faster HP and EXP Bars",
+        "tip": "Doubles the scroll speed of the in-battle HP and EXP bars."
+      },
+      "miscFastDistortionWorld": {
+        "label": "Fast Distortion World",
+        "tip": "Skips most of the Distortion World, warping you to the Cyrus fight (Platinum)."
+      },
+      "miscUpdateRotomFormeTyping": {
+        "label": "Update Rotom Appliance Typings",
+        "tip": "Updates Rotom's appliance formes to their Gen 5+ typings (e.g. Wash Rotom becomes Electric/Water)."
+      },
+      "miscDisableLowHPMusic": {
+        "label": "Disable Low HP Music",
+        "tip": "Disables the low-HP warning music so the current track keeps playing."
+      },
+      "startersMod": {
+        "UNCHANGED": "Unchanged",
+        "CUSTOM": "Custom",
+        "COMPLETELY_RANDOM": "Random (completely)",
+        "RANDOM_WITH_TWO_EVOLUTIONS": "Random (basic with 2 evolutions)",
+        "RANDOM_BASIC": "Random (any basic Pokémon)"
+      },
+      "customStarter": {
+        "label1": "Custom Starter 1",
+        "label2": "Custom Starter 2",
+        "label3": "Custom Starter 3",
+        "tip": "Species ID of the custom starter. The web editor has no species-name list yet, so enter the FVX species index (it round-trips correctly)."
+      },
+      "startersTypeMod": {
+        "NONE": "None",
+        "FIRE_WATER_GRASS": "Fire, Water, Grass",
+        "TRIANGLE": "Any Type Triangle",
+        "UNIQUE": "Unique",
+        "SINGLE_TYPE": "Single Type"
+      },
+      "startersSingleType": {
+        "label": "Single Type",
+        "tip": "All randomly-chosen starters will be of this type; 'Random' picks one type for all of them.",
+        "RANDOM": "Random"
+      },
+      "pokemonTypes": {
+        "NORMAL": "Normal",
+        "FIGHTING": "Fighting",
+        "FLYING": "Flying",
+        "GRASS": "Grass",
+        "WATER": "Water",
+        "FIRE": "Fire",
+        "ROCK": "Rock",
+        "GROUND": "Ground",
+        "PSYCHIC": "Psychic",
+        "BUG": "Bug",
+        "DRAGON": "Dragon",
+        "ELECTRIC": "Electric",
+        "GHOST": "Ghost",
+        "POISON": "Poison",
+        "ICE": "Ice",
+        "STEEL": "Steel",
+        "DARK": "Dark",
+        "FAIRY": "Fairy"
+      },
+      "startersNoDualTypes": {
+        "label": "No Dual Types",
+        "tip": "Chosen starters will not be dual-typed (they may still evolve into dual-types)."
+      },
+      "allowStarterAltFormes": {
+        "label": "Allow Alternate Formes",
+        "tip": "Allow alternate formes (e.g. Rotom, Deoxys) to appear as starters."
+      },
+      "startersNoLegendaries": {
+        "label": "Don't Use Legendaries",
+        "tip": "Legendary Pokémon will not be chosen as starters."
+      },
+      "startersBSTMinimum": {
+        "label": "Minimum BST",
+        "tip": "No Pokémon below this base stat total may be a starter."
+      },
+      "startersBSTMaximum": {
+        "label": "Maximum BST",
+        "tip": "No Pokémon above this base stat total may be a starter."
+      },
+      "randomizeStartersHeldItems": {
+        "label": "Randomize Starter Held Items",
+        "tip": "Randomize the items held by the starters where possible."
+      },
+      "banBadRandomStarterHeldItems": {
+        "label": "Ban Bad Items",
+        "tip": "Remove low-value items (berries, mail) from the random starter held-item pool."
+      },
+      "staticPokemonMod": {
+        "UNCHANGED": "Unchanged",
+        "RANDOM_MATCHING": "Swap Legendaries & Swap Standards",
+        "COMPLETELY_RANDOM": "Random (completely)",
+        "SIMILAR_STRENGTH": "Random (similar strength)"
+      },
+      "swapStaticMegaEvos": {
+        "label": "Swap Mega Evolvables",
+        "tip": "Swap static Pokémon capable of Mega Evolution with another such Pokémon."
+      },
+      "limit600": {
+        "label": "Randomize 600+ BST",
+        "tip": "Enforce pure random on all static Pokémon with 600+ BST."
+      },
+      "allowStaticAltFormes": {
+        "label": "Allow Alternate Formes",
+        "tip": "Allow alternate formes to appear as static Pokémon."
+      },
+      "limitMainGameLegendaries": {
+        "label": "Limit Main-Game Legendaries",
+        "tip": "Prevent main-game legendaries from being replaced by Pokémon with higher base stat totals."
+      },
+      "correctStaticMusic": {
+        "label": "Fix Music",
+        "tip": "Play the correct special music for randomized static encounters."
+      },
+      "staticLevelModified": {
+        "label": "Percentage Level Modifier",
+        "tip": "Enable a percentage-based level modifier for every static Pokémon."
+      },
+      "staticLevelModifier": {
+        "label": "Static Level Modifier",
+        "tip": "Percentage change applied to static Pokémon levels."
+      },
+      "inGameTradesMod": {
+        "UNCHANGED": "Unchanged",
+        "RANDOMIZE_GIVEN": "Randomize Given Pokémon Only",
+        "RANDOMIZE_GIVEN_AND_REQUESTED": "Randomize Both Requested & Given"
+      },
+      "randomizeInGameTradesNicknames": {
+        "label": "Randomize Nicknames",
+        "tip": "Randomize the nicknames of received traded Pokémon."
+      },
+      "randomizeInGameTradesOTs": {
+        "label": "Randomize OTs",
+        "tip": "Randomize the Original Trainer (ID & name) of received traded Pokémon."
+      },
+      "randomizeInGameTradesIVs": {
+        "label": "Randomize IVs",
+        "tip": "Randomize the IVs of received traded Pokémon."
+      },
+      "randomizeInGameTradesItems": {
+        "label": "Randomize Items",
+        "tip": "Give each received traded Pokémon a random held item."
+      },
+      "trainersMod": {
+        "label": "Trainer Pokémon",
+        "tip": "How trainer Pokémon are randomized.",
+        "UNCHANGED": "Unchanged",
+        "RANDOM": "Random",
+        "DISTRIBUTED": "Random (even distribution)",
+        "MAINPLAYTHROUGH": "Random (even distribution, main playthrough)",
+        "TYPE_THEMED": "Type Themed",
+        "TYPE_THEMED_ELITE4_GYMS": "Type Themed (Elite Four/Gyms)",
+        "KEEP_THEMED": "Keep Themed",
+        "KEEP_THEME_OR_PRIMARY": "Keep Theme or Primary"
+      },
+      "battleStyleMod": {
+        "UNCHANGED": "Unchanged",
+        "RANDOM": "Random",
+        "SINGLE_STYLE": "Single Style"
+      },
+      "battleStyleStyle": {
+        "label": "Battle Style",
+        "tip": "When 'Single Style' is chosen, set all trainer battles to this style.",
+        "SINGLE_BATTLE": "Single Battles",
+        "DOUBLE_BATTLE": "Double Battles",
+        "TRIPLE_BATTLE": "Triple Battles",
+        "ROTATION_BATTLE": "Rotation Battles"
+      },
+      "rivalCarriesStarterThroughout": {
+        "label": "Rival Carries Starter Through Game",
+        "tip": "The rival keeps their starter (evolved as appropriate) in every battle."
+      },
+      "trainersUsePokemonOfSimilarStrength": {
+        "label": "Use Pokémon of Similar Strength",
+        "tip": "Replacement Pokémon are of similar power to the original."
+      },
+      "trainersAvoidDuplicates": {
+        "label": "Avoid Duplicates",
+        "tip": "A trainer's randomized Pokémon are different from each other where possible."
+      },
+      "trainersMatchTypingDistribution": {
+        "label": "Weight Types by # of Pokémon",
+        "tip": "Match the number of trainers of each type to the number of Pokémon of that type."
+      },
+      "trainersUseLocalPokemon": {
+        "label": "Use Local Pokémon",
+        "tip": "Trainers use only Pokémon found in the wild and their evolutionary relatives."
+      },
+      "trainersBlockLegendaries": {
+        "label": "Don't Use Legendaries",
+        "tip": "Legendary Pokémon will not be given to trainers."
+      },
+      "trainersBlockEarlyWonderGuard": {
+        "label": "No Early Wonder Guard",
+        "tip": "No trainer under level 20 is given a Wonder Guard Pokémon."
+      },
+      "allowTrainerAlternateFormes": {
+        "label": "Allow Alternate Formes",
+        "tip": "Allow trainers to have alternate formes of Pokémon."
+      },
+      "swapTrainerMegaEvos": {
+        "label": "Swap Mega Evolvables",
+        "tip": "Swap trainer Pokémon holding a Mega Stone with another Mega-capable Pokémon."
+      },
+      "shinyChance": {
+        "label": "Random Shiny Trainer Pokémon",
+        "tip": "Gives a 1/256 chance of trainer Pokémon being shiny."
+      },
+      "randomizeTrainerNames": {
+        "label": "Randomize Trainer Names",
+        "tip": "Randomize trainers' names."
+      },
+      "randomizeTrainerClassNames": {
+        "label": "Randomize Trainer Class Names",
+        "tip": "Randomize trainer class names (e.g. 'Youngster' becomes 'Misfit')."
+      },
+      "trainersEvolveTheirPokemon": {
+        "label": "Trainers Evolve Their Pokémon",
+        "tip": "Guarantee that trainer Pokémon are evolved as far as possible for their level."
+      },
+      "trainersEvolutionLevelModifier": {
+        "label": "Evolution Level Modifier",
+        "tip": "Percentage modifier applied to the levels at which trainer Pokémon evolve."
+      },
+      "trainersLevelModified": {
+        "label": "Percentage Level Modifier",
+        "tip": "Enable a percentage-based level modifier for every enemy trainer Pokémon."
+      },
+      "trainersLevelModifier": {
+        "label": "Trainer Level Modifier",
+        "tip": "Percentage change applied to trainer Pokémon levels."
+      },
+      "eliteFourUniquePokemonNumber": {
+        "label": "Pokémon League Has Unique Pokémon",
+        "tip": "Elite Four/Champion trainers get this many unique Pokémon that appear on no other trainer."
+      },
+      "additionalBossTrainerPokemon": {
+        "label": "Add Pokémon to Boss Trainers",
+        "tip": "Add this many Pokémon to Boss trainers (max 6 total)."
+      },
+      "additionalImportantTrainerPokemon": {
+        "label": "Add Pokémon to Important Trainers",
+        "tip": "Add this many Pokémon to Important trainers (max 6 total)."
+      },
+      "additionalRegularTrainerPokemon": {
+        "label": "Add Pokémon to Regular Trainers",
+        "tip": "Add this many Pokémon to regular trainers (max 6 total)."
+      },
+      "randomizeHeldItemsForBossTrainerPokemon": {
+        "label": "Held Items — Boss Trainers",
+        "tip": "Add or replace held items for Boss trainers' Pokémon."
+      },
+      "randomizeHeldItemsForImportantTrainerPokemon": {
+        "label": "Held Items — Important Trainers",
+        "tip": "Add or replace held items for Important trainers' Pokémon."
+      },
+      "randomizeHeldItemsForRegularTrainerPokemon": {
+        "label": "Held Items — Regular Trainers",
+        "tip": "Add or replace held items for regular trainers' Pokémon."
+      },
+      "consumableItemsOnlyForTrainerPokemon": {
+        "label": "Consumable Only",
+        "tip": "Trainer held items are chosen from single-use items (mostly berries)."
+      },
+      "sensibleItemsOnlyForTrainerPokemon": {
+        "label": "Sensible Items",
+        "tip": "Trainer held items are chosen from items that make sense for that Pokémon."
+      },
+      "highestLevelOnlyGetsItemsForTrainerPokemon": {
+        "label": "Highest Level Only",
+        "tip": "Only a trainer's highest-level Pokémon receives a held item."
+      },
+      "diverseTypesForBossTrainers": {
+        "label": "Type Diversity — Boss Trainers",
+        "tip": "Boss trainers avoid using multiple Pokémon of the same type."
+      },
+      "diverseTypesForImportantTrainers": {
+        "label": "Type Diversity — Important Trainers",
+        "tip": "Important trainers avoid using multiple Pokémon of the same type."
+      },
+      "diverseTypesForRegularTrainers": {
+        "label": "Type Diversity — Regular Trainers",
+        "tip": "Regular trainers avoid using multiple Pokémon of the same type."
+      },
+      "betterBossTrainerMovesets": {
+        "label": "Better Movesets — Boss Trainers",
+        "tip": "Give Boss trainers better movesets (TM/tutor/egg moves and synergy)."
+      },
+      "betterImportantTrainerMovesets": {
+        "label": "Better Movesets — Important Trainers",
+        "tip": "Give Important trainers better movesets (TM/tutor/egg moves and synergy)."
+      },
+      "betterRegularTrainerMovesets": {
+        "label": "Better Movesets — Regular Trainers",
+        "tip": "Give regular trainers better movesets (TM/tutor/egg moves and synergy)."
+      },
+      "totemPokemonMod": {
+        "UNCHANGED": "Unchanged",
+        "RANDOM": "Random",
+        "SIMILAR_STRENGTH": "Random (similar strength)"
+      },
+      "allyPokemonMod": {
+        "UNCHANGED": "Unchanged",
+        "RANDOM": "Random",
+        "SIMILAR_STRENGTH": "Random (similar strength)"
+      },
+      "auraMod": {
+        "UNCHANGED": "Unchanged",
+        "RANDOM": "Random",
+        "SAME_STRENGTH": "Random (same strength)"
+      },
+      "randomizeTotemHeldItems": {
+        "label": "Randomize Held Items",
+        "tip": "Replace Totem Pokémon's held items with consumable items."
+      },
+      "allowTotemAltFormes": {
+        "label": "Allow Alternate Formes",
+        "tip": "Allow alternate formes to appear as Totem/Ally Pokémon."
+      },
+      "totemLevelsModified": {
+        "label": "Percentage Level Modifier",
+        "tip": "Enable a percentage-based level modifier for Totem/Ally Pokémon."
+      },
+      "totemLevelModifier": {
+        "label": "Totem Level Modifier",
+        "tip": "Percentage change applied to Totem/Ally Pokémon levels."
+      },
+      "fieldItemsMod": {
+        "UNCHANGED": "Unchanged",
+        "SHUFFLE": "Shuffle",
+        "RANDOM": "Random",
+        "RANDOM_EVEN": "Random (even distribution)"
+      },
+      "banBadRandomFieldItems": {
+        "label": "Ban Bad Items",
+        "tip": "Remove \"bad\" items that don't do much from the set of possible random items for field items, such as berries and mail."
+      },
+      "shopItemsMod": {
+        "UNCHANGED": "Unchanged",
+        "SHUFFLE": "Shuffle",
+        "RANDOM": "Random"
+      },
+      "banBadRandomShopItems": {
+        "label": "Ban Bad Items",
+        "tip": "Remove \"bad\" items that don't do much from the set of possible random items for shop items, such as berries and mail."
+      },
+      "banRegularShopItems": {
+        "label": "Ban Regular Shop Items",
+        "tip": "Remove regular shop items from the possible random items for shop items."
+      },
+      "guaranteeEvolutionItems": {
+        "label": "Guarantee Evolution Items",
+        "tip": "Ensure all evolution items appear in shops."
+      },
+      "guaranteeXItems": {
+        "label": "Guarantee X Items",
+        "tip": "Ensure all X items (including Guard Spec. and Dire Hit) appear in shops."
+      },
+      "banOPShopItems": {
+        "label": "Ban Overpowered Shop Items",
+        "tip": "Remove overpowered shop items from the pool, such as the Lucky Egg and items that sell for high prices to maniacs."
+      },
+      "balanceShopPrices": {
+        "label": "Balance Shop Item Prices",
+        "tip": "Change prices for many items to make them more balanced. Note: prices for some items are seriously imbalanced without this setting."
+      },
+      "addCheapRareCandiesToShops": {
+        "label": "Add Cheap Rare Candies",
+        "tip": "Add cheap Rare Candies to all shops. (With a few exceptions, such as the HGSS Pokéathlon shops.)"
+      },
+      "pickupItemsMod": {
+        "UNCHANGED": "Unchanged",
+        "RANDOM": "Random"
+      },
+      "banBadRandomPickupItems": {
+        "label": "Ban Bad Items",
+        "tip": "Remove \"bad\" items that don't do much from the set of possible random items for the Pickup item table, such as berries and mail."
       }
     },
     "events": {

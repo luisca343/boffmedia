@@ -28,17 +28,47 @@ Requirements:
 - **Java 21, exactly** (the runner passes `--enable-preview`, and preview features are locked to
   their version — 22/23/25 will not run this jar).
 
-Set these environment variables for the API dev process (paths relative to the repo root):
+Set these environment variables for the API dev process. **Use absolute paths** — the runner
+spawns Java with its cwd set to a temp scratch dir, so a relative jar path resolves against the
+wrong place and fails.
 
-| Var | Value |
+| Var | Notes |
 |---|---|
-| `RANDOMIZER_JAR` | `apps/api/fvx-local/fvx.jar` |
-| `RANDOMIZER_SHIM_JAR` | `apps/api/fvx-local/settings-shim.jar` |
-| `RANDOMIZER_JAVA` | path to your Java 21 `java` — omit if `java` on `PATH` is already 21 |
+| `RANDOMIZER_JAR` | absolute path to `fvx-local/fvx.jar` |
+| `RANDOMIZER_SHIM_JAR` | absolute path to `fvx-local/settings-shim.jar` |
+| `RANDOMIZER_JAVA` | absolute path to a **Java 21** `java` binary — omit only if `java` on `PATH` is already 21 |
 | `RANDOMIZER_SCRATCH_DIR` | optional; defaults to `%TEMP%/randomizer` (or `$TMPDIR/randomizer`) |
 
 The classpath separator is handled per-platform in code (`;` on Windows, `:` on Linux), so the
 same jars work in Windows dev and the Linux container.
+
+### Windows setup (this machine)
+
+The dev API loads env via `dotenv.config()` and runs with its cwd at `apps/api`, so it reads
+`apps/api/.env`. Add these lines there (save the file as **UTF-8** — the repo path contains `ó`).
+Forward slashes are used deliberately: they work on Windows and avoid backslash-escaping in dotenv.
+
+```dotenv
+RANDOMIZER_JAVA="C:/Users/luisc/.jdks/openjdk-21.0.2/bin/java.exe"
+RANDOMIZER_JAR="e:/Programación/Ficus Labs/boffmedia/apps/api/fvx-local/fvx.jar"
+RANDOMIZER_SHIM_JAR="e:/Programación/Ficus Labs/boffmedia/apps/api/fvx-local/settings-shim.jar"
+```
+
+Note: the machine's PATH `java` is **17** and `JAVA_HOME` is **8** — neither runs this jar, so
+`RANDOMIZER_JAVA` must point explicitly at `openjdk-21.0.2` (verified: `java 21.0.2`, runs the jar
+with `--seed`). Other Java 21 installs work too, as long as it is exactly 21.
+
+Alternatively, set them as persistent Windows user vars (open a **new** terminal afterward):
+
+```bat
+setx RANDOMIZER_JAVA "C:\Users\luisc\.jdks\openjdk-21.0.2\bin\java.exe"
+setx RANDOMIZER_JAR "e:\Programación\Ficus Labs\boffmedia\apps\api\fvx-local\fvx.jar"
+setx RANDOMIZER_SHIM_JAR "e:\Programación\Ficus Labs\boffmedia\apps\api\fvx-local\settings-shim.jar"
+```
+
+After setting them, **restart** the dev server (env is read at process start). The boot log confirms
+which path you're on: `Using FvxRandomizerRunner with jar: …` (wired) vs
+`RANDOMIZER_JAR not set; using StubRandomizerRunner (throws 503)` (not picked up).
 
 ## Rebuilding the jars from the fork
 

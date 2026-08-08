@@ -17,6 +17,12 @@ interface SelectRowProps {
   tipKey?: string
   options: SelectRowOption[]
   disabled?: boolean
+  /**
+   * How to coerce the selected option value before writing it to the form.
+   * FVX generation/int fields (e.g. updateMovesToGeneration) are numbers in the
+   * schema; without coercion the <select> writes a string and zod rejects it.
+   */
+  valueType?: "string" | "number"
 }
 
 export function SelectRow({
@@ -25,6 +31,7 @@ export function SelectRow({
   tipKey,
   options,
   disabled,
+  valueType = "string",
 }: SelectRowProps) {
   const t = useTranslations("randomizer")
   const form = useFormContext<RandomizerSettings>()
@@ -39,7 +46,9 @@ export function SelectRow({
       control={form.control}
       name={field}
       render={({ field: { value, onChange } }) => {
-        const stringValue = typeof value === "string" ? value : ""
+        const stringValue = value === null || value === undefined ? "" : String(value)
+        const handleChange = (next: string) =>
+          onChange(valueType === "number" ? Number(next) : next)
         return (
           <Field
             label={
@@ -51,7 +60,7 @@ export function SelectRow({
           >
             <Select
               value={stringValue}
-              onChange={onChange}
+              onChange={handleChange}
               options={selectOptions}
               disabled={disabled}
             />
