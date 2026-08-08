@@ -4,11 +4,14 @@
 /* eslint-disable */
 export type AssignmentAdminDto = {
     id: number;
-    eventId: number;
-    participantId: number;
-    mcUuid: Record<string, any>;
+    configId: number;
     /**
-     * Only present if event.status === finished
+     * BoffMedia User ID if linked
+     */
+    boffmediaUserId: number | null;
+    mcUuid: string;
+    /**
+     * Only present if config.status === published
      */
     seed: number;
     status: string;

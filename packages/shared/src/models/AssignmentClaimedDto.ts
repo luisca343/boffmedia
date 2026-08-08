@@ -9,7 +9,7 @@ export type AssignmentClaimedDto = {
     gameTitle: string;
     cleanRomSha512: string;
     romHint: Record<string, any>;
-    eventStatus: string;
+    configStatus: string;
     /**
      * SHA-512 of randomized output ROM; present only if patched
      */
@@ -17,7 +17,6 @@ export type AssignmentClaimedDto = {
 };
 export namespace AssignmentClaimedDto {
     export enum status {
-        PENDING = 'pending',
         CLAIMED = 'claimed',
         PATCHED = 'patched',
         VERIFIED = 'verified',
