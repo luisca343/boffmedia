@@ -4,7 +4,6 @@ import * as React from "react"
 import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { Icon, type IconName, Spinner } from "@boffmedia/ui"
-import { AvLiveDot } from "./av-kit"
 
 export interface AvNavItem {
   id: string
@@ -32,7 +31,6 @@ interface AvShellProps {
 export function AvShell({ nav, section, onNavigate, children, loading, fluid }: AvShellProps) {
   const t = useTranslations("admin.shell")
   const allItems = nav.flatMap((g) => g.items)
-  const active = allItems.find((i) => i.id === section)
 
   return (
     <div className="grid h-full [grid-template-columns:1fr] md:[grid-template-columns:244px_minmax(0,1fr)] bg-base">
@@ -102,18 +100,6 @@ export function AvShell({ nav, section, onNavigate, children, loading, fluid }: 
               </button>
             )
           })}
-        </div>
-
-        {/* Top bar (desktop) */}
-        <div className="hidden md:flex sticky top-[var(--nav-h)] z-[5] items-center gap-4 py-[15px] px-[26px] border-b border-solid border-line bg-[color-mix(in_srgb,var(--bg)_88%,transparent)] backdrop-blur-[8px]">
-          <span className="inline-flex items-center gap-2.5 font-display text-[24px] font-extrabold italic uppercase leading-none">
-            {active && <Icon name={active.icon} size={20} className="text-accent" />}
-            {active?.label ?? t("brand")}
-          </span>
-          <span className="ml-auto inline-flex items-center gap-2 font-mono text-[10px] font-bold leading-none uppercase tracking-[0.14em] text-ok">
-            <AvLiveDot />
-            {t("live")}
-          </span>
         </div>
 
         <div

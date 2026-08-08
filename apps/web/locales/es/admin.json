@@ -256,6 +256,7 @@
         "configuredTitle": "Regulaciones configuradas",
         "colRegulation": "Regulación",
         "colStatus": "Estado",
+        "empty": "Sin regulaciones configuradas.",
         "teamsImported": "{count} equipos importados",
         "statusRunningCsv": "Importando CSV",
         "statusRunningPastes": "Descargando pastes",

@@ -198,6 +198,8 @@ export function VgcChampionsFetcher() {
           <div className="py-8 flex justify-center">
             <Spinner size={16} className="text-accent" />
           </div>
+        ) : available.length === 0 ? (
+          <p className="py-6 text-center text-[13px] text-txt-muted">{t("champions.empty")}</p>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm min-w-[560px]">

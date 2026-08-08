@@ -3,7 +3,7 @@
 import { useTranslations } from "next-intl"
 import { Icon } from "@boffmedia/ui"
 import { AdminCrud } from "../_components/ui/av-crud"
-import { AvSectionHead } from "../_components/ui/av-kit"
+import { AvSectionHead, AvPill } from "../_components/ui/av-kit"
 import { useGetAchievements } from "@/hooks/events/useGetAchievements"
 import { EventsService } from "@/services/api/boffmedia/eventsService"
 import { AchievementForm } from "./forms/AchievementForm"
@@ -59,13 +59,9 @@ export function AchievementsAdmin() {
             <span className="text-sm font-mono text-txt-muted">{a.points}</span>
           )},
           { key: "rarity", label: t("colRarity"), render: (a) => (
-            <span
-              className={`text-[10px] font-mono font-semibold uppercase tracking-[0.08em] px-2 py-1 border border-solid ${
-                RARITY[a.rarity ?? ""] ?? "text-txt-muted border-line bg-panel-2"
-              }`}
-            >
+            <AvPill tone="default" className={RARITY[a.rarity ?? ""]}>
               {a.rarity ?? "—"}
-            </span>
+            </AvPill>
           )},
           { key: "category", label: t("colCategory"), render: (a) => (
             <span className="text-sm text-txt-muted capitalize">{a.category ?? "—"}</span>

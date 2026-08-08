@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils"
+import { AvSectionHead } from "../../_components/ui/av-kit"
 
 export function Stat({
   label,
@@ -20,10 +21,5 @@ export function Stat({
 }
 
 export function SectionHead({ title, sub }: { title: string; sub?: string }) {
-  return (
-    <div className="grid gap-0.5">
-      <h2 className="font-display text-[20px] font-bold uppercase not-italic tracking-[0.02em]">{title}</h2>
-      {sub && <p className="font-mono text-[11px] uppercase tracking-[0.06em] text-txt-dim">{sub}</p>}
-    </div>
-  )
+  return <AvSectionHead title={title} desc={sub} />
 }

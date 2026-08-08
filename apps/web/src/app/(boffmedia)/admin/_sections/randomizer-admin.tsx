@@ -179,23 +179,18 @@ function PresetsView({ onLoad }: { onLoad: (preset: RandomizerPreset) => void })
 
   return (
     <div className="space-y-5">
-      <AvSectionHead
-        title={t("chrome.presets")}
-        desc={t("desc")}
-        actions={
-          <Button onClick={() => loadPresets()} disabled={loading}>
-            {loading ? <Spinner size={16} /> : <Icon name="refresh" size={16} />}
+      <AvPanel>
+        <div className="flex items-center gap-3">
+          <Input
+            placeholder={t("chrome.searchPresets")}
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.currentTarget.value)}
+            className="flex-1 min-w-0"
+          />
+          <Button variant="ghost" size="sm" icon="refresh" onClick={() => loadPresets()} loading={loading} className="shrink-0">
             {t("chrome.refresh")}
           </Button>
-        }
-      />
-
-      <AvPanel>
-        <Input
-          placeholder={t("chrome.searchPresets")}
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.currentTarget.value)}
-        />
+        </div>
       </AvPanel>
 
       {loading && !presets ? (

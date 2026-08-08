@@ -44,11 +44,7 @@ export function TeamsAdmin() {
           { key: "name", label: tr("colTeam"), render: (t) => (
             <div className="flex items-center gap-2">
               <span className="font-medium">{t.name}</span>
-              {t.tag && (
-                <span className="text-xs font-mono text-txt-dim bg-panel-2 border border-solid border-line px-1.5 py-0.5">
-                  [{t.tag}]
-                </span>
-              )}
+              {t.tag && <AvPill tone="default">{t.tag}</AvPill>}
             </div>
           )},
           { key: "eventId", label: tr("colEventId"), render: (t) => (

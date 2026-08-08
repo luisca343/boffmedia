@@ -206,7 +206,7 @@ export function VgcLimitlessFetcher() {
             <Spinner size={16} className="text-accent" />
           </div>
         ) : tournaments.length === 0 ? (
-          <p className="px-4 py-6 text-center text-xs text-txt-dim">{t("limitless.empty")}</p>
+          <p className="px-4 py-6 text-center text-[13px] text-txt-muted">{t("limitless.empty")}</p>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm min-w-[560px]">

@@ -122,7 +122,7 @@ export function VgcSmogonFetcher() {
             <Spinner size={16} className="text-accent" />
           </div>
         ) : snapshots.length === 0 ? (
-          <p className="py-6 text-center text-xs text-txt-dim">{t("smogon.empty")}</p>
+          <p className="py-6 text-center text-[13px] text-txt-muted">{t("smogon.empty")}</p>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm min-w-[520px]">

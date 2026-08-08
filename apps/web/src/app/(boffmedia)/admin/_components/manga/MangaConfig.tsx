@@ -142,7 +142,7 @@ export default function MangaConfig() {
             {t("loadingConfig")}
           </div>
         ) : seriesEntries.length === 0 ? (
-          <div className="flex items-center gap-2 py-4 text-[13px] text-txt-dim">
+          <div className="flex items-center gap-2 py-4 text-[13px] text-txt-muted">
             <Icon name="book" size={15} />
             <span>{t("noSeries")}</span>
           </div>
