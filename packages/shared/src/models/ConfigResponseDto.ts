@@ -2,26 +2,25 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export type EventResponseDto = {
+export type ConfigResponseDto = {
     id: number;
-    tournamentId: number;
+    eventId: number;
     gamePlatform: string;
     gameTitle: string;
     settingsBlobSha512: string;
     fvxJarSha512: string;
     cleanRomSha512: string;
     romHint: Record<string, any>;
-    packId?: string | null;
-    status: EventResponseDto.status;
+    status: ConfigResponseDto.status;
     createdAt: string;
     updatedAt: string;
 };
-export namespace EventResponseDto {
+export namespace ConfigResponseDto {
     export enum status {
         DRAFT = 'draft',
-        LOCKED = 'locked',
-        RUNNING = 'running',
-        FINISHED = 'finished',
+        OPEN = 'open',
+        CLOSED = 'closed',
+        PUBLISHED = 'published',
     }
 }
 
