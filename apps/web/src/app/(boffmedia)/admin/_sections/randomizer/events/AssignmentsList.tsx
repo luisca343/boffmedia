@@ -48,9 +48,10 @@ export function AssignmentsList({ event, onClose }: AssignmentsListProps) {
   }
 
   const handleViewLog = async (assignment: RandomizerAssignment) => {
+    if (!event) return
     setLoadingLog(true)
     try {
-      const res = await RandomizerService.readLog(assignment.id)
+      const res = await RandomizerService.readLog(event.id, assignment.id)
       if (res.success && res.data) {
         setSelectedLog(res.data)
         setLogModalOpen(true)
@@ -77,7 +78,7 @@ export function AssignmentsList({ event, onClose }: AssignmentsListProps) {
   return (
     <div className="space-y-5">
       <AvSectionHead
-        title={t("assignmentsFor", { event: event.title })}
+        title={t("assignmentsFor", { event: event.gameTitle })}
         actions={
           <Button onClick={onClose} variant="ghost" size="sm">
             {t("back")}

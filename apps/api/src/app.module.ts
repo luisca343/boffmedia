@@ -11,6 +11,7 @@ import { JwtAuthGuard } from './api/auth/jwt-auth.guard';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
+import { env } from './config/env';
 import { PrometheusModule } from '@willsoto/nestjs-prometheus';
 import { MetricsMiddleware } from './_utils/metrics/metrics.middleware';
 import { SmartRotomAppsModule } from '@api/smartrotom/apps/apps.module';
@@ -82,7 +83,9 @@ import { RandomizerModule } from '@api/randomizer/randomizer.module';
     // Rate limiting is available app-wide but only enforced where ThrottlerGuard is
     // applied (auth routes) — a global guard would throttle SSE/tool streams too.
     ThrottlerModule.forRoot([{ ttl: 60_000, limit: 120 }]),
-    ConfigModule.forRoot(),
+    // Register the validated env object under the `env` namespace so
+    // `configService.get('env')` resolves it (the randomizer runner/shim gate on it).
+    ConfigModule.forRoot({ load: [() => ({ env })] }),
     // Kept because PUBLIC_DIR-built URLs (sharex) may point at /public/*.
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'public'),

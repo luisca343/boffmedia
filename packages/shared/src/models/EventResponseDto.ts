@@ -11,7 +11,7 @@ export type EventResponseDto = {
     fvxJarSha512: string;
     cleanRomSha512: string;
     romHint: Record<string, any>;
-    packId?: Record<string, any>;
+    packId?: string | null;
     status: EventResponseDto.status;
     createdAt: string;
     updatedAt: string;

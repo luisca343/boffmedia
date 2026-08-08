@@ -5,7 +5,9 @@ import {
   NotFoundException,
   ConflictException,
 } from '@nestjs/common';
-import { randomBytes } from 'crypto';
+import { randomBytes, createHash } from 'crypto';
+import { readFileSync } from 'fs';
+import { ConfigService } from '@nestjs/config';
 import { Logger } from 'nestjs-pino';
 import { RandomizerRepository } from '../repositories/randomizer.repository';
 import { RANDOMIZER_REPOSITORY_TOKEN } from '@api/_utils/repositories/interfaces/repository.token';
@@ -20,27 +22,147 @@ import {
   type IRandomizerRunner,
   type RandomizeJob,
 } from '../ports/randomizer-runner.port';
+import {
+  SETTINGS_SHIM_TOKEN,
+  type ISettingsShim,
+} from '../ports/settings-shim.port';
 import { Readable } from 'stream';
+
+/**
+ * The `settings_json` column is a MySQL `json` column, but the driver hands it back
+ * as a raw JSON string on read — coerce it to the object the shim/hash expect.
+ */
+function asSettingsObject(value: unknown): Record<string, unknown> {
+  if (typeof value === 'string') {
+    return JSON.parse(value) as Record<string, unknown>;
+  }
+  return (value ?? {}) as Record<string, unknown>;
+}
+
+/**
+ * Deterministic JSON serialization with recursively sorted object keys, so the
+ * settings-snapshot hash is stable regardless of property order in the stored JSON.
+ */
+function stableStringify(value: unknown): string {
+  if (Array.isArray(value)) {
+    return `[${value.map(stableStringify).join(',')}]`;
+  }
+  if (value && typeof value === 'object') {
+    const entries = Object.keys(value as Record<string, unknown>)
+      .sort()
+      .map(
+        (k) =>
+          `${JSON.stringify(k)}:${stableStringify(
+            (value as Record<string, unknown>)[k],
+          )}`,
+      );
+    return `{${entries.join(',')}}`;
+  }
+  return JSON.stringify(value ?? null);
+}
 
 @Injectable()
 export class EventsService {
+  /** Memoized SHA-512 of the configured FVX jar (path + hash), computed on first create. */
+  private jarHashCache: { path: string; sha512: string } | null = null;
+
   constructor(
     private readonly logger: Logger,
+    private readonly configService: ConfigService,
     @Inject(RANDOMIZER_REPOSITORY_TOKEN)
     private readonly repository: RandomizerRepository,
     @Inject(RANDOMIZER_RUNNER_TOKEN)
     private readonly runner: IRandomizerRunner,
+    @Inject(SETTINGS_SHIM_TOKEN)
+    private readonly settingsShim: ISettingsShim,
   ) {}
 
   /**
+   * Direct, event-less randomization: encode a preset's settings to .rnqs, run the
+   * FVX jar against an uploaded ROM, and return the randomized ROM bytes. This is the
+   * "use the randomizer program directly" path — no event, assignment, or persistence.
+   */
+  async quickRandomize(params: {
+    presetId: number;
+    gamePlatform: 'gba' | 'nds';
+    romBuffer: Buffer;
+    seed?: number;
+  }): Promise<{ romBytes: Buffer; outputSha512: string; seed: number }> {
+    if (!params.presetId || params.presetId <= 0) {
+      throw new BadRequestException('Valid presetId is required');
+    }
+    if (!params.romBuffer || params.romBuffer.length === 0) {
+      throw new BadRequestException('ROM file is required');
+    }
+
+    const preset = await this.repository.getPresetById(params.presetId);
+    if (!preset) {
+      throw new BadRequestException(`Preset ${params.presetId} not found`);
+    }
+
+    // Encode the preset's stored settings JSON into the .rnqs the FVX jar consumes.
+    const settingsRnqs = await this.settingsShim.encode(
+      asSettingsObject(preset.settingsJson),
+    );
+
+    const seed =
+      params.seed && params.seed > 0
+        ? params.seed
+        : randomBytes(6).readUintBE(0, 6) % Number.MAX_SAFE_INTEGER;
+
+    const result = await this.runner.randomize({
+      romStream: Readable.from(params.romBuffer),
+      settingsRnqs,
+      seed,
+      gamePlatform: params.gamePlatform,
+      jarSha512: this.getFvxJarSha512(),
+    });
+
+    this.logger.debug(
+      `Quick-randomized a ${params.gamePlatform} ROM with preset ${params.presetId} (seed ${seed})`,
+    );
+
+    return { romBytes: result.romBytes, outputSha512: result.outputSha512, seed };
+  }
+
+  /**
+   * SHA-512 (hex) of the configured FVX jar. The event pins the jar version used;
+   * the jar itself is server-configured via env.RANDOMIZER_JAR, never sent by the client.
+   */
+  private getFvxJarSha512(): string {
+    const env = this.configService.get<any>('env') || {};
+    const jarPath: string = env.RANDOMIZER_JAR || '';
+    if (!jarPath) {
+      throw new BadRequestException(
+        'Randomizer jar is not configured (RANDOMIZER_JAR)',
+      );
+    }
+    if (this.jarHashCache && this.jarHashCache.path === jarPath) {
+      return this.jarHashCache.sha512;
+    }
+    let sha512: string;
+    try {
+      sha512 = createHash('sha512').update(readFileSync(jarPath)).digest('hex');
+    } catch (err) {
+      throw new BadRequestException(
+        `Cannot read configured randomizer jar at ${jarPath}: ${(err as Error).message}`,
+      );
+    }
+    this.jarHashCache = { path: jarPath, sha512 };
+    return sha512;
+  }
+
+  /**
    * Create a new randomizer event in draft status.
+   *
+   * The client picks a preset (whose settings snapshot is hashed into settingsBlobSha512)
+   * and the server pins the configured jar (fvxJarSha512). Neither hash is client-supplied.
    */
   async createEvent(data: {
     tournamentId: number;
     gamePlatform: string;
     gameTitle: string;
-    settingsBlobSha512: string;
-    fvxJarSha512: string;
+    presetId: number;
     cleanRomSha512: string;
     romHint?: string;
     packId?: string;
@@ -48,14 +170,29 @@ export class EventsService {
     if (!data.tournamentId || data.tournamentId <= 0) {
       throw new BadRequestException('Valid tournamentId is required');
     }
+    if (!data.presetId || data.presetId <= 0) {
+      throw new BadRequestException('Valid presetId is required');
+    }
+
+    const preset = await this.repository.getPresetById(data.presetId);
+    if (!preset) {
+      throw new BadRequestException(`Preset ${data.presetId} not found`);
+    }
+
+    // Pin the settings snapshot: SHA-512 over a stable serialization of the preset's JSON.
+    const settingsBlobSha512 = createHash('sha512')
+      .update(stableStringify(asSettingsObject(preset.settingsJson)))
+      .digest('hex');
+
+    const fvxJarSha512 = this.getFvxJarSha512();
 
     try {
       const eventId = await this.repository.createEvent({
         tournamentId: data.tournamentId,
         gamePlatform: data.gamePlatform,
         gameTitle: data.gameTitle,
-        settingsBlobSha512: data.settingsBlobSha512,
-        fvxJarSha512: data.fvxJarSha512,
+        settingsBlobSha512,
+        fvxJarSha512,
         cleanRomSha512: data.cleanRomSha512,
         romHint: data.romHint || null,
         packId: data.packId || null,

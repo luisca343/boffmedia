@@ -13,8 +13,9 @@ import type { RandomizerEvent, RandomizerPreset } from "@/services/api/boffmedia
 import type { AdminPack } from "@/services/api/boffmedia/packsService"
 
 const eventSchema = z.object({
-  title: z.string().min(1, "Title is required"),
+  gameTitle: z.string().min(1, "Game title is required"),
   gamePlatform: z.enum(["gba", "nds"]),
+  // presetId is required on create (its settings snapshot pins the event); enforced in onSubmit.
   presetId: z.string().optional(),
   cleanRomSha512: z.string().min(1, "ROM hash is required"),
   romHint: z.string().optional().default(""),
@@ -37,6 +38,7 @@ export function EventEditor({
   onCancel,
 }: EventEditorProps) {
   const t = useTranslations("randomizer.events")
+  const isExisting = Boolean(event?.id)
   const [presets, setPresets] = useState<RandomizerPreset[]>([])
   const [packs, setPacks] = useState<AdminPack[]>([])
   const [loadingPresets, setLoadingPresets] = useState(false)
@@ -53,12 +55,12 @@ export function EventEditor({
     resolver: zodResolver(eventSchema),
     defaultValues: event
       ? {
-          title: event.title,
+          gameTitle: event.gameTitle,
           gamePlatform: event.gamePlatform,
-          presetId: event.presetId,
+          presetId: undefined, // not returned by the API; only chosen on create
           cleanRomSha512: event.cleanRomSha512,
-          romHint: event.romHint,
-          packId: event.packId,
+          romHint: event.romHint ?? "",
+          packId: event.packId ?? undefined,
         }
       : {
           gamePlatform: "gba",
@@ -107,8 +109,13 @@ export function EventEditor({
 
     setSubmitting(true)
     try {
-      if (event) {
-        const res = await RandomizerService.updateEvent(event.id, data)
+      if (isExisting && event) {
+        // Only romHint and packId are editable once an event exists (everything
+        // else is pinned) — the API's UpdateEventDto rejects any other property.
+        const res = await RandomizerService.updateEvent(event.id, {
+          romHint: data.romHint,
+          packId: data.packId || undefined,
+        })
         if (res.success) {
           toast({ tone: "ok", title: t("eventUpdated") })
           onSave()
@@ -116,9 +123,18 @@ export function EventEditor({
           toast({ tone: "bad", title: t("updateError"), msg: res.userMessage })
         }
       } else {
+        if (!data.presetId) {
+          toast({ tone: "bad", title: t("selectPreset") })
+          return
+        }
         const res = await RandomizerService.createEvent({
-          ...data,
-          tournamentId,
+          tournamentId: Number(tournamentId),
+          gamePlatform: data.gamePlatform,
+          gameTitle: data.gameTitle,
+          presetId: Number(data.presetId),
+          cleanRomSha512: data.cleanRomSha512,
+          romHint: data.romHint || "",
+          packId: data.packId || undefined,
         })
         if (res.success) {
           toast({ tone: "ok", title: t("eventCreated") })
@@ -136,7 +152,7 @@ export function EventEditor({
   return (
     <div className="space-y-5">
       <AvSectionHead
-        title={event ? t("editEvent") : t("createEvent")}
+        title={isExisting ? t("editEvent") : t("createEvent")}
         actions={
           <Button onClick={onCancel} variant="ghost" size="sm">
             {t("cancel")}
@@ -146,11 +162,12 @@ export function EventEditor({
 
       <AvPanel>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-          {/* Title */}
-          <Field label={t("title")} error={errors.title?.message}>
+          {/* Game Title (FVX game identifier) */}
+          <Field label={t("title")} error={errors.gameTitle?.message}>
             <Input
               placeholder={t("titlePlaceholder")}
-              {...register("title")}
+              disabled={isExisting}
+              {...register("gameTitle")}
             />
           </Field>
 
@@ -166,6 +183,7 @@ export function EventEditor({
                   { value: "gba", label: "GBA" },
                   { value: "nds", label: "NDS" },
                 ]}
+                disabled={isExisting}
                 onChange={field.onChange}
               />
             )}
@@ -178,7 +196,6 @@ export function EventEditor({
             render={({ field }) => (
               <Select
                 label={t("presetLabel")}
-                hint={t("optional")}
                 value={field.value || ""}
                 options={[
                   { value: "", label: t("selectPreset") },
@@ -187,7 +204,7 @@ export function EventEditor({
                     label: preset.name,
                   })),
                 ]}
-                disabled={loadingPresets}
+                disabled={loadingPresets || isExisting}
                 onChange={(v) => field.onChange(v || undefined)}
               />
             )}
@@ -197,6 +214,7 @@ export function EventEditor({
           <Field label={t("cleanRomSha512")} error={errors.cleanRomSha512?.message}>
             <Input
               placeholder={t("romHashPlaceholder")}
+              disabled={isExisting}
               {...register("cleanRomSha512")}
             />
           </Field>
@@ -235,7 +253,7 @@ export function EventEditor({
           <div className="flex gap-3 pt-4">
             <Button type="submit" disabled={submitting}>
               {submitting && <Spinner size={16} />}
-              {event ? t("save") : t("create")}
+              {isExisting ? t("save") : t("create")}
             </Button>
             <Button type="button" variant="ghost" onClick={onCancel}>
               {t("cancel")}

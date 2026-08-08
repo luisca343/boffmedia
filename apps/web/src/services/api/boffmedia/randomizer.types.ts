@@ -5,58 +5,43 @@
 
 import type { RandomizerSettings } from "@boffmedia/pack-schema"
 
+// Request DTOs come straight from the API's generated OpenAPI models so the
+// frontend and backend can never drift. Do NOT redeclare these locally.
+export type {
+  CreateEventDto,
+  UpdateEventDto,
+  CreatePresetDto,
+  UpdatePresetDto,
+} from "@boffmedia/shared"
+
+// Preset view-model — mirrors the API's PresetResponseDto fields. Kept as a clean
+// local shape because the generated PresetResponseDto types nullables as `Record<string, any>`.
 export interface RandomizerPreset {
   id: string
   name: string
-  description?: string
-  settings: RandomizerSettings
+  description?: string | null
+  gameScope?: string | null
+  settingsJson: RandomizerSettings
   createdAt: string
   updatedAt: string
 }
 
-export interface CreatePresetDto {
-  name: string
-  description?: string
-  settings: RandomizerSettings
-}
-
-export interface UpdatePresetDto {
-  name?: string
-  description?: string
-  settings?: RandomizerSettings
-}
-
+// Event view-model — mirrors the API's EventResponseDto fields (the response the
+// admin UI renders). Kept as a clean local shape because the generated
+// EventResponseDto types nullable strings as `Record<string, any>`.
 export interface RandomizerEvent {
   id: string
   tournamentId: string
-  title: string
   gamePlatform: "gba" | "nds"
-  presetId?: string
+  gameTitle: string
+  settingsBlobSha512: string
+  fvxJarSha512: string
   cleanRomSha512: string
-  romHint: string
-  packId?: string
+  romHint: string | null
+  packId?: string | null
   status: "draft" | "locked" | "running" | "finished"
   createdAt: string
   updatedAt: string
-}
-
-export interface CreateEventDto {
-  tournamentId: string
-  title: string
-  gamePlatform: "gba" | "nds"
-  presetId?: string
-  cleanRomSha512: string
-  romHint: string
-  packId?: string
-}
-
-export interface UpdateEventDto {
-  title?: string
-  gamePlatform?: "gba" | "nds"
-  presetId?: string
-  cleanRomSha512?: string
-  romHint?: string
-  packId?: string
 }
 
 export interface RandomizerAssignment {

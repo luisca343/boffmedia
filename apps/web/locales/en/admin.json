@@ -1050,7 +1050,26 @@
       "errorLoadingPresets": "Failed to load presets",
       "refresh": "Refresh",
       "validationError": "Validation error",
-      "dirty": "Unsaved changes"
+      "dirty": "Unsaved changes",
+      "savePreset": "Save preset",
+      "namePlaceholder": "Preset name",
+      "descriptionPlaceholder": "Description (optional)",
+      "presetSaved": "Preset saved",
+      "saveError": "Failed to save preset"
+    },
+    "quick": {
+      "title": "Randomize ROM",
+      "run": "Randomize",
+      "running": "Randomizing…",
+      "dropZone": "Choose a .gba/.nds ROM",
+      "selectRom": "Select a ROM first",
+      "platform": "Platform",
+      "seed": "Seed",
+      "seedHint": "Optional",
+      "seedPlaceholder": "Random if left blank",
+      "cancel": "Cancel",
+      "done": "Randomized ROM downloaded",
+      "error": "Randomization failed"
     },
     "panels": {
       "baseStatistics": "Pokemon Base Statistics",

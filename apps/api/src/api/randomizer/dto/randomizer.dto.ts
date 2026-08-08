@@ -1,5 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsInt, IsString, IsOptional } from 'class-validator';
+import { Type } from 'class-transformer';
+import {
+  IsNotEmpty,
+  IsInt,
+  IsString,
+  IsOptional,
+  IsIn,
+} from 'class-validator';
 import {
   RandomizerEventStatus,
   RandomizerAssignmentStatus,
@@ -24,20 +31,13 @@ export class CreateEventDto {
   gameTitle: string;
 
   @ApiProperty({
-    example: 'a'.repeat(128),
-    description: 'SHA-512 of settings blob',
+    example: 1,
+    description:
+      'Preset whose settings snapshot pins the event (settingsBlobSha512 is derived from it)',
   })
   @IsNotEmpty()
-  @IsString()
-  settingsBlobSha512: string;
-
-  @ApiProperty({
-    example: 'b'.repeat(128),
-    description: 'SHA-512 of FVX jar',
-  })
-  @IsNotEmpty()
-  @IsString()
-  fvxJarSha512: string;
+  @IsInt()
+  presetId: number;
 
   @ApiProperty({
     example: 'c'.repeat(128),
@@ -288,4 +288,32 @@ export class FinishEventDto {
 
 export class DryRunDto {
   // File is passed via multipart, not in body — no properties needed
+}
+
+// ==================== QUICK RANDOMIZE DTO ====================
+
+/**
+ * Direct, event-less randomization: pick a preset + upload a ROM, get the
+ * randomized ROM back. Multipart fields arrive as strings, so numeric fields
+ * are coerced via @Type (transform is enabled globally).
+ */
+export class QuickRandomizeDto {
+  @ApiProperty({ example: 1, description: 'Preset supplying the FVX settings' })
+  @Type(() => Number)
+  @IsInt()
+  presetId: number;
+
+  @ApiProperty({ example: 'gba', enum: ['gba', 'nds'] })
+  @IsString()
+  @IsIn(['gba', 'nds'])
+  gamePlatform: string;
+
+  @ApiProperty({
+    required: false,
+    description: 'Optional fixed seed; a random one is used when omitted',
+  })
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  seed?: number;
 }

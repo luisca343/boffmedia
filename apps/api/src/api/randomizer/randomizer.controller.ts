@@ -9,8 +9,12 @@ import {
   Post,
   Req,
   UseGuards,
+  UseInterceptors,
+  UploadedFile,
+  BadRequestException,
   StreamableFile,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import {
   ApiBearerAuth,
   ApiConsumes,
@@ -36,6 +40,7 @@ import {
   PresetResponseDto,
   LockEventDto,
   FinishEventDto,
+  QuickRandomizeDto,
 } from './dto/randomizer.dto';
 
 // Admin panel for randomizer events, assignments, and presets.
@@ -142,6 +147,35 @@ export class RandomizerController {
       stubStream,
     );
     return new StreamableFile(randomizedRom);
+  }
+
+  @Post('quick-randomize')
+  @ApiOperation({
+    summary: 'Randomizar una ROM al vuelo con un preset (descarga directa)',
+  })
+  @ApiConsumes('multipart/form-data')
+  @ApiResponse({ status: HttpStatus.OK })
+  @UseInterceptors(FileInterceptor('rom'))
+  async quickRandomize(
+    @UploadedFile() rom: Express.Multer.File,
+    @Body() dto: QuickRandomizeDto,
+  ): Promise<StreamableFile> {
+    if (!rom?.buffer?.length) {
+      throw new BadRequestException('ROM file is required (multipart field "rom")');
+    }
+
+    const { romBytes, seed } = await this.events.quickRandomize({
+      presetId: dto.presetId,
+      gamePlatform: dto.gamePlatform as 'gba' | 'nds',
+      romBuffer: rom.buffer,
+      seed: dto.seed,
+    });
+
+    const ext = dto.gamePlatform === 'nds' ? 'nds' : 'gba';
+    return new StreamableFile(romBytes, {
+      type: 'application/octet-stream',
+      disposition: `attachment; filename="randomized-${seed}.${ext}"`,
+    });
   }
 
   // ==================== ASSIGNMENTS ====================

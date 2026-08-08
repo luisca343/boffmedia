@@ -16,13 +16,9 @@ export type CreateEventDto = {
      */
     gameTitle: string;
     /**
-     * SHA-512 of settings blob
+     * Preset whose settings snapshot pins the event (settingsBlobSha512 is derived from it)
      */
-    settingsBlobSha512: string;
-    /**
-     * SHA-512 of FVX jar
-     */
-    fvxJarSha512: string;
+    presetId: number;
     /**
      * SHA-512 of clean ROM
      */

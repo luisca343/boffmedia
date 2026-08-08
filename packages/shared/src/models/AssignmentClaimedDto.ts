@@ -13,7 +13,7 @@ export type AssignmentClaimedDto = {
     /**
      * SHA-512 of randomized output ROM; present only if patched
      */
-    outputSha512: Record<string, any> | null;
+    outputSha512: string | null;
 };
 export namespace AssignmentClaimedDto {
     export enum status {

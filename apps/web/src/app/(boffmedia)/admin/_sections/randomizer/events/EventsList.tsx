@@ -108,7 +108,7 @@ export function EventsList({
 
   const filtered = (events ?? []).filter(
     (e) =>
-      e.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      e.gameTitle.toLowerCase().includes(searchTerm.toLowerCase()) ||
       e.gamePlatform.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
@@ -184,7 +184,7 @@ export function EventsList({
                         {PLATFORM_LABELS[event.gamePlatform] || event.gamePlatform}
                       </span>
                     </td>
-                    <td className="px-3 py-2 font-medium">{event.title}</td>
+                    <td className="px-3 py-2 font-medium">{event.gameTitle}</td>
                     <td className="px-3 py-2 text-txt-muted">
                       {new Date(event.createdAt).toLocaleDateString()}
                     </td>

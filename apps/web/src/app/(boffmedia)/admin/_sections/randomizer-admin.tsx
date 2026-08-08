@@ -10,6 +10,7 @@ import { TournamentsService } from "@/services/api/boffmedia/tournamentsService"
 import type { RandomizerPreset, RandomizerEvent } from "@/services/api/boffmedia/randomizer.types"
 import type { TournamentSummaryApi } from "@/services/api/boffmedia/tournamentsService"
 import { RandomizerEditor } from "./randomizer/randomizer-editor"
+import { QuickRandomizeModal } from "./randomizer/QuickRandomizeModal"
 import { EventsList } from "./randomizer/events/EventsList"
 import { EventEditor } from "./randomizer/events/EventEditor"
 import { AssignmentsList } from "./randomizer/events/AssignmentsList"
@@ -90,7 +91,7 @@ function EventsView() {
         <div>
           <AvPanel className="mb-5">
             <Button
-              onClick={() => setEditingEvent({ id: "", tournamentId: selectedTournamentId, title: "", gamePlatform: "gba", cleanRomSha512: "", romHint: "", status: "draft", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() } as any)}
+              onClick={() => setEditingEvent({ id: "", tournamentId: selectedTournamentId, gameTitle: "", gamePlatform: "gba", settingsBlobSha512: "", fvxJarSha512: "", cleanRomSha512: "", romHint: "", status: "draft", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() } as any)}
               className="w-full"
             >
               <Icon name="plus" size={16} />
@@ -117,6 +118,7 @@ function PresetsView() {
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState("")
   const [deleting, setDeleting] = useState<string | null>(null)
+  const [randomizing, setRandomizing] = useState<RandomizerPreset | null>(null)
 
   useEffect(() => {
     loadPresets()
@@ -210,6 +212,14 @@ function PresetsView() {
                 <div className="flex gap-2 shrink-0">
                   <Button
                     size="sm"
+                    variant="pri"
+                    onClick={() => setRandomizing(preset)}
+                  >
+                    <Icon name="dice" size={16} />
+                    {t("quick.run")}
+                  </Button>
+                  <Button
+                    size="sm"
                     variant="ghost"
                     onClick={() => {
                       // Later: load and switch to editor
@@ -241,6 +251,13 @@ function PresetsView() {
             ))}
           </div>
         </AvPanel>
+      )}
+
+      {randomizing && (
+        <QuickRandomizeModal
+          preset={randomizing}
+          onClose={() => setRandomizing(null)}
+        />
       )}
     </div>
   )

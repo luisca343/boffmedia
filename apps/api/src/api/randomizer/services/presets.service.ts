@@ -220,7 +220,11 @@ export class PresetsService {
       name: preset.name,
       description: preset.description,
       gameScope: preset.gameScope,
-      settingsJson: preset.settingsJson,
+      // `settings_json` is a MySQL json column but the driver returns a raw string on read.
+      settingsJson:
+        typeof preset.settingsJson === 'string'
+          ? (JSON.parse(preset.settingsJson) as Record<string, unknown>)
+          : preset.settingsJson,
       rnqsBlobSha512: preset.rnqsBlobSha512,
       updatedBy: preset.updatedBy,
       createdAt: preset.createdAt,

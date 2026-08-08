@@ -11,6 +11,7 @@ import {
   Toggle,
   Input,
   Icon,
+  Spinner,
   toast,
 } from "@boffmedia/ui"
 import { AvPanel, AvSectionHead, AvAlert } from "../../_components/ui/av-kit"
@@ -236,6 +237,10 @@ export function RandomizerEditor() {
   const [activeTab, setActiveTab] = useState<(typeof RANDOMIZER_TABS)[number]["value"]>("traits")
   const [selectedGame, setSelectedGame] = useState<string>("")
   const [limitPokemon, setLimitPokemon] = useState(false)
+  const [saveModalOpen, setSaveModalOpen] = useState(false)
+  const [presetName, setPresetName] = useState("")
+  const [presetDescription, setPresetDescription] = useState("")
+  const [saving, setSaving] = useState(false)
 
   const form = useForm<any>({
     resolver: zodResolver(RandomizerSettings as any) as any,
@@ -252,8 +257,34 @@ export function RandomizerEditor() {
       toast({ tone: "bad", title: t("chrome.validationError"), msg: "Please fix errors before saving" })
       return
     }
-    toast({ tone: "ok", title: "Saved", msg: "Settings saved (no-op in shell phase)" })
+    setSaveModalOpen(true)
   }, [isValid, t])
+
+  const confirmSave = useCallback(async () => {
+    if (!presetName.trim()) {
+      toast({ tone: "bad", title: t("chrome.validationError"), msg: t("chrome.namePlaceholder") })
+      return
+    }
+    setSaving(true)
+    try {
+      const res = await RandomizerService.createPreset({
+        name: presetName.trim(),
+        description: presetDescription.trim() || undefined,
+        gameScope: selectedGame || undefined,
+        settingsJson: form.getValues(),
+      })
+      if (res.success) {
+        toast({ tone: "ok", title: t("chrome.presetSaved") })
+        setSaveModalOpen(false)
+        setPresetName("")
+        setPresetDescription("")
+      } else {
+        toast({ tone: "bad", title: t("chrome.saveError"), msg: res.userMessage })
+      }
+    } finally {
+      setSaving(false)
+    }
+  }, [presetName, presetDescription, selectedGame, form, t])
 
   const handleDryRun = useCallback(async (romFile: File) => {
     toast({ tone: "info", title: "Dry-run", msg: "Placeholder (wired in later pass)" })
@@ -315,7 +346,7 @@ export function RandomizerEditor() {
           <div className="flex gap-3">
             <Button
               onClick={handleSave}
-              disabled={!isDirty || !isValid}
+              disabled={!isValid}
             >
               {t("chrome.save")}
             </Button>
@@ -328,6 +359,48 @@ export function RandomizerEditor() {
             </Button>
           </div>
         </div>
+
+        {/* Save-preset modal */}
+        {saveModalOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+            <AvPanel className="max-w-md w-full">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="font-semibold">{t("chrome.savePreset")}</h3>
+                <button
+                  onClick={() => setSaveModalOpen(false)}
+                  className="text-txt-dim hover:text-txt"
+                >
+                  <Icon name="x" size={18} />
+                </button>
+              </div>
+              <div className="space-y-3">
+                <Input
+                  placeholder={t("chrome.namePlaceholder")}
+                  value={presetName}
+                  onChange={(e) => setPresetName(e.currentTarget.value)}
+                />
+                <Input
+                  placeholder={t("chrome.descriptionPlaceholder")}
+                  value={presetDescription}
+                  onChange={(e) => setPresetDescription(e.currentTarget.value)}
+                />
+                <div className="flex gap-3 pt-2">
+                  <Button onClick={confirmSave} disabled={saving} className="flex-1">
+                    {saving && <Spinner size={16} />}
+                    {t("chrome.save")}
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    onClick={() => setSaveModalOpen(false)}
+                    disabled={saving}
+                  >
+                    {t("chrome.cancel")}
+                  </Button>
+                </div>
+              </div>
+            </AvPanel>
+          </div>
+        )}
       </div>
     </FormProvider>
   )

@@ -1050,7 +1050,26 @@
       "errorLoadingPresets": "Error al cargar presets",
       "refresh": "Actualizar",
       "validationError": "Error de validación",
-      "dirty": "Cambios sin guardar"
+      "dirty": "Cambios sin guardar",
+      "savePreset": "Guardar preset",
+      "namePlaceholder": "Nombre del preset",
+      "descriptionPlaceholder": "Descripción (opcional)",
+      "presetSaved": "Preset guardado",
+      "saveError": "No se pudo guardar el preset"
+    },
+    "quick": {
+      "title": "Randomizar ROM",
+      "run": "Randomizar",
+      "running": "Randomizando…",
+      "dropZone": "Elige una ROM .gba/.nds",
+      "selectRom": "Selecciona una ROM primero",
+      "platform": "Plataforma",
+      "seed": "Semilla",
+      "seedHint": "Opcional",
+      "seedPlaceholder": "Aleatoria si se deja vacío",
+      "cancel": "Cancelar",
+      "done": "ROM randomizada descargada",
+      "error": "Falló la randomización"
     },
     "panels": {
       "baseStatistics": "Estadísticas Base de Pokémon",
