@@ -1017,6 +1017,7 @@
     "chrome": {
       "presets": "Presets",
       "editor": "Editor",
+      "events": "Events",
       "loadPreset": "Load preset…",
       "newPreset": "New preset",
       "importRnqs": "Import .rnqs",

@@ -305,7 +305,7 @@ export function RandomizerAdmin() {
               size="sm"
               onClick={() => handleViewChange("events")}
             >
-              {t("events")}
+              {t("chrome.events")}
             </Button>
           </div>
         }
