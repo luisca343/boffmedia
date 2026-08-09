@@ -674,6 +674,7 @@ mod tests {
             pinned: false,
             game_type: GameType::Minecraft,
             emulator: None,
+            randomizer: None,
         }
     }
 

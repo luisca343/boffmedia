@@ -601,6 +601,7 @@ mod tests {
             pinned: false,
             game_type: GameType::Minecraft,
             emulator: None,
+            randomizer: None,
         };
         assert_eq!(mod_count_of(&marker), 2, "configs are not mods");
 

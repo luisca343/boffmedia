@@ -120,7 +120,7 @@ async fn install_payload(
     reporter.emit(Phase::Verifying, 0.5, "", 0, 0);
 
     let previous = super::read_marker(&prepared.instance);
-    let mut marker = build_marker(&prepared.plan, &wanted, manifest);
+    let mut marker = build_marker(&prepared.plan, &wanted, manifest, previous.as_ref());
     // A pin survives a re-verify of the SAME version (every launch does one)
     // and is cleared by an install of a different one — an explicit update.
     marker.pinned = previous
@@ -150,7 +150,76 @@ async fn install_payload(
     Ok(())
 }
 
-fn build_marker(plan: &PlannedEmulator, installed: &[PlannedFile], manifest: &PackManifest) -> Marker {
+/// Carry this player's randomized ROM hash across a marker rebuild.
+///
+/// The randomizer ROM slot is the one managed entry whose expected hash is NOT
+/// the manifest's. The manifest carries the CLEAN ROM's hash — that is the whole
+/// point of the gate — while what belongs on disk is the player's randomized
+/// output, written here by the randomizer flow.
+///
+/// The install pass runs again on EVERY launch, so rebuilding that entry from
+/// the plan put the clean hash back each time: the gate re-armed itself between
+/// the panel clearing it and `spawn` reading it, Play failed with "you must
+/// patch the ROM first", and the panel re-downloaded the ROM on the next visit
+/// — forever.
+fn preserve_randomizer_rom_hash(
+    managed: &mut [ManagedFile],
+    rom_path: &str,
+    gate_event_id: i64,
+    gate_clean_sha512: &str,
+    previous: Option<&Marker>,
+) {
+    // Only carry the hash forward when it was produced for THIS gate. A
+    // different event, or a new version with a different clean ROM, makes the
+    // stored output meaningless — and preserving it there would leave the gate
+    // looking satisfied by a ROM randomized for something else entirely.
+    let same_gate = previous
+        .and_then(|p| p.randomizer.as_ref())
+        .is_some_and(|prev| {
+            prev.event_id == gate_event_id
+                && prev.clean_rom_sha512.eq_ignore_ascii_case(gate_clean_sha512)
+        });
+    if !same_gate {
+        return;
+    }
+
+    let norm = |p: &str| p.to_lowercase().replace('\\', "/");
+    let rom_key = norm(rom_path);
+
+    let kept = previous
+        .and_then(|p| p.managed.iter().find(|f| norm(&f.path) == rom_key))
+        // An entry still equal to the clean hash means the player never patched,
+        // so there is nothing worth carrying forward.
+        .filter(|f| !f.sha512.eq_ignore_ascii_case(gate_clean_sha512))
+        .map(|f| (f.sha512.clone(), f.size));
+
+    if let Some((sha512, size)) = kept {
+        if let Some(entry) = managed.iter_mut().find(|f| norm(&f.path) == rom_key) {
+            entry.sha512 = sha512;
+            entry.size = size;
+        }
+    }
+}
+
+fn build_marker(
+    plan: &PlannedEmulator,
+    installed: &[PlannedFile],
+    manifest: &PackManifest,
+    previous: Option<&Marker>,
+) -> Marker {
+    let mut managed: Vec<ManagedFile> =
+        installed.iter().map(ManagedFile::from_planned).collect();
+
+    if let Some(gate) = &manifest.randomizer {
+        preserve_randomizer_rom_hash(
+            &mut managed,
+            &plan.rom,
+            gate.event_id,
+            &gate.clean_rom_sha512.to_string(),
+            previous,
+        );
+    }
+
     Marker {
         version_id: plan.version_id.clone(),
         version_name: plan.version_name.clone(),
@@ -161,7 +230,7 @@ fn build_marker(plan: &PlannedEmulator, installed: &[PlannedFile], manifest: &Pa
         installed_at: chrono::Utc::now().to_rfc3339(),
         file_count: installed.len(),
         pack_id: plan.pack_id.clone(),
-        managed: installed.iter().map(ManagedFile::from_planned).collect(),
+        managed,
         optional_files: plan
             .files
             .iter()
@@ -448,4 +517,141 @@ fn spawn(app: &tauri::AppHandle, prepared: &EmulatorPrepared) -> Result<RunningG
         &prepared.instance.minecraft,
         prepared.plan.pack_id.clone(),
     )
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::install::instance::{ManagedSource, RandomizerGate};
+
+    const CLEAN: &str = "aaaa";
+    const RANDOMIZED: &str = "bbbb";
+    const ROM: &str = "roms/rom.gba";
+
+    fn rom_entry(sha512: &str, size: u64) -> ManagedFile {
+        ManagedFile {
+            path: ROM.to_string(),
+            sha512: sha512.to_string(),
+            size,
+            is_mod: false,
+            optional: false,
+            source: ManagedSource::UserProvided {
+                hint: "Pokémon FireRed".to_string(),
+            },
+        }
+    }
+
+    /// A marker as the randomizer flow leaves it: the ROM entry rewritten to the
+    /// player's randomized output, which is what clears the launch gate.
+    fn previous_marker(gate: Option<RandomizerGate>, rom_sha512: &str) -> Marker {
+        Marker {
+            version_id: "v1".into(),
+            version_name: "1.0".into(),
+            minecraft: String::new(),
+            loader: None,
+            loader_version: None,
+            installed_at: "2026-08-09T00:00:00Z".into(),
+            file_count: 1,
+            pack_id: "pk1".into(),
+            managed: vec![rom_entry(rom_sha512, 4096)],
+            optional_files: vec![],
+            pinned: false,
+            game_type: GameType::Emulator,
+            emulator: Some(instance::EmulatorMarker {
+                kind: "mgba".into(),
+                rom: ROM.into(),
+                args: vec![],
+            }),
+            randomizer: gate,
+        }
+    }
+
+    fn gate() -> RandomizerGate {
+        RandomizerGate {
+            event_id: 3,
+            clean_rom_sha512: CLEAN.into(),
+        }
+    }
+
+    #[test]
+    fn the_randomized_hash_survives_the_rebuild_every_launch_performs() {
+        // The plan always carries the CLEAN hash — it comes from the manifest.
+        let mut managed = vec![rom_entry(CLEAN, 1024)];
+        let previous = previous_marker(Some(gate()), RANDOMIZED);
+
+        preserve_randomizer_rom_hash(&mut managed, ROM, 3, CLEAN, Some(&previous));
+
+        // Without this the gate re-arms on every Play and the pack is unplayable.
+        assert_eq!(managed[0].sha512, RANDOMIZED);
+        assert_eq!(managed[0].size, 4096);
+    }
+
+    #[test]
+    fn a_player_who_never_patched_keeps_the_clean_hash() {
+        let mut managed = vec![rom_entry(CLEAN, 1024)];
+        let previous = previous_marker(Some(gate()), CLEAN);
+
+        preserve_randomizer_rom_hash(&mut managed, ROM, 3, CLEAN, Some(&previous));
+
+        assert_eq!(managed[0].sha512, CLEAN, "the gate must stay armed");
+    }
+
+    #[test]
+    fn a_first_install_has_nothing_to_carry_forward() {
+        let mut managed = vec![rom_entry(CLEAN, 1024)];
+        preserve_randomizer_rom_hash(&mut managed, ROM, 3, CLEAN, None);
+        assert_eq!(managed[0].sha512, CLEAN);
+    }
+
+    #[test]
+    fn a_hash_from_a_different_event_is_not_reused() {
+        // Re-pointing the pack at another event invalidates the old output: it
+        // was randomized for a different run, and honouring it would let the
+        // player into the new event with the previous event's ROM.
+        let mut managed = vec![rom_entry(CLEAN, 1024)];
+        let previous = previous_marker(
+            Some(RandomizerGate {
+                event_id: 99,
+                clean_rom_sha512: CLEAN.into(),
+            }),
+            RANDOMIZED,
+        );
+
+        preserve_randomizer_rom_hash(&mut managed, ROM, 3, CLEAN, Some(&previous));
+
+        assert_eq!(managed[0].sha512, CLEAN);
+    }
+
+    #[test]
+    fn a_new_version_with_a_different_clean_rom_invalidates_the_output() {
+        let mut managed = vec![rom_entry("cccc", 1024)];
+        let previous = previous_marker(Some(gate()), RANDOMIZED);
+
+        // Same event, but the version now ships a different base ROM.
+        preserve_randomizer_rom_hash(&mut managed, ROM, 3, "cccc", Some(&previous));
+
+        assert_eq!(managed[0].sha512, "cccc");
+    }
+
+    #[test]
+    fn a_previous_install_with_no_gate_is_ignored() {
+        let mut managed = vec![rom_entry(CLEAN, 1024)];
+        let previous = previous_marker(None, RANDOMIZED);
+
+        preserve_randomizer_rom_hash(&mut managed, ROM, 3, CLEAN, Some(&previous));
+
+        assert_eq!(managed[0].sha512, CLEAN);
+    }
+
+    #[test]
+    fn the_rom_path_is_matched_case_and_separator_insensitively() {
+        let mut managed = vec![rom_entry("ROMS\\ROM.GBA", 0)];
+        managed[0].path = "ROMS\\ROM.GBA".to_string();
+        managed[0].sha512 = CLEAN.to_string();
+        let previous = previous_marker(Some(gate()), RANDOMIZED);
+
+        preserve_randomizer_rom_hash(&mut managed, ROM, 3, CLEAN, Some(&previous));
+
+        assert_eq!(managed[0].sha512, RANDOMIZED);
+    }
 }
