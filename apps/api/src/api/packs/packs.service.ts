@@ -88,8 +88,11 @@ export class PacksService {
           ...(pack.description ? { description: pack.description } : {}),
           ...(pack.gallery ? { gallery: pack.gallery as any } : {}),
           // The card reads this to mark the pack as a server pack and to ping
-          // the server for its live status.
-          ...(pack.server ? { server: pack.server } : {}),
+          // the server for its live status. Minecraft-only, mirroring the
+          // manifest: a non-MC pack never advertises a Quick Play server.
+          ...(gameType === 'minecraft' && pack.server
+            ? { server: pack.server }
+            : {}),
           accessKind: pack.accessKind,
           latestVersion:
             version && version.published
@@ -221,9 +224,12 @@ export class PacksService {
         ...(pack.gallery ? { gallery: pack.gallery } : {}),
         // Carried into the manifest too, so the installed pack can Quick Play
         // into the server offline (the listing is not consulted at launch).
-        // Only when it has a host: a legacy `{}` must not fail PackManifest
-        // validation and block the whole install — it just means "no server".
-        ...(pack.server?.host ? { server: pack.server } : {}),
+        // Minecraft-only: a legacy non-MC row with a stored server must never
+        // ship a Quick Play target. Only when it has a host: a legacy `{}` must
+        // not fail PackManifest validation and block the whole install.
+        ...(gameType === 'minecraft' && pack.server?.host
+          ? { server: pack.server }
+          : {}),
         access: this.accessPayload(pack.accessKind),
         latestVersionId: version.id,
       },
@@ -384,9 +390,12 @@ export class PacksService {
     if (existing)
       throw new BadRequestException('Ya existe un pack con ese slug');
 
-    if (dto.accessKind === 'password' && !dto.password) {
-      throw new BadRequestException(
-        'Un pack con contraseña necesita una contraseña',
+    // Password packs are deprecated: the write path is closed while existing
+    // rows stay readable (listVisibleTo/assertAccess still honour them). New
+    // private packs use invites/grants instead.
+    if (dto.accessKind === 'password') {
+      throw new ConflictException(
+        'Los packs con contraseña están obsoletos; usa invitaciones o concede acceso por cuenta',
       );
     }
 
@@ -397,6 +406,9 @@ export class PacksService {
       dto.gameType && dto.gameType !== 'minecraft'
         ? (dto.gameType as GameType)
         : null;
+    // Quick Play targets are minecraft-only: an emulator/zomboid/stardew pack
+    // that happens to send `server` gets it stripped, never persisted.
+    const isMinecraft = this.resolveGameType(gameType) === 'minecraft';
     await this.repo.insertPack({
       id,
       slug: dto.slug,
@@ -406,7 +418,7 @@ export class PacksService {
       description: dto.description ?? null,
       iconUrl: dto.iconUrl ?? null,
       gallery: dto.gallery ?? null,
-      server: this.normalizeServer(dto.server),
+      server: isMinecraft ? this.normalizeServer(dto.server) : null,
       accessKind: dto.accessKind,
       passwordHash: dto.password ? await bcrypt.hash(dto.password, 10) : null,
     });
@@ -426,6 +438,14 @@ export class PacksService {
     const pack = await this.repo.findById(id);
     if (!pack) throw new NotFoundException('Pack no encontrado');
 
+    // Password packs are deprecated: converting a pack TO password is rejected,
+    // while an existing password pack can still be edited (read-compat).
+    if (dto.accessKind === 'password') {
+      throw new ConflictException(
+        'Los packs con contraseña están obsoletos; usa invitaciones o concede acceso por cuenta',
+      );
+    }
+
     const patch: Record<string, unknown> = {};
     if (dto.name !== undefined) patch.name = dto.name;
     if (dto.summary !== undefined) patch.summary = dto.summary;
@@ -433,8 +453,13 @@ export class PacksService {
     if (dto.gallery !== undefined) patch.gallery = dto.gallery;
     if (dto.iconUrl !== undefined) patch.iconUrl = dto.iconUrl;
     // `null` clears the server (back to a client pack); an object sets it.
+    // gameType is immutable, so a non-minecraft pack never persists a server:
+    // whatever the admin sends is stripped to null (Quick Play is MC-only).
     if (dto.server !== undefined)
-      patch.server = this.normalizeServer(dto.server);
+      patch.server =
+        this.resolveGameType(pack.gameType) === 'minecraft'
+          ? this.normalizeServer(dto.server)
+          : null;
     if (dto.archived !== undefined) patch.archived = dto.archived;
     if (dto.accessKind !== undefined) patch.accessKind = dto.accessKind;
     if (dto.password !== undefined) {

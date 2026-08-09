@@ -1,6 +1,6 @@
 import { Injectable, Inject, ConflictException } from '@nestjs/common';
 import { MySql2Database } from 'drizzle-orm/mysql2';
-import { and, eq, ne, or, sql, isNotNull, inArray } from 'drizzle-orm';
+import { and, eq, ne, or, sql, isNotNull, isNull, inArray } from 'drizzle-orm';
 import { packs } from '@/_db/schema/Packs';
 import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
 import {
@@ -426,7 +426,22 @@ export class RandomizerRepository {
             eq(boffMediaEventParticipants.eventId, eventId),
           ),
         )
-        .where(eq(boffMediaParticipants.userId, userId))
+        .innerJoin(
+          boffMediaEvents,
+          and(
+            eq(boffMediaEvents.id, boffMediaEventParticipants.eventId),
+            isNull(boffMediaEvents.deletedAt),
+          ),
+        )
+        .where(
+          and(
+            eq(boffMediaParticipants.userId, userId),
+            inArray(boffMediaEventParticipants.status, [
+              'registered',
+              'confirmed',
+            ]),
+          ),
+        )
         .execute();
 
       if (rows.length === 0) {
@@ -434,11 +449,6 @@ export class RandomizerRepository {
       }
 
       const row = rows[0];
-      // Only 'registered' or 'confirmed' are eligible
-      if (row.status !== 'registered' && row.status !== 'confirmed') {
-        return null;
-      }
-
       return {
         boffmediaUserId: row.boffmediaUserId!,
         status: row.status,

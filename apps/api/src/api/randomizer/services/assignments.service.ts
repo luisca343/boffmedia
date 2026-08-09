@@ -58,8 +58,8 @@ export class AssignmentsService {
   /**
    * Get the current user's assignment for a config.
    *
-   * - Resolve entitlement: mcUuid → boffMediaUsers → event participant (must be registered/confirmed)
-   * - Check if assignment exists for (configId, mcUuid)
+   * - Resolve entitlement by user id: event participant must be registered/confirmed
+   * - Check if assignment exists for (configId, userId)
    * - If found → return it (sealed DTO)
    * - If NOT found AND config.status==='open' → MINT: generate seed, create assignment, return sealed DTO
    * - If NOT found AND config.status!=='open' → throw 404 (claims closed; they never participated)

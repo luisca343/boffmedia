@@ -71,10 +71,12 @@ export class EventsFacadeService {
   async getEvent(
     id: number,
     includePrivate = false,
+    userId?: number,
   ): Promise<Event & { childEvents?: Event[] }> {
     return this.eventsService.getEventById(
       id,
       includePrivate,
+      userId,
     ) as unknown as Event & {
       childEvents?: Event[];
     };
@@ -208,10 +210,12 @@ export class EventsFacadeService {
   async getEventAchievements(
     eventId: number,
     includePrivate = false,
+    userId?: number,
   ): Promise<Achievement[]> {
     const eventVisible = await this.eventsService.validateEventVisible(
       eventId,
       includePrivate,
+      userId,
     );
     if (!eventVisible) {
       // 404 (not 500) — also hides a private event's existence from non-admins.
@@ -271,10 +275,12 @@ export class EventsFacadeService {
     participantId: number,
     eventId: number,
     includePrivate = false,
+    userId?: number,
   ): Promise<AchievementWithProgress[]> {
     const eventVisible = await this.eventsService.validateEventVisible(
       eventId,
       includePrivate,
+      userId,
     );
     if (!eventVisible) {
       // 404 (not 500) — also hides a private event's existence from non-admins.
@@ -295,10 +301,12 @@ export class EventsFacadeService {
   async getEventTeams(
     eventId: number,
     includePrivate = false,
+    userId?: number,
   ): Promise<Team[]> {
     const eventVisible = await this.eventsService.validateEventVisible(
       eventId,
       includePrivate,
+      userId,
     );
     if (!eventVisible) {
       // 404 (not 500) — also hides a private event's existence from non-admins.
@@ -484,6 +492,14 @@ export class EventsFacadeService {
       throw new NotFoundException('You are not a participant of this event');
     }
 
+    // A removed player cannot self-clear their expulsion by leaving and
+    // re-joining; the `removed` row must stay to keep the REMOVED guard effective.
+    if (participation.status === PARTICIPANT_STATUS.REMOVED) {
+      throw new ForbiddenException(
+        'Has sido expulsado de este evento por un administrador',
+      );
+    }
+
     await this.participantsService.leaveEvent(
       eventId,
       participation.participantId,
@@ -564,10 +580,12 @@ export class EventsFacadeService {
   async getEventParticipants(
     eventId: number,
     includePrivate = false,
+    userId?: number,
   ): Promise<Participant[]> {
     const eventVisible = await this.eventsService.validateEventVisible(
       eventId,
       includePrivate,
+      userId,
     );
     if (!eventVisible) {
       // 404 (not 500) — also hides a private event's existence from non-admins.
@@ -648,10 +666,12 @@ export class EventsFacadeService {
   async getLeaderboard(
     eventId: number,
     includePrivate = false,
+    userId?: number,
   ): Promise<LeaderboardEntry[]> {
     const eventVisible = await this.eventsService.validateEventVisible(
       eventId,
       includePrivate,
+      userId,
     );
     if (!eventVisible) {
       // 404 (not 500) — also hides a private event's existence from non-admins.
@@ -664,10 +684,12 @@ export class EventsFacadeService {
   async getTeamLeaderboard(
     eventId: number,
     includePrivate = false,
+    userId?: number,
   ): Promise<TeamLeaderboardEntry[]> {
     const eventVisible = await this.eventsService.validateEventVisible(
       eventId,
       includePrivate,
+      userId,
     );
     if (!eventVisible) {
       // 404 (not 500) — also hides a private event's existence from non-admins.

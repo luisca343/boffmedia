@@ -6,6 +6,8 @@ import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
 import {
   boffMediaEvents,
   boffMediaGames,
+  boffMediaParticipants,
+  boffMediaEventParticipants,
   Event,
 } from '@/_db/schema/BoffMediaEvents';
 
@@ -128,6 +130,26 @@ export class EventsRepository {
     return (result.length
       ? result[0]
       : null) as unknown as EventWithGameNameAndParent | null;
+  }
+
+  /** True when the user has a participation row in the event (any status). */
+  async isParticipant(eventId: number, userId: number): Promise<boolean> {
+    if (!eventId || !userId) return false;
+    const rows = await this.db
+      .select({ id: boffMediaEventParticipants.id })
+      .from(boffMediaEventParticipants)
+      .innerJoin(
+        boffMediaParticipants,
+        eq(boffMediaParticipants.id, boffMediaEventParticipants.participantId),
+      )
+      .where(
+        and(
+          eq(boffMediaEventParticipants.eventId, eventId),
+          eq(boffMediaParticipants.userId, userId),
+        ),
+      )
+      .limit(1);
+    return rows.length > 0;
   }
 
   async findChildEvents(

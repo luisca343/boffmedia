@@ -94,8 +94,22 @@ pub fn clear_refresh_token() -> Result<(), StoreError> {
 // lasts 30 days. Same store as the refresh token, for the same reason: it is a
 // bearer credential for the account.
 
+//
+// MULTI-ACCOUNT. `LAUNCHER_SESSION` now doubles as the ACTIVE account's token
+// mirror: it always holds whatever account is currently active, so `authed()`
+// (which has no AppHandle to read the roster) can fetch the active token with
+// no extra plumbing. Each signed-in account ALSO gets a per-id entry, which is
+// what a switch reads to make a different account active.
+
 const LAUNCHER_SESSION: &str = "boff-launcher-session";
 
+/// One Boffmedia-session credential per account. The id is the account's numeric
+/// primary key; it is filtered anyway, since it becomes part of a store key.
+fn launcher_account_key(id: i64) -> String {
+    format!("{LAUNCHER_SESSION}:{id}")
+}
+
+/// The ACTIVE account's token (the mirror). Read by `authed()` on every request.
 pub fn load_launcher_session() -> Result<Option<String>, StoreError> {
     match entry_for(LAUNCHER_SESSION)?.get_password() {
         Ok(token) => Ok(Some(token)),
@@ -110,6 +124,26 @@ pub fn save_launcher_session(token: &str) -> Result<(), StoreError> {
 
 pub fn clear_launcher_session() -> Result<(), StoreError> {
     match entry_for(LAUNCHER_SESSION)?.delete_credential() {
+        Ok(()) => Ok(()),
+        Err(keyring::Error::NoEntry) => Ok(()),
+        Err(err) => Err(StoreError::Keyring(err)),
+    }
+}
+
+pub fn load_launcher_session_for(id: i64) -> Result<Option<String>, StoreError> {
+    match entry_for(&launcher_account_key(id))?.get_password() {
+        Ok(token) => Ok(Some(token)),
+        Err(keyring::Error::NoEntry) => Ok(None),
+        Err(err) => Err(StoreError::Keyring(err)),
+    }
+}
+
+pub fn save_launcher_session_for(id: i64, token: &str) -> Result<(), StoreError> {
+    Ok(entry_for(&launcher_account_key(id))?.set_password(token)?)
+}
+
+pub fn clear_launcher_session_for(id: i64) -> Result<(), StoreError> {
+    match entry_for(&launcher_account_key(id))?.delete_credential() {
         Ok(()) => Ok(()),
         Err(keyring::Error::NoEntry) => Ok(()),
         Err(err) => Err(StoreError::Keyring(err)),

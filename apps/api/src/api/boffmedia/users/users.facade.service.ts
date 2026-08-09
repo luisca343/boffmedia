@@ -1,4 +1,6 @@
 import { ConflictException, Injectable } from '@nestjs/common';
+import { ModuleRef } from '@nestjs/core';
+import { PacksService } from '@api/packs/packs.service';
 import {
   BoffMediaUsersManagementService,
   UserCreationResult,
@@ -70,7 +72,34 @@ export class BoffMediaUsersFacadeService {
     private readonly usersManagementService: BoffMediaUsersManagementService,
     private readonly smartRotomUsersFacadeService: SmartRotomUsersFacadeService,
     private readonly starbankService: StarbankFacadeService,
+    private readonly moduleRef: ModuleRef,
   ) {}
+
+  /**
+   * Convert any legacy `pack_acl` UUID pre-grants into real grants the moment a
+   * Minecraft account is linked. Best-effort: a failure here must never fail the
+   * link. Resolved through ModuleRef (not a constructor dep) because PacksModule
+   * already imports the users module, and a static import would close that cycle.
+   */
+  private async claimLegacyPackGrants(
+    userId: number,
+    mcUuid: string,
+  ): Promise<void> {
+    try {
+      const packsService = this.moduleRef.get(PacksService, { strict: false });
+      const claimed = await packsService.claimLegacyGrants(userId, mcUuid);
+      if (claimed > 0) {
+        this.logger.log(
+          `Claimed ${claimed} legacy pack grant(s) for user ${userId} (${mcUuid})`,
+        );
+      }
+    } catch (error: any) {
+      this.logger.error(
+        `Failed to claim legacy pack grants for user ${userId} (${mcUuid}):`,
+        error,
+      );
+    }
+  }
 
   // ==================== USER CREATION & INITIALIZATION ====================
 
@@ -553,7 +582,12 @@ export class BoffMediaUsersFacadeService {
       world: env.MC_WORLD,
     });
 
-    return this.usersManagementService.setMinecraftUuid(userId, minecraft.uuid);
+    const linked = await this.usersManagementService.setMinecraftUuid(
+      userId,
+      minecraft.uuid,
+    );
+    await this.claimLegacyPackGrants(userId, minecraft.uuid);
+    return linked;
   }
 
   async linkMinecraftAccount(linkData: MinecraftLinkData): Promise<{
@@ -587,6 +621,11 @@ export class BoffMediaUsersFacadeService {
       // Now update BoffMedia user with UUID (the UUID exists in rotom_users now)
       const boffMediaUser =
         await this.usersManagementService.linkMinecraftAccount(linkData);
+
+      await this.claimLegacyPackGrants(
+        boffMediaUser.id,
+        linkData.minecraft.uuid,
+      );
 
       this.logger.log('Minecraft account linking completed:', {
         boffMediaUserId: boffMediaUser.id,

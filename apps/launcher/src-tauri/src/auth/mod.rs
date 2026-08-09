@@ -124,7 +124,6 @@ pub async fn auth_begin(state: tauri::State<'_, AuthState>) -> Result<DeviceCode
 pub async fn auth_await(
     app: tauri::AppHandle,
     state: tauri::State<'_, AuthState>,
-    api: tauri::State<'_, crate::api::ApiState>,
 ) -> Result<AccountView, AuthFailure> {
     let code = state
         .pending
@@ -152,9 +151,10 @@ pub async fn auth_await(
     })?;
 
     *state.pending.lock().await = None;
-    // A sign-in may be a DIFFERENT account than the one this process last held,
-    // so any launcher session minted earlier is now for the wrong UUID.
-    api.forget_session().await;
+    // Signing into Minecraft is a sub-step of launching a Minecraft pack now,
+    // NOT the launcher session. It links (or relinks) an MSA identity under the
+    // active Boffmedia account, so it must leave the Boffmedia session — and the
+    // pack library that keys on it — completely untouched.
     let view = AccountView::from(&session);
     *state.session.lock().await = Some(session);
     Ok(view)
@@ -189,6 +189,29 @@ pub async fn auth_open_verification(state: tauri::State<'_, AuthState>) -> Resul
     // Detached: `open::that` waits on the spawned process, which would hold
     // this command open for as long as the browser runs.
     open::that_detached(&url).map_err(|e| AuthFailure {
+        message: format!("No se pudo abrir el navegador: {e}"),
+        needs_signin: false,
+    })
+}
+
+/// Open an ARBITRARY external URL in the system browser.
+///
+/// Unlike `auth_open_verification`, which can only open the pending Microsoft
+/// device code, this takes the URL from the renderer — the Boffmedia device
+/// flow's verification page and the randomizer's event link both live in the
+/// pack API / website, not in `AuthState.pending`. Only http(s) is accepted, so
+/// the renderer cannot turn this into a launcher for `file://` or a custom
+/// scheme handler.
+#[tauri::command]
+pub async fn open_url(url: String) -> Result<(), AuthFailure> {
+    let trimmed = url.trim();
+    if !(trimmed.starts_with("https://") || trimmed.starts_with("http://")) {
+        return Err(AuthFailure {
+            message: "Enlace no válido.".into(),
+            needs_signin: false,
+        });
+    }
+    open::that_detached(trimmed).map_err(|e| AuthFailure {
         message: format!("No se pudo abrir el navegador: {e}"),
         needs_signin: false,
     })
@@ -369,7 +392,6 @@ pub async fn auth_switch(
     app: tauri::AppHandle,
     uuid: String,
     state: tauri::State<'_, AuthState>,
-    api: tauri::State<'_, crate::api::ApiState>,
 ) -> Result<AccountView, AuthFailure> {
     let _restoring = state.restoring.lock().await;
 
@@ -405,9 +427,9 @@ pub async fn auth_switch(
         needs_signin: false,
     })?;
 
-    // The launcher JWT belongs to the PREVIOUS uuid; keeping it would let the
-    // new account list the old one's packs (the same reason sign-out drops it).
-    api.forget_session().await;
+    // A Minecraft identity is a LINKED credential under the active Boffmedia
+    // account now, not the launcher session — switching it leaves the Boffmedia
+    // session (and the pack library that keys on it) alone.
     let view = AccountView::from(&session);
     *state.session.lock().await = Some(session);
     Ok(view)
@@ -424,7 +446,6 @@ pub async fn auth_remove(
     app: tauri::AppHandle,
     uuid: String,
     state: tauri::State<'_, AuthState>,
-    api: tauri::State<'_, crate::api::ApiState>,
 ) -> Result<Option<AccountView>, AuthFailure> {
     let mut roster = accounts::load(&app);
     let was_active = roster.active.as_deref() == Some(uuid.as_str());
@@ -441,10 +462,9 @@ pub async fn auth_remove(
     }
 
     *state.session.lock().await = None;
-    api.forget_session().await;
 
     match next {
-        Some(next_uuid) => auth_switch(app, next_uuid, state, api).await.map(Some),
+        Some(next_uuid) => auth_switch(app, next_uuid, state).await.map(Some),
         None => Ok(None),
     }
 }

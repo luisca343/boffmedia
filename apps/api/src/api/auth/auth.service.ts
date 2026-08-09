@@ -30,11 +30,16 @@ export class AuthService {
    */
   async login(fullUser: any, scope?: typeof TOKEN_TYPE.INGAME) {
     const user = fullUser.sessionUser || fullUser;
+    // An in-game token proves only a public UUID, so it must never carry admin
+    // roles: RolesGuard reads roles straight off the JWT, and a hijacked ingame
+    // session belonging to an admin would otherwise reach the admin API. Website
+    // (unscoped) sessions keep their real roles.
+    const isIngame = scope === TOKEN_TYPE.INGAME;
     const payload = {
       username: user.name,
       sub: user.id,
       email: user.email,
-      roles: user.roles,
+      roles: isIngame ? [] : user.roles,
       mcUuid: user.mcUUid,
     };
 
@@ -130,10 +135,10 @@ export class AuthService {
       }
 
       // Refresh tokens carry `typ: 'refresh'`; access tokens carry no `typ` at
-      // all. Tokens minted before the claim existed are indistinguishable, so
-      // they are still accepted — remove ALLOW_LEGACY_REFRESH once the 7-day
-      // window since deployment has passed and they have all expired.
-      const ALLOW_LEGACY_REFRESH = true;
+      // all. Accepting typ-less tokens meant every access token could be
+      // replayed at /auth/refresh — the migration window is closed, so only a
+      // real `typ:'refresh'` token is accepted now.
+      const ALLOW_LEGACY_REFRESH = false;
       const isRefresh = payload.typ === TOKEN_TYPE.REFRESH;
       const isLegacy = payload.typ === undefined && ALLOW_LEGACY_REFRESH;
       if (!isRefresh && !isLegacy) {
@@ -158,18 +163,20 @@ export class AuthService {
         smartRotomUser,
       } = userWithIntegrations;
 
-      const newPayload = {
-        username: user.username,
-        sub: user.id,
-        email: user.email,
-        roles,
-        mcUuid: user.uuid,
-      };
-
       // A narrowed session stays narrowed across refreshes — otherwise an
       // in-game token buys a full website session one round trip later.
       const scope: typeof TOKEN_TYPE.INGAME | undefined =
         payload.scope === TOKEN_TYPE.INGAME ? TOKEN_TYPE.INGAME : undefined;
+
+      const newPayload = {
+        username: user.username,
+        sub: user.id,
+        email: user.email,
+        // Ingame sessions never carry roles (see login()); re-minting must not
+        // reintroduce them from the DB.
+        roles: scope === TOKEN_TYPE.INGAME ? [] : roles,
+        mcUuid: user.uuid,
+      };
 
       return {
         access_token: this.jwtService.sign(

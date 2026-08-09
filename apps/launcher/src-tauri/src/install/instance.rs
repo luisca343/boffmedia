@@ -37,6 +37,22 @@ pub enum GameType {
     Emulator,
 }
 
+impl GameType {
+    /// Every game module this binary implements — one entry per `PlannedGame`
+    /// arm in `resolve::plan`. `api::game_types_header` iterates this.
+    pub const ALL: &'static [GameType] = &[GameType::Minecraft, GameType::Emulator];
+
+    /// The wire token sent in `X-Boff-Game-Types` for this module. A `match`
+    /// rather than a stored string so adding a variant fails to compile here
+    /// until its header membership is decided — the header cannot go stale.
+    pub fn module_header(self) -> &'static str {
+        match self {
+            GameType::Minecraft => "minecraft",
+            GameType::Emulator => "emulator",
+        }
+    }
+}
+
 /// Retained-version cap when settings say nothing. Three is "the one that broke
 /// it, the one before, and one more" — enough for a mid-session rollback,
 /// small enough that the history file stays a file and not a database.
@@ -221,7 +237,12 @@ impl ManagedFile {
 pub struct Marker {
     pub version_id: String,
     pub version_name: String,
-    pub minecraft: String,
+    /// The Minecraft version, present only on Minecraft markers. `None` for
+    /// emulator packs, which have no Minecraft version — writing `""` there
+    /// (as the first cut did) put a meaningless field on every emulator marker
+    /// and every emulator rollback row.
+    #[serde(default)]
+    pub minecraft: Option<String>,
     pub loader: Option<String>,
     pub loader_version: Option<String>,
     pub installed_at: String,
@@ -336,7 +357,8 @@ impl OptionalState {
 pub struct RetainedVersion {
     pub version_id: String,
     pub version_name: String,
-    pub minecraft: String,
+    /// `None` for an emulator version — the renderer's field is `string | null`.
+    pub minecraft: Option<String>,
     pub loader: Option<String>,
     pub loader_version: Option<String>,
     pub installed_at: String,
@@ -663,7 +685,7 @@ mod tests {
         Marker {
             version_id: version.to_string(),
             version_name: version.to_string(),
-            minecraft: "1.21.4".into(),
+            minecraft: Some("1.21.4".into()),
             loader: None,
             loader_version: None,
             installed_at: "2026-07-30T12:00:00Z".into(),

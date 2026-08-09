@@ -4,23 +4,43 @@ import { createPortal } from "react-dom"
 import { Icon, Spinner } from "@boffmedia/ui"
 
 import { useT } from "../i18n"
-import { PlayerHead } from "./PlayerHead"
 import { useLauncher } from "../state/launcher"
 
-// The account avatar button at the foot of the rail, and the switcher flyout it opens.
-//
-// Not the shared `Menu` primitive: the rows here are not commands but a
-// selection with a current value, each carrying its own destructive secondary
-// action (remove). Bending Menu into that shape would have cost more than the
-// lines below.
+// The account avatar button at the foot of the rail, and the switcher flyout it
+// opens. This is the PRIMARY account surface and shows the BOFFMEDIA account —
+// the launcher principal — never a Minecraft one. A Minecraft identity is a
+// linked sub-credential asked for at launch time, a separate concern from which
+// Boffmedia account you are signed in as.
 //
 // The panel is portaled to document.body because the rail scrolls, and an
-// in-tree absolute positioned panel would be clipped by the overflow.
+// in-tree absolute-positioned panel would be clipped by the overflow.
+
+/** A monogram avatar. `/packs/launcher/me` returns no avatar URL, so the
+ *  Boffmedia identity is drawn as the first letter of the username rather than
+ *  a Minecraft head — which would be the wrong identity entirely. */
+function BoffAvatar({ username, size = 32 }: { username: string; size?: number }) {
+  const letter = (username.trim()[0] ?? "?").toUpperCase()
+  return (
+    <span
+      className="cut-seal grid shrink-0 place-items-center bg-accent font-display font-bold text-accent-ink"
+      style={{ width: size, height: size, fontSize: Math.round(size * 0.44) }}
+      aria-hidden
+    >
+      {letter}
+    </span>
+  )
+}
 
 export function AccountSwitcher() {
   const t = useT("accountSwitcher")
-  const { account, accounts, switchAccount, removeAccount, switchingAccount, signIn, signOut } =
-    useLauncher()
+  const {
+    boffAccount,
+    boffAccountList,
+    switchBoffAccount,
+    switchingBoffAccount,
+    boffSignIn,
+    boffSignOut,
+  } = useLauncher()
   const [open, setOpen] = useState(false)
   const triggerRef = useRef<HTMLButtonElement>(null)
   const panelRef = useRef<HTMLDivElement>(null)
@@ -46,30 +66,30 @@ export function AccountSwitcher() {
     }
   }, [open])
 
-  if (!account) return null
+  // The rail only mounts inside the shell, which is gated on a Boffmedia
+  // session, so this is effectively always set — but guard rather than assume.
+  if (!boffAccount) return null
 
-  // With one account the switcher is pointless, but "Añadir cuenta" is not —
-  // that is precisely how a player gets to two.
-  const others = accounts.filter((a) => a.uuid !== account.uuid)
+  const others = boffAccountList.filter((a) => a.id !== boffAccount.id)
 
   return (
     <>
-      {/* Trigger: 32px avatar button in the rail */}
+      {/* Trigger: 40px avatar button in the rail */}
       <button
         ref={triggerRef}
         type="button"
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
         aria-haspopup="menu"
-        title={account.username}
+        title={boffAccount.username}
         className="flex h-10 w-10 items-center justify-center shrink-0 rounded transition-colors hover:bg-surface-bright"
       >
-        {switchingAccount ? (
+        {switchingBoffAccount ? (
           <span className="cut-seal grid h-8 w-8 place-items-center bg-accent text-accent-ink">
             <Spinner size={14} />
           </span>
         ) : (
-          <PlayerHead skinUrl={account.skinUrl} size={32} />
+          <BoffAvatar username={boffAccount.username} size={32} />
         )}
       </button>
 
@@ -88,53 +108,43 @@ export function AccountSwitcher() {
             <ul className="flex flex-col">
               {/* Current account header */}
               <li className="flex items-center gap-2 px-3 py-2 border-b border-line">
-                <PlayerHead skinUrl={account.skinUrl} size={24} />
+                <BoffAvatar username={boffAccount.username} size={24} />
                 <div className="min-w-0 flex-1">
-                  <p className="block truncate text-[12px] font-semibold text-txt">{account.username}</p>
+                  <p className="block truncate text-[12px] font-semibold text-txt">
+                    {boffAccount.username}
+                  </p>
                   <p className="block truncate font-mono text-[10px] text-txt-dim">
-                    {account.uuid.slice(0, 13)}…
+                    Boffmedia · #{boffAccount.id}
                   </p>
                 </div>
               </li>
 
-              {/* Other accounts */}
+              {/* Other signed-in Boffmedia accounts */}
               {others.map((entry) => (
-                <li key={entry.uuid} className="flex items-center gap-2 px-3 py-2 hover:bg-panel-2">
+                <li key={entry.id} className="flex items-center gap-2 px-3 py-2 hover:bg-panel-2">
                   <button
                     type="button"
-                    disabled={switchingAccount}
+                    disabled={switchingBoffAccount}
                     onClick={() => {
                       setOpen(false)
-                      void switchAccount(entry.uuid)
+                      void switchBoffAccount(entry.id)
                     }}
                     className="flex min-w-0 flex-1 items-center gap-2 text-left disabled:opacity-50"
                   >
-                    <PlayerHead skinUrl={entry.skinUrl} size={24} />
+                    <BoffAvatar username={entry.username} size={24} />
                     <span className="min-w-0 truncate text-[12px] text-txt">{entry.username}</span>
-                  </button>
-                  <button
-                    type="button"
-                    aria-label={t("removeLabel", { username: entry.username })}
-                    title={t("removeTitle")}
-                    disabled={switchingAccount}
-                    onClick={() => void removeAccount(entry.uuid)}
-                    className="p-1 text-txt-dim hover:text-bad disabled:opacity-50"
-                  >
-                    <Icon name="trash" size={13} />
                   </button>
                 </li>
               ))}
 
-              {/* Add account */}
+              {/* Add account: a fresh device flow, keyed by id so it ADDS. */}
               <li className="border-t border-solid border-line">
                 <button
                   type="button"
-                  disabled={switchingAccount}
+                  disabled={switchingBoffAccount}
                   onClick={() => {
                     setOpen(false)
-                    // Sign-in ADDS: the Rust side keys tokens by UUID, so this
-                    // never evicts the account already signed in.
-                    void signIn()
+                    void boffSignIn()
                   }}
                   className="flex w-full items-center gap-2 px-3 py-2 text-left text-[12px] text-txt-dim hover:bg-panel-2 hover:text-txt disabled:opacity-50"
                 >
@@ -142,17 +152,18 @@ export function AccountSwitcher() {
                 </button>
               </li>
 
-              {/* Sign out all */}
+              {/* Sign out of the active account */}
               <li className="border-t border-solid border-line">
                 <button
                   type="button"
+                  disabled={switchingBoffAccount}
                   onClick={() => {
                     setOpen(false)
-                    signOut()
+                    void boffSignOut()
                   }}
-                  className="flex w-full items-center gap-2 px-3 py-2 text-left text-[12px] text-txt-dim hover:bg-panel-2 hover:text-bad"
+                  className="flex w-full items-center gap-2 px-3 py-2 text-left text-[12px] text-txt-dim hover:bg-panel-2 hover:text-bad disabled:opacity-50"
                 >
-                  <Icon name="logout" size={13} /> {t("signOutAll")}
+                  <Icon name="logout" size={13} /> {t("signOut")}
                 </button>
               </li>
             </ul>

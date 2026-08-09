@@ -88,7 +88,7 @@ export class EventsController {
   })
   async getEvents(
     @Query() query: ListEventsQueryDto,
-    @Req() req: { user?: { roles?: string[] } },
+    @Req() req: { user?: { roles?: string[]; userId?: number } },
   ): Promise<Event[]> {
     // Private events are only exposed to admins; anonymous/non-admin callers
     // (public pages) get public events only.
@@ -110,12 +110,16 @@ export class EventsController {
   })
   async getEvent(
     @Param('id') id: number,
-    @Req() req: { user?: { roles?: string[] } },
+    @Req() req: { user?: { roles?: string[]; userId?: number } },
   ): Promise<Event> {
     // A private event is only returned to admins; non-admins get not-found.
     const includePrivate =
       req.user?.roles?.includes(USER_ROLES.BOFF_ADMIN) ?? false;
-    return await this.eventsFacadeService.getEvent(id, includePrivate);
+    return await this.eventsFacadeService.getEvent(
+      id,
+      includePrivate,
+      req.user?.userId,
+    );
   }
 
   @Post('/event')
@@ -340,13 +344,14 @@ export class EventsController {
   })
   async getEventAchievements(
     @Param('eventId') eventId: number,
-    @Req() req: { user?: { roles?: string[] } },
+    @Req() req: { user?: { roles?: string[]; userId?: number } },
   ): Promise<Achievement[]> {
     const includePrivate =
       req.user?.roles?.includes(USER_ROLES.BOFF_ADMIN) ?? false;
     return await this.eventsFacadeService.getEventAchievements(
       eventId,
       includePrivate,
+      req.user?.userId,
     );
   }
 
@@ -419,7 +424,7 @@ export class EventsController {
   async getParticipantProgressByEvent(
     @Param('eventId') eventId: number,
     @Param('participantId') participantId: number,
-    @Req() req: { user?: { roles?: string[] } },
+    @Req() req: { user?: { roles?: string[]; userId?: number } },
   ): Promise<AchievementWithProgress[]> {
     const includePrivate =
       req.user?.roles?.includes(USER_ROLES.BOFF_ADMIN) ?? false;
@@ -427,6 +432,7 @@ export class EventsController {
       participantId,
       eventId,
       includePrivate,
+      req.user?.userId,
     );
   }
 
@@ -453,13 +459,14 @@ export class EventsController {
   })
   async getEventTeams(
     @Param('eventId') eventId: number,
-    @Req() req: { user?: { roles?: string[] } },
+    @Req() req: { user?: { roles?: string[]; userId?: number } },
   ): Promise<Team[]> {
     const includePrivate =
       req.user?.roles?.includes(USER_ROLES.BOFF_ADMIN) ?? false;
     return await this.eventsFacadeService.getEventTeams(
       eventId,
       includePrivate,
+      req.user?.userId,
     );
   }
 
@@ -645,13 +652,14 @@ export class EventsController {
   })
   async getEventParticipants(
     @Param('eventId') eventId: number,
-    @Req() req: { user?: { roles?: string[] } },
+    @Req() req: { user?: { roles?: string[]; userId?: number } },
   ): Promise<Participant[]> {
     const includePrivate =
       req.user?.roles?.includes(USER_ROLES.BOFF_ADMIN) ?? false;
     return await this.eventsFacadeService.getEventParticipants(
       eventId,
       includePrivate,
+      req.user?.userId,
     );
   }
 
@@ -697,13 +705,14 @@ export class EventsController {
   })
   async getLeaderboard(
     @Param('eventId') eventId: number,
-    @Req() req: { user?: { roles?: string[] } },
+    @Req() req: { user?: { roles?: string[]; userId?: number } },
   ): Promise<LeaderboardEntry[]> {
     const includePrivate =
       req.user?.roles?.includes(USER_ROLES.BOFF_ADMIN) ?? false;
     return await this.eventsFacadeService.getLeaderboard(
       eventId,
       includePrivate,
+      req.user?.userId,
     );
   }
 
@@ -717,13 +726,14 @@ export class EventsController {
   })
   async getTeamLeaderboard(
     @Param('eventId') eventId: number,
-    @Req() req: { user?: { roles?: string[] } },
+    @Req() req: { user?: { roles?: string[]; userId?: number } },
   ): Promise<TeamLeaderboardEntry[]> {
     const includePrivate =
       req.user?.roles?.includes(USER_ROLES.BOFF_ADMIN) ?? false;
     return await this.eventsFacadeService.getTeamLeaderboard(
       eventId,
       includePrivate,
+      req.user?.userId,
     );
   }
 

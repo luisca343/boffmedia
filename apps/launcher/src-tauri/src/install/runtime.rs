@@ -586,7 +586,7 @@ mod tests {
         let mut marker = Marker {
             version_id: "v".into(),
             version_name: "v".into(),
-            minecraft: "1.21.4".into(),
+            minecraft: Some("1.21.4".into()),
             loader: None,
             loader_version: None,
             installed_at: "now".into(),

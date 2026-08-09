@@ -825,9 +825,11 @@ export function PacksAdmin() {
                 <AvMetric value={pack.versionCount} label={t("tabVersions")} tone="accent" />
                 <AvMetric value={pack.aclCount} label={t("tabAccess")} />
              </div>
-             <div className="mb-4 shrink-0">
-               <PackServerEditor key={pack.id} pack={pack} onSaved={load} />
-             </div>
+             {pack.gameType === "minecraft" && (
+               <div className="mb-4 shrink-0">
+                 <PackServerEditor key={pack.id} pack={pack} onSaved={load} />
+               </div>
+             )}
              <div className="shrink-0">
                <Tabs
                 value={tab}

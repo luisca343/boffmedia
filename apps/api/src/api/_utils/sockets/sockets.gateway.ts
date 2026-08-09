@@ -116,7 +116,7 @@ export class SocketsGateway
 
   /* ChatApp */
   @SubscribeMessage('chat:exitcall')
-  handleChatExit(
+  async handleChatExit(
     @ConnectedSocket() client: Socket,
     @MessageBody()
     data: {
@@ -128,55 +128,76 @@ export class SocketsGateway
       user: any;
       startTime: number;
     },
-  ): void {
+  ): Promise<void> {
     const actor = this.uuidOf(client);
     if (!actor) return;
 
-    this.logger.log(`Exit call signal sent by ${actor}`);
-    data.call.users = data.call.users.filter((user) => user.uuid !== actor);
-    const _sockets = this.server.sockets.sockets;
-    const currentUsers = data.call.users.filter(
-      (user) => user.status === 'IN_CALL',
-    );
-    this.logger.log('Current users in call: ', currentUsers);
+    const chatId = Number(data.call.chatId);
+    let members: { uuid: string }[];
+    try {
+      // getChatById is also the membership check: it throws for a chat this
+      // uuid is not in, so neither the fan-out nor endCall runs on a chatId the
+      // caller does not belong to.
+      const chat = await this.chatAppService.getChatById(chatId, actor);
+      members = chat.members;
+    } catch (error: any) {
+      this.logger.error(`exitcall membership check failed for ${actor}:`, error);
+      return;
+    }
 
-    data.call.users.forEach((user) => {
-      const userSocket = this.users.get(user.uuid);
+    this.logger.log(`Exit call signal sent by ${actor}`);
+    // Recipients come from proven chat membership, never from the client body.
+    members.forEach((member) => {
+      if (member.uuid === actor) return;
+      const userSocket = this.users.get(member.uuid);
       if (userSocket) {
-        this.logger.log(`Sending exit call signal to ${user.uuid}`);
+        this.logger.log(`Sending exit call signal to ${member.uuid}`);
         this.server.to(userSocket.socketId).emit('chat:exitcall', data);
       }
     });
 
-    if (currentUsers.length === 0) {
-      this.chatAppService.endCall(data.call.chatId, data.startTime);
-      return;
+    // Whether the call is over is still read from the client-reported statuses,
+    // but only after membership is proven and only for this verified chatId.
+    const remaining = (data.call.users ?? []).filter(
+      (user) => user.uuid !== actor && user.status === 'IN_CALL',
+    );
+    if (remaining.length === 0) {
+      this.chatAppService.endCall(chatId, data.startTime);
     }
   }
   @SubscribeMessage('chat:joincall')
-  handleChatJoin(
+  async handleChatJoin(
     @ConnectedSocket() client: Socket,
     @MessageBody()
     data: {
-      call: { users: { uuid: string; status: string }[]; caller: string };
+      call: {
+        chatId: number;
+        users: { uuid: string; status: string }[];
+        caller: string;
+      };
       user: any;
     },
-  ): void {
+  ): Promise<void> {
     const actor = this.uuidOf(client);
     if (!actor) return;
 
+    const chatId = Number(data.call.chatId);
+    let members: { uuid: string }[];
+    try {
+      const chat = await this.chatAppService.getChatById(chatId, actor);
+      members = chat.members;
+    } catch (error: any) {
+      this.logger.error(`joincall membership check failed for ${actor}:`, error);
+      return;
+    }
+
     this.logger.log(`Join call signal sent by ${actor}`);
-    const _sockets = this.server.sockets.sockets;
-    const users = data.call.users.map((user) => user.uuid);
-    const connectedUsers = Array.from(this.users.keys());
-
-    this.logger.log('Users: ', users);
-    this.logger.log('Connected users: ', connectedUsers);
-
-    data.call.users.forEach((user) => {
-      const userSocket = this.users.get(user.uuid);
+    // Recipients come from proven chat membership, never from the client body.
+    members.forEach((member) => {
+      if (member.uuid === actor) return;
+      const userSocket = this.users.get(member.uuid);
       if (userSocket) {
-        this.logger.log(`Sending join call signal to ${user.uuid}`);
+        this.logger.log(`Sending join call signal to ${member.uuid}`);
         this.server
           .to(userSocket.socketId)
           .emit('chat:joincall', { uuid: actor });

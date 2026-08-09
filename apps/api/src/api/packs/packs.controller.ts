@@ -22,6 +22,7 @@ import {
 import type { Request } from 'express';
 import { JwtAuthGuard } from '@api/auth/jwt-auth.guard';
 import { RolesGuard } from '@api/_utils/guards/roles.guard';
+import { FullSessionGuard } from '@api/_utils/guards/full-session.guard';
 import { Roles } from '@api/_utils/decorators/roles.decorator';
 import { USER_ROLES } from '@api/_utils/auth/roles.constants';
 import { PacksDownloadsService } from './packs-downloads.service';
@@ -66,7 +67,7 @@ import {
 // which is exactly what keeps the guards effective.
 @ApiTags('Packs | Admin')
 @Controller('packs/admin')
-@UseGuards(JwtAuthGuard, RolesGuard)
+@UseGuards(JwtAuthGuard, FullSessionGuard, RolesGuard)
 @Roles(USER_ROLES.BOFF_ADMIN)
 @ApiBearerAuth('JWT')
 export class PacksController {

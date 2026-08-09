@@ -30,6 +30,18 @@ interface FileEntry {
 export const EMULATOR_STEPS = ["metadata", "rom", "files", "review"] as const
 export type EmulatorStep = (typeof EMULATOR_STEPS)[number]
 
+/** Scalar prefill for clone/edit. The ROM and any user-provided binaries are
+ *  never stored on our side, so a clone can only restore the metadata and paths
+ *  — the author re-selects the files. Freeze this at mount: the parent remounts
+ *  the editor (via `key`) once the async prefill lands. */
+export interface EmulatorInitial {
+  name: string
+  kind: EmulatorKind
+  romHint: string
+  romPath: string
+  args: string
+}
+
 interface EmulatorEditorProps {
   onSave: (data: {
     name: string
@@ -41,6 +53,8 @@ interface EmulatorEditorProps {
   }) => void
   previousKind?: EmulatorKind
   initialName?: string
+  /** Prefill for clone/edit; overrides `initialName`/`previousKind`. */
+  initial?: EmulatorInitial
   /** Which step to render. The rail and the Back/Next bar live in the parent so
    *  both arms of the editor share one chrome. */
   step: EmulatorStep
@@ -69,17 +83,18 @@ export function EmulatorEditor({
   onSave,
   previousKind,
   initialName,
+  initial,
   step,
   onValidity,
   submitRef,
 }: EmulatorEditorProps) {
   const t = useTranslations("admin.packs")
 
-  const [name, setName] = useState(initialName ?? "")
-  const [kind, setKind] = useState<EmulatorKind>(previousKind ?? "mgba")
-  const [romHint, setRomHint] = useState("")
+  const [name, setName] = useState(initial?.name ?? initialName ?? "")
+  const [kind, setKind] = useState<EmulatorKind>(initial?.kind ?? previousKind ?? "mgba")
+  const [romHint, setRomHint] = useState(initial?.romHint ?? "")
   const [romFile, setRomFile] = useState<{ file: File; sha512: string; size: number } | null>(null)
-  const [romPath, setRomPath] = useState("roms/rom.bin")
+  const [romPath, setRomPath] = useState(initial?.romPath ?? "roms/rom.bin")
 
   const [useRomhack, setUseRomhack] = useState(false)
   const [baseFile, setBaseFile] = useState<{ file: File; sha512: string; size: number } | null>(null)
@@ -92,7 +107,7 @@ export function EmulatorEditor({
   const [savePath, setSavePath] = useState("roms/save.sav")
 
   const [extraFiles, setExtraFiles] = useState<Array<{ file: File; sha512: string; size: number; path: string }>>([])
-  const [args, setArgs] = useState("")
+  const [args, setArgs] = useState(initial?.args ?? "")
 
   const [hashing, setHashing] = useState(false)
   const [busy, setBusy] = useState(false)

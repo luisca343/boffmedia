@@ -209,6 +209,10 @@ export interface BoffAccount {
   mcUuid: string | null
 }
 
+/** A row in the Boffmedia account switcher: only `active` has the live session
+ *  `authed()` is sending; the rest can be switched to without a browser trip. */
+export type BoffAccountEntry = BoffAccount & { active: boolean }
+
 export interface BoffDevicePoll {
   status: "pending" | "approved" | "denied" | "expired"
   user: BoffAccount | null
@@ -265,9 +269,40 @@ export async function boffSessionRestore(): Promise<BoffAccount | null> {
   }
 }
 
-export async function boffSignOut(): Promise<void> {
-  if (!isDesktop()) return
-  await invoke("boff_sign_out")
+/** Sign out of the ACTIVE Boffmedia account. Resolves to whoever is active
+ *  afterwards — another signed-in account is promoted — or null when that was
+ *  the last one and BoffSignIn is due. */
+export async function boffSignOut(): Promise<BoffAccount | null> {
+  if (!isDesktop()) return null
+  try {
+    return await invoke<BoffAccount | null>("boff_sign_out")
+  } catch (err) {
+    throw asFailure(err)
+  }
+}
+
+/** Every signed-in Boffmedia account, active one flagged. Offline and cheap —
+ *  reads the roster, never the network. */
+export async function boffAccounts(): Promise<BoffAccountEntry[]> {
+  if (!isDesktop()) return [{ ...MOCK_BOFF_ACCOUNT, active: true }]
+  try {
+    return await invoke<BoffAccountEntry[]>("boff_accounts")
+  } catch {
+    // Degrade to "just the account you are signed in as" rather than blocking
+    // the shell on a roster it could not read.
+    return []
+  }
+}
+
+/** Make a known Boffmedia account active. Swaps the token every API call and the
+ *  randomizer send use, so the pack library reloads for the new account. */
+export async function boffSwitch(id: number): Promise<BoffAccount> {
+  if (!isDesktop()) return MOCK_BOFF_ACCOUNT
+  try {
+    return await invoke<BoffAccount>("boff_switch", { id })
+  } catch (err) {
+    throw asFailure(err)
+  }
 }
 
 /** Signs out of EVERY account and forgets them. Per-account sign-out is
@@ -325,6 +360,22 @@ export async function authOpenVerification(fallbackUrl: string): Promise<void> {
   }
   try {
     await invoke("auth_open_verification")
+  } catch (err) {
+    throw asFailure(err)
+  }
+}
+
+/** Open an arbitrary external URL in the SYSTEM browser. Unlike
+ *  {@link authOpenVerification}, which only opens the pending Microsoft code,
+ *  this honours the URL it is given — the Boffmedia device-flow page and the
+ *  randomizer event link both live in the API/website, not in `AuthState`. */
+export async function openUrl(url: string): Promise<void> {
+  if (!isDesktop()) {
+    window.open(url, "_blank", "noopener,noreferrer")
+    return
+  }
+  try {
+    await invoke("open_url", { url })
   } catch (err) {
     throw asFailure(err)
   }

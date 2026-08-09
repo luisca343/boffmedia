@@ -779,7 +779,7 @@ fn build_marker(prepared: &game::Prepared, installed: &[PlannedFile], manifest: 
     Marker {
         version_id: plan.version_id.clone(),
         version_name: plan.version_name.clone(),
-        minecraft: plan.minecraft.clone(),
+        minecraft: Some(plan.minecraft.clone()),
         loader: plan.loader.as_ref().map(|(k, _)| k.key().to_string()),
         loader_version: plan.loader.as_ref().map(|(_, v)| v.clone()),
         installed_at: chrono::Utc::now().to_rfc3339(),
@@ -886,7 +886,9 @@ fn apply_pin(prepared: &mut game::Prepared) -> Option<String> {
     let plan = &mut prepared.plan;
     plan.version_id = marker.version_id.clone();
     plan.version_name = marker.version_name.clone();
-    plan.minecraft = marker.minecraft.clone();
+    // A pinned Minecraft marker always carries its version; default to empty for
+    // the impossible None so pinning can never silently install "no version".
+    plan.minecraft = marker.minecraft.clone().unwrap_or_default();
     plan.loader = match (&marker.loader, &marker.loader_version) {
         (Some(key), Some(version)) => resolve::LoaderKind::from_key(key).map(|k| (k, version.clone())),
         _ => None,

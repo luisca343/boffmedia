@@ -14,7 +14,6 @@ import {
   packVersions,
   packs,
 } from '@/_db/schema/Packs';
-import { randomizerConfigs } from '@/_db/schema/Randomizer';
 import {
   EVENT_STATUS,
   PARTICIPANT_STATUS,
@@ -24,7 +23,6 @@ import {
 } from '@/_db/schema/BoffMediaEvents';
 import { boffMediaUsers } from '@/_db/schema/BoffMedia';
 import type { AuditAction } from './types/packs.types';
-import type { RandomizerConfig } from '@/_db/schema/Randomizer';
 
 /**
  * Who is asking for a pack. The Boffmedia account is the real principal;
@@ -157,7 +155,39 @@ export class PacksRepository {
   async listVisibleTo(principal: PackPrincipal): Promise<Pack[]> {
     const sources = [inArray(packs.accessKind, ['public', 'password'])];
 
-    let query = this.db
+    // Each non-public source is a correlated EXISTS, never a join: a user with
+    // both an `admin` and an `invite` grant, or with a grant and an ACL row, must
+    // still yield exactly one pack row. A left-join on the (pack_id, user_id,
+    // source) PK fans out and lists the pack once per matching grant.
+    if (principal.userId != null) {
+      const grantExists = this.db
+        .select({ one: sql`1` })
+        .from(packGrants)
+        .where(
+          and(
+            eq(packGrants.packId, packs.id),
+            eq(packGrants.userId, principal.userId),
+          ),
+        );
+      sources.push(sql`exists ${grantExists}`);
+    }
+
+    // Legacy pre-grants: a UUID an admin granted before that player registered.
+    // Only reachable while the account still carries a linked Minecraft UUID.
+    if (principal.mcUuid) {
+      const aclExists = this.db
+        .select({ one: sql`1` })
+        .from(packAcl)
+        .where(
+          and(eq(packAcl.packId, packs.id), eq(packAcl.uuid, principal.mcUuid)),
+        );
+      sources.push(sql`exists ${aclExists}`);
+    }
+
+    const membership = this.eventMembershipExists(packs.id, principal);
+    if (membership) sources.push(membership);
+
+    const rows = await this.db
       .select({
         id: packs.id,
         slug: packs.slug,
@@ -176,33 +206,6 @@ export class PacksRepository {
         updatedAt: packs.updatedAt,
       })
       .from(packs)
-      .$dynamic();
-
-    if (principal.userId != null) {
-      query = query.leftJoin(
-        packGrants,
-        and(
-          eq(packGrants.packId, packs.id),
-          eq(packGrants.userId, principal.userId),
-        ),
-      );
-      sources.push(sql`${packGrants.userId} is not null`);
-    }
-
-    // Legacy pre-grants: a UUID an admin granted before that player registered.
-    // Only reachable while the account still carries a linked Minecraft UUID.
-    if (principal.mcUuid) {
-      query = query.leftJoin(
-        packAcl,
-        and(eq(packAcl.packId, packs.id), eq(packAcl.uuid, principal.mcUuid)),
-      );
-      sources.push(sql`${packAcl.uuid} is not null`);
-    }
-
-    const membership = this.eventMembershipExists(packs.id, principal);
-    if (membership) sources.push(membership);
-
-    const rows = await query
       .where(and(eq(packs.archived, false), or(...sources)))
       .orderBy(desc(packs.createdAt));
     return rows.map((row) => this.hydratePack(row));

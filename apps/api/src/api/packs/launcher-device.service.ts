@@ -64,6 +64,14 @@ export class LauncherDeviceService {
     return `${pick(4)}-${pick(4)}`;
   }
 
+  /** A duplicate on the `user_code` unique index, so the insert can be retried
+   *  with a fresh code instead of surfacing as a 500. */
+  private isDuplicateUserCode(err: unknown): boolean {
+    const code = (err as { code?: string; errno?: number } | null)?.code;
+    const errno = (err as { errno?: number } | null)?.errno;
+    return code === 'ER_DUP_ENTRY' || errno === 1062;
+  }
+
   async start(
     clientLabel: string | null,
     verificationUri: string,
@@ -71,15 +79,28 @@ export class LauncherDeviceService {
     await this.repo.sweepExpired();
 
     const deviceCode = randomBytes(32).toString('hex');
-    const userCode = this.newUserCode();
     const expiresAt = new Date(Date.now() + CODE_TTL_MS);
+    const label = clientLabel?.slice(0, 128) ?? null;
 
-    await this.repo.create({
-      deviceCode,
-      userCode,
-      clientLabel: clientLabel?.slice(0, 128) ?? null,
-      expiresAt,
-    });
+    // The user_code space is small (two 4-char groups) and the column is unique,
+    // so a collision with a still-live code is rare but real. Regenerate a few
+    // times before giving up rather than 500ing on the duplicate-key error.
+    const MAX_ATTEMPTS = 5;
+    let userCode = this.newUserCode();
+    for (let attempt = 1; ; attempt++) {
+      try {
+        await this.repo.create({
+          deviceCode,
+          userCode,
+          clientLabel: label,
+          expiresAt,
+        });
+        break;
+      } catch (err) {
+        if (attempt >= MAX_ATTEMPTS || !this.isDuplicateUserCode(err)) throw err;
+        userCode = this.newUserCode();
+      }
+    }
 
     return {
       deviceCode,
@@ -159,8 +180,17 @@ export class LauncherDeviceService {
       throw new BadRequestException('Este código ya no es válido');
   }
 
-  async deny(userCode: string): Promise<void> {
-    if (!(await this.repo.decide(this.normalize(userCode), 'denied', null))) {
+  /**
+   * A pending request has no owner until someone approves it, so deny cannot be
+   * bound to "the intended approver" — there isn't one yet. What we CAN do is
+   * bind the actor: the denial records who performed it, and the route already
+   * requires a FullSession (an in-game MCEF session cannot reach it) plus a
+   * throttle, which is what closes casual abuse of a known user_code.
+   */
+  async deny(userCode: string, userId: number): Promise<void> {
+    if (
+      !(await this.repo.decide(this.normalize(userCode), 'denied', userId))
+    ) {
       throw new BadRequestException('Este código ya no es válido');
     }
   }

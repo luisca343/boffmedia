@@ -85,6 +85,8 @@ export class AuthController {
   }
 
   @Post('refresh')
+  @UseGuards(AuthThrottlerGuard)
+  @Throttle({ default: { ttl: 60_000, limit: 30 } })
   @ApiOperation({ summary: 'Refresh JWT token' })
   @ApiResponse({
     status: HttpStatus.OK,

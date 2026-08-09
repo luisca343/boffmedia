@@ -224,7 +224,7 @@ fn build_marker(
         version_id: plan.version_id.clone(),
         version_name: plan.version_name.clone(),
         // Minecraft/loader are meaningless for an emulator pack.
-        minecraft: String::new(),
+        minecraft: None,
         loader: None,
         loader_version: None,
         installed_at: chrono::Utc::now().to_rfc3339(),
@@ -547,7 +547,7 @@ mod tests {
         Marker {
             version_id: "v1".into(),
             version_name: "1.0".into(),
-            minecraft: String::new(),
+            minecraft: None,
             loader: None,
             loader_version: None,
             installed_at: "2026-08-09T00:00:00Z".into(),

@@ -68,8 +68,11 @@ export class LauncherAuthController {
   @Throttle({ default: { ttl: 60_000, limit: 20 } })
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Rechazar la solicitud' })
-  async deny(@Body() dto: DeviceDecisionDto): Promise<{ success: true }> {
-    await this.device.deny(dto.userCode);
+  async deny(
+    @Body() dto: DeviceDecisionDto,
+    @Req() req: { user: { userId: number } },
+  ): Promise<{ success: true }> {
+    await this.device.deny(dto.userCode, req.user.userId);
     return { success: true };
   }
 }

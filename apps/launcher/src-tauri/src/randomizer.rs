@@ -43,6 +43,25 @@ pub struct RandomizerError {
     pub message: String,
 }
 
+/// Map a shared-client `ApiError` onto the randomizer's error shape. A session
+/// problem stays actionable ("auth_error"); a transport failure is "network_error".
+fn randomizer_error_from_api(err: api::ApiError) -> RandomizerError {
+    match err {
+        api::ApiError::NeedsSignin(m) => RandomizerError {
+            code: "auth_error".to_string(),
+            message: m,
+        },
+        api::ApiError::Denied(m) => RandomizerError {
+            code: "auth_error".to_string(),
+            message: m,
+        },
+        api::ApiError::Message(m) => RandomizerError {
+            code: "network_error".to_string(),
+            message: m,
+        },
+    }
+}
+
 /// Get the player's assignment for a pack's active randomizer event.
 /// Returns 404 (error code "not_found") if the pack has no active event.
 #[tauri::command]
@@ -50,31 +69,12 @@ pub async fn randomizer_get_assignment(
     pack_id: String,
     api: tauri::State<'_, ApiState>,
 ) -> Result<RandomizerAssignment, RandomizerError> {
-    let url = format!("{}/randomizer/launcher/packs/{}/my-assignment", api::base_url(), pack_id);
-
-    let token = api.current_token().await
-        .map_err(|e| {
-            let msg = match e {
-                api::ApiError::NeedsSignin(m) => m,
-                api::ApiError::Denied(m) => m,
-                api::ApiError::Message(m) => m,
-            };
-            RandomizerError {
-                code: "auth_error".to_string(),
-                message: format!("Authentication failed: {}", msg),
-            }
-        })?;
-
-    let client = reqwest::Client::new();
-    let res = client
-        .get(&url)
-        .header("Authorization", format!("Bearer {}", token))
-        .send()
+    // Through the shared authed client: same session invalidation and
+    // `X-Boff-Game-Types` header as every other API call. `authed_get` already
+    // folds a missing/rejected session into NeedsSignin.
+    let res = api::authed_get(&api, &format!("/randomizer/launcher/packs/{}/my-assignment", pack_id))
         .await
-        .map_err(|e| RandomizerError {
-            code: "network_error".to_string(),
-            message: format!("Failed to fetch assignment: {}", e),
-        })?;
+        .map_err(randomizer_error_from_api)?;
 
     if res.status() == 404 {
         return Err(RandomizerError {
@@ -149,31 +149,9 @@ pub async fn randomizer_download_rom(
     event_id: String,
     api: tauri::State<'_, ApiState>,
 ) -> Result<RandomizerRomResult, RandomizerError> {
-    let url = format!("{}/randomizer/launcher/events/{}/rom", api::base_url(), event_id);
-
-    let token = api.current_token().await
-        .map_err(|e| {
-            let msg = match e {
-                api::ApiError::NeedsSignin(m) => m,
-                api::ApiError::Denied(m) => m,
-                api::ApiError::Message(m) => m,
-            };
-            RandomizerError {
-                code: "auth_error".to_string(),
-                message: format!("Authentication failed: {}", msg),
-            }
-        })?;
-
-    let client = reqwest::Client::new();
-    let res = client
-        .get(&url)
-        .header("Authorization", format!("Bearer {}", token))
-        .send()
+    let res = api::authed_get(&api, &format!("/randomizer/launcher/events/{}/rom", event_id))
         .await
-        .map_err(|e| RandomizerError {
-            code: "network_error".to_string(),
-            message: format!("Failed to download ROM: {}", e),
-        })?;
+        .map_err(randomizer_error_from_api)?;
 
     let status = res.status();
     if !status.is_success() {

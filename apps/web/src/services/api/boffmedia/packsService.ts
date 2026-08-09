@@ -264,9 +264,13 @@ export class PacksService {
   /** The only call that returns a version's `files` — the list endpoint omits
    *  them. This is what "clone" and "edit draft" start from. */
   static versionDetail(packId: string, versionId: string) {
-    return apiAuthedAutoGET<PackVersionRow & { files: unknown[] }>(
-      `/packs/admin/${packId}/versions/${versionId}`,
-    );
+    return apiAuthedAutoGET<
+      PackVersionRow & {
+        files: unknown[];
+        emulator?: { kind: 'mgba' | 'melonds'; rom: string; args?: string[] };
+        initialFiles?: unknown[];
+      }
+    >(`/packs/admin/${packId}/versions/${versionId}`);
   }
 
   /** Drafts only: the API refuses to rewrite a published version, because

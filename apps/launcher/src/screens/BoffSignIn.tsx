@@ -3,7 +3,7 @@ import { useState } from "react"
 import { Badge, Banner, Button, Icon, Kicker, Panel, Spinner } from "@boffmedia/ui"
 
 import { useT } from "../i18n"
-import { authOpenVerification, copyText } from "../runtime"
+import { copyText, openUrl } from "../runtime"
 import { useLauncher } from "../state/launcher"
 
 // The launcher's own sign-in. The player is already signed in on the website,
@@ -108,9 +108,7 @@ export function BoffSignIn() {
                       variant="pri"
                       icon="external"
                       onClick={() => {
-                        void authOpenVerification(boffDeviceCode.verificationUri).catch(
-                          () => undefined,
-                        )
+                        void openUrl(boffDeviceCode.verificationUri).catch(() => undefined)
                       }}
                     >
                       {t("browserButton")}

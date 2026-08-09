@@ -29,6 +29,7 @@ import { BundledWorldsEditor } from "./bundled-worlds-editor"
 import {
   EMULATOR_STEPS,
   EmulatorEditor,
+  type EmulatorInitial,
   type EmulatorKind,
   type EmulatorStep,
 } from "./emulator-editor"
@@ -210,6 +211,10 @@ export function VersionEditor({
   const [importing, setImporting] = useState<string | null>(null)
   // Emulator pack data
   const [emulatorData, setEmulatorData] = useState<EmulatorVersionData | null>(null)
+  // Prefill for a cloned/edited emulator version. Null until the source loads;
+  // the EmulatorEditor is keyed on its presence so it remounts once and seeds
+  // its own state (a plain prop is frozen at mount).
+  const [emuInitial, setEmuInitial] = useState<EmulatorInitial | null>(null)
   // The emulator arm runs the same wizard with its own step set. It used to be
   // a single un-stepped form dropped in the middle of the editor, which is why
   // it read as a bypass rather than a first-class arm.
@@ -244,7 +249,25 @@ export function VersionEditor({
         return
       }
       const version = res.data
-      setName(mode === "edit" ? version.name : `${version.name}-copy`)
+      const restoredName = mode === "edit" ? version.name : `${version.name}-copy`
+      if (pack.gameType === "emulator") {
+        // The ROM and any user-provided binaries are never stored server-side,
+        // so a clone restores metadata + paths only; the author re-selects files.
+        const emu = version.emulator
+        const romEntry = emu
+          ? (version.files as StoredFile[]).find((f) => f?.path === emu.rom)
+          : undefined
+        const romHint = (romEntry?.source as { hint?: string } | undefined)?.hint ?? ""
+        setEmuInitial({
+          name: restoredName,
+          kind: emu?.kind ?? "mgba",
+          romHint,
+          romPath: emu?.rom ?? "roms/rom.bin",
+          args: emu?.args?.join(" ") ?? "",
+        })
+        return
+      }
+      setName(restoredName)
       setMinecraft(version.minecraft)
       setLoader(version.loader ?? "")
       setLoaderVersion(version.loaderVersion ?? "")
@@ -543,7 +566,10 @@ export function VersionEditor({
 
         <div className="min-h-0 flex-1 bm-scroll overflow-auto pr-1">
           <EmulatorEditor
+            key={emuInitial ? "prefilled" : "blank"}
             initialName={name}
+            initial={emuInitial ?? undefined}
+            previousKind={emuInitial?.kind}
             step={emuStep}
             onValidity={setEmuValid}
             submitRef={emuSubmit}
@@ -552,7 +578,6 @@ export function VersionEditor({
               setEmulatorData(data)
               void submit(data)
             }}
-            previousKind={undefined}
           />
         </div>
 

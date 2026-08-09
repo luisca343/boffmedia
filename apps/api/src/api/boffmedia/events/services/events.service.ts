@@ -18,13 +18,15 @@ export class EventsService {
   async getEventById(
     id: number,
     includePrivate = false,
+    userId?: number,
   ): Promise<Event & { childEvents?: Event[] }> {
-    const event = await this.eventsRepository.findById(id, includePrivate);
+    const effectivePrivate = await this.canSeePrivate(id, includePrivate, userId);
+    const event = await this.eventsRepository.findById(id, effectivePrivate);
     if (!event) return null as unknown as Event & { childEvents?: Event[] };
 
     const childEvents = await this.eventsRepository.findChildEvents(
       id,
-      includePrivate,
+      effectivePrivate,
     );
 
     return {
@@ -125,14 +127,37 @@ export class EventsService {
 
   /**
    * Like validateEventExists, but a private event counts as "not visible" for
-   * non-admins (includePrivate=false) — so its sub-resources return not-found
-   * to the public instead of leaking the event's existence/data.
+   * non-admins — so its sub-resources return not-found to the public instead of
+   * leaking the event's existence/data. Admins (includePrivate) and the event's
+   * own participants (userId) can see it even when private.
    */
   async validateEventVisible(
     eventId: number,
     includePrivate = false,
+    userId?: number,
   ): Promise<boolean> {
-    const event = await this.eventsRepository.findById(eventId, includePrivate);
+    const effectivePrivate = await this.canSeePrivate(
+      eventId,
+      includePrivate,
+      userId,
+    );
+    const event = await this.eventsRepository.findById(
+      eventId,
+      effectivePrivate,
+    );
     return !!event;
+  }
+
+  /** Admins, or an authenticated participant of the event, may see private data. */
+  private async canSeePrivate(
+    eventId: number,
+    includePrivate: boolean,
+    userId?: number,
+  ): Promise<boolean> {
+    if (includePrivate) return true;
+    if (userId && (await this.eventsRepository.isParticipant(eventId, userId))) {
+      return true;
+    }
+    return false;
   }
 }

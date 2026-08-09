@@ -289,7 +289,9 @@ export type InstanceRuntime = {
 export type RetainedVersion = {
   versionId: string
   versionName: string
-  minecraft: string
+  /** `null` for an emulator version — Rust's `minecraft` marker field is
+   *  `Option<String>`, absent on non-Minecraft packs. */
+  minecraft: string | null
   loader: string | null
   loaderVersion: string | null
   installedAt: string

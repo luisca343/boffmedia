@@ -24,6 +24,7 @@ import {
 } from '@nestjs/swagger';
 import { JwtAuthGuard } from '@api/auth/jwt-auth.guard';
 import { RolesGuard } from '@api/_utils/guards/roles.guard';
+import { FullSessionGuard } from '@api/_utils/guards/full-session.guard';
 import { Roles } from '@api/_utils/decorators/roles.decorator';
 import { USER_ROLES } from '@api/_utils/auth/roles.constants';
 import { EventsService } from './services/events.service';
@@ -50,7 +51,7 @@ import {
 // All routes require JWT + BOFF_ADMIN role.
 @ApiTags('Randomizer | Admin')
 @Controller('randomizer/admin')
-@UseGuards(JwtAuthGuard, RolesGuard)
+@UseGuards(JwtAuthGuard, FullSessionGuard, RolesGuard)
 @Roles(USER_ROLES.BOFF_ADMIN)
 @ApiBearerAuth('JWT')
 export class RandomizerController {

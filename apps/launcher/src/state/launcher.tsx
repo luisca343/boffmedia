@@ -6,13 +6,16 @@ import { loadPackEntries } from "../services/packs"
 import {
   type AccountEntry,
   type BoffAccount,
+  type BoffAccountEntry,
   type BoffDeviceCode,
   authAccounts,
   authBegin,
+  boffAccounts,
   boffDevicePoll,
   boffDeviceStart,
   boffSessionRestore,
   boffSignOut,
+  boffSwitch,
   authAwait,
   authLogout,
   authOffline,
@@ -110,6 +113,7 @@ type Action =
   | { type: "boff/start" }
   | { type: "boff/code"; code: BoffDeviceCode }
   | { type: "boff/done"; account: BoffAccount }
+  | { type: "boff/switched"; account: BoffAccount }
   | { type: "boff/cancel"; message?: string }
   | { type: "boff/signout" }
   | { type: "boot/step"; step: string }
@@ -158,6 +162,24 @@ function reducer(s: State, a: Action): State {
         boffSigningIn: false,
         boffDeviceCode: null,
         boffError: null,
+      }
+    case "boff/switched":
+      // A different Boffmedia account: its entitlements differ, so the library
+      // is dropped and reloaded (the packs effect keys on boffAccount.id). Same
+      // §7.2 reason as a Minecraft switch — never show one account another's
+      // pack names.
+      return {
+        ...s,
+        boffAccount: a.account,
+        boffSigningIn: false,
+        boffDeviceCode: null,
+        boffError: null,
+        packs: [],
+        packsError: null,
+        packsPartial: null,
+        packsLoading: false,
+        view: "packs",
+        selectedPackId: null,
       }
     case "boff/cancel":
       return {
@@ -374,13 +396,24 @@ type Ctx = State & {
    *  machine has no account that ever completed a real sign-in. */
   goOffline: () => Promise<boolean>
   selected: PackEntry | null
-  /** Authorize this launcher against a Boffmedia account (device flow). */
+  /** Authorize this launcher against a Boffmedia account (device flow). Also the
+   *  "add account" action — it keys tokens by account id, so a fresh device flow
+   *  ADDS an account beside the ones already signed in. */
   boffSignIn: () => Promise<void>
   cancelBoffSignIn: () => void
-  boffSignOut: () => void
-  /** Sign in to MINECRAFT. Only needed to install or launch a Minecraft pack;
-   *  the shell, the library and every emulator pack work without it. */
-  signIn: () => Promise<void>
+  /** Sign out of the ACTIVE Boffmedia account. Promotes another signed-in
+   *  account when one remains; otherwise lands on BoffSignIn. */
+  boffSignOut: () => Promise<void>
+  /** Every signed-in Boffmedia account, active one flagged. */
+  boffAccountList: BoffAccountEntry[]
+  /** Make a known Boffmedia account active. */
+  switchBoffAccount: (id: number) => Promise<void>
+  /** True while a Boffmedia switch/sign-out is resolving. */
+  switchingBoffAccount: boolean
+  /** Sign in to MINECRAFT. Resolves true once an MSA session is live. Only
+   *  needed to install or launch a Minecraft pack; the shell, the library and
+   *  every emulator pack work without it. */
+  signIn: () => Promise<boolean>
   cancelSignIn: () => void
   signOut: () => void
   /** Every account the launcher knows, active one flagged. */
@@ -497,7 +530,10 @@ export function LauncherProvider({ children }: { children: React.ReactNode }) {
 
         const poll = await boffDevicePoll()
         if (poll.status === "approved" && poll.user) {
-          dispatch({ type: "boff/done", account: poll.user })
+          // `boff/switched` rather than `boff/done`: this path is reached by the
+          // first sign-in AND by "add account", and the latter must drop the
+          // previous account's library instead of showing it under the new one.
+          dispatch({ type: "boff/switched", account: poll.user })
           log({
             level: "info",
             source: "launcher",
@@ -533,14 +569,73 @@ export function LauncherProvider({ children }: { children: React.ReactNode }) {
     dispatch({ type: "boff/cancel" })
   }, [])
 
-  const boffSignOutFn = React.useCallback(() => {
-    void boffSignOut().catch(() => undefined)
-    dispatch({ type: "boff/signout" })
+  // Boffmedia account roster: outside the reducer, exactly like the Minecraft
+  // one — it is what Rust has on disk, not derived state, and changes on
+  // sign-in, switch and sign-out, each of which reloads it explicitly.
+  const [boffAccountList, setBoffAccountList] = React.useState<BoffAccountEntry[]>([])
+  const [switchingBoffAccount, setSwitchingBoffAccount] = React.useState(false)
+
+  const reloadBoffAccounts = React.useCallback(() => {
+    void boffAccounts().then(setBoffAccountList).catch(() => undefined)
   }, [])
+
+  const boffSignOutFn = React.useCallback(async () => {
+    setSwitchingBoffAccount(true)
+    try {
+      const next = await boffSignOut()
+      if (next) {
+        // Another account was promoted in place of the one signed out.
+        dispatch({ type: "boff/switched", account: next })
+        log({ level: "info", source: "launcher", text: `Cuenta activa: ${next.username}` })
+      } else {
+        dispatch({ type: "boff/signout" })
+      }
+    } catch (err) {
+      // Even on error the local dispatch clears the session, matching the old
+      // fire-and-forget behaviour rather than trapping the player signed in.
+      dispatch({ type: "boff/signout" })
+      log({
+        level: "error",
+        source: "launcher",
+        text: (err as { message?: string })?.message ?? "No se pudo cerrar la sesión.",
+      })
+    } finally {
+      setSwitchingBoffAccount(false)
+      reloadBoffAccounts()
+    }
+  }, [log, reloadBoffAccounts])
+
+  const switchBoffAccount = React.useCallback(
+    async (id: number) => {
+      if (id === state.boffAccount?.id || switchingBoffAccount) return
+      setSwitchingBoffAccount(true)
+      try {
+        const account = await boffSwitch(id)
+        dispatch({ type: "boff/switched", account })
+        log({ level: "info", source: "launcher", text: `Cuenta activa: ${account.username}` })
+      } catch (err) {
+        const message = (err as { message?: string })?.message ?? "No se pudo cambiar de cuenta."
+        log({ level: "error", source: "launcher", text: message })
+        // Rust prunes an account whose token is gone; re-read drops the dead row.
+        reloadBoffAccounts()
+      } finally {
+        setSwitchingBoffAccount(false)
+      }
+    },
+    [state.boffAccount?.id, switchingBoffAccount, log, reloadBoffAccounts],
+  )
+
+  // Re-read the roster whenever the active Boffmedia account changes: covers the
+  // restore on launch, every device-flow sign-in, and every switch, without any
+  // of them having to remember to.
+  const boffAccountId = state.boffAccount?.id ?? null
+  React.useEffect(() => {
+    reloadBoffAccounts()
+  }, [boffAccountId, reloadBoffAccounts])
 
   // §5. In a browser there is no Rust side, so the mock flow runs instead —
   // that is what keeps every screen workable from `pnpm dev:renderer`.
-  const signIn = React.useCallback(async () => {
+  const signIn = React.useCallback(async (): Promise<boolean> => {
     dispatch({ type: "signin/start" })
 
     if (!isDesktop()) {
@@ -549,7 +644,7 @@ export function LauncherProvider({ children }: { children: React.ReactNode }) {
       await sleep(2600)
       dispatch({ type: "signin/done", account: MOCK_ACCOUNT })
       log({ level: "info", source: "launcher", text: `Sesión simulada como ${MOCK_ACCOUNT.username}` })
-      return
+      return true
     }
 
     try {
@@ -568,6 +663,7 @@ export function LauncherProvider({ children }: { children: React.ReactNode }) {
         account,
       })
       log({ level: "info", source: "launcher", text: `Sesión iniciada como ${account.username}` })
+      return true
     } catch (err) {
       const failure = err as { message?: string }
       dispatch({ type: "signin/cancel" })
@@ -576,6 +672,7 @@ export function LauncherProvider({ children }: { children: React.ReactNode }) {
         source: "launcher",
         text: failure?.message ?? "No se pudo iniciar sesión.",
       })
+      return false
     }
   }, [log])
 
@@ -860,8 +957,24 @@ export function LauncherProvider({ children }: { children: React.ReactNode }) {
       busy.current.add(packId)
       dispatch({ type: "install/start", packId })
       try {
-        const state = await installPack(packId, await manifestFor(packId))
-        dispatch({ type: "install/state", packId, state })
+        const manifest = await manifestFor(packId)
+        try {
+          const state = await installPack(packId, manifest)
+          dispatch({ type: "install/state", packId, state })
+        } catch (err) {
+          // A Minecraft pack needs a live Minecraft (MSA) session to install.
+          // When the backend says so, PROMPT the sign-in here and retry once,
+          // rather than marking the pack broken over a missing sub-credential.
+          // Emulator packs never reach this — they install Minecraft-free.
+          if ((err as { needsSignin?: boolean })?.needsSignin) {
+            const ok = await signIn()
+            if (!ok) throw err
+            const retried = await installPack(packId, manifest)
+            dispatch({ type: "install/state", packId, state: retried })
+          } else {
+            throw err
+          }
+        }
       } catch (err) {
         const errObj = err as { message?: string; code?: string }
         let message = errObj.message ?? "No se pudo instalar el pack."
@@ -879,7 +992,7 @@ export function LauncherProvider({ children }: { children: React.ReactNode }) {
         busy.current.delete(packId)
       }
     },
-    [log, manifestFor],
+    [log, manifestFor, signIn],
   )
 
   /** Wipe the managed files and install again. One action rather than two
@@ -925,7 +1038,21 @@ export function LauncherProvider({ children }: { children: React.ReactNode }) {
         // The pid is already on its way as a `game://state` running event, and
         // that event is authoritative — a crash can beat this resolve, and
         // dispatching "running" here would paper over it.
-        await launchPack(packId, await manifestFor(packId))
+        const manifest = await manifestFor(packId)
+        try {
+          await launchPack(packId, manifest)
+        } catch (err) {
+          // Launching a Minecraft pack needs a live Minecraft session. When it
+          // is missing/expired the backend asks for it; PROMPT here and retry
+          // once. Emulator packs launch Minecraft-free and never reach this.
+          if ((err as { needsSignin?: boolean })?.needsSignin) {
+            const ok = await signIn()
+            if (!ok) throw err
+            await launchPack(packId, manifest)
+          } else {
+            throw err
+          }
+        }
         runningPackId.current = packId
         dispatch({ type: "pack/played", packId, at: new Date().toISOString() })
         void refreshInstallState(packId)
@@ -944,7 +1071,7 @@ export function LauncherProvider({ children }: { children: React.ReactNode }) {
         busy.current.delete(packId)
       }
     },
-    [log, manifestFor, refreshInstallState],
+    [log, manifestFor, refreshInstallState, signIn],
   )
 
   // Preferences live in a JSON file on the Rust side; the mock defaults only
@@ -1114,6 +1241,9 @@ export function LauncherProvider({ children }: { children: React.ReactNode }) {
     boffSignIn,
     cancelBoffSignIn,
     boffSignOut: boffSignOutFn,
+    boffAccountList,
+    switchBoffAccount,
+    switchingBoffAccount,
     signIn,
     cancelSignIn: () => dispatch({ type: "signin/cancel" }),
     signOut: () => {

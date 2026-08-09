@@ -493,11 +493,14 @@ export async function validateParticipantCanReceiveAchievement(
 
   // 2. Check if participant is registered for this event
   const eventParticipant = await db.query.boffMediaEventParticipants.findFirst({
-    where: (p: any, { eq, and }: any) =>
+    where: (p: any, { eq, and, inArray }: any) =>
       and(
         eq(p.participantId, participantId),
         eq(p.eventId, achievement.eventId), // Use achievement.eventId safely now
-        eq(p.status, PARTICIPANT_STATUS.CONFIRMED),
+        inArray(p.status, [
+          PARTICIPANT_STATUS.REGISTERED,
+          PARTICIPANT_STATUS.CONFIRMED,
+        ]),
       ),
   });
 

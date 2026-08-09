@@ -3,7 +3,7 @@ import { Button, Panel, Progress, toast } from "@boffmedia/ui"
 
 import { useT } from "../../i18n"
 import {
-  authOpenVerification,
+  openUrl,
   getRandomizerAssignment,
   downloadRandomizerRom,
   provideFile,
@@ -158,7 +158,7 @@ export function RandomizerPanel({
           <p className="text-sm text-txt-success">{t("readyToPlay")}</p>
           {assignment.eventId && (
             <Button size="sm" variant="default" onClick={() => {
-                void authOpenVerification(`${webBaseUrl()}/eventos/${assignment.eventId}`).catch(
+                void openUrl(`${webBaseUrl()}/eventos/${assignment.eventId}`).catch(
                   () => undefined,
                 )
               }}>

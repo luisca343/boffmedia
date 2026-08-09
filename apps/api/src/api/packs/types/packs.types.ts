@@ -98,9 +98,9 @@ export interface StoredPackFile {
     // pack's manifest did not type against its own stored shape.
     | {
         kind: 'patched';
-        sourcePath: string;
-        patchPath: string;
-        patchFormat?: string;
+        base: string;
+        patch: string;
+        format: 'bps' | 'ups';
       };
 }
 
