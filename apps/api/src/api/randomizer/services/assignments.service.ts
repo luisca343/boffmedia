@@ -3,10 +3,10 @@ import {
   Inject,
   BadRequestException,
   NotFoundException,
-  UnprocessableEntityException,
+  ConflictException,
   ForbiddenException,
 } from '@nestjs/common';
-import { randomBytes, createHash } from 'crypto';
+import { randomBytes } from 'crypto';
 import { Readable } from 'stream';
 import { Logger } from 'nestjs-pino';
 import { RandomizerRepository } from '../repositories/randomizer.repository';
@@ -36,6 +36,13 @@ import { EventsService } from './events.service';
 
 @Injectable()
 export class AssignmentsService {
+  /**
+   * Per-assignment single-flight lock for ROM generation. A double GET (e.g. the
+   * launcher retrying) never triggers two FVX runs for the same assignment — the
+   * second request awaits the first's stored output.
+   */
+  private readonly inFlight = new Map<number, Promise<{ outputSha512: string }>>();
+
   constructor(
     private readonly logger: Logger,
     @Inject(RANDOMIZER_REPOSITORY_TOKEN)
@@ -67,52 +74,62 @@ export class AssignmentsService {
       throw new BadRequestException('Valid configId is required');
     }
 
-    if (!principal?.uuid) {
-      throw new BadRequestException('Launcher principal required');
-    }
-
     const config = await this.repository.getConfigById(configId);
     if (!config) {
       throw new NotFoundException(`Config ${configId} not found`);
     }
 
-    // Check if assignment already exists for this (configId, mcUuid)
-    let assignment = await this.repository.getAssignmentByConfigAndMcUuid(
-      configId,
-      principal.uuid,
-    );
+    const assignment = await this.resolveOrMintAssignment(config, principal);
+    return this.sealAssignmentDto(assignment, config);
+  }
 
-    if (assignment) {
-      // Already exists — return sealed DTO
-      return this.sealAssignmentDto(assignment, config);
+  /**
+   * Resolve the launcher user's assignment for a config, minting on first claim.
+   *
+   * - Existing assignment → return it.
+   * - No assignment AND config.status==='open' AND user entitled → MINT (seed + row).
+   * - No assignment AND config not open → 404 (claims closed; they never participated).
+   * - No assignment AND not entitled → 403.
+   *
+   * Shared by the sealed-DTO claim path and the ROM generation path so both mint
+   * identically. Returns the raw assignment row (NEVER expose its seed to players).
+   */
+  private async resolveOrMintAssignment(
+    config: RandomizerConfig,
+    principal: LauncherPrincipal,
+  ): Promise<RandomizerAssignment> {
+    if (!principal?.uuid) {
+      throw new BadRequestException('Launcher principal required');
     }
 
-    // Assignment doesn't exist. Check if config is open for new claims.
+    const assignment = await this.repository.getAssignmentByConfigAndMcUuid(
+      config.id,
+      principal.uuid,
+    );
+    if (assignment) {
+      return assignment;
+    }
+
     if (config.status !== 'open') {
-      // Config is not open for claims. They have no assignment.
       throw new NotFoundException(
-        `Config ${configId} is not accepting new claims (status: ${config.status})`,
+        `Config ${config.id} is not accepting new claims (status: ${config.status})`,
       );
     }
 
-    // Resolve entitlement to check if they're registered/confirmed for this event
     const entitlement = await this.repository.resolveEventEntitlement(
       config.eventId,
       principal.uuid,
     );
-
     if (!entitlement) {
-      // Not registered/confirmed for this event
       throw new ForbiddenException(
         'You are not registered or confirmed for this event.',
       );
     }
 
-    // MINT: Generate seed and create assignment
     const seed = randomBytes(6).readUintBE(0, 6) % Number.MAX_SAFE_INTEGER;
 
     const assignmentId = await this.repository.createAssignment({
-      configId,
+      configId: config.id,
       boffmediaUserId: entitlement.boffmediaUserId,
       mcUuid: principal.uuid,
       seed,
@@ -131,13 +148,11 @@ export class AssignmentsService {
       `Minted assignment ${assignmentId} for user ${principal.uuid} with seed ${seed}`,
     );
 
-    // Fetch fresh assignment to return
     const newAssignment = await this.repository.getAssignmentById(assignmentId);
     if (!newAssignment) {
       throw new Error('Failed to retrieve created assignment');
     }
-
-    return this.sealAssignmentDto(newAssignment, config);
+    return newAssignment;
   }
 
   /**
@@ -160,23 +175,25 @@ export class AssignmentsService {
   }
 
   /**
-   * Upload a patched ROM: hash, verify, randomize, store log, update assignment.
+   * Get the launcher user's randomized ROM for a config, generating it server-side
+   * on first request and caching the output blob thereafter.
    *
-   * - Get config and assignment
-   * - Hash the incoming stream server-side
-   * - 422 if hash != config.cleanRomSha512
-   * - Fetch assignment seed and config settings blob
-   * - Call runner.randomize
-   * - Store log blob
-   * - Update assignment: outputSha512, logBlobSha512, patchedAt, status=patched
-   * - Audit ROM_RECEIVED then PATCHED
-   * - Stream back the randomized ROM
+   * - Resolve/mint the assignment (same entitlement + open-config rules as claim).
+   * - Cached: assignment.outputSha512 set and its blob on disk → stream it (ROM_SERVED).
+   * - Generate: stream the clean ROM from the blob store (409 if the config has no
+   *   base ROM on the server) + encoded settings + assignment seed → runner.randomize
+   *   → store output + log blobs → assignment {outputSha512, logBlobSha512, patchedAt,
+   *   status:'patched'} → ROM_GENERATED → stream.
+   * - Concurrency: a per-assignment in-flight lock prevents a double request from
+   *   randomizing twice.
+   *
+   * The output blob is content-addressed by its sha512 (== outputSha512), so both
+   * the generator and any concurrent waiter stream it back through the blob store.
    */
-  async patchRom(
+  async getOrGenerateRom(
     configId: number,
     principal: LauncherPrincipal,
-    romStream: Readable,
-  ): Promise<{ randomizedRom: Readable; logBlob: Buffer }> {
+  ): Promise<{ stream: Readable; outputSha512: string; contentLength: number }> {
     if (!configId || configId <= 0) {
       throw new BadRequestException('Valid configId is required');
     }
@@ -186,119 +203,113 @@ export class AssignmentsService {
       throw new NotFoundException(`Config ${configId} not found`);
     }
 
-    // Get assignment — user must have already claimed
-    const assignment = await this.repository.getAssignmentByConfigAndMcUuid(
-      configId,
-      principal.uuid,
-    );
+    const assignment = await this.resolveOrMintAssignment(config, principal);
 
-    if (!assignment) {
-      throw new NotFoundException(
-        `No assignment found for config ${configId} and user ${principal.uuid}`,
-      );
+    // Cached fast-path: output already generated and still on disk.
+    if (assignment.outputSha512) {
+      const size = await this.blobStorage.blobSize(assignment.outputSha512);
+      if (size !== null) {
+        await this.repository.appendAudit({
+          assignmentId: assignment.id,
+          action: 'ROM_SERVED',
+          actor: principal.uuid,
+          meta: { outputSha512: assignment.outputSha512 },
+        });
+        return this.streamOutput(assignment.outputSha512);
+      }
     }
 
-    // Hash the incoming ROM stream
-    const hash = createHash('sha512');
-    const chunks: Buffer[] = [];
-
-    return new Promise((resolve, reject) => {
-      romStream.on('data', (chunk: Buffer) => {
-        hash.update(chunk);
-        chunks.push(chunk);
+    // Generate (or join an in-flight generation) for this assignment.
+    let generation = this.inFlight.get(assignment.id);
+    if (!generation) {
+      generation = this.generateRom(config, assignment, principal).finally(() => {
+        this.inFlight.delete(assignment.id);
       });
+      this.inFlight.set(assignment.id, generation);
+    }
+    const { outputSha512 } = await generation;
+    return this.streamOutput(outputSha512);
+  }
 
-      romStream.on('end', async () => {
-        try {
-          const uploadedSha512 = hash.digest('hex');
+  /** Open a read stream over a stored output blob (with its content length). */
+  private async streamOutput(
+    outputSha512: string,
+  ): Promise<{ stream: Readable; outputSha512: string; contentLength: number }> {
+    const { stream, contentLength } = await this.blobStorage.override(
+      outputSha512,
+    );
+    // Blob is always on disk here (checked before calling), so length is real.
+    return { stream, outputSha512, contentLength: contentLength ?? 0 };
+  }
 
-          // Verify hash
-          if (uploadedSha512 !== config.cleanRomSha512) {
-            await this.repository.appendAudit({
-              assignmentId: assignment.id,
-              action: 'ROM_RECEIVED',
-              actor: principal.uuid,
-              meta: { uploadedSha512, expectedSha512: config.cleanRomSha512 },
-            });
-
-            throw new UnprocessableEntityException({
-              message: `ROM hash mismatch: expected ${config.cleanRomSha512}, got ${uploadedSha512}`,
-              userMessage:
-                'El archivo ROM no coincide con el esperado. Verifica que sea el archivo correcto.',
-            });
-          }
-
-          // Audit receipt
-          await this.repository.appendAudit({
-            assignmentId: assignment.id,
-            action: 'ROM_RECEIVED',
-            actor: principal.uuid,
-            meta: { uploadedSha512 },
-          });
-
-          // Fetch settings JSON bytes (with heal-on-miss logic)
-          const settingsJsonBytes = await this.eventsService.settingsJsonBytesForConfig(config);
-
-          // Encode settings JSON to .rnqs
-          const settingsRnqs = await this.settingsShim.encode(
-            JSON.parse(settingsJsonBytes.toString('utf-8')),
-          );
-
-          const job: RandomizeJob = {
-            romStream: Readable.from(chunks),
-            settingsRnqs,
-            seed: assignment.seed,
-            gamePlatform: config.gamePlatform as 'gba' | 'nds',
-            jarSha512: config.fvxJarSha512,
-          };
-
-          const result = await this.runner.randomize(job);
-
-          // Store log blob
-          const { sha512: logBlobSha512 } = await this.blobStorage.storeBlob(
-            Readable.from(result.logBytes),
-          );
-
-          // Update assignment
-          await this.repository.updateAssignment(assignment.id, {
-            outputSha512: result.outputSha512,
-            logBlobSha512,
-            patchedAt: new Date(),
-            status: 'patched',
-          });
-
-          // Audit patched
-          await this.repository.appendAudit({
-            assignmentId: assignment.id,
-            action: 'PATCHED',
-            actor: principal.uuid,
-            meta: { outputSha512: result.outputSha512, logBlobSha512 },
-          });
-
-          this.logger.debug(
-            `Patched assignment ${assignment.id}: output ${result.outputSha512.slice(0, 8)}..., log ${logBlobSha512.slice(0, 8)}...`,
-          );
-
-          // Return randomized ROM as stream from actual bytes
-          resolve({
-            randomizedRom: Readable.from(result.romBytes),
-            logBlob: result.logBytes,
-          });
-        } catch (error) {
-          reject(error);
-        }
+  /**
+   * Run FVX against the config's clean ROM (from the blob store) with the
+   * assignment's seed, store the output + log blobs, and mark the assignment
+   * patched. Returns the output sha512 (the stored blob's content address).
+   */
+  private async generateRom(
+    config: RandomizerConfig,
+    assignment: RandomizerAssignment,
+    principal: LauncherPrincipal,
+  ): Promise<{ outputSha512: string }> {
+    // The clean ROM must be on the server (uploaded to the library and pinned).
+    // A missing blob is an admin-side error (config never got a base ROM), kept
+    // distinct from the player-side 404/403 above.
+    const cleanSize = await this.blobStorage.blobSize(config.cleanRomSha512);
+    if (cleanSize === null) {
+      throw new ConflictException({
+        message: `Config ${config.id} has no base ROM on the server (clean blob ${config.cleanRomSha512.slice(0, 8)}… missing)`,
+        userMessage:
+          'Este evento todavía no tiene una ROM base en el servidor. Avisa a un administrador.',
       });
+    }
 
-      romStream.on('error', (error) => {
-        this.logger.error('ROM stream error:', error);
-        reject(
-          new BadRequestException({
-            message: `ROM upload failed: ${(error as Error).message}`,
-            userMessage: 'La subida se ha interrumpido. Inténtalo de nuevo.',
-          }),
-        );
-      });
+    const { stream: cleanStream } = await this.blobStorage.override(
+      config.cleanRomSha512,
+    );
+
+    // Settings JSON bytes (heal-on-miss) → .rnqs
+    const settingsJsonBytes =
+      await this.eventsService.settingsJsonBytesForConfig(config);
+    const settingsRnqs = await this.settingsShim.encode(
+      JSON.parse(settingsJsonBytes.toString('utf-8')),
+    );
+
+    const job: RandomizeJob = {
+      romStream: cleanStream,
+      settingsRnqs,
+      seed: assignment.seed,
+      gamePlatform: config.gamePlatform as 'gba' | 'nds',
+      jarSha512: config.fvxJarSha512,
+    };
+
+    const result = await this.runner.randomize(job);
+
+    // Cache the randomized ROM (content-addressed → key === outputSha512) and the log.
+    await this.blobStorage.storeBlob(Readable.from(result.romBytes));
+    const { sha512: logBlobSha512 } = await this.blobStorage.storeBlob(
+      Readable.from(result.logBytes),
+    );
+
+    await this.repository.updateAssignment(assignment.id, {
+      outputSha512: result.outputSha512,
+      logBlobSha512,
+      patchedAt: new Date(),
+      status: 'patched',
     });
+
+    await this.repository.appendAudit({
+      assignmentId: assignment.id,
+      action: 'ROM_GENERATED',
+      actor: principal.uuid,
+      meta: { outputSha512: result.outputSha512, logBlobSha512 },
+    });
+
+    this.logger.debug(
+      `Generated ROM for assignment ${assignment.id}: output ${result.outputSha512.slice(0, 8)}…, log ${logBlobSha512.slice(0, 8)}…`,
+    );
+
+    return { outputSha512: result.outputSha512 };
   }
 
   /**

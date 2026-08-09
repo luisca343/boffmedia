@@ -1,6 +1,6 @@
 import { Injectable, Inject, ConflictException } from '@nestjs/common';
 import { MySql2Database } from 'drizzle-orm/mysql2';
-import { and, eq, ne, isNotNull, inArray } from 'drizzle-orm';
+import { and, eq, ne, or, sql, isNotNull, inArray } from 'drizzle-orm';
 import { packs } from '@/_db/schema/Packs';
 import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
 import {
@@ -8,6 +8,7 @@ import {
   randomizerAssignments,
   randomizerAudit,
   randomizerPresets,
+  randomizerRoms,
   RandomizerConfig,
   NewRandomizerConfig,
   RandomizerAssignment,
@@ -15,6 +16,8 @@ import {
   RandomizerAuditRow,
   RandomizerPreset,
   NewRandomizerPreset,
+  RandomizerRom,
+  NewRandomizerRom,
   RandomizerAuditAction,
 } from '@/_db/schema/Randomizer';
 import { boffMediaUsers } from '@/_db/schema/BoffMedia';
@@ -590,5 +593,97 @@ export class RandomizerRepository {
       this.logger.error(`Failed to delete preset ${id}:`, error);
       throw new Error(`Preset deletion failed: ${error.message}`);
     }
+  }
+
+  // ==================== ROM LIBRARY ====================
+
+  /**
+   * Insert a library ROM row. sha512 is UNIQUE (content address), so a duplicate
+   * upload surfaces as a 409 the admin UI can explain, not an opaque 500.
+   */
+  async createRom(data: NewRandomizerRom): Promise<number> {
+    try {
+      const result = await this.db
+        .insert(randomizerRoms)
+        .values(data)
+        .execute();
+      return result[0].insertId;
+    } catch (error: any) {
+      if (error?.code === 'ER_DUP_ENTRY') {
+        throw new ConflictException({
+          message: `A ROM with sha512 ${data.sha512} already exists in the library`,
+          userMessage:
+            'Esta ROM ya está en la biblioteca (mismo contenido). Usa la existente.',
+        });
+      }
+      this.logger.error('Failed to create randomizer ROM:', error);
+      throw new Error(`ROM creation failed: ${error.message}`);
+    }
+  }
+
+  async getRomById(id: number): Promise<RandomizerRom | null> {
+    if (!id || id <= 0) return null;
+    const rows = await this.db
+      .select()
+      .from(randomizerRoms)
+      .where(eq(randomizerRoms.id, id))
+      .execute();
+    return rows.length > 0 ? rows[0] : null;
+  }
+
+  async getRomBySha512(sha512: string): Promise<RandomizerRom | null> {
+    if (!sha512) return null;
+    const rows = await this.db
+      .select()
+      .from(randomizerRoms)
+      .where(eq(randomizerRoms.sha512, sha512))
+      .execute();
+    return rows.length > 0 ? rows[0] : null;
+  }
+
+  /** List all library ROMs, each with the number of configs that reference it. */
+  async listRomsWithRefCount(): Promise<
+    (RandomizerRom & { referencedBy: number })[]
+  > {
+    const roms = await this.db.select().from(randomizerRoms).execute();
+    if (roms.length === 0) return [];
+    return Promise.all(
+      roms.map(async (rom) => ({
+        ...rom,
+        referencedBy: await this.countConfigsReferencingRom(rom.id, rom.sha512),
+      })),
+    );
+  }
+
+  /**
+   * How many configs reference a library ROM — by provenance FK (rom_id) OR by
+   * the pinned clean hash (clean_rom_sha512). Either link blocks deletion, so a
+   * live event never loses its base ROM out from under it.
+   */
+  async countConfigsReferencingRom(
+    romId: number,
+    sha512: string,
+  ): Promise<number> {
+    const rows = await this.db
+      .select({ n: sql<number>`count(*)` })
+      .from(randomizerConfigs)
+      .where(
+        or(
+          eq(randomizerConfigs.romId, romId),
+          eq(randomizerConfigs.cleanRomSha512, sha512),
+        ),
+      )
+      .execute();
+    return Number(rows[0]?.n ?? 0);
+  }
+
+  async deleteRom(id: number): Promise<void> {
+    if (!id || id <= 0) {
+      throw new Error('Valid ROM ID is required');
+    }
+    await this.db
+      .delete(randomizerRoms)
+      .where(eq(randomizerRoms.id, id))
+      .execute();
   }
 }

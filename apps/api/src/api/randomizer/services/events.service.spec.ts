@@ -28,12 +28,14 @@ describe('EventsService', () => {
       getConfigById: jest.fn(),
       getEmulatorPack: jest.fn(),
       findEventHoldingPack: jest.fn(),
+      getRomById: jest.fn(),
     } as unknown as jest.Mocked<RandomizerRepository>;
 
     // Mock blob storage
     blobStorage = {
       storeBlob: jest.fn(),
       override: jest.fn(),
+      blobSize: jest.fn(),
     } as unknown as jest.Mocked<PacksDownloadsService>;
 
     // Mock settings shim
@@ -94,6 +96,15 @@ describe('EventsService', () => {
     beforeEach(() => {
       // Mock getFvxJarSha512 to avoid reading actual jar file
       jest.spyOn(service as any, 'getFvxJarSha512').mockReturnValue('jarsha512hash');
+      // The config now pins a library ROM: resolve one and confirm its blob is on disk.
+      repository.getRomById.mockResolvedValue({
+        id: 7,
+        name: 'FireRed',
+        gamePlatform: 'gba',
+        sha512: 'r'.repeat(128),
+        fileSize: 1000,
+      } as any);
+      blobStorage.blobSize.mockResolvedValue(1000);
     });
 
     it('persists settings blob and uses returned hash', async () => {
@@ -122,7 +133,7 @@ describe('EventsService', () => {
         gamePlatform: 'gba',
         gameTitle: 'Pokemon Red',
         presetId: 1,
-        cleanRomSha512: 'abc123',
+        romId: 7,
         packId: 'pack1',
       });
 
@@ -156,7 +167,7 @@ describe('EventsService', () => {
           gamePlatform: 'gba',
           gameTitle: 'Pokemon Red',
           presetId: 1,
-          cleanRomSha512: 'abc123',
+          romId: 7,
           packId: 'pack1',
         }),
       ).rejects.toThrow('Settings blob hash mismatch');

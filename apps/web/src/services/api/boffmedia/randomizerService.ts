@@ -19,6 +19,7 @@ import type {
   CreateConfigDto,
   UpdateConfigDto,
   RandomizerAssignment,
+  RandomizerRom,
 } from "./randomizer.types"
 import type { ApiResponse } from "@/services/http/core"
 
@@ -83,6 +84,38 @@ export class RandomizerService {
     })
     if (!response.ok) throw new Error(`Export failed: ${response.statusText}`)
     return response.blob()
+  }
+
+  // ==================== ROM LIBRARY OPERATIONS (Phase 3) ====================
+
+  /**
+   * List all ROMs in the library.
+   */
+  static listRoms() {
+    return apiAuthedAutoGET<RandomizerRom[]>(`${BASE}/roms`)
+  }
+
+  /**
+   * Upload a new ROM to the library.
+   * Body: multipart/form-data with file field 'rom', plus form fields 'name' and 'gamePlatform'.
+   */
+  static async uploadRom(
+    file: File,
+    name: string,
+    gamePlatform: "gba" | "nds",
+  ): Promise<ApiResponse<RandomizerRom>> {
+    const formData = new FormData()
+    formData.append("rom", file)
+    formData.append("name", name)
+    formData.append("gamePlatform", gamePlatform)
+    return apiAuthedAutoPOST<RandomizerRom>(`${BASE}/roms`, formData)
+  }
+
+  /**
+   * Delete a ROM from the library.
+   */
+  static deleteRom(id: number) {
+    return apiAuthedAutoDELETE<void>(`${BASE}/roms/${id}`)
   }
 
   /**

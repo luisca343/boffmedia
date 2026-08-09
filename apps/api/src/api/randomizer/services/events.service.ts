@@ -164,7 +164,7 @@ export class EventsService {
     gamePlatform: string;
     gameTitle: string;
     presetId: number;
-    cleanRomSha512: string;
+    romId: number;
     packId: string;
     romHint?: string;
   }): Promise<RandomizerConfig> {
@@ -179,6 +179,11 @@ export class EventsService {
     if (!preset) {
       throw new BadRequestException(`Preset ${data.presetId} not found`);
     }
+
+    // Resolve the library ROM: the server pins its sha512 (execution value) and
+    // records rom_id (provenance). Replacing a library entry later never silently
+    // changes this config, because the hash is copied here, not referenced live.
+    const rom = await this.resolveLibraryRom(data.romId, data.gamePlatform);
 
     // The pack is what makes the config reachable in the launcher (pack → event
     // → config). Validate it up front and attach it to the event in the same
@@ -213,7 +218,8 @@ export class EventsService {
         gameTitle: data.gameTitle,
         settingsBlobSha512: storedSha512,
         fvxJarSha512,
-        cleanRomSha512: data.cleanRomSha512,
+        cleanRomSha512: rom.sha512,
+        romId: rom.id,
         romHint: data.romHint || null,
         status: 'draft',
       } as NewRandomizerConfig,
@@ -317,6 +323,40 @@ export class EventsService {
    * emulator pack, and not already be claimed by a different event (the launcher
    * resolves a pack to a single event).
    */
+  /**
+   * Resolve a library ROM for pinning into a config: it must exist, match the
+   * config's platform, and its blob must be present on disk (so the server can
+   * actually generate ROMs from it). Returns the row whose sha512/id get pinned.
+   */
+  private async resolveLibraryRom(
+    romId: number,
+    gamePlatform: string,
+  ): Promise<{ id: number; sha512: string }> {
+    if (!romId || romId <= 0) {
+      throw new BadRequestException('A base ROM must be selected (romId)');
+    }
+    const rom = await this.repository.getRomById(romId);
+    if (!rom) {
+      throw new BadRequestException(`ROM ${romId} not found in the library`);
+    }
+    if (rom.gamePlatform !== gamePlatform) {
+      throw new BadRequestException({
+        message: `ROM ${romId} is ${rom.gamePlatform}, but the config is ${gamePlatform}`,
+        userMessage:
+          'La ROM elegida no es de la misma plataforma que la configuración.',
+      });
+    }
+    const size = await this.blobStorage.blobSize(rom.sha512);
+    if (size === null) {
+      throw new BadRequestException({
+        message: `ROM ${romId} blob ${rom.sha512.slice(0, 8)}… is not on disk`,
+        userMessage:
+          'El archivo de esa ROM no está disponible en el servidor. Vuelve a subirla.',
+      });
+    }
+    return { id: rom.id, sha512: rom.sha512 };
+  }
+
   private async assertPackAttachable(
     packId: string,
     eventId: number,
@@ -386,7 +426,7 @@ export class EventsService {
    */
   async updateConfig(
     configId: number,
-    patch: { romHint?: string; packId?: string },
+    patch: { romHint?: string; packId?: string; romId?: number },
   ): Promise<RandomizerConfig> {
     if (!configId || configId <= 0) {
       throw new BadRequestException('Valid configId is required');
@@ -394,7 +434,11 @@ export class EventsService {
 
     const config = await this.getConfig(configId);
 
-    if (config.status !== 'draft') {
+    // Selecting a base ROM is allowed while draft OR whenever the config has no
+    // library ROM yet (the migrated event-2 case: re-pin its base ROM without
+    // touching the preserved assignment/seed). Other edits stay draft-only.
+    const isRepairingRom = patch.romId !== undefined && config.romId == null;
+    if (config.status !== 'draft' && !isRepairingRom) {
       throw new ConflictException(
         `Cannot update config ${configId}: status is ${config.status}, not draft`,
       );
@@ -406,9 +450,22 @@ export class EventsService {
       await this.repository.attachPackToEvent(config.eventId, patch.packId);
     }
 
-    await this.repository.updateConfig(configId, {
+    const update: {
+      romHint?: string | null;
+      cleanRomSha512?: string;
+      romId?: number;
+    } = {
       romHint: patch.romHint !== undefined ? patch.romHint : config.romHint,
-    });
+    };
+
+    // Re-select the base ROM: re-pin sha512 + record provenance.
+    if (patch.romId !== undefined) {
+      const rom = await this.resolveLibraryRom(patch.romId, config.gamePlatform);
+      update.romId = rom.id;
+      update.cleanRomSha512 = rom.sha512;
+    }
+
+    await this.repository.updateConfig(configId, update);
 
     return this.getConfig(configId);
   }
@@ -439,6 +496,16 @@ export class EventsService {
         message: `Event ${config.eventId} has no pack attached`,
         userMessage:
           'El evento no tiene un pack vinculado. Vuelve a guardar la configuración con un pack.',
+      });
+    }
+
+    // A config with no library ROM cannot go live: the server would have no base
+    // ROM to generate from. Migrated configs must re-select a base ROM first.
+    if (config.romId == null) {
+      throw new ConflictException({
+        message: `Config ${configId} has no base ROM selected`,
+        userMessage:
+          'Selecciona una ROM base de la biblioteca antes de abrir la configuración.',
       });
     }
 

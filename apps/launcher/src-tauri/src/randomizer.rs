@@ -143,12 +143,12 @@ pub fn hash_file(path: String) -> Result<String, RandomizerError> {
         })
 }
 
-/// Upload a clean ROM and download the randomized version.
-/// Returns the path to the output ROM and its SHA-512 hash.
+/// Download the player's randomized ROM.
+/// The server generates it on first request, caches it, and streams it.
+/// Returns the path to the output ROM and its SHA-512 hash (from x-output-sha512 header).
 #[tauri::command]
-pub async fn randomizer_patch_rom(
+pub async fn randomizer_download_rom(
     event_id: String,
-    rom_path: String,
     auth: tauri::State<'_, AuthState>,
     api: tauri::State<'_, ApiState>,
 ) -> Result<RandomizerRomResult, RandomizerError> {
@@ -167,51 +167,61 @@ pub async fn randomizer_patch_rom(
             }
         })?;
 
-    let rom_file = std::path::PathBuf::from(&rom_path);
-    if !rom_file.is_file() {
-        return Err(RandomizerError {
-            code: "not_found".to_string(),
-            message: "ROM file not found".to_string(),
-        });
-    }
-
-    // Create a temporary file for the output
-    let temp_dir = std::env::temp_dir();
-    let output_name = format!("randomized_{}.gba", uuid::Uuid::new_v4());
-    let output_path = temp_dir.join(&output_name);
-
-    // Read the ROM file and upload it as raw bytes
-    let rom_bytes = std::fs::read(&rom_file)
-        .map_err(|e| RandomizerError {
-            code: "io_error".to_string(),
-            message: format!("Failed to read ROM: {}", e),
-        })?;
-
     let client = reqwest::Client::new();
     let res = client
-        .post(&url)
+        .get(&url)
         .header("Authorization", format!("Bearer {}", token))
-        .header("Content-Type", "application/octet-stream")
-        .body(rom_bytes)
         .send()
         .await
         .map_err(|e| RandomizerError {
             code: "network_error".to_string(),
-            message: format!("Failed to upload ROM: {}", e),
+            message: format!("Failed to download ROM: {}", e),
         })?;
 
-    if !res.status().is_success() {
+    let status = res.status();
+    if !status.is_success() {
+        let status_code = status.as_u16();
+        let body: serde_json::Value = res.json().await.unwrap_or_default();
+        let reason = body
+            .get("userMessage")
+            .or_else(|| body.get("message"))
+            .and_then(|v| v.as_str())
+            .unwrap_or("Request failed")
+            .to_string();
+
+        let code = match status {
+            reqwest::StatusCode::NOT_FOUND => "not_found",
+            reqwest::StatusCode::FORBIDDEN => "not_registered",
+            reqwest::StatusCode::CONFLICT => "no_base_rom",
+            _ => "http_error",
+        };
+
         return Err(RandomizerError {
-            code: "upload_error".to_string(),
-            message: format!("Upload failed with status {}", res.status()),
+            code: code.to_string(),
+            message: format!("{} ({})", reason, status_code),
         });
     }
 
-    // Download the randomized ROM
+    // Read the x-output-sha512 header
+    let output_sha512 = res
+        .headers()
+        .get("x-output-sha512")
+        .and_then(|h| h.to_str().ok())
+        .map(|s| s.to_lowercase())
+        .ok_or_else(|| RandomizerError {
+            code: "parse_error".to_string(),
+            message: "Missing x-output-sha512 header in response".to_string(),
+        })?;
+
+    // Stream the ROM bytes to a temporary file
+    let temp_dir = std::env::temp_dir();
+    let output_name = format!("randomized_{}.gba", uuid::Uuid::new_v4());
+    let output_path = temp_dir.join(&output_name);
+
     let rom_data = res.bytes().await
         .map_err(|e| RandomizerError {
             code: "network_error".to_string(),
-            message: format!("Failed to download randomized ROM: {}", e),
+            message: format!("Failed to download ROM bytes: {}", e),
         })?;
 
     std::fs::write(&output_path, &rom_data)
@@ -220,16 +230,9 @@ pub async fn randomizer_patch_rom(
             message: format!("Failed to save randomized ROM: {}", e),
         })?;
 
-    // Compute the output ROM's hash
-    let output_hash = install::files::sha512_of(&output_path)
-        .ok_or_else(|| RandomizerError {
-            code: "hash_error".to_string(),
-            message: "Failed to compute output ROM hash".to_string(),
-        })?;
-
     Ok(RandomizerRomResult {
         output_path: output_path.to_string_lossy().to_string(),
-        output_sha512: output_hash,
+        output_sha512,
     })
 }
 

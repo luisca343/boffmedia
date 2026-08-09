@@ -66,12 +66,20 @@ async fn install_payload(
     // Everything that is actually fetchable in one pass (emulators have no
     // `mods/`, so there is no separate mods phase). Unsatisfied user-provided
     // ROMs skip inside fetch_one; patched files are materialized separately.
+    // Randomizer-managed ROM slots are also skipped here and populated by the
+    // randomizer auto-flow after install.
     let downloadable: Vec<PlannedFile> = wanted
         .iter()
         .filter(|f| !matches!(f.fetch, Fetch::Patched { .. }))
         .cloned()
         .collect();
-    files::download_all(
+    // Skip the ROM slot if this pack is linked to a randomizer event
+    let skip_paths = if manifest.randomizer.is_some() {
+        vec![prepared.plan.rom.clone()]
+    } else {
+        vec![]
+    };
+    files::download_all_with_skips(
         app,
         http,
         &prepared.layout,
@@ -81,6 +89,7 @@ async fn install_payload(
         &downloadable,
         Phase::Overrides,
         reporter,
+        &skip_paths,
     )
     .await?;
 
@@ -333,12 +342,6 @@ fn spawn(app: &tauri::AppHandle, prepared: &EmulatorPrepared) -> Result<RunningG
         .instance
         .minecraft
         .join(prepared.plan.rom.replace('\\', "/"));
-    if !rom.is_file() {
-        return Err(InstallFailure::message(format!(
-            "No se encontró el ROM «{}». Proporciónalo antes de jugar.",
-            prepared.plan.rom
-        )));
-    }
 
     // Randomizer event gate: if this pack is linked to an active randomizer,
     // verify the ROM has been patched (expected sha512 != clean_rom_sha512).
@@ -352,6 +355,14 @@ fn spawn(app: &tauri::AppHandle, prepared: &EmulatorPrepared) -> Result<RunningG
                 .iter()
                 .find(|f| norm(&f.path) == rom_key)
             {
+                // ROM file missing → not patched (player needs to get their ROM)
+                if !rom.is_file() {
+                    return Err(InstallFailure::with_code(
+                        "Este pack está vinculado a un evento de randomizador que requiere que parches el ROM antes de jugar.",
+                        "randomizer_not_patched",
+                    ));
+                }
+
                 let expected_sha512 = &rom_entry.sha512;
                 // If expected == clean, the player never patched the ROM
                 if expected_sha512.eq_ignore_ascii_case(&gate.clean_rom_sha512) {
@@ -375,6 +386,14 @@ fn spawn(app: &tauri::AppHandle, prepared: &EmulatorPrepared) -> Result<RunningG
                 }
             }
         }
+    }
+
+    // Non-randomizer ROM check: if no randomizer gate, just check the ROM exists
+    if !rom.is_file() {
+        return Err(InstallFailure::message(format!(
+            "No se encontró el ROM «{}». Proporciónalo antes de jugar.",
+            prepared.plan.rom
+        )));
     }
 
     // Saves live INSIDE the instance (owner decision): two packs of the same

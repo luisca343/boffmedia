@@ -28,6 +28,18 @@ export interface RandomizerPreset {
   updatedAt: string
 }
 
+// ROM library entry — Phase 3 admin feature.
+export interface RandomizerRom {
+  id: number
+  name: string
+  gamePlatform: "gba" | "nds"
+  sha512: string
+  fileSize: number
+  referencedBy: number
+  createdAt: string
+  updatedAt: string
+}
+
 // Config view-model — randomizer config for a community event.
 // Mirrors the API's ConfigResponseDto fields. Status lifecycle: draft → open → closed → published.
 export interface RandomizerConfig {
@@ -37,7 +49,8 @@ export interface RandomizerConfig {
   gameTitle: string
   settingsBlobSha512: string
   fvxJarSha512: string
-  cleanRomSha512: string
+  cleanRomSha512?: string
+  romId?: number | null
   romHint: string | null
   packId?: string | null
   status: "draft" | "open" | "closed" | "published"
@@ -62,21 +75,22 @@ export interface RandomizerEvent {
   updatedAt: string
 }
 
-// Config creation DTO (client sends eventId + presetId; server derives settingsBlobSha512).
+// Config creation DTO (client sends eventId + presetId + romId; server derives settingsBlobSha512).
 export interface CreateConfigDto {
   eventId: number
   presetId: number
   gamePlatform: "gba" | "nds"
   gameTitle: string
-  cleanRomSha512: string
+  romId: number
   packId: string
   romHint?: string
 }
 
-// Config update DTO (draft only; only romHint + packId editable).
+// Config update DTO (draft only; romHint + packId + romId editable).
 export interface UpdateConfigDto {
   romHint?: string
   packId?: string | null
+  romId?: number
 }
 
 export interface RandomizerAssignment {

@@ -24,6 +24,8 @@ export type RandomizerAssignmentStatus = 'claimed' | 'patched' | 'verified';
 /** Audit action for randomizer configs and assignments */
 export type RandomizerAuditAction =
   | 'ROM_RECEIVED'
+  | 'ROM_GENERATED'
+  | 'ROM_SERVED'
   | 'PATCHED'
   | 'LOG_SEALED'
   | 'VERIFY_PASSED'
@@ -32,6 +34,37 @@ export type RandomizerAuditAction =
   | 'SEED_MINTED'
   | 'CONFIG_OPENED'
   | 'CONFIG_CLOSED';
+
+/**
+ * Central library of admin-uploaded clean ROMs. A config pins the sha512 of one
+ * of these at selection time (cleanRomSha512) and records provenance via rom_id.
+ * The blob itself lives in the shared content-addressed pack blob store, keyed
+ * by this sha512, and is never referenced by any pack manifest — so a player can
+ * never download it. Only the admin routes and the server-side randomize job touch it.
+ */
+export const randomizerRoms = mysqlTable(
+  'randomizer_roms',
+  {
+    id: int('id').primaryKey().autoincrement(),
+    name: varchar('name', { length: 128 }).notNull(), // human label, e.g. "Pokémon FireRed (USA)"
+    gamePlatform: varchar('game_platform', { length: 8 }).notNull(), // "gba" | "nds"
+    sha512: char('sha512', { length: 128 }).notNull(), // content address in the blob store
+    fileSize: bigint('file_size', { mode: 'number' }).notNull(),
+    createdAt: timestamp('created_at')
+      .notNull()
+      .default(sql`CURRENT_TIMESTAMP()`),
+    updatedAt: timestamp('updated_at')
+      .notNull()
+      .default(sql`CURRENT_TIMESTAMP() ON UPDATE CURRENT_TIMESTAMP()`),
+  },
+  (table) => ({
+    sha512Unique: uniqueIndex('rr_sha512_unique').on(table.sha512),
+    platformIdx: index('rr_platform_idx').on(table.gamePlatform),
+  }),
+);
+
+export type RandomizerRom = typeof randomizerRoms.$inferSelect;
+export type NewRandomizerRom = typeof randomizerRoms.$inferInsert;
 
 export const randomizerConfigs = mysqlTable(
   'randomizer_configs',
@@ -42,7 +75,8 @@ export const randomizerConfigs = mysqlTable(
     gameTitle: varchar('game_title', { length: 64 }).notNull(), // FVX game identifier
     settingsBlobSha512: char('settings_blob_sha512', { length: 128 }).notNull(), // .rnqs settings snapshot
     fvxJarSha512: char('fvx_jar_sha512', { length: 128 }).notNull(), // pinned jar patches
-    cleanRomSha512: char('clean_rom_sha512', { length: 128 }).notNull(), // No-Intro clean-dump hash
+    cleanRomSha512: char('clean_rom_sha512', { length: 128 }).notNull(), // No-Intro clean-dump hash (pinned execution value)
+    romId: int('rom_id'), // provenance: library ROM this config's clean hash was pinned from; nullable for pre-library configs
     romHint: varchar('rom_hint', { length: 255 }), // human hint (e.g. "Pokémon FireRed (Spain)")
     status: varchar('status', { length: 16 }).notNull().default('draft'), // draft | open | closed | published
     createdAt: timestamp('created_at')
@@ -58,8 +92,14 @@ export const randomizerConfigs = mysqlTable(
       columns: [table.eventId],
       foreignColumns: [boffMediaEvents.id],
     }).onDelete('cascade'),
+    romFk: foreignKey({
+      name: 'rc_rom_fk',
+      columns: [table.romId],
+      foreignColumns: [randomizerRoms.id],
+    }).onDelete('restrict'),
     eventIdx: index('rc_event_idx').on(table.eventId),
     statusIdx: index('rc_status_idx').on(table.status),
+    romIdx: index('rc_rom_idx').on(table.romId),
   }),
 );
 

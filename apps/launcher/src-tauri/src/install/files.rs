@@ -106,6 +106,8 @@ pub fn put_local_blob(layout: &Layout, bytes: &[u8]) -> Result<String, InstallFa
 ///
 /// `phase` selects which slice of the progress bar this batch moves — mods and
 /// overrides are two calls, not one, because the UI shows them as two steps.
+/// `skip_paths` (optional) are file paths to skip during download — used for
+/// randomizer ROM slots which are managed exclusively by the randomizer.
 #[allow(clippy::too_many_arguments)]
 pub async fn download_all(
     app: &tauri::AppHandle,
@@ -118,10 +120,30 @@ pub async fn download_all(
     phase: Phase,
     reporter: &Reporter,
 ) -> Result<(), InstallFailure> {
+    download_all_with_skips(app, http, layout, dest_root, pack_id, password, files, phase, reporter, &[]).await
+}
+
+/// Same as `download_all`, but with an option to skip certain paths.
+#[allow(clippy::too_many_arguments)]
+pub async fn download_all_with_skips(
+    app: &tauri::AppHandle,
+    http: &reqwest::Client,
+    layout: &Layout,
+    dest_root: &Path,
+    pack_id: &str,
+    password: Option<&str>,
+    files: &[PlannedFile],
+    phase: Phase,
+    reporter: &Reporter,
+    skip_paths: &[String],
+) -> Result<(), InstallFailure> {
     if files.is_empty() {
         reporter.emit(phase, 1.0, "", 0, 0);
         return Ok(());
     }
+
+    let norm = |p: &str| p.to_lowercase().replace('\\', "/");
+    let skip_norm: Vec<String> = skip_paths.iter().map(|p| norm(p)).collect();
 
     let total: u64 = files.iter().map(|f| f.size).sum();
     // Per batch, not per install: each phase owns its own slice of the bar, so
@@ -131,6 +153,24 @@ pub async fn download_all(
     let mut handles = Vec::with_capacity(files.len());
 
     for file in files {
+        // Skip randomizer-managed ROM slots
+        if skip_norm.iter().any(|s| norm(&file.path) == *s) {
+            // Still advance the progress bar for skipped files
+            let done = counter.add(file.size);
+            reporter.emit(
+                phase,
+                if total > 0 {
+                    done.min(total) as f32 / total as f32
+                } else {
+                    1.0
+                },
+                &file.path,
+                done,
+                total,
+            );
+            continue;
+        }
+
         let permit_source = Arc::clone(&semaphore);
         // Owned, because the task outlives this loop. The AppHandle is what
         // lets a proxied download reach ApiState/AuthState — and therefore

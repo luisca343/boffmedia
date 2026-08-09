@@ -931,11 +931,11 @@ const es = {
 
   randomlocke: {
     panelTitle: "Randomizer",
-    pickRom: "Elige tu ROM limpia para generar una versión randomizada personalizada.",
-    wrongHashError: "La ROM no coincide. Verifica que hayas elegido la ROM correcta.",
-    uploading: "Subiendo ROM…",
-    uploadButton: "Elegir ROM",
-    generating: "Generando ROM randomizada…",
+    claiming: "Solicitando tu ROM personalizado…",
+    downloading: "Descargando ROM randomizado…",
+    autoInstalled: "ROM listo para jugar",
+    downloadError: "No se pudo descargar el ROM. Por favor, intenta de nuevo.",
+    retry: "Reintentar",
     noRomSlot: "No se pudo determinar la ranura de ROM de este pack.",
     readyToPlay: "Listo para jugar",
     loadError: "No se pudo cargar tu asignación del randomizer.",
@@ -1875,11 +1875,11 @@ const en = {
 
   randomlocke: {
     panelTitle: "Randomizer",
-    pickRom: "Select your clean ROM to generate a custom randomized version.",
-    wrongHashError: "ROM does not match. Please verify you selected the correct ROM.",
-    uploading: "Uploading ROM…",
-    uploadButton: "Select ROM",
-    generating: "Generating randomized ROM…",
+    claiming: "Requesting your personalized ROM…",
+    downloading: "Downloading randomized ROM…",
+    autoInstalled: "ROM ready to play",
+    downloadError: "Could not download the ROM. Please try again.",
+    retry: "Retry",
     noRomSlot: "Could not determine this pack's ROM slot.",
     readyToPlay: "Ready to play",
     loadError: "Could not load your randomizer assignment.",

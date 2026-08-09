@@ -196,7 +196,7 @@ pub fn run() {
             // Randomizer commands
             randomizer::randomizer_get_assignment,
             randomizer::hash_file,
-            randomizer::randomizer_patch_rom,
+            randomizer::randomizer_download_rom,
             randomizer::randomizer_update_expected_hash,
         ])
         .run(tauri::generate_context!())

@@ -40,12 +40,13 @@ export class CreateConfigDto {
   presetId: number;
 
   @ApiProperty({
-    example: 'c'.repeat(128),
-    description: 'SHA-512 of clean ROM',
+    example: 1,
+    description:
+      'Library ROM to pin as the clean base. The server copies its sha512 (execution value) and records rom_id (provenance); the platform must match gamePlatform.',
   })
   @IsNotEmpty()
-  @IsString()
-  cleanRomSha512: string;
+  @IsInt()
+  romId: number;
 
   @ApiProperty({
     example: '5b1f88208cfdad6834c7bbec',
@@ -79,6 +80,16 @@ export class UpdateConfigDto {
   @IsOptional()
   @IsString()
   packId?: string;
+
+  @ApiProperty({
+    example: 1,
+    required: false,
+    description:
+      'Select / re-select the base library ROM. Allowed while draft, or on a config that has no ROM yet (re-pins sha512 + rom_id).',
+  })
+  @IsOptional()
+  @IsInt()
+  romId?: number;
 }
 
 export class ConfigResponseDto {
@@ -102,6 +113,15 @@ export class ConfigResponseDto {
 
   @ApiProperty()
   cleanRomSha512: string;
+
+  @ApiProperty({
+    type: Number,
+    nullable: true,
+    required: false,
+    description:
+      'Provenance: the library ROM this config was pinned from. Null for pre-library configs, which the editor flags for re-selection.',
+  })
+  romId?: number | null;
 
   @ApiProperty()
   romHint: string | null;
@@ -312,6 +332,53 @@ export class PublishConfigDto {
 
 export class DryRunDto {
   // File is passed via multipart, not in body — no properties needed
+}
+
+// ==================== ROM LIBRARY DTOS ====================
+
+/**
+ * Upload a clean ROM to the central library. The file arrives as a multipart
+ * field ("rom"); name + platform come as form fields (strings from multipart).
+ */
+export class CreateRomDto {
+  @ApiProperty({ example: 'Pokémon FireRed (USA)', description: 'Human label' })
+  @IsNotEmpty()
+  @IsString()
+  name: string;
+
+  @ApiProperty({ example: 'gba', enum: ['gba', 'nds'] })
+  @IsString()
+  @IsIn(['gba', 'nds'])
+  gamePlatform: string;
+}
+
+export class RomResponseDto {
+  @ApiProperty({ example: 1 })
+  id: number;
+
+  @ApiProperty({ example: 'Pokémon FireRed (USA)' })
+  name: string;
+
+  @ApiProperty({ example: 'gba', enum: ['gba', 'nds'] })
+  gamePlatform: string;
+
+  @ApiProperty({ description: 'SHA-512 content address in the blob store' })
+  sha512: string;
+
+  @ApiProperty({ example: 16777216 })
+  fileSize: number;
+
+  @ApiProperty({
+    example: 0,
+    description: 'How many configs pin this ROM (by rom_id or clean hash).',
+  })
+  referencedBy: number;
+
+  @ApiProperty()
+  createdAt: Date;
+
+  @ApiProperty()
+  updatedAt: Date;
 }
 
 // ==================== QUICK RANDOMIZE DTO ====================

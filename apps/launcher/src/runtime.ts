@@ -1705,25 +1705,21 @@ export type RandomizerRomResult = {
   outputSha512: string
 }
 
-/** Upload a clean ROM and download the randomized version.
- *  Shows upload/download progress via the callback.
+/** Download the player's randomized ROM.
+ *  The server generates it on first request and streams it.
  *  Returns the path to the output ROM file and its SHA-512 hash. */
-export async function patchRandomizerRom(
+export async function downloadRandomizerRom(
   eventId: string,
-  romPath: string,
-  onProgress: (progress: { phase: "uploading" | "downloading"; fraction: number }) => void,
 ): Promise<RandomizerRomResult> {
   if (!isDesktop()) {
     // Browser mock
-    onProgress({ phase: "uploading", fraction: 1 })
-    onProgress({ phase: "downloading", fraction: 1 })
     return {
-      outputPath: romPath,
+      outputPath: `/tmp/randomized_mock_${eventId}.gba`,
       outputSha512: "b".repeat(128),
     }
   }
   try {
-    return await invoke<RandomizerRomResult>("randomizer_patch_rom", { eventId, romPath })
+    return await invoke<RandomizerRomResult>("randomizer_download_rom", { eventId })
   } catch (err) {
     throw err
   }

@@ -160,6 +160,17 @@ pub struct MissingUserFile {
     pub file_size: u64,
 }
 
+/// The path to the emulator ROM slot managed by the randomizer, if present.
+/// Returns None if there is no randomizer gate or the ROM path is not found.
+/// Used to exclude the slot from blob-cache re-satisfaction and missing-file checks.
+pub fn randomizer_rom_slot_path(marker: &Marker) -> Option<String> {
+    if marker.randomizer.is_none() || marker.game_type != instance::GameType::Emulator {
+        return None;
+    }
+    let emulator = marker.emulator.as_ref()?;
+    Some(emulator.rom.clone())
+}
+
 /// The required `user-provided` files this instance still lacks. Read from the
 /// marker (which records every managed file, including the ones we never fetch),
 /// so it works from a plain library scan with no manifest in hand.
@@ -168,11 +179,15 @@ pub struct MissingUserFile {
 /// the mere presence of `<sha512>` there means a reinstall would place the file;
 /// and a file already at the instance path was hash-verified when it was placed.
 /// Optional entries (`env.client == optional`) never block and are skipped.
+/// Randomizer ROM slots are also skipped — they are managed by the randomizer.
 pub fn compute_missing_user_files(
     layout: &Layout,
     instance: &InstancePaths,
     marker: &Marker,
 ) -> Vec<MissingUserFile> {
+    let norm = |p: &str| p.to_lowercase().replace('\\', "/");
+    let randomizer_slot_norm = randomizer_rom_slot_path(marker).map(|p| norm(&p));
+
     let mut missing = Vec::new();
     for file in &marker.managed {
         if file.optional {
@@ -181,6 +196,12 @@ pub fn compute_missing_user_files(
         let ManagedSource::UserProvided { hint } = &file.source else {
             continue;
         };
+        // Skip the randomizer ROM slot if present
+        if let Some(ref slot_norm) = randomizer_slot_norm {
+            if norm(&file.path) == *slot_norm {
+                continue;
+            }
+        }
         let sha512 = file.sha512.to_lowercase();
         let in_blob = files::local_blob_path(layout, &sha512).is_file();
         let on_disk = std::fs::metadata(instance.minecraft.join(file.path.replace('\\', "/")))

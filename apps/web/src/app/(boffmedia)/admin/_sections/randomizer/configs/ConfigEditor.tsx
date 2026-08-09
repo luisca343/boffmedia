@@ -9,7 +9,7 @@ import { Button, Field, Input, Select, Spinner, toast } from "@boffmedia/ui"
 import { AvPanel, AvSectionHead } from "../../../_components/ui/av-kit"
 import { RandomizerService } from "@/services/api/boffmedia/randomizerService"
 import { PacksService } from "@/services/api/boffmedia/packsService"
-import type { RandomizerConfig, RandomizerPreset } from "@/services/api/boffmedia/randomizer.types"
+import type { RandomizerConfig, RandomizerPreset, RandomizerRom } from "@/services/api/boffmedia/randomizer.types"
 import type { AdminPack } from "@/services/api/boffmedia/packsService"
 
 const makeConfigSchema = (t: (key: string) => string) =>
@@ -18,7 +18,7 @@ const makeConfigSchema = (t: (key: string) => string) =>
     gamePlatform: z.enum(["gba", "nds"]),
     // presetId is required on create; enforced in onSubmit
     presetId: z.string().optional(),
-    cleanRomSha512: z.string().min(1, t("romHashRequired")),
+    romId: z.string().optional(),
     romHint: z.string().optional().default(""),
     packId: z.string().optional(),
   })
@@ -42,9 +42,12 @@ export function ConfigEditor({
   const isExisting = Boolean(config?.id)
   const [presets, setPresets] = useState<RandomizerPreset[]>([])
   const [packs, setPacks] = useState<AdminPack[]>([])
+  const [roms, setRoms] = useState<RandomizerRom[]>([])
   const [loadingPresets, setLoadingPresets] = useState(false)
   const [loadingPacks, setLoadingPacks] = useState(false)
+  const [loadingRoms, setLoadingRoms] = useState(false)
   const [submitting, setSubmitting] = useState(false)
+  const [romError, setRomError] = useState<string | null>(null)
 
   const {
     control,
@@ -52,6 +55,7 @@ export function ConfigEditor({
     handleSubmit,
     formState: { errors },
     reset,
+    watch,
   } = useForm<ConfigFormData>({
     resolver: zodResolver(makeConfigSchema(t)),
     // Branch on an actual saved config (id), not truthiness: the "create" path
@@ -63,20 +67,39 @@ export function ConfigEditor({
           gameTitle: config.gameTitle,
           gamePlatform: config.gamePlatform,
           presetId: undefined, // not returned by the API; only chosen on create
-          cleanRomSha512: config.cleanRomSha512,
+          romId: config.romId ? String(config.romId) : "",
           romHint: config.romHint ?? "",
           packId: config.packId ?? undefined,
         }
       : {
           gamePlatform: "gba",
+          romId: "",
           romHint: "",
         },
   })
 
+  const selectedPlatform = watch("gamePlatform")
+  const selectedRomId = watch("romId")
+
   useEffect(() => {
     loadPresets()
     loadPacks()
+    loadRoms()
   }, [])
+
+  const loadRoms = async () => {
+    setLoadingRoms(true)
+    try {
+      const res = await RandomizerService.listRoms()
+      setRoms(res.success ? res.data || [] : [])
+      setRomError(null)
+    } catch (err) {
+      toast({ tone: "bad", title: t("errorLoadingRoms"), msg: String(err) })
+      setRomError(String(err))
+    } finally {
+      setLoadingRoms(false)
+    }
+  }
 
   const loadPresets = async () => {
     setLoadingPresets(true)
@@ -115,10 +138,11 @@ export function ConfigEditor({
     setSubmitting(true)
     try {
       if (isExisting && config) {
-        // Only romHint and packId are editable once a config exists
+        // romHint, packId, and romId are editable once a config exists
         const res = await RandomizerService.updateConfig(config.id, {
           romHint: data.romHint,
           packId: data.packId || undefined,
+          romId: data.romId ? Number(data.romId) : undefined,
         })
         if (res.success) {
           toast({ tone: "ok", title: t("configUpdated") })
@@ -131,6 +155,10 @@ export function ConfigEditor({
           toast({ tone: "bad", title: t("selectPreset") })
           return
         }
+        if (!data.romId) {
+          toast({ tone: "bad", title: t("selectBaseRom") })
+          return
+        }
         if (!data.packId) {
           toast({ tone: "bad", title: t("selectPack") })
           return
@@ -140,7 +168,7 @@ export function ConfigEditor({
           gamePlatform: data.gamePlatform,
           gameTitle: data.gameTitle,
           presetId: Number(data.presetId),
-          cleanRomSha512: data.cleanRomSha512,
+          romId: Number(data.romId),
           packId: data.packId,
           romHint: data.romHint || "",
         })
@@ -234,14 +262,44 @@ export function ConfigEditor({
             )}
           />
 
-          {/* Clean ROM SHA512 */}
-          <Field label={t("cleanRomSha512")} error={errors.cleanRomSha512?.message}>
-            <Input
-              placeholder={t("romHashPlaceholder")}
-              disabled={isExisting}
-              {...register("cleanRomSha512")}
-            />
-          </Field>
+          {/* Base ROM Selector */}
+          <Controller
+            control={control}
+            name="romId"
+            render={({ field }) => {
+              const romsForPlatform = roms.filter((r) => r.gamePlatform === selectedPlatform)
+              const isBaseMissing = isExisting && !config?.romId
+
+              return (
+                <>
+                  <Select
+                    label={t("baseRom")}
+                    error={errors.romId?.message || (isExisting && !selectedRomId && t("baseRomMissingWarning"))}
+                    value={field.value || ""}
+                    options={[
+                      { value: "", label: t("selectBaseRom") },
+                      ...romsForPlatform.map((rom) => ({
+                        value: String(rom.id),
+                        label: `${rom.name} (${(rom.fileSize / 1024 / 1024).toFixed(1)} MB)`,
+                      })),
+                    ]}
+                    disabled={loadingRoms || (!isExisting && romsForPlatform.length === 0)}
+                    onChange={(v) => field.onChange(v || undefined)}
+                  />
+                  {!isExisting && romsForPlatform.length === 0 && (
+                    <p className="text-[12px] text-txt-dim mt-2">
+                      {t("noRomsForPlatform")}
+                    </p>
+                  )}
+                  {isBaseMissing && (
+                    <div className="mt-3 p-3 bg-danger-alpha rounded border border-solid border-danger text-danger text-[12px]">
+                      {t("baseRomMissingWarning")}
+                    </div>
+                  )}
+                </>
+              )
+            }}
+          />
 
           {/* ROM Hint */}
           <Field label={t("romHint")} hint={t("optional")}>

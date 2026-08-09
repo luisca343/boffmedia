@@ -30,6 +30,7 @@ import { USER_ROLES } from '@api/_utils/auth/roles.constants';
 import { EventsService } from './services/events.service';
 import { AssignmentsService } from './services/assignments.service';
 import { PresetsService } from './services/presets.service';
+import { RomsService } from './services/roms.service';
 import {
   CreateConfigDto,
   UpdateConfigDto,
@@ -42,6 +43,8 @@ import {
   CloseConfigDto,
   PublishConfigDto,
   QuickRandomizeDto,
+  CreateRomDto,
+  RomResponseDto,
 } from './dto/randomizer.dto';
 
 // Admin panel for randomizer configs, assignments, and presets.
@@ -56,11 +59,52 @@ export class RandomizerController {
     private readonly events: EventsService,
     private readonly assignments: AssignmentsService,
     private readonly presets: PresetsService,
+    private readonly roms: RomsService,
   ) {}
 
   private actorId(req: any): string | null {
     const userId = req?.user?.userId;
     return userId ? `user:${userId}` : null;
+  }
+
+  // ==================== ROM LIBRARY ====================
+
+  @Post('roms')
+  @ApiOperation({
+    summary: 'Upload a clean ROM to the central library',
+    description:
+      'Streams the ROM into the content-addressed blob store and registers it. Rejects a duplicate sha512.',
+  })
+  @ApiConsumes('multipart/form-data')
+  @ApiResponse({ status: HttpStatus.CREATED, type: RomResponseDto })
+  @UseInterceptors(FileInterceptor('rom'))
+  async uploadRom(
+    @UploadedFile() rom: Express.Multer.File,
+    @Body() dto: CreateRomDto,
+  ): Promise<RomResponseDto> {
+    if (!rom?.buffer?.length) {
+      throw new BadRequestException('ROM file is required (multipart field "rom")');
+    }
+    const created = await this.roms.uploadRom({
+      name: dto.name,
+      gamePlatform: dto.gamePlatform,
+      romBuffer: rom.buffer,
+    });
+    return { ...created, referencedBy: 0 } as RomResponseDto;
+  }
+
+  @Get('roms')
+  @ApiOperation({ summary: 'List library ROMs (with referenced-by counts)' })
+  @ApiResponse({ status: HttpStatus.OK, type: [RomResponseDto] })
+  async listRoms(): Promise<RomResponseDto[]> {
+    return this.roms.listRoms() as Promise<RomResponseDto[]>;
+  }
+
+  @Delete('roms/:id')
+  @ApiOperation({ summary: 'Delete a library ROM (409 if referenced by a config)' })
+  @ApiResponse({ status: HttpStatus.NO_CONTENT })
+  async deleteRom(@Param('id') id: string): Promise<void> {
+    await this.roms.deleteRom(Number(id));
   }
 
   // ==================== CONFIGS ====================

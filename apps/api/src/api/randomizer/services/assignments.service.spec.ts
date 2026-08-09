@@ -1,14 +1,16 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { BadRequestException, NotFoundException } from '@nestjs/common';
+import { ConflictException, NotFoundException } from '@nestjs/common';
 import { AssignmentsService } from './assignments.service';
 import { EventsService } from './events.service';
 import { RandomizerRepository } from '../repositories/randomizer.repository';
 import { RANDOMIZER_REPOSITORY_TOKEN } from '@api/_utils/repositories/interfaces/repository.token';
 import { PacksDownloadsService } from '@api/packs/packs-downloads.service';
 import { Logger } from 'nestjs-pino';
-import { RANDOMIZER_RUNNER_TOKEN, IRandomizerRunner } from '../ports/randomizer-runner.port';
+import {
+  RANDOMIZER_RUNNER_TOKEN,
+  IRandomizerRunner,
+} from '../ports/randomizer-runner.port';
 import { SETTINGS_SHIM_TOKEN, ISettingsShim } from '../ports/settings-shim.port';
-import { createHash } from 'crypto';
 import { Readable } from 'stream';
 
 describe('AssignmentsService', () => {
@@ -20,37 +22,61 @@ describe('AssignmentsService', () => {
   let runner: jest.Mocked<IRandomizerRunner>;
   let logger: jest.Mocked<Logger>;
 
+  const CLEAN_SHA = 'a'.repeat(128);
+  const OUTPUT_SHA = 'b'.repeat(128);
+  const principal = { uuid: 'player-uuid', username: 'player' };
+
+  const config = {
+    id: 1,
+    eventId: 1,
+    settingsBlobSha512: 'settingssha',
+    gamePlatform: 'gba',
+    gameTitle: 'pokered',
+    fvxJarSha512: 'jarsha',
+    cleanRomSha512: CLEAN_SHA,
+    romId: 7,
+    romHint: null,
+    status: 'open',
+  } as any;
+
+  const claimedAssignment = {
+    id: 10,
+    configId: 1,
+    mcUuid: principal.uuid,
+    seed: 12345,
+    status: 'claimed',
+    outputSha512: null,
+  } as any;
+
   beforeEach(async () => {
-    // Mock repository
     repository = {
       getConfigById: jest.fn(),
       getAssignmentByConfigAndMcUuid: jest.fn(),
+      getAssignmentById: jest.fn(),
+      createAssignment: jest.fn(),
+      resolveEventEntitlement: jest.fn(),
       appendAudit: jest.fn(),
       updateAssignment: jest.fn(),
     } as unknown as jest.Mocked<RandomizerRepository>;
 
-    // Mock blob storage
     blobStorage = {
       storeBlob: jest.fn(),
       override: jest.fn(),
+      blobSize: jest.fn(),
     } as unknown as jest.Mocked<PacksDownloadsService>;
 
-    // Mock events service
     eventsService = {
       settingsJsonBytesForConfig: jest.fn(),
     } as unknown as jest.Mocked<EventsService>;
 
-    // Mock settings shim
     settingsShim = {
       encode: jest.fn(),
     } as unknown as jest.Mocked<ISettingsShim>;
 
-    // Mock runner
     runner = {
       randomize: jest.fn(),
     } as unknown as jest.Mocked<IRandomizerRunner>;
 
-    // Mock logger
     logger = {
       debug: jest.fn(),
       error: jest.fn(),
@@ -59,219 +85,197 @@ describe('AssignmentsService', () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         AssignmentsService,
-        {
-          provide: RANDOMIZER_REPOSITORY_TOKEN,
-          useValue: repository,
-        },
-        {
-          provide: PacksDownloadsService,
-          useValue: blobStorage,
-        },
-        {
-          provide: EventsService,
-          useValue: eventsService,
-        },
-        {
-          provide: SETTINGS_SHIM_TOKEN,
-          useValue: settingsShim,
-        },
-        {
-          provide: RANDOMIZER_RUNNER_TOKEN,
-          useValue: runner,
-        },
-        {
-          provide: Logger,
-          useValue: logger,
-        },
+        { provide: RANDOMIZER_REPOSITORY_TOKEN, useValue: repository },
+        { provide: PacksDownloadsService, useValue: blobStorage },
+        { provide: EventsService, useValue: eventsService },
+        { provide: SETTINGS_SHIM_TOKEN, useValue: settingsShim },
+        { provide: RANDOMIZER_RUNNER_TOKEN, useValue: runner },
+        { provide: Logger, useValue: logger },
       ],
     }).compile();
 
     service = module.get<AssignmentsService>(AssignmentsService);
   });
 
-  describe('patchRom', () => {
-    it('encodes settings via shim and calls runner with encoded .rnqs', async () => {
-      const settingsJson = { foo: 'bar' };
-      const settingsJsonBytes = Buffer.from(JSON.stringify(settingsJson));
-      const encodedRnqs = Buffer.from('encoded rnqs data');
+  describe('getOrGenerateRom', () => {
+    it('streams the cached blob without calling the runner when output exists on disk', async () => {
+      repository.getConfigById.mockResolvedValue(config);
+      repository.getAssignmentByConfigAndMcUuid.mockResolvedValue({
+        ...claimedAssignment,
+        outputSha512: OUTPUT_SHA,
+        status: 'patched',
+      });
+      blobStorage.blobSize.mockResolvedValue(1024); // cached output present
+      blobStorage.override.mockResolvedValue({
+        stream: Readable.from(Buffer.from('cached rom')),
+        contentType: 'application/octet-stream',
+        contentLength: 10,
+        filename: OUTPUT_SHA,
+      } as any);
 
-      const config = {
-        id: 1,
-        eventId: 1,
-        settingsBlobSha512: 'sha512hash',
-        gamePlatform: 'gba',
-        fvxJarSha512: 'jarsha512',
-        cleanRomSha512: createHash('sha512').update('rom content').digest('hex'),
-      };
+      const result = await service.getOrGenerateRom(1, principal as any);
 
-      const assignment = {
-        id: 1,
-        configId: 1,
-        seed: 12345,
-      };
+      expect(result.outputSha512).toBe(OUTPUT_SHA);
+      expect(result.contentLength).toBe(10);
+      expect(runner.randomize).not.toHaveBeenCalled();
+      expect(blobStorage.override).toHaveBeenCalledWith(OUTPUT_SHA);
+      expect(repository.appendAudit).toHaveBeenCalledWith(
+        expect.objectContaining({ action: 'ROM_SERVED' }),
+      );
+    });
 
-      const principal = { uuid: 'player-uuid' };
-
-      const romBuffer = Buffer.from('rom content');
-
-      repository.getConfigById.mockResolvedValue(config as any);
-      repository.getAssignmentByConfigAndMcUuid.mockResolvedValue(assignment as any);
-      eventsService.settingsJsonBytesForConfig.mockResolvedValue(settingsJsonBytes);
-      settingsShim.encode.mockResolvedValue(encodedRnqs);
+    it('generates on first request: clean stream + encoded settings + seed, then caches', async () => {
+      repository.getConfigById.mockResolvedValue(config);
+      repository.getAssignmentByConfigAndMcUuid.mockResolvedValue(
+        claimedAssignment,
+      );
+      const cleanStream = Readable.from(Buffer.from('clean rom'));
+      // blobSize: clean present (number), then override(clean) for generation,
+      // override(output) for streaming back.
+      blobStorage.blobSize.mockResolvedValue(2048); // clean blob present
+      blobStorage.override
+        .mockResolvedValueOnce({
+          stream: cleanStream,
+          contentType: 'application/octet-stream',
+          contentLength: 9,
+          filename: CLEAN_SHA,
+        } as any)
+        .mockResolvedValueOnce({
+          stream: Readable.from(Buffer.from('randomized rom')),
+          contentType: 'application/octet-stream',
+          contentLength: 14,
+          filename: OUTPUT_SHA,
+        } as any);
+      eventsService.settingsJsonBytesForConfig.mockResolvedValue(
+        Buffer.from(JSON.stringify({ foo: 'bar' })),
+      );
+      settingsShim.encode.mockResolvedValue(Buffer.from('rnqs'));
       runner.randomize.mockResolvedValue({
         romBytes: Buffer.from('randomized rom'),
-        outputSha512: 'output sha512',
-        logBytes: Buffer.from('log data'),
+        outputSha512: OUTPUT_SHA,
+        logBytes: Buffer.from('log'),
       } as any);
-      blobStorage.storeBlob.mockResolvedValue({ sha512: 'logblobsha512', size: 8 });
+      blobStorage.storeBlob
+        .mockResolvedValueOnce({ sha512: OUTPUT_SHA, size: 14 }) // output blob
+        .mockResolvedValueOnce({ sha512: 'c'.repeat(128), size: 3 }); // log blob
 
-      const romStream = Readable.from([romBuffer]);
+      const result = await service.getOrGenerateRom(1, principal as any);
 
-      const result = await service.patchRom(1, principal as any, romStream);
-
-      // Verify settingsShim.encode was called with parsed settings
-      expect(settingsShim.encode).toHaveBeenCalledWith(settingsJson);
-
-      // Verify runner was called with encoded .rnqs
       expect(runner.randomize).toHaveBeenCalledWith(
         expect.objectContaining({
-          settingsRnqs: encodedRnqs,
+          romStream: cleanStream,
+          settingsRnqs: Buffer.from('rnqs'),
           seed: 12345,
         }),
       );
-
-      // Verify assignment was updated with output and log
       expect(repository.updateAssignment).toHaveBeenCalledWith(
-        1,
+        10,
         expect.objectContaining({
-          outputSha512: 'output sha512',
-          logBlobSha512: 'logblobsha512',
+          outputSha512: OUTPUT_SHA,
           status: 'patched',
         }),
       );
+      expect(repository.appendAudit).toHaveBeenCalledWith(
+        expect.objectContaining({ action: 'ROM_GENERATED' }),
+      );
+      expect(result.outputSha512).toBe(OUTPUT_SHA);
     });
 
-    it('handles heal case: blob missing but preset matches', async () => {
-      const settingsJson = { foo: 'bar' };
-      const settingsJsonBytes = Buffer.from(JSON.stringify(settingsJson));
-      const encodedRnqs = Buffer.from('encoded rnqs data');
-
-      const config = {
-        id: 1,
-        eventId: 1,
-        settingsBlobSha512: 'sha512hash',
-        gamePlatform: 'gba',
-        fvxJarSha512: 'jarsha512',
-        cleanRomSha512: createHash('sha512').update('rom content').digest('hex'),
-      };
-
-      const assignment = {
-        id: 1,
-        configId: 1,
-        seed: 12345,
-      };
-
-      const principal = { uuid: 'player-uuid' };
-      const romBuffer = Buffer.from('rom content');
-
-      repository.getConfigById.mockResolvedValue(config as any);
-      repository.getAssignmentByConfigAndMcUuid.mockResolvedValue(assignment as any);
-      // eventsService handles the heal internally
-      eventsService.settingsJsonBytesForConfig.mockResolvedValue(settingsJsonBytes);
-      settingsShim.encode.mockResolvedValue(encodedRnqs);
+    it('mints the assignment when open and unclaimed, then generates', async () => {
+      repository.getConfigById.mockResolvedValue(config);
+      repository.getAssignmentByConfigAndMcUuid.mockResolvedValue(null); // unclaimed
+      repository.resolveEventEntitlement.mockResolvedValue({
+        boffmediaUserId: 42,
+        status: 'registered',
+      });
+      repository.createAssignment.mockResolvedValue(10);
+      repository.getAssignmentById.mockResolvedValue(claimedAssignment);
+      blobStorage.blobSize.mockResolvedValue(2048);
+      blobStorage.override
+        .mockResolvedValueOnce({
+          stream: Readable.from(Buffer.from('clean rom')),
+          contentLength: 9,
+        } as any)
+        .mockResolvedValueOnce({
+          stream: Readable.from(Buffer.from('randomized rom')),
+          contentLength: 14,
+        } as any);
+      eventsService.settingsJsonBytesForConfig.mockResolvedValue(
+        Buffer.from('{}'),
+      );
+      settingsShim.encode.mockResolvedValue(Buffer.from('rnqs'));
       runner.randomize.mockResolvedValue({
         romBytes: Buffer.from('randomized rom'),
-        outputSha512: 'output sha512',
-        logBytes: Buffer.from('log data'),
+        outputSha512: OUTPUT_SHA,
+        logBytes: Buffer.from('log'),
       } as any);
-      blobStorage.storeBlob.mockResolvedValue({ sha512: 'logblobsha512', size: 8 });
+      blobStorage.storeBlob
+        .mockResolvedValueOnce({ sha512: OUTPUT_SHA, size: 14 })
+        .mockResolvedValueOnce({ sha512: 'c'.repeat(128), size: 3 });
 
-      const romStream = Readable.from([romBuffer]);
+      const result = await service.getOrGenerateRom(1, principal as any);
 
-      const result = await service.patchRom(1, principal as any, romStream);
-
-      // Verify settings were fetched (heal happens internally in eventsService)
-      expect(eventsService.settingsJsonBytesForConfig).toHaveBeenCalledWith(config);
-
-      // Verify runner was called with encoded .rnqs
-      expect(runner.randomize).toHaveBeenCalledWith(
-        expect.objectContaining({
-          settingsRnqs: encodedRnqs,
-        }),
-      );
+      expect(repository.createAssignment).toHaveBeenCalled();
+      expect(runner.randomize).toHaveBeenCalled();
+      expect(result.outputSha512).toBe(OUTPUT_SHA);
     });
 
-    it('throws 409 if blob missing and no preset matches', async () => {
-      const config = {
-        id: 1,
-        eventId: 1,
-        settingsBlobSha512: 'nonmatchingsha512hash',
-        gamePlatform: 'gba',
-        fvxJarSha512: 'jarsha512',
-        cleanRomSha512: createHash('sha512').update('rom content').digest('hex'),
-      };
-
-      const assignment = {
-        id: 1,
-        configId: 1,
-        seed: 12345,
-      };
-
-      const principal = { uuid: 'player-uuid' };
-      const romBuffer = Buffer.from('rom content');
-
-      repository.getConfigById.mockResolvedValue(config as any);
-      repository.getAssignmentByConfigAndMcUuid.mockResolvedValue(assignment as any);
-      // eventsService throws ConflictException when heal fails
-      eventsService.settingsJsonBytesForConfig.mockRejectedValueOnce(
-        new Error('Config has no settings blob SHA512 matching any preset'),
+    it('throws 409 when the config has no base ROM on the server', async () => {
+      repository.getConfigById.mockResolvedValue(config);
+      repository.getAssignmentByConfigAndMcUuid.mockResolvedValue(
+        claimedAssignment,
       );
-
-      const romStream = Readable.from([romBuffer]);
+      blobStorage.blobSize.mockResolvedValue(null); // clean blob missing
 
       await expect(
-        service.patchRom(1, principal as any, romStream),
-      ).rejects.toThrow();
+        service.getOrGenerateRom(1, principal as any),
+      ).rejects.toBeInstanceOf(ConflictException);
+      expect(runner.randomize).not.toHaveBeenCalled();
     });
 
-    it('throws 422 if ROM hash does not match', async () => {
-      const config = {
-        id: 1,
-        eventId: 1,
-        settingsBlobSha512: 'sha512hash',
-        gamePlatform: 'gba',
-        fvxJarSha512: 'jarsha512',
-        cleanRomSha512: 'expected sha512 hash',
-      };
-
-      const assignment = {
-        id: 1,
-        configId: 1,
-        seed: 12345,
-      };
-
-      const principal = { uuid: 'player-uuid' };
-      const romBuffer = Buffer.from('wrong rom content');
-
-      repository.getConfigById.mockResolvedValue(config as any);
-      repository.getAssignmentByConfigAndMcUuid.mockResolvedValue(assignment as any);
-
-      const romStream = Readable.from([romBuffer]);
+    it('404s an unclaimed user when the config is not open', async () => {
+      repository.getConfigById.mockResolvedValue({ ...config, status: 'closed' });
+      repository.getAssignmentByConfigAndMcUuid.mockResolvedValue(null);
 
       await expect(
-        service.patchRom(1, principal as any, romStream),
-      ).rejects.toThrow();
+        service.getOrGenerateRom(1, principal as any),
+      ).rejects.toBeInstanceOf(NotFoundException);
+    });
 
-      // Should have audited the mismatch
-      expect(repository.appendAudit).toHaveBeenCalledWith(
-        expect.objectContaining({
-          action: 'ROM_RECEIVED',
-          actor: principal.uuid,
-          meta: expect.objectContaining({
-            expectedSha512: config.cleanRomSha512,
-          }),
-        }),
+    it('single-flights concurrent generation (runner runs once)', async () => {
+      repository.getConfigById.mockResolvedValue(config);
+      repository.getAssignmentByConfigAndMcUuid.mockResolvedValue(
+        claimedAssignment,
       );
+      blobStorage.blobSize.mockResolvedValue(2048);
+      blobStorage.override.mockResolvedValue({
+        stream: Readable.from(Buffer.from('rom')),
+        contentLength: 3,
+      } as any);
+      eventsService.settingsJsonBytesForConfig.mockResolvedValue(
+        Buffer.from('{}'),
+      );
+      settingsShim.encode.mockResolvedValue(Buffer.from('rnqs'));
+      let resolveRandomize: (v: any) => void = () => {};
+      runner.randomize.mockReturnValue(
+        new Promise((r) => {
+          resolveRandomize = r;
+        }) as any,
+      );
+      blobStorage.storeBlob.mockResolvedValue({ sha512: OUTPUT_SHA, size: 3 });
+
+      const p1 = service.getOrGenerateRom(1, principal as any);
+      const p2 = service.getOrGenerateRom(1, principal as any);
+      // let both reach the in-flight lock
+      await new Promise((r) => setImmediate(r));
+      resolveRandomize({
+        romBytes: Buffer.from('rom'),
+        outputSha512: OUTPUT_SHA,
+        logBytes: Buffer.from('log'),
+      });
+      await Promise.all([p1, p2]);
+
+      expect(runner.randomize).toHaveBeenCalledTimes(1);
     });
   });
 });

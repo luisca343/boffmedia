@@ -12,6 +12,7 @@ import { RANDOMIZER_REPOSITORY_TOKEN } from '@api/_utils/repositories/interfaces
 import { EventsService } from './services/events.service';
 import { AssignmentsService } from './services/assignments.service';
 import { PresetsService } from './services/presets.service';
+import { RomsService } from './services/roms.service';
 
 // Ports + Stubs
 import { RANDOMIZER_RUNNER_TOKEN } from './ports/randomizer-runner.port';
@@ -44,6 +45,7 @@ import { PacksModule } from '@api/packs/packs.module';
     EventsService,
     AssignmentsService,
     PresetsService,
+    RomsService,
 
     // Ports + Stubs — env-gated: use real FvxRandomizerRunner if jar is set, else stub
     {

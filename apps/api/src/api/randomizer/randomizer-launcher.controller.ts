@@ -1,23 +1,20 @@
 import {
   Controller,
   Get,
-  Post,
   Param,
   Req,
+  Res,
   UseGuards,
   StreamableFile,
   NotFoundException,
-  BadRequestException,
-  PayloadTooLargeException,
   Inject,
 } from '@nestjs/common';
-import { Readable } from 'stream';
+import type { Response } from 'express';
 import {
   ApiOperation,
   ApiResponse,
   ApiTags,
   ApiBearerAuth,
-  ApiConsumes,
 } from '@nestjs/swagger';
 import {
   LauncherAuthGuard,
@@ -91,32 +88,45 @@ export class RandomizerLauncherController {
   }
 
   /**
-   * POST /events/:eventId/rom
+   * GET /events/:eventId/rom
    *
-   * Upload a clean ROM: hash, verify, randomize, store log, return randomized ROM.
-   * - Request body: the clean ROM as a raw application/octet-stream body
-   * - Response: streams the randomized ROM back.
+   * Get the launcher user's randomized ROM. The server generates it on first
+   * request (clean library ROM + config settings + assignment seed → FVX), caches
+   * the output blob, and streams it. Every later request streams the cache.
+   *
+   * - Mints the assignment if the config is open and the user is entitled.
+   * - `x-output-sha512` header carries the expected hash the launcher pins.
+   * - 409 if the config has no base ROM on the server (admin never selected one).
    *
    * Keyed by eventId to keep the launcher contract stable (the sealed assignment
-   * DTO exposes eventId, not configId). Resolves event -> config internally.
+   * DTO exposes eventId, not configId). Resolves event → config internally.
    */
   @Public()
-  @Post('events/:eventId/rom')
+  @Get('events/:eventId/rom')
   @ApiOperation({
-    summary: 'Upload clean ROM and receive randomized ROM',
+    summary: 'Download my randomized ROM (server generates on first request)',
   })
-  @ApiConsumes('application/octet-stream')
   @ApiResponse({
     status: 200,
+    headers: {
+      'x-output-sha512': {
+        description: 'SHA-512 of the randomized ROM (pin this in the slot).',
+        schema: { type: 'string' },
+      },
+    },
     content: {
       'application/octet-stream': {
         schema: { type: 'string', format: 'binary' },
       },
     },
   })
-  async patchRom(
+  @ApiResponse({ status: 404, description: 'No config / not accepting claims' })
+  @ApiResponse({ status: 403, description: 'Not registered for this event' })
+  @ApiResponse({ status: 409, description: 'Config has no base ROM on the server' })
+  async getRom(
     @Param('eventId') eventId: string,
     @Req() req: LauncherRequest,
+    @Res({ passthrough: true }) res: Response,
   ): Promise<StreamableFile> {
     if (!req.launcher) {
       throw new Error('Launcher principal not found');
@@ -129,35 +139,19 @@ export class RandomizerLauncherController {
       );
     }
 
-    // The clean ROM arrives as a raw octet-stream body. express.json() only
-    // parses application/json, so req is still an unconsumed Readable here.
-    // Buffer it with a hard cap (NDS dumps run ~16–64MB) before patching.
-    const MAX_ROM_BYTES = 96 * 1024 * 1024;
-    const chunks: Buffer[] = [];
-    let total = 0;
-    for await (const chunk of req) {
-      const buf = chunk as Buffer;
-      total += buf.length;
-      if (total > MAX_ROM_BYTES) {
-        throw new PayloadTooLargeException('ROM upload exceeds the size limit');
-      }
-      chunks.push(buf);
-    }
-    const romBuffer = Buffer.concat(chunks);
-    if (romBuffer.length === 0) {
-      throw new BadRequestException('Empty ROM upload');
-    }
+    const { stream, outputSha512, contentLength } =
+      await this.assignments.getOrGenerateRom(config.id, req.launcher);
 
-    const { randomizedRom } = await this.assignments.patchRom(
-      config.id,
-      req.launcher,
-      Readable.from(romBuffer),
-    );
+    // Expose the hash so the launcher can pin the slot's expected hash without
+    // re-hashing the whole file, and so browsers/CORS clients can read it.
+    res.set('x-output-sha512', outputSha512);
+    res.set('Access-Control-Expose-Headers', 'x-output-sha512');
 
-    // Return randomized ROM as file download
-    return new StreamableFile(randomizedRom, {
+    const ext = config.gamePlatform === 'nds' ? 'nds' : 'gba';
+    return new StreamableFile(stream, {
       type: 'application/octet-stream',
-      disposition: 'attachment; filename="randomized.gba"',
+      disposition: `attachment; filename="randomized.${ext}"`,
+      length: contentLength,
     });
   }
 

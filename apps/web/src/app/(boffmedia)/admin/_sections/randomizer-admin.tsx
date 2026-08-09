@@ -14,6 +14,7 @@ import { totalChanged } from "./randomizer/_components/catalog-view"
 import { ConfigsList } from "./randomizer/configs/ConfigsList"
 import { ConfigEditor } from "./randomizer/configs/ConfigEditor"
 import { ConfigAssignmentsList } from "./randomizer/configs/ConfigAssignmentsList"
+import { RomsView } from "./randomizer/roms/RomsView"
 
 /**
  * Configs management view with community event selection, config list/edit, and assignments.
@@ -348,6 +349,13 @@ export function RandomizerAdmin() {
             >
               {t("chrome.configs")}
             </Button>
+            <Button
+              variant={view === "roms" ? "pri" : "ghost"}
+              size="sm"
+              onClick={() => handleViewChange("roms")}
+            >
+              {t("chrome.roms")}
+            </Button>
           </div>
         }
       />
@@ -361,6 +369,7 @@ export function RandomizerAdmin() {
           />
         )}
         {view === "configs" && <ConfigsView />}
+        {view === "roms" && <RomsView />}
       </div>
     </div>
   )
