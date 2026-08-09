@@ -71,7 +71,7 @@ export const NAMESPACE_ROOTS: Record<Namespace, readonly string[]> = {
   "events.json": ["events","logros","juegos","community","calendario","sugerir"],
   "foro.json": ["foro"],
   "items.json": ["items"],
-  "launcher.json": ["launcher"],
+  "launcher.json": ["launcher","launcherAuth"],
   "leaderboard.json": ["leaderboard"],
   "metadata.json": ["pageMeta"],
   "nav.json": ["nav"],

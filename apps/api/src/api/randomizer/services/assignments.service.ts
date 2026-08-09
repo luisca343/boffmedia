@@ -98,13 +98,13 @@ export class AssignmentsService {
     config: RandomizerConfig,
     principal: LauncherPrincipal,
   ): Promise<RandomizerAssignment> {
-    if (!principal?.uuid) {
+    if (!principal?.userId) {
       throw new BadRequestException('Launcher principal required');
     }
 
-    const assignment = await this.repository.getAssignmentByConfigAndMcUuid(
+    const assignment = await this.repository.getAssignmentByConfigAndUser(
       config.id,
-      principal.uuid,
+      principal.userId,
     );
     if (assignment) {
       return assignment;
@@ -118,7 +118,7 @@ export class AssignmentsService {
 
     const entitlement = await this.repository.resolveEventEntitlement(
       config.eventId,
-      principal.uuid,
+      principal.userId,
     );
     if (!entitlement) {
       throw new ForbiddenException(
@@ -131,7 +131,7 @@ export class AssignmentsService {
     const assignmentId = await this.repository.createAssignment({
       configId: config.id,
       boffmediaUserId: entitlement.boffmediaUserId,
-      mcUuid: principal.uuid,
+      mcUuid: principal.mcUuid ?? null,
       seed,
       status: 'claimed',
       claimedAt: new Date(),
@@ -140,12 +140,12 @@ export class AssignmentsService {
     await this.repository.appendAudit({
       assignmentId,
       action: 'SEED_MINTED',
-      actor: principal.uuid,
+      actor: String(principal.userId),
       meta: { seed },
     });
 
     this.logger.debug(
-      `Minted assignment ${assignmentId} for user ${principal.uuid} with seed ${seed}`,
+      `Minted assignment ${assignmentId} for user ${principal.userId} with seed ${seed}`,
     );
 
     const newAssignment = await this.repository.getAssignmentById(assignmentId);
@@ -212,7 +212,7 @@ export class AssignmentsService {
         await this.repository.appendAudit({
           assignmentId: assignment.id,
           action: 'ROM_SERVED',
-          actor: principal.uuid,
+          actor: String(principal.userId),
           meta: { outputSha512: assignment.outputSha512 },
         });
         return this.streamOutput(assignment.outputSha512);
@@ -301,7 +301,7 @@ export class AssignmentsService {
     await this.repository.appendAudit({
       assignmentId: assignment.id,
       action: 'ROM_GENERATED',
-      actor: principal.uuid,
+      actor: String(principal.userId),
       meta: { outputSha512: result.outputSha512, logBlobSha512 },
     });
 

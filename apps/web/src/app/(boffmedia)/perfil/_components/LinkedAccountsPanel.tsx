@@ -4,6 +4,7 @@ import * as React from "react"
 import { useTranslations } from "next-intl"
 import { Badge, Button, Panel } from "@boffmedia/ui"
 import { LinkedAccounts, LinkedAccountRow } from "@/components/boffmedia/ui/profile"
+import { LinkMinecraftModal } from "./LinkMinecraftModal"
 
 type Provider = "google" | "discord" | "steam" | "twitch"
 
@@ -18,6 +19,7 @@ export function LinkedAccountsPanel({
   discordEnabled,
   twitchEnabled,
   onUnlink,
+  onMinecraftLinked,
 }: {
   googleId?: string | null
   discordId?: string | null
@@ -29,8 +31,10 @@ export function LinkedAccountsPanel({
   discordEnabled: boolean
   twitchEnabled: boolean
   onUnlink: (provider: Provider) => void
+  onMinecraftLinked?: () => void
 }) {
   const t = useTranslations("profile")
+  const [linkingMc, setLinkingMc] = React.useState(false)
 
   const linkEnd = (linked: boolean, provider?: Provider) => {
     if (linked) {
@@ -117,9 +121,26 @@ export function LinkedAccountsPanel({
           hue="#3fbf5f"
           linked={mcLinked}
           sub={mcLinked ? (mcUsername ?? t("linked.linked")) : t("linked.unlinked")}
-          end={mcLinked ? <Badge tone="ok">{t("linked.linked")}</Badge> : linkEnd(false)}
+          end={
+            mcLinked ? (
+              <Badge tone="ok">{t("linked.linked")}</Badge>
+            ) : (
+              <Button size="sm" icon="link" onClick={() => setLinkingMc(true)}>
+                {t("linked.link")}
+              </Button>
+            )
+          }
         />
       </LinkedAccounts>
+
+      <LinkMinecraftModal
+        open={linkingMc}
+        onClose={() => setLinkingMc(false)}
+        onLinked={() => {
+          setLinkingMc(false)
+          onMinecraftLinked?.()
+        }}
+      />
     </Panel>
   )
 }

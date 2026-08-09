@@ -33,7 +33,10 @@ export type RandomizerAuditAction =
   | 'CLAIMED'
   | 'SEED_MINTED'
   | 'CONFIG_OPENED'
-  | 'CONFIG_CLOSED';
+  | 'CONFIG_CLOSED'
+  | 'CONFIG_PUBLISHED'
+  | 'CONFIG_REOPENED'
+  | 'CONFIG_DELETED';
 
 /**
  * Central library of admin-uploaded clean ROMs. A config pins the sha512 of one
@@ -111,8 +114,12 @@ export const randomizerAssignments = mysqlTable(
   {
     id: int('id').primaryKey().autoincrement(),
     configId: int('config_id').notNull(),
-    boffmediaUserId: int('boffmedia_user_id'),
-    mcUuid: char('mc_uuid', { length: 36 }).notNull(), // minted at claim; immutable
+    // The entitlement key. Event membership — which is what earns an assignment
+    // — is an account-level fact, so keying on a Minecraft UUID locked out every
+    // player who never linked one, for a feature that is emulator-only.
+    boffmediaUserId: int('boffmedia_user_id').notNull(),
+    // Audit context only, and null for an account with no Minecraft linked.
+    mcUuid: char('mc_uuid', { length: 36 }),
     seed: bigint('seed', { mode: 'number' }).notNull(),
     status: varchar('status', { length: 16 }).notNull().default('claimed'), // claimed | patched | verified
     outputSha512: char('output_sha512', { length: 128 }), // sha512 of randomized output ROM
@@ -137,10 +144,10 @@ export const randomizerAssignments = mysqlTable(
       name: 'rass_user_fk',
       columns: [table.boffmediaUserId],
       foreignColumns: [boffMediaUsers.id],
-    }).onDelete('set null'),
-    configMcUuidUnique: uniqueIndex('rass_config_mcuuid_unique').on(
+    }).onDelete('cascade'),
+    configUserUnique: uniqueIndex('rass_config_user_unique').on(
       table.configId,
-      table.mcUuid,
+      table.boffmediaUserId,
     ),
     configIdx: index('rass_config_idx').on(table.configId),
     mcUuidIdx: index('rass_mc_uuid_idx').on(table.mcUuid),

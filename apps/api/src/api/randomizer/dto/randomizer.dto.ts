@@ -330,10 +330,6 @@ export class PublishConfigDto {
   // No additional fields needed
 }
 
-export class DryRunDto {
-  // File is passed via multipart, not in body — no properties needed
-}
-
 // ==================== ROM LIBRARY DTOS ====================
 
 /**

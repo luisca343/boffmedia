@@ -2,11 +2,10 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export type JoinChallengeEntity = {
+export type RedeemEventInviteDto = {
     /**
-     * Preséntalo a Mojang en session/minecraft/join
+     * The invitation code.
      */
-    serverId: string;
-    expiresInSeconds: number;
+    code: string;
 };
 

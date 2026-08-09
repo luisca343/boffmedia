@@ -3,7 +3,6 @@
 use serde::{Deserialize, Deserializer, Serialize};
 
 use crate::api::{self, ApiState};
-use crate::auth::AuthState;
 use crate::install;
 use crate::settings;
 
@@ -49,12 +48,11 @@ pub struct RandomizerError {
 #[tauri::command]
 pub async fn randomizer_get_assignment(
     pack_id: String,
-    auth: tauri::State<'_, AuthState>,
     api: tauri::State<'_, ApiState>,
 ) -> Result<RandomizerAssignment, RandomizerError> {
     let url = format!("{}/randomizer/launcher/packs/{}/my-assignment", api::base_url(), pack_id);
 
-    let token = api.current_token(&auth).await
+    let token = api.current_token().await
         .map_err(|e| {
             let msg = match e {
                 api::ApiError::NeedsSignin(m) => m,
@@ -149,12 +147,11 @@ pub fn hash_file(path: String) -> Result<String, RandomizerError> {
 #[tauri::command]
 pub async fn randomizer_download_rom(
     event_id: String,
-    auth: tauri::State<'_, AuthState>,
     api: tauri::State<'_, ApiState>,
 ) -> Result<RandomizerRomResult, RandomizerError> {
     let url = format!("{}/randomizer/launcher/events/{}/rom", api::base_url(), event_id);
 
-    let token = api.current_token(&auth).await
+    let token = api.current_token().await
         .map_err(|e| {
             let msg = match e {
                 api::ApiError::NeedsSignin(m) => m,

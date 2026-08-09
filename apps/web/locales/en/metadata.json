@@ -72,6 +72,10 @@
       "sugerir": {
         "title": "Suggest an event · Boffmedia",
         "description": "Pitch an event for the Boffmedia community."
+      },
+      "invitacion": {
+        "title": "Redeem an invitation · Boffmedia",
+        "description": "Join a private Boffmedia event with an invitation code."
       }
     },
     "juegos": {
@@ -108,6 +112,10 @@
       "index": {
         "title": "Boff Launcher · Boffmedia",
         "description": "Download the Boffmedia launcher: install, update and launch the community Minecraft packs."
+      },
+      "autorizar": {
+        "title": "Authorize the launcher · Boffmedia",
+        "description": "Approve a Boff Launcher sign-in with your Boffmedia account."
       }
     }
   }

@@ -80,7 +80,10 @@
       "randomlockeDownloadError": "Error al descargar",
       "randomlockeCopy": "Clic para copiar",
       "randomlockeCopied": "Copiado",
-      "randomlockeParticipants": "{count, plural, one {# participante} other {# participantes}}"
+      "randomlockeParticipants": "{count, plural, one {# participante} other {# participantes}}",
+      "leave": "Salir del evento",
+      "left": "Has salido del evento.",
+      "leaveConfirm": "Al salir perderás el acceso al pack que te daba este evento. ¿Continuar?"
     },
     "organizer": {
       "tagOfficial": "Oficial",
@@ -94,6 +97,17 @@
       "linePlatform": "{name} organiza este evento. Boffmedia aporta la plataforma, las inscripciones y los logros.",
       "inBoffmedia": "en Boffmedia",
       "by": "Por"
+    },
+    "invite": {
+      "title": "Canjear una invitación",
+      "lead": "Introduce el código que te han dado para entrar en un evento privado.",
+      "codeLabel": "Código de invitación",
+      "codeHint": "No distingue mayúsculas.",
+      "redeem": "Unirse al evento",
+      "joined": "Te has unido al evento.",
+      "failed": "Ese código no es válido.",
+      "loginFirst": "Inicia sesión para canjear",
+      "note": "Unirte al evento es lo que te da su pack en el launcher."
     }
   },
   "logros": {

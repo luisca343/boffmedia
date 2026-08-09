@@ -3,7 +3,7 @@
 /* tslint:disable */
 /* eslint-disable */
 export type AssignmentClaimedDto = {
-    eventId: number;
+    eventId: string;
     status: AssignmentClaimedDto.status;
     gamePlatform: string;
     gameTitle: string;

@@ -8,9 +8,13 @@ export class RolesGuard implements CanActivate {
   constructor(private reflector: Reflector) {}
 
   canActivate(context: ExecutionContext): boolean {
-    const required = this.reflector.get<UserRole[]>(
+    // Both levels, handler first: controllers such as `packs/admin`,
+    // `randomizer/admin` and `launcher/admin/releases` declare @Roles once on
+    // the class and never per method. Reading only the handler made every one
+    // of those routes reachable by any logged-in user.
+    const required = this.reflector.getAllAndOverride<UserRole[]>(
       ROLES_METADATA_KEY,
-      context.getHandler(),
+      [context.getHandler(), context.getClass()],
     );
     if (!required) return true;
     const user = context.switchToHttp().getRequest().user;

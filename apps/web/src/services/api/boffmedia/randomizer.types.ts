@@ -40,6 +40,8 @@ export interface RandomizerRom {
   updatedAt: string
 }
 
+export type ResolutionIssue = "no-pack" | "event-not-active" | "config-not-open"
+
 // Config view-model — randomizer config for a community event.
 // Mirrors the API's ConfigResponseDto fields. Status lifecycle: draft → open → closed → published.
 export interface RandomizerConfig {
@@ -53,24 +55,9 @@ export interface RandomizerConfig {
   romId?: number | null
   romHint: string | null
   packId?: string | null
+  launcherResolvable?: boolean
+  resolutionIssue?: ResolutionIssue | null
   status: "draft" | "open" | "closed" | "published"
-  createdAt: string
-  updatedAt: string
-}
-
-// Legacy event view-model (tournament-based, deprecated).
-// Kept for backward compatibility during migration.
-export interface RandomizerEvent {
-  id: string
-  tournamentId: string
-  gamePlatform: "gba" | "nds"
-  gameTitle: string
-  settingsBlobSha512: string
-  fvxJarSha512: string
-  cleanRomSha512: string
-  romHint: string | null
-  packId?: string | null
-  status: "draft" | "locked" | "running" | "finished"
   createdAt: string
   updatedAt: string
 }
@@ -107,13 +94,3 @@ export interface RandomizerAssignment {
   createdAt: string
 }
 
-export interface DryRunRequest {
-  romFile: File
-  settings: RandomizerSettings
-}
-
-export interface DryRunResult {
-  success: boolean
-  seedGenerated: string
-  warnings: string[]
-}

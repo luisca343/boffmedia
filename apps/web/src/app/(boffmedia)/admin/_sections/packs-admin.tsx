@@ -12,6 +12,9 @@ import {
   type AccessRow,
   type AdminPack,
   type AuditRow,
+  type GrantingEvent,
+  type LegacyAccessRow,
+  type UserSearchHit,
   type InviteRow,
   type PackVersionRow,
   PacksService,
@@ -135,7 +138,22 @@ function VersionsTab({
                 {v.published ? <AvPill tone="ok">{t("publishedPill")}</AvPill> : <AvPill tone="warn">{t("draft")}</AvPill>}
                 {pack.latestVersionId === v.id && <AvPill tone="accent">{t("latest")}</AvPill>}
               </>}
-              meta={<>{v.minecraft} · {v.loader ? `${v.loader} ${v.loaderVersion ?? ""}` : t("vanilla")} · {v.fileCount} {t("files")}</>}
+              // `minecraft`/`loader` are the Minecraft spec block. Printing
+              // them for an emulator pack rendered a literal "null · vanilla".
+              meta={
+                pack.gameType === "minecraft" ? (
+                  <>
+                    {v.minecraft} ·{" "}
+                    {v.loader ? `${v.loader} ${v.loaderVersion ?? ""}` : t("vanilla")} ·{" "}
+                    {v.fileCount} {t("files")}
+                  </>
+                ) : (
+                  <>
+                    {v.emulatorKind ? `${v.emulatorKind} · ` : ""}
+                    {v.fileCount} {t("files")}
+                  </>
+                )
+              }
               date={new Date(v.createdAt).toLocaleDateString()}
               actions={<>
                 <Button size="sm" variant="ghost" icon="copy" onClick={() => onCloneVersion(v.id)}>{t("clone")}</Button>
@@ -164,14 +182,60 @@ function VersionsTab({
 function AccessTab({ pack }: { pack: AdminPack }) {
   const t = useTranslations("admin.packs")
   const [rows, setRows] = useState<AccessRow[] | null>(null)
+  const [legacy, setLegacy] = useState<LegacyAccessRow[]>([])
+  const [events, setEvents] = useState<GrantingEvent[]>([])
+  const [query, setQuery] = useState("")
+  const [hits, setHits] = useState<UserSearchHit[]>([])
   const [uuid, setUuid] = useState("")
   const [busy, setBusy] = useState(false)
-  const [confirmRevoke, setConfirmRevoke] = useState<string | null>(null)
+  const [confirmRevoke, setConfirmRevoke] = useState<number | null>(null)
+  const [confirmRevokeUuid, setConfirmRevokeUuid] = useState<string | null>(null)
 
   const load = useCallback(async () => {
     const res = await PacksService.access(pack.id)
-    setRows(res.success ? (res.data ?? []) : [])
+    setRows(res.success ? (res.data?.grants ?? []) : [])
+    setLegacy(res.success ? (res.data?.legacy ?? []) : [])
+    setEvents(res.success ? (res.data?.events ?? []) : [])
   }, [pack.id])
+
+  // Debounced so typing a username is not one request per keystroke.
+  useEffect(() => {
+    const term = query.trim()
+    if (term.length < 2) {
+      setHits([])
+      return
+    }
+    const timer = setTimeout(async () => {
+      const res = await PacksService.searchUsers(term)
+      setHits(res.success ? (res.data ?? []) : [])
+    }, 250)
+    return () => clearTimeout(timer)
+  }, [query])
+
+  const grantToUser = async (userId: number) => {
+    setBusy(true)
+    try {
+      const res = await PacksService.grantToUser(pack.id, userId)
+      if (!res.success) {
+        toast({ tone: "bad", title: t("grantFailed"), msg: res.userMessage })
+        return
+      }
+      setQuery("")
+      setHits([])
+      await load()
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  const revokeUser = async (userId: number) => {
+    const res = await PacksService.revokeFromUser(pack.id, userId)
+    if (!res.success) {
+      toast({ tone: "bad", title: t("revokeFailed"), msg: res.userMessage })
+      return
+    }
+    await load()
+  }
 
   useEffect(() => {
     void load()
@@ -209,37 +273,120 @@ function AccessTab({ pack }: { pack: AdminPack }) {
         <p className="text-xs text-txt-dim">{t("aclIrrelevant")}</p>
       )}
 
-      <div className="flex items-end gap-3">
-        <div className="flex-1">
-          <Field
-            label={t("grantUuid")}
-            hint={t("grantUuidHint")}
-            error={uuid && !uuidValid ? t("uuidInvalid") : undefined}
-          >
-            <Input
-              value={uuid}
-              onChange={(e) => setUuid(e.target.value)}
-              placeholder="069a79f4-44e9-4726-a5be-fca90e38aaf5"
-            />
-          </Field>
-        </div>
-        <Button icon="plus" disabled={!uuidValid} loading={busy} onClick={() => void grant()}>
-          {t("grant")}
-        </Button>
+      {/* The normal path: a pack is an account-level entitlement. */}
+      <div>
+        <Field label={t("grantUser")} hint={t("grantUserHint")}>
+          <Input
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder={t("grantUserPlaceholder")}
+          />
+        </Field>
+        {hits.length > 0 && (
+          <div className="mt-2 flex flex-col gap-1 border border-solid border-line bg-panel-2 p-2 cut-tag">
+            {hits.map((u) => (
+              <button
+                key={u.id}
+                type="button"
+                disabled={busy}
+                onClick={() => void grantToUser(u.id)}
+                className="flex items-center gap-3 px-2 py-1.5 text-left hover:bg-panel disabled:opacity-50"
+              >
+                <span className="font-medium text-txt">{u.username}</span>
+                <span className="font-mono text-[11px] text-txt-dim">{u.email}</span>
+                <Icon name="plus" size={13} className="ml-auto text-accent" />
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
+      {/* The exception: a player who has not registered yet. */}
+      <details className="border border-solid border-line bg-panel-2 p-3 cut-tag">
+        <summary className="cursor-pointer font-mono text-[11px] uppercase tracking-[0.08em] text-txt-dim">
+          {t("preGrantTitle")}
+        </summary>
+        <p className="mt-2 text-xs text-txt-dim">{t("preGrantHint")}</p>
+        <div className="mt-3 flex items-end gap-3">
+          <div className="flex-1">
+            <Field
+              label={t("grantUuid")}
+              hint={t("grantUuidHint")}
+              error={uuid && !uuidValid ? t("uuidInvalid") : undefined}
+            >
+              <Input
+                value={uuid}
+                onChange={(e) => setUuid(e.target.value)}
+                placeholder="069a79f4-44e9-4726-a5be-fca90e38aaf5"
+              />
+            </Field>
+          </div>
+          <Button icon="plus" disabled={!uuidValid} loading={busy} onClick={() => void grant()}>
+            {t("grant")}
+          </Button>
+        </div>
+        {legacy.length > 0 && (
+          <div className="mt-3 flex flex-col gap-1">
+            {legacy.map((row) => (
+              <div
+                key={row.uuid}
+                className="flex items-center gap-3 border-b border-line py-2 last:border-0"
+              >
+                <span className="font-mono text-[12px] text-txt">{row.uuid}</span>
+                <span className="ml-auto font-mono text-[11px] text-txt-dim">
+                  {new Date(row.grantedAt).toLocaleDateString()}
+                </span>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  icon="trash"
+                  onClick={() => setConfirmRevokeUuid(row.uuid)}
+                >
+                  {t("revoke")}
+                </Button>
+              </div>
+            ))}
+          </div>
+        )}
+      </details>
+
+      {/* Event members hold no ACL row: access derives from membership at every
+          check, so the grant list alone under-reports who can install this. */}
+      {events.length > 0 && (
+        <div className="flex flex-col gap-1 border border-solid border-line bg-panel-2 p-3 cut-tag">
+          <span className="font-mono text-[10px] uppercase tracking-[0.08em] text-txt-dim">
+            {t("derivedFromEvents")}
+          </span>
+          {events.map((e) => (
+            <div key={e.eventId} className="flex items-center gap-3">
+              <span className="text-sm text-txt">{e.title}</span>
+              <span className="font-mono text-[11px] text-txt-dim">
+                {e.status} · {e.visibility}
+              </span>
+              <span className="ml-auto font-mono text-[11px] text-txt">
+                {t("derivedMembers", { count: e.memberCount })}
+              </span>
+            </div>
+          ))}
+        </div>
+      )}
+
       {!rows && <Spinner />}
-      {rows && rows.length === 0 && (
+      {rows && rows.length === 0 && legacy.length === 0 && events.length === 0 && (
         <Empty icon="users" title={t("noAccess")} lead={t("noAccessLead")} />
       )}
       {rows && rows.length > 0 && (
         <div className="flex flex-col gap-1">
           {rows.map((row) => (
             <div
-              key={row.uuid}
+              key={`${row.userId}-${row.source}`}
               className="flex items-center gap-3 border-b border-line py-2 last:border-0"
             >
-              <span className="font-mono text-[12px] text-txt">{row.uuid}</span>
+              <span className="font-medium text-txt">{row.username}</span>
+              <span className="font-mono text-[11px] text-txt-dim">{row.email}</span>
+              <AvPill tone={row.source === "invite" ? "accent" : "default"}>
+                {t(row.source === "invite" ? "sourceInvite" : "sourceAdmin")}
+              </AvPill>
               <span className="ml-auto font-mono text-[11px] text-txt-dim">
                 {new Date(row.grantedAt).toLocaleDateString()}
               </span>
@@ -247,7 +394,7 @@ function AccessTab({ pack }: { pack: AdminPack }) {
                 size="sm"
                 variant="ghost"
                 icon="trash"
-                onClick={() => setConfirmRevoke(row.uuid)}
+                onClick={() => setConfirmRevoke(row.userId)}
               >
                 {t("revoke")}
               </Button>
@@ -259,9 +406,26 @@ function AccessTab({ pack }: { pack: AdminPack }) {
       <ConfirmModal
         open={confirmRevoke !== null}
         title={t("confirmRevokeAccess")}
-        lead={confirmRevoke ? t("confirmRevokeAccessLead", { uuid: confirmRevoke }) : undefined}
+        lead={
+          confirmRevoke !== null
+            ? t("confirmRevokeUserLead", {
+                name:
+                  rows?.find((r) => r.userId === confirmRevoke)?.username ?? String(confirmRevoke),
+              })
+            : undefined
+        }
         onClose={() => setConfirmRevoke(null)}
-        onConfirm={() => (confirmRevoke ? revoke(confirmRevoke) : undefined)}
+        onConfirm={() => (confirmRevoke !== null ? revokeUser(confirmRevoke) : undefined)}
+      />
+
+      <ConfirmModal
+        open={confirmRevokeUuid !== null}
+        title={t("confirmRevokeAccess")}
+        lead={
+          confirmRevokeUuid ? t("confirmRevokeAccessLead", { uuid: confirmRevokeUuid }) : undefined
+        }
+        onClose={() => setConfirmRevokeUuid(null)}
+        onConfirm={() => (confirmRevokeUuid ? revoke(confirmRevokeUuid) : undefined)}
       />
     </div>
   )

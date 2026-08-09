@@ -13,6 +13,7 @@ import { JwtAuthGuard } from '@api/auth/jwt-auth.guard';
 import { RolesGuard } from '@api/_utils/guards/roles.guard';
 import { OwnerOrAdminGuard } from '@api/_utils/guards/owner-or-admin.guard';
 import { AuthThrottlerGuard } from '@api/_utils/guards/auth-throttler.guard';
+import { GameServerAuthGuard } from '@api/_utils/guards/game-server-auth.guard';
 
 const mockLogger = {
   log: jest.fn(),
@@ -72,6 +73,11 @@ describe('BoffMediaUsersController — integration (ValidationPipe + GlobalExcep
       .overrideGuard(RolesGuard)
       .useValue({ canActivate: () => true })
       .overrideGuard(OwnerOrAdminGuard)
+      .useValue({ canActivate: () => true })
+      // These specs cover ValidationPipe + routing, not auth. The two Minecraft
+      // routes are machine-authed (TERAS_API_TOKEN) since the world-string
+      // credential was retired.
+      .overrideGuard(GameServerAuthGuard)
       .useValue({ canActivate: () => true })
       .overrideGuard(AuthThrottlerGuard)
       .useValue({ canActivate: () => true })

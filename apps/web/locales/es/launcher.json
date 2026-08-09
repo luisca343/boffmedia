@@ -57,5 +57,26 @@
       "macIntel": "macOS (Intel)",
       "macApple": "macOS (Apple Silicon)"
     }
+  },
+  "launcherAuth": {
+    "title": "Autorizar el launcher",
+    "lead": "Introduce el código que te está mostrando el launcher.",
+    "loginLead": "Inicia sesión para autorizar un launcher en esta cuenta.",
+    "login": "Iniciar sesión",
+    "codeLabel": "Código",
+    "codeHint": "No distingue mayúsculas ni hace falta el guion.",
+    "continue": "Continuar",
+    "notFound": "Ese código no es válido o ha caducado.",
+    "failed": "No se ha podido completar la solicitud.",
+    "confirmLead": "Este launcher podrá ver e instalar los packs a los que tenga derecho tu cuenta. No podrá modificar tu cuenta.",
+    "client": "Launcher",
+    "unknownClient": "Launcher sin identificar",
+    "approve": "Autorizar",
+    "deny": "Rechazar",
+    "approvedToast": "Launcher autorizado.",
+    "approvedTitle": "Autorizado",
+    "approvedLead": "Puedes volver al launcher: iniciará sesión solo en unos segundos.",
+    "deniedTitle": "Rechazado",
+    "deniedLead": "Ese launcher no ha sido autorizado. No se le ha compartido nada."
   }
 }

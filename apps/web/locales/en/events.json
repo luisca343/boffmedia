@@ -80,7 +80,10 @@
       "randomlockeDownloadError": "Download failed",
       "randomlockeCopy": "Click to copy",
       "randomlockeCopied": "Copied",
-      "randomlockeParticipants": "{count, plural, one {# participant} other {# participants}}"
+      "randomlockeParticipants": "{count, plural, one {# participant} other {# participants}}",
+      "leave": "Leave event",
+      "left": "You have left the event.",
+      "leaveConfirm": "Leaving withdraws any pack access this event granted you. Continue?"
     },
     "organizer": {
       "tagOfficial": "Official",
@@ -94,6 +97,17 @@
       "linePlatform": "{name} organises this event. Boffmedia provides the platform, the registrations and the achievements.",
       "inBoffmedia": "on Boffmedia",
       "by": "By"
+    },
+    "invite": {
+      "title": "Redeem an invitation",
+      "lead": "Enter the code you were given to join a private event.",
+      "codeLabel": "Invitation code",
+      "codeHint": "Case is ignored.",
+      "redeem": "Join the event",
+      "joined": "You have joined the event.",
+      "failed": "That code is not valid.",
+      "loginFirst": "Sign in to redeem",
+      "note": "Joining the event is what grants you its pack in the launcher."
     }
   },
   "logros": {

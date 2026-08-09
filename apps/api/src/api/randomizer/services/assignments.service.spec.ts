@@ -24,7 +24,8 @@ describe('AssignmentsService', () => {
 
   const CLEAN_SHA = 'a'.repeat(128);
   const OUTPUT_SHA = 'b'.repeat(128);
-  const principal = { uuid: 'player-uuid', username: 'player' };
+  // The launcher principal is a Boffmedia account; the MC uuid is audit context.
+  const principal = { userId: 5, username: 'player', mcUuid: 'player-uuid' };
 
   const config = {
     id: 1,
@@ -42,7 +43,7 @@ describe('AssignmentsService', () => {
   const claimedAssignment = {
     id: 10,
     configId: 1,
-    mcUuid: principal.uuid,
+    mcUuid: principal.mcUuid,
     seed: 12345,
     status: 'claimed',
     outputSha512: null,
@@ -51,7 +52,7 @@ describe('AssignmentsService', () => {
   beforeEach(async () => {
     repository = {
       getConfigById: jest.fn(),
-      getAssignmentByConfigAndMcUuid: jest.fn(),
+      getAssignmentByConfigAndUser: jest.fn(),
       getAssignmentById: jest.fn(),
       createAssignment: jest.fn(),
       resolveEventEntitlement: jest.fn(),
@@ -100,7 +101,7 @@ describe('AssignmentsService', () => {
   describe('getOrGenerateRom', () => {
     it('streams the cached blob without calling the runner when output exists on disk', async () => {
       repository.getConfigById.mockResolvedValue(config);
-      repository.getAssignmentByConfigAndMcUuid.mockResolvedValue({
+      repository.getAssignmentByConfigAndUser.mockResolvedValue({
         ...claimedAssignment,
         outputSha512: OUTPUT_SHA,
         status: 'patched',
@@ -126,7 +127,7 @@ describe('AssignmentsService', () => {
 
     it('generates on first request: clean stream + encoded settings + seed, then caches', async () => {
       repository.getConfigById.mockResolvedValue(config);
-      repository.getAssignmentByConfigAndMcUuid.mockResolvedValue(
+      repository.getAssignmentByConfigAndUser.mockResolvedValue(
         claimedAssignment,
       );
       const cleanStream = Readable.from(Buffer.from('clean rom'));
@@ -183,7 +184,7 @@ describe('AssignmentsService', () => {
 
     it('mints the assignment when open and unclaimed, then generates', async () => {
       repository.getConfigById.mockResolvedValue(config);
-      repository.getAssignmentByConfigAndMcUuid.mockResolvedValue(null); // unclaimed
+      repository.getAssignmentByConfigAndUser.mockResolvedValue(null); // unclaimed
       repository.resolveEventEntitlement.mockResolvedValue({
         boffmediaUserId: 42,
         status: 'registered',
@@ -222,7 +223,7 @@ describe('AssignmentsService', () => {
 
     it('throws 409 when the config has no base ROM on the server', async () => {
       repository.getConfigById.mockResolvedValue(config);
-      repository.getAssignmentByConfigAndMcUuid.mockResolvedValue(
+      repository.getAssignmentByConfigAndUser.mockResolvedValue(
         claimedAssignment,
       );
       blobStorage.blobSize.mockResolvedValue(null); // clean blob missing
@@ -235,7 +236,7 @@ describe('AssignmentsService', () => {
 
     it('404s an unclaimed user when the config is not open', async () => {
       repository.getConfigById.mockResolvedValue({ ...config, status: 'closed' });
-      repository.getAssignmentByConfigAndMcUuid.mockResolvedValue(null);
+      repository.getAssignmentByConfigAndUser.mockResolvedValue(null);
 
       await expect(
         service.getOrGenerateRom(1, principal as any),
@@ -244,7 +245,7 @@ describe('AssignmentsService', () => {
 
     it('single-flights concurrent generation (runner runs once)', async () => {
       repository.getConfigById.mockResolvedValue(config);
-      repository.getAssignmentByConfigAndMcUuid.mockResolvedValue(
+      repository.getAssignmentByConfigAndUser.mockResolvedValue(
         claimedAssignment,
       );
       blobStorage.blobSize.mockResolvedValue(2048);

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import {
   EventsRepository,
   FindEventsFilters,
@@ -45,6 +45,10 @@ export class EventsService {
       icon: createEventDto.icon,
       banner: createEventDto.banner,
       type: createEventDto.type,
+      ...(createEventDto.status ? { status: createEventDto.status } : {}),
+      ...(createEventDto.packId !== undefined
+        ? { packId: createEventDto.packId }
+        : {}),
     };
 
     const result = await this.eventsRepository.create(eventData);
@@ -59,17 +63,27 @@ export class EventsService {
     id: number,
     updateEventDto: UpdateEventDto,
   ): Promise<Event> {
-    const eventData = {
-      parentId: updateEventDto.parentId || null,
-      title: updateEventDto.title,
-      description: updateEventDto.description,
-      gameId: updateEventDto.gameId,
-      startDate: new Date(updateEventDto.startDate!),
-      endDate: updateEventDto.endDate ? new Date(updateEventDto.endDate) : null,
-      visibility: updateEventDto.visibility,
-      icon: updateEventDto.icon,
-      banner: updateEventDto.banner,
-      type: updateEventDto.type,
+    // Only the keys actually sent are written. Building the object
+    // unconditionally turned an omitted `startDate` into `new Date(undefined)`
+    // — an Invalid Date that MySQL rejects — so a genuine PATCH could not work.
+    const d = updateEventDto;
+    const eventData: Partial<Event> = {
+      ...(d.parentId !== undefined ? { parentId: d.parentId || null } : {}),
+      ...(d.title !== undefined ? { title: d.title } : {}),
+      ...(d.description !== undefined ? { description: d.description } : {}),
+      ...(d.gameId !== undefined ? { gameId: d.gameId } : {}),
+      ...(d.startDate !== undefined
+        ? { startDate: new Date(d.startDate) }
+        : {}),
+      ...(d.endDate !== undefined
+        ? { endDate: d.endDate ? new Date(d.endDate) : null }
+        : {}),
+      ...(d.visibility !== undefined ? { visibility: d.visibility } : {}),
+      ...(d.icon !== undefined ? { icon: d.icon } : {}),
+      ...(d.banner !== undefined ? { banner: d.banner } : {}),
+      ...(d.type !== undefined ? { type: d.type } : {}),
+      ...(d.status !== undefined ? { status: d.status } : {}),
+      ...(d.packId !== undefined ? { packId: d.packId } : {}),
     };
 
     await this.eventsRepository.update(id, eventData);
@@ -85,8 +99,27 @@ export class EventsService {
     await this.eventsRepository.softDelete(id);
   }
 
+  /**
+   * The events module owns the lifecycle. It used to be written from exactly
+   * one place — the randomizer's `openConfig` — so an event with no randomizer
+   * config could never become active and nothing ever wrote `completed`.
+   */
+  async setStatus(
+    id: number,
+    status: 'upcoming' | 'active' | 'completed',
+  ): Promise<Event> {
+    const event = await this.eventsRepository.findById(id, true);
+    if (!event) throw new NotFoundException('Event not found');
+
+    await this.eventsRepository.setStatus(id, status);
+    return this.getEventById(id, true);
+  }
+
   async validateEventExists(eventId: number): Promise<boolean> {
-    const event = await this.eventsRepository.findById(eventId);
+    // includePrivate: existence is not visibility. Callers that must not leak a
+    // private event use validateEventVisible instead — this one used to filter
+    // private events out, which is why joining one failed as "Event not found".
+    const event = await this.eventsRepository.findById(eventId, true);
     return !!event;
   }
 

@@ -12,11 +12,12 @@ import {
   timestamp,
   varchar,
 } from 'drizzle-orm/mysql-core';
+import { boffMediaUsers } from './BoffMedia';
 
-// The launcher's pack registry — HANDOFF §7. Identity is the Minecraft UUID
-// throughout, proved via Mojang's `hasJoined` handshake (§7.2), which is why the
-// ACL keys on `rotom_users.uuid` rather than on a Boffmedia account: a player
-// who has never logged into the website still has to be grantable.
+// The launcher's pack registry — HANDOFF §7. Identity is the BOFFMEDIA account:
+// the right to a pack comes from an admin decision, a redeemed invite or
+// membership of an event, none of which are Minecraft facts. `pack_acl` survives
+// only as legacy pre-grants for UUIDs with no account behind them yet.
 
 /** `public` · `password` · `allowlist` — mirrors PackAccess in @boffmedia/pack-schema. */
 export type PackAccessKind = 'public' | 'password' | 'allowlist';
@@ -110,7 +111,9 @@ export const packVersions = mysqlTable(
     /** Draft versions are invisible to launchers — publishing is a deliberate act. */
     published: boolean('published').notNull().default(false),
     notes: text('notes'),
-    createdBy: char('created_by', { length: 36 }),
+    // The Boffmedia admin who cut this version. Was char(36) — a Minecraft UUID
+    // shape — and never written by anything, so every row said "nobody".
+    createdBy: int('created_by'),
     createdAt: timestamp('created_at')
       .notNull()
       .default(sql`CURRENT_TIMESTAMP()`),
@@ -128,7 +131,63 @@ export const packVersions = mysqlTable(
 export type PackVersion = typeof packVersions.$inferSelect;
 export type NewPackVersion = typeof packVersions.$inferInsert;
 
-/** §7.2 — per-UUID entitlement. Present row = access; revocation is a DELETE. */
+/** Where a direct grant came from. Union semantics: losing one source leaves
+ *  the others standing, which the old single-ACL-row model could not express. */
+export type PackGrantSource = 'admin' | 'invite';
+
+/**
+ * Per-ACCOUNT entitlement. Present row = access; revocation is a DELETE.
+ *
+ * Replaces `pack_acl` as the way grants are stored. The right to a pack derives
+ * from Boffmedia-level facts (an admin decision, a redeemed invite, membership
+ * of an event), so keying it on a Minecraft UUID forced every emulator flow to
+ * round-trip through an identity it had no reason to need — and locked out any
+ * account that never linked Minecraft.
+ *
+ * The primary key includes `source`: a player can hold an admin grant AND an
+ * invite grant for the same pack, and revoking one must not revoke the other.
+ */
+export const packGrants = mysqlTable(
+  'pack_grants',
+  {
+    packId: varchar('pack_id', { length: 32 }).notNull(),
+    userId: int('user_id').notNull(),
+    source: varchar('source', { length: 16 })
+      .$type<PackGrantSource>()
+      .notNull()
+      .default('admin'),
+    /** The invite code this grant came from, when it came from one. */
+    sourceRef: varchar('source_ref', { length: 32 }),
+    /** Boffmedia user id of the admin who granted it; null for redemptions. */
+    grantedBy: int('granted_by'),
+    grantedAt: timestamp('granted_at')
+      .notNull()
+      .default(sql`CURRENT_TIMESTAMP()`),
+  },
+  (table) => ({
+    pk: primaryKey({ columns: [table.packId, table.userId, table.source] }),
+    userIdx: index('pack_grants_user_idx').on(table.userId),
+    packFk: foreignKey({
+      name: 'pack_grants_pack_fk',
+      columns: [table.packId],
+      foreignColumns: [packs.id],
+    }).onDelete('cascade'),
+    userFk: foreignKey({
+      name: 'pack_grants_user_fk',
+      columns: [table.userId],
+      foreignColumns: [boffMediaUsers.id],
+    }).onDelete('cascade'),
+  }),
+);
+
+export type PackGrant = typeof packGrants.$inferSelect;
+
+/**
+ * LEGACY pre-grants, kept only for Minecraft UUIDs with no matching account.
+ * Rows joinable to an account were migrated into `pack_grants`; what is left is
+ * a UUID an admin granted before that player ever registered, claimed when they
+ * link that UUID. Drop the table once it is empty.
+ */
 export const packAcl = mysqlTable(
   'pack_acl',
   {

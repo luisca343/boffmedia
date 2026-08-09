@@ -52,6 +52,10 @@ export type Event = {
      */
     type: Event.type;
     /**
+     * Pack this event grants access to. Membership in the event is the entitlement.
+     */
+    packId?: string | null;
+    /**
      * Game name
      */
     gameName?: string;

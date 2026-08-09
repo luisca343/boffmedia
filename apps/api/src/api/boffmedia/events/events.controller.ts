@@ -24,8 +24,10 @@ import {
   ApiQuery,
   ApiBearerAuth,
 } from '@nestjs/swagger';
+import { Throttle } from '@nestjs/throttler';
 import { JwtAuthGuard } from '@api/auth/jwt-auth.guard';
 import { RolesGuard } from '@api/_utils/guards/roles.guard';
+import { UserThrottlerGuard } from '@api/_utils/guards/user-throttler.guard';
 import { OwnerOrAdminGuard } from '@api/_utils/guards/owner-or-admin.guard';
 import { Roles } from '@api/_utils/decorators/roles.decorator';
 import { USER_ROLES } from '@api/_utils/auth/roles.constants';
@@ -37,7 +39,6 @@ import { CreateAchievementDto } from './dto/create-achievement.dto';
 import { CreateTeamDto } from './dto/create-team.dto';
 import { JoinEventDto } from './dto/join-event.dto';
 import { UpdateProgressDto } from './dto/update-progress.dto'; // Import from DTO folder
-import { JoinTeamDto } from './dto/join-team.dto'; // Import from DTO folder
 import { UpdateEventDto } from './dto/update-event.dto';
 import { UpdateGameDto } from './dto/update-game.dto';
 import { Event } from './entities/event.entity';
@@ -53,6 +54,16 @@ import {
   TeamLeaderboardEntry,
 } from './entities/leaderboard.entity';
 import { UpdateTeamDto } from './dto/update-team.dto';
+import {
+  CreateEventInviteDto,
+  RedeemEventInviteDto,
+  SetEventStatusDto,
+  SetParticipantStatusDto,
+} from './dto/event-lifecycle.dto';
+import {
+  EventInviteEntity,
+  RedeemEventInviteResponseEntity,
+} from './entities/event-invite.entity';
 import {
   UserTrophiesEntity,
   UserActivityItemEntity,
@@ -136,6 +147,90 @@ export class EventsController {
     @Body() updateEventDto: UpdateEventDto,
   ): Promise<Event> {
     return await this.eventsFacadeService.updateEvent(id, updateEventDto);
+  }
+
+  @Post('/event/:id/status')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.BOFF_ADMIN)
+  @ApiBearerAuth('JWT')
+  @ApiOperation({
+    summary: 'Set the event lifecycle status',
+    description:
+      'The events module owns the lifecycle. This used to be writable only as a side effect of opening a randomizer config, so an event with no randomizer could never go active and nothing ever wrote `completed`.',
+  })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Status updated.',
+    type: Event,
+  })
+  async setEventStatus(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: SetEventStatusDto,
+  ): Promise<Event> {
+    return this.eventsFacadeService.setEventStatus(id, dto.status);
+  }
+
+  // ==================== EVENT INVITATIONS ====================
+
+  @Post('/event/:id/invites')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.BOFF_ADMIN)
+  @ApiBearerAuth('JWT')
+  @ApiOperation({ summary: 'Create an invitation code for a private event' })
+  @ApiResponse({ status: HttpStatus.CREATED, type: EventInviteEntity })
+  async createEventInvite(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: CreateEventInviteDto,
+    @Req() req: { user: { userId: number } },
+  ): Promise<EventInviteEntity> {
+    return this.eventsFacadeService.createEventInvite(id, req.user.userId, dto);
+  }
+
+  @Get('/event/:id/invites')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.BOFF_ADMIN)
+  @ApiBearerAuth('JWT')
+  @ApiOperation({ summary: 'List invitation codes for an event' })
+  @ApiResponse({ status: HttpStatus.OK, type: [EventInviteEntity] })
+  async listEventInvites(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<EventInviteEntity[]> {
+    return this.eventsFacadeService.listEventInvites(id);
+  }
+
+  @Delete('/invites/:code')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.BOFF_ADMIN)
+  @ApiBearerAuth('JWT')
+  @ApiOperation({ summary: 'Revoke an invitation code' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Invite revoked.' })
+  async revokeEventInvite(
+    @Param('code') code: string,
+  ): Promise<{ success: boolean }> {
+    return this.eventsFacadeService.revokeEventInvite(code);
+  }
+
+  @Post('/invites/redeem')
+  @UseGuards(JwtAuthGuard, UserThrottlerGuard)
+  @Throttle({ default: { ttl: 60_000, limit: 10 } })
+  @ApiBearerAuth('JWT')
+  @ApiOperation({
+    summary: 'Redeem an invitation and join the event',
+    description:
+      'The only way a player can join a private event. Throttled per account — redemption is the abuse surface now that membership grants pack access.',
+  })
+  @ApiResponse({
+    status: HttpStatus.CREATED,
+    type: RedeemEventInviteResponseEntity,
+  })
+  async redeemEventInvite(
+    @Body() dto: RedeemEventInviteDto,
+    @Req() req: { user: { userId: number } },
+  ): Promise<RedeemEventInviteResponseEntity> {
+    return this.eventsFacadeService.redeemEventInvite(
+      dto.code,
+      req.user.userId,
+    );
   }
 
   @Delete('/event/:id')
@@ -442,13 +537,15 @@ export class EventsController {
   async joinTeam(
     @Param('eventId') eventId: number,
     @Param('teamId') teamId: number,
-    @Body() joinTeamDto: JoinTeamDto,
+    @Req() req: { user: { userId: number } },
   ): Promise<{ success: boolean }> {
-    // TODO(roadmap): verify joinTeamDto.participantId belongs to req.user.
+    // The joining identity comes from the token, never from the body: the old
+    // `participantId` field let any authenticated user enrol anyone else — and
+    // it was passed straight into a parameter the service reads as a *user* id.
     return await this.eventsFacadeService.joinTeam(
       eventId,
       teamId,
-      joinTeamDto,
+      req.user.userId,
     );
   }
 
@@ -485,6 +582,57 @@ export class EventsController {
     // Identity comes from the JWT, never the request body (anti-spoofing).
     joinEventDto.userId = req.user.userId;
     return await this.eventsFacadeService.joinEvent(eventId, joinEventDto);
+  }
+
+  @Post(':eventId/leave')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT')
+  @ApiOperation({
+    summary: 'Leave an event',
+    description:
+      'Self-service. Deletes the membership row, so any pack access derived from it lapses on the next server check and re-joining later is clean.',
+  })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Left the event.' })
+  async leaveEvent(
+    @Param('eventId', ParseIntPipe) eventId: number,
+    @Req() req: { user: { userId: number } },
+  ): Promise<{ success: boolean }> {
+    return this.eventsFacadeService.leaveEvent(eventId, req.user.userId);
+  }
+
+  @Delete(':eventId/participants/:participantId')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.BOFF_ADMIN)
+  @ApiBearerAuth('JWT')
+  @ApiOperation({
+    summary: 'Remove a participant from an event (admin)',
+    description:
+      'Marks the membership `removed` rather than deleting it, so the player cannot undo an expulsion by re-joining.',
+  })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Participant removed.' })
+  async removeParticipant(
+    @Param('eventId', ParseIntPipe) eventId: number,
+    @Param('participantId', ParseIntPipe) participantId: number,
+  ): Promise<{ success: boolean }> {
+    return this.eventsFacadeService.removeParticipant(eventId, participantId);
+  }
+
+  @Patch(':eventId/participants/:participantId')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.BOFF_ADMIN)
+  @ApiBearerAuth('JWT')
+  @ApiOperation({ summary: 'Set a participant status (admin)' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Status updated.' })
+  async setParticipantStatus(
+    @Param('eventId', ParseIntPipe) eventId: number,
+    @Param('participantId', ParseIntPipe) participantId: number,
+    @Body() dto: SetParticipantStatusDto,
+  ) {
+    return this.eventsFacadeService.setParticipantStatus(
+      eventId,
+      participantId,
+      dto.status,
+    );
   }
 
   @OptionalAuth()

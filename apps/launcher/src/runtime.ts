@@ -190,6 +190,86 @@ export async function authOffline(): Promise<Account> {
   }
 }
 
+// ── Boffmedia launcher session ─────────────────────────────────────────────
+//
+// The launcher signs in with a BOFFMEDIA account, not a Minecraft one: packs,
+// events, entitlement and downloads are all Boffmedia-level facts. Microsoft is
+// asked for only when a Minecraft pack is actually installed or launched.
+
+export interface BoffDeviceCode {
+  userCode: string
+  verificationUri: string
+  expiresIn: number
+  intervalSeconds: number
+}
+
+export interface BoffAccount {
+  id: number
+  username: string
+  mcUuid: string | null
+}
+
+export interface BoffDevicePoll {
+  status: "pending" | "approved" | "denied" | "expired"
+  user: BoffAccount | null
+}
+
+const MOCK_BOFF_ACCOUNT: BoffAccount = {
+  id: 1,
+  username: "Trainer",
+  mcUuid: MOCK_ACCOUNT.uuid,
+}
+
+/** The website this launcher belongs to. Used for the links the launcher hands
+ *  to the system browser — a relative URL from a Tauri custom protocol resolves
+ *  against `tauri://localhost` and goes nowhere. */
+export function webBaseUrl(): string {
+  const fromEnv = import.meta.env?.VITE_BOFF_WEB_URL as string | undefined
+  return (fromEnv && fromEnv.trim()) || "https://boffmedia.es"
+}
+
+export async function boffDeviceStart(): Promise<BoffDeviceCode> {
+  if (!isDesktop()) {
+    return {
+      userCode: "K7QM-3BXR",
+      verificationUri: "https://boffmedia.es/launcher/autorizar",
+      expiresIn: 600,
+      intervalSeconds: 2,
+    }
+  }
+  try {
+    return await invoke<BoffDeviceCode>("boff_device_start")
+  } catch (err) {
+    throw asFailure(err)
+  }
+}
+
+/** One poll. The caller sets the cadence — see the interval the start call
+ *  returned — so a ten-minute wait never parks a request anywhere. */
+export async function boffDevicePoll(): Promise<BoffDevicePoll> {
+  if (!isDesktop()) return { status: "approved", user: MOCK_BOFF_ACCOUNT }
+  try {
+    return await invoke<BoffDevicePoll>("boff_device_poll")
+  } catch (err) {
+    throw asFailure(err)
+  }
+}
+
+/** The stored 30-day session, if it is still live. `null` = sign in again. */
+export async function boffSessionRestore(): Promise<BoffAccount | null> {
+  if (!isDesktop()) return MOCK_BOFF_ACCOUNT
+  try {
+    return await invoke<BoffAccount | null>("boff_session_restore")
+  } catch (err) {
+    throw asFailure(err)
+  }
+}
+
+export async function boffSignOut(): Promise<void> {
+  if (!isDesktop()) return
+  await invoke("boff_sign_out")
+}
+
 /** Signs out of EVERY account and forgets them. Per-account sign-out is
  *  `authRemove`. */
 export async function authLogout(): Promise<void> {

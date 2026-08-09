@@ -15,6 +15,7 @@ import type { Readable } from 'stream';
 import { pipeline } from 'stream/promises';
 import { firstValueFrom } from 'rxjs';
 import { env } from '@/config/env';
+import { laboonPath } from '@/config/laboon';
 
 // HANDOFF §4.5 — every CurseForge byte is proxied. The key stays here because an
 // embedded key is an extracted key, and an abused key is a revoked key, which
@@ -264,7 +265,7 @@ export class PacksDownloadsService {
 /** Content-addressed, sharded two levels so a pack with thousands of overrides
  *  does not put thousands of entries in one directory. */
 function blobDir(): string {
-  return env.PACK_BLOB_DIR ?? join(process.cwd(), 'data', 'pack-blobs');
+  return laboonPath('pack-blobs');
 }
 
 function blobPath(sha512: string): string {

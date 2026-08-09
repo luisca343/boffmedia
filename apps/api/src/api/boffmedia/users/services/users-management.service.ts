@@ -904,6 +904,15 @@ export class BoffMediaUsersManagementService {
     }
   }
 
+  /** Records an already-proved Minecraft identity on an account. `uuid` is not a
+   *  public UpdateUserDto field, so it goes through the repository directly. */
+  async setMinecraftUuid(
+    userId: number,
+    uuid: string,
+  ): Promise<BoffMediaUserSafe> {
+    return this.usersRepository.updateUser(userId, { uuid });
+  }
+
   async linkMinecraftAccount(
     linkData: MinecraftLinkData,
   ): Promise<BoffMediaUserSafe> {

@@ -2,14 +2,11 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export type VerifyJoinDto = {
+export type McJoinChallengeEntity = {
     /**
-     * Nombre de usuario de Minecraft
-     */
-    username: string;
-    /**
-     * El serverId devuelto por /packs/auth/challenge
+     * Preséntalo a Mojang en session/minecraft/join
      */
     serverId: string;
+    expiresInSeconds: number;
 };
 

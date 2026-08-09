@@ -280,6 +280,16 @@ export class CreateVersionDto {
   initialFiles?: unknown[];
 }
 
+/** Grant to an account. The normal path — a pack is a Boffmedia entitlement. */
+export class GrantUserAccessDto {
+  @ApiProperty({ example: 42 })
+  @IsInt()
+  @Min(1)
+  userId!: number;
+}
+
+/** Pre-grant to a raw Minecraft UUID, for a player who has not registered yet.
+ *  Becomes a real grant when that UUID is linked. */
 export class GrantAccessDto {
   @ApiProperty({ example: '069a79f4-44e9-4726-a5be-fca90e38aaf5' })
   @IsString()
@@ -516,21 +526,34 @@ export class ResolveFileDto {
 
 // ── Launcher-facing ────────────────────────────────────────────────────────
 
-export class VerifyJoinDto {
-  @ApiProperty({ description: 'Nombre de usuario de Minecraft' })
-  @IsString()
-  @MinLength(1)
-  @MaxLength(32)
-  username!: string;
-
-  @ApiProperty({
-    description: 'El serverId devuelto por /packs/auth/challenge',
+export class StartDeviceAuthDto {
+  @ApiPropertyOptional({
+    description:
+      'Cómo se presenta este launcher en la pantalla de aprobación (SO, versión). Solo informativo.',
   })
+  @IsOptional()
   @IsString()
-  @MinLength(8)
-  @MaxLength(64)
-  serverId!: string;
+  @MaxLength(128)
+  clientLabel?: string;
 }
+
+export class PollDeviceAuthDto {
+  @ApiProperty({ description: 'La mitad secreta devuelta por /auth/device' })
+  @IsString()
+  @MinLength(16)
+  @MaxLength(64)
+  deviceCode!: string;
+}
+
+export class DeviceLookupDto {
+  @ApiProperty({ example: 'K7QM-3BXR' })
+  @IsString()
+  @MinLength(4)
+  @MaxLength(16)
+  userCode!: string;
+}
+
+export class DeviceDecisionDto extends DeviceLookupDto {}
 
 export class ManifestQueryDto {
   @ApiPropertyOptional({

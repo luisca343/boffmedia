@@ -138,6 +138,20 @@
       "notFoundTitle": "Profile not found",
       "notFoundBody": "No user exists with that name.",
       "viewMine": "View public profile"
+    },
+    "linkMc": {
+      "title": "Link your Minecraft account",
+      "lead": "Open Microsoft, enter the code below and sign in with the account that owns Minecraft.",
+      "codeLabel": "Your code",
+      "openMicrosoft": "Open Microsoft",
+      "waiting": "Waiting for you to finish in Microsoft…",
+      "linked": "Minecraft account linked: {name}",
+      "doneShort": "Linked.",
+      "declined": "You cancelled the authorization.",
+      "expired": "The code expired. Try again.",
+      "failed": "Could not link the account.",
+      "cancel": "Cancel",
+      "close": "Close"
     }
   }
 }

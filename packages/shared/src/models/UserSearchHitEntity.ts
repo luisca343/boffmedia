@@ -2,12 +2,9 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export type LauncherSessionEntity = {
-    /**
-     * Bearer para el resto de rutas del launcher
-     */
-    token: string;
-    uuid: string;
+export type UserSearchHitEntity = {
+    id: number;
     username: string;
+    email: string;
 };
 

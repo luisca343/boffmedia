@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
 import {
   BoffMediaUsersManagementService,
   UserCreationResult,
@@ -21,6 +21,7 @@ import {
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Logger } from 'nestjs-pino';
+import { env } from '@/config/env';
 
 export interface BoffMediaUserInitializationData {
   email: string;
@@ -518,6 +519,41 @@ export class BoffMediaUsersFacadeService {
       this.logger.error('Failed to create Minecraft user:', error);
       throw new Error(`Minecraft user creation failed: ${error.message}`);
     }
+  }
+
+  /**
+   * Attach a Minecraft identity that has already been PROVED — by the Microsoft
+   * chain on the website, or by Mojang's hasJoined handshake. No password and no
+   * world string: the caller has established the identity, this only records it.
+   *
+   * The old world-string paths trusted `MC_WORLD`, which ships in the browser
+   * bundle, so anyone who knew a player's UUID could attach it to their own
+   * account — and `boffmedia_users.uuid` is what SmartRotom money routes own.
+   */
+  async linkProvenMinecraftAccount(
+    userId: number,
+    minecraft: { uuid: string; username: string },
+  ): Promise<BoffMediaUserSafe> {
+    const owner = await this.usersManagementService.getUserByUuid(
+      minecraft.uuid,
+    );
+    if (owner && owner.id !== userId) {
+      throw new ConflictException({
+        message: 'Minecraft account already linked',
+        userMessage:
+          'Esa cuenta de Minecraft ya está vinculada a otra cuenta de Boffmedia.',
+      });
+    }
+
+    // rotom_users first: boffmedia_users.uuid is an FK to it, so writing the
+    // link before the player exists there fails on the constraint.
+    await this.smartRotomUsersFacadeService.initializeUserAndAccounts({
+      uuid: minecraft.uuid,
+      username: minecraft.username,
+      world: env.MC_WORLD,
+    });
+
+    return this.usersManagementService.setMinecraftUuid(userId, minecraft.uuid);
   }
 
   async linkMinecraftAccount(linkData: MinecraftLinkData): Promise<{

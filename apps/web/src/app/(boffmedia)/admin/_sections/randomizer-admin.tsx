@@ -3,117 +3,14 @@
 import { useState, useEffect } from "react"
 import { useSearchParams, useRouter } from "next/navigation"
 import { useTranslations } from "next-intl"
-import { Button, Empty, Icon, Input, Modal, Spinner, toast, Select } from "@boffmedia/ui"
+import { Button, Empty, Icon, Input, Modal, Spinner, toast } from "@boffmedia/ui"
 import { AvPanel, AvSectionHead } from "../_components/ui/av-kit"
 import { RandomizerService } from "@/services/api/boffmedia/randomizerService"
-import { EventsService } from "@/services/api/boffmedia/eventsService"
-import type { RandomizerPreset, RandomizerConfig } from "@/services/api/boffmedia/randomizer.types"
+import type { RandomizerPreset } from "@/services/api/boffmedia/randomizer.types"
 import { RandomizerEditor } from "./randomizer/randomizer-editor"
 import { QuickRandomizeModal } from "./randomizer/QuickRandomizeModal"
 import { totalChanged } from "./randomizer/_components/catalog-view"
-import { ConfigsList } from "./randomizer/configs/ConfigsList"
-import { ConfigEditor } from "./randomizer/configs/ConfigEditor"
-import { ConfigAssignmentsList } from "./randomizer/configs/ConfigAssignmentsList"
 import { RomsView } from "./randomizer/roms/RomsView"
-
-/**
- * Configs management view with community event selection, config list/edit, and assignments.
- * Replaces tournament-based event management with event-based config management.
- */
-function ConfigsView() {
-  const t = useTranslations("randomizer.events")
-  const [events, setEvents] = useState<any[]>([])
-  const [selectedEventId, setSelectedEventId] = useState<string | null>(null)
-  const [loadingEvents, setLoadingEvents] = useState(false)
-  const [editingConfig, setEditingConfig] = useState<RandomizerConfig | null>(null)
-  const [showAssignments, setShowAssignments] = useState<RandomizerConfig | null>(null)
-
-  useEffect(() => {
-    loadEvents()
-  }, [])
-
-  const loadEvents = async () => {
-    setLoadingEvents(true)
-    try {
-      // Load community events (any game). createConfig validates emulator-pack
-      // attachment server-side; listing all events keeps this independent of the
-      // shared Event type exposing packId (pre generate:shared).
-      const res = await EventsService.getEvents()
-      setEvents(res.success ? res.data || [] : [])
-    } catch (err) {
-      toast({ tone: "bad", title: t("errorLoadingEvents"), msg: String(err) })
-    } finally {
-      setLoadingEvents(false)
-    }
-  }
-
-  // If editing a config, show the editor
-  if (editingConfig !== null) {
-    return (
-      <ConfigEditor
-        config={editingConfig}
-        eventId={selectedEventId ? Number(selectedEventId) : null}
-        onSave={() => {
-          setEditingConfig(null)
-          // Refresh configs list
-        }}
-        onCancel={() => setEditingConfig(null)}
-      />
-    )
-  }
-
-  // If viewing assignments, show the assignments list
-  if (showAssignments) {
-    return (
-      <ConfigAssignmentsList
-        config={showAssignments}
-        onClose={() => setShowAssignments(null)}
-      />
-    )
-  }
-
-  // Main configs view with event selector
-  return (
-    <div className="space-y-5">
-      <AvPanel>
-        <div className="space-y-3">
-          <Select
-            label={t("selectEvent")}
-            value={selectedEventId || ""}
-            options={[
-              { value: "", label: t("chooseEvent") },
-              ...events.map((ev) => ({
-                value: String(ev.id),
-                label: ev.title ?? ev.name ?? `#${ev.id}`,
-              })),
-            ]}
-            disabled={loadingEvents}
-            onChange={(v) => setSelectedEventId(v || null)}
-          />
-        </div>
-      </AvPanel>
-
-      {selectedEventId && (
-        <div>
-          <AvPanel className="mb-5">
-            <Button
-              onClick={() => setEditingConfig({} as any)}
-              className="w-full"
-            >
-              <Icon name="plus" size={16} />
-              {t("createConfig")}
-            </Button>
-          </AvPanel>
-          <ConfigsList
-            eventId={Number(selectedEventId)}
-            onEdit={setEditingConfig}
-            onShowAssignments={setShowAssignments}
-          />
-        </div>
-      )}
-    </div>
-  )
-}
 
 /**
  * Presets list view with create/edit/delete/import/export actions.
@@ -299,7 +196,7 @@ function PresetsView({ onLoad }: { onLoad: (preset: RandomizerPreset) => void })
 }
 
 /**
- * Main section: routes between Presets, Editor, and Events based on ?view=
+ * Main section: routes between Presets, Editor, and ROMs based on ?view=
  */
 export function RandomizerAdmin() {
   const t = useTranslations("randomizer")
@@ -343,13 +240,6 @@ export function RandomizerAdmin() {
               {t("chrome.editor")}
             </Button>
             <Button
-              variant={view === "configs" ? "pri" : "ghost"}
-              size="sm"
-              onClick={() => handleViewChange("configs")}
-            >
-              {t("chrome.configs")}
-            </Button>
-            <Button
               variant={view === "roms" ? "pri" : "ghost"}
               size="sm"
               onClick={() => handleViewChange("roms")}
@@ -368,7 +258,6 @@ export function RandomizerAdmin() {
             initialSettings={presetToLoad?.settingsJson}
           />
         )}
-        {view === "configs" && <ConfigsView />}
         {view === "roms" && <RomsView />}
       </div>
     </div>

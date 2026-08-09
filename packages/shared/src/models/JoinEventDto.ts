@@ -4,10 +4,6 @@
 /* eslint-disable */
 export type JoinEventDto = {
     /**
-     * The user ID trying to join the event
-     */
-    userId: number;
-    /**
      * Optional nickname for the participant
      */
     nickname?: string;

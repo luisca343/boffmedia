@@ -63,9 +63,42 @@ export interface PackVersionRow {
   createdAt: string;
 }
 
+/** A direct grant, keyed on the account that holds it. */
 export interface AccessRow {
+  userId: number;
+  username: string;
+  email: string;
+  source: 'admin' | 'invite';
+  sourceRef: string | null;
+  grantedAt: string;
+}
+
+/** A pre-grant to a raw Minecraft UUID with no account behind it yet. */
+export interface LegacyAccessRow {
   uuid: string;
   grantedAt: string;
+}
+
+export interface UserSearchHit {
+  id: number;
+  username: string;
+  email: string;
+}
+
+/** An event whose membership entitles its members to the pack. These people
+ *  hold no ACL row — access is derived live from the membership. */
+export interface GrantingEvent {
+  eventId: number;
+  title: string;
+  status: string;
+  visibility: string;
+  memberCount: number;
+}
+
+export interface PackAccess {
+  grants: AccessRow[];
+  legacy: LegacyAccessRow[];
+  events: GrantingEvent[];
 }
 
 export interface InviteRow {
@@ -360,15 +393,36 @@ export class PacksService {
   // ── Access ───────────────────────────────────────────────────────────────
 
   static access(packId: string) {
-    return apiAuthedAutoGET<AccessRow[]>(`/packs/admin/${packId}/access`);
+    return apiAuthedAutoGET<PackAccess>(`/packs/admin/${packId}/access`);
   }
 
+  static searchUsers(q: string) {
+    return apiAuthedAutoGET<UserSearchHit[]>(
+      `/packs/admin/users/search?q=${encodeURIComponent(q)}`,
+    );
+  }
+
+  static grantToUser(packId: string, userId: number) {
+    return apiAuthedAutoPOST<void>(`/packs/admin/${packId}/access`, { userId });
+  }
+
+  static revokeFromUser(packId: string, userId: number) {
+    return apiAuthedAutoDELETE<void>(
+      `/packs/admin/${packId}/access/user/${userId}`,
+    );
+  }
+
+  /** Pre-grant to a UUID for a player who has not registered yet. */
   static grant(packId: string, uuid: string) {
-    return apiAuthedAutoPOST<void>(`/packs/admin/${packId}/access`, { uuid });
+    return apiAuthedAutoPOST<void>(`/packs/admin/${packId}/access/legacy`, {
+      uuid,
+    });
   }
 
   static revoke(packId: string, uuid: string) {
-    return apiAuthedAutoDELETE<void>(`/packs/admin/${packId}/access/${uuid}`);
+    return apiAuthedAutoDELETE<void>(
+      `/packs/admin/${packId}/access/legacy/${uuid}`,
+    );
   }
 
   // ── Invites ──────────────────────────────────────────────────────────────

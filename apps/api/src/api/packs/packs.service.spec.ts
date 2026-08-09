@@ -6,6 +6,7 @@ import {
 import { Test, TestingModule } from '@nestjs/testing';
 import * as bcrypt from 'bcrypt';
 import { PacksRepository } from './packs.repository';
+import { RandomizerPackLinkRepository } from '@api/_repositories/randomizer/pack-link.repository';
 import { PacksService } from './packs.service';
 
 // These tests concentrate on the ONE thing worth being paranoid about: who can
@@ -13,7 +14,12 @@ import { PacksService } from './packs.service';
 // where a mistake hands a private pack to the wrong person.
 
 const UUID = '069a79f4-44e9-4726-a5be-fca90e38aaf5';
-const OTHER = '11111111-2222-3333-4444-555555555555';
+// Launcher requests still carry a Minecraft UUID; the service speaks
+// PackPrincipal so Phase 3 can swap in a Boffmedia id without touching it.
+const WHO = { mcUuid: UUID };
+// A launcher session: the account is the principal, the MC uuid rides along.
+const LAUNCHER = { userId: 7, username: 'TrainerAsh', mcUuid: UUID };
+const OTHER = { mcUuid: '11111111-2222-3333-4444-555555555555' };
 const sha512 = 'a'.repeat(128);
 
 // A launcher that can only parse minecraft (the pre-multi-game capability set).
@@ -60,6 +66,7 @@ const version = (over: Record<string, unknown> = {}) => ({
 describe('PacksService', () => {
   let service: PacksService;
   let repo: jest.Mocked<PacksRepository>;
+  let randomizerLink: jest.Mocked<RandomizerPackLinkRepository>;
 
   beforeEach(async () => {
     const mockRepo = {
@@ -71,21 +78,28 @@ describe('PacksService', () => {
       insertPack: jest.fn(),
       insertVersion: jest.fn(),
       grant: jest.fn(),
+      grantToUser: jest.fn(),
+      revokeFromUser: jest.fn(),
+      listGrants: jest.fn(),
+      claimLegacyGrants: jest.fn(),
       findInvite: jest.fn(),
       consumeInvite: jest.fn(),
       audit: jest.fn(),
-      getRandomizerConfigByPackId: jest.fn(),
     };
+
+    const mockLink = { findByPackId: jest.fn() };
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         PacksService,
         { provide: PacksRepository, useValue: mockRepo },
+        { provide: RandomizerPackLinkRepository, useValue: mockLink },
       ],
     }).compile();
 
     service = module.get(PacksService);
     repo = module.get(PacksRepository);
+    randomizerLink = module.get(RandomizerPackLinkRepository);
   });
 
   describe('manifestFor — the access gate', () => {
@@ -93,13 +107,13 @@ describe('PacksService', () => {
       repo.findById.mockResolvedValue(pack() as never);
       repo.hasAccess.mockResolvedValue(true);
       repo.findVersion.mockResolvedValue(version() as never);
-      repo.getRandomizerConfigByPackId.mockResolvedValue(null);
+      randomizerLink.findByPackId.mockResolvedValue(null);
 
-      const manifest = (await service.manifestFor(UUID, 'pk1', null, MC)) as {
+      const manifest = (await service.manifestFor(WHO, 'pk1', null, MC)) as {
         version: { files: unknown[] };
       };
       expect(manifest.version.files).toHaveLength(1);
-      expect(repo.hasAccess).toHaveBeenCalledWith('pk1', UUID);
+      expect(repo.hasAccess).toHaveBeenCalledWith('pk1', WHO);
     });
 
     it('refuses an allowlisted pack to a UUID with no grant', async () => {
@@ -117,17 +131,31 @@ describe('PacksService', () => {
       repo.hasAccess.mockResolvedValue(false);
       repo.findVersion.mockResolvedValue(version() as never);
 
-      await expect(service.manifestFor(UUID, 'pk1', null, MC)).rejects.toThrow(
+      await expect(service.manifestFor(WHO, 'pk1', null, MC)).rejects.toThrow(
         ForbiddenException,
       );
       // Rejected before the version was ever loaded.
       expect(repo.findVersion).not.toHaveBeenCalled();
     });
 
+    it('passes the principal through so entitlement can derive from membership', async () => {
+      // Access is the union of a direct grant and live event membership; the
+      // service must hand the repository the whole principal, not just a UUID,
+      // or the membership half of the check can never run.
+      repo.findById.mockResolvedValue(pack() as never);
+      repo.hasAccess.mockResolvedValue(true);
+      repo.findVersion.mockResolvedValue(version() as never);
+      randomizerLink.findByPackId.mockResolvedValue(null);
+
+      await service.manifestFor({ userId: 42 }, 'pk1', null, MC);
+
+      expect(repo.hasAccess).toHaveBeenCalledWith('pk1', { userId: 42 });
+    });
+
     it('serves a public pack without consulting the ACL at all', async () => {
       repo.findById.mockResolvedValue(pack({ accessKind: 'public' }) as never);
       repo.findVersion.mockResolvedValue(version() as never);
-      repo.getRandomizerConfigByPackId.mockResolvedValue(null);
+      randomizerLink.findByPackId.mockResolvedValue(null);
 
       await service.manifestFor(OTHER, 'pk1', null, MC);
       expect(repo.hasAccess).not.toHaveBeenCalled();
@@ -139,16 +167,16 @@ describe('PacksService', () => {
         pack({ accessKind: 'password', passwordHash }) as never,
       );
       repo.findVersion.mockResolvedValue(version() as never);
-      repo.getRandomizerConfigByPackId.mockResolvedValue(null);
+      randomizerLink.findByPackId.mockResolvedValue(null);
 
       await expect(
-        service.manifestFor(UUID, 'pk1', 'incorrecta', MC),
+        service.manifestFor(WHO, 'pk1', 'incorrecta', MC),
       ).rejects.toThrow(ForbiddenException);
-      await expect(service.manifestFor(UUID, 'pk1', null, MC)).rejects.toThrow(
+      await expect(service.manifestFor(WHO, 'pk1', null, MC)).rejects.toThrow(
         ForbiddenException,
       );
       await expect(
-        service.manifestFor(UUID, 'pk1', 'correcta', MC),
+        service.manifestFor(WHO, 'pk1', 'correcta', MC),
       ).resolves.toBeDefined();
     });
 
@@ -156,9 +184,9 @@ describe('PacksService', () => {
       repo.findById.mockResolvedValue(pack() as never);
       repo.hasAccess.mockResolvedValue(true);
       repo.findVersion.mockResolvedValue(version() as never);
-      repo.getRandomizerConfigByPackId.mockResolvedValue(null);
+      randomizerLink.findByPackId.mockResolvedValue(null);
 
-      const manifest = (await service.manifestFor(UUID, 'pk1', null, MC)) as {
+      const manifest = (await service.manifestFor(WHO, 'pk1', null, MC)) as {
         pack: { access: { kind: string; uuids?: string[] } };
       };
       expect(manifest.pack.access.kind).toBe('allowlist');
@@ -167,7 +195,7 @@ describe('PacksService', () => {
 
     it('hides an archived pack', async () => {
       repo.findById.mockResolvedValue(pack({ archived: true }) as never);
-      await expect(service.manifestFor(UUID, 'pk1', null, MC)).rejects.toThrow(
+      await expect(service.manifestFor(WHO, 'pk1', null, MC)).rejects.toThrow(
         NotFoundException,
       );
     });
@@ -178,9 +206,9 @@ describe('PacksService', () => {
       repo.findVersion.mockResolvedValue(
         version({ published: false }) as never,
       );
-      repo.getRandomizerConfigByPackId.mockResolvedValue(null);
+      randomizerLink.findByPackId.mockResolvedValue(null);
 
-      await expect(service.manifestFor(UUID, 'pk1', null, MC)).rejects.toThrow(
+      await expect(service.manifestFor(WHO, 'pk1', null, MC)).rejects.toThrow(
         NotFoundException,
       );
     });
@@ -191,7 +219,7 @@ describe('PacksService', () => {
       repo.findById.mockResolvedValue(pack() as never);
       repo.hasAccess.mockResolvedValue(true);
       repo.findVersion.mockResolvedValue(version() as never);
-      repo.getRandomizerConfigByPackId.mockResolvedValue({
+      randomizerLink.findByPackId.mockResolvedValue({
         id: 1,
         eventId: 42,
         gamePlatform: 'gba',
@@ -205,7 +233,7 @@ describe('PacksService', () => {
         updatedAt: new Date(),
       } as never);
 
-      const manifest = (await service.manifestFor(UUID, 'pk1', null, MC)) as {
+      const manifest = (await service.manifestFor(WHO, 'pk1', null, MC)) as {
         randomizer?: { eventId: number; cleanRomSha512: string };
       };
       expect(manifest.randomizer).toEqual({
@@ -218,7 +246,7 @@ describe('PacksService', () => {
       repo.findById.mockResolvedValue(pack() as never);
       repo.hasAccess.mockResolvedValue(true);
       repo.findVersion.mockResolvedValue(version() as never);
-      repo.getRandomizerConfigByPackId.mockResolvedValue({
+      randomizerLink.findByPackId.mockResolvedValue({
         id: 2,
         eventId: 99,
         gamePlatform: 'gba',
@@ -232,7 +260,7 @@ describe('PacksService', () => {
         updatedAt: new Date(),
       } as never);
 
-      const manifest = (await service.manifestFor(UUID, 'pk1', null, MC)) as {
+      const manifest = (await service.manifestFor(WHO, 'pk1', null, MC)) as {
         randomizer?: { eventId: number; cleanRomSha512: string };
       };
       expect(manifest.randomizer).toEqual({
@@ -245,7 +273,7 @@ describe('PacksService', () => {
       repo.findById.mockResolvedValue(pack() as never);
       repo.hasAccess.mockResolvedValue(true);
       repo.findVersion.mockResolvedValue(version() as never);
-      repo.getRandomizerConfigByPackId.mockResolvedValue({
+      randomizerLink.findByPackId.mockResolvedValue({
         id: 3,
         eventId: 123,
         gamePlatform: 'gba',
@@ -259,7 +287,7 @@ describe('PacksService', () => {
         updatedAt: new Date(),
       } as never);
 
-      const manifest = (await service.manifestFor(UUID, 'pk1', null, MC)) as {
+      const manifest = (await service.manifestFor(WHO, 'pk1', null, MC)) as {
         randomizer?: unknown;
       };
       expect(manifest.randomizer).toBeUndefined();
@@ -269,9 +297,9 @@ describe('PacksService', () => {
       repo.findById.mockResolvedValue(pack() as never);
       repo.hasAccess.mockResolvedValue(true);
       repo.findVersion.mockResolvedValue(version() as never);
-      repo.getRandomizerConfigByPackId.mockResolvedValue(null);
+      randomizerLink.findByPackId.mockResolvedValue(null);
 
-      const manifest = (await service.manifestFor(UUID, 'pk1', null, MC)) as {
+      const manifest = (await service.manifestFor(WHO, 'pk1', null, MC)) as {
         randomizer?: unknown;
       };
       expect(manifest.randomizer).toBeUndefined();
@@ -334,10 +362,10 @@ describe('PacksService', () => {
       } as never);
       repo.consumeInvite.mockResolvedValue(true);
 
-      await expect(service.redeemInvite(UUID, 'abc')).resolves.toEqual({
+      await expect(service.redeemInvite(LAUNCHER, 'abc')).resolves.toEqual({
         packId: 'pk1',
       });
-      expect(repo.grant).toHaveBeenCalledWith('pk1', UUID, null, 'abc');
+      expect(repo.grantToUser).toHaveBeenCalledWith('pk1', 7, 'invite', 'abc', null);
     });
 
     it('grants nothing when the code is exhausted, expired or revoked', async () => {
@@ -347,10 +375,10 @@ describe('PacksService', () => {
       } as never);
       repo.consumeInvite.mockResolvedValue(false);
 
-      await expect(service.redeemInvite(UUID, 'abc')).rejects.toThrow(
+      await expect(service.redeemInvite(LAUNCHER, 'abc')).rejects.toThrow(
         ForbiddenException,
       );
-      expect(repo.grant).not.toHaveBeenCalled();
+      expect(repo.grantToUser).not.toHaveBeenCalled();
     });
   });
 
@@ -361,12 +389,12 @@ describe('PacksService', () => {
         pack({ id: 'emu', gameType: 'emulator', latestVersionId: null }),
       ] as never);
 
-      const mcOnly = await service.listForLauncher(UUID, ['minecraft']);
+      const mcOnly = await service.listForLauncher(WHO, ['minecraft']);
       expect(mcOnly.map((p) => p.id)).toEqual(['mc']);
       // NULL column resolves to minecraft for the client.
       expect(mcOnly[0].gameType).toBe('minecraft');
 
-      const both = await service.listForLauncher(UUID, [
+      const both = await service.listForLauncher(WHO, [
         'minecraft',
         'emulator',
       ]);
@@ -385,7 +413,7 @@ describe('PacksService', () => {
           emulator: { kind: 'mgba', rom: 'roms/x.gba' },
         }) as never,
       );
-      const [entry] = await service.listForLauncher(UUID, [
+      const [entry] = await service.listForLauncher(WHO, [
         'minecraft',
         'emulator',
       ]);
@@ -395,7 +423,7 @@ describe('PacksService', () => {
 
     it('409s the manifest of a pack whose game type the caller cannot parse', async () => {
       repo.findById.mockResolvedValue(pack({ gameType: 'emulator' }) as never);
-      await expect(service.manifestFor(UUID, 'pk1', null, MC)).rejects.toThrow(
+      await expect(service.manifestFor(WHO, 'pk1', null, MC)).rejects.toThrow(
         ConflictException,
       );
       // Rejected before any access or version work.

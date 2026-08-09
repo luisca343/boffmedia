@@ -296,6 +296,9 @@ export function ProfileView({
                 discordEnabled={discordEnabled}
                 twitchEnabled={twitchEnabled}
                 onUnlink={handleUnlink}
+                // A fresh link changes mcLinked and the SmartRotom half of the
+                // session, neither of which the page can know about otherwise.
+                onMinecraftLinked={() => window.location.reload()}
               />
 
               <Panel title={t("section.activity")}>

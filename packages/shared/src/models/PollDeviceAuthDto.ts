@@ -2,10 +2,10 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export type JoinTeamDto = {
+export type PollDeviceAuthDto = {
     /**
-     * The ID of the participant joining the team
+     * La mitad secreta devuelta por /auth/device
      */
-    participantId: number;
+    deviceCode: string;
 };
 

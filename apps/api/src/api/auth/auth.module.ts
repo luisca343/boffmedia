@@ -1,3 +1,4 @@
+import { HttpModule } from '@nestjs/axios';
 import { Module } from '@nestjs/common';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
@@ -8,6 +9,9 @@ import { AuthService } from './auth.service';
 import { PasswordResetService } from './password-reset.service';
 import { EmailVerificationService } from './email-verification.service';
 import { AuthController } from './auth.controller';
+import { MinecraftController } from './minecraft.controller';
+import { MinecraftLinkService } from './minecraft-link.service';
+import { MinecraftHandshakeService } from './minecraft-handshake.service';
 import { DrizzleModule } from '@api/_utils/drizzle/drizzle.module';
 import { StarbankModule } from '@api/smartrotom/starbank/starbank.module';
 import { BoffMediaUsersModule } from '@api/boffmedia/users/users.module';
@@ -22,19 +26,28 @@ import { MailModule } from '@api/mail/mail.module';
     BoffMediaUsersModule,
     PasswordModule,
     MailModule,
+    // Microsoft's device-code endpoints and Mojang's sessionserver.
+    HttpModule,
     JwtModule.register({
       secret: env.JWT_SECRET,
       signOptions: { expiresIn: '1h' },
     }),
   ],
-  controllers: [AuthController],
+  controllers: [AuthController, MinecraftController],
   providers: [
     GoogleStrategy,
     JwtStrategy,
     AuthService,
     PasswordResetService,
     EmailVerificationService,
+    MinecraftLinkService,
+    MinecraftHandshakeService,
   ],
-  exports: [AuthService, JwtModule, EmailVerificationService],
+  exports: [
+    AuthService,
+    JwtModule,
+    EmailVerificationService,
+    MinecraftHandshakeService,
+  ],
 })
 export class AuthModule {}

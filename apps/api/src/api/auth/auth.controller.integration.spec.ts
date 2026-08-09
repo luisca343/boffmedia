@@ -23,8 +23,7 @@ const mockAuthService = {
   validateUser: jest.fn(),
   login: jest.fn(),
   loginMC: jest.fn(),
-  registerMinecraft: jest.fn(),
-  linkMinecraft: jest.fn(),
+  loginProvenMinecraft: jest.fn(),
   refreshToken: jest.fn(),
   googleLogin: jest.fn(),
 };
@@ -209,98 +208,6 @@ describe('AuthController — integration (ValidationPipe + GlobalExceptionFilter
     });
   });
 
-  // ── POST /auth/register-minecraft — RegisterMinecraftDto validation ────
-  describe('POST /auth/register-minecraft — RegisterMinecraftDto validation', () => {
-    const validBody = {
-      username: 'TrainerAsh',
-      email: 'ash@pokemon.com',
-      password: 'securepw1',
-      minecraft: {
-        username: 'AshMC',
-        uuid: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4',
-        world: 'world1',
-      },
-    };
-
-    it('returns 400 when username is missing', async () => {
-      const { username: _u, ...body } = validBody;
-      const res = await request(app.getHttpServer())
-        .post('/auth/register-minecraft')
-        .send(body);
-
-      expect(res.status).toBe(400);
-      expect(res.body.statusCode).toBe(400);
-    });
-
-    it('returns 400 when email is invalid', async () => {
-      const res = await request(app.getHttpServer())
-        .post('/auth/register-minecraft')
-        .send({ ...validBody, email: 'not-an-email' });
-
-      expect(res.status).toBe(400);
-    });
-
-    it('returns 400 when password is shorter than 8 characters', async () => {
-      const res = await request(app.getHttpServer())
-        .post('/auth/register-minecraft')
-        .send({ ...validBody, password: 'short' });
-
-      expect(res.status).toBe(400);
-    });
-
-    it('returns 400 when minecraft object is missing', async () => {
-      const { minecraft: _mc, ...body } = validBody;
-      const res = await request(app.getHttpServer())
-        .post('/auth/register-minecraft')
-        .send(body);
-
-      expect(res.status).toBe(400);
-    });
-
-    it('returns 400 when minecraft.uuid is not a valid UUID', async () => {
-      const res = await request(app.getHttpServer())
-        .post('/auth/register-minecraft')
-        .send({
-          ...validBody,
-          minecraft: { ...validBody.minecraft, uuid: 'not-a-uuid' },
-        });
-
-      expect(res.status).toBe(400);
-    });
-
-    it('returns 400 when minecraft.world is missing', async () => {
-      const res = await request(app.getHttpServer())
-        .post('/auth/register-minecraft')
-        .send({
-          ...validBody,
-          minecraft: {
-            username: 'AshMC',
-            uuid: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4',
-          },
-        });
-
-      expect(res.status).toBe(400);
-    });
-
-    it('calls AuthService when body is valid', async () => {
-      mockAuthService.registerMinecraft.mockResolvedValue({
-        access_token: 'tok',
-      });
-
-      const res = await request(app.getHttpServer())
-        .post('/auth/register-minecraft')
-        .send(validBody);
-
-      expect(res.status).toBeLessThan(300);
-      expect(mockAuthService.registerMinecraft).toHaveBeenCalledWith(
-        expect.objectContaining({
-          username: 'TrainerAsh',
-          email: 'ash@pokemon.com',
-        }),
-      );
-    });
-  });
-
   // ── POST /auth/refresh — RefreshTokenDto validation ────────────────────
   describe('POST /auth/refresh — RefreshTokenDto validation', () => {
     it('returns 400 when refresh_token is missing', async () => {
@@ -322,81 +229,6 @@ describe('AuthController — integration (ValidationPipe + GlobalExceptionFilter
 
       expect(res.status).toBeLessThan(300);
       expect(mockAuthService.refreshToken).toHaveBeenCalledWith('some-token');
-    });
-  });
-
-  // ── POST /auth/link-minecraft — RegisterMinecraftDto validation ────────
-  describe('POST /auth/link-minecraft — RegisterMinecraftDto validation', () => {
-    const validBody = {
-      username: 'TrainerAsh',
-      email: 'ash@pokemon.com',
-      password: 'securepw1',
-      minecraft: {
-        username: 'AshMC',
-        uuid: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4',
-        world: 'world1',
-      },
-    };
-
-    it('returns 400 when username is missing', async () => {
-      const { username: _u, ...body } = validBody;
-      const res = await request(app.getHttpServer())
-        .post('/auth/link-minecraft')
-        .send(body);
-
-      expect(res.status).toBe(400);
-    });
-
-    it('returns 400 when email is invalid', async () => {
-      const res = await request(app.getHttpServer())
-        .post('/auth/link-minecraft')
-        .send({ ...validBody, email: 'not-an-email' });
-
-      expect(res.status).toBe(400);
-    });
-
-    it('returns 400 when password is shorter than 8 characters', async () => {
-      const res = await request(app.getHttpServer())
-        .post('/auth/link-minecraft')
-        .send({ ...validBody, password: 'short' });
-
-      expect(res.status).toBe(400);
-    });
-
-    it('returns 400 when minecraft object is missing', async () => {
-      const { minecraft: _mc, ...body } = validBody;
-      const res = await request(app.getHttpServer())
-        .post('/auth/link-minecraft')
-        .send(body);
-
-      expect(res.status).toBe(400);
-    });
-
-    it('returns 400 when minecraft.uuid is not a valid UUID', async () => {
-      const res = await request(app.getHttpServer())
-        .post('/auth/link-minecraft')
-        .send({
-          ...validBody,
-          minecraft: { ...validBody.minecraft, uuid: 'not-a-uuid' },
-        });
-
-      expect(res.status).toBe(400);
-    });
-
-    it('calls AuthService.linkMinecraft when body is valid', async () => {
-      mockAuthService.linkMinecraft.mockResolvedValue({ access_token: 'tok' });
-
-      const res = await request(app.getHttpServer())
-        .post('/auth/link-minecraft')
-        .send(validBody);
-
-      expect(res.status).toBeLessThan(300);
-      expect(mockAuthService.linkMinecraft).toHaveBeenCalledWith(
-        expect.objectContaining({
-          username: 'TrainerAsh',
-          email: 'ash@pokemon.com',
-        }),
-      );
     });
   });
 

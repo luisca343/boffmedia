@@ -1,7 +1,7 @@
 import { apiAuthedDELETE, apiAuthedGET, apiAuthedPUT } from '@/services/boffAPI';
 import type {
   CreateMatchDto,
-  CreatePresetDto,
+  CreateTrackerPresetDto,
   CreateSessionDto,
   MatchDto,
   MatchNoteDto,
@@ -121,7 +121,7 @@ type TrackerSeriesWrite = Omit<UpsertSeriesDto, 'seriesResult'> & {
   updatedAt?: number;
 };
 
-type TrackerPresetWrite = CreatePresetDto & {
+type TrackerPresetWrite = CreateTrackerPresetDto & {
   updatedAt?: number;
 };
 
@@ -182,7 +182,7 @@ function toSeriesPayload(series: TrackerSeriesWrite): UpsertSeriesDto {
   };
 }
 
-function toPresetPayload(preset: TrackerPresetWrite): CreatePresetDto {
+function toPresetPayload(preset: TrackerPresetWrite): CreateTrackerPresetDto {
   return {
     id: preset.id,
     name: preset.name,

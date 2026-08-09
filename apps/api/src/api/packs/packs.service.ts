@@ -8,11 +8,13 @@ import {
 import * as bcrypt from 'bcrypt';
 import { randomBytes } from 'crypto';
 import { PackManifest } from '@boffmedia/pack-schema';
-import { PacksRepository } from './packs.repository';
+import { PackPrincipal, PacksRepository } from './packs.repository';
+import { RandomizerPackLinkRepository } from '@api/_repositories/randomizer/pack-link.repository';
 import type { GameType, PackAccessKind, PackLoader } from '@/_db/schema/Packs';
 import {
   AUDIT,
   AdminPackView,
+  LauncherPrincipal,
   LauncherPackView,
   PackVersionView,
   StoredPackFile,
@@ -28,7 +30,10 @@ const INVITE_BYTES = 8;
 
 @Injectable()
 export class PacksService {
-  constructor(private readonly repo: PacksRepository) {}
+  constructor(
+    private readonly repo: PacksRepository,
+    private readonly randomizerLink: RandomizerPackLinkRepository,
+  ) {}
 
   private newId(): string {
     return randomBytes(ID_BYTES).toString('hex');
@@ -58,10 +63,10 @@ export class PacksService {
    *  lists a pack of that type. `capabilities` is the parsed X-Boff-Game-Types
    *  set (absent header → ['minecraft'], §3.1). */
   async listForLauncher(
-    uuid: string,
+    principal: PackPrincipal,
     capabilities: string[],
   ): Promise<LauncherPackView[]> {
-    const rows = await this.repo.listVisibleTo(uuid);
+    const rows = await this.repo.listVisibleTo(principal);
     const canParse = new Set(capabilities);
 
     const views = await Promise.all(
@@ -152,7 +157,7 @@ export class PacksService {
    * closes the side-door a shared id / redeemed invite would otherwise open.
    */
   async manifestFor(
-    uuid: string,
+    principal: PackPrincipal,
     packId: string,
     password: string | null,
     capabilities: string[],
@@ -174,7 +179,7 @@ export class PacksService {
       pack.id,
       pack.accessKind,
       pack.passwordHash,
-      uuid,
+      principal,
       password,
     );
 
@@ -190,14 +195,12 @@ export class PacksService {
       );
     }
 
-    await this.repo.audit(AUDIT.MANIFEST_SERVED, pack.id, uuid, {
+    await this.repo.audit(AUDIT.MANIFEST_SERVED, pack.id, principal.mcUuid ?? null, {
       versionId: version.id,
     });
 
     // Fetch randomizer config if this pack is linked to an active event
-    const randomizerConfig = await this.repo.getRandomizerConfigByPackId(
-      pack.id,
-    );
+    const randomizerConfig = await this.randomizerLink.findByPackId(pack.id);
 
     // Built to the shape @boffmedia/pack-schema defines and validated with it
     // before leaving the server: the launcher parses these exact bytes with the
@@ -265,7 +268,7 @@ export class PacksService {
    * make us fetch it.
    */
   async entitledFile(
-    uuid: string,
+    principal: PackPrincipal,
     packId: string,
     password: string | null,
     match: (file: StoredPackFile) => boolean,
@@ -278,7 +281,7 @@ export class PacksService {
       pack.id,
       pack.accessKind,
       pack.passwordHash,
-      uuid,
+      principal,
       password,
     );
 
@@ -298,7 +301,7 @@ export class PacksService {
       );
     }
 
-    await this.repo.audit(AUDIT.FILE_SERVED, pack.id, uuid, {
+    await this.repo.audit(AUDIT.FILE_SERVED, pack.id, principal.mcUuid ?? null, {
       versionId: version.id,
       path: file.path,
       source: file.source.kind,
@@ -306,7 +309,10 @@ export class PacksService {
     return file;
   }
 
-  async redeemInvite(uuid: string, code: string): Promise<{ packId: string }> {
+  async redeemInvite(
+    principal: LauncherPrincipal,
+    code: string,
+  ): Promise<{ packId: string }> {
     const invite = await this.repo.findInvite(code);
     if (!invite) throw new NotFoundException('Código de invitación no válido');
 
@@ -315,8 +321,19 @@ export class PacksService {
       throw new ForbiddenException('Este código ya no se puede usar');
     }
 
-    await this.repo.grant(invite.packId, uuid, null, code);
-    await this.repo.audit(AUDIT.INVITE_REDEEMED, invite.packId, uuid, { code });
+    await this.repo.grantToUser(
+      invite.packId,
+      principal.userId,
+      'invite',
+      code,
+      null,
+    );
+    await this.repo.audit(
+      AUDIT.INVITE_REDEEMED,
+      invite.packId,
+      principal.mcUuid ?? null,
+      { code, userId: principal.userId },
+    );
     return { packId: invite.packId };
   }
 
@@ -655,6 +672,7 @@ export class PacksService {
       initialFiles: pv.initialFiles ?? null,
       notes: dto.notes ?? null,
       published: false,
+      createdBy: actorId,
     });
     await this.repo.audit(AUDIT.VERSION_CREATED, packId, null, {
       actorId,
@@ -685,10 +703,54 @@ export class PacksService {
     });
   }
 
+  /** All three answers to "who can install this": direct grants, legacy UUID
+   *  pre-grants still waiting for an account, and the events whose membership
+   *  derives access without any row of its own. */
   async listAccess(packId: string) {
-    return this.repo.listAcl(packId);
+    const [grants, legacy, events] = await Promise.all([
+      this.repo.listGrants(packId),
+      this.repo.listAcl(packId),
+      this.repo.listGrantingEvents(packId),
+    ]);
+    return { grants, legacy, events };
   }
 
+  async searchUsers(q: string) {
+    return q.trim().length < 2 ? [] : this.repo.searchUsers(q.trim());
+  }
+
+  /** Grant to an ACCOUNT. This is the normal path. */
+  async grantToUser(
+    packId: string,
+    userId: number,
+    actorId: number | null,
+  ): Promise<void> {
+    const pack = await this.repo.findById(packId);
+    if (!pack) throw new NotFoundException('Pack no encontrado');
+    await this.repo.grantToUser(packId, userId, 'admin', null, actorId);
+    await this.repo.audit(AUDIT.ACCESS_GRANTED, packId, null, {
+      actorId,
+      userId,
+    });
+  }
+
+  async revokeFromUser(
+    packId: string,
+    userId: number,
+    actorId: number | null,
+  ): Promise<void> {
+    await this.repo.revokeFromUser(packId, userId);
+    await this.repo.audit(AUDIT.ACCESS_REVOKED, packId, null, {
+      actorId,
+      userId,
+    });
+  }
+
+  /**
+   * Pre-grant to a raw Minecraft UUID. Kept for the one case accounts cannot
+   * cover: granting to a player who has not registered yet. Becomes a real
+   * grant when that UUID is linked (`claimLegacyGrants`).
+   */
   async grant(
     packId: string,
     uuid: string,
@@ -711,6 +773,12 @@ export class PacksService {
     await this.repo.audit(AUDIT.ACCESS_REVOKED, packId, uuid.toLowerCase(), {
       actorId,
     });
+  }
+
+  /** Called when a Minecraft account is linked: the moment a pre-grant finally
+   *  has an account to belong to. */
+  async claimLegacyGrants(userId: number, mcUuid: string): Promise<number> {
+    return this.repo.claimLegacyGrants(userId, mcUuid.toLowerCase());
   }
 
   async createInvite(
@@ -765,7 +833,7 @@ export class PacksService {
     packId: string,
     accessKind: string,
     passwordHash: string | null,
-    uuid: string,
+    principal: PackPrincipal,
     password: string | null,
   ): Promise<void> {
     if (accessKind === 'public') return;
@@ -779,7 +847,7 @@ export class PacksService {
       return;
     }
 
-    if (!(await this.repo.hasAccess(packId, uuid))) {
+    if (!(await this.repo.hasAccess(packId, principal))) {
       throw new ForbiddenException('Tu cuenta no tiene acceso a este pack');
     }
   }

@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { TrackerRepository } from './tracker.repository';
 import {
-  CreatePresetDto,
+  CreateTrackerPresetDto,
   CreateSessionDto,
   CreateMatchDto,
   UpdateMatchDto,
@@ -63,7 +63,7 @@ export class TrackerService {
   async upsertPreset(
     userId: number,
     id: string,
-    dto: CreatePresetDto,
+    dto: CreateTrackerPresetDto,
   ): Promise<void> {
     const existing = await this.repo.findPreset(id);
     if (existing) {

@@ -29,6 +29,20 @@ import {
 } from '@/_db/schema/BoffMediaEvents';
 import { Logger } from 'nestjs-pino';
 
+/**
+ * Drizzle wraps driver errors in a query error and hangs the real mysql2 error
+ * off `.cause` (the transaction path nests it further), so a top-level
+ * `error.code` check misses ER_DUP_ENTRY. Walk the cause chain instead.
+ */
+function isDuplicateEntry(error: unknown): boolean {
+  let e: any = error;
+  while (e) {
+    if (e.code === 'ER_DUP_ENTRY') return true;
+    e = e.cause;
+  }
+  return false;
+}
+
 @Injectable()
 export class RandomizerRepository {
   constructor(
@@ -38,30 +52,6 @@ export class RandomizerRepository {
   ) {}
 
   // ==================== CONFIGS ====================
-
-  async createConfig(data: NewRandomizerConfig): Promise<number> {
-    try {
-      const result = await this.db
-        .insert(randomizerConfigs)
-        .values(data)
-        .execute();
-
-      return result[0].insertId;
-    } catch (error: any) {
-      this.logger.error('Failed to create randomizer config:', error);
-      // event_id is unique: one config per event. Surface the collision as a
-      // 409 instead of an opaque 500 so the admin UI can tell the user a config
-      // already exists (and to edit/delete it instead of re-creating).
-      if (error?.code === 'ER_DUP_ENTRY') {
-        throw new ConflictException({
-          message: `A randomizer config already exists for event ${data.eventId}`,
-          userMessage:
-            'Ya existe una configuración para este evento. Edítala o elimínala antes de crear otra.',
-        });
-      }
-      throw new Error(`Config creation failed: ${error.message}`);
-    }
-  }
 
   /**
    * Insert a config AND attach its pack to the event in one transaction, so a
@@ -86,7 +76,7 @@ export class RandomizerRepository {
       });
     } catch (error: any) {
       this.logger.error('Failed to create randomizer config:', error);
-      if (error?.code === 'ER_DUP_ENTRY') {
+      if (isDuplicateEntry(error)) {
         throw new ConflictException({
           message: `A randomizer config already exists for event ${data.eventId}`,
           userMessage:
@@ -111,7 +101,7 @@ export class RandomizerRepository {
   }
 
   /**
-   * The launcher resolves a pack to at most one event (getConfigByPackId takes
+   * The launcher resolves a pack to at most one event (the link lookup takes
    * the first row), so a pack must map to a single event. Return the id of any
    * OTHER event already holding this pack, or null.
    */
@@ -138,15 +128,6 @@ export class RandomizerRepository {
     await this.db
       .update(boffMediaEvents)
       .set({ packId })
-      .where(eq(boffMediaEvents.id, eventId))
-      .execute();
-  }
-
-  /** Set an event's lifecycle status (used to activate on config open). */
-  async setEventStatus(eventId: number, status: string): Promise<void> {
-    await this.db
-      .update(boffMediaEvents)
-      .set({ status: status as any })
       .where(eq(boffMediaEvents.id, eventId))
       .execute();
   }
@@ -185,40 +166,6 @@ export class RandomizerRepository {
     }
   }
 
-  /**
-   * Resolve a pack to its randomizer config: the config of the ACTIVE
-   * community event that has this pack attached. Returns null if no such
-   * event/config (→ launcher renders no panel). Config-status gating
-   * (open/closed/published) is left to the caller (getMyAssignment).
-   */
-  async getConfigByPackId(packId: string): Promise<RandomizerConfig | null> {
-    if (!packId) {
-      return null;
-    }
-
-    try {
-      const rows = await this.db
-        .select({ config: randomizerConfigs })
-        .from(boffMediaEvents)
-        .innerJoin(
-          randomizerConfigs,
-          eq(randomizerConfigs.eventId, boffMediaEvents.id),
-        )
-        .where(
-          and(
-            eq(boffMediaEvents.packId, packId),
-            eq(boffMediaEvents.status, EVENT_STATUS.ACTIVE),
-          ),
-        )
-        .execute();
-
-      return rows.length > 0 ? rows[0].config : null;
-    } catch (error: any) {
-      this.logger.error(`Failed to get config by pack ${packId}:`, error);
-      throw new Error(`Config retrieval failed: ${error.message}`);
-    }
-  }
-
   async getConfigByEventId(eventId: number): Promise<RandomizerConfig | null> {
     if (!eventId || eventId <= 0) {
       return null;
@@ -247,6 +194,69 @@ export class RandomizerRepository {
     } catch (error: any) {
       this.logger.error('Failed to list configs:', error);
       throw new Error(`Configs listing failed: ${error.message}`);
+    }
+  }
+
+  /** All configs with their event's pack + status, for resolvability enrichment. */
+  async listConfigsWithEventMeta(): Promise<
+    Array<{
+      config: RandomizerConfig;
+      packId: string | null;
+      eventStatus: string;
+    }>
+  > {
+    try {
+      return await this.db
+        .select({
+          config: randomizerConfigs,
+          packId: boffMediaEvents.packId,
+          eventStatus: boffMediaEvents.status,
+        })
+        .from(randomizerConfigs)
+        .innerJoin(
+          boffMediaEvents,
+          eq(boffMediaEvents.id, randomizerConfigs.eventId),
+        )
+        .execute();
+    } catch (error: any) {
+      this.logger.error('Failed to list configs with event meta:', error);
+      throw new Error(`Configs listing failed: ${error.message}`);
+    }
+  }
+
+  async countAssignmentsByConfig(configId: number): Promise<number> {
+    const rows = await this.db
+      .select({ n: sql<number>`count(*)` })
+      .from(randomizerAssignments)
+      .where(eq(randomizerAssignments.configId, configId))
+      .execute();
+    return Number(rows[0]?.n ?? 0);
+  }
+
+  /**
+   * Delete a config AND free its event's pack in one transaction — the
+   * symmetric undo of createConfigAndAttachPack, so the pack becomes
+   * attachable to another event.
+   */
+  async deleteConfigAndDetachPack(
+    configId: number,
+    eventId: number,
+  ): Promise<void> {
+    try {
+      await this.db.transaction(async (tx) => {
+        await tx
+          .delete(randomizerConfigs)
+          .where(eq(randomizerConfigs.id, configId))
+          .execute();
+        await tx
+          .update(boffMediaEvents)
+          .set({ packId: null })
+          .where(eq(boffMediaEvents.id, eventId))
+          .execute();
+      });
+    } catch (error: any) {
+      this.logger.error(`Failed to delete config ${configId}:`, error);
+      throw new Error(`Config deletion failed: ${error.message}`);
     }
   }
 
@@ -286,11 +296,11 @@ export class RandomizerRepository {
     }
   }
 
-  async getAssignmentByConfigAndMcUuid(
+  async getAssignmentByConfigAndUser(
     configId: number,
-    mcUuid: string,
+    userId: number,
   ): Promise<RandomizerAssignment | null> {
-    if (!configId || !mcUuid) {
+    if (!configId || !userId) {
       return null;
     }
 
@@ -301,7 +311,7 @@ export class RandomizerRepository {
         .where(
           and(
             eq(randomizerAssignments.configId, configId),
-            eq(randomizerAssignments.mcUuid, mcUuid),
+            eq(randomizerAssignments.boffmediaUserId, userId),
           ),
         )
         .execute();
@@ -309,7 +319,7 @@ export class RandomizerRepository {
       return rows.length > 0 ? rows[0] : null;
     } catch (error: any) {
       this.logger.error(
-        `Failed to get assignment for config ${configId}, MC UUID ${mcUuid}:`,
+        `Failed to get assignment for config ${configId}, user ${userId}:`,
         error,
       );
       throw new Error(`Assignment retrieval failed: ${error.message}`);
@@ -385,32 +395,27 @@ export class RandomizerRepository {
   // ==================== ENTITLEMENT RESOLUTION ====================
 
   /**
-   * Resolve boffmedia user ID and event participant status via the identity chain:
-   * mcUuid → boffMediaUsers (uuid = mcUuid)
-   *       → boffMediaParticipants (userId)
-   *       → boffMediaEventParticipants (participantId, eventId)
+   * Returns { boffmediaUserId, status } if registered/confirmed, else null.
    *
-   * Returns { boffmediaUserId, status } if registered/confirmed, or null if not eligible.
+   * Direct join on the account. This used to walk MC UUID → boffmedia_users →
+   * participants, which meant a player who joined an event but never linked
+   * Minecraft could not claim a seed for an emulator event.
    */
   async resolveEventEntitlement(
     eventId: number,
-    mcUuid: string,
+    userId: number,
   ): Promise<{ boffmediaUserId: number; status: string } | null> {
-    if (!eventId || eventId <= 0 || !mcUuid) {
+    if (!eventId || eventId <= 0 || !userId) {
       return null;
     }
 
     try {
       const rows = await this.db
         .select({
-          boffmediaUserId: boffMediaUsers.id,
+          boffmediaUserId: boffMediaParticipants.userId,
           status: boffMediaEventParticipants.status,
         })
-        .from(boffMediaUsers)
-        .innerJoin(
-          boffMediaParticipants,
-          eq(boffMediaParticipants.userId, boffMediaUsers.id),
-        )
+        .from(boffMediaParticipants)
         .innerJoin(
           boffMediaEventParticipants,
           and(
@@ -421,7 +426,7 @@ export class RandomizerRepository {
             eq(boffMediaEventParticipants.eventId, eventId),
           ),
         )
-        .where(eq(boffMediaUsers.uuid, mcUuid))
+        .where(eq(boffMediaParticipants.userId, userId))
         .execute();
 
       if (rows.length === 0) {
@@ -435,12 +440,12 @@ export class RandomizerRepository {
       }
 
       return {
-        boffmediaUserId: row.boffmediaUserId,
+        boffmediaUserId: row.boffmediaUserId!,
         status: row.status,
       };
     } catch (error: any) {
       this.logger.error(
-        `Failed to resolve entitlement for event ${eventId}, MC UUID ${mcUuid}:`,
+        `Failed to resolve entitlement for event ${eventId}, user ${userId}:`,
         error,
       );
       throw new Error(`Entitlement resolution failed: ${error.message}`);
@@ -609,7 +614,7 @@ export class RandomizerRepository {
         .execute();
       return result[0].insertId;
     } catch (error: any) {
-      if (error?.code === 'ER_DUP_ENTRY') {
+      if (isDuplicateEntry(error)) {
         throw new ConflictException({
           message: `A ROM with sha512 ${data.sha512} already exists in the library`,
           userMessage:

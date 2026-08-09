@@ -16,7 +16,6 @@ import { PasswordResetService } from './password-reset.service';
 import { EmailVerificationService } from './email-verification.service';
 import { CreateUserDto } from '@api/boffmedia/users/dto/create-user.dto';
 import { LoginMcDto } from './dto/login-mc.dto';
-import { RegisterMinecraftDto } from './dto/register-minecraft.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { GoogleCallbackDto } from './dto/google-callback.dto';
 import { DiscordCallbackDto } from './dto/discord-callback.dto';
@@ -67,7 +66,14 @@ export class AuthController {
     return this.authService.login(user);
   }
 
+  // `loginmc` authenticates on the `MC_WORLD` string, which is documented as
+  // non-secret and ships in the browser bundle. It survives only because the
+  // in-game MCEF page has nothing else yet; the sessions it mints are scoped to
+  // `ingame` and cannot touch the account, and it is throttled per username.
+  // `/auth/minecraft/session` below is its replacement, waiting on the mod.
   @Post('loginmc')
+  @UseGuards(AuthThrottlerGuard)
+  @Throttle({ default: { ttl: 60_000, limit: 10 } })
   @ApiOperation({ summary: 'Login Minecraft user' })
   @ApiResponse({
     status: HttpStatus.OK,
@@ -76,34 +82,6 @@ export class AuthController {
   })
   async loginMC(@Body() loginMC: LoginMcDto) {
     return this.authService.loginMC(loginMC);
-  }
-
-  @Post('register-minecraft')
-  @ApiOperation({ summary: 'Register user with Minecraft account' })
-  @ApiResponse({
-    status: HttpStatus.CREATED,
-    description: 'User registered successfully.',
-  })
-  @ApiResponse({
-    status: HttpStatus.BAD_REQUEST,
-    description: 'Invalid input data.',
-  })
-  async registerMinecraft(@Body() registerDto: RegisterMinecraftDto) {
-    return this.authService.registerMinecraft(registerDto);
-  }
-
-  @Post('link-minecraft')
-  @ApiOperation({ summary: 'Link existing BoffMedia account to Minecraft' })
-  @ApiResponse({
-    status: HttpStatus.OK,
-    description: 'Minecraft account linked successfully.',
-  })
-  @ApiResponse({
-    status: HttpStatus.BAD_REQUEST,
-    description: 'Invalid input data.',
-  })
-  async linkMinecraft(@Body() linkDto: RegisterMinecraftDto) {
-    return this.authService.linkMinecraft(linkDto);
   }
 
   @Post('refresh')

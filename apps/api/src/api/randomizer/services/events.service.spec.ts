@@ -26,6 +26,7 @@ describe('EventsService', () => {
       listPresets: jest.fn(),
       createConfigAndAttachPack: jest.fn(),
       getConfigById: jest.fn(),
+      getEventPackAndStatus: jest.fn().mockResolvedValue(null),
       getEmulatorPack: jest.fn(),
       findEventHoldingPack: jest.fn(),
       getRomById: jest.fn(),
@@ -257,6 +258,58 @@ describe('EventsService', () => {
       await expect(
         service.settingsJsonBytesForConfig(config as any),
       ).rejects.toThrow(BadRequestException);
+    });
+  });
+
+  describe('openConfig()', () => {
+    const draftConfig = {
+      id: 7,
+      eventId: 12,
+      status: 'draft',
+      romId: 3,
+    };
+
+    beforeEach(() => {
+      jest
+        .spyOn(service, 'getConfig')
+        .mockResolvedValue(draftConfig as never);
+      repository.updateConfig = jest.fn();
+      repository.appendAudit = jest.fn();
+    });
+
+    it('refuses to open when the event is not active', async () => {
+      // The randomizer consumes the event lifecycle now; it used to flip the
+      // event to active itself, which is why an event with no randomizer config
+      // could never go live.
+      repository.getEventPackAndStatus.mockResolvedValue({
+        packId: 'pack1',
+        status: 'upcoming',
+      });
+
+      await expect(service.openConfig(7)).rejects.toThrow(ConflictException);
+      expect(repository.updateConfig).not.toHaveBeenCalled();
+    });
+
+    it('opens when the event is already active', async () => {
+      repository.getEventPackAndStatus.mockResolvedValue({
+        packId: 'pack1',
+        status: 'active',
+      });
+
+      await service.openConfig(7);
+
+      expect(repository.updateConfig).toHaveBeenCalledWith(7, {
+        status: 'open',
+      });
+    });
+
+    it('refuses to open when the event has no pack attached', async () => {
+      repository.getEventPackAndStatus.mockResolvedValue({
+        packId: null,
+        status: 'active',
+      });
+
+      await expect(service.openConfig(7)).rejects.toThrow(ConflictException);
     });
   });
 });

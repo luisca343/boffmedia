@@ -5,6 +5,7 @@ import {
   Get,
   HttpStatus,
   Param,
+  ParseIntPipe,
   Patch,
   Post,
   Query,
@@ -37,11 +38,13 @@ import {
   CreatePackDto,
   CreateVersionDto,
   GrantAccessDto,
+  GrantUserAccessDto,
   ResolveFileDto,
   UpdatePackDto,
 } from './dto/packs.dto';
 import {
-  AccessRowEntity,
+  PackAccessEntity,
+  UserSearchHitEntity,
   AdminPackEntity,
   BlobUploadEntity,
   CategoryEntity,
@@ -345,14 +348,56 @@ export class PacksController {
   // ── Access ───────────────────────────────────────────────────────────────
 
   @Get(':id/access')
-  @ApiOperation({ summary: 'UUIDs con acceso' })
-  @ApiResponse({ status: HttpStatus.OK, type: [AccessRowEntity] })
-  async access(@Param('id') id: string): Promise<AccessRowEntity[]> {
+  @ApiOperation({
+    summary: 'Quién puede instalar este pack',
+    description:
+      'Concesiones directas por cuenta, pre-concesiones heredadas a UUIDs sin cuenta todavía, y los eventos cuya participación deriva el acceso. Los miembros de un evento no tienen fila propia: el acceso se deriva en cada comprobación.',
+  })
+  @ApiResponse({ status: HttpStatus.OK, type: PackAccessEntity })
+  async access(@Param('id') id: string): Promise<PackAccessEntity> {
     return this.packs.listAccess(id);
   }
 
+  @Get('users/search')
+  @ApiOperation({
+    summary: 'Buscar cuentas por nombre o correo',
+    description: 'Para el selector de concesiones. Máximo 10 resultados.',
+  })
+  @ApiResponse({ status: HttpStatus.OK, type: [UserSearchHitEntity] })
+  async searchUsers(
+    @Query('q') q?: string,
+  ): Promise<UserSearchHitEntity[]> {
+    return this.packs.searchUsers(q ?? '');
+  }
+
   @Post(':id/access')
-  @ApiOperation({ summary: 'Conceder acceso a un UUID' })
+  @ApiOperation({ summary: 'Conceder acceso a una cuenta' })
+  async grantToUser(
+    @Param('id') id: string,
+    @Body() dto: GrantUserAccessDto,
+    @Req() req: { user?: { userId?: number } },
+  ): Promise<{ success: true }> {
+    await this.packs.grantToUser(id, dto.userId, this.actorId(req));
+    return { success: true };
+  }
+
+  @Delete(':id/access/user/:userId')
+  @ApiOperation({ summary: 'Revocar el acceso de una cuenta' })
+  async revokeFromUser(
+    @Param('id') id: string,
+    @Param('userId', ParseIntPipe) userId: number,
+    @Req() req: { user?: { userId?: number } },
+  ): Promise<{ success: true }> {
+    await this.packs.revokeFromUser(id, userId, this.actorId(req));
+    return { success: true };
+  }
+
+  @Post(':id/access/legacy')
+  @ApiOperation({
+    summary: 'Pre-conceder acceso a un UUID de Minecraft sin cuenta',
+    description:
+      'Para un jugador que todavía no se ha registrado. Se convierte en concesión real cuando vincule ese UUID.',
+  })
   async grant(
     @Param('id') id: string,
     @Body() dto: GrantAccessDto,
@@ -362,8 +407,8 @@ export class PacksController {
     return { success: true };
   }
 
-  @Delete(':id/access/:uuid')
-  @ApiOperation({ summary: 'Revocar el acceso de un UUID' })
+  @Delete(':id/access/legacy/:uuid')
+  @ApiOperation({ summary: 'Revocar una pre-concesión a un UUID' })
   async revoke(
     @Param('id') id: string,
     @Param('uuid') uuid: string,

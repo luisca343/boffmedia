@@ -10,7 +10,7 @@ import { mkdir, rename, rm, stat } from 'fs/promises';
 import { basename, dirname, join } from 'path';
 import type { Readable } from 'stream';
 import { pipeline } from 'stream/promises';
-import { env } from '@/config/env';
+import { laboonPath } from '@/config/laboon';
 import { LauncherRelease } from '@/_db/schema/LauncherReleases';
 import { LauncherReleasesRepository } from './repositories/launcher-releases.repository';
 import {
@@ -308,9 +308,7 @@ function toEntity(row: LauncherRelease): LauncherReleaseEntity {
 }
 
 function releaseDir(): string {
-  return (
-    env.LAUNCHER_RELEASE_DIR ?? join(process.cwd(), 'data', 'launcher-releases')
-  );
+  return laboonPath('launcher-releases');
 }
 
 /** `<dir>/<version>/<target>/<artifactName>` — one directory per release so an

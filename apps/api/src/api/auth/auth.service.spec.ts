@@ -112,6 +112,25 @@ describe('AuthService', () => {
 
       expect(result.user.username).toBe('TrainerAsh');
     });
+
+    it('marks the refresh token with typ and leaves the access token untyped', async () => {
+      await service.login(fullUser);
+
+      const [access] = jwtService.sign.mock.calls[0];
+      const [refresh] = jwtService.sign.mock.calls[1];
+      expect(access).not.toHaveProperty('typ');
+      expect(refresh).toMatchObject({ typ: 'refresh' });
+      expect(refresh).not.toHaveProperty('scope');
+    });
+
+    it('carries a narrowed scope onto both tokens', async () => {
+      await service.login(fullUser, 'ingame');
+
+      const [access] = jwtService.sign.mock.calls[0];
+      const [refresh] = jwtService.sign.mock.calls[1];
+      expect(access).toMatchObject({ typ: 'ingame' });
+      expect(refresh).toMatchObject({ typ: 'refresh', scope: 'ingame' });
+    });
   });
 
   describe('loginMC()', () => {
@@ -137,6 +156,17 @@ describe('AuthService', () => {
       await expect(
         service.loginMC({ ...loginData, world: 'wrong-world' }),
       ).rejects.toThrow(UnauthorizedException);
+    });
+
+    it('scopes the session to ingame — MC_WORLD is not a secret', async () => {
+      usersService.getUserWithIntegrations.mockResolvedValue(
+        mockUserWithIntegrations as any,
+      );
+
+      await service.loginMC(loginData);
+
+      const [access] = jwtService.sign.mock.calls[0];
+      expect(access).toMatchObject({ typ: 'ingame' });
     });
 
     it('should return error object when user not found', async () => {
@@ -178,6 +208,35 @@ describe('AuthService', () => {
       await expect(service.refreshToken('valid-token')).rejects.toThrow(
         UnauthorizedException,
       );
+    });
+
+    it('should reject an access token presented as a refresh token', async () => {
+      jwtService.verify.mockReturnValue({ sub: 1, typ: 'ingame' });
+      usersService.getUserWithIntegrations.mockResolvedValue(
+        mockUserWithIntegrations as any,
+      );
+
+      await expect(service.refreshToken('an-access-token')).rejects.toThrow(
+        UnauthorizedException,
+      );
+    });
+
+    it('should keep an ingame session narrowed across a refresh', async () => {
+      jwtService.verify.mockReturnValue({
+        sub: 1,
+        typ: 'refresh',
+        scope: 'ingame',
+      });
+      usersService.getUserWithIntegrations.mockResolvedValue(
+        mockUserWithIntegrations as any,
+      );
+
+      await service.refreshToken('valid-token-string');
+
+      const [access] = jwtService.sign.mock.calls[0];
+      const [refresh] = jwtService.sign.mock.calls[1];
+      expect(access).toMatchObject({ typ: 'ingame' });
+      expect(refresh).toMatchObject({ typ: 'refresh', scope: 'ingame' });
     });
 
     it('should throw UnauthorizedException when JWT verification fails', async () => {

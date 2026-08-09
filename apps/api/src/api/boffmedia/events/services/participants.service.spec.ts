@@ -254,16 +254,32 @@ describe('ParticipantsService', () => {
       );
     });
 
-    it('returns false when status is not confirmed', async () => {
+    it('returns true when status is registered', async () => {
+      // Nothing in the product asks a player to confirm, so a confirmed-only
+      // check made every achievement award unreachable.
       mockRepo.findEventParticipation.mockResolvedValue({
         ...mockEventParticipation,
         status: 'registered',
       });
 
       await expect(service.validateEventParticipation(5, 20)).resolves.toBe(
-        false,
+        true,
       );
     });
+
+    it.each(['declined', 'removed'])(
+      'returns false when status is %s',
+      async (status) => {
+        mockRepo.findEventParticipation.mockResolvedValue({
+          ...mockEventParticipation,
+          status,
+        });
+
+        await expect(service.validateEventParticipation(5, 20)).resolves.toBe(
+          false,
+        );
+      },
+    );
 
     it('returns false when no participation record exists', async () => {
       mockRepo.findEventParticipation.mockResolvedValue(null);

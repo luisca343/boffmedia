@@ -138,6 +138,20 @@
       "notFoundTitle": "Perfil no encontrado",
       "notFoundBody": "No existe ningún usuario con ese nombre.",
       "viewMine": "Ver perfil público"
+    },
+    "linkMc": {
+      "title": "Vincula tu cuenta de Minecraft",
+      "lead": "Abre Microsoft, introduce el código de abajo e inicia sesión con la cuenta que tiene Minecraft.",
+      "codeLabel": "Tu código",
+      "openMicrosoft": "Abrir Microsoft",
+      "waiting": "Esperando a que termines en Microsoft…",
+      "linked": "Cuenta de Minecraft vinculada: {name}",
+      "doneShort": "Vinculada.",
+      "declined": "Has cancelado la autorización.",
+      "expired": "El código ha caducado. Inténtalo otra vez.",
+      "failed": "No se ha podido vincular la cuenta.",
+      "cancel": "Cancelar",
+      "close": "Cerrar"
     }
   }
 }

@@ -7,12 +7,16 @@ import { AvPanel, AvPill } from "../ui/av-kit"
 import { type AdminPack, type GalleryImage, type GameType, PacksService } from "@/services/api/boffmedia/packsService"
 import { apiUpload } from "@/services/http/boff-client"
 
+// `password` is deprecated and deliberately absent: a shared secret is listed to
+// every authenticated launcher, has no per-user record and cannot be revoked for
+// one person. Invitations cover the same use case properly. Existing password
+// packs keep working — they just cannot be created, and the edit form still
+// shows the kind when a pack already has it.
 const ACCESS_OPTIONS: {
   value: AdminPack["accessKind"]
   icon: "globe" | "lock" | "users"
 }[] = [
   { value: "public", icon: "globe" },
-  { value: "password", icon: "lock" },
   { value: "allowlist", icon: "users" },
 ]
 
@@ -57,9 +61,11 @@ export function PackForm({
         gameType,
         accessKind,
         password: accessKind === "password" ? password : undefined,
+        // Minecraft-only: switching a pack to another game clears it, so a
+        // value typed before the switch cannot be submitted invisibly.
         // A host makes it a server pack; a blank port lets the API default to
         // the vanilla 25565.
-        server: serverHost.trim()
+        server: gameType === "minecraft" && serverHost.trim()
           ? { host: serverHost.trim(), port: serverPort.trim() ? Number(serverPort) : undefined }
           : undefined,
       })
@@ -116,6 +122,7 @@ export function PackForm({
   const slugValid = /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug)
   const portNum = serverPort.trim() ? Number(serverPort) : null
   const serverValid =
+    gameType !== "minecraft" ||
     !serverHost.trim() ||
     portNum === null ||
     (Number.isInteger(portNum) && portNum >= 1 && portNum <= 65535)
@@ -407,8 +414,13 @@ export function PackForm({
                 </div>
               </div>
 
+              {/* A pack that already IS password-gated keeps the option visible,
+                  so editing it does not silently change its access kind. */}
               <div role="radiogroup" aria-label={t("accessKind")} className="grid gap-2 md:grid-cols-3">
-                {ACCESS_OPTIONS.map((option) => {
+                {(accessKind === "password"
+                  ? [...ACCESS_OPTIONS, { value: "password" as const, icon: "lock" as const }]
+                  : ACCESS_OPTIONS
+                ).map((option) => {
                   const selected = accessKind === option.value
                   return (
                     <button
@@ -462,6 +474,10 @@ export function PackForm({
               )}
             </section>
 
+            {/* Quick Play is a Minecraft concept: there is no server to join in a
+                GBA pack, and offering the field on one only invites a value the
+                launcher will never read. */}
+            {gameType === "minecraft" && (
             <section className="border border-solid border-line bg-panel-2 p-4">
               <div className="mb-4 flex items-start gap-3">
                 <span className="grid size-8 shrink-0 place-items-center border border-solid border-line-2 bg-panel text-accent">
@@ -497,6 +513,7 @@ export function PackForm({
                 </Field>
               </div>
             </section>
+            )}
           </div>
         </div>
 

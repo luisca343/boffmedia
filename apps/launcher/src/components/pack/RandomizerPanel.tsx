@@ -3,11 +3,13 @@ import { Button, Panel, Progress, toast } from "@boffmedia/ui"
 
 import { useT } from "../../i18n"
 import {
+  authOpenVerification,
   getRandomizerAssignment,
   downloadRandomizerRom,
   provideFile,
   updateRandomizerExpectedHash,
   instanceRomSlot,
+  webBaseUrl,
   type RandomizerAssignment,
 } from "../../runtime"
 import type { MissingUserFile } from "../../services/types"
@@ -153,7 +155,11 @@ export function RandomizerPanel({
         <div className="flex items-center justify-between">
           <p className="text-sm text-txt-success">{t("readyToPlay")}</p>
           {assignment.eventId && (
-            <Button size="sm" variant="default" onClick={() => window.open(`/randomizer/events/${assignment.eventId}`)}>
+            <Button size="sm" variant="default" onClick={() => {
+                void authOpenVerification(`${webBaseUrl()}/eventos/${assignment.eventId}`).catch(
+                  () => undefined,
+                )
+              }}>
               {t("eventLink")}
             </Button>
           )}

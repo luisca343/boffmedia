@@ -10,6 +10,7 @@ import { ResponseInterceptor } from '@api/_utils/interceptors/response.intercept
 import { Reflector } from '@nestjs/core';
 import { JwtAuthGuard } from '@api/auth/jwt-auth.guard';
 import { RolesGuard } from '@api/_utils/guards/roles.guard';
+import { UserThrottlerGuard } from '@api/_utils/guards/user-throttler.guard';
 import { OwnerOrAdminGuard } from '@api/_utils/guards/owner-or-admin.guard';
 import { USER_ROLES } from '@api/_utils/auth/roles.constants';
 
@@ -104,6 +105,8 @@ describe('EventsController — integration (ValidationPipe + GlobalExceptionFilt
       .overrideGuard(RolesGuard)
       .useValue({ canActivate: () => true })
       .overrideGuard(OwnerOrAdminGuard)
+      .useValue({ canActivate: () => true })
+      .overrideGuard(UserThrottlerGuard)
       .useValue({ canActivate: () => true })
       .compile();
 
@@ -762,10 +765,10 @@ describe('EventsController — integration (ValidationPipe + GlobalExceptionFilt
     });
   });
 
-  // ── POST /events/:eventId/teams/:teamId/join — JoinTeamDto validation ────
+  // ── POST /events/:eventId/teams/:teamId/join — JWT identity ──────────────
 
-  describe('POST /events/:eventId/teams/:teamId/join — JoinTeamDto validation', () => {
-    it('returns 201 and calls facade.joinTeam when body is valid', async () => {
+  describe('POST /events/:eventId/teams/:teamId/join', () => {
+    it('joins with the JWT identity and ignores any body', async () => {
       mockFacade.joinTeam.mockResolvedValue({ success: true });
 
       const res = await request(app.getHttpServer())
@@ -773,25 +776,20 @@ describe('EventsController — integration (ValidationPipe + GlobalExceptionFilt
         .send({ participantId: 10 });
 
       expect(res.status).toBe(201);
-      expect(mockFacade.joinTeam).toHaveBeenCalledWith(
-        5,
-        1,
-        expect.objectContaining({ participantId: 10 }),
-      );
+      // participantId used to be read from the body, which let any authenticated
+      // user enrol anyone else. The authenticated user (1) is the only input now.
+      expect(mockFacade.joinTeam).toHaveBeenCalledWith(5, 1, 1);
     });
 
-    it('returns 400 when participantId is missing', async () => {
+    it('accepts an empty body', async () => {
+      mockFacade.joinTeam.mockResolvedValue({ success: true });
+
       const res = await request(app.getHttpServer())
         .post('/events/5/teams/1/join')
         .send({});
-      expect(res.status).toBe(400);
-    });
 
-    it('returns 400 when participantId is below minimum (Min 1)', async () => {
-      const res = await request(app.getHttpServer())
-        .post('/events/5/teams/1/join')
-        .send({ participantId: 0 });
-      expect(res.status).toBe(400);
+      expect(res.status).toBe(201);
+      expect(mockFacade.joinTeam).toHaveBeenCalledWith(5, 1, 1);
     });
   });
 

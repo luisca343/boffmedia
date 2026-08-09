@@ -8,11 +8,11 @@ export function useJoinTeam(eventId: number, teamId: number) {
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
 
-  const joinTeam = async (userId: number) => {
+  const joinTeam = async () => {
     setIsLoading(true)
     setError(null)
     try {
-      const res = await EventsService.joinTeam(eventId, teamId, { participantId: userId })
+      const res = await EventsService.joinTeam(eventId, teamId)
       if (res.error) setError(res.error)
       else setJoinResult(res.data)
       return res

@@ -351,6 +351,41 @@
       "when": 1786223165221,
       "tag": "0049_randomizer_roms_library",
       "breakpoints": true
+    },
+    {
+      "idx": 50,
+      "version": "5",
+      "when": 1786279787644,
+      "tag": "0050_event_participants_unique",
+      "breakpoints": true
+    },
+    {
+      "idx": 51,
+      "version": "5",
+      "when": 1786280425712,
+      "tag": "0051_event_invites",
+      "breakpoints": true
+    },
+    {
+      "idx": 52,
+      "version": "5",
+      "when": 1786282694619,
+      "tag": "0052_launcher_device_and_pack_grants",
+      "breakpoints": true
+    },
+    {
+      "idx": 53,
+      "version": "5",
+      "when": 1786282873892,
+      "tag": "0053_randomizer_assignments_rekey",
+      "breakpoints": true
+    },
+    {
+      "idx": 54,
+      "version": "5",
+      "when": 1786284646403,
+      "tag": "0054_pack_versions_created_by_int",
+      "breakpoints": true
     }
   ]
 }

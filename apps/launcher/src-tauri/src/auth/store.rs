@@ -85,6 +85,37 @@ pub fn clear_refresh_token() -> Result<(), StoreError> {
     }
 }
 
+// ── Boffmedia launcher session ─────────────────────────────────────────────
+//
+// Persisted, unlike the old pack session. That one was re-derived from a live
+// Minecraft session in two round-trips, so keeping it bought nothing. This one
+// is minted by a device-authorization flow that needs the player to approve it
+// in a browser — asking for that on every launch would be intolerable — and it
+// lasts 30 days. Same store as the refresh token, for the same reason: it is a
+// bearer credential for the account.
+
+const LAUNCHER_SESSION: &str = "boff-launcher-session";
+
+pub fn load_launcher_session() -> Result<Option<String>, StoreError> {
+    match entry_for(LAUNCHER_SESSION)?.get_password() {
+        Ok(token) => Ok(Some(token)),
+        Err(keyring::Error::NoEntry) => Ok(None),
+        Err(err) => Err(StoreError::Keyring(err)),
+    }
+}
+
+pub fn save_launcher_session(token: &str) -> Result<(), StoreError> {
+    Ok(entry_for(LAUNCHER_SESSION)?.set_password(token)?)
+}
+
+pub fn clear_launcher_session() -> Result<(), StoreError> {
+    match entry_for(LAUNCHER_SESSION)?.delete_credential() {
+        Ok(()) => Ok(()),
+        Err(keyring::Error::NoEntry) => Ok(()),
+        Err(err) => Err(StoreError::Keyring(err)),
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

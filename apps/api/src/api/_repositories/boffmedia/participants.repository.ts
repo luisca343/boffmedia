@@ -178,6 +178,52 @@ export class ParticipantsRepository {
       .where(eq(boffMediaEventParticipants.eventId, eventId)) as any;
   }
 
+  /** The membership row for a *user* (not a participant) in one event — the
+   *  shape every entitlement check needs. */
+  async findEventParticipationByUserId(
+    userId: number,
+    eventId: number,
+  ): Promise<EventParticipant | undefined> {
+    const result = await this.db
+      .select({
+        id: boffMediaEventParticipants.id,
+        participantId: boffMediaEventParticipants.participantId,
+        eventId: boffMediaEventParticipants.eventId,
+        status: boffMediaEventParticipants.status,
+        comment: boffMediaEventParticipants.comment,
+        createdAt: boffMediaEventParticipants.createdAt,
+        updatedAt: boffMediaEventParticipants.updatedAt,
+      })
+      .from(boffMediaEventParticipants)
+      .innerJoin(
+        boffMediaParticipants,
+        eq(boffMediaParticipants.id, boffMediaEventParticipants.participantId),
+      )
+      .where(
+        and(
+          eq(boffMediaParticipants.userId, userId),
+          eq(boffMediaEventParticipants.eventId, eventId),
+        ),
+      );
+    return result[0];
+  }
+
+  async setEventParticipationStatus(
+    eventId: number,
+    participantId: number,
+    status: EventParticipant['status'],
+  ): Promise<void> {
+    await this.db
+      .update(boffMediaEventParticipants)
+      .set({ status, updatedAt: new Date() } as EventParticipant)
+      .where(
+        and(
+          eq(boffMediaEventParticipants.eventId, eventId),
+          eq(boffMediaEventParticipants.participantId, participantId),
+        ),
+      );
+  }
+
   async deleteEventParticipation(
     eventId: number,
     participantId: number,

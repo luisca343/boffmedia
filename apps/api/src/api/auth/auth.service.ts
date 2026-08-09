@@ -2,6 +2,7 @@ import { BoffMediaUsersFacadeService } from '@api/boffmedia/users/users.facade.s
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Logger } from 'nestjs-pino';
+import { TOKEN_TYPE } from '@api/_utils/auth/token-types';
 import { env } from '@/config/env';
 
 @Injectable()
@@ -21,7 +22,13 @@ export class AuthService {
     return null;
   }
 
-  async login(fullUser: any) {
+  /**
+   * `scope` narrows what the minted session may do. Undefined = a full website
+   * session; `ingame` = the MCEF session from `loginmc`, which proves nothing
+   * beyond a public UUID and is therefore refused by FullSessionGuard. The
+   * refresh token carries the scope forward so refreshing can never widen it.
+   */
+  async login(fullUser: any, scope?: typeof TOKEN_TYPE.INGAME) {
     const user = fullUser.sessionUser || fullUser;
     const payload = {
       username: user.name,
@@ -32,8 +39,13 @@ export class AuthService {
     };
 
     return {
-      access_token: this.jwtService.sign(payload),
-      refresh_token: this.jwtService.sign(payload, { expiresIn: '7d' }),
+      access_token: this.jwtService.sign(
+        scope ? { ...payload, typ: scope } : payload,
+      ),
+      refresh_token: this.jwtService.sign(
+        { ...payload, typ: TOKEN_TYPE.REFRESH, ...(scope ? { scope } : {}) },
+        { expiresIn: '7d' },
+      ),
       user: {
         id: user.id,
         username: user.name,
@@ -69,101 +81,39 @@ export class AuthService {
       },
     };
 
-    return this.login(loginUser);
+    return this.login(loginUser, TOKEN_TYPE.INGAME);
   }
 
-  async registerMinecraft(registerData: {
-    username: string;
-    email: string;
-    password: string;
-    minecraft: {
-      username: string;
-      uuid: string;
-      world: string;
-    };
-  }) {
-    // Validate world
-    if (registerData.minecraft.world !== env.MC_WORLD) {
-      throw new UnauthorizedException('Invalid world');
+  /**
+   * Mint an in-game session for a Minecraft identity that has already been
+   * PROVED via Mojang's hasJoined handshake. Scoped to `ingame` exactly like
+   * `loginmc`: proving a Minecraft identity is not the same as signing in to
+   * the website, and the MCEF page only ever needs the Rotom-phone surface.
+   *
+   * Replaces `registerMinecraft` / `linkMinecraft`, which authenticated on the
+   * `MC_WORLD` string. Linking now happens on the website through Microsoft
+   * (MinecraftLinkService), so there is nothing left here to auto-provision
+   * credentials for.
+   */
+  async loginProvenMinecraft(uuid: string) {
+    const user = await this.usersService.getUserWithIntegrations(uuid, 'uuid');
+    if (!user) {
+      return { error: 'User not found in BoffMedia system' };
     }
 
-    try {
-      // Create the user accounts
-      const result = await this.usersService.createMinecraftUser(registerData);
-
-      // Get the created user with all integrations for login
-      const userWithIntegrations =
-        await this.usersService.getUserWithIntegrations(
-          result.boffMediaUser.id.toString(),
-          'id',
-        );
-
-      if (!userWithIntegrations) {
-        return { error: 'Failed to retrieve created user' };
-      }
-
-      // Convert to the format expected by login
-      const loginUser = {
-        id: userWithIntegrations.boffMediaUser.id,
-        name: userWithIntegrations.boffMediaUser.username,
-        email: userWithIntegrations.boffMediaUser.email,
-        roles: userWithIntegrations.roles,
-        mcUUid: userWithIntegrations.boffMediaUser.uuid,
-        smartRotomUser: userWithIntegrations.smartRotomUser,
-      };
-
-      return this.login(loginUser);
-    } catch (error: any) {
-      this.logger.error('Minecraft registration error:', error);
-      return { error: error.message || 'Registration failed' };
-    }
-  }
-
-  async linkMinecraft(linkData: {
-    username: string;
-    email: string;
-    password: string;
-    minecraft: {
-      username: string;
-      uuid: string;
-      world: string;
-    };
-  }) {
-    // Validate world
-    if (linkData.minecraft.world !== env.MC_WORLD) {
-      throw new UnauthorizedException('Invalid world');
-    }
-
-    try {
-      // Link the Minecraft account to existing BoffMedia account
-      const result = await this.usersService.linkMinecraftAccount(linkData);
-
-      // Get the user with all integrations for login
-      const userWithIntegrations =
-        await this.usersService.getUserWithIntegrations(
-          result.boffMediaUser.id.toString(),
-          'id',
-        );
-
-      if (!userWithIntegrations) {
-        return { error: 'Failed to retrieve linked user' };
-      }
-
-      // Convert to the format expected by login
-      const loginUser = {
-        id: userWithIntegrations.boffMediaUser.id,
-        name: userWithIntegrations.boffMediaUser.username,
-        email: userWithIntegrations.boffMediaUser.email,
-        roles: userWithIntegrations.roles,
-        mcUUid: userWithIntegrations.boffMediaUser.uuid,
-        smartRotomUser: userWithIntegrations.smartRotomUser,
-      };
-
-      return this.login(loginUser);
-    } catch (error: any) {
-      this.logger.error('Minecraft linking error:', error);
-      return { error: error.message || 'Linking failed' };
-    }
+    return this.login(
+      {
+        sessionUser: {
+          id: user.boffMediaUser.id,
+          name: user.boffMediaUser.username,
+          email: user.boffMediaUser.email,
+          roles: user.roles,
+          mcUUid: user.boffMediaUser.uuid,
+          smartRotomUser: user.smartRotomUser,
+        },
+      },
+      TOKEN_TYPE.INGAME,
+    );
   }
 
   async refreshToken(tokenData: any) {
@@ -177,6 +127,17 @@ export class AuthService {
         payload = this.jwtService.verify(tokenData);
       } catch {
         throw new UnauthorizedException('Invalid or expired refresh token');
+      }
+
+      // Refresh tokens carry `typ: 'refresh'`; access tokens carry no `typ` at
+      // all. Tokens minted before the claim existed are indistinguishable, so
+      // they are still accepted — remove ALLOW_LEGACY_REFRESH once the 7-day
+      // window since deployment has passed and they have all expired.
+      const ALLOW_LEGACY_REFRESH = true;
+      const isRefresh = payload.typ === TOKEN_TYPE.REFRESH;
+      const isLegacy = payload.typ === undefined && ALLOW_LEGACY_REFRESH;
+      if (!isRefresh && !isLegacy) {
+        throw new UnauthorizedException('Not a refresh token');
       }
 
       // Fetch full user with integrations so smartRotomUser comes from DB,
@@ -205,9 +166,23 @@ export class AuthService {
         mcUuid: user.uuid,
       };
 
+      // A narrowed session stays narrowed across refreshes — otherwise an
+      // in-game token buys a full website session one round trip later.
+      const scope: typeof TOKEN_TYPE.INGAME | undefined =
+        payload.scope === TOKEN_TYPE.INGAME ? TOKEN_TYPE.INGAME : undefined;
+
       return {
-        access_token: this.jwtService.sign(newPayload),
-        refresh_token: this.jwtService.sign(newPayload, { expiresIn: '7d' }),
+        access_token: this.jwtService.sign(
+          scope ? { ...newPayload, typ: scope } : newPayload,
+        ),
+        refresh_token: this.jwtService.sign(
+          {
+            ...newPayload,
+            typ: TOKEN_TYPE.REFRESH,
+            ...(scope ? { scope } : {}),
+          },
+          { expiresIn: '7d' },
+        ),
         user: {
           id: user.id,
           name: user.username,

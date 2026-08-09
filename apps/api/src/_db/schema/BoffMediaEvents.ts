@@ -9,6 +9,7 @@ import {
   index,
   foreignKey,
   boolean,
+  unique,
   AnyMySqlColumn,
 } from 'drizzle-orm/mysql-core';
 import { boffMediaUsers } from './BoffMedia';
@@ -237,6 +238,13 @@ export const boffMediaEventParticipants = mysqlTable(
     return {
       eventIdx: index('ep_event_idx').on(table.eventId),
       participantIdx: index('ep_participant_idx').on(table.participantId),
+      // Membership is the source of truth for pack entitlement, so a duplicate
+      // row would mean two contradictory statuses for the same person and a
+      // leave that only half-removes them.
+      participantEventUq: unique('ep_participant_event_uq').on(
+        table.participantId,
+        table.eventId,
+      ),
       participantFk: foreignKey({
         columns: [table.participantId],
         foreignColumns: [boffMediaParticipants.id],
@@ -256,6 +264,49 @@ export const boffMediaEventParticipants = mysqlTable(
 );
 
 export type EventParticipant = typeof boffMediaEventParticipants.$inferSelect;
+
+/**
+ * Invitations to a *private* event. A private event is unlisted and cannot be
+ * joined from the public site, so without these it can only ever be populated
+ * by an admin — and since event membership is what grants pack access, that
+ * made private events unusable rather than merely discreet.
+ *
+ * Deliberately shaped like `pack_invites`: same fields, same revocation model.
+ */
+export const boffMediaEventInvites = mysqlTable(
+  'boffmedia_event_invites',
+  {
+    code: varchar('code', { length: 32 }).primaryKey(),
+    eventId: int('event_id').notNull(),
+    createdBy: int('created_by'),
+    createdAt: timestamp('created_at')
+      .notNull()
+      .default(sql`CURRENT_TIMESTAMP()`),
+    expiresAt: timestamp('expires_at'),
+    maxUses: int('max_uses').notNull().default(1),
+    uses: int('uses').notNull().default(0),
+    revoked: boolean('revoked').notNull().default(false),
+  },
+  (table) => ({
+    eventIdx: index('ei_event_idx').on(table.eventId),
+    eventFk: foreignKey({
+      columns: [table.eventId],
+      foreignColumns: [boffMediaEvents.id],
+      name: 'ei_event_fk',
+    })
+      .onDelete('cascade')
+      .onUpdate('cascade'),
+    creatorFk: foreignKey({
+      columns: [table.createdBy],
+      foreignColumns: [boffMediaUsers.id],
+      name: 'ei_creator_fk',
+    })
+      .onDelete('set null')
+      .onUpdate('cascade'),
+  }),
+);
+
+export type EventInvite = typeof boffMediaEventInvites.$inferSelect;
 
 // Unified achievements table
 export const boffMediaAchievements = mysqlTable(

@@ -61,6 +61,38 @@ function stableStringify(value: unknown): string {
   return JSON.stringify(value ?? null);
 }
 
+export type ResolutionIssue = 'no-pack' | 'event-not-active' | 'config-not-open';
+
+export type EnrichedConfig = RandomizerConfig & {
+  packId: string | null;
+  launcherResolvable: boolean;
+  resolutionIssue: ResolutionIssue | null;
+};
+
+/** First broken gate in the launcher resolution chain, or null when it resolves. */
+function diagnose(
+  config: RandomizerConfig,
+  ev: { packId: string | null; status: string } | null,
+): ResolutionIssue | null {
+  if (!ev?.packId) return 'no-pack';
+  if (ev.status !== 'active') return 'event-not-active';
+  if (config.status !== 'open') return 'config-not-open';
+  return null;
+}
+
+function enrich(
+  config: RandomizerConfig,
+  ev: { packId: string | null; status: string } | null,
+): EnrichedConfig {
+  const issue = diagnose(config, ev);
+  return {
+    ...config,
+    packId: ev?.packId ?? null,
+    launcherResolvable: issue === null,
+    resolutionIssue: issue,
+  };
+}
+
 @Injectable()
 export class EventsService {
   /** Memoized SHA-512 of the configured FVX jar (path + hash), computed on first create. */
@@ -167,7 +199,7 @@ export class EventsService {
     romId: number;
     packId: string;
     romHint?: string;
-  }): Promise<RandomizerConfig> {
+  }): Promise<EnrichedConfig> {
     if (!data.eventId || data.eventId <= 0) {
       throw new BadRequestException('Valid eventId is required');
     }
@@ -226,15 +258,10 @@ export class EventsService {
       data.packId,
     );
 
-    const config = await this.repository.getConfigById(configId);
-    if (!config) {
-      throw new Error('Failed to retrieve created config');
-    }
-
     this.logger.debug(
       `Created randomizer config ${configId} for event ${data.eventId}, pack ${data.packId}`,
     );
-    return config;
+    return this.getConfig(configId);
   }
 
   /**
@@ -383,7 +410,7 @@ export class EventsService {
   /**
    * Get a config by ID.
    */
-  async getConfig(configId: number): Promise<RandomizerConfig> {
+  async getConfig(configId: number): Promise<EnrichedConfig> {
     if (!configId || configId <= 0) {
       throw new BadRequestException('Valid configId is required');
     }
@@ -393,13 +420,14 @@ export class EventsService {
       throw new NotFoundException(`Config ${configId} not found`);
     }
 
-    return config;
+    const ev = await this.repository.getEventPackAndStatus(config.eventId);
+    return enrich(config, ev);
   }
 
   /**
    * Get a config by event ID.
    */
-  async getConfigByEventId(eventId: number): Promise<RandomizerConfig> {
+  async getConfigByEventId(eventId: number): Promise<EnrichedConfig> {
     if (!eventId || eventId <= 0) {
       throw new BadRequestException('Valid eventId is required');
     }
@@ -411,14 +439,18 @@ export class EventsService {
       );
     }
 
-    return config;
+    const ev = await this.repository.getEventPackAndStatus(config.eventId);
+    return enrich(config, ev);
   }
 
   /**
    * List all configs.
    */
-  async listConfigs(): Promise<RandomizerConfig[]> {
-    return this.repository.listConfigs();
+  async listConfigs(): Promise<EnrichedConfig[]> {
+    const rows = await this.repository.listConfigsWithEventMeta();
+    return rows.map(({ config, packId, eventStatus }) =>
+      enrich(config, { packId, status: eventStatus }),
+    );
   }
 
   /**
@@ -427,7 +459,7 @@ export class EventsService {
   async updateConfig(
     configId: number,
     patch: { romHint?: string; packId?: string; romId?: number },
-  ): Promise<RandomizerConfig> {
+  ): Promise<EnrichedConfig> {
     if (!configId || configId <= 0) {
       throw new BadRequestException('Valid configId is required');
     }
@@ -473,7 +505,7 @@ export class EventsService {
   /**
    * Open a config: transitions draft → open, allowing claims to begin.
    */
-  async openConfig(configId: number, actor?: string): Promise<RandomizerConfig> {
+  async openConfig(configId: number, actor?: string): Promise<EnrichedConfig> {
     if (!configId || configId <= 0) {
       throw new BadRequestException('Valid configId is required');
     }
@@ -486,16 +518,23 @@ export class EventsService {
       );
     }
 
-    // Opening is the admin's "go live" action, so it also activates the event —
-    // the last gate the launcher needs (pack + active event + open config). The
-    // event must already have a pack (attached at create); guard so we never
-    // open a config that can't actually be reached.
+    // The randomizer consumes the event lifecycle, it no longer drives it: the
+    // events module owns `status`, so opening a config requires an event that is
+    // already active rather than silently activating one.
     const ev = await this.repository.getEventPackAndStatus(config.eventId);
     if (!ev?.packId) {
       throw new ConflictException({
         message: `Event ${config.eventId} has no pack attached`,
         userMessage:
           'El evento no tiene un pack vinculado. Vuelve a guardar la configuración con un pack.',
+      });
+    }
+
+    if (ev.status !== 'active') {
+      throw new ConflictException({
+        message: `Event ${config.eventId} is ${ev.status}, not active`,
+        userMessage:
+          'El evento todavía no está activo. Actívalo antes de abrir la configuración.',
       });
     }
 
@@ -513,19 +552,13 @@ export class EventsService {
       status: 'open' as RandomizerConfigStatus,
     });
 
-    if (ev.status !== 'active') {
-      await this.repository.setEventStatus(config.eventId, 'active');
-    }
-
     await this.repository.appendAudit({
       configId,
       action: 'CONFIG_OPENED',
       actor: actor || 'system',
     });
 
-    this.logger.debug(
-      `Opened config ${configId} and activated event ${config.eventId}`,
-    );
+    this.logger.debug(`Opened config ${configId} for event ${config.eventId}`);
 
     return this.getConfig(configId);
   }
@@ -533,7 +566,7 @@ export class EventsService {
   /**
    * Close a config: transitions open → closed, stopping new claims but allowing patching/verify.
    */
-  async closeConfig(configId: number, actor?: string): Promise<RandomizerConfig> {
+  async closeConfig(configId: number, actor?: string): Promise<EnrichedConfig> {
     if (!configId || configId <= 0) {
       throw new BadRequestException('Valid configId is required');
     }
@@ -562,23 +595,29 @@ export class EventsService {
   }
 
   /**
-   * Publish a config: transitions any status → published, making seeds/settings/logs public.
+   * Publish a config: closed → published, making seeds/settings/logs public.
+   * Publishing from open would leak seeds mid-play; from draft it is meaningless.
    */
-  async publishConfig(configId: number, actor?: string): Promise<RandomizerConfig> {
+  async publishConfig(configId: number, actor?: string): Promise<EnrichedConfig> {
     if (!configId || configId <= 0) {
       throw new BadRequestException('Valid configId is required');
     }
 
     const config = await this.getConfig(configId);
 
-    // Can publish from any state
+    if (config.status !== 'closed') {
+      throw new ConflictException(
+        `Cannot publish config ${configId}: status is ${config.status}, not closed`,
+      );
+    }
+
     await this.repository.updateConfig(configId, {
       status: 'published' as RandomizerConfigStatus,
     });
 
     await this.repository.appendAudit({
       configId,
-      action: 'CONFIG_OPENED', // Reuse audit action for now; consider adding 'CONFIG_PUBLISHED' if needed
+      action: 'CONFIG_PUBLISHED',
       actor: actor || 'system',
     });
 
@@ -588,46 +627,81 @@ export class EventsService {
   }
 
   /**
-   * Dry-run randomization: admin uploads a ROM, server validates and calls runner.
-   * Returns the randomized ROM as bytes (does NOT store it).
-   *
-   * Throws if runner is not wired (Phase 0).
+   * Reopen a config: closed → open only. Claims re-mint against the same pinned
+   * settings/ROM/jar, so this is invariant-safe. Published configs stay published:
+   * their seeds are public, and new claims against revealed seeds would break
+   * seal integrity.
    */
-  async dryRunRandomization(
-    configId: number,
-    romStream: Readable,
-  ): Promise<{ randomizedRom: Readable; logBytes: Buffer }> {
+  async reopenConfig(configId: number, actor?: string): Promise<EnrichedConfig> {
     if (!configId || configId <= 0) {
       throw new BadRequestException('Valid configId is required');
     }
 
     const config = await this.getConfig(configId);
 
-    if (!config) {
-      throw new NotFoundException(`Config ${configId} not found`);
+    if (config.status !== 'closed') {
+      throw new ConflictException(
+        `Cannot reopen config ${configId}: status is ${config.status}, not closed`,
+      );
     }
 
-    // Fetch settings JSON bytes (with heal-on-miss)
-    const settingsJsonBytes = await this.settingsJsonBytesForConfig(config);
+    await this.repository.updateConfig(configId, {
+      status: 'open' as RandomizerConfigStatus,
+    });
 
-    // Encode settings JSON to .rnqs
-    const settingsRnqs = await this.settingsShim.encode(
-      JSON.parse(settingsJsonBytes.toString('utf-8')),
-    );
+    await this.repository.appendAudit({
+      configId,
+      action: 'CONFIG_REOPENED',
+      actor: actor || 'system',
+    });
 
-    const job: RandomizeJob = {
-      romStream,
-      settingsRnqs,
-      seed: 0,
-      gamePlatform: config.gamePlatform as 'gba' | 'nds',
-      jarSha512: config.fvxJarSha512,
-    };
+    this.logger.debug(`Reopened config ${configId}`);
 
-    const result = await this.runner.randomize(job);
-
-    return {
-      randomizedRom: Readable.from(result.romBytes),
-      logBytes: result.logBytes,
-    };
+    return this.getConfig(configId);
   }
+
+  /**
+   * Delete a config: draft-only, and frees the event's pack for another event.
+   * Non-draft configs are never deletable — their assignments and sealed logs
+   * are competition evidence.
+   */
+  async deleteConfig(configId: number, actor?: string): Promise<void> {
+    if (!configId || configId <= 0) {
+      throw new BadRequestException('Valid configId is required');
+    }
+
+    const config = await this.getConfig(configId);
+
+    if (config.status !== 'draft') {
+      throw new ConflictException({
+        message: `Cannot delete config ${configId}: status is ${config.status}, not draft`,
+        userMessage:
+          'Solo se puede eliminar una configuración en borrador. Ciérrala o publícala en su lugar.',
+      });
+    }
+
+    // Drafts cannot mint claims, so this is belt-and-braces.
+    const assignments = await this.repository.countAssignmentsByConfig(configId);
+    if (assignments > 0) {
+      throw new ConflictException(
+        `Cannot delete config ${configId}: it has ${assignments} assignment(s)`,
+      );
+    }
+
+    await this.repository.deleteConfigAndDetachPack(configId, config.eventId);
+
+    // configId null on purpose: the FK target is gone (audit FK is set-null);
+    // meta preserves the ids.
+    await this.repository.appendAudit({
+      configId: null,
+      action: 'CONFIG_DELETED',
+      actor: actor || 'system',
+      meta: { configId, eventId: config.eventId },
+    });
+
+    this.logger.debug(
+      `Deleted config ${configId} and detached pack from event ${config.eventId}`,
+    );
+  }
+
 }

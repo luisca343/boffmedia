@@ -2,24 +2,19 @@
 
 import { useState, useEffect } from "react"
 import { useTranslations } from "next-intl"
-import { Button, Field, Input, Modal, Select, Spinner, toast } from "@boffmedia/ui"
+import { Button, Modal, Spinner, toast } from "@boffmedia/ui"
 import { AvPanel, AvSectionHead } from "../../../_components/ui/av-kit"
 import { RandomizerService } from "@/services/api/boffmedia/randomizerService"
+import { RomUploadModal } from "./RomUploadModal"
 import type { RandomizerRom } from "@/services/api/boffmedia/randomizer.types"
 
 export function RomsView() {
   const t = useTranslations("randomizer.events")
   const [roms, setRoms] = useState<RandomizerRom[]>([])
   const [loading, setLoading] = useState(true)
-  const [uploading, setUploading] = useState(false)
   const [deleting, setDeleting] = useState<number | null>(null)
   const [romToDelete, setRomToDelete] = useState<RandomizerRom | null>(null)
-
-  // Upload form state
   const [showUploadForm, setShowUploadForm] = useState(false)
-  const [uploadName, setUploadName] = useState("")
-  const [uploadPlatform, setUploadPlatform] = useState<"gba" | "nds">("gba")
-  const [uploadFile, setUploadFile] = useState<File | null>(null)
 
   useEffect(() => {
     loadRoms()
@@ -34,31 +29,6 @@ export function RomsView() {
       toast({ tone: "bad", title: t("romsLoadError"), msg: String(err) })
     } finally {
       setLoading(false)
-    }
-  }
-
-  const handleUpload = async () => {
-    if (!uploadFile || !uploadName.trim()) {
-      toast({ tone: "bad", title: t("romsUploadError"), msg: t("romsUploadInvalid") })
-      return
-    }
-
-    setUploading(true)
-    try {
-      const res = await RandomizerService.uploadRom(uploadFile, uploadName, uploadPlatform)
-      if (res.success) {
-        toast({ tone: "ok", title: t("romsUploadSuccess") })
-        setShowUploadForm(false)
-        setUploadName("")
-        setUploadFile(null)
-        await loadRoms()
-      } else {
-        toast({ tone: "bad", title: t("romsUploadError"), msg: res.userMessage })
-      }
-    } catch (err) {
-      toast({ tone: "bad", title: t("romsUploadError"), msg: String(err) })
-    } finally {
-      setUploading(false)
     }
   }
 
@@ -152,63 +122,14 @@ export function RomsView() {
         </AvPanel>
       )}
 
-      {/* Upload Form Modal */}
-      <Modal
+      <RomUploadModal
         open={showUploadForm}
-        onClose={() => !uploading && setShowUploadForm(false)}
-        title={t("romsUploadTitle")}
-        size="sm"
-      >
-        <div className="space-y-4">
-          <Field label={t("romsName")}>
-            <Input
-              placeholder={t("romsNamePlaceholder")}
-              value={uploadName}
-              onChange={(e) => setUploadName(e.currentTarget.value)}
-              disabled={uploading}
-            />
-          </Field>
-
-          <Field label={t("romsPlatform")}>
-            <Select
-              value={uploadPlatform}
-              options={[
-                { value: "gba", label: "GBA" },
-                { value: "nds", label: "NDS" },
-              ]}
-              onChange={(v) => setUploadPlatform(v as "gba" | "nds")}
-              disabled={uploading}
-            />
-          </Field>
-
-          <Field label={t("romsFile")}>
-            <input
-              type="file"
-              accept=".gba,.nds,.rom,.bin"
-              onChange={(e) => setUploadFile(e.currentTarget.files?.[0] || null)}
-              disabled={uploading}
-              className="block w-full text-[12px]"
-            />
-          </Field>
-
-          <div className="flex gap-3 pt-4">
-            <Button
-              onClick={handleUpload}
-              disabled={uploading || !uploadFile || !uploadName.trim()}
-            >
-              {uploading && <Spinner size={16} />}
-              {uploading ? t("romsUploading") : t("romsUploadButton")}
-            </Button>
-            <Button
-              variant="ghost"
-              onClick={() => !uploading && setShowUploadForm(false)}
-              disabled={uploading}
-            >
-              {t("cancel")}
-            </Button>
-          </div>
-        </div>
-      </Modal>
+        onClose={() => setShowUploadForm(false)}
+        onUploaded={() => {
+          setShowUploadForm(false)
+          loadRoms()
+        }}
+      />
 
       {/* Delete Confirmation Modal */}
       <Modal

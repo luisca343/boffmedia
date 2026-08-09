@@ -1,3 +1,4 @@
+import { RandomizerPackLinkModule } from '@api/_repositories/randomizer/pack-link.repository';
 import { Module } from '@nestjs/common';
 import { LoggerModule } from '@api/_utils/logger/logger.module';
 import { DrizzleModule } from '@api/_utils/drizzle/drizzle.module';
@@ -31,7 +32,8 @@ import { RandomizerPublicController } from './randomizer-public.controller';
 import { PacksModule } from '@api/packs/packs.module';
 
 @Module({
-  imports: [ConfigModule, LoggerModule, DrizzleModule, PacksModule],
+  imports: [
+    RandomizerPackLinkModule,ConfigModule, LoggerModule, DrizzleModule, PacksModule],
   providers: [
     // Repository with token binding
     {

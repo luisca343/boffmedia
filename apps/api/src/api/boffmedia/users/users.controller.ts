@@ -28,6 +28,8 @@ import { AuthThrottlerGuard } from '@api/_utils/guards/auth-throttler.guard';
 import { JwtAuthGuard } from '@api/auth/jwt-auth.guard';
 import { RolesGuard } from '@api/_utils/guards/roles.guard';
 import { OwnerOrAdminGuard } from '@api/_utils/guards/owner-or-admin.guard';
+import { FullSessionGuard } from '@api/_utils/guards/full-session.guard';
+import { GameServerAuthGuard } from '@api/_utils/guards/game-server-auth.guard';
 import { Roles } from '@api/_utils/decorators/roles.decorator';
 import { USER_ROLES } from '@api/_utils/auth/roles.constants';
 import { PasswordService } from '@api/auth/password.service';
@@ -113,7 +115,13 @@ export class BoffMediaUsersController {
     }
   }
 
+  // Machine-authed, not world-string-authed. These two are the last routes that
+  // create or move a Minecraft link, and `MC_WORLD` — their old credential —
+  // ships inside the browser bundle, so anyone who knew a player's UUID could
+  // attach it to their own account. The mod already sends TERAS_API_TOKEN.
+  // Human linking goes through Microsoft now (/auth/minecraft/link/*).
   @Public()
+  @UseGuards(GameServerAuthGuard)
   @Post('minecraft/register')
   @ApiOperation({ summary: 'Register a new user with Minecraft integration' })
   @ApiResponse({
@@ -141,6 +149,8 @@ export class BoffMediaUsersController {
   }
 
   @Public()
+  @UseGuards(GameServerAuthGuard, AuthThrottlerGuard)
+  @Throttle({ default: { ttl: 60_000, limit: 5 } })
   @Post('minecraft/link')
   @ApiOperation({ summary: 'Link existing user to Minecraft account' })
   @ApiResponse({
@@ -418,7 +428,7 @@ export class BoffMediaUsersController {
   // ==================== USER UPDATE ====================
 
   @Patch(':id')
-  @UseGuards(JwtAuthGuard, OwnerOrAdminGuard)
+  @UseGuards(JwtAuthGuard, OwnerOrAdminGuard, FullSessionGuard)
   @ApiBearerAuth('JWT')
   @ApiOperation({ summary: 'Update user by ID' })
   @ApiParam({ name: 'id', type: 'number', description: 'User ID' })
@@ -446,7 +456,7 @@ export class BoffMediaUsersController {
   }
 
   @Post(':id/password')
-  @UseGuards(JwtAuthGuard, OwnerOrAdminGuard)
+  @UseGuards(JwtAuthGuard, OwnerOrAdminGuard, FullSessionGuard)
   @ApiBearerAuth('JWT')
   @ApiOperation({
     summary: 'Change a user password (verifies current password)',
@@ -466,7 +476,7 @@ export class BoffMediaUsersController {
   }
 
   @Post(':id/link/steam')
-  @UseGuards(JwtAuthGuard, OwnerOrAdminGuard)
+  @UseGuards(JwtAuthGuard, OwnerOrAdminGuard, FullSessionGuard)
   @ApiBearerAuth('JWT')
   @ApiOperation({
     summary: 'Link a verified SteamID64 to a user (Steam is link-only)',
@@ -489,7 +499,7 @@ export class BoffMediaUsersController {
   }
 
   @Post(':id/link/discord')
-  @UseGuards(JwtAuthGuard, OwnerOrAdminGuard)
+  @UseGuards(JwtAuthGuard, OwnerOrAdminGuard, FullSessionGuard)
   @ApiBearerAuth('JWT')
   @ApiOperation({
     summary:
@@ -513,7 +523,7 @@ export class BoffMediaUsersController {
   }
 
   @Post(':id/link/google')
-  @UseGuards(JwtAuthGuard, OwnerOrAdminGuard)
+  @UseGuards(JwtAuthGuard, OwnerOrAdminGuard, FullSessionGuard)
   @ApiBearerAuth('JWT')
   @ApiOperation({
     summary: 'Link a verified Google id to a user (session-preserving linking)',
@@ -536,7 +546,7 @@ export class BoffMediaUsersController {
   }
 
   @Post(':id/link/twitch')
-  @UseGuards(JwtAuthGuard, OwnerOrAdminGuard)
+  @UseGuards(JwtAuthGuard, OwnerOrAdminGuard, FullSessionGuard)
   @ApiBearerAuth('JWT')
   @ApiOperation({
     summary: 'Link a verified Twitch id to a user (session-preserving linking)',
@@ -559,7 +569,7 @@ export class BoffMediaUsersController {
   }
 
   @Delete(':id/link/:provider')
-  @UseGuards(JwtAuthGuard, OwnerOrAdminGuard)
+  @UseGuards(JwtAuthGuard, OwnerOrAdminGuard, FullSessionGuard)
   @ApiBearerAuth('JWT')
   @ApiOperation({ summary: 'Unlink an OAuth provider from a user' })
   @ApiParam({ name: 'id', type: 'number', description: 'User ID' })
@@ -588,7 +598,7 @@ export class BoffMediaUsersController {
   // ==================== USER DELETION ====================
 
   @Delete(':id')
-  @UseGuards(JwtAuthGuard, OwnerOrAdminGuard)
+  @UseGuards(JwtAuthGuard, OwnerOrAdminGuard, FullSessionGuard)
   @ApiBearerAuth('JWT')
   @ApiOperation({ summary: 'Delete user by ID' })
   @ApiParam({ name: 'id', type: 'number', description: 'User ID' })

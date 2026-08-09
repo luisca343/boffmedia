@@ -1,7 +1,20 @@
-import { apiPOST } from '@/services/boffAPI';
+import { apiAuthedAutoPOST, apiPOST } from '@/services/boffAPI';
 
 interface SuccessResult {
   success: boolean;
+}
+
+export interface McDeviceCode {
+  userCode: string;
+  verificationUri: string;
+  expiresIn: number;
+  intervalSeconds: number;
+}
+
+export interface McLinkPoll {
+  status: 'pending' | 'linked' | 'declined' | 'expired';
+  uuid?: string;
+  username?: string;
 }
 
 interface ResetResult {
@@ -34,5 +47,20 @@ export class AuthService {
   /** Send (or resend) a verification email. Always resolves generically. */
   static resendVerification(email: string) {
     return apiPOST<SuccessResult>('/auth/resend-verification', { email });
+  }
+
+  // ── Minecraft linking (Microsoft device code) ────────────────────────────
+  //
+  // Replaces the old link paths, which authenticated on the MC_WORLD string —
+  // documented as non-secret and shipped in this very bundle, so knowing a
+  // player's UUID was enough to attach it to your own account.
+
+  static startMinecraftLink() {
+    return apiAuthedAutoPOST<McDeviceCode>('/auth/minecraft/link/start', {});
+  }
+
+  /** One Microsoft poll per call; the browser sets the cadence. */
+  static pollMinecraftLink() {
+    return apiAuthedAutoPOST<McLinkPoll>('/auth/minecraft/link/poll', {});
   }
 }

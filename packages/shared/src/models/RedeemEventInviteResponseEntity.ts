@@ -2,9 +2,10 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export type MinecraftAccountDto = {
-    username: string;
-    uuid: string;
-    world: string;
+export type RedeemEventInviteResponseEntity = {
+    /**
+     * The event that was joined.
+     */
+    eventId: number;
 };
 

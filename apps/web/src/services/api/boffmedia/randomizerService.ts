@@ -8,6 +8,7 @@ import {
   apiAuthedAutoPOST,
   apiAuthedAutoPATCH,
   apiAuthedAutoDELETE,
+  apiMultipartPOST,
   sessionToken,
   getApiUrl,
 } from "@/services/boffAPI"
@@ -68,9 +69,8 @@ export class RandomizerService {
    * Import preset(s) from .rnqs file.
    */
   static async importRnqs(file: File): Promise<ApiResponse<RandomizerPreset[]>> {
-    const formData = new FormData()
-    formData.append("file", file)
-    return apiAuthedAutoPOST<RandomizerPreset[]>(`${BASE}/presets/import`, formData)
+    // Multipart, not JSON — apiAuthedAutoPOST would stringify FormData to "{}".
+    return apiMultipartPOST<RandomizerPreset[]>(`${BASE}/presets/import`, {}, { file })
   }
 
   /**
@@ -104,11 +104,13 @@ export class RandomizerService {
     name: string,
     gamePlatform: "gba" | "nds",
   ): Promise<ApiResponse<RandomizerRom>> {
-    const formData = new FormData()
-    formData.append("rom", file)
-    formData.append("name", name)
-    formData.append("gamePlatform", gamePlatform)
-    return apiAuthedAutoPOST<RandomizerRom>(`${BASE}/roms`, formData)
+    // Must be multipart/form-data — apiAuthedAutoPOST JSON-stringifies the body,
+    // which turns a FormData into "{}" and drops the file + fields.
+    return apiMultipartPOST<RandomizerRom>(
+      `${BASE}/roms`,
+      { name, gamePlatform },
+      { rom: file },
+    )
   }
 
   /**
@@ -166,6 +168,13 @@ export class RandomizerService {
   }
 
   /**
+   * List all configs (admin) — enriched with packId/launcherResolvable/resolutionIssue.
+   */
+  static listConfigs() {
+    return apiAuthedAutoGET<RandomizerConfig[]>(`${BASE}/configs`)
+  }
+
+  /**
    * Get a specific config by ID.
    */
   static getConfig(id: string) {
@@ -198,6 +207,20 @@ export class RandomizerService {
    */
   static publishConfig(id: string) {
     return apiAuthedAutoPOST<RandomizerConfig>(`${BASE}/configs/${id}/publish`, {})
+  }
+
+  /**
+   * Transition config from closed → open (claims resume).
+   */
+  static reopenConfig(id: string) {
+    return apiAuthedAutoPOST<RandomizerConfig>(`${BASE}/configs/${id}/reopen`, {})
+  }
+
+  /**
+   * Get the config for an event (admin — 404 when the event has none).
+   */
+  static getAdminEventConfig(eventId: number) {
+    return apiAuthedAutoGET<RandomizerConfig>(`${BASE}/events/${eventId}/config`)
   }
 
   /**

@@ -146,6 +146,26 @@ const es = {
     },
   },
 
+  boffSignin: {
+    title: "Autoriza el launcher",
+    subtitle: "Con tu cuenta de Boffmedia. No hace falta Minecraft: solo se te pedirá cuando instales o juegues un pack de Minecraft.",
+    failedTitle: "No se pudo autorizar",
+    button: "Autorizar con Boffmedia",
+    securityNote: "Aprobarás un código corto en la web, donde ya has iniciado sesión. El launcher nunca ve tu contraseña.",
+    complete: "Completa la autorización",
+    waiting: "Esperando",
+    copied: "Copiado",
+    copyFailed: "No se pudo",
+    consulting: "Pidiendo un código…",
+    copyCodeLabel: "Copia este código — lo necesitarás en la web:",
+    copyCodeButton: "Copiar código",
+    browserStep: "Abre la página de autorización e introduce el código.",
+    browserButton: "Abrir en el navegador",
+    linkButton: "Copiar enlace",
+    confirmWaiting: "Esperando tu aprobación…",
+    cancelButton: "Cancelar",
+  },
+
   signin: {
     title: "Inicia sesión",
     subtitle: "Necesitas una cuenta de Minecraft con Java Edition. El launcher nunca ve tu contraseña — la sesión se abre en tu navegador.",
@@ -1088,6 +1108,26 @@ const en = {
         path: "PATH",
       },
     },
+  },
+
+  boffSignin: {
+    title: "Authorize the launcher",
+    subtitle: "With your Boffmedia account. Minecraft is not required — you will only be asked for it when you install or play a Minecraft pack.",
+    failedTitle: "Could not authorize",
+    button: "Authorize with Boffmedia",
+    securityNote: "You approve a short code on the website, where you are already signed in. The launcher never sees your password.",
+    complete: "Finish authorizing",
+    waiting: "Waiting",
+    copied: "Copied",
+    copyFailed: "Failed",
+    consulting: "Requesting a code…",
+    copyCodeLabel: "Copy this code — you will need it on the website:",
+    copyCodeButton: "Copy code",
+    browserStep: "Open the authorization page and enter the code.",
+    browserButton: "Open in browser",
+    linkButton: "Copy link",
+    confirmWaiting: "Waiting for your approval…",
+    cancelButton: "Cancel",
   },
 
   signin: {

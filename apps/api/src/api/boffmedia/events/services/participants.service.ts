@@ -1,6 +1,15 @@
-import { Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { ParticipantsRepository } from '../../../_repositories/boffmedia/participants.repository';
-import { Participant, EventParticipant } from '@/_db/schema/BoffMediaEvents';
+import {
+  PARTICIPANT_STATUS,
+  Participant,
+  EventParticipant,
+} from '@/_db/schema/BoffMediaEvents';
 import { JoinEventDto } from '../dto/join-event.dto';
 
 @Injectable()
@@ -92,7 +101,26 @@ export class ParticipantsService {
       );
 
     if (existingParticipation) {
-      throw new Error('Participant is already registered for this event');
+      // An admin removal is not something the removed player can undo by
+      // re-joining; a self-declined membership is.
+      if (existingParticipation.status === PARTICIPANT_STATUS.REMOVED) {
+        throw new ForbiddenException(
+          'Has sido expulsado de este evento por un administrador',
+        );
+      }
+      if (existingParticipation.status === PARTICIPANT_STATUS.DECLINED) {
+        await this.participantsRepository.setEventParticipationStatus(
+          eventId,
+          participantId,
+          PARTICIPANT_STATUS.REGISTERED,
+        );
+        return this.participantsRepository.findEventParticipationById(
+          existingParticipation.id,
+        );
+      }
+      throw new ConflictException(
+        'Participant is already registered for this event',
+      );
     }
 
     const participationData = {
@@ -128,6 +156,37 @@ export class ParticipantsService {
     );
   }
 
+  async getParticipationForUser(
+    userId: number,
+    eventId: number,
+  ): Promise<EventParticipant | undefined> {
+    return this.participantsRepository.findEventParticipationByUserId(
+      userId,
+      eventId,
+    );
+  }
+
+  async setParticipationStatus(
+    eventId: number,
+    participantId: number,
+    status: EventParticipant['status'],
+  ): Promise<EventParticipant> {
+    const existing = await this.participantsRepository.findEventParticipation(
+      participantId,
+      eventId,
+    );
+    if (!existing) {
+      throw new NotFoundException('Participation not found');
+    }
+
+    await this.participantsRepository.setEventParticipationStatus(
+      eventId,
+      participantId,
+      status,
+    );
+    return this.participantsRepository.findEventParticipationById(existing.id);
+  }
+
   async validateParticipantExists(_participantId: number): Promise<boolean> {
     // We can implement this by trying to find by userId if needed
     // For now, we'll assume it exists if we get here
@@ -143,6 +202,12 @@ export class ParticipantsService {
         participantId,
         eventId,
       );
-    return !!participation && participation.status === 'confirmed';
+    // `registered` counts: nothing in the product ever asks a player to confirm,
+    // so a confirmed-only check made every achievement award impossible.
+    return (
+      !!participation &&
+      (participation.status === PARTICIPANT_STATUS.REGISTERED ||
+        participation.status === PARTICIPANT_STATUS.CONFIRMED)
+    );
   }
 }

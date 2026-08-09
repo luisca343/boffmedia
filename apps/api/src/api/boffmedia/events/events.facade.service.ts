@@ -1,4 +1,9 @@
-import { Injectable, Inject, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  Inject,
+  ForbiddenException,
+  NotFoundException,
+} from '@nestjs/common';
 import { MySql2Database } from 'drizzle-orm/mysql2';
 import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
 import { EventsService } from './services/events.service';
@@ -7,6 +12,7 @@ import { GamesService } from './services/games.service';
 import { AchievementsService } from './services/achievements.service';
 import { TeamsService } from './services/teams.service';
 import { ParticipantsService } from './services/participants.service';
+import { EventInvitesService } from './services/event-invites.service';
 import { ProgressService } from './services/progress.service';
 import { LeaderboardsService } from './services/leaderboards.service';
 import {
@@ -23,7 +29,6 @@ import { UpdateAchievementDto } from './dto/update-achievement.dto';
 import { CreateTeamDto } from './dto/create-team.dto';
 import { UpdateTeamDto } from './dto/update-team.dto';
 import { JoinEventDto } from './dto/join-event.dto';
-import { JoinTeamDto } from './dto/join-team.dto';
 import { UpdateProgressDto } from './dto/update-progress.dto';
 import { Event } from './entities/event.entity';
 import { Game } from './entities/game.entity';
@@ -32,6 +37,11 @@ import { AchievementWithProgress } from './entities/achievement-with-progress.en
 import { Team } from './entities/team.entity';
 import { TeamMember } from './entities/team-member.entity';
 import { Participant } from './entities/participant.entity';
+import {
+  EventInvite,
+  EventParticipant,
+  PARTICIPANT_STATUS,
+} from '@/_db/schema/BoffMediaEvents';
 import {
   LeaderboardEntry,
   TeamLeaderboardEntry,
@@ -46,6 +56,7 @@ export class EventsFacadeService {
     private readonly gamesService: GamesService,
     private readonly achievementsService: AchievementsService,
     private readonly participantsService: ParticipantsService,
+    private readonly eventInvitesService: EventInvitesService,
     private readonly teamsService: TeamsService,
     private readonly progressService: ProgressService,
     private readonly leaderboardsService: LeaderboardsService,
@@ -369,7 +380,7 @@ export class EventsFacadeService {
   async joinTeam(
     eventId: number,
     teamId: number,
-    joinTeamDto: JoinTeamDto,
+    userId: number,
   ): Promise<{ success: boolean }> {
     const [eventExists, teamExists, teamInEvent] = await Promise.all([
       this.eventsService.validateEventExists(eventId),
@@ -387,11 +398,7 @@ export class EventsFacadeService {
       throw new Error('Team does not belong to this event');
     }
 
-    await this.teamsService.joinTeam(
-      eventId,
-      teamId,
-      joinTeamDto.participantId,
-    );
+    await this.teamsService.joinTeam(eventId, teamId, userId);
     return { success: true };
   }
 
@@ -424,11 +431,21 @@ export class EventsFacadeService {
   async joinEvent(
     eventId: number,
     joinEventDto: JoinEventDto,
+    options: { bypassVisibility?: boolean } = {},
   ): Promise<{ success: boolean }> {
-    // First, verify the event exists
-    const eventExists = await this.eventsService.validateEventExists(eventId);
-    if (!eventExists) {
-      throw new Error('Event not found');
+    const event = await this.eventsService.getEventById(eventId, true);
+    if (!event) {
+      throw new NotFoundException('Event not found');
+    }
+
+    // A private event is joinable, but only through an invitation (or by an
+    // admin adding the player). It used to fail as "Event not found" because
+    // the existence check itself filtered private events out.
+    if (event.visibility === 'private' && !options.bypassVisibility) {
+      throw new ForbiddenException({
+        message: 'Event is private',
+        userMessage: 'Este evento es privado. Necesitas una invitación.',
+      });
     }
 
     // userId is injected from the JWT by the controller; guard narrows the
@@ -443,22 +460,105 @@ export class EventsFacadeService {
         joinEventDto.userId,
       );
 
-    // Check if already participating
-    const existingParticipation =
-      await this.participantsService.validateEventParticipation(
-        participant.id,
-        eventId,
-      );
-    if (existingParticipation) {
-      throw new Error('Participant is already registered for this event');
-    }
-
+    // joinEvent itself resolves the already-a-member cases (re-joining after
+    // declining, refusing after an admin removal) — duplicating the check here
+    // only made "already registered" and "previously declined" indistinguishable.
     await this.participantsService.joinEvent(
       eventId,
       participant.id,
       joinEventDto,
     );
     return { success: true };
+  }
+
+  /** Self-service. Deletes the row outright, so re-joining later is clean. */
+  async leaveEvent(
+    eventId: number,
+    userId: number,
+  ): Promise<{ success: boolean }> {
+    const participation = await this.participantsService.getParticipationForUser(
+      userId,
+      eventId,
+    );
+    if (!participation) {
+      throw new NotFoundException('You are not a participant of this event');
+    }
+
+    await this.participantsService.leaveEvent(
+      eventId,
+      participation.participantId,
+    );
+    return { success: true };
+  }
+
+  /** Admin. Keeps the row as `removed` so the player cannot simply re-join. */
+  async removeParticipant(
+    eventId: number,
+    participantId: number,
+  ): Promise<{ success: boolean }> {
+    await this.participantsService.setParticipationStatus(
+      eventId,
+      participantId,
+      PARTICIPANT_STATUS.REMOVED,
+    );
+    return { success: true };
+  }
+
+  async setParticipantStatus(
+    eventId: number,
+    participantId: number,
+    status: (typeof PARTICIPANT_STATUS)[keyof typeof PARTICIPANT_STATUS],
+  ): Promise<EventParticipant> {
+    return this.participantsService.setParticipationStatus(
+      eventId,
+      participantId,
+      status,
+    );
+  }
+
+  // ==================== EVENT LIFECYCLE ====================
+
+  async setEventStatus(
+    eventId: number,
+    status: 'upcoming' | 'active' | 'completed',
+  ): Promise<Event> {
+    return this.eventsService.setStatus(eventId, status) as unknown as Event;
+  }
+
+  // ==================== EVENT INVITATIONS ====================
+
+  async createEventInvite(
+    eventId: number,
+    createdBy: number | null,
+    options: { expiresAt?: string; maxUses?: number },
+  ): Promise<EventInvite> {
+    const exists = await this.eventsService.validateEventExists(eventId);
+    if (!exists) throw new NotFoundException('Event not found');
+    return this.eventInvitesService.create(eventId, createdBy, options);
+  }
+
+  async listEventInvites(eventId: number): Promise<EventInvite[]> {
+    return this.eventInvitesService.listForEvent(eventId);
+  }
+
+  async revokeEventInvite(code: string): Promise<{ success: boolean }> {
+    await this.eventInvitesService.revoke(code);
+    return { success: true };
+  }
+
+  async redeemEventInvite(
+    code: string,
+    userId: number,
+  ): Promise<{ eventId: number }> {
+    const invite = await this.eventInvitesService.consume(code);
+    // bypassVisibility: the invitation IS the authorisation to join a private
+    // event — that is the entire point of the code.
+    await this.joinEvent(
+      invite.eventId,
+      { userId, comment: `Invitación ${code}` },
+      { bypassVisibility: true },
+    );
+    return { eventId: invite.eventId };
   }
 
   async getEventParticipants(

@@ -43,6 +43,9 @@ export class EventsRepository {
     status: boffMediaEvents.status,
     visibility: boffMediaEvents.visibility,
     type: boffMediaEvents.type,
+    // Exposed because entitlement now derives from event membership: a client
+    // that cannot see which pack an event carries cannot explain the access.
+    packId: boffMediaEvents.packId,
     createdAt: boffMediaEvents.createdAt,
     updatedAt: boffMediaEvents.updatedAt,
     deletedAt: boffMediaEvents.deletedAt,
@@ -171,6 +174,16 @@ export class EventsRepository {
         ...eventData,
         updatedAt: new Date(),
       } as Event)
+      .where(eq(boffMediaEvents.id, id));
+  }
+
+  async setStatus(
+    id: number,
+    status: 'upcoming' | 'active' | 'completed',
+  ): Promise<void> {
+    await this.db
+      .update(boffMediaEvents)
+      .set({ status, updatedAt: new Date() } as Partial<Event>)
       .where(eq(boffMediaEvents.id, id));
   }
 

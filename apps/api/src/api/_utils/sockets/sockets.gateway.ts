@@ -9,8 +9,10 @@ import {
 } from '@nestjs/websockets';
 import type { Server, Socket } from 'socket.io';
 import { Inject, forwardRef } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 import { ChatappFacadeService } from '@api/smartrotom/chatapp/chatapp.facade.service';
 import { PresenceService } from './presence.service';
+import { identifySocket } from './socket-identity';
 import { Logger } from 'nestjs-pino';
 
 @WebSocketGateway(34304, {
@@ -32,7 +34,15 @@ export class SocketsGateway
     private chatAppService: ChatappFacadeService,
 
     private readonly presence: PresenceService,
+
+    private readonly jwt: JwtService,
   ) {}
+
+  /** The uuid this socket PROVED at connection time. Every handler keys on this
+   *  rather than on whatever the message body claims. */
+  private uuidOf(client: Socket): string | null {
+    return client.identity?.mcUuid ?? null;
+  }
 
   private broadcastPresence(uuid: string): void {
     this.server.emit('presence:update', {
@@ -42,7 +52,21 @@ export class SocketsGateway
   }
 
   handleConnection(client: Socket) {
-    this.logger.log(`Client with ID ${client.id} connected`);
+    // Authenticate here, not per message: a socket that never proved who it is
+    // has no business holding a connection, and checking once means no handler
+    // can forget to.
+    const identity = identifySocket(this.jwt, client);
+    if (!identity) {
+      this.logger.warn(`Socket ${client.id} rejected: no valid session token`);
+      client.emit('auth:error', { message: 'Sesión no válida' });
+      client.disconnect(true);
+      return;
+    }
+
+    client.identity = identity;
+    this.logger.log(
+      `Client with ID ${client.id} connected as user ${identity.userId}`,
+    );
     this.logger.log('Total connections:', this.server.sockets.sockets.size);
   }
 
@@ -51,30 +75,25 @@ export class SocketsGateway
     @ConnectedSocket() client: Socket,
     @MessageBody() smartRotomUser: any,
   ): boolean {
-    this.logger.log(`SmartRotom connection for user ${smartRotomUser.uuid}`);
+    // The uuid comes from the token, never from the body. `inGame` still does:
+    // it is a presentation flag (online vs in-game), not an identity claim.
+    const uuid = this.uuidOf(client);
+    if (!uuid) {
+      this.logger.warn(
+        `Socket ${client.id} has no linked Minecraft account; refusing presence`,
+      );
+      return client.emit('auth:error', {
+        message: 'Esta cuenta no tiene Minecraft vinculado',
+      });
+    }
 
-    // If the user already has a connection, disconnect the old one
-    const _existingUser = this.users.get(smartRotomUser.uuid);
-    /*
-      if (existingUser && existingUser.socketId !== client.id) {
-        const oldSocket = this.server.sockets.sockets.get(existingUser.socketId)
-        if (oldSocket) {
-          this.logger.log(`Disconnecting old socket for user ${smartRotomUser.uuid}`)
-          oldSocket.disconnect(true)
-        }
-      }*/
-
-    // Update or add the new connection
-    this.users.set(smartRotomUser.uuid, {
-      uuid: smartRotomUser.uuid,
-      socketId: client.id,
-    });
-    this.presence.setOnline(smartRotomUser.uuid, !!smartRotomUser.inGame);
-    this.broadcastPresence(smartRotomUser.uuid);
-    this.logger.log(`Updated connection for user ${smartRotomUser.uuid}`);
+    this.users.set(uuid, { uuid, socketId: client.id });
+    this.presence.setOnline(uuid, !!smartRotomUser?.inGame);
+    this.broadcastPresence(uuid);
+    this.logger.log(`Updated connection for user ${uuid}`);
     this.logger.log('Current users:', this.users.size);
 
-    return client.emit('smartrotom:connection', smartRotomUser);
+    return client.emit('smartrotom:connection', { ...smartRotomUser, uuid });
   }
 
   handleDisconnect(client: Socket) {
@@ -110,11 +129,11 @@ export class SocketsGateway
       startTime: number;
     },
   ): void {
-    // Remove the user from the call
-    this.logger.log(`Exit call signal sent by ${data.user.uuid}`);
-    data.call.users = data.call.users.filter(
-      (user) => user.uuid !== data.user.uuid,
-    );
+    const actor = this.uuidOf(client);
+    if (!actor) return;
+
+    this.logger.log(`Exit call signal sent by ${actor}`);
+    data.call.users = data.call.users.filter((user) => user.uuid !== actor);
     const _sockets = this.server.sockets.sockets;
     const currentUsers = data.call.users.filter(
       (user) => user.status === 'IN_CALL',
@@ -143,7 +162,10 @@ export class SocketsGateway
       user: any;
     },
   ): void {
-    this.logger.log(`Join call signal sent by ${data.user.uuid}`);
+    const actor = this.uuidOf(client);
+    if (!actor) return;
+
+    this.logger.log(`Join call signal sent by ${actor}`);
     const _sockets = this.server.sockets.sockets;
     const users = data.call.users.map((user) => user.uuid);
     const connectedUsers = Array.from(this.users.keys());
@@ -157,7 +179,7 @@ export class SocketsGateway
         this.logger.log(`Sending join call signal to ${user.uuid}`);
         this.server
           .to(userSocket.socketId)
-          .emit('chat:joincall', { uuid: data.user.uuid });
+          .emit('chat:joincall', { uuid: actor });
       }
     });
   }
@@ -165,23 +187,28 @@ export class SocketsGateway
   @SubscribeMessage('chat:typing:start')
   async handleTypingStart(
     @ConnectedSocket() client: Socket,
-    @MessageBody() data: { chatId: number; uuid: string; username?: string },
+    @MessageBody() data: { chatId: number; username?: string },
   ): Promise<void> {
+    const actor = this.uuidOf(client);
+    if (!actor) return;
+
     try {
-      // Get chat members to broadcast to
+      // getChatById is also the membership check: it throws for a chat this
+      // uuid is not in, so a typing signal cannot be broadcast into a stranger's
+      // conversation.
       const chatMembers = await this.chatAppService.getChatById(
         data.chatId,
-        data.uuid,
+        actor,
       );
 
       // Broadcast typing indicator to all other members in the chat
       chatMembers.members.forEach((member) => {
-        if (member.uuid !== data.uuid) {
+        if (member.uuid !== actor) {
           const userSocket = this.users.get(member.uuid);
           if (userSocket) {
             this.server.to(userSocket.socketId).emit('chat:typing:start', {
               chatId: data.chatId,
-              uuid: data.uuid,
+              uuid: actor,
               username: data.username,
             });
           }
@@ -195,25 +222,27 @@ export class SocketsGateway
   @SubscribeMessage('chat:typing:stop')
   async handleTypingStop(
     @ConnectedSocket() client: Socket,
-    @MessageBody() data: { chatId: number; uuid: string },
+    @MessageBody() data: { chatId: number },
   ): Promise<void> {
-    this.logger.log(`Typing stopped by ${data.uuid} in chat ${data.chatId}`);
+    const actor = this.uuidOf(client);
+    if (!actor) return;
+
+    this.logger.log(`Typing stopped by ${actor} in chat ${data.chatId}`);
 
     try {
-      // Get chat members to broadcast to
       const chatMembers = await this.chatAppService.getChatById(
         data.chatId,
-        data.uuid,
+        actor,
       );
 
       // Broadcast typing stop to all other members in the chat
       chatMembers.members.forEach((member) => {
-        if (member.uuid !== data.uuid) {
+        if (member.uuid !== actor) {
           const userSocket = this.users.get(member.uuid);
           if (userSocket) {
             this.server.to(userSocket.socketId).emit('chat:typing:stop', {
               chatId: data.chatId,
-              uuid: data.uuid,
+              uuid: actor,
             });
           }
         }

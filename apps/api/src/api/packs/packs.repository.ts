@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { and, desc, eq, inArray, isNull, or, sql } from 'drizzle-orm';
+import { and, desc, eq, inArray, isNull, or, sql, type SQL } from 'drizzle-orm';
 import { MySql2Database } from 'drizzle-orm/mysql2';
 import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
 import {
@@ -9,14 +9,33 @@ import {
   PackVersion,
   packAcl,
   packAudit,
+  packGrants,
   packInvites,
   packVersions,
   packs,
 } from '@/_db/schema/Packs';
 import { randomizerConfigs } from '@/_db/schema/Randomizer';
-import { boffMediaEvents, EVENT_STATUS } from '@/_db/schema/BoffMediaEvents';
+import {
+  EVENT_STATUS,
+  PARTICIPANT_STATUS,
+  boffMediaEventParticipants,
+  boffMediaEvents,
+  boffMediaParticipants,
+} from '@/_db/schema/BoffMediaEvents';
+import { boffMediaUsers } from '@/_db/schema/BoffMedia';
 import type { AuditAction } from './types/packs.types';
 import type { RandomizerConfig } from '@/_db/schema/Randomizer';
+
+/**
+ * Who is asking for a pack. The Boffmedia account is the real principal;
+ * `mcUuid` is the legacy key that `pack_acl` rows and pre-grants are stored
+ * under, and — until the launcher signs in with a Boffmedia account — the only
+ * identity a launcher request carries.
+ */
+export interface PackPrincipal {
+  userId?: number | null;
+  mcUuid?: string | null;
+}
 
 @Injectable()
 export class PacksRepository {
@@ -74,13 +93,71 @@ export class PacksRepository {
   }
 
   /**
-   * Packs this UUID may see: public ones, password ones (the gate is on the
-   * manifest, not the listing), and allowlist ones where a grant exists.
-   * Access filtering lives HERE rather than in the service so there is exactly
-   * one query that can leak a pack, and it is this one.
+   * Membership in an event that carries this pack, as a correlated EXISTS.
+   *
+   * Access is *derived* from membership rather than propagated into a grant
+   * row on join: with no stored copy there is nothing to synchronise, so leave,
+   * removal, pack swap, event deletion and visibility flips are all correct by
+   * construction instead of by a job that has to remember them.
+   *
+   * `packIdRef` is either `packs.id` (correlated, for the listing) or a literal
+   * pack id. Participants with no `user_id` are anonymous and derive nothing.
    */
-  async listVisibleTo(uuid: string): Promise<Pack[]> {
-    const rows = await this.db
+  private eventMembershipExists(
+    packIdRef: SQL | typeof packs.id,
+    principal: PackPrincipal,
+  ): SQL | null {
+    const conditions = [
+      eq(boffMediaEvents.packId, packIdRef as never),
+      isNull(boffMediaEvents.deletedAt),
+      inArray(boffMediaEventParticipants.status, [
+        PARTICIPANT_STATUS.REGISTERED,
+        PARTICIPANT_STATUS.CONFIRMED,
+      ]),
+    ];
+
+    let query = this.db
+      .select({ one: sql`1` })
+      .from(boffMediaEventParticipants)
+      .innerJoin(
+        boffMediaEvents,
+        eq(boffMediaEvents.id, boffMediaEventParticipants.eventId),
+      )
+      .innerJoin(
+        boffMediaParticipants,
+        eq(boffMediaParticipants.id, boffMediaEventParticipants.participantId),
+      )
+      .$dynamic();
+
+    if (principal.userId != null) {
+      conditions.push(eq(boffMediaParticipants.userId, principal.userId));
+    } else if (principal.mcUuid) {
+      // The Phase 2 bridge: the launcher still authenticates as a Minecraft
+      // UUID, so membership is reached through the account that UUID is linked
+      // to. Phase 4 drops this join when the launcher carries a user id.
+      query = query.innerJoin(
+        boffMediaUsers,
+        eq(boffMediaUsers.id, boffMediaParticipants.userId),
+      );
+      conditions.push(eq(boffMediaUsers.uuid, principal.mcUuid));
+    } else {
+      return null;
+    }
+
+    return sql`exists ${query.where(and(...conditions))}`;
+  }
+
+  /**
+   * Packs this principal may see. Three independent sources, unioned:
+   * public/password packs (the password gate is on the manifest, not the
+   * listing), a direct ACL grant, and live membership in an event carrying the
+   * pack. Access filtering lives HERE rather than in the service so there is
+   * exactly one query that can leak a pack, and it is this one.
+   */
+  async listVisibleTo(principal: PackPrincipal): Promise<Pack[]> {
+    const sources = [inArray(packs.accessKind, ['public', 'password'])];
+
+    let query = this.db
       .select({
         id: packs.id,
         slug: packs.slug,
@@ -99,19 +176,34 @@ export class PacksRepository {
         updatedAt: packs.updatedAt,
       })
       .from(packs)
-      .leftJoin(
-        packAcl,
-        and(eq(packAcl.packId, packs.id), eq(packAcl.uuid, uuid)),
-      )
-      .where(
+      .$dynamic();
+
+    if (principal.userId != null) {
+      query = query.leftJoin(
+        packGrants,
         and(
-          eq(packs.archived, false),
-          or(
-            inArray(packs.accessKind, ['public', 'password']),
-            sql`${packAcl.uuid} is not null`,
-          ),
+          eq(packGrants.packId, packs.id),
+          eq(packGrants.userId, principal.userId),
         ),
-      )
+      );
+      sources.push(sql`${packGrants.userId} is not null`);
+    }
+
+    // Legacy pre-grants: a UUID an admin granted before that player registered.
+    // Only reachable while the account still carries a linked Minecraft UUID.
+    if (principal.mcUuid) {
+      query = query.leftJoin(
+        packAcl,
+        and(eq(packAcl.packId, packs.id), eq(packAcl.uuid, principal.mcUuid)),
+      );
+      sources.push(sql`${packAcl.uuid} is not null`);
+    }
+
+    const membership = this.eventMembershipExists(packs.id, principal);
+    if (membership) sources.push(membership);
+
+    const rows = await query
+      .where(and(eq(packs.archived, false), or(...sources)))
       .orderBy(desc(packs.createdAt));
     return rows.map((row) => this.hydratePack(row));
   }
@@ -223,13 +315,152 @@ export class PacksRepository {
 
   // ── ACL ──────────────────────────────────────────────────────────────────
 
-  async hasAccess(packId: string, uuid: string): Promise<boolean> {
+  /**
+   * The union of the two non-public sources: a direct ACL grant, or membership
+   * in an event carrying this pack. Public packs never reach here — the service
+   * short-circuits them before asking.
+   */
+  async hasAccess(packId: string, principal: PackPrincipal): Promise<boolean> {
+    if (principal.userId != null) {
+      const [row] = await this.db
+        .select({ userId: packGrants.userId })
+        .from(packGrants)
+        .where(
+          and(
+            eq(packGrants.packId, packId),
+            eq(packGrants.userId, principal.userId),
+          ),
+        )
+        .limit(1);
+      if (row) return true;
+    }
+
+    if (principal.mcUuid) {
+      const [row] = await this.db
+        .select({ uuid: packAcl.uuid })
+        .from(packAcl)
+        .where(
+          and(eq(packAcl.packId, packId), eq(packAcl.uuid, principal.mcUuid)),
+        )
+        .limit(1);
+      if (row) return true;
+    }
+
+    const membership = this.eventMembershipExists(
+      sql`${packId}` as SQL,
+      principal,
+    );
+    if (!membership) return false;
+
     const [row] = await this.db
-      .select({ uuid: packAcl.uuid })
+      .select({ ok: membership })
+      .from(sql`(select 1) as _`);
+    return Boolean(Number(row?.ok ?? 0));
+  }
+
+  /** Account picker for the admin grant UI. Deliberately narrow: a pack admin
+   *  needs to identify a person, not read their profile. */
+  async searchUsers(
+    q: string,
+    limit = 10,
+  ): Promise<{ id: number; username: string; email: string }[]> {
+    const term = `%${q}%`;
+    return this.db
+      .select({
+        id: boffMediaUsers.id,
+        username: boffMediaUsers.username,
+        email: boffMediaUsers.email,
+      })
+      .from(boffMediaUsers)
+      .where(
+        and(
+          isNull(boffMediaUsers.deletedAt),
+          or(
+            sql`${boffMediaUsers.username} like ${term}`,
+            sql`${boffMediaUsers.email} like ${term}`,
+          ),
+        ),
+      )
+      .orderBy(boffMediaUsers.username)
+      .limit(limit);
+  }
+
+  /** Direct grants on a pack, with the account behind each one. */
+  async listGrants(packId: string): Promise<
+    {
+      userId: number;
+      username: string;
+      email: string;
+      source: string;
+      sourceRef: string | null;
+      grantedAt: Date;
+    }[]
+  > {
+    return this.db
+      .select({
+        userId: packGrants.userId,
+        username: boffMediaUsers.username,
+        email: boffMediaUsers.email,
+        source: packGrants.source,
+        sourceRef: packGrants.sourceRef,
+        grantedAt: packGrants.grantedAt,
+      })
+      .from(packGrants)
+      .innerJoin(boffMediaUsers, eq(boffMediaUsers.id, packGrants.userId))
+      .where(eq(packGrants.packId, packId))
+      .orderBy(desc(packGrants.grantedAt)) as never;
+  }
+
+  /** Idempotent: re-granting an existing entitlement must not 500. */
+  async grantToUser(
+    packId: string,
+    userId: number,
+    source: 'admin' | 'invite',
+    sourceRef: string | null,
+    grantedBy: number | null,
+  ): Promise<void> {
+    await this.db
+      .insert(packGrants)
+      .values({ packId, userId, source, sourceRef, grantedBy })
+      .onDuplicateKeyUpdate({ set: { grantedAt: sql`CURRENT_TIMESTAMP()` } });
+  }
+
+  /** Revokes every source at once — the admin UI's "remove this person". */
+  async revokeFromUser(packId: string, userId: number): Promise<void> {
+    await this.db
+      .delete(packGrants)
+      .where(and(eq(packGrants.packId, packId), eq(packGrants.userId, userId)));
+  }
+
+  /**
+   * Converts this account's legacy UUID pre-grants into real grants. Called when
+   * a Minecraft account is linked, which is the moment a pre-grant finally has
+   * an account to belong to.
+   */
+  async claimLegacyGrants(userId: number, mcUuid: string): Promise<number> {
+    const rows = await this.db
+      .select({
+        packId: packAcl.packId,
+        grantedBy: packAcl.grantedBy,
+        viaInvite: packAcl.viaInvite,
+      })
       .from(packAcl)
-      .where(and(eq(packAcl.packId, packId), eq(packAcl.uuid, uuid)))
-      .limit(1);
-    return !!row;
+      .where(eq(packAcl.uuid, mcUuid));
+
+    for (const row of rows) {
+      await this.grantToUser(
+        row.packId,
+        userId,
+        row.viaInvite ? 'invite' : 'admin',
+        row.viaInvite,
+        row.grantedBy,
+      );
+    }
+
+    if (rows.length > 0) {
+      await this.db.delete(packAcl).where(eq(packAcl.uuid, mcUuid));
+    }
+    return rows.length;
   }
 
   async listAcl(packId: string): Promise<{ uuid: string; grantedAt: Date }[]> {
@@ -240,15 +471,65 @@ export class PacksRepository {
       .orderBy(desc(packAcl.grantedAt));
   }
 
+  /**
+   * The events whose membership grants this pack, with how many members that
+   * currently is. Without this the admin access panel lists only ACL rows and
+   * silently under-reports who can actually install the pack.
+   */
+  async listGrantingEvents(packId: string): Promise<
+    {
+      eventId: number;
+      title: string;
+      status: string;
+      visibility: string;
+      memberCount: number;
+    }[]
+  > {
+    return this.db
+      .select({
+        eventId: boffMediaEvents.id,
+        title: boffMediaEvents.title,
+        status: boffMediaEvents.status,
+        visibility: boffMediaEvents.visibility,
+        memberCount: sql<number>`sum(case when ${inArray(
+          boffMediaEventParticipants.status,
+          [PARTICIPANT_STATUS.REGISTERED, PARTICIPANT_STATUS.CONFIRMED],
+        )} then 1 else 0 end)`,
+      })
+      .from(boffMediaEvents)
+      .leftJoin(
+        boffMediaEventParticipants,
+        eq(boffMediaEventParticipants.eventId, boffMediaEvents.id),
+      )
+      .where(
+        and(
+          eq(boffMediaEvents.packId, packId),
+          isNull(boffMediaEvents.deletedAt),
+        ),
+      )
+      .groupBy(
+        boffMediaEvents.id,
+        boffMediaEvents.title,
+        boffMediaEvents.status,
+        boffMediaEvents.visibility,
+      );
+  }
+
+  /** How many people hold a direct grant: real grants plus any legacy UUID
+   *  pre-grants still waiting for an account. */
   async countAcl(packId: string): Promise<number> {
-    const [row] = await this.db
+    const [grants] = await this.db
+      .select({ n: sql<number>`count(*)` })
+      .from(packGrants)
+      .where(eq(packGrants.packId, packId));
+    const [legacy] = await this.db
       .select({ n: sql<number>`count(*)` })
       .from(packAcl)
       .where(eq(packAcl.packId, packId));
-    return Number(row?.n ?? 0);
+    return Number(grants?.n ?? 0) + Number(legacy?.n ?? 0);
   }
 
-  /** Idempotent: re-granting an existing entitlement must not 500. */
+  /** LEGACY pre-grant for a UUID with no account behind it yet. */
   async grant(
     packId: string,
     uuid: string,
@@ -320,47 +601,6 @@ export class PacksRepository {
       .update(packInvites)
       .set({ revoked: true })
       .where(eq(packInvites.code, code));
-  }
-
-  // ── Randomizer ───────────────────────────────────────────────────────────
-
-  /**
-   * Resolve a pack to its randomizer config: the config of the ACTIVE
-   * community event that has this pack attached. Returns null if no such
-   * event/config exists. Mirrors RandomizerRepository.getConfigByPackId but
-   * lives here to avoid circular module dependencies (RandomizerModule imports
-   * PacksModule, so PacksModule cannot import RandomizerModule).
-   */
-  async getRandomizerConfigByPackId(
-    packId: string,
-  ): Promise<RandomizerConfig | null> {
-    if (!packId) {
-      return null;
-    }
-
-    try {
-      const rows = await this.db
-        .select({ config: randomizerConfigs })
-        .from(boffMediaEvents)
-        .innerJoin(
-          randomizerConfigs,
-          eq(randomizerConfigs.eventId, boffMediaEvents.id),
-        )
-        .where(
-          and(
-            eq(boffMediaEvents.packId, packId),
-            eq(boffMediaEvents.status, EVENT_STATUS.ACTIVE),
-          ),
-        )
-        .execute();
-
-      return rows.length > 0 ? rows[0].config : null;
-    } catch (error: any) {
-      // Log but don't throw — a randomizer lookup failure should not block
-      // manifest serving; just means no randomizer block in the manifest.
-      console.error(`Failed to get randomizer config for pack ${packId}:`, error);
-      return null;
-    }
   }
 
   // ── Audit ────────────────────────────────────────────────────────────────

@@ -91,7 +91,17 @@ export interface StoredPackFile {
     | { kind: 'curseforge'; projectId: number; fileId: number }
     | { kind: 'url'; url: string }
     | { kind: 'override'; blobSha512: string }
-    | { kind: 'user-provided'; hint: string };
+    | { kind: 'user-provided'; hint: string }
+    // The romhack case: produced on the client from a clean file plus a patch,
+    // both of which are other entries in files[]. The server never hosts the
+    // result, which is exactly why it was missing here and why an emulator
+    // pack's manifest did not type against its own stored shape.
+    | {
+        kind: 'patched';
+        sourcePath: string;
+        patchPath: string;
+        patchFormat?: string;
+      };
 }
 
 export interface StoredPackGalleryImage {
@@ -111,16 +121,18 @@ export interface StoredBundledWorld {
   sha512: string;
 }
 
-/** A launcher session, minted only after `hasJoined` proved UUID ownership. */
+/**
+ * Who a launcher request is. The Boffmedia account is the principal — packs,
+ * events, entitlements and downloads need no Minecraft identity at all.
+ *
+ * `mcUuid` is carried only so Minecraft-specific behaviour (legacy pack_acl
+ * pre-grants, server allowlisting) still has it, and is absent for an account
+ * that has never linked Minecraft.
+ */
 export interface LauncherPrincipal {
-  uuid: string;
+  userId: number;
   username: string;
-}
-
-/** §7.2 step 1 — the serverId the launcher must present to Mojang. */
-export interface JoinChallenge {
-  serverId: string;
-  expiresInSeconds: number;
+  mcUuid?: string | null;
 }
 
 export const AUDIT = {

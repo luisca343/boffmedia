@@ -21,13 +21,15 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
+import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
 import { Public } from '@api/_utils/decorators/public.decorator';
+import { LauncherThrottlerGuard } from '@api/_utils/guards/launcher-throttler.guard';
 import {
   LauncherAuthGuard,
   LauncherRequest,
 } from './guards/launcher-auth.guard';
-import { PacksAuthService } from './packs-auth.service';
 import { PacksService } from './packs.service';
+import type { PackPrincipal } from './packs.repository';
 import {
   PacksDownloadsService,
   ProxiedDownload,
@@ -35,18 +37,23 @@ import {
 import {
   DownloadQueryDto,
   ManifestQueryDto,
+  PollDeviceAuthDto,
   RedeemInviteDto,
-  VerifyJoinDto,
+  StartDeviceAuthDto,
 } from './dto/packs.dto';
 import {
-  JoinChallengeEntity,
+  DeviceAuthorizationEntity,
+  DevicePollEntity,
   LauncherPackEntity,
-  LauncherSessionEntity,
+  LauncherSessionUserEntity,
 } from './entities/packs.entity';
+import { LauncherDeviceService } from './launcher-device.service';
+import { env } from '@/config/env';
 
-// The launcher's entire surface. HANDOFF §7.2 — identity is a Minecraft UUID
-// proved through Mojang's hasJoined handshake, never a Boffmedia account, so a
-// player who has never opened the website can still install a pack.
+// The launcher's entire surface. Identity is a BOFFMEDIA account, established
+// by the device-authorization flow below — packs, events, entitlement and
+// downloads are all Boffmedia-level facts, and requiring a paid Minecraft
+// account to open an emulator pack had no product justification left.
 //
 // `@Public()` is applied PER ROUTE, never on the class: it exempts these from
 // the global JwtAuthGuard (a launcher token is not a website session), and the
@@ -55,37 +62,53 @@ import {
 @Controller('packs/launcher')
 export class LauncherController {
   constructor(
-    private readonly auth: PacksAuthService,
+    private readonly device: LauncherDeviceService,
     private readonly packs: PacksService,
     private readonly downloads: PacksDownloadsService,
   ) {}
 
-  @Post('auth/challenge')
+  // Throttled by IP: these are unauthenticated and each one writes a row.
+  @Post('auth/device')
   @Public()
+  @UseGuards(ThrottlerGuard)
+  @Throttle({ default: { ttl: 60_000, limit: 20 } })
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
-    summary: 'Paso 1: obtener un serverId para el handshake de Mojang',
+    summary: 'Paso 1: pedir un código para autorizar este launcher',
+    description:
+      'El jugador aprueba el código en la web, donde ya ha iniciado sesión. Sustituye al handshake de Mojang: el launcher se identifica con una cuenta de Boffmedia, no con una de Minecraft.',
   })
-  @ApiResponse({ status: HttpStatus.OK, type: JoinChallengeEntity })
-  challenge(): JoinChallengeEntity {
-    return this.auth.createChallenge();
+  @ApiResponse({ status: HttpStatus.OK, type: DeviceAuthorizationEntity })
+  async startDevice(
+    @Body() dto: StartDeviceAuthDto,
+  ): Promise<DeviceAuthorizationEntity> {
+    return this.device.start(
+      dto.clientLabel ?? null,
+      `${env.WEB_URL}/launcher/autorizar`,
+    );
   }
 
-  @Post('auth/verify')
+  @Post('auth/device/poll')
   @Public()
+  @UseGuards(ThrottlerGuard)
+  @Throttle({ default: { ttl: 60_000, limit: 60 } })
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
-    summary: 'Paso 3: canjear el desafío por una sesión de launcher',
+    summary: 'Paso 2: esperar a que el jugador apruebe',
     description:
-      'Entre el paso 1 y este, el launcher debe llamar a sessionserver.mojang.com/session/minecraft/join con el serverId.',
+      'Devuelve `pending` hasta que alguien decide. Una aprobación se canjea una sola vez.',
   })
-  @ApiResponse({ status: HttpStatus.OK, type: LauncherSessionEntity })
-  async verify(@Body() dto: VerifyJoinDto): Promise<LauncherSessionEntity> {
-    const principal = await this.auth.verify(dto.username, dto.serverId);
+  @ApiResponse({ status: HttpStatus.OK, type: DevicePollEntity })
+  async pollDevice(@Body() dto: PollDeviceAuthDto): Promise<DevicePollEntity> {
+    return this.device.poll(dto.deviceCode) as Promise<DevicePollEntity>;
+  }
+
+  /** The account is the principal; the Minecraft UUID rides along only so
+   *  legacy pack_acl pre-grants keyed on it still resolve. */
+  private principalOf(req: LauncherRequest): PackPrincipal {
     return {
-      token: this.auth.signSession(principal),
-      uuid: principal.uuid,
-      username: principal.username,
+      userId: req.launcher!.userId,
+      mcUuid: req.launcher!.mcUuid ?? null,
     };
   }
 
@@ -101,18 +124,36 @@ export class LauncherController {
       .filter(Boolean);
   }
 
+  @Get('me')
+  @Public()
+  @UseGuards(LauncherAuthGuard)
+  @ApiBearerAuth('JWT')
+  @ApiOperation({
+    summary: 'La cuenta de esta sesión',
+    description:
+      'El launcher lo llama al arrancar: una sesión de 30 días sobrevive a muchos motivos para revocarla, y enterarse al iniciar es mejor que enterarse a mitad de una instalación.',
+  })
+  @ApiResponse({ status: HttpStatus.OK, type: LauncherSessionUserEntity })
+  me(@Req() req: LauncherRequest): LauncherSessionUserEntity {
+    return {
+      id: req.launcher!.userId,
+      username: req.launcher!.username,
+      mcUuid: req.launcher!.mcUuid ?? null,
+    };
+  }
+
   @Get('packs')
   @Public()
   @UseGuards(LauncherAuthGuard)
   @ApiBearerAuth('JWT')
-  @ApiOperation({ summary: 'Los packs a los que este UUID tiene acceso' })
+  @ApiOperation({ summary: 'Los packs a los que esta cuenta tiene acceso' })
   @ApiResponse({ status: HttpStatus.OK, type: [LauncherPackEntity] })
   async list(
     @Req() req: LauncherRequest,
     @Headers('x-boff-game-types') gameTypes?: string,
   ): Promise<LauncherPackEntity[]> {
     return this.packs.listForLauncher(
-      req.launcher!.uuid,
+      this.principalOf(req),
       this.capabilitiesFrom(gameTypes),
     ) as Promise<LauncherPackEntity[]>;
   }
@@ -133,7 +174,7 @@ export class LauncherController {
     @Headers('x-boff-game-types') gameTypes?: string,
   ): Promise<unknown> {
     return this.packs.manifestFor(
-      req.launcher!.uuid,
+      this.principalOf(req),
       id,
       query.password ?? null,
       this.capabilitiesFrom(gameTypes),
@@ -160,7 +201,7 @@ export class LauncherController {
     @Res({ passthrough: true }) res: Response,
   ): Promise<StreamableFile> {
     await this.packs.entitledFile(
-      req.launcher!.uuid,
+      this.principalOf(req),
       id,
       query.password ?? null,
       (file) =>
@@ -190,7 +231,7 @@ export class LauncherController {
   ): Promise<StreamableFile> {
     const blob = sha512.toLowerCase();
     await this.packs.entitledFile(
-      req.launcher!.uuid,
+      this.principalOf(req),
       id,
       query.password ?? null,
       (file) =>
@@ -217,9 +258,12 @@ export class LauncherController {
     return new StreamableFile(download.stream);
   }
 
+  // Per-account, not per-IP: redemption is the abuse surface once launcher
+  // sessions stop costing a paid Minecraft account.
   @Post('invites/redeem')
   @Public()
-  @UseGuards(LauncherAuthGuard)
+  @UseGuards(LauncherAuthGuard, LauncherThrottlerGuard)
+  @Throttle({ default: { ttl: 60_000, limit: 10 } })
   @HttpCode(HttpStatus.OK)
   @ApiBearerAuth('JWT')
   @ApiOperation({ summary: 'Canjear un código de invitación' })
@@ -227,6 +271,6 @@ export class LauncherController {
     @Body() dto: RedeemInviteDto,
     @Req() req: LauncherRequest,
   ): Promise<{ packId: string }> {
-    return this.packs.redeemInvite(req.launcher!.uuid, dto.code);
+    return this.packs.redeemInvite(req.launcher!, dto.code);
   }
 }

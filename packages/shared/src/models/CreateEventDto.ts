@@ -43,6 +43,14 @@ export type CreateEventDto = {
      * The banner of the event
      */
     banner?: string;
+    /**
+     * Lifecycle status. Owned by the events module — the randomizer now requires an active event instead of activating one.
+     */
+    status?: CreateEventDto.status;
+    /**
+     * The pack this event grants access to. Membership in the event is what entitles a player to the pack.
+     */
+    packId?: Record<string, any> | null;
 };
 export namespace CreateEventDto {
     /**
@@ -58,6 +66,14 @@ export namespace CreateEventDto {
     export enum type {
         EVENT = 'event',
         SERVER = 'server',
+    }
+    /**
+     * Lifecycle status. Owned by the events module — the randomizer now requires an active event instead of activating one.
+     */
+    export enum status {
+        UPCOMING = 'upcoming',
+        ACTIVE = 'active',
+        COMPLETED = 'completed',
     }
 }
 

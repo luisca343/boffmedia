@@ -5,6 +5,7 @@ import { GamesService } from './services/games.service';
 import { AchievementsService } from './services/achievements.service';
 import { TeamsService } from './services/teams.service';
 import { ParticipantsService } from './services/participants.service';
+import { EventInvitesService } from './services/event-invites.service';
 import { ProgressService } from './services/progress.service';
 import { LeaderboardsService } from './services/leaderboards.service';
 import { ProfileService } from './services/profile.service';
@@ -139,6 +140,12 @@ describe('EventsFacadeService', () => {
       getParticipantAchievements: jest.fn(),
       joinEvent: jest.fn(),
     };
+    const mockEventInvitesService = {
+      create: jest.fn(),
+      listForEvent: jest.fn(),
+      revoke: jest.fn(),
+      consume: jest.fn(),
+    };
     const mockProgressService = { updateProgress: jest.fn() };
     const mockProfileService = {
       getUserTrophies: jest.fn(),
@@ -162,6 +169,7 @@ describe('EventsFacadeService', () => {
         { provide: AchievementsService, useValue: mockAchievementsService },
         { provide: TeamsService, useValue: mockTeamsService },
         { provide: ParticipantsService, useValue: mockParticipantsService },
+        { provide: EventInvitesService, useValue: mockEventInvitesService },
         { provide: ProgressService, useValue: mockProgressService },
         { provide: LeaderboardsService, useValue: mockLeaderboardsService },
         { provide: ProfileService, useValue: mockProfileService },

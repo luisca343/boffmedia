@@ -8,6 +8,7 @@ import { Logs } from "./screens/Logs"
 import { PackDetail } from "./screens/PackDetail"
 import { Packs } from "./screens/Packs"
 import { Settings } from "./screens/Settings"
+import { BoffSignIn } from "./screens/BoffSignIn"
 import { SignIn } from "./screens/SignIn"
 import { Splash } from "./screens/Splash"
 import { LauncherProvider, useLauncher } from "./state/launcher"
@@ -16,7 +17,7 @@ import { LauncherProvider, useLauncher } from "./state/launcher"
 // custom protocol where history-based routing is more trouble than it solves.
 
 function Router() {
-  const { account, accounts, booting, bootStep, signingIn, view } = useLauncher()
+  const { account, accounts, boffAccount, booting, bootStep, signingIn, view } = useLauncher()
 
   // Before anything else: while the silent restore is in flight we do not yet
   // know whether this player is signed in, and guessing "no" is what put
@@ -31,13 +32,15 @@ function Router() {
   // being signed out.
   if (signingIn) return <SignIn />
 
-  // Known accounts but no live session: offer the faces rather than the
-  // Microsoft button.
-  if (!account && accounts.length > 0) return <AccountPicker />
+  // Everything is gated on the BOFFMEDIA account: the pack list is filtered by
+  // that account's entitlements. Minecraft is NOT a prerequisite for the shell
+  // — an emulator pack never needs it, and gating on it meant a paid Minecraft
+  // account was required to open a GBA pack.
+  if (!boffAccount) return <BoffSignIn />
 
-  // Everything is gated on an account — the pack list is filtered per UUID
-  // server-side (§7.2), so there is nothing to render before sign-in.
-  if (!account) return <SignIn />
+  // Known Minecraft accounts but no live session: offer the faces rather than
+  // the Microsoft button. Reachable from the shell, never blocking it.
+  if (!account && accounts.length > 0) return <AccountPicker />
 
   return (
     <Shell>

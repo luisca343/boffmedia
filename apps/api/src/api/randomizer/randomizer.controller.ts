@@ -22,7 +22,6 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { Readable } from 'stream';
 import { JwtAuthGuard } from '@api/auth/jwt-auth.guard';
 import { RolesGuard } from '@api/_utils/guards/roles.guard';
 import { Roles } from '@api/_utils/decorators/roles.decorator';
@@ -187,21 +186,39 @@ export class RandomizerController {
     ) as Promise<ConfigResponseDto>;
   }
 
-  @Post('configs/:id/dry-run')
-  @ApiOperation({
-    summary: 'Dry-run randomization (test only, no persistence)',
-  })
-  @ApiConsumes('multipart/form-data')
-  @ApiResponse({ status: HttpStatus.OK })
-  async dryRunRandomization(@Param('id') id: string): Promise<StreamableFile> {
-    // TODO: Extract file from multipart form
-    // For now, just call service with stub stream
-    const stubStream = Readable.from(Buffer.alloc(0));
-    const { randomizedRom } = await this.events.dryRunRandomization(
+  @Post('configs/:id/reopen')
+  @ApiOperation({ summary: 'Reopen config (closed → open; claims resume)' })
+  @ApiResponse({ status: HttpStatus.OK, type: ConfigResponseDto })
+  async reopenConfig(
+    @Param('id') id: string,
+    @Req() req: any,
+  ): Promise<ConfigResponseDto> {
+    return this.events.reopenConfig(
       Number(id),
-      stubStream,
-    );
-    return new StreamableFile(randomizedRom);
+      this.actorId(req) || undefined,
+    ) as Promise<ConfigResponseDto>;
+  }
+
+  @Delete('configs/:id')
+  @ApiOperation({
+    summary: 'Delete a draft config and free its event’s pack',
+  })
+  @ApiResponse({ status: HttpStatus.NO_CONTENT })
+  async deleteConfig(@Param('id') id: string, @Req() req: any): Promise<void> {
+    await this.events.deleteConfig(Number(id), this.actorId(req) || undefined);
+  }
+
+  @Get('events/:eventId/config')
+  @ApiOperation({
+    summary: 'Get the config for an event (404 when not set up)',
+  })
+  @ApiResponse({ status: HttpStatus.OK, type: ConfigResponseDto })
+  async getEventConfig(
+    @Param('eventId') eventId: string,
+  ): Promise<ConfigResponseDto> {
+    return this.events.getConfigByEventId(
+      Number(eventId),
+    ) as Promise<ConfigResponseDto>;
   }
 
   @Post('quick-randomize')

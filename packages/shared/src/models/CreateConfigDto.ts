@@ -20,9 +20,13 @@ export type CreateConfigDto = {
      */
     presetId: number;
     /**
-     * SHA-512 of clean ROM
+     * Library ROM to pin as the clean base. The server copies its sha512 (execution value) and records rom_id (provenance); the platform must match gamePlatform.
      */
-    cleanRomSha512: string;
+    romId: number;
+    /**
+     * Emulator pack to attach to the event. The launcher resolves pack → event → config, so this is what makes the config reachable in the launcher.
+     */
+    packId: string;
     /**
      * Human-readable ROM hint
      */

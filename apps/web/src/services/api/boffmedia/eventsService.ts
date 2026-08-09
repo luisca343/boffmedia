@@ -25,9 +25,21 @@ import type {
   Participant,
   LeaderboardEntry,
   TeamLeaderboardEntry,
-  JoinTeamDto,
   SuccessResponse,
 } from '@boffmedia/shared';
+
+/** Declared locally like the pack invite types: this is the API response shape,
+ *  and it only reaches @boffmedia/shared after `pnpm generate:shared`. */
+export interface EventInvite {
+  code: string;
+  eventId: number;
+  createdBy: number | null;
+  createdAt: string;
+  expiresAt: string | null;
+  maxUses: number;
+  uses: number;
+  revoked: boolean;
+}
 
 export interface EventFilters {
   status?: 'upcoming' | 'active' | 'completed';
@@ -198,8 +210,9 @@ export class EventsService {
   /**
    * Join a team
    */
-  static joinTeam(eventId: number, teamId: number, data: JoinTeamDto) {
-    return apiAuthedAutoPOST<SuccessResponse>(`/events/${eventId}/teams/${teamId}/join`, data);
+  static joinTeam(eventId: number, teamId: number) {
+    // No body: the server takes the joining identity from the session.
+    return apiAuthedAutoPOST<SuccessResponse>(`/events/${eventId}/teams/${teamId}/join`, {});
   }
   
   /**
@@ -209,15 +222,71 @@ export class EventsService {
     return apiAuthedAutoDELETE<SuccessResponse>(`/events/${eventId}/teams/${teamId}/members/${userId}`);
   }
 
+  // ==================== EVENT LIFECYCLE ====================
+
+  /**
+   * Set the event's lifecycle status. Owned by the events module — the
+   * randomizer now requires an active event rather than activating one.
+   */
+  static setEventStatus(eventId: number, status: 'upcoming' | 'active' | 'completed') {
+    return apiAuthedAutoPOST<Event>(`/events/event/${eventId}/status`, { status });
+  }
+
+  // ==================== EVENT INVITATIONS ====================
+
+  static getEventInvites(eventId: number) {
+    return apiAuthedAutoGET<EventInvite[]>(`/events/event/${eventId}/invites`);
+  }
+
+  static createEventInvite(eventId: number, maxUses: number, expiresAt?: string) {
+    return apiAuthedAutoPOST<EventInvite>(`/events/event/${eventId}/invites`, {
+      maxUses,
+      ...(expiresAt ? { expiresAt } : {}),
+    });
+  }
+
+  static revokeEventInvite(code: string) {
+    return apiAuthedAutoDELETE<SuccessResponse>(`/events/invites/${code}`);
+  }
+
+  /** The only way a player joins a private event. */
+  static redeemEventInvite(code: string) {
+    return apiAuthedAutoPOST<{ eventId: number }>('/events/invites/redeem', { code });
+  }
+
   // ==================== PARTICIPANT OPERATIONS ====================
-  
+
   /**
    * Join an event
    */
   static joinEvent(eventId: number, data: any) {
     return apiAuthedAutoPOST<SuccessResponse>(`/events/join/${eventId}`, data);
   }
-  
+
+  /** Leave an event. Deletes the membership, so derived pack access lapses. */
+  static leaveEvent(eventId: number) {
+    return apiAuthedAutoPOST<SuccessResponse>(`/events/${eventId}/leave`, {});
+  }
+
+  /** Admin: mark a membership `removed` so the player cannot re-join. */
+  static removeParticipant(eventId: number, participantId: number) {
+    return apiAuthedAutoDELETE<SuccessResponse>(
+      `/events/${eventId}/participants/${participantId}`,
+    );
+  }
+
+  /** Admin: set a membership status directly. */
+  static setParticipantStatus(
+    eventId: number,
+    participantId: number,
+    status: 'registered' | 'confirmed' | 'declined' | 'removed',
+  ) {
+    return apiAuthedAutoPATCH<Participant>(
+      `/events/${eventId}/participants/${participantId}`,
+      { status },
+    );
+  }
+
   /**
    * Get all participants for an event
    */

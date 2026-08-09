@@ -1,24 +1,36 @@
 // The pack registry client (HANDOFF §7). Lives in Rust rather than the renderer
-// for one reason: minting a pack session needs the MINECRAFT access token to
-// complete Mojang's `join` handshake, and that token never leaves `auth`. Doing
-// the HTTP here also sidesteps CORS entirely — this is not a browser.
+// so the HTTP sidesteps CORS entirely — this is not a browser — and so the
+// launcher session never has to exist in JavaScript.
 //
-// Two tokens, never confused:
-//   * the Minecraft access token — auth::AuthState, used only against Mojang.
-//   * the LAUNCHER session JWT   — this module, used only against our API.
+// Identity is a BOFFMEDIA account, obtained through a device-authorization
+// flow: the launcher shows a short code, the player approves it on the website
+// where they are already signed in, and we receive a 30-day session. It used to
+// be a Minecraft identity proved through Mojang's `hasJoined` handshake, which
+// meant a paid Minecraft account was required to open an emulator pack.
+//
+// Three tokens, never confused:
+//   * the Minecraft access token  — auth::AuthState, used only against Mojang,
+//     and only when a MINECRAFT pack is installed or launched.
+//   * the LAUNCHER session JWT    — this module, used only against our API.
+//   * the Microsoft refresh token — auth::store, never leaves the credential store.
 
 use serde::{Deserialize, Serialize};
 use tokio::sync::Mutex;
 
-use crate::auth::{AuthState, AuthFailure};
+use crate::auth::{store, AuthFailure};
 
-const JOIN_URL: &str = "https://sessionserver.mojang.com/session/minecraft/join";
+/// The game modules THIS binary actually implements — install, launch, the lot.
+/// Adding a module here is what makes the server willing to hand us its packs,
+/// so the list must never run ahead of the code: a pack we cannot parse is a
+/// 409 the player reads as "update your launcher", which is the correct answer
+/// only when it is true.
+const GAME_MODULES: &[&str] = &["minecraft", "emulator"];
 
-/// The game types THIS binary can parse and launch, sent on every pack list /
-/// manifest call so the server never hands us a pack we cannot handle. This is
-/// the truthful capability set of the build, never aspirational: `emulator`
-/// joins it in the Cycle 2 release that can actually launch emulator packs.
-const GAME_TYPES_HEADER: &str = "minecraft,emulator";
+/// Sent on every pack list / manifest call. Derived from GAME_MODULES rather
+/// than hand-written, so a new module cannot ship with a stale header.
+fn game_types_header() -> String {
+    GAME_MODULES.join(",")
+}
 
 /// Where the pack registry lives. A runtime env var wins so a QA build can be
 /// pointed at a staging API without a rebuild; the compile-time value is what
@@ -35,15 +47,15 @@ pub fn base_url() -> String {
         .to_string()
 }
 
-/// The launcher session. Held in memory only: it is derived from the Minecraft
-/// session in a couple of round-trips, so persisting it would buy nothing and
-/// widen the blast radius of a stolen profile directory.
+/// The launcher session, cached in memory and mirrored into the OS credential
+/// store. Unlike the old pack session — re-derived from a live Minecraft
+/// session on demand — this one costs the player a browser round-trip to mint,
+/// so losing it on every restart would be intolerable.
 pub struct ApiState {
     http: reqwest::Client,
     token: Mutex<Option<String>>,
-    /// Held across the whole mint, unlike `token` which is only held long
-    /// enough to read or write it. See `current_token`.
-    minting: Mutex<()>,
+    /// The device-authorization request currently awaiting approval.
+    pending: Mutex<Option<String>>,
 }
 
 impl Default for ApiState {
@@ -54,22 +66,23 @@ impl Default for ApiState {
                 .build()
                 .unwrap_or_default(),
             token: Mutex::new(None),
-            minting: Mutex::new(()),
+            pending: Mutex::new(None),
         }
     }
 }
 
 impl ApiState {
     /// Called on sign-out: the next request must not reuse the previous
-    /// player's entitlements.
+    /// player's entitlements, and the stored credential must not outlive them.
     pub async fn forget_session(&self) {
         *self.token.lock().await = None;
+        let _ = store::clear_launcher_session();
     }
 
-    /// Get or mint the current launcher session JWT.
+    /// The current launcher session JWT, from memory or the credential store.
     /// Used by randomizer and other authenticated endpoints.
-    pub async fn current_token(&self, auth: &AuthState) -> Result<String, ApiError> {
-        current_token(self, auth).await
+    pub async fn current_token(&self) -> Result<String, ApiError> {
+        current_token(self).await
     }
 }
 
@@ -92,15 +105,37 @@ struct ApiErrorBody {
     message: Option<serde_json::Value>,
 }
 
-#[derive(Deserialize)]
+/// What the player is shown while they approve in a browser.
+#[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
-struct JoinChallenge {
-    server_id: String,
+pub struct DeviceAuthorization {
+    #[serde(skip_serializing)]
+    pub device_code: String,
+    pub user_code: String,
+    pub verification_uri: String,
+    pub expires_in: u64,
+    pub interval_seconds: u64,
+}
+
+/// The signed-in Boffmedia account. `mc_uuid` is present only when the account
+/// has linked Minecraft, and nothing outside the Minecraft module may require it.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct BoffAccount {
+    pub id: i64,
+    pub username: String,
+    #[serde(default)]
+    pub mc_uuid: Option<String>,
 }
 
 #[derive(Deserialize)]
-struct LauncherSession {
-    token: String,
+#[serde(rename_all = "camelCase")]
+struct DevicePoll {
+    status: String,
+    #[serde(default)]
+    token: Option<String>,
+    #[serde(default)]
+    user: Option<BoffAccount>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -246,120 +281,173 @@ async fn error_message(res: reqwest::Response, fallback: &str) -> String {
 
 // ── Session ────────────────────────────────────────────────────────────────
 
-/// §7.2 in three hops: ask our API for a serverId, prove it to Mojang with the
-/// Minecraft access token, then exchange it for a launcher JWT. Our API never
-/// sees a Microsoft or Minecraft token — only a username and the serverId it
-/// issued itself.
-async fn mint_session(api: &ApiState, auth: &AuthState) -> Result<String, ApiError> {
-    let session = auth.session().await.ok_or_else(|| {
-        ApiError::NeedsSignin("Inicia sesión con tu cuenta de Minecraft para ver tus packs.".into())
-    })?;
-
-    let base = base_url();
+/// Step 1 — ask for a code and show it to the player.
+#[tauri::command]
+pub async fn boff_device_start(
+    api: tauri::State<'_, ApiState>,
+) -> Result<DeviceAuthorization, ApiError> {
+    let label = format!(
+        "Boff Launcher {} · {}",
+        env!("CARGO_PKG_VERSION"),
+        std::env::consts::OS
+    );
 
     let res = api
         .http
-        .post(format!("{base}/packs/launcher/auth/challenge"))
+        .post(format!("{}/packs/launcher/auth/device", base_url()))
+        .json(&serde_json::json!({ "clientLabel": label }))
         .send()
         .await?;
+
     if !res.status().is_success() {
         return Err(ApiError::Message(
             error_message(res, "El servidor de packs no está disponible.").await,
         ));
     }
-    let challenge: Envelope<JoinChallenge> = res.json().await?;
-    let server_id = challenge.data.server_id;
 
-    // Mojang wants the profile id UNDASHED here, unlike everywhere else in this
-    // launcher — auth::msa normalises to dashed on arrival because that is what
-    // our own char(36) columns hold.
-    let join = api
-        .http
-        .post(JOIN_URL)
-        .json(&serde_json::json!({
-            "accessToken": session.access_token,
-            "selectedProfile": session.uuid.replace('-', ""),
-            "serverId": server_id,
-        }))
-        .send()
-        .await?;
-    if !join.status().is_success() {
-        // 403 here means the Minecraft token is stale or the account is not
-        // entitled to the game; either way signing in again is the fix.
-        return Err(ApiError::NeedsSignin(
-            "Mojang rechazó tu sesión. Vuelve a iniciar sesión.".into(),
-        ));
-    }
+    let body: Envelope<DeviceAuthorization> = res.json().await?;
+    *api.pending.lock().await = Some(body.data.device_code.clone());
+    Ok(body.data)
+}
+
+/// Step 2 — one poll. The renderer sets the cadence, so a ten-minute wait never
+/// parks a Tauri worker on a sleeping future.
+#[tauri::command]
+pub async fn boff_device_poll(
+    api: tauri::State<'_, ApiState>,
+) -> Result<DevicePollView, ApiError> {
+    let device_code = api.pending.lock().await.clone().ok_or_else(|| {
+        ApiError::Message("No hay ninguna autorización en curso.".into())
+    })?;
 
     let res = api
         .http
-        .post(format!("{base}/packs/launcher/auth/verify"))
-        .json(&serde_json::json!({
-            "username": session.username,
-            "serverId": server_id,
-        }))
+        .post(format!("{}/packs/launcher/auth/device/poll", base_url()))
+        .json(&serde_json::json!({ "deviceCode": device_code }))
         .send()
         .await?;
+
     if !res.status().is_success() {
-        return Err(ApiError::NeedsSignin(
-            error_message(res, "No se pudo verificar tu sesión con Boffmedia.").await,
+        return Err(ApiError::Message(
+            error_message(res, "No se pudo comprobar la autorización.").await,
         ));
     }
-    let verified: Envelope<LauncherSession> = res.json().await?;
 
-    *api.token.lock().await = Some(verified.data.token.clone());
-    Ok(verified.data.token)
+    let body: Envelope<DevicePoll> = res.json().await?;
+    if body.data.status == "approved" {
+        let token = body.data.token.clone().ok_or_else(|| {
+            ApiError::Message("El servidor aprobó la sesión sin devolverla.".into())
+        })?;
+        // Store first: a session we hold but never persisted would silently
+        // vanish on restart and read as "it logged me out again".
+        store::save_launcher_session(&token)
+            .map_err(|e| ApiError::Message(e.to_string()))?;
+        *api.token.lock().await = Some(token);
+        *api.pending.lock().await = None;
+    } else if body.data.status != "pending" {
+        *api.pending.lock().await = None;
+    }
+
+    Ok(DevicePollView {
+        status: body.data.status,
+        user: body.data.user,
+    })
 }
 
-async fn current_token(api: &ApiState, auth: &AuthState) -> Result<String, ApiError> {
+/// The stored session, if any. Called on start so a returning player never sees
+/// the sign-in screen.
+#[tauri::command]
+pub async fn boff_session_restore(
+    api: tauri::State<'_, ApiState>,
+) -> Result<Option<BoffAccount>, ApiError> {
+    let token = match store::load_launcher_session() {
+        Ok(Some(token)) => token,
+        // A locked or broken keychain must not look like a first run, or the
+        // player re-authorises on every launch and nobody ever notices why.
+        Ok(None) => return Ok(None),
+        Err(e) => return Err(ApiError::Message(e.to_string())),
+    };
+    *api.token.lock().await = Some(token);
+
+    // `/me` doubles as the liveness check: a 30-day session outlives plenty of
+    // reasons to be revoked, and finding out at sign-in beats finding out
+    // halfway through an install.
+    match boff_me(&api).await {
+        Ok(account) => Ok(Some(account)),
+        Err(ApiError::NeedsSignin(_)) => {
+            api.forget_session().await;
+            Ok(None)
+        }
+        Err(e) => Err(e),
+    }
+}
+
+#[tauri::command]
+pub async fn boff_sign_out(api: tauri::State<'_, ApiState>) -> Result<(), ApiError> {
+    api.forget_session().await;
+    Ok(())
+}
+
+async fn boff_me(api: &ApiState) -> Result<BoffAccount, ApiError> {
+    let res = authed(api, |http, base| {
+        http.get(format!("{base}/packs/launcher/me"))
+    })
+    .await?;
+
+    if res.status() == reqwest::StatusCode::UNAUTHORIZED {
+        return Err(ApiError::NeedsSignin("Tu sesión ha caducado.".into()));
+    }
+    if !res.status().is_success() {
+        return Err(ApiError::Message(
+            error_message(res, "No se pudo leer tu cuenta.").await,
+        ));
+    }
+    let body: Envelope<BoffAccount> = res.json().await?;
+    Ok(body.data)
+}
+
+#[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct DevicePollView {
+    pub status: String,
+    pub user: Option<BoffAccount>,
+}
+
+async fn current_token(api: &ApiState) -> Result<String, ApiError> {
     if let Some(token) = api.token.lock().await.clone() {
         return Ok(token);
     }
 
-    // Minting is SERIALISED. The handshake in `mint_session` is stateful on
-    // Mojang's side: a serverId is proven by a `hasJoined` call against the
-    // player's profile, and a second concurrent join overwrites the first, so
-    // whichever challenge our API then tries to verify has already been
-    // invalidated. Two callers arriving here at once — the pack list and
-    // anything else authenticated — both saw `None` above and both minted, and
-    // one of them failed with "Mojang rechazó tu sesión" or "no se pudo
-    // verificar tu sesión". Intermittent, and entirely a race.
-    let _minting = api.minting.lock().await;
-
-    // Whoever we queued behind may have already minted one for us.
-    if let Some(token) = api.token.lock().await.clone() {
-        return Ok(token);
+    match store::load_launcher_session() {
+        Ok(Some(token)) => {
+            *api.token.lock().await = Some(token.clone());
+            Ok(token)
+        }
+        Ok(None) => Err(ApiError::NeedsSignin(
+            "Autoriza este launcher con tu cuenta de Boffmedia para ver tus packs.".into(),
+        )),
+        Err(e) => Err(ApiError::Message(e.to_string())),
     }
-    mint_session(api, auth).await
 }
 
-/// Send an authenticated request, re-minting the session ONCE on a 401. The
-/// launcher session is short-lived and the app stays open for hours, so an
-/// expired token is the normal case, not an error worth showing anyone.
+/// Send an authenticated request. There is nothing to re-mint on a 401 any
+/// more: a launcher session is approved by a human in a browser, so an expired
+/// or revoked one has to be re-approved. Dropping it here is what makes the
+/// next call surface `NeedsSignin` instead of looping on 401s.
 async fn authed(
     api: &ApiState,
-    auth: &AuthState,
     build: impl Fn(&reqwest::Client, &str) -> reqwest::RequestBuilder,
 ) -> Result<reqwest::Response, ApiError> {
-    let token = current_token(api, auth).await?;
+    let token = current_token(api).await?;
     let res = build(&api.http, &base_url())
         .bearer_auth(&token)
         .send()
         .await?;
 
-    if res.status() != reqwest::StatusCode::UNAUTHORIZED {
-        return Ok(res);
+    if res.status() == reqwest::StatusCode::UNAUTHORIZED {
+        api.forget_session().await;
     }
-
-    // Through `current_token`, not `mint_session` directly: the expiry that
-    // produced this 401 hits every in-flight request at once, so this is
-    // precisely where several callers would otherwise mint in parallel.
-    *api.token.lock().await = None;
-    let token = current_token(api, auth).await?;
-    Ok(build(&api.http, &base_url())
-        .bearer_auth(&token)
-        .send()
-        .await?)
+    Ok(res)
 }
 
 // ── Commands ───────────────────────────────────────────────────────────────
@@ -369,11 +457,10 @@ async fn authed(
 #[tauri::command]
 pub async fn packs_list(
     api: tauri::State<'_, ApiState>,
-    auth: tauri::State<'_, AuthState>,
 ) -> Result<Vec<LauncherPack>, ApiError> {
-    let res = authed(&api, &auth, |http, base| {
+    let res = authed(&api, |http, base| {
         http.get(format!("{base}/packs/launcher/packs"))
-            .header("X-Boff-Game-Types", GAME_TYPES_HEADER)
+            .header("X-Boff-Game-Types", game_types_header())
     })
     .await?;
 
@@ -394,16 +481,15 @@ pub async fn pack_manifest(
     pack_id: String,
     password: Option<String>,
     api: tauri::State<'_, ApiState>,
-    auth: tauri::State<'_, AuthState>,
 ) -> Result<serde_json::Value, ApiError> {
     let query: Vec<(String, String)> = password
         .filter(|p| !p.is_empty())
         .map(|p| vec![("password".to_string(), p)])
         .unwrap_or_default();
 
-    let res = authed(&api, &auth, |http, base| {
+    let res = authed(&api, |http, base| {
         http.get(format!("{base}/packs/launcher/packs/{pack_id}/manifest"))
-            .header("X-Boff-Game-Types", GAME_TYPES_HEADER)
+            .header("X-Boff-Game-Types", game_types_header())
             .query(&query)
     })
     .await?;
@@ -482,7 +568,6 @@ pub async fn fetch_pack_file(
     use tauri::Manager;
 
     let api = app.state::<ApiState>();
-    let auth = app.state::<AuthState>();
 
     // Same precedent as the manifest call: a password gates the whole pack, so
     // it has to ride on every download too, not just the first request.
@@ -493,7 +578,7 @@ pub async fn fetch_pack_file(
         .unwrap_or_default();
 
     let route = file.route();
-    let res = authed(&api, &auth, |http, base| {
+    let res = authed(&api, |http, base| {
         http.get(format!("{base}/packs/launcher/packs/{pack_id}/files/{route}"))
             .query(&query)
     })
@@ -557,10 +642,9 @@ fn missing_fallback(file: &PackFile) -> String {
 pub async fn invite_redeem(
     code: String,
     api: tauri::State<'_, ApiState>,
-    auth: tauri::State<'_, AuthState>,
 ) -> Result<String, ApiError> {
     let payload = serde_json::json!({ "code": code });
-    let res = authed(&api, &auth, |http, base| {
+    let res = authed(&api, |http, base| {
         http.post(format!("{base}/packs/launcher/invites/redeem"))
             .json(&payload)
     })

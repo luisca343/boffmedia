@@ -5,8 +5,14 @@ import { MOCK_ACCOUNT, MOCK_DEVICE_CODE, MOCK_SETTINGS, mockLocalPacks } from ".
 import { loadPackEntries } from "../services/packs"
 import {
   type AccountEntry,
+  type BoffAccount,
+  type BoffDeviceCode,
   authAccounts,
   authBegin,
+  boffDevicePoll,
+  boffDeviceStart,
+  boffSessionRestore,
+  boffSignOut,
   authAwait,
   authLogout,
   authOffline,
@@ -49,6 +55,15 @@ import type { SystemId } from "../services/systems"
 export type View = "packs" | "pack" | "logs" | "settings"
 
 type State = {
+  /** The BOFFMEDIA account the launcher is signed in as. This is the principal:
+   *  the pack list, entitlement and downloads all key on it, and the shell is
+   *  gated on it. */
+  boffAccount: BoffAccount | null
+  boffDeviceCode: BoffDeviceCode | null
+  boffSigningIn: boolean
+  boffError: string | null
+  /** The MINECRAFT account, when one is signed in. Needed to launch Minecraft
+   *  and nothing else — an emulator pack never asks for it. */
   account: Account | null
   deviceCode: DeviceCode | null
   signingIn: boolean
@@ -92,6 +107,11 @@ type State = {
 }
 
 type Action =
+  | { type: "boff/start" }
+  | { type: "boff/code"; code: BoffDeviceCode }
+  | { type: "boff/done"; account: BoffAccount }
+  | { type: "boff/cancel"; message?: string }
+  | { type: "boff/signout" }
   | { type: "boot/step"; step: string }
   | { type: "boot/done"; part: "auth" | "settings" | "packs" }
   | { type: "signin/restore-failed"; message: string; needsSignin: boolean }
@@ -127,6 +147,37 @@ type Action =
 
 function reducer(s: State, a: Action): State {
   switch (a.type) {
+    case "boff/start":
+      return { ...s, boffSigningIn: true, boffDeviceCode: null, boffError: null }
+    case "boff/code":
+      return { ...s, boffDeviceCode: a.code }
+    case "boff/done":
+      return {
+        ...s,
+        boffAccount: a.account,
+        boffSigningIn: false,
+        boffDeviceCode: null,
+        boffError: null,
+      }
+    case "boff/cancel":
+      return {
+        ...s,
+        boffSigningIn: false,
+        boffDeviceCode: null,
+        boffError: a.message ?? null,
+      }
+    case "boff/signout":
+      // Signing out of Boffmedia empties the library too: every managed pack in
+      // it was listed for THAT account's entitlements.
+      return {
+        ...s,
+        boffAccount: null,
+        boffDeviceCode: null,
+        boffSigningIn: false,
+        packs: [],
+        view: "packs",
+        selectedPackId: null,
+      }
     case "boot/step":
       return { ...s, bootStep: a.step }
     case "boot/done":
@@ -289,6 +340,10 @@ function reducer(s: State, a: Action): State {
 }
 
 const initial: State = {
+  boffAccount: null,
+  boffDeviceCode: null,
+  boffSigningIn: false,
+  boffError: null,
   account: null,
   deviceCode: null,
   signingIn: false,
@@ -319,6 +374,12 @@ type Ctx = State & {
    *  machine has no account that ever completed a real sign-in. */
   goOffline: () => Promise<boolean>
   selected: PackEntry | null
+  /** Authorize this launcher against a Boffmedia account (device flow). */
+  boffSignIn: () => Promise<void>
+  cancelBoffSignIn: () => void
+  boffSignOut: () => void
+  /** Sign in to MINECRAFT. Only needed to install or launch a Minecraft pack;
+   *  the shell, the library and every emulator pack work without it. */
   signIn: () => Promise<void>
   cancelSignIn: () => void
   signOut: () => void
@@ -409,6 +470,72 @@ export function LauncherProvider({ children }: { children: React.ReactNode }) {
     } catch {
       /* the listing stays as it was rather than flickering to not-installed */
     }
+  }, [])
+
+  // The launcher's own sign-in: a short code, approved on the website where the
+  // player is already logged in. Polling lives here rather than in Rust so the
+  // cadence is the renderer's and no worker sleeps for ten minutes.
+  const boffCancelled = React.useRef(false)
+
+  const boffSignIn = React.useCallback(async () => {
+    boffCancelled.current = false
+    dispatch({ type: "boff/start" })
+    try {
+      const code = await boffDeviceStart()
+      dispatch({ type: "boff/code", code })
+
+      const intervalMs = Math.max(2, code.intervalSeconds) * 1000
+      const deadline = Date.now() + code.expiresIn * 1000
+      for (;;) {
+        if (boffCancelled.current) return
+        if (Date.now() > deadline) {
+          dispatch({ type: "boff/cancel", message: "El código ha caducado." })
+          return
+        }
+        await sleep(intervalMs)
+        if (boffCancelled.current) return
+
+        const poll = await boffDevicePoll()
+        if (poll.status === "approved" && poll.user) {
+          dispatch({ type: "boff/done", account: poll.user })
+          log({
+            level: "info",
+            source: "launcher",
+            text: `Launcher autorizado como ${poll.user.username}`,
+          })
+          return
+        }
+        if (poll.status === "denied") {
+          dispatch({ type: "boff/cancel", message: "Has rechazado la autorización." })
+          return
+        }
+        if (poll.status === "expired") {
+          dispatch({ type: "boff/cancel", message: "El código ha caducado." })
+          return
+        }
+      }
+    } catch (err) {
+      const failure = err as { message?: string }
+      dispatch({
+        type: "boff/cancel",
+        message: failure?.message ?? "No se pudo autorizar el launcher.",
+      })
+      log({
+        level: "error",
+        source: "launcher",
+        text: failure?.message ?? "No se pudo autorizar el launcher.",
+      })
+    }
+  }, [log])
+
+  const cancelBoffSignIn = React.useCallback(() => {
+    boffCancelled.current = true
+    dispatch({ type: "boff/cancel" })
+  }, [])
+
+  const boffSignOutFn = React.useCallback(() => {
+    void boffSignOut().catch(() => undefined)
+    dispatch({ type: "boff/signout" })
   }, [])
 
   // §5. In a browser there is no Rust side, so the mock flow runs instead —
@@ -538,6 +665,27 @@ export function LauncherProvider({ children }: { children: React.ReactNode }) {
 
     dispatch({ type: "boot/step", step: "Restaurando tu sesión…" })
 
+    // The Boffmedia session first: it gates the shell, and it is the one the
+    // pack list needs. A missing Minecraft session is no longer a reason not to
+    // open the launcher — it is only needed to launch Minecraft itself.
+    void boffSessionRestore()
+      .then((account) => {
+        if (!account) return
+        dispatch({ type: "boff/done", account })
+        log({
+          level: "info",
+          source: "launcher",
+          text: `Launcher autorizado como ${account.username}`,
+        })
+      })
+      .catch((err: { message?: string }) => {
+        log({
+          level: "error",
+          source: "launcher",
+          text: err?.message ?? "No se pudo restaurar la sesión del launcher.",
+        })
+      })
+
     void authRestore()
       .then((account) => {
         if (!account) return
@@ -566,10 +714,10 @@ export function LauncherProvider({ children }: { children: React.ReactNode }) {
       .finally(openGate)
   }, [log, goOffline])
 
-  // Packs arrive only once there is an account: the server filters by UUID, so
-  // there is nothing meaningful to fetch while signed out. The UUID — not the
-  // account object — is the dependency, so a re-render cannot refetch.
-  const accountUuid = state.account?.uuid ?? null
+  // Packs arrive only once there is a BOFFMEDIA account: the server filters by
+  // that account's entitlements. The id — not the account object — is the
+  // dependency, so a re-render cannot refetch.
+  const accountUuid = state.boffAccount?.id ?? null
   const bootAuthDone = state.bootAuthDone
   // SEPARATE from the load effect on purpose. Folding this into it meant
   // `bootAuthDone` had to be a dependency, and flipping it re-ran the whole
@@ -963,6 +1111,9 @@ export function LauncherProvider({ children }: { children: React.ReactNode }) {
     booting: !(state.bootAuthDone && state.bootSettingsDone && state.bootPacksDone),
     goOffline,
     selected: state.packs.find((p) => p.pack.id === state.selectedPackId) ?? null,
+    boffSignIn,
+    cancelBoffSignIn,
+    boffSignOut: boffSignOutFn,
     signIn,
     cancelSignIn: () => dispatch({ type: "signin/cancel" }),
     signOut: () => {

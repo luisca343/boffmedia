@@ -91,4 +91,27 @@ export class CreateEventDto {
   @IsString()
   @MaxLength(255)
   banner?: string;
+
+  @ApiProperty({
+    description:
+      'Lifecycle status. Owned by the events module — the randomizer now requires an active event instead of activating one.',
+    enum: ['upcoming', 'active', 'completed'],
+    required: false,
+    default: 'upcoming',
+  })
+  @IsOptional()
+  @IsEnum(['upcoming', 'active', 'completed'])
+  status?: 'upcoming' | 'active' | 'completed';
+
+  @ApiProperty({
+    description:
+      'The pack this event grants access to. Membership in the event is what entitles a player to the pack.',
+    required: false,
+    nullable: true,
+    example: 'k3n8x1p0',
+  })
+  @IsOptional()
+  @IsString()
+  @MaxLength(32)
+  packId?: string | null;
 }

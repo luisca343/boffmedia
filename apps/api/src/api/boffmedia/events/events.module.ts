@@ -7,6 +7,7 @@ import { NotificationsModule } from '@api/boffmedia/notifications/notifications.
 
 // Import all repositories
 import { EventsRepository } from './repositories/events.repository';
+import { EventInvitesRepository } from './repositories/event-invites.repository';
 import { GamesRepository } from '../../_repositories/boffmedia/games.repository';
 import { AchievementsRepository } from '../../_repositories/boffmedia/achievements.repository';
 import { ParticipantsRepository } from '../../_repositories/boffmedia/participants.repository';
@@ -17,6 +18,7 @@ import { EventsService } from './services/events.service';
 import { GamesService } from './services/games.service';
 import { AchievementsService } from './services/achievements.service';
 import { ParticipantsService } from './services/participants.service';
+import { EventInvitesService } from './services/event-invites.service';
 import { TeamsService } from './services/teams.service';
 import { ProgressService } from './services/progress.service';
 import { LeaderboardsService } from './services/leaderboards.service';
@@ -29,6 +31,7 @@ import { EventsFacadeService } from './events.facade.service';
   providers: [
     // Repositories
     EventsRepository,
+    EventInvitesRepository,
     GamesRepository,
     AchievementsRepository,
     ParticipantsRepository,
@@ -39,6 +42,7 @@ import { EventsFacadeService } from './events.facade.service';
     GamesService,
     AchievementsService,
     ParticipantsService,
+    EventInvitesService,
     TeamsService,
     ProgressService,
     LeaderboardsService,
@@ -57,6 +61,7 @@ import { EventsFacadeService } from './events.facade.service';
     GamesService,
     AchievementsService,
     ParticipantsService,
+    EventInvitesService,
     TeamsService,
     ProgressService,
     LeaderboardsService,

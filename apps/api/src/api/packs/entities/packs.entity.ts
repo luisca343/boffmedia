@@ -1,22 +1,66 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
-export class JoinChallengeEntity {
-  @ApiProperty({ description: 'Preséntalo a Mojang en session/minecraft/join' })
-  serverId!: string;
+export class DeviceAuthorizationEntity {
+  @ApiProperty({ description: 'La mitad secreta: solo la guarda el launcher' })
+  deviceCode!: string;
 
-  @ApiProperty({ example: 60 })
-  expiresInSeconds!: number;
+  @ApiProperty({
+    example: 'K7QM-3BXR',
+    description: 'La mitad legible: el jugador la escribe en la web',
+  })
+  userCode!: string;
+
+  @ApiProperty({ example: 'https://boffmedia.es/launcher/autorizar' })
+  verificationUri!: string;
+
+  @ApiProperty({ example: 600 })
+  expiresIn!: number;
+
+  @ApiProperty({ example: 3 })
+  intervalSeconds!: number;
 }
 
-export class LauncherSessionEntity {
-  @ApiProperty({ description: 'Bearer para el resto de rutas del launcher' })
-  token!: string;
-
-  @ApiProperty({ example: '069a79f4-44e9-4726-a5be-fca90e38aaf5' })
-  uuid!: string;
+export class LauncherSessionUserEntity {
+  @ApiProperty({ example: 42 })
+  id!: number;
 
   @ApiProperty()
   username!: string;
+
+  @ApiProperty({
+    example: '069a79f4-44e9-4726-a5be-fca90e38aaf5',
+    nullable: true,
+    description: 'Solo si la cuenta tiene Minecraft vinculado.',
+  })
+  mcUuid!: string | null;
+}
+
+export class DevicePollEntity {
+  @ApiProperty({ enum: ['pending', 'approved', 'denied', 'expired'] })
+  status!: 'pending' | 'approved' | 'denied' | 'expired';
+
+  @ApiPropertyOptional({
+    description: 'Bearer para el resto de rutas del launcher. Solo en approved.',
+  })
+  token?: string;
+
+  @ApiPropertyOptional({ type: LauncherSessionUserEntity })
+  user?: LauncherSessionUserEntity;
+}
+
+/** The approval screen shows this before the player commits to anything. */
+export class DeviceRequestEntity {
+  @ApiProperty({ example: 'K7QM-3BXR' })
+  userCode!: string;
+
+  @ApiProperty({ nullable: true, example: 'Boff Launcher 0.3 · Windows' })
+  clientLabel!: string | null;
+
+  @ApiProperty({ enum: ['pending', 'approved', 'denied'] })
+  status!: string;
+
+  @ApiProperty()
+  expiresAt!: Date;
 }
 
 const GAME_TYPES = ['minecraft', 'emulator', 'zomboid', 'stardew'] as const;
@@ -282,7 +326,42 @@ export class ResolvedFileEntity {
   source!: Record<string, unknown> | object;
 }
 
+/** A direct grant, keyed on the account that holds it. */
 export class AccessRowEntity {
+  @ApiProperty() userId!: number;
+  @ApiProperty() username!: string;
+  @ApiProperty() email!: string;
+  @ApiProperty({ enum: ['admin', 'invite'] }) source!: string;
+  @ApiPropertyOptional({ nullable: true }) sourceRef!: string | null;
+  @ApiProperty() grantedAt!: Date;
+}
+
+/** A pre-grant to a raw Minecraft UUID with no account behind it yet. Becomes a
+ *  real grant the moment that UUID is linked. */
+export class LegacyAccessRowEntity {
   @ApiProperty() uuid!: string;
   @ApiProperty() grantedAt!: Date;
+}
+
+/** An event whose membership entitles its members to this pack. Access derives
+ *  from membership live, so these people hold no ACL row of their own. */
+export class GrantingEventEntity {
+  @ApiProperty() eventId!: number;
+  @ApiProperty() title!: string;
+  @ApiProperty() status!: string;
+  @ApiProperty() visibility!: string;
+  @ApiProperty() memberCount!: number;
+}
+
+export class UserSearchHitEntity {
+  @ApiProperty() id!: number;
+  @ApiProperty() username!: string;
+  @ApiProperty() email!: string;
+}
+
+export class PackAccessEntity {
+  @ApiProperty({ type: [AccessRowEntity] }) grants!: AccessRowEntity[];
+  @ApiProperty({ type: [LegacyAccessRowEntity] })
+  legacy!: LegacyAccessRowEntity[];
+  @ApiProperty({ type: [GrantingEventEntity] }) events!: GrantingEventEntity[];
 }

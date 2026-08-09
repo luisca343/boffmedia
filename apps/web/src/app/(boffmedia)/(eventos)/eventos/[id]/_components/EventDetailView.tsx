@@ -65,6 +65,26 @@ export function EventDetailView({ id }: { id: number }) {
     }
   }
 
+  async function handleLeave() {
+    // Membership is what entitles the account to the event's pack, so leaving
+    // withdraws that access on the launcher's next check.
+    if (!window.confirm(t("detail.leaveConfirm"))) return
+    setJoining(true)
+    try {
+      const res = await EventsService.leaveEvent(id)
+      if (res.success) {
+        toast.success(t("detail.left"))
+        refetchParts()
+      } else {
+        toast.error(res.error || t("error.title"))
+      }
+    } catch {
+      toast.error(t("error.title"))
+    } finally {
+      setJoining(false)
+    }
+  }
+
   return (
     <main className="wrap pb-[90px] pt-6">
       <Link
@@ -120,7 +140,18 @@ export function EventDetailView({ id }: { id: number }) {
                   {t("detail.loginToJoin")}
                 </Button>
               ) : joined ? (
-                <Badge tone="ok">{t("detail.participating")}</Badge>
+                <div className="grid gap-2 justify-items-center">
+                  <Badge tone="ok">{t("detail.participating")}</Badge>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    icon="logout"
+                    loading={joining}
+                    onClick={handleLeave}
+                  >
+                    {t("detail.leave")}
+                  </Button>
+                </div>
               ) : (
                 <Button variant="pri" icon="plus" loading={joining} onClick={handleJoin} className="w-full">
                   {t("detail.participate")}

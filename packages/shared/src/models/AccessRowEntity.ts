@@ -3,7 +3,17 @@
 /* tslint:disable */
 /* eslint-disable */
 export type AccessRowEntity = {
-    uuid: string;
+    userId: number;
+    username: string;
+    email: string;
+    source: AccessRowEntity.source;
+    sourceRef?: Record<string, any> | null;
     grantedAt: string;
 };
+export namespace AccessRowEntity {
+    export enum source {
+        ADMIN = 'admin',
+        INVITE = 'invite',
+    }
+}
 

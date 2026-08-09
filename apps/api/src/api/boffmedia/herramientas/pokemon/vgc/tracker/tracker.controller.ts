@@ -14,7 +14,7 @@ import { JwtAuthGuard } from '@api/auth/jwt-auth.guard';
 import { TrackerService } from './tracker.service';
 import {
   CreateMatchDto,
-  CreatePresetDto,
+  CreateTrackerPresetDto,
   CreateSessionDto,
   UpsertSeriesDto,
 } from './dto';
@@ -67,7 +67,7 @@ export class TrackerController {
   @ApiOperation({ summary: 'Create or update a team preset' })
   upsertPreset(
     @Param('id') id: string,
-    @Body() dto: CreatePresetDto,
+    @Body() dto: CreateTrackerPresetDto,
     @Req() req: any,
   ) {
     return this.service.upsertPreset(req.user.userId, id, dto);

@@ -22,6 +22,7 @@ import {
 } from '@api/packs/guards/launcher-auth.guard';
 import { Public } from '@api/_utils/decorators/public.decorator';
 import { AssignmentsService } from './services/assignments.service';
+import { RandomizerPackLinkRepository } from '@api/_repositories/randomizer/pack-link.repository';
 import { AssignmentClaimedDto } from './dto/randomizer.dto';
 import { RandomizerRepository } from './repositories/randomizer.repository';
 import { RANDOMIZER_REPOSITORY_TOKEN } from '@api/_utils/repositories/interfaces/repository.token';
@@ -41,6 +42,7 @@ export class RandomizerLauncherController {
     private readonly assignments: AssignmentsService,
     @Inject(RANDOMIZER_REPOSITORY_TOKEN)
     private readonly repository: RandomizerRepository,
+    private readonly packLink: RandomizerPackLinkRepository,
   ) {}
 
   /**
@@ -77,7 +79,7 @@ export class RandomizerLauncherController {
 
     // Resolve pack -> active event -> randomizer config, then delegate to the
     // same mint-on-claim path. 404 (no config) leaves the launcher panel hidden.
-    const config = await this.repository.getConfigByPackId(packId);
+    const config = await this.packLink.findByPackId(packId);
     if (!config) {
       throw new NotFoundException(
         `No active randomizer config found for pack ${packId}`,

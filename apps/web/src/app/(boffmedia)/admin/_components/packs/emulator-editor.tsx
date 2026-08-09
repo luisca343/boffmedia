@@ -1,5 +1,6 @@
 "use client"
 
+import * as React from "react"
 import { useEffect, useRef, useState } from "react"
 import { useTranslations } from "next-intl"
 import { Badge, Button, FeatureToggle, Field, Icon, Input, Select, Textarea, toast } from "@boffmedia/ui"
@@ -22,6 +23,13 @@ interface FileEntry {
   env?: { client?: string; server?: string }
 }
 
+/** The emulator arm's steps. Deliberately the same shape as the Minecraft
+ *  arm's: an emulator pack is a first-class pack, not a special case that skips
+ *  the wizard, and an author who has cut one kind of version should recognise
+ *  the other. */
+export const EMULATOR_STEPS = ["metadata", "rom", "files", "review"] as const
+export type EmulatorStep = (typeof EMULATOR_STEPS)[number]
+
 interface EmulatorEditorProps {
   onSave: (data: {
     name: string
@@ -33,6 +41,14 @@ interface EmulatorEditorProps {
   }) => void
   previousKind?: EmulatorKind
   initialName?: string
+  /** Which step to render. The rail and the Back/Next bar live in the parent so
+   *  both arms of the editor share one chrome. */
+  step: EmulatorStep
+  /** Reports which steps are currently satisfied, so the parent can gate Next
+   *  and the rail without duplicating the rules. */
+  onValidity?: (valid: Record<EmulatorStep, boolean>) => void
+  /** Called on the review step's confirm; the parent owns the button. */
+  submitRef?: React.MutableRefObject<(() => void) | null>
 }
 
 /** In-browser SHA-512 hash of a file. */
@@ -49,7 +65,14 @@ async function sha512File(file: File): Promise<{ sha512: string; size: number }>
  *  - Extra user-provided files (BIOS/firmware)
  *  - Advanced args
  */
-export function EmulatorEditor({ onSave, previousKind, initialName }: EmulatorEditorProps) {
+export function EmulatorEditor({
+  onSave,
+  previousKind,
+  initialName,
+  step,
+  onValidity,
+  submitRef,
+}: EmulatorEditorProps) {
   const t = useTranslations("admin.packs")
 
   const [name, setName] = useState(initialName ?? "")
@@ -147,13 +170,29 @@ export function EmulatorEditor({ onSave, previousKind, initialName }: EmulatorEd
     setExtraFiles((current) => [...current, ...added])
   }
 
+  // Split by step so the rail can show how far the form actually is, rather
+  // than one all-or-nothing flag on a single long page.
+  const stepValidity: Record<EmulatorStep, boolean> = {
+    metadata: name.trim().length > 0,
+    rom:
+      romHint.trim().length > 0 &&
+      romFile !== null &&
+      (!useRomhack ||
+        (baseFile !== null && patchFile !== null && patchedRomFile !== null)),
+    // Extra BIOS/firmware files are optional: a GBA pack usually needs none.
+    files: true,
+    review: true,
+  }
+
   const canSubmit =
-    name.trim().length > 0 &&
-    romHint.trim().length > 0 &&
-    romFile !== null &&
-    (!useRomhack || (baseFile !== null && patchFile !== null && patchedRomFile !== null)) &&
-    !hashing &&
-    !busy
+    stepValidity.metadata && stepValidity.rom && !hashing && !busy
+
+  useEffect(() => {
+    onValidity?.(stepValidity)
+    // Serialised: the object is rebuilt on every render, so comparing it by
+    // reference would fire the effect forever.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [JSON.stringify(stepValidity)])
 
   const submit = async () => {
     if (!canSubmit || !romFile) return
@@ -254,8 +293,11 @@ export function EmulatorEditor({ onSave, previousKind, initialName }: EmulatorEd
     }
   }
 
+  if (submitRef) submitRef.current = () => void submit()
+
   return (
     <div className="flex flex-col gap-5">
+      {step === "metadata" && (
       <section className="border border-solid border-line bg-panel-2 p-4">
         <div className="mb-4 flex items-start gap-3">
           <span className="grid size-8 shrink-0 place-items-center border border-solid border-line-2 bg-panel text-accent">
@@ -274,7 +316,9 @@ export function EmulatorEditor({ onSave, previousKind, initialName }: EmulatorEd
           <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="1.4.2" />
         </Field>
       </section>
+      )}
 
+      {step === "metadata" && (
       <section className="border border-solid border-line bg-panel-2 p-4">
         <div className="mb-4 flex items-start gap-3">
           <span className="grid size-8 shrink-0 place-items-center border border-solid border-line-2 bg-panel text-accent">
@@ -301,7 +345,9 @@ export function EmulatorEditor({ onSave, previousKind, initialName }: EmulatorEd
           />
         </Field>
       </section>
+      )}
 
+      {step === "rom" && (
       <section className="border border-solid border-line bg-panel-2 p-4">
         <div className="mb-4 flex items-start gap-3">
           <span className="grid size-8 shrink-0 place-items-center border border-solid border-line-2 bg-panel text-accent">
@@ -372,7 +418,9 @@ export function EmulatorEditor({ onSave, previousKind, initialName }: EmulatorEd
           </Field>
         </div>
       </section>
+      )}
 
+      {step === "rom" && (
       <FeatureToggle
         icon={<Icon name="copy" size={18} />}
         title={t("emulator.romhackToggle")}
@@ -480,7 +528,9 @@ export function EmulatorEditor({ onSave, previousKind, initialName }: EmulatorEd
           />
         </Field>
       </FeatureToggle>
+      )}
 
+      {step === "files" && (
       <FeatureToggle
         icon={<Icon name="download" size={18} />}
         title={t("emulator.saveToggle")}
@@ -527,7 +577,9 @@ export function EmulatorEditor({ onSave, previousKind, initialName }: EmulatorEd
           </>
         )}
       </FeatureToggle>
+      )}
 
+      {step === "files" && (
       <section className="border border-solid border-line bg-panel-2 p-4">
         <div className="mb-4 flex items-start gap-3">
           <span className="grid size-8 shrink-0 place-items-center border border-solid border-line-2 bg-panel text-accent">
@@ -551,7 +603,9 @@ export function EmulatorEditor({ onSave, previousKind, initialName }: EmulatorEd
           />
         </Field>
       </section>
+      )}
 
+      {step === "files" && (
       <section className="border border-solid border-line bg-panel-2 p-4">
         <div className="mb-4 flex items-start gap-3">
           <span className="grid size-8 shrink-0 place-items-center border border-solid border-line-2 bg-panel text-accent">
@@ -613,22 +667,80 @@ export function EmulatorEditor({ onSave, previousKind, initialName }: EmulatorEd
           )}
         </div>
       </section>
+      )}
 
-      <AvPill tone="info" icon="info">
-        {t("emulator.reviewNote")}
-      </AvPill>
+      {step === "review" && (
+        <section className="border border-solid border-line bg-panel-2 p-4">
+          <div className="mb-4 flex items-start gap-3">
+            <span className="grid size-8 shrink-0 place-items-center border border-solid border-line-2 bg-panel text-accent">
+              <Icon name="check" size={15} />
+            </span>
+            <div>
+              <h3 className="font-display text-[14px] font-bold uppercase tracking-[0.08em] text-txt">
+                {t("emulator.reviewSection")}
+              </h3>
+              <p className="mt-1 text-[12px] leading-[1.45] text-txt-dim">
+                {t("emulator.reviewSectionLead")}
+              </p>
+            </div>
+          </div>
 
-      <div className="flex shrink-0 items-center gap-2">
-        <Button
-          variant="pri"
-          icon="check"
-          loading={busy}
-          disabled={!canSubmit}
-          onClick={() => void submit()}
-        >
-          {t("create")}
-        </Button>
-      </div>
+          <dl className="grid gap-2 text-[13px]">
+            <div className="flex items-baseline gap-3">
+              <dt className="w-40 shrink-0 font-mono text-[11px] uppercase tracking-[0.08em] text-txt-dim">
+                {t("versionName")}
+              </dt>
+              <dd className="text-txt">{name || "—"}</dd>
+            </div>
+            <div className="flex items-baseline gap-3">
+              <dt className="w-40 shrink-0 font-mono text-[11px] uppercase tracking-[0.08em] text-txt-dim">
+                {t("emulator.kind")}
+              </dt>
+              <dd className="text-txt">{kind === "mgba" ? "mGBA" : "melonDS"}</dd>
+            </div>
+            <div className="flex items-baseline gap-3">
+              <dt className="w-40 shrink-0 font-mono text-[11px] uppercase tracking-[0.08em] text-txt-dim">
+                {t("emulator.romHint")}
+              </dt>
+              <dd className="text-txt">{romHint || "—"}</dd>
+            </div>
+            <div className="flex items-baseline gap-3">
+              <dt className="w-40 shrink-0 font-mono text-[11px] uppercase tracking-[0.08em] text-txt-dim">
+                {t("emulator.romPath")}
+              </dt>
+              <dd className="font-mono text-[12px] text-txt">
+                {useRomhack ? patchedRomPath : romPath}
+              </dd>
+            </div>
+            {useRomhack && (
+              <div className="flex items-baseline gap-3">
+                <dt className="w-40 shrink-0 font-mono text-[11px] uppercase tracking-[0.08em] text-txt-dim">
+                  {t("emulator.patchFormat")}
+                </dt>
+                <dd className="text-txt">{patchFormat.toUpperCase()}</dd>
+              </div>
+            )}
+            <div className="flex items-baseline gap-3">
+              <dt className="w-40 shrink-0 font-mono text-[11px] uppercase tracking-[0.08em] text-txt-dim">
+                {t("emulator.biosSection")}
+              </dt>
+              <dd className="text-txt">{extraFiles.length}</dd>
+            </div>
+            {startingSave && (
+              <div className="flex items-baseline gap-3">
+                <dt className="w-40 shrink-0 font-mono text-[11px] uppercase tracking-[0.08em] text-txt-dim">
+                  {t("emulator.startingSave")}
+                </dt>
+                <dd className="font-mono text-[12px] text-txt">{savePath}</dd>
+              </div>
+            )}
+          </dl>
+
+          <AvPill tone="info" icon="info" className="mt-4">
+            {t("emulator.reviewNote")}
+          </AvPill>
+        </section>
+      )}
     </div>
   )
 }

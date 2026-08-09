@@ -57,5 +57,26 @@
       "macIntel": "macOS (Intel)",
       "macApple": "macOS (Apple Silicon)"
     }
+  },
+  "launcherAuth": {
+    "title": "Authorize the launcher",
+    "lead": "Enter the code the launcher is showing you.",
+    "loginLead": "Sign in to authorize a launcher on this account.",
+    "login": "Sign in",
+    "codeLabel": "Code",
+    "codeHint": "Case and the dash are ignored.",
+    "continue": "Continue",
+    "notFound": "That code is not valid or has expired.",
+    "failed": "Could not complete the request.",
+    "confirmLead": "This launcher will be able to see and install the packs your account is entitled to. It will not be able to change your account.",
+    "client": "Launcher",
+    "unknownClient": "Unidentified launcher",
+    "approve": "Authorize",
+    "deny": "Reject",
+    "approvedToast": "Launcher authorized.",
+    "approvedTitle": "Authorized",
+    "approvedLead": "You can go back to the launcher — it will sign in on its own within a few seconds.",
+    "deniedTitle": "Rejected",
+    "deniedLead": "That launcher was not authorized. Nothing was shared with it."
   }
 }

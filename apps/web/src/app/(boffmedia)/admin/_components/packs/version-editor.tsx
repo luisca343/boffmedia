@@ -26,7 +26,12 @@ import { overrideFileEntry, uploadOverrideBlob } from "./upload-blob"
 import { useGameVersions, useLoaderVersions } from "./use-version-meta"
 import { VersionCombobox, type ComboOption } from "./version-combobox"
 import { BundledWorldsEditor } from "./bundled-worlds-editor"
-import { EmulatorEditor, type EmulatorKind } from "./emulator-editor"
+import {
+  EMULATOR_STEPS,
+  EmulatorEditor,
+  type EmulatorKind,
+  type EmulatorStep,
+} from "./emulator-editor"
 import { type BundledWorld } from "@/services/api/boffmedia/packsService"
 
 // Cutting a version is the one authoring step the launcher cannot do for you:
@@ -115,25 +120,32 @@ function toSelected(files: unknown[]): SelectedMod[] {
     })
 }
 
-function StepRail({
+/** Shared by both arms of the editor: an emulator version is cut through the
+ *  same wizard as a Minecraft one, with its own step set. */
+function StepRail<S extends string>({
+  steps,
   step,
   onGo,
   reachable,
   stepValid,
+  label,
 }: {
-  step: Step
-  onGo: (next: Step) => void
+  steps: readonly S[]
+  step: S
+  onGo: (next: S) => void
+  /** next-intl cannot narrow a generic `step.${S}` key, so the caller resolves
+   *  the label for its own step set. */
+  label: (s: S) => string
   /** How far the form is currently valid — steps beyond it are not clickable. */
   reachable: number
   /** Whether a given step's required fields are currently valid. */
-  stepValid: (s: Step) => boolean
+  stepValid: (s: S) => boolean
 }) {
-  const t = useTranslations("admin.packs")
   return (
     <ol className="flex flex-wrap items-center gap-1">
-      {STEPS.map((s, i) => {
+      {steps.map((s, i) => {
         const current = s === step
-        const done = stepValid(s) && i < STEPS.indexOf(step)
+        const done = stepValid(s) && i < steps.indexOf(step)
         const enabled = i <= reachable
         return (
           <li key={s} className="flex items-center gap-1">
@@ -152,10 +164,10 @@ function StepRail({
             >
               <span className="font-mono text-[11px]">{done ? "✓" : i + 1}</span>
               <span className="font-display text-[11px] font-bold uppercase tracking-[0.08em]">
-                {t(`step.${s}`)}
+                {label(s)}
               </span>
             </button>
-            {i < STEPS.length - 1 && <span className="text-txt-muted">·</span>}
+            {i < steps.length - 1 && <span className="text-txt-muted">·</span>}
           </li>
         )
       })}
@@ -198,6 +210,17 @@ export function VersionEditor({
   const [importing, setImporting] = useState<string | null>(null)
   // Emulator pack data
   const [emulatorData, setEmulatorData] = useState<EmulatorVersionData | null>(null)
+  // The emulator arm runs the same wizard with its own step set. It used to be
+  // a single un-stepped form dropped in the middle of the editor, which is why
+  // it read as a bypass rather than a first-class arm.
+  const [emuStep, setEmuStep] = useState<EmulatorStep>("metadata")
+  const [emuValid, setEmuValid] = useState<Record<EmulatorStep, boolean>>({
+    metadata: false,
+    rom: false,
+    files: true,
+    review: true,
+  })
+  const emuSubmit = useRef<(() => void) | null>(null)
   const filesRef = useRef<HTMLInputElement>(null)
   const folderRef = useRef<HTMLInputElement>(null)
   const archiveRef = useRef<HTMLInputElement>(null)
@@ -466,6 +489,13 @@ export function VersionEditor({
   const isEmulator = pack.gameType === "emulator"
   const isNonMc = pack.gameType !== "minecraft" && !isEmulator
 
+  const emuStepIndex = EMULATOR_STEPS.indexOf(emuStep)
+  // The furthest step the current input justifies reaching: the first invalid
+  // one, so a half-filled form cannot skip ahead to review.
+  const emuReachable = EMULATOR_STEPS.findIndex((s) => !emuValid[s]) === -1
+    ? EMULATOR_STEPS.length - 1
+    : EMULATOR_STEPS.findIndex((s) => !emuValid[s])
+
   return (
     <AvPanel
       title={title}
@@ -496,21 +526,83 @@ export function VersionEditor({
           </Button>
         </div>
       ) : isEmulator ? (
-      <div className="flex min-h-0 flex-1 flex-col gap-5 bm-scroll overflow-auto pr-1 pb-4">
-        <EmulatorEditor
-          initialName={name}
-          onSave={(data) => {
-            setName(data.name)
-            setEmulatorData(data)
-            void submit(data)
-          }}
-          previousKind={undefined}
-        />
+      <div className="flex min-h-0 flex-1 flex-col gap-5">
+        <div className="flex shrink-0 flex-wrap items-center justify-between gap-3 border-b border-line pb-4">
+          <StepRail
+            steps={EMULATOR_STEPS}
+            step={emuStep}
+            onGo={setEmuStep}
+            reachable={emuReachable}
+            stepValid={(s) => emuValid[s]}
+            label={(s) => t(`emulatorStep.${s}`)}
+          />
+          <span className="font-mono text-[11px] text-txt-dim">
+            {t("stepOf", { n: emuStepIndex + 1, total: EMULATOR_STEPS.length })}
+          </span>
+        </div>
+
+        <div className="min-h-0 flex-1 bm-scroll overflow-auto pr-1">
+          <EmulatorEditor
+            initialName={name}
+            step={emuStep}
+            onValidity={setEmuValid}
+            submitRef={emuSubmit}
+            onSave={(data) => {
+              setName(data.name)
+              setEmulatorData(data)
+              void submit(data)
+            }}
+            previousKind={undefined}
+          />
+        </div>
+
+        <div className="flex shrink-0 items-center justify-between gap-3 border-t border-line pt-4">
+          <Button
+            variant="ghost"
+            icon="back"
+            disabled={emuStepIndex === 0}
+            onClick={() => setEmuStep(EMULATOR_STEPS[emuStepIndex - 1])}
+          >
+            {t("back")}
+          </Button>
+          <div className="flex items-center gap-2">
+            <Button variant="ghost" onClick={onClose}>
+              {t("cancel")}
+            </Button>
+            {emuStep === "review" ? (
+              <Button
+                variant="pri"
+                icon="check"
+                loading={busy}
+                disabled={!emuValid.metadata || !emuValid.rom}
+                onClick={() => emuSubmit.current?.()}
+              >
+                {mode === "edit" ? t("saveVersion") : t("create")}
+              </Button>
+            ) : (
+              <Button
+                variant="pri"
+                icon="chevronRight"
+                disabled={!emuValid[emuStep]}
+                onClick={() => setEmuStep(EMULATOR_STEPS[emuStepIndex + 1])}
+              >
+                {t("continue")}
+              </Button>
+            )}
+          </div>
+        </div>
       </div>
       ) : (
       <div className="flex min-h-0 flex-1 flex-col gap-5">
         <div className="flex shrink-0 flex-wrap items-center justify-between gap-3 border-b border-line pb-4">
-          <StepRail step={step} onGo={setStep} reachable={reachable} stepValid={stepValid} />
+          <StepRail
+            steps={STEPS}
+            step={step}
+            onGo={setStep}
+            reachable={reachable}
+            stepValid={stepValid}
+            label={(s) => t(`step.${s}`)}
+          />
           <span className="font-mono text-[11px] text-txt-dim">
             {t("stepOf", { n: stepIndex + 1, total: STEPS.length })}
           </span>

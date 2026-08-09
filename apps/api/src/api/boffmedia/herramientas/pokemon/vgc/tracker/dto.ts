@@ -8,7 +8,7 @@ import {
   IsObject,
 } from 'class-validator';
 
-export class CreatePresetDto {
+export class CreateTrackerPresetDto {
   @ApiPropertyOptional() @IsOptional() @IsString() id?: string;
   @ApiProperty() @IsString() name: string;
   @ApiProperty() @IsString() regulationId: string;

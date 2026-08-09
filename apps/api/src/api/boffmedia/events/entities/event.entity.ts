@@ -80,6 +80,18 @@ export class Event {
   type: 'event' | 'server';
 
   @ApiProperty({
+    // `type` is explicit: without it swagger cannot infer `string | null` and
+    // the generated client model comes out as Record<string, any>.
+    type: String,
+    example: 'k3n8x1p0',
+    description:
+      'Pack this event grants access to. Membership in the event is the entitlement.',
+    required: false,
+    nullable: true,
+  })
+  packId?: string | null;
+
+  @ApiProperty({
     example: 'Minecraft',
     description: 'Game name',
     required: false,
