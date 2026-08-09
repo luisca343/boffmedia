@@ -30,7 +30,7 @@ export function AssignmentsPanel({ configId }: AssignmentsPanelProps) {
   const [assignments, setAssignments] = useState<RandomizerAssignment[] | null>(null)
   const [loading, setLoading] = useState(false)
   const [selectedLog, setSelectedLog] = useState<string | null>(null)
-  const [loadingLogId, setLoadingLogId] = useState<string | null>(null)
+  const [loadingLogId, setLoadingLogId] = useState<number | null>(null)
 
   useEffect(() => {
     loadAssignments()
@@ -53,7 +53,7 @@ export function AssignmentsPanel({ configId }: AssignmentsPanelProps) {
   const handleViewLog = async (assignment: RandomizerAssignment) => {
     setLoadingLogId(assignment.id)
     try {
-      const res = await RandomizerService.readConfigLog(configId, assignment.id)
+      const res = await RandomizerService.readConfigLog(configId, String(assignment.id))
       // `!= null` rather than truthy: an empty log is a real (if odd) answer,
       // and reporting it as "could not load the log" sends you looking for a
       // network problem that is not there.
@@ -109,7 +109,7 @@ export function AssignmentsPanel({ configId }: AssignmentsPanelProps) {
                   className="border-b border-line hover:bg-panel-2 transition-colors"
                 >
                   <td className="px-3 py-2 font-medium">
-                    {assignment.participantName || assignment.participantId}
+                    {assignment.displayName}
                   </td>
                   <td className="px-3 py-2">
                     <AvPill tone={STATUS_TONE[assignment.status] ?? "muted"}>
@@ -124,9 +124,9 @@ export function AssignmentsPanel({ configId }: AssignmentsPanelProps) {
                     )}
                   </td>
                   <td className="px-3 py-2">
-                    {assignment.outputHash || assignment.outputSha512 ? (
+                    {assignment.outputSha512 ? (
                       <code className="text-xs bg-panel-2 px-2 py-1 rounded">
-                        {(assignment.outputHash || assignment.outputSha512)!.slice(0, 16)}…
+                        {assignment.outputSha512.slice(0, 16)}…
                       </code>
                     ) : (
                       <span className="text-txt-dim text-xs">—</span>

@@ -9,7 +9,15 @@ export type AssignmentAdminDto = {
      * BoffMedia User ID if linked
      */
     boffmediaUserId: number | null;
-    mcUuid: string;
+    /**
+     * The player's Boffmedia username (from the account the assignment is keyed to). 'Anonymous' if the account was removed.
+     */
+    displayName: string;
+    mcUuid: Record<string, any> | null;
+    /**
+     * True while the seed is still under seal (config not yet published). The admin table shows a lock; the seed field is withheld until it flips false.
+     */
+    seedSealed: boolean;
     /**
      * Only present if config.status === published
      */

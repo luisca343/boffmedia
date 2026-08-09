@@ -328,7 +328,15 @@ export class AssignmentsService {
       throw new NotFoundException(`Config ${configId} not found`);
     }
 
-    const assignments = await this.repository.listAssignmentsByConfig(configId);
+    // The name-joining variant, not the bare one: the admin table's first
+    // column is the participant, and without the username join it can only show
+    // an opaque user id — which the web panel rendered as a blank cell.
+    const assignments =
+      await this.repository.listAssignmentsByConfigWithDisplayNames(configId);
+
+    // Seeds are exposed only once results go public; until then they are under
+    // seal, which is what the table's lock column reports.
+    const sealed = config.status !== 'published';
 
     return assignments.map(
       (a) =>
@@ -336,7 +344,9 @@ export class AssignmentsService {
           id: a.id,
           configId: a.configId,
           boffmediaUserId: a.boffmediaUserId,
+          displayName: a.displayName,
           mcUuid: a.mcUuid,
+          seedSealed: sealed,
           ...(config.status === 'published' && { seed: a.seed }), // Only expose seed when published
           status: a.status,
           outputSha512: a.outputSha512,

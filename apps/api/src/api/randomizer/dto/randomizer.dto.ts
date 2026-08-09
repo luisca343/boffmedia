@@ -212,8 +212,20 @@ export class AssignmentAdminDto {
   @ApiProperty({ type: Number, nullable: true, description: 'BoffMedia User ID if linked' })
   boffmediaUserId: number | null;
 
-  @ApiProperty()
-  mcUuid: string;
+  @ApiProperty({
+    description:
+      "The player's Boffmedia username (from the account the assignment is keyed to). 'Anonymous' if the account was removed.",
+  })
+  displayName: string;
+
+  @ApiProperty({ nullable: true })
+  mcUuid: string | null;
+
+  @ApiProperty({
+    description:
+      "True while the seed is still under seal (config not yet published). The admin table shows a lock; the seed field is withheld until it flips false.",
+  })
+  seedSealed: boolean;
 
   @ApiProperty({ description: 'Only present if config.status === published' })
   seed?: number;

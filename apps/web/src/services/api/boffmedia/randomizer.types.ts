@@ -80,17 +80,29 @@ export interface UpdateConfigDto {
   romId?: number
 }
 
+// Mirrors AssignmentAdminDto (apps/api/.../randomizer.dto.ts). The admin
+// assignments table is the only consumer; the fields below are exactly what the
+// API sends, no more. The previous shape (participantId/participantName/
+// outputHash) matched nothing the server returned, which is why the participant
+// column was always blank.
 export interface RandomizerAssignment {
-  id: string
-  eventId: string
-  participantId: string
-  participantName?: string
+  id: number
+  configId: number
+  boffmediaUserId: number | null
+  /** Boffmedia username of the account this assignment is keyed to. */
+  displayName: string
+  mcUuid: string | null
   status: "pending" | "claimed" | "patched" | "verified"
-  seed?: string
-  seedSealed?: boolean
-  outputHash?: string
-  outputSha512?: string
-  spoilerLog?: string
+  /** True while the seed is still under seal (config not yet published). */
+  seedSealed: boolean
+  /** Present only when the config is published. */
+  seed?: number
+  outputSha512: string | null
+  logBlobSha512: string | null
+  claimedAt: string | null
+  patchedAt: string | null
+  verifiedAt: string | null
   createdAt: string
+  updatedAt: string
 }
 

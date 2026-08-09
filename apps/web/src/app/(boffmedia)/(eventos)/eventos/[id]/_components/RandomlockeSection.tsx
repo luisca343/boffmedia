@@ -4,7 +4,6 @@ import { useEffect, useState } from "react"
 import { useTranslations } from "next-intl"
 import { Button, Icon, toast, Spinner } from "@boffmedia/ui"
 import { RandomizerService } from "@/services/api/boffmedia/randomizerService"
-import type { RandomizerConfig, RandomizerAssignment } from "@/services/api/boffmedia/randomizer.types"
 
 export interface EventConfig {
   id: string
@@ -19,14 +18,17 @@ export interface EventConfig {
   createdAt: string
 }
 
+// Mirrors PublicAssignmentDto. The server sends `displayName` (joined from
+// boffMediaUsers), never `participantName`/`outputHash` — the old shape here
+// left the participant column blank on the public results table, exactly as it
+// did on the admin one.
 export interface ConfigAssignment {
-  id: string
-  eventId: number
-  participantName: string
+  id: number
+  configId: number
+  displayName: string
   status: "pending" | "claimed" | "patched" | "verified"
-  seed?: string | number | null
+  seed?: number | null
   outputSha512: string | null
-  outputHash?: string | null
   createdAt: string
 }
 
@@ -190,7 +192,7 @@ function RandomlockeRunningView({
         <tbody>
           {assignments.map((a) => (
             <tr key={a.id} className="border-b border-line-2 hover:bg-panel-alt">
-              <td className="px-4 py-2 text-txt">{a.participantName}</td>
+              <td className="px-4 py-2 text-txt">{a.displayName}</td>
               <td className="px-4 py-2">
                 <StatusBadge status={a.status} />
               </td>
@@ -264,7 +266,7 @@ function RandomlockePublishedView({
           <tbody>
             {assignments.map((a) => (
               <tr key={a.id} className="border-b border-line-2 hover:bg-panel-alt">
-                <td className="px-4 py-2 text-txt">{a.participantName}</td>
+                <td className="px-4 py-2 text-txt">{a.displayName}</td>
                 <td className="px-4 py-2 font-mono text-txt-muted">
                   {a.seed !== undefined && a.seed !== null ? (
                     <CopyableText text={String(a.seed)} />
@@ -273,17 +275,17 @@ function RandomlockePublishedView({
                   )}
                 </td>
                 <td className="px-4 py-2 font-mono text-txt-muted text-[11px]">
-                  {a.outputSha512 || a.outputHash ? (
+                  {a.outputSha512 ? (
                     <CopyableText
-                      text={(a.outputSha512 || a.outputHash)!.substring(0, 16)}
-                      full={(a.outputSha512 || a.outputHash) ?? undefined}
+                      text={a.outputSha512.substring(0, 16)}
+                      full={a.outputSha512}
                     />
                   ) : (
                     <span className="text-txt-dim">—</span>
                   )}
                 </td>
                 <td className="px-4 py-2">
-                  <LogDownloadButton eventId={config.eventId} assignmentId={a.id} />
+                  <LogDownloadButton eventId={config.eventId} assignmentId={String(a.id)} />
                 </td>
               </tr>
             ))}
