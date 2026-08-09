@@ -54,7 +54,10 @@ export function AssignmentsPanel({ configId }: AssignmentsPanelProps) {
     setLoadingLogId(assignment.id)
     try {
       const res = await RandomizerService.readConfigLog(configId, assignment.id)
-      if (res.success && res.data) {
+      // `!= null` rather than truthy: an empty log is a real (if odd) answer,
+      // and reporting it as "could not load the log" sends you looking for a
+      // network problem that is not there.
+      if (res.success && res.data != null) {
         setSelectedLog(res.data)
       } else {
         toast({
@@ -160,7 +163,9 @@ export function AssignmentsPanel({ configId }: AssignmentsPanelProps) {
           <Button onClick={() => setSelectedLog(null)}>{t("close")}</Button>
         }
       >
-        <pre className="bg-panel-2 p-4 text-xs overflow-x-auto whitespace-pre-wrap break-words">
+        {/* A spoiler log runs to thousands of lines; without a capped height the
+            modal grows past the viewport and the close button goes with it. */}
+        <pre className="bg-panel-2 p-4 text-xs max-h-[60vh] overflow-auto whitespace-pre-wrap break-words">
           {selectedLog}
         </pre>
       </Modal>

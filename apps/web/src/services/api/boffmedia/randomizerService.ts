@@ -5,6 +5,7 @@
 
 import {
   apiAuthedAutoGET,
+  apiAuthedAutoTextGET,
   apiAuthedAutoPOST,
   apiAuthedAutoPATCH,
   apiAuthedAutoDELETE,
@@ -235,7 +236,11 @@ export class RandomizerService {
    * Backend route: configs/:configId/assignments/:assignmentId/log
    */
   static readConfigLog(configId: string, assignmentId: string) {
-    return apiAuthedAutoGET<string>(`${BASE}/configs/${configId}/assignments/${assignmentId}/log`)
+    // The route returns a StreamableFile, which the response interceptor passes
+    // through untouched — so the body is the raw spoiler log, not the
+    // `{ success, data }` envelope. Reading it as JSON threw on the log's own
+    // `==========` header.
+    return apiAuthedAutoTextGET(`${BASE}/configs/${configId}/assignments/${assignmentId}/log`)
   }
 
   /**

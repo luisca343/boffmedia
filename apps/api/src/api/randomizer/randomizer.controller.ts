@@ -262,7 +262,11 @@ export class RandomizerController {
   }
 
   @Get('configs/:configId/assignments/:assignmentId/log')
-  @ApiOperation({ summary: 'Download sealed log for an assignment' })
+  @ApiOperation({
+    summary: 'Leer el registro (spoiler log) de una asignación',
+    description:
+      'Texto plano, NO el envoltorio { success, data }: el ResponseInterceptor deja pasar un StreamableFile tal cual. El panel de admin lo muestra en un modal, así que se sirve inline y declarado como texto en lugar de como descarga binaria.',
+  })
   @ApiResponse({ status: HttpStatus.OK })
   async getAssignmentLog(
     @Param('configId') configId: string,
@@ -273,8 +277,8 @@ export class RandomizerController {
       Number(assignmentId),
     );
     return new StreamableFile(logBlob, {
-      type: 'application/octet-stream',
-      disposition: 'attachment',
+      type: 'text/plain; charset=utf-8',
+      disposition: 'inline',
     });
   }
 

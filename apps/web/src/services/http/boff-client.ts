@@ -91,6 +91,32 @@ export async function apiMultipartPOST<T>(
 // Raw binary upload. Not multipart on purpose: the pack blob store is
 // content-addressed, so there is exactly one file and no fields, and a
 // multipart wrapper would only add a boundary the server has to parse back off.
+/**
+ * A guarded GET whose response is NOT the `{ success, data }` envelope.
+ *
+ * The interceptor passes a `StreamableFile` through untouched, so routes that
+ * return one (the randomizer spoiler log) answer with raw bytes. Sending those
+ * through the JSON helpers throws `Unexpected token '='` on the log's own
+ * `==========` header — the same family of trap as passing FormData to the JSON
+ * POST helpers, where the body silently serialises to `{}`.
+ *
+ * The text is wrapped back into an ApiResponse so call sites keep the one
+ * `{ success, data }` shape they check everywhere else.
+ */
+export async function apiAuthedAutoTextGET(
+  url: string,
+): Promise<ApiResponse<string>> {
+  const res = await fetch(`${getApiUrl()}${url}`, {
+    method: "GET",
+    headers: { Authorization: `Bearer ${await sessionToken()}` },
+    cache: "no-store",
+  });
+  // An ERROR from these routes still comes back as the normal JSON envelope —
+  // the exception filter writes it, not the interceptor.
+  if (!res.ok) return parseErrorEnvelope<string>(res);
+  return { success: true, statusCode: res.status, data: await res.text() };
+}
+
 export async function apiAuthedAutoBinaryPOST<T>(
   url: string,
   body: Blob | ArrayBuffer,
