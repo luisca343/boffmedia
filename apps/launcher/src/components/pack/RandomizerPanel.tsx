@@ -19,11 +19,25 @@ export function RandomizerPanel({
   slug,
   packId,
   missingFiles,
+  romBlocked,
   className,
 }: {
   slug: string
   packId: string
   missingFiles: MissingUserFile[]
+  /**
+   * Whether THIS install still has the clean ROM in its slot, read from the
+   * on-disk marker (`compute_randomizer_blocked`).
+   *
+   * This — not the assignment's `status` — decides whether the ROM has to be
+   * downloaded. `status: 'patched'` is a SERVER fact ("a ROM has been generated
+   * for this assignment"), and the server has no idea which machine holds the
+   * file: a reinstall, a second computer or a wiped data directory all leave it
+   * saying `patched` with nothing on disk. Keying on it meant the panel
+   * reported "ready to play" while the Play button stayed disabled on the very
+   * gate this panel exists to clear, with no way for the player to retry.
+   */
+  romBlocked: boolean
   className?: string
 }) {
   const t = useT("randomlocke")
@@ -31,7 +45,11 @@ export function RandomizerPanel({
   const [assignment, setAssignment] = useState<RandomizerAssignment | null | "loading">("loading")
   const [flowState, setFlowState] = useState<"idle" | "claiming" | "downloading" | "ready" | "error">("idle")
   const [error, setError] = useState<string | null>(null)
-  const [loadError, setLoadError] = useState<string | null>(null)
+
+  // `missingUserFiles` is rebuilt on every PackDetail render, so depending on
+  // the array itself gives runAutoFlow a new identity each time — which resets
+  // the effect's timer below and can starve it. The paths are what matter.
+  const missingKey = missingFiles.map((f) => f.path).join("|")
 
   // Run the auto-flow: claim assignment, resolve ROM slot, download, place, update marker
   const runAutoFlow = useCallback(async () => {
@@ -42,17 +60,11 @@ export function RandomizerPanel({
       // Step 1: Get/refresh the assignment
       const result = await getRandomizerAssignment(packId)
       if (!result) {
-        // No active event → panel should hide, this shouldn't happen
+        // No active event → panel hides.
         setAssignment(null)
         return
       }
       setAssignment(result)
-
-      // If already patched/verified, no need to download
-      if (result.status === "patched" || result.status === "verified") {
-        setFlowState("ready")
-        return
-      }
 
       // Step 2: Resolve the ROM slot
       let slotPath = await instanceRomSlot(slug)
@@ -67,7 +79,28 @@ export function RandomizerPanel({
         throw new Error(t("noRomSlot"))
       }
 
-      // Step 3: Download the randomized ROM
+      // Two independent ways this install can still need the ROM, and BOTH have
+      // to be clear before the panel may claim it is ready:
+      //
+      //   · the slot is empty — the ROM is a user-provided file, so it shows up
+      //     in missingUserFiles until something puts it there;
+      //   · the marker still expects the clean ROM's hash — the anti-cheat gate,
+      //     which is what disables Play.
+      //
+      // Checking only one of them is how the panel ended up announcing "ready to
+      // play" over a Play button that was disabled, with no way to retry.
+      const norm = (p: string) => p.toLowerCase().replace(/\\/g, "/")
+      const romMissingOnDisk = missingFiles.some((f) => norm(f.path) === norm(slotPath))
+
+      if (!romBlocked && !romMissingOnDisk) {
+        setFlowState("ready")
+        return
+      }
+
+      // Step 3: Download the randomized ROM. Cheap when the server already has
+      // the output — it streams the cached blob instead of regenerating — so
+      // erring towards downloading costs a transfer, while erring the other way
+      // leaves the pack permanently unplayable.
       setFlowState("downloading")
       const rom = await downloadRandomizerRom(result.eventId)
 
@@ -83,58 +116,27 @@ export function RandomizerPanel({
       toast.success(t("autoInstalled"))
     } catch (err) {
       const message = (err as { message?: string })?.message ?? (typeof err === "string" ? err : t("downloadError"))
+      // Every failure lands on the retryable panel, including one that happened
+      // before the assignment resolved. The old split showed a dead-end message
+      // for those, which is the worst possible response to a transient network
+      // error on the one screen that can fix the pack.
       setError(message)
       setFlowState("error")
       console.error("Randomizer auto-flow failed:", err)
     }
-  }, [packId, slug, missingFiles, t, refreshInstallState])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [packId, slug, missingKey, romBlocked, t, refreshInstallState])
 
-  // Load the assignment on mount
+  // One entry point. This used to fetch the assignment on mount and then fetch
+  // it AGAIN inside the flow, which was two round trips for one screen — and
+  // the mount copy owned the decision about whether to download at all.
   useEffect(() => {
-    const load = async () => {
-      try {
-        const result = await getRandomizerAssignment(packId)
-        if (!result) {
-          // No active event → hide panel
-          setAssignment(null)
-          return
-        }
-        setAssignment(result)
-        setLoadError(null)
-
-        // If not yet patched, auto-start the flow
-        if (result.status !== "patched" && result.status !== "verified") {
-          setFlowState("idle")
-        } else {
-          setFlowState("ready")
-        }
-      } catch (err) {
-        console.error("Failed to load randomizer assignment:", err)
-        setLoadError((err as { message?: string })?.message ?? t("loadError"))
-        setAssignment(null)
-      }
-    }
-    void load()
-  }, [packId, t])
-
-  // Auto-run the flow when entering idle state (after mount or error retry)
-  useEffect(() => {
-    if (flowState === "idle" && assignment && assignment !== "loading") {
-      const timer = setTimeout(() => {
-        void runAutoFlow()
-      }, 100)
-      return () => clearTimeout(timer)
-    }
-  }, [flowState, assignment, runAutoFlow])
-
-  // A real error (not a plain 404) is shown so the failing gate is visible.
-  if (assignment === null && loadError) {
-    return (
-      <Panel title={t("panelTitle")} className={className}>
-        <p className="text-sm text-bad">{loadError}</p>
-      </Panel>
-    )
-  }
+    if (flowState !== "idle") return
+    const timer = setTimeout(() => {
+      void runAutoFlow()
+    }, 100)
+    return () => clearTimeout(timer)
+  }, [flowState, runAutoFlow])
 
   // Don't render if no assignment (404 means no active event)
   if (assignment === null) return null

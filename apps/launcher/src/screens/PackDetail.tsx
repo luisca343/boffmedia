@@ -735,6 +735,7 @@ export function PackDetail() {
           slug={pack.slug}
           packId={pack.id}
           missingFiles={state.missingUserFiles ?? []}
+          romBlocked={randomizerBlocked}
           className="mb-4"
         />
       )}
