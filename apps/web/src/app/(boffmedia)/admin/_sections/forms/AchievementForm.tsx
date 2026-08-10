@@ -4,7 +4,7 @@ import * as z from "zod"
 import { useTranslations } from "next-intl"
 import { Button, Field, Input, Select } from "@boffmedia/ui"
 import { useGetEvents } from "@/hooks/events/useGetEvents"
-import { CreateAchievementDto } from "@boffmedia/shared"
+import { CreateEventAchievementDto as CreateAchievementDto } from "@boffmedia/shared"
 
 const achievementSchema = z.object({
   id: z.number().optional(),

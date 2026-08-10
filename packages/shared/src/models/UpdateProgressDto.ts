@@ -12,7 +12,7 @@ export type UpdateProgressDto = {
      */
     achievementId: number;
     /**
-     * The progress amount to add
+     * The new absolute progress value (overwrites the current value; it is NOT added to it)
      */
     progress: number;
     /**

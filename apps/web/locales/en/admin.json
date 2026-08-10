@@ -1156,7 +1156,8 @@
         "updateError": "Failed to update config",
         "loadPacksError": "Failed to load packs",
         "loadPresetsError": "Failed to load presets",
-        "loadRomsError": "Failed to load ROMs"
+        "loadRomsError": "Failed to load ROMs",
+        "cancel": "Cancel"
       },
       "summary": {
         "title": "Configuration",
@@ -1214,6 +1215,11 @@
         "statusClaimed": "Claimed",
         "statusPatched": "Patched",
         "statusVerified": "Verified"
+      },
+      "empty": {
+        "title": "No randomizer",
+        "lead": "This event has no randomizer config. Add one only if it is a randomlocke: participants will receive a sealed seed to patch from the launcher.",
+        "add": "Add randomizer"
       }
     },
     "tabs": {

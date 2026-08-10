@@ -10,6 +10,7 @@
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
     "dev": "NODE_OPTIONS='--max-old-space-size=3072' nest start --watch",
+    "dev:win": "set \"NODE_OPTIONS=--max-old-space-size=3072\" && nest start --watch",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node --max-old-space-size=4096 dist/main",
     "lint": "NODE_OPTIONS='--max-old-space-size=3072' eslint -c .eslintrc.memory-safe.js \"src/**/*.ts\" \"test/**/*.ts\" --fix",

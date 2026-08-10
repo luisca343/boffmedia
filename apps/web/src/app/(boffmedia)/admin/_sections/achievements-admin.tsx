@@ -7,7 +7,7 @@ import { AvSectionHead, AvPill } from "../_components/ui/av-kit"
 import { useGetAchievements } from "@/hooks/events/useGetAchievements"
 import { EventsService } from "@/services/api/boffmedia/eventsService"
 import { AchievementForm } from "./forms/AchievementForm"
-import type { Achievement } from "@boffmedia/shared"
+import type { EventAchievement as Achievement } from "@boffmedia/shared"
 
 function useAchievementsList() {
   const { achievements, error, isLoading, refetch } = useGetAchievements()

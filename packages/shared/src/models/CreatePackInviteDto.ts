@@ -2,7 +2,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export type CreateInviteDto = {
+export type CreatePackInviteDto = {
     maxUses?: number;
     /**
      * ISO-8601

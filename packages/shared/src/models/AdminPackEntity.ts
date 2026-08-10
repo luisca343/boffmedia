@@ -13,6 +13,8 @@ export type AdminPackEntity = {
     gameType: AdminPackEntity.gameType;
     summary?: Record<string, any> | null;
     iconUrl?: Record<string, any> | null;
+    description?: Record<string, any> | null;
+    gallery?: Array<Record<string, any>> | null;
     accessKind: string;
     server?: PackServerEntity | null;
     archived: boolean;

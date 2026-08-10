@@ -4,6 +4,7 @@ import {
   FindEventsFilters,
 } from '../repositories/events.repository';
 import { Event } from '@/_db/schema/BoffMediaEvents';
+import type { EventModules } from '../entities/event.entity';
 import { CreateEventDto } from '../dto/create-event.dto';
 import { UpdateEventDto } from '../dto/update-event.dto';
 
@@ -19,19 +20,24 @@ export class EventsService {
     id: number,
     includePrivate = false,
     userId?: number,
-  ): Promise<Event & { childEvents?: Event[] }> {
+  ): Promise<Event & { childEvents?: Event[]; modules?: EventModules }> {
     const effectivePrivate = await this.canSeePrivate(id, includePrivate, userId);
     const event = await this.eventsRepository.findById(id, effectivePrivate);
-    if (!event) return null as unknown as Event & { childEvents?: Event[] };
+    if (!event)
+      return null as unknown as Event & {
+        childEvents?: Event[];
+        modules?: EventModules;
+      };
 
-    const childEvents = await this.eventsRepository.findChildEvents(
-      id,
-      effectivePrivate,
-    );
+    const [childEvents, modules] = await Promise.all([
+      this.eventsRepository.findChildEvents(id, effectivePrivate),
+      this.eventsRepository.findModules(id),
+    ]);
 
     return {
       ...event,
       childEvents: childEvents.length > 0 ? childEvents : [],
+      modules,
     };
   }
 

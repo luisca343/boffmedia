@@ -1156,7 +1156,8 @@
         "updateError": "No se pudo actualizar la configuración",
         "loadPacksError": "No se pudieron cargar los packs",
         "loadPresetsError": "No se pudieron cargar los presets",
-        "loadRomsError": "No se pudieron cargar las ROMs"
+        "loadRomsError": "No se pudieron cargar las ROMs",
+        "cancel": "Cancelar"
       },
       "summary": {
         "title": "Configuración",
@@ -1214,6 +1215,11 @@
         "statusClaimed": "Reclamada",
         "statusPatched": "Parcheada",
         "statusVerified": "Verificada"
+      },
+      "empty": {
+        "title": "Sin randomizer",
+        "lead": "Este evento no tiene una configuración de randomizer. Añádela solo si es un randomlocke: los participantes recibirán una semilla sellada que parchearán desde el launcher.",
+        "add": "Añadir randomizer"
       }
     },
     "tabs": {

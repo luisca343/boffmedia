@@ -196,8 +196,11 @@ export function EventDetailView({ id }: { id: number }) {
         </div>
       </div>
 
-      {/* Randomlocke transparency section (if config exists) */}
-      <RandomlockeSection eventId={id} />
+      {/* Randomlocke transparency. `modules` already answers whether this event
+          has a randomizer, so the section is no longer mounted on every event
+          just to fetch a config that is usually absent. Drafts read as null
+          server-side, so they stay invisible here. */}
+      {event.modules?.randomizer && <RandomlockeSection eventId={id} />}
     </main>
   )
 }

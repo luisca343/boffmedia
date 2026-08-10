@@ -41,9 +41,11 @@ interface EventConfigFormProps {
   config?: RandomizerConfig | null
   eventId: number
   onSaved: () => void
+  /** Backs out of an unsaved create, returning the panel to its CTA. */
+  onCancel?: () => void
 }
 
-export function EventConfigForm({ config, eventId, onSaved }: EventConfigFormProps) {
+export function EventConfigForm({ config, eventId, onSaved, onCancel }: EventConfigFormProps) {
   const t = useTranslations("randomizer.eventPanel.form")
   const isEdit = Boolean(config?.id)
   const [presets, setPresets] = useState<RandomizerPreset[]>([])
@@ -330,11 +332,16 @@ export function EventConfigForm({ config, eventId, onSaved }: EventConfigFormPro
           <Input placeholder={t("romHintPlaceholder")} {...register("romHint")} />
         </Field>
 
-        <div className="pt-2">
+        <div className="pt-2 flex items-center gap-2">
           <Button type="submit" disabled={submitting}>
             {submitting && <Spinner size={16} />}
             {isEdit ? t("save") : t("create")}
           </Button>
+          {onCancel && (
+            <Button type="button" variant="ghost" disabled={submitting} onClick={onCancel}>
+              {t("cancel")}
+            </Button>
+          )}
         </div>
       </form>
 

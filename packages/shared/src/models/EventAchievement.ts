@@ -2,7 +2,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export type Achievement = {
+export type EventAchievement = {
     /**
      * Unique identifier for the achievement
      */
@@ -34,15 +34,15 @@ export type Achievement = {
     /**
      * Type of item
      */
-    itemType?: Achievement.itemType;
+    itemType?: EventAchievement.itemType;
     /**
      * Category of the achievement
      */
-    category?: Achievement.category;
+    category?: EventAchievement.category;
     /**
      * Rarity of the achievement
      */
-    rarity?: Achievement.rarity;
+    rarity?: EventAchievement.rarity;
     /**
      * Display order
      */
@@ -68,7 +68,7 @@ export type Achievement = {
      */
     deletedAt?: string;
 };
-export namespace Achievement {
+export namespace EventAchievement {
     /**
      * Type of item
      */

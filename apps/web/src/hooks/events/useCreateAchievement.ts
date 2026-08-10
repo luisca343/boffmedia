@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { CreateAchievementDto } from "@boffmedia/shared"
+import { CreateEventAchievementDto as CreateAchievementDto } from "@boffmedia/shared"
 import { EventsService } from "@/services/api/boffmedia/eventsService"
 
 // Imperative mutation — never auto-fires on mount (call createAchievement to run it).

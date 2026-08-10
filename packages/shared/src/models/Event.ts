@@ -2,6 +2,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { EventModules } from './EventModules';
 export type Event = {
     /**
      * Unique identifier for the event
@@ -79,6 +80,10 @@ export type Event = {
      * Child events if this is a parent event
      */
     childEvents?: Array<Event>;
+    /**
+     * Optional modules present on this event. Only populated by the single-event endpoint — the list endpoint omits it.
+     */
+    modules?: EventModules;
 };
 export namespace Event {
     /**

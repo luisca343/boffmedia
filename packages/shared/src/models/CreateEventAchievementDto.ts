@@ -2,7 +2,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export type CreateAchievementDto = {
+export type CreateEventAchievementDto = {
     /**
      * The name of the achievement
      */
@@ -26,15 +26,15 @@ export type CreateAchievementDto = {
     /**
      * Type of item
      */
-    itemType?: CreateAchievementDto.itemType;
+    itemType: CreateEventAchievementDto.itemType;
     /**
      * Category of the achievement
      */
-    category?: CreateAchievementDto.category;
+    category: CreateEventAchievementDto.category;
     /**
      * Rarity of the achievement
      */
-    rarity?: CreateAchievementDto.rarity;
+    rarity?: CreateEventAchievementDto.rarity;
     /**
      * Display order
      */
@@ -44,7 +44,7 @@ export type CreateAchievementDto = {
      */
     active?: number;
 };
-export namespace CreateAchievementDto {
+export namespace CreateEventAchievementDto {
     /**
      * Type of item
      */

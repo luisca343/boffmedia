@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react"
 import { useTranslations } from "next-intl"
-import { Button, Spinner } from "@boffmedia/ui"
+import { Button, Empty, Spinner } from "@boffmedia/ui"
 import { AvPanel, AvPill, AvSectionHead } from "../../../_components/ui/av-kit"
 import { RandomizerService } from "@/services/api/boffmedia/randomizerService"
 import { EventConfigForm } from "./EventConfigForm"
@@ -38,6 +38,10 @@ export function EventRandomizerPanel({ event, onBack, embedded }: EventRandomize
   const [config, setConfig] = useState<RandomizerConfig | null>(null)
   const [loading, setLoading] = useState(true)
   const [tab, setTab] = useState<"setup" | "assignments">("setup")
+  // Most events are not randomlockes, so the config form is opt-in: it used to
+  // mount eagerly on every event, presenting a full setup form for a module the
+  // event was never going to have.
+  const [adding, setAdding] = useState(false)
 
   const loadConfig = useCallback(async () => {
     setLoading(true)
@@ -45,11 +49,16 @@ export function EventRandomizerPanel({ event, onBack, embedded }: EventRandomize
       const res = await RandomizerService.getAdminEventConfig(eventId)
       const next = res.success && res.data ? res.data : null
       setConfig(next)
-      // After a delete the assignments tab has nothing to point at.
-      if (!next) setTab("setup")
+      // After a delete the assignments tab has nothing to point at, and the
+      // form must fold back into the CTA rather than reappear pre-opened.
+      if (!next) {
+        setTab("setup")
+        setAdding(false)
+      }
     } catch {
       setConfig(null)
       setTab("setup")
+      setAdding(false)
     } finally {
       setLoading(false)
     }
@@ -77,28 +86,32 @@ export function EventRandomizerPanel({ event, onBack, embedded }: EventRandomize
         />
       )}
 
-      <div className="flex gap-2 mb-5 items-center">
-        {embedded && (
-          <AvPill tone={config ? STATUS_TONE[config.status] : "muted"} className="mr-1">
-            {config ? t(STATUS_KEY[config.status]) : t("statusNone")}
-          </AvPill>
-        )}
-        <Button
-          variant={tab === "setup" ? "pri" : "ghost"}
-          size="sm"
-          onClick={() => setTab("setup")}
-        >
-          {t("tabSetup")}
-        </Button>
-        <Button
-          variant={tab === "assignments" ? "pri" : "ghost"}
-          size="sm"
-          onClick={() => setTab("assignments")}
-          disabled={!config}
-        >
-          {t("tabAssignments")}
-        </Button>
-      </div>
+      {/* Tabs only make sense once the event actually has a randomizer —
+          before that there is one action, not two views. */}
+      {(config || adding) && (
+        <div className="flex gap-2 mb-5 items-center">
+          {embedded && (
+            <AvPill tone={config ? STATUS_TONE[config.status] : "muted"} className="mr-1">
+              {config ? t(STATUS_KEY[config.status]) : t("statusNone")}
+            </AvPill>
+          )}
+          <Button
+            variant={tab === "setup" ? "pri" : "ghost"}
+            size="sm"
+            onClick={() => setTab("setup")}
+          >
+            {t("tabSetup")}
+          </Button>
+          <Button
+            variant={tab === "assignments" ? "pri" : "ghost"}
+            size="sm"
+            onClick={() => setTab("assignments")}
+            disabled={!config}
+          >
+            {t("tabAssignments")}
+          </Button>
+        </div>
+      )}
 
       {loading ? (
         <AvPanel>
@@ -107,11 +120,21 @@ export function EventRandomizerPanel({ event, onBack, embedded }: EventRandomize
             <span className="text-txt-muted">{t("loading")}</span>
           </div>
         </AvPanel>
+      ) : !config && !adding ? (
+        <Empty icon="dice" title={t("empty.title")} lead={t("empty.lead")}>
+          <Button variant="pri" icon="plus" onClick={() => setAdding(true)}>
+            {t("empty.add")}
+          </Button>
+        </Empty>
       ) : tab === "setup" ? (
         config ? (
           <ConfigSummaryCard config={config} onChanged={loadConfig} />
         ) : (
-          <EventConfigForm eventId={eventId} onSaved={loadConfig} />
+          <EventConfigForm
+            eventId={eventId}
+            onSaved={loadConfig}
+            onCancel={() => setAdding(false)}
+          />
         )
       ) : (
         config && <AssignmentsPanel configId={config.id} />

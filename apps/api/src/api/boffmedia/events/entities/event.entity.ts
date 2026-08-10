@@ -1,5 +1,25 @@
 import { ApiProperty } from '@nestjs/swagger';
 
+/**
+ * Which optional modules an event actually has. Derived from the satellite
+ * tables that already key on `event_id` — never stored on the event row, so it
+ * cannot drift from the thing it describes.
+ */
+export class EventModules {
+  @ApiProperty({
+    // Explicit `type`, same reason as `Event.packId`: swagger cannot infer a
+    // nullable union and the generated client degrades to Record<string, any>.
+    type: String,
+    example: 'open',
+    description:
+      'Randomizer lifecycle, or null when the event has no randomizer. A `draft` config reads as null here: drafts are admin-only, so the public shape never reveals one.',
+    enum: ['open', 'closed', 'published'],
+    required: false,
+    nullable: true,
+  })
+  randomizer: 'open' | 'closed' | 'published' | null;
+}
+
 export class Event {
   @ApiProperty({
     example: 1,
@@ -130,4 +150,12 @@ export class Event {
     required: false,
   })
   childEvents?: Event[];
+
+  @ApiProperty({
+    description:
+      'Optional modules present on this event. Only populated by the single-event endpoint — the list endpoint omits it.',
+    type: EventModules,
+    required: false,
+  })
+  modules?: EventModules;
 }

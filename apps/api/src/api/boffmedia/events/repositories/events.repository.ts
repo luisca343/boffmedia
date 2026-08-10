@@ -11,6 +11,10 @@ import {
   Event,
   PARTICIPANT_STATUS,
 } from '@/_db/schema/BoffMediaEvents';
+// Schema-level import only, exactly like the packs entitlement predicate below:
+// depending on the randomizer *module* here would close a cycle, since the
+// randomizer already depends on events.
+import { randomizerConfigs } from '@/_db/schema/Randomizer';
 
 const ACTIVE_MEMBERSHIP_STATUSES = [
   PARTICIPANT_STATUS.REGISTERED,
@@ -147,6 +151,34 @@ export class EventsRepository {
     return (result.length
       ? result[0]
       : null) as unknown as EventWithGameNameAndParent | null;
+  }
+
+  /**
+   * Which optional modules the event has. Nothing is stored on the event row:
+   * the satellite tables keyed on `event_id` are the source of truth, so this
+   * cannot go stale the way a declared-state column would.
+   *
+   * `draft` collapses to null on purpose. Drafts are admin-only, and the admin
+   * panel reads the randomizer's own endpoint rather than this field — mapping
+   * it here keeps a draft out of every public payload by construction instead
+   * of relying on each caller to filter it.
+   */
+  async findModules(eventId: number): Promise<{
+    randomizer: 'open' | 'closed' | 'published' | null;
+  }> {
+    const rows = await this.db
+      .select({ status: randomizerConfigs.status })
+      .from(randomizerConfigs)
+      .where(eq(randomizerConfigs.eventId, eventId))
+      .limit(1);
+
+    const status = rows[0]?.status;
+    return {
+      randomizer:
+        status === 'open' || status === 'closed' || status === 'published'
+          ? status
+          : null,
+    };
   }
 
   /** Correlated EXISTS: the user holds an active membership in the outer event. */
