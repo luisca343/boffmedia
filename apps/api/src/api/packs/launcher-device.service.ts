@@ -2,6 +2,7 @@ import {
   BadRequestException,
   ForbiddenException,
   Injectable,
+  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { randomBytes } from 'crypto';
@@ -51,6 +52,8 @@ export type DevicePollResult =
  */
 @Injectable()
 export class LauncherDeviceService {
+  private readonly logger = new Logger(LauncherDeviceService.name);
+
   constructor(
     private readonly repo: LauncherDeviceRepository,
     private readonly auth: PacksAuthService,
@@ -130,24 +133,42 @@ export class LauncherDeviceService {
       return { status: 'pending' };
     }
 
-    // Burn it before minting: a replayed poll must not hand out a second
-    // 30-day session for one approval.
+    // Everything the token needs is gathered BEFORE the burn. Consuming first
+    // and reading after made every read a single point of no return: the code
+    // was already dead, so one failure did not fail the poll, it killed the
+    // whole authorization — the next poll answered 'expired' and the player had
+    // to start over with no idea why. (Seen for real: a missing
+    // `launcher_token_version` column on an un-migrated database.)
+    const user = await this.users.getUserById(row.userId);
+    if (!user) throw new NotFoundException('Cuenta no encontrada');
+    const tokenVersion =
+      (await this.packsRepo.getLauncherTokenVersion(user.id)) ?? 0;
+
+    // Burn it, last thing before minting: a replayed poll must not hand out a
+    // second 30-day session for one approval.
     if (!(await this.repo.consume(deviceCode))) {
       return { status: 'expired' };
     }
 
-    const user = await this.users.getUserById(row.userId);
-    if (!user) throw new NotFoundException('Cuenta no encontrada');
-
-    // The launcher_device_codes row is swept within minutes; this is the only
-    // durable record of who authorised a 30-day session, from which client.
-    await this.packsRepo.audit(
-      AUDIT.LAUNCHER_AUTH,
-      null,
-      user.uuid ?? null,
-      { userId: user.id, clientLabel: row.clientLabel },
-      user.id,
-    );
+    // The launcher_device_codes row is swept within minutes, so this is the only
+    // durable record of who authorised a 30-day session, from which client — but
+    // it is a record, not a gate. Losing the log entry must not cost the player
+    // the session they just approved and can no longer re-approve.
+    try {
+      await this.packsRepo.audit(
+        AUDIT.LAUNCHER_AUTH,
+        null,
+        user.uuid ?? null,
+        { userId: user.id, clientLabel: row.clientLabel },
+        user.id,
+      );
+    } catch (err) {
+      this.logger.error(
+        `No se pudo auditar la autorización del launcher para el usuario ${user.id}: ${
+          err instanceof Error ? err.message : err
+        }`,
+      );
+    }
 
     return {
       status: 'approved',
@@ -157,7 +178,7 @@ export class LauncherDeviceService {
           username: user.username,
           mcUuid: user.uuid ?? null,
         },
-        (await this.packsRepo.getLauncherTokenVersion(user.id)) ?? 0,
+        tokenVersion,
       ),
       user: {
         id: user.id,
