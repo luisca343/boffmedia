@@ -41,6 +41,8 @@ interface AvCrudProps<T extends { id: number | string }> {
   entityName: { singular: string; plural: string }
   columns: AvCrudColumn<T>[]
   searchPlaceholder?: string
+  /** Extra per-row controls rendered before the built-in edit/delete icons. */
+  rowActions?: (item: T) => React.ReactNode
 }
 
 export function AdminCrud<T extends { id: number | string }>({
@@ -53,6 +55,7 @@ export function AdminCrud<T extends { id: number | string }>({
   entityName,
   columns,
   searchPlaceholder,
+  rowActions,
 }: AvCrudProps<T>) {
   const t = useTranslations("admin.crud")
   const singular = entityName.singular
@@ -202,7 +205,7 @@ export function AdminCrud<T extends { id: number | string }>({
                     {col.label}
                   </th>
                 ))}
-                <th className="w-[92px] text-right font-mono text-[10px] font-bold uppercase tracking-[0.1em] text-txt-muted py-[11px] px-[14px] border-b border-solid border-line">
+                <th className={cn(rowActions ? "text-right" : "w-[92px] text-right", " font-mono text-[10px] font-bold uppercase tracking-[0.1em] text-txt-muted py-[11px] px-[14px] border-b border-solid border-line")}>
                   {t("actions")}
                 </th>
               </tr>
@@ -219,7 +222,8 @@ export function AdminCrud<T extends { id: number | string }>({
                     </td>
                   ))}
                   <td className="py-[10px] px-[14px] text-right">
-                    <div className="flex justify-end gap-1.5">
+                    <div className="flex justify-end items-center gap-1.5">
+                      {rowActions?.(item)}
                       <button
                         aria-label={t("editAction")}
                         onClick={() => {

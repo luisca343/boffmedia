@@ -391,7 +391,7 @@ export function PackForm({
                 </div>
               </div>
 
-              <div role="radiogroup" aria-label={t("gameType")} className="grid gap-2 md:grid-cols-2">
+              <div role="radiogroup" aria-label={t("gameTypeSection")} className="grid gap-2 md:grid-cols-2">
                 {(["minecraft", "emulator"] as const).map((gt) => {
                   const selected = gameType === gt
                   return (

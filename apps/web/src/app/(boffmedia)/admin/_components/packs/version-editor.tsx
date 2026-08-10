@@ -937,7 +937,9 @@ export function VersionEditor({
 
         </div>
 
-        <div className="flex shrink-0 items-center gap-2 border-t border-line pt-4">
+        {/* sticky: below 1100px the admin grid scrolls the whole panel, so a
+            plain footer ends up under the mod list instead of on screen. */}
+        <div className="sticky bottom-0 z-[2] flex shrink-0 items-center gap-2 border-t border-line bg-panel pt-4 pb-1">
           <Button
             variant="ghost"
             icon="back"

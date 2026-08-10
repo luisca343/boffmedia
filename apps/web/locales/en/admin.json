@@ -79,18 +79,21 @@
       "statusActive": "Active",
       "statusCompleted": "Completed",
       "panel": {
-        "desc": "Lifecycle, members and invitations for this event.",
+        "desc": "Configuration, members and invites for this event.",
         "back": "Back",
         "lifecycle": "Lifecycle",
         "notActiveNotice": "This event is not active. Players can join, but a randomizer config cannot be opened until you activate it.",
-        "tabRandomizer": "Randomizer",
         "tabParticipants": "Members",
         "tabInvites": "Invitations",
         "status": {
           "upcoming": "Upcoming",
           "active": "Active",
           "completed": "Completed"
-        }
+        },
+        "tabConfig": "Configuration",
+        "lifecycleDesc": "The event's status. Only an active event can hold an open randomizer config.",
+        "randomizerSection": "Randomizer",
+        "randomizerSectionDesc": "Randomizer configuration and participant assignments."
       },
       "participants": {
         "title": "Members",
@@ -123,7 +126,8 @@
         "uses": "{used}/{max} used",
         "copy": "Copy code",
         "revoke": "Revoke"
-      }
+      },
+      "manage": "Manage"
     },
     "teams": {
       "title": "Teams management",
@@ -813,6 +817,18 @@
         "kind": "Emulator",
         "romSection": "Clean ROM",
         "romSectionLead": "The admin supplies their own ROM copy. Its hash is computed in the browser and never uploaded. The launcher verifies the player's ROM matches this hash.",
+        "romSourceLabel": "ROM source",
+        "romSourceHelp": "Where the expected hash comes from. The ROM bytes are never uploaded either way — only the hash the launcher checks a player's dump against.",
+        "romSourceLibrary": "Randomizer ROM library",
+        "romSourceFile": "A local file (hash it in the browser)",
+        "romSourceFileWarning": "A randomizer event refuses every claim unless the pack's ROM hash is identical to the library ROM it pinned. Hashing a local dump only matches if it is byte-for-byte the same file — pick from the library instead unless no event uses this pack.",
+        "romLibraryPick": "Library ROM",
+        "romLibraryNone": "Select a ROM…",
+        "romLibraryLoading": "Loading library…",
+        "romLibraryEmpty": "No {platform} ROM in the library yet. Upload one under Randomizer → ROMs first.",
+        "romLibraryError": "Could not load the ROM library.",
+        "reviewRomLibrary": "Library · {name}",
+        "reviewRomFile": "Local file · {name}",
         "romHint": "Hint for players",
         "romHintHelp": "Tell players which version and region they need. Example: 'Pokémon Emerald v1.0 EUR'",
         "romHintPlaceholder": "e.g. 'Pokémon Emerald v1.0, dumped from your own cartridge'",

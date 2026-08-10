@@ -11,7 +11,7 @@ import { EventInvitesPanel } from "./EventInvitesPanel"
 import type { Event as EventType } from "@boffmedia/shared"
 
 type EventStatus = "upcoming" | "active" | "completed"
-type Tab = "randomizer" | "participants" | "invites"
+type Tab = "config" | "participants" | "invites"
 
 const STATUS_TONE: Record<EventStatus, "amber" | "green" | "muted"> = {
   upcoming: "amber",
@@ -19,11 +19,19 @@ const STATUS_TONE: Record<EventStatus, "amber" | "green" | "muted"> = {
   completed: "muted",
 }
 
+function SectionLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <h3 className="text-xs text-txt-dim uppercase tracking-[0.08em] font-mono mb-1 pb-2 border-b border-solid border-line">
+      {children}
+    </h3>
+  )
+}
+
 export function EventAdminPanel({ event, onBack }: { event: EventType; onBack: () => void }) {
   const t = useTranslations("admin.events.panel")
   const eventId = Number(event.id)
   const [status, setStatus] = useState<EventStatus>(event.status as EventStatus)
-  const [tab, setTab] = useState<Tab>("randomizer")
+  const [tab, setTab] = useState<Tab>("config")
   const [busy, setBusy] = useState<EventStatus | null>(null)
   const [error, setError] = useState<string | null>(null)
 
@@ -42,7 +50,7 @@ export function EventAdminPanel({ event, onBack }: { event: EventType; onBack: (
   }
 
   const tabs: { key: Tab; label: string }[] = [
-    { key: "randomizer", label: t("tabRandomizer") },
+    { key: "config", label: t("tabConfig") },
     { key: "participants", label: t("tabParticipants") },
     { key: "invites", label: t("tabInvites") },
   ]
@@ -62,33 +70,6 @@ export function EventAdminPanel({ event, onBack }: { event: EventType; onBack: (
         }
       />
 
-      <div className="flex items-center gap-2 flex-wrap mb-4">
-        <span className="text-xs text-txt-dim uppercase tracking-[0.08em] font-mono">
-          {t("lifecycle")}
-        </span>
-        {(["upcoming", "active", "completed"] as EventStatus[]).map((s) => (
-          <Button
-            key={s}
-            size="sm"
-            variant={status === s ? "pri" : "ghost"}
-            loading={busy === s}
-            disabled={status === s}
-            onClick={() => move(s)}
-          >
-            {t(`status.${s}`)}
-          </Button>
-        ))}
-      </div>
-
-      {/* Opening a randomizer config requires an active event — it no longer
-          activates one as a side effect, so say so before the attempt fails. */}
-      {status !== "active" && (
-        <AvAlert tone="warning" className="mb-4">
-          {t("notActiveNotice")}
-        </AvAlert>
-      )}
-      {error && <AvAlert tone="error" className="mb-4">{error}</AvAlert>}
-
       <div className="flex gap-2 mb-5">
         {tabs.map((x) => (
           <Button
@@ -102,7 +83,38 @@ export function EventAdminPanel({ event, onBack }: { event: EventType; onBack: (
         ))}
       </div>
 
-      {tab === "randomizer" && <EventRandomizerPanel event={event} onBack={onBack} embedded />}
+      {tab === "config" && (
+        <div>
+          <SectionLabel>{t("lifecycle")}</SectionLabel>
+          <p className="text-[13px] text-txt-muted mb-3">{t("lifecycleDesc")}</p>
+          <div className="flex items-center gap-2 flex-wrap mb-6">
+            {(["upcoming", "active", "completed"] as EventStatus[]).map((s) => (
+              <Button
+                key={s}
+                size="sm"
+                variant={status === s ? "pri" : "ghost"}
+                loading={busy === s}
+                disabled={status === s}
+                onClick={() => move(s)}
+              >
+                {t(`status.${s}`)}
+              </Button>
+            ))}
+          </div>
+          {error && <AvAlert tone="error" className="mb-4">{error}</AvAlert>}
+
+          <SectionLabel>{t("randomizerSection")}</SectionLabel>
+          <p className="text-[13px] text-txt-muted mb-3">{t("randomizerSectionDesc")}</p>
+          {/* Opening a randomizer config requires an active event — it no longer
+              activates one as a side effect, so say so before the attempt fails. */}
+          {status !== "active" && (
+            <AvAlert tone="warning" className="mb-4">
+              {t("notActiveNotice")}
+            </AvAlert>
+          )}
+          <EventRandomizerPanel event={event} onBack={onBack} embedded />
+        </div>
+      )}
       {tab === "participants" && <ParticipantsPanel eventId={eventId} />}
       {tab === "invites" && (
         <EventInvitesPanel eventId={eventId} isPrivate={event.visibility === "private"} />

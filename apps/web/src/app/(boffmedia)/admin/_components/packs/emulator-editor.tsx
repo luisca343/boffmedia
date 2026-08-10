@@ -7,6 +7,8 @@ import { Badge, Button, FeatureToggle, Field, Icon, Input, Select, Textarea, toa
 import { cn } from "@/lib/utils"
 import { AvPanel, AvPill } from "../ui/av-kit"
 import { sha512Hex, uploadOverrideBlob } from "./upload-blob"
+import { RandomizerService } from "@/services/api/boffmedia/randomizerService"
+import type { RandomizerRom } from "@/services/api/boffmedia/randomizer.types"
 
 export type EmulatorKind = "mgba" | "melonds"
 
@@ -72,6 +74,12 @@ async function sha512File(file: File): Promise<{ sha512: string; size: number }>
 }
 
 const ROM_EXT: Record<EmulatorKind, string> = { mgba: "gba", melonds: "nds" }
+/** Which library platform an emulator can run. The randomizer ROM library is
+ *  keyed by platform, not by emulator. */
+const ROM_PLATFORM: Record<EmulatorKind, RandomizerRom["gamePlatform"]> = {
+  mgba: "gba",
+  melonds: "nds",
+}
 const defaultRomPath = (kind: EmulatorKind) => `roms/rom.${ROM_EXT[kind]}`
 const defaultPatchedPath = (kind: EmulatorKind) => `roms/rom-patched.${ROM_EXT[kind]}`
 
@@ -132,6 +140,19 @@ export function EmulatorEditor({
   const [romFile, setRomFile] = useState<{ file: File; sha512: string; size: number } | null>(null)
   const [romPath, setRomPath] = useState(initial?.romPath ?? defaultRomPath(initialKind))
 
+  // Where the clean ROM's IDENTITY comes from. The bytes are never uploaded
+  // either way — only the expected sha512 is authored here.
+  //
+  // "library" is the default and exists because of a real failure: a randomizer
+  // event pins a clean ROM from the library, and the API refuses every claim
+  // unless the pack's published ROM hash is byte-identical to it. Hashing a
+  // local dump means matching that by luck, and the mismatch only surfaces
+  // later, to players, as "la ROM del pack publicado no coincide".
+  const [romSource, setRomSource] = useState<"library" | "file">("library")
+  const [libraryRoms, setLibraryRoms] = useState<RandomizerRom[]>([])
+  const [libraryRomId, setLibraryRomId] = useState("")
+  const [loadingLibrary, setLoadingLibrary] = useState(false)
+
   const [useRomhack, setUseRomhack] = useState(false)
   const [baseFile, setBaseFile] = useState<{ file: File; sha512: string; size: number } | null>(null)
   const [patchFile, setPatchFile] = useState<{ file: File; name: string } | null>(null)
@@ -147,15 +168,64 @@ export function EmulatorEditor({
   >([])
   const [args, setArgs] = useState(initial?.args ?? "")
 
+  const romsForPlatform = libraryRoms.filter((r) => r.gamePlatform === ROM_PLATFORM[kind])
+  const selectedLibraryRom = libraryRoms.find((r) => String(r.id) === libraryRomId) ?? null
+
+  /** The clean ROM the manifest will declare, whichever source authored it.
+   *  Everything downstream reads this and nothing else, so adding a third
+   *  source later touches one place. */
+  const romSpec: { sha512: string; size: number; label: string } | null =
+    romSource === "library"
+      ? selectedLibraryRom
+        ? {
+            sha512: selectedLibraryRom.sha512,
+            size: selectedLibraryRom.fileSize,
+            label: selectedLibraryRom.name,
+          }
+        : null
+      : romFile
+        ? { sha512: romFile.sha512, size: romFile.size, label: romFile.file.name }
+        : null
+
   /** Re-derive the untouched path defaults when the emulator changes, so a
    *  melonDS pack does not ship a `.gba` path the author never looked at. */
   const changeKind = (next: EmulatorKind) => {
     if (next !== kind) {
       setRomPath((p) => (p === defaultRomPath(kind) ? defaultRomPath(next) : p))
       setPatchedRomPath((p) => (p === defaultPatchedPath(kind) ? defaultPatchedPath(next) : p))
+      // A library ROM for the old platform cannot run on the new emulator.
+      setLibraryRomId((id) => {
+        const rom = libraryRoms.find((r) => String(r.id) === id)
+        return rom && rom.gamePlatform !== ROM_PLATFORM[next] ? "" : id
+      })
     }
     setKind(next)
   }
+
+  // Loaded once the ROM step is actually reached: the wizard mounts on step 1
+  // and most sessions never touch a library that costs a round trip to list.
+  useEffect(() => {
+    if (step !== "rom" || romSource !== "library" || libraryRoms.length > 0 || loadingLibrary) {
+      return
+    }
+    let cancelled = false
+    setLoadingLibrary(true)
+    RandomizerService.listRoms()
+      .then((res) => {
+        if (cancelled) return
+        setLibraryRoms(res.success && res.data ? res.data : [])
+      })
+      .catch(() => {
+        if (!cancelled) toast({ tone: "bad", title: t("emulator.romLibraryError") })
+      })
+      .finally(() => {
+        if (!cancelled) setLoadingLibrary(false)
+      })
+    return () => {
+      cancelled = true
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [step, romSource])
 
   const [hashing, setHashing] = useState(false)
   const [busy, setBusy] = useState(false)
@@ -252,7 +322,7 @@ export function EmulatorEditor({
       romHint.trim().length > 0 &&
       (useRomhack
         ? baseFile !== null && patchFile !== null && patchedRomFile !== null
-        : romFile !== null),
+        : romSpec !== null),
     // Extra BIOS/firmware files are optional: a GBA pack usually needs none.
     files: argsError === null,
     review: true,
@@ -270,7 +340,7 @@ export function EmulatorEditor({
 
   const submit = async () => {
     if (!canSubmit) return
-    if (!useRomhack && !romFile) return
+    if (!useRomhack && !romSpec) return
     setBusy(true)
     try {
       const files: FileEntry[] = []
@@ -279,11 +349,11 @@ export function EmulatorEditor({
       // Clean ROM (user-provided). In romhack mode the base dump below is the
       // clean ROM — a second user-provided entry would either collide on path
       // or sit unreferenced and required, blocking launch forever.
-      if (!useRomhack && romFile) {
+      if (!useRomhack && romSpec) {
         files.push({
           path: romPath,
-          sha512: romFile.sha512,
-          fileSize: romFile.size,
+          sha512: romSpec.sha512,
+          fileSize: romSpec.size,
           source: { kind: "user-provided", hint: romHint },
           env: { client: "required", server: "unsupported" },
         })
@@ -456,38 +526,85 @@ export function EmulatorEditor({
               a second picker here would author a phantom required file. */}
           {!useRomhack && (
             <>
-              <div className="flex flex-wrap items-end gap-3">
-                <div className="flex-1 min-w-[200px]">
-                  <Field label={t("emulator.romFile")}>
-                    <div className="rounded border border-solid border-line bg-panel px-3 py-2 font-mono text-[11px] text-txt-dim truncate">
-                      {romFile?.file.name || "No file selected"}
-                    </div>
-                  </Field>
-                </div>
-                <Button
-                  size="sm"
-                  icon="upload"
-                  loading={hashing}
-                  onClick={() => romInputRef.current?.click()}
-                >
-                  {t("emulator.selectRom")}
-                </Button>
-                <input
-                  ref={romInputRef}
-                  type="file"
-                  hidden
-                  onChange={(e) => {
-                    void handleRomPick(e.target.files?.[0])
-                    e.target.value = ""
-                  }}
+              <Field label={t("emulator.romSourceLabel")} hint={t("emulator.romSourceHelp")}>
+                <Select
+                  value={romSource}
+                  onChange={(value) => setRomSource(value as "library" | "file")}
+                  options={[
+                    { value: "library", label: t("emulator.romSourceLibrary") },
+                    { value: "file", label: t("emulator.romSourceFile") },
+                  ]}
                 />
-              </div>
+              </Field>
 
-              {romFile && (
+              {romSource === "library" ? (
+                <>
+                  <Field label={t("emulator.romLibraryPick")}>
+                    <Select
+                      value={libraryRomId}
+                      disabled={loadingLibrary}
+                      onChange={setLibraryRomId}
+                      options={[
+                        {
+                          value: "",
+                          label: loadingLibrary
+                            ? t("emulator.romLibraryLoading")
+                            : t("emulator.romLibraryNone"),
+                        },
+                        ...romsForPlatform.map((rom) => ({
+                          value: String(rom.id),
+                          label: rom.name,
+                        })),
+                      ]}
+                    />
+                  </Field>
+
+                  {!loadingLibrary && romsForPlatform.length === 0 && (
+                    <p className="text-[11px] leading-[1.45] text-txt-muted">
+                      {t("emulator.romLibraryEmpty", { platform: ROM_PLATFORM[kind].toUpperCase() })}
+                    </p>
+                  )}
+                </>
+              ) : (
+                <>
+                  <p className="border-l-2 border-solid border-warn bg-panel px-3 py-2 text-[11px] leading-[1.45] text-txt-muted">
+                    {t("emulator.romSourceFileWarning")}
+                  </p>
+
+                  <div className="flex flex-wrap items-end gap-3">
+                    <div className="flex-1 min-w-[200px]">
+                      <Field label={t("emulator.romFile")}>
+                        <div className="rounded border border-solid border-line bg-panel px-3 py-2 font-mono text-[11px] text-txt-dim truncate">
+                          {romFile?.file.name || "No file selected"}
+                        </div>
+                      </Field>
+                    </div>
+                    <Button
+                      size="sm"
+                      icon="upload"
+                      loading={hashing}
+                      onClick={() => romInputRef.current?.click()}
+                    >
+                      {t("emulator.selectRom")}
+                    </Button>
+                    <input
+                      ref={romInputRef}
+                      type="file"
+                      hidden
+                      onChange={(e) => {
+                        void handleRomPick(e.target.files?.[0])
+                        e.target.value = ""
+                      }}
+                    />
+                  </div>
+                </>
+              )}
+
+              {romSpec && (
                 <div className="text-[11px] font-mono text-txt-muted">
                   {t("emulator.romInfo", {
-                    size: (romFile.size / (1024 * 1024)).toFixed(1),
-                    hash: romFile.sha512.slice(0, 16) + "…",
+                    size: (romSpec.size / (1024 * 1024)).toFixed(1),
+                    hash: romSpec.sha512.slice(0, 16) + "…",
                   })}
                 </div>
               )}
@@ -810,6 +927,18 @@ export function EmulatorEditor({
               </dt>
               <dd className="text-txt">{romHint || "—"}</dd>
             </div>
+            {!useRomhack && (
+              <div className="flex items-baseline gap-3">
+                <dt className="w-40 shrink-0 font-mono text-[11px] uppercase tracking-[0.08em] text-txt-dim">
+                  {t("emulator.romSourceLabel")}
+                </dt>
+                <dd className="text-txt">
+                  {romSource === "library"
+                    ? t("emulator.reviewRomLibrary", { name: romSpec?.label ?? "—" })
+                    : t("emulator.reviewRomFile", { name: romSpec?.label ?? "—" })}
+                </dd>
+              </div>
+            )}
             <div className="flex items-baseline gap-3">
               <dt className="w-40 shrink-0 font-mono text-[11px] uppercase tracking-[0.08em] text-txt-dim">
                 {t("emulator.romPath")}

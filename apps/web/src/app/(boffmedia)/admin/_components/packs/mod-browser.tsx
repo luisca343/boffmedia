@@ -239,7 +239,10 @@ export function ModBrowser({
             <>
               {/* auto-fill, not a fixed column count: a 2560px screen shows five
                   cards per row instead of two very wide ones. */}
-              <ul className="bm-scroll grid min-h-0 flex-1 auto-rows-min content-start gap-2 overflow-auto pr-1 [grid-template-columns:repeat(auto-fill,minmax(260px,1fr))]">
+              {/* max-h is the safety net, not the layout: below 1100px the
+                  admin grid stops constraining height, so flex-1 resolves to
+                  content and the growing result list buries the Next button. */}
+              <ul className="bm-scroll grid max-h-[55vh] min-h-0 flex-1 auto-rows-min content-start gap-2 overflow-auto pr-1 [grid-template-columns:repeat(auto-fill,minmax(260px,1fr))]">
                 {hits.map((hit) => {
                   const added = isAdded(hit.platform, hit.projectId)
                   return (
@@ -303,7 +306,7 @@ export function ModBrowser({
         </div>
 
         {selected && (
-          <div className="bm-scroll hidden min-h-0 w-[400px] shrink-0 overflow-auto lg:block 2xl:w-[480px]">
+          <div className="bm-scroll hidden max-h-[55vh] min-h-0 w-[400px] shrink-0 overflow-auto lg:block 2xl:w-[480px]">
             <ProjectDetail
               hit={selected}
               gameVersion={gameVersion}

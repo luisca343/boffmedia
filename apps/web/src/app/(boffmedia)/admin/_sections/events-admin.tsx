@@ -66,19 +66,22 @@ export function EventsAdmin() {
   const { events, isLoading } = useGetEvents()
   const { summaries, reload } = useRandomizerSummaries()
 
-  const randomizerParam = searchParams.get("randomizer")
-  const selectedEvent = randomizerParam
-    ? (events as EventType[]).find((e) => String(e.id) === randomizerParam)
+  // `randomizer` is the legacy param name; links to it are already in the wild.
+  const manageParam = searchParams.get("manage") ?? searchParams.get("randomizer")
+  const selectedEvent = manageParam
+    ? (events as EventType[]).find((e) => String(e.id) === manageParam)
     : undefined
 
-  const openRandomizer = (e: EventType) => {
+  const openManage = (e: EventType) => {
     const params = new URLSearchParams(searchParams.toString())
-    params.set("randomizer", String(e.id))
+    params.delete("randomizer")
+    params.set("manage", String(e.id))
     router.replace(`?${params.toString()}`, { scroll: false })
   }
 
-  const closeRandomizer = () => {
+  const closeManage = () => {
     const params = new URLSearchParams(searchParams.toString())
+    params.delete("manage")
     params.delete("randomizer")
     router.replace(`?${params.toString()}`, { scroll: false })
     // The panel's lifecycle actions may have changed the badge.
@@ -88,7 +91,7 @@ export function EventsAdmin() {
   const statusLabel = (s: string) =>
     ({ upcoming: t("statusUpcoming"), active: t("statusActive"), completed: t("statusCompleted") })[s] ?? s
 
-  if (randomizerParam && isLoading) {
+  if (manageParam && isLoading) {
     return (
       <AvPanel>
         <div className="flex items-center justify-center py-8 gap-2">
@@ -99,7 +102,7 @@ export function EventsAdmin() {
   }
 
   if (selectedEvent) {
-    return <EventAdminPanel event={selectedEvent} onBack={closeRandomizer} />
+    return <EventAdminPanel event={selectedEvent} onBack={closeManage} />
   }
 
   return (
@@ -153,29 +156,23 @@ export function EventsAdmin() {
           )},
           { key: "randomizer", label: tr("colRandomizer"), render: (e) => {
             const cfg = summaries?.get(Number(e.id))
-            return (
-              <div className="flex items-center gap-2">
-                {cfg ? (
-                  <AvPill tone={cfg.launcherResolvable === false ? "amber" : RANDOMIZER_TONE[cfg.status]}>
-                    {tr(RANDOMIZER_STATUS_KEY[cfg.status])}
-                  </AvPill>
-                ) : (
-                  <span className="text-txt-dim text-sm">—</span>
-                )}
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  icon="settings"
-                  title={tr("openPanel")}
-                  onClick={() => openRandomizer(e)}
-                />
-              </div>
+            return cfg ? (
+              <AvPill tone={cfg.launcherResolvable === false ? "amber" : RANDOMIZER_TONE[cfg.status]}>
+                {tr(RANDOMIZER_STATUS_KEY[cfg.status])}
+              </AvPill>
+            ) : (
+              <span className="text-txt-dim text-sm">—</span>
             )
           }},
           { key: "startDate", label: t("colStart"), render: (e) => (
             <span className="text-sm text-txt-muted font-mono">{new Date(e.startDate).toLocaleDateString()}</span>
           )},
         ]}
+        rowActions={(e) => (
+          <Button size="sm" variant="ghost" icon="settings" onClick={() => openManage(e)}>
+            {t("manage")}
+          </Button>
+        )}
       />
     </div>
   )

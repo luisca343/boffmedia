@@ -79,18 +79,21 @@
       "statusActive": "Activo",
       "statusCompleted": "Completado",
       "panel": {
-        "desc": "Ciclo de vida, miembros e invitaciones de este evento.",
+        "desc": "Configuración, miembros e invitaciones de este evento.",
         "back": "Volver",
         "lifecycle": "Ciclo de vida",
         "notActiveNotice": "Este evento no está activo. Los jugadores pueden unirse, pero no podrás abrir una configuración de randomizer hasta activarlo.",
-        "tabRandomizer": "Randomizer",
         "tabParticipants": "Miembros",
         "tabInvites": "Invitaciones",
         "status": {
           "upcoming": "Próximo",
           "active": "Activo",
           "completed": "Completado"
-        }
+        },
+        "tabConfig": "Configuración",
+        "lifecycleDesc": "El estado del evento. Solo un evento activo puede tener una configuración de randomizer abierta.",
+        "randomizerSection": "Randomizer",
+        "randomizerSectionDesc": "Configuración del randomizer y asignaciones de los participantes."
       },
       "participants": {
         "title": "Miembros",
@@ -123,7 +126,8 @@
         "uses": "{used}/{max} usados",
         "copy": "Copiar código",
         "revoke": "Revocar"
-      }
+      },
+      "manage": "Gestionar"
     },
     "teams": {
       "title": "Gestión de equipos",
@@ -813,6 +817,18 @@
         "kind": "Emulador",
         "romSection": "ROM limpia",
         "romSectionLead": "El administrador suministra su propia copia del ROM. Se calcula su hash en el navegador sin subirse. El lanzador verifica que el ROM del jugador coincida con este hash.",
+        "romSourceLabel": "Origen de la ROM",
+        "romSourceHelp": "De dónde sale el hash esperado. Los bytes de la ROM no se suben en ningún caso: solo se guarda el hash con el que el lanzador comprueba el volcado del jugador.",
+        "romSourceLibrary": "Biblioteca de ROMs del randomizer",
+        "romSourceFile": "Un archivo local (se calcula el hash en el navegador)",
+        "romSourceFileWarning": "Un evento de randomizer rechaza todas las reclamaciones si el hash de la ROM del pack no es idéntico al de la ROM de la biblioteca que fijó. Calcular el hash de un volcado local solo coincide si es exactamente el mismo archivo: elige de la biblioteca salvo que ningún evento use este pack.",
+        "romLibraryPick": "ROM de la biblioteca",
+        "romLibraryNone": "Elige una ROM…",
+        "romLibraryLoading": "Cargando biblioteca…",
+        "romLibraryEmpty": "Todavía no hay ninguna ROM {platform} en la biblioteca. Sube una en Randomizer → ROMs.",
+        "romLibraryError": "No se pudo cargar la biblioteca de ROMs.",
+        "reviewRomLibrary": "Biblioteca · {name}",
+        "reviewRomFile": "Archivo local · {name}",
         "romHint": "Pista para el jugador",
         "romHintHelp": "Muestra al jugador qué versión y región necesita. Ejemplo: «Pokémon Esmeralda v1.0 EUR»",
         "romHintPlaceholder": "p. ej. «Pokémon Esmeralda v1.0, volcado propio de tu cartucho»",

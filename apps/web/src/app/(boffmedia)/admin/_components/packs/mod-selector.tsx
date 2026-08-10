@@ -382,7 +382,7 @@ export function ModSelector({
         {value.length === 0 ? (
           <p className="font-body text-[12px] text-txt-dim">{t("noModsSelected")}</p>
         ) : (
-          <ul className="bm-scroll flex min-h-0 flex-1 flex-col gap-1 overflow-auto pr-1">
+          <ul className="bm-scroll flex max-h-[45vh] min-h-0 flex-1 flex-col gap-1 overflow-auto pr-1">
             {value.map((mod) => {
               const duplicate =
                 (pathCounts.get(mod.path.toLowerCase().replace(/\\/g, "/")) ?? 0) > 1
