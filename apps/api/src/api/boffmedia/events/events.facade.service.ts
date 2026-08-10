@@ -630,15 +630,19 @@ export class EventsFacadeService {
       eventId,
     );
     if (!participation) {
-      throw new NotFoundException('You are not a participant of this event');
+      throw new NotFoundException({
+        message: 'You are not a participant of this event',
+        userMessage: 'No participas en este evento.',
+      });
     }
 
     // A removed player cannot self-clear their expulsion by leaving and
     // re-joining; the `removed` row must stay to keep the REMOVED guard effective.
     if (participation.status === PARTICIPANT_STATUS.REMOVED) {
-      throw new ForbiddenException(
-        'Has sido expulsado de este evento por un administrador',
-      );
+      throw new ForbiddenException({
+        message: 'Participant was removed by an admin',
+        userMessage: 'Has sido expulsado de este evento por un administrador.',
+      });
     }
 
     await this.participantsService.leaveEvent(

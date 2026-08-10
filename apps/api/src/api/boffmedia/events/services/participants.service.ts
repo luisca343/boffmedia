@@ -125,9 +125,10 @@ export class ParticipantsService {
       // An admin removal is not something the removed player can undo by
       // re-joining; a self-declined membership is.
       if (existingParticipation.status === PARTICIPANT_STATUS.REMOVED) {
-        throw new ForbiddenException(
-          'Has sido expulsado de este evento por un administrador',
-        );
+        throw new ForbiddenException({
+          message: 'Participant was removed by an admin',
+          userMessage: 'Has sido expulsado de este evento por un administrador.',
+        });
       }
       if (existingParticipation.status === PARTICIPANT_STATUS.DECLINED) {
         await this.participantsRepository.setEventParticipationStatus(
@@ -139,9 +140,10 @@ export class ParticipantsService {
           existingParticipation.id,
         );
       }
-      throw new ConflictException(
-        'Participant is already registered for this event',
-      );
+      throw new ConflictException({
+        message: 'Participant is already registered for this event',
+        userMessage: 'Ya participas en este evento.',
+      });
     }
 
     const participationData = {

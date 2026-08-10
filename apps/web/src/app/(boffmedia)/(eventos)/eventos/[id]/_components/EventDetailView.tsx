@@ -56,7 +56,9 @@ export function EventDetailView({ id }: { id: number }) {
         toast.success(t("detail.participating"))
         refetchParts()
       } else {
-        toast.error(res.error || t("error.title"))
+        // `error` is the machine code (HTTP_EXCEPTION) — never renderable.
+        // Only `userMessage` is the server's user-facing Spanish copy.
+        toast.error(res.userMessage || t("error.title"))
       }
     } catch {
       toast.error(t("error.title"))
@@ -76,7 +78,7 @@ export function EventDetailView({ id }: { id: number }) {
         toast.success(t("detail.left"))
         refetchParts()
       } else {
-        toast.error(res.error || t("error.title"))
+        toast.error(res.userMessage || t("error.title"))
       }
     } catch {
       toast.error(t("error.title"))
