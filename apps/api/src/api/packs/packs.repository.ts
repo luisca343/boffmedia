@@ -39,6 +39,26 @@ export interface PackPrincipal {
 export class PacksRepository {
   constructor(@Inject(DRIZZLE) private readonly db: MySql2Database) {}
 
+  /** Current launcher revocation counter, or null if the account is gone. Single
+   *  keyed lookup — the guard runs this on every launcher request. */
+  async getLauncherTokenVersion(userId: number): Promise<number | null> {
+    const [row] = await this.db
+      .select({ v: boffMediaUsers.launcherTokenVersion })
+      .from(boffMediaUsers)
+      .where(eq(boffMediaUsers.id, userId))
+      .limit(1);
+    return row ? row.v : null;
+  }
+
+  async incrementLauncherTokenVersion(userId: number): Promise<void> {
+    await this.db
+      .update(boffMediaUsers)
+      .set({
+        launcherTokenVersion: sql`${boffMediaUsers.launcherTokenVersion} + 1`,
+      })
+      .where(eq(boffMediaUsers.id, userId));
+  }
+
   // ── Packs ────────────────────────────────────────────────────────────────
 
   /**
@@ -173,8 +193,24 @@ export class PacksRepository {
     }
 
     // Legacy pre-grants: a UUID an admin granted before that player registered.
-    // Only reachable while the account still carries a linked Minecraft UUID.
-    if (principal.mcUuid) {
+    // When the principal is an account, correlate against the uuid CURRENTLY
+    // linked to it — the token's mcUuid claim lives 30 days and goes stale on
+    // unlink/relink. The raw-claim path survives only for pre-cutover
+    // principals that carry no userId.
+    if (principal.userId != null) {
+      const aclExists = this.db
+        .select({ one: sql`1` })
+        .from(packAcl)
+        .innerJoin(boffMediaUsers, eq(boffMediaUsers.uuid, packAcl.uuid))
+        .where(
+          and(
+            eq(packAcl.packId, packs.id),
+            eq(boffMediaUsers.id, principal.userId),
+            isNull(boffMediaUsers.deletedAt),
+          ),
+        );
+      sources.push(sql`exists ${aclExists}`);
+    } else if (principal.mcUuid) {
       const aclExists = this.db
         .select({ one: sql`1` })
         .from(packAcl)
@@ -301,11 +337,22 @@ export class PacksRepository {
     await this.db.delete(packVersions).where(eq(packVersions.id, id));
   }
 
-  async publishVersion(id: string): Promise<void> {
-    await this.db
-      .update(packVersions)
-      .set({ published: true })
-      .where(eq(packVersions.id, id));
+  /** One transaction: a crash between the flip and the pointer move must not
+   *  leave a published version that is not `latest` (invisible AND undeletable). */
+  async publishVersionAndSetLatest(
+    packId: string,
+    versionId: string,
+  ): Promise<void> {
+    await this.db.transaction(async (tx) => {
+      await tx
+        .update(packVersions)
+        .set({ published: true })
+        .where(eq(packVersions.id, versionId));
+      await tx
+        .update(packs)
+        .set({ latestVersionId: versionId })
+        .where(eq(packs.id, packId));
+    });
   }
 
   async countVersions(packId: string): Promise<number> {
@@ -338,7 +385,23 @@ export class PacksRepository {
       if (row) return true;
     }
 
-    if (principal.mcUuid) {
+    // Same stale-claim rule as listVisibleTo: an account principal resolves
+    // pack_acl through its CURRENT linked uuid, never the token claim.
+    if (principal.userId != null) {
+      const [row] = await this.db
+        .select({ uuid: packAcl.uuid })
+        .from(packAcl)
+        .innerJoin(boffMediaUsers, eq(boffMediaUsers.uuid, packAcl.uuid))
+        .where(
+          and(
+            eq(packAcl.packId, packId),
+            eq(boffMediaUsers.id, principal.userId),
+            isNull(boffMediaUsers.deletedAt),
+          ),
+        )
+        .limit(1);
+      if (row) return true;
+    } else if (principal.mcUuid) {
       const [row] = await this.db
         .select({ uuid: packAcl.uuid })
         .from(packAcl)
@@ -433,6 +496,24 @@ export class PacksRepository {
     await this.db
       .delete(packGrants)
       .where(and(eq(packGrants.packId, packId), eq(packGrants.userId, userId)));
+  }
+
+  /** Revokes ONE source, leaving the others standing — the invariant the
+   *  composite PK exists for. */
+  async revokeSourceFromUser(
+    packId: string,
+    userId: number,
+    source: 'admin' | 'invite',
+  ): Promise<void> {
+    await this.db
+      .delete(packGrants)
+      .where(
+        and(
+          eq(packGrants.packId, packId),
+          eq(packGrants.userId, userId),
+          eq(packGrants.source, source),
+        ),
+      );
   }
 
   /**
@@ -608,15 +689,24 @@ export class PacksRepository {
 
   // ── Audit ────────────────────────────────────────────────────────────────
 
+  /** `userId` is the acting account. When omitted it falls back to `meta.actorId`
+   *  so pre-existing admin call sites record their actor without changing shape. */
   async audit(
     action: AuditAction,
     packId: string | null,
     uuid: string | null,
     meta?: Record<string, unknown>,
+    userId?: number | null,
   ): Promise<void> {
+    const actor =
+      userId !== undefined
+        ? userId
+        : typeof meta?.actorId === 'number'
+          ? meta.actorId
+          : null;
     await this.db
       .insert(packAudit)
-      .values({ action, packId, uuid, meta: meta ?? null });
+      .values({ action, packId, userId: actor, uuid, meta: meta ?? null });
   }
 
   async listAudit(packId: string, limit: number) {

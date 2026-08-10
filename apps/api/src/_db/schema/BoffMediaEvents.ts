@@ -129,6 +129,10 @@ export const boffMediaParticipants = mysqlTable(
   (table) => {
     return {
       userIdx: index('p_user_idx').on(table.userId),
+      // One participant identity per user: concurrent first-joins used to fork
+      // a user into two rows, splitting progress/trophies/entitlement. MySQL
+      // allows multiple NULLs, so anonymous participants are unaffected.
+      userUq: unique('p_user_uq').on(table.userId),
       userFk: foreignKey({
         columns: [table.userId],
         foreignColumns: [boffMediaUsers.id],

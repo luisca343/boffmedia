@@ -39,6 +39,10 @@ export const boffMediaUsers = mysqlTable('boffmedia_users', {
   // to Spanish. Deliberately NOT request Accept-Language: that is wrong for
   // anything the user did not trigger from a browser.
   locale: varchar('locale', { length: 8 }),
+  // Coarse revocation counter for launcher sessions. Every launcher JWT embeds
+  // the value at mint time; the guard rejects a token whose embedded value no
+  // longer matches. Incrementing it invalidates every outstanding session at once.
+  launcherTokenVersion: int('launcher_token_version').notNull().default(0),
   createdAt: timestamp('created_at', { mode: 'date' }).notNull().defaultNow(),
   updatedAt: timestamp('updated_at', { mode: 'date' })
     .notNull()

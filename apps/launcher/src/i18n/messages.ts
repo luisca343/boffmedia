@@ -107,7 +107,14 @@ const es = {
       revalidate: "Revalidar sesión",
       revalidating: "Revalidando…",
       revalidateHint:
-        "Renueva el token si los packs dejan de cargar o el juego rechaza la sesión.",
+        "Vuelve a comprobar tu sesión de Boffmedia si los packs dejan de cargar o dan error 401.",
+      boffAccount: "Cuenta de Boffmedia",
+      linkedMinecraft: "Minecraft vinculado",
+      minecraftNone: "Sin cuenta de Minecraft vinculada. Se te pedirá al jugar un pack de Minecraft.",
+      unlinkMinecraft: "Desvincular",
+      signOutEverywhere: "Cerrar sesión en todo",
+      signOutEverywhereHint:
+        "Olvida todas las cuentas de Minecraft y la sesión del launcher en este equipo.",
     },
     emulators: {
       title: "Emuladores",
@@ -164,6 +171,11 @@ const es = {
     linkButton: "Copiar enlace",
     confirmWaiting: "Esperando tu aprobación…",
     cancelButton: "Cancelar",
+    restoreExpiredTitle: "Tu sesión ha caducado",
+    restoreStoreTitle: "No se pudo leer el almacén de credenciales",
+    restoreOfflineTitle: "Sin conexión",
+    playOffline: "Jugar sin conexión",
+    playOfflineHint: "Abre tu biblioteca con los packs ya instalados. Necesitarás conexión para instalar o actualizar.",
   },
 
   signin: {
@@ -1072,7 +1084,13 @@ const en = {
       note: "Only the refresh token is stored, and never in plain text. The Minecraft access token lasts about 24h and is requested again each session.",
       revalidate: "Revalidate session",
       revalidating: "Revalidating…",
-      revalidateHint: "Renews the token if packs stop loading or the game rejects the session.",
+      revalidateHint: "Re-checks your Boffmedia session if packs stop loading or return 401.",
+      boffAccount: "Boffmedia account",
+      linkedMinecraft: "Linked Minecraft",
+      minecraftNone: "No linked Minecraft account. You will be asked when you play a Minecraft pack.",
+      unlinkMinecraft: "Unlink",
+      signOutEverywhere: "Sign out everywhere",
+      signOutEverywhereHint: "Forgets every Minecraft account and the launcher session on this machine.",
     },
     emulators: {
       title: "Emulators",
@@ -1129,6 +1147,11 @@ const en = {
     linkButton: "Copy link",
     confirmWaiting: "Waiting for your approval…",
     cancelButton: "Cancel",
+    restoreExpiredTitle: "Your session has expired",
+    restoreStoreTitle: "Could not read the credential store",
+    restoreOfflineTitle: "No connection",
+    playOffline: "Play offline",
+    playOfflineHint: "Opens your library with the packs already installed. You will need a connection to install or update.",
   },
 
   signin: {

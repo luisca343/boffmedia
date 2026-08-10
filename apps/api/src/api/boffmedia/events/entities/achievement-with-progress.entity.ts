@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Achievement } from './achievement.entity';
+import { EventAchievement } from './achievement.entity';
 
-export class AchievementWithProgress extends Achievement {
+export class AchievementWithProgress extends EventAchievement {
   @ApiProperty({
     example: 5,
     description: 'Current progress towards the achievement',

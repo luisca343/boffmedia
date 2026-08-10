@@ -17,6 +17,11 @@ export interface McLinkPoll {
   username?: string;
 }
 
+export interface McJoinChallenge {
+  serverId: string;
+  expiresInSeconds: number;
+}
+
 interface ResetResult {
   success: boolean;
   /** Account username, returned so the web can auto-sign-in after reset. */
@@ -62,5 +67,15 @@ export class AuthService {
   /** One Microsoft poll per call; the browser sets the cadence. */
   static pollMinecraftLink() {
     return apiAuthedAutoPOST<McLinkPoll>('/auth/minecraft/link/poll', {});
+  }
+
+  /**
+   * Step 1 of the in-game Mojang handshake: a serverId for the mod to join
+   * against. Public and short-lived (60s), and consumed by the first
+   * `/auth/minecraft/session` call whatever its outcome — a retry needs a fresh
+   * one.
+   */
+  static minecraftChallenge() {
+    return apiPOST<McJoinChallenge>('/auth/minecraft/challenge', {});
   }
 }

@@ -133,6 +133,10 @@ export interface LauncherPrincipal {
   userId: number;
   username: string;
   mcUuid?: string | null;
+  /** The `launcher_token_version` embedded in the session at mint time. The
+   *  guard compares it against the account's current value to reject revoked
+   *  sessions. Absent on tokens minted before revocation existed (treated as 0). */
+  tokenVersion?: number;
 }
 
 export const AUDIT = {
@@ -147,7 +151,9 @@ export const AUDIT = {
   ACCESS_REVOKED: 'access.revoked',
   INVITE_CREATED: 'invite.created',
   INVITE_REDEEMED: 'invite.redeemed',
+  INVITE_REVOKED: 'invite.revoked',
   LAUNCHER_AUTH: 'launcher.auth',
+  LAUNCHER_DENIED: 'launcher.denied',
   MANIFEST_SERVED: 'manifest.served',
   FILE_SERVED: 'file.served',
 } as const;

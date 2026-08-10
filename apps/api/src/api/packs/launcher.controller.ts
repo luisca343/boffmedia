@@ -230,12 +230,15 @@ export class LauncherController {
     @Res({ passthrough: true }) res: Response,
   ): Promise<StreamableFile> {
     const blob = sha512.toLowerCase();
+    // includeWorlds: bundled worlds and initialFiles ride this route too; the
+    // CurseForge route stays pinned to files[].
     await this.packs.entitledFile(
       this.principalOf(req),
       id,
       query.password ?? null,
       (file) =>
         file.source.kind === 'override' && file.source.blobSha512 === blob,
+      { includeWorlds: true },
     );
 
     return this.stream(res, await this.downloads.override(blob));

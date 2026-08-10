@@ -1,6 +1,6 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { MySql2Database } from 'drizzle-orm/mysql2';
-import { eq, and, isNull, or } from 'drizzle-orm';
+import { eq, and, isNull, or, inArray, exists, sql } from 'drizzle-orm';
 import { alias } from 'drizzle-orm/mysql-core';
 import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
 import {
@@ -9,7 +9,13 @@ import {
   boffMediaParticipants,
   boffMediaEventParticipants,
   Event,
+  PARTICIPANT_STATUS,
 } from '@/_db/schema/BoffMediaEvents';
+
+const ACTIVE_MEMBERSHIP_STATUSES = [
+  PARTICIPANT_STATUS.REGISTERED,
+  PARTICIPANT_STATUS.CONFIRMED,
+] as const;
 
 export interface EventWithGameNameAndParent extends Event {
   gameName?: string;
@@ -24,6 +30,8 @@ export interface FindEventsFilters {
   offset?: number;
   /** When false/undefined, only `public`-visibility events are returned. */
   includePrivate?: boolean;
+  /** Requester: private events they actively participate in are listed too. */
+  userId?: number;
 }
 
 @Injectable()
@@ -72,7 +80,16 @@ export class EventsRepository {
       conditions.push(eq(boffMediaEvents.type, filters.type));
     }
     if (!filters.includePrivate) {
-      conditions.push(eq(boffMediaEvents.visibility, 'public'));
+      if (filters.userId) {
+        conditions.push(
+          or(
+            eq(boffMediaEvents.visibility, 'public'),
+            exists(this.activeMembershipSubquery(filters.userId)),
+          )!,
+        );
+      } else {
+        conditions.push(eq(boffMediaEvents.visibility, 'public'));
+      }
     }
 
     const query = this.db
@@ -132,7 +149,33 @@ export class EventsRepository {
       : null) as unknown as EventWithGameNameAndParent | null;
   }
 
-  /** True when the user has a participation row in the event (any status). */
+  /** Correlated EXISTS: the user holds an active membership in the outer event. */
+  private activeMembershipSubquery(userId: number) {
+    return this.db
+      .select({ one: sql`1` })
+      .from(boffMediaEventParticipants)
+      .innerJoin(
+        boffMediaParticipants,
+        eq(boffMediaParticipants.id, boffMediaEventParticipants.participantId),
+      )
+      .where(
+        and(
+          eq(boffMediaEventParticipants.eventId, boffMediaEvents.id),
+          eq(boffMediaParticipants.userId, userId),
+          inArray(
+            boffMediaEventParticipants.status,
+            [...ACTIVE_MEMBERSHIP_STATUSES],
+          ),
+        ),
+      );
+  }
+
+  /**
+   * True when the user holds an active (`registered`/`confirmed`) membership.
+   * `removed`/`declined` rows deliberately do not count: this predicate drives
+   * private-event visibility, and an expelled user must lose read access —
+   * matching the predicate packs entitlement uses.
+   */
   async isParticipant(eventId: number, userId: number): Promise<boolean> {
     if (!eventId || !userId) return false;
     const rows = await this.db
@@ -146,10 +189,58 @@ export class EventsRepository {
         and(
           eq(boffMediaEventParticipants.eventId, eventId),
           eq(boffMediaParticipants.userId, userId),
+          inArray(
+            boffMediaEventParticipants.status,
+            [...ACTIVE_MEMBERSHIP_STATUSES],
+          ),
         ),
       )
       .limit(1);
     return rows.length > 0;
+  }
+
+  /**
+   * Of the given event ids, the private ones this viewer may NOT see (i.e. is
+   * neither admin — handled by the caller — nor an active participant of).
+   */
+  async hiddenPrivateEventIds(
+    eventIds: (number | null | undefined)[],
+    userId?: number,
+  ): Promise<Set<number>> {
+    const ids = [...new Set(eventIds.filter((id): id is number => !!id))];
+    if (ids.length === 0) return new Set();
+
+    const privateRows = await this.db
+      .select({ id: boffMediaEvents.id })
+      .from(boffMediaEvents)
+      .where(
+        and(
+          inArray(boffMediaEvents.id, ids),
+          eq(boffMediaEvents.visibility, 'private'),
+        ),
+      );
+    const hidden = new Set(privateRows.map((r) => r.id));
+    if (hidden.size === 0 || !userId) return hidden;
+
+    const memberRows = await this.db
+      .select({ eventId: boffMediaEventParticipants.eventId })
+      .from(boffMediaEventParticipants)
+      .innerJoin(
+        boffMediaParticipants,
+        eq(boffMediaParticipants.id, boffMediaEventParticipants.participantId),
+      )
+      .where(
+        and(
+          inArray(boffMediaEventParticipants.eventId, [...hidden]),
+          eq(boffMediaParticipants.userId, userId),
+          inArray(
+            boffMediaEventParticipants.status,
+            [...ACTIVE_MEMBERSHIP_STATUSES],
+          ),
+        ),
+      );
+    for (const r of memberRows) hidden.delete(r.eventId);
+    return hidden;
   }
 
   async findChildEvents(

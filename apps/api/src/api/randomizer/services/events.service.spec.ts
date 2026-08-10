@@ -30,6 +30,7 @@ describe('EventsService', () => {
       getEmulatorPack: jest.fn(),
       findEventHoldingPack: jest.fn(),
       getRomById: jest.fn(),
+      getPublishedEmulatorRom: jest.fn().mockResolvedValue({ state: 'no-version' }),
     } as unknown as jest.Mocked<RandomizerRepository>;
 
     // Mock blob storage
@@ -267,6 +268,7 @@ describe('EventsService', () => {
       eventId: 12,
       status: 'draft',
       romId: 3,
+      cleanRomSha512: 'r'.repeat(128),
     };
 
     beforeEach(() => {
@@ -275,6 +277,14 @@ describe('EventsService', () => {
         .mockResolvedValue(draftConfig as never);
       repository.updateConfig = jest.fn();
       repository.appendAudit = jest.fn();
+      // Opening requires a published version whose emulator ROM matches the
+      // pinned clean ROM.
+      repository.getPublishedEmulatorRom.mockResolvedValue({
+        state: 'ok',
+        versionId: 'v1',
+        romPath: 'roms/clean.gba',
+        sha512: 'r'.repeat(128),
+      });
     });
 
     it('refuses to open when the event is not active', async () => {
@@ -310,6 +320,35 @@ describe('EventsService', () => {
       });
 
       await expect(service.openConfig(7)).rejects.toThrow(ConflictException);
+    });
+
+    it('refuses to open when the published ROM differs from the pinned clean ROM', async () => {
+      repository.getEventPackAndStatus.mockResolvedValue({
+        packId: 'pack1',
+        status: 'active',
+      });
+      repository.getPublishedEmulatorRom.mockResolvedValue({
+        state: 'ok',
+        versionId: 'v1',
+        romPath: 'roms/clean.gba',
+        sha512: 'f'.repeat(128),
+      });
+
+      await expect(service.openConfig(7)).rejects.toThrow(ConflictException);
+      expect(repository.updateConfig).not.toHaveBeenCalled();
+    });
+
+    it('refuses to open when the pack has no published version', async () => {
+      repository.getEventPackAndStatus.mockResolvedValue({
+        packId: 'pack1',
+        status: 'active',
+      });
+      repository.getPublishedEmulatorRom.mockResolvedValue({
+        state: 'no-version',
+      });
+
+      await expect(service.openConfig(7)).rejects.toThrow(ConflictException);
+      expect(repository.updateConfig).not.toHaveBeenCalled();
     });
   });
 });

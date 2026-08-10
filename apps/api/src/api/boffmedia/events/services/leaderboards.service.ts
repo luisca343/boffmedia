@@ -1,6 +1,6 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { MySql2Database } from 'drizzle-orm/mysql2';
-import { eq, and, desc, sql, isNull } from 'drizzle-orm';
+import { eq, and, desc, sql, isNull, or } from 'drizzle-orm';
 import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
 import {
   boffMediaParticipantProgress,
@@ -96,7 +96,21 @@ export class LeaderboardsService {
           boffMediaParticipantProgress.participantId,
         ),
       )
-      .where(eq(boffMediaParticipantProgress.isCompleted, true))
+      .leftJoin(
+        boffMediaEvents,
+        eq(boffMediaEvents.id, boffMediaAchievements.eventId),
+      )
+      .where(
+        and(
+          eq(boffMediaParticipantProgress.isCompleted, true),
+          // A soft-deleted event's points must leave the board; server-wide
+          // achievements (no event) always count.
+          or(
+            isNull(boffMediaAchievements.eventId),
+            isNull(boffMediaEvents.deletedAt),
+          ),
+        ),
+      )
       .groupBy(
         boffMediaParticipants.id,
         boffMediaParticipants.nickname,
@@ -162,6 +176,8 @@ export class LeaderboardsService {
         and(
           eq(boffMediaAchievements.eventId, eventId),
           eq(boffMediaParticipantProgress.isCompleted, true),
+          // Deleting an achievement is the admin's way to un-award it.
+          isNull(boffMediaAchievements.deletedAt),
         ),
       )
       .groupBy(
@@ -346,6 +362,7 @@ export class LeaderboardsService {
     const whereConditions = [
       eq(boffMediaParticipantProgress.isCompleted, true),
       eq(boffMediaAchievements.itemType, 'achievement'),
+      isNull(boffMediaAchievements.deletedAt),
     ];
 
     if (eventId) {
@@ -468,6 +485,7 @@ export class LeaderboardsService {
   > {
     const whereConditions = [
       eq(boffMediaParticipantProgress.isCompleted, true),
+      isNull(boffMediaAchievements.deletedAt),
     ];
 
     if (eventId) {
@@ -548,7 +566,19 @@ export class LeaderboardsService {
           isNull(boffMediaAchievements.deletedAt),
         ),
       )
-      .where(eq(boffMediaParticipantProgress.isCompleted, true));
+      .leftJoin(
+        boffMediaEvents,
+        eq(boffMediaEvents.id, boffMediaAchievements.eventId),
+      )
+      .where(
+        and(
+          eq(boffMediaParticipantProgress.isCompleted, true),
+          or(
+            isNull(boffMediaAchievements.eventId),
+            isNull(boffMediaEvents.deletedAt),
+          ),
+        ),
+      );
   }
 
   private getEventLeaderboardCountQuery(eventId: number) {
@@ -571,6 +601,7 @@ export class LeaderboardsService {
         and(
           eq(boffMediaAchievements.eventId, eventId),
           eq(boffMediaParticipantProgress.isCompleted, true),
+          isNull(boffMediaAchievements.deletedAt),
         ),
       );
   }

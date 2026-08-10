@@ -76,7 +76,10 @@ export class AssignmentsService {
 
     const config = await this.repository.getConfigById(configId);
     if (!config) {
-      throw new NotFoundException(`Config ${configId} not found`);
+      throw new NotFoundException({
+        error: 'not_found',
+        message: `Config ${configId} not found`,
+      });
     }
 
     const assignment = await this.resolveOrMintAssignment(config, principal);
@@ -102,40 +105,65 @@ export class AssignmentsService {
       throw new BadRequestException('Launcher principal required');
     }
 
+    await this.assertConfigRomConsistent(config);
+
+    // Entitlement is re-checked on EVERY call, not just on mint: a participant
+    // removed from the event keeps their assignment row but loses access.
+    const entitlement = await this.repository.resolveEventEntitlement(
+      config.eventId,
+      principal.userId,
+    );
+
     const assignment = await this.repository.getAssignmentByConfigAndUser(
       config.id,
       principal.userId,
     );
     if (assignment) {
+      if (!entitlement) {
+        throw new ForbiddenException(
+          'You are no longer registered or confirmed for this event.',
+        );
+      }
       return assignment;
     }
 
     if (config.status !== 'open') {
-      throw new NotFoundException(
-        `Config ${config.id} is not accepting new claims (status: ${config.status})`,
-      );
+      throw new NotFoundException({
+        error: 'claims_closed',
+        message: `Config ${config.id} is not accepting new claims (status: ${config.status})`,
+      });
     }
 
-    const entitlement = await this.repository.resolveEventEntitlement(
-      config.eventId,
-      principal.userId,
-    );
     if (!entitlement) {
       throw new ForbiddenException(
         'You are not registered or confirmed for this event.',
       );
     }
 
-    const seed = randomBytes(6).readUintBE(0, 6) % Number.MAX_SAFE_INTEGER;
+    const seed = randomBytes(6).readUintBE(0, 6);
 
-    const assignmentId = await this.repository.createAssignment({
-      configId: config.id,
-      boffmediaUserId: entitlement.boffmediaUserId,
-      mcUuid: principal.mcUuid ?? null,
-      seed,
-      status: 'claimed',
-      claimedAt: new Date(),
-    });
+    let assignmentId: number;
+    try {
+      assignmentId = await this.repository.createAssignment({
+        configId: config.id,
+        boffmediaUserId: entitlement.boffmediaUserId,
+        mcUuid: principal.mcUuid ?? null,
+        seed,
+        status: 'claimed',
+        claimedAt: new Date(),
+      });
+    } catch (error) {
+      // Concurrent mint (unique rass_config_user): serve the winner's row
+      // instead of surfacing a duplicate-key 500.
+      const winner = await this.repository.getAssignmentByConfigAndUser(
+        config.id,
+        principal.userId,
+      );
+      if (winner) {
+        return winner;
+      }
+      throw error;
+    }
 
     await this.repository.appendAudit({
       assignmentId,
@@ -153,6 +181,29 @@ export class AssignmentsService {
       throw new Error('Failed to retrieve created assignment');
     }
     return newAssignment;
+  }
+
+  /**
+   * Claim-time half of the clean-ROM gate: if the pack currently linked to the
+   * config's event ships a published emulator ROM whose hash differs from the
+   * pinned clean ROM, the launcher's anti-cheat comparison is disarmed — refuse
+   * to serve assignments/ROMs until an admin fixes the pack or the config.
+   * (Publish lives in the packs module, so this is the in-scope re-assert for
+   * versions published mid-event.)
+   */
+  private async assertConfigRomConsistent(
+    config: RandomizerConfig,
+  ): Promise<void> {
+    const ev = await this.repository.getEventPackAndStatus(config.eventId);
+    if (!ev?.packId) return;
+    const pub = await this.repository.getPublishedEmulatorRom(ev.packId);
+    if (pub?.state === 'ok' && pub.sha512 !== config.cleanRomSha512) {
+      throw new ConflictException({
+        message: `Config ${config.id}: pack ${ev.packId} publishes emulator ROM ${pub.sha512.slice(0, 8)}… but the config pins clean ROM ${config.cleanRomSha512.slice(0, 8)}…`,
+        userMessage:
+          'La ROM del pack publicado no coincide con la configurada para este evento. Avisa a un administrador.',
+      });
+    }
   }
 
   /**
@@ -200,7 +251,10 @@ export class AssignmentsService {
 
     const config = await this.repository.getConfigById(configId);
     if (!config) {
-      throw new NotFoundException(`Config ${configId} not found`);
+      throw new NotFoundException({
+        error: 'not_found',
+        message: `Config ${configId} not found`,
+      });
     }
 
     const assignment = await this.resolveOrMintAssignment(config, principal);
@@ -286,7 +340,19 @@ export class AssignmentsService {
     const result = await this.runner.randomize(job);
 
     // Cache the randomized ROM (content-addressed → key === outputSha512) and the log.
-    await this.blobStorage.storeBlob(Readable.from(result.romBytes));
+    const { sha512: storedRomSha512 } = await this.blobStorage.storeBlob(
+      Readable.from(result.romBytes),
+    );
+    // outputSha512 is pinned into the launcher marker AND used as the blob
+    // address, so a divergence here would 404 every later download.
+    if (storedRomSha512 !== result.outputSha512) {
+      this.logger.error(
+        `Assignment ${assignment.id}: stored ROM blob hash ${storedRomSha512} != runner outputSha512 ${result.outputSha512}`,
+      );
+      throw new Error(
+        `Randomized ROM hash mismatch: runner reported ${result.outputSha512.slice(0, 8)}… but blob store computed ${storedRomSha512.slice(0, 8)}…`,
+      );
+    }
     const { sha512: logBlobSha512 } = await this.blobStorage.storeBlob(
       Readable.from(result.logBytes),
     );

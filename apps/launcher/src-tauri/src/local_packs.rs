@@ -569,6 +569,7 @@ async fn export_mrpack_impl(
                 &manifest.pack.id.to_string(),
                 None,
                 &embed.pack_file,
+                None,
             )
             .await
             .map_err(|e| {
@@ -606,6 +607,7 @@ async fn export_mrpack_impl(
                 &crate::api::PackFile::Override {
                     sha512: world.sha512.as_str().to_string(),
                 },
+                None,
             )
             .await
             .ok()

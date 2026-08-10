@@ -386,6 +386,27 @@
       "when": 1786284646403,
       "tag": "0054_pack_versions_created_by_int",
       "breakpoints": true
+    },
+    {
+      "idx": 55,
+      "version": "5",
+      "when": 1786284647403,
+      "tag": "0055_participants_user_unique",
+      "breakpoints": true
+    },
+    {
+      "idx": 56,
+      "version": "5",
+      "when": 1786284648403,
+      "tag": "0056_pack_audit_actor",
+      "breakpoints": true
+    },
+    {
+      "idx": 57,
+      "version": "5",
+      "when": 1786284649403,
+      "tag": "0057_launcher_token_version",
+      "breakpoints": true
     }
   ]
 }

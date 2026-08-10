@@ -179,8 +179,9 @@ describe('EventsController — integration (ValidationPipe + GlobalExceptionFilt
 
       expect(res.status).toBe(200);
       // No global guard in this controller-only module → req.user undefined →
-      // includePrivate false (admin path covered in events.controller.spec.ts).
-      expect(mockFacade.getEvent).toHaveBeenCalledWith(1, false);
+      // includePrivate false and no userId (admin path covered in
+      // events.controller.spec.ts).
+      expect(mockFacade.getEvent).toHaveBeenCalledWith(1, false, undefined);
     });
   });
 
@@ -302,7 +303,7 @@ describe('EventsController — integration (ValidationPipe + GlobalExceptionFilt
       );
 
       expect(res.status).toBe(200);
-      expect(mockFacade.getLeaderboard).toHaveBeenCalledWith(1, false);
+      expect(mockFacade.getLeaderboard).toHaveBeenCalledWith(1, false, undefined);
     });
 
     it('returns entries in the order the facade provides them', async () => {
@@ -317,7 +318,7 @@ describe('EventsController — integration (ValidationPipe + GlobalExceptionFilt
       );
 
       expect(res.status).toBe(200);
-      expect(mockFacade.getLeaderboard).toHaveBeenCalledWith(5, false);
+      expect(mockFacade.getLeaderboard).toHaveBeenCalledWith(5, false, undefined);
     });
 
     it('returns empty array when event has no participants', async () => {
@@ -525,7 +526,11 @@ describe('EventsController — integration (ValidationPipe + GlobalExceptionFilt
       );
 
       expect(res.status).toBe(200);
-      expect(mockFacade.getEventAchievements).toHaveBeenCalledWith(5, false);
+      expect(mockFacade.getEventAchievements).toHaveBeenCalledWith(
+        5,
+        false,
+        undefined,
+      );
     });
   });
 
@@ -535,6 +540,8 @@ describe('EventsController — integration (ValidationPipe + GlobalExceptionFilt
     name: 'First Win',
     description: 'Win your first match',
     icon: '/icons/trophy.png',
+    itemType: 'achievement',
+    category: 'achievement',
     points: 100,
     maxProgress: 1,
   };
@@ -612,7 +619,11 @@ describe('EventsController — integration (ValidationPipe + GlobalExceptionFilt
       );
 
       expect(res.status).toBe(200);
-      expect(mockFacade.getParticipantProgress).toHaveBeenCalledWith(7);
+      expect(mockFacade.getParticipantProgress).toHaveBeenCalledWith(
+        7,
+        false,
+        undefined,
+      );
     });
   });
 
@@ -631,6 +642,7 @@ describe('EventsController — integration (ValidationPipe + GlobalExceptionFilt
         7,
         5,
         false,
+        undefined,
       );
     });
   });
@@ -657,7 +669,7 @@ describe('EventsController — integration (ValidationPipe + GlobalExceptionFilt
       const res = await request(app.getHttpServer()).get('/events/5/teams');
 
       expect(res.status).toBe(200);
-      expect(mockFacade.getEventTeams).toHaveBeenCalledWith(5, false);
+      expect(mockFacade.getEventTeams).toHaveBeenCalledWith(5, false, undefined);
     });
   });
 
@@ -670,7 +682,7 @@ describe('EventsController — integration (ValidationPipe + GlobalExceptionFilt
       const res = await request(app.getHttpServer()).get('/events/teams/3');
 
       expect(res.status).toBe(200);
-      expect(mockFacade.getTeam).toHaveBeenCalledWith(3);
+      expect(mockFacade.getTeam).toHaveBeenCalledWith(3, false, undefined);
     });
   });
 
@@ -685,7 +697,7 @@ describe('EventsController — integration (ValidationPipe + GlobalExceptionFilt
       );
 
       expect(res.status).toBe(200);
-      expect(mockFacade.getTeamMembers).toHaveBeenCalledWith(3);
+      expect(mockFacade.getTeamMembers).toHaveBeenCalledWith(3, false, undefined);
     });
   });
 
@@ -777,8 +789,10 @@ describe('EventsController — integration (ValidationPipe + GlobalExceptionFilt
 
       expect(res.status).toBe(201);
       // participantId used to be read from the body, which let any authenticated
-      // user enrol anyone else. The authenticated user (1) is the only input now.
-      expect(mockFacade.joinTeam).toHaveBeenCalledWith(5, 1, 1);
+      // user enrol anyone else. The authenticated user (1) is the only identity
+      // input now; the trailing flag is whether that caller is an admin (the
+      // overridden JWT guard grants BOFF_ADMIN here).
+      expect(mockFacade.joinTeam).toHaveBeenCalledWith(5, 1, 1, true);
     });
 
     it('accepts an empty body', async () => {
@@ -789,7 +803,7 @@ describe('EventsController — integration (ValidationPipe + GlobalExceptionFilt
         .send({});
 
       expect(res.status).toBe(201);
-      expect(mockFacade.joinTeam).toHaveBeenCalledWith(5, 1, 1);
+      expect(mockFacade.joinTeam).toHaveBeenCalledWith(5, 1, 1, true);
     });
   });
 
@@ -866,7 +880,11 @@ describe('EventsController — integration (ValidationPipe + GlobalExceptionFilt
       );
 
       expect(res.status).toBe(200);
-      expect(mockFacade.getEventParticipants).toHaveBeenCalledWith(5, false);
+      expect(mockFacade.getEventParticipants).toHaveBeenCalledWith(
+        5,
+        false,
+        undefined,
+      );
     });
   });
 
@@ -952,7 +970,11 @@ describe('EventsController — integration (ValidationPipe + GlobalExceptionFilt
       );
 
       expect(res.status).toBe(200);
-      expect(mockFacade.getTeamLeaderboard).toHaveBeenCalledWith(5, false);
+      expect(mockFacade.getTeamLeaderboard).toHaveBeenCalledWith(
+        5,
+        false,
+        undefined,
+      );
     });
 
     it('returns empty array when no teams exist', async () => {

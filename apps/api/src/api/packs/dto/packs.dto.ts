@@ -200,7 +200,7 @@ export class UpdatePackDto {
   archived?: boolean;
 }
 
-export class CreateVersionDto {
+export class CreatePackVersionDto {
   @ApiProperty({ example: '1.4.2' })
   @IsString()
   @MinLength(1)
@@ -297,7 +297,7 @@ export class GrantAccessDto {
   uuid!: string;
 }
 
-export class CreateInviteDto {
+export class CreatePackInviteDto {
   @ApiPropertyOptional({ default: 1 })
   @IsOptional()
   @IsInt()

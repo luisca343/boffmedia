@@ -134,10 +134,20 @@ export class TeamsRepository {
         ),
       )
       .innerJoin(
+        boffMediaEventTeams,
+        eq(boffMediaEventTeams.id, boffMediaEventTeamMembers.teamId),
+      )
+      .innerJoin(
         boffMediaAchievements,
-        eq(
-          boffMediaAchievements.id,
-          boffMediaParticipantProgress.achievementId,
+        and(
+          eq(
+            boffMediaAchievements.id,
+            boffMediaParticipantProgress.achievementId,
+          ),
+          // Only this event's achievements: a member's points from unrelated
+          // events used to inflate the team score.
+          eq(boffMediaAchievements.eventId, boffMediaEventTeams.eventId),
+          isNull(boffMediaAchievements.deletedAt),
         ),
       )
       .where(

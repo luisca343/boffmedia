@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { MySql2Database } from 'drizzle-orm/mysql2';
-import { and, desc, eq, isNull, sql } from 'drizzle-orm';
+import { and, desc, eq, isNull, or, sql } from 'drizzle-orm';
 import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
 import { boffMediaUsers } from '@/_db/schema/BoffMedia';
 import {
@@ -68,6 +68,8 @@ export class CommunityService {
    * across every participant, newest first.
    */
   async getActivity(limit = 15): Promise<ActivityItemEntity[]> {
+    // The feed is anonymous, so private events never surface here: neither
+    // their titles (joins) nor their achievements (unlocks).
     const unlocks = await this.db
       .select({
         actor: boffMediaParticipants.nickname,
@@ -93,7 +95,19 @@ export class CommunityService {
           boffMediaParticipantProgress.participantId,
         ),
       )
-      .where(eq(boffMediaParticipantProgress.isCompleted, true))
+      .leftJoin(
+        boffMediaEvents,
+        eq(boffMediaEvents.id, boffMediaAchievements.eventId),
+      )
+      .where(
+        and(
+          eq(boffMediaParticipantProgress.isCompleted, true),
+          or(
+            isNull(boffMediaAchievements.eventId),
+            eq(boffMediaEvents.visibility, 'public'),
+          ),
+        ),
+      )
       .orderBy(desc(boffMediaParticipantProgress.completedAt))
       .limit(limit);
 
@@ -110,6 +124,7 @@ export class CommunityService {
         and(
           eq(boffMediaEvents.id, boffMediaEventParticipants.eventId),
           isNull(boffMediaEvents.deletedAt),
+          eq(boffMediaEvents.visibility, 'public'),
         ),
       )
       .innerJoin(

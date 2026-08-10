@@ -1,5 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { ConflictException, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  ForbiddenException,
+  NotFoundException,
+} from '@nestjs/common';
 import { AssignmentsService } from './assignments.service';
 import { EventsService } from './events.service';
 import { RandomizerRepository } from '../repositories/randomizer.repository';
@@ -58,7 +62,25 @@ describe('AssignmentsService', () => {
       resolveEventEntitlement: jest.fn(),
       appendAudit: jest.fn(),
       updateAssignment: jest.fn(),
+      getEventPackAndStatus: jest.fn(),
+      getPublishedEmulatorRom: jest.fn(),
     } as unknown as jest.Mocked<RandomizerRepository>;
+
+    // Defaults: entitled participant, pack's published ROM matches the config.
+    repository.resolveEventEntitlement.mockResolvedValue({
+      boffmediaUserId: 42,
+      status: 'registered',
+    });
+    repository.getEventPackAndStatus.mockResolvedValue({
+      packId: 'pack1',
+      status: 'active',
+    });
+    repository.getPublishedEmulatorRom.mockResolvedValue({
+      state: 'ok',
+      versionId: 'v1',
+      romPath: 'roms/clean.gba',
+      sha512: CLEAN_SHA,
+    });
 
     blobStorage = {
       storeBlob: jest.fn(),
@@ -241,6 +263,61 @@ describe('AssignmentsService', () => {
       await expect(
         service.getOrGenerateRom(1, principal as any),
       ).rejects.toBeInstanceOf(NotFoundException);
+    });
+
+    it('403s an existing assignment when the participant was removed from the event', async () => {
+      repository.getConfigById.mockResolvedValue(config);
+      repository.resolveEventEntitlement.mockResolvedValue(null); // revoked
+      repository.getAssignmentByConfigAndUser.mockResolvedValue({
+        ...claimedAssignment,
+        outputSha512: OUTPUT_SHA,
+        status: 'patched',
+      });
+
+      await expect(
+        service.getOrGenerateRom(1, principal as any),
+      ).rejects.toBeInstanceOf(ForbiddenException);
+      expect(runner.randomize).not.toHaveBeenCalled();
+      expect(blobStorage.override).not.toHaveBeenCalled();
+    });
+
+    it('409s when the pack publishes a ROM that differs from the pinned clean ROM', async () => {
+      repository.getConfigById.mockResolvedValue(config);
+      repository.getPublishedEmulatorRom.mockResolvedValue({
+        state: 'ok',
+        versionId: 'v2',
+        romPath: 'roms/clean.gba',
+        sha512: 'f'.repeat(128), // != CLEAN_SHA
+      });
+
+      await expect(
+        service.getOrGenerateRom(1, principal as any),
+      ).rejects.toBeInstanceOf(ConflictException);
+      expect(runner.randomize).not.toHaveBeenCalled();
+    });
+
+    it('re-reads the winner row when a concurrent mint hits the unique key', async () => {
+      repository.getConfigById.mockResolvedValue(config);
+      repository.getAssignmentByConfigAndUser
+        .mockResolvedValueOnce(null) // pre-insert check: unclaimed
+        .mockResolvedValueOnce({
+          ...claimedAssignment,
+          outputSha512: OUTPUT_SHA,
+          status: 'patched',
+        }); // post-conflict re-read
+      repository.createAssignment.mockRejectedValue(
+        new Error('Assignment creation failed: ER_DUP_ENTRY'),
+      );
+      blobStorage.blobSize.mockResolvedValue(1024);
+      blobStorage.override.mockResolvedValue({
+        stream: Readable.from(Buffer.from('cached rom')),
+        contentLength: 10,
+      } as any);
+
+      const result = await service.getOrGenerateRom(1, principal as any);
+
+      expect(result.outputSha512).toBe(OUTPUT_SHA);
+      expect(runner.randomize).not.toHaveBeenCalled();
     });
 
     it('single-flights concurrent generation (runner runs once)', async () => {

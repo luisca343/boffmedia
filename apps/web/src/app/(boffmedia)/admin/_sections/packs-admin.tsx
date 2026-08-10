@@ -34,7 +34,7 @@ const ACCESS_TONE = {
 } as const
 
 /** Detail-column views. Anything other than `detail` is driven by `?view=`. */
-type View = "detail" | "new-pack" | "new-version" | "clone-version" | "edit-version"
+type View = "detail" | "new-pack" | "edit-pack" | "new-version" | "clone-version" | "edit-version"
 
 const VERSION_VIEWS: Record<string, "create" | "clone" | "edit"> = {
   "new-version": "create",
@@ -188,7 +188,10 @@ function AccessTab({ pack }: { pack: AdminPack }) {
   const [hits, setHits] = useState<UserSearchHit[]>([])
   const [uuid, setUuid] = useState("")
   const [busy, setBusy] = useState(false)
-  const [confirmRevoke, setConfirmRevoke] = useState<number | null>(null)
+  const [confirmRevoke, setConfirmRevoke] = useState<{
+    userId: number
+    source: AccessRow["source"]
+  } | null>(null)
   const [confirmRevokeUuid, setConfirmRevokeUuid] = useState<string | null>(null)
 
   const load = useCallback(async () => {
@@ -228,8 +231,10 @@ function AccessTab({ pack }: { pack: AdminPack }) {
     }
   }
 
-  const revokeUser = async (userId: number) => {
-    const res = await PacksService.revokeFromUser(pack.id, userId)
+  // Scoped to one source: an admin grant and an invite grant can coexist, and
+  // the row the admin clicked is the only one that should disappear.
+  const revokeUser = async (userId: number, source: AccessRow["source"]) => {
+    const res = await PacksService.revokeFromUser(pack.id, userId, source)
     if (!res.success) {
       toast({ tone: "bad", title: t("revokeFailed"), msg: res.userMessage })
       return
@@ -394,7 +399,7 @@ function AccessTab({ pack }: { pack: AdminPack }) {
                 size="sm"
                 variant="ghost"
                 icon="trash"
-                onClick={() => setConfirmRevoke(row.userId)}
+                onClick={() => setConfirmRevoke({ userId: row.userId, source: row.source })}
               >
                 {t("revoke")}
               </Button>
@@ -410,12 +415,18 @@ function AccessTab({ pack }: { pack: AdminPack }) {
           confirmRevoke !== null
             ? t("confirmRevokeUserLead", {
                 name:
-                  rows?.find((r) => r.userId === confirmRevoke)?.username ?? String(confirmRevoke),
+                  rows?.find(
+                    (r) => r.userId === confirmRevoke.userId && r.source === confirmRevoke.source,
+                  )?.username ?? String(confirmRevoke.userId),
               })
             : undefined
         }
         onClose={() => setConfirmRevoke(null)}
-        onConfirm={() => (confirmRevoke !== null ? revokeUser(confirmRevoke) : undefined)}
+        onConfirm={() =>
+          confirmRevoke !== null
+            ? revokeUser(confirmRevoke.userId, confirmRevoke.source)
+            : undefined
+        }
       />
 
       <ConfirmModal
@@ -583,7 +594,7 @@ export function PacksAdmin() {
   const packSlug = searchParams.get("pack")
   const rawView = searchParams.get("view") ?? "detail"
   const view = (
-    ["detail", "new-pack", "new-version", "clone-version", "edit-version"].includes(rawView)
+    ["detail", "new-pack", "edit-pack", "new-version", "clone-version", "edit-version"].includes(rawView)
       ? rawView
       : "detail"
   ) as View
@@ -750,6 +761,16 @@ export function PacksAdmin() {
               go({ pack: slug, view: null })
             }}
           />
+        ) : view === "edit-pack" && pack ? (
+          <PackForm
+            key={pack.id}
+            pack={pack}
+            onClose={() => go({ view: null })}
+            onSaved={async () => {
+              await load()
+              go({ view: null })
+            }}
+          />
         ) : pack && editorMode ? (
           <VersionEditor
             // Mounted per target: the editor prefills once, and reusing an
@@ -790,6 +811,14 @@ export function PacksAdmin() {
                 <Badge tone={pack.latestVersionId ? "ok" : "warn"}>
                   {pack.latestVersionId ? t("live") : t("noPublished")}
                 </Badge>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  icon="edit"
+                  onClick={() => go({ view: "edit-pack", version: null })}
+                >
+                  {t("editPack")}
+                </Button>
                 <Button
                   size="sm"
                   variant={pack.archived ? "default" : "ghost"}

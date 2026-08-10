@@ -1,7 +1,17 @@
-import { Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { TeamsRepository } from '../../../_repositories/boffmedia/teams.repository';
 import { ParticipantsService } from './participants.service';
-import { EventTeam, EventTeamMember } from '@/_db/schema/BoffMediaEvents';
+import {
+  EventTeam,
+  EventTeamMember,
+  PARTICIPANT_STATUS,
+  Participant,
+} from '@/_db/schema/BoffMediaEvents';
 import { CreateTeamDto } from '../dto/create-team.dto';
 import { UpdateTeamDto } from '../dto/update-team.dto';
 
@@ -34,7 +44,15 @@ export class TeamsService {
         createTeamDto.leaderId,
       );
 
-    // 2. Create the team
+    // 2. Event membership FIRST: it is the step that can refuse (removed,
+    // etc.), so failing here leaves no orphaned team/member rows behind.
+    await this.ensureEventMembership(
+      eventId,
+      leaderParticipant,
+      `Created team ${createTeamDto.name}`,
+    );
+
+    // 3. Create the team
     const teamData = {
       eventId,
       name: createTeamDto.name,
@@ -45,7 +63,7 @@ export class TeamsService {
     const result = await this.teamsRepository.create(teamData);
     const teamId = result.insertId;
 
-    // 3. Add leader as team member with leader role
+    // 4. Add leader as team member with leader role
     const memberData = {
       teamId,
       participantId: leaderParticipant.id,
@@ -54,13 +72,43 @@ export class TeamsService {
 
     await this.teamsRepository.addMember(memberData);
 
-    // 4. Add leader to event participants
-    await this.participantsService.joinEvent(eventId, leaderParticipant.id, {
-      userId: leaderParticipant.userId!,
-      comment: `Created team ${createTeamDto.name}`,
-    });
-
     return this.getTeamById(teamId);
+  }
+
+  /**
+   * Idempotent event join: an existing active membership is fine (joining a
+   * team is the expected follow-up to joining the event), `declined` re-joins,
+   * `removed` stays refused.
+   */
+  private async ensureEventMembership(
+    eventId: number,
+    participant: Participant,
+    comment: string,
+  ): Promise<void> {
+    const existing =
+      participant.userId != null
+        ? await this.participantsService.getParticipationForUser(
+            participant.userId,
+            eventId,
+          )
+        : undefined;
+
+    if (existing?.status === PARTICIPANT_STATUS.REMOVED) {
+      throw new ForbiddenException(
+        'Has sido expulsado de este evento por un administrador',
+      );
+    }
+    if (
+      existing &&
+      existing.status !== PARTICIPANT_STATUS.DECLINED
+    ) {
+      return; // already an active member
+    }
+
+    await this.participantsService.joinEvent(eventId, participant.id, {
+      userId: participant.userId ?? undefined,
+      comment,
+    });
   }
 
   async updateTeam(
@@ -86,17 +134,28 @@ export class TeamsService {
     const participant =
       await this.participantsService.getOrCreateParticipantByUserId(userId);
 
-    // 2. Check if participant is already in a team for this event
+    // 2. Event membership FIRST — it can refuse (removed), and doing it before
+    // the member insert avoids a half-committed "on the team but not in the
+    // event" state that was unrecoverable without manual SQL.
+    await this.ensureEventMembership(
+      eventId,
+      participant,
+      `Joined team ${teamId}`,
+    );
+
+    // 3. Check if participant is already in a team for this event
     const existingTeam = await this.teamsRepository.findParticipantTeamInEvent(
       participant.id,
       eventId,
     );
 
     if (existingTeam.length > 0) {
-      throw new Error('Participant is already in a team for this event');
+      throw new ConflictException(
+        'Participant is already in a team for this event',
+      );
     }
 
-    // 3. Add participant to team members
+    // 4. Add participant to team members
     const memberData = {
       teamId,
       participantId: participant.id,
@@ -104,12 +163,6 @@ export class TeamsService {
     };
 
     await this.teamsRepository.addMember(memberData);
-
-    // 4. Add to event participants
-    await this.participantsService.joinEvent(eventId, participant.id, {
-      userId: participant.userId!,
-      comment: `Joined team ${teamId}`,
-    });
 
     return this.teamsRepository.findMember(teamId, participant.id);
   }
@@ -129,11 +182,11 @@ export class TeamsService {
     );
 
     if (!member) {
-      throw new Error('Participant is not a member of this team');
+      throw new NotFoundException('Participant is not a member of this team');
     }
 
     if (member.role === 'leader') {
-      throw new Error(
+      throw new ForbiddenException(
         'Team leader cannot leave the team. Transfer leadership or disband the team.',
       );
     }

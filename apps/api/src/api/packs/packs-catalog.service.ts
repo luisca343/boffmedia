@@ -8,6 +8,8 @@ import {
   ServiceUnavailableException,
 } from '@nestjs/common';
 import { createHash } from 'crypto';
+import { lookup } from 'dns/promises';
+import { isIP } from 'net';
 import type { Readable } from 'stream';
 import { firstValueFrom } from 'rxjs';
 import { env } from '@/config/env';
@@ -568,7 +570,10 @@ export class PacksCatalogService {
           userMessage: 'La URL debe empezar por http:// o https://',
         });
       }
-      const { sha512, fileSize } = await this.hashRemote(source.url, {});
+      // Admin-supplied URL — the one SSRF-able source. Fetched with DNS/private
+      // -range validation on every hop; CF/Modrinth URLs come from their APIs
+      // and keep the plain path.
+      const { sha512, fileSize } = await this.hashRemotePublic(source.url);
       resolved = {
         sha512,
         fileSize,
@@ -611,6 +616,79 @@ export class PacksCatalogService {
     };
   }
 
+  /**
+   * The url-source fetch. Every hop — the original URL and each redirect, capped
+   * at 2 — must resolve to public addresses only, and every failure collapses to
+   * ONE opaque error: a distinguishable error taxonomy here is a blind-SSRF
+   * oracle over the internal network.
+   */
+  private async hashRemotePublic(
+    url: string,
+  ): Promise<{ sha512: string; fileSize: number }> {
+    const MAX_HOPS = 2;
+    let current = url;
+    for (let hop = 0; hop <= MAX_HOPS; hop++) {
+      await this.assertPublicHttpUrl(current);
+      const response = await firstValueFrom(
+        this.http.get<Readable>(current, {
+          responseType: 'stream',
+          timeout: 15_000,
+          maxRedirects: 0,
+          validateStatus: () => true,
+        }),
+      ).catch(() => {
+        throw urlResolveFailure();
+      });
+
+      if (response.status >= 300 && response.status < 400) {
+        response.data?.destroy();
+        const location = response.headers['location'] as string | undefined;
+        if (!location || hop === MAX_HOPS) throw urlResolveFailure();
+        try {
+          current = new URL(location, current).toString();
+        } catch {
+          throw urlResolveFailure();
+        }
+        continue;
+      }
+      if (response.status >= 400) {
+        response.data?.destroy();
+        throw urlResolveFailure();
+      }
+      return this.digestStream(response.data);
+    }
+    throw urlResolveFailure();
+  }
+
+  /** http(s) only, and no hostname that resolves to loopback / private /
+   *  link-local / CGNAT / ULA space. Failure is the same opaque error as every
+   *  other url-source failure. */
+  private async assertPublicHttpUrl(raw: string): Promise<void> {
+    let parsed: URL;
+    try {
+      parsed = new URL(raw);
+    } catch {
+      throw urlResolveFailure();
+    }
+    if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') {
+      throw urlResolveFailure();
+    }
+    const host = parsed.hostname.replace(/^\[|\]$/g, '');
+    let addresses: string[];
+    try {
+      addresses = isIP(host)
+        ? [host]
+        : (await lookup(host, { all: true, verbatim: true })).map(
+            (a) => a.address,
+          );
+    } catch {
+      throw urlResolveFailure();
+    }
+    if (addresses.length === 0 || addresses.some(isPrivateIp)) {
+      throw urlResolveFailure();
+    }
+  }
+
   /** Streams the file through a sha512 digest without ever holding it in memory. */
   private async hashRemote(
     url: string,
@@ -651,7 +729,12 @@ export class PacksCatalogService {
       });
     }
 
-    const stream = response.data;
+    return this.digestStream(response.data);
+  }
+
+  private async digestStream(
+    stream: Readable,
+  ): Promise<{ sha512: string; fileSize: number }> {
     const hash = createHash('sha512');
     let fileSize = 0;
 
@@ -865,6 +948,44 @@ function fileNameFromUrl(url: string): string {
   } catch {
     return last;
   }
+}
+
+/** The ONE error every url-source failure surfaces as — DNS, private range,
+ *  connect, status, redirect. Distinguishable variants would let an admin
+ *  session (or a stolen one) map the internal network blind. */
+function urlResolveFailure(): BadGatewayException {
+  return new BadGatewayException({
+    message: 'url source could not be resolved',
+    userMessage: 'No se ha podido descargar esa URL.',
+  });
+}
+
+function isPrivateIp(ip: string): boolean {
+  if (isIP(ip) === 4) return isPrivateIpv4(ip);
+  const lower = ip.toLowerCase();
+  if (lower === '::' || lower === '::1') return true;
+  if (lower.startsWith('::ffff:')) {
+    const v4 = lower.slice(7);
+    if (isIP(v4) === 4) return isPrivateIpv4(v4);
+  }
+  const first = parseInt(lower.split(':')[0] || '0', 16);
+  if (Number.isNaN(first)) return true;
+  if ((first & 0xfe00) === 0xfc00) return true; // fc00::/7 ULA
+  if ((first & 0xffc0) === 0xfe80) return true; // fe80::/10 link-local
+  if ((first & 0xffc0) === 0xfec0) return true; // fec0::/10 site-local
+  return false;
+}
+
+function isPrivateIpv4(ip: string): boolean {
+  const [a, b] = ip.split('.').map(Number);
+  if (a === 0 || a === 10 || a === 127) return true;
+  if (a === 100 && b >= 64 && b <= 127) return true; // CGNAT
+  if (a === 169 && b === 254) return true;
+  if (a === 172 && b >= 16 && b <= 31) return true;
+  if (a === 192 && (b === 168 || b === 0)) return true;
+  if (a === 198 && (b === 18 || b === 19)) return true;
+  if (a >= 224) return true; // multicast + reserved
+  return false;
 }
 
 function asMessage(error: unknown): string {

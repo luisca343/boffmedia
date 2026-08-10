@@ -32,6 +32,30 @@ export async function getMcUserData(): Promise<QueryResult<McUserData>> {
     return result;
 }
 
+export type McJoinResult = {
+    ok: boolean;
+    username: string;
+    /** Undashed, as Mojang stores it. The API re-dashes it; nothing here should. */
+    uuid: string;
+};
+
+/**
+ * Step 2 of the Mojang identity handshake: asks the mod to complete
+ * `session/minecraft/join` with the running game's own access token, against the
+ * `serverId` the API just issued.
+ *
+ * The token never reaches this page — the mod does the join and the API confirms
+ * it with Mojang directly. That is the point: `/auth/loginmc` trusted the
+ * `MC_WORLD` string, which ships in this very bundle, so a public UUID was enough
+ * to impersonate anyone.
+ *
+ * A jar older than this query answers `Unknown query type`, which `mcefQuery`
+ * surfaces as status 400 — see the legacy fallback in AppWrapper.
+ */
+export async function joinMinecraftServer(serverId: string): Promise<QueryResult<McJoinResult>> {
+    return mcefQuery<McJoinResult>('MC_JOIN_SERVER', { serverId });
+}
+
 /** Lowercase unlike every other query here: the mod registered it as `getMisiones`. */
 export async function getMisiones(): Promise<QueryResult<UserQuestData>> {
     const result = await mcefQuery<UserQuestData>('getMisiones');

@@ -6,8 +6,8 @@ import {
   openUrl,
   getRandomizerAssignment,
   downloadRandomizerRom,
-  provideFile,
-  updateRandomizerExpectedHash,
+  randomizerPlaceRom,
+  randomizerRomPresent,
   instanceRomSlot,
   webBaseUrl,
   type RandomizerAssignment,
@@ -82,17 +82,17 @@ export function RandomizerPanel({
       // Two independent ways this install can still need the ROM, and BOTH have
       // to be clear before the panel may claim it is ready:
       //
-      //   · the slot is empty — the ROM is a user-provided file, so it shows up
-      //     in missingUserFiles until something puts it there;
+      //   · the slot is empty on disk — a REAL on-disk check, not the missing-
+      //     files list: `compute_missing_user_files` excludes the randomizer slot,
+      //     so it can never report the ROM as missing;
       //   · the marker still expects the clean ROM's hash — the anti-cheat gate,
       //     which is what disables Play.
       //
       // Checking only one of them is how the panel ended up announcing "ready to
       // play" over a Play button that was disabled, with no way to retry.
-      const norm = (p: string) => p.toLowerCase().replace(/\\/g, "/")
-      const romMissingOnDisk = missingFiles.some((f) => norm(f.path) === norm(slotPath))
+      const romPresent = await randomizerRomPresent(slug)
 
-      if (!romBlocked && !romMissingOnDisk) {
+      if (!romBlocked && romPresent) {
         setFlowState("ready")
         return
       }
@@ -102,13 +102,12 @@ export function RandomizerPanel({
       // erring towards downloading costs a transfer, while erring the other way
       // leaves the pack permanently unplayable.
       setFlowState("downloading")
-      const rom = await downloadRandomizerRom(result.eventId)
+      const rom = await downloadRandomizerRom(result.eventId, slotPath)
 
-      // Step 4: Update marker with new expected hash
-      await updateRandomizerExpectedHash(slug, slotPath, rom.outputSha512)
-
-      // Step 5: Place the ROM in the slot
-      await provideFile(slug, slotPath, rom.outputPath)
+      // Step 4: Place the ROM and update the marker atomically — the file lands
+      // in the slot first, then the marker's expected hash + size are rewritten
+      // from what was actually written. No pre-write of the hash.
+      await randomizerPlaceRom(slug, rom.outputPath, slotPath, rom.outputSha512)
 
       // Done!
       setFlowState("ready")

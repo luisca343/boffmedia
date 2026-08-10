@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
 import { Logger } from 'nestjs-pino';
 import { ConfigService } from '@nestjs/config';
 import { spawn, ChildProcess } from 'child_process';
@@ -63,11 +63,14 @@ class Semaphore {
 @Injectable()
 export class FvxRandomizerRunner implements IRandomizerRunner {
   private semaphore: Semaphore;
+  /** NDS jobs run with 4G heaps: clamp them to 1 unless the operator explicitly raised RANDOMIZER_MAX_CONCURRENCY. */
+  private ndsSemaphore: Semaphore;
   private readonly javaPath: string;
   private readonly jarPath: string;
   private readonly scratchDir: string;
   private readonly timeoutMs: number;
   private readonly logger: Logger;
+  private jarSha512Cache: string | null = null;
 
   constructor(
     logger: Logger,
@@ -78,7 +81,10 @@ export class FvxRandomizerRunner implements IRandomizerRunner {
 
     this.javaPath = env.RANDOMIZER_JAVA || 'java';
     this.jarPath = env.RANDOMIZER_JAR || '';
-    const maxConcurrency = env.RANDOMIZER_MAX_CONCURRENCY || 2;
+    const explicitConcurrency = env.RANDOMIZER_MAX_CONCURRENCY != null
+      ? Number(env.RANDOMIZER_MAX_CONCURRENCY)
+      : null;
+    const maxConcurrency = explicitConcurrency || 2;
     this.timeoutMs = env.RANDOMIZER_TIMEOUT_MS || 180000;
 
     // If no scratch dir specified, use system temp + randomizer
@@ -89,6 +95,13 @@ export class FvxRandomizerRunner implements IRandomizerRunner {
     }
 
     this.semaphore = new Semaphore(maxConcurrency);
+    this.ndsSemaphore = new Semaphore(explicitConcurrency || 1);
+
+    if (!this.jarPath) {
+      this.logger.warn(
+        'RANDOMIZER_JAR is not configured; randomization requests will fail until it is set',
+      );
+    }
 
     // Ensure scratch dir exists
     if (!fs.existsSync(this.scratchDir)) {
@@ -96,9 +109,49 @@ export class FvxRandomizerRunner implements IRandomizerRunner {
     }
   }
 
+  /**
+   * Validate the configured jar and return its SHA-512 (cached after first
+   * read). Fails with the actual path in the message, not ''.
+   */
+  private ensureJar(): string {
+    if (!this.jarPath) {
+      throw new FvxRandomizerError(
+        'RANDOMIZER_JAR is not configured (env var is empty or unset)',
+      );
+    }
+    if (this.jarSha512Cache) {
+      return this.jarSha512Cache;
+    }
+    let bytes: Buffer;
+    try {
+      bytes = fs.readFileSync(this.jarPath);
+    } catch (err) {
+      throw new FvxRandomizerError(
+        `Cannot read randomizer jar at ${this.jarPath}: ${(err as Error).message}`,
+      );
+    }
+    this.jarSha512Cache = createHash('sha512').update(bytes).digest('hex');
+    return this.jarSha512Cache;
+  }
+
   async randomize(job: RandomizeJob): Promise<RandomizeResult> {
-    // Acquire permit from semaphore
+    const actualJarSha512 = this.ensureJar();
+    // The config pinned a jar hash so results stay reproducible/advertised;
+    // a swapped jar must refuse, not silently change outputs.
+    if (job.jarSha512 && job.jarSha512 !== actualJarSha512) {
+      throw new ConflictException({
+        message: `Configured randomizer jar (${actualJarSha512.slice(0, 8)}…) does not match the hash pinned by this job (${job.jarSha512.slice(0, 8)}…)`,
+        userMessage:
+          'La versión del randomizador en el servidor ya no coincide con la fijada para este evento. Avisa a un administrador.',
+      });
+    }
+
+    const isNds = job.gamePlatform === 'nds';
+    // Acquire order is fixed (global → NDS) so mixed workloads cannot deadlock.
     await this.semaphore.acquire();
+    if (isNds) {
+      await this.ndsSemaphore.acquire();
+    }
 
     const jobId = randomUUID();
     const jobDir = path.join(this.scratchDir, jobId);
@@ -144,13 +197,16 @@ export class FvxRandomizerRunner implements IRandomizerRunner {
 
       return result;
     } finally {
-      // Clean up job directory and release semaphore permit
+      // Clean up job directory and release semaphore permits
       try {
         if (fs.existsSync(jobDir)) {
           fs.rmSync(jobDir, { recursive: true, force: true });
         }
       } catch (err) {
         this.logger.warn(`Failed to clean up job directory ${jobDir}:`, err);
+      }
+      if (isNds) {
+        this.ndsSemaphore.release();
       }
       this.semaphore.release();
     }
@@ -202,7 +258,7 @@ export class FvxRandomizerRunner implements IRandomizerRunner {
     outPath: string,
   ): Promise<RandomizeResult> {
     return new Promise((resolve, reject) => {
-      let process: ChildProcess | null = null;
+      let child: ChildProcess | null = null;
       let timedOut = false;
       let timeoutHandle: NodeJS.Timeout | null = null;
       let stdout = '';
@@ -211,29 +267,38 @@ export class FvxRandomizerRunner implements IRandomizerRunner {
       // Set up timeout
       timeoutHandle = setTimeout(() => {
         timedOut = true;
-        if (process && process.pid) {
+        if (child && child.pid) {
           this.logger.warn(
-            `FVX process ${process.pid} timeout after ${this.timeoutMs}ms, killing...`,
+            `FVX process ${child.pid} timeout after ${this.timeoutMs}ms, killing...`,
           );
-          // Kill the entire process tree
-          process.kill('SIGKILL');
+          // Kill the whole process tree: the child is its own process group
+          // (detached), so a negative pid signals every descendant on POSIX.
+          // Windows has no process groups — it would need `taskkill /pid /T /F`
+          // if this ever runs there.
+          try {
+            process.kill(-child.pid, 'SIGKILL');
+          } catch {
+            child.kill('SIGKILL');
+          }
         }
       }, this.timeoutMs);
 
       // Spawn process
       try {
-        process = spawn(this.javaPath, args, {
+        child = spawn(this.javaPath, args, {
           cwd: jobDir,
           stdio: ['ignore', 'pipe', 'pipe'],
+          // Own process group so the timeout can kill java AND anything it forks.
+          detached: true,
         });
 
-        if (!process.stdout || !process.stderr) {
+        if (!child.stdout || !child.stderr) {
           throw new FvxRandomizerError('Failed to create process streams');
         }
 
         // Capture stdout/stderr with size limit
         const maxOutputSize = 1024 * 1024; // 1MB cap
-        process.stdout.on('data', (chunk: Buffer) => {
+        child.stdout.on('data', (chunk: Buffer) => {
           if (stdout.length < maxOutputSize) {
             stdout += chunk.toString(
               'utf-8',
@@ -243,7 +308,7 @@ export class FvxRandomizerRunner implements IRandomizerRunner {
           }
         });
 
-        process.stderr.on('data', (chunk: Buffer) => {
+        child.stderr.on('data', (chunk: Buffer) => {
           if (stderr.length < maxOutputSize) {
             stderr += chunk.toString(
               'utf-8',
@@ -253,7 +318,7 @@ export class FvxRandomizerRunner implements IRandomizerRunner {
           }
         });
 
-        process.on('exit', (exitCode: number | null) => {
+        child.on('exit', (exitCode: number | null) => {
           if (timeoutHandle) clearTimeout(timeoutHandle);
 
           if (timedOut) {
@@ -288,7 +353,7 @@ export class FvxRandomizerRunner implements IRandomizerRunner {
           }
         });
 
-        process.on('error', (err) => {
+        child.on('error', (err) => {
           if (timeoutHandle) clearTimeout(timeoutHandle);
           reject(
             new FvxRandomizerError(

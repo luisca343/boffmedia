@@ -3,18 +3,22 @@ import { RotomUser } from '@/_db/schema/SmartRotom';
 import { CreateUserDto } from '../../dto/create-user.dto';
 
 // Entity types for responses (without password, the internal soft-delete marker,
-// or the forum presence marker — lastSeenAt is read directly by the forum, never
-// surfaced through the general user reads).
+// the forum presence marker — lastSeenAt is read directly by the forum, never
+// surfaced through the general user reads — or the internal launcher revocation
+// counter, which the user selects never fetch).
 export type BoffMediaUserSafe = Omit<
   BoffMediaUser,
-  'password' | 'deletedAt' | 'lastSeenAt'
+  'password' | 'deletedAt' | 'lastSeenAt' | 'launcherTokenVersion'
 >;
 
 // Complex query result types. Keeps `password` (for credential checks) but not
 // the internal soft-delete / presence markers, matching the repository's select
 // clause.
 export interface FullUserData {
-  boffmedia_users: Omit<BoffMediaUser, 'deletedAt' | 'lastSeenAt'>;
+  boffmedia_users: Omit<
+    BoffMediaUser,
+    'deletedAt' | 'lastSeenAt' | 'launcherTokenVersion'
+  >;
   rotom_users: RotomUser | null;
 }
 

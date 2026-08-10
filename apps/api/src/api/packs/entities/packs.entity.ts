@@ -125,6 +125,13 @@ export class AdminPackEntity {
   gameType!: (typeof GAME_TYPES)[number];
   @ApiPropertyOptional({ nullable: true }) summary!: string | null;
   @ApiPropertyOptional({ nullable: true }) iconUrl!: string | null;
+  @ApiPropertyOptional({ nullable: true }) description?: string | null;
+  @ApiPropertyOptional({
+    type: 'array',
+    items: { type: 'object' },
+    nullable: true,
+  })
+  gallery?: unknown[];
   @ApiProperty() accessKind!: string;
   @ApiPropertyOptional({ type: PackServerEntity, nullable: true })
   server?: PackServerEntity | null;

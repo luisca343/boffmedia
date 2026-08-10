@@ -1,5 +1,7 @@
 import * as React from "react"
 
+import { toast } from "@boffmedia/ui"
+
 import { setLocale } from "../i18n"
 import { MOCK_ACCOUNT, MOCK_DEVICE_CODE, MOCK_SETTINGS, mockLocalPacks } from "../services/mock"
 import { loadPackEntries } from "../services/packs"
@@ -11,8 +13,11 @@ import {
   authAccounts,
   authBegin,
   boffAccounts,
+  boffDeviceCancel,
   boffDevicePoll,
   boffDeviceStart,
+  boffOffline,
+  boffRevalidate,
   boffSessionRestore,
   boffSignOut,
   boffSwitch,
@@ -32,6 +37,7 @@ import {
   onInstallDone,
   onInstallProgress,
   packManifest,
+  packManifestCached,
   repairInstance,
   setIconFailureSink,
   settingsGet,
@@ -88,6 +94,12 @@ type State = {
    *  telling a player to re-authenticate over a network blip sends them into a
    *  loop that cannot succeed. */
   restoreError: { message: string; needsSignin: boolean } | null
+  /** Why the BOFFMEDIA session did not come back on boot. `code === "store_error"`
+   *  means the credential store itself failed (offline mode cannot help — the
+   *  token cannot be read either); `needsSignin` separates an expired session
+   *  from a plain network blip, which offline mode IS for. Rendered on
+   *  BoffSignIn so a player is never dropped there with no explanation. */
+  boffRestoreError: { message: string; needsSignin: boolean; code?: string } | null
   view: View
   selectedPackId: string | null
   /** One-shot: set when navigation asked the pack detail to open its edit form
@@ -114,6 +126,8 @@ type Action =
   | { type: "boff/code"; code: BoffDeviceCode }
   | { type: "boff/done"; account: BoffAccount }
   | { type: "boff/switched"; account: BoffAccount }
+  | { type: "boff/offline"; account: BoffAccount }
+  | { type: "boff/restore-failed"; message: string; needsSignin: boolean; code?: string }
   | { type: "boff/cancel"; message?: string }
   | { type: "boff/signout" }
   | { type: "boot/step"; step: string }
@@ -152,7 +166,7 @@ type Action =
 function reducer(s: State, a: Action): State {
   switch (a.type) {
     case "boff/start":
-      return { ...s, boffSigningIn: true, boffDeviceCode: null, boffError: null }
+      return { ...s, boffSigningIn: true, boffDeviceCode: null, boffError: null, boffRestoreError: null }
     case "boff/code":
       return { ...s, boffDeviceCode: a.code }
     case "boff/done":
@@ -162,24 +176,50 @@ function reducer(s: State, a: Action): State {
         boffSigningIn: false,
         boffDeviceCode: null,
         boffError: null,
+        boffRestoreError: null,
       }
     case "boff/switched":
       // A different Boffmedia account: its entitlements differ, so the library
-      // is dropped and reloaded (the packs effect keys on boffAccount.id). Same
-      // §7.2 reason as a Minecraft switch — never show one account another's
-      // pack names.
+      // is dropped and reloaded (the packs effect keys on boffAccount.id) —
+      // never show one account another's pack names. The Minecraft session, the
+      // logs and any running-game state belonged to the departing account too
+      // (Rust clears the MSA session on switch), so they are dropped with it.
       return {
         ...s,
         boffAccount: a.account,
+        account: null,
         boffSigningIn: false,
         boffDeviceCode: null,
         boffError: null,
+        boffRestoreError: null,
+        restoreError: null,
+        offline: false,
         packs: [],
         packsError: null,
         packsPartial: null,
         packsLoading: false,
+        logs: [],
+        game: { kind: "idle" },
         view: "packs",
         selectedPackId: null,
+      }
+    case "boff/offline":
+      // Offline Boffmedia principal: the stored token proved a prior sign-in,
+      // but nothing server-side is reachable. The shell opens on installed packs
+      // only; `offline` is what keeps install/update buttons hidden.
+      return {
+        ...s,
+        boffAccount: a.account,
+        offline: true,
+        boffSigningIn: false,
+        boffDeviceCode: null,
+        boffError: null,
+        boffRestoreError: null,
+      }
+    case "boff/restore-failed":
+      return {
+        ...s,
+        boffRestoreError: { message: a.message, needsSignin: a.needsSignin, code: a.code },
       }
     case "boff/cancel":
       return {
@@ -190,13 +230,24 @@ function reducer(s: State, a: Action): State {
       }
     case "boff/signout":
       // Signing out of Boffmedia empties the library too: every managed pack in
-      // it was listed for THAT account's entitlements.
+      // it was listed for THAT account's entitlements. The Minecraft session,
+      // logs and game state went with it (Rust clears the MSA session on
+      // sign-out), and offline mode ends — the next account proves itself fresh.
       return {
         ...s,
         boffAccount: null,
+        account: null,
         boffDeviceCode: null,
         boffSigningIn: false,
+        boffRestoreError: null,
+        restoreError: null,
+        offline: false,
         packs: [],
+        packsError: null,
+        packsPartial: null,
+        packsLoading: false,
+        logs: [],
+        game: { kind: "idle" },
         view: "packs",
         selectedPackId: null,
       }
@@ -374,6 +425,7 @@ const initial: State = {
   bootPacksDone: false,
   bootStep: "Iniciando…",
   restoreError: null,
+  boffRestoreError: null,
   offline: false,
   view: "packs",
   selectedPackId: null,
@@ -392,9 +444,19 @@ type Ctx = State & {
   /** True until every boot gate is open. While it is, render the splash and
    *  NOTHING else — this flag is the whole reason SignIn no longer flashes. */
   booting: boolean
-  /** Enter offline mode as the last account. Resolves to false when this
-   *  machine has no account that ever completed a real sign-in. */
+  /** Enter offline mode as the last Minecraft account. Resolves to false when
+   *  this machine has no account that ever completed a real sign-in. */
   goOffline: () => Promise<boolean>
+  /** Enter offline mode as the last BOFFMEDIA account: opens the shell on
+   *  installed packs when the network is gone but a stored session proves a
+   *  prior sign-in here. Resolves to false when there is nothing to fall back
+   *  to (no stored session, or the credential store is unreadable). */
+  goBoffOffline: () => Promise<boolean>
+  /** True while an install is downloading or a game is live. Account switching
+   *  and sign-out are refused in this window: the process-global session token
+   *  is what those operations authenticate with, and swapping it mid-flight
+   *  re-authenticates their remaining requests as somebody else (C1). */
+  sessionBusy: boolean
   selected: PackEntry | null
   /** Authorize this launcher against a Boffmedia account (device flow). Also the
    *  "add account" action — it keys tokens by account id, so a fresh device flow
@@ -484,6 +546,15 @@ export function LauncherProvider({ children }: { children: React.ReactNode }) {
   // than a dependency so the callbacks do not re-create when the flag flips.
   const offlineRef = React.useRef(state.offline)
   offlineRef.current = state.offline
+  // An install or a live game holds the process-global session token. Switching
+  // account under them re-authenticates their remaining requests as somebody
+  // else (C1), so the switcher disables itself and the callbacks refuse.
+  const sessionBusy =
+    state.game.kind === "running" ||
+    state.game.kind === "preparing" ||
+    state.packs.some((p) => p.state?.kind === "installing")
+  const sessionBusyRef = React.useRef(sessionBusy)
+  sessionBusyRef.current = sessionBusy
   const settingsRef = React.useRef<Settings>(state.settings)
   settingsRef.current = state.settings
   const saveTimer = React.useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -509,8 +580,24 @@ export function LauncherProvider({ children }: { children: React.ReactNode }) {
   // player is already logged in. Polling lives here rather than in Rust so the
   // cadence is the renderer's and no worker sleeps for ten minutes.
   const boffCancelled = React.useRef(false)
+  // Re-entrancy guard: "Add account" and a stray double-click both call this.
+  // A second flow would share the one cancel token and race the first's poll,
+  // committing whichever approval lands — so only one runs at a time.
+  const boffFlowActive = React.useRef(false)
+  // Whether a flow is an ADD (someone already signed in) — its failure banner
+  // lives on BoffSignIn, which an add-account flow returns away from, so the
+  // error would vanish unseen. A toast is the only surface that survives.
+  const boffAccountRef = React.useRef<BoffAccount | null>(state.boffAccount)
+  boffAccountRef.current = state.boffAccount
 
   const boffSignIn = React.useCallback(async () => {
+    if (boffFlowActive.current) return
+    boffFlowActive.current = true
+    const adding = boffAccountRef.current != null
+    const surfaceFailure = (message: string) => {
+      dispatch({ type: "boff/cancel", message })
+      if (adding) toast.error(message)
+    }
     boffCancelled.current = false
     dispatch({ type: "boff/start" })
     try {
@@ -522,13 +609,17 @@ export function LauncherProvider({ children }: { children: React.ReactNode }) {
       for (;;) {
         if (boffCancelled.current) return
         if (Date.now() > deadline) {
-          dispatch({ type: "boff/cancel", message: "El código ha caducado." })
+          surfaceFailure("El código ha caducado.")
           return
         }
         await sleep(intervalMs)
         if (boffCancelled.current) return
 
         const poll = await boffDevicePoll()
+        // The poll can take a full interval; a cancel that landed while it was
+        // in flight must win, or a just-approved session gets committed after
+        // the player already backed out.
+        if (boffCancelled.current) return
         if (poll.status === "approved" && poll.user) {
           // `boff/switched` rather than `boff/done`: this path is reached by the
           // first sign-in AND by "add account", and the latter must drop the
@@ -542,30 +633,29 @@ export function LauncherProvider({ children }: { children: React.ReactNode }) {
           return
         }
         if (poll.status === "denied") {
-          dispatch({ type: "boff/cancel", message: "Has rechazado la autorización." })
+          surfaceFailure("Has rechazado la autorización.")
           return
         }
         if (poll.status === "expired") {
-          dispatch({ type: "boff/cancel", message: "El código ha caducado." })
+          surfaceFailure("El código ha caducado.")
           return
         }
       }
     } catch (err) {
       const failure = err as { message?: string }
-      dispatch({
-        type: "boff/cancel",
-        message: failure?.message ?? "No se pudo autorizar el launcher.",
-      })
-      log({
-        level: "error",
-        source: "launcher",
-        text: failure?.message ?? "No se pudo autorizar el launcher.",
-      })
+      const message = failure?.message ?? "No se pudo autorizar el launcher."
+      surfaceFailure(message)
+      log({ level: "error", source: "launcher", text: message })
+    } finally {
+      boffFlowActive.current = false
     }
   }, [log])
 
   const cancelBoffSignIn = React.useCallback(() => {
     boffCancelled.current = true
+    // Drop the pending authorization server-side too, so a late approval can
+    // never be committed by a stray in-flight poll resolving after this.
+    void boffDeviceCancel()
     dispatch({ type: "boff/cancel" })
   }, [])
 
@@ -580,9 +670,14 @@ export function LauncherProvider({ children }: { children: React.ReactNode }) {
   }, [])
 
   const boffSignOutFn = React.useCallback(async () => {
+    // The backing token is mid-use while an install runs or a game is live;
+    // Rust refuses the sign-out, but disabling it here is the real guard.
+    if (sessionBusyRef.current) return
     setSwitchingBoffAccount(true)
     try {
       const next = await boffSignOut()
+      runningPackId.current = null
+      busy.current.clear()
       if (next) {
         // Another account was promoted in place of the one signed out.
         dispatch({ type: "boff/switched", account: next })
@@ -607,10 +702,12 @@ export function LauncherProvider({ children }: { children: React.ReactNode }) {
 
   const switchBoffAccount = React.useCallback(
     async (id: number) => {
-      if (id === state.boffAccount?.id || switchingBoffAccount) return
+      if (id === state.boffAccount?.id || switchingBoffAccount || sessionBusyRef.current) return
       setSwitchingBoffAccount(true)
       try {
         const account = await boffSwitch(id)
+        runningPackId.current = null
+        busy.current.clear()
         dispatch({ type: "boff/switched", account })
         log({ level: "info", source: "launcher", text: `Cuenta activa: ${account.username}` })
       } catch (err) {
@@ -730,6 +827,30 @@ export function LauncherProvider({ children }: { children: React.ReactNode }) {
     }
   }, [log])
 
+  // The BOFFMEDIA equivalent: open the shell on installed packs when the network
+  // is gone but a stored session proves a prior sign-in here. Fails closed when
+  // there is nothing to fall back to (no session, or an unreadable keychain),
+  // which leaves the player on BoffSignIn with the restore error still shown.
+  const goBoffOffline = React.useCallback(async () => {
+    try {
+      const account = await boffOffline()
+      dispatch({ type: "boff/offline", account })
+      log({
+        level: "warn",
+        source: "launcher",
+        text: `Modo sin conexión como ${account.username}. Solo packs ya instalados.`,
+      })
+      return true
+    } catch (err) {
+      log({
+        level: "info",
+        source: "launcher",
+        text: (err as { message?: string })?.message ?? "No hay ninguna cuenta de Boffmedia guardada.",
+      })
+      return false
+    }
+  }, [log])
+
   // Silent sign-in on start. A THROW here is a real failure — a credential
   // store that could not be read, or Minecraft refusing the chain — and §5.7
   // says it must never be swallowed into "please sign in". The Rust side
@@ -775,12 +896,21 @@ export function LauncherProvider({ children }: { children: React.ReactNode }) {
           text: `Launcher autorizado como ${account.username}`,
         })
       })
-      .catch((err: { message?: string }) => {
-        log({
-          level: "error",
-          source: "launcher",
-          text: err?.message ?? "No se pudo restaurar la sesión del launcher.",
-        })
+      .catch(async (err: { message?: string; needsSignin?: boolean; code?: string }) => {
+        // Surfaced on BoffSignIn, not just logged: a player dropped there must
+        // know why. `code === "store_error"` means the keychain itself failed —
+        // offline mode cannot help (it reads the same token). A dead session
+        // (needsSignin) genuinely needs re-authorising. Anything else is a
+        // network blip, which is exactly what offline mode is for.
+        const message = err?.message ?? "No se pudo restaurar la sesión del launcher."
+        const needsSignin = err?.needsSignin ?? false
+        const code = err?.code
+        dispatch({ type: "boff/restore-failed", message, needsSignin, code })
+        log({ level: "error", source: "launcher", text: message })
+
+        if (needsSignin || code === "store_error") return
+        dispatch({ type: "boot/step", step: "Sin conexión — usando tu cuenta guardada…" })
+        await goBoffOffline()
       })
 
     void authRestore()
@@ -809,12 +939,11 @@ export function LauncherProvider({ children }: { children: React.ReactNode }) {
         await goOffline()
       })
       .finally(openGate)
-  }, [log, goOffline])
+  }, [log, goOffline, goBoffOffline])
 
   // Packs arrive only once there is a BOFFMEDIA account: the server filters by
-  // that account's entitlements. The id — not the account object — is the
-  // dependency, so a re-render cannot refetch.
-  const accountUuid = state.boffAccount?.id ?? null
+  // that account's entitlements. `boffAccountId` (declared above for the roster
+  // reload) is the id, not the account object, so a re-render cannot refetch.
   const bootAuthDone = state.bootAuthDone
   // SEPARATE from the load effect on purpose. Folding this into it meant
   // `bootAuthDone` had to be a dependency, and flipping it re-ran the whole
@@ -825,11 +954,11 @@ export function LauncherProvider({ children }: { children: React.ReactNode }) {
   React.useEffect(() => {
     // Nothing to wait for: auth settled and there is no account, so no fetch
     // is coming. Without this a first-run player would sit on the splash.
-    if (bootAuthDone && !accountUuid) dispatch({ type: "boot/done", part: "packs" })
-  }, [bootAuthDone, accountUuid])
+    if (bootAuthDone && !boffAccountId) dispatch({ type: "boot/done", part: "packs" })
+  }, [bootAuthDone, boffAccountId])
 
   React.useEffect(() => {
-    if (!accountUuid) return
+    if (!boffAccountId) return
     let cancelled = false
 
     dispatch({ type: "boot/step", step: "Cargando tu biblioteca…" })
@@ -867,7 +996,7 @@ export function LauncherProvider({ children }: { children: React.ReactNode }) {
     return () => {
       cancelled = true
     }
-  }, [accountUuid, log, reloadToken])
+  }, [boffAccountId, log, reloadToken])
 
   // Shell events. Every one of these is a fire-and-forget stream from Rust, so
   // the reducer is the only thing that has to be correct here — and the
@@ -1038,7 +1167,30 @@ export function LauncherProvider({ children }: { children: React.ReactNode }) {
         // The pid is already on its way as a `game://state` running event, and
         // that event is authoritative — a crash can beat this resolve, and
         // dispatching "running" here would paper over it.
-        const manifest = await manifestFor(packId)
+        //
+        // Emu-M3 — `manifestFor` hits the network, so offline it throws and an
+        // already-installed emulator pack could not launch. Fall back to the
+        // manifest cached on the last successful fetch: it drives the same
+        // Java-free launch, and any randomizer clean-ROM gate is still rebuilt
+        // in Rust from the on-disk marker, so the fallback cannot weaken it.
+        // Scoped to emulator packs — Minecraft keeps its own offline path.
+        let manifest: unknown
+        try {
+          manifest = await manifestFor(packId)
+        } catch (err) {
+          const entry = packsRef.current.find((p) => p.pack.id === packId)
+          const cached =
+            offlineRef.current && entry?.pack.gameType === "emulator"
+              ? await packManifestCached(entry.pack.slug)
+              : null
+          if (!cached) throw err
+          log({
+            level: "warn",
+            source: "launcher",
+            text: "Sin conexión: usando el manifiesto guardado de este pack.",
+          })
+          manifest = cached
+        }
         try {
           await launchPack(packId, manifest)
         } catch (err) {
@@ -1204,27 +1356,30 @@ export function LauncherProvider({ children }: { children: React.ReactNode }) {
     [log, reloadAccounts],
   )
 
-  // Re-mint the CURRENT session: run the full refresh chain again and drop the
-  // stale launcher JWT (auth_switch does both, even for the already-active uuid,
-  // which is why revalidating is just a switch to yourself). Fixes the "packs
-  // won't load / 401" state after a refresh token silently went stale mid-session
-  // without making the player sign out and back in.
+  // Re-check the BOFFMEDIA session against `/me` — the launcher JWT is what the
+  // pack list authenticates with, and it going stale mid-session is what the
+  // "packs won't load / 401" state is. A live answer refreshes the account; a
+  // dead one (Rust prunes it and resolves null) lands on BoffSignIn rather than
+  // looping. The Minecraft session is a separate, launch-time concern.
   const revalidate = React.useCallback(async () => {
-    const uuid = state.account?.uuid
-    if (!uuid || revalidating || switchingAccount) return
+    if (!state.boffAccount || revalidating) return
     setRevalidating(true)
     try {
-      const account = await authSwitch(uuid)
-      dispatch({ type: "account/switched", account })
-      log({ level: "info", source: "launcher", text: "Sesión revalidada." })
+      const account = await boffRevalidate()
+      if (account) {
+        dispatch({ type: "boff/done", account })
+        log({ level: "info", source: "launcher", text: "Sesión revalidada." })
+      } else {
+        dispatch({ type: "boff/signout" })
+        log({ level: "warn", source: "launcher", text: "Tu sesión ya no es válida. Vuelve a autorizar el launcher." })
+      }
     } catch (err) {
       const message = (err as { message?: string })?.message ?? "No se pudo revalidar la sesión."
       log({ level: "error", source: "launcher", text: message })
-      reloadAccounts()
     } finally {
       setRevalidating(false)
     }
-  }, [state.account?.uuid, revalidating, switchingAccount, log, reloadAccounts])
+  }, [state.boffAccount, revalidating, log])
 
   // The i18n store is a module-level signal, not React state, so the language
   // is applied by pushing settings.locale into it whenever it changes — the boot
@@ -1237,6 +1392,8 @@ export function LauncherProvider({ children }: { children: React.ReactNode }) {
     ...state,
     booting: !(state.bootAuthDone && state.bootSettingsDone && state.bootPacksDone),
     goOffline,
+    goBoffOffline,
+    sessionBusy,
     selected: state.packs.find((p) => p.pack.id === state.selectedPackId) ?? null,
     boffSignIn,
     cancelBoffSignIn,
@@ -1247,8 +1404,11 @@ export function LauncherProvider({ children }: { children: React.ReactNode }) {
     signIn,
     cancelSignIn: () => dispatch({ type: "signin/cancel" }),
     signOut: () => {
+      // "Leave this machine clean": auth_logout forgets every Minecraft account
+      // AND the launcher session (api.forget_session), so the renderer drops the
+      // Boffmedia principal too and lands back on BoffSignIn.
       void authLogout()
-      dispatch({ type: "signout" })
+      dispatch({ type: "boff/signout" })
     },
     accounts,
     switchingAccount,

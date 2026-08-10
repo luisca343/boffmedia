@@ -36,8 +36,29 @@ function CopyButton({ value, label }: { value: string; label: string }) {
 }
 
 export function BoffSignIn() {
-  const { boffSignIn, cancelBoffSignIn, boffSigningIn, boffDeviceCode, boffError } = useLauncher()
+  const {
+    boffSignIn,
+    cancelBoffSignIn,
+    boffSigningIn,
+    boffDeviceCode,
+    boffError,
+    boffRestoreError,
+    goBoffOffline,
+  } = useLauncher()
   const t = useT("boffSignin")
+
+  // A network-failed restore is the only case offline mode can rescue: a dead
+  // session must be re-authorised, and a credential-store failure means the
+  // stored token cannot be read either, so there is nothing to fall back to.
+  const canPlayOffline =
+    !!boffRestoreError && !boffRestoreError.needsSignin && boffRestoreError.code !== "store_error"
+  const restoreTitle = boffRestoreError
+    ? boffRestoreError.needsSignin
+      ? t("restoreExpiredTitle")
+      : boffRestoreError.code === "store_error"
+        ? t("restoreStoreTitle")
+        : t("restoreOfflineTitle")
+    : ""
 
   return (
     <div className="grid h-full place-items-center px-8 py-10">
@@ -49,6 +70,12 @@ export function BoffSignIn() {
           </h1>
           <p className="mt-3 text-sm text-txt-muted">{t("subtitle")}</p>
         </div>
+
+        {boffRestoreError && !boffSigningIn && (
+          <Banner tone="warn" title={restoreTitle} className="mb-4">
+            {boffRestoreError.message}
+          </Banner>
+        )}
 
         {boffError && !boffSigningIn && (
           <Banner tone="warn" title={t("failedTitle")} className="mb-4">
@@ -65,6 +92,21 @@ export function BoffSignIn() {
               <Button variant="pri" size="lg" icon="external" onClick={() => void boffSignIn()}>
                 {t("button")}
               </Button>
+              {canPlayOffline && (
+                <>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    icon="play"
+                    onClick={() => void goBoffOffline()}
+                  >
+                    {t("playOffline")}
+                  </Button>
+                  <p className="max-w-[380px] text-center text-xs text-txt-dim">
+                    {t("playOfflineHint")}
+                  </p>
+                </>
+              )}
               <p className="max-w-[380px] text-center text-xs text-txt-dim">{t("securityNote")}</p>
             </div>
           </Panel>

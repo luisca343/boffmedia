@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { AchievementsRepository } from '../../../_repositories/boffmedia/achievements.repository';
 import { Achievement } from '@/_db/schema/BoffMediaEvents';
-import { CreateAchievementDto } from '../dto/create-achievement.dto';
+import { CreateEventAchievementDto } from '../dto/create-achievement.dto';
 import { UpdateAchievementDto } from '../dto/update-achievement.dto';
 
 @Injectable()
@@ -31,7 +31,7 @@ export class AchievementsService {
 
   async createAchievement(
     eventId: number,
-    createAchievementDto: CreateAchievementDto,
+    createAchievementDto: CreateEventAchievementDto,
   ): Promise<Achievement> {
     const achievementData = {
       eventId,
@@ -54,15 +54,20 @@ export class AchievementsService {
     id: number,
     updateAchievementDto: UpdateAchievementDto,
   ): Promise<Achievement> {
-    const achievementData = {
-      name: updateAchievementDto.name,
-      description: updateAchievementDto.description,
-      icon: updateAchievementDto.icon,
-      maxProgress: updateAchievementDto.maxProgress || 1,
-      points: updateAchievementDto.points,
-      category: updateAchievementDto.category,
-      rarity: updateAchievementDto.rarity,
-      order: updateAchievementDto.order || 0,
+    // Only the keys actually sent are written: `maxProgress || 1` turned any
+    // partial PATCH into a silent reset to 1 (instantly "completing" every
+    // in-flight progress row) and `order || 0` dropped the display order.
+    const d = updateAchievementDto;
+    const achievementData: Partial<Achievement> = {
+      ...(d.name !== undefined ? { name: d.name } : {}),
+      ...(d.description !== undefined ? { description: d.description } : {}),
+      ...(d.icon !== undefined ? { icon: d.icon } : {}),
+      ...(d.maxProgress !== undefined ? { maxProgress: d.maxProgress } : {}),
+      ...(d.points !== undefined ? { points: d.points } : {}),
+      ...(d.itemType !== undefined ? { itemType: d.itemType } : {}),
+      ...(d.category !== undefined ? { category: d.category } : {}),
+      ...(d.rarity !== undefined ? { rarity: d.rarity } : {}),
+      ...(d.order !== undefined ? { order: d.order } : {}),
     };
 
     await this.achievementsRepository.update(id, achievementData);

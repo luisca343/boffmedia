@@ -180,7 +180,7 @@ describe('AuthService', () => {
 
   describe('refreshToken()', () => {
     it('should issue new tokens from a valid JWT string', async () => {
-      const payload = { sub: 1, username: 'TrainerAsh' };
+      const payload = { sub: 1, username: 'TrainerAsh', typ: 'refresh' };
       jwtService.verify.mockReturnValue(payload);
       usersService.getUserWithIntegrations.mockResolvedValue(
         mockUserWithIntegrations as any,
@@ -190,6 +190,20 @@ describe('AuthService', () => {
 
       expect(result.access_token).toBe('mock-token');
       expect(result.user.id).toBe(1);
+    });
+
+    it('should reject a token that is not a refresh token', async () => {
+      // A typ-less payload is an ACCESS token: replaying one here used to mint
+      // a fresh session, which is the hole `typ:'refresh'` closed.
+      jwtService.verify.mockReturnValue({ sub: 1, username: 'TrainerAsh' });
+      await expect(service.refreshToken('access-token-string')).rejects.toThrow(
+        UnauthorizedException,
+      );
+
+      jwtService.verify.mockReturnValue({ sub: 1, typ: 'launcher' });
+      await expect(
+        service.refreshToken('launcher-token-string'),
+      ).rejects.toThrow(UnauthorizedException);
     });
 
     it('should throw UnauthorizedException when passed a non-string', async () => {

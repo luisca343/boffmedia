@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -35,9 +36,9 @@ import {
   CatalogProjectsQueryDto,
   CatalogSearchQueryDto,
   LoaderVersionsQueryDto,
-  CreateInviteDto,
+  CreatePackInviteDto,
   CreatePackDto,
-  CreateVersionDto,
+  CreatePackVersionDto,
   GrantAccessDto,
   GrantUserAccessDto,
   ResolveFileDto,
@@ -89,6 +90,17 @@ export class PacksController {
     return this.packs.listForAdmin(archived === 'true') as Promise<
       AdminPackEntity[]
     >;
+  }
+
+  @Get(':id')
+  @ApiOperation({
+    summary: 'Un pack completo',
+    description:
+      'Incluye descripción y galería, que el listado omite — es lo que precarga el formulario de edición.',
+  })
+  @ApiResponse({ status: HttpStatus.OK, type: AdminPackEntity })
+  async detail(@Param('id') id: string): Promise<AdminPackEntity> {
+    return this.packs.adminPack(id) as Promise<AdminPackEntity>;
   }
 
   @Post()
@@ -283,7 +295,7 @@ export class PacksController {
   @ApiResponse({ status: HttpStatus.CREATED, type: PackIdEntity })
   async createVersion(
     @Param('id') id: string,
-    @Body() dto: CreateVersionDto,
+    @Body() dto: CreatePackVersionDto,
     @Req() req: { user?: { userId?: number } },
   ): Promise<PackIdEntity> {
     return this.packs.createVersion(id, dto, this.actorId(req));
@@ -313,7 +325,7 @@ export class PacksController {
   async updateVersion(
     @Param('id') id: string,
     @Param('versionId') versionId: string,
-    @Body() dto: CreateVersionDto,
+    @Body() dto: CreatePackVersionDto,
     @Req() req: { user?: { userId?: number } },
   ): Promise<{ success: true }> {
     await this.packs.updateVersion(id, versionId, dto, this.actorId(req));
@@ -341,8 +353,14 @@ export class PacksController {
     @Param('id') id: string,
     @Param('versionId') versionId: string,
     @Req() req: { user?: { userId?: number } },
+    @Query('allowRollback') allowRollback?: string,
   ): Promise<{ success: true }> {
-    await this.packs.publishVersion(id, versionId, this.actorId(req));
+    await this.packs.publishVersion(
+      id,
+      versionId,
+      this.actorId(req),
+      allowRollback === 'true',
+    );
     return { success: true };
   }
 
@@ -383,13 +401,21 @@ export class PacksController {
   }
 
   @Delete(':id/access/user/:userId')
-  @ApiOperation({ summary: 'Revocar el acceso de una cuenta' })
+  @ApiOperation({
+    summary: 'Revocar el acceso de una cuenta',
+    description:
+      '`?source=admin|invite` revoca solo esa concesión; sin él, todas.',
+  })
   async revokeFromUser(
     @Param('id') id: string,
     @Param('userId', ParseIntPipe) userId: number,
     @Req() req: { user?: { userId?: number } },
+    @Query('source') source?: string,
   ): Promise<{ success: true }> {
-    await this.packs.revokeFromUser(id, userId, this.actorId(req));
+    if (source !== undefined && source !== 'admin' && source !== 'invite') {
+      throw new BadRequestException('source debe ser admin o invite');
+    }
+    await this.packs.revokeFromUser(id, userId, this.actorId(req), source);
     return { success: true };
   }
 
@@ -432,7 +458,7 @@ export class PacksController {
   @ApiResponse({ status: HttpStatus.CREATED, type: InviteCodeEntity })
   async createInvite(
     @Param('id') id: string,
-    @Body() dto: CreateInviteDto,
+    @Body() dto: CreatePackInviteDto,
     @Req() req: { user?: { userId?: number } },
   ): Promise<InviteCodeEntity> {
     return this.packs.createInvite(
@@ -445,8 +471,11 @@ export class PacksController {
 
   @Delete('invites/:code')
   @ApiOperation({ summary: 'Revocar una invitación' })
-  async revokeInvite(@Param('code') code: string): Promise<{ success: true }> {
-    await this.packs.revokeInvite(code);
+  async revokeInvite(
+    @Param('code') code: string,
+    @Req() req: { user?: { userId?: number } },
+  ): Promise<{ success: true }> {
+    await this.packs.revokeInvite(code, this.actorId(req));
     return { success: true };
   }
 

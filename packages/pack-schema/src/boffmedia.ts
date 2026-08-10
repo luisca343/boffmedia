@@ -427,6 +427,18 @@ export const PackManifest = z
           })
         }
       }
+      // The ROM container must match the emulator kind: mgba runs GBA (.gba),
+      // melonDS runs DS (.nds). The file is handed to the emulator verbatim, so a
+      // .nds under mgba opens the wrong core. Mirrored in pack.rs::validate_emulator.
+      const romLower = v.emulator.rom.toLowerCase()
+      const wantExt = v.emulator.kind === "mgba" ? ".gba" : ".nds"
+      if (!romLower.endsWith(wantExt)) {
+        ctx.addIssue({
+          code: "custom",
+          path: ["version", "emulator", "rom"],
+          message: `a ${v.emulator.kind} ROM must end in ${wantExt}: ${v.emulator.rom}`,
+        })
+      }
     }
   })
 export type PackManifest = z.infer<typeof PackManifest>

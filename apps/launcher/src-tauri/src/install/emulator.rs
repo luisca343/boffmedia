@@ -63,18 +63,46 @@ async fn install_payload(
         .cloned()
         .collect();
 
+    let previous = super::read_marker(&prepared.instance);
+
+    // The randomizer ROM slot is only skipped while the gate is still ARMED (the
+    // player has not patched the ROM for this event). Skipping it whenever a
+    // randomizer block exists — as the first cut did — meant a deleted ROM could
+    // never self-heal: the payload pass refused to touch the slot even once the
+    // player had a valid randomized ROM in the local blob store. Once the gate is
+    // satisfied the slot is a normal content-addressed file; rewriting its
+    // expected hash to the randomized output below lets fetch_one restore it from
+    // that blob store without a re-download.
+    let gate_armed = manifest.randomizer.is_some()
+        && previous
+            .as_ref()
+            .map(super::compute_randomizer_blocked)
+            .unwrap_or(true);
+
     // Everything that is actually fetchable in one pass (emulators have no
     // `mods/`, so there is no separate mods phase). Unsatisfied user-provided
     // ROMs skip inside fetch_one; patched files are materialized separately.
-    // Randomizer-managed ROM slots are also skipped here and populated by the
-    // randomizer auto-flow after install.
-    let downloadable: Vec<PlannedFile> = wanted
-        .iter()
-        .filter(|f| !matches!(f.fetch, Fetch::Patched { .. }))
-        .cloned()
-        .collect();
-    // Skip the ROM slot if this pack is linked to a randomizer event
-    let skip_paths = if manifest.randomizer.is_some() {
+    let downloadable: Vec<PlannedFile> = {
+        let mut files: Vec<PlannedFile> = wanted
+            .iter()
+            .filter(|f| !matches!(f.fetch, Fetch::Patched { .. }))
+            .cloned()
+            .collect();
+        if let Some(gate) = manifest.randomizer.as_ref().filter(|_| !gate_armed) {
+            if let Some((sha512, size)) =
+                randomized_rom_hash(previous.as_ref(), &prepared.plan.rom, &gate.clean_rom_sha512.to_string())
+            {
+                let norm = |p: &str| p.to_lowercase().replace('\\', "/");
+                let rom_key = norm(&prepared.plan.rom);
+                if let Some(rom) = files.iter_mut().find(|f| norm(&f.path) == rom_key) {
+                    rom.sha512 = sha512;
+                    rom.size = size;
+                }
+            }
+        }
+        files
+    };
+    let skip_paths = if gate_armed {
         vec![prepared.plan.rom.clone()]
     } else {
         vec![]
@@ -119,7 +147,6 @@ async fn install_payload(
 
     reporter.emit(Phase::Verifying, 0.5, "", 0, 0);
 
-    let previous = super::read_marker(&prepared.instance);
     let mut marker = build_marker(&prepared.plan, &wanted, manifest, previous.as_ref());
     // A pin survives a re-verify of the SAME version (every launch does one)
     // and is cleared by an install of a different one — an explicit update.
@@ -199,6 +226,24 @@ fn preserve_randomizer_rom_hash(
             entry.size = size;
         }
     }
+}
+
+/// The player's randomized ROM hash + size from the previous marker, if that
+/// entry has been patched away from the clean ROM. Used to re-point the payload
+/// pass at the blob-store copy so a deleted randomized ROM self-heals.
+fn randomized_rom_hash(
+    previous: Option<&Marker>,
+    rom_path: &str,
+    clean_sha512: &str,
+) -> Option<(String, u64)> {
+    let norm = |p: &str| p.to_lowercase().replace('\\', "/");
+    let key = norm(rom_path);
+    previous?
+        .managed
+        .iter()
+        .find(|f| norm(&f.path) == key)
+        .filter(|f| !f.sha512.eq_ignore_ascii_case(clean_sha512))
+        .map(|f| (f.sha512.clone(), f.size))
 }
 
 fn build_marker(
@@ -407,52 +452,59 @@ fn spawn(app: &tauri::AppHandle, prepared: &EmulatorPrepared) -> Result<RunningG
     let method = crate::emulators::resolve_method(kind, &prepared.settings)
         .map_err(InstallFailure::message)?;
 
-    let rom = prepared
-        .instance
-        .minecraft
-        .join(prepared.plan.rom.replace('\\', "/"));
+    // §9 path hygiene: the ROM path comes from a marker on the player's disk, so
+    // join it through the same traversal guard the file pipeline uses rather than
+    // trusting it into a naive `join`.
+    let rom = instance::safe_join(&prepared.instance.minecraft, &instance::normalise(&prepared.plan.rom))
+        .ok_or_else(|| {
+            InstallFailure::message(format!("Ruta de ROM no válida: {}", prepared.plan.rom))
+        })?;
 
     // Randomizer event gate: if this pack is linked to an active randomizer,
     // verify the ROM has been patched (expected sha512 != clean_rom_sha512).
     if let Some(marker) = super::read_marker(&prepared.instance) {
         if let Some(gate) = &marker.randomizer {
-            // Find the ROM's managed entry to get its expected sha512
+            // Find the ROM's managed entry to get its expected sha512. Fail
+            // CLOSED: a gate with no resolved ROM entry must refuse to launch, not
+            // fall through to the plain existence check below and start the game
+            // with whatever (unverified) ROM happens to sit in the slot.
             let norm = |p: &str| p.to_lowercase().replace('\\', "/");
             let rom_key = norm(&prepared.plan.rom);
-            if let Some(rom_entry) = marker
-                .managed
-                .iter()
-                .find(|f| norm(&f.path) == rom_key)
-            {
-                // ROM file missing → not patched (player needs to get their ROM)
-                if !rom.is_file() {
-                    return Err(InstallFailure::with_code(
-                        "Este pack está vinculado a un evento de randomizador que requiere que parches el ROM antes de jugar.",
-                        "randomizer_not_patched",
-                    ));
-                }
+            let Some(rom_entry) = marker.managed.iter().find(|f| norm(&f.path) == rom_key) else {
+                return Err(InstallFailure::with_code(
+                    "Este pack está vinculado a un evento de randomizador pero su ROM aún no está resuelto. Vuelve a instalar el pack para descargar tu ROM randomizado.",
+                    "randomizer_not_patched",
+                ));
+            };
 
-                let expected_sha512 = &rom_entry.sha512;
-                // If expected == clean, the player never patched the ROM
-                if expected_sha512.eq_ignore_ascii_case(&gate.clean_rom_sha512) {
+            // ROM file missing → not patched (player needs to get their ROM)
+            if !rom.is_file() {
+                return Err(InstallFailure::with_code(
+                    "Este pack está vinculado a un evento de randomizador que requiere que parches el ROM antes de jugar.",
+                    "randomizer_not_patched",
+                ));
+            }
+
+            let expected_sha512 = &rom_entry.sha512;
+            // If expected == clean, the player never patched the ROM
+            if expected_sha512.eq_ignore_ascii_case(&gate.clean_rom_sha512) {
+                return Err(InstallFailure::with_code(
+                    "Este pack está vinculado a un evento de randomizador que requiere que parches el ROM antes de jugar.",
+                    "randomizer_not_patched",
+                ));
+            }
+            // Otherwise, verify the actual file matches the expected hash
+            if let Some(actual_sha512) = files::sha512_of(&rom) {
+                if !actual_sha512.eq_ignore_ascii_case(expected_sha512) {
                     return Err(InstallFailure::with_code(
-                        "Este pack está vinculado a un evento de randomizador que requiere que parches el ROM antes de jugar.",
-                        "randomizer_not_patched",
+                        "El ROM no coincide con el esperado. Asegúrate de que has descargado la versión correcta randomizada.",
+                        "randomizer_rom_mismatch",
                     ));
                 }
-                // Otherwise, verify the actual file matches the expected hash
-                if let Some(actual_sha512) = files::sha512_of(&rom) {
-                    if !actual_sha512.eq_ignore_ascii_case(expected_sha512) {
-                        return Err(InstallFailure::with_code(
-                            "El ROM no coincide con el esperado. Asegúrate de que has descargado la versión correcta randomizada.",
-                            "randomizer_rom_mismatch",
-                        ));
-                    }
-                } else {
-                    return Err(InstallFailure::message(
-                        "No se pudo verificar la integridad del ROM."
-                    ));
-                }
+            } else {
+                return Err(InstallFailure::message(
+                    "No se pudo verificar la integridad del ROM."
+                ));
             }
         }
     }

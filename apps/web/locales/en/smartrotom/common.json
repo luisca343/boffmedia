@@ -21,6 +21,9 @@
     },
     "auth": {
       "linkAccount": "Link Account",
+      "linkMovedTitle": "Link on the website",
+      "linkMovedLead": "In-game linking has moved. To connect your Minecraft account to a BoffMedia account, open the website in a browser and link or create your account there.",
+      "close": "Close",
       "linkExisting": "Link Existing Account",
       "createNew": "Create New Account",
       "minecraftUser": "Minecraft User:",

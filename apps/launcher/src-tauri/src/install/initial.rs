@@ -94,7 +94,7 @@ async fn fetch_initial_bytes(
             } else {
                 let pack_file = crate::api::PackFile::Override { sha512 };
                 let response =
-                    crate::api::fetch_pack_file(app, pack_id, password, &pack_file)
+                    crate::api::fetch_pack_file(app, pack_id, password, &pack_file, None)
                         .await
                         .map_err(|e| format!("{e:?}"))?;
                 let bytes = response.bytes().await.map_err(|e| e.to_string())?;

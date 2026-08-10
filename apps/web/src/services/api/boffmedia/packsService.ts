@@ -47,17 +47,25 @@ export interface AdminPack {
   updatedAt: string;
 }
 
+/** The list row plus the two long fields the list omits. Declared locally until
+ *  `pnpm generate:shared` picks up the GET /packs/admin/:id entity. */
+export interface AdminPackDetail extends AdminPack {
+  description: string | null;
+  gallery: GalleryImage[] | null;
+}
+
 export interface PackVersionRow {
   id: string;
   packId: string;
   name: string;
-  minecraft: string;
+  /** null for every non-Minecraft version. */
+  minecraft: string | null;
   loader: PackLoader | null;
   loaderVersion: string | null;
   fileCount: number;
+  worldCount: number;
   published: boolean;
   notes: string | null;
-  gameType: GameType;
   // Emulator pack fields (Cycle 2, awaiting reconciliation via pnpm generate:shared)
   emulatorKind?: 'mgba' | 'melonds';
   createdAt: string;
@@ -247,6 +255,12 @@ export class PacksService {
     return apiAuthedAutoPOST<{ id: string }>('/packs/admin', input);
   }
 
+  /** The only read that carries `description`/`gallery` — the list omits both,
+   *  so an edit form MUST prefill from here or it blanks them on save. */
+  static detail(id: string) {
+    return apiAuthedAutoGET<AdminPackDetail>(`/packs/admin/${id}`);
+  }
+
   static update(id: string, input: UpdatePackInput) {
     return apiAuthedAutoPATCH<void>(`/packs/admin/${id}`, input);
   }
@@ -410,9 +424,11 @@ export class PacksService {
     return apiAuthedAutoPOST<void>(`/packs/admin/${packId}/access`, { userId });
   }
 
-  static revokeFromUser(packId: string, userId: number) {
+  /** `source` scopes the revoke to one grant source (admin vs invite) so the
+   *  other survives; older APIs ignore the param and delete both. */
+  static revokeFromUser(packId: string, userId: number, source?: 'admin' | 'invite') {
     return apiAuthedAutoDELETE<void>(
-      `/packs/admin/${packId}/access/user/${userId}`,
+      `/packs/admin/${packId}/access/user/${userId}${source ? `?source=${source}` : ''}`,
     );
   }
 

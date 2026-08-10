@@ -10,7 +10,7 @@ import {
   type DeviceRequest,
 } from "@/services/api/boffmedia/launcherAuthService"
 
-type Phase = "code" | "confirm" | "approved" | "denied"
+type Phase = "code" | "confirm" | "approved" | "denied" | "already-approved" | "already-denied"
 
 /**
  * The website half of the launcher's device-authorization flow.
@@ -41,9 +41,13 @@ export function AuthorizeLauncherView() {
         const res = await LauncherAuthService.describe(value)
         if (res.success && res.data) {
           setRequest(res.data)
-          setPhase("confirm")
+          // A code that is already decided cannot be decided again — offering
+          // Approve/Deny on it only produces a 400.
+          if (res.data.status === "approved") setPhase("already-approved")
+          else if (res.data.status === "denied") setPhase("already-denied")
+          else setPhase("confirm")
         } else {
-          setError(res.error ?? t("notFound"))
+          setError(res.userMessage ?? res.error ?? t("notFound"))
         }
       } catch (e) {
         setError(e instanceof Error ? e.message : t("notFound"))
@@ -105,6 +109,20 @@ export function AuthorizeLauncherView() {
               <Icon name="x" size={34} className="mx-auto text-txt-dim" />
               <p className="font-display text-[20px] font-bold uppercase">{t("deniedTitle")}</p>
               <p className="font-body text-[14px] text-txt-muted">{t("deniedLead")}</p>
+            </div>
+          ) : phase === "already-approved" || phase === "already-denied" ? (
+            <div className="grid gap-3 py-4 text-center">
+              <Icon
+                name={phase === "already-approved" ? "check" : "x"}
+                size={34}
+                className={phase === "already-approved" ? "mx-auto text-ok" : "mx-auto text-txt-dim"}
+              />
+              <p className="font-display text-[20px] font-bold uppercase">
+                {t(phase === "already-approved" ? "alreadyApprovedTitle" : "alreadyDeniedTitle")}
+              </p>
+              <p className="font-body text-[14px] text-txt-muted">
+                {t(phase === "already-approved" ? "alreadyApprovedLead" : "alreadyDeniedLead")}
+              </p>
             </div>
           ) : phase === "confirm" && request ? (
             <div className="grid gap-4">

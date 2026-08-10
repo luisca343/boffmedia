@@ -5,12 +5,13 @@ import {
   Injectable,
   Logger,
   NotFoundException,
+  PayloadTooLargeException,
   ServiceUnavailableException,
 } from '@nestjs/common';
 import { createHash, randomUUID } from 'crypto';
 import { createReadStream, createWriteStream } from 'fs';
 import { mkdir, rename, rm, stat } from 'fs/promises';
-import { dirname, join } from 'path';
+import { dirname, join, resolve } from 'path';
 import type { Readable } from 'stream';
 import { pipeline } from 'stream/promises';
 import { firstValueFrom } from 'rxjs';
@@ -23,6 +24,10 @@ import { laboonPath } from '@/config/laboon';
 // NOT proxied: they need no key and the egress would be ours for nothing.
 
 const CF_API = 'https://api.curseforge.com/v1';
+
+/** An unbounded raw-body upload can fill the laboon volume, which also hosts
+ *  launcher releases. Checked as the bytes stream in, never after. */
+const MAX_BLOB_BYTES = 512 * 1024 * 1024;
 
 /** §3.2 / §10 — as of 16 July 2026 `edge.forgecdn.net` answers 401 to any
  *  request without this header. It is a header, never a query parameter; any
@@ -229,15 +234,27 @@ export class PacksDownloadsService {
 
     const hash = createHash('sha512');
     let size = 0;
+    let tooLarge = false;
     source.on('data', (chunk: Buffer) => {
-      hash.update(chunk);
       size += chunk.length;
+      if (size > MAX_BLOB_BYTES) {
+        tooLarge = true;
+        source.destroy();
+        return;
+      }
+      hash.update(chunk);
     });
 
     try {
       await pipeline(source, createWriteStream(temp));
     } catch (error: unknown) {
       await rm(temp, { force: true });
+      if (tooLarge) {
+        throw new PayloadTooLargeException({
+          message: `blob exceeds ${MAX_BLOB_BYTES} bytes`,
+          userMessage: 'Ese archivo es demasiado grande (máx. 512 MB).',
+        });
+      }
       throw new BadRequestException({
         message: `blob upload failed: ${asMessage(error)}`,
         userMessage: 'La subida se ha interrumpido. Inténtalo de nuevo.',
@@ -263,9 +280,15 @@ export class PacksDownloadsService {
 }
 
 /** Content-addressed, sharded two levels so a pack with thousands of overrides
- *  does not put thousands of entries in one directory. */
+ *  does not put thousands of entries in one directory.
+ *
+ *  PACK_BLOB_DIR wins when set (prod: `./laboon/pack-blobs`, resolved against
+ *  cwd — the same directory as the fallback, so behaviour does not change);
+ *  without it, the laboon store. Read per call so tests can point it elsewhere. */
 function blobDir(): string {
-  return laboonPath('pack-blobs');
+  return env.PACK_BLOB_DIR
+    ? resolve(process.cwd(), env.PACK_BLOB_DIR)
+    : laboonPath('pack-blobs');
 }
 
 function blobPath(sha512: string): string {

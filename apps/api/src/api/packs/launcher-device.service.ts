@@ -8,6 +8,8 @@ import { randomBytes } from 'crypto';
 import { BoffMediaUsersFacadeService } from '@api/boffmedia/users/users.facade.service';
 import { LauncherDeviceRepository } from './launcher-device.repository';
 import { PacksAuthService } from './packs-auth.service';
+import { PacksRepository } from './packs.repository';
+import { AUDIT } from './types/packs.types';
 
 /** Long enough for a player to find the browser window, short enough that an
  *  abandoned code is not worth stealing. */
@@ -53,6 +55,7 @@ export class LauncherDeviceService {
     private readonly repo: LauncherDeviceRepository,
     private readonly auth: PacksAuthService,
     private readonly users: BoffMediaUsersFacadeService,
+    private readonly packsRepo: PacksRepository,
   ) {}
 
   private newUserCode(): string {
@@ -105,7 +108,9 @@ export class LauncherDeviceService {
     return {
       deviceCode,
       userCode,
-      verificationUri,
+      // ?code= lets the approval page prefill: the launcher opens this URI
+      // itself, so the player should not have to retype the code.
+      verificationUri: `${verificationUri}?code=${encodeURIComponent(userCode)}`,
       expiresIn: Math.floor(CODE_TTL_MS / 1000),
       intervalSeconds: 3,
     };
@@ -113,7 +118,11 @@ export class LauncherDeviceService {
 
   async poll(deviceCode: string): Promise<DevicePollResult> {
     const row = await this.repo.findByDeviceCode(deviceCode);
-    if (!row) throw new NotFoundException('Solicitud desconocida');
+    // An unknown code is an expired one: sweepExpired deletes past-TTL rows, so
+    // "missing" and "expired" are the same fact seen at different times. Codes
+    // are 64 random hex — answering 'expired' leaks nothing — and a 404 here
+    // strands the launcher's pending state instead of ending it.
+    if (!row) return { status: 'expired' };
 
     if (row.expiresAt.getTime() < Date.now()) return { status: 'expired' };
     if (row.status === 'denied') return { status: 'denied' };
@@ -130,13 +139,26 @@ export class LauncherDeviceService {
     const user = await this.users.getUserById(row.userId);
     if (!user) throw new NotFoundException('Cuenta no encontrada');
 
+    // The launcher_device_codes row is swept within minutes; this is the only
+    // durable record of who authorised a 30-day session, from which client.
+    await this.packsRepo.audit(
+      AUDIT.LAUNCHER_AUTH,
+      null,
+      user.uuid ?? null,
+      { userId: user.id, clientLabel: row.clientLabel },
+      user.id,
+    );
+
     return {
       status: 'approved',
-      token: this.auth.signSession({
-        userId: user.id,
-        username: user.username,
-        mcUuid: user.uuid ?? null,
-      }),
+      token: this.auth.signSession(
+        {
+          userId: user.id,
+          username: user.username,
+          mcUuid: user.uuid ?? null,
+        },
+        (await this.packsRepo.getLauncherTokenVersion(user.id)) ?? 0,
+      ),
       user: {
         id: user.id,
         username: user.username,
@@ -193,6 +215,13 @@ export class LauncherDeviceService {
     ) {
       throw new BadRequestException('Este código ya no es válido');
     }
+    await this.packsRepo.audit(
+      AUDIT.LAUNCHER_DENIED,
+      null,
+      null,
+      { userId, userCode: this.normalize(userCode) },
+      userId,
+    );
   }
 
   /** Players paste the code with the dash, without it, or in lower case. */

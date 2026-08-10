@@ -194,16 +194,36 @@ describe('AchievementsService', () => {
       expect(result.name).toBe('Updated Name');
     });
 
-    it('defaults maxProgress to 1 when not provided in update', async () => {
+    it('omits maxProgress from the write when not provided (no silent reset to 1)', async () => {
+      // F-16: `maxProgress || 1` used to reset absent maxProgress to 1 on every
+      // partial PATCH, instantly "completing" all in-flight progress rows. The
+      // field must simply be left out of the write when the caller omits it.
       mockRepo.update.mockResolvedValue(undefined);
       mockRepo.findById.mockResolvedValue(mockAchievement);
 
       await service.updateAchievement(1, { ...dto, maxProgress: undefined });
 
-      expect(mockRepo.update).toHaveBeenCalledWith(
-        1,
-        expect.objectContaining({ maxProgress: 1 }),
+      const [id, written] = mockRepo.update.mock.calls[0];
+      expect(id).toBe(1);
+      expect(written).not.toHaveProperty('maxProgress');
+      // The fields that WERE provided are still written through.
+      expect(written).toEqual(
+        expect.objectContaining({ name: 'Updated Name', order: 1 }),
       );
+    });
+
+    it('writes only the fields present on a partial patch (leaves order/maxProgress untouched)', async () => {
+      // Sending just `points` must not drag along a reset order (0) or
+      // maxProgress (1) — those columns are left alone entirely.
+      mockRepo.update.mockResolvedValue(undefined);
+      mockRepo.findById.mockResolvedValue(mockAchievement);
+
+      await service.updateAchievement(1, { points: 250 } as any);
+
+      const [, written] = mockRepo.update.mock.calls[0];
+      expect(written).toEqual({ points: 250 });
+      expect(written).not.toHaveProperty('order');
+      expect(written).not.toHaveProperty('maxProgress');
     });
   });
 

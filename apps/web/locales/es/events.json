@@ -55,6 +55,7 @@
       "participants": "Participantes",
       "participate": "Participar",
       "participating": "Participando",
+      "removedNotice": "Se te ha eliminado de este evento y no puedes volver a unirte.",
       "loginToJoin": "Entrar para participar",
       "notFound": "Evento no encontrado",
       "notFoundLead": "Este evento no existe o ha sido retirado.",
@@ -105,6 +106,7 @@
       "codeHint": "No distingue mayúsculas.",
       "redeem": "Unirse al evento",
       "joined": "Te has unido al evento.",
+      "alreadyMember": "Ya estás en este evento.",
       "failed": "Ese código no es válido.",
       "loginFirst": "Inicia sesión para canjear",
       "note": "Unirte al evento es lo que te da su pack en el launcher."

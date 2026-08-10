@@ -59,6 +59,11 @@ pub struct ApiState {
     token: Mutex<Option<String>>,
     /// The device-authorization request currently awaiting approval.
     pending: Mutex<Option<String>>,
+    /// Held for the WHOLE body of every session-mutating command (switch,
+    /// sign-out, restore, device poll). Without it a switch racing a background
+    /// add-account poll leaves roster.active last-write-wins and the wrong
+    /// account dispatched to the renderer.
+    session_op: Mutex<()>,
 }
 
 impl Default for ApiState {
@@ -70,6 +75,7 @@ impl Default for ApiState {
                 .unwrap_or_default(),
             token: Mutex::new(None),
             pending: Mutex::new(None),
+            session_op: Mutex::new(()),
         }
     }
 }
@@ -244,14 +250,21 @@ fn remove_boff(roster: &mut BoffRoster, id: i64) -> Option<i64> {
 /// legacy key (which `current_token` reads with no AppHandle). Returns false when
 /// that account has no stored token, so the caller can prune the dead row.
 async fn activate_boff(api: &ApiState, id: i64) -> Result<bool, ApiError> {
-    let Some(token) = store::load_launcher_session_for(id)
-        .map_err(|e| ApiError::Message(e.to_string()))?
+    let Some(token) =
+        store::load_launcher_session_for(id).map_err(|e| ApiError::Store(e.to_string()))?
     else {
         return Ok(false);
     };
-    store::save_launcher_session(&token).map_err(|e| ApiError::Message(e.to_string()))?;
+    store::save_launcher_session(&token).map_err(|e| ApiError::Store(e.to_string()))?;
     *api.token.lock().await = Some(token);
     Ok(true)
+}
+
+/// The id of the active Boffmedia account, straight from the on-disk roster.
+/// Used by the MSA roster (auth/accounts.rs) to scope Minecraft identities to
+/// the Boffmedia account that linked them.
+pub fn active_boff_id(app: &tauri::AppHandle) -> Option<i64> {
+    load_boff_roster(app).active
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -337,6 +350,10 @@ pub enum ApiError {
     /// Authenticated fine; this player simply is not entitled.
     Denied(String),
     Message(String),
+    /// The OS credential store itself failed (locked keychain, broken Secret
+    /// Service). Kept apart from `Message` because the renderer must not offer
+    /// "play offline" for it — the stored token cannot be read either.
+    Store(String),
 }
 
 impl From<reqwest::Error> for ApiError {
@@ -354,21 +371,36 @@ impl From<ApiError> for AuthFailure {
                 message,
                 needs_signin: true,
             },
-            ApiError::Denied(message) | ApiError::Message(message) => AuthFailure {
-                message,
-                needs_signin: false,
-            },
+            ApiError::Denied(message) | ApiError::Message(message) | ApiError::Store(message) => {
+                AuthFailure {
+                    message,
+                    needs_signin: false,
+                }
+            }
         }
     }
 }
 
 impl serde::Serialize for ApiError {
     fn serialize<S: serde::Serializer>(&self, s: S) -> Result<S::Ok, S::Error> {
-        AuthFailure::from(match self {
-            ApiError::NeedsSignin(m) => ApiError::NeedsSignin(m.clone()),
-            ApiError::Denied(m) => ApiError::Denied(m.clone()),
-            ApiError::Message(m) => ApiError::Message(m.clone()),
-        })
+        #[derive(Serialize)]
+        struct Wire<'a> {
+            message: &'a str,
+            needs_signin: bool,
+            #[serde(skip_serializing_if = "Option::is_none")]
+            code: Option<&'a str>,
+        }
+        let (message, needs_signin, code) = match self {
+            ApiError::NeedsSignin(m) => (m.as_str(), true, None),
+            ApiError::Denied(m) => (m.as_str(), false, None),
+            ApiError::Message(m) => (m.as_str(), false, None),
+            ApiError::Store(m) => (m.as_str(), false, Some("store_error")),
+        };
+        Wire {
+            message,
+            needs_signin,
+            code,
+        }
         .serialize(s)
     }
 }
@@ -453,29 +485,36 @@ pub async fn boff_device_poll(
     let body: Envelope<DevicePoll> = res.json().await?;
     let mut user = body.data.user.clone();
     if body.data.status == "approved" {
+        // Session-mutating from here on: serialise against switch/sign-out.
+        let _op = api.session_op.lock().await;
+
         let token = body.data.token.clone().ok_or_else(|| {
             ApiError::Message("El servidor aprobó la sesión sin devolverla.".into())
         })?;
-        // Cache + mirror first so `boff_me` (below, if the poll omitted the
-        // account) can authenticate. A session we hold but never persisted would
-        // silently vanish on restart and read as "it logged me out again".
-        store::save_launcher_session(&token)
-            .map_err(|e| ApiError::Message(e.to_string()))?;
-        *api.token.lock().await = Some(token.clone());
 
         // Which account this token belongs to — the poll usually says, but fall
         // back to /me so we always have an id to key the per-account entry by.
         let account = match user.clone() {
             Some(account) => account,
-            None => boff_me(&api).await?,
+            None => boff_me_with(&api, &token).await?,
         };
-        // Store the token under the account's own key so a later switch can find
-        // it, ADDING this account beside any already signed in.
-        store::save_launcher_session_for(account.id, &token)
-            .map_err(|e| ApiError::Message(e.to_string()))?;
+
+        // Persistence order matters: the roster is the ONLY enumeration of
+        // accounts, so a credential written without a roster row would be a
+        // permanently orphaned token. Roster row first; per-account credential
+        // second (rolling the row back if it fails); the active mirror and the
+        // in-memory cache last, once the account is fully recorded.
         let mut roster = load_boff_roster(&app);
         upsert_active_boff(&mut roster, &account);
         save_boff_roster(&app, &roster).map_err(ApiError::Message)?;
+        if let Err(e) = store::save_launcher_session_for(account.id, &token) {
+            let mut roster = load_boff_roster(&app);
+            remove_boff(&mut roster, account.id);
+            let _ = save_boff_roster(&app, &roster);
+            return Err(ApiError::Store(e.to_string()));
+        }
+        store::save_launcher_session(&token).map_err(|e| ApiError::Store(e.to_string()))?;
+        *api.token.lock().await = Some(token);
 
         user = Some(account);
         *api.pending.lock().await = None;
@@ -489,6 +528,15 @@ pub async fn boff_device_poll(
     })
 }
 
+/// Abandon the pending device authorization. Local-only on purpose: server-side
+/// codes expire on their own within minutes, and clearing `pending` is what
+/// guarantees a late approval can never be committed by a stray poll.
+#[tauri::command]
+pub async fn boff_device_cancel(api: tauri::State<'_, ApiState>) -> Result<(), ApiError> {
+    *api.pending.lock().await = None;
+    Ok(())
+}
+
 /// The stored session, if any. Called on start so a returning player never sees
 /// the sign-in screen.
 #[tauri::command]
@@ -496,6 +544,7 @@ pub async fn boff_session_restore(
     app: tauri::AppHandle,
     api: tauri::State<'_, ApiState>,
 ) -> Result<Option<BoffAccount>, ApiError> {
+    let _op = api.session_op.lock().await;
     let mut roster = load_boff_roster(&app);
 
     // First run of a multi-account build: no roster yet, but an older build may
@@ -508,7 +557,7 @@ pub async fn boff_session_restore(
                 return match boff_me(&api).await {
                     Ok(account) => {
                         store::save_launcher_session_for(account.id, &token)
-                            .map_err(|e| ApiError::Message(e.to_string()))?;
+                            .map_err(|e| ApiError::Store(e.to_string()))?;
                         upsert_active_boff(&mut roster, &account);
                         save_boff_roster(&app, &roster).map_err(ApiError::Message)?;
                         Ok(Some(account))
@@ -523,7 +572,7 @@ pub async fn boff_session_restore(
             // A locked or broken keychain must not look like a first run, or the
             // player re-authorises every launch and nobody notices why.
             Ok(None) => return Ok(None),
-            Err(e) => return Err(ApiError::Message(e.to_string())),
+            Err(e) => return Err(ApiError::Store(e.to_string())),
         }
     }
 
@@ -538,19 +587,44 @@ pub async fn boff_session_restore(
         .chain(roster.accounts.iter().map(|a| a.id))
         .collect();
     let mut tried = std::collections::HashSet::new();
+    // A store failure for ONE account must not abort the walk: the other
+    // accounts' entries may read fine, and any live one beats an error. The
+    // failing row is skipped WITHOUT pruning — its token may still exist behind
+    // a locked keychain.
+    let mut store_failure: Option<ApiError> = None;
 
     for id in ordered {
         if !tried.insert(id) {
             continue;
         }
-        match activate_boff(&api, id).await? {
-            false => {
+        match activate_boff(&api, id).await {
+            Err(e) => {
+                if store_failure.is_none() {
+                    store_failure = Some(e);
+                }
+            }
+            Ok(false) => {
                 // Roster lists it but the keychain lost the token: prune it.
                 remove_boff(&mut roster, id);
             }
-            true => match boff_me(&api).await {
+            Ok(true) => match boff_me(&api).await {
                 Ok(account) => {
                     upsert_active_boff(&mut roster, &account);
+                    // Startup reconciliation: any OTHER row whose credential is
+                    // demonstrably gone is pruned now, so it cannot linger as a
+                    // switch target that can only fail.
+                    let dead: Vec<i64> = roster
+                        .accounts
+                        .iter()
+                        .map(|a| a.id)
+                        .filter(|other| {
+                            *other != account.id
+                                && matches!(store::load_launcher_session_for(*other), Ok(None))
+                        })
+                        .collect();
+                    for id in dead {
+                        remove_boff(&mut roster, id);
+                    }
                     save_boff_roster(&app, &roster).map_err(ApiError::Message)?;
                     return Ok(Some(account));
                 }
@@ -563,7 +637,11 @@ pub async fn boff_session_restore(
         }
     }
 
-    // Nobody is live. Clear the active mirror and record the pruned roster.
+    // Nobody restored. A credential-store failure outranks "first run": §5.7's
+    // rule, a locked keychain must never look like a signed-out machine.
+    if let Some(err) = store_failure {
+        return Err(err);
+    }
     api.forget_session().await;
     let _ = save_boff_roster(&app, &roster);
     Ok(None)
@@ -586,40 +664,80 @@ pub async fn boff_accounts(app: tauri::AppHandle) -> Result<Vec<BoffAccountEntry
         .collect())
 }
 
-/// Make a known Boffmedia account the active one. Swaps the token `authed()` and
-/// the randomizer send, then validates it against `/me`. A dead account is
-/// pruned rather than reported as an error the player cannot act on.
+/// Refuse a session mutation while an install is downloading or a game is
+/// running: the process-global token is what those operations authenticate
+/// with, and swapping it under them re-authenticates their remaining requests
+/// as somebody else (C1).
+async fn ensure_idle(manager: &crate::install::InstallManager) -> Result<(), ApiError> {
+    if manager.is_busy().await {
+        return Err(ApiError::Message(
+            "No puedes cambiar de cuenta mientras hay una instalación en curso o un juego \
+             abierto."
+                .into(),
+        ));
+    }
+    Ok(())
+}
+
+/// The commit half of a switch. Validates the CANDIDATE token against `/me`
+/// BEFORE touching the mirror, the memory cache or the roster, so a transient
+/// failure leaves the previous account fully active — disk, keychain and memory
+/// all still agree. Caller must hold `session_op`.
+async fn switch_inner(
+    app: &tauri::AppHandle,
+    api: &ApiState,
+    id: i64,
+) -> Result<BoffAccount, ApiError> {
+    let mut roster = load_boff_roster(app);
+    let Some(candidate) =
+        store::load_launcher_session_for(id).map_err(|e| ApiError::Store(e.to_string()))?
+    else {
+        remove_boff(&mut roster, id);
+        let _ = save_boff_roster(app, &roster);
+        return Err(ApiError::NeedsSignin(
+            "Esa cuenta ya no tiene sesión guardada. Vuelve a añadirla.".into(),
+        ));
+    };
+
+    match boff_me_with(api, &candidate).await {
+        Ok(account) => {
+            store::save_launcher_session(&candidate)
+                .map_err(|e| ApiError::Store(e.to_string()))?;
+            *api.token.lock().await = Some(candidate);
+            upsert_active_boff(&mut roster, &account);
+            save_boff_roster(app, &roster).map_err(ApiError::Message)?;
+            Ok(account)
+        }
+        Err(ApiError::NeedsSignin(m)) => {
+            // The candidate is dead. The previous account was never displaced.
+            let _ = store::clear_launcher_session_for(id);
+            remove_boff(&mut roster, id);
+            let _ = save_boff_roster(app, &roster);
+            Err(ApiError::NeedsSignin(m))
+        }
+        // Transient (network) failure: nothing was committed, nothing to undo.
+        Err(e) => Err(e),
+    }
+}
+
+/// Make a known Boffmedia account the active one. Validates the candidate's
+/// token against `/me` BEFORE committing anything; a dead account is pruned
+/// rather than reported as an error the player cannot act on.
 #[tauri::command]
 pub async fn boff_switch(
     app: tauri::AppHandle,
     id: i64,
     api: tauri::State<'_, ApiState>,
+    auth: tauri::State<'_, crate::auth::AuthState>,
+    manager: tauri::State<'_, crate::install::InstallManager>,
 ) -> Result<BoffAccount, ApiError> {
-    let mut roster = load_boff_roster(&app);
-    if !activate_boff(&api, id).await? {
-        remove_boff(&mut roster, id);
-        let _ = save_boff_roster(&app, &roster);
-        return Err(ApiError::NeedsSignin(
-            "Esa cuenta ya no tiene sesión guardada. Vuelve a añadirla.".into(),
-        ));
-    }
-    roster.active = Some(id);
-
-    match boff_me(&api).await {
-        Ok(account) => {
-            upsert_active_boff(&mut roster, &account);
-            save_boff_roster(&app, &roster).map_err(ApiError::Message)?;
-            Ok(account)
-        }
-        Err(ApiError::NeedsSignin(m)) => {
-            let _ = store::clear_launcher_session_for(id);
-            remove_boff(&mut roster, id);
-            api.forget_session().await;
-            let _ = save_boff_roster(&app, &roster);
-            Err(ApiError::NeedsSignin(m))
-        }
-        Err(e) => Err(e),
-    }
+    let _op = api.session_op.lock().await;
+    ensure_idle(&manager).await?;
+    let account = switch_inner(&app, &api, id).await?;
+    // The Minecraft identity is a credential LINKED under the departing
+    // Boffmedia account; the incoming one restores (or links) its own.
+    auth.clear_session().await;
+    Ok(account)
 }
 
 /// Sign out of the ACTIVE Boffmedia account. Returns whoever is active
@@ -629,7 +747,13 @@ pub async fn boff_switch(
 pub async fn boff_sign_out(
     app: tauri::AppHandle,
     api: tauri::State<'_, ApiState>,
+    auth: tauri::State<'_, crate::auth::AuthState>,
+    manager: tauri::State<'_, crate::install::InstallManager>,
 ) -> Result<Option<BoffAccount>, ApiError> {
+    let _op = api.session_op.lock().await;
+    ensure_idle(&manager).await?;
+    auth.clear_session().await;
+
     let mut roster = load_boff_roster(&app);
     let Some(active) = roster.active else {
         api.forget_session().await;
@@ -641,11 +765,20 @@ pub async fn boff_sign_out(
     save_boff_roster(&app, &roster).map_err(ApiError::Message)?;
 
     match next {
-        // Promote the next account. If its token is gone or dead, fall through to
-        // the sign-in screen rather than leaving a name with no session behind it.
-        Some(id) => match boff_switch(app, id, api).await {
+        // Promote the next account. A DEAD next (no token, or the server says
+        // needs-signin) resolves to the sign-in screen; a TRANSIENT failure is
+        // an error the renderer can retry. Either way the signed-out account's
+        // session must not stay live in this process.
+        Some(id) => match switch_inner(&app, &api, id).await {
             Ok(account) => Ok(Some(account)),
-            Err(_) => Ok(None),
+            Err(ApiError::NeedsSignin(_)) => {
+                api.forget_session().await;
+                Ok(None)
+            }
+            Err(e) => {
+                api.forget_session().await;
+                Err(e)
+            }
         },
         None => {
             api.forget_session().await;
@@ -654,11 +787,109 @@ pub async fn boff_sign_out(
     }
 }
 
+/// Enter OFFLINE mode as the last active Boffmedia account. Requires a stored
+/// session token — proof of a real, completed sign-in on this machine — but
+/// deliberately does NOT call the network: this exists precisely for when the
+/// network is gone. Grants nothing server-side; only locally installed packs
+/// are playable, and every API call still fails until connectivity returns.
+#[tauri::command]
+pub async fn boff_offline(
+    app: tauri::AppHandle,
+    api: tauri::State<'_, ApiState>,
+) -> Result<BoffAccount, ApiError> {
+    let _op = api.session_op.lock().await;
+    let roster = load_boff_roster(&app);
+    let no_account = || {
+        ApiError::NeedsSignin("No hay ninguna cuenta de Boffmedia guardada en este equipo.".into())
+    };
+    let active = roster.active.ok_or_else(no_account)?;
+    let entry = roster
+        .accounts
+        .iter()
+        .find(|a| a.id == active)
+        .ok_or_else(no_account)?;
+
+    // The proof: the token only exists after a completed device flow.
+    let Some(token) =
+        store::load_launcher_session_for(active).map_err(|e| ApiError::Store(e.to_string()))?
+    else {
+        return Err(no_account());
+    };
+    // Keep it live in memory so the first request after connectivity returns
+    // authenticates without a restart.
+    *api.token.lock().await = Some(token);
+
+    Ok(BoffAccount {
+        id: entry.id,
+        username: entry.username.clone(),
+        mc_uuid: entry.mc_uuid.clone(),
+    })
+}
+
+/// Re-run `/me` against the STORED active token — the fix for "packs stopped
+/// loading / 401" mid-session. A live answer refreshes the roster row; a 401
+/// prunes the dead account and resolves None so the renderer can land on the
+/// sign-in screen instead of looping.
+#[tauri::command]
+pub async fn boff_revalidate(
+    app: tauri::AppHandle,
+    api: tauri::State<'_, ApiState>,
+) -> Result<Option<BoffAccount>, ApiError> {
+    let _op = api.session_op.lock().await;
+    let mut roster = load_boff_roster(&app);
+    let Some(active) = roster.active else {
+        return Ok(None);
+    };
+    if !activate_boff(&api, active).await? {
+        remove_boff(&mut roster, active);
+        let _ = save_boff_roster(&app, &roster);
+        return Ok(None);
+    }
+    match boff_me(&api).await {
+        Ok(account) => {
+            upsert_active_boff(&mut roster, &account);
+            save_boff_roster(&app, &roster).map_err(ApiError::Message)?;
+            Ok(Some(account))
+        }
+        Err(ApiError::NeedsSignin(_)) => {
+            let _ = store::clear_launcher_session_for(active);
+            remove_boff(&mut roster, active);
+            api.forget_session().await;
+            let _ = save_boff_roster(&app, &roster);
+            Ok(None)
+        }
+        Err(e) => Err(e),
+    }
+}
+
 async fn boff_me(api: &ApiState) -> Result<BoffAccount, ApiError> {
     let res = authed(api, |http, base| {
         http.get(format!("{base}/packs/launcher/me"))
     })
     .await?;
+
+    if res.status() == reqwest::StatusCode::UNAUTHORIZED {
+        return Err(ApiError::NeedsSignin("Tu sesión ha caducado.".into()));
+    }
+    if !res.status().is_success() {
+        return Err(ApiError::Message(
+            error_message(res, "No se pudo leer tu cuenta.").await,
+        ));
+    }
+    let body: Envelope<BoffAccount> = res.json().await?;
+    Ok(body.data)
+}
+
+/// `/me` with an EXPLICIT bearer token — the validation probe. Never touches
+/// the cached token or the credential store, so a candidate can be judged
+/// without displacing whoever is currently active.
+async fn boff_me_with(api: &ApiState, token: &str) -> Result<BoffAccount, ApiError> {
+    let res = api
+        .http
+        .get(format!("{}/packs/launcher/me", base_url()))
+        .bearer_auth(token)
+        .send()
+        .await?;
 
     if res.status() == reqwest::StatusCode::UNAUTHORIZED {
         return Err(ApiError::NeedsSignin("Tu sesión ha caducado.".into()));
@@ -692,7 +923,7 @@ async fn current_token(api: &ApiState) -> Result<String, ApiError> {
         Ok(None) => Err(ApiError::NeedsSignin(
             "Autoriza este launcher con tu cuenta de Boffmedia para ver tus packs.".into(),
         )),
-        Err(e) => Err(ApiError::Message(e.to_string())),
+        Err(e) => Err(ApiError::Store(e.to_string())),
     }
 }
 
@@ -730,17 +961,78 @@ pub async fn authed_get(api: &ApiState, path: &str) -> Result<reqwest::Response,
 
 // ── Commands ───────────────────────────────────────────────────────────────
 
-/// The packs this UUID may see. Access filtering is the server's job — a pack
+/// Filesystem-safe rendering of an id used as a cache filename.
+fn safe_cache_key(id: &str) -> String {
+    id.chars()
+        .filter(|c| c.is_ascii_alphanumeric() || matches!(c, '-' | '_'))
+        .collect()
+}
+
+fn packs_cache_path(app: &tauri::AppHandle, account_id: i64) -> Option<std::path::PathBuf> {
+    Some(
+        crate::datadir::data_root(app)
+            .ok()?
+            .join(format!("packs_cache_{account_id}.json")),
+    )
+}
+
+fn manifest_cache_path(app: &tauri::AppHandle, pack_id: &str) -> Option<std::path::PathBuf> {
+    Some(
+        crate::datadir::data_root(app)
+            .ok()?
+            .join("manifest_cache")
+            .join(format!("{}.json", safe_cache_key(pack_id))),
+    )
+}
+
+fn write_json_cache(path: Option<std::path::PathBuf>, value: &impl Serialize) {
+    let Some(path) = path else { return };
+    if let Some(parent) = path.parent() {
+        let _ = std::fs::create_dir_all(parent);
+    }
+    if let Ok(raw) = serde_json::to_vec(value) {
+        let tmp = path.with_extension("json.tmp");
+        if std::fs::write(&tmp, raw).is_ok() {
+            let _ = std::fs::rename(&tmp, &path);
+        }
+    }
+}
+
+fn read_json_cache<T: serde::de::DeserializeOwned>(path: Option<std::path::PathBuf>) -> Option<T> {
+    let raw = std::fs::read(path?).ok()?;
+    serde_json::from_slice(&raw).ok()
+}
+
+/// The packs this account may see. Access filtering is the server's job — a pack
 /// the player cannot install must never reach this list in the first place.
+///
+/// Offline: the last-good list for the ACTIVE account is cached on disk and
+/// served when the network is unreachable, so an installed pack does not vanish
+/// from the library on a train. Never used for a NeedsSignin/Denied answer —
+/// those are the server revoking access, which the cache must not outlive.
 #[tauri::command]
 pub async fn packs_list(
+    app: tauri::AppHandle,
     api: tauri::State<'_, ApiState>,
 ) -> Result<Vec<LauncherPack>, ApiError> {
-    let res = authed(&api, |http, base| {
+    let account_id = active_boff_id(&app);
+    let res = match authed(&api, |http, base| {
         http.get(format!("{base}/packs/launcher/packs"))
             .header("X-Boff-Game-Types", game_types_header())
     })
-    .await?;
+    .await
+    {
+        Ok(res) => res,
+        Err(err @ ApiError::Message(_)) => {
+            if let Some(id) = account_id {
+                if let Some(cached) = read_json_cache::<Vec<LauncherPack>>(packs_cache_path(&app, id)) {
+                    return Ok(cached);
+                }
+            }
+            return Err(err);
+        }
+        Err(err) => return Err(err),
+    };
 
     if !res.status().is_success() {
         return Err(ApiError::Message(
@@ -748,6 +1040,9 @@ pub async fn packs_list(
         ));
     }
     let body: Envelope<Vec<LauncherPack>> = res.json().await?;
+    if let Some(id) = account_id {
+        write_json_cache(packs_cache_path(&app, id), &body.data);
+    }
     Ok(body.data)
 }
 
@@ -758,6 +1053,7 @@ pub async fn packs_list(
 pub async fn pack_manifest(
     pack_id: String,
     password: Option<String>,
+    app: tauri::AppHandle,
     api: tauri::State<'_, ApiState>,
 ) -> Result<serde_json::Value, ApiError> {
     let query: Vec<(String, String)> = password
@@ -765,12 +1061,28 @@ pub async fn pack_manifest(
         .map(|p| vec![("password".to_string(), p)])
         .unwrap_or_default();
 
-    let res = authed(&api, |http, base| {
+    let res = match authed(&api, |http, base| {
         http.get(format!("{base}/packs/launcher/packs/{pack_id}/manifest"))
             .header("X-Boff-Game-Types", game_types_header())
             .query(&query)
     })
-    .await?;
+    .await
+    {
+        Ok(res) => res,
+        // Network unreachable: fall back to the last manifest this pack
+        // installed with, so an already-installed pack stays LAUNCHABLE
+        // offline. Only for transport failures — a revoked entitlement or a
+        // dead session must never be papered over by a cache.
+        Err(err @ ApiError::Message(_)) => {
+            if let Some(cached) =
+                read_json_cache::<serde_json::Value>(manifest_cache_path(&app, &pack_id))
+            {
+                return Ok(cached);
+            }
+            return Err(err);
+        }
+        Err(err) => return Err(err),
+    };
 
     let status = res.status();
     if !status.is_success() {
@@ -778,9 +1090,9 @@ pub async fn pack_manifest(
         return Err(if status == reqwest::StatusCode::FORBIDDEN {
             ApiError::Denied(message)
         } else if status == reqwest::StatusCode::CONFLICT {
-            ApiError::Message(format!(
-                "Este pack necesita una versión más reciente del launcher. Por favor, actualiza el launcher desde el sitio oficial."
-            ))
+            ApiError::Message(
+                "Este pack necesita una versión más reciente del launcher. Por favor, actualiza el launcher desde el sitio oficial.".to_string()
+            )
         } else {
             ApiError::Message(message)
         });
@@ -795,6 +1107,9 @@ pub async fn pack_manifest(
         .map_err(|e| ApiError::Message(format!("Manifiesto ilegible: {e}")))?;
     crate::pack::parse_manifest(&raw)
         .map_err(|e| ApiError::Message(format!("El manifiesto del pack no es válido: {e}")))?;
+
+    // Last-good manifest, for the offline fallback above.
+    write_json_cache(manifest_cache_path(&app, &pack_id), &body.data);
 
     Ok(body.data)
 }
@@ -835,17 +1150,27 @@ impl PackFile {
 /// success would consume the body and fail on the first jar.
 ///
 /// Takes an `AppHandle` rather than `tauri::State` so a download task can own
-/// it: `authed` re-mints an expired session on a 401, and a multi-minute
-/// install is long enough for the launcher JWT to expire mid-batch.
+/// it. `token` is the session captured ONCE at operation start: a multi-minute
+/// install must keep authenticating as the account that started it, not as
+/// whatever the process-global token says mid-way through an account switch.
+/// `None` (a local pack installed with no session) falls back to the global
+/// token, which will surface `NeedsSignin` if there is none. A 401 only forgets
+/// the stored session — there is nothing to re-mint; the player has to
+/// re-approve in a browser.
 pub async fn fetch_pack_file(
     app: &tauri::AppHandle,
     pack_id: &str,
     password: Option<&str>,
     file: &PackFile,
+    token: Option<&str>,
 ) -> Result<reqwest::Response, ApiError> {
     use tauri::Manager;
 
     let api = app.state::<ApiState>();
+    let token = match token {
+        Some(t) => t.to_string(),
+        None => current_token(&api).await?,
+    };
 
     // Same precedent as the manifest call: a password gates the whole pack, so
     // it has to ride on every download too, not just the first request.
@@ -856,11 +1181,19 @@ pub async fn fetch_pack_file(
         .unwrap_or_default();
 
     let route = file.route();
-    let res = authed(&api, |http, base| {
-        http.get(format!("{base}/packs/launcher/packs/{pack_id}/files/{route}"))
-            .query(&query)
-    })
-    .await?;
+    let res = api
+        .http
+        .get(format!(
+            "{}/packs/launcher/packs/{pack_id}/files/{route}",
+            base_url()
+        ))
+        .query(&query)
+        .bearer_auth(&token)
+        .send()
+        .await?;
+    if res.status() == reqwest::StatusCode::UNAUTHORIZED {
+        api.forget_session().await;
+    }
 
     let status = res.status();
     if status.is_success() {

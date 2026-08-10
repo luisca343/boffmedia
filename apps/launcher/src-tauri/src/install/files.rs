@@ -354,12 +354,19 @@ async fn fetch_and_stream(
         Fetch::Proxied(pack_file) => {
             // The proxy re-mints an expired session internally, so a failure
             // here is most often a network blip; let the loop try again.
-            crate::api::fetch_pack_file(app, pack_id, password, pack_file)
+            crate::api::fetch_pack_file(app, pack_id, password, pack_file, None)
                 .await
                 .map_err(|e| FetchError::Transient(InstallFailure::from(e)))?
         }
         _ => {
-            let url = resolve_url(http, file).await.map_err(FetchError::Transient)?;
+            // Only Modrinth's resolve does a network round-trip that a retry can
+            // rescue; a UserProvided or Patched source reaching here is a logic
+            // error (they are placed from the blob store / materialized, never
+            // fetched), so it is Permanent — retrying only delays the real error.
+            let url = resolve_url(http, file).await.map_err(|e| match file.fetch {
+                Fetch::ModrinthVersion { .. } | Fetch::Direct(_) => FetchError::Transient(e),
+                _ => FetchError::Permanent(e),
+            })?;
             let res = http.get(&url).send().await.map_err(|e| {
                 FetchError::Transient(InstallFailure::message(format!(
                     "No se pudo descargar «{}»: {e}",

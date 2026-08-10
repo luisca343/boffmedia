@@ -263,17 +263,18 @@ export function VersionEditor({
           kind: emu?.kind ?? "mgba",
           romHint,
           romPath: emu?.rom ?? "roms/rom.bin",
-          args: emu?.args?.join(" ") ?? "",
+          // Quote args carrying spaces so the editor's tokenizer round-trips them.
+          args: emu?.args?.map((a) => (/\s/.test(a) ? `"${a}"` : a)).join(" ") ?? "",
         })
         return
       }
       setName(restoredName)
-      setMinecraft(version.minecraft)
+      setMinecraft(version.minecraft ?? "")
       setLoader(version.loader ?? "")
       setLoaderVersion(version.loaderVersion ?? "")
       // Claim the pair before the reset effect sees it change, or the loader
       // build we just restored is wiped and replaced by "recommended".
-      lastPair.current = `${version.loader ?? ""}:${version.minecraft}`
+      lastPair.current = `${version.loader ?? ""}:${version.minecraft ?? ""}`
       setNotes(version.notes ?? "")
       setMods(toSelected(version.files))
     })

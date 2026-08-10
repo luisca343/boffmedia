@@ -36,6 +36,8 @@ pub enum ManifestError {
     UnexpectedSpecBlock,
     #[error("non-Minecraft packs must include exactly one specification block (emulator, zomboid, or stardew)")]
     MissingSpecBlock,
+    #[error("the specification block present does not match the declared gameType")]
+    SpecBlockMismatch,
     #[error("non-Minecraft packs cannot include dependencies or worlds")]
     ForbiddenForNonMinecraft,
     #[error("initialFiles cannot contain user-provided sources")]
@@ -54,6 +56,8 @@ pub enum ManifestError {
     EmulatorRomEnv,
     #[error("the ROM must be user-provided or patched (the server never hosts ROM bytes)")]
     EmulatorRomSource,
+    #[error("an mgba ROM must end in .gba and a melonDS ROM in .nds: {0}")]
+    EmulatorRomExtension(String),
     #[error("patched.base does not reference a files[] entry: {0}")]
     PatchedBaseMissing(String),
     #[error("patched.base must reference a user-provided file: {0}")]
@@ -163,6 +167,18 @@ fn validate_emulator(manifest: &PackManifest) -> Result<(), ManifestError> {
     ) {
         return Err(ManifestError::EmulatorRomSource);
     }
+    // The ROM extension must match the emulator kind. JSON Schema drops the
+    // zod `.superRefine` that encodes this, so it is mirrored here: mgba runs
+    // GBA (.gba), melonDS runs DS (.nds). Handed to the emulator verbatim, a
+    // mismatched container is a launch that opens the wrong core or fails.
+    let rom_lower = emu.rom.as_str().to_lowercase();
+    let ext_ok = match emu.kind {
+        PackManifestVersionEmulatorKind::Mgba => rom_lower.ends_with(".gba"),
+        PackManifestVersionEmulatorKind::Melonds => rom_lower.ends_with(".nds"),
+    };
+    if !ext_ok {
+        return Err(ManifestError::EmulatorRomExtension(emu.rom.as_str().to_string()));
+    }
     Ok(())
 }
 
@@ -257,6 +273,19 @@ fn validate_game_type(manifest: &PackManifest) -> Result<(), ManifestError> {
     } else {
         if spec_blocks_count != 1 {
             return Err(ManifestError::MissingSpecBlock);
+        }
+        // The one spec block present must be the one the gameType declares: an
+        // `emulator` pack carrying only a `zomboid` block passes the count check
+        // but would resolve down the wrong install arm.
+        let matches_declared = match &manifest.pack.game_type {
+            Some(crate::pack::PackManifestPackGameType::Emulator) => has_emulator,
+            Some(crate::pack::PackManifestPackGameType::Zomboid) => has_zomboid,
+            Some(crate::pack::PackManifestPackGameType::Stardew) => has_stardew,
+            // Minecraft/None already took the other arm.
+            _ => false,
+        };
+        if !matches_declared {
+            return Err(ManifestError::SpecBlockMismatch);
         }
         if has_dependencies || !manifest.version.worlds.is_empty() {
             return Err(ManifestError::ForbiddenForNonMinecraft);

@@ -3,6 +3,7 @@ import {
   ConflictException,
   ForbiddenException,
   Injectable,
+  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
@@ -18,10 +19,11 @@ import {
   LauncherPackView,
   PackVersionView,
   StoredPackFile,
+  StoredPackServer,
 } from './types/packs.types';
 import {
   CreatePackDto,
-  CreateVersionDto,
+  CreatePackVersionDto,
   UpdatePackDto,
 } from './dto/packs.dto';
 
@@ -30,6 +32,8 @@ const INVITE_BYTES = 8;
 
 @Injectable()
 export class PacksService {
+  private readonly logger = new Logger(PacksService.name);
+
   constructor(
     private readonly repo: PacksRepository,
     private readonly randomizerLink: RandomizerPackLinkRepository,
@@ -198,12 +202,50 @@ export class PacksService {
       );
     }
 
-    await this.repo.audit(AUDIT.MANIFEST_SERVED, pack.id, principal.mcUuid ?? null, {
-      versionId: version.id,
-    });
+    await this.repo.audit(
+      AUDIT.MANIFEST_SERVED,
+      pack.id,
+      principal.mcUuid ?? null,
+      { versionId: version.id },
+      principal.userId ?? null,
+    );
 
-    // Fetch randomizer config if this pack is linked to an active event
-    const randomizerConfig = await this.randomizerLink.findByPackId(pack.id);
+    // Any attached non-draft config injects, regardless of event lifecycle
+    // status: a normal active→completed flip must not leave the pack
+    // installable with no anti-cheat gate. Minting (elsewhere) still requires
+    // an active event; injection is only the gate.
+    const linked = await this.randomizerLink.findByPackId(pack.id, {
+      anyEventStatus: true,
+    });
+    const randomizerConfig = linked && linked.status !== 'draft' ? linked : null;
+
+    // Belt-and-braces for the clean-ROM invariant: if the version's declared
+    // ROM hash disagrees with the config's pinned clean hash, the launcher's
+    // gate would disarm on first install. Refuse to serve rather than ship an
+    // unprotected pack.
+    if (randomizerConfig) {
+      const romPath = (version.emulator as { rom?: unknown } | null)?.rom;
+      if (typeof romPath === 'string' && romPath) {
+        const norm = (p: string) => p.toLowerCase().replace(/\\/g, '/');
+        const romEntry = (version.files as StoredPackFile[]).find(
+          (f) => norm(f.path) === norm(romPath),
+        );
+        if (
+          !romEntry ||
+          romEntry.sha512.toLowerCase() !==
+            randomizerConfig.cleanRomSha512.toLowerCase()
+        ) {
+          this.logger.error(
+            `Pack ${pack.id} version ${version.id}: emulator.rom hash ${romEntry?.sha512 ?? 'MISSING'} does not match randomizer config ${randomizerConfig.id} cleanRomSha512 ${randomizerConfig.cleanRomSha512} — refusing to serve an unprotected manifest`,
+          );
+          throw new ConflictException({
+            error: 'randomizer_rom_mismatch',
+            message:
+              'La ROM de la versión publicada no coincide con la ROM limpia fijada por el randomizer del evento. Un administrador debe corregir la versión del pack o la configuración del randomizer.',
+          });
+        }
+      }
+    }
 
     // Built to the shape @boffmedia/pack-schema defines and validated with it
     // before leaving the server: the launcher parses these exact bytes with the
@@ -240,9 +282,8 @@ export class PacksService {
         files: version.files,
         ...this.versionGameFields(gameType, version),
       },
-      // Inject randomizer block if the pack is linked to an active, non-draft config.
-      // This linkage is pack-level and injected at serve time (never stored in manifests).
-      ...(randomizerConfig && randomizerConfig.status !== 'draft'
+      // Injected at serve time (never stored in manifests); pack-level linkage.
+      ...(randomizerConfig
         ? {
             randomizer: {
               eventId: randomizerConfig.eventId,
@@ -278,6 +319,7 @@ export class PacksService {
     packId: string,
     password: string | null,
     match: (file: StoredPackFile) => boolean,
+    opts?: { includeWorlds?: boolean },
   ): Promise<StoredPackFile> {
     const pack = await this.repo.findById(packId);
     if (!pack || pack.archived)
@@ -300,18 +342,51 @@ export class PacksService {
       );
     }
 
-    const file = (version.files as StoredPackFile[]).find(match);
+    // `initialFiles` ship override/url sources through the SAME download route
+    // as `files` — matching only files[] made every emulator starting save
+    // silently 404 at install.
+    const candidates: StoredPackFile[] = [
+      ...(version.files as StoredPackFile[]),
+      ...((version.initialFiles ?? []) as StoredPackFile[]),
+    ];
+    let file = candidates.find(match);
+
+    // Bundled worlds also ride the override route. Only that route opts in, so
+    // the CurseForge proxy stays pinned to files[] and cannot become a relay.
+    if (!file && opts?.includeWorlds) {
+      const world = (
+        (version.worlds ?? []) as {
+          folder: string;
+          sha512: string;
+          sizeBytes: number;
+          source: StoredPackFile['source'];
+        }[]
+      )
+        .map(
+          (w): StoredPackFile => ({
+            path: w.folder,
+            sha512: w.sha512,
+            fileSize: w.sizeBytes,
+            source: w.source,
+          }),
+        )
+        .find(match);
+      file = world;
+    }
+
     if (!file) {
       throw new NotFoundException(
         'Ese archivo no pertenece a esta versión del pack',
       );
     }
 
-    await this.repo.audit(AUDIT.FILE_SERVED, pack.id, principal.mcUuid ?? null, {
-      versionId: version.id,
-      path: file.path,
-      source: file.source.kind,
-    });
+    await this.repo.audit(
+      AUDIT.FILE_SERVED,
+      pack.id,
+      principal.mcUuid ?? null,
+      { versionId: version.id, path: file.path, source: file.source.kind },
+      principal.userId ?? null,
+    );
     return file;
   }
 
@@ -321,6 +396,13 @@ export class PacksService {
   ): Promise<{ packId: string }> {
     const invite = await this.repo.findInvite(code);
     if (!invite) throw new NotFoundException('Código de invitación no válido');
+
+    // Idempotent: a re-redemption (double click, retry) must not burn a second
+    // use for an entitlement the account already holds.
+    const grants = (await this.repo.listGrants(invite.packId)) ?? [];
+    if (grants.some((g) => g.userId === principal.userId)) {
+      return { packId: invite.packId };
+    }
 
     const consumed = await this.repo.consumeInvite(code);
     if (!consumed) {
@@ -339,33 +421,62 @@ export class PacksService {
       invite.packId,
       principal.mcUuid ?? null,
       { code, userId: principal.userId },
+      principal.userId,
     );
     return { packId: invite.packId };
   }
 
   // ── Admin-facing ─────────────────────────────────────────────────────────
 
+  private async toAdminView(pack: {
+    id: string;
+    slug: string;
+    gameType: GameType | null;
+    name: string;
+    summary: string | null;
+    iconUrl: string | null;
+    description: string | null;
+    gallery: unknown[] | null;
+    server: StoredPackServer | null;
+    accessKind: PackAccessKind;
+    passwordHash: string | null;
+    latestVersionId: string | null;
+    archived: boolean;
+    createdAt: Date;
+    updatedAt: Date;
+  }): Promise<AdminPackView> {
+    return {
+      id: pack.id,
+      slug: pack.slug,
+      gameType: this.resolveGameType(pack.gameType),
+      name: pack.name,
+      summary: pack.summary,
+      iconUrl: pack.iconUrl,
+      ...(pack.description ? { description: pack.description } : {}),
+      ...(pack.gallery ? { gallery: pack.gallery as never } : {}),
+      accessKind: pack.accessKind,
+      ...(pack.server ? { server: pack.server } : {}),
+      archived: pack.archived,
+      hasPassword: !!pack.passwordHash,
+      aclCount: await this.repo.countAcl(pack.id),
+      versionCount: await this.repo.countVersions(pack.id),
+      latestVersionId: pack.latestVersionId,
+      createdAt: pack.createdAt.toISOString(),
+      updatedAt: pack.updatedAt.toISOString(),
+    };
+  }
+
   async listForAdmin(includeArchived: boolean): Promise<AdminPackView[]> {
     const rows = await this.repo.listAll(includeArchived);
-    return Promise.all(
-      rows.map(async (pack) => ({
-        id: pack.id,
-        slug: pack.slug,
-        gameType: this.resolveGameType(pack.gameType),
-        name: pack.name,
-        summary: pack.summary,
-        iconUrl: pack.iconUrl,
-        accessKind: pack.accessKind,
-        ...(pack.server ? { server: pack.server } : {}),
-        archived: pack.archived,
-        hasPassword: !!pack.passwordHash,
-        aclCount: await this.repo.countAcl(pack.id),
-        versionCount: await this.repo.countVersions(pack.id),
-        latestVersionId: pack.latestVersionId,
-        createdAt: pack.createdAt.toISOString(),
-        updatedAt: pack.updatedAt.toISOString(),
-      })),
-    );
+    return Promise.all(rows.map((pack) => this.toAdminView(pack)));
+  }
+
+  /** The full pack for the admin detail/edit view — the list view alone left
+   *  `description`/`gallery` write-only. */
+  async adminPack(id: string): Promise<AdminPackView> {
+    const pack = await this.repo.findById(id);
+    if (!pack) throw new NotFoundException('Pack no encontrado');
+    return this.toAdminView(pack);
   }
 
   /** A server pack must have a host; anything hostless (including a stray `{}`)
@@ -484,6 +595,9 @@ export class PacksService {
       actorId,
       fields: Object.keys(patch),
     });
+    if (dto.archived === true && !pack.archived) {
+      await this.repo.audit(AUDIT.PACK_ARCHIVED, id, null, { actorId });
+    }
   }
 
   async listVersions(packId: string): Promise<PackVersionView[]> {
@@ -552,7 +666,7 @@ export class PacksService {
   async updateVersion(
     packId: string,
     versionId: string,
-    dto: CreateVersionDto,
+    dto: CreatePackVersionDto,
     actorId: number | null,
   ): Promise<void> {
     const existing = await this.repo.findVersion(versionId);
@@ -628,7 +742,7 @@ export class PacksService {
       gameType?: GameType | null;
     },
     versionId: string,
-    dto: CreateVersionDto,
+    dto: CreatePackVersionDto,
   ) {
     const gameType = this.resolveGameType(pack.gameType);
     const candidate = {
@@ -674,7 +788,7 @@ export class PacksService {
    */
   async createVersion(
     packId: string,
-    dto: CreateVersionDto,
+    dto: CreatePackVersionDto,
     actorId: number | null,
   ): Promise<{ id: string }> {
     const pack = await this.requirePack(packId);
@@ -707,24 +821,44 @@ export class PacksService {
   }
 
   /** Publishing is what makes a version visible to launchers, and it is also
-   *  what makes it the pack's `latestVersionId`. One step, so the two can never
-   *  disagree. */
+   *  what makes it the pack's `latestVersionId`. One transaction, so the two
+   *  can never disagree. Moving `latestVersionId` to an OLDER version is a
+   *  rollback and must be asked for explicitly, not the accident of publishing
+   *  the wrong row. */
   async publishVersion(
     packId: string,
     versionId: string,
     actorId: number | null,
+    allowRollback = false,
   ): Promise<void> {
     const version = await this.repo.findVersion(versionId);
     if (!version || version.packId !== packId) {
       throw new NotFoundException('Versión no encontrada');
     }
     const pack = await this.repo.findById(packId);
-    await this.repo.publishVersion(versionId);
-    await this.repo.updatePack(packId, { latestVersionId: versionId });
+    if (!pack) throw new NotFoundException('Pack no encontrado');
+
+    let rollback = false;
+    if (pack.latestVersionId && pack.latestVersionId !== versionId) {
+      const current = await this.repo.findVersion(pack.latestVersionId);
+      if (current && current.createdAt > version.createdAt) {
+        if (!allowRollback) {
+          throw new ConflictException({
+            error: 'version_rollback',
+            message:
+              'Esa versión es anterior a la publicada actualmente; confirma el retroceso para publicarla',
+          });
+        }
+        rollback = true;
+      }
+    }
+
+    await this.repo.publishVersionAndSetLatest(packId, versionId);
     await this.repo.audit(AUDIT.VERSION_PUBLISHED, packId, null, {
       actorId,
       versionId,
-      gameType: this.resolveGameType(pack?.gameType),
+      gameType: this.resolveGameType(pack.gameType),
+      ...(rollback ? { rollback: true } : {}),
     });
   }
 
@@ -759,15 +893,23 @@ export class PacksService {
     });
   }
 
+  /** With `source`, revokes only that grant source (the admin UI lists one row
+   *  per source); without it, every source at once. */
   async revokeFromUser(
     packId: string,
     userId: number,
     actorId: number | null,
+    source?: 'admin' | 'invite',
   ): Promise<void> {
-    await this.repo.revokeFromUser(packId, userId);
+    if (source) {
+      await this.repo.revokeSourceFromUser(packId, userId, source);
+    } else {
+      await this.repo.revokeFromUser(packId, userId);
+    }
     await this.repo.audit(AUDIT.ACCESS_REVOKED, packId, null, {
       actorId,
       userId,
+      ...(source ? { source } : {}),
     });
   }
 
@@ -835,8 +977,14 @@ export class PacksService {
     return this.repo.listInvites(packId);
   }
 
-  async revokeInvite(code: string): Promise<void> {
+  async revokeInvite(code: string, actorId: number | null): Promise<void> {
+    const invite = await this.repo.findInvite(code);
+    if (!invite) throw new NotFoundException('Código de invitación no válido');
     await this.repo.revokeInvite(code);
+    await this.repo.audit(AUDIT.INVITE_REVOKED, invite.packId, null, {
+      actorId,
+      code,
+    });
   }
 
   async listAudit(packId: string, limit: number) {

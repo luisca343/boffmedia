@@ -14,8 +14,9 @@ import { ChatappFacadeService } from '@api/smartrotom/chatapp/chatapp.facade.ser
 import { PresenceService } from './presence.service';
 import { identifySocket } from './socket-identity';
 import { Logger } from 'nestjs-pino';
+import { env } from '@/config/env';
 
-@WebSocketGateway(34304, {
+@WebSocketGateway(env.SOCKET_PORT, {
   cors: {
     origin: '*',
   },

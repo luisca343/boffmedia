@@ -185,24 +185,21 @@ pub fn loader_of(manifest: &PackManifest) -> Option<(LoaderKind, String)> {
 /// Resolve a manifest into a game-specific install plan. Cycle 1 only handles
 /// Minecraft (the non-MC arms return early in validate_game_type).
 pub fn plan(manifest: &PackManifest) -> Result<PlannedGame, InstallFailure> {
-    // Determine game type (defaulting to minecraft per §4.1 pack.rs)
-    let is_minecraft = manifest
-        .pack
-        .game_type
-        .as_ref()
-        .map(|gt| matches!(gt, crate::pack::PackManifestPackGameType::Minecraft))
-        .unwrap_or(true);
-
-    if is_minecraft {
-        return plan_minecraft(manifest).map(PlannedGame::Minecraft);
+    // Dispatch on the declared game type (absent defaults to Minecraft), not on
+    // which spec block happens to be present. `parse_manifest` has already
+    // proven the block matches the type, so each arm can trust its own spec.
+    match manifest.pack.game_type.as_ref() {
+        None | Some(crate::pack::PackManifestPackGameType::Minecraft) => {
+            plan_minecraft(manifest).map(PlannedGame::Minecraft)
+        }
+        Some(crate::pack::PackManifestPackGameType::Emulator) => {
+            plan_emulator(manifest).map(PlannedGame::Emulator)
+        }
+        // Cycle 3+: zomboid/stardew arms land with their cycles.
+        Some(_) => Err(InstallFailure::message(
+            "Este tipo de juego no es soportado en esta versión del launcher.".to_string(),
+        )),
     }
-    if manifest.version.emulator.is_some() {
-        return plan_emulator(manifest).map(PlannedGame::Emulator);
-    }
-    // Cycle 3+: zomboid/stardew arms land with their cycles.
-    Err(InstallFailure::message(
-        "Este tipo de juego no es soportado en esta versión del launcher.".to_string(),
-    ))
 }
 
 /// The file list is game-agnostic: skip client-unsupported entries, resolve each

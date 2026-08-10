@@ -39,21 +39,46 @@ pub struct Roster {
     pub accounts: Vec<RosterEntry>,
 }
 
+/// The roster is SCOPED to the active Boffmedia account: a Minecraft identity is
+/// a credential linked under whoever authorised the launcher, so account A's
+/// linked faces must not surface while B is signed in. Each Boffmedia id gets
+/// `accounts_<id>.json`; the unscoped `accounts.json` is the pre-scoping legacy
+/// file (and the path used before any Boffmedia sign-in).
 fn roster_path(app: &tauri::AppHandle) -> Result<PathBuf, String> {
+    let root = crate::datadir::data_root(app)?;
+    Ok(match crate::api::active_boff_id(app) {
+        Some(id) => root.join(format!("accounts_{id}.json")),
+        None => root.join("accounts.json"),
+    })
+}
+
+fn legacy_roster_path(app: &tauri::AppHandle) -> Result<PathBuf, String> {
     Ok(crate::datadir::data_root(app)?.join("accounts.json"))
 }
 
 /// Best-effort by design: a corrupt or unreadable roster reads as "no accounts
 /// known", which shows the sign-in screen. Failing the whole launcher because a
 /// list of usernames would not parse is the wrong trade.
+///
+/// Migration: when the per-account file does not exist yet, fall back to the
+/// unscoped legacy roster so an install that predates scoping keeps its linked
+/// Minecraft accounts. The next `save` writes the scoped file; the legacy one is
+/// left untouched.
 pub fn load(app: &tauri::AppHandle) -> Roster {
     let Ok(path) = roster_path(app) else {
         return Roster::default();
     };
-    let Ok(raw) = std::fs::read(&path) else {
-        return Roster::default();
-    };
-    serde_json::from_slice(&raw).unwrap_or_default()
+    if let Ok(raw) = std::fs::read(&path) {
+        return serde_json::from_slice(&raw).unwrap_or_default();
+    }
+    if let Ok(legacy) = legacy_roster_path(app) {
+        if legacy != path {
+            if let Ok(raw) = std::fs::read(&legacy) {
+                return serde_json::from_slice(&raw).unwrap_or_default();
+            }
+        }
+    }
+    Roster::default()
 }
 
 pub fn save(app: &tauri::AppHandle, roster: &Roster) -> Result<(), String> {

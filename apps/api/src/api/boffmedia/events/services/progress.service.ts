@@ -1,4 +1,9 @@
-import { Injectable, Inject } from '@nestjs/common';
+import {
+  ConflictException,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { MySql2Database } from 'drizzle-orm/mysql2';
 import { eq, and } from 'drizzle-orm';
 import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
@@ -35,7 +40,7 @@ export class ProgressService {
       this.db,
     );
     if (!canReceive) {
-      throw new Error(
+      throw new ConflictException(
         'Participant is not eligible to receive this achievement',
       );
     }
@@ -44,7 +49,7 @@ export class ProgressService {
     const achievement =
       await this.achievementsService.getAchievementById(achievementId);
     if (!achievement) {
-      throw new Error('Achievement not found');
+      throw new NotFoundException('Achievement not found');
     }
 
     // Was it already completed? (so we only notify on the transition)

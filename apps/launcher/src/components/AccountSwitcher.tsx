@@ -40,7 +40,14 @@ export function AccountSwitcher() {
     switchingBoffAccount,
     boffSignIn,
     boffSignOut,
+    boffSigningIn,
+    sessionBusy,
   } = useLauncher()
+  // Switching, signing out and adding all swap or drop the process-global
+  // session token; an install or a live game authenticates with it, so the
+  // whole surface is disabled while `sessionBusy`. A device flow already in
+  // flight (`boffSigningIn`) likewise blocks starting another (M2/C1).
+  const locked = switchingBoffAccount || sessionBusy || boffSigningIn
   const [open, setOpen] = useState(false)
   const triggerRef = useRef<HTMLButtonElement>(null)
   const panelRef = useRef<HTMLDivElement>(null)
@@ -124,7 +131,7 @@ export function AccountSwitcher() {
                 <li key={entry.id} className="flex items-center gap-2 px-3 py-2 hover:bg-panel-2">
                   <button
                     type="button"
-                    disabled={switchingBoffAccount}
+                    disabled={locked}
                     onClick={() => {
                       setOpen(false)
                       void switchBoffAccount(entry.id)
@@ -141,7 +148,7 @@ export function AccountSwitcher() {
               <li className="border-t border-solid border-line">
                 <button
                   type="button"
-                  disabled={switchingBoffAccount}
+                  disabled={locked}
                   onClick={() => {
                     setOpen(false)
                     void boffSignIn()
@@ -156,7 +163,7 @@ export function AccountSwitcher() {
               <li className="border-t border-solid border-line">
                 <button
                   type="button"
-                  disabled={switchingBoffAccount}
+                  disabled={locked}
                   onClick={() => {
                     setOpen(false)
                     void boffSignOut()

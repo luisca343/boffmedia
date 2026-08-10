@@ -20,6 +20,7 @@ import { JwtAuthGuard } from '@api/auth/jwt-auth.guard';
 import { FullSessionGuard } from '@api/_utils/guards/full-session.guard';
 import { UserThrottlerGuard } from '@api/_utils/guards/user-throttler.guard';
 import { LauncherDeviceService } from './launcher-device.service';
+import { PacksAuthService } from './packs-auth.service';
 import { DeviceRequestEntity } from './entities/packs.entity';
 import { DeviceDecisionDto, DeviceLookupDto } from './dto/packs.dto';
 
@@ -37,9 +38,17 @@ import { DeviceDecisionDto, DeviceLookupDto } from './dto/packs.dto';
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth('JWT')
 export class LauncherAuthController {
-  constructor(private readonly device: LauncherDeviceService) {}
+  constructor(
+    private readonly device: LauncherDeviceService,
+    private readonly auth: PacksAuthService,
+  ) {}
 
+  // Guarded and throttled like its siblings: describe is the DISCOVERY half of
+  // a device-code hijack — free enumeration of the user_code space is what
+  // makes searching for a pending code tractable at all.
   @Get('device')
+  @UseGuards(FullSessionGuard, UserThrottlerGuard)
+  @Throttle({ default: { ttl: 60_000, limit: 20 } })
   @ApiOperation({ summary: 'Qué launcher está pidiendo autorización' })
   @ApiResponse({ status: HttpStatus.OK, type: DeviceRequestEntity })
   async describe(@Query() query: DeviceLookupDto) {
@@ -73,6 +82,20 @@ export class LauncherAuthController {
     @Req() req: { user: { userId: number } },
   ): Promise<{ success: true }> {
     await this.device.deny(dto.userCode, req.user.userId);
+    return { success: true };
+  }
+
+  // FullSessionGuard: revoking every launcher session is an account-sensitive
+  // action, so an in-game MCEF session (public UUID only) must not trigger it.
+  @Post('sessions/revoke-all')
+  @UseGuards(FullSessionGuard, UserThrottlerGuard)
+  @Throttle({ default: { ttl: 60_000, limit: 5 } })
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Cerrar todas las sesiones del launcher' })
+  async revokeAll(
+    @Req() req: { user: { userId: number } },
+  ): Promise<{ success: true }> {
+    await this.auth.revokeAllLauncherSessions(req.user.userId);
     return { success: true };
   }
 }

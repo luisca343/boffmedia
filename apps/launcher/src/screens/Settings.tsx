@@ -21,7 +21,17 @@ import { elidePath, formatBytes } from "../utils/format"
 // ticket." Hence the explicit, visible Java row rather than silent detection.
 
 export function Settings() {
-  const { settings, patchSettings, account, revalidate, revalidating } = useLauncher()
+  const {
+    settings,
+    patchSettings,
+    account,
+    boffAccount,
+    revalidate,
+    revalidating,
+    removeAccount,
+    signOut,
+    switchingAccount,
+  } = useLauncher()
   const { phase, update, error } = useUpdates()
   const t = useT("settings")
   const [version, setVersion] = useState<string | null>(null)
@@ -447,18 +457,19 @@ export function Settings() {
         <Panel title={t("account.title")}>
           <DataList
             rows={[
-              { label: t("account.user"), value: account?.username ?? "—" },
-              { label: t("account.uuid"), value: account?.uuid ?? "—", mono: true, wide: true },
+              { label: t("account.boffAccount"), value: boffAccount?.username ?? "—" },
               { label: t("account.token"), value: t("account.tokenValue"), icon: "lock" },
             ]}
           />
-          <p className="mt-3 text-xs text-txt-dim">{t("account.note")}</p>
+          {/* Revalidates the BOFFMEDIA session — the one the pack list uses. A
+              stale launcher JWT is what the "packs won't load / 401" state is;
+              the Minecraft session is a separate, launch-time credential. */}
           <div className="mt-4 flex items-center gap-3">
             <Button
               size="sm"
               variant="ghost"
               icon="refresh"
-              disabled={!account || revalidating}
+              disabled={!boffAccount || revalidating}
               onClick={() => {
                 void revalidate()
               }}
@@ -467,6 +478,50 @@ export function Settings() {
             </Button>
             <span className="text-xs text-txt-dim">{t("account.revalidateHint")}</span>
           </div>
+
+          <Divider className="my-4" />
+
+          {/* The linked Minecraft identity: a sub-credential asked for at launch
+              time, not the launcher principal. This is the only surface that
+              keeps unlink (auth_remove) and sign-out-everywhere (auth_logout)
+              reachable now that the old Minecraft account picker is gone. */}
+          <p className="mb-2 text-sm font-medium">{t("account.linkedMinecraft")}</p>
+          {account ? (
+            <>
+              <DataList
+                rows={[
+                  { label: t("account.user"), value: account.username },
+                  { label: t("account.uuid"), value: account.uuid, mono: true, wide: true },
+                ]}
+              />
+              <div className="mt-3 flex flex-wrap items-center gap-2">
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  icon="x"
+                  disabled={switchingAccount}
+                  onClick={() => void removeAccount(account.uuid)}
+                >
+                  {t("account.unlinkMinecraft")}
+                </Button>
+                <Button size="sm" variant="ghost" icon="logout" onClick={() => signOut()}>
+                  {t("account.signOutEverywhere")}
+                </Button>
+              </div>
+              <p className="mt-2 text-xs text-txt-dim">{t("account.signOutEverywhereHint")}</p>
+            </>
+          ) : (
+            <>
+              <p className="text-xs text-txt-dim">{t("account.minecraftNone")}</p>
+              <div className="mt-3">
+                <Button size="sm" variant="ghost" icon="logout" onClick={() => signOut()}>
+                  {t("account.signOutEverywhere")}
+                </Button>
+              </div>
+              <p className="mt-2 text-xs text-txt-dim">{t("account.signOutEverywhereHint")}</p>
+            </>
+          )}
+          <p className="mt-3 text-xs text-txt-dim">{t("account.note")}</p>
         </Panel>
       </div>
     </div>

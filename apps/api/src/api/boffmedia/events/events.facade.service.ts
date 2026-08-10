@@ -1,7 +1,9 @@
 import {
   Injectable,
   Inject,
+  ConflictException,
   ForbiddenException,
+  InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 import { MySql2Database } from 'drizzle-orm/mysql2';
@@ -24,7 +26,7 @@ import { CreateEventDto } from './dto/create-event.dto';
 import { UpdateEventDto } from './dto/update-event.dto';
 import { CreateGameDto } from './dto/create-game.dto';
 import { UpdateGameDto } from './dto/update-game.dto';
-import { CreateAchievementDto } from './dto/create-achievement.dto';
+import { CreateEventAchievementDto } from './dto/create-achievement.dto';
 import { UpdateAchievementDto } from './dto/update-achievement.dto';
 import { CreateTeamDto } from './dto/create-team.dto';
 import { UpdateTeamDto } from './dto/update-team.dto';
@@ -32,7 +34,7 @@ import { JoinEventDto } from './dto/join-event.dto';
 import { UpdateProgressDto } from './dto/update-progress.dto';
 import { Event } from './entities/event.entity';
 import { Game } from './entities/game.entity';
-import { Achievement } from './entities/achievement.entity';
+import { EventAchievement } from './entities/achievement.entity';
 import { AchievementWithProgress } from './entities/achievement-with-progress.entity';
 import { Team } from './entities/team.entity';
 import { TeamMember } from './entities/team-member.entity';
@@ -40,6 +42,7 @@ import { Participant } from './entities/participant.entity';
 import {
   EventInvite,
   EventParticipant,
+  EVENT_STATUS,
   PARTICIPANT_STATUS,
 } from '@/_db/schema/BoffMediaEvents';
 import {
@@ -89,7 +92,7 @@ export class EventsFacadeService {
         createEventDto.gameId,
       );
       if (!gameExists) {
-        throw new Error('Game not found');
+        throw new NotFoundException('Game not found');
       }
     }
 
@@ -99,7 +102,7 @@ export class EventsFacadeService {
         createEventDto.parentId,
       );
       if (!parentExists) {
-        throw new Error('Parent event not found');
+        throw new NotFoundException('Parent event not found');
       }
     }
 
@@ -121,7 +124,7 @@ export class EventsFacadeService {
     // Validate event exists
     const eventExists = await this.eventsService.validateEventExists(id);
     if (!eventExists) {
-      throw new Error('Event not found');
+      throw new NotFoundException('Event not found');
     }
 
     // Validate game exists if provided
@@ -130,7 +133,7 @@ export class EventsFacadeService {
         updateEventDto.gameId,
       );
       if (!gameExists) {
-        throw new Error('Game not found');
+        throw new NotFoundException('Game not found');
       }
     }
 
@@ -140,7 +143,7 @@ export class EventsFacadeService {
         updateEventDto.parentId,
       );
       if (!parentExists) {
-        throw new Error('Parent event not found');
+        throw new NotFoundException('Parent event not found');
       }
     }
 
@@ -159,7 +162,7 @@ export class EventsFacadeService {
   async deleteEvent(id: number): Promise<void> {
     const eventExists = await this.eventsService.validateEventExists(id);
     if (!eventExists) {
-      throw new Error('Event not found');
+      throw new NotFoundException('Event not found');
     }
 
     return this.eventsService.deleteEvent(id);
@@ -181,7 +184,7 @@ export class EventsFacadeService {
   async updateGame(id: number, updateGameDto: UpdateGameDto): Promise<Game> {
     const gameExists = await this.gamesService.validateGameExists(id);
     if (!gameExists) {
-      throw new Error('Game not found');
+      throw new NotFoundException('Game not found');
     }
 
     return this.gamesService.updateGame(id, updateGameDto) as unknown as Game;
@@ -190,28 +193,76 @@ export class EventsFacadeService {
   async deleteGame(id: number): Promise<void> {
     const gameExists = await this.gamesService.validateGameExists(id);
     if (!gameExists) {
-      throw new Error('Game not found');
+      throw new NotFoundException('Game not found');
+    }
+
+    // Deleting a game used to soft-delete every one of its events, silently
+    // revoking pack access for all their participants in one click. Refuse
+    // while live (non-completed) events exist — delete or complete them first.
+    const events = await this.eventsService.getAllEvents({
+      gameId: id,
+      includePrivate: true,
+    });
+    const liveEvents = events.filter(
+      (e) => e.status !== EVENT_STATUS.COMPLETED,
+    );
+    if (liveEvents.length > 0) {
+      throw new ConflictException(
+        `Game has ${liveEvents.length} active or upcoming event(s); delete or complete them first`,
+      );
     }
 
     return this.gamesService.deleteGame(id);
   }
 
-  // ==================== ACHIEVEMENT MANAGEMENT ====================
-  async getAchievements(): Promise<Achievement[]> {
-    return this.achievementsService.getAllAchievements() as unknown as Achievement[];
+  /**
+   * Drops rows that belong to a private event the viewer may not see. Rows
+   * with no event (server-wide) always pass.
+   */
+  private async filterPrivateEventRows<T>(
+    rows: T[],
+    eventIdOf: (row: T) => number | null | undefined,
+    includePrivate: boolean,
+    userId?: number,
+  ): Promise<T[]> {
+    if (includePrivate || rows.length === 0) return rows;
+    const hidden = await this.eventsService.hiddenPrivateEventIds(
+      rows.map(eventIdOf),
+      userId,
+    );
+    if (hidden.size === 0) return rows;
+    return rows.filter((row) => {
+      const eventId = eventIdOf(row);
+      return !eventId || !hidden.has(eventId);
+    });
   }
 
-  async getAchievement(id: number): Promise<Achievement> {
+  // ==================== ACHIEVEMENT MANAGEMENT ====================
+  async getAchievements(
+    includePrivate = false,
+    userId?: number,
+  ): Promise<EventAchievement[]> {
+    const achievements =
+      (await this.achievementsService.getAllAchievements()) as unknown as EventAchievement[];
+    return this.filterPrivateEventRows(
+      achievements,
+      (a) => a.eventId,
+      includePrivate,
+      userId,
+    );
+  }
+
+  async getAchievement(id: number): Promise<EventAchievement> {
     return this.achievementsService.getAchievementById(
       id,
-    ) as unknown as Achievement;
+    ) as unknown as EventAchievement;
   }
 
   async getEventAchievements(
     eventId: number,
     includePrivate = false,
     userId?: number,
-  ): Promise<Achievement[]> {
+  ): Promise<EventAchievement[]> {
     const eventVisible = await this.eventsService.validateEventVisible(
       eventId,
       includePrivate,
@@ -224,51 +275,67 @@ export class EventsFacadeService {
 
     return this.achievementsService.getAchievementsByEventId(
       eventId,
-    ) as unknown as Achievement[];
+    ) as unknown as EventAchievement[];
   }
 
   async createAchievement(
     eventId: number,
-    createAchievementDto: CreateAchievementDto,
-  ): Promise<Achievement> {
+    createAchievementDto: CreateEventAchievementDto,
+  ): Promise<EventAchievement> {
     const eventExists = await this.eventsService.validateEventExists(eventId);
     if (!eventExists) {
-      throw new Error('Event not found');
+      throw new NotFoundException('Event not found');
     }
 
     return this.achievementsService.createAchievement(
       eventId,
       createAchievementDto,
-    ) as unknown as Achievement;
+    ) as unknown as EventAchievement;
   }
 
   async updateAchievement(
     eventId: number,
     id: number,
     updateAchievementDto: UpdateAchievementDto,
-  ): Promise<Achievement> {
+  ): Promise<EventAchievement> {
     const [eventExists, achievementExists] = await Promise.all([
       this.eventsService.validateEventExists(eventId),
       this.achievementsService.validateAchievementExists(id),
     ]);
 
     if (!eventExists) {
-      throw new Error('Event not found');
+      throw new NotFoundException('Event not found');
     }
     if (!achievementExists) {
-      throw new Error('Achievement not found');
+      throw new NotFoundException('Achievement not found');
     }
 
     return this.achievementsService.updateAchievement(
       id,
       updateAchievementDto,
-    ) as unknown as Achievement;
+    ) as unknown as EventAchievement;
   }
 
   async getParticipantProgress(
     participantId: number,
+    includePrivate = false,
+    userId?: number,
   ): Promise<AchievementWithProgress[]> {
-    return this.achievementsService.getParticipantProgress(participantId);
+    const rows =
+      await this.achievementsService.getParticipantProgress(participantId);
+    if (includePrivate || rows.length === 0) return rows;
+    // Progress rows don't carry the event id; resolve it via the catalogue so
+    // private-event achievements stay invisible to outsiders.
+    const catalogue = await this.achievementsService.getAllAchievements();
+    const eventByAchievement = new Map(
+      catalogue.map((a) => [a.id, a.eventId]),
+    );
+    return this.filterPrivateEventRows(
+      rows,
+      (r) => eventByAchievement.get(r.id),
+      includePrivate,
+      userId,
+    );
   }
 
   async getParticipantProgressByEvent(
@@ -294,8 +361,14 @@ export class EventsFacadeService {
   }
 
   // ==================== TEAM MANAGEMENT ====================
-  async getTeams(): Promise<Team[]> {
-    return this.teamsService.getAllTeams() as unknown as Team[];
+  async getTeams(includePrivate = false, userId?: number): Promise<Team[]> {
+    const teams = (await this.teamsService.getAllTeams()) as unknown as Team[];
+    return this.filterPrivateEventRows(
+      teams,
+      (t) => t.eventId,
+      includePrivate,
+      userId,
+    );
   }
 
   async getEventTeams(
@@ -316,15 +389,49 @@ export class EventsFacadeService {
     return this.teamsService.getTeamsByEventId(eventId) as unknown as Team[];
   }
 
-  async getTeam(teamId: number): Promise<Team> {
-    return this.teamsService.getTeamById(teamId) as unknown as Team;
+  async getTeam(
+    teamId: number,
+    includePrivate = false,
+    userId?: number,
+  ): Promise<Team> {
+    const team = (await this.teamsService.getTeamById(
+      teamId,
+    )) as unknown as Team;
+    if (team) {
+      await this.assertTeamEventVisible(team.eventId, includePrivate, userId);
+    }
+    return team;
   }
 
-  async getTeamMembers(teamId: number): Promise<TeamMember[]> {
-    const teamExists = await this.teamsService.validateTeamExists(teamId);
-    if (!teamExists) {
-      throw new Error('Team not found');
+  /** 404 (not 403) so a private event's teams don't reveal their existence. */
+  private async assertTeamEventVisible(
+    eventId: number | null | undefined,
+    includePrivate: boolean,
+    userId?: number,
+  ): Promise<void> {
+    if (!eventId || includePrivate) return;
+    const visible = await this.eventsService.validateEventVisible(
+      eventId,
+      includePrivate,
+      userId,
+    );
+    if (!visible) {
+      throw new NotFoundException('Team not found');
     }
+  }
+
+  async getTeamMembers(
+    teamId: number,
+    includePrivate = false,
+    userId?: number,
+  ): Promise<TeamMember[]> {
+    const team = (await this.teamsService.getTeamById(
+      teamId,
+    )) as unknown as Team;
+    if (!team) {
+      throw new NotFoundException('Team not found');
+    }
+    await this.assertTeamEventVisible(team.eventId, includePrivate, userId);
 
     // Get raw team members data
     const rawMembers = await this.teamsService.getTeamMembers(teamId);
@@ -349,7 +456,7 @@ export class EventsFacadeService {
   ): Promise<Team> {
     const eventExists = await this.eventsService.validateEventExists(eventId);
     if (!eventExists) {
-      throw new Error('Event not found');
+      throw new NotFoundException('Event not found');
     }
 
     return this.teamsService.createTeam(
@@ -370,13 +477,13 @@ export class EventsFacadeService {
     ]);
 
     if (!eventExists) {
-      throw new Error('Event not found');
+      throw new NotFoundException('Event not found');
     }
     if (!teamExists) {
-      throw new Error('Team not found');
+      throw new NotFoundException('Team not found');
     }
     if (!teamInEvent) {
-      throw new Error('Team does not belong to this event');
+      throw new ConflictException('Team does not belong to this event');
     }
 
     return this.teamsService.updateTeam(
@@ -389,21 +496,46 @@ export class EventsFacadeService {
     eventId: number,
     teamId: number,
     userId: number,
+    includePrivate = false,
   ): Promise<{ success: boolean }> {
-    const [eventExists, teamExists, teamInEvent] = await Promise.all([
-      this.eventsService.validateEventExists(eventId),
+    const [event, teamExists, teamInEvent] = await Promise.all([
+      this.eventsService.getEventById(eventId, true),
       this.teamsService.validateTeamExists(teamId),
       this.teamsService.validateTeamInEvent(teamId, eventId),
     ]);
 
-    if (!eventExists) {
-      throw new Error('Event not found');
+    if (!event) {
+      throw new NotFoundException('Event not found');
     }
     if (!teamExists) {
-      throw new Error('Team not found');
+      throw new NotFoundException('Team not found');
     }
     if (!teamInEvent) {
-      throw new Error('Team does not belong to this event');
+      throw new ConflictException('Team does not belong to this event');
+    }
+
+    // Team join creates event membership, so it must pass the same gates as
+    // joinEvent — it used to bypass the private-visibility guard entirely,
+    // letting any authed user take a private event's pack via an enumerable
+    // team id.
+    if (event.status === EVENT_STATUS.COMPLETED) {
+      throw new ForbiddenException({
+        message: 'Event is completed',
+        userMessage: 'Este evento ya ha finalizado.',
+      });
+    }
+    if (event.visibility === 'private' && !includePrivate) {
+      const canSee = await this.eventsService.validateEventVisible(
+        eventId,
+        false,
+        userId,
+      );
+      if (!canSee) {
+        throw new ForbiddenException({
+          message: 'Event is private',
+          userMessage: 'Este evento es privado. Necesitas una invitación.',
+        });
+      }
     }
 
     await this.teamsService.joinTeam(eventId, teamId, userId);
@@ -422,13 +554,13 @@ export class EventsFacadeService {
     ]);
 
     if (!eventExists) {
-      throw new Error('Event not found');
+      throw new NotFoundException('Event not found');
     }
     if (!teamExists) {
-      throw new Error('Team not found');
+      throw new NotFoundException('Team not found');
     }
     if (!teamInEvent) {
-      throw new Error('Team does not belong to this event');
+      throw new ConflictException('Team does not belong to this event');
     }
 
     await this.teamsService.leaveTeam(teamId, userId);
@@ -446,6 +578,15 @@ export class EventsFacadeService {
       throw new NotFoundException('Event not found');
     }
 
+    // A finished event must stop handing out memberships (and with them, pack
+    // access) — leftover invite codes included.
+    if (event.status === EVENT_STATUS.COMPLETED) {
+      throw new ForbiddenException({
+        message: 'Event is completed',
+        userMessage: 'Este evento ya ha finalizado.',
+      });
+    }
+
     // A private event is joinable, but only through an invitation (or by an
     // admin adding the player). It used to fail as "Event not found" because
     // the existence check itself filtered private events out.
@@ -459,7 +600,7 @@ export class EventsFacadeService {
     // userId is injected from the JWT by the controller; guard narrows the
     // now-optional DTO field and fails loudly if identity is ever missing.
     if (joinEventDto.userId == null) {
-      throw new Error('Missing authenticated user');
+      throw new InternalServerErrorException('Missing authenticated user');
     }
 
     // Get or create participant
@@ -566,12 +707,47 @@ export class EventsFacadeService {
     code: string,
     userId: number,
   ): Promise<{ eventId: number }> {
-    const invite = await this.eventInvitesService.consume(code);
+    // Pre-validate everything that would make the join fail BEFORE consuming:
+    // a use burned on a doomed redemption is unrecoverable (there is no admin
+    // "restore use"). The atomic consume stays the concurrency arbiter.
+    const invite = await this.eventInvitesService.getByCode(code);
+
+    const event = await this.eventsService.getEventById(invite.eventId, true);
+    if (!event) {
+      throw new NotFoundException('Event not found');
+    }
+    if (event.status === EVENT_STATUS.COMPLETED) {
+      throw new ForbiddenException({
+        message: 'Event is completed',
+        userMessage: 'Este evento ya ha finalizado.',
+      });
+    }
+
+    const participation = await this.participantsService.getParticipationForUser(
+      userId,
+      invite.eventId,
+    );
+    if (participation) {
+      if (participation.status === PARTICIPANT_STATUS.REMOVED) {
+        throw new ForbiddenException(
+          'Has sido expulsado de este evento por un administrador',
+        );
+      }
+      if (participation.status !== PARTICIPANT_STATUS.DECLINED) {
+        throw new ConflictException(
+          'Participant is already registered for this event',
+        );
+      }
+    }
+
+    await this.eventInvitesService.consume(code);
     // bypassVisibility: the invitation IS the authorisation to join a private
-    // event — that is the entire point of the code.
+    // event — that is the entire point of the code. The comment is a marker,
+    // never the code itself: it used to echo live invite codes to anyone who
+    // could read the participants list.
     await this.joinEvent(
       invite.eventId,
-      { userId, comment: `Invitación ${code}` },
+      { userId, comment: 'invite' },
       { bypassVisibility: true },
     );
     return { eventId: invite.eventId };
@@ -596,7 +772,9 @@ export class EventsFacadeService {
     const rawParticipants =
       await this.participantsService.getEventParticipants(eventId);
 
-    // Transform to match Participant entity
+    // Transform to match Participant entity. `comment` is admin-only: old rows
+    // stored the literal invite code in it, so echoing it publicly leaked live
+    // codes to anyone who could read the roster.
     return rawParticipants.map((participant) => ({
       id: participant.id,
       eventId: participant.eventId,
@@ -605,7 +783,7 @@ export class EventsFacadeService {
       avatar: participant.avatar,
       nickname: participant.nickname,
       status: participant.status,
-      comment: participant.comment,
+      comment: includePrivate ? participant.comment : null,
       createdAt: participant.createdAt,
       updatedAt: participant.updatedAt,
     })) as unknown as Participant[];
@@ -632,10 +810,10 @@ export class EventsFacadeService {
     ]);
 
     if (!eventExists) {
-      throw new Error('Event not found');
+      throw new NotFoundException('Event not found');
     }
     if (!achievementExists) {
-      throw new Error('Achievement not found');
+      throw new NotFoundException('Achievement not found');
     }
 
     // Validate participant is in the event
@@ -645,7 +823,7 @@ export class EventsFacadeService {
         eventId,
       );
     if (!participantInEvent) {
-      throw new Error('Participant is not registered for this event');
+      throw new ConflictException('Participant is not registered for this event');
     }
 
     await this.progressService.updateProgress(
@@ -727,7 +905,7 @@ export class EventsFacadeService {
     if (eventId) {
       const eventExists = await this.eventsService.validateEventExists(eventId);
       if (!eventExists) {
-        throw new Error('Event not found');
+        throw new NotFoundException('Event not found');
       }
     }
 
@@ -742,7 +920,7 @@ export class EventsFacadeService {
     if (eventId) {
       const eventExists = await this.eventsService.validateEventExists(eventId);
       if (!eventExists) {
-        throw new Error('Event not found');
+        throw new NotFoundException('Event not found');
       }
     }
 
@@ -760,7 +938,7 @@ export class EventsFacadeService {
     if (eventId) {
       const eventExists = await this.eventsService.validateEventExists(eventId);
       if (!eventExists) {
-        throw new Error('Event not found');
+        throw new NotFoundException('Event not found');
       }
     }
 
@@ -769,14 +947,18 @@ export class EventsFacadeService {
 
   // ==================== USER PROFILE ====================
 
-  async getUserTrophies(userId: number): Promise<UserTrophies> {
-    return this.profileService.getUserTrophies(userId);
+  async getUserTrophies(
+    userId: number,
+    viewer?: { includePrivate?: boolean; userId?: number },
+  ): Promise<UserTrophies> {
+    return this.profileService.getUserTrophies(userId, viewer);
   }
 
   async getUserActivity(
     userId: number,
     limit?: number,
+    viewer?: { includePrivate?: boolean; userId?: number },
   ): Promise<UserActivityItem[]> {
-    return this.profileService.getUserActivity(userId, limit);
+    return this.profileService.getUserActivity(userId, limit, viewer);
   }
 }

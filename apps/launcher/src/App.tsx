@@ -16,7 +16,7 @@ import { LauncherProvider, useLauncher } from "./state/launcher"
 // custom protocol where history-based routing is more trouble than it solves.
 
 function Router() {
-  const { boffAccount, boffSigningIn, booting, bootStep, signingIn, view } = useLauncher()
+  const { boffAccount, offline, boffSigningIn, booting, bootStep, signingIn, view } = useLauncher()
 
   // Before anything else: while the silent restore is in flight we do not yet
   // know whether this player is signed in, and guessing "no" is what put
@@ -38,7 +38,12 @@ function Router() {
   // is already signed in: "Add account" in the rail starts one while
   // `boffAccount` is still set, and BoffSignIn is the only screen that renders
   // the code — so reaching it cannot be conditional on being signed out.
-  if (!boffAccount || boffSigningIn) return <BoffSignIn />
+  //
+  // `offline` opens the shell with no live session (the network-failed restore
+  // fell back to the stored account): the principal is still set, but the gate
+  // honours `offline` explicitly so an offline session can never be mistaken for
+  // "not signed in" and bounced to the code screen.
+  if ((!boffAccount && !offline) || boffSigningIn) return <BoffSignIn />
 
   return (
     <Shell>

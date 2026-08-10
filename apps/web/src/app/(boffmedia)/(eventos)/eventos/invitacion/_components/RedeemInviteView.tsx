@@ -34,7 +34,15 @@ export function RedeemInviteView() {
         router.push(`/eventos/${res.data.eventId}`)
         return
       }
-      setError(res.error ?? t("failed"))
+      // 409 = already a member: the invite has nothing to add, but the player
+      // has what they came for — send them to the event, not to an error.
+      if (res.statusCode === 409) {
+        toast.success(t("alreadyMember"))
+        const eventId = (res.data as { eventId?: number } | undefined)?.eventId
+        router.push(eventId ? `/eventos/${eventId}` : "/eventos")
+        return
+      }
+      setError(res.userMessage ?? res.error ?? t("failed"))
     } catch (e) {
       setError(e instanceof Error ? e.message : t("failed"))
     } finally {

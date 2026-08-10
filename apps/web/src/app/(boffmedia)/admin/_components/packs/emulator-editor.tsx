@@ -71,6 +71,41 @@ async function sha512File(file: File): Promise<{ sha512: string; size: number }>
   return { sha512: hex, size: file.size }
 }
 
+const ROM_EXT: Record<EmulatorKind, string> = { mgba: "gba", melonds: "nds" }
+const defaultRomPath = (kind: EmulatorKind) => `roms/rom.${ROM_EXT[kind]}`
+const defaultPatchedPath = (kind: EmulatorKind) => `roms/rom-patched.${ROM_EXT[kind]}`
+
+// The schema caps args at 32 items of 256 chars; enforcing them here turns a
+// server 400 into an inline error. Quotes let a single arg carry spaces.
+const MAX_ARGS = 32
+const MAX_ARG_LENGTH = 256
+
+function tokenizeArgs(input: string): { tokens: string[]; unterminated: boolean } {
+  const tokens: string[] = []
+  let current = ""
+  let quote: '"' | "'" | null = null
+  let started = false
+  for (const ch of input) {
+    if (quote) {
+      if (ch === quote) quote = null
+      else current += ch
+    } else if (ch === '"' || ch === "'") {
+      quote = ch
+      started = true
+    } else if (/\s/.test(ch)) {
+      if (started || current) {
+        tokens.push(current)
+        current = ""
+        started = false
+      }
+    } else {
+      current += ch
+    }
+  }
+  if (started || current) tokens.push(current)
+  return { tokens, unterminated: quote !== null }
+}
+
 /** Emulator editor for creating/editing emulator pack versions. Handles:
  *  - Emulator kind (mGBA/melonDS) selection
  *  - ROM definer (in-browser hash, user-provided source)
@@ -90,24 +125,37 @@ export function EmulatorEditor({
 }: EmulatorEditorProps) {
   const t = useTranslations("admin.packs")
 
+  const initialKind = initial?.kind ?? previousKind ?? "mgba"
   const [name, setName] = useState(initial?.name ?? initialName ?? "")
-  const [kind, setKind] = useState<EmulatorKind>(initial?.kind ?? previousKind ?? "mgba")
+  const [kind, setKind] = useState<EmulatorKind>(initialKind)
   const [romHint, setRomHint] = useState(initial?.romHint ?? "")
   const [romFile, setRomFile] = useState<{ file: File; sha512: string; size: number } | null>(null)
-  const [romPath, setRomPath] = useState(initial?.romPath ?? "roms/rom.bin")
+  const [romPath, setRomPath] = useState(initial?.romPath ?? defaultRomPath(initialKind))
 
   const [useRomhack, setUseRomhack] = useState(false)
   const [baseFile, setBaseFile] = useState<{ file: File; sha512: string; size: number } | null>(null)
   const [patchFile, setPatchFile] = useState<{ file: File; name: string } | null>(null)
   const [patchFormat, setPatchFormat] = useState<"bps" | "ups">("bps")
   const [patchedRomFile, setPatchedRomFile] = useState<{ file: File; sha512: string; size: number } | null>(null)
-  const [patchedRomPath, setPatchedRomPath] = useState("roms/rom-patched.bin")
+  const [patchedRomPath, setPatchedRomPath] = useState(defaultPatchedPath(initialKind))
 
   const [startingSave, setStartingSave] = useState<{ file: File; name: string } | null>(null)
   const [savePath, setSavePath] = useState("roms/save.sav")
 
-  const [extraFiles, setExtraFiles] = useState<Array<{ file: File; sha512: string; size: number; path: string }>>([])
+  const [extraFiles, setExtraFiles] = useState<
+    Array<{ file: File; sha512: string; size: number; path: string; required: boolean }>
+  >([])
   const [args, setArgs] = useState(initial?.args ?? "")
+
+  /** Re-derive the untouched path defaults when the emulator changes, so a
+   *  melonDS pack does not ship a `.gba` path the author never looked at. */
+  const changeKind = (next: EmulatorKind) => {
+    if (next !== kind) {
+      setRomPath((p) => (p === defaultRomPath(kind) ? defaultRomPath(next) : p))
+      setPatchedRomPath((p) => (p === defaultPatchedPath(kind) ? defaultPatchedPath(next) : p))
+    }
+    setKind(next)
+  }
 
   const [hashing, setHashing] = useState(false)
   const [busy, setBusy] = useState(false)
@@ -177,7 +225,7 @@ export function EmulatorEditor({
     for (const file of Array.from(files)) {
       try {
         const { sha512, size } = await sha512File(file)
-        added.push({ file, sha512, size, path: file.name })
+        added.push({ file, sha512, size, path: `bios/${file.name}`, required: true })
       } catch (e) {
         toast({ tone: "bad", title: t("emulator.romHashFailed"), msg: file.name })
       }
@@ -185,22 +233,33 @@ export function EmulatorEditor({
     setExtraFiles((current) => [...current, ...added])
   }
 
+  const parsedArgs = tokenizeArgs(args)
+  const argsError = parsedArgs.unterminated
+    ? t("emulator.argsUnterminated")
+    : parsedArgs.tokens.length > MAX_ARGS
+      ? t("emulator.argsTooMany", { max: MAX_ARGS })
+      : parsedArgs.tokens.some((a) => a.length > MAX_ARG_LENGTH)
+        ? t("emulator.argsTooLong", { max: MAX_ARG_LENGTH })
+        : null
+
   // Split by step so the rail can show how far the form actually is, rather
   // than one all-or-nothing flag on a single long page.
   const stepValidity: Record<EmulatorStep, boolean> = {
     metadata: name.trim().length > 0,
+    // In romhack mode the base dump IS the clean ROM — there is no separate
+    // clean-ROM entry, so the standalone picker plays no part in validity.
     rom:
       romHint.trim().length > 0 &&
-      romFile !== null &&
-      (!useRomhack ||
-        (baseFile !== null && patchFile !== null && patchedRomFile !== null)),
+      (useRomhack
+        ? baseFile !== null && patchFile !== null && patchedRomFile !== null
+        : romFile !== null),
     // Extra BIOS/firmware files are optional: a GBA pack usually needs none.
-    files: true,
+    files: argsError === null,
     review: true,
   }
 
   const canSubmit =
-    stepValidity.metadata && stepValidity.rom && !hashing && !busy
+    stepValidity.metadata && stepValidity.rom && stepValidity.files && !hashing && !busy
 
   useEffect(() => {
     onValidity?.(stepValidity)
@@ -210,20 +269,25 @@ export function EmulatorEditor({
   }, [JSON.stringify(stepValidity)])
 
   const submit = async () => {
-    if (!canSubmit || !romFile) return
+    if (!canSubmit) return
+    if (!useRomhack && !romFile) return
     setBusy(true)
     try {
       const files: FileEntry[] = []
       const initialFiles: FileEntry[] = []
 
-      // Clean ROM (user-provided)
-      files.push({
-        path: useRomhack ? `roms/${romFile.file.name}` : romPath,
-        sha512: romFile.sha512,
-        fileSize: romFile.size,
-        source: { kind: "user-provided", hint: romHint },
-        env: { client: "required", server: "unsupported" },
-      })
+      // Clean ROM (user-provided). In romhack mode the base dump below is the
+      // clean ROM — a second user-provided entry would either collide on path
+      // or sit unreferenced and required, blocking launch forever.
+      if (!useRomhack && romFile) {
+        files.push({
+          path: romPath,
+          sha512: romFile.sha512,
+          fileSize: romFile.size,
+          source: { kind: "user-provided", hint: romHint },
+          env: { client: "required", server: "unsupported" },
+        })
+      }
 
       if (useRomhack && baseFile && patchFile && patchedRomFile) {
         // Upload patch file
@@ -291,7 +355,7 @@ export function EmulatorEditor({
           sha512: extra.sha512,
           fileSize: extra.size,
           source: { kind: "user-provided", hint: t("emulator.biosHint") },
-          env: { client: "required", server: "unsupported" },
+          env: { client: extra.required ? "required" : "optional", server: "unsupported" },
         })
       }
 
@@ -299,7 +363,7 @@ export function EmulatorEditor({
         name: name.trim(),
         kind,
         rom: useRomhack ? patchedRomPath : romPath,
-        args: args.trim().length > 0 ? args.trim().split(/\s+/) : undefined,
+        args: parsedArgs.tokens.length > 0 ? parsedArgs.tokens : undefined,
         files,
         initialFiles: initialFiles.length > 0 ? initialFiles : undefined,
       })
@@ -352,7 +416,7 @@ export function EmulatorEditor({
         <Field label={t("emulator.kind")}>
           <Select
             value={kind}
-            onChange={(v) => setKind(v as EmulatorKind)}
+            onChange={(v) => changeKind(v as EmulatorKind)}
             options={[
               { value: "mgba", label: "mGBA (Game Boy Advance)" },
               { value: "melonds", label: "melonDS (Nintendo DS)" },
@@ -388,49 +452,55 @@ export function EmulatorEditor({
             />
           </Field>
 
-          <div className="flex flex-wrap items-end gap-3">
-            <div className="flex-1 min-w-[200px]">
-              <Field label={t("emulator.romFile")}>
-                <div className="rounded border border-solid border-line bg-panel px-3 py-2 font-mono text-[11px] text-txt-dim truncate">
-                  {romFile?.file.name || "No file selected"}
+          {/* In romhack mode the base dump picker below covers the clean ROM;
+              a second picker here would author a phantom required file. */}
+          {!useRomhack && (
+            <>
+              <div className="flex flex-wrap items-end gap-3">
+                <div className="flex-1 min-w-[200px]">
+                  <Field label={t("emulator.romFile")}>
+                    <div className="rounded border border-solid border-line bg-panel px-3 py-2 font-mono text-[11px] text-txt-dim truncate">
+                      {romFile?.file.name || "No file selected"}
+                    </div>
+                  </Field>
                 </div>
+                <Button
+                  size="sm"
+                  icon="upload"
+                  loading={hashing}
+                  onClick={() => romInputRef.current?.click()}
+                >
+                  {t("emulator.selectRom")}
+                </Button>
+                <input
+                  ref={romInputRef}
+                  type="file"
+                  hidden
+                  onChange={(e) => {
+                    void handleRomPick(e.target.files?.[0])
+                    e.target.value = ""
+                  }}
+                />
+              </div>
+
+              {romFile && (
+                <div className="text-[11px] font-mono text-txt-muted">
+                  {t("emulator.romInfo", {
+                    size: (romFile.size / (1024 * 1024)).toFixed(1),
+                    hash: romFile.sha512.slice(0, 16) + "…",
+                  })}
+                </div>
+              )}
+
+              <Field label={t("emulator.romPath")}>
+                <Input
+                  value={romPath}
+                  onChange={(e) => setRomPath(e.target.value)}
+                  placeholder="roms/emerald.gba"
+                />
               </Field>
-            </div>
-            <Button
-              size="sm"
-              icon="upload"
-              loading={hashing}
-              onClick={() => romInputRef.current?.click()}
-            >
-              {t("emulator.selectRom")}
-            </Button>
-            <input
-              ref={romInputRef}
-              type="file"
-              hidden
-              onChange={(e) => {
-                void handleRomPick(e.target.files?.[0])
-                e.target.value = ""
-              }}
-            />
-          </div>
-
-          {romFile && (
-            <div className="text-[11px] font-mono text-txt-muted">
-              {t("emulator.romInfo", {
-                size: (romFile.size / (1024 * 1024)).toFixed(1),
-                hash: romFile.sha512.slice(0, 16) + "…",
-              })}
-            </div>
+            </>
           )}
-
-          <Field label={t("emulator.romPath")}>
-            <Input
-              value={romPath}
-              onChange={(e) => setRomPath(e.target.value)}
-              placeholder="roms/emerald.gba"
-            />
-          </Field>
         </div>
       </section>
       )}
@@ -610,11 +680,13 @@ export function EmulatorEditor({
           </div>
         </div>
 
-        <Field label={t("emulator.args")} hint={t("emulator.argsHint")}>
-          <Input
+        <Field label={t("emulator.args")} hint={t("emulator.argsHint")} error={argsError ?? undefined}>
+          <Textarea
             value={args}
             onChange={(e) => setArgs(e.target.value)}
-            placeholder="--fullscreen --skip-bios"
+            rows={3}
+            className="font-mono"
+            placeholder={'--fullscreen\n--savedir "My Saves"'}
           />
         </Field>
       </section>
@@ -669,6 +741,25 @@ export function EmulatorEditor({
                   <span className="ml-auto shrink-0 font-mono text-[11px] text-txt-dim">
                     {Math.max(1, Math.round(extra.size / 1024))} KB
                   </span>
+                  {/* A required entry blocks launch until the player provides
+                      it; letting the author demote it keeps optional firmware
+                      from bricking every install. */}
+                  <button
+                    type="button"
+                    className={cn(
+                      "shrink-0 border border-solid px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.06em]",
+                      extra.required
+                        ? "border-warn/50 text-warn"
+                        : "border-line text-txt-dim",
+                    )}
+                    onClick={() =>
+                      setExtraFiles((current) =>
+                        current.map((f, i) => (i === idx ? { ...f, required: !f.required } : f)),
+                      )
+                    }
+                  >
+                    {t(extra.required ? "emulator.fileRequired" : "emulator.fileOptional")}
+                  </button>
                   <button
                     type="button"
                     className="shrink-0 font-mono text-[11px] text-txt-dim hover:text-bad"

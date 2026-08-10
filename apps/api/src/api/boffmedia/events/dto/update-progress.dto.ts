@@ -17,7 +17,8 @@ export class UpdateProgressDto {
   achievementId: number;
 
   @ApiProperty({
-    description: 'The progress amount to add',
+    description:
+      'The new absolute progress value (overwrites the current value; it is NOT added to it)',
     example: 1,
   })
   @IsInt()

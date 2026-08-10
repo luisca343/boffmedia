@@ -141,7 +141,7 @@ export class EventsService {
     const seed =
       params.seed && params.seed > 0
         ? params.seed
-        : randomBytes(6).readUintBE(0, 6) % Number.MAX_SAFE_INTEGER;
+        : randomBytes(6).readUintBE(0, 6);
 
     const result = await this.runner.randomize({
       romStream: Readable.from(params.romBuffer),
@@ -220,7 +220,7 @@ export class EventsService {
     // The pack is what makes the config reachable in the launcher (pack → event
     // → config). Validate it up front and attach it to the event in the same
     // transaction as the insert, so a config can never exist unreachable.
-    await this.assertPackAttachable(data.packId, data.eventId);
+    await this.assertPackAttachable(data.packId, data.eventId, rom.sha512);
 
     // Pin the settings snapshot: SHA-512 over a stable serialization of the preset's JSON.
     const settingsJsonString = stableStringify(asSettingsObject(preset.settingsJson));
@@ -387,6 +387,7 @@ export class EventsService {
   private async assertPackAttachable(
     packId: string,
     eventId: number,
+    cleanRomSha512?: string,
   ): Promise<void> {
     if (!packId) {
       throw new BadRequestException('A pack is required');
@@ -403,6 +404,52 @@ export class EventsService {
         message: `Pack ${packId} is already attached to event ${other}`,
         userMessage:
           'Este pack ya está vinculado a otro evento. Elige un pack distinto.',
+      });
+    }
+    if (cleanRomSha512) {
+      // Attach-time: a pack with nothing published yet is fine (openConfig
+      // re-asserts strictly), but a published version whose emulator ROM
+      // differs from the pinned clean ROM would disarm the launcher's
+      // clean-ROM gate — reject it now, where the admin can fix it.
+      await this.assertPublishedRomMatchesPack(packId, cleanRomSha512, {
+        requirePublished: false,
+      });
+    }
+  }
+
+  /**
+   * Anti-cheat invariant: the ROM the pack's published version ships must be
+   * the exact clean ROM the config pinned, or the launcher's expected-vs-clean
+   * comparison never fires and players can supply their own dump.
+   */
+  private async assertPublishedRomMatchesPack(
+    packId: string,
+    cleanRomSha512: string,
+    opts: { requirePublished: boolean },
+  ): Promise<void> {
+    const pub = await this.repository.getPublishedEmulatorRom(packId);
+    if (!pub || pub.state === 'no-version') {
+      if (opts.requirePublished) {
+        throw new ConflictException({
+          message: `Pack ${packId} has no published version with an emulator ROM`,
+          userMessage:
+            'El pack no tiene ninguna versión publicada con ROM de emulador. Publica una versión del pack antes de abrir la configuración.',
+        });
+      }
+      return;
+    }
+    if (pub.state === 'no-rom') {
+      throw new ConflictException({
+        message: `Pack ${packId}: published version declares no resolvable emulator ROM entry`,
+        userMessage:
+          'La versión publicada del pack no declara una ROM de emulador válida. Corrige el pack antes de continuar.',
+      });
+    }
+    if (pub.sha512 !== cleanRomSha512) {
+      throw new ConflictException({
+        message: `Pack ${packId}: published emulator ROM sha512 ${pub.sha512.slice(0, 8)}… (version ${pub.versionId}, ${pub.romPath}) does not match the config's clean ROM ${cleanRomSha512.slice(0, 8)}…`,
+        userMessage:
+          'La ROM que distribuye el pack publicado no coincide con la ROM base elegida para el evento: el anti-trampas no funcionaría. Corrige la versión del pack o elige la ROM correcta de la biblioteca.',
       });
     }
   }
@@ -476,10 +523,31 @@ export class EventsService {
       );
     }
 
+    // Resolve the new base ROM first: pack/ROM consistency is validated
+    // against the sha512 the config will END UP with, not the current one.
+    const resolvedRom =
+      patch.romId !== undefined
+        ? await this.resolveLibraryRom(patch.romId, config.gamePlatform)
+        : null;
+    const effectiveCleanSha = resolvedRom?.sha512 ?? config.cleanRomSha512;
+
     // Re-attach to a different pack if asked (validated the same as create).
     if (patch.packId !== undefined) {
-      await this.assertPackAttachable(patch.packId, config.eventId);
+      await this.assertPackAttachable(
+        patch.packId,
+        config.eventId,
+        effectiveCleanSha,
+      );
       await this.repository.attachPackToEvent(config.eventId, patch.packId);
+    } else if (resolvedRom) {
+      // ROM changed without changing the pack: the currently attached pack (if
+      // any) must still ship this exact ROM in its published version.
+      const ev = await this.repository.getEventPackAndStatus(config.eventId);
+      if (ev?.packId) {
+        await this.assertPublishedRomMatchesPack(ev.packId, effectiveCleanSha, {
+          requirePublished: false,
+        });
+      }
     }
 
     const update: {
@@ -491,10 +559,9 @@ export class EventsService {
     };
 
     // Re-select the base ROM: re-pin sha512 + record provenance.
-    if (patch.romId !== undefined) {
-      const rom = await this.resolveLibraryRom(patch.romId, config.gamePlatform);
-      update.romId = rom.id;
-      update.cleanRomSha512 = rom.sha512;
+    if (resolvedRom) {
+      update.romId = resolvedRom.id;
+      update.cleanRomSha512 = resolvedRom.sha512;
     }
 
     await this.repository.updateConfig(configId, update);
@@ -547,6 +614,15 @@ export class EventsService {
           'Selecciona una ROM base de la biblioteca antes de abrir la configuración.',
       });
     }
+
+    // Second clean-ROM gate: by open time the pack MUST have a published
+    // version whose emulator ROM is exactly the pinned clean ROM. This also
+    // catches versions published after the config was created.
+    await this.assertPublishedRomMatchesPack(
+      ev.packId,
+      config.cleanRomSha512,
+      { requirePublished: true },
+    );
 
     await this.repository.updateConfig(configId, {
       status: 'open' as RandomizerConfigStatus,

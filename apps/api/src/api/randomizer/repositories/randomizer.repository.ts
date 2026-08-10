@@ -1,7 +1,7 @@
 import { Injectable, Inject, ConflictException } from '@nestjs/common';
 import { MySql2Database } from 'drizzle-orm/mysql2';
 import { and, eq, ne, or, sql, isNotNull, isNull, inArray } from 'drizzle-orm';
-import { packs } from '@/_db/schema/Packs';
+import { packs, packVersions } from '@/_db/schema/Packs';
 import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
 import {
   randomizerConfigs,
@@ -98,6 +98,56 @@ export class RandomizerRepository {
       .where(and(eq(packs.id, packId), eq(packs.gameType, 'emulator')))
       .execute();
     return rows.length > 0 ? rows[0] : null;
+  }
+
+  /**
+   * The emulator ROM a pack's published version actually ships: the files[]
+   * entry whose path equals version.emulator.rom. This is the hash the
+   * launcher's clean-ROM gate compares against, so configs must pin the same
+   * value or the anti-cheat silently disarms.
+   *
+   * null = pack not found; 'no-version' = nothing published yet;
+   * 'no-rom' = published version declares no resolvable emulator ROM entry.
+   */
+  async getPublishedEmulatorRom(packId: string): Promise<
+    | { state: 'no-version' }
+    | { state: 'no-rom' }
+    | { state: 'ok'; versionId: string; romPath: string; sha512: string }
+    | null
+  > {
+    if (!packId) return null;
+    const packRows = await this.db
+      .select({ latestVersionId: packs.latestVersionId })
+      .from(packs)
+      .where(eq(packs.id, packId))
+      .execute();
+    if (packRows.length === 0) return null;
+    const latestVersionId = packRows[0].latestVersionId;
+    if (!latestVersionId) return { state: 'no-version' };
+
+    const versionRows = await this.db
+      .select({
+        id: packVersions.id,
+        files: packVersions.files,
+        emulator: packVersions.emulator,
+        published: packVersions.published,
+      })
+      .from(packVersions)
+      .where(eq(packVersions.id, latestVersionId))
+      .execute();
+    const version = versionRows[0];
+    if (!version || !version.published) return { state: 'no-version' };
+
+    const romPath = (version.emulator as { rom?: unknown } | null)?.rom;
+    if (typeof romPath !== 'string' || !romPath) return { state: 'no-rom' };
+
+    const files = Array.isArray(version.files)
+      ? (version.files as Array<{ path?: unknown; sha512?: unknown }>)
+      : [];
+    const entry = files.find((f) => f?.path === romPath);
+    if (!entry || typeof entry.sha512 !== 'string') return { state: 'no-rom' };
+
+    return { state: 'ok', versionId: version.id, romPath, sha512: entry.sha512 };
   }
 
   /**

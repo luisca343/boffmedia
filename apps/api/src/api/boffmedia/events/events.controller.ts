@@ -29,13 +29,14 @@ import { JwtAuthGuard } from '@api/auth/jwt-auth.guard';
 import { RolesGuard } from '@api/_utils/guards/roles.guard';
 import { UserThrottlerGuard } from '@api/_utils/guards/user-throttler.guard';
 import { OwnerOrAdminGuard } from '@api/_utils/guards/owner-or-admin.guard';
+import { FullSessionGuard } from '@api/_utils/guards/full-session.guard';
 import { Roles } from '@api/_utils/decorators/roles.decorator';
 import { USER_ROLES } from '@api/_utils/auth/roles.constants';
 import { EventsFacadeService } from './events.facade.service';
 import { CreateEventDto } from './dto/create-event.dto';
 import { ListEventsQueryDto } from './dto/list-events-query.dto';
 import { CreateGameDto } from './dto/create-game.dto';
-import { CreateAchievementDto } from './dto/create-achievement.dto';
+import { CreateEventAchievementDto } from './dto/create-achievement.dto';
 import { CreateTeamDto } from './dto/create-team.dto';
 import { JoinEventDto } from './dto/join-event.dto';
 import { UpdateProgressDto } from './dto/update-progress.dto'; // Import from DTO folder
@@ -43,7 +44,7 @@ import { UpdateEventDto } from './dto/update-event.dto';
 import { UpdateGameDto } from './dto/update-game.dto';
 import { Event } from './entities/event.entity';
 import { Game } from './entities/game.entity';
-import { Achievement } from './entities/achievement.entity';
+import { EventAchievement } from './entities/achievement.entity';
 import { AchievementWithProgress } from './entities/achievement-with-progress.entity';
 import { UpdateAchievementDto } from './dto/update-achievement.dto';
 import { Team } from './entities/team.entity';
@@ -90,13 +91,15 @@ export class EventsController {
     @Query() query: ListEventsQueryDto,
     @Req() req: { user?: { roles?: string[]; userId?: number } },
   ): Promise<Event[]> {
-    // Private events are only exposed to admins; anonymous/non-admin callers
-    // (public pages) get public events only.
+    // Admins see every private event; an authenticated non-admin additionally
+    // sees the private events they actively participate in (the invite flow's
+    // payoff used to vanish from every listing).
     const includePrivate =
       req.user?.roles?.includes(USER_ROLES.BOFF_ADMIN) ?? false;
     return await this.eventsFacadeService.getEvents({
       ...query,
       includePrivate,
+      userId: req.user?.userId,
     });
   }
 
@@ -215,7 +218,7 @@ export class EventsController {
   }
 
   @Post('/invites/redeem')
-  @UseGuards(JwtAuthGuard, UserThrottlerGuard)
+  @UseGuards(JwtAuthGuard, FullSessionGuard, UserThrottlerGuard)
   @Throttle({ default: { ttl: 60_000, limit: 10 } })
   @ApiBearerAuth('JWT')
   @ApiOperation({
@@ -322,16 +325,23 @@ export class EventsController {
   }
 
   // ==================== ACHIEVEMENT MANAGEMENT ====================
-  @Public()
+  @OptionalAuth()
   @Get('/achievements')
   @ApiOperation({ summary: 'Get all achievements' })
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Achievements retrieved successfully.',
-    type: [Achievement],
+    type: [EventAchievement],
   })
-  async getAchievements(): Promise<Achievement[]> {
-    return await this.eventsFacadeService.getAchievements();
+  async getAchievements(
+    @Req() req: { user?: { roles?: string[]; userId?: number } },
+  ): Promise<EventAchievement[]> {
+    const includePrivate =
+      req.user?.roles?.includes(USER_ROLES.BOFF_ADMIN) ?? false;
+    return await this.eventsFacadeService.getAchievements(
+      includePrivate,
+      req.user?.userId,
+    );
   }
 
   @OptionalAuth()
@@ -340,12 +350,12 @@ export class EventsController {
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Achievements retrieved successfully.',
-    type: [Achievement],
+    type: [EventAchievement],
   })
   async getEventAchievements(
     @Param('eventId') eventId: number,
     @Req() req: { user?: { roles?: string[]; userId?: number } },
-  ): Promise<Achievement[]> {
+  ): Promise<EventAchievement[]> {
     const includePrivate =
       req.user?.roles?.includes(USER_ROLES.BOFF_ADMIN) ?? false;
     return await this.eventsFacadeService.getEventAchievements(
@@ -363,12 +373,12 @@ export class EventsController {
   @ApiResponse({
     status: HttpStatus.CREATED,
     description: 'Achievement created successfully.',
-    type: Achievement,
+    type: EventAchievement,
   })
   async createAchievement(
     @Param('eventId') eventId: number,
-    @Body() createAchievementDto: CreateAchievementDto,
-  ): Promise<Achievement> {
+    @Body() createAchievementDto: CreateEventAchievementDto,
+  ): Promise<EventAchievement> {
     return await this.eventsFacadeService.createAchievement(
       eventId,
       createAchievementDto,
@@ -383,13 +393,13 @@ export class EventsController {
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Achievement updated successfully.',
-    type: Achievement,
+    type: EventAchievement,
   })
   async updateAchievement(
     @Param('eventId') eventId: number,
     @Param('achievementId') achievementId: number,
     @Body() updateAchievementDto: UpdateAchievementDto,
-  ): Promise<Achievement> {
+  ): Promise<EventAchievement> {
     return await this.eventsFacadeService.updateAchievement(
       eventId,
       achievementId,
@@ -397,7 +407,7 @@ export class EventsController {
     );
   }
 
-  @Public()
+  @OptionalAuth()
   @Get('/participants/:participantId/progress')
   @ApiOperation({ summary: 'Get all achievement progress for a participant' })
   @ApiResponse({
@@ -407,8 +417,15 @@ export class EventsController {
   })
   async getParticipantProgress(
     @Param('participantId') participantId: number,
+    @Req() req: { user?: { roles?: string[]; userId?: number } },
   ): Promise<AchievementWithProgress[]> {
-    return await this.eventsFacadeService.getParticipantProgress(participantId);
+    const includePrivate =
+      req.user?.roles?.includes(USER_ROLES.BOFF_ADMIN) ?? false;
+    return await this.eventsFacadeService.getParticipantProgress(
+      participantId,
+      includePrivate,
+      req.user?.userId,
+    );
   }
 
   @OptionalAuth()
@@ -437,7 +454,7 @@ export class EventsController {
   }
 
   // ==================== TEAM MANAGEMENT ====================
-  @Public()
+  @OptionalAuth()
   @Get('/teams')
   @ApiOperation({ summary: 'Get all teams' })
   @ApiResponse({
@@ -445,8 +462,15 @@ export class EventsController {
     description: 'Teams retrieved successfully.',
     type: [Team],
   })
-  async getTeams(): Promise<Team[]> {
-    return await this.eventsFacadeService.getTeams();
+  async getTeams(
+    @Req() req: { user?: { roles?: string[]; userId?: number } },
+  ): Promise<Team[]> {
+    const includePrivate =
+      req.user?.roles?.includes(USER_ROLES.BOFF_ADMIN) ?? false;
+    return await this.eventsFacadeService.getTeams(
+      includePrivate,
+      req.user?.userId,
+    );
   }
 
   @OptionalAuth()
@@ -470,7 +494,7 @@ export class EventsController {
     );
   }
 
-  @Public()
+  @OptionalAuth()
   @Get('/teams/:teamId')
   @ApiOperation({ summary: 'Get team by id' })
   @ApiResponse({
@@ -478,11 +502,20 @@ export class EventsController {
     description: 'Team retrieved successfully.',
     type: Team,
   })
-  async getTeam(@Param('teamId') teamId: number): Promise<Team> {
-    return await this.eventsFacadeService.getTeam(teamId);
+  async getTeam(
+    @Param('teamId') teamId: number,
+    @Req() req: { user?: { roles?: string[]; userId?: number } },
+  ): Promise<Team> {
+    const includePrivate =
+      req.user?.roles?.includes(USER_ROLES.BOFF_ADMIN) ?? false;
+    return await this.eventsFacadeService.getTeam(
+      teamId,
+      includePrivate,
+      req.user?.userId,
+    );
   }
 
-  @Public()
+  @OptionalAuth()
   @Get('/teams/:teamId/members')
   @ApiOperation({ summary: 'Get team members' })
   @ApiResponse({
@@ -490,8 +523,17 @@ export class EventsController {
     description: 'Team members retrieved successfully.',
     type: [TeamMember],
   })
-  async getTeamMembers(@Param('teamId') teamId: number): Promise<TeamMember[]> {
-    return await this.eventsFacadeService.getTeamMembers(teamId);
+  async getTeamMembers(
+    @Param('teamId') teamId: number,
+    @Req() req: { user?: { roles?: string[]; userId?: number } },
+  ): Promise<TeamMember[]> {
+    const includePrivate =
+      req.user?.roles?.includes(USER_ROLES.BOFF_ADMIN) ?? false;
+    return await this.eventsFacadeService.getTeamMembers(
+      teamId,
+      includePrivate,
+      req.user?.userId,
+    );
   }
 
   @Post(':eventId/teams')
@@ -534,7 +576,7 @@ export class EventsController {
   }
 
   @Post(':eventId/teams/:teamId/join')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, FullSessionGuard)
   @ApiBearerAuth('JWT')
   @ApiOperation({ summary: 'Join a team' })
   @ApiResponse({
@@ -544,7 +586,7 @@ export class EventsController {
   async joinTeam(
     @Param('eventId') eventId: number,
     @Param('teamId') teamId: number,
-    @Req() req: { user: { userId: number } },
+    @Req() req: { user: { userId: number; roles?: string[] } },
   ): Promise<{ success: boolean }> {
     // The joining identity comes from the token, never from the body: the old
     // `participantId` field let any authenticated user enrol anyone else — and
@@ -553,11 +595,12 @@ export class EventsController {
       eventId,
       teamId,
       req.user.userId,
+      req.user.roles?.includes(USER_ROLES.BOFF_ADMIN) ?? false,
     );
   }
 
   @Delete(':eventId/teams/:teamId/members/:userId')
-  @UseGuards(JwtAuthGuard, OwnerOrAdminGuard)
+  @UseGuards(JwtAuthGuard, FullSessionGuard, OwnerOrAdminGuard)
   @ApiBearerAuth('JWT')
   @ApiOperation({ summary: 'Leave a team' })
   @ApiResponse({
@@ -573,8 +616,10 @@ export class EventsController {
   }
 
   // ==================== PARTICIPANT MANAGEMENT ====================
+  // FullSessionGuard on every self-service membership write: membership grants
+  // pack access, and an in-game MCEF token must not be able to self-grant it.
   @Post('join/:eventId')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, FullSessionGuard)
   @ApiBearerAuth('JWT')
   @ApiOperation({ summary: 'Join an event' })
   @ApiResponse({
@@ -592,7 +637,7 @@ export class EventsController {
   }
 
   @Post(':eventId/leave')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, FullSessionGuard)
   @ApiBearerAuth('JWT')
   @ApiOperation({
     summary: 'Leave an event',
@@ -739,7 +784,7 @@ export class EventsController {
 
   // ==================== USER PROFILE ====================
 
-  @Public()
+  @OptionalAuth()
   @Get('users/:userId/trophies')
   @ApiOperation({ summary: "Get a user's trophy case (earned + locked)" })
   @ApiParam({
@@ -752,11 +797,18 @@ export class EventsController {
     description: 'Trophy case retrieved successfully.',
     type: UserTrophiesEntity,
   })
-  async getUserTrophies(@Param('userId', ParseIntPipe) userId: number) {
-    return await this.eventsFacadeService.getUserTrophies(userId);
+  async getUserTrophies(
+    @Param('userId', ParseIntPipe) userId: number,
+    @Req() req: { user?: { roles?: string[]; userId?: number } },
+  ) {
+    return await this.eventsFacadeService.getUserTrophies(userId, {
+      includePrivate:
+        req.user?.roles?.includes(USER_ROLES.BOFF_ADMIN) ?? false,
+      userId: req.user?.userId,
+    });
   }
 
-  @Public()
+  @OptionalAuth()
   @Get('users/:userId/activity')
   @ApiOperation({ summary: "Get a user's activity timeline" })
   @ApiParam({
@@ -773,7 +825,12 @@ export class EventsController {
   async getUserActivity(
     @Param('userId', ParseIntPipe) userId: number,
     @Query() q: PaginationQueryDto,
+    @Req() req: { user?: { roles?: string[]; userId?: number } },
   ) {
-    return await this.eventsFacadeService.getUserActivity(userId, q.limit);
+    return await this.eventsFacadeService.getUserActivity(userId, q.limit, {
+      includePrivate:
+        req.user?.roles?.includes(USER_ROLES.BOFF_ADMIN) ?? false,
+      userId: req.user?.userId,
+    });
   }
 }

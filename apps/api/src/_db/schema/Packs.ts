@@ -248,6 +248,9 @@ export const packAudit = mysqlTable(
   {
     id: int('id').primaryKey().autoincrement(),
     packId: varchar('pack_id', { length: 32 }),
+    /** The Boffmedia account that performed the action, when known. No FK:
+     *  like pack_id, the trail must survive the row it points at. */
+    userId: int('user_id'),
     /** The Minecraft UUID the action concerns, when it concerns one. */
     uuid: char('uuid', { length: 36 }),
     action: varchar('action', { length: 32 }).notNull(),
@@ -258,6 +261,7 @@ export const packAudit = mysqlTable(
   },
   (table) => ({
     packIdx: index('pack_audit_pack_idx').on(table.packId),
+    userIdx: index('pack_audit_user_idx').on(table.userId),
     // No FK on pack_id: the audit trail must survive the pack being deleted,
     // which is exactly when it is most worth reading.
   }),

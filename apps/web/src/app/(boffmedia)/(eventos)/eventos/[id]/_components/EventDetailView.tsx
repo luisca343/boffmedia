@@ -19,7 +19,7 @@ export function EventDetailView({ id }: { id: number }) {
   const { event, isLoading } = useGetEvent(id)
   const { achievements } = useGetEventAchievements(id)
   const { leaderboard } = useGetLeaderboard(id)
-  const { participantId, participants, refetch: refetchParts } = useCurrentParticipant(id)
+  const { isParticipating, status: memberStatus, activeCount, refetch: refetchParts } = useCurrentParticipant(id)
   const { session } = useBoffSession()
   const [joining, setJoining] = React.useState(false)
 
@@ -45,8 +45,8 @@ export function EventDetailView({ id }: { id: number }) {
 
   const ach = Array.isArray(achievements) ? achievements : []
   const board = Array.isArray(leaderboard) ? leaderboard : []
-  const count = participants?.length ?? 0
-  const joined = !!participantId
+  const count = activeCount
+  const joined = isParticipating
 
   async function handleJoin() {
     setJoining(true)
@@ -152,6 +152,10 @@ export function EventDetailView({ id }: { id: number }) {
                     {t("detail.leave")}
                   </Button>
                 </div>
+              ) : memberStatus === "removed" ? (
+                // The API refuses both join and leave for a removed membership,
+                // so a button here can only produce errors.
+                <p className="font-body text-[13px] text-txt-dim">{t("detail.removedNotice")}</p>
               ) : (
                 <Button variant="pri" icon="plus" loading={joining} onClick={handleJoin} className="w-full">
                   {t("detail.participate")}

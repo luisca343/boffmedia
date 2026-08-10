@@ -48,10 +48,18 @@ export class EventInvitesService {
     await this.repository.revoke(code);
   }
 
+  /** Read-only lookup so the caller can pre-validate before burning a use. */
+  async getByCode(code: string): Promise<EventInvite> {
+    const invite = await this.repository.findByCode(code);
+    if (!invite) throw new NotFoundException('Código de invitación no válido');
+    return invite;
+  }
+
   /**
-   * Burns one use and returns the event it belongs to. The use is consumed
-   * before the join runs: a redemption that fails downstream is not worth
-   * risking a code that two people can spend at once.
+   * Burns one use and returns the event it belongs to. The atomic conditional
+   * UPDATE stays the concurrency arbiter: two redemptions of a single-use code
+   * cannot both win. Callers should pre-validate the join (event alive, not
+   * already a member) so a doomed redemption does not waste the use.
    */
   async consume(code: string): Promise<EventInvite> {
     const invite = await this.repository.findByCode(code);

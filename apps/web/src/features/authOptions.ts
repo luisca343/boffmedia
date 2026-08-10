@@ -73,20 +73,41 @@ export const authOptions: NextAuthOptions = {
       credentials: {
         username: { label: "Username", type: "text", placeholder: "Luisca" },
         uuid: { label: "UUID", type: "text" },
-        world: { label: "World", type: "text" }
+        world: { label: "World", type: "text" },
+        // The proven path. Present when the mod completed Mojang's
+        // session/minecraft/join against a serverId this API issued.
+        serverId: { label: "Server ID", type: "text" }
       },
       async authorize(credentials, req) {
         try {
           if (!credentials?.username || !credentials?.uuid || !credentials?.world) {
             throw new AuthError("Missing required Minecraft credentials", AUTH_ERROR_CODES.MISSING_CREDENTIALS);
           }
+          // Two paths, and they are not equivalent.
+          //
+          // `/auth/minecraft/session` PROVES the identity: the mod joined Mojang
+          // with the running game's own token, and the API confirms it with
+          // hasJoined. `/auth/loginmc` only checks the `world` string, which is
+          // documented non-secret and ships in the browser bundle — a public UUID
+          // is enough to impersonate anyone.
+          //
+          // loginmc survives solely for jars older than the MC_JOIN_SERVER query
+          // (1.16.5 among them). Delete it, `AuthService.loginMC` and `MC_WORLD`
+          // once every jar in the wild carries the handshake — see
+          // docs/handoff/03-MINECRAFT-MOD.md.
+          //
           // Only the declared fields: NextAuth folds csrfToken/callbackUrl/json into
           // `credentials`, and the API's strict DTOs reject unknown properties.
-          const response = (await boffPOST<AuthLoginResponseEntity | { error: string }>(`/auth/loginmc`, {
-            username: credentials.username,
-            uuid: credentials.uuid,
-            world: credentials.world,
-          })).data;
+          const response = credentials.serverId
+            ? (await boffPOST<AuthLoginResponseEntity | { error: string }>(`/auth/minecraft/session`, {
+                username: credentials.username,
+                serverId: credentials.serverId,
+              })).data
+            : (await boffPOST<AuthLoginResponseEntity | { error: string }>(`/auth/loginmc`, {
+                username: credentials.username,
+                uuid: credentials.uuid,
+                world: credentials.world,
+              })).data;
           if (response && !('error' in response)) {
             const { user } = response;
             return {

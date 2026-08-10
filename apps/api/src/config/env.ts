@@ -5,6 +5,9 @@ export const env = z
     // App
     NODE_ENV: z.string().default('development'),
     PORT: z.coerce.number().default(34301),
+    // WebSocket gateway port. Kept env-driven so it can move without a code
+    // change; 34304 stays the effective default.
+    SOCKET_PORT: z.coerce.number().default(34304),
     // Public base URL of the web app — used to build reset/verify links.
     WEB_URL: z.string().default('http://localhost:3000'),
     // Directory served as static files.
@@ -117,5 +120,20 @@ export const env = z
     RANDOMIZER_SHIM_JAR: z.string().optional(),
     RANDOMIZER_SHIM_MAX_CONCURRENCY: z.coerce.number().default(2),
     RANDOMIZER_SHIM_TIMEOUT_MS: z.coerce.number().default(30000),
+  })
+  .superRefine((cfg, ctx) => {
+    // In production a missing/localhost WEB_URL would silently ship localhost
+    // links (password reset, launcher approval). Fail at boot instead.
+    if (cfg.NODE_ENV === 'production') {
+      const web = cfg.WEB_URL;
+      if (!web || /localhost|127\.0\.0\.1/.test(web)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['WEB_URL'],
+          message:
+            'WEB_URL must be set to the public web origin in production (not localhost)',
+        });
+      }
+    }
   })
   .parse(process.env);

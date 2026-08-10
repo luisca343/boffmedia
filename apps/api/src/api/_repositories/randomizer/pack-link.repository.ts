@@ -1,5 +1,5 @@
 import { Inject, Injectable, Logger, Module } from '@nestjs/common';
-import { and, eq } from 'drizzle-orm';
+import { and, eq, isNull } from 'drizzle-orm';
 import { MySql2Database } from 'drizzle-orm/mysql2';
 import { DRIZZLE, DrizzleModule } from '@api/_utils/drizzle/drizzle.module';
 import { EVENT_STATUS, boffMediaEvents } from '@/_db/schema/BoffMediaEvents';
@@ -21,7 +21,11 @@ export class RandomizerPackLinkRepository {
   constructor(@Inject(DRIZZLE) private readonly db: MySql2Database) {}
 
   /**
-   * The config of the ACTIVE event that has this pack attached, or null.
+   * The config of the event that has this pack attached, or null. By default
+   * only an ACTIVE event matches (the mint path's contract). With
+   * `anyEventStatus` any non-deleted event matches: the manifest's anti-cheat
+   * injection must survive a normal active→completed lifecycle flip, or the
+   * pack stays installable with no clean-ROM gate at all.
    * Config-status gating (open/closed/published) is the caller's job.
    *
    * A failure returns null rather than throwing, so a database hiccup cannot
@@ -29,7 +33,10 @@ export class RandomizerPackLinkRepository {
    * null here means the manifest ships WITHOUT the randomizer block and the
    * launcher's clean-ROM gate quietly stops applying.
    */
-  async findByPackId(packId: string): Promise<RandomizerConfig | null> {
+  async findByPackId(
+    packId: string,
+    opts?: { anyEventStatus?: boolean },
+  ): Promise<RandomizerConfig | null> {
     if (!packId) return null;
 
     try {
@@ -43,7 +50,9 @@ export class RandomizerPackLinkRepository {
         .where(
           and(
             eq(boffMediaEvents.packId, packId),
-            eq(boffMediaEvents.status, EVENT_STATUS.ACTIVE),
+            opts?.anyEventStatus
+              ? isNull(boffMediaEvents.deletedAt)
+              : eq(boffMediaEvents.status, EVENT_STATUS.ACTIVE),
           ),
         )
         .execute();

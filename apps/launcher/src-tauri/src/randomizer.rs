@@ -1,6 +1,9 @@
 // Randomizer ROM flow: claim assignment, hash ROM locally, upload and download randomized version.
 
+use std::io::Write;
+
 use serde::{Deserialize, Deserializer, Serialize};
+use sha2::{Digest, Sha512};
 
 use crate::api::{self, ApiState};
 use crate::install;
@@ -57,6 +60,12 @@ fn randomizer_error_from_api(err: api::ApiError) -> RandomizerError {
         },
         api::ApiError::Message(m) => RandomizerError {
             code: "network_error".to_string(),
+            message: m,
+        },
+        // The OS credential store failed — not a network problem, and not fixable
+        // by signing in again from this screen.
+        api::ApiError::Store(m) => RandomizerError {
+            code: "store_error".to_string(),
             message: m,
         },
     }
@@ -144,9 +153,17 @@ pub fn hash_file(path: String) -> Result<String, RandomizerError> {
 /// Download the player's randomized ROM.
 /// The server generates it on first request, caches it, and streams it.
 /// Returns the path to the output ROM and its SHA-512 hash (from x-output-sha512 header).
+///
+/// The bytes are STREAMED to a temp file and hashed as they arrive, then the
+/// digest is checked against the `x-output-sha512` header before the path is
+/// returned — a truncated or tampered transfer never reaches `place_rom`. The
+/// temp file is removed on every failure so a rejected download leaves nothing
+/// behind. `rom_path` gives the slot's extension so an mgba pack lands a `.gba`
+/// and a melonDS pack a `.nds`; absent or unknown, `.gba` is the fallback.
 #[tauri::command]
 pub async fn randomizer_download_rom(
     event_id: String,
+    rom_path: Option<String>,
     api: tauri::State<'_, ApiState>,
 ) -> Result<RandomizerRomResult, RandomizerError> {
     let res = api::authed_get(&api, &format!("/randomizer/launcher/events/{}/rom", event_id))
@@ -188,22 +205,65 @@ pub async fn randomizer_download_rom(
             message: "Missing x-output-sha512 header in response".to_string(),
         })?;
 
-    // Stream the ROM bytes to a temporary file
-    let temp_dir = std::env::temp_dir();
-    let output_name = format!("randomized_{}.gba", uuid::Uuid::new_v4());
-    let output_path = temp_dir.join(&output_name);
+    // The output extension is the ROM slot's, not a fixed `.gba`: melonDS packs
+    // hand the emulator a `.nds`.
+    let ext = rom_path
+        .as_deref()
+        .and_then(|p| std::path::Path::new(p).extension().and_then(|e| e.to_str()))
+        .map(|e| e.to_lowercase())
+        .filter(|e| e == "gba" || e == "nds")
+        .unwrap_or_else(|| "gba".to_string());
 
-    let rom_data = res.bytes().await
-        .map_err(|e| RandomizerError {
-            code: "network_error".to_string(),
-            message: format!("Failed to download ROM bytes: {}", e),
-        })?;
+    let output_path = std::env::temp_dir().join(format!("randomized_{}.{ext}", uuid::Uuid::new_v4()));
 
-    std::fs::write(&output_path, &rom_data)
-        .map_err(|e| RandomizerError {
+    let remove_temp = || {
+        let _ = std::fs::remove_file(&output_path);
+    };
+
+    // Stream to disk, hashing as we go, so a multi-MB ROM never sits fully in
+    // memory and a cut transfer is caught by the hash rather than silently
+    // saved short.
+    let mut res = res;
+    let mut hasher = Sha512::new();
+    {
+        let mut file = std::fs::File::create(&output_path).map_err(|e| RandomizerError {
             code: "io_error".to_string(),
-            message: format!("Failed to save randomized ROM: {}", e),
+            message: format!("Failed to create temp ROM: {}", e),
         })?;
+        loop {
+            match res.chunk().await {
+                Ok(Some(chunk)) => {
+                    hasher.update(&chunk);
+                    if let Err(e) = file.write_all(&chunk) {
+                        remove_temp();
+                        return Err(RandomizerError {
+                            code: "io_error".to_string(),
+                            message: format!("Failed to write ROM: {}", e),
+                        });
+                    }
+                }
+                Ok(None) => break,
+                Err(e) => {
+                    drop(file);
+                    remove_temp();
+                    return Err(RandomizerError {
+                        code: "network_error".to_string(),
+                        message: format!("Failed to download ROM bytes: {}", e),
+                    });
+                }
+            }
+        }
+    }
+
+    let actual = install::files::hex(&hasher.finalize()).to_lowercase();
+    if actual != output_sha512 {
+        remove_temp();
+        return Err(RandomizerError {
+            code: "hash_error".to_string(),
+            message: "El ROM descargado no coincide con el hash anunciado por el servidor."
+                .to_string(),
+        });
+    }
 
     Ok(RandomizerRomResult {
         output_path: output_path.to_string_lossy().to_string(),
@@ -211,63 +271,135 @@ pub async fn randomizer_download_rom(
     })
 }
 
-/// Update the instance marker's expected hash for a file path.
-/// Used by randomizer to mark a ROM slot as expecting the output ROM hash
-/// instead of the clean ROM hash.
+/// Place a downloaded randomized ROM into an instance's ROM slot ATOMICALLY.
+///
+/// Ordering is the whole point: the ROM is imported to the never-purged local
+/// blob store and copied into the slot on disk FIRST, and only once it is in
+/// place is the marker entry rewritten — its `sha512` AND `size` together, read
+/// back from the file that was just written. The old two-step (mark the hash,
+/// then place the file) could leave the marker claiming a hash for a ROM that
+/// was not there yet, and never touched `size`, so a partial run left the gate
+/// looking cleared over an empty slot.
 #[tauri::command]
-pub async fn randomizer_update_expected_hash(
+pub async fn randomizer_place_rom(
     slug: String,
-    path: String,
-    sha512: String,
+    temp_path: String,
+    rom_path: String,
+    expected_sha512: String,
     app: tauri::AppHandle,
 ) -> Result<(), RandomizerError> {
+    let io_err = |m: String| RandomizerError {
+        code: "io_error".to_string(),
+        message: m,
+    };
+
+    let source = std::path::PathBuf::from(&temp_path);
+    if !source.is_file() {
+        return Err(RandomizerError {
+            code: "not_found".to_string(),
+            message: "El ROM descargado ya no existe.".to_string(),
+        });
+    }
+
+    // Re-verify the downloaded bytes against the hash the caller expects before
+    // anything touches the instance: a mismatch here means a corrupt temp file,
+    // not a marker to rewrite.
+    let expected = expected_sha512.to_lowercase();
+    let actual = install::files::sha512_of(&source).ok_or_else(|| RandomizerError {
+        code: "hash_error".to_string(),
+        message: "No se pudo leer el ROM descargado.".to_string(),
+    })?;
+    if actual != expected {
+        return Err(RandomizerError {
+            code: "hash_error".to_string(),
+            message: "El ROM descargado no coincide con el hash esperado.".to_string(),
+        });
+    }
+
     let settings_val = settings::load(&app);
     let layout = install::paths::Layout::new(&app, settings_val.game_dir())
-        .map_err(|e| RandomizerError {
-            code: "io_error".to_string(),
-            message: format!("Failed to access layout: {}", e.message),
-        })?;
-
+        .map_err(|e| io_err(format!("Failed to access layout: {}", e.message)))?;
     let instance = layout.instance(&slug);
 
-    // Read the current marker
-    let raw = std::fs::read_to_string(&instance.marker)
-        .map_err(|e| RandomizerError {
-            code: "io_error".to_string(),
-            message: format!("Failed to read marker: {}", e),
-        })?;
+    // Import into the content-addressed local blob store keyed by the output
+    // hash, so a deleted randomized ROM self-heals from the cache on the next
+    // install/launch (the emulator payload pass, gate satisfied).
+    let blob = install::files::local_blob_path(&layout, &expected);
+    if let Some(parent) = blob.parent() {
+        let _ = std::fs::create_dir_all(parent);
+    }
+    std::fs::copy(&source, &blob).map_err(|e| io_err(format!("No se pudo guardar en el almacén: {e}")))?;
 
+    let rel = install::instance::normalise(&rom_path);
+    let dest = install::instance::safe_join(&instance.minecraft, &rel).ok_or_else(|| RandomizerError {
+        code: "invalid_path".to_string(),
+        message: format!("Ruta de ROM no válida: {rom_path}"),
+    })?;
+    if let Some(parent) = dest.parent() {
+        let _ = std::fs::create_dir_all(parent);
+    }
+    std::fs::copy(&blob, &dest).map_err(|e| io_err(format!("No se pudo colocar el ROM: {e}")))?;
+
+    // ONLY NOW rewrite the marker, from the file actually on disk.
+    let placed_size = std::fs::metadata(&dest)
+        .map_err(|e| io_err(format!("No se pudo leer el ROM colocado: {e}")))?
+        .len();
+
+    let raw = std::fs::read_to_string(&instance.marker)
+        .map_err(|e| io_err(format!("Failed to read marker: {}", e)))?;
     let mut marker: install::instance::Marker = serde_json::from_str(&raw)
         .map_err(|e| RandomizerError {
             code: "parse_error".to_string(),
             message: format!("Failed to parse marker: {}", e),
         })?;
 
-    // Find the file entry matching the path (case-insensitive)
     let norm = |p: &str| p.to_lowercase().replace('\\', "/");
-    let target_norm = norm(&path);
-
-    if let Some(entry) = marker.managed.iter_mut().find(|f| norm(&f.path) == target_norm) {
-        entry.sha512 = sha512.to_lowercase();
-    } else {
+    let target = norm(&rom_path);
+    let Some(entry) = marker.managed.iter_mut().find(|f| norm(&f.path) == target) else {
         return Err(RandomizerError {
             code: "not_found".to_string(),
-            message: format!("File {} not found in instance marker", path),
+            message: format!("File {} not found in instance marker", rom_path),
         });
-    }
+    };
+    entry.sha512 = expected;
+    entry.size = placed_size;
 
-    // Write the marker back
-    let json = serde_json::to_string_pretty(&marker)
-        .map_err(|e| RandomizerError {
-            code: "serialize_error".to_string(),
-            message: format!("Failed to serialize marker: {}", e),
-        })?;
-
-    std::fs::write(&instance.marker, json)
-        .map_err(|e| RandomizerError {
-            code: "io_error".to_string(),
-            message: format!("Failed to write marker: {}", e),
-        })?;
+    let json = serde_json::to_string_pretty(&marker).map_err(|e| RandomizerError {
+        code: "serialize_error".to_string(),
+        message: format!("Failed to serialize marker: {}", e),
+    })?;
+    std::fs::write(&instance.marker, json).map_err(|e| io_err(format!("Failed to write marker: {}", e)))?;
 
     Ok(())
+}
+
+/// Whether the emulator ROM slot for this instance is present on disk right now.
+/// A REAL on-disk check — not derived from the marker or the missing-files list,
+/// both of which exclude the randomizer slot — so the panel can tell a slot that
+/// still needs the ROM from one that already holds it.
+#[tauri::command]
+pub fn randomizer_rom_present(slug: String, app: tauri::AppHandle) -> Result<bool, RandomizerError> {
+    let settings_val = settings::load(&app);
+    let layout = install::paths::Layout::new(&app, settings_val.game_dir())
+        .map_err(|e| RandomizerError {
+            code: "io_error".to_string(),
+            message: format!("Failed to access layout: {}", e.message),
+        })?;
+    let instance = layout.instance(&slug);
+
+    let raw = match std::fs::read_to_string(&instance.marker) {
+        Ok(raw) => raw,
+        Err(_) => return Ok(false),
+    };
+    let marker: install::instance::Marker = match serde_json::from_str(&raw) {
+        Ok(m) => m,
+        Err(_) => return Ok(false),
+    };
+    let Some(rom) = install::randomizer_rom_slot_path(&marker) else {
+        return Ok(false);
+    };
+    let present = install::instance::safe_join(&instance.minecraft, &install::instance::normalise(&rom))
+        .map(|p| p.is_file())
+        .unwrap_or(false);
+    Ok(present)
 }

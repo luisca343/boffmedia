@@ -272,6 +272,22 @@ struct InstallGuard {
 }
 
 impl InstallManager {
+    /// True while an install is downloading or a game is running. A session
+    /// mutation (account switch, sign-out) must refuse in this window: the
+    /// process-global launcher token is what those operations authenticate
+    /// with, and swapping it mid-flight re-authenticates their remaining
+    /// requests as somebody else (C1).
+    pub async fn is_busy(&self) -> bool {
+        if !self.running.lock().await.is_empty() {
+            return true;
+        }
+        !self
+            .installing
+            .lock()
+            .unwrap_or_else(|poisoned| poisoned.into_inner())
+            .is_empty()
+    }
+
     fn begin_install(&self, pack_id: &str) -> Result<InstallGuard, InstallFailure> {
         let mut installing = self
             .installing
@@ -521,6 +537,7 @@ async fn fetch_world_bytes(
         &prepared.plan.pack_id,
         password,
         &pack_file,
+        None,
     )
     .await
     .map_err(|e| format!("{e:?}"))?;
@@ -828,6 +845,25 @@ fn read_marker(instance: &InstancePaths) -> Option<Marker> {
     serde_json::from_str(&raw).ok()
 }
 
+/// Emu-M3 — stash the just-fetched manifest beside the instance. Best-effort:
+/// the value arrived from the network (JS fetched it), so it is a good copy; a
+/// failure to persist it only costs a future offline launch, never this one.
+/// Runs for every game type but is only read back by the offline emulator path.
+fn cache_manifest(app: &tauri::AppHandle, manifest: &serde_json::Value) {
+    let Ok(parsed) = parse_manifest_value(manifest) else {
+        return;
+    };
+    let settings = settings::load(app);
+    let Ok(layout) = Layout::new(app, settings.game_dir()) else {
+        return;
+    };
+    let instance = layout.instance(parsed.pack.slug.as_str());
+    let _ = std::fs::create_dir_all(&instance.root);
+    if let Ok(raw) = serde_json::to_string(manifest) {
+        let _ = std::fs::write(&instance.manifest, raw);
+    }
+}
+
 fn read_history(instance: &InstancePaths) -> History {
     std::fs::read_to_string(&instance.history)
         .ok()
@@ -919,6 +955,7 @@ pub async fn install_pack(
 ) -> Result<InstallStatus, InstallFailure> {
     // Dispatch by game type. Emulator packs take an entirely separate, Java-free
     // path; everything below is the Minecraft arm, unchanged.
+    cache_manifest(&app, &manifest);
     {
         let parsed = parse_manifest_value(&manifest)?;
         if let resolve::PlannedGame::Emulator(plan) = resolve::plan(&parsed)? {
@@ -1015,6 +1052,7 @@ pub async fn launch_pack(
 ) -> Result<u32, InstallFailure> {
     // Emulator packs launch an external process, not the JVM — a wholly separate
     // path. Everything below is the Minecraft arm, unchanged.
+    cache_manifest(&app, &manifest);
     {
         let parsed = parse_manifest_value(&manifest)?;
         if let resolve::PlannedGame::Emulator(plan) = resolve::plan(&parsed)? {
@@ -1367,6 +1405,17 @@ pub async fn instance_revert(
         .await?;
     }
 
+    // Re-materialize any romhack ("Patched") files now their base + patch are
+    // back on disk. A reverted emulator/randomizer version whose ROM is a patched
+    // file would otherwise come back with an empty slot — the download pass never
+    // produces these, they are generated locally.
+    let patched: Vec<PlannedFile> = wanted
+        .iter()
+        .filter(|f| matches!(f.fetch, resolve::Fetch::Patched { .. }))
+        .cloned()
+        .collect();
+    files::materialize_patched(&layout, &instance.minecraft, &patched, &reporter)?;
+
     reporter.emit(Phase::Verifying, 0.5, "", 0, 0);
 
     let mut marker = target.clone();
@@ -1395,10 +1444,11 @@ pub async fn instance_revert(
     reporter.done();
 
     let randomizer_blocked = compute_randomizer_blocked(&marker);
+    let missing_user_files = compute_missing_user_files(&layout, &instance, &marker);
     Ok(InstallStatus::Installed {
         version_id: marker.version_id,
         size_bytes: paths::dir_size(&instance.root),
-        missing_user_files: vec![],
+        missing_user_files,
         randomizer_blocked,
     })
 }
@@ -1419,10 +1469,11 @@ pub async fn instance_unpin(
     marker.pinned = false;
     write_marker(&instance, &marker)?;
     let randomizer_blocked = compute_randomizer_blocked(&marker);
+    let missing_user_files = compute_missing_user_files(&layout, &instance, &marker);
     Ok(InstallStatus::Installed {
         version_id: marker.version_id,
         size_bytes: paths::dir_size(&instance.root),
-        missing_user_files: vec![],
+        missing_user_files,
         randomizer_blocked,
     })
 }
@@ -1531,6 +1582,24 @@ pub async fn instance_optional_set(
     let settings = settings::load(&app);
     let layout = Layout::new(&app, settings.game_dir())?;
     let instance = layout.instance(&slug);
+
+    // Reject a path the pack never declared optional. The intent file feeds the
+    // install filter directly, so silently recording an arbitrary path there
+    // would let a caller switch OFF a required file and have the next install
+    // honour it. Only validated once a marker exists — before the first install
+    // there is no catalogue to check against and toggling intent is still valid.
+    if let Some(marker) = read_marker(&instance) {
+        let target = instance::normalise(&path);
+        let is_optional = marker
+            .optional_files
+            .iter()
+            .any(|f| instance::normalise(&f.path) == target);
+        if !is_optional {
+            return Err(InstallFailure::message(format!(
+                "«{path}» no es un archivo opcional de este pack."
+            )));
+        }
+    }
 
     let mut state = read_optional_state(&instance);
     state.set(&path, enabled);
@@ -1854,6 +1923,24 @@ pub fn instance_rom_slot(
 
     // Return the ROM path from the emulator marker
     Ok(marker.emulator.as_ref().map(|e| e.rom.clone()))
+}
+
+/// Emu-M3 — read back the manifest [`cache_manifest`] stashed on the last
+/// successful install/launch. `None` when nothing was cached (a pack installed
+/// before this build, or never fetched here), which the caller treats as "no
+/// offline fallback available" and surfaces the original network error.
+#[tauri::command]
+pub fn pack_manifest_cache(
+    slug: String,
+    app: tauri::AppHandle,
+) -> Result<Option<serde_json::Value>, InstallFailure> {
+    let settings = settings::load(&app);
+    let layout = Layout::new(&app, settings.game_dir())?;
+    let instance = layout.instance(&slug);
+    let Ok(raw) = std::fs::read_to_string(&instance.manifest) else {
+        return Ok(None);
+    };
+    Ok(serde_json::from_str(&raw).ok())
 }
 
 /// Search roots in priority order: the player's own list first, then the

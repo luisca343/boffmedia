@@ -133,15 +133,21 @@ type RawDeviceCode = {
   expires_in: number
 }
 
-export type AuthFailure = { message: string; needsSignin: boolean }
+export type AuthFailure = { message: string; needsSignin: boolean; code?: string }
 
 function asFailure(err: unknown): AuthFailure {
   // Tauri rejects with the serialised AuthFailure; anything else is a bug in
   // the bridge rather than something the player can act on.
-  const e = err as { message?: string; needs_signin?: boolean }
+  const e = err as { message?: string; needs_signin?: boolean; code?: string }
   return {
     message: e?.message ?? "Error inesperado al iniciar sesión.",
-    needsSignin: e?.needs_signin ?? true,
+    // Only a real Rust NeedsSignin flips this. Defaulting it true made every
+    // install/launch failure (a randomizer gate, a mismatched ROM) look like an
+    // expired session and fire a spurious Microsoft sign-in prompt + retry.
+    needsSignin: e?.needs_signin === true,
+    // Carried through so the caller can map a machine code (randomizer_*,
+    // store_error) to its own message; asFailure used to drop it.
+    code: e?.code,
   }
 }
 
@@ -300,6 +306,43 @@ export async function boffSwitch(id: number): Promise<BoffAccount> {
   if (!isDesktop()) return MOCK_BOFF_ACCOUNT
   try {
     return await invoke<BoffAccount>("boff_switch", { id })
+  } catch (err) {
+    throw asFailure(err)
+  }
+}
+
+/** Abandon a pending Boffmedia device authorization. Local-only: the server
+ *  code expires on its own, and clearing `pending` is what stops a late
+ *  approval from being committed by a stray poll. */
+export async function boffDeviceCancel(): Promise<void> {
+  if (!isDesktop()) return
+  try {
+    await invoke("boff_device_cancel")
+  } catch {
+    /* nothing to abandon is not an error the player can act on */
+  }
+}
+
+/** Enter OFFLINE mode as the last active Boffmedia account: no network, only
+ *  the stored token proving a prior sign-in on this machine. Installed packs
+ *  play from the on-disk manifest cache; every API call still fails until the
+ *  connection returns. */
+export async function boffOffline(): Promise<BoffAccount> {
+  if (!isDesktop()) return MOCK_BOFF_ACCOUNT
+  try {
+    return await invoke<BoffAccount>("boff_offline")
+  } catch (err) {
+    throw asFailure(err)
+  }
+}
+
+/** Re-run `/me` against the stored active Boffmedia token — the fix for "packs
+ *  stopped loading / 401" mid-session. Resolves to the live account, or null
+ *  when the session is gone and BoffSignIn is due. */
+export async function boffRevalidate(): Promise<BoffAccount | null> {
+  if (!isDesktop()) return MOCK_BOFF_ACCOUNT
+  try {
+    return await invoke<BoffAccount | null>("boff_revalidate")
   } catch (err) {
     throw asFailure(err)
   }
@@ -494,6 +537,19 @@ export async function packManifest(
     })
   } catch (err) {
     throw asFailure(err)
+  }
+}
+
+/** Emu-M3 — the last-good manifest cached on disk for `slug`, or null when
+ *  none was ever stored. Never throws and never hits the network: it is the
+ *  offline fallback for {@link packManifest}, letting an installed emulator
+ *  pack relaunch with no connection. Browser mode has no cache, so null. */
+export async function packManifestCached(slug: string): Promise<unknown | null> {
+  if (!isDesktop()) return null
+  try {
+    return (await invoke<unknown | null>("pack_manifest_cache", { slug })) ?? null
+  } catch {
+    return null
   }
 }
 
@@ -1836,39 +1892,49 @@ export type RandomizerRomResult = {
   outputSha512: string
 }
 
-/** Download the player's randomized ROM.
- *  The server generates it on first request and streams it.
- *  Returns the path to the output ROM file and its SHA-512 hash. */
+/** Download the player's randomized ROM. The server generates it on first
+ *  request and streams it; Rust streams it to a temp file, verifies it against
+ *  the `x-output-sha512` header and deletes the temp on any failure. `romPath`
+ *  is the instance ROM slot, from which the output extension (.gba/.nds) is
+ *  derived. Returns the temp path + verified SHA-512 — the ROM is NOT yet placed
+ *  in the instance; call {@link randomizerPlaceRom} for that. */
 export async function downloadRandomizerRom(
   eventId: string,
+  romPath?: string | null,
 ): Promise<RandomizerRomResult> {
   if (!isDesktop()) {
-    // Browser mock
     return {
       outputPath: `/tmp/randomized_mock_${eventId}.gba`,
       outputSha512: "b".repeat(128),
     }
   }
-  try {
-    return await invoke<RandomizerRomResult>("randomizer_download_rom", { eventId })
-  } catch (err) {
-    throw err
-  }
+  return await invoke<RandomizerRomResult>("randomizer_download_rom", { eventId, romPath })
 }
 
-/** Update the instance marker's expected hash for a file path.
- *  Used by randomizer to mark a ROM slot as expecting the output ROM hash
- *  instead of the clean ROM hash. */
-export async function updateRandomizerExpectedHash(
+/** Place a downloaded randomized ROM into the instance ROM slot AND update the
+ *  marker's expected sha512 + size together — the marker is written only AFTER
+ *  the file is on disk, so it can never claim a hash for a file that is not
+ *  there. Re-verifies the temp file against `expectedSha512` before touching the
+ *  instance. */
+export async function randomizerPlaceRom(
   slug: string,
-  path: string,
-  sha512: string,
+  tempPath: string,
+  romPath: string,
+  expectedSha512: string,
 ): Promise<void> {
   if (!isDesktop()) return
+  await invoke("randomizer_place_rom", { slug, tempPath, romPath, expectedSha512 })
+}
+
+/** Whether the instance's ROM slot actually holds a file on disk — a real
+ *  presence check, not a marker inference. Never throws: a missing ROM reads as
+ *  "not present". */
+export async function randomizerRomPresent(slug: string): Promise<boolean> {
+  if (!isDesktop()) return false
   try {
-    await invoke("randomizer_update_expected_hash", { slug, path, sha512 })
-  } catch (err) {
-    throw err
+    return await invoke<boolean>("randomizer_rom_present", { slug })
+  } catch {
+    return false
   }
 }
 

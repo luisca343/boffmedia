@@ -1,17 +1,17 @@
 "use client"
 
-import { useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useTranslations } from "next-intl"
 import { Button, Field, Icon, Input, Modal, Textarea, toast } from "@boffmedia/ui"
 import { AvPanel, AvPill } from "../ui/av-kit"
 import { type AdminPack, type GalleryImage, type GameType, PacksService } from "@/services/api/boffmedia/packsService"
 import { apiUpload } from "@/services/http/boff-client"
 
-// `password` is deprecated and deliberately absent: a shared secret is listed to
-// every authenticated launcher, has no per-user record and cannot be revoked for
-// one person. Invitations cover the same use case properly. Existing password
-// packs keep working — they just cannot be created, and the edit form still
-// shows the kind when a pack already has it.
+// `password` is deprecated and cannot be selected for a NEW pack: a shared
+// secret is listed to every authenticated launcher, has no per-user record and
+// cannot be revoked for one person. Invitations cover the same use case
+// properly. A pack that already IS password-gated shows the kind in edit mode
+// so it can be migrated to public/allowlist — the only exit the API allows.
 const ACCESS_OPTIONS: {
   value: AdminPack["accessKind"]
   icon: "globe" | "lock" | "users"
@@ -20,37 +20,87 @@ const ACCESS_OPTIONS: {
   { value: "allowlist", icon: "users" },
 ]
 
-/** Creating a pack is a pane in the detail column, not an overlay: the packs
- *  list stays visible so a slug clash is obvious before submitting. */
+/** Creating or editing a pack is a pane in the detail column, not an overlay:
+ *  the packs list stays visible so a slug clash is obvious before submitting.
+ *  With `pack` set the form edits in place — slug and game type are immutable,
+ *  and the server target keeps its own editor in the detail pane. */
 export function PackForm({
   onClose,
   onCreated,
+  pack,
+  onSaved,
 }: {
   onClose: () => void
   /** Gets the new pack's slug so the caller can select it in the list. */
-  onCreated: (slug: string) => void
+  onCreated?: (slug: string) => void
+  /** Edit an existing pack instead of creating one. */
+  pack?: AdminPack
+  onSaved?: () => void
 }) {
   const t = useTranslations("admin.packs")
-  const [slug, setSlug] = useState("")
-  const [name, setName] = useState("")
-  const [summary, setSummary] = useState("")
+  const editing = pack !== undefined
+  const [slug, setSlug] = useState(pack?.slug ?? "")
+  const [name, setName] = useState(pack?.name ?? "")
+  const [summary, setSummary] = useState(pack?.summary ?? "")
   const [description, setDescription] = useState("")
-  const [iconUrl, setIconUrl] = useState("")
+  const [iconUrl, setIconUrl] = useState(pack?.iconUrl ?? "")
   const [gallery, setGallery] = useState<GalleryImage[]>([])
   const [gameType, setGameType] = useState<GameType>("minecraft")
-  const [accessKind, setAccessKind] = useState<AdminPack["accessKind"]>("allowlist")
-  const [password, setPassword] = useState("")
+  const [accessKind, setAccessKind] = useState<AdminPack["accessKind"]>(
+    pack?.accessKind ?? "allowlist",
+  )
   const [serverHost, setServerHost] = useState("")
   const [serverPort, setServerPort] = useState("")
+  // The list omits description/gallery, so an edit prefills them from the
+  // detail route. Until that lands, saving must not touch either field — a
+  // PATCH built from the blank defaults would silently erase both.
+  const [detailLoaded, setDetailLoaded] = useState(false)
   const [busy, setBusy] = useState(false)
   const [uploadingIcon, setUploadingIcon] = useState(false)
   const [uploadingGallery, setUploadingGallery] = useState(false)
   const iconInputRef = useRef<HTMLInputElement>(null)
   const galleryInputRef = useRef<HTMLInputElement>(null)
 
+  const packId = pack?.id
+  useEffect(() => {
+    if (!packId) return
+    let live = true
+    void PacksService.detail(packId).then((res) => {
+      if (!live || !res.success || !res.data) return
+      setDescription(res.data.description ?? "")
+      setGallery(res.data.gallery ?? [])
+      setDetailLoaded(true)
+    })
+    return () => {
+      live = false
+    }
+  }, [packId])
+
   const submit = async () => {
     setBusy(true)
     try {
+      if (editing && pack) {
+        const res = await PacksService.update(pack.id, {
+          name,
+          summary: summary || undefined,
+          iconUrl: iconUrl || undefined,
+          ...(detailLoaded
+            ? { description: description || undefined, gallery }
+            : description
+              ? { description }
+              : {}),
+          // Unchanged kind is omitted: the API refuses `password` in a PATCH
+          // even when the pack already has it.
+          ...(accessKind !== pack.accessKind ? { accessKind } : {}),
+        })
+        if (!res.success) {
+          toast({ tone: "bad", title: t("packSaveFailed"), msg: res.userMessage })
+          return
+        }
+        toast({ tone: "ok", title: t("packSaved") })
+        onSaved?.()
+        return
+      }
       const res = await PacksService.create({
         slug,
         name,
@@ -60,7 +110,6 @@ export function PackForm({
         gallery: gallery.length > 0 ? gallery : undefined,
         gameType,
         accessKind,
-        password: accessKind === "password" ? password : undefined,
         // Minecraft-only: switching a pack to another game clears it, so a
         // value typed before the switch cannot be submitted invisibly.
         // A host makes it a server pack; a blank port lets the API default to
@@ -75,7 +124,7 @@ export function PackForm({
         return
       }
       toast({ tone: "ok", title: t("created") })
-      onCreated(slug)
+      onCreated?.(slug)
     } finally {
       setBusy(false)
     }
@@ -126,15 +175,11 @@ export function PackForm({
     !serverHost.trim() ||
     portNum === null ||
     (Number.isInteger(portNum) && portNum >= 1 && portNum <= 65535)
-  const canSubmit =
-    slugValid &&
-    name.trim().length > 0 &&
-    (accessKind !== "password" || password.length >= 4) &&
-    serverValid
+  const canSubmit = (editing || slugValid) && name.trim().length > 0 && serverValid
 
   return (
     <AvPanel
-      title={t("newPack")}
+      title={editing ? t("editPack") : t("newPack")}
       icon="cube"
       className="mb-0 flex min-h-0 flex-col"
       bodyClassName="flex min-h-0 flex-1 flex-col"
@@ -151,10 +196,10 @@ export function PackForm({
           </span>
           <div className="min-w-0">
             <p className="font-display text-[15px] font-bold uppercase tracking-[0.04em] text-txt">
-              {t("newPackSetup")}
+              {editing ? t("editPack") : t("newPackSetup")}
             </p>
             <p className="mt-1 max-w-[66ch] text-[13px] leading-[1.5] text-txt-dim">
-              {t("newPackLead")}
+              {editing ? t("editPackLead") : t("newPackLead")}
             </p>
           </div>
         </div>
@@ -182,14 +227,15 @@ export function PackForm({
                 </Field>
                 <Field
                   label={t("slug")}
-                  hint={t("slugHint")}
-                  error={slug && !slugValid ? t("slugInvalid") : undefined}
+                  hint={editing ? t("slugImmutable") : t("slugHint")}
+                  error={!editing && slug && !slugValid ? t("slugInvalid") : undefined}
                 >
                   <Input
                     value={slug}
                     onChange={(e) => setSlug(e.target.value.toLowerCase())}
                     placeholder="boff-smp"
                     className="font-mono"
+                    disabled={editing}
                   />
                 </Field>
               </div>
@@ -326,6 +372,10 @@ export function PackForm({
               </Field>
             </section>
 
+            {/* Immutable after creation, so edit mode has nothing to offer here.
+                Only the game types a launcher can actually list are offered —
+                zomboid/stardew stay in the type union, not in the selector. */}
+            {!editing && (
             <section className="border border-solid border-line bg-panel-2 p-4">
               <div className="mb-4 flex items-start gap-3">
                 <span className="grid size-8 shrink-0 place-items-center border border-solid border-line-2 bg-panel text-accent">
@@ -342,24 +392,20 @@ export function PackForm({
               </div>
 
               <div role="radiogroup" aria-label={t("gameType")} className="grid gap-2 md:grid-cols-2">
-                {(["minecraft", "emulator", "zomboid", "stardew"] as const).map((gt) => {
+                {(["minecraft", "emulator"] as const).map((gt) => {
                   const selected = gameType === gt
-                  const disabled = gt !== "minecraft" && gt !== "emulator"
                   return (
                     <button
                       key={gt}
                       type="button"
                       role="radio"
                       aria-checked={selected}
-                      disabled={disabled}
-                      onClick={() => !disabled && setGameType(gt)}
+                      onClick={() => setGameType(gt)}
                       className={[
-                        "flex min-h-[96px] items-start gap-3 border-2 border-solid p-3 text-left transition-colors duration-[140ms]",
-                        disabled
-                          ? "cursor-not-allowed opacity-60 border-line-2 hover:border-line-2 bg-panel-2"
-                          : selected
-                            ? "border-accent bg-accent-soft cursor-pointer"
-                            : "border-line hover:border-line-2 hover:bg-panel cursor-pointer",
+                        "flex min-h-[96px] items-start gap-3 border-2 border-solid p-3 text-left transition-colors duration-[140ms] cursor-pointer",
+                        selected
+                          ? "border-accent bg-accent-soft"
+                          : "border-line hover:border-line-2 hover:bg-panel",
                       ].join(" ")}
                     >
                       <span
@@ -379,12 +425,6 @@ export function PackForm({
                         <span className="mt-1 block text-[11px] leading-[1.4] text-txt-dim">
                           {t(`gameTypeLead.${gt}`)}
                         </span>
-                        {disabled && (
-                          <span className="mt-2 inline-flex items-center gap-1 rounded-sm bg-warn/20 px-2 py-1 text-[11px] font-bold uppercase tracking-[0.04em] text-warn">
-                            <Icon name="clock" size={12} />
-                            {t("comingSoon")}
-                          </span>
-                        )}
                       </span>
                       {selected && <Icon name="check" size={14} className="shrink-0 text-accent" />}
                     </button>
@@ -398,6 +438,7 @@ export function PackForm({
                 </p>
               </div>
             </section>
+            )}
 
             <section className="border border-solid border-line bg-panel-2 p-4">
               <div className="mb-4 flex items-start gap-3">
@@ -415,9 +456,10 @@ export function PackForm({
               </div>
 
               {/* A pack that already IS password-gated keeps the option visible,
-                  so editing it does not silently change its access kind. */}
+                  so editing it does not silently change its access kind — but
+                  the only exits are public/allowlist (password is deprecated). */}
               <div role="radiogroup" aria-label={t("accessKind")} className="grid gap-2 md:grid-cols-3">
-                {(accessKind === "password"
+                {(pack?.accessKind === "password"
                   ? [...ACCESS_OPTIONS, { value: "password" as const, icon: "lock" as const }]
                   : ACCESS_OPTIONS
                 ).map((option) => {
@@ -460,24 +502,20 @@ export function PackForm({
                 })}
               </div>
 
-              {accessKind === "password" && (
-                <div className="mt-4 max-w-[420px] border-t border-line pt-4">
-                  <Field label={t("password")} hint={t("passwordHint")}>
-                    <Input
-                      type="password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      autoComplete="new-password"
-                    />
-                  </Field>
+              {pack?.accessKind === "password" && (
+                <div className="mt-4 rounded-sm border border-solid border-info-border bg-info-soft px-3 py-2">
+                  <p className="text-[12px] leading-[1.5] text-txt-dim">
+                    {t("accessPasswordDeprecated")}
+                  </p>
                 </div>
               )}
             </section>
 
             {/* Quick Play is a Minecraft concept: there is no server to join in a
                 GBA pack, and offering the field on one only invites a value the
-                launcher will never read. */}
-            {gameType === "minecraft" && (
+                launcher will never read. In edit mode the detail pane's server
+                editor owns this. */}
+            {!editing && gameType === "minecraft" && (
             <section className="border border-solid border-line bg-panel-2 p-4">
               <div className="mb-4 flex items-start gap-3">
                 <span className="grid size-8 shrink-0 place-items-center border border-solid border-line-2 bg-panel text-accent">
@@ -522,7 +560,9 @@ export function PackForm({
             <AvPill tone={slugValid ? "ok" : "muted"} icon={slugValid ? "check" : "cube"}>
               {slugValid ? slug : t("slugPending")}
             </AvPill>
-            <span className="hidden font-mono text-[10px] text-txt-dim sm:inline">{t("slugPreview")}</span>
+            {!editing && (
+              <span className="hidden font-mono text-[10px] text-txt-dim sm:inline">{t("slugPreview")}</span>
+            )}
           </div>
           <div className="flex items-center gap-2">
             <Button variant="ghost" onClick={onClose}>
@@ -530,12 +570,12 @@ export function PackForm({
             </Button>
             <Button
               variant="pri"
-              icon="plus"
+              icon={editing ? "check" : "plus"}
               loading={busy}
               disabled={!canSubmit}
               onClick={() => void submit()}
             >
-              {t("create")}
+              {editing ? t("savePack") : t("create")}
             </Button>
           </div>
         </div>

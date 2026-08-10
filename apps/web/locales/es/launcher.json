@@ -77,6 +77,10 @@
     "approvedTitle": "Autorizado",
     "approvedLead": "Puedes volver al launcher: iniciará sesión solo en unos segundos.",
     "deniedTitle": "Rechazado",
-    "deniedLead": "Ese launcher no ha sido autorizado. No se le ha compartido nada."
+    "deniedLead": "Ese launcher no ha sido autorizado. No se le ha compartido nada.",
+    "alreadyApprovedTitle": "Ya autorizado",
+    "alreadyApprovedLead": "Este código ya fue aprobado. El launcher ha iniciado sesión; no hay nada más que hacer aquí.",
+    "alreadyDeniedTitle": "Ya rechazado",
+    "alreadyDeniedLead": "Este código ya fue rechazado. Vuelve a empezar desde el launcher si querías autorizarlo."
   }
 }

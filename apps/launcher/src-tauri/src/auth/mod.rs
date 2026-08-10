@@ -73,6 +73,14 @@ impl AuthState {
     pub async fn session(&self) -> Option<McSession> {
         self.session.lock().await.clone()
     }
+
+    /// Drop the live Minecraft session AND any pending device flow. Called on a
+    /// Boffmedia switch/sign-out: the MSA identity is a credential linked under
+    /// the departing account and must not survive into the next one.
+    pub async fn clear_session(&self) {
+        *self.session.lock().await = None;
+        *self.pending.lock().await = None;
+    }
 }
 
 /// Serialisable error for the renderer. Every variant of the underlying errors
@@ -205,11 +213,21 @@ pub async fn auth_open_verification(state: tauri::State<'_, AuthState>) -> Resul
 #[tauri::command]
 pub async fn open_url(url: String) -> Result<(), AuthFailure> {
     let trimmed = url.trim();
-    if !(trimmed.starts_with("https://") || trimmed.starts_with("http://")) {
-        return Err(AuthFailure {
-            message: "Enlace no válido.".into(),
-            needs_signin: false,
-        });
+    let invalid = || AuthFailure {
+        message: "Enlace no válido.".into(),
+        needs_signin: false,
+    };
+    // A real parse, not a prefix test: "https://" alone, userinfo tricks and
+    // whitespace smuggling all fail here. Plain http is for local dev only.
+    let parsed = reqwest::Url::parse(trimmed).map_err(|_| invalid())?;
+    match parsed.scheme() {
+        "https" => {}
+        "http"
+            if matches!(
+                parsed.host_str(),
+                Some("localhost" | "127.0.0.1" | "[::1]" | "::1")
+            ) => {}
+        _ => return Err(invalid()),
     }
     open::that_detached(trimmed).map_err(|e| AuthFailure {
         message: format!("No se pudo abrir el navegador: {e}"),

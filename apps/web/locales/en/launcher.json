@@ -77,6 +77,10 @@
     "approvedTitle": "Authorized",
     "approvedLead": "You can go back to the launcher — it will sign in on its own within a few seconds.",
     "deniedTitle": "Rejected",
-    "deniedLead": "That launcher was not authorized. Nothing was shared with it."
+    "deniedLead": "That launcher was not authorized. Nothing was shared with it.",
+    "alreadyApprovedTitle": "Already authorized",
+    "alreadyApprovedLead": "This code was already approved. The launcher has signed in — nothing more to do here.",
+    "alreadyDeniedTitle": "Already rejected",
+    "alreadyDeniedLead": "This code was already rejected. Start again from the launcher if you meant to authorize it."
   }
 }

@@ -21,6 +21,9 @@ const mockTeamsRepo = {
 const mockParticipantsService = {
   getOrCreateParticipantByUserId: jest.fn(),
   joinEvent: jest.fn(),
+  // ensureEventMembership consults this before writing any team/member row so a
+  // `removed` player cannot re-enter via a team, and a `declined` one re-joins.
+  getParticipationForUser: jest.fn(),
 };
 
 const mockTeam = {
@@ -111,6 +114,11 @@ describe('TeamsService', () => {
       mockParticipantsService.getOrCreateParticipantByUserId.mockResolvedValue(
         mockParticipant,
       );
+      // No prior participation by default (clearAllMocks keeps implementations,
+      // so reset it explicitly to avoid a 'removed' leaking from another test).
+      mockParticipantsService.getParticipationForUser.mockResolvedValue(
+        undefined,
+      );
       mockTeamsRepo.create.mockResolvedValue({ insertId: 1 });
       mockTeamsRepo.addMember.mockResolvedValue(undefined);
       mockParticipantsService.joinEvent.mockResolvedValue({});
@@ -154,6 +162,20 @@ describe('TeamsService', () => {
       expect(mockTeamsRepo.findById).toHaveBeenCalledWith(42);
       expect(result.id).toBe(42);
     });
+
+    it('ensures event membership BEFORE writing any row — a removed player writes nothing (F-11)', async () => {
+      // Membership is checked first: an expelled player's create must be refused
+      // with no orphaned team/member rows left behind.
+      mockParticipantsService.getParticipationForUser.mockResolvedValue({
+        status: 'removed',
+      });
+
+      await expect(service.createTeam(10, dto)).rejects.toThrow(/expulsado/i);
+
+      expect(mockTeamsRepo.create).not.toHaveBeenCalled();
+      expect(mockTeamsRepo.addMember).not.toHaveBeenCalled();
+      expect(mockParticipantsService.joinEvent).not.toHaveBeenCalled();
+    });
   });
 
   // ─── updateTeam ───────────────────────────────────────────────────────────────
@@ -184,6 +206,11 @@ describe('TeamsService', () => {
     beforeEach(() => {
       mockParticipantsService.getOrCreateParticipantByUserId.mockResolvedValue(
         mockParticipant,
+      );
+      // No prior participation by default (clearAllMocks keeps implementations,
+      // so reset it explicitly to avoid a 'removed' leaking from another test).
+      mockParticipantsService.getParticipationForUser.mockResolvedValue(
+        undefined,
       );
       mockTeamsRepo.findParticipantTeamInEvent.mockResolvedValue([]);
       mockTeamsRepo.addMember.mockResolvedValue(undefined);
@@ -222,6 +249,20 @@ describe('TeamsService', () => {
       await expect(service.joinTeam(10, 1, 1)).rejects.toThrow(
         'Participant is already in a team for this event',
       );
+      expect(mockTeamsRepo.addMember).not.toHaveBeenCalled();
+    });
+
+    it('refuses a removed player at the membership gate before any team read/write (F-11)', async () => {
+      // The membership check runs first now: a removed player never reaches the
+      // team-membership lookup or the member insert (which previously left an
+      // "on the team but not in the event" row that needed manual SQL to fix).
+      mockParticipantsService.getParticipationForUser.mockResolvedValue({
+        status: 'removed',
+      });
+
+      await expect(service.joinTeam(10, 1, 1)).rejects.toThrow(/expulsado/i);
+
+      expect(mockTeamsRepo.findParticipantTeamInEvent).not.toHaveBeenCalled();
       expect(mockTeamsRepo.addMember).not.toHaveBeenCalled();
     });
   });

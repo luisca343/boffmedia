@@ -114,10 +114,13 @@ pub fn run() {
             auth::open_url,
             api::boff_device_start,
             api::boff_device_poll,
+            api::boff_device_cancel,
             api::boff_session_restore,
             api::boff_sign_out,
             api::boff_accounts,
             api::boff_switch,
+            api::boff_offline,
+            api::boff_revalidate,
             api::packs_list,
             api::pack_manifest,
             api::invite_redeem,
@@ -140,6 +143,7 @@ pub fn run() {
             // Cycle 2 — emulator ROM library sweep + resolution + settings.
             install::instance_user_files_scan,
             install::instance_rom_slot,
+            install::pack_manifest_cache,
             dialogs::file_picker,
             dialogs::folder_picker,
             emulators::emulator_status,
@@ -204,7 +208,8 @@ pub fn run() {
             randomizer::randomizer_get_assignment,
             randomizer::hash_file,
             randomizer::randomizer_download_rom,
-            randomizer::randomizer_update_expected_hash,
+            randomizer::randomizer_place_rom,
+            randomizer::randomizer_rom_present,
         ])
         .run(tauri::generate_context!())
         .expect("error while running the Boff Launcher");

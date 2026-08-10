@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-export class Achievement {
+export class EventAchievement {
   @ApiProperty({
     example: 1,
     description: 'Unique identifier for the achievement',

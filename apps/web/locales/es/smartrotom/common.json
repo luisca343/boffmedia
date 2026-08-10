@@ -21,6 +21,9 @@
     },
     "auth": {
       "linkAccount": "Vincular Cuenta",
+      "linkMovedTitle": "Vincula en la web",
+      "linkMovedLead": "La vinculación dentro del juego ya no está disponible. Para conectar tu cuenta de Minecraft con una cuenta de BoffMedia, abre la web en un navegador y vincula o crea tu cuenta allí.",
+      "close": "Cerrar",
       "linkExisting": "Vincular Cuenta Existente",
       "createNew": "Crear Nueva Cuenta",
       "minecraftUser": "Usuario de Minecraft:",

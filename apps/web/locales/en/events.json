@@ -55,6 +55,7 @@
       "participants": "Participants",
       "participate": "Take part",
       "participating": "Taking part",
+      "removedNotice": "You were removed from this event and cannot rejoin it.",
       "loginToJoin": "Sign in to take part",
       "notFound": "Event not found",
       "notFoundLead": "This event doesn't exist or has been removed.",
@@ -105,6 +106,7 @@
       "codeHint": "Case is ignored.",
       "redeem": "Join the event",
       "joined": "You have joined the event.",
+      "alreadyMember": "You are already in this event.",
       "failed": "That code is not valid.",
       "loginFirst": "Sign in to redeem",
       "note": "Joining the event is what grants you its pack in the launcher."

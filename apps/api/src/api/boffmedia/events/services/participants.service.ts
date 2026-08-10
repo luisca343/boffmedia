@@ -31,7 +31,7 @@ export class ParticipantsService {
     const user = await this.participantsRepository.findUserById(userId);
 
     if (!user) {
-      throw new Error('User not found');
+      throw new NotFoundException('User not found');
     }
 
     // Create new participant
@@ -40,8 +40,19 @@ export class ParticipantsService {
       nickname: user.username,
     };
 
-    const result =
-      await this.participantsRepository.createParticipant(participantData);
+    let result: { insertId: number };
+    try {
+      result =
+        await this.participantsRepository.createParticipant(participantData);
+    } catch (error) {
+      // Concurrent first-join: the unique index on user_id makes the loser's
+      // insert fail — re-select the winner instead of forking the identity.
+      if (this.isDuplicateEntry(error)) {
+        const winner = await this.participantsRepository.findByUserId(userId);
+        if (winner) return winner;
+      }
+      throw error;
+    }
 
     return {
       id: result.insertId,
@@ -51,6 +62,16 @@ export class ParticipantsService {
       createdAt: new Date(),
       updatedAt: new Date(),
     } as Participant;
+  }
+
+  private isDuplicateEntry(err: unknown): boolean {
+    if (typeof err !== 'object' || err === null) return false;
+    const e = err as { code?: unknown; errno?: unknown; message?: unknown };
+    return (
+      e.code === 'ER_DUP_ENTRY' ||
+      e.errno === 1062 ||
+      (typeof e.message === 'string' && e.message.includes('Duplicate entry'))
+    );
   }
 
   async getParticipantAchievements(participantId: number): Promise<any[]> {

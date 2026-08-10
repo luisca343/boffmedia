@@ -148,6 +148,14 @@ export class EventsService {
     return !!event;
   }
 
+  /** See EventsRepository.hiddenPrivateEventIds. */
+  async hiddenPrivateEventIds(
+    eventIds: (number | null | undefined)[],
+    userId?: number,
+  ): Promise<Set<number>> {
+    return this.eventsRepository.hiddenPrivateEventIds(eventIds, userId);
+  }
+
   /** Admins, or an authenticated participant of the event, may see private data. */
   private async canSeePrivate(
     eventId: number,

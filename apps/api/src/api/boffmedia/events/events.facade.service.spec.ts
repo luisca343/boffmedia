@@ -103,6 +103,9 @@ describe('EventsFacadeService', () => {
       deleteEvent: jest.fn(),
       validateEventExists: jest.fn(),
       validateEventVisible: jest.fn(),
+      // Private-event filtering helper the facade calls for row-level lists;
+      // default to "nothing hidden" so plain list assertions stay simple.
+      hiddenPrivateEventIds: jest.fn().mockResolvedValue(new Set<number>()),
     };
     const mockGamesService = {
       getAllGames: jest.fn(),
@@ -210,8 +213,9 @@ describe('EventsFacadeService', () => {
 
       const result = await service.getEvent(1);
 
-      // Defaults to public-only (includePrivate=false) when no role is passed.
-      expect(eventsService.getEventById).toHaveBeenCalledWith(1, false);
+      // Defaults to public-only (includePrivate=false) and no viewer id when
+      // neither is passed.
+      expect(eventsService.getEventById).toHaveBeenCalledWith(1, false, undefined);
       expect(result).toEqual(mockEvent);
     });
   });
@@ -339,13 +343,34 @@ describe('EventsFacadeService', () => {
   });
 
   describe('deleteGame', () => {
-    it('should delete a game when it exists', async () => {
+    it('should delete a game when it exists and has no live events', async () => {
       gamesService.validateGameExists.mockResolvedValue(true);
+      // Only completed events remain → safe to delete (no live pack access lapses).
+      eventsService.getAllEvents.mockResolvedValue([
+        { id: 1, status: 'completed' },
+      ] as any);
       gamesService.deleteGame.mockResolvedValue(undefined);
 
       await service.deleteGame(1);
 
+      expect(eventsService.getAllEvents).toHaveBeenCalledWith(
+        expect.objectContaining({ gameId: 1, includePrivate: true }),
+      );
       expect(gamesService.deleteGame).toHaveBeenCalledWith(1);
+    });
+
+    it('should throw 409 when the game has non-completed (live/upcoming) events', async () => {
+      gamesService.validateGameExists.mockResolvedValue(true);
+      eventsService.getAllEvents.mockResolvedValue([
+        { id: 1, status: 'completed' },
+        { id: 2, status: 'active' },
+      ] as any);
+
+      await expect(service.deleteGame(1)).rejects.toThrow(
+        /active or upcoming event/i,
+      );
+      // Refuses before touching the game so no events get soft-deleted.
+      expect(gamesService.deleteGame).not.toHaveBeenCalled();
     });
 
     it('should throw if game not found', async () => {
@@ -478,7 +503,10 @@ describe('EventsFacadeService', () => {
 
   describe('getTeamMembers', () => {
     it('should return normalized team members', async () => {
-      teamsService.validateTeamExists.mockResolvedValue(true);
+      // getTeamMembers now resolves the team first (to gate on its event's
+      // visibility) instead of a bare existence check.
+      teamsService.getTeamById.mockResolvedValue(mockTeam as any);
+      eventsService.validateEventVisible.mockResolvedValue(true);
       teamsService.getTeamMembers.mockResolvedValue([
         {
           userId: 1,

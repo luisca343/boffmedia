@@ -8,7 +8,7 @@ import {
   IsEnum,
 } from 'class-validator';
 
-export class CreateAchievementDto {
+export class CreateEventAchievementDto {
   @ApiProperty({
     description: 'The name of the achievement',
     example: 'First Kill',
@@ -48,25 +48,23 @@ export class CreateAchievementDto {
   @Min(1)
   maxProgress: number;
 
+  // Required: both columns are NOT NULL with no default, so an omitted value
+  // used to die as a 500 on insert instead of a 400 here.
   @ApiProperty({
     description: 'Type of item',
     enum: ['achievement', 'medal'],
     example: 'achievement',
-    required: false,
   })
-  @IsOptional()
   @IsEnum(['achievement', 'medal'])
-  itemType?: 'achievement' | 'medal';
+  itemType: 'achievement' | 'medal';
 
   @ApiProperty({
     description: 'Category of the achievement',
     enum: ['competition', 'challenge', 'participation', 'achievement'],
     example: 'achievement',
-    required: false,
   })
-  @IsOptional()
-  @IsEnum(['competition', 'challenge', 'participation'])
-  category?: 'competition' | 'challenge' | 'participation';
+  @IsEnum(['competition', 'challenge', 'participation', 'achievement'])
+  category: 'competition' | 'challenge' | 'participation' | 'achievement';
 
   @ApiProperty({
     description: 'Rarity of the achievement',

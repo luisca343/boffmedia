@@ -51,6 +51,14 @@ pub const OPTIONAL: &str = ".boff-optional.json";
 /// `RuntimeOverride::default()` reads as "inherit the global setting".
 pub const RUNTIME: &str = ".boff-runtime.json";
 
+/// Emu-M3 — the last-good manifest fetched for this pack. Written on a
+/// successful install/launch so an already-installed emulator pack can be
+/// relaunched offline: the network fetch is skipped in favour of this copy,
+/// from which the launch (and any randomizer gate) is rebuilt exactly as a
+/// fresh manifest would be. User-independent managed state; overwritten on
+/// every successful fetch.
+pub const MANIFEST: &str = ".boff-manifest.json";
+
 /// Extracted natives. Dot-prefixed since it now shares a directory with the
 /// game's own tree — a plain `bin/` would sit among `mods/` and `saves/` and
 /// read as something the player put there.
@@ -84,6 +92,8 @@ pub struct InstancePaths {
     /// §9 — the per-pack Java/memory override. User state like `optional`, so
     /// an install, an update and a repair all leave it alone.
     pub runtime: PathBuf,
+    /// Emu-M3 — the cached last-good manifest, read back to launch offline.
+    pub manifest: PathBuf,
 }
 
 impl Layout {
@@ -152,6 +162,7 @@ impl Layout {
             history: root.join(HISTORY),
             optional: root.join(OPTIONAL),
             runtime: root.join(RUNTIME),
+            manifest: root.join(MANIFEST),
             minecraft,
             root,
         }
@@ -279,7 +290,7 @@ mod tests {
         assert_eq!(instance.mods, instance.root.join("mods"));
         // Every launcher-owned entry is dot-prefixed, which is what lets the
         // Files tab hide the lot with one rule.
-        for path in [&instance.marker, &instance.history, &instance.optional, &instance.runtime, &instance.bin] {
+        for path in [&instance.marker, &instance.history, &instance.optional, &instance.runtime, &instance.manifest, &instance.bin] {
             let name = path.file_name().unwrap().to_string_lossy().to_string();
             assert!(name.starts_with(".boff-"), "{name} must be hidden");
         }

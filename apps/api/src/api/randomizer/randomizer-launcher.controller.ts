@@ -78,12 +78,14 @@ export class RandomizerLauncherController {
     }
 
     // Resolve pack -> active event -> randomizer config, then delegate to the
-    // same mint-on-claim path. 404 (no config) leaves the launcher panel hidden.
+    // same mint-on-claim path. 404 (no config) leaves the launcher panel
+    // hidden; the machine `error` code distinguishes it from other 404s.
     const config = await this.packLink.findByPackId(packId);
     if (!config) {
-      throw new NotFoundException(
-        `No active randomizer config found for pack ${packId}`,
-      );
+      throw new NotFoundException({
+        error: 'no_event',
+        message: `No active randomizer config found for pack ${packId}`,
+      });
     }
 
     return this.assignments.getMyAssignment(config.id, req.launcher);
@@ -136,9 +138,10 @@ export class RandomizerLauncherController {
 
     const config = await this.repository.getConfigByEventId(Number(eventId));
     if (!config) {
-      throw new NotFoundException(
-        `No randomizer config found for event ${eventId}`,
-      );
+      throw new NotFoundException({
+        error: 'no_event',
+        message: `No randomizer config found for event ${eventId}`,
+      });
     }
 
     const { stream, outputSha512, contentLength } =
