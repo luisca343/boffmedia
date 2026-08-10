@@ -4,16 +4,18 @@ import { useCallback, useEffect, useState } from "react"
 import { useTranslations } from "next-intl"
 import { Button, Select, Spinner } from "@boffmedia/ui"
 import { AvAlert, AvPanel, AvPill } from "../../_components/ui/av-kit"
+import { cn } from "@/lib/utils"
 import { EventsService } from "@/services/api/boffmedia/eventsService"
 import type { Participant } from "@boffmedia/shared"
 
 type Status = "registered" | "confirmed" | "declined" | "removed"
 
-const TONE: Record<Status, "green" | "accent" | "amber" | "muted"> = {
-  registered: "green",
-  confirmed: "accent",
-  declined: "amber",
-  removed: "muted",
+// Status colour, shown as a dot instead of a pill so the row stays one line.
+const DOT: Record<Status, string> = {
+  registered: "bg-ok",
+  confirmed: "bg-accent",
+  declined: "bg-warn",
+  removed: "bg-txt-dim",
 }
 
 export function ParticipantsPanel({ eventId }: { eventId: number }) {
@@ -65,29 +67,36 @@ export function ParticipantsPanel({ eventId }: { eventId: number }) {
 
   return (
     <AvPanel title={t("title")} icon="users">
-      <p className="text-sm text-txt-muted mb-4">{t("desc")}</p>
-      {error && <AvAlert tone="error" className="mb-4">{error}</AvAlert>}
+      <div className="flex items-baseline gap-2 flex-wrap mb-3">
+        <AvPill tone="default">{t("count", { count: rows.length })}</AvPill>
+        <p className="text-xs text-txt-dim flex-1 min-w-[240px]">{t("desc")}</p>
+      </div>
+      {error && <AvAlert tone="error" className="mb-3">{error}</AvAlert>}
 
       {rows.length === 0 ? (
         <p className="text-txt-dim text-sm py-6 text-center">{t("empty")}</p>
       ) : (
-        <div className="grid gap-2">
+        <div className="border border-solid border-line bg-panel-2 cut-tag divide-y divide-line">
           {rows.map((p) => (
-            <div
-              key={p.id}
-              className="flex items-center gap-3 flex-wrap border border-solid border-line bg-panel-2 cut-tag px-3 py-2"
-            >
-              <div className="min-w-0 flex-1">
-                <span className="font-medium">{p.nickname ?? `#${p.participantId}`}</span>
-                <p className="text-xs text-txt-dim font-mono">
-                  {t("userId", { id: p.userId ?? "—" })}
-                </p>
-              </div>
+            <div key={p.id} className="flex items-center gap-2 px-3 py-1.5">
+              <span
+                className={cn("w-[7px] h-[7px] shrink-0 rotate-45", DOT[p.status as Status] ?? "bg-txt-dim")}
+                title={t(`status.${p.status}`)}
+              />
 
-              <AvPill tone={TONE[p.status as Status] ?? "muted"}>{t(`status.${p.status}`)}</AvPill>
+              <span className="font-medium text-sm truncate">
+                {p.nickname ?? `#${p.participantId}`}
+              </span>
+              <span className="font-mono text-[11px] text-txt-dim truncate hidden sm:inline">
+                {t("userId", { id: p.userId ?? "—" })}
+              </span>
+
+              <span className="flex-1" />
 
               <Select
                 value={p.status}
+                className="w-[150px] py-[5px] px-[9px] pr-8 text-[13px]"
+                ariaLabel={t("title")}
                 options={(["registered", "confirmed", "declined", "removed"] as Status[]).map((s) => ({
                   value: s,
                   label: t(`status.${s}`),

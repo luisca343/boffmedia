@@ -13,11 +13,13 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
   href?: string
 }
 
+// Colours travel as --cut-line / --cut-fill rather than border-*/bg-*: the shape
+// is a `.cut-frame`, so the stroke is painted geometry, not a CSS border.
 const VARIANTS: Record<string, string> = {
-  default: "border-line-2 text-txt hover:border-accent hover:text-accent-bright",
-  pri: "bg-accent border-accent text-accent-ink hover:bg-accent-bright hover:border-accent-bright",
-  ghost: "border-transparent text-txt-muted hover:text-accent-bright hover:border-transparent",
-  danger: "border-bad text-bad hover:bg-bad hover:text-white hover:border-bad",
+  default: "[--cut-line:var(--line-2)] text-txt hover:[--cut-line:var(--accent)] hover:text-accent-bright",
+  pri: "[--cut-line:var(--accent)] [--cut-fill:var(--accent)] text-accent-ink hover:[--cut-line:var(--accent-bright)] hover:[--cut-fill:var(--accent-bright)]",
+  ghost: "[--cut-line:transparent] [--cut-fill:transparent] text-txt-muted hover:text-accent-bright",
+  danger: "[--cut-line:var(--bad)] text-bad hover:[--cut-fill:var(--bad)] hover:text-white",
 }
 
 export function Button({
@@ -34,17 +36,20 @@ export function Button({
 }: ButtonProps) {
   const iconSize = size === "sm" ? 14 : 16
   const cls = cn(
-    "cut",
+    "cut-frame [--cut-w:2px] [--cut-fill:var(--bg)]",
     "relative inline-flex items-center justify-center gap-2.5 whitespace-nowrap select-none",
     // line-height pinned to 1 via the `/none` token: a bare `leading-none` is
     // stripped by tailwind-merge when it sits next to an arbitrary `text-[..px]`.
     "font-display font-bold not-italic uppercase tracking-[0.1em] text-[15px]/none",
-    "border-2 border-solid text-txt no-underline",
-    "transition-[background,border-color,color,transform] duration-[140ms] active:translate-y-px",
+    "text-txt no-underline",
+    "transition-[color,transform] duration-[140ms] active:translate-y-px",
+    "before:transition-[background] before:duration-[140ms] after:transition-[background] after:duration-[140ms]",
     VARIANTS[variant] || VARIANTS.default,
-    size === "sm" && "[--cut:7px] py-[9px] px-4 text-[13px]/none",
-    size === "lg" && "py-[17px] px-[34px] text-[17px]/none",
-    !size && "py-[13px] px-[26px]",
+    // Paddings absorb --cut-w, which the old `border-2` used to contribute to the
+    // box: the rendered size is unchanged from the bordered version.
+    size === "sm" && "[--cut:7px] py-[11px] px-[18px] text-[13px]/none",
+    size === "lg" && "py-[19px] px-[36px] text-[17px]/none",
+    !size && "py-[15px] px-[28px]",
     (disabled || loading) && "opacity-45 pointer-events-none",
     loading && "cursor-default",
     className,

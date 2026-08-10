@@ -53,9 +53,14 @@ export function CodeBlock({ lines, label, copyText, scan = false, tone, actions,
             aria-label={t("copyCode")}
             className={cn(
               "inline-flex items-center gap-[5px] font-mono text-[11px] font-semibold leading-none tracking-[0.04em] cursor-pointer",
-              "bg-transparent border border-solid py-[6px] px-[9px] cut [--cut:4px]",
-              "transition-[color,border-color] duration-[140ms]",
-              ok ? "text-ok border-[color-mix(in_srgb,var(--ok)_50%,transparent)]" : "text-txt-muted border-line-2 hover:text-txt hover:border-txt-muted",
+              "cut-frame [--cut:4px] [--cut-w:1px] py-[7px] px-[10px]",
+              // The header sits on a translucent panel wash over --bg-deep.
+              "[--cut-fill:color-mix(in_srgb,var(--panel)_40%,var(--bg-deep))]",
+              "transition-[color] duration-[140ms]",
+              "after:transition-[background] after:duration-[140ms]",
+              ok
+                ? "text-ok [--cut-line:color-mix(in_srgb,var(--ok)_50%,var(--bg-deep))]"
+                : "text-txt-muted [--cut-line:var(--line-2)] hover:text-txt hover:[--cut-line:var(--muted)]",
             )}
           >
             <Icon name={ok ? "check" : "copy"} size={14} />

@@ -102,6 +102,7 @@
         "loadError": "Could not load the members.",
         "empty": "Nobody has joined yet.",
         "userId": "User {id}",
+        "count": "{count, plural, =0 {No members} one {# member} other {# members}}",
         "remove": "Remove from event",
         "status": {
           "registered": "Registered",

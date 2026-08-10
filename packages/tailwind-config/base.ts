@@ -92,6 +92,48 @@ export const geometry = plugin(({ addComponents }) => {
       clipPath:
         "polygon(0 0, 100% 0, 100% calc(100% - var(--cut-tag, 8px)), calc(100% - var(--cut-tag, 8px)) 100%, 0 100%)",
     },
+    // Bordered `.cut`. A CSS `border` cannot survive a clip-path: the clip slices
+    // the left/right borders off entirely and leaves the two diagonals unstroked,
+    // so an outline shape collapses into two loose horizontal rules. This draws
+    // the stroke as geometry instead — the element itself is a solid slab in the
+    // line colour, and `::before` re-cuts the same parallelogram inset by
+    // --cut-w, leaving a stroke that follows all four edges including the slants.
+    //
+    // Use INSTEAD of `border` + `.cut`, never alongside them. Set the colours via
+    // --cut-line / --cut-fill (utilities: `[--cut-line:var(--accent)]`), which
+    // also makes hover/active variants a one-token swap. Because the fill is a
+    // real paint, --cut-fill must name the surface the element sits on; a
+    // genuinely transparent shape is not expressible here.
+    //
+    // The inner clip reuses --cut over a box shortened by 2*--cut-w, so the slant
+    // is a hair steeper than the outer one: at the sizes the primitives use
+    // (--cut 3-10px, height 20-56px) the stroke drifts well under half a pixel.
+    ".cut-frame": {
+      position: "relative",
+      border: "0",
+      background: "transparent",
+      clipPath: "polygon(var(--cut) 0, 100% 0, calc(100% - var(--cut)) 100%, 0 100%)",
+      // Both layers sit at a negative z-index so they paint above the element's
+      // own background but below its content — otherwise the fill would cover
+      // bare text nodes, which cannot be raised with z-index.
+      "&::after": {
+        content: '""',
+        position: "absolute",
+        inset: "0",
+        zIndex: "-2",
+        background: "var(--cut-line, var(--line-2))",
+        pointerEvents: "none",
+      },
+      "&::before": {
+        content: '""',
+        position: "absolute",
+        inset: "var(--cut-w, 1px)",
+        zIndex: "-1",
+        background: "var(--cut-fill, var(--panel))",
+        clipPath: "polygon(var(--cut) 0, 100% 0, calc(100% - var(--cut)) 100%, 0 100%)",
+        pointerEvents: "none",
+      },
+    },
   })
 })
 

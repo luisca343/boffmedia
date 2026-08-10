@@ -19,9 +19,12 @@ export function Toggle({ on, onChange, label, className }: ToggleProps) {
     >
       <span
         className={cn(
-          "relative w-[42px] h-[22px] border border-solid transition-[background,border-color] duration-[140ms]",
-          "cut [--cut:6px]",
-          on ? "bg-accent-soft border-accent" : "bg-panel-2 border-line-2",
+          "relative w-[42px] h-[22px]",
+          "cut-frame [--cut:6px] [--cut-w:1px]",
+          "before:transition-[background] before:duration-[140ms] after:transition-[background] after:duration-[140ms]",
+          on
+            ? "[--cut-line:var(--accent)] [--cut-fill:color-mix(in_srgb,var(--accent)_13%,var(--panel))]"
+            : "[--cut-line:var(--line-2)] [--cut-fill:var(--panel-2)]",
         )}
       >
         <i

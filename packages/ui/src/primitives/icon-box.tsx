@@ -33,12 +33,14 @@ export function IconBox({ icon, tone = "accent", size = "md", className }: IconB
     <span
       style={{
         color: c,
-        background: `color-mix(in srgb, ${c} 12%, transparent)`,
-        borderColor: `color-mix(in srgb, ${c} 30%, transparent)`,
+        // Mixed against --panel rather than transparent: `.cut-frame` paints the
+        // fill over the stroke slab, so a translucent one would take its tint.
+        ["--cut-fill" as string]: `color-mix(in srgb, ${c} 12%, var(--panel))`,
+        ["--cut-line" as string]: `color-mix(in srgb, ${c} 30%, var(--panel))`,
       }}
       className={cn(
-        "inline-grid place-items-center flex-none border border-solid",
-        "cut [--cut:6px]",
+        "inline-grid place-items-center flex-none",
+        "cut-frame [--cut:6px] [--cut-w:1px]",
         SIZE[size],
         className,
       )}

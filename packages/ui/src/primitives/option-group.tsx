@@ -30,14 +30,15 @@ export function OptionCard({ icon, label, sub, active, disabled, onClick, ariaRo
       title={typeof sub === "string" ? sub : typeof label === "string" ? label : undefined}
       onClick={onClick}
       className={cn(
-        "group flex flex-col items-start gap-[6px] p-3 text-left cursor-pointer min-w-0 border border-solid",
-        "cut",
-        "transition-[border-color,color,background] duration-[140ms]",
+        "group flex flex-col items-start gap-[6px] p-[13px] text-left cursor-pointer min-w-0",
+        "cut-frame [--cut-w:1px]",
+        "transition-[color] duration-[140ms]",
+        "before:transition-[background] before:duration-[140ms] after:transition-[background] after:duration-[140ms]",
         "focus-visible:outline-2 focus-visible:outline-accent-line focus-visible:outline-offset-2",
         "disabled:opacity-40 disabled:cursor-not-allowed",
         active
-          ? "border-accent bg-accent-soft text-txt"
-          : "border-line bg-panel text-txt-muted hover:enabled:border-line-2 hover:enabled:text-txt",
+          ? "[--cut-line:var(--accent)] [--cut-fill:color-mix(in_srgb,var(--accent)_13%,var(--panel))] text-txt"
+          : "[--cut-line:var(--line)] [--cut-fill:var(--panel)] text-txt-muted hover:enabled:[--cut-line:var(--line-2)] hover:enabled:text-txt",
       )}
     >
       {icon && (

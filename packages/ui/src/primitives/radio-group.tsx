@@ -30,12 +30,14 @@ export function RadioGroup({ value, onChange, options = [], ariaLabel, className
             disabled={o.disabled}
             onClick={() => onChange?.(o.value)}
             className={cn(
-              "group flex items-start gap-[13px] w-full py-3 px-4 text-left cursor-pointer border border-solid",
-              "cut",
-              "transition-[border-color,background] duration-[140ms]",
+              "group flex items-start gap-[13px] w-full py-[13px] px-[17px] text-left cursor-pointer",
+              "cut-frame [--cut-w:1px]",
+              "before:transition-[background] before:duration-[140ms] after:transition-[background] after:duration-[140ms]",
               "disabled:opacity-40 disabled:cursor-not-allowed",
               "focus-visible:outline-2 focus-visible:outline-accent-line focus-visible:outline-offset-2",
-              on ? "border-accent bg-accent-soft" : "border-line bg-panel hover:enabled:border-line-2",
+              on
+                ? "[--cut-line:var(--accent)] [--cut-fill:color-mix(in_srgb,var(--accent)_13%,var(--panel))]"
+                : "[--cut-line:var(--line)] [--cut-fill:var(--panel)] hover:enabled:[--cut-line:var(--line-2)]",
             )}
           >
             <span
