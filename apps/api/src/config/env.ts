@@ -92,9 +92,14 @@ export const env = z
     // Where override blobs live, content-addressed by their sha512. Deliberately
     // OUTSIDE PUBLIC_DIR: overrides are gated by the pack ACL, and anything under
     // the static root would be world-readable by URL.
+    //
+    // CURRENTLY INERT, like LAUNCHER_RELEASE_DIR below: both stores resolve
+    // through `laboonPath()` (cwd + /laboon) so uploads work with zero env
+    // setup. Kept in the schema because deploy envs already set them; setting
+    // one changes nothing until `config/laboon.ts`'s TEMP note is unwound.
     PACK_BLOB_DIR: z.string().optional(),
-    // Boff Launcher auto-update artifacts (Tauri v2 updater). Same rootless
-    // approach as PACK_BLOB_DIR and, like it, deliberately OUTSIDE PUBLIC_DIR:
+    // Boff Launcher auto-update artifacts (Tauri v2 updater). Inert for the same
+    // reason as PACK_BLOB_DIR and, like it, deliberately OUTSIDE PUBLIC_DIR:
     // the bytes are served by a controller route so downloads stay countable
     // and the layout on disk is not part of the public contract.
     LAUNCHER_RELEASE_DIR: z.string().optional(),

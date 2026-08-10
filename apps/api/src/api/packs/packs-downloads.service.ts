@@ -11,7 +11,7 @@ import {
 import { createHash, randomUUID } from 'crypto';
 import { createReadStream, createWriteStream } from 'fs';
 import { mkdir, rename, rm, stat } from 'fs/promises';
-import { dirname, join, resolve } from 'path';
+import { dirname, join } from 'path';
 import type { Readable } from 'stream';
 import { pipeline } from 'stream/promises';
 import { firstValueFrom } from 'rxjs';
@@ -282,13 +282,15 @@ export class PacksDownloadsService {
 /** Content-addressed, sharded two levels so a pack with thousands of overrides
  *  does not put thousands of entries in one directory.
  *
- *  PACK_BLOB_DIR wins when set (prod: `./laboon/pack-blobs`, resolved against
- *  cwd — the same directory as the fallback, so behaviour does not change);
- *  without it, the laboon store. Read per call so tests can point it elsewhere. */
+ *  Resolved through `laboonPath`, exactly like the launcher-release store —
+ *  PACK_BLOB_DIR is deliberately NOT read here. It holds the container path
+ *  (`/app/laboon/pack-blobs`), which is identical to `laboonPath('pack-blobs')`
+ *  under Docker (cwd is `/app`) but absolute-and-unwritable on a host dev run,
+ *  where it turned every upload into `EACCES: mkdir '/app'`. Honouring it in one
+ *  of the two stores and ignoring it in the other is what made that failure look
+ *  like a packs bug rather than an environment one. */
 function blobDir(): string {
-  return env.PACK_BLOB_DIR
-    ? resolve(process.cwd(), env.PACK_BLOB_DIR)
-    : laboonPath('pack-blobs');
+  return laboonPath('pack-blobs');
 }
 
 function blobPath(sha512: string): string {
