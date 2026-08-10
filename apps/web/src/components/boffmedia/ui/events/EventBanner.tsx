@@ -54,7 +54,7 @@ export function EventBanner({
       <div className="relative z-[2] max-w-[1000px] px-[clamp(22px,3.2vw,40px)] pb-[26px] pt-10">
         <div className="mb-4 flex flex-wrap items-center gap-3.5">
           <EventStatusChip status={status} label={t(`status.${status}`)} lg />
-          {status === "upcoming" && <Countdown date={event.startDate} />}
+          {status === "upcoming" && event.startDate && <Countdown date={event.startDate} />}
           {event.gameName && (
             <span className="inline-flex items-center gap-2 font-mono text-[11px]/none font-semibold uppercase tracking-[0.08em] text-txt-muted">
               <span className="grid h-[26px] w-[26px] flex-none place-items-center border-[1.5px] border-solid border-[color-mix(in_srgb,var(--ghue)_55%,var(--line-2))] bg-[color-mix(in_srgb,var(--ghue)_14%,var(--bg))] text-[var(--ghue)] cut-seal [--cut:5px]">

@@ -8,6 +8,7 @@ import { AdminCrud } from "../_components/ui/av-crud"
 import { AvPanel, AvSectionHead, AvPill } from "../_components/ui/av-kit"
 import { useGetEvents } from "@/hooks/events/useGetEvents"
 import { EventsService } from "@/services/api/boffmedia/eventsService"
+import { orThrow } from "@/services/http/core"
 import { RandomizerService } from "@/services/api/boffmedia/randomizerService"
 import { EventForm } from "./forms/EventForm"
 import { EventAdminPanel } from "./events/EventAdminPanel"
@@ -113,22 +114,31 @@ export function EventsAdmin() {
         FormComponent={EventForm}
         onCreate={async (data: any) => {
           const { gameId, packId, ...rest } = data
-          await EventsService.createEvent({
+          // orThrow: the http helpers return an envelope instead of throwing, so
+          // without it a 400 was reported to the admin as "created OK".
+          await orThrow(EventsService.createEvent({
             ...rest,
             gameId,
             // The Select yields "" for "no pack"; the column is nullable.
             packId: packId || null,
             icon: data.icon || "",
             banner: data.banner || "",
-            endDate: data.endDate || data.startDate,
-          })
+            // Empty datetime inputs mean "undated", not "invalid" — send null.
+            startDate: data.startDate || null,
+            endDate: data.endDate || data.startDate || null,
+          }))
         }}
         onUpdate={async (id, data: any) => {
           const { packId, ...rest } = data
-          await EventsService.updateEvent(Number(id), { ...rest, packId: packId || null })
+          await orThrow(EventsService.updateEvent(Number(id), {
+            ...rest,
+            packId: packId || null,
+            startDate: data.startDate || null,
+            endDate: data.endDate || null,
+          }))
         }}
         onDelete={async (id) => {
-          await EventsService.deleteEvent(Number(id))
+          await orThrow(EventsService.deleteEvent(Number(id)))
         }}
         searchFields={["title", "description"]}
         entityName={{ singular: t("singular"), plural: t("plural") }}
@@ -165,7 +175,9 @@ export function EventsAdmin() {
             )
           }},
           { key: "startDate", label: t("colStart"), render: (e) => (
-            <span className="text-sm text-txt-muted font-mono">{new Date(e.startDate).toLocaleDateString()}</span>
+            <span className="text-sm text-txt-muted font-mono">
+              {e.startDate ? new Date(e.startDate).toLocaleDateString() : "—"}
+            </span>
           )},
         ]}
         rowActions={(e) => (

@@ -17,10 +17,13 @@ export function CalendarView() {
 
   const groups = React.useMemo(() => {
     const list = (Array.isArray(events) ? events : []) as EventLike[]
-    const sorted = [...list].sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime())
+    // Undated events have no place on a calendar — they drop out entirely.
+    const sorted = [...list]
+      .filter((e) => Boolean(e.startDate))
+      .sort((a, b) => new Date(a.startDate!).getTime() - new Date(b.startDate!).getTime())
     const map = new Map<string, { label: string; items: EventLike[] }>()
     for (const e of sorted) {
-      const d = new Date(e.startDate)
+      const d = new Date(e.startDate!)
       if (Number.isNaN(d.getTime())) continue
       const key = `${d.getFullYear()}-${String(d.getMonth()).padStart(2, "0")}`
       if (!map.has(key)) {

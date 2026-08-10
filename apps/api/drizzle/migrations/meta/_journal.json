@@ -407,6 +407,13 @@
       "when": 1786284649403,
       "tag": "0057_launcher_token_version",
       "breakpoints": true
+    },
+    {
+      "idx": 58,
+      "version": "5",
+      "when": 1786284650403,
+      "tag": "0058_events_nullable_start_date",
+      "breakpoints": true
     }
   ]
 }

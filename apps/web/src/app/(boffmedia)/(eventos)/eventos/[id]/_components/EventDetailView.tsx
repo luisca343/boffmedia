@@ -106,7 +106,7 @@ export function EventDetailView({ id }: { id: number }) {
             <div className="mt-4 flex flex-wrap gap-x-6 gap-y-3">
               <span className="inline-flex items-center gap-2 font-mono text-[12px]/none uppercase tracking-[0.06em] text-txt-muted">
                 <Icon name="calendar" size={14} className="text-accent" />
-                {formatEventDate(event.startDate)}
+                {formatEventDate(event.startDate) || "—"}
                 {event.endDate ? ` — ${formatEventDate(event.endDate)}` : ""}
               </span>
               <span className="inline-flex items-center gap-2 font-mono text-[12px]/none uppercase tracking-[0.06em] text-txt-muted">

@@ -43,11 +43,18 @@ export class CreateEventDto {
   gameId: number;
 
   @ApiProperty({
-    description: 'The start date of the event',
+    description:
+      'The start date of the event. Optional: an event can be created undated and dated later.',
     example: '2024-07-01T00:00:00Z',
+    required: false,
+    nullable: true,
+    // Explicit: the CLI plugin renders the `string | null` union as `object`,
+    // which would land in @boffmedia/shared as an untyped field.
+    type: String,
   })
+  @IsOptional()
   @IsDateString()
-  startDate: string;
+  startDate?: string | null;
 
   @ApiProperty({
     description: 'The end date of the event',

@@ -131,11 +131,16 @@ export function CartasView({ data, effective, initialQ, onOpenCard }: Props) {
         </Empty>
       ) : grouped && bySet ? (
         bySet.map(([sid, cards]) => {
-          const s = data.sets.find((x) => x.id === sid)!
-          const have = s.cards.filter((c) => effective(c.id) > 0).length
+          // `sid` comes off the cards (`c.setId`), while `data.sets` is keyed by the
+          // grouped endpoint's `setId` — the two can disagree (promos, a group that
+          // came back without a setId). Fall back to this group's own cards instead
+          // of asserting the set exists; the `!` here used to crash the whole view.
+          const s = data.sets.find((x) => x.id === sid)
+          const pool = s?.cards ?? cards
+          const have = pool.filter((c) => effective(c.id) > 0).length
           return (
             <section key={sid} className="mb-[26px]">
-              <div className="mb-3"><TcgSetProgress label={s.name} sub={s.id} have={have} total={s.cards.length} /></div>
+              <div className="mb-3"><TcgSetProgress label={s?.name ?? sid} sub={sid} have={have} total={pool.length} /></div>
               <TcgCardGrid cards={cards} effective={effective} allColored density={density} onOpen={(c) => onOpenCard(c, filtered)} />
             </section>
           )

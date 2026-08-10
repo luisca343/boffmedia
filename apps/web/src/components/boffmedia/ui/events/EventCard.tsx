@@ -22,7 +22,7 @@ export function EventCard({ event, layout }: { event: EventLike; layout?: "grid"
   // accent. [deferred — needs a game→hue field on the event DTO]
   const hue = event.hue || "var(--accent)"
 
-  const start = new Date(event.startDate)
+  const start = new Date(event.startDate ?? NaN)
   const valid = !Number.isNaN(start.getTime())
   const day = valid ? start.toLocaleDateString(intlLocale, { day: "2-digit" }) : "–"
   const mon = valid ? start.toLocaleDateString(intlLocale, { month: "short" }).replace(".", "").toUpperCase() : ""
@@ -80,7 +80,7 @@ export function EventCard({ event, layout }: { event: EventLike; layout?: "grid"
             </span>
             {event.gameName || "—"}
           </span>
-          {status === "upcoming" ? (
+          {status === "upcoming" && event.startDate ? (
             <Countdown date={event.startDate} compact />
           ) : (
             <span className="inline-flex items-center gap-1.5 font-mono text-[11px]/none font-medium uppercase tracking-[0.05em] text-txt-muted">

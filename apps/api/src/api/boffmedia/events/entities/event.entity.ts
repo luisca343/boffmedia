@@ -67,9 +67,13 @@ export class Event {
 
   @ApiProperty({
     example: '2024-07-01T00:00:00.000Z',
-    description: 'Event start date',
+    description: 'Event start date. Null while the event is still undated.',
+    required: false,
+    nullable: true,
+    // Explicit: the CLI plugin renders the `Date | null` union as `object`.
+    type: Date,
   })
-  startDate: Date;
+  startDate: Date | null;
 
   @ApiProperty({
     example: '2024-07-31T23:59:59.000Z',

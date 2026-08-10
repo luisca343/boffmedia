@@ -69,7 +69,9 @@ export const boffMediaEvents = mysqlTable(
     description: text('description'),
     icon: varchar('icon', { length: 255 }).notNull(),
     banner: varchar('banner', { length: 255 }),
-    startDate: timestamp('start_date').notNull(),
+    // Nullable on purpose: an event can be drafted before its date is known
+    // and dated (or re-cleared) later. Same shape as boffmedia_tournaments.
+    startDate: timestamp('start_date'),
     endDate: timestamp('end_date'),
     status: mysqlEnum('status', [
       EVENT_STATUS.UPCOMING,

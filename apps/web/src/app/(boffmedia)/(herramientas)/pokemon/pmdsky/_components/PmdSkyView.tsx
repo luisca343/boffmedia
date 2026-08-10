@@ -19,7 +19,10 @@ import { useWmV3 } from "../_lib/useWmV3"
 import { WmSection, WmStars, WmPokePicker, WmTicket, WmCombo } from "./ui/wm-kit"
 
 export function PmdSkyView() {
-  const t = useTranslations("pmdsky")
+  // Root scope on purpose: the pmdsky catalogs live at the message root
+  // (`questTypes.*`, `rewardTypes.*`, `selectPokemon`) and the dungeon labels are
+  // numeric root keys from dungeons.json. Scoping to "pmdsky" resolved none of them.
+  const t = useTranslations()
   const tApp = useTranslations("pmdsky.app")
   const ctx = useWmV3(t, tApp)
 

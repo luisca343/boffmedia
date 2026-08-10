@@ -29,7 +29,12 @@ export function CommunityView() {
     const list = (Array.isArray(events) ? events : []) as EventLike[]
     return list
       .filter((e) => eventStatus(e) !== "completed")
-      .sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime())
+      // Undated events sort last — Infinity, not the epoch `new Date(null)` gives.
+      .sort(
+        (a, b) =>
+          (a.startDate ? new Date(a.startDate).getTime() : Infinity) -
+          (b.startDate ? new Date(b.startDate).getTime() : Infinity)
+      )
       .slice(0, 4)
   }, [events])
 

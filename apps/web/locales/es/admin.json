@@ -180,6 +180,7 @@
         "gamePlaceholder": "Selecciona un juego",
         "startLabel": "Fecha de inicio",
         "endLabel": "Fecha de finalización",
+        "dateHint": "Opcional — puedes dejarla vacía y ponerla más tarde.",
         "typeLabel": "Tipo de evento",
         "typeHintChild": "Los eventos dentro de un servidor son siempre de tipo 'evento'.",
         "typeHint": "Selecciona el tipo de evento.",

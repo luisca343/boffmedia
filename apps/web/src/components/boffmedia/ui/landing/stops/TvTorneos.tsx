@@ -23,19 +23,21 @@ export function TvTorneos() {
     const now = Date.now()
     return (
       list
+        // "The next tournament" only means something for a dated event.
         .filter((e) => {
+          if (!e.startDate) return false
           const s = new Date(e.startDate).getTime()
           return !Number.isNaN(s) && s >= now
         })
-        .sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime())[0] || null
+        .sort((a, b) => new Date(a.startDate!).getTime() - new Date(b.startDate!).getTime())[0] || null
     )
   }, [events])
 
   // `next.title` is DB content (a real tournament name); only the fallback is chrome.
   const title = next?.title ?? t("fallbackTitle")
-  const eventTs = next ? new Date(next.startDate).getTime() : undefined
+  const eventTs = next ? new Date(next.startDate!).getTime() : undefined
   const dateStr = next
-    ? `${new Date(next.startDate).toLocaleDateString(intlLocale, { day: "numeric", month: "short" }).replace(".", "").toUpperCase()} · ${new Date(next.startDate).toLocaleTimeString(intlLocale, { hour: "2-digit", minute: "2-digit" })}`
+    ? `${new Date(next.startDate!).toLocaleDateString(intlLocale, { day: "numeric", month: "short" }).replace(".", "").toUpperCase()} · ${new Date(next.startDate!).toLocaleTimeString(intlLocale, { hour: "2-digit", minute: "2-digit" })}`
     : t("fallbackDate")
 
   return (

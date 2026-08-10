@@ -22,7 +22,15 @@
     "Raikou": "Raikou",
     "Suicune": "Suicune",
     "Jiraichi": "Jirachi",
-    "TREASURE_HUNT": "Treasure hunt"
+    "TREASURE_HUNT": "Treasure hunt",
+    "Normal": "Normal",
+    "Escort": "Escort",
+    "Monster House": "Monster house",
+    "Arrest client (Magnemite)": "Arrest client (Magnemite)",
+    "Arrest client (Magnezone)": "Arrest client (Magnezone)",
+    "Jirachi": "Jirachi",
+    "Special Floor (broken)": "Special floor (broken)",
+    "Unlock seven treasures dungeon (broken)": "Unlock seven treasures dungeon (broken)"
   },
   "rewardTypes": {
     "CASH": "Cash",

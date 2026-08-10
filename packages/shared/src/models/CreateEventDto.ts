@@ -20,9 +20,9 @@ export type CreateEventDto = {
      */
     gameId: number;
     /**
-     * The start date of the event
+     * The start date of the event. Optional: an event can be created undated and dated later.
      */
-    startDate: string;
+    startDate?: string | null;
     /**
      * The end date of the event
      */

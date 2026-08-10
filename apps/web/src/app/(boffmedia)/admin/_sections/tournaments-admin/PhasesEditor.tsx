@@ -316,7 +316,7 @@ function PhaseFields({
             )}
             {advType === "top_or_record" && (
               <p className="font-mono text-[10px] leading-[1.4] text-txt-dim sm:col-span-3">
-                {t("phaseAdvanceHint")}
+                {t.rich("phaseAdvanceHint", { b: (chunks) => <b className="text-txt">{chunks}</b> })}
               </p>
             )}
           </>

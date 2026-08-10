@@ -19,7 +19,8 @@ export interface EventLike {
   gameName?: string | null
   icon?: string | null
   banner?: string | null
-  startDate: string
+  /** Null while the event is still undated — the date can be set later, or never. */
+  startDate?: string | null
   endDate?: string | null
   status?: string | null
   type?: string | null
@@ -97,7 +98,9 @@ export function eventStatus(e: EventLike): EventStatus {
   const s = (e.status || "").toLowerCase()
   if (s === "active" || s === "upcoming" || s === "completed") return s
   const now = Date.now()
-  const start = new Date(e.startDate).getTime()
+  // An undated event has no start to compare against — `new Date(null)` would
+  // silently read as the epoch and make it look already-started.
+  const start = e.startDate ? new Date(e.startDate).getTime() : NaN
   const end = e.endDate ? new Date(e.endDate).getTime() : NaN
   if (!Number.isNaN(start) && now < start) return "upcoming"
   if (!Number.isNaN(end) && now > end) return "completed"

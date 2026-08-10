@@ -22,7 +22,15 @@
     "Raikou": "Raikou",
     "Suicune": "Suicune",
     "Jiraichi": "Jirachi",
-    "TREASURE_HUNT": "Búsqueda del tesoro"
+    "TREASURE_HUNT": "Búsqueda del tesoro",
+    "Normal": "Normal",
+    "Escort": "Escoltar",
+    "Monster House": "Casa de monstruos",
+    "Arrest client (Magnemite)": "Arrestar cliente (Magnemite)",
+    "Arrest client (Magnezone)": "Arrestar cliente (Magnezone)",
+    "Jirachi": "Jirachi",
+    "Special Floor (broken)": "Piso especial (roto)",
+    "Unlock seven treasures dungeon (broken)": "Desbloquear la mazmorra de los siete tesoros (roto)"
   },
   "rewardTypes": {
     "CASH": "Dinero",

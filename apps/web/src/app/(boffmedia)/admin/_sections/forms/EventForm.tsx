@@ -17,8 +17,10 @@ const eventSchema = z.object({
   icon: z.string().optional(),
   banner: z.string().optional(),
   gameId: z.number(),
-  startDate: z.string(),
-  endDate: z.string().optional(),
+  // Both dates are optional: an event can be drafted undated and dated later.
+  // Nullish, not optional — that is what the Event entity hands back undated.
+  startDate: z.string().nullish(),
+  endDate: z.string().nullish(),
   type: z.enum(["event", "server"]),
   visibility: z.enum(["public", "private"]),
   status: z.enum(["upcoming", "active", "completed"]),
@@ -145,10 +147,10 @@ export function EventForm({ defaultValues, isSubmitting, onSubmit, onCancel, sub
       />
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <Field label={t("event.startLabel")} error={errors.startDate?.message}>
+        <Field label={t("event.startLabel")} hint={t("event.dateHint")} error={errors.startDate?.message}>
           <Input type="datetime-local" {...register("startDate")} />
         </Field>
-        <Field label={t("event.endLabel")} error={errors.endDate?.message}>
+        <Field label={t("event.endLabel")} hint={t("event.dateHint")} error={errors.endDate?.message}>
           <Input type="datetime-local" {...register("endDate")} />
         </Field>
       </div>

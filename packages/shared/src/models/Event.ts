@@ -33,9 +33,9 @@ export type Event = {
      */
     banner?: string;
     /**
-     * Event start date
+     * Event start date. Null while the event is still undated.
      */
-    startDate: string;
+    startDate?: string | null;
     /**
      * Event end date
      */

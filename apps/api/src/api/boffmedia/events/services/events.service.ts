@@ -47,7 +47,10 @@ export class EventsService {
       title: createEventDto.title,
       description: createEventDto.description,
       gameId: createEventDto.gameId,
-      startDate: new Date(createEventDto.startDate),
+      // Undated events are legal — the date can be filled in later, or never.
+      startDate: createEventDto.startDate
+        ? new Date(createEventDto.startDate)
+        : null,
       endDate: createEventDto.endDate ? new Date(createEventDto.endDate) : null,
       visibility: createEventDto.visibility,
       icon: createEventDto.icon,
@@ -80,8 +83,9 @@ export class EventsService {
       ...(d.title !== undefined ? { title: d.title } : {}),
       ...(d.description !== undefined ? { description: d.description } : {}),
       ...(d.gameId !== undefined ? { gameId: d.gameId } : {}),
+      // Sending `startDate: null` clears the date; omitting the key leaves it.
       ...(d.startDate !== undefined
-        ? { startDate: new Date(d.startDate) }
+        ? { startDate: d.startDate ? new Date(d.startDate) : null }
         : {}),
       ...(d.endDate !== undefined
         ? { endDate: d.endDate ? new Date(d.endDate) : null }

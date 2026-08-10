@@ -27,7 +27,11 @@ export function EventsView() {
       })
       .sort((a, b) => {
         const d = ORDER[eventStatus(a)] - ORDER[eventStatus(b)]
-        return d || new Date(b.startDate).getTime() - new Date(a.startDate).getTime()
+        if (d) return d
+        // Undated events sort last within their status group.
+        const ta = a.startDate ? new Date(a.startDate).getTime() : -Infinity
+        const tb = b.startDate ? new Date(b.startDate).getTime() : -Infinity
+        return tb - ta
       })
   }, [events, q, filter])
 
