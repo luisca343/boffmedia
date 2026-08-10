@@ -138,12 +138,22 @@ export class RandomizerRepository {
     const version = versionRows[0];
     if (!version || !version.published) return { state: 'no-version' };
 
-    const romPath = (version.emulator as { rom?: unknown } | null)?.rom;
+    // MariaDB implements JSON as a LONGTEXT alias, so mysql2 hands these back as
+    // raw strings whatever `json()` types them as — `$type<>` is compile-time
+    // only. PacksRepository has `hydrate()` for exactly this; reading the table
+    // directly from here bypassed it, so `emulator.rom` was always undefined and
+    // `files` was never an array. The guard therefore reported 'no-rom' for
+    // EVERY pack, including perfectly valid ones, and no randomizer config could
+    // be opened.
+    const emulator = parseJsonColumn<{ rom?: unknown }>(version.emulator);
+    const romPath = emulator?.rom;
     if (typeof romPath !== 'string' || !romPath) return { state: 'no-rom' };
 
-    const files = Array.isArray(version.files)
-      ? (version.files as Array<{ path?: unknown; sha512?: unknown }>)
-      : [];
+    const parsedFiles =
+      parseJsonColumn<Array<{ path?: unknown; sha512?: unknown }>>(
+        version.files,
+      );
+    const files = Array.isArray(parsedFiles) ? parsedFiles : [];
     const entry = files.find((f) => f?.path === romPath);
     if (!entry || typeof entry.sha512 !== 'string') return { state: 'no-rom' };
 
@@ -750,5 +760,23 @@ export class RandomizerRepository {
       .delete(randomizerRoms)
       .where(eq(randomizerRoms.id, id))
       .execute();
+  }
+}
+
+/**
+ * Read a MariaDB "JSON" column that mysql2 may hand back as a raw string.
+ *
+ * Tolerant of both shapes because the same column reads as an object on MySQL
+ * and as a string on MariaDB, and of malformed text because a manifest that
+ * cannot be parsed must fail the caller's own validity check ('no-rom'), not
+ * throw out of a read.
+ */
+function parseJsonColumn<T>(value: unknown): T | null {
+  if (value == null) return null;
+  if (typeof value !== 'string') return value as T;
+  try {
+    return JSON.parse(value) as T;
+  } catch {
+    return null;
   }
 }

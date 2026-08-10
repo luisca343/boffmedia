@@ -47,7 +47,14 @@ import { PacksService } from './packs.service';
     PacksService,
     PacksDownloadsService,
     LauncherAuthGuard,
+    // A guard named in another module's @UseGuards() is instantiated in THAT
+    // module's injector, so every dependency it has must be exported from here
+    // too — exporting the guard alone is not enough. These two are the guard's
+    // constructor, not an invitation to use the repository elsewhere:
+    // RandomizerModule pulls in LauncherAuthGuard and would otherwise fail to
+    // boot with "PacksRepository is not available in the RandomizerModule".
     PacksAuthService,
+    PacksRepository,
   ],
 })
 export class PacksModule {}
