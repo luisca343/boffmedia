@@ -4,17 +4,24 @@ import { Icon, type IconName } from "@boffmedia/ui"
 import { cssVars, DK_CUT } from "./utils"
 
 /**
- * Full-height data-tool chassis: a sticky bar, an optional sub-bar and a body
- * with its own scroll. Owns the `--dk-pad` gutter. On narrow screens the body
- * stops clipping so the page scrolls and the bar sticks.
+ * Data-tool chassis: a sticky bar, an optional sub-bar and a body. Owns the
+ * `--dk-pad` gutter.
+ *
+ * The page is the only scroller. This used to be a `100vh - nav` box whose body
+ * carried `overflow-y-auto`, which nested a second scrollbar inside a document
+ * that still scrolled by one Footer height — so scrolling slid the tool up and
+ * left the content in a sliver above the footer. `min-h` + a sticky bar is the
+ * same pattern ToolShell and the auth screens already use.
  */
 export function DkApp({ children, className }: { children: React.ReactNode; className?: string }) {
   return (
     <div
-      style={cssVars({ "--dk-pad": "clamp(14px,2vw,32px)" })}
+      // `--dk-bar-h` is the nominal DkBar height. Split views inside a DkApp use
+      // it to sticky-offset their own column below the bar; override per tool if
+      // a bar wraps to two rows.
+      style={cssVars({ "--dk-pad": "clamp(14px,2vw,32px)", "--dk-bar-h": "45px" })}
       className={cn(
-        "flex min-w-0 flex-col h-[calc(100vh_-_var(--nav-h,66px))]",
-        "max-[720px]:h-auto max-[720px]:min-h-[calc(100vh_-_var(--nav-h,66px))]",
+        "flex min-w-0 flex-col min-h-[calc(100dvh_-_var(--nav-h))]",
         className,
       )}
     >
@@ -28,7 +35,9 @@ export function DkBar({ children, className }: { children: React.ReactNode; clas
     <div
       className={cn(
         "relative z-30 flex flex-none flex-wrap items-center gap-3 border-b border-solid border-line bg-base",
-        "px-[var(--dk-pad)] py-[10px] max-[720px]:sticky max-[720px]:top-0",
+        // Sticks under the site Navbar, at every width. It used to stick to
+        // `top-0` below 720px, i.e. underneath the Navbar rather than below it.
+        "px-[var(--dk-pad)] py-[10px] sticky top-[var(--nav-h)]",
         className,
       )}
     >
@@ -64,7 +73,7 @@ export function DkBody({ children, pad = true, className }: { children: React.Re
   return (
     <div
       className={cn(
-        "min-h-0 flex-1 overflow-y-auto max-[720px]:overflow-visible",
+        "min-h-0 flex-1",
         pad && "px-[var(--dk-pad)] pb-[60px] pt-4",
         className,
       )}

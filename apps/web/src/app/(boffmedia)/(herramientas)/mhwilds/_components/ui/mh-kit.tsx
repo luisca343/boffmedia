@@ -13,7 +13,7 @@ export function MhApp({ children, className = "" }: { children: React.ReactNode;
   return (
     <div
       style={MH_VARS}
-      className={`flex flex-col min-w-0 h-[calc(100vh_-_var(--nav-h,66px))] bg-base text-txt relative ${className}`}
+      className={`flex flex-col min-w-0 min-h-[calc(100dvh_-_var(--nav-h))] bg-base text-txt relative ${className}`}
     >
       {children}
     </div>
@@ -22,7 +22,7 @@ export function MhApp({ children, className = "" }: { children: React.ReactNode;
 
 export function MhBody({ children, className = "", ...rest }: React.HTMLAttributes<HTMLDivElement>) {
   return (
-    <div className={`flex-1 min-h-0 overflow-y-auto ${className}`} {...rest}>
+    <div className={`flex-1 min-h-0 ${className}`} {...rest}>
       {children}
     </div>
   )
@@ -35,7 +35,7 @@ export function MhWrap({ children, className = "" }: { children: React.ReactNode
 // ── top toolbar ──────────────────────────────────────────────────────────────
 export function MhBar({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex items-center gap-4 flex-wrap flex-none px-[clamp(16px,2.4vw,36px)] py-[11px] border-b border-line bg-base sticky top-0 z-30 min-h-[58px]">
+    <div className="flex items-center gap-4 flex-wrap flex-none px-[clamp(16px,2.4vw,36px)] py-[11px] border-b border-line bg-base sticky top-[var(--nav-h)] z-30 min-h-[58px]">
       {children}
     </div>
   )

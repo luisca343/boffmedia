@@ -23,7 +23,7 @@ interface MvDetailProps {
 
 export function MvDetail({ detail, entry, rank, pokeMap, onSelect, onBack, loading, teams, teamsLoading, className }: MvDetailProps) {
   const t = useTranslations("vgc.meta")
-  const shell = cn("min-h-0 min-w-0 overflow-y-auto max-[980px]:overflow-visible", className)
+  const shell = cn("min-h-0 min-w-0", className)
 
   if (loading) {
     return (

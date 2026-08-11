@@ -107,9 +107,11 @@ export default function BestiaryPage() {
         ) : error ? (
           <div className="py-16"><Empty icon="alert" title={t("errorTitle")} lead={error} /></div>
         ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-[minmax(300px,360px)_minmax(0,1fr)]">
+          // Master/detail: the roster is a sticky, self-scrolling column and the
+          // detail rides the page scroll — MhApp no longer bounds their height.
+          <div className="grid grid-cols-1 items-start lg:grid-cols-[minmax(300px,360px)_minmax(0,1fr)]">
             {/* ── roster ── */}
-            <div className="flex flex-col min-h-0 lg:border-r border-solid border-line bg-base-2">
+            <div className="flex flex-col min-h-0 lg:sticky lg:top-[calc(var(--nav-h)_+_58px)] lg:h-[calc(100dvh_-_var(--nav-h)_-_58px)] lg:border-r border-solid border-line bg-base-2">
               <div className="flex flex-col gap-2.5 p-[12px_13px] border-b border-solid border-line">
                 <div className="flex gap-2 items-center">
                   <MhSearch value={q} onChange={setQ} placeholder={t("searchPlaceholder")} />
@@ -192,7 +194,7 @@ export default function BestiaryPage() {
             </div>
 
             {/* ── detail ── */}
-            <div ref={detailRef} className="min-w-0 overflow-y-auto scroll-smooth">
+            <div ref={detailRef} className="min-w-0">
               {selected ? <MonsterDetail m={selected} /> : null}
             </div>
           </div>

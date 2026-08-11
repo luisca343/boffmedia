@@ -4,7 +4,7 @@ import * as React from "react"
 import { useTranslations } from "next-intl"
 import { Icon } from "@boffmedia/ui"
 import { MewData } from "../mew-store"
-import { MEW, MEW_CATS, mewCatKey } from "../mew-util"
+import { MEW_CATS, mewCatKey } from "../mew-util"
 import type { MewCodexModel } from "./useMewCodex"
 
 // Presentational chrome strips driven by the codex model: brand/actions bar, the
@@ -12,7 +12,7 @@ import type { MewCodexModel } from "./useMewCodex"
 
 export function MewTopBar({ codex }: { codex: MewCodexModel }) {
   const t = useTranslations("mewgenics")
-  const { ready, total, catDef, randomPick, setRosterOpen } = codex
+  const { ready, total, randomPick } = codex
   return (
     <div className="relative z-[2] flex min-h-[64px] flex-none flex-wrap items-center gap-4 border-b-2 border-solid border-[color:var(--mwp-nline)] px-[clamp(16px,2.4vw,36px)] pb-2.5 pt-3">
       <div className="flex min-w-0 items-center gap-[13px]">
@@ -38,14 +38,6 @@ export function MewTopBar({ codex }: { codex: MewCodexModel }) {
         >
           <Icon name="sparkles" size={16} />
           <span className="max-[760px]:hidden">{t("chrome.random")}</span>
-        </button>
-        <button
-          type="button"
-          onClick={() => setRosterOpen((v) => !v)}
-          className="hidden items-center gap-[7px] border-2 border-solid border-[color:var(--mwp-nline)] bg-[color:var(--mwp-night-3)] px-3 pb-1.5 pt-[9px] text-[13px]/none tracking-[0.03em] text-[color:var(--mwp-cream)] [font-family:var(--mwf-disp)] [border-radius:var(--wob-sm)] max-[760px]:inline-flex"
-        >
-          <Icon name="list" size={16} />
-          {t(mewCatKey(catDef.key, "label"))}
         </button>
       </div>
     </div>
@@ -82,29 +74,6 @@ export function MewCatTabs({ codex }: { codex: MewCodexModel }) {
           </button>
         )
       })}
-    </div>
-  )
-}
-
-export function MewTrail({ codex }: { codex: MewCodexModel }) {
-  const t = useTranslations("mewgenics")
-  const { ready, trail, cat, selId, onNav } = codex
-  if (!ready || trail.length <= 1) return null
-  return (
-    <div className="relative z-[2] flex flex-none items-center gap-2.5 overflow-x-auto border-b border-dashed border-[color:var(--mwp-nline)] px-[clamp(16px,2.4vw,36px)] py-[7px] [scrollbar-width:none]">
-      <span className="inline-flex flex-none items-center gap-1.5 text-[11px]/none tracking-[0.08em] text-[color:var(--mwp-cream-dim)] [font-family:var(--mwf-disp)]"><Icon name="paw" size={12} />{t("chrome.trail")}</span>
-      <div className="flex gap-1.5">
-        {/* the crumb was named `t`, which shadowed the translator — hence `crumb`. */}
-        {trail.map((crumb) => {
-          const tc = MEW.catBy[crumb.cat]
-          const on = crumb.cat === cat && crumb.id === selId
-          return (
-            <button key={crumb.key} type="button" onClick={() => onNav(crumb.cat, crumb.id)} title={tc ? t(mewCatKey(tc.key, "label")) : ""} className={"inline-flex flex-none items-center gap-1.5 border-[1.5px] border-dashed px-[9px] py-[5px] text-[11.5px]/none font-semibold [font-family:var(--mwf-hand)] [border-radius:var(--wob-sm)] transition-all " + (on ? "border-[color:var(--mwp-cream-dim)] text-[color:var(--mwp-cream)]" : "border-[color:var(--mwp-nline)] text-[color:var(--mwp-cream-dim)] hover:border-[color:var(--mwp-ink)] hover:bg-[color:var(--mwp-paper)] hover:text-[color:var(--mwp-ink)]")}>
-              <Icon name={tc ? tc.icon : "paw"} size={11} />{crumb.name}
-            </button>
-          )
-        })}
-      </div>
     </div>
   )
 }

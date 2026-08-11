@@ -43,9 +43,9 @@ function DamageCalcShell() {
   const [savedOpen, setSavedOpen] = useState(false)
 
   return (
-    <div className="flex min-w-0 flex-col" style={{ height: "calc(100vh - var(--nav-h, 66px))" }}>
+    <div className="flex min-w-0 flex-col" style={{ minHeight: "calc(100dvh - var(--nav-h))" }}>
       {/* App bar */}
-      <div className="sticky top-0 z-20 flex flex-none flex-wrap items-center gap-[18px] border-b border-solid border-line bg-base px-[clamp(18px,2.4vw,40px)] py-3">
+      <div className="sticky top-[var(--nav-h)] z-20 flex flex-none flex-wrap items-center gap-[18px] border-b border-solid border-line bg-base px-[clamp(18px,2.4vw,40px)] py-3">
         <Tabs
           value={tab}
           onChange={(v) => setTab(v as TabId)}
@@ -86,7 +86,7 @@ function DamageCalcShell() {
       </div>
 
       {/* Body */}
-      <div className="flex-1 overflow-y-auto px-[clamp(18px,2.4vw,40px)] pb-[60px] pt-5">
+      <div className="flex-1 px-[clamp(18px,2.4vw,40px)] pb-[60px] pt-5">
         {tab === "combate" && <CombatView />}
         {tab === "matriz" && (
           <Suspense fallback={<TabFallback />}>

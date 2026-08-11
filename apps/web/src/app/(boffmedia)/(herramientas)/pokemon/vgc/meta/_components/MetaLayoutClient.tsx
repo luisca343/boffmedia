@@ -231,9 +231,11 @@ export function MetaLayoutClient() {
     );
   } else {
     body = (
-      <div className="grid min-h-0 flex-1 grid-cols-[minmax(280px,340px)_minmax(0,1fr)]">
+      // Split view: the ranking is a sticky, self-scrolling column and the detail
+      // rides the page scroll — DkApp no longer bounds their height.
+      <div className="grid min-h-0 flex-1 items-start grid-cols-[minmax(280px,340px)_minmax(0,1fr)]">
         <MvList
-          className="h-full border-r border-solid border-line"
+          className="sticky top-[calc(var(--nav-h)_+_var(--dk-bar-h,45px))] h-[calc(100dvh_-_var(--nav-h)_-_var(--dk-bar-h,45px))] border-r border-solid border-line"
           entries={usageEntries}
           pokeMap={pokeMap}
           selectedId={selectedEntry?.id ?? null}

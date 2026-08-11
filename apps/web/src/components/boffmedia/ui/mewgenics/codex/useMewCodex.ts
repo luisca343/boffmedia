@@ -10,15 +10,23 @@ export interface FilterOption { value: string; label: string; count: number; col
 export interface FilterGroup extends FilterDef { options: FilterOption[] }
 
 /**
- * All codex state, derivations and navigation handlers. The shell + chrome + roster
- * components are pure presenters of this model (separates state logic from render).
+ * All codex state, derivations and navigation handlers. The shell, chrome, browse
+ * grid and fiche are pure presenters of this model.
+ *
+ * The codex is two screens, not two panes: `selId === null` is the browse grid,
+ * a selection is the fiche. Nothing auto-selects, so you always land on the grid
+ * unless a deep link names an entry.
  */
 export function useMewCodex() {
   const t = useTranslations("mewgenics")
   const { ready, error, rev } = useMewData()
   const boot = React.useRef(true)
-  const scrollRef = React.useRef<HTMLDivElement>(null)
-  const detailRef = React.useRef<HTMLElement>(null)
+  // Wrapper, not the input: @boffmedia/ui's SearchInput does not forward a ref
+  // and it is shared with the launcher, so it is not ours to change for this.
+  const searchRef = React.useRef<HTMLDivElement>(null)
+  // Where the browse grid was when we opened a fiche, so `back()` lands you on
+  // the entry you clicked instead of at the top of the list.
+  const browseScroll = React.useRef(0)
 
   // Start from the SSR-safe default; the deep-link hash is applied post-mount
   // (reading window.location.hash in the initializer would break hydration).
@@ -28,7 +36,6 @@ export function useMewCodex() {
   const [filters, setFilters] = React.useState<Record<string, string>>({})
   const [sort, setSort] = React.useState("name")
   const [view, setView] = React.useState<"grid" | "list">("grid")
-  const [rosterOpen, setRosterOpen] = React.useState(false)
   const [trail, setTrail] = React.useState<TrailItem[]>([])
 
   // apply the deep-link hash once, client-side (kept out of the initial render)
@@ -84,23 +91,28 @@ export function useMewCodex() {
   const shown = filtered.slice(0, CX_CAP)
   const selRec = selId ? select.get(cat, selId) : null
 
-  const ensureVisible = React.useCallback((id: string) => {
-    const sc = scrollRef.current
-    if (!sc) return
-    let el: HTMLElement | null = null
-    try { el = sc.querySelector('[data-cxid="' + (window.CSS && CSS.escape ? CSS.escape(id) : id) + '"]') } catch { /* noop */ }
-    if (!el) return
-    const r = el.getBoundingClientRect(), rs = sc.getBoundingClientRect()
-    if (r.top < rs.top + 10) sc.scrollTop += r.top - (rs.top + 10)
-    else if (r.bottom > rs.bottom - 10) sc.scrollTop += r.bottom - (rs.bottom - 10)
+  // Browse ⇄ detail: `selId === null` is the grid, a selection is the fiche.
+  const pick = React.useCallback((id: string) => {
+    setSelId((cur) => {
+      // Only remember the grid position when leaving it, not when hopping
+      // between fiches via the trail or a cross-link.
+      if (cur == null) browseScroll.current = window.scrollY
+      return id
+    })
+    requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: "smooth" }))
   }, [])
 
-  const pick = React.useCallback((id: string) => {
-    setSelId(id)
-    setRosterOpen(false)
-    requestAnimationFrame(() => { if (detailRef.current) detailRef.current.scrollTop = 0 })
+  const back = React.useCallback(() => {
+    setSelId(null)
+    const y = browseScroll.current
+    requestAnimationFrame(() => window.scrollTo({ top: y }))
   }, [])
-  const pickCat = (k: string) => { setCat(k); setQ(""); setFilters({}); setSort("name"); setSelId(null) }
+
+  const pickCat = (k: string) => {
+    setCat(k); setQ(""); setFilters({}); setSort("name"); setSelId(null)
+    browseScroll.current = 0
+    requestAnimationFrame(() => window.scrollTo({ top: 0 }))
+  }
   const onNav = (nextCat: string, id: string) => {
     if (!MEW.catBy[nextCat]) return
     if (nextCat !== cat) { setCat(nextCat); setQ(""); setFilters({}); setSort("name") }
@@ -109,19 +121,25 @@ export function useMewCodex() {
   const randomPick = () => {
     const arr = filtered.length ? filtered : list
     if (!arr.length) return
-    const r = arr[Math.floor(Math.random() * arr.length)]
-    pick(r.id)
-    requestAnimationFrame(() => ensureVisible(r.id))
+    pick(arr[Math.floor(Math.random() * arr.length)].id)
   }
 
-  // default selection when category changes / on ready / when list populates late
+  // Browse-first: never auto-select. The only selection that survives mount is a
+  // deep-linked one, which is why `boot` still clears a hash id that no longer
+  // resolves (stale link, or a category whose remote data failed to load).
   React.useEffect(() => {
     if (!ready) return
     if (boot.current) { boot.current = false; if (selId && select.get(cat, selId)) return }
-    if (!selId || !select.get(cat, selId)) setSelId(filtered.length ? filtered[0].id : null)
+    if (selId && !select.get(cat, selId)) setSelId(null)
   }, [ready, cat, filtered.length])
 
-  React.useEffect(() => { if (ready && selId) cxWriteHash(cat, selId) }, [cat, selId, ready])
+  // Prev/next within the current result set, for the fiche's pager and ↑/↓.
+  const selIdx = selId ? shown.findIndex((r) => r.id === selId) : -1
+  const prevRec = selIdx > 0 ? shown[selIdx - 1] : null
+  const nextRec = selIdx >= 0 && selIdx < shown.length - 1 ? shown[selIdx + 1] : null
+
+  // Deep link tracks both modes: `?c=cat` while browsing, `?c=cat&id=…` on a fiche.
+  React.useEffect(() => { if (ready) cxWriteHash(cat, selId) }, [cat, selId, ready])
 
   // trail of visited entities (dedup, newest first)
   React.useEffect(() => {
@@ -134,27 +152,29 @@ export function useMewCodex() {
     })
   }, [cat, selId, ready])
 
-  // keyboard: ↑/↓ entries · ←/→ categories · "/" focuses search
+  // Keyboard. The bindings are mode-aware now that browse and detail are separate
+  // screens: ←/→ always walks categories, "/" always focuses search, but ↑/↓ pages
+  // between fiches only while one is open, and Esc returns to the grid.
   React.useEffect(() => {
     if (!ready) return
     const onKey = (e: KeyboardEvent) => {
-      const t = e.target as HTMLElement
-      const tag = (t?.tagName || "").toLowerCase()
-      const typing = tag === "input" || tag === "textarea" || tag === "select" || t?.isContentEditable
+      const el = e.target as HTMLElement
+      const tag = (el?.tagName || "").toLowerCase()
+      const typing = tag === "input" || tag === "textarea" || tag === "select" || el?.isContentEditable
       if (e.key === "/" && !typing) {
         e.preventDefault()
-        const el = scrollRef.current?.closest(".mew-roster")?.querySelector("input")
-        if (el) (el as HTMLInputElement).focus()
+        if (selId) back()
+        requestAnimationFrame(() => searchRef.current?.querySelector("input")?.focus())
         return
       }
+      if (e.key === "Escape" && !typing && selId) { e.preventDefault(); back(); return }
       if (typing || e.metaKey || e.ctrlKey || e.altKey) return
       if (e.key === "ArrowDown" || e.key === "ArrowUp") {
-        if (!shown.length) return
+        if (!selId) return
+        const next = e.key === "ArrowDown" ? nextRec : prevRec
+        if (!next) return
         e.preventDefault()
-        const idx = shown.findIndex((r) => r.id === selId)
-        const ni = idx < 0 ? 0 : Math.max(0, Math.min(shown.length - 1, idx + (e.key === "ArrowDown" ? 1 : -1)))
-        const next = shown[ni]
-        if (next && next.id !== selId) { pick(next.id); requestAnimationFrame(() => ensureVisible(next.id)) }
+        pick(next.id)
       } else if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
         e.preventDefault()
         const i = MEW_CATS.findIndex((c) => c.key === cat)
@@ -171,11 +191,12 @@ export function useMewCodex() {
 
   return {
     ready, error, catDef,
-    cat, selId, q, filters, sort, view, rosterOpen, trail,
-    setQ, setFilters, setSort, setView, setRosterOpen,
-    scrollRef, detailRef,
+    cat, selId, q, filters, sort, view, trail,
+    setQ, setFilters, setSort, setView,
+    searchRef,
     filterOpts, filtered, shown, selRec, total, abilitiesLoading,
-    pick, pickCat, onNav, randomPick,
+    prevRec, nextRec,
+    pick, back, pickCat, onNav, randomPick,
   }
 }
 

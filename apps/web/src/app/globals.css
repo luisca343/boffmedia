@@ -434,6 +434,11 @@
 * { box-sizing: border-box; }
 html.theme-switching * { transition: none !important; }
 html { scroll-behavior: smooth; background: var(--bg); }
+/* Height of the sticky site Navbar. It was never actually defined: the Navbar
+   asked for `h-[var(--nav-h)]` (no fallback, so the height collapsed to content)
+   while every tool shell offset itself by `var(--nav-h, 66px)`. The two could
+   not agree. Anything that sticks below the Navbar reads this token. */
+:root { --nav-h: 66px; }
 body {
   margin: 0;
   font: 400 16px/1.55 var(--font-body);

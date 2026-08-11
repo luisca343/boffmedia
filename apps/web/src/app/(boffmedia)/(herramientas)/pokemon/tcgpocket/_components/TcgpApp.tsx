@@ -66,9 +66,13 @@ export function TcgpApp({ view, expansion, cardId }: Props) {
   const drawerEditable = view === "coleccion" && !galleryUser && collection.editable
 
   return (
-    <div className="flex min-w-0 flex-col max-[720px]:h-auto max-[720px]:min-h-[calc(100vh_-_var(--nav-h,66px))] min-[721px]:h-[calc(100vh_-_var(--nav-h,66px))]">
-      {/* section header */}
-      <header className="flex-none border-b border-solid border-line bg-base/90 backdrop-blur-[10px] max-[720px]:sticky max-[720px]:top-0 max-[720px]:z-20">
+    // Single scroller: the page. This used to be a `100vh - nav` box with its own
+    // `overflow-y-auto` body, which nested a second scrollbar inside a document
+    // that still scrolled by exactly one Footer's height — so scrolling down slid
+    // the tool up and left the grid peeking through a sliver above the footer.
+    <div className="flex min-w-0 flex-col">
+      {/* section header — sticks directly under the sticky site Navbar */}
+      <header className="sticky top-[var(--nav-h)] z-20 flex-none border-b border-solid border-line bg-base/90 backdrop-blur-[10px]">
         <div className="flex items-center gap-4 px-[clamp(16px,3vw,34px)] py-[14px]">
           <div className="flex items-center gap-3">
             <span className="cut grid h-10 w-10 flex-none place-items-center bg-accent font-display text-[15px] font-bold tracking-[0.02em] text-accent-ink">TCG</span>
@@ -104,7 +108,7 @@ export function TcgpApp({ view, expansion, cardId }: Props) {
       </header>
 
       {/* body */}
-      <div className="min-h-0 flex-1 overflow-y-auto max-[720px]:overflow-visible">
+      <div>
         <div className="mx-auto w-full max-w-[1400px] p-[clamp(18px,3vw,34px)]">
           {loading ? (
             <div className="grid min-h-[40vh] place-items-center"><Spinner /></div>

@@ -56,7 +56,7 @@ export function SchematicViewerTool() {
       <div
         data-ds="boffmedia"
         className="flex min-h-0 flex-col overflow-hidden bg-base text-txt"
-        style={{ height: "calc(100vh - var(--nav-h, 66px))" }}
+        style={{ height: "calc(100dvh - var(--nav-h))" }}
       >
         <div className="flex h-[58px] shrink-0 items-center gap-[18px] border-b-2 border-line bg-base-deep px-[18px]">
           <div className="flex min-w-0 items-center gap-[11px]">

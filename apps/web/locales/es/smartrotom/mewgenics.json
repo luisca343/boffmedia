@@ -260,6 +260,12 @@
         "singular": "mapa",
         "desc": "Áreas por acto y capítulo: enemigos, jefes, objetos y eventos."
       }
+    },
+    "fiche": {
+      "back": "Volver a {category}",
+      "prev": "Entrada anterior",
+      "next": "Entrada siguiente",
+      "position": "{n} de {total}"
     }
   }
 }

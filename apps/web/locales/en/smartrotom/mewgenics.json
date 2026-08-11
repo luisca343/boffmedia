@@ -260,6 +260,12 @@
         "singular": "map",
         "desc": "Areas by act and chapter: enemies, bosses, items and events."
       }
+    },
+    "fiche": {
+      "back": "Back to {category}",
+      "prev": "Previous entry",
+      "next": "Next entry",
+      "position": "{n} of {total}"
     }
   }
 }

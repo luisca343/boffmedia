@@ -20,7 +20,7 @@ export default function MatchPage({ params }: Props) {
 
   if (loading) {
     return (
-      <div className="grid h-[calc(100vh_-_var(--nav-h,66px))] place-items-center">
+      <div className="grid min-h-[calc(100dvh_-_var(--nav-h))] place-items-center">
         <Spinner />
       </div>
     );
@@ -28,7 +28,7 @@ export default function MatchPage({ params }: Props) {
 
   if (!match) {
     return (
-      <div className="grid h-[calc(100vh_-_var(--nav-h,66px))] place-items-center font-mono text-[13px] text-txt-muted">
+      <div className="grid min-h-[calc(100dvh_-_var(--nav-h))] place-items-center font-mono text-[13px] text-txt-muted">
         {t('workspace.matchNotFound')}
       </div>
     );

@@ -63,7 +63,7 @@ export function SchematicCompatTool() {
       getModdedBlockModel={getModdedBlockModel}
       getBlockConnections={getBlockConnections}
     >
-      <div data-ds="boffmedia" className="flex min-h-0 flex-col overflow-hidden bg-base text-txt" style={{ height: "calc(100vh - var(--nav-h, 66px))" }}>
+      <div data-ds="boffmedia" className="flex min-h-0 flex-col overflow-hidden bg-base text-txt" style={{ height: "calc(100dvh - var(--nav-h))" }}>
         {/* app bar */}
         <div className="shrink-0 flex items-center gap-[18px] px-[18px] h-[58px] bg-base-deep border-b-2 border-line">
           <div className="flex items-center gap-[11px] min-w-0">

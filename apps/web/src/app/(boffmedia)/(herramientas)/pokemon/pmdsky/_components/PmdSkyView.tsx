@@ -69,9 +69,9 @@ export function PmdSkyView() {
   const floorError = issues.find((i) => i.field === "floor")?.msg
 
   return (
-    <div className="flex min-w-0 flex-col bg-base min-[961px]:h-[calc(100vh_-_var(--nav-h,66px))]">
-      {/* ── top bar ─────────────────────────────────────────────────────────── */}
-      <div className="sticky top-0 z-20 flex flex-none flex-wrap items-end gap-5 border-b border-solid border-line bg-base px-[clamp(18px,2.4vw,40px)] py-4 max-[960px]:items-start">
+    <div className="flex min-w-0 flex-col bg-base min-h-[calc(100dvh_-_var(--nav-h))]">
+      {/* ── top bar: sticks under the site Navbar (was `top-0`, i.e. under it) ── */}
+      <div className="sticky top-[var(--nav-h)] z-20 flex flex-none flex-wrap items-end gap-5 border-b border-solid border-line bg-base px-[clamp(18px,2.4vw,40px)] py-4 max-[960px]:items-start">
         <div className="min-w-0 flex-1">
           <Kicker>{tApp("kicker")}</Kicker>
           <h1 className="mt-1 font-display text-[clamp(1.4rem,2.6vw,2rem)] font-extrabold not-italic uppercase leading-[1.02] tracking-[0.01em] text-txt">
@@ -102,7 +102,7 @@ export function PmdSkyView() {
       </div>
 
       {/* ── body: builder + ticket ──────────────────────────────────────────── */}
-      <div className="min-h-0 flex-1 overflow-y-auto px-[clamp(18px,2.4vw,40px)] pb-[60px] pt-[22px]">
+      <div className="min-h-0 flex-1 px-[clamp(18px,2.4vw,40px)] pb-[60px] pt-[22px]">
         <div className="mx-auto grid max-w-[1240px] grid-cols-1 items-start gap-[22px] min-[961px]:grid-cols-[minmax(0,1fr)_minmax(340px,400px)]">
           {/* CONSTRUCTOR */}
           <div className="flex min-w-0 flex-col gap-4">
