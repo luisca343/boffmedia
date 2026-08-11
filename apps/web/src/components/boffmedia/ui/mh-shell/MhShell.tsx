@@ -23,7 +23,7 @@ export function MhToolTabs({ go, active, onOpenFavs, favCount = 0 }: { go?: (rou
   return (
     <div className="flex min-h-[46px] items-stretch gap-1 border-b border-solid border-line bg-base-2 px-[clamp(10px,2vw,24px)]" role="tablist" aria-label={t("ariaLabel")}>
       <button type="button" title={t("back")} onClick={() => go && go("/herramientas/mhwilds")} className="group mr-1.5 flex items-center gap-[9px] border-0 border-r border-solid border-line bg-transparent pr-4 cursor-pointer">
-        <span className="grid h-[26px] w-[26px] flex-none place-items-center border border-solid border-[color:var(--mh-line)] bg-[var(--mh-soft)] text-[color:var(--mh-bright)] [clip-path:polygon(0_0,calc(100%_-_6px)_0,100%_6px,100%_100%,6px_100%,0_calc(100%_-_6px))]">
+        <span className="grid h-[26px] w-[26px] flex-none place-items-center border border-solid border-[color:var(--mh-line)] bg-[var(--mh-soft)] text-[color:var(--mh-bright)] [clip-path:polygon(0_0,calc(100%_-_6px)_0,100%_6px,100%_100%,6px_100%,0_calc(100%_-_6px))] cut-edge-notch [--cut-e:6px] [--cut-line:var(--mh-line)]">
           <Icon name="skull" size={15} />
         </span>
         <span className="font-display text-[15px]/none font-extrabold uppercase tracking-[0.03em] text-txt group-hover:text-[color:var(--mh-bright)] max-[640px]:hidden">

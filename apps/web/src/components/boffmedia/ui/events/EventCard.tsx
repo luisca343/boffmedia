@@ -75,7 +75,7 @@ export function EventCard({ event, layout }: { event: EventLike; layout?: "grid"
 
         <div className="mt-3.5 flex flex-wrap items-center gap-3.5 border-t border-dashed border-line pt-3.5">
           <span className="inline-flex items-center gap-1.5 font-mono text-[11px]/none font-semibold uppercase tracking-[0.06em] text-txt">
-            <span className="grid h-[22px] w-[22px] flex-none place-items-center border-[1.5px] border-solid border-[color-mix(in_srgb,var(--ghue)_55%,var(--line-2))] bg-[color-mix(in_srgb,var(--ghue)_14%,var(--bg))] text-[var(--ghue)] cut-seal [--cut:5px]">
+            <span className="grid h-[22px] w-[22px] flex-none place-items-center border-[1.5px] border-solid border-[color-mix(in_srgb,var(--ghue)_55%,var(--line-2))] bg-[color-mix(in_srgb,var(--ghue)_14%,var(--bg))] text-[var(--ghue)] cut-seal cut-seal-edge [--cut-w:1.5px] [--cut-line:color-mix(in_srgb,var(--ghue)_55%,var(--line-2))] [--cut:5px]">
               <Icon name="gamepad" size={11} />
             </span>
             {event.gameName || "—"}

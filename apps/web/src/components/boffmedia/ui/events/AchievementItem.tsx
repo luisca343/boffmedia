@@ -63,7 +63,7 @@ export function AchievementItem({
         locked && "opacity-80",
       )}
     >
-      <span className="relative grid h-[52px] w-[52px] flex-none place-items-center border border-solid border-[color:color-mix(in_srgb,var(--rc)_40%,var(--line-2))] bg-[color-mix(in_srgb,var(--rc)_14%,transparent)] text-[color:var(--rc)] cut-seal [--cut:9px]">
+      <span className="relative grid h-[52px] w-[52px] flex-none place-items-center border border-solid border-[color:color-mix(in_srgb,var(--rc)_40%,var(--line-2))] bg-[color-mix(in_srgb,var(--rc)_14%,transparent)] text-[color:var(--rc)] cut-seal cut-seal-edge [--cut-line:color-mix(in_srgb,var(--rc)_40%,var(--line-2))] [--cut:9px]">
         <Icon name={icon} size={24} className={cn(locked && "opacity-45")} />
         {locked && (
           <span className="absolute -bottom-1 -right-1 grid h-[18px] w-[18px] place-items-center border border-solid border-line bg-panel text-txt-dim">

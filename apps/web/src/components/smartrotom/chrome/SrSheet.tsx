@@ -49,7 +49,7 @@ export function SrSheetClose({ children, className }: { children: ReactNode; cla
 type SrSheetSide = "top" | "right"
 
 const SCRIM_FADE =
-  "animate-in fade-in-0 duration-300 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:duration-300"
+  "animate-in fade-in-0 animate-duration-300 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:animate-duration-300"
 
 const SIDE_SCRIM: Record<SrSheetSide, string> = {
   top: `z-50 flex items-start justify-center bg-black/80 ${SCRIM_FADE}`,
@@ -57,8 +57,8 @@ const SIDE_SCRIM: Record<SrSheetSide, string> = {
 }
 
 const SIDE_PANEL: Record<SrSheetSide, string> = {
-  top: "w-full border-b gap-4 p-6 animate-in slide-in-from-top duration-500 data-[state=closed]:animate-out data-[state=closed]:slide-out-to-top data-[state=closed]:duration-300",
-  right: "h-full w-3/4 border-l gap-4 p-6 animate-in slide-in-from-right duration-500 data-[state=closed]:animate-out data-[state=closed]:slide-out-to-right data-[state=closed]:duration-300",
+  top: "w-full border-b gap-4 p-6 animate-in slide-in-from-top animate-duration-500 data-[state=closed]:animate-out data-[state=closed]:slide-out-to-top data-[state=closed]:animate-duration-300",
+  right: "h-full w-3/4 border-l gap-4 p-6 animate-in slide-in-from-right animate-duration-500 data-[state=closed]:animate-out data-[state=closed]:slide-out-to-right data-[state=closed]:animate-duration-300",
 }
 
 // Must match the data-[state=closed] duration above.

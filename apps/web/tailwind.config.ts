@@ -8,6 +8,39 @@ import {
   uiContent,
 } from "@boffmedia/tailwind-config/base"
 
+/**
+ * `tailwindcss-animate` registers `duration`, `delay` and `ease` for
+ * animation-*, which collide head-on with core Tailwind's transition-* versions.
+ * Tailwind cannot resolve an ARBITRARY value against two candidates, so it warns
+ * and emits NOTHING: every `duration-[140ms]` / `ease-[cubic-bezier(...)]` in the
+ * codebase was silently dead, leaving the transition at its 150ms default. (A
+ * named value like `duration-200` does not warn — it quietly emits both rules.)
+ *
+ * This wrapper renames the animation trio to `animate-duration-*`,
+ * `animate-delay-*` and `animate-ease-*`, so each namespace owns one property
+ * and arbitrary values resolve. Use the `animate-` forms next to `animate-in` /
+ * `animate-out`; plain `duration-*` / `ease-*` / `delay-*` are transitions.
+ */
+const animateNamespaced = (() => {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const animate: { handler: (api: any) => void; config?: unknown } = require("tailwindcss-animate")
+  const COLLIDING = ["duration", "delay", "ease"]
+  return {
+    ...animate,
+    handler: (api: any) =>
+      animate.handler({
+        ...api,
+        matchUtilities: (utilities: Record<string, unknown>, options: unknown) =>
+          api.matchUtilities(
+            Object.fromEntries(
+              Object.entries(utilities).map(([name, fn]) => [COLLIDING.includes(name) ? `animate-${name}` : name, fn]),
+            ),
+            options,
+          ),
+      }),
+  }
+})()
+
 const config: Config = {
   darkMode: ["selector", '[data-theme="dark"]'],
   content: [
@@ -1839,7 +1872,7 @@ const config: Config = {
   plugins: [
     // Shared .cut/.cut-seal/.cut-corner/.cut-tag geometry.
     geometry,
-    require("tailwindcss-animate"),
+    animateNamespaced,
     require("tailwindcss-textshadow"),
     // ── Boffmedia v3 design system ─────────────────────────────────────────
     // Base heading treatment + shared geometry/label patterns, so pages get

@@ -18,7 +18,7 @@ export function Sheet({ title, eyebrow, onClose, width = 720, children }: {
 
   return (
     <div
-      className="fixed inset-0 z-[60] grid animate-in place-items-end bg-[rgba(7,17,42,0.45)] backdrop-blur-[4px] fade-in duration-200"
+      className="fixed inset-0 z-[60] grid animate-in place-items-end bg-[rgba(7,17,42,0.45)] backdrop-blur-[4px] fade-in animate-duration-200"
       onClick={onClose}
     >
       <div
@@ -26,7 +26,7 @@ export function Sheet({ title, eyebrow, onClose, width = 720, children }: {
         aria-modal="true"
         onClick={(e) => e.stopPropagation()}
         style={{ width: `min(${width}px, 96vw)` }}
-        className="flex h-full animate-in flex-col border-l border-sb-border bg-sb-surface slide-in-from-right duration-300"
+        className="flex h-full animate-in flex-col border-l border-sb-border bg-sb-surface slide-in-from-right animate-duration-300"
       >
         <div className="flex items-center justify-between border-b border-sb-border px-[22px] py-[18px]">
           <div>

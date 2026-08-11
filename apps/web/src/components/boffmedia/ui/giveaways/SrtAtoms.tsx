@@ -10,10 +10,10 @@ import { srtSourceMeta, srtPrizeMeta, type SrtPrizeType, type SrtSourceKey, type
 // tag, prize-type pill and the weighted ticket meter. Prefix srt- in sorteos.css.
 
 const STATUS_CLS: Record<string, string> = {
-  active: "border-accent bg-accent text-accent-ink",
-  upcoming: "border-transparent bg-[color:var(--info-soft)] text-[color:var(--info)]",
-  ended: "border-transparent bg-warn-soft text-warn",
-  announced: "border-accent-line bg-[color-mix(in_srgb,var(--accent)_20%,var(--panel))] text-accent",
+  active: "border-accent [--cut-line:var(--accent)] bg-accent text-accent-ink",
+  upcoming: "border-transparent [--cut-line:var(--info-soft)] bg-[color:var(--info-soft)] text-[color:var(--info)]",
+  ended: "border-transparent [--cut-line:var(--warn-soft)] bg-warn-soft text-warn",
+  announced: "border-accent-line [--cut-line:var(--accent-line)] bg-[color-mix(in_srgb,var(--accent)_20%,var(--panel))] text-accent",
 }
 
 export function SrtStatusChip({ status, size }: { status: SrtStatus; size?: "lg" }) {
@@ -23,8 +23,8 @@ export function SrtStatusChip({ status, size }: { status: SrtStatus; size?: "lg"
   return (
     <span
       className={cn(
-        "cut [--cut:4px] inline-flex items-center gap-[7px] border border-solid px-2.5 py-1.5 font-mono text-[10px]/none font-bold uppercase tracking-[0.12em]",
-        STATUS_CLS[key] || "border-line-2 bg-panel-2 text-txt-muted",
+        "cut cut-edge-slant [--cut:4px] inline-flex items-center gap-[7px] border border-solid px-2.5 py-1.5 font-mono text-[10px]/none font-bold uppercase tracking-[0.12em]",
+        STATUS_CLS[key] || "border-line-2 [--cut-line:var(--line-2)] bg-panel-2 text-txt-muted",
         size === "lg" && "px-[13px] py-2 text-[11px]",
       )}
     >
@@ -74,7 +74,7 @@ export function SrtPrizeTag({ type, winners }: { type: SrtPrizeType; winners?: n
   const t = useTranslations("common.giveaways")
   const m = srtPrizeMeta(type)
   return (
-    <span className="cut [--cut:4px] inline-flex items-center gap-1.5 border border-solid border-accent-line bg-accent-soft px-2 py-[5px] font-mono text-[9.5px]/none font-semibold uppercase tracking-[0.1em] text-accent">
+    <span className="cut cut-edge-slant [--cut-line:var(--accent-line)] [--cut:4px] inline-flex items-center gap-1.5 border border-solid border-accent-line bg-accent-soft px-2 py-[5px] font-mono text-[9.5px]/none font-semibold uppercase tracking-[0.1em] text-accent">
       <Icon name={m.icon} size={12} />
       {t(`prize.${type}.label`)}
       {winners && winners > 1 ? ` · ${winners} ${t("winner", { count: winners })}` : ""}

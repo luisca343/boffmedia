@@ -15,17 +15,19 @@ export interface ArtImageProps {
   height?: number
   sizes?: string
   priority?: boolean
+  /** `cover` crops to fill (key art); `contain` shows the whole image (icons that aren't square). */
+  fit?: "cover" | "contain"
 }
 
 /** Key-art/icon image with a graceful fallback — the one place that owns the broken-image behavior. */
-export function ArtImage({ src, alt = "", className, fallback = null, width, height, sizes, priority }: ArtImageProps) {
+export function ArtImage({ src, alt = "", className, fallback = null, width, height, sizes, priority, fit = "cover" }: ArtImageProps) {
   const [failedSrc, setFailedSrc] = React.useState<string | null>(null)
   if (!src || failedSrc === src) return <>{fallback}</>
   const shared = {
     src,
     priority,
     onError: () => setFailedSrc(src),
-    className: cn("object-cover", className),
+    className: cn(fit === "contain" ? "object-contain" : "object-cover", className),
   }
   return width != null && height != null ? (
     <Image {...shared} alt={alt} width={width} height={height} sizes={sizes} />

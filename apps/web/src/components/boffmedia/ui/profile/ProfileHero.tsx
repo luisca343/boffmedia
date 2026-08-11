@@ -32,7 +32,7 @@ export interface ProfileHeroProps {
 }
 
 const CAM_BTN = cn(
-  "grid place-items-center border border-solid border-line-2 bg-[rgba(11,13,17,0.7)] text-txt cut-tag",
+  "grid place-items-center border border-solid border-line-2 bg-[rgba(11,13,17,0.7)] text-txt cut-tag cut-tag-edge [--cut-line:var(--line-2)]",
   "transition-[background,color,border-color] duration-[140ms] hover:border-accent hover:bg-accent hover:text-accent-ink",
 )
 
@@ -59,7 +59,7 @@ export function ProfileHero({
 }: ProfileHeroProps) {
   const t = useTranslations("common.profile")
   return (
-    <div className={cn("relative mb-[22px] border border-solid border-line bg-panel cut-corner", className)}>
+    <div className={cn("relative mb-[22px] border border-solid border-line bg-panel cut-corner cut-corner-edge", className)}>
       {/* cover band */}
       <div className="relative h-[236px] overflow-hidden bg-panel-2">
         {coverUrl && (
@@ -110,7 +110,7 @@ export function ProfileHero({
         <div className="relative h-[136px] w-[136px] flex-none">
           <div
             className={cn(
-              "absolute inset-0 overflow-hidden border-4 border-solid border-accent bg-panel-2 cut-seal [--cut:16px] shadow-[0_16px_38px_-12px_rgba(255,92,10,0.55)]",
+              "absolute inset-0 overflow-hidden border-4 border-solid border-accent bg-panel-2 cut-seal cut-seal-edge [--cut-w:4px] [--cut-line:var(--accent)] [--cut:16px] shadow-[0_16px_38px_-12px_rgba(255,92,10,0.55)]",
               editable && "cursor-pointer",
             )}
             onClick={editable ? onAvatarClick : undefined}

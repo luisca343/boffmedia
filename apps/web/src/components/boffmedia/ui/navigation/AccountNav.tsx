@@ -68,7 +68,7 @@ const MOBILE_ITEM =
 function AccountAvatar({ image, initial, size }: { image?: string | null; initial: string; size: number }) {
   return (
     <span
-      className="relative grid shrink-0 place-items-center overflow-hidden border border-solid border-accent bg-panel-2 font-display font-extrabold italic text-accent cut-seal [--cut:5px]"
+      className="relative grid shrink-0 place-items-center overflow-hidden border border-solid border-accent bg-panel-2 font-display font-extrabold italic text-accent cut-seal cut-seal-edge [--cut-line:var(--accent)] [--cut:5px]"
       style={{ width: size, height: size, fontSize: Math.round(size * 0.42) }}
     >
       <ArtImage src={image} alt="" sizes={`${size}px`} fallback={<span>{initial}</span>} />
@@ -109,10 +109,10 @@ export function AccountMenu({ user, isAdmin }: { user: AccountUser; isAdmin?: bo
         aria-label={tNav("account")}
         onClick={() => setOpen((v) => !v)}
         className={cn(
-          "inline-flex items-center gap-[9px] border border-solid py-1 pl-1 pr-2 cut-tag transition-[color,border-color,background] duration-[140ms]",
+          "inline-flex items-center gap-[9px] border border-solid py-1 pl-1 pr-2 cut-tag cut-tag-edge transition-[color,border-color,background] duration-[140ms]",
           open
-            ? "border-line-2 bg-panel-2 text-txt"
-            : "border-transparent bg-transparent text-txt-muted hover:border-line-2 hover:bg-panel-2 hover:text-txt",
+            ? "border-line-2 [--cut-line:var(--line-2)] bg-panel-2 text-txt"
+            : "border-transparent [--cut-line:transparent] bg-transparent text-txt-muted hover:border-line-2 hover:[--cut-line:var(--line-2)] hover:bg-panel-2 hover:text-txt",
         )}
       >
         <AccountAvatar image={image} initial={initial} size={28} />
@@ -130,7 +130,7 @@ export function AccountMenu({ user, isAdmin }: { user: AccountUser; isAdmin?: bo
         <div
           role="menu"
           aria-label={tNav("account")}
-          className="cut-tag [--cut-tag:10px] absolute right-0 top-[calc(100%_+_8px)] z-[70] w-[248px] border border-solid border-line-2 border-t-accent bg-panel shadow-[0_24px_54px_-22px_rgba(0,0,0,0.75)] animate-[bm-nd-pop_0.14s_ease-out] motion-reduce:animate-none"
+          className="cut-tag cut-tag-edge [--cut-line:var(--line-2)] [--cut-tag:10px] absolute right-0 top-[calc(100%_+_8px)] z-[70] w-[248px] border border-solid border-line-2 border-t-accent bg-panel shadow-[0_24px_54px_-22px_rgba(0,0,0,0.75)] animate-[bm-nd-pop_0.14s_ease-out] motion-reduce:animate-none"
         >
           <div className="flex items-center gap-3 border-b border-line px-[15px] py-3">
             <AccountAvatar image={image} initial={initial} size={38} />
@@ -226,7 +226,7 @@ export function MobileAccount({ onNavigate }: { onNavigate: () => void }) {
       <Link
         href="/perfil"
         onClick={onNavigate}
-        className="flex items-center gap-3 border border-solid border-line bg-panel px-3 py-2.5 cut-tag no-underline"
+        className="flex items-center gap-3 border border-solid border-line bg-panel px-3 py-2.5 cut-tag cut-tag-edge no-underline"
       >
         <AccountAvatar image={image} initial={initial} size={36} />
         <div className="min-w-0">

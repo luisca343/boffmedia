@@ -52,7 +52,7 @@ export function TvTorneos() {
       <div
         data-glare
         className={cn(
-          "relative overflow-hidden border border-solid border-line-2 bg-base-deep text-[#f2f4f8] cut-corner [--cut-lg:14px]",
+          "relative overflow-hidden border border-solid border-line-2 bg-base-deep text-[#f2f4f8] cut-corner cut-corner-edge [--cut-line:var(--line-2)] [--cut-lg:14px]",
           GLARE,
           HUD_FRAME,
         )}

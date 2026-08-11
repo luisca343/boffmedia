@@ -17,7 +17,7 @@ export function TourLive({ name, where, format, stats, roundLabel, vs, liveLabel
   return (
     <div
       className={cn(
-        "border border-solid border-line border-l-[3px] border-l-[hsl(28_60%_50%)] bg-panel cut-corner",
+        "border border-solid border-line border-l-[3px] border-l-[hsl(28_60%_50%)] bg-panel cut-corner cut-corner-edge",
         className,
       )}
       style={hue != null ? { borderLeftColor: `hsl(${hue} 60% 50%)` } : undefined}

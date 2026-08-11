@@ -20,7 +20,7 @@ export function VoteRail({
 }) {
   const t = useTranslations("community.vote")
   const total = votes + vote
-  const btn = "grid h-[26px] w-[34px] place-items-center border border-solid bg-panel-2 transition-[color,border-color] duration-[140ms] cut-seal [--cut:6px]"
+  const btn = "grid h-[26px] w-[34px] place-items-center border border-solid bg-panel-2 transition-[color,border-color] duration-[140ms] cut-seal cut-seal-edge [--cut:6px] [--cut-line:var(--line-2)]"
   return (
     <span className={cn("inline-grid justify-items-center gap-[5px]", row && "grid-flow-col items-center")}>
       <button

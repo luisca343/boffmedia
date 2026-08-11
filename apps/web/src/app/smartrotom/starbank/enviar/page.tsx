@@ -80,7 +80,7 @@ export default function Enviar() {
 
   if (done && recipient && fromAcc) {
     return (
-      <div className="mx-auto mt-14 w-full max-w-[460px] animate-in fade-in duration-300">
+      <div className="mx-auto mt-14 w-full max-w-[460px] animate-in fade-in animate-duration-300">
         <Card className="p-10 text-center">
           <div className="mx-auto mb-5 grid size-20 place-items-center rounded-full bg-sb-pos-soft text-sb-pos">
             <Ico name="check" size={36} />

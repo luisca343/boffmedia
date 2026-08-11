@@ -26,10 +26,10 @@ function Ctrl({
     <div className="flex flex-wrap items-center gap-4 border-b border-solid border-line px-[22px] py-4 last:border-b-0">
       <span
         className={cn(
-          "grid h-10 w-10 flex-none place-items-center border border-solid cut [--cut:8px]",
+          "grid h-10 w-10 flex-none place-items-center border border-solid cut cut-edge-slant [--cut:8px]",
           danger
-            ? "border-[color:color-mix(in_srgb,var(--bad)_40%,var(--line-2))] bg-bad-soft text-bad"
-            : "border-line-2 bg-panel-2 text-txt-muted",
+            ? "border-[color:color-mix(in_srgb,var(--bad)_40%,var(--line-2))] [--cut-line:color-mix(in_srgb,var(--bad)_40%,var(--line-2))] bg-bad-soft text-bad"
+            : "border-line-2 [--cut-line:var(--line-2)] bg-panel-2 text-txt-muted",
         )}
       >
         <Icon name={icon} size={18} />
@@ -48,7 +48,7 @@ export function DataControls() {
   const [analytics, setAnalytics] = React.useState(true)
   const [marketing, setMarketing] = React.useState(false)
   return (
-    <div className="mt-2 border border-solid border-line bg-panel cut-corner">
+    <div className="mt-2 border border-solid border-line bg-panel cut-corner cut-corner-edge">
       <div className="flex items-center gap-3 border-b border-solid border-line px-[22px] py-4">
         <Icon name="sliders" size={18} className="text-accent" />
         <h3 className="font-display text-[17px]/none font-bold uppercase tracking-[0.02em]">{t("title")}</h3>

@@ -91,7 +91,7 @@ export function LegalDoc({ kicker, title, lead, updated, tocLabel, sections }: L
               className="mb-10 scroll-mt-[100px] border-b border-line pb-10 last-of-type:mb-0 last-of-type:border-b-0"
             >
               <div className="mb-[18px] flex items-center gap-4">
-                <span className="grid h-11 w-11 flex-none place-items-center border border-solid border-accent-line bg-accent-soft font-display text-[20px]/none font-extrabold italic text-accent cut-seal [--cut:9px]">
+                <span className="grid h-11 w-11 flex-none place-items-center border border-solid border-accent-line bg-accent-soft font-display text-[20px]/none font-extrabold italic text-accent cut-seal cut-seal-edge [--cut-line:var(--accent-line)] [--cut:9px]">
                   {String(i + 1).padStart(2, "0")}
                 </span>
                 <h2 className="text-[clamp(22px,3vw,27px)]/[1.02]">{s.title}</h2>
@@ -102,7 +102,7 @@ export function LegalDoc({ kicker, title, lead, updated, tocLabel, sections }: L
                     <ul key={j} className="grid gap-[11px]">
                       {b.map((li, k) => (
                         <li key={k} className="relative pl-[30px] font-body text-[16px]/[1.6] text-txt text-pretty">
-                          <span className="absolute left-0 top-[3px] grid h-[19px] w-[19px] place-items-center border border-solid border-accent-line bg-accent-soft text-accent cut-seal [--cut:4px]">
+                          <span className="absolute left-0 top-[3px] grid h-[19px] w-[19px] place-items-center border border-solid border-accent-line bg-accent-soft text-accent cut-seal cut-seal-edge [--cut-line:var(--accent-line)] [--cut:4px]">
                             <Icon name="check" size={12} />
                           </span>
                           {li}

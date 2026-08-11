@@ -45,7 +45,7 @@ export function ThreadRow({
     >
       <span
         className={cn(
-          "relative grid h-11 w-11 flex-none place-items-center overflow-hidden border border-solid border-[color-mix(in_srgb,hsl(var(--chue)_70%_50%)_40%,var(--line-2))] bg-[color-mix(in_srgb,hsl(var(--chue)_70%_50%)_14%,var(--panel-2))] font-display text-[18px]/none font-extrabold italic text-[hsl(var(--chue)_78%_64%)] cut-seal [--cut:8px]",
+          "relative grid h-11 w-11 flex-none place-items-center overflow-hidden border border-solid border-[color-mix(in_srgb,hsl(var(--chue)_70%_50%)_40%,var(--line-2))] bg-[color-mix(in_srgb,hsl(var(--chue)_70%_50%)_14%,var(--panel-2))] font-display text-[18px]/none font-extrabold italic text-[hsl(var(--chue)_78%_64%)] cut-seal cut-seal-edge [--cut-line:color-mix(in_srgb,hsl(var(--chue)_70%_50%)_40%,var(--line-2))] [--cut:8px]",
           compact && "h-[38px] w-[38px] text-[15px]",
         )}
       >
@@ -118,9 +118,9 @@ export function CategoryTile({ cat, onOpen, now }: { cat: ForumCategoryLike; onO
       }}
       role="button"
       tabIndex={0}
-      className="grid cursor-pointer grid-cols-[56px_1fr_auto] items-center gap-[18px] border border-solid border-line border-l-4 border-l-[hsl(var(--chue)_72%_55%)] bg-panel px-[22px] py-[18px] text-left transition-[border-color,background] duration-[140ms] cut-corner hover:border-accent-line hover:border-l-accent hover:bg-panel-2"
+      className="grid cursor-pointer grid-cols-[56px_1fr_auto] items-center gap-[18px] border border-solid border-line border-l-4 border-l-[hsl(var(--chue)_72%_55%)] bg-panel px-[22px] py-[18px] text-left transition-[border-color,background] duration-[140ms] cut-corner cut-corner-edge hover:border-accent-line hover:border-l-accent hover:bg-panel-2"
     >
-      <span className="grid h-14 w-14 flex-none place-items-center border border-solid border-[color-mix(in_srgb,hsl(var(--chue)_70%_50%)_42%,var(--line-2))] bg-[color-mix(in_srgb,hsl(var(--chue)_70%_50%)_14%,var(--panel-2))] text-[hsl(var(--chue)_78%_64%)] cut-seal [--cut:10px]">
+      <span className="grid h-14 w-14 flex-none place-items-center border border-solid border-[color-mix(in_srgb,hsl(var(--chue)_70%_50%)_42%,var(--line-2))] bg-[color-mix(in_srgb,hsl(var(--chue)_70%_50%)_14%,var(--panel-2))] text-[hsl(var(--chue)_78%_64%)] cut-seal cut-seal-edge [--cut-line:color-mix(in_srgb,hsl(var(--chue)_70%_50%)_42%,var(--line-2))] [--cut:10px]">
         <Icon name={cat.icon} size={24} />
       </span>
       <div>

@@ -45,7 +45,7 @@ const components: Components = {
   ),
   pre: ({ node, ...props }) => (
     <pre
-      className="my-4 overflow-x-auto border border-solid border-line bg-panel-2 p-4 font-mono text-[13px]/[1.6] text-txt cut-corner"
+      className="my-4 overflow-x-auto border border-solid border-line bg-panel-2 p-4 font-mono text-[13px]/[1.6] text-txt cut-corner cut-corner-edge"
       {...props}
     />
   ),

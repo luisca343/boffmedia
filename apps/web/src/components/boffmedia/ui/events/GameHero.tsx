@@ -57,7 +57,7 @@ export function GameHero({
 
       <div className="relative z-[2] max-w-[1000px] px-[clamp(22px,3.2vw,40px)] pb-[26px] pt-10">
         <div className="mb-4 flex flex-wrap items-center gap-3.5">
-          <span className="grid h-[54px] w-[54px] flex-none place-items-center border-[1.5px] border-solid border-[color-mix(in_srgb,var(--ghue)_55%,var(--line-2))] bg-[color-mix(in_srgb,var(--ghue)_14%,var(--bg))] text-[var(--ghue)] cut-seal [--cut:7px]">
+          <span className="grid h-[54px] w-[54px] flex-none place-items-center border-[1.5px] border-solid border-[color-mix(in_srgb,var(--ghue)_55%,var(--line-2))] bg-[color-mix(in_srgb,var(--ghue)_14%,var(--bg))] text-[var(--ghue)] cut-seal cut-seal-edge [--cut-w:1.5px] [--cut-line:color-mix(in_srgb,var(--ghue)_55%,var(--line-2))] [--cut:7px]">
             <Icon name="gamepad" size={27} />
           </span>
           {/* [deferred] short code — omitted until the API has it */}

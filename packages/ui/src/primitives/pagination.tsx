@@ -54,7 +54,7 @@ export function Pagination({ page, total, onChange, ariaLabel, className }: Pagi
             className={cn(
               BTN,
               p === page
-                ? "bg-accent border-accent text-accent-ink cut [--cut:4px]"
+                ? "bg-accent border-accent text-accent-ink cut cut-edge-slant [--cut-line:var(--accent)] [--cut:4px]"
                 : "hover:enabled:text-txt hover:enabled:border-line-2",
             )}
           >

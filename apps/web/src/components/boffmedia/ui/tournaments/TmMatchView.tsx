@@ -53,7 +53,7 @@ function copyText(text: string, msg: string) {
   toast({ msg, icon: "check", tone: "ok" })
 }
 
-export const TM_CARD = "border border-solid border-line bg-panel cut-corner [--cut-lg:14px]"
+export const TM_CARD = "border border-solid border-line bg-panel cut-corner cut-corner-edge [--cut-lg:14px]"
 export const TM_CARD_HEAD = "flex items-center justify-between gap-3 border-b border-solid border-line bg-panel-2 px-4 py-[13px]"
 export const TM_CARD_H3 = "m-0 font-mono text-[13px]/none font-bold uppercase tracking-[0.12em] text-txt"
 const CARD = TM_CARD
@@ -66,7 +66,7 @@ export function TmRoundHeader({ comp, roundNo, tableNo, status, bestOf = 3, sche
   const { intlLocale } = useFormat()
   const chip = "inline-flex items-center gap-1.5 border border-solid border-line-2 px-[9px] py-[5px] font-mono text-[11px]/none font-semibold text-txt-muted [&_svg]:text-txt-dim"
   return (
-    <div className={cn("flex flex-wrap items-center justify-between gap-3.5 border border-solid border-line bg-panel px-[18px] py-[15px] cut-corner [--cut-lg:14px]", GHUE_BORDER)}>
+    <div className={cn("flex flex-wrap items-center justify-between gap-3.5 border border-solid border-line bg-panel px-[18px] py-[15px] cut-corner cut-corner-edge [--cut-lg:14px]", GHUE_BORDER)}>
       <div>
         <span className="mb-[9px] block font-display text-[20px]/[1.05] font-extrabold uppercase tracking-[0.02em]">{comp.title}</span>
         <div className="flex flex-wrap gap-2">

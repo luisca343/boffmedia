@@ -39,7 +39,7 @@ export function GameCard({ game }: { game: GameLike }) {
       href={`/juegos/${game.id}`}
       style={{ "--ghue": hue } as React.CSSProperties}
       className={cn(
-        "group relative flex flex-col overflow-hidden border border-solid border-line bg-panel no-underline cut-corner [--cut-lg:18px]",
+        "group relative flex flex-col overflow-hidden border border-solid border-line bg-panel no-underline cut-corner cut-corner-edge [--cut-lg:18px]",
         "transition-[border-color,transform] duration-[140ms] hover:-translate-y-1 hover:border-[color-mix(in_srgb,var(--ghue)_55%,var(--line))]",
         !active && "opacity-[0.86]",
       )}
@@ -61,7 +61,7 @@ export function GameCard({ game }: { game: GameLike }) {
         <Icon name="gamepad" size={128} className="pointer-events-none absolute right-[-18px] top-1/2 z-[1] -translate-y-1/2 text-[var(--ghue)] opacity-[0.14]" />
         <div className="pointer-events-none absolute inset-0 z-[2] [background:linear-gradient(to_top,var(--panel)_2%,color-mix(in_srgb,var(--panel)_40%,transparent)_40%,transparent_80%),radial-gradient(120%_130%_at_88%_8%,color-mix(in_srgb,var(--ghue)_20%,transparent),transparent_55%)]" />
         <div className="absolute inset-x-0 top-0 z-[3] flex items-center gap-2.5 p-3.5">
-          <span className="grid h-9 w-9 flex-none place-items-center border-[1.5px] border-solid border-[color-mix(in_srgb,var(--ghue)_55%,var(--line-2))] bg-[color-mix(in_srgb,var(--ghue)_14%,var(--bg))] text-[var(--ghue)] cut-seal [--cut:6px]">
+          <span className="grid h-9 w-9 flex-none place-items-center border-[1.5px] border-solid border-[color-mix(in_srgb,var(--ghue)_55%,var(--line-2))] bg-[color-mix(in_srgb,var(--ghue)_14%,var(--bg))] text-[var(--ghue)] cut-seal cut-seal-edge [--cut-w:1.5px] [--cut-line:color-mix(in_srgb,var(--ghue)_55%,var(--line-2))] [--cut:6px]">
             <Icon name="gamepad" size={18} />
           </span>
           {/* [deferred] short code — omitted until the API has it */}

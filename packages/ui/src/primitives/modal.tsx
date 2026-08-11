@@ -81,7 +81,7 @@ export function Modal({ open, onClose, title, aside, footer, size, className, bo
         aria-labelledby={title ? titleId : undefined}
         tabIndex={-1}
         className={cn(
-          "w-full my-auto flex flex-col max-h-[calc(100dvh-3rem)] bg-panel border border-solid border-line-2 outline-none cut-corner",
+          "w-full my-auto flex flex-col max-h-[calc(100dvh-3rem)] bg-panel border border-solid border-line-2 outline-none cut-corner cut-corner-edge [--cut-line:var(--line-2)]",
           "animate-[bm-modal-in_0.26s_cubic-bezier(0.2,0.8,0.2,1)] motion-reduce:animate-none",
           size === "sm" ? "max-w-[440px]" : size === "lg" ? "max-w-[760px]" : "max-w-[580px]",
           className,

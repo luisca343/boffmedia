@@ -16,11 +16,11 @@ const DK_LIVE: Record<string, [string, string, boolean]> = {
 }
 
 const DK_LIVE_TONE: Record<string, string> = {
-  live: "text-ok border-[color:color-mix(in_srgb,var(--ok)_45%,transparent)] bg-ok-soft",
-  playing: "text-warn border-[color:color-mix(in_srgb,var(--warn)_45%,transparent)] bg-warn-soft",
-  pending: "text-txt-dim border-line-2 bg-transparent",
-  final: "text-txt-muted border-line-2 bg-panel-2",
-  soon: "text-info border-[color:color-mix(in_srgb,var(--info)_45%,transparent)] bg-info-soft",
+  live: "text-ok border-[color:color-mix(in_srgb,var(--ok)_45%,transparent)] [--cut-line:color-mix(in_srgb,var(--ok)_45%,transparent)] bg-ok-soft",
+  playing: "text-warn border-[color:color-mix(in_srgb,var(--warn)_45%,transparent)] [--cut-line:color-mix(in_srgb,var(--warn)_45%,transparent)] bg-warn-soft",
+  pending: "text-txt-dim border-line-2 [--cut-line:var(--line-2)] bg-transparent",
+  final: "text-txt-muted border-line-2 [--cut-line:var(--line-2)] bg-panel-2",
+  soon: "text-info border-[color:color-mix(in_srgb,var(--info)_45%,transparent)] [--cut-line:color-mix(in_srgb,var(--info)_45%,transparent)] bg-info-soft",
 }
 
 export function DkLive({ status = "live", label, size = "md" }: { status?: string; label?: React.ReactNode; size?: "sm" | "md" }) {
@@ -29,7 +29,7 @@ export function DkLive({ status = "live", label, size = "md" }: { status?: strin
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1.5 whitespace-nowrap border border-solid font-mono font-bold uppercase tracking-[0.14em] cut [--cut:3px]",
+        "inline-flex items-center gap-1.5 whitespace-nowrap border border-solid font-mono font-bold uppercase tracking-[0.14em] cut cut-edge-slant [--cut:3px]",
         size === "sm" ? "px-1.5 py-1 text-[8px]/none" : "px-2 py-[5px] text-[9px]/none",
         DK_LIVE_TONE[kind],
       )}

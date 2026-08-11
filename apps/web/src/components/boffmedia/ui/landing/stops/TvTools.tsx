@@ -19,7 +19,7 @@ export function TvTools() {
       title={t.rich("title", { em: (chunks) => <em>{chunks}</em> })}
       lead={t("lead")}
     >
-      <div className="overflow-hidden border border-solid border-line backdrop-blur-[6px] [background:rgba(10,12,16,0.5)] cut-tag [--cut-tag:12px] [[data-theme=light]_&]:[background:rgba(255,255,255,0.55)]">
+      <div className="overflow-hidden border border-solid border-line backdrop-blur-[6px] [background:rgba(10,12,16,0.5)] cut-tag cut-tag-edge [--cut-tag:12px] [[data-theme=light]_&]:[background:rgba(255,255,255,0.55)]">
         <div className="flex items-center gap-2.5 border-b border-solid border-line bg-base-deep px-3.5 py-[11px]" aria-hidden="true">
           <span className="flex gap-[5px]">
             <i className="h-[9px] w-[9px] rounded-full bg-line-2" />
@@ -43,7 +43,7 @@ export function TvTools() {
                 GLARE,
               )}
             >
-              <span className="grid h-[42px] w-[42px] flex-none place-items-center border border-solid border-line-2 bg-[rgba(var(--zr),var(--zg),var(--zb),0.08)] text-[rgba(var(--zr),var(--zg),var(--zb),1)] transition-[background,box-shadow] duration-[260ms] cut-tag group-hover/mod:bg-[rgba(var(--zr),var(--zg),var(--zb),0.16)] group-hover/mod:shadow-[0_0_20px_rgba(var(--zr),var(--zg),var(--zb),0.3)]">
+              <span className="grid h-[42px] w-[42px] flex-none place-items-center border border-solid border-line-2 bg-[rgba(var(--zr),var(--zg),var(--zb),0.08)] text-[rgba(var(--zr),var(--zg),var(--zb),1)] transition-[background,box-shadow] duration-[260ms] cut-tag cut-tag-edge [--cut-line:var(--line-2)] group-hover/mod:bg-[rgba(var(--zr),var(--zg),var(--zb),0.16)] group-hover/mod:shadow-[0_0_20px_rgba(var(--zr),var(--zg),var(--zb),0.3)]">
                 <Icon name={tool.ic} size={20} />
               </span>
               <span className="flex min-w-0 flex-col gap-[5px]">

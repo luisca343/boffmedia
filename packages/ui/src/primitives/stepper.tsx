@@ -26,11 +26,11 @@ export function Stepper({ steps, current, className }: StepperProps) {
             >
               <span
                 className={cn(
-                  "cut-tag [--cut-tag:5px] grid place-items-center w-5 h-5 shrink-0 border border-solid",
+                  "cut-tag cut-tag-edge [--cut-tag:5px] grid place-items-center w-5 h-5 shrink-0 border border-solid",
                   "font-mono text-[10px] font-semibold transition-[background,border-color,color] duration-[140ms]",
-                  state === "idle" && "border-line-2 bg-panel text-txt-muted",
-                  state === "done" && "text-ok bg-ok-soft border-ok",
-                  state === "active" && "text-accent-ink bg-accent border-accent",
+                  state === "idle" && "border-line-2 [--cut-line:var(--line-2)] bg-panel text-txt-muted",
+                  state === "done" && "text-ok bg-ok-soft border-ok [--cut-line:var(--ok)]",
+                  state === "active" && "text-accent-ink bg-accent border-accent [--cut-line:var(--accent)]",
                 )}
               >
                 {state === "done" ? <Icon name="check" size={11} /> : i + 1}

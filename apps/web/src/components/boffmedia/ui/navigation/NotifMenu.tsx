@@ -60,7 +60,7 @@ export function NotifMenu({ initialItems, onMarkAllRead, onDismiss, onClear }: N
       >
         <Icon name="bell" size={18} />
         {unread > 0 && (
-          <span className="absolute -right-[5px] -top-[5px] grid h-[17px] min-w-[17px] place-items-center border-2 border-base bg-accent px-1 font-mono text-[10px] font-extrabold leading-none text-accent-ink cut [--cut:3px]">
+          <span className="absolute -right-[5px] -top-[5px] grid h-[17px] min-w-[17px] place-items-center border-2 border-base bg-accent px-1 font-mono text-[10px] font-extrabold leading-none text-accent-ink cut cut-edge-slant [--cut:3px] [--cut-w:2px] [--cut-line:var(--base)]">
             {unread}
           </span>
         )}
@@ -70,7 +70,7 @@ export function NotifMenu({ initialItems, onMarkAllRead, onDismiss, onClear }: N
         <div
           role="menu"
           aria-label={tNav("notifications")}
-          className="cut-tag [--cut-tag:10px] absolute right-0 top-[calc(100%_+_8px)] z-[70] w-[340px] border border-solid border-line-2 border-t-accent bg-panel shadow-[0_24px_54px_-22px_rgba(0,0,0,0.75)] animate-[bm-nd-pop_0.14s_ease-out] motion-reduce:animate-none"
+          className="cut-tag cut-tag-edge [--cut-line:var(--line-2)] [--cut-tag:10px] absolute right-0 top-[calc(100%_+_8px)] z-[70] w-[340px] border border-solid border-line-2 border-t-accent bg-panel shadow-[0_24px_54px_-22px_rgba(0,0,0,0.75)] animate-[bm-nd-pop_0.14s_ease-out] motion-reduce:animate-none"
         >
           <header className="flex items-center gap-2 border-b border-line px-[15px] pb-[11px] pt-[13px]">
             <b className="flex-1 font-display text-[13px] font-bold uppercase leading-none tracking-[0.04em] text-txt">
@@ -120,12 +120,13 @@ export function NotifMenu({ initialItems, onMarkAllRead, onDismiss, onClear }: N
                   )}
                 >
                   <span
-                    className="mt-px grid h-[30px] w-[30px] shrink-0 place-items-center border border-solid cut [--cut:5px]"
+                    className="mt-px grid h-[30px] w-[30px] shrink-0 place-items-center border border-solid cut cut-edge-slant [--cut:5px]"
                     style={{
                       color: TONE_VAR[n.tone],
                       background: `color-mix(in srgb, ${TONE_VAR[n.tone]} 12%, transparent)`,
                       borderColor: `color-mix(in srgb, ${TONE_VAR[n.tone]} 26%, transparent)`,
-                    }}
+                      "--cut-line": `color-mix(in srgb, ${TONE_VAR[n.tone]} 26%, transparent)`,
+                    } as React.CSSProperties}
                   >
                     <Icon name={n.icon} size={15} />
                   </span>

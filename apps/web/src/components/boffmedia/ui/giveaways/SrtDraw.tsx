@@ -106,13 +106,13 @@ export function SrtWinnerCard({ sorteo, onReplay }: { sorteo: Sorteo; onReplay?:
   const total = srtTotalTickets(sorteo)
   const odds = total ? (w.tickets / total) * 100 : 0
   return (
-    <div className="relative overflow-hidden border border-solid border-accent-line border-t-[3px] border-t-accent bg-panel px-[26px] pb-[30px] pt-[34px] text-center cut-corner [--cut-lg:16px]">
+    <div className="relative overflow-hidden border border-solid border-accent-line border-t-[3px] border-t-accent bg-panel px-[26px] pb-[30px] pt-[34px] text-center cut-corner cut-corner-edge [--cut-line:var(--accent-line)] [--cut-lg:16px]">
       <span aria-hidden className="pointer-events-none absolute inset-0 z-0 [background:radial-gradient(80%_70%_at_50%_0,var(--accent-soft),transparent_60%)]" />
       <span className="relative z-[1] inline-flex items-center gap-[7px] border border-solid border-accent-line px-[11px] py-1.5 font-mono text-[10px]/none font-bold uppercase tracking-[0.14em] text-accent">
         <Icon name="sparkles" size={12} />
         {t("status.announced.label")}
       </span>
-      <div className="relative z-[1] mx-auto mb-[14px] mt-[18px] grid h-[76px] w-[76px] place-items-center border border-solid border-accent-line bg-accent-soft text-accent cut-seal [--cut:14px]">
+      <div className="relative z-[1] mx-auto mb-[14px] mt-[18px] grid h-[76px] w-[76px] place-items-center border border-solid border-accent-line bg-accent-soft text-accent cut-seal cut-seal-edge [--cut-line:var(--accent-line)] [--cut:14px]">
         <Icon name="trophy" size={40} />
       </div>
       <div className="relative z-[1] inline-flex items-center gap-3">

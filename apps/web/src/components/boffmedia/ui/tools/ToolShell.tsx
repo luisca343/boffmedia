@@ -45,9 +45,9 @@ function GameSwitch({ slug }: { slug: string }) {
         aria-haspopup="true"
         title={tShell("switchGame", { game: t(game.nameKey) })}
         onClick={() => setOpen((v) => !v)}
-        className="group/sw cut-tag flex w-full items-center gap-3 overflow-hidden whitespace-nowrap border border-solid border-line bg-panel py-[7px] pl-[6px] pr-[10px] transition-[border-color,background] duration-[140ms] hover:border-accent-line hover:bg-panel-2"
+        className="group/sw cut-tag cut-tag-edge flex w-full items-center gap-3 overflow-hidden whitespace-nowrap border border-solid border-line bg-panel py-[7px] pl-[6px] pr-[10px] transition-[border-color,background] duration-[140ms] hover:border-accent-line hover:bg-panel-2"
       >
-        <GameLogo label={hub.logoLabel} hueColor={hueColorOf(hub.hue)} size="sm" imageSrc={game.icon} />
+        <GameLogo label={hub.logoLabel} hueColor={hueColorOf(hub.hue)} size="sm" imageSrc={game.icon} bare />
         <span className="min-w-0 flex-1 text-left font-display text-[15px] font-bold uppercase leading-none tracking-[0.02em]">{hub.short}</span>
         <Icon name="chevronDown" size={16} className={cn("flex-none text-txt-muted transition-transform duration-[140ms]", open && "rotate-180")} />
       </button>
@@ -66,8 +66,8 @@ function GameSwitch({ slug }: { slug: string }) {
                   s === slug ? "text-accent" : "text-txt-muted",
                 )}
               >
-                <span className="relative h-5 w-5 flex-none overflow-hidden">
-                  <ArtImage src={g.icon} sizes="20px" fallback={<Icon name="gamepad" size={14} />} />
+                <span className="relative grid h-5 w-5 flex-none place-items-center overflow-hidden">
+                  <ArtImage src={g.icon} sizes="20px" fit="contain" fallback={<Icon name="gamepad" size={14} />} />
                 </span>
                 {t(g.nameKey)}
               </Link>
@@ -306,9 +306,9 @@ export function ToolShell({ slug, children }: ToolShellProps) {
             type="button"
             onClick={() => setMobileOpen(true)}
             aria-label={tShell("openToolsMenu")}
-            className="cut-tag flex items-center gap-3 border border-solid border-line bg-panel py-[7px] pl-[6px] pr-[10px]"
+            className="cut-tag cut-tag-edge flex items-center gap-3 border border-solid border-line bg-panel py-[7px] pl-[6px] pr-[10px]"
           >
-            <GameLogo label={hub.logoLabel} hueColor={hueColorOf(hub.hue)} size="sm" imageSrc={game.icon} />
+            <GameLogo label={hub.logoLabel} hueColor={hueColorOf(hub.hue)} size="sm" imageSrc={game.icon} bare />
             <span className="font-display text-[15px] font-bold uppercase leading-none tracking-[0.02em]">{hub.short}</span>
             <Icon name="list" size={18} className="text-txt-muted" />
           </button>

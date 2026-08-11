@@ -58,7 +58,7 @@ export function ForumComposer({
   const titleTooShort = withTitle && titleTrimmed.length > 0 && titleTrimmed.length < TITLE_MIN
 
   return (
-    <div className="border border-solid border-line bg-panel p-4 cut-corner">
+    <div className="border border-solid border-line bg-panel p-4 cut-corner cut-corner-edge">
       {withTitle && (
         <div className="mb-3">
           <label className="mb-1.5 block font-mono text-[11px] font-semibold uppercase tracking-[0.1em] text-txt-muted">
@@ -98,7 +98,7 @@ export function ForumComposer({
           className="min-h-[160px] font-mono text-[13px]/[1.6]"
         />
       ) : (
-        <div className="min-h-[160px] border border-solid border-line-2 bg-panel-2 p-4 cut-tag">
+        <div className="min-h-[160px] border border-solid border-line-2 bg-panel-2 p-4 cut-tag cut-tag-edge [--cut-line:var(--line-2)]">
           {bodyTrimmed ? (
             <ForumMarkdown>{body}</ForumMarkdown>
           ) : (

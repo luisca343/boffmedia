@@ -75,7 +75,7 @@ export function FooterSocial({ items }: { items: FooterSocialItem[] }) {
           title={s.label}
           target={s.href.startsWith("http") ? "_blank" : undefined}
           rel={s.href.startsWith("http") ? "noopener noreferrer" : undefined}
-          className="cut [--cut:7px] grid h-[38px] w-[38px] place-items-center border border-solid border-line bg-panel text-txt-muted transition-[color,background,border-color,transform] duration-[140ms] hover:-translate-y-0.5 hover:border-accent hover:bg-accent hover:text-accent-ink"
+          className="cut cut-edge-slant [--cut:7px] grid h-[38px] w-[38px] place-items-center border border-solid border-line bg-panel text-txt-muted transition-[color,background,border-color,transform] duration-[140ms] hover:-translate-y-0.5 hover:border-accent hover:bg-accent hover:text-accent-ink"
         >
           <Icon name={s.icon} size={17} />
         </a>

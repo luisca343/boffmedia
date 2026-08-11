@@ -108,7 +108,7 @@ export function SrPopoverContent({
       data-state={open ? "open" : "closed"}
       className={cn(
         "absolute left-1/2 top-full z-50 mt-2 -translate-x-1/2 outline-none",
-        "animate-in fade-in-0 zoom-in-95 duration-150 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=closed]:duration-150 data-[state=closed]:pointer-events-none",
+        "animate-in fade-in-0 zoom-in-95 animate-duration-150 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=closed]:animate-duration-150 data-[state=closed]:pointer-events-none",
         className,
       )}
     >

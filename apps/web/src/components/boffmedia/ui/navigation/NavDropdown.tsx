@@ -133,7 +133,7 @@ export function NavDropdown({ label, href, active, sections, demoOpen }: NavDrop
           role="menu"
           aria-label={tNav("menuOf", { label })}
           className={cn(
-            "cut-tag [--cut-tag:10px] z-[70] flex w-fit border border-solid border-line-2 border-t-accent bg-panel shadow-[0_24px_54px_-22px_rgba(0,0,0,0.75)] animate-[bm-nd-pop_0.14s_ease-out] motion-reduce:animate-none",
+            "cut-tag cut-tag-edge [--cut-line:var(--line-2)] [--cut-tag:10px] z-[70] flex w-fit border border-solid border-line-2 border-t-accent bg-panel shadow-[0_24px_54px_-22px_rgba(0,0,0,0.75)] animate-[bm-nd-pop_0.14s_ease-out] motion-reduce:animate-none",
             demoOpen ? "relative" : "absolute left-[-18px] top-full",
           )}
         >

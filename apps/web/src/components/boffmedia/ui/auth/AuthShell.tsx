@@ -43,7 +43,7 @@ export function AuthShell({
     >
       <div aria-hidden className="pointer-events-none absolute inset-0 z-0 opacity-50" style={GRID_BG} />
 
-      <div className="relative z-[1] flex w-full max-w-[440px] flex-col gap-[18px] border border-line-2 border-t-[3px] border-t-accent bg-panel px-[34px] pb-[30px] pt-8 shadow-[0_40px_80px_-34px_rgba(0,0,0,0.75)] cut-tag [--cut-tag:16px] max-[480px]:px-5 max-[480px]:pt-[26px] max-[480px]:pb-6">
+      <div className="relative z-[1] flex w-full max-w-[440px] flex-col gap-[18px] border border-line-2 border-t-[3px] border-t-accent bg-panel px-[34px] pb-[30px] pt-8 shadow-[0_40px_80px_-34px_rgba(0,0,0,0.75)] cut-tag cut-tag-edge [--cut-line:var(--line-2)] [--cut-tag:16px] max-[480px]:px-5 max-[480px]:pt-[26px] max-[480px]:pb-6">
         <Link
           href="/"
           className="flex items-center gap-2.5 font-display text-[20px]/none font-extrabold italic uppercase text-txt no-underline"

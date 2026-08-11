@@ -47,7 +47,7 @@ export function PostCard({
         onKeyDown={onKey}
         role="button"
         tabIndex={0}
-        className="grid cursor-pointer grid-cols-[1.05fr_1fr] items-stretch overflow-hidden border border-solid border-line border-l-4 border-l-[hsl(var(--phue)_72%_55%)] bg-panel text-left transition-[border-color,background,transform] duration-[140ms] cut-corner hover:-translate-y-[2px] hover:border-accent-line hover:border-l-accent"
+        className="grid cursor-pointer grid-cols-[1.05fr_1fr] items-stretch overflow-hidden border border-solid border-line border-l-4 border-l-[hsl(var(--phue)_72%_55%)] bg-panel text-left transition-[border-color,background,transform] duration-[140ms] cut-corner cut-corner-edge hover:-translate-y-[2px] hover:border-accent-line hover:border-l-accent"
       >
         <div className="relative min-h-[320px] overflow-hidden bg-panel-2">
           <div aria-hidden className="absolute inset-0 z-0 [background:radial-gradient(120%_90%_at_20%_10%,color-mix(in_srgb,hsl(var(--phue)_72%_45%)_30%,transparent),transparent_60%)]" />
@@ -79,7 +79,7 @@ export function PostCard({
         onKeyDown={onKey}
         role="button"
         tabIndex={0}
-        className="grid min-w-0 cursor-pointer grid-cols-[116px_1fr] items-stretch overflow-hidden border border-solid border-line border-l-4 border-l-[hsl(var(--phue)_72%_55%)] bg-panel text-left transition-[border-color,background] duration-[140ms] [clip-path:polygon(0_0,100%_0,calc(100%_-_14px)_100%,0_100%)] hover:border-accent-line hover:border-l-accent hover:bg-panel-2"
+        className="grid min-w-0 cursor-pointer grid-cols-[116px_1fr] items-stretch overflow-hidden border border-solid border-line border-l-4 border-l-[hsl(var(--phue)_72%_55%)] bg-panel text-left transition-[border-color,background] duration-[140ms] [clip-path:polygon(0_0,100%_0,calc(100%_-_14px)_100%,0_100%)] cut-edge-slant-r [--cut:14px] hover:border-accent-line hover:[--cut-line:var(--accent-line)] hover:border-l-accent hover:bg-panel-2"
       >
         <div className="relative grid place-items-center overflow-hidden bg-panel-2">
           <div aria-hidden className="absolute inset-0 [background:radial-gradient(120%_120%_at_50%_0%,color-mix(in_srgb,hsl(var(--phue)_72%_45%)_26%,transparent),transparent_65%)]" />
@@ -110,7 +110,7 @@ export function PostCard({
         tabIndex={0}
         className="group flex cursor-pointer items-center gap-3 border-b border-solid border-line px-1 py-2.5 last:border-b-0"
       >
-        <span className="grid h-[38px] w-[38px] flex-none place-items-center border border-solid border-line-2 bg-[color-mix(in_srgb,hsl(var(--phue)_70%_50%)_12%,var(--panel-2))] text-[hsl(var(--phue)_74%_62%)] cut-seal [--cut:8px]">
+        <span className="grid h-[38px] w-[38px] flex-none place-items-center border border-solid border-line-2 bg-[color-mix(in_srgb,hsl(var(--phue)_70%_50%)_12%,var(--panel-2))] text-[hsl(var(--phue)_74%_62%)] cut-seal cut-seal-edge [--cut-line:var(--line-2)] [--cut:8px]">
           <Icon name={post.icon} size={19} />
         </span>
         <div>
@@ -131,7 +131,7 @@ export function PostCard({
       onKeyDown={onKey}
       role="button"
       tabIndex={0}
-      className="flex min-w-0 cursor-pointer flex-col overflow-hidden border border-solid border-line border-t-4 border-t-[hsl(var(--phue)_72%_55%)] bg-panel text-left transition-[border-color,transform] duration-[140ms] cut-corner hover:-translate-y-[3px] hover:border-accent-line"
+      className="flex min-w-0 cursor-pointer flex-col overflow-hidden border border-solid border-line border-t-4 border-t-[hsl(var(--phue)_72%_55%)] bg-panel text-left transition-[border-color,transform] duration-[140ms] cut-corner cut-corner-edge hover:-translate-y-[3px] hover:border-accent-line"
     >
       <div className="relative grid h-[132px] place-items-center overflow-hidden bg-panel-2">
         <div aria-hidden className="absolute inset-0 [background:radial-gradient(120%_100%_at_80%_0%,color-mix(in_srgb,hsl(var(--phue)_72%_45%)_24%,transparent),transparent_62%)]" />
@@ -173,10 +173,10 @@ export function BlogCatChip({
       onClick={onClick}
       style={{ "--phue": cat.hue } as React.CSSProperties}
       className={cn(
-        "inline-flex items-center gap-2 border border-solid px-[14px] py-[9px] font-mono text-[11px]/none font-semibold uppercase tracking-[0.08em] transition-[color,border-color,background] duration-[140ms] cut-tag",
+        "inline-flex items-center gap-2 border border-solid px-[14px] py-[9px] font-mono text-[11px]/none font-semibold uppercase tracking-[0.08em] transition-[color,border-color,background] duration-[140ms] cut-tag cut-tag-edge",
         active
-          ? "border-[color-mix(in_srgb,hsl(var(--phue)_72%_55%)_55%,var(--line-2))] bg-[color-mix(in_srgb,hsl(var(--phue)_72%_50%)_14%,var(--panel))] text-txt"
-          : "border-line-2 bg-panel text-txt-muted hover:bg-panel-2 hover:text-txt",
+          ? "border-[color-mix(in_srgb,hsl(var(--phue)_72%_55%)_55%,var(--line-2))] [--cut-line:color-mix(in_srgb,hsl(var(--phue)_72%_55%)_55%,var(--line-2))] bg-[color-mix(in_srgb,hsl(var(--phue)_72%_50%)_14%,var(--panel))] text-txt"
+          : "border-line-2 [--cut-line:var(--line-2)] bg-panel text-txt-muted hover:bg-panel-2 hover:text-txt",
       )}
     >
       <Icon name={cat.icon} size={14} className="text-[hsl(var(--phue)_72%_62%)]" />

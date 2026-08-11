@@ -12,7 +12,7 @@ export function ToolGrid({ tools, variant = "fila" }: { tools: ToolCardData[]; v
   return (
     <div className={cn("grid grid-cols-1 gap-4", variant === "fila" ? "sm:grid-cols-[repeat(auto-fill,minmax(380px,1fr))]" : "sm:grid-cols-[repeat(auto-fill,minmax(320px,1fr))]")}>
       {tools.map((t) => (
-        <ToolCard key={t.href} tool={t} variant={variant} />
+        <ToolCard key={t.key} tool={t} variant={variant} />
       ))}
     </div>
   )

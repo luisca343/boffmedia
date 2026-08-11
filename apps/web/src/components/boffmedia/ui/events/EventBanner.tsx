@@ -57,7 +57,7 @@ export function EventBanner({
           {status === "upcoming" && event.startDate && <Countdown date={event.startDate} />}
           {event.gameName && (
             <span className="inline-flex items-center gap-2 font-mono text-[11px]/none font-semibold uppercase tracking-[0.08em] text-txt-muted">
-              <span className="grid h-[26px] w-[26px] flex-none place-items-center border-[1.5px] border-solid border-[color-mix(in_srgb,var(--ghue)_55%,var(--line-2))] bg-[color-mix(in_srgb,var(--ghue)_14%,var(--bg))] text-[var(--ghue)] cut-seal [--cut:5px]">
+              <span className="grid h-[26px] w-[26px] flex-none place-items-center border-[1.5px] border-solid border-[color-mix(in_srgb,var(--ghue)_55%,var(--line-2))] bg-[color-mix(in_srgb,var(--ghue)_14%,var(--bg))] text-[var(--ghue)] cut-seal cut-seal-edge [--cut-w:1.5px] [--cut-line:color-mix(in_srgb,var(--ghue)_55%,var(--line-2))] [--cut:5px]">
                 <Icon name="gamepad" size={13} />
               </span>
               {event.gameName}
