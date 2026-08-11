@@ -17,7 +17,7 @@ export function EventPreviewCard({ data }: { data: SuggestFormData }) {
   const start = fmtDate(data.suggestedDate)
 
   return (
-    <div className="cut-corner [--cut-lg:14px] border border-solid border-line-2 bg-base p-5 [[data-theme=light]_&]:bg-panel">
+    <div className="cut-corner cut-corner-edge [--cut-line:var(--line-2)] [--cut-lg:14px] border border-solid border-line-2 bg-base p-5 [[data-theme=light]_&]:bg-panel">
       <span className="mono-label">{t("title")}</span>
       <h3 className="mt-2 font-display text-[22px] font-extrabold italic uppercase leading-[0.95] tracking-[-0.005em] text-txt">
         {data.title.trim() || t("untitled")}

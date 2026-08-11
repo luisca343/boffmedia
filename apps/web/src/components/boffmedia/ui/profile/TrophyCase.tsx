@@ -10,9 +10,9 @@ export function TrophyCard({ icon, name, meta, rare, done, locked, className }: 
     <div
       className={cn(
         "relative border border-solid border-line bg-panel-2 px-[14px] pb-4 pt-5 text-center",
-        "[clip-path:polygon(0_0,100%_0,100%_100%,16px_100%,0_calc(100%_-_16px))]",
+        "cut-bl cut-edge-bl [--cut-e:16px] [--cut-line:var(--line)]",
         "transition-[border-color,transform] duration-[140ms]",
-        done && "hover:-translate-y-0.5 hover:border-accent-line",
+        done && "hover:-translate-y-0.5 hover:border-accent-line hover:[--cut-line:var(--accent-line)]",
         locked && "opacity-60",
         className,
       )}
@@ -24,10 +24,13 @@ export function TrophyCard({ icon, name, meta, rare, done, locked, className }: 
       )}
       <span
         className={cn(
-          "mx-auto grid h-[50px] w-[50px] place-items-center cut-seal [--cut:10px]",
+          "mx-auto grid h-[50px] w-[50px] place-items-center cut-seal cut-seal-edge [--cut:10px]",
+          // The locked chamfer is stroked solid even though its sides are
+          // dashed — a 10px stub cannot carry a legible dash pattern, and the
+          // alternative is the corner reading as a gap.
           locked
-            ? "border border-dashed border-line-2 bg-transparent text-txt-dim"
-            : "border border-solid border-accent-line bg-accent-soft text-accent",
+            ? "border border-dashed border-line-2 [--cut-line:var(--line-2)] bg-transparent text-txt-dim"
+            : "border border-solid border-accent-line [--cut-line:var(--accent-line)] bg-accent-soft text-accent",
         )}
       >
         <Icon name={icon} size={24} />

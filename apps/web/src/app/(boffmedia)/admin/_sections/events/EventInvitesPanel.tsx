@@ -82,7 +82,7 @@ export function EventInvitesPanel({
 
       {/* Create strip: labels inline so every control shares one baseline; the
           former hints live on `title` instead of pushing the button out of line. */}
-      <div className="flex flex-wrap items-center gap-x-3 gap-y-2 border border-solid border-line bg-panel-2 cut-tag px-3 py-2 mb-3">
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-2 border border-solid border-line bg-panel-2 cut-tag cut-tag-edge px-3 py-2 mb-3">
         <label className="flex items-center gap-2" title={t("maxUsesHint")}>
           <span className="font-mono text-[9.5px] font-bold uppercase tracking-[0.08em] text-txt-muted whitespace-nowrap">
             {t("maxUsesLabel")}
@@ -127,7 +127,7 @@ export function EventInvitesPanel({
       ) : rows.length === 0 ? (
         <p className="text-txt-dim text-sm py-6 text-center">{t("empty")}</p>
       ) : (
-        <div className="border border-solid border-line bg-panel-2 cut-tag divide-y divide-line">
+        <div className="border border-solid border-line bg-panel-2 cut-tag cut-tag-edge divide-y divide-line">
           {rows.map((i) => (
             <div key={i.code} className="flex items-center gap-2 px-3 py-1.5">
               <span

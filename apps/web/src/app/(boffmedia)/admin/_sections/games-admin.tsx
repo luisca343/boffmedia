@@ -30,7 +30,7 @@ export function GamesAdmin() {
         columns={[
           { key: "title", label: t("colGame"), render: (g) => (
             <div className="flex items-center gap-3">
-              <div className="cut-seal [--cut:7px] w-9 h-9 bg-panel-2 border border-solid border-line flex items-center justify-center overflow-hidden shrink-0">
+              <div className="cut-seal cut-seal-edge [--cut:7px] w-9 h-9 bg-panel-2 border border-solid border-line flex items-center justify-center shrink-0">
                 {g.icon ? (
                   <img src={g.icon} alt={g.title} className="w-full h-full object-cover" />
                 ) : (

@@ -5,17 +5,17 @@ import { cn } from "@/lib/utils"
 
 const badgeVariants = cva(
   cn(
-    "cut [--cut:5px] inline-flex items-center justify-center gap-1",
+    "cut cut-edge-slant [--cut:5px] inline-flex items-center justify-center gap-1",
     "font-display font-bold not-italic uppercase tracking-[0.08em] leading-none",
     "text-[11px] px-2 py-1 border border-solid transition-colors",
   ),
   {
     variants: {
       variant: {
-        default: "bg-sr-accent border-sr-accent text-sr-accent-ink",
-        neutral: "bg-sr-panel-2 border-sr-line text-sr-txt",
+        default: "bg-sr-accent border-sr-accent [--cut-line:var(--sr-accent)] text-sr-accent-ink",
+        neutral: "bg-sr-panel-2 border-sr-line [--cut-line:var(--sr-line)] text-sr-txt",
         button:
-          "bg-sr-accent-soft border-sr-accent-line text-sr-accent-bright cursor-pointer hover:bg-sr-accent hover:text-sr-accent-ink hover:border-sr-accent",
+          "bg-sr-accent-soft border-sr-accent-line [--cut-line:var(--sr-accent-line)] text-sr-accent-bright cursor-pointer hover:bg-sr-accent hover:text-sr-accent-ink hover:border-sr-accent hover:[--cut-line:var(--sr-accent)]",
       },
     },
     defaultVariants: {

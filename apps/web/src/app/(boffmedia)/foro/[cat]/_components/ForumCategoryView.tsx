@@ -85,7 +85,7 @@ export function ForumCategoryView({ slug }: { slug: string }) {
       </Link>
 
       <header className="mb-6 flex items-start gap-4" style={{ "--chue": category.hue } as React.CSSProperties}>
-        <span className="grid h-14 w-14 flex-none place-items-center border border-solid border-[color-mix(in_srgb,hsl(var(--chue)_70%_50%)_42%,var(--line-2))] bg-[color-mix(in_srgb,hsl(var(--chue)_70%_50%)_14%,var(--panel-2))] text-[hsl(var(--chue)_78%_64%)] cut-seal [--cut:10px]">
+        <span className="grid h-14 w-14 flex-none place-items-center border border-solid border-[color-mix(in_srgb,hsl(var(--chue)_70%_50%)_42%,var(--line-2))] bg-[color-mix(in_srgb,hsl(var(--chue)_70%_50%)_14%,var(--panel-2))] text-[hsl(var(--chue)_78%_64%)] cut-seal cut-seal-edge [--cut:10px] [--cut-line:color-mix(in_srgb,hsl(var(--chue)_70%_50%)_42%,var(--line-2))]">
           <Icon name={category.icon as IconName} size={26} />
         </span>
         <div className="min-w-0">
@@ -121,7 +121,7 @@ export function ForumCategoryView({ slug }: { slug: string }) {
       {composing && canCreate && (
         <div className="mb-6">
           {createError && (
-            <p className="mb-2.5 border border-solid border-bad bg-bad-soft py-2.5 px-3.5 font-mono text-[12px] font-medium text-bad cut-tag">
+            <p className="mb-2.5 border border-solid border-bad bg-bad-soft py-2.5 px-3.5 font-mono text-[12px] font-medium text-bad cut-tag cut-tag-edge [--cut-line:var(--bad)]">
               {createError}
             </p>
           )}

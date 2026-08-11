@@ -140,7 +140,7 @@ export function MatchWorkspace({ match: initialMatch, sessionId, regulationId, o
 
         {/* Finish / saved */}
         {!isCompleted ? (
-          <button type="button" onClick={handleFinish} className="cut inline-flex items-center gap-[6px] border border-solid border-accent bg-accent px-3 py-[7px] font-display text-[13px] font-bold uppercase tracking-[0.06em] text-accent-ink transition-colors hover:bg-accent-bright">
+          <button type="button" onClick={handleFinish} className="cut cut-edge-slant [--cut-line:var(--accent)] inline-flex items-center gap-[6px] border border-solid border-accent bg-accent px-3 py-[7px] font-display text-[13px] font-bold uppercase tracking-[0.06em] text-accent-ink transition-colors hover:bg-accent-bright">
             <Icon name="check" size={14} /> {t('buttons.finish')}
           </button>
         ) : (

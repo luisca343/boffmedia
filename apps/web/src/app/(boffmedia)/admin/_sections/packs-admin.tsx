@@ -288,7 +288,7 @@ function AccessTab({ pack }: { pack: AdminPack }) {
           />
         </Field>
         {hits.length > 0 && (
-          <div className="mt-2 flex flex-col gap-1 border border-solid border-line bg-panel-2 p-2 cut-tag">
+          <div className="mt-2 flex flex-col gap-1 border border-solid border-line bg-panel-2 p-2 cut-tag cut-tag-edge">
             {hits.map((u) => (
               <button
                 key={u.id}
@@ -307,7 +307,7 @@ function AccessTab({ pack }: { pack: AdminPack }) {
       </div>
 
       {/* The exception: a player who has not registered yet. */}
-      <details className="border border-solid border-line bg-panel-2 p-3 cut-tag">
+      <details className="border border-solid border-line bg-panel-2 p-3 cut-tag cut-tag-edge">
         <summary className="cursor-pointer font-mono text-[11px] uppercase tracking-[0.08em] text-txt-dim">
           {t("preGrantTitle")}
         </summary>
@@ -358,7 +358,7 @@ function AccessTab({ pack }: { pack: AdminPack }) {
       {/* Event members hold no ACL row: access derives from membership at every
           check, so the grant list alone under-reports who can install this. */}
       {events.length > 0 && (
-        <div className="flex flex-col gap-1 border border-solid border-line bg-panel-2 p-3 cut-tag">
+        <div className="flex flex-col gap-1 border border-solid border-line bg-panel-2 p-3 cut-tag cut-tag-edge">
           <span className="font-mono text-[10px] uppercase tracking-[0.08em] text-txt-dim">
             {t("derivedFromEvents")}
           </span>

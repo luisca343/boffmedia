@@ -23,7 +23,7 @@ const PAGE = 20
 
 function ErrorNote({ children }: { children: React.ReactNode }) {
   return (
-    <p className="mb-2.5 border border-solid border-bad bg-bad-soft py-2.5 px-3.5 font-mono text-[12px] font-medium text-bad cut-tag">
+    <p className="mb-2.5 border border-solid border-bad bg-bad-soft py-2.5 px-3.5 font-mono text-[12px] font-medium text-bad cut-tag cut-tag-edge [--cut-line:var(--bad)]">
       {children}
     </p>
   )
@@ -203,11 +203,11 @@ export function ForumThreadView({ threadId, cat }: { threadId: number; cat: stri
               disabled={voting}
               aria-pressed={hasVoted}
               className={cn(
-                "inline-flex items-center gap-2 border border-solid py-[9px] px-3.5 cut-tag font-mono text-[12px] font-semibold uppercase tracking-[0.08em]",
+                "inline-flex items-center gap-2 border border-solid py-[9px] px-3.5 cut-tag cut-tag-edge font-mono text-[12px] font-semibold uppercase tracking-[0.08em]",
                 "transition-[color,border-color,background] duration-[140ms]",
                 hasVoted
-                  ? "border-accent bg-accent-soft text-accent"
-                  : "border-line-2 text-txt-muted hover:border-accent-line hover:text-accent-bright",
+                  ? "border-accent [--cut-line:var(--accent)] bg-accent-soft text-accent"
+                  : "border-line-2 [--cut-line:var(--line-2)] text-txt-muted hover:border-accent-line hover:[--cut-line:var(--accent-line)] hover:text-accent-bright",
                 voting && "opacity-60 pointer-events-none",
               )}
             >
@@ -250,7 +250,7 @@ export function ForumThreadView({ threadId, cat }: { threadId: number; cat: stri
                 <article
                   key={post.id}
                   className={cn(
-                    "border border-solid border-line bg-panel p-5 cut-corner",
+                    "border border-solid border-line bg-panel p-5 cut-corner cut-corner-edge [--cut-line:var(--line)]",
                     post.isSolution && "border-accent-line border-l-4 border-l-accent",
                   )}
                 >
@@ -333,7 +333,7 @@ export function ForumThreadView({ threadId, cat }: { threadId: number; cat: stri
       )}
 
       {thread.locked ? (
-        <div className="mt-8 flex items-center justify-center gap-2 border border-solid border-line bg-panel-2 py-4 px-5 cut-corner font-mono text-[12px] font-semibold uppercase tracking-[0.08em] text-txt-muted">
+        <div className="mt-8 flex items-center justify-center gap-2 border border-solid border-line bg-panel-2 py-4 px-5 cut-corner cut-corner-edge font-mono text-[12px] font-semibold uppercase tracking-[0.08em] text-txt-muted">
           <Icon name="lock" size={14} /> {t("closedNotice")}
         </div>
       ) : loggedIn ? (
@@ -343,7 +343,7 @@ export function ForumThreadView({ threadId, cat }: { threadId: number; cat: stri
           <ForumComposer key={replyKey} submitLabel={t("replySubmit")} busy={replying} onSubmit={handleReply} />
         </div>
       ) : (
-        <div className="mt-8 flex flex-wrap items-center justify-center gap-3 border border-solid border-line bg-panel py-5 px-5 cut-corner text-center">
+        <div className="mt-8 flex flex-wrap items-center justify-center gap-3 border border-solid border-line bg-panel py-5 px-5 cut-corner cut-corner-edge text-center">
           <span className="font-body text-[14px] text-txt-muted">{t("joinConversation")}</span>
           <Button variant="pri" size="sm" icon="user" href="/entrar">
             {t("loginToReply")}

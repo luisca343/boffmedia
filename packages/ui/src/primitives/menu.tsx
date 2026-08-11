@@ -190,7 +190,8 @@ export function Menu({
             style={{ boxShadow: POP_SHADOW, position: "fixed", top: coords.top, bottom: coords.bottom, left: coords.left, right: coords.right }}
             className={cn(
               "z-[500] min-w-[216px] flex flex-col p-[6px] bg-panel border border-solid border-line-2",
-              "cut-tag [--cut-tag:9px] animate-[bm-menu-in_0.12s_ease-out] motion-reduce:animate-none",
+              "cut-tag cut-tag-edge [--cut-tag:9px] [--cut-line:var(--line-2)]",
+              "animate-[bm-menu-in_0.12s_ease-out] motion-reduce:animate-none",
             )}
           >
           {items.map((it, i) =>

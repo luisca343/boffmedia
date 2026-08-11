@@ -28,7 +28,7 @@ export function SrtCard({ sorteo, layout, entered, onOpen }: { sorteo: Sorteo; l
       aria-label={sorteo.title}
       style={{ "--ghue": hue } as React.CSSProperties}
       className={cn(
-        "group relative flex cursor-pointer flex-col overflow-hidden border border-solid border-line border-l-4 border-l-[color:var(--ghue)] bg-panel text-left transition-[border-color,background,transform] duration-[140ms] cut-tag cut-tag-edge [--cut-tag:14px]",
+        "group relative flex cursor-pointer flex-col border border-solid border-line border-l-4 border-l-[color:var(--ghue)] bg-panel text-left transition-[border-color,background,transform] duration-[140ms] cut-tag cut-tag-edge [--cut-tag:14px]",
         "hover:-translate-y-[3px] hover:border-[color-mix(in_srgb,var(--ghue)_45%,var(--line))] hover:bg-panel-2 hover:border-l-[color:var(--ghue)]",
         row && "sm:flex-row sm:items-stretch",
         status.key === "ended" && "opacity-[0.82]",
@@ -121,8 +121,8 @@ export function SrtFeatured({ sorteo, entered, onOpen }: { sorteo: Sorteo; enter
   const open = () => onOpen && onOpen("/sorteos?g=" + sorteo.slug)
   const cta = status.key === "active" ? (entered ? t("youreInDotView") : t("participateNow")) : status.key === "announced" ? t("viewWinner") : status.key === "upcoming" ? t("viewDetails") : t("viewGiveaway")
   return (
-    <div className="relative mb-[30px] grid min-h-[340px] grid-cols-1 overflow-hidden border border-solid border-line border-t-[3px] border-t-accent bg-base-2 cut-corner cut-corner-edge [--cut-lg:20px] md:grid-cols-[1.15fr_0.85fr]">
-      <div className="relative min-h-[220px] overflow-hidden border-b border-solid border-line md:border-b-0 md:border-r">
+    <div className="relative mb-[30px] grid min-h-[340px] grid-cols-1 border border-solid border-line border-t-[3px] border-t-accent bg-base-2 cut-corner cut-corner-edge [--cut-lg:20px] md:grid-cols-[1.15fr_0.85fr]">
+      <div className="relative min-h-[220px] border-b border-solid border-line md:border-b-0 md:border-r">
         <div aria-hidden className="absolute inset-0 z-0 bg-base" />
         <div aria-hidden className="pointer-events-none absolute inset-0 z-[1] [background:linear-gradient(105deg,transparent_40%,color-mix(in_srgb,var(--panel)_70%,transparent)_82%,var(--panel)_100%),radial-gradient(120%_120%_at_20%_20%,color-mix(in_srgb,var(--accent)_22%,transparent),transparent_55%)]" />
         <div aria-hidden className="pointer-events-none absolute inset-0 z-[1] opacity-[0.35] mix-blend-multiply [background:repeating-linear-gradient(to_bottom,transparent_0_3px,rgba(0,0,0,0.2)_3px_4px)]" />

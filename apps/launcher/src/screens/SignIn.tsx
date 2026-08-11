@@ -133,7 +133,7 @@ export function SignIn() {
                     {t("copyCodeLabel")}
                   </p>
                   {/* Selectable, so it works even if the clipboard is denied. */}
-                  <div className="cut select-text border-2 border-solid border-accent-line bg-base-deep px-5 py-3 text-center font-display text-[30px]/none font-bold tracking-[0.24em] text-accent-bright">
+                  <div className="cut cut-edge-slant [--cut-w:2px] [--cut-line:var(--accent-line)] select-text border-2 border-solid border-accent-line bg-base-deep px-5 py-3 text-center font-display text-[30px]/none font-bold tracking-[0.24em] text-accent-bright">
                     {deviceCode.userCode}
                   </div>
                   <div className="mt-2 flex justify-center">

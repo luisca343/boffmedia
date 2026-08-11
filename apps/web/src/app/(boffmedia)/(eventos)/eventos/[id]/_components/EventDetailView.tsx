@@ -131,7 +131,7 @@ export function EventDetailView({ id }: { id: number }) {
 
         {/* aside */}
         <div className="grid gap-5 max-[980px]:grid-cols-2 max-[560px]:grid-cols-1">
-          <div className="border border-solid border-line border-t-[3px] border-t-accent bg-panel p-[22px] text-center cut-corner">
+          <div className="border border-solid border-line border-t-[3px] border-t-accent bg-panel p-[22px] text-center cut-corner cut-corner-edge">
             <div className="font-display text-[52px]/[0.9] font-extrabold italic text-txt">{count}</div>
             <div className="mt-1.5 font-mono text-[10px]/none uppercase tracking-[0.16em] text-txt-muted">
               {t("detail.participants")}

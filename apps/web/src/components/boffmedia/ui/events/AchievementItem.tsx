@@ -58,7 +58,7 @@ export function AchievementItem({
       style={{ ["--rc" as string]: rc } as React.CSSProperties}
       className={cn(
         "flex items-start gap-4 border border-solid border-line border-l-[color:var(--rc)] bg-panel px-[18px] py-4",
-        "cut-tag [--cut-tag:10px] transition-colors duration-[140ms] hover:bg-panel-2",
+        "cut-tag cut-tag-edge [--cut-tag:10px] [--cut-line:var(--line)] transition-colors duration-[140ms] hover:bg-panel-2",
         isMedal ? "border-l-4" : "border-l-[3px]",
         locked && "opacity-80",
       )}

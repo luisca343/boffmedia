@@ -41,9 +41,8 @@ function MechanicButton({
       aria-pressed={armed}
       aria-label={meta.tooltip}
       title={meta.tooltip}
-      style={{ ['--tyc']: meta.tone, clipPath: 'polygon(4px 0,100% 0,calc(100% - 4px) 100%,0 100%)' } as CSSProperties}
-      className={cn(
-        'inline-flex items-center gap-2 border border-solid border-line-2 bg-panel px-3 py-2 font-mono text-[10.5px] font-semibold uppercase leading-none tracking-[0.06em] text-txt-muted transition-[border-color,color,box-shadow]',
+      style={{ ['--tyc']: meta.tone } as CSSProperties}
+      className={cn('cut cut-edge-slant [--cut-line:var(--line-2)] [--cut:4px]', 'inline-flex items-center gap-2 border border-solid border-line-2 bg-panel px-3 py-2 font-mono text-[10.5px] font-semibold uppercase leading-none tracking-[0.06em] text-txt-muted transition-[border-color,color,box-shadow]',
         'hover:border-[color-mix(in_srgb,var(--tyc)_60%,transparent)] hover:text-txt',
         armed && 'border-[var(--tyc)] text-txt [box-shadow:0_0_12px_color-mix(in_srgb,var(--tyc)_35%,transparent),inset_0_0_12px_color-mix(in_srgb,var(--tyc)_12%,transparent)]',
       )}

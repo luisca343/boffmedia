@@ -1,8 +1,6 @@
 import * as React from "react"
 import { cn } from "../cn"
 
-const CLIP = "polygon(0 0,100% 0,calc(100% - 14px) 100%,0 100%)"
-
 export interface ThirdProps {
   date?: string
   month?: string
@@ -17,11 +15,13 @@ export function Third({ date, month, title, meta, side, muted, onClick }: ThirdP
   return (
     <div
       onClick={onClick}
-      style={{ clipPath: CLIP }}
       className={cn(
         "flex min-w-0 items-center gap-[18px] border border-solid border-line bg-panel px-5 py-3.5 transition-[background,border-color] duration-[140ms] [border-left-width:var(--bar)]",
+        // `.cut-slant-r`, not the inline polygon it replaces — same shape, but
+        // the utility comes with the stroke that draws the slant the clip cuts.
+        "cut-slant-r cut-edge-slant-r [--cut:14px] [--cut-line:var(--line)]",
         muted ? "border-l-line-2" : "border-l-accent",
-        onClick && "cursor-pointer hover:border-accent-line hover:border-l-accent hover:bg-panel-2",
+        onClick && "cursor-pointer hover:border-accent-line hover:[--cut-line:var(--accent-line)] hover:border-l-accent hover:bg-panel-2",
       )}
     >
       {date && (

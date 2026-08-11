@@ -35,7 +35,7 @@ export function LobbyView({ go }: { go: (view: BsimView) => void }) {
   return (
     <div className="mx-auto grid max-w-[780px] gap-[14px]">
       {/* ============ GAME CONSOLE ============ */}
-      <section className="cut-corner relative grid gap-[15px] overflow-hidden border border-solid border-line-2 border-t-[3px] border-t-accent px-[22px] pb-[22px] pt-5 [background:linear-gradient(180deg,var(--panel),var(--bg-2))]">
+      <section className="cut-corner cut-corner-edge [--cut-line:var(--line-2)] relative grid gap-[15px] border border-solid border-line-2 border-t-[3px] border-t-accent px-[22px] pb-[22px] pt-5 [background:linear-gradient(180deg,var(--panel),var(--bg-2))]">
         <div aria-hidden="true" className="pointer-events-none absolute inset-[-45%_35%_auto_-12%] h-[320px] [background:radial-gradient(50%_60%_at_30%_0,var(--accent-soft),transparent_70%)]" />
 
         <header className="relative grid gap-[6px]">
@@ -54,8 +54,10 @@ export function LobbyView({ go }: { go: (view: BsimView) => void }) {
             return (
               <button key={m.id} type="button" role="radio" aria-checked={on} onClick={() => setMode(m.id)}
                 className={cn(
-                  "cut [--cut:8px] flex min-w-0 items-center gap-[9px] border border-solid px-3 py-[11px] text-left transition-colors",
-                  on ? "border-accent bg-accent-soft text-txt" : "border-line bg-base text-txt-muted hover:border-line-2 hover:text-txt",
+                  "cut cut-edge-slant [--cut:8px] flex min-w-0 items-center gap-[9px] border border-solid px-3 py-[11px] text-left transition-colors",
+                  on
+                    ? "border-accent [--cut-line:var(--accent)] bg-accent-soft text-txt"
+                    : "border-line [--cut-line:var(--line)] bg-base text-txt-muted hover:border-line-2 hover:[--cut-line:var(--line-2)] hover:text-txt",
                 )}>
                 <Icon name={m.icon} size={17} className={cn("flex-none", on ? "text-accent-bright" : "text-txt-dim")} />
                 <span className="grid min-w-0 gap-[2px]">
@@ -99,7 +101,7 @@ export function LobbyView({ go }: { go: (view: BsimView) => void }) {
 
 function LobbyTile({ icon, title, sub, onClick, href }: { icon: IconName; title: string; sub: string; onClick?: () => void; href?: string }) {
   const cls =
-    "cut group grid min-w-0 justify-items-start gap-[5px] border border-solid border-line bg-panel px-4 py-[15px] text-left text-txt-muted transition-[color,border-color,background,transform] hover:-translate-y-[2px] hover:border-accent-line hover:text-txt"
+    "cut cut-edge-slant hover:[--cut-line:var(--accent-line)] [--cut-line:var(--line)] group grid min-w-0 justify-items-start gap-[5px] border border-solid border-line bg-panel px-4 py-[15px] text-left text-txt-muted transition-[color,border-color,background,transform] hover:-translate-y-[2px] hover:border-accent-line hover:text-txt"
   const inner = (
     <>
       <Icon name={icon} size={20} className="text-accent-bright" />

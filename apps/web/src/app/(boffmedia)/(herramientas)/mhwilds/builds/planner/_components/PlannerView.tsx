@@ -163,7 +163,7 @@ export function PlannerView() {
                 <button
                   type="button"
                   onClick={() => setDrawer({ type: "skillsearch" })}
-                  className="flex w-full items-center gap-3 border border-line bg-panel px-3.5 py-3 text-left transition-colors cut-corner hover:border-[var(--mh)]"
+                  className="flex w-full items-center gap-3 border border-line bg-panel px-3.5 py-3 text-left transition-colors cut-corner cut-corner-edge hover:border-[var(--mh)] hover:[--cut-line:var(--mh)]"
                 >
                   <Icon name="search" size={16} className="shrink-0 text-[var(--mh-bright)]" />
                   <span className="grid min-w-0 gap-0.5">

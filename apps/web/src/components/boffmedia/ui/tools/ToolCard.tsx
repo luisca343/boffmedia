@@ -9,7 +9,7 @@ import { hueStyle, type ToolCardData } from "./tools-data"
 // `-edge` classes redraw the diagonal the clip erases; --cut-line tracks the
 // border colour, hover included.
 const SENAL_CLIP = "cut-tag cut-tag-edge [--cut-tag:14px]"
-const FILA_CLIP = "[clip-path:polygon(0_0,100%_0,100%_100%,10px_100%,0_calc(100%_-_10px))] cut-edge-bl [--cut-e:10px]"
+const FILA_CLIP = "cut-bl cut-edge-bl [--cut-e:10px]"
 const CARD_HOVER_LINE = "hover:[--cut-line:color-mix(in_srgb,var(--ghue)_45%,var(--line))]"
 
 const ICON_BOX =

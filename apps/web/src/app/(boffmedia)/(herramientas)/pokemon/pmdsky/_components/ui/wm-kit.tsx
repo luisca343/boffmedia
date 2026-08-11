@@ -162,7 +162,7 @@ export function WmSection({
   return (
     <section className="border border-solid border-line bg-panel">
       <header className="flex items-center gap-[11px] border-b border-solid border-line px-4 py-[13px]">
-        <span className="cut [--cut:3px] border border-solid border-accent-line bg-accent-soft px-[7px] py-[5px] font-mono text-[11px] font-bold leading-none tracking-[0.1em] text-accent">
+        <span className="cut cut-edge-slant [--cut-line:var(--accent-line)] [--cut:3px] border border-solid border-accent-line bg-accent-soft px-[7px] py-[5px] font-mono text-[11px] font-bold leading-none tracking-[0.1em] text-accent">
           {n}
         </span>
         <span className="grid place-items-center text-txt-muted">
@@ -277,7 +277,7 @@ export function WmTicket({
   readyHint: string
 }) {
   return (
-    <div className="cut-corner [--cut-lg:16px] relative overflow-hidden border border-solid border-line-2 bg-[color-mix(in_srgb,var(--accent)_5%,var(--panel))]">
+    <div className="cut-corner cut-corner-edge [--cut-line:var(--line-2)] [--cut-lg:16px] relative border border-solid border-line-2 bg-[color-mix(in_srgb,var(--accent)_5%,var(--panel))]">
       <div className="h-[3px] bg-[linear-gradient(90deg,var(--accent),var(--accent-bright),transparent)]" aria-hidden="true" />
       <div className="flex items-center justify-between px-4 pt-[13px]">
         <span className="inline-flex items-center gap-2 font-display text-[12px] font-bold uppercase leading-none tracking-[0.08em] text-txt">
@@ -300,7 +300,7 @@ export function WmTicket({
         <div className="flex flex-col items-center gap-2 px-6 pb-[34px] pt-[30px] text-center">
           <span
             className={cn(
-              "cut grid h-[60px] w-[60px] place-items-center border border-solid border-accent-line bg-accent-soft text-accent",
+              "cut cut-edge-slant [--cut-line:var(--accent-line)] grid h-[60px] w-[60px] place-items-center border border-solid border-accent-line bg-accent-soft text-accent",
               status === "loading" && "motion-safe:animate-[bm-spin_0.9s_linear_infinite]",
             )}
           >

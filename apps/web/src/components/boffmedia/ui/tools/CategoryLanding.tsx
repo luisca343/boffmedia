@@ -46,10 +46,10 @@ export function FeaturedTool({ cat }: { cat: CategoryData }) {
   return (
     <div
       style={hueStyle(cat.hueColor)}
-      className="group relative mb-[34px] grid grid-cols-1 border border-solid bg-panel md:grid-cols-[0.82fr_1.18fr] border-[color-mix(in_srgb,var(--ghue)_32%,var(--line))] [--cut-line:color-mix(in_srgb,var(--ghue)_32%,var(--line))] [background:radial-gradient(130%_150%_at_100%_0%,color-mix(in_srgb,var(--ghue)_13%,transparent),transparent_52%),var(--panel)] [clip-path:polygon(0_0,calc(100%_-_22px)_0,100%_22px,100%_100%,22px_100%,0_calc(100%_-_22px))] cut-edge-notch [--cut-e:22px] transition-[border-color,box-shadow] duration-300 hover:border-[color-mix(in_srgb,var(--ghue)_52%,var(--line))] hover:[--cut-line:color-mix(in_srgb,var(--ghue)_52%,var(--line))] hover:shadow-[0_22px_54px_rgba(0,0,0,0.32)]"
+      className="group relative mb-[34px] grid grid-cols-1 border border-solid bg-panel md:grid-cols-[0.82fr_1.18fr] border-[color-mix(in_srgb,var(--ghue)_32%,var(--line))] [--cut-line:color-mix(in_srgb,var(--ghue)_32%,var(--line))] [background:radial-gradient(130%_150%_at_100%_0%,color-mix(in_srgb,var(--ghue)_13%,transparent),transparent_52%),var(--panel)] cut-notch cut-edge-notch [--cut-e:22px] transition-[border-color,box-shadow] duration-300 hover:border-[color-mix(in_srgb,var(--ghue)_52%,var(--line))] hover:[--cut-line:color-mix(in_srgb,var(--ghue)_52%,var(--line))] hover:shadow-[0_22px_54px_rgba(0,0,0,0.32)]"
     >
       <span aria-hidden="true" className="absolute inset-x-0 top-0 z-[3] h-[3px] [background:linear-gradient(90deg,var(--ghue)_0%,color-mix(in_srgb,var(--ghue)_40%,transparent)_42%,transparent_72%)]" />
-      <span className="absolute left-0 top-0 z-[4] inline-flex items-center gap-[7px] whitespace-nowrap py-2 pl-[14px] pr-[18px] font-mono text-[10px] font-bold uppercase tracking-[0.14em] text-[var(--bg)] bg-[var(--ghue)] [clip-path:polygon(0_0,100%_0,calc(100%_-_13px)_100%,0_100%)]">
+      <span className="absolute left-0 top-0 z-[4] inline-flex items-center gap-[7px] whitespace-nowrap py-2 pl-[14px] pr-[18px] font-mono text-[10px] font-bold uppercase tracking-[0.14em] text-[var(--bg)] bg-[var(--ghue)] cut-slant-r [--cut:13px]">
         <Icon name="star" size={13} />
         {f.isNew ? tCat("featuredNew") : tCat("featured")}
       </span>

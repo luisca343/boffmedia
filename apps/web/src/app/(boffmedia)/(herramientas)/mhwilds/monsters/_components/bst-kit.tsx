@@ -175,10 +175,8 @@ export function MonsterCard({ m, active, onClick }: { m: MhMonster; active: bool
     <button
       type="button"
       onClick={onClick}
-      style={{ clipPath: "polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 0 100%)" }}
-      className={cn(
-        "flex flex-col text-left bg-panel border border-solid border-line text-inherit cursor-pointer overflow-hidden transition-[border-color,transform,box-shadow] duration-[140ms] hover:border-line-2 hover:-translate-y-0.5 hover:shadow-[0_12px_26px_-16px_#000]",
-        active && "border-[var(--mh)] shadow-[0_0_0_1px_var(--mh)]",
+      className={cn("cut-corner cut-corner-edge hover:[--cut-line:var(--line-2)] [--cut-lg:10px] ", "flex flex-col text-left bg-panel border border-solid border-line text-inherit cursor-pointer transition-[border-color,transform,box-shadow] duration-[140ms] hover:border-line-2 hover:-translate-y-0.5 hover:shadow-[0_12px_26px_-16px_#000]",
+        active && "border-[var(--mh)] [--cut-line:var(--mh)] shadow-[0_0_0_1px_var(--mh)]",
       )}
     >
       <div

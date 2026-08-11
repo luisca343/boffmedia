@@ -41,7 +41,7 @@ export function PanelView({ data, owned, effective, recent, loggedIn, go, onGall
   return (
     <div className="motion-safe:animate-[bm-modal-in_.3s_both] motion-reduce:animate-none">
       {/* hero */}
-      <div className="cut-corner relative mb-6 grid grid-cols-1 items-center gap-[26px] overflow-hidden border border-solid border-line bg-gradient-to-br from-panel to-base-2 p-[clamp(20px,3vw,34px)] sm:grid-cols-[auto_1fr]">
+      <div className="cut-corner cut-corner-edge relative mb-6 grid grid-cols-1 items-center gap-[26px] border border-solid border-line bg-gradient-to-br from-panel to-base-2 p-[clamp(20px,3vw,34px)] sm:grid-cols-[auto_1fr]">
         <div className="justify-self-center">
           <TcgRing pct={stats.pct} size={132}>
             <b className="font-display text-[30px] font-bold leading-none text-txt">{stats.pct}%</b>

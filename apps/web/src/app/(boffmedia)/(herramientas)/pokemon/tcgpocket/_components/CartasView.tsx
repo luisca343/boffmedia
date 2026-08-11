@@ -81,7 +81,7 @@ export function CartasView({ data, effective, initialQ, onOpenCard }: Props) {
       </div>
 
       {/* toolbar */}
-      <div className="cut mb-[18px] flex flex-wrap items-center gap-[10px] border border-solid border-line bg-panel p-[12px_14px]">
+      <div className="cut cut-edge-slant mb-[18px] flex flex-wrap items-center gap-[10px] border border-solid border-line bg-panel p-[12px_14px]">
         <label className="flex min-w-[180px] flex-1 items-center gap-2 border border-solid border-line-2 bg-base px-3 py-2">
           <Icon name="search" size={18} className="text-txt-dim" />
           <input className="w-full bg-transparent font-body text-[14px] text-txt outline-none placeholder:text-txt-dim" placeholder={t("app.searchCards")} value={q} onChange={(e) => setQ(e.target.value)} />
@@ -110,10 +110,12 @@ export function CartasView({ data, effective, initialQ, onOpenCard }: Props) {
             const on = types.includes(ty)
             return (
               <button key={ty} type="button" onClick={() => toggleType(ty)}
-                className="cut [--cut:5px] inline-flex items-center gap-[6px] border border-solid px-[10px] py-[6px] font-mono text-[11px] uppercase tracking-[0.04em] transition-colors"
+                className="cut cut-edge-slant [--cut:5px] inline-flex items-center gap-[6px] border border-solid px-[10px] py-[6px] font-mono text-[11px] uppercase tracking-[0.04em] transition-colors"
                 style={cssVars({
                   color: on ? "var(--text)" : "var(--muted)",
                   borderColor: on ? `color-mix(in srgb, ${typeColor(ty)} 65%, transparent)` : "var(--line-2)",
+                  // The slants are painted geometry — they need the colour by name.
+                  "--cut-line": on ? `color-mix(in srgb, ${typeColor(ty)} 65%, transparent)` : "var(--line-2)",
                   background: on ? `color-mix(in srgb, ${typeColor(ty)} 15%, transparent)` : "transparent",
                 })}>
                 <TcgTypePip type={ty} size={16} />{tl(`types.${ty}`, ty)}

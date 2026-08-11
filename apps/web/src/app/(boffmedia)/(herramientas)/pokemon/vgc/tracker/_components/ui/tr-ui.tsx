@@ -46,12 +46,11 @@ export function TrSprite({ name, size = 26, dim, title }: { name: string | null;
 }
 
 // ─── W / L / D result badge ──────────────────────────────────────────────────────
-const RES_CUT = "polygon(0 0,100% 0,100% calc(100% - 7px),calc(100% - 7px) 100%,0 100%)"
 const RES_STYLE: Record<string, { bg: string; fg: string; extra?: string }> = {
   win: { bg: "bg-ok", fg: "text-[#06240f]" },
   loss: { bg: "bg-bad", fg: "text-[#2b060a]" },
   draw: { bg: "bg-warn", fg: "text-[#2b1d02]" },
-  none: { bg: "bg-panel-2", fg: "text-txt-dim", extra: "border border-solid border-line-2" },
+  none: { bg: "bg-panel-2", fg: "text-txt-dim", extra: "border border-solid border-line-2 cut-tag-edge [--cut-line:var(--line-2)]" },
 }
 
 export function TrResult({ result, size = 28 }: { result?: MatchResult; size?: number }) {
@@ -65,8 +64,8 @@ export function TrResult({ result, size = 28 }: { result?: MatchResult; size?: n
   return (
     <span
       aria-label={aria}
-      style={{ width: size, height: size, fontSize: Math.round(size * 0.42), clipPath: RES_CUT }}
-      className={cn("inline-grid flex-none place-items-center font-mono font-extrabold", s.bg, s.fg, s.extra)}
+      style={{ width: size, height: size, fontSize: Math.round(size * 0.42) }}
+      className={cn("cut-tag [--cut-tag:7px]", "inline-grid flex-none place-items-center font-mono font-extrabold", s.bg, s.fg, s.extra)}
     >
       {label}
     </span>

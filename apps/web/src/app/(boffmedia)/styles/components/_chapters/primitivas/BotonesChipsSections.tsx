@@ -22,19 +22,28 @@ export function BotonesChipsSections() {
             Deshabilitado
           </Button>
         </Sample>
-        <Sample title="Tamaños e iconos">
+        <Sample
+          title="Tamaños e iconos"
+          code='size="sm" | "md" | "lg"'
+          note={
+            <>
+              Una sola escala de controles: <code>sm</code> 32px, <code>md</code> 40px, <code>lg</code> 48px. <code>IconButton</code> usa el mismo
+              chasis, así que un botón con texto y uno de solo icono se alinean en la misma barra.
+            </>
+          }
+        >
           <Button variant="pri" size="lg" iconRight="arrow">
             Explorar juegos
           </Button>
+          <IconButton name="settings" label="Ajustes" size="lg" />
           <Button variant="pri" iconRight="arrow">
             Inscribirse
           </Button>
+          <IconButton name="bell" label="Notificaciones" />
           <Button size="sm" icon="download">
             Exportar
           </Button>
-          <IconButton name="search" label="Buscar" />
-          <IconButton name="bell" label="Notificaciones" />
-          <IconButton name="settings" label="Ajustes" />
+          <IconButton name="search" label="Buscar" size="sm" />
         </Sample>
         <Sample
           title="Estado de carga"

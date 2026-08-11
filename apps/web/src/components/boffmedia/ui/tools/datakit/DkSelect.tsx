@@ -31,9 +31,8 @@ export function DkSelect({ value, options, onChange, minWidth, ariaLabel, classN
       value={value}
       aria-label={ariaLabel}
       onChange={(e) => onChange(e.target.value)}
-      style={{ ...CARET, clipPath: DK_CUT, minWidth }}
-      className={cn(
-        "max-w-[280px] cursor-pointer overflow-hidden text-ellipsis border border-solid border-line-2 bg-base py-[9px] pl-[11px] pr-[28px]",
+      style={{ ...CARET, minWidth }}
+      className={cn("cut-tag cut-tag-edge [--cut-line:var(--line-2)] [--cut-tag:8px]", "max-w-[280px] cursor-pointer text-ellipsis border border-solid border-line-2 bg-base py-[9px] pl-[11px] pr-[28px]",
         "font-mono text-[11px] font-semibold leading-[1.2] tracking-[0.04em] text-txt outline-none transition-[border-color] hover:border-line-2 focus-visible:outline-2 focus-visible:outline-accent-line",
         className,
       )}

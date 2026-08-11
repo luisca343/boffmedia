@@ -245,14 +245,14 @@ export function BattlesimChapter() {
       >
         <Sample title="Píldoras de modo" code=".bx-modepill" col note="Selector de modo de la consola del lobby: icono, etiqueta y coletilla en una sola línea alineada.">
           <div className="grid w-[min(440px,100%)] grid-cols-2 gap-2">
-            <button type="button" className="flex min-w-0 items-center gap-[9px] border border-solid border-accent bg-accent-soft px-3 py-[11px] text-left text-txt cut-tag [--cut-tag:8px]">
+            <button type="button" className="flex min-w-0 items-center gap-[9px] border border-solid border-accent bg-accent-soft px-3 py-[11px] text-left text-txt cut-tag cut-tag-edge [--cut-line:var(--accent)] [--cut-tag:8px]">
               <Icon name="target" size={17} className="flex-none text-accent-bright" />
               <span className="grid min-w-0 gap-[2px]">
                 <b className="font-display text-[12.5px]/none font-bold uppercase tracking-[0.03em]">Entrenamiento</b>
                 <small className="truncate font-mono text-[9px]/[1.2] text-txt-dim">Contra la IA</small>
               </span>
             </button>
-            <button type="button" className="flex min-w-0 items-center gap-[9px] border border-solid border-line bg-base px-3 py-[11px] text-left text-txt-muted transition-[color,border-color] hover:border-line-2 hover:text-txt cut-tag [--cut-tag:8px]">
+            <button type="button" className="flex min-w-0 items-center gap-[9px] border border-solid border-line bg-base px-3 py-[11px] text-left text-txt-muted transition-[color,border-color] hover:border-line-2 hover:text-txt cut-tag cut-tag-edge hover:[--cut-line:var(--line-2)] [--cut-line:var(--line)] [--cut-tag:8px]">
               <Icon name="sword" size={17} className="flex-none text-txt-dim" />
               <span className="grid min-w-0 gap-[2px]">
                 <b className="font-display text-[12.5px]/none font-bold uppercase tracking-[0.03em]">Clasificatoria</b>
@@ -270,7 +270,7 @@ export function BattlesimChapter() {
             </button>
             <div className="grid grid-cols-2 gap-[10px]">
               {([["layers", "Team Builder", "2 equipos"], ["play", "Repeticiones", "6 guardadas"]] as const).map(([ic, tit, sub]) => (
-                <button key={tit} type="button" className="grid min-w-0 justify-items-start gap-[5px] border border-solid border-line bg-panel px-4 py-[15px] text-left text-txt-muted transition-[color,border-color,transform] hover:-translate-y-[2px] hover:border-accent-line hover:text-txt cut-tag [--cut-tag:10px]">
+                <button key={tit} type="button" className="grid min-w-0 justify-items-start gap-[5px] border border-solid border-line bg-panel px-4 py-[15px] text-left text-txt-muted transition-[color,border-color,transform] hover:-translate-y-[2px] hover:border-accent-line hover:text-txt cut-tag cut-tag-edge hover:[--cut-line:var(--accent-line)] [--cut-line:var(--line)] [--cut-tag:10px]">
                   <Icon name={ic} size={20} className="text-accent-bright" />
                   <b className="font-display text-[14px]/none font-bold uppercase tracking-[0.03em]">{tit}</b>
                   <small className="font-mono text-[10px]/[1.2] text-txt-dim">{sub}</small>

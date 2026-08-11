@@ -9,8 +9,6 @@ import { TrSprite, trFmtDate } from "./ui/tr-ui"
 import type { Session, TeamPreset } from "@/features/vgc-tracker/types"
 import type { SessionSummary } from "./useSessionSummaries"
 
-const ICON_CUT = "polygon(0 0,100% 0,100% calc(100% - 7px),calc(100% - 7px) 100%,0 100%)"
-
 function Chip({ children, tone }: { children: React.ReactNode; tone?: "tour" | "ghost" }) {
   return (
     <span
@@ -69,9 +67,7 @@ export function TrSessionRow({
         )}
       >
         <span
-          style={{ clipPath: ICON_CUT }}
-          className={cn(
-            "grid h-8 w-8 flex-none place-items-center border border-solid",
+          className={cn("cut-tag cut-tag-edge [--cut-tag:7px] ", "grid h-8 w-8 flex-none place-items-center border border-solid",
             isTour
               ? "border-[color-mix(in_srgb,var(--warn)_45%,transparent)] bg-warn-soft text-warn"
               : "border-accent-line bg-accent-soft text-accent-bright",

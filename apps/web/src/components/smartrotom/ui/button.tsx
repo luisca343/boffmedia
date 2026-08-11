@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils"
 
 const buttonVariants = cva(
   cn(
-    "cut relative inline-flex items-center justify-center gap-2 whitespace-nowrap select-none",
+    "cut cut-edge-slant [--cut-w:2px] relative inline-flex items-center justify-center gap-2 whitespace-nowrap select-none",
     "font-display font-bold not-italic uppercase tracking-[0.08em] leading-none",
     "border-2 border-solid no-underline",
     "transition-[background,border-color,color,transform] duration-[140ms] active:translate-y-px",
@@ -18,18 +18,18 @@ const buttonVariants = cva(
       variant: {
         // filled accent — the primary CTA
         default:
-          "bg-sr-accent border-sr-accent text-sr-accent-ink hover:bg-sr-accent-bright hover:border-sr-accent-bright",
+          "bg-sr-accent border-sr-accent [--cut-line:var(--sr-accent)] text-sr-accent-ink hover:bg-sr-accent-bright hover:border-sr-accent-bright hover:[--cut-line:var(--sr-accent-bright)]",
         // outline — neutral / secondary action
         neutral:
-          "bg-transparent border-sr-line-2 text-sr-txt hover:border-sr-accent hover:text-sr-accent-bright",
+          "bg-transparent border-sr-line-2 [--cut-line:var(--sr-line-2)] text-sr-txt hover:border-sr-accent hover:[--cut-line:var(--sr-accent)] hover:text-sr-accent-bright",
         // soft-filled, borderless — low-emphasis inline action
         noShadow:
-          "bg-sr-accent-soft border-transparent text-sr-accent-bright hover:bg-sr-panel-2",
+          "bg-sr-accent-soft border-transparent [--cut-line:transparent] text-sr-accent-bright hover:bg-sr-panel-2",
         // text-only
         ghost:
-          "bg-transparent border-transparent text-sr-txt-muted hover:text-sr-accent-bright",
+          "bg-transparent border-transparent [--cut-line:transparent] text-sr-txt-muted hover:text-sr-accent-bright",
         danger:
-          "bg-transparent border-sr-bad text-sr-bad hover:bg-sr-bad hover:text-white hover:border-sr-bad",
+          "bg-transparent border-sr-bad [--cut-line:var(--sr-bad)] text-sr-bad hover:bg-sr-bad hover:text-white hover:border-sr-bad",
       },
       size: {
         default: "[--cut:9px] py-2.5 px-5 text-[13px]",

@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils"
 export const INPUT_CLASS = cn(
   "w-full font-body text-[13px]/[1.3] text-txt",
   "bg-base [[data-theme=light]_&]:bg-panel-2 border border-solid border-line-2 px-[10px] py-[7px]",
-  "cut-tag [--cut-tag:7px]",
+  "cut-tag cut-tag-edge [--cut-line:var(--line-2)] [--cut-tag:7px]",
   "transition-[border-color] duration-[140ms] outline-none focus:border-accent",
   "placeholder:text-txt-dim",
 )
@@ -85,9 +85,9 @@ export function CritToggle({ on, onClick, title }: { on: boolean; onClick: () =>
       title={title}
       onClick={onClick}
       className={cn(
-        "cut-tag [--cut-tag:6px] grid h-full min-h-[32px] place-items-center border border-solid font-mono text-[11px]/none font-bold",
+        "cut-tag cut-tag-edge [--cut-tag:6px] grid h-full min-h-[32px] place-items-center border border-solid font-mono text-[11px]/none font-bold",
         "transition-[color,border-color,background] duration-[140ms]",
-        on ? "border-warn bg-warn-soft text-warn" : "border-line-2 bg-base text-txt-dim hover:text-warn",
+        on ? "border-warn [--cut-line:var(--warn)] bg-warn-soft text-warn" : "border-line-2 [--cut-line:var(--line-2)] bg-base text-txt-dim hover:text-warn",
       )}
     >
       C

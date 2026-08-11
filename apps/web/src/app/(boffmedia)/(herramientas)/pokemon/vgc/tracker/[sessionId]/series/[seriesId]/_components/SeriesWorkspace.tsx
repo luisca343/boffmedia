@@ -194,7 +194,7 @@ export function SeriesWorkspace({ series: initialSeries, sessionId, regulationId
           <span className={cn('font-mono text-[24px] font-bold tabular-nums leading-none', losses > wins ? 'text-bad' : losses < wins ? 'text-ok' : 'text-txt')}>{losses}</span>
         </span>
         {!isCompleted ? (
-          <button type="button" onClick={handleFinishSeries} className="cut inline-flex items-center gap-[6px] border border-solid border-accent bg-accent px-3 py-[7px] font-display text-[13px] font-bold uppercase tracking-[0.06em] text-accent-ink transition-colors hover:bg-accent-bright">
+          <button type="button" onClick={handleFinishSeries} className="cut cut-edge-slant [--cut-line:var(--accent)] inline-flex items-center gap-[6px] border border-solid border-accent bg-accent px-3 py-[7px] font-display text-[13px] font-bold uppercase tracking-[0.06em] text-accent-ink transition-colors hover:bg-accent-bright">
             <Icon name="check" size={14} /> {t('buttons.finish')}
           </button>
         ) : (
@@ -218,9 +218,7 @@ export function SeriesWorkspace({ series: initialSeries, sessionId, regulationId
                 type="button"
                 onClick={() => unlocked && setActiveGame(n)}
                 disabled={!unlocked}
-                style={{ clipPath: 'polygon(0 0,100% 0,100% calc(100% - 6px),calc(100% - 6px) 100%,0 100%)' }}
-                className={cn(
-                  'inline-flex flex-none items-center gap-[6px] border border-solid px-[10px] py-[7px] font-mono text-[10px] font-semibold uppercase leading-none tracking-[0.08em] transition-[color,background,border-color]',
+                className={cn('cut-tag cut-tag-edge [--cut-tag:6px] ', 'inline-flex flex-none items-center gap-[6px] border border-solid px-[10px] py-[7px] font-mono text-[10px] font-semibold uppercase leading-none tracking-[0.08em] transition-[color,background,border-color]',
                   active ? 'border-accent bg-accent text-accent-ink' : !unlocked ? 'cursor-not-allowed border-line bg-base text-txt-dim' : 'border-line bg-base text-txt-muted hover:text-txt',
                 )}
               >

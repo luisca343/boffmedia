@@ -25,8 +25,7 @@ export function DkSeg({ options, value, onChange, size, ariaLabel, className }: 
     <div
       role="tablist"
       aria-label={ariaLabel}
-      style={{ clipPath: DK_CUT }}
-      className={cn("inline-flex border border-solid border-line-2 bg-base", className)}
+      className={cn("cut-tag cut-tag-edge [--cut-line:var(--line-2)] [--cut-tag:8px] ", "inline-flex border border-solid border-line-2 bg-base", className)}
     >
       {options.map((o) => {
         const on = o.value === value
@@ -67,9 +66,7 @@ export function DkSearch({ value, onChange, placeholder, ariaLabel, className }:
   const ph = placeholder ?? t("searchPh")
   return (
     <div
-      style={{ clipPath: DK_CUT }}
-      className={cn(
-        "inline-flex min-w-0 items-center gap-2 border border-solid border-line-2 bg-base px-[10px] text-txt-dim transition-[border-color] focus-within:border-accent",
+      className={cn("cut-tag cut-tag-edge [--cut-line:var(--line-2)] [--cut-tag:8px] ", "inline-flex min-w-0 items-center gap-2 border border-solid border-line-2 bg-base px-[10px] text-txt-dim transition-[border-color] focus-within:border-accent",
         className,
       )}
     >
@@ -95,14 +92,11 @@ export function DkSearch({ value, onChange, placeholder, ariaLabel, className }:
   )
 }
 
-const CHIP_CUT = "polygon(3px 0,100% 0,calc(100% - 3px) 100%,0 100%)"
-
 export function DkChip({ icon, tone, children, className }: { icon?: IconName; tone?: string; children: React.ReactNode; className?: string }) {
   return (
     <span
-      style={{ clipPath: CHIP_CUT, color: tone }}
-      className={cn(
-        "inline-flex items-center gap-[6px] whitespace-nowrap border border-solid border-line bg-panel px-[9px] py-[6px] font-mono text-[10px] font-semibold uppercase leading-none tracking-[0.08em]",
+      style={{  color: tone }}
+      className={cn("cut cut-edge-slant [--cut:3px]", "inline-flex items-center gap-[6px] whitespace-nowrap border border-solid border-line bg-panel px-[9px] py-[6px] font-mono text-[10px] font-semibold uppercase leading-none tracking-[0.08em]",
         !tone && "text-txt-muted",
         className,
       )}

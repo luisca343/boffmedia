@@ -64,11 +64,11 @@ export function SorteosView() {
           <p className="max-w-[56ch] text-pretty text-[15px] leading-[1.5] text-txt-muted">{t("sub")}</p>
         </div>
         <div className="flex flex-wrap items-center gap-[10px]">
-          <span style={{ clipPath: "polygon(4px 0,100% 0,calc(100% - 4px) 100%,0 100%)" }} className="inline-flex items-center gap-[8px] border border-line-2 bg-panel-2 px-[11px] py-[8px] font-mono text-[11px] font-semibold uppercase tracking-[0.06em] text-txt-muted">
+          <span className="cut cut-edge-slant [--cut-line:var(--line-2)] [--cut:4px] inline-flex items-center gap-[8px] border border-line-2 bg-panel-2 px-[11px] py-[8px] font-mono text-[11px] font-semibold uppercase tracking-[0.06em] text-txt-muted">
             <Icon name="users" size={13} className="text-accent" />
             <b className="text-txt">{entrants.length}</b> {t("participants")}
           </span>
-          <span style={{ clipPath: "polygon(4px 0,100% 0,calc(100% - 4px) 100%,0 100%)" }} className="inline-flex items-center gap-[8px] border border-line-2 bg-panel-2 px-[11px] py-[8px] font-mono text-[11px] font-semibold uppercase tracking-[0.06em] text-txt-muted">
+          <span className="cut cut-edge-slant [--cut-line:var(--line-2)] [--cut:4px] inline-flex items-center gap-[8px] border border-line-2 bg-panel-2 px-[11px] py-[8px] font-mono text-[11px] font-semibold uppercase tracking-[0.06em] text-txt-muted">
             <Icon name="trophy" size={13} className="text-accent" />
             <b className="text-txt">{history.length}</b> {t("rounds")}
           </span>
@@ -203,7 +203,7 @@ export function SorteosView() {
           <div className="flex flex-1 flex-col p-[20px]">
             {entrants.length === 0 ? (
               <div className="flex flex-1 flex-col items-center justify-center gap-[14px] p-[30px] text-center text-txt-dim">
-                <span style={{ clipPath: "polygon(14px 0,100% 0,100% calc(100% - 14px),calc(100% - 14px) 100%,0 100%,0 14px)" }} className="grid h-[76px] w-[76px] place-items-center border border-dashed border-line-2 text-line-2">
+                <span className="cut-seal cut-seal-edge [--cut-line:var(--line-2)] [--cut:14px] grid h-[76px] w-[76px] place-items-center border border-dashed border-line-2 text-line-2">
                   <Icon name="gift" size={34} />
                 </span>
                 <h3 className="font-display text-[20px] font-bold not-italic uppercase text-txt-muted">{t("blankTitle")}</h3>
@@ -212,7 +212,7 @@ export function SorteosView() {
             ) : phase === "setup" ? (
               <div className="flex flex-1 flex-col justify-center gap-[20px]">
                 <div className="flex flex-wrap items-center gap-[14px] border border-line bg-panel-2 px-[18px] py-[16px]">
-                  <span style={{ clipPath: "polygon(9px 0,100% 0,100% calc(100% - 9px),calc(100% - 9px) 100%,0 100%,0 9px)" }} className="grid h-[46px] w-[46px] flex-none place-items-center border border-accent-line bg-accent-soft text-accent">
+                  <span className="cut-seal cut-seal-edge [--cut-line:var(--accent-line)] [--cut:9px] grid h-[46px] w-[46px] flex-none place-items-center border border-accent-line bg-accent-soft text-accent">
                     <Icon name="users" size={22} />
                   </span>
                   <div className="min-w-0">
@@ -249,8 +249,7 @@ export function SorteosView() {
                   type="button"
                   disabled={pool.length === 0}
                   onClick={runDraw}
-                  style={{ clipPath: "polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 0 100%)" }}
-                  className="relative inline-flex w-full items-center justify-center gap-[12px] overflow-hidden border-0 p-[20px] font-display text-[22px] font-extrabold italic uppercase tracking-[0.03em] text-accent-ink transition-[filter,transform] [background:repeating-linear-gradient(-55deg,var(--accent)_0_14px,var(--accent-bright)_14px_28px)] enabled:hover:-translate-y-[2px] enabled:hover:brightness-[1.08] disabled:cursor-default disabled:bg-panel-2 disabled:bg-none disabled:text-txt-muted disabled:opacity-50 disabled:grayscale"
+                  className="cut-corner [--cut-lg:14px] relative inline-flex w-full items-center justify-center gap-[12px] overflow-hidden border-0 p-[20px] font-display text-[22px] font-extrabold italic uppercase tracking-[0.03em] text-accent-ink transition-[filter,transform] [background:repeating-linear-gradient(-55deg,var(--accent)_0_14px,var(--accent-bright)_14px_28px)] enabled:hover:-translate-y-[2px] enabled:hover:brightness-[1.08] disabled:cursor-default disabled:bg-panel-2 disabled:bg-none disabled:text-txt-muted disabled:opacity-50 disabled:grayscale"
                 >
                   <Icon name="bolt" size={20} className="flex-none" />
                   {effCount > 1 ? t("drawN", { n: effCount }) : t("drawOne")}
@@ -280,7 +279,7 @@ export function SorteosView() {
                 </div>
                 {draw.winners.length === 1 ? (
                   <div className="relative overflow-hidden pb-1 pt-2 text-center">
-                    <div style={{ clipPath: "polygon(14px 0,100% 0,100% calc(100% - 14px),calc(100% - 14px) 100%,0 100%,0 14px)" }} className="mx-auto mb-[16px] grid h-[76px] w-[76px] place-items-center border border-accent-line bg-accent-soft text-accent">
+                    <div className="cut-seal cut-seal-edge [--cut-line:var(--accent-line)] [--cut:14px] mx-auto mb-[16px] grid h-[76px] w-[76px] place-items-center border border-accent-line bg-accent-soft text-accent">
                       <Icon name="trophy" size={36} />
                     </div>
                     <div className="inline-flex items-center gap-[14px]">
@@ -330,7 +329,7 @@ export function SorteosView() {
           <div className="grid">
             {history.map((r) => (
               <div key={r.round + "-" + r.seed} className="flex items-center gap-[14px] border-b border-line px-[18px] py-[13px] last:border-b-0">
-                <span style={{ clipPath: "polygon(8px 0,100% 0,100% calc(100% - 8px),calc(100% - 8px) 100%,0 100%,0 8px)" }} className="grid h-[40px] w-[40px] flex-none place-items-center border border-accent-line bg-accent-soft font-display text-[15px] font-extrabold italic text-accent">
+                <span className="cut-seal cut-seal-edge [--cut-line:var(--accent-line)] [--cut:8px] grid h-[40px] w-[40px] flex-none place-items-center border border-accent-line bg-accent-soft font-display text-[15px] font-extrabold italic text-accent">
                   #{r.round}
                 </span>
                 <div className="flex min-w-0 flex-1 flex-wrap gap-[7px]">

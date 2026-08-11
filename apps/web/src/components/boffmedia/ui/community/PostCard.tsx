@@ -47,7 +47,7 @@ export function PostCard({
         onKeyDown={onKey}
         role="button"
         tabIndex={0}
-        className="grid cursor-pointer grid-cols-[1.05fr_1fr] items-stretch overflow-hidden border border-solid border-line border-l-4 border-l-[hsl(var(--phue)_72%_55%)] bg-panel text-left transition-[border-color,background,transform] duration-[140ms] cut-corner cut-corner-edge hover:-translate-y-[2px] hover:border-accent-line hover:border-l-accent"
+        className="grid cursor-pointer grid-cols-[1.05fr_1fr] items-stretch border border-solid border-line border-l-4 border-l-[hsl(var(--phue)_72%_55%)] bg-panel text-left transition-[border-color,background,transform] duration-[140ms] cut-corner cut-corner-edge hover:[--cut-line:var(--accent-line)] hover:-translate-y-[2px] hover:border-accent-line hover:border-l-accent"
       >
         <div className="relative min-h-[320px] overflow-hidden bg-panel-2">
           <div aria-hidden className="absolute inset-0 z-0 [background:radial-gradient(120%_90%_at_20%_10%,color-mix(in_srgb,hsl(var(--phue)_72%_45%)_30%,transparent),transparent_60%)]" />
@@ -79,7 +79,7 @@ export function PostCard({
         onKeyDown={onKey}
         role="button"
         tabIndex={0}
-        className="grid min-w-0 cursor-pointer grid-cols-[116px_1fr] items-stretch overflow-hidden border border-solid border-line border-l-4 border-l-[hsl(var(--phue)_72%_55%)] bg-panel text-left transition-[border-color,background] duration-[140ms] [clip-path:polygon(0_0,100%_0,calc(100%_-_14px)_100%,0_100%)] cut-edge-slant-r [--cut:14px] hover:border-accent-line hover:[--cut-line:var(--accent-line)] hover:border-l-accent hover:bg-panel-2"
+        className="grid min-w-0 cursor-pointer grid-cols-[116px_1fr] items-stretch border border-solid border-line border-l-4 border-l-[hsl(var(--phue)_72%_55%)] bg-panel text-left transition-[border-color,background] duration-[140ms] cut-slant-r [--cut:14px] cut-edge-slant-r [--cut:14px] hover:border-accent-line hover:[--cut-line:var(--accent-line)] hover:border-l-accent hover:bg-panel-2"
       >
         <div className="relative grid place-items-center overflow-hidden bg-panel-2">
           <div aria-hidden className="absolute inset-0 [background:radial-gradient(120%_120%_at_50%_0%,color-mix(in_srgb,hsl(var(--phue)_72%_45%)_26%,transparent),transparent_65%)]" />
@@ -131,7 +131,7 @@ export function PostCard({
       onKeyDown={onKey}
       role="button"
       tabIndex={0}
-      className="flex min-w-0 cursor-pointer flex-col overflow-hidden border border-solid border-line border-t-4 border-t-[hsl(var(--phue)_72%_55%)] bg-panel text-left transition-[border-color,transform] duration-[140ms] cut-corner cut-corner-edge hover:-translate-y-[3px] hover:border-accent-line"
+      className="flex min-w-0 cursor-pointer flex-col border border-solid border-line border-t-4 border-t-[hsl(var(--phue)_72%_55%)] bg-panel text-left transition-[border-color,transform] duration-[140ms] cut-corner cut-corner-edge hover:[--cut-line:var(--accent-line)] hover:-translate-y-[3px] hover:border-accent-line"
     >
       <div className="relative grid h-[132px] place-items-center overflow-hidden bg-panel-2">
         <div aria-hidden className="absolute inset-0 [background:radial-gradient(120%_100%_at_80%_0%,color-mix(in_srgb,hsl(var(--phue)_72%_45%)_24%,transparent),transparent_62%)]" />

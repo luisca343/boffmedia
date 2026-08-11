@@ -18,7 +18,7 @@ export function LinkedAccountRow({ icon, name, sub, hue, linked, end, className 
     <div
       className={cn(
         "flex items-center gap-[14px] border border-solid border-line bg-base px-[15px] py-3 [[data-theme=light]_&]:bg-panel",
-        "cut-tag",
+        "cut-tag cut-tag-edge [--cut-line:var(--line)]",
         className,
       )}
     >

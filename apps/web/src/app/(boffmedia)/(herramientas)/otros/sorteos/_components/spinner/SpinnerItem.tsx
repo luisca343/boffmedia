@@ -1,6 +1,7 @@
 "use client"
 
 import { useTranslations } from "next-intl"
+import { cn } from "@/lib/utils"
 
 interface SpinnerItemProps {
   name: string
@@ -10,10 +11,7 @@ interface SpinnerItemProps {
 }
 
 // cut-seal chamfer (top-left + bottom-right) — the v3 idiom for identity glyphs.
-const SEAL = "polygon(10px 0,100% 0,100% calc(100% - 10px),calc(100% - 10px) 100%,0 100%,0 10px)"
 // cut-corner (beveled top-right) — the v3 idiom for cards/panels.
-const CARD = "polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,0 100%)"
-
 function getInitials(name: string): string {
   const parts = name.trim().split(/\s+/).filter(Boolean)
   if (!parts.length) return "?"
@@ -29,14 +27,14 @@ export default function SpinnerItem({ name, isWinningItem, spinComplete }: Spinn
   return (
     <div
       // width 180 + mx 10*2 = 200px, matching the hook's ITEM_WIDTH (do not change)
-      className={
+      className={cn("cut-corner cut-corner-edge [--cut-lg:12px]", 
         "relative mx-[10px] flex h-64 w-[180px] flex-none flex-col items-center justify-center p-4 transition-all duration-500 " +
         (showWin
           ? "scale-[1.06] border border-accent bg-accent-soft"
           : "border border-line-2 bg-panel-2")
-      }
+      )}
       style={{
-        clipPath: CARD,
+        
         boxShadow: showWin
           ? "0 0 30px color-mix(in srgb, var(--accent) 34%, transparent), 0 0 80px color-mix(in srgb, var(--accent) 14%, transparent)"
           : "none",
@@ -53,12 +51,12 @@ export default function SpinnerItem({ name, isWinningItem, spinComplete }: Spinn
 
       {/* initials seal */}
       <div
-        className={
+        className={cn("cut-seal cut-seal-edge [--cut:10px]", 
           "mb-3 grid h-20 w-20 select-none place-items-center border font-display text-2xl font-extrabold not-italic " +
           (showWin ? "border-accent-line bg-accent text-accent-ink" : "border-line-2 bg-base-deep text-txt-muted")
-        }
+        )}
         style={{
-          clipPath: SEAL,
+          
           letterSpacing: initials.length > 1 ? "-0.03em" : "0",
         }}
       >

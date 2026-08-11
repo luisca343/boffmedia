@@ -126,7 +126,7 @@ function Badge({ tone, children }: { tone: "signal" | "warn"; children: React.Re
       : { color: "var(--warn)", background: "color-mix(in srgb, var(--warn) 12%, transparent)", borderColor: "color-mix(in srgb, var(--warn) 35%, transparent)" }
   return (
     <span
-      className="inline-flex whitespace-nowrap border border-solid px-[7px] py-1 font-mono text-[9px] font-semibold uppercase leading-none tracking-[0.1em] cut [--cut:2px]"
+      className="inline-flex whitespace-nowrap border border-solid px-[7px] py-1 font-mono text-[9px] font-semibold uppercase leading-none tracking-[0.1em] cut cut-edge-slant [--cut:2px]"
       style={style}
     >
       {children}

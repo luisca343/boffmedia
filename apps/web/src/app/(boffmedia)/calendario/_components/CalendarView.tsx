@@ -74,7 +74,7 @@ export function CalendarView() {
                       key={e.id}
                       href={`/eventos/${e.id}`}
                       className={cn(
-                        "group flex items-center gap-5 border border-solid border-line border-l-4 border-l-accent bg-panel px-5 py-3.5 no-underline cut-tag",
+                        "group flex items-center gap-5 border border-solid border-line border-l-4 border-l-accent bg-panel px-5 py-3.5 no-underline cut-tag cut-tag-edge",
                         "transition-[border-color,background] duration-[140ms] hover:border-accent-line hover:bg-panel-2",
                         status === "completed" && "opacity-70",
                       )}

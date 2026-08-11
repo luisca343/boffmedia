@@ -102,7 +102,7 @@ export function MgChapter({
       onClick={onClick}
       title={title}
       className={cn(
-        "cut [--cut:5px] inline-flex min-w-[40px] items-center justify-center gap-[4px] border border-solid px-[10px] py-[7px] font-mono text-[12px] font-semibold leading-none transition-colors",
+        "cut cut-edge-slant [--cut-line:var(--line-2)] [--cut:5px] inline-flex min-w-[40px] items-center justify-center gap-[4px] border border-solid px-[10px] py-[7px] font-mono text-[12px] font-semibold leading-none transition-colors",
         state === "on" && "border-accent bg-accent-soft text-accent",
         state === "done" && "border-transparent bg-ok-soft text-ok",
         state === "off" && "border-line-2 bg-base-2 text-txt-muted hover:border-line-2 hover:text-txt",
@@ -133,7 +133,7 @@ export function MgResult({
       onClick={onClick}
       className="group flex w-full items-center gap-3 border border-solid border-line bg-panel px-4 py-3 text-left transition-colors hover:border-accent-line hover:bg-panel-2"
     >
-      <MgCover src={cover} alt={title} className="h-14 w-10 flex-none cut-seal [--cut:6px]" />
+      <MgCover src={cover} alt={title} className="h-14 w-10 flex-none cut-seal cut-seal-edge [--cut-line:var(--accent-line)] [--cut:6px]" />
       <div className="min-w-0 flex-1">
         <p className="truncate text-[14px] font-medium text-txt transition-colors group-hover:text-accent">{title}</p>
         {sub && <p className="mt-0.5 truncate font-mono text-[11px] text-txt-dim">{sub}</p>}

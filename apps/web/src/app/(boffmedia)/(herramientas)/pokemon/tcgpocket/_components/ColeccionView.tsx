@@ -46,7 +46,7 @@ function CGroup({ set, cards, effective, editable, hideMissing, onAdd, onRemove,
   return (
     <div className="mb-[18px]">
       <button type="button" onClick={() => setOpen((v) => !v)} aria-expanded={open}
-        className="cut flex w-full items-center gap-[14px] border border-solid border-line bg-panel p-[13px_16px] text-left transition-colors hover:bg-panel-2">
+        className="cut cut-edge-slant flex w-full items-center gap-[14px] border border-solid border-line bg-panel p-[13px_16px] text-left transition-colors hover:bg-panel-2">
         <span className="cut [--cut:3px] flex-none bg-accent px-[7px] py-1 font-display text-[12px] font-bold leading-none text-accent-ink">{set.id}</span>
         <span className="font-display text-[17px] font-bold uppercase leading-none tracking-[0.02em] text-txt">{set.name}</span>
         <span className="font-mono text-[12px] leading-none text-txt-muted">{have}/{cards.length}</span>
@@ -164,7 +164,7 @@ export function ColeccionView({ data, collection, username, onOpenCard }: Props)
 
       <div className="grid grid-cols-1 items-start gap-5 xl:grid-cols-[1fr_minmax(280px,340px)]">
         <div>
-          <div className="cut mb-[18px] flex flex-wrap items-center gap-[10px] border border-solid border-line bg-panel p-[12px_14px]">
+          <div className="cut cut-edge-slant [--cut-line:var(--line)] mb-[18px] flex flex-wrap items-center gap-[10px] border border-solid border-line bg-panel p-[12px_14px]">
             <label className="flex min-w-[180px] flex-1 items-center gap-2 border border-solid border-line-2 bg-base px-3 py-2">
               <Icon name="search" size={18} className="text-txt-dim" />
               <input className="w-full bg-transparent font-body text-[14px] text-txt outline-none placeholder:text-txt-dim" placeholder={t("app.coleccion.searchPlaceholder")} value={q} onChange={(e) => setQ(e.target.value)} />
@@ -216,7 +216,7 @@ export function ColeccionView({ data, collection, username, onOpenCard }: Props)
       </div>
 
       {editable && dirtyCount > 0 && (
-        <div className="cut fixed bottom-[22px] left-1/2 z-[120] flex -translate-x-1/2 items-center gap-[14px] border border-solid border-accent-line bg-panel py-[11px] pl-[18px] pr-3 shadow-2xl motion-safe:animate-[bm-toast-in_.24s_both]">
+        <div className="cut cut-edge-slant [--cut-line:var(--accent-line)] fixed bottom-[22px] left-1/2 z-[120] flex -translate-x-1/2 items-center gap-[14px] border border-solid border-accent-line bg-panel py-[11px] pl-[18px] pr-3 shadow-2xl motion-safe:animate-[bm-toast-in_.24s_both]">
           <span className="text-[13px] leading-tight text-txt-muted">
             <b className="font-mono text-txt">{dirtyCount}</b> {t("app.coleccion.unsaved", { count: dirtyCount })}
           </span>

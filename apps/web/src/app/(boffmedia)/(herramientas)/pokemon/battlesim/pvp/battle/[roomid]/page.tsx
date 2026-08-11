@@ -217,7 +217,7 @@ export default function PvPBattlePage({ params }: { params: Promise<{ roomid: st
           {t('end.watchReplay')}
         </a>
       )}
-      <a href={LOBBY_HREF} className="bg-accent px-6 py-2 font-display text-[13px] font-bold uppercase leading-none tracking-[0.04em] text-accent-ink transition-[filter] hover:brightness-110" style={{ clipPath: 'polygon(4px 0,100% 0,calc(100% - 4px) 100%,0 100%)' }}>
+      <a href={LOBBY_HREF} className="cut [--cut:4px] bg-accent px-6 py-2 font-display text-[13px] font-bold uppercase leading-none tracking-[0.04em] text-accent-ink transition-[filter] hover:brightness-110">
         {t('end.playAgain')}
       </a>
     </div>

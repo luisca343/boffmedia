@@ -30,9 +30,9 @@ export function GameCover({ game, mini = false }: { game: GameCoverData; mini?: 
       aria-label={t("toolsOf", { game: game.name })}
       style={hueStyle(game.hueColor)}
       className={cn(
-        "group relative flex flex-col justify-end overflow-hidden border border-solid border-line bg-panel text-left no-underline",
-        "cut-corner [--cut-lg:18px] transition-[transform,border-color] duration-[140ms]",
-        "hover:-translate-y-1 hover:border-[color-mix(in_srgb,var(--ghue)_55%,var(--line))]",
+        "group relative flex flex-col justify-end border border-solid border-line bg-panel text-left no-underline",
+        "cut-corner cut-corner-edge [--cut-lg:18px] [--cut-line:var(--line)] transition-[transform,border-color] duration-[140ms]",
+        "hover:-translate-y-1 hover:border-[color-mix(in_srgb,var(--ghue)_55%,var(--line))] hover:[--cut-line:color-mix(in_srgb,var(--ghue)_55%,var(--line))]",
         mini ? "aspect-[21/9]" : "aspect-[15/11]",
       )}
     >

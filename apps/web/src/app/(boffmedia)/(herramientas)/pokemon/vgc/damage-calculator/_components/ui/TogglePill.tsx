@@ -28,11 +28,11 @@ export function TogglePill({ on, label, tone, onClick, title }: TogglePillProps)
       onClick={onClick}
       style={tone ? cssVars({ "--tone": tone }) : undefined}
       className={cn(
-        "cut-tag [--cut-tag:6px] cursor-pointer border border-solid px-[10px] py-[6px] font-mono text-[10px]/none font-semibold uppercase tracking-[0.06em]",
+        "cut-tag cut-tag-edge [--cut-tag:6px] cursor-pointer border border-solid px-[10px] py-[6px] font-mono text-[10px]/none font-semibold uppercase tracking-[0.06em]",
         "transition-[color,border-color,background] duration-[140ms]",
         on
-          ? "border-[color-mix(in_srgb,var(--tone,var(--accent))_55%,transparent)] bg-[color-mix(in_srgb,var(--tone,var(--accent))_11%,transparent)] text-[var(--tone,var(--accent))]"
-          : "border-line-2 bg-base text-txt-muted hover:border-line-2 hover:bg-panel-2 hover:text-txt",
+          ? "border-[color-mix(in_srgb,var(--tone,var(--accent))_55%,transparent)] [--cut-line:color-mix(in_srgb,var(--tone,var(--accent))_55%,transparent)] bg-[color-mix(in_srgb,var(--tone,var(--accent))_11%,transparent)] text-[var(--tone,var(--accent))]"
+          : "border-line-2 [--cut-line:var(--line-2)] bg-base text-txt-muted hover:border-line-2 hover:bg-panel-2 hover:text-txt",
       )}
     >
       {label}

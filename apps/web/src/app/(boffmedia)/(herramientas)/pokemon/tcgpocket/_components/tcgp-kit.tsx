@@ -97,7 +97,7 @@ function StepBtn({ dir, disabled, onClick, label }: { dir: "minus" | "plus"; dis
   return (
     <button
       type="button" aria-label={label} disabled={disabled} onClick={onClick}
-      className="cut [--cut:4px] grid h-7 w-7 flex-none place-items-center border border-solid border-line-2 bg-panel-2 text-txt transition-colors enabled:hover:border-accent enabled:hover:text-accent disabled:opacity-30"
+      className="cut cut-edge-slant [--cut-line:var(--line-2)] [--cut:4px] grid h-7 w-7 flex-none place-items-center border border-solid border-line-2 bg-panel-2 text-txt transition-colors enabled:hover:border-accent enabled:hover:text-accent disabled:opacity-30"
     >
       <Icon name={dir} size={15} />
     </button>
@@ -331,7 +331,7 @@ export function TcgPackTile({ setId, name, meta, hue, onOpen }: { setId: string;
 export function TcgStatTile({ icon, label, value, sub, hue }: { icon?: IconName; label: string; value: React.ReactNode; sub?: string; hue?: string }) {
   return (
     <div
-      className="cut-corner [--cut-lg:10px] relative flex flex-col gap-[3px] border border-solid border-line bg-panel px-4 py-[15px]"
+      className="cut-corner cut-corner-edge [--cut-lg:10px] relative flex flex-col gap-[3px] border border-solid border-line bg-panel px-4 py-[15px]"
       style={{ borderLeft: `3px solid ${hue || "var(--accent)"}` }}
     >
       {icon && <span className="absolute right-[13px] top-[13px]" style={{ color: hue || "var(--accent)" }}><Icon name={icon} size={17} /></span>}
@@ -369,7 +369,12 @@ export function TcgOddsTable({ rows, slotLabels, aggLabel, packLabel, bestLabel 
   rows: OddsTableRow[]; slotLabels: string[]; aggLabel: string; packLabel: string; bestLabel: string
 }) {
   return (
-    <div className="cut-corner [--cut-lg:10px] overflow-x-auto border border-solid border-line">
+    // The shape, border and stroke live on the wrapper; the scrolling lives
+    // inside it. On one element `overflow-x-auto` clips the stroke pseudo to the
+    // padding box, so the chamfer would lose its diagonal the moment the table
+    // became scrollable.
+    <div className="cut-corner cut-corner-edge [--cut-lg:10px] [--cut-line:var(--line)] border border-solid border-line">
+      <div className="overflow-x-auto">
       <table className="w-full border-collapse [font-variant-numeric:tabular-nums]">
         <thead>
           <tr>
@@ -397,6 +402,7 @@ export function TcgOddsTable({ rows, slotLabels, aggLabel, packLabel, bestLabel 
           ))}
         </tbody>
       </table>
+      </div>
     </div>
   )
 }
@@ -438,7 +444,7 @@ export function TcgCardDrawer({ card, list, count, editable, labels, onAdd, onRe
         className="fixed inset-y-0 right-0 z-[201] flex w-[min(560px,94vw)] flex-col border-l border-solid border-line-2 bg-base shadow-2xl animate-[bm-drawer-in_.24s_cubic-bezier(0.2,0.7,0.3,1)] motion-reduce:animate-none"
       >
         <div className="flex items-center gap-3 border-b border-solid border-line px-[18px] py-[15px]">
-          <span className="cut [--cut:3px] bg-accent px-[7px] py-1 font-display text-[12px] font-bold leading-none text-accent-ink">{card.setId}</span>
+          <span className="cut cut-edge-slant [--cut-line:var(--line-2)] [--cut:3px] bg-accent px-[7px] py-1 font-display text-[12px] font-bold leading-none text-accent-ink">{card.setId}</span>
           <b className="font-display text-[18px] font-bold uppercase leading-none tracking-[0.03em] text-txt">{card.name}</b>
           <div className="ml-auto flex gap-1">
             <button type="button" aria-label={labels.prev} onClick={() => step(-1)} className="grid h-8 w-8 place-items-center rounded border border-solid border-line-2 text-txt-muted hover:text-txt"><Icon name="back" size={15} /></button>
@@ -484,7 +490,7 @@ export function TcgCardDrawer({ card, list, count, editable, labels, onAdd, onRe
               </Spec2>
             )}
             {card.boosters && card.boosters.length > 0 && (
-              <Spec k={labels.availableIn} v={<span className="flex flex-wrap gap-1">{card.boosters.map((b) => <span key={b.id} className="cut [--cut:3px] border border-solid border-line-2 px-2 py-1 font-mono text-[11px] text-txt-muted">{b.name}</span>)}</span>} />
+              <Spec k={labels.availableIn} v={<span className="flex flex-wrap gap-1">{card.boosters.map((b) => <span key={b.id} className="cut cut-edge-slant [--cut-line:var(--line-2)] [--cut:3px] border border-solid border-line-2 px-2 py-1 font-mono text-[11px] text-txt-muted">{b.name}</span>)}</span>} />
             )}
             {card.illustrator && <Spec k={labels.illustrator} v={card.illustrator} />}
             {card.description && <p className="border-l-2 border-solid border-accent-line pl-3 text-[14px] italic leading-relaxed text-txt-muted">{card.description}</p>}

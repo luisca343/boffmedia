@@ -129,7 +129,7 @@ export function AuthorizeLauncherView() {
               <p className="font-body text-[15px]/[1.6] text-txt-muted text-pretty">
                 {t("confirmLead")}
               </p>
-              <div className="border border-solid border-line bg-panel-2 p-4 cut-tag">
+              <div className="border border-solid border-line bg-panel-2 p-4 cut-tag cut-tag-edge">
                 <div className="font-mono text-[10px] uppercase tracking-[0.16em] text-txt-dim">
                   {t("client")}
                 </div>

@@ -2,6 +2,7 @@
 
 import * as React from "react"
 import { Icon, IconButton, Avatar, type IconName } from "@boffmedia/ui"
+import { cn } from "@/lib/utils"
 import { initials, oddsOf, type Entrant } from "../../_lib/useSorteos"
 
 export const SRT_COLORS = [
@@ -179,7 +180,7 @@ export function SrtConfetti({ n = 54 }: { n?: number }) {
 /* small panel + head helpers (srt-panel) reused across the view */
 export function SrtPanel({ className, children }: { className?: string; children: React.ReactNode }) {
   return (
-    <div style={{ clipPath: "polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 0 100%)" }} className={"border border-line bg-panel " + (className ?? "")}>
+    <div className={cn("cut-corner cut-corner-edge [--cut-lg:14px]", "border border-line bg-panel " + (className ?? ""))}>
       {children}
     </div>
   )

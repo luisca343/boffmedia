@@ -5,24 +5,27 @@ import { Icon, type IconName } from "./icon"
 
 export type BannerTone = "info" | "success" | "error" | "warn"
 
+/** `--cut-line` repeats each tone's border colour because `.cut-seal-edge` draws
+ *  the two chamfer diagonals as its own paint, and it cannot read the `border-*`
+ *  utility — see the shape note on the wrapper below. */
 const TONES: Record<BannerTone, { wrap: string; ico: string; def: IconName }> = {
   info: {
-    wrap: "border-[color-mix(in_srgb,var(--info)_45%,transparent)] bg-signal-soft",
+    wrap: "border-[color-mix(in_srgb,var(--info)_45%,transparent)] [--cut-line:color-mix(in_srgb,var(--info)_45%,transparent)] bg-signal-soft",
     ico: "text-signal",
     def: "info",
   },
   success: {
-    wrap: "border-[color-mix(in_srgb,var(--ok)_45%,transparent)] bg-ok-soft",
+    wrap: "border-[color-mix(in_srgb,var(--ok)_45%,transparent)] [--cut-line:color-mix(in_srgb,var(--ok)_45%,transparent)] bg-ok-soft",
     ico: "text-ok",
     def: "check",
   },
   error: {
-    wrap: "border-[color-mix(in_srgb,var(--bad)_45%,transparent)] bg-bad-soft",
+    wrap: "border-[color-mix(in_srgb,var(--bad)_45%,transparent)] [--cut-line:color-mix(in_srgb,var(--bad)_45%,transparent)] bg-bad-soft",
     ico: "text-bad",
     def: "alert",
   },
   warn: {
-    wrap: "border-[color-mix(in_srgb,var(--warn)_45%,transparent)] bg-warn-soft",
+    wrap: "border-[color-mix(in_srgb,var(--warn)_45%,transparent)] [--cut-line:color-mix(in_srgb,var(--warn)_45%,transparent)] bg-warn-soft",
     ico: "text-warn",
     def: "alert",
   },
@@ -46,7 +49,15 @@ export function Banner({ tone = "info", title, children, icon, onClose, actions,
       role={tone === "error" ? "alert" : "status"}
       className={cn(
         "flex items-start gap-[11px] py-3 px-[14px] border border-solid",
-        "[clip-path:polygon(var(--cut)_0,100%_0,100%_calc(100%_-_var(--cut)),calc(100%_-_var(--cut))_100%,0_100%)]",
+        // `.cut-seal`, not a hand-written polygon: the inline one this replaced
+        // was the seal path MINUS its closing `0 var(--cut)` vertex, so instead
+        // of chamfering the top-left corner it closed straight from the
+        // bottom-left corner to a point along the top edge — one long diagonal
+        // down the whole left side. `-edge` then strokes the two chamfers the
+        // clip takes out of the border. Not `.cut-frame`: every tone fill is a
+        // translucent `*-soft`, and a translucent --cut-fill composites over the
+        // stroke slab instead of over the page behind it.
+        "cut-seal cut-seal-edge",
         toneCfg.wrap,
         className,
       )}

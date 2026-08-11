@@ -105,7 +105,7 @@ export function LzBannerCard({ game, popular, wished, onWish, onOpen }: { game: 
                 e.stopPropagation()
                 open()
               }}
-              className="grid h-[30px] w-9 flex-none place-items-center border border-solid border-accent bg-accent text-accent-ink transition-[background,border-color] duration-[140ms] cut cut-edge-slant [--cut-line:var(--accent)] [--cut:6px] hover:border-accent-bright hover:bg-accent-bright"
+              className="grid h-[30px] w-9 flex-none place-items-center border border-solid border-accent bg-accent text-accent-ink transition-[background,border-color] duration-[140ms] cut cut-edge-slant hover:[--cut-line:var(--accent-bright)] [--cut-line:var(--accent)] [--cut:6px] hover:border-accent-bright hover:bg-accent-bright"
             >
               <Icon name="play" size={14} />
             </button>

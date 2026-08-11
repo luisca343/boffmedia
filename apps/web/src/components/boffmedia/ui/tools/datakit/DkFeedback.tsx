@@ -25,7 +25,6 @@ export function DkEmpty({
   )
 }
 
-const SKEL_CUT = "polygon(0 0,100% 0,100% calc(100% - 7px),calc(100% - 7px) 100%,0 100%)"
 const SKEL_CLS = cn(
   "block w-full border border-solid border-line",
   "[background:linear-gradient(100deg,var(--panel)_40%,var(--panel-2)_50%,var(--panel)_60%)] [background-size:200%_100%]",
@@ -34,14 +33,14 @@ const SKEL_CLS = cn(
 
 /** Single shimmer block. */
 export function DkSkel({ h = 62, className, style }: { h?: number | string; className?: string; style?: React.CSSProperties }) {
-  return <span aria-hidden="true" style={{ height: h, clipPath: SKEL_CUT, ...style }} className={cn(SKEL_CLS, className)} />
+  return <span aria-hidden="true" style={{ height: h, ...style }} className={cn("cut-tag [--cut-tag:7px]", cn(SKEL_CLS, className))} />
 }
 
 export function DkSkelList({ rows = 6, h = 62, gap = 7, className }: { rows?: number; h?: number; gap?: number; className?: string }) {
   return (
     <div className="grid" style={{ gap }}>
       {Array.from({ length: rows }).map((_, i) => (
-        <span key={i} aria-hidden="true" style={{ height: h, clipPath: SKEL_CUT }} className={cn(SKEL_CLS, className)} />
+        <span key={i} aria-hidden="true" style={{ height: h }} className={cn("cut-tag [--cut-tag:7px]", cn(SKEL_CLS, className))} />
       ))}
     </div>
   )

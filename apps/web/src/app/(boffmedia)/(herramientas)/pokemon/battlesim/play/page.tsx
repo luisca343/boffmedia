@@ -97,8 +97,7 @@ function PlayInner() {
           <button
             type="button"
             onClick={handleCreateBattle}
-            style={{ clipPath: 'polygon(10px 0,100% 0,calc(100% - 10px) 100%,0 100%)' }}
-            className="flex items-center justify-center gap-2 bg-accent p-4 font-display text-[17px] font-extrabold italic uppercase leading-none tracking-[0.04em] text-accent-ink transition-[filter,transform] hover:-translate-y-px hover:brightness-110 focus-visible:outline-none"
+            className="cut [--cut:10px] flex items-center justify-center gap-2 bg-accent p-4 font-display text-[17px] font-extrabold italic uppercase leading-none tracking-[0.04em] text-accent-ink transition-[filter,transform] hover:-translate-y-px hover:brightness-110 focus-visible:outline-none"
           >
             <Icon name="sword" size={20} />{t('play.start')}
           </button>

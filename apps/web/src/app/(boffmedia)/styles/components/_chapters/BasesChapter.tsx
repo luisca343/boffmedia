@@ -70,7 +70,7 @@ export function BasesChapter() {
               <Sample title="Cortes" code=".cut · .cut-tag · .cut-corner">
                 <div className="flex gap-[22px] flex-wrap">
                   {[
-                    ["CUT 10px", "cut"],
+                    ["CUT 10px", "cut cut-edge-slant [--cut-line:var(--line-2)]"],
                     ["TAG 8px", "cut-tag"],
                     ["CORNER 16px", "cut-corner"],
                   ].map(([l, clip]) => (

@@ -45,7 +45,7 @@ export function TvComunidad() {
       <div
         data-glare
         className={cn(
-          "relative overflow-hidden border border-solid border-line px-6 pb-6 pt-[22px] backdrop-blur-[6px] [background:rgba(10,12,16,0.5)] [clip-path:polygon(0_0,100%_0,100%_100%,16px_100%,0_calc(100%_-_16px))] cut-edge-bl [--cut-e:16px] [[data-theme=light]_&]:[background:rgba(255,255,255,0.55)]",
+          "relative border border-solid border-line px-6 pb-6 pt-[22px] backdrop-blur-[6px] [background:rgba(10,12,16,0.5)] cut-bl cut-edge-bl [--cut-e:16px] [[data-theme=light]_&]:[background:rgba(255,255,255,0.55)]",
           GLARE,
           HUD_FRAME,
         )}

@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils"
 import { Icon } from "@boffmedia/ui"
 import { evOrgMeta, EV_BOFF, type EventOrganizerData } from "./events-util"
 
-const SEAL = "grid place-items-center flex-none font-display font-bold leading-none cut-seal [--cut:5px]"
+const SEAL = "grid place-items-center flex-none font-display font-bold leading-none cut-seal cut-seal-edge [--cut:5px]"
 
 /**
  * Who organizes the event. Three roles — boffmedia · coorg · platform — with a
@@ -25,13 +25,13 @@ export function EventOrganizer({
   const m = evOrgMeta(o.role)
   const dual = o.role !== "boffmedia"
 
-  const firstSeal = o.role === "platform" ? "text-txt bg-panel-2 border border-solid border-line-2" : "text-accent-ink bg-accent"
+  const firstSeal = o.role === "platform" ? "text-txt bg-panel-2 border border-solid border-line-2 [--cut-line:var(--line-2)]" : "text-accent-ink bg-accent"
   const partnerSeal =
     o.role === "coorg"
       ? "text-signal bg-signal-soft"
       : o.role === "platform"
         ? "text-accent-ink bg-accent"
-        : "text-txt bg-panel-2 border border-solid border-line-2"
+        : "text-txt bg-panel-2 border border-solid border-line-2 [--cut-line:var(--line-2)]"
 
   const seals = (sz: string, overlap: string) => (
     <span className={cn("inline-flex flex-none", variant === "block" && "mt-[2px]")}>
@@ -47,17 +47,19 @@ export function EventOrganizer({
         : o.role === "coorg"
           ? t("lineCoorg", { name: o.name })
           : t("linePlatform", { name: o.name })
+    // Each branch repeats its border colour as --cut-line, which is what draws
+    // the chamfer diagonal the clip removes.
     const tagCls =
       o.role === "coorg"
-        ? "text-signal bg-signal-soft border border-solid border-[color-mix(in_srgb,var(--signal)_40%,var(--line-2))]"
+        ? "text-signal bg-signal-soft border border-solid border-[color-mix(in_srgb,var(--signal)_40%,var(--line-2))] [--cut-line:color-mix(in_srgb,var(--signal)_40%,var(--line-2))]"
         : o.role === "platform"
-          ? "text-txt-muted bg-panel-2 border border-solid border-line-2"
-          : "text-accent bg-[color-mix(in_srgb,var(--accent)_10%,transparent)] border border-solid border-[color-mix(in_srgb,var(--accent)_40%,var(--line-2))]"
+          ? "text-txt-muted bg-panel-2 border border-solid border-line-2 [--cut-line:var(--line-2)]"
+          : "text-accent bg-[color-mix(in_srgb,var(--accent)_10%,transparent)] border border-solid border-[color-mix(in_srgb,var(--accent)_40%,var(--line-2))] [--cut-line:color-mix(in_srgb,var(--accent)_40%,var(--line-2))]"
     return (
       <div className={cn("flex items-start gap-[13px]", className)}>
         {seals("w-[34px] h-[34px] text-[14px]", "-ml-[10px]")}
         <div className="flex min-w-0 flex-col gap-[7px]">
-          <span className={cn("inline-flex items-center gap-[6px] self-start font-mono text-[9.5px] font-bold uppercase leading-none tracking-[0.13em] px-[9px] py-[5px] cut-tag [--cut-tag:4px]", tagCls)}>
+          <span className={cn("inline-flex items-center gap-[6px] self-start font-mono text-[9.5px] font-bold uppercase leading-none tracking-[0.13em] px-[9px] py-[5px] cut-tag cut-tag-edge [--cut-tag:4px]", tagCls)}>
             <Icon name={m.icon} size={12} />
             {t(m.tagKey)}
           </span>

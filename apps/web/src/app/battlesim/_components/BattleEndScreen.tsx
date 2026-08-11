@@ -84,8 +84,8 @@ export const BattleEndScreen = ({ battle, pov, username, onRestart }: {
       >
         {isWinner && (
           <span
-            className="absolute -top-3 left-4 font-mono font-bold text-t-4xs tracking-[.2em] px-2 py-0.5 uppercase"
-            style={{ background: accent, color: '#06070b', clipPath: 'polygon(0 0, 100% 0, calc(100% - 6px) 100%, 0 100%)' }}
+            className="cut-slant-r [--cut:6px] absolute -top-3 left-4 font-mono font-bold text-t-4xs tracking-[.2em] px-2 py-0.5 uppercase"
+            style={{ background: accent, color: '#06070b' }}
           >
             {t('end.winner')}
           </span>
@@ -177,11 +177,10 @@ export const BattleEndScreen = ({ battle, pov, username, onRestart }: {
 
         {/* CTA */}
         <button
-          className="end-cta bsx-focus font-display font-bold uppercase tracking-[.14em] text-t-sm px-10 py-3 cursor-pointer transition-transform duration-[var(--dur-fast)] hover:scale-[1.04] active:scale-[.98]"
+          className="cut [--cut:10px] end-cta bsx-focus font-display font-bold uppercase tracking-[.14em] text-t-sm px-10 py-3 cursor-pointer transition-transform duration-[var(--dur-fast)] hover:scale-[1.04] active:scale-[.98]"
           style={{
             background: `linear-gradient(135deg, ${accent}, color-mix(in srgb, ${accent} 60%, #000))`,
             color: '#06070b',
-            clipPath: 'polygon(10px 0, 100% 0, calc(100% - 10px) 100%, 0 100%)',
             boxShadow: `0 0 28px -8px ${accent}`,
           }}
           onClick={(e) => {

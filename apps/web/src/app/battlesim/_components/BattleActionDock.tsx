@@ -91,8 +91,7 @@ export function BattleActionDock({
       <div className="flex flex-col gap-3">
         {activeMechanic && (
           <span
-            className="inline-flex w-fit items-center gap-2 border border-accent-line bg-accent-soft px-[10px] py-[6px] font-mono text-[10.5px] font-semibold uppercase leading-none tracking-[0.06em] text-accent-bright"
-            style={{ clipPath: 'polygon(4px 0,100% 0,calc(100% - 4px) 100%,0 100%)' }}
+            className="cut cut-edge-slant [--cut-line:var(--accent-line)] [--cut:4px] inline-flex w-fit items-center gap-2 border border-accent-line bg-accent-soft px-[10px] py-[6px] font-mono text-[10.5px] font-semibold uppercase leading-none tracking-[0.06em] text-accent-bright"
           >
             <span aria-hidden>★</span>
             {t(`dock.mechanics.${activeMechanic}`)}
@@ -140,8 +139,7 @@ export function BattleActionDock({
         <button
           type="button"
           onClick={() => onChoice('team 1')}
-          style={{ clipPath: 'polygon(4px 0,100% 0,calc(100% - 4px) 100%,0 100%)' }}
-          className="self-start bg-accent px-4 py-2 font-display text-[13px] font-bold uppercase leading-none tracking-[0.04em] text-accent-ink transition-[filter] hover:brightness-110 focus-visible:outline-none"
+          className="cut [--cut:4px] self-start bg-accent px-4 py-2 font-display text-[13px] font-bold uppercase leading-none tracking-[0.04em] text-accent-ink transition-[filter] hover:brightness-110 focus-visible:outline-none"
         >
           {t('dock.confirmTeam')}
         </button>
@@ -172,8 +170,7 @@ export function BattleActionDock({
   return (
     <section
       aria-label={t('dock.aria')}
-      style={{ clipPath: 'polygon(0 0,100% 0,100% calc(100% - 14px),calc(100% - 14px) 100%,0 100%)' }}
-      className="min-h-[96px] border border-solid border-line bg-[color-mix(in_srgb,var(--panel)_88%,transparent)] p-3 backdrop-blur-[4px]"
+      className="cut-tag cut-tag-edge [--cut-tag:14px] min-h-[96px] border border-solid border-line bg-[color-mix(in_srgb,var(--panel)_88%,transparent)] p-3 backdrop-blur-[4px]"
     >
       <div key={phase} className="animate-[bm-menu-in_200ms_ease_both] motion-reduce:animate-none">
         {content}

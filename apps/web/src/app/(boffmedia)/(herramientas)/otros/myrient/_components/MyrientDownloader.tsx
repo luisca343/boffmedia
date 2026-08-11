@@ -353,7 +353,7 @@ export default function MyrientDownloader() {
         <div className="flex items-center gap-[8px]">
           <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-txt-dim">{t("consoleLabel")}</span>
           {selectedConsole ? (
-            <span className="cut [--cut:4px] inline-flex items-center border border-accent-line bg-accent-soft px-[8px] py-[4px] font-mono text-[10px] font-semibold uppercase tracking-[0.06em] text-accent">
+            <span className="cut cut-edge-slant [--cut-line:var(--accent-line)] [--cut:4px] inline-flex items-center border border-accent-line bg-accent-soft px-[8px] py-[4px] font-mono text-[10px] font-semibold uppercase tracking-[0.06em] text-accent">
               {CONSOLES[selectedConsole]?.shortLabel ?? selectedConsole}
             </span>
           ) : (
@@ -399,7 +399,7 @@ export default function MyrientDownloader() {
               <div className="flex flex-wrap items-center gap-[6px]">
                 <span className="font-mono text-[10px] uppercase tracking-[0.08em] text-txt-dim">{t("activeRegions")}</span>
                 {regions.map((r) => (
-                  <span key={r} className="cut [--cut:4px] inline-flex items-center gap-[6px] border border-accent-line bg-accent-soft py-[4px] pl-[8px] pr-[5px] font-mono text-[10px] font-semibold uppercase tracking-[0.06em] text-accent">
+                  <span key={r} className="cut cut-edge-slant [--cut-line:var(--accent-line)] [--cut:4px] inline-flex items-center gap-[6px] border border-accent-line bg-accent-soft py-[4px] pl-[8px] pr-[5px] font-mono text-[10px] font-semibold uppercase tracking-[0.06em] text-accent">
                     {r}
                     <button type="button" aria-label={t("removeRegion", { r })} onClick={() => removeRegion(r)} className="grid h-[16px] w-[16px] place-items-center text-accent/70 transition-opacity hover:text-accent">
                       <Icon name="x" size={11} />

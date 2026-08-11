@@ -32,11 +32,13 @@ export function EventCard({ event, layout }: { event: EventLike; layout?: "grid"
       href={`/eventos/${event.id}`}
       style={{ "--ghue": hue } as React.CSSProperties}
       className={cn(
-        "group relative flex overflow-hidden border border-solid border-line border-l-4 border-l-[var(--ghue)] bg-panel no-underline",
-        "transition-[border-color,background,transform] duration-[140ms] hover:-translate-y-[3px] hover:bg-panel-2 hover:border-[color-mix(in_srgb,var(--ghue)_45%,var(--line))]",
+        // No: the cut clip already clips descendants, and
+        // overflow trims the chamfer stroke off its own corner.
+        "group relative flex border border-solid border-line [--cut-line:var(--line)] border-l-4 border-l-[var(--ghue)] bg-panel no-underline",
+        "transition-[border-color,background,transform] duration-[140ms] hover:-translate-y-[3px] hover:bg-panel-2 hover:border-[color-mix(in_srgb,var(--ghue)_45%,var(--line))] hover:[--cut-line:color-mix(in_srgb,var(--ghue)_45%,var(--line))]",
         row
-          ? "flex-row items-center gap-5 px-[22px] py-4 [clip-path:polygon(0_0,100%_0,100%_100%,14px_100%,0_calc(100%_-_14px))] max-[560px]:flex-wrap"
-          : "flex-col px-5 pb-4 pt-[18px] cut-tag [--cut-tag:14px]",
+          ? "flex-row items-center gap-5 px-[22px] py-4 cut-bl cut-edge-bl [--cut-e:14px] max-[560px]:flex-wrap"
+          : "flex-col px-5 pb-4 pt-[18px] cut-tag cut-tag-edge [--cut-tag:14px]",
         status === "completed" && "opacity-70",
       )}
     >

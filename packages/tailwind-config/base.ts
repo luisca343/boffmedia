@@ -74,23 +74,41 @@ export const colors = {
  *  Boffmedia-only layer. Size via --cut/--cut-lg/--cut-tag; override
  *  per-instance with e.g. `[--cut:4px]`. */
 export const geometry = plugin(({ addComponents }) => {
-  /** A 1px band along one diagonal of a square, painted as a gradient so the
-   *  colour can come from a custom property. `dir` is the gradient direction,
+  /** A --cut-w-wide band along one diagonal of a box, painted as a gradient so
+   *  the colour can come from a custom property. `dir` is the gradient direction,
    *  which CSS defines as perpendicular to the diagonal joining the two corners
    *  it does NOT point at — so `to top right` bands the main (TL→BR) diagonal
-   *  and `to bottom right` bands the anti-diagonal (BL→TR). */
-  const band = (dir: string) =>
-    `linear-gradient(${dir}, transparent calc(50% - var(--cut-w, 1px) / 2), var(--cut-line, var(--line)) 0 calc(50% + var(--cut-w, 1px) / 2), transparent 0)`
+   *  and `to bottom right` bands the anti-diagonal (BL→TR).
+   *
+   *  `side` says which half of the box the shape KEEPS, in gradient-axis terms:
+   *  `lo` = the low-percentage side (toward the gradient's origin corner), `hi`
+   *  = the high side. The band is laid entirely on that side, never centred on
+   *  the diagonal — the diagonal is exactly where the clip-path cuts, so a
+   *  centred band loses its outer half and renders at --cut-w / 2. That is the
+   *  whole reason these strokes used to read thinner than the border they
+   *  continue. A CSS border sits inside the border box; so does this.
+   *
+   *  Each utility below passes its own `side` rather than deriving one: the
+   *  answer depends on the shape, not just on which corner the pseudo is
+   *  anchored to (`.cut-edge-slant`'s two halves sit on opposite sides while
+   *  sharing a direction). */
+  const band = (dir: string, side: "lo" | "hi") => {
+    const w = "var(--cut-w, 1px)"
+    const c = "var(--cut-line, var(--line))"
+    return side === "lo"
+      ? `linear-gradient(${dir}, transparent calc(50% - ${w}), ${c} 0 50%, transparent 0)`
+      : `linear-gradient(${dir}, transparent 50%, ${c} 0 calc(50% + ${w}), transparent 0)`
+  }
   /** Places a chamfer stroke over one corner. Sized off the shape's own token
    *  and pulled out by --cut-w, because an absolutely positioned pseudo is laid
    *  out against the PADDING box while clip-path cuts the BORDER box — without
    *  the offset the stroke lands one border-width inside its own chamfer. */
-  const edge = (size: string, dir: string, corner: Record<string, string>) => ({
+  const edge = (size: string, dir: string, side: "lo" | "hi", corner: Record<string, string>) => ({
     content: '""',
     position: "absolute" as const,
     width: size,
     height: size,
-    background: band(dir),
+    background: band(dir, side),
     // Above in-flow content, so a card whose child media reaches the corner
     // cannot paint over the stroke. Inert, so it never eats a click.
     zIndex: "2",
@@ -112,6 +130,25 @@ export const geometry = plugin(({ addComponents }) => {
     },
     ".cut-corner": {
       clipPath: "polygon(0 0, calc(100% - var(--cut-lg)) 0, 100% var(--cut-lg), 100% 100%, 0 100%)",
+    },
+    // Bottom-left chamfer alone, and the two-corner notch. Like the slants
+    // below, these had `-edge` strokes but no clip, so call sites hand-wrote the
+    // polygon. Both size off --cut-e to match the stroke that draws them.
+    ".cut-bl": {
+      clipPath: "polygon(0 0, 100% 0, 100% 100%, var(--cut-e, var(--cut-lg)) 100%, 0 calc(100% - var(--cut-e, var(--cut-lg))))",
+    },
+    ".cut-notch": {
+      clipPath:
+        "polygon(0 0, calc(100% - var(--cut-e, var(--cut-lg))) 0, 100% var(--cut-e, var(--cut-lg)), 100% 100%, var(--cut-e, var(--cut-lg)) 100%, 0 calc(100% - var(--cut-e, var(--cut-lg))))",
+    },
+    // Half-parallelograms: one slanted side, the other square. The `-edge`
+    // strokes for these already existed; the clips did not, so call sites that
+    // wanted the shape hand-wrote the polygon inline.
+    ".cut-slant-l": {
+      clipPath: "polygon(var(--cut) 0, 100% 0, 100% 100%, 0 100%)",
+    },
+    ".cut-slant-r": {
+      clipPath: "polygon(0 0, 100% 0, calc(100% - var(--cut)) 100%, 0 100%)",
     },
     ".cut-tag": {
       clipPath:
@@ -203,56 +240,63 @@ export const geometry = plugin(({ addComponents }) => {
     //
     // Pair each with its shape and set --cut-line to the border colour (default
     // --line); bump --cut-w to match a thicker border on the chamfered corner.
+    // The `side` argument is the half the CLIP KEEPS. A chamfer removes the
+    // triangle at its own corner, so a pseudo whose gradient points AT that
+    // corner keeps the low side, and one pointing away keeps the high side.
     ".cut-corner-edge": {
       position: "relative",
-      "&::after": edge("var(--cut-lg)", "to top right", { top: out, right: out }),
+      "&::after": edge("var(--cut-lg)", "to top right", "lo", { top: out, right: out }),
     },
     ".cut-tag-edge": {
       position: "relative",
-      "&::after": edge("var(--cut-tag, 8px)", "to bottom right", { bottom: out, right: out }),
+      "&::after": edge("var(--cut-tag, 8px)", "to bottom right", "lo", { bottom: out, right: out }),
     },
     // One-off chamfers that do not match a named shape: pick the corner and
     // size it with --cut-e (e.g. `cut-edge-bl [--cut-e:10px]`).
     ".cut-edge-tr": {
       position: "relative",
-      "&::after": edge("var(--cut-e, var(--cut-lg))", "to top right", { top: out, right: out }),
+      "&::after": edge("var(--cut-e, var(--cut-lg))", "to top right", "lo", { top: out, right: out }),
     },
     ".cut-edge-bl": {
       position: "relative",
-      "&::after": edge("var(--cut-e, var(--cut-lg))", "to top right", { bottom: out, left: out }),
+      "&::after": edge("var(--cut-e, var(--cut-lg))", "to top right", "hi", { bottom: out, left: out }),
     },
     ".cut-edge-tl": {
       position: "relative",
-      "&::after": edge("var(--cut-e, var(--cut-lg))", "to bottom right", { top: out, left: out }),
+      "&::after": edge("var(--cut-e, var(--cut-lg))", "to bottom right", "hi", { top: out, left: out }),
     },
     ".cut-edge-br": {
       position: "relative",
-      "&::after": edge("var(--cut-e, var(--cut-lg))", "to bottom right", { bottom: out, right: out }),
+      "&::after": edge("var(--cut-e, var(--cut-lg))", "to bottom right", "lo", { bottom: out, right: out }),
     },
     // Opposite-corner pairs. Both spend ::before as well as ::after — do not use
     // them on an element that already carries a ::before.
     ".cut-edge-notch": {
       position: "relative",
-      "&::before": edge("var(--cut-e, var(--cut-lg))", "to top right", { top: out, right: out }),
-      "&::after": edge("var(--cut-e, var(--cut-lg))", "to top right", { bottom: out, left: out }),
+      "&::before": edge("var(--cut-e, var(--cut-lg))", "to top right", "lo", { top: out, right: out }),
+      "&::after": edge("var(--cut-e, var(--cut-lg))", "to top right", "hi", { bottom: out, left: out }),
     },
     ".cut-seal-edge": {
       position: "relative",
-      "&::before": edge("var(--cut)", "to bottom right", { top: out, left: out }),
-      "&::after": edge("var(--cut)", "to bottom right", { bottom: out, right: out }),
+      "&::before": edge("var(--cut)", "to bottom right", "hi", { top: out, left: out }),
+      "&::after": edge("var(--cut)", "to bottom right", "lo", { bottom: out, right: out }),
     },
     // The parallelogram is the one shape whose left and right edges ARE the
     // diagonals, so the clip is right to discard those two borders — but then
     // nothing strokes the slants. Each is the anti-diagonal of a --cut-wide,
     // full-height box, so the same gradient band draws it at any height.
+    // The two slants keep OPPOSITE sides while sharing a direction — the
+    // parallelogram's interior is right of the left slant and left of the right
+    // one — which is why `side` is passed per pseudo rather than derived from
+    // the anchor corner.
     ".cut-edge-slant": {
       position: "relative",
       "&::before": {
-        ...edge("var(--cut)", "to bottom right", { top: out, left: out }),
+        ...edge("var(--cut)", "to bottom right", "hi", { top: out, left: out }),
         height: "calc(100% + var(--cut-w, 1px) * 2)",
       },
       "&::after": {
-        ...edge("var(--cut)", "to bottom right", { top: out, right: out }),
+        ...edge("var(--cut)", "to bottom right", "lo", { top: out, right: out }),
         height: "calc(100% + var(--cut-w, 1px) * 2)",
       },
     },
@@ -260,14 +304,14 @@ export const geometry = plugin(({ addComponents }) => {
     ".cut-edge-slant-l": {
       position: "relative",
       "&::after": {
-        ...edge("var(--cut)", "to bottom right", { top: out, left: out }),
+        ...edge("var(--cut)", "to bottom right", "hi", { top: out, left: out }),
         height: "calc(100% + var(--cut-w, 1px) * 2)",
       },
     },
     ".cut-edge-slant-r": {
       position: "relative",
       "&::after": {
-        ...edge("var(--cut)", "to bottom right", { top: out, right: out }),
+        ...edge("var(--cut)", "to bottom right", "lo", { top: out, right: out }),
         height: "calc(100% + var(--cut-w, 1px) * 2)",
       },
     },

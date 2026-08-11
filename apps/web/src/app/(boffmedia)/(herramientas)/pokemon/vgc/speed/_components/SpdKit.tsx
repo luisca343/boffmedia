@@ -57,9 +57,7 @@ export function SpdInput({
   const t = useTranslations("vgc.speed");
   return (
     <div
-      style={{ clipPath: "polygon(0 0,100% 0,100% calc(100% - 8px),calc(100% - 8px) 100%,0 100%)" }}
-      className={cn(
-        "inline-flex min-w-0 items-center gap-2 border border-solid border-line-2 bg-base px-[10px] text-txt-dim transition-[border-color] focus-within:border-accent",
+      className={cn("cut-tag cut-tag-edge [--cut-line:var(--line-2)] [--cut-tag:8px] ", "inline-flex min-w-0 items-center gap-2 border border-solid border-line-2 bg-base px-[10px] text-txt-dim transition-[border-color] focus-within:border-accent",
         className,
       )}
     >

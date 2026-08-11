@@ -61,8 +61,7 @@ export function BattleHeader({
   return (
     <header
       aria-label={t('header.aria')}
-      style={{ clipPath: 'polygon(0 0,100% 0,100% calc(100% - 12px),calc(100% - 12px) 100%,0 100%)' }}
-      className="flex flex-wrap items-center gap-x-3 gap-y-2 border border-solid border-line bg-[color-mix(in_srgb,var(--panel)_88%,transparent)] px-3 py-2 backdrop-blur-[4px]"
+      className="cut-tag cut-tag-edge [--cut-tag:12px] flex flex-wrap items-center gap-x-3 gap-y-2 border border-solid border-line bg-[color-mix(in_srgb,var(--panel)_88%,transparent)] px-3 py-2 backdrop-blur-[4px]"
     >
       <div className="flex min-w-0 flex-wrap items-center gap-2">
         {backHref && (
@@ -74,8 +73,8 @@ export function BattleHeader({
           </Link>
         )}
         <span
-          style={{ ['--tyc']: meta.tone, clipPath: 'polygon(3px 0,100% 0,calc(100% - 3px) 100%,0 100%)' } as CSSProperties}
-          className="flex-none border border-solid border-[color-mix(in_srgb,var(--tyc)_45%,transparent)] bg-[color-mix(in_srgb,var(--tyc)_14%,transparent)] px-2 py-1 font-mono text-[10px] font-bold uppercase leading-none tracking-[0.12em] text-[var(--tyc)]"
+          style={{ ['--tyc']: meta.tone } as CSSProperties}
+          className="cut cut-edge-slant [--cut:3px] flex-none border border-solid border-[color-mix(in_srgb,var(--tyc)_45%,transparent)] [--cut-line:color-mix(in_srgb,var(--tyc)_45%,transparent)] bg-[color-mix(in_srgb,var(--tyc)_14%,transparent)] px-2 py-1 font-mono text-[10px] font-bold uppercase leading-none tracking-[0.12em] text-[var(--tyc)]"
         >
           {t(`header.modes.${meta.labelKey}`)}
         </span>

@@ -31,15 +31,17 @@ export function TypeCards({ value, onChange }: TypeCardsProps) {
               onClick={() => onChange(ty.value)}
               aria-pressed={active}
               className={cn(
-                "cut-corner [--cut-lg:14px] flex items-center gap-4 border border-solid p-4 text-left",
+                "cut-corner cut-corner-edge [--cut-lg:14px] flex items-center gap-4 border border-solid p-4 text-left",
                 "transition-[border-color,background] duration-[140ms]",
-                active ? "border-accent bg-accent-soft" : "border-line bg-panel hover:border-accent-line",
+                active
+                  ? "border-accent [--cut-line:var(--accent)] bg-accent-soft"
+                  : "border-line [--cut-line:var(--line)] bg-panel hover:border-accent-line hover:[--cut-line:var(--accent-line)]",
               )}
             >
               <span
                 className={cn(
-                  "cut [--cut:7px] grid h-11 w-11 shrink-0 place-items-center border border-solid",
-                  active ? "border-accent text-accent-bright" : "border-line-2 text-txt-muted",
+                  "cut cut-edge-slant [--cut:7px] grid h-11 w-11 shrink-0 place-items-center border border-solid",
+                  active ? "border-accent [--cut-line:var(--accent)] text-accent-bright" : "border-line-2 [--cut-line:var(--line-2)] text-txt-muted",
                 )}
               >
                 <Icon name={ty.icon} size={20} />

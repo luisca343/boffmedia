@@ -54,8 +54,10 @@ export function NotifMenu({ initialItems, onMarkAllRead, onDismiss, onClear }: N
         onClick={() => setOpen((v) => !v)}
         className={cn(
           "relative inline-grid h-10 w-10 place-items-center border border-solid bg-panel transition-[color,border-color,background] duration-[140ms]",
-          "cut-tag",
-          open ? "border-accent-line text-accent-bright" : "border-line text-txt-muted hover:border-accent-line hover:text-accent-bright",
+          "cut-tag cut-tag-edge",
+          open
+            ? "border-accent-line [--cut-line:var(--accent-line)] text-accent-bright"
+            : "border-line [--cut-line:var(--line)] text-txt-muted hover:border-accent-line hover:[--cut-line:var(--accent-line)] hover:text-accent-bright",
         )}
       >
         <Icon name="bell" size={18} />

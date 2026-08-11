@@ -56,8 +56,7 @@ export function BattleConnectionState({
           <button
             type="button"
             onClick={onRetry}
-            style={{ clipPath: 'polygon(4px 0,100% 0,calc(100% - 4px) 100%,0 100%)' }}
-            className="bg-accent px-6 py-2 font-display text-[13px] font-bold uppercase leading-none tracking-[0.04em] text-accent-ink transition-[filter] hover:brightness-110 focus-visible:outline-none"
+            className="cut [--cut:4px] bg-accent px-6 py-2 font-display text-[13px] font-bold uppercase leading-none tracking-[0.04em] text-accent-ink transition-[filter] hover:brightness-110 focus-visible:outline-none"
           >
             {retryLabel ?? t('connection.tryAgain')}
           </button>

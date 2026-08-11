@@ -4,8 +4,6 @@ import { useTranslations } from "next-intl"
 import { Icon } from "@boffmedia/ui"
 import { useTrackerSync } from "@/features/vgc-tracker/context/TrackerSyncContext"
 
-const TAG_CUT = "polygon(3px 0,100% 0,calc(100% - 3px) 100%,0 100%)"
-
 export function SyncStatusBadge() {
   const t = useTranslations("vgc.tracker.sync")
   const { syncStatus, conflictMessage, refreshNow } = useTrackerSync()
@@ -31,17 +29,18 @@ export function SyncStatusBadge() {
     )
   }
 
+  // --cut-line repeats each tone's border colour: the two slants are painted
+  // geometry, and they cannot read a `border-*` utility.
   const tone =
     syncStatus === "idle"
-      ? "border-[color-mix(in_srgb,var(--ok)_45%,transparent)] bg-ok-soft text-ok"
+      ? "border-[color-mix(in_srgb,var(--ok)_45%,transparent)] [--cut-line:color-mix(in_srgb,var(--ok)_45%,transparent)] bg-ok-soft text-ok"
       : syncStatus === "syncing"
-        ? "border-[color-mix(in_srgb,var(--warn)_45%,transparent)] bg-warn-soft text-warn"
-        : "border-[color-mix(in_srgb,var(--bad)_45%,transparent)] bg-bad-soft text-bad"
+        ? "border-[color-mix(in_srgb,var(--warn)_45%,transparent)] [--cut-line:color-mix(in_srgb,var(--warn)_45%,transparent)] bg-warn-soft text-warn"
+        : "border-[color-mix(in_srgb,var(--bad)_45%,transparent)] [--cut-line:color-mix(in_srgb,var(--bad)_45%,transparent)] bg-bad-soft text-bad"
 
   return (
     <div
-      style={{ clipPath: TAG_CUT }}
-      className={`inline-flex select-none items-center gap-[6px] border border-solid px-[9px] py-[5px] font-mono text-[9px] font-bold uppercase tracking-[0.14em] ${tone}`}
+      className={`cut cut-edge-slant [--cut:3px] inline-flex select-none items-center gap-[6px] border border-solid px-[9px] py-[5px] font-mono text-[9px] font-bold uppercase tracking-[0.14em] ${tone}`}
       title={syncStatus === "idle" ? t("synced") : syncStatus === "syncing" ? t("syncing") : t("error")}
     >
       <Icon

@@ -4,16 +4,16 @@ import * as React from "react"
 import { useTranslations } from "next-intl"
 import { Kicker, SearchInput, Seg, Select, Empty, Button, Icon, Skeleton } from "@boffmedia/ui"
 import { useKeysV3 } from "../_lib/useKeysV3"
+import { cn } from "@/lib/utils"
 import { KvCard, KeyModal, type KvModalStrings } from "./ui/kv-kit"
 
 function StatChip({ icon, value, label, tone }: { icon: "layers" | "bookmark" | "check"; value: number; label: string; tone?: "ok" | "used" }) {
   return (
     <span
-      style={{ clipPath: "polygon(4px 0,100% 0,calc(100% - 4px) 100%,0 100%)" }}
-      className={
+      className={cn("cut cut-edge-slant [--cut:4px]", 
         "inline-flex items-center gap-[9px] border bg-panel-2 px-[12px] py-[9px] font-mono text-[11px] font-semibold uppercase leading-none tracking-[0.06em] " +
         (tone === "ok" ? "border-[color-mix(in_srgb,var(--ok)_35%,var(--line-2))] text-ok" : "border-line-2 text-txt-muted")
-      }
+      )}
     >
       <Icon name={icon} size={14} className={tone === "ok" ? "text-ok" : tone === "used" ? "text-txt-dim" : "text-txt-muted"} />
       <b className={"font-display text-[16px] font-extrabold italic leading-none " + (tone === "ok" ? "text-ok" : "text-txt")}>{value}</b>

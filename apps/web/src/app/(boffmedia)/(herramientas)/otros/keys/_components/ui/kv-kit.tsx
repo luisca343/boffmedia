@@ -3,6 +3,7 @@
 import * as React from "react"
 import { useTranslations } from "next-intl"
 import { Icon, Seg, Button, IconButton } from "@boffmedia/ui"
+import { cn } from "@/lib/utils"
 import type { SteamGame, MediaItem } from "../../_hooks/useFetchSteamData"
 
 /* ── steam art with graceful fallback ─────────────────────────────────────── */
@@ -35,16 +36,16 @@ export function KvArt({ src, name, className }: { src?: string; name: string; cl
 
 /* ── status chip (disponible | entregada) ─────────────────────────────────── */
 export function KvStatus({ given, label }: { given: boolean; label: string }) {
-  const clip = { clipPath: "polygon(4px 0,100% 0,calc(100% - 4px) 100%,0 100%)" }
+  const clip = {  }
   return (
     <span
       style={clip}
-      className={
+      className={cn("cut cut-edge-slant [--cut:4px]", 
         "inline-flex items-center gap-[7px] border px-[9px] py-[6px] font-mono text-[9.5px] font-bold uppercase leading-none tracking-[0.1em] " +
         (given
           ? "border-[color-mix(in_srgb,var(--warn)_28%,transparent)] bg-[color-mix(in_srgb,var(--warn)_8%,transparent)] text-txt-dim"
           : "border-[color-mix(in_srgb,var(--ok)_40%,transparent)] bg-ok-soft text-ok")
-      }
+      )}
     >
       <Icon name={given ? "check" : "bookmark"} size={11} />
       {label}
@@ -116,13 +117,12 @@ export function KvCard({
       type="button"
       onClick={() => onOpen(item)}
       aria-label={item.name}
-      style={{ clipPath: "polygon(0 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%)" }}
-      className={
-        "group relative flex cursor-pointer flex-col overflow-hidden border border-line bg-panel p-0 text-left " +
+      className={cn("cut-tag cut-tag-edge [--cut-tag:14px]", 
+        "group relative flex cursor-pointer flex-col border border-line bg-panel p-0 text-left " +
         "transition-[border-color,transform,background] duration-[140ms] hover:-translate-y-[3px] hover:bg-panel-2 " +
         "hover:border-[color-mix(in_srgb,var(--accent)_45%,var(--line))] " +
         (item.given ? "opacity-[0.72]" : "")
-      }
+      )}
     >
       <div className="relative aspect-[460/200] border-b border-line">
         <KvArt src={item.imageUrl} name={item.name} />
@@ -361,8 +361,7 @@ export function KeyModal({
     <div className="fixed inset-0 z-[200] grid place-items-center p-[20px]" role="dialog" aria-modal="true" aria-label={item.name}>
       <button type="button" aria-label={tc("close")} onClick={onClose} className="absolute inset-0 cursor-default border-0 bg-[rgba(0,0,0,0.62)] p-0 backdrop-blur-[3px]" />
       <div
-        style={{ clipPath: "polygon(0 0, calc(100% - 18px) 0, 100% 18px, 100% 100%, 0 100%)" }}
-        className="relative max-h-[92vh] w-[min(600px,100%)] overflow-y-auto border border-line-2 border-t-[3px] border-t-accent bg-panel animate-[bm-modal-in_var(--t-med,180ms)] motion-reduce:animate-none bm-scroll"
+        className="cut-corner cut-corner-edge [--cut-line:var(--line-2)] [--cut-lg:18px] relative max-h-[92vh] w-[min(600px,100%)] overflow-y-auto border border-line-2 border-t-[3px] border-t-accent bg-panel animate-[bm-modal-in_var(--t-med,180ms)] motion-reduce:animate-none bm-scroll"
       >
         <IconButton name="x" label={tc("close")} onClick={onClose} className="absolute right-[14px] top-[14px] z-[3]" />
         <div className="relative aspect-[460/172] border-b border-line">

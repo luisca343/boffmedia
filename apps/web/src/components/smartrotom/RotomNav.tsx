@@ -114,10 +114,10 @@ export function RotomNav() {
             <div
               key={notif.id}
               className={cn(
-                "cut-tag [--cut-tag:9px] p-2.5 border text-sm flex flex-col gap-1 transition-colors",
+                "cut-tag cut-tag-edge [--cut-tag:9px] p-2.5 border text-sm flex flex-col gap-1 transition-colors",
                 notif.isRead
-                  ? "bg-sr-panel border-sr-line text-sr-txt-muted"
-                  : "bg-sr-panel-2 border-sr-accent-line text-sr-txt"
+                  ? "bg-sr-panel border-sr-line [--cut-line:var(--sr-line)] text-sr-txt-muted"
+                  : "bg-sr-panel-2 border-sr-accent-line [--cut-line:var(--sr-accent-line)] text-sr-txt"
               )}
             >
               <div className="flex justify-between items-start gap-2">
@@ -204,7 +204,7 @@ export function RotomNav() {
                   {t("language")}
                 </h3>
               </div>
-              <div className="bg-sr-panel-2 border border-sr-line p-4 cut-corner [--cut-lg:12px]">
+              <div className="bg-sr-panel-2 border border-sr-line p-4 cut-corner cut-corner-edge [--cut-lg:12px] [--cut-line:var(--sr-line)]">
                 <LanguageSwitcher variant="mobile" />
               </div>
             </div>

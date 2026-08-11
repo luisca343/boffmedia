@@ -10,10 +10,13 @@ import { evHue, evNum, type PlayerLike } from "./events-util"
 // (compact list) and ParticipantStack (stacked avatars). Mirror eventos.css.
 // [deferred] — fed by demo rows until the ranking API exists.
 
-const CUT_RANK = "cut-seal [--cut:6px]"
-const CUT_PLACE = "cut-seal [--cut:7px]"
-const CUT_POD = "cut-corner [--cut-lg:14px]"
-const CUT_MORE = "cut-seal [--cut:8px]"
+// The -edge classes ride along with the shape: every branch that draws a border
+// sets --cut-line beside it, and a filled branch simply leaves the stroke
+// invisible against its own fill.
+const CUT_RANK = "cut-seal cut-seal-edge [--cut:6px]"
+const CUT_PLACE = "cut-seal cut-seal-edge [--cut:7px]"
+const CUT_POD = "cut-corner cut-corner-edge [--cut-lg:14px]"
+const CUT_MORE = "cut-seal cut-seal-edge [--cut:8px]"
 
 // ── ParticipantStack — grupo de avatares apilados ────────────────────────────
 export function ParticipantStack({ players, max = 8, size = 38 }: { players: PlayerLike[]; max?: number; size?: number }) {
@@ -33,7 +36,7 @@ export function ParticipantStack({ players, max = 8, size = 38 }: { players: Pla
       {extra > 0 && (
         <span
           className={cn(
-            "-ml-2.5 grid flex-none place-items-center border border-solid border-accent-line bg-panel-2 font-mono text-[12px]/none font-bold text-accent shadow-[0_0_0_2px_var(--panel)]",
+            "-ml-2.5 grid flex-none place-items-center border border-solid border-accent-line [--cut-line:var(--accent-line)] bg-panel-2 font-mono text-[12px]/none font-bold text-accent shadow-[0_0_0_2px_var(--panel)]",
             CUT_MORE,
           )}
           style={{ width: size, height: size }}
@@ -79,11 +82,11 @@ export function LeaderTable({
             const me = highlight === p.userId
             const rankCls =
               rank === 1
-                ? cn("bg-accent text-accent-ink", CUT_RANK)
+                ? cn("bg-accent text-accent-ink [--cut-line:var(--accent)]", CUT_RANK)
                 : rank === 2
-                  ? cn("border border-solid border-line-2 bg-panel-2 text-txt", CUT_RANK)
+                  ? cn("border border-solid border-line-2 [--cut-line:var(--line-2)] bg-panel-2 text-txt", CUT_RANK)
                   : rank === 3
-                    ? cn("border border-solid border-accent-line text-accent", CUT_RANK)
+                    ? cn("border border-solid border-accent-line [--cut-line:var(--accent-line)] text-accent", CUT_RANK)
                     : ""
             return (
               <tr
@@ -168,8 +171,8 @@ export function Podium({ players }: { players: PlayerLike[] }) {
               "relative flex flex-col items-center px-4 pb-[18px] pt-[46px] text-center",
               "border border-solid bg-panel",
               first
-                ? "border-accent-line bg-[linear-gradient(to_bottom,var(--accent-soft),var(--panel)_60%)] pt-[54px]"
-                : "border-line",
+                ? "border-accent-line [--cut-line:var(--accent-line)] bg-[linear-gradient(to_bottom,var(--accent-soft),var(--panel)_60%)] pt-[54px]"
+                : "border-line [--cut-line:var(--line)]",
               CUT_POD,
               "max-[720px]:flex-row max-[720px]:items-center max-[720px]:gap-[14px] max-[720px]:p-4 max-[720px]:text-left",
             )}
@@ -177,7 +180,7 @@ export function Podium({ players }: { players: PlayerLike[] }) {
             <span
               className={cn(
                 "absolute left-1/2 top-3 grid h-[34px] w-[34px] -translate-x-1/2 place-items-center font-display text-[18px]/none font-extrabold italic",
-                first ? "bg-accent text-accent-ink" : "border border-solid border-line-2 bg-panel-2 text-txt",
+                first ? "bg-accent text-accent-ink [--cut-line:var(--accent)]" : "border border-solid border-line-2 [--cut-line:var(--line-2)] bg-panel-2 text-txt",
                 CUT_PLACE,
                 "max-[720px]:static max-[720px]:translate-x-0",
               )}

@@ -4,8 +4,10 @@ import * as React from "react"
 import { cn } from "@/lib/utils"
 import type { TnCompetitor } from "./tournaments-util"
 
-const CUT_POD = "cut-corner [--cut-lg:14px]"
-const CUT_PLACE = "cut-corner [--cut-lg:6px]"
+const CUT_POD = "cut-corner cut-corner-edge [--cut-lg:14px]"
+// The place badge is a filled slab when first, a bordered one otherwise — the
+// stroke colour follows in the branch that sets the border.
+const CUT_PLACE = "cut-corner cut-corner-edge [--cut-lg:6px]"
 
 function PodiumAvatar({ c, size }: { c: TnCompetitor; size: number }) {
   const ini = (c.name || "?").trim()[0]?.toUpperCase() || "?"
@@ -46,8 +48,8 @@ export function TnPodium({ podium }: { podium: TnCompetitor[] }) {
               "relative flex flex-col items-center px-4 pb-[18px] pt-[46px] text-center",
               "border border-solid bg-panel",
               first
-                ? "border-accent-line bg-[linear-gradient(to_bottom,var(--accent-soft),var(--panel)_60%)] pt-[54px]"
-                : "border-line",
+                ? "border-accent-line [--cut-line:var(--accent-line)] bg-[linear-gradient(to_bottom,var(--accent-soft),var(--panel)_60%)] pt-[54px]"
+                : "border-line [--cut-line:var(--line)]",
               CUT_POD,
               "max-[720px]:flex-row max-[720px]:items-center max-[720px]:gap-[14px] max-[720px]:p-4 max-[720px]:text-left",
             )}
@@ -55,7 +57,7 @@ export function TnPodium({ podium }: { podium: TnCompetitor[] }) {
             <span
               className={cn(
                 "absolute left-1/2 top-3 grid h-[34px] w-[34px] -translate-x-1/2 place-items-center font-display text-[18px]/none font-extrabold italic",
-                first ? "bg-accent text-accent-ink" : "border border-solid border-line-2 bg-panel-2 text-txt",
+                first ? "bg-accent text-accent-ink [--cut-line:var(--accent)]" : "border border-solid border-line-2 [--cut-line:var(--line-2)] bg-panel-2 text-txt",
                 CUT_PLACE,
                 "max-[720px]:static max-[720px]:translate-x-0",
               )}

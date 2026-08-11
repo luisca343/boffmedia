@@ -11,7 +11,7 @@ export function RankInsignia({ icon, tier, sub, pct, metaLeft, metaRight, classN
       className={cn(
         "relative overflow-hidden border border-solid border-line border-l-4 border-l-accent p-[22px_24px]",
         "bg-[linear-gradient(150deg,var(--accent-soft),var(--panel)_62%)]",
-        "cut-corner [--cut-lg:14px]",
+        "cut-corner cut-corner-edge [--cut-lg:14px] [--cut-line:var(--line)]",
         className,
       )}
     >

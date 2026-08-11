@@ -46,7 +46,7 @@ export function AchievementsAdmin() {
         columns={[
           { key: "name", label: t("colAchievement"), render: (a) => (
             <div className="flex items-center gap-3">
-              <div className="cut-seal [--cut:7px] w-9 h-9 bg-accent-soft border border-solid border-accent-line flex items-center justify-center shrink-0">
+              <div className="cut-seal cut-seal-edge [--cut-line:var(--accent-line)] [--cut:7px] w-9 h-9 bg-accent-soft border border-solid border-accent-line flex items-center justify-center shrink-0">
                 <Icon name="trophy" size={16} className="text-accent" />
               </div>
               <div className="min-w-0">

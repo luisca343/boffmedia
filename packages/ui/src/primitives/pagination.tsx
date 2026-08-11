@@ -54,7 +54,10 @@ export function Pagination({ page, total, onChange, ariaLabel, className }: Pagi
             className={cn(
               BTN,
               p === page
-                ? "bg-accent border-accent text-accent-ink cut cut-edge-slant [--cut-line:var(--accent)] [--cut:4px]"
+                // The kit's bottom-right chamfer, the same one Button carries —
+                // this used to be `.cut`, the slanted parallelogram, which left
+                // the current page as the one leaning box in the whole pager.
+                ? "bg-accent border-accent text-accent-ink cut-tag cut-tag-edge [--cut-line:var(--accent)] [--cut-tag:8px]"
                 : "hover:enabled:text-txt hover:enabled:border-line-2",
             )}
           >

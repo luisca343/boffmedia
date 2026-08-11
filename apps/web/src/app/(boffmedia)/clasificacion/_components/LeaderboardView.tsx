@@ -88,7 +88,7 @@ export function LeaderboardView() {
         <Empty icon="search" title={t("empty.title")} lead={t("empty.lead")} />
       ) : (
         <>
-          <div className="overflow-hidden border border-solid border-line bg-panel cut-corner">
+          <div className=" border border-solid border-line bg-panel cut-corner cut-corner-edge">
             {pageRows.map((e, i) => (
               <LeaderRow
                 key={(e as { participantId?: number }).participantId ?? start + i}

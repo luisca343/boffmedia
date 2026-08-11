@@ -57,7 +57,7 @@ export function PokemonPanel({ poke, side, onChange, useChampions = false }: Pro
 
   return (
     <div
-      className="cut-corner grid gap-[14px] border border-t-[3px] border-solid border-line bg-panel p-4"
+      className="cut-corner cut-corner-edge grid gap-[14px] border border-t-[3px] border-solid border-line bg-panel p-4"
       style={cssVars({ "--cxc": color, borderTopColor: "var(--cxc)" })}
     >
       <div>

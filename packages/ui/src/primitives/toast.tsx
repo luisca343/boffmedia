@@ -79,7 +79,8 @@ export function ToastStack() {
             style={{ ["--tc" as string]: TONE_VAR[tone], boxShadow: "0 18px 44px -20px rgba(0,0,0,0.7)" }}
             className={cn(
               "pointer-events-auto flex items-start gap-[11px] py-[13px] px-[14px] bg-panel border border-solid border-line-2 border-l-[3px] border-l-[var(--tc)]",
-              "cut-tag [--cut-tag:9px] animate-[bm-toast-in_0.22s_cubic-bezier(0.2,0.8,0.2,1)] motion-reduce:animate-none",
+              "cut-tag cut-tag-edge [--cut-tag:9px] [--cut-line:var(--line-2)]",
+              "animate-[bm-toast-in_0.22s_cubic-bezier(0.2,0.8,0.2,1)] motion-reduce:animate-none",
             )}
           >
             <span className="flex-none mt-px text-[var(--tc)]">

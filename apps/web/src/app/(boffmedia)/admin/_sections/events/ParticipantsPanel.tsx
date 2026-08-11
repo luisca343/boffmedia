@@ -76,7 +76,7 @@ export function ParticipantsPanel({ eventId }: { eventId: number }) {
       {rows.length === 0 ? (
         <p className="text-txt-dim text-sm py-6 text-center">{t("empty")}</p>
       ) : (
-        <div className="border border-solid border-line bg-panel-2 cut-tag divide-y divide-line">
+        <div className="border border-solid border-line bg-panel-2 cut-tag cut-tag-edge divide-y divide-line">
           {rows.map((p) => (
             <div key={p.id} className="flex items-center gap-2 px-3 py-1.5">
               <span

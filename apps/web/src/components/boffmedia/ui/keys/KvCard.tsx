@@ -18,7 +18,7 @@ export function KvCard({ item, onOpen }: { item: KvKey; onOpen?: (item: KvKey) =
       aria-label={item.name}
       onClick={() => onOpen?.(item)}
       className={cn(
-        "group relative flex cursor-pointer flex-col overflow-hidden border border-solid border-line bg-panel p-0 text-left transition-[border-color,transform,background] duration-[140ms] cut-tag cut-tag-edge [--cut-tag:14px]",
+        "group relative flex cursor-pointer flex-col border border-solid border-line bg-panel p-0 text-left transition-[border-color,transform,background] duration-[140ms] cut-tag cut-tag-edge [--cut-tag:14px]",
         "hover:-translate-y-[3px] hover:border-[color-mix(in_srgb,var(--accent)_45%,var(--line))] hover:bg-panel-2",
         item.given && "opacity-[0.72]",
       )}

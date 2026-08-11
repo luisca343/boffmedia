@@ -71,7 +71,7 @@ export function EnvironmentPicker({
           />
           <button
             type="button"
-            className="cut-tag [--cut-tag:7px] bg-panel border border-line-2 px-3 py-2.5 text-left font-mono text-[11.5px] text-txt hover:border-accent hover:bg-accent-soft disabled:opacity-50"
+            className="cut-tag cut-tag-edge hover:[--cut-line:var(--accent)] [--cut-line:var(--line-2)] [--cut-tag:7px] bg-panel border border-line-2 px-3 py-2.5 text-left font-mono text-[11.5px] text-txt hover:border-accent hover:bg-accent-soft disabled:opacity-50"
             onClick={pickInstance}
             disabled={busy}
           >

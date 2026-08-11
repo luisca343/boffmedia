@@ -29,7 +29,7 @@ export function Tooltip({ label, side = "top", children, className }: TooltipPro
           "absolute z-[90] whitespace-nowrap pointer-events-none",
           "font-mono text-[11px] font-semibold leading-none tracking-[0.06em] text-txt",
           "bg-base-deep border border-solid border-line-2 py-2 px-[11px]",
-          "cut-tag [--cut-tag:7px]",
+          "cut-tag cut-tag-edge [--cut-tag:7px] [--cut-line:var(--line-2)]",
           "opacity-0 invisible transition-[opacity,transform,visibility] duration-[160ms]",
           "group-hover:opacity-100 group-hover:visible group-hover:[transition-delay:250ms]",
           "group-focus-within:opacity-100 group-focus-within:visible group-focus-within:[transition-delay:250ms]",

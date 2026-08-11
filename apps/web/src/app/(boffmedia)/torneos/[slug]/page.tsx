@@ -17,11 +17,11 @@ import { RegisterButton } from "../_components/RegisterButton"
 import * as A from "../_lib/adapt"
 
 const STATUS_TONE: Record<string, string> = {
-  live: "text-accent-bright border-accent-line",
-  registration: "text-ok border-ok",
-  completed: "text-txt-muted border-line-2",
-  draft: "text-txt-dim border-line",
-  cancelled: "text-bad border-bad",
+  live: "text-accent-bright border-accent-line [--cut-line:var(--accent-line)]",
+  registration: "text-ok border-ok [--cut-line:var(--ok)]",
+  completed: "text-txt-muted border-line-2 [--cut-line:var(--line-2)]",
+  draft: "text-txt-dim border-line [--cut-line:var(--line)]",
+  cancelled: "text-bad border-bad [--cut-line:var(--bad)]",
 }
 
 function formatDate(iso: string | null, locale: string): string | null {
@@ -79,8 +79,8 @@ export default function TorneoPage({
           </span>
           <span
             className={cn(
-              "inline-flex items-center border border-solid px-2 py-[3px] font-mono text-[10px] font-semibold uppercase tracking-[0.08em] cut [--cut:4px]",
-              STATUS_TONE[tn.status] ?? "text-txt-dim border-line",
+              "inline-flex items-center border border-solid px-2 py-[3px] font-mono text-[10px] font-semibold uppercase tracking-[0.08em] cut cut-edge-slant [--cut:4px]",
+              STATUS_TONE[tn.status] ?? "text-txt-dim border-line [--cut-line:var(--line)]",
             )}
           >
             {t(`status.${tn.status}`)}
@@ -145,7 +145,7 @@ function MyMatchBanner({ detail }: { detail: TournamentDetailApi }) {
   return (
     <Link
       href={`/torneos/${detail.slug}/partida/${detail.myMatchId}`}
-      className="cut mb-6 flex items-center gap-3 border border-solid border-accent-line bg-accent-soft px-4 py-3 transition-opacity hover:opacity-85 [--cut:6px]"
+      className="cut cut-edge-slant [--cut-line:var(--accent-line)] mb-6 flex items-center gap-3 border border-solid border-accent-line bg-accent-soft px-4 py-3 transition-opacity hover:opacity-85 [--cut:6px]"
     >
       <Icon name="zap" size={16} className="flex-none text-accent-bright" />
       <span className="flex-1 font-body text-[14px] font-semibold text-txt">

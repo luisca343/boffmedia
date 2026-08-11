@@ -16,8 +16,10 @@ function LeaderAvatar({ src, initial, top3 }: { src?: string | null; initial: st
   return (
     <span
       className={cn(
-        "relative grid h-[38px] w-[38px] shrink-0 place-items-center overflow-hidden border border-solid bg-panel-2 font-display text-[15px] font-extrabold italic text-accent cut-seal [--cut:6px]",
-        top3 ? "border-accent" : "border-line-2",
+        // No: the seal clip already clips the image, and
+        // overflow would trim the chamfer strokes off their own corners.
+        "relative grid h-[38px] w-[38px] shrink-0 place-items-center border border-solid bg-panel-2 font-display text-[15px] font-extrabold italic text-accent cut-seal cut-seal-edge [--cut:6px]",
+        top3 ? "border-accent [--cut-line:var(--accent)]" : "border-line-2 [--cut-line:var(--line-2)]",
       )}
     >
       <ArtImage src={src} alt="" sizes="38px" fallback={<span>{initial}</span>} />

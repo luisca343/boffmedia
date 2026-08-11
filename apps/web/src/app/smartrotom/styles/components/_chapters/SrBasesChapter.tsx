@@ -189,7 +189,7 @@ export function SrBasesChapter() {
           <span className="cut [--cut:7px] bg-sr-accent px-4 py-2 font-mono text-[11px] font-semibold uppercase tracking-[0.12em] text-sr-accent-ink">
             accent · ink
           </span>
-          <span className="cut [--cut:7px] border border-solid border-sr-accent-line bg-sr-accent-soft px-4 py-2 font-mono text-[11px] font-semibold uppercase tracking-[0.12em] text-sr-accent-bright">
+          <span className="cut cut-edge-slant [--cut:7px] [--cut-line:var(--sr-accent-line)] border border-solid border-sr-accent-line bg-sr-accent-soft px-4 py-2 font-mono text-[11px] font-semibold uppercase tracking-[0.12em] text-sr-accent-bright">
             accent-soft · line
           </span>
           <span className="font-body text-[14px] text-sr-txt-muted">← cambia con el tema activo</span>

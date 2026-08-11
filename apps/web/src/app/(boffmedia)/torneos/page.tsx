@@ -99,7 +99,7 @@ function TorneoCard({ t }: { t: TournamentSummaryApi }) {
   return (
     <Link
       href={`/torneos/${t.slug}`}
-      className="cut-corner group grid content-start gap-3 border border-solid border-line bg-panel p-4 transition-colors hover:border-line-2"
+      className="cut-corner cut-corner-edge hover:[--cut-line:var(--line-2)] [--cut-line:var(--line)] group grid content-start gap-3 border border-solid border-line bg-panel p-4 transition-colors hover:border-line-2"
     >
       <div className="flex items-center justify-between">
         <TnFormatBadge format={t.format} size="sm" />

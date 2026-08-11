@@ -15,7 +15,7 @@ type BaseStats = Record<StatKey, number>
 
 // Compact cell control.
 const CELL =
-  "w-full cut-tag [--cut-tag:5px] border border-solid border-line-2 bg-base [[data-theme=light]_&]:bg-panel-2 px-[7px] py-[5px] font-mono text-[11px] text-txt outline-none focus:border-accent"
+  "w-full cut-tag cut-tag-edge [--cut-tag:5px] [--cut-line:var(--line-2)] border border-solid border-line-2 bg-base [[data-theme=light]_&]:bg-panel-2 px-[7px] py-[5px] font-mono text-[11px] text-txt outline-none focus:border-accent focus:[--cut-line:var(--accent)]"
 
 const CELL_CARET: React.CSSProperties = {
   backgroundImage:

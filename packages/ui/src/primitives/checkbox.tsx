@@ -39,10 +39,10 @@ export function Checkbox({ checked, defaultChecked, onChange, label, disabled, c
         aria-hidden="true"
         className={cn(
           "flex-none grid place-items-center w-5 h-5 border border-solid transition-[background,border-color] duration-[140ms]",
-          "cut-tag [--cut-tag:6px]",
+          "cut-tag cut-tag-edge [--cut-tag:6px]",
           val
-            ? "bg-accent border-accent"
-            : "bg-base border-line-2 [.group:enabled:hover_&]:border-accent",
+            ? "bg-accent border-accent [--cut-line:var(--accent)]"
+            : "bg-base border-line-2 [--cut-line:var(--line-2)] [.group:enabled:hover_&]:border-accent [.group:enabled:hover_&]:[--cut-line:var(--accent)]",
         )}
       >
         <Icon

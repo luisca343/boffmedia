@@ -26,7 +26,7 @@ export function CmAvatar({
   return (
     <span
       style={{ "--h": h, width: size, height: size, fontSize: size ? size * 0.44 : undefined } as React.CSSProperties}
-      className="relative inline-grid h-[34px] w-[34px] flex-none place-items-center overflow-hidden border border-solid border-[color-mix(in_srgb,hsl(var(--h)_70%_50%)_40%,var(--line-2))] bg-[color-mix(in_srgb,hsl(var(--h)_70%_50%)_16%,var(--panel-2))] font-display text-[15px]/none font-extrabold italic text-[hsl(var(--h)_78%_62%)] cut-seal cut-seal-edge [--cut-line:color-mix(in_srgb,hsl(var(--h)_70%_50%)_40%,var(--line-2))] [--cut:8px]"
+      className="relative inline-grid h-[34px] w-[34px] flex-none place-items-center border border-solid border-[color-mix(in_srgb,hsl(var(--h)_70%_50%)_40%,var(--line-2))] bg-[color-mix(in_srgb,hsl(var(--h)_70%_50%)_16%,var(--panel-2))] font-display text-[15px]/none font-extrabold italic text-[hsl(var(--h)_78%_62%)] cut-seal cut-seal-edge [--cut-line:color-mix(in_srgb,hsl(var(--h)_70%_50%)_40%,var(--line-2))] [--cut:8px]"
     >
       {author?.avatarUrl ? (
         <ArtImage src={author.avatarUrl} alt={author.name ?? ""} width={px} height={px} className="h-full w-full" fallback={<span>{ch}</span>} />

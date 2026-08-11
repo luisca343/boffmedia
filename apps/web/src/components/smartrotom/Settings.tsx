@@ -25,9 +25,9 @@ function SectionLabel({ icon: Icon, children }: { icon: typeof Sun; children: Re
 }
 
 const tileBase =
-  "group flex flex-col items-center gap-1.5 p-2 cut [--cut:6px] border transition-[background,border-color] duration-150";
-const tileActive = "border-sr-accent bg-sr-accent-soft";
-const tileIdle = "border-sr-line bg-sr-panel hover:bg-sr-panel-2 hover:border-sr-line-2";
+  "group flex flex-col items-center gap-1.5 p-2 cut cut-edge-slant [--cut:6px] border transition-[background,border-color] duration-150";
+const tileActive = "border-sr-accent [--cut-line:var(--sr-accent)] bg-sr-accent-soft";
+const tileIdle = "border-sr-line [--cut-line:var(--sr-line)] bg-sr-panel hover:bg-sr-panel-2 hover:border-sr-line-2 hover:[--cut-line:var(--sr-line-2)]";
 
 export function SettingsPage() {
   const { session } = useBoffSession();
@@ -122,7 +122,7 @@ export function SettingsPage() {
       {isDev && session && (
         <div>
           <SectionLabel icon={Bug}>Debug</SectionLabel>
-          <div className="bg-sr-bg border border-sr-line cut-corner [--cut-lg:10px] overflow-hidden">
+          <div className="bg-sr-bg border border-sr-line cut-corner cut-corner-edge [--cut-lg:10px] [--cut-line:var(--sr-line)]">
             {/* Session info header */}
             <div className="flex items-center justify-between px-3 py-2 bg-sr-panel-2 border-b border-sr-line">
               <div className="flex items-center gap-2">

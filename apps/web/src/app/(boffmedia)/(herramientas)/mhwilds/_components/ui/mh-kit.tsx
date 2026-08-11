@@ -43,7 +43,7 @@ export function MhBar({ children }: { children: React.ReactNode }) {
 
 export function MhSeal({ name }: { name: IconName }) {
   return (
-    <span className="w-[34px] h-[34px] flex-none grid place-items-center bg-[var(--mh-soft)] text-[var(--mh-bright)] border border-[var(--mh-line)] cut [--cut:9px]">
+    <span className="w-[34px] h-[34px] flex-none grid place-items-center bg-[var(--mh-soft)] text-[var(--mh-bright)] border border-[var(--mh-line)] cut cut-edge-slant [--cut:9px] [--cut-line:var(--mh-line)]">
       <Icon name={name} size={18} />
     </span>
   )
@@ -91,7 +91,7 @@ export function MhPanel({
   title?: React.ReactNode; icon?: IconName; count?: React.ReactNode; aside?: React.ReactNode; children: React.ReactNode; className?: string
 }) {
   return (
-    <section className={`bg-panel border border-line cut-corner ${className}`}>
+    <section className={`bg-panel border border-line cut-corner cut-corner-edge ${className}`}>
       {(title || aside) && (
         <div className="flex items-center gap-2.5 px-[15px] pt-3 pb-[11px] border-b border-line">
           {icon && <Icon name={icon} size={15} className="text-[var(--mh-bright)]" />}
@@ -513,7 +513,7 @@ export function MhNodeCard({
       data-node
       onClick={onSelect}
       style={{ ...style, borderLeftColor: rarVar(rarity) }}
-      className={`absolute box-border bg-panel border border-line border-l-[3px] py-[9px] px-[11px] text-left cursor-pointer transition-[border-color,box-shadow,transform,opacity] hover:-translate-y-0.5 hover:border-line-2 cut [--cut:9px] ${selected ? "!border-[var(--mh)] shadow-[0_0_0_1px_var(--mh),0_12px_30px_-14px_#000]" : ""} ${dim ? "opacity-[0.34]" : ""}`}
+      className={`absolute box-border bg-panel border border-line border-l-[3px] py-[9px] px-[11px] text-left cursor-pointer transition-[border-color,box-shadow,transform,opacity] hover:-translate-y-0.5 hover:border-line-2 hover:[--cut-line:var(--line-2)] cut cut-edge-slant [--cut:9px] ${selected ? "!border-[var(--mh)] [--cut-line:var(--line)] shadow-[0_0_0_1px_var(--mh),0_12px_30px_-14px_#000]" : ""} ${dim ? "opacity-[0.34]" : ""}`}
     >
       {owned && <span className="absolute top-2 right-[9px] w-[7px] h-[7px] rounded-full bg-[var(--mh)] shadow-[0_0_0_3px_var(--mh-soft)]" />}
       <span className="flex items-center gap-[7px] mb-1.5">

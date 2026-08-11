@@ -41,8 +41,10 @@ export function RegionChip({ label, on, onClick }: { label: string; on: boolean;
       type="button"
       onClick={onClick}
       className={
-        "cut [--cut:4px] border px-[11px] py-[6px] font-mono text-[11px] font-semibold uppercase tracking-[0.06em] transition-colors " +
-        (on ? "border-accent bg-accent-soft text-accent" : "border-line bg-panel text-txt-muted hover:border-line-2 hover:text-txt")
+        "cut cut-edge-slant [--cut:4px] border px-[11px] py-[6px] font-mono text-[11px] font-semibold uppercase tracking-[0.06em] transition-colors " +
+        (on
+          ? "border-accent [--cut-line:var(--accent)] bg-accent-soft text-accent"
+          : "border-line [--cut-line:var(--line)] bg-panel text-txt-muted hover:border-line-2 hover:[--cut-line:var(--line-2)] hover:text-txt")
       }
     >
       {label}

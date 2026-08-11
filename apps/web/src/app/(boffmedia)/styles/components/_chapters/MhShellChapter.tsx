@@ -45,7 +45,7 @@ export function MhShellChapter() {
       <Section id="mhshelldmg" kicker="Monster Hunter" title="Laboratorio de daño" lead={<>El Laboratorio cruza un arma con la tabla de hitzones de un monstruo. Cada parte muestra el índice de daño físico + elemental con la mejor resaltada.</>}>
         <Sample title="Selector arma × monstruo" code=".mh-dmgsel" col>
           <div className="flex w-full flex-wrap items-stretch gap-3">
-            <div style={{ "--sh": 15 } as React.CSSProperties} className="flex flex-1 basis-[300px] cursor-pointer items-center gap-3 border border-solid border-line bg-panel px-[14px] py-3 text-left transition-[border-color,background] duration-[140ms] cut-corner [--cut-lg:10px] hover:border-line-2 hover:bg-panel-2">
+            <div style={{ "--sh": 15 } as React.CSSProperties} className="flex flex-1 basis-[300px] cursor-pointer items-center gap-3 border border-solid border-line bg-panel px-[14px] py-3 text-left transition-[border-color,background] duration-[140ms] cut-corner cut-corner-edge hover:[--cut-line:var(--line-2)] [--cut-line:var(--line)] [--cut-lg:10px] hover:border-line-2 hover:bg-panel-2">
               <span className="grid h-11 w-11 flex-none place-items-center border border-solid border-[hsl(var(--sh)_52%_46%/0.4)] bg-[hsl(var(--sh)_52%_46%/0.13)] text-[hsl(var(--sh)_58%_60%)]">
                 <Icon name="sword" size={22} />
               </span>
@@ -59,7 +59,7 @@ export function MhShellChapter() {
               <Icon name="edit" size={16} className="flex-none text-txt-dim" />
             </div>
             <span className="flex-none self-center font-mono text-[11px]/none font-bold uppercase tracking-[0.1em] text-txt-dim">contra</span>
-            <div className="flex flex-1 basis-[300px] cursor-pointer items-center gap-3 border border-solid border-line bg-panel px-[14px] py-3 text-left transition-[border-color,background] duration-[140ms] cut-corner [--cut-lg:10px] hover:border-line-2 hover:bg-panel-2">
+            <div className="flex flex-1 basis-[300px] cursor-pointer items-center gap-3 border border-solid border-line bg-panel px-[14px] py-3 text-left transition-[border-color,background] duration-[140ms] cut-corner cut-corner-edge hover:[--cut-line:var(--line-2)] [--cut-line:var(--line)] [--cut-lg:10px] hover:border-line-2 hover:bg-panel-2">
               <span className="grid h-11 w-11 flex-none place-items-center border border-solid border-[hsl(8_52%_46%/0.4)] bg-[hsl(8_52%_46%/0.13)] text-[hsl(8_58%_60%)]">
                 <Icon name="skull" size={22} />
               </span>
@@ -115,7 +115,7 @@ export function MhShellChapter() {
 
       <Section id="mhshellhunt" kicker="Monster Hunter" title="Lista de caza" lead={<>La Caza agrupa por monstruo los materiales que faltan para tus objetivos (builds guardadas + favoritos), con casillas de progreso sincronizadas con el Planner.</>}>
         <Sample title="Tarjeta de caza" code=".mh-huntcard" col>
-          <div className="w-full max-w-[460px] border border-solid border-line bg-panel cut-corner">
+          <div className="w-full max-w-[460px] border border-solid border-line bg-panel cut-corner cut-corner-edge">
             <div className="flex items-center gap-[11px] border-b border-solid border-line px-[14px] py-3">
               <span className="grid h-[34px] w-[34px] flex-none place-items-center border border-solid border-[hsl(8_60%_55%/0.4)] bg-[hsl(8_60%_55%/0.13)] text-[hsl(8_70%_62%)]">
                 <Icon name="skull" size={18} />

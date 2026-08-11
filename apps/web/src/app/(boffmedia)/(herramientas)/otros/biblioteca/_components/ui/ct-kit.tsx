@@ -41,8 +41,10 @@ export function RegionChip({ label, on, onClick }: { label: string; on: boolean;
       type="button"
       onClick={onClick}
       className={
-        "cut [--cut:4px] border px-[11px] py-[6px] font-mono text-[11px] font-semibold uppercase tracking-[0.06em] transition-colors " +
-        (on ? "border-accent bg-accent-soft text-accent" : "border-line bg-panel text-txt-muted hover:border-line-2 hover:text-txt")
+        "cut cut-edge-slant [--cut:4px] border px-[11px] py-[6px] font-mono text-[11px] font-semibold uppercase tracking-[0.06em] transition-colors " +
+        (on
+          ? "border-accent [--cut-line:var(--accent)] bg-accent-soft text-accent"
+          : "border-line [--cut-line:var(--line)] bg-panel text-txt-muted hover:border-line-2 hover:[--cut-line:var(--line-2)] hover:text-txt")
       }
     >
       {label}
@@ -71,7 +73,7 @@ function FileRow({ consoleKey, filename, size, downloadLabel }: { consoleKey: st
       <a
         href={ScrapeService.getServeFileUrl(consoleKey, filename)}
         download={filename}
-        className="cut [--cut:6px] inline-flex flex-none items-center gap-[6px] border border-line-2 bg-panel-2 px-[10px] py-[6px] font-mono text-[10px] font-semibold uppercase tracking-[0.06em] text-txt transition-colors hover:border-accent-line hover:text-accent"
+        className="cut cut-edge-slant hover:[--cut-line:var(--accent-line)] [--cut-line:var(--line-2)] [--cut:6px] inline-flex flex-none items-center gap-[6px] border border-line-2 bg-panel-2 px-[10px] py-[6px] font-mono text-[10px] font-semibold uppercase tracking-[0.06em] text-txt transition-colors hover:border-accent-line hover:text-accent"
       >
         <Icon name="download" size={13} />
         {downloadLabel}

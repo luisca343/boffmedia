@@ -143,7 +143,7 @@ export function SorteosChapter() {
         }
       >
         <Sample title="Premio" code="<SrtPrizeShowcase sorteo>" col>
-          <div className="w-full border border-solid border-line bg-panel cut-corner [--cut-lg:14px]">
+          <div className="w-full border border-solid border-line bg-panel cut-corner cut-corner-edge [--cut-lg:14px]">
             <div className="p-5">
               <SrtPrizeShowcase sorteo={featured} />
             </div>

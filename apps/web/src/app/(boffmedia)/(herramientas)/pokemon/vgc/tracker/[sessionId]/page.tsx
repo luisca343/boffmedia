@@ -362,9 +362,7 @@ function RoundBtn({ on, onClick, children }: { on: boolean; onClick: () => void;
     <button
       type="button"
       onClick={onClick}
-      style={{ clipPath: "polygon(0 0,100% 0,100% calc(100% - 6px),calc(100% - 6px) 100%,0 100%)" }}
-      className={cn(
-        "border border-solid px-[10px] py-[6px] font-mono text-[10px] font-semibold uppercase leading-none tracking-[0.06em] transition-[color,background,border-color]",
+      className={cn("cut-tag cut-tag-edge [--cut-tag:6px] ", "border border-solid px-[10px] py-[6px] font-mono text-[10px] font-semibold uppercase leading-none tracking-[0.06em] transition-[color,background,border-color]",
         on ? "border-accent bg-accent text-accent-ink" : "border-line-2 bg-base text-txt-muted hover:text-txt",
       )}
     >

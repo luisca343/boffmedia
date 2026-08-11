@@ -17,7 +17,7 @@ export function SrtPrizeShowcase({ sorteo }: { sorteo: Sorteo }) {
   return (
     <div className="flex flex-col items-start gap-5 sm:flex-row">
       {/* [deferred] <image-slot> prize art — shows the tinted glyph until upload exists */}
-      <div className="relative aspect-square w-full flex-none overflow-hidden border border-solid border-line-2 bg-base-2 cut-corner cut-corner-edge [--cut-line:var(--line-2)] [--cut-lg:14px] sm:aspect-square sm:w-[168px] max-sm:aspect-[16/9]">
+      <div className="relative aspect-square w-full flex-none border border-solid border-line-2 bg-base-2 cut-corner cut-corner-edge [--cut-line:var(--line-2)] [--cut-lg:14px] sm:aspect-square sm:w-[168px] max-sm:aspect-[16/9]">
         <span aria-hidden className="absolute inset-0 z-0 grid place-items-center text-accent opacity-[0.28]">
           <Icon name={m.icon} size={70} />
         </span>
@@ -75,7 +75,7 @@ export function SrtSteps({ steps }: { steps: SrtStep[] }) {
         return (
           <div key={i} className={cn("relative flex gap-4", last ? "pb-0" : "pb-5")}>
             {!last && <span aria-hidden className={cn("absolute bottom-0.5 left-[18px] top-[38px] w-0.5", s.done ? "bg-accent" : "bg-line")} />}
-            <span className={cn("relative z-[1] grid h-[38px] w-[38px] flex-none place-items-center font-display text-[17px]/none font-extrabold italic cut-seal [--cut:8px]", s.done ? "border border-solid border-accent bg-accent text-accent-ink" : "border border-solid border-line-2 bg-panel-2 text-txt-muted")}>
+            <span className={cn("relative z-[1] grid h-[38px] w-[38px] flex-none place-items-center font-display text-[17px]/none font-extrabold italic cut-seal cut-seal-edge [--cut:8px]", s.done ? "border border-solid border-accent [--cut-line:var(--accent)] bg-accent text-accent-ink" : "border border-solid border-line-2 [--cut-line:var(--line-2)] bg-panel-2 text-txt-muted")}>
               {s.done ? <Icon name="check" size={16} /> : i + 1}
             </span>
             <div className="pt-2">

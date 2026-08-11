@@ -98,8 +98,7 @@ export function DkTitle({ icon, label, sub, className }: { icon?: IconName; labe
     <div className={cn("flex min-w-0 items-center gap-[10px]", className)}>
       {icon && (
         <span
-          style={{ clipPath: DK_CUT }}
-          className="grid h-[34px] w-[34px] flex-none place-items-center border border-solid border-accent-line bg-accent-soft text-accent"
+          className="cut-tag cut-tag-edge [--cut-line:var(--accent-line)] [--cut-tag:8px] grid h-[34px] w-[34px] flex-none place-items-center border border-solid border-accent-line bg-accent-soft text-accent"
         >
           <Icon name={icon} size={17} />
         </span>
@@ -119,13 +118,13 @@ export function DkBack({ onClick, href, label }: { onClick?: () => void; href?: 
     "grid h-[34px] w-[34px] flex-none place-items-center border border-solid border-line-2 bg-panel text-txt-muted transition-[color,border-color] hover:border-accent-line hover:text-accent-bright focus-visible:outline-2 focus-visible:outline-accent-line"
   if (href) {
     return (
-      <a href={href} aria-label={label} title={label} style={{ clipPath: DK_CUT }} className={cls}>
+      <a href={href} aria-label={label} title={label} className={cn("cut-tag cut-tag-edge [--cut-tag:8px] [--cut-line:var(--line-2)] hover:[--cut-line:var(--accent-line)]", cls)}>
         <Icon name="back" size={17} />
       </a>
     )
   }
   return (
-    <button type="button" onClick={onClick} aria-label={label} title={label} style={{ clipPath: DK_CUT }} className={cls}>
+    <button type="button" onClick={onClick} aria-label={label} title={label} className={cn("cut-tag cut-tag-edge [--cut-tag:8px] [--cut-line:var(--line-2)] hover:[--cut-line:var(--accent-line)]", cls)}>
       <Icon name="back" size={17} />
     </button>
   )

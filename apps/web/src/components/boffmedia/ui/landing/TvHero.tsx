@@ -86,7 +86,7 @@ export function TvHero({ lvl, density }: { lvl: number; density: number }) {
             {hud.map((h) => (
               <div
                 key={h.k}
-                className="relative min-w-[150px] border border-solid border-line px-4 pb-[13px] pt-3.5 backdrop-blur-[6px] [background:rgba(10,12,16,0.6)] cut-tag [--cut-tag:9px] before:absolute before:bottom-0 before:left-0 before:top-0 before:w-[3px] before:bg-accent before:content-[''] [[data-theme=light]_&]:[background:rgba(255,255,255,0.6)]"
+                className="relative min-w-[150px] border border-solid border-line px-4 pb-[13px] pt-3.5 backdrop-blur-[6px] [background:rgba(10,12,16,0.6)] cut-tag cut-tag-edge [--cut-tag:9px] before:absolute before:bottom-0 before:left-0 before:top-0 before:w-[3px] before:bg-accent before:content-[''] [[data-theme=light]_&]:[background:rgba(255,255,255,0.6)]"
               >
                 <span className="inline-flex items-center gap-1.5 font-mono text-[10px] font-semibold uppercase leading-none tracking-[0.12em] text-txt-dim">
                   {h.live && <i className="h-1.5 w-1.5 rounded-full bg-ok animate-[lv4-blink_1.6s_infinite] motion-reduce:animate-none" aria-hidden="true" />}

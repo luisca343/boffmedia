@@ -10,7 +10,7 @@ export function StatTile({ icon, value, em, label, delta, deltaTone, className }
     <div
       className={cn(
         "relative border border-solid border-line bg-panel px-[18px] pt-4 pb-[15px]",
-        "cut-tag [--cut-tag:10px] transition-[border-color,background] duration-[140ms]",
+        "cut-tag cut-tag-edge [--cut-line:var(--accent-line)] [--cut-tag:10px] transition-[border-color,background] duration-[140ms]",
         "hover:border-accent-line hover:bg-panel-2",
         className,
       )}

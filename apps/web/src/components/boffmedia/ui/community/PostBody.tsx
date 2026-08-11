@@ -30,7 +30,7 @@ export function PostBody({ blocks, className }: { blocks?: PostBlock[]; classNam
           return (
             <blockquote
               key={i}
-              className="border-l-4 border-solid border-accent bg-accent-soft px-[22px] py-[18px] font-body text-[19px]/[1.5] font-medium italic text-txt [clip-path:polygon(0_0,100%_0,calc(100%_-_12px)_100%,0_100%)]"
+              className="border-l-4 border-solid border-accent bg-accent-soft px-[22px] py-[18px] font-body text-[19px]/[1.5] font-medium italic text-txt cut-slant-r cut-edge-slant-r [--cut-line:var(--accent)] [--cut:12px]"
             >
               {b.quote}
               {b.cite && (
@@ -65,7 +65,7 @@ export function PostBody({ blocks, className }: { blocks?: PostBlock[]; classNam
           return (
             <pre
               key={i}
-              className="overflow-x-auto border border-solid border-line-2 border-l-4 border-l-accent bg-base-deep px-5 py-[18px] [clip-path:polygon(0_0,100%_0,100%_100%,12px_100%,0_calc(100%_-_12px))] cut-edge-bl [--cut-e:12px] [--cut-line:var(--line-2)]"
+              className="overflow-x-auto border border-solid border-line-2 border-l-4 border-l-accent bg-base-deep px-5 py-[18px] cut-bl cut-edge-bl [--cut-e:12px] [--cut-line:var(--line-2)]"
             >
               <code className="whitespace-pre font-mono text-[13px]/[1.7] font-medium tracking-[0.02em] text-txt">{b.code}</code>
             </pre>
@@ -76,7 +76,7 @@ export function PostBody({ blocks, className }: { blocks?: PostBlock[]; classNam
             <div
               key={i}
               style={{ "--tone": tone } as React.CSSProperties}
-              className="flex items-start gap-[14px] border border-solid border-line-2 border-l-4 border-l-[color:var(--tone)] bg-[color-mix(in_srgb,var(--tone)_9%,var(--panel))] px-[18px] py-4 [clip-path:polygon(0_0,100%_0,calc(100%_-_12px)_100%,0_100%)] cut-edge-slant-r [--cut:12px] [--cut-line:var(--line-2)]"
+              className="flex items-start gap-[14px] border border-solid border-line-2 border-l-4 border-l-[color:var(--tone)] bg-[color-mix(in_srgb,var(--tone)_9%,var(--panel))] px-[18px] py-4 cut-slant-r [--cut:12px] cut-edge-slant-r [--cut:12px] [--cut-line:var(--line-2)]"
             >
               <Icon name={CM_NOTE_ICON[b.tone || "info"] || "info"} size={18} className="mt-px flex-none text-[color:var(--tone)]" />
               <div>

@@ -32,8 +32,10 @@ export function CodeBlock({ lines, label, copyText, scan = false, tone, actions,
   return (
     <div
       className={cn(
-        "border border-solid border-line-2 bg-base-deep overflow-hidden",
-        "cut-corner [--cut-lg:10px]",
+        "border border-solid border-line-2 bg-base-deep",
+        // No `overflow-hidden`: the `.cut-corner` clip already clips descendants,
+        // and overflow would trim the chamfer stroke off its own corner.
+        "cut-corner cut-corner-edge [--cut-lg:10px] [--cut-line:var(--line-2)]",
         className,
       )}
     >

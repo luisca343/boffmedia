@@ -84,7 +84,7 @@ export function ProfileHero({
         <div className="pointer-events-none absolute inset-0 z-[3] bg-[linear-gradient(180deg,rgba(0,0,0,0.28)_0%,rgba(0,0,0,0)_34%,var(--panel)_98%)]" />
 
         {live && (
-          <span className="absolute left-0 top-4 z-[4] inline-flex items-center gap-2 bg-accent py-[7px] pl-5 pr-3.5 font-mono text-[11px]/none font-bold uppercase tracking-[0.16em] text-accent-ink [clip-path:polygon(0_0,100%_0,calc(100%_-_9px)_100%,0_100%)]">
+          <span className="absolute left-0 top-4 z-[4] inline-flex items-center gap-2 bg-accent py-[7px] pl-5 pr-3.5 font-mono text-[11px]/none font-bold uppercase tracking-[0.16em] text-accent-ink cut-slant-r [--cut:9px]">
             <i className="h-[7px] w-[7px] rounded-full bg-accent-ink animate-[bm-pulse_1.6s_ease-in-out_infinite] motion-reduce:animate-none" />
             {liveLabel ?? t("live")}
           </span>
@@ -110,7 +110,7 @@ export function ProfileHero({
         <div className="relative h-[136px] w-[136px] flex-none">
           <div
             className={cn(
-              "absolute inset-0 overflow-hidden border-4 border-solid border-accent bg-panel-2 cut-seal cut-seal-edge [--cut-w:4px] [--cut-line:var(--accent)] [--cut:16px] shadow-[0_16px_38px_-12px_rgba(255,92,10,0.55)]",
+              "absolute inset-0 border-4 border-solid border-accent bg-panel-2 cut-seal cut-seal-edge [--cut-w:4px] [--cut-line:var(--accent)] [--cut:16px] shadow-[0_16px_38px_-12px_rgba(255,92,10,0.55)]",
               editable && "cursor-pointer",
             )}
             onClick={editable ? onAvatarClick : undefined}

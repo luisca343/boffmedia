@@ -41,7 +41,7 @@ function ReplayLoader({ onReplayLoad }: { onReplayLoad: (data: ReplayData) => vo
   };
 
   return (
-    <div data-ds="boffmedia" className="mx-auto mt-10 flex max-w-3xl flex-col items-center justify-center border border-solid border-line bg-panel p-6 text-txt cut-corner">
+    <div data-ds="boffmedia" className="mx-auto mt-10 flex max-w-3xl flex-col items-center justify-center border border-solid border-line bg-panel p-6 text-txt cut-corner cut-corner-edge [--cut-line:var(--line)]">
       <h2 className="mb-4 text-[22px]">{t('replays.loader.title')}</h2>
       <textarea
         value={replayText}
@@ -57,8 +57,7 @@ function ReplayLoader({ onReplayLoad }: { onReplayLoad: (data: ReplayData) => vo
       <button
         type="button"
         onClick={handleLoadReplay}
-        style={{ clipPath: 'polygon(8px 0,100% 0,calc(100% - 8px) 100%,0 100%)' }}
-        className="w-full bg-accent p-2.5 font-display text-[14px] font-bold uppercase leading-none tracking-[0.04em] text-accent-ink transition-[filter] hover:brightness-110 focus-visible:outline-none"
+        className="cut [--cut:8px] w-full bg-accent p-2.5 font-display text-[14px] font-bold uppercase leading-none tracking-[0.04em] text-accent-ink transition-[filter] hover:brightness-110 focus-visible:outline-none"
       >
         {t('replays.loader.load')}
       </button>

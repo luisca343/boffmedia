@@ -103,7 +103,7 @@ export const PokemonAutocomplete = forwardRef<PokemonAutocompleteHandle, Props>(
         onFocus={() => query.length >= 2 && setOpen(results.length > 0)}
         onBlur={() => setTimeout(() => setOpen(false), 120)}
         placeholder={placeholder}
-        className="w-full cut-tag border border-solid border-line-2 bg-base px-3 py-2 font-body text-[13px] text-txt outline-none transition-[border-color] placeholder:text-txt-dim focus:border-accent"
+        className="w-full cut-tag cut-tag-edge focus:[--cut-line:var(--accent)] [--cut-line:var(--line-2)] border border-solid border-line-2 bg-base px-3 py-2 font-body text-[13px] text-txt outline-none transition-[border-color] placeholder:text-txt-dim focus:border-accent"
         autoComplete="off"
         spellCheck={false}
       />

@@ -39,8 +39,8 @@ export function GameCard({ game }: { game: GameLike }) {
       href={`/juegos/${game.id}`}
       style={{ "--ghue": hue } as React.CSSProperties}
       className={cn(
-        "group relative flex flex-col overflow-hidden border border-solid border-line bg-panel no-underline cut-corner cut-corner-edge [--cut-lg:18px]",
-        "transition-[border-color,transform] duration-[140ms] hover:-translate-y-1 hover:border-[color-mix(in_srgb,var(--ghue)_55%,var(--line))]",
+        "group relative flex flex-col border border-solid border-line bg-panel no-underline cut-corner cut-corner-edge [--cut-lg:18px]",
+        "transition-[border-color,transform] duration-[140ms] hover:-translate-y-1 hover:border-[color-mix(in_srgb,var(--ghue)_55%,var(--line))] hover:[--cut-line:color-mix(in_srgb,var(--ghue)_55%,var(--line))]",
         !active && "opacity-[0.86]",
       )}
     >

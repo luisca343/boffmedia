@@ -61,7 +61,7 @@ export function SavedDrawer({ onClose }: { onClose: () => void }) {
               onClick={() => load(s.id)}
               title={s.name}
               className={cn(
-                "cut-tag [--cut-tag:8px] flex min-w-0 flex-1 items-center gap-[10px] border border-solid border-line bg-base px-3 py-[10px] text-left",
+                "cut-tag cut-tag-edge [--cut-line:var(--line)] [--cut-tag:8px] flex min-w-0 flex-1 items-center gap-[10px] border border-solid border-line bg-base px-3 py-[10px] text-left",
                 "transition-[border-color,background] duration-[140ms] hover:border-accent-line hover:bg-panel-2",
               )}
             >

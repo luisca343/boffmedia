@@ -67,7 +67,7 @@ function DamageCalcShell() {
                 setUseChampions(true)
               }}
               style={REG_CARET}
-              className="cut-tag [--cut-tag:8px] cursor-pointer appearance-none border border-solid border-line-2 bg-panel py-2 pl-3 pr-[30px] font-mono text-[12px]/none font-semibold tracking-[0.06em] text-txt-muted outline-none focus-visible:outline-2 focus-visible:outline-accent-line"
+              className="cut-tag cut-tag-edge [--cut-line:var(--line-2)] [--cut-tag:8px] cursor-pointer appearance-none border border-solid border-line-2 bg-panel py-2 pl-3 pr-[30px] font-mono text-[12px]/none font-semibold tracking-[0.06em] text-txt-muted outline-none focus-visible:outline-2 focus-visible:outline-accent-line"
             >
               {regs.map((r) => (
                 <option key={r.formatId} value={r.formatId}>

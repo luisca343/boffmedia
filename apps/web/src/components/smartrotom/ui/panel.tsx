@@ -22,7 +22,7 @@ export function SmartRotomPanel({
     <section
       className={cn(
         "bg-sr-panel border border-solid border-sr-line transition-[background,border-color] duration-[240ms]",
-        !flat && "cut-corner",
+        !flat && "cut-corner cut-corner-edge [--cut-line:var(--sr-line)]",
         className,
       )}
       {...rest}

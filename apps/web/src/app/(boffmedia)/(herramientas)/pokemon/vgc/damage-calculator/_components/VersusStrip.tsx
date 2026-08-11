@@ -69,7 +69,7 @@ function MoveList({
             onClick={() => onPick(i)}
             style={cssVars({ "--cxc": color })}
             className={cn(
-              "cut-tag [--cut-tag:7px] flex w-full items-center gap-[10px] border border-solid border-line bg-base px-3 py-2 text-left font-body text-[13px]/none text-txt",
+              "cut-tag cut-tag-edge [--cut-tag:7px] flex w-full items-center gap-[10px] border border-solid border-line bg-base px-3 py-2 text-left font-body text-[13px]/none text-txt",
               "transition-[border-color,background] duration-[140ms] hover:border-line-2 hover:bg-panel-2",
               "aria-pressed:border-[var(--cxc)] aria-pressed:bg-[color-mix(in_srgb,var(--cxc)_8%,var(--bg))]",
               reversed && "flex-row-reverse text-right",
@@ -130,7 +130,7 @@ export function VersusStrip({ poke1, poke2, field, useChampions, sel, setSel }: 
   return (
     <section
       aria-label={t("title")}
-      className="cut-corner mb-5 grid grid-cols-[minmax(0,1fr)_minmax(280px,340px)_minmax(0,1fr)] border border-solid border-line bg-panel max-[920px]:grid-cols-1"
+      className="cut-corner cut-corner-edge mb-5 grid grid-cols-[minmax(0,1fr)_minmax(280px,340px)_minmax(0,1fr)] border border-solid border-line bg-panel max-[920px]:grid-cols-1"
     >
       <div className="min-w-0 px-4 py-[14px]">
         <div className="mb-[10px] flex items-center gap-[10px]">

@@ -16,7 +16,7 @@ function FxPlayground() {
       <div
         data-glare
         data-tilt-fx
-        className={cn("relative overflow-hidden w-[250px] max-w-full p-5 bg-panel border border-solid border-line cut-corner transition-transform duration-[140ms] will-change-transform", GLARE)}
+        className={cn("relative w-[250px] max-w-full p-5 bg-panel border border-solid border-line cut-corner cut-corner-edge transition-transform duration-[140ms] will-change-transform", GLARE)}
       >
         <span className="font-mono text-[11px] text-txt-dim">01</span>
         <h4 className={cn(HEAD4, "text-[18px] mt-2")}>Tarjeta táctil</h4>

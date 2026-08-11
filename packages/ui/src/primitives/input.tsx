@@ -5,9 +5,9 @@ import { cn } from "../cn"
 export const INPUT_BASE = cn(
   "w-full font-body text-[15px] font-normal leading-[1.4] text-txt",
   "bg-base [[data-theme=light]_&]:bg-panel border border-solid border-line-2 py-[11px] px-[14px]",
-  "cut-tag",
+  "cut-tag cut-tag-edge [--cut-line:var(--line-2)]",
   "transition-[border-color,background] duration-[140ms] outline-none",
-  "focus:border-accent placeholder:text-txt-dim",
+  "focus:border-accent focus:[--cut-line:var(--accent)] placeholder:text-txt-dim",
   "disabled:opacity-[0.42] disabled:cursor-not-allowed",
 )
 

@@ -2,10 +2,16 @@ import * as React from "react"
 import { cn } from "../cn"
 import { Icon } from "./icon"
 
-const CLIP = "polygon(0 0,100% 0,100% calc(100% - 8px),calc(100% - 8px) 100%,0 100%)"
-
-const BASE =
-  "inline-flex items-center gap-2 whitespace-nowrap border border-solid px-3 py-[7px] font-mono text-[11px] font-semibold uppercase leading-none tracking-[0.1em] transition-[color,border-color,background] duration-[140ms]"
+// `.cut-tag` + its `-edge` stroke, not the inline polygon this replaced: that
+// polygon WAS `.cut-tag` at the default 8px, but written as a style prop it was
+// invisible to the sweep that added the chamfer strokes, so every chip carried
+// the corner with nothing drawing its diagonal.
+const BASE = cn(
+  "inline-flex items-center gap-2 whitespace-nowrap border border-solid px-3 py-[7px]",
+  "font-mono text-[11px] font-semibold uppercase leading-none tracking-[0.1em]",
+  "cut-tag cut-tag-edge",
+  "transition-[color,border-color,background] duration-[140ms]",
+)
 
 export interface ChipProps {
   children: React.ReactNode
@@ -17,11 +23,15 @@ export interface ChipProps {
 }
 
 export function Chip({ children, on, onRemove, onClick, href, className }: ChipProps) {
-  const tone = on ? "border-accent-line bg-accent-soft text-accent" : "border-line-2 text-txt-muted"
+  // --cut-line mirrors the border colour: `.cut-tag-edge` paints the diagonal
+  // itself and cannot read a `border-*` utility.
+  const tone = on
+    ? "border-accent-line [--cut-line:var(--accent-line)] bg-accent-soft text-accent"
+    : "border-line-2 [--cut-line:var(--line-2)] text-txt-muted"
 
   if (onRemove) {
     return (
-      <span style={{ clipPath: CLIP }} className={cn(BASE, "pr-[7px]", tone, className)}>
+      <span className={cn(BASE, "pr-[7px]", tone, className)}>
         {children}
         <button
           type="button"
@@ -39,20 +49,20 @@ export function Chip({ children, on, onRemove, onClick, href, className }: ChipP
 
   if (href) {
     return (
-      <a href={href} onClick={onClick} style={{ clipPath: CLIP }} className={cn(BASE, tone, !on && interactive, className)}>
+      <a href={href} onClick={onClick} className={cn(BASE, tone, !on && interactive, className)}>
         {children}
       </a>
     )
   }
   if (onClick) {
     return (
-      <button type="button" onClick={onClick} style={{ clipPath: CLIP }} className={cn(BASE, tone, !on && interactive, className)}>
+      <button type="button" onClick={onClick} className={cn(BASE, tone, !on && interactive, className)}>
         {children}
       </button>
     )
   }
   return (
-    <span style={{ clipPath: CLIP }} className={cn(BASE, tone, className)}>
+    <span className={cn(BASE, tone, className)}>
       {children}
     </span>
   )

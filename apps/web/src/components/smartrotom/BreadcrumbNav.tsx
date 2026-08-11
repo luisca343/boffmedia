@@ -13,7 +13,7 @@ export default function BreadcrumbNav({className} : {className?: string}){
     const parts = path.split('/').filter(Boolean)
 
     return (
-        <div className={`${className} flex cut [--cut:6px] bg-sr-panel-2 border border-sr-line h-8 items-center px-3 text-sr-txt`}>
+        <div className={`${className} flex cut cut-edge-slant [--cut:6px] [--cut-line:var(--sr-line)] bg-sr-panel-2 border border-sr-line h-8 items-center px-3 text-sr-txt`}>
             {parts.map((part, index) => {
 
                 const href = '/' + parts.slice(0, index + 1).join('/')

@@ -14,8 +14,6 @@ interface SpinnerProps {
   ITEM_WIDTH: number
 }
 
-const PANEL = "polygon(0 0,calc(100% - 14px) 0,100% 14px,100% 100%,0 100%)"
-
 export default function Spinner({
   spinItems,
   scrollPosition,
@@ -30,9 +28,9 @@ export default function Spinner({
   return (
     <div className="relative w-full">
       <div
-        className="border border-line bg-panel transition-all duration-500"
+        className="cut-corner cut-corner-edge [--cut-lg:14px] border border-line bg-panel transition-all duration-500"
         style={{
-          clipPath: PANEL,
+          
           boxShadow: spinComplete
             ? "0 8px 40px rgba(0,0,0,0.5), 0 0 60px color-mix(in srgb, var(--accent) 16%, transparent)"
             : "0 8px 40px rgba(0,0,0,0.5)",

@@ -91,8 +91,7 @@ function ReplayRow({ r, winnerLabel }: { r: LeagueReplay; winnerLabel: string })
     <li>
       <a
         href={`/pokemon/battlesim/replay/${r.id}`}
-        style={{ clipPath: "polygon(0 0,100% 0,100% calc(100% - 10px),calc(100% - 10px) 100%,0 100%)" }}
-        className="group flex items-center gap-3 border border-solid border-line bg-panel px-4 py-3 transition-[border-color,background,transform] hover:-translate-y-px hover:border-accent-line hover:bg-panel-2"
+        className="cut-tag cut-tag-edge hover:[--cut-line:var(--accent-line)] [--cut-tag:10px] group flex items-center gap-3 border border-solid border-line bg-panel px-4 py-3 transition-[border-color,background,transform] hover:-translate-y-px hover:border-accent-line hover:bg-panel-2"
       >
         <span className="grid min-w-0 flex-1 gap-[3px]">
           <span className="flex min-w-0 items-center gap-2 font-display text-[14px] font-bold uppercase leading-none tracking-[0.03em]">

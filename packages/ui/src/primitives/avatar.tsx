@@ -13,9 +13,11 @@ export function Avatar({ children, lg, accent, className }: AvatarProps) {
     <span
       className={cn(
         "inline-grid place-items-center border border-solid font-display font-bold uppercase leading-none shrink-0",
-        "cut-seal [--cut:8px]",
+        "cut-seal cut-seal-edge [--cut:8px]",
         lg ? "h-16 w-16 text-[22px]" : "h-9 w-9 text-[13px]",
-        accent ? "bg-accent border-accent text-accent-ink" : "bg-panel-2 border-line-2",
+        accent
+          ? "bg-accent border-accent [--cut-line:var(--accent)] text-accent-ink"
+          : "bg-panel-2 border-line-2 [--cut-line:var(--line-2)]",
         className,
       )}
     >

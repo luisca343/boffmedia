@@ -11,7 +11,7 @@ export function Stat({
   tone?: string
 }) {
   return (
-    <div className="cut border border-solid border-line bg-base px-3 py-2 [--cut:5px]">
+    <div className="cut cut-edge-slant border border-solid border-line bg-base px-3 py-2 [--cut:5px]">
       <div className="font-mono text-[9px] font-semibold uppercase tracking-[0.1em] text-txt-dim">{label}</div>
       <div className={cn("truncate font-display text-[19px] font-bold not-italic leading-tight", tone ?? "text-txt")}>
         {value}

@@ -52,7 +52,7 @@ export function CommunityView() {
       </div>
 
       {/* Discord CTA */}
-      <div className="mb-8 flex flex-wrap items-center gap-5 border border-solid border-accent-line border-l-4 border-l-accent bg-[linear-gradient(120deg,var(--accent-soft),var(--panel)_60%)] px-7 py-6 cut-corner">
+      <div className="mb-8 flex flex-wrap items-center gap-5 border border-solid border-accent-line border-l-4 border-l-accent bg-[linear-gradient(120deg,var(--accent-soft),var(--panel)_60%)] px-7 py-6 cut-corner cut-corner-edge [--cut-line:var(--accent-line)]">
         <span className="grid h-[54px] w-[54px] flex-none place-items-center bg-accent text-accent-ink [clip-path:polygon(50%_0,100%_50%,50%_100%,0_50%)]">
           <Icon name="discord" size={26} />
         </span>
@@ -71,7 +71,7 @@ export function CommunityView() {
           <Link
             key={l.href}
             href={l.href}
-            className="group flex items-center gap-3 border border-solid border-line bg-panel px-4 py-3.5 no-underline cut-tag transition-[border-color,background] duration-[140ms] hover:border-accent-line hover:bg-panel-2"
+            className="group flex items-center gap-3 border border-solid border-line bg-panel px-4 py-3.5 no-underline cut-tag cut-tag-edge hover:[--cut-line:var(--accent-line)] [--cut-line:var(--line)] transition-[border-color,background] duration-[140ms] hover:border-accent-line hover:bg-panel-2"
           >
             <Icon name={l.icon} size={18} className="flex-none text-accent" />
             <span className="min-w-0 truncate font-display text-[14px] font-bold uppercase tracking-[0.03em] text-txt">

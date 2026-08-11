@@ -101,7 +101,18 @@ export function FormulariosSeleccionSections({ rng, setRng }: { rng: number; set
             <Checkbox disabled label="Opción no disponible" />
           </div>
         </Sample>
-        <Sample title="Radio" code="<RadioGroup value onChange options>" col>
+        <Sample
+          title="Radio"
+          code="<RadioGroup value onChange options>"
+          col
+          note={
+            <>
+              Filas sin caja: sólo la opción elegida se pinta, con barra de acento y tinte. Sigue el patrón ARIA de radiogroup — las flechas
+              mueven la selección y el grupo entero ocupa <em>una</em> parada de tabulación, así que <code>Tab</code> entra y sale en vez de
+              recorrer opción por opción.
+            </>
+          }
+        >
           <div className="w-full max-w-[440px]">
             <RadioGroup
               value={rad}
@@ -125,7 +136,14 @@ export function FormulariosSeleccionSections({ rng, setRng }: { rng: number; set
           title="Tarjetas de opción"
           code="<OptionGroup options value onChange columns multi>"
           col
-          note={<>Tarjetas con icono para elección exclusiva o <code>multi</code>; alternativa expresiva al <code>RadioGroup</code>. <code>columns</code> fija la rejilla.</>}
+          note={
+            <>
+              Tarjetas con icono para elección exclusiva o <code>multi</code>; alternativa expresiva al <code>RadioGroup</code>.{" "}
+              <code>columns</code> es el <em>máximo</em> a pantalla ancha, no una rejilla fija: por debajo baja a dos columnas sola, para que un
+              grupo de cuatro no acabe en cuatro tarjetas estrujadas en el móvil. En modo exclusivo hereda las flechas y la parada única de
+              tabulación del <code>RadioGroup</code>; con <code>multi</code> cada tarjeta es una casilla y mantiene su propio tabulador.
+            </>
+          }
         >
           <div className="grid gap-4 w-full max-w-[520px]">
             <OptionGroup
@@ -134,9 +152,9 @@ export function FormulariosSeleccionSections({ rng, setRng }: { rng: number; set
               columns={3}
               ariaLabel="Formato de combate"
               options={[
-                { value: "singles", icon: "sword", label: "Singles", sub: "1v1" },
-                { value: "dobles", icon: "users", label: "Dobles", sub: "VGC" },
-                { value: "draft", icon: "list", label: "Draft", sub: "Por turnos" },
+                { value: "singles", icon: "sword", label: "Singles", desc: "1v1" },
+                { value: "dobles", icon: "users", label: "Dobles", desc: "VGC" },
+                { value: "draft", icon: "list", label: "Draft", desc: "Por turnos" },
               ]}
             />
             <OptionGroup
@@ -146,8 +164,8 @@ export function FormulariosSeleccionSections({ rng, setRng }: { rng: number; set
               columns={2}
               ariaLabel="Coberturas del equipo"
               options={[
-                { value: "protect", icon: "shield", label: "Protect", sub: "Prioridad +4" },
-                { value: "fake", icon: "zap", label: "Fake Out", sub: "Amedrenta" },
+                { value: "protect", icon: "shield", label: "Protect", desc: "Prioridad +4" },
+                { value: "fake", icon: "zap", label: "Fake Out", desc: "Amedrenta" },
               ]}
             />
           </div>

@@ -100,7 +100,7 @@ export function LinkMinecraftModal({
 
         {phase === "waiting" && code && (
           <>
-            <div className="border border-solid border-line bg-panel-2 p-5 text-center cut-tag">
+            <div className="border border-solid border-line bg-panel-2 p-5 text-center cut-tag cut-tag-edge">
               <div className="font-mono text-[10px] uppercase tracking-[0.16em] text-txt-dim">
                 {t("codeLabel")}
               </div>

@@ -16,9 +16,6 @@ import {
 } from "../../_lib/bx-helpers"
 
 const tyc = (v: string) => ({ ["--tyc"]: v }) as React.CSSProperties
-const CUT = "polygon(0 0,100% 0,100% calc(100% - var(--cut,10px)),calc(100% - var(--cut,10px)) 100%,0 100%)"
-const SLASH = "polygon(3px 0,100% 0,calc(100% - 3px) 100%,0 100%)"
-
 export function BxSprite({ mon, size = 40 }: { mon: BxMon; size?: number }) {
   return <DkSprite src={spriteUrl(mon.name)} alt={mon.name} size={size} onError={handleSpriteError} />
 }
@@ -26,8 +23,8 @@ export function BxSprite({ mon, size = 40 }: { mon: BxMon; size?: number }) {
 /* ── Type / category / status / boost / tera ─────────────────────────────── */
 export function BxType({ type, ghost = false, small = false }: { type: string; ghost?: boolean; small?: boolean }) {
   return (
-    <span style={{ ...tyc(tyColor(type)), clipPath: SLASH }}
-      className={cn("inline-flex items-center gap-[5px] font-mono font-semibold uppercase leading-none tracking-[0.06em]",
+    <span style={{ ...tyc(tyColor(type)) }}
+      className={cn("cut cut-edge-slant [--cut:3px]", "inline-flex items-center gap-[5px] font-mono font-semibold uppercase leading-none tracking-[0.06em]",
         small ? "gap-1 px-[5px] py-[3px] text-[8.5px]" : "px-[7px] py-1 text-[10px]",
         ghost
           ? "border border-solid border-[color-mix(in_srgb,var(--tyc)_40%,transparent)] text-[var(--tyc)] [background:color-mix(in_srgb,var(--tyc)_13%,transparent)]"
@@ -61,8 +58,8 @@ const STATUS_BG: Record<string, string> = {
 export function BxStatus({ status, long = false }: { status?: string | null; long?: boolean }) {
   if (!status) return null
   return (
-    <span title={STATUS_LONG[status]} style={{ clipPath: "polygon(2px 0,100% 0,calc(100% - 2px) 100%,0 100%)" }}
-      className={cn("flex-none px-[5px] py-[3px] font-mono text-[8.5px] font-bold leading-none tracking-[0.08em]", STATUS_BG[status] || "bg-warn text-accent-ink")}>
+    <span title={STATUS_LONG[status]}
+      className={cn("cut [--cut:2px] ", "flex-none px-[5px] py-[3px] font-mono text-[8.5px] font-bold leading-none tracking-[0.08em]", STATUS_BG[status] || "bg-warn text-accent-ink")}>
       {long ? STATUS_LONG[status] : STATUS_ES[status] || status.toUpperCase()}
     </span>
   )
@@ -113,9 +110,8 @@ export function BxPlate({ mon, slotTag, foe = false, ghost = null, active = fals
     <Tag
       type={targetable ? "button" : undefined}
       onClick={targetable ? onClick : undefined}
-      style={{ ...tyc(tyColor(mon.tera && mon.teraType ? mon.teraType : mon.types[0])), clipPath: CUT }}
-      className={cn(
-        "relative flex w-full min-w-0 items-center gap-[9px] border border-solid border-line border-l-[3px] border-l-[var(--tyc)] bg-[color-mix(in_srgb,var(--panel)_88%,transparent)] px-[10px] py-[7px] pl-2 text-left backdrop-blur-[4px] transition-[border-color,background,transform]",
+      style={{ ...tyc(tyColor(mon.tera && mon.teraType ? mon.teraType : mon.types[0])) }}
+      className={cn("cut-tag cut-tag-edge [--cut-tag:var(--cut,10px)]", "relative flex w-full min-w-0 items-center gap-[9px] border border-solid border-line border-l-[3px] border-l-[var(--tyc)] bg-[color-mix(in_srgb,var(--panel)_88%,transparent)] px-[10px] py-[7px] pl-2 text-left backdrop-blur-[4px] transition-[border-color,background,transform]",
         compact ? "gap-[7px] px-2 py-[5px]" : "",
         mon.fnt && "opacity-55 saturate-[0.2]",
         active && "border-accent-line shadow-[0_0_0_1px_var(--accent-line)]",
@@ -165,9 +161,8 @@ export function BxKey({ move, hotkey, target = null, selected = false, disabled 
   return (
     <button type="button" disabled={off} onClick={off ? undefined : onClick}
       onMouseEnter={onHover} onMouseLeave={onLeave} onFocus={onHover} onBlur={onLeave}
-      style={{ ...tyc(tyColor(move.type)), clipPath: CUT }}
-      className={cn(
-        "relative flex w-full min-w-0 items-center gap-[9px] border border-solid border-line border-l-[3px] border-l-[var(--tyc)] bg-panel px-[10px] py-2 text-left transition-[background,border-color,transform]",
+      style={{ ...tyc(tyColor(move.type)) }}
+      className={cn("cut-tag cut-tag-edge [--cut-tag:var(--cut,10px)]", "relative flex w-full min-w-0 items-center gap-[9px] border border-solid border-line border-l-[3px] border-l-[var(--tyc)] bg-panel px-[10px] py-2 text-left transition-[background,border-color,transform]",
         "hover:-translate-y-px hover:border-[color-mix(in_srgb,var(--tyc)_55%,var(--line))] hover:bg-panel-2 focus-visible:outline-none",
         selected && "border-accent shadow-[0_0_0_1px_var(--accent-line)]",
         off && "cursor-not-allowed opacity-45",
@@ -202,8 +197,8 @@ export function BxBench({ mon, hotkey, disabled = false, reserved = false, onCli
   const t = useTranslations("battlesim")
   const pct = mon.fnt ? 0 : mon.hp
   return (
-    <button type="button" disabled={disabled || mon.fnt} onClick={onClick} style={{ clipPath: CUT }}
-      className={cn("flex w-full min-w-0 items-center gap-[9px] border border-solid border-line bg-panel px-[10px] py-[7px] text-left transition-[background,border-color]",
+    <button type="button" disabled={disabled || mon.fnt} onClick={onClick}
+      className={cn("cut-tag cut-tag-edge [--cut-tag:var(--cut,10px)] ", "flex w-full min-w-0 items-center gap-[9px] border border-solid border-line bg-panel px-[10px] py-[7px] text-left transition-[background,border-color]",
         "hover:border-accent-line hover:bg-panel-2 focus-visible:outline-none disabled:cursor-not-allowed",
         mon.fnt && "opacity-45 saturate-[0.2]", reserved && "border-accent-line bg-accent-soft")}>
       {hotkey != null && <BxKbd>{hotkey}</BxKbd>}
@@ -226,9 +221,9 @@ export function BxTeraBtn({ type, armed = false, used = false, onToggle, hotkey 
 }) {
   const t = useTranslations("battlesim")
   return (
-    <button type="button" disabled={used} onClick={onToggle} style={{ ...tyc(tyColor(type)), clipPath: "polygon(4px 0,100% 0,calc(100% - 4px) 100%,0 100%)" }}
+    <button type="button" disabled={used} onClick={onToggle} style={{ ...tyc(tyColor(type)) }}
       title={used ? t("bx.teraUsedTitle") : t("bx.teraArmTitle")}
-      className={cn("inline-flex items-center gap-2 border border-solid border-line-2 bg-panel px-3 py-2 font-mono text-[10.5px] font-semibold uppercase leading-none tracking-[0.06em] text-txt-muted transition-[border-color,color,box-shadow]",
+      className={cn("cut cut-edge-slant [--cut-line:var(--line-2)] [--cut:4px]", "inline-flex items-center gap-2 border border-solid border-line-2 bg-panel px-3 py-2 font-mono text-[10.5px] font-semibold uppercase leading-none tracking-[0.06em] text-txt-muted transition-[border-color,color,box-shadow]",
         "hover:border-[color-mix(in_srgb,var(--tyc)_60%,transparent)] hover:text-txt",
         armed && "border-[var(--tyc)] text-txt [box-shadow:0_0_12px_color-mix(in_srgb,var(--tyc)_35%,transparent),inset_0_0_12px_color-mix(in_srgb,var(--tyc)_12%,transparent)]",
         used && "cursor-not-allowed opacity-45")}>
@@ -319,8 +314,8 @@ export function BxScore({ name, handle, rating, av, team = [], right = false, ta
   const t = useTranslations("battlesim")
   return (
     <div className={cn("flex min-w-0 items-center gap-[10px]", right && "flex-row-reverse text-right")}>
-      <span style={{ clipPath: "polygon(0 0,100% 0,100% calc(100% - 8px),calc(100% - 8px) 100%,0 100%)" }}
-        className={cn("grid h-9 w-9 flex-none place-items-center border border-solid font-display text-[13px] font-extrabold leading-none tracking-[0.04em]",
+      <span
+        className={cn("cut-tag cut-tag-edge [--cut-tag:8px] ", "grid h-9 w-9 flex-none place-items-center border border-solid font-display text-[13px] font-extrabold leading-none tracking-[0.04em]",
           right ? "border-[color-mix(in_srgb,var(--bad)_45%,transparent)] bg-bad-soft text-bad" : "border-accent-line bg-accent-soft text-accent-bright")}>{av}</span>
       <span className="grid min-w-0 gap-[2px]">
         <b className={cn("flex items-center gap-[6px] truncate font-display text-[14.5px] font-bold uppercase leading-none tracking-[0.04em]", right && "flex-row-reverse")}>
@@ -347,8 +342,8 @@ export function BxOrder({ slots }: { slots: OrderSlot[] }) {
       </span>
       <span className="flex min-w-0 flex-wrap gap-[6px]">
         {order.map((s, i) => (
-          <span key={s.side + s.idx} style={{ clipPath: "polygon(4px 0,100% 0,calc(100% - 4px) 100%,0 100%)" }}
-            className={cn("inline-flex items-center gap-[6px] border border-solid bg-panel py-[3px] pl-1 pr-2", s.side === "foe" ? "border-[color-mix(in_srgb,var(--bad)_30%,var(--line))]" : "border-line")}>
+          <span key={s.side + s.idx}
+            className={cn("cut cut-edge-slant [--cut:4px] ", "inline-flex items-center gap-[6px] border border-solid bg-panel py-[3px] pl-1 pr-2", s.side === "foe" ? "border-[color-mix(in_srgb,var(--bad)_30%,var(--line))]" : "border-line")}>
             <b className={cn("font-mono text-[9.5px] font-extrabold leading-none", s.side === "foe" ? "text-bad" : "text-accent-bright")}>{i + 1}</b>
             <BxSprite mon={s.mon} size={22} />
             <span className="whitespace-nowrap font-body text-[10.5px] font-semibold leading-none text-txt-muted">{s.mon.name}</span>
@@ -411,8 +406,8 @@ export function BxPlan({ tag, action, onClear, hint }: { tag: string; action: Bx
   const t = useTranslations("battlesim")
   if (!action) {
     return (
-      <div style={{ clipPath: "polygon(4px 0,100% 0,calc(100% - 4px) 100%,0 100%)" }}
-        className="inline-flex min-w-0 items-center gap-[7px] border border-dashed border-line-2 bg-panel px-[9px] py-[6px]">
+      <div
+        className="cut cut-edge-slant [--cut-line:var(--line-2)] [--cut:4px] inline-flex min-w-0 items-center gap-[7px] border border-dashed border-line-2 bg-panel px-[9px] py-[6px]">
         <b className={SLOTTAG}>{tag}</b>
         <span className="font-mono text-[10px] font-medium leading-none tracking-[0.04em] text-txt-dim">{hint || t("bx.noOrder")}</span>
       </div>
@@ -421,8 +416,8 @@ export function BxPlan({ tag, action, onClear, hint }: { tag: string; action: Bx
   const isMove = action.kind === "move"
   const tgt = !isMove ? null : action.target && action.target.spread ? (action.target.spread === "all" ? t("bx.targetAll") : t("bx.targetBoth")) : action.targetName || ""
   return (
-    <div style={{ ...tyc(isMove ? tyColor(action.move.type) : "var(--accent)"), clipPath: "polygon(4px 0,100% 0,calc(100% - 4px) 100%,0 100%)" }}
-      className="inline-flex min-w-0 items-center gap-[7px] border border-solid border-[color-mix(in_srgb,var(--tyc)_45%,var(--line))] bg-panel px-[9px] py-[6px]">
+    <div style={{ ...tyc(isMove ? tyColor(action.move.type) : "var(--accent)") }}
+      className="cut cut-edge-slant [--cut:4px] inline-flex min-w-0 items-center gap-[7px] border border-solid border-[color-mix(in_srgb,var(--tyc)_45%,var(--line))] bg-panel px-[9px] py-[6px]">
       <b className={SLOTTAG}>{tag}</b>
       <span className="min-w-0 truncate font-body text-[11.5px] leading-[1.2] text-txt-muted [&_b]:font-semibold [&_b]:text-txt">
         {isMove ? (
@@ -448,15 +443,15 @@ export function BxSlot({ mon, order, selected = false, dim = false, onClick, asi
   const t = useTranslations("battlesim")
   if (!mon) {
     return (
-      <button type="button" onClick={onClick} style={{ clipPath: CUT }}
-        className="flex min-h-[58px] w-full items-center justify-center gap-2 border border-dashed border-line bg-panel px-[10px] py-2 font-mono text-[10.5px] font-semibold uppercase leading-none tracking-[0.08em] text-txt-dim transition-[border-color,color] hover:border-accent-line hover:text-txt focus-visible:outline-none">
+      <button type="button" onClick={onClick}
+        className="cut-tag cut-tag-edge hover:[--cut-line:var(--accent-line)] [--cut-tag:var(--cut,10px)] flex min-h-[58px] w-full items-center justify-center gap-2 border border-dashed border-line bg-panel px-[10px] py-2 font-mono text-[10.5px] font-semibold uppercase leading-none tracking-[0.08em] text-txt-dim transition-[border-color,color] hover:border-accent-line hover:text-txt focus-visible:outline-none">
         <Icon name="plus" size={16} /><span>{t("bx.add")}</span>
       </button>
     )
   }
   return (
-    <button type="button" onClick={onClick} style={{ clipPath: CUT }}
-      className={cn("flex w-full min-w-0 items-center gap-[10px] border border-solid border-line bg-panel px-[10px] py-2 text-left transition-[border-color,background] hover:border-accent-line hover:bg-panel-2 focus-visible:outline-none",
+    <button type="button" onClick={onClick}
+      className={cn("cut-tag cut-tag-edge hover:[--cut-line:var(--accent-line)] [--cut-tag:var(--cut,10px)] ", "flex w-full min-w-0 items-center gap-[10px] border border-solid border-line bg-panel px-[10px] py-2 text-left transition-[border-color,background] hover:border-accent-line hover:bg-panel-2 focus-visible:outline-none",
         selected && "border-accent shadow-[0_0_0_1px_var(--accent-line)]", dim && "opacity-55")}>
       {order != null && <b className="flex-none font-mono text-[11px] font-extrabold leading-none text-accent-bright">{order}</b>}
       <BxSprite mon={mon as BxMon} size={40} />

@@ -18,8 +18,8 @@ export function Panel({ title, aside, media, flat, hover, className, bodyClassNa
     <section
       className={cn(
         "bg-panel border border-solid border-line transition-[background,border-color] duration-[260ms]",
-        !flat && "cut-corner",
-        hover && "cursor-pointer relative hover:border-accent-line hover:bg-panel-2",
+        !flat && "cut-corner cut-corner-edge [--cut-line:var(--line)]",
+        hover && "cursor-pointer relative hover:border-accent-line hover:[--cut-line:var(--accent-line)] hover:bg-panel-2",
         className,
       )}
       {...rest}

@@ -45,7 +45,7 @@ function GameSwitch({ slug }: { slug: string }) {
         aria-haspopup="true"
         title={tShell("switchGame", { game: t(game.nameKey) })}
         onClick={() => setOpen((v) => !v)}
-        className="group/sw cut-tag cut-tag-edge flex w-full items-center gap-3 overflow-hidden whitespace-nowrap border border-solid border-line bg-panel py-[7px] pl-[6px] pr-[10px] transition-[border-color,background] duration-[140ms] hover:border-accent-line hover:bg-panel-2"
+        className="group/sw cut-tag cut-tag-edge hover:[--cut-line:var(--accent-line)] flex w-full items-center gap-3 whitespace-nowrap border border-solid border-line bg-panel py-[7px] pl-[6px] pr-[10px] transition-[border-color,background] duration-[140ms] hover:border-accent-line hover:bg-panel-2"
       >
         <GameLogo label={hub.logoLabel} hueColor={hueColorOf(hub.hue)} size="sm" imageSrc={game.icon} bare />
         <span className="min-w-0 flex-1 text-left font-display text-[15px] font-bold uppercase leading-none tracking-[0.02em]">{hub.short}</span>
