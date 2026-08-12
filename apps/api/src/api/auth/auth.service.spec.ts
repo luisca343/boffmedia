@@ -133,50 +133,6 @@ describe('AuthService', () => {
     });
   });
 
-  describe('loginMC()', () => {
-    const loginData = {
-      username: 'TrainerAsh',
-      uuid: 'abc-123',
-      world: 'test-world',
-    };
-
-    it('should return tokens for a valid MC login', async () => {
-      usersService.getUserWithIntegrations.mockResolvedValue(
-        mockUserWithIntegrations as any,
-      );
-
-      const result = await service.loginMC(loginData);
-
-      expect((result as { access_token: string }).access_token).toBe(
-        'mock-token',
-      );
-    });
-
-    it('should throw UnauthorizedException for invalid world', async () => {
-      await expect(
-        service.loginMC({ ...loginData, world: 'wrong-world' }),
-      ).rejects.toThrow(UnauthorizedException);
-    });
-
-    it('scopes the session to ingame — MC_WORLD is not a secret', async () => {
-      usersService.getUserWithIntegrations.mockResolvedValue(
-        mockUserWithIntegrations as any,
-      );
-
-      await service.loginMC(loginData);
-
-      const [access] = jwtService.sign.mock.calls[0];
-      expect(access).toMatchObject({ typ: 'ingame' });
-    });
-
-    it('should return error object when user not found', async () => {
-      usersService.getUserWithIntegrations.mockResolvedValue(null);
-
-      const result = await service.loginMC(loginData);
-
-      expect(result).toEqual({ error: 'User not found in BoffMedia system' });
-    });
-  });
 
   describe('refreshToken()', () => {
     it('should issue new tokens from a valid JWT string', async () => {

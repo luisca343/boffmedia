@@ -83,31 +83,32 @@ export const authOptions: NextAuthOptions = {
           if (!credentials?.username || !credentials?.uuid || !credentials?.world) {
             throw new AuthError("Missing required Minecraft credentials", AUTH_ERROR_CODES.MISSING_CREDENTIALS);
           }
-          // Two paths, and they are not equivalent.
+          // `serverId` is the credential. There is no longer a second path: the
+          // mod joined Mojang with the running game's own access token, and the
+          // API confirms it with hasJoined, so the identity is PROVEN rather
+          // than asserted.
           //
-          // `/auth/minecraft/session` PROVES the identity: the mod joined Mojang
-          // with the running game's own token, and the API confirms it with
-          // hasJoined. `/auth/loginmc` only checks the `world` string, which is
-          // documented non-secret and ships in the browser bundle — a public UUID
-          // is enough to impersonate anyone.
+          // What used to sit here was `/auth/loginmc`, which authenticated on
+          // the `world` string — documented non-secret and shipped in the
+          // browser bundle, so a public UUID was enough to impersonate anyone.
+          // It survived only for jars predating the MC_JOIN_SERVER query; 1.16.5
+          // is deprecated and every supported jar carries the handshake, so the
+          // weaker path is gone rather than merely deprioritised.
           //
-          // loginmc survives solely for jars older than the MC_JOIN_SERVER query
-          // (1.16.5 among them). Delete it, `AuthService.loginMC` and `MC_WORLD`
-          // once every jar in the wild carries the handshake — see
-          // docs/handoff/03-MINECRAFT-MOD.md.
-          //
+          // `uuid` and `world` stay in `credentials` because the session's
+          // smartRotomUser block below reports the live game values — they are
+          // display data now, never proof of anything.
+          if (!credentials.serverId) {
+            throw new AuthError("Minecraft identity was not proven", AUTH_ERROR_CODES.MISSING_CREDENTIALS);
+          }
           // Only the declared fields: NextAuth folds csrfToken/callbackUrl/json into
           // `credentials`, and the API's strict DTOs reject unknown properties.
-          const response = credentials.serverId
-            ? (await boffPOST<AuthLoginResponseEntity | { error: string }>(`/auth/minecraft/session`, {
-                username: credentials.username,
-                serverId: credentials.serverId,
-              })).data
-            : (await boffPOST<AuthLoginResponseEntity | { error: string }>(`/auth/loginmc`, {
-                username: credentials.username,
-                uuid: credentials.uuid,
-                world: credentials.world,
-              })).data;
+          const response = (
+            await boffPOST<AuthLoginResponseEntity | { error: string }>(`/auth/minecraft/session`, {
+              username: credentials.username,
+              serverId: credentials.serverId,
+            })
+          ).data;
           if (response && !('error' in response)) {
             const { user } = response;
             return {

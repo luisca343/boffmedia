@@ -163,7 +163,7 @@ export class MinecraftController {
   @ApiOperation({
     summary: 'Paso 3: canjear el desafío por una sesión in-game',
     description:
-      'Sustituye a /auth/loginmc, que acepta un UUID público sin prueba alguna. La sesión sigue estando limitada a `ingame`: probar la identidad de Minecraft no es lo mismo que iniciar sesión en la web.',
+      'Única vía para obtener una sesión in-game. Sustituyó a /auth/loginmc, que aceptaba un UUID público sin prueba alguna y ya no existe. La sesión sigue estando limitada a `ingame`: probar la identidad de Minecraft no es lo mismo que iniciar sesión en la web.',
   })
   @ApiResponse({ status: HttpStatus.OK, description: 'Sesión in-game.' })
   async session(@Body() dto: McSessionDto) {

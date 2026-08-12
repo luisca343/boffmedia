@@ -15,7 +15,6 @@ import { AuthService } from './auth.service';
 import { PasswordResetService } from './password-reset.service';
 import { EmailVerificationService } from './email-verification.service';
 import { CreateUserDto } from '@api/boffmedia/users/dto/create-user.dto';
-import { LoginMcDto } from './dto/login-mc.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { GoogleCallbackDto } from './dto/google-callback.dto';
 import { DiscordCallbackDto } from './dto/discord-callback.dto';
@@ -64,24 +63,6 @@ export class AuthController {
     }
 
     return this.authService.login(user);
-  }
-
-  // `loginmc` authenticates on the `MC_WORLD` string, which is documented as
-  // non-secret and ships in the browser bundle. It survives only because the
-  // in-game MCEF page has nothing else yet; the sessions it mints are scoped to
-  // `ingame` and cannot touch the account, and it is throttled per username.
-  // `/auth/minecraft/session` below is its replacement, waiting on the mod.
-  @Post('loginmc')
-  @UseGuards(AuthThrottlerGuard)
-  @Throttle({ default: { ttl: 60_000, limit: 10 } })
-  @ApiOperation({ summary: 'Login Minecraft user' })
-  @ApiResponse({
-    status: HttpStatus.OK,
-    description: 'Minecraft user logged in successfully.',
-    type: AuthLoginResponseEntity,
-  })
-  async loginMC(@Body() loginMC: LoginMcDto) {
-    return this.authService.loginMC(loginMC);
   }
 
   @Post('refresh')

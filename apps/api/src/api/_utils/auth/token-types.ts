@@ -14,8 +14,10 @@ export const TOKEN_TYPE = {
   /** Launcher session (30 d). Only LauncherAuthGuard accepts it. */
   LAUNCHER: 'launcher',
   /**
-   * In-game MCEF session minted by `/auth/loginmc`, whose only proof of
-   * identity is the non-secret `MC_WORLD` string. Reaches the Rotom-phone
+   * In-game MCEF session, minted only by `/auth/minecraft/session` once Mojang
+   * has confirmed the join via hasJoined. The identity behind it is therefore
+   * proven, but proving a Minecraft identity is still not the same as signing
+   * in to the website, so the scope stays narrow. Reaches the Rotom-phone
    * surface but is refused by every account-sensitive route (FullSessionGuard)
    * so a hijacked one cannot take the account over.
    */

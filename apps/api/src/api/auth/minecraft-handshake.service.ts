@@ -16,9 +16,10 @@ import { firstValueFrom } from 'rxjs';
 //
 // It used to mint *launcher* sessions. The launcher signs in with a Boffmedia
 // account now, so the handshake was kept and repointed at the problem it is
-// actually right for: the in-game MCEF page, whose only alternative is
-// `/auth/loginmc` trusting the non-secret `MC_WORLD` string. A client mod holds
-// the running game's own session token and can therefore run step 2.
+// actually right for: the in-game MCEF page. A client mod holds the running
+// game's own session token and can therefore run step 2. This is now the only
+// way to obtain an `ingame` session — the alternative it replaced,
+// `/auth/loginmc`, trusted the non-secret `MC_WORLD` string and is deleted.
 
 const HAS_JOINED_URL =
   'https://sessionserver.mojang.com/session/minecraft/hasJoined';

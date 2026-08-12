@@ -22,7 +22,6 @@ const mockLogger = {
 const mockAuthService = {
   validateUser: jest.fn(),
   login: jest.fn(),
-  loginMC: jest.fn(),
   loginProvenMinecraft: jest.fn(),
   refreshToken: jest.fn(),
   googleLogin: jest.fn(),
@@ -162,39 +161,12 @@ describe('AuthController — integration (ValidationPipe + GlobalExceptionFilter
     });
   });
 
-  // ── POST /auth/loginmc — DTO validation ────────────────────────────────
-  describe('POST /auth/loginmc — DTO validation', () => {
-    it('returns 400 when uuid is missing', async () => {
-      const res = await request(app.getHttpServer())
-        .post('/auth/loginmc')
-        .send({ username: 'ash', world: 'world1' });
-
-      expect(res.status).toBe(400);
-      expect(res.body.statusCode).toBe(400);
-    });
-
-    it('returns 400 when uuid is not a valid UUID', async () => {
-      const res = await request(app.getHttpServer())
-        .post('/auth/loginmc')
-        .send({ username: 'ash', uuid: 'not-a-uuid', world: 'world1' });
-
-      expect(res.status).toBe(400);
-    });
-
-    it('returns 400 when world is missing', async () => {
-      const res = await request(app.getHttpServer())
-        .post('/auth/loginmc')
-        .send({
-          username: 'ash',
-          uuid: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4',
-        });
-
-      expect(res.status).toBe(400);
-    });
-
-    it('calls AuthService when body is valid', async () => {
-      mockAuthService.loginMC.mockResolvedValue({ access_token: 'tok' });
-
+  // ── POST /auth/loginmc — removed ───────────────────────────────────────
+  // The world-string login is gone, not deprecated. Asserted here because a
+  // reintroduced route would be a silent downgrade: it minted real ingame
+  // sessions from a public UUID plus a value that ships in the browser bundle.
+  describe('POST /auth/loginmc — removed', () => {
+    it('no longer exists', async () => {
       const res = await request(app.getHttpServer())
         .post('/auth/loginmc')
         .send({
@@ -203,8 +175,7 @@ describe('AuthController — integration (ValidationPipe + GlobalExceptionFilter
           world: 'world1',
         });
 
-      expect(res.status).toBeLessThan(300);
-      expect(mockAuthService.loginMC).toHaveBeenCalled();
+      expect(res.status).toBe(404);
     });
   });
 

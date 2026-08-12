@@ -3,7 +3,6 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Logger } from 'nestjs-pino';
 import { TOKEN_TYPE } from '@api/_utils/auth/token-types';
-import { env } from '@/config/env';
 
 @Injectable()
 export class AuthService {
@@ -24,8 +23,9 @@ export class AuthService {
 
   /**
    * `scope` narrows what the minted session may do. Undefined = a full website
-   * session; `ingame` = the MCEF session from `loginmc`, which proves nothing
-   * beyond a public UUID and is therefore refused by FullSessionGuard. The
+   * session; `ingame` = the MCEF session from the Mojang handshake, which
+   * proves a Minecraft identity but not account ownership and is therefore
+   * refused by FullSessionGuard. The
    * refresh token carries the scope forward so refreshing can never widen it.
    */
   async login(fullUser: any, scope?: typeof TOKEN_TYPE.INGAME) {
@@ -62,43 +62,17 @@ export class AuthService {
     };
   }
 
-  async loginMC(loginData: { username: string; uuid: string; world: string }) {
-    if (loginData.world !== env.MC_WORLD) {
-      throw new UnauthorizedException('Invalid world');
-    }
-
-    const user = await this.usersService.getUserWithIntegrations(
-      loginData.uuid,
-      'uuid',
-    );
-    if (!user) {
-      return { error: 'User not found in BoffMedia system' };
-    }
-
-    const loginUser = {
-      sessionUser: {
-        id: user.boffMediaUser.id,
-        name: user.boffMediaUser.username,
-        email: user.boffMediaUser.email,
-        roles: user.roles,
-        mcUUid: user.boffMediaUser.uuid,
-        smartRotomUser: user.smartRotomUser,
-      },
-    };
-
-    return this.login(loginUser, TOKEN_TYPE.INGAME);
-  }
-
   /**
    * Mint an in-game session for a Minecraft identity that has already been
-   * PROVED via Mojang's hasJoined handshake. Scoped to `ingame` exactly like
-   * `loginmc`: proving a Minecraft identity is not the same as signing in to
-   * the website, and the MCEF page only ever needs the Rotom-phone surface.
+   * PROVED via Mojang's hasJoined handshake. Scoped to `ingame`: proving a
+   * Minecraft identity is not the same as signing in to the website, and the
+   * MCEF page only ever needs the Rotom-phone surface.
    *
-   * Replaces `registerMinecraft` / `linkMinecraft`, which authenticated on the
-   * `MC_WORLD` string. Linking now happens on the website through Microsoft
-   * (MinecraftLinkService), so there is nothing left here to auto-provision
-   * credentials for.
+   * This is now the ONLY way to obtain an in-game session. It replaced
+   * `loginmc`, which authenticated on the non-secret `MC_WORLD` string, and
+   * `registerMinecraft` / `linkMinecraft` before it; linking happens on the
+   * website through Microsoft (MinecraftLinkService), so there is nothing left
+   * here to auto-provision credentials for.
    */
   async loginProvenMinecraft(uuid: string) {
     const user = await this.usersService.getUserWithIntegrations(uuid, 'uuid');

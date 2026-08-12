@@ -19,39 +19,39 @@ import { useRotomThemeClass } from "./theme/useRotomTheme"
 import { useTranslations } from "next-intl"
 
 /**
- * Runs the Mojang identity handshake and returns `{ serverId }` for the sign-in,
- * or `{}` when it could not complete.
+ * Runs the Mojang identity handshake and returns the `serverId` the sign-in
+ * trades for a session, or `null` when it could not complete.
  *
  * 1. the API issues a serverId (60s, single use)
  * 2. the mod joins Mojang with the running game's own access token
  * 3. the sign-in trades the serverId for a session the API verified via hasJoined
  *
- * `{}` on failure is deliberate, not a swallowed error: an older jar has no
- * `MC_JOIN_SERVER` query, and the alternative to falling back is locking those
- * players out of the Rotom phone entirely. The fallback path is the old
- * `world`-string one and is no worse than what shipped before — it just isn't
- * better. It goes away with `loginmc`.
+ * `null` now means no sign-in, where it used to mean "fall back to the `world`
+ * string". That fallback existed for jars predating the `MC_JOIN_SERVER` query;
+ * 1.16.5 is deprecated, so failing here is a real failure — a jar that cannot
+ * prove its identity is one we no longer serve, rather than one we trust on its
+ * word.
  */
-async function mcJoinServerId(username: string): Promise<{ serverId?: string }> {
+async function mcJoinServerId(username: string): Promise<string | null> {
   try {
     const challenge = await AuthService.minecraftChallenge()
     const serverId = challenge.data?.serverId
-    if (!serverId) return {}
+    if (!serverId) return null
 
     const join = await joinMinecraftServer(serverId)
     if (join.error || !join.data?.ok) {
-      console.warn("Minecraft handshake unavailable, falling back:", join.error)
-      return {}
+      console.warn("Minecraft handshake failed:", join.error)
+      return null
     }
     // The mod answers with the profile it actually joined as. If that is not who
     // the page thinks it is, the API would refuse anyway (hasJoined is keyed on
     // the username) — bail early rather than burn the challenge.
-    if (join.data.username !== username) return {}
+    if (join.data.username !== username) return null
 
-    return { serverId }
+    return serverId
   } catch (error) {
-    console.warn("Minecraft handshake failed, falling back:", error)
-    return {}
+    console.warn("Minecraft handshake failed:", error)
+    return null
   }
 }
 
@@ -121,14 +121,21 @@ export default function AppWrapper({
         }
 
         if (data) {
+          // No serverId, no session: the handshake is the only credential now,
+          // so there is nothing to attempt a sign-in with. Showing the player
+          // the signed-out phone beats sending a request that cannot succeed.
+          const serverId = await mcJoinServerId(data.username)
+          if (!serverId) {
+            setDatosUsuario(null)
+            return
+          }
+
           await signIn("minecraft", {
             redirect: false,
             username: data.username,
             uuid: data.uuid,
             world: data.world,
-            // Absent when the handshake could not run; the provider then falls
-            // back to the legacy `world` credential. See mcJoinServerId().
-            ...(await mcJoinServerId(data.username)),
+            serverId,
           })
 
           setDatosUsuario(data)
