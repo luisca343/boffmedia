@@ -1,13 +1,13 @@
 // Where the launcher keeps everything, and the one-shot migration into it.
 //
 // Tauri's `app_data_dir()` is derived from the bundle identifier, so on Windows
-// it lands on `%APPDATA%\es.boffmedia.launcher` (and `…launcher.dev` for the dev
-// profile) — a reverse-DNS string is a macOS convention that Windows users read
-// as junk in their Roaming folder. This module is the ONLY place that decides
-// the root, and it uses a human name instead:
+// it lands on `%APPDATA%\es.boffmedia.app` (and `…app.dev` for the dev profile)
+// — a reverse-DNS string is a macOS convention that Windows users read as junk
+// in their Roaming folder. This module is the ONLY place that decides the root,
+// and it uses a human name instead:
 //
-//   %APPDATA%\BoffLauncher            release
-//   %APPDATA%\BoffLauncher Dev        dev profile (identifier ends in `.dev`)
+//   %APPDATA%\Boffmedia               release
+//   %APPDATA%\Boffmedia Dev           dev profile (identifier ends in `.dev`)
 //
 // Dev and release stay separate on purpose: testing must never touch the
 // instances a player actually plays.
@@ -25,9 +25,32 @@ use tauri::Manager;
 /// constant to keep in sync with `tauri.dev.conf.json`.
 fn folder_name(app: &tauri::AppHandle) -> &'static str {
     if app.config().identifier.ends_with(".dev") {
+        "Boffmedia Dev"
+    } else {
+        "Boffmedia"
+    }
+}
+
+/// The folder this app used before the "Boff Launcher" → "Boffmedia App"
+/// rename. Kept ONLY so `migrate` can move an existing tree across; nothing
+/// else may read it. Every instance, world, mod cache and pack a player already
+/// has lives under this name.
+fn legacy_folder_name(app: &tauri::AppHandle) -> &'static str {
+    if app.config().identifier.ends_with(".dev") {
         "BoffLauncher Dev"
     } else {
         "BoffLauncher"
+    }
+}
+
+/// The bundle identifier from before the rename. `app_data_dir()` resolves the
+/// CURRENT one, so the oldest layout — a raw identifier folder, from before
+/// this module existed — is unreachable without naming it.
+fn legacy_identifier(app: &tauri::AppHandle) -> &'static str {
+    if app.config().identifier.ends_with(".dev") {
+        "es.boffmedia.launcher.dev"
+    } else {
+        "es.boffmedia.launcher"
     }
 }
 
@@ -51,7 +74,8 @@ const LAYOUT_VERSION: &str = "2";
 /// Migrate an install made by an earlier build (§ "auto-migrate on first
 /// launch"). Two independent steps, each a no-op when it has already happened:
 ///
-///  1. `%APPDATA%\<identifier>` → `%APPDATA%\BoffLauncher[ Dev]`
+///  1. `%APPDATA%\<old identifier>` or `%APPDATA%\BoffLauncher[ Dev]`
+///     → `%APPDATA%\Boffmedia[ Dev]`
 ///  2. `instances/<slug>/.minecraft/*` → `instances/<slug>/`, and
 ///     `instances/<slug>/bin` → `instances/<slug>/.boff-bin`
 ///
@@ -65,20 +89,48 @@ pub fn migrate(app: &tauri::AppHandle) {
     };
 
     // Step 1 — the whole tree, before anything looks inside it.
+    //
+    // TWO possible legacy roots, tried oldest-name-last:
+    //
+    //   %APPDATA%\es.boffmedia.launcher   the raw identifier folder, from
+    //                                     before this module existed
+    //   %APPDATA%\BoffLauncher            the human name this app used before
+    //                                     it was renamed to Boffmedia App
+    //
+    // `app_data_dir()` now resolves the NEW identifier (`es.boffmedia.app`), so
+    // it can no longer find the old identifier folder on its own — hence the
+    // explicit list. First hit wins; a player who never had either just starts
+    // clean. Only ever a RENAME of a whole tree: it is instant even for a 40 GB
+    // instances/ folder, and it is on the same volume by construction.
     if !root.exists() {
-        if let Ok(legacy) = app.path().app_data_dir() {
-            if legacy.exists() && legacy != root {
-                if let Some(parent) = root.parent() {
-                    let _ = std::fs::create_dir_all(parent);
-                }
-                match std::fs::rename(&legacy, &root) {
-                    Ok(()) => eprintln!(
+        let legacy_roots = [
+            app.path().app_data_dir().ok(),
+            app.path()
+                .data_dir()
+                .ok()
+                .map(|base| base.join(legacy_identifier(app))),
+            app.path()
+                .data_dir()
+                .ok()
+                .map(|base| base.join(legacy_folder_name(app))),
+        ];
+        for legacy in legacy_roots.into_iter().flatten() {
+            if !legacy.exists() || legacy == root {
+                continue;
+            }
+            if let Some(parent) = root.parent() {
+                let _ = std::fs::create_dir_all(parent);
+            }
+            match std::fs::rename(&legacy, &root) {
+                Ok(()) => {
+                    eprintln!(
                         "[datadir] migrated {} -> {}",
                         legacy.display(),
                         root.display()
-                    ),
-                    Err(e) => eprintln!("[datadir] could not move {}: {e}", legacy.display()),
+                    );
+                    break;
                 }
+                Err(e) => eprintln!("[datadir] could not move {}: {e}", legacy.display()),
             }
         }
     }

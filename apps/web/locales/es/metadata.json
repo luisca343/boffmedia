@@ -110,12 +110,12 @@
     },
     "launcher": {
       "index": {
-        "title": "Boff Launcher · Boffmedia",
-        "description": "Descarga el launcher de Boffmedia: instala, actualiza y lanza los packs de Minecraft de la comunidad."
+        "title": "Boffmedia App · Boffmedia",
+        "description": "Descarga Boffmedia App: instala, actualiza y lanza los packs de Minecraft de la comunidad, con las herramientas de Boffmedia integradas."
       },
       "autorizar": {
-        "title": "Autorizar el launcher · Boffmedia",
-        "description": "Aprueba el inicio de sesión de Boff Launcher con tu cuenta de Boffmedia."
+        "title": "Autorizar la app · Boffmedia",
+        "description": "Aprueba el inicio de sesión de Boffmedia App con tu cuenta de Boffmedia."
       }
     }
   }

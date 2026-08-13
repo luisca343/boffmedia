@@ -2,6 +2,8 @@ import * as React from "react"
 
 import { configureUi, DEFAULT_LOCALE, isAppLocale, type AppLocale } from "@boffmedia/ui"
 
+import { messages as toolsMinecraftMessages } from "@boffmedia/tools-minecraft/catalog"
+
 import { messages } from "./messages"
 
 // The launcher's translator. `@boffmedia/ui` is host-agnostic and only exposes a
@@ -57,9 +59,13 @@ function flatten(node: unknown, prefix: string, out: Dict): Dict {
   return out
 }
 
+// Workspace tool packages own their own catalogs (plan §3), so they are
+// flattened in FIRST and the launcher's own messages land on top — a host key
+// wins a collision, which is the direction that lets the launcher override a
+// tool string without editing the package.
 const FLAT: Record<AppLocale, Dict> = {
-  es: flatten(messages.es, "", {}),
-  en: flatten(messages.en, "", {}),
+  es: flatten(messages.es, "", flatten(toolsMinecraftMessages.es, "", {})),
+  en: flatten(messages.en, "", flatten(toolsMinecraftMessages.en, "", {})),
 }
 
 /** next-intl uses ICU `{name}` placeholders; the launcher only needs simple
@@ -108,5 +114,7 @@ export function useT(ns?: string): Translate {
 // router. Import-time, once, before anything renders.
 configureUi({
   useTranslate: () => useT("common.primitives"),
+  // Unbound — the tool packages' `tools.*` keys live at the root of this store.
+  useTranslateRoot: () => useT(),
   useLocale,
 })

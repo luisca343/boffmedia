@@ -25,6 +25,7 @@ import type { MenuItem } from "@boffmedia/ui"
 
 import { useT } from "../i18n"
 import { CrashDiagnosisCard } from "../components/CrashDiagnosis"
+import { SectionHeader } from "../components/SectionHeader"
 import { VersionPicker, dependenciesOf } from "../components/VersionPicker"
 import type { VersionChoice } from "../components/VersionPicker"
 import { InstanceSpace } from "../components/InstanceSpace"
@@ -481,13 +482,7 @@ export function PackDetail() {
 
   return (
     <div className="px-8 py-7">
-      <button
-        type="button"
-        onClick={() => go("packs")}
-        className="mb-4 flex items-center gap-1.5 text-xs uppercase tracking-[0.1em] text-txt-muted hover:text-accent-bright"
-      >
-        <Icon name="back" size={13} /> {t("libraryBack")}
-      </button>
+      <SectionHeader label={t("libraryBack")} onBack={() => go("packs")} />
 
       <header className="mb-5 flex flex-wrap items-start justify-between gap-4">
         <div className="flex min-w-0 items-start gap-4">

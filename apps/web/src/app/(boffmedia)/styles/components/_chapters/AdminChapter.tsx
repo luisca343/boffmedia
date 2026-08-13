@@ -365,7 +365,7 @@ export function AdminChapter() {
               published
               version="2.0.1"
               target="win-x64"
-              meta="boff-launcher.msi · 62 MB"
+              meta="boffmedia-app.msi · 62 MB"
               hashShort="3af0c1…9e2"
               hashFull="3af0c1a8b2d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6a7b8c9e2"
               date="18 Jun 2026"
@@ -376,7 +376,7 @@ export function AdminChapter() {
             <ReleaseRow
               version="2.0.2"
               target="macOS-arm64"
-              meta="boff-launcher-arm64.dmg · 71 MB"
+              meta="boffmedia-app-arm64.dmg · 71 MB"
               hashShort="f2e1d0…c9b"
               hashFull="f2e1d0c9b8a7z6y5x4w3v2u1t0s9r8q7p6o5n4m3l2k1j0i9h8g7f6e5d4c3b2a1"
               date="19 Jun 2026"

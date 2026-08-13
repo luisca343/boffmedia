@@ -18,6 +18,8 @@ const PACKAGES = [
   'apps/launcher',
   'packages/ui',
   'packages/pack-schema',
+  'packages/tools/kit',
+  'packages/tools/minecraft',
 ];
 function getAvailableMemoryMB() {
   try {

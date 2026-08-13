@@ -106,6 +106,14 @@ const ICONS = {
 /** Every valid icon name — use this to type icon fields so typos fail at compile time. */
 export type IconName = keyof typeof ICONS
 
+/** Runtime check for names that only exist as strings at compile time — a tool
+ *  package's registry manifest carries `icon: string`, because the registry is
+ *  host-agnostic and cannot depend on this icon set. Lets a host fall back
+ *  instead of rendering a hole when a package names a glyph it does not have. */
+export function isIconName(value: string): value is IconName {
+  return Object.prototype.hasOwnProperty.call(ICONS, value)
+}
+
 export interface IconProps {
   name: IconName
   size?: number

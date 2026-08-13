@@ -186,7 +186,7 @@ impl ProfileResponse {
 fn client() -> Result<reqwest::Client, AuthError> {
     Ok(reqwest::Client::builder()
         // §3.3's courtesy rule for Modrinth; harmless and polite everywhere else.
-        .user_agent("BoffLauncher/0.1 (+https://boffmedia.es)")
+        .user_agent("BoffmediaApp/0.1 (+https://boffmedia.es)")
         .timeout(Duration::from_secs(30))
         .build()?)
 }

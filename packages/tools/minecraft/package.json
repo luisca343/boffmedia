@@ -1,0 +1,38 @@
+{
+  "name": "@boffmedia/tools-minecraft",
+  "version": "0.0.1",
+  "private": true,
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./catalog": "./src/catalog/index.ts",
+    "./*": "./src/*"
+  },
+  "scripts": {
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@boffmedia/tool-kit": "workspace:*",
+    "@boffmedia/ui": "workspace:*",
+    "@react-three/drei": "^10.7.7",
+    "@react-three/fiber": "^9.6.1",
+    "comlink": "^4.4.2",
+    "jszip": "^3.10.1",
+    "minecraft-data": "^3.111.0",
+    "pako": "^3.0.0",
+    "three": "^0.163.0",
+    "zustand": "^4.5.0"
+  },
+  "peerDependencies": {
+    "react": ">=19",
+    "react-dom": ">=19"
+  },
+  "devDependencies": {
+    "@types/pako": "^2.0.4",
+    "@types/react": "19.2.7",
+    "@types/react-dom": "19.2.3",
+    "@types/three": "^0.185.0",
+    "vitest": "^4.1.10"
+  }
+}

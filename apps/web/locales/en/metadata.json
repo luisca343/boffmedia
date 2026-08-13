@@ -110,12 +110,12 @@
     },
     "launcher": {
       "index": {
-        "title": "Boff Launcher · Boffmedia",
-        "description": "Download the Boffmedia launcher: install, update and launch the community Minecraft packs."
+        "title": "Boffmedia App · Boffmedia",
+        "description": "Download Boffmedia App: install, update and launch the community Minecraft packs, with the Boffmedia tools built in."
       },
       "autorizar": {
-        "title": "Authorize the launcher · Boffmedia",
-        "description": "Approve a Boff Launcher sign-in with your Boffmedia account."
+        "title": "Authorize the app · Boffmedia",
+        "description": "Approve a Boffmedia App sign-in with your Boffmedia account."
       }
     }
   }

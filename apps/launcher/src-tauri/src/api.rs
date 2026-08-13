@@ -70,7 +70,18 @@ impl Default for ApiState {
     fn default() -> Self {
         Self {
             http: reqwest::Client::builder()
-                .user_agent(concat!("BoffLauncher/", env!("CARGO_PKG_VERSION")))
+                .user_agent(concat!("BoffmediaApp/", env!("CARGO_PKG_VERSION")))
+                // A dead host used to hold a request open until the OS gave up
+                // — minutes, during which the library spinner never resolved
+                // and the player could not tell "down" from "slow". This is the
+                // bound that lets us say "server unreachable" quickly.
+                //
+                // Deliberately NOT a whole-request `.timeout()`: this same
+                // client streams pack file downloads (`download_file` hands the
+                // Response to the installer), and a total budget would cut a
+                // large mod off mid-body. The short control-plane calls set
+                // their own per-request timeout via `CONTROL_TIMEOUT`.
+                .connect_timeout(std::time::Duration::from_secs(8))
                 .build()
                 .unwrap_or_default(),
             token: Mutex::new(None),
@@ -350,6 +361,17 @@ pub enum ApiError {
     /// Authenticated fine; this player simply is not entitled.
     Denied(String),
     Message(String),
+    /// The request never reached the API: DNS, refused connection, TLS, or a
+    /// connect timeout. Distinct from `Message` so the renderer can say
+    /// "cannot reach the server" instead of inventing a reason — from here we
+    /// genuinely cannot tell whether the fault is ours or their network, and
+    /// the UI is honest about that.
+    Unreachable(String),
+    /// The API answered, and answered 5xx. This one IS definitively server-side
+    /// and the player can be told so plainly: nothing about their machine,
+    /// their session or their install is wrong, and retrying later is the whole
+    /// of the advice.
+    ServerDown(String),
     /// The OS credential store itself failed (locked keychain, broken Secret
     /// Service). Kept apart from `Message` because the renderer must not offer
     /// "play offline" for it — the stored token cannot be read either.
@@ -358,10 +380,40 @@ pub enum ApiError {
 
 impl From<reqwest::Error> for ApiError {
     fn from(err: reqwest::Error) -> Self {
-        // Network failures are the common case here (the player is offline, or
-        // the API is down) and must never read as "you were kicked out".
-        ApiError::Message(format!("No se pudo contactar con el servidor: {err}"))
+        // A transport failure is the common case here (the player is offline,
+        // or the API is down) and must never read as "you were kicked out".
+        // A body that fails to DECODE is a different animal — the server did
+        // answer — so it stays a plain message rather than claiming the host
+        // is unreachable.
+        if err.is_decode() {
+            return ApiError::Message(format!("Respuesta inesperada del servidor: {err}"));
+        }
+        if err.is_timeout() {
+            return ApiError::Unreachable(
+                "El servidor no respondió a tiempo. Puede estar caído o tu conexión ser inestable."
+                    .into(),
+            );
+        }
+        ApiError::Unreachable(format!("No se pudo contactar con el servidor: {err}"))
     }
+}
+
+/// How long the short, non-streaming calls wait for a whole answer. The shared
+/// client sets no total timeout (it streams downloads), so every control-plane
+/// request applies this itself — otherwise a server that accepts the socket and
+/// then stalls leaves the library loading forever.
+pub const CONTROL_TIMEOUT: std::time::Duration = std::time::Duration::from_secs(20);
+
+/// Turn a non-success response into the right error variant. A 5xx is the
+/// server telling us it is broken, and collapsing that into a generic message
+/// is what made "the API is down" look like "your library failed to load".
+async fn response_error(res: reqwest::Response, fallback: &str) -> ApiError {
+    if res.status().is_server_error() {
+        let status = res.status().as_u16();
+        let message = error_message(res, fallback).await;
+        return ApiError::ServerDown(format!("{message} (error {status} del servidor)"));
+    }
+    ApiError::Message(error_message(res, fallback).await)
 }
 
 impl From<ApiError> for AuthFailure {
@@ -371,12 +423,14 @@ impl From<ApiError> for AuthFailure {
                 message,
                 needs_signin: true,
             },
-            ApiError::Denied(message) | ApiError::Message(message) | ApiError::Store(message) => {
-                AuthFailure {
-                    message,
-                    needs_signin: false,
-                }
-            }
+            ApiError::Denied(message)
+            | ApiError::Message(message)
+            | ApiError::Unreachable(message)
+            | ApiError::ServerDown(message)
+            | ApiError::Store(message) => AuthFailure {
+                message,
+                needs_signin: false,
+            },
         }
     }
 }
@@ -394,6 +448,10 @@ impl serde::Serialize for ApiError {
             ApiError::NeedsSignin(m) => (m.as_str(), true, None),
             ApiError::Denied(m) => (m.as_str(), false, None),
             ApiError::Message(m) => (m.as_str(), false, None),
+            // The renderer switches on these two to pick between "we cannot
+            // reach the server" and "the server is down" — see `serverStatus`.
+            ApiError::Unreachable(m) => (m.as_str(), false, Some("server_unreachable")),
+            ApiError::ServerDown(m) => (m.as_str(), false, Some("server_down")),
             ApiError::Store(m) => (m.as_str(), false, Some("store_error")),
         };
         Wire {
@@ -435,7 +493,7 @@ pub async fn boff_device_start(
     api: tauri::State<'_, ApiState>,
 ) -> Result<DeviceAuthorization, ApiError> {
     let label = format!(
-        "Boff Launcher {} · {}",
+        "Boffmedia App {} · {}",
         env!("CARGO_PKG_VERSION"),
         std::env::consts::OS
     );
@@ -1003,6 +1061,64 @@ fn read_json_cache<T: serde::de::DeserializeOwned>(path: Option<std::path::PathB
     serde_json::from_slice(&raw).ok()
 }
 
+/// The answer to "is the backend up?", as three states the UI can phrase
+/// differently. Never an `Err`: a probe that fails IS the result, and modelling
+/// it as an error would put "could not check whether the server is down" in
+/// front of a player, which says nothing.
+#[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ServerHealth {
+    /// `ok` — answered 2xx. `unreachable` — never got an answer (DNS, refused,
+    /// TLS, timeout): could be them, could be this machine's network, and the
+    /// UI says exactly that. `down` — answered, with a 5xx: unambiguously
+    /// server-side, and the player is told so.
+    pub status: &'static str,
+    pub http_status: Option<u16>,
+    pub detail: Option<String>,
+}
+
+/// Probe the API root. Unauthenticated on purpose — `GET /health` is `@Public`,
+/// so this answers the same for a signed-out player, which is the point: the
+/// launcher now opens without an account and still has to be able to say why
+/// nothing is loading. Kept short so a down server is reported in seconds
+/// rather than held behind the same budget as a real request.
+#[tauri::command]
+pub async fn server_health(api: tauri::State<'_, ApiState>) -> Result<ServerHealth, ()> {
+    let res = api
+        .http
+        .get(format!("{}/health", base_url()))
+        .timeout(std::time::Duration::from_secs(8))
+        .send()
+        .await;
+
+    Ok(match res {
+        Ok(res) if res.status().is_success() => ServerHealth {
+            status: "ok",
+            http_status: Some(res.status().as_u16()),
+            detail: None,
+        },
+        Ok(res) if res.status().is_server_error() => ServerHealth {
+            status: "down",
+            http_status: Some(res.status().as_u16()),
+            detail: None,
+        },
+        // A 4xx from /health still proves something is listening and routing —
+        // a proxy or a stale deploy, not a dead host. Reported as reachable so
+        // the real call's own error is what the player sees, rather than a
+        // blanket "server offline" over a launcher that otherwise works.
+        Ok(res) => ServerHealth {
+            status: "ok",
+            http_status: Some(res.status().as_u16()),
+            detail: None,
+        },
+        Err(err) => ServerHealth {
+            status: "unreachable",
+            http_status: None,
+            detail: Some(err.to_string()),
+        },
+    })
+}
+
 /// The packs this account may see. Access filtering is the server's job — a pack
 /// the player cannot install must never reach this list in the first place.
 ///
@@ -1019,11 +1135,12 @@ pub async fn packs_list(
     let res = match authed(&api, |http, base| {
         http.get(format!("{base}/packs/launcher/packs"))
             .header("X-Boff-Game-Types", game_types_header())
+            .timeout(CONTROL_TIMEOUT)
     })
     .await
     {
         Ok(res) => res,
-        Err(err @ ApiError::Message(_)) => {
+        Err(err @ (ApiError::Message(_) | ApiError::Unreachable(_))) => {
             if let Some(id) = account_id {
                 if let Some(cached) = read_json_cache::<Vec<LauncherPack>>(packs_cache_path(&app, id)) {
                     return Ok(cached);
@@ -1035,9 +1152,20 @@ pub async fn packs_list(
     };
 
     if !res.status().is_success() {
-        return Err(ApiError::Message(
-            error_message(res, "No se pudo cargar la lista de packs.").await,
-        ));
+        let err = response_error(res, "No se pudo cargar la lista de packs.").await;
+        // A 5xx is the registry being broken, not this player's entitlements
+        // changing — the last-good list is still the truth about what they own,
+        // so it is served exactly as it is for an unreachable host. A 4xx is
+        // NOT: that is the server deciding about this account, and the cache
+        // must not outlive it.
+        if matches!(err, ApiError::ServerDown(_)) {
+            if let Some(id) = account_id {
+                if let Some(cached) = read_json_cache::<Vec<LauncherPack>>(packs_cache_path(&app, id)) {
+                    return Ok(cached);
+                }
+            }
+        }
+        return Err(err);
     }
     let body: Envelope<Vec<LauncherPack>> = res.json().await?;
     if let Some(id) = account_id {
@@ -1073,7 +1201,7 @@ pub async fn pack_manifest(
         // installed with, so an already-installed pack stays LAUNCHABLE
         // offline. Only for transport failures — a revoked entitlement or a
         // dead session must never be papered over by a cache.
-        Err(err @ ApiError::Message(_)) => {
+        Err(err @ (ApiError::Message(_) | ApiError::Unreachable(_))) => {
             if let Some(cached) =
                 read_json_cache::<serde_json::Value>(manifest_cache_path(&app, &pack_id))
             {

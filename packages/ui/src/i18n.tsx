@@ -19,7 +19,14 @@ export type LinkComponent = React.ComponentType<
  *  the host's *hook*, not its result, so per-request locale still resolves
  *  normally when useTranslate() runs during render. */
 export type UiRuntime = {
+  /** Bound to the `common.primitives` namespace — what the primitives use. */
   useTranslate: () => Translate
+  /** UNBOUND: takes full dotted keys from the root of the host's message store.
+   *  The primitives never use this; workspace tool packages
+   *  (`@boffmedia/tools-*`) do, because their keys live under their own
+   *  top-level namespace (`tools.*`) rather than inside `common.primitives`.
+   *  A host that only renders primitives can leave it unset. */
+  useTranslateRoot: () => Translate
   useLocale: () => string
   Link: LinkComponent
 }
@@ -35,6 +42,7 @@ const DefaultLink: LinkComponent = ({ href, children, ...rest }) => (
  *  translations wired. */
 let runtime: UiRuntime = {
   useTranslate: () => (key: string) => key,
+  useTranslateRoot: () => (key: string) => key,
   useLocale: () => DEFAULT_LOCALE,
   Link: DefaultLink,
 }
@@ -49,6 +57,11 @@ export function configureUi(partial: Partial<UiRuntime>) {
  *  Keys are unchanged, so existing message files keep working verbatim. */
 export function useT(): Translate {
   return runtime.useTranslate()
+}
+
+/** Root-namespace translator for tool packages. See `useTranslateRoot`. */
+export function useRootT(): Translate {
+  return runtime.useTranslateRoot()
 }
 
 export function useUiLocale(): string {

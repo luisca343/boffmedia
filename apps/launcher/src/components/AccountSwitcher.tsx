@@ -73,9 +73,29 @@ export function AccountSwitcher() {
     }
   }, [open])
 
-  // The rail only mounts inside the shell, which is gated on a Boffmedia
-  // session, so this is effectively always set — but guard rather than assume.
-  if (!boffAccount) return null
+  // The shell (and so this rail) renders signed OUT too. The chip is where a
+  // session comes from in that state: one obvious affordance, from anywhere in
+  // the app. Rendering nothing here (the old behaviour, when the rail could not
+  // exist without a session) would leave the rail with a hole where the account
+  // belongs.
+  //
+  // It STARTS the device flow rather than navigating to Play. That worked only
+  // while Play was a sign-in wall; now Play is a working library, so navigating
+  // there would answer a click on "sign in" with a pack list and no sign-in in
+  // sight. The flow itself takes the content area (see App's Router).
+  if (!boffAccount) {
+    return (
+      <button
+        type="button"
+        onClick={() => void boffSignIn()}
+        title={t("signIn")}
+        aria-label={t("signIn")}
+        className="flex h-10 w-10 shrink-0 items-center justify-center rounded text-txt-muted transition-colors hover:bg-surface-bright hover:text-txt"
+      >
+        <Icon name="key" size={20} />
+      </button>
+    )
+  }
 
   const others = boffAccountList.filter((a) => a.id !== boffAccount.id)
 

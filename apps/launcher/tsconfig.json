@@ -14,6 +14,9 @@
     "types": ["vite/client"],
     "paths": {
       "@/*": ["./src/*"],
+      "@boffmedia/tool-kit": ["../../packages/tools/kit/src"],
+      "@boffmedia/tools-minecraft": ["../../packages/tools/minecraft/src"],
+      "@boffmedia/tools-minecraft/*": ["../../packages/tools/minecraft/src/*"],
       "@boffmedia/ui": ["../../packages/ui/src"],
       "@boffmedia/ui/*": ["../../packages/ui/src/*"],
       "@boffmedia/tailwind-config/*": ["../../packages/tailwind-config/*"]

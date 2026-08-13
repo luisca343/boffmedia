@@ -62,6 +62,17 @@ fn randomizer_error_from_api(err: api::ApiError) -> RandomizerError {
             code: "network_error".to_string(),
             message: m,
         },
+        // Split out from the generic network failure so this screen can say
+        // whether the fault is reaching the server at all or the server itself
+        // answering 5xx — the two need different advice.
+        api::ApiError::Unreachable(m) => RandomizerError {
+            code: "server_unreachable".to_string(),
+            message: m,
+        },
+        api::ApiError::ServerDown(m) => RandomizerError {
+            code: "server_down".to_string(),
+            message: m,
+        },
         // The OS credential store failed — not a network problem, and not fixable
         // by signing in again from this screen.
         api::ApiError::Store(m) => RandomizerError {

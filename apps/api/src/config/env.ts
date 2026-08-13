@@ -98,7 +98,7 @@ export const env = z
     // setup. Kept in the schema because deploy envs already set them; setting
     // one changes nothing until `config/laboon.ts`'s TEMP note is unwound.
     PACK_BLOB_DIR: z.string().optional(),
-    // Boff Launcher auto-update artifacts (Tauri v2 updater). Inert for the same
+    // Boffmedia App auto-update artifacts (Tauri v2 updater). Inert for the same
     // reason as PACK_BLOB_DIR and, like it, deliberately OUTSIDE PUBLIC_DIR:
     // the bytes are served by a controller route so downloads stay countable
     // and the layout on disk is not part of the public contract.

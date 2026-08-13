@@ -8,6 +8,11 @@
 
 use keyring::Entry;
 
+// Deliberately still the OLD bundle identifier, even though the app now ships
+// as `es.boffmedia.app`. This is the OS keychain's service name, not a label:
+// every Minecraft refresh token and every Boffmedia session on every existing
+// install is filed under it. Renaming it would find an empty keychain and sign
+// the whole userbase out on update — and this string is never shown to anyone.
 const SERVICE: &str = "es.boffmedia.launcher";
 
 /// The pre-multi-account key: ONE token, no UUID. Still read (never written) so
@@ -101,6 +106,11 @@ pub fn clear_refresh_token() -> Result<(), StoreError> {
 // no extra plumbing. Each signed-in account ALSO gets a per-id entry, which is
 // what a switch reads to make a different account active.
 
+// Deliberately NOT renamed alongside "Boff Launcher" → "Boffmedia App". This
+// string is a live credential-store key: every signed-in player's session is
+// filed under it in the OS keychain, and a new name would find nothing there
+// and read as "no stored session" — silently signing out everyone who updates.
+// Cosmetic consistency is not worth a forced re-authorisation.
 const LAUNCHER_SESSION: &str = "boff-launcher-session";
 
 /// One Boffmedia-session credential per account. The id is the account's numeric

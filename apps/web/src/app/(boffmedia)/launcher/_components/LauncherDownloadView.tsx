@@ -180,11 +180,11 @@ export function LauncherDownloadView() {
               <p className="mt-4 mb-2 font-body text-[15px]/[1.6] text-txt-muted">{t("verifyHow")}</p>
               <CodeBlock
                 label="PowerShell"
-                lines={[`Get-FileHash -Algorithm SHA512 .\\${rows[0]?.artifactName ?? "BoffLauncher.exe"}`]}
+                lines={[`Get-FileHash -Algorithm SHA512 .\\${rows[0]?.artifactName ?? "BoffmediaApp.exe"}`]}
               />
               <CodeBlock
                 label="Linux / macOS"
-                lines={[`sha512sum ${rows[0]?.artifactName ?? "BoffLauncher.exe"}`]}
+                lines={[`sha512sum ${rows[0]?.artifactName ?? "BoffmediaApp.exe"}`]}
                 className="mt-2"
               />
             </Panel>

@@ -55,8 +55,12 @@ export function Titlebar() {
           draggable={false}
           className="pointer-events-none select-none"
         />
-        <span className="pointer-events-none select-none font-display text-[14px]/none font-bold uppercase tracking-[0.06em] text-txt">Boff</span>
-        <span className="pointer-events-none select-none font-display text-[14px]/none font-bold uppercase tracking-[0.06em] text-txt-dim">Launcher</span>
+        {/* L4 — "Boffmedia App", not "Boff Launcher": this stopped being a
+            launcher when Tools became a first-class section. UI STRINGS ONLY —
+            the executable, installer and updater feed keep their current
+            identity until a dedicated release cycle. */}
+        <span className="pointer-events-none select-none font-display text-[14px]/none font-bold uppercase tracking-[0.06em] text-txt">{t("brandName")}</span>
+        <span className="pointer-events-none select-none font-display text-[14px]/none font-bold uppercase tracking-[0.06em] text-txt-dim">{t("brandSuffix")}</span>
       </div>
 
       {/* Right: window controls */}

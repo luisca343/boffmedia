@@ -3,5 +3,5 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 fn main() {
-    boff_launcher_lib::run()
+    boffmedia_app_lib::run()
 }

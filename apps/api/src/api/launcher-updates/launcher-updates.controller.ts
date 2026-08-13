@@ -21,7 +21,7 @@ import { LauncherUpdatesService } from './launcher-updates.service';
 import { UpdaterFeedEntity } from './entities/launcher-updates.entity';
 
 /**
- * El feed de auto-actualización del Boff Launcher (plugin updater de Tauri v2).
+ * El feed de auto-actualización de Boffmedia App (plugin updater de Tauri v2).
  *
  * Todo aquí es PÚBLICO a propósito: el launcher comprueba si hay actualización
  * antes de que el usuario inicie sesión, así que exigir un token haría que un

@@ -46,7 +46,7 @@ export function SignIn() {
     <div className="grid h-full place-items-center px-8 py-10">
       <div className="w-full max-w-[520px]">
         <div className="mb-6 text-center">
-          <Kicker>Boff Launcher</Kicker>
+          <Kicker>Boffmedia App</Kicker>
           <h1 className="font-display text-[34px]/none font-bold uppercase tracking-[0.06em] text-txt">
             {t("title")}
           </h1>

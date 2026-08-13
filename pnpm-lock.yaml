@@ -351,6 +351,12 @@ importers:
       '@boffmedia/tailwind-config':
         specifier: workspace:*
         version: link:../../packages/tailwind-config
+      '@boffmedia/tool-kit':
+        specifier: workspace:*
+        version: link:../../packages/tools/kit
+      '@boffmedia/tools-minecraft':
+        specifier: workspace:*
+        version: link:../../packages/tools/minecraft
       '@boffmedia/ui':
         specifier: workspace:*
         version: link:../../packages/ui
@@ -403,6 +409,12 @@ importers:
       '@boffmedia/shared':
         specifier: workspace:*
         version: link:../../packages/shared
+      '@boffmedia/tool-kit':
+        specifier: workspace:*
+        version: link:../../packages/tools/kit
+      '@boffmedia/tools-minecraft':
+        specifier: workspace:*
+        version: link:../../packages/tools/minecraft
       '@boffmedia/ui':
         specifier: workspace:*
         version: link:../../packages/ui
@@ -767,6 +779,71 @@ importers:
       tailwindcss:
         specifier: ^3.4.0
         version: 3.4.19(tsx@4.21.0)(yaml@2.8.3)
+
+  packages/tools/kit:
+    dependencies:
+      react:
+        specifier: 19.2.3
+        version: 19.2.3
+    devDependencies:
+      '@types/react':
+        specifier: 19.2.7
+        version: 19.2.7
+
+  packages/tools/minecraft:
+    dependencies:
+      '@boffmedia/tool-kit':
+        specifier: workspace:*
+        version: link:../kit
+      '@boffmedia/ui':
+        specifier: workspace:*
+        version: link:../../ui
+      '@react-three/drei':
+        specifier: ^10.7.7
+        version: 10.7.7(@react-three/fiber@9.6.1(@types/react@19.2.7)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(three@0.163.0))(@types/react@19.2.7)(@types/three@0.185.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(three@0.163.0)
+      '@react-three/fiber':
+        specifier: ^9.6.1
+        version: 9.6.1(@types/react@19.2.7)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(three@0.163.0)
+      comlink:
+        specifier: ^4.4.2
+        version: 4.4.2
+      jszip:
+        specifier: ^3.10.1
+        version: 3.10.1
+      minecraft-data:
+        specifier: ^3.111.0
+        version: 3.111.0
+      pako:
+        specifier: ^3.0.0
+        version: 3.0.0
+      react:
+        specifier: 19.2.3
+        version: 19.2.3
+      react-dom:
+        specifier: 19.2.3
+        version: 19.2.3(react@19.2.3)
+      three:
+        specifier: ^0.163.0
+        version: 0.163.0
+      zustand:
+        specifier: ^4.5.0
+        version: 4.5.7(@types/react@19.2.7)(react@19.2.3)
+    devDependencies:
+      '@types/pako':
+        specifier: ^2.0.4
+        version: 2.0.4
+      '@types/react':
+        specifier: 19.2.7
+        version: 19.2.7
+      '@types/react-dom':
+        specifier: 19.2.3
+        version: 19.2.3(@types/react@19.2.7)
+      '@types/three':
+        specifier: ^0.185.0
+        version: 0.185.0
+      vitest:
+        specifier: ^4.1.10
+        version: 4.1.10(@opentelemetry/api@1.9.1)(@types/node@24.12.0)(jsdom@29.1.0(@noble/hashes@1.8.0))(vite@8.0.10(@types/node@24.12.0)(esbuild@0.27.4)(jiti@1.21.7)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.3))
 
   packages/ui:
     dependencies:
@@ -11163,8 +11240,6 @@ snapshots:
       '@ckeditor/ckeditor5-core': 47.6.1
       '@ckeditor/ckeditor5-utils': 47.6.1
       ckeditor5: 47.6.1
-    transitivePeerDependencies:
-      - supports-color
 
   '@ckeditor/ckeditor5-code-block@47.6.1':
     dependencies:
@@ -11207,8 +11282,6 @@ snapshots:
       '@ckeditor/ckeditor5-utils': 47.6.1
       ckeditor5: 47.6.1
       es-toolkit: 1.39.5
-    transitivePeerDependencies:
-      - supports-color
 
   '@ckeditor/ckeditor5-editor-classic@47.6.1':
     dependencies:
@@ -11218,8 +11291,6 @@ snapshots:
       '@ckeditor/ckeditor5-utils': 47.6.1
       ckeditor5: 47.6.1
       es-toolkit: 1.39.5
-    transitivePeerDependencies:
-      - supports-color
 
   '@ckeditor/ckeditor5-editor-decoupled@47.6.1':
     dependencies:
@@ -11270,6 +11341,8 @@ snapshots:
     dependencies:
       '@ckeditor/ckeditor5-utils': 47.6.1
       es-toolkit: 1.39.5
+    transitivePeerDependencies:
+      - supports-color
 
   '@ckeditor/ckeditor5-enter@47.6.1':
     dependencies:
@@ -11559,8 +11632,6 @@ snapshots:
       '@ckeditor/ckeditor5-ui': 47.6.1
       '@ckeditor/ckeditor5-utils': 47.6.1
       ckeditor5: 47.6.1
-    transitivePeerDependencies:
-      - supports-color
 
   '@ckeditor/ckeditor5-restricted-editing@47.6.1':
     dependencies:
@@ -11668,6 +11739,8 @@ snapshots:
       '@ckeditor/ckeditor5-icons': 47.6.1
       '@ckeditor/ckeditor5-ui': 47.6.1
       '@ckeditor/ckeditor5-utils': 47.6.1
+    transitivePeerDependencies:
+      - supports-color
 
   '@ckeditor/ckeditor5-upload@47.6.1':
     dependencies:
@@ -11678,6 +11751,8 @@ snapshots:
     dependencies:
       '@ckeditor/ckeditor5-ui': 47.6.1
       es-toolkit: 1.39.5
+    transitivePeerDependencies:
+      - supports-color
 
   '@ckeditor/ckeditor5-watchdog@47.6.1':
     dependencies:

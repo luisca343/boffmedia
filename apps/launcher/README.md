@@ -1,4 +1,4 @@
-# Boff Launcher
+# Boffmedia App
 
 Tauri v2 + React. Design system from `@boffmedia/ui`, pack validation from
 `@boffmedia/pack-schema` — the same schema `apps/api` validates with.

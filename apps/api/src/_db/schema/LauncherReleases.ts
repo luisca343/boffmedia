@@ -11,7 +11,7 @@ import {
   timestamp,
 } from 'drizzle-orm/mysql-core';
 
-// Boff Launcher auto-update — the artifacts Tauri v2's updater plugin downloads.
+// Boffmedia App auto-update — the artifacts Tauri v2's updater plugin downloads.
 // One row per (version, target) pair: a single release ships several bundles
 // (windows-x86_64, linux-x86_64, …) and the updater asks for exactly one of
 // them, so the platform key has to be a column and not a JSON blob.

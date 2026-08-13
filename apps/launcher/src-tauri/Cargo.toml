@@ -1,7 +1,7 @@
 [package]
-name = "boff-launcher"
+name = "boffmedia-app"
 version = "0.0.2"
-description = "Boff Launcher"
+description = "Boffmedia App"
 authors = ["Boffmedia"]
 edition = "2021"
 # portablemc 5.0.4 is edition 2024 and declares rust-version 1.88.0, so the
@@ -13,7 +13,7 @@ rust-version = "1.88.0"
 [lib]
 # Tauri v2 keeps the app in a lib so mobile targets and integration tests can
 # reach it; main.rs is a thin shim over run().
-name = "boff_launcher_lib"
+name = "boffmedia_app_lib"
 crate-type = ["staticlib", "cdylib", "rlib"]
 
 [build-dependencies]

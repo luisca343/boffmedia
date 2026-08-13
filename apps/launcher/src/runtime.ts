@@ -492,6 +492,31 @@ export type LauncherPack = {
   latestVersion: LauncherVersion | null
 }
 
+/** Whether the backend is answering, as three states the UI phrases
+ *  differently — see the Rust `ServerHealth`. */
+export type ServerHealth = {
+  status: "ok" | "unreachable" | "down"
+  httpStatus: number | null
+  detail: string | null
+}
+
+/** Probe the API. NEVER throws and never needs a session: it is the thing that
+ *  has to still work when everything else is failing, including for a player
+ *  who never signed in. In a browser there is no Rust side and no API to probe,
+ *  so `dev:renderer` reports healthy rather than painting a false alarm over
+ *  every screen. */
+export async function serverHealth(): Promise<ServerHealth> {
+  if (!isDesktop()) return { status: "ok", httpStatus: 200, detail: null }
+  try {
+    return await invoke<ServerHealth>("server_health")
+  } catch (err) {
+    // The command itself is infallible on the Rust side, so reaching here means
+    // the IPC bridge failed. Reporting "unreachable" is still the honest
+    // answer: nothing can be fetched either way.
+    return { status: "unreachable", httpStatus: null, detail: String(err) }
+  }
+}
+
 /** Every pack this UUID may install. Throws an {@link AuthFailure}.
  *  `LauncherPack`/`LauncherVersion` carry `#[serde(rename_all = "camelCase")]`
  *  on the Rust side, so the payload is already in this shape — mapping it from
@@ -1829,6 +1854,59 @@ export async function folderPicker(): Promise<string | null> {
   } catch {
     return null
   }
+}
+
+/** Native SAVE dialog (the pickers above are open dialogs). Resolves to the
+ *  chosen absolute path, or null if the user cancelled.
+ *
+ *  `filters` are `[label, extensions]` pairs, e.g. `[["NBT", ["nbt"]]]`. */
+export async function saveDialog(
+  suggestedName: string,
+  filters?: Array<[string, string[]]>,
+): Promise<string | null> {
+  if (!isDesktop()) return null
+  try {
+    return await invoke<string | null>("save_dialog", { suggestedName, filters })
+  } catch {
+    return null
+  }
+}
+
+/** Chunked write session for tool exports. A Schematic Compat `.prefab` can run
+ *  to multiple GB, so the payload is pushed chunk by chunk instead of crossing
+ *  the IPC boundary as one message. Errors propagate (unlike the pickers): a
+ *  failed disk write must not look like a completed save. */
+export const saveStream = {
+  async begin(path: string): Promise<string> {
+    try {
+      return await invoke<string>("save_stream_begin", { path })
+    } catch (err) {
+      throw asFailure(err)
+    }
+  },
+  async chunk(token: string, chunk: Uint8Array): Promise<void> {
+    try {
+      // Tauri v2 serialises a number[] for Vec<u8>; the copy is per-chunk, not
+      // per-file, which is what keeps peak memory flat.
+      await invoke("save_stream_chunk", { token, chunk: Array.from(chunk) })
+    } catch (err) {
+      throw asFailure(err)
+    }
+  },
+  async finish(token: string): Promise<void> {
+    try {
+      await invoke("save_stream_finish", { token })
+    } catch (err) {
+      throw asFailure(err)
+    }
+  },
+  async abort(token: string): Promise<void> {
+    try {
+      await invoke("save_stream_abort", { token })
+    } catch (err) {
+      throw asFailure(err)
+    }
+  },
 }
 
 /** Get the emulator ROM slot's instance-relative path for a pack.

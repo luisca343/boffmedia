@@ -15,7 +15,7 @@
 // It USED to hand back a file path for the asset protocol instead. That path
 // died twice and was replaced: the static `$APPDATA` scope in tauri.conf.json
 // resolves under the bundle identifier while datadir.rs deliberately uses
-// `%APPDATA%\BoffLauncher[ Dev]`, so the scope never matched the real cache —
+// `%APPDATA%\Boffmedia[ Dev]`, so the scope never matched the real cache —
 // and even a runtime `allow_directory` grant left WebView2 refusing the
 // encoded paths. A data: URL has no scope, no protocol handler and no
 // extension-derived content type to get wrong; the MIME is sniffed from the
@@ -143,7 +143,7 @@ pub async fn icon_cache(app: tauri::AppHandle, url: String) -> Result<String, Ic
 
     let client = reqwest::Client::builder()
         .user_agent(concat!(
-            "FicusLabs/BoffLauncher/",
+            "FicusLabs/BoffmediaApp/",
             env!("CARGO_PKG_VERSION"),
             " (boffmedia.es)"
         ))

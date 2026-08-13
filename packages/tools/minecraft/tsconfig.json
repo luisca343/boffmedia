@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "target": "ES2017",
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "jsx": "react-jsx",
+    "strict": true,
+    "noEmit": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "isolatedModules": true,
+    "resolveJsonModule": true,
+    // The worker entry points use `new URL(..., import.meta.url)`, which needs
+    // the bundler-style module target above plus DOM's Worker types.
+    "types": ["vitest/globals"],
+    "paths": {
+      "@boffmedia/tool-kit": ["../kit/src/index.ts"],
+      "@boffmedia/ui": ["../../ui/src/index.ts"],
+      "@boffmedia/ui/*": ["../../ui/src/*"]
+    }
+  },
+  "include": ["src/**/*.ts", "src/**/*.tsx"],
+  "exclude": ["node_modules"]
+}

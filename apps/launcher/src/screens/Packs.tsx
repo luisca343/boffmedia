@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react"
 
 import {
   Badge,
+  Banner,
   Button,
   CatalogIcon,
   Empty,
@@ -33,7 +34,8 @@ import {
 import { ImportPackPage } from "../components/pack/ImportPackPage"
 import { DeleteLocalPackModal, UninstallPackModal } from "../components/pack/PackDeleteDialogs"
 import type { GameType, InstallState, PackEntry, ServerStatus } from "../services/types"
-import { systemOfEntry } from "../services/systems"
+import type { SystemId } from "../services/systems"
+import { SYSTEMS, systemOfEntry } from "../services/systems"
 import { getModule } from "../services/gameModules"
 import { useLauncher } from "../state/launcher"
 import { formatBytes, formatPlaytime, formatWhen } from "../utils/format"
@@ -414,10 +416,90 @@ function CreateLocalPackModal({ open, onClose, onCreated }: { open: boolean; onC
   )
 }
 
+/** L2 — the game-system filter, moved out of the app rail and into the screen it
+ *  actually belongs to. It is one screen's filter, and it was occupying the only
+ *  navigation space the app has.
+ *
+ *  Hidden below two systems, exactly as the rail's block was: a single chip that
+ *  filters nothing is a control that can only mislead. */
+function SystemChips() {
+  const t = useT("common")
+  const tp = useT("packs")
+  const { packs, selectedSystem, selectSystem } = useLauncher()
+
+  const systems = useMemo(() => {
+    const seen = new Set<SystemId>()
+    for (const p of packs) seen.add(systemOfEntry(p))
+    return Array.from(seen).sort()
+  }, [packs])
+
+  if (systems.length < 2) return null
+
+  const meta = new Map(SYSTEMS.map((s) => [s.id, s]))
+  const chip = (active: boolean) =>
+    `flex items-center gap-1.5 rounded-full border border-solid px-3 py-1 text-xs transition-colors ${
+      active
+        ? "border-accent bg-accent text-white"
+        : "border-line text-txt-muted hover:border-accent-line hover:text-txt"
+    }`
+
+  return (
+    // Its own line above the toolbar, never inside it: the toolbar already
+    // carries search, the layout switch, Import and Create, and folding a
+    // variable-length chip row in there is what makes it wrap unpredictably.
+    <div className="mb-5 flex flex-wrap items-center gap-2" role="group" aria-label={tp("systemFilterLabel")}>
+      <button
+        type="button"
+        onClick={() => selectSystem("All")}
+        aria-pressed={selectedSystem === "All"}
+        className={chip(selectedSystem === "All")}
+      >
+        <Icon name="grid" size={13} />
+        {tp("allSystems")}
+      </button>
+      {systems.map((id) => {
+        const system = meta.get(id)
+        if (!system) return null
+        return (
+          <button
+            key={id}
+            type="button"
+            onClick={() => selectSystem(id)}
+            aria-pressed={selectedSystem === id}
+            className={chip(selectedSystem === id)}
+          >
+            <Icon name={system.icon} size={13} />
+            {t(system.labelKey)}
+          </button>
+        )
+      })}
+    </div>
+  )
+}
+
 export function Packs() {
   const t = useT("packs")
   const tSettings = useT("settings")
-  const { packs, packsLoading, packsError, reloadPacks, selectedSystem, settings, patchSettings } = useLauncher()
+  const {
+    packs,
+    packsLoading,
+    packsError,
+    reloadPacks,
+    selectedSystem,
+    settings,
+    patchSettings,
+    hasSession,
+    boffSignIn,
+    backendStatus,
+    boffRestoreError,
+  } = useLauncher()
+
+  // A session that DIED is not the same as never having had one, and the
+  // difference used to be explained on the sign-in wall that stood in front of
+  // this screen. With no wall left, this banner is the only place that
+  // explanation can live — otherwise a player who was signed in yesterday is
+  // silently signed out today with no account of why.
+  const sessionExpired = boffRestoreError?.needsSignin === true
   const [query, setQuery] = useState("")
   const [creating, setCreating] = useState(false)
   const [importing, setImporting] = useState(false)
@@ -506,6 +588,8 @@ export function Packs() {
         </div>
       </header>
 
+      <SystemChips />
+
       <CreateLocalPackModal
         open={creating}
         onClose={() => setCreating(false)}
@@ -515,7 +599,27 @@ export function Packs() {
         }}
       />
 
-      {/* Three distinct states, deliberately not collapsed into one: a server
+      {/* Signed out is not an error and not an empty library — it is a library
+          with one half of it missing, and the missing half has a name. This is
+          the ONLY thing sign-in is asked for on this screen: everything below
+          it (local packs, install, launch) works without an account. */}
+      {!hasSession && (
+        <Banner
+          tone={sessionExpired ? "warn" : "info"}
+          icon="shield"
+          title={sessionExpired ? t("sessionExpiredTitle") : t("signedOutTitle")}
+          className="mb-5"
+          actions={
+            <Button size="sm" variant="pri" onClick={() => void boffSignIn()}>
+              {sessionExpired ? t("sessionExpiredAction") : t("signedOutAction")}
+            </Button>
+          }
+        >
+          {sessionExpired ? t("sessionExpiredMessage") : t("signedOutMessage")}
+        </Banner>
+      )}
+
+      {/* Four distinct states, deliberately not collapsed into one: a server
           that cannot be reached is not the same as a library that is empty,
           and telling a player to ask for an invite when the API is down is how
           support tickets get filed against the wrong thing. */}
@@ -531,11 +635,27 @@ export function Packs() {
         <Empty icon="cube" title={t("loadingPacks")} lead={t("loadingPacaksDetail")} />
       )}
 
+      {/* An empty library has three different reasons, and "ask an admin for an
+          invite" is the right advice for exactly one of them. Saying it to a
+          player who is simply signed out, or to one whose registry is down,
+          sends them to support over something that is not their problem. */}
       {!packsError && !packsLoading && packs.length === 0 && (
         <Empty
-          icon="cube"
-          title={t("noPacksAvailable")}
-          lead={t("noPacksDetail")}
+          icon={backendStatus === "down" || backendStatus === "unreachable" ? "alert" : "cube"}
+          title={
+            backendStatus === "down" || backendStatus === "unreachable"
+              ? t("noPacksServerDown")
+              : hasSession
+                ? t("noPacksAvailable")
+                : t("noPacksSignedOut")
+          }
+          lead={
+            backendStatus === "down" || backendStatus === "unreachable"
+              ? t("noPacksServerDownDetail")
+              : hasSession
+                ? t("noPacksDetail")
+                : t("noPacksSignedOutDetail")
+          }
         />
       )}
 

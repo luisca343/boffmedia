@@ -9,7 +9,7 @@ import {
   playtimeGet,
   type LauncherPack,
 } from "../runtime"
-import { mockPackEntries } from "./mock"
+import { mockLocalPacks, mockPackEntries } from "./mock"
 import type { InstallState, PackEntry, PackVersionSummary } from "./types"
 
 // The bridge between the registry's wire shape (§7.2) and what this machine
@@ -23,6 +23,11 @@ import type { InstallState, PackEntry, PackVersionSummary } from "./types"
 export type PackLibrary = {
   entries: PackEntry[]
   registryError: string | null
+  /** The Rust error `code` behind {@link registryError}, when it carried one.
+   *  `server_unreachable` / `server_down` are what let the caller declare the
+   *  BACKEND bad off the back of a failed load, instead of waiting up to a
+   *  probe interval to say what this request already proved. */
+  registryErrorCode: string | null
 }
 
 function toVersion(pack: LauncherPack): PackVersionSummary | null {
@@ -90,13 +95,31 @@ function toLocalEntry(manifest: PackManifest): PackEntry {
  * environment. Throws an AuthFailure on desktop; the caller decides whether
  * that means "sign in again" or "the server is down".
  *
+ * `authenticated: false` is a SIGNED-OUT load, not a degraded one. The registry
+ * is skipped entirely rather than called and allowed to fail: the launcher no
+ * longer requires a Boffmedia account, and a player who never signed in must
+ * see their local packs with no error attached to them — a `registryError`
+ * here would put "could not reach the pack server" in front of someone whose
+ * only problem is that they have no account, which is not a problem at all.
+ *
  * Managed and local packs are merged by slug; a local pack can never win that
  * merge over a managed one, because every local slug carries the reserved
  * `local-` prefix a managed slug never has (RF-10, spec D3) — so there is
  * nothing here for a collision to resolve.
  */
-export async function loadPackEntries(): Promise<PackLibrary> {
-  if (!isDesktop()) return { entries: mockPackEntries(), registryError: null }
+export async function loadPackEntries(
+  { authenticated }: { authenticated: boolean } = { authenticated: true },
+): Promise<PackLibrary> {
+  if (!isDesktop()) {
+    // Signed out in dev:renderer shows only what a signed-out desktop would:
+    // the local half. Serving the full mock library would make the signed-out
+    // shell impossible to actually look at while building it.
+    return {
+      entries: authenticated ? mockPackEntries() : mockLocalPacks().map(toLocalEntry),
+      registryError: null,
+      registryErrorCode: null,
+    }
+  }
 
   // The registry is the ONLY part of this that needs a network, and it used to
   // be able to sink the whole load: one `Promise.all` meant an unreachable
@@ -104,13 +127,20 @@ export async function loadPackEntries(): Promise<PackLibrary> {
   // entirely on this disk. A player on a train got an error screen instead of
   // the packs sitting in front of them.
   const [managedResult, plays, playtime, localManifests] = await Promise.all([
-    packsList().then(
-      (packs) => ({ packs, error: null as string | null }),
-      (err: { message?: string }) => ({
-        packs: [] as LauncherPack[],
-        error: err?.message ?? "No se pudo contactar con el servidor de packs.",
-      }),
-    ),
+    !authenticated
+      ? Promise.resolve({
+          packs: [] as LauncherPack[],
+          error: null as string | null,
+          code: null as string | null,
+        })
+      : packsList().then(
+          (packs) => ({ packs, error: null as string | null, code: null as string | null }),
+          (err: { message?: string; code?: string }) => ({
+            packs: [] as LauncherPack[],
+            error: err?.message ?? "No se pudo contactar con el servidor de packs.",
+            code: err?.code ?? null,
+          }),
+        ),
     playsGet().catch(() => ({}) as Record<string, string>),
     playtimeGet().catch(() => ({}) as Record<string, number>),
     localPacksList().catch(() => []),
@@ -172,5 +202,6 @@ export async function loadPackEntries(): Promise<PackLibrary> {
   return {
     entries: [...managed, ...local.filter((e) => !managedSlugs.has(e.pack.slug))],
     registryError: managedResult.error,
+    registryErrorCode: managedResult.code,
   }
 }

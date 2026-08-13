@@ -39,6 +39,7 @@ import {
   packManifest,
   packManifestCached,
   repairInstance,
+  serverHealth,
   setIconFailureSink,
   settingsGet,
   settingsSet,
@@ -61,7 +62,22 @@ import type { SystemId } from "../services/systems"
 // mutually exclusive, and expressing that as independent booleans is how you
 // get a launcher that offers Play mid-download.
 
-export type View = "packs" | "pack" | "logs" | "settings"
+// "tools" is the registry-driven hub, "tool" one tool full-screen. Both are
+// reachable WITHOUT a Boffmedia session and offline (plan D4) — the tools are
+// public on the web, so gating them behind sign-in here would be a regression.
+export type View = "packs" | "pack" | "logs" | "settings" | "tools" | "tool"
+
+/** The unit the rail highlights. Views map onto sections, which is what makes
+ *  the rail stay lit at depth — `pack` is still Play, `tool` is still Tools.
+ *  Logs and Settings are UTILITIES, not sections: they live at the foot of the
+ *  rail and deliberately light no section button. */
+export type Section = "play" | "tools" | null
+
+export function sectionOfView(view: View): Section {
+  if (view === "packs" || view === "pack") return "play"
+  if (view === "tools" || view === "tool") return "tools"
+  return null
+}
 
 type State = {
   /** The BOFFMEDIA account the launcher is signed in as. This is the principal:
@@ -102,6 +118,8 @@ type State = {
   boffRestoreError: { message: string; needsSignin: boolean; code?: string } | null
   view: View
   selectedPackId: string | null
+  /** Which registry tool the "tool" view is showing. */
+  selectedToolId: string | null
   /** One-shot: set when navigation asked the pack detail to open its edit form
    *  straight away (the library card's "Edit" action). The detail consumes and
    *  clears it on mount, so it never re-fires on a later plain visit. */
@@ -119,7 +137,25 @@ type State = {
   settings: Settings
   /** Currently selected system filter. "All" shows all packs, or a specific SystemId. */
   selectedSystem: SystemId | "All"
+  /** Whether the BACKEND is answering, independent of whether anyone is signed
+   *  in. Its own axis on purpose: `offline` means "we fell back to a stored
+   *  identity", `packsError` means "this one request failed", and neither of
+   *  them can say "the server is down" — which is the thing a player most needs
+   *  told, because otherwise they go looking for the fault in their own
+   *  install. `unknown` is pre-probe; `checking` is a probe in flight. */
+  backendStatus: BackendStatus
+  /** The transport detail behind a non-ok {@link backendStatus}, for the log. */
+  backendDetail: string | null
+  /** The player closed the outage banner. Sticky for the WHOLE outage, not just
+   *  the render — a banner that reopens on the next navigation or the next
+   *  30-second poll is not dismissible, it is nagging. Re-armed only when the
+   *  backend comes back, so the NEXT outage is announced once more. */
+  backendNoticeDismissed: boolean
 }
+
+/** `unreachable` — nothing answered, and we cannot tell whose network is at
+ *  fault. `down` — the server answered 5xx, which is unambiguously theirs. */
+export type BackendStatus = "unknown" | "checking" | "ok" | "unreachable" | "down"
 
 type Action =
   | { type: "boff/start" }
@@ -143,7 +179,7 @@ type Action =
   | { type: "packs/loading" }
   | { type: "packs/load"; packs: PackEntry[]; registryError: string | null }
   | { type: "packs/error"; message: string }
-  | { type: "view"; view: View; packId?: string; edit?: boolean }
+  | { type: "view"; view: View; packId?: string; edit?: boolean; toolId?: string }
   | { type: "editIntent/clear" }
   | { type: "install/start"; packId: string }
   | {
@@ -162,6 +198,8 @@ type Action =
   | { type: "logs/clear" }
   | { type: "settings"; settings: Settings }
   | { type: "system/select"; system: SystemId | "All" }
+  | { type: "backend/status"; status: BackendStatus; detail?: string | null }
+  | { type: "backend/dismiss" }
 
 function reducer(s: State, a: Action): State {
   switch (a.type) {
@@ -200,7 +238,12 @@ function reducer(s: State, a: Action): State {
         packsLoading: false,
         logs: [],
         game: { kind: "idle" },
-        view: "packs",
+        // Only a view that the NEW account cannot honour is reset. `pack`
+        // pointed at a pack listed for the departing account's entitlements, so
+        // it goes; everything else (the library itself, Tools, Logs, Settings)
+        // is just as valid under the new principal, and bouncing someone out of
+        // an open tool because they switched account is a lost-place bug.
+        view: s.view === "pack" ? "packs" : s.view,
         selectedPackId: null,
       }
     case "boff/offline":
@@ -248,7 +291,11 @@ function reducer(s: State, a: Action): State {
         packsLoading: false,
         logs: [],
         game: { kind: "idle" },
-        view: "packs",
+        // Play is NO LONGER gated, so signing out does not evict anyone from
+        // it: the library still lists this machine's local packs and they are
+        // still playable. Only `pack` goes, and only because the pack it
+        // pointed at was a managed one listed under the departing account.
+        view: s.view === "pack" ? "packs" : s.view,
         selectedPackId: null,
       }
     case "boot/step":
@@ -310,7 +357,10 @@ function reducer(s: State, a: Action): State {
         // through the real chain, and a stale flag would tell the shell to keep
         // hiding install buttons for a player who is fully online.
         offline: false,
-        view: "packs",
+        // The BOFFMEDIA principal is untouched here — only the Minecraft
+        // sub-credential went — so the section the player is in stays valid.
+        // Only `pack` is dropped, along with the id it pointed at.
+        view: s.view === "pack" ? "packs" : s.view,
         selectedPackId: null,
       }
     case "packs/loading":
@@ -332,6 +382,7 @@ function reducer(s: State, a: Action): State {
         ...s,
         view: a.view,
         selectedPackId: a.packId ?? s.selectedPackId,
+        selectedToolId: a.toolId ?? s.selectedToolId,
         editIntent: a.edit ?? false,
       }
     case "editIntent/clear":
@@ -407,6 +458,17 @@ function reducer(s: State, a: Action): State {
         /* storage error is non-fatal */
       }
       return { ...s, selectedSystem: a.system }
+    case "backend/status":
+      return {
+        ...s,
+        backendStatus: a.status,
+        backendDetail: a.detail ?? null,
+        // Recovery re-arms the banner; a `checking` tick in the middle of an
+        // outage must NOT, or every poll would resurrect what was dismissed.
+        backendNoticeDismissed: a.status === "ok" ? false : s.backendNoticeDismissed,
+      }
+    case "backend/dismiss":
+      return { ...s, backendNoticeDismissed: true }
     default:
       return s
   }
@@ -429,6 +491,7 @@ const initial: State = {
   offline: false,
   view: "packs",
   selectedPackId: null,
+  selectedToolId: null,
   editIntent: false,
   packs: [],
   packsLoading: false,
@@ -438,6 +501,9 @@ const initial: State = {
   logs: [],
   settings: MOCK_SETTINGS,
   selectedSystem: "All",
+  backendStatus: "unknown",
+  backendDetail: null,
+  backendNoticeDismissed: false,
 }
 
 type Ctx = State & {
@@ -490,7 +556,21 @@ type Ctx = State & {
   revalidate: () => Promise<void>
   /** True while {@link revalidate} runs — same cost as a silent sign-in. */
   revalidating: boolean
-  go: (view: View, packId?: string, opts?: { edit?: boolean }) => void
+  /** The rail's highlight, derived from {@link View}. See {@link sectionOfView}. */
+  section: Section
+  /** True once the launcher has a Boffmedia principal to act as — a live one or
+   *  an offline-restored one. NOTHING is gated on it any more: it decides what
+   *  the library can CONTAIN (server packs are entitlement-filtered, so they
+   *  need an account) and whether the sign-in call to action is shown. */
+  hasSession: boolean
+  /** Re-probe the backend. Resolves to the status it found. */
+  checkBackend: () => Promise<BackendStatus>
+  /** Re-probe AND reload the library — what the "Retry" button does. */
+  retryBackend: () => void
+  /** Close the outage banner for the rest of this outage. The rail keeps a
+   *  permanent, one-icon indicator, so nothing is actually lost by closing it. */
+  dismissBackendNotice: () => void
+  go: (view: View, packId?: string, opts?: { edit?: boolean; toolId?: string }) => void
   /** True when the pack detail was opened with a request to edit immediately.
    *  Read once, then cleared via {@link clearEditIntent}. */
   editIntent: boolean
@@ -523,6 +603,15 @@ const MIN_SPLASH_MS = 650
  *  lands in the UI when it lands, where each screen already has its own loading
  *  and error states. A late splash is a worse failure than a late pack list. */
 const MAX_BOOT_MS = 10_000
+
+/** Rust error codes (api.rs `ApiError`) that mean the fault is the BACKEND's,
+ *  mapped onto the status the shell shows for each. Any other code — a dead
+ *  session, a revoked entitlement, an unreadable keychain — says nothing about
+ *  the server and deliberately has no entry here. */
+const BACKEND_FAULT: Record<string, BackendStatus | undefined> = {
+  server_unreachable: "unreachable",
+  server_down: "down",
+}
 
 export function LauncherProvider({ children }: { children: React.ReactNode }) {
   const [state, dispatch] = React.useReducer(reducer, initial)
@@ -802,6 +891,55 @@ export function LauncherProvider({ children }: { children: React.ReactNode }) {
     return () => clearTimeout(timer)
   }, [])
 
+  // ── Server availability ─────────────────────────────────────────────────
+  //
+  // Probed as its own thing rather than inferred from whichever request
+  // happened to fail. A player whose library is empty cannot tell "you own no
+  // packs" from "the registry is down", and a spinner tells them nothing at
+  // all; the probe is what lets the shell say which it is. It is
+  // unauthenticated, so it answers for a signed-out player too — the case the
+  // launcher now has to handle.
+  const backendStatusRef = React.useRef<BackendStatus>(state.backendStatus)
+  backendStatusRef.current = state.backendStatus
+
+  const checkBackend = React.useCallback(async (): Promise<BackendStatus> => {
+    dispatch({ type: "backend/status", status: "checking" })
+    const health = await serverHealth()
+    const status: BackendStatus =
+      health.status === "ok" ? "ok" : health.status === "down" ? "down" : "unreachable"
+    dispatch({ type: "backend/status", status, detail: health.detail })
+    return status
+  }, [])
+
+  // On boot, then on a cadence only while it is BAD. Polling a healthy server
+  // every half minute forever would be traffic spent to learn nothing: a
+  // server that goes down mid-session announces itself through the next real
+  // request, and this loop exists to notice it coming BACK.
+  React.useEffect(() => {
+    void checkBackend()
+  }, [checkBackend])
+
+  React.useEffect(() => {
+    if (state.backendStatus !== "unreachable" && state.backendStatus !== "down") return
+    const timer = setInterval(() => {
+      // A probe already in flight must not be stacked on by the timer.
+      if (backendStatusRef.current === "checking") return
+      void checkBackend().then((status) => {
+        // Recovered on its own: pull the library in rather than leaving the
+        // player looking at a banner that has stopped being true.
+        if (status === "ok") setReloadToken((n) => n + 1)
+      })
+    }, 30_000)
+    return () => clearInterval(timer)
+  }, [state.backendStatus, checkBackend])
+
+  /** The banner's retry: re-probe, and reload the library on the same click —
+   *  the two are one action to a player, who is asking for the thing they
+   *  cannot see, not for a diagnostic. */
+  const retryBackend = React.useCallback(() => {
+    void checkBackend().finally(() => setReloadToken((n) => n + 1))
+  }, [checkBackend])
+
   // Falling back to the roster when the network is gone. Returns whether it
   // worked, so the caller can decide between "you are in, offline" and leaving
   // the player on the sign-in screen.
@@ -941,42 +1079,53 @@ export function LauncherProvider({ children }: { children: React.ReactNode }) {
       .finally(openGate)
   }, [log, goOffline, goBoffOffline])
 
-  // Packs arrive only once there is a BOFFMEDIA account: the server filters by
-  // that account's entitlements. `boffAccountId` (declared above for the roster
-  // reload) is the id, not the account object, so a re-render cannot refetch.
+  // The MANAGED half of the library needs a Boffmedia account (the server
+  // filters by that account's entitlements); the local half never did. So the
+  // load runs either way now that the launcher opens without an account —
+  // `authenticated` decides whether the registry is asked at all, rather than
+  // the whole library being skipped. `boffAccountId` (declared above for the
+  // roster reload) is the id, not the account object, so a re-render cannot
+  // refetch.
   const bootAuthDone = state.bootAuthDone
-  // SEPARATE from the load effect on purpose. Folding this into it meant
-  // `bootAuthDone` had to be a dependency, and flipping it re-ran the whole
-  // effect — firing a SECOND loadPackEntries for the same account while the
-  // first was still in flight. Two concurrent pack-session mints race each
-  // other's Mojang hasJoined handshake (api.rs) and the loser fails, which is
-  // why the library appeared to fail to load most of the time.
   React.useEffect(() => {
-    // Nothing to wait for: auth settled and there is no account, so no fetch
-    // is coming. Without this a first-run player would sit on the splash.
-    if (bootAuthDone && !boffAccountId) dispatch({ type: "boot/done", part: "packs" })
-  }, [bootAuthDone, boffAccountId])
-
-  React.useEffect(() => {
-    if (!boffAccountId) return
+    // Waiting for the silent restore first: kicking off a signed-out load and
+    // then a signed-in one the moment it resolves would fetch twice and, worse,
+    // flash an empty library at a player who IS signed in.
+    if (!bootAuthDone) return
     let cancelled = false
 
     dispatch({ type: "boot/step", step: "Cargando tu biblioteca…" })
     dispatch({ type: "packs/loading" })
-    loadPackEntries()
-      .then(({ entries, registryError }) => {
+    loadPackEntries({ authenticated: !!boffAccountId })
+      .then(({ entries, registryError, registryErrorCode }) => {
         // A late response from the PREVIOUS account must not repopulate the
         // list after a sign-out — that is exactly the leak `signout` clears.
         if (cancelled) return
         dispatch({ type: "packs/load", packs: entries, registryError })
+        // This request just proved what the probe would go and ask, so the
+        // banner is accurate immediately instead of up to a poll behind. A
+        // SUCCESSFUL registry call proves the opposite just as well.
+        const serverFault = BACKEND_FAULT[registryErrorCode ?? ""]
+        if (serverFault) {
+          dispatch({ type: "backend/status", status: serverFault, detail: registryError })
+        } else if (!registryError && boffAccountId) {
+          // Only when a request actually went out. A signed-out load asks the
+          // registry nothing, so its clean result proves nothing about the
+          // server and must not overwrite what the probe found.
+          dispatch({ type: "backend/status", status: "ok" })
+        }
         if (registryError) {
           // Not an error state: the local packs below it are real and usable.
           // Only the managed half is missing, and the banner says so.
           log({ level: "warn", source: "launcher", text: registryError })
         }
       })
-      .catch((err: { message?: string }) => {
+      .catch((err: { message?: string; code?: string }) => {
         if (cancelled) return
+        const serverFault = BACKEND_FAULT[err?.code ?? ""]
+        if (serverFault) {
+          dispatch({ type: "backend/status", status: serverFault, detail: err?.message ?? null })
+        }
         dispatch({
           type: "packs/error",
           message: err?.message ?? "No se pudo cargar tu biblioteca de packs.",
@@ -996,7 +1145,7 @@ export function LauncherProvider({ children }: { children: React.ReactNode }) {
     return () => {
       cancelled = true
     }
-  }, [boffAccountId, log, reloadToken])
+  }, [bootAuthDone, boffAccountId, log, reloadToken])
 
   // Shell events. Every one of these is a fire-and-forget stream from Rust, so
   // the reducer is the only thing that has to be correct here — and the
@@ -1388,9 +1537,24 @@ export function LauncherProvider({ children }: { children: React.ReactNode }) {
     setLocale(state.settings.locale)
   }, [state.settings.locale])
 
+  const booting = !(state.bootAuthDone && state.bootSettingsDone && state.bootPacksDone)
+  const hasSession = !!state.boffAccount || state.offline
+
+  // The signed-out landing redirect to Tools is GONE. It existed for one
+  // reason: Play was a sign-in wall, and dropping a player on a wall is worse
+  // than dropping them somewhere public. Play is now a working library for a
+  // signed-out player (their local packs, plus an invitation to sign in for the
+  // server ones), so everyone lands in the same place and the launcher stops
+  // having two different front doors depending on who you are.
+
   const value: Ctx = {
     ...state,
-    booting: !(state.bootAuthDone && state.bootSettingsDone && state.bootPacksDone),
+    booting,
+    section: sectionOfView(state.view),
+    hasSession,
+    checkBackend,
+    retryBackend,
+    dismissBackendNotice: () => dispatch({ type: "backend/dismiss" }),
     goOffline,
     goBoffOffline,
     sessionBusy,
@@ -1416,7 +1580,8 @@ export function LauncherProvider({ children }: { children: React.ReactNode }) {
     removeAccount,
     revalidate,
     revalidating,
-    go: (view, packId, opts) => dispatch({ type: "view", view, packId, edit: opts?.edit }),
+    go: (view, packId, opts) =>
+      dispatch({ type: "view", view, packId, edit: opts?.edit, toolId: opts?.toolId }),
     editIntent: state.editIntent,
     clearEditIntent: () => dispatch({ type: "editIntent/clear" }),
     reloadPacks: () => setReloadToken((n) => n + 1),

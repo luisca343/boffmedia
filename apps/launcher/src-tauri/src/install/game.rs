@@ -123,7 +123,7 @@ pub fn install(prepared: &Prepared, reporter: &Reporter) -> Result<base::Game, I
 
 fn configure(base: &mut base::Installer, prepared: &Prepared) {
     prepared.layout.apply(base, &prepared.instance);
-    base.set_launcher_name("boff-launcher")
+    base.set_launcher_name("boffmedia-app")
         .set_launcher_version(env!("CARGO_PKG_VERSION"))
         .set_jvm_policy(jvm_policy(&prepared.runtime));
 }

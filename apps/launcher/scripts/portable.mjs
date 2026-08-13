@@ -22,7 +22,7 @@ import { fileURLToPath } from "node:url"
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..")
 const profile = process.argv[2] ?? "prod"
 const base = JSON.parse(readFileSync(path.join(root, "src-tauri/tauri.conf.json"), "utf8"))
-// El perfil dev sobreescribe productName ("Boff Launcher (dev)"), así que el
+// El perfil dev sobreescribe productName ("Boffmedia App (dev)"), así que el
 // nombre del ejecutable depende del perfil, no solo de la config base.
 const overrides =
   profile === "dev"
@@ -48,18 +48,18 @@ const releaseDir = path.join(root, "src-tauri/target/release")
 // `--no-bundle` salta la fase de bundling, y el rename de la binaria al
 // productName ocurre DENTRO de esa fase: aquí el ejecutable conserva el nombre
 // del paquete de Cargo. Se aceptan los dos por si algún día se empaqueta.
-const src = [`${productName}${ext}`, `boff-launcher${ext}`]
+const src = [`${productName}${ext}`, `boffmedia-app${ext}`]
   .map((name) => path.join(releaseDir, name))
   .find(existsSync)
 
 if (!src) {
-  console.error(`no se encontró ni "${productName}${ext}" ni "boff-launcher${ext}" en ${releaseDir}`)
+  console.error(`no se encontró ni "${productName}${ext}" ni "boffmedia-app${ext}" en ${releaseDir}`)
   process.exit(1)
 }
 
 const outDir = path.join(root, "src-tauri/target/portable")
 mkdirSync(outDir, { recursive: true })
-const zip = path.join(outDir, `BoffLauncher_${version}_portable_x64.zip`)
+const zip = path.join(outDir, `BoffmediaApp_${version}_portable_x64.zip`)
 
 // El zip debe llevar el nombre bonito aunque la binaria en disco sea la de
 // Cargo: ninguna de las dos herramientas de compresión sabe renombrar entradas.

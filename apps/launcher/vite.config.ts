@@ -32,8 +32,18 @@ export default defineConfig({
       // consumes it as compiled CJS, and pointing bundlers at the source
       // instead would let types and runtime drift apart.
       "@boffmedia/ui": resolve(__dirname, "../../packages/ui/src"),
+      // Tool packages ship TS source too (plan §3: "Consumed as TS source").
+      "@boffmedia/tool-kit": resolve(__dirname, "../../packages/tools/kit/src"),
+      "@boffmedia/tools-minecraft": resolve(__dirname, "../../packages/tools/minecraft/src"),
     },
   },
+  // The schematic tools spawn `new Worker(new URL(...), { type: "module" })`,
+  // and those workers dynamically import their parsers/registries. Vite's
+  // default worker format is "iife", which cannot represent a code-split
+  // bundle — the build fails outright. WebView2 and WKWebView both support
+  // module workers, so "es" is free here (this is what the plan's S1 spike was
+  // meant to catch).
+  worker: { format: "es" },
   build: {
     outDir: "dist",
     emptyOutDir: true,

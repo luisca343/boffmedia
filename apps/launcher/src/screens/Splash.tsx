@@ -4,10 +4,12 @@
 // not know whether the correct screen is the pack list or "Entrar con
 // Microsoft". Showing either one early is a lie; showing this is not.
 //
-// Deliberately asset-free — every mark here is generated (inline SVG + CSS), so
-// nothing can arrive a frame late and make the splash itself flash. All motion
-// is defined in index.css under `.splash-*` and parks safely under
-// prefers-reduced-motion.
+// Nothing here is FETCHED — every mark is either generated (CSS + inline SVG)
+// or base64'd into the bundle (`?inline`), so nothing can arrive a frame late
+// and make the splash itself flash. All motion is defined in index.css under
+// `.splash-*` and parks safely under prefers-reduced-motion.
+
+import markUrl from "../../src-tauri/icons/128x128.png?inline"
 
 export function Splash({ step }: { step: string }) {
   return (
@@ -34,24 +36,29 @@ export function Splash({ step }: { step: string }) {
           <span className="splash-bracket-tl pointer-events-none absolute left-0 top-0 h-4 w-4 border-l-2 border-t-2 border-solid border-accent" />
           <span className="splash-bracket-br pointer-events-none absolute bottom-0 right-0 h-4 w-4 border-b-2 border-r-2 border-solid border-accent" />
 
-          {/* The seal itself. */}
-          <span className="cut-seal relative grid h-20 w-20 place-items-center bg-accent shadow-[0_10px_30px_rgba(255,92,10,0.35)]">
-            <svg width="40" height="40" viewBox="0 0 40 40" fill="none" aria-hidden="true">
-              {/* Play triangle: strokes itself in, then the fill fades up. */}
-              <path
-                className="splash-glyph-stroke splash-glyph-fill"
-                d="M15 11 L30 20 L15 29 Z"
-                fill="var(--naranja-ink)"
-                stroke="var(--naranja-ink)"
-                strokeWidth="2.5"
-                strokeLinejoin="round"
-              />
-            </svg>
+          {/* The seal. The mark used to be a generated PLAY TRIANGLE — right
+              when this was a launcher and pressing Play was the only thing it
+              did, wrong now that Tools is a first-class section. It is the real
+              Boffmedia mark instead.
+              `?inline` is what keeps the promise at the top of this file: Vite
+              base64s the file INTO the bundle rather than emitting a URL, so
+              there is no second request that can land a frame late and make the
+              splash flash. It is also why the seal turned dark — the mark is
+              orange, and orange-on-accent is an invisible logo. */}
+          <span className="cut-seal relative grid h-20 w-20 place-items-center border-2 border-solid border-accent bg-base-deep shadow-[0_10px_30px_rgba(255,92,10,0.35)]">
+            <img
+              src={markUrl}
+              width={44}
+              height={44}
+              alt=""
+              draggable={false}
+              className="splash-glyph-fade select-none"
+            />
           </span>
         </div>
 
         <h1 className="splash-word mt-7 font-display text-[34px]/none font-bold uppercase tracking-[0.14em] text-txt">
-          Boff<span className="text-accent"> Launcher</span>
+          Boffmedia<span className="text-accent"> App</span>
         </h1>
 
         <p className="splash-tag mt-1.5 font-display text-[11px] uppercase tracking-[0.42em] text-txt-dim">

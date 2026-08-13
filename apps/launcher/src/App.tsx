@@ -7,6 +7,7 @@ import { Logs } from "./screens/Logs"
 import { PackDetail } from "./screens/PackDetail"
 import { Packs } from "./screens/Packs"
 import { Settings } from "./screens/Settings"
+import { Tools, ToolView } from "./screens/Tools"
 import { BoffSignIn } from "./screens/BoffSignIn"
 import { SignIn } from "./screens/SignIn"
 import { Splash } from "./screens/Splash"
@@ -16,7 +17,7 @@ import { LauncherProvider, useLauncher } from "./state/launcher"
 // custom protocol where history-based routing is more trouble than it solves.
 
 function Router() {
-  const { boffAccount, offline, boffSigningIn, booting, bootStep, signingIn, view } = useLauncher()
+  const { boffSigningIn, booting, bootStep, signingIn, view } = useLauncher()
 
   // Before anything else: while the silent restore is in flight we do not yet
   // know whether this player is signed in, and guessing "no" is what put
@@ -29,28 +30,36 @@ function Router() {
   // was already showing. SignIn is the only screen that renders the code.
   if (signingIn) return <SignIn />
 
-  // The shell is gated on the BOFFMEDIA account ONLY: the pack list is filtered
-  // by that account's entitlements. Minecraft is NOT a prerequisite — an
-  // emulator pack never needs it, and a missing/expired Minecraft session must
-  // never block the shell. Minecraft is asked for at launch time, not here.
+  // NOTHING here is gated on being signed in any more. This is Boffmedia's own
+  // application, not a paid product behind a door: it opens, the rail is there,
+  // and every section works to the extent it can without an account. Play used
+  // to be replaced wholesale by the sign-in panel, which meant a player with
+  // packs sitting on their own disk was shown a login wall to reach them.
   //
-  // A Boffmedia device flow IN PROGRESS also owns the screen, even when someone
-  // is already signed in: "Add account" in the rail starts one while
-  // `boffAccount` is still set, and BoffSignIn is the only screen that renders
-  // the code — so reaching it cannot be conditional on being signed out.
+  // What an account actually buys is CONTENT, not entry: server packs are
+  // filtered by that account's entitlements, so a signed-out library shows the
+  // local packs plus a call to action for the rest (see Packs). Minecraft is a
+  // separate credential again, asked for at launch time.
   //
-  // `offline` opens the shell with no live session (the network-failed restore
-  // fell back to the stored account): the principal is still set, but the gate
-  // honours `offline` explicitly so an offline session can never be mistaken for
-  // "not signed in" and bounced to the code screen.
-  if ((!boffAccount && !offline) || boffSigningIn) return <BoffSignIn />
-
+  // A Boffmedia device flow IN PROGRESS still takes the content area whatever
+  // section you are in, including when someone is already signed in: "Add
+  // account" starts one while the session is still set, and BoffSignIn is the
+  // only screen that renders the code. That is a flow the player chose, not a
+  // wall put in front of them.
   return (
     <Shell>
-      {view === "packs" && <Packs />}
-      {view === "pack" && <PackDetail />}
-      {view === "logs" && <Logs />}
-      {view === "settings" && <Settings />}
+      {boffSigningIn ? (
+        <BoffSignIn />
+      ) : (
+        <>
+          {view === "packs" && <Packs />}
+          {view === "pack" && <PackDetail />}
+          {view === "logs" && <Logs />}
+          {view === "settings" && <Settings />}
+          {view === "tools" && <Tools />}
+          {view === "tool" && <ToolView />}
+        </>
+      )}
     </Shell>
   )
 }

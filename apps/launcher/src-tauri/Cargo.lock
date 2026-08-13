@@ -313,7 +313,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "boff-launcher"
+name = "boffmedia-app"
 version = "0.0.2"
 dependencies = [
  "base64 0.22.1",

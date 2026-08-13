@@ -1,4 +1,4 @@
-; Personalización del instalador NSIS del Boff Launcher.
+; Personalización del instalador NSIS de Boffmedia App.
 ;
 ; Tauri hace `!include` de este fichero MUY ARRIBA en su installer.nsi (justo
 ; después de MUI2.nsh y antes de cualquier `!insertmacro MUI_PAGE_*`), que es

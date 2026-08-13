@@ -76,7 +76,7 @@ fn http() -> &'static reqwest::Client {
     static CLIENT: OnceLock<reqwest::Client> = OnceLock::new();
     CLIENT.get_or_init(|| {
         reqwest::Client::builder()
-            .user_agent(concat!("BoffLauncher/", env!("CARGO_PKG_VERSION")))
+            .user_agent(concat!("BoffmediaApp/", env!("CARGO_PKG_VERSION")))
             .timeout(Duration::from_secs(15))
             .build()
             .unwrap_or_default()

@@ -168,7 +168,7 @@ fn http() -> &'static reqwest::Client {
             // Modrinth's docs ask for a contactable identifier; an anonymous
             // client is the one they rate-limit first.
             .user_agent(concat!(
-                "FicusLabs/BoffLauncher/",
+                "FicusLabs/BoffmediaApp/",
                 env!("CARGO_PKG_VERSION"),
                 " (boffmedia.es)"
             ))

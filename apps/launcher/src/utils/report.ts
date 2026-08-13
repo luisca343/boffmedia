@@ -54,11 +54,11 @@ export function buildSupportReport(input: {
   const { runtime, pack, game, settings, logs } = input
 
   const header = [
-    "Boff Launcher — informe de diagnóstico",
+    "Boffmedia App — informe de diagnóstico",
     `Generado: ${new Date().toISOString()}`,
     runtime
-      ? `Launcher: ${runtime.appVersion} (${runtime.platform}/${runtime.arch}, tauri ${runtime.tauri})`
-      : "Launcher: modo navegador (sin datos del shell)",
+      ? `App: ${runtime.appVersion} (${runtime.platform}/${runtime.arch}, tauri ${runtime.tauri})`
+      : "App: modo navegador (sin datos del shell)",
     packLine(pack),
     `Memoria: ${settings.memoryAuto ? "automática" : `${settings.memoryMib} MiB`} · Java: ${
       settings.javaPath ? settings.javaPath : "gestionado por el launcher"

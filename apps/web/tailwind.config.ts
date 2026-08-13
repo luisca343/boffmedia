@@ -6,6 +6,7 @@ import {
   fontFamily as baseFontFamily,
   geometry,
   uiContent,
+  toolsContent,
 } from "@boffmedia/tailwind-config/base"
 
 /**
@@ -51,6 +52,8 @@ const config: Config = {
     // The v3 primitives live in @boffmedia/ui now — without these globs every
     // class they own gets purged out of the build.
     ...uiContent,
+    // Tool packages (@boffmedia/tools-*) render inside these routes.
+    ...toolsContent,
     "*.{js,ts,jsx,tsx,mdx}",
   ],
   prefix: "",

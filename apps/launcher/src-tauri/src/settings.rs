@@ -139,7 +139,7 @@ impl Settings {
 /// not in Tauri's `app_config_dir()`.
 ///
 /// On Windows those two used to be the identical directory, so the move to
-/// `%APPDATA%\BoffLauncher` would have carried `settings.json` off to a folder
+/// `%APPDATA%\Boffmedia` would have carried `settings.json` off to a folder
 /// nothing read any more — the player's memory slider and game-dir override
 /// silently back to defaults. Pointing both at one root is what keeps the
 /// migration honest, and it means "the launcher's folder" is one place a

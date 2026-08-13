@@ -87,7 +87,7 @@ pub fn run() {
         .plugin(tauri_plugin_dialog::init())
         .setup(|app| {
             // Before anything reads the tree: move an install made by an
-            // earlier build into `%APPDATA%\BoffLauncher[ Dev]` and flatten
+            // earlier build into `%APPDATA%\Boffmedia[ Dev]` and flatten
             // away the old `<instance>/.minecraft` level.
             let handle = app.handle().clone();
             datadir::migrate(&handle);
@@ -100,6 +100,7 @@ pub fn run() {
         .manage(auth::AuthState::default())
         .manage(api::ApiState::default())
         .manage(install::InstallManager::default())
+        .manage(dialogs::SaveSessions::default())
         .invoke_handler(tauri::generate_handler![
             runtime_info,
             auth::auth_begin,
@@ -121,6 +122,7 @@ pub fn run() {
             api::boff_switch,
             api::boff_offline,
             api::boff_revalidate,
+            api::server_health,
             api::packs_list,
             api::pack_manifest,
             api::invite_redeem,
@@ -146,6 +148,12 @@ pub fn run() {
             install::pack_manifest_cache,
             dialogs::file_picker,
             dialogs::folder_picker,
+            // Tools section — streamed export writes (see dialogs.rs).
+            dialogs::save_dialog,
+            dialogs::save_stream_begin,
+            dialogs::save_stream_chunk,
+            dialogs::save_stream_finish,
+            dialogs::save_stream_abort,
             emulators::emulator_status,
             emulators::emulator_set_path,
             emulators::emulator_clear_path,
@@ -212,5 +220,5 @@ pub fn run() {
             randomizer::randomizer_rom_present,
         ])
         .run(tauri::generate_context!())
-        .expect("error while running the Boff Launcher");
+        .expect("error while running Boffmedia App");
 }

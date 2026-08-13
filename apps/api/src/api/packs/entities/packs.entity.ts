@@ -53,7 +53,7 @@ export class DeviceRequestEntity {
   @ApiProperty({ example: 'K7QM-3BXR' })
   userCode!: string;
 
-  @ApiProperty({ nullable: true, example: 'Boff Launcher 0.3 · Windows' })
+  @ApiProperty({ nullable: true, example: 'Boffmedia App 0.3 · Windows' })
   clientLabel!: string | null;
 
   @ApiProperty({ enum: ['pending', 'approved', 'denied'] })

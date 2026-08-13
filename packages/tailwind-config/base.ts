@@ -321,3 +321,9 @@ export const geometry = plugin(({ addComponents }) => {
 /** Content globs for the shared primitives. A host that renders @boffmedia/ui
  *  must include these or every class the package owns is purged. */
 export const uiContent = ["../../packages/ui/src/**/*.{ts,tsx}"]
+
+/** Content globs for the workspace tool packages (@boffmedia/tools-*). Same
+ *  deal as `uiContent`: a host rendering a tool must include these or the
+ *  tool's classes are purged out of that host's build. One glob covers every
+ *  domain package, so porting tool #2..N needs no host config change. */
+export const toolsContent = ["../../packages/tools/*/src/**/*.{ts,tsx}"]

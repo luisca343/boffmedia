@@ -64,11 +64,15 @@ export function BoffSignIn() {
     <div className="grid h-full place-items-center px-8 py-10">
       <div className="w-full max-w-[520px]">
         <div className="mb-6 text-center">
-          <Kicker>Boff Launcher</Kicker>
+          <Kicker>{t("kicker")}</Kicker>
           <h1 className="font-display text-[34px]/none font-bold uppercase tracking-[0.06em] text-txt">
             {t("title")}
           </h1>
           <p className="mt-3 text-sm text-txt-muted">{t("subtitle")}</p>
+          {/* The "browse tools without signing in" escape link lived here while
+              this screen owned the whole window. It is gone with L3: this is now
+              a PANEL inside the Play section, the rail is always beside it, and
+              Tools is one click away from anywhere — including from here. */}
         </div>
 
         {boffRestoreError && !boffSigningIn && (

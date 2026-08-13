@@ -38,7 +38,7 @@ fn prepare(app: &tauri::AppHandle, plan: PlannedEmulator) -> Result<EmulatorPrep
 
 fn build_client() -> Result<reqwest::Client, InstallFailure> {
     reqwest::Client::builder()
-        .user_agent(concat!("BoffLauncher/", env!("CARGO_PKG_VERSION")))
+        .user_agent(concat!("BoffmediaApp/", env!("CARGO_PKG_VERSION")))
         .build()
         .map_err(|e| InstallFailure::message(format!("No se pudo crear el cliente HTTP: {e}")))
 }

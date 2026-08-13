@@ -60,7 +60,7 @@ export class LauncherDownloadEntity {
   @ApiProperty({ example: '0.0.2' })
   version!: string;
 
-  @ApiProperty({ example: 'BoffLauncher_0.0.2_x64-setup.exe' })
+  @ApiProperty({ example: 'BoffmediaApp_0.0.2_x64-setup.exe' })
   artifactName!: string;
 
   @ApiProperty({ description: 'URL absoluta de descarga directa' })
@@ -97,7 +97,7 @@ export class LauncherReleaseEntity {
 
   @ApiPropertyOptional({ type: String, nullable: true }) notes!: string | null;
 
-  @ApiProperty({ example: 'boff-launcher_1.4.0_x64_en-US.msi' })
+  @ApiProperty({ example: 'boffmedia-app_1.4.0_x64_en-US.msi' })
   artifactName!: string;
 
   @ApiProperty({

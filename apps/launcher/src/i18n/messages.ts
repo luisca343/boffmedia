@@ -3,7 +3,7 @@
 // default locale at runtime, but the goal is parity. Add a screen as a new
 // top-level namespace; call it from that screen with `useT("<namespace>")`.
 //
-// Spanish is the source of truth (the launcher was authored in it); English is
+// Spanish is the source of truth (the app was authored in it); English is
 // the translation. When they drift, `es` wins.
 
 import type { AppLocale } from "@boffmedia/ui"
@@ -58,7 +58,7 @@ const es = {
     java: {
       title: "Java",
       pathLabel: "Ruta del ejecutable",
-      pathHint: "Vacío = usar el runtime que gestiona el launcher (recomendado)",
+      pathHint: "Vacío = usar el runtime que gestiona la app (recomendado)",
       placeholder: "Detección automática",
       manual: "Manual",
       auto: "Automático",
@@ -69,7 +69,7 @@ const es = {
       title: "Instalación",
       gameDir: "Carpeta de juego",
       retain: "Versiones que se conservan",
-      closeOnLaunch: "Cerrar el launcher al iniciar el juego",
+      closeOnLaunch: "Cerrar la app al iniciar el juego",
       keepLogs: "Conservar el registro entre sesiones",
       backupBeforeUpdate: "Hacer copia antes de actualizar",
       backupBeforeUpdateHint: "Guarda automáticamente una copia de los mundos y la configuración antes de descargar una nueva versión de un pack.",
@@ -82,7 +82,7 @@ const es = {
       checking: "Buscando…",
       checkingHint: "Comprobando con el servidor…",
       availableHint: "Disponible la {version}. Actualiza desde el aviso de arriba.",
-      idleHint: "El launcher lo comprueba solo al arrancar.",
+      idleHint: "La app lo comprueba solo al arrancar.",
     },
     language: {
       title: "Idioma",
@@ -114,7 +114,7 @@ const es = {
       unlinkMinecraft: "Desvincular",
       signOutEverywhere: "Cerrar sesión en todo",
       signOutEverywhereHint:
-        "Olvida todas las cuentas de Minecraft y la sesión del launcher en este equipo.",
+        "Olvida todas las cuentas de Minecraft y la sesión de la app en este equipo.",
     },
     emulators: {
       title: "Emuladores",
@@ -153,12 +153,23 @@ const es = {
     },
   },
 
+  // The Tools hub chrome. Each TOOL's own strings live in its package catalog
+  // (@boffmedia/tools-*), which is merged into this store in ./index.tsx.
+  tools: {
+    title: "Herramientas",
+    subtitle: "Las herramientas de Boffmedia, disponibles sin conexión.",
+    empty: "No hay herramientas disponibles.",
+    notFound: "Esa herramienta ya no existe.",
+    back: "Volver a herramientas",
+  },
+
   boffSignin: {
-    title: "Autoriza el launcher",
+    kicker: "Boffmedia App",
+    title: "Autoriza la app",
     subtitle: "Con tu cuenta de Boffmedia. No hace falta Minecraft: solo se te pedirá cuando instales o juegues un pack de Minecraft.",
     failedTitle: "No se pudo autorizar",
     button: "Autorizar con Boffmedia",
-    securityNote: "Aprobarás un código corto en la web, donde ya has iniciado sesión. El launcher nunca ve tu contraseña.",
+    securityNote: "Aprobarás un código corto en la web, donde ya has iniciado sesión. La app nunca ve tu contraseña.",
     complete: "Completa la autorización",
     waiting: "Esperando",
     copied: "Copiado",
@@ -180,7 +191,7 @@ const es = {
 
   signin: {
     title: "Inicia sesión",
-    subtitle: "Necesitas una cuenta de Minecraft con Java Edition. El launcher nunca ve tu contraseña — la sesión se abre en tu navegador.",
+    subtitle: "Necesitas una cuenta de Minecraft con Java Edition. La app nunca ve tu contraseña — la sesión se abre en tu navegador.",
     sessionExpired: "Tu sesión caducó",
     sessionExpiredAction: "Vuelve a entrar con Microsoft para seguir jugando.",
     restoreFailed: "No pudimos recuperar tu sesión",
@@ -222,6 +233,8 @@ const es = {
   },
 
   titlebar: {
+    brandName: "Boffmedia",
+    brandSuffix: "App",
     minimize: "Minimizar",
     maximize: "Maximizar",
     restore: "Restaurar",
@@ -229,13 +242,13 @@ const es = {
   },
 
   updateBanner: {
-    updateFailedTitle: "No se pudo actualizar el launcher",
-    updateAvailableTitle: "Hay una nueva versión del launcher ({version})",
+    updateFailedTitle: "No se pudo actualizar la app",
+    updateAvailableTitle: "Hay una nueva versión de la app ({version})",
     retryButton: "Reintentar",
     updateButton: "Actualizar y reiniciar",
     failedMessage: "Inténtalo de nuevo más tarde.",
-    downloadingMessage: "Descargando la actualización. El launcher se reiniciará solo al terminar; no cierres la ventana.",
-    availableMessage: "Tienes la {currentVersion}. Se descargará e instalará sola, y el launcher se reiniciará al terminar.",
+    downloadingMessage: "Descargando la actualización. La app se reiniciará sola al terminar; no cierres la ventana.",
+    availableMessage: "Tienes la {currentVersion}. Se descargará e instalará sola, y la app se reiniciará al terminar.",
   },
 
   versionPicker: {
@@ -366,6 +379,8 @@ const es = {
 
   packs: {
     librarySectionTitle: "Tu biblioteca",
+    systemFilterLabel: "Filtrar por sistema",
+    allSystems: "Todos",
     title: "Packs",
     search: "Buscar pack…",
     importButton: "Importar modpack",
@@ -378,6 +393,16 @@ const es = {
     loadingPacaksDetail: "Consultando el registro.",
     noPacksAvailable: "No hay packs disponibles",
     noPacksDetail: "Tu cuenta no tiene acceso a ningún pack todavía. Pide una invitación al administrador.",
+    noPacksSignedOut: "Todavía no hay packs aquí",
+    noPacksSignedOutDetail: "Crea un pack local para empezar, o inicia sesión con tu cuenta de Boffmedia para ver los packs del servidor.",
+    noPacksServerDown: "No se pueden cargar los packs del servidor",
+    noPacksServerDownDetail: "Tus packs locales siguen disponibles. Los del servidor volverán cuando se restablezca el servicio.",
+    signedOutTitle: "Estás sin iniciar sesión",
+    signedOutMessage: "Puedes usar la aplicación y tus packs locales sin cuenta. Inicia sesión con Boffmedia para ver los packs del servidor a los que tengas acceso.",
+    signedOutAction: "Iniciar sesión",
+    sessionExpiredTitle: "Tu sesión ha caducado",
+    sessionExpiredMessage: "Tu sesión de Boffmedia ya no es válida, así que los packs del servidor no se están mostrando. Vuelve a iniciar sesión para recuperarlos; tus packs locales no se han visto afectados.",
+    sessionExpiredAction: "Volver a iniciar sesión",
     searchNoResultsTitle: "Sin resultados",
     searchNoResults: "Nada coincide con «{query}».",
     accessInfo: "Solo se listan los packs a los que tu UUID tiene acceso.",
@@ -461,7 +486,7 @@ const es = {
     installingPercent: "Instalando {percent}%",
     damagedTitle: "Instalación dañada",
     damaged: "Dañado",
-    damageExplanation: "Reparar borra los mods, la configuración y el loader gestionados por el launcher, y los vuelve a descargar. Tus mundos, capturas y opciones no se tocan.",
+    damageExplanation: "Reparar borra los mods, la configuración y el loader gestionados por la app, y los vuelve a descargar. Tus mundos, capturas y opciones no se tocan.",
     crashedTitle: "El juego se cerró inesperadamente",
     crashCode: "Código {code}",
     noErrorLines: "No se registró ningún error antes del cierre.",
@@ -472,7 +497,7 @@ const es = {
     elapsedTime: "tiempo",
     pid: "pid",
     loader: "loader",
-    launcherClosable: "El launcher puede cerrarse sin afectar a la partida.",
+    launcherClosable: "La app puede cerrarse sin afectar a la partida.",
     tabs: {
       content: "Contenido",
       files: "Archivos",
@@ -564,8 +589,10 @@ const es = {
     alreadyBundled: "Ya en el pack",
   },
 
-  gameSidebar: {
-    allSystemsTooltip: "Ver todos los sistemas",
+  appRail: {
+    navLabel: "Secciones de la aplicación",
+    play: "Jugar",
+    tools: "Herramientas",
   },
 
   logs: {
@@ -578,11 +605,16 @@ const es = {
   shell: {
     navPacks: "Packs",
     navLogs: "Registro",
+    navTools: "Herramientas",
     navSettings: "Ajustes",
     offlineTitle: "Sin conexión",
     offlineMessage: "Puedes jugar a los packs que ya tengas instalados. Instalar, actualizar y descargar packs necesita conexión.",
     partialTitle: "No se pudo cargar toda tu biblioteca",
     partialMessage: "Se muestran tus packs locales. Los packs del servidor volverán a aparecer cuando se restablezca la conexión.",
+    serverDownTitle: "Servidor no disponible",
+    serverDownShort: "No es tu instalación. Tus packs instalados y las herramientas siguen funcionando.",
+    serverUnreachableTitle: "Sin conexión con el servidor",
+    serverUnreachableShort: "Tus packs instalados y las herramientas siguen funcionando.",
     retryButton: "Reintentar",
     running: "En ejecución",
   },
@@ -851,14 +883,14 @@ const es = {
 
   logPanel: {
     allLogs: "Todo",
-    launcher: "Launcher",
+    launcher: "App",
     game: "Juego",
     problems: "Problemas",
     follow: "Seguir",
     copyButton: "Copiar",
     clearButton: "Limpiar",
     noLogs: "Sin registro",
-    noLogsDetail: "Aquí aparecerá la salida del launcher y del juego.",
+    noLogsDetail: "Aquí aparecerá la salida de la app y del juego.",
     linesSummary: "{shown} líneas mostradas · se conservan las últimas 2000",
   },
 
@@ -868,7 +900,7 @@ const es = {
     noOptional: "Sin mods opcionales",
     noOptionalDetail: "Este pack no marca ningún archivo como opcional, o aún no lo has instalado.",
     spaceDivider: "tu espacio",
-    spaceWarning: "Los mods que añadas tú a <code>mods/</code> sobreviven a las actualizaciones: el launcher solo borra archivos que instaló él y que no has modificado. Un opcional desactivado no se descarga.",
+    spaceWarning: "Los mods que añadas tú a <code>mods/</code> sobreviven a las actualizaciones: la app solo borra archivos que instaló ella misma y que no has modificado. Un opcional desactivado no se descarga.",
     savedVersions: "Versiones guardadas",
     currentVersion: "actual",
     noVersions: "Sin historial",
@@ -888,9 +920,9 @@ const es = {
     javaDivider: "java",
     javaAuto: "Este pack ignora la ruta de los ajustes y usa la versión de Java que pida.",
     javaGlobal: "Se usa la ruta de los ajustes generales ({path}).",
-    javaManaged: "Los ajustes generales dejan que el launcher gestione Java.",
+    javaManaged: "Los ajustes generales dejan que la app gestione Java.",
     javaPath: "Java: {path}",
-    javaManagedJava: "Java: el que instala y gestiona el launcher",
+    javaManagedJava: "Java: el que instala y gestiona la app",
     javaRAM: "equipo con {gib} de RAM",
     customJavaLabel: "Ruta del ejecutable",
     customJavaHint: "Se usa tal cual, aunque no sea compatible con el pack",
@@ -983,7 +1015,7 @@ const es = {
   },
 
   errors: {
-    needsNewerLauncher: "Esta función necesita una versión más nueva del launcher.",
+    needsNewerLauncher: "Esta función necesita una versión más nueva de la app.",
   },
 } as const
 
@@ -1036,7 +1068,7 @@ const en = {
     java: {
       title: "Java",
       pathLabel: "Executable path",
-      pathHint: "Empty = use the runtime the launcher manages (recommended)",
+      pathHint: "Empty = use the runtime the app manages (recommended)",
       placeholder: "Automatic detection",
       manual: "Manual",
       auto: "Automatic",
@@ -1047,7 +1079,7 @@ const en = {
       title: "Installation",
       gameDir: "Game folder",
       retain: "Versions kept",
-      closeOnLaunch: "Close the launcher when the game starts",
+      closeOnLaunch: "Close the app when the game starts",
       keepLogs: "Keep the log between sessions",
       backupBeforeUpdate: "Backup before updating",
       backupBeforeUpdateHint: "Automatically saves a backup of worlds and config before downloading a new version of a pack.",
@@ -1060,7 +1092,7 @@ const en = {
       checking: "Checking…",
       checkingHint: "Checking with the server…",
       availableHint: "Version {version} is available. Update from the banner above.",
-      idleHint: "The launcher checks on its own at startup.",
+      idleHint: "The app checks on its own at startup.",
     },
     language: {
       title: "Language",
@@ -1090,7 +1122,7 @@ const en = {
       minecraftNone: "No linked Minecraft account. You will be asked when you play a Minecraft pack.",
       unlinkMinecraft: "Unlink",
       signOutEverywhere: "Sign out everywhere",
-      signOutEverywhereHint: "Forgets every Minecraft account and the launcher session on this machine.",
+      signOutEverywhereHint: "Forgets every Minecraft account and the app session on this machine.",
     },
     emulators: {
       title: "Emulators",
@@ -1129,12 +1161,21 @@ const en = {
     },
   },
 
+  tools: {
+    title: "Tools",
+    subtitle: "The Boffmedia tools, available offline.",
+    empty: "No tools available.",
+    notFound: "That tool no longer exists.",
+    back: "Back to tools",
+  },
+
   boffSignin: {
-    title: "Authorize the launcher",
+    kicker: "Boffmedia App",
+    title: "Authorize the app",
     subtitle: "With your Boffmedia account. Minecraft is not required — you will only be asked for it when you install or play a Minecraft pack.",
     failedTitle: "Could not authorize",
     button: "Authorize with Boffmedia",
-    securityNote: "You approve a short code on the website, where you are already signed in. The launcher never sees your password.",
+    securityNote: "You approve a short code on the website, where you are already signed in. The app never sees your password.",
     complete: "Finish authorizing",
     waiting: "Waiting",
     copied: "Copied",
@@ -1156,7 +1197,7 @@ const en = {
 
   signin: {
     title: "Sign in",
-    subtitle: "You need a Minecraft account with Java Edition. The launcher never sees your password — the session opens in your browser.",
+    subtitle: "You need a Minecraft account with Java Edition. The app never sees your password — the session opens in your browser.",
     sessionExpired: "Your session expired",
     sessionExpiredAction: "Sign in with Microsoft again to keep playing.",
     restoreFailed: "We couldn't restore your session",
@@ -1198,6 +1239,8 @@ const en = {
   },
 
   titlebar: {
+    brandName: "Boffmedia",
+    brandSuffix: "App",
     minimize: "Minimize",
     maximize: "Maximize",
     restore: "Restore",
@@ -1205,13 +1248,13 @@ const en = {
   },
 
   updateBanner: {
-    updateFailedTitle: "Could not update the launcher",
-    updateAvailableTitle: "A new version of the launcher is available ({version})",
+    updateFailedTitle: "Could not update the app",
+    updateAvailableTitle: "A new version of the app is available ({version})",
     retryButton: "Retry",
     updateButton: "Update and restart",
     failedMessage: "Try again later.",
-    downloadingMessage: "Downloading the update. The launcher will restart on its own when done; don't close the window.",
-    availableMessage: "You have {currentVersion}. It will download and install itself, and the launcher will restart when done.",
+    downloadingMessage: "Downloading the update. The app will restart on its own when done; don't close the window.",
+    availableMessage: "You have {currentVersion}. It will download and install itself, and the app will restart when done.",
   },
 
   versionPicker: {
@@ -1342,6 +1385,8 @@ const en = {
 
   packs: {
     librarySectionTitle: "Your library",
+    systemFilterLabel: "Filter by system",
+    allSystems: "All",
     title: "Packs",
     search: "Search packs…",
     importButton: "Import modpack",
@@ -1354,6 +1399,16 @@ const en = {
     loadingPacaksDetail: "Querying the registry.",
     noPacksAvailable: "No packs available",
     noPacksDetail: "Your account has no access to any packs yet. Ask the administrator for an invite.",
+    noPacksSignedOut: "No packs here yet",
+    noPacksSignedOutDetail: "Create a local pack to get started, or sign in with your Boffmedia account to see server packs.",
+    noPacksServerDown: "Server packs cannot be loaded",
+    noPacksServerDownDetail: "Your local packs are still available. Server packs will return once the service is back.",
+    signedOutTitle: "You are not signed in",
+    signedOutMessage: "You can use the app and your local packs without an account. Sign in with Boffmedia to see the server packs you have access to.",
+    signedOutAction: "Sign in",
+    sessionExpiredTitle: "Your session has expired",
+    sessionExpiredMessage: "Your Boffmedia session is no longer valid, so server packs are not being shown. Sign in again to get them back; your local packs are unaffected.",
+    sessionExpiredAction: "Sign in again",
     searchNoResultsTitle: "No results",
     searchNoResults: "Nothing matches \"{query}\".",
     accessInfo: "Only packs your UUID has access to are listed.",
@@ -1437,7 +1492,7 @@ const en = {
     installingPercent: "Installing {percent}%",
     damagedTitle: "Installation damaged",
     damaged: "Damaged",
-    damageExplanation: "Repair deletes the mods, config, and loader managed by the launcher and re-downloads them. Your worlds, screenshots, and options are left untouched.",
+    damageExplanation: "Repair deletes the mods, config, and loader managed by the app and re-downloads them. Your worlds, screenshots, and options are left untouched.",
     crashedTitle: "The game closed unexpectedly",
     crashCode: "Code {code}",
     noErrorLines: "No errors were logged before the crash.",
@@ -1448,7 +1503,7 @@ const en = {
     elapsedTime: "elapsed",
     pid: "pid",
     loader: "loader",
-    launcherClosable: "The launcher can close without affecting the game.",
+    launcherClosable: "The app can close without affecting the game.",
     tabs: {
       content: "Content",
       files: "Files",
@@ -1540,8 +1595,10 @@ const en = {
     alreadyBundled: "Already in pack",
   },
 
-  gameSidebar: {
-    allSystemsTooltip: "View all systems",
+  appRail: {
+    navLabel: "App sections",
+    play: "Play",
+    tools: "Tools",
   },
 
   logs: {
@@ -1554,11 +1611,16 @@ const en = {
   shell: {
     navPacks: "Packs",
     navLogs: "Log",
+    navTools: "Tools",
     navSettings: "Settings",
     offlineTitle: "Offline",
     offlineMessage: "You can play packs you already have installed. Installing, updating, and downloading packs requires a connection.",
     partialTitle: "Could not load your full library",
     partialMessage: "Your local packs are shown. Server packs will reappear when the connection is restored.",
+    serverDownTitle: "Server unavailable",
+    serverDownShort: "Not your installation. Your installed packs and the tools keep working.",
+    serverUnreachableTitle: "Cannot reach the server",
+    serverUnreachableShort: "Your installed packs and the tools keep working.",
     retryButton: "Retry",
     running: "Running",
   },
@@ -1661,17 +1723,17 @@ const en = {
     "unsupportedclassversionerror": {
       title: "Wrong Java version",
       explanation: "The game is running with a version of Java older than what this pack needs.",
-      action: "In Settings, clear the Java path so the launcher installs and uses the correct version automatically.",
+      action: "In Settings, clear the Java path so the app installs and uses the correct version automatically.",
     },
     "has-been-compiled-more-recent": {
       title: "Wrong Java version",
       explanation: "The configured Java is too old for this pack's mods.",
-      action: "In Settings, leave the Java path empty so the launcher uses the correct one.",
+      action: "In Settings, leave the Java path empty so the app uses the correct one.",
     },
     "unrecognized-option": {
       title: "Java doesn't accept the startup arguments",
       explanation: "The manually configured Java installation doesn't understand the options Minecraft needs; usually it's too old or an incomplete JRE.",
-      action: "In Settings, clear the Java path to go back to the launcher-managed version.",
+      action: "In Settings, clear the Java path to go back to the app-managed version.",
     },
     "duplicate-mods-found": {
       title: "Duplicate mods found",
@@ -1827,14 +1889,14 @@ const en = {
 
   logPanel: {
     allLogs: "All",
-    launcher: "Launcher",
+    launcher: "App",
     game: "Game",
     problems: "Problems",
     follow: "Follow",
     copyButton: "Copy",
     clearButton: "Clear",
     noLogs: "No log",
-    noLogsDetail: "Output from the launcher and game will appear here.",
+    noLogsDetail: "Output from the app and game will appear here.",
     linesSummary: "{shown} lines shown · last 2000 kept",
   },
 
@@ -1844,7 +1906,7 @@ const en = {
     noOptional: "No optional mods",
     noOptionalDetail: "This pack marks no files as optional, or hasn't been installed yet.",
     spaceDivider: "your space",
-    spaceWarning: "Mods you add to <code>mods/</code> yourself survive updates: the launcher only deletes files it installed and you haven't modified. A disabled optional mod is not downloaded.",
+    spaceWarning: "Mods you add to <code>mods/</code> yourself survive updates: the app only deletes files it installed and you haven't modified. A disabled optional mod is not downloaded.",
     savedVersions: "Saved versions",
     currentVersion: "current",
     noVersions: "No history",
@@ -1864,9 +1926,9 @@ const en = {
     javaDivider: "java",
     javaAuto: "This pack ignores the settings path and uses the Java version it requires.",
     javaGlobal: "Using the path from global settings ({path}).",
-    javaManaged: "Global settings let the launcher manage Java.",
+    javaManaged: "Global settings let the app manage Java.",
     javaPath: "Java: {path}",
-    javaManagedJava: "Java: managed by the launcher",
+    javaManagedJava: "Java: managed by the app",
     javaRAM: "machine with {gib} of RAM",
     customJavaLabel: "Executable path",
     customJavaHint: "Will be used as-is, even if not compatible with the pack",
@@ -1959,7 +2021,7 @@ const en = {
   },
 
   errors: {
-    needsNewerLauncher: "This feature requires a newer version of the launcher.",
+    needsNewerLauncher: "This feature requires a newer version of the app.",
   },
 } as const
 

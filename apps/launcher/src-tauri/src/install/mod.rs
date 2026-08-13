@@ -360,7 +360,7 @@ async fn prepare(
     layout.prepare(&instance)?;
 
     let http = reqwest::Client::builder()
-        .user_agent(concat!("BoffLauncher/", env!("CARGO_PKG_VERSION")))
+        .user_agent(concat!("BoffmediaApp/", env!("CARGO_PKG_VERSION")))
         .build()
         .map_err(|e| InstallFailure::message(format!("No se pudo crear el cliente HTTP: {e}")))?;
 
@@ -1369,7 +1369,7 @@ pub async fn instance_revert(
     }
 
     let http = reqwest::Client::builder()
-        .user_agent(concat!("BoffLauncher/", env!("CARGO_PKG_VERSION")))
+        .user_agent(concat!("BoffmediaApp/", env!("CARGO_PKG_VERSION")))
         .build()
         .map_err(|e| InstallFailure::message(format!("No se pudo crear el cliente HTTP: {e}")))?;
 

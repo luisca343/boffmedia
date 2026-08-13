@@ -539,7 +539,7 @@ async fn export_mrpack_impl(
     use std::io::Write as _;
 
     let http = reqwest::Client::builder()
-        .user_agent(concat!("BoffLauncher/", env!("CARGO_PKG_VERSION")))
+        .user_agent(concat!("BoffmediaApp/", env!("CARGO_PKG_VERSION")))
         .build()
         .map_err(|e| InstallFailure::message(format!("No se pudo crear el cliente HTTP: {e}")))?;
 
@@ -841,7 +841,7 @@ pub async fn import_mrpack_bytes(
             let settings = crate::settings::load(app);
             let layout = crate::install::paths::Layout::new(app, settings.game_dir())?;
             let http = reqwest::Client::builder()
-                .user_agent(concat!("BoffLauncher/", env!("CARGO_PKG_VERSION")))
+                .user_agent(concat!("BoffmediaApp/", env!("CARGO_PKG_VERSION")))
                 .build()
                 .map_err(|e| {
                     InstallFailure::message(format!("No se pudo crear el cliente HTTP: {e}"))
@@ -922,7 +922,7 @@ pub async fn import_mrpack_url(
     url: String,
 ) -> Result<ImportResult, InstallFailure> {
     let http = reqwest::Client::builder()
-        .user_agent(concat!("BoffLauncher/", env!("CARGO_PKG_VERSION")))
+        .user_agent(concat!("BoffmediaApp/", env!("CARGO_PKG_VERSION")))
         .build()
         .map_err(|e| InstallFailure::message(format!("No se pudo crear el cliente HTTP: {e}")))?;
 

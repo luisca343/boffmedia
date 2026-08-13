@@ -1,5 +1,6 @@
 import { getRequestConfig } from 'next-intl/server';
 import { cookies, headers } from 'next/headers';
+import { messages as toolsMinecraftMessages } from '@boffmedia/tools-minecraft/catalog';
 import { ALL_NAMESPACES } from './manifest.generated';
 import { namespacesFor, PATHNAME_HEADER } from './scopes';
 
@@ -134,7 +135,12 @@ export default getRequestConfig(async () => {
         }),
       ),
     );
-    return modules.reduce<DeepMergeable>((acc, m) => deepMerge(acc, m.default), {});
+    const fromFiles = modules.reduce<DeepMergeable>((acc, m) => deepMerge(acc, m.default), {});
+    // Workspace tool packages own their own catalogs (plan §3: "Package-owned
+    // es/en message catalogs; hosts merge them"). They are merged in
+    // unconditionally rather than through the pathname scope manifest, which
+    // only knows about files under locales/ — the payload is a few hundred keys.
+    return deepMerge(fromFiles, toolsMinecraftMessages[loc] as DeepMergeable);
   };
 
   const messages = await load(locale);
