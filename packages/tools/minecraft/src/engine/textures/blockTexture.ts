@@ -16,7 +16,20 @@
 // jsDelivr mirror of InventivetalentDev/minecraft-assets — per-version git tags,
 // permissive CORS, immutable + CDN-cached. Plain <img> loads (no pixel reads),
 // so this is an external media asset, not a backend API call.
-const CDN_BASE = "https://cdn.jsdelivr.net/gh/InventivetalentDev/minecraft-assets@";
+//
+// HOST-COUPLED: `apps/launcher` renders these tools inside a webview whose CSP
+// (`app.security.csp` in src-tauri/tauri.conf.json) is `default-src 'self'`, so
+// this exact origin is named there on BOTH `img-src` (the <img> and
+// THREE.TextureLoader paths) and `connect-src` (the blockstate/model JSON fetch
+// in ../model/providers/cdn-provider.ts). apps/web ships no CSP, which is why a
+// wrong policy shows up as "every texture is a coloured placeholder in the
+// desktop app only" — with no error the browser build can ever reproduce.
+// Change this host and the launcher CSP has to change with it.
+//
+// Exported because the model/blockstate provider (../model/providers/cdn-provider.ts)
+// reads the same mirror: one origin, one definition, so widening the CSP is a
+// single edit rather than a search. Callers append `<ref>/assets/…`.
+export const CDN_BASE = "https://cdn.jsdelivr.net/gh/InventivetalentDev/minecraft-assets@";
 
 // Refs we have confirmed exist on the mirror. An arbitrary detected version
 // (e.g. "1.20.1", "1.19.4") is snapped to the nearest of these; cross-patch

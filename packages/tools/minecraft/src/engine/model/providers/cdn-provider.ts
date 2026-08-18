@@ -5,15 +5,15 @@
  * refs to CDN URLs.
  *
  * The `fetch` here is an external static-asset read (permitted by the repo's
- * web-network policy as a media/asset exception), localized to this module.
+ * web-network policy as a media/asset exception), localized to this module. It
+ * is also the `connect-src` half of the launcher CSP coupling noted at
+ * {@link CDN_BASE} — the origin itself is defined there, not here.
  */
 
 import type { AssetProvider, Blockstate, RawModel } from "../types";
-import { normalizeTextureVersion, LATEST_TEXTURE_REF } from "../../textures/blockTexture";
+import { CDN_BASE, normalizeTextureVersion, LATEST_TEXTURE_REF } from "../../textures/blockTexture";
 import { adaptToLegacyAssets } from "../legacy-compat";
 import legacyAssets from "./1.12-assets.json";
-
-const CDN_BASE = "https://cdn.jsdelivr.net/gh/InventivetalentDev/minecraft-assets@";
 
 /** The one mirror ref that predates the flattening; see `1.12-assets.json`. */
 const LEGACY_REF: string = legacyAssets.ref;

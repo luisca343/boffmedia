@@ -36,23 +36,75 @@ export type SaveFileResult =
   | { status: "cancelled" };
 
 /**
- * D7 — the API seam, typed from day one, implemented per host on its own
- * schedule. Web resolves this to a plain `fetch` against the public API; the
- * launcher's authenticated Rust proxy lands when the first API-backed tool
- * ports. Tools that need it must declare `api` in `requiredCapabilities` so a
- * host lacking it can hide them instead of crashing at click time.
+ * Whether a call needs the player's Boffmedia session.
+ *
+ * `optional` is the DEFAULT and the important one: most tool endpoints are
+ * `@Public()` (all of `/tools/mhwilds/*`, for instance), and D4 promises the
+ * Tools section works with no account at all. An `optional` call therefore
+ * attaches a session when one happens to exist — some endpoints personalise
+ * their answer — and proceeds anonymously when it does not, instead of
+ * failing closed.
+ *
+ * `required` is for the genuinely per-user calls (a saved collection, a
+ * tracker) and fails fast with `needsSignin` rather than sending an anonymous
+ * request the API will only reject.
+ */
+export type ToolApiAuth = "optional" | "required";
+
+export interface ToolApiRequest {
+  method?: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
+  body?: unknown;
+  query?: Record<string, string | number | boolean | undefined>;
+  signal?: AbortSignal;
+  /** Defaults to `"optional"` — see {@link ToolApiAuth}. */
+  auth?: ToolApiAuth;
+}
+
+/**
+ * What both hosts throw on a failed API call, so a tool can branch on the
+ * failure without knowing which host it is running in. Without this the web
+ * host threw a bare `Error` with the status stringified into the message and
+ * the launcher threw Tauri's own error shape — nothing portable to catch.
+ */
+export class ToolApiError extends Error {
+  /** HTTP status, or 0 when the request never got an answer. */
+  readonly status: number;
+  /** The session is gone or was rejected: the tool should offer sign-in. */
+  readonly needsSignin: boolean;
+  /**
+   * Machine-readable cause where the host can tell one: `server_unreachable`
+   * (never arrived) and `server_down` (5xx) mirror the codes the launcher
+   * shell already switches on for its outage notice.
+   */
+  readonly code?: string;
+
+  constructor(
+    message: string,
+    options: { status?: number; needsSignin?: boolean; code?: string } = {},
+  ) {
+    super(message);
+    this.name = "ToolApiError";
+    this.status = options.status ?? 0;
+    this.needsSignin = options.needsSignin ?? false;
+    this.code = options.code;
+  }
+}
+
+/**
+ * D7 — the API seam. Web resolves this to a plain `fetch` against the public
+ * API; the launcher routes it through an authenticated Rust proxy (the browser
+ * cannot reach the OS keychain where its session JWT lives, and the webview
+ * has no cookie for the API origin). Tools that need it must declare `api` in
+ * `requiredCapabilities` so a host lacking it can hide them instead of
+ * crashing at click time.
+ *
+ * Both hosts return the API's response body VERBATIM — envelope
+ * (`{ success, statusCode, data }`) included — so tool code sees one shape
+ * regardless of host, and both throw {@link ToolApiError} on failure.
  */
 export interface ToolApi {
   /** Path is relative to the host's API root, e.g. `/scrape/myrient`. */
-  request<T = unknown>(
-    path: string,
-    init?: {
-      method?: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
-      body?: unknown;
-      query?: Record<string, string | number | boolean | undefined>;
-      signal?: AbortSignal;
-    },
-  ): Promise<T>;
+  request<T = unknown>(path: string, init?: ToolApiRequest): Promise<T>;
 }
 
 /**

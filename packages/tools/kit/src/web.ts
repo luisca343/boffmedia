@@ -6,11 +6,13 @@
  * Nothing here imports `next/*` — this is plain DOM code.
  */
 
+import { ToolApiError } from "./host";
 import type {
   SaveFileData,
   SaveFileRequest,
   SaveFileResult,
   ToolApi,
+  ToolApiRequest,
   ToolHost,
   ToolStorage,
 } from "./host";
@@ -79,31 +81,69 @@ export function createWebStorage(namespace = "boffmedia.tools"): ToolStorage {
   };
 }
 
+/**
+ * Pull the most human sentence out of an API error body, mirroring the Rust
+ * `error_message`: `userMessage` is the only field the API marks as safe to
+ * show verbatim, and `message` is developer text used solely so a failure is
+ * never a blank dialog.
+ */
+async function errorMessage(response: Response, fallback: string): Promise<string> {
+  try {
+    const body = (await response.json()) as { userMessage?: string; message?: unknown };
+    if (typeof body.userMessage === "string" && body.userMessage) return body.userMessage;
+    if (typeof body.message === "string" && body.message) return body.message;
+    // class-validator returns an array of strings for a 400.
+    if (Array.isArray(body.message)) {
+      const first = body.message.find((entry) => typeof entry === "string");
+      if (typeof first === "string") return first;
+    }
+  } catch {
+    // A non-JSON body (a gateway's HTML error page) tells us nothing useful.
+  }
+  return fallback;
+}
+
 /** Direct `fetch` against the public API — what the web tools do today. */
 export function createWebApi(baseUrl: string): ToolApi {
   return {
-    async request<T>(
-      path: string,
-      init?: {
-        method?: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
-        body?: unknown;
-        query?: Record<string, string | number | boolean | undefined>;
-        signal?: AbortSignal;
-      },
-    ): Promise<T> {
+    async request<T>(path: string, init?: ToolApiRequest): Promise<T> {
+      const method = init?.method ?? "GET";
       const url = new URL(path.replace(/^\//, ""), baseUrl.endsWith("/") ? baseUrl : `${baseUrl}/`);
       for (const [key, value] of Object.entries(init?.query ?? {})) {
         if (value !== undefined) url.searchParams.set(key, String(value));
       }
-      const response = await fetch(url, {
-        method: init?.method ?? "GET",
-        headers: init?.body === undefined ? undefined : { "content-type": "application/json" },
-        body: init?.body === undefined ? undefined : JSON.stringify(init.body),
-        signal: init?.signal,
-        credentials: "include",
-      });
+
+      let response: Response;
+      try {
+        response = await fetch(url, {
+          method,
+          headers: init?.body === undefined ? undefined : { "content-type": "application/json" },
+          body: init?.body === undefined ? undefined : JSON.stringify(init.body),
+          signal: init?.signal,
+          // The browser IS the session here: the cookie for the API origin is
+          // what `auth` selects between on the launcher side, so there is
+          // nothing extra to attach for either mode.
+          credentials: "include",
+        });
+      } catch (err) {
+        // An AbortError is the caller's own doing — it must stay an
+        // AbortError so `signal`-based cancellation is not reported as an
+        // outage the tool then shows the player.
+        if (err instanceof DOMException && err.name === "AbortError") throw err;
+        throw new ToolApiError(err instanceof Error ? err.message : `${method} ${path} failed`, {
+          code: "server_unreachable",
+        });
+      }
+
       if (!response.ok) {
-        throw new Error(`${init?.method ?? "GET"} ${url.pathname} failed: ${response.status}`);
+        throw new ToolApiError(
+          await errorMessage(response, `${method} ${url.pathname} failed: ${response.status}`),
+          {
+            status: response.status,
+            needsSignin: response.status === 401,
+            code: response.status >= 500 ? "server_down" : undefined,
+          },
+        );
       }
       return (await response.json()) as T;
     },

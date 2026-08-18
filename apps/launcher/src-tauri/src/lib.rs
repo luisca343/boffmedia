@@ -37,6 +37,7 @@ pub mod mrpack;
 pub mod pack;
 pub mod randomizer;
 pub mod settings;
+pub mod tool_api;
 pub mod worlds;
 pub mod status;
 pub mod updates;
@@ -154,6 +155,7 @@ pub fn run() {
             dialogs::save_stream_chunk,
             dialogs::save_stream_finish,
             dialogs::save_stream_abort,
+            tool_api::tool_api_request,
             emulators::emulator_status,
             emulators::emulator_set_path,
             emulators::emulator_clear_path,

@@ -4,6 +4,7 @@ export {
   hasToolHost,
   openUrl,
   saveFile,
+  ToolApiError,
   toolApi,
   toolStorage,
 } from "./host";
@@ -12,6 +13,8 @@ export type {
   SaveFileRequest,
   SaveFileResult,
   ToolApi,
+  ToolApiAuth,
+  ToolApiRequest,
   ToolCapability,
   ToolHost,
   ToolStorage,

@@ -14,14 +14,19 @@ import {
   configureToolHost,
   createWebApi,
   createWebStorage,
+  getToolHost,
+  listTools,
   registerTools,
   webSaveFile,
+  ToolApiError,
   type SaveFileData,
   type SaveFileRequest,
   type SaveFileResult,
+  type ToolApi,
+  type ToolApiRequest,
 } from "@boffmedia/tool-kit"
 
-import { isDesktop, openUrl, saveStream, saveDialog } from "./runtime"
+import { isDesktop, openUrl, saveStream, saveDialog, toolApiRequest } from "./runtime"
 
 /** 4 MiB — big enough that per-chunk IPC overhead disappears against disk
  *  throughput, small enough that no single message is a memory spike. */
@@ -78,18 +83,72 @@ async function desktopSaveFile(request: SaveFileRequest): Promise<SaveFileResult
   }
 }
 
+/** Rust's serialised `ApiError`, as it arrives through `invoke`. */
+type WireApiError = { message?: string; needs_signin?: boolean; code?: string }
+
+/**
+ * The desktop `api` capability (plan D7).
+ *
+ * Everything host-shaped happens in Rust — bearer, timeout, 401 handling — so
+ * this side is only translation: `query` values are stringified (the Rust
+ * struct takes a flat string map, since a query string has no other type) and
+ * the rejected `ApiError` becomes the `ToolApiError` the web host also throws.
+ */
+const desktopApi: ToolApi = {
+  async request<T>(path: string, init?: ToolApiRequest): Promise<T> {
+    const query: Record<string, string> = {}
+    for (const [key, value] of Object.entries(init?.query ?? {})) {
+      if (value !== undefined) query[key] = String(value)
+    }
+    // `signal` is deliberately not forwarded: a Tauri command cannot be
+    // cancelled mid-flight, so honouring the abort would only hide a request
+    // that is still running. Callers that pass one still get their result.
+    try {
+      return await toolApiRequest<T>({
+        path,
+        method: init?.method,
+        body: init?.body,
+        query,
+        auth: init?.auth ?? "optional",
+      })
+    } catch (err) {
+      const wire = err as WireApiError
+      throw new ToolApiError(wire?.message ?? `${init?.method ?? "GET"} ${path} failed`, {
+        needsSignin: wire?.needs_signin === true,
+        code: wire?.code,
+      })
+    }
+  },
+}
+
 configureToolHost({
   // Browser dev mode (`dev:renderer`) has no Rust side, so it falls back to the
   // ordinary blob download — every tool screen stays browser-runnable.
   saveFile: (request) => (isDesktop() ? desktopSaveFile(request) : webSaveFile(request)),
   openUrl,
   storage: createWebStorage("boffmedia.tools"),
-  // D7: typed from day one, not yet routed through an authenticated Rust proxy.
-  // No tool shipped in this cycle declares the `api` capability, so nothing
-  // calls it; the first API-backed tool to port replaces this line.
-  api: createWebApi(import.meta.env.VITE_API_URL ?? "https://api.boffmedia.net"),
+  // D7. Browser dev mode has no Rust side and no keychain, so it falls back to
+  // an anonymous direct fetch — enough for the public tool endpoints, which is
+  // what `dev:renderer` needs to stay useful.
+  api: isDesktop()
+    ? desktopApi
+    : createWebApi(import.meta.env.VITE_API_URL ?? "https://api.boffmedia.es"),
 })
 
 // D6 — the Tools hub renders from the registry, so a domain package becomes
 // visible by being registered here and nowhere else.
 registerTools(minecraftTools)
+
+// Dev-only console handle for the capabilities. No tool declares `api` yet, so
+// without this there is no way to exercise the Rust proxy from a running build
+// short of porting a tool first — which is the wrong order to find out the
+// bridge is wrong. Stripped from release bundles by the `import.meta.env.DEV`
+// guard (Vite folds the constant, so the branch is dead code eliminated).
+if (import.meta.env.DEV) {
+  ;(window as unknown as { boffTools: unknown }).boffTools = {
+    api: (path: string, init?: ToolApiRequest) => getToolHost().api.request(path, init),
+    host: () => getToolHost(),
+    tools: () => listTools().map((t) => t.id),
+    isDesktop,
+  }
+}

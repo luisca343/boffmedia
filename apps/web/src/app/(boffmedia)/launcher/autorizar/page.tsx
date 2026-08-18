@@ -1,3 +1,4 @@
+import { Suspense } from "react"
 import type { Metadata } from "next"
 import { getTranslations } from "next-intl/server"
 import { AuthorizeLauncherView } from "./_components/AuthorizeLauncherView"
@@ -8,5 +9,11 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default function AutorizarPage() {
-  return <AuthorizeLauncherView />
+  // The view reads ?code= via useSearchParams, which opts the page into client
+  // rendering — without this boundary the prerender pass fails outright.
+  return (
+    <Suspense>
+      <AuthorizeLauncherView />
+    </Suspense>
+  )
 }

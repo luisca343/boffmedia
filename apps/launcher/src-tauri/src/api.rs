@@ -104,6 +104,13 @@ impl ApiState {
     pub async fn current_token(&self) -> Result<String, ApiError> {
         current_token(self).await
     }
+
+    /// The shared client, for callers that build their own request (the tool
+    /// API proxy). Sharing it matters: it carries the launcher user-agent and
+    /// the connect timeout, and a second client would drift from both.
+    pub(crate) fn http(&self) -> &reqwest::Client {
+        &self.http
+    }
 }
 
 // ── Wire types ─────────────────────────────────────────────────────────────
@@ -407,7 +414,7 @@ pub const CONTROL_TIMEOUT: std::time::Duration = std::time::Duration::from_secs(
 /// Turn a non-success response into the right error variant. A 5xx is the
 /// server telling us it is broken, and collapsing that into a generic message
 /// is what made "the API is down" look like "your library failed to load".
-async fn response_error(res: reqwest::Response, fallback: &str) -> ApiError {
+pub(crate) async fn response_error(res: reqwest::Response, fallback: &str) -> ApiError {
     if res.status().is_server_error() {
         let status = res.status().as_u16();
         let message = error_message(res, fallback).await;
@@ -466,7 +473,7 @@ impl serde::Serialize for ApiError {
 /// Pull the most human sentence out of an error body. `userMessage` is the only
 /// field the API marks as safe to show verbatim; `message` is developer text
 /// and is used solely as a last resort so a failure is never a blank dialog.
-async fn error_message(res: reqwest::Response, fallback: &str) -> String {
+pub(crate) async fn error_message(res: reqwest::Response, fallback: &str) -> String {
     let Ok(body) = res.json::<ApiErrorBody>().await else {
         return fallback.to_string();
     };

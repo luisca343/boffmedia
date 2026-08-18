@@ -1872,6 +1872,23 @@ export async function saveDialog(
   }
 }
 
+/** One proxied tool API call. The renderer never talks to the API directly:
+ *  the launcher's session is a JWT in the OS credential store, which the webview
+ *  cannot read, so Rust attaches the bearer (see `tool_api.rs`).
+ *
+ *  Rejects with the serialised `ApiError` shape (`{message, needs_signin, code}`)
+ *  — `tool-host.ts` translates that into `ToolApiError` so tool code sees the
+ *  same failure type it does on the web. */
+export async function toolApiRequest<T = unknown>(request: {
+  path: string
+  method?: string
+  body?: unknown
+  query?: Record<string, string>
+  auth?: "optional" | "required"
+}): Promise<T> {
+  return await invoke<T>("tool_api_request", { request })
+}
+
 /** Chunked write session for tool exports. A Schematic Compat `.prefab` can run
  *  to multiple GB, so the payload is pushed chunk by chunk instead of crossing
  *  the IPC boundary as one message. Errors propagate (unlike the pickers): a
