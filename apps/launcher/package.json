@@ -20,6 +20,7 @@
     "@boffmedia/pack-schema": "workspace:*",
     "@boffmedia/tailwind-config": "workspace:*",
     "@boffmedia/tool-kit": "workspace:*",
+    "@boffmedia/tools-mhwilds": "workspace:*",
     "@boffmedia/tools-minecraft": "workspace:*",
     "@boffmedia/ui": "workspace:*",
     "@tauri-apps/api": "^2.1.1",

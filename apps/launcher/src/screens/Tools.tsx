@@ -1,4 +1,4 @@
-import { Suspense, useMemo } from "react"
+import { Suspense, useMemo, type CSSProperties } from "react"
 import { Icon, isIconName, Spinner, type IconName } from "@boffmedia/ui"
 import { getTool, listTools, type ToolManifest } from "@boffmedia/tool-kit"
 
@@ -12,8 +12,8 @@ import { useLauncher } from "../state/launcher"
 
 /** Capabilities this host actually provides. A tool declaring something absent
  *  is hidden rather than offered and then failing at click time. `api` is listed
- *  because `tool-host.ts` configures it — it is typed and wired, just not yet
- *  routed through an authenticated Rust proxy (D7). */
+ *  because `tool-host.ts` routes it through the authenticated Rust proxy
+ *  (`tool_api.rs`), which is what the MH Wilds tools need to load their data. */
 const HOST_CAPABILITIES = new Set(["saveFile", "openUrl", "storage", "api"])
 
 function supported(tool: ToolManifest): boolean {
@@ -107,10 +107,30 @@ export function ToolView() {
         onBack={() => go("tools")}
         title={tRoot(tool.titleKey)}
       />
-      {/* overflow-hidden, NOT overflow-y-auto: the tools are full-height shells
-          that scroll their own panes. An auto-scrolling parent would let them
-          size to content and produce a second, outer scrollbar. */}
-      <div className="min-h-0 flex-1 overflow-hidden">
+      {/* The manifest's `layout` decides this, and it is not cosmetic.
+          `viewport` tools (the schematic pair) fill a bounded box and scroll
+          their own panes, so an auto-scrolling parent would let them size to
+          content and produce a second, outer scrollbar. `document` tools grow
+          with their content and need US to scroll them — this container used to
+          be unconditionally `overflow-hidden`, which clipped them dead: the MH
+          Wilds tools could not scroll at all.
+
+          `--tool-vh` / `--tool-sticky-top` are this host's half of the deal (see
+          MhBar). The scrollport starts below the 40px titlebar and the 37px
+          bordered SectionHeader, and nothing overlays its top edge — so the
+          sticky offset is 0, which is NOT the same number as the chrome height.
+          One variable could not serve both. */}
+      <div
+        style={
+          {
+            "--tool-vh": "calc(100dvh - 40px - 37px)",
+            "--tool-sticky-top": "0px",
+          } as CSSProperties
+        }
+        className={`min-h-0 flex-1 ${
+          (tool.layout ?? "document") === "viewport" ? "overflow-hidden" : "overflow-y-auto"
+        }`}
+      >
         <Suspense
           fallback={
             <div className="flex h-full items-center justify-center">

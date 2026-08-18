@@ -40,6 +40,12 @@
       "@boffmedia/tools-minecraft/*": [
         "../../packages/tools/minecraft/src/*"
       ],
+      "@boffmedia/tools-mhwilds": [
+        "../../packages/tools/mhwilds/src"
+      ],
+      "@boffmedia/tools-mhwilds/*": [
+        "../../packages/tools/mhwilds/src/*"
+      ],
       "@boffmedia/ui": [
         "../../packages/ui/src"
       ],

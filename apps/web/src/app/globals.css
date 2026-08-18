@@ -439,6 +439,20 @@ html { scroll-behavior: smooth; background: var(--bg); }
    while every tool shell offset itself by `var(--nav-h, 66px)`. The two could
    not agree. Anything that sticks below the Navbar reads this token. */
 :root { --nav-h: 66px; }
+/* apps/web's half of the tool-package layout contract (see ToolManifest.layout
+   and MhBar in @boffmedia/tools-mhwilds). A tool package must not do viewport
+   math itself — `--nav-h` lives here and nowhere else, so a package reading it
+   directly rendered an invalid `calc()` in the launcher and silently lost its
+   sizing. Packages read these two instead:
+     --tool-vh          height of the box the host gives a tool (its scrollport)
+     --tool-sticky-top  how far below the scrollport's top edge tool chrome sticks
+   Here the scroller IS the document and the Navbar overlays its top, so both
+   are the nav height. In the launcher they differ — chrome sits above the
+   scrollport rather than over it — which is why this is two tokens, not one. */
+:root {
+  --tool-vh: calc(100dvh - var(--nav-h));
+  --tool-sticky-top: var(--nav-h);
+}
 body {
   margin: 0;
   font: 400 16px/1.55 var(--font-body);

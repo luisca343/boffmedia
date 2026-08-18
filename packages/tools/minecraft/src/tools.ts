@@ -19,6 +19,9 @@ export const schematicCompatTool: ToolManifest = {
   descriptionKey: `${SCHEMATIC_COMPAT_NS}.appTagline`,
   icon: "cube",
   route: "/minecraft/schematic-compat",
+  // A WebGL canvas cannot size itself from content: these two want a bounded
+  // box and scroll their own panes inside it.
+  layout: "viewport",
   // The export flow is the only host-shaped thing either tool does.
   requiredCapabilities: ["saveFile"],
   component: lazy(() =>
@@ -35,6 +38,9 @@ export const schematicViewerTool: ToolManifest = {
   descriptionKey: `${SCHEMATIC_VIEWER_NS}.appTagline`,
   icon: "cube",
   route: "/minecraft/schematic-viewer",
+  // A WebGL canvas cannot size itself from content: these two want a bounded
+  // box and scroll their own panes inside it.
+  layout: "viewport",
   component: lazy(() =>
     import("./schematic-viewer/SchematicViewerTool").then((m) => ({
       default: m.SchematicViewerTool,

@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { Sample, Section } from "../showcase-shared"
-import { MhElemBadge, MhSpeciesTag, MhStars, MhThreatBadge, MonsterCard, MonsterRow } from "@/app/(boffmedia)/(herramientas)/mhwilds/monsters/_components/bst-kit"
+import { MhElemBadge, MhSpeciesTag, MhStars, MhThreatBadge, MonsterCard, MonsterRow } from "@boffmedia/tools-mhwilds/bestiary/bst-kit"
 import {
   MhAilmentTag,
   MhBreakPanel,
@@ -21,7 +21,7 @@ import {
   type MhHitzone,
   type MhReward,
 } from "@/components/boffmedia/ui/mh-bestiary"
-import type { MhMonster } from "@/types/tools/mhwilds"
+import type { MhMonster } from "@boffmedia/tools-mhwilds/types"
 
 // ── Bestiary detail demo data (mock — hitzones/rewards/breaks/strategy). [deferred]
 const RATH_HITZONES: MhHitzone[] = [

@@ -4,7 +4,7 @@ import * as React from "react"
 import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { Icon } from "@boffmedia/ui"
-import { MhRarity } from "@/app/(boffmedia)/(herramientas)/mhwilds/_components/ui/mh-kit"
+import { MhRarity } from "@boffmedia/tools-mhwilds/ui/mh-kit"
 import { MH_COATINGS, MH_ELDERSEAL, MH_NOTE_COLORS, MH_PHIALS, MH_SHARPNESS, sharpnessAt, topSharpColor, type MhWeapon } from "./mh-db-util"
 
 // Armory (weapon-DB) pieces: weapon card (grid/list, compare-select), interactive
@@ -107,7 +107,7 @@ export function MhWeaponCard({ weapon, active, onOpen, view, selectable, selecte
 }
 
 export function MhSharpHandicraft({ weapon, defaultLevel }: { weapon: MhWeapon; defaultLevel?: number }) {
-  const t = useTranslations("mhwilds.db.weapon")
+  const t = useTranslations("tools.mhwilds.db.weapon")
   const levels = weapon.handicraftLevels || 5
   const [lv, setLv] = React.useState(defaultLevel != null ? defaultLevel : 0)
   if (!weapon.sharpness) return <div className="inline-block border border-solid border-line bg-panel-2 px-2 py-1 font-mono text-[11px]/none text-txt-muted">{t("noSharpness")}</div>
@@ -148,7 +148,7 @@ function MhLabel({ children, className }: { children: React.ReactNode; className
 }
 
 export function MhWeaponExtra({ weapon }: { weapon: MhWeapon }) {
-  const t = useTranslations("mhwilds.db")
+  const t = useTranslations("tools.mhwilds.db")
   const ex = weapon.extra
   if (!ex) return null
   if (ex.coatings) {
@@ -220,7 +220,7 @@ export function MhWeaponExtra({ weapon }: { weapon: MhWeapon }) {
 }
 
 export function MhElderseal({ value }: { value?: string }) {
-  const t = useTranslations("mhwilds.db.elderseal")
+  const t = useTranslations("tools.mhwilds.db.elderseal")
   if (!value) return null
   const key = MH_ELDERSEAL[value]
   const lbl = key ? t(key) : value

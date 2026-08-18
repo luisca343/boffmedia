@@ -4,8 +4,8 @@ import * as React from "react"
 import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { Icon, type IconName } from "@boffmedia/ui"
-import { MhStars } from "@/app/(boffmedia)/(herramientas)/mhwilds/monsters/_components/bst-kit"
-import { MhRarity } from "@/app/(boffmedia)/(herramientas)/mhwilds/_components/ui/mh-kit"
+import { MhStars } from "@boffmedia/tools-mhwilds/bestiary/bst-kit"
+import { MhRarity } from "@boffmedia/tools-mhwilds/ui/mh-kit"
 
 // v3 «Señal» — MH Wilds Bestiary detail molecules (weakness/hitzone/drops/
 // strategy). Mirrors v3-mh-monsters-kit.jsx; prop-driven (mock data). [deferred]
@@ -200,7 +200,7 @@ export function MhHitzoneTable({ hitzones }: { hitzones: MhHitzone[] }) {
 
 // ── drops ─────────────────────────────────────────────────────────────────────
 export function MhDropChance({ chance, rare }: { chance: number; rare?: boolean }) {
-  const t = useTranslations("mhwilds.bestiary")
+  const t = useTranslations("tools.mhwilds.bestiary")
   const band = rare ? "rare" : chance >= 40 ? "hi" : chance >= 18 ? "mid" : "low"
   const col = { hi: "var(--ok)", mid: "var(--warn)", low: "var(--bad)", rare: "var(--rar8)" }[band]
   return (
@@ -234,7 +234,7 @@ export interface MhReward {
 }
 export function MhDropTable({ rewards }: { rewards: MhReward[] }) {
   const t = useTranslations("common.bestiary")
-  const tMh = useTranslations("mhwilds.bestiary")
+  const tMh = useTranslations("tools.mhwilds.bestiary")
   const rows: { item: MhRewardItem; cond: MhReward["conditions"][number]; rare: boolean }[] = []
   rewards.forEach((r) => r.conditions.forEach((c) => rows.push({ item: r.item, cond: c, rare: r.item.rarity >= 7 })))
   rows.sort((a, b) => b.cond.chance - a.cond.chance)

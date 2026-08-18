@@ -14,6 +14,9 @@ import type { ToolCapability } from "./host";
 
 export type ToolDomain = "minecraft" | "pokemon" | "mhwilds" | "misc";
 
+/** See `ToolManifest.layout`. */
+export type ToolLayout = "document" | "viewport";
+
 export interface ToolManifest {
   /** Stable, host-independent identifier, e.g. `minecraft.schematic-compat`. */
   id: string;
@@ -26,6 +29,25 @@ export interface ToolManifest {
   component: LazyExoticComponent<ComponentType<Record<string, never>>>;
   /** Hosts hide (or disable) a tool whose capabilities they cannot provide. */
   requiredCapabilities?: ToolCapability[];
+  /**
+   * How the tool expects to be sized and scrolled — the one structural thing a
+   * host cannot guess from the manifest alone.
+   *
+   * `"document"` (the default): the tool GROWS with its content and needs an
+   * ancestor to scroll it, the way a web page does. Its chrome sticks to the
+   * top of whatever box the host gives it. Every tool converted to page scroll
+   * on the web is this shape.
+   *
+   * `"viewport"`: the tool wants a BOUNDED box that it fills exactly and
+   * scrolls its own panes inside. A WebGL canvas needs this — it cannot size
+   * itself from content.
+   *
+   * Getting this wrong is silent and total: a `"document"` tool dropped into a
+   * clipped box cannot scroll AT ALL. That is exactly what happened to the MH
+   * Wilds tools, because the launcher had assumed every tool was `"viewport"`
+   * (true of the only two that existed at the time).
+   */
+  layout?: ToolLayout;
   /**
    * Route segment used by hosts that have URLs (web). The launcher keys its
    * view state off `id` instead.

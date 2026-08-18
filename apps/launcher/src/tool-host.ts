@@ -10,6 +10,7 @@
 // startup chunk. `./tools` only holds the declarative manifests plus their
 // `lazy()` component references, so the heavy code stays behind the split.
 import { minecraftTools } from "@boffmedia/tools-minecraft/tools"
+import { mhwildsTools } from "@boffmedia/tools-mhwilds/tools"
 import {
   configureToolHost,
   createWebApi,
@@ -137,13 +138,12 @@ configureToolHost({
 
 // D6 — the Tools hub renders from the registry, so a domain package becomes
 // visible by being registered here and nowhere else.
-registerTools(minecraftTools)
+registerTools([...minecraftTools, ...mhwildsTools])
 
-// Dev-only console handle for the capabilities. No tool declares `api` yet, so
-// without this there is no way to exercise the Rust proxy from a running build
-// short of porting a tool first — which is the wrong order to find out the
-// bridge is wrong. Stripped from release bundles by the `import.meta.env.DEV`
-// guard (Vite folds the constant, so the branch is dead code eliminated).
+// Dev-only console handle for the capabilities: it exercises a capability
+// directly, without having to drive a tool UI to the screen that happens to use
+// it. Stripped from release bundles by the `import.meta.env.DEV` guard (Vite
+// folds the constant, so the branch is dead code eliminated).
 if (import.meta.env.DEV) {
   ;(window as unknown as { boffTools: unknown }).boffTools = {
     api: (path: string, init?: ToolApiRequest) => getToolHost().api.request(path, init),

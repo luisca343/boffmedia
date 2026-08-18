@@ -19,7 +19,7 @@ const MH_TABS: { key: string; route: string; labelKey: string; icon: IconName }[
 ]
 
 export function MhToolTabs({ go, active, onOpenFavs, favCount = 0 }: { go?: (route: string) => void; active?: string; onOpenFavs?: () => void; favCount?: number }) {
-  const t = useTranslations("mhwilds.shell")
+  const t = useTranslations("tools.mhwilds.shell")
   return (
     <div className="flex min-h-[46px] items-stretch gap-1 border-b border-solid border-line bg-base-2 px-[clamp(10px,2vw,24px)]" role="tablist" aria-label={t("ariaLabel")}>
       <button type="button" title={t("back")} onClick={() => go && go("/herramientas/mhwilds")} className="group mr-1.5 flex items-center gap-[9px] border-0 border-r border-solid border-line bg-transparent pr-4 cursor-pointer">
@@ -55,7 +55,7 @@ export function MhToolTabs({ go, active, onOpenFavs, favCount = 0 }: { go?: (rou
 }
 
 export function MhFavStar({ type, id, label, meta, size = 15, defaultOn = false }: { type: string; id: string; label?: string; meta?: string; size?: number; defaultOn?: boolean }) {
-  const t = useTranslations("mhwilds.shell")
+  const t = useTranslations("tools.mhwilds.shell")
   const [on, setOn] = React.useState(defaultOn)
   return (
     <button

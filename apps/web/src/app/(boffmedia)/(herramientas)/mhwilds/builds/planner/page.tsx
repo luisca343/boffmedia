@@ -1,4 +1,4 @@
-import { PlannerView } from "./_components/PlannerView"
+import { PlannerView } from "@boffmedia/tools-mhwilds"
 
 export default function BuildPlannerPage() {
   return <PlannerView />

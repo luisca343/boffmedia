@@ -3,6 +3,7 @@ import * as React from "react"
 import { configureUi, DEFAULT_LOCALE, isAppLocale, type AppLocale } from "@boffmedia/ui"
 
 import { messages as toolsMinecraftMessages } from "@boffmedia/tools-minecraft/catalog"
+import { messages as toolsMhwildsMessages } from "@boffmedia/tools-mhwilds/catalog"
 
 import { messages } from "./messages"
 
@@ -64,19 +65,107 @@ function flatten(node: unknown, prefix: string, out: Dict): Dict {
 // wins a collision, which is the direction that lets the launcher override a
 // tool string without editing the package.
 const FLAT: Record<AppLocale, Dict> = {
-  es: flatten(messages.es, "", flatten(toolsMinecraftMessages.es, "", {})),
-  en: flatten(messages.en, "", flatten(toolsMinecraftMessages.en, "", {})),
+  es: flatten(messages.es, "", flatten(toolsMhwildsMessages.es, "", flatten(toolsMinecraftMessages.es, "", {}))),
+  en: flatten(messages.en, "", flatten(toolsMhwildsMessages.en, "", flatten(toolsMinecraftMessages.en, "", {}))),
 }
 
-/** next-intl uses ICU `{name}` placeholders; the launcher only needs simple
- *  named substitution, so that is all this does. An unmatched placeholder is
- *  left verbatim — a visible `{count}` is a better bug report than a silent "". */
-function interpolate(template: string, values?: Record<string, string | number | Date>): string {
+/** Index of the `}` matching the `{` at `open`, or -1 if unbalanced. Branch
+ *  bodies nest (`other {{count} opciones}`), so a regex cannot find this. */
+function matchBrace(s: string, open: number): number {
+  let depth = 0
+  for (let i = open; i < s.length; i++) {
+    if (s[i] === "{") depth++
+    else if (s[i] === "}" && --depth === 0) return i
+  }
+  return -1
+}
+
+/** `=0 {…} one {…} other {…}` → a map of branch key to body. */
+function parseBranches(s: string): Map<string, string> {
+  const out = new Map<string, string>()
+  let i = 0
+  for (;;) {
+    const head = /^\s*(=\d+|\w+)\s*\{/.exec(s.slice(i))
+    if (!head) return out
+    const open = i + head[0].length - 1
+    const close = matchBrace(s, open)
+    if (close === -1) return out
+    out.set(head[1], s.slice(open + 1, close))
+    i = close + 1
+  }
+}
+
+/** Render one `{…}` argument. `raw` is returned unchanged for anything not
+ *  understood — a visible `{count}` is a better bug report than a silent "". */
+function renderArg(
+  body: string,
+  raw: string,
+  values: Record<string, string | number | Date>,
+  locale: AppLocale,
+): string {
+  const simple = /^\w+$/.test(body)
+  if (simple) {
+    const v = values[body]
+    return v === undefined ? raw : String(v)
+  }
+
+  const head = /^(\w+)\s*,\s*(plural|select)\s*,\s*([\s\S]*)$/.exec(body)
+  if (!head) return raw
+  const [, name, kind, rest] = head
+  const value = values[name]
+  if (value === undefined) return raw
+
+  const branches = parseBranches(rest)
+  let chosen: string | undefined
+  if (kind === "plural") {
+    const n = Number(value)
+    if (!Number.isFinite(n)) return raw
+    // An `=N` exact match outranks the language's plural category, which is the
+    // whole reason catalogs write `=0 {No hay decoraciones equipadas}`.
+    chosen =
+      branches.get(`=${n}`) ?? branches.get(new Intl.PluralRules(locale).select(n)) ?? branches.get("other")
+  } else {
+    chosen = branches.get(String(value)) ?? branches.get("other")
+  }
+  if (chosen === undefined) return raw
+
+  // `#` is the plural's own number; the body may also nest `{name}` args.
+  return interpolate(kind === "plural" ? chosen.split("#").join(String(value)) : chosen, values, locale)
+}
+
+/**
+ * The launcher's ICU renderer: named `{placeholders}` plus `plural`/`select`.
+ *
+ * This used to be a one-line `{name}` regex, with a comment saying the launcher
+ * "only needs simple named substitution". That was true right up until the host
+ * started merging tool-package catalogs, which are authored for next-intl and
+ * DO use ICU — so `{count, plural, one {# opción} other {# opciones}}` rendered
+ * to the player verbatim, in both the MH Wilds and the schematic tools.
+ *
+ * Plural categories come from `Intl.PluralRules`, not a hand-rolled n===1 test:
+ * getting this right per locale is exactly what that API is for, and it costs
+ * nothing here. Anything unrecognised (a format we do not implement, an unknown
+ * placeholder) is left verbatim on purpose.
+ */
+function interpolate(
+  template: string,
+  values?: Record<string, string | number | Date>,
+  locale: AppLocale = DEFAULT_LOCALE,
+): string {
   if (!values) return template
-  return template.replace(/\{(\w+)\}/g, (whole, name: string) => {
-    const v = values[name]
-    return v === undefined ? whole : String(v)
-  })
+  let out = ""
+  let i = 0
+  while (i < template.length) {
+    const open = template.indexOf("{", i)
+    if (open === -1) return out + template.slice(i)
+    out += template.slice(i, open)
+    const close = matchBrace(template, open)
+    // Unbalanced braces: emit the rest verbatim rather than looping forever.
+    if (close === -1) return out + template.slice(open)
+    out += renderArg(template.slice(open + 1, close), template.slice(open, close + 1), values, locale)
+    i = close + 1
+  }
+  return out
 }
 
 /** Mirrors next-intl's `useTranslations(ns)` return value, so the same call
@@ -94,7 +183,7 @@ function resolve(
   // a not-yet-translated English string shows the Spanish original, never a raw
   // dotted key in the player's face.
   const msg = FLAT[locale][full] ?? FLAT[DEFAULT_LOCALE][full] ?? full
-  return interpolate(msg, values)
+  return interpolate(msg, values, locale)
 }
 
 /** The launcher's own `useT`. Pass the screen/namespace once, then call with the

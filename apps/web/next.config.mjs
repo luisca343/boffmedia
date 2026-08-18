@@ -14,7 +14,7 @@ const nextConfig = {
     output: "standalone",
 
     // @boffmedia/ui ships TypeScript source, not a build.
-    transpilePackages: ['@boffmedia/ui', '@boffmedia/tool-kit', '@boffmedia/tools-minecraft'],
+    transpilePackages: ['@boffmedia/ui', '@boffmedia/tool-kit', '@boffmedia/tools-minecraft', '@boffmedia/tools-mhwilds'],
     typescript: {
         ignoreBuildErrors: true,
     },

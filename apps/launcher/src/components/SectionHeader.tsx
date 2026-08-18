@@ -28,7 +28,12 @@ export function SectionHeader({
     <div
       className={
         bordered
-          ? "flex shrink-0 items-center gap-3 border-b border-line px-4 py-2"
+          ? // Explicit height, not padding: ToolView subtracts this from 100dvh
+            // to build `--tool-vh` for document-layout tools, so it has to be a
+            // known constant rather than whatever the tallest child happens to
+            // make it. 37px = the previous rendered height (py-2 around a 20px
+            // text-sm line, plus the border), so nothing moves.
+            "flex h-[37px] shrink-0 items-center gap-3 border-b border-line px-4"
           : "mb-4 flex items-center gap-3"
       }
     >

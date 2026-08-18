@@ -4,7 +4,7 @@ import * as React from "react"
 import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { Icon } from "@boffmedia/ui"
-import { MhRarity, MhSlotPips } from "@/app/(boffmedia)/(herramientas)/mhwilds/_components/ui/mh-kit"
+import { MhRarity, MhSlotPips } from "@boffmedia/tools-mhwilds/ui/mh-kit"
 import { MH_ELEMENTS, MH_RES_ORDER, MH_SKILL_CAT, type MhArmorPiece, type MhArmorProfile, type MhArmorSet, type MhSetBonusData, type MhSkill } from "./mh-db-util"
 
 // Armor-DB atoms: skill chip, stat bar, set card (grid/list), set-bonus ladder and
@@ -48,7 +48,7 @@ function topRes(profile: MhArmorProfile) {
 }
 
 export function MhSetCard({ set, active, onOpen, view }: { set: MhArmorSet; active?: boolean; onOpen?: () => void; view?: "grid" | "list" }) {
-  const t = useTranslations("mhwilds.db.armor")
+  const t = useTranslations("tools.mhwilds.db.armor")
   const p = set.profile
   const bonus = set.bonus || set.group
   const style = { "--sh": set.hue } as React.CSSProperties
@@ -105,7 +105,7 @@ export function MhSetCard({ set, active, onOpen, view }: { set: MhArmorSet; acti
 }
 
 export function MhSetBonusDetail({ bonus, kind, activePieces }: { bonus: MhSetBonusData; kind?: "set" | "group"; activePieces?: number }) {
-  const t = useTranslations("mhwilds.db.armor")
+  const t = useTranslations("tools.mhwilds.db.armor")
   const group = kind === "group"
   return (
     <div className={cn("border border-solid border-line border-l-[3px] bg-base-2", group ? "border-l-[color:var(--info)]" : "border-l-[color:var(--mh)]")}>

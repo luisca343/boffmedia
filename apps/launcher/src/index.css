@@ -29,6 +29,53 @@ body {
   user-select: none;
 }
 
+/* ── Scrollbar ──────────────────────────────────────────────────────────────
+   WebView2's default scrollbar is a light-grey Windows widget: it reads as a
+   piece of the OS sitting inside the app, and at 17px it is wider than the
+   rail's own icons. Same palette and same thin rectangular thumb as apps/web,
+   using the `--sb-*` tokens that already ship in @boffmedia/tailwind-config —
+   the launcher just never styled it.
+
+   Deliberately webkit-only, NO `scrollbar-width`/`scrollbar-color`: Chromium
+   121+ (which WebView2 is) honours the standard properties INSTEAD of the
+   ::-webkit-scrollbar pseudo-elements when both are present, and the standard
+   ones cannot express the inset thumb below. Setting them would silently throw
+   this whole block away.
+
+   The thumb is drawn by a transparent border plus `background-clip: padding-box`
+   — that is what insets it from the track edge, so it reads as a floating bar
+   rather than a gutter fill. Narrower than the web's 12px because the launcher
+   window is small and a browser-scale bar looks oversized in it. */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+  background: transparent;
+}
+::-webkit-scrollbar-track,
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background-color: var(--sb-idle);
+  background-clip: padding-box;
+  border: 3px solid transparent;
+  border-radius: 0;
+  /* Long lists (the bestiary roster, a log) otherwise shrink the thumb to a
+     few unclickable pixels. */
+  min-height: 40px;
+  min-width: 40px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background-color: var(--sb-hover);
+  border-width: 2px;
+}
+/* Accent only while actually dragging — the one moment the scrollbar is the
+   thing the user is manipulating rather than a passive indicator. */
+::-webkit-scrollbar-thumb:active {
+  background-color: var(--sb-drag);
+  border-width: 2px;
+}
+
 /* …but content the user genuinely needs to copy must stay selectable. Log
    output and identifiers are the whole point of a diagnostics screen, and a
    blanket user-select:none silently breaks "paste me the error". */

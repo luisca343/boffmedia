@@ -31,9 +31,9 @@ export const hubConfig: Record<string, HubEntry> = {
     taglineKey: "toolsUi.taglines.mhwilds",
     hue: 130,
     logoLabel: "M",
-    toolNs: "mhwilds.tools",
-    extNs: "mhwilds.externalLinks",
-    headerNs: "mhwilds.header",
+    toolNs: "tools.mhwilds.tools",
+    extNs: "tools.mhwilds.externalLinks",
+    headerNs: "tools.mhwilds.header",
   },
   otros: {
     short: "MISC",

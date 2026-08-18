@@ -20,6 +20,7 @@ const PACKAGES = [
   'packages/pack-schema',
   'packages/tools/kit',
   'packages/tools/minecraft',
+  'packages/tools/mhwilds',
 ];
 function getAvailableMemoryMB() {
   try {

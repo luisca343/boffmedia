@@ -354,6 +354,9 @@ importers:
       '@boffmedia/tool-kit':
         specifier: workspace:*
         version: link:../../packages/tools/kit
+      '@boffmedia/tools-mhwilds':
+        specifier: workspace:*
+        version: link:../../packages/tools/mhwilds
       '@boffmedia/tools-minecraft':
         specifier: workspace:*
         version: link:../../packages/tools/minecraft
@@ -412,6 +415,9 @@ importers:
       '@boffmedia/tool-kit':
         specifier: workspace:*
         version: link:../../packages/tools/kit
+      '@boffmedia/tools-mhwilds':
+        specifier: workspace:*
+        version: link:../../packages/tools/mhwilds
       '@boffmedia/tools-minecraft':
         specifier: workspace:*
         version: link:../../packages/tools/minecraft
@@ -789,6 +795,28 @@ importers:
       '@types/react':
         specifier: 19.2.7
         version: 19.2.7
+
+  packages/tools/mhwilds:
+    dependencies:
+      '@boffmedia/tool-kit':
+        specifier: workspace:*
+        version: link:../kit
+      '@boffmedia/ui':
+        specifier: workspace:*
+        version: link:../../ui
+      react:
+        specifier: 19.2.3
+        version: 19.2.3
+      react-dom:
+        specifier: 19.2.3
+        version: 19.2.3(react@19.2.3)
+    devDependencies:
+      '@types/react':
+        specifier: 19.2.7
+        version: 19.2.7
+      '@types/react-dom':
+        specifier: 19.2.3
+        version: 19.2.3(@types/react@19.2.7)
 
   packages/tools/minecraft:
     dependencies:
@@ -11349,6 +11377,8 @@ snapshots:
       '@ckeditor/ckeditor5-core': 47.6.1
       '@ckeditor/ckeditor5-engine': 47.6.1
       '@ckeditor/ckeditor5-utils': 47.6.1
+    transitivePeerDependencies:
+      - supports-color
 
   '@ckeditor/ckeditor5-essentials@47.6.1':
     dependencies:
@@ -11632,6 +11662,8 @@ snapshots:
       '@ckeditor/ckeditor5-ui': 47.6.1
       '@ckeditor/ckeditor5-utils': 47.6.1
       ckeditor5: 47.6.1
+    transitivePeerDependencies:
+      - supports-color
 
   '@ckeditor/ckeditor5-restricted-editing@47.6.1':
     dependencies:

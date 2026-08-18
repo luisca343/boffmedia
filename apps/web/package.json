@@ -21,6 +21,7 @@
     "@boffmedia/pack-schema": "workspace:*",
     "@boffmedia/shared": "workspace:*",
     "@boffmedia/tool-kit": "workspace:*",
+    "@boffmedia/tools-mhwilds": "workspace:*",
     "@boffmedia/tools-minecraft": "workspace:*",
     "@boffmedia/ui": "workspace:*",
     "@ckeditor/ckeditor5-react": "^9.4.0",

@@ -21,7 +21,7 @@ export type {
 } from "./host";
 
 export { getTool, listTools, registerTools } from "./registry";
-export type { ToolDomain, ToolManifest } from "./registry";
+export type { ToolDomain, ToolLayout, ToolManifest } from "./registry";
 
 export {
   createWebApi,

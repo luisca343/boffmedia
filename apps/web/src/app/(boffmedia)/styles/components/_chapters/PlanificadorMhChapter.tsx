@@ -18,8 +18,8 @@ import {
   MhSlot,
   MhSlotPips,
   MhStat3,
-} from "@/app/(boffmedia)/(herramientas)/mhwilds/_components/ui/mh-kit"
-import { MH_VARS } from "@/app/(boffmedia)/(herramientas)/mhwilds/_components/mh-helpers"
+} from "@boffmedia/tools-mhwilds/ui/mh-kit"
+import { MH_VARS } from "@boffmedia/tools-mhwilds/ui/mh-helpers"
 
 const RES_LABELS: Record<string, string> = { fire: "Fuego", water: "Agua", thunder: "Rayo", ice: "Hielo", dragon: "Dragón" }
 const CAT_LABELS = { attack: "Ofensiva", element: "Elemental", defense: "Defensiva", utility: "Utilidad" }
