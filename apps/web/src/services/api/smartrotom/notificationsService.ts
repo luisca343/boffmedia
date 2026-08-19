@@ -1,4 +1,4 @@
-import { rotomGET, rotomPATCH, rotomPOST, ApiResponse } from '@/services/boffAPI';
+import { rotomGET, rotomPATCH, ApiResponse, rotomAuthedPOST } from "@/services/boffAPI";
 import { NotificationResponseDto, NotificationsInboxDto } from '@boffmedia/shared';
 
 export interface SendNotificationPayload {
@@ -46,7 +46,7 @@ export class NotificationsService {
   static sendNotification(
     payload: SendNotificationPayload,
   ): Promise<ApiResponse<NotificationResponseDto>> {
-    return rotomPOST<NotificationResponseDto>('/notifications/send', payload);
+    return rotomAuthedPOST<NotificationResponseDto>('/notifications/send', payload);
   }
 }
 

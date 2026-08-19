@@ -1,5 +1,5 @@
 
-import { rotomGET, rotomPOST } from "@/services/boffAPI"
+import { rotomGET, rotomAuthedPOST } from '@/services/boffAPI';
 import { EvolutionTree, PokedexData, PokemonMove, Registry } from "@/types/pokedex";
 import { NextPrev, Pokemon, SpeciesMoveEntry, SpriteManifest } from "@/types/Pokemon";
 import type { AbilityCount, MoveCount } from "@boffmedia/shared";
@@ -242,14 +242,14 @@ export class PokemonService {
    * Register a Pokemon encounter
    */
   static registerPokemon(uuid: string, pokemonId: number, form: string, palette: string, status: string) {
-    return rotomPOST(`/pokemon/register`, { uuid, pokemonId, form, palette, status });
+    return rotomAuthedPOST(`/pokemon/register`, { uuid, pokemonId, form, palette, status });
   }
 
   /**
    * Bulk update Pokedex
    */
   static updateDex(uuid: string, SEEN: number[], CAUGHT: number[]) {
-    return rotomPOST(`/pokemon/dex/update`, { uuid, SEEN, CAUGHT });
+    return rotomAuthedPOST(`/pokemon/dex/update`, { uuid, SEEN, CAUGHT });
   }
 
   /**
@@ -302,7 +302,7 @@ export class PokemonService {
    * Refresh sprite manifest
    */
   static refreshSpriteManifest() {
-    return rotomPOST("/pokemon/sprites/refresh", {});
+    return rotomAuthedPOST("/pokemon/sprites/refresh", {});
   }
 
   /**

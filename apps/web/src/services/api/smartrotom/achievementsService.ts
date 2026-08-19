@@ -1,4 +1,4 @@
-import { rotomGET, rotomPOST, ApiResponse } from '@/services/boffAPI';
+import { rotomGET, rotomPOST, ApiResponse, rotomAuthedPOST } from '@/services/boffAPI';
 import type { 
   UserAchievement,
   Replay,
@@ -50,7 +50,7 @@ export class AchievementService {
     replay: string;
     winner: string;
   }): Promise<ApiResponse<{ replayId: number }>> {
-    return rotomPOST<{ replayId: number }>('/achievement/create-replay', data);
+    return rotomAuthedPOST<{ replayId: number }>('/achievement/create-replay', data);
   }
 
   /**

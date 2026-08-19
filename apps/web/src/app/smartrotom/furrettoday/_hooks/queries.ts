@@ -17,9 +17,10 @@ import {
   apiAuthedDELETEOrThrow,
   apiAuthedPOSTOrThrow,
   apiAuthedPUTOrThrow,
-  rotomDELETEOrThrow,
   rotomGETOrThrow,
   rotomPOSTOrThrow,
+  rotomAuthedDELETEOrThrow,
+  rotomAuthedPOSTOrThrow,
 } from "@/services/boffAPI";
 import { useBoffSession } from "@/services/useBoffSession";
 import { useRotomUuid } from "@/components/smartrotom/behavior/useRotomUuid";
@@ -128,7 +129,7 @@ export function usePostComment(newsId: number) {
 export function useDeleteComment(newsId: number) {
   const client = useQueryClient();
   return useMutation({
-    mutationFn: (commentId: number) => rotomDELETEOrThrow(`/documents/news/comments/${commentId}`),
+    mutationFn: (commentId: number) => rotomAuthedDELETEOrThrow(`/documents/news/comments/${commentId}`),
     onSuccess: () => {
       void client.invalidateQueries({ queryKey: furretKeys.comments(newsId) });
     },
@@ -182,7 +183,7 @@ export function useUpdateNewsStatus() {
   const client = useQueryClient();
   return useMutation({
     mutationFn: (data: { published: number[]; featured: number }) =>
-      rotomPOSTOrThrow("/documents/newsstatus", data),
+      rotomAuthedPOSTOrThrow("/documents/newsstatus", data),
     onSuccess: () => {
       void client.invalidateQueries({ queryKey: furretKeys.all() });
     },

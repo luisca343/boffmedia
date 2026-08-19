@@ -1,4 +1,4 @@
-import { rotomGET, rotomPOST, ApiResponse } from '@/services/boffAPI';
+import { rotomGET, rotomPOST, ApiResponse, rotomAuthedPOST } from "@/services/boffAPI";
 import { SuccessResponse, UploadNpcImageDto } from '@boffmedia/shared';
 import { QuestSystemData } from '@/types/misiones';
 
@@ -21,7 +21,7 @@ export class MisionesService {
    * Upload custom NPC image
    */
   static uploadCustomNpcImage(data: UploadNpcImageDto) {
-    return rotomPOST<SuccessResponse>('/misiones/images/upload', data);
+    return rotomAuthedPOST<SuccessResponse>('/misiones/images/upload', data);
   }
 
   /**
@@ -42,7 +42,7 @@ export class MisionesService {
    * Force refresh quest cache
    */
   static refreshCache() {
-    return rotomPOST<SuccessResponse>('/misiones/cache/refresh', {});
+    return rotomAuthedPOST<SuccessResponse>('/misiones/cache/refresh', {});
   }
 
   /**

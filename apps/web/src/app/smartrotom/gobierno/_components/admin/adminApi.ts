@@ -2,7 +2,13 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { useTranslations } from "next-intl"
-import { rotomAuthedPOSTOrThrow, rotomGETOrThrow, rotomPOSTOrThrow, userMessageFrom } from "@/services/boffAPI"
+import {
+  rotomAuthedPOSTOrThrow,
+  rotomGETOrThrow,
+  rotomPOSTOrThrow,
+  userMessageFrom,
+  rotomAuthedGETOrThrow,
+} from "@/services/boffAPI";
 import { useApiError } from "@/hooks/useApiError"
 import type { SendNotificationPayload } from "@/services/api/smartrotom/notificationsService"
 import type { NotificationResponseDto } from "@boffmedia/shared"
@@ -29,7 +35,7 @@ export const useAdminUsers = () =>
 export const useAdminApps = () =>
   useQuery({
     queryKey: adminKeys.apps,
-    queryFn: () => rotomGETOrThrow<SmartRotomApp[]>("/apps"),
+    queryFn: () => rotomAuthedGETOrThrow<SmartRotomApp[]>("/apps"),
   })
 
 export const useAdminPlayerApps = (uuid: string | null) =>
@@ -71,7 +77,7 @@ export const useSendNotification = () => {
   const t = useTranslations("gobierno")
   return useMutation({
     mutationFn: (payload: SendNotificationPayload) =>
-      rotomPOSTOrThrow<NotificationResponseDto>("/notifications/send", payload),
+      rotomAuthedPOSTOrThrow<NotificationResponseDto>("/notifications/send", payload),
     onSuccess: () => toast.success(t("notificaciones.notifEnviada")),
     onError: (e: unknown) => toast.error(userMessageFrom(e, t("notificaciones.errorEnviar"))),
   })

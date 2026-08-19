@@ -78,6 +78,7 @@ export class EventsController {
   // ==================== EVENT MANAGEMENT ====================
   @OptionalAuth()
   @Get()
+  @Public()
   @ApiOperation({
     summary:
       'Get all events (optional status/gameId/type filters + pagination)',
@@ -105,6 +106,7 @@ export class EventsController {
 
   @OptionalAuth()
   @Get('/event/:id')
+  @Public()
   @ApiOperation({ summary: 'Get event by id' })
   @ApiResponse({
     status: HttpStatus.OK,
@@ -327,6 +329,7 @@ export class EventsController {
   // ==================== ACHIEVEMENT MANAGEMENT ====================
   @OptionalAuth()
   @Get('/achievements')
+  @Public()
   @ApiOperation({ summary: 'Get all achievements' })
   @ApiResponse({
     status: HttpStatus.OK,
@@ -346,6 +349,7 @@ export class EventsController {
 
   @OptionalAuth()
   @Get(':eventId/achievements')
+  @Public()
   @ApiOperation({ summary: 'Get all achievements for an event' })
   @ApiResponse({
     status: HttpStatus.OK,
@@ -409,6 +413,7 @@ export class EventsController {
 
   @OptionalAuth()
   @Get('/participants/:participantId/progress')
+  @Public()
   @ApiOperation({ summary: 'Get all achievement progress for a participant' })
   @ApiResponse({
     status: HttpStatus.OK,
@@ -430,6 +435,7 @@ export class EventsController {
 
   @OptionalAuth()
   @Get(':eventId/participants/:participantId/progress')
+  @Public()
   @ApiOperation({
     summary: 'Get achievement progress for a participant in a specific event',
   })
@@ -456,6 +462,7 @@ export class EventsController {
   // ==================== TEAM MANAGEMENT ====================
   @OptionalAuth()
   @Get('/teams')
+  @Public()
   @ApiOperation({ summary: 'Get all teams' })
   @ApiResponse({
     status: HttpStatus.OK,
@@ -475,6 +482,7 @@ export class EventsController {
 
   @OptionalAuth()
   @Get(':eventId/teams')
+  @Public()
   @ApiOperation({ summary: 'Get all teams in an event' })
   @ApiResponse({
     status: HttpStatus.OK,
@@ -496,6 +504,7 @@ export class EventsController {
 
   @OptionalAuth()
   @Get('/teams/:teamId')
+  @Public()
   @ApiOperation({ summary: 'Get team by id' })
   @ApiResponse({
     status: HttpStatus.OK,
@@ -517,6 +526,7 @@ export class EventsController {
 
   @OptionalAuth()
   @Get('/teams/:teamId/members')
+  @Public()
   @ApiOperation({ summary: 'Get team members' })
   @ApiResponse({
     status: HttpStatus.OK,
@@ -689,6 +699,7 @@ export class EventsController {
 
   @OptionalAuth()
   @Get(':eventId/participants')
+  @Public()
   @ApiOperation({ summary: 'Get all participants in an event' })
   @ApiResponse({
     status: HttpStatus.OK,
@@ -742,6 +753,7 @@ export class EventsController {
 
   @OptionalAuth()
   @Get(':eventId/leaderboard')
+  @Public()
   @ApiOperation({ summary: 'Get event leaderboard' })
   @ApiResponse({
     status: HttpStatus.OK,
@@ -763,6 +775,7 @@ export class EventsController {
 
   @OptionalAuth()
   @Get(':eventId/teams/leaderboard')
+  @Public()
   @ApiOperation({ summary: 'Get team leaderboard for event' })
   @ApiResponse({
     status: HttpStatus.OK,
@@ -786,6 +799,7 @@ export class EventsController {
 
   @OptionalAuth()
   @Get('users/:userId/trophies')
+  @Public()
   @ApiOperation({ summary: "Get a user's trophy case (earned + locked)" })
   @ApiParam({
     name: 'userId',
@@ -809,6 +823,7 @@ export class EventsController {
 
   @OptionalAuth()
   @Get('users/:userId/activity')
+  @Public()
   @ApiOperation({ summary: "Get a user's activity timeline" })
   @ApiParam({
     name: 'userId',

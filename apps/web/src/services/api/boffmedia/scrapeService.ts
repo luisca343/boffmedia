@@ -1,4 +1,4 @@
-import { apiGET, apiPATCH, apiPOST } from '@/services/boffAPI';
+import { apiGET, apiAuthedAutoPATCH, apiAuthedAutoPOST } from "@/services/boffAPI";
 import { env } from '@/config/env.public';
 import type {
   LocalGamesResult,
@@ -158,7 +158,7 @@ export class ScrapeService {
   }
 
   static setBrowserTunnel(tunnelEnabled: boolean) {
-    return apiPATCH<BrowserConfig>('/boffmedia/herramientas/scrape/manga/browser', { tunnelEnabled });
+    return apiAuthedAutoPATCH<BrowserConfig>('/boffmedia/herramientas/scrape/manga/browser', { tunnelEnabled });
   }
 
   static getNovelInfo(novelUrl: string) {
@@ -274,14 +274,14 @@ export class ScrapeService {
   }
 
   static convertMangaChapter(series: string, chapter: string, excludePages: number[], includeCover?: boolean, metadata?: EpubMetadata) {
-    return apiPOST<{ outputPath: string }>(
+    return apiAuthedAutoPOST<{ outputPath: string }>(
       '/boffmedia/herramientas/scrape/manga/convert-chapter',
       { series, chapter, excludePages, includeCover, metadata },
     );
   }
 
   static patchEpubMetadata(series: string, chapters: string[], metadata: EpubMetadata) {
-    return apiPOST<{ results: { chapter: string; updated: boolean }[]; updated: number }>(
+    return apiAuthedAutoPOST<{ results: { chapter: string; updated: boolean }[]; updated: number }>(
       '/boffmedia/herramientas/scrape/manga/patch-metadata',
       { series, chapters, metadata },
     );

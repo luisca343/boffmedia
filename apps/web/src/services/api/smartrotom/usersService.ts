@@ -1,4 +1,10 @@
-import { rotomGET, rotomPOST, rotomPATCH, rotomAuthedDELETE, ApiResponse } from '@/services/boffAPI';
+import {
+  rotomGET,
+  rotomAuthedDELETE,
+  ApiResponse,
+  rotomAuthedPATCH,
+  rotomAuthedPOST,
+} from "@/services/boffAPI";
 import type { 
   RotomUser as SmartRotomUser,
   CreateSmartrotomUserDto,
@@ -23,7 +29,7 @@ export class UsersService {
    * Create a new user
    */
   static create(createUserDto: CreateSmartrotomUserDto): Promise<ApiResponse<SmartRotomUser>> {
-    return rotomPOST<SmartRotomUser>('/users', createUserDto);
+    return rotomAuthedPOST<SmartRotomUser>('/users', createUserDto);
   }
 
   /**
@@ -44,7 +50,7 @@ export class UsersService {
    * Update a user
    */
   static update(id: number, updateUserDto: UpdateSmartrotomUserDto): Promise<ApiResponse<SmartRotomUser>> {
-    return rotomPATCH<SmartRotomUser>(`/users/${id}`, updateUserDto);
+    return rotomAuthedPATCH<SmartRotomUser>(`/users/${id}`, updateUserDto);
   }
 
   /**
@@ -58,14 +64,14 @@ export class UsersService {
    * Find or create a user
    */
   static findOrCreate(createUserDto: CreateSmartrotomUserDto): Promise<ApiResponse<FindOrCreateResult>> {
-    return rotomPOST<FindOrCreateResult>('/users/find-or-create', createUserDto);
+    return rotomAuthedPOST<FindOrCreateResult>('/users/find-or-create', createUserDto);
   }
 
   /**
    * Initialize user and accounts
    */
   static initialize(data: UserInitializationDataDto): Promise<ApiResponse<InitializationResult>> {
-    return rotomPOST<InitializationResult>('/users/initialize', data);
+    return rotomAuthedPOST<InitializationResult>('/users/initialize', data);
   }
 
   /**
@@ -79,14 +85,14 @@ export class UsersService {
    * Get multiple users by UUIDs
    */
   static getMultipleUsers(uuids: string[]): Promise<ApiResponse<{ [uuid: string]: SmartRotomUser | null }>> {
-    return rotomPOST<{ [uuid: string]: SmartRotomUser | null }>('/users/batch', { uuids });
+    return rotomAuthedPOST<{ [uuid: string]: SmartRotomUser | null }>('/users/batch', { uuids });
   }
 
   /**
    * Get multiple users with their accounts
    */
   static getMultipleUsersWithAccounts(uuids: string[]): Promise<ApiResponse<{ [uuid: string]: UserWithAccounts | null }>> {
-    return rotomPOST<{ [uuid: string]: UserWithAccounts | null }>('/users/batch/accounts', { uuids });
+    return rotomAuthedPOST<{ [uuid: string]: UserWithAccounts | null }>('/users/batch/accounts', { uuids });
   }
 
   /**

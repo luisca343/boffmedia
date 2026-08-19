@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Button, Field, Input, Icon, Spinner, Toggle } from "@boffmedia/ui";
-import { apiGET, apiPATCH, apiPOST } from "@/services/boffAPI";
+import { apiGET, apiAuthedAutoPATCH, apiAuthedAutoPOST } from "@/services/boffAPI";
 import { AvSectionHead, AvPanel, AvPill } from "../ui/av-kit";
 
 type SeriesStatus = "ongoing" | "completed" | "hiatus";
@@ -48,7 +48,7 @@ export default function MangaConfig() {
   async function handleCronToggle() {
     if (!config) return;
     setSavingCron(true);
-    const res = await apiPATCH<MangaConfigData>("/boffmedia/herramientas/scrape/manga/config", {
+    const res = await apiAuthedAutoPATCH<MangaConfigData>("/boffmedia/herramientas/scrape/manga/config", {
       cron: { ...config.cron, enabled: !config.cron.enabled },
     });
     if (res.success && res.data) setConfig(res.data);
@@ -58,7 +58,7 @@ export default function MangaConfig() {
   async function handleSaveSchedule() {
     if (!config || !cronSchedule.trim()) return;
     setSavingCron(true);
-    const res = await apiPATCH<MangaConfigData>("/boffmedia/herramientas/scrape/manga/config", {
+    const res = await apiAuthedAutoPATCH<MangaConfigData>("/boffmedia/herramientas/scrape/manga/config", {
       cron: { ...config.cron, schedule: cronSchedule.trim() },
     });
     if (res.success && res.data) setConfig(res.data);
@@ -68,14 +68,14 @@ export default function MangaConfig() {
   async function handleRunNow() {
     setTriggering(true);
     setTriggerMessage(null);
-    const res = await apiPOST<{ message: string }>("/boffmedia/herramientas/scrape/manga/cron/run", {});
+    const res = await apiAuthedAutoPOST<{ message: string }>("/boffmedia/herramientas/scrape/manga/cron/run", {});
     setTriggerMessage(res.success && res.data ? res.data.message : t("runError"));
     setTriggering(false);
   }
 
   async function handleStatusChange(slug: string, status: SeriesStatus) {
     if (!config) return;
-    const res = await apiPATCH<{ slug: string; status: SeriesStatus }>(
+    const res = await apiAuthedAutoPATCH<{ slug: string; status: SeriesStatus }>(
       `/boffmedia/herramientas/scrape/manga/series/${encodeURIComponent(slug)}/status`,
       { status },
     );

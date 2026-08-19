@@ -31,13 +31,19 @@ import { PokemonGiveRequestDto } from './dto/pokemon-give-request.dto';
 import { Logger } from 'nestjs-pino';
 
 @ApiTags('SmartRotom | Wingull')
-// These are the game-server bridge routes: the Minecraft plugin calls them
-// server-to-server with its opaque token, and the web calls a few of them on
-// behalf of a signed-in player. `GameOrUserAuthGuard` accepts exactly those two
-// credentials — the controller was `@Public()`, so `POST /wingull/money` and
-// `POST /wingull/updateBalance` were reachable by anyone on the internet.
+// Game-server bridge routes, with two callers: the Minecraft plugin
+// server-to-server with its opaque token, and the web on behalf of a signed-in
+// player. `GameOrUserAuthGuard` accepts exactly those two credentials, and it
+// sits on the **writes only** — the money/state mutations that were once
+// reachable by anyone on the internet (`money`, `updateBalance`).
+//
+// The guard must NOT go on the controller. `@Public()` only tells the global
+// JwtAuthGuard to stand down; an explicitly declared guard still runs. With it
+// at controller level every GET was rejected too, and a GET carries no body —
+// so the transitional `body.server` tripwire could never fire and reads like
+// `weather` and `towns` 401'd for every caller. The reads are world state, not
+// player state, so they stay anonymous under `@Public()`.
 @Public()
-@UseGuards(GameOrUserAuthGuard)
 @Controller('wingull')
 export class WingullController {
   constructor(
@@ -78,6 +84,7 @@ export class WingullController {
   // Economy endpoints
   //=====================================================
 
+  @UseGuards(GameOrUserAuthGuard)
   @Post('updateBalance')
   @ApiOperation({ summary: 'Update player balance in game' })
   @ApiResponse({
@@ -93,6 +100,7 @@ export class WingullController {
     return await this.wingullFacadeService.updateBalance(account);
   }
 
+  @UseGuards(GameOrUserAuthGuard)
   @Post('getCurrentBalance')
   @ApiOperation({ summary: 'Get current balance for player from game' })
   @ApiResponse({
@@ -113,6 +121,7 @@ export class WingullController {
     return balance;
   }
 
+  @UseGuards(GameOrUserAuthGuard)
   @Post('money')
   @ApiOperation({ summary: 'Get player money directly' })
   @ApiResponse({
@@ -133,6 +142,7 @@ export class WingullController {
   // Player endpoints
   //=====================================================
 
+  @UseGuards(GameOrUserAuthGuard)
   @Post('stats')
   @ApiOperation({ summary: 'Get player stats' })
   @ApiResponse({
@@ -149,6 +159,7 @@ export class WingullController {
     return await this.wingullFacadeService.getStats(uuid);
   }
 
+  @UseGuards(GameOrUserAuthGuard)
   @Post('team')
   @ApiOperation({ summary: 'Get player team' })
   @ApiResponse({
@@ -165,6 +176,7 @@ export class WingullController {
     return await this.wingullFacadeService.getTeam(uuid);
   }
 
+  @UseGuards(GameOrUserAuthGuard)
   @Post('pc')
   @ApiOperation({ summary: 'Get player PC' })
   @ApiResponse({
@@ -181,6 +193,7 @@ export class WingullController {
     return await this.wingullFacadeService.getPC(uuid);
   }
 
+  @UseGuards(GameOrUserAuthGuard)
   @Post('pc/move')
   @ApiOperation({ summary: 'Move Pokémon inside the PC' })
   @ApiResponse({
@@ -196,6 +209,7 @@ export class WingullController {
     return await this.wingullFacadeService.movePokemon(movePokemonDto);
   }
 
+  @UseGuards(GameOrUserAuthGuard)
   @Post('battleteams')
   @ApiOperation({ summary: 'Get all battle teams' })
   @ApiResponse({
@@ -211,6 +225,7 @@ export class WingullController {
     return await this.wingullFacadeService.getBattleTeams(uuid);
   }
 
+  @UseGuards(GameOrUserAuthGuard)
   @Post('battleteams/update')
   @ApiOperation({ summary: 'Update a battle team' })
   @ApiResponse({
@@ -244,6 +259,7 @@ export class WingullController {
     return await this.wingullFacadeService.getTaxiStops();
   }
 
+  @UseGuards(GameOrUserAuthGuard)
   @Post('updateDex')
   @ApiOperation({ summary: 'Update player Pokédex' })
   @ApiResponse({
@@ -260,6 +276,7 @@ export class WingullController {
     return await this.wingullFacadeService.updateDex(uuid);
   }
 
+  @UseGuards(GameOrUserAuthGuard)
   @Post('quests')
   @ApiOperation({ summary: 'Get player quests' })
   @ApiResponse({
@@ -275,6 +292,7 @@ export class WingullController {
     return await this.wingullFacadeService.getQuests(uuid);
   }
 
+  @UseGuards(GameOrUserAuthGuard)
   @Post('message')
   @ApiOperation({ summary: 'Send message to player' })
   @ApiResponse({
@@ -289,6 +307,7 @@ export class WingullController {
     return await this.wingullFacadeService.sendMessage(uuid, message);
   }
 
+  @UseGuards(GameOrUserAuthGuard)
   @Post('globalchat')
   @ApiOperation({ summary: 'Send message to player' })
   @ApiResponse({
@@ -303,6 +322,7 @@ export class WingullController {
     return await this.wingullFacadeService.globalchat(uuid, message);
   }
 
+  @UseGuards(GameOrUserAuthGuard)
   @Post('givePokemon')
   @ApiOperation({ summary: 'Give a Pokémon to a player' })
   @ApiResponse({
@@ -374,6 +394,7 @@ export class WingullController {
     return await this.wingullFacadeService.getWeather();
   }
 
+  @UseGuards(GameOrUserAuthGuard)
   @Post('updateNPCs')
   @ApiOperation({ summary: 'Update NPCs in game world' })
   @ApiResponse({

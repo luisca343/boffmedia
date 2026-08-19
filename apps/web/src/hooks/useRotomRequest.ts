@@ -19,6 +19,28 @@ export function useRotomRequest<T>(
   apiFunction: (...args: any[]) => Promise<ApiResponse<T>>,
   ...params: any[]
 ) {
+  return useRotomRequestGated<T>(true, apiFunction, ...params)
+}
+
+/**
+ * `useRotomRequest` that waits for a gate before firing.
+ *
+ * The hook above fetches once on mount and never retries, so a request made
+ * before its credential exists fails permanently: the 401 resolves to
+ * `success: false`, `data` is cleared, and nothing re-runs it. In-game that read
+ * as an empty app dock on the first SmartRotom open after a server boot — the
+ * phone had a session by the time it rendered, but the access token behind it
+ * was not readable yet. Reopening the phone remounted the hook and it worked.
+ *
+ * Pass `enabled: false` while the credential is missing. The request fires on
+ * the transition to `true`, and `isLoading` stays true meanwhile so callers
+ * render a loader rather than an empty result.
+ */
+export function useRotomRequestGated<T>(
+  enabled: boolean,
+  apiFunction: (...args: any[]) => Promise<ApiResponse<T>>,
+  ...params: any[]
+) {
   const [data, setData] = useState<T>()
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState<boolean>(true)
@@ -42,6 +64,7 @@ export function useRotomRequest<T>(
   paramsRef.current = params
 
   const fetchData = useCallback(async () => {
+    if (!enabled) return
     const id = ++requestId.current
     const isCurrent = () => mounted.current && requestId.current === id
 
@@ -63,8 +86,8 @@ export function useRotomRequest<T>(
     } finally {
       if (isCurrent()) setIsLoading(false)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [apiFunction, paramsKey])
+    // `paramsRef` holds the live values; `paramsKey` is the serialised dep.
+  }, [apiFunction, paramsKey, enabled])
 
   useEffect(() => {
     fetchData()

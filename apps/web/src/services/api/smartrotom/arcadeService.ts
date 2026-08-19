@@ -1,4 +1,4 @@
-import { rotomGET, rotomPOST, rotomPATCH, rotomDELETE, ApiResponse } from '@/services/boffAPI';
+import { rotomGET, rotomPOST, ApiResponse, rotomAuthedPOST } from "@/services/boffAPI";
 import type { 
   ArcadeInventoryItem, 
   OpenLootBoxDto, 
@@ -141,7 +141,7 @@ export class ArcadeService {
    * Give lootbox to player
    */
   static giveLootbox(giveLootboxDto: GiveLootboxDto): Promise<ApiResponse<SuccessResponse>> {
-    return rotomPOST<SuccessResponse>('/arcade/lootbox/give', giveLootboxDto);
+    return rotomAuthedPOST<SuccessResponse>('/arcade/lootbox/give', giveLootboxDto);
   }
 
   /**
