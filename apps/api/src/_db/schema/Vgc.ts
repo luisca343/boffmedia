@@ -43,7 +43,7 @@ export interface VgcMetaSlot {
 
 /** One row per format + month + cutoff — metadata only, data lives in vgcSmogonPokemon */
 export const vgcSmogonSnapshots = mysqlTable(
-  'vgc_smogon_snapshots',
+  'tools_vgc_smogon_snapshots',
   {
     id: int('id').primaryKey().autoincrement(),
     formatId: varchar('format_id', { length: 64 }).notNull(),
@@ -65,7 +65,7 @@ export type VgcSmogonSnapshot = typeof vgcSmogonSnapshots.$inferSelect;
 
 /** One row per Pokémon per snapshot — normalized from Smogon stats.txt + moveset.txt */
 export const vgcSmogonPokemon = mysqlTable(
-  'vgc_smogon_pokemon',
+  'tools_vgc_smogon_pokemon',
   {
     id: int('id').primaryKey().autoincrement(),
     formatId: varchar('format_id', { length: 64 }).notNull(),
@@ -110,7 +110,7 @@ export type VgcSmogonPokemonRow = typeof vgcSmogonPokemon.$inferSelect;
  *   tournament, a single vgcPokepastes row is shared — both FK references point to it.
  */
 export const vgcPokepastes = mysqlTable(
-  'vgc_pokepastes',
+  'tools_vgc_pokepastes',
   {
     id: int('id').primaryKey().autoincrement(),
     pokepasteId: varchar('pokepaste_id', { length: 32 }).unique(), // null if not from pokepast.es
@@ -140,7 +140,7 @@ export type VgcPokepaste = typeof vgcPokepastes.$inferSelect;
  * hasEvs:        whether the paste includes EV/SP spread data ('Yes'/'No' in sheet).
  */
 export const vgcPastesRepository = mysqlTable(
-  'vgc_pastes_repository',
+  'tools_vgc_pastes_repository',
   {
     id: varchar('id', { length: 16 }).primaryKey(), // e.g. 'PC476'
     // `set null`, not the implicit RESTRICT: the repository row is the durable
@@ -176,7 +176,7 @@ export type VgcPastesRepositoryEntry = typeof vgcPastesRepository.$inferSelect;
 
 /** One row per scraped Limitless tournament */
 export const vgcLimitlessTournaments = mysqlTable(
-  'vgc_limitless_tournaments',
+  'tools_vgc_limitless_tournaments',
   {
     id: int('id').primaryKey().autoincrement(),
     limitlessId: varchar('limitless_id', { length: 64 }).notNull().unique(),
@@ -207,7 +207,7 @@ export type VgcLimitlessTournament =
  * pasteId: populated once the teamlist page is scraped and stored in vgcPokepastes.
  */
 export const vgcLimitlessTeams = mysqlTable(
-  'vgc_limitless_teams',
+  'tools_vgc_limitless_teams',
   {
     id: int('id').primaryKey().autoincrement(),
     tournamentId: int('tournament_id'),
@@ -246,7 +246,7 @@ export type VgcLimitlessTeam = typeof vgcLimitlessTeams.$inferSelect;
  * config (GID, name, etc.) lives here.
  */
 export const vgcRegulations = mysqlTable(
-  'vgc_regulations',
+  'tools_vgc_regulations',
   {
     id: varchar('id', { length: 64 }).primaryKey(), // e.g. 'vgc2026regma'
     formatId: varchar('format_id', { length: 128 }).notNull(), // e.g. 'gen9championsvgc2026regma'

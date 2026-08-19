@@ -1,9 +1,9 @@
 import {
   DiscordUser,
-  FicusQuote,
+  DiscordQuote,
   discordUsers,
-  ficusQuotes,
-} from '@/_db/schema/Ficus';
+  discordQuotes,
+} from '@/_db/schema/Discord';
 import { MySQL2Service } from '@/_utils/MySQL2Service';
 import { Injectable } from '@nestjs/common';
 import { User } from 'discord.js';
@@ -30,14 +30,14 @@ export class CommandsService {
     );
     let condition;
     if (guildID !== this.testServerGUID) {
-      condition = eq(ficusQuotes.serverId, guildID);
+      condition = eq(discordQuotes.serverId, guildID);
     }
 
     const finalCondition = userID
       ? and(
           condition,
           eq(
-            ficusQuotes.discordId,
+            discordQuotes.discordId,
             typeof userID === 'string' ? userID : userID.id,
           ),
         )
@@ -52,7 +52,7 @@ export class CommandsService {
       .select({
         count: sql`COUNT(*)`,
       })
-      .from(ficusQuotes)
+      .from(discordQuotes)
       .where(finalCondition);
 
     this.logger.log(`Total quotes found: ${totalCountQuery[0].count}`);
@@ -63,22 +63,22 @@ export class CommandsService {
     const query = await this.db
       .getDrizzle()
       .select({
-        id: ficusQuotes.id,
-        quote: ficusQuotes.quote,
-        comment: ficusQuotes.comment,
+        id: discordQuotes.id,
+        quote: discordQuotes.quote,
+        comment: discordQuotes.comment,
         discordId: discordUsers.userId,
         discordName: discordUsers.username,
-        serverId: ficusQuotes.serverId,
+        serverId: discordQuotes.serverId,
         color: discordUsers.color,
-        createdAt: ficusQuotes.createdAt,
+        createdAt: discordQuotes.createdAt,
         avatar: discordUsers.avatar,
       })
-      .from(ficusQuotes)
-      .leftJoin(discordUsers, eq(ficusQuotes.discordId, discordUsers.userId))
+      .from(discordQuotes)
+      .leftJoin(discordUsers, eq(discordQuotes.discordId, discordUsers.userId))
       .where(finalCondition)
       // LIMIT/OFFSET without ORDER BY lets MySQL return the same row on two
       // pages (or skip one): paging was non-deterministic. `id` is the tiebreak.
-      .orderBy(desc(ficusQuotes.createdAt), desc(ficusQuotes.id))
+      .orderBy(desc(discordQuotes.createdAt), desc(discordQuotes.id))
       .limit(maxQuotes)
       .offset((page - 1) * maxQuotes);
 
@@ -114,13 +114,13 @@ export class CommandsService {
     // Insert quote
     const quoteInsert = await this.db
       .getDrizzle()
-      .insert(ficusQuotes)
+      .insert(discordQuotes)
       .values({
         discordId: user.id,
         serverId: guildID,
         quote: quote,
         comment: comment,
-      } as FicusQuote);
+      } as DiscordQuote);
 
     this.logger.log(`Quote inserted: ${quoteInsert}`);
 
@@ -142,30 +142,30 @@ export class CommandsService {
       const queryBuilder = this.db
         .getDrizzle()
         .select({
-          id: ficusQuotes.id,
-          quote: ficusQuotes.quote,
-          comment: ficusQuotes.comment,
+          id: discordQuotes.id,
+          quote: discordQuotes.quote,
+          comment: discordQuotes.comment,
           discordId: discordUsers.userId,
           discordName: discordUsers.username,
-          serverId: ficusQuotes.serverId,
+          serverId: discordQuotes.serverId,
           color: discordUsers.color,
-          createdAt: ficusQuotes.createdAt,
+          createdAt: discordQuotes.createdAt,
           avatar: discordUsers.avatar,
         })
-        .from(ficusQuotes)
-        .leftJoin(discordUsers, eq(ficusQuotes.discordId, discordUsers.userId));
+        .from(discordQuotes)
+        .leftJoin(discordUsers, eq(discordQuotes.discordId, discordUsers.userId));
 
       if (userId && global) {
-        queryBuilder.where(eq(ficusQuotes.discordId, userId));
+        queryBuilder.where(eq(discordQuotes.discordId, userId));
       } else if (userId && !global) {
         queryBuilder.where(
           and(
-            eq(ficusQuotes.serverId, guildID),
-            eq(ficusQuotes.discordId, userId),
+            eq(discordQuotes.serverId, guildID),
+            eq(discordQuotes.discordId, userId),
           ),
         );
       } else {
-        queryBuilder.where(eq(ficusQuotes.serverId, guildID));
+        queryBuilder.where(eq(discordQuotes.serverId, guildID));
       }
 
       const query = await queryBuilder.orderBy(sql`RAND()`).limit(1);
@@ -175,30 +175,30 @@ export class CommandsService {
     const queryBuilder = this.db
       .getDrizzle()
       .select({
-        id: ficusQuotes.id,
-        quote: ficusQuotes.quote,
-        comment: ficusQuotes.comment,
+        id: discordQuotes.id,
+        quote: discordQuotes.quote,
+        comment: discordQuotes.comment,
         discordId: discordUsers.userId,
         discordName: discordUsers.username,
-        serverId: ficusQuotes.serverId,
+        serverId: discordQuotes.serverId,
         color: discordUsers.color,
-        createdAt: ficusQuotes.createdAt,
+        createdAt: discordQuotes.createdAt,
         avatar: discordUsers.avatar,
       })
-      .from(ficusQuotes)
-      .leftJoin(discordUsers, eq(ficusQuotes.discordId, discordUsers.userId));
+      .from(discordQuotes)
+      .leftJoin(discordUsers, eq(discordQuotes.discordId, discordUsers.userId));
 
     if (userId && global) {
-      queryBuilder.where(eq(ficusQuotes.discordId, userId));
+      queryBuilder.where(eq(discordQuotes.discordId, userId));
     } else if (userId && !global) {
       queryBuilder.where(
         and(
-          eq(ficusQuotes.serverId, guildID),
-          eq(ficusQuotes.discordId, userId),
+          eq(discordQuotes.serverId, guildID),
+          eq(discordQuotes.discordId, userId),
         ),
       );
     } else {
-      queryBuilder.where(eq(ficusQuotes.serverId, guildID));
+      queryBuilder.where(eq(discordQuotes.serverId, guildID));
     }
 
     const query = await queryBuilder.offset(quoteNum - 1).limit(1);

@@ -62,7 +62,7 @@ export type RandomizerAssignmentStatus =
   (typeof RANDOMIZER_ASSIGNMENT_STATUSES)[number];
 
 export const randomizerRoms = mysqlTable(
-  'randomizer_roms',
+  'tools_randomizer_roms',
   {
     id: int('id').primaryKey().autoincrement(),
     name: varchar('name', { length: 128 }).notNull(), // human label, e.g. "Pokémon FireRed (USA)"
@@ -82,7 +82,7 @@ export type RandomizerRom = typeof randomizerRoms.$inferSelect;
 export type NewRandomizerRom = typeof randomizerRoms.$inferInsert;
 
 export const randomizerConfigs = mysqlTable(
-  'randomizer_configs',
+  'tools_randomizer_configs',
   {
     id: int('id').primaryKey().autoincrement(),
     eventId: int('event_id').notNull().unique(),
@@ -120,7 +120,7 @@ export type RandomizerConfig = typeof randomizerConfigs.$inferSelect;
 export type NewRandomizerConfig = typeof randomizerConfigs.$inferInsert;
 
 export const randomizerAssignments = mysqlTable(
-  'randomizer_assignments',
+  'tools_randomizer_assignments',
   {
     id: int('id').primaryKey().autoincrement(),
     configId: int('config_id').notNull(),
@@ -168,7 +168,7 @@ export type RandomizerAssignment = typeof randomizerAssignments.$inferSelect;
 export type NewRandomizerAssignment = typeof randomizerAssignments.$inferInsert;
 
 export const randomizerAudit = mysqlTable(
-  'randomizer_audit',
+  'tools_randomizer_audit',
   {
     id: int('id').primaryKey().autoincrement(),
     configId: int('config_id'),
@@ -198,7 +198,7 @@ export const randomizerAudit = mysqlTable(
 export type RandomizerAuditRow = typeof randomizerAudit.$inferSelect;
 
 export const randomizerPresets = mysqlTable(
-  'randomizer_presets',
+  'tools_randomizer_presets',
   {
     id: int('id').primaryKey().autoincrement(),
     name: varchar('name', { length: 128 }).notNull(),

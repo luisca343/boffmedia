@@ -2,7 +2,7 @@ import { Injectable, Inject } from '@nestjs/common';
 import { MySql2Database } from 'drizzle-orm/mysql2';
 import { eq, desc, sql } from 'drizzle-orm';
 import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
-import { ficusMessages } from '@/_db/schema/FicusAI';
+import { ficusAiMessages } from '@/_db/schema/FicusAI';
 import { IFicusAiRepository } from './interfaces/ficusai.interface.repository';
 import { FicusMessage } from '../entities/ficus-message.entity';
 import { CreateMessageDto } from '../dto/create-message.dto';
@@ -14,11 +14,11 @@ export class FicusAIRepository
   implements IFicusAiRepository
 {
   constructor(@Inject(DRIZZLE) db: MySql2Database<Record<string, never>>) {
-    super(db, ficusMessages);
+    super(db, ficusAiMessages);
   }
 
   async create(createMessageDto: CreateMessageDto): Promise<FicusMessage> {
-    const result = await this.db.insert(ficusMessages).values({
+    const result = await this.db.insert(ficusAiMessages).values({
       uuid: createMessageDto.uuid,
       content: createMessageDto.content,
     });
@@ -36,8 +36,8 @@ export class FicusAIRepository
     // and only `countByUuid` honoured it — every read that fed the model kept
     // returning "deleted" messages, so clearing a conversation did nothing.
     const result = await this.db
-      .delete(ficusMessages)
-      .where(eq(ficusMessages.id, id));
+      .delete(ficusAiMessages)
+      .where(eq(ficusAiMessages.id, id));
 
     return result[0].affectedRows > 0;
   }
@@ -45,18 +45,18 @@ export class FicusAIRepository
   async findByUuid(uuid: string, limit: number = 20): Promise<FicusMessage[]> {
     return this.db
       .select()
-      .from(ficusMessages)
-      .where(eq(ficusMessages.uuid, uuid))
-      .orderBy(desc(ficusMessages.id))
+      .from(ficusAiMessages)
+      .where(eq(ficusAiMessages.uuid, uuid))
+      .orderBy(desc(ficusAiMessages.id))
       .limit(limit) as unknown as FicusMessage[];
   }
 
   async findRecentByUuid(uuid: string, limit: number): Promise<FicusMessage[]> {
     const messages = await this.db
       .select()
-      .from(ficusMessages)
-      .where(eq(ficusMessages.uuid, uuid))
-      .orderBy(desc(ficusMessages.id))
+      .from(ficusAiMessages)
+      .where(eq(ficusAiMessages.uuid, uuid))
+      .orderBy(desc(ficusAiMessages.id))
       .limit(limit);
 
     // Return in chronological order (oldest first) for context
@@ -65,8 +65,8 @@ export class FicusAIRepository
 
   async deleteByUuid(uuid: string): Promise<boolean> {
     const result = await this.db
-      .delete(ficusMessages)
-      .where(eq(ficusMessages.uuid, uuid));
+      .delete(ficusAiMessages)
+      .where(eq(ficusAiMessages.uuid, uuid));
 
     return result[0].affectedRows > 0;
   }
@@ -76,8 +76,8 @@ export class FicusAIRepository
       .select({
         count: sql<number>`count(*)`,
       })
-      .from(ficusMessages)
-      .where(eq(ficusMessages.uuid, uuid));
+      .from(ficusAiMessages)
+      .where(eq(ficusAiMessages.uuid, uuid));
 
     return result[0]?.count || 0;
   }

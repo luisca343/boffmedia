@@ -1,7 +1,7 @@
 {
   "version": "5",
   "dialect": "mysql",
-  "id": "61195905-d4f4-4c70-9f22-0b30e273bc83",
+  "id": "5a68c955-bdf9-4198-b409-1b11e2741b80",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "boffmedia_roles": {
@@ -3803,8 +3803,8 @@
       },
       "checkConstraint": {}
     },
-    "ficus_discord_users": {
-      "name": "ficus_discord_users",
+    "discord_users": {
+      "name": "discord_users",
       "columns": {
         "user_id": {
           "name": "user_id",
@@ -3863,8 +3863,8 @@
       "indexes": {},
       "foreignKeys": {},
       "compositePrimaryKeys": {
-        "ficus_discord_users_user_id": {
-          "name": "ficus_discord_users_user_id",
+        "discord_users_user_id": {
+          "name": "discord_users_user_id",
           "columns": [
             "user_id"
           ]
@@ -3873,8 +3873,8 @@
       "uniqueConstraints": {},
       "checkConstraint": {}
     },
-    "ficus_quotes": {
-      "name": "ficus_quotes",
+    "discord_quotes": {
+      "name": "discord_quotes",
       "columns": {
         "id": {
           "name": "id",
@@ -3940,10 +3940,10 @@
         }
       },
       "foreignKeys": {
-        "ficus_quotes_discord_id_ficus_discord_users_user_id_fk": {
-          "name": "ficus_quotes_discord_id_ficus_discord_users_user_id_fk",
-          "tableFrom": "ficus_quotes",
-          "tableTo": "ficus_discord_users",
+        "discord_quotes_discord_id_discord_users_user_id_fk": {
+          "name": "discord_quotes_discord_id_discord_users_user_id_fk",
+          "tableFrom": "discord_quotes",
+          "tableTo": "discord_users",
           "columnsFrom": [
             "discord_id"
           ],
@@ -3955,8 +3955,8 @@
         }
       },
       "compositePrimaryKeys": {
-        "ficus_quotes_id": {
-          "name": "ficus_quotes_id",
+        "discord_quotes_id": {
+          "name": "discord_quotes_id",
           "columns": [
             "id"
           ]
@@ -3965,8 +3965,8 @@
       "uniqueConstraints": {},
       "checkConstraint": {}
     },
-    "ficus_messages": {
-      "name": "ficus_messages",
+    "rotom_ficusai_messages": {
+      "name": "rotom_ficusai_messages",
       "columns": {
         "id": {
           "name": "id",
@@ -4018,9 +4018,9 @@
         }
       },
       "foreignKeys": {
-        "ficus_messages_uuid_rotom_users_uuid_fk": {
-          "name": "ficus_messages_uuid_rotom_users_uuid_fk",
-          "tableFrom": "ficus_messages",
+        "rotom_ficusai_messages_uuid_rotom_users_uuid_fk": {
+          "name": "rotom_ficusai_messages_uuid_rotom_users_uuid_fk",
+          "tableFrom": "rotom_ficusai_messages",
           "tableTo": "rotom_users",
           "columnsFrom": [
             "uuid"
@@ -4033,8 +4033,8 @@
         }
       },
       "compositePrimaryKeys": {
-        "ficus_messages_id": {
-          "name": "ficus_messages_id",
+        "rotom_ficusai_messages_id": {
+          "name": "rotom_ficusai_messages_id",
           "columns": [
             "id"
           ]
@@ -4918,8 +4918,8 @@
       },
       "checkConstraint": {}
     },
-    "randomizer_assignments": {
-      "name": "randomizer_assignments",
+    "tools_randomizer_assignments": {
+      "name": "tools_randomizer_assignments",
       "columns": {
         "id": {
           "name": "id",
@@ -5059,8 +5059,8 @@
       "foreignKeys": {
         "rass_config_fk": {
           "name": "rass_config_fk",
-          "tableFrom": "randomizer_assignments",
-          "tableTo": "randomizer_configs",
+          "tableFrom": "tools_randomizer_assignments",
+          "tableTo": "tools_randomizer_configs",
           "columnsFrom": [
             "config_id"
           ],
@@ -5072,7 +5072,7 @@
         },
         "rass_user_fk": {
           "name": "rass_user_fk",
-          "tableFrom": "randomizer_assignments",
+          "tableFrom": "tools_randomizer_assignments",
           "tableTo": "boffmedia_users",
           "columnsFrom": [
             "boffmedia_user_id"
@@ -5085,8 +5085,8 @@
         }
       },
       "compositePrimaryKeys": {
-        "randomizer_assignments_id": {
-          "name": "randomizer_assignments_id",
+        "tools_randomizer_assignments_id": {
+          "name": "tools_randomizer_assignments_id",
           "columns": [
             "id"
           ]
@@ -5095,8 +5095,8 @@
       "uniqueConstraints": {},
       "checkConstraint": {}
     },
-    "randomizer_audit": {
-      "name": "randomizer_audit",
+    "tools_randomizer_audit": {
+      "name": "tools_randomizer_audit",
       "columns": {
         "id": {
           "name": "id",
@@ -5175,8 +5175,8 @@
       "foreignKeys": {
         "raud_config_fk": {
           "name": "raud_config_fk",
-          "tableFrom": "randomizer_audit",
-          "tableTo": "randomizer_configs",
+          "tableFrom": "tools_randomizer_audit",
+          "tableTo": "tools_randomizer_configs",
           "columnsFrom": [
             "config_id"
           ],
@@ -5188,8 +5188,8 @@
         },
         "raud_assignment_fk": {
           "name": "raud_assignment_fk",
-          "tableFrom": "randomizer_audit",
-          "tableTo": "randomizer_assignments",
+          "tableFrom": "tools_randomizer_audit",
+          "tableTo": "tools_randomizer_assignments",
           "columnsFrom": [
             "assignment_id"
           ],
@@ -5201,8 +5201,8 @@
         }
       },
       "compositePrimaryKeys": {
-        "randomizer_audit_id": {
-          "name": "randomizer_audit_id",
+        "tools_randomizer_audit_id": {
+          "name": "tools_randomizer_audit_id",
           "columns": [
             "id"
           ]
@@ -5211,8 +5211,8 @@
       "uniqueConstraints": {},
       "checkConstraint": {}
     },
-    "randomizer_configs": {
-      "name": "randomizer_configs",
+    "tools_randomizer_configs": {
+      "name": "tools_randomizer_configs",
       "columns": {
         "id": {
           "name": "id",
@@ -5329,7 +5329,7 @@
       "foreignKeys": {
         "rc_event_fk": {
           "name": "rc_event_fk",
-          "tableFrom": "randomizer_configs",
+          "tableFrom": "tools_randomizer_configs",
           "tableTo": "boffmedia_events",
           "columnsFrom": [
             "event_id"
@@ -5342,8 +5342,8 @@
         },
         "rc_rom_fk": {
           "name": "rc_rom_fk",
-          "tableFrom": "randomizer_configs",
-          "tableTo": "randomizer_roms",
+          "tableFrom": "tools_randomizer_configs",
+          "tableTo": "tools_randomizer_roms",
           "columnsFrom": [
             "rom_id"
           ],
@@ -5355,16 +5355,16 @@
         }
       },
       "compositePrimaryKeys": {
-        "randomizer_configs_id": {
-          "name": "randomizer_configs_id",
+        "tools_randomizer_configs_id": {
+          "name": "tools_randomizer_configs_id",
           "columns": [
             "id"
           ]
         }
       },
       "uniqueConstraints": {
-        "randomizer_configs_event_id_unique": {
-          "name": "randomizer_configs_event_id_unique",
+        "tools_randomizer_configs_event_id_unique": {
+          "name": "tools_randomizer_configs_event_id_unique",
           "columns": [
             "event_id"
           ]
@@ -5372,8 +5372,8 @@
       },
       "checkConstraint": {}
     },
-    "randomizer_presets": {
-      "name": "randomizer_presets",
+    "tools_randomizer_presets": {
+      "name": "tools_randomizer_presets",
       "columns": {
         "id": {
           "name": "id",
@@ -5446,7 +5446,7 @@
       "foreignKeys": {
         "rp_updated_by_fk": {
           "name": "rp_updated_by_fk",
-          "tableFrom": "randomizer_presets",
+          "tableFrom": "tools_randomizer_presets",
           "tableTo": "boffmedia_users",
           "columnsFrom": [
             "updated_by"
@@ -5459,8 +5459,8 @@
         }
       },
       "compositePrimaryKeys": {
-        "randomizer_presets_id": {
-          "name": "randomizer_presets_id",
+        "tools_randomizer_presets_id": {
+          "name": "tools_randomizer_presets_id",
           "columns": [
             "id"
           ]
@@ -5469,8 +5469,8 @@
       "uniqueConstraints": {},
       "checkConstraint": {}
     },
-    "randomizer_roms": {
-      "name": "randomizer_roms",
+    "tools_randomizer_roms": {
+      "name": "tools_randomizer_roms",
       "columns": {
         "id": {
           "name": "id",
@@ -5543,8 +5543,8 @@
       },
       "foreignKeys": {},
       "compositePrimaryKeys": {
-        "randomizer_roms_id": {
-          "name": "randomizer_roms_id",
+        "tools_randomizer_roms_id": {
+          "name": "tools_randomizer_roms_id",
           "columns": [
             "id"
           ]
@@ -5553,8 +5553,8 @@
       "uniqueConstraints": {},
       "checkConstraint": {}
     },
-    "sharex_images": {
-      "name": "sharex_images",
+    "boffmedia_sharex_images": {
+      "name": "boffmedia_sharex_images",
       "columns": {
         "id": {
           "name": "id",
@@ -5603,8 +5603,8 @@
       "indexes": {},
       "foreignKeys": {},
       "compositePrimaryKeys": {
-        "sharex_images_id": {
-          "name": "sharex_images_id",
+        "boffmedia_sharex_images_id": {
+          "name": "boffmedia_sharex_images_id",
           "columns": [
             "id"
           ]
@@ -13276,8 +13276,8 @@
       "uniqueConstraints": {},
       "checkConstraint": {}
     },
-    "tcg_cards": {
-      "name": "tcg_cards",
+    "tools_tcg_cards": {
+      "name": "tools_tcg_cards",
       "columns": {
         "id": {
           "name": "id",
@@ -13436,10 +13436,10 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "tcg_cards_set_id_tcg_sets_id_fk": {
-          "name": "tcg_cards_set_id_tcg_sets_id_fk",
-          "tableFrom": "tcg_cards",
-          "tableTo": "tcg_sets",
+        "tools_tcg_cards_set_id_tools_tcg_sets_id_fk": {
+          "name": "tools_tcg_cards_set_id_tools_tcg_sets_id_fk",
+          "tableFrom": "tools_tcg_cards",
+          "tableTo": "tools_tcg_sets",
           "columnsFrom": [
             "set_id"
           ],
@@ -13451,8 +13451,8 @@
         }
       },
       "compositePrimaryKeys": {
-        "tcg_cards_id": {
-          "name": "tcg_cards_id",
+        "tools_tcg_cards_id": {
+          "name": "tools_tcg_cards_id",
           "columns": [
             "id"
           ]
@@ -13461,8 +13461,8 @@
       "uniqueConstraints": {},
       "checkConstraint": {}
     },
-    "tcg_series": {
-      "name": "tcg_series",
+    "tools_tcg_series": {
+      "name": "tools_tcg_series",
       "columns": {
         "id": {
           "name": "id",
@@ -13496,8 +13496,8 @@
       "indexes": {},
       "foreignKeys": {},
       "compositePrimaryKeys": {
-        "tcg_series_id": {
-          "name": "tcg_series_id",
+        "tools_tcg_series_id": {
+          "name": "tools_tcg_series_id",
           "columns": [
             "id"
           ]
@@ -13506,8 +13506,8 @@
       "uniqueConstraints": {},
       "checkConstraint": {}
     },
-    "tcg_sets": {
-      "name": "tcg_sets",
+    "tools_tcg_sets": {
+      "name": "tools_tcg_sets",
       "columns": {
         "id": {
           "name": "id",
@@ -13568,10 +13568,10 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "tcg_sets_series_id_tcg_series_id_fk": {
-          "name": "tcg_sets_series_id_tcg_series_id_fk",
-          "tableFrom": "tcg_sets",
-          "tableTo": "tcg_series",
+        "tools_tcg_sets_series_id_tools_tcg_series_id_fk": {
+          "name": "tools_tcg_sets_series_id_tools_tcg_series_id_fk",
+          "tableFrom": "tools_tcg_sets",
+          "tableTo": "tools_tcg_series",
           "columnsFrom": [
             "series_id"
           ],
@@ -13583,8 +13583,8 @@
         }
       },
       "compositePrimaryKeys": {
-        "tcg_sets_id": {
-          "name": "tcg_sets_id",
+        "tools_tcg_sets_id": {
+          "name": "tools_tcg_sets_id",
           "columns": [
             "id"
           ]
@@ -13593,8 +13593,8 @@
       "uniqueConstraints": {},
       "checkConstraint": {}
     },
-    "tcg_user_card_history": {
-      "name": "tcg_user_card_history",
+    "tools_tcg_user_card_history": {
+      "name": "tools_tcg_user_card_history",
       "columns": {
         "id": {
           "name": "id",
@@ -13634,9 +13634,9 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "tcg_user_card_history_user_id_boffmedia_users_id_fk": {
-          "name": "tcg_user_card_history_user_id_boffmedia_users_id_fk",
-          "tableFrom": "tcg_user_card_history",
+        "tools_tcg_user_card_history_user_id_boffmedia_users_id_fk": {
+          "name": "tools_tcg_user_card_history_user_id_boffmedia_users_id_fk",
+          "tableFrom": "tools_tcg_user_card_history",
           "tableTo": "boffmedia_users",
           "columnsFrom": [
             "user_id"
@@ -13647,10 +13647,10 @@
           "onDelete": "cascade",
           "onUpdate": "cascade"
         },
-        "tcg_user_card_history_card_id_tcg_cards_id_fk": {
-          "name": "tcg_user_card_history_card_id_tcg_cards_id_fk",
-          "tableFrom": "tcg_user_card_history",
-          "tableTo": "tcg_cards",
+        "tools_tcg_user_card_history_card_id_tools_tcg_cards_id_fk": {
+          "name": "tools_tcg_user_card_history_card_id_tools_tcg_cards_id_fk",
+          "tableFrom": "tools_tcg_user_card_history",
+          "tableTo": "tools_tcg_cards",
           "columnsFrom": [
             "card_id"
           ],
@@ -13662,8 +13662,8 @@
         }
       },
       "compositePrimaryKeys": {
-        "tcg_user_card_history_id": {
-          "name": "tcg_user_card_history_id",
+        "tools_tcg_user_card_history_id": {
+          "name": "tools_tcg_user_card_history_id",
           "columns": [
             "id"
           ]
@@ -13672,8 +13672,8 @@
       "uniqueConstraints": {},
       "checkConstraint": {}
     },
-    "tcg_user_cards": {
-      "name": "tcg_user_cards",
+    "tools_tcg_user_cards": {
+      "name": "tools_tcg_user_cards",
       "columns": {
         "id": {
           "name": "id",
@@ -13740,9 +13740,9 @@
         }
       },
       "foreignKeys": {
-        "tcg_user_cards_user_id_boffmedia_users_id_fk": {
-          "name": "tcg_user_cards_user_id_boffmedia_users_id_fk",
-          "tableFrom": "tcg_user_cards",
+        "tools_tcg_user_cards_user_id_boffmedia_users_id_fk": {
+          "name": "tools_tcg_user_cards_user_id_boffmedia_users_id_fk",
+          "tableFrom": "tools_tcg_user_cards",
           "tableTo": "boffmedia_users",
           "columnsFrom": [
             "user_id"
@@ -13753,10 +13753,10 @@
           "onDelete": "cascade",
           "onUpdate": "cascade"
         },
-        "tcg_user_cards_card_id_tcg_cards_id_fk": {
-          "name": "tcg_user_cards_card_id_tcg_cards_id_fk",
-          "tableFrom": "tcg_user_cards",
-          "tableTo": "tcg_cards",
+        "tools_tcg_user_cards_card_id_tools_tcg_cards_id_fk": {
+          "name": "tools_tcg_user_cards_card_id_tools_tcg_cards_id_fk",
+          "tableFrom": "tools_tcg_user_cards",
+          "tableTo": "tools_tcg_cards",
           "columnsFrom": [
             "card_id"
           ],
@@ -13768,8 +13768,8 @@
         }
       },
       "compositePrimaryKeys": {
-        "tcg_user_cards_id": {
-          "name": "tcg_user_cards_id",
+        "tools_tcg_user_cards_id": {
+          "name": "tools_tcg_user_cards_id",
           "columns": [
             "id"
           ]
@@ -13778,8 +13778,8 @@
       "uniqueConstraints": {},
       "checkConstraint": {}
     },
-    "vgc_limitless_teams": {
-      "name": "vgc_limitless_teams",
+    "tools_vgc_limitless_teams": {
+      "name": "tools_vgc_limitless_teams",
       "columns": {
         "id": {
           "name": "id",
@@ -13856,10 +13856,10 @@
         }
       },
       "foreignKeys": {
-        "vgc_limitless_teams_paste_id_vgc_pokepastes_id_fk": {
-          "name": "vgc_limitless_teams_paste_id_vgc_pokepastes_id_fk",
-          "tableFrom": "vgc_limitless_teams",
-          "tableTo": "vgc_pokepastes",
+        "tools_vgc_limitless_teams_paste_id_tools_vgc_pokepastes_id_fk": {
+          "name": "tools_vgc_limitless_teams_paste_id_tools_vgc_pokepastes_id_fk",
+          "tableFrom": "tools_vgc_limitless_teams",
+          "tableTo": "tools_vgc_pokepastes",
           "columnsFrom": [
             "paste_id"
           ],
@@ -13871,8 +13871,8 @@
         },
         "vgc_lt_tournament_id_fk": {
           "name": "vgc_lt_tournament_id_fk",
-          "tableFrom": "vgc_limitless_teams",
-          "tableTo": "vgc_limitless_tournaments",
+          "tableFrom": "tools_vgc_limitless_teams",
+          "tableTo": "tools_vgc_limitless_tournaments",
           "columnsFrom": [
             "tournament_id"
           ],
@@ -13884,8 +13884,8 @@
         }
       },
       "compositePrimaryKeys": {
-        "vgc_limitless_teams_id": {
-          "name": "vgc_limitless_teams_id",
+        "tools_vgc_limitless_teams_id": {
+          "name": "tools_vgc_limitless_teams_id",
           "columns": [
             "id"
           ]
@@ -13894,8 +13894,8 @@
       "uniqueConstraints": {},
       "checkConstraint": {}
     },
-    "vgc_limitless_tournaments": {
-      "name": "vgc_limitless_tournaments",
+    "tools_vgc_limitless_tournaments": {
+      "name": "tools_vgc_limitless_tournaments",
       "columns": {
         "id": {
           "name": "id",
@@ -13997,16 +13997,16 @@
       },
       "foreignKeys": {},
       "compositePrimaryKeys": {
-        "vgc_limitless_tournaments_id": {
-          "name": "vgc_limitless_tournaments_id",
+        "tools_vgc_limitless_tournaments_id": {
+          "name": "tools_vgc_limitless_tournaments_id",
           "columns": [
             "id"
           ]
         }
       },
       "uniqueConstraints": {
-        "vgc_limitless_tournaments_limitless_id_unique": {
-          "name": "vgc_limitless_tournaments_limitless_id_unique",
+        "tools_vgc_limitless_tournaments_limitless_id_unique": {
+          "name": "tools_vgc_limitless_tournaments_limitless_id_unique",
           "columns": [
             "limitless_id"
           ]
@@ -14014,8 +14014,8 @@
       },
       "checkConstraint": {}
     },
-    "vgc_pastes_repository": {
-      "name": "vgc_pastes_repository",
+    "tools_vgc_pastes_repository": {
+      "name": "tools_vgc_pastes_repository",
       "columns": {
         "id": {
           "name": "id",
@@ -14142,10 +14142,10 @@
         }
       },
       "foreignKeys": {
-        "vgc_pastes_repository_paste_id_vgc_pokepastes_id_fk": {
-          "name": "vgc_pastes_repository_paste_id_vgc_pokepastes_id_fk",
-          "tableFrom": "vgc_pastes_repository",
-          "tableTo": "vgc_pokepastes",
+        "tools_vgc_pastes_repository_paste_id_tools_vgc_pokepastes_id_fk": {
+          "name": "tools_vgc_pastes_repository_paste_id_tools_vgc_pokepastes_id_fk",
+          "tableFrom": "tools_vgc_pastes_repository",
+          "tableTo": "tools_vgc_pokepastes",
           "columnsFrom": [
             "paste_id"
           ],
@@ -14157,8 +14157,8 @@
         }
       },
       "compositePrimaryKeys": {
-        "vgc_pastes_repository_id": {
-          "name": "vgc_pastes_repository_id",
+        "tools_vgc_pastes_repository_id": {
+          "name": "tools_vgc_pastes_repository_id",
           "columns": [
             "id"
           ]
@@ -14167,8 +14167,8 @@
       "uniqueConstraints": {},
       "checkConstraint": {}
     },
-    "vgc_pokepastes": {
-      "name": "vgc_pokepastes",
+    "tools_vgc_pokepastes": {
+      "name": "tools_vgc_pokepastes",
       "columns": {
         "id": {
           "name": "id",
@@ -14252,22 +14252,22 @@
       },
       "foreignKeys": {},
       "compositePrimaryKeys": {
-        "vgc_pokepastes_id": {
-          "name": "vgc_pokepastes_id",
+        "tools_vgc_pokepastes_id": {
+          "name": "tools_vgc_pokepastes_id",
           "columns": [
             "id"
           ]
         }
       },
       "uniqueConstraints": {
-        "vgc_pokepastes_pokepaste_id_unique": {
-          "name": "vgc_pokepastes_pokepaste_id_unique",
+        "tools_vgc_pokepastes_pokepaste_id_unique": {
+          "name": "tools_vgc_pokepastes_pokepaste_id_unique",
           "columns": [
             "pokepaste_id"
           ]
         },
-        "vgc_pokepastes_source_key_unique": {
-          "name": "vgc_pokepastes_source_key_unique",
+        "tools_vgc_pokepastes_source_key_unique": {
+          "name": "tools_vgc_pokepastes_source_key_unique",
           "columns": [
             "source_key"
           ]
@@ -14275,8 +14275,8 @@
       },
       "checkConstraint": {}
     },
-    "vgc_regulations": {
-      "name": "vgc_regulations",
+    "tools_vgc_regulations": {
+      "name": "tools_vgc_regulations",
       "columns": {
         "id": {
           "name": "id",
@@ -14394,8 +14394,8 @@
       },
       "foreignKeys": {},
       "compositePrimaryKeys": {
-        "vgc_regulations_id": {
-          "name": "vgc_regulations_id",
+        "tools_vgc_regulations_id": {
+          "name": "tools_vgc_regulations_id",
           "columns": [
             "id"
           ]
@@ -14404,8 +14404,8 @@
       "uniqueConstraints": {},
       "checkConstraint": {}
     },
-    "vgc_smogon_pokemon": {
-      "name": "vgc_smogon_pokemon",
+    "tools_vgc_smogon_pokemon": {
+      "name": "tools_vgc_smogon_pokemon",
       "columns": {
         "id": {
           "name": "id",
@@ -14555,8 +14555,8 @@
       },
       "foreignKeys": {},
       "compositePrimaryKeys": {
-        "vgc_smogon_pokemon_id": {
-          "name": "vgc_smogon_pokemon_id",
+        "tools_vgc_smogon_pokemon_id": {
+          "name": "tools_vgc_smogon_pokemon_id",
           "columns": [
             "id"
           ]
@@ -14565,8 +14565,8 @@
       "uniqueConstraints": {},
       "checkConstraint": {}
     },
-    "vgc_smogon_snapshots": {
-      "name": "vgc_smogon_snapshots",
+    "tools_vgc_smogon_snapshots": {
+      "name": "tools_vgc_smogon_snapshots",
       "columns": {
         "id": {
           "name": "id",
@@ -14625,8 +14625,8 @@
       },
       "foreignKeys": {},
       "compositePrimaryKeys": {
-        "vgc_smogon_snapshots_id": {
-          "name": "vgc_smogon_snapshots_id",
+        "tools_vgc_smogon_snapshots_id": {
+          "name": "tools_vgc_smogon_snapshots_id",
           "columns": [
             "id"
           ]
@@ -14635,8 +14635,8 @@
       "uniqueConstraints": {},
       "checkConstraint": {}
     },
-    "vgc_matches": {
-      "name": "vgc_matches",
+    "tools_vgc_matches": {
+      "name": "tools_vgc_matches",
       "columns": {
         "id": {
           "name": "id",
@@ -14765,10 +14765,10 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "vgc_matches_session_id_vgc_sessions_id_fk": {
-          "name": "vgc_matches_session_id_vgc_sessions_id_fk",
-          "tableFrom": "vgc_matches",
-          "tableTo": "vgc_sessions",
+        "tools_vgc_matches_session_id_tools_vgc_sessions_id_fk": {
+          "name": "tools_vgc_matches_session_id_tools_vgc_sessions_id_fk",
+          "tableFrom": "tools_vgc_matches",
+          "tableTo": "tools_vgc_sessions",
           "columnsFrom": [
             "session_id"
           ],
@@ -14778,9 +14778,9 @@
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
-        "vgc_matches_user_id_boffmedia_users_id_fk": {
-          "name": "vgc_matches_user_id_boffmedia_users_id_fk",
-          "tableFrom": "vgc_matches",
+        "tools_vgc_matches_user_id_boffmedia_users_id_fk": {
+          "name": "tools_vgc_matches_user_id_boffmedia_users_id_fk",
+          "tableFrom": "tools_vgc_matches",
           "tableTo": "boffmedia_users",
           "columnsFrom": [
             "user_id"
@@ -14793,8 +14793,8 @@
         }
       },
       "compositePrimaryKeys": {
-        "vgc_matches_id": {
-          "name": "vgc_matches_id",
+        "tools_vgc_matches_id": {
+          "name": "tools_vgc_matches_id",
           "columns": [
             "id"
           ]
@@ -14803,8 +14803,8 @@
       "uniqueConstraints": {},
       "checkConstraint": {}
     },
-    "vgc_series": {
-      "name": "vgc_series",
+    "tools_vgc_series": {
+      "name": "tools_vgc_series",
       "columns": {
         "id": {
           "name": "id",
@@ -14911,10 +14911,10 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "vgc_series_session_id_vgc_sessions_id_fk": {
-          "name": "vgc_series_session_id_vgc_sessions_id_fk",
-          "tableFrom": "vgc_series",
-          "tableTo": "vgc_sessions",
+        "tools_vgc_series_session_id_tools_vgc_sessions_id_fk": {
+          "name": "tools_vgc_series_session_id_tools_vgc_sessions_id_fk",
+          "tableFrom": "tools_vgc_series",
+          "tableTo": "tools_vgc_sessions",
           "columnsFrom": [
             "session_id"
           ],
@@ -14924,9 +14924,9 @@
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
-        "vgc_series_user_id_boffmedia_users_id_fk": {
-          "name": "vgc_series_user_id_boffmedia_users_id_fk",
-          "tableFrom": "vgc_series",
+        "tools_vgc_series_user_id_boffmedia_users_id_fk": {
+          "name": "tools_vgc_series_user_id_boffmedia_users_id_fk",
+          "tableFrom": "tools_vgc_series",
           "tableTo": "boffmedia_users",
           "columnsFrom": [
             "user_id"
@@ -14939,8 +14939,8 @@
         }
       },
       "compositePrimaryKeys": {
-        "vgc_series_id": {
-          "name": "vgc_series_id",
+        "tools_vgc_series_id": {
+          "name": "tools_vgc_series_id",
           "columns": [
             "id"
           ]
@@ -14949,8 +14949,8 @@
       "uniqueConstraints": {},
       "checkConstraint": {}
     },
-    "vgc_sessions": {
-      "name": "vgc_sessions",
+    "tools_vgc_sessions": {
+      "name": "tools_vgc_sessions",
       "columns": {
         "id": {
           "name": "id",
@@ -15066,9 +15066,9 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "vgc_sessions_user_id_boffmedia_users_id_fk": {
-          "name": "vgc_sessions_user_id_boffmedia_users_id_fk",
-          "tableFrom": "vgc_sessions",
+        "tools_vgc_sessions_user_id_boffmedia_users_id_fk": {
+          "name": "tools_vgc_sessions_user_id_boffmedia_users_id_fk",
+          "tableFrom": "tools_vgc_sessions",
           "tableTo": "boffmedia_users",
           "columnsFrom": [
             "user_id"
@@ -15081,8 +15081,8 @@
         }
       },
       "compositePrimaryKeys": {
-        "vgc_sessions_id": {
-          "name": "vgc_sessions_id",
+        "tools_vgc_sessions_id": {
+          "name": "tools_vgc_sessions_id",
           "columns": [
             "id"
           ]
@@ -15091,8 +15091,8 @@
       "uniqueConstraints": {},
       "checkConstraint": {}
     },
-    "vgc_team_presets": {
-      "name": "vgc_team_presets",
+    "tools_vgc_team_presets": {
+      "name": "tools_vgc_team_presets",
       "columns": {
         "id": {
           "name": "id",
@@ -15172,9 +15172,9 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "vgc_team_presets_user_id_boffmedia_users_id_fk": {
-          "name": "vgc_team_presets_user_id_boffmedia_users_id_fk",
-          "tableFrom": "vgc_team_presets",
+        "tools_vgc_team_presets_user_id_boffmedia_users_id_fk": {
+          "name": "tools_vgc_team_presets_user_id_boffmedia_users_id_fk",
+          "tableFrom": "tools_vgc_team_presets",
           "tableTo": "boffmedia_users",
           "columnsFrom": [
             "user_id"
@@ -15187,8 +15187,8 @@
         }
       },
       "compositePrimaryKeys": {
-        "vgc_team_presets_id": {
-          "name": "vgc_team_presets_id",
+        "tools_vgc_team_presets_id": {
+          "name": "tools_vgc_team_presets_id",
           "columns": [
             "id"
           ]
@@ -15197,8 +15197,8 @@
       "uniqueConstraints": {},
       "checkConstraint": {}
     },
-    "wingull_invites": {
-      "name": "wingull_invites",
+    "rotom_wingull_invites": {
+      "name": "rotom_wingull_invites",
       "columns": {
         "id": {
           "name": "id",
@@ -15247,8 +15247,8 @@
       "indexes": {},
       "foreignKeys": {},
       "compositePrimaryKeys": {
-        "wingull_invites_id": {
-          "name": "wingull_invites_id",
+        "rotom_wingull_invites_id": {
+          "name": "rotom_wingull_invites_id",
           "columns": [
             "id"
           ]

@@ -9,7 +9,7 @@ import {
 
 import { boffMediaUsers } from './BoffMedia';
 
-export const tcgSets = mysqlTable('tcg_sets', {
+export const tcgSets = mysqlTable('tools_tcg_sets', {
   id: varchar('id', { length: 32 }).primaryKey(),
   seriesId: varchar('series_id', { length: 32 })
     .notNull()
@@ -27,7 +27,7 @@ export const tcgSets = mysqlTable('tcg_sets', {
 
 export type TcgSet = typeof tcgSets.$inferSelect;
 
-export const tcgSeries = mysqlTable('tcg_series', {
+export const tcgSeries = mysqlTable('tools_tcg_series', {
   id: varchar('id', { length: 32 }).primaryKey(),
   nameEn: varchar('name_en', { length: 64 }).notNull(),
   nameEs: varchar('name_es', { length: 64 }).notNull(),
@@ -36,7 +36,7 @@ export const tcgSeries = mysqlTable('tcg_series', {
 
 export type TcgSeries = typeof tcgSeries.$inferSelect;
 
-export const tcgCards = mysqlTable('tcg_cards', {
+export const tcgCards = mysqlTable('tools_tcg_cards', {
   id: varchar('id', { length: 32 }).primaryKey(),
   setId: varchar('set_id', { length: 32 })
     .notNull()
@@ -68,7 +68,7 @@ export const tcgCards = mysqlTable('tcg_cards', {
 export type TcgCard = typeof tcgCards.$inferSelect;
 
 export const tcgUserCards = mysqlTable(
-  'tcg_user_cards',
+  'tools_tcg_user_cards',
   {
     id: varchar('id', { length: 32 }).primaryKey(),
     userId: int('user_id')
@@ -101,7 +101,7 @@ export const tcgUserCards = mysqlTable(
 
 export type TcgUserCard = typeof tcgUserCards.$inferSelect;
 
-export const tcgUserCardHistory = mysqlTable('tcg_user_card_history', {
+export const tcgUserCardHistory = mysqlTable('tools_tcg_user_card_history', {
   id: varchar('id', { length: 32 }).primaryKey(),
   userId: int('user_id')
     .notNull()

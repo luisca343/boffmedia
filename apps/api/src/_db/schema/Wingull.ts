@@ -1,6 +1,6 @@
 import { char, mysqlTable, timestamp, varchar } from 'drizzle-orm/mysql-core';
 
-export const wingullInvites = mysqlTable('wingull_invites', {
+export const wingullInvites = mysqlTable('rotom_wingull_invites', {
   id: varchar('id', { length: 6 }).primaryKey(),
   uuid: char('uuid', { length: 36 }).notNull(),
   username: varchar('username', { length: 32 }).notNull(),

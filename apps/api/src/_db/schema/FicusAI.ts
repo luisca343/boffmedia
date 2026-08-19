@@ -13,8 +13,8 @@ import { rotomUsers } from './SmartRotom';
 // `deleted_at` was honoured by `countByUuid` alone — every read that actually
 // fed the model ignored it, so a cleared conversation kept answering from the
 // messages the player thought they had deleted.
-export const ficusMessages = mysqlTable(
-  'ficus_messages',
+export const ficusAiMessages = mysqlTable(
+  'rotom_ficusai_messages',
   {
     id: int('id').primaryKey().autoincrement(),
     uuid: char('uuid', { length: 36 })
@@ -33,4 +33,4 @@ export const ficusMessages = mysqlTable(
   }),
 );
 
-export type FicusMessage = typeof ficusMessages.$inferSelect;
+export type FicusAiMessage = typeof ficusAiMessages.$inferSelect;

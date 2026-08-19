@@ -6,7 +6,7 @@ import {
   varchar,
 } from 'drizzle-orm/mysql-core';
 
-export const sharexImages = mysqlTable('sharex_images', {
+export const sharexImages = mysqlTable('boffmedia_sharex_images', {
   id: int('id').primaryKey().autoincrement(),
   app: varchar('app', { length: 32 }).notNull(),
   name: char('name', { length: 10 }).notNull(),

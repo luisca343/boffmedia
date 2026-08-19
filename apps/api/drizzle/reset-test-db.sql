@@ -1,5 +1,5 @@
 -- WARNING: This script irreversibly deletes only VGC-prefixed views and tables
--- (name starts with `vgc_`) in the current database.
+-- (name starts with `tools_vgc_`) in the current database.
 -- Use only in local/test environments.
 
 SET @OLD_FOREIGN_KEY_CHECKS = @@FOREIGN_KEY_CHECKS;
@@ -13,7 +13,7 @@ SELECT GROUP_CONCAT(CONCAT('`', table_name, '`') ORDER BY table_name SEPARATOR '
 INTO @view_list
 FROM information_schema.views
 WHERE table_schema = DATABASE()
-  AND table_name LIKE 'vgc\_%';
+  AND table_name LIKE 'tools_vgc\_%';
 
 SET @drop_views_sql = IF(
   @view_list IS NULL OR @view_list = '',
@@ -31,7 +31,7 @@ INTO @table_list
 FROM information_schema.tables
 WHERE table_schema = DATABASE()
   AND table_type = 'BASE TABLE'
-  AND table_name LIKE 'vgc\_%';
+  AND table_name LIKE 'tools_vgc\_%';
 
 SET @drop_tables_sql = IF(
   @table_list IS NULL OR @table_list = '',

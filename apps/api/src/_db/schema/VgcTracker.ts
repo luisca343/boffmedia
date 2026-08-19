@@ -45,7 +45,7 @@ export interface MatchNoteData {
 
 // ─── Tables ──────────────────────────────────────────────────────────────────
 
-export const vgcTeamPresets = mysqlTable('vgc_team_presets', {
+export const vgcTeamPresets = mysqlTable('tools_vgc_team_presets', {
   id: varchar('id', { length: 36 }).primaryKey(),
   userId: int('user_id').references(() => boffMediaUsers.id, {
     onDelete: 'cascade',
@@ -62,7 +62,7 @@ export const vgcTeamPresets = mysqlTable('vgc_team_presets', {
 
 export type VgcTeamPreset = typeof vgcTeamPresets.$inferSelect;
 
-export const vgcSessions = mysqlTable('vgc_sessions', {
+export const vgcSessions = mysqlTable('tools_vgc_sessions', {
   id: varchar('id', { length: 36 }).primaryKey(),
   userId: int('user_id').references(() => boffMediaUsers.id, {
     onDelete: 'cascade',
@@ -86,7 +86,7 @@ export const vgcSessions = mysqlTable('vgc_sessions', {
 
 export type VgcSession = typeof vgcSessions.$inferSelect;
 
-export const vgcMatches = mysqlTable('vgc_matches', {
+export const vgcMatches = mysqlTable('tools_vgc_matches', {
   id: varchar('id', { length: 36 }).primaryKey(),
   sessionId: varchar('session_id', { length: 36 }).references(
     () => vgcSessions.id,
@@ -113,7 +113,7 @@ export const vgcMatches = mysqlTable('vgc_matches', {
 
 export type VgcMatch = typeof vgcMatches.$inferSelect;
 
-export const vgcSeries = mysqlTable('vgc_series', {
+export const vgcSeries = mysqlTable('tools_vgc_series', {
   id: varchar('id', { length: 36 }).primaryKey(),
   sessionId: varchar('session_id', { length: 36 }).references(
     () => vgcSessions.id,
