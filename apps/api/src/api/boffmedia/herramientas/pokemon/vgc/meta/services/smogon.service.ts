@@ -5,7 +5,7 @@ import {
   PokemonUsageDetail,
   PokemonUsageEntry,
 } from '../entities/pokemon-usage.entity';
-import { VgcSmogonSnapshot, VgcSmogonPokemonRow } from '@/_db/schema/Vgc';
+import { VgcSmogonSnapshot, VgcSmogonPokemon } from '@/_db/schema/Vgc';
 import { smogonUsageUrl, smogonMovesetUrl } from '../config/smogon.config';
 import { parseUsageTxt } from '../utils/parse-usage-txt';
 import { parseMovesetTxt } from '../utils/parse-moveset-txt';
@@ -196,7 +196,7 @@ export class SmogonService {
   // ─── Private ────────────────────────────────────────────────────────────────
 
   private toDetail(
-    row: VgcSmogonPokemonRow,
+    row: VgcSmogonPokemon,
     dex: typeof Dex,
   ): PokemonUsageDetail {
     const species = dex.species.get(row.speciesName);
@@ -227,7 +227,7 @@ export class SmogonService {
   }
 
   private toEntry(
-    row: VgcSmogonPokemonRow,
+    row: VgcSmogonPokemon,
     dex: typeof Dex,
   ): PokemonUsageEntry {
     const species = dex.species.get(row.speciesName);

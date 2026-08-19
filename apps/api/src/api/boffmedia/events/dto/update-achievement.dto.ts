@@ -1,6 +1,6 @@
 import { PartialType } from '@nestjs/swagger';
 import { CreateEventAchievementDto } from './create-achievement.dto';
 
-export class UpdateAchievementDto extends PartialType(
+export class UpdateEventAchievementDto extends PartialType(
   CreateEventAchievementDto,
 ) {}

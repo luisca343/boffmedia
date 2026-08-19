@@ -5,19 +5,19 @@ import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
 import { ficusAiMessages } from '@/_db/schema/FicusAI';
 import { IFicusAiRepository } from './interfaces/ficusai.interface.repository';
 import { FicusMessage } from '../entities/ficus-message.entity';
-import { CreateMessageDto } from '../dto/create-message.dto';
+import { CreateFicusAiMessageDto } from '../dto/create-message.dto';
 import { BaseRepositoryImpl } from '@api/_utils/repositories/base-repository';
 
 @Injectable()
 export class FicusAIRepository
-  extends BaseRepositoryImpl<FicusMessage, CreateMessageDto, never>
+  extends BaseRepositoryImpl<FicusMessage, CreateFicusAiMessageDto, never>
   implements IFicusAiRepository
 {
   constructor(@Inject(DRIZZLE) db: MySql2Database<Record<string, never>>) {
     super(db, ficusAiMessages);
   }
 
-  async create(createMessageDto: CreateMessageDto): Promise<FicusMessage> {
+  async create(createMessageDto: CreateFicusAiMessageDto): Promise<FicusMessage> {
     const result = await this.db.insert(ficusAiMessages).values({
       uuid: createMessageDto.uuid,
       content: createMessageDto.content,

@@ -53,7 +53,7 @@ export const vgcSmogonSnapshots = mysqlTable(
     fetchedAt: timestamp('fetched_at').notNull(),
   },
   (t) => [
-    uniqueIndex('vgc_smogon_format_month_cutoff_idx').on(
+    uniqueIndex('tools_vgc_smogon_format_month_cutoff_uq').on(
       t.formatId,
       t.month,
       t.cutoff,
@@ -88,7 +88,7 @@ export const vgcSmogonPokemon = mysqlTable(
     fetchedAt: timestamp('fetched_at').notNull(),
   },
   (t) => [
-    uniqueIndex('vgc_smogon_pokemon_idx').on(
+    uniqueIndex('tools_vgc_smogon_pokemon_uq').on(
       t.formatId,
       t.month,
       t.cutoff,
@@ -97,7 +97,7 @@ export const vgcSmogonPokemon = mysqlTable(
   ],
 );
 
-export type VgcSmogonPokemonRow = typeof vgcSmogonPokemon.$inferSelect;
+export type VgcSmogonPokemon = typeof vgcSmogonPokemon.$inferSelect;
 
 /**
  * Single source of truth for all Showdown-format pastes, regardless of origin.
@@ -123,7 +123,7 @@ export const vgcPokepastes = mysqlTable(
     replicaCode: varchar('replica_code', { length: 20 }),
     fetchedAt: timestamp('fetched_at').notNull(),
   },
-  (t) => [index('vgc_pokepastes_format_idx').on(t.formatId)],
+  (t) => [index('tools_vgc_pokepastes_format_idx').on(t.formatId)],
 );
 
 export type VgcPokepaste = typeof vgcPokepastes.$inferSelect;
@@ -165,14 +165,14 @@ export const vgcPastesRepository = mysqlTable(
     fetchedAt: timestamp('fetched_at').notNull(),
   },
   (t) => [
-    index('vgc_pastes_repository_regulation_paste_idx').on(
+    index('tools_vgc_pastes_repository_regulation_paste_idx').on(
       t.regulationId,
       t.pasteId,
     ),
   ],
 );
 
-export type VgcPastesRepositoryEntry = typeof vgcPastesRepository.$inferSelect;
+export type VgcRepositoryPaste = typeof vgcPastesRepository.$inferSelect;
 
 /** One row per scraped Limitless tournament */
 export const vgcLimitlessTournaments = mysqlTable(
@@ -192,7 +192,7 @@ export const vgcLimitlessTournaments = mysqlTable(
     fetchedAt: timestamp('fetched_at').notNull(),
   },
   (t) => [
-    index('vgc_limitless_tournaments_regulation_status_idx').on(
+    index('tools_vgc_limitless_tournaments_regulation_status_idx').on(
       t.regulationId,
       t.status,
     ),
@@ -222,13 +222,13 @@ export const vgcLimitlessTeams = mysqlTable(
     fetchedAt: timestamp('fetched_at').notNull(),
   },
   (t) => [
-    index('vgc_limitless_teams_tournament_player_idx').on(
+    index('tools_vgc_limitless_teams_tournament_player_idx').on(
       t.tournamentId,
       t.playerSlug,
     ),
-    index('vgc_limitless_teams_paste_idx').on(t.pasteId),
+    index('tools_vgc_limitless_teams_paste_idx').on(t.pasteId),
     foreignKey({
-      name: 'vgc_lt_tournament_id_fk',
+      name: 'tools_vgc_lt_tournament_id_fk',
       columns: [t.tournamentId],
       foreignColumns: [vgcLimitlessTournaments.id],
     }).onDelete('cascade'),
@@ -265,8 +265,8 @@ export const vgcRegulations = mysqlTable(
     createdAt: timestamp('created_at').notNull().defaultNow(),
   },
   (t) => [
-    index('vgc_regulations_active_idx').on(t.active),
-    index('vgc_regulations_format_idx').on(t.formatId),
+    index('tools_vgc_regulations_active_idx').on(t.active),
+    index('tools_vgc_regulations_format_idx').on(t.formatId),
   ],
 );
 

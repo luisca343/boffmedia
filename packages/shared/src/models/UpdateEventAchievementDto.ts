@@ -2,7 +2,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export type UpdateAchievementDto = {
+export type UpdateEventAchievementDto = {
     /**
      * The name of the achievement
      */
@@ -26,21 +26,21 @@ export type UpdateAchievementDto = {
     /**
      * Type of item
      */
-    itemType?: UpdateAchievementDto.itemType;
+    itemType?: UpdateEventAchievementDto.itemType;
     /**
      * Category of the achievement
      */
-    category?: UpdateAchievementDto.category;
+    category?: UpdateEventAchievementDto.category;
     /**
      * Rarity of the achievement
      */
-    rarity?: UpdateAchievementDto.rarity;
+    rarity?: UpdateEventAchievementDto.rarity;
     /**
      * Display order
      */
     order?: number;
 };
-export namespace UpdateAchievementDto {
+export namespace UpdateEventAchievementDto {
     /**
      * Type of item
      */

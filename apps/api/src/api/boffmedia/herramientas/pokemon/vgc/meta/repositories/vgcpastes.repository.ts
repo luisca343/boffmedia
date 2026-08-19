@@ -5,7 +5,7 @@ import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
 import {
   vgcPastesRepository,
   vgcPokepastes,
-  VgcPastesRepositoryEntry,
+  VgcRepositoryPaste,
 } from '@/_db/schema/Vgc';
 
 @Injectable()
@@ -16,7 +16,7 @@ export class VgcPastesRepository {
 
   async findByRegulation(
     regulationId: string,
-  ): Promise<VgcPastesRepositoryEntry[]> {
+  ): Promise<VgcRepositoryPaste[]> {
     return this.db
       .select()
       .from(vgcPastesRepository)

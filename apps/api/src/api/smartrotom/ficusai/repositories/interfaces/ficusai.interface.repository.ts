@@ -1,10 +1,10 @@
 import { FicusMessage } from '../../entities/ficus-message.entity';
-import { CreateMessageDto } from '../../dto/create-message.dto';
+import { CreateFicusAiMessageDto } from '../../dto/create-message.dto';
 import { BaseRepository } from '@api/_utils/repositories/base-repository.interface';
 
 export interface IFicusAiRepository extends BaseRepository<
   FicusMessage,
-  CreateMessageDto,
+  CreateFicusAiMessageDto,
   never
 > {
   findByUuid(uuid: string, limit?: number): Promise<FicusMessage[]>;

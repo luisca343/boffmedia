@@ -212,7 +212,7 @@ CREATE TABLE `boffmedia_forum_categories` (
 	`updated_at` timestamp NOT NULL DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP,
 	`deleted_at` timestamp,
 	CONSTRAINT `boffmedia_forum_categories_id` PRIMARY KEY(`id`),
-	CONSTRAINT `fc_slug_idx` UNIQUE(`slug`)
+	CONSTRAINT `fc_slug_uq` UNIQUE(`slug`)
 );
 --> statement-breakpoint
 CREATE TABLE `boffmedia_forum_posts` (
@@ -252,7 +252,7 @@ CREATE TABLE `boffmedia_forum_votes` (
 	`thread_id` int NOT NULL,
 	`created_at` timestamp NOT NULL DEFAULT (now()),
 	CONSTRAINT `boffmedia_forum_votes_id` PRIMARY KEY(`id`),
-	CONSTRAINT `fv_user_thread_idx` UNIQUE(`user_id`,`thread_id`)
+	CONSTRAINT `fv_user_thread_uq` UNIQUE(`user_id`,`thread_id`)
 );
 --> statement-breakpoint
 CREATE TABLE `boffmedia_notifications` (
@@ -427,17 +427,6 @@ CREATE TABLE `boffmedia_tournaments` (
 	CONSTRAINT `boffmedia_tournaments_slug_unique` UNIQUE(`slug`)
 );
 --> statement-breakpoint
-CREATE TABLE `discord_users` (
-	`user_id` varchar(32) NOT NULL,
-	`username` varchar(32) NOT NULL,
-	`avatar` varchar(255),
-	`color` varchar(6),
-	`tts_voice` varchar(32) DEFAULT 'Enrique',
-	`created_at` timestamp NOT NULL DEFAULT (now()),
-	`updated_at` timestamp NOT NULL DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP,
-	CONSTRAINT `discord_users_user_id` PRIMARY KEY(`user_id`)
-);
---> statement-breakpoint
 CREATE TABLE `discord_quotes` (
 	`id` int AUTO_INCREMENT NOT NULL,
 	`discord_id` varchar(32) NOT NULL,
@@ -447,6 +436,17 @@ CREATE TABLE `discord_quotes` (
 	`created_at` timestamp NOT NULL DEFAULT (now()),
 	`updated_at` timestamp NOT NULL DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP,
 	CONSTRAINT `discord_quotes_id` PRIMARY KEY(`id`)
+);
+--> statement-breakpoint
+CREATE TABLE `discord_users` (
+	`user_id` varchar(32) NOT NULL,
+	`username` varchar(32) NOT NULL,
+	`avatar` varchar(255),
+	`color` varchar(6),
+	`tts_voice` varchar(32) DEFAULT 'Enrique',
+	`created_at` timestamp NOT NULL DEFAULT (now()),
+	`updated_at` timestamp NOT NULL DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP,
+	CONSTRAINT `discord_users_user_id` PRIMARY KEY(`user_id`)
 );
 --> statement-breakpoint
 CREATE TABLE `rotom_ficusai_messages` (
@@ -486,7 +486,7 @@ CREATE TABLE `launcher_releases` (
 	`created_at` timestamp NOT NULL DEFAULT (now()),
 	`updated_at` timestamp NOT NULL DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP,
 	CONSTRAINT `launcher_releases_id` PRIMARY KEY(`id`),
-	CONSTRAINT `launcher_releases_version_target_idx` UNIQUE(`version`,`target`)
+	CONSTRAINT `launcher_releases_version_target_uq` UNIQUE(`version`,`target`)
 );
 --> statement-breakpoint
 CREATE TABLE `pack_acl` (
@@ -1365,7 +1365,7 @@ CREATE TABLE `rotom_pc_marks` (
 	`created_at` timestamp NOT NULL DEFAULT (now()),
 	`updated_at` timestamp NOT NULL DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP,
 	CONSTRAINT `rotom_pc_marks_id` PRIMARY KEY(`id`),
-	CONSTRAINT `rotom_pc_marks_user_key_idx` UNIQUE(`user_uuid`,`pokemon_key`)
+	CONSTRAINT `rotom_pc_marks_user_key_uq` UNIQUE(`user_uuid`,`pokemon_key`)
 );
 --> statement-breakpoint
 CREATE TABLE `rotom_pokedex` (
@@ -1701,7 +1701,7 @@ CREATE TABLE `tools_tcg_user_cards` (
 	`created_at` timestamp NOT NULL DEFAULT (now()),
 	`updated_at` timestamp NOT NULL DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP,
 	CONSTRAINT `tools_tcg_user_cards_id` PRIMARY KEY(`id`),
-	CONSTRAINT `tcg_user_cards_user_card_uq` UNIQUE(`user_id`,`card_id`)
+	CONSTRAINT `tools_tcg_user_cards_user_card_uq` UNIQUE(`user_id`,`card_id`)
 );
 --> statement-breakpoint
 CREATE TABLE `tools_vgc_limitless_teams` (
@@ -1807,7 +1807,7 @@ CREATE TABLE `tools_vgc_smogon_pokemon` (
 	`spreads` text NOT NULL,
 	`fetched_at` timestamp NOT NULL,
 	CONSTRAINT `tools_vgc_smogon_pokemon_id` PRIMARY KEY(`id`),
-	CONSTRAINT `vgc_smogon_pokemon_idx` UNIQUE(`format_id`,`month`,`cutoff`,`species_id`)
+	CONSTRAINT `tools_vgc_smogon_pokemon_uq` UNIQUE(`format_id`,`month`,`cutoff`,`species_id`)
 );
 --> statement-breakpoint
 CREATE TABLE `tools_vgc_smogon_snapshots` (
@@ -1818,7 +1818,7 @@ CREATE TABLE `tools_vgc_smogon_snapshots` (
 	`pokemon_count` int NOT NULL DEFAULT 0,
 	`fetched_at` timestamp NOT NULL,
 	CONSTRAINT `tools_vgc_smogon_snapshots_id` PRIMARY KEY(`id`),
-	CONSTRAINT `vgc_smogon_format_month_cutoff_idx` UNIQUE(`format_id`,`month`,`cutoff`)
+	CONSTRAINT `tools_vgc_smogon_format_month_cutoff_uq` UNIQUE(`format_id`,`month`,`cutoff`)
 );
 --> statement-breakpoint
 CREATE TABLE `tools_vgc_matches` (
@@ -2055,7 +2055,7 @@ ALTER TABLE `tools_tcg_user_card_history` ADD CONSTRAINT `tools_tcg_user_card_hi
 ALTER TABLE `tools_tcg_user_cards` ADD CONSTRAINT `tools_tcg_user_cards_user_id_boffmedia_users_id_fk` FOREIGN KEY (`user_id`) REFERENCES `boffmedia_users`(`id`) ON DELETE cascade ON UPDATE cascade;--> statement-breakpoint
 ALTER TABLE `tools_tcg_user_cards` ADD CONSTRAINT `tools_tcg_user_cards_card_id_tools_tcg_cards_id_fk` FOREIGN KEY (`card_id`) REFERENCES `tools_tcg_cards`(`id`) ON DELETE cascade ON UPDATE cascade;--> statement-breakpoint
 ALTER TABLE `tools_vgc_limitless_teams` ADD CONSTRAINT `tools_vgc_limitless_teams_paste_id_tools_vgc_pokepastes_id_fk` FOREIGN KEY (`paste_id`) REFERENCES `tools_vgc_pokepastes`(`id`) ON DELETE set null ON UPDATE cascade;--> statement-breakpoint
-ALTER TABLE `tools_vgc_limitless_teams` ADD CONSTRAINT `vgc_lt_tournament_id_fk` FOREIGN KEY (`tournament_id`) REFERENCES `tools_vgc_limitless_tournaments`(`id`) ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE `tools_vgc_limitless_teams` ADD CONSTRAINT `tools_vgc_lt_tournament_id_fk` FOREIGN KEY (`tournament_id`) REFERENCES `tools_vgc_limitless_tournaments`(`id`) ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE `tools_vgc_pastes_repository` ADD CONSTRAINT `tools_vgc_pastes_repository_paste_id_tools_vgc_pokepastes_id_fk` FOREIGN KEY (`paste_id`) REFERENCES `tools_vgc_pokepastes`(`id`) ON DELETE set null ON UPDATE cascade;--> statement-breakpoint
 ALTER TABLE `tools_vgc_matches` ADD CONSTRAINT `tools_vgc_matches_session_id_tools_vgc_sessions_id_fk` FOREIGN KEY (`session_id`) REFERENCES `tools_vgc_sessions`(`id`) ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE `tools_vgc_matches` ADD CONSTRAINT `tools_vgc_matches_user_id_boffmedia_users_id_fk` FOREIGN KEY (`user_id`) REFERENCES `boffmedia_users`(`id`) ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
@@ -2104,8 +2104,8 @@ CREATE INDEX `t_game_idx` ON `boffmedia_tournaments` (`game_id`);--> statement-b
 CREATE INDEX `t_event_idx` ON `boffmedia_tournaments` (`event_id`);--> statement-breakpoint
 CREATE INDEX `t_status_idx` ON `boffmedia_tournaments` (`status`);--> statement-breakpoint
 CREATE INDEX `t_format_idx` ON `boffmedia_tournaments` (`format`);--> statement-breakpoint
-CREATE INDEX `ficus_quotes_server_idx` ON `discord_quotes` (`server_id`,`created_at`);--> statement-breakpoint
-CREATE INDEX `ficus_messages_owner_recent_idx` ON `rotom_ficusai_messages` (`uuid`,`id`);--> statement-breakpoint
+CREATE INDEX `discord_quotes_server_idx` ON `discord_quotes` (`server_id`,`created_at`);--> statement-breakpoint
+CREATE INDEX `rotom_ficusai_messages_owner_recent_idx` ON `rotom_ficusai_messages` (`uuid`,`id`);--> statement-breakpoint
 CREATE INDEX `ldc_user_idx` ON `launcher_device_codes` (`user_id`);--> statement-breakpoint
 CREATE INDEX `ldc_expires_idx` ON `launcher_device_codes` (`expires_at`);--> statement-breakpoint
 CREATE INDEX `launcher_releases_target_published_idx` ON `launcher_releases` (`target`,`published`);--> statement-breakpoint
@@ -2167,10 +2167,10 @@ CREATE INDEX `wp_olines_listing_idx` ON `rotom_wigglypop_order_lines` (`listing_
 CREATE INDEX `wp_orders_buyer_idx` ON `rotom_wigglypop_orders` (`buyer_uuid`);--> statement-breakpoint
 CREATE INDEX `wp_reviews_seller_idx` ON `rotom_wigglypop_reviews` (`seller_uuid`);--> statement-breakpoint
 CREATE INDEX `wp_trades_listing_idx` ON `rotom_wigglypop_trade_offers` (`listing_id`);--> statement-breakpoint
-CREATE INDEX `vgc_limitless_teams_tournament_player_idx` ON `tools_vgc_limitless_teams` (`tournament_id`,`player_slug`);--> statement-breakpoint
-CREATE INDEX `vgc_limitless_teams_paste_idx` ON `tools_vgc_limitless_teams` (`paste_id`);--> statement-breakpoint
-CREATE INDEX `vgc_limitless_tournaments_regulation_status_idx` ON `tools_vgc_limitless_tournaments` (`regulation_id`,`status`);--> statement-breakpoint
-CREATE INDEX `vgc_pastes_repository_regulation_paste_idx` ON `tools_vgc_pastes_repository` (`regulation_id`,`paste_id`);--> statement-breakpoint
-CREATE INDEX `vgc_pokepastes_format_idx` ON `tools_vgc_pokepastes` (`format_id`);--> statement-breakpoint
-CREATE INDEX `vgc_regulations_active_idx` ON `tools_vgc_regulations` (`active`);--> statement-breakpoint
-CREATE INDEX `vgc_regulations_format_idx` ON `tools_vgc_regulations` (`format_id`);
+CREATE INDEX `tools_vgc_limitless_teams_tournament_player_idx` ON `tools_vgc_limitless_teams` (`tournament_id`,`player_slug`);--> statement-breakpoint
+CREATE INDEX `tools_vgc_limitless_teams_paste_idx` ON `tools_vgc_limitless_teams` (`paste_id`);--> statement-breakpoint
+CREATE INDEX `tools_vgc_limitless_tournaments_regulation_status_idx` ON `tools_vgc_limitless_tournaments` (`regulation_id`,`status`);--> statement-breakpoint
+CREATE INDEX `tools_vgc_pastes_repository_regulation_paste_idx` ON `tools_vgc_pastes_repository` (`regulation_id`,`paste_id`);--> statement-breakpoint
+CREATE INDEX `tools_vgc_pokepastes_format_idx` ON `tools_vgc_pokepastes` (`format_id`);--> statement-breakpoint
+CREATE INDEX `tools_vgc_regulations_active_idx` ON `tools_vgc_regulations` (`active`);--> statement-breakpoint
+CREATE INDEX `tools_vgc_regulations_format_idx` ON `tools_vgc_regulations` (`format_id`);

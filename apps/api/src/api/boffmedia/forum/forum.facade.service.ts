@@ -11,7 +11,7 @@ import { SuccessResponse } from '@api/_utils/entities/common-response.entity';
 import { ListThreadsQueryDto } from './dto/list-threads-query.dto';
 import { ListPostsQueryDto } from './dto/list-posts-query.dto';
 import { CreateThreadDto } from './dto/create-thread.dto';
-import { CreatePostDto } from './dto/create-post.dto';
+import { CreateForumPostDto } from './dto/create-post.dto';
 import { SolveThreadDto } from './dto/solve-thread.dto';
 import { EditPostDto } from './dto/edit-post.dto';
 import { ForumCategory } from './entities/forum-category.entity';
@@ -103,7 +103,7 @@ export class ForumFacadeService {
   createPost(
     threadId: number,
     userId: number,
-    dto: CreatePostDto,
+    dto: CreateForumPostDto,
   ): Promise<ForumPost> {
     return this.postsService.createReply(threadId, userId, dto.body);
   }

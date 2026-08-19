@@ -27,7 +27,7 @@ import { UpdateEventDto } from './dto/update-event.dto';
 import { CreateGameDto } from './dto/create-game.dto';
 import { UpdateGameDto } from './dto/update-game.dto';
 import { CreateEventAchievementDto } from './dto/create-achievement.dto';
-import { UpdateAchievementDto } from './dto/update-achievement.dto';
+import { UpdateEventAchievementDto } from './dto/update-achievement.dto';
 import { CreateTeamDto } from './dto/create-team.dto';
 import { UpdateTeamDto } from './dto/update-team.dto';
 import { JoinEventDto } from './dto/join-event.dto';
@@ -296,7 +296,7 @@ export class EventsFacadeService {
   async updateAchievement(
     eventId: number,
     id: number,
-    updateAchievementDto: UpdateAchievementDto,
+    updateAchievementDto: UpdateEventAchievementDto,
   ): Promise<EventAchievement> {
     const [eventExists, achievementExists] = await Promise.all([
       this.eventsService.validateEventExists(eventId),

@@ -66,7 +66,7 @@ export const boffMediaRoles = mysqlTable('boffmedia_roles', {
   name: varchar('name', { length: 32 }).notNull().unique(),
 });
 
-export type BoffMediaPermission = typeof boffMediaRoles.$inferSelect;
+export type BoffMediaRole = typeof boffMediaRoles.$inferSelect;
 
 export const boffMediaUserRoles = mysqlTable('boffmedia_user_roles', {
   id: int('id').primaryKey().autoincrement(),
@@ -84,4 +84,4 @@ export const boffMediaUserRoles = mysqlTable('boffmedia_user_roles', {
     }),
 });
 
-export type BoffMediaUserPermission = typeof boffMediaUserRoles.$inferSelect;
+export type BoffMediaUserRole = typeof boffMediaUserRoles.$inferSelect;

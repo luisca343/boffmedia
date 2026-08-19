@@ -10,7 +10,7 @@ import { Type } from 'class-transformer';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { BaseDto } from '@api/_utils/dto/base.dto';
 
-export class CreateTournamentDto extends BaseDto {
+export class CreateLigaTournamentDto extends BaseDto {
   @ApiProperty()
   @IsString()
   @IsNotEmpty()

@@ -213,7 +213,7 @@ export const packAcl = mysqlTable(
   }),
 );
 
-export type PackAclRow = typeof packAcl.$inferSelect;
+export type PackAcl = typeof packAcl.$inferSelect;
 
 /** §7.2 — onboarding without knowing a UUID in advance. */
 export const packInvites = mysqlTable(
@@ -264,4 +264,4 @@ export const packAudit = mysqlTable(
   }),
 );
 
-export type PackAuditRow = typeof packAudit.$inferSelect;
+export type PackAudit = typeof packAudit.$inferSelect;

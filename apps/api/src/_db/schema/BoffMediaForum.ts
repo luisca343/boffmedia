@@ -41,7 +41,7 @@ export const boffMediaForumCategories = mysqlTable(
   },
   (table) => {
     return {
-      slugIdx: uniqueIndex('fc_slug_idx').on(table.slug),
+      slugIdx: uniqueIndex('fc_slug_uq').on(table.slug),
     };
   },
 );
@@ -157,7 +157,7 @@ export const boffMediaForumVotes = mysqlTable(
       })
         .onDelete('cascade')
         .onUpdate('cascade'),
-      userThreadIdx: uniqueIndex('fv_user_thread_idx').on(
+      userThreadIdx: uniqueIndex('fv_user_thread_uq').on(
         table.userId,
         table.threadId,
       ),

@@ -25,7 +25,7 @@ export const discordQuotes = mysqlTable(
   },
   // Every Discord command filters by guild, and half of them order by recency.
   (t) => ({
-    serverIdx: index('ficus_quotes_server_idx').on(t.serverId, t.createdAt),
+    serverIdx: index('discord_quotes_server_idx').on(t.serverId, t.createdAt),
   }),
 );
 

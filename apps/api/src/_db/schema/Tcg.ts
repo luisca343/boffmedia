@@ -92,7 +92,7 @@ export const tcgUserCards = mysqlTable(
   // MySQL cannot have — the live table only ever got PRIMARY KEY(id), so the
   // rule was unenforced. It is a unique index now (migration 0036).
   (table) => ({
-    userCardUq: uniqueIndex('tcg_user_cards_user_card_uq').on(
+    userCardUq: uniqueIndex('tools_tcg_user_cards_user_card_uq').on(
       table.userId,
       table.cardId,
     ),

@@ -2,7 +2,7 @@ import { Injectable, Inject } from '@nestjs/common';
 import { FICUSAI_REPOSITORY_TOKEN } from '@api/_utils/repositories/interfaces/repository.token';
 import { IFicusAiRepository } from '../repositories/interfaces/ficusai.interface.repository';
 import { FicusMessage } from '../entities/ficus-message.entity';
-import { CreateMessageDto } from '../dto/create-message.dto';
+import { CreateFicusAiMessageDto } from '../dto/create-message.dto';
 import { FicusMessageContentDto } from '../dto/ficus-message-content.dto';
 import { MessageSender } from '../enums/message-sender.enum';
 import { MessagePartType } from '../dto/message-part.dto';
@@ -52,7 +52,7 @@ export class MessageService {
   ): Promise<FicusMessage> {
     this.validateUuid(uuid);
 
-    const createMessageDto: CreateMessageDto = {
+    const createMessageDto: CreateFicusAiMessageDto = {
       uuid,
       content: messageContent,
     };

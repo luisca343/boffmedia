@@ -31,7 +31,7 @@ import { ForumFacadeService } from './forum.facade.service';
 import { ListThreadsQueryDto } from './dto/list-threads-query.dto';
 import { ListPostsQueryDto } from './dto/list-posts-query.dto';
 import { CreateThreadDto } from './dto/create-thread.dto';
-import { CreatePostDto } from './dto/create-post.dto';
+import { CreateForumPostDto } from './dto/create-post.dto';
 import { SolveThreadDto } from './dto/solve-thread.dto';
 import { EditPostDto } from './dto/edit-post.dto';
 import { SetPinnedDto } from './dto/set-pinned.dto';
@@ -185,7 +185,7 @@ export class ForumController {
   })
   async createPost(
     @Param('id', ParseIntPipe) id: number,
-    @Body() dto: CreatePostDto,
+    @Body() dto: CreateForumPostDto,
     @Req() req: AuthedRequest,
   ): Promise<ForumPost> {
     return this.forumFacadeService.createPost(id, req.user.userId, dto);

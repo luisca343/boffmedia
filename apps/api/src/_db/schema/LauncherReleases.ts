@@ -58,7 +58,7 @@ export const launcherReleases = mysqlTable(
     // Re-uploading the same (version, target) replaces the row rather than
     // creating a second one — two rows would make "the latest" ambiguous and
     // the feed would flip between them.
-    versionTargetIdx: uniqueIndex('launcher_releases_version_target_idx').on(
+    versionTargetIdx: uniqueIndex('launcher_releases_version_target_uq').on(
       table.version,
       table.target,
     ),

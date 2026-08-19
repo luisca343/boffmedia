@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { AchievementsRepository } from '../../../_repositories/boffmedia/achievements.repository';
 import { Achievement } from '@/_db/schema/BoffMediaEvents';
 import { CreateEventAchievementDto } from '../dto/create-achievement.dto';
-import { UpdateAchievementDto } from '../dto/update-achievement.dto';
+import { UpdateEventAchievementDto } from '../dto/update-achievement.dto';
 
 @Injectable()
 export class AchievementsService {
@@ -52,7 +52,7 @@ export class AchievementsService {
 
   async updateAchievement(
     id: number,
-    updateAchievementDto: UpdateAchievementDto,
+    updateAchievementDto: UpdateEventAchievementDto,
   ): Promise<Achievement> {
     // Only the keys actually sent are written: `maxProgress || 1` turned any
     // partial PATCH into a silent reset to 1 (instantly "completing" every

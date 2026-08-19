@@ -6,7 +6,7 @@ import {
   vgcSmogonSnapshots,
   vgcSmogonPokemon,
   VgcSmogonSnapshot,
-  VgcSmogonPokemonRow,
+  VgcSmogonPokemon,
 } from '@/_db/schema/Vgc';
 
 type PokemonInsert = typeof vgcSmogonPokemon.$inferInsert;
@@ -104,7 +104,7 @@ export class SmogonRepository {
     formatId: string,
     month: string,
     cutoff: number,
-  ): Promise<VgcSmogonPokemonRow[]> {
+  ): Promise<VgcSmogonPokemon[]> {
     return this.db
       .select()
       .from(vgcSmogonPokemon)
@@ -123,7 +123,7 @@ export class SmogonRepository {
     month: string,
     cutoff: number,
     speciesId: string,
-  ): Promise<VgcSmogonPokemonRow | null> {
+  ): Promise<VgcSmogonPokemon | null> {
     const [row] = await this.db
       .select()
       .from(vgcSmogonPokemon)

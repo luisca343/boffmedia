@@ -1,7 +1,7 @@
 {
   "version": "5",
   "dialect": "mysql",
-  "id": "5a68c955-bdf9-4198-b409-1b11e2741b80",
+  "id": "3e6fa841-7fe1-4caa-9809-010c2efc4a0f",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "boffmedia_roles": {
@@ -1810,8 +1810,8 @@
         }
       },
       "indexes": {
-        "fc_slug_idx": {
-          "name": "fc_slug_idx",
+        "fc_slug_uq": {
+          "name": "fc_slug_uq",
           "columns": [
             "slug"
           ],
@@ -2162,8 +2162,8 @@
         }
       },
       "indexes": {
-        "fv_user_thread_idx": {
-          "name": "fv_user_thread_idx",
+        "fv_user_thread_uq": {
+          "name": "fv_user_thread_uq",
           "columns": [
             "user_id",
             "thread_id"
@@ -3803,6 +3803,98 @@
       },
       "checkConstraint": {}
     },
+    "discord_quotes": {
+      "name": "discord_quotes",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "discord_id": {
+          "name": "discord_id",
+          "type": "varchar(32)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "server_id": {
+          "name": "server_id",
+          "type": "varchar(32)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "quote": {
+          "name": "quote",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "comment": {
+          "name": "comment",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(now())"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "onUpdate": true,
+          "default": "(now())"
+        }
+      },
+      "indexes": {
+        "discord_quotes_server_idx": {
+          "name": "discord_quotes_server_idx",
+          "columns": [
+            "server_id",
+            "created_at"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "discord_quotes_discord_id_discord_users_user_id_fk": {
+          "name": "discord_quotes_discord_id_discord_users_user_id_fk",
+          "tableFrom": "discord_quotes",
+          "tableTo": "discord_users",
+          "columnsFrom": [
+            "discord_id"
+          ],
+          "columnsTo": [
+            "user_id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        }
+      },
+      "compositePrimaryKeys": {
+        "discord_quotes_id": {
+          "name": "discord_quotes_id",
+          "columns": [
+            "id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
     "discord_users": {
       "name": "discord_users",
       "columns": {
@@ -3873,98 +3965,6 @@
       "uniqueConstraints": {},
       "checkConstraint": {}
     },
-    "discord_quotes": {
-      "name": "discord_quotes",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "int",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": true
-        },
-        "discord_id": {
-          "name": "discord_id",
-          "type": "varchar(32)",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "server_id": {
-          "name": "server_id",
-          "type": "varchar(32)",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "quote": {
-          "name": "quote",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "comment": {
-          "name": "comment",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": "(now())"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "onUpdate": true,
-          "default": "(now())"
-        }
-      },
-      "indexes": {
-        "ficus_quotes_server_idx": {
-          "name": "ficus_quotes_server_idx",
-          "columns": [
-            "server_id",
-            "created_at"
-          ],
-          "isUnique": false
-        }
-      },
-      "foreignKeys": {
-        "discord_quotes_discord_id_discord_users_user_id_fk": {
-          "name": "discord_quotes_discord_id_discord_users_user_id_fk",
-          "tableFrom": "discord_quotes",
-          "tableTo": "discord_users",
-          "columnsFrom": [
-            "discord_id"
-          ],
-          "columnsTo": [
-            "user_id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "cascade"
-        }
-      },
-      "compositePrimaryKeys": {
-        "discord_quotes_id": {
-          "name": "discord_quotes_id",
-          "columns": [
-            "id"
-          ]
-        }
-      },
-      "uniqueConstraints": {},
-      "checkConstraint": {}
-    },
     "rotom_ficusai_messages": {
       "name": "rotom_ficusai_messages",
       "columns": {
@@ -4008,8 +4008,8 @@
         }
       },
       "indexes": {
-        "ficus_messages_owner_recent_idx": {
-          "name": "ficus_messages_owner_recent_idx",
+        "rotom_ficusai_messages_owner_recent_idx": {
+          "name": "rotom_ficusai_messages_owner_recent_idx",
           "columns": [
             "uuid",
             "id"
@@ -4254,8 +4254,8 @@
         }
       },
       "indexes": {
-        "launcher_releases_version_target_idx": {
-          "name": "launcher_releases_version_target_idx",
+        "launcher_releases_version_target_uq": {
+          "name": "launcher_releases_version_target_uq",
           "columns": [
             "version",
             "target"
@@ -10927,8 +10927,8 @@
         }
       },
       "indexes": {
-        "rotom_pc_marks_user_key_idx": {
-          "name": "rotom_pc_marks_user_key_idx",
+        "rotom_pc_marks_user_key_uq": {
+          "name": "rotom_pc_marks_user_key_uq",
           "columns": [
             "user_uuid",
             "pokemon_key"
@@ -13730,8 +13730,8 @@
         }
       },
       "indexes": {
-        "tcg_user_cards_user_card_uq": {
-          "name": "tcg_user_cards_user_card_uq",
+        "tools_tcg_user_cards_user_card_uq": {
+          "name": "tools_tcg_user_cards_user_card_uq",
           "columns": [
             "user_id",
             "card_id"
@@ -13839,16 +13839,16 @@
         }
       },
       "indexes": {
-        "vgc_limitless_teams_tournament_player_idx": {
-          "name": "vgc_limitless_teams_tournament_player_idx",
+        "tools_vgc_limitless_teams_tournament_player_idx": {
+          "name": "tools_vgc_limitless_teams_tournament_player_idx",
           "columns": [
             "tournament_id",
             "player_slug"
           ],
           "isUnique": false
         },
-        "vgc_limitless_teams_paste_idx": {
-          "name": "vgc_limitless_teams_paste_idx",
+        "tools_vgc_limitless_teams_paste_idx": {
+          "name": "tools_vgc_limitless_teams_paste_idx",
           "columns": [
             "paste_id"
           ],
@@ -13869,8 +13869,8 @@
           "onDelete": "set null",
           "onUpdate": "cascade"
         },
-        "vgc_lt_tournament_id_fk": {
-          "name": "vgc_lt_tournament_id_fk",
+        "tools_vgc_lt_tournament_id_fk": {
+          "name": "tools_vgc_lt_tournament_id_fk",
           "tableFrom": "tools_vgc_limitless_teams",
           "tableTo": "tools_vgc_limitless_tournaments",
           "columnsFrom": [
@@ -13986,8 +13986,8 @@
         }
       },
       "indexes": {
-        "vgc_limitless_tournaments_regulation_status_idx": {
-          "name": "vgc_limitless_tournaments_regulation_status_idx",
+        "tools_vgc_limitless_tournaments_regulation_status_idx": {
+          "name": "tools_vgc_limitless_tournaments_regulation_status_idx",
           "columns": [
             "regulation_id",
             "status"
@@ -14132,8 +14132,8 @@
         }
       },
       "indexes": {
-        "vgc_pastes_repository_regulation_paste_idx": {
-          "name": "vgc_pastes_repository_regulation_paste_idx",
+        "tools_vgc_pastes_repository_regulation_paste_idx": {
+          "name": "tools_vgc_pastes_repository_regulation_paste_idx",
           "columns": [
             "regulation_id",
             "paste_id"
@@ -14242,8 +14242,8 @@
         }
       },
       "indexes": {
-        "vgc_pokepastes_format_idx": {
-          "name": "vgc_pokepastes_format_idx",
+        "tools_vgc_pokepastes_format_idx": {
+          "name": "tools_vgc_pokepastes_format_idx",
           "columns": [
             "format_id"
           ],
@@ -14377,15 +14377,15 @@
         }
       },
       "indexes": {
-        "vgc_regulations_active_idx": {
-          "name": "vgc_regulations_active_idx",
+        "tools_vgc_regulations_active_idx": {
+          "name": "tools_vgc_regulations_active_idx",
           "columns": [
             "active"
           ],
           "isUnique": false
         },
-        "vgc_regulations_format_idx": {
-          "name": "vgc_regulations_format_idx",
+        "tools_vgc_regulations_format_idx": {
+          "name": "tools_vgc_regulations_format_idx",
           "columns": [
             "format_id"
           ],
@@ -14542,8 +14542,8 @@
         }
       },
       "indexes": {
-        "vgc_smogon_pokemon_idx": {
-          "name": "vgc_smogon_pokemon_idx",
+        "tools_vgc_smogon_pokemon_uq": {
+          "name": "tools_vgc_smogon_pokemon_uq",
           "columns": [
             "format_id",
             "month",
@@ -14613,8 +14613,8 @@
         }
       },
       "indexes": {
-        "vgc_smogon_format_month_cutoff_idx": {
-          "name": "vgc_smogon_format_month_cutoff_idx",
+        "tools_vgc_smogon_format_month_cutoff_uq": {
+          "name": "tools_vgc_smogon_format_month_cutoff_uq",
           "columns": [
             "format_id",
             "month",

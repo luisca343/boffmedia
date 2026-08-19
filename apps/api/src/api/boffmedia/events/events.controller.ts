@@ -46,7 +46,7 @@ import { Event } from './entities/event.entity';
 import { Game } from './entities/game.entity';
 import { EventAchievement } from './entities/achievement.entity';
 import { AchievementWithProgress } from './entities/achievement-with-progress.entity';
-import { UpdateAchievementDto } from './dto/update-achievement.dto';
+import { UpdateEventAchievementDto } from './dto/update-achievement.dto';
 import { Team } from './entities/team.entity';
 import { TeamMember } from './entities/team-member.entity';
 import { Participant } from './entities/participant.entity';
@@ -402,7 +402,7 @@ export class EventsController {
   async updateAchievement(
     @Param('eventId') eventId: number,
     @Param('achievementId') achievementId: number,
-    @Body() updateAchievementDto: UpdateAchievementDto,
+    @Body() updateAchievementDto: UpdateEventAchievementDto,
   ): Promise<EventAchievement> {
     return await this.eventsFacadeService.updateAchievement(
       eventId,

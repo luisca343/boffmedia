@@ -12,7 +12,7 @@ import type {
   CreateGameDto,
   UpdateGameDto,
   CreateEventAchievementDto as CreateAchievementDto,
-  UpdateAchievementDto,
+  UpdateEventAchievementDto as UpdateAchievementDto,
   CreateTeamDto,
   UpdateTeamDto,
   UpdateProgressDto,

@@ -19,7 +19,7 @@ import {
 } from '@nestjs/swagger';
 import { LigaFacadeService } from './liga.facade.service';
 import {
-  CreateTournamentDto,
+  CreateLigaTournamentDto,
   TournamentRegistrationDto,
 } from './dto/tournament.dto';
 import { PaginationQueryDto } from '@api/_utils/dto/pagination.dto';
@@ -233,7 +233,7 @@ export class LigaController {
       },
     },
   })
-  async createTournament(@Body() tournamentRequest: CreateTournamentDto) {
+  async createTournament(@Body() tournamentRequest: CreateLigaTournamentDto) {
     return await this.ligaFacadeService.createTournament(tournamentRequest);
   }
 

@@ -18,7 +18,7 @@ import {
   NewRandomizerConfig,
   RandomizerAssignment,
   NewRandomizerAssignment,
-  RandomizerAuditRow,
+  RandomizerAudit,
   RandomizerPreset,
   NewRandomizerPreset,
   RandomizerRom,
@@ -586,7 +586,7 @@ export class RandomizerRepository {
           action: row.action,
           actor: row.actor || null,
           meta: row.meta || null,
-        } as RandomizerAuditRow)
+        } as RandomizerAudit)
         .execute();
     } catch (error: any) {
       this.logger.error('Failed to append audit record:', error);

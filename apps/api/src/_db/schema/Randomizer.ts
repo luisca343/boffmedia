@@ -195,7 +195,7 @@ export const randomizerAudit = mysqlTable(
   }),
 );
 
-export type RandomizerAuditRow = typeof randomizerAudit.$inferSelect;
+export type RandomizerAudit = typeof randomizerAudit.$inferSelect;
 
 export const randomizerPresets = mysqlTable(
   'tools_randomizer_presets',

@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsString, Length } from 'class-validator';
 
-export class CreatePostDto {
+export class CreateForumPostDto {
   @ApiProperty({
     example: 'Prueba a subir la velocidad base...',
     minLength: 1,

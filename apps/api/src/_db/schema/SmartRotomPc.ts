@@ -36,7 +36,7 @@ export const rotomPcMarks = mysqlTable(
     updatedAt: timestamp('updated_at').notNull().defaultNow().onUpdateNow(),
   },
   (t) => ({
-    userKeyIdx: uniqueIndex('rotom_pc_marks_user_key_idx').on(
+    userKeyIdx: uniqueIndex('rotom_pc_marks_user_key_uq').on(
       t.userUuid,
       t.pokemonKey,
     ),
