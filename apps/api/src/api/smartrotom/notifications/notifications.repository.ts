@@ -63,7 +63,7 @@ export class NotificationsRepository implements INotificationsRepository {
   async markRead(id: number, userUuid: string): Promise<void> {
     await this.db
       .update(rotomNotifications)
-      .set({ isRead: 1 })
+      .set({ isRead: true })
       .where(
         and(
           eq(rotomNotifications.id, id),
@@ -75,7 +75,7 @@ export class NotificationsRepository implements INotificationsRepository {
   async markAllRead(userUuid: string): Promise<void> {
     await this.db
       .update(rotomNotifications)
-      .set({ isRead: 1 })
+      .set({ isRead: true })
       .where(eq(rotomNotifications.userUuid, userUuid));
   }
 }

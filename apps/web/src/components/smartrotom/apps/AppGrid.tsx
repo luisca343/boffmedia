@@ -2,7 +2,6 @@
 import { useCallback } from "react"
 import { motion } from "framer-motion"
 import { useOrderApps } from "@/hooks/apps/useOrderApps"
-import { useRotomUuid } from "@/components/smartrotom/behavior/useRotomUuid"
 import { SortableContext } from "@dnd-kit/sortable"
 import { DndContext, type DragEndEvent, DragOverlay } from "@dnd-kit/core"
 import { SmartRotomAppExtended } from "@/types"
@@ -24,7 +23,6 @@ interface AppGridProps {
 }
 
 export default function AppGrid({ apps, setApps, className }: AppGridProps) {
-  const uuid = useRotomUuid()
   const { orderApps, isLoading } = useOrderApps()
   const t = useTranslations("smartrotom.appGrid")
   
@@ -90,13 +88,11 @@ export default function AppGrid({ apps, setApps, className }: AppGridProps) {
       order: app.order || 0 
     }))
     
-    orderApps({ 
-      order: orderUpdates, 
-      uuid: uuid!
-    })
+    // Identity comes from the session — OrderAppDto no longer carries a uuid.
+    orderApps({ order: orderUpdates })
 
     setApps(updatedApps)
-  }, [apps, setApps, uuid, orderApps])
+  }, [apps, setApps, orderApps])
 
   if (isLoading) {
     return (

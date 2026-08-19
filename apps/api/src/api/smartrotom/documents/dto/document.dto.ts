@@ -1,6 +1,13 @@
 import { BaseDto } from '@api/_utils/dto/base.dto';
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString, IsInt, IsOptional, Min } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsString,
+  IsInt,
+  IsOptional,
+  Min,
+  IsBoolean,
+} from 'class-validator';
 
 export class CreateDocumentDto extends BaseDto {
   @ApiProperty({
@@ -60,21 +67,21 @@ export class UpdateDocumentDto extends BaseDto {
 
   @ApiProperty({
     description: 'Whether the document is public',
-    example: 1,
+    example: true,
     required: false,
   })
   @IsOptional()
-  @IsInt()
-  public?: number;
+  @IsBoolean()
+  public?: boolean;
 
   @ApiProperty({
-    description: 'Whether the document is pinned (0 = no, 1 = pinned)',
-    example: 1,
+    description: 'Whether the document is pinned',
+    example: true,
     required: false,
   })
   @IsOptional()
-  @IsInt()
-  pinned?: number;
+  @IsBoolean()
+  pinned?: boolean;
 
   @ApiProperty({
     type: Number,

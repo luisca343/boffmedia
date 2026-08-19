@@ -16,15 +16,15 @@ export interface CreateDocumentRequest {
   title: string;
   content: string;
   type: number;
-  public?: number;
+  public?: boolean;
 }
 
 export interface UpdateDocumentRequest {
   title?: string;
   content?: string;
   type?: number;
-  public?: number;
-  pinned?: number;
+  public?: boolean;
+  pinned?: boolean;
   folderId?: number | null;
 }
 
@@ -110,7 +110,7 @@ export class DocumentService {
       title: title.trim(),
       content: content.trim(),
       type,
-      public: isPublic || 0,
+      public: isPublic ?? false,
     });
 
     return this.requireDocument(result.insertId);

@@ -1,4 +1,5 @@
 import {
+  boolean,
   char,
   bigint,
   decimal,
@@ -28,6 +29,11 @@ const regionId = (name = 'region_id') => varchar(name, { length: 128 });
 // vary table by table, which made these columns a mismatch against
 // `rotom_users.uuid` and unusable as clean join keys.
 const playerUuid = (name: string) => char(name, { length: 36 });
+
+// Actor columns carry the `_uuid` suffix because they hold a PLAYER identity.
+// `created_by` alone is an `int` Boffmedia user id elsewhere in the schema
+// (pack_versions, pack_invites, randomizer_presets), so an unsuffixed name here
+// meant the same column name denoted two different identities.
 
 // ─── Urbanismo ────────────────────────────────────────────────────────────────
 
@@ -106,7 +112,7 @@ export const gobiernoSubastas = mysqlTable(
     // FK named explicitly below: the auto-generated name exceeds MySQL's
     // 64-char identifier limit.
     settledTxId: int('settled_tx_id'),
-    createdBy: playerUuid('created_by').notNull(),
+    createdByUuid: playerUuid('created_by_uuid').notNull(),
     createdAt: timestamp('created_at').notNull().defaultNow(),
     updatedAt: timestamp('updated_at').notNull().defaultNow().onUpdateNow(),
   },
@@ -155,7 +161,7 @@ export const gobiernoDenuncias = mysqlTable('rotom_gobierno_denuncias', {
   status: varchar('status', { length: 16 }).notNull().default('pending'),
   description: text('description').notNull(),
   resolution: text('resolution'),
-  resolvedBy: playerUuid('resolved_by'),
+  resolvedByUuid: playerUuid('resolved_by_uuid'),
   resolvedAt: timestamp('resolved_at'),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow().onUpdateNow(),
@@ -173,10 +179,10 @@ export const gobiernoBuscados = mysqlTable(
     status: varchar('status', { length: 16 }).notNull().default('active'),
     bounty: bigint('bounty', { mode: 'number' }).notNull().default(0),
     offense: varchar('offense', { length: 255 }).notNull(),
-    reportedBy: playerUuid('reported_by').notNull(),
+    reportedByUuid: playerUuid('reported_by_uuid').notNull(),
     lastSeen: varchar('last_seen', { length: 128 }),
     notes: text('notes'),
-    capturedBy: playerUuid('captured_by'),
+    capturedByUuid: playerUuid('captured_by_uuid'),
     capturedAt: timestamp('captured_at'),
     // The StarBank transfer that paid the bounty out of the treasury to the captor.
     // FK named explicitly below: the auto-generated name exceeds MySQL's
@@ -271,7 +277,7 @@ export const gobiernoMultas = mysqlTable(
     amount: bigint('amount', { mode: 'number' }).notNull(),
     status: varchar('status', { length: 16 }).notNull().default('pending'),
     reason: varchar('reason', { length: 255 }).notNull(),
-    issuedBy: playerUuid('issued_by').notNull(),
+    issuedByUuid: playerUuid('issued_by_uuid').notNull(),
     denunciaId: int('denuncia_id').references(() => gobiernoDenuncias.id, {
       onDelete: 'set null',
       onUpdate: 'cascade',
@@ -306,7 +312,7 @@ export const gobiernoTasas = mysqlTable('rotom_gobierno_tasas', {
   kind: varchar('kind', { length: 32 }).notNull(),
   rate: varchar('rate', { length: 64 }).notNull(),
   amount: bigint('amount', { mode: 'number' }).notNull().default(0),
-  active: tinyint('active').notNull().default(1),
+  active: boolean('active').notNull().default(true),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow().onUpdateNow(),
 });
@@ -404,7 +410,7 @@ export const gobiernoAnuncios = mysqlTable('rotom_gobierno_anuncios', {
   body: text('body').notNull(),
   town: varchar('town', { length: 64 }),
   authorUuid: playerUuid('author_uuid').notNull(),
-  pinned: tinyint('pinned').notNull().default(0),
+  pinned: boolean('pinned').notNull().default(false),
   audience: varchar('audience', { length: 16 }).notNull().default('public'),
   publishedAt: timestamp('published_at').notNull().defaultNow(),
   createdAt: timestamp('created_at').notNull().defaultNow(),
@@ -460,7 +466,7 @@ export const gobiernoEventos = mysqlTable('rotom_gobierno_eventos', {
   rules: text('rules'),
   // { tamano, ivs, shiny, nivel, especie } — the public scoring weights of a hunt.
   weights: json('weights'),
-  createdBy: playerUuid('created_by').notNull(),
+  createdByUuid: playerUuid('created_by_uuid').notNull(),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow().onUpdateNow(),
 });
@@ -621,7 +627,7 @@ export const gobiernoCarteles = mysqlTable('rotom_gobierno_carteles', {
   highway: varchar('highway', { length: 64 }).notNull(),
   // [{ dest, dist, dir }] — the destinations rendered on the sign.
   destinations: json('destinations'),
-  createdBy: playerUuid('created_by').notNull(),
+  createdByUuid: playerUuid('created_by_uuid').notNull(),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow().onUpdateNow(),
 });

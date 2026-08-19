@@ -15,9 +15,5 @@ export type CreateGameDto = {
      * The icon URL for the game
      */
     icon: string;
-    /**
-     * Whether the game is active
-     */
-    active?: number;
 };
 

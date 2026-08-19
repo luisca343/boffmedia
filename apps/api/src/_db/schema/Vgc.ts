@@ -1,4 +1,5 @@
 import {
+  boolean,
   double,
   foreignKey,
   index,
@@ -260,7 +261,7 @@ export const vgcRegulations = mysqlTable(
     importFetchedCount: int('import_fetched_count').notNull().default(0),
     importStartedAt: timestamp('import_started_at'),
     importCompletedAt: timestamp('import_completed_at'),
-    active: int('active').notNull().default(1), // 0 = soft-disabled
+    active: boolean('active').notNull().default(true), // false = soft-disabled
     createdAt: timestamp('created_at').notNull().defaultNow(),
   },
   (t) => [

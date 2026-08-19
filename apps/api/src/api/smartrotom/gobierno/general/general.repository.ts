@@ -31,7 +31,7 @@ export class GeneralRepository {
         ? eq(gobiernoAnuncios.audience, filters.audience)
         : undefined,
       filters.pinned !== undefined
-        ? eq(gobiernoAnuncios.pinned, filters.pinned ? 1 : 0)
+        ? eq(gobiernoAnuncios.pinned, filters.pinned)
         : undefined,
     ].filter((c) => c !== undefined);
     const where = conditions.length > 0 ? and(...conditions) : undefined;
@@ -70,7 +70,7 @@ export class GeneralRepository {
       body: data.body,
       town: data.town,
       authorUuid: data.authorUuid,
-      pinned: data.pinned ? 1 : 0,
+      pinned: data.pinned ?? false,
       audience: data.audience ?? 'public',
     });
     return (await this.findAnuncio(result[0].insertId)) as GobiernoAnuncio;
@@ -83,7 +83,7 @@ export class GeneralRepository {
       title: string;
       body: string;
       town: string;
-      pinned: number;
+      pinned: boolean;
       audience: string;
     }>,
   ): Promise<GobiernoAnuncio | null> {

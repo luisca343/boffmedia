@@ -8,10 +8,6 @@ export type CreateFolderDto = {
      */
     server?: string;
     /**
-     * Owner UUID
-     */
-    uuid: string;
-    /**
      * Folder name
      */
     name: string;

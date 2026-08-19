@@ -1,4 +1,5 @@
 import {
+  boolean,
   AnyMySqlColumn,
   char,
   index,
@@ -41,8 +42,8 @@ export const rotomDocuments = mysqlTable('rotom_documents', {
   content: text('content').notNull(),
   // 0 = private, 1 = public. Referenced by the DTOs/repository (previously
   // written via `as any` with no backing column) — now a real column.
-  public: int('public').notNull().default(0),
-  pinned: int('pinned').notNull().default(0),
+  public: boolean('public').notNull().default(false),
+  pinned: boolean('pinned').notNull().default(false),
   folderId: int('folder_id').references(() => rotomNoteFolders.id, {
     onDelete: 'set null',
     onUpdate: 'cascade',
@@ -145,8 +146,8 @@ export const rotomNews = mysqlTable(
     subtitle: varchar('subtitle', { length: 255 }),
     category: varchar('category', { length: 255 }),
     subcategory: varchar('subcategory', { length: 255 }),
-    published: int('published').notNull().default(0),
-    featured: int('featured').notNull().default(0),
+    published: boolean('published').notNull().default(false),
+    featured: boolean('featured').notNull().default(false),
     content: text('content').notNull(),
     buttonText: varchar('button_text', { length: 255 }),
     imageUrl: varchar('image_url', { length: 255 }),

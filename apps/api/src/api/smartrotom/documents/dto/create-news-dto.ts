@@ -2,9 +2,9 @@ import { ApiProperty } from '@nestjs/swagger';
 import {
   IsString,
   IsOptional,
-  IsInt,
   IsNotEmpty,
   IsUrl,
+  IsBoolean,
 } from 'class-validator';
 
 export class CreateNewsDto {
@@ -40,15 +40,19 @@ export class CreateNewsDto {
   @IsOptional()
   subcategory?: string;
 
-  @ApiProperty({ description: 'Published status of the news', default: 0 })
-  @IsInt()
-  @IsNotEmpty()
-  published: number;
+  @ApiProperty({
+    description: 'Whether the article is published',
+    default: false,
+  })
+  @IsBoolean()
+  published: boolean;
 
-  @ApiProperty({ description: 'Featured status of the news', default: 0 })
-  @IsInt()
-  @IsNotEmpty()
-  featured: number;
+  @ApiProperty({
+    description: 'Whether the article is featured',
+    default: false,
+  })
+  @IsBoolean()
+  featured: boolean;
 
   @ApiProperty({ description: 'Content of the news' })
   @IsString()

@@ -110,7 +110,7 @@ export class UserAppsRepository implements IUserAppsRepository {
           eq(rotomUserApps.uuid, uuid),
         ),
       )
-      .where(and(eq(rotomApps.active, 1), eq(rotomUserApps.uuid, uuid)))
+      .where(and(eq(rotomApps.active, true), eq(rotomUserApps.uuid, uuid)))
       .orderBy(asc(rotomUserApps.order));
   }
 }

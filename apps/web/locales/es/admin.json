@@ -248,10 +248,7 @@
         "rarityPlatinum": "Platino",
         "rarityDiamond": "Diamante",
         "orderLabel": "Orden",
-        "orderHint": "Orden de visualización.",
-        "activeLabel": "Estado",
-        "activeOn": "Activo",
-        "activeOff": "Inactivo"
+        "orderHint": "Orden de visualización."
       }
     },
     "tcgp": {

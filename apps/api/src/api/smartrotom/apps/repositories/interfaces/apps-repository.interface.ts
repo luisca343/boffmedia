@@ -10,5 +10,5 @@ export interface IAppsRepository extends BaseRepository<
 > {
   findByUrl(url: string): Promise<RotomApp | null>;
   findActiveApps(): Promise<RotomApp[]>;
-  findByActive(active: number): Promise<RotomApp[]>;
+  findByActive(active: boolean): Promise<RotomApp[]>;
 }

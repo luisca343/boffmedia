@@ -18,15 +18,6 @@ export type UpdateAppDto = {
     /**
      * The active status of the app
      */
-    active?: UpdateAppDto.active;
+    active?: boolean;
 };
-export namespace UpdateAppDto {
-    /**
-     * The active status of the app
-     */
-    export enum active {
-        '_0' = 0,
-        '_1' = 1,
-    }
-}
 

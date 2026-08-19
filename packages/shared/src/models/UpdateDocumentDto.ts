@@ -22,11 +22,11 @@ export type UpdateDocumentDto = {
     /**
      * Whether the document is public
      */
-    public?: number;
+    public?: boolean;
     /**
-     * Whether the document is pinned (0 = no, 1 = pinned)
+     * Whether the document is pinned
      */
-    pinned?: number;
+    pinned?: boolean;
     /**
      * Folder the document belongs to; null moves it to the root
      */

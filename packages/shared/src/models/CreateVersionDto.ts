@@ -11,9 +11,5 @@ export type CreateVersionDto = {
      * Optional label for the snapshot
      */
     label?: string;
-    /**
-     * Author UUID producing the snapshot
-     */
-    authorUuid?: string;
 };
 

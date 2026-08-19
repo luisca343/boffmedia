@@ -64,7 +64,7 @@ export class NewsRepository implements INewsRepository {
     return this.db
       .select(NEWS_COLUMNS)
       .from(rotomNews)
-      .where(eq(rotomNews.published, 1))
+      .where(eq(rotomNews.published, true))
       .orderBy(desc(rotomNews.id)) as unknown as NewsDetails[];
   }
 
@@ -81,7 +81,7 @@ export class NewsRepository implements INewsRepository {
     const result = await this.db
       .select(NEWS_COLUMNS)
       .from(rotomNews)
-      .where(eq(rotomNews.featured, 1))
+      .where(eq(rotomNews.featured, true))
       .limit(1);
     return (result[0] || null) as unknown as NewsDetails | null;
   }
@@ -91,8 +91,8 @@ export class NewsRepository implements INewsRepository {
     subtitle?: string;
     category?: string;
     subcategory?: string;
-    published?: number;
-    featured?: number;
+    published?: boolean;
+    featured?: boolean;
     content: string;
     buttonText?: string;
     imageUrl?: string;
@@ -117,8 +117,8 @@ export class NewsRepository implements INewsRepository {
       subtitle?: string;
       category?: string;
       subcategory?: string;
-      published?: number;
-      featured?: number;
+      published?: boolean;
+      featured?: boolean;
       content?: string;
       buttonText?: string;
       imageUrl?: string;
@@ -140,13 +140,13 @@ export class NewsRepository implements INewsRepository {
     await this.db.delete(rotomNews).where(eq(rotomNews.id, newsId));
   }
 
-  async updateAllNewsPublishedStatus(published: number): Promise<void> {
+  async updateAllNewsPublishedStatus(published: boolean): Promise<void> {
     await this.db.update(rotomNews).set({ published } as RotomNews);
   }
 
   async updateNewsPublishedStatus(
     newsIds: number[],
-    published: number,
+    published: boolean,
   ): Promise<void> {
     await this.db
       .update(rotomNews)
@@ -154,13 +154,13 @@ export class NewsRepository implements INewsRepository {
       .where(inArray(rotomNews.id, newsIds));
   }
 
-  async updateAllNewsFeaturedStatus(featured: number): Promise<void> {
+  async updateAllNewsFeaturedStatus(featured: boolean): Promise<void> {
     await this.db.update(rotomNews).set({ featured } as RotomNews);
   }
 
   async updateNewsFeaturedStatus(
     newsId: number,
-    featured: number,
+    featured: boolean,
   ): Promise<void> {
     await this.db
       .update(rotomNews)
@@ -239,7 +239,7 @@ export class NewsRepository implements INewsRepository {
         articles: sql<number>`COUNT(*)`.as('articles'),
       })
       .from(rotomNews)
-      .where(and(eq(rotomNews.published, 1), isNotNull(rotomNews.author)))
+      .where(and(eq(rotomNews.published, true), isNotNull(rotomNews.author)))
       .groupBy(rotomNews.author, rotomNews.authorRole)
       .orderBy(desc(sql`COUNT(*)`));
 
@@ -260,7 +260,7 @@ export class NewsRepository implements INewsRepository {
         publishedAt: sql<Date>`MAX(${rotomNews.createdAt})`.as('publishedAt'),
       })
       .from(rotomNews)
-      .where(and(eq(rotomNews.published, 1), isNotNull(rotomNews.issue)))
+      .where(and(eq(rotomNews.published, true), isNotNull(rotomNews.issue)))
       .groupBy(rotomNews.issue)
       .orderBy(desc(rotomNews.issue));
 
@@ -272,7 +272,7 @@ export class NewsRepository implements INewsRepository {
         createdAt: rotomNews.createdAt,
       })
       .from(rotomNews)
-      .where(and(eq(rotomNews.published, 1), isNotNull(rotomNews.issue)))
+      .where(and(eq(rotomNews.published, true), isNotNull(rotomNews.issue)))
       .orderBy(desc(rotomNews.createdAt));
 
     // First pass per issue picks the newest article (rows arrive newest-first);
@@ -280,7 +280,7 @@ export class NewsRepository implements INewsRepository {
     const headlineByIssue = new Map<number, string>();
     for (const row of articles) {
       const issueNum = row.issue as number;
-      if (!headlineByIssue.has(issueNum) || row.featured === 1) {
+      if (!headlineByIssue.has(issueNum) || row.featured) {
         headlineByIssue.set(issueNum, row.title);
       }
     }

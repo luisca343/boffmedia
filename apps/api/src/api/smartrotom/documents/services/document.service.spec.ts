@@ -23,7 +23,7 @@ const mockDocument = {
   title: 'Notes',
   content: 'Hello',
   type: 1,
-  public: 0,
+  public: false,
 } as any;
 
 describe('DocumentService', () => {
@@ -118,19 +118,19 @@ describe('DocumentService', () => {
           title: 'Notes',
           content: 'Hello',
           type: 1,
-          public: 0,
+          public: false,
         }),
       );
     });
 
-    it('defaults public to 0 when not provided', async () => {
+    it('defaults public to false when not provided', async () => {
       mockRepo.createDocument.mockResolvedValue({ insertId: 1 });
       mockRepo.findDocumentById.mockResolvedValue(mockDocument);
 
       await service.createDocument({ title: 'T', content: 'C', type: 2 });
 
       expect(mockRepo.createDocument).toHaveBeenCalledWith(
-        expect.objectContaining({ public: 0 }),
+        expect.objectContaining({ public: false }),
       );
     });
 
@@ -259,7 +259,7 @@ describe('DocumentService', () => {
     it('serves a public document to a caller who does not hold it', async () => {
       mockRepo.findDocumentById.mockResolvedValue({
         ...mockDocument,
-        public: 1,
+        public: true,
       });
       mockRepo.findDocumentUserAssociation.mockResolvedValue(null);
 

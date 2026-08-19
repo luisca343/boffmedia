@@ -18,7 +18,6 @@ const achievementSchema = z.object({
   category: z.nativeEnum(CreateAchievementDto.category).optional(),
   rarity: z.nativeEnum(CreateAchievementDto.rarity).optional(),
   order: z.number().optional(),
-  active: z.number().optional(),
 })
 
 export type AchievementFormValues = z.infer<typeof achievementSchema>
@@ -41,7 +40,7 @@ export function AchievementForm({ defaultValues, isSubmitting, onSubmit, onCance
       itemType: CreateAchievementDto.itemType.ACHIEVEMENT,
       category: CreateAchievementDto.category.CHALLENGE,
       rarity: CreateAchievementDto.rarity.BRONZE,
-      order: 0, active: 1,
+      order: 0,
     },
   })
 
@@ -143,21 +142,6 @@ export function AchievementForm({ defaultValues, isSubmitting, onSubmit, onCance
                 { value: CreateAchievementDto.rarity.DIAMOND, label: t("achievement.rarityDiamond") },
               ]}
               onChange={field.onChange}
-            />
-          )}
-        />
-        <Controller
-          control={control}
-          name="active"
-          render={({ field }) => (
-            <Select
-              label={t("achievement.activeLabel")}
-              value={field.value != null ? String(field.value) : "1"}
-              options={[
-                { value: "1", label: t("achievement.activeOn") },
-                { value: "0", label: t("achievement.activeOff") },
-              ]}
-              onChange={(v) => field.onChange(Number(v))}
             />
           )}
         />

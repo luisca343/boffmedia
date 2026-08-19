@@ -85,7 +85,7 @@ export class EventosRepository {
       closesAt: data.closesAt ? new Date(data.closesAt) : undefined,
       rules: data.rules,
       weights: data.weights,
-      createdBy: data.createdBy,
+      createdByUuid: data.createdBy,
     });
     return (await this.findEvento(result[0].insertId)) as GobiernoEvento;
   }

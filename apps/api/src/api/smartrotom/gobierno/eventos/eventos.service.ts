@@ -48,7 +48,7 @@ export class EventosService {
     return {
       ...e,
       weights: e.weights as GobiernoEventoEntity['weights'],
-      createdBy: toPersonRef(e.createdBy, names) as any,
+      createdBy: toPersonRef(e.createdByUuid, names) as any,
     };
   }
 
@@ -57,7 +57,7 @@ export class EventosService {
   ): Promise<GobiernoEventoEntity[]> {
     const rows = await this.eventosRepository.listEventos(query);
     const names = await this.peopleRepository.findUsernames(
-      rows.map((e) => e.createdBy),
+      rows.map((e) => e.createdByUuid),
     );
     return Promise.all(rows.map((e) => this.toEventoEntity(e, names)));
   }
@@ -65,7 +65,7 @@ export class EventosService {
   async getEvento(id: number): Promise<GobiernoEventoEntity> {
     const e = await this.eventosRepository.findEvento(id);
     if (!e) throw new NotFoundException(`Evento ${id} not found`);
-    const names = await this.peopleRepository.findUsernames([e.createdBy]);
+    const names = await this.peopleRepository.findUsernames([e.createdByUuid]);
     return this.toEventoEntity(e, names);
   }
 
@@ -106,7 +106,7 @@ export class EventosService {
       status: dto.status,
     });
     await this.auditoriaService.log({
-      actorUuid: existing.createdBy,
+      actorUuid: existing.createdByUuid,
       action: 'update',
       target: `evento ${existing.code}`,
       dep: 'eventos',
@@ -122,7 +122,7 @@ export class EventosService {
     if (!existing) throw new NotFoundException(`Evento ${id} not found`);
     await this.eventosRepository.deleteEvento(id);
     await this.auditoriaService.log({
-      actorUuid: actorUuid || existing.createdBy,
+      actorUuid: actorUuid || existing.createdByUuid,
       action: 'delete',
       target: `evento ${existing.code}`,
       dep: 'eventos',
@@ -210,7 +210,7 @@ export class EventosService {
 
     const o = await this.eventosRepository.createObra(eventoId, dto);
     await this.auditoriaService.log({
-      actorUuid: dto.actorUuid || evento.createdBy,
+      actorUuid: dto.actorUuid || evento.createdByUuid,
       action: 'create',
       target: `obra "${o.buildName}" (evento ${evento.code})`,
       dep: 'eventos',
@@ -337,7 +337,7 @@ export class EventosService {
 
     const e = await this.eventosRepository.createEspecie(eventoId, dto);
     await this.auditoriaService.log({
-      actorUuid: dto.actorUuid || evento.createdBy,
+      actorUuid: dto.actorUuid || evento.createdByUuid,
       action: 'create',
       target: `especie "${e.name}" (evento ${evento.code})`,
       dep: 'eventos',

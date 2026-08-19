@@ -18,15 +18,6 @@ export type RotomApp = {
     /**
      * Whether the app is active
      */
-    active: RotomApp.active | null;
+    active: boolean;
 };
-export namespace RotomApp {
-    /**
-     * Whether the app is active
-     */
-    export enum active {
-        '_0' = 0,
-        '_1' = 1,
-    }
-}
 

@@ -218,7 +218,7 @@ export class PasaporteRepository {
     const rows = await this.db
       .select()
       .from(pasaporteSeasons)
-      .where(eq(pasaporteSeasons.active, 1))
+      .where(eq(pasaporteSeasons.active, true))
       .orderBy(desc(pasaporteSeasons.startsAt))
       .limit(1);
     return rows[0] ?? null;

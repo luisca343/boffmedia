@@ -84,13 +84,4 @@ export class CreateEventAchievementDto {
   @IsOptional()
   @IsInt()
   order?: number;
-
-  @ApiProperty({
-    description: 'Whether the achievement is active',
-    example: 1,
-    required: false,
-  })
-  @IsOptional()
-  @IsInt()
-  active?: number;
 }

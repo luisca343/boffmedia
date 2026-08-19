@@ -61,7 +61,7 @@ function AppsScreen() {
   const addApp = useAdminAddApp()
   const removeApp = useAdminRemoveApp()
 
-  const activeApps = (allApps ?? []).filter((a) => a.active === 1)
+  const activeApps = (allApps ?? []).filter((a) => Boolean(a.active))
   const assignedIds = new Set((playerApps ?? []).map((a) => a.id))
   const assigned = activeApps.filter((a) => assignedIds.has(a.id))
   const available = activeApps.filter((a) => !assignedIds.has(a.id))

@@ -81,7 +81,7 @@ describe('UserAppsService', () => {
   describe('addAppToPlayer', () => {
     const uuid = 'test-uuid';
     const appId = 1;
-    const mockApp = { id: 1, name: 'Test App', active: 1 };
+    const mockApp = { id: 1, name: 'Test App', active: true };
 
     it('should add app to player successfully', async () => {
       appsRepository.findById.mockResolvedValue(mockApp);
@@ -130,7 +130,7 @@ describe('UserAppsService', () => {
     });
 
     it('should throw BadRequestException when app is inactive', async () => {
-      appsRepository.findById.mockResolvedValue({ ...mockApp, active: 0 });
+      appsRepository.findById.mockResolvedValue({ ...mockApp, active: false });
 
       await expect(service.addAppToPlayer(uuid, appId)).rejects.toThrow(
         BadRequestException,

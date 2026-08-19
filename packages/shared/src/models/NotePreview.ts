@@ -16,13 +16,13 @@ export type NotePreview = {
      */
     type: number;
     /**
-     * Public flag (0 = private, 1 = public)
+     * Whether the note is publicly readable
      */
-    public: number;
+    public: boolean;
     /**
-     * Pinned flag (0 = no, 1 = pinned)
+     * Whether the note is pinned
      */
-    pinned: number;
+    pinned: boolean;
     /**
      * Folder ID the note belongs to, or null
      */

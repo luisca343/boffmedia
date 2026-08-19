@@ -30,7 +30,7 @@ export function RotomNav() {
   const [notifications, setNotifications] = useState<NotificationResponseDto[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
-  const unreadCount = notifications.filter((n) => n.isRead === 0).length;
+  const unreadCount = notifications.filter((n) => !n.isRead).length;
 
   const loadNotifications = useCallback(async () => {
     if (!session) return;

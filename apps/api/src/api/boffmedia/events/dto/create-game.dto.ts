@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsOptional, MaxLength } from 'class-validator';
+import { IsString, MaxLength } from 'class-validator';
 
 export class CreateGameDto {
   @ApiProperty({
@@ -24,12 +24,4 @@ export class CreateGameDto {
   @IsString()
   @MaxLength(500)
   icon: string;
-
-  @ApiProperty({
-    description: 'Whether the game is active',
-    example: 1,
-    required: false,
-  })
-  @IsOptional()
-  active?: number;
 }

@@ -1,5 +1,4 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { AppStatus } from '../enums/app-status.enum';
 
 export class RotomApp {
   @ApiProperty({
@@ -23,10 +22,8 @@ export class RotomApp {
   url: string | null;
 
   @ApiProperty({
-    example: AppStatus.ACTIVE,
+    example: true,
     description: 'Whether the app is active',
-    enum: AppStatus,
-    nullable: true,
   })
-  active: number | null;
+  active: boolean;
 }

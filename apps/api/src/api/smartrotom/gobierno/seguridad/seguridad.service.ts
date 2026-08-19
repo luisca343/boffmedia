@@ -63,7 +63,7 @@ export class SeguridadService {
       status: d.status,
       description: d.description,
       resolution: d.resolution,
-      resolvedBy: toPersonRef(d.resolvedBy, names),
+      resolvedBy: toPersonRef(d.resolvedByUuid, names),
       resolvedAt: d.resolvedAt,
       createdAt: d.createdAt,
       updatedAt: d.updatedAt,
@@ -81,7 +81,7 @@ export class SeguridadService {
       query,
     );
     const names = await this.peopleRepository.findUsernames(
-      items.flatMap((d) => [d.accusedUuid, d.reporterUuid, d.resolvedBy]),
+      items.flatMap((d) => [d.accusedUuid, d.reporterUuid, d.resolvedByUuid]),
     );
     return {
       items: await Promise.all(
@@ -99,7 +99,7 @@ export class SeguridadService {
     const names = await this.peopleRepository.findUsernames([
       d.accusedUuid,
       d.reporterUuid,
-      d.resolvedBy,
+      d.resolvedByUuid,
     ]);
     return this.toDenunciaEntity(d, names);
   }
@@ -198,10 +198,10 @@ export class SeguridadService {
       status: b.status,
       bounty: b.bounty,
       offense: b.offense,
-      reportedBy: toPersonRef(b.reportedBy, names) as any,
+      reportedBy: toPersonRef(b.reportedByUuid, names) as any,
       lastSeen: b.lastSeen,
       notes: b.notes,
-      capturedBy: toPersonRef(b.capturedBy, names),
+      capturedBy: toPersonRef(b.capturedByUuid, names),
       capturedAt: b.capturedAt,
       payoutTxId: b.payoutTxId,
       createdAt: b.createdAt,
@@ -220,7 +220,7 @@ export class SeguridadService {
       query,
     );
     const names = await this.peopleRepository.findUsernames(
-      items.flatMap((b) => [b.playerUuid, b.reportedBy, b.capturedBy]),
+      items.flatMap((b) => [b.playerUuid, b.reportedByUuid, b.capturedByUuid]),
     );
     return {
       items: await Promise.all(
@@ -237,8 +237,8 @@ export class SeguridadService {
     if (!b) throw new NotFoundException(`Buscado ${id} not found`);
     const names = await this.peopleRepository.findUsernames([
       b.playerUuid,
-      b.reportedBy,
-      b.capturedBy,
+      b.reportedByUuid,
+      b.capturedByUuid,
     ]);
     return this.toBuscadoEntity(b, names);
   }
@@ -268,7 +268,7 @@ export class SeguridadService {
       notes: dto.notes,
     });
     await this.auditoriaService.log({
-      actorUuid: existing.reportedBy,
+      actorUuid: existing.reportedByUuid,
       action: 'update',
       target: `buscado ${existing.code}`,
       dep: 'seguridad',
@@ -284,7 +284,7 @@ export class SeguridadService {
     if (!existing) throw new NotFoundException(`Buscado ${id} not found`);
     await this.seguridadRepository.deleteBuscado(id);
     await this.auditoriaService.log({
-      actorUuid: actorUuid || existing.reportedBy,
+      actorUuid: actorUuid || existing.reportedByUuid,
       action: 'delete',
       target: `buscado ${existing.code}`,
       dep: 'seguridad',

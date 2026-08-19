@@ -1,1 +1,0 @@
-ALTER TABLE `rotom_inventory` ADD `item_data` varchar(255) NULL DEFAULT NULL AFTER `item_id`;

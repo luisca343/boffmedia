@@ -50,10 +50,10 @@ export class AppsRepository
   }
 
   async findActiveApps(): Promise<RotomApp[]> {
-    return this.db.select().from(rotomApps).where(eq(rotomApps.active, 1));
+    return this.db.select().from(rotomApps).where(eq(rotomApps.active, true));
   }
 
-  async findByActive(active: number): Promise<RotomApp[]> {
+  async findByActive(active: boolean): Promise<RotomApp[]> {
     return this.db.select().from(rotomApps).where(eq(rotomApps.active, active));
   }
 }

@@ -80,7 +80,7 @@ export class HaciendaService {
       amount: m.amount,
       status: m.status,
       reason: m.reason,
-      issuedBy: toPersonRef(m.issuedBy, names) as any,
+      issuedBy: toPersonRef(m.issuedByUuid, names) as any,
       denunciaId: m.denunciaId,
       paidTxId: m.paidTxId,
       paidAt: m.paidAt,
@@ -100,7 +100,7 @@ export class HaciendaService {
       query,
     );
     const names = await this.peopleRepository.findUsernames(
-      items.flatMap((m) => [m.playerUuid, m.issuedBy]),
+      items.flatMap((m) => [m.playerUuid, m.issuedByUuid]),
     );
     return {
       items: await Promise.all(items.map((m) => this.toMultaEntity(m, names))),
@@ -115,7 +115,7 @@ export class HaciendaService {
     if (!m) throw new NotFoundException(`Multa ${id} not found`);
     const names = await this.peopleRepository.findUsernames([
       m.playerUuid,
-      m.issuedBy,
+      m.issuedByUuid,
     ]);
     return this.toMultaEntity(m, names);
   }
@@ -148,7 +148,7 @@ export class HaciendaService {
       denunciaId: dto.denunciaId,
     });
     await this.auditoriaService.log({
-      actorUuid: existing.issuedBy,
+      actorUuid: existing.issuedByUuid,
       action: 'update',
       target: `multa ${existing.code}`,
       dep: 'hacienda',
@@ -164,7 +164,7 @@ export class HaciendaService {
     if (!existing) throw new NotFoundException(`Multa ${id} not found`);
     await this.haciendaRepository.deleteMulta(id);
     await this.auditoriaService.log({
-      actorUuid: actorUuid || existing.issuedBy,
+      actorUuid: actorUuid || existing.issuedByUuid,
       action: 'delete',
       target: `multa ${existing.code}`,
       dep: 'hacienda',
@@ -239,13 +239,13 @@ export class HaciendaService {
       kind: string;
       rate: string;
       amount: number;
-      active: number;
+      active: boolean;
       createdAt: Date;
       updatedAt: Date;
     },
     collected = 0,
   ): GobiernoTasaEntity {
-    return { ...t, active: t.active === 1, collected };
+    return { ...t, active: t.active, collected };
   }
 
   /**
@@ -307,7 +307,7 @@ export class HaciendaService {
       kind: dto.kind,
       rate: dto.rate,
       amount: dto.amount,
-      active: dto.active === undefined ? undefined : dto.active ? 1 : 0,
+      active: dto.active,
     });
     await this.auditoriaService.log({
       actorUuid: dto.actorUuid || 'system',

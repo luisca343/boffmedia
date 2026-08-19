@@ -97,9 +97,9 @@ async function main() {
   // ── Apps ────────────────────────────────────────────────────────────────────
   logger.info('Seeding rotom_apps…');
   const apps = [
-    { name: 'ChatApp', active: 1 },
-    { name: 'StarBank', active: 1 },
-    { name: 'Pokedex', active: 1 },
+    { name: 'ChatApp', active: true },
+    { name: 'StarBank', active: true },
+    { name: 'Pokedex', active: true },
   ];
   for (const app of apps) {
     const [existing] = await db

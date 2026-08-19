@@ -30,7 +30,7 @@ export function JuegosChapter() {
             <Section id="jgcover" kicker="Juegos y Eventos" title="Portada de juego" lead={<>Tarjeta de juego (<code>GameCard</code>): arte de portada con velo, distintivo activo/inactivo y fecha de alta. Enlaza a <code>/juegos/[id]</code>.</>}>
               <Sample title="Tarjeta de juego" code="<GameCard game>" grid note={<>Los datos <code>short</code>, <code>events</code>, <code>players</code> y <code>hue</code> aún no están en la API de juegos — aquí van de ejemplo; en la página real se omiten. [aplazado]</>}>
                 <GameCard game={DEMO_GAME} />
-                <GameCard game={{ ...DEMO_GAME, id: 2, title: "Minecraft", active: 0, hue: "hsl(140 45% 55%)", short: "MC", events: 3, players: 820 }} />
+                <GameCard game={{ ...DEMO_GAME, id: 2, title: "Minecraft", deletedAt: "2024-06-01", hue: "hsl(140 45% 55%)", short: "MC", events: 3, players: 820 }} />
               </Sample>
             </Section>
 

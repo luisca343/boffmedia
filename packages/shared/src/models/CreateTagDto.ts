@@ -8,10 +8,6 @@ export type CreateTagDto = {
      */
     server?: string;
     /**
-     * Owner UUID
-     */
-    uuid: string;
-    /**
      * Tag label
      */
     label: string;

@@ -8,10 +8,6 @@ export type BulkUpsertPcMarksDto = {
      */
     server?: string;
     /**
-     * SmartRotom user UUID
-     */
-    uuid: string;
-    /**
      * Opaque content hashes of the Pokémon to mark
      */
     pokemonKeys: Array<string>;

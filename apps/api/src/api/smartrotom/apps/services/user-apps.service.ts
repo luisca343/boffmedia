@@ -12,7 +12,6 @@ import {
   APPS_REPOSITORY_TOKEN,
   USER_APPS_REPOSITORY_TOKEN,
 } from '@api/_utils/repositories/interfaces/repository.token';
-import { AppStatus } from '../enums/app-status.enum';
 
 @Injectable()
 export class UserAppsService {
@@ -42,7 +41,7 @@ export class UserAppsService {
       throw new NotFoundException('App not found');
     }
 
-    if (app.active == AppStatus.INACTIVE) {
+    if (!app.active) {
       throw new BadRequestException('App is inactive');
     }
 

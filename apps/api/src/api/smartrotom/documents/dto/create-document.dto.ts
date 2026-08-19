@@ -1,6 +1,6 @@
 import { BaseDto } from '@api/_utils/dto/base.dto';
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsNotEmpty, IsInt } from 'class-validator';
+import { IsString, IsNotEmpty, IsInt, IsBoolean } from 'class-validator';
 
 export class CreateDocumentDto extends BaseDto {
   @ApiProperty({ description: 'Title of the document' })
@@ -21,9 +21,9 @@ export class CreateDocumentDto extends BaseDto {
   @ApiProperty({
     description: 'Public status of the document (0=private, 1=public)',
   })
-  @IsInt()
+  @IsBoolean()
   @IsNotEmpty()
-  public: number;
+  public: boolean;
 }
 
 export class CreateDocumentDtoWithUuid extends CreateDocumentDto {

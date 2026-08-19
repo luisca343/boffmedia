@@ -26,15 +26,15 @@ export class Document {
 
   @ApiProperty({
     example: 0,
-    description: 'Public flag (0 = private, 1 = public)',
+    description: 'Whether the note is publicly readable',
   })
-  public: number;
+  public: boolean;
 
   @ApiProperty({
     example: 0,
-    description: 'Pinned flag (0 = no, 1 = pinned)',
+    description: 'Whether the note is pinned',
   })
-  pinned: number;
+  pinned: boolean;
 
   @ApiProperty({
     type: Number,
@@ -86,15 +86,15 @@ export class NotePreview {
 
   @ApiProperty({
     example: 0,
-    description: 'Public flag (0 = private, 1 = public)',
+    description: 'Whether the note is publicly readable',
   })
-  public: number;
+  public: boolean;
 
   @ApiProperty({
     example: 0,
-    description: 'Pinned flag (0 = no, 1 = pinned)',
+    description: 'Whether the note is pinned',
   })
-  pinned: number;
+  pinned: boolean;
 
   @ApiProperty({
     type: Number,

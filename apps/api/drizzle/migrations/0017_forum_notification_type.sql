@@ -1,1 +1,0 @@
-ALTER TABLE `boffmedia_notifications` MODIFY COLUMN `type` enum('event','achievement','tournament','system','forum') NOT NULL DEFAULT 'system';

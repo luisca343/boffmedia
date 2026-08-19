@@ -448,7 +448,7 @@ export class RookerRepository {
         text: p.text ?? null,
         type: p.type as RookerPostType,
         createdAt: p.createdAt ?? null,
-        pinned: (p.pinned ?? 0) === 1,
+        pinned: p.pinned ?? false,
         parentId: p.parentId ?? null,
         counts: {
           replies: replyMap.get(p.id) ?? 0,

@@ -95,7 +95,7 @@ export class ParticipantsService {
       category: achievement.category,
       rarity: achievement.rarity,
       order: achievement.order || 0,
-      active: 1,
+      active: true,
       eventName: '',
       createdAt: new Date(),
       updatedAt: new Date(),

@@ -67,7 +67,7 @@ export class HaciendaRepository {
       playerUuid: data.playerUuid,
       amount: data.amount,
       reason: data.reason,
-      issuedBy: data.issuedBy,
+      issuedByUuid: data.issuedBy,
       denunciaId: data.denunciaId,
     });
     return (await this.findMulta(result[0].insertId)) as GobiernoMulta;
@@ -121,7 +121,7 @@ export class HaciendaRepository {
     const conditions = [
       filters.kind ? eq(gobiernoTasas.kind, filters.kind) : undefined,
       filters.active !== undefined
-        ? eq(gobiernoTasas.active, filters.active ? 1 : 0)
+        ? eq(gobiernoTasas.active, filters.active)
         : undefined,
     ].filter((c) => c !== undefined);
     const where = conditions.length > 0 ? and(...conditions) : undefined;
@@ -159,7 +159,7 @@ export class HaciendaRepository {
       kind: string;
       rate: string;
       amount: number;
-      active: number;
+      active: boolean;
     }>,
   ): Promise<GobiernoTasa | null> {
     if (Object.keys(data).length > 0) {

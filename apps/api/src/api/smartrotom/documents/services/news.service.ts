@@ -13,8 +13,8 @@ export interface CreateNewsRequest {
   subtitle?: string;
   category?: string;
   subcategory?: string;
-  published?: number;
-  featured?: number;
+  published?: boolean;
+  featured?: boolean;
   content?: string;
   buttonText?: string;
   imageUrl?: string;
@@ -28,8 +28,8 @@ export interface UpdateNewsRequest {
   subtitle?: string;
   category?: string;
   subcategory?: string;
-  published?: number;
-  featured?: number;
+  published?: boolean;
+  featured?: boolean;
   content?: string;
   buttonText?: string;
   imageUrl?: string;
@@ -52,14 +52,14 @@ export class NewsService {
 
   async getAllNews(): Promise<NewsResponse> {
     const allNews = await this.newsRepository.findAllNews();
-    const featured = allNews.find((item) => item.featured === 1) || null;
+    const featured = allNews.find((item) => item.featured) || null;
 
     return { featured, news: allNews };
   }
 
   async getPublishedNews(): Promise<NewsResponse> {
     const publishedNews = await this.newsRepository.findPublishedNews();
-    const featured = publishedNews.find((item) => item.featured === 1) || null;
+    const featured = publishedNews.find((item) => item.featured) || null;
 
     return { featured, news: publishedNews };
   }
@@ -180,16 +180,16 @@ export class NewsService {
     }
 
     // Reset all news to unpublished and unfeatured
-    await this.newsRepository.updateAllNewsPublishedStatus(0);
-    await this.newsRepository.updateAllNewsFeaturedStatus(0);
+    await this.newsRepository.updateAllNewsPublishedStatus(false);
+    await this.newsRepository.updateAllNewsFeaturedStatus(false);
 
     // Set published status for specified news
     if (publishedIds.length > 0) {
-      await this.newsRepository.updateNewsPublishedStatus(publishedIds, 1);
+      await this.newsRepository.updateNewsPublishedStatus(publishedIds, true);
     }
 
     // Set featured status
-    await this.newsRepository.updateNewsFeaturedStatus(featuredId, 1);
+    await this.newsRepository.updateNewsFeaturedStatus(featuredId, true);
 
     return { success: true };
   }

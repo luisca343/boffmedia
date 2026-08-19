@@ -1,7 +1,6 @@
 import { rotomGET, rotomPOST, rotomPUT, rotomDELETE, rotomAuthedGET, rotomAuthedPOST, rotomAuthedPUT, rotomAuthedDELETE, apiAuthedPOST, apiAuthedPUT, apiAuthedDELETE } from '@/services/boffAPI';
 import type {
   CreateDocumentDto,
-  UpdateDocumentDto,
   CreateNewsDto,
   UpdateNewsDto,
   NewsStatusDto,
@@ -37,6 +36,18 @@ export type CreateFolderDto = {
   parentId?: number | null;
 };
 export type CreateTagDto = { label: string; color?: string };
+
+// `public`/`pinned` are real booleans now (the columns were `int` 0/1). The
+// generated type still says `number` until `pnpm generate:shared` runs against a
+// rebuilt API.
+export type UpdateDocumentDto = {
+  title?: string;
+  content?: string;
+  type?: number;
+  public?: boolean;
+  pinned?: boolean;
+  folderId?: number | null;
+};
 
 export class DocumentsService {
   // ==================== DOCUMENT OPERATIONS ====================

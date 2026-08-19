@@ -15,8 +15,8 @@ export interface DocumentDetails {
   title: string;
   content: string;
   type: number;
-  public: number;
-  pinned: number;
+  public: boolean;
+  pinned: boolean;
   folderId: number | null;
   deletedAt: Date | null;
   createdAt: Date;
@@ -29,8 +29,8 @@ export interface NewsDetails {
   subtitle: string;
   category: string;
   subcategory: string;
-  published: number;
-  featured: number;
+  published: boolean;
+  featured: boolean;
   content: string;
   buttonText: string;
   imageUrl: string;
@@ -46,8 +46,8 @@ export interface NotePreview {
   id: number;
   title: string;
   type: number;
-  public: number;
-  pinned: number;
+  public: boolean;
+  pinned: boolean;
   folderId: number | null;
   deletedAt: Date | null;
   createdAt: Date;
@@ -63,8 +63,8 @@ interface DocumentMutation {
   title?: string;
   content?: string;
   type?: number;
-  public?: number;
-  pinned?: number;
+  public?: boolean;
+  pinned?: boolean;
   folderId?: number | null;
 }
 
@@ -134,7 +134,7 @@ export class DocumentsRepository implements IDocumentsRepository {
     title: string;
     content: string;
     type: number;
-    public?: number;
+    public?: boolean;
   }): Promise<{ insertId: number }> {
     const result = await this.db.insert(rotomDocuments).values({
       ...documentData,

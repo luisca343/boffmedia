@@ -36,7 +36,7 @@ const mockFacade = {
 };
 
 const VALID_UUID = '67d9b543-5ac9-41e1-a8a5-20d7689e24a4';
-const mockApp = { id: 1, name: 'ChatApp', url: 'chatapp', active: 1 };
+const mockApp = { id: 1, name: 'ChatApp', url: 'chatapp', active: true };
 
 describe('AppsController — integration (ValidationPipe + GlobalExceptionFilter)', () => {
   let app: INestApplication;
@@ -198,7 +198,7 @@ describe('AppsController — integration (ValidationPipe + GlobalExceptionFilter
         id: 2,
         name: 'TestApp',
         url: 'testapp',
-        active: 1,
+        active: true,
       });
 
       const res = await request(app.getHttpServer())
@@ -260,7 +260,7 @@ describe('AppsController — integration (ValidationPipe + GlobalExceptionFilter
 
   describe('PATCH /smartrotom/apps/:id/activate', () => {
     it('returns 200 and calls facade.activateApp with numeric id', async () => {
-      mockFacade.activateApp.mockResolvedValue({ ...mockApp, active: 1 });
+      mockFacade.activateApp.mockResolvedValue({ ...mockApp, active: true });
 
       const res = await request(app.getHttpServer()).patch(
         '/smartrotom/apps/2/activate',
@@ -275,7 +275,7 @@ describe('AppsController — integration (ValidationPipe + GlobalExceptionFilter
 
   describe('PATCH /smartrotom/apps/:id/deactivate', () => {
     it('returns 200 and calls facade.deactivateApp with numeric id', async () => {
-      mockFacade.deactivateApp.mockResolvedValue({ ...mockApp, active: 0 });
+      mockFacade.deactivateApp.mockResolvedValue({ ...mockApp, active: false });
 
       const res = await request(app.getHttpServer()).patch(
         '/smartrotom/apps/2/deactivate',

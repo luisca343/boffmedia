@@ -1,5 +1,6 @@
 import { sql } from 'drizzle-orm';
 import {
+  boolean,
   char,
   int,
   mysqlTable,
@@ -38,7 +39,7 @@ export const pasaporteSeasons = mysqlTable('rotom_pasaporte_seasons', {
   name: varchar('name', { length: 64 }).notNull(),
   startsAt: timestamp('starts_at').notNull(),
   endsAt: timestamp('ends_at').notNull(),
-  active: int('active').default(1),
+  active: boolean('active').notNull().default(true),
 });
 
 export type PasaporteSeason = typeof pasaporteSeasons.$inferSelect;

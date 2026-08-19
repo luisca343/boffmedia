@@ -44,7 +44,7 @@ async function main() {
   const active = await db
     .select({ id: pasaporteSeasons.id, name: pasaporteSeasons.name })
     .from(pasaporteSeasons)
-    .where(eq(pasaporteSeasons.active, 1))
+    .where(eq(pasaporteSeasons.active, true))
     .limit(1);
 
   if (active.length > 0) {
@@ -60,7 +60,7 @@ async function main() {
       name: SEASON_NAME,
       startsAt: new Date(now - SEASON_DAYS * day),
       endsAt: new Date(now + SEASON_DAYS * day),
-      active: 1,
+      active: true,
     });
     logger.info(
       `✓ season ${SEASON_NUMBER} "${SEASON_NAME}" created — a ${SEASON_DAYS * 2}-day window around today`,

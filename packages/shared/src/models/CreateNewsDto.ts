@@ -28,13 +28,13 @@ export type CreateNewsDto = {
      */
     subcategory?: string;
     /**
-     * Published status (0=draft, 1=published)
+     * Whether the article is published
      */
-    published?: number;
+    published?: boolean;
     /**
-     * Featured status (0=normal, 1=featured)
+     * Whether the article is featured
      */
-    featured?: number;
+    featured?: boolean;
     /**
      * News content
      */

@@ -39,10 +39,6 @@ export type CreateEventAchievementDto = {
      * Display order
      */
     order?: number;
-    /**
-     * Whether the achievement is active
-     */
-    active?: number;
 };
 export namespace CreateEventAchievementDto {
     /**

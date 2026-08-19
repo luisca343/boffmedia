@@ -87,7 +87,7 @@ async function main() {
   for (const tasa of TASAS) {
     await db
       .insert(gobiernoTasas)
-      .values({ ...tasa, active: 1 })
+      .values({ ...tasa, active: true })
       .onDuplicateKeyUpdate({
         set: {
           concept: tasa.concept,

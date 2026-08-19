@@ -6,9 +6,9 @@ import {
   IsInt,
   IsOptional,
   Min,
-  Max,
   IsEmail,
   MaxLength,
+  IsBoolean,
 } from 'class-validator';
 
 export class CreateNewsDto extends BaseDto {
@@ -59,26 +59,22 @@ export class CreateNewsDto extends BaseDto {
   subcategory?: string;
 
   @ApiProperty({
-    description: 'Published status (0=draft, 1=published)',
-    example: 1,
+    description: 'Whether the article is published',
+    example: true,
     required: false,
   })
   @IsOptional()
-  @IsInt()
-  @Min(0)
-  @Max(1)
-  published?: number;
+  @IsBoolean()
+  published?: boolean;
 
   @ApiProperty({
-    description: 'Featured status (0=normal, 1=featured)',
-    example: 0,
+    description: 'Whether the article is featured',
+    example: false,
     required: false,
   })
   @IsOptional()
-  @IsInt()
-  @Min(0)
-  @Max(1)
-  featured?: number;
+  @IsBoolean()
+  featured?: boolean;
 
   @ApiProperty({
     description: 'News content',

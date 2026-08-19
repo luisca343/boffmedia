@@ -24,13 +24,13 @@ export type News = {
      */
     subcategory: string;
     /**
-     * Published status (0=draft, 1=published)
+     * Published, as opposed to a draft
      */
-    published: number;
+    published: boolean;
     /**
-     * Featured status (0=normal, 1=featured)
+     * Featured on the news landing page
      */
-    featured: number;
+    featured: boolean;
     /**
      * News content
      */

@@ -275,7 +275,7 @@ export class UrbanismoRepository {
     startBid: number;
     reason?: string;
     endsAt: string;
-    createdBy: string;
+    createdByUuid: string;
   }): Promise<GobiernoSubasta> {
     const result = await this.db.insert(gobiernoSubastas).values({
       code: data.code,
@@ -287,7 +287,7 @@ export class UrbanismoRepository {
       reason: data.reason,
       status: 'live',
       endsAt: new Date(data.endsAt),
-      createdBy: data.createdBy,
+      createdByUuid: data.createdByUuid,
     });
     return (await this.findSubasta(result[0].insertId)) as GobiernoSubasta;
   }

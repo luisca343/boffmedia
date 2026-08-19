@@ -36,7 +36,7 @@ export class AppsService {
   }
 
   async getInactiveApps(): Promise<RotomApp[]> {
-    return this.appsRepository.findByActive(0);
+    return this.appsRepository.findByActive(false);
   }
 
   async createApp(createAppDto: CreateAppDto): Promise<RotomApp> {
@@ -84,10 +84,10 @@ export class AppsService {
   // ==================== APP STATUS MANAGEMENT ====================
 
   async activateApp(id: number): Promise<RotomApp> {
-    return this.updateApp(id, { active: 1 });
+    return this.updateApp(id, { active: true });
   }
 
   async deactivateApp(id: number): Promise<RotomApp> {
-    return this.updateApp(id, { active: 0 });
+    return this.updateApp(id, { active: false });
   }
 }

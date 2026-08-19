@@ -118,7 +118,7 @@ export class AdministracionRepository {
       name: data.name,
       highway: data.highway,
       destinations: data.destinations,
-      createdBy: data.createdBy,
+      createdByUuid: data.createdBy,
     });
     return (await this.findCartel(result[0].insertId)) as GobiernoCartel;
   }

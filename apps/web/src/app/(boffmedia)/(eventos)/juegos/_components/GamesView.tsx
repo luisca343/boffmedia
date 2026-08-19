@@ -19,7 +19,7 @@ export function GamesView() {
     const list = (Array.isArray(games) ? games : []) as GameLike[]
     const needle = q.trim().toLowerCase()
     return list.filter((g) => {
-      const active = g.active !== 0 && !g.deletedAt
+      const active = !g.deletedAt
       if (filter === "active" && !active) return false
       if (needle && !`${g.title} ${g.description ?? ""}`.toLowerCase().includes(needle)) return false
       return true

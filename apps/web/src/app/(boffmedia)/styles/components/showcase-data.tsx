@@ -341,7 +341,7 @@ export const DEMO_TOOLS: ToolCardData[] = [
 ]
 
 // Showcase demo game — carries fields the games API lacks (short·events·players·hue). [deferred]
-export const DEMO_GAME: GameLike = { id: 1, title: "Pokémon VGC", description: "Combates dobles oficiales de la comunidad.", icon: null, active: 1, createdAt: "2024-01-10", hue: "hsl(18 90% 55%)", short: "VGC", events: 12, players: 3400 }
+export const DEMO_GAME: GameLike = { id: 1, title: "Pokémon VGC", description: "Combates dobles oficiales de la comunidad.", icon: null, createdAt: "2024-01-10", hue: "hsl(18 90% 55%)", short: "VGC", events: 12, players: 3400 }
 
 // Showcase demo events — carry participants·organizer·hue for the full card. [deferred]
 export const DEMO_EVENTS: EventLike[] = [

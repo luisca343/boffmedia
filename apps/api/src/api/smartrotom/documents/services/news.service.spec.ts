@@ -22,7 +22,7 @@ const makeNews = (id: number, featured = 0) =>
     title: `News ${id}`,
     content: 'content',
     featured,
-    published: 1,
+    published: true,
   }) as any;
 
 describe('NewsService', () => {
@@ -208,13 +208,13 @@ describe('NewsService', () => {
       const result = await service.updateNewsStatus([2, 3], 1);
 
       expect(result.success).toBe(true);
-      expect(mockRepo.updateAllNewsPublishedStatus).toHaveBeenCalledWith(0);
-      expect(mockRepo.updateAllNewsFeaturedStatus).toHaveBeenCalledWith(0);
+      expect(mockRepo.updateAllNewsPublishedStatus).toHaveBeenCalledWith(false);
+      expect(mockRepo.updateAllNewsFeaturedStatus).toHaveBeenCalledWith(false);
       expect(mockRepo.updateNewsPublishedStatus).toHaveBeenCalledWith(
         [2, 3],
-        1,
+        true,
       );
-      expect(mockRepo.updateNewsFeaturedStatus).toHaveBeenCalledWith(1, 1);
+      expect(mockRepo.updateNewsFeaturedStatus).toHaveBeenCalledWith(1, true);
     });
 
     it('throws when publishedIds is not an array', async () => {

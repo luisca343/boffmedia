@@ -123,11 +123,11 @@ export class SeguridadRepository {
     id: number,
     status: 'resolved' | 'dismissed',
     resolution: string,
-    resolvedBy: string,
+    resolvedByUuid: string,
   ): Promise<GobiernoDenuncia> {
     await this.db
       .update(gobiernoDenuncias)
-      .set({ status, resolution, resolvedBy, resolvedAt: new Date() })
+      .set({ status, resolution, resolvedByUuid, resolvedAt: new Date() })
       .where(eq(gobiernoDenuncias.id, id));
     return (await this.findDenuncia(id)) as GobiernoDenuncia;
   }
@@ -189,7 +189,7 @@ export class SeguridadRepository {
       severity: data.severity,
       bounty: data.bounty ?? 0,
       offense: data.offense,
-      reportedBy: data.reportedBy,
+      reportedByUuid: data.reportedBy,
       lastSeen: data.lastSeen,
       notes: data.notes,
     });
@@ -225,14 +225,14 @@ export class SeguridadRepository {
 
   async captureBuscado(
     id: number,
-    capturedBy: string,
+    capturedByUuid: string,
     payoutTxId: number | null,
   ): Promise<GobiernoBuscado> {
     await this.db
       .update(gobiernoBuscados)
       .set({
         status: 'captured',
-        capturedBy,
+        capturedByUuid,
         capturedAt: new Date(),
         payoutTxId,
       })

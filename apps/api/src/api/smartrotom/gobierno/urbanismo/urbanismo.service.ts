@@ -343,7 +343,7 @@ export class UrbanismoService {
       : [];
     const names = await this.peopleRepository.findUsernames([
       subasta.bidderUuid,
-      subasta.createdBy,
+      subasta.createdByUuid,
       ...bids.map((b) => b.uuid),
     ]);
     return {
@@ -360,7 +360,7 @@ export class UrbanismoService {
       status: subasta.status,
       endsAt: subasta.endsAt,
       settledTxId: subasta.settledTxId,
-      createdBy: toPersonRef(subasta.createdBy, names) as any,
+      createdBy: toPersonRef(subasta.createdByUuid, names) as any,
       createdAt: subasta.createdAt,
       updatedAt: subasta.updatedAt,
       recentBids: withBids
@@ -400,6 +400,9 @@ export class UrbanismoService {
     const code = generateGobCode('SUB');
     const subasta = await this.urbanismoRepository.createSubasta({
       ...dto,
+      // The payload names the actor `createdBy` (it is a person to the client);
+      // the column is `created_by_uuid` because it holds a player uuid.
+      createdByUuid: dto.createdBy,
       code,
     });
     await this.auditoriaService.log({

@@ -18,15 +18,6 @@ export type CreateAppDto = {
     /**
      * The active status of the app
      */
-    active?: CreateAppDto.active;
+    active?: boolean;
 };
-export namespace CreateAppDto {
-    /**
-     * The active status of the app
-     */
-    export enum active {
-        '_0' = 0,
-        '_1' = 1,
-    }
-}
 

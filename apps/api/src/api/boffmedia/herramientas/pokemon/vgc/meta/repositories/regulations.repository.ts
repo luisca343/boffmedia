@@ -18,7 +18,7 @@ export class VgcRegulationsRepository {
     return this.db
       .select()
       .from(vgcRegulations)
-      .where(eq(vgcRegulations.active, 1));
+      .where(eq(vgcRegulations.active, true));
   }
 
   async findById(id: string): Promise<VgcRegulation | null> {
@@ -45,7 +45,7 @@ export class VgcRegulationsRepository {
     name: string;
     gameType?: string;
     vgcPastesGid?: string | null;
-    active?: number;
+    active?: boolean;
   }): Promise<void> {
     const now = new Date();
     await this.db
@@ -61,7 +61,7 @@ export class VgcRegulationsRepository {
         importTeamCount: 0,
         importStartedAt: null,
         importCompletedAt: null,
-        active: data.active ?? 1,
+        active: data.active ?? true,
         createdAt: now,
       })
       .onDuplicateKeyUpdate({
@@ -69,7 +69,7 @@ export class VgcRegulationsRepository {
           formatId: data.formatId,
           name: data.name,
           gameType: data.gameType ?? 'doubles',
-          active: data.active ?? 1,
+          active: data.active ?? true,
           // Only overwrite vgcPastesGid when a string is explicitly supplied.
           // null/undefined means "leave the stored GID as-is" so that re-saving
           // the regulation form without filling in the GID field doesn't wipe

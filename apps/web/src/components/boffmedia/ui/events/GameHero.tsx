@@ -29,7 +29,7 @@ export function GameHero({
 }) {
   const t = useTranslations("juegos")
   const { intlLocale, number: formatNumber } = useFormat()
-  const active = game.active !== 0 && !game.deletedAt
+  const active = !game.deletedAt
   const hue = game.hue || "var(--accent)" // [deferred] no game→hue field
 
   return (

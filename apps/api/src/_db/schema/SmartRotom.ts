@@ -1,5 +1,6 @@
 import { sql } from 'drizzle-orm';
 import {
+  boolean,
   char,
   index,
   int,
@@ -30,7 +31,7 @@ export const rotomApps = mysqlTable('rotom_apps', {
   // guarantee; the pre-check only survives to produce a nicer message.
   name: varchar('name', { length: 32 }).notNull().unique(),
   url: varchar('url', { length: 255 }),
-  active: int('active').default(1),
+  active: boolean('active').notNull().default(true),
 });
 
 export type RotomApp = typeof rotomApps.$inferSelect;
@@ -241,7 +242,7 @@ export const rotomNotifications = mysqlTable('rotom_notifications', {
   title: varchar('title', { length: 255 }).notNull(),
   body: text('body').notNull(),
   link: varchar('link', { length: 512 }),
-  isRead: int('is_read').default(0),
+  isRead: boolean('is_read').notNull().default(false),
   createdAt: timestamp('created_at').notNull().defaultNow(),
 });
 

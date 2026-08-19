@@ -505,6 +505,7 @@ describe('DocumentsController — integration (ValidationPipe + GlobalExceptionF
 
       const res = await request(app.getHttpServer())
         .post('/smartrotom/documents/newsstatus')
+        // `featured` here is a news ID, not a flag — NewsStatusDto keeps it numeric.
         .send({ published: [1, 2], featured: 1 });
 
       expect(res.status).toBe(201);

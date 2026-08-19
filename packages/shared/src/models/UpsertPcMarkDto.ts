@@ -8,10 +8,6 @@ export type UpsertPcMarkDto = {
      */
     server?: string;
     /**
-     * SmartRotom user UUID
-     */
-    uuid: string;
-    /**
      * Opaque content hash identifying the Pokémon
      */
     pokemonKey: string;

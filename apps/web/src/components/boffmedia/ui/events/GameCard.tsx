@@ -14,7 +14,6 @@ export interface GameLike {
   title: string
   description?: string | null
   icon?: string | null
-  active?: number
   createdAt?: string | null
   deletedAt?: string | null
   // ── Fields the games API does NOT provide yet — optional + deferred. ─────────
@@ -31,7 +30,8 @@ export interface GameLike {
 export function GameCard({ game }: { game: GameLike }) {
   const t = useTranslations("juegos")
   const { intlLocale, number: formatNumber } = useFormat()
-  const active = game.active !== 0 && !game.deletedAt
+  // `boffmedia_games` has no `active` column — soft-deletion is the only liveness signal.
+  const active = !game.deletedAt
   const hue = game.hue || "var(--accent)" // [deferred] no game→hue field
 
   return (

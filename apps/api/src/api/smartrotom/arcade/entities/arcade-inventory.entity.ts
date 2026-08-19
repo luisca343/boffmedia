@@ -69,7 +69,8 @@ export class ArcadeInventoryItem {
 
   @ApiProperty({
     example: 0,
-    description: 'Whether item has been used (0 = not used, 1 = used)',
+    description:
+      'How many of this stack have been spent. A count, not a flag — the spend check is `amount > used`.',
   })
   @IsInt()
   used: number;

@@ -1,1 +1,0 @@
-ALTER TABLE `boffmedia_users` ADD `launcher_token_version` int NOT NULL DEFAULT 0;

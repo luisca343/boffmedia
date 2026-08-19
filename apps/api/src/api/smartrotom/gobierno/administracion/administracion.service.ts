@@ -154,7 +154,7 @@ export class AdministracionService {
       name: c.name,
       highway: c.highway,
       destinations: c.destinations as GobiernoCartelEntity['destinations'],
-      createdBy: toPersonRef(c.createdBy, names) as any,
+      createdBy: toPersonRef(c.createdByUuid, names) as any,
       createdAt: c.createdAt,
       updatedAt: c.updatedAt,
     };
@@ -163,7 +163,7 @@ export class AdministracionService {
   async listCarteles(highway?: string): Promise<GobiernoCartelEntity[]> {
     const rows = await this.administracionRepository.listCarteles(highway);
     const names = await this.peopleRepository.findUsernames(
-      rows.map((c) => c.createdBy),
+      rows.map((c) => c.createdByUuid),
     );
     return Promise.all(rows.map((c) => this.toCartelEntity(c, names)));
   }
@@ -171,7 +171,7 @@ export class AdministracionService {
   async getCartel(id: number): Promise<GobiernoCartelEntity> {
     const c = await this.administracionRepository.findCartel(id);
     if (!c) throw new NotFoundException(`Cartel ${id} not found`);
-    const names = await this.peopleRepository.findUsernames([c.createdBy]);
+    const names = await this.peopleRepository.findUsernames([c.createdByUuid]);
     return this.toCartelEntity(c, names);
   }
 
@@ -198,7 +198,7 @@ export class AdministracionService {
       destinations: dto.destinations,
     });
     await this.auditoriaService.log({
-      actorUuid: existing.createdBy,
+      actorUuid: existing.createdByUuid,
       action: 'update',
       target: `cartel "${existing.name}"`,
       dep: 'administracion',
@@ -214,7 +214,7 @@ export class AdministracionService {
     if (!existing) throw new NotFoundException(`Cartel ${id} not found`);
     await this.administracionRepository.deleteCartel(id);
     await this.auditoriaService.log({
-      actorUuid: actorUuid || existing.createdBy,
+      actorUuid: actorUuid || existing.createdByUuid,
       action: 'delete',
       target: `cartel "${existing.name}"`,
       dep: 'administracion',

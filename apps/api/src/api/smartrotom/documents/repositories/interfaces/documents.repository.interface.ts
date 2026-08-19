@@ -8,8 +8,8 @@ export interface DocumentMutation {
   title?: string;
   content?: string;
   type?: number;
-  public?: number;
-  pinned?: number;
+  public?: boolean;
+  pinned?: boolean;
   folderId?: number | null;
 }
 
@@ -21,7 +21,7 @@ export interface IDocumentsRepository {
     title: string;
     content: string;
     type: number;
-    public?: number;
+    public?: boolean;
   }): Promise<{ insertId: number }>;
   updateDocument(id: number, documentData: DocumentMutation): Promise<void>;
   softDeleteDocument(id: number): Promise<void>;

@@ -26,13 +26,6 @@ export class Game {
   icon: string;
 
   @ApiProperty({
-    example: 1,
-    description: 'Whether the game is active (1 = active, 0 = inactive)',
-    required: false,
-  })
-  active?: number;
-
-  @ApiProperty({
     example: '2024-01-01T00:00:00.000Z',
     description: 'When the game was created',
   })

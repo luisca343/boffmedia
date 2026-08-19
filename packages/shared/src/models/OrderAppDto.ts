@@ -9,10 +9,6 @@ export type OrderAppDto = {
      */
     server?: string;
     /**
-     * Player UUID
-     */
-    uuid: string;
-    /**
      * Array of apps with their new order
      */
     order: Array<OrderItemDto>;

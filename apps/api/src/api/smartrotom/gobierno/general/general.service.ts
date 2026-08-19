@@ -42,7 +42,7 @@ export class GeneralService {
       body: a.body,
       town: a.town,
       author: toPersonRef(a.authorUuid, names) as any,
-      pinned: a.pinned === 1,
+      pinned: a.pinned,
       audience: a.audience,
       publishedAt: a.publishedAt,
       createdAt: a.createdAt,
@@ -102,7 +102,7 @@ export class GeneralService {
       title: dto.title,
       body: dto.body,
       town: dto.town,
-      pinned: dto.pinned === undefined ? undefined : dto.pinned ? 1 : 0,
+      pinned: dto.pinned,
       audience: dto.audience,
     });
     await this.auditoriaService.log({

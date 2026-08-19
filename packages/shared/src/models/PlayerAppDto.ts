@@ -11,9 +11,5 @@ export type PlayerAppDto = {
      * The id of the app
      */
     id: number;
-    /**
-     * The uuid of the player
-     */
-    uuid: string;
 };
 

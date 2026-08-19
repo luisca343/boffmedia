@@ -32,8 +32,8 @@ export interface INewsRepository {
     subtitle?: string;
     category?: string;
     subcategory?: string;
-    published?: number;
-    featured?: number;
+    published?: boolean;
+    featured?: boolean;
     content: string;
     buttonText?: string;
     imageUrl?: string;
@@ -48,8 +48,8 @@ export interface INewsRepository {
       subtitle?: string;
       category?: string;
       subcategory?: string;
-      published?: number;
-      featured?: number;
+      published?: boolean;
+      featured?: boolean;
       content?: string;
       buttonText?: string;
       imageUrl?: string;
@@ -59,13 +59,13 @@ export interface INewsRepository {
     },
   ): Promise<void>;
   deleteNews(newsId: number): Promise<void>;
-  updateAllNewsPublishedStatus(published: number): Promise<void>;
+  updateAllNewsPublishedStatus(published: boolean): Promise<void>;
   updateNewsPublishedStatus(
     newsIds: number[],
-    published: number,
+    published: boolean,
   ): Promise<void>;
-  updateAllNewsFeaturedStatus(featured: number): Promise<void>;
-  updateNewsFeaturedStatus(newsId: number, featured: number): Promise<void>;
+  updateAllNewsFeaturedStatus(featured: boolean): Promise<void>;
+  updateNewsFeaturedStatus(newsId: number, featured: boolean): Promise<void>;
 
   findCommentsByNewsId(newsId: number): Promise<NewsCommentRow[]>;
   createComment(

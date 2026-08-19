@@ -32,16 +32,16 @@ export class News {
   subcategory: string;
 
   @ApiProperty({
-    example: 1,
-    description: 'Published status (0=draft, 1=published)',
+    example: true,
+    description: 'Published, as opposed to a draft',
   })
-  published: number;
+  published: boolean;
 
   @ApiProperty({
-    example: 0,
-    description: 'Featured status (0=normal, 1=featured)',
+    example: false,
+    description: 'Featured on the news landing page',
   })
-  featured: number;
+  featured: boolean;
 
   @ApiProperty({
     example: 'We are excited to announce the release of new features...',

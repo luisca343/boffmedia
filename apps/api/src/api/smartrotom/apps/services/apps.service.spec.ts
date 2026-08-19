@@ -9,7 +9,7 @@ const mockApp = {
   id: 1,
   name: 'Test App',
   url: 'test-app',
-  active: 1,
+  active: true,
   createdAt: new Date(),
   updatedAt: new Date(),
 };

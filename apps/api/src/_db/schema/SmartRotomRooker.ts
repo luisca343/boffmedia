@@ -1,4 +1,5 @@
 import {
+  boolean,
   char,
   foreignKey,
   index,
@@ -63,7 +64,7 @@ export const rookerPosts = mysqlTable(
     text: varchar('text', { length: 280 }),
     type: varchar('type', { length: 16 }).notNull().default('text'),
     parentId: int('parent_id'),
-    pinned: int('pinned').default(0),
+    pinned: boolean('pinned').notNull().default(false),
     mediaUrl: varchar('media_url', { length: 512 }),
     captureId: int('capture_id').references(() => pokedexRegistry.id, {
       onDelete: 'set null',

@@ -12,7 +12,7 @@ export type AddNoteToUserDto = {
      */
     documentId: number;
     /**
-     * User UUID
+     * UUID of the player the note is shared with (NOT the caller)
      */
     uuid: string;
 };
