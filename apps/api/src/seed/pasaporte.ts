@@ -33,7 +33,7 @@ const DEFAULT_WEIGHT = { tier: 'bronce', points: 10 };
 const DEFAULT_POINTS = 10;
 const DEFAULT_TIER = 'bronce';
 
-async function main() {
+export async function main() {
   const DATABASE_URL = env.DATABASE_URL;
   if (!DATABASE_URL) throw new Error('DATABASE_URL env var is required');
 
@@ -103,7 +103,10 @@ async function main() {
   logger.info(`✓ Pasaporte seed complete — ${updated} achievement(s) weighted`);
 }
 
-main().catch((err) => {
-  logger.error(err);
-  process.exit(1);
-});
+// Direct invocation only; `seed:system` imports `main` and awaits it.
+if (require.main === module) {
+  main().catch((err) => {
+    logger.error(err);
+    process.exit(1);
+  });
+}

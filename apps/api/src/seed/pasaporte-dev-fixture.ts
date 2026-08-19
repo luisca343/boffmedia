@@ -171,7 +171,7 @@ const TRIPS: Array<[string, number, number]> = [
   ['Ciudad Plateada', 80, 5],
 ];
 
-async function main() {
+export async function main() {
   const clean = process.argv.includes('--clean');
   const connection = await mysql.createConnection({
     host: env.DB_HOST,
@@ -298,7 +298,10 @@ async function main() {
   logger.info('✓ dev fixture applied — run with --clean to remove it');
 }
 
-main().catch((err) => {
-  logger.error(err);
-  process.exit(1);
-});
+// Direct invocation only; `seed:system` imports `main` and awaits it.
+if (require.main === module) {
+  main().catch((err) => {
+    logger.error(err);
+    process.exit(1);
+  });
+}

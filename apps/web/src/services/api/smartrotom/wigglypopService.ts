@@ -1,20 +1,25 @@
 import {
   rotomGET,
   rotomGETOrThrow,
-  rotomPOST,
-  rotomPOSTOrThrow,
-  rotomPUTOrThrow,
-  rotomPATCHOrThrow,
-  rotomDELETE,
+  rotomAuthedPOST,
+  rotomAuthedPOSTOrThrow,
+  rotomAuthedPUTOrThrow,
+  rotomAuthedPATCHOrThrow,
+  rotomAuthedDELETE,
   type ApiResponse,
 } from "@/services/boffAPI"
 
 /**
  * Wigglypop — the marketplace transport.
  *
- * Every non-GET goes through `rotomPOST/PUT/PATCH/DELETE`, which inject
- * `body.server = MC_WORLD` for you. Without it `MinecraftMiddleware` 403s the
- * request (SMARTROTOM_V3.md §8) — so never reach for the bare `POST` here.
+ * Every non-GET uses `rotomAuthed*`: all 17 mutations sit behind
+ * `GameOrUserAuthGuard` and need the session Bearer; every GET is `@Public()`.
+ * The helpers also inject `body.server`, which MinecraftMiddleware requires.
+ *
+ * The Bearer gives the guard an identity, so `assertActsAsSelf`/`actingUuid`
+ * now enforce ownership. Every actor field (sellerUuid, buyerUuid, bidderUuid,
+ * proposerUuid, reviewerUuid, actorUuid) must be the caller's own uuid from
+ * `useWpUuid()` — a counterparty's is a 403.
  *
  * Types are intentionally loose (`unknown`) at this boundary: the real models come
  * from `@boffmedia/shared` once `pnpm generate:shared` has run against the new
@@ -62,13 +67,13 @@ export class WigglypopService {
     return rotomGETOrThrow<T>(`${BASE}/listings/${id}`)
   }
   static createListing<T>(body: unknown): Promise<T> {
-    return rotomPOSTOrThrow<T>(`${BASE}/listings`, body)
+    return rotomAuthedPOSTOrThrow<T>(`${BASE}/listings`, body)
   }
   static updateListing<T>(id: number, body: unknown): Promise<T> {
-    return rotomPATCHOrThrow<T>(`${BASE}/listings/${id}`, body)
+    return rotomAuthedPATCHOrThrow<T>(`${BASE}/listings/${id}`, body)
   }
   static deleteListing<T>(id: number, actorUuid: string): Promise<ApiResponse<T>> {
-    return rotomDELETE<T>(`${BASE}/listings/${id}`, { actorUuid })
+    return rotomAuthedDELETE<T>(`${BASE}/listings/${id}`, { actorUuid })
   }
   static getBids<T>(id: number): Promise<T> {
     return rotomGETOrThrow<T>(`${BASE}/listings/${id}/bids`)
@@ -87,7 +92,7 @@ export class WigglypopService {
     return rotomGET<T>(`${BASE}/item-catalog`)
   }
   static valuate<T>(body: unknown): Promise<ApiResponse<T>> {
-    return rotomPOST<T>(`${BASE}/valuate`, body)
+    return rotomAuthedPOST<T>(`${BASE}/valuate`, body)
   }
 
   // ── watchlist ──────────────────────────────────────────────────────────────
@@ -95,7 +100,7 @@ export class WigglypopService {
     return rotomGETOrThrow<T>(`${BASE}/watchlist/${uuid}`)
   }
   static toggleWatch<T>(uuid: string, listingId: number): Promise<T> {
-    return rotomPUTOrThrow<T>(`${BASE}/watchlist`, { uuid, listingId })
+    return rotomAuthedPUTOrThrow<T>(`${BASE}/watchlist`, { uuid, listingId })
   }
 
   // ── orders (the escrow flow) ───────────────────────────────────────────────
@@ -103,21 +108,21 @@ export class WigglypopService {
     buyerUuid: string
     lines: Array<{ listingId: number; qty: number }>
   }): Promise<T> {
-    return rotomPOSTOrThrow<T>(`${BASE}/orders`, body)
+    return rotomAuthedPOSTOrThrow<T>(`${BASE}/orders`, body)
   }
   static getOrders<T>(uuid: string): Promise<T> {
     return rotomGETOrThrow<T>(`${BASE}/orders/user/${uuid}`)
   }
   /** Seller: "I handed it over in-game." Manual-custody path only. */
   static markTransferred<T>(id: number, actorUuid: string): Promise<T> {
-    return rotomPOSTOrThrow<T>(`${BASE}/orders/${id}/transferred`, { actorUuid })
+    return rotomAuthedPOSTOrThrow<T>(`${BASE}/orders/${id}/transferred`, { actorUuid })
   }
   /** Buyer: "I got it." THIS is what releases the escrow to the seller. */
   static confirmOrder<T>(id: number, actorUuid: string): Promise<T> {
-    return rotomPOSTOrThrow<T>(`${BASE}/orders/${id}/confirm`, { actorUuid })
+    return rotomAuthedPOSTOrThrow<T>(`${BASE}/orders/${id}/confirm`, { actorUuid })
   }
   static cancelOrder<T>(id: number, actorUuid: string): Promise<T> {
-    return rotomPOSTOrThrow<T>(`${BASE}/orders/${id}/cancel`, { actorUuid })
+    return rotomAuthedPOSTOrThrow<T>(`${BASE}/orders/${id}/cancel`, { actorUuid })
   }
 
   // ── auctions ───────────────────────────────────────────────────────────────
@@ -126,7 +131,7 @@ export class WigglypopService {
     bidderUuid: string
     amount: number
   }): Promise<T> {
-    return rotomPOSTOrThrow<T>(`${BASE}/bids`, body)
+    return rotomAuthedPOSTOrThrow<T>(`${BASE}/bids`, body)
   }
 
   // ── offers ─────────────────────────────────────────────────────────────────
@@ -136,16 +141,16 @@ export class WigglypopService {
     amount: number
     qty?: number
   }): Promise<T> {
-    return rotomPOSTOrThrow<T>(`${BASE}/offers`, body)
+    return rotomAuthedPOSTOrThrow<T>(`${BASE}/offers`, body)
   }
   static getSellerOffers<T>(uuid: string): Promise<T> {
     return rotomGETOrThrow<T>(`${BASE}/offers/seller/${uuid}`)
   }
   static acceptOffer<T>(id: number, actorUuid: string): Promise<ApiResponse<T>> {
-    return rotomPOST<T>(`${BASE}/offers/${id}/accept`, { actorUuid })
+    return rotomAuthedPOST<T>(`${BASE}/offers/${id}/accept`, { actorUuid })
   }
   static rejectOffer<T>(id: number, actorUuid: string): Promise<ApiResponse<T>> {
-    return rotomPOST<T>(`${BASE}/offers/${id}/reject`, { actorUuid })
+    return rotomAuthedPOST<T>(`${BASE}/offers/${id}/reject`, { actorUuid })
   }
 
   // ── trades ─────────────────────────────────────────────────────────────────
@@ -155,16 +160,16 @@ export class WigglypopService {
     offeredPokemonKey: string
     offeredSnapshot: unknown
   }): Promise<ApiResponse<T>> {
-    return rotomPOST<T>(`${BASE}/trades`, body)
+    return rotomAuthedPOST<T>(`${BASE}/trades`, body)
   }
   static getSellerTrades<T>(uuid: string): Promise<T> {
     return rotomGETOrThrow<T>(`${BASE}/trades/seller/${uuid}`)
   }
   static acceptTrade<T>(id: number, actorUuid: string): Promise<ApiResponse<T>> {
-    return rotomPOST<T>(`${BASE}/trades/${id}/accept`, { actorUuid })
+    return rotomAuthedPOST<T>(`${BASE}/trades/${id}/accept`, { actorUuid })
   }
   static rejectTrade<T>(id: number, actorUuid: string): Promise<ApiResponse<T>> {
-    return rotomPOST<T>(`${BASE}/trades/${id}/reject`, { actorUuid })
+    return rotomAuthedPOST<T>(`${BASE}/trades/${id}/reject`, { actorUuid })
   }
 
   // ── sellers ────────────────────────────────────────────────────────────────
@@ -179,6 +184,6 @@ export class WigglypopService {
     rating: number
     body?: string
   }): Promise<ApiResponse<T>> {
-    return rotomPOST<T>(`${BASE}/reviews`, body)
+    return rotomAuthedPOST<T>(`${BASE}/reviews`, body)
   }
 }

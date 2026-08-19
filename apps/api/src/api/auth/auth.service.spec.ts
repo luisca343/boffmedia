@@ -92,7 +92,7 @@ describe('AuthService', () => {
       name: 'TrainerAsh',
       email: 'ash@pokemon.com',
       roles: ['user'],
-      mcUUid: 'abc-123',
+      mcUuid: 'abc-123',
       smartRotomUser: {},
     };
 
@@ -104,6 +104,16 @@ describe('AuthService', () => {
       expect(result.user.id).toBe(1);
       expect(result.user.username).toBe('TrainerAsh');
       expect(jwtService.sign).toHaveBeenCalledTimes(2);
+    });
+
+    // Regression: `login()` takes `any`, so a claim that silently stops being
+    // produced type-checks fine. Assert the payload, not just the token string.
+    it('signs the mcUuid claim into both tokens', async () => {
+      await service.login(fullUser);
+
+      for (const [payload] of jwtService.sign.mock.calls) {
+        expect(payload).toMatchObject({ mcUuid: 'abc-123' });
+      }
     });
 
     it('should unwrap sessionUser when present', async () => {

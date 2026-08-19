@@ -14,10 +14,10 @@ import pino from 'pino';
 const logger = pino({ name: 'seed:dev' });
 
 const STEPS: { name: string; run: () => Promise<unknown> }[] = [
-  { name: 'packs-dev', run: () => import('./packs-dev') },
+  { name: 'packs-dev', run: () => import('./packs-dev').then((m) => m.main()) },
   {
     name: 'pasaporte-dev-fixture',
-    run: () => import('./pasaporte-dev-fixture'),
+    run: () => import('./pasaporte-dev-fixture').then((m) => m.main()),
   },
 ];
 

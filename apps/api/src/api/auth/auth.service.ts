@@ -40,7 +40,7 @@ export class AuthService {
       sub: user.id,
       email: user.email,
       roles: isIngame ? [] : user.roles,
-      mcUuid: user.mcUUid,
+      mcUuid: user.mcUuid,
     };
 
     return {
@@ -56,7 +56,7 @@ export class AuthService {
         username: user.name,
         email: user.email,
         roles: user.roles,
-        mcUuid: user.mcUUid,
+        mcUuid: user.mcUuid,
         smartRotomUser: user.smartRotomUser || {},
       },
     };
@@ -87,7 +87,7 @@ export class AuthService {
           name: user.boffMediaUser.username,
           email: user.boffMediaUser.email,
           roles: user.roles,
-          mcUUid: user.boffMediaUser.uuid,
+          mcUuid: user.boffMediaUser.uuid,
           smartRotomUser: user.smartRotomUser,
         },
       },

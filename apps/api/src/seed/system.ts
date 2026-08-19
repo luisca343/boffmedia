@@ -30,12 +30,21 @@ import pino from 'pino';
 const logger = pino({ name: 'seed:system' });
 
 const STEPS: { name: string; run: () => Promise<unknown> }[] = [
-  { name: 'default', run: () => import('./default') },
-  { name: 'forum-categories', run: () => import('./forum-categories') },
-  { name: 'gobierno (incl. house accounts)', run: () => import('./gobierno') },
-  { name: 'mine-rewards', run: () => import('./mine-rewards') },
-  { name: 'pasaporte', run: () => import('./pasaporte') },
-  { name: 'rooker', run: () => import('./rooker') },
+  { name: 'default', run: () => import('./default').then((m) => m.main()) },
+  {
+    name: 'forum-categories',
+    run: () => import('./forum-categories').then((m) => m.main()),
+  },
+  {
+    name: 'gobierno (incl. house accounts)',
+    run: () => import('./gobierno').then((m) => m.main()),
+  },
+  {
+    name: 'mine-rewards',
+    run: () => import('./mine-rewards').then((m) => m.main()),
+  },
+  { name: 'pasaporte', run: () => import('./pasaporte').then((m) => m.main()) },
+  { name: 'rooker', run: () => import('./rooker').then((m) => m.main()) },
 ];
 
 async function main() {
@@ -48,8 +57,8 @@ async function main() {
 
   for (const step of STEPS) {
     logger.info(`▶ ${step.name}`);
-    // Each seed script runs its own `main()` on import and closes its own
-    // connection; awaiting the import is what sequences them.
+    // Awaiting the imported `main()` is what sequences these. Awaiting the
+    // bare `import()` does not — it resolves once the module has evaluated.
     await step.run();
   }
 

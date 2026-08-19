@@ -32,6 +32,8 @@ export interface SessionUser {
   name: string;
   email: string;
   roles: string[];
+  /** Linked Minecraft uuid; minted as the `mcUuid` JWT claim. */
+  mcUuid?: string;
   smartRotomUser: {
     username: string;
     uuid: string;
@@ -1058,6 +1060,9 @@ export class BoffMediaUsersManagementService {
       name: fullUser.boffmedia_users.username,
       email: fullUser.boffmedia_users.email,
       roles,
+      // Load-bearing: `@CurrentMcUuid()` 403s without it, and `assertActsAsSelf`
+      // silently skips ownership checks without it.
+      mcUuid: fullUser.boffmedia_users.uuid ?? undefined,
       smartRotomUser: fullUser.rotom_users
         ? {
             username: fullUser.rotom_users.username,

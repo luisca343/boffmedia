@@ -44,13 +44,17 @@ export const env = z
     // without it; when unset, server auth is unavailable and the mod is locked out
     // (JWT still works). NOT a JWT — see GameOrUserAuthGuard.
     TERAS_API_TOKEN: z.string().optional(),
-    // Rollout flag for money/admin route auth. While false (default), the guard
-    // still accepts the legacy `body.server === MC_WORLD` tripwire so an
-    // un-migrated web keeps working. Flip to true once the web sends its JWT;
-    // the mod already sends its Bearer, so it needs no change.
+    // Closes the legacy `body.server === MC_WORLD` tripwire. Read by BOTH
+    // GameServerTransitionalAuthGuard and GameOrUserAuthGuard — grep the flag,
+    // not either guard.
+    //
+    // Mod and web are both ready: the mod already sends its Bearer on all four
+    // flag-sensitive routes, and wigglypopService moved to the authed helpers.
+    // Still requires `TerasConfig.apiToken` on the game server to equal
+    // TERAS_API_TOKEN here — both default to empty and fail silently/closed.
     ENFORCE_MONEY_AUTH: z
       .enum(['true', 'false'])
-      .default('false')
+      .default('true')
       .transform((v) => v === 'true'),
     // Wigglypop marketplace. OFF until the game server ships /takepokemon + /takeitems.
     // While it is off, a sale only moves money (buyer → escrow → seller) and the two players

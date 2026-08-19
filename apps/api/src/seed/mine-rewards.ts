@@ -660,7 +660,7 @@ function assertFits(rewards: Reward[]) {
   }
 }
 
-async function main() {
+export async function main() {
   const DATABASE_URL = env.DATABASE_URL;
   if (!DATABASE_URL) throw new Error('DATABASE_URL env var is required');
 
@@ -729,7 +729,10 @@ async function main() {
   await connection.end();
 }
 
-main().catch((e) => {
-  logger.error(e);
-  process.exit(1);
-});
+// Direct invocation only; `seed:system` imports `main` and awaits it.
+if (require.main === module) {
+  main().catch((e) => {
+    logger.error(e);
+    process.exit(1);
+  });
+}

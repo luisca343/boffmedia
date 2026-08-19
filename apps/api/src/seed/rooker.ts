@@ -41,7 +41,7 @@ function dedupe(base: string, taken: Set<string>): string {
   }
 }
 
-async function main() {
+export async function main() {
   const DATABASE_URL = env.DATABASE_URL;
   if (!DATABASE_URL) throw new Error('DATABASE_URL env var is required');
 
@@ -86,7 +86,10 @@ async function main() {
   logger.info(`✓ Rooker seed complete — ${created} profile(s) created`);
 }
 
-main().catch((err) => {
-  logger.error(err);
-  process.exit(1);
-});
+// Direct invocation only; `seed:system` imports `main` and awaits it.
+if (require.main === module) {
+  main().catch((err) => {
+    logger.error(err);
+    process.exit(1);
+  });
+}

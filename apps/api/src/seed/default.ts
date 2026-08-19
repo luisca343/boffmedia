@@ -17,7 +17,7 @@ import pino from 'pino';
 
 const logger = pino({ name: 'util' });
 
-async function main() {
+export async function main() {
   const DATABASE_URL = env.DATABASE_URL;
   if (!DATABASE_URL) throw new Error('DATABASE_URL env var is required');
 
@@ -115,7 +115,10 @@ async function main() {
   logger.info('✓ Seed complete');
 }
 
-main().catch((err) => {
-  logger.error(err);
-  process.exit(1);
-});
+// Direct invocation only; `seed:system` imports `main` and awaits it.
+if (require.main === module) {
+  main().catch((err) => {
+    logger.error(err);
+    process.exit(1);
+  });
+}
