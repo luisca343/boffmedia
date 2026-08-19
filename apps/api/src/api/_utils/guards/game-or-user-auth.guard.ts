@@ -23,11 +23,11 @@ import { extractBearer, matchesServerToken } from '../auth/server-token';
  * passport would reject it outright. Bearer is the only server credential —
  * do not reintroduce a header-based one (see DARCAJA.md §D1).
  *
- * Rollout: while `ENFORCE_MONEY_AUTH` is false (default), a request carrying the
- * legacy `body.server === MC_WORLD` tripwire is still allowed, so an un-migrated
- * web keeps working. Flip the flag to true once the web sends its JWT — then
- * only the two real credentials are accepted. See MinecraftMiddleware (not a
- * security boundary) for why the tripwire alone is insufficient.
+ * `ENFORCE_MONEY_AUTH` now defaults to true, so only the two credentials above
+ * are accepted. The legacy `body.server === MC_WORLD` branch below survives
+ * solely as the rollback: setting the flag to false in the environment reopens
+ * it without a code change. See MinecraftMiddleware (not a security boundary)
+ * for why the tripwire alone is insufficient.
  */
 @Injectable()
 export class GameOrUserAuthGuard extends AuthGuard('jwt') {

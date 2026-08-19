@@ -13,6 +13,7 @@ import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
 import { env } from './config/env';
 import { PrometheusModule } from '@willsoto/nestjs-prometheus';
+import { METRICS_PATH } from '@/_utils/metrics/metrics.constants';
 import { MetricsMiddleware } from './_utils/metrics/metrics.middleware';
 import { SmartRotomAppsModule } from '@api/smartrotom/apps/apps.module';
 import { SmartRotomUsersModule } from '@api/smartrotom/users/users.module';
@@ -78,7 +79,7 @@ import { RandomizerModule } from '@api/randomizer/randomizer.module';
   imports: [
     PrometheusModule.register({
       defaultMetrics: { enabled: true },
-      path: '/metrics',
+      path: METRICS_PATH,
     }),
     // Rate limiting is available app-wide but only enforced where ThrottlerGuard is
     // applied (auth routes) — a global guard would throttle SSE/tool streams too.

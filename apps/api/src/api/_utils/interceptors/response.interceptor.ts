@@ -11,6 +11,7 @@ import { Observable, throwError } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
 import { Reflector } from '@nestjs/core';
 import { SKIP_ENVELOPE_METADATA_KEY } from '@/common/decorators/skip-envelope.decorator';
+import { METRICS_PATH } from '@/_utils/metrics/metrics.constants';
 
 @Injectable()
 export class ResponseInterceptor implements NestInterceptor {
@@ -31,6 +32,14 @@ export class ResponseInterceptor implements NestInterceptor {
     const request = context.switchToHttp().getRequest();
     const response = context.switchToHttp().getResponse();
     const handler = context.getHandler();
+
+    // Prometheus exposition is a text format and must not be wrapped. Its
+    // controller comes from PrometheusModule, so it cannot carry
+    // @SkipEnvelope() — the path is the only handle we have. Wrapped, the body
+    // starts `{"success":true,...}` and every scrape fails to parse.
+    if (request?.path === METRICS_PATH) {
+      return next.handle();
+    }
 
     // Get action name from ApiOperation
     const { action } = this.extractSwaggerMetadata(handler);

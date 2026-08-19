@@ -42,5 +42,21 @@ setup("authenticate", async ({ page }) => {
 
   await page.waitForURL((url) => !url.pathname.startsWith("/auth"), { timeout: 20_000, waitUntil: "commit" })
 
+  // Leaving /auth is NOT proof of a session. next-auth answers the credentials
+  // callback 200 and redirects even when the browser then refuses to store the
+  // cookie — which is what happens on any origin the cookie options cannot be
+  // expressed on (see authOptions' `servedOverInsecureOrigin`). The saved state is
+  // then empty and every chromium:auth spec runs anonymously while still passing,
+  // because a mocked spec never needs a session. Check the session itself.
+  const session = await page.request.get("/api/auth/session")
+  const user = session.ok() ? ((await session.json()) as { user?: unknown }).user : undefined
+  if (!user) {
+    throw new Error(
+      "Auth setup: signed in but no session was stored. /api/auth/session came back empty, " +
+        "so the session cookie was rejected by the browser — check that NEXTAUTH_URL matches " +
+        "the origin under test and that the cookie options in authOptions are valid for it.",
+    )
+  }
+
   await page.context().storageState({ path: AUTH_FILE })
 })
