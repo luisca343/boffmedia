@@ -1,7 +1,6 @@
 import {
   AuthenticationResultEntity, BatchUsersDto, BoffMediaUserEntity, CreateUserDto, FullUserEntity,
-  GoogleAuthDto, IntegratedUserCreationResultEntity, UserLoginDto,
-  MinecraftLinkDto, MinecraftRegistrationDto,
+  GoogleAuthDto, UserLoginDto,
   SessionUserEntity, SuccessResponse, UpdateUserDto, UserStatistics, UserValidationResponseEntity,
   UserRolesResponseEntity, UsersPaginatedResponseEntity, UserWithIntegrationsEntity,
 } from '@boffmedia/shared';
@@ -15,7 +14,7 @@ import {
   apiAuthedAutoDELETE,
 } from '@/services/boffAPI';
 
-export type { GoogleAuthDto, UserLoginDto, MinecraftLinkDto, MinecraftRegistrationDto };
+export type { GoogleAuthDto, UserLoginDto };
 
 export type BatchUsersRequest = BatchUsersDto;
 export type UsersPaginatedResponse = UsersPaginatedResponseEntity;
@@ -30,20 +29,6 @@ export class UsersService {
    */
   static createUser(data: CreateUserDto) {
     return apiPOST<BoffMediaUserEntity>('/users', data);
-  }
-
-  /**
-   * Register a new user with Minecraft integration
-   */
-  static registerMinecraftUser(data: MinecraftRegistrationDto) {
-    return apiPOST<IntegratedUserCreationResultEntity>('/users/minecraft/register', data);
-  }
-
-  /**
-   * Link existing user to Minecraft account
-   */
-  static linkMinecraftAccount(data: MinecraftLinkDto) {
-    return apiPOST<UserWithIntegrationsEntity>('/users/minecraft/link', data);
   }
 
   /**

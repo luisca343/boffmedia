@@ -2,13 +2,7 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { useTranslations } from "next-intl"
-import {
-  rotomAuthedPOSTOrThrow,
-  rotomGETOrThrow,
-  rotomPOSTOrThrow,
-  userMessageFrom,
-  rotomAuthedGETOrThrow,
-} from "@/services/boffAPI";
+import { rotomAuthedPOSTOrThrow, userMessageFrom, rotomAuthedGETOrThrow } from "@/services/boffAPI";
 import { useApiError } from "@/hooks/useApiError"
 import type { SendNotificationPayload } from "@/services/api/smartrotom/notificationsService"
 import type { NotificationResponseDto } from "@boffmedia/shared"
@@ -29,7 +23,7 @@ export const adminKeys = {
 export const useAdminUsers = () =>
   useQuery({
     queryKey: adminKeys.users,
-    queryFn: () => rotomGETOrThrow<SmartRotomUser[]>("/users"),
+    queryFn: () => rotomAuthedGETOrThrow<SmartRotomUser[]>("/users"),
   })
 
 export const useAdminApps = () =>

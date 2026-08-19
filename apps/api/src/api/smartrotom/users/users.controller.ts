@@ -10,7 +10,6 @@ import {
   ParseIntPipe,
   UseGuards,
 } from '@nestjs/common';
-import { Public } from '@api/_utils/decorators/public.decorator';
 import { JwtAuthGuard } from '@api/auth/jwt-auth.guard';
 import { RolesGuard } from '@api/_utils/guards/roles.guard';
 import { Roles } from '@api/_utils/decorators/roles.decorator';
@@ -35,13 +34,26 @@ import { UserStatistics } from './entities/user-statistics.entity';
 import { UserValidationResult } from './entities/user-validation-result.entity';
 
 @ApiTags('SmartRotom | Users')
+// Three tiers, and nothing here is anonymous.
+//
+// Reads (roster, by id/uuid, accounts, stats, validate) need a **session**: any
+// signed-in player, because ChatApp's group picker legitimately lists players.
+// They used to be `@Public()`, which meant the whole username/uuid roster was
+// enumerable by anyone on the internet — while `POST batch`, the same data in
+// one call, demanded ROTOM_ADMIN. The singular and batch forms now agree.
+//
+// Writes that create or mutate a user (`POST /`, `PATCH :id`, `DELETE :id`,
+// `find-or-create`, `initialize`) stay ROTOM_ADMIN.
+//
+// No route carries `@Public()` any more, including the admin ones where it was
+// inert: `@Public()` only stands down the global JwtAuthGuard, so next to an
+// explicit guard it changes nothing and only obscures which credential applies.
 @Controller('smartrotom/users')
 export class UsersController {
   constructor(private readonly usersFacadeService: UsersFacadeService) {}
 
   // ==================== BASIC USER OPERATIONS ====================
 
-  @Public()
   @Get()
   @ApiOperation({ summary: 'Get all users' })
   @ApiResponse({
@@ -57,7 +69,6 @@ export class UsersController {
     return this.usersFacadeService.getAllUsers() as unknown as RotomUser[];
   }
 
-  @Public()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(USER_ROLES.ROTOM_ADMIN)
   @Post()
@@ -87,7 +98,6 @@ export class UsersController {
     ) as unknown as RotomUser;
   }
 
-  @Public()
   @Get(':id')
   @ApiOperation({ summary: 'Get a user by ID' })
   @ApiResponse({
@@ -105,7 +115,6 @@ export class UsersController {
     return this.usersFacadeService.getUserById(id) as unknown as RotomUser;
   }
 
-  @Public()
   @Get('uuid/:uuid')
   @ApiOperation({ summary: 'Get a user by UUID' })
   @ApiResponse({
@@ -127,7 +136,6 @@ export class UsersController {
     return user as unknown as RotomUser;
   }
 
-  @Public()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(USER_ROLES.ROTOM_ADMIN)
   @Patch(':id')
@@ -191,7 +199,6 @@ export class UsersController {
 
   // ==================== ENHANCED OPERATIONS ====================
 
-  @Public()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(USER_ROLES.ROTOM_ADMIN)
   @Post('find-or-create')
@@ -221,7 +228,6 @@ export class UsersController {
     } as unknown as FindOrCreateResult;
   }
 
-  @Public()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(USER_ROLES.ROTOM_ADMIN)
   @Post('initialize')
@@ -245,7 +251,6 @@ export class UsersController {
 
   // ==================== USER WITH ACCOUNTS ====================
 
-  @Public()
   @Get(':uuid/accounts')
   @ApiOperation({ summary: 'Get user with their accounts' })
   @ApiResponse({
@@ -265,9 +270,6 @@ export class UsersController {
     return result as unknown as UserWithAccounts;
   }
 
-  @Public()
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(USER_ROLES.ROTOM_ADMIN)
   @Post('batch')
   @ApiOperation({ summary: 'Get multiple users by UUIDs' })
   @ApiResponse({
@@ -292,9 +294,6 @@ export class UsersController {
     ) as unknown as { [uuid: string]: RotomUser | null };
   }
 
-  @Public()
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(USER_ROLES.ROTOM_ADMIN)
   @Post('batch/accounts')
   @ApiOperation({ summary: 'Get multiple users with their accounts' })
   @ApiResponse({
@@ -324,7 +323,6 @@ export class UsersController {
 
   // ==================== STATISTICS ====================
 
-  @Public()
   @Get('stats/overview')
   @ApiOperation({ summary: 'Get user statistics overview' })
   @ApiResponse({
@@ -338,7 +336,6 @@ export class UsersController {
 
   // ==================== VALIDATION ====================
 
-  @Public()
   @Get('validate/:uuid')
   @ApiOperation({ summary: 'Validate if user exists' })
   @ApiResponse({
