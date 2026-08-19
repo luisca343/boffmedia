@@ -3,7 +3,6 @@ import {
   Get,
   Param,
   NotFoundException,
-  ForbiddenException,
   HttpStatus,
   StreamableFile,
 } from '@nestjs/common';
@@ -11,14 +10,8 @@ import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Public } from '@api/_utils/decorators/public.decorator';
 import { EventsService } from './services/events.service';
 import { AssignmentsService } from './services/assignments.service';
-import {
-  PublicConfigDto,
-  PublicAssignmentDto,
-} from './dto/randomizer.dto';
-import {
-  RandomizerConfigStatus,
-  RandomizerAssignmentStatus,
-} from '@/_db/schema/Randomizer';
+import { PublicConfigDto, PublicAssignmentDto } from './dto/randomizer.dto';
+import { RandomizerConfigStatus } from '@/_db/schema/Randomizer';
 
 /**
  * Public randomizer endpoints — NO AUTH REQUIRED.
@@ -51,7 +44,10 @@ export class RandomizerPublicController {
     description: 'No auth required. Settings blob hash only when published.',
   })
   @ApiResponse({ status: HttpStatus.OK, type: PublicConfigDto })
-  @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'No config found for event' })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'No config found for event',
+  })
   async getEventConfig(
     @Param('eventId') eventId: string,
   ): Promise<PublicConfigDto> {
@@ -73,7 +69,9 @@ export class RandomizerPublicController {
       status: config.status as RandomizerConfigStatus,
       createdAt: config.createdAt,
       // Include settings blob hash only when published
-      ...(config.status === 'published' && { settingsBlobSha512: config.settingsBlobSha512 }),
+      ...(config.status === 'published' && {
+        settingsBlobSha512: config.settingsBlobSha512,
+      }),
     };
   }
 
@@ -90,14 +88,17 @@ export class RandomizerPublicController {
   @Get('events/:eventId/assignments')
   @ApiOperation({
     summary: 'List event assignments with status (public)',
-    description: 'No auth required. Seed revealed only when config is published.',
+    description:
+      'No auth required. Seed revealed only when config is published.',
   })
   @ApiResponse({ status: HttpStatus.OK, type: [PublicAssignmentDto] })
   async listEventAssignments(
     @Param('eventId') eventId: string,
   ): Promise<PublicAssignmentDto[]> {
     const config = await this.events.getConfigByEventId(Number(eventId));
-    const assignments = await this.assignments.listAssignmentsForPublic(config.id);
+    const assignments = await this.assignments.listAssignmentsForPublic(
+      config.id,
+    );
     return assignments;
   }
 
@@ -112,7 +113,8 @@ export class RandomizerPublicController {
   @Get('events/:eventId/settings')
   @ApiOperation({
     summary: 'Download event settings file (.rnqs)',
-    description: 'Only available after config is published. Returns 403 if not published.',
+    description:
+      'Only available after config is published. Returns 403 if not published.',
   })
   @ApiResponse({ status: HttpStatus.OK })
   async getEventSettings(
@@ -138,7 +140,8 @@ export class RandomizerPublicController {
   @Get('events/:eventId/assignments/:assignmentId/log')
   @ApiOperation({
     summary: 'Download assignment log file (public)',
-    description: 'Only available after config is published. Returns 403 if not published.',
+    description:
+      'Only available after config is published. Returns 403 if not published.',
   })
   @ApiResponse({ status: HttpStatus.OK })
   async getAssignmentLog(

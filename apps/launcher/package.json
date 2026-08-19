@@ -1,6 +1,6 @@
 {
   "name": "launcher",
-  "version": "0.0.1",
+  "version": "0.9.0",
   "private": true,
   "scripts": {
     "dev": "node scripts/profile.mjs dev dev",

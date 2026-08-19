@@ -55,6 +55,22 @@ export const otros: GameEntry = {
           },
         },
         {
+          key: "steamfree",
+          nameKey: "games.otros.tools.steamfree",
+          href: "/otros/steamfree",
+          sidebarIcon: "gift",
+          landing: {
+            icon: "",
+            fallbackIcon: "gift",
+            fallbackIconColor: "text-secondary-hover",
+            color: "from-secondary-hover to-emerald-600",
+            features: ["live", "countdown", "claim"],
+            featured: false,
+            isNew: true,
+            popularity: "high",
+          },
+        },
+        {
           key: "mewgenics",
           nameKey: "games.otros.tools.mewgenics",
           href: "/otros/mewgenics",

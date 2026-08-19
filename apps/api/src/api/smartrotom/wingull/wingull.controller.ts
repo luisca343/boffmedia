@@ -1,5 +1,14 @@
-import { Body, Controller, Get, Post, HttpStatus, Param } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  HttpStatus,
+  Param,
+  UseGuards,
+} from '@nestjs/common';
 import { Public } from '@api/_utils/decorators/public.decorator';
+import { GameOrUserAuthGuard } from '@api/_utils/guards/game-or-user-auth.guard';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
 import { WingullFacadeService } from './wingull.facade.service';
 import { UuidDto } from '../_dto/smartrotom-request-dto';
@@ -22,7 +31,13 @@ import { PokemonGiveRequestDto } from './dto/pokemon-give-request.dto';
 import { Logger } from 'nestjs-pino';
 
 @ApiTags('SmartRotom | Wingull')
+// These are the game-server bridge routes: the Minecraft plugin calls them
+// server-to-server with its opaque token, and the web calls a few of them on
+// behalf of a signed-in player. `GameOrUserAuthGuard` accepts exactly those two
+// credentials — the controller was `@Public()`, so `POST /wingull/money` and
+// `POST /wingull/updateBalance` were reachable by anyone on the internet.
 @Public()
+@UseGuards(GameOrUserAuthGuard)
 @Controller('wingull')
 export class WingullController {
   constructor(

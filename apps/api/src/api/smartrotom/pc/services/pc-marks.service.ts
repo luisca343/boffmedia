@@ -46,19 +46,20 @@ export class PcMarksService {
     return this.pcMarksRepository.findByUser(uuid);
   }
 
-  // Upsert one mark: create when absent, patch only the provided fields when present.
-  async upsertMark(data: UpsertPcMarkDto): Promise<PcMark> {
-    this.validateUuid(data.uuid);
+  // Upsert one mark: create when absent, patch only the provided fields when
+  // present. `ownerUuid` is the authenticated caller, never a body field.
+  async upsertMark(ownerUuid: string, data: UpsertPcMarkDto): Promise<PcMark> {
+    this.validateUuid(ownerUuid);
     if (!data.pokemonKey) {
       throw new BadRequestException('pokemonKey is required');
     }
 
     const existing = await this.pcMarksRepository.findOne(
-      data.uuid,
+      ownerUuid,
       data.pokemonKey,
     );
 
-    return this.pcMarksRepository.upsert(data.uuid, data.pokemonKey, {
+    return this.pcMarksRepository.upsert(ownerUuid, data.pokemonKey, {
       favorite: data.favorite ?? existing?.favorite ?? false,
       tags: data.tags ? this.normalizeTags(data.tags) : (existing?.tags ?? []),
     });
@@ -66,13 +67,16 @@ export class PcMarksService {
 
   // Upsert many marks at once (bulk-select bar): same favourite flag for every
   // key, plus an additive/subtractive tag delta applied per key.
-  async bulkUpsert(data: BulkUpsertPcMarksDto): Promise<PcMark[]> {
-    this.validateUuid(data.uuid);
+  async bulkUpsert(
+    ownerUuid: string,
+    data: BulkUpsertPcMarksDto,
+  ): Promise<PcMark[]> {
+    this.validateUuid(ownerUuid);
 
     const keys = this.normalizeTags(data.pokemonKeys ?? []);
     if (keys.length === 0) return [];
 
-    const existing = await this.pcMarksRepository.findByKeys(data.uuid, keys);
+    const existing = await this.pcMarksRepository.findByKeys(ownerUuid, keys);
     const byKey = new Map(existing.map((mark) => [mark.pokemonKey, mark]));
 
     const rows = keys.map((pokemonKey) => {
@@ -88,6 +92,6 @@ export class PcMarksService {
       };
     });
 
-    return this.pcMarksRepository.upsertMany(data.uuid, rows);
+    return this.pcMarksRepository.upsertMany(ownerUuid, rows);
   }
 }

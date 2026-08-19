@@ -327,9 +327,7 @@ export class EventsFacadeService {
     // Progress rows don't carry the event id; resolve it via the catalogue so
     // private-event achievements stay invisible to outsiders.
     const catalogue = await this.achievementsService.getAllAchievements();
-    const eventByAchievement = new Map(
-      catalogue.map((a) => [a.id, a.eventId]),
-    );
+    const eventByAchievement = new Map(catalogue.map((a) => [a.id, a.eventId]));
     return this.filterPrivateEventRows(
       rows,
       (r) => eventByAchievement.get(r.id),
@@ -625,10 +623,8 @@ export class EventsFacadeService {
     eventId: number,
     userId: number,
   ): Promise<{ success: boolean }> {
-    const participation = await this.participantsService.getParticipationForUser(
-      userId,
-      eventId,
-    );
+    const participation =
+      await this.participantsService.getParticipationForUser(userId, eventId);
     if (!participation) {
       throw new NotFoundException({
         message: 'You are not a participant of this event',
@@ -727,10 +723,11 @@ export class EventsFacadeService {
       });
     }
 
-    const participation = await this.participantsService.getParticipationForUser(
-      userId,
-      invite.eventId,
-    );
+    const participation =
+      await this.participantsService.getParticipationForUser(
+        userId,
+        invite.eventId,
+      );
     if (participation) {
       if (participation.status === PARTICIPANT_STATUS.REMOVED) {
         throw new ForbiddenException(
@@ -827,7 +824,9 @@ export class EventsFacadeService {
         eventId,
       );
     if (!participantInEvent) {
-      throw new ConflictException('Participant is not registered for this event');
+      throw new ConflictException(
+        'Participant is not registered for this event',
+      );
     }
 
     await this.progressService.updateProgress(

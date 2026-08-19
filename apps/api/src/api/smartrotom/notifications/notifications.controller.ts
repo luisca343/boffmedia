@@ -9,6 +9,7 @@ import {
   Query,
   HttpCode,
   HttpStatus,
+  UseGuards,
 } from '@nestjs/common';
 import { Public } from '@api/_utils/decorators/public.decorator';
 import {
@@ -19,6 +20,12 @@ import {
   ApiQuery,
 } from '@nestjs/swagger';
 import { NotificationsService } from './notifications.service';
+import { CurrentMcUuid } from '@api/_utils/decorators/current-user.decorator';
+import { RequireSession } from '@api/_utils/decorators/require-session.decorator';
+import { JwtAuthGuard } from '@api/auth/jwt-auth.guard';
+import { RolesGuard } from '@api/_utils/guards/roles.guard';
+import { USER_ROLES } from '@api/_utils/auth/roles.constants';
+import { Roles } from '@api/_utils/decorators/roles.decorator';
 import {
   GetInboxQueryDto,
   MarkReadBodyDto,
@@ -28,6 +35,8 @@ import {
 } from './notifications.dto';
 
 @ApiTags('SmartRotom | Notifications')
+// Marking notifications read is per-player and now runs on the session's uuid;
+// sending one to somebody is an admin action. Both were public.
 @Public()
 @Controller('smartrotom/notifications')
 export class NotificationsController {
@@ -55,6 +64,7 @@ export class NotificationsController {
     ) as unknown as NotificationsInboxDto;
   }
 
+  @RequireSession()
   @Patch(':id/read')
   @ApiOperation({ summary: 'Mark a single notification as read' })
   @ApiParam({ name: 'id', description: 'Notification ID', type: Number })
@@ -64,21 +74,28 @@ export class NotificationsController {
   })
   async markRead(
     @Param('id', ParseIntPipe) id: number,
-    @Body() body: MarkReadBodyDto,
+    @Body() _body: MarkReadBodyDto,
+    @CurrentMcUuid() uuid: string,
   ): Promise<void> {
-    return this.notificationsService.markRead(id, body.uuid);
+    return this.notificationsService.markRead(id, uuid);
   }
 
+  @RequireSession()
   @Patch('read-all')
   @ApiOperation({ summary: 'Mark all notifications as read for a user' })
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'All notifications marked as read',
   })
-  async markAllRead(@Body() body: MarkReadBodyDto): Promise<void> {
-    return this.notificationsService.markAllRead(body.uuid);
+  async markAllRead(
+    @Body() _body: MarkReadBodyDto,
+    @CurrentMcUuid() uuid: string,
+  ): Promise<void> {
+    return this.notificationsService.markAllRead(uuid);
   }
 
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.ROTOM_ADMIN)
   @Post('send')
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Send a notification to a player (admin)' })

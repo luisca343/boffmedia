@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { HttpException, Inject, Injectable } from '@nestjs/common';
 import { MessageRequestDto } from '../dto/message-request.dto';
 import { PokemonGiveRequestDto } from '../dto/pokemon-give-request.dto';
 import { PokemonTakeResponse } from '../dto/pokemon-take-request.dto';
@@ -24,6 +24,9 @@ export class WingullPlayerService {
       return await this.wingullPlayerRepository.getStatsFromAPI(uuid);
     } catch (error: any) {
       this.logger.error(`Failed to get stats for ${uuid}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Stats retrieval failed: ${error.message}`);
     }
   }
@@ -33,6 +36,9 @@ export class WingullPlayerService {
       return await this.wingullPlayerRepository.getTeamFromAPI(uuid);
     } catch (error: any) {
       this.logger.error(`Failed to get team for ${uuid}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Team retrieval failed: ${error.message}`);
     }
   }
@@ -42,6 +48,9 @@ export class WingullPlayerService {
       return await this.wingullPlayerRepository.getPCFromAPI(uuid);
     } catch (error: any) {
       this.logger.error(`Failed to get PC for ${uuid}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`PC retrieval failed: ${error.message}`);
     }
   }
@@ -53,6 +62,9 @@ export class WingullPlayerService {
       );
     } catch (error: any) {
       this.logger.error(`Failed to move Pokémon:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Pokémon move failed: ${error.message}`);
     }
   }
@@ -62,6 +74,9 @@ export class WingullPlayerService {
       return await this.wingullPlayerRepository.updateDexInAPI(uuid);
     } catch (error: any) {
       this.logger.error(`Failed to update dex for ${uuid}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Dex update failed: ${error.message}`);
     }
   }
@@ -71,6 +86,9 @@ export class WingullPlayerService {
       return await this.wingullPlayerRepository.getQuestsFromAPI(uuid);
     } catch (error: any) {
       this.logger.error(`Failed to get quests for ${uuid}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Quests retrieval failed: ${error.message}`);
     }
   }
@@ -81,6 +99,9 @@ export class WingullPlayerService {
       return await this.wingullPlayerRepository.sendMessageInAPI(request);
     } catch (error: any) {
       this.logger.error(`Failed to send message to ${uuid}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Message sending failed: ${error.message}`);
     }
   }
@@ -94,6 +115,9 @@ export class WingullPlayerService {
         `Failed to send global chat message for ${uuid}:`,
         error,
       );
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Global chat message sending failed: ${error.message}`);
     }
   }
@@ -108,6 +132,9 @@ export class WingullPlayerService {
       return await this.wingullPlayerRepository.givePokemonInAPI(request);
     } catch (error: any) {
       this.logger.error(`Failed to give Pokémon to ${uuid}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Pokémon giving failed: ${error.message}`);
     }
   }
@@ -125,6 +152,9 @@ export class WingullPlayerService {
       return await this.wingullPlayerRepository.giveItemsInAPI(uuid, items);
     } catch (error: any) {
       this.logger.error(`Failed to give items to ${uuid}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Items giving failed: ${error.message}`);
     }
   }
@@ -149,6 +179,9 @@ export class WingullPlayerService {
       });
     } catch (error: any) {
       this.logger.error(`Failed to take Pokémon from ${uuid}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Pokémon taking failed: ${error.message}`);
     }
   }
@@ -165,6 +198,9 @@ export class WingullPlayerService {
       return await this.wingullPlayerRepository.takeItemsInAPI({ uuid, items });
     } catch (error: any) {
       this.logger.error(`Failed to take items from ${uuid}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Items taking failed: ${error.message}`);
     }
   }
@@ -174,6 +210,9 @@ export class WingullPlayerService {
       return await this.wingullPlayerRepository.getBattleTeamsFromAPI(uuid);
     } catch (error: any) {
       this.logger.error(`Failed to get battle teams for ${uuid}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Battle teams retrieval failed: ${error.message}`);
     }
   }
@@ -187,6 +226,9 @@ export class WingullPlayerService {
       );
     } catch (error: any) {
       this.logger.error('Failed to update battle team:', error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Battle team update failed: ${error.message}`);
     }
   }

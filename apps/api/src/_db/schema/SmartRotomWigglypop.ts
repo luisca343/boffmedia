@@ -1,4 +1,5 @@
 import {
+  char,
   bigint,
   boolean,
   foreignKey,
@@ -24,7 +25,7 @@ const pokemonKey = (name = 'pokemon_key') => varchar(name, { length: 64 });
 
 // Player uuids are FK'd to rotom_users where the column is required and single-purpose
 // (seller, buyer, bidder…). Matches how the rest of SmartRotom references players.
-const playerUuid = (name: string) => varchar(name, { length: 36 });
+const playerUuid = (name: string) => char(name, { length: 36 });
 
 // ─── Listings ─────────────────────────────────────────────────────────────────
 

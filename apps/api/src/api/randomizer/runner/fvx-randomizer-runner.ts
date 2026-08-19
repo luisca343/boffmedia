@@ -81,9 +81,10 @@ export class FvxRandomizerRunner implements IRandomizerRunner {
 
     this.javaPath = env.RANDOMIZER_JAVA || 'java';
     this.jarPath = env.RANDOMIZER_JAR || '';
-    const explicitConcurrency = env.RANDOMIZER_MAX_CONCURRENCY != null
-      ? Number(env.RANDOMIZER_MAX_CONCURRENCY)
-      : null;
+    const explicitConcurrency =
+      env.RANDOMIZER_MAX_CONCURRENCY != null
+        ? Number(env.RANDOMIZER_MAX_CONCURRENCY)
+        : null;
     const maxConcurrency = explicitConcurrency || 2;
     this.timeoutMs = env.RANDOMIZER_TIMEOUT_MS || 180000;
 

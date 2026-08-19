@@ -1,4 +1,4 @@
-import { Controller, Post, Body } from '@nestjs/common';
+import { Body, Controller, Post, UseGuards } from '@nestjs/common';
 import { Public } from '@api/_utils/decorators/public.decorator';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { AchievementFacadeService } from './achievement.facade.service';
@@ -25,8 +25,11 @@ import {
 // Entities
 import { UserAchievement } from './entities/achievement.entity';
 import { Replay } from './entities/replay.entity';
+import { GameOrUserAuthGuard } from '@api/_utils/guards/game-or-user-auth.guard';
 
 @ApiTags('SmartRotom | Achievements')
+// The lookup routes are POST-shaped reads and stay public; writing a replay or
+// awarding an achievement is a game-server action and takes its credential.
 @Public()
 @Controller('smartrotom/achievement')
 export class AchievementController {
@@ -80,6 +83,7 @@ export class AchievementController {
     );
   }
 
+  @UseGuards(GameOrUserAuthGuard)
   @Post('check-achievement')
   @ApiOperation({
     summary: 'Check achievement status',
@@ -101,6 +105,7 @@ export class AchievementController {
 
   // ==================== BATTLE ACHIEVEMENT ENDPOINTS ====================
 
+  @UseGuards(GameOrUserAuthGuard)
   @Post('battle-achievement')
   @ApiOperation({
     summary: 'Process battle achievement',
@@ -152,6 +157,7 @@ export class AchievementController {
 
   // ==================== REPLAY ENDPOINTS ====================
 
+  @UseGuards(GameOrUserAuthGuard)
   @Post('create-replay')
   @ApiOperation({
     summary: 'Create replay',
@@ -181,6 +187,7 @@ export class AchievementController {
     return { replayId: result.insertId };
   }
 
+  @UseGuards(GameOrUserAuthGuard)
   @Post('create-user-replay')
   @ApiOperation({
     summary: 'Create user replay association',

@@ -19,10 +19,11 @@ import { useWmV3 } from "../_lib/useWmV3"
 import { WmSection, WmStars, WmPokePicker, WmTicket, WmCombo } from "./ui/wm-kit"
 
 export function PmdSkyView() {
-  // Root scope on purpose: the pmdsky catalogs live at the message root
-  // (`questTypes.*`, `rewardTypes.*`, `selectPokemon`) and the dungeon labels are
-  // numeric root keys from dungeons.json. Scoping to "pmdsky" resolved none of them.
-  const t = useTranslations()
+  // Both pmdsky catalogs are namespaced under `pmdsky` (common.json carries the
+  // field labels plus `questTypes.*` / `rewardTypes.*`; dungeons.json hangs its
+  // numeric ids off `pmdsky.dungeons.*`), so one scoped translator serves all of
+  // them. It used to be a root translator, which put ~40 keys at the message root.
+  const t = useTranslations("pmdsky")
   const tApp = useTranslations("pmdsky.app")
   const ctx = useWmV3(t, tApp)
 

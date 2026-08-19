@@ -5,6 +5,9 @@ const request = require('supertest') as typeof import('supertest');
 import { SharexController } from './sharex.controller';
 import { SharexService } from './sharex.service';
 import { GlobalExceptionFilter } from '@/common/filters/global-exception.filter';
+import { JwtAuthGuard } from '@api/auth/jwt-auth.guard';
+import { RolesGuard } from '@api/_utils/guards/roles.guard';
+import { GameOrUserAuthGuard } from '@api/_utils/guards/game-or-user-auth.guard';
 
 const mockService: jest.Mocked<Partial<SharexService>> = {
   createImage: jest.fn(),
@@ -24,9 +27,40 @@ describe('SharexController — integration (ValidationPipe + GlobalExceptionFilt
     const module: TestingModule = await Test.createTestingModule({
       controllers: [SharexController],
       providers: [{ provide: SharexService, useValue: mockService }],
-    }).compile();
+    })
+      // Guards are stubbed: this suite is about validation and error
+      // shape, not about who may call the route.
+      .overrideGuard(JwtAuthGuard)
+      .useValue({ canActivate: () => true })
+      .overrideGuard(RolesGuard)
+      .useValue({ canActivate: () => true })
+      .overrideGuard(GameOrUserAuthGuard)
+      .useValue({ canActivate: () => true })
+      .compile();
 
     app = module.createNestApplication();
+
+    // These routes are no longer public: the identity that used to come from
+
+    // the URL or the body is now taken from the authenticated principal.
+
+    // This suite covers the ValidationPipe and the exception filter, so it
+
+    // runs as a signed-in caller.
+
+    app.use((req: any, _res: any, next: any) => {
+      req.user = {
+        userId: 1,
+
+        username: 'tester',
+
+        roles: ['BOFF_ADMIN', 'ROTOM_ADMIN'],
+
+        mcUuid: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4',
+      };
+
+      next();
+    });
     app.useGlobalPipes(
       new ValidationPipe({
         whitelist: true,

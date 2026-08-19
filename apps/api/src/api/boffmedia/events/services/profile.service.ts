@@ -209,10 +209,7 @@ export class ProfileService {
     // A private event's title (and its achievements) must not surface in a
     // public timeline for viewers who cannot see the event.
     const hiddenEventIds = await this.hiddenEventIdsFor(
-      [
-        ...rawUnlocks.map((u) => u.eventId),
-        ...rawJoins.map((j) => j.eventId),
-      ],
+      [...rawUnlocks.map((u) => u.eventId), ...rawJoins.map((j) => j.eventId)],
       viewer,
     );
     const unlocks = rawUnlocks.filter(

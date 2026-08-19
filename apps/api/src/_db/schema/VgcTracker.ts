@@ -56,12 +56,8 @@ export const vgcTeamPresets = mysqlTable('vgc_team_presets', {
   slots: text('slots').notNull(),
   currentVersion: int('current_version').notNull().default(1),
   versions: text('versions').notNull().default('[]'),
-  createdAt: timestamp('created_at')
-    .notNull()
-    .default(sql`CURRENT_TIMESTAMP()`),
-  updatedAt: timestamp('updated_at')
-    .notNull()
-    .default(sql`CURRENT_TIMESTAMP() ON UPDATE CURRENT_TIMESTAMP()`),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow().onUpdateNow(),
 });
 
 export type VgcTeamPreset = typeof vgcTeamPresets.$inferSelect;
@@ -84,12 +80,8 @@ export const vgcSessions = mysqlTable('vgc_sessions', {
   tournamentName: varchar('tournament_name', { length: 255 }),
   limitlessTournamentId: int('limitless_tournament_id'),
   sessionNotes: text('session_notes'),
-  createdAt: timestamp('created_at')
-    .notNull()
-    .default(sql`CURRENT_TIMESTAMP()`),
-  updatedAt: timestamp('updated_at')
-    .notNull()
-    .default(sql`CURRENT_TIMESTAMP() ON UPDATE CURRENT_TIMESTAMP()`),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow().onUpdateNow(),
 });
 
 export type VgcSession = typeof vgcSessions.$inferSelect;
@@ -114,13 +106,9 @@ export const vgcMatches = mysqlTable('vgc_matches', {
   eloAfter: double('elo_after'),
   opponentElo: double('opponent_elo'),
   notes: text('notes').notNull().default('[]'),
-  createdAt: timestamp('created_at')
-    .notNull()
-    .default(sql`CURRENT_TIMESTAMP()`),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
   completedAt: timestamp('completed_at'),
-  updatedAt: timestamp('updated_at')
-    .notNull()
-    .default(sql`CURRENT_TIMESTAMP() ON UPDATE CURRENT_TIMESTAMP()`),
+  updatedAt: timestamp('updated_at').notNull().defaultNow().onUpdateNow(),
 });
 
 export type VgcMatch = typeof vgcMatches.$inferSelect;
@@ -134,6 +122,12 @@ export const vgcSeries = mysqlTable('vgc_series', {
   userId: int('user_id').references(() => boffMediaUsers.id, {
     onDelete: 'cascade',
   }),
+  // DELIBERATE exception to the timestamp convention (see _db/CONVENTIONS.md):
+  // the VGC tracker is offline-first and syncs rows out of the client's IndexedDB,
+  // so both stamps are the CLIENT's epoch millis — the value the offline copy was
+  // created with, not the moment the server received it. Storing them as
+  // `timestamp DEFAULT CURRENT_TIMESTAMP` would silently rewrite a series'
+  // creation time to its upload time and break ordering against unsynced rows.
   createdAt: bigint('created_at', { mode: 'number' }).notNull(),
   completedAt: bigint('completed_at', { mode: 'number' }),
   roundNumber: int('round_number'),
@@ -144,9 +138,7 @@ export const vgcSeries = mysqlTable('vgc_series', {
   games: text('games').notNull().default('[]'),
   seriesResult: varchar('series_result', { length: 8 }),
   notes: text('notes').notNull().default('[]'),
-  updatedAt: timestamp('updated_at')
-    .notNull()
-    .default(sql`CURRENT_TIMESTAMP() ON UPDATE CURRENT_TIMESTAMP()`),
+  updatedAt: timestamp('updated_at').notNull().defaultNow().onUpdateNow(),
 });
 
 export type VgcSeries = typeof vgcSeries.$inferSelect;

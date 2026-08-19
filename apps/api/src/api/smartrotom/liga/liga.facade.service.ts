@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
 import { ReplayService } from './services/replay.service';
 import {
   StatisticsService,
@@ -34,6 +34,9 @@ export class LigaFacadeService {
       return await this.replayService.getReplayById(id);
     } catch (error: any) {
       this.logger.error(`Error getting replay ${id}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to retrieve replay: ${error.message}`);
     }
   }
@@ -43,6 +46,9 @@ export class LigaFacadeService {
       return await this.replayService.getRecentReplays(limit);
     } catch (error: any) {
       this.logger.error('Error getting recent replays:', error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to retrieve recent replays: ${error.message}`);
     }
   }
@@ -55,6 +61,9 @@ export class LigaFacadeService {
         `Error getting replays for player ${playerUuid}:`,
         error,
       );
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to retrieve player replays: ${error.message}`);
     }
   }
@@ -70,6 +79,9 @@ export class LigaFacadeService {
         `Error getting match history between ${player1} and ${player2}:`,
         error,
       );
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to retrieve match history: ${error.message}`);
     }
   }
@@ -84,6 +96,9 @@ export class LigaFacadeService {
         `Error getting statistics for player ${playerUuid}:`,
         error,
       );
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to retrieve player statistics: ${error.message}`);
     }
   }
@@ -93,6 +108,9 @@ export class LigaFacadeService {
       return await this.statisticsService.getLeaderboard(limit);
     } catch (error: any) {
       this.logger.error('Error getting leaderboard:', error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to retrieve leaderboard: ${error.message}`);
     }
   }
@@ -107,6 +125,9 @@ export class LigaFacadeService {
         `Error getting ranking for player ${playerUuid}:`,
         error,
       );
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to retrieve player ranking: ${error.message}`);
     }
   }
@@ -130,6 +151,9 @@ export class LigaFacadeService {
         `Error comparing players ${player1} and ${player2}:`,
         error,
       );
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to compare players: ${error.message}`);
     }
   }
@@ -141,6 +165,9 @@ export class LigaFacadeService {
       return await this.tournamentService.getActiveTournaments();
     } catch (error: any) {
       this.logger.error('Error getting active tournaments:', error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(
         `Failed to retrieve active tournaments: ${error.message}`,
       );
@@ -152,6 +179,9 @@ export class LigaFacadeService {
       return await this.tournamentService.getTournamentById(tournamentId);
     } catch (error: any) {
       this.logger.error(`Error getting tournament ${tournamentId}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to retrieve tournament: ${error.message}`);
     }
   }
@@ -164,6 +194,9 @@ export class LigaFacadeService {
         `Error getting matches for tournament ${tournamentId}:`,
         error,
       );
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(
         `Failed to retrieve tournament matches: ${error.message}`,
       );
@@ -177,6 +210,9 @@ export class LigaFacadeService {
       return await this.tournamentService.createTournament(request);
     } catch (error: any) {
       this.logger.error('Error creating tournament:', error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to create tournament: ${error.message}`);
     }
   }
@@ -188,6 +224,9 @@ export class LigaFacadeService {
       return await this.tournamentService.registerForTournament(registration);
     } catch (error: any) {
       this.logger.error('Error registering for tournament:', error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to register for tournament: ${error.message}`);
     }
   }

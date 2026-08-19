@@ -15,14 +15,6 @@ import { BaseDto } from '@api/_utils/dto/base.dto';
 // would otherwise reject it with "property server should not exist".
 export class UpsertPcMarkDto extends BaseDto {
   @ApiProperty({
-    description: 'SmartRotom user UUID',
-    example: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4',
-  })
-  @IsNotEmpty()
-  @IsString()
-  uuid: string;
-
-  @ApiProperty({
     description: 'Opaque content hash identifying the Pokémon',
     example: '25|0|adamant|static|31,31,31,31,31,31',
   })
@@ -56,14 +48,6 @@ export class UpsertPcMarkDto extends BaseDto {
 }
 
 export class BulkUpsertPcMarksDto extends BaseDto {
-  @ApiProperty({
-    description: 'SmartRotom user UUID',
-    example: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4',
-  })
-  @IsNotEmpty()
-  @IsString()
-  uuid: string;
-
   @ApiProperty({
     type: String,
     isArray: true,

@@ -4,35 +4,11 @@ import * as React from "react"
 import { useTranslations } from "next-intl"
 import { Icon, Seg, Button, IconButton } from "@boffmedia/ui"
 import { cn } from "@/lib/utils"
-import type { SteamGame, MediaItem } from "../../_hooks/useFetchSteamData"
+import type { SteamGame, MediaItem } from "../../../_hooks/useFetchSteamData"
+import { SteamArt, SteamGallery, SteamFact, platformList } from "../../../_components/steam-media"
 
-/* ── steam art with graceful fallback ─────────────────────────────────────── */
-const FALLBACK_BG =
-  "repeating-linear-gradient(-45deg, var(--bg-2) 0 10px, var(--panel-2) 10px 20px)"
-
-export function KvArt({ src, name, className }: { src?: string; name: string; className?: string }) {
-  const [err, setErr] = React.useState(false)
-  const show = src && !err
-  // Fill the parent absolutely so height is driven purely by the parent's
-  // aspect-ratio — identical whether the art loads or falls back.
-  return (
-    <div className={"absolute inset-0 overflow-hidden bg-base-2 " + (className ?? "")}>
-      {show ? (
-        <img
-          src={src}
-          alt={name}
-          loading="lazy"
-          onError={() => setErr(true)}
-          className="block h-full w-full object-cover"
-        />
-      ) : (
-        <div className="absolute inset-0 grid place-items-center text-line-2" style={{ background: FALLBACK_BG }}>
-          <Icon name="gamepad" size={34} />
-        </div>
-      )}
-    </div>
-  )
-}
+/* ── steam art — shared with the sibling steamfree tool ──────────────────── */
+export const KvArt = SteamArt
 
 /* ── status chip (disponible | entregada) ─────────────────────────────────── */
 export function KvStatus({ given, label }: { given: boolean; label: string }) {
@@ -154,33 +130,16 @@ export function KvCard({
 }
 
 /* ── modal · info section ─────────────────────────────────────────────────── */
-function Fact({ k, children }: { k: string; children: React.ReactNode }) {
-  return (
-    <div className="flex flex-col gap-[5px] bg-panel px-[13px] py-[11px] transition-colors duration-[120ms] hover:bg-panel-2">
-      <span className="font-mono text-[9.5px] font-semibold uppercase leading-none tracking-[0.1em] text-txt-dim">{k}</span>
-      <span className="font-display text-[13px] font-semibold leading-[1.3] text-txt">{children}</span>
-    </div>
-  )
-}
-
-function platformList(p: SteamGame["platforms"]): string {
-  const out: string[] = []
-  if (p?.windows) out.push("Windows")
-  if (p?.mac) out.push("macOS")
-  if (p?.linux) out.push("Linux")
-  return out.join(" · ") || "—"
-}
-
 export function KvInfo({ game, t }: { game: SteamGame; t: KvModalStrings }) {
   const desc = (game.shortDescription || "").trim()
   return (
     <div className="grid gap-[16px]">
       {desc && <p className="text-pretty text-[14px] leading-[1.55] text-txt-muted">{desc}</p>}
       <div className="grid grid-cols-2 gap-px border border-line bg-line max-[600px]:grid-cols-1">
-        <Fact k={t.developer}>{game.developers?.join(", ") || "—"}</Fact>
-        <Fact k={t.publisher}>{game.publishers?.join(", ") || "—"}</Fact>
-        <Fact k={t.release}>{game.releaseDate || "—"}</Fact>
-        <Fact k={t.platforms}>{platformList(game.platforms)}</Fact>
+        <SteamFact k={t.developer}>{game.developers?.join(", ") || "—"}</SteamFact>
+        <SteamFact k={t.publisher}>{game.publishers?.join(", ") || "—"}</SteamFact>
+        <SteamFact k={t.release}>{game.releaseDate || "—"}</SteamFact>
+        <SteamFact k={t.platforms}>{platformList(game.platforms)}</SteamFact>
       </div>
       {game.genres?.length > 0 && (
         <div className="grid gap-[8px]">
@@ -236,71 +195,10 @@ export function KvPrice({ game, t }: { game: SteamGame; t: KvModalStrings }) {
   )
 }
 
-/* ── modal · media gallery (images + trailers) ────────────────────────────── */
-function isVideo(m: MediaItem): boolean {
-  return "thumbnail" in m && !("path_full" in m)
-}
-function videoSrc(m: any): string | undefined {
-  return m?.mp4?.max || m?.mp4?.["480"] || m?.webm?.max || m?.webm?.["480"]
-}
-function imgSrc(m: any): string | undefined {
-  return m?.path_full || m?.path_thumbnail
-}
-function thumbSrc(m: any): string | undefined {
-  return isVideo(m) ? m?.thumbnail : m?.path_thumbnail || m?.path_full
-}
-
+/* ── modal · media gallery (delegates to the shared Steam kit) ────────────── */
 export function KvGallery({ media, name }: { media: MediaItem[]; name: string }) {
   const t = useTranslations("otros.keysApp")
-  const [i, setI] = React.useState(0)
-  const [err, setErr] = React.useState<Record<number, boolean>>({})
-  const shots = media || []
-  const current = shots[i]
-  if (!shots.length) {
-    return (
-      <div className="grid aspect-video place-items-center border border-line-2 text-line-2" style={{ background: FALLBACK_BG }}>
-        <Icon name="gamepad" size={34} />
-      </div>
-    )
-  }
-  return (
-    <div className="grid gap-[10px]">
-      <div className="relative aspect-video overflow-hidden border border-line-2 bg-base-2">
-        {isVideo(current) ? (
-          <video key={"v" + i} src={videoSrc(current)} controls className="h-full w-full object-cover" />
-        ) : !err[i] ? (
-          <img key={"i" + i} src={imgSrc(current)} alt={name + " " + (i + 1)} onError={() => setErr((e) => ({ ...e, [i]: true }))} className="h-full w-full object-contain" />
-        ) : (
-          <div className="absolute inset-0 grid place-items-center text-line-2" style={{ background: FALLBACK_BG }}>
-            <Icon name="gamepad" size={34} />
-          </div>
-        )}
-      </div>
-      {shots.length > 1 && (
-        <div className="grid grid-cols-4 gap-[8px]">
-          {shots.map((s, k) => (
-            <button
-              key={k}
-              type="button"
-              onClick={() => setI(k)}
-              aria-label={t("mediaN", { n: k + 1 })}
-              className={
-                "relative aspect-video overflow-hidden border bg-base-2 p-0 transition-colors duration-[120ms] " +
-                (k === i ? "border-accent shadow-[inset_0_0_0_1px_var(--accent)]" : "border-line hover:border-line-2")
-              }
-            >
-              <img src={thumbSrc(s)} alt="" className="h-full w-full object-cover" />
-              {isVideo(s) && (
-                <span className="absolute inset-0 grid place-items-center bg-[color-mix(in_srgb,var(--bg)_30%,transparent)]">
-                  <Icon name="play" size={16} className="text-white" />
-                </span>
-              )}
-            </button>
-          ))}
-        </div>
-      )}
-    </div>
-  )
+  return <SteamGallery media={media} name={name} thumbLabel={(n) => t("mediaN", { n })} />
 }
 
 /* ── detail modal ─────────────────────────────────────────────────────────── */

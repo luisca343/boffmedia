@@ -39,6 +39,28 @@ describe('UploadController — integration (ValidationPipe + GlobalExceptionFilt
       .compile();
 
     app = module.createNestApplication();
+
+    // These routes are no longer public: the identity that used to come from
+
+    // the URL or the body is now taken from the authenticated principal.
+
+    // This suite covers the ValidationPipe and the exception filter, so it
+
+    // runs as a signed-in caller.
+
+    app.use((req: any, _res: any, next: any) => {
+      req.user = {
+        userId: 1,
+
+        username: 'tester',
+
+        roles: ['BOFF_ADMIN', 'ROTOM_ADMIN'],
+
+        mcUuid: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4',
+      };
+
+      next();
+    });
     app.useGlobalPipes(
       new ValidationPipe({
         whitelist: true,

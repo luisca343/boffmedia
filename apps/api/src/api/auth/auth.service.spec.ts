@@ -133,7 +133,6 @@ describe('AuthService', () => {
     });
   });
 
-
   describe('refreshToken()', () => {
     it('should issue new tokens from a valid JWT string', async () => {
       const payload = { sub: 1, username: 'TrainerAsh', typ: 'refresh' };

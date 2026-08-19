@@ -111,6 +111,7 @@ describe('EventsController — integration (ValidationPipe + GlobalExceptionFilt
       .compile();
 
     app = moduleRef.createNestApplication();
+
     app.useGlobalPipes(
       new ValidationPipe({
         whitelist: true,
@@ -303,7 +304,11 @@ describe('EventsController — integration (ValidationPipe + GlobalExceptionFilt
       );
 
       expect(res.status).toBe(200);
-      expect(mockFacade.getLeaderboard).toHaveBeenCalledWith(1, false, undefined);
+      expect(mockFacade.getLeaderboard).toHaveBeenCalledWith(
+        1,
+        false,
+        undefined,
+      );
     });
 
     it('returns entries in the order the facade provides them', async () => {
@@ -318,7 +323,11 @@ describe('EventsController — integration (ValidationPipe + GlobalExceptionFilt
       );
 
       expect(res.status).toBe(200);
-      expect(mockFacade.getLeaderboard).toHaveBeenCalledWith(5, false, undefined);
+      expect(mockFacade.getLeaderboard).toHaveBeenCalledWith(
+        5,
+        false,
+        undefined,
+      );
     });
 
     it('returns empty array when event has no participants', async () => {
@@ -669,7 +678,11 @@ describe('EventsController — integration (ValidationPipe + GlobalExceptionFilt
       const res = await request(app.getHttpServer()).get('/events/5/teams');
 
       expect(res.status).toBe(200);
-      expect(mockFacade.getEventTeams).toHaveBeenCalledWith(5, false, undefined);
+      expect(mockFacade.getEventTeams).toHaveBeenCalledWith(
+        5,
+        false,
+        undefined,
+      );
     });
   });
 
@@ -697,7 +710,11 @@ describe('EventsController — integration (ValidationPipe + GlobalExceptionFilt
       );
 
       expect(res.status).toBe(200);
-      expect(mockFacade.getTeamMembers).toHaveBeenCalledWith(3, false, undefined);
+      expect(mockFacade.getTeamMembers).toHaveBeenCalledWith(
+        3,
+        false,
+        undefined,
+      );
     });
   });
 

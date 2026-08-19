@@ -1,4 +1,10 @@
-import { Injectable, Inject } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { DOCUMENTS_REPOSITORY_TOKEN } from '../repositories/interfaces/documents.repository.token';
 import { IDocumentsRepository } from '../repositories/interfaces/documents.repository.interface';
 import {
@@ -22,6 +28,16 @@ export interface UpdateDocumentRequest {
   folderId?: number | null;
 }
 
+/**
+ * Notes.
+ *
+ * Every mutating method takes the OWNER's uuid and proves the caller holds a
+ * `rotom_user_documents` row for that note before touching it. Previously these
+ * methods took an id alone and checked only that the row existed, so any caller
+ * could edit, trash or permanently purge anyone else's notes by guessing an
+ * integer — and the routes in front of them were `@Public()`, so no account was
+ * needed either. The owner uuid now comes from the JWT, never from the request.
+ */
 @Injectable()
 export class DocumentService {
   constructor(
@@ -29,32 +45,51 @@ export class DocumentService {
     private readonly documentsRepository: IDocumentsRepository,
   ) {}
 
-  async getDocumentById(id: number): Promise<DocumentDetails> {
-    if (!id || id <= 0) {
-      throw new Error('Valid document ID is required');
+  /** Throws unless `ownerUuid` holds this document. */
+  private async assertOwner(id: number, ownerUuid: string): Promise<void> {
+    const link = await this.documentsRepository.findDocumentUserAssociation(
+      id,
+      ownerUuid,
+    );
+    if (!link) {
+      throw new ForbiddenException('Esta nota no te pertenece');
     }
+  }
 
+  private async requireDocument(id: number): Promise<DocumentDetails> {
+    if (!id || id <= 0) {
+      throw new BadRequestException('Identificador de nota inválido');
+    }
     const document = await this.documentsRepository.findDocumentById(id);
     if (!document) {
-      throw new Error('Document not found');
+      throw new NotFoundException('Nota no encontrada');
     }
+    return document;
+  }
 
+  /**
+   * A note is readable by its holders, or by anyone when it is explicitly
+   * public. `public` is the only path that does not require ownership.
+   */
+  async getDocumentById(
+    id: number,
+    requesterUuid?: string,
+  ): Promise<DocumentDetails> {
+    const document = await this.requireDocument(id);
+    if (document.public) return document;
+
+    if (!requesterUuid) {
+      throw new ForbiddenException('Esta nota es privada');
+    }
+    await this.assertOwner(id, requesterUuid);
     return document;
   }
 
   async getUserDocuments(uuid: string): Promise<NotePreview[]> {
-    if (!uuid) {
-      throw new Error('UUID is required');
-    }
-
     return this.documentsRepository.findUserDocuments(uuid);
   }
 
   async getTrashedDocuments(uuid: string): Promise<NotePreview[]> {
-    if (!uuid) {
-      throw new Error('UUID is required');
-    }
-
     return this.documentsRepository.findTrashedDocuments(uuid);
   }
 
@@ -64,11 +99,11 @@ export class DocumentService {
     const { title, content, type, public: isPublic } = createDocumentRequest;
 
     if (!title || !content) {
-      throw new Error('Title and content are required');
+      throw new BadRequestException('Título y contenido son obligatorios');
     }
 
     if (type === undefined || type === null) {
-      throw new Error('Document type is required');
+      throw new BadRequestException('El tipo de nota es obligatorio');
     }
 
     const result = await this.documentsRepository.createDocument({
@@ -78,20 +113,18 @@ export class DocumentService {
       public: isPublic || 0,
     });
 
-    return this.getDocumentById(result.insertId);
+    return this.requireDocument(result.insertId);
   }
 
   async updateDocument(
     id: number,
+    ownerUuid: string,
     updateDocumentRequest: UpdateDocumentRequest,
   ): Promise<DocumentDetails> {
-    const existingDocument =
-      await this.documentsRepository.findDocumentById(id);
-    if (!existingDocument) {
-      throw new Error('Document not found');
-    }
+    await this.requireDocument(id);
+    await this.assertOwner(id, ownerUuid);
 
-    const updateData: any = {};
+    const updateData: UpdateDocumentRequest = {};
 
     if (updateDocumentRequest.title !== undefined) {
       updateData.title = updateDocumentRequest.title.trim();
@@ -118,68 +151,55 @@ export class DocumentService {
     }
 
     await this.documentsRepository.updateDocument(id, updateData);
-    return this.getDocumentById(id);
+    return this.requireDocument(id);
   }
 
   // Soft delete: moves the document to the trash (recoverable).
-  async deleteDocument(id: number): Promise<void> {
-    const existingDocument =
-      await this.documentsRepository.findDocumentById(id);
-    if (!existingDocument) {
-      throw new Error('Document not found');
-    }
-
+  async deleteDocument(id: number, ownerUuid: string): Promise<void> {
+    await this.requireDocument(id);
+    await this.assertOwner(id, ownerUuid);
     await this.documentsRepository.softDeleteDocument(id);
   }
 
-  async restoreDocument(id: number): Promise<DocumentDetails> {
-    const existingDocument =
-      await this.documentsRepository.findDocumentById(id);
-    if (!existingDocument) {
-      throw new Error('Document not found');
-    }
-
+  async restoreDocument(
+    id: number,
+    ownerUuid: string,
+  ): Promise<DocumentDetails> {
+    await this.requireDocument(id);
+    await this.assertOwner(id, ownerUuid);
     await this.documentsRepository.restoreDocument(id);
-    return this.getDocumentById(id);
+    return this.requireDocument(id);
   }
 
   // Permanent removal (cascades to tags/versions/shares via FKs).
-  async purgeDocument(id: number): Promise<void> {
-    const existingDocument =
-      await this.documentsRepository.findDocumentById(id);
-    if (!existingDocument) {
-      throw new Error('Document not found');
-    }
-
+  async purgeDocument(id: number, ownerUuid: string): Promise<void> {
+    await this.requireDocument(id);
+    await this.assertOwner(id, ownerUuid);
     await this.documentsRepository.deleteDocument(id);
   }
 
+  /** `id === 0` creates; the caller is responsible for linking a new note. */
   async saveDocument(
     id: number,
+    ownerUuid: string,
     title: string,
     content: string,
     type: number,
   ): Promise<{ success: boolean; id: number }> {
-    // Legacy method for backward compatibility
     if (id === 0) {
       const newDocument = await this.createDocument({ title, content, type });
+      await this.documentsRepository.addDocumentToUser(
+        newDocument.id,
+        ownerUuid,
+      );
       return { success: true, id: newDocument.id };
-    } else {
-      const updatedDocument = await this.updateDocument(id, {
-        title,
-        content,
-        type,
-      });
-      return { success: true, id: updatedDocument.id };
     }
-  }
 
-  async validateDocumentExists(id: number): Promise<boolean> {
-    try {
-      await this.getDocumentById(id);
-      return true;
-    } catch {
-      return false;
-    }
+    const updatedDocument = await this.updateDocument(id, ownerUuid, {
+      title,
+      content,
+      type,
+    });
+    return { success: true, id: updatedDocument.id };
   }
 }

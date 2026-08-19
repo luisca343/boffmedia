@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
 import { StarbankAccountService } from './services/starbank-account.service';
 import { StarbankTransactionService } from './services/starbank-transaction.service';
 import { WingullFacadeService } from '../wingull/wingull.facade.service';
@@ -317,6 +317,9 @@ export class StarbankFacadeService {
       await this.wingullFacadeService.updateBalance(account);
     } catch (error: any) {
       this.logger.error('Error updating balance in game:', error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Balance update failed: ${error.message}`);
     }
   }

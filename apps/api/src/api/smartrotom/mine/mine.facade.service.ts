@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
 import { EnergyService, EnergyStatus } from './services/energy.service';
 import {
   GameService,
@@ -52,6 +52,9 @@ export class MineFacadeService {
       return await this.energyService.getPlayerEnergy(uuid);
     } catch (error: any) {
       this.logger.error(`Error getting energy for player ${uuid}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to retrieve energy: ${error.message}`);
     }
   }
@@ -80,6 +83,9 @@ export class MineFacadeService {
         `Error starting game for player ${request.uuid}:`,
         error,
       );
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to start game: ${error.message}`);
     }
   }
@@ -99,6 +105,9 @@ export class MineFacadeService {
       return await this.gameService.endGame(uuid, rewards);
     } catch (error: any) {
       this.logger.error(`Error ending game for player ${request.uuid}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to end game: ${error.message}`);
     }
   }
@@ -110,6 +119,9 @@ export class MineFacadeService {
       return await this.rewardService.getAllRewards();
     } catch (error: any) {
       this.logger.error('Error getting all rewards:', error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to retrieve rewards: ${error.message}`);
     }
   }
@@ -119,6 +131,9 @@ export class MineFacadeService {
       return await this.rewardService.getRewardsByType();
     } catch (error: any) {
       this.logger.error('Error getting rewards by type:', error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to retrieve rewards by type: ${error.message}`);
     }
   }
@@ -130,6 +145,9 @@ export class MineFacadeService {
       return await this.rewardService.getRewardDropRates();
     } catch (error: any) {
       this.logger.error('Error getting reward drop rates:', error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to retrieve drop rates: ${error.message}`);
     }
   }
@@ -141,6 +159,9 @@ export class MineFacadeService {
       return await this.playerService.getPlayerHistory(uuid);
     } catch (error: any) {
       this.logger.error(`Error getting history for player ${uuid}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to retrieve player history: ${error.message}`);
     }
   }
@@ -150,6 +171,9 @@ export class MineFacadeService {
       return await this.playerService.getPlayerRanking();
     } catch (error: any) {
       this.logger.error('Error getting player ranking:', error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to retrieve ranking: ${error.message}`);
     }
   }
@@ -161,6 +185,9 @@ export class MineFacadeService {
       return await this.playerService.getPlayerRank(uuid);
     } catch (error: any) {
       this.logger.error(`Error getting rank for player ${uuid}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to retrieve player rank: ${error.message}`);
     }
   }
@@ -173,6 +200,9 @@ export class MineFacadeService {
         `Error getting unclaimed rewards for player ${uuid}:`,
         error,
       );
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to retrieve unclaimed rewards: ${error.message}`);
     }
   }
@@ -185,6 +215,9 @@ export class MineFacadeService {
         `Error claiming rewards for player ${request.uuid}:`,
         error,
       );
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to claim rewards: ${error.message}`);
     }
   }
@@ -194,6 +227,9 @@ export class MineFacadeService {
       return await this.playerService.getPlayerStatistics(uuid);
     } catch (error: any) {
       this.logger.error(`Error getting statistics for player ${uuid}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to retrieve player statistics: ${error.message}`);
     }
   }

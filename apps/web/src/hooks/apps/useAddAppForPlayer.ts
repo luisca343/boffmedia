@@ -4,8 +4,9 @@ import { AppsService } from "@/services/api/smartrotom/appsService"
 export function useAddAppToPlayer() {
   const { data, error, isLoading, refetch, setData } = useRotomRequest(AppsService.addAppToPlayer)
 
-  const addAppToPlayer = (uuid: string, appId: number) => {
-    return AppsService.addAppToPlayer(uuid, appId)
+  // The owner is the signed-in player; the API reads it from the session.
+  const addAppToPlayer = (appId: number) => {
+    return AppsService.addAppToPlayer(appId)
   }
 
   return {

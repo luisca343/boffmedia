@@ -14,7 +14,7 @@ import { WigglypopListingsRepository } from '../repositories/wigglypop-listings.
 jest.mock('@/config/env', () => ({
   env: { WIGGLYPOP_ATOMIC_CUSTODY: false },
 }));
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+// eslint-disable-next-line @typescript-eslint/no-require-imports
 const { env } = require('@/config/env');
 
 const BUYER = 'buyer-uuid';

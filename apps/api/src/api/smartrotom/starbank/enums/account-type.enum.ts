@@ -1,3 +1,5 @@
+import type { STARBANK_ACCOUNT_TYPES } from '@/_db/schema/SmartRotomStarBank';
+
 export enum AccountType {
   MAIN = 'MAIN',
   SECONDARY = 'SECONDARY',
@@ -18,3 +20,11 @@ export enum AccountType {
   // when the next money sink arrives without needing a new type and a new migration.
   SERVICE = 'SERVICE',
 }
+
+// The column is a MySQL enum built from STARBANK_ACCOUNT_TYPES. This assertion
+// fails to compile if the two ever drift, which is the whole point of having the
+// database hold the closed set rather than trusting inserts.
+type _AccountTypeMatchesSchema =
+  AccountType extends (typeof STARBANK_ACCOUNT_TYPES)[number] ? true : never;
+const _accountTypeMatchesSchema: _AccountTypeMatchesSchema = true;
+void _accountTypeMatchesSchema;

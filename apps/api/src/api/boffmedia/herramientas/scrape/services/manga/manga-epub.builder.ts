@@ -1,4 +1,4 @@
-﻿// ---------------------------------------------------------------------------
+import { HttpException } from '@nestjs/common'; // ---------------------------------------------------------------------------
 // manga-epub.builder.ts — Converts chapter images to EPUB via Calibre's
 // ebook-convert CLI (https://calibre-ebook.com).
 //
@@ -229,6 +229,9 @@ export async function buildEpub(opts: EpubChapterOptions): Promise<void> {
   } catch (err: unknown) {
     const errCode = (err as NodeJS.ErrnoException)?.code;
     if (errCode === 'ENOENT') {
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (err instanceof HttpException) throw err;
       throw new Error(
         'ebook-convert not found. Install Calibre (https://calibre-ebook.com) and ensure it is on PATH.',
       );

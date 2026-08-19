@@ -5,7 +5,6 @@ import {
   timestamp,
   varchar,
 } from 'drizzle-orm/mysql-core';
-import { sql } from 'drizzle-orm';
 import { boffMediaUsers } from './BoffMedia';
 
 /**
@@ -26,9 +25,7 @@ export const boffMediaPasswordResetTokens = mysqlTable(
     tokenHash: varchar('token_hash', { length: 64 }).notNull(),
     expiresAt: timestamp('expires_at').notNull(),
     usedAt: timestamp('used_at'),
-    createdAt: timestamp('created_at')
-      .notNull()
-      .default(sql`CURRENT_TIMESTAMP()`),
+    createdAt: timestamp('created_at').notNull().defaultNow(),
   },
   (t) => ({
     tokenIdx: index('prt_token_idx').on(t.tokenHash),
@@ -57,9 +54,7 @@ export const boffMediaEmailVerifications = mysqlTable(
     tokenHash: varchar('token_hash', { length: 64 }).notNull(),
     expiresAt: timestamp('expires_at').notNull(),
     usedAt: timestamp('used_at'),
-    createdAt: timestamp('created_at')
-      .notNull()
-      .default(sql`CURRENT_TIMESTAMP()`),
+    createdAt: timestamp('created_at').notNull().defaultNow(),
   },
   (t) => ({
     tokenIdx: index('ev_token_idx').on(t.tokenHash),

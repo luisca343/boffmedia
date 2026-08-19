@@ -1,5 +1,5 @@
-import { sql } from 'drizzle-orm';
 import {
+  char,
   boolean,
   foreignKey,
   int,
@@ -17,10 +17,8 @@ export const rotomChats = mysqlTable('rotom_chats', {
   name: varchar('name', { length: 255 }).notNull(),
   description: varchar('description', { length: 255 }).notNull(),
   image: varchar('image', { length: 255 }),
-  createdAt: timestamp('created_at')
-    .notNull()
-    .default(sql`CURRENT_TIMESTAMP()`),
-  updatedAt: timestamp('updated_at'),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow().onUpdateNow(),
 });
 
 export type RotomChat = typeof rotomChats.$inferSelect;
@@ -34,7 +32,7 @@ export const rotomChatMembers = mysqlTable(
         onDelete: 'cascade',
         onUpdate: 'cascade',
       }),
-    uuid: varchar('uuid', { length: 36 })
+    uuid: char('uuid', { length: 36 })
       .notNull()
       .references(() => rotomUsers.uuid, {
         onDelete: 'cascade',
@@ -60,7 +58,7 @@ export const rotomChatMessages = mysqlTable('rotom_chat_messages', {
       onDelete: 'cascade',
       onUpdate: 'cascade',
     }),
-  senderUUID: varchar('sender_uuid', { length: 36 })
+  senderUUID: char('sender_uuid', { length: 36 })
     .notNull()
     .references(() => rotomUsers.uuid, {
       onDelete: 'cascade',
@@ -68,9 +66,7 @@ export const rotomChatMessages = mysqlTable('rotom_chat_messages', {
     }),
   content: text('content').notNull(),
   type: varchar('type', { length: 255 }).default('text'),
-  createdAt: timestamp('created_at')
-    .notNull()
-    .default(sql`CURRENT_TIMESTAMP()`),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
 });
 
 export type RotomChatMessage = typeof rotomChatMessages.$inferSelect;
@@ -84,7 +80,7 @@ export const rotomChatMessageReads = mysqlTable(
         onDelete: 'cascade',
         onUpdate: 'cascade',
       }),
-    uuid: varchar('uuid', { length: 36 })
+    uuid: char('uuid', { length: 36 })
       .notNull()
       .references(() => rotomUsers.uuid, {
         onDelete: 'cascade',
@@ -105,7 +101,7 @@ export const rotomChatMessageReactions = mysqlTable(
   {
     // Named explicitly: the auto-generated name is 65 chars, over MySQL's limit.
     messageId: int('message_id').notNull(),
-    uuid: varchar('uuid', { length: 36 })
+    uuid: char('uuid', { length: 36 })
       .notNull()
       .references(() => rotomUsers.uuid, {
         onDelete: 'cascade',

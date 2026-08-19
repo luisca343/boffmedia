@@ -1,5 +1,5 @@
-import { sql } from 'drizzle-orm';
 import {
+  mysqlEnum,
   bigint,
   char,
   foreignKey,
@@ -14,12 +14,6 @@ import {
 } from 'drizzle-orm/mysql-core';
 import { boffMediaUsers } from './BoffMedia';
 import { boffMediaEvents } from './BoffMediaEvents';
-
-/** Status of a randomizer config: draft | open | closed | published */
-export type RandomizerConfigStatus = 'draft' | 'open' | 'closed' | 'published';
-
-/** Status of an assignment: claimed | patched | verified */
-export type RandomizerAssignmentStatus = 'claimed' | 'patched' | 'verified';
 
 /** Audit action for randomizer configs and assignments */
 export type RandomizerAuditAction =
@@ -45,6 +39,28 @@ export type RandomizerAuditAction =
  * by this sha512, and is never referenced by any pack manifest — so a player can
  * never download it. Only the admin routes and the server-side randomize job touch it.
  */
+// Lifecycle of a randomizer config. `draft` is editable; `open` mints
+// assignments on claim; `closed` stops minting; `published` unseals the seed,
+// settings and spoiler log on the public transparency surface.
+export const RANDOMIZER_CONFIG_STATUSES = [
+  'draft',
+  'open',
+  'closed',
+  'published',
+] as const;
+export type RandomizerConfigStatus =
+  (typeof RANDOMIZER_CONFIG_STATUSES)[number];
+
+// A player's assignment: minted on claim, `patched` once the randomized ROM has
+// been produced and downloaded, `verified` once its hash was checked at launch.
+export const RANDOMIZER_ASSIGNMENT_STATUSES = [
+  'claimed',
+  'patched',
+  'verified',
+] as const;
+export type RandomizerAssignmentStatus =
+  (typeof RANDOMIZER_ASSIGNMENT_STATUSES)[number];
+
 export const randomizerRoms = mysqlTable(
   'randomizer_roms',
   {
@@ -53,15 +69,11 @@ export const randomizerRoms = mysqlTable(
     gamePlatform: varchar('game_platform', { length: 8 }).notNull(), // "gba" | "nds"
     sha512: char('sha512', { length: 128 }).notNull(), // content address in the blob store
     fileSize: bigint('file_size', { mode: 'number' }).notNull(),
-    createdAt: timestamp('created_at')
-      .notNull()
-      .default(sql`CURRENT_TIMESTAMP()`),
-    updatedAt: timestamp('updated_at')
-      .notNull()
-      .default(sql`CURRENT_TIMESTAMP() ON UPDATE CURRENT_TIMESTAMP()`),
+    createdAt: timestamp('created_at').notNull().defaultNow(),
+    updatedAt: timestamp('updated_at').notNull().defaultNow().onUpdateNow(),
   },
   (table) => ({
-    sha512Unique: uniqueIndex('rr_sha512_unique').on(table.sha512),
+    sha512Unique: uniqueIndex('rr_sha512_uq').on(table.sha512),
     platformIdx: index('rr_platform_idx').on(table.gamePlatform),
   }),
 );
@@ -81,13 +93,11 @@ export const randomizerConfigs = mysqlTable(
     cleanRomSha512: char('clean_rom_sha512', { length: 128 }).notNull(), // No-Intro clean-dump hash (pinned execution value)
     romId: int('rom_id'), // provenance: library ROM this config's clean hash was pinned from; nullable for pre-library configs
     romHint: varchar('rom_hint', { length: 255 }), // human hint (e.g. "Pokémon FireRed (Spain)")
-    status: varchar('status', { length: 16 }).notNull().default('draft'), // draft | open | closed | published
-    createdAt: timestamp('created_at')
+    status: mysqlEnum('status', RANDOMIZER_CONFIG_STATUSES)
       .notNull()
-      .default(sql`CURRENT_TIMESTAMP()`),
-    updatedAt: timestamp('updated_at')
-      .notNull()
-      .default(sql`CURRENT_TIMESTAMP() ON UPDATE CURRENT_TIMESTAMP()`),
+      .default('draft'),
+    createdAt: timestamp('created_at').notNull().defaultNow(),
+    updatedAt: timestamp('updated_at').notNull().defaultNow().onUpdateNow(),
   },
   (table) => ({
     eventFk: foreignKey({
@@ -121,18 +131,16 @@ export const randomizerAssignments = mysqlTable(
     // Audit context only, and null for an account with no Minecraft linked.
     mcUuid: char('mc_uuid', { length: 36 }),
     seed: bigint('seed', { mode: 'number' }).notNull(),
-    status: varchar('status', { length: 16 }).notNull().default('claimed'), // claimed | patched | verified
+    status: mysqlEnum('status', RANDOMIZER_ASSIGNMENT_STATUSES)
+      .notNull()
+      .default('claimed'),
     outputSha512: char('output_sha512', { length: 128 }), // sha512 of randomized output ROM
     logBlobSha512: char('log_blob_sha512', { length: 128 }), // sealed spoiler log blob ref
     claimedAt: timestamp('claimed_at').defaultNow(),
     patchedAt: timestamp('patched_at'),
     verifiedAt: timestamp('verified_at'),
-    createdAt: timestamp('created_at')
-      .notNull()
-      .default(sql`CURRENT_TIMESTAMP()`),
-    updatedAt: timestamp('updated_at')
-      .notNull()
-      .default(sql`CURRENT_TIMESTAMP() ON UPDATE CURRENT_TIMESTAMP()`),
+    createdAt: timestamp('created_at').notNull().defaultNow(),
+    updatedAt: timestamp('updated_at').notNull().defaultNow().onUpdateNow(),
   },
   (table) => ({
     configFk: foreignKey({
@@ -145,7 +153,7 @@ export const randomizerAssignments = mysqlTable(
       columns: [table.boffmediaUserId],
       foreignColumns: [boffMediaUsers.id],
     }).onDelete('cascade'),
-    configUserUnique: uniqueIndex('rass_config_user_unique').on(
+    configUserUnique: uniqueIndex('rass_config_user_uq').on(
       table.configId,
       table.boffmediaUserId,
     ),
@@ -168,9 +176,7 @@ export const randomizerAudit = mysqlTable(
     action: varchar('action', { length: 32 }).notNull(), // ROM_RECEIVED, PATCHED, LOG_SEALED, VERIFY_PASSED, etc.
     actor: varchar('actor', { length: 64 }), // admin id / launcher:{mc_uuid} / 'system'
     meta: json('meta').$type<Record<string, unknown>>(), // additional context
-    createdAt: timestamp('created_at')
-      .notNull()
-      .default(sql`CURRENT_TIMESTAMP()`),
+    createdAt: timestamp('created_at').notNull().defaultNow(),
   },
   (table) => ({
     configFk: foreignKey({
@@ -203,12 +209,8 @@ export const randomizerPresets = mysqlTable(
       .notNull(), // RandomizerSettings JSON document
     rnqsBlobSha512: char('rnqs_blob_sha512', { length: 128 }), // encoded .rnqs blob ref; nullable until first encode
     updatedBy: int('updated_by'),
-    createdAt: timestamp('created_at')
-      .notNull()
-      .default(sql`CURRENT_TIMESTAMP()`),
-    updatedAt: timestamp('updated_at')
-      .notNull()
-      .default(sql`CURRENT_TIMESTAMP() ON UPDATE CURRENT_TIMESTAMP()`),
+    createdAt: timestamp('created_at').notNull().defaultNow(),
+    updatedAt: timestamp('updated_at').notNull().defaultNow().onUpdateNow(),
   },
   (table) => ({
     updatedByFk: foreignKey({

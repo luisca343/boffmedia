@@ -126,7 +126,10 @@ export class RandomizerLauncherController {
   })
   @ApiResponse({ status: 404, description: 'No config / not accepting claims' })
   @ApiResponse({ status: 403, description: 'Not registered for this event' })
-  @ApiResponse({ status: 409, description: 'Config has no base ROM on the server' })
+  @ApiResponse({
+    status: 409,
+    description: 'Config has no base ROM on the server',
+  })
   async getRom(
     @Param('eventId') eventId: string,
     @Req() req: LauncherRequest,
@@ -175,7 +178,10 @@ export class RandomizerLauncherController {
     description: 'Mints seed on first claim if config is open.',
   })
   @ApiResponse({ status: 200, type: AssignmentClaimedDto })
-  @ApiResponse({ status: 404, description: 'Config not found or not accepting claims' })
+  @ApiResponse({
+    status: 404,
+    description: 'Config not found or not accepting claims',
+  })
   @ApiResponse({ status: 403, description: 'Not registered for this event' })
   async getMyAssignment(
     @Param('configId') configId: string,

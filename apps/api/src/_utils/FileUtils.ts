@@ -1,3 +1,4 @@
+import { HttpException } from '@nestjs/common';
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -34,6 +35,9 @@ export class FileUtils {
     try {
       return JSON.parse(content) as T;
     } catch (error: any) {
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(
         `Failed to parse JSON file ${fileName}: ${error.message}`,
       );

@@ -21,7 +21,11 @@ export class EventsService {
     includePrivate = false,
     userId?: number,
   ): Promise<Event & { childEvents?: Event[]; modules?: EventModules }> {
-    const effectivePrivate = await this.canSeePrivate(id, includePrivate, userId);
+    const effectivePrivate = await this.canSeePrivate(
+      id,
+      includePrivate,
+      userId,
+    );
     const event = await this.eventsRepository.findById(id, effectivePrivate);
     if (!event)
       return null as unknown as Event & {
@@ -173,7 +177,10 @@ export class EventsService {
     userId?: number,
   ): Promise<boolean> {
     if (includePrivate) return true;
-    if (userId && (await this.eventsRepository.isParticipant(eventId, userId))) {
+    if (
+      userId &&
+      (await this.eventsRepository.isParticipant(eventId, userId))
+    ) {
       return true;
     }
     return false;

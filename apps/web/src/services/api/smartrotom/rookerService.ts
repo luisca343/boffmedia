@@ -1,4 +1,13 @@
-import { rotomGETOrThrow, rotomPOSTOrThrow, rotomPATCHOrThrow, rotomDELETEOrThrow } from "@/services/boffAPI"
+import {
+  rotomGETOrThrow,
+  rotomAuthedPOSTOrThrow,
+  rotomAuthedPATCHOrThrow,
+  rotomAuthedDELETEOrThrow,
+} from "@/services/boffAPI"
+
+// Reads stay anonymous (the timeline is public). Writes carry the Bearer: the
+// API takes the acting player from the token now, so the `uuid` still sent in
+// these bodies is ignored server-side.
 
 /**
  * Rooker — the social nest.
@@ -74,25 +83,25 @@ export class RookerService {
   }
 
   static createPost(body: CreatePostBody): Promise<RookerPost> {
-    return rotomPOSTOrThrow<RookerPost>("/rooker/posts", body)
+    return rotomAuthedPOSTOrThrow<RookerPost>("/rooker/posts", body)
   }
 
   static deletePost(id: number, uuid: string): Promise<{ ok: boolean; id: number }> {
-    return rotomDELETEOrThrow<{ ok: boolean; id: number }>(`/rooker/posts/${id}`, { uuid })
+    return rotomAuthedDELETEOrThrow<{ ok: boolean; id: number }>(`/rooker/posts/${id}`, { uuid })
   }
 
   // ── Engagement. All three toggle, and all three answer with the whole post,
   //    so the caller never has to reconstruct the new counts itself. ──────────
   static react(id: number, uuid: string, type: ReactionType): Promise<RookerPost> {
-    return rotomPOSTOrThrow<RookerPost>(`/rooker/posts/${id}/react`, { uuid, type })
+    return rotomAuthedPOSTOrThrow<RookerPost>(`/rooker/posts/${id}/react`, { uuid, type })
   }
 
   static retrino(id: number, uuid: string): Promise<RookerPost> {
-    return rotomPOSTOrThrow<RookerPost>(`/rooker/posts/${id}/retrino`, { uuid })
+    return rotomAuthedPOSTOrThrow<RookerPost>(`/rooker/posts/${id}/retrino`, { uuid })
   }
 
   static bookmark(id: number, uuid: string): Promise<RookerPost> {
-    return rotomPOSTOrThrow<RookerPost>(`/rooker/posts/${id}/bookmark`, { uuid })
+    return rotomAuthedPOSTOrThrow<RookerPost>(`/rooker/posts/${id}/bookmark`, { uuid })
   }
 
   static getBookmarks(uuid: string): Promise<RookerFeed> {
@@ -111,7 +120,7 @@ export class RookerService {
   }
 
   static follow(uuid: string, targetUuid: string): Promise<RookerFollowResult> {
-    return rotomPOSTOrThrow<RookerFollowResult>("/rooker/follow", { uuid, targetUuid })
+    return rotomAuthedPOSTOrThrow<RookerFollowResult>("/rooker/follow", { uuid, targetUuid })
   }
 
   static getProfile(handle: string, viewer?: string): Promise<RookerProfile> {
@@ -126,7 +135,7 @@ export class RookerService {
   }
 
   static updateProfile(body: UpdateProfileBody): Promise<RookerProfile> {
-    return rotomPATCHOrThrow<RookerProfile>("/rooker/profile", body)
+    return rotomAuthedPATCHOrThrow<RookerProfile>("/rooker/profile", body)
   }
 
   // ── Discovery ──────────────────────────────────────────────────────────────

@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { HttpException, Inject, Injectable } from '@nestjs/common';
 import { TeleportRequestDto } from '../dto/teleport-request.dto';
 import { WINGULL_TRANSPORT_REPOSITORY_TOKEN } from '@api/_utils/repositories/interfaces/repository.token';
 import { IWingullTransportRepository } from '../repositories/interfaces/wingull-transport.repository.interface';
@@ -21,6 +21,9 @@ export class WingullTransportService {
       return await this.wingullTransportRepository.getTaxiStopsFromAPI();
     } catch (error: any) {
       this.logger.error('Failed to get taxi stops:', error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Taxi stops retrieval failed: ${error.message}`);
     }
   }
@@ -36,6 +39,9 @@ export class WingullTransportService {
       );
     } catch (error: any) {
       this.logger.error(`Failed to read the position of ${uuid}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Player position read failed: ${error.message}`);
     }
   }

@@ -46,6 +46,8 @@ import {
   ClapResponse,
 } from './entities/news.entity';
 import { SuccessResponse } from '@api/_utils/entities/common-response.entity';
+import { CurrentMcUuid } from '@api/_utils/decorators/current-user.decorator';
+import { RequireSession } from '@api/_utils/decorators/require-session.decorator';
 
 @ApiTags('SmartRotom | Documents')
 @Controller('smartrotom/documents')
@@ -172,6 +174,7 @@ export class NewsController {
   }
 
   @Public()
+  @RequireSession()
   @Post('news/:newsId/comments')
   @ApiOperation({ summary: 'Add a comment to a news article' })
   @ApiResponse({
@@ -184,14 +187,17 @@ export class NewsController {
   async addNewsComment(
     @Param('newsId') newsId: string,
     @Body() createNewsCommentDto: CreateNewsCommentDto,
+    @CurrentMcUuid() authorUuid: string,
   ): Promise<NewsComment> {
     const newsIdNum = parseInt(newsId, 10);
     if (isNaN(newsIdNum)) {
       throw new BadRequestException('Invalid news ID');
     }
+    // The author is the session. It used to be `dto.uuid`, so a comment could
+    // be posted under anybody's name — with no account at all.
     return await this.documentsFacadeService.addNewsComment(
       newsIdNum,
-      createNewsCommentDto.uuid,
+      authorUuid,
       createNewsCommentDto.body,
     );
   }

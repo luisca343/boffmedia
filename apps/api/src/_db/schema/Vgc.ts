@@ -142,7 +142,12 @@ export const vgcPastesRepository = mysqlTable(
   'vgc_pastes_repository',
   {
     id: varchar('id', { length: 16 }).primaryKey(), // e.g. 'PC476'
-    pasteId: int('paste_id').references(() => vgcPokepastes.id), // null until Phase 3
+    // `set null`, not the implicit RESTRICT: the repository row is the durable
+    // record (it carries the sheet metadata) and must outlive a re-imported paste.
+    pasteId: int('paste_id').references(() => vgcPokepastes.id, {
+      onDelete: 'set null',
+      onUpdate: 'cascade',
+    }), // null until Phase 3
     pasteUrl: varchar('paste_url', { length: 255 }),
     playerName: varchar('player_name', { length: 128 }),
     teamDescription: varchar('team_description', { length: 512 }),
@@ -209,7 +214,10 @@ export const vgcLimitlessTeams = mysqlTable(
     playerName: varchar('player_name', { length: 128 }),
     placing: int('placing'),
     record: varchar('record', { length: 16 }), // e.g. '7-2-0'
-    pasteId: int('paste_id').references(() => vgcPokepastes.id), // null until paste scraped
+    pasteId: int('paste_id').references(() => vgcPokepastes.id, {
+      onDelete: 'set null',
+      onUpdate: 'cascade',
+    }), // null until paste scraped
     fetchedAt: timestamp('fetched_at').notNull(),
   },
   (t) => [
@@ -253,7 +261,7 @@ export const vgcRegulations = mysqlTable(
     importStartedAt: timestamp('import_started_at'),
     importCompletedAt: timestamp('import_completed_at'),
     active: int('active').notNull().default(1), // 0 = soft-disabled
-    createdAt: timestamp('created_at').notNull(),
+    createdAt: timestamp('created_at').notNull().defaultNow(),
   },
   (t) => [
     index('vgc_regulations_active_idx').on(t.active),

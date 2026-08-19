@@ -98,7 +98,7 @@ export function SorteosChapter() {
         title="Tarjeta de sorteo"
         lead={
           <>
-            La pieza que puebla el descubridor. <code>&lt;SrtCard&gt;</code> lleva franja de premio con valor, estado, origen y pie contextual: cuenta atrás para los activos, ganador para los anunciados. Dos pieles: rejilla y lista (<code>layout="list"</code>). El rail y el glifo se tiñen con el hue del juego cuando el sorteo está ligado a uno.
+            La pieza que puebla el descubridor. <code>&lt;SrtCard&gt;</code> lleva franja de premio con valor, estado, origen y pie contextual: cuenta atrás para los activos, ganador para los anunciados. Dos pieles: rejilla y lista (<code>layout=&quot;list&quot;</code>). El rail y el glifo se tiñen con el hue del juego cuando el sorteo está ligado a uno.
           </>
         }
       >

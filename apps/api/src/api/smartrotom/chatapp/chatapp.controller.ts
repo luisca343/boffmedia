@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Get,
@@ -9,7 +10,7 @@ import {
   HttpStatus,
   Query,
 } from '@nestjs/common';
-import { Public } from '@api/_utils/decorators/public.decorator';
+import { CurrentMcUuid } from '@api/_utils/decorators/current-user.decorator';
 import {
   ApiTags,
   ApiOperation,
@@ -52,7 +53,6 @@ import {
 import { CallSession, CallResponse } from './entities/call.entity';
 
 @ApiTags('SmartRotom | ChatApp')
-@Public()
 @Controller('smartrotom/chatapp')
 export class ChatappController {
   constructor(private readonly chatappFacadeService: ChatappFacadeService) {}
@@ -71,9 +71,14 @@ export class ChatappController {
     description: 'Invalid chat data.',
   })
   @ApiBody({ type: CreateChatDto })
-  async createChat(@Body() createChatDto: CreateChatDto): Promise<number> {
+  async createChat(
+    @Body() createChatDto: CreateChatDto,
+    @CurrentMcUuid() uuid: string,
+  ): Promise<number> {
     const createChatRequest: CreateChatRequest = {
-      player: createChatDto.player!,
+      // The creator is the caller. It used to be `dto.player`, i.e. whoever the
+      // client said it was.
+      player: uuid,
       users: createChatDto.users,
       name: createChatDto.name ?? '',
     };
@@ -92,7 +97,7 @@ export class ChatappController {
     description: 'Failed to retrieve chats.',
   })
   @ApiParam({ name: 'uuid', description: 'Player UUID' })
-  async getChats(@Param('uuid') uuid: string): Promise<Chat[]> {
+  async getChats(@CurrentMcUuid() uuid: string): Promise<Chat[]> {
     return await this.chatappFacadeService.getChats(uuid);
   }
 
@@ -108,7 +113,7 @@ export class ChatappController {
   @ApiQuery({ name: 'uuid', description: 'Requesting user UUID' })
   async getChatById(
     @Param('chatId') chatId: string,
-    @Query('uuid') uuid: string,
+    @CurrentMcUuid() uuid: string,
   ): Promise<Chat> {
     const chatIdNum = parseInt(chatId, 10);
     if (isNaN(chatIdNum)) {
@@ -163,6 +168,7 @@ export class ChatappController {
   async createMessage(
     @Param('chatId') chatId: string,
     @Body() createMessageDto: CreateMessageDto,
+    @CurrentMcUuid() uuid: string,
   ): Promise<RotomMessage> {
     const chatIdNum = parseInt(chatId, 10);
     if (isNaN(chatIdNum)) {
@@ -170,7 +176,8 @@ export class ChatappController {
     }
 
     const createMessageRequest: CreateChatMessageRequest = {
-      uuid: createMessageDto.uuid,
+      // Author = caller, not a body field: anyone could post as anyone.
+      uuid,
       message: createMessageDto.message,
       type: createMessageDto.type!,
     };
@@ -195,9 +202,10 @@ export class ChatappController {
   @ApiBody({ type: CreateMessageDto })
   async createGlobalMessage(
     @Body() createMessageDto: CreateMessageDto,
+    @CurrentMcUuid() uuid: string,
   ): Promise<RotomMessage> {
     const createMessageRequest: CreateChatMessageRequest = {
-      uuid: createMessageDto.uuid,
+      uuid,
       message: createMessageDto.message,
       type: createMessageDto.type!,
     };
@@ -223,6 +231,7 @@ export class ChatappController {
   async updateMessage(
     @Param('messageId') messageId: string,
     @Body() updateMessageDto: UpdateMessageDto,
+    @CurrentMcUuid() uuid: string,
   ): Promise<RotomMessage> {
     const messageIdNum = parseInt(messageId, 10);
     if (isNaN(messageIdNum)) {
@@ -231,7 +240,7 @@ export class ChatappController {
     return await this.chatappFacadeService.updateMessage(
       messageIdNum,
       updateMessageDto.content,
-      updateMessageDto.uuid,
+      uuid,
     );
   }
 
@@ -250,16 +259,14 @@ export class ChatappController {
   @ApiBody({ type: DeleteMessageDto })
   async deleteMessage(
     @Param('messageId') messageId: string,
-    @Body() deleteMessageDto: DeleteMessageDto,
+    @Body() _deleteMessageDto: DeleteMessageDto,
+    @CurrentMcUuid() uuid: string,
   ): Promise<MessageResponse> {
     const messageIdNum = parseInt(messageId, 10);
     if (isNaN(messageIdNum)) {
       throw new Error('Invalid message ID');
     }
-    return await this.chatappFacadeService.deleteMessage(
-      messageIdNum,
-      deleteMessageDto.uuid,
-    );
+    return await this.chatappFacadeService.deleteMessage(messageIdNum, uuid);
   }
 
   @Post('message/:messageId/read')
@@ -273,7 +280,8 @@ export class ChatappController {
   @ApiBody({ type: MarkMessageReadDto })
   async markMessageAsRead(
     @Param('messageId') messageId: string,
-    @Body() markReadDto: MarkMessageReadDto,
+    @Body() _markReadDto: MarkMessageReadDto,
+    @CurrentMcUuid() uuid: string,
   ): Promise<MessageResponse> {
     const messageIdNum = parseInt(messageId, 10);
     if (isNaN(messageIdNum)) {
@@ -281,7 +289,7 @@ export class ChatappController {
     }
     return await this.chatappFacadeService.markMessageAsRead(
       messageIdNum,
-      markReadDto.uuid,
+      uuid,
     );
   }
 
@@ -302,11 +310,12 @@ export class ChatappController {
   @ApiBody({ type: MarkChatReadDto })
   async markChatAsRead(
     @Param('chatId') chatId: string,
-    @Body() dto: MarkChatReadDto,
+    @Body() _dto: MarkChatReadDto,
+    @CurrentMcUuid() uuid: string,
   ): Promise<MarkChatReadResponse> {
     const id = parseInt(chatId, 10);
-    if (isNaN(id)) throw new Error('Invalid chat ID');
-    return await this.chatappFacadeService.markChatAsRead(id, dto.uuid);
+    if (isNaN(id)) throw new BadRequestException('Chat inválido');
+    return await this.chatappFacadeService.markChatAsRead(id, uuid);
   }
 
   @Post('message/:messageId/react')
@@ -317,14 +326,11 @@ export class ChatappController {
   async reactToMessage(
     @Param('messageId') messageId: string,
     @Body() dto: ReactMessageDto,
+    @CurrentMcUuid() uuid: string,
   ): Promise<MessageResponse> {
     const id = parseInt(messageId, 10);
-    if (isNaN(id)) throw new Error('Invalid message ID');
-    return await this.chatappFacadeService.toggleReaction(
-      id,
-      dto.uuid,
-      dto.emoji,
-    );
+    if (isNaN(id)) throw new BadRequestException('Mensaje inválido');
+    return await this.chatappFacadeService.toggleReaction(id, uuid, dto.emoji);
   }
 
   @Post('chat/:chatId/pin')
@@ -335,14 +341,11 @@ export class ChatappController {
   async setChatPinned(
     @Param('chatId') chatId: string,
     @Body() dto: SetChatPinnedDto,
+    @CurrentMcUuid() uuid: string,
   ): Promise<MessageResponse> {
     const id = parseInt(chatId, 10);
-    if (isNaN(id)) throw new Error('Invalid chat ID');
-    return await this.chatappFacadeService.setChatPinned(
-      id,
-      dto.uuid,
-      dto.pinned,
-    );
+    if (isNaN(id)) throw new BadRequestException('Chat inválido');
+    return await this.chatappFacadeService.setChatPinned(id, uuid, dto.pinned);
   }
 
   @Post('chat/:chatId/mute')
@@ -353,14 +356,11 @@ export class ChatappController {
   async setChatMuted(
     @Param('chatId') chatId: string,
     @Body() dto: SetChatMutedDto,
+    @CurrentMcUuid() uuid: string,
   ): Promise<MessageResponse> {
     const id = parseInt(chatId, 10);
-    if (isNaN(id)) throw new Error('Invalid chat ID');
-    return await this.chatappFacadeService.setChatMuted(
-      id,
-      dto.uuid,
-      dto.muted,
-    );
+    if (isNaN(id)) throw new BadRequestException('Chat inválido');
+    return await this.chatappFacadeService.setChatMuted(id, uuid, dto.muted);
   }
 
   // ==================== GROUP MANAGEMENT ENDPOINTS ====================
@@ -377,15 +377,17 @@ export class ChatappController {
   async addMemberToGroup(
     @Param('groupId') groupId: string,
     @Body() addMemberDto: AddMemberDto,
+    @CurrentMcUuid() requesterUuid: string,
   ): Promise<MessageResponse> {
     const groupIdNum = parseInt(groupId, 10);
     if (isNaN(groupIdNum)) {
       throw new Error('Invalid group ID');
     }
+    // The member being added is request data; WHO is adding them is not.
     return await this.chatappFacadeService.addMemberToGroup(
       groupIdNum,
       addMemberDto.uuid,
-      addMemberDto.requestingUserUuid,
+      requesterUuid,
     );
   }
 
@@ -402,7 +404,8 @@ export class ChatappController {
   async removeMemberFromGroup(
     @Param('groupId') groupId: string,
     @Param('uuid') uuid: string,
-    @Body() removeMemberDto: RemoveMemberDto,
+    @Body() _removeMemberDto: RemoveMemberDto,
+    @CurrentMcUuid() requesterUuid: string,
   ): Promise<MessageResponse> {
     const groupIdNum = parseInt(groupId, 10);
     if (isNaN(groupIdNum)) {
@@ -411,7 +414,7 @@ export class ChatappController {
     return await this.chatappFacadeService.removeMemberFromGroup(
       groupIdNum,
       uuid,
-      removeMemberDto.requestingUserUuid,
+      requesterUuid,
     );
   }
 
@@ -432,16 +435,14 @@ export class ChatappController {
   @ApiBody({ type: InitiateCallDto })
   async initiateCall(
     @Param('chatId') chatId: string,
-    @Body() initiateCallDto: InitiateCallDto,
+    @Body() _initiateCallDto: InitiateCallDto,
+    @CurrentMcUuid() uuid: string,
   ): Promise<CallSession> {
     const chatIdNum = parseInt(chatId, 10);
     if (isNaN(chatIdNum)) {
       throw new Error('Invalid chat ID');
     }
-    return await this.chatappFacadeService.initiateCall(
-      chatIdNum,
-      initiateCallDto.uuid,
-    );
+    return await this.chatappFacadeService.initiateCall(chatIdNum, uuid);
   }
 
   @Post('call/:chatId/end')

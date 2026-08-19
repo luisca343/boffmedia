@@ -63,7 +63,7 @@ export class ForumController {
     type: [ForumCategory],
   })
   async getCategories(
-    @Req() req: { user?: { roles?: string[] } },
+    @Req() _req: { user?: { roles?: string[] } },
   ): Promise<ForumCategory[]> {
     return this.forumFacadeService.getCategories();
   }
@@ -78,7 +78,7 @@ export class ForumController {
   })
   async getCategory(
     @Param('slug') slug: string,
-    @Req() req: { user?: { roles?: string[] } },
+    @Req() _req: { user?: { roles?: string[] } },
   ): Promise<ForumCategory> {
     return this.forumFacadeService.getCategory(slug);
   }
@@ -94,7 +94,7 @@ export class ForumController {
   async getCategoryThreads(
     @Param('slug') slug: string,
     @Query() query: ListThreadsQueryDto,
-    @Req() req: { user?: { roles?: string[] } },
+    @Req() _req: { user?: { roles?: string[] } },
   ): Promise<ForumThreadList> {
     return this.forumFacadeService.getCategoryThreads(slug, query);
   }
@@ -109,7 +109,7 @@ export class ForumController {
   })
   async getThread(
     @Param('id', ParseIntPipe) id: number,
-    @Req() req: { user?: { roles?: string[] } },
+    @Req() _req: { user?: { roles?: string[] } },
   ): Promise<ForumThread> {
     return this.forumFacadeService.getThread(id);
   }
@@ -125,7 +125,7 @@ export class ForumController {
   async getThreadPosts(
     @Param('id', ParseIntPipe) id: number,
     @Query() query: ListPostsQueryDto,
-    @Req() req: { user?: { roles?: string[] } },
+    @Req() _req: { user?: { roles?: string[] } },
   ): Promise<ForumPostList> {
     return this.forumFacadeService.getThreadPosts(id, query);
   }

@@ -1,4 +1,4 @@
-import { Injectable, Inject } from '@nestjs/common';
+import { HttpException, Injectable, Inject } from '@nestjs/common';
 import {
   PokedexRegistryData,
   PokedexStatistics,
@@ -246,6 +246,9 @@ export class PokedexManagementService {
       );
     } catch (error: any) {
       this.logger.error(`Failed to get pokedex statistics for ${uuid}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Pokedex statistics retrieval failed: ${error.message}`);
     }
   }
@@ -310,6 +313,9 @@ export class PokedexManagementService {
         `Failed to get detailed pokedex status for ${uuid}:`,
         error,
       );
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(
         `Detailed pokedex status retrieval failed: ${error.message}`,
       );
@@ -337,6 +343,9 @@ export class PokedexManagementService {
       });
     } catch (error: any) {
       this.logger.error(`Failed to get pokedex registries for ${uuid}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Pokedex registries retrieval failed: ${error.message}`);
     }
   }

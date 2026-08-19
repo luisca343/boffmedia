@@ -1,4 +1,10 @@
-import { Injectable, Inject } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { NOTE_ORGANIZATION_REPOSITORY_TOKEN } from '../repositories/interfaces/documents.repository.token';
 import {
   INoteOrganizationRepository,
@@ -39,13 +45,13 @@ export class NoteOrganizationService {
 
   // ==================== FOLDERS ====================
   getFolders(uuid: string): Promise<FolderRow[]> {
-    if (!uuid) throw new Error('UUID is required');
     return this.repo.findFoldersByUser(uuid);
   }
 
   async createFolder(req: CreateFolderRequest): Promise<FolderRow> {
-    if (!req.uuid) throw new Error('UUID is required');
-    if (!req.name?.trim()) throw new Error('Folder name is required');
+    if (!req.name?.trim()) {
+      throw new BadRequestException('El nombre de la carpeta es obligatorio');
+    }
     const { insertId } = await this.repo.createFolder({
       uuid: req.uuid,
       name: req.name.trim(),
@@ -53,42 +59,55 @@ export class NoteOrganizationService {
       parentId: req.parentId ?? null,
     });
     const folder = await this.repo.findFolderById(insertId);
-    if (!folder) throw new Error('Failed to create folder');
+    if (!folder) throw new NotFoundException('Carpeta no encontrada');
     return folder;
   }
 
   async updateFolder(
     id: number,
+    ownerUuid: string,
     data: { name?: string; color?: string; parentId?: number | null },
   ): Promise<FolderRow> {
     if (id === data.parentId) {
-      throw new Error('A folder cannot be its own parent');
+      throw new BadRequestException(
+        'Una carpeta no puede ser su propia carpeta padre',
+      );
     }
-    const existing = await this.repo.findFolderById(id);
-    if (!existing) throw new Error('Folder not found');
-    await this.repo.updateFolder(id, {
+    // The update is owner-scoped in SQL; 0 rows means the folder is not the
+    // caller's (or does not exist), which is a 403 either way — telling the two
+    // apart would leak that the id is real.
+    const affected = await this.repo.updateFolder(id, ownerUuid, {
       ...data,
       name: data.name?.trim(),
     });
+    if (affected === 0) {
+      throw new ForbiddenException('Esta carpeta no te pertenece');
+    }
     const folder = await this.repo.findFolderById(id);
-    if (!folder) throw new Error('Folder not found');
+    if (!folder) throw new NotFoundException('Carpeta no encontrada');
     return folder;
   }
 
-  async deleteFolder(id: number): Promise<{ success: boolean }> {
-    await this.repo.deleteFolder(id);
+  async deleteFolder(
+    id: number,
+    ownerUuid: string,
+  ): Promise<{ success: boolean }> {
+    const affected = await this.repo.deleteFolder(id, ownerUuid);
+    if (affected === 0) {
+      throw new ForbiddenException('Esta carpeta no te pertenece');
+    }
     return { success: true };
   }
 
   // ==================== TAGS ====================
   getTags(uuid: string): Promise<TagRow[]> {
-    if (!uuid) throw new Error('UUID is required');
     return this.repo.findTagsByUser(uuid);
   }
 
   async createTag(req: CreateTagRequest): Promise<TagRow> {
-    if (!req.uuid) throw new Error('UUID is required');
-    if (!req.label?.trim()) throw new Error('Tag label is required');
+    if (!req.label?.trim()) {
+      throw new BadRequestException('La etiqueta necesita un nombre');
+    }
     const { insertId } = await this.repo.createTag({
       uuid: req.uuid,
       label: req.label.trim(),
@@ -103,14 +122,27 @@ export class NoteOrganizationService {
 
   async updateTag(
     id: number,
+    ownerUuid: string,
     data: { label?: string; color?: string },
   ): Promise<{ success: boolean }> {
-    await this.repo.updateTag(id, { ...data, label: data.label?.trim() });
+    const affected = await this.repo.updateTag(id, ownerUuid, {
+      ...data,
+      label: data.label?.trim(),
+    });
+    if (affected === 0) {
+      throw new ForbiddenException('Esta etiqueta no te pertenece');
+    }
     return { success: true };
   }
 
-  async deleteTag(id: number): Promise<{ success: boolean }> {
-    await this.repo.deleteTag(id);
+  async deleteTag(
+    id: number,
+    ownerUuid: string,
+  ): Promise<{ success: boolean }> {
+    const affected = await this.repo.deleteTag(id, ownerUuid);
+    if (affected === 0) {
+      throw new ForbiddenException('Esta etiqueta no te pertenece');
+    }
     return { success: true };
   }
 
@@ -135,7 +167,7 @@ export class NoteOrganizationService {
   // ==================== VERSIONS ====================
   getVersions(documentId: number): Promise<VersionRow[]> {
     if (!documentId || documentId <= 0) {
-      throw new Error('Valid document ID is required');
+      throw new BadRequestException('Identificador de nota inválido');
     }
     return this.repo.findVersionsByDocument(documentId);
   }
@@ -146,7 +178,7 @@ export class NoteOrganizationService {
 
   async createVersion(req: CreateVersionRequest): Promise<VersionRow> {
     if (!req.documentId || req.documentId <= 0) {
-      throw new Error('Valid document ID is required');
+      throw new BadRequestException('Identificador de nota inválido');
     }
     const { insertId } = await this.repo.createVersion({
       documentId: req.documentId,
@@ -156,7 +188,7 @@ export class NoteOrganizationService {
       words: countWords(req.content),
     });
     const version = await this.repo.findVersionById(insertId);
-    if (!version) throw new Error('Failed to create version');
+    if (!version) throw new NotFoundException('Versión no encontrada');
     return version;
   }
 }

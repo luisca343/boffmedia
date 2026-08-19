@@ -25,8 +25,12 @@ import { RankingEntry } from './entities/ranking-entry.entity';
 import { UnclaimedItem } from './entities/unclaimed-item.entity';
 import { ClaimResponse } from './entities/claim-response.entity';
 import { PlayerStatistics } from './entities/player-statistics.entity';
+import { CurrentMcUuid } from '@api/_utils/decorators/current-user.decorator';
+import { RequireSession } from '@api/_utils/decorators/require-session.decorator';
 
 @ApiTags('SmartRotom | Mine')
+// Leaderboards and reward tables are public; playing, ending a run and claiming
+// rewards move a player's energy and money, so they run on the session's uuid.
 @Public()
 @Controller('smartrotom/mine')
 export class MineController {
@@ -52,6 +56,7 @@ export class MineController {
 
   // ==================== GAME ENDPOINTS ====================
 
+  @RequireSession()
   @Post('play')
   @ApiOperation({ summary: 'Start a new mining game' })
   @ApiResponse({
@@ -64,10 +69,13 @@ export class MineController {
     description: 'Insufficient energy or invalid request.',
   })
   @ApiBody({ type: PlayGameDto })
-  async play(@Body() body: PlayGameDto) {
-    return await this.mineFacadeService.playGame(body);
+  async play(@Body() body: PlayGameDto, @CurrentMcUuid() uuid: string) {
+    // The player is the session, not `body.uuid`: this spends energy and, at
+    // endgame, pays out.
+    return await this.mineFacadeService.playGame({ ...body, uuid });
   }
 
+  @RequireSession()
   @Post('endgame')
   @ApiOperation({ summary: 'End a mining game and submit rewards' })
   @ApiResponse({
@@ -80,8 +88,8 @@ export class MineController {
     description: 'Invalid game data or rewards.',
   })
   @ApiBody({ type: EndGameDto })
-  async endGame(@Body() body: EndGameDto) {
-    return await this.mineFacadeService.endGame(body);
+  async endGame(@Body() body: EndGameDto, @CurrentMcUuid() uuid: string) {
+    return await this.mineFacadeService.endGame({ ...body, uuid });
   }
 
   // ==================== REWARD ENDPOINTS ====================
@@ -227,6 +235,7 @@ export class MineController {
     return await this.mineFacadeService.getUnclaimedRewards(uuid);
   }
 
+  @RequireSession()
   @Post('claim')
   @ApiOperation({ summary: 'Claim all unclaimed rewards for a player' })
   @ApiResponse({
@@ -239,8 +248,8 @@ export class MineController {
     description: 'Player not found.',
   })
   @ApiBody({ type: ClaimRewardsDto })
-  async claim(@Body() body: ClaimRewardsDto) {
-    return await this.mineFacadeService.claimRewards(body);
+  async claim(@Body() body: ClaimRewardsDto, @CurrentMcUuid() uuid: string) {
+    return await this.mineFacadeService.claimRewards({ ...body, uuid });
   }
 
   @Get('stats/:uuid')

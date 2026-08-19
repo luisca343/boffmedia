@@ -1,3 +1,4 @@
+import { Roles } from '@api/_utils/decorators/roles.decorator';
 import {
   Controller,
   Get,
@@ -8,8 +9,8 @@ import {
   HttpStatus,
   UsePipes,
   ValidationPipe,
+  UseGuards,
 } from '@nestjs/common';
-import { Public } from '@api/_utils/decorators/public.decorator';
 import {
   ApiTags,
   ApiOperation,
@@ -56,8 +57,18 @@ import {
 } from './entities/pokemon-evolution-tree';
 import { BiomeSpawnCollection } from './entities/biome-spawn-collection.entity';
 import { WingullFacadeService } from '../wingull/wingull.facade.service';
+import { JwtAuthGuard } from '@api/auth/jwt-auth.guard';
+import { RolesGuard } from '@api/_utils/guards/roles.guard';
+import { USER_ROLES } from '@api/_utils/auth/roles.constants';
+import { Public } from '@api/_utils/decorators/public.decorator';
+import { GameOrUserAuthGuard } from '@api/_utils/guards/game-or-user-auth.guard';
 
 @ApiTags('SmartRotom | Pokémon')
+// Pokédex reads are public — the web dex needs no account. The writes are not:
+// `register`, `dex/update` and `dex/sync` are player/game-server actions and
+// take the two credentials `GameOrUserAuthGuard` accepts (the mod's server token
+// or a player's JWT), while rebuilding the sprite manifest is admin-only. All
+// four used to be public.
 @Public()
 @Controller('smartrotom/pokemon')
 @UsePipes(new ValidationPipe({ transform: true, whitelist: true }))
@@ -495,6 +506,7 @@ export class PokemonController {
 
   // ==================== POKEDEX OPERATIONS ====================
 
+  @UseGuards(GameOrUserAuthGuard)
   @Post('register')
   @ApiOperation({ summary: 'Register a Pokémon encounter' })
   @ApiResponse({
@@ -524,6 +536,7 @@ export class PokemonController {
     );
   }
 
+  @UseGuards(GameOrUserAuthGuard)
   @Post('dex/update')
   @ApiOperation({ summary: 'Bulk update Pokédex' })
   @ApiResponse({
@@ -561,6 +574,7 @@ export class PokemonController {
     });
   }
 
+  @UseGuards(GameOrUserAuthGuard)
   @Post('dex/sync')
   @ApiOperation({ summary: 'Sync Pokédex between Wingull and SmartRotom' })
   @ApiResponse({
@@ -705,6 +719,8 @@ export class PokemonController {
     return this.pokemonFacadeService.getSpriteManifest();
   }
 
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.ROTOM_ADMIN)
   @Post('sprites/refresh')
   @ApiOperation({ summary: 'Refresh sprite manifest' })
   @ApiResponse({

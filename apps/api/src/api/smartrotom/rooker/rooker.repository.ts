@@ -892,6 +892,12 @@ export class RookerRepository {
         rookerProfiles.partnerPokemonId,
         rotomUsers.username,
       )
+      // A capped search with no order returned an arbitrary subset, so the same
+      // term could yield different people on two calls. Most-followed first.
+      .orderBy(
+        desc(sql`count(${rookerFollows.followerUuid})`),
+        rookerProfiles.handle,
+      )
       .limit(limit);
 
     return rows.map((r) => ({

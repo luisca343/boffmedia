@@ -1,4 +1,4 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import { HttpException, ConflictException, Injectable } from '@nestjs/common';
 import { ModuleRef } from '@nestjs/core';
 import { PacksService } from '@api/packs/packs.service';
 import {
@@ -108,6 +108,9 @@ export class BoffMediaUsersFacadeService {
       return await this.usersManagementService.createUser(userData);
     } catch (error: any) {
       this.logger.error('Failed to create BoffMedia user:', error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`BoffMedia user creation failed: ${error.message}`);
     }
   }
@@ -117,6 +120,9 @@ export class BoffMediaUsersFacadeService {
       return await this.usersManagementService.findOrCreateUser(userData);
     } catch (error: any) {
       this.logger.error('Failed to find or create BoffMedia user:', error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`BoffMedia user find/create failed: ${error.message}`);
     }
   }
@@ -180,6 +186,9 @@ export class BoffMediaUsersFacadeService {
       };
     } catch (error: any) {
       this.logger.error('Failed to initialize full user:', error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`User initialization failed: ${error.message}`);
     }
   }
@@ -191,6 +200,9 @@ export class BoffMediaUsersFacadeService {
       return await this.usersManagementService.getAllUsers();
     } catch (error: any) {
       this.logger.error('Failed to get all BoffMedia users:', error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to retrieve users: ${error.message}`);
     }
   }
@@ -200,6 +212,9 @@ export class BoffMediaUsersFacadeService {
       return await this.usersManagementService.getUserById(id);
     } catch (error: any) {
       this.logger.error(`Failed to get BoffMedia user by ID ${id}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to retrieve user: ${error.message}`);
     }
   }
@@ -212,6 +227,9 @@ export class BoffMediaUsersFacadeService {
         `Failed to get BoffMedia user by username ${username}:`,
         error,
       );
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to retrieve user: ${error.message}`);
     }
   }
@@ -224,6 +242,9 @@ export class BoffMediaUsersFacadeService {
         `Failed to get BoffMedia user by email ${email}:`,
         error,
       );
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to retrieve user: ${error.message}`);
     }
   }
@@ -294,6 +315,9 @@ export class BoffMediaUsersFacadeService {
         `Failed to get user with integrations ${identifier}:`,
         error,
       );
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to retrieve integrated user: ${error.message}`);
     }
   }
@@ -308,6 +332,9 @@ export class BoffMediaUsersFacadeService {
         `Failed to get full user by username ${username}:`,
         error,
       );
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to retrieve full user: ${error.message}`);
     }
   }
@@ -317,6 +344,9 @@ export class BoffMediaUsersFacadeService {
       return await this.usersManagementService.getFullUserByEmail(email);
     } catch (error: any) {
       this.logger.error(`Failed to get full user by email ${email}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to retrieve full user: ${error.message}`);
     }
   }
@@ -331,6 +361,9 @@ export class BoffMediaUsersFacadeService {
       return await this.usersManagementService.updateUser(id, updateData);
     } catch (error: any) {
       this.logger.error(`Failed to update BoffMedia user ${id}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`User update failed: ${error.message}`);
     }
   }
@@ -358,6 +391,9 @@ export class BoffMediaUsersFacadeService {
         `Failed to unlink ${provider} for BoffMedia user ${id}:`,
         error,
       );
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Provider unlink failed: ${error.message}`);
     }
   }
@@ -495,6 +531,9 @@ export class BoffMediaUsersFacadeService {
       return await this.usersManagementService.createFromGoogle(googleUser);
     } catch (error: any) {
       this.logger.error('Failed to create user from Google:', error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Google authentication failed: ${error.message}`);
     }
   }
@@ -504,6 +543,9 @@ export class BoffMediaUsersFacadeService {
       return await this.usersManagementService.createFromDiscord(discordUser);
     } catch (error: any) {
       this.logger.error('Failed to create user from Discord:', error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Discord authentication failed: ${error.message}`);
     }
   }
@@ -513,6 +555,9 @@ export class BoffMediaUsersFacadeService {
       return await this.usersManagementService.createFromTwitch(twitchUser);
     } catch (error: any) {
       this.logger.error('Failed to create user from Twitch:', error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Twitch authentication failed: ${error.message}`);
     }
   }
@@ -546,6 +591,9 @@ export class BoffMediaUsersFacadeService {
       return result;
     } catch (error: any) {
       this.logger.error('Failed to create Minecraft user:', error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Minecraft user creation failed: ${error.message}`);
     }
   }
@@ -640,6 +688,9 @@ export class BoffMediaUsersFacadeService {
       };
     } catch (error: any) {
       this.logger.error('Failed to link Minecraft account:', error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Minecraft account linking failed: ${error.message}`);
     }
   }
@@ -651,6 +702,9 @@ export class BoffMediaUsersFacadeService {
       return await this.usersManagementService.getUserRoles(userId);
     } catch (error: any) {
       this.logger.error(`Failed to get user roles for ${userId}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to get user roles: ${error.message}`);
     }
   }
@@ -691,6 +745,9 @@ export class BoffMediaUsersFacadeService {
         'Failed to get multiple users with integrations:',
         error,
       );
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Batch user retrieval failed: ${error.message}`);
     }
   }

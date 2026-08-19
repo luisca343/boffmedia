@@ -1,4 +1,4 @@
-import { Injectable, Inject } from '@nestjs/common';
+import { HttpException, Injectable, Inject } from '@nestjs/common';
 import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
 import { MySql2Database } from 'drizzle-orm/mysql2';
 import * as fs from 'fs/promises';
@@ -67,6 +67,9 @@ export class MhwildsRepository implements IMhwildsRepository {
         };
       }
     } catch (error: any) {
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(
         `Failed to get cache metadata for ${resourceType}: ${error.message}`,
       );
@@ -96,6 +99,9 @@ export class MhwildsRepository implements IMhwildsRepository {
       const fileContent = await fs.readFile(filePath, 'utf8');
       return JSON.parse(fileContent);
     } catch (error: any) {
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(
         `Failed to read cached data from ${filePath}: ${error.message}`,
       );
@@ -108,6 +114,9 @@ export class MhwildsRepository implements IMhwildsRepository {
       await this.ensureDirectoryExists(dirPath);
       await fs.writeFile(filePath, JSON.stringify(data, null, 2), 'utf8');
     } catch (error: any) {
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to save data to ${filePath}: ${error.message}`);
     }
   }
@@ -127,12 +136,21 @@ export class MhwildsRepository implements IMhwildsRepository {
       return response.data;
     } catch (error: any) {
       if (error.response) {
+        // A typed HTTP error (404/403/409…) has to reach the client as itself;
+        // wrapping it in a bare Error turned all of them into 500s.
+        if (error instanceof HttpException) throw error;
         throw new Error(
           `API request failed: ${error.response.status} - ${error.response.statusText}`,
         );
       } else if (error.request) {
+        // A typed HTTP error (404/403/409…) has to reach the client as itself;
+        // wrapping it in a bare Error turned all of them into 500s.
+        if (error instanceof HttpException) throw error;
         throw new Error(`Network error: Unable to reach the API`);
       } else {
+        // A typed HTTP error (404/403/409…) has to reach the client as itself;
+        // wrapping it in a bare Error turned all of them into 500s.
+        if (error instanceof HttpException) throw error;
         throw new Error(`Request error: ${error.message}`);
       }
     }
@@ -182,6 +200,9 @@ export class MhwildsRepository implements IMhwildsRepository {
         // Ignore fallback errors
       }
 
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to get ${resourceType} data: ${error.message}`);
     }
   }
@@ -226,6 +247,9 @@ export class MhwildsRepository implements IMhwildsRepository {
       );
       await this.saveCachedData(filePath, data);
     } catch (error: any) {
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(
         `Failed to save processed data to ${filename}: ${error.message}`,
       );
@@ -364,6 +388,9 @@ export class MhwildsRepository implements IMhwildsRepository {
         resources: Array.from(resources),
       };
     } catch (error: any) {
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to get cache stats: ${error.message}`);
     }
   }

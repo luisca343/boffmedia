@@ -41,7 +41,10 @@ export class AssignmentsService {
    * launcher retrying) never triggers two FVX runs for the same assignment — the
    * second request awaits the first's stored output.
    */
-  private readonly inFlight = new Map<number, Promise<{ outputSha512: string }>>();
+  private readonly inFlight = new Map<
+    number,
+    Promise<{ outputSha512: string }>
+  >();
 
   constructor(
     private readonly logger: Logger,
@@ -244,7 +247,11 @@ export class AssignmentsService {
   async getOrGenerateRom(
     configId: number,
     principal: LauncherPrincipal,
-  ): Promise<{ stream: Readable; outputSha512: string; contentLength: number }> {
+  ): Promise<{
+    stream: Readable;
+    outputSha512: string;
+    contentLength: number;
+  }> {
     if (!configId || configId <= 0) {
       throw new BadRequestException('Valid configId is required');
     }
@@ -276,9 +283,11 @@ export class AssignmentsService {
     // Generate (or join an in-flight generation) for this assignment.
     let generation = this.inFlight.get(assignment.id);
     if (!generation) {
-      generation = this.generateRom(config, assignment, principal).finally(() => {
-        this.inFlight.delete(assignment.id);
-      });
+      generation = this.generateRom(config, assignment, principal).finally(
+        () => {
+          this.inFlight.delete(assignment.id);
+        },
+      );
       this.inFlight.set(assignment.id, generation);
     }
     const { outputSha512 } = await generation;
@@ -286,12 +295,13 @@ export class AssignmentsService {
   }
 
   /** Open a read stream over a stored output blob (with its content length). */
-  private async streamOutput(
-    outputSha512: string,
-  ): Promise<{ stream: Readable; outputSha512: string; contentLength: number }> {
-    const { stream, contentLength } = await this.blobStorage.override(
-      outputSha512,
-    );
+  private async streamOutput(outputSha512: string): Promise<{
+    stream: Readable;
+    outputSha512: string;
+    contentLength: number;
+  }> {
+    const { stream, contentLength } =
+      await this.blobStorage.override(outputSha512);
     // Blob is always on disk here (checked before calling), so length is real.
     return { stream, outputSha512, contentLength: contentLength ?? 0 };
   }
@@ -484,9 +494,7 @@ export class AssignmentsService {
    * Seed is ONLY exposed when config.status === 'published'.
    * Enforced at service layer for defense-in-depth.
    */
-  async listAssignmentsForPublic(
-    configId: number,
-  ): Promise<any[]> {
+  async listAssignmentsForPublic(configId: number): Promise<any[]> {
     if (!configId || configId <= 0) {
       throw new BadRequestException('Valid configId is required');
     }
@@ -540,7 +548,9 @@ export class AssignmentsService {
     }
 
     if (!config.settingsBlobSha512) {
-      throw new NotFoundException(`No settings blob found for config ${configId}`);
+      throw new NotFoundException(
+        `No settings blob found for config ${configId}`,
+      );
     }
 
     // Fetch settings blob from disk

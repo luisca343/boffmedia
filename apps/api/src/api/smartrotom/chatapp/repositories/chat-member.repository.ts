@@ -1,7 +1,7 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { MySql2Database } from 'drizzle-orm/mysql2';
 import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
-import { rotomChatMembers, RotomChatMember } from '@/_db/schema/SmartRotomChat';
+import { rotomChatMembers } from '@/_db/schema/SmartRotomChat';
 import { rotomUsers } from '@/_db/schema/SmartRotom';
 import { IMemberRepository } from './interfaces/chat-member.repository.interface';
 import { and, eq } from 'drizzle-orm';

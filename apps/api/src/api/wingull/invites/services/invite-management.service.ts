@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
 import { Logger } from 'nestjs-pino';
 import {
   InvitesRepository,
@@ -71,6 +71,9 @@ export class InviteManagementService {
       return await this.invitesRepository.findAllInvites();
     } catch (error: any) {
       this.logger.error('Failed to get all invites:', error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Invites retrieval failed: ${error.message}`);
     }
   }
@@ -80,6 +83,9 @@ export class InviteManagementService {
       return await this.invitesRepository.findInviteById(id);
     } catch (error: any) {
       this.logger.error(`Failed to get invite ${id}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Invite retrieval failed: ${error.message}`);
     }
   }
@@ -89,6 +95,9 @@ export class InviteManagementService {
       return await this.invitesRepository.findActiveInviteById(id);
     } catch (error: any) {
       this.logger.error(`Failed to get active invite ${id}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Active invite retrieval failed: ${error.message}`);
     }
   }
@@ -98,6 +107,9 @@ export class InviteManagementService {
       return await this.invitesRepository.findInvitesByUuid(uuid);
     } catch (error: any) {
       this.logger.error(`Failed to get invites for user ${uuid}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`User invites retrieval failed: ${error.message}`);
     }
   }
@@ -110,6 +122,9 @@ export class InviteManagementService {
         `Failed to get invites for username ${username}:`,
         error,
       );
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Username invites retrieval failed: ${error.message}`);
     }
   }
@@ -284,6 +299,9 @@ export class InviteManagementService {
       };
     } catch (error: any) {
       this.logger.error('Failed to get invite statistics:', error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Statistics retrieval failed: ${error.message}`);
     }
   }

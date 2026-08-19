@@ -1,11 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import {
-  IsString,
-  IsArray,
-  ValidateNested,
-  IsNumber,
-  IsUUID,
-} from 'class-validator';
+import { IsArray, ValidateNested, IsNumber } from 'class-validator';
 import { Transform, Type } from 'class-transformer';
 import { BaseDto } from '@api/_utils/dto/base.dto';
 
@@ -28,14 +22,6 @@ class OrderItemDto {
 }
 
 export class OrderAppDto extends BaseDto {
-  @ApiProperty({
-    description: 'Player UUID',
-    example: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4',
-  })
-  @IsString()
-  @IsUUID()
-  uuid: string;
-
   @ApiProperty({
     description: 'Array of apps with their new order',
     example: [

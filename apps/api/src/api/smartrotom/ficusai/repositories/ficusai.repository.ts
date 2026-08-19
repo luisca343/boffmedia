@@ -1,6 +1,6 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { MySql2Database } from 'drizzle-orm/mysql2';
-import { eq, desc, sql, and, isNull } from 'drizzle-orm';
+import { eq, desc, sql } from 'drizzle-orm';
 import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
 import { ficusMessages } from '@/_db/schema/FicusAI';
 import { IFicusAiRepository } from './interfaces/ficusai.interface.repository';
@@ -32,12 +32,11 @@ export class FicusAIRepository
   }
 
   async delete(id: number): Promise<boolean> {
-    // Soft delete implementation
+    // Hard delete: the table has no soft-delete column any more. It used to,
+    // and only `countByUuid` honoured it — every read that fed the model kept
+    // returning "deleted" messages, so clearing a conversation did nothing.
     const result = await this.db
-      .update(ficusMessages)
-      .set({
-        deletedAt: new Date(),
-      })
+      .delete(ficusMessages)
       .where(eq(ficusMessages.id, id));
 
     return result[0].affectedRows > 0;
@@ -65,12 +64,8 @@ export class FicusAIRepository
   }
 
   async deleteByUuid(uuid: string): Promise<boolean> {
-    // Soft delete all messages for a user
     const result = await this.db
-      .update(ficusMessages)
-      .set({
-        deletedAt: new Date(),
-      })
+      .delete(ficusMessages)
       .where(eq(ficusMessages.uuid, uuid));
 
     return result[0].affectedRows > 0;
@@ -82,9 +77,7 @@ export class FicusAIRepository
         count: sql<number>`count(*)`,
       })
       .from(ficusMessages)
-      .where(
-        and(eq(ficusMessages.uuid, uuid), isNull(ficusMessages.deletedAt)),
-      );
+      .where(eq(ficusMessages.uuid, uuid));
 
     return result[0]?.count || 0;
   }

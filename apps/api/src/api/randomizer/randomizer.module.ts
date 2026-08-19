@@ -33,7 +33,12 @@ import { PacksModule } from '@api/packs/packs.module';
 
 @Module({
   imports: [
-    RandomizerPackLinkModule,ConfigModule, LoggerModule, DrizzleModule, PacksModule],
+    RandomizerPackLinkModule,
+    ConfigModule,
+    LoggerModule,
+    DrizzleModule,
+    PacksModule,
+  ],
   providers: [
     // Repository with token binding
     {

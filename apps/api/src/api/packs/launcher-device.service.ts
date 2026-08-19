@@ -103,7 +103,8 @@ export class LauncherDeviceService {
         });
         break;
       } catch (err) {
-        if (attempt >= MAX_ATTEMPTS || !this.isDuplicateUserCode(err)) throw err;
+        if (attempt >= MAX_ATTEMPTS || !this.isDuplicateUserCode(err))
+          throw err;
         userCode = this.newUserCode();
       }
     }
@@ -231,9 +232,7 @@ export class LauncherDeviceService {
    * throttle, which is what closes casual abuse of a known user_code.
    */
   async deny(userCode: string, userId: number): Promise<void> {
-    if (
-      !(await this.repo.decide(this.normalize(userCode), 'denied', userId))
-    ) {
+    if (!(await this.repo.decide(this.normalize(userCode), 'denied', userId))) {
       throw new BadRequestException('Este código ya no es válido');
     }
     await this.packsRepo.audit(
@@ -247,7 +246,10 @@ export class LauncherDeviceService {
 
   /** Players paste the code with the dash, without it, or in lower case. */
   private normalize(userCode: string): string {
-    const raw = userCode.trim().toUpperCase().replace(/[^A-Z0-9]/g, '');
+    const raw = userCode
+      .trim()
+      .toUpperCase()
+      .replace(/[^A-Z0-9]/g, '');
     return raw.length === 8 ? `${raw.slice(0, 4)}-${raw.slice(4)}` : userCode;
   }
 }

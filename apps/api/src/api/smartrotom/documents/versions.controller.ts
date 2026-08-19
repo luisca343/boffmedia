@@ -1,71 +1,79 @@
-import { Body, Controller, Get, Param, Post, HttpStatus } from '@nestjs/common';
-import { Public } from '@api/_utils/decorators/public.decorator';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  ParseIntPipe,
+  Post,
+  HttpStatus,
+} from '@nestjs/common';
 import {
   ApiTags,
   ApiOperation,
   ApiResponse,
   ApiParam,
+  ApiBearerAuth,
   ApiBody,
 } from '@nestjs/swagger';
+import { CurrentMcUuid } from '@api/_utils/decorators/current-user.decorator';
 import { DocumentsFacadeService } from './documents.facade.service';
 
 import { CreateVersionDto } from './dto/document.dto';
 
 import { Document, NoteVersion } from './entities/document.entity';
 
+/**
+ * Note version history. Every route proves the caller holds the document first
+ * — reading someone else's revision history is the same disclosure as reading
+ * the note. The snapshot author is the authenticated principal; it used to be
+ * `dto.authorUuid`, i.e. whatever the client typed.
+ */
 @ApiTags('SmartRotom | Documents')
+@ApiBearerAuth()
 @Controller('smartrotom/documents')
 export class VersionsController {
   constructor(
     private readonly documentsFacadeService: DocumentsFacadeService,
   ) {}
 
-  @Public()
   @Get('document/:id/versions')
-  @ApiOperation({ summary: 'List version history for a note' })
+  @ApiOperation({ summary: 'List version history for a note the caller owns' })
   @ApiResponse({ status: HttpStatus.OK, type: [NoteVersion] })
   @ApiParam({ name: 'id', description: 'Document ID' })
-  async getVersions(@Param('id') id: string): Promise<NoteVersion[]> {
-    const documentId = parseInt(id, 10);
-    if (isNaN(documentId)) {
-      throw new Error('Invalid document ID');
-    }
-    return await this.documentsFacadeService.getVersions(documentId);
+  async getVersions(
+    @Param('id', ParseIntPipe) id: number,
+    @CurrentMcUuid() uuid: string,
+  ): Promise<NoteVersion[]> {
+    await this.documentsFacadeService.getDocumentById(id, uuid);
+    return await this.documentsFacadeService.getVersions(id);
   }
 
-  @Public()
   @Post('document/:id/versions')
   @ApiOperation({ summary: 'Snapshot the current note content as a version' })
   @ApiResponse({ status: HttpStatus.CREATED, type: NoteVersion })
   @ApiParam({ name: 'id', description: 'Document ID' })
   @ApiBody({ type: CreateVersionDto })
   async snapshotVersion(
-    @Param('id') id: string,
+    @Param('id', ParseIntPipe) id: number,
     @Body() dto: CreateVersionDto,
+    @CurrentMcUuid() uuid: string,
   ): Promise<NoteVersion> {
-    const documentId = parseInt(id, 10);
-    if (isNaN(documentId)) {
-      throw new Error('Invalid document ID');
-    }
+    await this.documentsFacadeService.getDocumentById(id, uuid);
     return await this.documentsFacadeService.snapshotVersion(
-      documentId,
+      id,
       dto.label,
-      dto.authorUuid,
+      uuid,
     );
   }
 
-  @Public()
   @Post('versions/:versionId/restore')
-  @ApiOperation({ summary: 'Restore a note to a previous version' })
+  @ApiOperation({ summary: 'Restore a note the caller owns to a version' })
   @ApiResponse({ status: HttpStatus.OK, type: Document })
   @ApiParam({ name: 'versionId', description: 'Version ID' })
   async restoreVersion(
-    @Param('versionId') versionId: string,
+    @Param('versionId', ParseIntPipe) versionId: number,
+    @CurrentMcUuid() uuid: string,
   ): Promise<Document> {
-    const parsedVersionId = parseInt(versionId, 10);
-    if (isNaN(parsedVersionId)) {
-      throw new Error('Invalid version ID');
-    }
-    return await this.documentsFacadeService.restoreVersion(parsedVersionId);
+    return await this.documentsFacadeService.restoreVersion(versionId, uuid);
   }
 }

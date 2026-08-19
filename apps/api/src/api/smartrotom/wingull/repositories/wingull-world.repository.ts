@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
 import axios, { AxiosResponse } from 'axios';
 import { Weather } from '../entities/weather.entity';
 import { IWingullWorldRepository } from './interfaces/wingull-world.repository.interface';
@@ -32,6 +32,9 @@ export class WingullWorldRepository implements IWingullWorldRepository {
       return response.data.data;
     } catch (error: any) {
       this.logger.error('Failed to get performance data:', error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Performance data retrieval failed: ${error.message}`);
     }
   }
@@ -57,6 +60,9 @@ export class WingullWorldRepository implements IWingullWorldRepository {
       return response.data.data;
     } catch (error: any) {
       this.logger.error('Failed to get regions data:', error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Regions data retrieval failed: ${error.message}`);
     }
   }
@@ -78,6 +84,9 @@ export class WingullWorldRepository implements IWingullWorldRepository {
       return response.data.data as Weather;
     } catch (error: any) {
       this.logger.error('Failed to get weather data:', error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Weather data retrieval failed: ${error.message}`);
     }
   }
@@ -100,6 +109,9 @@ export class WingullWorldRepository implements IWingullWorldRepository {
       return response.data.data;
     } catch (error: any) {
       this.logger.error('Failed to update NPCs:', error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`NPCs update failed: ${error.message}`);
     }
   }

@@ -3,6 +3,7 @@ import { MySql2Database } from 'drizzle-orm/mysql2';
 import { and, desc, eq, inArray, sql } from 'drizzle-orm';
 import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
 import {
+  wigglypopListings,
   wigglypopOrderLines,
   wigglypopOrders,
   WigglypopOrder,
@@ -49,6 +50,14 @@ export class WigglypopOrdersRepository {
     return orders.map((o) => ({ ...o, lines: by.get(o.id) ?? [] }));
   }
 
+  /**
+   * Creates the order, its lines AND takes every listing off the shelf in ONE
+   * transaction.
+   *
+   * The listing flips used to happen in a loop in the service, after the order
+   * had already been committed: a failure between the two left a paid-for order
+   * whose listings were still `disponible`, i.e. sellable twice.
+   */
   async create(
     order: {
       code: string;
@@ -59,22 +68,34 @@ export class WigglypopOrdersRepository {
       status: string;
     },
     lines: NewOrderLine[],
+    reserveListings: number[] = [],
   ): Promise<OrderWithLines> {
-    const inserted = await this.db.insert(wigglypopOrders).values({
-      code: order.code,
-      buyerUuid: order.buyerUuid,
-      subtotal: order.subtotal,
-      fee: order.fee,
-      total: order.total,
-      status: order.status,
-    });
-    const orderId = inserted[0].insertId;
+    const orderId = await this.db.transaction(async (tx) => {
+      const inserted = await tx.insert(wigglypopOrders).values({
+        code: order.code,
+        buyerUuid: order.buyerUuid,
+        subtotal: order.subtotal,
+        fee: order.fee,
+        total: order.total,
+        status: order.status,
+      });
+      const id = inserted[0].insertId;
 
-    if (lines.length > 0) {
-      await this.db
-        .insert(wigglypopOrderLines)
-        .values(lines.map((l) => ({ ...l, orderId })));
-    }
+      if (lines.length > 0) {
+        await tx
+          .insert(wigglypopOrderLines)
+          .values(lines.map((l) => ({ ...l, orderId: id })));
+      }
+
+      for (const listingId of reserveListings) {
+        await tx
+          .update(wigglypopListings)
+          .set({ status: 'reservado' })
+          .where(eq(wigglypopListings.id, listingId));
+      }
+
+      return id;
+    });
 
     return (await this.findById(orderId)) as OrderWithLines;
   }

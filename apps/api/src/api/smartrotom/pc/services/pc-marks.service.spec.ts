@@ -52,8 +52,7 @@ describe('PcMarksService', () => {
         ) => Promise.resolve(makeMark(key, data.favorite, data.tags)),
       );
 
-      const result = await service.upsertMark({
-        uuid: UUID,
+      const result = await service.upsertMark(UUID, {
         pokemonKey: KEY_A,
         favorite: true,
       });
@@ -79,8 +78,7 @@ describe('PcMarksService', () => {
       );
 
       // Only `tags` is sent — `favorite` must keep its stored value.
-      const result = await service.upsertMark({
-        uuid: UUID,
+      const result = await service.upsertMark(UUID, {
         pokemonKey: KEY_A,
         tags: ['shiny'],
       });
@@ -97,8 +95,7 @@ describe('PcMarksService', () => {
       mockRepo.findOne.mockResolvedValue(makeMark(KEY_A, true, ['shiny']));
       mockRepo.upsert.mockResolvedValue(makeMark(KEY_A, false, ['shiny']));
 
-      await service.upsertMark({
-        uuid: UUID,
+      await service.upsertMark(UUID, {
         pokemonKey: KEY_A,
         favorite: false,
       });
@@ -127,8 +124,7 @@ describe('PcMarksService', () => {
           ),
       );
 
-      const result = await service.bulkUpsert({
-        uuid: UUID,
+      const result = await service.bulkUpsert(UUID, {
         pokemonKeys: [KEY_A, KEY_B],
         favorite: true,
         addTags: ['competitivo'],
@@ -148,8 +144,7 @@ describe('PcMarksService', () => {
       mockRepo.findByKeys.mockResolvedValue([makeMark(KEY_A, true, [])]);
       mockRepo.upsertMany.mockResolvedValue([]);
 
-      await service.bulkUpsert({
-        uuid: UUID,
+      await service.bulkUpsert(UUID, {
         pokemonKeys: [KEY_A, KEY_B],
         addTags: ['shiny'],
       });
@@ -161,8 +156,7 @@ describe('PcMarksService', () => {
     });
 
     it('is a no-op when no keys are given', async () => {
-      const result = await service.bulkUpsert({
-        uuid: UUID,
+      const result = await service.bulkUpsert(UUID, {
         pokemonKeys: [],
         favorite: true,
         addTags: ['shiny'],

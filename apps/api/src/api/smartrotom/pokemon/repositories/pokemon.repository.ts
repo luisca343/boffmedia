@@ -1,4 +1,4 @@
-import { Injectable, Inject } from '@nestjs/common';
+import { HttpException, Injectable, Inject } from '@nestjs/common';
 import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
 import { MySql2Database } from 'drizzle-orm/mysql2';
 import {
@@ -130,6 +130,9 @@ export class PokemonRepository implements IPokemonRepository {
       return result.length > 0 ? result[0] : null;
     } catch (error: any) {
       this.logger.error('Failed to find pokedex registry:', error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Registry lookup failed: ${error.message}`);
     }
   }
@@ -189,6 +192,9 @@ export class PokemonRepository implements IPokemonRepository {
         .execute();
     } catch (error: any) {
       this.logger.error(`Failed to get registries for user ${uuid}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`User registries retrieval failed: ${error.message}`);
     }
   }
@@ -213,6 +219,9 @@ export class PokemonRepository implements IPokemonRepository {
         `Failed to get all registries for user ${uuid}:`,
         error,
       );
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`All user registries retrieval failed: ${error.message}`);
     }
   }
@@ -331,6 +340,9 @@ export class PokemonRepository implements IPokemonRepository {
       };
     } catch (error: any) {
       this.logger.error(`Failed to get pokedex statistics for ${uuid}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Pokedex statistics retrieval failed: ${error.message}`);
     }
   }
@@ -354,6 +366,9 @@ export class PokemonRepository implements IPokemonRepository {
         .execute();
     } catch (error: any) {
       this.logger.error(`Failed to get registries for cache ${uuid}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Cache registries retrieval failed: ${error.message}`);
     }
   }

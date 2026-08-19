@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
 import { PokemonDataService } from './data/pokemon-data.service';
 import { MoveDataService } from './data/move-data.service';
 import { SpawnDataService } from './data/spawn-data.service';
@@ -34,6 +34,9 @@ export class PokemonDataManagementService {
       this.initializeFuse();
     } catch (error: any) {
       this.logger.error('Failed to initialize Pokemon data:', error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Data initialization failed: ${error.message}`);
     }
   }

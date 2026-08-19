@@ -1,6 +1,7 @@
 import { sql } from 'drizzle-orm';
 import {
   char,
+  index,
   int,
   mysqlTable,
   primaryKey,
@@ -24,7 +25,10 @@ export type RotomUser = typeof rotomUsers.$inferSelect;
 
 export const rotomApps = mysqlTable('rotom_apps', {
   id: int('id').primaryKey().autoincrement(),
-  name: varchar('name', { length: 32 }).notNull(),
+  // Unique: `seed/default.ts` and the admin CRUD both identify an app by name,
+  // and both used select-then-insert, which races. The constraint is the real
+  // guarantee; the pre-check only survives to produce a nicer message.
+  name: varchar('name', { length: 32 }).notNull().unique(),
   url: varchar('url', { length: 255 }),
   active: int('active').default(1),
 });
@@ -115,12 +119,8 @@ export const rotomReplays = mysqlTable('rotom_replays', {
   team2: text('team2'),
   replay: text('replay').notNull(),
   winner: varchar('winner', { length: 36 }),
-  createdAt: timestamp('created_at')
-    .notNull()
-    .default(sql`CURRENT_TIMESTAMP()`),
-  updatedAt: timestamp('updated_at')
-    .notNull()
-    .default(sql`CURRENT_TIMESTAMP()`),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow().onUpdateNow(),
 });
 
 export type RotomReplay = typeof rotomReplays.$inferSelect;
@@ -162,45 +162,70 @@ export type RotomArceuSpeak = typeof rotomArceuSpeak.$inferSelect;
 
 export const rotomArcadeStreaks = mysqlTable('rotom_arcade_streaks', {
   id: int('id').primaryKey().autoincrement(),
-  uuid: varchar('uuid', { length: 36 }).notNull(),
-  lastClaimed: timestamp('last_claimed')
-    .notNull()
-    .default(sql`CURRENT_TIMESTAMP()`)
-    .onUpdateNow(),
-  lastBanner: varchar('last_banner', { length: 100 }),
-  streak: int('streak').default(0),
-  totalClaims: int('total_claims').default(0),
-});
-
-export type RotomArcadeStreak = typeof rotomArcadeStreaks.$inferSelect;
-
-export const rotomInventory = mysqlTable('rotom_inventory', {
-  id: int('id').primaryKey().autoincrement(),
+  // One streak row per player, FK'd like every other player-owned table. The
+  // column carried neither constraint nor index while being the only thing
+  // every claim/reset query filters on; `unique` supplies both.
   uuid: char('uuid', { length: 36 })
     .notNull()
+    .unique()
     .references(() => rotomUsers.uuid, {
       onDelete: 'cascade',
       onUpdate: 'cascade',
     }),
-  // 256, not 32: mod item ids are namespaced and already reach 173 chars live.
-  itemId: varchar('item_id', { length: 256 }).notNull(),
-  itemData: varchar('item_data', { length: 512 }),
-  itemType: varchar('item_type', { length: 32 }).notNull(),
-  amount: int('amount').default(1),
-  sourceType: varchar('source_type', { length: 32 }),
-  used: int('used').default(0),
-  rarity: varchar('rarity', { length: 20 })
-    .$type<'common' | 'uncommon' | 'rare' | 'epic' | 'legendary'>()
-    .default('common'),
-  createdAt: timestamp('created_at').default(sql`CURRENT_TIMESTAMP()`),
-  // Two-phase caja delivery (DARCAJA.md §7). A row is *reserved* — soft-locked for
-  // an in-flight grant — when reservationId is set and it is not yet spent
-  // (amount > used). `confirm` turns a reservation into a spend; an unconfirmed
-  // reservation older than the TTL is reclaimable, so a lost delivery is not a lost
-  // reward. `used` alone stays the single-use gate — reservation never touches it.
-  reservationId: varchar('reservation_id', { length: 36 }),
-  reservedAt: timestamp('reserved_at'),
+  lastClaimed: timestamp('last_claimed').notNull().defaultNow().onUpdateNow(),
+  lastBanner: varchar('last_banner', { length: 100 }),
+  streak: int('streak').notNull().default(0),
+  totalClaims: int('total_claims').notNull().default(0),
 });
+
+export type RotomArcadeStreak = typeof rotomArcadeStreaks.$inferSelect;
+
+export const rotomInventory = mysqlTable(
+  'rotom_inventory',
+  {
+    id: int('id').primaryKey().autoincrement(),
+    uuid: char('uuid', { length: 36 })
+      .notNull()
+      .references(() => rotomUsers.uuid, {
+        onDelete: 'cascade',
+        onUpdate: 'cascade',
+      }),
+    // 256, not 32: mod item ids are namespaced and already reach 173 chars live.
+    itemId: varchar('item_id', { length: 256 }).notNull(),
+    itemData: varchar('item_data', { length: 512 }),
+    itemType: varchar('item_type', { length: 32 }).notNull(),
+    amount: int('amount').default(1),
+    sourceType: varchar('source_type', { length: 32 }),
+    used: int('used').default(0),
+    rarity: varchar('rarity', { length: 20 })
+      .$type<'common' | 'uncommon' | 'rare' | 'epic' | 'legendary'>()
+      .default('common'),
+    createdAt: timestamp('created_at').notNull().defaultNow(),
+    // Two-phase caja delivery (DARCAJA.md §7). A row is *reserved* — soft-locked for
+    // an in-flight grant — when reservationId is set and it is not yet spent
+    // (amount > used). `confirm` turns a reservation into a spend; an unconfirmed
+    // reservation older than the TTL is reclaimable, so a lost delivery is not a lost
+    // reward. `used` alone stays the single-use gate — reservation never touches it.
+    reservationId: varchar('reservation_id', { length: 36 }),
+    reservedAt: timestamp('reserved_at'),
+  },
+  // The table had no index at all beyond the implicit FK one on `uuid`, while
+  // every arcade/caja read filters on some combination of owner, item and spent
+  // state. `(uuid, item_id, used)` serves the lookup, the "do I already hold
+  // this" check and the unspent-items listing from one B-tree; the reservation
+  // sweeper gets its own, since it scans by age across all owners.
+  (t) => ({
+    ownerItemIdx: index('rotom_inventory_owner_item_idx').on(
+      t.uuid,
+      t.itemId,
+      t.used,
+    ),
+    reservationIdx: index('rotom_inventory_reservation_idx').on(
+      t.reservationId,
+      t.reservedAt,
+    ),
+  }),
+);
 
 export type RotomInventoryItem = typeof rotomInventory.$inferSelect;
 
@@ -217,7 +242,7 @@ export const rotomNotifications = mysqlTable('rotom_notifications', {
   body: text('body').notNull(),
   link: varchar('link', { length: 512 }),
   isRead: int('is_read').default(0),
-  createdAt: timestamp('created_at').default(sql`CURRENT_TIMESTAMP()`),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
 });
 
 export type RotomNotification = typeof rotomNotifications.$inferSelect;

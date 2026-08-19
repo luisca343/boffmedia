@@ -194,10 +194,9 @@ export class EventsRepository {
         and(
           eq(boffMediaEventParticipants.eventId, boffMediaEvents.id),
           eq(boffMediaParticipants.userId, userId),
-          inArray(
-            boffMediaEventParticipants.status,
-            [...ACTIVE_MEMBERSHIP_STATUSES],
-          ),
+          inArray(boffMediaEventParticipants.status, [
+            ...ACTIVE_MEMBERSHIP_STATUSES,
+          ]),
         ),
       );
   }
@@ -221,10 +220,9 @@ export class EventsRepository {
         and(
           eq(boffMediaEventParticipants.eventId, eventId),
           eq(boffMediaParticipants.userId, userId),
-          inArray(
-            boffMediaEventParticipants.status,
-            [...ACTIVE_MEMBERSHIP_STATUSES],
-          ),
+          inArray(boffMediaEventParticipants.status, [
+            ...ACTIVE_MEMBERSHIP_STATUSES,
+          ]),
         ),
       )
       .limit(1);
@@ -265,10 +263,9 @@ export class EventsRepository {
         and(
           inArray(boffMediaEventParticipants.eventId, [...hidden]),
           eq(boffMediaParticipants.userId, userId),
-          inArray(
-            boffMediaEventParticipants.status,
-            [...ACTIVE_MEMBERSHIP_STATUSES],
-          ),
+          inArray(boffMediaEventParticipants.status, [
+            ...ACTIVE_MEMBERSHIP_STATUSES,
+          ]),
         ),
       );
     for (const r of memberRows) hidden.delete(r.eventId);

@@ -35,7 +35,7 @@ export const useAdminApps = () =>
 export const useAdminPlayerApps = (uuid: string | null) =>
   useQuery({
     queryKey: adminKeys.playerApps(uuid ?? ""),
-    queryFn: () => rotomPOSTOrThrow<SmartRotomApp[]>("/apps/player", { uuid }),
+    queryFn: () => rotomAuthedPOSTOrThrow<SmartRotomApp[]>("/apps/player", {}),
     enabled: !!uuid,
   })
 
@@ -44,7 +44,7 @@ export const useAdminAddApp = () => {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: ({ uuid, id }: { uuid: string; id: number }) =>
-      rotomPOSTOrThrow("/apps/player/add", { uuid, id }),
+      rotomAuthedPOSTOrThrow("/apps/player/add", { id }),
     onSuccess: (_d, { uuid }) => {
       qc.invalidateQueries({ queryKey: adminKeys.playerApps(uuid) })
       toast.success(t("apps.appAnadida"))
@@ -58,7 +58,7 @@ export const useAdminRemoveApp = () => {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: ({ uuid, id }: { uuid: string; id: number }) =>
-      rotomPOSTOrThrow("/apps/player/remove", { uuid, id }),
+      rotomAuthedPOSTOrThrow("/apps/player/remove", { id }),
     onSuccess: (_d, { uuid }) => {
       qc.invalidateQueries({ queryKey: adminKeys.playerApps(uuid) })
       toast.info(t("apps.appEliminada"))

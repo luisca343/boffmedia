@@ -1,5 +1,5 @@
 import { WingullSQL2Service } from '@/_utils/WingullSQL2Service';
-import { Injectable } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
 import { Logger } from 'nestjs-pino';
 
 @Injectable()
@@ -16,6 +16,9 @@ export class WingullRepository {
       return rows as { id: number; name: string }[];
     } catch (error: any) {
       this.logger.error('Error fetching WorldGuard worlds:', error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error('Failed to fetch WorldGuard worlds');
     }
   }
@@ -71,6 +74,9 @@ export class WingullRepository {
       });
     } catch (error: any) {
       this.logger.error('Error fetching players owned regions:', error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error('Failed to fetch players owned regions');
     }
   }
@@ -124,6 +130,9 @@ export class WingullRepository {
       }[];
     } catch (error: any) {
       this.logger.error('Error fetching all plots:', error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error('Failed to fetch all plots');
     }
   }

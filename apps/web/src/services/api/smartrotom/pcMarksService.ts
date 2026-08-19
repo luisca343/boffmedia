@@ -1,4 +1,4 @@
-import { rotomGETOrThrow, rotomPUTOrThrow } from '@/services/boffAPI';
+import { rotomAuthedGETOrThrow, rotomAuthedPUTOrThrow } from '@/services/boffAPI';
 import type { PcMark } from '@boffmedia/shared';
 
 /**
@@ -8,24 +8,26 @@ import type { PcMark } from '@boffmedia/shared';
  * (box, index) changes on every move — so marks are keyed on `pokemonKey`, an
  * opaque content hash the client computes from immutable fields
  * (dex|palette|nature|ability|ivs). The API never validates it.
+ *
+ * The owner is no longer passed by the caller: the API takes it from the
+ * session, so these calls carry the Bearer instead of a uuid.
  */
 export class PcMarksService {
   /**
    * Get every mark of a user
    */
-  static getMarks(uuid: string): Promise<PcMark[]> {
-    return rotomGETOrThrow<PcMark[]>(`/pc-marks/${uuid}`);
+  static getMarks(): Promise<PcMark[]> {
+    return rotomAuthedGETOrThrow<PcMark[]>('/pc-marks');
   }
 
   /**
    * Upsert a single mark. Omitted fields keep their stored value.
    */
   static upsertMark(
-    uuid: string,
     pokemonKey: string,
     patch: { favorite?: boolean; tags?: string[] }
   ): Promise<PcMark> {
-    return rotomPUTOrThrow<PcMark>('/pc-marks', { uuid, pokemonKey, ...patch });
+    return rotomAuthedPUTOrThrow<PcMark>('/pc-marks', { pokemonKey, ...patch });
   }
 
   /**
@@ -33,10 +35,9 @@ export class PcMarksService {
    * key, plus an additive/subtractive tag delta applied to each of them.
    */
   static bulkUpsert(
-    uuid: string,
     pokemonKeys: string[],
     patch: { favorite?: boolean; addTags?: string[]; removeTags?: string[] }
   ): Promise<PcMark[]> {
-    return rotomPUTOrThrow<PcMark[]>('/pc-marks/bulk', { uuid, pokemonKeys, ...patch });
+    return rotomAuthedPUTOrThrow<PcMark[]>('/pc-marks/bulk', { pokemonKeys, ...patch });
   }
 }

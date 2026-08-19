@@ -22,10 +22,7 @@ import { AuthService } from './auth.service';
 import { MinecraftHandshakeService } from './minecraft-handshake.service';
 import { MinecraftLinkService } from './minecraft-link.service';
 import { BoffMediaUsersFacadeService } from '@api/boffmedia/users/users.facade.service';
-import {
-  McLinkPollDto,
-  McSessionDto,
-} from './dto/minecraft-link.dto';
+import { McLinkPollDto, McSessionDto } from './dto/minecraft-link.dto';
 import {
   McDeviceCodeEntity,
   McLinkPollEntity,

@@ -10,7 +10,7 @@ const path = require('path');
 
 const PACKAGES = ['apps/web', 'apps/api'];
 const WEB_MEMORY_LIMIT = 2048; // MB for web
-const API_MEMORY_LIMIT = 2048; // MB for api (use memory-safe config)
+const API_MEMORY_LIMIT = 3072; // MB for api (use memory-safe config); matches apps/api's own lint script — 2048 OOMs
 const MIN_AVAILABLE_MB = 2048; // Need 2GB free to run lint safely
 
 function getAvailableMemoryMB() {
@@ -43,8 +43,21 @@ async function runLint(pkg) {
   console.log(`Memory limit: ${memLimit}MB`);
   console.log(`${'='.repeat(60)}\n`);
 
+  // Run ESLint's own JS entry point under THIS node rather than shelling out to
+  // `pnpm lint`. Same Windows trap typecheck-sequential.js documents: `pnpm` is a
+  // .cmd shim there, so spawn() without shell:true died with `spawn pnpm ENOENT`
+  // and took the whole `pnpm lint` chain (v3-conventions, layering, i18n, fonts,
+  // schema, error-codes) down with it before any of them ran. The per-app scripts
+  // also prefix `NODE_OPTIONS='…'` POSIX-style, which cmd.exe cannot parse — the
+  // memory limit is passed through the env below instead.
+  const eslintPkg = require.resolve('eslint/package.json', { paths: [pkgDir] });
+  const eslintBin = path.join(path.dirname(eslintPkg), require(eslintPkg).bin.eslint);
+  const args = isApi
+    ? ['-c', '.eslintrc.memory-safe.js', 'src/**/*.ts', 'test/**/*.ts', '--fix']
+    : ['src'];
+
   return new Promise((resolve, reject) => {
-    const child = spawn('pnpm', ['lint'], {
+    const child = spawn(process.execPath, [eslintBin, ...args], {
       cwd: pkgDir,
       stdio: 'inherit',
       env: {

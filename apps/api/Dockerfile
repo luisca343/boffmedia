@@ -53,6 +53,15 @@ COPY apps/api/docker/fvx/seed-flag.patch /build/fvx/
 WORKDIR /build/fvx
 RUN git apply --verbose seed-flag.patch || (echo "Patch application failed" && exit 1)
 
+# Pin the Gradle toolchain to Java 21. Pristine FVX at this commit declares
+# `JavaLanguageVersion.of(25)`, which this 21-jdk builder cannot provision — the
+# build dies in Gradle before producing a jar. 21 is also what the determinism
+# anchor (spike jar sha512 2cb5057c…) was built with, so do NOT "fix" this by
+# moving the builder to a 25 JDK: that would silently produce a different jar.
+RUN sed -i 's/JavaLanguageVersion.of(25)/JavaLanguageVersion.of(21)/' build.gradle.kts && \
+    grep -q 'JavaLanguageVersion.of(21)' build.gradle.kts || \
+    (echo "FVX toolchain pin failed — upstream build.gradle.kts changed shape" && exit 1)
+
 # Build the fat jar with Gradle (requires Java 21 + preview flag)
 RUN ./gradlew jar -x test --no-daemon && \
     mkdir -p /opt/fvx && \

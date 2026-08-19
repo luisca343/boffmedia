@@ -46,7 +46,6 @@ export class WigglypopOrdersService {
     const listings = await this.listingsRepository.findManyByIds(
       order.lines.map((l) => l.listingId),
     );
-    const byId = new Map(listings.map((l) => [l.id, l]));
     const entities = await this.listingsService.toEntities(listings);
     const entityById = new Map(entities.map((e) => [e.id, e]));
 
@@ -146,13 +145,11 @@ export class WigglypopOrdersService {
         status: 'escrow',
       },
       lines,
+      // Off the shelf while the order is in flight, in the SAME transaction as
+      // the order itself. If custody cancels the order it puts them back; if it
+      // completes, they go to `vendido`.
+      lines.map((l) => l.listingId),
     );
-
-    // Off the shelf while the order is in flight. If custody cancels the order it puts them
-    // back; if it completes, they go to `vendido`.
-    for (const line of lines) {
-      await this.listingsRepository.setStatus(line.listingId, 'reservado');
-    }
 
     const settled = await this.custody.settleNewOrder(order);
     await this.notifySale(settled, byId);

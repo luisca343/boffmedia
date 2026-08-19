@@ -1,4 +1,4 @@
-import { Injectable, Inject } from '@nestjs/common';
+import { HttpException, Injectable, Inject } from '@nestjs/common';
 import { MySql2Database } from 'drizzle-orm/mysql2';
 import { and, eq, isNull, or } from 'drizzle-orm';
 import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
@@ -83,6 +83,9 @@ export class BoffMediaUsersRepository implements IBoffMediaUsersRepository {
       return newUser;
     } catch (error: any) {
       this.logger.error('Failed to create user:', error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`User creation failed: ${error.message}`);
     }
   }
@@ -109,6 +112,9 @@ export class BoffMediaUsersRepository implements IBoffMediaUsersRepository {
       }
     } catch (error: any) {
       this.logger.error('Error creating participant:', error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Participant creation failed: ${error.message}`);
     }
   }
@@ -124,6 +130,9 @@ export class BoffMediaUsersRepository implements IBoffMediaUsersRepository {
         .execute();
     } catch (error: any) {
       this.logger.error('Failed to retrieve all users:', error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to retrieve users: ${error.message}`);
     }
   }
@@ -143,6 +152,9 @@ export class BoffMediaUsersRepository implements IBoffMediaUsersRepository {
       return rows.length > 0 ? rows[0] : null;
     } catch (error: any) {
       this.logger.error(`Failed to find user by ID ${id}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to find user: ${error.message}`);
     }
   }
@@ -169,6 +181,9 @@ export class BoffMediaUsersRepository implements IBoffMediaUsersRepository {
       return rows.length > 0 ? rows[0] : null;
     } catch (error: any) {
       this.logger.error(`Failed to find user by username ${username}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to find user: ${error.message}`);
     }
   }
@@ -193,6 +208,9 @@ export class BoffMediaUsersRepository implements IBoffMediaUsersRepository {
       return rows.length > 0 ? rows[0] : null;
     } catch (error: any) {
       this.logger.error(`Failed to find user by email ${email}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to find user: ${error.message}`);
     }
   }
@@ -214,6 +232,9 @@ export class BoffMediaUsersRepository implements IBoffMediaUsersRepository {
       return rows.length > 0 ? rows[0] : null;
     } catch (error: any) {
       this.logger.error(`Failed to find user by UUID ${uuid}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to find user: ${error.message}`);
     }
   }
@@ -240,6 +261,9 @@ export class BoffMediaUsersRepository implements IBoffMediaUsersRepository {
       return rows.length > 0 ? rows[0] : null;
     } catch (error: any) {
       this.logger.error(`Failed to find user by Google ID ${googleId}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to find user: ${error.message}`);
     }
   }
@@ -269,6 +293,9 @@ export class BoffMediaUsersRepository implements IBoffMediaUsersRepository {
         `Failed to find user by Discord ID ${discordId}:`,
         error,
       );
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to find user: ${error.message}`);
     }
   }
@@ -293,6 +320,9 @@ export class BoffMediaUsersRepository implements IBoffMediaUsersRepository {
       return rows.length > 0 ? rows[0] : null;
     } catch (error: any) {
       this.logger.error(`Failed to find user by Steam ID ${steamId}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to find user: ${error.message}`);
     }
   }
@@ -319,6 +349,9 @@ export class BoffMediaUsersRepository implements IBoffMediaUsersRepository {
       return rows.length > 0 ? rows[0] : null;
     } catch (error: any) {
       this.logger.error(`Failed to find user by Twitch ID ${twitchId}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to find user: ${error.message}`);
     }
   }
@@ -356,6 +389,9 @@ export class BoffMediaUsersRepository implements IBoffMediaUsersRepository {
         `Failed to find full user by username ${username}:`,
         error,
       );
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to find full user: ${error.message}`);
     }
   }
@@ -391,6 +427,9 @@ export class BoffMediaUsersRepository implements IBoffMediaUsersRepository {
         `Failed to find full user by username ${username}:`,
         error,
       );
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to find full user: ${error.message}`);
     }
   }
@@ -420,6 +459,9 @@ export class BoffMediaUsersRepository implements IBoffMediaUsersRepository {
       };
     } catch (error: any) {
       this.logger.error(`Failed to find full user by UUID ${uuid}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to find full user: ${error.message}`);
     }
   }
@@ -450,6 +492,9 @@ export class BoffMediaUsersRepository implements IBoffMediaUsersRepository {
       };
     } catch (error: any) {
       this.logger.error(`Failed to find full user by email ${email}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to find full user: ${error.message}`);
     }
   }
@@ -475,6 +520,9 @@ export class BoffMediaUsersRepository implements IBoffMediaUsersRepository {
         .filter(Boolean);
     } catch (error: any) {
       this.logger.error(`Failed to get user roles for user ${userId}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to get user roles: ${error.message}`);
     }
   }
@@ -512,6 +560,9 @@ export class BoffMediaUsersRepository implements IBoffMediaUsersRepository {
       return updatedUser;
     } catch (error: any) {
       this.logger.error(`Failed to update user ${id}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`User update failed: ${error.message}`);
     }
   }
@@ -536,35 +587,43 @@ export class BoffMediaUsersRepository implements IBoffMediaUsersRepository {
       // GDPR soft-delete: keep the row so foreign keys / leaderboards / history
       // survive, but scrub every PII field and stamp deletedAt. Reads and login
       // exclude deletedAt rows.
-      await this.db
-        .update(boffMediaUsers)
-        .set({
-          deletedAt: new Date(),
-          username: tombstone,
-          email: `deleted+${id}@deleted.invalid`,
-          password: null,
-          uuid: null,
-          googleId: null,
-          discordId: null,
-          twitchId: null,
-          steamId: null,
-          profilePicture: 'https://cdn.boffmedia.es/default-profile.png',
-          coverImage: null,
-          bio: null,
-        })
-        .where(eq(boffMediaUsers.id, id))
-        .execute();
+      //
+      // Both statements run in ONE transaction: they were two sequential awaits,
+      // so a failure in between left an account scrubbed on the users table but
+      // still named on the public leaderboard — half-anonymised, and with no
+      // second attempt possible (the row now reads as already deleted).
+      await this.db.transaction(async (tx) => {
+        await tx
+          .update(boffMediaUsers)
+          .set({
+            deletedAt: new Date(),
+            username: tombstone,
+            email: `deleted+${id}@deleted.invalid`,
+            password: null,
+            uuid: null,
+            googleId: null,
+            discordId: null,
+            twitchId: null,
+            steamId: null,
+            profilePicture: 'https://cdn.boffmedia.es/default-profile.png',
+            coverImage: null,
+            bio: null,
+          })
+          .where(eq(boffMediaUsers.id, id));
 
-      // Anonymize the public-facing participant identity (shown on leaderboards).
-      await this.db
-        .update(boffMediaParticipants)
-        .set({ nickname: tombstone, avatar: null })
-        .where(eq(boffMediaParticipants.userId, id))
-        .execute();
+        // Anonymize the public-facing participant identity (leaderboards).
+        await tx
+          .update(boffMediaParticipants)
+          .set({ nickname: tombstone, avatar: null })
+          .where(eq(boffMediaParticipants.userId, id));
+      });
 
       return true;
     } catch (error: any) {
       this.logger.error(`Failed to soft-delete user ${id}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`User deletion failed: ${error.message}`);
     }
   }
@@ -629,6 +688,9 @@ export class BoffMediaUsersRepository implements IBoffMediaUsersRepository {
         .execute();
     } catch (error: any) {
       this.logger.error('Failed to check multiple fields exist:', error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to check user existence: ${error.message}`);
     }
   }

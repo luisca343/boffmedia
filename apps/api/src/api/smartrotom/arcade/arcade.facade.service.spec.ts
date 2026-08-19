@@ -28,7 +28,7 @@ describe('ArcadeFacadeService', () => {
   let streakService: jest.Mocked<StreakService>;
   let inventoryService: jest.Mocked<InventoryService>;
   let lootboxService: jest.Mocked<LootboxService>;
-  let wingullFacadeService: jest.Mocked<WingullFacadeService>;
+  let _wingullFacadeService: jest.Mocked<WingullFacadeService>;
 
   beforeEach(async () => {
     const mockStreakService = {
@@ -76,7 +76,7 @@ describe('ArcadeFacadeService', () => {
     streakService = module.get(StreakService);
     inventoryService = module.get(InventoryService);
     lootboxService = module.get(LootboxService);
-    wingullFacadeService = module.get(WingullFacadeService);
+    _wingullFacadeService = module.get(WingullFacadeService);
   });
 
   it('should be defined', () => {

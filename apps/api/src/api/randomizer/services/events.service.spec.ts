@@ -1,13 +1,16 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { BadRequestException, ConflictException, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConflictException } from '@nestjs/common';
 import { EventsService } from './events.service';
 import { RandomizerRepository } from '../repositories/randomizer.repository';
 import { RANDOMIZER_REPOSITORY_TOKEN } from '@api/_utils/repositories/interfaces/repository.token';
 import { PacksDownloadsService } from '@api/packs/packs-downloads.service';
 import { Logger } from 'nestjs-pino';
 import { ConfigService } from '@nestjs/config';
-import { RANDOMIZER_RUNNER_TOKEN, IRandomizerRunner } from '../ports/randomizer-runner.port';
-import { SETTINGS_SHIM_TOKEN, ISettingsShim } from '../ports/settings-shim.port';
+import { RANDOMIZER_RUNNER_TOKEN } from '../ports/randomizer-runner.port';
+import {
+  SETTINGS_SHIM_TOKEN,
+  ISettingsShim,
+} from '../ports/settings-shim.port';
 import { createHash } from 'crypto';
 import { Readable } from 'stream';
 
@@ -30,7 +33,9 @@ describe('EventsService', () => {
       getEmulatorPack: jest.fn(),
       findEventHoldingPack: jest.fn(),
       getRomById: jest.fn(),
-      getPublishedEmulatorRom: jest.fn().mockResolvedValue({ state: 'no-version' }),
+      getPublishedEmulatorRom: jest
+        .fn()
+        .mockResolvedValue({ state: 'no-version' }),
     } as unknown as jest.Mocked<RandomizerRepository>;
 
     // Mock blob storage
@@ -97,7 +102,9 @@ describe('EventsService', () => {
   describe('createConfig', () => {
     beforeEach(() => {
       // Mock getFvxJarSha512 to avoid reading actual jar file
-      jest.spyOn(service as any, 'getFvxJarSha512').mockReturnValue('jarsha512hash');
+      jest
+        .spyOn(service as any, 'getFvxJarSha512')
+        .mockReturnValue('jarsha512hash');
       // The config now pins a library ROM: resolve one and confirm its blob is on disk.
       repository.getRomById.mockResolvedValue({
         id: 7,
@@ -116,12 +123,20 @@ describe('EventsService', () => {
       };
 
       const settingsJson = JSON.stringify(preset.settingsJson);
-      const expectedSha512 = createHash('sha512').update(settingsJson).digest('hex');
+      const expectedSha512 = createHash('sha512')
+        .update(settingsJson)
+        .digest('hex');
 
       repository.getPresetById.mockResolvedValue(preset as any);
-      repository.getEmulatorPack.mockResolvedValue({ id: 'pack1', name: 'Pack 1' });
+      repository.getEmulatorPack.mockResolvedValue({
+        id: 'pack1',
+        name: 'Pack 1',
+      });
       repository.findEventHoldingPack.mockResolvedValue(null);
-      blobStorage.storeBlob.mockResolvedValue({ sha512: expectedSha512, size: settingsJson.length });
+      blobStorage.storeBlob.mockResolvedValue({
+        sha512: expectedSha512,
+        size: settingsJson.length,
+      });
       repository.createConfigAndAttachPack.mockResolvedValue(1);
       repository.getConfigById.mockResolvedValue({
         id: 1,
@@ -156,10 +171,14 @@ describe('EventsService', () => {
       };
 
       repository.getPresetById.mockResolvedValue(preset as any);
-      repository.getEmulatorPack.mockResolvedValue({ id: 'pack1', name: 'Pack 1' });
+      repository.getEmulatorPack.mockResolvedValue({
+        id: 'pack1',
+        name: 'Pack 1',
+      });
       repository.findEventHoldingPack.mockResolvedValue(null);
       blobStorage.storeBlob.mockResolvedValue({
-        sha512: 'wronghash123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890',
+        sha512:
+          'wronghash123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890',
         size: 100,
       });
 
@@ -181,7 +200,9 @@ describe('EventsService', () => {
       const settingsJson = JSON.stringify({ foo: 'bar' });
       const config = {
         id: 1,
-        settingsBlobSha512: createHash('sha512').update(settingsJson).digest('hex'),
+        settingsBlobSha512: createHash('sha512')
+          .update(settingsJson)
+          .digest('hex'),
       };
 
       const mockStream = Readable.from([Buffer.from(settingsJson)]);
@@ -190,7 +211,9 @@ describe('EventsService', () => {
       const result = await service.settingsJsonBytesForConfig(config as any);
 
       expect(result.toString('utf-8')).toBe(settingsJson);
-      expect(blobStorage.override).toHaveBeenCalledWith(config.settingsBlobSha512);
+      expect(blobStorage.override).toHaveBeenCalledWith(
+        config.settingsBlobSha512,
+      );
     });
 
     it('heals blob if missing but preset matches', async () => {
@@ -214,7 +237,10 @@ describe('EventsService', () => {
       repository.listPresets.mockResolvedValue([preset] as any);
 
       // storeBlob called during heal
-      blobStorage.storeBlob.mockResolvedValue({ sha512, size: settingsJson.length });
+      blobStorage.storeBlob.mockResolvedValue({
+        sha512,
+        size: settingsJson.length,
+      });
 
       const result = await service.settingsJsonBytesForConfig(config as any);
 
@@ -272,9 +298,7 @@ describe('EventsService', () => {
     };
 
     beforeEach(() => {
-      jest
-        .spyOn(service, 'getConfig')
-        .mockResolvedValue(draftConfig as never);
+      jest.spyOn(service, 'getConfig').mockResolvedValue(draftConfig as never);
       repository.updateConfig = jest.fn();
       repository.appendAudit = jest.fn();
       // Opening requires a published version whose emulator ROM matches the

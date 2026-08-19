@@ -1,5 +1,6 @@
 import { sql } from 'drizzle-orm';
 import {
+  mysqlEnum,
   boolean,
   char,
   foreignKey,
@@ -20,20 +21,29 @@ import { boffMediaUsers } from './BoffMedia';
 // only as legacy pre-grants for UUIDs with no account behind them yet.
 
 /** `public` · `password` · `allowlist` — mirrors PackAccess in @boffmedia/pack-schema. */
-export type PackAccessKind = 'public' | 'password' | 'allowlist';
+export const PACK_ACCESS_KINDS = ['public', 'password', 'allowlist'] as const;
+export type PackAccessKind = (typeof PACK_ACCESS_KINDS)[number];
 
 /** Mirrors MrpackDependencies' loader keys. Null = vanilla. */
-export type PackLoader =
-  | 'forge'
-  | 'neoforge'
-  | 'fabric-loader'
-  | 'quilt-loader';
+export const PACK_LOADERS = [
+  'forge',
+  'neoforge',
+  'fabric-loader',
+  'quilt-loader',
+] as const;
+export type PackLoader = (typeof PACK_LOADERS)[number];
 
 /** Which game a pack targets — mirrors GameType in @boffmedia/pack-schema.
- *  NULL in the column means `minecraft` (every pack authored before multi-game
- *  had no game type); the API resolves NULL → 'minecraft' so clients never
- *  re-implement the default. Immutable after creation (enforced in the service). */
-export type GameType = 'minecraft' | 'emulator' | 'zomboid' | 'stardew';
+ *  Immutable after creation (enforced in the service). The column used to be
+ *  nullable with "NULL means minecraft" as a back-compat rule; on a clean
+ *  database the default does that job honestly and every read gets a real value. */
+export const GAME_TYPES = [
+  'minecraft',
+  'emulator',
+  'zomboid',
+  'stardew',
+] as const;
+export type GameType = (typeof GAME_TYPES)[number];
 
 export const packs = mysqlTable(
   'packs',
@@ -42,8 +52,7 @@ export const packs = mysqlTable(
     // launcher caches on disk, and a sequential integer leaks how many packs exist.
     id: varchar('id', { length: 32 }).primaryKey(),
     slug: varchar('slug', { length: 64 }).notNull().unique(),
-    // NULL = 'minecraft' (back-compat, zero backfill). Immutable after creation.
-    gameType: varchar('game_type', { length: 32 }).$type<GameType>(),
+    gameType: mysqlEnum('game_type', GAME_TYPES).notNull().default('minecraft'),
     name: varchar('name', { length: 128 }).notNull(),
     summary: varchar('summary', { length: 512 }),
     iconUrl: varchar('icon_url', { length: 512 }),
@@ -54,8 +63,7 @@ export const packs = mysqlTable(
     // `port` is optional (a bare host behind an SRV record declares none). Typed
     // loosely because the column can also hold a legacy/malformed `{}`.
     server: json('server').$type<{ host?: string; port?: number }>(),
-    accessKind: varchar('access_kind', { length: 16 })
-      .$type<PackAccessKind>()
+    accessKind: mysqlEnum('access_kind', PACK_ACCESS_KINDS)
       .notNull()
       .default('allowlist'),
     // bcrypt, and only when accessKind = 'password'. §7.3 is explicit that this
@@ -65,13 +73,8 @@ export const packs = mysqlTable(
     // how "created but empty" stays distinguishable from "broken".
     latestVersionId: varchar('latest_version_id', { length: 32 }),
     archived: boolean('archived').notNull().default(false),
-    createdAt: timestamp('created_at')
-      .notNull()
-      .default(sql`CURRENT_TIMESTAMP()`),
-    updatedAt: timestamp('updated_at')
-      .notNull()
-      .default(sql`CURRENT_TIMESTAMP()`)
-      .onUpdateNow(),
+    createdAt: timestamp('created_at').notNull().defaultNow(),
+    updatedAt: timestamp('updated_at').notNull().defaultNow().onUpdateNow(),
   },
   // No explicit slug index: the UNIQUE constraint above already creates one,
   // and a second would be paid for on every write for nothing.
@@ -91,7 +94,7 @@ export const packVersions = mysqlTable(
     // shared zod schema requires it iff the pack is minecraft). Non-MC versions
     // leave it, `loader`, and `loader_version` NULL.
     minecraft: varchar('minecraft', { length: 32 }),
-    loader: varchar('loader', { length: 20 }).$type<PackLoader>(),
+    loader: mysqlEnum('loader', PACK_LOADERS),
     loaderVersion: varchar('loader_version', { length: 64 }),
     // The PackFile[] payload, validated against @boffmedia/pack-schema on write.
     // Stored whole rather than normalised: nothing queries an individual file,
@@ -114,9 +117,7 @@ export const packVersions = mysqlTable(
     // The Boffmedia admin who cut this version. Was char(36) — a Minecraft UUID
     // shape — and never written by anything, so every row said "nobody".
     createdBy: int('created_by'),
-    createdAt: timestamp('created_at')
-      .notNull()
-      .default(sql`CURRENT_TIMESTAMP()`),
+    createdAt: timestamp('created_at').notNull().defaultNow(),
   },
   (table) => ({
     packFk: foreignKey({
@@ -133,7 +134,8 @@ export type NewPackVersion = typeof packVersions.$inferInsert;
 
 /** Where a direct grant came from. Union semantics: losing one source leaves
  *  the others standing, which the old single-ACL-row model could not express. */
-export type PackGrantSource = 'admin' | 'invite';
+export const PACK_GRANT_SOURCES = ['admin', 'invite'] as const;
+export type PackGrantSource = (typeof PACK_GRANT_SOURCES)[number];
 
 /**
  * Per-ACCOUNT entitlement. Present row = access; revocation is a DELETE.
@@ -152,10 +154,7 @@ export const packGrants = mysqlTable(
   {
     packId: varchar('pack_id', { length: 32 }).notNull(),
     userId: int('user_id').notNull(),
-    source: varchar('source', { length: 16 })
-      .$type<PackGrantSource>()
-      .notNull()
-      .default('admin'),
+    source: mysqlEnum('source', PACK_GRANT_SOURCES).notNull().default('admin'),
     /** The invite code this grant came from, when it came from one. */
     sourceRef: varchar('source_ref', { length: 32 }),
     /** Boffmedia user id of the admin who granted it; null for redemptions. */
@@ -223,9 +222,7 @@ export const packInvites = mysqlTable(
     code: varchar('code', { length: 32 }).primaryKey(),
     packId: varchar('pack_id', { length: 32 }).notNull(),
     createdBy: int('created_by'),
-    createdAt: timestamp('created_at')
-      .notNull()
-      .default(sql`CURRENT_TIMESTAMP()`),
+    createdAt: timestamp('created_at').notNull().defaultNow(),
     expiresAt: timestamp('expires_at'),
     maxUses: int('max_uses').notNull().default(1),
     uses: int('uses').notNull().default(0),

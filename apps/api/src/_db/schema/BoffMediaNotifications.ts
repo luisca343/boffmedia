@@ -7,7 +7,6 @@ import {
   timestamp,
   varchar,
 } from 'drizzle-orm/mysql-core';
-import { sql } from 'drizzle-orm';
 import { boffMediaUsers } from './BoffMedia';
 
 export const NOTIFICATION_TYPE = {
@@ -43,9 +42,7 @@ export const boffMediaNotifications = mysqlTable(
     body: text('body'),
     link: varchar('link', { length: 512 }),
     readAt: timestamp('read_at'),
-    createdAt: timestamp('created_at')
-      .notNull()
-      .default(sql`CURRENT_TIMESTAMP()`),
+    createdAt: timestamp('created_at').notNull().defaultNow(),
   },
   (t) => ({
     userIdx: index('notif_user_idx').on(t.userId),

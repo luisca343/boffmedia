@@ -1,5 +1,5 @@
-import { sql } from 'drizzle-orm';
 import {
+  mysqlEnum,
   char,
   foreignKey,
   index,
@@ -23,6 +23,9 @@ import { boffMediaUsers } from './BoffMedia';
  * different clients, and an API restart in between must not strand the player
  * on a spinner.
  */
+export const DEVICE_CODE_STATUSES = ['pending', 'approved', 'denied'] as const;
+export type DeviceCodeStatus = (typeof DEVICE_CODE_STATUSES)[number];
+
 export const launcherDeviceCodes = mysqlTable(
   'launcher_device_codes',
   {
@@ -32,15 +35,12 @@ export const launcherDeviceCodes = mysqlTable(
     userCode: varchar('user_code', { length: 16 }).notNull().unique(),
     /** Set when a user approves. NULL while pending or denied. */
     userId: int('user_id'),
-    status: varchar('status', { length: 16 })
-      .$type<'pending' | 'approved' | 'denied'>()
+    status: mysqlEnum('status', DEVICE_CODE_STATUSES)
       .notNull()
       .default('pending'),
     /** What the launcher told us about itself, for the approval screen. */
     clientLabel: varchar('client_label', { length: 128 }),
-    createdAt: timestamp('created_at')
-      .notNull()
-      .default(sql`CURRENT_TIMESTAMP()`),
+    createdAt: timestamp('created_at').notNull().defaultNow(),
     expiresAt: timestamp('expires_at').notNull(),
     /** Set the moment the launcher collects its session, so a code can never be
      *  redeemed twice even if the poll is replayed. */

@@ -11,9 +11,16 @@ const PEER = 'bbbbbbbb-0000-0000-0000-000000000002';
 const STRANGER = 'cccccccc-0000-0000-0000-000000000003';
 
 const socket = (mcUuid: string | null, id = 'sock-actor') =>
-  ({ id, identity: mcUuid ? { userId: 1, mcUuid } : { userId: 1 }, emit: jest.fn() }) as never;
+  ({
+    id,
+    identity: mcUuid ? { userId: 1, mcUuid } : { userId: 1 },
+    emit: jest.fn(),
+  }) as never;
 
-const payload = (chatId: number, users: { uuid: string; status: string }[]) => ({
+const payload = (
+  chatId: number,
+  users: { uuid: string; status: string }[],
+) => ({
   call: { chatId, users, caller: ACTOR },
   user: { uuid: ACTOR },
   startTime: 1_700_000_000,
@@ -38,7 +45,11 @@ describe('SocketsGateway — call membership', () => {
 
     emit = jest.fn();
     to = jest.fn(() => ({ emit }));
-    gateway.server = { to, emit: jest.fn(), sockets: { sockets: { size: 2 } } } as never;
+    gateway.server = {
+      to,
+      emit: jest.fn(),
+      sockets: { sockets: { size: 2 } },
+    } as never;
 
     // Both the peer and an unrelated stranger hold live sockets.
     gateway.users.set(PEER, { uuid: PEER, socketId: 'sock-peer' });
@@ -53,22 +64,31 @@ describe('SocketsGateway — call membership', () => {
     });
 
     it('checks membership with the socket identity, never the body', async () => {
-      chat.getChatById.mockResolvedValue({ members: [{ uuid: ACTOR }, { uuid: PEER }] });
-      await gateway.handleChatJoin(
-        socket(ACTOR),
-        { call: { chatId: 5, users: [], caller: STRANGER }, user: { uuid: STRANGER } } as never,
-      );
+      chat.getChatById.mockResolvedValue({
+        members: [{ uuid: ACTOR }, { uuid: PEER }],
+      });
+      await gateway.handleChatJoin(socket(ACTOR), {
+        call: { chatId: 5, users: [], caller: STRANGER },
+        user: { uuid: STRANGER },
+      } as never);
       expect(chat.getChatById).toHaveBeenCalledWith(5, ACTOR);
     });
 
     it('refuses a non-member: nothing is emitted anywhere', async () => {
-      chat.getChatById.mockRejectedValue(new ForbiddenException('not a member'));
-      await gateway.handleChatJoin(socket(ACTOR), payload(5, [{ uuid: PEER, status: 'IN_CALL' }]) as never);
+      chat.getChatById.mockRejectedValue(
+        new ForbiddenException('not a member'),
+      );
+      await gateway.handleChatJoin(
+        socket(ACTOR),
+        payload(5, [{ uuid: PEER, status: 'IN_CALL' }]) as never,
+      );
       expect(to).not.toHaveBeenCalled();
     });
 
     it('derives recipients from chat membership, not the client payload', async () => {
-      chat.getChatById.mockResolvedValue({ members: [{ uuid: ACTOR }, { uuid: PEER }] });
+      chat.getChatById.mockResolvedValue({
+        members: [{ uuid: ACTOR }, { uuid: PEER }],
+      });
       // The body names a stranger; only the real member may be reached.
       await gateway.handleChatJoin(
         socket(ACTOR),
@@ -82,7 +102,9 @@ describe('SocketsGateway — call membership', () => {
 
     it('does not echo the signal back to the actor', async () => {
       gateway.users.set(ACTOR, { uuid: ACTOR, socketId: 'sock-actor' });
-      chat.getChatById.mockResolvedValue({ members: [{ uuid: ACTOR }, { uuid: PEER }] });
+      chat.getChatById.mockResolvedValue({
+        members: [{ uuid: ACTOR }, { uuid: PEER }],
+      });
       await gateway.handleChatJoin(socket(ACTOR), payload(5, []) as never);
       expect(to).not.toHaveBeenCalledWith('sock-actor');
     });
@@ -96,7 +118,9 @@ describe('SocketsGateway — call membership', () => {
     });
 
     it('does NOT call endCall for a chat the socket is not in', async () => {
-      chat.getChatById.mockRejectedValue(new ForbiddenException('not a member'));
+      chat.getChatById.mockRejectedValue(
+        new ForbiddenException('not a member'),
+      );
       // An empty remaining-users list is exactly what would otherwise end the call.
       await gateway.handleChatExit(socket(STRANGER), payload(5, []) as never);
       expect(chat.endCall).not.toHaveBeenCalled();
@@ -104,7 +128,9 @@ describe('SocketsGateway — call membership', () => {
     });
 
     it('fans out to proven members only', async () => {
-      chat.getChatById.mockResolvedValue({ members: [{ uuid: ACTOR }, { uuid: PEER }] });
+      chat.getChatById.mockResolvedValue({
+        members: [{ uuid: ACTOR }, { uuid: PEER }],
+      });
       await gateway.handleChatExit(
         socket(ACTOR),
         payload(5, [{ uuid: STRANGER, status: 'IN_CALL' }]) as never,
@@ -115,7 +141,9 @@ describe('SocketsGateway — call membership', () => {
     });
 
     it('ends the call on the verified chatId once nobody else is in it', async () => {
-      chat.getChatById.mockResolvedValue({ members: [{ uuid: ACTOR }, { uuid: PEER }] });
+      chat.getChatById.mockResolvedValue({
+        members: [{ uuid: ACTOR }, { uuid: PEER }],
+      });
       await gateway.handleChatExit(
         socket(ACTOR),
         payload(5, [{ uuid: ACTOR, status: 'IN_CALL' }]) as never,
@@ -124,7 +152,9 @@ describe('SocketsGateway — call membership', () => {
     });
 
     it('leaves the call open while another participant is still in it', async () => {
-      chat.getChatById.mockResolvedValue({ members: [{ uuid: ACTOR }, { uuid: PEER }] });
+      chat.getChatById.mockResolvedValue({
+        members: [{ uuid: ACTOR }, { uuid: PEER }],
+      });
       await gateway.handleChatExit(
         socket(ACTOR),
         payload(5, [{ uuid: PEER, status: 'IN_CALL' }]) as never,
@@ -135,15 +165,22 @@ describe('SocketsGateway — call membership', () => {
 
   describe('typing indicators', () => {
     it('will not broadcast typing into a chat the socket is not in', async () => {
-      chat.getChatById.mockRejectedValue(new ForbiddenException('not a member'));
+      chat.getChatById.mockRejectedValue(
+        new ForbiddenException('not a member'),
+      );
       await gateway.handleTypingStart(socket(ACTOR), { chatId: 5 } as never);
       await gateway.handleTypingStop(socket(ACTOR), { chatId: 5 } as never);
       expect(to).not.toHaveBeenCalled();
     });
 
     it('broadcasts typing to the other members only', async () => {
-      chat.getChatById.mockResolvedValue({ members: [{ uuid: ACTOR }, { uuid: PEER }] });
-      await gateway.handleTypingStart(socket(ACTOR), { chatId: 5, username: 'ash' } as never);
+      chat.getChatById.mockResolvedValue({
+        members: [{ uuid: ACTOR }, { uuid: PEER }],
+      });
+      await gateway.handleTypingStart(socket(ACTOR), {
+        chatId: 5,
+        username: 'ash',
+      } as never);
       expect(to).toHaveBeenCalledWith('sock-peer');
       expect(emit).toHaveBeenCalledWith('chat:typing:start', {
         chatId: 5,

@@ -1,6 +1,11 @@
-import { Injectable, Inject, ConflictException } from '@nestjs/common';
+import {
+  HttpException,
+  Injectable,
+  Inject,
+  ConflictException,
+} from '@nestjs/common';
 import { MySql2Database } from 'drizzle-orm/mysql2';
-import { and, eq, ne, or, sql, isNotNull, isNull, inArray } from 'drizzle-orm';
+import { and, eq, ne, or, sql, isNull, inArray } from 'drizzle-orm';
 import { packs, packVersions } from '@/_db/schema/Packs';
 import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
 import {
@@ -25,7 +30,6 @@ import {
   boffMediaParticipants,
   boffMediaEventParticipants,
   boffMediaEvents,
-  EVENT_STATUS,
 } from '@/_db/schema/BoffMediaEvents';
 import { Logger } from 'nestjs-pino';
 
@@ -83,6 +87,9 @@ export class RandomizerRepository {
             'Ya existe una configuración para este evento. Edítala o elimínala antes de crear otra.',
         });
       }
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Config creation failed: ${error.message}`);
     }
   }
@@ -109,7 +116,9 @@ export class RandomizerRepository {
    * null = pack not found; 'no-version' = nothing published yet;
    * 'no-rom' = published version declares no resolvable emulator ROM entry.
    */
-  async getPublishedEmulatorRom(packId: string): Promise<
+  async getPublishedEmulatorRom(
+    packId: string,
+  ): Promise<
     | { state: 'no-version' }
     | { state: 'no-rom' }
     | { state: 'ok'; versionId: string; romPath: string; sha512: string }
@@ -149,15 +158,19 @@ export class RandomizerRepository {
     const romPath = emulator?.rom;
     if (typeof romPath !== 'string' || !romPath) return { state: 'no-rom' };
 
-    const parsedFiles =
-      parseJsonColumn<Array<{ path?: unknown; sha512?: unknown }>>(
-        version.files,
-      );
+    const parsedFiles = parseJsonColumn<
+      Array<{ path?: unknown; sha512?: unknown }>
+    >(version.files);
     const files = Array.isArray(parsedFiles) ? parsedFiles : [];
     const entry = files.find((f) => f?.path === romPath);
     if (!entry || typeof entry.sha512 !== 'string') return { state: 'no-rom' };
 
-    return { state: 'ok', versionId: version.id, romPath, sha512: entry.sha512 };
+    return {
+      state: 'ok',
+      versionId: version.id,
+      romPath,
+      sha512: entry.sha512,
+    };
   }
 
   /**
@@ -222,6 +235,9 @@ export class RandomizerRepository {
       return rows.length > 0 ? rows[0] : null;
     } catch (error: any) {
       this.logger.error(`Failed to get config by ID ${id}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Config retrieval failed: ${error.message}`);
     }
   }
@@ -240,10 +256,10 @@ export class RandomizerRepository {
 
       return rows.length > 0 ? rows[0] : null;
     } catch (error: any) {
-      this.logger.error(
-        `Failed to get config for event ${eventId}:`,
-        error,
-      );
+      this.logger.error(`Failed to get config for event ${eventId}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Config retrieval failed: ${error.message}`);
     }
   }
@@ -253,6 +269,9 @@ export class RandomizerRepository {
       return await this.db.select().from(randomizerConfigs).execute();
     } catch (error: any) {
       this.logger.error('Failed to list configs:', error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Configs listing failed: ${error.message}`);
     }
   }
@@ -280,6 +299,9 @@ export class RandomizerRepository {
         .execute();
     } catch (error: any) {
       this.logger.error('Failed to list configs with event meta:', error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Configs listing failed: ${error.message}`);
     }
   }
@@ -316,6 +338,9 @@ export class RandomizerRepository {
       });
     } catch (error: any) {
       this.logger.error(`Failed to delete config ${configId}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Config deletion failed: ${error.message}`);
     }
   }
@@ -336,6 +361,9 @@ export class RandomizerRepository {
         .execute();
     } catch (error: any) {
       this.logger.error(`Failed to update config ${id}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Config update failed: ${error.message}`);
     }
   }
@@ -352,6 +380,9 @@ export class RandomizerRepository {
       return result[0].insertId;
     } catch (error: any) {
       this.logger.error('Failed to create randomizer assignment:', error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Assignment creation failed: ${error.message}`);
     }
   }
@@ -382,6 +413,9 @@ export class RandomizerRepository {
         `Failed to get assignment for config ${configId}, user ${userId}:`,
         error,
       );
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Assignment retrieval failed: ${error.message}`);
     }
   }
@@ -406,6 +440,9 @@ export class RandomizerRepository {
         `Failed to get assignment by ID ${assignmentId}:`,
         error,
       );
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Assignment retrieval failed: ${error.message}`);
     }
   }
@@ -428,6 +465,9 @@ export class RandomizerRepository {
         `Failed to list assignments for config ${configId}:`,
         error,
       );
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Assignments listing failed: ${error.message}`);
     }
   }
@@ -448,6 +488,9 @@ export class RandomizerRepository {
         .execute();
     } catch (error: any) {
       this.logger.error(`Failed to update assignment ${id}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Assignment update failed: ${error.message}`);
     }
   }
@@ -518,6 +561,9 @@ export class RandomizerRepository {
         `Failed to resolve entitlement for event ${eventId}, user ${userId}:`,
         error,
       );
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Entitlement resolution failed: ${error.message}`);
     }
   }
@@ -544,6 +590,9 @@ export class RandomizerRepository {
         .execute();
     } catch (error: any) {
       this.logger.error('Failed to append audit record:', error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Audit append failed: ${error.message}`);
     }
   }
@@ -554,9 +603,7 @@ export class RandomizerRepository {
    */
   async listAssignmentsByConfigWithDisplayNames(
     configId: number,
-  ): Promise<
-    (RandomizerAssignment & { displayName: string })[]
-  > {
+  ): Promise<(RandomizerAssignment & { displayName: string })[]> {
     if (!configId || configId <= 0) {
       return [];
     }
@@ -584,6 +631,9 @@ export class RandomizerRepository {
         `Failed to list assignments with names for config ${configId}:`,
         error,
       );
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(
         `Assignments listing with names failed: ${error.message}`,
       );
@@ -602,6 +652,9 @@ export class RandomizerRepository {
       return result[0].insertId;
     } catch (error: any) {
       this.logger.error('Failed to create randomizer preset:', error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Preset creation failed: ${error.message}`);
     }
   }
@@ -621,6 +674,9 @@ export class RandomizerRepository {
       return rows.length > 0 ? rows[0] : null;
     } catch (error: any) {
       this.logger.error(`Failed to get preset by ID ${id}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Preset retrieval failed: ${error.message}`);
     }
   }
@@ -630,6 +686,9 @@ export class RandomizerRepository {
       return await this.db.select().from(randomizerPresets).execute();
     } catch (error: any) {
       this.logger.error('Failed to list presets:', error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Presets listing failed: ${error.message}`);
     }
   }
@@ -650,6 +709,9 @@ export class RandomizerRepository {
         .execute();
     } catch (error: any) {
       this.logger.error(`Failed to update preset ${id}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Preset update failed: ${error.message}`);
     }
   }
@@ -666,6 +728,9 @@ export class RandomizerRepository {
         .execute();
     } catch (error: any) {
       this.logger.error(`Failed to delete preset ${id}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Preset deletion failed: ${error.message}`);
     }
   }
@@ -692,6 +757,9 @@ export class RandomizerRepository {
         });
       }
       this.logger.error('Failed to create randomizer ROM:', error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`ROM creation failed: ${error.message}`);
     }
   }

@@ -2,7 +2,10 @@ import { Injectable, Inject } from '@nestjs/common';
 import { MySql2Database } from 'drizzle-orm/mysql2';
 import { and, asc, desc, eq, isNull, sql } from 'drizzle-orm';
 import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
-import { boffMediaForumPosts } from '@/_db/schema/BoffMediaForum';
+import {
+  boffMediaForumPosts,
+  boffMediaForumThreads,
+} from '@/_db/schema/BoffMediaForum';
 import { boffMediaUsers } from '@/_db/schema/BoffMedia';
 
 export interface PostRow {
@@ -99,21 +102,40 @@ export class ForumPostsRepository {
 
   // Inserts a reply; `at` is passed explicitly so the caller can reuse the same
   // instant for the thread's lastPostAt pointer. Returns the new post id.
+  /**
+   * Inserts the reply AND advances the thread's counters in one transaction.
+   *
+   * These were two awaits in the service: a failure between them left a visible
+   * reply the thread did not count, with `lastPostAt`/`lastPostUserId` pointing
+   * at the previous post — drift that nothing ever repaired.
+   */
   async insertReply(
     threadId: number,
     userId: number,
     body: string,
     at: Date,
   ): Promise<number> {
-    const [result] = await this.db.insert(boffMediaForumPosts).values({
-      threadId,
-      userId,
-      body,
-      isSolution: false,
-      createdAt: at,
-      updatedAt: at,
+    return this.db.transaction(async (tx) => {
+      const [result] = await tx.insert(boffMediaForumPosts).values({
+        threadId,
+        userId,
+        body,
+        isSolution: false,
+        createdAt: at,
+        updatedAt: at,
+      });
+
+      await tx
+        .update(boffMediaForumThreads)
+        .set({
+          replyCount: sql`${boffMediaForumThreads.replyCount} + 1`,
+          lastPostAt: at,
+          lastPostUserId: userId,
+        })
+        .where(eq(boffMediaForumThreads.id, threadId));
+
+      return result.insertId;
     });
-    return result.insertId;
   }
 
   // Full (author-joined) row for mapping a single non-deleted post to a ForumPost.

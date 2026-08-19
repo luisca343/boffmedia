@@ -8,7 +8,6 @@ import {
   rotomChatMessages,
   rotomChatMessageReads,
   RotomChat,
-  RotomChatMember,
   RotomChatMessage,
   RotomChatMessageRead,
 } from '@/_db/schema/SmartRotomChat';

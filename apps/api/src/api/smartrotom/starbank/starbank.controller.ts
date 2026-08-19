@@ -14,7 +14,6 @@ import {
   UseInterceptors,
   ValidationPipe,
   UploadedFile,
-  BadRequestException,
 } from '@nestjs/common';
 import { Request } from 'express';
 import { Public } from '@api/_utils/decorators/public.decorator';

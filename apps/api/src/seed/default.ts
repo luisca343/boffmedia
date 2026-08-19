@@ -42,16 +42,30 @@ async function main() {
     .onDuplicateKeyUpdate({ set: { username: sql`username` } });
 
   // ── BoffMedia user ──────────────────────────────────────────────────────────
+  // The password comes from the environment and has NO default. It used to be
+  // the literal 'admin123', and this is the only script that creates an
+  // administrator — so rebuilding a database with it produced a live site whose
+  // admin credentials were a five-character string in the repository.
+  const adminPassword = process.env.SEED_ADMIN_PASSWORD;
+  if (!adminPassword || adminPassword.length < 12) {
+    throw new Error(
+      'SEED_ADMIN_PASSWORD is required (min 12 chars). Refusing to seed an ' +
+        'administrator with a guessable password.',
+    );
+  }
+
   logger.info('Seeding boffmedia_users…');
-  const hashedPassword = await bcrypt.hash('admin123', 12);
+  const hashedPassword = await bcrypt.hash(adminPassword, 12);
   await db
     .insert(boffMediaUsers)
     .values({
       username: 'admin',
       password: hashedPassword,
-      email: 'admin@boffmedia.com',
+      email: process.env.SEED_ADMIN_EMAIL ?? 'admin@boffmedia.es',
       uuid: ADMIN_UUID,
     })
+    // Existing row wins: re-running the bootstrap must never silently reset a
+    // password that has since been changed.
     .onDuplicateKeyUpdate({ set: { username: sql`username` } });
 
   // ── User → role assignments ─────────────────────────────────────────────────

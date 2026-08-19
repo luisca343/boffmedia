@@ -6,6 +6,7 @@ import {
   Param,
   Delete,
   HttpStatus,
+  UseGuards,
 } from '@nestjs/common';
 import { Public } from '@api/_utils/decorators/public.decorator';
 import {
@@ -18,8 +19,14 @@ import {
 import { InvitesFacadeService } from './invites.facade.service';
 import { RegistrationData } from './services/registration.service';
 import { CreateInviteBodyDto } from './dto/create-invite-body.dto';
+import { JwtAuthGuard } from '@api/auth/jwt-auth.guard';
+import { RolesGuard } from '@api/_utils/guards/roles.guard';
+import { USER_ROLES } from '@api/_utils/auth/roles.constants';
+import { Roles } from '@api/_utils/decorators/roles.decorator';
 
 @ApiTags('Wingull | Invites')
+// Redeeming an invite is deliberately public (that is the point of an invite
+// code); minting and revoking them are administrative and used to be public too.
 @Public()
 @Controller('wingull/invites')
 export class InvitesController {
@@ -27,6 +34,8 @@ export class InvitesController {
 
   // ==================== INVITE OPERATIONS ====================
 
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.BOFF_ADMIN)
   @Post()
   @ApiOperation({ summary: 'Create a new invite' })
   @ApiResponse({
@@ -200,6 +209,8 @@ export class InvitesController {
 
   // ==================== INVITE MANAGEMENT ====================
 
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.BOFF_ADMIN)
   @Delete(':id')
   @ApiOperation({ summary: 'Soft delete invite by ID' })
   @ApiResponse({
@@ -219,6 +230,8 @@ export class InvitesController {
     return await this.invitesFacadeService.deleteInvite(id);
   }
 
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.BOFF_ADMIN)
   @Delete(':id/permanent')
   @ApiOperation({ summary: 'Permanently delete invite by ID' })
   @ApiResponse({

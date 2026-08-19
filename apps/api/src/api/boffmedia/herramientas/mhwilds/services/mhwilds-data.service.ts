@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { HttpException, Inject, Injectable } from '@nestjs/common';
 import {
   ResourceFetchResult,
   WeaponTreeNode,
@@ -49,6 +49,9 @@ export class MhwildsDataService {
       const result = await this.mhwildsRepository.getWeapons(locale);
       return this.formatResultWithCacheInfo(result);
     } catch (error: any) {
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to get weapons: ${error.message}`);
     }
   }
@@ -60,6 +63,9 @@ export class MhwildsDataService {
       const result = await this.mhwildsRepository.getArmor(locale);
       return this.formatResultWithCacheInfo(result);
     } catch (error: any) {
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to get armor: ${error.message}`);
     }
   }
@@ -71,6 +77,9 @@ export class MhwildsDataService {
       const result = await this.mhwildsRepository.getCharms(locale);
       return this.formatResultWithCacheInfo(result);
     } catch (error: any) {
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to get charms: ${error.message}`);
     }
   }
@@ -82,6 +91,9 @@ export class MhwildsDataService {
       const result = await this.mhwildsRepository.getDecorations(locale);
       return this.formatResultWithCacheInfo(result);
     } catch (error: any) {
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to get decorations: ${error.message}`);
     }
   }
@@ -93,6 +105,9 @@ export class MhwildsDataService {
       const result = await this.mhwildsRepository.getSkills(locale);
       return this.formatResultWithCacheInfo(result);
     } catch (error: any) {
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to get skills: ${error.message}`);
     }
   }
@@ -104,6 +119,9 @@ export class MhwildsDataService {
       const result = await this.mhwildsRepository.getMonsters(locale);
       return this.formatResultWithCacheInfo(result);
     } catch (error: any) {
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to get monsters: ${error.message}`);
     }
   }
@@ -134,6 +152,9 @@ export class MhwildsDataService {
         cacheInfo: this.extractCacheInfo(result),
       };
     } catch (error: any) {
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to get charm ranks: ${error.message}`);
     }
   }
@@ -218,6 +239,9 @@ export class MhwildsDataService {
         weaponKinds: Object.keys(weaponTreeByKind),
       };
     } catch (error: any) {
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to create weapon tree: ${error.message}`);
     }
   }
@@ -241,6 +265,9 @@ export class MhwildsDataService {
         cacheInfo: this.extractCacheInfo(result),
       };
     } catch (error: any) {
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to search weapons: ${error.message}`);
     }
   }
@@ -262,6 +289,9 @@ export class MhwildsDataService {
         cacheInfo: this.extractCacheInfo(result),
       };
     } catch (error: any) {
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to get weapons by kind: ${error.message}`);
     }
   }
@@ -283,6 +313,9 @@ export class MhwildsDataService {
         cacheInfo: this.extractCacheInfo(result),
       };
     } catch (error: any) {
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to get armor by rarity: ${error.message}`);
     }
   }
@@ -368,6 +401,9 @@ export class MhwildsDataService {
         },
       };
     } catch (error: any) {
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to get data statistics: ${error.message}`);
     }
   }

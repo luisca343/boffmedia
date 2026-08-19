@@ -18,10 +18,11 @@ import { AUDIT } from './types/packs.types';
 const UUID = '069a79f4-44e9-4726-a5be-fca90e38aaf5';
 const DEVICE = 'd'.repeat(64);
 
-const dupErr = () => Object.assign(new Error('duplicate'), {
-  code: 'ER_DUP_ENTRY',
-  errno: 1062,
-});
+const dupErr = () =>
+  Object.assign(new Error('duplicate'), {
+    code: 'ER_DUP_ENTRY',
+    errno: 1062,
+  });
 
 const row = (over: Record<string, unknown> = {}) => ({
   id: 1,
@@ -82,7 +83,9 @@ describe('LauncherDeviceService', () => {
       const result = await service.start('Boff Launcher', 'https://x/link');
 
       expect(repo.sweepExpired).toHaveBeenCalled();
-      expect(result.userCode).toMatch(/^[2-9BCDFGHJKLMNPQRSTVWXZ]{4}-[2-9BCDFGHJKLMNPQRSTVWXZ]{4}$/);
+      expect(result.userCode).toMatch(
+        /^[2-9BCDFGHJKLMNPQRSTVWXZ]{4}-[2-9BCDFGHJKLMNPQRSTVWXZ]{4}$/,
+      );
       expect(result.deviceCode).toHaveLength(64);
       expect(result.verificationUri).toBe(
         `https://x/link?code=${encodeURIComponent(result.userCode)}`,
@@ -110,18 +113,24 @@ describe('LauncherDeviceService', () => {
       expect(new Set(codes).size).toBe(3);
       expect(result.userCode).toBe(codes[2]);
       // The device code is generated once and survives the retries.
-      expect(new Set(repo.create.mock.calls.map((c) => c[0].deviceCode)).size).toBe(1);
+      expect(
+        new Set(repo.create.mock.calls.map((c) => c[0].deviceCode)).size,
+      ).toBe(1);
     });
 
     it('gives up after a bounded number of collisions instead of looping', async () => {
       repo.create.mockRejectedValue(dupErr());
-      await expect(service.start(null, 'https://x/link')).rejects.toThrow('duplicate');
+      await expect(service.start(null, 'https://x/link')).rejects.toThrow(
+        'duplicate',
+      );
       expect(repo.create).toHaveBeenCalledTimes(5);
     });
 
     it('does not retry a non-duplicate insert failure', async () => {
       repo.create.mockRejectedValue(new Error('connection lost'));
-      await expect(service.start(null, 'https://x/link')).rejects.toThrow('connection lost');
+      await expect(service.start(null, 'https://x/link')).rejects.toThrow(
+        'connection lost',
+      );
       expect(repo.create).toHaveBeenCalledTimes(1);
     });
   });
@@ -129,7 +138,9 @@ describe('LauncherDeviceService', () => {
   describe('poll', () => {
     it('reports pending while nobody has decided', async () => {
       repo.findByDeviceCode.mockResolvedValue(row() as never);
-      await expect(service.poll(DEVICE)).resolves.toEqual({ status: 'pending' });
+      await expect(service.poll(DEVICE)).resolves.toEqual({
+        status: 'pending',
+      });
       expect(repo.consume).not.toHaveBeenCalled();
     });
 
@@ -137,18 +148,24 @@ describe('LauncherDeviceService', () => {
       repo.findByDeviceCode.mockResolvedValue(
         row({ status: 'approved', userId: null }) as never,
       );
-      await expect(service.poll(DEVICE)).resolves.toEqual({ status: 'pending' });
+      await expect(service.poll(DEVICE)).resolves.toEqual({
+        status: 'pending',
+      });
       expect(auth.signSession).not.toHaveBeenCalled();
     });
 
     it('reports denied', async () => {
-      repo.findByDeviceCode.mockResolvedValue(row({ status: 'denied' }) as never);
+      repo.findByDeviceCode.mockResolvedValue(
+        row({ status: 'denied' }) as never,
+      );
       await expect(service.poll(DEVICE)).resolves.toEqual({ status: 'denied' });
     });
 
     it('answers expired for an unknown/swept device code rather than throwing', async () => {
       repo.findByDeviceCode.mockResolvedValue(undefined);
-      await expect(service.poll('nope')).resolves.toEqual({ status: 'expired' });
+      await expect(service.poll('nope')).resolves.toEqual({
+        status: 'expired',
+      });
     });
 
     it('answers expired for a row past its TTL even when it was approved', async () => {
@@ -159,7 +176,9 @@ describe('LauncherDeviceService', () => {
           expiresAt: new Date(Date.now() - 1),
         }) as never,
       );
-      await expect(service.poll(DEVICE)).resolves.toEqual({ status: 'expired' });
+      await expect(service.poll(DEVICE)).resolves.toEqual({
+        status: 'expired',
+      });
       expect(repo.consume).not.toHaveBeenCalled();
       expect(auth.signSession).not.toHaveBeenCalled();
     });
@@ -236,7 +255,9 @@ describe('LauncherDeviceService', () => {
       );
       repo.consume.mockResolvedValue(false);
 
-      await expect(service.poll(DEVICE)).resolves.toEqual({ status: 'expired' });
+      await expect(service.poll(DEVICE)).resolves.toEqual({
+        status: 'expired',
+      });
       expect(auth.signSession).not.toHaveBeenCalled();
       expect(packsRepo.audit).not.toHaveBeenCalled();
     });
@@ -246,7 +267,9 @@ describe('LauncherDeviceService', () => {
         row({ status: 'approved', userId: 7 }) as never,
       );
       users.getUserById.mockResolvedValue(null as never);
-      await expect(service.poll(DEVICE)).rejects.toBeInstanceOf(NotFoundException);
+      await expect(service.poll(DEVICE)).rejects.toBeInstanceOf(
+        NotFoundException,
+      );
     });
   });
 
@@ -276,7 +299,9 @@ describe('LauncherDeviceService', () => {
 
   describe('approve', () => {
     it('requires a verified email', async () => {
-      users.getUserById.mockResolvedValue(user({ emailVerified: false }) as never);
+      users.getUserById.mockResolvedValue(
+        user({ emailVerified: false }) as never,
+      );
       await expect(service.approve('BCDF-GHJK', 7)).rejects.toBeInstanceOf(
         ForbiddenException,
       );
@@ -296,13 +321,16 @@ describe('LauncherDeviceService', () => {
       expect(repo.decide).toHaveBeenCalledWith('BCDF-GHJK', 'approved', 7);
     });
 
-    it.each([['BCDF-GHJK'], ['bcdfghjk'], ['bcdf-ghjk'], ['BCDFGHJK'], ['bCdF gHjK']])(
-      'resolves the pasted form %s to the canonical code',
-      async (pasted) => {
-        await service.approve(pasted, 7);
-        expect(repo.decide).toHaveBeenCalledWith('BCDF-GHJK', 'approved', 7);
-      },
-    );
+    it.each([
+      ['BCDF-GHJK'],
+      ['bcdfghjk'],
+      ['bcdf-ghjk'],
+      ['BCDFGHJK'],
+      ['bCdF gHjK'],
+    ])('resolves the pasted form %s to the canonical code', async (pasted) => {
+      await service.approve(pasted, 7);
+      expect(repo.decide).toHaveBeenCalledWith('BCDF-GHJK', 'approved', 7);
+    });
 
     it('400s when the conditional UPDATE loses (expired or already decided)', async () => {
       // repo.decide is the arbiter: its WHERE demands pending AND expiresAt > NOW().

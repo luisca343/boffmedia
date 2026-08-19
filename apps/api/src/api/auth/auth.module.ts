@@ -1,6 +1,7 @@
 import { HttpModule } from '@nestjs/axios';
 import { Module } from '@nestjs/common';
 import { PassportModule } from '@nestjs/passport';
+import { ScheduleModule } from '@nestjs/schedule';
 import { JwtModule } from '@nestjs/jwt';
 import { env } from '@/config/env';
 import { GoogleStrategy } from './google.strategy';
@@ -17,9 +18,11 @@ import { StarbankModule } from '@api/smartrotom/starbank/starbank.module';
 import { BoffMediaUsersModule } from '@api/boffmedia/users/users.module';
 import { PasswordModule } from './password.module';
 import { MailModule } from '@api/mail/mail.module';
+import { TokenSweeperService } from './token-sweeper.service';
 
 @Module({
   imports: [
+    ScheduleModule.forRoot(),
     PassportModule,
     DrizzleModule,
     StarbankModule,
@@ -42,6 +45,7 @@ import { MailModule } from '@api/mail/mail.module';
     EmailVerificationService,
     MinecraftLinkService,
     MinecraftHandshakeService,
+    TokenSweeperService,
   ],
   exports: [
     AuthService,

@@ -70,6 +70,28 @@ describe('DocumentsController — integration (ValidationPipe + GlobalExceptionF
       .compile();
 
     app = module.createNestApplication();
+
+    // These routes are no longer public: the identity that used to come from
+
+    // the URL or the body is now taken from the authenticated principal.
+
+    // This suite covers the ValidationPipe and the exception filter, so it
+
+    // runs as a signed-in caller.
+
+    app.use((req: any, _res: any, next: any) => {
+      req.user = {
+        userId: 1,
+
+        username: 'tester',
+
+        roles: ['BOFF_ADMIN', 'ROTOM_ADMIN'],
+
+        mcUuid: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4',
+      };
+
+      next();
+    });
     app.useGlobalPipes(
       new ValidationPipe({
         whitelist: true,
@@ -101,15 +123,15 @@ describe('DocumentsController — integration (ValidationPipe + GlobalExceptionF
       );
 
       expect(res.status).toBe(200);
-      expect(mockFacade.getDocumentById).toHaveBeenCalledWith(1);
+      expect(mockFacade.getDocumentById).toHaveBeenCalledWith(1, MOCK_UUID);
     });
 
-    it('returns 500 when id is non-numeric', async () => {
+    it('returns 400 when id is non-numeric (ParseIntPipe)', async () => {
       const res = await request(app.getHttpServer()).get(
         '/smartrotom/documents/document/abc',
       );
 
-      expect(res.status).toBe(500);
+      expect(res.status).toBe(400);
     });
   });
 
@@ -117,10 +139,14 @@ describe('DocumentsController — integration (ValidationPipe + GlobalExceptionF
 
   // ── POST /smartrotom/documents/document ────────────────────────────────
   describe('POST /smartrotom/documents/document', () => {
-    it('returns 201 and delegates to facade.createDocument', async () => {
-      (mockFacade.createDocument! as jest.Mock).mockResolvedValue({
+    it('returns 201 and creates a note owned by the caller', async () => {
+      (mockFacade.createNoteWithUser! as jest.Mock).mockResolvedValue({
         id: 1,
-        title: 'Doc',
+        success: true,
+      } as any);
+      (mockFacade.getDocumentById! as jest.Mock).mockResolvedValue({
+        id: 1,
+        title: 'My Doc',
       } as any);
 
       const res = await request(app.getHttpServer())
@@ -128,10 +154,13 @@ describe('DocumentsController — integration (ValidationPipe + GlobalExceptionF
         .send({ title: 'My Doc', content: 'Hello world', type: 1 });
 
       expect(res.status).toBe(201);
-      expect(mockFacade.createDocument).toHaveBeenCalledWith({
+      // The note is created FOR the caller: the uuid comes from the session,
+      // and the route no longer accepts one in the body.
+      expect(mockFacade.createNoteWithUser).toHaveBeenCalledWith({
         title: 'My Doc',
         content: 'Hello world',
         type: 1,
+        uuid: MOCK_UUID,
       });
     });
 
@@ -167,17 +196,17 @@ describe('DocumentsController — integration (ValidationPipe + GlobalExceptionF
         .send({ title: 'Updated' });
 
       expect(res.status).toBe(200);
-      expect(mockFacade.updateDocument).toHaveBeenCalledWith(1, {
+      expect(mockFacade.updateDocument).toHaveBeenCalledWith(1, MOCK_UUID, {
         title: 'Updated',
       });
     });
 
-    it('returns 500 when id is non-numeric', async () => {
+    it('returns 400 when id is non-numeric (ParseIntPipe)', async () => {
       const res = await request(app.getHttpServer())
         .put('/smartrotom/documents/document/abc')
         .send({ title: 'Updated' });
 
-      expect(res.status).toBe(500);
+      expect(res.status).toBe(400);
     });
   });
 
@@ -195,47 +224,34 @@ describe('DocumentsController — integration (ValidationPipe + GlobalExceptionF
       );
 
       expect(res.status).toBe(200);
-      expect(mockFacade.deleteDocument).toHaveBeenCalledWith(1);
+      expect(mockFacade.deleteDocument).toHaveBeenCalledWith(1, MOCK_UUID);
     });
   });
 
-  // ==================== POST /smartrotom/documents/notes ====================
-
-  // ── POST /smartrotom/documents/notes ───────────────────────────────────
-  describe('POST /smartrotom/documents/notes', () => {
-    it('returns 201 and delegates to facade.getUserNotes', async () => {
-      (mockFacade.getUserNotes! as jest.Mock).mockResolvedValue([] as any);
-
-      const res = await request(app.getHttpServer())
-        .post('/smartrotom/documents/notes')
-        .send({ uuid: MOCK_UUID });
-
-      expect(res.status).toBe(201);
-      expect(mockFacade.getUserNotes).toHaveBeenCalledWith(MOCK_UUID);
-    });
-
-    it('returns 400 when uuid is missing', async () => {
-      const res = await request(app.getHttpServer())
-        .post('/smartrotom/documents/notes')
-        .send({});
-
-      expect(res.status).toBe(400);
-    });
-  });
-
-  // ==================== GET /smartrotom/documents/all/:uuid ====================
-
-  // ── GET /smartrotom/documents/all/:uuid ────────────────────────────────
-  describe('GET /smartrotom/documents/all/:uuid', () => {
-    it('returns 200 and delegates to facade.getUserNotes (legacy)', async () => {
+  // ── GET /smartrotom/documents/notes ────────────────────────────────────
+  // The listing routes lost their `:uuid` / body uuid entirely: the owner is
+  // the session. `POST /notes { uuid }` and the legacy `GET /all/:uuid` are
+  // gone, because both let a caller name whose notes to read.
+  describe('GET /smartrotom/documents/notes', () => {
+    it("returns 200 and lists the CALLER's notes", async () => {
       (mockFacade.getUserNotes! as jest.Mock).mockResolvedValue([] as any);
 
       const res = await request(app.getHttpServer()).get(
-        `/smartrotom/documents/all/${MOCK_UUID}`,
+        '/smartrotom/documents/notes',
       );
 
       expect(res.status).toBe(200);
       expect(mockFacade.getUserNotes).toHaveBeenCalledWith(MOCK_UUID);
+    });
+  });
+
+  describe('removed legacy routes', () => {
+    it('no longer serves GET /smartrotom/documents/all/:uuid', async () => {
+      const res = await request(app.getHttpServer()).get(
+        `/smartrotom/documents/all/${MOCK_UUID}`,
+      );
+
+      expect(res.status).toBe(404);
     });
   });
 
@@ -251,7 +267,7 @@ describe('DocumentsController — integration (ValidationPipe + GlobalExceptionF
 
       const res = await request(app.getHttpServer())
         .post('/smartrotom/documents/create')
-        .send({ title: 'Note', content: 'Body', type: 0, uuid: MOCK_UUID });
+        .send({ title: 'Note', content: 'Body', type: 0 });
 
       expect(res.status).toBe(201);
       expect(mockFacade.createNoteWithUser).toHaveBeenCalledWith({
@@ -280,18 +296,19 @@ describe('DocumentsController — integration (ValidationPipe + GlobalExceptionF
       expect(res.status).toBe(201);
       expect(mockFacade.saveDocument).toHaveBeenCalledWith(
         1,
+        MOCK_UUID,
         'My Note',
         'Updated content',
         1,
       );
     });
 
-    it('returns 500 when id is non-numeric', async () => {
+    it('returns 400 when id is non-numeric (ParseIntPipe)', async () => {
       const res = await request(app.getHttpServer())
         .post('/smartrotom/documents/save/abc')
         .send({ title: 'x', content: 'y', type: 0 });
 
-      expect(res.status).toBe(500);
+      expect(res.status).toBe(400);
     });
   });
 

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
 import { WingullEconomyService } from './services/wingull-economy.service';
 import { WingullPlayerService } from './services/wingull-player.service';
 import { WingullWorldService } from './services/wingull-world.service';
@@ -32,6 +32,9 @@ export class WingullFacadeService {
       return await this.wingullEconomyService.updateBalance(balanceData);
     } catch (error: any) {
       this.logger.error('Error updating balance:', error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to update balance: ${error.message}`);
     }
   }
@@ -41,6 +44,9 @@ export class WingullFacadeService {
       return await this.wingullEconomyService.getCurrentBalance(uuid, amount);
     } catch (error: any) {
       this.logger.error(`Error getting current balance for ${uuid}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to get current balance: ${error.message}`);
     }
   }
@@ -50,6 +56,9 @@ export class WingullFacadeService {
       return await this.wingullEconomyService.getMoney(uuid);
     } catch (error: any) {
       this.logger.error(`Error getting money for ${uuid}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to get money: ${error.message}`);
     }
   }
@@ -61,6 +70,9 @@ export class WingullFacadeService {
       return await this.wingullPlayerService.getStats(uuid);
     } catch (error: any) {
       this.logger.error(`Error getting stats for ${uuid}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to get stats: ${error.message}`);
     }
   }
@@ -70,6 +82,9 @@ export class WingullFacadeService {
       return await this.wingullPlayerService.getTeam(uuid);
     } catch (error: any) {
       this.logger.error(`Error getting team for ${uuid}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to get team: ${error.message}`);
     }
   }
@@ -79,6 +94,9 @@ export class WingullFacadeService {
       return await this.wingullPlayerService.getPC(uuid);
     } catch (error: any) {
       this.logger.error(`Error getting PC for ${uuid}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to get PC: ${error.message}`);
     }
   }
@@ -88,6 +106,9 @@ export class WingullFacadeService {
       return await this.wingullPlayerService.movePokemon(movePokemonDto);
     } catch (error: any) {
       this.logger.error(`Error moving Pokémon:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to move Pokémon: ${error.message}`);
     }
   }
@@ -97,6 +118,9 @@ export class WingullFacadeService {
       return await this.wingullPlayerService.updateDex(uuid);
     } catch (error: any) {
       this.logger.error(`Error updating dex for ${uuid}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to update dex: ${error.message}`);
     }
   }
@@ -106,6 +130,9 @@ export class WingullFacadeService {
       return await this.wingullPlayerService.getQuests(uuid);
     } catch (error: any) {
       this.logger.error(`Error getting quests for ${uuid}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to get quests: ${error.message}`);
     }
   }
@@ -115,6 +142,9 @@ export class WingullFacadeService {
       return await this.wingullPlayerService.sendMessage(uuid, message);
     } catch (error: any) {
       this.logger.error(`Error sending message to ${uuid}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to send message: ${error.message}`);
     }
   }
@@ -127,6 +157,9 @@ export class WingullFacadeService {
         `Error sending global chat message for ${uuid}:`,
         error,
       );
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to send global chat message: ${error.message}`);
     }
   }
@@ -144,6 +177,9 @@ export class WingullFacadeService {
       );
     } catch (error: any) {
       this.logger.error(`Error giving Pokémon to ${uuid}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to give Pokémon: ${error.message}`);
     }
   }
@@ -161,6 +197,9 @@ export class WingullFacadeService {
       return await this.wingullPlayerService.giveItems(uuid, items);
     } catch (error: any) {
       this.logger.error(`Error giving items to ${uuid}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to give items: ${error.message}`);
     }
   }
@@ -182,6 +221,9 @@ export class WingullFacadeService {
       );
     } catch (error: any) {
       this.logger.error(`Error taking Pokémon from ${uuid}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to take Pokémon: ${error.message}`);
     }
   }
@@ -194,6 +236,9 @@ export class WingullFacadeService {
       return await this.wingullPlayerService.takeItems(uuid, items);
     } catch (error: any) {
       this.logger.error(`Error taking items from ${uuid}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to take items: ${error.message}`);
     }
   }
@@ -224,6 +269,9 @@ export class WingullFacadeService {
       return data;
     } catch (error: any) {
       this.logger.error(`Error getting battle teams for ${uuid}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to get battle teams: ${error.message}`);
     }
   }
@@ -237,6 +285,9 @@ export class WingullFacadeService {
       );
     } catch (error: any) {
       this.logger.error('Error updating battle team:', error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to update battle team: ${error.message}`);
     }
   }
@@ -248,6 +299,9 @@ export class WingullFacadeService {
       return await this.wingullWorldService.getPerformance();
     } catch (error: any) {
       this.logger.error('Error getting performance data:', error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to get performance data: ${error.message}`);
     }
   }
@@ -257,6 +311,9 @@ export class WingullFacadeService {
       return await this.wingullWorldService.getRegions();
     } catch (error: any) {
       this.logger.error('Error getting regions data:', error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to get regions data: ${error.message}`);
     }
   }
@@ -266,6 +323,9 @@ export class WingullFacadeService {
       return await this.wingullWorldService.getWeather();
     } catch (error: any) {
       this.logger.error('Error getting weather data:', error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to get weather data: ${error.message}`);
     }
   }
@@ -275,6 +335,9 @@ export class WingullFacadeService {
       return await this.wingullWorldService.updateNPCs(data);
     } catch (error: any) {
       this.logger.error('Error updating NPCs:', error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to update NPCs: ${error.message}`);
     }
   }
@@ -290,6 +353,9 @@ export class WingullFacadeService {
       return await this.wingullTransportService.getTaxiStops();
     } catch (error: any) {
       this.logger.error('Error getting taxi stops:', error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to get taxi stops: ${error.message}`);
     }
   }
@@ -299,6 +365,9 @@ export class WingullFacadeService {
       return await this.wingullTransportService.getPlayerPosition(uuid);
     } catch (error: any) {
       this.logger.error(`Error reading the position of ${uuid}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to read player position: ${error.message}`);
     }
   }

@@ -37,11 +37,13 @@ export interface INoteOrganizationRepository {
     color: string;
     parentId: number | null;
   }): Promise<{ insertId: number }>;
+  /** Owner-scoped. Returns the number of rows the query actually matched. */
   updateFolder(
     id: number,
+    ownerUuid: string,
     data: { name?: string; color?: string; parentId?: number | null },
-  ): Promise<void>;
-  deleteFolder(id: number): Promise<void>;
+  ): Promise<number>;
+  deleteFolder(id: number, ownerUuid: string): Promise<number>;
 
   findTagsByUser(uuid: string): Promise<TagRow[]>;
   createTag(data: {
@@ -51,9 +53,10 @@ export interface INoteOrganizationRepository {
   }): Promise<{ insertId: number }>;
   updateTag(
     id: number,
+    ownerUuid: string,
     data: { label?: string; color?: string },
-  ): Promise<void>;
-  deleteTag(id: number): Promise<void>;
+  ): Promise<number>;
+  deleteTag(id: number, ownerUuid: string): Promise<number>;
 
   findTagIdsByDocumentIds(ids: number[]): Promise<TagLink[]>;
   findTagLink(documentId: number, tagId: number): Promise<TagLink | null>;

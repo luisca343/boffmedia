@@ -1,4 +1,3 @@
-import { sql } from 'drizzle-orm';
 import {
   char,
   int,
@@ -13,9 +12,7 @@ export const sharexImages = mysqlTable('sharex_images', {
   name: char('name', { length: 10 }).notNull(),
   extension: varchar('extension', { length: 4 }).notNull(),
   key: char('key', { length: 32 }).notNull(),
-  createdAt: timestamp('created_at')
-    .notNull()
-    .default(sql`CURRENT_TIMESTAMP()`),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
 });
 
 export type SharexImage = typeof sharexImages.$inferSelect;

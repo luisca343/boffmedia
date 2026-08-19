@@ -15,7 +15,6 @@ import {
   packs,
 } from '@/_db/schema/Packs';
 import {
-  EVENT_STATUS,
   PARTICIPANT_STATUS,
   boffMediaEventParticipants,
   boffMediaEvents,

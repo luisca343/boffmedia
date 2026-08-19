@@ -1,7 +1,6 @@
-import { sql } from 'drizzle-orm';
 import {
+  char,
   boolean,
-  index,
   int,
   json,
   mysqlTable,
@@ -9,6 +8,7 @@ import {
   uniqueIndex,
   varchar,
 } from 'drizzle-orm/mysql-core';
+import { rotomUsers } from './SmartRotom';
 
 // PC marks: favourites + tags for Pokémon stored in the SmartRotom PC.
 // The Pokémon live on the external Pixelmon server and have NO id — their
@@ -19,16 +19,21 @@ export const rotomPcMarks = mysqlTable(
   'rotom_pc_marks',
   {
     id: int('id').primaryKey().autoincrement(),
-    userUuid: varchar('user_uuid', { length: 64 }).notNull(),
+    // Was varchar(64) with no constraint at all: the owner column of a
+    // player-owned table, unable to be joined cleanly and free to hold a uuid
+    // that belongs to nobody. Now the same char(36) FK every other
+    // player-owned table uses.
+    userUuid: char('user_uuid', { length: 36 })
+      .notNull()
+      .references(() => rotomUsers.uuid, {
+        onDelete: 'cascade',
+        onUpdate: 'cascade',
+      }),
     pokemonKey: varchar('pokemon_key', { length: 64 }).notNull(),
     favorite: boolean('favorite').notNull().default(false),
     tags: json('tags').$type<string[]>().notNull().default([]),
-    createdAt: timestamp('created_at')
-      .notNull()
-      .default(sql`CURRENT_TIMESTAMP()`),
-    updatedAt: timestamp('updated_at')
-      .notNull()
-      .default(sql`CURRENT_TIMESTAMP()`),
+    createdAt: timestamp('created_at').notNull().defaultNow(),
+    updatedAt: timestamp('updated_at').notNull().defaultNow().onUpdateNow(),
   },
   (t) => ({
     userKeyIdx: uniqueIndex('rotom_pc_marks_user_key_idx').on(

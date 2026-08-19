@@ -58,6 +58,8 @@ export class UsersController {
   }
 
   @Public()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.ROTOM_ADMIN)
   @Post()
   @ApiOperation({ summary: 'Create a new user' })
   @ApiResponse({
@@ -126,6 +128,8 @@ export class UsersController {
   }
 
   @Public()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.ROTOM_ADMIN)
   @Patch(':id')
   @ApiOperation({ summary: 'Update a user by ID' })
   @ApiResponse({
@@ -188,6 +192,8 @@ export class UsersController {
   // ==================== ENHANCED OPERATIONS ====================
 
   @Public()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.ROTOM_ADMIN)
   @Post('find-or-create')
   @ApiOperation({ summary: 'Find or create a user' })
   @ApiResponse({
@@ -216,6 +222,8 @@ export class UsersController {
   }
 
   @Public()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.ROTOM_ADMIN)
   @Post('initialize')
   @ApiOperation({ summary: 'Initialize user and accounts' })
   @ApiResponse({
@@ -258,6 +266,8 @@ export class UsersController {
   }
 
   @Public()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.ROTOM_ADMIN)
   @Post('batch')
   @ApiOperation({ summary: 'Get multiple users by UUIDs' })
   @ApiResponse({
@@ -283,6 +293,8 @@ export class UsersController {
   }
 
   @Public()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.ROTOM_ADMIN)
   @Post('batch/accounts')
   @ApiOperation({ summary: 'Get multiple users with their accounts' })
   @ApiResponse({

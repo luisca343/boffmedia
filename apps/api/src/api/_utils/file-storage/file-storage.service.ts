@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { HttpException, Injectable, Logger } from '@nestjs/common';
 import * as path from 'path';
 import * as fs from 'fs/promises';
 import axios from 'axios';
@@ -36,6 +36,9 @@ export class FileStorageService {
       await fs.mkdir(path.dirname(filePath), { recursive: true });
       await fs.writeFile(filePath, JSON.stringify(data, null, 2));
     } catch (error: any) {
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(
         `Failed to write file ${filename} in ${subdir}: ${error.message}`,
       );
@@ -51,6 +54,9 @@ export class FileStorageService {
       if (error.code === 'ENOENT') {
         return null;
       }
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(
         `Failed to read file ${filename} in ${subdir}: ${error.message}`,
       );

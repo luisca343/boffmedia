@@ -40,12 +40,20 @@ describe('EventInvitesService', () => {
     it('defaults maxUses to 1 and expiresAt to null', async () => {
       await service.create(42, 3);
       expect(repo.create).toHaveBeenCalledWith(
-        expect.objectContaining({ eventId: 42, createdBy: 3, maxUses: 1, expiresAt: null }),
+        expect.objectContaining({
+          eventId: 42,
+          createdBy: 3,
+          maxUses: 1,
+          expiresAt: null,
+        }),
       );
     });
 
     it('honours an explicit maxUses and expiresAt', async () => {
-      await service.create(42, 3, { maxUses: 25, expiresAt: '2026-09-01T12:00:00.000Z' });
+      await service.create(42, 3, {
+        maxUses: 25,
+        expiresAt: '2026-09-01T12:00:00.000Z',
+      });
       const row = repo.create.mock.calls[0][0];
       expect(row.maxUses).toBe(25);
       expect(row.expiresAt).toBeInstanceOf(Date);
@@ -53,9 +61,9 @@ describe('EventInvitesService', () => {
     });
 
     it('rejects a maxUses below 1 before touching the repository', async () => {
-      await expect(service.create(42, 3, { maxUses: 0 })).rejects.toBeInstanceOf(
-        BadRequestException,
-      );
+      await expect(
+        service.create(42, 3, { maxUses: 0 }),
+      ).rejects.toBeInstanceOf(BadRequestException);
       expect(repo.create).not.toHaveBeenCalled();
     });
 
@@ -75,14 +83,18 @@ describe('EventInvitesService', () => {
 
     it('throws when the created row cannot be read back', async () => {
       repo.findByCode.mockResolvedValue(undefined);
-      await expect(service.create(42, 3)).rejects.toBeInstanceOf(NotFoundException);
+      await expect(service.create(42, 3)).rejects.toBeInstanceOf(
+        NotFoundException,
+      );
     });
   });
 
   describe('getByCode', () => {
     it('404s an unknown code', async () => {
       repo.findByCode.mockResolvedValue(undefined);
-      await expect(service.getByCode('nope')).rejects.toBeInstanceOf(NotFoundException);
+      await expect(service.getByCode('nope')).rejects.toBeInstanceOf(
+        NotFoundException,
+      );
     });
   });
 
@@ -94,12 +106,16 @@ describe('EventInvitesService', () => {
       // After revocation the conditional UPDATE stops matching, so a redemption
       // of the same code loses even though the row still reads back.
       repo.consume.mockResolvedValue(false);
-      await expect(service.consume('ABC')).rejects.toBeInstanceOf(BadRequestException);
+      await expect(service.consume('ABC')).rejects.toBeInstanceOf(
+        BadRequestException,
+      );
     });
 
     it('404s an unknown code and revokes nothing', async () => {
       repo.findByCode.mockResolvedValue(undefined);
-      await expect(service.revoke('nope')).rejects.toBeInstanceOf(NotFoundException);
+      await expect(service.revoke('nope')).rejects.toBeInstanceOf(
+        NotFoundException,
+      );
       expect(repo.revoke).not.toHaveBeenCalled();
     });
   });
@@ -114,7 +130,9 @@ describe('EventInvitesService', () => {
 
     it('404s a code that does not exist at all', async () => {
       repo.findByCode.mockResolvedValue(undefined);
-      await expect(service.consume('nope')).rejects.toBeInstanceOf(NotFoundException);
+      await expect(service.consume('nope')).rejects.toBeInstanceOf(
+        NotFoundException,
+      );
       expect(repo.consume).not.toHaveBeenCalled();
     });
 
@@ -122,18 +140,27 @@ describe('EventInvitesService', () => {
       ['revoked', invite({ revoked: true })],
       ['exhausted', invite({ uses: 1, maxUses: 1 })],
       ['expired', invite({ expiresAt: new Date('2020-01-01T00:00:00Z') })],
-    ])('throws when the guard reports 0 affected rows (%s)', async (_label, row) => {
-      repo.findByCode.mockResolvedValue(row as never);
-      repo.consume.mockResolvedValue(false);
-      await expect(service.consume(row.code)).rejects.toBeInstanceOf(BadRequestException);
-    });
+    ])(
+      'throws when the guard reports 0 affected rows (%s)',
+      async (_label, row) => {
+        repo.findByCode.mockResolvedValue(row as never);
+        repo.consume.mockResolvedValue(false);
+        await expect(service.consume(row.code)).rejects.toBeInstanceOf(
+          BadRequestException,
+        );
+      },
+    );
 
     it('trusts the guard over the row it read: a stale-looking row still wins', async () => {
       // The read is advisory. If the UPDATE matched, the redemption is valid —
       // the service must not second-guess it from a snapshot taken earlier.
-      repo.findByCode.mockResolvedValue(invite({ uses: 1, maxUses: 1 }) as never);
+      repo.findByCode.mockResolvedValue(
+        invite({ uses: 1, maxUses: 1 }) as never,
+      );
       repo.consume.mockResolvedValue(true);
-      await expect(service.consume('ABC')).resolves.toMatchObject({ eventId: 42 });
+      await expect(service.consume('ABC')).resolves.toMatchObject({
+        eventId: 42,
+      });
     });
 
     it('double-spend: of two concurrent redemptions only one wins', async () => {

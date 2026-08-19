@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
 import { Response } from 'express';
 import { MyrientScrapeService } from './services/myrient.service';
 import { MangaScraperService } from './services/manga.service';
@@ -83,6 +83,9 @@ export class ScrapeFacadeService {
       return await this.myrientScrapeService.scrapeCatalog(consoleKey, regions);
     } catch (error: unknown) {
       this.logger.error('Error scraping Myrient catalog:', error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to scrape catalog: ${(error as Error).message}`);
     }
   }
@@ -94,6 +97,9 @@ export class ScrapeFacadeService {
       return await this.myrientScrapeService.downloadGame(url);
     } catch (error: unknown) {
       this.logger.error('Error downloading game from Myrient:', error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to download game: ${(error as Error).message}`);
     }
   }
@@ -105,6 +111,9 @@ export class ScrapeFacadeService {
       return await this.myrientScrapeService.downloadAllGames(dto);
     } catch (error: unknown) {
       this.logger.error('Error in bulk download from Myrient:', error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Bulk download failed: ${(error as Error).message}`);
     }
   }
@@ -116,6 +125,9 @@ export class ScrapeFacadeService {
       return await this.myrientScrapeService.downloadSelectedGames(dto);
     } catch (error: unknown) {
       this.logger.error('Error in selected download from Myrient:', error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Selected download failed: ${(error as Error).message}`);
     }
   }
@@ -132,6 +144,9 @@ export class ScrapeFacadeService {
     try {
       return await this.mangaScraperService.searchNovels(query);
     } catch (error: unknown) {
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to search manga: ${(error as Error).message}`);
     }
   }
@@ -142,6 +157,9 @@ export class ScrapeFacadeService {
     try {
       return await this.mangaScraperService.getNovelInfo(novelUrl);
     } catch (error: unknown) {
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(
         `Failed to fetch novel info: ${(error as Error).message}`,
       );
@@ -152,6 +170,9 @@ export class ScrapeFacadeService {
     try {
       return await this.mangaScraperService.getChapterList(novelUrl);
     } catch (error: unknown) {
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(
         `Failed to fetch chapter list: ${(error as Error).message}`,
       );
@@ -168,6 +189,9 @@ export class ScrapeFacadeService {
         saveDir,
       );
     } catch (error: unknown) {
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(
         `Failed to download chapter: ${(error as Error).message}`,
       );

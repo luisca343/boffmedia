@@ -39,12 +39,8 @@ export const boffMediaGames = mysqlTable('boffmedia_games', {
   title: varchar('title', { length: 255 }).notNull(),
   description: text('description'),
   icon: varchar('icon', { length: 255 }).notNull(),
-  createdAt: timestamp('created_at')
-    .notNull()
-    .default(sql`CURRENT_TIMESTAMP()`),
-  updatedAt: timestamp('updated_at')
-    .notNull()
-    .default(sql`CURRENT_TIMESTAMP() ON UPDATE CURRENT_TIMESTAMP()`),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow().onUpdateNow(),
   deletedAt: timestamp('deleted_at'),
 });
 
@@ -88,12 +84,8 @@ export const boffMediaEvents = mysqlTable(
       .default(VISIBILITY_STATUS.PRIVATE),
     type: mysqlEnum('type', ['event', 'server']).notNull(),
     packId: varchar('pack_id', { length: 32 }),
-    createdAt: timestamp('created_at')
-      .notNull()
-      .default(sql`CURRENT_TIMESTAMP()`),
-    updatedAt: timestamp('updated_at')
-      .notNull()
-      .default(sql`CURRENT_TIMESTAMP() ON UPDATE CURRENT_TIMESTAMP()`),
+    createdAt: timestamp('created_at').notNull().defaultNow(),
+    updatedAt: timestamp('updated_at').notNull().defaultNow().onUpdateNow(),
     deletedAt: timestamp('deleted_at'),
   },
   (table) => {
@@ -121,12 +113,8 @@ export const boffMediaParticipants = mysqlTable(
     userId: int('user_id'), // May be null for anonymous participants
     nickname: varchar('nickname', { length: 32 }),
     avatar: varchar('avatar', { length: 255 }),
-    createdAt: timestamp('created_at')
-      .notNull()
-      .default(sql`CURRENT_TIMESTAMP()`),
-    updatedAt: timestamp('updated_at')
-      .notNull()
-      .default(sql`CURRENT_TIMESTAMP() ON UPDATE CURRENT_TIMESTAMP()`),
+    createdAt: timestamp('created_at').notNull().defaultNow(),
+    updatedAt: timestamp('updated_at').notNull().defaultNow().onUpdateNow(),
   },
   (table) => {
     return {
@@ -164,12 +152,8 @@ export const boffMediaEventTeams = mysqlTable(
     status: mysqlEnum('status', ['active', 'disqualified', 'withdrew'])
       .notNull()
       .default('active'),
-    createdAt: timestamp('created_at')
-      .notNull()
-      .default(sql`CURRENT_TIMESTAMP()`),
-    updatedAt: timestamp('updated_at')
-      .notNull()
-      .default(sql`CURRENT_TIMESTAMP() ON UPDATE CURRENT_TIMESTAMP()`),
+    createdAt: timestamp('created_at').notNull().defaultNow(),
+    updatedAt: timestamp('updated_at').notNull().defaultNow().onUpdateNow(),
     deletedAt: timestamp('deleted_at'),
   },
   (table) => {
@@ -190,9 +174,7 @@ export const boffMediaEventTeamMembers = mysqlTable(
     joinedAt: timestamp('joined_at')
       .notNull()
       .default(sql`CURRENT_TIMESTAMP()`),
-    updatedAt: timestamp('updated_at')
-      .notNull()
-      .default(sql`CURRENT_TIMESTAMP() ON UPDATE CURRENT_TIMESTAMP()`),
+    updatedAt: timestamp('updated_at').notNull().defaultNow().onUpdateNow(),
   },
   (table) => {
     return {
@@ -233,12 +215,8 @@ export const boffMediaEventParticipants = mysqlTable(
       .notNull()
       .default(PARTICIPANT_STATUS.REGISTERED),
     comment: text('comment'),
-    createdAt: timestamp('created_at')
-      .notNull()
-      .default(sql`CURRENT_TIMESTAMP()`),
-    updatedAt: timestamp('updated_at')
-      .notNull()
-      .default(sql`CURRENT_TIMESTAMP() ON UPDATE CURRENT_TIMESTAMP()`),
+    createdAt: timestamp('created_at').notNull().defaultNow(),
+    updatedAt: timestamp('updated_at').notNull().defaultNow().onUpdateNow(),
   },
   (table) => {
     return {
@@ -285,9 +263,7 @@ export const boffMediaEventInvites = mysqlTable(
     code: varchar('code', { length: 32 }).primaryKey(),
     eventId: int('event_id').notNull(),
     createdBy: int('created_by'),
-    createdAt: timestamp('created_at')
-      .notNull()
-      .default(sql`CURRENT_TIMESTAMP()`),
+    createdAt: timestamp('created_at').notNull().defaultNow(),
     expiresAt: timestamp('expires_at'),
     maxUses: int('max_uses').notNull().default(1),
     uses: int('uses').notNull().default(0),
@@ -341,12 +317,8 @@ export const boffMediaAchievements = mysqlTable(
     ]),
     hidden: boolean('hidden').notNull().default(false),
     order: int('order').notNull().default(0),
-    createdAt: timestamp('created_at')
-      .notNull()
-      .default(sql`CURRENT_TIMESTAMP()`),
-    updatedAt: timestamp('updated_at')
-      .notNull()
-      .default(sql`CURRENT_TIMESTAMP() ON UPDATE CURRENT_TIMESTAMP()`),
+    createdAt: timestamp('created_at').notNull().defaultNow(),
+    updatedAt: timestamp('updated_at').notNull().defaultNow().onUpdateNow(),
     deletedAt: timestamp('deleted_at'),
   },
   (table) => {
@@ -378,9 +350,7 @@ export const boffMediaParticipantProgress = mysqlTable(
     lastUpdated: timestamp('last_updated')
       .notNull()
       .default(sql`CURRENT_TIMESTAMP() ON UPDATE CURRENT_TIMESTAMP()`),
-    createdAt: timestamp('created_at')
-      .notNull()
-      .default(sql`CURRENT_TIMESTAMP()`),
+    createdAt: timestamp('created_at').notNull().defaultNow(),
   },
   (table) => {
     return {
@@ -445,12 +415,8 @@ export const boffMediaEventSuggestions = mysqlTable(
       .notNull()
       .default(SUGGESTION_STATUS.PENDING),
     reviewNote: text('review_note'),
-    createdAt: timestamp('created_at')
-      .notNull()
-      .default(sql`CURRENT_TIMESTAMP()`),
-    updatedAt: timestamp('updated_at')
-      .notNull()
-      .default(sql`CURRENT_TIMESTAMP() ON UPDATE CURRENT_TIMESTAMP()`),
+    createdAt: timestamp('created_at').notNull().defaultNow(),
+    updatedAt: timestamp('updated_at').notNull().defaultNow().onUpdateNow(),
   },
   (table) => {
     return {

@@ -1,5 +1,13 @@
-import { Controller, Get, Post, Body, Param, Delete } from '@nestjs/common';
-import { Public } from '@api/_utils/decorators/public.decorator';
+import { Roles } from '@api/_utils/decorators/roles.decorator';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Delete,
+  UseGuards,
+} from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { TwitchMonitorService } from './services/twitch-monitor.service';
 import { TwitchApiService } from './services/twitch-api.service';
@@ -7,8 +15,13 @@ import { NotificationService } from './services/notification.service';
 import { NotificationTargetDto } from './dto/notification-target.dto';
 import { Logger } from 'nestjs-pino';
 import { SkipEnvelope } from '@/common/decorators/skip-envelope.decorator';
+import { JwtAuthGuard } from '@api/auth/jwt-auth.guard';
+import { RolesGuard } from '@api/_utils/guards/roles.guard';
+import { USER_ROLES } from '@api/_utils/auth/roles.constants';
+import { Public } from '@api/_utils/decorators/public.decorator';
 
 @ApiTags('Automation - Twitch')
+// Stream status is public; changing what is monitored or where notifications land is not.
 @Public()
 @Controller('automation/twitch')
 @SkipEnvelope()
@@ -35,6 +48,8 @@ export class TwitchController {
     };
   }
 
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.BOFF_ADMIN)
   @Post('check-now')
   @ApiOperation({ summary: 'Trigger immediate stream check' })
   @ApiResponse({ status: 200, description: 'Manual check completed' })
@@ -70,6 +85,8 @@ export class TwitchController {
     return titleContains || tagsContain || gameIsPixelmonWingull;
   }
 
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.BOFF_ADMIN)
   @Post('monitor/user/:username')
   @ApiOperation({ summary: 'Add user to monitoring list' })
   @ApiResponse({ status: 200, description: 'User added to monitoring' })
@@ -81,6 +98,8 @@ export class TwitchController {
     };
   }
 
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.BOFF_ADMIN)
   @Delete('monitor/user/:username')
   @ApiOperation({ summary: 'Remove user from monitoring list' })
   @ApiResponse({ status: 200, description: 'User removed from monitoring' })
@@ -92,6 +111,8 @@ export class TwitchController {
     };
   }
 
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.BOFF_ADMIN)
   @Post('notifications/target')
   @ApiOperation({ summary: 'Add notification target' })
   @ApiResponse({ status: 200, description: 'Notification target added' })
@@ -103,6 +124,8 @@ export class TwitchController {
     };
   }
 
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.BOFF_ADMIN)
   @Delete('notifications/target/:type')
   @ApiOperation({ summary: 'Remove notification target' })
   @ApiResponse({ status: 200, description: 'Notification target removed' })

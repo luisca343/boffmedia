@@ -35,6 +35,15 @@
           "search": "Búsqueda y filtros",
           "crosslinks": "Fichas enlazadas"
         }
+      },
+      "steamfree": {
+        "title": "Gratis en Steam",
+        "description": "Juegos que Steam regala ahora mismo al 100 % de descuento, con cuenta atrás para reclamarlos",
+        "features": {
+          "live": "En directo desde Steam",
+          "countdown": "Cuenta atrás",
+          "claim": "Reclamar en un clic"
+        }
       }
     },
     "externalLinks": {
@@ -243,6 +252,57 @@
       "pageOf": "Pág. {page} / {total}",
       "prevPage": "Página anterior",
       "nextPage": "Página siguiente"
+    },
+    "steamfreeApp": {
+      "kicker": "Otros · En directo desde Steam",
+      "titlePre": "Gratis en",
+      "titleEm": "Steam",
+      "sub": "Todos los juegos que Steam está regalando ahora mismo al 100 % de descuento, directo de la tienda. Reclámalo antes de que se acabe el tiempo y es tuyo para siempre — sin clave, sin sorteo, solo tu cuenta de Steam.",
+      "statFree": "gratis ahora",
+      "statKeep": "para siempre",
+      "statValue": "de valor",
+      "searchPlaceholder": "Buscar juego, estudio o editor…",
+      "sortLabel": "Ordenar",
+      "sortEnds": "Acaba antes",
+      "sortValue": "Mayor valor",
+      "sortRating": "Mejor valorados",
+      "sortName": "Nombre",
+      "refresh": "Actualizar",
+      "retry": "Reintentar",
+      "updated": "Actualizado a las {time}",
+      "sourceLink": "Abrir en Steam",
+      "claim": "Reclamar en Steam",
+      "details": "Ficha",
+      "close": "Cerrar",
+      "endsIn": "Acaba en",
+      "endsUnknown": "Sin fecha límite",
+      "ended": "Oferta terminada",
+      "deadline": "Tiempo que queda para reclamar la oferta",
+      "keep": "Para siempre",
+      "keepNote": "Reclámalo antes de que acabe el contador y se queda en tu biblioteca para siempre, aunque termine la promoción.",
+      "weekend": "Prueba gratis",
+      "weekendNote": "Gratis para jugar mientras dure la promoción — no se queda en tu biblioteca después.",
+      "saves": "te ahorras el precio completo",
+      "reviews": "reseñas",
+      "noReviews": "Todavía sin reseñas",
+      "developer": "Desarrollador",
+      "publisher": "Editor",
+      "release": "Lanzamiento",
+      "platforms": "Plataformas",
+      "genres": "Géneros",
+      "officialSite": "Sitio oficial",
+      "tabInfo": "Info",
+      "tabMedia": "Media",
+      "detailLoading": "Cargando ficha de Steam…",
+      "viewSteam": "Página de la tienda",
+      "mediaN": "Media {n}",
+      "emptyTitle": "Nada gratis ahora mismo",
+      "emptyLead": "Steam no tiene juegos al 100 % de descuento en este momento. Vuelve pronto — las promociones suelen durar unos días.",
+      "emptySearchTitle": "Sin coincidencias",
+      "emptySearch": "Nada coincide con «{q}».",
+      "clearSearch": "Limpiar búsqueda",
+      "errorTitle": "No se pudo contactar con Steam",
+      "errorLead": "La tienda no respondió. Suele ser algo temporal."
     }
   }
 }

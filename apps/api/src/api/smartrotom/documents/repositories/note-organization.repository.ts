@@ -71,18 +71,29 @@ export class NoteOrganizationRepository implements INoteOrganizationRepository {
     return { insertId: result[0].insertId };
   }
 
+  // Owner is part of the WHERE, not a pre-check: a folder id from another
+  // player simply matches no row, so the query itself cannot cross owners.
   async updateFolder(
     id: number,
+    ownerUuid: string,
     data: { name?: string; color?: string; parentId?: number | null },
-  ): Promise<void> {
-    await this.db
+  ): Promise<number> {
+    const result = await this.db
       .update(rotomNoteFolders)
-      .set({ ...data, updatedAt: new Date() })
-      .where(eq(rotomNoteFolders.id, id));
+      .set(data)
+      .where(
+        and(eq(rotomNoteFolders.id, id), eq(rotomNoteFolders.uuid, ownerUuid)),
+      );
+    return result[0].affectedRows;
   }
 
-  async deleteFolder(id: number): Promise<void> {
-    await this.db.delete(rotomNoteFolders).where(eq(rotomNoteFolders.id, id));
+  async deleteFolder(id: number, ownerUuid: string): Promise<number> {
+    const result = await this.db
+      .delete(rotomNoteFolders)
+      .where(
+        and(eq(rotomNoteFolders.id, id), eq(rotomNoteFolders.uuid, ownerUuid)),
+      );
+    return result[0].affectedRows;
   }
 
   // ==================== TAGS ====================
@@ -114,16 +125,21 @@ export class NoteOrganizationRepository implements INoteOrganizationRepository {
 
   async updateTag(
     id: number,
+    ownerUuid: string,
     data: { label?: string; color?: string },
-  ): Promise<void> {
-    await this.db
+  ): Promise<number> {
+    const result = await this.db
       .update(rotomNoteTags)
       .set(data)
-      .where(eq(rotomNoteTags.id, id));
+      .where(and(eq(rotomNoteTags.id, id), eq(rotomNoteTags.uuid, ownerUuid)));
+    return result[0].affectedRows;
   }
 
-  async deleteTag(id: number): Promise<void> {
-    await this.db.delete(rotomNoteTags).where(eq(rotomNoteTags.id, id));
+  async deleteTag(id: number, ownerUuid: string): Promise<number> {
+    const result = await this.db
+      .delete(rotomNoteTags)
+      .where(and(eq(rotomNoteTags.id, id), eq(rotomNoteTags.uuid, ownerUuid)));
+    return result[0].affectedRows;
   }
 
   // ==================== TAG LINKS ====================

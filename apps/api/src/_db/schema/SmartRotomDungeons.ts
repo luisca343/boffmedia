@@ -1,4 +1,3 @@
-import { sql } from 'drizzle-orm';
 import {
   bigint,
   boolean,
@@ -25,7 +24,7 @@ export const dungeonRuns = mysqlTable('rotom_dungeon_runs', {
   monedasGastadas: int('monedas_gastadas').notNull(),
   monedasConvertidas: int('monedas_convertidas').notNull(),
   fecha: timestamp('fecha').notNull(),
-  createdAt: timestamp('created_at').default(sql`CURRENT_TIMESTAMP()`),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
 });
 
 export type DungeonRun = typeof dungeonRuns.$inferSelect;
@@ -51,8 +50,8 @@ export const dungeonRunPlayers = mysqlTable(
     abandono: boolean('abandono').notNull().default(false),
   },
   (table) => [
-    index('idx_dungeon_run_players_uuid').on(table.uuid),
-    index('idx_dungeon_run_players_run').on(table.runId),
+    index('drp_uuid_idx').on(table.uuid),
+    index('drp_run_idx').on(table.runId),
   ],
 );
 

@@ -1,3 +1,4 @@
+import { Roles } from '@api/_utils/decorators/roles.decorator';
 import {
   Body,
   Controller,
@@ -8,8 +9,8 @@ import {
   HttpStatus,
   ValidationPipe,
   UsePipes,
+  UseGuards,
 } from '@nestjs/common';
-import { Public } from '@api/_utils/decorators/public.decorator';
 import {
   ApiTags,
   ApiOperation,
@@ -43,8 +44,13 @@ import {
 } from './entities/cache-response.entity';
 import { SystemHealthResponse } from './entities/system-health-response.entity';
 import { NPC } from './entities/npc.entity';
+import { JwtAuthGuard } from '@api/auth/jwt-auth.guard';
+import { RolesGuard } from '@api/_utils/guards/roles.guard';
+import { USER_ROLES } from '@api/_utils/auth/roles.constants';
+import { Public } from '@api/_utils/decorators/public.decorator';
 
 @ApiTags('SmartRotom | Misiones')
+// Mission and NPC reads are public (the missions page needs no account); authoring, cache control and image upload are admin-only and used to be public.
 @Public()
 @Controller('smartrotom/misiones')
 @UsePipes(new ValidationPipe({ transform: true, whitelist: true }))
@@ -90,6 +96,8 @@ export class MisionesController {
     );
   }
 
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.ROTOM_ADMIN)
   @Post('cache/refresh')
   @ApiOperation({ summary: 'Force refresh quest cache from external API' })
   @ApiResponse({
@@ -115,6 +123,8 @@ export class MisionesController {
 
   // ==================== NPC ENDPOINTS ====================
 
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.ROTOM_ADMIN)
   @Post('npcs')
   @ApiOperation({ summary: 'Update NPCs data in the system' })
   @ApiResponse({
@@ -177,6 +187,8 @@ export class MisionesController {
 
   // ==================== IMAGE ENDPOINTS ====================
 
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.ROTOM_ADMIN)
   @Post('images/upload')
   @ApiOperation({ summary: 'Upload custom NPC image' })
   @ApiResponse({

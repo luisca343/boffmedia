@@ -8,6 +8,9 @@ import { WingullFacadeService } from '../wingull/wingull.facade.service';
 import { GlobalExceptionFilter } from '@/common/filters/global-exception.filter';
 import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
 import { Reflector } from '@nestjs/core';
+import { GameOrUserAuthGuard } from '@api/_utils/guards/game-or-user-auth.guard';
+import { JwtAuthGuard } from '@api/auth/jwt-auth.guard';
+import { RolesGuard } from '@api/_utils/guards/roles.guard';
 
 const mockLogger = {
   log: jest.fn(),
@@ -69,9 +72,43 @@ describe('PokemonController — integration (ValidationPipe + GlobalExceptionFil
         ResponseInterceptor,
         Reflector,
       ],
-    }).compile();
+    })
+      // The write routes are no longer public: `register`, `dex/update` and
+      // `dex/sync` require the game server's token or a player's JWT, and
+      // `sprites/refresh` requires an admin role. This suite is about the
+      // ValidationPipe and the exception filter, so the credentials are stubbed
+      // out here — `pokemon.controller.auth.spec.ts` covers the guards.
+      .overrideGuard(GameOrUserAuthGuard)
+      .useValue({ canActivate: () => true })
+      .overrideGuard(JwtAuthGuard)
+      .useValue({ canActivate: () => true })
+      .overrideGuard(RolesGuard)
+      .useValue({ canActivate: () => true })
+      .compile();
 
     app = moduleRef.createNestApplication();
+
+    // These routes are no longer public: the identity that used to come from
+
+    // the URL or the body is now taken from the authenticated principal.
+
+    // This suite covers the ValidationPipe and the exception filter, so it
+
+    // runs as a signed-in caller; the guards themselves are unit-tested.
+
+    app.use((req: any, _res: any, next: any) => {
+      req.user = {
+        userId: 1,
+
+        username: 'tester',
+
+        roles: ['BOFF_ADMIN', 'ROTOM_ADMIN'],
+
+        mcUuid: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4',
+      };
+
+      next();
+    });
     app.useGlobalPipes(
       new ValidationPipe({
         whitelist: true,

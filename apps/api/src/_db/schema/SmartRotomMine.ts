@@ -1,4 +1,3 @@
-import { sql } from 'drizzle-orm';
 import {
   char,
   int,
@@ -16,7 +15,7 @@ export const mineGames = mysqlTable('rotom_mine_games', {
       onDelete: 'cascade',
       onUpdate: 'cascade',
     }),
-  createdAt: timestamp('created_at').default(sql`CURRENT_TIMESTAMP()`),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
 });
 
 export type MineGame = typeof mineGames.$inferSelect;

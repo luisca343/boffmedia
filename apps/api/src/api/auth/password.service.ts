@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
 import { Logger } from 'nestjs-pino';
@@ -47,6 +47,9 @@ export class PasswordService {
       const salt = await bcrypt.genSalt(this.saltRounds);
       return bcrypt.hash(password, salt);
     } catch (error: any) {
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Password hashing failed: ${error.message}`);
     }
   }

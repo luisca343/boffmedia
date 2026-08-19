@@ -26,6 +26,11 @@ import { SuccessResponse } from '@api/_utils/entities/common-response.entity';
 import { AddUserCardDto, UpdateUserCardQuantityDto } from './dto/user-card.dto';
 import { TcgUserCard, TcgUserCardHistory } from './entities/user-card.entity';
 import { Logger } from 'nestjs-pino';
+import {
+  CurrentUser,
+  AuthPrincipal,
+} from '@api/_utils/decorators/current-user.decorator';
+import { RequireSession } from '@api/_utils/decorators/require-session.decorator';
 
 @ApiTags('BoffMedia 🛠 | Pokemon TCG Pocket')
 @Public()
@@ -438,6 +443,7 @@ export class TcgController {
     return this.tcgFacade.getUserCards(userName);
   }
 
+  @RequireSession()
   @Post('users/cards')
   @ApiOperation({ summary: 'Add card to user collection' })
   @ApiResponse({
@@ -451,10 +457,17 @@ export class TcgController {
   })
   async addUserCard(
     @Body() addUserCardDto: AddUserCardDto,
+    @CurrentUser() user: AuthPrincipal,
   ): Promise<SuccessResponse> {
-    return this.tcgFacade.addUserCard(addUserCardDto);
+    // The collection belongs to the caller. `userId` used to come from the body,
+    // so one player could stuff cards into another player's collection.
+    return this.tcgFacade.addUserCard({
+      ...addUserCardDto,
+      userId: user.userId,
+    });
   }
 
+  @RequireSession()
   @Put('users/:userId/cards/:cardId')
   @ApiOperation({ summary: 'Update user card quantity' })
   @ApiParam({ name: 'userId', description: 'User ID', example: 'user123' })
@@ -469,13 +482,19 @@ export class TcgController {
     description: 'User does not own this card.',
   })
   async updateUserCardQuantity(
-    @Param('userId') userId: number,
+    @Param('userId') _userId: number,
     @Param('cardId') cardId: string,
     @Body() updateDto: UpdateUserCardQuantityDto,
+    @CurrentUser() user: AuthPrincipal,
   ): Promise<SuccessResponse> {
-    return this.tcgFacade.updateUserCardQuantity(userId, cardId, updateDto);
+    return this.tcgFacade.updateUserCardQuantity(
+      user.userId,
+      cardId,
+      updateDto,
+    );
   }
 
+  @RequireSession()
   @Delete('users/:userId/cards/:cardId')
   @ApiOperation({ summary: 'Remove card from user collection' })
   @ApiParam({ name: 'userId', description: 'User ID', example: 'user123' })
@@ -490,10 +509,11 @@ export class TcgController {
     description: 'User does not own this card.',
   })
   async removeUserCard(
-    @Param('userId') userId: number,
+    @Param('userId') _userId: number,
     @Param('cardId') cardId: string,
+    @CurrentUser() user: AuthPrincipal,
   ): Promise<SuccessResponse> {
-    return this.tcgFacade.removeUserCard(userId, cardId);
+    return this.tcgFacade.removeUserCard(user.userId, cardId);
   }
 
   @Get('users/:userId/cards/history')

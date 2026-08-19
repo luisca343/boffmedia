@@ -14,6 +14,12 @@ COPY package.json pnpm-workspace.yaml pnpm-lock.yaml ./
 COPY packages/shared/package.json ./packages/shared/
 COPY packages/ui/package.json ./packages/ui/
 COPY packages/tailwind-config/package.json ./packages/tailwind-config/
+# Domain tool packages are `workspace:*` dependencies of apps/web since the
+# tools extraction — without their manifests here, `pnpm install` cannot resolve
+# @boffmedia/tool-kit, /tools-minecraft or /tools-mhwilds and the build dies.
+COPY packages/tools/kit/package.json ./packages/tools/kit/
+COPY packages/tools/minecraft/package.json ./packages/tools/minecraft/
+COPY packages/tools/mhwilds/package.json ./packages/tools/mhwilds/
 # Whole package: its `prepare` script builds on install (see apps/api/Dockerfile).
 COPY packages/pack-schema ./packages/pack-schema
 COPY apps/web/package.json ./apps/web/
@@ -30,6 +36,9 @@ COPY packages/shared ./packages/shared
 # it the build succeeds and every page renders in a fallback typeface.
 COPY packages/ui ./packages/ui
 COPY packages/tailwind-config ./packages/tailwind-config
+# Same deal as @boffmedia/ui: the tool packages ship TS source that Next
+# transpiles, and their message catalogs are merged at request time.
+COPY packages/tools ./packages/tools
 COPY apps/web ./apps/web
 
 ENV NEXT_TELEMETRY_DISABLED=1

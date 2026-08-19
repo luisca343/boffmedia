@@ -6,6 +6,7 @@ import {
   Post,
   Body,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { Public } from '@api/_utils/decorators/public.decorator';
 import {
@@ -38,8 +39,18 @@ import {
   RarityRange,
 } from './entities/lootbox-config.entity';
 import { DailyRewardsConfig } from './entities/daily-rewards.entity';
+import { CurrentMcUuid } from '@api/_utils/decorators/current-user.decorator';
+import { RequireSession } from '@api/_utils/decorators/require-session.decorator';
+import { JwtAuthGuard } from '@api/auth/jwt-auth.guard';
+import { RolesGuard } from '@api/_utils/guards/roles.guard';
+import { USER_ROLES } from '@api/_utils/auth/roles.constants';
+import { Roles } from '@api/_utils/decorators/roles.decorator';
 
 @ApiTags('SmartRotom | Arcade')
+// Catalogue reads stay public. Everything that grants, consumes or resets a
+// player's items runs on the SESSION's uuid: these routes took the owner from
+// the body or the URL while being fully public, so anyone could hand themselves
+// items, open someone else's lootbox or wipe their streak.
 @Public()
 @Controller('smartrotom/arcade')
 export class ArcadeController {
@@ -84,6 +95,7 @@ export class ArcadeController {
     return this.arcadeFacadeService.getUserStreak(uuid);
   }
 
+  @RequireSession()
   @Post('streak/claim')
   @ApiOperation({ summary: 'Claim daily arcade reward' })
   @ApiResponse({
@@ -93,7 +105,8 @@ export class ArcadeController {
   })
   @ApiBody({ type: ClaimRewardDto })
   async claimDailyReward(
-    @Body() { uuid }: ClaimRewardDto,
+    @Body() _claim: ClaimRewardDto,
+    @CurrentMcUuid() uuid: string,
   ): Promise<ArcadeStreakClaim> {
     return this.arcadeFacadeService.claimDailyReward(uuid);
   }
@@ -114,6 +127,7 @@ export class ArcadeController {
     return this.arcadeFacadeService.getStreakStats(uuid);
   }
 
+  @RequireSession()
   @Post('streak/:uuid/reset')
   @ApiOperation({ summary: 'Reset user streak (admin only)' })
   @ApiParam({
@@ -125,7 +139,7 @@ export class ArcadeController {
     status: HttpStatus.OK,
     description: 'Streak reset successfully.',
   })
-  async resetUserStreak(@Param('uuid') uuid: string): Promise<void> {
+  async resetUserStreak(@CurrentMcUuid() uuid: string): Promise<void> {
     return this.arcadeFacadeService.resetUserStreak(uuid);
   }
 
@@ -156,7 +170,8 @@ export class ArcadeController {
     example: 'rare',
   })
   async getInventory(
-    @Param('uuid') uuid: string,
+    @Param('uuid') _pathUuid: string,
+    @CurrentMcUuid() uuid: string,
     @Query('itemType') _itemType?: string,
     @Query('rarity') _rarity?: string,
   ): Promise<ArcadeInventoryResponse> {
@@ -203,12 +218,14 @@ export class ArcadeController {
     type: ArcadeInventoryItem,
   })
   async getUserItem(
-    @Param('uuid') uuid: string,
+    @Param('uuid') _pathUuid: string,
+    @CurrentMcUuid() uuid: string,
     @Param('itemId') itemId: string,
   ): Promise<ArcadeInventoryItem | null> {
     return this.arcadeFacadeService.getUserItem(uuid, itemId);
   }
 
+  @RequireSession()
   @Post('inventory/add')
   @ApiOperation({ summary: 'Add item to player inventory' })
   @ApiResponse({
@@ -219,9 +236,11 @@ export class ArcadeController {
   @ApiBody({ type: AddInventoryItemDto })
   async addInventoryItem(
     @Body() data: AddInventoryItemDto,
+    @CurrentMcUuid() uuid: string,
   ): Promise<ArcadeInventoryItem> {
     return this.arcadeFacadeService.addItemToInventory({
-      uuid: data.uuid,
+      // Session, not `data.uuid`: this route hands out items.
+      uuid,
       itemId: data.itemId,
       itemType: data.itemType,
       amount: data.amount ?? 1,
@@ -230,6 +249,7 @@ export class ArcadeController {
     });
   }
 
+  @RequireSession()
   @Post('inventory/consume')
   @ApiOperation({ summary: 'Consume an inventory item' })
   @ApiResponse({
@@ -238,7 +258,8 @@ export class ArcadeController {
   })
   @ApiBody({ type: ConsumeInventoryItemDto })
   async consumeInventoryItem(
-    @Body() { uuid, itemId, amount }: ConsumeInventoryItemDto,
+    @Body() { itemId, amount }: ConsumeInventoryItemDto,
+    @CurrentMcUuid() uuid: string,
   ): Promise<{
     item: ArcadeInventoryItem | null;
     consumed: number;
@@ -250,6 +271,7 @@ export class ArcadeController {
     );
   }
 
+  @RequireSession()
   @Post('inventory/:uuid/item/:itemId/use')
   @ApiOperation({ summary: 'Mark inventory item as used' })
   @ApiParam({
@@ -264,7 +286,8 @@ export class ArcadeController {
     type: ArcadeInventoryItem,
   })
   async markItemAsUsed(
-    @Param('uuid') uuid: string,
+    @Param('uuid') _pathUuid: string,
+    @CurrentMcUuid() uuid: string,
     @Param('itemId') itemId: string,
   ): Promise<ArcadeInventoryItem> {
     return this.arcadeFacadeService.markItemAsUsed(uuid, itemId);
@@ -272,6 +295,7 @@ export class ArcadeController {
 
   // ==================== LOOTBOX ENDPOINTS ====================
 
+  @RequireSession()
   @Post('lootbox/open')
   @ApiOperation({ summary: 'Open a loot box and get a random item' })
   @ApiResponse({
@@ -285,11 +309,14 @@ export class ArcadeController {
   })
   @ApiBody({ type: OpenLootBoxDto })
   async openLootBox(
-    @Body() { uuid, boxId }: OpenLootBoxDto,
+    @Body() { boxId }: OpenLootBoxDto,
+    @CurrentMcUuid() uuid: string,
   ): Promise<OpenLootBoxResponseDto> {
     return this.arcadeFacadeService.openLootbox(uuid, boxId);
   }
 
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.ROTOM_ADMIN)
   @Post('lootbox/give')
   @ApiOperation({ summary: 'Give lootbox to player' })
   @ApiResponse({
@@ -318,6 +345,7 @@ export class ArcadeController {
   // Claiming moved to MCEF: the page delivers via darCaja('arcade', ids) → mod → POST /smartrotom/caja/claim.
 
   /*
+  @RequireSession()
   @Post('inventory/claim-multiple')
   @ApiResponse({ 
     status: HttpStatus.OK, 
@@ -325,7 +353,10 @@ export class ArcadeController {
     type: [ArcadeInventory]
   })
   @ApiBody({ type: ClaimInventoryItemsDto })
-  async claimMultipleItems(@Body() { uuid, items }: ClaimInventoryItemsDto): Promise<ArcadeInventory[]> {
+  async claimMultipleItems(
+    @Body() { items }: ClaimInventoryItemsDto,
+    @CurrentMcUuid() uuid: string,
+  ): Promise<ArcadeInventory[]> {
     return this.arcadeFacadeService.claimMultipleItems(uuid, items);
   }*/
 

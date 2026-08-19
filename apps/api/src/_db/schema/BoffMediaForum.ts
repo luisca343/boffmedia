@@ -10,17 +10,19 @@ import {
   foreignKey,
 } from 'drizzle-orm/mysql-core';
 import { boffMediaUsers } from './BoffMedia';
-import { sql } from 'drizzle-orm';
 
 // FK constraint names are set explicitly: Drizzle's auto-generated
 // `{table}_{col}_{reftable}_{col}_fk` overflows MySQL's 64-char identifier
 // limit when both table names are long (forum_threads → forum_categories).
 //
-// The FKs below deliberately omit onDelete/onUpdate, so MySQL applies RESTRICT.
-// That is intentional here and NOT the drift it looks like next to the
-// cascade/set-null used elsewhere: a forum post must never vanish because its
-// author row was removed, and users are only ever soft-deleted (scrubbed in
-// place, see users.repository.ts), so RESTRICT can never actually fire.
+// Every FK below states its behaviour explicitly rather than leaning on MySQL's
+// implicit RESTRICT default. The rules, by domain:
+//   * author / category  -> RESTRICT. Content must never vanish because a user
+//     or category row was removed; users are only ever soft-deleted (scrubbed in
+//     place, see users.repository.ts), so RESTRICT can never actually fire.
+//   * post -> thread     -> CASCADE.  A post has no meaning without its thread.
+//   * vote -> user/thread-> CASCADE.  A vote is a tally entry, not content.
+//   * lastPostUserId     -> SET NULL. Denormalised pointer, already nullable.
 
 export const boffMediaForumCategories = mysqlTable(
   'boffmedia_forum_categories',
@@ -33,12 +35,8 @@ export const boffMediaForumCategories = mysqlTable(
     hue: int('hue').notNull().default(28),
     locked: boolean('locked').notNull().default(false),
     position: int('position').notNull().default(0),
-    createdAt: timestamp('created_at')
-      .notNull()
-      .default(sql`CURRENT_TIMESTAMP()`),
-    updatedAt: timestamp('updated_at')
-      .notNull()
-      .default(sql`CURRENT_TIMESTAMP() ON UPDATE CURRENT_TIMESTAMP()`),
+    createdAt: timestamp('created_at').notNull().defaultNow(),
+    updatedAt: timestamp('updated_at').notNull().defaultNow().onUpdateNow(),
     deletedAt: timestamp('deleted_at'),
   },
   (table) => {
@@ -65,12 +63,8 @@ export const boffMediaForumThreads = mysqlTable(
     voteCount: int('vote_count').notNull().default(0),
     lastPostAt: timestamp('last_post_at'),
     lastPostUserId: int('last_post_user_id'),
-    createdAt: timestamp('created_at')
-      .notNull()
-      .default(sql`CURRENT_TIMESTAMP()`),
-    updatedAt: timestamp('updated_at')
-      .notNull()
-      .default(sql`CURRENT_TIMESTAMP() ON UPDATE CURRENT_TIMESTAMP()`),
+    createdAt: timestamp('created_at').notNull().defaultNow(),
+    updatedAt: timestamp('updated_at').notNull().defaultNow().onUpdateNow(),
     deletedAt: timestamp('deleted_at'),
   },
   (table) => {
@@ -79,17 +73,23 @@ export const boffMediaForumThreads = mysqlTable(
         columns: [table.categoryId],
         foreignColumns: [boffMediaForumCategories.id],
         name: 'ft_category_fk',
-      }),
+      })
+        .onDelete('restrict')
+        .onUpdate('cascade'),
       authorFk: foreignKey({
         columns: [table.userId],
         foreignColumns: [boffMediaUsers.id],
         name: 'ft_author_fk',
-      }),
+      })
+        .onDelete('restrict')
+        .onUpdate('cascade'),
       lastPostFk: foreignKey({
         columns: [table.lastPostUserId],
         foreignColumns: [boffMediaUsers.id],
         name: 'ft_lastpost_fk',
-      }),
+      })
+        .onDelete('set null')
+        .onUpdate('cascade'),
       categoryIdx: index('ft_category_idx').on(table.categoryId),
       lastPostIdx: index('ft_last_post_idx').on(table.lastPostAt),
     };
@@ -106,12 +106,8 @@ export const boffMediaForumPosts = mysqlTable(
     userId: int('user_id').notNull(),
     body: text('body').notNull(),
     isSolution: boolean('is_solution').notNull().default(false),
-    createdAt: timestamp('created_at')
-      .notNull()
-      .default(sql`CURRENT_TIMESTAMP()`),
-    updatedAt: timestamp('updated_at')
-      .notNull()
-      .default(sql`CURRENT_TIMESTAMP() ON UPDATE CURRENT_TIMESTAMP()`),
+    createdAt: timestamp('created_at').notNull().defaultNow(),
+    updatedAt: timestamp('updated_at').notNull().defaultNow().onUpdateNow(),
     deletedAt: timestamp('deleted_at'),
   },
   (table) => {
@@ -120,12 +116,16 @@ export const boffMediaForumPosts = mysqlTable(
         columns: [table.threadId],
         foreignColumns: [boffMediaForumThreads.id],
         name: 'fp_thread_fk',
-      }),
+      })
+        .onDelete('cascade')
+        .onUpdate('cascade'),
       authorFk: foreignKey({
         columns: [table.userId],
         foreignColumns: [boffMediaUsers.id],
         name: 'fp_author_fk',
-      }),
+      })
+        .onDelete('restrict')
+        .onUpdate('cascade'),
       threadIdx: index('fp_thread_idx').on(table.threadId),
     };
   },
@@ -139,9 +139,7 @@ export const boffMediaForumVotes = mysqlTable(
     id: int('id').primaryKey().autoincrement(),
     userId: int('user_id').notNull(),
     threadId: int('thread_id').notNull(),
-    createdAt: timestamp('created_at')
-      .notNull()
-      .default(sql`CURRENT_TIMESTAMP()`),
+    createdAt: timestamp('created_at').notNull().defaultNow(),
   },
   (table) => {
     return {
@@ -149,12 +147,16 @@ export const boffMediaForumVotes = mysqlTable(
         columns: [table.userId],
         foreignColumns: [boffMediaUsers.id],
         name: 'fv_user_fk',
-      }),
+      })
+        .onDelete('cascade')
+        .onUpdate('cascade'),
       threadFk: foreignKey({
         columns: [table.threadId],
         foreignColumns: [boffMediaForumThreads.id],
         name: 'fv_thread_fk',
-      }),
+      })
+        .onDelete('cascade')
+        .onUpdate('cascade'),
       userThreadIdx: uniqueIndex('fv_user_thread_idx').on(
         table.userId,
         table.threadId,

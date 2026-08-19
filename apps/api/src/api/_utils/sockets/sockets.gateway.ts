@@ -142,7 +142,10 @@ export class SocketsGateway
       const chat = await this.chatAppService.getChatById(chatId, actor);
       members = chat.members;
     } catch (error: any) {
-      this.logger.error(`exitcall membership check failed for ${actor}:`, error);
+      this.logger.error(
+        `exitcall membership check failed for ${actor}:`,
+        error,
+      );
       return;
     }
 
@@ -188,7 +191,10 @@ export class SocketsGateway
       const chat = await this.chatAppService.getChatById(chatId, actor);
       members = chat.members;
     } catch (error: any) {
-      this.logger.error(`joincall membership check failed for ${actor}:`, error);
+      this.logger.error(
+        `joincall membership check failed for ${actor}:`,
+        error,
+      );
       return;
     }
 

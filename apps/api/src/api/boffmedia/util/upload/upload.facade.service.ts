@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
 import { Logger } from 'nestjs-pino';
 import {
   FileUploadService,
@@ -28,6 +28,9 @@ export class UploadFacadeService {
       return await this.imageUploadService.uploadImage(imageRequest);
     } catch (error: any) {
       this.logger.error('Error uploading image:', error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to upload image: ${error.message}`);
     }
   }
@@ -46,6 +49,9 @@ export class UploadFacadeService {
       };
     } catch (error: any) {
       this.logger.error(`Error deleting image ${filename}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to delete image: ${error.message}`);
     }
   }
@@ -58,6 +64,9 @@ export class UploadFacadeService {
       return await this.imageUploadService.getImageInfo(path, filename);
     } catch (error: any) {
       this.logger.error(`Error getting image info for ${filename}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to get image info: ${error.message}`);
     }
   }
@@ -71,6 +80,9 @@ export class UploadFacadeService {
       return await this.fileUploadService.uploadFile(fileRequest);
     } catch (error: any) {
       this.logger.error('Error uploading file:', error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to upload file: ${error.message}`);
     }
   }
@@ -89,6 +101,9 @@ export class UploadFacadeService {
       };
     } catch (error: any) {
       this.logger.error(`Error deleting file ${filename}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to delete file: ${error.message}`);
     }
   }
@@ -101,6 +116,9 @@ export class UploadFacadeService {
       return await this.fileUploadService.getFileInfo(path, filename);
     } catch (error: any) {
       this.logger.error(`Error getting file info for ${filename}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to get file info: ${error.message}`);
     }
   }

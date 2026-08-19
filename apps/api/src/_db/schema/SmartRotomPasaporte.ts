@@ -23,8 +23,8 @@ export const pasaporteProfiles = mysqlTable('rotom_pasaporte_profiles', {
   trainerId: varchar('trainer_id', { length: 16 }).notNull().unique(),
   region: varchar('region', { length: 32 }).notNull().default('Fukitsu'),
   memberSince: timestamp('member_since').default(sql`CURRENT_TIMESTAMP()`),
-  createdAt: timestamp('created_at').default(sql`CURRENT_TIMESTAMP()`),
-  updatedAt: timestamp('updated_at').default(sql`CURRENT_TIMESTAMP()`),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow().onUpdateNow(),
 });
 
 export type PasaporteProfile = typeof pasaporteProfiles.$inferSelect;

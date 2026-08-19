@@ -29,16 +29,6 @@ export class CreateDocumentDto extends BaseDto {
   type: number;
 }
 
-export class CreateDocumentDtoWithUuid extends CreateDocumentDto {
-  @ApiProperty({
-    description: 'User UUID',
-    example: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4',
-  })
-  @IsNotEmpty()
-  @IsString()
-  uuid: string;
-}
-
 export class UpdateDocumentDto extends BaseDto {
   @ApiProperty({
     description: 'Document title',
@@ -99,11 +89,6 @@ export class UpdateDocumentDto extends BaseDto {
 }
 
 export class CreateFolderDto extends BaseDto {
-  @ApiProperty({ description: 'Owner UUID', example: '67d9b543-...' })
-  @IsNotEmpty()
-  @IsString()
-  uuid: string;
-
   @ApiProperty({ description: 'Folder name', example: 'VGC 2026' })
   @IsNotEmpty()
   @IsString()
@@ -153,11 +138,6 @@ export class UpdateFolderDto extends BaseDto {
 }
 
 export class CreateTagDto extends BaseDto {
-  @ApiProperty({ description: 'Owner UUID', example: '67d9b543-...' })
-  @IsNotEmpty()
-  @IsString()
-  uuid: string;
-
   @ApiProperty({ description: 'Tag label', example: 'meta' })
   @IsNotEmpty()
   @IsString()
@@ -194,24 +174,6 @@ export class CreateVersionDto extends BaseDto {
   @IsOptional()
   @IsString()
   label?: string;
-
-  @ApiProperty({
-    description: 'Author UUID producing the snapshot',
-    required: false,
-  })
-  @IsOptional()
-  @IsString()
-  authorUuid?: string;
-}
-
-export class GetUserDocumentsDto extends BaseDto {
-  @ApiProperty({
-    description: 'User UUID',
-    example: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4',
-  })
-  @IsNotEmpty()
-  @IsString()
-  uuid: string;
 }
 
 export class AddNoteToUserDto extends BaseDto {
@@ -225,7 +187,7 @@ export class AddNoteToUserDto extends BaseDto {
   documentId: number;
 
   @ApiProperty({
-    description: 'User UUID',
+    description: 'UUID of the player the note is shared with (NOT the caller)',
     example: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4',
   })
   @IsNotEmpty()

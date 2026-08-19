@@ -393,8 +393,7 @@ export class BattleRoom {
           player.turnRemaining = Math.max(0, this.timerConfig.turnMs - elapsed);
         }
         this.callbacks.onTimerUpdate?.(this.timerState);
-        for (const [s, startTime] of this.turnStartTimes.entries()) {
-          const elapsed = now - startTime;
+        for (const [s] of this.turnStartTimes.entries()) {
           const player = this.timerState[s];
           if (player.turnRemaining <= 0 || player.totalRemaining <= 0) {
             this.logger?.log(`Timer expired for ${s}, auto-forfeiting`);

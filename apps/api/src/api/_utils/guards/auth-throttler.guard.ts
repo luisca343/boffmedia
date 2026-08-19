@@ -18,8 +18,7 @@ import { ThrottlerGuard } from '@nestjs/throttler';
 @Injectable()
 export class AuthThrottlerGuard extends ThrottlerGuard {
   protected async getTracker(req: Record<string, any>): Promise<string> {
-    const identifier =
-      req.body?.uuid ?? req.body?.username ?? req.body?.email;
+    const identifier = req.body?.uuid ?? req.body?.username ?? req.body?.email;
     if (typeof identifier === 'string' && identifier.length > 0) {
       return `auth:${identifier.toLowerCase()}`;
     }

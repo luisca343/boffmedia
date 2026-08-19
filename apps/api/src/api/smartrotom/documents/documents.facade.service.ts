@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { NotFoundException, HttpException, Injectable } from '@nestjs/common';
 import {
   DocumentService,
   CreateDocumentRequest,
@@ -94,11 +94,17 @@ export class DocumentsFacadeService {
 
   // ==================== DOCUMENT MANAGEMENT ====================
 
-  async getDocumentById(id: number): Promise<DocumentDetails> {
+  async getDocumentById(
+    id: number,
+    requesterUuid?: string,
+  ): Promise<DocumentDetails> {
     try {
-      return await this.documentService.getDocumentById(id);
+      return await this.documentService.getDocumentById(id, requesterUuid);
     } catch (error: any) {
       this.logger.error(`Error getting document ${id}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to retrieve document: ${error.message}`);
     }
   }
@@ -110,50 +116,72 @@ export class DocumentsFacadeService {
       return await this.documentService.createDocument(createDocumentRequest);
     } catch (error: any) {
       this.logger.error('Error creating document:', error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to create document: ${error.message}`);
     }
   }
 
   async updateDocument(
     id: number,
+    ownerUuid: string,
     updateDocumentRequest: UpdateDocumentRequest,
   ): Promise<DocumentDetails> {
     try {
       return await this.documentService.updateDocument(
         id,
+        ownerUuid,
         updateDocumentRequest,
       );
     } catch (error: any) {
       this.logger.error(`Error updating document ${id}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to update document: ${error.message}`);
     }
   }
 
   async deleteDocument(
     id: number,
+    ownerUuid: string,
   ): Promise<{ success: boolean; message: string }> {
     try {
-      await this.documentService.deleteDocument(id);
+      await this.documentService.deleteDocument(id, ownerUuid);
       return {
         success: true,
         message: 'Document deleted successfully',
       };
     } catch (error: any) {
       this.logger.error(`Error deleting document ${id}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to delete document: ${error.message}`);
     }
   }
 
   async saveDocument(
     id: number,
+    ownerUuid: string,
     title: string,
     content: string,
     type: number,
   ): Promise<{ success: boolean; id: number }> {
     try {
-      return await this.documentService.saveDocument(id, title, content, type);
+      return await this.documentService.saveDocument(
+        id,
+        ownerUuid,
+        title,
+        content,
+        type,
+      );
     } catch (error: any) {
       this.logger.error(`Error saving document:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to save document: ${error.message}`);
     }
   }
@@ -166,6 +194,9 @@ export class DocumentsFacadeService {
       return await this.enrichNotes(rows, uuid);
     } catch (error: any) {
       this.logger.error(`Error getting notes for user ${uuid}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to retrieve notes: ${error.message}`);
     }
   }
@@ -176,27 +207,40 @@ export class DocumentsFacadeService {
       return await this.enrichNotes(rows, uuid);
     } catch (error: any) {
       this.logger.error(`Error getting trash for user ${uuid}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to retrieve trash: ${error.message}`);
     }
   }
 
-  async restoreDocument(id: number): Promise<DocumentDetails> {
+  async restoreDocument(
+    id: number,
+    ownerUuid: string,
+  ): Promise<DocumentDetails> {
     try {
-      return await this.documentService.restoreDocument(id);
+      return await this.documentService.restoreDocument(id, ownerUuid);
     } catch (error: any) {
       this.logger.error(`Error restoring document ${id}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to restore document: ${error.message}`);
     }
   }
 
   async purgeDocument(
     id: number,
+    ownerUuid: string,
   ): Promise<{ success: boolean; message: string }> {
     try {
-      await this.documentService.purgeDocument(id);
+      await this.documentService.purgeDocument(id, ownerUuid);
       return { success: true, message: 'Document permanently deleted' };
     } catch (error: any) {
       this.logger.error(`Error purging document ${id}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to delete document: ${error.message}`);
     }
   }
@@ -206,6 +250,9 @@ export class DocumentsFacadeService {
       return await this.noteService.getShares(documentId);
     } catch (error: any) {
       this.logger.error(`Error getting shares for ${documentId}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to retrieve shares: ${error.message}`);
     }
   }
@@ -217,6 +264,9 @@ export class DocumentsFacadeService {
       return await this.noteOrganizationService.getFolders(uuid);
     } catch (error: any) {
       this.logger.error(`Error getting folders for ${uuid}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to retrieve folders: ${error.message}`);
     }
   }
@@ -226,27 +276,44 @@ export class DocumentsFacadeService {
       return await this.noteOrganizationService.createFolder(req);
     } catch (error: any) {
       this.logger.error('Error creating folder:', error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to create folder: ${error.message}`);
     }
   }
 
   async updateFolder(
     id: number,
+    ownerUuid: string,
     data: { name?: string; color?: string; parentId?: number | null },
   ): Promise<FolderRow> {
     try {
-      return await this.noteOrganizationService.updateFolder(id, data);
+      return await this.noteOrganizationService.updateFolder(
+        id,
+        ownerUuid,
+        data,
+      );
     } catch (error: any) {
       this.logger.error(`Error updating folder ${id}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to update folder: ${error.message}`);
     }
   }
 
-  async deleteFolder(id: number): Promise<{ success: boolean }> {
+  async deleteFolder(
+    id: number,
+    ownerUuid: string,
+  ): Promise<{ success: boolean }> {
     try {
-      return await this.noteOrganizationService.deleteFolder(id);
+      return await this.noteOrganizationService.deleteFolder(id, ownerUuid);
     } catch (error: any) {
       this.logger.error(`Error deleting folder ${id}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to delete folder: ${error.message}`);
     }
   }
@@ -258,6 +325,9 @@ export class DocumentsFacadeService {
       return await this.noteOrganizationService.getTags(uuid);
     } catch (error: any) {
       this.logger.error(`Error getting tags for ${uuid}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to retrieve tags: ${error.message}`);
     }
   }
@@ -267,27 +337,40 @@ export class DocumentsFacadeService {
       return await this.noteOrganizationService.createTag(req);
     } catch (error: any) {
       this.logger.error('Error creating tag:', error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to create tag: ${error.message}`);
     }
   }
 
   async updateTag(
     id: number,
+    ownerUuid: string,
     data: { label?: string; color?: string },
   ): Promise<{ success: boolean }> {
     try {
-      return await this.noteOrganizationService.updateTag(id, data);
+      return await this.noteOrganizationService.updateTag(id, ownerUuid, data);
     } catch (error: any) {
       this.logger.error(`Error updating tag ${id}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to update tag: ${error.message}`);
     }
   }
 
-  async deleteTag(id: number): Promise<{ success: boolean }> {
+  async deleteTag(
+    id: number,
+    ownerUuid: string,
+  ): Promise<{ success: boolean }> {
     try {
-      return await this.noteOrganizationService.deleteTag(id);
+      return await this.noteOrganizationService.deleteTag(id, ownerUuid);
     } catch (error: any) {
       this.logger.error(`Error deleting tag ${id}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to delete tag: ${error.message}`);
     }
   }
@@ -300,6 +383,9 @@ export class DocumentsFacadeService {
       return await this.noteOrganizationService.toggleTag(documentId, tagId);
     } catch (error: any) {
       this.logger.error(`Error toggling tag ${tagId} on ${documentId}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to toggle tag: ${error.message}`);
     }
   }
@@ -311,6 +397,9 @@ export class DocumentsFacadeService {
       return await this.noteOrganizationService.getVersions(documentId);
     } catch (error: any) {
       this.logger.error(`Error getting versions for ${documentId}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to retrieve versions: ${error.message}`);
     }
   }
@@ -330,24 +419,37 @@ export class DocumentsFacadeService {
       });
     } catch (error: any) {
       this.logger.error(`Error snapshotting ${documentId}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to snapshot note: ${error.message}`);
     }
   }
 
   // Snapshots the current content first (so nothing is lost), then restores the
   // chosen version's content onto the live document.
-  async restoreVersion(versionId: number): Promise<DocumentDetails> {
+  async restoreVersion(
+    versionId: number,
+    ownerUuid: string,
+  ): Promise<DocumentDetails> {
     try {
       const version = await this.noteOrganizationService.getVersion(versionId);
       if (!version) {
-        throw new Error('Version not found');
+        throw new NotFoundException('Versión no encontrada');
       }
       await this.snapshotVersion(version.documentId, 'Antes de restaurar');
-      return await this.documentService.updateDocument(version.documentId, {
-        content: version.content,
-      });
+      // updateDocument re-checks ownership of the document the version belongs
+      // to, so restoring someone else's version is rejected there.
+      return await this.documentService.updateDocument(
+        version.documentId,
+        ownerUuid,
+        { content: version.content },
+      );
     } catch (error: any) {
       this.logger.error(`Error restoring version ${versionId}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to restore version: ${error.message}`);
     }
   }
@@ -367,6 +469,9 @@ export class DocumentsFacadeService {
       return { id: document.id, success: true };
     } catch (error: any) {
       this.logger.error('Error creating note with user:', error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to create note: ${error.message}`);
     }
   }
@@ -382,6 +487,9 @@ export class DocumentsFacadeService {
         `Error adding note ${documentId} to user ${uuid}:`,
         error,
       );
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to add note to user: ${error.message}`);
     }
   }
@@ -397,6 +505,9 @@ export class DocumentsFacadeService {
         `Error removing note ${documentId} from user ${uuid}:`,
         error,
       );
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to remove note from user: ${error.message}`);
     }
   }
@@ -408,6 +519,9 @@ export class DocumentsFacadeService {
       return await this.newsService.getAllNews();
     } catch (error: any) {
       this.logger.error('Error getting all news:', error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to retrieve news: ${error.message}`);
     }
   }
@@ -417,6 +531,9 @@ export class DocumentsFacadeService {
       return await this.newsService.getPublishedNews();
     } catch (error: any) {
       this.logger.error('Error getting published news:', error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to retrieve published news: ${error.message}`);
     }
   }
@@ -426,6 +543,9 @@ export class DocumentsFacadeService {
       return await this.newsService.getNewsById(newsId);
     } catch (error: any) {
       this.logger.error(`Error getting news ${newsId}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to retrieve news: ${error.message}`);
     }
   }
@@ -435,6 +555,9 @@ export class DocumentsFacadeService {
       return await this.newsService.getFeaturedNews();
     } catch (error: any) {
       this.logger.error('Error getting featured news:', error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to retrieve featured news: ${error.message}`);
     }
   }
@@ -444,6 +567,9 @@ export class DocumentsFacadeService {
       return await this.newsService.createNews(createNewsRequest);
     } catch (error: any) {
       this.logger.error('Error creating news:', error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to create news: ${error.message}`);
     }
   }
@@ -456,6 +582,9 @@ export class DocumentsFacadeService {
       return await this.newsService.updateNews(newsId, updateNewsRequest);
     } catch (error: any) {
       this.logger.error(`Error updating news ${newsId}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to update news: ${error.message}`);
     }
   }
@@ -471,6 +600,9 @@ export class DocumentsFacadeService {
       };
     } catch (error: any) {
       this.logger.error(`Error deleting news ${newsId}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to delete news: ${error.message}`);
     }
   }
@@ -483,6 +615,9 @@ export class DocumentsFacadeService {
       return await this.newsService.updateNewsStatus(publishedIds, featuredId);
     } catch (error: any) {
       this.logger.error('Error updating news status:', error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to update news status: ${error.message}`);
     }
   }
@@ -495,6 +630,9 @@ export class DocumentsFacadeService {
       return await this.newsService.saveNews(news, newsId);
     } catch (error: any) {
       this.logger.error('Error saving news:', error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to save news: ${error.message}`);
     }
   }
@@ -506,6 +644,9 @@ export class DocumentsFacadeService {
       return await this.newsService.getComments(newsId);
     } catch (error: any) {
       this.logger.error(`Error getting comments for news ${newsId}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to retrieve comments: ${error.message}`);
     }
   }
@@ -519,6 +660,9 @@ export class DocumentsFacadeService {
       return await this.newsService.addComment(newsId, uuid, body);
     } catch (error: any) {
       this.logger.error(`Error adding comment to news ${newsId}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to add comment: ${error.message}`);
     }
   }
@@ -531,6 +675,9 @@ export class DocumentsFacadeService {
       return { success: true, message: 'Comment deleted successfully' };
     } catch (error: any) {
       this.logger.error(`Error deleting comment ${commentId}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to delete comment: ${error.message}`);
     }
   }
@@ -542,6 +689,9 @@ export class DocumentsFacadeService {
       return await this.newsService.clapNews(newsId);
     } catch (error: any) {
       this.logger.error(`Error clapping news ${newsId}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to clap news: ${error.message}`);
     }
   }
@@ -553,6 +703,9 @@ export class DocumentsFacadeService {
       return await this.newsService.getEditorialBoard();
     } catch (error: any) {
       this.logger.error('Error getting editorial board:', error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to retrieve editorial board: ${error.message}`);
     }
   }
@@ -562,6 +715,9 @@ export class DocumentsFacadeService {
       return await this.newsService.getIssues();
     } catch (error: any) {
       this.logger.error('Error getting news issues:', error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to retrieve news issues: ${error.message}`);
     }
   }
@@ -573,6 +729,9 @@ export class DocumentsFacadeService {
       return await this.newsService.subscribeNewsletter(email);
     } catch (error: any) {
       this.logger.error('Error subscribing to newsletter:', error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to subscribe to newsletter: ${error.message}`);
     }
   }
@@ -587,15 +746,6 @@ export class DocumentsFacadeService {
       return await this.noteService.validateUserHasAccess(documentId, uuid);
     } catch (error: any) {
       this.logger.error(`Error validating document access:`, error);
-      return false;
-    }
-  }
-
-  async validateDocumentExists(documentId: number): Promise<boolean> {
-    try {
-      return await this.documentService.validateDocumentExists(documentId);
-    } catch (error: any) {
-      this.logger.error(`Error validating document exists:`, error);
       return false;
     }
   }

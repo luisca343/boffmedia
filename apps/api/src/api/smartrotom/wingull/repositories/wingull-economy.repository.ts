@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
 import axios, { AxiosResponse } from 'axios';
 import { WingullBalanceDto } from '../dto/wingull-balance.dto';
 import { IWingullEconomyRepository } from './interfaces/wingull-economy.repository.interface';
@@ -30,6 +30,9 @@ export class WingullEconomyRepository implements IWingullEconomyRepository {
       return response.data.data;
     } catch (error: any) {
       this.logger.error('Failed to update balance in WINGULL API:', error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Balance update failed: ${error.message}`);
     }
   }
@@ -58,6 +61,9 @@ export class WingullEconomyRepository implements IWingullEconomyRepository {
         `Failed to get current balance for UUID ${uuid}:`,
         error,
       );
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Current balance retrieval failed: ${error.message}`);
     }
   }
@@ -83,6 +89,9 @@ export class WingullEconomyRepository implements IWingullEconomyRepository {
       return response.data.data;
     } catch (error: any) {
       this.logger.error(`Failed to get money for UUID ${uuid}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Money retrieval failed: ${error.message}`);
     }
   }

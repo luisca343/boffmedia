@@ -17,10 +17,9 @@ describe('PacksService.claimLegacyGrants', () => {
     repo = {
       claimLegacyGrants: jest.fn().mockResolvedValue(2),
     } as unknown as jest.Mocked<PacksRepository>;
-    service = new PacksService(
-      repo,
-      { findByPackId: jest.fn() } as unknown as RandomizerPackLinkRepository,
-    );
+    service = new PacksService(repo, {
+      findByPackId: jest.fn(),
+    } as unknown as RandomizerPackLinkRepository);
   });
 
   it('lowercases the uuid before matching pack_acl', async () => {
@@ -37,7 +36,9 @@ describe('PacksService.claimLegacyGrants', () => {
     // Best-effort is the CALL SITE's policy, not this service's: a caller that
     // does care (an admin backfill) must be able to see the failure.
     repo.claimLegacyGrants.mockRejectedValue(new Error('deadlock'));
-    await expect(service.claimLegacyGrants(7, UUID)).rejects.toThrow('deadlock');
+    await expect(service.claimLegacyGrants(7, UUID)).rejects.toThrow(
+      'deadlock',
+    );
   });
 });
 
@@ -46,9 +47,13 @@ describe('BoffMediaUsersFacadeService — claiming is best-effort on link', () =
     const logger = { log: jest.fn(), error: jest.fn(), warn: jest.fn() };
     const usersManagement = {
       getUserByUuid: jest.fn().mockResolvedValue(null),
-      setMinecraftUuid: jest.fn().mockResolvedValue({ id: 7, username: 'TrainerAsh' }),
+      setMinecraftUuid: jest
+        .fn()
+        .mockResolvedValue({ id: 7, username: 'TrainerAsh' }),
     };
-    const smartRotom = { initializeUserAndAccounts: jest.fn().mockResolvedValue({}) };
+    const smartRotom = {
+      initializeUserAndAccounts: jest.fn().mockResolvedValue({}),
+    };
     const moduleRef = { get: jest.fn().mockReturnValue(packsService) };
 
     const facade = new BoffMediaUsersFacadeService(
@@ -70,7 +75,10 @@ describe('BoffMediaUsersFacadeService — claiming is best-effort on link', () =
       username: 'TrainerAsh',
     });
 
-    expect(usersManagement.setMinecraftUuid).toHaveBeenCalledWith(7, 'abc-uuid');
+    expect(usersManagement.setMinecraftUuid).toHaveBeenCalledWith(
+      7,
+      'abc-uuid',
+    );
     expect(packsService.claimLegacyGrants).toHaveBeenCalledWith(7, 'abc-uuid');
   });
 
@@ -81,7 +89,10 @@ describe('BoffMediaUsersFacadeService — claiming is best-effort on link', () =
     const { facade, logger } = make(packsService);
 
     await expect(
-      facade.linkProvenMinecraftAccount(7, { uuid: 'abc-uuid', username: 'TrainerAsh' }),
+      facade.linkProvenMinecraftAccount(7, {
+        uuid: 'abc-uuid',
+        username: 'TrainerAsh',
+      }),
     ).resolves.toMatchObject({ id: 7 });
     expect(logger.error).toHaveBeenCalled();
   });

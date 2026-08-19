@@ -6,6 +6,7 @@ import {
   Body,
   Query,
   HttpStatus,
+  UseGuards,
 } from '@nestjs/common';
 import { Public } from '@api/_utils/decorators/public.decorator';
 import {
@@ -22,8 +23,15 @@ import {
   TournamentRegistrationDto,
 } from './dto/tournament.dto';
 import { PaginationQueryDto } from '@api/_utils/dto/pagination.dto';
+import { RequireSession } from '@api/_utils/decorators/require-session.decorator';
+import { JwtAuthGuard } from '@api/auth/jwt-auth.guard';
+import { RolesGuard } from '@api/_utils/guards/roles.guard';
+import { USER_ROLES } from '@api/_utils/auth/roles.constants';
+import { Roles } from '@api/_utils/decorators/roles.decorator';
 
 @ApiTags('SmartRotom | Liga')
+// Standings and replays are public; creating a tournament is an admin action
+// and registering for one needs a session.
 @Public()
 @Controller('smartrotom/liga')
 export class LigaController {
@@ -202,6 +210,8 @@ export class LigaController {
     return await this.ligaFacadeService.getTournamentMatches(tournamentId);
   }
 
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.ROTOM_ADMIN)
   @Post('tournament')
   @ApiOperation({ summary: 'Create a new tournament' })
   @ApiResponse({
@@ -227,6 +237,7 @@ export class LigaController {
     return await this.ligaFacadeService.createTournament(tournamentRequest);
   }
 
+  @RequireSession()
   @Post('tournament/register')
   @ApiOperation({ summary: 'Register for a tournament' })
   @ApiResponse({

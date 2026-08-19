@@ -3,19 +3,21 @@ import {
   Controller,
   Get,
   Param,
+  ParseIntPipe,
   Post,
   Put,
   Delete,
   HttpStatus,
 } from '@nestjs/common';
-import { Public } from '@api/_utils/decorators/public.decorator';
 import {
   ApiTags,
   ApiOperation,
   ApiResponse,
   ApiParam,
+  ApiBearerAuth,
   ApiBody,
 } from '@nestjs/swagger';
+import { CurrentMcUuid } from '@api/_utils/decorators/current-user.decorator';
 import { DocumentsFacadeService } from './documents.facade.service';
 
 import {
@@ -28,126 +30,122 @@ import {
 import { NoteFolder, NoteTag } from './entities/document.entity';
 import { SuccessResponse } from '@api/_utils/entities/common-response.entity';
 
+/**
+ * Note folders and tags.
+ *
+ * The owner is the authenticated principal. These routes used to be `@Public()`
+ * and read the owner from `:uuid` or `dto.uuid`, so listing (and deleting)
+ * another player's folders was a URL edit away. Writes are additionally
+ * owner-scoped in SQL — see `note-organization.repository.ts`.
+ */
 @ApiTags('SmartRotom | Documents')
+@ApiBearerAuth()
 @Controller('smartrotom/documents')
 export class FoldersTagsController {
   constructor(
     private readonly documentsFacadeService: DocumentsFacadeService,
   ) {}
 
-  @Public()
-  @Get('folders/:uuid')
-  @ApiOperation({ summary: 'List folders for a user' })
+  @Get('folders')
+  @ApiOperation({ summary: "List the caller's folders" })
   @ApiResponse({ status: HttpStatus.OK, type: [NoteFolder] })
-  @ApiParam({ name: 'uuid', description: 'User UUID' })
-  async getFolders(@Param('uuid') uuid: string): Promise<NoteFolder[]> {
+  async getFolders(@CurrentMcUuid() uuid: string): Promise<NoteFolder[]> {
     return await this.documentsFacadeService.getFolders(uuid);
   }
 
-  @Public()
   @Post('folders')
-  @ApiOperation({ summary: 'Create a folder' })
+  @ApiOperation({ summary: 'Create a folder owned by the caller' })
   @ApiResponse({ status: HttpStatus.CREATED, type: NoteFolder })
   @ApiBody({ type: CreateFolderDto })
-  async createFolder(@Body() dto: CreateFolderDto): Promise<NoteFolder> {
-    return await this.documentsFacadeService.createFolder({
-      uuid: dto.uuid,
-      name: dto.name,
-      color: dto.color,
-      parentId: dto.parentId ?? null,
-    });
-  }
-
-  @Public()
-  @Put('folders/:id')
-  @ApiOperation({ summary: 'Update a folder' })
-  @ApiResponse({ status: HttpStatus.OK, type: NoteFolder })
-  @ApiParam({ name: 'id', description: 'Folder ID' })
-  @ApiBody({ type: UpdateFolderDto })
-  async updateFolder(
-    @Param('id') id: string,
-    @Body() dto: UpdateFolderDto,
+  async createFolder(
+    @Body() dto: CreateFolderDto,
+    @CurrentMcUuid() uuid: string,
   ): Promise<NoteFolder> {
-    const folderId = parseInt(id, 10);
-    if (isNaN(folderId)) {
-      throw new Error('Invalid folder ID');
-    }
-    return await this.documentsFacadeService.updateFolder(folderId, {
+    return await this.documentsFacadeService.createFolder({
+      uuid,
       name: dto.name,
       color: dto.color,
       parentId: dto.parentId,
     });
   }
 
-  @Public()
-  @Delete('folders/:id')
-  @ApiOperation({ summary: 'Delete a folder' })
-  @ApiResponse({ status: HttpStatus.OK, type: SuccessResponse })
+  @Put('folders/:id')
+  @ApiOperation({ summary: 'Rename or recolour a folder the caller owns' })
+  @ApiResponse({ status: HttpStatus.OK, type: NoteFolder })
   @ApiParam({ name: 'id', description: 'Folder ID' })
-  async deleteFolder(@Param('id') id: string): Promise<SuccessResponse> {
-    const folderId = parseInt(id, 10);
-    if (isNaN(folderId)) {
-      throw new Error('Invalid folder ID');
-    }
-    return await this.documentsFacadeService.deleteFolder(folderId);
+  @ApiBody({ type: UpdateFolderDto })
+  async updateFolder(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: UpdateFolderDto,
+    @CurrentMcUuid() uuid: string,
+  ): Promise<NoteFolder> {
+    return await this.documentsFacadeService.updateFolder(id, uuid, {
+      name: dto.name,
+      color: dto.color,
+      parentId: dto.parentId,
+    });
   }
 
-  @Public()
-  @Get('tags/:uuid')
-  @ApiOperation({ summary: 'List tags for a user' })
+  @Delete('folders/:id')
+  @ApiOperation({ summary: 'Delete a folder the caller owns' })
+  @ApiResponse({ status: HttpStatus.OK, type: SuccessResponse })
+  @ApiParam({ name: 'id', description: 'Folder ID' })
+  async deleteFolder(
+    @Param('id', ParseIntPipe) id: number,
+    @CurrentMcUuid() uuid: string,
+  ): Promise<SuccessResponse> {
+    return await this.documentsFacadeService.deleteFolder(id, uuid);
+  }
+
+  @Get('tags')
+  @ApiOperation({ summary: "List the caller's tags" })
   @ApiResponse({ status: HttpStatus.OK, type: [NoteTag] })
-  @ApiParam({ name: 'uuid', description: 'User UUID' })
-  async getTags(@Param('uuid') uuid: string): Promise<NoteTag[]> {
+  async getTags(@CurrentMcUuid() uuid: string): Promise<NoteTag[]> {
     return await this.documentsFacadeService.getTags(uuid);
   }
 
-  @Public()
   @Post('tags')
-  @ApiOperation({ summary: 'Create a tag' })
+  @ApiOperation({ summary: 'Create a tag owned by the caller' })
   @ApiResponse({ status: HttpStatus.CREATED, type: NoteTag })
   @ApiBody({ type: CreateTagDto })
-  async createTag(@Body() dto: CreateTagDto): Promise<NoteTag> {
+  async createTag(
+    @Body() dto: CreateTagDto,
+    @CurrentMcUuid() uuid: string,
+  ): Promise<NoteTag> {
     return await this.documentsFacadeService.createTag({
-      uuid: dto.uuid,
+      uuid,
       label: dto.label,
       color: dto.color,
     });
   }
 
-  @Public()
   @Put('tags/:id')
-  @ApiOperation({ summary: 'Update a tag' })
+  @ApiOperation({ summary: 'Rename or recolour a tag the caller owns' })
   @ApiResponse({ status: HttpStatus.OK, type: SuccessResponse })
   @ApiParam({ name: 'id', description: 'Tag ID' })
   @ApiBody({ type: UpdateTagDto })
   async updateTag(
-    @Param('id') id: string,
+    @Param('id', ParseIntPipe) id: number,
     @Body() dto: UpdateTagDto,
+    @CurrentMcUuid() uuid: string,
   ): Promise<SuccessResponse> {
-    const tagId = parseInt(id, 10);
-    if (isNaN(tagId)) {
-      throw new Error('Invalid tag ID');
-    }
-    return await this.documentsFacadeService.updateTag(tagId, {
+    return await this.documentsFacadeService.updateTag(id, uuid, {
       label: dto.label,
       color: dto.color,
     });
   }
 
-  @Public()
   @Delete('tags/:id')
-  @ApiOperation({ summary: 'Delete a tag' })
+  @ApiOperation({ summary: 'Delete a tag the caller owns' })
   @ApiResponse({ status: HttpStatus.OK, type: SuccessResponse })
   @ApiParam({ name: 'id', description: 'Tag ID' })
-  async deleteTag(@Param('id') id: string): Promise<SuccessResponse> {
-    const tagId = parseInt(id, 10);
-    if (isNaN(tagId)) {
-      throw new Error('Invalid tag ID');
-    }
-    return await this.documentsFacadeService.deleteTag(tagId);
+  async deleteTag(
+    @Param('id', ParseIntPipe) id: number,
+    @CurrentMcUuid() uuid: string,
+  ): Promise<SuccessResponse> {
+    return await this.documentsFacadeService.deleteTag(id, uuid);
   }
 
-  @Public()
   @Post('document/:id/tag/:tagId')
   @ApiOperation({
     summary: 'Toggle a tag on a note (adds if absent, removes if present)',
@@ -156,17 +154,16 @@ export class FoldersTagsController {
   @ApiParam({ name: 'id', description: 'Document ID' })
   @ApiParam({ name: 'tagId', description: 'Tag ID' })
   async toggleNoteTag(
-    @Param('id') id: string,
-    @Param('tagId') tagId: string,
+    @Param('id', ParseIntPipe) id: number,
+    @Param('tagId', ParseIntPipe) tagId: number,
+    @CurrentMcUuid() uuid: string,
   ): Promise<{ success: boolean; applied: boolean }> {
-    const documentId = parseInt(id, 10);
-    const parsedTagId = parseInt(tagId, 10);
-    if (isNaN(documentId) || isNaN(parsedTagId)) {
-      throw new Error('Invalid document or tag ID');
+    // Both halves have to be the caller's: the note, and the tag being applied.
+    await this.documentsFacadeService.getDocumentById(id, uuid);
+    const tags = await this.documentsFacadeService.getTags(uuid);
+    if (!tags.some((t) => t.id === tagId)) {
+      return { success: false, applied: false };
     }
-    return await this.documentsFacadeService.toggleNoteTag(
-      documentId,
-      parsedTagId,
-    );
+    return await this.documentsFacadeService.toggleNoteTag(id, tagId);
   }
 }

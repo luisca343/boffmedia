@@ -1,36 +1,36 @@
-import { Body, Controller, Get, HttpStatus, Param, Put } from '@nestjs/common';
+import { Body, Controller, Get, HttpStatus, Put } from '@nestjs/common';
 import {
+  ApiBearerAuth,
   ApiBody,
   ApiOperation,
-  ApiParam,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { Public } from '@api/_utils/decorators/public.decorator';
+import { CurrentMcUuid } from '@api/_utils/decorators/current-user.decorator';
 import { PcMarksService } from './services/pc-marks.service';
 import { PcMark } from './entities/pc-mark.entity';
 import { BulkUpsertPcMarksDto, UpsertPcMarkDto } from './dto/pc-mark.dto';
 
+/**
+ * PC marks (favourites + tags) are per-player data. The owner comes from the
+ * session: the controller was `@Public()` and read `:uuid` from the URL / body,
+ * so anyone could read or overwrite another player's marks.
+ */
 @ApiTags('SmartRotom | PC')
-@Public()
+@ApiBearerAuth()
 @Controller('smartrotom/pc-marks')
 export class PcMarksController {
   constructor(private readonly pcMarksService: PcMarksService) {}
 
-  @Get(':uuid')
-  @ApiOperation({ summary: 'Get all PC marks (favourites + tags) for a user' })
-  @ApiParam({
-    name: 'uuid',
-    description: 'Player UUID',
-    example: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4',
-  })
+  @Get()
+  @ApiOperation({ summary: "Get the caller's PC marks (favourites + tags)" })
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Marks retrieved successfully.',
     type: PcMark,
     isArray: true,
   })
-  async getMarks(@Param('uuid') uuid: string): Promise<PcMark[]> {
+  async getMarks(@CurrentMcUuid() uuid: string): Promise<PcMark[]> {
     return this.pcMarksService.getMarks(uuid);
   }
 
@@ -43,8 +43,11 @@ export class PcMarksController {
     isArray: true,
   })
   @ApiBody({ type: BulkUpsertPcMarksDto })
-  async bulkUpsert(@Body() data: BulkUpsertPcMarksDto): Promise<PcMark[]> {
-    return this.pcMarksService.bulkUpsert(data);
+  async bulkUpsert(
+    @Body() data: BulkUpsertPcMarksDto,
+    @CurrentMcUuid() uuid: string,
+  ): Promise<PcMark[]> {
+    return this.pcMarksService.bulkUpsert(uuid, data);
   }
 
   @Put()
@@ -55,7 +58,10 @@ export class PcMarksController {
     type: PcMark,
   })
   @ApiBody({ type: UpsertPcMarkDto })
-  async upsertMark(@Body() data: UpsertPcMarkDto): Promise<PcMark> {
-    return this.pcMarksService.upsertMark(data);
+  async upsertMark(
+    @Body() data: UpsertPcMarkDto,
+    @CurrentMcUuid() uuid: string,
+  ): Promise<PcMark> {
+    return this.pcMarksService.upsertMark(uuid, data);
   }
 }

@@ -69,7 +69,9 @@ export function useWmV3(t: Tr, tApp: Tr) {
   // ── real, localized catalogs ────────────────────────────────────────────────
   const questData = React.useMemo(() => getQuestData(t), [t])
   const rewardTypes = React.useMemo(() => getRewardTypes(t), [t])
-  const dungeons = React.useMemo(() => getValidDungeons(t), [t])
+  // Dungeon names live one level deeper than the rest of the catalog
+  // (`pmdsky.dungeons.<id>`), so they need their own key prefix.
+  const dungeons = React.useMemo(() => getValidDungeons((key) => t(`dungeons.${key}`)), [t])
   const items = React.useMemo(() => getItemData(), [])
   const pokemon = React.useMemo(() => getValidPokemon(t("selectPokemon")).filter((o) => o.value !== "0"), [t])
   const subQuestData = React.useMemo(() => getSubQuestData(f.questType, t), [f.questType, t])

@@ -4,6 +4,7 @@ import {
   Get,
   Param,
   Post,
+  Query,
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
@@ -128,5 +129,15 @@ export class AppController {
   @Get('steamdata/:steamID')
   async steamData(@Param('steamID') steamID: string) {
     return await this.appService.getSteamData(steamID);
+  }
+
+  /**
+   * Games that are 100 % off on Steam right now — the API-side mirror of
+   * store.steampowered.com/search/?maxprice=free&category1=998&specials=1.
+   * The lang query is the UI locale (es|en); prices are always quoted in EUR.
+   */
+  @Get('steamfree')
+  async steamFree(@Query('lang') lang?: string) {
+    return await this.appService.getSteamFreeGames(lang);
   }
 }

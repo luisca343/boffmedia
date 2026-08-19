@@ -6,6 +6,8 @@ import { TeleportPlayerDto } from '../_dto/teleport-player.dto';
 import { WingullFacadeService } from '../wingull/wingull.facade.service';
 import { ArceuSpeakEntity } from './entities/arceuspeak.entity';
 import { ArceusspeakDto } from '../_dto/arceuspeak.dto';
+import { CurrentMcUuid } from '@api/_utils/decorators/current-user.decorator';
+import { RequireSession } from '@api/_utils/decorators/require-session.decorator';
 
 @ApiTags('Smartrotom')
 @Public()
@@ -80,6 +82,7 @@ export class SmartrotomController {
     return await this.wingullService.getTaxiStops();
   }
 
+  @RequireSession()
   @Post('taxi/teleport')
   @ApiOperation({ summary: 'Teleport a player to a destination' })
   @ApiResponse({
@@ -90,8 +93,13 @@ export class SmartrotomController {
     status: HttpStatus.INTERNAL_SERVER_ERROR,
     description: 'Failed to teleport player.',
   })
-  async teleportPlayer(@Body() body: TeleportPlayerDto) {
-    const result = await this.wingullService.teleportPlayer(body.id, body.uuid);
+  async teleportPlayer(
+    @Body() body: TeleportPlayerDto,
+    @CurrentMcUuid() uuid: string,
+  ) {
+    // Teleports the CALLER. The uuid used to come from the body on a public
+    // route, so anyone could move any player anywhere.
+    const result = await this.wingullService.teleportPlayer(body.id, uuid);
     return { success: result };
   }
 }

@@ -83,7 +83,9 @@ export class RandomizerController {
     @Body() dto: CreateRomDto,
   ): Promise<RomResponseDto> {
     if (!rom?.buffer?.length) {
-      throw new BadRequestException('ROM file is required (multipart field "rom")');
+      throw new BadRequestException(
+        'ROM file is required (multipart field "rom")',
+      );
     }
     const created = await this.roms.uploadRom({
       name: dto.name,
@@ -101,7 +103,9 @@ export class RandomizerController {
   }
 
   @Delete('roms/:id')
-  @ApiOperation({ summary: 'Delete a library ROM (409 if referenced by a config)' })
+  @ApiOperation({
+    summary: 'Delete a library ROM (409 if referenced by a config)',
+  })
   @ApiResponse({ status: HttpStatus.NO_CONTENT })
   async deleteRom(@Param('id') id: string): Promise<void> {
     await this.roms.deleteRom(Number(id));
@@ -174,7 +178,9 @@ export class RandomizerController {
   }
 
   @Post('configs/:id/publish')
-  @ApiOperation({ summary: 'Publish config (seeds/settings/logs become public)' })
+  @ApiOperation({
+    summary: 'Publish config (seeds/settings/logs become public)',
+  })
   @ApiResponse({ status: HttpStatus.OK, type: ConfigResponseDto })
   async publishConfig(
     @Param('id') id: string,
@@ -234,7 +240,9 @@ export class RandomizerController {
     @Body() dto: QuickRandomizeDto,
   ): Promise<StreamableFile> {
     if (!rom?.buffer?.length) {
-      throw new BadRequestException('ROM file is required (multipart field "rom")');
+      throw new BadRequestException(
+        'ROM file is required (multipart field "rom")',
+      );
     }
 
     const { romBytes, seed } = await this.events.quickRandomize({

@@ -35,6 +35,15 @@
           "search": "Search & filters",
           "crosslinks": "Cross-linked fiches"
         }
+      },
+      "steamfree": {
+        "title": "Free on Steam",
+        "description": "Games Steam is giving away at 100 % off right now, with a live countdown to claim them",
+        "features": {
+          "live": "Live from Steam",
+          "countdown": "Claim countdown",
+          "claim": "One-click claim"
+        }
       }
     },
     "externalLinks": {
@@ -243,6 +252,57 @@
       "pageOf": "Page {page} / {total}",
       "prevPage": "Previous page",
       "nextPage": "Next page"
+    },
+    "steamfreeApp": {
+      "kicker": "Others · Live from Steam",
+      "titlePre": "Free on",
+      "titleEm": "Steam",
+      "sub": "Every game Steam is giving away at 100 % off right now, straight from the store. Claim one before its timer runs out and it is yours forever — no key, no raffle, just your Steam account.",
+      "statFree": "free now",
+      "statKeep": "keep forever",
+      "statValue": "value",
+      "searchPlaceholder": "Search game, studio or publisher…",
+      "sortLabel": "Sort",
+      "sortEnds": "Ending soonest",
+      "sortValue": "Highest value",
+      "sortRating": "Best rated",
+      "sortName": "Name",
+      "refresh": "Refresh",
+      "retry": "Try again",
+      "updated": "Updated at {time}",
+      "sourceLink": "Open on Steam",
+      "claim": "Claim on Steam",
+      "details": "Details",
+      "close": "Close",
+      "endsIn": "Ends in",
+      "endsUnknown": "No deadline given",
+      "ended": "Offer ended",
+      "deadline": "Time left to claim this offer",
+      "keep": "Keep forever",
+      "keepNote": "Claim it before the timer ends and it stays in your library forever, even after the promotion is over.",
+      "weekend": "Free trial",
+      "weekendNote": "Free to play while the promotion lasts — it does not stay in your library afterwards.",
+      "saves": "you save the full price",
+      "reviews": "reviews",
+      "noReviews": "No reviews yet",
+      "developer": "Developer",
+      "publisher": "Publisher",
+      "release": "Release",
+      "platforms": "Platforms",
+      "genres": "Genres",
+      "officialSite": "Official site",
+      "tabInfo": "Info",
+      "tabMedia": "Media",
+      "detailLoading": "Loading Steam details…",
+      "viewSteam": "Store page",
+      "mediaN": "Media {n}",
+      "emptyTitle": "Nothing free right now",
+      "emptyLead": "Steam has no 100 % off games at this moment. Check back soon — promotions usually last a few days.",
+      "emptySearchTitle": "No matches",
+      "emptySearch": "Nothing matches “{q}”.",
+      "clearSearch": "Clear search",
+      "errorTitle": "Could not reach Steam",
+      "errorLead": "The store did not answer. This is usually temporary."
     }
   }
 }

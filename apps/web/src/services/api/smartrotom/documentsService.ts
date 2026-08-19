@@ -1,7 +1,6 @@
-import { rotomGET, rotomPOST, rotomPUT, rotomDELETE, rotomAuthedPOST, rotomAuthedDELETE, apiAuthedPOST, apiAuthedPUT, apiAuthedDELETE } from '@/services/boffAPI';
+import { rotomGET, rotomPOST, rotomPUT, rotomDELETE, rotomAuthedGET, rotomAuthedPOST, rotomAuthedPUT, rotomAuthedDELETE, apiAuthedPOST, apiAuthedPUT, apiAuthedDELETE } from '@/services/boffAPI';
 import type {
   CreateDocumentDto,
-  CreateDocumentDtoWithUuid,
   UpdateDocumentDto,
   CreateNewsDto,
   UpdateNewsDto,
@@ -22,12 +21,22 @@ import type {
   NoteFolder,
   NoteTag,
   NoteVersion,
-  CreateFolderDto,
   UpdateFolderDto,
-  CreateTagDto,
   UpdateTagDto,
   CreateVersionDto,
 } from '@boffmedia/shared';
+
+// Local request shapes for the three payloads whose owner uuid moved out of the
+// body and into the session. `@boffmedia/shared` is generated from the running
+// API, so its copies still carry `uuid` until `pnpm generate:shared` is re-run
+// against a rebuilt API — sending that field now fails the global
+// ValidationPipe (`forbidNonWhitelisted`), which is exactly the point.
+export type CreateFolderDto = {
+  name: string;
+  color?: string;
+  parentId?: number | null;
+};
+export type CreateTagDto = { label: string; color?: string };
 
 export class DocumentsService {
   // ==================== DOCUMENT OPERATIONS ====================
@@ -36,28 +45,28 @@ export class DocumentsService {
    * Get a document by ID
    */
   static getDocument(id: number) {
-    return rotomGET<Document>(`/documents/document/${id}`);
+    return rotomAuthedGET<Document>(`/documents/document/${id}`);
   }
   
   /**
    * Create a new document
    */
   static createDocument(data: CreateDocumentDto) {
-    return rotomPOST<Document>('/documents/document', data);
+    return rotomAuthedPOST<Document>('/documents/document', data);
   }
   
   /**
    * Update an existing document
    */
   static updateDocument(id: number, data: UpdateDocumentDto) {
-    return rotomPUT<Document>(`/documents/document/${id}`, data);
+    return rotomAuthedPUT<Document>(`/documents/document/${id}`, data);
   }
   
   /**
    * Delete a document
    */
   static deleteDocument(id: number) {
-    return rotomDELETE<SuccessResponse>(`/documents/document/${id}`);
+    return rotomAuthedDELETE<SuccessResponse>(`/documents/document/${id}`);
   }
 
   // ==================== NOTE OPERATIONS ====================
@@ -65,99 +74,101 @@ export class DocumentsService {
   /**
    * Get all notes for a user
    */
-  static getUserNotes(uuid: string) {
-    return rotomGET<NotePreview[]>(`/documents/all/${uuid}`);
+  /** The caller's notes. The owner is taken from the session, not the URL. */
+  static getUserNotes() {
+    return rotomAuthedGET<NotePreview[]>('/documents/notes');
   }
   
   /**
    * Create a new note
    */
-  static createNote(data: CreateDocumentDtoWithUuid) {
-    return rotomPOST<CreateNoteResponse>('/documents/create', data);
+  static createNote(data: CreateDocumentDto) {
+    return rotomAuthedPOST<CreateNoteResponse>('/documents/create', data);
   }
   
   /**
    * Save a note
    */
   static saveNote(id: number, data: CreateDocumentDto) {
-    return rotomPOST<SaveDocumentResponse>(`/documents/save/${id}`, data);
+    return rotomAuthedPOST<SaveDocumentResponse>(`/documents/save/${id}`, data);
   }
   
   /**
    * Add a note to a user
    */
-  static addNoteToUser(noteId: number, uuid: string) {
-    return rotomPOST<SuccessResponse>(`/documents/note/${noteId}/user/${uuid}`, {});
+  /** Share a note the caller owns with another player. */
+  static addNoteToUser(documentId: number, uuid: string) {
+    return rotomAuthedPOST<SuccessResponse>('/documents/note/user', { documentId, uuid });
   }
 
   /**
    * Remove a note from a user
    */
-  static removeNoteFromUser(noteId: number, uuid: string) {
-    return rotomDELETE<SuccessResponse>(`/documents/note/${noteId}/user/${uuid}`);
+  static removeNoteFromUser(documentId: number, uuid: string) {
+    return rotomAuthedDELETE<SuccessResponse>('/documents/note/user', { documentId, uuid });
   }
 
   /** List the UUIDs a note is shared with */
   static getDocumentShares(id: number) {
-    return rotomGET<string[]>(`/documents/document/${id}/shares`);
+    return rotomAuthedGET<string[]>(`/documents/document/${id}/shares`);
   }
 
   // ==================== TRASH OPERATIONS ====================
 
   /** Soft-deleted notes for a user */
-  static getTrash(uuid: string) {
-    return rotomGET<NotePreview[]>(`/documents/trash/${uuid}`);
+  static getTrash() {
+    return rotomAuthedGET<NotePreview[]>('/documents/trash');
   }
 
   /** Restore a soft-deleted note */
   static restoreDocument(id: number) {
-    return rotomPOST<Document>(`/documents/document/${id}/restore`, {});
+    return rotomAuthedPOST<Document>(`/documents/document/${id}/restore`, {});
   }
 
   /** Permanently delete a note */
   static purgeDocument(id: number) {
-    return rotomDELETE<SuccessResponse>(`/documents/document/${id}/purge`);
+    return rotomAuthedDELETE<SuccessResponse>(`/documents/document/${id}/purge`);
   }
 
   // ==================== FOLDER OPERATIONS ====================
 
-  static getFolders(uuid: string) {
-    return rotomGET<NoteFolder[]>(`/documents/folders/${uuid}`);
+  static getFolders() {
+    return rotomAuthedGET<NoteFolder[]>('/documents/folders');
   }
 
   static createFolder(data: CreateFolderDto) {
-    return rotomPOST<NoteFolder>('/documents/folders', data);
+    return rotomAuthedPOST<NoteFolder>('/documents/folders', data);
   }
 
   static updateFolder(id: number, data: UpdateFolderDto) {
-    return rotomPUT<NoteFolder>(`/documents/folders/${id}`, data);
+    return rotomAuthedPUT<NoteFolder>(`/documents/folders/${id}`, data);
   }
 
   static deleteFolder(id: number) {
-    return rotomDELETE<SuccessResponse>(`/documents/folders/${id}`);
+    return rotomAuthedDELETE<SuccessResponse>(`/documents/folders/${id}`);
   }
 
   // ==================== TAG OPERATIONS ====================
 
-  static getTags(uuid: string) {
-    return rotomGET<NoteTag[]>(`/documents/tags/${uuid}`);
+  static getTags() {
+    return rotomAuthedGET<NoteTag[]>('/documents/tags');
   }
 
   static createTag(data: CreateTagDto) {
-    return rotomPOST<NoteTag>('/documents/tags', data);
+    return rotomAuthedPOST<NoteTag>('/documents/tags', data);
   }
 
   static updateTag(id: number, data: UpdateTagDto) {
-    return rotomPUT<SuccessResponse>(`/documents/tags/${id}`, data);
+    return rotomAuthedPUT<SuccessResponse>(`/documents/tags/${id}`, data);
   }
 
   static deleteTag(id: number) {
-    return rotomDELETE<SuccessResponse>(`/documents/tags/${id}`);
+    return rotomAuthedDELETE<SuccessResponse>(`/documents/tags/${id}`);
   }
 
   /** Toggle a tag on a note (adds if absent, removes if present) */
   static toggleNoteTag(documentId: number, tagId: number) {
-    return rotomPOST<{ success: boolean; applied: boolean }>(
+    return rotomAuthedPOST<{ success: boolean; applied: boolean }>(
       `/documents/document/${documentId}/tag/${tagId}`,
       {},
     );
@@ -166,12 +177,12 @@ export class DocumentsService {
   // ==================== VERSION OPERATIONS ====================
 
   static getVersions(documentId: number) {
-    return rotomGET<NoteVersion[]>(`/documents/document/${documentId}/versions`);
+    return rotomAuthedGET<NoteVersion[]>(`/documents/document/${documentId}/versions`);
   }
 
   /** Snapshot the current note content as a version */
   static snapshotVersion(documentId: number, data: CreateVersionDto) {
-    return rotomPOST<NoteVersion>(
+    return rotomAuthedPOST<NoteVersion>(
       `/documents/document/${documentId}/versions`,
       data,
     );
@@ -179,7 +190,7 @@ export class DocumentsService {
 
   /** Restore a note to a previous version */
   static restoreVersion(versionId: number) {
-    return rotomPOST<Document>(`/documents/versions/${versionId}/restore`, {});
+    return rotomAuthedPOST<Document>(`/documents/versions/${versionId}/restore`, {});
   }
 
   // ==================== NEWS OPERATIONS ====================

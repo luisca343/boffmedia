@@ -1,7 +1,7 @@
 import * as dotenv from 'dotenv';
 dotenv.config();
 
-import { and, eq, inArray, like, sql } from 'drizzle-orm';
+import { and, eq, inArray, like } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/mysql2';
 import * as mysql from 'mysql2/promise';
 import pino from 'pino';

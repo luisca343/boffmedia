@@ -55,7 +55,9 @@ describe('PacksRepository — entitlement derivation (query shape)', () => {
         'exists (select 1 from `pack_grants` where (`pack_grants`.`pack_id` = `packs`.`id` and `pack_grants`.`user_id` = ?))',
       );
       // (a) event membership
-      expect(sql).toContain('exists (select 1 from `boffmedia_event_participants`');
+      expect(sql).toContain(
+        'exists (select 1 from `boffmedia_event_participants`',
+      );
       // Archived packs never appear.
       expect(sql).toContain('`packs`.`archived` = ?');
     });
@@ -87,7 +89,10 @@ describe('PacksRepository — entitlement derivation (query shape)', () => {
 
     it('resolves pack_acl through the CURRENTLY linked uuid for an account principal', async () => {
       const h = harness();
-      await h.repo.listVisibleTo({ userId: 7, mcUuid: 'a-stale-claim' } as never);
+      await h.repo.listVisibleTo({
+        userId: 7,
+        mcUuid: 'a-stale-claim',
+      } as never);
       const { sql, params } = h.last();
 
       // The token's mcUuid claim lives 30 days and goes stale on unlink/relink,
@@ -129,13 +134,17 @@ describe('PacksRepository — entitlement derivation (query shape)', () => {
       await h.repo.listVisibleTo({ userId: 7 } as never);
       const { sql, params } = h.last();
 
-      expect(sql).toContain('`boffmedia_event_participants`.`status` in (?, ?)');
+      expect(sql).toContain(
+        '`boffmedia_event_participants`.`status` in (?, ?)',
+      );
       // A soft-deleted event must stop conferring access.
       expect(sql).toContain('`boffmedia_events`.`deleted_at` is null');
       // Anonymous participants (no user_id) derive nothing.
       expect(sql).toContain('`boffmedia_participants`.`user_id` = ?');
 
-      expect(params).toEqual(expect.arrayContaining(['registered', 'confirmed']));
+      expect(params).toEqual(
+        expect.arrayContaining(['registered', 'confirmed']),
+      );
       expect(params).not.toContain('removed');
       expect(params).not.toContain('waitlisted');
       expect(params).not.toContain('cancelled');
@@ -158,7 +167,9 @@ describe('PacksRepository — entitlement derivation (query shape)', () => {
       const h = harness();
       h.queue([[7]]);
 
-      await expect(h.repo.hasAccess('pk1', { userId: 7 } as never)).resolves.toBe(true);
+      await expect(
+        h.repo.hasAccess('pk1', { userId: 7 } as never),
+      ).resolves.toBe(true);
       expect(h.executed).toHaveLength(1);
       expect(h.executed[0].sql).toContain('from `pack_grants`');
       expect(h.executed[0].sql).toContain('`pack_grants`.`pack_id` = ?');
@@ -176,7 +187,9 @@ describe('PacksRepository — entitlement derivation (query shape)', () => {
       expect(h.executed).toHaveLength(3);
       expect(h.executed[2].sql).toContain('`boffmedia_event_participants`');
       // The membership clause is bound to THIS pack, not correlated to packs.id.
-      expect(h.executed[2].sql).not.toContain('`boffmedia_events`.`pack_id` = `packs`.`id`');
+      expect(h.executed[2].sql).not.toContain(
+        '`boffmedia_events`.`pack_id` = `packs`.`id`',
+      );
     });
 
     it('answers true when the membership probe matches', async () => {
@@ -185,7 +198,9 @@ describe('PacksRepository — entitlement derivation (query shape)', () => {
       h.queue([]);
       h.queue([[1]]);
 
-      await expect(h.repo.hasAccess('pk1', { userId: 7 } as never)).resolves.toBe(true);
+      await expect(
+        h.repo.hasAccess('pk1', { userId: 7 } as never),
+      ).resolves.toBe(true);
     });
 
     it('answers true on a legacy ACL row reached through the linked account', async () => {
@@ -194,10 +209,15 @@ describe('PacksRepository — entitlement derivation (query shape)', () => {
       h.queue([[UUID]]); // acl hit via boffmedia_users
 
       await expect(
-        h.repo.hasAccess('pk1', { userId: 7, mcUuid: 'a-stale-claim' } as never),
+        h.repo.hasAccess('pk1', {
+          userId: 7,
+          mcUuid: 'a-stale-claim',
+        } as never),
       ).resolves.toBe(true);
       expect(h.executed[1].sql).toContain('`boffmedia_users`.`id` = ?');
-      expect(h.executed[1].sql).toContain('`boffmedia_users`.`deleted_at` is null');
+      expect(h.executed[1].sql).toContain(
+        '`boffmedia_users`.`deleted_at` is null',
+      );
       expect(h.executed[1].params).not.toContain('a-stale-claim');
     });
 
@@ -205,7 +225,9 @@ describe('PacksRepository — entitlement derivation (query shape)', () => {
       const h = harness();
       h.queue([[UUID]]);
 
-      await expect(h.repo.hasAccess('pk1', { mcUuid: UUID } as never)).resolves.toBe(true);
+      await expect(
+        h.repo.hasAccess('pk1', { mcUuid: UUID } as never),
+      ).resolves.toBe(true);
       expect(h.executed[0].sql).toContain('`pack_acl`.`uuid` = ?');
       expect(h.executed[0].params).toContain(UUID);
     });
@@ -267,7 +289,9 @@ describe('PacksRepository.claimLegacyGrants', () => {
     h.queue([]);
 
     await h.repo.claimLegacyGrants(7, UUID);
-    expect(h.executed[0].sql).toContain('from `pack_acl` where `pack_acl`.`uuid` = ?');
+    expect(h.executed[0].sql).toContain(
+      'from `pack_acl` where `pack_acl`.`uuid` = ?',
+    );
     expect(h.executed[0].params).toEqual([UUID]);
   });
 });

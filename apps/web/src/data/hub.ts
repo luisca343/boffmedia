@@ -49,7 +49,10 @@ export const hubConfig: Record<string, HubEntry> = {
     taglineKey: "toolsUi.taglines.minecraft",
     hue: 145,
     logoLabel: "M",
-    toolNs: "games.minecraft",
+    // Tool strings are owned by @boffmedia/tools-minecraft under `tools.<toolKey>.*`
+    // and merged in by both hosts; only the game name + category labels stay in the
+    // web catalog under `games.minecraft.*`.
+    toolNs: "tools",
     extNs: "games.minecraft.externalLinks",
   },
 }

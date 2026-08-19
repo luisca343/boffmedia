@@ -18,8 +18,13 @@ export const boffMediaUsers = mysqlTable('boffmedia_users', {
   // keys on it. Soft-delete scrubs the column to `deleted+<id>@deleted.invalid`,
   // which is unique per row, so tombstones never collide here.
   email: varchar('email', { length: 255 }).notNull().unique(),
+  // Link to the in-game (SmartRotom/Minecraft) identity. Deliberately
+  // `set null`, NOT cascade: the website account is the durable record and must
+  // survive its game identity being removed. Cascading here meant deleting one
+  // `rotom_users` row silently destroyed the person's whole Boffmedia account —
+  // forum posts, events, packs and grants — through the FKs hanging off it.
   uuid: char('uuid', { length: 36 }).references(() => rotomUsers.uuid, {
-    onDelete: 'cascade',
+    onDelete: 'set null',
     onUpdate: 'cascade',
   }),
   profilePicture: varchar('profile_picture', { length: 255 })

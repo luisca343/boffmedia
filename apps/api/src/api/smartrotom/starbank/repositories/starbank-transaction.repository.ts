@@ -1,4 +1,4 @@
-import { Injectable, Inject } from '@nestjs/common';
+import { HttpException, Injectable, Inject } from '@nestjs/common';
 import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
 import { MySql2Database } from 'drizzle-orm/mysql2';
 import { and, eq, inArray, or, desc } from 'drizzle-orm';
@@ -283,6 +283,9 @@ export class StarbankTransactionRepository implements IStarbankTransactionReposi
         `Failed to find transactions for account ${accountId}:`,
         error,
       );
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to find account transactions: ${error.message}`);
     }
   }
@@ -331,6 +334,9 @@ export class StarbankTransactionRepository implements IStarbankTransactionReposi
       return result.map(this.mapToEntity);
     } catch (error: any) {
       this.logger.error(`Failed to find transactions for user ${uuid}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to find user transactions: ${error.message}`);
     }
   }
@@ -384,6 +390,9 @@ export class StarbankTransactionRepository implements IStarbankTransactionReposi
         `Failed to find transfers for account ${accountId}:`,
         error,
       );
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to find account transfers: ${error.message}`);
     }
   }
@@ -435,6 +444,9 @@ export class StarbankTransactionRepository implements IStarbankTransactionReposi
       return result.map(this.mapToEntity);
     } catch (error: any) {
       this.logger.error(`Failed to find transfers for user ${uuid}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to find user transfers: ${error.message}`);
     }
   }
@@ -475,6 +487,9 @@ export class StarbankTransactionRepository implements IStarbankTransactionReposi
       return result.map(this.mapToEntity);
     } catch (error: any) {
       this.logger.error(`Failed to find transactions by type ${type}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to find transactions by type: ${error.message}`);
     }
   }

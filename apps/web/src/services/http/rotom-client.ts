@@ -66,6 +66,13 @@ export async function rotomDELETE<T>(url: string, data?: any): Promise<ApiRespon
   });
 }
 
+// Reads that belong to one player (notes, folders, tags, PC marks) carry the
+// Bearer too: the owner is taken from the token server-side, so an anonymous GET
+// has nobody to read for. No `server` field — it is a GET.
+export async function rotomAuthedGET<T>(url: string): Promise<ApiResponse<T>> {
+  return authedRequest<T>("GET", `${getApiUrl()}/smartrotom${url}`, await sessionToken());
+}
+
 // Authed PUT/PATCH/DELETE mirror rotomAuthedPOST: routes carrying their own
 // JwtAuthGuard (gobierno/*, news admin) 401 without the Bearer. `server` rides
 // along so the same helper works on routes still behind MinecraftMiddleware.
@@ -88,6 +95,10 @@ export async function rotomAuthedDELETE<T>(url: string, data?: any): Promise<Api
 
 export async function rotomGETOrThrow<T>(url: string): Promise<T> {
   return orThrow(rotomGET<T>(url));
+}
+
+export async function rotomAuthedGETOrThrow<T>(url: string): Promise<T> {
+  return orThrow(rotomAuthedGET<T>(url));
 }
 
 export async function rotomPOSTOrThrow<T>(url: string, data: any): Promise<T> {

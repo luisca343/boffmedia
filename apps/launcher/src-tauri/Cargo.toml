@@ -1,6 +1,6 @@
 [package]
 name = "boffmedia-app"
-version = "0.0.2"
+version = "0.9.0"
 description = "Boffmedia App"
 authors = ["Boffmedia"]
 edition = "2021"

@@ -1,6 +1,6 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { MySql2Database } from 'drizzle-orm/mysql2';
-import { eq } from 'drizzle-orm';
+import { eq, desc } from 'drizzle-orm';
 import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
 import { vgcPokepastes, VgcPokepaste, VgcMetaSlot } from '@/_db/schema/Vgc';
 
@@ -46,18 +46,23 @@ export class PastesRepository {
       'id' | 'parsedSlots' | 'rawText' | 'author' | 'title' | 'replicaCode'
     >[]
   > {
-    return this.db
-      .select({
-        id: vgcPokepastes.id,
-        parsedSlots: vgcPokepastes.parsedSlots,
-        rawText: vgcPokepastes.rawText,
-        author: vgcPokepastes.author,
-        title: vgcPokepastes.title,
-        replicaCode: vgcPokepastes.replicaCode,
-      })
-      .from(vgcPokepastes)
-      .where(eq(vgcPokepastes.formatId, formatId))
-      .limit(limit);
+    return (
+      this.db
+        .select({
+          id: vgcPokepastes.id,
+          parsedSlots: vgcPokepastes.parsedSlots,
+          rawText: vgcPokepastes.rawText,
+          author: vgcPokepastes.author,
+          title: vgcPokepastes.title,
+          replicaCode: vgcPokepastes.replicaCode,
+        })
+        .from(vgcPokepastes)
+        .where(eq(vgcPokepastes.formatId, formatId))
+        // The cap made this a silent sample; with no order it was a different
+        // sample on every call.
+        .orderBy(desc(vgcPokepastes.id))
+        .limit(limit)
+    );
   }
 
   /** Update author/title/sourceKey/replicaCode without touching rawText or parsedSlots. */

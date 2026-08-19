@@ -1,3 +1,4 @@
+import { Roles } from '@api/_utils/decorators/roles.decorator';
 import {
   Controller,
   Get,
@@ -7,21 +8,27 @@ import {
   Param,
   Delete,
   HttpStatus,
+  UseGuards,
 } from '@nestjs/common';
-import { Public } from '@api/_utils/decorators/public.decorator';
 import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AppsFacadeService } from './apps.facade.service';
 import { UpdateAppDto } from './dto/update-app.dto';
 import { CreateAppDto } from './dto/create-app.dto';
 import { OrderAppDto } from './dto/order-apps.dto';
 import { PlayerAppDto } from './dto/player-app.dto';
-import { GetPlayerAppsDto } from './dto/get-player-apps.dto';
 import { RotomApp } from './entities/app.entity';
 import { SuccessResponse } from '@api/_utils/entities/common-response.entity';
 import { Logger } from 'nestjs-pino';
+import { JwtAuthGuard } from '@api/auth/jwt-auth.guard';
+import { RolesGuard } from '@api/_utils/guards/roles.guard';
+import { USER_ROLES } from '@api/_utils/auth/roles.constants';
+import { CurrentMcUuid } from '@api/_utils/decorators/current-user.decorator';
 
 @ApiTags('SmartRotom | Apps')
-@Public()
+// The app registry (create/rename/activate/delete) is an admin surface and is
+// gated per method below; the four `player/*` routes are the caller's own dock
+// and need only a session. The whole controller used to be @Public(), so anyone
+// could delete an app for everyone or reorder another player's dock.
 @Controller('/smartrotom/apps')
 export class AppsController {
   constructor(
@@ -79,6 +86,8 @@ export class AppsController {
     return this.appsFacadeService.getApp(id);
   }
 
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.ROTOM_ADMIN)
   @Post()
   @ApiOperation({ summary: 'Create a new app' })
   @ApiResponse({
@@ -91,6 +100,8 @@ export class AppsController {
     return this.appsFacadeService.createApp(createAppDto);
   }
 
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.ROTOM_ADMIN)
   @Patch(':id')
   @ApiOperation({ summary: 'Update an app by ID' })
   @ApiResponse({
@@ -110,6 +121,8 @@ export class AppsController {
     return this.appsFacadeService.updateApp(id, updateAppDto);
   }
 
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.ROTOM_ADMIN)
   @Delete(':id')
   @ApiOperation({ summary: 'Delete an app by ID' })
   @ApiResponse({
@@ -127,6 +140,8 @@ export class AppsController {
 
   // ==================== APP STATUS MANAGEMENT ====================
 
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.ROTOM_ADMIN)
   @Patch(':id/activate')
   @ApiOperation({ summary: 'Activate an app by ID' })
   @ApiResponse({
@@ -142,6 +157,8 @@ export class AppsController {
     return this.appsFacadeService.activateApp(id);
   }
 
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.ROTOM_ADMIN)
   @Patch(':id/deactivate')
   @ApiOperation({ summary: 'Deactivate an app by ID' })
   @ApiResponse({
@@ -158,6 +175,9 @@ export class AppsController {
   }
 
   // ==================== PLAYER APP MANAGEMENT ====================
+  // These four are the player's own dock, not the registry: a session is
+  // enough, and the owner comes from it. @Roles() with no argument clears the
+  // class-level admin requirement for the handler.
 
   @Post('player')
   @ApiOperation({ summary: 'Get apps for a player' })
@@ -166,9 +186,7 @@ export class AppsController {
     description: 'Apps found for player successfully.',
     type: [RotomApp],
   })
-  @ApiBody({ type: GetPlayerAppsDto })
-  async getForPlayer(@Body() { uuid }: GetPlayerAppsDto): Promise<RotomApp[]> {
-    this.logger.log('Fetching apps for player:', uuid);
+  async getForPlayer(@CurrentMcUuid() uuid: string): Promise<RotomApp[]> {
     return this.appsFacadeService.getAppsForPlayer(uuid);
   }
 
@@ -181,7 +199,8 @@ export class AppsController {
   })
   @ApiBody({ type: PlayerAppDto })
   async addAppToPlayer(
-    @Body() { uuid, id }: PlayerAppDto,
+    @Body() { id }: PlayerAppDto,
+    @CurrentMcUuid() uuid: string,
   ): Promise<SuccessResponse> {
     return this.appsFacadeService.addAppToPlayer(uuid, id);
   }
@@ -195,7 +214,8 @@ export class AppsController {
   })
   @ApiBody({ type: PlayerAppDto })
   async removeAppFromPlayer(
-    @Body() { uuid, id }: PlayerAppDto,
+    @Body() { id }: PlayerAppDto,
+    @CurrentMcUuid() uuid: string,
   ): Promise<SuccessResponse> {
     return this.appsFacadeService.removeAppFromPlayer(uuid, id);
   }
@@ -210,12 +230,11 @@ export class AppsController {
     type: SuccessResponse,
   })
   @ApiBody({ type: OrderAppDto })
-  async order(@Body() orderDto: OrderAppDto): Promise<SuccessResponse> {
-    this.logger.log('Ordering apps with data:', orderDto);
-    const result = await this.appsFacadeService.orderApps(
-      orderDto.order,
-      orderDto.uuid,
-    );
+  async order(
+    @Body() orderDto: OrderAppDto,
+    @CurrentMcUuid() uuid: string,
+  ): Promise<SuccessResponse> {
+    const result = await this.appsFacadeService.orderApps(orderDto.order, uuid);
     return {
       success: result.success,
       message: 'Apps ordered successfully',

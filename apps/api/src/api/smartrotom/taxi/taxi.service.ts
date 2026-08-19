@@ -114,7 +114,8 @@ export class TaxiService {
     actorUuid: string,
     reason?: string,
   ): Promise<void> {
-    const stop = await this.findStop(stopId);
+    // Called for the 404 it throws when the stop does not exist.
+    await this.findStop(stopId);
     const outcome = await this.wingull.teleportPlayer(stopId, uuid);
 
     if (!outcome.ok) {

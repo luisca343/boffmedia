@@ -365,7 +365,13 @@ describe('PacksService', () => {
       await expect(service.redeemInvite(LAUNCHER, 'abc')).resolves.toEqual({
         packId: 'pk1',
       });
-      expect(repo.grantToUser).toHaveBeenCalledWith('pk1', 7, 'invite', 'abc', null);
+      expect(repo.grantToUser).toHaveBeenCalledWith(
+        'pk1',
+        7,
+        'invite',
+        'abc',
+        null,
+      );
     });
 
     it('grants nothing when the code is exhausted, expired or revoked', async () => {
@@ -442,14 +448,18 @@ describe('PacksService', () => {
       expect(m.version.dependencies).toBeDefined();
     });
 
-    it('defaults gameType to minecraft on create and stores NULL', async () => {
+    it('defaults gameType to minecraft on create and STORES it', async () => {
       repo.findBySlug.mockResolvedValue(null as never);
       await service.createPack(
         { slug: 'x', name: 'X', accessKind: 'public' } as never,
         1,
       );
+      // The column is NOT NULL with a 'minecraft' default now. It used to be
+      // nullable with "NULL means minecraft", so every reader had to
+      // re-implement the default and an unset value was indistinguishable from
+      // a deliberate one.
       expect(repo.insertPack).toHaveBeenCalledWith(
-        expect.objectContaining({ gameType: null }),
+        expect.objectContaining({ gameType: 'minecraft' }),
       );
       expect(repo.audit).toHaveBeenCalledWith(
         'pack.created',

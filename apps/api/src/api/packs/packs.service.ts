@@ -47,6 +47,8 @@ export class PacksService {
 
   /** NULL column → 'minecraft'. One place owns the default so no consumer
    *  re-implements it. */
+  /** The column is NOT NULL with a 'minecraft' default, so this only guards
+   *  callers that hand us a partially-built row. */
   private resolveGameType(gameType: GameType | null | undefined): GameType {
     return gameType ?? 'minecraft';
   }
@@ -217,7 +219,8 @@ export class PacksService {
     const linked = await this.randomizerLink.findByPackId(pack.id, {
       anyEventStatus: true,
     });
-    const randomizerConfig = linked && linked.status !== 'draft' ? linked : null;
+    const randomizerConfig =
+      linked && linked.status !== 'draft' ? linked : null;
 
     // Belt-and-braces for the clean-ROM invariant: if the version's declared
     // ROM hash disagrees with the config's pinned clean hash, the launcher's
@@ -511,12 +514,10 @@ export class PacksService {
     }
 
     const id = this.newId();
-    // NULL = minecraft (zero-backfill semantics): an explicit 'minecraft' is
-    // normalized to NULL so the stored value matches every pre-multi-game row.
-    const gameType =
-      dto.gameType && dto.gameType !== 'minecraft'
-        ? (dto.gameType as GameType)
-        : null;
+    // Stored as the real value. The column used to be nullable with "NULL means
+    // minecraft", so every reader had to re-implement the default; it is now
+    // NOT NULL with a 'minecraft' default and says what it means.
+    const gameType = (dto.gameType as GameType | undefined) ?? 'minecraft';
     // Quick Play targets are minecraft-only: an emulator/zomboid/stardew pack
     // that happens to send `server` gets it stripped, never persisted.
     const isMinecraft = this.resolveGameType(gameType) === 'minecraft';

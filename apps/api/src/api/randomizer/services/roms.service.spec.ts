@@ -62,7 +62,11 @@ describe('RomsService', () => {
 
       expect(blobStorage.storeBlob).toHaveBeenCalled();
       expect(repository.createRom).toHaveBeenCalledWith(
-        expect.objectContaining({ sha512: SHA, gamePlatform: 'gba', fileSize: 1000 }),
+        expect.objectContaining({
+          sha512: SHA,
+          gamePlatform: 'gba',
+          fileSize: 1000,
+        }),
       );
       expect(rom.id).toBe(5);
     });

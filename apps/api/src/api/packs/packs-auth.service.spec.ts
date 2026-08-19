@@ -42,7 +42,9 @@ describe('PacksAuthService', () => {
         { userId: 7, username: 'TrainerAsh', mcUuid: null },
         0,
       );
-      expect(jwt.verify<Record<string, unknown>>(token)).not.toHaveProperty('mcUuid');
+      expect(jwt.verify<Record<string, unknown>>(token)).not.toHaveProperty(
+        'mcUuid',
+      );
     });
 
     it('round-trips through verifySession', () => {
@@ -70,8 +72,14 @@ describe('PacksAuthService', () => {
   describe('verifySession', () => {
     it('rejects a website/access token: no launcher `typ`', () => {
       // Exactly the shape a website session has — same secret, no typ claim.
-      const website = jwt.sign({ sub: 7, username: 'TrainerAsh', roles: ['user'] });
-      expect(() => service.verifySession(website)).toThrow(UnauthorizedException);
+      const website = jwt.sign({
+        sub: 7,
+        username: 'TrainerAsh',
+        roles: ['user'],
+      });
+      expect(() => service.verifySession(website)).toThrow(
+        UnauthorizedException,
+      );
       try {
         service.verifySession(website);
       } catch (err: any) {
@@ -85,31 +93,44 @@ describe('PacksAuthService', () => {
     });
 
     it('rejects an OLD MC-UUID-subject session with needs_newer_launcher', () => {
-      const legacy = jwt.sign({ sub: UUID, username: 'TrainerAsh', typ: 'launcher' });
+      const legacy = jwt.sign({
+        sub: UUID,
+        username: 'TrainerAsh',
+        typ: 'launcher',
+      });
       try {
         service.verifySession(legacy);
         throw new Error('should have thrown');
       } catch (err: any) {
         expect(err).toBeInstanceOf(UnauthorizedException);
-        expect(err.getResponse()).toMatchObject({ error: 'needs_newer_launcher' });
+        expect(err.getResponse()).toMatchObject({
+          error: 'needs_newer_launcher',
+        });
       }
     });
 
-    it.each([[0], [-1], [1.5]])('rejects a non-positive-integer subject (%s)', (sub) => {
-      const bad = jwt.sign({ sub, username: 'x', typ: 'launcher' });
-      try {
-        service.verifySession(bad);
-        throw new Error('should have thrown');
-      } catch (err: any) {
-        expect(err.getResponse()).toMatchObject({ error: 'needs_newer_launcher' });
-      }
-    });
+    it.each([[0], [-1], [1.5]])(
+      'rejects a non-positive-integer subject (%s)',
+      (sub) => {
+        const bad = jwt.sign({ sub, username: 'x', typ: 'launcher' });
+        try {
+          service.verifySession(bad);
+          throw new Error('should have thrown');
+        } catch (err: any) {
+          expect(err.getResponse()).toMatchObject({
+            error: 'needs_newer_launcher',
+          });
+        }
+      },
+    );
 
     it('rejects a token signed with a different secret', () => {
-      const foreign = new JwtService({ secret: 'a-completely-different-secret-value' }).sign(
-        { sub: 7, username: 'x', typ: 'launcher' },
+      const foreign = new JwtService({
+        secret: 'a-completely-different-secret-value',
+      }).sign({ sub: 7, username: 'x', typ: 'launcher' });
+      expect(() => service.verifySession(foreign)).toThrow(
+        UnauthorizedException,
       );
-      expect(() => service.verifySession(foreign)).toThrow(UnauthorizedException);
     });
 
     it('rejects an expired launcher token', () => {
@@ -117,15 +138,23 @@ describe('PacksAuthService', () => {
         { sub: 7, username: 'x', typ: 'launcher' },
         { expiresIn: '-1s' },
       );
-      expect(() => service.verifySession(expired)).toThrow(UnauthorizedException);
+      expect(() => service.verifySession(expired)).toThrow(
+        UnauthorizedException,
+      );
     });
 
     it('rejects garbage instead of leaking the jwt error', () => {
-      expect(() => service.verifySession('not-a-jwt')).toThrow(UnauthorizedException);
+      expect(() => service.verifySession('not-a-jwt')).toThrow(
+        UnauthorizedException,
+      );
     });
 
     it('treats a token minted before revocation existed as version 0', () => {
-      const preRevocation = jwt.sign({ sub: 7, username: 'x', typ: 'launcher' });
+      const preRevocation = jwt.sign({
+        sub: 7,
+        username: 'x',
+        typ: 'launcher',
+      });
       expect(service.verifySession(preRevocation).tokenVersion).toBe(0);
     });
   });

@@ -2,12 +2,20 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { DocumentService } from './document.service';
 import { DOCUMENTS_REPOSITORY_TOKEN } from '../repositories/interfaces/documents.repository.token';
 
+const OWNER = '67d9b543-5ac9-41e1-a8a5-20d7689e24a4';
+const STRANGER = '11111111-2222-3333-4444-555555555555';
+
 const mockRepo = {
   findDocumentById: jest.fn(),
   findUserDocuments: jest.fn(),
   createDocument: jest.fn(),
   updateDocument: jest.fn(),
   softDeleteDocument: jest.fn(),
+  // Ownership is proven through the join table, so every mutating test needs it.
+  findDocumentUserAssociation: jest.fn(),
+  addDocumentToUser: jest.fn(),
+  deleteDocument: jest.fn(),
+  restoreDocument: jest.fn(),
 };
 
 const mockDocument = {
@@ -23,6 +31,12 @@ describe('DocumentService', () => {
 
   beforeEach(async () => {
     jest.clearAllMocks();
+    // Default: the caller holds the document. Tests that check the 403 path
+    // override this.
+    mockRepo.findDocumentUserAssociation.mockResolvedValue({
+      documentId: 1,
+      uuid: OWNER,
+    });
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         DocumentService,
@@ -43,13 +57,15 @@ describe('DocumentService', () => {
     it('returns the document when found', async () => {
       mockRepo.findDocumentById.mockResolvedValue(mockDocument);
 
-      await expect(service.getDocumentById(1)).resolves.toEqual(mockDocument);
+      await expect(service.getDocumentById(1, OWNER)).resolves.toEqual(
+        mockDocument,
+      );
       expect(mockRepo.findDocumentById).toHaveBeenCalledWith(1);
     });
 
     it('throws when id is 0', async () => {
-      await expect(service.getDocumentById(0)).rejects.toThrow(
-        'Valid document ID is required',
+      await expect(service.getDocumentById(0, OWNER)).rejects.toThrow(
+        'Identificador de nota inválido',
       );
       expect(mockRepo.findDocumentById).not.toHaveBeenCalled();
     });
@@ -57,8 +73,8 @@ describe('DocumentService', () => {
     it('throws when document not found', async () => {
       mockRepo.findDocumentById.mockResolvedValue(null);
 
-      await expect(service.getDocumentById(99)).rejects.toThrow(
-        'Document not found',
+      await expect(service.getDocumentById(99, OWNER)).rejects.toThrow(
+        'Nota no encontrada',
       );
     });
   });
@@ -76,10 +92,10 @@ describe('DocumentService', () => {
       expect(mockRepo.findUserDocuments).toHaveBeenCalledWith('user-uuid');
     });
 
-    it('throws when uuid is empty', async () => {
-      await expect(service.getUserDocuments('')).rejects.toThrow(
-        'UUID is required',
-      );
+    it('lists nothing for an owner with no notes', async () => {
+      mockRepo.findUserDocuments.mockResolvedValue([]);
+
+      await expect(service.getUserDocuments(OWNER)).resolves.toEqual([]);
     });
   });
 
@@ -121,13 +137,13 @@ describe('DocumentService', () => {
     it('throws when title is missing', async () => {
       await expect(
         service.createDocument({ title: '', content: 'Hello', type: 1 }),
-      ).rejects.toThrow('Title and content are required');
+      ).rejects.toThrow('Título y contenido son obligatorios');
     });
 
     it('throws when content is missing', async () => {
       await expect(
         service.createDocument({ title: 'Notes', content: '', type: 1 }),
-      ).rejects.toThrow('Title and content are required');
+      ).rejects.toThrow('Título y contenido son obligatorios');
     });
 
     it('throws when type is not provided', async () => {
@@ -137,7 +153,7 @@ describe('DocumentService', () => {
           content: 'Hello',
           type: undefined as any,
         }),
-      ).rejects.toThrow('Document type is required');
+      ).rejects.toThrow('El tipo de nota es obligatorio');
     });
   });
 
@@ -152,7 +168,9 @@ describe('DocumentService', () => {
         title: 'Updated',
       });
 
-      const result = await service.updateDocument(1, { title: 'Updated' });
+      const result = await service.updateDocument(1, OWNER, {
+        title: 'Updated',
+      });
 
       expect(result.title).toBe('Updated');
       expect(mockRepo.updateDocument).toHaveBeenCalledWith(1, {
@@ -163,9 +181,9 @@ describe('DocumentService', () => {
     it('throws when document not found', async () => {
       mockRepo.findDocumentById.mockResolvedValue(null);
 
-      await expect(service.updateDocument(99, { title: 'X' })).rejects.toThrow(
-        'Document not found',
-      );
+      await expect(
+        service.updateDocument(99, OWNER, { title: 'X' }),
+      ).rejects.toThrow('Nota no encontrada');
     });
   });
 
@@ -176,15 +194,15 @@ describe('DocumentService', () => {
       mockRepo.findDocumentById.mockResolvedValue(mockDocument);
       mockRepo.softDeleteDocument.mockResolvedValue(undefined);
 
-      await expect(service.deleteDocument(1)).resolves.toBeUndefined();
+      await expect(service.deleteDocument(1, OWNER)).resolves.toBeUndefined();
       expect(mockRepo.softDeleteDocument).toHaveBeenCalledWith(1);
     });
 
     it('throws when document not found', async () => {
       mockRepo.findDocumentById.mockResolvedValue(null);
 
-      await expect(service.deleteDocument(99)).rejects.toThrow(
-        'Document not found',
+      await expect(service.deleteDocument(99, OWNER)).rejects.toThrow(
+        'Nota no encontrada',
       );
       expect(mockRepo.softDeleteDocument).not.toHaveBeenCalled();
     });
@@ -197,7 +215,7 @@ describe('DocumentService', () => {
       mockRepo.createDocument.mockResolvedValue({ insertId: 5 });
       mockRepo.findDocumentById.mockResolvedValue({ ...mockDocument, id: 5 });
 
-      const result = await service.saveDocument(0, 'New', 'Body', 1);
+      const result = await service.saveDocument(0, OWNER, 'New', 'Body', 1);
 
       expect(result.success).toBe(true);
       expect(result.id).toBe(5);
@@ -208,26 +226,54 @@ describe('DocumentService', () => {
       mockRepo.updateDocument.mockResolvedValue(undefined);
       mockRepo.findDocumentById.mockResolvedValue(mockDocument);
 
-      const result = await service.saveDocument(1, 'Notes', 'Hello', 1);
+      const result = await service.saveDocument(1, OWNER, 'Notes', 'Hello', 1);
 
       expect(result.success).toBe(true);
       expect(result.id).toBe(1);
     });
   });
 
-  // ─── validateDocumentExists ───────────────────────────────────────────────────
+  // ─── ownership ────────────────────────────────────────────────────────────────
 
-  describe('validateDocumentExists()', () => {
-    it('returns true when document exists', async () => {
+  describe('ownership', () => {
+    it('refuses to update a document the caller does not hold', async () => {
       mockRepo.findDocumentById.mockResolvedValue(mockDocument);
+      mockRepo.findDocumentUserAssociation.mockResolvedValue(null);
 
-      await expect(service.validateDocumentExists(1)).resolves.toBe(true);
+      await expect(
+        service.updateDocument(1, STRANGER, { title: 'pwned' }),
+      ).rejects.toThrow('Esta nota no te pertenece');
+      expect(mockRepo.updateDocument).not.toHaveBeenCalled();
     });
 
-    it('returns false when document does not exist', async () => {
-      mockRepo.findDocumentById.mockResolvedValue(null);
+    it('refuses to purge a document the caller does not hold', async () => {
+      mockRepo.findDocumentById.mockResolvedValue(mockDocument);
+      mockRepo.findDocumentUserAssociation.mockResolvedValue(null);
 
-      await expect(service.validateDocumentExists(99)).resolves.toBe(false);
+      await expect(service.purgeDocument(1, STRANGER)).rejects.toThrow(
+        'Esta nota no te pertenece',
+      );
+      expect(mockRepo.deleteDocument).not.toHaveBeenCalled();
+    });
+
+    it('serves a public document to a caller who does not hold it', async () => {
+      mockRepo.findDocumentById.mockResolvedValue({
+        ...mockDocument,
+        public: 1,
+      });
+      mockRepo.findDocumentUserAssociation.mockResolvedValue(null);
+
+      await expect(service.getDocumentById(1, STRANGER)).resolves.toMatchObject(
+        { id: 1 },
+      );
+    });
+
+    it('refuses an anonymous read of a private document', async () => {
+      mockRepo.findDocumentById.mockResolvedValue(mockDocument);
+
+      await expect(service.getDocumentById(1)).rejects.toThrow(
+        'Esta nota es privada',
+      );
     });
   });
 });

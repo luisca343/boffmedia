@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
 import axios, { AxiosResponse } from 'axios';
 import { Logger } from 'nestjs-pino';
 import { env } from '@/config/env';
@@ -40,13 +40,22 @@ export class PlayerRepository {
       );
 
       if (error.code === 'ECONNABORTED') {
+        // A typed HTTP error (404/403/409…) has to reach the client as itself;
+        // wrapping it in a bare Error turned all of them into 500s.
+        if (error instanceof HttpException) throw error;
         throw new Error('Wingull API request timed out');
       }
 
       if (error.response?.status === 404) {
+        // A typed HTTP error (404/403/409…) has to reach the client as itself;
+        // wrapping it in a bare Error turned all of them into 500s.
+        if (error instanceof HttpException) throw error;
         throw new Error('Player not found in Wingull API');
       }
 
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Wingull API stats request failed: ${error.message}`);
     }
   }
@@ -77,13 +86,22 @@ export class PlayerRepository {
       this.logger.error(`Failed to fetch player team for UUID ${uuid}:`, error);
 
       if (error.code === 'ECONNABORTED') {
+        // A typed HTTP error (404/403/409…) has to reach the client as itself;
+        // wrapping it in a bare Error turned all of them into 500s.
+        if (error instanceof HttpException) throw error;
         throw new Error('Wingull API request timed out');
       }
 
       if (error.response?.status === 404) {
+        // A typed HTTP error (404/403/409…) has to reach the client as itself;
+        // wrapping it in a bare Error turned all of them into 500s.
+        if (error instanceof HttpException) throw error;
         throw new Error('Player team not found in Wingull API');
       }
 
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Wingull API team request failed: ${error.message}`);
     }
   }

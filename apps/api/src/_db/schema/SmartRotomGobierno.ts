@@ -1,4 +1,5 @@
 import {
+  char,
   bigint,
   decimal,
   foreignKey,
@@ -23,7 +24,10 @@ const regionId = (name = 'region_id') => varchar(name, { length: 128 });
 // join players in application code (the plot side lives in another database), and 20-odd
 // nullable actor columns would each need a hand-shortened constraint name to clear MySQL's
 // 64-char limit.
-const playerUuid = (name: string) => varchar(name, { length: 36 });
+// char(36), like every other player-uuid column in the schema: the type used to
+// vary table by table, which made these columns a mismatch against
+// `rotom_users.uuid` and unusable as clean join keys.
+const playerUuid = (name: string) => char(name, { length: 36 });
 
 // ─── Urbanismo ────────────────────────────────────────────────────────────────
 

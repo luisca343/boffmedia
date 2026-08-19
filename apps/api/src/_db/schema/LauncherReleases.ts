@@ -1,4 +1,3 @@
-import { sql } from 'drizzle-orm';
 import {
   boolean,
   char,
@@ -52,13 +51,8 @@ export const launcherReleases = mysqlTable(
     /** boffmedia user id of the admin who uploaded it. No FK: the release must
      *  outlive the account, exactly like pack_audit. */
     uploadedBy: int('uploaded_by'),
-    createdAt: timestamp('created_at')
-      .notNull()
-      .default(sql`CURRENT_TIMESTAMP()`),
-    updatedAt: timestamp('updated_at')
-      .notNull()
-      .default(sql`CURRENT_TIMESTAMP()`)
-      .onUpdateNow(),
+    createdAt: timestamp('created_at').notNull().defaultNow(),
+    updatedAt: timestamp('updated_at').notNull().defaultNow().onUpdateNow(),
   },
   (table) => ({
     // Re-uploading the same (version, target) replaces the row rather than

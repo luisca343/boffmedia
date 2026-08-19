@@ -10,7 +10,6 @@ import {
   boolean,
   foreignKey,
 } from 'drizzle-orm/mysql-core';
-import { sql } from 'drizzle-orm';
 import { boffMediaUsers } from './BoffMedia';
 import { boffMediaGames, boffMediaEvents } from './BoffMediaEvents';
 
@@ -186,12 +185,8 @@ export const boffMediaTournaments = mysqlTable(
     // Set on completion. No hard FK: avoids a circular tournaments↔participants
     // constraint; the service only ever writes a valid participant id here.
     championParticipantId: int('champion_participant_id'),
-    createdAt: timestamp('created_at')
-      .notNull()
-      .default(sql`CURRENT_TIMESTAMP()`),
-    updatedAt: timestamp('updated_at')
-      .notNull()
-      .default(sql`CURRENT_TIMESTAMP() ON UPDATE CURRENT_TIMESTAMP()`),
+    createdAt: timestamp('created_at').notNull().defaultNow(),
+    updatedAt: timestamp('updated_at').notNull().defaultNow().onUpdateNow(),
     deletedAt: timestamp('deleted_at'),
   },
   (t) => ({
@@ -230,9 +225,7 @@ export const boffMediaTournamentGroups = mysqlTable(
     label: varchar('label', { length: 64 }),
     advanceCount: int('advance_count').notNull().default(2),
     order: int('order').notNull().default(0),
-    createdAt: timestamp('created_at')
-      .notNull()
-      .default(sql`CURRENT_TIMESTAMP()`),
+    createdAt: timestamp('created_at').notNull().defaultNow(),
   },
   (t) => ({
     tournamentIdx: index('tg_tournament_idx').on(t.tournamentId),
@@ -285,12 +278,8 @@ export const boffMediaTournamentParticipants = mysqlTable(
     ])
       .notNull()
       .default(TOURNAMENT_PARTICIPANT_STATUS.ACTIVE),
-    createdAt: timestamp('created_at')
-      .notNull()
-      .default(sql`CURRENT_TIMESTAMP()`),
-    updatedAt: timestamp('updated_at')
-      .notNull()
-      .default(sql`CURRENT_TIMESTAMP() ON UPDATE CURRENT_TIMESTAMP()`),
+    createdAt: timestamp('created_at').notNull().defaultNow(),
+    updatedAt: timestamp('updated_at').notNull().defaultNow().onUpdateNow(),
   },
   (t) => ({
     userIdx: index('tp_user_idx').on(t.userId),
@@ -298,7 +287,7 @@ export const boffMediaTournamentParticipants = mysqlTable(
     groupIdx: index('tp_group_idx').on(t.groupId),
     // One account may enter a tournament once. MySQL permits multiple NULL
     // user_ids, so admin-added no-account entrants are unaffected.
-    userUnique: uniqueIndex('tp_user_unique').on(t.tournamentId, t.userId),
+    userUnique: uniqueIndex('tp_user_uq').on(t.tournamentId, t.userId),
     tournamentFk: foreignKey({
       columns: [t.tournamentId],
       foreignColumns: [boffMediaTournaments.id],
@@ -335,9 +324,7 @@ export const boffMediaTournamentRoster = mysqlTable(
     userId: int('user_id'),
     name: varchar('name', { length: 255 }).notNull(),
     role: varchar('role', { length: 32 }),
-    createdAt: timestamp('created_at')
-      .notNull()
-      .default(sql`CURRENT_TIMESTAMP()`),
+    createdAt: timestamp('created_at').notNull().defaultNow(),
   },
   (t) => ({
     participantIdx: index('tr_participant_idx').on(t.participantId),
@@ -413,12 +400,8 @@ export const boffMediaTournamentPhases = mysqlTable(
       .default(TIEBREAK_PROFILE.POINTS),
     startDate: timestamp('start_date'),
     endDate: timestamp('end_date'),
-    createdAt: timestamp('created_at')
-      .notNull()
-      .default(sql`CURRENT_TIMESTAMP()`),
-    updatedAt: timestamp('updated_at')
-      .notNull()
-      .default(sql`CURRENT_TIMESTAMP() ON UPDATE CURRENT_TIMESTAMP()`),
+    createdAt: timestamp('created_at').notNull().defaultNow(),
+    updatedAt: timestamp('updated_at').notNull().defaultNow().onUpdateNow(),
   },
   (t) => ({
     tournamentIdx: index('tph_tournament_idx').on(t.tournamentId, t.phaseOrder),
@@ -445,12 +428,13 @@ export const boffMediaTournamentPhaseEntrants = mysqlTable(
     seed: int('seed').notNull(), // 1-based, from previous phase standings
     sourceRank: int('source_rank'), // rank they finished the previous phase at
     sourceRecord: varchar('source_record', { length: 16 }), // display: "7-2"
-    createdAt: timestamp('created_at')
-      .notNull()
-      .default(sql`CURRENT_TIMESTAMP()`),
+    createdAt: timestamp('created_at').notNull().defaultNow(),
   },
   (t) => ({
-    unique: uniqueIndex('tpe_unique').on(t.phaseId, t.participantId),
+    unique: uniqueIndex('tpe_phase_participant_uq').on(
+      t.phaseId,
+      t.participantId,
+    ),
     phaseFk: foreignKey({
       columns: [t.phaseId],
       foreignColumns: [boffMediaTournamentPhases.id],
@@ -534,12 +518,8 @@ export const boffMediaTournamentMatches = mysqlTable(
       PROPOSAL_STATE.DISPUTED,
     ]),
     judgeRequestedAt: timestamp('judge_requested_at'),
-    createdAt: timestamp('created_at')
-      .notNull()
-      .default(sql`CURRENT_TIMESTAMP()`),
-    updatedAt: timestamp('updated_at')
-      .notNull()
-      .default(sql`CURRENT_TIMESTAMP() ON UPDATE CURRENT_TIMESTAMP()`),
+    createdAt: timestamp('created_at').notNull().defaultNow(),
+    updatedAt: timestamp('updated_at').notNull().defaultNow().onUpdateNow(),
   },
   (t) => ({
     phaseIdx: index('tm_phase_idx').on(t.phaseId),
@@ -636,9 +616,7 @@ export const boffMediaTournamentMatchMessages = mysqlTable(
       .notNull()
       .default(MATCH_MESSAGE_KIND.PLAYER),
     body: varchar('body', { length: 1000 }).notNull(),
-    createdAt: timestamp('created_at')
-      .notNull()
-      .default(sql`CURRENT_TIMESTAMP()`),
+    createdAt: timestamp('created_at').notNull().defaultNow(),
   },
   (t) => ({
     matchIdx: index('tmm_match_idx').on(t.matchId),

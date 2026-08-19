@@ -9,6 +9,7 @@ import {
   Post,
   Query,
   Res,
+  UseGuards,
 } from '@nestjs/common';
 import { Public } from '@api/_utils/decorators/public.decorator';
 import {
@@ -38,9 +39,16 @@ import { ConvertChapterDto } from './dto/convert-chapter.dto';
 import { PatchEpubMetadataDto } from './dto/patch-epub-metadata.dto';
 import { UpdateMangaConfigDto } from './dto/update-manga-config.dto';
 import { UpdateSeriesStatusDto } from './dto/update-series-status.dto';
+import { JwtAuthGuard } from '@api/auth/jwt-auth.guard';
+import { RolesGuard } from '@api/_utils/guards/roles.guard';
+import { USER_ROLES } from '@api/_utils/auth/roles.constants';
+import { Roles } from '@api/_utils/decorators/roles.decorator';
 
 @ApiTags('BoffMedia | Scrape')
 @Public()
+// Browsing the catalogue is public; making the server DOWNLOAD, convert or write
+// files is not. Every write route below used to be public, so anyone could make
+// the box fetch gigabytes or rewrite library metadata.
 @Controller('boffmedia/herramientas/scrape')
 export class ScrapeController {
   constructor(private readonly scrapeFacadeService: ScrapeFacadeService) {}
@@ -203,6 +211,8 @@ export class ScrapeController {
 
   // ==================== DOWNLOADS ====================
 
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.BOFF_ADMIN)
   @Post('myrient/download')
   @ApiOperation({
     summary: 'Download a game file from Myrient to the local 3DS directory',
@@ -233,6 +243,8 @@ export class ScrapeController {
     return this.scrapeFacadeService.downloadGame(body.url);
   }
 
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.BOFF_ADMIN)
   @Post('myrient/download-all')
   @ApiOperation({
     summary: 'Download all games for a console with optional region filters',
@@ -255,6 +267,8 @@ export class ScrapeController {
     return this.scrapeFacadeService.downloadAllGames(dto);
   }
 
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.BOFF_ADMIN)
   @Post('myrient/download-selected/stream')
   @ApiOperation({
     summary: 'Stream download progress for selected games via SSE',
@@ -302,6 +316,8 @@ export class ScrapeController {
     return this.scrapeFacadeService.getBrowserConfig();
   }
 
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.BOFF_ADMIN)
   @Patch('manga/browser')
   @ApiOperation({ summary: 'Enable or disable the remote browser tunnel' })
   @ApiResponse({
@@ -360,6 +376,8 @@ export class ScrapeController {
     return this.scrapeFacadeService.getMangaChapters(url);
   }
 
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.BOFF_ADMIN)
   @Post('manga/download/novel/stream')
   @ApiOperation({
     summary: 'Stream manga download progress via SSE',
@@ -390,6 +408,8 @@ export class ScrapeController {
     res.end();
   }
 
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.BOFF_ADMIN)
   @Post('myrient/download-selected')
   @ApiOperation({
     summary: 'Download a user-selected list of games for a console',
@@ -459,6 +479,8 @@ export class ScrapeController {
     );
   }
 
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.BOFF_ADMIN)
   @Post('manga/convert-chapter')
   @ApiOperation({
     summary: 'Convert a CBZ chapter to EPUB, optionally excluding pages',
@@ -483,6 +505,8 @@ export class ScrapeController {
     );
   }
 
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.BOFF_ADMIN)
   @Post('manga/patch-metadata')
   @ApiOperation({
     summary: 'Patch metadata in existing EPUB files without re-converting',
@@ -514,6 +538,8 @@ export class ScrapeController {
     return this.scrapeFacadeService.getMangaConfig();
   }
 
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.BOFF_ADMIN)
   @Patch('manga/config')
   @ApiOperation({
     summary: 'Update manga admin config (cron enable/disable + schedule)',
@@ -523,6 +549,8 @@ export class ScrapeController {
     return this.scrapeFacadeService.updateMangaConfig(body);
   }
 
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.BOFF_ADMIN)
   @Patch('manga/series/:slug/status')
   @ApiOperation({ summary: 'Update the status of a tracked manga series' })
   @ApiResponse({ status: HttpStatus.OK })
@@ -534,6 +562,8 @@ export class ScrapeController {
     return this.scrapeFacadeService.updateSeriesStatus(slug, body.status);
   }
 
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.BOFF_ADMIN)
   @Post('manga/cron/run')
   @ApiOperation({ summary: 'Manually trigger the manga auto-update cron task' })
   @ApiResponse({ status: HttpStatus.CREATED })

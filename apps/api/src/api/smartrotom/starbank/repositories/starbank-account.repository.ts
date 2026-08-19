@@ -1,4 +1,4 @@
-import { Injectable, Inject } from '@nestjs/common';
+import { HttpException, Injectable, Inject } from '@nestjs/common';
 import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
 import { MySql2Database } from 'drizzle-orm/mysql2';
 import { and, eq } from 'drizzle-orm';
@@ -104,6 +104,9 @@ export class StarbankAccountRepository
       return result.map(this.mapToEntity);
     } catch (error: any) {
       this.logger.error(`Failed to find accounts by type ${type}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to find accounts by type: ${error.message}`);
     }
   }
@@ -122,6 +125,9 @@ export class StarbankAccountRepository
         `Failed to find the owner of account ${accountId}:`,
         error,
       );
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to find account owner: ${error.message}`);
     }
   }
@@ -145,6 +151,9 @@ export class StarbankAccountRepository
         .execute();
     } catch (error: any) {
       this.logger.error(`Failed to update account ${accountId}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to update account: ${error.message}`);
     }
   }
@@ -170,6 +179,9 @@ export class StarbankAccountRepository
       return result.length > 0 ? this.mapToEntity(result[0]) : null;
     } catch (error: any) {
       this.logger.error(`Failed to find house account ${type}/${name}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to find house account: ${error.message}`);
     }
   }
@@ -209,6 +221,9 @@ export class StarbankAccountRepository
         : null;
     } catch (error: any) {
       this.logger.error(`Failed to find main account for ${uuid}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to find main account: ${error.message}`);
     }
   }
@@ -227,6 +242,9 @@ export class StarbankAccountRepository
         `Failed to update balance for account ${accountId}:`,
         error,
       );
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to update account balance: ${error.message}`);
     }
   }
@@ -329,6 +347,9 @@ export class StarbankAccountRepository
       return result.length > 0 ? this.mapToEntity(result[0]) : null;
     } catch (error: any) {
       this.logger.error(`Failed to find account ${accountId}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to find account: ${error.message}`);
     }
   }
@@ -354,6 +375,9 @@ export class StarbankAccountRepository
       return result.map(this.mapToEntity);
     } catch (error: any) {
       this.logger.error(`Failed to find accounts for ${uuid}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to find user accounts: ${error.message}`);
     }
   }
@@ -373,6 +397,9 @@ export class StarbankAccountRepository
       return result.map(this.mapToEntity);
     } catch (error: any) {
       this.logger.error('Failed to find all accounts:', error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to find all accounts: ${error.message}`);
     }
   }

@@ -36,6 +36,9 @@ export class ChatappFacadeService {
       return await this.chatService.createChat(createChatRequest);
     } catch (error: any) {
       this.logger.error('Error creating chat:', error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to create chat: ${error.message}`);
     }
   }
@@ -45,6 +48,9 @@ export class ChatappFacadeService {
       return await this.groupService.getUserGroups(uuid);
     } catch (error: any) {
       this.logger.error(`Error getting chats for user ${uuid}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to retrieve chats: ${error.message}`);
     }
   }
@@ -57,6 +63,9 @@ export class ChatappFacadeService {
       return await this.groupService.getGroupById(chatId, requestingUserUuid);
     } catch (error: any) {
       this.logger.error(`Error getting chat ${chatId}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to retrieve chat: ${error.message}`);
     }
   }
@@ -68,6 +77,9 @@ export class ChatappFacadeService {
       return await this.messageService.getMessages(chatId);
     } catch (error: any) {
       this.logger.error(`Error getting messages for chat ${chatId}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to retrieve messages: ${error.message}`);
     }
   }
@@ -109,6 +121,9 @@ export class ChatappFacadeService {
       return message;
     } catch (error: any) {
       this.logger.error(`Error creating message in chat ${chatId}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to create message: ${error.message}`);
     }
   }
@@ -129,6 +144,9 @@ export class ChatappFacadeService {
       return message;
     } catch (error: any) {
       this.logger.error('Error creating global message:', error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to create global message: ${error.message}`);
     }
   }
@@ -146,6 +164,9 @@ export class ChatappFacadeService {
       );
     } catch (error: any) {
       this.logger.error(`Error updating message ${messageId}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to update message: ${error.message}`);
     }
   }
@@ -162,6 +183,9 @@ export class ChatappFacadeService {
       };
     } catch (error: any) {
       this.logger.error(`Error deleting message ${messageId}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to delete message: ${error.message}`);
     }
   }
@@ -179,6 +203,9 @@ export class ChatappFacadeService {
       };
     } catch (error: any) {
       this.logger.error(`Error marking message ${messageId} as read:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to mark message as read: ${error.message}`);
     }
   }
@@ -204,6 +231,9 @@ export class ChatappFacadeService {
     } catch (error: any) {
       if (error instanceof HttpException) throw error;
       this.logger.error(`Error marking chat ${chatId} as read:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to mark chat as read: ${error.message}`);
     }
   }
@@ -227,6 +257,9 @@ export class ChatappFacadeService {
       return { success: true, message: 'Reaction updated' };
     } catch (error: any) {
       this.logger.error(`Error toggling reaction on ${messageId}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to toggle reaction: ${error.message}`);
     }
   }
@@ -268,6 +301,9 @@ export class ChatappFacadeService {
       };
     } catch (error: any) {
       this.logger.error(`Error adding member to group ${groupId}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to add member to group: ${error.message}`);
     }
   }
@@ -289,6 +325,9 @@ export class ChatappFacadeService {
       };
     } catch (error: any) {
       this.logger.error(`Error removing member from group ${groupId}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to remove member from group: ${error.message}`);
     }
   }
@@ -309,6 +348,9 @@ export class ChatappFacadeService {
     } catch (error: any) {
       this.logger.error(`Error initiating call in chat ${chatId}:`, error);
       if (error instanceof HttpException) throw error;
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to initiate call: ${error.message}`);
     }
   }
@@ -328,6 +370,9 @@ export class ChatappFacadeService {
       };
     } catch (error: any) {
       this.logger.error(`Error ending call in chat ${chatId}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to end call: ${error.message}`);
     }
   }

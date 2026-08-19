@@ -279,6 +279,128 @@ export class AppService {
 
     return data;
   }
+
+  /* ── Steam · currently-free promos ─────────────────────────────────────────
+   * The source of truth for "what is 100 % off right now" is the store search
+   * the tool links to (`maxprice=free&specials=1&category1=998`). Its JSON
+   * payload carries only markup, so we pull the appids out of it and hand them
+   * to IStoreBrowseService/GetItems — the only public endpoint that exposes
+   * `free_to_keep_ends`, i.e. the deadline to claim. appdetails does not.
+   */
+
+  /** Promos change on Steam's schedule, not per request — cache per lang+cc. */
+  private readonly steamFreeCache = new Map<
+    string,
+    { at: number; data: SteamFreeResult }
+  >();
+
+  async getSteamFreeGames(locale?: string): Promise<SteamFreeResult> {
+    const lang = STEAM_LANG[(locale ?? '').toLowerCase()] ?? STEAM_LANG.es;
+    const cacheKey = `${lang}:${STEAM_COUNTRY}`;
+    const cached = this.steamFreeCache.get(cacheKey);
+    if (cached && Date.now() - cached.at < STEAM_FREE_TTL_MS)
+      return cached.data;
+
+    let appIds: string[];
+    try {
+      appIds = await this.fetchSteamFreeAppIds(lang);
+    } catch (err: any) {
+      // A stale list beats an empty page when the store hiccups.
+      this.logger.error(`steamfree: search failed — ${err?.message}`);
+      if (cached) return cached.data;
+      throw err;
+    }
+
+    const games = appIds.length
+      ? await this.fetchSteamStoreItems(appIds, lang)
+      : [];
+
+    // Soonest deadline first — the whole point of the tool is "claim before".
+    games.sort((a, b) => {
+      if (a.freeToKeepEnds !== b.freeToKeepEnds) {
+        if (a.freeToKeepEnds == null) return 1;
+        if (b.freeToKeepEnds == null) return -1;
+        return a.freeToKeepEnds - b.freeToKeepEnds;
+      }
+      return a.name.localeCompare(b.name);
+    });
+
+    const data: SteamFreeResult = {
+      games,
+      count: games.length,
+      fetchedAt: new Date().toISOString(),
+      searchUrl: STEAM_FREE_SEARCH_URL,
+    };
+    this.steamFreeCache.set(cacheKey, { at: Date.now(), data });
+    return data;
+  }
+
+  /** Scrapes only `data-ds-appid` — the one attribute in that markup that is
+   *  a stable contract rather than presentation. */
+  private async fetchSteamFreeAppIds(lang: string): Promise<string[]> {
+    const res = await axios.get(
+      'https://store.steampowered.com/search/results/',
+      {
+        params: {
+          query: '',
+          start: 0,
+          count: 100,
+          sort_by: '_ASC',
+          maxprice: 'free',
+          category1: 998,
+          specials: 1,
+          infinite: 1,
+          cc: STEAM_COUNTRY,
+          l: lang,
+        },
+        headers: { 'User-Agent': STEAM_UA },
+        timeout: 15_000,
+      },
+    );
+    const html = String(res.data?.results_html ?? '');
+    const ids = new Set<string>();
+    for (const m of html.matchAll(/data-ds-appid="([\d,]+)"/g)) {
+      for (const id of m[1].split(',')) if (id) ids.add(id);
+    }
+    return [...ids];
+  }
+
+  private async fetchSteamStoreItems(
+    appIds: string[],
+    lang: string,
+  ): Promise<SteamFreeGame[]> {
+    const out: SteamFreeGame[] = [];
+    for (let i = 0; i < appIds.length; i += 50) {
+      const input = {
+        ids: appIds.slice(i, i + 50).map((id) => ({ appid: Number(id) })),
+        context: {
+          language: lang,
+          country_code: STEAM_COUNTRY,
+          steam_realm: 1,
+        },
+        data_request: {
+          include_assets: true,
+          include_release: true,
+          include_platforms: true,
+          include_basic_info: true,
+          include_reviews: true,
+        },
+      };
+      const res = await axios.get(
+        'https://api.steampowered.com/IStoreBrowseService/GetItems/v1/',
+        {
+          params: { input_json: JSON.stringify(input) },
+          headers: { 'User-Agent': STEAM_UA },
+          timeout: 15_000,
+        },
+      );
+      for (const item of res.data?.response?.store_items ?? []) {
+        const mapped = mapSteamStoreItem(item);
+        if (mapped) out.push(mapped);
+      }
+    }
+    return out;
+  }
 }
 
 export interface Image {
@@ -327,4 +449,109 @@ export interface GameData {
   website: string;
 
   media: (Video | Image)[];
+}
+
+/* ── Steam free-promo helpers ─────────────────────────────────────────────── */
+
+const STEAM_FREE_TTL_MS = 10 * 60 * 1000;
+const STEAM_COUNTRY = 'ES';
+const STEAM_UA =
+  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36';
+const STEAM_LANG: Record<string, string> = {
+  es: 'spanish',
+  en: 'english',
+};
+/** The human-facing page this endpoint mirrors — echoed back so the UI can link it. */
+const STEAM_FREE_SEARCH_URL =
+  'https://store.steampowered.com/search/?sort_by=_ASC&hwtype=0&maxprice=free&category1=998&specials=1';
+const STEAM_ASSET_BASE =
+  'https://shared.fastly.steamstatic.com/store_item_assets/';
+
+function steamAsset(assets: any, file?: string): string {
+  const fmt = assets?.asset_url_format;
+  if (!fmt || !file) return '';
+  return STEAM_ASSET_BASE + String(fmt).replace('${FILENAME}', file);
+}
+
+function mapSteamStoreItem(item: any): SteamFreeGame | null {
+  if (!item || item.success !== 1 || !item.appid) return null;
+  const buy = item.best_purchase_option ?? {};
+  // `summary_filtered` is the all-languages score; the language-specific one is
+  // a much smaller sample, so it is only a fallback.
+  const rev =
+    item.reviews?.summary_filtered ??
+    item.reviews?.summary_language_specific ??
+    {};
+  const p = item.platforms ?? {};
+  const release = Number(item.release?.steam_release_date ?? 0);
+
+  return {
+    steamID: String(item.appid),
+    name: item.name ?? '',
+    storeUrl: `https://store.steampowered.com/app/${item.appid}/`,
+    headerImage: steamAsset(item.assets, item.assets?.header),
+    capsuleImage: steamAsset(
+      item.assets,
+      item.assets?.main_capsule ?? item.assets?.small_capsule,
+    ),
+    libraryImage: steamAsset(item.assets, item.assets?.library_capsule),
+    shortDescription: item.basic_info?.short_description ?? '',
+    developers: (item.basic_info?.developers ?? [])
+      .map((d: any) => d?.name)
+      .filter(Boolean),
+    publishers: (item.basic_info?.publishers ?? [])
+      .map((d: any) => d?.name)
+      .filter(Boolean),
+    releaseDate: release ? new Date(release * 1000).toISOString() : null,
+    platforms: {
+      windows: !!p.windows,
+      mac: !!p.mac,
+      linux: !!(p.steamos_linux ?? p.linux),
+    },
+    normalPrice:
+      buy.formatted_original_price ?? buy.formatted_final_price ?? '',
+    currentPrice: buy.formatted_final_price ?? '',
+    originalPriceCents: Number(buy.original_price_in_cents ?? 0) || 0,
+    discountPercent: Number(buy.discount_pct ?? 0) || 0,
+    /** True = yours forever once claimed. False = a free *weekend*, not a keep. */
+    isFreeToKeep: !!buy.is_free_to_keep,
+    isFreeTemporarily: !!item.is_free_temporarily,
+    /** Unix seconds; null when Steam does not publish a deadline. */
+    freeToKeepEnds: Number(buy.free_to_keep_ends ?? 0) || null,
+    reviewLabel: rev.review_score_label ?? null,
+    reviewPercentPositive: Number(rev.percent_positive ?? 0) || null,
+    reviewCount: Number(rev.review_count ?? 0) || null,
+  };
+}
+
+export interface SteamFreeGame {
+  steamID: string;
+  name: string;
+  storeUrl: string;
+  headerImage: string;
+  capsuleImage: string;
+  libraryImage: string;
+  shortDescription: string;
+  developers: string[];
+  publishers: string[];
+  releaseDate: string | null;
+  platforms: { windows: boolean; mac: boolean; linux: boolean };
+  normalPrice: string;
+  currentPrice: string;
+  originalPriceCents: number;
+  discountPercent: number;
+  isFreeToKeep: boolean;
+  isFreeTemporarily: boolean;
+  freeToKeepEnds: number | null;
+  reviewLabel: string | null;
+  reviewPercentPositive: number | null;
+  reviewCount: number | null;
+}
+
+export interface SteamFreeResult {
+  games: SteamFreeGame[];
+  count: number;
+  /** ISO — when this snapshot was pulled from Steam (may be up to 10 min old). */
+  fetchedAt: string;
+  searchUrl: string;
 }

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
 import { PokemonDataManagementService } from './services/pokemon-data-management.service';
 import {
   PokedexManagementService,
@@ -29,6 +29,9 @@ export class PokemonFacadeService {
       await this.pokemonDataService.initializeData();
     } catch (error: any) {
       this.logger.error('Error initializing Pokemon service:', error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(
         `Pokemon service initialization failed: ${error.message}`,
       );
@@ -42,6 +45,9 @@ export class PokemonFacadeService {
       return this.pokemonDataService.getAllPokemon();
     } catch (error: any) {
       this.logger.error('Error getting all Pokemon:', error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to retrieve all Pokemon: ${error.message}`);
     }
   }
@@ -51,6 +57,9 @@ export class PokemonFacadeService {
       return this.pokemonDataService.getPokemonByDex(dex);
     } catch (error: any) {
       this.logger.error(`Error getting Pokemon by dex ${dex}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to retrieve Pokemon by dex: ${error.message}`);
     }
   }
@@ -60,6 +69,9 @@ export class PokemonFacadeService {
       return this.pokemonDataService.getPokemonByName(name);
     } catch (error: any) {
       this.logger.error(`Error getting Pokemon by name ${name}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to retrieve Pokemon by name: ${error.message}`);
     }
   }
@@ -72,6 +84,9 @@ export class PokemonFacadeService {
       return this.pokemonDataService.searchPokemonByName(name, amount);
     } catch (error: any) {
       this.logger.error(`Error searching Pokemon by name ${name}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to search Pokemon: ${error.message}`);
     }
   }
@@ -81,6 +96,9 @@ export class PokemonFacadeService {
       return this.pokemonDataService.getPokemonNames();
     } catch (error: any) {
       this.logger.error('Error getting Pokemon names:', error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to retrieve Pokemon names: ${error.message}`);
     }
   }
@@ -104,6 +122,9 @@ export class PokemonFacadeService {
       return this.pokemonDataService.getEvoTree(id);
     } catch (error: any) {
       this.logger.error(`Error getting evolution tree for ${id}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to retrieve evolution tree: ${error.message}`);
     }
   }
@@ -116,6 +137,9 @@ export class PokemonFacadeService {
       return this.pokemonDataService.getNextPrev(id);
     } catch (error: any) {
       this.logger.error(`Error getting next/prev for ${id}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to retrieve next/prev Pokemon: ${error.message}`);
     }
   }
@@ -127,6 +151,9 @@ export class PokemonFacadeService {
       return this.pokemonDataService.getAllMoves();
     } catch (error: any) {
       this.logger.error('Error getting all moves:', error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to retrieve all moves: ${error.message}`);
     }
   }
@@ -136,6 +163,9 @@ export class PokemonFacadeService {
       return this.pokemonDataService.getMove(name);
     } catch (error: any) {
       this.logger.error(`Error getting move ${name}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to retrieve move: ${error.message}`);
     }
   }
@@ -148,6 +178,9 @@ export class PokemonFacadeService {
         `Error getting moves for Pokemon ${id}, form ${formIndex}:`,
         error,
       );
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to retrieve Pokemon moves: ${error.message}`);
     }
   }
@@ -159,6 +192,9 @@ export class PokemonFacadeService {
       return this.pokemonDataService.getPokemonByMove(name);
     } catch (error: any) {
       this.logger.error(`Error getting Pokemon by move ${name}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to retrieve Pokemon by move: ${error.message}`);
     }
   }
@@ -170,6 +206,9 @@ export class PokemonFacadeService {
       return this.pokemonDataService.getAllAbilities();
     } catch (error: any) {
       this.logger.error('Error getting all abilities:', error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to retrieve all abilities: ${error.message}`);
     }
   }
@@ -179,6 +218,9 @@ export class PokemonFacadeService {
       return this.pokemonDataService.getAbility(name);
     } catch (error: any) {
       this.logger.error(`Error getting ability ${name}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to retrieve ability: ${error.message}`);
     }
   }
@@ -190,6 +232,9 @@ export class PokemonFacadeService {
       return this.pokemonDataService.getPokemonByAbility(name);
     } catch (error: any) {
       this.logger.error(`Error getting Pokemon by ability ${name}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(
         `Failed to retrieve Pokemon by ability: ${error.message}`,
       );
@@ -203,6 +248,9 @@ export class PokemonFacadeService {
       return this.pokemonDataService.getSpawnByPokemon(name);
     } catch (error: any) {
       this.logger.error(`Error getting spawns for Pokemon ${name}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to retrieve Pokemon spawns: ${error.message}`);
     }
   }
@@ -216,6 +264,9 @@ export class PokemonFacadeService {
       }));
     } catch (error: any) {
       this.logger.error('Error getting biomes:', error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to retrieve biomes: ${error.message}`);
     }
   }
@@ -234,6 +285,9 @@ export class PokemonFacadeService {
       return this.pokemonDataService.getPokemonByBiome(name);
     } catch (error: any) {
       this.logger.error(`Error getting Pokemon by biome ${name}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to retrieve Pokemon by biome: ${error.message}`);
     }
   }
@@ -243,6 +297,9 @@ export class PokemonFacadeService {
       return this.pokemonDataService.getBiomesByPokemon(name);
     } catch (error: any) {
       this.logger.error(`Error getting biomes for Pokemon ${name}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(
         `Failed to retrieve biomes for Pokemon: ${error.message}`,
       );
@@ -263,6 +320,9 @@ export class PokemonFacadeService {
       return await this.pokemonDataService.getImage(params);
     } catch (error: any) {
       this.logger.error('Error getting Pokemon image:', error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to retrieve Pokemon image: ${error.message}`);
     }
   }
@@ -272,6 +332,9 @@ export class PokemonFacadeService {
       return this.pokemonDataService.getItemSprite(name);
     } catch (error: any) {
       this.logger.error(`Error getting item sprite ${name}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to retrieve item sprite: ${error.message}`);
     }
   }
@@ -295,6 +358,9 @@ export class PokemonFacadeService {
       );
     } catch (error: any) {
       this.logger.error('Error registering Pokemon:', error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to register Pokemon: ${error.message}`);
     }
   }
@@ -307,6 +373,9 @@ export class PokemonFacadeService {
       return await this.integrationService.updateDexWithSync(uuid, data);
     } catch (error: any) {
       this.logger.error('Error updating dex:', error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to update dex: ${error.message}`);
     }
   }
@@ -316,6 +385,9 @@ export class PokemonFacadeService {
       return await this.pokedexService.getPokedexStatistics(uuid);
     } catch (error: any) {
       this.logger.error(`Error getting pokedex statistics for ${uuid}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(
         `Failed to retrieve pokedex statistics: ${error.message}`,
       );
@@ -330,6 +402,9 @@ export class PokemonFacadeService {
         `Error getting detailed pokedex status for ${uuid}:`,
         error,
       );
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(
         `Failed to retrieve detailed pokedex status: ${error.message}`,
       );
@@ -341,6 +416,9 @@ export class PokemonFacadeService {
       return await this.pokedexService.getPokedexRegistries(uuid);
     } catch (error: any) {
       this.logger.error(`Error getting pokedex registries for ${uuid}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(
         `Failed to retrieve pokedex registries: ${error.message}`,
       );
@@ -354,6 +432,9 @@ export class PokemonFacadeService {
       return await this.integrationService.getTerasPokemonShowdownData();
     } catch (error: any) {
       this.logger.error('Error getting Teras Pokemon Showdown data:', error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to retrieve Showdown data: ${error.message}`);
     }
   }
@@ -365,6 +446,9 @@ export class PokemonFacadeService {
       return this.pokemonDataService.getWordleData();
     } catch (error: any) {
       this.logger.error('Error getting Wordle data:', error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to retrieve Wordle data: ${error.message}`);
     }
   }
@@ -376,6 +460,9 @@ export class PokemonFacadeService {
       return this.pokemonDataService.getSpriteManifest();
     } catch (error: any) {
       this.logger.error('Error getting sprite manifest:', error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to retrieve sprite manifest: ${error.message}`);
     }
   }
@@ -385,6 +472,9 @@ export class PokemonFacadeService {
       await this.pokemonDataService.refreshSpriteManifest();
     } catch (error: any) {
       this.logger.error('Error refreshing sprite manifest:', error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to refresh sprite manifest: ${error.message}`);
     }
   }
@@ -396,6 +486,9 @@ export class PokemonFacadeService {
       return await this.pokemonDataService.getPmdPortrait(name);
     } catch (error: any) {
       this.logger.error(`Error getting PMD portrait for ${name}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Failed to retrieve PMD portrait: ${error.message}`);
     }
   }

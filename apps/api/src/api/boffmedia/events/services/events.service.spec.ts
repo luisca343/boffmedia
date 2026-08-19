@@ -38,6 +38,9 @@ describe('EventsService', () => {
 
   beforeEach(async () => {
     const mockEventsRepository = {
+      // Added by the module-derivation work; the mock was never updated, so
+      // every getEventById test threw "findModules is not a function".
+      findModules: jest.fn().mockResolvedValue({ randomizer: null }),
       findAll: jest.fn(),
       findById: jest.fn(),
       findChildEvents: jest.fn(),

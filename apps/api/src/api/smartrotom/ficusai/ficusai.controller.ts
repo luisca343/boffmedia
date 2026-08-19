@@ -16,8 +16,13 @@ import { FicusMessageContentDto } from './dto/ficus-message-content.dto';
 import { SuccessResponse } from '@api/_utils/entities/common-response.entity';
 import { FicusAiUserStatsEntity } from './entities/ficusai-user-stats.entity';
 import { FicusAiHealthEntity } from './entities/ficusai-health.entity';
+import { CurrentMcUuid } from '@api/_utils/decorators/current-user.decorator';
+import { RequireSession } from '@api/_utils/decorators/require-session.decorator';
 
 @ApiTags('FicusAI - Chat Assistant')
+// The assistant answers for ONE player: the conversation is theirs. Reads of
+// public stats stay open; sending, initialising and clearing take the player
+// from the session, not from a query string or body field.
 @Public()
 @Controller('smartrotom/ficusai')
 export class FicusAIController {
@@ -55,6 +60,7 @@ export class FicusAIController {
     return this.ficusAIFacadeService.getMessages(getMessagesDto);
   }
 
+  @RequireSession()
   @Post('send')
   @ApiOperation({
     summary: 'Send a message to the AI assistant',
@@ -76,6 +82,7 @@ export class FicusAIController {
     return this.ficusAIFacadeService.sendMessage(sendMessageDto);
   }
 
+  @RequireSession()
   @Post('initialize')
   @ApiOperation({
     summary: 'Initialize chat for a user',
@@ -91,11 +98,12 @@ export class FicusAIController {
     description: 'Invalid UUID',
   })
   async initializeChat(
-    @Body('uuid') uuid: string,
+    @CurrentMcUuid() uuid: string,
   ): Promise<FicusMessageContentDto> {
     return this.ficusAIFacadeService.initializeChat(uuid);
   }
 
+  @RequireSession()
   @Delete('messages')
   @ApiOperation({
     summary: 'Delete all messages for a user',
@@ -116,7 +124,7 @@ export class FicusAIController {
     example: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4',
   })
   async deleteUserMessages(
-    @Query('uuid') uuid: string,
+    @CurrentMcUuid() uuid: string,
   ): Promise<SuccessResponse> {
     const result = await this.ficusAIFacadeService.deleteUserMessages(uuid);
     return {

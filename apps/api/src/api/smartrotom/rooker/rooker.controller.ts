@@ -20,6 +20,8 @@ import {
 } from '@nestjs/swagger';
 import { Public } from '@api/_utils/decorators/public.decorator';
 import { RookerService } from './rooker.service';
+import { CurrentMcUuid } from '@api/_utils/decorators/current-user.decorator';
+import { RequireSession } from '@api/_utils/decorators/require-session.decorator';
 import {
   ActorDto,
   BookmarksQueryDto,
@@ -51,6 +53,10 @@ import {
 } from './entities/rooker.entity';
 
 @ApiTags('SmartRotom | Rooker')
+// The timeline, profiles and search are public reads. Everything that writes
+// takes the acting player from the session — it used to come from `dto.uuid`,
+// so any caller could post, follow, react or DELETE A TRINO as anybody else,
+// with no account at all.
 @Public()
 @Controller('smartrotom/rooker')
 export class RookerController {
@@ -141,6 +147,7 @@ export class RookerController {
 
   // ==================== PROFILES ====================
 
+  @RequireSession()
   @Patch('profile')
   @ApiOperation({
     summary: 'Upsert your own profile. 409 if the handle is taken.',
@@ -153,10 +160,12 @@ export class RookerController {
   })
   async updateProfile(
     @Body() dto: UpdateProfileDto,
+    @CurrentMcUuid() actorUuid: string,
   ): Promise<RookerProfileEntity> {
-    return this.rookerService.updateProfile(
-      dto,
-    ) as unknown as Promise<RookerProfileEntity>;
+    return this.rookerService.updateProfile({
+      ...dto,
+      uuid: actorUuid,
+    }) as unknown as Promise<RookerProfileEntity>;
   }
 
   // Declared BEFORE `profile/:handle` would be reachable as `me`, but it lives on its
@@ -212,17 +221,22 @@ export class RookerController {
     ) as unknown as Promise<RookerFeedEntity>;
   }
 
+  @RequireSession()
   @Post('follow')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Toggle follow. Notifies the target on follow.' })
   @ApiBody({ type: FollowDto })
   @ApiResponse({ status: HttpStatus.OK, type: RookerFollowResultEntity })
-  async follow(@Body() dto: FollowDto): Promise<RookerFollowResultEntity> {
-    return this.rookerService.follow(dto.uuid, dto.targetUuid);
+  async follow(
+    @Body() dto: FollowDto,
+    @CurrentMcUuid() actorUuid: string,
+  ): Promise<RookerFollowResultEntity> {
+    return this.rookerService.follow(actorUuid, dto.targetUuid);
   }
 
   // ==================== POSTS ====================
 
+  @RequireSession()
   @Post('posts')
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({
@@ -231,10 +245,14 @@ export class RookerController {
   })
   @ApiBody({ type: CreatePostDto })
   @ApiResponse({ status: HttpStatus.CREATED, type: RookerPostEntity })
-  async createPost(@Body() dto: CreatePostDto): Promise<RookerPostEntity> {
-    return this.rookerService.createPost(
-      dto,
-    ) as unknown as Promise<RookerPostEntity>;
+  async createPost(
+    @Body() dto: CreatePostDto,
+    @CurrentMcUuid() actorUuid: string,
+  ): Promise<RookerPostEntity> {
+    return this.rookerService.createPost({
+      ...dto,
+      uuid: actorUuid,
+    }) as unknown as Promise<RookerPostEntity>;
   }
 
   @Get('posts/:id')
@@ -251,6 +269,7 @@ export class RookerController {
     ) as unknown as Promise<RookerThreadEntity>;
   }
 
+  @RequireSession()
   @Delete('posts/:id')
   @ApiOperation({ summary: 'Delete a trino. Author only — 403 otherwise.' })
   @ApiParam({ name: 'id', type: Number })
@@ -259,11 +278,13 @@ export class RookerController {
   @ApiResponse({ status: HttpStatus.FORBIDDEN, description: 'Not the author' })
   async deletePost(
     @Param('id', ParseIntPipe) id: number,
-    @Body() dto: ActorDto,
+    @Body() _dto: ActorDto,
+    @CurrentMcUuid() actorUuid: string,
   ): Promise<RookerDeleteResultEntity> {
-    return this.rookerService.deletePost(id, dto.uuid);
+    return this.rookerService.deletePost(id, actorUuid);
   }
 
+  @RequireSession()
   @Post('posts/:id/react')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
@@ -280,14 +301,16 @@ export class RookerController {
   async react(
     @Param('id', ParseIntPipe) id: number,
     @Body() dto: ReactDto,
+    @CurrentMcUuid() actorUuid: string,
   ): Promise<RookerPostEntity> {
     return this.rookerService.react(
       id,
-      dto.uuid,
+      actorUuid,
       dto.type,
     ) as unknown as Promise<RookerPostEntity>;
   }
 
+  @RequireSession()
   @Post('posts/:id/retrino')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
@@ -298,14 +321,16 @@ export class RookerController {
   @ApiResponse({ status: HttpStatus.OK, type: RookerPostEntity })
   async retrino(
     @Param('id', ParseIntPipe) id: number,
-    @Body() dto: ActorDto,
+    @Body() _dto: ActorDto,
+    @CurrentMcUuid() actorUuid: string,
   ): Promise<RookerPostEntity> {
     return this.rookerService.retrino(
       id,
-      dto.uuid,
+      actorUuid,
     ) as unknown as Promise<RookerPostEntity>;
   }
 
+  @RequireSession()
   @Post('posts/:id/bookmark')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Toggle a bookmark. Private — never notifies.' })
@@ -314,11 +339,12 @@ export class RookerController {
   @ApiResponse({ status: HttpStatus.OK, type: RookerPostEntity })
   async bookmark(
     @Param('id', ParseIntPipe) id: number,
-    @Body() dto: ActorDto,
+    @Body() _dto: ActorDto,
+    @CurrentMcUuid() actorUuid: string,
   ): Promise<RookerPostEntity> {
     return this.rookerService.bookmark(
       id,
-      dto.uuid,
+      actorUuid,
     ) as unknown as Promise<RookerPostEntity>;
   }
 }

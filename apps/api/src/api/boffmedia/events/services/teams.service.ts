@@ -98,10 +98,7 @@ export class TeamsService {
         'Has sido expulsado de este evento por un administrador',
       );
     }
-    if (
-      existing &&
-      existing.status !== PARTICIPANT_STATUS.DECLINED
-    ) {
+    if (existing && existing.status !== PARTICIPANT_STATUS.DECLINED) {
       return; // already an active member
     }
 

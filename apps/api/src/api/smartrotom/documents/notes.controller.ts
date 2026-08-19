@@ -3,33 +3,34 @@ import {
   Controller,
   Get,
   Param,
+  ParseIntPipe,
   Post,
   Put,
   Delete,
   HttpStatus,
 } from '@nestjs/common';
-import { Public } from '@api/_utils/decorators/public.decorator';
 import {
   ApiTags,
   ApiOperation,
   ApiResponse,
   ApiParam,
   ApiBody,
+  ApiBearerAuth,
 } from '@nestjs/swagger';
+import {
+  CurrentMcUuid,
+  CurrentMcUuidOptional,
+} from '@api/_utils/decorators/current-user.decorator';
+import { OptionalAuth } from '@api/_utils/decorators/optional-auth.decorator';
 import {
   DocumentsFacadeService,
   CreateNoteWithUserRequest,
 } from './documents.facade.service';
-import {
-  CreateDocumentRequest,
-  UpdateDocumentRequest,
-} from './services/document.service';
+import { UpdateDocumentRequest } from './services/document.service';
 
 import {
   CreateDocumentDto,
-  CreateDocumentDtoWithUuid,
   UpdateDocumentDto,
-  GetUserDocumentsDto,
   AddNoteToUserDto,
 } from './dto/document.dto';
 
@@ -41,16 +42,33 @@ import {
 } from './entities/document.entity';
 import { SuccessResponse } from '@api/_utils/entities/common-response.entity';
 
+/**
+ * Notes.
+ *
+ * Every route here used to be `@Public()` and took the owner from the URL or the
+ * body (`GET all/:uuid`, `POST create { uuid }`), so an unauthenticated caller
+ * could read, edit and permanently purge anybody's notes by guessing an integer.
+ * The owner is now the authenticated principal's Minecraft uuid and nothing
+ * else; the only route that stays reachable without a session is reading a note
+ * that is explicitly marked public, and even that is checked server-side.
+ *
+ * The legacy duplicate routes (`GET all/:uuid`, `POST note/:noteId/user/:uuid`,
+ * `DELETE note/:noteId/user/:uuid`) are gone — they existed only to keep an
+ * older client working and were a second, unguarded way into the same data.
+ */
 @ApiTags('SmartRotom | Documents')
+@ApiBearerAuth()
 @Controller('smartrotom/documents')
 export class NotesController {
   constructor(
     private readonly documentsFacadeService: DocumentsFacadeService,
   ) {}
 
-  @Public()
+  @OptionalAuth()
   @Get('document/:id')
-  @ApiOperation({ summary: 'Get a document by ID' })
+  @ApiOperation({
+    summary: 'Get a document by ID (public notes need no session)',
+  })
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Document retrieved successfully.',
@@ -61,63 +79,55 @@ export class NotesController {
     description: 'Document not found.',
   })
   @ApiParam({ name: 'id', description: 'Document ID' })
-  async getDocument(@Param('id') id: string): Promise<Document> {
-    const documentId = parseInt(id, 10);
-    if (isNaN(documentId)) {
-      throw new Error('Invalid document ID');
-    }
-    return await this.documentsFacadeService.getDocumentById(documentId);
+  async getDocument(
+    @Param('id', ParseIntPipe) id: number,
+    @CurrentMcUuidOptional() uuid: string | undefined,
+  ): Promise<Document> {
+    return await this.documentsFacadeService.getDocumentById(id, uuid);
   }
 
-  @Public()
   @Post('document')
-  @ApiOperation({ summary: 'Create a new document' })
+  @ApiOperation({ summary: 'Create a new document owned by the caller' })
   @ApiResponse({
     status: HttpStatus.CREATED,
     description: 'Document created successfully.',
     type: Document,
   })
-  @ApiResponse({
-    status: HttpStatus.BAD_REQUEST,
-    description: 'Invalid document data.',
-  })
   @ApiBody({ type: CreateDocumentDto })
   async createDocument(
     @Body() createDocumentDto: CreateDocumentDto,
+    @CurrentMcUuid() uuid: string,
   ): Promise<Document> {
-    const createDocumentRequest: CreateDocumentRequest = {
+    const createDocumentRequest: CreateNoteWithUserRequest = {
       title: createDocumentDto.title,
       content: createDocumentDto.content,
       type: createDocumentDto.type,
+      uuid,
     };
-    return await this.documentsFacadeService.createDocument(
+    const created = await this.documentsFacadeService.createNoteWithUser(
       createDocumentRequest,
     );
+    return await this.documentsFacadeService.getDocumentById(created.id, uuid);
   }
 
-  @Public()
   @Put('document/:id')
-  @ApiOperation({ summary: 'Update an existing document' })
+  @ApiOperation({ summary: 'Update a document the caller owns' })
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Document updated successfully.',
     type: Document,
   })
   @ApiResponse({
-    status: HttpStatus.NOT_FOUND,
-    description: 'Document not found.',
+    status: HttpStatus.FORBIDDEN,
+    description: 'The document belongs to someone else.',
   })
   @ApiParam({ name: 'id', description: 'Document ID' })
   @ApiBody({ type: UpdateDocumentDto })
   async updateDocument(
-    @Param('id') id: string,
+    @Param('id', ParseIntPipe) id: number,
     @Body() updateDocumentDto: UpdateDocumentDto,
+    @CurrentMcUuid() uuid: string,
   ): Promise<Document> {
-    const documentId = parseInt(id, 10);
-    if (isNaN(documentId)) {
-      throw new Error('Invalid document ID');
-    }
-
     const updateDocumentRequest: UpdateDocumentRequest = {
       title: updateDocumentDto.title,
       content: updateDocumentDto.content,
@@ -127,147 +137,103 @@ export class NotesController {
       folderId: updateDocumentDto.folderId,
     };
     return await this.documentsFacadeService.updateDocument(
-      documentId,
+      id,
+      uuid,
       updateDocumentRequest,
     );
   }
 
-  @Public()
   @Post('document/:id/restore')
   @ApiOperation({ summary: 'Restore a soft-deleted document from the trash' })
   @ApiResponse({ status: HttpStatus.OK, type: Document })
   @ApiParam({ name: 'id', description: 'Document ID' })
-  async restoreDocument(@Param('id') id: string): Promise<Document> {
-    const documentId = parseInt(id, 10);
-    if (isNaN(documentId)) {
-      throw new Error('Invalid document ID');
-    }
-    return await this.documentsFacadeService.restoreDocument(documentId);
+  async restoreDocument(
+    @Param('id', ParseIntPipe) id: number,
+    @CurrentMcUuid() uuid: string,
+  ): Promise<Document> {
+    return await this.documentsFacadeService.restoreDocument(id, uuid);
   }
 
-  @Public()
   @Delete('document/:id/purge')
-  @ApiOperation({ summary: 'Permanently delete a document' })
+  @ApiOperation({ summary: 'Permanently delete a document the caller owns' })
   @ApiResponse({ status: HttpStatus.OK, type: SuccessResponse })
   @ApiParam({ name: 'id', description: 'Document ID' })
-  async purgeDocument(@Param('id') id: string): Promise<SuccessResponse> {
-    const documentId = parseInt(id, 10);
-    if (isNaN(documentId)) {
-      throw new Error('Invalid document ID');
-    }
-    return await this.documentsFacadeService.purgeDocument(documentId);
+  async purgeDocument(
+    @Param('id', ParseIntPipe) id: number,
+    @CurrentMcUuid() uuid: string,
+  ): Promise<SuccessResponse> {
+    return await this.documentsFacadeService.purgeDocument(id, uuid);
   }
 
-  @Public()
   @Get('document/:id/shares')
   @ApiOperation({ summary: 'List UUIDs a document is shared with' })
   @ApiResponse({ status: HttpStatus.OK, type: [String] })
   @ApiParam({ name: 'id', description: 'Document ID' })
-  async getDocumentShares(@Param('id') id: string): Promise<string[]> {
-    const documentId = parseInt(id, 10);
-    if (isNaN(documentId)) {
-      throw new Error('Invalid document ID');
-    }
-    return await this.documentsFacadeService.getDocumentShares(documentId);
+  async getDocumentShares(
+    @Param('id', ParseIntPipe) id: number,
+    @CurrentMcUuid() uuid: string,
+  ): Promise<string[]> {
+    // Reading the share list is itself an ownership-gated read.
+    await this.documentsFacadeService.getDocumentById(id, uuid);
+    return await this.documentsFacadeService.getDocumentShares(id);
   }
 
-  @Public()
   @Delete('document/:id')
-  @ApiOperation({ summary: 'Delete a document' })
+  @ApiOperation({ summary: 'Move a document the caller owns to the trash' })
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Document deleted successfully.',
     type: SuccessResponse,
   })
-  @ApiResponse({
-    status: HttpStatus.NOT_FOUND,
-    description: 'Document not found.',
-  })
   @ApiParam({ name: 'id', description: 'Document ID' })
-  async deleteDocument(@Param('id') id: string): Promise<SuccessResponse> {
-    const documentId = parseInt(id, 10);
-    if (isNaN(documentId)) {
-      throw new Error('Invalid document ID');
-    }
-    return await this.documentsFacadeService.deleteDocument(documentId);
+  async deleteDocument(
+    @Param('id', ParseIntPipe) id: number,
+    @CurrentMcUuid() uuid: string,
+  ): Promise<SuccessResponse> {
+    return await this.documentsFacadeService.deleteDocument(id, uuid);
   }
 
-  @Public()
-  @Get('trash/:uuid')
-  @ApiOperation({ summary: 'Get soft-deleted notes for a user' })
+  @Get('trash')
+  @ApiOperation({ summary: "Get the caller's soft-deleted notes" })
   @ApiResponse({ status: HttpStatus.OK, type: [NotePreview] })
-  @ApiParam({ name: 'uuid', description: 'User UUID' })
-  async getTrash(@Param('uuid') uuid: string): Promise<NotePreview[]> {
+  async getTrash(@CurrentMcUuid() uuid: string): Promise<NotePreview[]> {
     return await this.documentsFacadeService.getTrashedNotes(uuid);
   }
 
-  @Public()
-  @Post('notes') // Changed from GET to POST to use request body
-  @ApiOperation({ summary: 'Get notes for a player' })
+  @Get('notes')
+  @ApiOperation({ summary: "Get the caller's notes" })
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Notes retrieved successfully.',
     type: [NotePreview],
   })
-  @ApiResponse({
-    status: HttpStatus.INTERNAL_SERVER_ERROR,
-    description: 'Failed to retrieve notes.',
-  })
-  @ApiBody({ type: GetUserDocumentsDto })
-  async getNotes(
-    @Body() getUserDocumentsDto: GetUserDocumentsDto,
-  ): Promise<NotePreview[]> {
-    return await this.documentsFacadeService.getUserNotes(
-      getUserDocumentsDto.uuid,
-    );
-  }
-
-  // Keep the existing GET endpoint for backward compatibility
-  @Public()
-  @Get('all/:uuid')
-  @ApiOperation({ summary: 'Get notes for a player (legacy)' })
-  @ApiResponse({
-    status: HttpStatus.OK,
-    description: 'Notes retrieved successfully.',
-    type: [NotePreview],
-  })
-  @ApiResponse({
-    status: HttpStatus.INTERNAL_SERVER_ERROR,
-    description: 'Failed to retrieve notes.',
-  })
-  @ApiParam({ name: 'uuid', description: 'Player UUID' })
-  async getNotesLegacy(@Param('uuid') uuid: string): Promise<NotePreview[]> {
+  async getNotes(@CurrentMcUuid() uuid: string): Promise<NotePreview[]> {
     return await this.documentsFacadeService.getUserNotes(uuid);
   }
 
-  @Public()
   @Post('create')
-  @ApiOperation({ summary: 'Create a new note and associate with user' })
+  @ApiOperation({ summary: 'Create a note owned by the caller' })
   @ApiResponse({
     status: HttpStatus.CREATED,
     description: 'Note created successfully.',
     type: CreateNoteResponse,
   })
-  @ApiResponse({
-    status: HttpStatus.BAD_REQUEST,
-    description: 'Invalid note data.',
-  })
-  @ApiBody({ type: CreateDocumentDtoWithUuid })
+  @ApiBody({ type: CreateDocumentDto })
   async createNote(
-    @Body() body: CreateDocumentDtoWithUuid,
+    @Body() body: CreateDocumentDto,
+    @CurrentMcUuid() uuid: string,
   ): Promise<CreateNoteResponse> {
     const createNoteRequest: CreateNoteWithUserRequest = {
       title: body.title,
       content: body.content,
       type: body.type,
-      uuid: body.uuid,
+      uuid,
     };
     return await this.documentsFacadeService.createNoteWithUser(
       createNoteRequest,
     );
   }
 
-  @Public()
   @Post('save/:id')
   @ApiOperation({ summary: 'Save a note (create or update)' })
   @ApiResponse({
@@ -275,126 +241,64 @@ export class NotesController {
     description: 'Note saved successfully.',
     type: SaveDocumentResponse,
   })
-  @ApiResponse({
-    status: HttpStatus.INTERNAL_SERVER_ERROR,
-    description: 'Failed to save note.',
-  })
   @ApiParam({ name: 'id', description: 'Note ID (0 for new note)' })
   @ApiBody({ type: CreateDocumentDto })
   async saveNote(
-    @Param('id') id: string,
+    @Param('id', ParseIntPipe) id: number,
     @Body() body: CreateDocumentDto,
+    @CurrentMcUuid() uuid: string,
   ): Promise<SaveDocumentResponse> {
-    const noteId = parseInt(id, 10);
-    if (isNaN(noteId)) {
-      throw new Error('Invalid note ID');
-    }
     return await this.documentsFacadeService.saveDocument(
-      noteId,
+      id,
+      uuid,
       body.title,
       body.content,
       body.type,
     );
   }
 
-  @Public()
-  @Post('note/user') // Changed to use request body instead of path params
-  @ApiOperation({ summary: 'Associate a note with a user' })
+  @Post('note/user')
+  @ApiOperation({ summary: 'Share a note the caller owns with another player' })
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Note associated with user successfully.',
     type: SuccessResponse,
   })
-  @ApiResponse({
-    status: HttpStatus.NOT_FOUND,
-    description: 'Note or user not found.',
-  })
   @ApiBody({ type: AddNoteToUserDto })
   async addNoteToUser(
     @Body() addNoteToUserDto: AddNoteToUserDto,
+    @CurrentMcUuid() uuid: string,
   ): Promise<SuccessResponse> {
+    // Only a holder may hand the note to someone else.
+    await this.documentsFacadeService.getDocumentById(
+      addNoteToUserDto.documentId,
+      uuid,
+    );
     return await this.documentsFacadeService.addNoteToUser(
       addNoteToUserDto.documentId,
       addNoteToUserDto.uuid,
     );
   }
 
-  // Keep the existing endpoint for backward compatibility
-  @Public()
-  @Post('note/:noteId/user/:uuid')
-  @ApiOperation({ summary: 'Associate a note with a user (legacy)' })
-  @ApiResponse({
-    status: HttpStatus.OK,
-    description: 'Note associated with user successfully.',
-    type: SuccessResponse,
-  })
-  @ApiResponse({
-    status: HttpStatus.NOT_FOUND,
-    description: 'Note or user not found.',
-  })
-  @ApiParam({ name: 'noteId', description: 'Note ID' })
-  @ApiParam({ name: 'uuid', description: 'User UUID' })
-  async addNoteToUserLegacy(
-    @Param('noteId') noteId: string,
-    @Param('uuid') uuid: string,
-  ): Promise<SuccessResponse> {
-    const noteIdNum = parseInt(noteId, 10);
-    if (isNaN(noteIdNum)) {
-      throw new Error('Invalid note ID');
-    }
-    return await this.documentsFacadeService.addNoteToUser(noteIdNum, uuid);
-  }
-
-  @Public()
-  @Delete('note/user') // Changed to use request body
-  @ApiOperation({ summary: 'Remove association between note and user' })
+  @Delete('note/user')
+  @ApiOperation({ summary: 'Remove a share from a note the caller owns' })
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Note removed from user successfully.',
     type: SuccessResponse,
   })
-  @ApiResponse({
-    status: HttpStatus.NOT_FOUND,
-    description: 'Association not found.',
-  })
-  @ApiBody({ type: AddNoteToUserDto }) // Reusing the same DTO since it has the same fields
+  @ApiBody({ type: AddNoteToUserDto })
   async removeNoteFromUser(
     @Body() removeNoteDto: AddNoteToUserDto,
+    @CurrentMcUuid() uuid: string,
   ): Promise<SuccessResponse> {
+    await this.documentsFacadeService.getDocumentById(
+      removeNoteDto.documentId,
+      uuid,
+    );
     return await this.documentsFacadeService.removeNoteFromUser(
       removeNoteDto.documentId,
       removeNoteDto.uuid,
-    );
-  }
-
-  // Keep the existing endpoint for backward compatibility
-  @Public()
-  @Delete('note/:noteId/user/:uuid')
-  @ApiOperation({
-    summary: 'Remove association between note and user (legacy)',
-  })
-  @ApiResponse({
-    status: HttpStatus.OK,
-    description: 'Note removed from user successfully.',
-    type: SuccessResponse,
-  })
-  @ApiResponse({
-    status: HttpStatus.NOT_FOUND,
-    description: 'Association not found.',
-  })
-  @ApiParam({ name: 'noteId', description: 'Note ID' })
-  @ApiParam({ name: 'uuid', description: 'User UUID' })
-  async removeNoteFromUserLegacy(
-    @Param('noteId') noteId: string,
-    @Param('uuid') uuid: string,
-  ): Promise<SuccessResponse> {
-    const noteIdNum = parseInt(noteId, 10);
-    if (isNaN(noteIdNum)) {
-      throw new Error('Invalid note ID');
-    }
-    return await this.documentsFacadeService.removeNoteFromUser(
-      noteIdNum,
-      uuid,
     );
   }
 }

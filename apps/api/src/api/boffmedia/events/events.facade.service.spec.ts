@@ -215,7 +215,11 @@ describe('EventsFacadeService', () => {
 
       // Defaults to public-only (includePrivate=false) and no viewer id when
       // neither is passed.
-      expect(eventsService.getEventById).toHaveBeenCalledWith(1, false, undefined);
+      expect(eventsService.getEventById).toHaveBeenCalledWith(
+        1,
+        false,
+        undefined,
+      );
       expect(result).toEqual(mockEvent);
     });
   });

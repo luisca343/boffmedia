@@ -1,4 +1,3 @@
-import { sql } from 'drizzle-orm';
 import {
   char,
   foreignKey,
@@ -44,8 +43,8 @@ export const rookerProfiles = mysqlTable('rotom_rooker_profiles', {
   // (must be a caught species) by the service — no FK, since rotom_pokedex is
   // keyed by row id, not by species.
   partnerPokemonId: int('partner_pokemon_id'),
-  createdAt: timestamp('created_at').default(sql`CURRENT_TIMESTAMP()`),
-  updatedAt: timestamp('updated_at').default(sql`CURRENT_TIMESTAMP()`),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow().onUpdateNow(),
 });
 
 export type RookerProfile = typeof rookerProfiles.$inferSelect;
@@ -74,8 +73,8 @@ export const rookerPosts = mysqlTable(
       onDelete: 'set null',
       onUpdate: 'cascade',
     }),
-    createdAt: timestamp('created_at').default(sql`CURRENT_TIMESTAMP()`),
-    updatedAt: timestamp('updated_at').default(sql`CURRENT_TIMESTAMP()`),
+    createdAt: timestamp('created_at').notNull().defaultNow(),
+    updatedAt: timestamp('updated_at').notNull().defaultNow().onUpdateNow(),
   },
   (t) => ({
     uuidIdx: index('rotom_rooker_posts_uuid_idx').on(t.uuid),
@@ -111,7 +110,7 @@ export const rookerReactions = mysqlTable(
         onUpdate: 'cascade',
       }),
     type: varchar('type', { length: 12 }).notNull(),
-    createdAt: timestamp('created_at').default(sql`CURRENT_TIMESTAMP()`),
+    createdAt: timestamp('created_at').notNull().defaultNow(),
   },
   (t) => ({
     pk: primaryKey({ columns: [t.postId, t.uuid] }),
@@ -135,7 +134,7 @@ export const rookerRetrinos = mysqlTable(
         onDelete: 'cascade',
         onUpdate: 'cascade',
       }),
-    createdAt: timestamp('created_at').default(sql`CURRENT_TIMESTAMP()`),
+    createdAt: timestamp('created_at').notNull().defaultNow(),
   },
   (t) => ({
     pk: primaryKey({ columns: [t.postId, t.uuid] }),
@@ -159,7 +158,7 @@ export const rookerBookmarks = mysqlTable(
         onDelete: 'cascade',
         onUpdate: 'cascade',
       }),
-    createdAt: timestamp('created_at').default(sql`CURRENT_TIMESTAMP()`),
+    createdAt: timestamp('created_at').notNull().defaultNow(),
   },
   (t) => ({
     pk: primaryKey({ columns: [t.postId, t.uuid] }),
@@ -183,7 +182,7 @@ export const rookerFollows = mysqlTable(
         onDelete: 'cascade',
         onUpdate: 'cascade',
       }),
-    createdAt: timestamp('created_at').default(sql`CURRENT_TIMESTAMP()`),
+    createdAt: timestamp('created_at').notNull().defaultNow(),
   },
   (t) => ({
     pk: primaryKey({ columns: [t.followerUuid, t.followeeUuid] }),

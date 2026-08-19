@@ -9,8 +9,8 @@ import {
   ValidationPipe,
   UsePipes,
   Body,
+  UseGuards,
 } from '@nestjs/common';
-import { Public } from '@api/_utils/decorators/public.decorator';
 import {
   ApiTags,
   ApiOperation,
@@ -47,8 +47,17 @@ import { Locale } from './enums/locale.enum';
 import { WeaponKind } from './enums/weapon-kind.enum';
 import { Rarity } from './enums/rarity.enum';
 import { WeaponTreeEntity } from './entities/weapon-tree.entity';
+import { Public } from '@api/_utils/decorators/public.decorator';
+import { JwtAuthGuard } from '@api/auth/jwt-auth.guard';
+import { RolesGuard } from '@api/_utils/guards/roles.guard';
+import { USER_ROLES } from '@api/_utils/auth/roles.constants';
+import { Roles } from '@api/_utils/decorators/roles.decorator';
 
 @ApiTags('BoffMedia 🛠 | MHWilds')
+// The MH Wilds data endpoints are deliberately public — the Tools section works
+// without a Boffmedia account, in the web and in the launcher alike. Only the
+// four cache-maintenance routes are privileged; they used to be public too, so
+// anyone could flush or rebuild the cache at will.
 @Public()
 @Controller('tools/mhwilds')
 @UsePipes(new ValidationPipe({ transform: true, whitelist: true }))
@@ -321,6 +330,8 @@ export class MhwildsController {
 
   // ==================== CACHE MANAGEMENT OPERATIONS ====================
 
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.BOFF_ADMIN)
   @Delete('cache')
   @ApiOperation({ summary: 'Clear cache' })
   @ApiResponse({
@@ -356,6 +367,8 @@ export class MhwildsController {
     return await this.mhwildsFacadeService.getCacheStatistics();
   }
 
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.BOFF_ADMIN)
   @Post('cache/warmup')
   @ApiOperation({ summary: 'Warmup cache for a locale' })
   @ApiResponse({
@@ -380,6 +393,8 @@ export class MhwildsController {
     );
   }
 
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.BOFF_ADMIN)
   @Post('cache/validate')
   @ApiOperation({ summary: 'Validate cache for a locale' })
   @ApiResponse({
@@ -404,6 +419,8 @@ export class MhwildsController {
     );
   }
 
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.BOFF_ADMIN)
   @Post('cache/optimize')
   @ApiOperation({ summary: 'Optimize cache storage' })
   @ApiResponse({

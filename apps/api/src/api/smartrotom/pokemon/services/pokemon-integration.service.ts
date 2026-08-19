@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
 import { PokemonShowdownService } from './pokemon-showdown.service';
 import { WingullFacadeService } from '../../wingull/wingull.facade.service';
 import { PokedexManagementService } from './pokedex-management.service';
@@ -21,6 +21,9 @@ export class PokemonIntegrationService {
       return await this.pokemonShowdownService.getTerasPokemonShowdownData();
     } catch (error: any) {
       this.logger.error('Failed to get Teras Pokemon Showdown data:', error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Showdown data retrieval failed: ${error.message}`);
     }
   }
@@ -32,6 +35,9 @@ export class PokemonIntegrationService {
       return await this.wingullFacadeService.updateDex(uuid);
     } catch (error: any) {
       this.logger.error(`Failed to update Wingull dex for ${uuid}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Wingull dex update failed: ${error.message}`);
     }
   }
@@ -65,6 +71,9 @@ export class PokemonIntegrationService {
       return updateResult;
     } catch (error: any) {
       this.logger.error(`Failed to update dex with sync for ${uuid}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Dex update with sync failed: ${error.message}`);
     }
   }

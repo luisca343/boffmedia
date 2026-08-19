@@ -1,5 +1,7 @@
 import {
   AnyMySqlColumn,
+  char,
+  index,
   int,
   mysqlTable,
   primaryKey,
@@ -13,7 +15,7 @@ import { rotomUsers } from './SmartRotom';
 // Defined before rotomDocuments so its folderId FK can reference it.
 export const rotomNoteFolders = mysqlTable('rotom_note_folders', {
   id: int('id').primaryKey().autoincrement(),
-  uuid: varchar('uuid', { length: 36 })
+  uuid: char('uuid', { length: 36 })
     .notNull()
     .references(() => rotomUsers.uuid, {
       onDelete: 'cascade',
@@ -26,8 +28,8 @@ export const rotomNoteFolders = mysqlTable('rotom_note_folders', {
     (): AnyMySqlColumn => rotomNoteFolders.id,
     { onDelete: 'set null', onUpdate: 'cascade' },
   ),
-  createdAt: timestamp('created_at').notNull(),
-  updatedAt: timestamp('updated_at').notNull(),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow().onUpdateNow(),
 });
 
 export type RotomNoteFolder = typeof rotomNoteFolders.$inferSelect;
@@ -47,8 +49,8 @@ export const rotomDocuments = mysqlTable('rotom_documents', {
   }),
   // Soft-delete: NULL = live, timestamp = in trash.
   deletedAt: timestamp('deleted_at'),
-  createdAt: timestamp('created_at').notNull(),
-  updatedAt: timestamp('updated_at').notNull(),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow().onUpdateNow(),
 });
 
 export type RotomDocument = typeof rotomDocuments.$inferSelect;
@@ -56,7 +58,7 @@ export type RotomDocument = typeof rotomDocuments.$inferSelect;
 export const rotomUserDocuments = mysqlTable(
   'rotom_user_documents',
   {
-    uuid: varchar('uuid', { length: 36 })
+    uuid: char('uuid', { length: 36 })
       .notNull()
       .references(() => rotomUsers.uuid, {
         onDelete: 'cascade',
@@ -80,7 +82,7 @@ export type RotomUserDocument = typeof rotomUserDocuments.$inferSelect;
 // Per-owner tags, linked many-to-many to documents.
 export const rotomNoteTags = mysqlTable('rotom_note_tags', {
   id: int('id').primaryKey().autoincrement(),
-  uuid: varchar('uuid', { length: 36 })
+  uuid: char('uuid', { length: 36 })
     .notNull()
     .references(() => rotomUsers.uuid, {
       onDelete: 'cascade',
@@ -88,7 +90,7 @@ export const rotomNoteTags = mysqlTable('rotom_note_tags', {
     }),
   label: varchar('label', { length: 64 }).notNull(),
   color: varchar('color', { length: 32 }).notNull().default('primary'),
-  createdAt: timestamp('created_at').notNull(),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
 });
 
 export type RotomNoteTag = typeof rotomNoteTags.$inferSelect;
@@ -128,34 +130,46 @@ export const rotomNoteVersions = mysqlTable('rotom_note_versions', {
     }),
   label: varchar('label', { length: 255 }),
   content: text('content').notNull(),
-  authorUuid: varchar('author_uuid', { length: 36 }),
+  authorUuid: char('author_uuid', { length: 36 }),
   words: int('words').notNull().default(0),
-  createdAt: timestamp('created_at').notNull(),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
 });
 
 export type RotomNoteVersion = typeof rotomNoteVersions.$inferSelect;
 
-export const rotomNews = mysqlTable('rotom_news', {
-  id: int('id').primaryKey().autoincrement(),
-  title: varchar('title', { length: 255 }).notNull(),
-  subtitle: varchar('subtitle', { length: 255 }),
-  category: varchar('category', { length: 255 }),
-  subcategory: varchar('subcategory', { length: 255 }),
-  published: int('published').notNull().default(0),
-  featured: int('featured').notNull().default(0),
-  content: text('content').notNull(),
-  buttonText: varchar('button_text', { length: 255 }),
-  imageUrl: varchar('image_url', { length: 255 }),
-  // Editorial byline. `authorRole` is the masthead role ("Editora de comunidad");
-  // the editorial board is derived by grouping news on this pair, not stored.
-  author: varchar('author', { length: 255 }),
-  authorRole: varchar('author_role', { length: 255 }),
-  // Magazine issue number. The back-issue archive is derived by grouping on it.
-  issue: int('issue'),
-  claps: int('claps').notNull().default(0),
-  createdAt: timestamp('created_at').notNull(),
-  updatedAt: timestamp('updated_at').notNull(),
-});
+export const rotomNews = mysqlTable(
+  'rotom_news',
+  {
+    id: int('id').primaryKey().autoincrement(),
+    title: varchar('title', { length: 255 }).notNull(),
+    subtitle: varchar('subtitle', { length: 255 }),
+    category: varchar('category', { length: 255 }),
+    subcategory: varchar('subcategory', { length: 255 }),
+    published: int('published').notNull().default(0),
+    featured: int('featured').notNull().default(0),
+    content: text('content').notNull(),
+    buttonText: varchar('button_text', { length: 255 }),
+    imageUrl: varchar('image_url', { length: 255 }),
+    // Editorial byline. `authorRole` is the masthead role ("Editora de comunidad");
+    // the editorial board is derived by grouping news on this pair, not stored.
+    author: varchar('author', { length: 255 }),
+    authorRole: varchar('author_role', { length: 255 }),
+    // Magazine issue number. The back-issue archive is derived by grouping on it.
+    issue: int('issue'),
+    claps: int('claps').notNull().default(0),
+    createdAt: timestamp('created_at').notNull().defaultNow(),
+    updatedAt: timestamp('updated_at').notNull().defaultNow().onUpdateNow(),
+  },
+  // The public feed is always "published, newest first"; the front page adds
+  // `featured`. Both were full scans.
+  (t) => ({
+    publishedIdx: index('rotom_news_published_idx').on(
+      t.published,
+      t.createdAt,
+    ),
+    featuredIdx: index('rotom_news_featured_idx').on(t.featured, t.createdAt),
+  }),
+);
 
 export type RotomNews = typeof rotomNews.$inferSelect;
 
@@ -168,14 +182,14 @@ export const rotomNewsComments = mysqlTable('rotom_news_comments', {
       onDelete: 'cascade',
       onUpdate: 'cascade',
     }),
-  uuid: varchar('uuid', { length: 36 })
+  uuid: char('uuid', { length: 36 })
     .notNull()
     .references(() => rotomUsers.uuid, {
       onDelete: 'cascade',
       onUpdate: 'cascade',
     }),
   body: varchar('body', { length: 500 }).notNull(),
-  createdAt: timestamp('created_at').notNull(),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
 });
 
 export type RotomNewsComment = typeof rotomNewsComments.$inferSelect;
@@ -185,7 +199,7 @@ export const rotomNewsletterSubscribers = mysqlTable(
   {
     id: int('id').primaryKey().autoincrement(),
     email: varchar('email', { length: 255 }).notNull().unique(),
-    createdAt: timestamp('created_at').notNull(),
+    createdAt: timestamp('created_at').notNull().defaultNow(),
   },
 );
 

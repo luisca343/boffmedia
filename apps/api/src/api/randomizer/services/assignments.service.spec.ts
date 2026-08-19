@@ -14,7 +14,10 @@ import {
   RANDOMIZER_RUNNER_TOKEN,
   IRandomizerRunner,
 } from '../ports/randomizer-runner.port';
-import { SETTINGS_SHIM_TOKEN, ISettingsShim } from '../ports/settings-shim.port';
+import {
+  SETTINGS_SHIM_TOKEN,
+  ISettingsShim,
+} from '../ports/settings-shim.port';
 import { Readable } from 'stream';
 
 describe('AssignmentsService', () => {
@@ -257,7 +260,10 @@ describe('AssignmentsService', () => {
     });
 
     it('404s an unclaimed user when the config is not open', async () => {
-      repository.getConfigById.mockResolvedValue({ ...config, status: 'closed' });
+      repository.getConfigById.mockResolvedValue({
+        ...config,
+        status: 'closed',
+      });
       repository.getAssignmentByConfigAndUser.mockResolvedValue(null);
 
       await expect(

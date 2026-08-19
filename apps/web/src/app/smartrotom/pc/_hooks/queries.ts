@@ -68,7 +68,7 @@ export function useMarks() {
   return useQuery({
     queryKey: pcKeys.marks(uuid ?? ""),
     queryFn: async () => {
-      const rows = await PcMarksService.getMarks(uuid!)
+      const rows = await PcMarksService.getMarks()
       const map: PcMarkMap = {}
       for (const r of rows) {
         map[r.pokemonKey] = { favorite: !!r.favorite, tags: Array.isArray(r.tags) ? r.tags : [] }
@@ -298,7 +298,7 @@ export function useSetMark() {
   return useMutation({
     mutationFn: ({ key, patch }: { key: string; patch: Partial<PcMarkState> }) => {
       if (!uuid) throw new Error("Sesión no iniciada")
-      return PcMarksService.upsertMark(uuid, key, patch)
+      return PcMarksService.upsertMark(key, patch)
     },
     onMutate: ({ key, patch }) => ({ prev: patchLocal((m) => withMark(m, key, patch)) }),
     onError: (_e, _v, ctx) => {
@@ -324,7 +324,7 @@ export function useBulkMark() {
       removeTags?: string[]
     }) => {
       if (!uuid) throw new Error("Sesión no iniciada")
-      return PcMarksService.bulkUpsert(uuid, vars.keys, {
+      return PcMarksService.bulkUpsert(vars.keys, {
         favorite: vars.favorite,
         addTags: vars.addTags,
         removeTags: vars.removeTags,

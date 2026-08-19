@@ -127,7 +127,8 @@ export class ParticipantsService {
       if (existingParticipation.status === PARTICIPANT_STATUS.REMOVED) {
         throw new ForbiddenException({
           message: 'Participant was removed by an admin',
-          userMessage: 'Has sido expulsado de este evento por un administrador.',
+          userMessage:
+            'Has sido expulsado de este evento por un administrador.',
         });
       }
       if (existingParticipation.status === PARTICIPANT_STATUS.DECLINED) {

@@ -1,5 +1,5 @@
-import { sql } from 'drizzle-orm';
 import {
+  index,
   int,
   mysqlTable,
   text,
@@ -7,22 +7,27 @@ import {
   varchar,
 } from 'drizzle-orm/mysql-core';
 
-export const ficusQuotes = mysqlTable('ficus_quotes', {
-  id: int('id').primaryKey().autoincrement(),
-  discordId: varchar('discord_id', { length: 32 })
-    .notNull()
-    .references(() => discordUsers.userId, {
-      onDelete: 'cascade',
-      onUpdate: 'cascade',
-    }),
-  serverID: varchar('server_id', { length: 32 }).notNull(),
-  quote: text('quote').notNull(),
-  comment: text('comment'),
-  createdAt: timestamp('created_at')
-    .notNull()
-    .default(sql`CURRENT_TIMESTAMP()`),
-  updatedAt: timestamp('updated_at'),
-});
+export const ficusQuotes = mysqlTable(
+  'ficus_quotes',
+  {
+    id: int('id').primaryKey().autoincrement(),
+    discordId: varchar('discord_id', { length: 32 })
+      .notNull()
+      .references(() => discordUsers.userId, {
+        onDelete: 'cascade',
+        onUpdate: 'cascade',
+      }),
+    serverId: varchar('server_id', { length: 32 }).notNull(),
+    quote: text('quote').notNull(),
+    comment: text('comment'),
+    createdAt: timestamp('created_at').notNull().defaultNow(),
+    updatedAt: timestamp('updated_at').notNull().defaultNow().onUpdateNow(),
+  },
+  // Every Discord command filters by guild, and half of them order by recency.
+  (t) => ({
+    serverIdx: index('ficus_quotes_server_idx').on(t.serverId, t.createdAt),
+  }),
+);
 
 export type FicusQuote = typeof ficusQuotes.$inferSelect;
 
@@ -32,10 +37,8 @@ export const discordUsers = mysqlTable('ficus_discord_users', {
   avatar: varchar('avatar', { length: 255 }),
   color: varchar('color', { length: 6 }),
   ttsVoice: varchar('tts_voice', { length: 32 }).default('Enrique'),
-  createdAt: timestamp('created_at')
-    .notNull()
-    .default(sql`CURRENT_TIMESTAMP()`),
-  updatedAt: timestamp('updated_at'),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow().onUpdateNow(),
 });
 
 export type DiscordUser = typeof discordUsers.$inferSelect;

@@ -40,7 +40,8 @@ export class DevicePollEntity {
   status!: 'pending' | 'approved' | 'denied' | 'expired';
 
   @ApiPropertyOptional({
-    description: 'Bearer para el resto de rutas del launcher. Solo en approved.',
+    description:
+      'Bearer para el resto de rutas del launcher. Solo en approved.',
   })
   token?: string;
 

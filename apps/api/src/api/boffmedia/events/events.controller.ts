@@ -802,8 +802,7 @@ export class EventsController {
     @Req() req: { user?: { roles?: string[]; userId?: number } },
   ) {
     return await this.eventsFacadeService.getUserTrophies(userId, {
-      includePrivate:
-        req.user?.roles?.includes(USER_ROLES.BOFF_ADMIN) ?? false,
+      includePrivate: req.user?.roles?.includes(USER_ROLES.BOFF_ADMIN) ?? false,
       userId: req.user?.userId,
     });
   }
@@ -828,8 +827,7 @@ export class EventsController {
     @Req() req: { user?: { roles?: string[]; userId?: number } },
   ) {
     return await this.eventsFacadeService.getUserActivity(userId, q.limit, {
-      includePrivate:
-        req.user?.roles?.includes(USER_ROLES.BOFF_ADMIN) ?? false,
+      includePrivate: req.user?.roles?.includes(USER_ROLES.BOFF_ADMIN) ?? false,
       userId: req.user?.userId,
     });
   }

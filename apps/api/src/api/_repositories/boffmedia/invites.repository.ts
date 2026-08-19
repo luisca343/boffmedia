@@ -1,4 +1,4 @@
-import { Injectable, Inject } from '@nestjs/common';
+import { HttpException, Injectable, Inject } from '@nestjs/common';
 import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
 import { MySql2Database } from 'drizzle-orm/mysql2';
 import { wingullInvites, Invite } from '@/_db/schema/Wingull';
@@ -90,6 +90,9 @@ export class InvitesRepository {
       return await query.execute();
     } catch (error: any) {
       this.logger.error('Failed to get all invites:', error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Invites retrieval failed: ${error.message}`);
     }
   }
@@ -105,6 +108,9 @@ export class InvitesRepository {
       return result.length > 0 ? result[0] : null;
     } catch (error: any) {
       this.logger.error(`Failed to find invite ${id}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Invite lookup failed: ${error.message}`);
     }
   }
@@ -126,6 +132,9 @@ export class InvitesRepository {
       return result.length > 0 ? result[0] : null;
     } catch (error: any) {
       this.logger.error(`Failed to find active invite ${id}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Active invite lookup failed: ${error.message}`);
     }
   }
@@ -139,6 +148,9 @@ export class InvitesRepository {
         .execute();
     } catch (error: any) {
       this.logger.error(`Failed to find invites for UUID ${uuid}:`, error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`UUID invites lookup failed: ${error.message}`);
     }
   }
@@ -155,6 +167,9 @@ export class InvitesRepository {
         `Failed to find invites for username ${username}:`,
         error,
       );
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Username invites lookup failed: ${error.message}`);
     }
   }

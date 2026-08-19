@@ -17,9 +17,10 @@ jest.mock('@/config/env', () => ({
   },
 }));
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+/* eslint-disable @typescript-eslint/no-require-imports */
 const { GameOrUserAuthGuard } =
   require('./game-or-user-auth.guard') as typeof import('./game-or-user-auth.guard');
+/* eslint-enable @typescript-eslint/no-require-imports */
 
 const ctxFor = (req: any) =>
   ({

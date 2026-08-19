@@ -11,7 +11,9 @@ const socketWith = (handshake: Record<string, unknown>): Socket =>
 describe('socket identity', () => {
   describe('tokenFromHandshake', () => {
     it('prefers socket.io handshake auth', () => {
-      expect(tokenFromHandshake(socketWith({ auth: { token: 'a' } }))).toBe('a');
+      expect(tokenFromHandshake(socketWith({ auth: { token: 'a' } }))).toBe(
+        'a',
+      );
     });
 
     it('accepts a query token — MCEF clients cannot set handshake auth', () => {

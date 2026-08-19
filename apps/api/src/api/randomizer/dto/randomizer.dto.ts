@@ -1,12 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import {
-  IsNotEmpty,
-  IsInt,
-  IsString,
-  IsOptional,
-  IsIn,
-} from 'class-validator';
+import { IsNotEmpty, IsInt, IsString, IsOptional, IsIn } from 'class-validator';
 import {
   RandomizerConfigStatus,
   RandomizerAssignmentStatus,
@@ -75,7 +69,8 @@ export class UpdateConfigDto {
   @ApiProperty({
     example: '5b1f88208cfdad6834c7bbec',
     required: false,
-    description: 'Re-attach the event to a different emulator pack (draft only)',
+    description:
+      'Re-attach the event to a different emulator pack (draft only)',
   })
   @IsOptional()
   @IsString()
@@ -136,7 +131,8 @@ export class ConfigResponseDto {
     example: '5b1f88208cfdad6834c7bbec',
     nullable: true,
     required: false,
-    description: 'Emulator pack attached to this config’s event (event.pack_id)',
+    description:
+      'Emulator pack attached to this config’s event (event.pack_id)',
   })
   packId?: string | null;
 
@@ -209,7 +205,11 @@ export class AssignmentAdminDto {
   @ApiProperty({ example: 1 })
   configId: number;
 
-  @ApiProperty({ type: Number, nullable: true, description: 'BoffMedia User ID if linked' })
+  @ApiProperty({
+    type: Number,
+    nullable: true,
+    description: 'BoffMedia User ID if linked',
+  })
   boffmediaUserId: number | null;
 
   @ApiProperty({
@@ -223,7 +223,7 @@ export class AssignmentAdminDto {
 
   @ApiProperty({
     description:
-      "True while the seed is still under seal (config not yet published). The admin table shows a lock; the seed field is withheld until it flips false.",
+      'True while the seed is still under seal (config not yet published). The admin table shows a lock; the seed field is withheld until it flips false.',
   })
   seedSealed: boolean;
 

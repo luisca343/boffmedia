@@ -8,6 +8,9 @@ import { AppsFacadeService } from './apps.facade.service';
 import { GlobalExceptionFilter } from '@/common/filters/global-exception.filter';
 import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
 import { Reflector } from '@nestjs/core';
+import { JwtAuthGuard } from '@api/auth/jwt-auth.guard';
+import { RolesGuard } from '@api/_utils/guards/roles.guard';
+import { GameOrUserAuthGuard } from '@api/_utils/guards/game-or-user-auth.guard';
 
 const mockLogger = {
   log: jest.fn(),
@@ -47,9 +50,40 @@ describe('AppsController — integration (ValidationPipe + GlobalExceptionFilter
         ResponseInterceptor,
         Reflector,
       ],
-    }).compile();
+    })
+      // Guards are stubbed: this suite is about validation and error
+      // shape, not about who may call the route.
+      .overrideGuard(JwtAuthGuard)
+      .useValue({ canActivate: () => true })
+      .overrideGuard(RolesGuard)
+      .useValue({ canActivate: () => true })
+      .overrideGuard(GameOrUserAuthGuard)
+      .useValue({ canActivate: () => true })
+      .compile();
 
     app = moduleRef.createNestApplication();
+
+    // These routes are no longer public: the identity that used to come from
+
+    // the URL or the body is now taken from the authenticated principal.
+
+    // This suite covers the ValidationPipe and the exception filter, so it
+
+    // runs as a signed-in caller; the guards themselves are unit-tested.
+
+    app.use((req: any, _res: any, next: any) => {
+      req.user = {
+        userId: 1,
+
+        username: 'tester',
+
+        roles: ['BOFF_ADMIN', 'ROTOM_ADMIN'],
+
+        mcUuid: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4',
+      };
+
+      next();
+    });
     app.useGlobalPipes(
       new ValidationPipe({
         whitelist: true,
@@ -254,32 +288,20 @@ describe('AppsController — integration (ValidationPipe + GlobalExceptionFilter
 
   // ── POST /smartrotom/apps/player — GetPlayerAppsDto ──────────────────────
 
-  describe('POST /smartrotom/apps/player — GetPlayerAppsDto validation', () => {
-    it('returns 400 when uuid is missing', async () => {
+  describe('POST /smartrotom/apps/player', () => {
+    it("takes no body: it lists the CALLER's apps", async () => {
+      (mockFacade.getAppsForPlayer as jest.Mock).mockResolvedValue([]);
+
       const res = await request(app.getHttpServer())
         .post('/smartrotom/apps/player')
         .send({});
 
-      expect(res.status).toBe(400);
-    });
-
-    it('returns 400 when uuid is not a valid UUID', async () => {
-      const res = await request(app.getHttpServer())
-        .post('/smartrotom/apps/player')
-        .send({ uuid: 'not-a-uuid' });
-
-      expect(res.status).toBe(400);
-    });
-
-    it('calls facade.getAppsForPlayer when uuid is valid', async () => {
-      mockFacade.getAppsForPlayer.mockResolvedValue([mockApp]);
-
-      const res = await request(app.getHttpServer())
-        .post('/smartrotom/apps/player')
-        .send({ uuid: VALID_UUID });
-
-      expect(res.status).toBeLessThan(300);
-      expect(mockFacade.getAppsForPlayer).toHaveBeenCalledWith(VALID_UUID);
+      expect(res.status).toBe(201);
+      // The uuid used to be a body field, so any caller could list (and
+      // reorder) somebody else's dock.
+      expect(mockFacade.getAppsForPlayer).toHaveBeenCalledWith(
+        '67d9b543-5ac9-41e1-a8a5-20d7689e24a4',
+      );
     });
   });
 
@@ -315,10 +337,13 @@ describe('AppsController — integration (ValidationPipe + GlobalExceptionFilter
 
       const res = await request(app.getHttpServer())
         .post('/smartrotom/apps/player/add')
-        .send({ uuid: VALID_UUID, id: 1 });
+        .send({ id: 1 });
 
       expect(res.status).toBeLessThan(300);
-      expect(mockFacade.addAppToPlayer).toHaveBeenCalledWith(VALID_UUID, 1);
+      expect(mockFacade.addAppToPlayer).toHaveBeenCalledWith(
+        '67d9b543-5ac9-41e1-a8a5-20d7689e24a4',
+        1,
+      );
     });
   });
 
@@ -338,11 +363,11 @@ describe('AppsController — integration (ValidationPipe + GlobalExceptionFilter
 
       const res = await request(app.getHttpServer())
         .post('/smartrotom/apps/player/remove')
-        .send({ uuid: VALID_UUID, id: 3 });
+        .send({ id: 3 });
 
       expect(res.status).toBeLessThan(300);
       expect(mockFacade.removeAppFromPlayer).toHaveBeenCalledWith(
-        VALID_UUID,
+        '67d9b543-5ac9-41e1-a8a5-20d7689e24a4',
         3,
       );
     });
@@ -351,14 +376,6 @@ describe('AppsController — integration (ValidationPipe + GlobalExceptionFilter
   // ── POST /smartrotom/apps/order — OrderAppDto ────────────────────────────
 
   describe('POST /smartrotom/apps/order — OrderAppDto validation', () => {
-    it('returns 400 when uuid is missing', async () => {
-      const res = await request(app.getHttpServer())
-        .post('/smartrotom/apps/order')
-        .send({ order: [{ id: 1, order: 1 }] });
-
-      expect(res.status).toBe(400);
-    });
-
     it('returns 400 when order array is missing', async () => {
       const res = await request(app.getHttpServer())
         .post('/smartrotom/apps/order')
@@ -381,7 +398,6 @@ describe('AppsController — integration (ValidationPipe + GlobalExceptionFilter
       const res = await request(app.getHttpServer())
         .post('/smartrotom/apps/order')
         .send({
-          uuid: VALID_UUID,
           order: [
             { id: 1, order: 1 },
             { id: 2, order: 2 },
@@ -391,7 +407,7 @@ describe('AppsController — integration (ValidationPipe + GlobalExceptionFilter
       expect(res.status).toBeLessThan(300);
       expect(mockFacade.orderApps).toHaveBeenCalledWith(
         expect.arrayContaining([expect.objectContaining({ id: 1, order: 1 })]),
-        VALID_UUID,
+        '67d9b543-5ac9-41e1-a8a5-20d7689e24a4',
       );
     });
   });

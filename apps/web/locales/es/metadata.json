@@ -96,6 +96,10 @@
       "mewgenics": {
         "title": "Codex Mewgenics",
         "description": "Base de datos completa de Mewgenics: objetos, bestiario, habilidades, pasivas, estados, eventos, clases y mapas."
+      },
+      "steamfree": {
+        "title": "Gratis en Steam",
+        "description": "Todos los juegos que Steam regala ahora mismo al 100 % de descuento, con cuenta atrás para reclamar cada uno."
       }
     },
     "smartrotom": {

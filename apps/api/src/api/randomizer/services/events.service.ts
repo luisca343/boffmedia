@@ -1,4 +1,5 @@
 import {
+  HttpException,
   Injectable,
   Inject,
   BadRequestException,
@@ -19,7 +20,6 @@ import type {
 import {
   RANDOMIZER_RUNNER_TOKEN,
   type IRandomizerRunner,
-  type RandomizeJob,
 } from '../ports/randomizer-runner.port';
 import {
   SETTINGS_SHIM_TOKEN,
@@ -61,7 +61,10 @@ function stableStringify(value: unknown): string {
   return JSON.stringify(value ?? null);
 }
 
-export type ResolutionIssue = 'no-pack' | 'event-not-active' | 'config-not-open';
+export type ResolutionIssue =
+  | 'no-pack'
+  | 'event-not-active'
+  | 'config-not-open';
 
 export type EnrichedConfig = RandomizerConfig & {
   packId: string | null;
@@ -155,7 +158,11 @@ export class EventsService {
       `Quick-randomized a ${params.gamePlatform} ROM with preset ${params.presetId} (seed ${seed})`,
     );
 
-    return { romBytes: result.romBytes, outputSha512: result.outputSha512, seed };
+    return {
+      romBytes: result.romBytes,
+      outputSha512: result.outputSha512,
+      seed,
+    };
   }
 
   /**
@@ -223,7 +230,9 @@ export class EventsService {
     await this.assertPackAttachable(data.packId, data.eventId, rom.sha512);
 
     // Pin the settings snapshot: SHA-512 over a stable serialization of the preset's JSON.
-    const settingsJsonString = stableStringify(asSettingsObject(preset.settingsJson));
+    const settingsJsonString = stableStringify(
+      asSettingsObject(preset.settingsJson),
+    );
     const computedSha512 = createHash('sha512')
       .update(settingsJsonString)
       .digest('hex');
@@ -310,7 +319,9 @@ export class EventsService {
       const presets = await this.repository.listPresets();
 
       for (const preset of presets) {
-        const presetJsonString = stableStringify(asSettingsObject(preset.settingsJson));
+        const presetJsonString = stableStringify(
+          asSettingsObject(preset.settingsJson),
+        );
         const presetSha512 = createHash('sha512')
           .update(presetJsonString)
           .digest('hex');
@@ -329,6 +340,9 @@ export class EventsService {
             this.logger.error(
               `Heal: preset ${preset.id} blob hash mismatch: expected ${config.settingsBlobSha512}, got ${storedSha512}`,
             );
+            // A typed HTTP error (404/403/409…) has to reach the client as itself;
+            // wrapping it in a bare Error turned all of them into 500s.
+            if (err instanceof HttpException) throw err;
             throw new Error('Settings blob hash mismatch during heal');
           }
 
@@ -481,9 +495,7 @@ export class EventsService {
 
     const config = await this.repository.getConfigByEventId(eventId);
     if (!config) {
-      throw new NotFoundException(
-        `No config found for event ${eventId}`,
-      );
+      throw new NotFoundException(`No config found for event ${eventId}`);
     }
 
     const ev = await this.repository.getEventPackAndStatus(config.eventId);
@@ -618,11 +630,9 @@ export class EventsService {
     // Second clean-ROM gate: by open time the pack MUST have a published
     // version whose emulator ROM is exactly the pinned clean ROM. This also
     // catches versions published after the config was created.
-    await this.assertPublishedRomMatchesPack(
-      ev.packId,
-      config.cleanRomSha512,
-      { requirePublished: true },
-    );
+    await this.assertPublishedRomMatchesPack(ev.packId, config.cleanRomSha512, {
+      requirePublished: true,
+    });
 
     await this.repository.updateConfig(configId, {
       status: 'open' as RandomizerConfigStatus,
@@ -674,7 +684,10 @@ export class EventsService {
    * Publish a config: closed → published, making seeds/settings/logs public.
    * Publishing from open would leak seeds mid-play; from draft it is meaningless.
    */
-  async publishConfig(configId: number, actor?: string): Promise<EnrichedConfig> {
+  async publishConfig(
+    configId: number,
+    actor?: string,
+  ): Promise<EnrichedConfig> {
     if (!configId || configId <= 0) {
       throw new BadRequestException('Valid configId is required');
     }
@@ -708,7 +721,10 @@ export class EventsService {
    * their seeds are public, and new claims against revealed seeds would break
    * seal integrity.
    */
-  async reopenConfig(configId: number, actor?: string): Promise<EnrichedConfig> {
+  async reopenConfig(
+    configId: number,
+    actor?: string,
+  ): Promise<EnrichedConfig> {
     if (!configId || configId <= 0) {
       throw new BadRequestException('Valid configId is required');
     }
@@ -757,7 +773,8 @@ export class EventsService {
     }
 
     // Drafts cannot mint claims, so this is belt-and-braces.
-    const assignments = await this.repository.countAssignmentsByConfig(configId);
+    const assignments =
+      await this.repository.countAssignmentsByConfig(configId);
     if (assignments > 0) {
       throw new ConflictException(
         `Cannot delete config ${configId}: it has ${assignments} assignment(s)`,
@@ -779,5 +796,4 @@ export class EventsService {
       `Deleted config ${configId} and detached pack from event ${config.eventId}`,
     );
   }
-
 }

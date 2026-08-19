@@ -383,9 +383,7 @@ export class PacksController {
     description: 'Para el selector de concesiones. Máximo 10 resultados.',
   })
   @ApiResponse({ status: HttpStatus.OK, type: [UserSearchHitEntity] })
-  async searchUsers(
-    @Query('q') q?: string,
-  ): Promise<UserSearchHitEntity[]> {
+  async searchUsers(@Query('q') q?: string): Promise<UserSearchHitEntity[]> {
     return this.packs.searchUsers(q ?? '');
   }
 

@@ -3,7 +3,7 @@
 import * as React from "react"
 import { useLocale } from "next-intl"
 import useGetKeys from "../_hooks/useGetKeys"
-import useFetchSteamData from "../_hooks/useFetchSteamData"
+import useFetchSteamData from "../../_hooks/useFetchSteamData"
 import type { KvItem } from "../_components/ui/kv-kit"
 
 export type KeysSort = "estado" | "nombre" | "stock"

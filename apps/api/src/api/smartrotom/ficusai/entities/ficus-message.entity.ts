@@ -30,10 +30,4 @@ export class FicusMessage {
     description: 'When the message was last updated',
   })
   updatedAt: Date;
-
-  @ApiProperty({
-    example: null,
-    description: 'When the message was deleted (soft delete)',
-  })
-  deletedAt?: Date;
 }

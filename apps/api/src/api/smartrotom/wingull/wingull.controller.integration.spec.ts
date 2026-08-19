@@ -9,6 +9,7 @@ import { WingullWorldService } from './services/wingull-world.service';
 import { GlobalExceptionFilter } from '@/common/filters/global-exception.filter';
 import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
 import { Reflector } from '@nestjs/core';
+import { GameOrUserAuthGuard } from '@api/_utils/guards/game-or-user-auth.guard';
 
 const mockLogger = {
   log: jest.fn(),
@@ -62,9 +63,37 @@ describe('WingullController — integration (ValidationPipe + GlobalExceptionFil
         ResponseInterceptor,
         Reflector,
       ],
-    }).compile();
+    })
+      // The controller now sits behind GameOrUserAuthGuard: these are the
+      // game-server bridge routes and used to be reachable by anyone. This suite
+      // covers DTO validation, so the credential is stubbed here.
+      .overrideGuard(GameOrUserAuthGuard)
+      .useValue({ canActivate: () => true })
+      .compile();
 
     app = moduleRef.createNestApplication();
+
+    // These routes are no longer public: the identity that used to come from
+
+    // the URL or the body is now taken from the authenticated principal.
+
+    // This suite covers the ValidationPipe and the exception filter, so it
+
+    // runs as a signed-in caller; the guards themselves are unit-tested.
+
+    app.use((req: any, _res: any, next: any) => {
+      req.user = {
+        userId: 1,
+
+        username: 'tester',
+
+        roles: ['BOFF_ADMIN', 'ROTOM_ADMIN'],
+
+        mcUuid: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4',
+      };
+
+      next();
+    });
     app.useGlobalPipes(
       new ValidationPipe({
         whitelist: true,

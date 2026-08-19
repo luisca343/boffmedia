@@ -1,4 +1,3 @@
-import { sql } from 'drizzle-orm';
 import {
   boolean,
   char,
@@ -18,11 +17,11 @@ export const kartRaces = mysqlTable(
     modo: varchar('modo', { length: 32 }).notNull(),
     vueltas: int('vueltas').notNull(),
     fecha: timestamp('fecha').notNull(),
-    createdAt: timestamp('created_at').default(sql`CURRENT_TIMESTAMP()`),
+    createdAt: timestamp('created_at').notNull().defaultNow(),
   },
   (table) => [
-    index('idx_kart_races_circuito').on(table.circuito),
-    index('idx_kart_races_modo').on(table.modo),
+    index('kr_circuit_idx').on(table.circuito),
+    index('kr_mode_idx').on(table.modo),
   ],
 );
 
@@ -55,8 +54,8 @@ export const kartRacePlayers = mysqlTable(
     dnf: boolean('dnf').notNull().default(false),
   },
   (table) => [
-    index('idx_kart_race_players_uuid').on(table.uuid),
-    index('idx_kart_race_players_race').on(table.raceId),
+    index('krp_uuid_idx').on(table.uuid),
+    index('krp_race_idx').on(table.raceId),
   ],
 );
 

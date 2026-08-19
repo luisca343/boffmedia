@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
 import axios, { AxiosResponse } from 'axios';
 import { TeleportRequestDto } from '../dto/teleport-request.dto';
 import { IWingullTransportRepository } from './interfaces/wingull-transport.repository.interface';
@@ -35,6 +35,9 @@ export class WingullTransportRepository implements IWingullTransportRepository {
       return response.data.data;
     } catch (error: any) {
       this.logger.error('Failed to get taxi stops:', error);
+      // A typed HTTP error (404/403/409…) has to reach the client as itself;
+      // wrapping it in a bare Error turned all of them into 500s.
+      if (error instanceof HttpException) throw error;
       throw new Error(`Taxi stops retrieval failed: ${error.message}`);
     }
   }

@@ -21,8 +21,6 @@ export const tcgSets = mysqlTable('tcg_sets', {
   nameEs: varchar('name_es', { length: 128 }).notNull(),
   logo: varchar('logo', { length: 255 }),
   symbol: varchar('symbol', { length: 255 }),
-  logoLocal: varchar('logo_local', { length: 255 }),
-  symbolLocal: varchar('symbol_local', { length: 255 }),
   cardCountOfficial: int('card_count_official'),
   cardCountTotal: int('card_count_total'),
 });
@@ -34,7 +32,6 @@ export const tcgSeries = mysqlTable('tcg_series', {
   nameEn: varchar('name_en', { length: 64 }).notNull(),
   nameEs: varchar('name_es', { length: 64 }).notNull(),
   logo: varchar('logo', { length: 255 }),
-  logoLocal: varchar('logo_local', { length: 255 }),
 });
 
 export type TcgSeries = typeof tcgSeries.$inferSelect;
@@ -88,8 +85,8 @@ export const tcgUserCards = mysqlTable(
       }),
     quantity: int('quantity').default(1).notNull(),
     acquiredDate: timestamp('acquired_date').notNull(),
-    createdAt: timestamp('created_at').notNull(),
-    updatedAt: timestamp('updated_at').notNull(),
+    createdAt: timestamp('created_at').notNull().defaultNow(),
+    updatedAt: timestamp('updated_at').notNull().defaultNow().onUpdateNow(),
   },
   // One row per (user, card). This was declared as a second primaryKey(), which
   // MySQL cannot have — the live table only ever got PRIMARY KEY(id), so the

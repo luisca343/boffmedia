@@ -33,7 +33,7 @@ export default function MensajesPage() {
   const { data: chats, isLoading } = useQuery({
     queryKey: ["rooker", "dms", uuid],
     queryFn: async () => {
-      const res = await ChatAppService.getChats(uuid!)
+      const res = await ChatAppService.getChats()
       if (!res.success || !res.data) throw new Error(res.userMessage ?? t("messages.loadError"))
       return res.data.filter((c) => c.type === DIRECT)
     },
