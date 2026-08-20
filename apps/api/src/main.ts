@@ -170,6 +170,19 @@ async function bootstrap() {
     );
   }
 
+  // Unset is a WORKING but degraded state, which is why it warns rather than
+  // throws: the download/update URLs fall back to `x-forwarded-proto`/`-host`,
+  // so an unexpected Host header mints a wrong absolute URL for the Tauri
+  // updater. The variable was `LAUNCHER_UPDATE_BASE_URL` before the desktop
+  // rename, so a deployed .env carrying the old name lands here silently.
+  if (!env.DESKTOP_UPDATE_BASE_URL) {
+    console.warn(
+      '[config] DESKTOP_UPDATE_BASE_URL is not set — desktop update and ' +
+        'download URLs will be derived from request headers. Set it in ' +
+        'production to pin the absolute URL.',
+    );
+  }
+
   await app.listen(port);
   console.log(`Server listening on port ${port}`);
 }

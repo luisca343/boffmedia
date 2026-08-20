@@ -72,7 +72,7 @@ export class MinecraftController {
   @ApiOperation({
     summary: 'Empezar a vincular una cuenta de Minecraft',
     description:
-      'Devuelve un código que el jugador introduce en microsoft.com/link. Se usa el flujo de código de dispositivo porque no necesita ni URI de redirección registrada ni secreto de cliente: web y launcher comparten el mismo registro público ya aprobado.',
+      'Devuelve un código que el jugador introduce en microsoft.com/link. Se usa el flujo de código de dispositivo porque no necesita ni URI de redirección registrada ni secreto de cliente: web y app comparten el mismo registro público ya aprobado.',
   })
   @ApiResponse({ status: HttpStatus.OK, type: McDeviceCodeEntity })
   async startLink(

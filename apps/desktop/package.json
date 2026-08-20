@@ -1,0 +1,42 @@
+{
+  "name": "desktop",
+  "version": "0.9.0",
+  "private": true,
+  "scripts": {
+    "dev": "node scripts/profile.mjs dev dev",
+    "dev:prod": "node scripts/profile.mjs prod dev",
+    "dev:renderer": "vite",
+    "build": "node scripts/profile.mjs dev build",
+    "build:prod": "node scripts/profile.mjs prod build",
+    "build:renderer": "vite build",
+    "build:portable": "node scripts/portable.mjs prod",
+    "gen:installer-art": "node scripts/gen-installer-art.mjs",
+    "preview": "vite preview",
+    "tauri": "tauri",
+    "type-check": "tsc --noEmit --skipLibCheck",
+    "lint": "eslint src --ext .ts,.tsx"
+  },
+  "dependencies": {
+    "@boffmedia/pack-schema": "workspace:*",
+    "@boffmedia/tailwind-config": "workspace:*",
+    "@boffmedia/tool-kit": "workspace:*",
+    "@boffmedia/tools-mhwilds": "workspace:*",
+    "@boffmedia/tools-minecraft": "workspace:*",
+    "@boffmedia/ui": "workspace:*",
+    "@tauri-apps/api": "^2.1.1",
+    "react": "19.2.3",
+    "react-dom": "19.2.3"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2.1.0",
+    "@types/react": "19.2.7",
+    "@types/react-dom": "19.2.3",
+    "@vitejs/plugin-react": "^4.3.4",
+    "autoprefixer": "^10.0.1",
+    "postcss": "^8",
+    "sharp": "^0.34.5",
+    "tailwindcss": "^3.3.0",
+    "typescript": "^5.9.2",
+    "vite": "^6.0.7"
+  }
+}

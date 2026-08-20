@@ -29,7 +29,9 @@ describe('ResponseInterceptor', () => {
       get: jest.fn().mockReturnValue(undefined),
     };
     interceptor = new ResponseInterceptor(reflector as unknown as Reflector);
-    jest.spyOn(interceptor['logger'], 'log').mockImplementation(() => undefined);
+    jest
+      .spyOn(interceptor['logger'], 'log')
+      .mockImplementation(() => undefined);
   });
 
   it('wraps an ordinary route in the success envelope', async () => {

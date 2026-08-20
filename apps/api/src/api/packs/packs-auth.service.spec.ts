@@ -92,7 +92,7 @@ describe('PacksAuthService', () => {
       expect(() => service.verifySession(other)).toThrow(UnauthorizedException);
     });
 
-    it('rejects an OLD MC-UUID-subject session with needs_newer_launcher', () => {
+    it('rejects an OLD MC-UUID-subject session with needs_newer_desktop', () => {
       const legacy = jwt.sign({
         sub: UUID,
         username: 'TrainerAsh',
@@ -104,7 +104,7 @@ describe('PacksAuthService', () => {
       } catch (err: any) {
         expect(err).toBeInstanceOf(UnauthorizedException);
         expect(err.getResponse()).toMatchObject({
-          error: 'needs_newer_launcher',
+          error: 'needs_newer_desktop',
         });
       }
     });
@@ -118,7 +118,7 @@ describe('PacksAuthService', () => {
           throw new Error('should have thrown');
         } catch (err: any) {
           expect(err.getResponse()).toMatchObject({
-            error: 'needs_newer_launcher',
+            error: 'needs_newer_desktop',
           });
         }
       },
@@ -159,8 +159,8 @@ describe('PacksAuthService', () => {
     });
   });
 
-  it('revokeAllLauncherSessions bumps the account counter', async () => {
-    await service.revokeAllLauncherSessions(7);
+  it('revokeAllDesktopSessions bumps the account counter', async () => {
+    await service.revokeAllDesktopSessions(7);
     expect(repo.incrementLauncherTokenVersion).toHaveBeenCalledWith(7);
   });
 });

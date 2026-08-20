@@ -1,0 +1,101 @@
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Post,
+  Query,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
+import { Throttle } from '@nestjs/throttler';
+import { JwtAuthGuard } from '@api/auth/jwt-auth.guard';
+import { FullSessionGuard } from '@api/_utils/guards/full-session.guard';
+import { UserThrottlerGuard } from '@api/_utils/guards/user-throttler.guard';
+import { DesktopDeviceService } from './desktop-device.service';
+import { PacksAuthService } from './packs-auth.service';
+import { DeviceRequestEntity } from './entities/packs.entity';
+import { DeviceDecisionDto, DeviceLookupDto } from './dto/packs.dto';
+
+/**
+ * The website half of the launcher's device-authorization flow. The player is
+ * already signed in here, which is the whole point: the launcher never sees a
+ * password and never needs a browser it controls.
+ *
+ * FullSessionGuard on the decision routes: an in-game MCEF session proves only
+ * a public Minecraft UUID, and must not be able to hand out a 30-day launcher
+ * session for the account.
+ */
+@ApiTags('Desktop | Authorization')
+@Controller('desktop/auth')
+@UseGuards(JwtAuthGuard)
+@ApiBearerAuth('JWT')
+export class DesktopAuthController {
+  constructor(
+    private readonly device: DesktopDeviceService,
+    private readonly auth: PacksAuthService,
+  ) {}
+
+  // Guarded and throttled like its siblings: describe is the DISCOVERY half of
+  // a device-code hijack — free enumeration of the user_code space is what
+  // makes searching for a pending code tractable at all.
+  @Get('device')
+  @UseGuards(FullSessionGuard, UserThrottlerGuard)
+  @Throttle({ default: { ttl: 60_000, limit: 20 } })
+  @ApiOperation({ summary: 'Qué instalación está pidiendo autorización' })
+  @ApiResponse({ status: HttpStatus.OK, type: DeviceRequestEntity })
+  async describe(@Query() query: DeviceLookupDto) {
+    return this.device.describe(query.userCode);
+  }
+
+  @Post('device/approve')
+  @UseGuards(FullSessionGuard, UserThrottlerGuard)
+  @Throttle({ default: { ttl: 60_000, limit: 10 } })
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Autorizar a esta app a usar tu cuenta',
+    description:
+      'Requiere el correo verificado: aprobar es lo que convierte una cuenta gratuita en una sesión de la app, y esa es la contrapartida de haber quitado el requisito de tener Minecraft comprado.',
+  })
+  async approve(
+    @Body() dto: DeviceDecisionDto,
+    @Req() req: { user: { userId: number } },
+  ): Promise<{ success: true }> {
+    await this.device.approve(dto.userCode, req.user.userId);
+    return { success: true };
+  }
+
+  @Post('device/deny')
+  @UseGuards(FullSessionGuard, UserThrottlerGuard)
+  @Throttle({ default: { ttl: 60_000, limit: 20 } })
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Rechazar la solicitud' })
+  async deny(
+    @Body() dto: DeviceDecisionDto,
+    @Req() req: { user: { userId: number } },
+  ): Promise<{ success: true }> {
+    await this.device.deny(dto.userCode, req.user.userId);
+    return { success: true };
+  }
+
+  // FullSessionGuard: revoking every launcher session is an account-sensitive
+  // action, so an in-game MCEF session (public UUID only) must not trigger it.
+  @Post('sessions/revoke-all')
+  @UseGuards(FullSessionGuard, UserThrottlerGuard)
+  @Throttle({ default: { ttl: 60_000, limit: 5 } })
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Cerrar todas las sesiones de la app' })
+  async revokeAll(
+    @Req() req: { user: { userId: number } },
+  ): Promise<{ success: true }> {
+    await this.auth.revokeAllDesktopSessions(req.user.userId);
+    return { success: true };
+  }
+}

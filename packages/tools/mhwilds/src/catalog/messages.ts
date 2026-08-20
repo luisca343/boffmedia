@@ -5,7 +5,7 @@
 // Namespace: `tools.mhwilds.*` (re-rooted from the old `mhwilds.*`, matching
 // the convention @boffmedia/tools-minecraft set with `tools.schematicCompat.*`).
 // Shape is nested, which is what both hosts want: next-intl in apps/web and
-// `useToolT("<namespace>")` in apps/launcher.
+// `useToolT("<namespace>")` in apps/desktop.
 //
 // The `manifest.*` block is new: the registry needs a title and tagline per
 // tool, and the old web catalog had none because the web hub named these tools

@@ -82,7 +82,10 @@ describe('starbank money auth — ENFORCE_MONEY_AUTH contract', () => {
     const moduleRef = await Test.createTestingModule({
       imports: [
         PassportModule,
-        JwtModule.register({ secret: JWT_SECRET, signOptions: { expiresIn: '1h' } }),
+        JwtModule.register({
+          secret: JWT_SECRET,
+          signOptions: { expiresIn: '1h' },
+        }),
       ],
       controllers: [StarbankController],
       providers: [
@@ -213,7 +216,10 @@ describe('starbank money auth — ENFORCE_MONEY_AUTH contract', () => {
     });
 
     it('is refused when the token is not signed by us', async () => {
-      const forged = jwt.sign({ sub: 1, mcUuid: SESSION_UUID }, { secret: 'wrong-secret-wrong-secret-wrong!' });
+      const forged = jwt.sign(
+        { sub: 1, mcUuid: SESSION_UUID },
+        { secret: 'wrong-secret-wrong-secret-wrong!' },
+      );
 
       await request(app.getHttpServer())
         .post(TRANSFER)
@@ -225,7 +231,11 @@ describe('starbank money auth — ENFORCE_MONEY_AUTH contract', () => {
     // A refresh token is signed by the same secret; only the `typ` claim keeps
     // it from being replayed as a session.
     it('is refused when the token is a refresh token', async () => {
-      const refresh = jwt.sign({ sub: 1, mcUuid: SESSION_UUID, typ: 'refresh' });
+      const refresh = jwt.sign({
+        sub: 1,
+        mcUuid: SESSION_UUID,
+        typ: 'refresh',
+      });
 
       await request(app.getHttpServer())
         .post(TRANSFER)
@@ -244,6 +254,9 @@ describe('starbank money auth — ENFORCE_MONEY_AUTH contract', () => {
   });
 
   it('refuses a request carrying no credential at all', async () => {
-    await request(app.getHttpServer()).post(TRANSFER).send(transferBody()).expect(401);
+    await request(app.getHttpServer())
+      .post(TRANSFER)
+      .send(transferBody())
+      .expect(401);
   });
 });

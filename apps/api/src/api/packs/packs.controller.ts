@@ -290,7 +290,7 @@ export class PacksController {
   @ApiOperation({
     summary: 'Crear una versión (borrador)',
     description:
-      'Valida el manifiesto completo con @boffmedia/pack-schema, el mismo esquema del que el launcher genera sus tipos de Rust.',
+      'Valida el manifiesto completo con @boffmedia/pack-schema, el mismo esquema del que la app genera sus tipos de Rust.',
   })
   @ApiResponse({ status: HttpStatus.CREATED, type: PackIdEntity })
   async createVersion(

@@ -129,7 +129,7 @@ export interface StoredBundledWorld {
  * pre-grants, server allowlisting) still has it, and is absent for an account
  * that has never linked Minecraft.
  */
-export interface LauncherPrincipal {
+export interface DesktopPrincipal {
   userId: number;
   username: string;
   mcUuid?: string | null;
@@ -152,8 +152,8 @@ export const AUDIT = {
   INVITE_CREATED: 'invite.created',
   INVITE_REDEEMED: 'invite.redeemed',
   INVITE_REVOKED: 'invite.revoked',
-  LAUNCHER_AUTH: 'launcher.auth',
-  LAUNCHER_DENIED: 'launcher.denied',
+  DESKTOP_AUTH: 'desktop.auth',
+  DESKTOP_DENIED: 'desktop.denied',
   MANIFEST_SERVED: 'manifest.served',
   FILE_SERVED: 'file.served',
 } as const;

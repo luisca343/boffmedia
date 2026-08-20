@@ -50,7 +50,7 @@ export const SCOPED_NAMESPACES: ReadonlyArray<{
   // Entirely off /smartrotom, so no other route can reach it.
   { prefix: "/wingull", namespaces: ["wingull.json"] },
   // Only the download page uses it, and nothing links its copy from elsewhere.
-  { prefix: "/launcher", namespaces: ["launcher.json"] },
+  { prefix: "/app", namespaces: ["app.json"] },
   // bidkea (0.9 KB), liga (0.2 KB) and guias (65 B) stay CORE on purpose: an entry
   // here is only worth its config cost when the file is big enough to matter.
   // mewgenics is used from shared components (components/boffmedia/ui/mewgenics/) so it must be CORE

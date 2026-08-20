@@ -195,10 +195,7 @@ export class SmogonService {
 
   // ─── Private ────────────────────────────────────────────────────────────────
 
-  private toDetail(
-    row: VgcSmogonPokemon,
-    dex: typeof Dex,
-  ): PokemonUsageDetail {
+  private toDetail(row: VgcSmogonPokemon, dex: typeof Dex): PokemonUsageDetail {
     const species = dex.species.get(row.speciesName);
     const baseStats = species.exists
       ? species.baseStats
@@ -226,10 +223,7 @@ export class SmogonService {
     };
   }
 
-  private toEntry(
-    row: VgcSmogonPokemon,
-    dex: typeof Dex,
-  ): PokemonUsageEntry {
+  private toEntry(row: VgcSmogonPokemon, dex: typeof Dex): PokemonUsageEntry {
     const species = dex.species.get(row.speciesName);
     return {
       speciesId: row.speciesId,

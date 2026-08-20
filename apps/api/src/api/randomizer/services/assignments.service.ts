@@ -11,7 +11,7 @@ import { Readable } from 'stream';
 import { Logger } from 'nestjs-pino';
 import { RandomizerRepository } from '../repositories/randomizer.repository';
 import { RANDOMIZER_REPOSITORY_TOKEN } from '@api/_utils/repositories/interfaces/repository.token';
-import type { LauncherPrincipal } from '@api/packs/types/packs.types';
+import type { DesktopPrincipal } from '@api/packs/types/packs.types';
 import {
   AssignmentClaimedDto,
   AssignmentAdminDto,
@@ -71,7 +71,7 @@ export class AssignmentsService {
    */
   async getMyAssignment(
     configId: number,
-    principal: LauncherPrincipal,
+    principal: DesktopPrincipal,
   ): Promise<AssignmentClaimedDto> {
     if (!configId || configId <= 0) {
       throw new BadRequestException('Valid configId is required');
@@ -102,7 +102,7 @@ export class AssignmentsService {
    */
   private async resolveOrMintAssignment(
     config: RandomizerConfig,
-    principal: LauncherPrincipal,
+    principal: DesktopPrincipal,
   ): Promise<RandomizerAssignment> {
     if (!principal?.userId) {
       throw new BadRequestException('Launcher principal required');
@@ -246,7 +246,7 @@ export class AssignmentsService {
    */
   async getOrGenerateRom(
     configId: number,
-    principal: LauncherPrincipal,
+    principal: DesktopPrincipal,
   ): Promise<{
     stream: Readable;
     outputSha512: string;
@@ -314,7 +314,7 @@ export class AssignmentsService {
   private async generateRom(
     config: RandomizerConfig,
     assignment: RandomizerAssignment,
-    principal: LauncherPrincipal,
+    principal: DesktopPrincipal,
   ): Promise<{ outputSha512: string }> {
     // The clean ROM must be on the server (uploaded to the library and pinned).
     // A missing blob is an admin-side error (config never got a base ROM), kept

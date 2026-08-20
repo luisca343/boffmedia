@@ -1,7 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class DeviceAuthorizationEntity {
-  @ApiProperty({ description: 'La mitad secreta: solo la guarda el launcher' })
+  @ApiProperty({ description: 'La mitad secreta: solo la guarda la app' })
   deviceCode!: string;
 
   @ApiProperty({
@@ -10,7 +10,7 @@ export class DeviceAuthorizationEntity {
   })
   userCode!: string;
 
-  @ApiProperty({ example: 'https://boffmedia.es/launcher/autorizar' })
+  @ApiProperty({ example: 'https://boffmedia.es/app/autorizar' })
   verificationUri!: string;
 
   @ApiProperty({ example: 600 })
@@ -20,7 +20,7 @@ export class DeviceAuthorizationEntity {
   intervalSeconds!: number;
 }
 
-export class LauncherSessionUserEntity {
+export class DesktopSessionUserEntity {
   @ApiProperty({ example: 42 })
   id!: number;
 
@@ -40,13 +40,12 @@ export class DevicePollEntity {
   status!: 'pending' | 'approved' | 'denied' | 'expired';
 
   @ApiPropertyOptional({
-    description:
-      'Bearer para el resto de rutas del launcher. Solo en approved.',
+    description: 'Bearer para el resto de rutas de la app. Solo en approved.',
   })
   token?: string;
 
-  @ApiPropertyOptional({ type: LauncherSessionUserEntity })
-  user?: LauncherSessionUserEntity;
+  @ApiPropertyOptional({ type: DesktopSessionUserEntity })
+  user?: DesktopSessionUserEntity;
 }
 
 /** The approval screen shows this before the player commits to anything. */
@@ -66,7 +65,7 @@ export class DeviceRequestEntity {
 
 const GAME_TYPES = ['minecraft', 'emulator', 'zomboid', 'stardew'] as const;
 
-export class LauncherVersionEntity {
+export class DesktopVersionEntity {
   @ApiProperty() id!: string;
   @ApiProperty() name!: string;
   @ApiPropertyOptional({ nullable: true }) minecraft!: string | null;
@@ -111,8 +110,8 @@ export class LauncherPackEntity {
   @ApiPropertyOptional({ type: PackServerEntity, nullable: true })
   server?: PackServerEntity | null;
 
-  @ApiPropertyOptional({ type: LauncherVersionEntity, nullable: true })
-  latestVersion!: LauncherVersionEntity | null;
+  @ApiPropertyOptional({ type: DesktopVersionEntity, nullable: true })
+  latestVersion!: DesktopVersionEntity | null;
 }
 
 export class AdminPackEntity {

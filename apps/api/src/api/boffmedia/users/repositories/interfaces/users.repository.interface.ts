@@ -8,7 +8,7 @@ import { CreateUserDto } from '../../dto/create-user.dto';
 // counter, which the user selects never fetch).
 export type BoffMediaUserSafe = Omit<
   BoffMediaUser,
-  'password' | 'deletedAt' | 'lastSeenAt' | 'launcherTokenVersion'
+  'password' | 'deletedAt' | 'lastSeenAt' | 'desktopTokenVersion'
 >;
 
 // Complex query result types. Keeps `password` (for credential checks) but not
@@ -17,7 +17,7 @@ export type BoffMediaUserSafe = Omit<
 export interface FullUserData {
   boffmedia_users: Omit<
     BoffMediaUser,
-    'deletedAt' | 'lastSeenAt' | 'launcherTokenVersion'
+    'deletedAt' | 'lastSeenAt' | 'desktopTokenVersion'
   >;
   rotom_users: RotomUser | null;
 }

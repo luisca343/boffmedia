@@ -52,7 +52,7 @@ for (const link of links) {
 // web app.
 const laboon = path.join(root, 'laboon');
 fs.mkdirSync(path.join(laboon, 'pack-blobs'), { recursive: true });
-fs.mkdirSync(path.join(laboon, 'launcher-releases'), { recursive: true });
+fs.mkdirSync(path.join(laboon, 'desktop-releases'), { recursive: true });
 
 const apiLaboon = path.join(root, 'apps', 'api', 'laboon');
 if (fs.existsSync(apiLaboon)) {

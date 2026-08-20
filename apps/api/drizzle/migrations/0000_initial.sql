@@ -27,7 +27,7 @@ CREATE TABLE `boffmedia_users` (
 	`steam_id` varchar(255),
 	`email_verified` boolean NOT NULL DEFAULT false,
 	`locale` varchar(8),
-	`launcher_token_version` int NOT NULL DEFAULT 0,
+	`desktop_token_version` int NOT NULL DEFAULT 0,
 	`created_at` timestamp NOT NULL DEFAULT (now()),
 	`updated_at` timestamp NOT NULL DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP,
 	`last_seen_at` timestamp,
@@ -427,6 +427,37 @@ CREATE TABLE `boffmedia_tournaments` (
 	CONSTRAINT `boffmedia_tournaments_slug_unique` UNIQUE(`slug`)
 );
 --> statement-breakpoint
+CREATE TABLE `desktop_device_codes` (
+	`device_code` char(64) NOT NULL,
+	`user_code` varchar(16) NOT NULL,
+	`user_id` int,
+	`status` enum('pending','approved','denied') NOT NULL DEFAULT 'pending',
+	`client_label` varchar(128),
+	`created_at` timestamp NOT NULL DEFAULT (now()),
+	`expires_at` timestamp NOT NULL,
+	`consumed_at` timestamp,
+	CONSTRAINT `desktop_device_codes_device_code` PRIMARY KEY(`device_code`),
+	CONSTRAINT `desktop_device_codes_user_code_unique` UNIQUE(`user_code`)
+);
+--> statement-breakpoint
+CREATE TABLE `desktop_releases` (
+	`id` int AUTO_INCREMENT NOT NULL,
+	`version` varchar(32) NOT NULL,
+	`target` varchar(32) NOT NULL,
+	`signature` text NOT NULL,
+	`notes` text,
+	`artifact_name` varchar(255) NOT NULL,
+	`artifact_sha512` char(128) NOT NULL,
+	`size_bytes` int unsigned NOT NULL,
+	`published` boolean NOT NULL DEFAULT false,
+	`published_at` timestamp,
+	`uploaded_by` int,
+	`created_at` timestamp NOT NULL DEFAULT (now()),
+	`updated_at` timestamp NOT NULL DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP,
+	CONSTRAINT `desktop_releases_id` PRIMARY KEY(`id`),
+	CONSTRAINT `desktop_releases_version_target_uq` UNIQUE(`version`,`target`)
+);
+--> statement-breakpoint
 CREATE TABLE `discord_quotes` (
 	`id` int AUTO_INCREMENT NOT NULL,
 	`discord_id` varchar(32) NOT NULL,
@@ -456,37 +487,6 @@ CREATE TABLE `rotom_ficusai_messages` (
 	`created_at` timestamp NOT NULL DEFAULT (now()),
 	`updated_at` timestamp NOT NULL DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP,
 	CONSTRAINT `rotom_ficusai_messages_id` PRIMARY KEY(`id`)
-);
---> statement-breakpoint
-CREATE TABLE `launcher_device_codes` (
-	`device_code` char(64) NOT NULL,
-	`user_code` varchar(16) NOT NULL,
-	`user_id` int,
-	`status` enum('pending','approved','denied') NOT NULL DEFAULT 'pending',
-	`client_label` varchar(128),
-	`created_at` timestamp NOT NULL DEFAULT (now()),
-	`expires_at` timestamp NOT NULL,
-	`consumed_at` timestamp,
-	CONSTRAINT `launcher_device_codes_device_code` PRIMARY KEY(`device_code`),
-	CONSTRAINT `launcher_device_codes_user_code_unique` UNIQUE(`user_code`)
-);
---> statement-breakpoint
-CREATE TABLE `launcher_releases` (
-	`id` int AUTO_INCREMENT NOT NULL,
-	`version` varchar(32) NOT NULL,
-	`target` varchar(32) NOT NULL,
-	`signature` text NOT NULL,
-	`notes` text,
-	`artifact_name` varchar(255) NOT NULL,
-	`artifact_sha512` char(128) NOT NULL,
-	`size_bytes` int unsigned NOT NULL,
-	`published` boolean NOT NULL DEFAULT false,
-	`published_at` timestamp,
-	`uploaded_by` int,
-	`created_at` timestamp NOT NULL DEFAULT (now()),
-	`updated_at` timestamp NOT NULL DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP,
-	CONSTRAINT `launcher_releases_id` PRIMARY KEY(`id`),
-	CONSTRAINT `launcher_releases_version_target_uq` UNIQUE(`version`,`target`)
 );
 --> statement-breakpoint
 CREATE TABLE `pack_acl` (
@@ -1953,9 +1953,9 @@ ALTER TABLE `boffmedia_tournament_roster` ADD CONSTRAINT `tr_p_fk` FOREIGN KEY (
 ALTER TABLE `boffmedia_tournament_roster` ADD CONSTRAINT `tr_user_fk` FOREIGN KEY (`user_id`) REFERENCES `boffmedia_users`(`id`) ON DELETE set null ON UPDATE cascade;--> statement-breakpoint
 ALTER TABLE `boffmedia_tournaments` ADD CONSTRAINT `t_game_fk` FOREIGN KEY (`game_id`) REFERENCES `boffmedia_games`(`id`) ON DELETE set null ON UPDATE cascade;--> statement-breakpoint
 ALTER TABLE `boffmedia_tournaments` ADD CONSTRAINT `t_event_fk` FOREIGN KEY (`event_id`) REFERENCES `boffmedia_events`(`id`) ON DELETE set null ON UPDATE cascade;--> statement-breakpoint
+ALTER TABLE `desktop_device_codes` ADD CONSTRAINT `ddc_user_fk` FOREIGN KEY (`user_id`) REFERENCES `boffmedia_users`(`id`) ON DELETE cascade ON UPDATE cascade;--> statement-breakpoint
 ALTER TABLE `discord_quotes` ADD CONSTRAINT `discord_quotes_discord_id_discord_users_user_id_fk` FOREIGN KEY (`discord_id`) REFERENCES `discord_users`(`user_id`) ON DELETE cascade ON UPDATE cascade;--> statement-breakpoint
 ALTER TABLE `rotom_ficusai_messages` ADD CONSTRAINT `rotom_ficusai_messages_uuid_rotom_users_uuid_fk` FOREIGN KEY (`uuid`) REFERENCES `rotom_users`(`uuid`) ON DELETE cascade ON UPDATE cascade;--> statement-breakpoint
-ALTER TABLE `launcher_device_codes` ADD CONSTRAINT `ldc_user_fk` FOREIGN KEY (`user_id`) REFERENCES `boffmedia_users`(`id`) ON DELETE cascade ON UPDATE cascade;--> statement-breakpoint
 ALTER TABLE `pack_acl` ADD CONSTRAINT `pack_acl_pack_fk` FOREIGN KEY (`pack_id`) REFERENCES `packs`(`id`) ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE `pack_grants` ADD CONSTRAINT `pack_grants_pack_fk` FOREIGN KEY (`pack_id`) REFERENCES `packs`(`id`) ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE `pack_grants` ADD CONSTRAINT `pack_grants_user_fk` FOREIGN KEY (`user_id`) REFERENCES `boffmedia_users`(`id`) ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
@@ -2104,11 +2104,11 @@ CREATE INDEX `t_game_idx` ON `boffmedia_tournaments` (`game_id`);--> statement-b
 CREATE INDEX `t_event_idx` ON `boffmedia_tournaments` (`event_id`);--> statement-breakpoint
 CREATE INDEX `t_status_idx` ON `boffmedia_tournaments` (`status`);--> statement-breakpoint
 CREATE INDEX `t_format_idx` ON `boffmedia_tournaments` (`format`);--> statement-breakpoint
+CREATE INDEX `ddc_user_idx` ON `desktop_device_codes` (`user_id`);--> statement-breakpoint
+CREATE INDEX `ddc_expires_idx` ON `desktop_device_codes` (`expires_at`);--> statement-breakpoint
+CREATE INDEX `desktop_releases_target_published_idx` ON `desktop_releases` (`target`,`published`);--> statement-breakpoint
 CREATE INDEX `discord_quotes_server_idx` ON `discord_quotes` (`server_id`,`created_at`);--> statement-breakpoint
 CREATE INDEX `rotom_ficusai_messages_owner_recent_idx` ON `rotom_ficusai_messages` (`uuid`,`id`);--> statement-breakpoint
-CREATE INDEX `ldc_user_idx` ON `launcher_device_codes` (`user_id`);--> statement-breakpoint
-CREATE INDEX `ldc_expires_idx` ON `launcher_device_codes` (`expires_at`);--> statement-breakpoint
-CREATE INDEX `launcher_releases_target_published_idx` ON `launcher_releases` (`target`,`published`);--> statement-breakpoint
 CREATE INDEX `pack_acl_uuid_idx` ON `pack_acl` (`uuid`);--> statement-breakpoint
 CREATE INDEX `pack_audit_pack_idx` ON `pack_audit` (`pack_id`);--> statement-breakpoint
 CREATE INDEX `pack_audit_user_idx` ON `pack_audit` (`user_id`);--> statement-breakpoint

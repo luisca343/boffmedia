@@ -11,7 +11,7 @@ import {
 } from '../../dto/items-take-request.dto';
 import { UpdateBattleTeamDto } from '../../dto/battle-team.dto';
 import { PlayerStats } from '../../entities/player-stats.entity';
-import { PokemonW } from '../../entities/pokemon-w-.entity';
+import { PokemonW } from '../../entities/pokemon-w.entity';
 
 export interface IWingullPlayerRepository {
   getStatsFromAPI(uuid: string): Promise<PlayerStats>;

@@ -14,9 +14,7 @@ export class VgcPastesRepository {
     @Inject(DRIZZLE) private db: MySql2Database<Record<string, never>>,
   ) {}
 
-  async findByRegulation(
-    regulationId: string,
-  ): Promise<VgcRepositoryPaste[]> {
+  async findByRegulation(regulationId: string): Promise<VgcRepositoryPaste[]> {
     return this.db
       .select()
       .from(vgcPastesRepository)

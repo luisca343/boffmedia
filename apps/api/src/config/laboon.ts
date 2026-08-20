@@ -7,7 +7,7 @@ import { join } from 'path';
  * ephemeral writable layer.
  *
  * TEMP: the pack-blob and launcher-release stores call this directly instead of
- * reading PACK_BLOB_DIR / LAUNCHER_RELEASE_DIR, so uploads work with zero env
+ * reading PACK_BLOB_DIR / DESKTOP_RELEASE_DIR, so uploads work with zero env
  * setup. Restore an `env.X ?? laboonPath(...)` override once the deploy env is
  * wired.
  *

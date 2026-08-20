@@ -17,7 +17,7 @@
 // permissive CORS, immutable + CDN-cached. Plain <img> loads (no pixel reads),
 // so this is an external media asset, not a backend API call.
 //
-// HOST-COUPLED: `apps/launcher` renders these tools inside a webview whose CSP
+// HOST-COUPLED: `apps/desktop` renders these tools inside a webview whose CSP
 // (`app.security.csp` in src-tauri/tauri.conf.json) is `default-src 'self'`, so
 // this exact origin is named there on BOTH `img-src` (the <img> and
 // THREE.TextureLoader paths) and `connect-src` (the blockstate/model JSON fetch

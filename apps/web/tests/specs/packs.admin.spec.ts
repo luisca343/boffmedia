@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test"
 
-// The launcher pack registry admin section (HANDOFF §7). Runs under the
+// The desktop-app pack registry admin section (HANDOFF §7). Runs under the
 // chromium:admin project, which mints a REAL credentials session — see
 // tests/admin.setup.ts on why a forged cookie is not acceptable here.
 //
@@ -9,12 +9,12 @@ import { expect, test } from "@playwright/test"
 // deliberate: it is the only teardown the API offers, because pack_audit has to
 // outlive the pack.
 
-test.describe("admin · launcher packs", () => {
+test.describe("admin · app packs", () => {
   test("renders the section with its KPIs and empty detail state", async ({ page }) => {
     await page.goto("/admin?section=packs")
 
     await expect(
-      page.getByRole("heading", { name: /packs del launcher|launcher packs/i }),
+      page.getByRole("heading", { name: /packs de la app|app packs/i }),
     ).toBeVisible()
 
     // The KPI tiles are computed from the list response, so they cannot render

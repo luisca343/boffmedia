@@ -29,7 +29,10 @@ export const ficusAiMessages = mysqlTable(
   },
   // Every read is "the last N messages for this player", newest first.
   (t) => ({
-    ownerRecentIdx: index('rotom_ficusai_messages_owner_recent_idx').on(t.uuid, t.id),
+    ownerRecentIdx: index('rotom_ficusai_messages_owner_recent_idx').on(
+      t.uuid,
+      t.id,
+    ),
   }),
 );
 

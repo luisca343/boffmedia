@@ -2,7 +2,7 @@
  * The host contract every Boffmedia tool talks to, mirroring `configureUi()` in
  * `@boffmedia/ui`. A tool NEVER reaches for `next/*`, `@tauri-apps/*` or `fetch`
  * on its own — everything host-shaped goes through the capabilities configured
- * here, so the same tool code runs inside `apps/web` and `apps/launcher`.
+ * here, so the same tool code runs inside `apps/web` and `apps/desktop`.
  *
  * i18n is deliberately NOT part of this contract: tools keep riding on
  * `@boffmedia/ui`'s `configureUi()` (`useTranslate`/`useLocale`), which both

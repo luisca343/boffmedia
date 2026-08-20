@@ -2,7 +2,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { LauncherVersionEntity } from './LauncherVersionEntity';
+import type { DesktopVersionEntity } from './DesktopVersionEntity';
 import type { PackServerEntity } from './PackServerEntity';
 export type LauncherPackEntity = {
     id: string;
@@ -18,7 +18,7 @@ export type LauncherPackEntity = {
     gallery?: Array<Record<string, any>> | null;
     accessKind: LauncherPackEntity.accessKind;
     server?: PackServerEntity | null;
-    latestVersion?: LauncherVersionEntity | null;
+    latestVersion?: DesktopVersionEntity | null;
 };
 export namespace LauncherPackEntity {
     /**

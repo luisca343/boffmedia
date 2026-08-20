@@ -1,0 +1,155 @@
+name: Desktop App Release
+
+# Builds the Boffmedia App on Windows, signs the updater artifact, and uploads it
+# to the API as a DRAFT release. Publishing to the feed stays a deliberate act:
+# by default this leaves the release unpublished so a human reviews it in the
+# admin portal; set `publish: true` to publish in the same run.
+#
+# Windows is mandatory (RELEASING §3.4): WebView2 is what users run, and the
+# updater's `ring`/`zstd-sys` need MSVC's lib.exe — cross-compiling is not an
+# option. There is NO service API key (RELEASING §3.3): the run logs in as a
+# dedicated BOFF_ADMIN user to mint a 1h JWT, so store the username/password as
+# secrets, never a pre-issued token.
+#
+# Code signing is intentionally NOT done here (1.0 ships unsigned): the artifact
+# is minisign-signed for the updater only. The published SHA-512 on /app is
+# what lets anyone verify the download until an Authenticode cert is added.
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Semver to release (must match src-tauri/tauri.conf.json)"
+        required: true
+        type: string
+      environment:
+        description: "Which API/profile to build against"
+        required: true
+        default: dev
+        type: choice
+        options:
+          - dev
+          - prod
+      notes:
+        description: "Release notes shown in the update banner"
+        required: false
+        default: ""
+        type: string
+      publish:
+        description: "Publish to the feed immediately (otherwise leave as draft)"
+        required: false
+        default: false
+        type: boolean
+
+concurrency:
+  group: desktop-release
+  cancel-in-progress: false
+
+jobs:
+  build-and-upload:
+    runs-on: windows-latest
+    env:
+      # The target key the feed indexes by ({os}-{arch}); the only platform 1.0 ships.
+      TARGET: windows-x86_64
+      # Runtime + compiled host must agree (RELEASING §3.1): prod → api.boffmedia.es,
+      # anything else → the dev API. The build command below picks the matching profile.
+      BOFF_API_URL: ${{ github.event.inputs.environment == 'prod' && 'https://api.boffmedia.es' || 'https://api.ficuslab.es' }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.24.0
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache cargo
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: apps/desktop/src-tauri
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Verify the tag matches tauri.conf.json
+        shell: bash
+        run: |
+          conf_version=$(node -p "require('./apps/desktop/src-tauri/tauri.conf.json').version")
+          if [ "$conf_version" != "${{ github.event.inputs.version }}" ]; then
+            echo "::error::tauri.conf.json version ($conf_version) != requested (${{ github.event.inputs.version }}). Bump it first (RELEASING §4.1)."
+            exit 1
+          fi
+
+      - name: Build + sign (Tauri)
+        env:
+          # createUpdaterArtifacts is already true, so this emits the .exe and its .sig.
+          # Without the key there is no .sig and nothing to upload (RELEASING §3).
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+        run: >
+          pnpm --filter desktop
+          ${{ github.event.inputs.environment == 'prod' && 'build:prod' || 'build' }}
+
+      - name: Upload draft (and optionally publish)
+        shell: bash
+        env:
+          BOFF_ADMIN_USERNAME: ${{ secrets.BOFF_ADMIN_USERNAME }}
+          BOFF_ADMIN_PASSWORD: ${{ secrets.BOFF_ADMIN_PASSWORD }}
+          VERSION: ${{ github.event.inputs.version }}
+          NOTES: ${{ github.event.inputs.notes }}
+          PUBLISH: ${{ github.event.inputs.publish }}
+        run: |
+          set -euo pipefail
+          bundle="apps/desktop/src-tauri/target/release/bundle/nsis"
+          # productName is "Boffmedia App", so NSIS emits "Boffmedia App_<ver>_x64-setup.exe"
+          # (with a space). Glob on the stable suffix instead of the product name, so a
+          # future rename cannot silently break the release job again.
+          exe=$(ls "$bundle"/*_x64-setup.exe)
+          sig="$exe.sig"
+          [ -f "$exe" ] && [ -f "$sig" ] || { echo "::error::missing artifact or .sig in $bundle"; exit 1; }
+          echo "Artifact: $exe"
+
+          # Log in for a fresh 1h admin JWT (RELEASING §3.3). Response is enveloped:
+          # the token lives at .data.access_token, and a POST returns 201, so check
+          # `success`, not the status code.
+          login=$(curl -sS -X POST "$BOFF_API_URL/auth/login" \
+            -H 'Content-Type: application/json' \
+            -d "{\"username\":\"$BOFF_ADMIN_USERNAME\",\"password\":\"$BOFF_ADMIN_PASSWORD\"}")
+          if [ "$(echo "$login" | jq -r '.success')" != "true" ]; then
+            echo "::error::login failed"; exit 1
+          fi
+          token=$(echo "$login" | jq -r '.data.access_token')
+
+          # Raw octet-stream body, sha512 computed server-side (RELEASING §4.3).
+          upload=$(curl -sS -X POST \
+            "$BOFF_API_URL/desktop/admin/releases?version=$VERSION&target=$TARGET&notes=$(jq -rn --arg n "$NOTES" '$n|@uri')" \
+            -H "Authorization: Bearer $token" \
+            -H "Content-Type: application/octet-stream" \
+            -H "X-Updater-Signature: $(cat "$sig")" \
+            -H "X-Artifact-Filename: $(basename "$exe")" \
+            --data-binary "@$exe")
+          if [ "$(echo "$upload" | jq -r '.success')" != "true" ]; then
+            echo "::error::upload failed: $upload"; exit 1
+          fi
+          id=$(echo "$upload" | jq -r '.data.id')
+          echo "Uploaded draft release $id"
+
+          if [ "$PUBLISH" = "true" ]; then
+            pub=$(curl -sS -X POST "$BOFF_API_URL/desktop/admin/releases/$id/publish" \
+              -H "Authorization: Bearer $token")
+            if [ "$(echo "$pub" | jq -r '.success')" != "true" ]; then
+              echo "::error::publish failed: $pub"; exit 1
+            fi
+            echo "Published $VERSION to the $TARGET feed."
+          else
+            echo "Left as draft. Review and publish it from the admin portal."
+          fi

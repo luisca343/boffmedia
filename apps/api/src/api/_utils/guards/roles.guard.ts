@@ -9,7 +9,7 @@ export class RolesGuard implements CanActivate {
 
   canActivate(context: ExecutionContext): boolean {
     // Both levels, handler first: controllers such as `packs/admin`,
-    // `randomizer/admin` and `launcher/admin/releases` declare @Roles once on
+    // `randomizer/admin` and `desktop/admin/releases` declare @Roles once on
     // the class and never per method. Reading only the handler made every one
     // of those routes reachable by any logged-in user.
     const required = this.reflector.getAllAndOverride<UserRole[]>(

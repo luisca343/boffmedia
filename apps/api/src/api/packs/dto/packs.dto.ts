@@ -234,7 +234,7 @@ export class CreatePackVersionDto {
 
   @ApiProperty({
     description:
-      'PackFile[] — validado con @boffmedia/pack-schema, el mismo esquema del que el launcher genera sus tipos de Rust',
+      'PackFile[] — validado con @boffmedia/pack-schema, el mismo esquema del que la app genera sus tipos de Rust',
     type: 'array',
     items: { type: 'object' },
   })
@@ -529,7 +529,7 @@ export class ResolveFileDto {
 export class StartDeviceAuthDto {
   @ApiPropertyOptional({
     description:
-      'Cómo se presenta este launcher en la pantalla de aprobación (SO, versión). Solo informativo.',
+      'Cómo se presenta esta instalación en la pantalla de aprobación (SO, versión). Solo informativo.',
   })
   @IsOptional()
   @IsString()

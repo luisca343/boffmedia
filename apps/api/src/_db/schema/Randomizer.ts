@@ -174,7 +174,7 @@ export const randomizerAudit = mysqlTable(
     configId: int('config_id'),
     assignmentId: int('assignment_id'),
     action: varchar('action', { length: 32 }).notNull(), // ROM_RECEIVED, PATCHED, LOG_SEALED, VERIFY_PASSED, etc.
-    actor: varchar('actor', { length: 64 }), // admin id / launcher:{mc_uuid} / 'system'
+    actor: varchar('actor', { length: 64 }), // user id (as a string) or 'system'
     meta: json('meta').$type<Record<string, unknown>>(), // additional context
     createdAt: timestamp('created_at').notNull().defaultNow(),
   },

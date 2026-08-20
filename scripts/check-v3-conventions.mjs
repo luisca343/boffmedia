@@ -45,21 +45,12 @@ const SR_ROOTS = [
 // count may only go DOWN. Adding an import to a listed file fails the build, and so does
 // the first one in any file not listed. When a file is cleaned, drop its entry.
 //
-// Everything left here is legacy (camara/liga/mina/bidkea). The chrome (RotomNav, layout,
+// 2026-08-20: the last 12 entries (camara/liga/mina/bidkea) all reached 0 and were dropped,
+// so the ratchet now sits at zero for the whole tree. The chrome (RotomNav, layout,
 // providers) was rebuilt on sr-* primitives in components/smartrotom/chrome/ and is clean.
 const CROSS_DS_BASELINE = {
-  "apps/web/src/components/smartrotom/apps/App.tsx": 1,
-  "apps/web/src/app/smartrotom/bidkea/page.tsx": 2,
-  "apps/web/src/app/smartrotom/camara/_components/CameraBottomControls.tsx": 1,
-  "apps/web/src/app/smartrotom/camara/_components/CameraControls.tsx": 1,
-  "apps/web/src/app/smartrotom/camara/_components/CameraZoomSlider.tsx": 1,
-  "apps/web/src/app/smartrotom/camara/_components/GalleryView.tsx": 1,
-  "apps/web/src/app/smartrotom/camara/_components/ScreenshotPreviewDialog.tsx": 2,
-  "apps/web/src/app/smartrotom/liga/page.tsx": 1,
-  "apps/web/src/app/smartrotom/liga/camaralucha/page.tsx": 1,
-  "apps/web/src/app/smartrotom/mina/_components/LinkMina.tsx": 1,
-  "apps/web/src/app/smartrotom/mina/drops/page.tsx": 1,
-  "apps/web/src/app/smartrotom/mina/jugar/page.tsx": 2,
+  // Empty: every listed file reached 0. Adding a cross-DS import
+  // anywhere under SR_ROOTS now fails the build outright.
 };
 
 // The wingull / auth / battlesim zones belong to no design system and used to be watched
@@ -76,15 +67,8 @@ const ORPHAN_ROOTS = [
 const LEGACY_UI = ["apps/web/src/components/ui/"];
 
 const ORPHAN_LEGACY_BASELINE = {
-  "apps/web/src/app/wingull/page.tsx": 2,
-  "apps/web/src/app/wingull/_components/MovingSection.tsx": 1,
-  "apps/web/src/app/wingull/pueblos/page.tsx": 1,
-  "apps/web/src/app/wingull/invitacion/[id]/_components/InvitacionUsada.tsx": 2,
-  "apps/web/src/app/wingull/invitacion/[id]/_components/InvitacionNoEncontrada.tsx": 2,
-  "apps/web/src/app/wingull/invitacion/[id]/_components/InvitacionForm.tsx": 5,
-  "apps/web/src/app/auth/AuthForm.tsx": 3,
-  "apps/web/src/app/battlesim/_components/PokemonElement.tsx": 1,
-  "apps/web/src/app/battlesim/_components/PokemonDetail.tsx": 3,
+  // Empty: every listed file reached 0. A new legacy-shadcn import
+  // anywhere under ORPHAN_ROOTS now fails the build outright.
 };
 
 function listFiles(roots) {

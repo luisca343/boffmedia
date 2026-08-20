@@ -1,0 +1,71 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "Boffmedia App",
+  "version": "0.9.0",
+  "identifier": "es.boffmedia.app",
+  "build": {
+    "beforeDevCommand": "pnpm dev:renderer",
+    "devUrl": "http://localhost:5273",
+    "beforeBuildCommand": "pnpm build:renderer",
+    "frontendDist": "../dist"
+  },
+  "app": {
+    "windows": [
+      {
+        "title": "Boffmedia App",
+        "width": 1180,
+        "height": 760,
+        "minWidth": 940,
+        "minHeight": 620,
+        "resizable": true,
+        "center": true,
+        "visible": false,
+        "backgroundColor": "#000000",
+        "decorations": false,
+        "label": "main"
+      }
+    ],
+    "security": {
+      "csp": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://cdn.jsdelivr.net https://cdn.modrinth.com https://cdn-raw.modrinth.com; font-src 'self' data:; connect-src 'self' ipc: http://ipc.localhost https://cdn.jsdelivr.net"
+    }
+  },
+  "plugins": {
+    "updater": {
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDM2MDlBNjU2QTdDNzFEQwpSV1RjY1h4cVpacGdBOFdJWE54ZTJ6TU1CUXAyNkFqb3phSWEwNG1vek02QXJoVkpSczZhOVdhSwo=",
+      "endpoints": [
+        "https://api.boffmedia.es/desktop/updates/{{target}}-{{arch}}/{{current_version}}"
+      ]
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": ["nsis", "app", "dmg", "deb", "appimage"],
+    "createUpdaterArtifacts": true,
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
+    "windows": {
+      "nsis": {
+        "installerIcon": "icons/icon.ico",
+        "uninstallerIcon": "icons/icon.ico",
+        "headerImage": "installer/nsis-header.bmp",
+        "uninstallerHeaderImage": "installer/nsis-header.bmp",
+        "sidebarImage": "installer/nsis-sidebar.bmp",
+        "installerHooks": "installer/hooks.nsh",
+        "languages": ["Spanish", "English"],
+        "customLanguageFiles": {
+          "Spanish": "installer/lang/Spanish.nsh",
+          "English": "installer/lang/English.nsh"
+        },
+        "displayLanguageSelector": false,
+        "startMenuFolder": "Boffmedia",
+        "compression": "lzma",
+        "installMode": "currentUser"
+      }
+    }
+  }
+}

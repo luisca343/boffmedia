@@ -1,0 +1,86 @@
+{
+  "app": {
+    "kicker": "Boffmedia App",
+    "title": "Download the app",
+    "lead": "One app for every Boffmedia pack: install, update and launch Minecraft with the mods already set up, plus the Boffmedia tools built in. No copying folders by hand.",
+    "download": "Download",
+    "primaryTitle": "Boffmedia App for {platform}",
+    "meta": "Version {version} · {size} · published {date}",
+    "loadFailedTitle": "Couldn't load the downloads",
+    "loadFailedLead": "Try again in a few minutes. If it keeps failing, let us know on Discord.",
+    "emptyTitle": "No downloads published yet",
+    "emptyLead": "We're preparing the first public release. Check back soon.",
+    "smartscreenTitle": "Windows will warn you about an «unknown publisher»",
+    "smartscreenLead": "Boffmedia App isn't code-signed yet, so SmartScreen shows a warning the first time you install it: click «More info», then «Run anyway». You can confirm the file is ours with the hash below.",
+    "verifyTitle": "Verify what you downloaded",
+    "verifyLead": "Our server computes these hashes from the exact bytes we publish. If your file's hash matches, it is the same file.",
+    "verifyHow": "To hash your download:",
+    "otherTitle": "Other platforms",
+    "requirementsTitle": "Requirements",
+    "requirements": {
+      "os": "Windows 10 (1803 or later) or Windows 11, 64-bit.",
+      "webview": "WebView2, already included in Windows 10 1803+ and Windows 11.",
+      "ram": "8 GB RAM for small packs; 16 GB recommended for large ones.",
+      "account": "A Minecraft: Java Edition account (you sign in with Microsoft)."
+    },
+    "notesTitle": "What's new in {version}",
+    "featuresTitle": "What it does for you",
+    "features": {
+      "delta": {
+        "title": "Incremental updates",
+        "lead": "When three mods change you download three mods, not the whole pack."
+      },
+      "mods": {
+        "title": "Your mods survive",
+        "lead": "A separate folder for your own additions: the minimap you add isn't wiped by the next update."
+      },
+      "versions": {
+        "title": "History and rollback",
+        "lead": "If an update breaks the pack, one click puts you back on the previous version."
+      },
+      "auth": {
+        "title": "Signed in as you",
+        "lead": "Microsoft sign-in, and private packs only visible to the people with access."
+      },
+      "java": {
+        "title": "Java and memory handled",
+        "lead": "Installs the Java each pack needs and tunes memory per instance."
+      },
+      "crash": {
+        "title": "Crashes in plain language",
+        "lead": "Reads the crash report and tells you what happened: a missing dependency, out of memory…"
+      }
+    },
+    "platforms": {
+      "windows": "Windows",
+      "linux": "Linux",
+      "macIntel": "macOS (Intel)",
+      "macApple": "macOS (Apple Silicon)"
+    }
+  },
+  "appAuth": {
+    "title": "Authorize the app",
+    "lead": "Enter the code Boffmedia App is showing you.",
+    "loginLead": "Sign in to authorize an app on this account.",
+    "login": "Sign in",
+    "codeLabel": "Code",
+    "codeHint": "Case and the dash are ignored.",
+    "continue": "Continue",
+    "notFound": "That code is not valid or has expired.",
+    "failed": "Could not complete the request.",
+    "confirmLead": "This app will be able to see and install the packs your account is entitled to. It will not be able to change your account.",
+    "client": "App",
+    "unknownClient": "Unidentified app",
+    "approve": "Authorize",
+    "deny": "Reject",
+    "approvedToast": "App authorized.",
+    "approvedTitle": "Authorized",
+    "approvedLead": "You can go back to the app — it will sign in on its own within a few seconds.",
+    "deniedTitle": "Rejected",
+    "deniedLead": "That app was not authorized. Nothing was shared with it.",
+    "alreadyApprovedTitle": "Already authorized",
+    "alreadyApprovedLead": "This code was already approved. The app has signed in — nothing more to do here.",
+    "alreadyDeniedTitle": "Already rejected",
+    "alreadyDeniedLead": "This code was already rejected. Start again from the app if you meant to authorize it."
+  }
+}

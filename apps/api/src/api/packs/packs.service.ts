@@ -15,7 +15,7 @@ import type { GameType, PackAccessKind, PackLoader } from '@/_db/schema/Packs';
 import {
   AUDIT,
   AdminPackView,
-  LauncherPrincipal,
+  DesktopPrincipal,
   LauncherPackView,
   PackVersionView,
   StoredPackFile,
@@ -178,7 +178,7 @@ export class PacksService {
     const gameType = this.resolveGameType(pack.gameType);
     if (!capabilities.includes(gameType)) {
       throw new ConflictException({
-        error: 'needs_newer_launcher',
+        error: 'needs_newer_desktop',
         gameType,
         message: 'Este pack necesita una versión más reciente del launcher',
       });
@@ -394,7 +394,7 @@ export class PacksService {
   }
 
   async redeemInvite(
-    principal: LauncherPrincipal,
+    principal: DesktopPrincipal,
     code: string,
   ): Promise<{ packId: string }> {
     const invite = await this.repo.findInvite(code);

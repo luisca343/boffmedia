@@ -175,11 +175,10 @@ describe('WigglypopController — auth integration (real guard, real JWT, real o
   // ─── The legacy tripwire is dead ─────────────────────────────────────────────
 
   it('401s an anonymous request carrying only the legacy body.server tripwire', async () => {
-    const res = await send(
-      'post',
-      LISTINGS_URL,
-      { ...validListing(OWN_UUID), server: mockEnv.MC_WORLD },
-    );
+    const res = await send('post', LISTINGS_URL, {
+      ...validListing(OWN_UUID),
+      server: mockEnv.MC_WORLD,
+    });
 
     expect(res.status).toBe(401);
     expect(listings.create).not.toHaveBeenCalled();
@@ -198,11 +197,10 @@ describe('WigglypopController — auth integration (real guard, real JWT, real o
   it('ENFORCE_MONEY_AUTH=false still admits that same tripwire request — the flag is what closed it', async () => {
     mockEnv.ENFORCE_MONEY_AUTH = false;
 
-    const res = await send(
-      'post',
-      LISTINGS_URL,
-      { ...validListing(OWN_UUID), server: mockEnv.MC_WORLD },
-    );
+    const res = await send('post', LISTINGS_URL, {
+      ...validListing(OWN_UUID),
+      server: mockEnv.MC_WORLD,
+    });
 
     expect(res.status).toBe(201);
     expect(listings.create).toHaveBeenCalledTimes(1);

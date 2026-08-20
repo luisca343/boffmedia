@@ -4,6 +4,7 @@
 /** Every namespace file under locales/<locale>/, relative to that directory. */
 export const ALL_NAMESPACES = [
   "admin.json",
+  "app.json",
   "auth.json",
   "battlesim.json",
   "boffmedia.json",
@@ -12,7 +13,6 @@ export const ALL_NAMESPACES = [
   "events.json",
   "foro.json",
   "items.json",
-  "launcher.json",
   "leaderboard.json",
   "metadata.json",
   "nav.json",
@@ -62,6 +62,7 @@ export type Namespace = (typeof ALL_NAMESPACES)[number];
 /** Top-level message keys each file contributes — used by check:i18n to verify scoping. */
 export const NAMESPACE_ROOTS: Record<Namespace, readonly string[]> = {
   "admin.json": ["admin","tournaments","data","randomizer","validation"],
+  "app.json": ["app","appAuth"],
   "auth.json": ["auth"],
   "battlesim.json": ["battlesim"],
   "boffmedia.json": ["boffmedia"],
@@ -70,7 +71,6 @@ export const NAMESPACE_ROOTS: Record<Namespace, readonly string[]> = {
   "events.json": ["events","logros","juegos","community","calendario","sugerir"],
   "foro.json": ["foro"],
   "items.json": ["items"],
-  "launcher.json": ["launcher","launcherAuth"],
   "leaderboard.json": ["leaderboard"],
   "metadata.json": ["pageMeta"],
   "nav.json": ["nav"],

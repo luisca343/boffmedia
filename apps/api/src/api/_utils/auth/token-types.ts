@@ -11,8 +11,8 @@ export const TOKEN_TYPE = {
   ACCESS: 'access',
   /** Website refresh token. Only `/auth/refresh` accepts it. */
   REFRESH: 'refresh',
-  /** Launcher session (30 d). Only LauncherAuthGuard accepts it. */
-  LAUNCHER: 'launcher',
+  /** Desktop app session (30 d). Only DesktopAuthGuard accepts it. */
+  DESKTOP: 'desktop',
   /**
    * In-game MCEF session, minted only by `/auth/minecraft/session` once Mojang
    * has confirmed the join via hasJoined. The identity behind it is therefore

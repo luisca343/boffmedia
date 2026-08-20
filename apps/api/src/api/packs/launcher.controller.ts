@@ -23,11 +23,8 @@ import {
 } from '@nestjs/swagger';
 import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
 import { Public } from '@api/_utils/decorators/public.decorator';
-import { LauncherThrottlerGuard } from '@api/_utils/guards/launcher-throttler.guard';
-import {
-  LauncherAuthGuard,
-  LauncherRequest,
-} from './guards/launcher-auth.guard';
+import { DesktopThrottlerGuard } from '@api/_utils/guards/desktop-throttler.guard';
+import { DesktopAuthGuard, DesktopRequest } from './guards/desktop-auth.guard';
 import { PacksService } from './packs.service';
 import type { PackPrincipal } from './packs.repository';
 import {
@@ -45,9 +42,9 @@ import {
   DeviceAuthorizationEntity,
   DevicePollEntity,
   LauncherPackEntity,
-  LauncherSessionUserEntity,
+  DesktopSessionUserEntity,
 } from './entities/packs.entity';
-import { LauncherDeviceService } from './launcher-device.service';
+import { DesktopDeviceService } from './desktop-device.service';
 import { env } from '@/config/env';
 
 // The launcher's entire surface. Identity is a BOFFMEDIA account, established
@@ -57,12 +54,12 @@ import { env } from '@/config/env';
 //
 // `@Public()` is applied PER ROUTE, never on the class: it exempts these from
 // the global JwtAuthGuard (a launcher token is not a website session), and the
-// LauncherAuthGuard below does the real authentication itself.
+// DesktopAuthGuard below does the real authentication itself.
 @ApiTags('Packs | Launcher')
 @Controller('packs/launcher')
 export class LauncherController {
   constructor(
-    private readonly device: LauncherDeviceService,
+    private readonly device: DesktopDeviceService,
     private readonly packs: PacksService,
     private readonly downloads: PacksDownloadsService,
   ) {}
@@ -84,7 +81,7 @@ export class LauncherController {
   ): Promise<DeviceAuthorizationEntity> {
     return this.device.start(
       dto.clientLabel ?? null,
-      `${env.WEB_URL}/launcher/autorizar`,
+      `${env.WEB_URL}/app/autorizar`,
     );
   }
 
@@ -105,10 +102,10 @@ export class LauncherController {
 
   /** The account is the principal; the Minecraft UUID rides along only so
    *  legacy pack_acl pre-grants keyed on it still resolve. */
-  private principalOf(req: LauncherRequest): PackPrincipal {
+  private principalOf(req: DesktopRequest): PackPrincipal {
     return {
-      userId: req.launcher!.userId,
-      mcUuid: req.launcher!.mcUuid ?? null,
+      userId: req.desktopClient!.userId,
+      mcUuid: req.desktopClient!.mcUuid ?? null,
     };
   }
 
@@ -126,30 +123,30 @@ export class LauncherController {
 
   @Get('me')
   @Public()
-  @UseGuards(LauncherAuthGuard)
+  @UseGuards(DesktopAuthGuard)
   @ApiBearerAuth('JWT')
   @ApiOperation({
     summary: 'La cuenta de esta sesión',
     description:
       'El launcher lo llama al arrancar: una sesión de 30 días sobrevive a muchos motivos para revocarla, y enterarse al iniciar es mejor que enterarse a mitad de una instalación.',
   })
-  @ApiResponse({ status: HttpStatus.OK, type: LauncherSessionUserEntity })
-  me(@Req() req: LauncherRequest): LauncherSessionUserEntity {
+  @ApiResponse({ status: HttpStatus.OK, type: DesktopSessionUserEntity })
+  me(@Req() req: DesktopRequest): DesktopSessionUserEntity {
     return {
-      id: req.launcher!.userId,
-      username: req.launcher!.username,
-      mcUuid: req.launcher!.mcUuid ?? null,
+      id: req.desktopClient!.userId,
+      username: req.desktopClient!.username,
+      mcUuid: req.desktopClient!.mcUuid ?? null,
     };
   }
 
   @Get('packs')
   @Public()
-  @UseGuards(LauncherAuthGuard)
+  @UseGuards(DesktopAuthGuard)
   @ApiBearerAuth('JWT')
   @ApiOperation({ summary: 'Los packs a los que esta cuenta tiene acceso' })
   @ApiResponse({ status: HttpStatus.OK, type: [LauncherPackEntity] })
   async list(
-    @Req() req: LauncherRequest,
+    @Req() req: DesktopRequest,
     @Headers('x-boff-game-types') gameTypes?: string,
   ): Promise<LauncherPackEntity[]> {
     return this.packs.listForLauncher(
@@ -160,7 +157,7 @@ export class LauncherController {
 
   @Get('packs/:id/manifest')
   @Public()
-  @UseGuards(LauncherAuthGuard)
+  @UseGuards(DesktopAuthGuard)
   @ApiBearerAuth('JWT')
   @ApiOperation({
     summary: 'El manifiesto a instalar',
@@ -170,7 +167,7 @@ export class LauncherController {
   async manifest(
     @Param('id') id: string,
     @Query() query: ManifestQueryDto,
-    @Req() req: LauncherRequest,
+    @Req() req: DesktopRequest,
     @Headers('x-boff-game-types') gameTypes?: string,
   ): Promise<unknown> {
     return this.packs.manifestFor(
@@ -185,7 +182,7 @@ export class LauncherController {
 
   @Get('packs/:id/files/curseforge/:projectId/:fileId')
   @Public()
-  @UseGuards(LauncherAuthGuard)
+  @UseGuards(DesktopAuthGuard)
   @ApiBearerAuth('JWT')
   @ApiOperation({
     summary: 'Proxy de descarga de CurseForge',
@@ -197,7 +194,7 @@ export class LauncherController {
     @Param('projectId', ParseIntPipe) projectId: number,
     @Param('fileId', ParseIntPipe) fileId: number,
     @Query() query: DownloadQueryDto,
-    @Req() req: LauncherRequest,
+    @Req() req: DesktopRequest,
     @Res({ passthrough: true }) res: Response,
   ): Promise<StreamableFile> {
     await this.packs.entitledFile(
@@ -215,7 +212,7 @@ export class LauncherController {
 
   @Get('packs/:id/files/override/:sha512')
   @Public()
-  @UseGuards(LauncherAuthGuard)
+  @UseGuards(DesktopAuthGuard)
   @ApiBearerAuth('JWT')
   @ApiOperation({
     summary: 'Descargar un blob de override',
@@ -226,7 +223,7 @@ export class LauncherController {
     @Param('id') id: string,
     @Param('sha512') sha512: string,
     @Query() query: DownloadQueryDto,
-    @Req() req: LauncherRequest,
+    @Req() req: DesktopRequest,
     @Res({ passthrough: true }) res: Response,
   ): Promise<StreamableFile> {
     const blob = sha512.toLowerCase();
@@ -265,15 +262,15 @@ export class LauncherController {
   // sessions stop costing a paid Minecraft account.
   @Post('invites/redeem')
   @Public()
-  @UseGuards(LauncherAuthGuard, LauncherThrottlerGuard)
+  @UseGuards(DesktopAuthGuard, DesktopThrottlerGuard)
   @Throttle({ default: { ttl: 60_000, limit: 10 } })
   @HttpCode(HttpStatus.OK)
   @ApiBearerAuth('JWT')
   @ApiOperation({ summary: 'Canjear un código de invitación' })
   async redeem(
     @Body() dto: RedeemInviteDto,
-    @Req() req: LauncherRequest,
+    @Req() req: DesktopRequest,
   ): Promise<{ packId: string }> {
-    return this.packs.redeemInvite(req.launcher!, dto.code);
+    return this.packs.redeemInvite(req.desktopClient!, dto.code);
   }
 }

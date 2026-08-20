@@ -171,7 +171,7 @@
         "events": "Eventos",
         "raffles": "Sorteos",
         "tournaments": "Torneos",
-        "launcher": "Boffmedia App"
+        "app": "Boffmedia App"
       },
       "footer": {
         "tagline": "Comunidad gaming: torneos, servidores, herramientas competitivas y una temporada siempre en marcha.",
@@ -189,7 +189,7 @@
         "privacy": "Privacidad",
         "web": "Web",
         "discord": "Discord",
-        "launcher": "Descargar el launcher"
+        "app": "Descargar la app"
       }
     }
   }

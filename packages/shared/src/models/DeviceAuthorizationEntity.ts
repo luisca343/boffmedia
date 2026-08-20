@@ -4,7 +4,7 @@
 /* eslint-disable */
 export type DeviceAuthorizationEntity = {
     /**
-     * La mitad secreta: solo la guarda el launcher
+     * La mitad secreta: solo la guarda la app
      */
     deviceCode: string;
     /**

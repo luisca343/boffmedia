@@ -165,10 +165,10 @@ describe('AuthService', () => {
         UnauthorizedException,
       );
 
-      jwtService.verify.mockReturnValue({ sub: 1, typ: 'launcher' });
-      await expect(
-        service.refreshToken('launcher-token-string'),
-      ).rejects.toThrow(UnauthorizedException);
+      jwtService.verify.mockReturnValue({ sub: 1, typ: 'app' });
+      await expect(service.refreshToken('app-token-string')).rejects.toThrow(
+        UnauthorizedException,
+      );
     });
 
     it('should throw UnauthorizedException when passed a non-string', async () => {

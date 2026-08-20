@@ -1,7 +1,7 @@
 // The mod-catalog vocabulary, shared by every host that browses mods. It lives
 // here rather than in a host's service layer because two very different hosts
 // speak it: apps/web talks to our API's CurseForge+Modrinth proxy, and
-// apps/launcher talks to Modrinth directly from Rust. Neither can import the
+// apps/desktop talks to Modrinth directly from Rust. Neither can import the
 // other's types, and a drifting copy is how a picker starts silently dropping
 // fields.
 

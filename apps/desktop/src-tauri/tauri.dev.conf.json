@@ -1,0 +1,12 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "Boffmedia App (dev)",
+  "identifier": "es.boffmedia.app.dev",
+  "plugins": {
+    "updater": {
+      "endpoints": [
+        "https://api.ficuslab.es/desktop/updates/{{target}}-{{arch}}/{{current_version}}"
+      ]
+    }
+  }
+}

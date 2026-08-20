@@ -112,7 +112,7 @@
         "description": "Minijuegos, racha diaria y cajas del servidor de SmartRotom."
       }
     },
-    "launcher": {
+    "app": {
       "index": {
         "title": "Boffmedia App · Boffmedia",
         "description": "Descarga Boffmedia App: instala, actualiza y lanza los packs de Minecraft de la comunidad, con las herramientas de Boffmedia integradas."

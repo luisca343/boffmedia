@@ -153,7 +153,10 @@ export class CommandsService {
           avatar: discordUsers.avatar,
         })
         .from(discordQuotes)
-        .leftJoin(discordUsers, eq(discordQuotes.discordId, discordUsers.userId));
+        .leftJoin(
+          discordUsers,
+          eq(discordQuotes.discordId, discordUsers.userId),
+        );
 
       if (userId && global) {
         queryBuilder.where(eq(discordQuotes.discordId, userId));

@@ -4,7 +4,7 @@
 /* eslint-disable */
 export type StartDeviceAuthDto = {
     /**
-     * Cómo se presenta este launcher en la pantalla de aprobación (SO, versión). Solo informativo.
+     * Cómo se presenta esta instalación en la pantalla de aprobación (SO, versión). Solo informativo.
      */
     clientLabel?: string;
 };

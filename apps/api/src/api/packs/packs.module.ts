@@ -4,11 +4,11 @@ import { DrizzleModule } from '@api/_utils/drizzle/drizzle.module';
 import { AuthModule } from '@api/auth/auth.module';
 import { BoffMediaUsersModule } from '@api/boffmedia/users/users.module';
 import { RandomizerPackLinkModule } from '@api/_repositories/randomizer/pack-link.repository';
-import { LauncherAuthGuard } from './guards/launcher-auth.guard';
-import { LauncherAuthController } from './launcher-auth.controller';
+import { DesktopAuthGuard } from './guards/desktop-auth.guard';
+import { DesktopAuthController } from './desktop-auth.controller';
 import { LauncherController } from './launcher.controller';
-import { LauncherDeviceRepository } from './launcher-device.repository';
-import { LauncherDeviceService } from './launcher-device.service';
+import { DesktopDeviceRepository } from './desktop-device.repository';
+import { DesktopDeviceService } from './desktop-device.service';
 import { PacksAuthService } from './packs-auth.service';
 import { PacksCatalogService } from './packs-catalog.service';
 import { PacksDownloadsService } from './packs-downloads.service';
@@ -31,27 +31,27 @@ import { PacksService } from './packs.service';
     // The CurseForge API/CDN proxy (§4.5).
     HttpModule,
   ],
-  controllers: [PacksController, LauncherController, LauncherAuthController],
+  controllers: [PacksController, LauncherController, DesktopAuthController],
   providers: [
     PacksRepository,
     PacksService,
     PacksAuthService,
-    LauncherDeviceRepository,
-    LauncherDeviceService,
+    DesktopDeviceRepository,
+    DesktopDeviceService,
     PacksDownloadsService,
     PacksCatalogService,
     PacksMetaService,
-    LauncherAuthGuard,
+    DesktopAuthGuard,
   ],
   exports: [
     PacksService,
     PacksDownloadsService,
-    LauncherAuthGuard,
+    DesktopAuthGuard,
     // A guard named in another module's @UseGuards() is instantiated in THAT
     // module's injector, so every dependency it has must be exported from here
     // too — exporting the guard alone is not enough. These two are the guard's
     // constructor, not an invitation to use the repository elsewhere:
-    // RandomizerModule pulls in LauncherAuthGuard and would otherwise fail to
+    // RandomizerModule pulls in DesktopAuthGuard and would otherwise fail to
     // boot with "PacksRepository is not available in the RandomizerModule".
     PacksAuthService,
     PacksRepository,

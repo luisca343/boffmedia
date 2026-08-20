@@ -17,7 +17,9 @@ export class FicusAIRepository
     super(db, ficusAiMessages);
   }
 
-  async create(createMessageDto: CreateFicusAiMessageDto): Promise<FicusMessage> {
+  async create(
+    createMessageDto: CreateFicusAiMessageDto,
+  ): Promise<FicusMessage> {
     const result = await this.db.insert(ficusAiMessages).values({
       uuid: createMessageDto.uuid,
       content: createMessageDto.content,

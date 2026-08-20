@@ -9,7 +9,7 @@ import { UpdateBattleTeamDto } from './dto/battle-team.dto';
 import { TaxiStop } from './entities/taxi-stop.entity';
 import { PlayerPosition } from './entities/player-position.entity';
 import { TeleportOutcome } from './entities/teleport-outcome.entity';
-import { PokemonW } from './entities/pokemon-w-.entity';
+import { PokemonW } from './entities/pokemon-w.entity';
 import { PlayerStats } from './entities/player-stats.entity';
 import { Logger } from 'nestjs-pino';
 

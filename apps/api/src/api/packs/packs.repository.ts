@@ -40,9 +40,9 @@ export class PacksRepository {
 
   /** Current launcher revocation counter, or null if the account is gone. Single
    *  keyed lookup — the guard runs this on every launcher request. */
-  async getLauncherTokenVersion(userId: number): Promise<number | null> {
+  async getDesktopTokenVersion(userId: number): Promise<number | null> {
     const [row] = await this.db
-      .select({ v: boffMediaUsers.launcherTokenVersion })
+      .select({ v: boffMediaUsers.desktopTokenVersion })
       .from(boffMediaUsers)
       .where(eq(boffMediaUsers.id, userId))
       .limit(1);
@@ -53,7 +53,7 @@ export class PacksRepository {
     await this.db
       .update(boffMediaUsers)
       .set({
-        launcherTokenVersion: sql`${boffMediaUsers.launcherTokenVersion} + 1`,
+        desktopTokenVersion: sql`${boffMediaUsers.desktopTokenVersion} + 1`,
       })
       .where(eq(boffMediaUsers.id, userId));
   }

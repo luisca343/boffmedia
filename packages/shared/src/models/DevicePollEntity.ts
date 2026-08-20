@@ -2,14 +2,14 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { LauncherSessionUserEntity } from './LauncherSessionUserEntity';
+import type { DesktopSessionUserEntity } from './DesktopSessionUserEntity';
 export type DevicePollEntity = {
     status: DevicePollEntity.status;
     /**
-     * Bearer para el resto de rutas del launcher. Solo en approved.
+     * Bearer para el resto de rutas de la app. Solo en approved.
      */
     token?: string;
-    user?: LauncherSessionUserEntity;
+    user?: DesktopSessionUserEntity;
 };
 export namespace DevicePollEntity {
     export enum status {

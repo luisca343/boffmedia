@@ -184,7 +184,7 @@ export interface CreateVersionInput {
   initialFiles?: unknown[];
 }
 
-// The catalog vocabulary is shared with apps/launcher, which browses mods too
+// The catalog vocabulary is shared with apps/desktop, which browses mods too
 // but reaches Modrinth directly instead of through these routes. It lives in
 // @boffmedia/ui next to the <ModBrowser> that renders it; a second copy here
 // is how the two ends start disagreeing about a field. Re-exported so existing

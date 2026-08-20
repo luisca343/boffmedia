@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsString, IsOptional, IsNumber, Min, Max } from 'class-validator';
-import { PokemonW } from '../entities/pokemon-w-.entity';
+import { PokemonW } from '../entities/pokemon-w.entity';
 import { BaseDto } from '@api/_utils/dto/base.dto';
 
 export class CreateBattleTeamDto extends BaseDto {

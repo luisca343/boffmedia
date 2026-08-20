@@ -7,7 +7,7 @@ import { UpdateBattleTeamDto } from '../dto/battle-team.dto';
 import { WINGULL_USER_REPOSITORY_TOKEN } from '@api/_utils/repositories/interfaces/repository.token';
 import { IWingullPlayerRepository } from '../repositories/interfaces/wingull-player.repository.interface';
 import { PlayerStats } from '../entities/player-stats.entity';
-import { PokemonW } from '../entities/pokemon-w-.entity';
+import { PokemonW } from '../entities/pokemon-w.entity';
 import { Logger } from 'nestjs-pino';
 
 @Injectable()

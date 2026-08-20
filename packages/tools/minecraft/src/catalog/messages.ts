@@ -4,7 +4,7 @@
 //
 // Namespace: `tools.schematicCompat.*` / `tools.schematicViewer.*`.
 // Shape is nested, which is what both hosts want: next-intl in apps/web and
-// `useT("<namespace>")` in apps/launcher.
+// `useT("<namespace>")` in apps/desktop.
 //
 // Spanish is the source of truth; English is the translation.
 

@@ -15,7 +15,7 @@ const path = require('path');
 const PACKAGES = [
   'apps/web',
   'apps/api',
-  'apps/launcher',
+  'apps/desktop',
   'packages/ui',
   'packages/pack-schema',
   'packages/tools/kit',

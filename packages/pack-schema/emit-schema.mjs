@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Emits the JSON Schema that apps/launcher's build.rs turns into Rust structs.
+// Emits the JSON Schema that apps/desktop's build.rs turns into Rust structs.
 // zod stays the single source of truth for the manifest format; this is the
 // bridge across the one unavoidable TS↔Rust boundary.
 //

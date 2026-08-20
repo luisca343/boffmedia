@@ -18,7 +18,7 @@ import { Region } from './entities/region.entity';
 import { SuccessResponse } from '@api/_utils/entities/common-response.entity';
 import { TaxiStop } from './entities/taxi-stop.entity';
 import { PlayerStats } from './entities/player-stats.entity';
-import { PokemonW } from './entities/pokemon-w-.entity';
+import { PokemonW } from './entities/pokemon-w.entity';
 import { WingullWorldService } from './services/wingull-world.service';
 import { UpdateDex } from './entities/update-dex.entity';
 import { UpdateBattleTeamDto } from './dto/battle-team.dto';

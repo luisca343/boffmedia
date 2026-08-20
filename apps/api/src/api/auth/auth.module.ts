@@ -19,6 +19,7 @@ import { BoffMediaUsersModule } from '@api/boffmedia/users/users.module';
 import { PasswordModule } from './password.module';
 import { MailModule } from '@api/mail/mail.module';
 import { TokenSweeperService } from './token-sweeper.service';
+import { TokenSweeperRepository } from './repositories/token-sweeper.repository';
 
 @Module({
   imports: [
@@ -46,6 +47,7 @@ import { TokenSweeperService } from './token-sweeper.service';
     MinecraftLinkService,
     MinecraftHandshakeService,
     TokenSweeperService,
+    TokenSweeperRepository,
   ],
   exports: [
     AuthService,

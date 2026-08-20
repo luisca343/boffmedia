@@ -9,7 +9,7 @@ export type CreatePackVersionDto = {
     loaderVersion?: string;
     notes?: string;
     /**
-     * PackFile[] — validado con @boffmedia/pack-schema, el mismo esquema del que el launcher genera sus tipos de Rust
+     * PackFile[] — validado con @boffmedia/pack-schema, el mismo esquema del que la app genera sus tipos de Rust
      */
     files: Array<Record<string, any>>;
     /**

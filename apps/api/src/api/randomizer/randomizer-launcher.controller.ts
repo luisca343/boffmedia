@@ -17,9 +17,9 @@ import {
   ApiBearerAuth,
 } from '@nestjs/swagger';
 import {
-  LauncherAuthGuard,
-  LauncherRequest,
-} from '@api/packs/guards/launcher-auth.guard';
+  DesktopAuthGuard,
+  DesktopRequest,
+} from '@api/packs/guards/desktop-auth.guard';
 import { Public } from '@api/_utils/decorators/public.decorator';
 import { AssignmentsService } from './services/assignments.service';
 import { RandomizerPackLinkRepository } from '@api/_repositories/randomizer/pack-link.repository';
@@ -30,12 +30,12 @@ import { RANDOMIZER_REPOSITORY_TOKEN } from '@api/_utils/repositories/interfaces
 // Launcher endpoints for randomizer claim and ROM patching.
 // Each route is @Public() (per-route, never on the class — a class-level
 // @Public would also neuter the guard) so the global JwtAuthGuard lets the
-// launcher token through; LauncherAuthGuard then authenticates it. Without the
+// launcher token through; DesktopAuthGuard then authenticates it. Without the
 // @Public the global website guard 401s every launcher call before this guard
 // runs — which silently killed all randomizer minting.
 @ApiTags('Randomizer | Launcher')
 @Controller('randomizer/launcher')
-@UseGuards(LauncherAuthGuard)
+@UseGuards(DesktopAuthGuard)
 @ApiBearerAuth('Launcher')
 export class RandomizerLauncherController {
   constructor(
@@ -71,9 +71,9 @@ export class RandomizerLauncherController {
   @ApiResponse({ status: 403, description: 'Not registered for this event' })
   async getMyAssignmentByPack(
     @Param('packId') packId: string,
-    @Req() req: LauncherRequest,
+    @Req() req: DesktopRequest,
   ): Promise<AssignmentClaimedDto> {
-    if (!req.launcher) {
+    if (!req.desktopClient) {
       throw new Error('Launcher principal not found');
     }
 
@@ -88,7 +88,7 @@ export class RandomizerLauncherController {
       });
     }
 
-    return this.assignments.getMyAssignment(config.id, req.launcher);
+    return this.assignments.getMyAssignment(config.id, req.desktopClient);
   }
 
   /**
@@ -132,10 +132,10 @@ export class RandomizerLauncherController {
   })
   async getRom(
     @Param('eventId') eventId: string,
-    @Req() req: LauncherRequest,
+    @Req() req: DesktopRequest,
     @Res({ passthrough: true }) res: Response,
   ): Promise<StreamableFile> {
-    if (!req.launcher) {
+    if (!req.desktopClient) {
       throw new Error('Launcher principal not found');
     }
 
@@ -148,7 +148,7 @@ export class RandomizerLauncherController {
     }
 
     const { stream, outputSha512, contentLength } =
-      await this.assignments.getOrGenerateRom(config.id, req.launcher);
+      await this.assignments.getOrGenerateRom(config.id, req.desktopClient);
 
     // Expose the hash so the launcher can pin the slot's expected hash without
     // re-hashing the whole file, and so browsers/CORS clients can read it.
@@ -185,12 +185,15 @@ export class RandomizerLauncherController {
   @ApiResponse({ status: 403, description: 'Not registered for this event' })
   async getMyAssignment(
     @Param('configId') configId: string,
-    @Req() req: LauncherRequest,
+    @Req() req: DesktopRequest,
   ): Promise<AssignmentClaimedDto> {
-    if (!req.launcher) {
+    if (!req.desktopClient) {
       throw new Error('Launcher principal not found');
     }
 
-    return this.assignments.getMyAssignment(Number(configId), req.launcher);
+    return this.assignments.getMyAssignment(
+      Number(configId),
+      req.desktopClient,
+    );
   }
 }
