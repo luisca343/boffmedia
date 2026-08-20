@@ -224,7 +224,6 @@ export function EmulatorEditor({
     return () => {
       cancelled = true
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [step, romSource])
 
   const [hashing, setHashing] = useState(false)
@@ -335,7 +334,6 @@ export function EmulatorEditor({
     onValidity?.(stepValidity)
     // Serialised: the object is rebuilt on every render, so comparing it by
     // reference would fire the effect forever.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [JSON.stringify(stepValidity)])
 
   const submit = async () => {

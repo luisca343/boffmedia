@@ -260,7 +260,6 @@ export function SpeedTiersTab({ speedTiers, loading, error, onSelectForMatchup }
       if (va > vb) return sortDir === "asc" ? 1 : -1;
       return 0;
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [speedTiers, tableSearch, sortKey, sortDir, computedMap]);
 
   const separatorBeforeIdx = useMemo(() => {

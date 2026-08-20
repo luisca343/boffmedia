@@ -25,7 +25,6 @@ export function DkSprite({ src, alt, size = 26, dim, title, onError, className }
       className={cn("inline-grid flex-none place-items-center", className)}
     >
       {src ? (
-        // eslint-disable-next-line @next/next/no-img-element
         <img
           src={src}
           alt={alt}

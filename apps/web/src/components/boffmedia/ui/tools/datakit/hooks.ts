@@ -31,7 +31,6 @@ export function useDkLoad(deps: React.DependencyList, ms = 260): boolean {
     setLoading(true)
     const id = setTimeout(() => setLoading(false), ms)
     return () => clearTimeout(id)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, deps)
   return loading
 }

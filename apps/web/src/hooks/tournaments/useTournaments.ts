@@ -26,7 +26,6 @@ export function useTournaments(filters?: TournamentFilters) {
       setLoading(false)
     }
     // filters is captured via the stringified key
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [key])
 
   useEffect(() => {

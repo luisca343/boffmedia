@@ -40,7 +40,6 @@ export function useForumResource<T>(
     return () => {
       alive = false
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [...deps, nonce])
 
   return { data, error, isLoading, refetch, setData }

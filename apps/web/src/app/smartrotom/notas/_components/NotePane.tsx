@@ -60,7 +60,6 @@ export function NotePane(props: NotePaneProps) {
       setWc(wordCount(loaded.content));
       props.onContentLoaded?.(note.id, loaded.content);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loaded?.content, note.id]);
 
   const commit = useCallback(

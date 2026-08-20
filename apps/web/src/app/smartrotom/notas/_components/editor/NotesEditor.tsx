@@ -212,7 +212,6 @@ export default function NotesEditor(props: NotesEditorProps) {
       },
       extraPlugins: [wikiLinks],
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Mirror the app theme onto CKEditor's body-mounted balloon layer.
@@ -255,7 +254,6 @@ export default function NotesEditor(props: NotesEditorProps) {
     if (ed.ui.focusTracker.isFocused) return;
     const next = upgradeLegacyContent(props.content);
     if (ed.getData() !== next) ed.setData(next);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [props.content]);
 
   return (

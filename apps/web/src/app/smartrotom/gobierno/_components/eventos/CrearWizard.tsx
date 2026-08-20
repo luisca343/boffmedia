@@ -147,7 +147,6 @@ export function CrearWizard() {
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     }),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [type, title, brief, prize, crew, buildClosedAt, ratingClosesAt, zone, coordsX, coordsZ, radius, opensAt, closesAt, rules, weights, officer.uuid],
   )
 

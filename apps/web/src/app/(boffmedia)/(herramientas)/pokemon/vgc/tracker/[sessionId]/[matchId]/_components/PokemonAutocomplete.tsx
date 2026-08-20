@@ -123,7 +123,6 @@ export const PokemonAutocomplete = forwardRef<PokemonAutocompleteHandle, Props>(
                   i === highlighted ? 'bg-accent-soft text-accent-bright' : 'text-txt hover:bg-panel-2'
                 }`}
               >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={spriteUrl(entry.name)}
                   alt={entry.name}

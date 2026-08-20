@@ -352,7 +352,6 @@ function PreviousGameRecap({ games, upToGame, side }: { games: SeriesGame[]; upT
             </span>
             <div className="flex items-center gap-[2px]">
               {leads.map((s) => (
-                // eslint-disable-next-line @next/next/no-img-element
                 <img key={s.slotIndex} src={spriteUrl(s.speciesName!)} alt={s.speciesName ?? ''} className="h-7 w-7 object-contain" onError={handleSpriteError} />
               ))}
             </div>
@@ -361,7 +360,6 @@ function PreviousGameRecap({ games, upToGame, side }: { games: SeriesGame[]; upT
                 <span className="text-[10px] text-txt-dim">/</span>
                 <div className="flex items-center gap-[2px]">
                   {backs.map((s) => (
-                    // eslint-disable-next-line @next/next/no-img-element
                     <img key={s.slotIndex} src={spriteUrl(s.speciesName!)} alt={s.speciesName ?? ''} className="h-6 w-6 object-contain opacity-60" onError={handleSpriteError} />
                   ))}
                 </div>

@@ -114,7 +114,6 @@ export function SpeedTierWidget({ slots, regulationId }: Props) {
               className="group relative flex cursor-pointer items-center gap-2 px-3 py-1 transition-colors hover:bg-panel-2"
             >
               <div className="absolute inset-y-0 left-0 bg-panel-2" style={{ width: `${barPct}%` }} />
-              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={spriteUrl(row.name)} alt="" className="relative h-6 w-6 shrink-0 object-contain" onError={handleSpriteError} />
               <div className="relative min-w-0 flex-1">
                 <div className="flex min-w-0 items-center gap-[6px]">

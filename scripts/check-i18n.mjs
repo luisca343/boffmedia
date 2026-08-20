@@ -554,7 +554,7 @@ for (const file of spanishSources) {
 
 // Pinned 2026-07-27, right after the mass extraction, at its historic low. Only
 // ever lower this — a growth means someone shipped a new hardcoded string.
-const HARDCODED_ES_BASELINE = 39;
+const HARDCODED_ES_BASELINE = 37;
 const hardcodedCount = hardcodedSpanish.length;
 if (hardcodedCount > HARDCODED_ES_BASELINE) {
   for (const { rel, sample } of hardcodedSpanish.slice(0, 40)) {

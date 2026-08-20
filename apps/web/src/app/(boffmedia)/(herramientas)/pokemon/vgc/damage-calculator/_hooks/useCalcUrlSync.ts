@@ -51,7 +51,6 @@ export function useCalcUrlSync() {
     const clean = new URL(window.location.href)
     clean.searchParams.delete(URL_PARAM)
     window.history.replaceState(null, '', clean.toString())
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const copyShareLink = useCallback(() => {

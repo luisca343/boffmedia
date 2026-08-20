@@ -92,7 +92,6 @@ export function EventConfigForm({ config, eventId, onSaved, onCancel }: EventCon
     loadPacks()
     loadRoms()
     if (!isEdit) loadPresets()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const loadPacks = async () => {

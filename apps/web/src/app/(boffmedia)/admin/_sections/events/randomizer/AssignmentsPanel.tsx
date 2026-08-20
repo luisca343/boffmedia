@@ -34,7 +34,6 @@ export function AssignmentsPanel({ configId }: AssignmentsPanelProps) {
 
   useEffect(() => {
     loadAssignments()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [configId])
 
   const loadAssignments = async () => {

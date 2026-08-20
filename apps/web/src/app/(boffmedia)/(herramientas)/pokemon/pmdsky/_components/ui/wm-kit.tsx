@@ -209,7 +209,6 @@ export function WmPokePicker({
     <div className="flex min-w-0 items-start gap-[11px]">
       <span className="grid h-[52px] w-[52px] flex-none place-items-center border border-solid border-line bg-base" aria-hidden="true">
         {sprite ? (
-          // eslint-disable-next-line @next/next/no-img-element
           <img
             src={sprite}
             alt=""

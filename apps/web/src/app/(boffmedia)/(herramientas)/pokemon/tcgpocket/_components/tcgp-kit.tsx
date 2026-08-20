@@ -66,7 +66,6 @@ function TcgCardArt({ card, glyphLabel }: { card: TcgCard; glyphLabel: string })
 
   if (idx < sources.length) {
     return (
-      // eslint-disable-next-line @next/next/no-img-element
       <img
         src={sources[idx]}
         alt={card.name}
@@ -315,7 +314,6 @@ export function TcgPackTile({ setId, name, meta, hue, onOpen }: { setId: string;
             <span className="text-[46px] text-white/85" style={{ textShadow: "0 0 16px rgba(255,255,255,0.4)" }}>◆</span>
           </>
         ) : (
-          // eslint-disable-next-line @next/next/no-img-element
           <img src={packArt(setId, name)} alt={name} loading="lazy" className="h-full w-full object-contain p-2" onError={() => setFailed(true)} />
         )}
       </span>

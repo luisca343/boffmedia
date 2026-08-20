@@ -104,7 +104,6 @@ export function KvGallery({ images, name }: { images: string[]; name: string }) 
     <div className="grid gap-2.5">
       <div className="relative aspect-[16/9] overflow-hidden border border-solid border-line-2 bg-base-2">
         {!err[i] && shots[i] ? (
-          // eslint-disable-next-line @next/next/no-img-element
           <img src={shots[i]} alt={t("screenshotAlt", { game: name, n: i + 1 })} onError={() => setErr((e) => ({ ...e, [i]: true }))} className="block h-full w-full object-cover" />
         ) : (
           fb
@@ -114,7 +113,6 @@ export function KvGallery({ images, name }: { images: string[]; name: string }) 
         {shots.map((s, k) => (
           <button key={k} type="button" aria-label={t("mediaAria", { n: k + 1 })} onClick={() => setI(k)} className={cn("relative aspect-[16/9] cursor-pointer overflow-hidden border border-solid bg-base-2 p-0 transition-[border-color] duration-[140ms]", k === i ? "border-accent [box-shadow:inset_0_0_0_1px_var(--accent)]" : "border-line hover:border-line-2")}>
             {!err[k] && s ? (
-              // eslint-disable-next-line @next/next/no-img-element
               <img src={s} alt="" onError={() => setErr((e) => ({ ...e, [k]: true }))} className="block h-full w-full object-cover" />
             ) : (
               <span className="grid h-full w-full place-items-center text-line-2 [background:repeating-linear-gradient(-45deg,var(--bg-2)_0_8px,var(--panel-2)_8px_16px)]">

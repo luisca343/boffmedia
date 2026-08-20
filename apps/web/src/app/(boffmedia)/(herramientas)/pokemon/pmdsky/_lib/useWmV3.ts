@@ -110,7 +110,6 @@ export function useWmV3(t: Tr, tApp: Tr) {
     if (targetActive && f.clientPokemon !== 0 && f.clientPokemon === f.targetPokemon && (f.questType === 0 || f.questType === 1))
       out.push({ tone: "warn", field: "target", msg: tApp("sameMon") })
     return out
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [f.clientPokemon, f.floor, f.targetPokemon, f.questType, maxFloors, targetActive, tApp])
   const hasError = issues.some((i) => i.tone === "error")
 
@@ -126,7 +125,6 @@ export function useWmV3(t: Tr, tApp: Tr) {
     rows.push({ k: tApp("sumReward"), v: rewardLabel() })
     if (rewardGivesItem) rows.push({ k: tApp("sumPrize"), v: itemLabel(f.rewardItem) })
     return rows
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [f, questLabel, targetActive, isItemQuest, rewardGivesItem, tApp, dungeons, pokemon, items, rewardTypes])
 
   // invalidate a generated code whenever a meaningful input changes

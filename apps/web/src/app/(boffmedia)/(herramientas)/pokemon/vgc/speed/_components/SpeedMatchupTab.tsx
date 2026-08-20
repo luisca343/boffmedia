@@ -67,7 +67,6 @@ export function SpeedMatchupTab({ speedTiers, loading, prefillEntry, onPrefillCo
       setOpponent({ name: prefillEntry.name, speed: String(prefillEntry.speedTiers.max), pokemon: prefillEntry, mods: DEFAULT_MODIFIERS });
       onPrefillConsumed();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [prefillEntry]);
 
   const opponentEffective = useMemo(() => calcEffective(opponent.speed, opponent.mods), [opponent.speed, opponent.mods]);

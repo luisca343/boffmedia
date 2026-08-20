@@ -67,7 +67,6 @@ export default function TorneoPage({
     <main className="wrap py-10">
       {tn.banner && (
         <div className="mb-6 aspect-[3/1] w-full overflow-hidden border border-solid border-line bg-panel">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={tn.banner} alt="" className="h-full w-full object-cover" />
         </div>
       )}

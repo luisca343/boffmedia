@@ -75,7 +75,6 @@ export function MatchWorkspace({ match: initialMatch, sessionId, regulationId, o
     };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [match.result]);
 
   const handleOutcomeTag = (tag: OutcomeTag) => update({ outcomeTag: tag === match.outcomeTag ? undefined : tag });

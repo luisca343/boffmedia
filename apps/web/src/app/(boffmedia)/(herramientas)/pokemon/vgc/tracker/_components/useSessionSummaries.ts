@@ -84,7 +84,6 @@ export function useSessionSummaries(sessions: Session[]): Record<string, Session
     return () => {
       alive = false
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sig, lastSyncAt])
 
   return byId

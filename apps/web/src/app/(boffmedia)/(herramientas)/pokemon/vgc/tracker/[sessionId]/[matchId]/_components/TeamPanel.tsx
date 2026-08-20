@@ -179,7 +179,6 @@ function PoolCard({
         )}
         title={isAssigned ? t('tooltips.assignedSlot', { role: slot.role }) : canAssign ? t('tooltips.assignSlot') : t('tooltips.slotsFull')}
       >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={spriteUrl(slot.speciesName!)} alt={slot.speciesName ?? ''} className="pointer-events-none h-10 w-10 object-contain" onError={handleSpriteError} />
         <span className="max-w-full truncate px-1 font-body text-[11px] leading-none text-txt">{slot.speciesName}</span>
       </button>
@@ -249,7 +248,6 @@ function AssignmentZone({
               className="relative flex min-h-[56px] flex-1 flex-col items-center justify-center gap-[2px] border border-solid bg-base py-1"
               style={{ borderColor: tone }}
             >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={spriteUrl(slot.speciesName!)} alt={slot.speciesName ?? ''} className="h-8 w-8 object-contain" onError={handleSpriteError} />
               <span className="max-w-full truncate px-1 font-body text-[9px] leading-none text-txt-muted">{slot.speciesName}</span>
               <button

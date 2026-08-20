@@ -65,7 +65,6 @@ export function AuthScreen({
           href="/"
           className="flex items-center gap-2.5 font-display text-[20px]/none font-extrabold italic uppercase text-txt no-underline"
         >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/assets/brand/boff-logo.webp" alt="" className="h-[26px] w-[26px] flex-none object-contain" />
           BOFF<b className="text-accent">MEDIA</b>
         </Link>

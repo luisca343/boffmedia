@@ -16,7 +16,6 @@ export function KvArt({ appid, name, kind = "header", src }: { appid?: number; n
   return (
     <div className="relative h-full w-full overflow-hidden bg-base-2">
       {!err && url ? (
-        // eslint-disable-next-line @next/next/no-img-element
         <img src={url} alt={name} loading="lazy" onError={() => setErr(true)} className="block h-full w-full object-cover" />
       ) : (
         <div className={cn("relative", ART_FB)}>

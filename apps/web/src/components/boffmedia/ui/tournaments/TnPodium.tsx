@@ -22,7 +22,6 @@ function PodiumAvatar({ c, size }: { c: TnCompetitor; size: number }) {
       }}
     >
       {c.avatar ? (
-        // eslint-disable-next-line @next/next/no-img-element
         <img src={c.avatar} alt="" className="h-full w-full object-cover" />
       ) : (
         ini

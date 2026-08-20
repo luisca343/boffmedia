@@ -47,7 +47,6 @@ function toSmogonPokemon(
     spe: p.boosts.spe,
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const opts: Partial<State.Pokemon> = {
     level: p.level,
     nature: p.nature as State.Pokemon['nature'],
@@ -112,7 +111,6 @@ export function calcDamage(
     const moveOpts: Partial<State.Move> = {
       isCrit: move.crit,
       hits: 1,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       overrides: { basePower: move.bp, type: move.type as any, category: move.category },
     }
 

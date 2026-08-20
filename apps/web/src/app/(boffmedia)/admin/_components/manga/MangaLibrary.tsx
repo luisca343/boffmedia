@@ -122,7 +122,6 @@ function ChapterRow({
                       className="relative aspect-[2/3] overflow-hidden focus:outline-none focus-visible:ring-1 focus-visible:ring-accent"
                       aria-pressed={excluded}
                     >
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img src={ScrapeService.getChapterImageUrl(seriesSlug, chapter.slug, page.index)} alt="" className="h-full w-full object-cover" loading="lazy" />
                       <span className="absolute inset-x-0 bottom-0 bg-black/60 py-px text-center text-[7px] leading-none text-white">{page.index + 1}</span>
                       {excluded ? (

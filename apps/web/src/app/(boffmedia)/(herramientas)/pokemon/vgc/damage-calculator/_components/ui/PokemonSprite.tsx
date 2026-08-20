@@ -7,7 +7,6 @@ export function PokemonSprite({ name, size = 32, className }: { name: string; si
       className={className}
       style={{ width: size, height: size, display: "inline-grid", placeItems: "center", flex: "none" }}
     >
-      {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={getSpriteUrl(name)}
         alt={name}
