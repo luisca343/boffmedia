@@ -60,12 +60,31 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-      - name: Deploy to server
-        run: |
-          mkdir -p ~/.ssh
-          chmod 700 ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" | base64 -d > ~/.ssh/deploy_key
-          chmod 600 ~/.ssh/deploy_key
-          ssh-keyscan -H "${{ secrets.DEPLOY_HOST }}" >> ~/.ssh/known_hosts
-          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no root@${{ secrets.DEPLOY_HOST }} \
-            "docker pull luisca343/boffmedia-web2:latest && docker restart boffmedia-web"
+
+      # ---- Deploy DISABLED ----------------------------------------------------
+      # Commented out, not deleted. The build and push above are what matter right
+      # now: every run still publishes :latest and :<run_number> to DockerHub, and
+      # the server is updated by hand until the cutover.
+      #
+      # It failed because two repository secrets are unset — DEPLOY_HOST and
+      # SSH_PRIVATE_KEY both expanded to an empty string, which is why the log
+      # showed `ssh ... root@` with no host. An unset secret expands to nothing,
+      # while a set one is masked as ***, so the masked DOCKERHUB_USERNAME on the
+      # same line is what proves these two are missing rather than hidden.
+      #
+      # To re-enable: set both secrets (SSH_PRIVATE_KEY must be stored BASE64
+      # ENCODED — the script pipes it through `base64 -d`, so a raw PEM decodes to
+      # garbage) and uncomment the block below.
+      #
+      # Two things worth fixing when it comes back: `-o StrictHostKeyChecking=no`
+      # makes the preceding ssh-keyscan pointless, and deploying `:latest` means
+      # the :<run_number> tag cannot actually be used to roll back.
+      # - name: Deploy to server
+        # run: |
+          # mkdir -p ~/.ssh
+          # chmod 700 ~/.ssh
+          # echo "${{ secrets.SSH_PRIVATE_KEY }}" | base64 -d > ~/.ssh/deploy_key
+          # chmod 600 ~/.ssh/deploy_key
+          # ssh-keyscan -H "${{ secrets.DEPLOY_HOST }}" >> ~/.ssh/known_hosts
+          # ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no root@${{ secrets.DEPLOY_HOST }} \
+            # "docker pull luisca343/boffmedia-web2:latest && docker restart boffmedia-web"
