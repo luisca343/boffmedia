@@ -4,7 +4,7 @@ import {
   lootboxConfig,
   getRarityFromWeight,
   rarityRanges,
-} from '../_config/lootboxConfig';
+} from '../_config/lootbox-config';
 import { ARCADE_INVENTORY_REPOSITORY_TOKEN } from '@api/_utils/repositories/interfaces/repository.token';
 import { IArcadeInventoryRepository } from '../repositories/interfaces/arcade-inventory.repository.interface';
 import {

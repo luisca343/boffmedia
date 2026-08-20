@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { LootboxService } from './lootbox.service';
 import { ARCADE_INVENTORY_REPOSITORY_TOKEN } from '@api/_utils/repositories/interfaces/repository.token';
 
-jest.mock('../_config/lootboxConfig', () => ({
+jest.mock('../_config/lootbox-config', () => ({
   getRarityFromWeight: jest.fn().mockReturnValue('common'),
   rarityRanges: { common: { min: 50, max: 100 } },
   lootboxConfig: {

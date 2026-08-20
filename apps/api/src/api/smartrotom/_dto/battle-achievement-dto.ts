@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { PokemonData } from '../pokemon/utils/PokemonData';
+import { PokemonData } from '../pokemon/utils/pokemon-data';
 import { SmartrotomRequestDto } from './smartrotom-request-dto';
 
 export class BattleAchievementDto extends SmartrotomRequestDto {

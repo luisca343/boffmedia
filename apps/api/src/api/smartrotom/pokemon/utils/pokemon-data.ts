@@ -5,7 +5,7 @@ import * as path from 'path';
 import { promises as fsPromises } from 'fs';
 import { Pokemon } from '@/types/pokemon';
 import { wolfeyTypeRanking } from './types';
-import { MoveData } from './MoveData';
+import { MoveData } from './move-data';
 import pino from 'pino';
 
 const logger = pino({ name: 'util' });

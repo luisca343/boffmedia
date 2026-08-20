@@ -6,7 +6,7 @@ import { ShowdownPokemonData } from '../interfaces/showdown.interface';
 import {
   standardizeFormDisplayName,
   standardizeFormIdSegment,
-} from '../utils/ShowdownHelper';
+} from '../utils/showdown-helper';
 
 @Injectable()
 export class PokemonShowdownService {
