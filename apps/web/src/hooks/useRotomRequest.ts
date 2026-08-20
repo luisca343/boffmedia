@@ -3,7 +3,7 @@ import { ApiResponse } from '@/services/boffAPI'
 
 /**
  * The fetch path for the apps not yet lifted to TanStack Query — ChatApp, Notas,
- * Pokédex (SMARTROTOM_V3.md §8, gap G5). StarBank was migrated off this hook.
+ * Pokédex. StarBank was migrated off this hook.
  *
  * `boffAPI` has two failure modes: a network error THROWS, an HTTP error RESOLVES
  * to `{ success: false }`. Only `success` separates them — `error` is absent

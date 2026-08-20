@@ -75,14 +75,13 @@ export function AccountSwitcher() {
 
   // The shell (and so this rail) renders signed OUT too. The chip is where a
   // session comes from in that state: one obvious affordance, from anywhere in
-  // the app. Rendering nothing here (the old behaviour, when the rail could not
-  // exist without a session) would leave the rail with a hole where the account
-  // belongs.
+  // the app. Rendering nothing here leaves the rail with a hole where the
+  // account belongs.
   //
-  // It STARTS the device flow rather than navigating to Play. That worked only
-  // while Play was a sign-in wall; now Play is a working library, so navigating
-  // there would answer a click on "sign in" with a pack list and no sign-in in
-  // sight. The flow itself takes the content area (see App's Router).
+  // It STARTS the device flow rather than navigating to Play. Play is a working
+  // library, not a sign-in wall, so navigating there would answer a click on
+  // "sign in" with a pack list and no sign-in in sight. The flow itself takes
+  // the content area (see App's Router).
   if (!boffAccount) {
     return (
       <button

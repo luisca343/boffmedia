@@ -13,15 +13,14 @@ declare global {
 /**
  * Scoped TanStack Query client for the PC, mirroring `ArcadeQueryProvider`.
  *
- * The PC is the app that most needed this: it was `useEffect` + `setState` over a
- * ~900-Pokémon payload with hand-rolled optimistic moves and manual rollback (audit
- * gap G5). Every move now invalidates the PC and the party together, because one
- * `POST /pc/move` can touch both.
+ * The PC carries a ~900-Pokémon payload, so hand-rolled optimistic moves and
+ * manual rollback are not worth maintaining here. Every move invalidates the PC
+ * and the party together, because one `POST /pc/move` can touch both.
  *
  * `staleTime` is long: the PC only changes when the player moves something here or
  * plays on the Minecraft server, and re-pulling 900 Pokémon on every focus is waste.
  * `window.terasStorageChanged` closes the second half of that: the mod pushes it on
- * every in-game storage write, so the long `staleTime` no longer means stale data.
+ * every in-game storage write, so the long `staleTime` does not mean stale data.
  */
 export function PCQueryProvider({ children }: { children: ReactNode }) {
   const [client] = useState(

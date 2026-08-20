@@ -1,5 +1,5 @@
 /**
- * D6 — this package's registry manifests. Hosts render their tool listings from
+ * This package's registry manifests. Hosts render their tool listings from
  * these; nothing host-shaped (routes aside) appears here.
  *
  * Both components are `lazy`: three.js, the block registries and the worker

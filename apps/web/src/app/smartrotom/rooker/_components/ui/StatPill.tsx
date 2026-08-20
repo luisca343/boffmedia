@@ -8,7 +8,7 @@ import { Icon, type IconName } from "./Icon"
  * log — so they are tabular-nums: four tiles side by side must align on their digits
  * or the row reads as ragged.
  *
- * `tone` is a literal class, never interpolated (§4).
+ * `tone` is a literal class, never interpolated.
  */
 export type StatTone = "accent" | "fuego" | "shiny" | "choque"
 

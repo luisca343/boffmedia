@@ -8,7 +8,7 @@ export interface RewardView {
   /** What the tile says. */
   label: string
   /** Which neon the tile wears. Keyed off the reward TYPE — the API has no
-   *  per-day rarity, and inventing one would be fabricating data (§9). */
+   *  per-day rarity, and inventing one would be fabricating data. */
   tone: ArTone
   /** The plinth artwork: a real sprite where one exists, else a pixel glyph. */
   art: React.ReactNode

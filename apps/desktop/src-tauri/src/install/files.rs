@@ -3,7 +3,7 @@
 // (packages/pack-schema/src/boffmedia.ts). Verifying the weaker hash when the
 // manifest hands us the stronger one would be a downgrade we chose.
 //
-// §9 "delta updates" is the reason for the content-addressed cache: a file is
+// Delta updates are the reason for the content-addressed cache: a file is
 // keyed by its sha512, so an update that changes 3 of 400 mods downloads 3.
 // A file already correct on disk is not even re-copied.
 
@@ -274,8 +274,8 @@ async fn fetch_one(
     let dest = dest_root.join(file.path.replace('\\', "/"));
     let sha512 = file.sha512.to_lowercase();
 
-    // 1. Already correct on disk? Nothing to do — this is the whole point of
-    //    §9's delta updates.
+    // 1. Already correct on disk? Nothing to do — the whole point of the
+    //    delta updates.
     if let Ok(meta) = std::fs::metadata(&dest) {
         if meta.is_file()
             && (file.size == 0 || meta.len() == file.size)
@@ -348,8 +348,8 @@ async fn fetch_and_stream(
     sha512: &str,
 ) -> Result<(), FetchError> {
     // Public sources are one GET; the proxied ones go through the launcher
-    // session so the API can re-check entitlement — §7.4, the listing and the
-    // download are separate requests and access can be revoked between them.
+    // session so the API can re-check entitlement: the listing and the download
+    // are separate requests, and access can be revoked between them.
     let response = match &file.fetch {
         Fetch::Proxied(pack_file) => {
             // The proxy re-mints an expired session internally, so a failure
@@ -558,7 +558,7 @@ fn place(blob: &Path, dest: &Path) -> Result<(), InstallFailure> {
         .map_err(|e| InstallFailure::message(format!("No se pudo instalar {}: {e}", dest.display())))
 }
 
-/// Materialize `patched` (romhack) files (§4.1) AFTER the normal downloads, so
+/// Materialize `patched` (romhack) files AFTER the normal downloads, so
 /// each hack's `base` (a user-provided dump) and `patch` (a downloaded blob) are
 /// already on disk. Applies the patch in Rust, verifies the output against the
 /// entry's pinned sha512, caches the (reproducible) result content-addressed,

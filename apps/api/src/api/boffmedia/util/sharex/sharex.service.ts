@@ -7,15 +7,12 @@ export class SharexService {
   constructor(private db: MySQL2Service) {}
 
   /**
-   * `tokenId` is who uploaded it. It replaced a `key` column that stored the
-   * raw shared secret the client sent — the same value on every row, so it
-   * identified nobody.
+   * `tokenId` is who uploaded it — not the raw shared secret the client sent,
+   * which is the same value on every row and identifies nobody.
    *
-   * AWAITED on purpose. This used to be fire-and-forget with no `.catch()`, so
-   * a failing insert became a swallowed unhandled rejection: the upload still
-   * returned 200 with a URL and the file still landed on disk, while no row was
-   * ever written. That is exactly how the dev database drifted to a table name
-   * the schema had already renamed away from without anyone noticing.
+   * AWAITED on purpose. Fire-and-forget with no `.catch()` turns a failing
+   * insert into a swallowed unhandled rejection: the upload still returns 200
+   * with a URL and the file still lands on disk, while no row is ever written.
    */
   async createImage(
     app: string,

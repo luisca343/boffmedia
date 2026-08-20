@@ -32,11 +32,10 @@ export interface UpdateDocumentRequest {
  * Notes.
  *
  * Every mutating method takes the OWNER's uuid and proves the caller holds a
- * `rotom_user_documents` row for that note before touching it. Previously these
- * methods took an id alone and checked only that the row existed, so any caller
- * could edit, trash or permanently purge anyone else's notes by guessing an
- * integer — and the routes in front of them were `@Public()`, so no account was
- * needed either. The owner uuid now comes from the JWT, never from the request.
+ * `rotom_user_documents` row for that note before touching it. Taking an id
+ * alone and checking only that the row exists lets any caller edit, trash or
+ * permanently purge anyone else's notes by guessing an integer. The owner uuid
+ * comes from the JWT, never from the request.
  */
 @Injectable()
 export class DocumentService {

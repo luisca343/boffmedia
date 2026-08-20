@@ -155,7 +155,7 @@ export function Checkbox({
  * The range slider. Native `input[type=range]` cannot be styled by Tailwind
  * utilities (the thumb lives behind a vendor pseudo-element), so this is the one
  * place in the app that reaches for inline `<style>` — the sanctioned escape hatch
- * for what Tailwind genuinely cannot express (§6).
+ * for what Tailwind genuinely cannot express.
  */
 export function Range({
   className,

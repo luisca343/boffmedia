@@ -1,13 +1,13 @@
 import type { IconName } from "../ui"
 
 /**
- * Shapes for the handoff surfaces the API cannot feed yet.
+ * Shapes for surfaces the API cannot feed yet.
  *
- * Everything in `deferred/` is BUILT to the handoff but rendered nowhere in the live app
- * — it appears only in the component showcase, marked as deferred. The moment an
- * endpoint exists these components drop straight into the app; until then, showing them
- * would mean inventing events, discounts and player counts that do not exist
- * (SMARTROTOM_V3 §9). Registered in `docs/smartrotom/deferred/README.md`.
+ * Everything in `deferred/` is fully built but rendered nowhere in the live app — it
+ * appears only in the component showcase, marked as deferred. The moment an endpoint
+ * exists these components drop straight into the app; until then, showing them would
+ * mean inventing events, discounts and player counts that do not exist. Registered in
+ * `docs/smartrotom/deferred/README.md`.
  */
 
 export type EventType = "gym" | "market" | "raid" | "social" | "boss"
@@ -24,8 +24,8 @@ export interface TaxiEvent {
 }
 
 /**
- * Event hues are data, not theme: they live as a JS map and are applied inline (§4).
- * `labelKey` is a key id under `taxi.eventTypes` — never copy (i18n.md §Conventions).
+ * Event hues are data, not theme: they live as a JS map and are applied inline.
+ * `labelKey` is a key id under `taxi.eventTypes` — never copy.
  */
 export const EVENT_META: Record<EventType, { labelKey: EventType; icon: IconName; color: string }> = {
   gym: { labelKey: "gym", icon: "swords", color: "#a78bfa" },

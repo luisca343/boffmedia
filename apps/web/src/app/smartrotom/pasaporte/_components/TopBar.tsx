@@ -3,11 +3,11 @@
 /**
  * The document's letterhead, and nothing else.
  *
- * The handoff put a row of controls here — ornament level, motion, inspection. Those were
- * knobs on its *design harness*, not features of a passport, so they do not ship. What they
- * drove still exists: the ornament sits at its designed level, motion follows the reader's OS
- * preference, and Inspección is still reachable with the `I` key (the Rotom note on the carné
- * says so, which is the only place it needs to be said).
+ * No row of controls for ornament level, motion or inspection: those are design-harness
+ * knobs, not features of a passport. What they drove still exists — the ornament sits at
+ * its designed level, motion follows the reader's OS preference, and Inspección is
+ * reachable with the `I` key (the Rotom note on the carné says so, which is the only place
+ * it needs to be said).
  */
 export function TopBar() {
   return (

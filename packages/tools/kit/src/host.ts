@@ -91,7 +91,7 @@ export class ToolApiError extends Error {
 }
 
 /**
- * D7 — the API seam. Web resolves this to a plain `fetch` against the public
+ * The API seam. Web resolves this to a plain `fetch` against the public
  * API; the launcher routes it through an authenticated Rust proxy (the browser
  * cannot reach the OS keychain where its session JWT lives, and the webview
  * has no cookie for the API origin). Tools that need it must declare `api` in

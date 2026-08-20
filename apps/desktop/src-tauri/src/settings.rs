@@ -2,8 +2,8 @@
 // apps/desktop/src/services/types.ts.
 //
 // Plain JSON in the app CONFIG dir, deliberately not the keyring: there is no
-// secret here, and §5.7's rule is about tokens. Putting a memory slider in the
-// OS credential store would be as wrong as putting a refresh token in a file.
+// secret here. Putting a memory slider in the OS credential store would be as
+// wrong as putting a refresh token in a file.
 
 use std::path::PathBuf;
 
@@ -26,14 +26,14 @@ pub struct Settings {
     pub game_dir: String,
     pub close_on_launch: bool,
     pub keep_logs: bool,
-    /// §9 — how many previous versions stay revertible. Cheap: a retained
+    /// How many previous versions stay revertible. Cheap: a retained
     /// version is one marker (~40 KB of JSON), never a copy of the instance
     /// tree, because the blobs it names already live in the shared
     /// content-addressed cache. `#[serde(default)]` so a settings.json written
     /// by the previous build loads instead of resetting every preference.
     #[serde(default = "default_retain")]
     pub retain_versions: u32,
-    /// §9 — when true, `memory_mib` is ignored and the heap is sized by
+    /// When true, `memory_mib` is ignored and the heap is sized by
     /// `install::runtime::recommended_heap_mib` from the pack's mod count and
     /// this machine's RAM. A separate flag rather than a sentinel value in
     /// `memory_mib` so switching automatic OFF restores the number the player
@@ -55,14 +55,13 @@ pub struct Settings {
     /// `#[serde(default = "default_true")]` so old files keep the feature enabled.
     #[serde(default = "default_true")]
     pub backup_before_update: bool,
-    /// §5 (Cycle 2) — per-emulator-kind exe path overrides (`"mgba"` → path).
-    /// A manual "Locate…" writes here; detection falls back to EmuDeck/common
-    /// dirs/PATH when a kind has no override. `#[serde(default)]` so a
-    /// pre-emulator settings.json loads unchanged.
+    /// Per-emulator-kind exe path overrides (`"mgba"` → path). A manual
+    /// "Locate…" writes here; detection falls back to EmuDeck/common dirs/PATH
+    /// when a kind has no override. `#[serde(default)]` so a settings.json
+    /// without the key loads unchanged.
     #[serde(default)]
     pub emulator_paths: std::collections::HashMap<String, String>,
-    /// §3/§5 (Cycle 2) — the player's ROM-library roots, searched first by the
-    /// auto-scan. EmuDeck prompts the user for this folder, so a manual list is
+    /// The player's ROM-library roots, searched first by the auto-scan. EmuDeck prompts the user for this folder, so a manual list is
     /// the primary path (with the EmuDeck-layout drive scan only as a fallback).
     #[serde(default)]
     pub rom_dirs: Vec<String>,
@@ -87,19 +86,19 @@ fn default_pack_layout() -> String {
 impl Default for Settings {
     fn default() -> Self {
         Self {
-            // §9 asks for a heuristic rather than a constant, but 4 GiB is the
-            // floor a modern modpack needs; anything lower reads as "the
-            // launcher is broken" on first launch.
+            // The sizing heuristic replaces this for a real pack, but 4 GiB
+            // is the floor a modern modpack needs; anything lower reads as
+            // "the launcher is broken" on first launch.
             memory_mib: 4096,
-            // None = let the JVM policy find or install one (§6.3).
+            // None = let the JVM policy find or install one.
             java_path: None,
             game_dir: String::new(),
             close_on_launch: false,
             keep_logs: true,
             retain_versions: default_retain(),
             // Off by default: the launcher must not silently change a heap size
-            // a player already tuned. The per-pack panel is where §9's heuristic
-            // is offered, and Ajustes can opt the global default into it.
+            // a player already tuned. The per-pack panel is where the
+            // heuristic is offered, and Ajustes can opt the global default in.
             memory_auto: false,
             locale: default_locale(),
             pack_layout: default_pack_layout(),
@@ -138,12 +137,11 @@ impl Settings {
 /// Settings live in the SAME root as everything else (`datadir::data_root`),
 /// not in Tauri's `app_config_dir()`.
 ///
-/// On Windows those two used to be the identical directory, so the move to
-/// `%APPDATA%\Boffmedia` would have carried `settings.json` off to a folder
-/// nothing read any more — the player's memory slider and game-dir override
-/// silently back to defaults. Pointing both at one root is what keeps the
-/// migration honest, and it means "the launcher's folder" is one place a
-/// player can back up or delete.
+/// The two are NOT interchangeable: `app_config_dir()` resolves under the
+/// bundle identifier, so writing `settings.json` there puts it in a folder
+/// nothing else reads — the player's memory slider and game-dir override
+/// silently back to defaults. Pointing both at one root also means "the
+/// launcher's folder" is one place a player can back up or delete.
 fn config_path(app: &tauri::AppHandle, name: &str) -> Result<PathBuf, InstallFailure> {
     let dir = crate::datadir::data_root(app).map_err(InstallFailure::message)?;
     Ok(dir.join(name))
@@ -258,7 +256,7 @@ pub fn settings_set(app: tauri::AppHandle, settings: Settings) -> Result<Setting
     Ok(settings)
 }
 
-// ── ROM library roots (§5, Cycle 2) ──────────────────────────────────────────
+// ── ROM library roots ────────────────────────────────────────────────────────
 
 #[tauri::command]
 pub fn rom_dirs_get(app: tauri::AppHandle) -> Vec<String> {
@@ -327,9 +325,8 @@ mod tests {
         assert_eq!(s.memory_mib, 8192);
         assert_eq!(s.retain_versions(), 3);
         assert_eq!(s.java_path(), Some("/opt/jdk/bin/java"));
-        // §9's automatic sizing must default OFF for an existing player: an
-        // update that silently re-sizes a heap they tuned is a regression they
-        // cannot explain.
+        // Automatic sizing must default OFF for an existing player: silently
+        // re-sizing a heap they tuned is a change they cannot explain.
         assert!(!s.memory_auto);
     }
 

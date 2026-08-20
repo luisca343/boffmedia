@@ -18,9 +18,9 @@ export function itemLabel(item: string) {
 }
 
 /**
- * The sprite an objective shows. Kept byte-for-byte compatible with the lookup
- * the old quest log used — objective names are free text from the quest file
- * ("Poke ball: consigue 5"), and only the leading token resolves to an item.
+ * The sprite an objective shows. Objective names are free text from the quest
+ * file ("Poke ball: consigue 5"), and only the leading token resolves to an
+ * item.
  */
 export const objectiveSprite = (objective: Pick<IQuestObjective, "name">) =>
   objective.name.split(":")[0].toLowerCase().replace(" ", "_")

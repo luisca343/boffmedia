@@ -12,8 +12,8 @@ import { ACCENTS, type RookerAccent } from "../_utils/display"
  * "Pantalla" — Rooker's display settings, modelled on the dialog Twitter ships.
  *
  * The one thing it deliberately does NOT offer is light vs dark. That belongs to the
- * platform (Ajustes → Temas), and an app that kept its own copy would fight the picker
- * (SMARTROTOM_V3 §2b). What the reader chooses here is *which dark* — Tenue or Oscuro —
+ * platform (Ajustes → Temas), and an app that kept its own copy would fight the picker.
+ * What the reader chooses here is *which dark* — Tenue or Oscuro —
  * and that row is disabled in light mode, with a line saying where the switch actually
  * lives. Everything else (accent, face, density, card style, reactions) is Rooker's own
  * identity and has no platform equivalent.
@@ -127,7 +127,7 @@ export function DisplayPanel({ compact = false }: { compact?: boolean }) {
                     aria-label={t(`display.accents.${key}`)}
                     aria-pressed={on}
                     // The swatch IS the accent, so its colour is a runtime value and
-                    // must be inline — a `bg-rk-${key}` class would never compile (§4).
+                    // must be inline — a `bg-rk-${key}` class would never compile.
                     style={{ background: `rgb(${ACCENTS[key].rgb})` }}
                     className={cn(
                       "grid h-9 w-9 place-items-center rounded-full transition-transform hover:scale-110",

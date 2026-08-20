@@ -145,7 +145,7 @@ export class TeamsRepository {
             boffMediaParticipantProgress.achievementId,
           ),
           // Only this event's achievements: a member's points from unrelated
-          // events used to inflate the team score.
+          // events would inflate the team score.
           eq(boffMediaAchievements.eventId, boffMediaEventTeams.eventId),
           isNull(boffMediaAchievements.deletedAt),
         ),

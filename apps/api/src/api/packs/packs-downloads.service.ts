@@ -18,7 +18,7 @@ import { firstValueFrom } from 'rxjs';
 import { env } from '@/config/env';
 import { laboonPath } from '@/config/laboon';
 
-// HANDOFF §4.5 — every CurseForge byte is proxied. The key stays here because an
+// Every CurseForge byte is proxied. The key stays here because an
 // embedded key is an extracted key, and an abused key is a revoked key, which
 // would break the launcher for every user at once. Modrinth and plain URLs are
 // NOT proxied: they need no key and the egress would be ours for nothing.
@@ -29,9 +29,8 @@ const CF_API = 'https://api.curseforge.com/v1';
  *  launcher releases. Checked as the bytes stream in, never after. */
 const MAX_BLOB_BYTES = 512 * 1024 * 1024;
 
-/** §3.2 / §10 — as of 16 July 2026 `edge.forgecdn.net` answers 401 to any
- *  request without this header. It is a header, never a query parameter; any
- *  recipe older than mid-2026 is broken on exactly this. */
+/** `edge.forgecdn.net` answers 401 to any request without this header. It is a
+ *  header, never a query parameter. */
 const CF_KEY_HEADER = 'x-api-key';
 
 export interface ProxiedDownload {
@@ -71,7 +70,7 @@ export class PacksDownloadsService {
     const response = await firstValueFrom(
       this.http.get<Readable>(url, {
         responseType: 'stream',
-        // The CDN itself needs the key too, not just the API host (§10).
+        // The CDN itself needs the key too, not just the API host.
         headers: { [CF_KEY_HEADER]: key },
         timeout: 30_000,
         maxRedirects: 5,
@@ -161,7 +160,7 @@ export class PacksDownloadsService {
       });
     }
     if (response.status === 404 || !response.data?.data) {
-      // §3.2 — `allowModDistribution: false`. There is no programmatic download
+      // `allowModDistribution: false`. There is no programmatic download
       // for these at all, so the launcher has to show a manual-download link.
       // This is not an edge case; it happens in most large packs.
       throw new NotFoundException({
@@ -174,11 +173,10 @@ export class PacksDownloadsService {
   }
 
   /**
-   * Override blobs. §7.2 asks for short-TTL presigned URLs, which presupposes
-   * object storage; we have none — blobs are plain files under PACK_BLOB_DIR —
-   * so there is nothing to presign and this streams them through the guard
-   * instead. Same property (never a public URL, always entitlement-checked),
-   * one fewer moving part. Swap this for a presign the day blobs move to S3.
+   * Override blobs. Presigned URLs would presuppose object storage; blobs are
+   * plain files under PACK_BLOB_DIR, so there is nothing to presign and this
+   * streams them through the guard instead — never a public URL, always
+   * entitlement-checked. Swap for a presign the day blobs move to S3.
    */
   async override(blobSha512: string): Promise<ProxiedDownload> {
     // Caller-validated hex, but re-asserted here: this value becomes a path

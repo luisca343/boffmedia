@@ -9,11 +9,10 @@ import { formatMoney, formatNum, relativeTime } from "../../_utils/format"
 /**
  * Cartera — the player's StarBank balance and their real recent movements.
  *
- * The handoff sold coin packs here for euros ("0,99 €", "Mejor valor"). There is no such
- * product: no packages endpoint, no payment provider, no prices. Inventing a storefront
- * — especially one that takes money — is exactly the fabrication SMARTROTOM_V3 §9
- * forbids, so the top-up grid is deferred and the wallet is a truthful statement
- * instead: what you have, and where it went.
+ * No coin packs and no top-up grid: there is no packages endpoint, no payment
+ * provider and no prices behind them. Inventing a storefront — especially one
+ * that takes money — would be fabricating a product, so the wallet states only
+ * what is true: what you have, and where it went.
  */
 export function WalletModal({
   balance,

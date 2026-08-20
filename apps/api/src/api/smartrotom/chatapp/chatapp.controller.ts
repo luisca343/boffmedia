@@ -76,8 +76,8 @@ export class ChatappController {
     @CurrentMcUuid() uuid: string,
   ): Promise<number> {
     const createChatRequest: CreateChatRequest = {
-      // The creator is the caller. It used to be `dto.player`, i.e. whoever the
-      // client said it was.
+      // The creator is the caller, never `dto.player` — that is whoever the
+      // client says it is.
       player: uuid,
       users: createChatDto.users,
       name: createChatDto.name ?? '',

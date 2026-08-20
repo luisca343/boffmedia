@@ -136,7 +136,7 @@ export function CartasView({ data, effective, initialQ, onOpenCard }: Props) {
           // `sid` comes off the cards (`c.setId`), while `data.sets` is keyed by the
           // grouped endpoint's `setId` — the two can disagree (promos, a group that
           // came back without a setId). Fall back to this group's own cards instead
-          // of asserting the set exists; the `!` here used to crash the whole view.
+          // of asserting the set exists — a `!` here crashes the whole view.
           const s = data.sets.find((x) => x.id === sid)
           const pool = s?.cards ?? cards
           const have = pool.filter((c) => effective(c.id) > 0).length

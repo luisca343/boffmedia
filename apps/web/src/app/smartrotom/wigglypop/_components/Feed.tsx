@@ -28,7 +28,7 @@ const SORTS: Array<[WpSort, string]> = [
   ["ending", "feed.sortEnding"],
 ]
 
-/** The discovery grid. A thin orchestrator (§12) — the filters live in the store,
+/** The discovery grid. A thin orchestrator — the filters live in the store,
  *  the fetching in `_hooks/queries`, and every card is a `ListingCard`. */
 export function Feed() {
   const t = useTranslations("wigglypop")

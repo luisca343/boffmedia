@@ -232,9 +232,9 @@ export default function NotesEditor(props: NotesEditorProps) {
     return () => mo.disconnect();
   }, []);
 
-  // Typography prefs ride as classes on the editable, exactly like the old
-  // .nt-doc — but through the view writer: CKEditor's renderer owns the
-  // editable's class attribute and wipes direct classList edits on refocus.
+  // Typography prefs ride as classes on the editable, applied through the view
+  // writer: CKEditor's renderer owns the editable's class attribute and wipes
+  // direct classList edits on refocus.
   useEffect(() => {
     const ed = editorRef.current;
     if (!ed) return;
@@ -279,7 +279,7 @@ export default function NotesEditor(props: NotesEditorProps) {
 
         editor.model.document.on("change:data", () => cb.current.onDirty());
 
-        // Blur = the old editor's commit-on-blur.
+        // Blur commits.
         editor.ui.focusTracker.on("change:isFocused", (_e: unknown, _n: unknown, focused: boolean) => {
           if (!focused) editor.plugins.get("Autosave").save();
         });

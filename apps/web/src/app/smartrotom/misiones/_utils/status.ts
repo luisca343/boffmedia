@@ -37,7 +37,7 @@ export const STATUS_GLYPH: Record<SealStatus, string> = {
 /**
  * Wax colour as a CSS value — these go into SVG `fill`, which Tailwind cannot
  * reach, so they are read from the token vars and applied as attributes. Legal
- * per SMARTROTOM_V3.md §4 (data-driven value), unlike a `bg-ms-seal-${s}` class.
+ * as a data-driven value, unlike a `bg-ms-seal-${s}` class.
  */
 export const SEAL_FILL: Record<SealStatus, string> = {
   ACTIVE: "rgb(var(--ms-seal-active))",

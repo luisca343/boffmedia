@@ -18,7 +18,7 @@ export interface GameTopBarProps {
 
 // The accent lights the whole cabinet head: the marquee underline, its bloom and
 // the back button's frame. Full literal classes — `border-b-ar-${accent}` would
-// silently never compile (SMARTROTOM_V3.md §4).
+// silently never compile.
 const ACCENT: Record<GameAccent, { bar: string; back: string }> = {
   cyan: {
     bar: "border-b-ar-cyan/[.35] shadow-[0_0_18px_rgb(var(--ar-cyan)/.2)]",
@@ -47,8 +47,8 @@ const ACCENT: Record<GameAccent, { bar: string; back: string }> = {
  * the machine's controls. Pair it with `GameStage`, which draws the cabinet body
  * underneath and continues its frame.
  *
- * The handoff also hangs a coin balance here — the arcade has no currency
- * endpoint, so it is not rendered (docs/smartrotom/deferred/arcade.md).
+ * No coin balance hangs here: the arcade has no currency endpoint
+ * (docs/smartrotom/deferred/arcade.md).
  */
 export function GameTopBar({ title, accent = "cyan", onHelp, onReset, actions }: GameTopBarProps) {
   const t = useTranslations("arcade")

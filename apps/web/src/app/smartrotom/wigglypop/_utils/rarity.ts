@@ -5,7 +5,7 @@ import type { WpRarity } from "../_types/market.types"
  * tiers — so every rarity-dependent class here is a **literal string in a map**.
  * Building them (`text-wp-rarity-${rarity}`) would silently never compile:
  * Tailwind's JIT only sees literal strings, and the style would just vanish with
- * no error (SMARTROTOM_V3.md §4, audit gap G2).
+ * no error.
  */
 
 /** Values are i18n key suffixes, not text — resolve with `t()`. */

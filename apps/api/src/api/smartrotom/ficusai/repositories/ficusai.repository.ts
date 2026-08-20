@@ -34,9 +34,9 @@ export class FicusAIRepository
   }
 
   async delete(id: number): Promise<boolean> {
-    // Hard delete: the table has no soft-delete column any more. It used to,
-    // and only `countByUuid` honoured it — every read that fed the model kept
-    // returning "deleted" messages, so clearing a conversation did nothing.
+    // Hard delete: the table has no soft-delete column. With one, only
+    // `countByUuid` honoured it — every read feeding the model still returned
+    // "deleted" messages, so clearing a conversation did nothing.
     const result = await this.db
       .delete(ficusAiMessages)
       .where(eq(ficusAiMessages.id, id));

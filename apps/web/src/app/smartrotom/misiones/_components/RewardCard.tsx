@@ -8,11 +8,10 @@ import { ItemSprite } from "./ui"
  * One reward on the open letter: the item's real sprite, its name and how many
  * of it the encargo pays.
  *
- * [deferred] The handoff gives every item a rarity (común → legendario) and
- * dresses the card in its colour, stars and a shimmer sweep. The quest API has
- * no rarity — a reward is `{ item, count }` — so the tier is left out entirely
- * rather than guessed from the item id. `rarity` stays off this component's
- * props until the game exposes it. See docs/smartrotom/deferred/README.md.
+ * [deferred] No rarity tier, colour, stars or shimmer: the quest API has no
+ * rarity — a reward is `{ item, count }` — so it is left out rather than
+ * guessed from the item id. `rarity` stays off this component's props until the
+ * game exposes it. See docs/smartrotom/deferred/README.md.
  */
 export function RewardCard({ reward }: { reward: IQuestReward }) {
   return (

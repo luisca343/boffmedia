@@ -13,12 +13,12 @@ import type { RookerCapture } from "../../_types"
  * Every field on this card comes from a real `rotom_pokedex` row: the species, the
  * shiny palette, and when it was caught. That is *all* the registry stores.
  *
- * [deferred] The handoff's card also showed level, nature, capture location, ball type
- * and an IV meter. None of those exist — the Pokédex registry has no such columns, and
- * the Pixelmon server does not expose them per-capture — so rather than invent numbers
- * that would look authoritative and be fiction, the card drops those rows entirely and
- * leans on the sprite. Registered in docs/smartrotom/deferred/README.md; if the game
- * server ever exposes them, they slot straight back into this grid.
+ * [deferred] No level, nature, capture location, ball type or IV meter: the Pokédex
+ * registry has no such columns and the Pixelmon server does not expose them
+ * per-capture. Inventing numbers that would look authoritative and be fiction is worse
+ * than a shorter card, so it drops those rows entirely and leans on the sprite.
+ * Registered in docs/smartrotom/deferred/README.md; if the game server ever exposes
+ * them, they slot straight back into this grid.
  *
  * A shiny gets the full treatment — cyan border, sheen crawling across the art, sparkle
  * — because that IS the moment worth posting about, and the registry does know.

@@ -1,10 +1,10 @@
 import type { Namespace } from "./manifest.generated"
 
 /**
- * The header carrying the request pathname. Set by `src/proxy.ts` — Next 16 renamed
- * the hook, so a `middleware.ts` here does NOT run and 404s every route (see
- * docs/I18N_PLAN.md §0). It stays absent on requests the proxy skips (static files,
- * `_next`), and `namespacesFor` then loads every namespace rather than guessing.
+ * The header carrying the request pathname. Set by `src/proxy.ts`: on Next 16 a
+ * `middleware.ts` here does NOT run and 404s every route. The header stays absent
+ * on requests the proxy skips (static files, `_next`), and `namespacesFor` then
+ * loads every namespace rather than guessing.
  */
 export const PATHNAME_HEADER = "x-pathname"
 
@@ -23,7 +23,7 @@ export const SCOPED_NAMESPACES: ReadonlyArray<{
   namespaces: readonly Namespace[]
 }> = [
   {
-    // 425 KB of Pokémon data — 69% of what every page used to ship.
+    // 425 KB of Pokémon data — 69% of the payload if every page ships it.
     prefix: "/smartrotom/pokedex",
     namespaces: [
       "smartrotom/pokedex/abilities.json",

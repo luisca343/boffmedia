@@ -6,11 +6,10 @@ import { getRandomTeam } from '../_utils/teams';
  * Runs a full random battle to completion to trace the stream data flow.
  *
  * Everything this test starts MUST be torn down through `finish()`. It shares a
- * process with every other suite under `--runInBand`, and it previously left its
- * 30s safety timer armed after the battle had already been won: the timer fired
- * ~30s later, inside whatever unrelated suite was running by then, and failed it
- * with an empty body ("Caught error after test environment was torn down").
- * The victim differed run to run, which is what made it look like a random flake.
+ * process with every other suite under `--runInBand`, so a 30s safety timer left
+ * armed after the battle is won fires inside whatever unrelated suite is running
+ * by then and fails it with an empty body ("Caught error after test environment
+ * was torn down"). The victim differs run to run, which reads as a random flake.
  */
 describe('BattleRoom — diagnostic', () => {
   it('should trace the stream data flow', (done) => {

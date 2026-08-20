@@ -1,7 +1,7 @@
 /**
  * @boffmedia/tools-mhwilds — the Monster Hunter Wilds tool domain.
  *
- * Host-agnostic by contract (see the plan's §3): no `next/*`, no `next-intl`,
+ * Host-agnostic by contract: no `next/*`, no `next-intl`,
  * no `@/` imports, no `@tauri-apps/*`. Game data goes through
  * `@boffmedia/tool-kit`'s `api` capability; translation rides on
  * `@boffmedia/ui`'s `configureUi`.

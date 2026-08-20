@@ -14,13 +14,13 @@ import { cn } from "@/lib/utils"
  * introducing a second service. It renders on demand from the uuid: there is no stored asset
  * and nothing to fake.
  *
- * When the render is unavailable the frame stays EMPTY. It used to fall back to a hand-drawn
- * pixel figure, which is a lie on an identity document — a passport carrying a stranger's face
- * is worse than one carrying none. An unphotographed holder gets "SIN FOTOGRAFÍA", which is
- * what a registry would actually print.
+ * When the render is unavailable the frame stays EMPTY. Never fall back to a drawn
+ * figure: a passport carrying a stranger's face is worse than one carrying none.
+ * An unphotographed holder gets "SIN FOTOGRAFÍA", which is what a registry would
+ * actually print.
  *
  * Not `next/image`: the render already comes back at the requested size, and the optimiser
- * would resample pixel art (§10).
+ * would resample pixel art.
  */
 export function PassportPhoto({
   uuid,

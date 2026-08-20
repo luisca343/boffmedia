@@ -20,8 +20,8 @@ function useSheetCtx() {
 /**
  * The sr-* chrome's own side/top drawer, skinned over the shared `ModalShell`
  * (portal, Escape, scrim dismiss, scroll lock, focus trap/restore, dialog semantics
- * all come free from there — SMARTROTOM_V3 §2). Replaces the Radix `Sheet` family
- * the chrome borrowed from Boffmedia; same open/close contract.
+ * all come free from there). Same open/close contract as the Radix `Sheet`
+ * family it stands in for.
  */
 export function SrSheet({ children }: { children: ReactNode }) {
   const [open, setOpen] = useState(false)

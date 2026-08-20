@@ -52,10 +52,8 @@ const LAYOUT_VERSION: &str = "2";
 /// `instances/<slug>/.minecraft/*` → `instances/<slug>/`, and
 /// `instances/<slug>/bin` → `instances/<slug>/.boff-bin`.
 ///
-/// The `BoffLauncher` → `Boffmedia` tree migration that used to run first was
-/// removed before the first public release: it existed for installs that never
-/// shipped, and carrying a rename shim for a name no user ever had is how dead
-/// paths survive forever.
+/// Deliberately no rename shim for app-data trees that never shipped: carrying
+/// one for a name no user ever had is how dead paths survive forever.
 ///
 /// Best-effort by design: a failure here must never stop the app from starting,
 /// so every problem is logged and the rest of the work continues. The worst case

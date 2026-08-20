@@ -11,8 +11,8 @@ import { SatchelSlot } from "../_components/SatchelSlot"
 /**
  * La Mochila — every reward any quest hands out, aggregated into one ledger.
  * No rarity tally here: the API has no rarity, so the only split that means
- * anything is reclaimed vs. still out there (SMARTROTOM_V3.md brief, §"defer
- * non-API fields").
+ * anything is reclaimed vs. still out there; a field the API does not serve is
+ * deferred rather than invented.
  */
 export default function MochilaPage() {
   const t = useTranslations("misiones.mochila")

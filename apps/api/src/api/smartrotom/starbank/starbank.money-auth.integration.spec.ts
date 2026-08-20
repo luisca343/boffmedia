@@ -196,9 +196,9 @@ describe('starbank money auth — ENFORCE_MONEY_AUTH contract', () => {
   });
 
   describe('a website session', () => {
-    // The regression guard for the missing `mcUuid` claim: the identity has to
-    // survive login -> JWT -> JwtStrategy -> resolveActor. When it did not,
-    // `assertActsAsSelf` silently skipped every ownership check.
+    // Guards the `mcUuid` claim: the identity has to survive
+    // login -> JWT -> JwtStrategy -> resolveActor. Drop it anywhere along that
+    // chain and `assertActsAsSelf` silently skips every ownership check.
     it('reaches the facade as an identified, non-server actor', async () => {
       const res = await request(app.getHttpServer())
         .post(TRANSFER)

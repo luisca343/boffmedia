@@ -6,14 +6,14 @@ import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
 import { rotomInventory, RotomInventoryItem } from '@/_db/schema/SmartRotom';
 import { CajaSource } from '../dto/claim-caja.dto';
 
-/** How long a reservation stays exclusive before its rows become reclaimable (DARCAJA.md §7). */
+/** How long a reservation stays exclusive before its rows become reclaimable. */
 export const RESERVATION_TTL_MINUTES = 5;
 
 /**
  * The single spend path for `rotom_inventory`. Two shapes: one-shot (`spend`/`spendByIds`)
  * marks `used` on read, so a failed delivery loses the reward; two-phase
  * (`reserve` → `confirm`, the mod path) soft-locks first, and an unconfirmed reservation
- * expires after the TTL and frees its rows, so a dropped delivery loses nothing (DARCAJA.md §7).
+ * expires after the TTL and frees its rows, so a dropped delivery loses nothing.
  *
  * `used` is read two ways: mine as a flag (`used = 0`), arcade as a counter (`amount > used`).
  * They only agree at amount 1, and mine rows can be up to 8 — so both shapes select on

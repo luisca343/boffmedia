@@ -1,6 +1,6 @@
 /**
  * Furret Today (`ft-*`) primitive library — the pop-art magazine kit.
- * Import from the barrel, never by deep path (SMARTROTOM_V3.md §1).
+ * Import from the barrel, never by deep path.
  */
 export { Avatar } from "./Avatar";
 export { Button } from "./Button";

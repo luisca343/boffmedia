@@ -44,7 +44,7 @@ import { EmptyState, Folio, Paper, toast } from "./ui"
  * StPageFlip measures the DOM on construction, so it cannot run on the server. It is loaded
  * here directly rather than through `@/components/shared/book` — that wrapper is
  * Boffmedia-styled and pulls in framer-motion and a stylesheet, neither of which belongs in
- * a SmartRotom app (§3, §6, §11).
+ * a SmartRotom app.
  */
 const HTMLFlipBook = dynamic(() => import("react-pageflip"), { ssr: false }) as ComponentType<
   ComponentProps<typeof FlipBook>
@@ -105,9 +105,9 @@ export function PassportBook() {
 
   /**
    * The leaves, as a NAMED list. Every jump in the book resolves a key to an index through
-   * this — the handoff's model — because index arithmetic over a list whose length depends
-   * on how many badges the trainer has earned is how a book ends up flipping to the wrong
-   * page for one player in ten.
+   * this, because index arithmetic over a list whose length depends on how many badges the
+   * trainer has earned is how a book ends up flipping to the wrong page for one player in
+   * ten.
    */
   const pages = useMemo<PageDescriptor[]>(() => {
     const list: PageDescriptor[] = [{ key: "cover", kind: "cover", accent: "gild", hard: true }]
@@ -265,7 +265,7 @@ export function PassportBook() {
    * them — while React still believes they hang off the wrapper it rendered. So a children array
    * rebuilt on every render tears the book's DOM out from under React mid-flip, and the next
    * reconciliation that removes a leaf calls `removeChild` on a parent that no longer holds it.
-   * Everything volatile — the open page, the lamp — is therefore read INSIDE the leaves (§7), so
+   * Everything volatile — the open page, the lamp — is therefore read INSIDE the leaves, so
    * this array only changes when the data behind the book does.
    */
   const leaves = useMemo(() => {

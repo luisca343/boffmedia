@@ -9,12 +9,11 @@ import { Seg } from "../_components/ui"
 type Kind = "mon" | "item"
 
 /**
- * Vender. A thin orchestrator (§12) over the two listing flows.
+ * Vender. A thin orchestrator over the two listing flows.
  *
- * There is no "Lote" tab. The handoff drew one, and the backend supports bundles —
- * but a bundle composer that lets you stake several Pokémon at once is a much bigger
- * commitment surface than a single sale, and it is not worth shipping half of it.
- * Registered in `docs/smartrotom/deferred/`.
+ * There is no "Lote" tab. The backend supports bundles, but a composer that stakes
+ * several Pokémon at once is a much bigger commitment surface than a single sale, and
+ * half of it is not worth shipping. Registered in `docs/smartrotom/deferred/`.
  */
 export default function SellPage() {
   const t = useTranslations("wigglypop")

@@ -47,8 +47,8 @@ export class DungeonRunParticipantDto {
 
 /**
  * The wire shape is the mod's, not ours — field names are Spanish because
- * `DungeonRunBodyTest` in the Teras repo pins them (docs/DUNGEONS.md §9). Renaming one
- * here fails that test rather than silently dropping a column.
+ * `DungeonRunBodyTest` in the Teras repo pins them. Renaming one here fails
+ * that test rather than silently dropping a column.
  *
  * Extends BaseDto for the `server` field: this route keeps the `MinecraftMiddleware`
  * tripwire (the mod does send `server`), so it is NOT on the exclude list in app.module.

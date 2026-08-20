@@ -4,10 +4,9 @@ import type { Region } from "@boffmedia/shared"
 /**
  * The world's real WorldGuard regions, drawn as the map's landmass.
  *
- * The handoff painted five invented "biome zones" at invented coordinates to give the
- * placeholder map a sense of place. We don't need the invention: the server already
- * knows the shape of every town, plot and protected area, so those polygons ARE the
- * sense of place — and a player recognises their own town on the map.
+ * No invented "biome zones" at invented coordinates: the server already knows the shape
+ * of every town, plot and protected area, so those polygons ARE the sense of place — and
+ * a player recognises their own town on the map.
  *
  * Drawn in WORLD coordinates inside a single transformed `<g>`, so panning and zooming
  * is one matrix update rather than a reprojection of every vertex on every frame.

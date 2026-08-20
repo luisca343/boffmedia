@@ -298,7 +298,19 @@ export function ProfileView({
                 onUnlink={handleUnlink}
                 // A fresh link changes mcLinked and the SmartRotom half of the
                 // session, neither of which the page can know about otherwise.
-                onMinecraftLinked={() => window.location.reload()}
+                //
+                // `update()` FIRST, and awaited: a bare reload re-runs the jwt
+                // callback with `trigger === undefined`, which deliberately does
+                // NOT refetch (see authOptions — refetching on every page load
+                // caused a refresh storm). The cookie would keep its pre-link
+                // claims, `smartRotomUser` would stay undefined for up to 55
+                // minutes, and the account would read as unlinked however many
+                // times the player reloaded. Only `trigger === 'update'` pulls
+                // the new SmartRotom identity down.
+                onMinecraftLinked={async () => {
+                  await update()
+                  window.location.reload()
+                }}
               />
 
               <Panel title={t("section.activity")}>

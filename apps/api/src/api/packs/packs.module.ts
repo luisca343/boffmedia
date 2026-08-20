@@ -28,7 +28,7 @@ import { PacksService } from './packs.service';
     BoffMediaUsersModule,
     // The one query that resolves a pack to its randomizer config.
     RandomizerPackLinkModule,
-    // The CurseForge API/CDN proxy (§4.5).
+    // The CurseForge API/CDN proxy.
     HttpModule,
   ],
   controllers: [PacksController, LauncherController, DesktopAuthController],

@@ -15,7 +15,7 @@ import { playtime } from "../../_utils/stats"
 import { PassportPhoto } from "../PassportPhoto"
 import { Icon, PageHead, Skeleton, toast } from "../ui"
 
-/** The laminate itself: guilloché over a pale blue wash. Multi-layer, so it is an inline style (§6). */
+/** The laminate itself: guilloché over a pale blue wash. Multi-layer, so it is an inline style. */
 const LAMINATE = {
   background: "linear-gradient(135deg, #eaf0f8, #dde8f4 48%, #cedcee)",
 }

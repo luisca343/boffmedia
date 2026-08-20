@@ -15,8 +15,8 @@ const logger = pino({ name: 'packs-dev-seed' });
 
 // Test fixtures for the launcher's install+launch path. Both packs are `public`
 // so no ACL grant or invite is needed to see them — the point here is to
-// exercise download → install → launch, not the entitlement gate (§7.2, which
-// has its own tests).
+// exercise download → install → launch, not the entitlement gate, which has
+// its own tests.
 //
 // Deliberately no `override` files: no blob upload route exists yet
 // (TODO(pack-blob-upload)), so an override source would 404 mid-install.

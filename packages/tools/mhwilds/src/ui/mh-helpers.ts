@@ -40,7 +40,7 @@ export const ELEMENT_COLOR: Record<string, string> = {
 }
 export const elementColor = (type?: string) => (type ? ELEMENT_COLOR[type.toLowerCase()] || "var(--muted)" : "var(--muted)")
 
-// skill category → left-accent colour (mirrors the handoff sk-* ramp)
+// skill category → left-accent colour (the sk-* ramp)
 export const SK_COLOR: Record<string, string> = {
   attack: "#ff7a5c",
   element: "var(--info)",

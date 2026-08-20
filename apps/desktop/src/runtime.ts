@@ -109,7 +109,7 @@ export async function getRuntimeInfo(): Promise<RuntimeInfo | null> {
   }
 }
 
-// ── Auth (HANDOFF §5) ──────────────────────────────────────────────────────
+// ── Auth ───────────────────────────────────────────────────────────────────
 // The Rust side owns every token. What crosses this boundary is a code to show
 // the user and, afterwards, a uuid + username — never an access or refresh
 // token.
@@ -146,7 +146,7 @@ function asFailure(err: unknown): AuthFailure {
     // expired session and fire a spurious Microsoft sign-in prompt + retry.
     needsSignin: e?.needs_signin === true,
     // Carried through so the caller can map a machine code (randomizer_*,
-    // store_error) to its own message; asFailure used to drop it.
+    // store_error) to its own message. asFailure must not drop it.
     code: e?.code,
   }
 }
@@ -172,8 +172,8 @@ export async function authAwait(): Promise<Account> {
 }
 
 /** Silent sign-in from the stored refresh token. `null` = no stored session.
- *  A THROW means the credential store itself failed, which §5.7 insists must
- *  not be mistaken for a first run. */
+ *  A THROW means the credential store itself failed, which must not be
+ *  mistaken for a first run. */
 export async function authRestore(): Promise<Account | null> {
   if (!isDesktop()) return null
   try {
@@ -336,9 +336,10 @@ export async function boffOffline(): Promise<BoffAccount> {
   }
 }
 
-/** Re-run `/me` against the stored active Boffmedia token — the fix for "packs
- *  stopped loading / 401" mid-session. Resolves to the live account, or null
- *  when the session is gone and BoffSignIn is due. */
+/** Re-run `/me` against the stored active Boffmedia token, so a session that
+ *  died mid-use surfaces as a sign-in rather than as "packs stopped loading".
+ *  Resolves to the live account, or null when the session is gone and
+ *  BoffSignIn is due. */
 export async function boffRevalidate(): Promise<BoffAccount | null> {
   if (!isDesktop()) return MOCK_BOFF_ACCOUNT
   try {
@@ -451,7 +452,7 @@ export async function copyText(text: string): Promise<boolean> {
   }
 }
 
-// ── Pack registry (HANDOFF §7) ─────────────────────────────────────────────
+// ── Pack registry ──────────────────────────────────────────────────────────
 // The HTTP lives in Rust: minting a pack session needs the Minecraft access
 // token for Mojang's join handshake, and that token never crosses this
 // boundary. What comes back is already access-filtered by the server.
@@ -550,7 +551,8 @@ export async function playtimeGet(): Promise<Record<string, number>> {
 }
 
 /** The manifest to install from — already validated against the generated
- *  schema types on the Rust side, so this is the exact shape §6 will read. */
+ *  schema types on the Rust side, so this is the exact shape the installer
+ *  will read. */
 export async function packManifest(
   packId: string,
   password?: string,
@@ -578,7 +580,7 @@ export async function packManifestCached(slug: string): Promise<unknown | null> 
   }
 }
 
-/** Redeem an invite code (§7.3); resolves to the pack id it unlocked. */
+/** Redeem an invite code; resolves to the pack id it unlocked. */
 export async function inviteRedeem(code: string): Promise<string> {
   try {
     return await invoke<string>("invite_redeem", { code })
@@ -587,7 +589,7 @@ export async function inviteRedeem(code: string): Promise<string> {
   }
 }
 
-// ── Install / launch (HANDOFF §6) ──────────────────────────────────────────
+// ── Install / launch ───────────────────────────────────────────────────────
 // Progress and game output arrive as Tauri events, never as return values: an
 // install is minutes long and the renderer must paint while it runs.
 //
@@ -725,7 +727,7 @@ export async function launchPack(packId: string, manifest: unknown): Promise<num
     await mockInstall(packId)
     busEmit<GameState>(EVENT_GAME_STATE, { kind: "running", pid: 4821, since: Date.now() })
     for (const line of mockLogs()) busEmit<LogLine>(EVENT_GAME_LOG, line)
-    // §9 — `?crash=1` replays a crashed session so the diagnosis UI is
+    // `?crash=1` replays a crashed session so the diagnosis UI is
     // developable in a browser. Opt-in, because the default mock must still
     // exercise the running state.
     if (new URLSearchParams(location.search).get("crash") === "1") {
@@ -791,7 +793,7 @@ export async function repairInstance(slug: string): Promise<ScannedInstallState>
   }
 }
 
-// ── §9: locked vs. user space, and version rollback ────────────────────────
+// ── Locked vs. user space, and version rollback ────────────────────────────
 // The Rust side keeps a MANAGED file set in the instance marker: everything the
 // launcher installed. Anything else under `.minecraft` is the player's and is
 // never touched, which is what lets an update delete a mod that left the pack
@@ -904,7 +906,7 @@ export async function instanceOptionalSet(
   }
 }
 
-// ── §9: per-instance Java runtime + memory ─────────────────────────────────
+// ── Per-instance Java runtime + memory ─────────────────────────────────────
 // The numbers are decided in Rust (install/runtime.rs), which is the only side
 // that can read physical RAM and the instance marker. What follows is the
 // bridge, plus a browser-mode simulation faithful enough that the three-state
@@ -1518,10 +1520,10 @@ export async function iconSrc(url: string): Promise<string | null> {
     }
     return data
   } catch (err) {
-    // Non-fatal — the caller falls back to the remote URL — but no longer
-    // invisible. Three different faults (the command missing, the download
-    // failing, the cache being unwritable) all used to look like a blank
-    // square, and only this message tells them apart.
+    // Non-fatal — the caller falls back to the remote URL — but not silent.
+    // Three different faults (the command missing, the download failing, the
+    // cache being unwritable) all present as a blank square, and only this
+    // message tells them apart.
     const detail = (err as { message?: string })?.message ?? String(err)
     console.error("icon_cache failed for", url, err)
     iconFailureSink?.(`No se pudo cachear el icono ${url}: ${detail}`)
@@ -1620,8 +1622,8 @@ export async function backupDelete(slug: string, id: string): Promise<void> {
 export type ImportMrpackResult = {
   manifest: PackManifest
   /** True when the imported pack's name collided with one already in the
-   *  library and was renamed with a suffix (spec D4) — show a non-blocking
-   *  notice, never a silent rename. */
+   *  library and was given a suffix — show a non-blocking notice, never a
+   *  silent rename. */
   renamed: boolean
 }
 
@@ -1757,7 +1759,7 @@ export async function localPackWorldRemove(slug: string, folder: string): Promis
   }
 }
 
-// ── Emulators (Cycle 2) ────────────────────────────────────────────────────
+// ── Emulators ──────────────────────────────────────────────────────────────
 
 /** Get the current status of an emulator (resolved path and source, or stale override). */
 export async function emulatorStatus(kind: "mgba" | "melonds"): Promise<any> {

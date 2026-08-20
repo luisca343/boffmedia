@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { createPortal } from "react-dom"
 import { cn } from "../cn"
 import { useT } from "../i18n"
 import { Icon } from "./icon"
@@ -63,9 +64,12 @@ export function Modal({ open, onClose, title, aside, footer, size, className, bo
     }
   }, [open])
 
-  if (!open) return null
+  if (!open || typeof document === "undefined") return null
 
-  return (
+  // Portalled to <body>: an ancestor with `clip-path` (every `.cut-corner` Panel
+  // and Card) both clips the overlay and becomes the containing block for its
+  // `fixed` positioning, so an in-place modal renders trapped inside the card.
+  return createPortal(
     // items-start + my-auto on the panel centers short modals but top-aligns tall ones;
     // place-items-center pushes a taller-than-viewport panel above the scroll origin, unreachable.
     <div
@@ -113,6 +117,7 @@ export function Modal({ open, onClose, title, aside, footer, size, className, bo
           </footer>
         )}
       </div>
-    </div>
+    </div>,
+    document.body,
   )
 }

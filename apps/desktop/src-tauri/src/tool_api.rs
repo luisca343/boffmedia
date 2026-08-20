@@ -1,15 +1,15 @@
-//! The desktop half of `@boffmedia/tool-kit`'s `api` capability (plan D7).
+//! The desktop half of `@boffmedia/tool-kit`'s `api` capability.
 //!
-//! Tools ported out of `apps/web` used to call the API straight from the page,
-//! where the browser's cookie for the API origin *was* the session. The webview
-//! has no such cookie — the launcher's session is a device-flow JWT living in
-//! the OS credential store, which JavaScript deliberately cannot read. So every
-//! tool API call is proxied through here, and Rust attaches the bearer.
+//! A tool cannot call the API straight from the page here. In a browser the
+//! cookie for the API origin *is* the session; the webview has no such cookie —
+//! the launcher's session is a device-flow JWT in the OS credential store, which
+//! JavaScript deliberately cannot read. So every tool API call is proxied
+//! through here and Rust attaches the bearer.
 //!
 //! Auth is OPTIONAL by default, and that is the point rather than an oversight:
-//! `/tools/mhwilds/*` and friends are `@Public()`, and D4 promises the Tools
-//! section works with no Boffmedia account at all. Failing closed when there is
-//! no session would break exactly the tools this capability exists to unblock.
+//! `/tools/mhwilds/*` and friends are `@Public()`, and the Tools section must
+//! work with no Boffmedia account at all. Failing closed with no session would
+//! break exactly the tools this capability exists to unblock.
 
 use std::collections::HashMap;
 

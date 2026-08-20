@@ -2,12 +2,12 @@ import * as React from "react"
 import { cn } from "@/lib/utils"
 
 // Shared class fragments + specimen wrappers for the SmartRotom showcase.
-// Mirrors the Boffmedia showcase's `showcase-shared.tsx` (BOFFMEDIA_V3.md §12).
+// Mirrors the Boffmedia showcase's `showcase-shared.tsx`.
 //
-// The one structural difference: SmartRotom is MANY design systems, not one
-// (SMARTROTOM_V3.md §0 — count the namespaces in `tailwind.config.ts`, never trust a
-// number written down). A primitive only resolves its tokens inside its own scope root,
-// so every specimen renders inside `<Scope>` — see below.
+// The one structural difference: SmartRotom is MANY design systems, not one —
+// count the namespaces in `tailwind.config.ts`, never trust a number written
+// down. A primitive only resolves its tokens inside its own scope root, so every
+// specimen renders inside `<Scope>` — see below.
 
 export const MONO_LABEL = "font-mono text-[11px] font-medium uppercase tracking-[0.14em] text-sr-txt-muted"
 
@@ -245,7 +245,7 @@ export function Section({
 }
 
 // The chrome has no `Kicker` primitive of its own (only Button/Badge/Panel), so the
-// showcase owns this one rather than reaching across to Boffmedia's (SMARTROTOM_V3.md §3).
+// showcase owns this one rather than reaching across to Boffmedia's.
 export function Kicker({ children }: { children: React.ReactNode }) {
   return (
     <span className="inline-flex items-center gap-2 font-mono text-[11px] font-semibold uppercase leading-none tracking-[0.16em] text-sr-accent">

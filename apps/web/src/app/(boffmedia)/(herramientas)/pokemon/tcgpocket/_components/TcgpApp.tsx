@@ -66,10 +66,10 @@ export function TcgpApp({ view, expansion, cardId }: Props) {
   const drawerEditable = view === "coleccion" && !galleryUser && collection.editable
 
   return (
-    // Single scroller: the page. This used to be a `100vh - nav` box with its own
-    // `overflow-y-auto` body, which nested a second scrollbar inside a document
-    // that still scrolled by exactly one Footer's height — so scrolling down slid
-    // the tool up and left the grid peeking through a sliver above the footer.
+    // Single scroller: the page. A `100vh - nav` box with its own
+    // `overflow-y-auto` body nests a second scrollbar inside a document that
+    // still scrolls by exactly one Footer's height — scrolling down slides the
+    // tool up and leaves the grid peeking through a sliver above the footer.
     <div className="flex min-w-0 flex-col">
       {/* section header — sticks directly under the sticky site Navbar */}
       <header className="sticky top-[var(--nav-h)] z-20 flex-none border-b border-solid border-line bg-base/90 backdrop-blur-[10px]">

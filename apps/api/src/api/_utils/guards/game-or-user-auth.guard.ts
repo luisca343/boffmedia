@@ -20,14 +20,14 @@ import { extractBearer, matchesServerToken } from '../auth/server-token';
  *    `req.serverAuthed` is set and ownership checks are skipped (trusted).
  *
  * The mod's token is checked *before* JWT verification because it is not a JWT:
- * passport would reject it outright. Bearer is the only server credential —
- * do not reintroduce a header-based one (see DARCAJA.md §D1).
+ * passport would reject it outright. Bearer is the only server credential — do
+ * not reintroduce a header-based one.
  *
- * `ENFORCE_MONEY_AUTH` now defaults to true, so only the two credentials above
- * are accepted. The legacy `body.server === MC_WORLD` branch below survives
- * solely as the rollback: setting the flag to false in the environment reopens
- * it without a code change. See MinecraftMiddleware (not a security boundary)
- * for why the tripwire alone is insufficient.
+ * `ENFORCE_MONEY_AUTH` defaults to true, so only the two credentials above are
+ * accepted. The `body.server === MC_WORLD` branch below exists solely as the
+ * rollback: setting the flag to false in the environment reopens it without a
+ * code change. See MinecraftMiddleware (not a security boundary) for why the
+ * tripwire alone is insufficient.
  */
 @Injectable()
 export class GameOrUserAuthGuard extends AuthGuard('jwt') {

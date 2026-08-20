@@ -7,9 +7,9 @@ import type { DesktopPrincipal } from './types/packs.types';
 // the pack listing, entitlement and downloads are all Boffmedia-level facts, and
 // none of them ever needed a Minecraft identity.
 //
-// Sessions are minted by the device-authorization flow (DesktopDeviceService).
-// The Mojang `hasJoined` handshake that used to mint them lives on in
-// MinecraftHandshakeService, repointed at the in-game MCEF page.
+// Sessions are minted by the device-authorization flow (DesktopDeviceService),
+// never by the Mojang `hasJoined` handshake — that one belongs to
+// MinecraftHandshakeService and serves the in-game MCEF page.
 
 /** Launcher sessions are long-lived on purpose: re-approving on the website
  *  every hour is not something a player tolerates, and the session confers only
@@ -49,7 +49,8 @@ export class PacksAuthService {
   }
 
   /** Invalidate every outstanding launcher session for an account by bumping the
-   *  revocation counter. Existing tokens embed the old value and stop validating. */
+   *  revocation counter. Issued tokens embed the previous value, so they stop
+   *  validating. */
   async revokeAllDesktopSessions(userId: number): Promise<void> {
     await this.repo.incrementLauncherTokenVersion(userId);
   }

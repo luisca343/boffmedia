@@ -60,9 +60,9 @@ describe('StarbankController — integration (ValidationPipe + GlobalExceptionFi
 
     app = moduleRef.createNestApplication();
 
-    // These routes are no longer public: the identity that used to come from
+    // These routes are not public: the identity that would otherwise come from
 
-    // the URL or the body is now taken from the authenticated principal.
+    // the URL or the body is taken from the authenticated principal.
 
     // This suite covers the ValidationPipe and the exception filter, so it
 
@@ -168,10 +168,9 @@ describe('StarbankController — integration (ValidationPipe + GlobalExceptionFi
         .send(validBody);
 
       expect(res.status).toBeLessThan(300);
-      // The suite now runs as a signed-in caller, so `resolveActor` carries
-      // their mcUuid — which is exactly what the ownership check downstream
-      // needs. It used to be `undefined` here because the route was reachable
-      // with no credential at all.
+      // The suite runs as a signed-in caller, so `resolveActor` carries their
+      // mcUuid — which is what the ownership check downstream needs. It is
+      // `undefined` only on a route reachable with no credential at all.
       expect(mockFacade.transfer).toHaveBeenCalledWith(1, 2, 100, 'payment', {
         mcUuid: TEST_MC_UUID,
         serverAuthed: false,

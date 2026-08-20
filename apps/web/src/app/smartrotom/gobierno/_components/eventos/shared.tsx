@@ -193,8 +193,8 @@ export function RankMark({ rank }: { rank: number }) {
 }
 
 /** score10 (0–10, already averaged server-side from the vote categories) presented as the
- * primary system — stars — plus the raw figure. Everything else the handoff offers (nota /10,
- * nota /100, medallas) is the same number restyled; this is the one we ship. */
+ * primary system — stars — plus the raw figure. nota /10, nota /100 and medallas are the
+ * same number restyled, so only this presentation ships. */
 export function ScoreDisplay({ score10 }: { score10: number }) {
   return (
     <div className="flex items-center gap-2">

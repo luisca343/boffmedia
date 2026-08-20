@@ -17,7 +17,7 @@ export const FEED_SKIN: Record<FeedState, string> = {
   miss: "border-white/[.08] text-ar-ink-dim bg-[linear-gradient(180deg,#160a34,#0a0420)] shadow-[0_2px_0_rgb(0_0_0/.4)]",
 }
 
-// Colour never carries the verdict alone (§ house style): the state is spelled out
+// Colour never carries the verdict alone: the state is spelled out
 // for screen readers, and the ordered attributes also show a direction arrow.
 const SPOKEN_KEY: Record<FeedState, string> = {
   hit: "squirdle.feedback.hit",

@@ -73,7 +73,7 @@ describe('PokemonController — integration (ValidationPipe + GlobalExceptionFil
         Reflector,
       ],
     })
-      // The write routes are no longer public: `register`, `dex/update` and
+      // The write routes are not public: `register`, `dex/update` and
       // `dex/sync` require the game server's token or a player's JWT, and
       // `sprites/refresh` requires an admin role. This suite is about the
       // ValidationPipe and the exception filter, so the credentials are stubbed
@@ -88,9 +88,9 @@ describe('PokemonController — integration (ValidationPipe + GlobalExceptionFil
 
     app = moduleRef.createNestApplication();
 
-    // These routes are no longer public: the identity that used to come from
+    // These routes are not public: the identity that would otherwise come from
 
-    // the URL or the body is now taken from the authenticated principal.
+    // the URL or the body is taken from the authenticated principal.
 
     // This suite covers the ValidationPipe and the exception filter, so it
 

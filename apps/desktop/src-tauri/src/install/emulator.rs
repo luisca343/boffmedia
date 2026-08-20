@@ -1,8 +1,8 @@
-//! The emulator install + launch path (Cycle 2). Installs are payload-only —
-//! no Java, no loaders, no MC session — so this is deliberately thin and reuses
-//! the game-agnostic file pipeline (`files`, `initial`) and the external-process
+//! The emulator install + launch path. Installs are payload-only — no Java, no
+//! loaders, no MC session — so this is deliberately thin and reuses the
+//! game-agnostic file pipeline (`files`, `initial`) and the external-process
 //! launcher (`process::spawn_external`). The launcher never writes into the
-//! emulator itself (D4); everything lives inside `instances/<slug>/`.
+//! emulator itself; everything lives inside `instances/<slug>/`.
 
 use super::files;
 use super::initial;
@@ -297,7 +297,7 @@ fn build_marker(
     }
 }
 
-/// §9 pinning for the emulator path. `launch` re-verifies against the manifest
+/// Version pinning for the emulator path. `launch` re-verifies against the manifest
 /// it was handed — always the LATEST — so without this a revert would be undone
 /// by the very next Play. The retained marker carries the version's kind, rom,
 /// args and complete file list, so the pin rewrites the WHOLE plan.
@@ -405,8 +405,8 @@ pub async fn launch(
     process::emit_preparing(app);
     let reporter = Reporter::for_emulator(app.clone(), &pack_id);
 
-    // §9 pinning — same contract as the Minecraft path: a reverted pack must
-    // not be silently re-upgraded by the next Play.
+    // Same pinning contract as the Minecraft path: a reverted pack must not
+    // be silently re-upgraded by the next Play.
     let mut prepared = prepared;
     if let Some(pinned) = apply_pin(&mut prepared) {
         reporter.log(
@@ -452,7 +452,7 @@ fn spawn(app: &tauri::AppHandle, prepared: &EmulatorPrepared) -> Result<RunningG
     let method = crate::emulators::resolve_method(kind, &prepared.settings)
         .map_err(InstallFailure::message)?;
 
-    // §9 path hygiene: the ROM path comes from a marker on the player's disk, so
+    // The ROM path comes from a marker on the player's disk, so
     // join it through the same traversal guard the file pipeline uses rather than
     // trusting it into a naive `join`.
     let rom = instance::safe_join(&prepared.instance.minecraft, &instance::normalise(&prepared.plan.rom))
@@ -657,9 +657,9 @@ mod tests {
 
     #[test]
     fn a_hash_from_a_different_event_is_not_reused() {
-        // Re-pointing the pack at another event invalidates the old output: it
-        // was randomized for a different run, and honouring it would let the
-        // player into the new event with the previous event's ROM.
+        // Re-pointing the pack at another event invalidates the existing
+        // output: it was randomized for a different run, and honouring it would
+        // let the player into the new event with the other event's ROM.
         let mut managed = vec![rom_entry(CLEAN, 1024)];
         let previous = previous_marker(
             Some(RandomizerGate {

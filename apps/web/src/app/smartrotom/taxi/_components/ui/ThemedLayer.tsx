@@ -8,7 +8,7 @@ export const TX_SCOPE = "tx-app font-tx text-tx-txt"
 
 /**
  * Wraps portaled content — which escapes the `.tx-app` root and would otherwise render
- * with every `tx-*` var unresolved — in a themed layer (SMARTROTOM_V3 §2).
+ * with every `tx-*` var unresolved — in a themed layer.
  */
 export function ThemedLayer({ children }: { children: ReactNode }) {
   return <SharedThemedLayer scope={TX_SCOPE}>{children}</SharedThemedLayer>

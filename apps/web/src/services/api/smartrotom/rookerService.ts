@@ -13,8 +13,8 @@ import {
  * Rooker — the social nest.
  *
  * Every non-GET here goes through `rotomPOST/PATCH/DELETE`, which inject
- * `body.server = MC_WORLD`; without it `MinecraftMiddleware` 403s the call
- * (SMARTROTOM_V3 §8). Do not hand-roll a `fetch` against these routes.
+ * `body.server = MC_WORLD`; without it `MinecraftMiddleware` 403s the call.
+ * Do not hand-roll a `fetch` against these routes.
  *
  * Note the envelopes: every *list* route answers `{ items, … }`, never a bare array —
  * the feed is paged and had to carry `hasMore`, and the rest followed for consistency.

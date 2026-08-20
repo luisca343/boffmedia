@@ -34,11 +34,11 @@ export function isEarned(achievement: UserAchievement): boolean {
 /**
  * The wax a seal is struck in.
  *
- * An achievement has NO type, element or colour column — the handoff coloured each gym seal
- * by its leader's Pokémon type, and that field does not exist. Rather than invent one, the
- * ink is a deterministic function of the badge's own id: the same badge is always the same
- * colour, on every device, and two badges are almost never the same. It is presentation, not
- * data — nothing is being claimed about the gym.
+ * An achievement has NO type, element or colour column, so a seal cannot be inked by its
+ * gym leader's Pokémon type. Instead the ink is a deterministic function of the badge's
+ * own id: the same badge is always the same colour, on every device, and two badges are
+ * almost never the same. It is presentation, not data — nothing is being claimed about
+ * the gym.
  */
 const WAX: string[] = [
   "156 59 54", // oxblood

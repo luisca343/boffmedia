@@ -8,7 +8,7 @@ export interface Chapter {
 /**
  * Parse chapter markers from a video description ("0:00 Intro" / "1:02:03 - X").
  * Returns [] when there aren't at least two markers, so the chapter rail hides
- * for videos that don't provide them (derive-or-defer, §13).
+ * for videos that don't provide them (derive-or-defer).
  */
 export function parseChapters(description?: string): Chapter[] {
   if (!description) return []

@@ -8,7 +8,7 @@ import { PageHead } from "../ui"
 /**
  * The table of contents. Each row carries its chapter's spine chip and numeral in that
  * chapter's own ink — spelled-out classes, because the accent of a row is NOT the accent of
- * the page it is printed on (§4, and see `Chapter.deep` / `Chapter.tab`).
+ * the page it is printed on (and see `Chapter.deep` / `Chapter.tab`).
  */
 export function Indice({
   chapters,

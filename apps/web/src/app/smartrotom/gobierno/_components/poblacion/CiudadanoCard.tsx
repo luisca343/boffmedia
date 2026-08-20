@@ -7,10 +7,10 @@ import { townName } from "../../_utils/format"
 import { useGobiernoUi } from "../../_stores/useGobiernoUi"
 import type { Ciudadano } from "../../_types"
 
-// The censo card: identity, residence, civic standing and land holdings. The handoff also
-// showed `level`, `role`, `balance`, `online` and `joinedAt` — none of those exist (playtime
-// lives in Minecraft NBT, there is no wallet column on this read, and presence isn't
-// tracked here), so they are omitted rather than faked.
+// The censo card: identity, residence, civic standing and land holdings. `level`, `role`,
+// `balance`, `online` and `joinedAt` do not exist here — playtime lives in Minecraft NBT,
+// this read has no wallet column, and presence is not tracked — so they are omitted
+// rather than faked.
 export function CiudadanoCard({ citizen }: { citizen: Ciudadano }) {
   const t = useTranslations("gobierno")
   const openDossier = useGobiernoUi((s) => s.openDossier)

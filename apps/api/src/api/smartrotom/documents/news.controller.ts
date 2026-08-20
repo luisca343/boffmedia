@@ -53,11 +53,11 @@ export class NewsController {
     private readonly documentsFacadeService: DocumentsFacadeService,
   ) {}
 
-  // PUBLIC: published articles only, always. This used to honour a `published`
-  // query flag and fall through to getAllNews() when it was absent — which is a
-  // genuinely different query that includes unpublished drafts, so the INSECURE
-  // branch was the default and every anonymous reader received draft content.
-  // Editors read drafts through `GET news/all` below, which is role-guarded.
+  // PUBLIC: published articles only, always. Honouring a `published` query flag
+  // and falling through to getAllNews() when absent makes the INSECURE branch
+  // the default — that query includes unpublished drafts, so every anonymous
+  // reader gets draft content. Editors read drafts through the role-guarded
+  // `GET news/all` below.
   @Public()
   @Get('news')
   @ApiOperation({ summary: 'Get published news' })
@@ -188,8 +188,8 @@ export class NewsController {
     if (isNaN(newsIdNum)) {
       throw new BadRequestException('Invalid news ID');
     }
-    // The author is the session. It used to be `dto.uuid`, so a comment could
-    // be posted under anybody's name — with no account at all.
+    // The author is the session, never `dto.uuid` — that allows a comment under
+    // anybody's name, with no account at all.
     return await this.documentsFacadeService.addNewsComment(
       newsIdNum,
       authorUuid,

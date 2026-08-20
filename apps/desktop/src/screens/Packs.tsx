@@ -494,11 +494,10 @@ export function Packs() {
     boffRestoreError,
   } = useApp()
 
-  // A session that DIED is not the same as never having had one, and the
-  // difference used to be explained on the sign-in wall that stood in front of
-  // this screen. With no wall left, this banner is the only place that
-  // explanation can live — otherwise a player who was signed in yesterday is
-  // silently signed out today with no account of why.
+  // A session that DIED is not the same as never having had one. With no
+  // sign-in wall in front of this screen, this banner is the only place that
+  // difference can be explained — otherwise a player who was signed in
+  // yesterday is silently signed out today with no account of why.
   const sessionExpired = boffRestoreError?.needsSignin === true
   const [query, setQuery] = useState("")
   const [creating, setCreating] = useState(false)

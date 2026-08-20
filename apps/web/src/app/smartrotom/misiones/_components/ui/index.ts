@@ -1,6 +1,6 @@
 /**
  * Misiones' primitive library — `ms-*`, the tavern quest board.
- * Import from this barrel, never by deep path (SMARTROTOM_V3.md §1).
+ * Import from this barrel, never by deep path.
  * Every primitive here renders from props and fetches nothing, except
  * `ItemSprite` / `NpcPortrait`, whose whole job is to resolve real game art.
  */

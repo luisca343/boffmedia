@@ -60,7 +60,7 @@ function flatten(node: unknown, prefix: string, out: Dict): Dict {
   return out
 }
 
-// Workspace tool packages own their own catalogs (plan §3), so they are
+// Workspace tool packages own their own catalogs, so they are
 // flattened in FIRST and the launcher's own messages land on top — a host key
 // wins a collision, which is the direction that lets the launcher override a
 // tool string without editing the package.
@@ -136,11 +136,10 @@ function renderArg(
 /**
  * The launcher's ICU renderer: named `{placeholders}` plus `plural`/`select`.
  *
- * This used to be a one-line `{name}` regex, with a comment saying the launcher
- * "only needs simple named substitution". That was true right up until the host
- * started merging tool-package catalogs, which are authored for next-intl and
- * DO use ICU — so `{count, plural, one {# opción} other {# opciones}}` rendered
- * to the player verbatim, in both the MH Wilds and the schematic tools.
+ * A plain `{name}` regex is NOT enough: the host merges tool-package catalogs,
+ * which are authored for next-intl and do use ICU, so
+ * `{count, plural, one {# opción} other {# opciones}}` would render to the
+ * player verbatim.
  *
  * Plural categories come from `Intl.PluralRules`, not a hand-rolled n===1 test:
  * getting this right per locale is exactly what that API is for, and it costs

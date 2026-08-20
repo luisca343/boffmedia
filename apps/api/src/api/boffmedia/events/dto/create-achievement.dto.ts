@@ -49,7 +49,7 @@ export class CreateEventAchievementDto {
   maxProgress: number;
 
   // Required: both columns are NOT NULL with no default, so an omitted value
-  // used to die as a 500 on insert instead of a 400 here.
+  // would die as a 500 on insert instead of a 400 here.
   @ApiProperty({
     description: 'Type of item',
     enum: ['achievement', 'medal'],

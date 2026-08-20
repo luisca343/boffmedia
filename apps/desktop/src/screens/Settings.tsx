@@ -17,8 +17,8 @@ import { checkForUpdates, useUpdates } from "../services/updates"
 import { useApp } from "../state/app"
 import { elidePath, formatBytes } from "../utils/format"
 
-// HANDOFF §6.3: "Wrong Java version is the single most common launcher support
-// ticket." Hence the explicit, visible Java row rather than silent detection.
+// Wrong Java version is the single most common launcher support ticket, hence
+// the explicit, visible Java row rather than silent detection.
 
 export function Settings() {
   const {

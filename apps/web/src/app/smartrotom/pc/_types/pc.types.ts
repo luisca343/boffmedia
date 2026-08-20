@@ -60,7 +60,7 @@ export interface SmartView {
   nameKey?: string
   name?: string
   icon: string
-  /** A `pc-*` text colour class. Literal, never interpolated (SMARTROTOM_V3.md §4). */
+  /** A `pc-*` text colour class. Literal, never interpolated. */
   tone: string
   filters?: PokemonFilter
   search?: string

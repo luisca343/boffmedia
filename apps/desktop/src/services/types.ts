@@ -18,7 +18,7 @@ export type PackGalleryImage = {
   alt?: string | null
 }
 
-/** What the LISTING (§7.2) knows about a pack. Note what is absent: the
+/** What the LISTING knows about a pack. Note what is absent: the
  *  allowlist UUIDs are never sent to any launcher, since one member could
  *  otherwise enumerate the whole membership of a pack they can read. */
 export type PackSummary = {
@@ -139,11 +139,11 @@ export type PackEntry = {
    *  this launcher; "local" was created/imported on this machine and can be
    *  edited or exported. */
   origin: "managed" | "local"
-  /** RF-01/RF-02: present only when the pack declares one — its absence is what
-   *  keeps a pack without a server looking exactly as it did before this
-   *  feature. `port` is absent for a bare SRV host (the status ping resolves it
-   *  via SRV); `host` can be absent on a legacy `{}` row, which still counts as
-   *  a server pack but renders as "unavailable". */
+  /** Present only when the pack declares one; its absence is what keeps a pack
+   *  without a server rendering as an ordinary pack. `port` is absent for a bare
+   *  SRV host (the status ping resolves it via SRV); `host` can be absent on a
+   *  `{}` row, which still counts as a server pack but renders as
+   *  "unavailable". */
   server?: { host?: string | null; port?: number | null }
 }
 
@@ -171,14 +171,14 @@ export type Account = {
   skinUrl: string
 }
 
-/** HANDOFF §5.1 — the device-code flow the user completes in a browser. */
+/** The device-code flow the user completes in a browser. */
 export type DeviceCode = {
   userCode: string
   verificationUri: string
   expiresInSeconds: number
 }
 
-/** HANDOFF §9 — what the Rust classifier (`install/crash.rs`) recognised in the
+/** What the Rust classifier (`install/crash.rs`) recognised in the
  *  tail of the game log. Mirrors `CrashKind`; kebab-case on the wire. */
 export type CrashKind =
   | "missing-dependency"
@@ -216,16 +216,16 @@ export type LogLine = {
 }
 
 export type Settings = {
-  /** MiB. Handoff §6.3: wrong Java is the #1 support ticket, so surface it. */
+  /** MiB. Wrong Java is the #1 support ticket, so surface it. */
   memoryMib: number
   javaPath: string | null
   gameDir: string
   closeOnLaunch: boolean
   keepLogs: boolean
-  /** HANDOFF §9 — how many previous versions stay one-click revertible.
+  /** How many previous versions stay one-click revertible.
    *  Cheap: a retained version is one marker, never a copy of the instance. */
   retainVersions: number
-  /** HANDOFF §9 — when on, `memoryMib` is ignored and the heap is sized from
+  /** When on, `memoryMib` is ignored and the heap is sized from
    *  the pack's mod count and this machine's RAM. A separate flag rather than a
    *  sentinel in `memoryMib`, so turning it off restores the chosen number. */
   memoryAuto: boolean
@@ -242,7 +242,7 @@ export type Settings = {
 /** Total playtime in milliseconds per pack, keyed by pack id. */
 export type Playtime = Record<string, number>
 
-/** HANDOFF §9 — why a resolved value is what it is. Mirrors Rust's
+/** Why a resolved value is what it is. Mirrors Rust's
  *  `install::runtime::RuntimeSource`. */
 export type RuntimeSource = "global" | "override" | "auto"
 
@@ -254,8 +254,8 @@ export type MemoryChoice =
   | { mode: "fixed"; mib: number }
 
 /** This pack's Java choice. `auto` is NOT `inherit`: it means "ignore the
- *  global path for this pack", which is the fix for a Java 8 path kept for one
- *  old pack breaking every new one. */
+ *  global path for this pack", so a Java 8 path kept for one legacy pack does
+ *  not break every other one. */
 export type JavaChoice =
   | { mode: "inherit" }
   | { mode: "auto" }
@@ -265,7 +265,7 @@ export type JavaChoice =
 export type ResolvedRuntime = {
   heapMib: number
   memorySource: RuntimeSource
-  /** Null = the launcher installs and manages the JVM (§6.3). */
+  /** Null = the launcher installs and manages the JVM. */
   javaPath: string | null
   javaSource: RuntimeSource
   modCount: number
@@ -274,7 +274,7 @@ export type ResolvedRuntime = {
   recommendedMib: number
 }
 
-/** HANDOFF §9 — the per-pack runtime panel's whole state. Mirrors Rust's
+/** The per-pack runtime panel's whole state. Mirrors Rust's
  *  `install::InstanceRuntime`. */
 export type InstanceRuntime = {
   over: { memory: MemoryChoice; java: JavaChoice }
@@ -284,7 +284,7 @@ export type InstanceRuntime = {
   globalJavaPath: string | null
 }
 
-/** HANDOFF §9 — a version this machine can roll back to. Mirrors Rust's
+/** A version this machine can roll back to. Mirrors Rust's
  *  `instance::RetainedVersion`. */
 export type RetainedVersion = {
   versionId: string
@@ -303,7 +303,7 @@ export type RetainedVersion = {
   revertible: boolean
 }
 
-/** HANDOFF §9 — one `env.client: "optional"` file and whether it is switched
+/** One `env.client: "optional"` file and whether it is switched
  *  on. Optional-ness comes from the manifest, so this is empty until the pack
  *  has been installed once. */
 export type OptionalFile = {

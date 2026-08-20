@@ -15,7 +15,7 @@ export interface CoinCounterProps {
  * The arcade has no currency balance: `rotom_inventory` stores items, and the
  * daily rewards of type `coins`/`money` are never persisted by the API, so no
  * endpoint can answer "how many stars do I have". Rendering a number here would
- * be fabricating one (SMARTROTOM_V3.md §9), so no screen mounts this — it is
+ * be fabricating one, so no screen mounts this — it is
  * built, demo-only in the showcase, and waiting on a balance endpoint.
  * See docs/smartrotom/deferred/arcade.md.
  */

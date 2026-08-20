@@ -26,7 +26,7 @@ import { Roles } from '@api/_utils/decorators/roles.decorator';
 
 @ApiTags('Wingull | Invites')
 // Redeeming an invite is deliberately public (that is the point of an invite
-// code); minting and revoking them are administrative and used to be public too.
+// code); minting and revoking them are administrative.
 @Public()
 @Controller('wingull/invites')
 export class InvitesController {

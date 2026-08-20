@@ -9,14 +9,14 @@ import { InspectOverlay, ToastHost, VerifyBadge } from "./_components/ui"
 import { usePassportStore } from "./_stores/usePassportStore"
 
 /**
- * The Pasaporte's scope root (SMARTROTOM_V3.md §2): every `ps-*` token is a CSS var
+ * The Pasaporte's scope root: every `ps-*` token is a CSS var
  * declared on `.ps-app`, so nothing resolves without it — and anything portaled out of it
  * (the replay sheet, the toasts) re-applies it through `ThemedLayer`.
  *
  * FIXED CANVAS. The app deliberately never calls `useRotomMode()`: the desk is always dark
  * and the paper always cream, in every platform theme. A passport is a physical object and
- * its pages do not turn dark because the OS did (§2b, the same stance as Furret Today's
- * newsprint and Gobierno's warm paper).
+ * its pages do not turn dark because the OS did — the same stance as Furret Today's
+ * newsprint and Gobierno's warm paper.
  *
  * The two `data-*` attributes are DOCUMENT properties, not themes — how loud the security
  * print is, and whether the looping ambience runs.

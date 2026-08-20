@@ -8,11 +8,10 @@ import { RandomizerConfig, randomizerConfigs } from '@/_db/schema/Randomizer';
 /**
  * The one query that resolves a pack to its randomizer config.
  *
- * It used to exist twice — once in PacksRepository, once in
- * RandomizerRepository — because RandomizerModule imports PacksModule, so
- * PacksModule cannot import RandomizerModule. Two copies of the query that
- * gates the anti-cheat clean-ROM check is one copy too many, so it lives in its
- * own tiny module that both sides import instead.
+ * RandomizerModule imports PacksModule, so PacksModule cannot import
+ * RandomizerModule — which invites a copy of this query on each side. Two copies
+ * of the query that gates the anti-cheat clean-ROM check is one too many, so it
+ * lives in its own tiny module that both sides import.
  */
 @Injectable()
 export class RandomizerPackLinkRepository {

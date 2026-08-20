@@ -1,8 +1,8 @@
 import { cn } from "@/lib/utils"
 
 /**
- * Live indicator: accent pill + pulsing white dot + the word "EN VIVO" (meaning
- * is never colour-only — a11y §10). Rendered static; the parent positions it
+ * Live indicator: accent pill + pulsing white dot + the word "EN VIVO", so the
+ * meaning is never colour-only. Rendered static; the parent positions it
  * (e.g. `className="absolute top-2.5 left-2.5"`) over a card or player.
  */
 export function LivePill({

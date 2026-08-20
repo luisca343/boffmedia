@@ -228,7 +228,7 @@ export class VgcPastesService {
     }
   }
 
-  // ── Phase 3 — Paste fetch ────────────────────────────────────────────────────
+  // ── Paste fetch ──────────────────────────────────────────────────────────────
 
   /**
    * Batch-fetches all paste URLs for a regulation that haven't been linked yet.

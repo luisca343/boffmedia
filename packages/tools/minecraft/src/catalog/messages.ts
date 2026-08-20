@@ -1,6 +1,5 @@
-// AUTO-EXTRACTED from apps/web/locales/{es,en}/tools/games.json during the
-// tools-minecraft extraction (plan Phase 1 step 3). This package OWNS these
-// keys now — the web catalog no longer carries them.
+// AUTO-EXTRACTED from apps/web/locales/{es,en}/tools/games.json. This package
+// OWNS these keys — the web catalog does not carry them.
 //
 // Namespace: `tools.schematicCompat.*` / `tools.schematicViewer.*`.
 // Shape is nested, which is what both hosts want: next-intl in apps/web and

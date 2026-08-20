@@ -5,7 +5,7 @@
  * gzip magic (0x1f 0x8b) and inflate with pako before parsing.
  *
  * Longs are decoded as bigint (TAG_Long / TAG_Long_Array) so 64-bit values are
- * never truncated — `.litematic` bit-packing (Phase 2) depends on this.
+ * never truncated — `.litematic` bit-packing depends on this.
  */
 import { ungzip } from "pako";
 

@@ -7,8 +7,8 @@ import { EmptyState, PageHead, Skeleton } from "../ui"
 
 /**
  * The ink a stamp is pressed in, by what put it there. Raw hex because these are SVG
- * `stroke`/`fill` values, which §4 explicitly allows — a `stroke` cannot take a Tailwind
- * token, and the palette is the `ps-*` one written out.
+ * `stroke`/`fill` values — a `stroke` cannot take a Tailwind token, and the palette
+ * is the `ps-*` one written out.
  */
 const INK: Record<TravelStamp["kind"], string> = {
   viaje: "#2b4a72", // info — an entry visa

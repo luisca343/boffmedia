@@ -119,7 +119,7 @@ export function MetaLayoutClient() {
   const { speciesId, view, handleSelect, handleTabChange, handleFormatChange, handleOptionsApply, handleRegulationChange, handleTournamentChange, handleViewChange, handleBack } =
     useMetaNavigation({ snapshots, regulations, tournaments, entries, entriesMap });
 
-  // ── Phase 3: paste-derived data for preview formats ───────────────────────
+  // ── Paste-derived data for preview formats ────────────────────────────────
   const { detail: pasteDetail } = useChampionsPasteDetail(
     isPreviewFormat ? speciesId : undefined,
     isPreviewFormat ? format    : undefined,
@@ -232,7 +232,7 @@ export function MetaLayoutClient() {
   } else {
     body = (
       // Split view: the ranking is a sticky, self-scrolling column and the detail
-      // rides the page scroll — DkApp no longer bounds their height.
+      // rides the page scroll — DkApp does not bound their height.
       <div className="grid min-h-0 flex-1 items-start grid-cols-[minmax(280px,340px)_minmax(0,1fr)]">
         <MvList
           className="sticky top-[calc(var(--nav-h)_+_var(--dk-bar-h,45px))] h-[calc(100dvh_-_var(--nav-h)_-_var(--dk-bar-h,45px))] border-r border-solid border-line"

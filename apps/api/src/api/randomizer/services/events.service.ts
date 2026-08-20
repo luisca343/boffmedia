@@ -597,7 +597,7 @@ export class EventsService {
       );
     }
 
-    // The randomizer consumes the event lifecycle, it no longer drives it: the
+    // The randomizer consumes the event lifecycle, it does not drive it: the
     // events module owns `status`, so opening a config requires an event that is
     // already active rather than silently activating one.
     const ev = await this.repository.getEventPackAndStatus(config.eventId);

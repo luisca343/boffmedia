@@ -24,9 +24,9 @@ export interface ArcadeGame {
 
 /**
  * The cabinet library. Editorial content the arcade owns (title, blurb, category,
- * cabinet art), not user data — there is no games endpoint, and the play counts
- * the handoff shows on each cabinet ("8.4k ▶") have no source, so they are not
- * rendered. See docs/smartrotom/deferred/arcade.md.
+ * cabinet art), not user data — there is no games endpoint. Per-cabinet play
+ * counts ("8.4k ▶") have no source, so they are not rendered. See
+ * docs/smartrotom/deferred/arcade.md.
  */
 export const GAMES: ArcadeGame[] = [
   {

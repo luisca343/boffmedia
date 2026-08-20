@@ -14,7 +14,7 @@ export function getGameEntry(slug: string): GameEntry | undefined {
 
 /**
  * Resolve a tool/category `href` from the registry by (hub slug, key) so callers
- * never hand-write tool routes (§10). Returns "" if the slug/key is unknown —
+ * never hand-write tool routes. Returns "" if the slug/key is unknown —
  * prefer a compile-time-known key so a bad reference surfaces as a dead link.
  */
 export function getToolHref(slug: string, key: string): string {

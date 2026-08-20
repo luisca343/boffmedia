@@ -88,7 +88,7 @@ export default function AppGrid({ apps, setApps, className }: AppGridProps) {
       order: app.order || 0 
     }))
     
-    // Identity comes from the session — OrderAppDto no longer carries a uuid.
+    // Identity comes from the session — OrderAppDto carries no uuid.
     orderApps({ order: orderUpdates })
 
     setApps(updatedApps)

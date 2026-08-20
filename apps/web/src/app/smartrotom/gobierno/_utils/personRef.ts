@@ -17,9 +17,9 @@ export function toPlayerRef(ref: { uuid: string; username?: unknown } | null | u
 
 const refArray = (refs: unknown): PlayerRef[] => (Array.isArray(refs) ? refs.map((r) => toPlayerRef(r) as PlayerRef) : [])
 
-// Normalizers below deliberately stay untyped past the wire boundary — they patch a handful
-// of known `PersonRefEntity` keys on whatever payload shape arrives, and the caller casts the
-// result to the app type same as it did before this normalizer existed.
+// Normalizers below deliberately stay untyped past the wire boundary: they patch a handful
+// of known `PersonRefEntity` keys on whatever payload shape arrives, and the caller casts
+// the result to the app type.
 const withRefs = (item: any, keys: string[]): any => {
   if (!item) return item
   const out = { ...item }

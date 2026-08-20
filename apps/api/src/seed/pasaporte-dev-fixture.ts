@@ -47,11 +47,10 @@ const FIXTURE_TAG = 'FIXTURE-RIVAL';
 // reads as a travel stamp. No trips table exists, so this is the only way to make
 // one real.
 //
-// Both used to be hardcoded ids (23 and 0) that this fixture never created. They
-// happened to exist in the long-lived dev database and in no other, so the
-// fixture died on a foreign key the moment that database was rebuilt — and an id
-// of 0 is one AUTO_INCREMENT never issues. (`TAXI_ACCOUNT`'s own comment records
-// that 0 meant "burned", which is what this fixture was still writing to.)
+// Neither may be a hardcoded id. Ids that happen to exist in a long-lived dev
+// database exist in no other, so the fixture dies on a foreign key the moment
+// that database is rebuilt — and 0 is an id AUTO_INCREMENT never issues
+// (`TAXI_ACCOUNT`'s own comment records that 0 means "burned").
 //
 // The taxi account is RESOLVED from the house-account registry, never created
 // here: it is a real house account owned by `seed:system`, and inventing a
@@ -203,10 +202,10 @@ export async function main() {
   }
 
   /**
-   * Everything this fixture writes hangs off three rows it used to assume were
-   * already there: the trainer, the trainer's StarBank account and the taxi's
-   * service account. On a rebuilt database none of them are, so create each
-   * idempotently and resolve the ids rather than hardcoding them.
+   * Everything this fixture writes hangs off three rows: the trainer, the
+   * trainer's StarBank account and the taxi's service account. None of them
+   * exist on a rebuilt database, so create each idempotently and resolve the
+   * ids rather than assuming or hardcoding them.
    */
   const findAccount = async (name: string, type: string) => {
     const [row] = await db

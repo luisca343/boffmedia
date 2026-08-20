@@ -2,8 +2,8 @@ import type { GameState, LogLine, PackEntry, Settings } from "../services/types"
 import type { RuntimeInfo } from "../runtime"
 import { formatClock } from "./format"
 
-// A copy-paste support bundle. §9 asks for "structured logs users can paste":
-// the raw log alone loses the one thing whoever reads it needs first — which
+// A copy-paste support bundle. The raw log alone loses the one thing whoever
+// reads it needs first — which
 // launcher, which pack, which Java, and what the crash classifier already
 // concluded. This assembles all of that above a bounded log tail so a player
 // can paste ONE block into a chat instead of a screenshot of a wall of text.

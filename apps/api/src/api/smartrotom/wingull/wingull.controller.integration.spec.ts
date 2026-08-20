@@ -64,18 +64,18 @@ describe('WingullController — integration (ValidationPipe + GlobalExceptionFil
         Reflector,
       ],
     })
-      // The controller now sits behind GameOrUserAuthGuard: these are the
-      // game-server bridge routes and used to be reachable by anyone. This suite
-      // covers DTO validation, so the credential is stubbed here.
+      // The controller sits behind GameOrUserAuthGuard: these are the
+      // game-server bridge routes and must not be reachable by anyone. This
+      // suite covers DTO validation, so the credential is stubbed here.
       .overrideGuard(GameOrUserAuthGuard)
       .useValue({ canActivate: () => true })
       .compile();
 
     app = moduleRef.createNestApplication();
 
-    // These routes are no longer public: the identity that used to come from
+    // These routes are not public: the identity that would otherwise come from
 
-    // the URL or the body is now taken from the authenticated principal.
+    // the URL or the body is taken from the authenticated principal.
 
     // This suite covers the ValidationPipe and the exception filter, so it
 

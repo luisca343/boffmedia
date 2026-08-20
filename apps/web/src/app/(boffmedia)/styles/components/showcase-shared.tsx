@@ -3,7 +3,6 @@ import { cn } from "@/lib/utils"
 import { Kicker } from "@boffmedia/ui"
 
 // Shared class fragments + specimen wrappers for the Sistema showcase.
-// Split out of the old monolithic page.tsx (convention §10).
 
 export const MONO_LABEL = "font-mono text-[11px] font-medium uppercase tracking-[0.14em] text-txt-muted"
 

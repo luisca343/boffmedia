@@ -54,9 +54,9 @@ export class WigglypopOrdersRepository {
    * Creates the order, its lines AND takes every listing off the shelf in ONE
    * transaction.
    *
-   * The listing flips used to happen in a loop in the service, after the order
-   * had already been committed: a failure between the two left a paid-for order
-   * whose listings were still `disponible`, i.e. sellable twice.
+   * Flipping the listings in a service-side loop after the order commits is
+   * wrong: a failure between the two leaves a paid-for order whose listings are
+   * still `disponible`, i.e. sellable twice.
    */
   async create(
     order: {

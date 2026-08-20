@@ -25,7 +25,7 @@ const mockService = {
 const VALID_UUID = '67d9b543-5ac9-41e1-a8a5-20d7689e24a4';
 const SERVER_UUID = '1ee7e5f6-8e50-4b49-9ee6-b26cc1b5f365';
 
-/** The body the mod actually sends — docs/KARTS_CARRERA_HANDOFF.md §1. */
+/** The body the mod actually sends. */
 const VALID_RACE = {
   server: SERVER_UUID,
   circuito: 'Rainbow Road',
@@ -63,9 +63,9 @@ describe('KartsController — integration (ValidationPipe + GlobalExceptionFilte
 
     app = moduleRef.createNestApplication();
 
-    // These routes are no longer public: the identity that used to come from
+    // These routes are not public: the identity that would otherwise come from
 
-    // the URL or the body is now taken from the authenticated principal.
+    // the URL or the body is taken from the authenticated principal.
 
     // This suite covers the ValidationPipe and the exception filter, so it
 

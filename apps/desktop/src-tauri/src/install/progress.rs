@@ -141,7 +141,7 @@ fn now_ms() -> u64 {
 }
 
 /// One structured log line, matching types.ts's `LogLine`. `source` separates
-/// what the launcher says from what the game printed, because §9's crash-report
+/// what the launcher says from what the game printed, because crash-report
 /// parsing only ever wants the latter.
 pub fn log(app: &tauri::AppHandle, level: &str, source: &str, text: &str) {
     let _ = app.emit(
@@ -232,7 +232,7 @@ pub struct InstallWatcher {
     reporter: Reporter,
     phase: Phase,
     file: String,
-    /// §6.3 — a JVM the version metadata says is the wrong major version. Held
+    /// A JVM the version metadata says is the wrong major version. Held
     /// here and raised as a HARD error by the caller once `install()` returns:
     /// portablemc treats it as a warning and launches anyway, which produces
     /// the confusing crash that is the #1 support ticket.
@@ -361,7 +361,7 @@ impl forge::Handler for InstallWatcher {
             forge::Event::Installing { .. } | forge::Event::InstallingGame => {
                 self.enter(Phase::Loader);
             }
-            // The processors are the slow part of a Forge install (§6.4) and
+            // The processors are the slow part of a Forge install and
             // the only feedback available during minutes of silence.
             forge::Event::RunInstallerProcessor { name, .. } => {
                 self.enter(Phase::Loader);

@@ -156,8 +156,8 @@ export class PresetsService {
   }
 
   /**
-   * Encode a preset's settings to .rnqs format.
-   * Calls SettingsShim (stub in Phase 0).
+   * Encode a preset's settings to .rnqs format via SettingsShim, which is a stub
+   * today and answers 503.
    */
   async encodePreset(presetId: number): Promise<Buffer> {
     if (!presetId || presetId <= 0) {
@@ -169,7 +169,7 @@ export class PresetsService {
       throw new NotFoundException(`Preset ${presetId} not found`);
     }
 
-    // Call shim to encode (will throw 503 in Phase 0)
+    // Call shim to encode; the stub throws 503
     const rnqs = await this.settingsShim.encode(preset.settingsJson);
 
     // TODO: Store blob via PacksDownloadsService
@@ -179,11 +179,11 @@ export class PresetsService {
   }
 
   /**
-   * Decode .rnqs to settings JSON.
-   * Calls SettingsShim (stub in Phase 0).
+   * Decode .rnqs to settings JSON via SettingsShim, which is a stub today and
+   * answers 503.
    */
   async decodeRnqs(rnqs: Buffer): Promise<Record<string, unknown>> {
-    // Call shim to decode (will throw 503 in Phase 0)
+    // Call shim to decode; the stub throws 503
     return this.settingsShim.decode(rnqs);
   }
 
@@ -195,7 +195,7 @@ export class PresetsService {
     rnqs: Buffer,
     metadata: { name: string; gameScope?: string; updatedBy?: number },
   ): Promise<PresetResponseDto> {
-    // Decode via shim (will throw 503 in Phase 0)
+    // Decode via shim; the stub throws 503
     const settingsJson = await this.settingsShim.decode(rnqs);
 
     return this.createPreset({

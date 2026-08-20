@@ -253,9 +253,9 @@ describe('TeamsService', () => {
     });
 
     it('refuses a removed player at the membership gate before any team read/write (F-11)', async () => {
-      // The membership check runs first now: a removed player never reaches the
-      // team-membership lookup or the member insert (which previously left an
-      // "on the team but not in the event" row that needed manual SQL to fix).
+      // The membership check runs FIRST: a removed player must never reach the
+      // team-membership lookup or the member insert, which leaves an "on the
+      // team but not in the event" row that needs manual SQL to fix.
       mockParticipantsService.getParticipationForUser.mockResolvedValue({
         status: 'removed',
       });

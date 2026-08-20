@@ -3,9 +3,9 @@
 // opinion about where `libraries/` is would mean re-downloading 400MB the first
 // time the two disagreed.
 //
-// HANDOFF §9 ("delta updates", "locked vs. user space") is the reason the
-// per-instance and the shared trees are separate: instances are cheap and
-// disposable, `shared/` is the expensive part and is never keyed on a pack.
+// Delta updates and the locked-vs-user-space split are why the per-instance
+// and the shared trees are separate: instances are cheap and disposable,
+// `shared/` is the expensive part and is never keyed on a pack.
 //
 //   <app-data>/
 //     instances/<slug>/      the game's working directory ITSELF
@@ -33,22 +33,21 @@ use super::InstallFailure;
 /// pack that was already fine.
 pub const MARKER: &str = ".boff-install.json";
 
-/// §9 "pack version pinning + rollback" — the last N installed markers, newest
+/// Pack version pinning and rollback: the last N installed markers, newest
 /// first. Beside the marker rather than inside it: this is read only when the
 /// player opens the rollback list, and a corrupt history must never make an
 /// otherwise healthy instance unreadable.
 pub const HISTORY: &str = ".boff-history.json";
 
-/// §9 optional-mod toggles — which optional files the player switched OFF.
+/// Optional-mod toggles: which optional files the player switched OFF.
 /// Survives updates and reinstalls precisely because it is NOT in the marker,
 /// which every install overwrites.
 pub const OPTIONAL: &str = ".boff-optional.json";
 
-/// §9 "per-instance Java runtime + memory" — this pack's Java path and heap
-/// choice. Beside the marker, not inside it and not in the global settings: an
-/// install overwrites the marker, and a global blob cannot hold a per-pack
-/// answer. Absent on every instance installed before this build, which
-/// `RuntimeOverride::default()` reads as "inherit the global setting".
+/// This pack's Java path and heap choice. Beside the marker, not inside it and
+/// not in the global settings: an install overwrites the marker, and a global
+/// blob cannot hold a per-pack answer. Absent when the pack has made no choice,
+/// which `RuntimeOverride::default()` reads as "inherit the global setting".
 pub const RUNTIME: &str = ".boff-runtime.json";
 
 /// Emu-M3 — the last-good manifest fetched for this pack. Written on a
@@ -82,14 +81,14 @@ pub struct InstancePaths {
     pub config: PathBuf,
     pub bin: PathBuf,
     pub marker: PathBuf,
-    /// §9 — retained version markers. Never deleted by `repair_instance`: a
+    /// Retained version markers. Never deleted by `repair_instance`: a
     /// repair rebuilds what is on disk, it does not throw away the rollback
     /// targets that are the reason the player is repairing at all.
     pub history: PathBuf,
-    /// §9 — the player's optional-mod choices. Deliberately outside everything
+    /// The player's optional-mod choices. Deliberately outside everything
     /// an install or a repair rewrites; it is user state, not managed state.
     pub optional: PathBuf,
-    /// §9 — the per-pack Java/memory override. User state like `optional`, so
+    /// The per-pack Java/memory override. User state like `optional`, so
     /// an install, an update and a repair all leave it alone.
     pub runtime: PathBuf,
     /// Emu-M3 — the cached last-good manifest, read back to launch offline.
@@ -98,7 +97,7 @@ pub struct InstancePaths {
 
 impl Layout {
     /// Rooted at the OS app-data dir, unless `gameDir` in the settings points
-    /// somewhere else (§9 — people put instances on the drive with space on it).
+    /// somewhere else (people put instances on the drive with space on it).
     pub fn new(app: &tauri::AppHandle, game_dir: Option<&str>) -> Result<Self, InstallFailure> {
         if let Some(dir) = game_dir.map(str::trim).filter(|d| !d.is_empty()) {
             return Ok(Self {
@@ -126,7 +125,7 @@ impl Layout {
         self.root.join("shared")
     }
 
-    /// The content-addressed blob store (§9 delta updates): a file already here
+    /// The content-addressed blob store behind delta updates: a file already here
     /// is never fetched again, whatever pack or version asks for it.
     pub fn cache_dir(&self) -> PathBuf {
         self.shared_dir().join("cache")
@@ -138,7 +137,7 @@ impl Layout {
     /// An imported third-party `.mrpack` carries its `overrides/` (configs,
     /// resource packs, scripts) as bytes inside the zip. Those become
     /// `source: override` entries in the manifest, and an `override` normally
-    /// means "stream it from the Boffmedia API" (§7.2) — which for a pack the
+    /// means "stream it from the Boffmedia API" — which for a pack the
     /// player imported off Modrinth would 404, because we never hosted it.
     ///
     /// Separate from `cache_dir()` on purpose: the cache is disposable by

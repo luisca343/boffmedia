@@ -7,11 +7,25 @@ import { env } from '@/config/env';
     PinoLoggerModule.forRoot({
       pinoHttp: {
         level: env.NODE_ENV === 'production' ? 'info' : 'debug',
+        // Dev logs go to BOTH the console and a file. The console is the one
+        // people read, but a terminal scrollback truncates, and a flow worth
+        // debugging (the Microsoft device-code chain, say) can outlive it. The
+        // file is relative to apps/api, and `*.log` is gitignored.
         transport:
           env.NODE_ENV !== 'production'
             ? {
-                target: 'pino-pretty',
-                options: { colorize: true, singleLine: false },
+                targets: [
+                  {
+                    target: 'pino-pretty',
+                    options: { colorize: true, singleLine: false },
+                    level: 'debug',
+                  },
+                  {
+                    target: 'pino/file',
+                    options: { destination: 'logs/api-dev.log', mkdir: true },
+                    level: 'debug',
+                  },
+                ],
               }
             : undefined,
         customProps: () => ({

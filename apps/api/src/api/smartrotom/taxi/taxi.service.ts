@@ -31,18 +31,18 @@ import {
 /**
  * Riding the taxi.
  *
- * **The player travels first and pays second.** The old flow transferred the fare from the
- * browser and then asked the mod to move the player, so every ordinary failure — logged out,
- * stop deleted, no safe arrival — left somebody charged and standing where they were, with no
- * refund path (StarBank has no reversal, only a compensating transfer).
+ * **The player travels first and pays second.** Transferring the fare from the browser and
+ * then asking the mod to move the player leaves every ordinary failure — logged out, stop
+ * deleted, no safe arrival — with somebody charged and standing where they were, and no refund
+ * path (StarBank has no reversal, only a compensating transfer).
  *
- * Charging afterwards removes the hole instead of compensating for it: a trip that did not
- * happen writes no ledger row at all, which is exactly what `_utils/trips.ts` needs, since a
- * trip IS its transfer and the passport is derived from those rows.
+ * Charging afterwards removes that hole rather than compensating for it: a trip that did not
+ * happen writes no ledger row at all, which is what `_utils/trips.ts` needs, since a trip IS
+ * its transfer and the passport is derived from those rows.
  *
- * The residual risk moved, it did not vanish: a teleport that succeeds and a charge that then
- * fails is a free ride. That window is one local DB write after every validation has already
- * passed, and it is logged as a debt rather than swallowed.
+ * The residual risk is the mirror case: a teleport that succeeds and a charge that then fails
+ * is a free ride. That window is one local DB write after every validation has passed, and it
+ * is logged as a debt rather than swallowed.
  */
 @Injectable()
 export class TaxiService {

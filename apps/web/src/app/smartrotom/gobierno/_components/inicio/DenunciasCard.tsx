@@ -13,8 +13,8 @@ export function DenunciasCard() {
   const { data, isLoading } = useDenuncias({ pageSize: 5 })
   const openDossier = useGobiernoUi((s) => s.openDossier)
 
-  // The API's own ordering isn't documented, so the most-recent-first read the handoff
-  // wants is guaranteed client-side rather than assumed.
+  // The API's own ordering is undocumented, so most-recent-first is enforced
+  // client-side rather than assumed.
   const recientes = [...(data?.items ?? [])].sort(
     (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
   )

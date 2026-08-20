@@ -588,12 +588,12 @@ mod tests {
 
     #[test]
     fn initial_files_cannot_have_user_provided_source() {
-        // This test would require initialFiles to have a user-provided source, which the schema forbids.
-        // The validation would fail at schema level, so we skip this test as it's a schema-level rule.
-        // Cycle 1 relies on the schema to forbid this; the launcher validator mirrors it for defense-in-depth.
+        // Not exercised here: initialFiles with a user-provided source is
+        // forbidden by the schema, so validation fails before this validator
+        // ever sees it. The validator mirrors the rule for defence in depth.
     }
 
-    // ── emulator arm (Cycle 2) ──────────────────────────────────────────────
+    // ── emulator arm ────────────────────────────────────────────────────────
 
     fn emu_manifest(emulator: &str, files: &str) -> String {
         format!(

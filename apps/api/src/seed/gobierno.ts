@@ -13,7 +13,7 @@ import pino from 'pino';
 
 const logger = pino({ name: 'gobierno-seed' });
 
-// Idempotent rate card from the handoff. `code` carries the uniqueness — re-running this
+// Idempotent rate card. `code` carries the uniqueness — re-running this
 // script updates the existing rows in place rather than duplicating them. Percentage-based
 // rates (captura) have no fixed `amount`; what's actually collected always derives from the
 // StarBank ledger, never from this column.

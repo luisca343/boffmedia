@@ -17,7 +17,7 @@ export interface ArButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonEleme
 // bottom, a white inner bevel on the top edge, a dark one on the bottom, and a
 // wide coloured bloom underneath. The off-token gradient stops (the light and
 // dark ends of each ramp) are the sanctioned multi-layer-gradient exception —
-// they are not palette colours (SMARTROTOM_V3.md §4).
+// they are not palette colours.
 const VARIANT: Record<ArButtonVariant, string> = {
   primary:
     "text-white border-white/[.18] [text-shadow:0_1px_0_rgb(0_0_0/.35)] " +

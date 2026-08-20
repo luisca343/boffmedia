@@ -6,10 +6,10 @@ import { join } from 'path';
 /**
  * Account profile pictures.
  *
- * **The file is named after the account id, never after anything the user typed.** It used to be
- * saved as `<account name>.<ext>`, which had two faults: two players who both called an account
- * "Ahorros" silently overwrote each other's picture, and the name went unsanitised into a path, so
- * `../../` escaped the upload directory entirely (the 40-character limit was client-side only).
+ * **The file is named after the account id, never after anything the user typed.** Saving it as
+ * `<account name>.<ext>` has two faults: two players who both call an account "Ahorros" silently
+ * overwrite each other's picture, and the name goes unsanitised into a path, so `../../` escapes
+ * the upload directory entirely (the 40-character limit is client-side only).
  *
  * The extension comes from the *mimetype* multer already validated, not from the uploaded
  * filename — that is the other half of the same hole.

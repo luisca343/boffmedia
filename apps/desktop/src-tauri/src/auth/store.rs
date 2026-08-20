@@ -1,4 +1,4 @@
-// HANDOFF §5.7 — the ONLY thing persisted is the Microsoft refresh token, and it
+// The ONLY thing persisted is the Microsoft refresh token, and it
 // goes in the OS credential store (DPAPI on Windows, Keychain on macOS, Secret
 // Service on Linux). A refresh token is effectively the account; several
 // launchers have shipped it in plaintext JSON and it is a real theft vector.
@@ -67,7 +67,7 @@ pub fn clear_refresh_token_for(uuid: &str) -> Result<(), StoreError> {
 
 /// `Ok(None)` means "no stored session" — a genuine first run.
 ///
-/// §5.7's warning is the reason this returns a Result rather than an Option: a
+/// This returns a Result rather than an Option for one reason: a
 /// keychain that is locked or broken must NOT look like a first run, or the user
 /// silently re-authenticates on every launch forever and nobody notices.
 pub fn load_refresh_token() -> Result<Option<String>, StoreError> {
@@ -91,12 +91,11 @@ pub fn clear_refresh_token() -> Result<(), StoreError> {
 
 // ── Boffmedia app session ──────────────────────────────────────────────────
 //
-// Persisted, unlike the old pack session. That one was re-derived from a live
-// Minecraft session in two round-trips, so keeping it bought nothing. This one
-// is minted by a device-authorization flow that needs the player to approve it
-// in a browser — asking for that on every launch would be intolerable — and it
-// lasts 30 days. Same store as the refresh token, for the same reason: it is a
-// bearer credential for the account.
+// Persisted, because it cannot be re-derived: this session is minted by a
+// device-authorization flow that needs the player to approve it in a browser —
+// asking for that on every launch would be intolerable — and it lasts 30 days.
+// Same store as the refresh token, for the same reason: it is a bearer
+// credential for the account.
 
 //
 // MULTI-ACCOUNT. `APP_SESSION` now doubles as the ACTIVE account's token

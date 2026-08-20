@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 
 // The whole SmartRotom type system is self-hosted (`src/styles/fonts.css`), so unlike
 // the Boffmedia showcase this layout loads no external font — it exists to scope the
-// route's metadata (SMARTROTOM_V3.md §5).
+// route's metadata.
 export default function SmartRotomComponentsLayout({ children }: { children: ReactNode }) {
   return <>{children}</>
 }

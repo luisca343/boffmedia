@@ -19,10 +19,10 @@ export interface LivingDexProps {
 }
 
 /**
- * A read-only tracker. The handoff's "auto-organizar" button is deliberately absent:
- * with only a single-swap `/pc/move`, gathering one of every species would be hundreds
- * of sequential round-trips against the game server. Showing the gaps is honest; moving
- * 900 Pokémon behind one click is not.
+ * A read-only tracker. There is deliberately no "auto-organizar" button: with only a
+ * single-swap `/pc/move`, gathering one of every species would be hundreds of sequential
+ * round-trips against the game server. Showing the gaps is honest; moving 900 Pokémon
+ * behind one click is not.
  */
 export function LivingDex({ onClose }: LivingDexProps) {
   const t = useTranslations("pc")

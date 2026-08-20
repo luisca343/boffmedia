@@ -12,14 +12,14 @@
 // <img>. Any host works, the second look is free, and a player with no
 // connection still sees the icons of mods they have browsed.
 //
-// It USED to hand back a file path for the asset protocol instead. That path
-// died twice and was replaced: the static `$APPDATA` scope in tauri.conf.json
-// resolves under the bundle identifier while datadir.rs deliberately uses
-// `%APPDATA%\Boffmedia[ Dev]`, so the scope never matched the real cache —
-// and even a runtime `allow_directory` grant left WebView2 refusing the
-// encoded paths. A data: URL has no scope, no protocol handler and no
-// extension-derived content type to get wrong; the MIME is sniffed from the
-// bytes themselves (`mime_of`), which browsers never do for SVG.
+// Do NOT hand back a file path for the asset protocol instead. The static
+// `$APPDATA` scope in tauri.conf.json resolves under the bundle identifier while
+// datadir.rs deliberately uses `%APPDATA%\Boffmedia[ Dev]`, so the scope never
+// matches the real cache — and even a runtime `allow_directory` grant leaves
+// WebView2 refusing the encoded paths. A data: URL has no scope, no protocol
+// handler and no extension-derived content type to get wrong; the MIME is
+// sniffed from the bytes themselves (`mime_of`), which browsers never do for
+// SVG.
 
 use std::path::PathBuf;
 use std::time::Duration;
@@ -222,8 +222,8 @@ mod tests {
 
     #[test]
     fn mime_comes_from_the_bytes_not_the_name() {
-        // The old cache renamed unknown extensions to .png; sniffing means
-        // even those stale files serve with the truth.
+        // Sniffed rather than taken from the extension, so a file cached under
+        // the wrong one still serves with the right type.
         assert_eq!(mime_of(b"\x89PNG\r\n\x1a\nrest", "x.svg"), "image/png");
         assert_eq!(mime_of(b"\xff\xd8\xff\xe0rest", "x.png"), "image/jpeg");
         assert_eq!(mime_of(b"GIF89a...", "x.png"), "image/gif");

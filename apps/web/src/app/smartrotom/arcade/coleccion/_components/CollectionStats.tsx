@@ -14,8 +14,8 @@ export interface CollectionStatsProps {
 
 /**
  * Only figures the inventory actually answers: how many distinct rows, how many
- * units across them, and how those rows split by rarity. The handoff's "set
- * completion / milestone" panel has no backing data and is not rendered.
+ * units across them, and how those rows split by rarity. A "set completion /
+ * milestone" panel has no backing data, so it is not rendered.
  */
 export function CollectionStats({ items }: CollectionStatsProps) {
   const t = useTranslations("arcade")

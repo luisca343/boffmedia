@@ -25,7 +25,7 @@ export const CA_SCOPE = "ca-app font-ca text-ca-50";
 /**
  * Centered dialog over a scrim — a skin over the shared `ModalShell` (portal + Escape +
  * scrim-click dismiss + scroll lock + focus trap/restore + dialog semantics all come
- * from there — SMARTROTOM_V3 §2).
+ * from there).
  *
  * The accent is a runtime CSS var (`--ca-accent`), not part of the static scope, so it
  * rides an inner wrapper here rather than the shared layer's `scope` string.

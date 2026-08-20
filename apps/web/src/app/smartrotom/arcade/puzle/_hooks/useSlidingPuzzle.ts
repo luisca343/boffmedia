@@ -31,8 +31,8 @@ const isAdjacent = (a: number, b: number) => {
  * is always solvable.
  *
  * Every shuffle restarts from the full nine-tile cut. Re-shuffling the eight
- * *rendered* pieces (which is what the old page did) walks the hole through a
- * board that no longer contains it and leaves two tiles stacked on one square.
+ * *rendered* pieces walks the hole through a board that no longer contains it
+ * and leaves two tiles stacked on one square.
  */
 export function useSlidingPuzzle() {
   const [tiles, setTiles] = useState<PuzzlePiece[]>([])

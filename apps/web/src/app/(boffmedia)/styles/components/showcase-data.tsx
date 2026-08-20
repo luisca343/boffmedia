@@ -4,7 +4,7 @@ import type { EventLike, GameLike, AchievementLike, PlayerLike } from "@/compone
 import type { LegalSection } from "@/components/boffmedia/ui/legal/LegalDoc"
 import type { AvMember, AvPipeStage } from "@/app/(boffmedia)/admin/_components/ui/av-data"
 
-// Index model + demo data for the Sistema showcase. Split out of page.tsx (§10).
+// Index model + demo data for the Sistema showcase. Split out of page.tsx.
 
 export interface SecMeta {
   id: string

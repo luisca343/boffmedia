@@ -12,7 +12,7 @@ import { Icon } from "./Icon"
  * Resolved through the shared sprite manifest — the same `id:form:palette` lookup, with its
  * form and palette fallbacks, that the PC and the Pokédex use. Deliberately not
  * `next/image`: the manifest already resolves the URL and the optimiser would resample
- * pixel art (§10).
+ * pixel art.
  *
  * It subscribes to the manifest store rather than reading `getState()` once, so a whole
  * team fills in when the manifest lands instead of staying blank until something else

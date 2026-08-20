@@ -3,9 +3,8 @@
  *
  * An article's accent is DERIVED from its category (the API has no colour
  * field), so the value is data-driven — which means it can never be
- * interpolated into a class name (`bg-ft-${accent}` silently never compiles,
- * SMARTROTOM_V3.md §4). Every accent is therefore applied through one of the
- * literal maps below.
+ * interpolated into a class name (`bg-ft-${accent}` silently never compiles).
+ * Every accent is therefore applied through one of the literal maps below.
  */
 export type FtAccent =
   | "pink"

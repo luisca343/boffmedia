@@ -8,7 +8,7 @@ import type { EnrichedStop } from "../_types"
 /**
  * One destination in the list: where it is, how far, which way, and what it costs. The
  * fare turns red when the player cannot afford it — but it also keeps its `−` and the
- * row stays selectable, so the colour is never the only signal (SMARTROTOM_V3 §11).
+ * row stays selectable, so the colour is never the only signal.
  */
 export function StopRow({
   stop,

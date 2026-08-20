@@ -47,8 +47,8 @@ export const MEW_VARS = {
   ...WOB,
 } as React.CSSProperties
 
-// v3 «Señal» skin — desk + accent map onto the Boffmedia v3 tokens (theme-reactive,
-// hex fallbacks match the handoff senal skin); the cream index cards are retained.
+// v3 «Señal» skin — desk + accent map onto the Boffmedia v3 tokens
+// (theme-reactive, with hex fallbacks); the cream index cards are retained.
 export const MEW_SENAL_VARS = {
   "--mwp-night": "var(--base-deep, #0b0d11)",
   "--mwp-night-2": "var(--base-2, #12151b)",
@@ -84,7 +84,7 @@ export interface MewCat {
   remote?: boolean
 }
 
-// Category definitions (order = tab order), mirroring the handoff data layer.
+// Category definitions (order = tab order).
 // `label` / `singular` / `desc` are NOT stored here — a module-scope t() would
 // freeze whichever locale loaded first. Consumers resolve them against the
 // `mewgenics` namespace as `cat.<key>.{label,singular,desc}` via `mewCatKey`.

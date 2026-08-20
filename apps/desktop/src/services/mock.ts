@@ -341,7 +341,7 @@ const LOG_SEED: [LogLine["level"], LogLine["source"], string][] = [
 
 /** Browser-mode stand-in for the tail of a crashed session, plus the verdict
  *  `install/crash.rs` produces for exactly these lines. Keeping the two in one
- *  place is what makes `dev:renderer` a real preview of the crash UI (§9). */
+ *  place is what makes `dev:renderer` a real preview of the crash UI. */
 export const MOCK_CRASH_LOG: [LogLine["level"], LogLine["source"], string][] = [
   ["error", "game", "[main/ERROR] Incompatible mods found!"],
   [
@@ -632,7 +632,7 @@ export function mockRemoveGalleryImage(slug: string, filename: string): void {
   mockPackGalleries.set(slug, filtered)
 }
 
-// ── Emulator mocks (Cycle 2) ──────────────────────────────────────────────
+// ── Emulator mocks ────────────────────────────────────────────────────────
 
 /** Mock emulator status lookup. */
 export function mockEmulatorStatus(kind: "mgba" | "melonds"): any {

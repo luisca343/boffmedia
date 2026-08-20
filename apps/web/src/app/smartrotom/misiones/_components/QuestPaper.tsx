@@ -9,10 +9,9 @@ import { normalizeStatus, SEAL_TEXT, STATUS_LABEL_KEY, STATUS_PAPER_FILTER } fro
 import { Icon, ItemSprite, Label, Nail, NpcPortrait, Paper, Bar, Sparkles, Stamp, TACK_GOLD, TACK_RED, Thumbtack, WaxSeal } from "./ui"
 
 /**
- * One quest, as a paper pinned to the cork. What the handoff printed as XP and a
- * quest "type" the API does not have (`type` is an unmapped Pixelmon enum id), so
- * the slots carry what is real instead: the status seal, the required level, and
- * the actual reward sprites.
+ * One quest, as a paper pinned to the cork. There is no XP, and no usable quest
+ * "type" (`type` is an unmapped Pixelmon enum id), so the slots carry what is
+ * real: the status seal, the required level, and the actual reward sprites.
  */
 export function QuestPaper({
   quest,

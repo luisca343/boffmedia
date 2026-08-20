@@ -31,7 +31,7 @@ export function typeColor(type: string | undefined | null): string {
   return TYPE_COLORS[normType(type)] ?? "var(--dim)"
 }
 
-// Signal glyph per type — mirrors the handoff «cara señal» art window.
+// Signal glyph per type — the «cara señal» art window's fallback face.
 const TYPE_GLYPH: Record<string, string> = {
   grass: "✦", fire: "✸", water: "❍", lightning: "⚡", psychic: "◈",
   fighting: "✜", darkness: "☾", metal: "⬡", dragon: "❈", colorless: "○", fairy: "✿",

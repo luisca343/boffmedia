@@ -67,7 +67,7 @@ export class PacksService {
    *  single repository query (one place can leak a pack); capability filtering
    *  is layered on top — a launcher that does not declare a game type never
    *  lists a pack of that type. `capabilities` is the parsed X-Boff-Game-Types
-   *  set (absent header → ['minecraft'], §3.1). */
+   *  set (absent header → ['minecraft']). */
   async listForLauncher(
     principal: PackPrincipal,
     capabilities: string[],
@@ -158,7 +158,7 @@ export class PacksService {
    * The manifest a launcher installs from. This is the gate: entitlement is
    * re-checked here rather than trusted from the listing, because the listing
    * and the download are separate requests and access can be revoked between
-   * them (§7.4 — revocation is the whole point).
+   * them (revocation is the whole point).
    *
    * `capabilities` is the parsed X-Boff-Game-Types set. A pack whose game type
    * the caller cannot parse returns 409 (not 404): the pack exists, the client
@@ -514,9 +514,8 @@ export class PacksService {
     }
 
     const id = this.newId();
-    // Stored as the real value. The column used to be nullable with "NULL means
-    // minecraft", so every reader had to re-implement the default; it is now
-    // NOT NULL with a 'minecraft' default and says what it means.
+    // Stored as the real value: the column is NOT NULL with a 'minecraft'
+    // default, so it says what it means and no reader re-implements it.
     const gameType = (dto.gameType as GameType | undefined) ?? 'minecraft';
     // Quick Play targets are minecraft-only: an emulator/zomboid/stardew pack
     // that happens to send `server` gets it stripped, never persisted.

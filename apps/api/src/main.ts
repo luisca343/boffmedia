@@ -61,7 +61,7 @@ async function bootstrap() {
 
   // Static assets are served only under the prefixes external consumers rely on
   // (DB-stored URLs, Minecraft clients, the external blog) — not the whole folder
-  // at the root, so API routes no longer pay a filesystem probe per request.
+  // at the root, so an API route never pays a filesystem probe per request.
   // sprites/packs/jcef are content-addressed or append-only → immutable; uploads
   // are overwritten in place (profile pics keyed by userId) → short TTL.
   const publicDir = join(__dirname, '..', 'public');
@@ -173,8 +173,8 @@ async function bootstrap() {
   // Unset is a WORKING but degraded state, which is why it warns rather than
   // throws: the download/update URLs fall back to `x-forwarded-proto`/`-host`,
   // so an unexpected Host header mints a wrong absolute URL for the Tauri
-  // updater. The variable was `LAUNCHER_UPDATE_BASE_URL` before the desktop
-  // rename, so a deployed .env carrying the old name lands here silently.
+  // updater. A deployed .env naming the variable anything but
+  // `DESKTOP_UPDATE_BASE_URL` lands here silently.
   if (!env.DESKTOP_UPDATE_BASE_URL) {
     console.warn(
       '[config] DESKTOP_UPDATE_BASE_URL is not set — desktop update and ' +

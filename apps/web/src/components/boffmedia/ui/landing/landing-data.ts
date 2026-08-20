@@ -47,7 +47,7 @@ interface Tv3Tool {
 }
 
 // Curated landing feature list — display copy (name/description/icon) is
-// landing-specific, but hrefs derive from the `@/data/games` registry (§10) so a
+// landing-specific, but hrefs derive from the `@/data/games` registry so a
 // route change follows automatically instead of drifting here.
 export const TV3_TOOLS: Tv3Tool[] = [
   { ix: "01", n: "BattleSim", d: "Simulador de combates dobles VGC con daño previsto.", ic: "sword", href: getToolHref("pokemon", "battlesim"), tk: "battlesim" },

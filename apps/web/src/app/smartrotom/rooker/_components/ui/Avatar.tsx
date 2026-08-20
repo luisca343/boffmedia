@@ -8,12 +8,11 @@ import type { RookerAuthor } from "../../_types"
 /**
  * A trainer's face.
  *
- * The handoff drew avatars as Pokémon in a tinted disc. That is a fiction: a
- * SmartRotom user IS a Minecraft account, and their skin is already their identity in
- * ChatApp, the calls overlay and the Pasaporte. So the face is the real head render
- * (`mc-heads.net/avatar/<uuid>`, the URL the rest of SmartRotom already uses) and the
- * handoff's Pokémon becomes what it should always have been: the disc it sits in,
- * tinted by the trainer's chosen partner. Identity underneath, personality around it.
+ * The face is NOT a Pokémon: a SmartRotom user IS a Minecraft account, and their skin
+ * is already their identity in ChatApp, the calls overlay and the Pasaporte. So the face
+ * is the real head render (`mc-heads.net/avatar/<uuid>`, the URL the rest of SmartRotom
+ * uses) and the Pokémon is the disc it sits in, tinted by the trainer's chosen partner.
+ * Identity underneath, personality around it.
  *
  * Rendered as a `span`, not a `button`, so it can nest inside the clickable rows and
  * post cards that already own the click — a button inside a button is invalid HTML and

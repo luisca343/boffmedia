@@ -6,7 +6,7 @@ import type { LogroTier, Rarity, StandingTier } from "../_types"
  * same gold. Logros only reach `platino`; the season ladder carries on to `maestro`.
  *
  * Every class below is written out in full. `text-ps-tier-${tier}` would compile to
- * nothing at all — no error, no warning, just an uncoloured medal (§4).
+ * nothing at all — no error, no warning, just an uncoloured medal.
  */
 type Metal = LogroTier | StandingTier
 

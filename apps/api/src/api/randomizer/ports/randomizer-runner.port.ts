@@ -23,11 +23,12 @@ export interface RandomizeResult {
 }
 
 /**
- * Port for the FVX randomizer runner. This spawns the FVX jar with the given
- * settings and seed, returning the randomized ROM and sealed spoiler log.
+ * Port for the FVX randomizer runner: spawns the FVX jar with the given settings
+ * and seed, returning the randomized ROM and sealed spoiler log.
  *
- * Phase 0 spike implementation is a stub that throws ServiceUnavailableException.
- * Real implementation will spawn FVX in a child process and handle streaming.
+ * The only implementation today is a stub that throws
+ * ServiceUnavailableException; a real one spawns FVX in a child process and
+ * streams its output.
  */
 export interface IRandomizerRunner {
   randomize(job: RandomizeJob): Promise<RandomizeResult>;

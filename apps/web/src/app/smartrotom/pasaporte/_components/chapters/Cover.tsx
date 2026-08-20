@@ -8,7 +8,7 @@ import { Icon } from "../ui"
 const R = 52
 const CIRCUMFERENCE = 2 * Math.PI * R
 
-/** The buckram cloth. A stack of gradients, which is the one thing Tailwind cannot say (§6). */
+/** The buckram cloth. A stack of gradients, which is the one thing Tailwind cannot say. */
 const CLOTH = {
   background:
     "radial-gradient(140% 100% at 50% 0%, rgba(255,255,255,.05), transparent 50%), linear-gradient(160deg, rgb(var(--ps-navy)), rgb(var(--ps-navy-deep)) 55%, rgb(12 21 40))",

@@ -15,10 +15,10 @@ import {
 import { NBT_TAG } from "../parsers/nbt";
 import { ERR, errorCode } from "../errors";
 
-// The Sponge v2/v3 happy-path round-trips (incl. the regression where a v3 file's
-// `Blocks` compound was misread as a legacy MCEdit file) live in the exporter's
-// `roundtrip.test.ts` on the tool side, next to the writers that emit those bytes
-// — so this lib spec depends on nothing under `tools/`.
+// The Sponge v2/v3 happy-path round-trips — including a v3 file whose `Blocks`
+// compound must not be misread as a legacy MCEdit file — live in the exporter's
+// `roundtrip.test.ts` on the tool side, next to the writers that emit those
+// bytes, so this lib spec depends on nothing under `tools/`.
 
 /** Wrap bytes in the File shape `loadSchematicFile` expects. */
 function asFile(bytes: Uint8Array, name: string): File {

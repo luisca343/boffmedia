@@ -32,7 +32,7 @@ import { RANDOMIZER_REPOSITORY_TOKEN } from '@api/_utils/repositories/interfaces
 // @Public would also neuter the guard) so the global JwtAuthGuard lets the
 // launcher token through; DesktopAuthGuard then authenticates it. Without the
 // @Public the global website guard 401s every launcher call before this guard
-// runs — which silently killed all randomizer minting.
+// runs, which silently kills all randomizer minting.
 @ApiTags('Randomizer | Launcher')
 @Controller('randomizer/launcher')
 @UseGuards(DesktopAuthGuard)

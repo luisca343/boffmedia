@@ -26,11 +26,9 @@ import { useTranslations } from "next-intl"
  * 2. the mod joins Mojang with the running game's own access token
  * 3. the sign-in trades the serverId for a session the API verified via hasJoined
  *
- * `null` now means no sign-in, where it used to mean "fall back to the `world`
- * string". That fallback existed for jars predating the `MC_JOIN_SERVER` query;
- * 1.16.5 is deprecated, so failing here is a real failure — a jar that cannot
- * prove its identity is one we no longer serve, rather than one we trust on its
- * word.
+ * `null` means no sign-in — never "fall back to the `world` string". Failing
+ * here is a real failure: a jar that cannot prove its identity is not served,
+ * rather than trusted on its word.
  */
 async function mcJoinServerId(username: string): Promise<string | null> {
   try {

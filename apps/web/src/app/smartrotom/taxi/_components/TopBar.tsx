@@ -6,11 +6,11 @@ import { formatMoney } from "../_utils/format"
 
 /**
  * The app bar. Two live figures only — the balance (which every fare spends) and who you
- * are — because everything else the handoff put here (players online, happy-hour
- * countdown) has no data behind it and is registered as deferred.
+ * are. Players online and a happy-hour countdown have no data behind them and are
+ * registered as deferred.
  *
  * There is deliberately NO light/dark toggle: the mode is a platform choice made once in
- * Ajustes → Temas, not per app (SMARTROTOM_V3 §2b).
+ * Ajustes → Temas, not per app.
  */
 export function TopBar({
   balance,
@@ -72,9 +72,8 @@ export function TopBar({
 export type TaxiTab = "go" | "pass"
 
 /**
- * The panel's tabs. The handoff had three — Viajar · Eventos · Pasaporte — but the
- * events board has no API behind it, so the tab is gated out rather than shown empty
- * (the board itself is built and lives in `_deferred/`).
+ * The panel's tabs. An Eventos tab is gated out rather than shown empty: the events
+ * board has no API behind it (the board itself is built and lives in `_deferred/`).
  */
 export function NavTabs({ tab, onChange }: { tab: TaxiTab; onChange: (t: TaxiTab) => void }) {
   const t = useTranslations("taxi.navTabs")

@@ -4,15 +4,15 @@ import { useTranslations } from "next-intl"
 import type { IDialogue, NPC, QuestData } from "../_types"
 import { Button, FlourishCorners, Icon, Label, NpcPortrait, Paper, WaxSeal } from "./ui"
 
-/** The paper's rest angle — deterministic per dialog, ±0.8°, same recipe as the handoff. */
+/** The paper's rest angle — deterministic per dialog, ±0.8°. */
 function tiltFor(id: number) {
   return (((id * 13) % 100) / 100) * 1.6 - 0.8
 }
 
 /**
- * One entry of the Bitácora: a dialog line, who said it, where. The handoff's
- * timestamp ("Hace 12 min") has no source in the API, so it is dropped rather
- * than faked — same for the NPC's "role", which the game never sends.
+ * One entry of the Bitácora: a dialog line, who said it, where. A relative
+ * timestamp ("Hace 12 min") has no source in the API, so it is not rendered —
+ * same for the NPC's "role", which the game never sends.
  */
 export function JournalEntry({
   dialog,

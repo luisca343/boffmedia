@@ -82,7 +82,7 @@ export function parseChatMessage(line: string): ChatMsg | null {
 /**
  * Connect to Twitch chat anonymously (justinfan login — read only, no auth) and
  * stream parsed messages. Sending needs a `chat:edit` OAuth token, so the
- * composer stays gated (§13). Returns a disconnect function.
+ * composer stays gated. Returns a disconnect function.
  */
 export function connectTwitchChat(
   channel: string,

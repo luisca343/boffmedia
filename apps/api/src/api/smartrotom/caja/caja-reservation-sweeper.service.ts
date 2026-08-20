@@ -4,7 +4,7 @@ import { Logger } from 'nestjs-pino';
 import { CajaRepository } from './repositories/caja.repository';
 
 /**
- * Periodically clears stamps of unconfirmed reservations past the TTL (DARCAJA.md §7).
+ * Periodically clears stamps of unconfirmed reservations past the TTL.
  * Housekeeping, not correctness — `claimable()` already treats an expired hold as free,
  * so a player is never blocked even if this never runs; it just keeps the table tidy.
  */

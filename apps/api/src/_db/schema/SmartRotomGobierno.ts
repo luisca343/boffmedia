@@ -25,9 +25,9 @@ const regionId = (name = 'region_id') => varchar(name, { length: 128 });
 // join players in application code (the plot side lives in another database), and 20-odd
 // nullable actor columns would each need a hand-shortened constraint name to clear MySQL's
 // 64-char limit.
-// char(36), like every other player-uuid column in the schema: the type used to
-// vary table by table, which made these columns a mismatch against
-// `rotom_users.uuid` and unusable as clean join keys.
+// char(36), like every other player-uuid column in the schema. A type that
+// varies table by table mismatches `rotom_users.uuid` and makes these columns
+// unusable as clean join keys.
 const playerUuid = (name: string) => char(name, { length: 36 });
 
 // Actor columns carry the `_uuid` suffix because they hold a PLAYER identity.
@@ -500,8 +500,8 @@ export const gobiernoEventoObras = mysqlTable(
 
 export type GobiernoEventoObra = typeof gobiernoEventoObras.$inferSelect;
 
-// One vote per player per build. The handoff's cats {diseno, ambicion, fidelidad}
-// are the average of these rows; stars / nota10 / nota100 / medallas all derive from that.
+// One vote per player per build. The categories {diseno, ambicion, fidelidad} are the
+// average of these rows; stars / nota10 / nota100 / medallas all derive from that.
 export const gobiernoEventoVotos = mysqlTable(
   'rotom_gobierno_evento_votos',
   {
@@ -610,7 +610,7 @@ export const gobiernoNpcSkins = mysqlTable('rotom_gobierno_npc_skins', {
 export type GobiernoNpcSkin = typeof gobiernoNpcSkins.$inferSelect;
 
 // Broadcast history. The message itself goes out over wingull/globalchat; this is the record
-// of who said what as whom — the old ArceuSpeak admin tool had no such record.
+// of who said what as whom.
 export const gobiernoMegafonia = mysqlTable('rotom_gobierno_megafonia', {
   id: int('id').primaryKey().autoincrement(),
   speaker: varchar('speaker', { length: 64 }).notNull(),

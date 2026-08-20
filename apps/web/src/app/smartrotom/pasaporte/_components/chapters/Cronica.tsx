@@ -42,7 +42,7 @@ export function Cronica({ milestones, loading }: { milestones: Milestone[]; load
         {shown.map((milestone, i) => {
           const date = timelineDate(milestone.date, locale)
           // The accent is a NAME on the milestone; the ink comes from the literal token map,
-          // never from an interpolated class (§4).
+          // never from an interpolated class.
           const ink = chapterInk(milestone.accent).accent
 
           return (

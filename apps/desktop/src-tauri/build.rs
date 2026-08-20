@@ -3,7 +3,7 @@ use std::{env, fs, path::PathBuf};
 // Generates Rust types for the pack manifest from the JSON Schema that
 // packages/pack-schema emits from its zod definitions. zod is the single source
 // of truth for the format; this keeps the launcher from drifting away from what
-// the dashboard publishes (HANDOFF §4.4).
+// the dashboard publishes.
 //
 // The schema file is committed, so this builds without Node installed.
 fn main() {

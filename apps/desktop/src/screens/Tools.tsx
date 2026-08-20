@@ -6,9 +6,9 @@ import { useT } from "../i18n"
 import { SectionHeader } from "../components/SectionHeader"
 import { useApp } from "../state/app"
 
-// D6 — this screen has NO per-tool wiring. It renders whatever the domain
-// packages registered, so porting tool #2..N is a manifest entry plus a catalog
-// merge, with nothing to change here.
+// This screen has NO per-tool wiring. It renders whatever the domain packages
+// registered, so adding a tool is a manifest entry plus a catalog merge, with
+// nothing to change here.
 
 /** Capabilities this host actually provides. A tool declaring something absent
  *  is hidden rather than offered and then failing at click time. `api` is listed

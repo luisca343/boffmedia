@@ -14,8 +14,8 @@ import { PacksService } from './packs.service';
 // where a mistake hands a private pack to the wrong person.
 
 const UUID = '069a79f4-44e9-4726-a5be-fca90e38aaf5';
-// Launcher requests still carry a Minecraft UUID; the service speaks
-// PackPrincipal so Phase 3 can swap in a Boffmedia id without touching it.
+// Launcher requests carry a Minecraft UUID; the service speaks PackPrincipal so
+// a Boffmedia id can be swapped in without touching it.
 const WHO = { mcUuid: UUID };
 // A launcher session: the account is the principal, the MC uuid rides along.
 const LAUNCHER = { userId: 7, username: 'TrainerAsh', mcUuid: UUID };
@@ -126,7 +126,7 @@ describe('PacksService', () => {
     });
 
     it('re-checks entitlement on every manifest request, not just at listing', async () => {
-      // Revocation between listing and download is the case §7.4 exists for.
+      // Revocation between listing and download: the case the re-check exists for.
       repo.findById.mockResolvedValue(pack() as never);
       repo.hasAccess.mockResolvedValue(false);
       repo.findVersion.mockResolvedValue(version() as never);
@@ -454,10 +454,10 @@ describe('PacksService', () => {
         { slug: 'x', name: 'X', accessKind: 'public' } as never,
         1,
       );
-      // The column is NOT NULL with a 'minecraft' default now. It used to be
-      // nullable with "NULL means minecraft", so every reader had to
-      // re-implement the default and an unset value was indistinguishable from
-      // a deliberate one.
+      // The column is NOT NULL with a 'minecraft' default. Nullable with
+      // "NULL means minecraft" would force every reader to re-implement the
+      // default, and make an unset value indistinguishable from a deliberate
+      // one.
       expect(repo.insertPack).toHaveBeenCalledWith(
         expect.objectContaining({ gameType: 'minecraft' }),
       );
@@ -503,7 +503,7 @@ describe('PacksService', () => {
               path: 'roms/x.gba',
               sha512,
               fileSize: 1,
-              // Cycle 2: the ROM entry must be client-required / server-unsupported.
+              // The ROM entry must be client-required / server-unsupported.
               env: { client: 'required', server: 'unsupported' },
               source: { kind: 'user-provided', hint: 'tu volcado' },
             },

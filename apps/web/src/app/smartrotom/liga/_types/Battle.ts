@@ -1,6 +1,6 @@
 // Unused today (no consumer imports it), kept as the read-side counterpart of BattleConfig.
-// Re-exported rather than hand-duplicated: the old copy typed `winner` as `number`, but the
-// wire (and `CreateReplayDto`) both send it as a `string`.
+// Re-exported rather than hand-duplicated: a local copy drifts, and `winner` is a `string`
+// on the wire and in `CreateReplayDto`, not a `number`.
 export type { Replay as BattleReplay } from "@boffmedia/shared"
 
 export interface BattleConfig {

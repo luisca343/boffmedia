@@ -51,9 +51,9 @@ export function TcgRarityMarks({ rarity, size = 12 }: { rarity: string; size?: n
 }
 
 // ── Card art window ──────────────────────────────────────────────────────────
-// The handoff draws a CSS «señal» window (type glyph + label). Where real card
-// art is available we render it inside that same window, falling back to the
-// glyph if every source fails — so the frame matches the handoff either way.
+// The window is a CSS «señal» frame (type glyph + label). Where real card art
+// is available it renders inside that same frame, falling back to the glyph if
+// every source fails, so the frame is identical either way.
 function TcgCardArt({ card, glyphLabel }: { card: TcgCard; glyphLabel: string }) {
   const sources = useMemo(() => {
     const list: string[] = []

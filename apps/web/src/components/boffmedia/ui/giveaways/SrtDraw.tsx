@@ -15,7 +15,7 @@ interface ReelCell {
 
 // Weighted draw reel — each participant occupies space proportional to their
 // tickets, and the needle lands on the winner. Mirrors .srt-reel from
-// sorteos.css; the transform animation is ported verbatim from the handoff.
+// sorteos.css.
 export function SrtDrawReel({ sorteo, spinning, revealed, onLand }: { sorteo: Sorteo; spinning?: boolean; revealed?: boolean; onLand?: () => void }) {
   const t = useTranslations("common.giveaways")
   const trackRef = React.useRef<HTMLDivElement>(null)

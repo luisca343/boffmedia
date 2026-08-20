@@ -30,7 +30,7 @@ import {
 import { useT } from "../i18n"
 import { formatBytes, formatWhen } from "../utils/format"
 
-// HANDOFF §9 — "locked vs. user space" and "pack version pinning + rollback".
+// "locked vs. user space" and "pack version pinning + rollback".
 //
 // A separate component rather than more of PackDetail: both features read the
 // instance marker on the Rust side and neither belongs to the install state
@@ -42,14 +42,14 @@ import { formatBytes, formatWhen } from "../utils/format"
 type Props = {
   slug: string
   /** Pack password, if any — a revert re-downloads through the same
-   *  entitlement-checked route an install uses (§7.4). */
+   *  entitlement-checked route an install uses. */
   password?: string
   /** Called after a revert so the library's install state stops claiming the
    *  version that was just rolled back. */
   onChanged?: () => void
 }
 
-// §9 — "per-instance Java runtime + memory, with a sane heuristic". Three
+// "per-instance Java runtime + memory, with a sane heuristic". Three
 // states, three badges: what the player picked must be readable at a glance, or
 // "why is this pack using 4 GB?" becomes a support ticket.
 

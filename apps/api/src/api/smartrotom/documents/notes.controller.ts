@@ -45,16 +45,14 @@ import { SuccessResponse } from '@api/_utils/entities/common-response.entity';
 /**
  * Notes.
  *
- * Every route here used to be `@Public()` and took the owner from the URL or the
- * body (`GET all/:uuid`, `POST create { uuid }`), so an unauthenticated caller
- * could read, edit and permanently purge anybody's notes by guessing an integer.
- * The owner is now the authenticated principal's Minecraft uuid and nothing
- * else; the only route that stays reachable without a session is reading a note
- * that is explicitly marked public, and even that is checked server-side.
+ * The owner is the authenticated principal's Minecraft uuid and nothing else.
+ * Taking it from the URL or the body (`GET all/:uuid`, `POST create { uuid }`)
+ * lets an unauthenticated caller read, edit and permanently purge anybody's
+ * notes by guessing an integer, so no route does. The only one reachable
+ * without a session reads a note explicitly marked public, checked server-side.
  *
- * The legacy duplicate routes (`GET all/:uuid`, `POST note/:noteId/user/:uuid`,
- * `DELETE note/:noteId/user/:uuid`) are gone — they existed only to keep an
- * older client working and were a second, unguarded way into the same data.
+ * Do not reintroduce `:uuid` variants of these routes as a compatibility shim:
+ * they are a second, unguarded way into the same data.
  */
 @ApiTags('SmartRotom | Documents')
 @ApiBearerAuth()

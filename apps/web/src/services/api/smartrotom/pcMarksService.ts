@@ -9,8 +9,8 @@ import type { PcMark } from '@boffmedia/shared';
  * opaque content hash the client computes from immutable fields
  * (dex|palette|nature|ability|ivs). The API never validates it.
  *
- * The owner is no longer passed by the caller: the API takes it from the
- * session, so these calls carry the Bearer instead of a uuid.
+ * The owner is never passed by the caller: the API takes it from the session,
+ * so these calls carry the Bearer instead of a uuid.
  */
 export class PcMarksService {
   /**

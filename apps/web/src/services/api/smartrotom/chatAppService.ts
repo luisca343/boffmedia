@@ -6,7 +6,7 @@ import {
 
 // Chat is private data: every call carries the session Bearer, and the API takes
 // the acting player from that token rather than from the path or body. Sending a
-// uuid no longer selects whose chats you see.
+// uuid does not select whose chats you see.
 import type {
   CreateChatDto,
   CreateMessageDto,

@@ -93,8 +93,8 @@ export class EventsController {
     @Req() req: { user?: { roles?: string[]; userId?: number } },
   ): Promise<Event[]> {
     // Admins see every private event; an authenticated non-admin additionally
-    // sees the private events they actively participate in (the invite flow's
-    // payoff used to vanish from every listing).
+    // sees the private events they actively participate in — without this the
+    // invite flow's payoff never appears in any listing.
     const includePrivate =
       req.user?.roles?.includes(USER_ROLES.BOFF_ADMIN) ?? false;
     return await this.eventsFacadeService.getEvents({
@@ -598,9 +598,9 @@ export class EventsController {
     @Param('teamId') teamId: number,
     @Req() req: { user: { userId: number; roles?: string[] } },
   ): Promise<{ success: boolean }> {
-    // The joining identity comes from the token, never from the body: the old
-    // `participantId` field let any authenticated user enrol anyone else — and
-    // it was passed straight into a parameter the service reads as a *user* id.
+    // The joining identity comes from the token, never from the body. A
+    // `participantId` field lets any authenticated user enrol anyone else, and
+    // feeds straight into a parameter the service reads as a *user* id.
     return await this.eventsFacadeService.joinTeam(
       eventId,
       teamId,

@@ -2,11 +2,11 @@
  * Lazy geometry resolver for MODDED Minecraft blocks, read straight out of the
  * instance's mod JARs.
  *
- * Modded blocks used to render as a flat cube with one representative texture:
- * the full asset chain (blockstate → model + parents → per-face textures) was
- * only implemented for vanilla ids, against the CDN mirror. That chain is
- * game-agnostic, so all that is missing for a mod is an {@link AssetProvider}
- * over its JAR — this module supplies one per namespace and drives the same
+ * Without this, a modded block renders as a flat cube with one representative
+ * texture: the full asset chain (blockstate → model + parents → per-face
+ * textures) is implemented against the CDN mirror, for vanilla ids. That chain
+ * is game-agnostic, so all a mod needs is an {@link AssetProvider} over its JAR
+ * — this module supplies one per namespace and drives the same
  * `resolveBlockModel` the vanilla path uses.
  *
  * Two constraints shape everything here:

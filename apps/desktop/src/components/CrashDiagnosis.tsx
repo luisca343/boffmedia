@@ -3,7 +3,7 @@ import { useT } from "../i18n"
 
 import type { CrashDiagnosis as Diagnosis, CrashKind } from "../services/types"
 
-// HANDOFF §9. The verdict comes from `src-tauri/src/install/crash.rs`; this only
+// The verdict comes from `src-tauri/src/install/crash.rs`; this only
 // renders it. Deliberately NOT a Panel: it is embedded inside panels on two
 // screens, and nesting panels reads as a bug.
 

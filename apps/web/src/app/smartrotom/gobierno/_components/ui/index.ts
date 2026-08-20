@@ -1,6 +1,6 @@
 // The Gobierno de Teras primitive kit (`gt-*`). Import from this barrel, never by deep path.
 // Add a line here whenever a primitive is created, and a specimen to the showcase chapter
-// at /smartrotom/styles/components (SMARTROTOM_V3 §1, §14).
+// at /smartrotom/styles/components.
 
 export { Icon, type IconName } from "./Icon"
 export { Seal } from "./Seal"

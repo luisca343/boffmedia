@@ -30,7 +30,7 @@ export function WaxSeal({
   alt: string
   earned: boolean
   size?: number
-  /** The seal's ink as an `r g b` triplet — data-driven, so it rides on `style` (§4). */
+  /** The seal's ink as an `r g b` triplet — data-driven, so it rides on `style`. */
   tint: string
   /** Strike it on mount: the stamp comes down. */
   slam?: boolean

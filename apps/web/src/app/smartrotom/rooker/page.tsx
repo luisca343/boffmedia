@@ -14,11 +14,11 @@ import { Button } from "./_components/ui"
 import type { FeedTab } from "./_types"
 
 /**
- * The timeline. A thin orchestrator (§12): it picks a tab and hands the list to
+ * The timeline. A thin orchestrator: it picks a tab and hands the list to
  * `PostCard`.
  *
  * The feed genuinely starts empty — Rooker ships with no fabricated trinos, because a
- * social network seeded with fake posts is a demo, not a product (§9). So the empty
+ * social network seeded with fake posts is a demo, not a product. So the empty
  * state is a first-class screen, and it tells the reader what to do rather than
  * apologising for having nothing.
  */

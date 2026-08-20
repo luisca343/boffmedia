@@ -43,9 +43,9 @@ function lookOf(category: string): Look {
  *
  * `achievements` and `logros` are THE SAME ROWS. `/pasaporte/logros` returns the whole
  * achievement list with `points`/`tier`/`rarity` bolted on — it is not a second, separate
- * trophy system. Walking both lists therefore stamps every badge onto the timeline twice, which
- * is exactly what it used to do. So merge them on `id` and emit one milestone per achievement,
- * taking the tier from the logro side when it is there.
+ * trophy system. Walking both lists stamps every badge onto the timeline twice, so
+ * merge them on `id` and emit one milestone per achievement, taking the tier from
+ * the logro side when it is there.
  */
 export function milestonesFromHistory(
   achievements: UserAchievement[] = [],

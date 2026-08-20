@@ -115,10 +115,10 @@ export function RandomizerPanel({
       toast.success(t("autoInstalled"))
     } catch (err) {
       const message = (err as { message?: string })?.message ?? (typeof err === "string" ? err : t("downloadError"))
-      // Every failure lands on the retryable panel, including one that happened
-      // before the assignment resolved. The old split showed a dead-end message
-      // for those, which is the worst possible response to a transient network
-      // error on the one screen that can fix the pack.
+      // Every failure lands on the retryable panel, including one raised before
+      // the assignment resolved. Splitting those onto a dead-end message is the
+      // worst possible response to a transient network error, on the one screen
+      // that can fix the pack.
       setError(message)
       setFlowState("error")
       console.error("Randomizer auto-flow failed:", err)
@@ -126,9 +126,9 @@ export function RandomizerPanel({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [packId, slug, missingKey, romBlocked, t, refreshInstallState])
 
-  // One entry point. This used to fetch the assignment on mount and then fetch
-  // it AGAIN inside the flow, which was two round trips for one screen — and
-  // the mount copy owned the decision about whether to download at all.
+  // One entry point. Fetching the assignment on mount and again inside the flow
+  // is two round trips for one screen, and leaves the mount copy owning the
+  // decision about whether to download at all.
   useEffect(() => {
     if (flowState !== "idle") return
     const timer = setTimeout(() => {

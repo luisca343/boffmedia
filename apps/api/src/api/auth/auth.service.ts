@@ -187,8 +187,8 @@ export class AuthService {
 
   async googleLogin(googleUser: any) {
     // Route through createFromGoogle so the google id is captured/synced onto
-    // the account (find by google id → by email(attach) → create) — the old
-    // findByEmail shortcut never stored googleId and broke new sign-ups.
+    // the account (find by google id → by email(attach) → create). A bare
+    // findByEmail shortcut never stores googleId and breaks new sign-ups.
     const user = await this.usersService.createFromGoogle(googleUser);
     return this.login(user);
   }

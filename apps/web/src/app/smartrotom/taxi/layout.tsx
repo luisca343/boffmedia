@@ -5,9 +5,9 @@ import { useRotomMode } from "@/components/smartrotom/theme/useRotomTheme"
 import { AppQueryProvider as TaxiQueryProvider } from "@/components/smartrotom/behavior/QueryProvider"
 
 /**
- * The taxi's scope root (SMARTROTOM_V3 §2). Every `tx-*` token resolves off `.tx-app`,
- * and `data-theme` swaps the palette — the mode comes from the one platform theme picker
- * (§2b), never from an in-app toggle.
+ * The taxi's scope root. Every `tx-*` token resolves off `.tx-app`,
+ * and `data-theme` swaps the palette — the mode comes from the one platform theme picker,
+ * never from an in-app toggle.
  *
  * The height is pinned explicitly (viewport minus the 3rem Rotom nav) rather than chained
  * up through AppWrapper's flex tree with `h-full` — the same way Starbank, ChatApp and

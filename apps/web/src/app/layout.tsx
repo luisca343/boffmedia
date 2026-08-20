@@ -1,7 +1,7 @@
 import type { Metadata } from "next"
 import "./globals.css"
-// Must stay immediately after globals.css: it defines the v3 theme tokens that
-// used to live inside it, and the cascade position is load-bearing.
+// Must stay immediately after globals.css: it defines the v3 theme tokens, and
+// the cascade position is load-bearing.
 import "@boffmedia/tailwind-config/base.css"
 import { env } from "@/config/env"
 

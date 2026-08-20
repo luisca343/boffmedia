@@ -36,9 +36,9 @@ import type { ProfileTab } from "../_types"
  * battle count from the replay log. That is the trade the design makes — the decoration
  * is yours, the numbers are the server's.
  *
- * [deferred] The handoff also put a trainer LEVEL badge and a TEAM chip (Místico /
- * Valor / Sabio) up here. Neither exists: `rotom_users` has no level and the server has
- * no factions, so both are omitted rather than invented.
+ * [deferred] No trainer LEVEL badge and no TEAM chip (Místico / Valor / Sabio):
+ * `rotom_users` has no level and the server has no factions, so both are omitted rather
+ * than invented.
  */
 export default function ProfilePage() {
   const t = useTranslations("rooker")

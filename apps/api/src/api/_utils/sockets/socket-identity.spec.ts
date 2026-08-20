@@ -64,7 +64,7 @@ describe('socket identity', () => {
     });
 
     it('refuses an unsigned uuid claim — the whole point of the fix', () => {
-      // The gateway used to take this shape straight out of the message body.
+      // The gateway must never take this shape straight out of the message body.
       expect(
         identifySocket(
           jwt,

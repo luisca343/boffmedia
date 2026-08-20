@@ -1,6 +1,6 @@
 // Every tone is a set of LITERAL class strings. Tailwind's JIT only ever sees literal
 // strings, so a name built at runtime (`bg-gt-${tone}`) compiles to nothing at all —
-// no error, no warning, just a missing style. Full maps are the fix (SMARTROTOM_V3 §4).
+// no error, no warning, just a missing style. Full maps are the fix.
 //
 // `css` is the same colour as a raw `rgb(var(…))` value, for the handful of places that
 // need it as a data-driven inline value: the department spine's `--gt-dep`, an SVG fill,

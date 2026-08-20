@@ -262,10 +262,10 @@ struct NeoforgeVersions {
     versions: Option<Vec<String>>,
 }
 
-/// NeoForge derives its version from the Minecraft one, with the leading "1."
-/// of the old scheme dropped and the result padded to three components:
+/// NeoForge derives its version from the Minecraft one: drop the leading "1."
+/// of the 1.x scheme and pad the result to three components:
 ///   1.21.4 → 21.4.x    1.21 → 21.0.x    26.2 → 26.2.0.x    26.1.2 → 26.1.2.x
-/// Only 1.20.2+ exists as `neoforge`; 1.20.1 shipped under the old
+/// Only 1.20.2+ exists as `neoforge`; 1.20.1 ships under
 /// `net.neoforged:forge` coordinates and is deliberately not offered.
 async fn neoforge(minecraft: &str) -> Result<Vec<LoaderVersion>, MetaError> {
     let mut parts: Vec<String> = minecraft.split('.').map(str::to_string).collect();
@@ -276,8 +276,8 @@ async fn neoforge(minecraft: &str) -> Result<Vec<LoaderVersion>, MetaError> {
     if parts.is_empty() || !parts[0].chars().all(|c| c.is_ascii_digit()) || parts[0].is_empty() {
         return Ok(Vec::new());
     }
-    // The old scheme contributes two components (21.4 → 21.4.<build>); the new
-    // one keeps its own three (26.2 → 26.2.0.<build>).
+    // The 1.x scheme contributes two components (21.4 → 21.4.<build>); the
+    // year-based one keeps its own three (26.2 → 26.2.0.<build>).
     let width = if legacy { 2 } else { 3 };
     while parts.len() < width {
         parts.push("0".to_string());

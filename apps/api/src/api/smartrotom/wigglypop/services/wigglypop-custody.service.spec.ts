@@ -154,9 +154,9 @@ describe('WigglypopCustodyService', () => {
       expect(escrow.release).not.toHaveBeenCalled();
     });
 
-    // THE bug the whole flag exists to prevent. The game server can give a Pokémon but cannot
-    // take one, so a give with no matching take would hand the buyer a COPY and leave the
-    // seller holding the original — the market would print Pokémon.
+    // What the whole flag exists to prevent. The game server can give a Pokémon but cannot
+    // take one, so a give with no matching take hands the buyer a COPY and leaves the seller
+    // holding the original — the market would print Pokémon.
     it('NEVER calls givePokemon or giveItems — that would duplicate the Pokémon', async () => {
       const order = makeOrder();
 

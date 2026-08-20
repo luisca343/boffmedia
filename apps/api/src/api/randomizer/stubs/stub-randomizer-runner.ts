@@ -6,9 +6,8 @@ import type {
 } from '../ports/randomizer-runner.port';
 
 /**
- * Stub implementation of IRandomizerRunner for Phase 0.
- * Always throws ServiceUnavailableException.
- * Real FVX child-process runner will replace this in Phase 1.
+ * Stub IRandomizerRunner: always throws ServiceUnavailableException. Replaced by
+ * the FVX child-process runner once it exists.
  */
 @Injectable()
 export class StubRandomizerRunner implements IRandomizerRunner {

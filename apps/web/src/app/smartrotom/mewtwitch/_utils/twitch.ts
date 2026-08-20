@@ -40,6 +40,6 @@ export function toCategoryCard(g: TwitchGame): CategoryCardData {
     href: `${MEWTWITCH_BASE}/game/${g.id}`,
     art: twitchThumb(g.box_art_url, 220, 300),
     name: g.name,
-    // Twitch's top-games endpoint carries no viewer/stream counts → gated (§13)
+    // Twitch's top-games endpoint carries no viewer/stream counts → gated
   }
 }

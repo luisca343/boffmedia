@@ -33,8 +33,8 @@ const TONE = {
 
 /**
  * The arcade's only dialog — a skin over the shared `ModalShell`. Portal, Escape, scrim
- * dismiss, scroll lock, focus trap/restore and dialog semantics all come from there
- * (SMARTROTOM_V3 §2); this file only owns the CRT skin.
+ * dismiss, scroll lock, focus trap/restore and dialog semantics all come from there;
+ * this file only owns the CRT skin.
  */
 export function Modal({
   open,

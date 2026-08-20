@@ -19,6 +19,6 @@ export function useToolT(namespace: string): Translate {
     t(`${namespace}.${key}`, values);
 }
 
-/** Message-key namespaces owned by this package (Phase 1 step 3 of the plan). */
+/** Message-key namespaces owned by this package. */
 export const SCHEMATIC_COMPAT_NS = "tools.schematicCompat";
 export const SCHEMATIC_VIEWER_NS = "tools.schematicViewer";

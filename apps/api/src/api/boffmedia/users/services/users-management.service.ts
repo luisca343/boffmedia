@@ -439,8 +439,8 @@ export class BoffMediaUsersManagementService {
 
     try {
       // Password and OAuth-identity changes are intentionally NOT handled here.
-      // UpdateUserDto no longer carries `password`/`googleId`/`discordId`/`uuid`,
-      // so a generic profile update can't overwrite credentials or hijack an
+      // UpdateUserDto carries no `password`/`googleId`/`discordId`/`uuid`, so a
+      // generic profile update cannot overwrite credentials or hijack an
       // account. Password change belongs to its own owner-checked endpoint.
       return await this.usersRepository.updateUser(id, updateData);
     } catch (error: any) {

@@ -10,7 +10,7 @@ export { toast }
 
 /**
  * The host portals to `document.body`, so it is wrapped in `ThemedLayer` — outside
- * `.wp-app` every `wp-*` var is undefined and the pill would render unthemed (§2).
+ * `.wp-app` every `wp-*` var is undefined and the pill would render unthemed.
  */
 
 const DOT: Record<ToastKind, string> = {

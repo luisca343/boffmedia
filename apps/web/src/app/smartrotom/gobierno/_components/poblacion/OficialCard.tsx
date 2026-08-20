@@ -9,8 +9,8 @@ import { useRevokeRole } from "../../_hooks/queries"
 import { badgeOf } from "../../_utils/format"
 import type { Oficial } from "../../_types"
 
-// The handoff also showed `since` (appointment date) and `online` — neither exists (roles
-// carry no grant timestamp, and there is no presence tracking here), so both are omitted.
+// No `since` (appointment date) and no `online`: roles carry no grant timestamp and
+// there is no presence tracking here, so both are omitted rather than faked.
 export function OficialCard({ oficial, isMe, canManage }: { oficial: Oficial; isMe: boolean; canManage: boolean }) {
   const t = useTranslations("gobierno")
   const openDossier = useGobiernoUi((s) => s.openDossier)

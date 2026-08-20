@@ -6,9 +6,9 @@ import { Icon, type IconName } from "@boffmedia/ui"
 import { AvPill } from "../../ui/av-kit"
 
 /**
- * Manga admin «Señal» atoms — the handoff `av-chapter` chip strip + `av-mcard`
- * library cards + the download/export progress readout, ported to Tailwind + v3
- * tokens. Shared by the downloader and the library panels.
+ * Manga admin «Señal» atoms — the `av-chapter` chip strip, `av-mcard` library
+ * cards and the download/export progress readout, on Tailwind + v3 tokens.
+ * Shared by the downloader and the library panels.
  */
 
 /* ---- diagonal-stripe cover (av-mcard__cover) ------------------------------- */

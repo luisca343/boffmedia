@@ -193,7 +193,7 @@ export function EmulatorEditor({
     if (next !== kind) {
       setRomPath((p) => (p === defaultRomPath(kind) ? defaultRomPath(next) : p))
       setPatchedRomPath((p) => (p === defaultPatchedPath(kind) ? defaultPatchedPath(next) : p))
-      // A library ROM for the old platform cannot run on the new emulator.
+      // A library ROM for the previous platform cannot run on the new emulator.
       setLibraryRomId((id) => {
         const rom = libraryRoms.find((r) => String(r.id) === id)
         return rom && rom.gamePlatform !== ROM_PLATFORM[next] ? "" : id

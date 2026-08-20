@@ -8,19 +8,14 @@ import { TokenSweeperRepository } from './repositories/token-sweeper.repository'
 const DEVICE_CODE_GRACE_MS = 60 * 60 * 1000;
 
 /**
- * Deletes single-use credentials once they can no longer be used.
- *
- * Nothing purged these before: password-reset tokens, email verifications and
- * desktop device codes accumulated forever. `desktop-device.repository` even
- * had a `sweepExpired()`, but the only caller was the poll path, so a code
- * nobody polled for stayed on disk indefinitely. Rows here are the *hashes* of
- * live credentials — keeping them past their expiry is storage no one needs and
+ * Deletes single-use credentials — password-reset tokens, email verifications,
+ * desktop device codes — once they can no longer be used. The rows are *hashes*
+ * of live credentials, so keeping them past expiry is storage no one needs and
  * an audit surface no one wants.
  *
- * Housekeeping only: every read path already re-checks expiry and single-use,
- * so nothing depends on this having run. The queries live in
- * `TokenSweeperRepository` (api-standards.md §Layering — a service never talks
- * to DRIZZLE directly).
+ * Housekeeping only: every read path re-checks expiry and single-use, so nothing
+ * depends on this having run. The queries live in `TokenSweeperRepository`; a
+ * service never talks to Drizzle directly.
  */
 @Injectable()
 export class TokenSweeperService {

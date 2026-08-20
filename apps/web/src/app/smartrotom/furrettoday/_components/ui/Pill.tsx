@@ -2,7 +2,7 @@ import type { FtTone } from "../../_utils/accents";
 
 /**
  * Literal classes per tone — the tone is data-driven (it comes from an
- * article's accent), so it can never be interpolated (§4).
+ * article's accent), so it can never be interpolated.
  */
 const TONE: Record<FtTone, string> = {
   ink: "bg-ft-ink text-ft-yellow",

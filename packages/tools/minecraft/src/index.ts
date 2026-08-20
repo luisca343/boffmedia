@@ -1,7 +1,7 @@
 /**
  * @boffmedia/tools-minecraft — the Minecraft tool domain.
  *
- * Host-agnostic by contract (see the plan's §3): no `next/*`, no `next-intl`,
+ * Host-agnostic by contract: no `next/*`, no `next-intl`,
  * no `@/` imports, no `@tauri-apps/*`. Everything host-shaped goes through
  * `@boffmedia/tool-kit`; translation rides on `@boffmedia/ui`'s `configureUi`.
  */

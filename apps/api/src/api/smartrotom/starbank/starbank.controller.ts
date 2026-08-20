@@ -146,7 +146,7 @@ export class StarbankController {
     if (!image) return account;
 
     // Written after the insert, because the file is named after the account id — see
-    // account-image.ts for why it is no longer named after whatever the user typed.
+    // account-image.ts for why it must not be named after whatever the user typed.
     const imagePath = await saveAccountImage(account.id, image);
     return await this.starbankFacadeService.updateAccount(
       account.id,

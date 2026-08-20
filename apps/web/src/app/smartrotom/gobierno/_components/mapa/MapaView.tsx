@@ -15,11 +15,10 @@ import { centroid, indexRegions, type Pt } from "../../_utils/geo"
 import type { Parcela, Zona } from "../../_types"
 
 /**
- * The handoff's cadastral map is a full-bleed canvas with a floating header. The real
- * layout shell (`layout.tsx`, off-limits for this build) wraps every page in a padded,
- * document-flow container instead of a fixed-height one, so this view carries its own
- * viewport-relative height rather than inheriting one — the split canvas/panel still reads
- * as one tall plan of the region, just inside a card instead of edge-to-edge.
+ * The layout shell (`layout.tsx`) wraps every page in a padded, document-flow container
+ * rather than a fixed-height one, so this view carries its own viewport-relative height
+ * instead of inheriting one. The split canvas/panel still reads as one tall plan of the
+ * region, inside a card rather than edge-to-edge.
  */
 export function MapaView() {
   const t = useTranslations("gobierno")

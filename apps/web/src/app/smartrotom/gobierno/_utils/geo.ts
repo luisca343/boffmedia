@@ -74,7 +74,7 @@ export function polygonPath(points: Pt[], proj: Projection): string {
 /** A deterministic hue from a town's own (real) name — there is no admin-assigned town
  * colour anywhere in the data, so this is the honest way to give each town a stable,
  * distinct fill without inventing a palette. Used only as inline SVG/style values, which
- * is the documented exception for data-driven colour (SMARTROTOM_V3 §4). */
+ * is the documented exception for data-driven colour. */
 export function townHue(town: string): number {
   let h = 0
   for (let i = 0; i < town.length; i++) h = (h * 31 + town.charCodeAt(i)) >>> 0

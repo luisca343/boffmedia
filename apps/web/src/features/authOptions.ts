@@ -83,21 +83,17 @@ export const authOptions: NextAuthOptions = {
           if (!credentials?.username || !credentials?.uuid || !credentials?.world) {
             throw new AuthError("Missing required Minecraft credentials", AUTH_ERROR_CODES.MISSING_CREDENTIALS);
           }
-          // `serverId` is the credential. There is no longer a second path: the
-          // mod joined Mojang with the running game's own access token, and the
-          // API confirms it with hasJoined, so the identity is PROVEN rather
-          // than asserted.
+          // `serverId` is the credential, and the only one: the mod joins
+          // Mojang with the running game's own access token and the API confirms
+          // it with hasJoined, so the identity is PROVEN rather than asserted.
           //
-          // What used to sit here was `/auth/loginmc`, which authenticated on
-          // the `world` string — documented non-secret and shipped in the
-          // browser bundle, so a public UUID was enough to impersonate anyone.
-          // It survived only for jars predating the MC_JOIN_SERVER query; 1.16.5
-          // is deprecated and every supported jar carries the handshake, so the
-          // weaker path is gone rather than merely deprioritised.
+          // Never authenticate on the `world` string instead. It is documented
+          // non-secret and ships in the browser bundle, so a public UUID would
+          // be enough to impersonate anyone.
           //
           // `uuid` and `world` stay in `credentials` because the session's
           // smartRotomUser block below reports the live game values — they are
-          // display data now, never proof of anything.
+          // display data, never proof of anything.
           if (!credentials.serverId) {
             throw new AuthError("Minecraft identity was not proven", AUTH_ERROR_CODES.MISSING_CREDENTIALS);
           }

@@ -1,10 +1,10 @@
 import { ForbiddenException } from '@nestjs/common';
 import { SocketsGateway } from './sockets.gateway';
 
-// Call signalling used to trust the client body for both membership and the
-// recipient list, which let any authenticated socket ring — or hang up on —
-// a conversation it was not in. These tests hold the line: identity comes from
-// the socket, recipients come from the chat.
+// Call signalling must not trust the client body for membership or the
+// recipient list: that lets any authenticated socket ring — or hang up on — a
+// conversation it is not in. These tests hold the line: identity comes from the
+// socket, recipients come from the chat.
 
 const ACTOR = 'aaaaaaaa-0000-0000-0000-000000000001';
 const PEER = 'bbbbbbbb-0000-0000-0000-000000000002';

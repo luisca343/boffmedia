@@ -9,9 +9,9 @@ import { AvPill, AvLiveDot } from "./av-kit"
 
 /**
  * Admin data/telemetry layer — the `av-*` control-room table, rows, pipeline,
- * charts, GPU/split/distribution bars from the handoff, ported to Tailwind + v3
- * tokens. The AI-pipeline & training charts are an aspirational board fed by demo
- * data until the ML API lands. [deferred]
+ * charts and GPU/split/distribution bars, on Tailwind + v3 tokens. The
+ * AI-pipeline and training charts run on demo data until the ML API lands.
+ * [deferred]
  */
 
 /* ---- resource row + actions ------------------------------------------------ */

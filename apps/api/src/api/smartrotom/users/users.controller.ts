@@ -38,14 +38,14 @@ import { UserValidationResult } from './entities/user-validation-result.entity';
 //
 // Reads (roster, by id/uuid, accounts, stats, validate) need a **session**: any
 // signed-in player, because ChatApp's group picker legitimately lists players.
-// They used to be `@Public()`, which meant the whole username/uuid roster was
-// enumerable by anyone on the internet — while `POST batch`, the same data in
-// one call, demanded ROTOM_ADMIN. The singular and batch forms now agree.
+// `@Public()` here would make the whole username/uuid roster enumerable by
+// anyone on the internet, while `POST batch` — the same data in one call —
+// demands ROTOM_ADMIN. The singular and batch forms must agree.
 //
 // Writes that create or mutate a user (`POST /`, `PATCH :id`, `DELETE :id`,
-// `find-or-create`, `initialize`) stay ROTOM_ADMIN.
+// `find-or-create`, `initialize`) are ROTOM_ADMIN.
 //
-// No route carries `@Public()` any more, including the admin ones where it was
+// No route carries `@Public()`, including the admin ones where it would be
 // inert: `@Public()` only stands down the global JwtAuthGuard, so next to an
 // explicit guard it changes nothing and only obscures which credential applies.
 @Controller('smartrotom/users')

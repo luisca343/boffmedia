@@ -1,7 +1,6 @@
-// v3 migration: this group's pages now render on the plain v3 surface
-// (`bg-base` from the (boffmedia) layout). The old v2 `FloatingSection` chrome
-// was removed here; unmigrated pages in this group (juegos, sugerir) render
-// without the decorative blobs until they're migrated too.
+// This group's pages render on the plain v3 surface (`bg-base`, from the
+// (boffmedia) layout) with no `FloatingSection` chrome. Pages still on v2
+// (juegos, sugerir) render without the decorative blobs until they move over.
 export default function EventosLayout({ children }: { children: React.ReactNode }) {
   return <>{children}</>
 }

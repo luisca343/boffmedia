@@ -30,7 +30,7 @@ interface WaxSealProps {
 
 /**
  * The seal that closes every paper on the board. Its colour is the quest's
- * status, applied as an SVG fill (a data-driven value — §4 — never a
+ * status, applied as an SVG fill (a data-driven value, never a
  * `bg-ms-seal-${status}` class the JIT would silently drop).
  */
 export function WaxSeal({ glyph, color, size = 60, tilt = -8, status, className }: WaxSealProps) {

@@ -15,9 +15,9 @@ import type { RookerAuthor, RookerBattle } from "../../_types"
  * replay where `winner` is null is a draw or an unfinished match, and the card says so
  * rather than defaulting to a loss.
  *
- * [deferred] The handoff also showed a score line ("3 – 2"), the format, the duration
- * and an MVP Pokémon. `rotom_replays` stores none of them — only the two sides, the
- * winner and the serialised replay — so they are omitted rather than invented. The
+ * [deferred] No score line ("3 – 2"), format, duration or MVP Pokémon:
+ * `rotom_replays` stores none of them — only the two sides, the winner and the
+ * serialised replay — so they are omitted rather than invented. The
  * "Ver repetición" button is real: it deep-links into the Liga's replay viewer, which
  * already exists.
  */

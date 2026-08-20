@@ -22,7 +22,7 @@ export interface RaritySkin {
 
 /**
  * The rarity ladder. A data-driven colour set, so it lives as a JS map and is
- * applied inline or as a literal class — never as `bg-${rarity}` (§4, gap G2).
+ * applied inline or as a literal class — never as `bg-${rarity}`.
  *
  * `mythic` is design-only: the API's `ItemRarity` union stops at `legendary`
  * and no drop table can produce it. It is kept so the ladder reads complete in

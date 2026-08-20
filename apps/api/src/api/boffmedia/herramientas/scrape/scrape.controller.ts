@@ -47,8 +47,8 @@ import { Roles } from '@api/_utils/decorators/roles.decorator';
 @ApiTags('BoffMedia | Scrape')
 @Public()
 // Browsing the catalogue is public; making the server DOWNLOAD, convert or write
-// files is not. Every write route below used to be public, so anyone could make
-// the box fetch gigabytes or rewrite library metadata.
+// files is not. Public, the write routes below would let anyone make the box
+// fetch gigabytes or rewrite library metadata.
 @Controller('boffmedia/herramientas/scrape')
 export class ScrapeController {
   constructor(private readonly scrapeFacadeService: ScrapeFacadeService) {}

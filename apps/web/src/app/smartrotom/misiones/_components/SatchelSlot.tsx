@@ -5,10 +5,10 @@ import type { SatchelItem } from "../_types"
 import { ItemSprite } from "./ui"
 
 /**
- * One cell of La Mochila. The API has no rarity, so unlike the handoff's
- * glowing rarity rings there is only one distinction that matters: owned or
- * not. An unearned item keeps its mystery — greyed out, its sprite swapped
- * for a "?" — rather than spoiling what you haven't gotten yet.
+ * One cell of La Mochila. The API has no rarity, so there is only one
+ * distinction to draw: owned or not. An unearned item keeps its mystery —
+ * greyed out, its sprite swapped for a "?" — rather than spoiling what you
+ * haven't gotten yet.
  */
 export function SatchelSlot({ item }: { item: SatchelItem }) {
   const t = useTranslations("misiones.satchelSlot")

@@ -62,10 +62,10 @@ import {
   ResolvedFileEntity,
 } from './entities/packs.entity';
 
-// The dashboard's surface — HANDOFF §4.1 puts pack authoring in the web app,
-// not the launcher. Every route is admin-only and carries its own
+// The dashboard's surface: pack authoring lives in the web app, not the
+// launcher. Every route is admin-only and carries its own
 // @UseGuards(JwtAuthGuard, RolesGuard); there is no class-level @Public() here,
-// which is exactly what keeps the guards effective.
+// which is what keeps the guards effective.
 @ApiTags('Packs | Admin')
 @Controller('packs/admin')
 @UseGuards(JwtAuthGuard, FullSessionGuard, RolesGuard)

@@ -6,8 +6,8 @@
  * fallback to input element). Callback-driven, no store imports — each tool's
  * picker UI remains independent.
  *
- * Duplicated detection and attribute logic (mimir #RF-13, RF-14) unified here
- * so both schematic-compat and schematic-viewer share one behavior.
+ * Detection and the attribute effect live here once so schematic-compat and
+ * schematic-viewer share one behaviour rather than each keeping a copy.
  */
 
 import { useEffect, useRef, useState } from "react";

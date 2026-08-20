@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test"
 
-// The desktop-app pack registry admin section (HANDOFF §7). Runs under the
+// The desktop-app pack registry admin section (HANDOFF). Runs under the
 // chromium:admin project, which mints a REAL credentials session — see
 // tests/admin.setup.ts on why a forged cookie is not acceptable here.
 //

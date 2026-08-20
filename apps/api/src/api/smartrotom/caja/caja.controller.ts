@@ -53,7 +53,7 @@ export class CajaController {
   }
 
   /**
-   * Phase one of loss-safe delivery (DARCAJA.md §7): soft-locks the grant and returns it
+   * Phase one of loss-safe delivery: soft-locks the grant and returns it
    * with a `reservationId`, spending nothing. The mod delivers, then calls `confirm`; an
    * unconfirmed reservation expires and frees up. Same auth/envelope/exclude rules as `claim`.
    */

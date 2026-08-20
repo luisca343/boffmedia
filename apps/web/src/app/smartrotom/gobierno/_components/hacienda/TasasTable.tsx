@@ -6,9 +6,9 @@ import { money } from "../../_utils/format"
 import { useFormat } from "@boffmedia/ui/useFormat"
 import type { Tasa } from "../../_types"
 
-// The handoff's mock had a "pendiente"/"cobro abierto" column — our real Tasa has no such
-// field (only `amount` as tariff and `collected` derived from the ledger), so it is gated
-// here in favour of `active`, which is a real column.
+// No "pendiente"/"cobro abierto" column: a Tasa has no such field (only `amount` as
+// tariff and `collected`, derived from the ledger). The table shows `active` instead,
+// which is a real column.
 export function TasasTable({ tasas }: { tasas: Tasa[] }) {
   const t = useTranslations("gobierno")
   const { intlLocale } = useFormat()

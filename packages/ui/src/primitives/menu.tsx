@@ -55,9 +55,9 @@ export function Menu({
   const [active, setActive] = React.useState(-1)
   const rootRef = React.useRef<HTMLSpanElement>(null)
   // The popup is rendered in a portal (below), so it escapes any ancestor's
-  // clip-path or overflow — a card whose `.cut-corner` clip used to swallow the
-  // menu whole no longer can. Its own ref keeps outside-click dismissal from
-  // treating a click on a menu item as a click "outside" the menu.
+  // clip-path or overflow — a card's `.cut-corner` clip would otherwise swallow
+  // the menu whole. Its own ref keeps outside-click dismissal from treating a
+  // click on a menu item as a click "outside" the menu.
   const menuRef = React.useRef<HTMLDivElement>(null)
   const itemRefs = React.useRef<(HTMLButtonElement | null)[]>([])
   const [coords, setCoords] = React.useState<{ top?: number; bottom?: number; left?: number; right?: number }>({})

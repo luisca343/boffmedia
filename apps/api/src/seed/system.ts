@@ -9,7 +9,7 @@ import pino from 'pino';
  * categories, the ledger's house accounts, the civic rate card, the mine's drop
  * table and the passport cycle are all things the API assumes exist.
  *
- * Ordering is load-bearing and used to live only in someone's head:
+ * Ordering is load-bearing:
  *   1. `default`          — roles, the admin's rotom_users row, the admin
  *                           account, the app registry. Everything else FKs to
  *                           rows this creates.

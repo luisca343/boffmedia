@@ -2,10 +2,10 @@ import type { PasaporteLogroEntity, PasaporteStandingEntity } from "@boffmedia/s
 
 /**
  * The API's own shapes, re-exported under short local names. They are ALIASES, never
- * copies: a hand-written duplicate of an API entity drifts silently (the old
- * `_types/Achievement.ts` in this folder still types `completed` as a boolean — the API
- * has always sent 0/1), and by the time the drift shows it is a wrong number on screen.
- * If a field is missing, it is missing from the API and belongs in a migration, not here.
+ * copies: a hand-written duplicate of an API entity drifts silently — typing `completed`
+ * as a boolean when the API sends 0/1, say — and by the time the drift shows it is a
+ * wrong number on screen. If a field is missing, it is missing from the API and belongs
+ * in a migration, not here.
  */
 export type {
   PasaporteLadderRungEntity as LadderRung,
@@ -71,7 +71,7 @@ export interface PageDescriptor {
 
 export interface Rarity {
   label: string
-  /** A literal class string — never interpolated (§4). */
+  /** A literal class string — never interpolated. */
   className: string
 }
 
@@ -102,7 +102,7 @@ export interface Milestone {
   title: string
   desc: string
   icon: MilestoneIcon
-  /** An ink NAME, not a colour — the UI maps it through the literal token map (§4). */
+  /** An ink NAME, not a colour — the UI maps it through the literal token map. */
   accent: ChapterAccent
   /** A crown moment: a league title, the Frente de Batalla, a platinum logro. */
   big?: boolean

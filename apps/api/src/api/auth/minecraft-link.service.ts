@@ -16,9 +16,9 @@ import { firstValueFrom } from 'rxjs';
 // public client that already exists. The user reads a short code off the page
 // and approves it at microsoft.com/link.
 //
-// This replaces the old link paths, which authenticated on the `MC_WORLD`
-// string — documented as non-secret and shipped inside the browser bundle, so
-// anyone who knew a player's UUID could attach it to their own account.
+// Never authenticate a link on the `MC_WORLD` string: it is documented as
+// non-secret and ships inside the browser bundle, so knowing a player's UUID
+// would be enough to attach it to your own account.
 
 const DEVICE_CODE_URL =
   'https://login.microsoftonline.com/consumers/oauth2/v2.0/devicecode';
@@ -33,7 +33,12 @@ const MC_PROFILE_URL = 'https://api.minecraftservices.com/minecraft/profile';
 const RP_MINECRAFT = 'rp://api.minecraftservices.com/';
 
 /** The same approved public client the launcher uses. Not a secret — a public
- *  client registration has none. */
+ *  client registration has none.
+ *
+ *  The name Microsoft shows on the consent screen is the registration's display
+ *  name in the Azure portal (App registrations → Branding & properties → Name),
+ *  NOT anything sent from here. Renaming it there changes both surfaces at once
+ *  and does not change this id. */
 const CLIENT_ID = '72c3e158-bb47-4ef7-a50c-f3ce51698108';
 
 /** Must be the `consumers` tenant and exactly these scopes. */
@@ -155,12 +160,21 @@ export class MinecraftLinkService {
           RelyingParty: 'http://auth.xboxlive.com',
           TokenType: 'JWT',
         },
-        { timeout: 20_000 },
+        // Every other call in this chain sets validateStatus; this one did not,
+        // so an Xbox 4xx threw a raw axios error and reached the browser as a
+        // 500 with no usable message.
+        { timeout: 20_000, validateStatus: () => true },
       ),
     );
 
+    if (xbl.status < 200 || xbl.status >= 300) {
+      this.logger.error(`mc-link xbl authenticate → HTTP ${xbl.status}`);
+      throw new BadRequestException('Xbox rechazó la autenticación.');
+    }
+
     const uhs = xbl.data.DisplayClaims?.xui?.[0]?.uhs;
     if (!uhs) {
+      this.logger.error('mc-link xbl authenticate → 2xx but no user hash');
       throw new BadRequestException('Xbox no devolvió una sesión utilizable');
     }
 
@@ -177,9 +191,11 @@ export class MinecraftLinkService {
     );
 
     if (xsts.status === 401) {
+      this.logger.error(`mc-link xsts → 401 XErr=${xsts.data?.XErr}`);
       throw new BadRequestException(this.describeXErr(xsts.data?.XErr));
     }
     if (xsts.status < 200 || xsts.status >= 300) {
+      this.logger.error(`mc-link xsts → HTTP ${xsts.status}`);
       throw new BadRequestException('Xbox rechazó la sesión.');
     }
 
@@ -197,7 +213,20 @@ export class MinecraftLinkService {
         'Minecraft está limitando las peticiones de tu cuenta. Espera un minuto y vuelve a intentarlo.',
       );
     }
+    // 403 here is specifically "Invalid app registration" — the Azure app is not
+    // approved for the Minecraft API. `apps/desktop` names this case explicitly
+    // (`AuthError::AppNotApproved`); folding it into a generic rejection sent
+    // everyone hunting for a player-account problem that does not exist.
+    if (mc.status === 403) {
+      this.logger.error(
+        `mc-link login_with_xbox → 403, app registration not approved for the Minecraft API: ${JSON.stringify(mc.data)}`,
+      );
+      throw new BadRequestException(
+        'El registro de la aplicación no está aprobado por Microsoft para la API de Minecraft.',
+      );
+    }
     if (mc.status < 200 || mc.status >= 300 || !mc.data?.access_token) {
+      this.logger.error(`mc-link login_with_xbox → HTTP ${mc.status}`);
       throw new BadRequestException('Minecraft rechazó la sesión.');
     }
     // TRAP: this response also carries a `username` field, and it is an internal
@@ -218,6 +247,7 @@ export class MinecraftLinkService {
       );
     }
     if (profile.status < 200 || profile.status >= 300 || !profile.data?.id) {
+      this.logger.error(`mc-link profile → HTTP ${profile.status}`);
       throw new UnauthorizedException('No se pudo leer el perfil de Minecraft');
     }
 

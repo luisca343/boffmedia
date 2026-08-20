@@ -4,8 +4,8 @@ import * as React from "react"
 import { cn } from "@/lib/utils"
 import { Icon, CodeBlock, INPUT_BASE, type IconName } from "@boffmedia/ui"
 
-// ── Searchable combo (port of the handoff CxCombo: input + filtered dropdown,
-//    ↑/↓/Enter/Esc, right-aligned `.tail` slot in options) ─────────────────────
+// ── Searchable combo: input + filtered dropdown, ↑/↓/Enter/Esc, and a
+//    right-aligned `.tail` slot in options ───────────────────────────────────
 export interface WmComboProps<T> {
   value: string
   getItems: (query: string) => T[]

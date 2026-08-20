@@ -13,7 +13,7 @@ export class CajaService {
 
   /**
    * One-shot claim: spends and returns in one step, so the caller must deliver what it
-   * gets or the reward is lost. Prefer `reserve` + `confirm` when delivery can drop (DARCAJA.md §7).
+   * gets or the reward is lost. Prefer `reserve` + `confirm` when delivery can drop.
    */
   async claim(
     uuid: string,

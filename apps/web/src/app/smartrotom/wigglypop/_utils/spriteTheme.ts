@@ -4,7 +4,7 @@ import type { WpSpriteWall } from "../_types/market.types"
  * Every Pokémon sprite in Wigglypop sits on a pastel wash, and which wash is
  * data-driven: shiny wins, then legendary, then the mon's primary type. Same rule
  * as `rarity.ts` — the classes are **literals in a map**, never `wp-wall-${type}`,
- * which the JIT would never compile (§4).
+ * which the JIT would never compile.
  *
  * Shiny takes ocean and legendary takes dusk on purpose: those two washes are the
  * coolest and the most violet in the set, so the teal shiny burst and the gold

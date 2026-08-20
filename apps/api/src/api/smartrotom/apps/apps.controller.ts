@@ -27,8 +27,8 @@ import { CurrentMcUuid } from '@api/_utils/decorators/current-user.decorator';
 @ApiTags('SmartRotom | Apps')
 // The app registry (create/rename/activate/delete) is an admin surface and is
 // gated per method below; the four `player/*` routes are the caller's own dock
-// and need only a session. The whole controller used to be @Public(), so anyone
-// could delete an app for everyone or reorder another player's dock.
+// and need only a session. A @Public() controller here would let anyone delete
+// an app for everyone, or reorder another player's dock.
 @Controller('/smartrotom/apps')
 export class AppsController {
   constructor(

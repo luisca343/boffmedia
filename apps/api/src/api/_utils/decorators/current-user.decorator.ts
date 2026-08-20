@@ -22,9 +22,9 @@ export interface AuthPrincipal {
  * The authenticated principal, straight off the token.
  *
  * Use this instead of taking an owner id from `@Param('uuid')` or a DTO field.
- * Routes used to read the owner out of the request — `GET folders/:uuid`,
- * `POST folders { uuid }` — which let any caller name whose data to touch, so
- * authenticating the route alone would not have fixed anything.
+ * Reading the owner out of the request — `GET folders/:uuid`,
+ * `POST folders { uuid }` — lets any caller name whose data to touch, and
+ * authenticating the route alone does not fix that.
  */
 export const CurrentUser = createParamDecorator(
   (_data: unknown, ctx: ExecutionContext): AuthPrincipal => {

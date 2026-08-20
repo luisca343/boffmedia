@@ -4,7 +4,7 @@
  * always did, and the Pixelmon vocabulary is an opt-in flourish on top.
  *
  * The class strings are full literals on purpose: a `text-rk-${type}` fragment is
- * invisible to the Tailwind JIT and would silently compile to nothing (§4, gap G2).
+ * invisible to the Tailwind JIT and would silently compile to nothing.
  */
 export type ReactionType = "heart" | "pokeball" | "choque" | "shiny" | "fuego"
 

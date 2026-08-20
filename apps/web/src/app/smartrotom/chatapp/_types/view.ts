@@ -17,7 +17,7 @@ export interface ChatMessageVM extends Omit<ChatMessage, "type" | "status" | "uu
   // union design:type and falls back to `object`, so the generated model widens it
   // to `Record<string, any>`. Narrowed back to what the wire actually sends.
   type: string;
-  // Phase 5 (optional until the API returns them)
+  // Optional until the API returns them
   status?: MessageStatus;
   replyTo?: number | null; // [deferred] no reply API yet
 }
@@ -28,7 +28,7 @@ export interface ChatVM extends Omit<Chat, "description" | "createdAt" | "update
   updatedAt?: string;
   messages: ChatMessageVM[];
   members: ChatMemberVM[];
-  // Phase 5 wiring (optional until backed by the API)
+  // Optional until backed by the API
   presence?: PresenceStatus;
   pinned?: boolean;
   muted?: boolean;

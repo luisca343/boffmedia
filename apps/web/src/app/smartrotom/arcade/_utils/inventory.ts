@@ -13,8 +13,8 @@ export const remaining = (item: ArcadeInventoryItem): number => item.amount - (i
  * Owned boxes, keyed by box id.
  *
  * Derived from the box ids the config itself declares — NOT from a hardcoded
- * name map. The old map keyed the battle box as `battle-box` while the API
- * stores `battle_box`, so a battle box a player owned never showed up as owned.
+ * name map. A hand-written map drifts from the API's ids (`battle-box` vs
+ * `battle_box`), and a box the player owns then never shows up as owned.
  */
 export function ownedBoxes(
   inventory: ArcadeInventoryResponse | undefined,

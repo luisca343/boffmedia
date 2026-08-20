@@ -31,7 +31,7 @@ export function Chip({
  * The rarity word. Text-only, no container — it is deliberately quieter than the
  * strip along the card's top edge, because on a grid of 60 cards a boxed badge on
  * every one turns into noise. Colour alone carries the tier here, but never *only*
- * colour: the word is always spelled out (§11).
+ * colour: the word is always spelled out.
  */
 export function RarityBadge({ rarity, className }: { rarity: WpRarity; className?: string }) {
   const t = useTranslations("wigglypop")

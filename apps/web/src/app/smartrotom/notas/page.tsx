@@ -99,8 +99,8 @@ export default function NotesPage() {
     [activeTab, splitId],
   );
 
-  // Double-clicking "new note" used to create two notes: the handler was a bare
-  // async callback and every trigger stayed enabled while it was in flight.
+  // Double-clicking "new note" must not create two notes: a bare async callback
+  // leaves every trigger enabled while it is in flight.
   const { submit: newNote, isPending: creatingNote } = useGuardedSubmit(async () => {
     const id = await actions.newNote({
       folderId: view.type === "folder" ? Number(view.id) : null,

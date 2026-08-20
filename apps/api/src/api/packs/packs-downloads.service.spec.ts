@@ -7,8 +7,8 @@ import { Readable } from 'stream';
 import { env } from '@/config/env';
 import { PacksDownloadsService } from './packs-downloads.service';
 
-// The blob store is the half of §7.2 that has no database behind it: if the
-// name on disk is not a true digest of the bytes, every launcher fails
+// The blob store is the half of the download path with no database behind it:
+// if the name on disk is not a true digest of the bytes, every launcher fails
 // verification and there is nothing in MySQL that would reveal why.
 describe('PacksDownloadsService — override blobs', () => {
   const service = new PacksDownloadsService({} as never);

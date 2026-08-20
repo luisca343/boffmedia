@@ -1,7 +1,7 @@
 export interface PixelArtSprite {
   /** One string per row; one character per pixel. `.` is transparent. */
   bitmap: string[]
-  /** Character → colour. Data-driven fills, so they are applied inline (§6). */
+  /** Character → colour. Data-driven fills, so they are applied inline. */
   legend: Record<string, string>
 }
 
@@ -16,7 +16,7 @@ export interface PixelArtProps {
 /**
  * Renders a sprite from a character bitmap as a grid of divs. The cabinet art is
  * original to this codebase — no Pokémon assets go through here; those keep
- * their own multi-tier sprite resolution (SMARTROTOM_V3.md §10).
+ * their own multi-tier sprite resolution.
  */
 export function PixelArt({ sprite, scale = 6, className, style }: PixelArtProps) {
   const { bitmap, legend } = sprite

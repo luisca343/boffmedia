@@ -312,9 +312,9 @@ describe('EventsService', () => {
     });
 
     it('refuses to open when the event is not active', async () => {
-      // The randomizer consumes the event lifecycle now; it used to flip the
-      // event to active itself, which is why an event with no randomizer config
-      // could never go live.
+      // The randomizer consumes the event lifecycle, it does not drive it.
+      // Flipping the event to active from here leaves an event with no
+      // randomizer config unable to go live at all.
       repository.getEventPackAndStatus.mockResolvedValue({
         packId: 'pack1',
         status: 'upcoming',

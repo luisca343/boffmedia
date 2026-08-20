@@ -56,8 +56,8 @@ import { Roles } from '@api/_utils/decorators/roles.decorator';
 @ApiTags('BoffMedia 🛠 | MHWilds')
 // The MH Wilds data endpoints are deliberately public — the Tools section works
 // without a Boffmedia account, in the web and in the launcher alike. Only the
-// four cache-maintenance routes are privileged; they used to be public too, so
-// anyone could flush or rebuild the cache at will.
+// four cache-maintenance routes are privileged: public, they would let anyone
+// flush or rebuild the cache at will.
 @Public()
 @Controller('tools/mhwilds')
 @UsePipes(new ValidationPipe({ transform: true, whitelist: true }))

@@ -12,10 +12,10 @@ import { boffMediaUsers } from './BoffMedia';
  * One row per person who may upload through ShareX.
  *
  * `POST /sharex` cannot carry a session — the uploader is a desktop tool, not a
- * browser — so the token IS the identity. It used to be a single shared secret
- * in the environment, which authenticated everyone as nobody: an upload could
- * not be traced to a person, and revoking one person's access meant rotating the
- * secret for everybody.
+ * browser — so the token IS the identity. A single shared secret in the
+ * environment authenticates everyone as nobody: an upload cannot be traced to a
+ * person, and revoking one person's access means rotating the secret for
+ * everybody.
  *
  * The plaintext token is never stored. Only its SHA-256 lives here, so a dump of
  * this table does not hand anyone upload access.

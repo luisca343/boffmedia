@@ -12,7 +12,7 @@ import { Icon } from "./Icon"
  * A Pokémon sprite, resolved through the shared sprite manifest — the same
  * `id:form:palette` lookup (with its form/palette fallbacks) the PC and Pokédex use.
  * Deliberately not `next/image`: the manifest already resolves the URL and the
- * optimiser would resample pixel art (§10).
+ * optimiser would resample pixel art.
  *
  * It subscribes to the manifest store rather than calling `getSpriteUrl`'s
  * `getState()` snapshot, so a whole grid fills in when the manifest lands instead of

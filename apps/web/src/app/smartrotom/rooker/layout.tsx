@@ -11,12 +11,12 @@ import { hydrateDisplay, useDisplayStore } from "./_stores/displayStore"
 import { displayVars, resolveCanvas } from "./_utils/display"
 
 /**
- * Rooker's scope root (SMARTROTOM_V3 §2). Every `rk-*` token resolves off `.rk-app`.
+ * Rooker's scope root. Every `rk-*` token resolves off `.rk-app`.
  *
  * `data-theme` carries the *canvas*, which is derived, not stored: the platform picker
- * decides light vs dark (§2b) and the reader only chooses which of the two darks. The
+ * decides light vs dark and the reader only chooses which of the two darks. The
  * accent and the body face ride on inline CSS vars rather than classes, because they
- * are runtime values — a `bg-rk-${accent}` class would never compile (§4).
+ * are runtime values — a `bg-rk-${accent}` class would never compile.
  *
  * `data-density` and `data-cards` are the two Pantalla knobs the post card reads.
  *

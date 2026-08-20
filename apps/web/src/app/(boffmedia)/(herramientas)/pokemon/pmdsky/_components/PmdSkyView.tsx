@@ -22,7 +22,7 @@ export function PmdSkyView() {
   // Both pmdsky catalogs are namespaced under `pmdsky` (common.json carries the
   // field labels plus `questTypes.*` / `rewardTypes.*`; dungeons.json hangs its
   // numeric ids off `pmdsky.dungeons.*`), so one scoped translator serves all of
-  // them. It used to be a root translator, which put ~40 keys at the message root.
+  // them. A root translator here would put ~40 keys at the message root.
   const t = useTranslations("pmdsky")
   const tApp = useTranslations("pmdsky.app")
   const ctx = useWmV3(t, tApp)

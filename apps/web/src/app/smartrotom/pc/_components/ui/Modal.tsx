@@ -30,7 +30,7 @@ export interface OverlayProps {
 
 /**
  * The scrim — a skin over the shared `ModalShell`. Closes on backdrop click and on
- * Escape — every overlay in the app gets both for free (SMARTROTOM_V3 §2), which is why
+ * Escape — every overlay in the app gets both for free, which is why
  * nothing else binds Escape itself.
  */
 export function Overlay({ onClose, children, align = "center", className = "", label }: OverlayProps) {

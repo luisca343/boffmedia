@@ -6,16 +6,14 @@ import { RandomizerRepository } from './randomizer.repository';
  * `openConfig` refuses to open and `assertConfigRomConsistent` refuses every
  * claim unless it answers `ok` with the hash the config pinned.
  *
- * It shipped reading `version.emulator.rom` and `Array.isArray(version.files)`
- * straight off the row. MariaDB implements JSON as a LONGTEXT alias, so mysql2
- * returns both as **strings** — drizzle's `$type<>` is compile-time only and
- * parses nothing. So `.rom` was always `undefined`, `files` was never an array,
- * and the gate answered `no-rom` for *every* pack in existence, valid or not.
- * Nothing caught it because nothing exercised this method against a row shaped
- * the way the database actually returns one.
+ * Never read `version.emulator.rom` or `Array.isArray(version.files)` straight
+ * off the row. MariaDB implements JSON as a LONGTEXT alias, so mysql2 returns
+ * both as **strings**, and drizzle's `$type<>` is compile-time only — it parses
+ * nothing. `.rom` is then `undefined`, `files` is never an array, and the gate
+ * answers `no-rom` for every pack in existence, valid or not.
  *
- * These tests therefore feed the STRING shape deliberately. A version of this
- * suite that passed pre-parsed objects would go green against the bug.
+ * These tests therefore feed the STRING shape deliberately. A suite that passed
+ * pre-parsed objects would go green against exactly that fault.
  */
 describe('RandomizerRepository.getPublishedEmulatorRom', () => {
   const SHA = 'e'.repeat(128);

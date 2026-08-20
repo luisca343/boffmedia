@@ -87,8 +87,8 @@ const STATUS_ORDER: Record<DiffEntry["status"], number> = {
 /**
  * Diff the schematic palette against source + target registries.
  *
- * Phase 1: safe / missing / mod-only
- * Phase 2: + renamed (known-renames + suffix match) + state-changed (invalid state values)
+ * Verdicts: safe / missing / mod-only, plus renamed (known-renames and suffix
+ * match) and state-changed (invalid state values).
  */
 // Aggregate by block id: a palette can hold many entries that share an id but
 // differ only in state (e.g. byg:willow_leaves with each distance/waterlogged

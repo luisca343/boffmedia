@@ -2,7 +2,7 @@
  * The Poké Ball — the "¡Captura!" reaction glyph, and the ball chip on a capture card.
  *
  * The five ball styles are a data-driven colour set, so they live as a JS map applied
- * through `fill` attributes rather than as Tailwind classes (§4): a `fill-${variant}`
+ * through `fill` attributes rather than as Tailwind classes: a `fill-${variant}`
  * fragment would never compile.
  */
 export type BallVariant = "ball-poke" | "ball-great" | "ball-ultra" | "ball-luxury" | "ball-quick"

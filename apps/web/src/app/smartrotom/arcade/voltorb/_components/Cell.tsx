@@ -12,8 +12,7 @@ interface CellProps {
   colIndex: number
 }
 
-// The lit face, by multiplier. Full literal classes — `text-${…}` never compiles
-// (SMARTROTOM_V3.md §4).
+// The lit face, by multiplier. Full literal classes — `text-${…}` never compiles.
 const FACE: Record<number, string> = {
   1: "border-white/20 bg-[radial-gradient(80%_80%_at_50%_30%,rgb(var(--ar-ink-dim)/.2),#06031a)] shadow-[inset_0_0_18px_rgb(var(--ar-ink-dim)/.13),0_2px_0_rgb(0_0_0/.4)] text-ar-ink-dim",
   2: "border-ar-cyan/35 bg-[radial-gradient(80%_80%_at_50%_30%,rgb(var(--ar-cyan)/.2),#06031a)] shadow-[inset_0_0_18px_rgb(var(--ar-cyan)/.13),0_2px_0_rgb(0_0_0/.4)] text-ar-cyan ar-glow-cyan",

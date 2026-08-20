@@ -6,9 +6,8 @@ import { cn } from "@/lib/utils"
 
 /**
  * The NPC's real Minecraft skin, framed like a portrait nailed to the board.
- * The handoff drew pixel-art faces from a hand-written palette; the server
- * already renders the actual skin of every custom NPC, so that is what hangs
- * here — this component only frames it.
+ * The server already renders the actual skin of every custom NPC, so that is
+ * what hangs here rather than hand-drawn art — this component only frames it.
  *
  * The render is a full-body 1:2 image, so a square frame showing its top half
  * lands on head-and-shoulders; `full` keeps the whole figure for the expediente.

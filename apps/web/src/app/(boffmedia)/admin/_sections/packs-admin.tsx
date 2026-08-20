@@ -20,7 +20,7 @@ import {
   PacksService,
 } from "@/services/api/boffmedia/packsService"
 
-// HANDOFF §4.1 — pack authoring lives here, not in the launcher. The desktop
+// Pack authoring lives here, not in the launcher. The desktop
 // app only installs and plays; creating packs, cutting versions and granting
 // access are admin work and belong on a real screen with a keyboard.
 //

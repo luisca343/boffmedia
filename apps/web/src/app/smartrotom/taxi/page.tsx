@@ -121,9 +121,9 @@ export default function TaxiPage() {
             }),
           )
         },
-        // Every refusal now carries a code (offline, unsafe arrival, in a dungeon run, server
-        // busy) and none of them cost the player anything, so it is safe to say plainly what
-        // happened instead of the old "contact support".
+        // Every refusal carries a code (offline, unsafe arrival, in a dungeon run, server
+        // busy) and none of them cost the player anything, so each one says plainly what
+        // happened rather than falling back to "contact support".
         onError: (error) => {
           setFlow("idle")
           toast.error(apiError(error, t("errors.tripFailed")))

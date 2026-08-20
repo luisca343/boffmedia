@@ -63,9 +63,9 @@ describe('AppsController — integration (ValidationPipe + GlobalExceptionFilter
 
     app = moduleRef.createNestApplication();
 
-    // These routes are no longer public: the identity that used to come from
+    // These routes are not public: the identity that would otherwise come from
 
-    // the URL or the body is now taken from the authenticated principal.
+    // the URL or the body is taken from the authenticated principal.
 
     // This suite covers the ValidationPipe and the exception filter, so it
 
@@ -297,7 +297,7 @@ describe('AppsController — integration (ValidationPipe + GlobalExceptionFilter
         .send({});
 
       expect(res.status).toBe(201);
-      // The uuid used to be a body field, so any caller could list (and
+      // The uuid must not be a body field: that lets any caller list (and
       // reorder) somebody else's dock.
       expect(mockFacade.getAppsForPlayer).toHaveBeenCalledWith(
         '67d9b543-5ac9-41e1-a8a5-20d7689e24a4',

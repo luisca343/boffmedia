@@ -30,8 +30,20 @@ export function LinkMinecraftModal({
   const [uri, setUri] = React.useState<string>("https://www.microsoft.com/link")
   const [error, setError] = React.useState<string | null>(null)
 
+  // The effect below must depend on `open` and NOTHING else. `onLinked` is an
+  // inline arrow from the parent and `t` is re-created per render, so leaving
+  // either in the deps restarts the whole device flow on any parent re-render —
+  // and `SessionProvider` refetches on window focus, i.e. at the exact moment
+  // the player returns from the Microsoft tab. That tore down the flow they had
+  // just approved and issued a fresh code, so linking could never complete.
+  const onLinkedRef = React.useRef(onLinked)
+  onLinkedRef.current = onLinked
+  const tRef = React.useRef(t)
+  tRef.current = t
+
   React.useEffect(() => {
     if (!open) return
+    const t = tRef.current
     let cancelled = false
     let timer: ReturnType<typeof setTimeout>
 
@@ -53,7 +65,7 @@ export function LinkMinecraftModal({
           if (res.data.status === "linked") {
             setPhase("done")
             toast.success(t("linked", { name: res.data.username ?? "" }))
-            onLinked()
+            onLinkedRef.current()
             return
           }
           fail(res.data.status === "declined" ? t("declined") : t("expired"))
@@ -85,7 +97,7 @@ export function LinkMinecraftModal({
       cancelled = true
       clearTimeout(timer)
     }
-  }, [open, onLinked, t])
+  }, [open])
 
   return (
     <Modal open={open} onClose={onClose} title={t("title")}>

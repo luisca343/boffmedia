@@ -2,7 +2,7 @@
 
 // DESK. The rail lives OUTSIDE every chapter's root, so `--ps-chapter` is not in scope
 // here: each tab carries its chapter's spelled-out class (`Chapter.tab`), never an
-// interpolated one (§4).
+// interpolated one.
 
 import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"

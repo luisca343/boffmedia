@@ -8,7 +8,7 @@ import { PokeBall } from "./PokeBall"
 
 /**
  * A Pokémon sprite, resolved through the shared sprite manifest — the same
- * `id:form:palette` lookup the Pokédex and the PC use. §10 says sprites keep that
+ * `id:form:palette` lookup the Pokédex and the PC use. Sprites keep that
  * resolution and are not routed through a generic image component, so this
  * deliberately avoids `next/image` (which would resample pixel art).
  *

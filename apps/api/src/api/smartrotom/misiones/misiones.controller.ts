@@ -50,7 +50,7 @@ import { USER_ROLES } from '@api/_utils/auth/roles.constants';
 import { Public } from '@api/_utils/decorators/public.decorator';
 
 @ApiTags('SmartRotom | Misiones')
-// Mission and NPC reads are public (the missions page needs no account); authoring, cache control and image upload are admin-only and used to be public.
+// Mission and NPC reads are public (the missions page needs no account); authoring, cache control and image upload are admin-only.
 @Public()
 @Controller('smartrotom/misiones')
 @UsePipes(new ValidationPipe({ transform: true, whitelist: true }))

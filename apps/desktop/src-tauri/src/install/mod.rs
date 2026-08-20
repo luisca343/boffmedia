@@ -1,4 +1,4 @@
-// HANDOFF §6 — the install and launch pipeline, and the commands the renderer
+// The install and launch pipeline, and the commands the renderer
 // drives it with.
 //
 // Shape of an install, and why it is split the way it is:
@@ -26,7 +26,7 @@ pub mod paths;
 pub mod process;
 pub mod progress;
 pub mod resolve;
-/// §9 — per-instance Java runtime + memory, and the sizing heuristic.
+/// Per-instance Java runtime + memory, and the sizing heuristic.
 pub mod runtime;
 pub mod session;
 
@@ -245,9 +245,8 @@ pub fn compute_randomizer_blocked(marker: &Marker) -> bool {
 }
 
 // The marker (`instance::Marker`) answers "installed, and of what version?"
-// without walking 400 files, and since §9 it also records WHICH files the
-// launcher owns — see instance.rs for why that set is the whole locked-vs-user
-// distinction.
+// without walking 400 files, and records WHICH files the launcher owns — see
+// instance.rs for why that set is the whole locked-vs-user distinction.
 
 /// Per-pack runtime state. One game at a time per pack; the map is keyed on
 /// pack id so two different packs can run side by side.
@@ -364,7 +363,7 @@ async fn prepare(
         .build()
         .map_err(|e| InstallFailure::message(format!("No se pudo crear el cliente HTTP: {e}")))?;
 
-    // §9 — the heap and JVM this pack will actually use. Resolved once, here,
+    // The heap and JVM this pack will actually use. Resolved once, here,
     // so install and launch can never disagree, and computed from the pack's
     // OWN mod count: the plan on a first install, the marker afterwards (which
     // knows which of the installed files are mods).
@@ -404,7 +403,7 @@ fn resolve_runtime(
 }
 
 /// Never fails: a corrupt or absent override file means "inherit", which is
-/// exactly what every instance installed before §9 should do.
+/// what an instance with no per-pack choice should do.
 fn read_runtime_override(instance: &InstancePaths) -> RuntimeOverride {
     std::fs::read_to_string(&instance.runtime)
         .ok()
@@ -641,12 +640,11 @@ async fn install_payload(
 ) -> Result<(), InstallFailure> {
     // A file the player switched off is never fetched.
     //
-    // This comment used to claim that the `<name>.jar.disabled` convention was
-    // Forge/NeoForge-only and that Fabric and Quilt would load the mod anyway.
-    // That is not so: all four loaders discover mods by scanning for files
-    // ending in `.jar`, so all four skip a `.disabled` one — which is why Prism
-    // and the Modrinth app use the suffix across every loader. The launcher now
-    // does the same (instance::set_enabled_on_disk), because parking the file
+    // The `<name>.jar.disabled` convention works on ALL FOUR loaders, not just
+    // Forge/NeoForge: every one of them discovers mods by scanning for files
+    // ending in `.jar`, so every one skips a `.disabled` one. Prism and the
+    // Modrinth app use the suffix across every loader for the same reason, and
+    // so does this launcher (instance::set_enabled_on_disk) — parking the file
     // makes re-enabling instant and leaves the mods folder legible to a player
     // who opens it by hand.
     //
@@ -655,10 +653,9 @@ async fn install_payload(
     // and the very first install has to know not to fetch them at all.
     //
     // `optional` is deliberately not consulted. It gates whether the pack
-    // OFFERS the choice, not whether the launcher honours one already made —
-    // requiring it here is what let a disabled non-optional mod come back on
-    // the next launch, since the file was re-fetched into the path the rename
-    // had just vacated.
+    // OFFERS the choice, not whether the launcher honours one already made.
+    // Requiring it here brings a disabled non-optional mod back on the next
+    // launch: the file is re-fetched into the path the rename just vacated.
     let disabled = read_optional_state(&prepared.instance);
     let wanted: Vec<PlannedFile> = prepared
         .plan
@@ -735,12 +732,11 @@ async fn install_payload(
 
     reporter.emit(Phase::Verifying, 0.5, "", 0, 0);
 
-    // §9 "locked vs. user space". The previous marker is the ONLY authority on
-    // what the launcher owns, so a mod dropped from the pack is removed here
-    // and a jar the player added themselves — never recorded, therefore never
-    // stale — is not a candidate. Before this the old jar simply stayed
-    // forever, which is how a removed-but-still-loaded mod crashes a pack that
-    // "updated fine".
+    // Locked vs. user space. The previous marker is the ONLY authority on what
+    // the launcher owns, so a mod dropped from the pack is removed here, and a
+    // jar the player added themselves — never recorded, therefore never stale —
+    // is not a candidate. Without this the dropped jar stays forever, which is
+    // how a removed-but-still-loaded mod crashes a pack that "updated fine".
     let previous = read_marker(&prepared.instance);
     let mut marker = build_marker(prepared, &wanted, &manifest);
     // A pin survives a re-verify of the SAME version (every launch does one)
@@ -784,7 +780,7 @@ async fn install_payload(
 }
 
 /// The marker for what was just installed. `installed` is the files actually
-/// written, which for §9 excludes the optional ones the player switched off —
+/// written, which excludes the optional ones the player switched off —
 /// recording those as managed would make the next update "clean up" files that
 /// were never there.
 ///
@@ -815,7 +811,7 @@ fn build_marker(prepared: &game::Prepared, installed: &[PlannedFile], manifest: 
         // A forward install always clears the pin: the player asked for this
         // version explicitly.
         pinned: false,
-        // Cycle 1 only handles Minecraft; later cycles will add other game types.
+        // Only Minecraft is handled here; other game types get their own arm.
         game_type: instance::GameType::Minecraft,
         emulator: None,
         // Populate randomizer gate from manifest, if present
@@ -908,7 +904,7 @@ fn write_optional_state(
 /// Rewrite the plan to the pinned version recorded on disk. Returns the version
 /// name when a pin was applied, `None` when there is nothing to pin to.
 ///
-/// Refuses to act on a marker with no managed list — a pre-§9 install, or a
+/// Refuses to act on a marker with no managed list — an older install, or a
 /// hand-edited one. There is nothing to replay, and launching with an EMPTY
 /// file list would present a modpack with no mods as a successful launch.
 fn apply_pin(prepared: &mut game::Prepared) -> Option<String> {
@@ -941,7 +937,7 @@ fn apply_pin(prepared: &mut game::Prepared) -> Option<String> {
 /// thing between the API and the disk that we do not control.
 ///
 /// `password` is the same value `pack_manifest` was called with. A
-/// password-protected pack re-checks it on EVERY download (§7.4: access can be
+/// password-protected pack re-checks it on EVERY download (access can be
 /// revoked between the listing and the file), so it has to be threaded all the
 /// way through rather than proved once. Omitted by the renderer for a public
 /// pack, which Tauri delivers as None.
@@ -985,7 +981,7 @@ pub async fn install_pack(
         ),
     );
 
-    // §9 — the resolved heap and JVM go in the log too, not only in the UI: a
+    // The resolved heap and JVM go in the log too, not only in the UI: a
     // player pasting a crash log into a support thread brings the number with
     // them, which is half of every out-of-memory diagnosis.
     reporter.log("info", &prepared.runtime.summary());
@@ -1080,13 +1076,13 @@ pub async fn launch_pack(
 
     let reporter = Reporter::new(app.clone(), &pack_id);
 
-    // §9 pinning. `launch_pack` re-verifies against the manifest it was handed,
+    // Version pinning. `launch_pack` re-verifies against the manifest it was handed,
     // which is always the LATEST — so without this a revert would be undone by
     // the very next click of Play, silently and with a progress bar that looks
     // like a normal launch. The retained marker carries the version's minecraft,
     // loader and complete file list, so the pin is applied to the whole plan and
-    // not just to the payload: installing the latest loader under the old mods
-    // is exactly the loader-mismatch crash rollback exists to escape.
+    // not just to the payload: installing the latest loader under the pinned
+    // mods is exactly the loader-mismatch crash rollback exists to escape.
     let mut prepared = prepared;
     if let Some(pinned) = apply_pin(&mut prepared) {
         reporter.log(
@@ -1170,17 +1166,16 @@ pub async fn instance_scan(
 
     let Some(marker) = read_marker(&instance) else {
         // A directory with no marker is an install that was interrupted, or one
-        // whose marker was deleted. Either way reinstalling is the fix, and
+        // whose marker was deleted. Either way it must be reinstalled, and
         // calling it "not installed" would hide that files are already there.
         return Ok(InstallStatus::Broken {
             reason: "La instalación quedó a medias. Vuelve a instalar el pack.".to_string(),
         });
     };
 
-    // There used to be a separate `instance.minecraft.is_dir()` check here. The
-    // instance directory IS the game directory now, so `instance.root.is_dir()`
-    // above already answers it — a second copy would be dead code that reads
-    // like a real guard.
+    // No separate `instance.minecraft.is_dir()` check: the instance directory IS
+    // the game directory, so `instance.root.is_dir()` above already answers it.
+    // A second copy would be dead code that reads like a real guard.
 
     let size_bytes = paths::dir_size(&instance.root);
     let missing_user_files = compute_missing_user_files(&layout, &instance, &marker);
@@ -1267,7 +1262,7 @@ pub async fn repair_instance(
     Ok(InstallStatus::NotInstalled)
 }
 
-// ── §9: locked vs. user space, and version rollback ────────────────────────
+// ── Locked vs. user space, and version rollback ────────────────────────────
 
 /// The versions this machine can still roll back to, newest first.
 ///
@@ -1297,14 +1292,14 @@ pub async fn instance_versions(
             installed_at: v.installed_at.clone(),
             file_count: v.file_count,
             current: current.as_deref() == Some(v.version_id.as_str()),
-            // A pre-§9 entry carries no file list, so there is nothing to
+            // An older entry carries no file list, so there is nothing to
             // replay and offering a revert to it would be a lie.
             revertible: !v.managed.is_empty(),
         })
         .collect())
 }
 
-/// One-click rollback (§9). Replays a retained version's recorded file list
+/// One-click rollback. Replays a retained version's recorded file list
 /// through the same content-addressed download path an install uses, then
 /// sweeps whatever the current version added.
 ///
@@ -1615,7 +1610,7 @@ pub async fn instance_optional_set(
     Ok(instance::optional_list(&catalogue, &state))
 }
 
-// ── §9: per-instance Java runtime + memory ─────────────────────────────────
+// ── Per-instance Java runtime + memory ─────────────────────────────────────
 
 /// What the runtime panel renders: the player's choice, what it resolves to,
 /// and the global values it would fall back to.
@@ -1649,7 +1644,7 @@ fn instance_runtime_view(
     }
 }
 
-/// §9 — the effective Java and heap for one pack, surfaced BEFORE launch so a
+/// The effective Java and heap for one pack, surfaced BEFORE launch so a
 /// player reads "6,0 GB (automático, 214 mods)" rather than guessing.
 #[tauri::command]
 pub async fn instance_runtime(
@@ -1683,7 +1678,7 @@ pub async fn instance_runtime_set(
     Ok(instance_runtime_view(&settings, &instance))
 }
 
-// ── User-provided files (§4.3) ───────────────────────────────────────────────
+// ── User-provided files ──────────────────────────────────────────────────────
 
 /// Response types for instance_provide_file.
 #[derive(Debug, Serialize)]
@@ -1812,7 +1807,7 @@ pub async fn instance_provide_file(
     Ok(ProvideFileOk { satisfied: true })
 }
 
-/// The result of a ROM-library sweep (§3): which required user-provided files it
+/// The result of a ROM-library sweep: which required user-provided files it
 /// found and imported, and which are still missing.
 #[derive(Debug, Clone, Default, Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -1821,7 +1816,7 @@ pub struct UserFileScan {
     pub still_missing: Vec<String>,
 }
 
-/// "Plug and play" (§3): sweep the player's ROM library for any unsatisfied
+/// "Plug and play": sweep the player's ROM library for any unsatisfied
 /// required `user-provided` file of an installed pack, matching by size then
 /// streamed SHA-512, and import+place every hit (the `instance_provide_file`
 /// flow, without a prompt). Also user-invokable ("Scan my library").
@@ -1925,10 +1920,9 @@ pub fn instance_rom_slot(
     Ok(marker.emulator.as_ref().map(|e| e.rom.clone()))
 }
 
-/// Emu-M3 — read back the manifest [`cache_manifest`] stashed on the last
-/// successful install/launch. `None` when nothing was cached (a pack installed
-/// before this build, or never fetched here), which the caller treats as "no
-/// offline fallback available" and surfaces the original network error.
+/// Read back the manifest [`cache_manifest`] stashed on the last successful
+/// install/launch. `None` when nothing was cached, which the caller treats as
+/// "no offline fallback available" and surfaces the original network error.
 #[tauri::command]
 pub fn pack_manifest_cache(
     slug: String,
@@ -1978,7 +1972,7 @@ fn rom_search_roots(settings: &settings::Settings) -> Vec<std::path::PathBuf> {
 }
 
 /// Collect files under `root`, traversing up to and including `max_depth`
-/// directory levels (root files = depth 0). Bounded and dumb by design (§3):
+/// directory levels (root files = depth 0). Bounded and dumb by design:
 /// the size+hash match is the judge, so no extension filter that could miss a
 /// renamed dump. Uses the dirent's own file type — which does NOT follow
 /// symlinks — so a link loop inside a ROM library cannot trap the walk.

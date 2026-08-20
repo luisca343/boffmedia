@@ -7,7 +7,7 @@ export type GobiernoAccent = "civic" | "navy" | "burgundy" | "gold"
 export type GobiernoDensity = "comfortable" | "compact"
 
 // Gobierno is light-only — the paper IS the design — so it does NOT keep a light/dark
-// preference and ignores the platform theme picker's mode (SMARTROTOM_V3 §2b). What it
+// preference and ignores the platform theme picker's mode. What it
 // does own is its institutional identity: the accent colour and the table rhythm.
 type GobiernoPrefs = {
   accent: GobiernoAccent

@@ -1,9 +1,9 @@
 // The launcher's identity layer. Two distinct things live here and must not be
 // confused:
 //
-//   1. The MINECRAFT session (§5) — proves who the player is to Mojang, and is
+//   1. The MINECRAFT session — proves who the player is to Mojang, and is
 //      what the game itself is launched with.
-//   2. The PACK session (§7.2) — proves that same UUID to our own API, via
+//   2. The PACK session — proves that same UUID to our own API, via
 //      Mojang's hasJoined handshake, WITHOUT ever sending it a Microsoft or
 //      Minecraft token.
 //
@@ -89,7 +89,7 @@ impl AuthState {
 #[derive(Debug, Serialize)]
 pub struct AuthFailure {
     pub message: String,
-    /// True when signing in again is the fix, as opposed to "try later".
+    /// True when signing in again resolves it, as opposed to "try later".
     pub needs_signin: bool,
 }
 
@@ -115,7 +115,7 @@ impl From<store::StoreError> for AuthFailure {
     }
 }
 
-/// Step 1 of sign-in: hand the renderer a code to display (§5.1).
+/// Step 1 of sign-in: hand the renderer a code to display.
 ///
 /// Deliberately split from `auth_await` so the UI can render the code while the
 /// long poll runs — the SignIn screen shows exactly these two fields.
@@ -175,8 +175,8 @@ pub async fn auth_await(
 /// primitive. That is also why `tauri-plugin-opener` is not used — the plugin
 /// exists to give the *renderer* an opener, which this app does not want.
 ///
-/// Letting the `<a href>` navigate instead put Microsoft's login inside our own
-/// window, which is exactly the embedded-webview sign-in §5.1 rules out.
+/// Letting the `<a href>` navigate instead puts Microsoft's login inside our
+/// own window — an embedded-webview sign-in, which Microsoft disallows.
 #[tauri::command]
 pub async fn auth_open_verification(state: tauri::State<'_, AuthState>) -> Result<(), AuthFailure> {
     let code = state
@@ -237,7 +237,7 @@ pub async fn open_url(url: String) -> Result<(), AuthFailure> {
 
 /// Silent sign-in on launch. `Ok(None)` means "no stored session, show the
 /// sign-in screen"; an Err means the credential store itself failed, which
-/// §5.7 insists must not be mistaken for a first run.
+/// must not be mistaken for a first run.
 #[tauri::command]
 pub async fn auth_restore(
     app: tauri::AppHandle,
@@ -351,7 +351,7 @@ pub async fn auth_accounts(app: tauri::AppHandle) -> Result<Vec<AccountEntry>, A
 ///     portablemc's offline configuration (install/session.rs), so the game
 ///     launches into singleplayer and every online server rejects it — the
 ///     server, not us, enforces that. Nothing here mints a credential.
-///   * It never touches the pack API: a launcher session (§7.2) needs Mojang's
+///   * It never touches the pack API: a launcher session needs Mojang's
 ///     hasJoined handshake, which is exactly the network this mode does not
 ///     have. Offline means locally installed packs only.
 #[tauri::command]

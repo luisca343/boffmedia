@@ -8,12 +8,10 @@ import { AppRail } from "./nav/AppRail"
 // felt, and then it gets out of the way:
 //
 //   * Play only. Tools is fully offline-capable — every tool runs local — so a
-//     banner there is pure tax on a screen that is working perfectly, and it
-//     was eating a chunk of it permanently.
+//     banner there is pure tax on a screen that is working perfectly.
 //   * Closable, and the dismissal sticks for the whole outage (see
-//     `backendNoticeDismissed`). It used to have no close button at all and to
-//     reappear on the next navigation, which is the behaviour that made it feel
-//     like the app shouting rather than informing.
+//     `backendNoticeDismissed`). Without a close button, or reappearing on the
+//     next navigation, it reads as the app shouting rather than informing.
 //   * One line. The long explanation moved to the rail indicator's tooltip.
 //
 // Nothing is hidden by closing it: `BackendIndicator` in the rail stays for as

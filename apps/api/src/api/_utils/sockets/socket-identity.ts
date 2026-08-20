@@ -6,9 +6,9 @@ import { TOKEN_TYPE, tokenTypeOf } from '@api/_utils/auth/token-types';
  * Who a socket belongs to, established ONCE at connection time from a signed
  * token and never again from anything the client sends.
  *
- * The gateway used to take the uuid straight out of the `smartrotom:connection`
- * payload, which meant any client could claim to be any player: presence,
- * typing indicators and every call signal were addressable by whoever asked.
+ * Taking the uuid out of the `smartrotom:connection` payload instead would let
+ * any client claim to be any player: presence, typing indicators and every call
+ * signal become addressable by whoever asks.
  */
 export interface SocketIdentity {
   userId: number;

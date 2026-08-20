@@ -10,7 +10,7 @@ import { TX_SCOPE } from "./ThemedLayer"
 /**
  * The taxi's one overlay shape: a bottom sheet on a phone, a centred dialog from 700px.
  * A skin over the shared `ModalShell` — portal, Escape, scrim dismiss, scroll lock,
- * focus trap/restore and dialog semantics all come from there (SMARTROTOM_V3 §2).
+ * focus trap/restore and dialog semantics all come from there.
  */
 export function Modal({
   onClose,

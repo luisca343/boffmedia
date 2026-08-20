@@ -26,12 +26,12 @@ import {
  *
  * The categories themselves are NOT hardcoded — they are derived from the real `category`
  * column, so one added to the seed shows up here on its own. Only the INK is a literal map,
- * because `bg-${category}` compiles to nothing at all (§4).
+ * because `bg-${category}` compiles to nothing at all.
  *
  * The first four keys are the categories the API actually ships today (including the seed's
  * own "Combaates" misspelling, kept alongside the correct one so fixing the seed cannot
- * silently grey the bar out); the rest are the handoff's, and are here for the day the seed
- * grows into them. Anything unknown falls back to the gild rather than vanishing.
+ * silently grey the bar out); the rest are here for the day the seed grows into them.
+ * Anything unknown falls back to the gild rather than vanishing.
  */
 const CAT_INK: Record<string, string> = {
   Gimnasios: "bg-ps-olive",

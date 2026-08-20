@@ -1,15 +1,15 @@
-// HANDOFF §9 — "locked vs. user space" and "pack version pinning + rollback".
+// "locked vs. user space" and "pack version pinning + rollback".
 //
 // Two ideas, one on-disk change, which is why they live in one module:
 //
-//   MANAGED vs USER. The marker used to record only `fileCount`, which answers
-//   "how many?" and nothing else. It now records the managed SET — path, size,
-//   sha512 and the source it came from. That set is the launcher's property:
-//   it may replace it, and it may DELETE from it when a mod leaves the pack.
-//   Anything in the game directory that is not in the set is the player's (the
-//   minimap they dropped into `mods/`), and is never touched. Without the set
-//   there is no way to tell those apart, so "remove mods dropped from the pack"
-//   was simply not implemented — an update left the old jar behind forever.
+//   MANAGED vs USER. The marker records the managed SET — path, size, sha512
+//   and the source it came from — not just a `fileCount`. That set is the
+//   launcher's property: it may replace it, and it may DELETE from it when a mod
+//   leaves the pack. Anything in the game directory that is not in the set is
+//   the player's (the minimap they dropped into `mods/`), and is never touched.
+//   Without the set there is no way to tell those apart, and "remove mods
+//   dropped from the pack" cannot be implemented at all — an update leaves the
+//   stale jar behind forever.
 //
 //   RETENTION. Because every managed entry carries its source, an old version
 //   is fully described by its marker: ~40 KB of JSON, not 400 jars. Reverting
@@ -25,15 +25,14 @@ use serde::{Deserialize, Serialize};
 
 use super::resolve::{Fetch, PlannedFile};
 
-/// The game type that an instance targets. Cycle 1 only handles Minecraft;
-/// later cycles add emulator, Zomboid, Stardew, etc.
+/// The game type that an instance targets.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub enum GameType {
     Minecraft,
-    /// Emulator pack (Cycle 2). A launch refuses if the binary has no arm for a
-    /// marker's game type, so this variant must exist before an emulator marker
-    /// can be read back.
+    /// Emulator pack. A launch refuses if the binary has no arm for a marker's
+    /// game type, so this variant must exist before an emulator marker can be
+    /// read back.
     Emulator,
 }
 
@@ -74,11 +73,11 @@ pub enum ManagedSource {
     Curseforge { project_id: i64, file_id: i64 },
     #[serde(rename_all = "camelCase")]
     Override { sha512: String },
-    /// User-provided file (§4.3): the player supplies it locally. The launcher
+    /// User-provided file: the player supplies it locally. The launcher
     /// never downloads this, only verifies it after the player provides it.
     #[serde(rename_all = "camelCase")]
     UserProvided { hint: String },
-    /// A romhack (§4.1): reproducible from its base + patch, so repair
+    /// A romhack: reproducible from its base + patch, so repair
     /// re-materializes it rather than re-downloading. `format` is the wire value
     /// (`bps`/`ups`) so old markers stay legible.
     #[serde(rename_all = "camelCase")]
@@ -165,11 +164,11 @@ impl ManagedSource {
     }
 }
 
-/// The emulator half of a marker (game_type == Emulator): what §9 rollback
-/// needs to replay THIS version without the (always-latest) manifest — the
-/// managed file list alone cannot say which ROM to hand the emulator or with
-/// which flags. Absent on minecraft markers and on emulator markers written
-/// before this field existed (those simply cannot pin, same as pre-§9 MC).
+/// The emulator half of a marker (game_type == Emulator): what rollback needs
+/// to replay THIS version without the (always-latest) manifest — the managed
+/// file list alone cannot say which ROM to hand the emulator or with which
+/// flags. Absent on minecraft markers, and on emulator markers that carry no
+/// such block; neither can be pinned.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct EmulatorMarker {
@@ -191,8 +190,8 @@ pub struct ManagedFile {
     #[serde(default)]
     pub is_mod: bool,
     /// `env.client == "optional"` in the manifest — the player may switch it
-    /// off. §9's optional-mod toggles need no schema change: `.mrpack` already
-    /// models this and `pack-schema`'s `EnvSupport` already carries it.
+    /// off. This needs no schema change: `.mrpack` already models it and
+    /// `pack-schema`'s `EnvSupport` already carries it.
     #[serde(default)]
     pub optional: bool,
     pub source: ManagedSource,
@@ -251,7 +250,7 @@ pub struct Marker {
     pub file_count: usize,
     #[serde(default)]
     pub pack_id: String,
-    /// What the launcher owns on disk right now. Empty on a pre-§9 marker.
+    /// What the launcher owns on disk right now. Empty on an older marker.
     #[serde(default)]
     pub managed: Vec<ManagedFile>,
     /// EVERY optional file this version declares, installed or not — the
@@ -366,8 +365,8 @@ pub struct RetainedVersion {
     /// True for the version currently on disk — the UI must not offer to revert
     /// to what is already installed.
     pub current: bool,
-    /// False when the entry predates §9 and carries no managed list; there is
-    /// nothing to replay, so reverting to it would be a lie.
+    /// False when the entry carries no managed list; there is nothing to
+    /// replay, so reverting to it would be a lie.
     pub revertible: bool,
 }
 
@@ -589,9 +588,9 @@ mod tests {
 
     #[test]
     fn a_file_the_app_never_recorded_is_never_stale() {
-        // The whole point of §9's user space: the player's minimap is not in
-        // the previous managed set, so it cannot appear in the delete list
-        // whatever the new version contains.
+        // The whole point of user space: the player's minimap is not in the
+        // previous managed set, so it cannot appear in the delete list whatever
+        // the new version contains.
         let previous = vec![managed("mods/a.jar", "aa")];
         let next: HashSet<String> = ["mods/b.jar".to_string()].into_iter().collect();
         let stale = stale_files(&previous, &next);

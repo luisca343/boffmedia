@@ -72,9 +72,9 @@ export class RaceParticipantDto {
 }
 
 /**
- * The wire shape is the mod's, not ours — field names are Spanish because unit tests in
- * the Teras repo pin them (docs/KARTS_CARRERA_HANDOFF.md §1). Renaming one here fails
- * that test rather than silently dropping a column.
+ * The wire shape is the mod's, not ours — field names are Spanish because unit
+ * tests in the Teras repo pin them. Renaming one here fails that test rather
+ * than silently dropping a column.
  *
  * Extends BaseDto for the `server` field: this route keeps the `MinecraftMiddleware`
  * tripwire (the mod does send `server`), so it is NOT on the exclude list in app.module.

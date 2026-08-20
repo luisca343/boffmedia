@@ -6,9 +6,9 @@ import { LoadingScreen } from "@/components/smartrotom/Loading"
 import { useOfficer } from "../_hooks/useOfficer"
 
 /**
- * Second gate, on top of the Gobierno layout's own GOBIERNO-role check: Administración
- * needs ROTOM_ADMIN (or Boffmedia admin), not just the base GOBIERNO role — the same
- * boundary the old `/smartrotom/admin` app enforced, now nested one level deeper.
+ * Second gate, on top of the Gobierno layout's own GOBIERNO-role check:
+ * Administración needs ROTOM_ADMIN (or Boffmedia admin), not just the base
+ * GOBIERNO role.
  */
 export default function AdminLayout({ children }: { children: ReactNode }) {
   const router = useRouter()

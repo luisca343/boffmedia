@@ -27,10 +27,10 @@ const FALLBACK_TONE: Record<ArTone, string> = {
  * Box artwork with a neon crate as the fallback.
  *
  * The lootbox config names an image for all three boxes but only `trainer_box.png`
- * ships in `public/` — `evolution_box` and `battle_box` 404. Rather than show a
- * broken image (which is what the old selector did), a missing sprite degrades to
- * the crate glyph in the box's own accent. Drop the two PNGs in and the art comes
- * back on its own. See docs/smartrotom/deferred/arcade.md.
+ * ships in `public/` — `evolution_box` and `battle_box` 404. A missing sprite
+ * degrades to the crate glyph in the box's own accent rather than rendering a
+ * broken image. Drop the two PNGs in and the art comes back on its own. See
+ * docs/smartrotom/deferred/arcade.md.
  */
 export function BoxArt({ boxId, size, tone, className }: BoxArtProps) {
   const t = useTranslations("arcade")

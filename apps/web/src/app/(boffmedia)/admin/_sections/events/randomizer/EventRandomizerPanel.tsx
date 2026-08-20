@@ -38,9 +38,9 @@ export function EventRandomizerPanel({ event, onBack, embedded }: EventRandomize
   const [config, setConfig] = useState<RandomizerConfig | null>(null)
   const [loading, setLoading] = useState(true)
   const [tab, setTab] = useState<"setup" | "assignments">("setup")
-  // Most events are not randomlockes, so the config form is opt-in: it used to
-  // mount eagerly on every event, presenting a full setup form for a module the
-  // event was never going to have.
+  // Most events are not randomlockes, so the config form is opt-in. Mounting it
+  // eagerly presents a full setup form for a module the event is never going to
+  // have.
   const [adding, setAdding] = useState(false)
 
   const loadConfig = useCallback(async () => {

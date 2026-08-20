@@ -25,7 +25,7 @@ const INK: Record<ChapterAccent, { accent: string; deep: string }> = {
  * chapter's ink without knowing which chapter it is in.
  *
  * The triplets come from a literal map, never from an interpolated var or class name:
- * `bg-ps-${accent}` compiles to nothing at all, silently (§4). This inline style is the
+ * `bg-ps-${accent}` compiles to nothing at all, silently. This inline style is the
  * sanctioned data-driven case.
  */
 export function chapterVars(accent: ChapterAccent): CSSProperties {

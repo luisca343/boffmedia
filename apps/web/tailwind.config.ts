@@ -294,7 +294,7 @@ const config: Config = {
         "wp-glow":
           "0 0 0 1px rgba(242,99,160,.5), 0 8px 24px -8px rgba(242,99,160,.45)",
         // The three rarity hovers. Literal classes, applied from the map in
-        // `_utils/rarity.ts` — never `shadow-wp-${rarity}` (§4).
+        // `_utils/rarity.ts` — never `shadow-wp-${rarity}`.
         "wp-raro": "0 22px 40px -20px rgba(18,192,176,.45)",
         "wp-epico": "0 22px 40px -20px rgba(157,92,224,.5)",
         "wp-legendario": "0 22px 42px -18px rgba(243,165,31,.55)",
@@ -795,7 +795,7 @@ const config: Config = {
         // ════════════════════════════════════════════════════════════════════
         // Arcade (SmartRotom) — `ar-*`. Synthwave, dark-only: a deep violet void
         // lit by four neons. There is no light mode; the app ignores the theme
-        // picker's mode entirely (SMARTROTOM_V3.md §2b — a single-mode app).
+        // picker's mode entirely (a single-mode app).
         // CSS-var backed (declared on `.ar-app`) rather than baked hex, because
         // the effect layer below — horizon, marquee, chrom, glows — has to read
         // the palette from inside plugin CSS. Alpha works: `bg-ar-cyan/12`.
@@ -835,7 +835,7 @@ const config: Config = {
         // ════════════════════════════════════════════════════════════════════
         // PC (SmartRotom) — `pc-*`. The storage console: a slate void behind
         // frosted glass panels. Dark-only — the app ignores the theme picker's
-        // mode (SMARTROTOM_V3.md §2b), like Pokédex, Arcade and Misiones.
+        // mode, like Pokédex, Arcade and Misiones.
         // CSS-var backed (declared on `.pc-app`) rather than baked hex, because
         // the glass/slot/wallpaper component classes below have to read the
         // palette from inside plugin CSS. Alpha works: `bg-pc-accent/16`.
@@ -873,7 +873,7 @@ const config: Config = {
         // MISIONES (SmartRotom) — `ms-*`. The tavern quest board: a cork+wood
         // tablón holding parchment papers pinned with wax seals. Dark-only, one
         // palette (Pergamino) — the app ignores the theme picker's mode, like
-        // Pokédex and Arcade (SMARTROTOM_V3.md §2b).
+        // Pokédex and Arcade.
         // CSS-var backed (declared on `.ms-app`) rather than baked hex so the
         // paper/cork/wood component classes below can read the palette from
         // inside plugin CSS — and so the handoff's four alternate palettes
@@ -931,7 +931,7 @@ const config: Config = {
         // Alpha works: `bg-ft-pink/12`, `border-ft-ink/30`.
         // The six accents are DATA-DRIVEN (an article's category picks one), so
         // they are applied through the literal class maps in `_utils/accents.ts`
-        // — never `bg-ft-${accent}` (§4: dynamic classes silently never compile).
+        // — never `bg-ft-${accent}` (dynamic classes silently never compile).
         // ════════════════════════════════════════════════════════════════════
         ft: {
           ink:   "rgb(var(--ft-ink) / <alpha-value>)",
@@ -1036,7 +1036,7 @@ const config: Config = {
         // ════════════════════════════════════════════════════════════════════
         // Rooker (SmartRotom) — "el nido social". Backed by `.rk-app[data-theme]`
         // with THREE canvases, not two: Claro, Tenue and Oscuro. Light/dark still
-        // comes from the platform picker (SMARTROTOM_V3 §2b) — what the app owns
+        // comes from the platform picker — what the app owns
         // is *which* dark, which is a contrast preference, not a theme.
         //
         // The accent is a runtime triplet (`--rk-accent`, six choices) and every
@@ -1050,8 +1050,8 @@ const config: Config = {
         // WIGGLYPOP (SmartRotom) — `wp-*`. The bubbly marketplace: Wallapop's
         // friendly second-hand shop crossed with Wigglytuff's balloon pink.
         // Light-only, like Furret Today and Gobierno — the pink-cream paper IS
-        // the product, so the app ignores the theme picker's mode
-        // (SMARTROTOM_V3.md §2b). There is no `data-theme` axis on `.wp-app`.
+        // the product, so the app ignores the theme picker's mode.
+        // There is no `data-theme` axis on `.wp-app`.
         //
         // TWO accents, and the split is the whole system:
         //   · `wp-accent` (balloon pink) = IDENTITY and ACTION — the brand, the
@@ -1063,7 +1063,7 @@ const config: Config = {
         //
         // The four rarity hues are DATA-DRIVEN (a Pokémon's IVs pick one), so
         // they are applied through the literal class maps in `_utils/rarity.ts`
-        // — never `text-wp-rarity-${r}` (§4: dynamic classes never compile).
+        // — never `text-wp-rarity-${r}` (dynamic classes never compile).
         // ════════════════════════════════════════════════════════════════════
         wp: {
           // Surfaces: a pink-cream page, white cards. `bg` is the page, `panel`
@@ -1160,7 +1160,7 @@ const config: Config = {
         // Both live in one scope root, always, in both platform modes: a passport
         // is a physical object and its paper does not turn dark because the OS
         // did. So `ps-*` is FIXED-CANVAS, like Furret Today's newsprint — the app
-        // never reads `useRotomMode()` (SMARTROTOM_V3.md §2b).
+        // never reads `useRotomMode()`.
         //
         // Never put desk ink on paper or paper ink on the desk: `text-ps-ink` on
         // the topbar is invisible, `text-ps-chrome-fg` on a page is invisible.
@@ -1416,7 +1416,7 @@ const config: Config = {
           "100%": { transform: "scale(2.2)", opacity: "0" },
         },
         // `--ar-dx`/`--ar-dy` are set per particle inline — a data-driven value,
-        // the sanctioned inline-style case (SMARTROTOM_V3.md §6).
+        // the sanctioned inline-style case.
         "ar-particle": {
           "0%": { transform: "translate(0, 0) scale(1)", opacity: "1" },
           "100%": { transform: "translate(var(--ar-dx, 0), var(--ar-dy, 0)) scale(0)", opacity: "0" },
@@ -2170,8 +2170,8 @@ const config: Config = {
       })
       // ── CKEditor (the notas editor) — Lark chrome skinned with nt tokens ──
       // Every var references an nt var, so light/dark flip for free. Balloons
-      // mount on <body>: NotesEditor stamps `.nt-app`+data-theme on CKEditor's
-      // .ck-body-wrapper so these resolve there too.
+      // mount on <body>: NotesEditor stamps `.nt-app`+data-theme on CKEditor's.
+      // ck-body-wrapper so these resolve there too.
       addBase({
         ".nt-app": {
           "--ck-border-radius": "8px",
@@ -2323,7 +2323,7 @@ const config: Config = {
     }),
     // ── Taxi (SmartRotom) theme layer ──────────────────────────────────────
     // "Teras Transit": blue structure, yellow money. Scoped to `.tx-app`, real
-    // light + dark (the mode comes from the platform picker — SMARTROTOM_V3 §2b).
+    // light + dark (the mode comes from the platform picker).
     // The blue ramp is CONSTANT across themes: it encodes structure (pins, the
     // player, the route beam), so it must not shift when the canvas flips. What
     // flips is the canvas, the ink and the translucent surfaces — which are
@@ -2489,7 +2489,7 @@ const config: Config = {
     // read it back out of the vars), the frosted-glass panel, the storage slot
     // (a four-layer inset shadow plus six mutually-composable states), and the
     // ten box wallpapers — which MUST be literal classes, because the box theme
-    // is data-driven and `theme-${t}` would never compile (SMARTROTOM_V3.md §4).
+    // is data-driven and `theme-${t}` would never compile.
     plugin(({ addBase, addComponents }) => {
       addBase({
         ".pc-app": {
@@ -2604,7 +2604,7 @@ const config: Config = {
         // ── Box wallpapers ────────────────────────────────────────────────────
         // Ten named gradients + a shared dot screen and vignette. Literal classes
         // on purpose: the theme is a data value, so it is mapped to a full class
-        // name in `_utils/boxThemes.ts` — never interpolated (§4, audit gap G2).
+        // name in `_utils/boxThemes.ts` — never interpolated.
         ".pc-wp": { position: "absolute", inset: "0", opacity: ".9" },
         ".pc-wp::after": {
           content: '""',
@@ -2656,7 +2656,7 @@ const config: Config = {
     // `data-scanlines` and `data-motion` on the `.ar-app` root are the two knobs
     // the in-app Ajustes screen writes; both degrade to the design's defaults
     // when absent. OS-level `prefers-reduced-motion` is handled separately, per
-    // element, with `motion-reduce:animate-none` (SMARTROTOM_V3.md §11).
+    // element, with `motion-reduce:animate-none`.
     plugin(({ addBase, addComponents }) => {
       addBase({
         ".ar-app": {
@@ -2832,7 +2832,7 @@ const config: Config = {
     // cork board, the wooden frame, the parchment (stacked radial-gradients +
     // an SVG turbulence grain + burned corners), the desk and the wax stamp.
     // These are MATERIALS, not components — the components themselves are
-    // Tailwind on JSX in misiones/_components (SMARTROTOM_V3.md §6).
+    // Tailwind on JSX in misiones/_components.
     // ══════════════════════════════════════════════════════════════════════
     plugin(({ addBase, addComponents }) => {
       // Turbulence grain, inlined as a data-URI so no asset request is made.
@@ -3687,7 +3687,7 @@ const config: Config = {
     //
     // Light-only: `colorScheme: light` is declared here and there is no
     // `[data-theme]` variant, because the warm paper IS the design. The app
-    // therefore ignores the theme picker's mode (SMARTROTOM_V3.md §2b).
+    // therefore ignores the theme picker's mode.
     //
     // Two data-attributes on the root ARE honoured:
     //   data-accent="civic|navy|burgundy|gold"  — the institutional colour
@@ -3863,7 +3863,7 @@ const config: Config = {
     // "El nido social": a Twitter-faithful timeline. Scoped to `.rk-app`, with
     // THREE canvases where every other app has two — Claro, Tenue and Oscuro.
     // That is not an extra theme: the platform picker still decides light vs
-    // dark (§2b), and when it says dark the reader picks *which* dark. Tenue is
+    // dark, and when it says dark the reader picks *which* dark. Tenue is
     // the default (a desaturated navy — Twitter's "dim"); Oscuro is true black
     // for OLED. So `data-theme` carries the resolved canvas, never a preference
     // the app invented.
@@ -4053,7 +4053,7 @@ const config: Config = {
         // ── Sprite backdrops ────────────────────────────────────────────────
         // The pastel wash behind every Pokémon sprite. Data-driven (the mon's
         // primary type picks one), so these are LITERAL classes selected through
-        // the map in `_utils/spriteTheme.ts` — never `wp-bg-${type}` (§4).
+        // the map in `_utils/spriteTheme.ts` — never `wp-bg-${type}`.
         ".wp-wall": { position: "relative", overflow: "hidden" },
         // The white bloom every wash carries at the top, so the sprite always
         // has light behind its head regardless of which wash it landed on.
@@ -4150,7 +4150,7 @@ const config: Config = {
     // Everything below that Tailwind cannot express — multi-layer security
     // print, the scalloped wax edge, buckram weave, holographic conic foil — is
     // a component class here rather than an inline style, so the pages stay
-    // readable JSX. (§6: Tailwind-only; the plugin IS the escape hatch.)
+    // readable JSX. (Tailwind-only; the plugin IS the escape hatch.)
     // ══════════════════════════════════════════════════════════════════════
     plugin(({ addBase, addComponents }) => {
       addBase({

@@ -23,7 +23,7 @@ import {
  *
  * Every number here is DERIVED from real completed orders and real reviews — there
  * is no seeded reputation. A brand-new seller therefore shows "Vendedor nuevo" and
- * no stars, rather than a flattering 4.9 nobody earned (§9). That honesty is the
+ * no stars, rather than a flattering 4.9 nobody earned. That honesty is the
  * whole point of the page: it is what makes a good rating mean something.
  */
 export default function SellerPage({ params }: { params: Promise<{ uuid: string }> }) {

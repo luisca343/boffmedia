@@ -1,9 +1,9 @@
 /**
  * Rooker's primitive library (`rk-*`).
  *
- * Import from this barrel, never by deep path (SMARTROTOM_V3 §1). Add a line here
+ * Import from this barrel, never by deep path. Add a line here
  * whenever a new primitive is created, and a specimen at
- * `/smartrotom/styles/components` (§14).
+ * `/smartrotom/styles/components`.
  */
 export { Icon, type IconName, type IconProps } from "./Icon"
 // The wordmark's art lives with the rest of the hand-drawn glyphs; re-exported

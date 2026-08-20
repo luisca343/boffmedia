@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils"
 
 /**
  * A literal map, applied through inline `style`. `bg-${type}` would compile to nothing at
- * all (§4), and eighteen full class strings for a value that arrives as free-form text
+ * all, and eighteen full class strings for a value that arrives as free-form text
  * from the game server would be eighteen ways to miss.
  *
  * Accents and case are normalised because the server sends the Spanish names as typed

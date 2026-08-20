@@ -38,8 +38,8 @@ import { type BundledWorld } from "@/services/api/boffmedia/packsService"
 // Cutting a version is the one authoring step the launcher cannot do for you:
 // mods come from CurseForge/Modrinth by id, but configs, scripts and resource
 // packs are OUR bytes and have to be uploaded before a manifest can reference
-// them. §7.1 — the API validates the whole thing with @boffmedia/pack-schema,
-// so anything malformed is rejected there rather than half-stored here.
+// them. The API validates the whole thing with @boffmedia/pack-schema, so
+// anything malformed is rejected there rather than half-stored here.
 //
 // This is a full page, not a modal: the mod browser alone needs the whole
 // viewport, and a wizard lets each step stay small enough to read.
@@ -215,9 +215,9 @@ export function VersionEditor({
   // the EmulatorEditor is keyed on its presence so it remounts once and seeds
   // its own state (a plain prop is frozen at mount).
   const [emuInitial, setEmuInitial] = useState<EmulatorInitial | null>(null)
-  // The emulator arm runs the same wizard with its own step set. It used to be
-  // a single un-stepped form dropped in the middle of the editor, which is why
-  // it read as a bypass rather than a first-class arm.
+  // The emulator arm runs the same wizard with its own step set — not a single
+  // un-stepped form dropped into the editor, which reads as a bypass rather than
+  // a first-class arm.
   const [emuStep, setEmuStep] = useState<EmulatorStep>("metadata")
   const [emuValid, setEmuValid] = useState<Record<EmulatorStep, boolean>>({
     metadata: false,

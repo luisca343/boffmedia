@@ -11,12 +11,11 @@ import { useCreatePost, useMe } from "../_hooks/queries"
 /**
  * Writing a trino.
  *
- * The handoff offered five composer types (texto, captura, combate, media, encuesta).
- * Three ship: **texto**, **media** (a URL — Rooker owns no upload pipeline) and
- * nothing else, because attaching a capture or a battle means picking a specific
- * `rotom_pokedex` / `rotom_replays` row, and the pickers for those are a screen each.
- * The API takes `captureId` / `replayId` today, so the pickers are additive — they do
- * not change the shape of anything already built.
+ * Two composer types ship: **texto** and **media** (a URL — Rooker owns no upload
+ * pipeline). Attaching a capture or a battle means picking a specific `rotom_pokedex` /
+ * `rotom_replays` row, and the pickers for those are a screen each. The API already
+ * takes `captureId` / `replayId`, so adding them later is additive — it does not change
+ * the shape of anything already built.
  *
  * [deferred] **Encuesta** (polls) has no table at all and is not offered; a poll button
  * that silently posts plain text would be a lie. Registered in

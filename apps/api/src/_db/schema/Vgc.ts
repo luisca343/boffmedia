@@ -131,12 +131,12 @@ export type VgcPokepaste = typeof vgcPokepastes.$inferSelect;
 /**
  * One row per team entry from the VGCPastes Google Sheet CSV.
  *
- * species:       quick 6-species list from the CSV column — available in Phase 2
- *                without fetching any paste.
+ * species:       quick 6-species list from the CSV column — read without fetching
+ *                any paste.
  * items:         parallel 6-item list extracted from the upper sprite-slot columns
- *                (col 7, 10, 13, 16, 19, 22) — free from Phase 2 without paste fetching.
- * pasteId:       populated in Phase 3 once the paste is stored in vgcPokepastes.
- * replicaStatus: '✔' = full replica; blank/other = unconfirmed. Used to gate Phase 3.
+ *                (col 7, 10, 13, 16, 19, 22) — also free of any paste fetch.
+ * pasteId:       set once the paste is stored in vgcPokepastes.
+ * replicaStatus: '✔' = full replica; blank/other = unconfirmed. Gates the fetch.
  * hasEvs:        whether the paste includes EV/SP spread data ('Yes'/'No' in sheet).
  */
 export const vgcPastesRepository = mysqlTable(

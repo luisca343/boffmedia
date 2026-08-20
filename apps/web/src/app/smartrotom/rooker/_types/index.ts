@@ -45,9 +45,9 @@ export interface RookerCapture extends Omit<RookerPostCaptureEntity, "caughtAt">
 export interface RookerBattle extends Omit<RookerPostBattleEntity, "winner" | "createdAt"> {
   winner: string | null
   /**
-   * TODO(P9): real drift, fixed here — the wire's `createdAt` is `Date | null` (a battle whose
-   * replay predates the join, or import gaps). This type used to claim it was always a string;
-   * `BattleCard.tsx`'s `relTime()` call was already null-safe, so no consumer needed a change.
+   * The wire's `createdAt` is `Date | null` (a battle whose replay predates the join,
+   * or import gaps), so this must stay nullable. `BattleCard.tsx`'s `relTime()` call
+   * is null-safe.
    */
   createdAt: string | null
 }
@@ -76,9 +76,9 @@ export interface RookerPost
   /** Same values as the generated `RookerPostEntity.type` enum, restated as a plain union. */
   type: PostType
   /**
-   * TODO(P9): real drift, fixed here — the wire's `createdAt` is `Date | null`, not always a
-   * string. `AuthorLine.tsx` (the one place a post's `createdAt` reaches a typed prop) is
-   * updated to accept `string | null`; its `relTime()`/`dateTime` use were already null-safe.
+   * The wire's `createdAt` is `Date | null`, not always a string. `AuthorLine.tsx`
+   * (the one place a post's `createdAt` reaches a typed prop) accepts
+   * `string | null`; its `relTime()`/`dateTime` use is null-safe.
    */
   createdAt: string | null
   parentId: number | null
@@ -109,8 +109,8 @@ export interface RookerProfile
   bio: string | null
   link: string | null
   partnerPokemonId: number | null
-  /** TODO(P9): real drift, fixed here — the wire's `createdAt` is `Date | null`; `joinedAt()`
-   * (the only reader, in `[handle]/page.tsx`) was already null-safe. */
+  /** The wire's `createdAt` is `Date | null`. `joinedAt()` (the only reader, in
+   * `[handle]/page.tsx`) is null-safe. */
   createdAt: string | null
   /**
    * [deferred] Same staff/gym-leader verification as `RookerAuthor.isVerified` — not on the

@@ -2,8 +2,8 @@ import type { AppKey } from "./showcase-shared"
 
 // Index model for the SmartRotom showcase. Mirrors the Boffmedia showcase's
 // `showcase-data.tsx`, with one addition: a chapter carries the `app` whose design
-// system it documents, because SmartRotom is many systems rather than one
-// (SMARTROTOM_V3.md §0). Domains ARE the systems, so `DOMAINS.length` IS the count —
+// system it documents, because SmartRotom is many systems rather than one.
+// Domains ARE the systems, so `DOMAINS.length` IS the count —
 // the page reads it from here rather than restating it in prose.
 
 export interface SecMeta {

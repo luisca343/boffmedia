@@ -149,9 +149,9 @@ export class PacksRepository {
     if (principal.userId != null) {
       conditions.push(eq(boffMediaParticipants.userId, principal.userId));
     } else if (principal.mcUuid) {
-      // The Phase 2 bridge: the launcher still authenticates as a Minecraft
-      // UUID, so membership is reached through the account that UUID is linked
-      // to. Phase 4 drops this join when the launcher carries a user id.
+      // The launcher authenticates as a Minecraft UUID, so membership is
+      // reached through the account that UUID is linked to. This join goes away
+      // the day the launcher carries a user id directly.
       query = query.innerJoin(
         boffMediaUsers,
         eq(boffMediaUsers.id, boffMediaParticipants.userId),

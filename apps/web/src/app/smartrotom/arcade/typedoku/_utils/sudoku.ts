@@ -126,7 +126,7 @@ export const getPossibilities = (row: number, col: number, currentGrid: Cell[][]
 }
 
 // A neon per type. Full literal classes — the cell picks one by lookup, never by
-// interpolation (SMARTROTOM_V3.md §4).
+// interpolation.
 export const TYPE_SKIN: Record<string, string> = {
   Normal: "border-white/25 bg-white/[.14] text-ar-ink",
   Fire: "border-ar-magenta/60 bg-ar-magenta/25 text-ar-magenta-2",

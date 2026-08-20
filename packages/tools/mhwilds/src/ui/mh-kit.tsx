@@ -14,11 +14,10 @@ import {
  * content and the HOST scrolls it.
  *
  * The min-height fills the host's box without the package knowing anything
- * about the host's chrome. This used to be `calc(100dvh - var(--nav-h))`, and
- * `--nav-h` is defined in apps/web's globals.css ONLY — so in the launcher the
- * whole declaration was invalid and silently dropped. Same host coupling the
- * schematic tools already removed; the rule for every future tool package is
- * that viewport math belongs to the host, never to the package.
+ * about the host's chrome. Never write `calc(100dvh - var(--nav-h))` here:
+ * `--nav-h` is defined in apps/web's globals.css ONLY, so in the launcher the
+ * whole declaration is invalid and silently dropped. Viewport math belongs to
+ * the host, never to a tool package.
  *
  * `100%` is the fallback rather than `100dvh` because a host that gives its
  * tools a definite box is the common case, and a bare `min-h-full` would not

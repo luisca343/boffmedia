@@ -1,4 +1,4 @@
-//! Locating the player's own emulator install (§2, D4) — now EmuDeck-aware.
+//! Locating the player's own emulator install; EmuDeck-aware.
 //!
 //! Ground truth from a real EmuDeck-on-Windows install (2026-08): EmuDeck's
 //! per-system default is recorded in `%APPDATA%\EmuDeck\settings.json` under
@@ -9,7 +9,7 @@
 //! folder (roms/saves/bios). So autowiring means: parse that file, honor the
 //! player's own choice, and fall back gracefully.
 //!
-//! The launcher never ships or writes into an emulator (D4). Resolution order:
+//! The launcher never ships or writes into an emulator. Resolution order:
 //! manual override → EmuDeck (per settings.json) → common install dirs → PATH.
 //! The result carries its SOURCE and METHOD so "it launched the wrong thing"
 //! is diagnosable at a glance.
@@ -20,8 +20,8 @@ use serde::Serialize;
 
 use crate::settings::{self, Settings};
 
-/// The systems supported in Cycle 2 (D2). Kept separate from the generated
-/// pack-schema enum so the command layer takes a plain wire string.
+/// The supported systems. Kept separate from the generated pack-schema enum so
+/// the command layer takes a plain wire string.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum EmulatorKind {
     Mgba,

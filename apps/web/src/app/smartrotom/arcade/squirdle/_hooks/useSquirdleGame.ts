@@ -44,8 +44,8 @@ export function useSquirdleGame() {
     [t],
   )
 
-  // Rebuilding the index on every keystroke is what the old monolith did; the
-  // pool is ~1k entries, so it is memoised on the data instead.
+  // Memoised on the data: the pool is ~1k entries, so rebuilding the index on
+  // every keystroke is pure waste.
   const fuse = useMemo(
     () => new Fuse(pokemonData, { keys: ["name", "transName"], threshold: 0.4 }),
     [pokemonData],

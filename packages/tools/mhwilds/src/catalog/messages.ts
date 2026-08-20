@@ -1,15 +1,11 @@
-// AUTO-EXTRACTED from apps/web/locales/{es,en}/tools/mhwilds.json during the
-// tools-mhwilds extraction. This package OWNS these keys now — the web catalog
-// no longer carries them.
+// AUTO-EXTRACTED from apps/web/locales/{es,en}/tools/mhwilds.json. This package
+// OWNS these keys — the web catalog does not carry them.
 //
-// Namespace: `tools.mhwilds.*` (re-rooted from the old `mhwilds.*`, matching
-// the convention @boffmedia/tools-minecraft set with `tools.schematicCompat.*`).
-// Shape is nested, which is what both hosts want: next-intl in apps/web and
-// `useToolT("<namespace>")` in apps/desktop.
+// Namespace: `tools.mhwilds.*`, matching the `tools.<tool>.*` convention
+// @boffmedia/tools-minecraft uses. Shape is nested, which is what both hosts
+// want: next-intl in apps/web and `useToolT("<namespace>")` in apps/desktop.
 //
-// The `manifest.*` block is new: the registry needs a title and tagline per
-// tool, and the old web catalog had none because the web hub named these tools
-// from its own tools-data.ts instead.
+// The `manifest.*` block carries the registry's per-tool title and tagline.
 //
 // Spanish is the source of truth; English is the translation.
 

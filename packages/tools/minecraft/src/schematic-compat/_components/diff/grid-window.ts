@@ -25,8 +25,8 @@ export function columnsFor(width: number, minCol: number, gap: number): number {
 
 /**
  * Rows an `itemCount`-item grid occupies at `columns` per row. Zero items means
- * zero rows: reserving a phantom row for an empty group used to make the
- * reserved height disagree with what the grid actually paints (nothing).
+ * zero rows: reserving a phantom row for an empty group makes the reserved
+ * height disagree with what the grid actually paints (nothing).
  */
 export function rowsFor(itemCount: number, columns: number): number {
   if (itemCount <= 0 || columns <= 0) return 0;

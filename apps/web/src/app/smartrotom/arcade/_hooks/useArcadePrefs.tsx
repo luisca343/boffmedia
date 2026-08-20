@@ -26,8 +26,7 @@ const Ctx = createContext<PrefsContext>({ ...DEFAULTS, setPref: () => {} })
  * Cabinet preferences — local to this browser, never on the server (there is no
  * arcade-settings endpoint, and these are display choices, not player state).
  * `useRotomMode` is deliberately not consulted: the arcade is dark-only and
- * ships a single mode, so it ignores the platform light/dark axis entirely
- * (SMARTROTOM_V3.md §2b).
+ * ships a single mode, so it ignores the platform light/dark axis entirely.
  */
 export function ArcadePrefsProvider({ children }: { children: ReactNode }) {
   const [prefs, setPrefs] = useState<ArcadePrefs>(DEFAULTS)

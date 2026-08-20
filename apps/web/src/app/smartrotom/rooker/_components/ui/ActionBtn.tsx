@@ -12,7 +12,7 @@ import { useFormat } from "../../_hooks/useFormat"
  * sits in a 30px disc that stays invisible until hover, when it washes with the
  * control's *own* colour (blue for reply, green for retrino) while the label tints to
  * match. Colour is therefore a property of the action, not of the theme, and each
- * variant is a literal class pair rather than an interpolated one (§4).
+ * variant is a literal class pair rather than an interpolated one.
  */
 export type ActionTone = "accent" | "rt" | "heart"
 

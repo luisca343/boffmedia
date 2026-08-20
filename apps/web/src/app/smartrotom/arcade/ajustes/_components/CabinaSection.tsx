@@ -6,9 +6,9 @@ import { Panel, Segmented, Switch } from "../../_components/ui"
 import { SettingsRow } from "./SettingsRow"
 
 /**
- * The three preferences the cabinet actually reads. The handoff also showed
- * "Música arcade", "Mostrar tooltips", "Atajos de teclado" and "Mostrar avisos
- * diarios"; none of them has a system behind it, so they are not switches here.
+ * The three preferences the cabinet actually reads. "Música arcade", "Mostrar
+ * tooltips", "Atajos de teclado" and "Mostrar avisos diarios" have no system
+ * behind them, so they are deliberately not switches here.
  */
 export function CabinaSection() {
   const t = useTranslations("arcade")

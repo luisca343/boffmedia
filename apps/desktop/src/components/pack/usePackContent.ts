@@ -220,10 +220,10 @@ function rowOf(file: ContentFile): ContentRow {
  *  The whole version list is fetched rather than just the newest one, because
  *  "different from what we have" is NOT the same question as "newer than what
  *  we have". `catalog_latest_version` prefers the newest *release*, so a pack
- *  pinned to a beta that is newer than every release used to be offered that
- *  release as an "Actualización" — a silent downgrade, and one that came back
- *  every single time the player checked. Comparing publish dates is what makes
- *  the offer directional. */
+ *  pinned to a beta newer than every release would be offered that release as
+ *  an "Actualización" — a silent downgrade, and one that returns every single
+ *  time the player checks. Comparing publish dates is what makes the offer
+ *  directional. */
 export async function findUpdates(
   rows: ContentRow[],
   minecraft: string,

@@ -500,9 +500,9 @@ export class RandomizerRepository {
   /**
    * Returns { boffmediaUserId, status } if registered/confirmed, else null.
    *
-   * Direct join on the account. This used to walk MC UUID → boffmedia_users →
-   * participants, which meant a player who joined an event but never linked
-   * Minecraft could not claim a seed for an emulator event.
+   * Direct join on the account, NOT via MC UUID → boffmedia_users →
+   * participants: that path locks a player who joined an event but never linked
+   * Minecraft out of claiming a seed for an emulator event.
    */
   async resolveEventEntitlement(
     eventId: number,

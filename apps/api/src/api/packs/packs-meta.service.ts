@@ -108,20 +108,20 @@ export class PacksMetaService {
       });
   }
 
-  /** NeoForge derives its version from the Minecraft one, with the leading "1."
-   *  of the old scheme dropped and the result padded to three components:
+  /** NeoForge derives its version from the Minecraft one: drop the leading "1."
+   *  of the 1.x scheme and pad the result to three components:
    *    1.21.4 → 21.4.x    1.21 → 21.0.x    26.2 → 26.2.0.x    26.1.2 → 26.1.2.x
-   *  (Minecraft switched to the year-based 26.x scheme, which keeps all three
-   *  of its own components — assuming "1.x.y" here silently returns nothing.)
-   *  Only 1.20.2+ exists as `neoforge`; 1.20.1 shipped under the old
-   *  `net.neoforged:forge` coordinates and is deliberately not offered here. */
+   *  The year-based 26.x scheme keeps all three of its own components, so
+   *  assuming "1.x.y" here silently returns nothing. Only 1.20.2+ exists as
+   *  `neoforge`; 1.20.1 ships under `net.neoforged:forge` coordinates and is
+   *  deliberately not offered here. */
   private async neoforge(minecraft: string): Promise<LoaderVersionEntity[]> {
     const parts = minecraft.split('.');
     const legacy = parts[0] === '1';
     if (legacy) parts.shift();
     if (parts.length === 0 || !/^\d+$/.test(parts[0])) return [];
-    // The old scheme contributes two components (21.4 → 21.4.<build>); the new
-    // one keeps its own three (26.2 → 26.2.0.<build>).
+    // The 1.x scheme contributes two components (21.4 → 21.4.<build>); the
+    // year-based one keeps its own three (26.2 → 26.2.0.<build>).
     const width = legacy ? 2 : 3;
     while (parts.length < width) parts.push('0');
     const prefix = `${parts.slice(0, width).join('.')}.`;

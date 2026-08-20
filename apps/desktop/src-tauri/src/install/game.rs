@@ -27,7 +27,7 @@ pub struct Prepared {
     pub plan: InstallPlan,
     pub settings: Settings,
     pub session: GameSession,
-    /// §9 — the heap and JVM for THIS pack, already folded from the global
+    /// The heap and JVM for THIS pack, already folded from the global
     /// settings, the per-instance override and the sizing heuristic. Everything
     /// below reads this rather than `settings`, so a pack-level choice cannot be
     /// bypassed by a code path that forgot about it.
@@ -52,7 +52,7 @@ pub fn install(prepared: &Prepared, reporter: &Reporter) -> Result<base::Game, I
                 .map_err(|e| describe_moj(e, prepared))?
         }
 
-        // §6.4 — Fabric and Quilt hand back a ready-made profile with
+        // Fabric and Quilt hand back a ready-made profile with
         // `inheritsFrom`; there is nothing to patch and no processors to run.
         Some((kind @ (LoaderKind::FabricLoader | LoaderKind::QuiltLoader), version)) => {
             let loader = if *kind == LoaderKind::FabricLoader {
@@ -74,7 +74,7 @@ pub fn install(prepared: &Prepared, reporter: &Reporter) -> Result<base::Game, I
                 .map_err(|e| describe_fabric(e, prepared))?
         }
 
-        // §6.4 — Forge/NeoForge since 1.13 run install_profile.json processors
+        // Forge/NeoForge since 1.13 run install_profile.json processors
         // that binary-patch the client jar. portablemc's forge installer
         // downloads the official installer AND runs those processors itself
         // (forge/mod.rs:40), so there is nothing to shell out to and nothing to
@@ -102,9 +102,9 @@ pub fn install(prepared: &Prepared, reporter: &Reporter) -> Result<base::Game, I
         }
     };
 
-    // §6.3 — portablemc reports an incompatible JVM as a warning and launches
-    // anyway. That produces the confusing crash the handoff calls the single
-    // most common support ticket, so it is promoted to a hard failure here.
+    // Portablemc reports an incompatible JVM as a warning and launches anyway.
+    // That produces the single most common support ticket there is, so it is
+    // promoted to a hard failure here.
     if let Some(detail) = watcher.jvm_incompatible.take() {
         return Err(InstallFailure::message(format!(
             "{detail}\nElige otra ruta de Java en los ajustes, o déjala vacía para que el \
@@ -112,8 +112,8 @@ pub fn install(prepared: &Prepared, reporter: &Reporter) -> Result<base::Game, I
         )));
     }
 
-    // -Xmx last so it wins over anything the version metadata set. §9: this is
-    // the RESOLVED value — the pack's own override, the heuristic, or the global
+    // -Xmx last so it wins over anything the version metadata set. This is the
+    // RESOLVED value — the pack's own override, the heuristic, or the global
     // setting, in that order — not the global slider.
     game.jvm_args.push(prepared.runtime.xmx_arg());
     session::patch_game_args(&mut game, &prepared.session);
@@ -128,12 +128,12 @@ fn configure(base: &mut base::Installer, prepared: &Prepared) {
         .set_jvm_policy(jvm_policy(&prepared.runtime));
 }
 
-/// §6.3. A path the player chose is used verbatim — silently falling back to a
+/// A path the player chose is used verbatim — silently falling back to a
 /// different JVM would make "I set Java 21 and it still crashes" unanswerable.
 /// Otherwise Mojang's own runtime is preferred over whatever is on PATH,
 /// because the system JVM is the usual source of a version mismatch.
 ///
-/// §9: the path comes from the RESOLVED runtime, so a pack that sets Java to
+/// The path comes from the RESOLVED runtime, so a pack that sets Java to
 /// "automático" escapes a global path that is wrong for it — the exact case
 /// where one player keeps a Java 8 path for an old pack and every new pack then
 /// refuses to start.

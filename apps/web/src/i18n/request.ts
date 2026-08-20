@@ -137,10 +137,10 @@ export default getRequestConfig(async () => {
       ),
     );
     const fromFiles = modules.reduce<DeepMergeable>((acc, m) => deepMerge(acc, m.default), {});
-    // Workspace tool packages own their own catalogs (plan §3: "Package-owned
-    // es/en message catalogs; hosts merge them"). They are merged in
-    // unconditionally rather than through the pathname scope manifest, which
-    // only knows about files under locales/ — the payload is a few hundred keys.
+    // Workspace tool packages own their own es/en catalogs and hosts merge
+    // them. Merged in unconditionally rather than through the pathname scope
+    // manifest, which only knows about files under locales/ — the payload is a
+    // few hundred keys.
     const withMinecraft = deepMerge(fromFiles, toolsMinecraftMessages[loc] as DeepMergeable);
     return deepMerge(withMinecraft, toolsMhwildsMessages[loc] as DeepMergeable);
   };

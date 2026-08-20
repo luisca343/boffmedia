@@ -3,9 +3,9 @@ import { cn } from "@/lib/utils"
 import { Icon, type IconName } from "@boffmedia/ui"
 
 /**
- * Admin «Señal» kit — the `av-*` broadcast control-room vocabulary from the
- * handoff, ported to Tailwind + v3 tokens. Dense panels, diagonal cuts, mono
- * data, orange as the live signal. Shared across every admin section.
+ * Admin «Señal» kit — the `av-*` broadcast control-room vocabulary on Tailwind
+ * + v3 tokens. Dense panels, diagonal cuts, mono data, orange as the live
+ * signal. Shared across every admin section.
  */
 
 /* ---- section head ---------------------------------------------------------- */

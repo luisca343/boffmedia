@@ -19,7 +19,7 @@ export interface OverlayProps {
 
 /**
  * The bare scrim, kept exported for parity with the barrel (unused internally beyond
- * `Modal` below). A skin over the shared `ModalShell` (SMARTROTOM_V3 §2).
+ * `Modal` below). A skin over the shared `ModalShell`.
  */
 export function Overlay({ onClose, children, className, label }: OverlayProps) {
   const t = useTranslations("pasaporte")
@@ -43,7 +43,7 @@ export function Overlay({ onClose, children, className, label }: OverlayProps) {
 /**
  * The replay sheet. Focus trap, focus restore, Escape, scrim dismiss, scroll lock and
  * dialog semantics all come from the shared `ModalShell` now — a modal whose focus can
- * wander behind the scrim is a modal only to the sighted (SMARTROTOM_V3 §2).
+ * wander behind the scrim is a modal only to the sighted.
  */
 export function Modal({
   title,

@@ -3,6 +3,7 @@ import {
   Controller,
   HttpCode,
   HttpStatus,
+  Logger,
   Post,
   Req,
   UseGuards,
@@ -55,6 +56,11 @@ export class MinecraftController {
     { deviceCode: string; expiresAt: number }
   >();
 
+  /** Every line here is prefixed `mc-link` so one grep follows a whole attempt.
+   *  The `userCode` is safe to log — it is what the player reads off the screen.
+   *  The `deviceCode` is NOT: it is the bearer credential for the flow. */
+  private readonly logger = new Logger(MinecraftController.name);
+
   constructor(
     private readonly link: MinecraftLinkService,
     private readonly handshake: MinecraftHandshakeService,
@@ -79,11 +85,18 @@ export class MinecraftController {
     @Req() req: { user: { userId: number } },
   ): Promise<McDeviceCodeEntity> {
     this.sweep();
+    const replacing = this.pendingLinks.has(req.user.userId);
     const code = await this.link.requestDeviceCode();
     this.pendingLinks.set(req.user.userId, {
       deviceCode: code.deviceCode,
       expiresAt: Date.now() + code.expiresIn * 1000,
     });
+    // `replacing` is the tell for a client that restarts the flow mid-attempt:
+    // the code the player already typed is discarded here, so they can never
+    // finish. It should be false on a first open.
+    this.logger.log(
+      `mc-link start user=${req.user.userId} userCode=${code.userCode} ttl=${code.expiresIn}s interval=${code.intervalSeconds}s replacingPending=${replacing}`,
+    );
 
     return {
       userCode: code.userCode,
@@ -110,12 +123,21 @@ export class MinecraftController {
   ): Promise<McLinkPollEntity> {
     const pending = this.pendingLinks.get(req.user.userId);
     if (!pending || pending.expiresAt < Date.now()) {
+      // No entry at all means the flow was never started on THIS process — a
+      // restart (dev watch mode) or a second API instance wipes the map, and
+      // the player sees "expired" seconds after starting.
+      this.logger.warn(
+        `mc-link poll user=${req.user.userId} → expired (${pending ? 'ttl elapsed' : 'no pending entry on this process'})`,
+      );
       this.pendingLinks.delete(req.user.userId);
       return { status: 'expired' };
     }
 
     const result = await this.link.poll(pending.deviceCode);
     if (result.status !== 'ready') {
+      this.logger.log(
+        `mc-link poll user=${req.user.userId} → ${result.status}`,
+      );
       if (result.status !== 'pending') {
         this.pendingLinks.delete(req.user.userId);
       }
@@ -123,10 +145,16 @@ export class MinecraftController {
     }
 
     this.pendingLinks.delete(req.user.userId);
+    this.logger.log(
+      `mc-link approved user=${req.user.userId} mc=${result.profile.username} uuid=${result.profile.uuid} — writing link`,
+    );
     await this.users.linkProvenMinecraftAccount(req.user.userId, {
       uuid: result.profile.uuid,
       username: result.profile.username,
     });
+    this.logger.log(
+      `mc-link linked user=${req.user.userId} mc=${result.profile.username}`,
+    );
 
     return {
       status: 'linked',

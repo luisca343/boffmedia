@@ -72,7 +72,7 @@ function backdrop(width, height, band) {
   </svg>`)
 }
 
-// Solo NSIS: el .msi ya no se genera (ver docs/RELEASING.md §4.2).
+// Solo NSIS: el .msi ya no se genera.
 const targets = [
   // La cabecera es una tira de 150x57 pegada arriba a la derecha, con el
   // título de la página a su izquierda.

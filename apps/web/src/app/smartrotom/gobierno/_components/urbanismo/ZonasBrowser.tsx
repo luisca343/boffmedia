@@ -13,8 +13,8 @@ import { groupBy, kindOf } from "./helpers"
 // The land-use directory: municipios on the left, their sectors on the right — each
 // sector's occupancy and member plots derived from the real parcelas list, since `zonas`
 // itself carries no aggregate counts (the API's `parcelas`/`ocupadas` fields are never
-// populated). The handoff's separate "zonas reguladas" overlay (Spawn/Mercado/PvP/Evento)
-// has no backing table or endpoint at all — it is dropped rather than faked.
+// populated). A separate "zonas reguladas" overlay (Spawn/Mercado/PvP/Evento) has no
+// backing table or endpoint at all, so it is not rendered.
 export function ZonasBrowser() {
   const t = useTranslations("gobierno")
   const { data: zonas, isLoading, isError } = useZonas()

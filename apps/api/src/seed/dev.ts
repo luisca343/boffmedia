@@ -7,9 +7,9 @@ import pino from 'pino';
  * Development and demo fixtures. NOT required for the application to work — the
  * system bootstrap (`seed:system`) is.
  *
- * These used to sit next to the required seeds with no marker of any kind, one
- * `ts-node` away from being run against production. This entrypoint refuses to
- * do that.
+ * Keep them out of the required seeds: sitting alongside those with no marker
+ * leaves them one `ts-node` away from running against production. This
+ * entrypoint refuses to do that.
  */
 const logger = pino({ name: 'seed:dev' });
 

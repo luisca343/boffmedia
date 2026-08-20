@@ -1,4 +1,4 @@
-//! Romhack patching (§4.1). Applies a `.bps` or `.ups` patch to a clean base
+//! Romhack patching. Applies a `.bps` or `.ups` patch to a clean base
 //! ROM entirely in Rust — small, well-specified formats, no external dependency.
 //! Both formats embed source/target/patch CRC32s, so we get integrity checks for
 //! free: a base that is the wrong revision, a corrupt patch, or an output that

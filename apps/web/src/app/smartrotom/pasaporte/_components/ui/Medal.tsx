@@ -12,7 +12,7 @@ type Metal = LogroTier | StandingTier
  * `.ps-coin` reads `--ps-metal`, and this points it at the tier's own token rather than at
  * a second copy of the hex — one metal ramp, declared once in `tailwind.config.ts`, so a
  * gold logro and a gold ladder rung can never drift apart. A literal map, never
- * `--ps-metal: var(--ps-tier-${tier})` built from a template (§4).
+ * `--ps-metal: var(--ps-tier-${tier})` built from a template.
  */
 const TIER_VAR: Record<Metal, string> = {
   bronce: "var(--ps-tier-bronce)",

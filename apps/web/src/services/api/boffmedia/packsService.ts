@@ -6,7 +6,7 @@ import {
   apiAuthedAutoPOST,
 } from '@/services/boffAPI';
 
-// The launcher's pack registry (HANDOFF §7), admin half. The launcher itself
+// The launcher's pack registry, admin half. The launcher itself
 // talks to /packs/launcher/* with its own session; nothing here is reachable
 // without BOFF_ADMIN.
 //
@@ -18,8 +18,8 @@ import {
 export type PackAccessKind = 'public' | 'password' | 'allowlist';
 export type PackLoader = 'forge' | 'neoforge' | 'fabric-loader' | 'quilt-loader';
 
-// Cycle 1 §3: gameType is now part of admin types. These will be reconciled
-// with @boffmedia/pack-schema via `pnpm generate:shared` once the API DTO is live.
+// gameType is part of the admin types. These reconcile with
+// @boffmedia/pack-schema via `pnpm generate:shared` once the API DTO is live.
 export type GameType = 'minecraft' | 'emulator' | 'zomboid' | 'stardew';
 
 /** A pack's Quick Play target — present only for "server packs". Port defaults
@@ -66,7 +66,7 @@ export interface PackVersionRow {
   worldCount: number;
   published: boolean;
   notes: string | null;
-  // Emulator pack fields (Cycle 2, awaiting reconciliation via pnpm generate:shared)
+  // Emulator pack fields — awaiting reconciliation via pnpm generate:shared
   emulatorKind?: 'mgba' | 'melonds';
   createdAt: string;
 }
@@ -179,7 +179,7 @@ export interface CreateVersionInput {
   /** PackFile[] — the API validates this with @boffmedia/pack-schema. */
   files: unknown[];
   worlds?: BundledWorld[];
-  // Emulator pack fields (Cycle 2, awaiting reconciliation via pnpm generate:shared)
+  // Emulator pack fields — awaiting reconciliation via pnpm generate:shared
   emulator?: { kind: 'mgba' | 'melonds'; rom: string; args?: string[] };
   initialFiles?: unknown[];
 }

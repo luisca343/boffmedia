@@ -9,7 +9,7 @@ export const FT_SCOPE = "ft-app font-ft";
 
 /**
  * A skin over the shared `ModalShell` — portal, Escape, scrim dismiss, scroll lock,
- * focus trap/restore and dialog semantics all come from there (SMARTROTOM_V3 §2).
+ * focus trap/restore and dialog semantics all come from there.
  */
 export function Modal({
   open,

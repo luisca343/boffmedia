@@ -32,7 +32,7 @@ export default defineConfig({
       // consumes it as compiled CJS, and pointing bundlers at the source
       // instead would let types and runtime drift apart.
       "@boffmedia/ui": resolve(__dirname, "../../packages/ui/src"),
-      // Tool packages ship TS source too (plan §3: "Consumed as TS source").
+      // Tool packages ship TS source too ("Consumed as TS source").
       "@boffmedia/tool-kit": resolve(__dirname, "../../packages/tools/kit/src"),
       "@boffmedia/tools-minecraft": resolve(__dirname, "../../packages/tools/minecraft/src"),
     },

@@ -8,9 +8,9 @@ import { FT_SCOPE } from "./Modal";
 export { toast };
 
 /**
- * The app only ever fired two visual tones (the default "ok" ink pill and a "warn"
- * orange one for failures) — every explicit second argument used to be `"warn"`, so
- * `kind: "error"` reuses that same look and no call site needed to change.
+ * The app fires two visual tones only: the default "ok" ink pill and a "warn"
+ * orange one for failures. `kind: "error"` deliberately reuses the "warn" look
+ * rather than adding a third.
  */
 const STYLE: Record<ToastKind, string> = {
   success: "bg-ft-ink text-ft-yellow",
@@ -21,7 +21,7 @@ const STYLE: Record<ToastKind, string> = {
 
 /**
  * Portalled, so it re-applies `ft-app` to keep the `--ft-*` vars resolving outside the
- * app root (§2).
+ * app root.
  */
 export function ToastHost() {
   const toasts = useToasts();

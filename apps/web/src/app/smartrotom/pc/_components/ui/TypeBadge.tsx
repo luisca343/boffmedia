@@ -9,7 +9,7 @@ export interface TypeBadgeProps {
 
 /**
  * The type colours are data, so they are applied inline — an interpolated
- * `bg-${type}-500` would silently never compile (SMARTROTOM_V3.md §4).
+ * `bg-${type}-500` would silently never compile.
  */
 // `pokedex` is the type chart's namespace; `type_*` lives in its CORE file, so it
 // resolves off-prefix here too.

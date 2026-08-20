@@ -10,9 +10,9 @@ export type RarityFilter = ItemRarity | "all"
 export type TypeFilter = string
 
 /**
- * Search + rarity + type + pagination over the collection. Ported from the old
- * `loot/_hooks/useCollectionFilter.ts`; the item-type axis and the name match are
- * new (the old one only matched raw `itemId`, so searching "Poké Ball" found nothing).
+ * Search + rarity + type + pagination over the collection. The search matches
+ * the item NAME, not just the raw `itemId` — matching the id alone means
+ * searching "Poké Ball" finds nothing.
  */
 export function useCollectionFilter(
   items: ArcadeInventoryItem[],

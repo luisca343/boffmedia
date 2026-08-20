@@ -10,7 +10,7 @@ import { ArcadeSidebar } from "./ArcadeSidebar"
 
 /**
  * The `.ar-app` scope root: every `ar-*` token resolves from the CSS vars this
- * class declares, so nothing arcade-flavoured renders outside it (§2). It also
+ * class declares, so nothing arcade-flavoured renders outside it. It also
  * carries the two preference switches the token layer reads — `data-scanlines`
  * and `data-motion`.
  *

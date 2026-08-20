@@ -1,12 +1,12 @@
-// The pack registry client (HANDOFF §7). Lives in Rust rather than the renderer
+// The pack registry client. Lives in Rust rather than the renderer
 // so the HTTP sidesteps CORS entirely — this is not a browser — and so the
 // launcher session never has to exist in JavaScript.
 //
 // Identity is a BOFFMEDIA account, obtained through a device-authorization
 // flow: the launcher shows a short code, the player approves it on the website
-// where they are already signed in, and we receive a 30-day session. It used to
-// be a Minecraft identity proved through Mojang's `hasJoined` handshake, which
-// meant a paid Minecraft account was required to open an emulator pack.
+// where they are already signed in, and the launcher receives a 30-day session.
+// It is deliberately NOT a Minecraft identity — that would require a paid
+// Minecraft account just to open an emulator pack.
 //
 // Three tokens, never confused:
 //   * the Minecraft access token  — auth::AuthState, used only against Mojang,
@@ -25,8 +25,8 @@ use crate::auth::{store, AuthFailure};
 /// Structurally tied to the real code rather than hand-written: the tokens come
 /// from `GameType::module_header`, a match that the compiler forces to cover
 /// every variant. Adding a `GameType` (with its `resolve::PlannedGame` arm) will
-/// not compile until its header membership is decided — the header can no longer
-/// go stale behind a new module.
+/// not compile until its header membership is decided, so the header cannot go
+/// stale behind a new module.
 fn game_types_header() -> String {
     crate::install::instance::GameType::ALL
         .iter()
@@ -51,9 +51,8 @@ pub fn base_url() -> String {
 }
 
 /// The launcher session, cached in memory and mirrored into the OS credential
-/// store. Unlike the old pack session — re-derived from a live Minecraft
-/// session on demand — this one costs the player a browser round-trip to mint,
-/// so losing it on every restart would be intolerable.
+/// store. It cannot be re-derived on demand: minting one costs the player a
+/// browser round-trip, so losing it on every restart would be intolerable.
 pub struct ApiState {
     http: reqwest::Client,
     token: Mutex<Option<String>>,
@@ -71,10 +70,10 @@ impl Default for ApiState {
         Self {
             http: reqwest::Client::builder()
                 .user_agent(concat!("BoffmediaApp/", env!("CARGO_PKG_VERSION")))
-                // A dead host used to hold a request open until the OS gave up
-                // — minutes, during which the library spinner never resolved
-                // and the player could not tell "down" from "slow". This is the
-                // bound that lets us say "server unreachable" quickly.
+                // Without this, a dead host holds a request open until the OS
+                // gives up — minutes, during which the library spinner never
+                // resolves and the player cannot tell "down" from "slow". This
+                // bound is what makes "server unreachable" quick.
                 //
                 // Deliberately NOT a whole-request `.timeout()`: this same
                 // client streams pack file downloads (`download_file` hands the
@@ -316,9 +315,9 @@ pub struct LauncherGalleryImage {
 /** The Quick Play target, mirrored from the registry's pack listing. Present
  *  only for "server packs". Both fields are optional and defaulted: `port` is
  *  absent for a bare SRV host, and a malformed/empty `{}` (legacy data) must
- *  deserialize to a hostless server rather than failing the WHOLE packs_list —
- *  one bad row used to blank the entire managed library. A hostless server is
- *  still a server pack; the renderer shows it as "unavailable". */
+ *  deserialize to a hostless server rather than failing the WHOLE packs_list,
+ *  or one bad row blanks the entire managed library. A hostless server is still
+ *  a server pack; the renderer shows it as "unavailable". */
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct LauncherServer {
@@ -702,8 +701,8 @@ pub async fn boff_session_restore(
         }
     }
 
-    // Nobody restored. A credential-store failure outranks "first run": §5.7's
-    // rule, a locked keychain must never look like a signed-out machine.
+    // Nobody restored. A credential-store failure outranks "first run": a
+    // locked keychain must never look like a signed-out machine.
     if let Some(err) = store_failure {
         return Err(err);
     }
@@ -891,10 +890,10 @@ pub async fn boff_offline(
     })
 }
 
-/// Re-run `/me` against the STORED active token — the fix for "packs stopped
-/// loading / 401" mid-session. A live answer refreshes the roster row; a 401
-/// prunes the dead account and resolves None so the renderer can land on the
-/// sign-in screen instead of looping.
+/// Re-run `/me` against the STORED active token, so a session that died
+/// mid-use surfaces as a sign-in rather than as "packs stopped loading". A live
+/// answer refreshes the roster row; a 401 prunes the dead account and resolves
+/// None so the renderer lands on the sign-in screen instead of looping.
 #[tauri::command]
 pub async fn boff_revalidate(
     app: tauri::AppHandle,
@@ -1014,8 +1013,8 @@ async fn authed(
 
 /// Authenticated GET against an API path (leading-slash), through the shared
 /// client. Same session handling and `X-Boff-Game-Types` header as every other
-/// authed call — the randomizer used to build its own `reqwest::Client` and so
-/// shared neither, drifting from the rest of the app on session invalidation.
+/// authed call. Building a separate `reqwest::Client` shares neither, and
+/// drifts from the rest of the app on session invalidation.
 pub async fn authed_get(api: &ApiState, path: &str) -> Result<reqwest::Response, ApiError> {
     authed(api, |http, base| {
         http.get(format!("{base}{path}"))
@@ -1183,7 +1182,7 @@ pub async fn packs_list(
 
 /// The manifest to install from. Returned to the renderer as raw JSON on
 /// purpose: it is validated here with the generated types + the hand-mirrored
-/// refinements, and the installer (§6) will read it from the same bytes.
+/// refinements, and the installer will read it from the same bytes.
 #[tauri::command]
 pub async fn pack_manifest(
     pack_id: String,
@@ -1249,17 +1248,17 @@ pub async fn pack_manifest(
     Ok(body.data)
 }
 
-// ── Payload downloads (§4.5, §7.2) ─────────────────────────────────────────
+// ── Payload downloads ──────────────────────────────────────────────────
 
 /// Which of the two streaming routes to hit. Kept as an enum rather than a raw
 /// path so the 404 case can say something true: the two routes fail for very
 /// different reasons and the player can only act on one of them.
 #[derive(Debug, Clone)]
 pub enum PackFile {
-    /// §4.5 — proxied because edge.forgecdn.net 401s without `x-api-key`, and a
+    /// Proxied because edge.forgecdn.net 401s without `x-api-key`, and a
     /// key shipped in the launcher is a key that gets extracted and revoked.
     Curseforge { project_id: i64, file_id: i64 },
-    /// §7.2 — an authenticated stream, NOT a presigned URL. The blobs live on
+    /// An authenticated stream, NOT a presigned URL. The blobs live on
     /// the API's disk (PACK_BLOB_DIR); there is no object storage, so there is
     /// nothing to sign and no indirection to build.
     Override { sha512: String },
@@ -1343,8 +1342,8 @@ pub async fn fetch_pack_file(
         reqwest::StatusCode::NOT_FOUND => ApiError::Message(
             error_message(res, &missing_fallback(file)).await,
         ),
-        // Entitlement revoked between listing and download — §7.4's whole
-        // point. A hard failure, but not one that signing in again fixes.
+        // Entitlement revoked between listing and download. A hard failure,
+        // but not one that signing in again fixes.
         reqwest::StatusCode::FORBIDDEN => ApiError::Denied(
             error_message(res, "Ya no tienes acceso a este pack.").await,
         ),
@@ -1382,7 +1381,7 @@ fn missing_fallback(file: &PackFile) -> String {
     }
 }
 
-/// Redeem an invite code (§7.3). Returns the pack it unlocked so the UI can
+/// Redeem an invite code. Returns the pack it unlocked so the UI can
 /// jump straight to it.
 #[tauri::command]
 pub async fn invite_redeem(
@@ -1434,9 +1433,9 @@ mod tests {
 
     #[test]
     fn app_pack_deserializes_game_type_and_emulator_kind() {
-        // Regression: without `game_type` on LauncherPack, serde silently drops
-        // the API's `gameType` and every pack reads back as minecraft — an
-        // emulator pack then shows in the library as "Minecraft Vanilla".
+        // Without `game_type` on LauncherPack, serde silently drops the API's
+        // `gameType` and every pack reads back as minecraft — an emulator pack
+        // then shows in the library as "Minecraft Vanilla".
         let json = r#"{
             "id":"pk","slug":"esmeralda","name":"Esmeralda","summary":null,
             "iconUrl":null,"accessKind":"public","gameType":"emulator",

@@ -4,22 +4,21 @@ import { EnvSupport, FileEnv, InstancePath, MrpackDependencies, loaderOf } from 
 
 // Boffmedia's additions to .mrpack, all under the `boffmedia:` namespace so a
 // third-party tool (Prism, packwiz) ignores them and the pack still installs.
-// HANDOFF §7.1: per file — source, SHA-512, target path, env.
+// Per file: source, SHA-512, target path, env.
 
-/** Which game a pack targets. Absent on a pack means `minecraft` (back-compat:
- *  every pack authored before multi-game had no `gameType`). All four values
- *  are declared in Cycle 1 even though only `minecraft` is playable — the
- *  discriminator, filtering, and validation skeleton land once; each game cycle
- *  lights up its own spec block (§PackVersion) and its own launcher arm.
- *  `gameType` is immutable after pack creation (enforced in the API): a pack
- *  that changed games would break every installed instance. */
+/** Which game a pack targets. Absent means `minecraft`, so a pack with no
+ *  `gameType` still loads. All four values are declared even though only
+ *  `minecraft` is playable: the discriminator, filtering and validation
+ *  skeleton exist once, and each game lights up its own spec block and its own
+ *  launcher arm. `gameType` is immutable after pack creation (enforced in the
+ *  API) — a pack that changed games would break every installed instance. */
 export const GameType = z.enum(["minecraft", "emulator", "zomboid", "stardew"])
 export type GameType = z.infer<typeof GameType>
 
-/** Where a file comes from. §7.1 lists exactly three sources; §4.5 explains why
- *  CurseForge is proxied rather than fetched directly (an embedded CF key gets
- *  extracted, and an abused key is a revoked key). Modrinth is primary and goes
- *  client-direct at zero egress cost. */
+/** Where a file comes from — exactly three sources. CurseForge is proxied
+ *  rather than fetched directly because an embedded CF key gets extracted, and
+ *  an abused key is a revoked key. Modrinth is primary and goes client-direct
+ *  at zero egress cost. */
 export const FileSource = z.discriminatedUnion("kind", [
   z.object({
     kind: z.literal("modrinth"),
@@ -36,7 +35,7 @@ export const FileSource = z.discriminatedUnion("kind", [
     url: z.url(),
   }),
   /** Configs, scripts, resource packs: content-addressed blobs we host.
-   *  §7.2 — fetched with a short-TTL presigned URL, never a public one. */
+   *  Fetched with a short-TTL presigned URL, never a public one. */
   z.object({
     kind: z.literal("override"),
     blobSha512: z.string().regex(/^[a-f0-9]{128}$/, "blobSha512 must be 128 lowercase hex chars"),
@@ -81,8 +80,8 @@ export const PackFile = z.object({
 })
 export type PackFile = z.infer<typeof PackFile>
 
-/** The emulator systems supported in Cycle 2 (D2). Azahar/3DS is deferred
- *  (decrypted dumps + keys); no RetroArch. */
+/** The supported emulator systems. Azahar/3DS is deferred (it needs decrypted
+ *  dumps plus keys); RetroArch is not supported. */
 export const EmulatorKind = z.enum(["mgba", "melonds"])
 export type EmulatorKind = z.infer<typeof EmulatorKind>
 
@@ -99,13 +98,13 @@ export const EmulatorSpec = z.object({
 })
 export type EmulatorSpec = z.infer<typeof EmulatorSpec>
 
-/** §7.3: a password gates composition and configs, not the mods themselves —
- *  those come from public CF/Modrinth URLs. §7.4: this is distribution control
- *  and revocation, never copy protection. */
+/** A password gates composition and configs, not the mods themselves — those
+ *  come from public CF/Modrinth URLs. This is distribution control and
+ *  revocation, never copy protection. */
 export const PackAccess = z.discriminatedUnion("kind", [
   z.object({ kind: z.literal("public") }),
   z.object({ kind: z.literal("password") }),
-  /** §7.2 — ACL keyed on the Minecraft UUID proved via `hasJoined`. */
+  /** ACL keyed on the Minecraft UUID proved via `hasJoined`. */
   z.object({
     kind: z.literal("allowlist"),
     uuids: z.array(z.uuid()),
@@ -150,8 +149,8 @@ export const PackVersion = z.object({
    *  (forbidden on any other gameType — superRefine). */
   worlds: z.array(BundledWorld).optional(),
   /** Per-game spec blocks — exactly one is present, matching the pack's
-   *  gameType (superRefine). `emulator` is tightened to its real shape as of
-   *  Cycle 2; `zomboid`/`stardew` stay loose slots until their cycles ship. */
+   *  gameType (superRefine). `minecraft` and `emulator` carry their real shapes;
+   *  `zomboid`/`stardew` stay loose slots until those games ship. */
   emulator: EmulatorSpec.optional(),
   zomboid: z.unknown().optional(),
   stardew: z.unknown().optional(),
@@ -275,9 +274,8 @@ export const PackManifest = z
     }
 
     // ---- game-type exclusivity rule engine ----
-    // Exactly one shape per gameType. Minecraft is the only arm that ships live
-    // in Cycle 1 (its spec blocks are the loosely-typed slots above); each game
-    // cycle tightens its own block and reuses this exclusivity check unchanged.
+    // Exactly one shape per gameType. A new game tightens its own block and
+    // reuses this exclusivity check unchanged.
     const specSlots = { emulator: v.emulator, zomboid: v.zomboid, stardew: v.stardew } as const
     const forbidSpec = (kind: keyof typeof specSlots) => {
       if (specSlots[kind] !== undefined) {
@@ -359,7 +357,7 @@ export const PackManifest = z
       initialSeen.add(key)
     }
 
-    // ---- `patched` (romhack) cross-field rules (game-agnostic, Cycle 2) ----
+    // ---- `patched` (romhack) cross-field rules, game-agnostic ----
     // A patched file references two other files[] entries by path: its clean
     // `base` (must be user-provided — the server never hosts ROM bytes) and its
     // `patch` (must be distributable). Requiring the base to be user-provided
@@ -398,7 +396,7 @@ export const PackManifest = z
       }
     }
 
-    // ---- emulator arm (Cycle 2) ----
+    // ---- emulator arm ----
     // The generic engine above already enforces block-presence/exclusivity; this
     // adds the emulator-internal rules. `emulator.rom` must name a real files[]
     // entry that is a player-supplied dump (user-provided) or a locally patched

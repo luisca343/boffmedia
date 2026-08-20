@@ -12,7 +12,7 @@ import {
 import { mockLocalPacks, mockPackEntries } from "./mock"
 import type { InstallState, PackEntry, PackVersionSummary } from "./types"
 
-// The bridge between the registry's wire shape (§7.2) and what this machine
+// The bridge between the registry's wire shape and what this machine
 // knows about each pack. The server decides WHICH packs exist for this player;
 // the InstallState is ours, and comes from scanning the instance directory.
 
@@ -121,11 +121,11 @@ export async function loadPackEntries(
     }
   }
 
-  // The registry is the ONLY part of this that needs a network, and it used to
-  // be able to sink the whole load: one `Promise.all` meant an unreachable
-  // server also threw away the local packs and the play history, which live
-  // entirely on this disk. A player on a train got an error screen instead of
-  // the packs sitting in front of them.
+  // The registry is the ONLY part of this that needs a network, and it must not
+  // sink the whole load: a single `Promise.all` lets an unreachable server throw
+  // away the local packs and the play history too, which live entirely on this
+  // disk. A player on a train would get an error screen instead of the packs
+  // sitting in front of them.
   const [managedResult, plays, playtime, localManifests] = await Promise.all([
     !authenticated
       ? Promise.resolve({

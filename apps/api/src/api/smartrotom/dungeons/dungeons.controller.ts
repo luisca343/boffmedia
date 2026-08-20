@@ -32,7 +32,7 @@ export class DungeonsController {
   constructor(private readonly dungeonsService: DungeonsService) {}
 
   /**
-   * The mod's run journal (Teras docs/DUNGEONS.md §9). Unlike `caja`, this route stays on
+   * The mod's run journal. Unlike `caja`, this route stays on
    * the `MinecraftMiddleware` list: the mod sends the top-level `server`, so the tripwire
    * still catches a cross-environment write. `GameServerAuthGuard` is the real credential.
    * No `@SkipEnvelope()` — the mod posts fire-and-forget and never reads the response.

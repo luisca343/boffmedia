@@ -1,6 +1,6 @@
 export { formatNumber as formatNum, formatMoney, timeAgo as relativeTime } from "@boffmedia/ui/format"
 
-/** A `taxi.countdown.*` key id plus its ICU args — never copy (i18n.md §Conventions). */
+/** A `taxi.countdown.*` key id plus its ICU args — never copy. */
 export interface Countdown {
   key: "endingNow" | "minutes" | "hours" | "hoursMinutes"
   values?: Record<string, number>

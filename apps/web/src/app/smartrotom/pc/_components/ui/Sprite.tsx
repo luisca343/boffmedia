@@ -18,8 +18,8 @@ export interface SpriteProps {
 /**
  * A Pokémon sprite, resolved through the shared sprite manifest — the same
  * `id:form:palette` lookup (with its form/palette fallbacks) the Pokédex uses.
- * SMARTROTOM_V3.md §10 says sprites keep that resolution and are not routed through
- * a generic image component, so this deliberately does not use `next/image`.
+ * Sprites keep that resolution and are not routed through a generic image
+ * component, so this deliberately does not use `next/image`.
  *
  * It reads the manifest *reactively* rather than through `getSpriteUrl`'s
  * `getState()` snapshot, so ~900 slots all fill in when the manifest lands instead

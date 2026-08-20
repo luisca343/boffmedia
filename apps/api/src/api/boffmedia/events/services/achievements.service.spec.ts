@@ -195,9 +195,9 @@ describe('AchievementsService', () => {
     });
 
     it('omits maxProgress from the write when not provided (no silent reset to 1)', async () => {
-      // F-16: `maxProgress || 1` used to reset absent maxProgress to 1 on every
+      // `maxProgress || 1` would reset an absent maxProgress to 1 on every
       // partial PATCH, instantly "completing" all in-flight progress rows. The
-      // field must simply be left out of the write when the caller omits it.
+      // field must be left out of the write entirely when the caller omits it.
       mockRepo.update.mockResolvedValue(undefined);
       mockRepo.findById.mockResolvedValue(mockAchievement);
 

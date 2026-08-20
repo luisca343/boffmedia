@@ -24,7 +24,7 @@ export function Watch({ id }: { id: string }) {
     if (v) addToHistory(v)
   }, [v])
 
-  // Deferred (need Google OAuth): subscribe / like reflect local UI only (§13)
+  // Deferred (need Google OAuth): subscribe / like reflect local UI only
   const [subscribed, setSubscribed] = useState(false)
   const [liked, setLiked] = useState(false)
   const [saved, setSaved] = useState(false)

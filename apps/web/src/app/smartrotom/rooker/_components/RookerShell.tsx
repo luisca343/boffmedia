@@ -22,11 +22,10 @@ interface NavItem {
 /**
  * The nest's navigation.
  *
- * There is no Gremio tab. The handoff designed one, but guilds do not exist anywhere
- * in the server — no table, no API, nothing to derive them from — so shipping the
- * screen would have meant fabricating its contents. It is deferred honestly instead
- * (docs/smartrotom/deferred/README.md). Mensajes is here but points at ChatApp, which
- * is where the server's real DMs already live.
+ * There is no Gremio tab: guilds do not exist anywhere in the server — no table, no
+ * API, nothing to derive them from — so the screen would have to fabricate its own
+ * contents. Deferred instead (docs/smartrotom/deferred/README.md). Mensajes is here but
+ * points at ChatApp, which is where the server's real DMs already live.
  */
 function isActive(pathname: string, href: string) {
   if (href === "/smartrotom/rooker") return pathname === href

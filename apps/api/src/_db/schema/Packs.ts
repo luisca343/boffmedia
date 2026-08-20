@@ -15,10 +15,10 @@ import {
 } from 'drizzle-orm/mysql-core';
 import { boffMediaUsers } from './BoffMedia';
 
-// The launcher's pack registry — HANDOFF §7. Identity is the BOFFMEDIA account:
-// the right to a pack comes from an admin decision, a redeemed invite or
-// membership of an event, none of which are Minecraft facts. `pack_acl` survives
-// only as legacy pre-grants for UUIDs with no account behind them yet.
+// The launcher's pack registry. Identity is the BOFFMEDIA account: the right to
+// a pack comes from an admin decision, a redeemed invite or membership of an
+// event, none of which are Minecraft facts. `pack_acl` holds pre-grants for
+// UUIDs with no account behind them yet.
 
 /** `public` · `password` · `allowlist` — mirrors PackAccess in @boffmedia/pack-schema. */
 export const PACK_ACCESS_KINDS = ['public', 'password', 'allowlist'] as const;
@@ -34,9 +34,8 @@ export const PACK_LOADERS = [
 export type PackLoader = (typeof PACK_LOADERS)[number];
 
 /** Which game a pack targets — mirrors GameType in @boffmedia/pack-schema.
- *  Immutable after creation (enforced in the service). The column used to be
- *  nullable with "NULL means minecraft" as a back-compat rule; on a clean
- *  database the default does that job honestly and every read gets a real value. */
+ *  Immutable after creation (enforced in the service). NOT NULL with a default
+ *  rather than nullable-means-minecraft, so every read gets a real value. */
 export const GAME_TYPES = [
   'minecraft',
   'emulator',
@@ -66,8 +65,8 @@ export const packs = mysqlTable(
     accessKind: mysqlEnum('access_kind', PACK_ACCESS_KINDS)
       .notNull()
       .default('allowlist'),
-    // bcrypt, and only when accessKind = 'password'. §7.3 is explicit that this
-    // gates composition and configs, never the mods themselves.
+    // bcrypt, and only when accessKind = 'password'. Gates composition and
+    // configs, never the mods themselves.
     passwordHash: varchar('password_hash', { length: 255 }),
     // The version launchers install. Null until something is published, which is
     // how "created but empty" stays distinguishable from "broken".
@@ -108,8 +107,8 @@ export const packVersions = mysqlTable(
     emulator: json('emulator').$type<Record<string, unknown>>(),
     zomboid: json('zomboid').$type<Record<string, unknown>>(),
     stardew: json('stardew').$type<Record<string, unknown>>(),
-    // The PackFile[] of first-install-only files (§initialFiles), validated
-    // against @boffmedia/pack-schema on write.
+    // The PackFile[] of first-install-only files, validated against
+    // @boffmedia/pack-schema on write.
     initialFiles: json('initial_files').$type<unknown[]>(),
     /** Draft versions are invisible to launchers — publishing is a deliberate act. */
     published: boolean('published').notNull().default(false),
@@ -133,7 +132,7 @@ export type PackVersion = typeof packVersions.$inferSelect;
 export type NewPackVersion = typeof packVersions.$inferInsert;
 
 /** Where a direct grant came from. Union semantics: losing one source leaves
- *  the others standing, which the old single-ACL-row model could not express. */
+ *  the others standing, which a single ACL row per pack cannot express. */
 export const PACK_GRANT_SOURCES = ['admin', 'invite'] as const;
 export type PackGrantSource = (typeof PACK_GRANT_SOURCES)[number];
 
@@ -215,7 +214,7 @@ export const packAcl = mysqlTable(
 
 export type PackAcl = typeof packAcl.$inferSelect;
 
-/** §7.2 — onboarding without knowing a UUID in advance. */
+/** Onboarding without knowing a UUID in advance. */
 export const packInvites = mysqlTable(
   'pack_invites',
   {
@@ -239,7 +238,7 @@ export const packInvites = mysqlTable(
 
 export type PackInvite = typeof packInvites.$inferSelect;
 
-/** §7.2 asks for an audit log. Append-only; nothing updates a row here. */
+/** Download audit log. Append-only; nothing updates a row here. */
 export const packAudit = mysqlTable(
   'pack_audit',
   {

@@ -1,9 +1,9 @@
 /**
- * Port for the settings encoding/decoding shim. Translates between JSON
- * settings objects and .rnqs binary format. Also provides capabilities.
+ * Port for the settings encoding/decoding shim: translates between JSON settings
+ * objects and the .rnqs binary format, and reports capabilities.
  *
- * Phase 0 spike implementation is a stub that throws ServiceUnavailableException.
- * Real implementation will call the dedicated settings service (TBD).
+ * The only implementation today is a stub that throws
+ * ServiceUnavailableException; a real one calls the dedicated settings service.
  */
 export interface ISettingsShim {
   /**

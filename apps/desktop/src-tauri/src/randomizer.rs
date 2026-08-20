@@ -287,10 +287,10 @@ pub async fn randomizer_download_rom(
 /// Ordering is the whole point: the ROM is imported to the never-purged local
 /// blob store and copied into the slot on disk FIRST, and only once it is in
 /// place is the marker entry rewritten — its `sha512` AND `size` together, read
-/// back from the file that was just written. The old two-step (mark the hash,
-/// then place the file) could leave the marker claiming a hash for a ROM that
-/// was not there yet, and never touched `size`, so a partial run left the gate
-/// looking cleared over an empty slot.
+/// back from the file that was just written. Marking the hash first and placing
+/// the file second leaves the marker claiming a hash for a ROM that is not there
+/// yet, and never touches `size` — so a partial run leaves the gate looking
+/// cleared over an empty slot.
 #[tauri::command]
 pub async fn randomizer_place_rom(
     slug: String,

@@ -29,7 +29,7 @@ function CopyButton({ value, label }: { value: string; label: string }) {
   )
 }
 
-// HANDOFF §5.1 — the Microsoft device-code flow. The user reads a short code
+// The Microsoft device-code flow. The user reads a short code
 // here and types it into microsoft.com/link in a real browser; we poll until
 // they finish. Deliberately NOT an embedded webview: putting Microsoft's login
 // inside our own window is both a phishing-training exercise for users and a

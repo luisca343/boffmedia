@@ -34,7 +34,7 @@ function StarbankLayoutBody({ children }: Readonly<{ children: React.ReactNode }
   const pathname = usePathname();
   const router = useRouter();
   const { accounts, activeAccount, setActiveAccount } = useStarBank();
-  // Light/dark is the platform's choice, not Starbank's (SMARTROTOM_V3.md §2b).
+  // Light/dark is the platform's choice, not Starbank's.
   const theme = useRotomMode();
 
   const seg = pathname.split("/").filter(Boolean).pop() || "starbank";

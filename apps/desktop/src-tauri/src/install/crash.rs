@@ -1,4 +1,4 @@
-// Crash report parsing (§9). The single highest-leverage support tool: a player
+// Crash report parsing. The single highest-leverage support tool: a player
 // who reads "te falta Fabric API" does not open a ticket, and a player who is
 // shown 4000 lines of log4j always does.
 //

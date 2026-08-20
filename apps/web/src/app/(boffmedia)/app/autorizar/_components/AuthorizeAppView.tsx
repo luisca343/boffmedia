@@ -17,8 +17,8 @@ type Phase = "code" | "confirm" | "approved" | "denied" | "already-approved" | "
  *
  * The launcher never sees a password: the player is already signed in here, so
  * approving a short code is all the proof either side needs. Approving requires
- * a verified email — that is the anti-abuse trade for no longer requiring a paid
- * Minecraft account to open the launcher at all.
+ * a verified email, which is the only anti-abuse gate on the flow — opening the
+ * launcher needs no paid Minecraft account.
  */
 export function AuthorizeAppView() {
   const t = useTranslations("appAuth")

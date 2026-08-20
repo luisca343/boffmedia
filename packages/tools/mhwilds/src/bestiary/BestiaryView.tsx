@@ -108,7 +108,7 @@ export function BestiaryView() {
           <div className="py-16"><Empty icon="alert" title={t("errorTitle")} lead={error} /></div>
         ) : (
           // Master/detail: the roster is a sticky, self-scrolling column and the
-          // detail rides the page scroll — MhApp no longer bounds their height.
+          // detail rides the page scroll — MhApp does not bound their height.
           <div className="grid grid-cols-1 items-start lg:grid-cols-[minmax(300px,360px)_minmax(0,1fr)]">
             {/* ── roster ── */}
             {/* `--tool-vh` is the height of the box the host gives a tool. A

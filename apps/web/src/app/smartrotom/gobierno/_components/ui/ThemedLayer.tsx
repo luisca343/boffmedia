@@ -9,7 +9,7 @@ export const GT_SCOPE = "gt-app font-gt text-gt-ink-800"
 
 /**
  * Wraps portaled content — which escapes the `.gt-app` root and would otherwise render
- * with every `gt-*` var unresolved — in a themed layer (SMARTROTOM_V3 §2). The shared
+ * with every `gt-*` var unresolved — in a themed layer. The shared
  * layer supplies the scope class; the accent/density preferences are runtime document
  * properties on top of that, so they ride an inner `display:contents` div.
  */

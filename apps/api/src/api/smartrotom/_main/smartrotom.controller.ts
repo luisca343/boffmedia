@@ -114,8 +114,8 @@ export class SmartrotomController {
     @Body() body: TeleportPlayerDto,
     @CurrentMcUuid() uuid: string,
   ) {
-    // Teleports the CALLER. The uuid used to come from the body on a public
-    // route, so anyone could move any player anywhere.
+    // Teleports the CALLER. A uuid from the body on a public route lets anyone
+    // move any player anywhere.
     const result = await this.wingullService.teleportPlayer(body.id, uuid);
     return { success: result };
   }

@@ -15,7 +15,7 @@ function Kbd({ children }: { children: React.ReactNode }) {
 
 /**
  * The browse screen: search / sort / filters over a full-width entry grid.
- * Replaces the old left rail — the grid gets the whole page width and rides the
+ * Deliberately no left rail — the grid gets the whole page width and rides the
  * page scroll, so there is no second scroll region beside the fiche.
  */
 export function MewBrowse({ codex }: { codex: MewCodexModel }) {

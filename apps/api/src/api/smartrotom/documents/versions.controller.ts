@@ -25,8 +25,8 @@ import { Document, NoteVersion } from './entities/document.entity';
 /**
  * Note version history. Every route proves the caller holds the document first
  * — reading someone else's revision history is the same disclosure as reading
- * the note. The snapshot author is the authenticated principal; it used to be
- * `dto.authorUuid`, i.e. whatever the client typed.
+ * the note. The snapshot author is the authenticated principal, never
+ * `dto.authorUuid` — that is whatever the client typed.
  */
 @ApiTags('SmartRotom | Documents')
 @ApiBearerAuth()

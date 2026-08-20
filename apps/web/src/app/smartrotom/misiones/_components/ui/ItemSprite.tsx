@@ -10,7 +10,7 @@ const cache = new Map<string, string | null>()
  * The real Minecraft/Pixelmon item sprite for a reward or an objective.
  * Misiones-local by design: the Pokédex has its own copy, but that one is a
  * `pk-*` component, and a `ms-*` screen must not reach across into another
- * app's library (SMARTROTOM_V3.md §1). When the id resolves to nothing — the
+ * app's library. When the id resolves to nothing — the
  * common case for a free-text objective — it falls back to a wax glyph rather
  * than a broken image.
  */

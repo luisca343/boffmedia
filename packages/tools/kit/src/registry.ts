@@ -1,7 +1,7 @@
 /**
- * D6 — tool discovery is registry-driven. Domain packages export manifest
- * entries; hosts render their listings from the registry so porting tool #2..N
- * costs a manifest entry and a catalog merge, not per-tool host wiring.
+ * Tool discovery is registry-driven. Domain packages export manifest entries;
+ * hosts render their listings from the registry, so adding a tool costs a
+ * manifest entry and a catalog merge, not per-tool host wiring.
  *
  * The manifest stays DECLARATIVE on purpose (ids, message keys, a lazy
  * component, capabilities). No logic lives here — that is what keeps the

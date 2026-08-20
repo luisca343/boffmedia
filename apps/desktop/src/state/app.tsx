@@ -63,8 +63,8 @@ import type { SystemId } from "../services/systems"
 // get a launcher that offers Play mid-download.
 
 // "tools" is the registry-driven hub, "tool" one tool full-screen. Both are
-// reachable WITHOUT a Boffmedia session and offline (plan D4) — the tools are
-// public on the web, so gating them behind sign-in here would be a regression.
+// reachable WITHOUT a Boffmedia session and offline — the tools are public on
+// the web, so gating them behind sign-in here would take that away.
 export type View = "packs" | "pack" | "logs" | "settings" | "tools" | "tool"
 
 /** The unit the rail highlights. Views map onto sections, which is what makes
@@ -291,10 +291,10 @@ function reducer(s: State, a: Action): State {
         packsLoading: false,
         logs: [],
         game: { kind: "idle" },
-        // Play is NO LONGER gated, so signing out does not evict anyone from
-        // it: the library still lists this machine's local packs and they are
-        // still playable. Only `pack` goes, and only because the pack it
-        // pointed at was a managed one listed under the departing account.
+        // Play is NOT gated, so signing out does not evict anyone from it:
+        // the library still lists this machine's local packs and they are still
+        // playable. Only `pack` goes, and only because the pack it pointed at
+        // was a managed one listed under the departing account.
         view: s.view === "pack" ? "packs" : s.view,
         selectedPackId: null,
       }
@@ -329,7 +329,7 @@ function reducer(s: State, a: Action): State {
     // A switch is a signout and a signin at once. It gets its own case rather
     // than dispatching both because the pair would blank the shell for a frame
     // and bounce the player back to the packs list; the ONE thing that must
-    // still happen is dropping the packs, for the same §7.2 reason as below.
+    // still happen is dropping the packs, for the same reason as below.
     case "account/switched":
       return {
         ...s,
@@ -344,7 +344,7 @@ function reducer(s: State, a: Action): State {
         selectedPackId: null,
       }
     case "signout":
-      // Never keep packs across accounts: entitlements are per-UUID (§7.2) and
+      // Never keep packs across accounts: entitlements are per-UUID and
       // showing the previous user's list would leak pack names.
       return {
         ...s,
@@ -508,7 +508,7 @@ const initial: State = {
 
 type Ctx = State & {
   /** True until every boot gate is open. While it is, render the splash and
-   *  NOTHING else — this flag is the whole reason SignIn no longer flashes. */
+   *  NOTHING else — this flag is what stops SignIn flashing on the way in. */
   booting: boolean
   /** Enter offline mode as the last Minecraft account. Resolves to false when
    *  this machine has no account that ever completed a real sign-in. */
@@ -775,8 +775,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         dispatch({ type: "boff/signout" })
       }
     } catch (err) {
-      // Even on error the local dispatch clears the session, matching the old
-      // fire-and-forget behaviour rather than trapping the player signed in.
+      // Even on error the local dispatch clears the session: the alternative
+      // traps the player signed in to a session that is already gone.
       dispatch({ type: "boff/signout" })
       log({
         level: "error",
@@ -819,7 +819,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     reloadBoffAccounts()
   }, [boffAccountId, reloadBoffAccounts])
 
-  // §5. In a browser there is no Rust side, so the mock flow runs instead —
+  // In a browser there is no Rust side, so the mock flow runs instead —
   // that is what keeps every screen workable from `pnpm dev:renderer`.
   const signIn = React.useCallback(async (): Promise<boolean> => {
     dispatch({ type: "signin/start" })
@@ -990,11 +990,11 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   }, [log])
 
   // Silent sign-in on start. A THROW here is a real failure — a credential
-  // store that could not be read, or Minecraft refusing the chain — and §5.7
-  // says it must never be swallowed into "please sign in". The Rust side
-  // already writes each of those as a sentence for a player, so it is logged
-  // VERBATIM: wrapping it in "no se pudo leer el almacén de credenciales" was
-  // how a Minecraft 429 came to be reported as a keychain problem.
+  // store that could not be read, or Minecraft refusing the chain — and it
+  // must never be swallowed into "please sign in". The Rust side already
+  // writes each of those as a sentence for a player, so it is logged VERBATIM;
+  // wrapping it in "no se pudo leer el almacén de credenciales" reports a
+  // Minecraft 429 as a keychain problem.
   React.useEffect(() => {
     // StrictMode mounts this effect twice in dev. Two restores in flight means
     // two runs of the four-hop chain, and Minecraft rate-limits the second.
@@ -1022,8 +1022,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     dispatch({ type: "boot/step", step: "Restaurando tu sesión…" })
 
     // The Boffmedia session first: it gates the shell, and it is the one the
-    // pack list needs. A missing Minecraft session is no longer a reason not to
-    // open the launcher — it is only needed to launch Minecraft itself.
+    // pack list needs. A missing Minecraft session is NOT a reason to keep the
+    // launcher shut — it is only needed to launch Minecraft itself.
     void boffSessionRestore()
       .then((account) => {
         if (!account) return
@@ -1058,9 +1058,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         log({ level: "info", source: "app", text: `Sesión restaurada: ${account.username}` })
       })
       .catch(async (err: { message?: string; needsSignin?: boolean }) => {
-        // Surfaced on the sign-in screen as well as the log: §5.7's point is
-        // that a player must never be dropped at "Entrar con Microsoft" with no
-        // idea why the launcher forgot them.
+        // Surfaced on the sign-in screen as well as the log: a player must
+        // never be dropped at "Entrar con Microsoft" with no idea why the
+        // launcher forgot them.
         const message = err?.message ?? "No se pudo restaurar la sesión."
         const needsSignin = err?.needsSignin ?? true
         dispatch({ type: "signin/restore-failed", message, needsSignin })
@@ -1193,10 +1193,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     }
   }, [log])
 
-  // §6. The manifest is fetched here rather than in Rust because the password
-  // path (§7.1) is a UI decision; install_pack re-validates whatever it gets.
+  // The manifest is fetched here rather than in Rust because the password
+  // path is a UI decision; install_pack re-validates whatever it gets.
   //
-  // A local pack IS its manifest (spec D3), so there is no registry call for
+  // A local pack IS its manifest, so there is no registry call for
   // it — `packManifest` only ever knows a managed pack's server-issued id.
   // Branching on `origin` is what lets install()/play() work unchanged for
   // both: the manifest itself is the only thing that differs.

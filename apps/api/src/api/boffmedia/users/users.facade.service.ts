@@ -603,9 +603,9 @@ export class BoffMediaUsersFacadeService {
    * chain on the website, or by Mojang's hasJoined handshake. No password and no
    * world string: the caller has established the identity, this only records it.
    *
-   * The old world-string paths trusted `MC_WORLD`, which ships in the browser
-   * bundle, so anyone who knew a player's UUID could attach it to their own
-   * account — and `boffmedia_users.uuid` is what SmartRotom money routes own.
+   * Never trust `MC_WORLD` as proof: it ships in the browser bundle, so knowing
+   * a player's UUID would be enough to attach it to your own account — and
+   * `boffmedia_users.uuid` is what SmartRotom money routes own.
    */
   async linkProvenMinecraftAccount(
     userId: number,

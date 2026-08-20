@@ -9,7 +9,7 @@ import { RK_SCOPE } from "./ThemedLayer"
  * The compose dialog's shell, and every other overlay in Rooker.
  *
  * A skin over the shared `ModalShell`: portal, Escape, scrim dismiss, scroll lock,
- * focus trap/restore and dialog semantics all come from there (SMARTROTOM_V3 §2).
+ * focus trap/restore and dialog semantics all come from there.
  */
 export interface ModalProps {
   open: boolean

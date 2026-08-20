@@ -106,8 +106,8 @@ describe('AuthService', () => {
       expect(jwtService.sign).toHaveBeenCalledTimes(2);
     });
 
-    // Regression: `login()` takes `any`, so a claim that silently stops being
-    // produced type-checks fine. Assert the payload, not just the token string.
+    // `login()` takes `any`, so a claim that silently stops being produced still
+    // type-checks. Assert the payload, not just the token string.
     it('signs the mcUuid claim into both tokens', async () => {
       await service.login(fullUser);
 
@@ -158,8 +158,8 @@ describe('AuthService', () => {
     });
 
     it('should reject a token that is not a refresh token', async () => {
-      // A typ-less payload is an ACCESS token: replaying one here used to mint
-      // a fresh session, which is the hole `typ:'refresh'` closed.
+      // A typ-less payload is an ACCESS token. Replaying one here must not mint
+      // a fresh session; `typ:'refresh'` is what closes that hole.
       jwtService.verify.mockReturnValue({ sub: 1, username: 'TrainerAsh' });
       await expect(service.refreshToken('access-token-string')).rejects.toThrow(
         UnauthorizedException,

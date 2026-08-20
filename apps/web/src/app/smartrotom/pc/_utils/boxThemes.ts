@@ -3,7 +3,7 @@
  *
  * The theme is a *data* value (it comes out of the user's saved box meta), so the
  * wallpaper class can never be built by interpolation — `pc-wp-${theme}` compiles
- * to nothing and the box silently renders bare (SMARTROTOM_V3.md §4, audit gap G2).
+ * to nothing and the box silently renders bare.
  * Hence the full-class map. The gradients themselves live in `tailwind.config.ts`.
  *
  * The accent is applied inline (a data-driven value on a gradient/border), which is

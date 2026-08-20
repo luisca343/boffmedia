@@ -6,7 +6,7 @@ import type { ReactionCounts } from "@/app/smartrotom/rooker/_utils/reactions"
  *
  * The showcase is the one place a fixture is legitimate — it documents the component,
  * not the product, and it has to render identically on every machine. The app itself
- * ships no mock content at all (§9).
+ * ships no mock content at all.
  *
  * The uuid is a real, stable Minecraft account (Notch), so the avatar specimen resolves
  * a genuine head render through the same `mc-heads.net` path the app uses, instead of

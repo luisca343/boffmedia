@@ -10,7 +10,7 @@ import { Icon } from "./Icon"
 /**
  * A seller's rating, 0–5. Renders `null` as nothing at all — a brand-new seller
  * genuinely has no rating, and painting five empty stars would imply a zero score
- * they never earned (§9: derive, or defer honestly).
+ * they never earned (derive, or defer honestly).
  */
 export function Stars({
   value,

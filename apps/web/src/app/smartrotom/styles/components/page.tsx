@@ -98,7 +98,7 @@ export default function SmartRotomComponentsShowcase() {
   const [openDoms, setOpenDoms] = React.useState<Set<string>>(new Set(["Sistema"]))
   const findRef = React.useRef<HTMLInputElement>(null)
   // SmartRotom's AppWrapper is fixed-height + `overflow-hidden`, so this page scrolls
-  // INTERNALLY (SMARTROTOM_V3.md §2). Every scroll/spy calculation is relative to this
+  // INTERNALLY. Every scroll/spy calculation is relative to this
   // container, not the window — the Boffmedia showcase can use `window` because its
   // shell window-scrolls; here that would silently never fire.
   const scrollRef = React.useRef<HTMLDivElement>(null)

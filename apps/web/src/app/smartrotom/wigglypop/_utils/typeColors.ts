@@ -1,13 +1,13 @@
 /**
  * Pokémon type colours, in Wigglypop's own values.
  *
- * These deliberately do NOT reuse the PC's map: Wigglypop's badges sit on white
- * cards over a pink page, so the handoff picked hues a few points more saturated
- * than the PC's (which sit on a slate void). Same eighteen types, different tuning
- * — importing the PC's would wash out here.
+ * These deliberately do NOT reuse the PC's map: Wigglypop's badges sit on white cards
+ * over a pink page, so the hues are a few points more saturated than the PC's (which sit
+ * on a slate void). Same eighteen types, different tuning — importing the PC's would
+ * wash out here.
  *
  * Data-driven, so they are applied via inline `style`, never as an interpolated
- * class — `bg-${type}` silently never compiles (§4). Raw hex is sanctioned for
+ * class — `bg-${type}` silently never compiles. Raw hex is sanctioned for
  * exactly this case.
  *
  * `c` is the fill, `t` the text that sits on it (chosen for contrast, which is why

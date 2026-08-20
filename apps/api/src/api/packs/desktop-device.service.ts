@@ -206,8 +206,8 @@ export class DesktopDeviceService {
 
   /**
    * Approving is what turns a free Boffmedia account into a launcher session,
-   * so it requires a verified email — the anti-abuse trade for dropping the
-   * Mojang paywall that used to gate this.
+   * so it requires a verified email. That is the only anti-abuse gate here —
+   * there is no Mojang paywall behind it.
    */
   async approve(userCode: string, userId: number): Promise<void> {
     const user = await this.users.getUserById(userId);

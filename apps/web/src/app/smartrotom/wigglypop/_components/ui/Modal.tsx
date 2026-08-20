@@ -26,7 +26,7 @@ export interface OverlayProps {
 
 /**
  * The bare scrim, kept exported for parity with the barrel (unused internally beyond
- * `Modal` below). A skin over the shared `ModalShell` (SMARTROTOM_V3 §2).
+ * `Modal` below). A skin over the shared `ModalShell`.
  */
 export function Overlay({ onClose, children, className, label }: OverlayProps) {
   const t = useTranslations("wigglypop")

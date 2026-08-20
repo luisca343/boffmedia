@@ -805,10 +805,10 @@ describe('EventsController — integration (ValidationPipe + GlobalExceptionFilt
         .send({ participantId: 10 });
 
       expect(res.status).toBe(201);
-      // participantId used to be read from the body, which let any authenticated
-      // user enrol anyone else. The authenticated user (1) is the only identity
-      // input now; the trailing flag is whether that caller is an admin (the
-      // overridden JWT guard grants BOFF_ADMIN here).
+      // participantId must never be read from the body — that would let any
+      // authenticated user enrol anyone else. The authenticated user (1) is the
+      // only identity input; the trailing flag is whether that caller is an
+      // admin (the overridden JWT guard grants BOFF_ADMIN here).
       expect(mockFacade.joinTeam).toHaveBeenCalledWith(5, 1, 1, true);
     });
 
@@ -860,7 +860,7 @@ describe('EventsController — integration (ValidationPipe + GlobalExceptionFilt
 
     it('accepts an empty body and joins via the JWT identity', async () => {
       // userId is never taken from the body — the client sends {} and the
-      // handler injects req.user.userId. Requiring it in the DTO used to 400
+      // handler injects req.user.userId. Requiring it in the DTO would 400
       // every real join request.
       mockFacade.joinEvent.mockResolvedValue({ success: true });
 

@@ -1,7 +1,7 @@
 "use client"
 
-// A small local primitive: the pill-tab status filter the handoff uses across every
-// urbanismo register. Not part of the shared `_components/ui` barrel — it's specific
+// A small local primitive: the pill-tab status filter used across every urbanismo
+// register. Not part of the shared `_components/ui` barrel — it's specific
 // to this department's filter rows, so it lives next to the sections that use it.
 export function Segmented<T extends string>({
   value,

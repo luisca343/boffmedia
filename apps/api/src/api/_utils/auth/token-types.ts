@@ -3,8 +3,8 @@
  * them, so the claim is the only thing keeping a token minted for one surface
  * from being replayed against another.
  *
- * `access` is encoded as the *absence* of `typ` for website sessions: tokens
- * issued before this claim existed must keep working until they expire.
+ * `access` is encoded as the *absence* of `typ` for website sessions, so a
+ * token carrying no `typ` at all is an access token and nothing else.
  */
 export const TOKEN_TYPE = {
   /** Website session. Full account powers. Serialized as no `typ` claim. */

@@ -117,9 +117,9 @@ fn read_manifest(dir: &Path) -> Result<PackManifest, InstallFailure> {
         .map_err(|e| InstallFailure::message(format!("El pack local está dañado: {e}")))
 }
 
-/// tmp + rename: a crash or a power loss mid-write leaves either the old
-/// manifest or the new one, never a half-written file (RF-08's "no partial
-/// state" applies here too, not only to a failed import).
+/// tmp + rename: a crash or a power loss mid-write leaves either the previous
+/// manifest or the new one, never a half-written file. No partial state, the
+/// same rule a failed import follows.
 fn write_manifest_atomic(dir: &Path, manifest: &PackManifest) -> Result<(), InstallFailure> {
     std::fs::create_dir_all(dir)
         .map_err(|e| InstallFailure::message(format!("No se pudo crear la carpeta del pack: {e}")))?;
@@ -409,9 +409,9 @@ struct MrpackIndex<'a> {
     boffmedia_manifest: &'a PackManifest,
 }
 
-/// A file whose source has no public URL (CurseForge or `override` — §4.5,
-/// §7.2) and must instead be fetched through our own API and embedded as
-/// zip bytes under `overrides/<path>`.
+/// A file whose source has no public URL (CurseForge or `override`) and must
+/// instead be fetched through our own API and embedded as zip bytes under
+/// `overrides/<path>`.
 struct EmbedFile {
     path: String,
     /// Carried so the export can look the bytes up in the local blob store
@@ -489,8 +489,8 @@ pub async fn export_mrpack(app: tauri::AppHandle, slug: String) -> Result<String
 }
 
 /// A server-only export: the same `.mrpack`, minus every file whose
-/// `env.server` is `unsupported`. HANDOFF §9 ("server pack generation from the
-/// same manifest"). The output is a standard Modrinth pack a server installer
+/// `env.server` is `unsupported`, generated from the same manifest.
+/// The output is a standard Modrinth pack a server installer
 /// (mrpack-install and friends) consumes directly — what it saves the admin is
 /// having to strip the client-only mods by hand, and shipping a shader pack to a
 /// headless server. It does NOT bundle a loader server jar: the admin installs
@@ -546,9 +546,9 @@ async fn export_mrpack_impl(
     // A Modrinth-sourced file needs one round-trip to turn its pinned version
     // id into a real CDN URL (same lookup install uses); a `url` source is
     // already public — both resolve to a `files[]` entry. A CurseForge or
-    // `override` source has NO public URL by construction (§4.5/§7.2), which
+    // `override` source has NO public URL by construction, which
     // `resolve_mrpack_files` reports back as `ToEmbed` instead of silently
-    // leaving the file out of the pack (RF-06).
+    // leaving the file out of the pack.
     let (mrpack_files, to_embed) = resolve_mrpack_files(&http, &manifest, server_only).await?;
 
     let settings = crate::settings::load(&app);
@@ -689,13 +689,13 @@ async fn export_mrpack_impl(
 /// precedence — a manifest that declares more than one (a hand-edited file,
 /// or a pack authored by a launcher with a different loader story) would
 /// otherwise have the rest silently dropped at install time. Rejected here,
-/// up front, with a message the player can act on (RF-08: no partial state).
+/// up front, with a message the player can act on, and with no partial state.
 ///
-/// The second check is exhaustive by construction — `LoaderKind` covers
-/// exactly the four keys the schema allows today — but named explicitly
-/// rather than discarded (as the dead code before this fix did): a future
-/// loader key added to the schema without a matching `LoaderKind` variant
-/// fails the import instead of installing silently as vanilla.
+/// The second check is exhaustive by construction — `LoaderKind` covers exactly
+/// the four keys the schema allows — but every variant is named explicitly
+/// rather than discarded: a loader key added to the schema without a matching
+/// `LoaderKind` variant then fails the import instead of installing silently as
+/// vanilla.
 fn reject_ambiguous_or_unsupported_loader(manifest: &PackManifest) -> Result<(), InstallFailure> {
     let Some(deps) = &manifest.version.dependencies else {
         // Non-Minecraft packs have no dependencies, so nothing to check
@@ -733,8 +733,8 @@ fn reject_ambiguous_or_unsupported_loader(manifest: &PackManifest) -> Result<(),
 pub struct ImportResult {
     pub manifest: PackManifest,
     /// True when the pack's own name/slug collided with an existing local pack
-    /// and was renamed with a suffix (spec D4) — the UI shows a non-blocking
-    /// notice for this, never a silent rename.
+    /// and was given a suffix — the UI shows a non-blocking notice for this,
+    /// never a silent rename.
     pub renamed: bool,
 }
 
@@ -1578,9 +1578,9 @@ mod tests {
         crate::pack::parse_manifest(&raw).expect("fixture must be valid")
     }
 
-    // T14: a real Modrinth/Prism reader only ever looks at `files`/`dependencies`
-    // — the round-trip against our own `boffmedia:manifest` key was passing
-    // while those stayed empty, which is exactly the bug this guards against.
+    // A real Modrinth/Prism reader only ever looks at `files`/`dependencies`, so
+    // a round-trip that checks only our own `boffmedia:manifest` key passes with
+    // both of those empty. That is what this guards against.
     #[tokio::test]
     async fn exported_index_carries_standard_files_and_dependencies() {
         let manifest = manifest_with_file(
@@ -1652,9 +1652,9 @@ mod tests {
         assert_eq!(to_embed[0].path, "mods/sodium.jar");
     }
 
-    // T15: an ambiguous loader used to pass straight through import — the
-    // first-match precedence in resolve.rs would then silently pick one and
-    // discard the other at install time instead of failing the import.
+    // An ambiguous loader must fail the import here. Passed through, the
+    // first-match precedence in resolve.rs silently picks one and discards the
+    // other at install time.
     #[test]
     fn import_rejects_a_manifest_declaring_two_loaders_at_once() {
         let manifest = manifest_with_file(

@@ -28,7 +28,7 @@ export interface RandomizerPreset {
   updatedAt: string
 }
 
-// ROM library entry — Phase 3 admin feature.
+// ROM library entry — an admin-only feature.
 export interface RandomizerRom {
   id: number
   name: string

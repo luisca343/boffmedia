@@ -14,7 +14,7 @@ export const PS_SCOPE = "ps-app font-ps text-ps-chrome-fg"
  *
  * A portal lands on `document.body`, outside the app root — and every `ps-*` token is a
  * CSS var declared ON that root, so a modal rendered through `createPortal` comes out
- * with no paper, no ink and no foil (SMARTROTOM_V3.md §2). `display: contents` re-declares
+ * with no paper, no ink and no foil. `display: contents` re-declares
  * the vars without adding a box to the layout.
  *
  * The two `data-*` attributes are DOCUMENT properties (how loud the security print is,

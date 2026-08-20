@@ -5,9 +5,8 @@ import { useState, type ReactNode } from "react"
 
 /**
  * Scoped TanStack Query client for Wigglypop, mirroring `FurretQueryProvider` and
- * `ArcadeQueryProvider`. Kept local to this route so lifting the marketplace's
- * fetching does not touch the rest of SmartRotom's still-imperative data layer
- * (audit gap G5).
+ * `ArcadeQueryProvider`. Kept local to this route so the marketplace's fetching
+ * does not touch the rest of SmartRotom's imperative data layer.
  *
  * `staleTime` is much shorter here than in the other apps (15s, not 60s): a
  * marketplace's prices, bids and stock genuinely move under you, and a stale feed

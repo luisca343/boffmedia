@@ -196,9 +196,9 @@ export class EventsFacadeService {
       throw new NotFoundException('Game not found');
     }
 
-    // Deleting a game used to soft-delete every one of its events, silently
-    // revoking pack access for all their participants in one click. Refuse
-    // while live (non-completed) events exist — delete or complete them first.
+    // Deleting a game must not cascade into its events: that silently revokes
+    // pack access for every participant in one click. Refuse while live
+    // (non-completed) events exist — delete or complete them first.
     const events = await this.eventsService.getAllEvents({
       gameId: id,
       includePrivate: true,
@@ -513,9 +513,8 @@ export class EventsFacadeService {
     }
 
     // Team join creates event membership, so it must pass the same gates as
-    // joinEvent — it used to bypass the private-visibility guard entirely,
-    // letting any authed user take a private event's pack via an enumerable
-    // team id.
+    // joinEvent. Bypassing the private-visibility guard here lets any authed
+    // user take a private event's pack via an enumerable team id.
     if (event.status === EVENT_STATUS.COMPLETED) {
       throw new ForbiddenException({
         message: 'Event is completed',
@@ -586,8 +585,8 @@ export class EventsFacadeService {
     }
 
     // A private event is joinable, but only through an invitation (or by an
-    // admin adding the player). It used to fail as "Event not found" because
-    // the existence check itself filtered private events out.
+    // admin adding the player). The existence check must not filter private
+    // events out, or a legitimate join fails as "Event not found".
     if (event.visibility === 'private' && !options.bypassVisibility) {
       throw new ForbiddenException({
         message: 'Event is private',
@@ -608,8 +607,8 @@ export class EventsFacadeService {
       );
 
     // joinEvent itself resolves the already-a-member cases (re-joining after
-    // declining, refusing after an admin removal) — duplicating the check here
-    // only made "already registered" and "previously declined" indistinguishable.
+    // declining, refusing after an admin removal). Duplicating the check here
+    // makes "already registered" and "declined earlier" indistinguishable.
     await this.participantsService.joinEvent(
       eventId,
       participant.id,
@@ -744,8 +743,8 @@ export class EventsFacadeService {
     await this.eventInvitesService.consume(code);
     // bypassVisibility: the invitation IS the authorisation to join a private
     // event — that is the entire point of the code. The comment is a marker,
-    // never the code itself: it used to echo live invite codes to anyone who
-    // could read the participants list.
+    // never the code itself; echoing it would leak live invite codes to anyone
+    // who can read the participants list.
     await this.joinEvent(
       invite.eventId,
       { userId, comment: 'invite' },

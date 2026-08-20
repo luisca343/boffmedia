@@ -67,8 +67,7 @@ import { GameOrUserAuthGuard } from '@api/_utils/guards/game-or-user-auth.guard'
 // Pokédex reads are public — the web dex needs no account. The writes are not:
 // `register`, `dex/update` and `dex/sync` are player/game-server actions and
 // take the two credentials `GameOrUserAuthGuard` accepts (the mod's server token
-// or a player's JWT), while rebuilding the sprite manifest is admin-only. All
-// four used to be public.
+// or a player's JWT), while rebuilding the sprite manifest is admin-only.
 @Public()
 @Controller('smartrotom/pokemon')
 @UsePipes(new ValidationPipe({ transform: true, whitelist: true }))

@@ -14,7 +14,7 @@ import { Modal } from "./ui"
  * replay itself from the achievement id — so the passport does not fetch it, does not
  * re-implement a player, and cannot drift from the one the rest of the site uses. It is a
  * feature, not a Boffmedia primitive, which is why importing it does not cross the
- * design-system boundary (§3).
+ * design-system boundary.
  */
 export function ReplayModal({
   achievement,

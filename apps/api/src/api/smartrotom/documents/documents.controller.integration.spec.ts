@@ -18,7 +18,7 @@ import { RolesGuard } from '@api/_utils/guards/roles.guard';
 
 const MOCK_UUID = '67d9b543-5ac9-41e1-a8a5-20d7689e24a4';
 
-// Allow all guard — used to bypass JWT+Roles on admin endpoints
+// Allow-all guard: bypasses JWT+Roles on admin endpoints for these tests
 class AllowAllGuard implements CanActivate {
   canActivate(_ctx: ExecutionContext) {
     return true;
@@ -72,9 +72,9 @@ describe('DocumentsController — integration (ValidationPipe + GlobalExceptionF
 
     app = module.createNestApplication();
 
-    // These routes are no longer public: the identity that used to come from
+    // These routes are not public: the identity that would otherwise come from
 
-    // the URL or the body is now taken from the authenticated principal.
+    // the URL or the body is taken from the authenticated principal.
 
     // This suite covers the ValidationPipe and the exception filter, so it
 
@@ -156,7 +156,7 @@ describe('DocumentsController — integration (ValidationPipe + GlobalExceptionF
 
       expect(res.status).toBe(201);
       // The note is created FOR the caller: the uuid comes from the session,
-      // and the route no longer accepts one in the body.
+      // and the route does not accept one in the body.
       expect(mockFacade.createNoteWithUser).toHaveBeenCalledWith({
         title: 'My Doc',
         content: 'Hello world',
@@ -361,10 +361,10 @@ describe('DocumentsController — integration (ValidationPipe + GlobalExceptionF
 
   // ── GET /smartrotom/documents/news ─────────────────────────────────────
   describe('GET /smartrotom/documents/news', () => {
-    // This route is @Public(). It used to fall through to getAllNews() unless
-    // `published=true` was passed, so the insecure branch was the DEFAULT and
-    // anonymous readers received unpublished drafts. It is now published-only,
-    // unconditionally — drafts live behind GET news/all.
+    // This route is @Public() and published-only, unconditionally. Falling
+    // through to getAllNews() without `published=true` would make the insecure
+    // branch the DEFAULT and serve drafts to anonymous readers. Drafts live
+    // behind GET news/all.
     it('returns published news only, and never reaches getAllNews', async () => {
       (mockFacade.getPublishedNews! as jest.Mock).mockResolvedValue({
         total: 0,

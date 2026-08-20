@@ -43,8 +43,8 @@ interface Options {
 /**
  * The CS:GO reel. The movement is a single CSS transform transition — the rAF
  * loop below never writes state, it only reads the interpolated matrix so the
- * ticks fire as faces cross the marker (SMARTROTOM_V3.md §5: no motion library,
- * no per-frame React renders).
+ * ticks fire as faces cross the marker: no motion library, no per-frame React
+ * renders.
  */
 export function useReelSpin({ winningPosition, tileCount, sound, reduceMotion }: Options): ReelSpin {
   const trackRef = useRef<HTMLDivElement>(null)

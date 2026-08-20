@@ -12,8 +12,8 @@ import type { TravelStats } from "../_utils/trips"
  *
  * Every figure here is REAL: the taxi keeps no stats table, so all of it is derived from
  * the StarBank ledger (each fare is a transfer concept'd `Taxi a <stop>`). Nothing is
- * seeded. The handoff's frequent-rider tier, streak and achievements are NOT here — they
- * would need a rewards backend that does not exist, and are registered as deferred.
+ * seeded. There is no frequent-rider tier, streak or achievements: each would need a
+ * rewards backend that does not exist, so all three are registered as deferred.
  */
 /**
  * Distance travelled, in the unit that keeps it honest. Rounding 538 blocks to "1 k b"

@@ -6,11 +6,10 @@ import { fmt } from "../../_utils/format"
 /**
  * The price-history sparkline.
  *
- * The data is DERIVED from real completed sales of the same species — not a
- * generated curve. That has a consequence the handoff never had to face: on a young
- * marketplace most species have **no sales at all**, so this renders nothing at
- * fewer than two points rather than drawing a straight line through a single sale
- * and implying a trend that does not exist (§9).
+ * The data is DERIVED from real completed sales of the same species, not a generated
+ * curve. On a young marketplace most species have **no sales at all**, so this renders
+ * nothing below two points rather than drawing a straight line through a single sale and
+ * implying a trend that does not exist.
  *
  * The stroke is green when the last point is at or above the first, rose when it is
  * below — the one place in the app where colour alone carries direction, which is
@@ -44,7 +43,7 @@ export function PriceChart({ data, height = 78 }: { data: number[]; height?: num
   const line = pts.map((p, i) => `${i ? "L" : "M"}${p[0].toFixed(1)} ${p[1].toFixed(1)}`).join(" ")
   const area = `${line} L${pts[pts.length - 1][0].toFixed(1)} ${height} L${pts[0][0].toFixed(1)} ${height} Z`
   const up = data[data.length - 1] >= data[0]
-  // Raw hex: an SVG fill/stroke, which §4 sanctions explicitly.
+  // Raw hex: an SVG fill/stroke, which a Tailwind token cannot reach.
   const stroke = up ? "#11b39a" : "#f15b7a"
   const gid = `wp-chart-${up ? "up" : "down"}`
 

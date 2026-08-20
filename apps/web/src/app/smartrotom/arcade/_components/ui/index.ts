@@ -1,6 +1,6 @@
 // The arcade's primitive library (`ar-*`). Import from this barrel, never by
-// deep path (SMARTROTOM_V3.md §1). Add a line here whenever a primitive is born,
-// and a specimen to /smartrotom/styles/components (§14).
+// deep path. Add a line here whenever a primitive is born,
+// and a specimen to /smartrotom/styles/components.
 
 export { Icon, type IconName, type IconProps } from "./Icon"
 export { Button, type ArButtonProps, type ArButtonSize, type ArButtonVariant } from "./Button"

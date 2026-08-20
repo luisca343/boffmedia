@@ -14,8 +14,8 @@ import { useGobiernoPrefs } from "./_stores/useGobiernoPrefs"
 
 /**
  * Scope root for Gobierno de Teras (`gt-*`). Light-only — the warm paper IS the design —
- * so there is no `data-theme` here and the app ignores the platform theme picker's mode
- * (SMARTROTOM_V3 §2b), exactly like Furret Today, Pokédex, Arcade and Misiones.
+ * so there is no `data-theme` here and the app ignores the platform theme picker's mode,
+ * exactly like Furret Today, Pokédex, Arcade and Misiones.
  *
  * Client-side gate: defence-in-depth and UX only. The authoritative check is the role
  * guard on each /smartrotom/gobierno endpoint.

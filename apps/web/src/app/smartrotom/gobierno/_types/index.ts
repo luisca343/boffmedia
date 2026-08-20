@@ -231,11 +231,11 @@ export interface Anuncio extends Omit<GobiernoAnuncioEntity, "kind" | "town" | "
 }
 
 /**
- * TODO(P9): shadows shared `GobiernoAuditoriaEntity`, whose `actor` is `PersonRefEntity | null` —
- * system/automated rows genuinely have no acting officer. This type used to claim `actor` was
- * always present; two consumers (`AuditoriaBoard.tsx`, `admin/actividad/page.tsx`) read
- * `.actor.username` unguarded and would throw on such a row. Fixed here: `actor` is now nullable
- * and both consumers fall back to "Sistema".
+ * Shadows shared `GobiernoAuditoriaEntity`, whose `actor` is `PersonRefEntity | null` —
+ * system/automated rows genuinely have no acting officer, so `actor` must stay
+ * nullable here. `AuditoriaBoard.tsx` and `admin/actividad/page.tsx` both read
+ * `.actor.username` and fall back to "Sistema"; declaring it non-null makes them
+ * throw on a system row.
  */
 export interface AuditEntry extends Omit<GobiernoAuditoriaEntity, "actor"> {
   actor: PlayerRef | null
@@ -246,14 +246,15 @@ export interface AuditEntry extends Omit<GobiernoAuditoriaEntity, "actor"> {
 export type EventoWeights = { tamano: number; ivs: number; shiny: number; nivel: number; especie: number }
 
 /**
- * TODO(P9): shadows shared `GobiernoEventoObraEntity`. Real drift, fixed here: the wire sends
- * `builders: PersonRefEntity[]` (this type claimed `string[]`, so `ConstruccionDetail.tsx` was
- * rendering a raw object into `<Avatar user={…}>` and using it as a React `key`) and flat
- * `diseno`/`ambicion`/`fidelidad` fields (this type invented a nested `cats` wrapper that does
- * not exist on the wire — `r.cats[k]` would throw the moment an obra had any votes). There is
- * also no combined `score10` on the wire; it was a straight cast (`GobiernoService.evento(...) as
- * Promise<Evento>`, see `_hooks/queries.ts`) papering over both gaps. `score10` is now computed
- * client-side in `ConstruccionDetail.tsx` from the three real fields instead of assumed present.
+ * Shadows shared `GobiernoEventoObraEntity`. Match the wire exactly:
+ *  - `builders` is `PersonRefEntity[]`, not `string[]` — typing it as strings makes
+ *    `ConstruccionDetail.tsx` render a raw object into `<Avatar user={…}>` and use it
+ *    as a React `key`.
+ *  - `diseno`/`ambicion`/`fidelidad` are FLAT fields. There is no nested `cats`
+ *    wrapper on the wire, so `r.cats[k]` throws the moment an obra has any votes.
+ *  - There is no combined `score10`; `ConstruccionDetail.tsx` computes it client-side
+ *    from the three real fields. A cast (`GobiernoService.evento(...) as Promise<Evento>`,
+ *    see `_hooks/queries.ts`) papers over every one of these.
  */
 export interface Obra extends Omit<GobiernoEventoObraEntity, "description" | "builders"> {
   description: string | null
@@ -309,14 +310,13 @@ export interface Evento
 // ─── Administración ───────────────────────────────────────────────────────────
 
 /**
- * TODO(P9): shadows shared `GobiernoNpcSkinEntity`. Real drift, fixed here: `npcs` is
- * `Array<string> | null` on the wire (this type claimed a plain array — `admin/skins/page.tsx`
- * called `x.npcs.join(...)` unguarded, and `NpcSkinModal.tsx` called `skin?.npcs.join(...)`,
- * neither guards `npcs` itself, so a skin with zero linked NPCs would throw); both call sites are
- * now null-safe. `src`/`face`/`head`/`body` are `number` (0/1) on the wire, not `boolean` — this
- * type claimed `boolean`; every read was already in a truthy context (`&&`, ternaries) so nothing
- * was actually broken, but the two typed consumers (`NpcSkinModal`'s local form state,
- * `RenderThumb`'s `ok` prop) now coerce with `!!` at the boundary instead of silently mismatching.
+ * Shadows shared `GobiernoNpcSkinEntity`. Match the wire exactly:
+ *  - `npcs` is `Array<string> | null`. Typing it as a plain array makes an unguarded
+ *    `npcs.join(...)` throw for a skin with zero linked NPCs — `admin/skins/page.tsx`
+ *    and `NpcSkinModal.tsx` both read it, and neither guards `npcs` itself.
+ *  - `src`/`face`/`head`/`body` are `number` (0/1), not `boolean`. Most reads sit in a
+ *    truthy context, but the typed consumers (`NpcSkinModal`'s form state, `RenderThumb`'s
+ *    `ok` prop) coerce with `!!` at the boundary rather than mismatching silently.
  */
 export type NpcSkin = GobiernoNpcSkinEntity
 

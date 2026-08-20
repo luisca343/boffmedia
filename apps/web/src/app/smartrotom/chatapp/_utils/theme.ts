@@ -1,7 +1,7 @@
 /**
- * What the `.ca-app` root renders. The *choice* between the two is no longer ChatApp's:
- * it is derived from the platform theme (`useRotomMode`), so the pref/auto resolution
- * that used to live here now lives once, in `components/smartrotom/theme`.
+ * What the `.ca-app` root renders. The *choice* between the two is not ChatApp's:
+ * it derives from the platform theme (`useRotomMode`), and the pref/auto
+ * resolution lives once, in `components/smartrotom/theme`.
  */
 export type ResolvedTheme = "light" | "dark";
 

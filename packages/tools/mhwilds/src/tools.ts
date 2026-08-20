@@ -1,10 +1,10 @@
 /**
- * D6 — this package's registry manifests. Hosts render their tool listings from
+ * This package's registry manifests. Hosts render their tool listings from
  * these; nothing host-shaped (routes aside) appears here.
  *
  * Three separate entries rather than one "MH Wilds" tile with internal tabs:
- * that matches how tools-minecraft registered compat and viewer separately, and
- * each of these is a destination in its own right on the web today.
+ * each is a destination in its own right, the same way tools-minecraft
+ * registers compat and viewer separately.
  *
  * All three components are `lazy` so a host's Tools hub can list them without
  * pulling the planner's calculation code or the bestiary's data into its

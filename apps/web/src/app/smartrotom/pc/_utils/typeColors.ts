@@ -1,7 +1,7 @@
 /**
  * Pokémon type colours. Data-driven, so they are applied via inline `style`, never
- * as an interpolated class — `bg-${type}` would silently never compile
- * (SMARTROTOM_V3.md §4, audit gap G2). Raw hex is sanctioned for exactly this.
+ * as an interpolated class — `bg-${type}` would silently never compile.
+ * Raw hex is sanctioned for exactly this.
  *
  * `c` is the fill, `t` the text that sits on it.
  */

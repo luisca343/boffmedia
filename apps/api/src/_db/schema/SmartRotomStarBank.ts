@@ -37,12 +37,12 @@ export const starBankAccounts = mysqlTable(
     type: mysqlEnum('type', STARBANK_ACCOUNT_TYPES).notNull(),
     image: varchar('image', { length: 255 }),
   },
-  // The house accounts (§ seed/house-accounts.ts) were kept singleton by an
-  // application `WHERE NOT EXISTS`, which races and cannot be trusted. A unique
-  // `(type, name)` is the real guarantee: it makes every house-account insert
-  // idempotent by construction, while still allowing many USER accounts and one
-  // SERVICE row per service name. The plain `type` index serves the lookups that
-  // resolve a house account on every transfer.
+  // A unique `(type, name)` is what keeps the house accounts (seed/house-accounts.ts)
+  // singleton: it makes every house-account insert idempotent by construction,
+  // while still allowing many USER accounts and one SERVICE row per service
+  // name. An application-level `WHERE NOT EXISTS` races and cannot be trusted.
+  // The plain `type` index serves the lookups that resolve a house account on
+  // every transfer.
   (t) => ({
     typeNameUq: uniqueIndex('starbank_accounts_type_name_uq').on(
       t.type,

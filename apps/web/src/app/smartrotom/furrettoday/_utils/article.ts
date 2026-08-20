@@ -168,9 +168,9 @@ export interface FtCategory {
 }
 
 /**
- * The section list, derived from the categories actually in use. The handoff
- * hardcoded seven sections; the real ones are whatever the newsroom has
- * published, so an empty category simply never appears.
+ * The section list, derived from the categories actually in use rather than
+ * hardcoded: the real sections are whatever the newsroom has published, so an
+ * empty category simply never appears.
  */
 export function categoriesOf(articles: FtArticle[]): FtCategory[] {
   const counts = new Map<string, number>();
@@ -189,8 +189,8 @@ export function categoriesOf(articles: FtArticle[]): FtCategory[] {
 }
 
 /**
- * The ticker. Real headlines, uppercased — the handoff's list was invented, but
- * a breaking-news rail full of real ones says the same thing and is true.
+ * The ticker. Real headlines, uppercased — a breaking-news rail reads the same
+ * with real ones, and they are true.
  */
 export function tickerOf(articles: FtArticle[], limit = 8): string[] {
   return articles.slice(0, limit).map((a) => a.title.toUpperCase());

@@ -3,23 +3,19 @@
 // there is no equivalent of Electron's nodeIntegration to fall back on, which
 // is one of the reasons this shell was chosen.
 //
-// ROADMAP (docs/DESKTOP_HANDOFF.md):
-//   §5 auth chain      — MS device code → Xbox → XSTS → Minecraft → profile
-//   §6 install pipeline — version JSON, rules, natives, assets, Java, argv
-//   §6.4 Forge/NeoForge — handled by `portablemc::forge` (forge/mod.rs:40),
-//        which downloads the official installer AND runs its
-//        install_profile.json processors itself. An earlier note here said to
-//        shell out to `java -jar installer.jar --installClient` by hand; that
-//        is STALE and was written before the crate was read. Doing it by hand
-//        now would mean re-solving library extraction, the processor graph and
-//        the sha1 checks that the crate already does. §6.4's real rule —
-//        "do not reimplement install_profile.json processors" — is satisfied by
-//        delegating to portablemc, which delegates to Forge.
+// The three pieces:
+//   auth chain       — MS device code → Xbox → XSTS → Minecraft → profile
+//   install pipeline — version JSON, rules, natives, assets, Java, argv
+//   Forge/NeoForge   — handled by `portablemc::forge` (forge/mod.rs:40), which
+//        downloads the official installer AND runs its install_profile.json
+//        processors itself. Never reimplement those processors by hand: doing
+//        so means re-solving library extraction, the processor graph and the
+//        sha1 checks the crate already does.
 //
-//        Still true, and the reason no shell plugin is used anywhere: the game
-//        process is spawned with std::process from `install::process`, never
-//        tauri-plugin-shell, whose purpose is handing the *renderer* shell
-//        access — which this app deliberately does not want.
+// No shell plugin is used anywhere: the game process is spawned with
+// std::process from `install::process`, never tauri-plugin-shell, whose purpose
+// is handing the *renderer* shell access — which this app deliberately does not
+// want.
 
 pub mod api;
 pub mod auth;
@@ -52,9 +48,8 @@ pub struct RuntimeInfo {
     pub app_version: String,
 }
 
-/// Mirrors what the Electron preload used to expose. The renderer treats a
-/// failure here as "not running inside the shell" and degrades to browser mode,
-/// so this must stay infallible.
+/// The renderer treats a failure here as "not running inside the shell" and
+/// degrades to browser mode, so this must stay infallible.
 #[tauri::command]
 fn runtime_info(app: tauri::AppHandle) -> RuntimeInfo {
     RuntimeInfo {
@@ -87,9 +82,9 @@ pub fn run() {
         // RF-06/RF-07 file pickers for local pack export/import.
         .plugin(tauri_plugin_dialog::init())
         .setup(|app| {
-            // Before anything reads the tree: move an install made by an
-            // earlier build into `%APPDATA%\Boffmedia[ Dev]` and flatten
-            // away the old `<instance>/.minecraft` level.
+            // Before anything reads the tree: bring an install up to the
+            // current layout under `%APPDATA%\Boffmedia[ Dev]`, flattening
+            // away any `<instance>/.minecraft` level.
             let handle = app.handle().clone();
             datadir::migrate(&handle);
             // Icons need no setup here: icon_cache returns data: URLs, so
@@ -132,18 +127,18 @@ pub fn run() {
             install::stop_game,
             install::instance_scan,
             install::repair_instance,
-            // §9 — locked vs. user space, and version rollback.
+            // Locked vs. user space, and version rollback.
             install::instance_versions,
             install::instance_revert,
             install::instance_unpin,
             install::instance_optional,
             install::instance_optional_set,
-            // §9 — per-instance Java runtime + memory.
+            // Per-instance Java runtime + memory.
             install::instance_runtime,
             install::instance_runtime_set,
-            // §4.3 — user-provided files.
+            // User-provided files.
             install::instance_provide_file,
-            // Cycle 2 — emulator ROM library sweep + resolution + settings.
+            // Emulator ROM library sweep + resolution + settings.
             install::instance_user_files_scan,
             install::instance_rom_slot,
             install::pack_manifest_cache,

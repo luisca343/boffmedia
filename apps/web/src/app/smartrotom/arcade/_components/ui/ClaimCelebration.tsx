@@ -26,7 +26,7 @@ const PARTICLE_COUNT = 16
 /**
  * The reward "moment" — the payoff every claim funnels into. Renders in place
  * (not a portal) so it keeps the `.ar-app` scope and its tokens resolve; the
- * fixed overlay covers the viewport regardless (SMARTROTOM_V3.md §2).
+ * fixed overlay covers the viewport regardless.
  */
 export function ClaimCelebration({ reward, onClose }: ClaimCelebrationProps) {
   const t = useTranslations("arcade")

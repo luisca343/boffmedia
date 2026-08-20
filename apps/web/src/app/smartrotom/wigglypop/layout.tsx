@@ -7,12 +7,12 @@ import { WigglypopShell } from "./_components/WigglypopShell"
 import { ToastHost } from "./_components/ui"
 
 /**
- * Wigglypop's scope root (SMARTROTOM_V3.md §2). Every `wp-*` token is a CSS var
+ * Wigglypop's scope root. Every `wp-*` token is a CSS var
  * declared on `.wp-app`, so nothing inside the app resolves without it — and
  * anything portaled OUT of it (modals, toasts) has to re-apply it via `ThemedLayer`.
  *
  * Light-only: there is no `data-theme`. The pink-cream page IS the product, so like
- * Furret Today and Gobierno the app ignores the platform theme picker's mode (§2b).
+ * Furret Today and Gobierno the app ignores the platform theme picker's mode.
  *
  * The height is pinned explicitly (viewport minus the 3rem Rotom nav) rather than
  * chained up through AppWrapper's flex tree — the feed is a `min-h-0` flex child,

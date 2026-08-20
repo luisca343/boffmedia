@@ -116,9 +116,9 @@ export class EventsService {
   }
 
   /**
-   * The events module owns the lifecycle. It used to be written from exactly
-   * one place — the randomizer's `openConfig` — so an event with no randomizer
-   * config could never become active and nothing ever wrote `completed`.
+   * The events module owns the lifecycle. It must not be driven from the
+   * randomizer's `openConfig` alone: an event with no randomizer config would
+   * never become active, and nothing would ever write `completed`.
    */
   async setStatus(
     id: number,
@@ -133,8 +133,8 @@ export class EventsService {
 
   async validateEventExists(eventId: number): Promise<boolean> {
     // includePrivate: existence is not visibility. Callers that must not leak a
-    // private event use validateEventVisible instead — this one used to filter
-    // private events out, which is why joining one failed as "Event not found".
+    // private event use validateEventVisible instead. Filtering private events
+    // out here makes joining one fail as "Event not found".
     const event = await this.eventsRepository.findById(eventId, true);
     return !!event;
   }

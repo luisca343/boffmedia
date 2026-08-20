@@ -462,10 +462,10 @@ describe("vanilla-style 'key=value' combination keys (road_snow)", () => {
   });
 
   it("falls back to the representative shape when no key matches", () => {
-    // road_snow declares no `defaults.model`, so an unmatched `layers` used to
-    // yield nothing at all and the block reverted to a flat cube. Drawing the
-    // first declared shape is deliberately preferred: a snow layer of the wrong
-    // depth still reads as a snow layer. Only the base model is taken this way —
+    // road_snow declares no `defaults.model`, so an unmatched `layers` yields
+    // nothing at all and the block falls back to a flat cube. Drawing the first
+    // declared shape is deliberately preferred: a snow layer of the wrong depth
+    // still reads as a snow layer. Only the base model is taken this way —
     // submodels are never invented (see the `undeclared properties` suite).
     const refs = resolveForgeV1(roadSnow, { layers: "9" });
     expect(refs).toHaveLength(1);

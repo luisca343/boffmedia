@@ -4,13 +4,12 @@ import { useT } from "../../i18n"
 import { type Section, useApp } from "../../state/app"
 import { AccountSwitcher } from "../AccountSwitcher"
 
-// L1 — the rail is the APP SECTION rail, not a pack filter.
+// The rail is the APP SECTION rail, not a pack filter.
 //
-// It used to open with the game-system filter block (All/NES/SNES/…), which put
-// one screen's filter in the only navigation space the app has and left Packs
-// with no rail entry at all — it was the implicit landing view. The filters
-// moved into the Packs screen as chips (L2); this is what the freed space is
-// for: first-class sections at the top, utilities at the foot.
+// Do not put a screen's filters here: the game-system block (All/NES/SNES/…)
+// belongs in the Packs screen as chips. Spending the only navigation space the
+// app has on one screen's filter also leaves Packs with no rail entry at all.
+// The space is for first-class sections at the top, utilities at the foot.
 //
 // The highlight is driven by `section`, never by the raw view, so opening a pack
 // or a tool full-screen keeps its section lit instead of going dark at depth.
@@ -66,7 +65,7 @@ function RailButton({
  * the privilege of being told so.
  *
  * Clickable, because "retry" is the only thing anyone wants from it, and the
- * tooltip carries the full explanation the banner no longer prints.
+ * tooltip carries the full explanation the one-line banner leaves out.
  */
 function BackendIndicator() {
   const st = useT("shell")

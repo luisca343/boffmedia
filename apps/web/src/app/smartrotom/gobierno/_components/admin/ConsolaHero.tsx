@@ -7,9 +7,9 @@ import { TONES, type Tone } from "../../_utils/tones"
 
 /**
  * The status strip every Administración tool opens with — internal-service branding on
- * civic paper, not the old app's terminal chrome. `status` is optional and must only be
- * passed when it reflects something real (Rendimiento's TPS-derived state, Actividad's
- * live/paused toggle) — never a hardcoded "CONECTADO".
+ * civic paper, not terminal chrome. `status` is optional and must only be passed when it
+ * reflects something real (Rendimiento's TPS-derived state, Actividad's live/paused
+ * toggle) — never a hardcoded "CONECTADO".
  */
 export function ConsolaHero({
   title,

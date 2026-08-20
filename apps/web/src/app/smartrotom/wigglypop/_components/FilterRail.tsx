@@ -90,7 +90,7 @@ export function FilterRail() {
                   "font-wp text-[10.5px] font-extrabold capitalize transition-all duration-100",
                   on ? "opacity-100 shadow-[inset_0_0_0_1.5px_currentColor]" : "opacity-60 hover:opacity-90",
                 )}
-                // Data-driven, so inline style — `bg-${type}` never compiles (§4).
+                // Data-driven, so inline style — `bg-${type}` never compiles.
                 style={{ color: c, background: on ? `${c}22` : "transparent" }}
               >
                 {t}

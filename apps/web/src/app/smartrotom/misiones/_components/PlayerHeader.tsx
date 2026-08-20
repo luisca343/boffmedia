@@ -10,11 +10,11 @@ import { Bar, FlourishCorners, Label, Nail, Paper, Shield } from "./ui"
 /**
  * "Bitácora del aventurero" — who is reading the board.
  *
- * The handoff's adventurer carries a level, an XP bar, badges and hours played.
- * None of that exists in the quest API, so none of it is invented here
- * ([deferred] — see docs/smartrotom/deferred/README.md). Every figure below is
- * counted from the player's own quests, and the name is the real Minecraft
- * account on the session.
+ * A level, an XP bar, badges and hours played do not exist in the quest API, so
+ * none of them are invented here ([deferred] — see
+ * docs/smartrotom/deferred/README.md). Every figure below is counted from the
+ * player's own quests, and the name is the real Minecraft account on the
+ * session.
  */
 export function PlayerHeader({ quests, regions }: { quests: QuestData[]; regions: Region[] }) {
   const t = useTranslations("misiones.playerHeader")

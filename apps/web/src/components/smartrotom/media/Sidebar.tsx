@@ -35,7 +35,7 @@ function Item({ item, collapsed, active, comingSoonLabel, label }: { item: NavIt
       </Link>
     )
   }
-  // deferred: present but gated (no dead link) — see §13
+  // deferred: present but gated, so it is never a dead link
   return (
     <button
       type="button"

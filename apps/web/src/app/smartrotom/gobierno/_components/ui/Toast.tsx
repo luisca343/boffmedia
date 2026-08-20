@@ -10,10 +10,9 @@ import { TONES, type Tone } from "../../_utils/tones"
 export { toast }
 
 /**
- * The shared bus only carries four kinds, so the free-form `(tone, icon)` pair every
- * call site used to pick is now a fixed lookup per kind — in practice every call site
- * only ever used "ok"/"check" or "danger"/"alert", so nothing here actually changes
- * pixel for pixel.
+ * The shared bus carries four kinds, so tone and icon are a fixed lookup per
+ * kind rather than a free-form `(tone, icon)` pair each call site picks. In
+ * practice only "ok"/"check" and "danger"/"alert" are ever used.
  */
 const KIND: Record<ToastKind, { tone: Tone; icon: IconName }> = {
   success: { tone: "ok", icon: "check" },

@@ -5,8 +5,8 @@ import { cn } from "@/lib/utils"
 /**
  * A ruled progress bar, filled with the chapter's ink by default.
  *
- * The width is an inline style because it is a real number from the data — §4's sanctioned
- * case, and the only way to express it (`w-[${pct}%]` compiles to nothing). `fill` exists
+ * The width is an inline style because it is a real number from the data, and the only
+ * way to express it (`w-[${pct}%]` compiles to nothing). `fill` exists
  * for the Logros category bars, which are inked with fixed category colours rather than
  * with the chapter accent.
  */

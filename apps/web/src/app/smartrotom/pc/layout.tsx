@@ -7,12 +7,12 @@ import { PCQueryProvider } from "./_components/PCQueryProvider"
 import { hydratePcUi } from "./_stores/pcUiStore"
 
 /**
- * The PC's scope root (SMARTROTOM_V3.md §2). Every `pc-*` token resolves off
+ * The PC's scope root. Every `pc-*` token resolves off
  * `.pc-app`, and `pc-canvas` paints the slate void behind the glass panels.
  *
  * Dark-only: there is no `data-theme`, because the console has one palette and no
  * light skin — like the Pokédex, the Arcade and Misiones, it ignores the platform
- * theme picker's mode (§2b). The box wallpapers are the app's colour, not a theme.
+ * theme picker's mode. The box wallpapers are the app's colour, not a theme.
  *
  * The height is pinned explicitly (viewport minus the 3rem Rotom nav) rather than
  * chained up through AppWrapper's flex tree, the same way Taxi and Starbank root

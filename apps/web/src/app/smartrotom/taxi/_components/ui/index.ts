@@ -1,5 +1,5 @@
-// The taxi's primitive library (`tx-*`). Import from this barrel, never by deep path
-// (SMARTROTOM_V3 §1). Add a line here whenever a new primitive is created.
+// The taxi's primitive library (`tx-*`). Import from this barrel, never by deep path.
+// Add a line here whenever a new primitive is created.
 export { Icon, type IconName } from "./Icon"
 export { Button, IconButton } from "./Button"
 export { Chip, FilterChip, Pill, RegionTag } from "./Chip"

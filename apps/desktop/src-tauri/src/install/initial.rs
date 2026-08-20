@@ -1,10 +1,9 @@
-//! First-install-only files (§4.4 of the multi-game plan). An `initialFiles`
-//! entry seeds instance state that then belongs to the PLAYER — a starting
-//! `.sav`, a default options file. It is written ONLY when the target path does
-//! not already exist, and is never re-verified or overwritten afterwards, so a
-//! player's progress is never clobbered on update or repair. This generalizes
-//! the bundled-worlds idea (state written once, then owned by the player)
-//! without touching the `worlds` mechanism.
+//! First-install-only files. An `initialFiles` entry seeds instance state that
+//! then belongs to the PLAYER — a starting `.sav`, a default options file. It is
+//! written ONLY when the target path does not already exist, and is never
+//! re-verified or overwritten afterwards, so a player's progress is never
+//! clobbered on update or repair. Same principle as bundled worlds (state
+//! written once, then owned by the player), on its own mechanism.
 //!
 //! Best-effort, exactly like worlds: a failed seed logs and moves on, it never
 //! fails the install. Sources are `override` (a blob) or `url` (distributable

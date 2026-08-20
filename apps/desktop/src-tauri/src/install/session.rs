@@ -5,11 +5,11 @@
 // ----------------------------------------------
 // portablemc's online auth path is built around `msa::Account`, which is
 // produced and stored by `msa::Database` — and that database is an on-disk JSON
-// file holding the refresh AND access tokens in plaintext. HANDOFF §5.7 rules
-// that out explicitly: the refresh token is effectively the account, it lives in
-// the OS credential store (auth/store.rs), and the access token is never
-// persisted at all. Adopting `set_auth_msa` would mean adopting `msa::Account`,
-// which we cannot construct without going through that database.
+// file holding the refresh AND access tokens in plaintext. That is ruled out:
+// the refresh token is effectively the account, it lives in the OS credential
+// store (auth/store.rs), and the access token is never persisted at all.
+// Adopting `set_auth_msa` would mean adopting `msa::Account`, which cannot be
+// constructed without going through that database.
 //
 // So the installer is configured OFFLINE — which is what actually determines the
 // correct `--uuid` and `--username`, the two values portablemc bakes into the
@@ -69,7 +69,7 @@ pub fn patch_game_args(game: &mut base::Game, session: &GameSession) {
         let value = match game.game_args[index].as_str() {
             "--accessToken" => Some(session.access_token.clone()),
             "--xuid" => Some(session.xuid.clone()),
-            // §6.2 — `msa` for a Microsoft account. `mojang`/`legacy` are dead.
+            // `msa` for a Microsoft account. `mojang`/`legacy` are dead.
             "--userType" => Some("msa".to_string()),
             // Pre-1.6 versions take one combined argument instead. Only filled
             // when the version actually declares it.

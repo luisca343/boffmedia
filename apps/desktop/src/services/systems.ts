@@ -10,8 +10,8 @@ export function systemOf(pack: PackSummary): SystemId {
     case "minecraft":
       return "minecraft"
     case "emulator":
-      // Cycle 2 will read version.emulator.kind for a specific system (gba, nds, etc.)
-      // For now, we return "emulator" as a placeholder.
+      // A specific system (gba, nds, …) would come from version.emulator.kind;
+      // until that is wired, "emulator" is the placeholder.
       return "emulator"
     case "zomboid":
       return "zomboid"

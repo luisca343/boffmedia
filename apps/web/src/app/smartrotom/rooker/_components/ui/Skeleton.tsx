@@ -3,7 +3,7 @@
 import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 
-/** A loading block. Pulses, and honours the OS reduced-motion preference (§11). */
+/** A loading block. Pulses, and honours the OS reduced-motion preference. */
 export function Skeleton({ className }: { className?: string }) {
   return <div className={cn("animate-pulse rounded-rk-md bg-rk-line motion-reduce:animate-none", className)} />
 }

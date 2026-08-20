@@ -59,7 +59,7 @@ function hashHue(uuid: string): number {
  * · "Pago en depósito" — the money really is held in a StarBank escrow account.
  *
  * There is deliberately no "vendedor verificado" badge: nothing in the domain
- * verifies a seller, and a badge that means nothing is worse than no badge (§9).
+ * verifies a seller, and a badge that means nothing is worse than no badge.
  */
 export function TrustBadges({
   listing,

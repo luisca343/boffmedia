@@ -7,11 +7,11 @@ import { cssVars, DK_CUT } from "./utils"
  * Data-tool chassis: a sticky bar, an optional sub-bar and a body. Owns the
  * `--dk-pad` gutter.
  *
- * The page is the only scroller. This used to be a `100vh - nav` box whose body
- * carried `overflow-y-auto`, which nested a second scrollbar inside a document
- * that still scrolled by one Footer height — so scrolling slid the tool up and
- * left the content in a sliver above the footer. `min-h` + a sticky bar is the
- * same pattern ToolShell and the auth screens already use.
+ * The page is the only scroller. A `100vh - nav` box whose body carries
+ * `overflow-y-auto` nests a second scrollbar inside a document that still
+ * scrolls by one Footer height — scrolling slides the tool up and leaves the
+ * content in a sliver above the footer. `min-h` + a sticky bar is the same
+ * pattern ToolShell and the auth screens use.
  */
 export function DkApp({ children, className }: { children: React.ReactNode; className?: string }) {
   return (
@@ -35,8 +35,8 @@ export function DkBar({ children, className }: { children: React.ReactNode; clas
     <div
       className={cn(
         "relative z-30 flex flex-none flex-wrap items-center gap-3 border-b border-solid border-line bg-base",
-        // Sticks under the site Navbar, at every width. It used to stick to
-        // `top-0` below 720px, i.e. underneath the Navbar rather than below it.
+        // Sticks under the site Navbar, at every width. `top-0` below 720px
+        // puts it underneath the Navbar rather than below it.
         "px-[var(--dk-pad)] py-[10px] sticky top-[var(--nav-h)]",
         className,
       )}

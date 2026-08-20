@@ -459,8 +459,8 @@ export class TcgController {
     @Body() addUserCardDto: AddUserCardDto,
     @CurrentUser() user: AuthPrincipal,
   ): Promise<SuccessResponse> {
-    // The collection belongs to the caller. `userId` used to come from the body,
-    // so one player could stuff cards into another player's collection.
+    // The collection belongs to the caller. `userId` must never come from the
+    // body, or one player can stuff cards into another player's collection.
     return this.tcgFacade.addUserCard({
       ...addUserCardDto,
       userId: user.userId,

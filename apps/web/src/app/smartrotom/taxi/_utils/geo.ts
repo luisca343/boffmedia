@@ -43,11 +43,11 @@ function prettify(name: string): string {
 }
 
 /**
- * The region a stop stands in, from the world's real WorldGuard polygons. The handoff
- * gave every stop a hand-written zone ("Costa", "Montaña"); we have no such field, but
- * the world does define named regions, so we resolve one by geometry instead of
- * inventing a taxonomy. A stop outside every region simply has none, and the region
- * filters only ever offer regions that at least one stop actually falls in.
+ * The region a stop stands in, from the world's real WorldGuard polygons. There is no
+ * hand-written zone field ("Costa", "Montaña"), but the world does define named regions,
+ * so one is resolved by geometry rather than by inventing a taxonomy. A stop outside
+ * every region simply has none, and the region filters only ever offer regions that at
+ * least one stop actually falls in.
  *
  * Regions can nest (a plot inside a town), so the smallest match wins — that is the
  * most specific place name for the stop.

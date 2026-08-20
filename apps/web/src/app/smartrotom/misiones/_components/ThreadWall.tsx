@@ -9,7 +9,7 @@ import { normalizeStatus, SEAL_TEXT, STATUS_LABEL_KEY, STATUS_PAPER_FILTER } fro
 import type { NPC, QuestData } from "../_types"
 import { Icon, Label, NpcPortrait, Paper, Thumbtack, WaxSeal } from "./ui"
 
-/** The tweakable yarn colour from the handoff is not a feature we ship — carmesí, always. */
+/** Yarn colour is not configurable — carmesí, always. */
 const CARMESI = "#a8201a"
 
 const NODE_W = 230

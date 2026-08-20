@@ -2,9 +2,8 @@ import { Injectable, ServiceUnavailableException } from '@nestjs/common';
 import type { ISettingsShim } from '../ports/settings-shim.port';
 
 /**
- * Stub implementation of ISettingsShim for Phase 0.
- * Encode/decode/caps methods always throw ServiceUnavailableException.
- * Real settings service will replace this in Phase 1.
+ * Stub ISettingsShim: encode/decode/caps always throw
+ * ServiceUnavailableException. Replaced by the real settings service.
  */
 @Injectable()
 export class StubSettingsShim implements ISettingsShim {

@@ -1,7 +1,7 @@
 import type { PixelArtSprite } from "../../_components/ui"
 
 // Original 12×12 creature silhouette — the arcade draws its own art, it never
-// ships Pokémon assets (SMARTROTOM_V3.md §10).
+// ships Pokémon assets.
 const CREATURE: string[] = [
   "....aaaa....",
   "..aaaaaaaa..",
@@ -20,7 +20,7 @@ const CREATURE: string[] = [
 const VOID = "#06031a"
 
 // A guess is tinted by its primary type, so the row reads at a glance. Data-driven
-// fills, applied inline — the sanctioned raw-hex exception (SMARTROTOM_V3.md §4).
+// fills, applied inline — the sanctioned raw-hex exception.
 const TYPE_TONE: Record<string, string> = {
   normal: "#bcb9dc",
   fire: "#ff2e93",

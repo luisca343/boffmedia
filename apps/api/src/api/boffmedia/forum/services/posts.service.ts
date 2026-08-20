@@ -59,8 +59,8 @@ export class PostsService {
     if (thread.locked) throw new ForbiddenException('Thread is locked');
 
     const now = new Date();
-    // insertReply now advances the thread counters inside its own transaction,
-    // so the post and the counts can no longer disagree.
+    // insertReply advances the thread counters inside its own transaction, so
+    // the post and the counts cannot disagree.
     const postId = await this.repo.insertReply(threadId, userId, body, now);
     await this.notifyReply(threadId, userId);
 

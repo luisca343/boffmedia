@@ -631,12 +631,10 @@ pub async fn catalog_versions_by_ids(
         .collect())
 }
 
-// `catalog_latest_version` used to live here, backing the Updates filter. It
-// was removed with the fix that made update detection directional: answering
-// "the newest release" is not enough to decide whether it is NEWER than the
-// pinned version, so `findUpdates` now takes the whole list from
-// `catalog_versions` and compares publish dates itself. Reintroducing a
-// latest-only endpoint would reintroduce the downgrade bug.
+// Deliberately no `catalog_latest_version` here. "The newest release" is not
+// enough to decide whether it is NEWER than the pinned version, so `findUpdates`
+// takes the whole list from `catalog_versions` and compares publish dates
+// itself. A latest-only endpoint reintroduces the silent-downgrade bug.
 
 // ── Resolve ────────────────────────────────────────────────────────────────
 

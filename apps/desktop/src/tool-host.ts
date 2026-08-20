@@ -1,6 +1,6 @@
 // Wires @boffmedia/tool-kit's capability contract to the launcher's runtime.
 // This is the launcher's half of the seam that lets the SAME tool code render
-// in apps/web and here (plan §3, "Host contract").
+// in apps/web and here.
 //
 // Import-time side effect, exactly like `./i18n` — call it once at bootstrap,
 // before any tool renders.
@@ -136,8 +136,8 @@ configureToolHost({
     : createWebApi(import.meta.env.VITE_API_URL ?? "https://api.boffmedia.es"),
 })
 
-// D6 — the Tools hub renders from the registry, so a domain package becomes
-// visible by being registered here and nowhere else.
+// The Tools hub renders from the registry, so a domain package becomes visible
+// by being registered here and nowhere else.
 registerTools([...minecraftTools, ...mhwildsTools])
 
 // Dev-only console handle for the capabilities: it exercises a capability

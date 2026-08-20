@@ -22,7 +22,7 @@ interface MoveEntry {
 const CATEGORY_LABELS: Record<string, string> = { physical: "category_physical", special: "category_special", status: "category_status" }
 const CATEGORY_COLORS: Record<string, string> = { physical: "#fb923c", special: "#22d3ee", status: "#cdd7e3" }
 
-// entry-move-row / entry-moves-header column template (handoff).
+// entry-move-row / entry-moves-header column template.
 const GRID = "60px 1.5fr 100px 80px 60px 60px 60px 80px"
 
 export function UnifiedMovesTable({ pokemon, formIndex, moveData }: { pokemon: Pokemon; formIndex: number; moveData: any }) {

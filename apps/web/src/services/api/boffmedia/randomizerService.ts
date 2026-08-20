@@ -87,7 +87,7 @@ export class RandomizerService {
     return response.blob()
   }
 
-  // ==================== ROM LIBRARY OPERATIONS (Phase 3) ====================
+  // ==================== ROM LIBRARY OPERATIONS ====================
 
   /**
    * List all ROMs in the library.
@@ -157,7 +157,7 @@ export class RandomizerService {
     return response.blob()
   }
 
-  // ==================== CONFIG OPERATIONS (Event-based, Phase 2) ====================
+  // ==================== CONFIG OPERATIONS (event-based) ====================
 
   /**
    * Create a new randomizer config for a community event.

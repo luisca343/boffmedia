@@ -261,12 +261,12 @@ export function AchievementRow({ achievement }: { achievement: Achievement }) {
 }
 
 /**
- * [deferred] Coin packs — the handoff's real-money storefront.
+ * [deferred] Coin packs — a real-money storefront.
  *
- * There is no packages endpoint, no payment provider and no prices; the euro figures in
- * the handoff are placeholders. Shipping a checkout that takes money for coins that
- * cannot be credited is the one fabrication with a real-world cost, so the wallet ships
- * without it.
+ * There is no packages endpoint, no payment provider and no prices; every euro figure
+ * below is a placeholder. Shipping a checkout that takes money for coins that cannot be
+ * credited is the one fabrication with a real-world cost, so the wallet ships without
+ * it.
  */
 export function TopUpGrid({ packages }: { packages: CoinPackage[] }) {
   const t = useTranslations("taxi.rewards")

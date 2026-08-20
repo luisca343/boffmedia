@@ -33,10 +33,9 @@ import { SuccessResponse } from '@api/_utils/entities/common-response.entity';
 /**
  * Note folders and tags.
  *
- * The owner is the authenticated principal. These routes used to be `@Public()`
- * and read the owner from `:uuid` or `dto.uuid`, so listing (and deleting)
- * another player's folders was a URL edit away. Writes are additionally
- * owner-scoped in SQL — see `note-organization.repository.ts`.
+ * The owner is the authenticated principal, never `:uuid` or `dto.uuid`: those
+ * put listing (and deleting) another player's folders one URL edit away. Writes
+ * are additionally owner-scoped in SQL — see `note-organization.repository.ts`.
  */
 @ApiTags('SmartRotom | Documents')
 @ApiBearerAuth()

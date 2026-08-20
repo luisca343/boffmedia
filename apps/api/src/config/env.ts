@@ -87,7 +87,7 @@ export const env = z
     // Third-party APIs
     GEMINI_API_KEY: z.string().optional(),
 
-    // Launcher pack distribution (HANDOFF §4.5). The CurseForge key never
+    // Launcher pack distribution. The CurseForge key never
     // reaches the launcher: since 16 July 2026 edge.forgecdn.net 401s without an
     // `x-api-key` header, and an embedded key is an extracted key, so every CF
     // byte is proxied by us. Optional so dev/tests boot without it — the proxy

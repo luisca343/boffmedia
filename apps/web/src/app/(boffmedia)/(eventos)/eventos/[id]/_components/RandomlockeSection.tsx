@@ -19,9 +19,8 @@ export interface EventConfig {
 }
 
 // Mirrors PublicAssignmentDto. The server sends `displayName` (joined from
-// boffMediaUsers), never `participantName`/`outputHash` — the old shape here
-// left the participant column blank on the public results table, exactly as it
-// did on the admin one.
+// boffMediaUsers), never `participantName`/`outputHash` — expecting those
+// leaves the participant column blank on the results table.
 export interface ConfigAssignment {
   id: number
   configId: number

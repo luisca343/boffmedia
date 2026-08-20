@@ -178,7 +178,7 @@ export class LauncherController {
     );
   }
 
-  // ── Downloads (§6 installs are blocked without these) ────────────────────
+  // ── Downloads (an install is blocked without these) ──────────────────────
 
   @Get('packs/:id/files/curseforge/:projectId/:fileId')
   @Public()

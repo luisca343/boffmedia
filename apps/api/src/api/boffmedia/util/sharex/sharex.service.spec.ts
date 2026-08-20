@@ -23,8 +23,8 @@ describe('SharexService', () => {
   });
 
   describe('createImage()', () => {
-    // Stores the token id, not the raw key. The old `key` column held the same
-    // shared secret on every row, so it attributed an upload to nobody.
+    // Stores the token id, not the raw key: a column holding the same shared
+    // secret on every row attributes an upload to nobody.
     it('inserts the image attributed to the uploading token', () => {
       service.createImage('boffmedia', 'screenshot', 'png', 7);
 

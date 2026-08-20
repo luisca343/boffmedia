@@ -406,10 +406,10 @@ export class EventosService {
     };
   }
 
-  // The public scoring weights {tamano, ivs, shiny, nivel, especie} are coefficients — this is
-  // a weighted-sum formula over species rarity, size, IVs, level and a flat shiny bonus. The
-  // exact formula wasn't specified beyond the key names in the handoff; this is a reasonable,
-  // documented interpretation.
+  // The public scoring weights {tamano, ivs, shiny, nivel, especie} are coefficients: a
+  // weighted sum over species rarity, size, IVs, level and a flat shiny bonus. Only the key
+  // names are fixed externally, so the curve below is this codebase's own interpretation —
+  // change it here and every event rescores.
   private computeScore(
     dto: RegisterCapturaDto,
     weights: Record<string, number> | null,

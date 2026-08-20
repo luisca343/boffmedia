@@ -40,8 +40,8 @@ export const rotomDocuments = mysqlTable('rotom_documents', {
   title: varchar('title', { length: 255 }).notNull(),
   type: int('type').notNull(),
   content: text('content').notNull(),
-  // 0 = private, 1 = public. Referenced by the DTOs/repository (previously
-  // written via `as any` with no backing column) — now a real column.
+  // 0 = private, 1 = public. A real column: the DTOs and repository read it,
+  // and writing it through `as any` with no backing column silently drops it.
   public: boolean('public').notNull().default(false),
   pinned: boolean('pinned').notNull().default(false),
   folderId: int('folder_id').references(() => rotomNoteFolders.id, {

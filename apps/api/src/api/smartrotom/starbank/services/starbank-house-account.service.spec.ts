@@ -88,7 +88,7 @@ describe('StarbankHouseAccountService', () => {
       );
     });
 
-    // SERVICE is one row per app, so type alone no longer identifies an account.
+    // SERVICE is one row per app, so type alone does not identify an account.
     it('does not fall back to type alone for SERVICE accounts', async () => {
       accountRepository.findHouseAccount.mockResolvedValue(null);
 

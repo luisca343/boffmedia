@@ -1,4 +1,4 @@
-// HANDOFF §9 — "per-instance Java runtime + memory, with a sane heuristic".
+// "per-instance Java runtime + memory, with a sane heuristic".
 //
 // Three ideas, one file, because they only make sense together:
 //
@@ -61,9 +61,9 @@ impl Default for MemoryChoice {
 }
 
 /// Per-pack Java choice. `Auto` is NOT the same as `Inherit`: it means "ignore
-/// the global path for this pack and let the launcher install the right JVM",
-/// which is the fix for "I pointed the launcher at Java 8 for an old pack and
-/// now the new one will not start".
+/// the global path for this pack and let the launcher install the right JVM", so
+/// a global Java 8 path kept for one legacy pack does not stop every other pack
+/// starting.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(tag = "mode", rename_all = "camelCase")]
 pub enum JavaChoice {
@@ -97,7 +97,7 @@ pub struct RuntimeOverride {
 pub struct ResolvedRuntime {
     pub heap_mib: u32,
     pub memory_source: RuntimeSource,
-    /// None = let portablemc find or install a JVM (§6.3).
+    /// None = let portablemc find or install a JVM.
     pub java_path: Option<String>,
     pub java_source: RuntimeSource,
     /// What the heuristic was fed. Shown next to the number so "6 GB
@@ -150,7 +150,7 @@ const BASE_MIB: u32 = 2560;
 ///
 ///   0 mods   -> 2560 MiB  (vanilla + shaders headroom)
 ///   200 mods -> 4960 MiB
-///   300 mods -> 6160 MiB  (the case §9 names: NOT 2 GB)
+///   300 mods -> 6160 MiB  (NOT 2 GB)
 ///   500 mods -> 8560 MiB
 const PER_MOD_MIB: u32 = 12;
 
@@ -208,7 +208,7 @@ pub fn recommended_heap_mib(mod_count: usize, total_ram_mib: u64) -> u32 {
 
 /// How many mods a pack has, from the marker alone.
 ///
-/// Prefers the managed set, which knows which files are mods. A pre-§9 marker
+/// Prefers the managed set, which knows which files are mods. An older marker
 /// has no managed list, so `fileCount` is the only number available — it
 /// over-counts (configs and overrides are in it), but over-counting biases the
 /// heuristic UP, and the RAM ceiling makes that safe.
@@ -379,8 +379,8 @@ mod tests {
 
     #[test]
     fn a_huge_modpack_gets_far_more_than_the_two_gigabyte_default() {
-        // §9's actual complaint: "not 2GB for a 300-mod pack". On a machine with
-        // room, a 300-mod pack must be sized for 300 mods.
+        // On a machine with room, a 300-mod pack must be sized for 300 mods,
+        // not handed a flat 2 GB.
         let heap = recommended_heap_mib(300, 16384);
         assert_eq!(heap, 6144);
         assert!(heap > 4096, "a 300-mod pack must not be handed 2–4 GB");
@@ -523,8 +523,8 @@ mod tests {
 
     #[test]
     fn an_instance_with_no_runtime_file_inherits_everything() {
-        // The file simply does not exist on any instance installed before this
-        // build; `unwrap_or_default()` at the call site must mean "inherit".
+        // The file does not exist on an instance that has made no per-pack
+        // choice; `unwrap_or_default()` at the call site must mean "inherit".
         let over = RuntimeOverride::default();
         assert_eq!(over.memory, MemoryChoice::Inherit);
         assert_eq!(over.java, JavaChoice::Inherit);
@@ -605,7 +605,7 @@ mod tests {
         };
         assert_eq!(mod_count_of(&marker), 2, "configs are not mods");
 
-        // A pre-§9 marker has no managed list at all; `fileCount` over-counts,
+        // An older marker has no managed list at all; `fileCount` over-counts,
         // which biases the heap UP — safe, because the RAM ceiling still caps it.
         marker.managed.clear();
         assert_eq!(mod_count_of(&marker), 90);

@@ -16,8 +16,8 @@ import { useFormat } from "../_hooks/useFormat"
  * neither shows anything until players have actually posted — which is honest, and is
  * why each has a real empty state rather than filler.
  *
- * The handoff also put an "Eventos en vivo" box here. Server events have no API, so it
- * is deferred rather than mocked (docs/smartrotom/deferred/README.md).
+ * There is no "Eventos en vivo" box: server events have no API, so it is deferred
+ * rather than mocked (docs/smartrotom/deferred/README.md).
  */
 function Box({ children }: { children: React.ReactNode }) {
   return <div className="overflow-hidden rounded-rk border border-rk-line bg-rk-card">{children}</div>

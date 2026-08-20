@@ -14,12 +14,10 @@ import { firstValueFrom } from 'rxjs';
 // This is the same handshake every vanilla server performs, which is why it is
 // safe and why it needs no special Mojang permission.
 //
-// It used to mint *launcher* sessions. The launcher signs in with a Boffmedia
-// account now, so the handshake was kept and repointed at the problem it is
-// actually right for: the in-game MCEF page. A client mod holds the running
-// game's own session token and can therefore run step 2. This is now the only
-// way to obtain an `ingame` session — the alternative it replaced,
-// `/auth/loginmc`, trusted the non-secret `MC_WORLD` string and is deleted.
+// This serves the in-game MCEF page only: a client mod holds the running game's
+// own session token and can therefore run step 2. It is the ONLY way to obtain
+// an `ingame` session. The launcher does not use it — it signs in with a
+// Boffmedia account instead.
 
 const HAS_JOINED_URL =
   'https://sessionserver.mojang.com/session/minecraft/hasJoined';

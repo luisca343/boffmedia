@@ -1,7 +1,7 @@
 // The roster: which accounts this launcher knows about, and which one is
 // active. Deliberately NOT where the secrets live.
 //
-// A refresh token is effectively the account (store.rs §5.7), so it stays in
+// A refresh token is effectively the account (see store.rs), so it stays in
 // the OS credential store, one entry per UUID. What is left over — a UUID, a
 // username, and a pointer to the active one — is public information that the
 // player's own skin URL already exposes, and it needs to be enumerable: a

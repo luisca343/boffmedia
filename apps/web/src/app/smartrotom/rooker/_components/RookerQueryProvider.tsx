@@ -4,7 +4,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { useState, type ReactNode } from "react"
 
 /**
- * Rooker's TanStack Query client (SMARTROTOM_V3 §8), scoped to this route like the
+ * Rooker's TanStack Query client, scoped to this route like the
  * Taxi's and the Arcade's.
  *
  * A timeline is the one place in SmartRotom where `refetchOnWindowFocus` earns its

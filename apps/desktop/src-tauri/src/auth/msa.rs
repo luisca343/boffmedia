@@ -1,14 +1,13 @@
-// The Microsoft → Xbox Live → XSTS → Minecraft chain, HANDOFF §5.
+// The Microsoft → Xbox Live → XSTS → Minecraft chain.
 //
 // Hand-rolled rather than delegated to portablemc::msa for one reason: that
 // crate's `Account` exposes no refresh token and implements neither Serialize
-// nor Deserialize, so its only persistence is a file-backed `Database`. §5.7 is
-// explicit that the refresh token belongs in the OS credential store, and a
-// refresh token IS the account. portablemc still owns all of §6.
+// nor Deserialize, so its only persistence is a file-backed `Database`. The
+// refresh token belongs in the OS credential store, and a refresh token IS the
+// account. portablemc still owns install and launch.
 //
-// Every endpoint, payload shape and trap below is transcribed from §5 and the
-// working reference in docs/mc_auth.py. The comments record the traps because
-// none of them are visible from the code afterwards.
+// The comments below record the traps in each step because none of them are
+// visible from the code afterwards.
 
 use std::time::Duration;
 
@@ -26,11 +25,15 @@ const MC_PROFILE_URL: &str = "https://api.minecraftservices.com/minecraft/profil
 const RP_MINECRAFT: &str = "rp://api.minecraftservices.com/";
 const RP_XBOXLIVE: &str = "http://xboxlive.com";
 
-/// Public client id from the approved Azure registration (HANDOFF §2 — not a
+/// Public client id from the approved Azure registration (not a
 /// secret, and the registration is a public client so there is no secret at all).
+///
+/// The name Microsoft shows on the consent screen is the registration's display
+/// name in the Azure portal, NOT anything sent from here. `apps/api` shares this
+/// same id, so renaming it there changes both surfaces at once.
 pub const CLIENT_ID: &str = "72c3e158-bb47-4ef7-a50c-f3ce51698108";
 
-/// §3.1 — must be the `consumers` tenant and exactly these scopes.
+/// Must be the `consumers` tenant and exactly these scopes.
 const SCOPE: &str = "XboxLive.signin offline_access";
 
 #[derive(Debug, thiserror::Error)]
@@ -44,15 +47,15 @@ pub enum AuthError {
     #[error("has cancelado el acceso desde Microsoft")]
     Declined,
 
-    /// §5.3 — mapped from XErr, because a raw code tells a player nothing.
+    /// Mapped from XErr, because a raw code tells a player nothing.
     #[error("{0}")]
     Xbox(String),
 
-    /// §5.5 — a 404 here is the "you don't own the game" case.
+    /// A 404 here is the "you don't own the game" case.
     #[error("{0}")]
     NoProfile(String),
 
-    /// §5.4 — pre-approval this is 403 "Invalid app registration". Reaching it
+    /// Pre-approval this is 403 "Invalid app registration". Reaching it
     /// proves the whole upstream chain is correct.
     #[error("el registro de la aplicación no está aprobado por Microsoft")]
     AppNotApproved,
@@ -67,7 +70,7 @@ pub enum AuthError {
     Unexpected(&'static str, String),
 }
 
-/// What the user is shown while they authorise in a browser (§5.1).
+/// What the user is shown while they authorise in a browser.
 #[derive(Debug, Clone, Serialize)]
 pub struct DeviceCode {
     pub user_code: String,
@@ -80,7 +83,7 @@ pub struct DeviceCode {
 }
 
 /// A fully resolved Minecraft session. The access token is deliberately NOT
-/// persisted (§5.7 — ~24h, re-derived per session).
+/// persisted (~24h, re-derived per session).
 #[derive(Debug, Clone, Serialize)]
 pub struct McSession {
     /// Dashed, lowercase. Mojang returns it undashed; `rotom_users.uuid` and the
@@ -90,7 +93,7 @@ pub struct McSession {
     pub username: String,
     #[serde(skip_serializing)]
     pub access_token: String,
-    /// Empty is legal — §5.6, it only matters for Xbox social features.
+    /// Empty is legal; it only matters for Xbox social features.
     pub xuid: String,
     #[serde(skip_serializing)]
     pub refresh_token: String,
@@ -137,7 +140,7 @@ struct DisplayClaims {
 #[derive(Deserialize)]
 struct XuiClaim {
     uhs: Option<String>,
-    /// Only present on the xboxlive.com relying party (§5.6).
+    /// Only present on the xboxlive.com relying party.
     xid: Option<String>,
 }
 
@@ -185,7 +188,7 @@ impl ProfileResponse {
 
 fn client() -> Result<reqwest::Client, AuthError> {
     Ok(reqwest::Client::builder()
-        // §3.3's courtesy rule for Modrinth; harmless and polite everywhere else.
+        // Modrinth asks callers to identify themselves; harmless everywhere else.
         .user_agent("BoffmediaApp/0.1 (+https://boffmedia.es)")
         .timeout(Duration::from_secs(30))
         .build()?)
@@ -249,7 +252,7 @@ pub async fn poll_for_tokens(code: &DeviceCode) -> Result<(String, String), Auth
             return Ok((tokens.access_token, tokens.refresh_token));
         }
 
-        // §5.1 — the polling error vocabulary. Anything else is terminal.
+        // The polling error vocabulary. Anything else is terminal.
         let err: TokenError = serde_json::from_str(&body)
             .map_err(|e| AuthError::Unexpected("token", e.to_string()))?;
         match err.error.as_str() {
@@ -265,7 +268,7 @@ pub async fn poll_for_tokens(code: &DeviceCode) -> Result<(String, String), Auth
     }
 }
 
-/// Exchange a stored refresh token for a fresh pair (§5.7 — this is what makes
+/// Exchange a stored refresh token for a fresh pair (this is what makes
 /// silent sign-in possible, and the only thing worth persisting).
 pub async fn refresh_tokens(refresh_token: &str) -> Result<(String, String), AuthError> {
     let res = client()?
@@ -299,7 +302,7 @@ pub async fn minecraft_session(
 ) -> Result<McSession, AuthError> {
     let http = client()?;
 
-    // §5.2 — the `d=` prefix is MANDATORY for tokens from an Azure app
+    // The `d=` prefix is MANDATORY for tokens from an Azure app
     // registration. Omitting it is the single most common mistake in this chain
     // and fails with an opaque Xbox error.
     let xbl: XblResponse = {
@@ -333,7 +336,7 @@ pub async fn minecraft_session(
 
     let xsts = xsts_authorize(&http, &xbl.token, RP_MINECRAFT).await?;
 
-    // §5.4 — literal `XBL3.0 x=`, user hash, semicolon, XSTS token.
+    // Literal `XBL3.0 x=`, user hash, semicolon, XSTS token.
     let mc_access_token = {
         let res = http
             .post(MC_LOGIN_URL)
@@ -353,7 +356,7 @@ pub async fn minecraft_session(
         if !status.is_success() {
             return Err(AuthError::Unexpected("login_with_xbox", body));
         }
-        // TRAP (§5.4): this response also carries a `username` field, and it is
+        // TRAP: this response also carries a `username` field, and it is
         // an internal account id, NOT the Minecraft username. The real name only
         // comes from the profile call below.
         let parsed: McLoginResponse = serde_json::from_str(&body)
@@ -361,7 +364,6 @@ pub async fn minecraft_session(
         parsed.access_token
     };
 
-    // §5.5
     let profile = {
         let res = http
             .get(MC_PROFILE_URL)
@@ -389,7 +391,7 @@ pub async fn minecraft_session(
         parsed
     };
 
-    // §5.6 — best-effort: an empty XUID plays fine on ordinary servers, so a
+    // Best-effort: an empty XUID plays fine on ordinary servers, so a
     // failure here must not sink an otherwise good sign-in.
     let xuid = fetch_xuid(&http, &xbl.token).await.unwrap_or_default();
 
@@ -403,7 +405,7 @@ pub async fn minecraft_session(
     })
 }
 
-/// Returns `(token, uhs)`. §5.3 — user-specific failures arrive as 401 + XErr.
+/// Returns `(token, uhs)`. User-specific failures arrive as 401 + XErr.
 async fn xsts_authorize(
     http: &reqwest::Client,
     xbl_token: &str,
@@ -441,7 +443,7 @@ async fn xsts_authorize(
     Ok((parsed.token, uhs))
 }
 
-/// §5.6 — the Minecraft relying party's claims carry only `uhs`; the XUID lives
+/// The Minecraft relying party's claims carry only `uhs`; the XUID lives
 /// on the xboxlive.com relying party, which needs its own call.
 async fn fetch_xuid(http: &reqwest::Client, xbl_token: &str) -> Result<String, AuthError> {
     let res = http
@@ -466,8 +468,7 @@ async fn fetch_xuid(http: &reqwest::Client, xbl_token: &str) -> Result<String, A
         .unwrap_or_default())
 }
 
-/// §5.3's table. A raw XErr is useless to a player; these are the five that
-/// actually happen.
+/// A raw XErr is useless to a player; these are the five that actually happen.
 fn describe_xerr(xerr: Option<u64>) -> String {
     match xerr {
         Some(2148916227) => "Esta cuenta está bloqueada en los servicios de Xbox.".into(),

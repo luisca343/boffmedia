@@ -26,7 +26,7 @@ function firstRef(value: ModelRef | ModelRef[]): ModelRef {
  *
  * A segment with no `=` is not a property at all — it is a Forge v1 render case
  * (`normal`, `all`, `inventory`), which 1.12 double-slab blockstates use as their
- * only key. Splitting those on a missing `=` used to invent the pair
+ * only key. Splitting those on a missing `=` invents the pair
  * `["norma", "normal"]`, which can never match anything; they are unconditional.
  */
 function parsePredicate(key: string): Array<[string, string]> {

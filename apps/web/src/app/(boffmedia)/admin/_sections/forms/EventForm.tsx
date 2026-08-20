@@ -66,8 +66,8 @@ export function EventForm({ defaultValues, isSubmitting, onSubmit, onCancel, sub
     },
   })
 
-  // The pack picker is no longer randomizer-only: event membership is what
-  // entitles a player to the pack, whatever game the pack targets.
+  // The pack picker is not randomizer-only: event membership is what entitles a
+  // player to the pack, whatever game the pack targets.
   const [packs, setPacks] = useState<AdminPack[] | null>(null)
   useEffect(() => {
     let alive = true

@@ -2,8 +2,8 @@
 //
 // stdout and stderr are piped rather than inherited for two reasons. The
 // obvious one is that a packaged GUI app has no terminal to inherit. The one
-// that matters is §9: crash-report parsing is the highest-leverage support tool
-// there is, and it needs the lines, not a console window nobody screenshots.
+// that matters is that crash-report parsing is the highest-leverage support
+// tool there is, and it needs the lines, not a console window nobody screenshots.
 //
 // A piped child that nobody reads FILLS ITS PIPE BUFFER AND HANGS, which looks
 // exactly like the game freezing on the Mojang splash — hence one reader thread
@@ -21,13 +21,12 @@ use super::crash::{diagnose as diagnose_crash, Diagnosis, LogTail};
 use super::progress::{log, EVENT_GAME_STATE};
 use super::InstallFailure;
 
-/// A game ready to be launched. Cycle 1 only handles Minecraft; Cycle 2+
-/// will add emulator and other game types.
+/// A game ready to be launched.
 #[derive(Debug, Clone)]
 pub enum Launchable {
     /// Minecraft via portablemc.
     Minecraft(portablemc::base::Game),
-    /// External executable (Cycle 2+): scaffolding for non-Minecraft games.
+    /// External executable: the non-Minecraft launch path.
     External {
         exe: PathBuf,
         args: Vec<String>,
@@ -48,7 +47,7 @@ enum GameStatePayload {
     #[serde(rename_all = "camelCase")]
     Crashed {
         exit_code: i32,
-        /// §9 — the plain-language verdict, when the log tail matched a known
+        /// The plain-language verdict, when the log tail matched a known
         /// signature. `None` (null in JSON) means "it crashed and we do not
         /// know why", which the UI must say instead of inventing a cause.
         diagnosis: Option<Diagnosis>,
@@ -110,9 +109,9 @@ pub fn spawn(
     pack_id: String,
 ) -> Result<RunningGame, InstallFailure> {
     let mut command: Command = game.command();
-    // RF-01/RF-02: only appended when the pack declares a server AND the pack's
-    // Minecraft version supports it (resolve::supports_quick_play); absent, the
-    // command is byte-for-byte what it was before this feature.
+    // Only appended when the pack declares a server AND the pack's Minecraft
+    // version supports it (resolve::supports_quick_play). Otherwise the command
+    // is byte-for-byte an ordinary launch.
     if let Some(target) = quick_play {
         command.arg("--quickPlayMultiplayer").arg(target);
     }
@@ -132,7 +131,7 @@ pub fn spawn(
     Ok(wire_child(app, child, pack_id, true))
 }
 
-/// Launch an external game executable (Cycle 2: an emulator). Shares all of the
+/// Launch an external game executable, e.g. an emulator. Shares all of the
 /// piped-output / exit-watch / playtime machinery with the Minecraft path; the
 /// only difference is that crash *diagnosis* is off — an emulator's nonzero exit
 /// is reported generically ("process exited with code N"), never run through

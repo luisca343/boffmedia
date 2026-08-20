@@ -18,11 +18,10 @@ export interface ArcadeHudProps {
 /**
  * The persistent player HUD.
  *
- * The handoff's HUD reads level, XP, a coin balance and a daily multiplier. None
- * of those exist: the arcade stores a streak and an item inventory and nothing
- * else, so this shows the week's real progress instead of a fabricated level.
- * The dropped fields are catalogued in docs/smartrotom/deferred/arcade.md (§9 —
- * derive, defer, or ask; never invent).
+ * Level, XP, a coin balance and a daily multiplier do not exist: the arcade
+ * stores a streak and an item inventory and nothing else, so this shows the
+ * week's real progress rather than a fabricated level. Derive, defer, or ask —
+ * never invent. Dropped fields: docs/smartrotom/deferred/arcade.md.
  */
 export function ArcadeHud({ streak, boxesOwned, loading, syncing }: ArcadeHudProps) {
   const t = useTranslations("arcade")

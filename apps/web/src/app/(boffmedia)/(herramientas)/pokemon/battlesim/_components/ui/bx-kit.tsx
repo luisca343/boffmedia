@@ -1,7 +1,7 @@
 "use client"
 
-// v3 «Bx» battle-HUD kit — Tailwind port of the handoff `bx-*` primitives,
-// consuming the real engine's BSX shapes (see `_lib/bx-helpers`). Presentational
+// v3 «Bx» battle-HUD kit — the `bx-*` primitives, consuming the real engine's
+// BSX shapes (see `_lib/bx-helpers`). Presentational
 // only; callers own data + choices. Sprites resolve through the shared
 // `spriteUrl` used by every other v3 Pokémon tool.
 import * as React from "react"

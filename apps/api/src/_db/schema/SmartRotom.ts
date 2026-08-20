@@ -202,7 +202,7 @@ export const rotomInventory = mysqlTable(
       .$type<'common' | 'uncommon' | 'rare' | 'epic' | 'legendary'>()
       .default('common'),
     createdAt: timestamp('created_at').notNull().defaultNow(),
-    // Two-phase caja delivery (DARCAJA.md §7). A row is *reserved* — soft-locked for
+    // Two-phase caja delivery. A row is *reserved* — soft-locked for
     // an in-flight grant — when reservationId is set and it is not yet spent
     // (amount > used). `confirm` turns a reservation into a spend; an unconfirmed
     // reservation older than the TTL is reclaimable, so a lost delivery is not a lost

@@ -4,7 +4,7 @@
  * A rule set captures a session's block substitutions as portable `exact` rules
  * so they can be reused across projects. Export turns the current
  * {@link ResolutionMap} into rules; import validates an untrusted JSON file back
- * into a typed {@link RuleSet} (see §12 of the plan).
+ * into a typed {@link RuleSet} (of the plan).
  */
 import { parseBlockState } from "../../../../engine/normalizer";
 import type { MappingRule, ResolutionMap, RuleSet, RuleSetMeta } from "../../../../engine/types";

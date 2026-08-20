@@ -139,8 +139,8 @@ describe("legacy structure placement", () => {
 
   it("reads the 1.12 grid from the TE data root, where the mod saves it", async () => {
     // TileEntityLittleTiles.writeToNBT writes the grid on the ROOT compound
-    // (context.set(nbt)) and only when non-default: a full grid-2 block read
-    // as grid 16 shrinks to 1/8 — that regression shipped once (LA_PUERTA).
+    // (context.set(nbt)) and only when non-default. Miss it and a full grid-2
+    // block read as grid 16 shrinks to 1/8.
     const tables = await loadLegacyTables();
     const tes = [
       legacyTE(

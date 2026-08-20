@@ -84,9 +84,9 @@ export const geometry = plugin(({ addComponents }) => {
    *  `lo` = the low-percentage side (toward the gradient's origin corner), `hi`
    *  = the high side. The band is laid entirely on that side, never centred on
    *  the diagonal — the diagonal is exactly where the clip-path cuts, so a
-   *  centred band loses its outer half and renders at --cut-w / 2. That is the
-   *  whole reason these strokes used to read thinner than the border they
-   *  continue. A CSS border sits inside the border box; so does this.
+   *  centred band loses its outer half and renders at --cut-w / 2, which is what
+   *  makes a stroke read thinner than the border it continues. A CSS border
+   *  sits inside the border box; so does this.
    *
    *  Each utility below passes its own `side` rather than deriving one: the
    *  answer depends on the shape, not just on which corner the pseudo is

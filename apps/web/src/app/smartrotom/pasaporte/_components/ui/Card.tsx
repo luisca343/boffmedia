@@ -5,8 +5,8 @@ import { cn } from "@/lib/utils"
 import { Icon, type IconName } from "./Icon"
 
 /**
- * The handoff's `.pcard`: white wash over the paper with an inset top highlight, so it
- * reads as a lighter patch of the same sheet rather than as a card lying on it.
+ * `.pcard`: a white wash over the paper with an inset top highlight, so it reads as a
+ * lighter patch of the same sheet rather than as a card lying on it.
  */
 export function Card({ children, className }: { children?: ReactNode; className?: string }) {
   return (

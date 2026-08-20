@@ -143,9 +143,9 @@ export default function ChatAppPage() {
     return s;
   }, [typingByChat, myUuid]);
 
-  // Persist AND clear the badge. The old code only did the optimistic clear, so
-  // the effect that was meant to persist always saw unread === 0 and bailed —
-  // nothing ever reached the server and the count returned on every reload.
+  // Persist AND clear the badge. An optimistic clear alone leaves the persisting
+  // effect seeing unread === 0, so it bails, nothing reaches the server and the
+  // count returns on the next reload.
   const markChatRead = useCallback(
     (chatId: number) => {
       if (!myUuid) return;

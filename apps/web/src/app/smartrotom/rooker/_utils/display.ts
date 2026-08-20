@@ -2,7 +2,7 @@
  * The reader's display preferences — Rooker's "Pantalla" panel, modelled on the
  * one Twitter ships.
  *
- * The load-bearing rule here is SMARTROTOM_V3 §2b: **an app never owns light/dark.**
+ * The load-bearing rule here: **an app never owns light/dark.**
  * That comes from the single platform picker via `useRotomMode()`. What Rooker owns
  * is everything the platform has no opinion about — which of the two darks, the
  * accent, the body face, and how dense the timeline reads.
@@ -68,7 +68,7 @@ export function resolveCanvas(mode: "light" | "dark", darkness: RookerDarkness):
 /**
  * The CSS custom properties the scope root carries. Returned as a style object rather
  * than as class names because the accent is a runtime value — a `bg-rk-${accent}` class
- * would never compile (§4, audit gap G2).
+ * would never compile.
  */
 export function displayVars(display: RookerDisplay): React.CSSProperties {
   const accent = ACCENTS[display.accent] ?? ACCENTS.azul

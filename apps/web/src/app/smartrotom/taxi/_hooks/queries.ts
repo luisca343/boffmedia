@@ -20,9 +20,9 @@ export const taxiKeys = {
 /**
  * The fare model and the account fares are paid into.
  *
- * The account id is read rather than hardcoded: it is a seeded row, so its id is whatever the
- * database assigned. The taxi previously hardcoded `0`, which is the virtual system account and
- * could never hold a fare.
+ * The account id is read rather than hardcoded: it is a seeded row, so its id is whatever
+ * the database assigned. `0` in particular is the virtual system account and can never hold
+ * a fare.
  */
 export function useTaxiConfig() {
   return useQuery({
@@ -139,10 +139,11 @@ export function useBalance(uuid?: string) {
 /**
  * Travel, then pay — one server-side call.
  *
- * This used to transfer the fare from here and *then* ask for the teleport, which meant every
- * ordinary failure (logged out, stop deleted, no safe arrival) left the player charged and
- * standing where they were, with no refund path. `POST /smartrotom/taxi/trip` teleports first
- * and charges only on a confirmed arrival, so a failed trip now costs nothing.
+ * Never transfer the fare here and *then* ask for the teleport: every ordinary
+ * failure (logged out, stop deleted, no safe arrival) leaves the player charged and
+ * standing where they were, with no refund path. `POST /smartrotom/taxi/trip`
+ * teleports first and charges only on a confirmed arrival, so a failed trip costs
+ * nothing.
  *
  * The price is not sent: the server recomputes it from the player's live position, which is
  * also what stops a crafted request from naming its own fare. What the page shows is an

@@ -65,9 +65,8 @@ function matchRule(
     }
 
     case "tag": {
-      // Tags are populated by the JAR scanner (Phase 2b+).
-      // Phase 2 bundled registries have empty tag arrays, so this branch
-      // fires only after a real registry scan.
+      // Tags are populated by the JAR scanner. The bundled registries carry
+      // empty tag arrays, so this branch fires only after a real registry scan.
       if (!block.tags.includes(rule.tag)) return null;
       if (!targetReg.blocks.has(rule.target)) return null;
       return parseBlockState(rule.target);

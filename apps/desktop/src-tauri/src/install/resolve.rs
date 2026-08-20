@@ -35,7 +35,7 @@ impl LoaderKind {
         }
     }
 
-    /// Inverse of `key()`. Needed by §9's rollback: a retained marker stores
+    /// Inverse of `key()`. Needed by rollback: a retained marker stores
     /// the loader as the wire string, and reverting has to install THAT loader
     /// rather than whatever the current manifest asks for.
     pub fn from_key(key: &str) -> Option<Self> {
@@ -54,18 +54,18 @@ impl LoaderKind {
 /// files.rs where the HTTP client lives.
 #[derive(Debug, Clone)]
 pub enum Fetch {
-    /// Modrinth needs no key (§4.5), so these go client-direct at zero egress
+    /// Modrinth needs no key, so these go client-direct at zero egress
     /// cost to us. Same for an explicit `url` source.
     Direct(String),
     ModrinthVersion { version_id: String },
     /// Streamed from our own API, authenticated with the launcher session:
-    /// CurseForge because its CDN needs a key we refuse to ship (§4.5), and
-    /// overrides because they are our blobs and never public (§7.2).
+    /// CurseForge because its CDN needs a key we refuse to ship, and
+    /// overrides because they are our blobs and never public.
     Proxied(crate::api::PackFile),
-    /// User-provided file (§4.3): the player supplies it locally. The hint
+    /// User-provided file: the player supplies it locally. The hint
     /// tells the player what to look for. Never automatically downloaded.
     UserProvided { hint: String },
-    /// A romhack (§4.1): materialized locally by applying `patch` to `base`
+    /// A romhack: materialized locally by applying `patch` to `base`
     /// (both other files[] entries, by instance-relative path), then verified
     /// against this entry's own sha512. Materialized in a dedicated pass AFTER
     /// the normal downloads, so its base and patch are already on disk.
@@ -87,23 +87,22 @@ pub struct PlannedFile {
     /// Configs and scripts go in the `overrides` phase, mods in `mods`; the two
     /// are separate bars in the UI and separate weights in progress.rs.
     pub is_mod: bool,
-    /// §9's optional-mod toggles. `env.client == "optional"` in `.mrpack`, so
-    /// this needs no addition to `packages/pack-schema` — `EnvSupport` already
-    /// has the three values and the manifest already carries them.
+    /// Optional-mod toggles. `env.client == "optional"` in `.mrpack`, so this
+    /// needs no addition to `packages/pack-schema` — `EnvSupport` already has
+    /// the three values and the manifest already carries them.
     pub optional: bool,
 }
 
 /// The result of resolving a manifest: the game type and game-specific plan.
-/// Cycle 1 only has the Minecraft arm; each game cycle adds its variant.
+/// Each supported game adds its own variant.
 #[derive(Debug, Clone)]
 pub enum PlannedGame {
     /// Minecraft pack: requires dependencies, optional loaders, and a Minecraft version.
     Minecraft(PlannedMinecraft),
-    /// Emulator pack (Cycle 2): a ROM (user-provided or patched) run on the
-    /// player's own mGBA/melonDS. No loaders, no Java — installs are payload-only.
+    /// Emulator pack: a ROM (user-provided or patched) run on the player's own
+    /// mGBA/melonDS. No loaders, no Java — installs are payload-only.
     Emulator(PlannedEmulator),
-    // Cycle 3: Zomboid(ZomboidPlan)
-    // Cycle 4: Stardew(StardewPlan)
+    // Still to come: Zomboid(ZomboidPlan), Stardew(StardewPlan)
 }
 
 #[derive(Debug, Clone)]
@@ -182,8 +181,8 @@ pub fn loader_of(manifest: &PackManifest) -> Option<(LoaderKind, String)> {
     None
 }
 
-/// Resolve a manifest into a game-specific install plan. Cycle 1 only handles
-/// Minecraft (the non-MC arms return early in validate_game_type).
+/// Resolve a manifest into a game-specific install plan. Only Minecraft is
+/// handled; the other arms return early in validate_game_type.
 pub fn plan(manifest: &PackManifest) -> Result<PlannedGame, InstallFailure> {
     // Dispatch on the declared game type (absent defaults to Minecraft), not on
     // which spec block happens to be present. `parse_manifest` has already
@@ -195,7 +194,7 @@ pub fn plan(manifest: &PackManifest) -> Result<PlannedGame, InstallFailure> {
         Some(crate::pack::PackManifestPackGameType::Emulator) => {
             plan_emulator(manifest).map(PlannedGame::Emulator)
         }
-        // Cycle 3+: zomboid/stardew arms land with their cycles.
+        // The zomboid/stardew arms land here when those games are supported.
         Some(_) => Err(InstallFailure::message(
             "Este tipo de juego no es soportado en esta versión de la app.".to_string(),
         )),
@@ -294,7 +293,7 @@ pub(crate) fn fetch_for(source: &Source, _path: &str) -> Result<Fetch, InstallFa
         },
         Source::Url { url } => Fetch::Direct(url.clone()),
 
-        // §4.5 — edge.forgecdn.net has required `x-api-key` since 16 July 2026.
+        // Edge.forgecdn.net has required `x-api-key` since 16 July 2026.
         // The key stays server-side, so the bytes come back through our proxy.
         Source::Curseforge {
             project_id,
@@ -304,7 +303,7 @@ pub(crate) fn fetch_for(source: &Source, _path: &str) -> Result<Fetch, InstallFa
             file_id: *file_id,
         }),
 
-        // §7.2 — an authenticated stream, not a presigned URL: the blobs live
+        // An authenticated stream, not a presigned URL: the blobs live
         // on the API's own disk, so there is nothing to sign.
         Source::Override { blob_sha512 } => Fetch::Proxied(crate::api::PackFile::Override {
             // The route lowercases before matching, and the schema already
@@ -312,7 +311,7 @@ pub(crate) fn fetch_for(source: &Source, _path: &str) -> Result<Fetch, InstallFa
             sha512: blob_sha512.to_string().to_lowercase(),
         }),
 
-        // §4.3 — user-provided files: planned but not fetched from any source.
+        // User-provided files: planned but not fetched from any source.
         // The frontend will show the hint and ask for the file. We return a
         // placeholder Fetch that signals this is user-provided, never actually
         // invoked by the download phase.
@@ -320,7 +319,7 @@ pub(crate) fn fetch_for(source: &Source, _path: &str) -> Result<Fetch, InstallFa
             hint: hint.to_string(),
         },
 
-        // §4.1 — a romhack. The base/patch references are validated by
+        // A romhack. The base/patch references are validated by
         // pack::parse_manifest; here they are just carried through for the
         // dedicated materialization pass.
         Source::Patched {
@@ -442,7 +441,7 @@ mod tests {
 
     #[test]
     fn optional_client_files_are_planned_and_flagged_not_skipped() {
-        // §9's toggles are a per-instance CHOICE, so the plan must still carry
+        // A toggle is a per-instance CHOICE, so the plan must still carry
         // the file. Skipping it here (as `unsupported` is skipped) would make
         // an optional mod impossible to enable at all.
         let m = manifest(
@@ -461,8 +460,8 @@ mod tests {
 
     #[test]
     fn curseforge_goes_through_our_proxy_never_the_cdn() {
-        // A direct edge.forgecdn.net fetch 401s (§10, §4.5). The plan must
-        // therefore never produce a Direct URL for a CF source.
+        // A direct edge.forgecdn.net fetch 401s, so the plan must never
+        // produce a Direct URL for a CurseForge source.
         let m = manifest(
             r#"{"minecraft":"1.21.4"}"#,
             &file(

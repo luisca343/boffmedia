@@ -27,9 +27,9 @@ export interface ArcadeSidebarProps {
 }
 
 /**
- * The arcade's own nav. The handoff also lists Misiones and Temporada; neither
- * has any backing data (no missions table, no season/XP anywhere), so neither is
- * routed — see docs/smartrotom/deferred/arcade.md.
+ * The arcade's own nav. Misiones and Temporada have no backing data (no
+ * missions table, no season/XP anywhere), so neither is routed — see
+ * docs/smartrotom/deferred/arcade.md.
  */
 function navigation({ boxesOwned, rewardReady }: ArcadeSidebarProps): NavGroup[] {
   return [

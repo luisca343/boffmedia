@@ -13,7 +13,7 @@ export interface CabinetCardProps {
 }
 
 // The accent drives the whole cabinet — marquee strip, CRT bloom, sprite glow,
-// the JUGAR chevron. Full literal classes, never `text-${accent}` (§4, gap G2).
+// the JUGAR chevron. Full literal classes, never `text-${accent}`.
 const ACCENT: Record<GameAccent, { text: string; strip: string; border: string; hover: string; crt: string }> = {
   cyan: {
     text: "text-ar-cyan",

@@ -39,7 +39,7 @@ interface CatalogItem {
  * we own, and the UI says so plainly: an item listing gets no "propiedad verificada"
  * badge, and the buyer is told the seller hands it over in-game. Delivery is still
  * real (the item is genuinely `/giveitems`-ed on confirmation) — only ownership is
- * unverified, and pretending otherwise would be the lie (§9).
+ * unverified, and pretending otherwise would be the lie.
  */
 export function SellItem() {
   const t = useTranslations("wigglypop")

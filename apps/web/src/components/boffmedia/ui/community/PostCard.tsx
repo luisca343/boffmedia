@@ -20,8 +20,8 @@ function BlRead({ mins }: { mins: number }) {
 //   feature (cover + image-slot), grid, row (horizontal list) and mini (sidebar).
 // The accent rail + glyph are tinted with the post's category hue. Mirrors
 // .bl-feature / .bl-card / .bl-row / .bl-mini from comunidad.css.
-// [deferred] The <image-slot> drop-zone from the handoff isn't wired locally, so
-// the media panel shows the tinted glyph until an image-upload flow exists.
+// [deferred] The <image-slot> drop-zone is not wired locally, so the media panel
+// shows the tinted glyph until an image-upload flow exists.
 export function PostCard({
   post,
   variant = "grid",

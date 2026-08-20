@@ -31,7 +31,7 @@ export type SmogonSnapshot = SmogonSnapshotDto;
 export type PokemonUsageEntry = PokemonUsageEntryDto;
 export type PokemonUsageDetail = PokemonUsageDetailDto;
 
-/** Paste-derived breakdown for a Champions species (Phase 3) */
+/** Paste-derived breakdown for a Champions species. */
 export type ChampionsPasteDetail = ChampionsPasteDetailDto;
 
 /** Result of a batch paste-fetch operation */

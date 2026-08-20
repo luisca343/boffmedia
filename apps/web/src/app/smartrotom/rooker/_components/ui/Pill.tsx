@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils"
 /**
  * The 10px uppercase capsule that labels everything in Rooker — SHINY, VIVO, PRÓX,
  * CAPTURA. One shape, one type scale; the colour is passed in as literal classes by
- * the caller (never interpolated, §4).
+ * the caller (never interpolated).
  */
 export interface PillProps {
   children: ReactNode

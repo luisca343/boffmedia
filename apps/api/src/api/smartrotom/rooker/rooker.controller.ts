@@ -54,9 +54,9 @@ import {
 
 @ApiTags('SmartRotom | Rooker')
 // The timeline, profiles and search are public reads. Everything that writes
-// takes the acting player from the session — it used to come from `dto.uuid`,
-// so any caller could post, follow, react or DELETE A TRINO as anybody else,
-// with no account at all.
+// takes the acting player from the session, never `dto.uuid` — that lets any
+// caller post, follow, react or DELETE A TRINO as anybody else, with no account
+// at all.
 @Public()
 @Controller('smartrotom/rooker')
 export class RookerController {

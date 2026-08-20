@@ -3,7 +3,7 @@ import { typeColor } from "../../_utils/typeColors"
 
 /**
  * A Pokémon type pill. The fill is data-driven so it goes through inline `style`
- * (§4) — and it carries a glow in its own hue, which is what stops eighteen flat
+ * — and it carries a glow in its own hue, which is what stops eighteen flat
  * pills from looking like a stack of stickers on the white card.
  */
 export function TypeBadge({
