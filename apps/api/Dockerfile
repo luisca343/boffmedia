@@ -27,6 +27,17 @@ WORKDIR /app
 COPY packages/shared ./packages/shared
 COPY apps/api ./apps/api
 
+# `nest build` type-checks the whole API in one pass and needs more heap than
+# Node's default heuristic hands it inside a container — it dies with
+# "Ineffective mark-compacts near heap limit" (exit 134) rather than a type
+# error, which reads like a code failure and is not one. Stated explicitly so
+# the build does not depend on how much memory the host happens to give Docker.
+#
+# Keep this BELOW the engine's memory limit: the value is a heap ceiling Node
+# will try to reach, so setting it above what the container can supply just
+# moves the failure from a V8 abort to an OOM kill.
+ENV NODE_OPTIONS="--max-old-space-size=3072"
+
 RUN pnpm --filter api build
 
 # Prune to production-only deps for the API
@@ -62,7 +73,24 @@ RUN sed -i 's/JavaLanguageVersion.of(25)/JavaLanguageVersion.of(21)/' build.grad
     grep -q 'JavaLanguageVersion.of(21)' build.gradle.kts || \
     (echo "FVX toolchain pin failed — upstream build.gradle.kts changed shape" && exit 1)
 
-# Build the fat jar with Gradle (requires Java 21 + preview flag)
+# The pin above is only half the contract. This source uses unnamed variables
+# (`_ ->`), which are STANDARD in the Java 25 upstream declares and a PREVIEW
+# feature in the 21 we pin to — so pinning the toolchain without also enabling
+# preview makes javac reject the source outright. Everything else in this system
+# already carries the flag: the SettingsShim javac below, and the runtime in
+# fvx-randomizer-runner.ts and fvx-settings-shim.ts.
+#
+# Enable it here rather than moving to a 25 JDK: preview class files are locked
+# to their exact major version, the runner passes --enable-preview on 21, and the
+# jar's sha512 is asserted byte-for-byte by the Phase 1 e2e test.
+# `allprojects`, not a bare `tasks.withType`: the compile that fails is
+# `:romio:compileJava`, and a root-scoped configuration block never reaches a
+# subproject's tasks.
+RUN printf '\nallprojects {\n    tasks.withType<JavaCompile>().configureEach {\n        options.compilerArgs.add("--enable-preview")\n    }\n}\n' >> build.gradle.kts && \
+    grep -q 'enable-preview' build.gradle.kts || \
+    (echo "FVX preview-flag injection failed" && exit 1)
+
+# Build the fat jar with Gradle (Java 21 + preview, per the two steps above)
 RUN ./gradlew jar -x test --no-daemon && \
     mkdir -p /opt/fvx && \
     cp random/build/libs/UPR-FVX.jar /opt/fvx/fvx.jar
