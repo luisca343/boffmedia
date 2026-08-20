@@ -2,7 +2,10 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export type UrlBodyDto = {
-    url: string;
+export type CreateSharexTokenDto = {
+    /**
+     * Who holds this token, shown in the admin list.
+     */
+    label: string;
 };
 

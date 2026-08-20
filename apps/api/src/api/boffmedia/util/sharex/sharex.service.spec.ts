@@ -23,15 +23,17 @@ describe('SharexService', () => {
   });
 
   describe('createImage()', () => {
-    it('inserts image record via Drizzle', () => {
-      service.createImage('boffmedia', 'screenshot', 'png', 'abc123');
+    // Stores the token id, not the raw key. The old `key` column held the same
+    // shared secret on every row, so it attributed an upload to nobody.
+    it('inserts the image attributed to the uploading token', () => {
+      service.createImage('boffmedia', 'screenshot', 'png', 7);
 
       expect(mockDrizzle.insert).toHaveBeenCalled();
       expect(mockInsert.values).toHaveBeenCalledWith({
         app: 'boffmedia',
         name: 'screenshot',
         extension: 'png',
-        key: 'abc123',
+        tokenId: 7,
       });
       expect(mockInsert.execute).toHaveBeenCalled();
     });

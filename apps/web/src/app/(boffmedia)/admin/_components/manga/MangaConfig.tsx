@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Button, Field, Input, Icon, Spinner, Toggle } from "@boffmedia/ui";
-import { apiGET, apiAuthedAutoPATCH, apiAuthedAutoPOST } from "@/services/boffAPI";
+import { apiAuthedAutoGET, apiAuthedAutoPATCH, apiAuthedAutoPOST } from "@/services/boffAPI";
 import { AvSectionHead, AvPanel, AvPill } from "../ui/av-kit";
 
 type SeriesStatus = "ongoing" | "completed" | "hiatus";
@@ -36,7 +36,7 @@ export default function MangaConfig() {
   const [triggerMessage, setTriggerMessage] = useState<string | null>(null);
 
   useEffect(() => {
-    apiGET<MangaConfigData>("/boffmedia/herramientas/scrape/manga/config").then((res) => {
+    apiAuthedAutoGET<MangaConfigData>("/boffmedia/herramientas/scrape/manga/config").then((res) => {
       if (res.success && res.data) {
         setConfig(res.data);
         setCronSchedule(res.data.cron.schedule);

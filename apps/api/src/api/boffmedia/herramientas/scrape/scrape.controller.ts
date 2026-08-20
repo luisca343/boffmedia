@@ -529,6 +529,10 @@ export class ScrapeController {
 
   // ==================== MANGA CONFIG ====================
 
+  // Guarded to match its PATCH sibling: same admin resource, so a public read
+  // of the cron schedule and series status was an unintended asymmetry.
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.BOFF_ADMIN)
   @Get('manga/config')
   @ApiOperation({
     summary: 'Get manga admin config (cron settings + series status)',

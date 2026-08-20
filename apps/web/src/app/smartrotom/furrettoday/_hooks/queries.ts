@@ -20,6 +20,7 @@ import {
   rotomGETOrThrow,
   rotomPOSTOrThrow,
   rotomAuthedDELETEOrThrow,
+  rotomAuthedGETOrThrow,
   rotomAuthedPOSTOrThrow,
 } from "@/services/boffAPI";
 import { useBoffSession } from "@/services/useBoffSession";
@@ -29,6 +30,9 @@ import { toArticle, type FtArticle } from "../_utils/article";
 
 export const furretKeys = {
   all: () => ["furret", "news"] as const,
+  // Separate entry on purpose: the editorial list contains unpublished drafts
+  // and must never share a cache entry with the reader-facing one.
+  editorial: () => ["furret", "news", "editorial"] as const,
   article: (id: number) => ["furret", "news", id] as const,
   comments: (id: number) => ["furret", "news", id, "comments"] as const,
   board: () => ["furret", "board"] as const,
@@ -41,12 +45,9 @@ export const furretKeys = {
  * client-side is cheaper than six endpoints — and it means the home, browse and
  * article screens all share one cache entry.
  */
-export function useNewsroom() {
-  const query = useQuery({
-    queryKey: furretKeys.all(),
-    queryFn: () => rotomGETOrThrow<NewsResponse>("/documents/news"),
-  });
-
+function useNewsroomQuery(
+  query: ReturnType<typeof useQuery<NewsResponse>>,
+) {
   const articles = useMemo<FtArticle[]>(
     () => (query.data?.news ?? []).map(toArticle),
     [query.data],
@@ -66,6 +67,31 @@ export function useNewsroom() {
   );
 
   return { ...query, articles, cover, published };
+}
+
+/** Reader-facing. `/documents/news` returns PUBLISHED articles only. */
+export function useNewsroom() {
+  return useNewsroomQuery(
+    useQuery({
+      queryKey: furretKeys.all(),
+      queryFn: () => rotomGETOrThrow<NewsResponse>("/documents/news"),
+    }),
+  );
+}
+
+/**
+ * Editorial. The only caller that receives unpublished drafts, and the only one
+ * that sends credentials — `/documents/news/all` is role-guarded to
+ * ROTOM_ADMIN / ROTOM_FURRET. Kept on its own cache key so a draft can never
+ * reach a reader screen through a shared entry.
+ */
+export function useNewsroomEditor() {
+  return useNewsroomQuery(
+    useQuery({
+      queryKey: furretKeys.editorial(),
+      queryFn: () => rotomAuthedGETOrThrow<NewsResponse>("/documents/news/all"),
+    }),
+  );
 }
 
 /** A single article. Seeded from the newsroom cache so a click paints instantly. */

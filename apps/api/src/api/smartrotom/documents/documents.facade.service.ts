@@ -550,6 +550,24 @@ export class DocumentsFacadeService {
     }
   }
 
+  /**
+   * The reader-facing lookup. `getNewsById` cannot itself refuse drafts — it is
+   * what `createNews` calls to return the article it just made, which is
+   * unpublished by definition — so the published check lives here, on the path
+   * the @Public() route uses. Without it, ids are sequential integers and every
+   * draft is one guess away.
+   *
+   * 404 rather than 403: to an anonymous reader an unpublished article should
+   * not exist, and 403 would confirm that the id is real.
+   */
+  async getPublishedNewsById(newsId: number): Promise<NewsDetails> {
+    const news = await this.getNewsById(newsId);
+    if (!news.published) {
+      throw new NotFoundException(`News ${newsId} not found`);
+    }
+    return news;
+  }
+
   async getFeaturedNews(): Promise<NewsDetails | null> {
     try {
       return await this.newsService.getFeaturedNews();

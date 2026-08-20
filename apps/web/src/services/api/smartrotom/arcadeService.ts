@@ -54,10 +54,15 @@ export class ArcadeService {
   }
 
   /**
-   * Reset user streak (admin only)
+   * Reset the signed-in player's own streak.
+   *
+   * Took a `uuid` and posted to `/arcade/streak/{uuid}/reset` with the
+   * unauthenticated helper — but the API ignored the uuid and reads the session,
+   * and the route requires one, so this could only ever have 401'd. It now
+   * matches the route it calls.
    */
-  static resetStreak(uuid: string): Promise<ApiResponse<SuccessResponse>> {
-    return rotomPOST<SuccessResponse>(`/arcade/streak/${uuid}/reset`, {});
+  static resetStreak(): Promise<ApiResponse<SuccessResponse>> {
+    return rotomAuthedPOST<SuccessResponse>(`/arcade/streak/reset`, {});
   }
 
   // ==================== INVENTORY ENDPOINTS ====================

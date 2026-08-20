@@ -39,6 +39,7 @@ const mockFacade: jest.Mocked<Partial<DocumentsFacadeService>> = {
   getPublishedNews: jest.fn(),
   getFeaturedNews: jest.fn(),
   getNewsById: jest.fn(),
+  getPublishedNewsById: jest.fn(),
   createNews: jest.fn(),
   updateNews: jest.fn(),
   deleteNews: jest.fn(),
@@ -360,8 +361,12 @@ describe('DocumentsController — integration (ValidationPipe + GlobalExceptionF
 
   // ── GET /smartrotom/documents/news ─────────────────────────────────────
   describe('GET /smartrotom/documents/news', () => {
-    it('returns 200 and fetches all news by default', async () => {
-      (mockFacade.getAllNews! as jest.Mock).mockResolvedValue({
+    // This route is @Public(). It used to fall through to getAllNews() unless
+    // `published=true` was passed, so the insecure branch was the DEFAULT and
+    // anonymous readers received unpublished drafts. It is now published-only,
+    // unconditionally — drafts live behind GET news/all.
+    it('returns published news only, and never reaches getAllNews', async () => {
+      (mockFacade.getPublishedNews! as jest.Mock).mockResolvedValue({
         total: 0,
         news: [],
       } as any);
@@ -371,21 +376,23 @@ describe('DocumentsController — integration (ValidationPipe + GlobalExceptionF
       );
 
       expect(res.status).toBe(200);
-      expect(mockFacade.getAllNews).toHaveBeenCalled();
+      expect(mockFacade.getPublishedNews).toHaveBeenCalled();
+      expect(mockFacade.getAllNews).not.toHaveBeenCalled();
     });
 
-    it('returns 200 and fetches published news when published=true', async () => {
+    it('ignores a published=false query rather than honouring it', async () => {
       (mockFacade.getPublishedNews! as jest.Mock).mockResolvedValue({
         total: 0,
         news: [],
       } as any);
 
       const res = await request(app.getHttpServer()).get(
-        '/smartrotom/documents/news?published=true',
+        '/smartrotom/documents/news?published=false',
       );
 
       expect(res.status).toBe(200);
       expect(mockFacade.getPublishedNews).toHaveBeenCalled();
+      expect(mockFacade.getAllNews).not.toHaveBeenCalled();
     });
   });
 
@@ -411,8 +418,10 @@ describe('DocumentsController — integration (ValidationPipe + GlobalExceptionF
 
   // ── GET /smartrotom/documents/news/:newsId ─────────────────────────────
   describe('GET /smartrotom/documents/news/:newsId', () => {
-    it('returns 200 and delegates to facade.getNewsById', async () => {
-      (mockFacade.getNewsById! as jest.Mock).mockResolvedValue({
+    // Delegates to the PUBLISHED-only lookup: ids are sequential, so the
+    // unrestricted one made every draft readable by guessing.
+    it('returns 200 and delegates to facade.getPublishedNewsById', async () => {
+      (mockFacade.getPublishedNewsById! as jest.Mock).mockResolvedValue({
         id: 1,
       } as any);
 
@@ -421,7 +430,8 @@ describe('DocumentsController — integration (ValidationPipe + GlobalExceptionF
       );
 
       expect(res.status).toBe(200);
-      expect(mockFacade.getNewsById).toHaveBeenCalledWith(1);
+      expect(mockFacade.getPublishedNewsById).toHaveBeenCalledWith(1);
+      expect(mockFacade.getNewsById).not.toHaveBeenCalled();
     });
 
     it('returns 400 when newsId is non-numeric', async () => {

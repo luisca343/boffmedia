@@ -21,7 +21,6 @@ const mockAppService = {
   getHealth: jest.fn(),
   getDBPort: jest.fn(),
   toggleLogging: jest.fn(),
-  uploadFile: jest.fn(),
   blogicons: jest.fn(),
   steamKeys: jest.fn(),
   getSteamData: jest.fn(),

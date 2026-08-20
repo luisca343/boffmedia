@@ -129,6 +129,8 @@ export class AuthController {
   }
 
   @Post('reset')
+  @UseGuards(AuthThrottlerGuard)
+  @Throttle({ default: { ttl: 60_000, limit: 5 } })
   @ApiOperation({ summary: 'Reset a password using an emailed token' })
   @ApiResponse({ status: HttpStatus.OK, description: 'Password updated.' })
   @ApiResponse({
@@ -142,6 +144,8 @@ export class AuthController {
   // ==================== EMAIL VERIFICATION ====================
 
   @Post('verify-email')
+  @UseGuards(AuthThrottlerGuard)
+  @Throttle({ default: { ttl: 60_000, limit: 5 } })
   @ApiOperation({ summary: 'Verify an email using an emailed token' })
   @ApiResponse({ status: HttpStatus.OK, description: 'Email verified.' })
   @ApiResponse({

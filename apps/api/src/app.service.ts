@@ -37,10 +37,6 @@ export class AppService {
     return this.configService.get<number>('DB_PORT') ?? 0;
   }
 
-  uploadFile(file: Express.Multer.File) {
-    this.logger.log(file);
-  }
-
   toggleLogging() {
     return LoggingUtil.getInstance().toggleLogging();
   }

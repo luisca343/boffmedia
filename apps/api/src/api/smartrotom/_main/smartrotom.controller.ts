@@ -1,7 +1,17 @@
 import { SmartrotomService } from './smartrotom.service';
 import { Public } from '@api/_utils/decorators/public.decorator';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
-import { Body, Controller, Get, Post, HttpStatus } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  HttpStatus,
+  UseGuards,
+} from '@nestjs/common';
+import { RolesGuard } from '@api/_utils/guards/roles.guard';
+import { Roles } from '@api/_utils/decorators/roles.decorator';
+import { USER_ROLES } from '@api/_utils/auth/roles.constants';
 import { TeleportPlayerDto } from '../_dto/teleport-player.dto';
 import { WingullFacadeService } from '../wingull/wingull.facade.service';
 import { ArceuSpeakEntity } from './entities/arceuspeak.entity';
@@ -48,8 +58,15 @@ export class SmartrotomController {
     return await this.smartrotomService.getArceuspeak();
   }
 
+  // Only the gobierno admin UI (VozCreator) writes personas. The controller is
+  // class-level @Public(), which would make a route-level @UseGuards(JwtAuthGuard)
+  // a no-op — @RequireSession() is the only thing that restores authentication
+  // here, and RolesGuard needs the `req.user` it populates.
+  @RequireSession()
+  @UseGuards(RolesGuard)
+  @Roles(USER_ROLES.GOBIERNO, USER_ROLES.ROTOM_ADMIN)
   @Post('arceuspeak')
-  @ApiOperation({ summary: 'Create or update Arceuspeak character' })
+  @ApiOperation({ summary: 'Create or update Arceuspeak character (admin)' })
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Character created or updated successfully.',

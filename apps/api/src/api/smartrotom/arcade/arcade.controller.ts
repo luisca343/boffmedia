@@ -127,14 +127,14 @@ export class ArcadeController {
     return this.arcadeFacadeService.getStreakStats(uuid);
   }
 
+  // Self-service: resets the CALLER's own streak. It used to be declared as
+  // `streak/:uuid/reset` and documented "(admin only)" with an @ApiParam, but
+  // the handler always read the session's mcUuid and ignored the param — so the
+  // path and the docs described an admin operation the code never implemented.
+  // Renamed to match what it does; an admin reset would need its own guarded route.
   @RequireSession()
-  @Post('streak/:uuid/reset')
-  @ApiOperation({ summary: 'Reset user streak (admin only)' })
-  @ApiParam({
-    name: 'uuid',
-    description: 'Player UUID',
-    example: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4',
-  })
+  @Post('streak/reset')
+  @ApiOperation({ summary: "Reset the caller's own streak" })
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Streak reset successfully.',

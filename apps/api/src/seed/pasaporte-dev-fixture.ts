@@ -12,8 +12,14 @@ import {
   rotomReplays,
   rotomUserAchievements,
   rotomUserReplays,
+  rotomUsers,
 } from '../_db/schema/SmartRotom';
-import { starBankTransactions } from '../_db/schema/SmartRotomStarBank';
+import {
+  starBankAccounts,
+  starBankTransactions,
+  starBankUserAccounts,
+} from '../_db/schema/SmartRotomStarBank';
+import { TAXI_ACCOUNT } from '@api/smartrotom/starbank/house-accounts';
 
 /**
  * DEV FIXTURE — NOT a seed. Never run this against production.
@@ -40,8 +46,16 @@ const FIXTURE_TAG = 'FIXTURE-RIVAL';
 // IS the trip (see apps/web/.../taxi/_utils/trips.ts), which is what the Bitácora
 // reads as a travel stamp. No trips table exists, so this is the only way to make
 // one real.
-const TRAINER_ACCOUNT = 23;
-const TAXI_SERVICE_ACCOUNT = 0;
+//
+// Both used to be hardcoded ids (23 and 0) that this fixture never created. They
+// happened to exist in the long-lived dev database and in no other, so the
+// fixture died on a foreign key the moment that database was rebuilt — and an id
+// of 0 is one AUTO_INCREMENT never issues. (`TAXI_ACCOUNT`'s own comment records
+// that 0 meant "burned", which is what this fixture was still writing to.)
+//
+// The taxi account is RESOLVED from the house-account registry, never created
+// here: it is a real house account owned by `seed:system`, and inventing a
+// second SERVICE row under a different name would split the fares in two.
 
 const day = (daysAgo: number) => {
   const d = new Date();
@@ -187,6 +201,61 @@ export async function main() {
     logger.error('refusing to run against production');
     process.exit(1);
   }
+
+  /**
+   * Everything this fixture writes hangs off three rows it used to assume were
+   * already there: the trainer, the trainer's StarBank account and the taxi's
+   * service account. On a rebuilt database none of them are, so create each
+   * idempotently and resolve the ids rather than hardcoding them.
+   */
+  const findAccount = async (name: string, type: string) => {
+    const [row] = await db
+      .select({ id: starBankAccounts.id })
+      .from(starBankAccounts)
+      .where(
+        and(
+          eq(starBankAccounts.name, name),
+          eq(starBankAccounts.type, type as never),
+        ),
+      )
+      .limit(1);
+    return row?.id ?? null;
+  };
+
+  await db
+    .insert(rotomUsers)
+    .values({ uuid: TRAINER_UUID, username: TRAINER_NAME })
+    .onDuplicateKeyUpdate({ set: { username: TRAINER_NAME } });
+
+  // The trainer's MAIN account is the fixture's own; `(type, name)` is unique,
+  // which is what makes this safe to re-run.
+  await db
+    .insert(starBankAccounts)
+    .values({ name: TRAINER_NAME, type: 'MAIN', balance: 100_000 })
+    .onDuplicateKeyUpdate({ set: { name: TRAINER_NAME } });
+  const TRAINER_ACCOUNT = await findAccount(TRAINER_NAME, 'MAIN');
+  if (!TRAINER_ACCOUNT)
+    throw new Error("could not resolve the trainer's account");
+
+  const TAXI_SERVICE_ACCOUNT = await findAccount(
+    TAXI_ACCOUNT.name,
+    TAXI_ACCOUNT.type,
+  );
+  if (!TAXI_SERVICE_ACCOUNT) {
+    throw new Error(
+      `the "${TAXI_ACCOUNT.name}" house account is missing — run seed:system first`,
+    );
+  }
+
+  await db
+    .insert(starBankUserAccounts)
+    .values({ uuid: TRAINER_UUID, accountId: TRAINER_ACCOUNT })
+    .onDuplicateKeyUpdate({ set: { accountId: TRAINER_ACCOUNT } });
+
+  logger.info(
+    { trainerAccount: TRAINER_ACCOUNT, taxiAccount: TAXI_SERVICE_ACCOUNT },
+    'trainer, StarBank account and taxi service account ready',
+  );
 
   // --- teardown (also runs first on a normal pass, so the fixture is idempotent) ---
   const tagged = await db

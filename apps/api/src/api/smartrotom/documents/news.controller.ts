@@ -8,7 +8,6 @@ import {
   Put,
   Delete,
   HttpStatus,
-  Query,
   UseGuards,
 } from '@nestjs/common';
 import { Public } from '@api/_utils/decorators/public.decorator';
@@ -17,7 +16,6 @@ import {
   ApiOperation,
   ApiResponse,
   ApiParam,
-  ApiQuery,
   ApiBody,
 } from '@nestjs/swagger';
 import { JwtAuthGuard } from '@api/auth/jwt-auth.guard';
@@ -31,7 +29,6 @@ import {
   CreateNewsDto,
   UpdateNewsDto,
   NewsStatusDto,
-  GetNewsDto,
   CreateNewsCommentDto,
   NewsletterSubscribeDto,
 } from './dto/news.dto';
@@ -56,40 +53,36 @@ export class NewsController {
     private readonly documentsFacadeService: DocumentsFacadeService,
   ) {}
 
-  @Public()
-  @Post('news/filter') // Changed to POST to use request body
-  @ApiOperation({ summary: 'Get filtered news' })
-  @ApiResponse({
-    status: HttpStatus.OK,
-    description: 'News retrieved successfully.',
-    type: NewsResponse,
-  })
-  @ApiBody({ type: GetNewsDto })
-  async getFilteredNews(@Body() getNewsDto: GetNewsDto): Promise<NewsResponse> {
-    if (getNewsDto.published === 'true') {
-      return await this.documentsFacadeService.getPublishedNews();
-    }
-    return await this.documentsFacadeService.getAllNews();
-  }
-
-  // Keep the existing GET endpoint for backward compatibility
+  // PUBLIC: published articles only, always. This used to honour a `published`
+  // query flag and fall through to getAllNews() when it was absent — which is a
+  // genuinely different query that includes unpublished drafts, so the INSECURE
+  // branch was the default and every anonymous reader received draft content.
+  // Editors read drafts through `GET news/all` below, which is role-guarded.
   @Public()
   @Get('news')
-  @ApiOperation({ summary: 'Get all news (legacy)' })
+  @ApiOperation({ summary: 'Get published news' })
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'News retrieved successfully.',
     type: NewsResponse,
   })
-  @ApiQuery({
-    name: 'published',
-    description: 'Filter by published status',
-    required: false,
+  async getNews(): Promise<NewsResponse> {
+    return await this.documentsFacadeService.getPublishedNews();
+  }
+
+  // EDITORIAL: the only route that returns unpublished drafts. Declared before
+  // `news/:newsId` because Nest matches in declaration order and would
+  // otherwise read "all" as a news id.
+  @Get('news/all')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.ROTOM_ADMIN, USER_ROLES.ROTOM_FURRET)
+  @ApiOperation({ summary: 'Get all news including drafts (editorial)' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'All news retrieved successfully.',
+    type: NewsResponse,
   })
-  async getNews(@Query() query: GetNewsDto): Promise<NewsResponse> {
-    if (query.published === 'true') {
-      return await this.documentsFacadeService.getPublishedNews();
-    }
+  async getAllNews(): Promise<NewsResponse> {
     return await this.documentsFacadeService.getAllNews();
   }
 
@@ -151,7 +144,9 @@ export class NewsController {
     if (isNaN(newsIdNum)) {
       throw new BadRequestException('Invalid news ID');
     }
-    return await this.documentsFacadeService.getNewsById(newsIdNum);
+    // Published only — ids are sequential, so the unrestricted lookup made
+    // every draft readable by guessing. Editors read drafts via `news/all`.
+    return await this.documentsFacadeService.getPublishedNewsById(newsIdNum);
   }
 
   @Public()

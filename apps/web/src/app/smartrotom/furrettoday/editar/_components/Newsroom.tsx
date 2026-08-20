@@ -5,7 +5,7 @@ import { useTranslations } from "next-intl";
 
 import {
   useDeleteArticle,
-  useNewsroom,
+  useNewsroomEditor,
   useSaveArticle,
   useUpdateNewsStatus,
 } from "../../_hooks/queries";
@@ -40,7 +40,7 @@ function requireFeatured(featured: number | null, message: string): featured is 
 
 export function Newsroom({ initialId = null }: { initialId?: number | null }) {
   const t = useTranslations("furrettoday");
-  const { articles, isLoading } = useNewsroom();
+  const { articles, isLoading } = useNewsroomEditor();
   const saveArticle = useSaveArticle();
   const deleteArticle = useDeleteArticle();
   const updateStatus = useUpdateNewsStatus();
