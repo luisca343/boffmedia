@@ -80,14 +80,18 @@ export class ResponseInterceptor implements NestInterceptor {
     return { action };
   }
 
+  // Debug rather than info: pino's own completion line already records the
+  // method, URL and status of every request, so at production level this pair
+  // was two entries saying the same thing. The body/params detail is worth
+  // having while developing, which is where the debug level is enabled.
   private logRequest(action: string, body: any, params: any, query: any) {
     // Log with different levels based on content sensitivity
     if (this.hasSensitiveData(body)) {
-      this.logger.log(
+      this.logger.debug(
         `[REQUEST] ${action} - Request received (body hidden for security)`,
       );
     } else {
-      this.logger.log(`[REQUEST] ${action}`, {
+      this.logger.debug(`[REQUEST] ${action}`, {
         body: body || 'empty',
         params: params || 'none',
         query: query || 'none',

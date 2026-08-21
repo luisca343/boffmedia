@@ -1080,7 +1080,9 @@ export class BoffMediaUsersManagementService {
   private validateUserData(userData: CreateUserDto): UserValidationResult {
     const errors: string[] = [];
 
-    this.logger.log('Validating user data:', userData);
+    this.logger.log(
+      `Validating user data for ${userData.username ?? '<no username>'}`,
+    );
 
     if (!userData.email || userData.email.trim() === '') {
       errors.push('Email is required');

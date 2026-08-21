@@ -87,7 +87,7 @@ export class BoffMediaUsersController {
   @ApiResponse({ status: 409, description: 'User already exists' })
   @ApiBody({ type: CreateUserDto })
   async create(@Body() createUserDto: CreateUserDto) {
-    this.logger.log('Creating user with data:', createUserDto);
+    this.logger.log(`Creating user: ${createUserDto.username}`);
     // Strong-password policy on credential sign-up only. Kept here (not on
     // CreateUserDto) because that DTO is reused by /auth/login, and not in the
     // shared createUser() because OAuth/Minecraft accounts get an auto-generated
@@ -111,7 +111,15 @@ export class BoffMediaUsersController {
 
       return user;
     } catch (error: any) {
-      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+      // Typed errors (409 already-exists, 400 validation) are meant for the
+      // client. Anything else is an infra failure whose message carries the
+      // failed SQL and its bound params - log it, return nothing about it.
+      if (error instanceof HttpException) throw error;
+      this.logger.error('Failed to create BoffMedia user:', error);
+      throw new HttpException(
+        'User creation failed',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
