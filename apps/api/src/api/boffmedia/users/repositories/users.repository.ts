@@ -18,6 +18,7 @@ import {
 } from './interfaces/users.repository.interface';
 import { CreateUserDto } from '../dto/create-user.dto';
 import { Logger } from 'nestjs-pino';
+import { DEFAULT_PROFILE_PICTURE } from '../users.constants';
 
 @Injectable()
 export class BoffMediaUsersRepository implements IBoffMediaUsersRepository {
@@ -605,7 +606,7 @@ export class BoffMediaUsersRepository implements IBoffMediaUsersRepository {
             discordId: null,
             twitchId: null,
             steamId: null,
-            profilePicture: 'https://cdn.boffmedia.es/default-profile.png',
+            profilePicture: DEFAULT_PROFILE_PICTURE,
             coverImage: null,
             bio: null,
           })

@@ -16,6 +16,7 @@ import {
 import { CreateUserDto } from '../dto/create-user.dto';
 import { UpdateUserDto } from '../dto/update-user.dto';
 import { Logger } from 'nestjs-pino';
+import { DEFAULT_PROFILE_PICTURE } from '../users.constants';
 
 export interface UserCreationResult {
   user: BoffMediaUserSafe;
@@ -148,9 +149,7 @@ export class BoffMediaUsersManagementService {
       const userDataWithHashedPassword = {
         ...userData,
         password: hashedPassword,
-        profilePicture:
-          userData.profilePicture ||
-          'https://cdn.boffmedia.es/default-profile.png',
+        profilePicture: userData.profilePicture || DEFAULT_PROFILE_PICTURE,
       };
 
       this.logger.log('Creating new BoffMedia user:', {
@@ -777,8 +776,7 @@ export class BoffMediaUsersManagementService {
             password: this.passwordService.generateOAuthPassword(), // Use PasswordService
             googleId: googleUser.googleId,
             profilePicture:
-              googleUser.profilePicture ||
-              'https://cdn.boffmedia.es/default-profile.png',
+              googleUser.profilePicture || DEFAULT_PROFILE_PICTURE,
           };
 
           existingUser = await this.createUser(userData);
@@ -849,8 +847,7 @@ export class BoffMediaUsersManagementService {
             password: this.passwordService.generateOAuthPassword(),
             discordId: discordUser.discordId,
             profilePicture:
-              discordUser.profilePicture ||
-              'https://cdn.boffmedia.es/default-profile.png',
+              discordUser.profilePicture || DEFAULT_PROFILE_PICTURE,
           };
 
           existingUser = await this.createUser(userData);
@@ -922,8 +919,7 @@ export class BoffMediaUsersManagementService {
             password: this.passwordService.generateOAuthPassword(),
             twitchId: twitchUser.twitchId,
             profilePicture:
-              twitchUser.profilePicture ||
-              'https://cdn.boffmedia.es/default-profile.png',
+              twitchUser.profilePicture || DEFAULT_PROFILE_PICTURE,
           };
 
           existingUser = await this.createUser(userData);

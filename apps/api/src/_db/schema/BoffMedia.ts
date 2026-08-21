@@ -27,9 +27,11 @@ export const boffMediaUsers = mysqlTable('boffmedia_users', {
     onDelete: 'set null',
     onUpdate: 'cascade',
   }),
+  // Mirrors DEFAULT_PROFILE_PICTURE in api/boffmedia/users/users.constants.ts —
+  // a SQL default cannot call into application code, so the value is repeated.
   profilePicture: varchar('profile_picture', { length: 255 })
     .notNull()
-    .default('https://cdn.boffmedia.es/default-profile.png'),
+    .default('/boffmedia/img/profile.png'),
   coverImage: varchar('cover_image', { length: 255 }),
   bio: text('bio'),
   googleId: varchar('google_id', { length: 255 }).unique(),

@@ -1,0 +1,1 @@
+ALTER TABLE `boffmedia_users` MODIFY COLUMN `profile_picture` varchar(255) NOT NULL DEFAULT '/boffmedia/img/profile.png';

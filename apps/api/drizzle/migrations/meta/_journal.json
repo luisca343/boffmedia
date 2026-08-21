@@ -15,6 +15,13 @@
       "when": 1787236610800,
       "tag": "0001_safe_wrecker",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1787307448446,
+      "tag": "0002_profile_picture_default",
+      "breakpoints": true
     }
   ]
 }

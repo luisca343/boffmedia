@@ -7,7 +7,7 @@ export class PublicProfileEntity {
   @ApiProperty({ example: 'AshKetchum' })
   name: string;
 
-  @ApiProperty({ nullable: true, example: 'https://cdn.boffmedia.es/u/42.png' })
+  @ApiProperty({ nullable: true, example: '/uploads/profiles/42.png' })
   avatarUrl: string | null;
 
   @ApiProperty({ nullable: true })
