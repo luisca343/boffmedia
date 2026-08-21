@@ -10,7 +10,7 @@ import { mkdir, rename, rm, stat } from 'fs/promises';
 import { basename, dirname, join } from 'path';
 import type { Readable } from 'stream';
 import { pipeline } from 'stream/promises';
-import { laboonPath } from '@/config/laboon';
+import { laboonPath } from '@/config/paths';
 import { DesktopRelease } from '@/_db/schema/DesktopReleases';
 import { DesktopReleasesRepository } from './repositories/desktop-releases.repository';
 import {

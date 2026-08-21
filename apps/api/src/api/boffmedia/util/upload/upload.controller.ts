@@ -12,6 +12,7 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { uploadsPath } from '@/config/paths';
 import {
   ApiTags,
   ApiOperation,
@@ -23,7 +24,7 @@ import {
 } from '@nestjs/swagger';
 import { JwtAuthGuard } from '@api/auth/jwt-auth.guard';
 import { diskStorage } from 'multer';
-import { extname, join } from 'path';
+import { extname } from 'path';
 import { mkdir } from 'fs/promises';
 
 import { UploadFacadeService } from './upload.facade.service';
@@ -78,8 +79,8 @@ export class UploadController {
               ? req.body.path[0]
               : req.body.path;
             const uploadPath = pathValue
-              ? join(process.cwd(), 'public', 'uploads', pathValue)
-              : join(process.cwd(), 'public', 'uploads');
+              ? uploadsPath(pathValue)
+              : uploadsPath();
 
             await mkdir(uploadPath, { recursive: true });
             callback(null, uploadPath);
@@ -166,8 +167,8 @@ export class UploadController {
               ? req.body.path[0]
               : req.body.path;
             const uploadPath = pathValue
-              ? join(process.cwd(), 'public', 'uploads', pathValue)
-              : join(process.cwd(), 'public', 'uploads');
+              ? uploadsPath(pathValue)
+              : uploadsPath();
 
             await mkdir(uploadPath, { recursive: true });
             callback(null, uploadPath);

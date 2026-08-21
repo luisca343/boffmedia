@@ -10,8 +10,19 @@ export const env = z
     SOCKET_PORT: z.coerce.number().default(34304),
     // Public base URL of the web app — used to build reset/verify links.
     WEB_URL: z.string().default('http://localhost:3000'),
-    // Directory served as static files.
+    // Public base URL of the asset tree (no trailing slash) — the origin that
+    // `config/asset-url.ts` prefixes onto stored, relative asset paths. Unset =
+    // the URLs come out root-relative, which is right whenever the API and the
+    // assets share an origin.
     PUBLIC_DIR: z.string().optional(),
+    // Filesystem root of the writable uploads store. Unset = <cwd>/var/uploads.
+    // Keep it on local disk: these files are read on ordinary page loads, and
+    // the laboon mount is network storage.
+    UPLOADS_ROOT: z.string().optional(),
+    // Filesystem root of the read-only asset tree. Unset = <cwd>/public, which
+    // is the bind-mount path in both dev and the container; set it only when the
+    // tree lives somewhere else on disk.
+    PUBLIC_ROOT: z.string().optional(),
 
     // Database (MySQL)
     DB_HOST: z.string(),
@@ -100,7 +111,7 @@ export const env = z
     // CURRENTLY INERT, like DESKTOP_RELEASE_DIR below: both stores resolve
     // through `laboonPath()` (cwd + /laboon) so uploads work with zero env
     // setup. Kept in the schema because deploy envs already set them; setting
-    // one changes nothing until `config/laboon.ts`'s TEMP note is unwound.
+    // one changes nothing until `config/paths.ts`'s TEMP note is unwound.
     PACK_BLOB_DIR: z.string().optional(),
     // Boffmedia App auto-update artifacts (Tauri v2 updater). Inert for the same
     // reason as PACK_BLOB_DIR and, like it, deliberately OUTSIDE PUBLIC_DIR:

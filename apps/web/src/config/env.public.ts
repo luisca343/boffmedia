@@ -8,6 +8,10 @@ export const env = z
     NODE_ENV: z.string().default('development'),
     NEXT_PUBLIC_URL: z.string().default(''),
     NEXT_PUBLIC_API: z.string(),
+    // Origin serving the static asset tree, without a trailing slash.
+    // Empty = the assets share this app's origin, which is what `staticAsset`
+    // assumes by default; set it to move every asset URL to another host.
+    NEXT_PUBLIC_STATIC_URL: z.string().default(''),
     NEXT_PUBLIC_SOCKET_URL: z.string(),
     NEXT_PUBLIC_ROTOM_API_URL: z.string().default(''),
     NEXT_PUBLIC_MC_WORLD: z.string(),
@@ -19,6 +23,7 @@ export const env = z
     NODE_ENV: process.env.NODE_ENV,
     NEXT_PUBLIC_URL: process.env.NEXT_PUBLIC_URL,
     NEXT_PUBLIC_API: process.env.NEXT_PUBLIC_API,
+    NEXT_PUBLIC_STATIC_URL: process.env.NEXT_PUBLIC_STATIC_URL,
     NEXT_PUBLIC_SOCKET_URL: process.env.NEXT_PUBLIC_SOCKET_URL,
     NEXT_PUBLIC_ROTOM_API_URL: process.env.NEXT_PUBLIC_ROTOM_API_URL,
     NEXT_PUBLIC_MC_WORLD: process.env.NEXT_PUBLIC_MC_WORLD,

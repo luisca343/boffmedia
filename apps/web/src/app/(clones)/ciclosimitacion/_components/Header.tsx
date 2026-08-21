@@ -1,6 +1,7 @@
 "use client"
 import { useState } from 'react'
 import { Menu, MoreVertical, Scale, Cog, LogOut, Accessibility, Inbox } from 'lucide-react'
+import { ASSET, staticAsset } from '@/lib/assets'
 
 export function Header() {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false)
@@ -28,7 +29,7 @@ export function Header() {
         <Cog className="text-[#009ee0]" />
         <Inbox className="text-[#009ee0]" />
         <div className="flex items-center">
-          <img src="/smartrotom/img/apps/chatapp/default.webp" alt="User" className="w-8 h-8 rounded-full mr-2" />
+          <img src={staticAsset(ASSET.smartrotom.img, 'apps/chatapp/default.webp')} alt="User" className="w-8 h-8 rounded-full mr-2" />
           <span>Usuario Ejemplo</span>
         </div>
         <LogOut className="text-[#009ee0]" />

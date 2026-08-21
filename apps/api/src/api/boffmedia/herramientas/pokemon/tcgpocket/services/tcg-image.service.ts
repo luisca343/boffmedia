@@ -3,6 +3,7 @@ import * as path from 'path';
 import axios from 'axios';
 import { Injectable } from '@nestjs/common';
 import { Logger } from 'nestjs-pino';
+import { publicPath } from '@/config/paths';
 
 @Injectable()
 export class TcgImageService {
@@ -10,15 +11,7 @@ export class TcgImageService {
 
   async downloadSetImages(sets: any[]): Promise<void> {
     for (const set of sets) {
-      const setImgDir = path.join(
-        process.cwd(),
-        'public',
-        'img',
-        'games',
-        'tcg',
-        'sets',
-        set.id,
-      );
+      const setImgDir = publicPath('boffmedia', 'tools', 'tcg', 'sets', set.id);
       await fs.mkdir(setImgDir, { recursive: true });
 
       // Download logo
@@ -75,11 +68,9 @@ export class TcgImageService {
       this.logger.log(
         `[TCG] Downloading ${locale.toUpperCase()} image for card ${cardId}...`,
       );
-      const cardImgDir = path.join(
-        process.cwd(),
-        'public',
-        'img',
-        'games',
+      const cardImgDir = publicPath(
+        'boffmedia',
+        'tools',
         'tcg',
         'cards',
         setId,

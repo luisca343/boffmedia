@@ -1,5 +1,6 @@
 import Image from "next/image"
 import { cn } from "@/lib/utils"
+import { ASSET, staticAsset } from '@/lib/assets'
 
 const SIZE = { sm: 16, md: 24, lg: 32, xl: 48 } as const
 
@@ -20,7 +21,7 @@ export default function VoltorbImage({ size = "md", glow = false, className }: V
   const px = SIZE[size]
   return (
     <Image
-      src="/smartrotom/img/apps/arcade/voltorb.png"
+      src={staticAsset(ASSET.smartrotom.img, 'apps/arcade/voltorb.png')}
       alt="Voltorb"
       width={px}
       height={px}

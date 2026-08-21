@@ -1,11 +1,21 @@
+import { ASSET, joinAssetPath } from '@boffmedia/asset-paths';
+
 import { env } from '@/config/env.public';
 
+export { ASSET };
+
 /**
- * Build a URL for a static asset served by the API origin (the frozen
- * prefixes: /smartrotom/img, /smartrotom/packs, /uploads, /jcef, /blog…).
- * The single place allowed to join NEXT_PUBLIC_API with an asset path —
- * never hand-build `${env.NEXT_PUBLIC_API}/...` asset strings elsewhere.
+ * Build a URL for a static asset, from one of the {@link ASSET} prefixes plus
+ * any further path segments. The single place allowed to turn an asset prefix
+ * into a URL — never hand-build asset path strings elsewhere, or the origin
+ * below cannot move without touching every call site.
+ *
+ * The result is root-relative while NEXT_PUBLIC_STATIC_URL is unset: Next serves
+ * the asset tree itself, and `/uploads` reaches the API through the rewrite in
+ * next.config.mjs. Pointing that variable at a dedicated asset host is the only
+ * change needed to serve every asset from somewhere else.
  */
-export function apiAsset(path: string): string {
-  return `${env.NEXT_PUBLIC_API}${path.startsWith('/') ? path : `/${path}`}`;
+export function staticAsset(prefix: string, ...segments: string[]): string {
+  const base = (env.NEXT_PUBLIC_STATIC_URL ?? '').replace(/\/+$/, '');
+  return `${base}${joinAssetPath(prefix, ...segments)}`;
 }

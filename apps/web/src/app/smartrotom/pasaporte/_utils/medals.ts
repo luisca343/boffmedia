@@ -1,11 +1,11 @@
 import type { useTranslations } from "next-intl"
 import type { UserAchievement } from "@boffmedia/shared"
 import type { ExtendedPokemonW } from "@/types/dto/pc-pokemon.dto"
-import { apiAsset } from "@/lib/assets"
+import { ASSET, staticAsset } from "@/lib/assets"
 
 /** The real badge artwork, served by the API next to the game's own icons. */
 export function badgeArt(icon: string | null | undefined): string | undefined {
-  return icon ? apiAsset(`/smartrotom/img/logros/${icon}.webp`) : undefined
+  return icon ? staticAsset(ASSET.smartrotom.img, 'logros', `${icon}.webp`) : undefined
 }
 
 /** Categories arrive accented and mixed-case; compare on a folded form, never on the raw string. */

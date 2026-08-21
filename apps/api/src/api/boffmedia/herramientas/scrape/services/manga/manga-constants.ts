@@ -1,3 +1,3 @@
-import * as path from 'path';
+import { laboonPath } from '@/config/paths';
 
-export const MANGA_ROOT = path.join(process.cwd(), 'laboon/manga');
+export const MANGA_ROOT = laboonPath('manga');

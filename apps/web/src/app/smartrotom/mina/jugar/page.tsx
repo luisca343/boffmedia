@@ -1,4 +1,4 @@
- 
+
 "use client"
 
 import { useEffect, useState } from "react"
@@ -14,6 +14,7 @@ import { useGuardedSubmit } from "@/components/smartrotom/behavior/useGuardedSub
 import { RewardEntry } from "@/types/mina"
 import { MinaService } from "@/services/api/smartrotom/minaService"
 import { useTranslations } from "next-intl"
+import { ASSET, staticAsset } from '@/lib/assets'
 
 enum Tool {
     PICKAXE = 1,
@@ -178,7 +179,7 @@ export default function Jugar(){
     }
 
     return (
-        <div className="bg-cover bg-repeat  overflow-hidden" style={{backgroundImage: 'url(/smartrotom/img/apps/mina/gui/fondo.png)'}}>
+        <div className="bg-cover bg-repeat  overflow-hidden" style={{backgroundImage: `url(${staticAsset(ASSET.smartrotom.img, 'apps/mina/gui/fondo.png')})`}}>
             <AlertDialog open={open}>
                 <AlertDialogContent className='bg-layer-1 border-edge-strong'>
                     {obtainedRewards.length === 0 ?  <></> : <div className="w-full text-ink text-center text-2xl">{t("play.rewardsObtained")}</div>}
@@ -186,10 +187,10 @@ export default function Jugar(){
                     {obtainedRewards.map((reward, i) => {
                         return (
                             <div key={i} className="flex flex-col flex-wrap w-ful justify-center items-center m-2">
-                                <img src={`/smartrotom/img/apps/mina/recompensas/${reward.reward.itemId.split(':')[1]}.png`} alt="" 
+                                <img src={staticAsset(ASSET.smartrotom.img, 'apps/mina/recompensas', `${reward.reward.itemId.split(':')[1]}.png`)} alt=""
                                     className="w-12 h-12"
                                     style={{imageRendering: "pixelated"}}
-                                    
+
                                     />
                                 <div className="text-ink">{reward.reward.name}</div>
                             </div>
@@ -210,13 +211,13 @@ export default function Jugar(){
         <motion.div className="flex w-full h-full"
         
         >
-            <audio id='pick' src='/smartrotom/audio/apps/mina/pick.ogg'></audio>
-            <audio id='hammer' src='/smartrotom/audio/apps/mina/hammer.mp3'></audio>
-            <audio id='item' src='/smartrotom/audio/apps/mina/item.mp3'></audio>
+            <audio id='pick' src={staticAsset(ASSET.smartrotom.audio, 'apps/mina/pick.ogg')}></audio>
+            <audio id='hammer' src={staticAsset(ASSET.smartrotom.audio, 'apps/mina/hammer.mp3')}></audio>
+            <audio id='item' src={staticAsset(ASSET.smartrotom.audio, 'apps/mina/item.mp3')}></audio>
 
             <div className="h-full flex-1 flex flex-col ">
                 <div className="bg-red-400 h-[10vh]" >
-                    <img className="h-full w-full m-auto" src={`/smartrotom/img/apps/mina/barra/barra${damage}.png`} alt="" />
+                    <img className="h-full w-full m-auto" src={staticAsset(ASSET.smartrotom.img, 'apps/mina/barra', `barra${damage}.png`)} alt="" />
                 </div>
                 <div className="relative w-full h-full flex-col overflow-auto">
                 <div id="rewards" className="absolute top-0 left-0 w-full h-full z-0 pointer-events-none">
@@ -224,16 +225,16 @@ export default function Jugar(){
                         return (
                             <motion.div key={i} className="absolute z-0"
                             animate={shakeAnim} style={{
-                                top: `calc(${(reward.y - 1) * 100 / rowNum}% + ${100 / rowNum}%)`, 
-                                left: `calc(${(reward.x -1) * 100 / colNum}% + ${100 / colNum}%)`, 
-                                width: `${reward.reward.width * 100 / colNum}%`, 
+                                top: `calc(${(reward.y - 1) * 100 / rowNum}% + ${100 / rowNum}%)`,
+                                left: `calc(${(reward.x -1) * 100 / colNum}% + ${100 / colNum}%)`,
+                                width: `${reward.reward.width * 100 / colNum}%`,
                                 height: `${reward.reward.height * 100 / rowNum}%`
                             }}>
-                                <img src={`/smartrotom/img/apps/mina/recompensas/${reward.reward.itemId.split(':')[1]}.png`} 
-                                alt="" 
+                                <img src={staticAsset(ASSET.smartrotom.img, 'apps/mina/recompensas', `${reward.reward.itemId.split(':')[1]}.png`)}
+                                alt=""
                                 className="w-full h-full z-0"
                                 style={{imageRendering: "pixelated"}}
-                                
+
                                 />
                             </motion.div>
                         )
@@ -253,7 +254,7 @@ export default function Jugar(){
                                             shake()
                                         }}
                                         >
-                                        <img className="hover:brightness-110 h-full w-full z-10 select-none no-drag " src={`/smartrotom/img/apps/mina/gui/muro${cell.estado}.png`} alt="" />
+                                        <img className="hover:brightness-110 h-full w-full z-10 select-none no-drag " src={staticAsset(ASSET.smartrotom.img, 'apps/mina/gui', `muro${cell.estado}.png`)} alt="" />
                                         </motion.div>
                                     )
                                 })}
@@ -263,9 +264,9 @@ export default function Jugar(){
                 </div>
                 </div >
             </div>
-            <div className="bg-secondary-hover h-full w-[15%] flex flex-col items-center justify-end pt-72  bg-no-repeat bg-cover" style={{backgroundImage:`url(/smartrotom/img/apps/mina/gui/barraHerramientas.png)`}}>
-                <img onClick={() => setTool(Tool.PICKAXE)} className="m-auto w-full  p-2lg:p-6" src={`/smartrotom/img/apps/mina/gui/btn_azul${tool === Tool.PICKAXE ? '1': '0'}.png`} alt="" />
-                <img onClick={() => setTool(Tool.HAMMER)} className="m-auto  w-full p-2 lg:p-6" src={`/smartrotom/img/apps/mina/gui/btn_rojo${tool === Tool.HAMMER ? '1': '0'}.png`} alt="" />
+            <div className="bg-secondary-hover h-full w-[15%] flex flex-col items-center justify-end pt-72  bg-no-repeat bg-cover" style={{backgroundImage:`url(${staticAsset(ASSET.smartrotom.img, 'apps/mina/gui/barraHerramientas.png')})`}}>
+                <img onClick={() => setTool(Tool.PICKAXE)} className="m-auto w-full  p-2lg:p-6" src={staticAsset(ASSET.smartrotom.img, 'apps/mina/gui', `btn_azul${tool === Tool.PICKAXE ? '1': '0'}.png`)} alt="" />
+                <img onClick={() => setTool(Tool.HAMMER)} className="m-auto  w-full p-2 lg:p-6" src={staticAsset(ASSET.smartrotom.img, 'apps/mina/gui', `btn_rojo${tool === Tool.HAMMER ? '1': '0'}.png`)} alt="" />
             </div>
         </motion.div>
         </div>

@@ -1,7 +1,8 @@
+/* Asset prefixes mirror @boffmedia/asset-paths and must stay in step with it. */
 @font-face {
     font-family: 'Vinque';
-    src: url('/assets/fonts/vinque/vinque-rg.woff2') format('woff2'),
-         url('/assets/fonts/vinque/vinque-rg.woff') format('woff');
+    src: url('/boffmedia/fonts/vinque/vinque-rg.woff2') format('woff2'),
+         url('/boffmedia/fonts/vinque/vinque-rg.woff') format('woff');
   }
   
   .page {

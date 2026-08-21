@@ -21,7 +21,6 @@ import { InvitesModule } from './api/wingull/invites/invites.module';
 import { BoffMediaUsersModule } from '@api/boffmedia/users/users.module';
 import { PokemonModule } from '@api/smartrotom/pokemon/pokemon.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
-import { join } from 'path';
 import { StarbankModule } from '@api/smartrotom/starbank/starbank.module';
 import { NetfluisModule } from '@api/smartrotom/netfluis/netfluis.module';
 import { MinecraftMiddleware } from './minecraft.middleware';
@@ -74,6 +73,7 @@ import { TaxiModule } from '@api/smartrotom/taxi/taxi.module';
 import { PacksModule } from './api/packs/packs.module';
 import { DesktopUpdatesModule } from './api/desktop-updates/desktop-updates.module';
 import { RandomizerModule } from '@api/randomizer/randomizer.module';
+import { publicPath } from '@/config/paths';
 
 @Module({
   imports: [
@@ -89,7 +89,7 @@ import { RandomizerModule } from '@api/randomizer/randomizer.module';
     ConfigModule.forRoot({ load: [() => ({ env })] }),
     // Kept because PUBLIC_DIR-built URLs (sharex) may point at /public/*.
     ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', 'public'),
+      rootPath: publicPath(),
       serveRoot: '/public',
       serveStaticOptions: { index: false, maxAge: '1h' },
     }),

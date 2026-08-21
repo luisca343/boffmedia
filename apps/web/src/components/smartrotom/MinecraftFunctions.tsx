@@ -1,5 +1,6 @@
 import { takeScreenshot } from "@/services/mcef/mcefApi";
 import { useRouter } from "next/navigation";
+import { ASSET, staticAsset } from '@/lib/assets';
 import { useCameraGalleryStore } from "@/stores/cameraGalleryStore";
 
 declare global {
@@ -55,8 +56,8 @@ export function MinecraftFunctions(){
     
 
     return <>
-        <audio id='dexOpen' src='/smartrotom/audio/apps/pokedex/openDex.mp3'></audio>
-        <audio id='cameraShutter' src='/smartrotom/audio/apps/camera/camera.mp3'></audio>
+        <audio id='dexOpen' src={staticAsset(ASSET.smartrotom.audio, 'apps/pokedex/openDex.mp3')}></audio>
+        <audio id='cameraShutter' src={staticAsset(ASSET.smartrotom.audio, 'apps/camera/camera.mp3')}></audio>
     </>
 }
 

@@ -2,9 +2,9 @@ import { Injectable } from '@nestjs/common';
 import { BaseDataService } from './base-data.service';
 import { PokemonDataService } from './pokemon-data.service';
 import { SpawnInfos } from '../../interfaces/pokemon.interface';
-import * as path from 'path';
 import { SpawnInfo } from '../../entities/pokemon-spawn.entity';
 import { Logger } from 'nestjs-pino';
+import { publicPath } from '@/config/paths';
 
 @Injectable()
 export class SpawnDataService extends BaseDataService {
@@ -39,14 +39,12 @@ export class SpawnDataService extends BaseDataService {
     ];
 
     for (const folder of folders) {
-      const defaultDir = path.join(
-        process.cwd(),
-        'public/smartrotom/packs/default_datapack/data/pixelmon/spawning',
+      const defaultDir = publicPath(
+        'smartrotom/packs/default_datapack/data/pixelmon/spawning',
         folder,
       );
-      const publicDir = path.join(
-        process.cwd(),
-        'public/smartrotom/packs/datapack/data/pixelmon/spawning',
+      const publicDir = publicPath(
+        'smartrotom/packs/datapack/data/pixelmon/spawning',
         folder,
       );
 

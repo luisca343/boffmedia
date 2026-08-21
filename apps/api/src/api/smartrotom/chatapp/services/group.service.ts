@@ -16,6 +16,7 @@ import {
   PresenceStatus,
 } from '@api/_utils/sockets/presence.service';
 import { ApiErrorCode } from '@/common/errors/error-codes.generated';
+import { ASSET } from '@boffmedia/asset-paths';
 
 @Injectable()
 export class GroupService {
@@ -179,7 +180,7 @@ export class GroupService {
     if (chat.type === 0 || chat.type === 3) {
       // Public or group chat - use configured name and image
       chatName = chat.name;
-      chatImage = `/smartrotom/img/apps/chatapp/${chatImage}`;
+      chatImage = `${ASSET.smartrotom.img}/apps/chatapp/${chatImage}`;
     } else if (chat.type === 1) {
       // Single user chat (saved messages)
       chatName = 'Mensajes guardados';

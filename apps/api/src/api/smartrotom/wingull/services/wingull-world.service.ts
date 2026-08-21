@@ -8,6 +8,7 @@ import { Region } from '../entities/region.entity';
 import { Weather } from '../entities/weather.entity';
 import { SuccessResponse } from '@api/_utils/entities/common-response.entity';
 import { Logger } from 'nestjs-pino';
+import { publicPath } from '@/config/paths';
 
 @Injectable()
 export class WingullWorldService {
@@ -68,10 +69,7 @@ export class WingullWorldService {
 
   async getAllTowns(): Promise<string[]> {
     try {
-      const pueblosPath = path.join(
-        process.cwd(),
-        'public/smartrotom/data/pueblos',
-      );
+      const pueblosPath = publicPath('smartrotom/data/pueblos');
 
       if (!fs.existsSync(pueblosPath)) {
         throw new Error('Towns directory does not exist.');
@@ -103,11 +101,7 @@ export class WingullWorldService {
         );
       }
 
-      const townPath = path.join(
-        process.cwd(),
-        'public/smartrotom/data/pueblos',
-        townName,
-      );
+      const townPath = publicPath('smartrotom/data/pueblos', townName);
       const textosPath = path.join(townPath, 'config.json');
 
       if (!fs.existsSync(townPath)) {

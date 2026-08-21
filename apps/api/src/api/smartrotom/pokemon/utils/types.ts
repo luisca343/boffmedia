@@ -1,6 +1,6 @@
 import * as fs from 'fs';
-import * as path from 'path';
 import pino from 'pino';
+import { publicPath } from '@/config/paths';
 
 const logger = pino({ name: 'util' });
 
@@ -179,11 +179,7 @@ const offTypeFrequency = {
   dragon: 20,
 } as { [key: string]: number };
 
-const defaultDirDef = path.join(
-  __dirname,
-  '../../../../',
-  'public/smartrotom/packs/wolfeyRanking.json',
-);
+const defaultDirDef = publicPath('smartrotom/packs/wolfeyRanking.json');
 export const wolfeyTypeRanking: {
   ranking: number;
   type1: string;

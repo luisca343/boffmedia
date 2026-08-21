@@ -24,7 +24,7 @@ export function MewCodex() {
     return (
       <div className="p-10" style={MEW_SENAL_VARS}>
         <Banner tone="error" title={t("error.title")}>
-          {t("error.checkPath", { path: "/data/mewgenics/", error: String(error.message || error) })}
+          {t("error.checkPath", { path: "/boffmedia/tools/mewgenics/", error: String(error.message || error) })}
         </Banner>
       </div>
     )

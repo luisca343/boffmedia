@@ -4,6 +4,7 @@ import Image from "next/image"
 import { useState } from "react"
 import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
+import { ASSET, staticAsset } from '@/lib/assets'
 import { Icon } from "../../_components/ui"
 import type { ArTone } from "../../_components/ui"
 
@@ -55,7 +56,7 @@ export function BoxArt({ boxId, size, tone, className }: BoxArtProps) {
       alt=""
       width={size}
       height={size}
-      src={`/smartrotom/img/apps/arcade/lootbox/${file}.png`}
+      src={staticAsset(ASSET.smartrotom.img, 'apps/arcade/lootbox', `${file}.png`)}
       onError={() => setBroken(true)}
       style={{ imageRendering: "pixelated" }}
       className={className}

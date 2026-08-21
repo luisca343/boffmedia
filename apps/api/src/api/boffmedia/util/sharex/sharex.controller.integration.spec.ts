@@ -14,7 +14,7 @@ jest.mock('@/config/env', () => ({
 }));
 
 // The handler writes to disk on the success path. Stub fs so the suite never
-// touches `public/`.
+// touches the real store.
 jest.mock('fs', () => ({
   existsSync: jest.fn().mockReturnValue(false),
   mkdirSync: jest.fn(),
@@ -23,6 +23,8 @@ jest.mock('fs', () => ({
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const request = require('supertest') as typeof import('supertest');
+import { ASSET } from '@boffmedia/asset-paths';
+import { uploadsPath } from '@/config/paths';
 import { SharexController } from './sharex.controller';
 import { SharexService } from './sharex.service';
 import { SharexTokensService } from './sharex-tokens.service';
@@ -128,6 +130,25 @@ describe('SharexController — integration (ValidationPipe + GlobalExceptionFilt
         TOKEN_ROW.id,
       );
       expect(res.body.file).toBeDefined();
+    });
+
+    it('writes into the uploads store, never the read-only asset tree', async () => {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const fs = require('fs') as { writeFileSync: jest.Mock };
+
+      await upload();
+
+      const calls = fs.writeFileSync.mock.calls;
+      const [writtenPath] = calls[calls.length - 1] as [string];
+      expect(writtenPath).toContain(uploadsPath('sharex'));
+    });
+
+    it('returns a URL under the uploads prefix', async () => {
+      const res = await upload();
+
+      expect(res.body.file.url).toBe(
+        `${mockEnv.PUBLIC_DIR}${ASSET.uploads.sharex}/${res.body.file.name}`,
+      );
     });
 
     it('stamps the token as used on success', async () => {

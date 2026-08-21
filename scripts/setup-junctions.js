@@ -1,7 +1,14 @@
 #!/usr/bin/env node
 /**
- * Creates directory junctions (Windows) or symlinks (Unix) so that
- * apps/api/public and apps/web/public both point to the shared root public/ folder.
+ * Creates directory junctions (Windows) or symlinks (Unix) so the apps reach the
+ * three shared storage roots at the same relative paths they use in production:
+ *
+ *   public/      read-only asset tree      -> apps/api/public, apps/web/public
+ *   var/uploads/ hot user content          -> apps/api/var/uploads
+ *   laboon/      large cold blobs          -> apps/api/laboon
+ *
+ * The three are separate because their storage differs: uploads are read on
+ * ordinary page loads and belong on local disk, while laboon is network storage.
  */
 
 const fs = require('fs');
@@ -65,4 +72,29 @@ if (fs.existsSync(apiLaboon)) {
 } else {
   fs.symlinkSync(laboon, apiLaboon, linkType);
   console.log(`✔  Created ${isWindows ? 'junction' : 'symlink'}: ${apiLaboon} → ${laboon}`);
+}
+
+// User uploads are their own root: they are written at runtime (so they cannot
+// live in the read-only asset tree) but are also read on ordinary page loads
+// (so they must not live on laboon's network storage).
+const uploads = path.join(root, 'var', 'uploads');
+for (const sub of ['sharex', 'profiles', 'chat', 'mhwilds', 'starbank']) {
+  fs.mkdirSync(path.join(uploads, sub), { recursive: true });
+}
+
+// Only `uploads` is shared. `apps/api/var/cache` stays per-checkout, matching
+// the container layout where var/ holds both and only uploads is a volume.
+fs.mkdirSync(path.join(root, 'apps', 'api', 'var'), { recursive: true });
+
+const apiUploads = path.join(root, 'apps', 'api', 'var', 'uploads');
+if (fs.existsSync(apiUploads)) {
+  const stat = fs.lstatSync(apiUploads);
+  if (stat.isSymbolicLink() || (isWindows && stat.isDirectory())) {
+    console.log(`✔  Already linked: ${apiUploads}`);
+  } else {
+    console.warn(`⚠  Not a link, leaving untouched: ${apiUploads}`);
+  }
+} else {
+  fs.symlinkSync(uploads, apiUploads, linkType);
+  console.log(`✔  Created ${isWindows ? 'junction' : 'symlink'}: ${apiUploads} → ${uploads}`);
 }

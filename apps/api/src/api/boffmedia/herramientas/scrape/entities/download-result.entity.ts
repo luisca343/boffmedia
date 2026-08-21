@@ -11,7 +11,7 @@ export class DownloadResult {
 
   @ApiProperty({
     example:
-      'public/juegos/myrient/3DS/Life with Horses 3D + My Baby Pet Hotel 3D (Europe).zip',
+      'laboon/juegos/myrient/3DS/Life with Horses 3D + My Baby Pet Hotel 3D (Europe).zip',
   })
   path: string;
 

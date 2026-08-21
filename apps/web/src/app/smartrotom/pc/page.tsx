@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react"
 import { useTranslations } from "next-intl"
 import { userMessageFrom } from "@/services/boffAPI"
+import { ASSET, staticAsset } from '@/lib/assets'
 import PlayOnMountAudio from "@/components/shared/PlayOnMountAudio"
 import { BootScreen } from "./_components/BootScreen"
 import { BoxOverview } from "./_components/BoxOverview"
@@ -159,7 +160,7 @@ export default function PCPage() {
     <DragProvider monAt={monAt} onDropSingle={onDropSingle} onDropMany={onDropMany} validate={canMove}>
       {/* The directory is `apps/PC`, capitalised. The legacy page asked for `apps/pc`
           and had been silently 404ing on any case-sensitive filesystem. */}
-      {sound && <PlayOnMountAudio src="/smartrotom/audio/apps/PC/TURN_ON.wav" volume={0.4} />}
+      {sound && <PlayOnMountAudio src={staticAsset(ASSET.smartrotom.audio, 'apps/PC/TURN_ON.wav')} volume={0.4} />}
 
       <div className="flex h-full min-h-0 flex-col gap-3 p-3.5">
         <Topbar

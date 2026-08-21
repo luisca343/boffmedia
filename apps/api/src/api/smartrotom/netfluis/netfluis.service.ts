@@ -1,12 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import * as path from 'path';
 import { promises as fsPromises } from 'fs';
+import { publicPath } from '@/config/paths';
 
 // Reads the netfluis series folder from disk — no database access.
 @Injectable()
 export class NetfluisService {
   async test() {
-    const dir = path.join(__dirname, '../../../', 'public/netfluis/series/');
+    const dir = publicPath('smartrotom', 'netfluis', 'series');
     const files = await this.readFolder(dir);
     return files;
   }

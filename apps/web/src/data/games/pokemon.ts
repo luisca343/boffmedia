@@ -1,3 +1,4 @@
+import { ASSET, staticAsset } from '@/lib/assets';
 import type { GameEntry } from "./types";
 
 export const pokemon: GameEntry = {
@@ -5,13 +6,13 @@ export const pokemon: GameEntry = {
   nameKey: "games.pokemon.name",
 
   // Sidebar
-  icon: "/assets/img/games/pokemon/icon.webp",
+  icon: staticAsset(ASSET.boffmedia.img, "games/pokemon/icon.webp"),
   color: "from-yellow-400 to-red-500",
   bg: "bg-red-900",
 
   // Landing page
-  logo: "/assets/img/games/pokemon/logo.webp",
-  bannerImage: "/assets/img/games/pokemon/banner.webp",
+  logo: staticAsset(ASSET.boffmedia.img, "games/pokemon/logo.webp"),
+  bannerImage: staticAsset(ASSET.boffmedia.img, "games/pokemon/banner.webp"),
   navHref: "/pokemon",
 
   externalLinks: [
@@ -26,7 +27,7 @@ export const pokemon: GameEntry = {
       nameKey: "games.pokemon.categories.vgc",
       href: "/pokemon/vgc/meta",
       landing: {
-        icon: "/assets/img/games/pokemon/vgc-icon2.webp",
+        icon: staticAsset(ASSET.boffmedia.img, "games/pokemon/vgc-icon2.webp"),
         fallbackIcon: "chart",
         fallbackIconColor: "text-primary-hover",
         color: "from-primary to-violet-600",
@@ -34,7 +35,7 @@ export const pokemon: GameEntry = {
         featured: true,
         isNew: false,
         popularity: "high",
-        heroImage: "/assets/img/games/pokemon/vgc.webp",
+        heroImage: staticAsset(ASSET.boffmedia.img, "games/pokemon/vgc.webp"),
       },
       tools: [
         { key: "meta",    nameKey: "games.pokemon.tools.meta",    href: "/pokemon/vgc/meta",    sidebarIcon: "chart", bleed: true },
@@ -51,7 +52,7 @@ export const pokemon: GameEntry = {
       href: "/pokemon/tcgpocket",
       // The whole category appears as a single card on the Pokemon landing page
       landing: {
-        icon: "/assets/img/games/tcgpocket/icon.webp",
+        icon: staticAsset(ASSET.boffmedia.img, "games/tcgpocket/icon.webp"),
         fallbackIcon: "cards",
         fallbackIconColor: "text-yellow-400",
         color: "from-yellow-300 to-yellow-500",
@@ -59,7 +60,7 @@ export const pokemon: GameEntry = {
         featured: true,
         isNew: true,
         popularity: "high",
-        heroImage: "/assets/img/games/tcgpocket/hero.webp",
+        heroImage: staticAsset(ASSET.boffmedia.img, "games/tcgpocket/hero.webp"),
       },
       // Full-bleed v3 tool — the whole subtree renders inside the section shell;
       // the rail entries mirror the app's internal tabs (Panel · Cartas · Colección · Sobres).
@@ -75,7 +76,7 @@ export const pokemon: GameEntry = {
       nameKey: "games.pokemon.categories.battlesim",
       href: "/pokemon/battlesim",
       landing: {
-        icon: "/assets/img/games/pokemon/vgc-icon2.webp",
+        icon: staticAsset(ASSET.boffmedia.img, "games/pokemon/vgc-icon2.webp"),
         fallbackIcon: "sword",
         fallbackIconColor: "text-red-400",
         color: "from-red-500 to-orange-600",
@@ -83,7 +84,7 @@ export const pokemon: GameEntry = {
         featured: false,
         isNew: true,
         popularity: "high",
-        heroImage: "/assets/img/games/pokemon/vgc.webp",
+        heroImage: staticAsset(ASSET.boffmedia.img, "games/pokemon/vgc.webp"),
       },
       // Full-bleed v3 tool. One route with in-app nav (Lobby · Equipos ·
       // Repeticiones); live battles keep dedicated room routes (Phase B).
@@ -103,7 +104,7 @@ export const pokemon: GameEntry = {
           sidebarIcon: "star",
           bleed: true,
           landing: {
-            icon: "/assets/img/games/pmdsky-icon.webp",
+            icon: staticAsset(ASSET.boffmedia.img, "games/pmdsky-icon.webp"),
             fallbackIcon: "zap",
             fallbackIconColor: "text-secondary-hover",
             color: "from-secondary-hover to-cyan-600",
@@ -121,7 +122,7 @@ export const pokemon: GameEntry = {
           sidebarIcon: "gamepad",
           showInSidebar: false,
           landing: {
-            icon: "/assets/img/games/pokedex-icon.webp",
+            icon: staticAsset(ASSET.boffmedia.img, "games/pokedex-icon.webp"),
             fallbackIcon: "database",
             fallbackIconColor: "text-red-500",
             color: "from-red-500 to-rose-600",

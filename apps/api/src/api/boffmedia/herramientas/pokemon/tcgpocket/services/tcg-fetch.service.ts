@@ -8,6 +8,7 @@ import { TcgSeriesDto } from '../dto/tcg-series.dto';
 import { TcgErrorService } from './tcg-error.service';
 import { TcgConfigService } from './tcg-config.service';
 import { Logger } from 'nestjs-pino';
+import { publicPath } from '@/config/paths';
 
 @Injectable()
 export class TcgFetchService {
@@ -406,11 +407,9 @@ export class TcgFetchService {
       this.logger.log(
         `[TCG] Downloading ${locale.toUpperCase()} image for card ${cardId}...`,
       );
-      const cardImgDir = path.join(
-        process.cwd(),
-        'public',
-        'img',
-        'games',
+      const cardImgDir = publicPath(
+        'boffmedia',
+        'tools',
         'tcg',
         'cards',
         setId,

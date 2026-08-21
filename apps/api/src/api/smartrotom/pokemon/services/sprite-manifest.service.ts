@@ -5,6 +5,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { promises as fsPromises } from 'fs';
 import { BaseDataService } from './data/base-data.service';
+import { publicPath } from '@/config/paths';
 
 @Injectable()
 export class SpriteManifestService extends BaseDataService {
@@ -12,17 +13,14 @@ export class SpriteManifestService extends BaseDataService {
   private manifest: SpriteManifest;
 
   // Base paths for resourcepacks
-  private readonly DEFAULT_RESOURCEPACK_PATH = path.join(
-    process.cwd(),
-    'public/smartrotom/packs/default_resourcepack',
+  private readonly DEFAULT_RESOURCEPACK_PATH = publicPath(
+    'smartrotom/packs/default_resourcepack',
   );
-  private readonly CUSTOM_RESOURCEPACK_PATH = path.join(
-    process.cwd(),
-    'public/smartrotom/packs/resourcepack',
+  private readonly CUSTOM_RESOURCEPACK_PATH = publicPath(
+    'smartrotom/packs/resourcepack',
   );
-  private readonly MANIFEST_PATH = path.join(
-    process.cwd(),
-    'public/smartrotom/packs/sprite-manifest.json',
+  private readonly MANIFEST_PATH = publicPath(
+    'smartrotom/packs/sprite-manifest.json',
   );
 
   constructor(private readonly pokemonDataService: PokemonDataService) {

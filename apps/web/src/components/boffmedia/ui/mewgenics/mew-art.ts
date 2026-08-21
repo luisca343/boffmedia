@@ -1,9 +1,10 @@
+import { ASSET, staticAsset } from '@/lib/assets';
 // Mewgenics real-art singleton. The codex store fills this once the sprite/icon
 // maps load; MewTile reads it to render a real SVG when one exists (else the hue
 // monogram fallback). Kept dependency-free so the showcase — which never loads
 // the store — bundles it without pulling the fetch layer.
 
-export const MEW_ART_BASE = "/data/mewgenics/"
+export const MEW_ART_BASE = staticAsset(ASSET.boffmedia.tools.mewgenics)
 
 interface MewArtState {
   /** character id → sprite svg path (single representative frame) */

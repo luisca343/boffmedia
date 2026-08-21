@@ -16,7 +16,7 @@ import type { Readable } from 'stream';
 import { pipeline } from 'stream/promises';
 import { firstValueFrom } from 'rxjs';
 import { env } from '@/config/env';
-import { laboonPath } from '@/config/laboon';
+import { laboonPath } from '@/config/paths';
 
 // Every CurseForge byte is proxied. The key stays here because an
 // embedded key is an extracted key, and an abused key is a revoked key, which

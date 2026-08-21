@@ -6,9 +6,9 @@ import {
   PokemonForm,
   SpeciesMoveEntry,
 } from '../../interfaces/pokemon.interface';
-import * as path from 'path';
 import { promises as fsPromises } from 'fs';
 import { Logger } from 'nestjs-pino';
+import { publicPath } from '@/config/paths';
 
 export interface EvoTreeNode {
   pkm: string;
@@ -49,13 +49,11 @@ export class PokemonDataService extends BaseDataService {
 
   async loadPokemonData() {
     const startingTime = Date.now();
-    const defaultDir = path.join(
-      process.cwd(),
-      'public/smartrotom/packs/default_datapack/data/pixelmon/species',
+    const defaultDir = publicPath(
+      'smartrotom/packs/default_datapack/data/pixelmon/species',
     );
-    const publicDir = path.join(
-      process.cwd(),
-      'public/smartrotom/packs/datapack/data/pixelmon/species',
+    const publicDir = publicPath(
+      'smartrotom/packs/datapack/data/pixelmon/species',
     );
 
     try {

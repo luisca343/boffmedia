@@ -1,10 +1,11 @@
 "use client"
 
 import { useEffect, useMemo, useState } from "react"
-import { useTranslations } from "next-intl"
+import { useLocale, useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { Icon, type IconName } from "@boffmedia/ui"
 import type { TcgCard } from "@boffmedia/shared"
+import { ASSET, staticAsset } from "@/lib/assets"
 import {
   cssVars, typeColor, typeGlyph, normType, normStage, rarityMeta, isPokemon, pct, padNum, localCardArt,
 } from "../_lib/tcgp-maps"
@@ -55,12 +56,14 @@ export function TcgRarityMarks({ rarity, size = 12 }: { rarity: string; size?: n
 // is available it renders inside that same frame, falling back to the glyph if
 // every source fails, so the frame is identical either way.
 function TcgCardArt({ card, glyphLabel }: { card: TcgCard; glyphLabel: string }) {
+  const locale = useLocale()
   const sources = useMemo(() => {
     const list: string[] = []
     if (card.image) list.push(card.image.startsWith("http") && !/\.(png|jpg|jpeg|webp)$/i.test(card.image) ? `${card.image}/high.webp` : card.image)
-    list.push(localCardArt(card.setId, card.id))
+    list.push(localCardArt(card.setId, card.id, locale))
+    if (locale !== "en") list.push(localCardArt(card.setId, card.id, "en"))
     return list
-  }, [card.image, card.setId, card.id])
+  }, [card.image, card.setId, card.id, locale])
   const [idx, setIdx] = useState(0)
   useEffect(() => setIdx(0), [card.id])
 
@@ -290,7 +293,7 @@ export function TcgSetProgress({ label, sub, have, total }: { label: string; sub
 
 // ── Pack tile (real pack art with CSS booster fallback) ──────────────────────
 function packArt(setId: string, name: string): string {
-  return `/assets/img/games/tcgpocket/packs/${setId}/${name.toLowerCase()}.png`
+  return staticAsset(ASSET.boffmedia.img, 'games/tcgpocket/packs', setId, `${name.toLowerCase()}.png`)
 }
 export function TcgPackTile({ setId, name, meta, hue, onOpen }: { setId: string; name: string; meta?: string; hue?: string; onOpen?: () => void }) {
   const t = useTranslations("tcgpocket")

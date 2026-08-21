@@ -12,6 +12,8 @@ import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
 import { MySql2Database } from 'drizzle-orm/mysql2';
 import { Logger } from 'nestjs-pino';
 import { env } from '@/config/env';
+import { publicPath } from '@/config/paths';
+import { ASSET, assetUrl } from '@/config/asset-url';
 
 // LEGACY_DIRECT_DB: pre-dates the repository rule; extract a repository when next touched
 @Injectable()
@@ -126,13 +128,12 @@ export class AppService {
   }
 
   async blogicons() {
-    const iconsFolderPath = path.join(process.cwd(), 'public/blog', 'icons');
+    const iconsFolderPath = publicPath('blog', 'icons');
     try {
       const files = await fs.readdir(iconsFolderPath);
       const filesObj = files.reduce(
         (acc, file) => {
-          acc[file.split('.')[0]] =
-            `https://api.boffmedia.es/blog/icons/${file}`;
+          acc[file.split('.')[0]] = assetUrl(ASSET.blog, 'icons', file);
           return acc;
         },
         {} as Record<string, string>,

@@ -6,6 +6,7 @@ import { useGetHistory } from "@/hooks/mina/useGetHistory";
 import { useRotomUuid } from "@/components/smartrotom/behavior/useRotomUuid";
 import { useTranslations } from "next-intl";
 import { useFormat } from "@boffmedia/ui/useFormat";
+import { ASSET, staticAsset } from '@/lib/assets';
 
 export default function History() {
   const t = useTranslations("mina");
@@ -33,9 +34,7 @@ export default function History() {
                       alt={reward.itemId}
                       width={32}
                       height={32}
-                      src={`/smartrotom/img/apps/mina/recompensas/${
-                        reward.itemId?.split(":")[1]
-                      }.png`}
+                      src={staticAsset(ASSET.smartrotom.img, 'apps/mina/recompensas', `${reward.itemId?.split(":")[1]}.png`)}
                       style={{ imageRendering: "pixelated" }}
                     />
                   ))}

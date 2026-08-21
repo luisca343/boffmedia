@@ -15,6 +15,8 @@ import { IMessageRepository } from '../repositories/interfaces/chat-message.repo
 import { RotomMessage } from '../entities/message.entity';
 import { Logger } from 'nestjs-pino';
 import { ApiErrorCode } from '@/common/errors/error-codes.generated';
+import { ASSET, joinAssetPath } from '@boffmedia/asset-paths';
+import { uploadsPath } from '@/config/paths';
 
 @Injectable()
 export class MessageService {
@@ -68,12 +70,7 @@ export class MessageService {
             const ext = mime.split('/')[1] || 'png';
             const buffer = Buffer.from(b64, 'base64');
 
-            const uploadDir = path.join(
-              process.cwd(),
-              'public',
-              'uploads',
-              'chat-screenshots',
-            );
+            const uploadDir = uploadsPath('chat', 'chat-screenshots');
             await fs.mkdir(uploadDir, { recursive: true });
 
             const safeId = (
@@ -83,7 +80,10 @@ export class MessageService {
             const filePath = path.join(uploadDir, filename);
             await fs.writeFile(filePath, buffer);
 
-            const publicUrl = `/uploads/chat-screenshots/${filename}`;
+            const publicUrl = joinAssetPath(
+              `${ASSET.uploads.chat}/chat-screenshots`,
+              filename,
+            );
 
             const meta: Record<string, unknown> = { ...screenshot };
             delete meta.image;

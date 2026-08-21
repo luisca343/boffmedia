@@ -1,3 +1,4 @@
+import { ASSET, staticAsset } from '@/lib/assets';
 import Image from "next/image";
 import { getScaleMultiplier } from "../_utils/viewUtils";
 
@@ -49,7 +50,7 @@ import { getScaleMultiplier } from "../_utils/viewUtils";
                     return (
                         <Image
                             key={level}
-                            src={`/battlesim/fx/${name}.png`}
+                            src={staticAsset(ASSET.boffmedia.tools.battlesim, 'fx', `${name}.png`)}
                             alt={name}
                             width={offset.width}
                             height={offset.width}

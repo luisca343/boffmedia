@@ -28,6 +28,7 @@ apps/web/public
 public/
 apps/api/laboon
 laboon/
+var/
 
 # Dev/IDE
 .vscode/

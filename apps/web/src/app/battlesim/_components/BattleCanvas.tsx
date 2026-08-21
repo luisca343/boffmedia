@@ -16,6 +16,7 @@ import { BxPlate } from "@/app/(boffmedia)/(herramientas)/pokemon/battlesim/_com
 import { toBSXMon } from "../_utils/toBSXMon";
 import { FieldConditions } from "./FieldConditions";
 import type { ReactNode } from "react";
+import { ASSET, staticAsset } from '@/lib/assets';
 
 export type BattleCanvasRefProps = {
   bounceAll: () => void;
@@ -88,7 +89,7 @@ export const BattleCanvas = memo(forwardRef(({
     
     if(liveMode && liveStatus === 'connecting') {
         return (
-            <div className="flex flex-col items-center justify-center gap-3" style={{ width: canvasWidth, height: canvasWidth * ASPECT_RATIO, backgroundImage: 'url(/battlesim/fx/bg/hagane.png)', backgroundSize: '100% 100%' }}>
+            <div className="flex flex-col items-center justify-center gap-3" style={{ width: canvasWidth, height: canvasWidth * ASPECT_RATIO, backgroundImage: `url(${staticAsset(ASSET.boffmedia.tools.battlesim, 'fx/bg/hagane.png')})`, backgroundSize: '100% 100%' }}>
                 <Spinner size={44} />
                 <span className="font-mono text-[12px] text-txt-muted">{t('connection.waitingBattle')}</span>
             </div>
@@ -108,7 +109,7 @@ export const BattleCanvas = memo(forwardRef(({
 
     return (
         <div  id="game" ref={gameRefCallback} className="flex overflow-hidden relative select-none" style={{
-            backgroundImage: 'url(/battlesim/fx/bg/hagane.png)', 
+            backgroundImage: `url(${staticAsset(ASSET.boffmedia.tools.battlesim, 'fx/bg/hagane.png')})`, 
             backgroundSize: `100% 100%`, width: canvasWidth, height: canvasWidth * ASPECT_RATIO }}>        
                   
                   {/* Preview overlay only shows when needed */}
@@ -223,7 +224,7 @@ export const BattleCanvas = memo(forwardRef(({
 
                 {battle.field.pseudoWeather['trickroom'] && (
                     <div className={`weather w-full h-full absolute top-0 left-0 `} style={{
-                        backgroundImage: 'url(/battlesim/fx/trickroom.png)',
+                        backgroundImage: `url(${staticAsset(ASSET.boffmedia.tools.battlesim, 'fx/trickroom.png')})`,
                         backgroundSize: '100% 100%',
                         opacity: 0.6,
                         zIndex: 5,
@@ -231,7 +232,7 @@ export const BattleCanvas = memo(forwardRef(({
                     </div>
                 )}
                 <div className={`weather w-full h-full absolute top-0 left-0 `} style={{
-                    backgroundImage: 'url(/battlesim/fx/bg/hagane_overlay.png)',
+                    backgroundImage: `url(${staticAsset(ASSET.boffmedia.tools.battlesim, 'fx/bg/hagane_overlay.png')})`,
                     backgroundSize: '100% 100%',
                     zIndex: 1,
                 }}>

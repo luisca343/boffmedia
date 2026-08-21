@@ -1,5 +1,6 @@
 "use client"
 
+import { ASSET, staticAsset } from '@/lib/assets';
 import { useState, useEffect, useRef } from 'react';
 import { useAudio } from "@/hooks/useAudio";
 
@@ -49,8 +50,8 @@ export function useBaseSpinnerAnimation<T>({
   const [spinComplete, setSpinComplete] = useState(false);
   const [winnerIndex, setWinnerIndex] = useState<number | null>(null);
   
-  const tickSound = useAudio('/assets/audio/spinner-tick.wav', 0.25);
-  const winSound = useAudio('/assets/audio/spinner-win.wav', 0.8);
+  const tickSound = useAudio(staticAsset(ASSET.boffmedia.img, 'audio', 'spinner-tick.wav'), 0.25);
+  const winSound = useAudio(staticAsset(ASSET.boffmedia.img, 'audio', 'spinner-win.wav'), 0.8);
   
   const spinnerRef = useRef<HTMLDivElement>(null);
   const itemsContainerRef = useRef<HTMLDivElement>(null);

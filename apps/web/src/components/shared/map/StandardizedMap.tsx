@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { ASSET, staticAsset } from '@/lib/assets';
 
 // Map constants - same as taxi system
 export const MAP_CONSTANTS_OLD = {
@@ -238,7 +239,7 @@ export function MapImage({ zoomLevel, mapCenter, transformer, children }: MapIma
       }}
     >
       <img
-        src="/smartrotom/img/TERASv7.avif"
+        src={staticAsset(ASSET.smartrotom.img, 'TERASv7.avif')}
         alt="Minecraft Map"
         className="w-full h-full object-cover"
         draggable={false}

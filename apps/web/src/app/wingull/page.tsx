@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/primitives/badge";
 import { Clock, Users, MapPin, Sparkles } from "lucide-react";
 import { getTranslations } from "next-intl/server";
+import { ASSET, staticAsset } from "@/lib/assets";
 
 export default async function Page() {
   const t = await getTranslations("wingull.home");
@@ -20,7 +21,7 @@ export default async function Page() {
           <div className="relative mb-8">
             <div className="absolute inset-0 bg-gradient-to-r from-yellow-400/20 to-secondary-hover/20 rounded-lg blur-3xl"></div>
             <Image
-              src="/assets/img/win-full.png"
+              src={staticAsset(ASSET.boffmedia.img, 'win-full.png')}
               alt={t("logoAlt")}
               width={350}
               height={175}

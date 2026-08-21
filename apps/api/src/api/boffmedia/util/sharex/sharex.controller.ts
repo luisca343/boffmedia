@@ -1,6 +1,7 @@
 import { randomString } from '@/_utils/stringUtils';
+import { ASSET, assetUrl } from '@/config/asset-url';
+import { uploadsPath } from '@/config/paths';
 import { Public } from '@api/_utils/decorators/public.decorator';
-import { env } from '@/config/env';
 import {
   BadRequestException,
   Body,
@@ -64,9 +65,9 @@ export class SharexController {
     }
 
     const fileName = file.originalname ?? '';
-    // Allow-list, never the caller's own extension: these files are written
-    // under `public/` and served from this origin, so honouring an arbitrary
-    // extension (.html, .svg, .js) would be stored XSS on the API's origin.
+    // Allow-list, never the caller's own extension: these files are served
+    // from this origin, so honouring an arbitrary extension (.html, .svg,
+    // .js) would be stored XSS on the API's origin.
     const extension = (fileName.split('.').pop() ?? '').toLowerCase();
     if (!SHAREX_ALLOWED_EXTENSIONS.has(extension)) {
       throw new BadRequestException(
@@ -83,7 +84,7 @@ export class SharexController {
       .slice(0, 32);
 
     let newName = randomString(10);
-    const dir = path.join(process.cwd(), 'public/smartrotom/img/sharex');
+    const dir = uploadsPath('sharex');
 
     while (fs.existsSync(path.join(dir, newName + '.' + extension))) {
       newName = randomString(10);
@@ -103,7 +104,7 @@ export class SharexController {
 
       return {
         file: {
-          url: `${env.PUBLIC_DIR}/smartrotom/img/sharex/${newName}.${extension}`,
+          url: assetUrl(ASSET.uploads.sharex, `${newName}.${extension}`),
           name: newName + '.' + extension,
           size: file.size,
           type: file.mimetype,

@@ -18,6 +18,7 @@ const PACKAGES = [
   'apps/desktop',
   'packages/ui',
   'packages/pack-schema',
+  'packages/asset-paths',
   'packages/tools/kit',
   'packages/tools/minecraft',
   'packages/tools/mhwilds',

@@ -1,10 +1,11 @@
+import { ASSET, staticAsset } from '@/lib/assets';
 import { mewHuman, type MewRec } from "./mew-util"
 
 // Shared mutable store singleton + localization + a tiny rev/subscribe bus. Kept
 // separate so the normalizers (which localize) and the resolvers (which index)
 // depend only on this, not on each other or the load orchestration.
 
-export const BASE = "/data/mewgenics/"
+export const BASE = staticAsset(ASSET.boffmedia.tools.mewgenics)
 
 // raw wiki_data JSON is genuinely untyped external input the normalizers re-type
 export type Raw = Record<string, any>

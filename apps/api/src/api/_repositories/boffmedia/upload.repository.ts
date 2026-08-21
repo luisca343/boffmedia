@@ -2,6 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { promises as fs } from 'fs';
 import { join } from 'path';
 
+import { uploadsPath } from '@/config/paths';
+
 export interface UploadedFileDetails {
   filename: string;
   originalName: string;
@@ -21,7 +23,10 @@ export interface FileUploadData {
 
 @Injectable()
 export class UploadRepository {
-  private readonly baseUploadDir = join(process.cwd(), 'public', 'uploads');
+  // Uploads are written while the app runs, so they live in the laboon store
+  // rather than the read-only asset tree. The `/uploads` URL prefix built by
+  // `constructUrlPath` is unaffected — only the directory behind it.
+  private readonly baseUploadDir = uploadsPath();
 
   // ==================== DIRECTORY OPERATIONS ====================
 

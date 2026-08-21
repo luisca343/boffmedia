@@ -1,7 +1,6 @@
 import * as dotenv from 'dotenv';
 dotenv.config();
 
-import { join } from 'path';
 import { env } from './config/env';
 import * as express from 'express';
 import helmet from 'helmet';
@@ -14,6 +13,7 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
 import { ApiResponseEntity } from './common/entities/api-response.entity';
 import { Logger } from 'nestjs-pino';
+import { publicPath, uploadsPath } from '@/config/paths';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { bufferLogs: true });
@@ -63,29 +63,26 @@ async function bootstrap() {
   // (DB-stored URLs, Minecraft clients, the external blog) — not the whole folder
   // at the root, so an API route never pays a filesystem probe per request.
   // sprites/packs/jcef are content-addressed or append-only → immutable; uploads
-  // are overwritten in place (profile pics keyed by userId) → short TTL.
-  const publicDir = join(__dirname, '..', 'public');
+  // are overwritten in place (profile pics keyed by userId) → short TTL, and they
+  // come from the laboon store because they are written while the app runs.
   const staticOpts = (
     maxAge: string,
   ): Parameters<typeof express.static>[1] => ({
     index: false,
     maxAge,
   });
-  app.use(
-    '/uploads',
-    express.static(join(publicDir, 'uploads'), staticOpts('5m')),
-  );
+  app.use('/uploads', express.static(uploadsPath(), staticOpts('5m')));
   app.use(
     '/jcef',
-    express.static(join(publicDir, 'jcef'), {
+    express.static(publicPath('jcef'), {
       ...staticOpts('365d'),
       immutable: true,
     }),
   );
-  app.use('/blog', express.static(join(publicDir, 'blog'), staticOpts('1h')));
+  app.use('/blog', express.static(publicPath('blog'), staticOpts('1h')));
   app.use(
     '/smartrotom',
-    express.static(join(publicDir, 'smartrotom'), {
+    express.static(publicPath('smartrotom'), {
       ...staticOpts('1h'),
       setHeaders: (res, filePath) => {
         if (/[/\\]smartrotom[/\\](img|packs)[/\\]/.test(filePath)) {

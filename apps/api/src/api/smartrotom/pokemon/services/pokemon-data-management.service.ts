@@ -10,6 +10,7 @@ import Fuse, { IFuseOptions, FuseResult } from 'fuse.js';
 import { FullMove } from '../entities/pokemon-move.entity';
 import { SpawnInfo } from '../entities/pokemon-spawn.entity';
 import { Logger } from 'nestjs-pino';
+import { ASSET } from '@boffmedia/asset-paths';
 
 @Injectable()
 export class PokemonDataManagementService {
@@ -337,7 +338,7 @@ export class PokemonDataManagementService {
 
       if (searchResults.length === 0) {
         this.logger.log('Pokemon not found:', name);
-        return { url: '/smartrotom/img/pmd/portrait/0000/Normal.png' };
+        return { url: `${ASSET.smartrotom.img}/pmd/portrait/0000/Normal.png` };
       }
 
       const pokemon = searchResults[0].item;
@@ -347,13 +348,13 @@ export class PokemonDataManagementService {
       const dex = pokemon.dex.toString().padStart(4, '0');
 
       // Construct the PMD sprite URL
-      const spriteUrl = `/smartrotom/img/pmd/portrait/${dex}/Normal.png`;
+      const spriteUrl = `${ASSET.smartrotom.img}/pmd/portrait/${dex}/Normal.png`;
 
       this.logger.log('PMD sprite URL:', spriteUrl);
       return { url: spriteUrl };
     } catch (error: any) {
       this.logger.error('Error in getPmdPortrait:', error);
-      return { url: '/smartrotom/img/pmd/portrait/0000/Normal.png' };
+      return { url: `${ASSET.smartrotom.img}/pmd/portrait/0000/Normal.png` };
     }
   }
 }

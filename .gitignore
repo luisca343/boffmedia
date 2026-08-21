@@ -21,6 +21,9 @@ apps/api/*.json
 apps/*/public/
 laboon/
 apps/*/laboon
+# Runtime uploads (local-disk tier): written by the app, never committed.
+/var/
+apps/*/var/
 
 # API runtime cache (imageCache.json etc.) — regenerable, never commit
 apps/api/var/

@@ -2,6 +2,7 @@
 
 import { useTranslations } from "next-intl"
 import type { Passport } from "../../_types"
+import { ASSET, staticAsset } from '@/lib/assets'
 import { Icon } from "../ui"
 
 /** r = 52 in the 120-unit viewBox. The ring is the real completion, not a decoration. */
@@ -56,7 +57,7 @@ export function Cover({ profile }: { profile?: Passport | null }) {
             do not survive being redrawn as a stroked glyph. */}
         <span className="absolute inset-0 grid place-items-center">
           <img
-            src="/smartrotom/img/apps/pasaporte/emblema.webp"
+            src={staticAsset(ASSET.smartrotom.img, 'apps/pasaporte/emblema.webp')}
             alt=""
             aria-hidden="true"
             draggable={false}

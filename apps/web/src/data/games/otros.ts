@@ -1,3 +1,4 @@
+import { ASSET, staticAsset } from '@/lib/assets';
 import type { GameEntry } from "./types";
 
 export const otros: GameEntry = {
@@ -9,7 +10,7 @@ export const otros: GameEntry = {
   bg: "bg-indigo-900",
 
   logo: "",
-  bannerImage: "/assets/img/games/otros/banner.webp",
+  bannerImage: staticAsset(ASSET.boffmedia.img, "games/otros/banner.webp"),
   navHref: "/otros",
 
   externalLinks: [

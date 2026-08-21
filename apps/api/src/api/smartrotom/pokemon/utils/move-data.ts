@@ -5,6 +5,7 @@ import * as path from 'path';
 import { promises as fsPromises } from 'fs';
 import { Attack } from '@/types/move';
 import pino from 'pino';
+import { publicPath } from '@/config/paths';
 
 const logger = pino({ name: 'util' });
 
@@ -18,15 +19,11 @@ export class MoveData {
 
   async loadMoveData() {
     const startingTime = Date.now();
-    const defaultDirDef = path.join(
-      __dirname,
-      '../../../../',
-      'public/smartrotom/packs/default_datapack/data/pixelmon/moves',
+    const defaultDirDef = publicPath(
+      'smartrotom/packs/default_datapack/data/pixelmon/moves',
     );
-    const publicDir = path.join(
-      __dirname,
-      '../../../../',
-      'public/smartrotom/packs/datapack/data/pixelmon/moves',
+    const publicDir = publicPath(
+      'smartrotom/packs/datapack/data/pixelmon/moves',
     );
 
     const defaultDir = await fsPromises.readdir(defaultDirDef);

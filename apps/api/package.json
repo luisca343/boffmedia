@@ -39,6 +39,7 @@
     "convert-mod": "node ../../node_modules/ts-node/dist/bin.js -P scripts/convert-showdown-mod/tsconfig.json scripts/convert-showdown-mod/index.ts"
   },
   "dependencies": {
+    "@boffmedia/asset-paths": "workspace:*",
     "@boffmedia/pack-schema": "workspace:*",
     "@discordjs/builders": "^1.14.0",
     "@discordjs/voice": "^0.19.2",

@@ -16,6 +16,8 @@ COPY packages/shared/package.json ./packages/shared/
 # `prepare` script compiles the package on install, and with only a manifest
 # present that tsc invocation fails and takes the whole install down.
 COPY packages/pack-schema ./packages/pack-schema
+# Same reason as pack-schema above: asset-paths compiles on install.
+COPY packages/asset-paths ./packages/asset-paths
 COPY apps/api/package.json ./apps/api/
 
 RUN pnpm install --no-frozen-lockfile
@@ -151,6 +153,13 @@ COPY --from=builder /app/apps/api/data ./data
 COPY --from=builder /app/apps/api/package.json ./
 # Writable runtime cache (imageCache.json lives here, not in public/)
 RUN mkdir -p var/cache
+# User uploads (avatars, chat images, ShareX captures, starbank pictures).
+# MOUNT A VOLUME HERE: this path is the container's writable layer, so without
+# one every upload is lost on the next deploy. It is deliberately NOT on the
+# laboon mount — laboon is network storage and these files are read on ordinary
+# page loads. Override the location with UPLOADS_ROOT.
+#   docker run -v /srv/boffmedia/uploads:/app/var/uploads ...
+RUN mkdir -p var/uploads
 
 # NOTE: mount your Google service-account JSON at runtime, e.g.:
 #   docker run -v /etc/boffmedia/boffmedia-b6e4f721c326.json:/app/boffmedia-b6e4f721c326.json ...

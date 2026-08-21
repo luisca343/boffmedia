@@ -1,3 +1,4 @@
+import { ASSET, staticAsset } from '@/lib/assets';
 import * as React from "react"
 import { useTranslations } from "next-intl"
 import { Button } from "@boffmedia/ui"
@@ -25,11 +26,11 @@ export function TvSmartRotom() {
           muted
           loop
           playsInline
-          poster="/assets/img/smartrotom.png"
+          poster={staticAsset(ASSET.boffmedia.img, 'smartrotom.png')}
           aria-label={t("demoAriaLabel")}
           className="relative z-[2] aspect-square w-full max-w-[540px] object-cover"
         >
-          <source src="/assets/img/rotom_demo3.webm" type="video/webm" />
+          <source src={staticAsset(ASSET.boffmedia.img, 'rotom_demo3.webm')} type="video/webm" />
         </video>
         <div className="relative z-[2] flex flex-wrap gap-x-[18px] gap-y-2.5 max-[980px]:justify-center">
           {featKeys.map((fk) => (

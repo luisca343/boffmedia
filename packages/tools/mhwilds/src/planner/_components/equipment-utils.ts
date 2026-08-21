@@ -217,10 +217,10 @@ export const getWeaponTypeIcon = (weaponType: string): string => {
     'bow': 'bow',
   };
 
-  
-  
+
+
   // Default to a generic weapon icon if not found
-  return `/assets/img/games/mhwilds/${iconMap[normalizedType] || 'great-sword'}.webp`;
+  return `/boffmedia/tools/mhwilds/${iconMap[normalizedType] || 'great-sword'}.webp`;
 };
 
 export const getArmorImagePath = (armorType: EquipmentType): string => {
@@ -234,7 +234,7 @@ export const getArmorImagePath = (armorType: EquipmentType): string => {
     'secondaryWeapon': 'great-sword',
     'charm': 'charm',
   };
-  
+
   // Return the path to the image
-  return `/assets/img/games/mhwilds/${imageMap[armorType] || 'helmet'}.webp`;
+  return `/boffmedia/tools/mhwilds/${imageMap[armorType] || 'helmet'}.webp`;
 };

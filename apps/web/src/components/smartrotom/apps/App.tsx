@@ -3,6 +3,7 @@ import Image from "next/image"
 import { useState } from "react"
 import { motion } from "framer-motion"
 import { CSS } from "@dnd-kit/utilities"
+import { ASSET, staticAsset } from '@/lib/assets'
 import { InternalLink } from "../../ui/navigation/Link"
 import { RotomApp as SmartRotomApp } from "@boffmedia/shared"
 
@@ -27,7 +28,7 @@ function AppIcon({ app, size, withLink = true }: AppIconProps) {
           </div>
         ) : (
           <Image
-            src={`/smartrotom/img/apps/${app.url}.webp`}
+            src={staticAsset(ASSET.smartrotom.img, 'apps', `${app.url}.webp`)}
             alt={app.name}
             width={150}
             height={150}

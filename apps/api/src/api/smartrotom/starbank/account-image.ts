@@ -2,6 +2,8 @@ import { BadRequestException } from '@nestjs/common';
 import { memoryStorage } from 'multer';
 import { mkdir, readdir, unlink, writeFile } from 'fs/promises';
 import { join } from 'path';
+import { ASSET, joinAssetPath } from '@boffmedia/asset-paths';
+import { uploadsPath } from '@/config/paths';
 
 /**
  * Account profile pictures.
@@ -15,19 +17,11 @@ import { join } from 'path';
  * filename — that is the other half of the same hole.
  */
 
-/** Relative to the API's CWD. `apps/api/public` is a junction to the shared root `public/`. */
-export const ACCOUNT_IMAGE_DIR = join(
-  'public',
-  'smartrotom',
-  'img',
-  'apps',
-  'starbank',
-  'cuentas',
-);
+/** Uploaded at runtime, so it lives in the laboon store, not the asset tree. */
+export const ACCOUNT_IMAGE_DIR = uploadsPath('starbank');
 
 /** What the browser requests — the web root, not the disk path. */
-export const ACCOUNT_IMAGE_PUBLIC_PATH =
-  '/smartrotom/img/apps/starbank/cuentas';
+export const ACCOUNT_IMAGE_PUBLIC_PATH = joinAssetPath(ASSET.uploads.starbank);
 
 const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
 

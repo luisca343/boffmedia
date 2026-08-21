@@ -22,6 +22,8 @@ COPY packages/tools/minecraft/package.json ./packages/tools/minecraft/
 COPY packages/tools/mhwilds/package.json ./packages/tools/mhwilds/
 # Whole package: its `prepare` script builds on install (see apps/api/Dockerfile).
 COPY packages/pack-schema ./packages/pack-schema
+# Same reason as pack-schema above: asset-paths compiles on install.
+COPY packages/asset-paths ./packages/asset-paths
 COPY apps/web/package.json ./apps/web/
 
 RUN pnpm install --no-frozen-lockfile

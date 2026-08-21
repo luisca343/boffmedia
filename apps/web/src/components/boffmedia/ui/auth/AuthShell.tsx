@@ -4,6 +4,7 @@ import * as React from "react"
 import Link from "next/link"
 import { useTranslations } from "next-intl"
 import { Icon, Kicker } from "@boffmedia/ui"
+import { ASSET, staticAsset } from "@/lib/assets"
 
 const GRID_BG: React.CSSProperties = {
   backgroundImage: [
@@ -48,7 +49,7 @@ export function AuthShell({
           href="/"
           className="flex items-center gap-2.5 font-display text-[20px]/none font-extrabold italic uppercase text-txt no-underline"
         >
-          <img src="/assets/brand/boff-logo.webp" alt="" className="h-[26px] w-[26px] flex-none object-contain" />
+          <img src={staticAsset(ASSET.boffmedia.brand, 'boff-logo.webp')} alt="" className="h-[26px] w-[26px] flex-none object-contain" />
           BOFF<b className="text-accent">MEDIA</b>
         </Link>
 

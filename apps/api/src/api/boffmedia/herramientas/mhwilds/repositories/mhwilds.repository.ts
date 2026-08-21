@@ -6,8 +6,13 @@ import * as path from 'path';
 import axios from 'axios';
 import { IMhwildsRepository } from './interface/mhwilds.repository.interface';
 
+import { publicPath, uploadsPath } from '@/config/paths';
+
 export interface CacheMetadata {
+  /** Best source to read from: the writable cache, or the seeded copy. */
   filePath: string;
+  /** Where a refreshed copy is written. Always the writable cache. */
+  writePath: string;
   lastModified: Date;
   exists: boolean;
 }
@@ -37,6 +42,21 @@ export class MhwildsRepository implements IMhwildsRepository {
   private readonly API_BASE_URL = 'https://wilds.mhdb.io';
   private readonly CACHE_DURATION_MS = 86400000; // 1 day in milliseconds
 
+  // Remote resources are re-fetched and rewritten as they go stale, so the
+  // cache lives in the laboon store; the asset tree only carries the seeded
+  // copy, which is read when nothing has been cached yet and never written.
+  private cacheRoot(): string {
+    return uploadsPath('mhwilds');
+  }
+
+  private cachePath(locale: string, filename: string): string {
+    return uploadsPath('mhwilds', locale, filename);
+  }
+
+  private seedPath(locale: string, filename: string): string {
+    return publicPath('boffmedia', 'tools', 'mhwilds', locale, filename);
+  }
+
   constructor(
     @Inject(DRIZZLE) private readonly db: MySql2Database<Record<string, never>>,
   ) {}
@@ -47,24 +67,36 @@ export class MhwildsRepository implements IMhwildsRepository {
     locale: string,
   ): Promise<CacheMetadata> {
     try {
-      const filePath = path.join(
-        process.cwd(),
-        `public/data/mhwilds/${locale}/${resourceType}.json`,
-      );
+      const writePath = this.cachePath(locale, `${resourceType}.json`);
 
       try {
-        const stats = await fs.stat(filePath);
+        const stats = await fs.stat(writePath);
         return {
-          filePath,
+          filePath: writePath,
+          writePath,
           lastModified: stats.mtime,
           exists: true,
         };
       } catch {
-        return {
-          filePath,
-          lastModified: new Date(0),
-          exists: false,
-        };
+        // Nothing cached yet: fall back to the seeded copy so a cold start
+        // still serves data, while a refresh is still written to the cache.
+        const seedPath = this.seedPath(locale, `${resourceType}.json`);
+        try {
+          const stats = await fs.stat(seedPath);
+          return {
+            filePath: seedPath,
+            writePath,
+            lastModified: stats.mtime,
+            exists: true,
+          };
+        } catch {
+          return {
+            filePath: writePath,
+            writePath,
+            lastModified: new Date(0),
+            exists: false,
+          };
+        }
       }
     } catch (error: any) {
       // A typed HTTP error (404/403/409…) has to reach the client as itself;
@@ -177,7 +209,7 @@ export class MhwildsRepository implements IMhwildsRepository {
 
       // Cache is invalid or doesn't exist, fetch from remote
       const remoteData = await this.fetchRemoteData(resourceType, locale);
-      await this.saveCachedData(cacheMetadata.filePath, remoteData);
+      await this.saveCachedData(cacheMetadata.writePath, remoteData);
 
       return {
         data: remoteData,
@@ -241,11 +273,7 @@ export class MhwildsRepository implements IMhwildsRepository {
     data: any,
   ): Promise<void> {
     try {
-      const filePath = path.join(
-        process.cwd(),
-        `public/data/mhwilds/${locale}/${filename}`,
-      );
-      await this.saveCachedData(filePath, data);
+      await this.saveCachedData(this.cachePath(locale, filename), data);
     } catch (error: any) {
       // A typed HTTP error (404/403/409…) has to reach the client as itself;
       // wrapping it in a bare Error turned all of them into 500s.
@@ -261,17 +289,13 @@ export class MhwildsRepository implements IMhwildsRepository {
     locale: string,
   ): Promise<any | null> {
     try {
-      const filePath = path.join(
-        process.cwd(),
-        `public/data/mhwilds/${locale}/${filename}`,
-      );
       const cacheMetadata = await this.getCacheMetadata(
         filename.replace('.json', ''),
         locale,
       );
 
       if (cacheMetadata.exists) {
-        return await this.readCachedData(filePath);
+        return await this.readCachedData(cacheMetadata.filePath);
       }
 
       return null;
@@ -287,7 +311,7 @@ export class MhwildsRepository implements IMhwildsRepository {
     locale?: string,
   ): Promise<{ success: boolean; message: string }> {
     try {
-      const basePath = path.join(process.cwd(), 'public/data/mhwilds');
+      const basePath = this.cacheRoot();
 
       if (resourceType && locale) {
         // Clear specific resource for specific locale
@@ -349,7 +373,7 @@ export class MhwildsRepository implements IMhwildsRepository {
     resources: string[];
   }> {
     try {
-      const basePath = path.join(process.cwd(), 'public/data/mhwilds');
+      const basePath = this.cacheRoot();
       let totalFiles = 0;
       let totalSize = 0;
       const locales = new Set<string>();

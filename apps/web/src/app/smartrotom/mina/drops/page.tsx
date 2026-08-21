@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/primitives/collapsible";
 import { Drop, DropByType } from "../_types/Drops";
 import { MinaService } from "@/services/api/smartrotom/minaService";
+import { ASSET, staticAsset } from '@/lib/assets';
 
 export default async function Drops() {
   // An HTTP failure resolves to `{ success: false }` with no `data`; destructuring it
@@ -37,9 +38,7 @@ export default async function Drops() {
                       className="p-4  rounded  flex flex-col items-center m-2 "
                     >
                       <img
-                        src={`/smartrotom/img/apps/mina/recompensas/${
-                          drop.itemId.split(":")[1]
-                        }.png`}
+                        src={staticAsset(ASSET.smartrotom.img, 'apps/mina/recompensas', `${drop.itemId.split(":")[1]}.png`)}
                         alt={drop.name}
                         className="w-12 h-12 mb-2"
                         style={{ imageRendering: "pixelated" }}

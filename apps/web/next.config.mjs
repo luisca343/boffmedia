@@ -30,23 +30,25 @@ const nextConfig = {
         ];
     },
     
-    // Cache policy for the public/ trees this app serves. Sprites, packs,
-    // fonts and datasets never change in place → immutable. Curated assets/
-    // are hand-replaced under the same name → short TTL.
+    // Cache policy for static assets. Content-addressed and append-only assets
+    // (fonts, brand, tools, sprites, packs, CEF runtime) are immutable; hand-replaced
+    // assets (events, blog posts) have short TTL.
     async headers() {
         const immutable = [
             { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' },
         ];
+        const oneHour = [
+            { key: 'Cache-Control', value: 'public, max-age=3600' },
+        ];
         return [
-            { source: '/fonts/:path*', headers: immutable },
+            { source: '/boffmedia/fonts/:path*', headers: immutable },
+            { source: '/boffmedia/brand/:path*', headers: immutable },
+            { source: '/boffmedia/tools/:path*', headers: immutable },
             { source: '/smartrotom/img/:path*', headers: immutable },
             { source: '/smartrotom/packs/:path*', headers: immutable },
-            { source: '/battlesim/:path*', headers: immutable },
-            { source: '/data/:path*', headers: immutable },
-            {
-                source: '/assets/:path*',
-                headers: [{ key: 'Cache-Control', value: 'public, max-age=3600' }],
-            },
+            { source: '/jcef/:path*', headers: immutable },
+            { source: '/boffmedia/img/:path*', headers: oneHour },
+            { source: '/blog/:path*', headers: oneHour },
         ];
     },
 

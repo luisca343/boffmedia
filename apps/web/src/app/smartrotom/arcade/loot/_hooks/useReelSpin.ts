@@ -1,5 +1,6 @@
 "use client"
 
+import { ASSET, staticAsset } from '@/lib/assets';
 import { useEffect, useMemo, useRef, useState } from "react"
 import { useAudio } from "@/hooks/useAudio"
 
@@ -53,8 +54,8 @@ export function useReelSpin({ winningPosition, tileCount, sound, reduceMotion }:
   const [settled, setSettled] = useState(false)
   const [revealed, setRevealed] = useState(false)
 
-  const tick = useAudio("/assets/audio/spinner-tick.wav", 0.25)
-  const win = useAudio("/assets/audio/spinner-win.wav", 0.8)
+  const tick = useAudio(staticAsset(ASSET.boffmedia.img, 'audio', 'spinner-tick.wav'), 0.25)
+  const win = useAudio(staticAsset(ASSET.boffmedia.img, 'audio', 'spinner-win.wav'), 0.8)
 
   // `useAudio` hands back a fresh object every render, and `sound` can flip
   // mid-spin; both are read through refs so neither restarts the animation.

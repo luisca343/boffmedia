@@ -8,6 +8,7 @@ import { type CallData, type UserData, UserStatus } from "../types/call"
 import { ExpandedView } from "./ExpandedView"
 import { CollapsedView } from "./CollapsedView"
 import { useTranslations } from "next-intl"
+import { ASSET, staticAsset } from '@/lib/assets'
 
 export function CallStatus() {
   const { socket } = useSocketStore()
@@ -196,7 +197,7 @@ export function CallStatus() {
           : "left-3 top-16 z-30 w-[320px] max-w-[calc(100vw-24px)] overflow-hidden rounded-[16px] border border-[#2a3942] bg-[#111b21] shadow-[0_24px_60px_-18px_rgba(0,0,0,.55)]"
       } text-[#e9edef] ${activeCall.caller ? "" : "hidden"}`}
     >
-      <audio ref={audioRef} src="/smartrotom/audio/apps/chatapp/denden.mp3" preload="auto"></audio>
+      <audio ref={audioRef} src={staticAsset(ASSET.smartrotom.audio, 'apps/chatapp/denden.mp3')} preload="auto"></audio>
       {isExpanded ? (
         <ExpandedView
           activeCall={activeCall}

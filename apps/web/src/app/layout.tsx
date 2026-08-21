@@ -47,7 +47,7 @@ export default async function RootLayout({
         {/* The body font on every page — fetch it before CSS discovers it. */}
         <link
           rel="preload"
-          href="/assets/fonts/Saira/Saira-VariableFont_wdth,wght.woff2"
+          href="/boffmedia/fonts/Saira/Saira-VariableFont_wdth,wght.woff2"
           as="font"
           type="font/woff2"
           crossOrigin="anonymous"

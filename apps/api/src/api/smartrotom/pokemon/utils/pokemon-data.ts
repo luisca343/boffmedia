@@ -7,6 +7,7 @@ import { Pokemon } from '@/types/pokemon';
 import { wolfeyTypeRanking } from './types';
 import { MoveData } from './move-data';
 import pino from 'pino';
+import { publicPath } from '@/config/paths';
 
 const logger = pino({ name: 'util' });
 
@@ -38,15 +39,11 @@ export class PokemonData {
 
   async loadPokemonData() {
     const startingTime = Date.now();
-    const defaultDirDef = path.join(
-      __dirname,
-      '../../../../',
-      'public/smartrotom/packs/default_datapack/data/pixelmon/species',
+    const defaultDirDef = publicPath(
+      'smartrotom/packs/default_datapack/data/pixelmon/species',
     );
-    const publicDir = path.join(
-      __dirname,
-      '../../../../',
-      'public/smartrotom/packs/datapack/data/pixelmon/species',
+    const publicDir = publicPath(
+      'smartrotom/packs/datapack/data/pixelmon/species',
     );
 
     const defaultDir = await fsPromises.readdir(defaultDirDef);

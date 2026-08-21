@@ -16,10 +16,10 @@ import { fileURLToPath } from "node:url"
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..")
 const pkgFonts = join(root, "packages/tailwind-config/fonts")
-const volume = join(root, "public/assets/fonts")
+const volume = join(root, "public/boffmedia/fonts")
 
 if (!existsSync(volume)) {
-  console.log("• fonts: public/assets/fonts absent (untracked asset volume) — skipped")
+  console.log("• fonts: public/boffmedia/fonts absent (untracked asset volume) — skipped")
   process.exit(0)
 }
 
@@ -50,7 +50,7 @@ if (problems.length) {
   console.error("✗ fonts: package copies have drifted from the asset volume\n")
   for (const p of problems) console.error(`    ${p}`)
   console.error(
-    "\n  Re-sync by copying public/assets/fonts/<family>/*.woff2 into\n" +
+    "\n  Re-sync by copying public/boffmedia/fonts/<family>/*.woff2 into\n" +
       "  packages/tailwind-config/fonts/<family>/, or update the volume to match.",
   )
   process.exit(1)

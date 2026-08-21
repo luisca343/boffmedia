@@ -2,6 +2,7 @@
 import { Battle } from "@pkmn/client";
 import { useTranslations } from "next-intl";
 import { getParticipantName } from "../_utils/replayUtils";
+import { ASSET, staticAsset } from '@/lib/assets';
 
 const RESULT_ACCENT: Record<'win' | 'loss' | 'tie', string> = {
   win: 'var(--emerald-400)',
@@ -93,7 +94,7 @@ export const BattleEndScreen = ({ battle, pov, username, onRestart }: {
         <div
           className="w-20 h-20 rounded-[var(--radius)] overflow-hidden grid place-items-center shrink-0"
           style={{
-            background: `center / cover url(/battlesim/trainers/${name.toLowerCase()}.png), var(--layer-2)`,
+            background: `center / cover url(${staticAsset(ASSET.boffmedia.tools.battlesim, 'trainers', `${name.toLowerCase()}.png`)}), var(--layer-2)`,
             border: `2px solid ${isWinner ? accent : 'rgba(255,255,255,.15)'}`,
           }}
         >

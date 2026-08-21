@@ -4,6 +4,8 @@ import * as path from 'path';
 import { PokemonDataService } from './pokemon-data.service';
 import { POKEMON_REPOSITORY_TOKEN } from '@api/_utils/repositories/interfaces/repository.token';
 import { IPokemonRepository } from '../../repositories/interfaces/pokemon.repository.interface';
+import { publicPath } from '@/config/paths';
+import { ASSET, joinAssetPath } from '@boffmedia/asset-paths';
 
 @Injectable()
 export class PokemonImageService {
@@ -18,28 +20,29 @@ export class PokemonImageService {
   getItemSprite(name: string) {
     const itemFileName1 = name.replaceAll('_', '').toUpperCase();
     const itemFileName2 = name;
-    const sprite = path.join(
-      process.cwd(),
-      'public/smartrotom/img/sprites/items',
+    const sprite = publicPath(
+      'smartrotom/img/sprites/items',
       itemFileName1 + '.png',
     );
-    const sprite2 = path.join(
-      process.cwd(),
-      'public/smartrotom/img/sprites/items/other',
+    const sprite2 = publicPath(
+      'smartrotom/img/sprites/items/other',
       itemFileName2 + '.png',
     );
     if (fs.existsSync(sprite))
       return {
-        url: path.join('/smartrotom/img/sprites/items', itemFileName1 + '.png'),
+        url: joinAssetPath(
+          `${ASSET.smartrotom.img}/sprites/items`,
+          itemFileName1 + '.png',
+        ),
       };
     if (fs.existsSync(sprite2))
       return {
-        url: path.join(
-          '/smartrotom/img/sprites/items/other',
+        url: joinAssetPath(
+          `${ASSET.smartrotom.img}/sprites/items/other`,
           itemFileName2 + '.png',
         ),
       };
-    return { url: '/smartrotom/img/sprites/items/000.png' };
+    return { url: `${ASSET.smartrotom.img}/sprites/items/000.png` };
   }
 
   async getImage({
@@ -112,17 +115,15 @@ export class PokemonImageService {
           ? pokemon.name.toUpperCase()
           : `${pokemon.name.toUpperCase()}_${form.name!.toUpperCase()}`;
 
-      const image = path.join(
-        __dirname,
-        '../../../',
-        'public/smartrotom/img/sprites',
+      const image = publicPath(
+        'smartrotom/img/sprites',
         imageFolder,
         `${pokemonImageName}.png`,
       );
       if (fs.existsSync(image))
         return {
-          url: path.join(
-            '/smartrotom/img/sprites',
+          url: joinAssetPath(
+            `${ASSET.smartrotom.img}/sprites`,
             imageFolder,
             `${pokemonImageName}.png`,
           ),
@@ -149,18 +150,11 @@ export class PokemonImageService {
     const sprite = this.getSpriteURL(palette, pokemonId);
 
     const url = `assets/pixelmon/textures/${sprite.split(':')[1]}`;
-    const defaultDirDef = path.join(
-      __dirname,
-      '../../../',
-      'public/smartrotom/packs/default_resourcepack',
+    const defaultDirDef = publicPath(
+      'smartrotom/packs/default_resourcepack',
       url,
     );
-    const publicDir = path.join(
-      __dirname,
-      '../../../',
-      'public/smartrotom/packs/resourcepack',
-      url,
-    );
+    const publicDir = publicPath('smartrotom/packs/resourcepack', url);
 
     if (fs.existsSync(defaultDirDef))
       return {
@@ -243,18 +237,11 @@ export class PokemonImageService {
       }
 
       const url = `assets/pixelmon/textures/${spriteResource.split(':')[1]}`;
-      const defaultDirDef = path.join(
-        __dirname,
-        '../../../',
-        'public/smartrotom/packs/default_resourcepack',
+      const defaultDirDef = publicPath(
+        'smartrotom/packs/default_resourcepack',
         url,
       );
-      const publicDir = path.join(
-        __dirname,
-        '../../../',
-        'public/smartrotom/packs/resourcepack',
-        url,
-      );
+      const publicDir = publicPath('smartrotom/packs/resourcepack', url);
 
       if (fs.existsSync(defaultDirDef)) {
         return path.join('/smartrotom/packs/default_resourcepack', url);

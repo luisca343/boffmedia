@@ -1,14 +1,15 @@
+import { ASSET, staticAsset } from '@/lib/assets';
 import type { GameEntry } from "./types";
 
 export const minecraft: GameEntry = {
   slug: "minecraft",
   nameKey: "games.minecraft.name",
 
-  icon: "/assets/img/games/minecraft/icon.webp",
+  icon: staticAsset(ASSET.boffmedia.img, "games/minecraft/icon.webp"),
   color: "from-green-700 to-emerald-500",
   bg: "bg-green-950",
 
-  logo: "/assets/img/games/minecraft/logo.webp",
+  logo: staticAsset(ASSET.boffmedia.img, "games/minecraft/logo.webp"),
   navHref: "/minecraft",
 
   externalLinks: [],
@@ -25,7 +26,7 @@ export const minecraft: GameEntry = {
           sidebarIcon: "grid",
           bleed: true,
           landing: {
-            icon: "/assets/img/games/minecraft/schematic-icon.webp",
+            icon: staticAsset(ASSET.boffmedia.img, "games/minecraft/schematic-icon.webp"),
             fallbackIcon: "grid",
             fallbackIconColor: "text-green-500",
             color: "from-green-700 to-emerald-500",
@@ -42,7 +43,7 @@ export const minecraft: GameEntry = {
           sidebarIcon: "cube",
           bleed: true,
           landing: {
-            icon: "/assets/img/games/minecraft/schematic-icon.webp",
+            icon: staticAsset(ASSET.boffmedia.img, "games/minecraft/schematic-icon.webp"),
             fallbackIcon: "cube",
             fallbackIconColor: "text-emerald-400",
             color: "from-emerald-700 to-teal-500",

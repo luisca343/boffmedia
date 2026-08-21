@@ -5,6 +5,7 @@ import { createWriteStream } from 'fs';
 import { access, mkdir, readdir, stat } from 'fs/promises';
 import * as path from 'path';
 import { pipeline } from 'stream/promises';
+import { laboonPath } from '@/config/paths';
 import { GameFileEntry } from '../entities/game-file.entity';
 import { EuropeAggregateResult } from '../entities/europe-aggregate.entity';
 import { DownloadResult } from '../entities/download-result.entity';
@@ -122,9 +123,9 @@ export class MyrientScrapeService {
   ): Promise<{ filePath: string; safeName: string }> {
     const catalog = CONSOLE_CATALOG[consoleKey];
     const safeName = path.basename(filename);
-    const filePath = path.join(
-      process.cwd(),
-      'laboon/juegos/Roms',
+    const filePath = laboonPath(
+      'juegos',
+      'Roms',
       catalog.localFolder,
       safeName,
     );
@@ -137,11 +138,7 @@ export class MyrientScrapeService {
     regions: string[],
   ): Promise<LocalGamesResult> {
     const catalog = CONSOLE_CATALOG[consoleKey];
-    const saveDir = path.join(
-      process.cwd(),
-      'laboon/juegos/Roms',
-      catalog.localFolder,
-    );
+    const saveDir = laboonPath('juegos', 'Roms', catalog.localFolder);
 
     let entries: LocalGameEntry[] = [];
     try {
@@ -362,7 +359,7 @@ export class MyrientScrapeService {
    * @returns    Metadata about the saved file.
    */
   async downloadGame(url: string): Promise<DownloadResult> {
-    const townPath = path.join(process.cwd(), 'laboon/juegos/myrient/3DS');
+    const townPath = laboonPath('juegos', 'myrient', '3DS');
     await mkdir(townPath, { recursive: true });
 
     // Derive a safe filename from the URL.
@@ -423,11 +420,7 @@ export class MyrientScrapeService {
     );
 
     // 3. Prepare the save directory
-    const saveDir = path.join(
-      process.cwd(),
-      'laboon/juegos/Roms',
-      catalog.localFolder,
-    );
+    const saveDir = laboonPath('juegos', 'Roms', catalog.localFolder);
     await mkdir(saveDir, { recursive: true });
 
     // 4. Build one download task per matched entry
@@ -544,11 +537,7 @@ export class MyrientScrapeService {
       `[${catalog.label}] Stream-download of ${selected.length} game(s) (concurrency=${concurrency})`,
     );
 
-    const saveDir = path.join(
-      process.cwd(),
-      'laboon/juegos/Roms',
-      catalog.localFolder,
-    );
+    const saveDir = laboonPath('juegos', 'Roms', catalog.localFolder);
     await mkdir(saveDir, { recursive: true });
 
     yield `data: ${JSON.stringify({ type: 'start', total: selected.length })}\n\n`;
@@ -677,11 +666,7 @@ export class MyrientScrapeService {
     );
 
     // Prepare the save directory
-    const saveDir = path.join(
-      process.cwd(),
-      'laboon/juegos/Roms',
-      catalog.localFolder,
-    );
+    const saveDir = laboonPath('juegos', 'Roms', catalog.localFolder);
     await mkdir(saveDir, { recursive: true });
 
     // Build one download task per selected entry

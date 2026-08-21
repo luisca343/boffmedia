@@ -1,6 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { mkdir, readdir, writeFile } from 'fs/promises';
 import * as path from 'path';
+import { laboonPath } from '@/config/paths';
 
 // ---------------------------------------------------------------------------
 // CBZ service
@@ -150,13 +151,7 @@ function imageExtension(imageUrl: string): string {
 
 // ── Path helpers ─────────────────────────────────────────────────────────────
 
-const MANGA_BASE = path.join(
-  process.cwd(),
-  'laboon',
-  'manga',
-  'downloads',
-  'mangas',
-);
+const MANGA_BASE = laboonPath('manga', 'downloads', 'mangas');
 
 /** Sanitizes a series or chapter name so it is safe to use as a filesystem path segment. */
 function sanitizeName(name: string): string {

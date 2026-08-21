@@ -1,5 +1,6 @@
 "use client"
 
+import { ASSET, staticAsset } from '@/lib/assets';
 import * as React from "react"
 import Link from "next/link"
 import Image from "next/image"
@@ -49,7 +50,7 @@ export function Navbar() {
         href="/"
         className="mr-0 flex shrink-0 items-center gap-[11px] font-display text-[22px] font-extrabold italic uppercase leading-none text-txt no-underline min-[1120px]:mr-[14px]"
       >
-        <Image src="/assets/brand/boff-logo.webp" alt="" width={27} height={27} className="h-[27px] w-[27px] object-contain" />
+        <Image src={staticAsset(ASSET.boffmedia.brand, 'boff-logo.webp')} alt="" width={27} height={27} className="h-[27px] w-[27px] object-contain" />
         <span>Boff<b className="text-accent">media</b></span>
       </Link>
 

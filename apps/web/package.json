@@ -18,6 +18,7 @@
     "test:show": "npx playwright show-report"
   },
   "dependencies": {
+    "@boffmedia/asset-paths": "workspace:*",
     "@boffmedia/pack-schema": "workspace:*",
     "@boffmedia/shared": "workspace:*",
     "@boffmedia/tool-kit": "workspace:*",

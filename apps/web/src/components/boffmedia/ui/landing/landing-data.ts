@@ -1,6 +1,7 @@
 import { getLandingItems, getToolHref } from "@/data/games"
 import { HUB_SLUGS } from "@/components/boffmedia/ui/tools/tools-data"
 import type { IconName } from "@boffmedia/ui"
+import { ASSET, staticAsset } from "@/lib/assets"
 
 /* Journey palette — each stop tints the sky; color interpolates continuously
    between stops so there are no hard edges between sections. */
@@ -69,7 +70,7 @@ export const TV3_EVENT_TS = new Date("2026-07-14T18:00:00").getTime()
 // fallback for `TvComunidad`'s activity ticker, which renders real activity from
 // `useSiteActivity` (GET /activity) when available.
 export const TV3_GAMES = [
-  { n: "Pixelmon Wingull 2", d: "La aventura Pokémon definitiva dentro de Minecraft.", tag: "Insignia — Temporada 04", img: "/assets/img/personajes.webp", tk: "wingull" },
+  { n: "Pixelmon Wingull 2", d: "La aventura Pokémon definitiva dentro de Minecraft.", tag: "Insignia — Temporada 04", img: staticAsset(ASSET.boffmedia.img, 'personajes.webp'), tk: "wingull" },
   { n: "Minecraft Bingo", d: "Carreras de objetivos por equipos, ediciones rápidas.", tag: "Competitivo — Semanal", ph: "Minecraft Bingo", tk: "bingo" },
   { n: "Project ZomBOFF", d: "Supervivencia cooperativa en un mundo infectado.", tag: "Survival — Noches especiales", ph: "Project ZomBOFF", tk: "zomboff" },
 ]

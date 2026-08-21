@@ -3,6 +3,7 @@
 import { Suspense, useEffect, useState, type ReactNode } from "react"
 import { useSearchParams } from "next/navigation"
 import { useTranslations } from "next-intl"
+import { ASSET, staticAsset } from '@/lib/assets'
 import { Bar, Button, Card, Empty, PageHead, Select, Skeleton } from "../../_components/ui"
 import { ConsolaHero } from "../../_components/admin/ConsolaHero"
 import {
@@ -21,7 +22,7 @@ function AppTile({ app, action }: { app: SmartRotomApp; action: ReactNode }) {
     <div className="flex flex-col items-center gap-2 rounded-gt-sm border border-gt-line bg-gt-paper-0 p-3 text-center">
       <div className="h-[46px] w-[46px] overflow-hidden rounded-[11px] border border-gt-line-strong bg-gt-paper-2">
         { }
-        <img src={`/smartrotom/img/apps/${app.url}.webp`} alt={app.name} className="h-full w-full object-cover" />
+        <img src={staticAsset(ASSET.smartrotom.img, 'apps', `${app.url}.webp`)} alt={app.name} className="h-full w-full object-cover" />
       </div>
       <div className="text-[12px] font-bold text-gt-ink-900">{app.name}</div>
       {action}
