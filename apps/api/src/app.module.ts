@@ -77,6 +77,11 @@ import { publicPath } from '@/config/paths';
 
 @Module({
   imports: [
+    // The module owns this route, so no Nest guard or @Public() decorator
+    // applies to it: METRICS_PATH is unauthenticated wherever the port is
+    // reachable. It must be restricted at the reverse proxy — Prometheus
+    // scrapes it over the Docker bridge (172.17.0.1:34301), never the public
+    // edge. Tracked in docs/infrastructure-integration-plan.md.
     PrometheusModule.register({
       defaultMetrics: { enabled: true },
       path: METRICS_PATH,

@@ -172,5 +172,25 @@ RUN mkdir -p var/uploads
 EXPOSE 34301
 ENV NODE_OPTIONS="--max-old-space-size=4096"
 
+# Proves the process is listening on 34301 — the failure this catches is a
+# container that reports "Up" while Node bound another port or died outright.
+# /health is @Public() and answers 200 even when the database is unreachable
+# (the degradation is in the body), so a DB blip cannot flap this.
+#
+# --start-period is 120s, not the web image's 10s: before app.listen() this
+# image loads the Pokémon dataset off the public/ mount and starts a JRE, a
+# Playwright/Chromium browser and a Discord client. Measured cold boot to the
+# last module-init step is ~12s on a warm local mount; the window has to cover
+# the slowest boot, not the typical one, because failures inside it are not
+# counted against --retries — so it is sized for a contended host reading that
+# mount off slower storage.
+#
+# --timeout must stay above the probe's own budget: /health opens a DB
+# connection and calls WINGULL_API with a 5s client-side timeout, so anything
+# at or below 5s reports a slow dependency as a dead container — the false
+# positive this healthcheck exists to avoid.
+HEALTHCHECK --interval=30s --timeout=10s --start-period=120s --retries=3 \
+  CMD node -e "require('http').get('http://localhost:34301/health', (r) => { process.exit(r.statusCode === 200 ? 0 : 1) }).on('error', () => process.exit(1))"
+
 CMD ["node", "dist/main.js"]
 

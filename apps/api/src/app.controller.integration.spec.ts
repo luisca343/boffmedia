@@ -85,6 +85,16 @@ describe('AppController — integration (smoke tests)', () => {
     jest.clearAllMocks();
   });
 
+  describe('GET /', () => {
+    it('should answer with a banner that carries no configuration', async () => {
+      const res = await request(app.getHttpServer()).get('/');
+
+      expect(res.status).toBe(200);
+      expect(res.body).toEqual({ service: 'boffmedia-api', status: 'ok' });
+      expect(mockAppService.getDBPort).not.toHaveBeenCalled();
+    });
+  });
+
   describe('GET /health', () => {
     it('should return health status object', async () => {
       const healthResponse = {

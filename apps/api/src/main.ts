@@ -240,6 +240,19 @@ async function bootstrap() {
     );
   }
 
+  // Registers the SIGTERM/SIGINT listeners that run Nest's shutdown hooks, so
+  // in-flight requests finish and the DB pool drains before the process leaves.
+  // This is load-bearing rather than a nicety: in the container Node is PID 1,
+  // and the kernel applies no default action to a signal PID 1 has no handler
+  // for — so without this `docker stop` is a 10s wait followed by SIGKILL
+  // (exit 137), never a shutdown.
+  //
+  // Disjoint from installProcessGuards() above, which listens only for
+  // 'uncaughtException' and 'unhandledRejection'; its process.exit(1) on a
+  // fatal defect deliberately bypasses this path, because draining from an
+  // unknown state is not safer than dying.
+  app.enableShutdownHooks();
+
   await app.listen(port);
   console.log(`Server listening on port ${port}`);
 }

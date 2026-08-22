@@ -1,18 +1,28 @@
-import { Controller, Get, Param, Query } from '@nestjs/common';
+import { Controller, Get, Param, Query, UseGuards } from '@nestjs/common';
+import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { Public } from '@api/_utils/decorators/public.decorator';
+import { JwtAuthGuard } from '@api/auth/jwt-auth.guard';
+import { RolesGuard } from '@api/_utils/guards/roles.guard';
+import { Roles } from '@api/_utils/decorators/roles.decorator';
+import { USER_ROLES } from '@api/_utils/auth/roles.constants';
 import { AppService } from './app.service';
 import { promises as fs } from 'fs';
 import { join } from 'path';
-import { ApiTags } from '@nestjs/swagger';
 import { SkipEnvelope } from './common/decorators/skip-envelope.decorator';
 
+/**
+ * Auth here is per route and must stay that way. JwtAuthGuard resolves
+ * IS_PUBLIC_KEY from the handler first and the controller class second and
+ * takes the first defined value, so a class-level @Public() would neuter
+ * @UseGuards on every guarded route below.
+ */
 @ApiTags('Boffmedia')
-@Public()
 @Controller()
 @SkipEnvelope()
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
+  @Public()
   @Get('zomboid')
   async zomboid() {
     const filePath = join(process.cwd(), 'data', 'zomboid', 'data.txt');
@@ -42,31 +52,54 @@ export class AppController {
     }
   }
 
+  /**
+   * The container HEALTHCHECK and any external prober call this unauthenticated,
+   * so it must stay @Public(). It answers 200 even when a dependency is down —
+   * `status` carries the degradation — so a database blip cannot restart-loop
+   * the container.
+   */
+  @Public()
   @Get('health')
   async getHealth() {
     return this.appService.getHealth();
   }
 
+  /**
+   * Service banner for the API root. Deliberately carries no configuration:
+   * anything reachable without a token answers only with what it already
+   * announces about itself.
+   */
+  @Public()
   @Get()
-  getDBPort(): number {
-    return this.appService.getDBPort();
+  getRoot(): { service: string; status: string } {
+    return { service: 'boffmedia-api', status: 'ok' };
   }
 
+  /**
+   * Flips production log verbosity for the whole process, so it is an
+   * admin-only switch: left open it is a disk-fill vector.
+   */
   @Get('togglelogging')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.BOFF_ADMIN)
+  @ApiBearerAuth('JWT')
   toggleLogging() {
     return { logging: this.appService.toggleLogging() };
   }
 
+  @Public()
   @Get('blogicons')
   async blogicons() {
     return await this.appService.blogicons();
   }
 
+  @Public()
   @Get('steamkeys')
   async steamkeys() {
     return await this.appService.steamKeys();
   }
 
+  @Public()
   @Get('steamdata/:steamID')
   async steamData(@Param('steamID') steamID: string) {
     return await this.appService.getSteamData(steamID);
@@ -77,6 +110,7 @@ export class AppController {
    * store.steampowered.com/search/?maxprice=free&category1=998&specials=1.
    * The lang query is the UI locale (es|en); prices are always quoted in EUR.
    */
+  @Public()
   @Get('steamfree')
   async steamFree(@Query('lang') lang?: string) {
     return await this.appService.getSteamFreeGames(lang);
