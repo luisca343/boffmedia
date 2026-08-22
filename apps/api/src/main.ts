@@ -15,7 +15,67 @@ import { ApiResponseEntity } from './common/entities/api-response.entity';
 import { Logger } from 'nestjs-pino';
 import { publicPath, uploadsPath } from '@/config/paths';
 
+/**
+ * Socket failures that say nothing about this process's health: the peer went
+ * away. They arrive as an 'error' event on whichever client emitted them, and
+ * an EventEmitter with no listener for 'error' is fatal to Node — so a public
+ * WebSocket dropping an idle connection could take the whole API down, taking
+ * every unrelated route with it.
+ */
+const RECOVERABLE_SOCKET_CODES = new Set([
+  'ECONNRESET',
+  'EPIPE',
+  'ETIMEDOUT',
+  'ECONNREFUSED',
+  'EHOSTUNREACH',
+  'ENETUNREACH',
+  'EAI_AGAIN',
+]);
+
+function installProcessGuards(): void {
+  process.on('uncaughtException', (error: NodeJS.ErrnoException) => {
+    if (error?.code && RECOVERABLE_SOCKET_CODES.has(error.code)) {
+      // Deliberately kept alive: a dropped peer connection is not a reason to
+      // stop serving requests that have nothing to do with it.
+      console.error(
+        JSON.stringify({
+          level: 50,
+          service: 'boffmedia-api',
+          msg: `Recovered from an unhandled socket error (${error.code})`,
+          err: { message: error.message, stack: error.stack },
+        }),
+      );
+      return;
+    }
+    // Anything else is a real defect, and continuing from an unknown state is
+    // worse than restarting: let the process die so the supervisor replaces it.
+    console.error(
+      JSON.stringify({
+        level: 60,
+        service: 'boffmedia-api',
+        msg: 'Fatal uncaught exception — exiting',
+        err: { message: error?.message, stack: error?.stack },
+      }),
+    );
+    process.exit(1);
+  });
+
+  process.on('unhandledRejection', (reason: unknown) => {
+    const error = reason as NodeJS.ErrnoException;
+    console.error(
+      JSON.stringify({
+        level: 50,
+        service: 'boffmedia-api',
+        msg: 'Unhandled promise rejection',
+        err: { message: error?.message ?? String(reason), stack: error?.stack },
+      }),
+    );
+  });
+}
+
 async function bootstrap() {
+  installProcessGuards();
+
   const app = await NestFactory.create(AppModule, { bufferLogs: true });
   app.useLogger(app.get(Logger));
 

@@ -121,6 +121,10 @@ export class MangaBrowserService implements OnModuleDestroy {
       const settle = (error?: Error) => {
         clearTimeout(timer);
         probe.removeAllListeners();
+        // Re-arm a no-op listener before tearing the socket down: terminate()
+        // can still emit, and an 'error' with no listener would be fatal — the
+        // exact failure this probe exists to contain.
+        probe.on('error', () => undefined);
         try {
           probe.terminate();
         } catch {

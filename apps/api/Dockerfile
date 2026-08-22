@@ -151,6 +151,11 @@ RUN node node_modules/playwright/cli.js install --with-deps chromium
 COPY --from=builder /app/apps/api/drizzle ./drizzle
 COPY --from=builder /app/apps/api/data ./data
 COPY --from=builder /app/apps/api/package.json ./
+# Operator scripts, taken from the build context rather than a stage: they are
+# dependency-free plain Node run against the mounted volumes, so they have to
+# travel with the image the server pulls.
+#   docker run --rm --entrypoint node <image> /app/scripts/check-storage-roots.js
+COPY scripts/check-storage-roots.js scripts/migrate-public-assets-2026-08-21.js scripts/migrate-public-assets-prod-2026-08-21.js ./scripts/
 # Writable runtime cache (imageCache.json lives here, not in public/)
 RUN mkdir -p var/cache
 # User uploads (avatars, chat images, ShareX captures, starbank pictures).
