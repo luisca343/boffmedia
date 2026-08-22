@@ -23,6 +23,7 @@ import { JwtAuthGuard } from '@api/auth/jwt-auth.guard';
 import { RolesGuard } from '@api/_utils/guards/roles.guard';
 import { USER_ROLES } from '@api/_utils/auth/roles.constants';
 import { Roles } from '@api/_utils/decorators/roles.decorator';
+import { RequireSession } from '@api/_utils/decorators/require-session.decorator';
 
 @ApiTags('Wingull | Invites')
 // Redeeming an invite is deliberately public (that is the point of an invite
@@ -36,6 +37,7 @@ export class InvitesController {
 
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(USER_ROLES.BOFF_ADMIN)
+  @RequireSession()
   @Post()
   @ApiOperation({ summary: 'Create a new invite' })
   @ApiResponse({
@@ -211,6 +213,7 @@ export class InvitesController {
 
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(USER_ROLES.BOFF_ADMIN)
+  @RequireSession()
   @Delete(':id')
   @ApiOperation({ summary: 'Soft delete invite by ID' })
   @ApiResponse({
@@ -232,6 +235,7 @@ export class InvitesController {
 
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(USER_ROLES.BOFF_ADMIN)
+  @RequireSession()
   @Delete(':id/permanent')
   @ApiOperation({ summary: 'Permanently delete invite by ID' })
   @ApiResponse({

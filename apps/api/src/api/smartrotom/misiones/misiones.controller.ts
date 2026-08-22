@@ -48,6 +48,7 @@ import { JwtAuthGuard } from '@api/auth/jwt-auth.guard';
 import { RolesGuard } from '@api/_utils/guards/roles.guard';
 import { USER_ROLES } from '@api/_utils/auth/roles.constants';
 import { Public } from '@api/_utils/decorators/public.decorator';
+import { RequireSession } from '@api/_utils/decorators/require-session.decorator';
 
 @ApiTags('SmartRotom | Misiones')
 // Mission and NPC reads are public (the missions page needs no account); authoring, cache control and image upload are admin-only.
@@ -98,6 +99,7 @@ export class MisionesController {
 
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(USER_ROLES.ROTOM_ADMIN)
+  @RequireSession()
   @Post('cache/refresh')
   @ApiOperation({ summary: 'Force refresh quest cache from external API' })
   @ApiResponse({
@@ -125,6 +127,7 @@ export class MisionesController {
 
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(USER_ROLES.ROTOM_ADMIN)
+  @RequireSession()
   @Post('npcs')
   @ApiOperation({ summary: 'Update NPCs data in the system' })
   @ApiResponse({
@@ -189,6 +192,7 @@ export class MisionesController {
 
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(USER_ROLES.ROTOM_ADMIN)
+  @RequireSession()
   @Post('images/upload')
   @ApiOperation({ summary: 'Upload custom NPC image' })
   @ApiResponse({

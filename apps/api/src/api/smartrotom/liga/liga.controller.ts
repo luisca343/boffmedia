@@ -212,6 +212,7 @@ export class LigaController {
 
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(USER_ROLES.ROTOM_ADMIN)
+  @RequireSession()
   @Post('tournament')
   @ApiOperation({ summary: 'Create a new tournament' })
   @ApiResponse({

@@ -19,7 +19,7 @@
     "lint:src": "cross-env NODE_OPTIONS=--max-old-space-size=2048 eslint src/**/*.ts --fix",
     "lint:staged": "cross-env NODE_OPTIONS=--max-old-space-size=2048 eslint --fix",
     "type-check": "cross-env NODE_OPTIONS=--max-old-space-size=2048 tsc --noEmit --skipLibCheck",
-    "test": "cross-env NODE_OPTIONS=--max-old-space-size=3072 jest --runInBand",
+    "test": "cross-env NODE_OPTIONS=--max-old-space-size=6144 jest --runInBand",
     "test:serial": "cross-env NODE_OPTIONS=--max-old-space-size=4096 jest --runInBand",
     "test:handles": "cross-env NODE_OPTIONS=--max-old-space-size=4096 jest --runInBand --detectOpenHandles",
     "test:watch": "cross-env NODE_OPTIONS=--max-old-space-size=4096 jest --watch --maxWorkers=1",

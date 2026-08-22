@@ -10,6 +10,7 @@ import { Reflector } from '@nestjs/core';
 import { JwtAuthGuard } from '@api/auth/jwt-auth.guard';
 import { RolesGuard } from '@api/_utils/guards/roles.guard';
 import { GameOrUserAuthGuard } from '@api/_utils/guards/game-or-user-auth.guard';
+import { UserThrottlerGuard } from '@api/_utils/guards/user-throttler.guard';
 
 const mockLogger = {
   log: jest.fn(),
@@ -44,6 +45,8 @@ describe('MangaController — integration (ValidationPipe + GlobalExceptionFilte
       .overrideGuard(RolesGuard)
       .useValue({ canActivate: () => true })
       .overrideGuard(GameOrUserAuthGuard)
+      .useValue({ canActivate: () => true })
+      .overrideGuard(UserThrottlerGuard)
       .useValue({ canActivate: () => true })
       .compile();
 

@@ -79,12 +79,18 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule, { bufferLogs: true });
   app.useLogger(app.get(Logger));
 
-  // Security headers. CSP is disabled because the Swagger/Scalar reference UIs load
-  // inline assets, and cross-origin resource policy is relaxed so the web app can
-  // load the static /public/uploads assets served by this API from another origin.
+  const isProduction = env.NODE_ENV === 'production';
+
+  // CSP is off only where the Swagger/Scalar reference UIs exist, which is
+  // strictly below production (they mount inside the same NODE_ENV check
+  // below) — their inline assets are the whole reason it was ever disabled.
+  // In production this origin serves JSON and static files and no HTML that
+  // needs a relaxed policy, so helmet's default applies. Cross-origin resource
+  // policy stays relaxed in both: the web app loads this API's static assets
+  // from another origin.
   app.use(
     helmet({
-      contentSecurityPolicy: false,
+      contentSecurityPolicy: isProduction ? undefined : false,
       crossOriginEmbedderPolicy: false,
       crossOriginResourcePolicy: { policy: 'cross-origin' },
     }),
@@ -99,17 +105,30 @@ async function bootstrap() {
     }),
   );
 
-  const origin = [
-    'http://localhost:3000',
-    'http://148.251.3.244:34333',
+  // Origins allowed to READ responses from this API. Kept split because an
+  // origin list is a capability list: any origin on it can read authenticated
+  // responses, so a production list that admits localhost extends that to any
+  // page running on any developer's machine.
+  const PUBLIC_ORIGINS = [
     'https://lizardon.es',
     'https://boffmedia.es',
-    'http://local.boffmedia.es',
-    'http://smartrotom.local.boffmedia.es',
     'https://ficuslab.es',
     'https://blog.ficuslab.es',
   ];
-  app.enableCors({ origin });
+  // Never reachable by a real user: hosts-file names, and the production box
+  // addressed directly by IP over plaintext HTTP — which is why that one is
+  // here rather than above, despite being the production machine.
+  const DEV_ONLY_ORIGINS = [
+    'http://localhost:3000',
+    'http://local.boffmedia.es',
+    'http://smartrotom.local.boffmedia.es',
+    'http://148.251.3.244:34333',
+  ];
+  app.enableCors({
+    origin: isProduction
+      ? PUBLIC_ORIGINS
+      : [...PUBLIC_ORIGINS, ...DEV_ONLY_ORIGINS],
+  });
   // JSON body cap. File uploads go through multer/FileInterceptor (multipart),
   // not express.json, so this only bounds JSON payloads — 5mb is very generous
   // for those while cutting the DoS surface from the previous 50mb. Bump a
@@ -154,7 +173,7 @@ async function bootstrap() {
 
   const port = configService.get<number>('PORT') ?? 34301;
 
-  if (env.NODE_ENV !== 'production') {
+  if (!isProduction) {
     const config = new DocumentBuilder()
       .setTitle('Ficus Labs API')
       .setDescription(

@@ -6,9 +6,18 @@ import {
   Post,
   Query,
   Res,
+  UseGuards,
 } from '@nestjs/common';
+import { Throttle } from '@nestjs/throttler';
 import { Public } from '@api/_utils/decorators/public.decorator';
+import { RequireSession } from '@api/_utils/decorators/require-session.decorator';
+import { Roles } from '@api/_utils/decorators/roles.decorator';
+import { USER_ROLES } from '@api/_utils/auth/roles.constants';
+import { JwtAuthGuard } from '@api/auth/jwt-auth.guard';
+import { RolesGuard } from '@api/_utils/guards/roles.guard';
+import { UserThrottlerGuard } from '@api/_utils/guards/user-throttler.guard';
 import {
+  ApiBearerAuth,
   ApiBody,
   ApiOperation,
   ApiQuery,
@@ -82,6 +91,15 @@ export class MangaController {
 
   // ── Download (SSE stream) ─────────────────────────────────────────────────
 
+  // Searching and reading are public; making the server FETCH and WRITE files is
+  // not. @RequireSession() is what actually enforces that — the class-level
+  // @Public() above would otherwise short-circuit JwtAuthGuard before passport,
+  // leaving RolesGuard with no principal to check.
+  @RequireSession()
+  @UseGuards(JwtAuthGuard, RolesGuard, UserThrottlerGuard)
+  @Roles(USER_ROLES.BOFF_ADMIN)
+  @Throttle({ default: { ttl: 60_000, limit: 5 } })
+  @ApiBearerAuth('JWT')
   @Post('download/stream')
   @ApiOperation({
     summary: 'Download chapters and stream progress via SSE',

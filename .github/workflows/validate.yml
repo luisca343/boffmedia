@@ -1,0 +1,51 @@
+name: Validate
+
+# The gate the deploy workflows depend on. It exists because neither of them
+# compiles anything they ship: the API image builds from `nest build`, and the
+# web image builds with `typescript.ignoreBuildErrors: true` in next.config.mjs,
+# so `next build` succeeds WITH real type errors. Without this job a type error
+# reaches production and nothing fails on the way.
+#
+# `pnpm lint` is not eslint — it chains six check-* scripts that encode rules
+# invisible in the component code (layering, i18n parity, design-system
+# crossing, schema drift, error codes). Run it as the script, never bare eslint.
+
+on:
+  workflow_call:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      # Not --frozen-lockfile: the API image builds with --no-frozen-lockfile,
+      # and a gate stricter than the thing it gates fails on lockfile drift that
+      # would have deployed fine. Keep the two in step.
+      - name: Install dependencies
+        run: pnpm install --no-frozen-lockfile
+
+      - name: Type-check all packages
+        run: pnpm type-check
+
+      - name: Lint (eslint + the six check-* scripts)
+        run: pnpm lint
+
+      # public/ is an untracked asset volume, so it is absent here. That is
+      # expected and handled — check-fonts skips itself when it is missing.
+      - name: API test suite
+        run: pnpm --filter api test

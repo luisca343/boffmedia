@@ -144,6 +144,7 @@ export class ArcadeController {
 
   // ==================== INVENTORY ENDPOINTS ====================
 
+  @RequireSession()
   @Get('inventory/:uuid')
   @ApiOperation({ summary: 'Get player inventory items' })
   @ApiResponse({
@@ -203,6 +204,7 @@ export class ArcadeController {
     return this.arcadeFacadeService.getInventoryStats(uuid);
   }
   @ApiExtraModels(RarityRange)
+  @RequireSession()
   @Get('inventory/:uuid/item/:itemId')
   @ApiOperation({ summary: 'Get specific inventory item' })
   @ApiParam({
@@ -316,6 +318,7 @@ export class ArcadeController {
 
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(USER_ROLES.ROTOM_ADMIN)
+  @RequireSession()
   @Post('lootbox/give')
   @ApiOperation({ summary: 'Give lootbox to player' })
   @ApiResponse({

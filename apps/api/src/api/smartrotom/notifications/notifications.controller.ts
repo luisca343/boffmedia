@@ -96,6 +96,7 @@ export class NotificationsController {
 
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(USER_ROLES.ROTOM_ADMIN)
+  @RequireSession()
   @Post('send')
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Send a notification to a player (admin)' })

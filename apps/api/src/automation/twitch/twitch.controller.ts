@@ -19,6 +19,7 @@ import { JwtAuthGuard } from '@api/auth/jwt-auth.guard';
 import { RolesGuard } from '@api/_utils/guards/roles.guard';
 import { USER_ROLES } from '@api/_utils/auth/roles.constants';
 import { Public } from '@api/_utils/decorators/public.decorator';
+import { RequireSession } from '@api/_utils/decorators/require-session.decorator';
 
 @ApiTags('Automation - Twitch')
 // Stream status is public; changing what is monitored or where notifications land is not.
@@ -50,6 +51,7 @@ export class TwitchController {
 
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(USER_ROLES.BOFF_ADMIN)
+  @RequireSession()
   @Post('check-now')
   @ApiOperation({ summary: 'Trigger immediate stream check' })
   @ApiResponse({ status: 200, description: 'Manual check completed' })
@@ -87,6 +89,7 @@ export class TwitchController {
 
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(USER_ROLES.BOFF_ADMIN)
+  @RequireSession()
   @Post('monitor/user/:username')
   @ApiOperation({ summary: 'Add user to monitoring list' })
   @ApiResponse({ status: 200, description: 'User added to monitoring' })
@@ -100,6 +103,7 @@ export class TwitchController {
 
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(USER_ROLES.BOFF_ADMIN)
+  @RequireSession()
   @Delete('monitor/user/:username')
   @ApiOperation({ summary: 'Remove user from monitoring list' })
   @ApiResponse({ status: 200, description: 'User removed from monitoring' })
@@ -113,6 +117,7 @@ export class TwitchController {
 
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(USER_ROLES.BOFF_ADMIN)
+  @RequireSession()
   @Post('notifications/target')
   @ApiOperation({ summary: 'Add notification target' })
   @ApiResponse({ status: 200, description: 'Notification target added' })
@@ -126,6 +131,7 @@ export class TwitchController {
 
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(USER_ROLES.BOFF_ADMIN)
+  @RequireSession()
   @Delete('notifications/target/:type')
   @ApiOperation({ summary: 'Remove notification target' })
   @ApiResponse({ status: 200, description: 'Notification target removed' })

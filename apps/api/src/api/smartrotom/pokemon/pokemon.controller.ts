@@ -62,6 +62,7 @@ import { RolesGuard } from '@api/_utils/guards/roles.guard';
 import { USER_ROLES } from '@api/_utils/auth/roles.constants';
 import { Public } from '@api/_utils/decorators/public.decorator';
 import { GameOrUserAuthGuard } from '@api/_utils/guards/game-or-user-auth.guard';
+import { RequireSession } from '@api/_utils/decorators/require-session.decorator';
 
 @ApiTags('SmartRotom | Pokémon')
 // Pokédex reads are public — the web dex needs no account. The writes are not:
@@ -720,6 +721,7 @@ export class PokemonController {
 
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(USER_ROLES.ROTOM_ADMIN)
+  @RequireSession()
   @Post('sprites/refresh')
   @ApiOperation({ summary: 'Refresh sprite manifest' })
   @ApiResponse({

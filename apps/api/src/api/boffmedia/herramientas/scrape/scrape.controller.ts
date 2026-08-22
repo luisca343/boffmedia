@@ -41,8 +41,11 @@ import { UpdateMangaConfigDto } from './dto/update-manga-config.dto';
 import { UpdateSeriesStatusDto } from './dto/update-series-status.dto';
 import { JwtAuthGuard } from '@api/auth/jwt-auth.guard';
 import { RolesGuard } from '@api/_utils/guards/roles.guard';
+import { UserThrottlerGuard } from '@api/_utils/guards/user-throttler.guard';
 import { USER_ROLES } from '@api/_utils/auth/roles.constants';
 import { Roles } from '@api/_utils/decorators/roles.decorator';
+import { Throttle } from '@nestjs/throttler';
+import { RequireSession } from '@api/_utils/decorators/require-session.decorator';
 
 @ApiTags('BoffMedia | Scrape')
 @Public()
@@ -211,8 +214,10 @@ export class ScrapeController {
 
   // ==================== DOWNLOADS ====================
 
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard, UserThrottlerGuard)
   @Roles(USER_ROLES.BOFF_ADMIN)
+  @RequireSession()
+  @Throttle({ default: { ttl: 60_000, limit: 10 } })
   @Post('myrient/download')
   @ApiOperation({
     summary: 'Download a game file from Myrient to the local 3DS directory',
@@ -243,8 +248,10 @@ export class ScrapeController {
     return this.scrapeFacadeService.downloadGame(body.url);
   }
 
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard, UserThrottlerGuard)
   @Roles(USER_ROLES.BOFF_ADMIN)
+  @RequireSession()
+  @Throttle({ default: { ttl: 60_000, limit: 2 } })
   @Post('myrient/download-all')
   @ApiOperation({
     summary: 'Download all games for a console with optional region filters',
@@ -267,8 +274,10 @@ export class ScrapeController {
     return this.scrapeFacadeService.downloadAllGames(dto);
   }
 
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard, UserThrottlerGuard)
   @Roles(USER_ROLES.BOFF_ADMIN)
+  @RequireSession()
+  @Throttle({ default: { ttl: 60_000, limit: 5 } })
   @Post('myrient/download-selected/stream')
   @ApiOperation({
     summary: 'Stream download progress for selected games via SSE',
@@ -318,6 +327,7 @@ export class ScrapeController {
 
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(USER_ROLES.BOFF_ADMIN)
+  @RequireSession()
   @Patch('manga/browser')
   @ApiOperation({ summary: 'Enable or disable the remote browser tunnel' })
   @ApiResponse({
@@ -376,8 +386,10 @@ export class ScrapeController {
     return this.scrapeFacadeService.getMangaChapters(url);
   }
 
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard, UserThrottlerGuard)
   @Roles(USER_ROLES.BOFF_ADMIN)
+  @RequireSession()
+  @Throttle({ default: { ttl: 60_000, limit: 5 } })
   @Post('manga/download/novel/stream')
   @ApiOperation({
     summary: 'Stream manga download progress via SSE',
@@ -408,8 +420,10 @@ export class ScrapeController {
     res.end();
   }
 
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard, UserThrottlerGuard)
   @Roles(USER_ROLES.BOFF_ADMIN)
+  @RequireSession()
+  @Throttle({ default: { ttl: 60_000, limit: 5 } })
   @Post('myrient/download-selected')
   @ApiOperation({
     summary: 'Download a user-selected list of games for a console',
@@ -479,8 +493,10 @@ export class ScrapeController {
     );
   }
 
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard, UserThrottlerGuard)
   @Roles(USER_ROLES.BOFF_ADMIN)
+  @RequireSession()
+  @Throttle({ default: { ttl: 60_000, limit: 20 } })
   @Post('manga/convert-chapter')
   @ApiOperation({
     summary: 'Convert a CBZ chapter to EPUB, optionally excluding pages',
@@ -507,6 +523,7 @@ export class ScrapeController {
 
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(USER_ROLES.BOFF_ADMIN)
+  @RequireSession()
   @Post('manga/patch-metadata')
   @ApiOperation({
     summary: 'Patch metadata in existing EPUB files without re-converting',
@@ -533,6 +550,7 @@ export class ScrapeController {
   // of the cron schedule and series status was an unintended asymmetry.
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(USER_ROLES.BOFF_ADMIN)
+  @RequireSession()
   @Get('manga/config')
   @ApiOperation({
     summary: 'Get manga admin config (cron settings + series status)',
@@ -544,6 +562,7 @@ export class ScrapeController {
 
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(USER_ROLES.BOFF_ADMIN)
+  @RequireSession()
   @Patch('manga/config')
   @ApiOperation({
     summary: 'Update manga admin config (cron enable/disable + schedule)',
@@ -555,6 +574,7 @@ export class ScrapeController {
 
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(USER_ROLES.BOFF_ADMIN)
+  @RequireSession()
   @Patch('manga/series/:slug/status')
   @ApiOperation({ summary: 'Update the status of a tracked manga series' })
   @ApiResponse({ status: HttpStatus.OK })
@@ -566,8 +586,10 @@ export class ScrapeController {
     return this.scrapeFacadeService.updateSeriesStatus(slug, body.status);
   }
 
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard, UserThrottlerGuard)
   @Roles(USER_ROLES.BOFF_ADMIN)
+  @RequireSession()
+  @Throttle({ default: { ttl: 60_000, limit: 2 } })
   @Post('manga/cron/run')
   @ApiOperation({ summary: 'Manually trigger the manga auto-update cron task' })
   @ApiResponse({ status: HttpStatus.CREATED })

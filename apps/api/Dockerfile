@@ -113,6 +113,13 @@ FROM eclipse-temurin:21-jre AS jre
 FROM node:20-slim AS runner
 WORKDIR /app
 
+# Not an optimisation — the image cannot run without it. Unset, NODE_ENV
+# defaults to development, and the logger then configures a `pino-pretty`
+# transport that `pnpm deploy --prod` pruned out of this image, so the process
+# dies at boot with "unable to determine transport target". Pinned here so no
+# `docker run` can select that mode.
+ENV NODE_ENV=production
+
 # Install runtime system dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
     ffmpeg \

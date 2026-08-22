@@ -131,6 +131,42 @@ pnpm --filter api add @willsoto/nestjs-prometheus prom-client
 **Endpoint:** `GET /metrics` on port 34301  
 **After deploy, verify:** `curl http://localhost:34301/metrics | head -20`
 
+### Restricting `/metrics`
+
+No Nest guard can protect this route — the Prometheus module owns it, and
+`JwtAuthGuard` waves it through explicitly. It is unauthenticated wherever the
+port is reachable, so it has to be closed at the edge. There are **two** ways in,
+and closing only the first leaves it open:
+
+**1. Through the proxy** — Nginx Proxy Manager → the API's Proxy Host → the
+*Advanced* tab, which is inserted inside the `server` block and so wins over the
+default `location /`:
+
+```nginx
+location /metrics {
+    return 403;
+}
+```
+
+Verify: `curl -o /dev/null -w '%{http_code}\n' https://<api-host>/metrics` → `403`.
+
+**2. Directly on the published port** — if the container publishes
+`-p 34301:34301` it binds `0.0.0.0`, so `http://<server-ip>:34301/metrics`
+bypasses the proxy entirely and the rule above does nothing for it. Publishing
+on the bridge address instead keeps Prometheus working (it already scrapes
+`172.17.0.1:34301`) while taking the port off the public interface:
+
+```
+-p 172.17.0.1:34301:34301
+```
+
+Confirm before changing it that Nginx Proxy Manager reaches the API over the
+bridge or a shared Docker network rather than via the public IP — if it uses the
+public IP, this change takes the site down. Check with:
+`docker inspect boffmedia-server --format '{{json .HostConfig.PortBindings}}'`
+
+Verify from off-box: `curl --max-time 5 http://<server-ip>:34301/metrics` → refused.
+
 ---
 
 ## Grafana dashboard

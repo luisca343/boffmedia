@@ -52,6 +52,7 @@ import { JwtAuthGuard } from '@api/auth/jwt-auth.guard';
 import { RolesGuard } from '@api/_utils/guards/roles.guard';
 import { USER_ROLES } from '@api/_utils/auth/roles.constants';
 import { Roles } from '@api/_utils/decorators/roles.decorator';
+import { RequireSession } from '@api/_utils/decorators/require-session.decorator';
 
 @ApiTags('BoffMedia 🛠 | MHWilds')
 // The MH Wilds data endpoints are deliberately public — the Tools section works
@@ -332,6 +333,7 @@ export class MhwildsController {
 
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(USER_ROLES.BOFF_ADMIN)
+  @RequireSession()
   @Delete('cache')
   @ApiOperation({ summary: 'Clear cache' })
   @ApiResponse({
@@ -369,6 +371,7 @@ export class MhwildsController {
 
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(USER_ROLES.BOFF_ADMIN)
+  @RequireSession()
   @Post('cache/warmup')
   @ApiOperation({ summary: 'Warmup cache for a locale' })
   @ApiResponse({
@@ -395,6 +398,7 @@ export class MhwildsController {
 
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(USER_ROLES.BOFF_ADMIN)
+  @RequireSession()
   @Post('cache/validate')
   @ApiOperation({ summary: 'Validate cache for a locale' })
   @ApiResponse({
@@ -421,6 +425,7 @@ export class MhwildsController {
 
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(USER_ROLES.BOFF_ADMIN)
+  @RequireSession()
   @Post('cache/optimize')
   @ApiOperation({ summary: 'Optimize cache storage' })
   @ApiResponse({
