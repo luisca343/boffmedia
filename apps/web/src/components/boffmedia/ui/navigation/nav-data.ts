@@ -122,9 +122,11 @@ export const FOOTER_COLS: { titleKey: string; links: FooterLink[] }[] = [
   {
     titleKey: "system",
     links: [
-      { route: "/styles/components", labelKey: "components" },
+      // Neither `/admin` nor `/styles/components` belongs here: the footer
+      // renders for everyone, and both are internal. Admins reach /admin from
+      // the account menu, which gates it on isBoffAdmin() (AccountNav); the
+      // component showcase stays reachable by URL for developers.
       { route: "/perfil", labelKey: "profile" },
-      { route: "/admin", labelKey: "admin" },
       { route: "/privacidad", labelKey: "privacy" },
     ],
   },

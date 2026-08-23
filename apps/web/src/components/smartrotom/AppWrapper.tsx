@@ -7,7 +7,7 @@ import { CallStatus } from "./calls/CallStatus"
 import { useEffect, useState } from "react"
 import { useSession } from "next-auth/react"
 import { useRotomUuid } from "./behavior/useRotomUuid"
-import { AuthForm } from "@/app/auth/AuthForm"
+import { usePathname, useRouter } from "next/navigation"
 import "react-toastify/dist/ReactToastify.css"
 import { ToastContainer } from "react-toastify"
 import { getMcUserData, joinMinecraftServer } from "@/services/mcef/mcefApi"
@@ -66,6 +66,18 @@ export default function AppWrapper({
   const [datosUsuario, setDatosUsuario] = useState<Object | null>(null)
   const [isMC, setIsMC] = useState(false)
   const t = useTranslations("smartrotom")
+  const router = useRouter()
+  const pathname = usePathname()
+
+  // Out of the game there is no MCEF bridge and no reason for SmartRotom to own
+  // a login form: `/entrar` is the single entry point, and it comes back here.
+  // In game this branch never runs — MinecraftAuthForm handles the Mojang
+  // handshake below.
+  const needsWebSignIn = status === "unauthenticated" && !isMC
+  useEffect(() => {
+    if (!needsWebSignIn) return
+    router.replace(`/entrar?redirect=${encodeURIComponent(pathname || "/smartrotom")}`)
+  }, [needsWebSignIn, pathname, router])
 
   const tema = useRotomThemeClass()
 
@@ -161,10 +173,12 @@ export default function AppWrapper({
     )
   }
 
-  if (status === "unauthenticated" && !isMC) {
+  if (needsWebSignIn) {
+    // The effect above is already navigating to /entrar; hold the loading
+    // screen rather than flashing an empty shell on the way out.
     return (
       <AuthScreen>
-        <AuthForm url="boffmedia" redirect="/smartrotom" />
+        <LoadingScreen />
       </AuthScreen>
     )
   }

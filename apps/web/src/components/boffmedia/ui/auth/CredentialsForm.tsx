@@ -35,7 +35,12 @@ export function CredentialsForm({ isRegister, redirect, onRegistered }: Credenti
   const schema = React.useMemo(() => {
     const base = z.object({
       username: z.string().min(1, t("errors.usernameRequired")),
-      password: z.string().min(8, t("errors.passwordMin")),
+      // Login checks only that something was typed. A length rule here would
+      // lock out any account whose password predates the current policy — the
+      // form would refuse before the API ever saw it — and it would advertise
+      // the minimum length to anyone probing the login screen. The API is the
+      // judge of whether a password is correct.
+      password: z.string().min(1, t("errors.passwordRequired")),
     })
     if (!isRegister) return base
     // Sign-up requires the full strong-password policy (same rules the reset

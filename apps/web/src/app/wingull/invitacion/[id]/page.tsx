@@ -1,8 +1,15 @@
+import type { Metadata } from "next"
+import { getTranslations } from "next-intl/server"
 import { wingullGET } from "@/services/boffAPI";
 import InvitacionForm from "./_components/InvitacionForm";
 import InvitacionNoEncontrada from "./_components/InvitacionNoEncontrada";
 import InvitacionUsada from "./_components/InvitacionUsada";
 import { BackgroundDecorations } from "../../_components/BackgroundDecorations";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("pageMeta.wingull")
+  return { title: t("invitacion.title"), description: t("invitacion.description") }
+}
 
 export default async function Invitacion({
   params,

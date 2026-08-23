@@ -1,4 +1,12 @@
+import type { Metadata } from "next"
 import type { ReactNode } from "react"
+
+// An internal showcase, no longer linked from the footer: reachable by URL for
+// developers, but it has no business in a search index.
+export const metadata: Metadata = {
+  title: "Componentes · Boffmedia",
+  robots: { index: false, follow: false },
+}
 
 // Luckiest Guy + Shantell Sans back the Mewgenics showcase specimen only (the sole
 // consumer of `--mwf-disp`/`--mwf-hand`), so the Google Fonts load is scoped to this

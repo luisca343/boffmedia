@@ -1,3 +1,5 @@
+import type { Metadata } from "next"
+import { getTranslations } from "next-intl/server"
 import { MovingSection } from "./_components/MovingSection";
 import { BackgroundDecorations } from "./_components/BackgroundDecorations";
 import Image from "next/image";
@@ -5,8 +7,12 @@ import Footer from "./_components/Footer";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/primitives/card";
 import { Badge } from "@/components/ui/primitives/badge";
 import { Clock, Users, MapPin, Sparkles } from "lucide-react";
-import { getTranslations } from "next-intl/server";
 import { ASSET, staticAsset } from "@/lib/assets";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("pageMeta.wingull")
+  return { title: t("index.title"), description: t("index.description") }
+}
 
 export default async function Page() {
   const t = await getTranslations("wingull.home");

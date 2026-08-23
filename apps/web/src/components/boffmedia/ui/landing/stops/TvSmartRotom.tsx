@@ -48,7 +48,9 @@ export function TvSmartRotom() {
         </div>
       </div>
       <div className={CTA_ROW}>
-        <Button variant="pri" iconRight="arrow" href="/herramientas" className={PRI_GLOW}>
+        {/* "Ver SmartRotom" goes to SmartRotom. It used to land on /herramientas,
+            which is a different product entirely. */}
+        <Button variant="pri" iconRight="arrow" href="/smartrotom" className={PRI_GLOW}>
           {t("ctaView")}
         </Button>
         <Button icon="bell">{t("ctaNotify")}</Button>

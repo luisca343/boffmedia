@@ -6,6 +6,10 @@ Apps are registered in the database (`rotom_apps` table) and assigned to players
 
 ---
 
+**Audited 2026-08-23** against the code — the Status lines below reflect what the route actually renders today, not what is planned. A "Stub" renders a heading and nothing else.
+
+---
+
 ## App Directory
 
 ### Admin (absorbed into Gobierno de Teras)
@@ -63,7 +67,7 @@ Real-time in-game chat application. Enables player-to-player and group messaging
 
 ### Cinder ⭐ New
 **Route:** `/smartrotom/cinder`  
-**Status:** Scaffold (in development)  
+**Status:** Stub — route exists, renders a heading only  
 Breeding tool app inspired by "Tinder"-style swipe mechanics. Helps players find compatible Pokémon for breeding by matching IVs, natures, egg groups, and other criteria.
 
 **UX flow:**
@@ -103,7 +107,7 @@ News and daily events feed, themed around Furret. Shows server news, event annou
 
 ### Guías ⭐ New
 **Route:** `/smartrotom/guias`  
-**Status:** Scaffold (in development)  
+**Status:** Stub — route exists, renders a heading only  
 Tutorial and guide library for players. Hosts written guides, tips, and how-to articles covering server mechanics, Pixelmon gameplay, and SmartRotom features.
 
 **Planned sub-sections:**
@@ -125,7 +129,9 @@ Tutorial and guide library for players. Hosts written guides, tips, and how-to a
 
 ### Karts ⭐ New
 **Route:** `/smartrotom/karts`  
-**Status:** Scaffold (in development)  
+**Status:** Stub on the web, but the API is live  
+The backend already serves `POST /smartrotom/karts/carrera`, `GET /ranking` and `GET /stats/:uuid`; the page renders nothing but a heading. The frontend is what is missing here, not the data.
+
 Racing companion app. Displays available kart races, circuits, personal best times, leaderboards, and upcoming race events on the server.
 
 **Data flow:** Lap times and race results are submitted by the server plugin after each race finishes. The app is read-only for players; staff manages circuits and events.
@@ -317,7 +323,9 @@ In-game weather and time display. Shows current server time, weather conditions,
 
 ### Wigglypop ⭐ New
 **Route:** `/smartrotom/wigglypop`  
-**Status:** Scaffold (in development)  
+**Status:** Active — built, not a scaffold  
+The app ships 55 files: 9 routes (`/`, `/anuncios`, `/anuncio/[id]`, `/carrito`, `/compras`, `/objetos`, `/seguimiento`, `/vender`, `/vendedor/[uuid]`), its own `_components/ui/` design system, Zustand cart and filter stores, a query provider and `_hooks/queries.ts`. The API backs it with listings, bids, offers, trades, orders, reviews, watchlist, valuation and price history. Treat the "Planned features" list below as a roadmap for what is still missing, not as a description of an unbuilt app.
+
 Wallapop/marketplace-style trading app. Allows players to list Pokémon and items for trade or sale, browse other players' listings, and complete peer-to-peer exchanges within the server economy.
 
 **Exchange model:** The app handles the agreement and payment. The physical Pokémon/item handoff happens in-game (players meet and use `/trade` or the server plugin facilitates it). StarBank stars are locked in escrow when a deal is struck and released to the seller after the buyer confirms receipt.
@@ -339,7 +347,7 @@ Wallapop/marketplace-style trading app. Allows players to list Pokémon and item
 
 ### Equipo (Team Builder) ⭐ New
 **Route:** `/smartrotom/equipo`  
-**Status:** Scaffold (in development)  
+**Status:** Stub — route exists, renders a heading only  
 Team composition tool. PC already has a team slot builder for Pokémon you own — Equipo extends beyond that: build hypothetical teams with any Pokémon (owned or not), run scenarios for Liga/Torneos prep, and analyze coverage without being limited to your box.
 
 **Rationale for standalone over PC sub-route:** PC is box management (what you have). Equipo is theory-crafting (what you want to build). The workflows and audience overlap but the depth warrants its own space — and it can deep-link *from* PC ("analyze this team in Equipo") without being buried inside it.

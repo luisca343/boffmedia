@@ -554,7 +554,12 @@ for (const file of spanishSources) {
 
 // Pinned 2026-07-27, right after the mass extraction, at its historic low. Only
 // ever lower this — a growth means someone shipped a new hardcoded string.
-const HARDCODED_ES_BASELINE = 37;
+//
+// 2026-08-23: 37 → 36. Caveat on this one: `contacto/page.tsx` left the list
+// because it gained a next-intl import for its page metadata, not because its
+// body was translated. Its copy is still hardcoded Spanish and this check can
+// no longer see it — extract it and the number stays honest.
+const HARDCODED_ES_BASELINE = 36;
 const hardcodedCount = hardcodedSpanish.length;
 if (hardcodedCount > HARDCODED_ES_BASELINE) {
   for (const { rel, sample } of hardcodedSpanish.slice(0, 40)) {

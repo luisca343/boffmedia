@@ -100,6 +100,150 @@
       "steamfree": {
         "title": "Gratis en Steam",
         "description": "Todos los juegos que Steam regala ahora mismo al 100 % de descuento, con cuenta atrás para reclamar cada uno."
+      },
+      "sorteos": {
+        "title": "Sorteos",
+        "description": "Sorteo rápido: pega tu lista de participantes y saca ganadores al instante."
+      },
+      "keys": {
+        "title": "Claves de Steam",
+        "description": "Catálogo de claves de Steam para sorteos y entregas de la comunidad."
+      },
+      "biblioteca": {
+        "title": "Biblioteca",
+        "description": "Catálogo de juegos por consola y región."
+      },
+      "myrient": {
+        "title": "Myrient",
+        "description": "Explora y busca en el catálogo de Myrient."
+      },
+      "manga": {
+        "title": "Lector de manga",
+        "description": "Lee los capítulos descargados en la biblioteca de Boffmedia."
+      },
+      "mangaLibrary": {
+        "title": "Biblioteca de manga",
+        "description": "Series descargadas, estado y capítulos disponibles."
+      },
+      "pmdsky": {
+        "title": "PMD Sky",
+        "description": "Herramienta de Pokémon Mystery Dungeon: Exploradores del Cielo."
+      },
+      "mhwildsPlanner": {
+        "title": "Planificador de builds",
+        "description": "Monta sets de Monster Hunter Wilds: armas, armaduras, talismanes y decoraciones."
+      },
+      "mhwildsMonsters": {
+        "title": "Bestiario",
+        "description": "Todos los monstruos de Monster Hunter Wilds: debilidades, partes y materiales."
+      },
+      "mhwildsTree": {
+        "title": "Árbol de armas",
+        "description": "El árbol de mejora completo de cada tipo de arma de Monster Hunter Wilds."
+      },
+      "schematicViewer": {
+        "title": "Visor de esquemas",
+        "description": "Abre y explora esquemas de Minecraft en 3D."
+      },
+      "schematicCompat": {
+        "title": "Compatibilidad de esquemas",
+        "description": "Comprueba si un esquema de Minecraft es compatible con otra versión."
+      },
+      "tcgpocket": {
+        "title": "TCG Pocket",
+        "description": "Colección, sobres, cartas y combates del Pokémon TCG Pocket."
+      },
+      "tcgpocketCartas": {
+        "title": "Cartas · TCG Pocket",
+        "description": "Explora todas las cartas del Pokémon TCG Pocket por serie y expansión."
+      },
+      "tcgpocketCarta": {
+        "title": "Carta · TCG Pocket",
+        "description": "Detalle de la carta: ataques, rareza y expansión."
+      },
+      "tcgpocketColeccion": {
+        "title": "Mi colección · TCG Pocket",
+        "description": "Gestiona las cartas que tienes y las que te faltan."
+      },
+      "tcgpocketCombates": {
+        "title": "Combates · TCG Pocket",
+        "description": "Combates del Pokémon TCG Pocket."
+      },
+      "tcgpocketGaleria": {
+        "title": "Galerías · TCG Pocket",
+        "description": "Las colecciones que la comunidad tiene en vitrina."
+      },
+      "tcgpocketGaleriaUsuario": {
+        "title": "Galería · TCG Pocket",
+        "description": "Las cartas que este entrenador tiene en vitrina."
+      },
+      "tcgpocketSobres": {
+        "title": "Sobres · TCG Pocket",
+        "description": "Abre sobres de cada expansión del Pokémon TCG Pocket."
+      },
+      "tcgpocketSobre": {
+        "title": "Sobres de la expansión · TCG Pocket",
+        "description": "Abre sobres de esta expansión del Pokémon TCG Pocket."
+      },
+      "vgcDamageCalculator": {
+        "title": "Calculadora de daño",
+        "description": "Rangos de daño VGC y singles al instante, con enlaces para compartir."
+      },
+      "vgcMeta": {
+        "title": "Análisis de meta",
+        "description": "Uso, tendencias y detalle por especie del meta VGC."
+      },
+      "vgcMetaEspecie": {
+        "title": "Especie · Análisis de meta",
+        "description": "Uso, spreads, movimientos, objetos y compañeros habituales."
+      },
+      "vgcSpeed": {
+        "title": "Tiers de velocidad",
+        "description": "Compara velocidades VGC con naturaleza, EVs, objeto y modificadores."
+      },
+      "vgcTracker": {
+        "title": "VGC Tracker",
+        "description": "Registra tus partidas VGC y analiza tu rendimiento."
+      },
+      "vgcTrackerSesion": {
+        "title": "Sesión · VGC Tracker",
+        "description": "Partidas, series y estadísticas de esta sesión."
+      },
+      "vgcTrackerPartida": {
+        "title": "Partida · VGC Tracker",
+        "description": "Detalle de la partida: equipos, resultado y notas."
+      },
+      "vgcTrackerSerie": {
+        "title": "Serie · VGC Tracker",
+        "description": "Detalle de la serie y sus partidas."
+      },
+      "battlesimPlay": {
+        "title": "Jugar · Battlesim",
+        "description": "Combate contra la IA en el simulador de Boffmedia."
+      },
+      "battlesimPvp": {
+        "title": "PvP · Battlesim",
+        "description": "Crea o únete a una sala y combate contra otro entrenador."
+      },
+      "battlesimPvpSala": {
+        "title": "Sala PvP · Battlesim",
+        "description": "Combate PvP en curso."
+      },
+      "battlesimReplay": {
+        "title": "Repeticiones · Battlesim",
+        "description": "Vuelve a ver combates guardados."
+      },
+      "battlesimReplayDetalle": {
+        "title": "Repetición · Battlesim",
+        "description": "Reproduce este combate turno a turno."
+      },
+      "battlesimShowdown": {
+        "title": "Showdown · Battlesim",
+        "description": "Conecta con Pokémon Showdown desde Boffmedia."
+      },
+      "battlesimShowdownSala": {
+        "title": "Sala Showdown · Battlesim",
+        "description": "Combate de Showdown en curso."
       }
     },
     "smartrotom": {
@@ -120,6 +264,62 @@
       "autorizar": {
         "title": "Autorizar la app · Boffmedia",
         "description": "Aprueba el inicio de sesión de Boffmedia App con tu cuenta de Boffmedia."
+      }
+    },
+    "torneos": {
+      "index": {
+        "title": "Torneos · Boffmedia",
+        "description": "Brackets de eliminación, ligas, grupos y clasificaciones de la comunidad Boffmedia."
+      },
+      "detalle": {
+        "title": "Torneo · Boffmedia",
+        "description": "Detalle del torneo: reglas, premios, participantes y bracket."
+      },
+      "partida": {
+        "title": "Partida · Torneos · Boffmedia",
+        "description": "Tu partida: reporta el resultado y habla con tu rival."
+      }
+    },
+    "contacto": {
+      "index": {
+        "title": "Contacto · Boffmedia",
+        "description": "Escríbenos: dudas, incidencias y colaboraciones con Boffmedia."
+      }
+    },
+    "admin": {
+      "index": {
+        "title": "Administración · Boffmedia",
+        "description": "Panel de administración de Boffmedia."
+      }
+    },
+    "wingull": {
+      "index": {
+        "title": "Pixelmon Wingull · Boffmedia",
+        "description": "El servidor Pixelmon de Boffmedia: información, pueblos y cómo entrar."
+      },
+      "pueblos": {
+        "title": "Pueblos · Pixelmon Wingull",
+        "description": "Todos los pueblos del servidor Pixelmon Wingull."
+      },
+      "pueblo": {
+        "title": "Pueblo · Pixelmon Wingull",
+        "description": "Detalle del pueblo: habitantes, parcelas y economía."
+      },
+      "invitacion": {
+        "title": "Invitación · Pixelmon Wingull",
+        "description": "Canjea tu invitación para entrar en Pixelmon Wingull."
+      }
+    },
+    "home": {
+      "index": {
+        "title": "Boffmedia",
+        "description": "Comunidad gaming: herramientas competitivas, torneos, servidores de Minecraft, sorteos y una temporada siempre en marcha."
+      }
+    },
+    "showdownDebug": {
+      "index": {
+        "title": "Consola Showdown · Boffmedia",
+        "description": "Consola de depuración del proxy de Pokémon Showdown. Solo administradores."
       }
     }
   }

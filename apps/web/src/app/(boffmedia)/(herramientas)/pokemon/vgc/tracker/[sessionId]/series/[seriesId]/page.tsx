@@ -1,44 +1,13 @@
-'use client';
+import type { ComponentProps } from "react"
+import type { Metadata } from "next"
+import { getTranslations } from "next-intl/server"
+import { TrackerSeriesView } from "./_components/TrackerSeriesView"
 
-import { use } from 'react';
-import { useTranslations } from 'next-intl';
-import { useSingleSeries, useSessions } from '@/features/vgc-tracker/hooks/useVgcDb';
-import { Spinner } from "@boffmedia/ui"
-import { SeriesWorkspace } from './_components/SeriesWorkspace';
-
-interface Props {
-  params: Promise<{ sessionId: string; seriesId: string }>;
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("pageMeta.herramientas")
+  return { title: t("vgcTrackerSerie.title"), description: t("vgcTrackerSerie.description") }
 }
 
-export default function SeriesPage({ params }: Props) {
-  const t = useTranslations('vgc.tracker');
-  const { sessionId, seriesId } = use(params);
-  const { series, loading, save } = useSingleSeries(seriesId);
-  const { sessions } = useSessions();
-  const session = sessions.find((s) => s.id === sessionId);
-
-  if (loading) {
-    return (
-      <div className="grid min-h-[calc(100dvh_-_var(--nav-h))] place-items-center">
-        <Spinner />
-      </div>
-    );
-  }
-
-  if (!series) {
-    return (
-      <div className="grid min-h-[calc(100dvh_-_var(--nav-h))] place-items-center font-mono text-[13px] text-txt-muted">
-        {t('workspace.seriesNotFound')}
-      </div>
-    );
-  }
-
-  return (
-    <SeriesWorkspace
-      series={series}
-      sessionId={sessionId}
-      regulationId={session?.regulationId ?? ''}
-      onSave={save}
-    />
-  );
+export default function Page(props: ComponentProps<typeof TrackerSeriesView>) {
+  return <TrackerSeriesView {...props} />
 }

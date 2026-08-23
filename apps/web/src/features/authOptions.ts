@@ -24,9 +24,19 @@ export const twitchEnabled = Boolean(
 );
 
 export const authOptions: NextAuthOptions = {
-  pages: {
+  // `/entrar` is the ONLY login entry point. These two used to point at
+  // `/auth/signin` and `/auth/error`, neither of which is a route — so every
+  // NextAuth-driven sign-in redirect and every provider error landed on a 404.
+  // Errors arrive as `?error=<code>`; AuthScreen surfaces them as a toast.
+  /*
+    pages: {
     signIn: '/auth/signin',
     error: '/auth/error',
+  },
+  */
+  pages: {
+    signIn: '/entrar',
+    error: '/entrar',
   },
   providers: [
     CredentialsProvider({

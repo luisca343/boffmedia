@@ -20,6 +20,22 @@ const GRID_BG: React.CSSProperties = {
   maskImage: "radial-gradient(90% 70% at 50% 30%, #000 30%, transparent 78%)",
 }
 
+/**
+ * NextAuth's `pages.error` is this screen, so provider failures arrive here as
+ * `?error=<code>`. Map the codes worth distinguishing; everything else falls
+ * back to the generic message rather than showing the user a raw code.
+ */
+const ERROR_KEY: Record<string, string> = {
+  CredentialsSignin: "signIn",
+  AccessDenied: "accessDenied",
+  OAuthAccountNotLinked: "accountNotLinked",
+  SessionRequired: "sessionRequired",
+  OAuthSignin: "oauth",
+  OAuthCallback: "oauth",
+  OAuthCreateAccount: "oauth",
+  Callback: "oauth",
+}
+
 export function AuthScreen({
   discordEnabled = false,
   twitchEnabled = false,
@@ -32,6 +48,18 @@ export function AuthScreen({
   const params = useSearchParams()
   const redirect = params.get("redirect") || "/"
   const [isRegister, setIsRegister] = React.useState(params.get("mode") === "register")
+
+  // Surface (once) whatever NextAuth redirected here with, then strip the code
+  // from the URL so a refresh does not re-announce a failure already handled.
+  const error = params.get("error")
+  React.useEffect(() => {
+    if (!error) return
+    toast.error(t(`errors.${ERROR_KEY[error] ?? "generic"}`))
+    const qs = new URLSearchParams(params.toString())
+    qs.delete("error")
+    const s = qs.toString()
+    router.replace(s ? `/entrar?${s}` : "/entrar", { scroll: false })
+  }, [error, params, router, t])
 
   function switchMode(next: boolean) {
     setIsRegister(next)

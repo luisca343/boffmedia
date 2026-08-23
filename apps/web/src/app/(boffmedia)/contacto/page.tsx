@@ -1,5 +1,12 @@
+import type { Metadata } from "next"
+import { getTranslations } from "next-intl/server"
 import React from "react";
 import { ContactForm } from "./_components/ContactForm";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("pageMeta.contacto")
+  return { title: t("index.title"), description: t("index.description") }
+}
 
 export default function ContactPage() {
   return (

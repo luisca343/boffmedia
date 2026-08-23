@@ -19,6 +19,19 @@ const nextConfig = {
         ignoreBuildErrors: true,
     },
 
+    // `/entrar` is the single login entry point. `/auth` and `/auth/signin`
+    // were a second, legacy login form built on the old shadcn primitives;
+    // `/auth/error` never existed at all. Kept as redirects so bookmarks and
+    // any link still in the wild land on the real screen instead of a 404.
+    // Query strings (?redirect=, ?mode=register, ?error=) are carried over.
+    async redirects() {
+        return [
+            { source: '/auth', destination: '/entrar', permanent: true },
+            { source: '/auth/signin', destination: '/entrar', permanent: true },
+            { source: '/auth/error', destination: '/entrar', permanent: true },
+        ];
+    },
+
     // Uploaded files (profile/cover images, blog assets) are stored relative
     // (/uploads/...) but live on the API server, not this app.
     async rewrites() {

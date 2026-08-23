@@ -1,11 +1,12 @@
-'use client';
+import type { Metadata } from "next"
+import { getTranslations } from "next-intl/server"
+import { BsimReplayView } from "./_components/BsimReplayView"
 
-import { Game } from '@/app/battlesim/replay/_components/Game';
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("pageMeta.herramientas")
+  return { title: t("battlesimReplay.title"), description: t("battlesimReplay.description") }
+}
 
-export default function ReplayPage() {
-  return (
-    <section className="flex flex-col bg-base text-txt">
-      <Game />
-    </section>
-  );
+export default function Page() {
+  return <BsimReplayView />
 }

@@ -1,8 +1,14 @@
+import type { Metadata } from "next"
 import { getTranslations } from "next-intl/server"
 import { Empty, Button } from "@boffmedia/ui"
 
 // Solo-battles data has no working backend yet (the /solobattles endpoint is
 // disabled and getBattleData is unimplemented), so this view is on hold.
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("pageMeta.herramientas")
+  return { title: t("tcgpocketCombates.title"), description: t("tcgpocketCombates.description") }
+}
+
 export default async function TcgpCombatesPage() {
   const t = await getTranslations("tcgpocket")
   return (
