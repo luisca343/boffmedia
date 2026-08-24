@@ -38,7 +38,6 @@ const mockFacade = {
   getRegions: jest.fn(),
   getWeather: jest.fn(),
   updateNPCs: jest.fn(),
-  getWorldGuardWorlds: jest.fn(),
   getPlayersOwnedRegions: jest.fn(),
   getAllPlots: jest.fn(),
 };
@@ -519,22 +518,8 @@ describe('WingullController — integration (ValidationPipe + GlobalExceptionFil
   });
 
   // ── GET /wingull/worldguard-worlds ───────────────────────────────────────
-
-  describe('GET /wingull/worldguard-worlds', () => {
-    it('returns 200 and delegates to facade.getWorldGuardWorlds', async () => {
-      mockFacade.getWorldGuardWorlds.mockResolvedValue([
-        'world',
-        'world_nether',
-      ]);
-
-      const res = await request(app.getHttpServer()).get(
-        '/wingull/worldguard-worlds',
-      );
-
-      expect(res.status).toBe(200);
-      expect(mockFacade.getWorldGuardWorlds).toHaveBeenCalledTimes(1);
-    });
-  });
+  // Route deleted with WorldGuard. Worlds are Teras `dimension` values now, and nothing asked
+  // for them — the web client method had no caller.
 
   // ── GET /wingull/owned-regions/:uuid ─────────────────────────────────────
 

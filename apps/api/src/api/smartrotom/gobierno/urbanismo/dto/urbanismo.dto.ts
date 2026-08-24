@@ -62,7 +62,7 @@ export class ListZonasQueryDto {
 export class CreateParcelaDto extends BaseDto {
   @ApiProperty({
     example: 'pueblo_mizu__parcela_1',
-    description: 'The exact WorldGuard region id',
+    description: 'The exact Teras region id',
   })
   @IsString()
   @MaxLength(128)

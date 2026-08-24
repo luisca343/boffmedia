@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { useTranslations } from "next-intl"
-import { Icon, Spinner, Empty, type IconName } from "@boffmedia/ui"
+import { Icon, Spinner, Empty, SearchInput, ToolSeal, ToolStrip, ToolTitle, type IconName } from "@boffmedia/ui"
 import { cn } from "@/lib/utils"
 import type { TcgCard } from "@boffmedia/shared"
 import { useTcgpCards } from "../_lib/useTcgpCards"
@@ -71,25 +71,26 @@ export function TcgpApp({ view, expansion, cardId }: Props) {
     // still scrolls by exactly one Footer's height — scrolling down slides the
     // tool up and leaves the grid peeking through a sliver above the footer.
     <div className="flex min-w-0 flex-col">
-      {/* section header — sticks directly under the sticky site Navbar */}
-      <header className="sticky top-[var(--nav-h)] z-20 flex-none border-b border-solid border-line bg-base/90 backdrop-blur-[10px]">
-        <div className="flex items-center gap-4 px-[clamp(16px,3vw,34px)] py-[14px]">
-          <div className="flex items-center gap-3">
-            <span className="cut grid h-10 w-10 flex-none place-items-center bg-accent font-display text-[15px] font-bold tracking-[0.02em] text-accent-ink">TCG</span>
-            <span className="flex flex-col leading-none">
-              <b className="font-display text-[20px] font-bold uppercase leading-none tracking-[0.03em] text-txt">TCG Pocket</b>
-              <small className="mt-1 font-mono text-[11px] uppercase leading-tight tracking-[0.1em] text-txt-dim max-[560px]:hidden">{t("app.tagline")}</small>
-            </span>
-          </div>
+      {/* section header — the shared ToolStrip, so this tool's bar is the same
+          object (height, gutter, sticky offset, z-order) as every other one. */}
+      {/* The whole two-row block sticks, so `ToolStrip` runs `static` here and
+          the sticky offset lives on the wrapper — a sticky child inside a sticky
+          parent resolves against the parent, not the viewport, and the tab row
+          would scroll away from under the title. */}
+      <header className="sticky top-[var(--tool-sticky-top,0px)] z-20 flex-none border-b border-solid border-line bg-base/90 backdrop-blur-[10px]">
+        <ToolStrip className="static z-auto border-b-0 bg-transparent [--tool-pad:clamp(16px,3vw,34px)] gap-4 py-[14px]">
+          <ToolSeal label="TCG" solid />
+          <ToolTitle title="TCG Pocket" sub={<span className="max-[560px]:hidden">{t("app.tagline")}</span>} />
           <div className="ml-auto w-[min(320px,40vw)] max-[720px]:hidden">
-            <label className="flex items-center gap-2 border border-solid border-line-2 bg-panel px-3 py-2">
-              <Icon name="search" size={18} className="text-txt-dim" />
-              <input className="w-full bg-transparent font-body text-[14px] text-txt outline-none placeholder:text-txt-dim"
-                placeholder={t("app.searchCards")} value={search}
-                onChange={(e) => setSearch(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") submitSearch() }} />
-            </label>
+            <SearchInput
+              value={search}
+              onChange={setSearch}
+              onSubmit={submitSearch}
+              placeholder={t("app.searchCards")}
+              size="sm"
+            />
           </div>
-        </div>
+        </ToolStrip>
         <nav role="tablist" aria-label="TCG Pocket" className="flex gap-[2px] overflow-x-auto px-[clamp(16px,3vw,34px)] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {TABS.map((tab) => {
             const on = tab.key === view

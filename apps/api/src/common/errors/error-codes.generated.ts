@@ -22,6 +22,7 @@ export const ApiErrorCode = {
   CHAT_MESSAGE_NOT_EDITABLE: 'CHAT_MESSAGE_NOT_EDITABLE',
   CHAT_NOT_FOUND: 'CHAT_NOT_FOUND',
   CHAT_NOT_MEMBER: 'CHAT_NOT_MEMBER',
+  SERVICE_DATABASE_UNAVAILABLE: 'SERVICE_DATABASE_UNAVAILABLE',
   TAXI_INSUFFICIENT_FUNDS: 'TAXI_INSUFFICIENT_FUNDS',
   TAXI_IN_DUNGEON_RUN: 'TAXI_IN_DUNGEON_RUN',
   TAXI_PLAYER_OFFLINE: 'TAXI_PLAYER_OFFLINE',
@@ -54,6 +55,8 @@ export const API_ERROR_FALLBACK_ES: Record<ApiErrorCode, string> = {
   CHAT_MESSAGE_NOT_EDITABLE: 'No puedes editar este mensaje.',
   CHAT_NOT_FOUND: 'No se encontró el chat.',
   CHAT_NOT_MEMBER: 'No formas parte de este chat.',
+  SERVICE_DATABASE_UNAVAILABLE:
+    'El servicio no está disponible ahora mismo. Vuelve a intentarlo en unos minutos.',
   TAXI_INSUFFICIENT_FUNDS: 'No tienes saldo suficiente para este viaje.',
   TAXI_IN_DUNGEON_RUN: 'No puedes coger un taxi durante una mazmorra.',
   TAXI_PLAYER_OFFLINE: 'Tienes que estar conectado al servidor para viajar.',

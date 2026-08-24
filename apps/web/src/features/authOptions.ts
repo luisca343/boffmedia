@@ -1,4 +1,5 @@
 import { NextAuthOptions } from "next-auth";
+import { ApiErrorCode } from "@boffmedia/shared/error-codes";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider, { GoogleProfile } from "next-auth/providers/google";
 import DiscordProvider, { DiscordProfile } from "next-auth/providers/discord";
@@ -22,6 +23,47 @@ export const discordEnabled = Boolean(
 export const twitchEnabled = Boolean(
   env.TWITCH_CLIENT_ID && env.TWITCH_CLIENT_SECRET,
 );
+
+// The session cookie is pinned to a parent domain so the app and its subdomains
+// share one login. That pinning cannot hold on a plain-HTTP local host: the
+// `__Secure-` prefix and `secure: true` both require HTTPS, and a `.ficuslab.es`
+// domain never matches `localhost` — so the browser drops the Set-Cookie without
+// a word and every request afterwards comes back signed out.
+//
+// NODE_ENV cannot make this call. The deployed dev box at ficuslab.es also runs
+// with NODE_ENV !== 'production' — that is precisely why the branch below hands
+// it `.ficuslab.es`. The app's own public origin can: https means a real
+// deployment, http:// means someone is running it on their machine.
+//
+// Fail-closed: an unset/blank URL does NOT start with `http://`, so it keeps the
+// hardened cookie rather than silently downgrading a misconfigured deployment.
+const appUrl = process.env.NEXTAUTH_URL || env.NEXT_PUBLIC_URL;
+const isPlainHttpHost = appUrl.startsWith('http://');
+
+const sessionCookie = {
+  sessionToken: isPlainHttpHost
+    ? {
+        name: 'next-auth.session-token',
+        options: {
+          httpOnly: true,
+          // No `domain` key — host-only, so it binds to whatever host and port
+          // the dev server happens to be on.
+          sameSite: 'lax',
+          path: '/',
+          secure: false,
+        },
+      }
+    : {
+        name: `__Secure-next-auth.session-token`,
+        options: {
+          httpOnly: true,
+          sameSite: 'none',
+          path: '/',
+          secure: true,
+          domain: env.NODE_ENV === 'production' ? '.boffmedia.es' : '.ficuslab.es',
+        },
+      },
+} as Partial<CookiesOptions>;
 
 export const authOptions: NextAuthOptions = {
   // `/entrar` is the ONLY login entry point. These two used to point at
@@ -52,10 +94,21 @@ export const authOptions: NextAuthOptions = {
             return null;
           }
 
-          const response = (await boffPOST<AuthLoginResponseEntity | { error: string }>(`/auth/login`, {
+          const envelope = await boffPOST<AuthLoginResponseEntity | { error: string }>(`/auth/login`, {
             username: credentials.username,
             password: credentials.password,
-          })).data;
+          });
+
+          // `null` from authorize() means exactly one thing to NextAuth: these
+          // credentials are wrong. The API answers 503 when it could not reach
+          // the database and therefore never checked them — collapsing that into
+          // `null` is what made an outage read as a wrong password all the way
+          // to the login form. Rethrown so the form can say something true.
+          if (envelope.statusCode === 503 || envelope.code === ApiErrorCode.SERVICE_DATABASE_UNAVAILABLE) {
+            throw new Error(ApiErrorCode.SERVICE_DATABASE_UNAVAILABLE);
+          }
+
+          const response = envelope.data;
 
           if (response && !('error' in response)) {
             const { user } = response;
@@ -73,6 +126,9 @@ export const authOptions: NextAuthOptions = {
           return null;
         } catch (error) {
           console.error("Authentication error:", error);
+          // Everything else stays `null` (= bad credentials); only the
+          // "never checked" signal is allowed past.
+          if (error instanceof Error && error.message === ApiErrorCode.SERVICE_DATABASE_UNAVAILABLE) throw error;
           return null;
         }
       }
@@ -339,16 +395,5 @@ export const authOptions: NextAuthOptions = {
     maxAge: 60 * 60 * 24 * 30, // 30 days
   },
   secret: env.NEXTAUTH_SECRET,
-  cookies: {
-    sessionToken: {
-      name: `__Secure-next-auth.session-token`,
-      options: {
-        httpOnly: true,
-        sameSite: 'none',
-        path: '/',
-        secure: true,
-        domain: env.NODE_ENV === 'production' ? '.boffmedia.es' : '.ficuslab.es'
-      }
-    }
-  } as Partial<CookiesOptions>,
+  cookies: sessionCookie,
 };

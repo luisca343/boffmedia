@@ -31,7 +31,16 @@ export class WingullSQL2Service {
       port: env.DB_PORT,
       waitForConnections: true,
       connectionLimit: 10,
-      queueLimit: 0,
+      // Matches the primary pool in api/_utils/drizzle/drizzle.module.ts. `0`
+      // is mysql2 for an UNBOUNDED queue, which turns an unreachable database
+      // into a growing backlog of waiters that can only ever time out.
+      queueLimit: 50,
+      connectTimeout: 10_000,
+      // Pooled sockets die quietly behind NAT or an idle reaper: the connection
+      // stays ESTABLISHED locally while nothing crosses it, and the next query
+      // to borrow it hangs instead of reconnecting.
+      enableKeepAlive: true,
+      keepAliveInitialDelay: 10_000,
     });
   }
 

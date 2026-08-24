@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { useTranslations } from "next-intl"
-import { Kicker, Button, Icon, Input, Textarea, Seg, Toggle, Avatar } from "@boffmedia/ui"
+import { Button, Icon, Input, Textarea, Seg, Toggle, Avatar, StatChip, ToolHeader } from "@boffmedia/ui"
 import { useSorteos, oddsOf } from "../_lib/useSorteos"
 import { SrtWeight, SrtRow, SrtWinnerList, SrtSeedTag, SrtConfetti, SrtPanel, SrtPanelHead } from "./ui/srt-kit"
 // v3 «Señal» draw animation (horizontal reel), keeps the original tick/win sound.
@@ -54,31 +54,24 @@ export function SorteosView() {
 
   return (
     <main className="pb-[10px]">
-      {/* ── header ─────────────────────────────────────────────────────────── */}
-      <header className="flex flex-wrap items-end justify-between gap-[24px] pb-[20px] pt-[4px]">
-        <div className="min-w-0">
-          <Kicker>{t("kicker")}</Kicker>
-          <h1 className="my-[12px] text-[clamp(38px,5vw,66px)] leading-[0.9]">
-            {t("titlePre")} <em>{t("titleEm")}</em>
-          </h1>
-          <p className="max-w-[56ch] text-pretty text-[15px] leading-[1.5] text-txt-muted">{t("sub")}</p>
-        </div>
-        <div className="flex flex-wrap items-center gap-[10px]">
-          <span className="cut cut-edge-slant [--cut-line:var(--line-2)] [--cut:4px] inline-flex items-center gap-[8px] border border-line-2 bg-panel-2 px-[11px] py-[8px] font-mono text-[11px] font-semibold uppercase tracking-[0.06em] text-txt-muted">
-            <Icon name="users" size={13} className="text-accent" />
-            <b className="text-txt">{entrants.length}</b> {t("participants")}
-          </span>
-          <span className="cut cut-edge-slant [--cut-line:var(--line-2)] [--cut:4px] inline-flex items-center gap-[8px] border border-line-2 bg-panel-2 px-[11px] py-[8px] font-mono text-[11px] font-semibold uppercase tracking-[0.06em] text-txt-muted">
-            <Icon name="trophy" size={13} className="text-accent" />
-            <b className="text-txt">{history.length}</b> {t("rounds")}
-          </span>
-          {(entrants.length > 0 || history.length > 0) && (
+      <ToolHeader
+        eyebrow={t("kicker")}
+        title={<>{t("titlePre")} <em>{t("titleEm")}</em></>}
+        sub={t("sub")}
+        meta={
+          <>
+            <StatChip icon="users" value={entrants.length} label={t("participants")} />
+            <StatChip icon="trophy" value={history.length} label={t("rounds")} />
+          </>
+        }
+        actions={
+          (entrants.length > 0 || history.length > 0) && (
             <Button variant="ghost" size="sm" icon="trash" onClick={clearAll}>
               {t("clear")}
             </Button>
-          )}
-        </div>
-      </header>
+          )
+        }
+      />
 
       {/* ── layout ─────────────────────────────────────────────────────────── */}
       <div className="grid grid-cols-1 items-start gap-[18px] min-[961px]:grid-cols-[388px_1fr]">

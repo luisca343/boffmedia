@@ -342,10 +342,6 @@ export class WingullFacadeService {
     }
   }
 
-  async getWorldGuardWorlds(): Promise<{ id: number; name: string }[]> {
-    return await this.wingullRepository.getWorldGuardWorlds();
-  }
-
   // ==================== TRANSPORTATION OPERATIONS ====================
 
   async getTaxiStops(): Promise<TaxiStop[]> {
@@ -380,17 +376,27 @@ export class WingullFacadeService {
 
   async getPlayersOwnedRegions(uuid: string): Promise<
     {
-      region_id: string;
-      world_id: number;
-      owner: boolean;
-      name: string;
-      uuid: string;
+      regionId: string;
+      type: string;
+      dimension: string;
+      ownedSince?: number;
     }[]
   > {
     return await this.wingullRepository.getPlayersOwnedRegions(uuid);
   }
 
-  async getAllPlots(): Promise<any[]> {
+  /**
+   * Ownable regions and their owners. `town` and `number` are NOT here — they live in
+   * `rotom_gobierno_parcelas` on this side, and callers that need them join by `regionId`.
+   */
+  async getAllPlots(): Promise<
+    {
+      regionId: string;
+      type: string;
+      ownerUuid?: string;
+      ownedSince?: number;
+    }[]
+  > {
     return await this.wingullRepository.getAllPlots();
   }
 }

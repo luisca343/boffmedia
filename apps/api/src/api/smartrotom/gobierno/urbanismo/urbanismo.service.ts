@@ -39,11 +39,25 @@ import {
 
 type Plot = {
   regionId: string;
-  town: string;
   type: string;
-  number: number;
   ownerUuid?: string;
+  ownedSince?: number;
 };
+
+/**
+ * Town and number for a parcela that has no `rotom_gobierno_parcelas` row yet, read back out of
+ * the region id it is named after.
+ *
+ * This is DISPLAY ONLY, and the distinction matters: the same parsing used to decide what a
+ * region *was*, so a name that did not match silently became type `''` and disappeared from every
+ * listing. Classification is now a stored column in Teras, so a name this cannot parse costs a
+ * label on one unregistered plot instead of hiding it.
+ */
+function labelFromRegionId(regionId: string): { town: string; number: number } {
+  const [town, tail] = regionId.split('__');
+  const parsed = Number.parseInt(tail?.split('_')[1] ?? '', 10);
+  return { town: town ?? regionId, number: Number.isNaN(parsed) ? 0 : parsed };
+}
 
 @Injectable()
 export class UrbanismoService {
@@ -121,6 +135,8 @@ export class UrbanismoService {
     names: Map<string, string>,
     meta?: {
       id: number;
+      town: string;
+      number: number;
       zonaId: number | null;
       status: string;
       taxAmount: number;
@@ -133,8 +149,8 @@ export class UrbanismoService {
     return {
       id: meta?.id ?? null,
       regionId: plot.regionId,
-      town: plot.town,
-      number: plot.number,
+      town: meta?.town ?? labelFromRegionId(plot.regionId).town,
+      number: meta?.number ?? labelFromRegionId(plot.regionId).number,
       zonaId: meta?.zonaId ?? null,
       status: meta?.status ?? 'sin_registrar',
       taxAmount: meta?.taxAmount ?? null,
@@ -152,8 +168,7 @@ export class UrbanismoService {
     const page = query.page ?? 1;
     const limit = resolvePageSize(query);
 
-    let plots = await this.getPlots();
-    if (query.town) plots = plots.filter((p) => p.town === query.town);
+    const plots = await this.getPlots();
 
     const metaRows = await this.urbanismoRepository.findParcelasByRegions(
       plots.map((p) => p.regionId),
@@ -164,6 +179,17 @@ export class UrbanismoService {
       plot,
       meta: metaByRegion.get(plot.regionId) ?? null,
     }));
+
+    // After the merge, not before it: town is a column on the gobierno register now, so it is
+    // not known until the metadata is joined. An unregistered plot falls back to its label so
+    // filtering by town does not make it vanish.
+    if (query.town) {
+      merged = merged.filter(
+        (r) =>
+          (r.meta?.town ?? labelFromRegionId(r.plot.regionId).town) ===
+          query.town,
+      );
+    }
 
     if (query.status) {
       merged = merged.filter(
@@ -193,7 +219,7 @@ export class UrbanismoService {
     const plots = await this.getPlots();
     const plot = plots.find((p) => p.regionId === regionId);
     if (!plot)
-      throw new NotFoundException(`Plot ${regionId} not found in WorldGuard`);
+      throw new NotFoundException(`Plot ${regionId} not found in the region catalog`);
 
     const meta = await this.urbanismoRepository.findParcelaByRegion(regionId);
     const names = await this.peopleRepository.findUsernames([plot.ownerUuid]);
@@ -205,7 +231,7 @@ export class UrbanismoService {
     const plot = plots.find((p) => p.regionId === dto.regionId);
     if (!plot) {
       throw new BadRequestException(
-        `No WorldGuard plot matches region ${dto.regionId}`,
+        `No ownable region matches ${dto.regionId}`,
       );
     }
 

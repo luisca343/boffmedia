@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react"
 import { useLocale, useTranslations } from "next-intl"
-import { Button, Panel, Select, Toggle, Banner, Empty, Icon } from "@boffmedia/ui"
+import { Button, Panel, SearchInput, Select, Toggle, Banner, Empty, Icon, ToolBar, ToolBarSpacer, ToolHeader } from "@boffmedia/ui"
 import { useBoffSession } from "@/services/useBoffSession"
 import type { TcgCard } from "@boffmedia/shared"
 import type { TcgpData } from "../_lib/useTcgpCards"
@@ -46,8 +46,8 @@ function CGroup({ set, cards, effective, editable, hideMissing, onAdd, onRemove,
   return (
     <div className="mb-[18px]">
       <button type="button" onClick={() => setOpen((v) => !v)} aria-expanded={open}
-        className="cut cut-edge-slant flex w-full items-center gap-[14px] border border-solid border-line bg-panel p-[13px_16px] text-left transition-colors hover:bg-panel-2">
-        <span className="cut [--cut:3px] flex-none bg-accent px-[7px] py-1 font-display text-[12px] font-bold leading-none text-accent-ink">{set.id}</span>
+        className="cut-corner cut-corner-edge [--cut-line:var(--line)] hover:[--cut-line:var(--accent-line)] flex w-full items-center gap-[14px] border border-solid border-line bg-panel p-[13px_16px] text-left transition-[background,border-color] hover:border-accent-line hover:bg-panel-2">
+        <span className="cut cut-edge-slant [--cut:3px] [--cut-line:var(--accent)] flex-none bg-accent px-[7px] py-1 font-display text-[12px] font-bold leading-none text-accent-ink">{set.id}</span>
         <span className="font-display text-[17px] font-bold uppercase leading-none tracking-[0.02em] text-txt">{set.name}</span>
         <span className="font-mono text-[12px] leading-none text-txt-muted">{have}/{cards.length}</span>
         <span className="hidden max-w-[220px] flex-1 sm:block"><TcgBar pct={p} /></span>
@@ -144,14 +144,11 @@ export function ColeccionView({ data, collection, username, onOpenCard }: Props)
 
   return (
     <div className="motion-safe:animate-[bm-modal-in_.3s_both] motion-reduce:animate-none">
-      <div className="mb-5">
-        <h1 className="font-display text-[clamp(26px,4vw,38px)] font-bold uppercase leading-none tracking-[0.01em] text-txt">
-          {username ? t("app.coleccion.galleryTitle", { user: username }) : t("app.coleccion.myTitle")}
-        </h1>
-        <p className="mt-[6px] text-[14px] leading-relaxed text-txt-muted">
-          {t("app.coleccion.summary", { have: totals.have, total: totals.total, pct: totals.pct, dupes: totals.dupes })}
-        </p>
-      </div>
+      <ToolHeader
+        eyebrow={t("app.tabs.coleccion")}
+        title={username ? t("app.coleccion.galleryTitle", { user: username }) : t("app.coleccion.myTitle")}
+        sub={t("app.coleccion.summary", { have: totals.have, total: totals.total, pct: totals.pct, dupes: totals.dupes })}
+      />
 
       {username && (
         <div className="mb-4">
@@ -164,19 +161,16 @@ export function ColeccionView({ data, collection, username, onOpenCard }: Props)
 
       <div className="grid grid-cols-1 items-start gap-5 xl:grid-cols-[1fr_minmax(280px,340px)]">
         <div>
-          <div className="cut cut-edge-slant [--cut-line:var(--line)] mb-[18px] flex flex-wrap items-center gap-[10px] border border-solid border-line bg-panel p-[12px_14px]">
-            <label className="flex min-w-[180px] flex-1 items-center gap-2 border border-solid border-line-2 bg-base px-3 py-2">
-              <Icon name="search" size={18} className="text-txt-dim" />
-              <input className="w-full bg-transparent font-body text-[14px] text-txt outline-none placeholder:text-txt-dim" placeholder={t("app.coleccion.searchPlaceholder")} value={q} onChange={(e) => setQ(e.target.value)} />
-            </label>
-            <Select value={setF} onChange={setSetF} ariaLabel={t("app.filters.expansion")}
+          <ToolBar>
+            <SearchInput value={q} onChange={setQ} placeholder={t("app.coleccion.searchPlaceholder")} className="min-w-[180px] flex-1" />
+            <Select value={setF} onChange={setSetF} ariaLabel={t("app.filters.expansion")} className="w-auto min-w-[140px]"
               options={[{ value: "", label: t("app.filters.allSets") }].concat(data.sets.map((s) => ({ value: s.id, label: s.id })))} />
-            <span className="flex-1" />
+            <ToolBarSpacer />
             <label className="inline-flex cursor-pointer items-center gap-2">
               <Toggle on={hideMissing} onChange={setHideMissing} />
               <span className="font-mono text-[12px] uppercase tracking-[0.06em] text-txt-muted">{t("app.coleccion.hideMissing")}</span>
             </label>
-          </div>
+          </ToolBar>
 
           {groups.length === 0 ? (
             <Empty icon="search" title={t("app.empty.title")} lead={t("app.empty.lead")} />
@@ -216,7 +210,7 @@ export function ColeccionView({ data, collection, username, onOpenCard }: Props)
       </div>
 
       {editable && dirtyCount > 0 && (
-        <div className="cut cut-edge-slant [--cut-line:var(--accent-line)] fixed bottom-[22px] left-1/2 z-[120] flex -translate-x-1/2 items-center gap-[14px] border border-solid border-accent-line bg-panel py-[11px] pl-[18px] pr-3 shadow-2xl motion-safe:animate-[bm-toast-in_.24s_both]">
+        <div className="cut-corner cut-corner-edge [--cut-line:var(--accent-line)] fixed bottom-[22px] left-1/2 z-[120] flex -translate-x-1/2 items-center gap-[14px] border border-solid border-accent-line bg-panel py-[11px] pl-[18px] pr-3 shadow-2xl motion-safe:animate-[bm-toast-in_.24s_both]">
           <span className="text-[13px] leading-tight text-txt-muted">
             <b className="font-mono text-txt">{dirtyCount}</b> {t("app.coleccion.unsaved", { count: dirtyCount })}
           </span>

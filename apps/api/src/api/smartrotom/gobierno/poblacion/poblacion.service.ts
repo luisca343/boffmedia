@@ -20,6 +20,7 @@ import {
   GobiernoOficialEntity,
   GobiernoOficialRankEntity,
 } from './entities/poblacion.entity';
+import { UrbanismoRepository } from '../urbanismo/urbanismo.repository';
 
 @Injectable()
 export class PoblacionService {
@@ -27,6 +28,7 @@ export class PoblacionService {
     private readonly logger: Logger,
     private readonly poblacionRepository: PoblacionRepository,
     private readonly wingullFacadeService: WingullFacadeService,
+    private readonly urbanismoRepository: UrbanismoRepository,
     private readonly auditoriaService: AuditoriaService,
   ) {}
 
@@ -36,18 +38,18 @@ export class PoblacionService {
    * The census is DERIVED — there is no census table. Standing, plots owned and towns all
    * fall out of the real registers, so it can never drift from them.
    *
-   * The plots come from a DIFFERENT database (WorldGuard, raw SQL), so they are joined here
-   * in application code rather than in SQL. Everything is fetched once and indexed by uuid:
-   * the one thing this must never do is a call per row.
+   * Ownership comes from the Teras database and the town each plot sits in comes from this
+   * one, so the two are joined here in application code rather than in SQL. Both sides are
+   * fetched ONCE and indexed: the one thing this must never do is a call per row.
    */
   private async landByOwner(): Promise<
     Map<string, { count: number; towns: Set<string> }>
   > {
-    const plots = (await this.wingullFacadeService.getAllPlots()) as {
-      town?: string;
-      type?: string;
-      ownerUuid?: string;
-    }[];
+    const [plots, parcelas] = await Promise.all([
+      this.wingullFacadeService.getAllPlots(),
+      this.urbanismoRepository.listAllParcelaMetadata(),
+    ]);
+    const townByRegion = new Map(parcelas.map((p) => [p.regionId, p.town]));
 
     const byOwner = new Map<string, { count: number; towns: Set<string> }>();
     for (const plot of plots) {
@@ -56,8 +58,11 @@ export class PoblacionService {
         count: 0,
         towns: new Set<string>(),
       };
+      // Counted whether or not it is registered — owning an unregistered plot is still owning
+      // land. Only the town is unknown until gobierno has a row for it.
       entry.count += 1;
-      if (plot.town) entry.towns.add(plot.town);
+      const town = townByRegion.get(plot.regionId);
+      if (town) entry.towns.add(town);
       byOwner.set(plot.ownerUuid, entry);
     }
     return byOwner;

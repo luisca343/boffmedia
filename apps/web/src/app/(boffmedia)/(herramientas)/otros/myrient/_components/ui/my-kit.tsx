@@ -3,64 +3,10 @@
 import * as React from "react"
 import { Icon } from "@boffmedia/ui"
 import type { CatalogSearchConsoleResult, FileDownloadStatus, GameFileEntry } from "@/services/api/boffmedia/scrapeService"
-import { CONSOLES, type Manufacturer } from "../../../_components/consoles"
-
-/* Manufacturer accent dots — legible on graphite (mirrors the biblioteca catalog). */
-export const MFR_DOT: Record<Manufacturer, string> = {
-  Nintendo: "#ff5b6a",
-  Sony: "#4da3ff",
-  Microsoft: "#34d377",
-  Sega: "#f0803c",
-  Retro: "#9d7bff",
-  Arcade: "#ffb224",
-}
-export const MFR_ORDER: Manufacturer[] = ["Nintendo", "Sony", "Microsoft", "Sega", "Retro", "Arcade"]
-
-/* ── console filter chip ──────────────────────────────────────────────────── */
-export function ConsoleChip({ label, dot, on, onClick }: { label: string; dot: string; on: boolean; onClick: () => void }) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      style={on ? { borderColor: dot, background: `color-mix(in oklch, ${dot} 12%, transparent)` } : undefined}
-      className={
-        "inline-flex items-center gap-[6px] border px-[11px] py-[7px] font-body text-[11px] font-semibold tracking-[0.02em] transition-colors " +
-        (on ? "text-txt" : "border-line bg-panel text-txt-muted hover:border-line-2 hover:text-txt")
-      }
-    >
-      <span className="h-[9px] w-[9px] flex-none rounded-[2px]" style={{ background: dot }} />
-      {label}
-    </button>
-  )
-}
-
-/* ── region toggle chip ───────────────────────────────────────────────────── */
-export function RegionChip({ label, on, onClick }: { label: string; on: boolean; onClick: () => void }) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={
-        "cut cut-edge-slant [--cut:4px] border px-[11px] py-[6px] font-mono text-[11px] font-semibold uppercase tracking-[0.06em] transition-colors " +
-        (on
-          ? "border-accent [--cut-line:var(--accent)] bg-accent-soft text-accent"
-          : "border-line [--cut-line:var(--line)] bg-panel text-txt-muted hover:border-line-2 hover:[--cut-line:var(--line-2)] hover:text-txt")
-      }
-    >
-      {label}
-    </button>
-  )
-}
-
-/* ── KPI tile ─────────────────────────────────────────────────────────────── */
-export function Kpi({ value, label }: { value: React.ReactNode; label: string }) {
-  return (
-    <div className="flex flex-col gap-[3px] border border-line border-t-[3px] border-t-accent bg-panel px-[16px] py-[12px]">
-      <b className="font-display text-[26px] font-extrabold italic leading-none text-txt">{value}</b>
-      <small className="font-mono text-[10px] font-semibold uppercase leading-none tracking-[0.12em] text-txt-muted">{label}</small>
-    </div>
-  )
-}
+import { CONSOLES } from "../../../_components/consoles"
+// Shared with the sibling catalogue tool — see `otros/_components/catalog-chips`.
+import { MFR_DOT } from "../../../_components/catalog-chips"
+export { MFR_DOT, MFR_ORDER, ConsoleChip, RegionChip } from "../../../_components/catalog-chips"
 
 /* ── selectable file row ──────────────────────────────────────────────────── */
 export function MyFileRow({

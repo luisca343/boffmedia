@@ -1,20 +1,9 @@
 import { cn } from "@/lib/utils"
-import { STAT_META, STAT_ORDER, NATURE_CHANGES, typeColor } from "../_lib/meta-types"
+import { STAT_META, STAT_ORDER, NATURE_CHANGES } from "../_lib/meta-types"
 
-/** Pokémon type label in its canonical colour (Spanish-keyed data). */
-export function MvType({ type, small }: { type: string; small?: boolean }) {
-  return (
-    <span
-      className={cn(
-        "cut [--cut:3px] inline-flex items-center font-mono font-bold uppercase tracking-[0.08em] text-white",
-        small ? "px-1.5 py-[3px] text-[9px]/none" : "px-2 py-1 text-[10px]/none",
-      )}
-      style={{ background: typeColor(type), textShadow: "0 1px 2px rgba(0,0,0,0.4)" }}
-    >
-      {type}
-    </span>
-  )
-}
+/** The datakit's type badge under the Meta kit's name — this used to be a
+ *  byte-identical copy of it. */
+export { DkType as MvType } from "@/components/boffmedia/ui/tools/datakit"
 
 /** EV spread: coloured nature (+/− arrows) and the invested-stat line. */
 export function MvSpread({ nature, ev }: { nature: string; ev: number[] }) {

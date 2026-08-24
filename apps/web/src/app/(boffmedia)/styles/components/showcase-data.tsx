@@ -50,6 +50,8 @@ export const CHAPTERS: Chapter[] = [
     dom: "Sistema",
     sections: [
       { id: "paneles", label: "Paneles" },
+      { id: "chasis", label: "Chasis de herramientas" },
+      { id: "geometria", label: "Geometría de corte" },
       { id: "datos", label: "Datos" },
       { id: "estados", label: "Estados" },
     ],

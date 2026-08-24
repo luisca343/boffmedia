@@ -3,9 +3,6 @@ import type * as React from "react"
 /** Tone for KPI cards, split rates and deltas. */
 export type DkTone = "pos" | "neg" | "accent" | "neutral"
 
-/** Single bottom-right diagonal cut (8px) shared across datakit chrome. */
-export const DK_CUT = "polygon(0 0,100% 0,100% calc(100% - 8px),calc(100% - 8px) 100%,0 100%)"
-
 /**
  * Inline CSS custom properties (e.g. `--dk-pad`) alongside standard style props.
  * @types/react in this repo rejects `--x` keys on object literals, so route them

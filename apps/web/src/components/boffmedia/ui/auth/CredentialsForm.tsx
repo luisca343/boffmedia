@@ -7,6 +7,7 @@ import { useForm } from "react-hook-form"
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { signIn } from "next-auth/react"
+import { ApiErrorCode } from "@boffmedia/shared/error-codes"
 import { Button, Field, Input, PasswordField, toast } from "@boffmedia/ui"
 import { UsersService } from "@/services/api/boffmedia/usersService"
 import { AuthService } from "@/services/api/boffmedia/authService"
@@ -91,8 +92,13 @@ export function CredentialsForm({ isRegister, redirect, onRegistered }: Credenti
       username: values.username,
       password: values.password,
     })
-    if (res?.error) toast.error(t("errors.signIn"))
-    else router.replace(redirect)
+    if (res?.error) {
+      // NextAuth passes an authorize() throw through as the error string. If a
+      // future version collapses it to CredentialsSignin instead, this falls
+      // back to the credentials message — i.e. exactly today's behaviour.
+      const unreachable = res.error.includes(ApiErrorCode.SERVICE_DATABASE_UNAVAILABLE)
+      toast.error(t(unreachable ? "errors.serviceUnavailable" : "errors.signIn"))
+    } else router.replace(redirect)
   }
 
   return (

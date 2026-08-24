@@ -24,6 +24,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Logger } from 'nestjs-pino';
 import { env } from '@/config/env';
+import { throwIfDatabaseUnavailable } from '@api/_utils/database-availability';
 
 export interface BoffMediaUserInitializationData {
   email: string;
@@ -493,6 +494,10 @@ export class BoffMediaUsersFacadeService {
       };
     } catch (error: any) {
       this.logger.error(`Failed to validate user ${username}:`, error);
+      // `null` here means "these credentials are not valid", which the caller
+      // turns into 401. An unreachable database has not established that, so it
+      // must not borrow the answer — it leaves as a 503.
+      throwIfDatabaseUnavailable(error);
       return null;
     }
   }

@@ -118,14 +118,7 @@ export class WingullService {
     }
     
     /**
-     * Fetch all WorldGuard worlds
-     */
-    static getWorldGuardWorlds() {
-        return wingullGET<any>('/worldguard-worlds');
-    }
-    
-    /**
-     * Fetch player's owned regions by UUID
+     * Fetch the regions a player owns, by UUID
      */
     static getPlayersOwnedRegions(uuid: string) {
         return wingullGET<any>(`/owned-regions/${uuid}`);

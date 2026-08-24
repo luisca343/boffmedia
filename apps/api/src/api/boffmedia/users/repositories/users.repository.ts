@@ -19,6 +19,7 @@ import {
 import { CreateUserDto } from '../dto/create-user.dto';
 import { Logger } from 'nestjs-pino';
 import { DEFAULT_PROFILE_PICTURE } from '../users.constants';
+import { throwIfDatabaseUnavailable } from '@api/_utils/database-availability';
 
 @Injectable()
 export class BoffMediaUsersRepository implements IBoffMediaUsersRepository {
@@ -393,6 +394,9 @@ export class BoffMediaUsersRepository implements IBoffMediaUsersRepository {
       // A typed HTTP error (404/403/409…) has to reach the client as itself;
       // wrapping it in a bare Error turned all of them into 500s.
       if (error instanceof HttpException) throw error;
+      // Must run before the wrap below: that wrap keeps only `error.message`,
+      // and the driver code this reads lives on the cause chain.
+      throwIfDatabaseUnavailable(error);
       throw new Error(`Failed to find full user: ${error.message}`);
     }
   }
@@ -431,6 +435,9 @@ export class BoffMediaUsersRepository implements IBoffMediaUsersRepository {
       // A typed HTTP error (404/403/409…) has to reach the client as itself;
       // wrapping it in a bare Error turned all of them into 500s.
       if (error instanceof HttpException) throw error;
+      // Must run before the wrap below: that wrap keeps only `error.message`,
+      // and the driver code this reads lives on the cause chain.
+      throwIfDatabaseUnavailable(error);
       throw new Error(`Failed to find full user: ${error.message}`);
     }
   }
@@ -463,6 +470,9 @@ export class BoffMediaUsersRepository implements IBoffMediaUsersRepository {
       // A typed HTTP error (404/403/409…) has to reach the client as itself;
       // wrapping it in a bare Error turned all of them into 500s.
       if (error instanceof HttpException) throw error;
+      // Must run before the wrap below: that wrap keeps only `error.message`,
+      // and the driver code this reads lives on the cause chain.
+      throwIfDatabaseUnavailable(error);
       throw new Error(`Failed to find full user: ${error.message}`);
     }
   }
@@ -496,6 +506,9 @@ export class BoffMediaUsersRepository implements IBoffMediaUsersRepository {
       // A typed HTTP error (404/403/409…) has to reach the client as itself;
       // wrapping it in a bare Error turned all of them into 500s.
       if (error instanceof HttpException) throw error;
+      // Must run before the wrap below: that wrap keeps only `error.message`,
+      // and the driver code this reads lives on the cause chain.
+      throwIfDatabaseUnavailable(error);
       throw new Error(`Failed to find full user: ${error.message}`);
     }
   }

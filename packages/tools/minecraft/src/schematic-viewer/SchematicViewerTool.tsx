@@ -2,7 +2,7 @@
 
 import { useCallback } from "react";
 import { useToolT } from "../i18n";
-import { Icon, Stepper } from "@boffmedia/ui";
+import { Stepper, ToolSeal, ToolStrip, ToolTitle } from "@boffmedia/ui";
 import { WorkbenchLayout } from "../ui/WorkbenchLayout";
 import { SchematicAssetProvider } from "../engine/render";
 import { useViewerEngine } from "./_hooks/useViewerEngine";
@@ -63,24 +63,15 @@ export function SchematicViewerTool() {
         data-ds="boffmedia"
         className="flex h-full min-h-0 flex-col overflow-hidden bg-base text-txt"
       >
-        <div className="flex h-[58px] shrink-0 items-center gap-[18px] border-b-2 border-line bg-base-deep px-[18px]">
-          <div className="flex min-w-0 items-center gap-[11px]">
-            <span className="cut-tag [--cut-tag:9px] grid h-[34px] w-[34px] shrink-0 place-items-center bg-accent text-accent-ink">
-              <Icon name="cube" size={18} />
-            </span>
-            <span className="flex min-w-0 flex-col leading-none">
-              <span className="whitespace-nowrap font-display text-[20px] font-extrabold italic tracking-[0.01em] text-white">
-                {t("appName")}
-              </span>
-              <span className="mt-1 font-mono text-[9.5px] uppercase tracking-[0.14em] text-txt-dim">
-                {t("appTagline")}
-              </span>
-            </span>
-          </div>
+        {/* app bar — the shared ToolStrip, `static` for the same reason as in
+            the compat tool: this shell is a fixed-height column, not a scroller. */}
+        <ToolStrip className="static z-auto h-[58px] gap-[18px] py-0 [--tool-pad:18px]">
+          <ToolSeal icon="cube" solid />
+          <ToolTitle title={t("appName")} sub={t("appTagline")} />
           <div className="min-w-2 flex-1" />
           <Stepper steps={steps} current={step} />
           <div className="min-w-2 flex-1" />
-        </div>
+        </ToolStrip>
 
         {/* body: two columns above 820px, tabs at/below it (E-front) — this
             tool's columns stop fitting earlier than compat's, hence the

@@ -1,8 +1,7 @@
 import * as React from "react"
 import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
-import { Icon, type IconName } from "@boffmedia/ui"
-import { DK_CUT } from "./utils"
+import { Icon, SearchInput, type IconName } from "@boffmedia/ui"
 
 export interface DkSegOption {
   value: string
@@ -61,34 +60,21 @@ export interface DkSearchProps {
   className?: string
 }
 
+/** The datakit's name for the shared `SearchInput` at bar density. The field
+ *  itself (chamfer, focus ring, clear button, Escape-to-clear) has one
+ *  definition in `@boffmedia/ui`; only the namespaced placeholder is local. */
 export function DkSearch({ value, onChange, placeholder, ariaLabel, className }: DkSearchProps) {
   const t = useTranslations("common.dkExtras")
   const ph = placeholder ?? t("searchPh")
   return (
-    <div
-      className={cn("cut-tag cut-tag-edge [--cut-line:var(--line-2)] [--cut-tag:8px] ", "inline-flex min-w-0 items-center gap-2 border border-solid border-line-2 bg-base px-[10px] text-txt-dim transition-[border-color] focus-within:border-accent",
-        className,
-      )}
-    >
-      <Icon name="search" size={15} className="flex-none" />
-      <input
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder={ph}
-        aria-label={ariaLabel ?? ph}
-        className="min-w-0 flex-1 border-0 bg-transparent py-[9px] font-body text-[13px] font-medium leading-none text-txt outline-none placeholder:text-txt-dim"
-      />
-      {value && (
-        <button
-          type="button"
-          aria-label={t("clear")}
-          onClick={() => onChange("")}
-          className="grid place-items-center p-1 text-txt-dim transition-colors hover:text-txt"
-        >
-          <Icon name="x" size={14} />
-        </button>
-      )}
-    </div>
+    <SearchInput
+      size="sm"
+      value={value}
+      onChange={onChange}
+      placeholder={ph}
+      ariaLabel={ariaLabel ?? ph}
+      className={cn("min-w-0", className)}
+    />
   )
 }
 

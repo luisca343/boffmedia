@@ -13,7 +13,7 @@ export const ADMIN_AUTH_FILE = path.join(__dirname, "../.auth/admin.json")
  * this check a suite run against an under-privileged account would assert happily on
  * the page it was bounced to. Failing here, loudly, is the only correct outcome.
  */
-setup("authenticate as admin", async ({ page, baseURL }) => {
+setup("authenticate as admin", async ({ page }) => {
   const username = process.env.TEST_ADMIN_USERNAME ?? ""
   const password = process.env.TEST_ADMIN_PASSWORD ?? ""
 
@@ -27,64 +27,13 @@ setup("authenticate as admin", async ({ page, baseURL }) => {
     )
   }
 
-  // LOCALHOST PATH. authOptions hardcodes the session cookie's domain to
-  // `.ficuslab.es` outside production (authOptions.ts, `cookies.sessionToken`),
-  // so a browser on http://localhost cannot store it: the form login succeeds
-  // server-side and /api/auth/session then returns {} — which reads exactly
-  // like "this account has no roles" and sends you hunting in the database.
-  //
-  // This is still a REAL credentials login: the same csrf + callback exchange
-  // the form performs, with the genuine token re-homed onto a domain the
-  // browser will accept. Nothing is minted from NEXTAUTH_SECRET.
-  const target = new URL(baseURL ?? "http://localhost:3000")
-  if (target.hostname === "localhost" || target.hostname === "127.0.0.1") {
-    const api = page.request
-    const csrfRes = await api.get("/api/auth/csrf")
-    const { csrfToken } = (await csrfRes.json()) as { csrfToken: string }
-
-    const callback = await api.post("/api/auth/callback/boffmedia", {
-      form: { csrfToken, username, password, json: "true" },
-    })
-    if (!callback.ok()) {
-      throw new Error(`Admin auth setup: credentials callback returned ${callback.status()}.`)
-    }
-
-    // Read the raw Set-Cookie, not the cookie jar: the jar rejects this cookie
-    // for the very reason we are here — its Domain is .ficuslab.es and the
-    // request went to localhost.
-    const setCookies = callback
-      .headersArray()
-      .filter((h) => h.name.toLowerCase() === "set-cookie")
-      .map((h) => h.value)
-    const token = setCookies
-      .find((c) => c.startsWith("__Secure-next-auth.session-token="))
-      ?.split(";")[0]
-      ?.split("=")
-      .slice(1)
-      .join("=")
-    if (!token) {
-      throw new Error(
-        "Admin auth setup: the credentials callback set no session cookie. " +
-          "Check TEST_ADMIN_USERNAME / TEST_ADMIN_PASSWORD.",
-      )
-    }
-
-    // sameSite must be spelled out or CDP rejects the __Secure- prefixed name.
-    // Chrome treats http://localhost as a secure origin, so `secure` is fine.
-    await page.context().addCookies([
-      {
-        name: "__Secure-next-auth.session-token",
-        value: token,
-        domain: "localhost",
-        path: "/",
-        httpOnly: true,
-        secure: true,
-        sameSite: "Lax",
-      },
-    ])
-  } else {
-    await formLogin()
-  }
+  // A plain UI login works on every host: the session cookie is host-only and
+  // non-secure on a plain-HTTP origin (authOptions.ts, `sessionCookie`), so a
+  // browser on http://localhost stores it like any other. This used to need a
+  // localhost workaround that scraped the raw Set-Cookie and re-homed the token,
+  // because the cookie was pinned to `.ficuslab.es` and `secure` outside
+  // production — nothing to work around now.
+  await formLogin()
 
   async function formLogin() {
   let loginError: string | undefined

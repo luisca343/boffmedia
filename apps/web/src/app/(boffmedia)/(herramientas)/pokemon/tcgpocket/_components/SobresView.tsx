@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react"
 import { useTranslations } from "next-intl"
-import { Button, Panel, Empty } from "@boffmedia/ui"
+import { Button, Panel, Empty, ToolHeader } from "@boffmedia/ui"
 import type { TcgCard } from "@boffmedia/shared"
 import type { TcgpData, TcgpSet } from "../_lib/useTcgpCards"
 import { typeColor } from "../_lib/tcgp-maps"
@@ -64,15 +64,12 @@ export function SobresView({ data, effective, initialSetId, onOpenCard }: Props)
 
   return (
     <div className="motion-safe:animate-[bm-modal-in_.3s_both] motion-reduce:animate-none">
-      <div className="mb-5">
-        <h1 className="font-display text-[clamp(26px,4vw,38px)] font-bold uppercase leading-none tracking-[0.01em] text-txt">{t("app.sobres.title")}</h1>
-        <p className="mt-[6px] max-w-[60ch] text-[14px] leading-relaxed text-txt-muted">{t("app.sobres.lead")}</p>
-      </div>
+      <ToolHeader eyebrow={t("app.tabs.sobres")} title={t("app.sobres.title")} sub={t("app.sobres.lead")} />
 
       {sets.map((s) => (
         <section key={s.id} className="mb-[26px]">
           <div className="mb-3 flex items-center gap-[9px]">
-            <span className="cut [--cut:3px] bg-accent px-[7px] py-1 font-display text-[12px] font-bold leading-none text-accent-ink">{s.id}</span>
+            <span className="cut cut-edge-slant [--cut:3px] [--cut-line:var(--accent)] bg-accent px-[7px] py-1 font-display text-[12px] font-bold leading-none text-accent-ink">{s.id}</span>
             <h2 className="font-display text-[18px] font-bold uppercase leading-none tracking-[0.03em] text-txt">{s.name}</h2>
           </div>
           {s.packs.length === 0 ? (

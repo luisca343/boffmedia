@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react"
 import { useTranslations } from "next-intl"
-import { Button, Select, Seg, Toggle, Empty, Icon } from "@boffmedia/ui"
+import { Button, Select, SearchInput, Seg, Toggle, Empty, ToolBar, ToolBarSpacer, ToolHeader } from "@boffmedia/ui"
 import type { TcgCard } from "@boffmedia/shared"
 import type { TcgpData } from "../_lib/useTcgpCards"
 import { normType, rarityMeta, typeColor, cssVars, TYPE_ORDER } from "../_lib/tcgp-maps"
@@ -75,57 +75,51 @@ export function CartasView({ data, effective, initialQ, onOpenCard }: Props) {
 
   return (
     <div className="motion-safe:animate-[bm-modal-in_.3s_both] motion-reduce:animate-none">
-      <div className="mb-5">
-        <h1 className="font-display text-[clamp(26px,4vw,38px)] font-bold uppercase leading-none tracking-[0.01em] text-txt">{t("app.cartas.title")}</h1>
-        <p className="mt-[6px] max-w-[60ch] text-[14px] leading-relaxed text-txt-muted">{t("app.cartas.lead", { cards: data.cards.length, sets: data.sets.length })}</p>
-      </div>
+      <ToolHeader
+        eyebrow={t("app.tabs.cartas")}
+        title={t("app.cartas.title")}
+        sub={t("app.cartas.lead", { cards: data.cards.length, sets: data.sets.length })}
+      />
 
-      {/* toolbar */}
-      <div className="cut cut-edge-slant mb-[18px] flex flex-wrap items-center gap-[10px] border border-solid border-line bg-panel p-[12px_14px]">
-        <label className="flex min-w-[180px] flex-1 items-center gap-2 border border-solid border-line-2 bg-base px-3 py-2">
-          <Icon name="search" size={18} className="text-txt-dim" />
-          <input className="w-full bg-transparent font-body text-[14px] text-txt outline-none placeholder:text-txt-dim" placeholder={t("app.searchCards")} value={q} onChange={(e) => setQ(e.target.value)} />
-        </label>
-        <Select value={setF} onChange={setSetF} ariaLabel={t("app.filters.expansion")}
+      <ToolBar
+        filters={
+          presentTypes.length > 0 &&
+            presentTypes.map((ty) => {
+              const on = types.includes(ty)
+              return (
+                <button key={ty} type="button" onClick={() => toggleType(ty)}
+                  className="cut cut-edge-slant [--cut:5px] inline-flex items-center gap-[6px] border border-solid px-[10px] py-[6px] font-mono text-[11px] uppercase tracking-[0.04em] transition-colors"
+                  style={cssVars({
+                    color: on ? "var(--text)" : "var(--muted)",
+                    borderColor: on ? `color-mix(in srgb, ${typeColor(ty)} 65%, transparent)` : "var(--line-2)",
+                    // The slants are painted geometry — they need the colour by name.
+                    "--cut-line": on ? `color-mix(in srgb, ${typeColor(ty)} 65%, transparent)` : "var(--line-2)",
+                    background: on ? `color-mix(in srgb, ${typeColor(ty)} 15%, transparent)` : "transparent",
+                  })}>
+                  <TcgTypePip type={ty} size={16} />{tl(`types.${ty}`, ty)}
+                </button>
+              )
+            })
+        }
+        note={t("app.showing", { shown: Math.min(limit, filtered.length), total: filtered.length })}
+      >
+        <SearchInput value={q} onChange={setQ} placeholder={t("app.searchCards")} className="min-w-[200px] flex-1" />
+        <Select value={setF} onChange={setSetF} ariaLabel={t("app.filters.expansion")} className="w-auto min-w-[200px]"
           options={[{ value: "", label: t("app.filters.allSets") }].concat(data.sets.map((s) => ({ value: s.id, label: `${s.id} · ${s.name}` })))} />
         {categories.length > 1 && (
-          <Select value={catF} onChange={setCatF} ariaLabel={t("app.filters.category")}
+          <Select value={catF} onChange={setCatF} ariaLabel={t("app.filters.category")} className="w-auto min-w-[160px]"
             options={[{ value: "", label: t("app.filters.allCategories") }].concat(categories.map((c) => ({ value: c, label: tl(`app.category.${c.toLowerCase()}`, c) })))} />
         )}
-        <Select value={sort} onChange={setSort} ariaLabel={t("app.sort.label")}
+        <Select value={sort} onChange={setSort} ariaLabel={t("app.sort.label")} className="w-auto min-w-[180px]"
           options={["num", "name", "rarity", "hp"].map((s) => ({ value: s, label: `${t("app.sort.label")}: ${t(`app.sort.${s}`)}` }))} />
-        <span className="flex-1" />
+        <ToolBarSpacer />
         <label className="inline-flex cursor-pointer items-center gap-2">
           <Toggle on={ownedOnly} onChange={setOwnedOnly} />
           <span className="font-mono text-[12px] uppercase tracking-[0.06em] text-txt-muted">{t("app.ownedOnly")}</span>
         </label>
         <Seg value={density} onChange={(v) => setDensity(v as Density)}
           options={[{ value: "compacta", label: "S" }, { value: "comoda", label: "M" }, { value: "espaciosa", label: "L" }]} />
-      </div>
-
-      {/* type chips */}
-      {presentTypes.length > 0 && (
-        <div className="mb-[18px] flex flex-wrap gap-[7px]">
-          {presentTypes.map((ty) => {
-            const on = types.includes(ty)
-            return (
-              <button key={ty} type="button" onClick={() => toggleType(ty)}
-                className="cut cut-edge-slant [--cut:5px] inline-flex items-center gap-[6px] border border-solid px-[10px] py-[6px] font-mono text-[11px] uppercase tracking-[0.04em] transition-colors"
-                style={cssVars({
-                  color: on ? "var(--text)" : "var(--muted)",
-                  borderColor: on ? `color-mix(in srgb, ${typeColor(ty)} 65%, transparent)` : "var(--line-2)",
-                  // The slants are painted geometry — they need the colour by name.
-                  "--cut-line": on ? `color-mix(in srgb, ${typeColor(ty)} 65%, transparent)` : "var(--line-2)",
-                  background: on ? `color-mix(in srgb, ${typeColor(ty)} 15%, transparent)` : "transparent",
-                })}>
-                <TcgTypePip type={ty} size={16} />{tl(`types.${ty}`, ty)}
-              </button>
-            )
-          })}
-        </div>
-      )}
-
-      <div className="mb-[14px] font-mono text-[12px] text-txt-dim">{t("app.showing", { shown: Math.min(limit, filtered.length), total: filtered.length })}</div>
+      </ToolBar>
 
       {filtered.length === 0 ? (
         <Empty icon="search" title={t("app.empty.title")} lead={t("app.empty.lead")}>

@@ -44,7 +44,7 @@ describe('WingullFacadeService', () => {
   let wingullRepository: jest.Mocked<
     Pick<
       WingullRepository,
-      'getWorldGuardWorlds' | 'getPlayersOwnedRegions' | 'getAllPlots'
+      'getPlayersOwnedRegions' | 'getAllPlots'
     >
   >;
   let _logger: jest.Mocked<Pick<Logger, 'log' | 'warn' | 'error'>>;
@@ -84,7 +84,6 @@ describe('WingullFacadeService', () => {
     };
 
     const mockWingullRepository = {
-      getWorldGuardWorlds: jest.fn(),
       getPlayersOwnedRegions: jest.fn(),
       getAllPlots: jest.fn(),
     };
@@ -309,17 +308,6 @@ describe('WingullFacadeService', () => {
       await expect(
         service.teleportPlayer('stop-1', 'test-uuid'),
       ).resolves.toEqual(refusal);
-    });
-  });
-
-  describe('getWorldGuardWorlds', () => {
-    it('should return WorldGuard worlds', async () => {
-      const worlds = [{ id: 1, name: 'world' }];
-      wingullRepository.getWorldGuardWorlds.mockResolvedValue(worlds as any);
-
-      const result = await service.getWorldGuardWorlds();
-
-      expect(result).toEqual(worlds);
     });
   });
 

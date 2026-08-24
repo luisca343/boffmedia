@@ -22,7 +22,7 @@ import {
   type TnCompetitorApi,
 } from "@/services/api/boffmedia/tournamentsService"
 import { FORMATS, KINDS, PHASE_FORMATS, ADVANCE_TYPE_OPTIONS, PARTICIPANT_STATUS, VGC_PRESET, PHASE_STATUS_TONE } from "./constants"
-import { SectionHead, Stat } from "./shared"
+import { SectionHead } from "./shared"
 
 export function PhasesEditor({
   phases,

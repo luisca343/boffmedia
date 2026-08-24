@@ -445,7 +445,7 @@ export function TcgCardDrawer({ card, list, count, editable, labels, onAdd, onRe
         className="fixed inset-y-0 right-0 z-[201] flex w-[min(560px,94vw)] flex-col border-l border-solid border-line-2 bg-base shadow-2xl animate-[bm-drawer-in_.24s_cubic-bezier(0.2,0.7,0.3,1)] motion-reduce:animate-none"
       >
         <div className="flex items-center gap-3 border-b border-solid border-line px-[18px] py-[15px]">
-          <span className="cut cut-edge-slant [--cut-line:var(--line-2)] [--cut:3px] bg-accent px-[7px] py-1 font-display text-[12px] font-bold leading-none text-accent-ink">{card.setId}</span>
+          <span className="cut cut-edge-slant [--cut-line:var(--accent)] [--cut:3px] bg-accent px-[7px] py-1 font-display text-[12px] font-bold leading-none text-accent-ink">{card.setId}</span>
           <b className="font-display text-[18px] font-bold uppercase leading-none tracking-[0.03em] text-txt">{card.name}</b>
           <div className="ml-auto flex gap-1">
             <button type="button" aria-label={labels.prev} onClick={() => step(-1)} className="grid h-8 w-8 place-items-center rounded border border-solid border-line-2 text-txt-muted hover:text-txt"><Icon name="back" size={15} /></button>

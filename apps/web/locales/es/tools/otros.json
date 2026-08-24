@@ -69,6 +69,7 @@
       "sortEstado": "Disponibles primero",
       "sortStock": "Más stock",
       "sortNombre": "Nombre",
+      "resultCount": "{n} claves",
       "cardCta": "Ver ficha",
       "available": "Disponible",
       "delivered": "Entregada",

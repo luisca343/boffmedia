@@ -7,7 +7,8 @@ import { TnFormatBadge } from "@/components/boffmedia/ui/tournaments"
 import { useTournament } from "@/hooks/tournaments/useTournament"
 import { TorneoView } from "../../torneos/_components/TorneoView"
 import { TournamentsService, type TnMatchApi, type TnStatus } from "@/services/api/boffmedia/tournamentsService"
-import { SectionHead, Stat } from "./tournaments-admin/shared"
+import { SectionHead } from "./tournaments-admin/shared"
+import { AvMetric, AvMetrics } from "../_components/ui/av-kit"
 import { ListAndCreate } from "./tournaments-admin/ListAndCreate"
 import { EditPanel } from "./tournaments-admin/EditPanel"
 import { EntrantsPanel } from "./tournaments-admin/EntrantsPanel"
@@ -101,16 +102,18 @@ function Manage({ slug, onBack }: { slug: string; onBack: () => void }) {
         </a>
       </div>
 
-      <div className="grid gap-2 [grid-template-columns:repeat(auto-fit,minmax(116px,1fr))]">
-        <Stat label={t("participants")} value={tn.participants.length} />
-        {tn.checkInOpen && <Stat label={t("checkIn")} value={`${checkedIn}/${tn.participants.length}`} tone="text-ok" />}
-        {matches.length > 0 && <Stat label={t("matches")} value={`${doneMatches}/${matches.length}`} />}
-        {multiPhase && livePhase && <Stat label={t("phase")} value={`${livePhase.order}/${(tn.phases ?? []).length}`} tone="text-accent-bright" />}
+      {/* av-* is the admin panel's canonical kit; this row used to be a local
+          `Stat` fork of AvMetric that also wore the pill parallelogram. */}
+      <AvMetrics className="[grid-template-columns:repeat(auto-fit,minmax(116px,1fr))]">
+        <AvMetric label={t("participants")} value={tn.participants.length} />
+        {tn.checkInOpen && <AvMetric label={t("checkIn")} value={`${checkedIn}/${tn.participants.length}`} tone="pos" />}
+        {matches.length > 0 && <AvMetric label={t("matches")} value={`${doneMatches}/${matches.length}`} />}
+        {multiPhase && livePhase && <AvMetric label={t("phase")} value={`${livePhase.order}/${(tn.phases ?? []).length}`} tone="accent" />}
         {livePhase?.format === "swiss" && (
-          <Stat label={t("round")} value={`${livePhase.view.rounds?.length ?? 0}/${livePhase.rounds ?? "?"}`} />
+          <AvMetric label={t("round")} value={`${livePhase.view.rounds?.length ?? 0}/${livePhase.rounds ?? "?"}`} />
         )}
-        {tn.champion && <Stat label={t("champion")} value={`🏆 ${tn.champion.name}`} tone="text-accent-bright" />}
-      </div>
+        {tn.champion && <AvMetric label={t("champion")} value={`🏆 ${tn.champion.name}`} tone="accent" />}
+      </AvMetrics>
 
       <Panel title={t("lifecycle")} aside={<TnFormatBadge format={tn.format} size="sm" />}>
         <div className="flex flex-wrap items-center gap-2">

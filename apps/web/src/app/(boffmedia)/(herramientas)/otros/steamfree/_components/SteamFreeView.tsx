@@ -2,47 +2,10 @@
 
 import * as React from "react"
 import { useTranslations, useFormatter } from "next-intl"
-import { Kicker, SearchInput, Select, Empty, Button, Icon, Skeleton } from "@boffmedia/ui"
+import { SearchInput, Select, Empty, Button, Icon, Skeleton, StatChip, ToolBar, ToolBarSpacer, ToolHeader } from "@boffmedia/ui"
 import { cn } from "@/lib/utils"
 import { useSteamFreeV3 } from "../_lib/useSteamFreeV3"
 import { SfCard, SfModal, type SfStrings } from "./ui/sf-kit"
-
-function StatChip({
-  icon,
-  value,
-  label,
-  tone,
-}: {
-  icon: "gift" | "bookmark" | "flame"
-  value: string | number
-  label: string
-  tone?: "ok" | "accent"
-}) {
-  return (
-    <span
-      className={cn(
-        "cut cut-edge-slant [--cut:4px]",
-        "inline-flex items-center gap-[9px] border bg-panel-2 px-[12px] py-[9px] font-mono text-[11px] font-semibold uppercase leading-none tracking-[0.06em]",
-        tone === "ok"
-          ? "border-[color-mix(in_srgb,var(--ok)_35%,var(--line-2))] text-ok"
-          : tone === "accent"
-            ? "border-accent-line text-accent"
-            : "border-line-2 text-txt-muted",
-      )}
-    >
-      <Icon name={icon} size={14} className={tone === "ok" ? "text-ok" : tone === "accent" ? "text-accent" : "text-txt-muted"} />
-      <b
-        className={
-          "font-display text-[16px] font-extrabold italic leading-none " +
-          (tone === "ok" ? "text-ok" : tone === "accent" ? "text-accent" : "text-txt")
-        }
-      >
-        {value}
-      </b>
-      {label}
-    </span>
-  )
-}
 
 export function SteamFreeView() {
   const t = useTranslations("otros.steamfreeApp")
@@ -101,24 +64,20 @@ export function SteamFreeView() {
 
   return (
     <main className="pb-[10px]">
-      {/* ── header ─────────────────────────────────────────────────────────── */}
-      <header className="flex flex-wrap items-end justify-between gap-[24px] pb-[20px] pt-[4px]">
-        <div className="min-w-0">
-          <Kicker>{t("kicker")}</Kicker>
-          <h1 className="my-[12px] text-[clamp(38px,5vw,66px)] leading-[0.9]">
-            {t("titlePre")} <em>{t("titleEm")}</em>
-          </h1>
-          <p className="max-w-[58ch] text-pretty text-[15px] leading-[1.5] text-txt-muted">{t("sub")}</p>
-        </div>
-        <div className="flex flex-wrap items-center gap-[10px]">
-          <StatChip icon="gift" value={stats.count} label={t("statFree")} tone="ok" />
-          <StatChip icon="bookmark" value={stats.keepCount} label={t("statKeep")} />
-          {stats.valueCents > 0 && <StatChip icon="flame" value={savedValue} label={t("statValue")} tone="accent" />}
-        </div>
-      </header>
+      <ToolHeader
+        eyebrow={t("kicker")}
+        title={<>{t("titlePre")} <em>{t("titleEm")}</em></>}
+        sub={t("sub")}
+        meta={
+          <>
+            <StatChip icon="gift" value={stats.count} label={t("statFree")} tone="ok" />
+            <StatChip icon="bookmark" value={stats.keepCount} label={t("statKeep")} />
+            {stats.valueCents > 0 && <StatChip icon="flame" value={savedValue} label={t("statValue")} tone="accent" />}
+          </>
+        }
+      />
 
-      {/* ── toolbar ────────────────────────────────────────────────────────── */}
-      <div className="mb-[10px] mt-[4px] flex flex-wrap items-center gap-[12px]">
+      <ToolBar className="mb-[10px]">
         <SearchInput value={q} onChange={setQ} placeholder={t("searchPlaceholder")} className="min-w-[230px] flex-1" />
         <Select
           value={sort}
@@ -132,10 +91,11 @@ export function SteamFreeView() {
             { value: "name", label: t("sortName") },
           ]}
         />
+        <ToolBarSpacer />
         <Button variant="ghost" icon="refresh" onClick={refresh} loading={loading}>
           {t("refresh")}
         </Button>
-      </div>
+      </ToolBar>
 
       {/* Steam is the authority here, so say when this snapshot was taken. */}
       <div className="mb-[22px] flex flex-wrap items-center gap-[10px] font-mono text-[10px] uppercase tracking-[0.08em] text-txt-dim">

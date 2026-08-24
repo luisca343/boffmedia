@@ -23,7 +23,7 @@
 // arbitrary properties (verified — `calc(100dvh-3rem)` and `calc(100dvh_-_3rem)` emit
 // identical CSS), so it is a spacing convention, not a correctness bug.
 import { existsSync, readFileSync } from "node:fs";
-import { execSync } from "node:child_process";
+import { execFileSync } from "node:child_process";
 import { posix } from "node:path";
 
 const BM_ROOTS = ["apps/web/src/components/boffmedia", "apps/web/src/app/(boffmedia)"];
@@ -45,12 +45,26 @@ const SR_ROOTS = [
 // count may only go DOWN. Adding an import to a listed file fails the build, and so does
 // the first one in any file not listed. When a file is cleaned, drop its entry.
 //
-// 2026-08-20: the last 12 entries (camara/liga/mina/bidkea) all reached 0 and were dropped,
-// so the ratchet now sits at zero for the whole tree. The chrome (RotomNav, layout,
-// providers) was rebuilt on sr-* primitives in components/smartrotom/chrome/ and is clean.
+// 2026-08-23: these numbers are measured, and they are the FIRST measured ones.
+// `listFiles` shelled out through cmd.exe on Windows, where single quotes are not
+// stripped, so every pathspec arrived at git quoted, matched nothing, and the
+// guard scanned zero files while printing its ✓. The "everything reached 0" note
+// that used to sit here was written against that blind run. The imports below
+// were never removed — they were never seen. Same ratchet contract as before: a
+// count may only go DOWN, and a file that reaches 0 gets its entry dropped.
 const CROSS_DS_BASELINE = {
-  // Empty: every listed file reached 0. Adding a cross-DS import
-  // anywhere under SR_ROOTS now fails the build outright.
+  "apps/web/src/app/smartrotom/bidkea/page.tsx": 2,
+  "apps/web/src/app/smartrotom/camara/_components/CameraBottomControls.tsx": 1,
+  "apps/web/src/app/smartrotom/camara/_components/CameraControls.tsx": 1,
+  "apps/web/src/app/smartrotom/camara/_components/CameraZoomSlider.tsx": 1,
+  "apps/web/src/app/smartrotom/camara/_components/GalleryView.tsx": 1,
+  "apps/web/src/app/smartrotom/camara/_components/ScreenshotPreviewDialog.tsx": 2,
+  "apps/web/src/app/smartrotom/liga/camaralucha/page.tsx": 1,
+  "apps/web/src/app/smartrotom/liga/page.tsx": 1,
+  "apps/web/src/app/smartrotom/mina/_components/LinkMina.tsx": 1,
+  "apps/web/src/app/smartrotom/mina/drops/page.tsx": 1,
+  "apps/web/src/app/smartrotom/mina/jugar/page.tsx": 2,
+  "apps/web/src/components/smartrotom/apps/App.tsx": 1,
 };
 
 // The wingull / auth / battlesim zones belong to no design system and used to be watched
@@ -66,9 +80,17 @@ const ORPHAN_ROOTS = [
 
 const LEGACY_UI = ["apps/web/src/components/ui/"];
 
+// Measured for the first time on 2026-08-23, for the same reason as
+// CROSS_DS_BASELINE above — the file listing had never returned anything.
 const ORPHAN_LEGACY_BASELINE = {
-  // Empty: every listed file reached 0. A new legacy-shadcn import
-  // anywhere under ORPHAN_ROOTS now fails the build outright.
+  "apps/web/src/app/battlesim/_components/PokemonDetail.tsx": 3,
+  "apps/web/src/app/battlesim/_components/PokemonElement.tsx": 1,
+  "apps/web/src/app/wingull/_components/MovingSection.tsx": 1,
+  "apps/web/src/app/wingull/invitacion/[id]/_components/InvitacionForm.tsx": 5,
+  "apps/web/src/app/wingull/invitacion/[id]/_components/InvitacionNoEncontrada.tsx": 2,
+  "apps/web/src/app/wingull/invitacion/[id]/_components/InvitacionUsada.tsx": 2,
+  "apps/web/src/app/wingull/page.tsx": 2,
+  "apps/web/src/app/wingull/pueblos/_components/PueblosView.tsx": 1,
 };
 
 function listFiles(roots) {
@@ -76,7 +98,13 @@ function listFiles(roots) {
   for (const root of roots) {
     let res = "";
     try {
-      res = execSync(`git ls-files -- '${root}/*.tsx' '${root}/*.ts'`, { encoding: "utf8" });
+      // execFileSync, NOT execSync: the latter goes through a shell, and on
+      // Windows that shell is cmd.exe, which does not strip single quotes. The
+      // pathspec then arrived at git as the literal `'apps/…/*.tsx'` — quotes
+      // included — matched nothing, and every root came back empty. The guard
+      // printed its ✓ having read zero files. Passing argv directly means no
+      // shell and no quoting, so the pathspec is identical on every platform.
+      res = execFileSync("git", ["ls-files", "--", `${root}/*.tsx`, `${root}/*.ts`], { encoding: "utf8" });
     } catch { /* root may be empty */ }
     for (const f of res.split("\n").map((s) => s.trim()).filter(Boolean)) {
       // `git ls-files` reads the INDEX, so a file that is staged but has since been deleted
@@ -158,6 +186,42 @@ const SHAPED = [
   [new RegExp(String.raw`\[clip-path:polygon\((${N})_0,100%_0,calc\(100%_-_\1\)_100%,0_100%\)\]`), "cut"],
 ];
 
+// `.cut` is the slanted parallelogram — the pill/button shape. Its clip runs
+// straight through the left and right edges, so a CSS `border` on the same
+// element loses those two sides entirely and the two diagonals are never drawn:
+// the outline collapses into a pair of loose horizontal rules. The fix is one of
+// `cut-edge-slant` / `-slant-l` / `-slant-r`, which paint the missing diagonals
+// as geometry (or `.cut-frame`, which draws the whole outline that way).
+//
+// Only `.cut` is checked. The chamfer shapes (`cut-corner`, `cut-tag`,
+// `cut-seal`) keep every axis-aligned edge, so a real border still draws them
+// and their `-edge` partner is a refinement, not a correctness fix — and at
+// least one card deliberately strokes its own chamfer with a filled triangle
+// instead (CategoryLanding's external link).
+// Double-quoted spans only. A className is written as a double-quoted literal
+// everywhere in this tree; a template literal that happened to hold classes
+// would be missed, which keeps the guard silent rather than wrong.
+const CLASS_STR = /"([^"]*)"/g;
+const SLANT_STROKES = new Set(["cut-edge-slant", "cut-edge-slant-l", "cut-edge-slant-r"]);
+
+function checkCutBorder(file, line, i) {
+  for (const m of line.matchAll(CLASS_STR)) {
+    const raw = m[1];
+    if (!raw) continue;
+    const cls = raw.split(/\s+/);
+    if (!cls.includes("cut")) continue;
+    if (cls.some((c) => SLANT_STROKES.has(c))) continue;
+    // `border-0` / `border-none` remove the border rather than asking for one.
+    const bordered = cls.some((c) => /^(?:hover:|focus:|focus-visible:)?border(?:-|$)/.test(c) && !/^border-(?:0|none)$/.test(c));
+    if (bordered) {
+      violations.push(
+        `${file}:${i + 1}  \`.cut\` + \`border\` without a slant stroke — the clip removes the left/right borders and leaves both diagonals undrawn; add \`cut-edge-slant\` (or use \`.cut-frame\`)`,
+      );
+      return;
+    }
+  }
+}
+
 const violations = [];
 
 function checkCalc(file, line, i) {
@@ -170,6 +234,7 @@ for (const file of listFiles(BM_ROOTS)) {
   const lines = readFileSync(file, "utf8").split("\n");
   lines.forEach((line, i) => {
     checkCalc(file, line, i);
+    checkCutBorder(file, line, i);
     for (const [re, util] of SHAPED) {
       if (re.test(line)) {
         violations.push(`${file}:${i + 1}  utility-shaped clip-path — use \`${util}\` (BOFFMEDIA_V3.md §3)`);

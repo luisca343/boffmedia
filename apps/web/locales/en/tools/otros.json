@@ -69,6 +69,7 @@
       "sortEstado": "Available first",
       "sortStock": "Most stock",
       "sortNombre": "Name",
+      "resultCount": "{n} keys",
       "cardCta": "View details",
       "available": "Available",
       "delivered": "Delivered",

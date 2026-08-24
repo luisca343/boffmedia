@@ -411,22 +411,8 @@ export class WingullController {
     return await this.wingullFacadeService.updateNPCs(data);
   }
 
-  @Get('worldguard-worlds')
-  @ApiOperation({ summary: 'Fetch all WorldGuard worlds' })
-  @ApiResponse({
-    status: HttpStatus.OK,
-    description: 'WorldGuard worlds fetched successfully.',
-  })
-  @ApiResponse({
-    status: HttpStatus.INTERNAL_SERVER_ERROR,
-    description: 'Failed to fetch WorldGuard worlds.',
-  })
-  async getWorldGuardWorlds() {
-    return await this.wingullFacadeService.getWorldGuardWorlds();
-  }
-
   @Get('owned-regions/:uuid')
-  @ApiOperation({ summary: "Fetch player's owned regions by UUID" })
+  @ApiOperation({ summary: "Fetch the regions a player owns, by UUID" })
   @ApiResponse({
     status: HttpStatus.OK,
     description: "Player's owned regions fetched successfully.",

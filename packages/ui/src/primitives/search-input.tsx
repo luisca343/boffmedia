@@ -8,28 +8,52 @@ export interface SearchInputProps {
   value: string
   onChange: (value: string) => void
   placeholder?: string
-  size?: "sm"
+  /** Fired on Enter. A search that only runs a *local* filter needs nothing
+   *  here; one that hits the network (a gallery lookup, a catalogue query) does,
+   *  and every such call site used to hand-roll its own `<input>` purely to get
+   *  this one handler back. */
+  onSubmit?: () => void
+  /** Fired on Escape when the field is non-empty; the field also clears itself. */
+  onCancel?: () => void
+  /** `sm` 38px · `md` 45px (default) · `lg` 50px, the hero search on a landing.
+   *  One ladder for every search field in the product — the three hand-rolled
+   *  copies this replaces sat at 38, 42 and 50px with three different type sizes. */
+  size?: "sm" | "md" | "lg"
+  /** Defaults to the placeholder; set it when the placeholder is decorative. */
+  ariaLabel?: string
   autoFocus?: boolean
   className?: string
 }
 
-export function SearchInput({ value, onChange, placeholder, size, autoFocus, className }: SearchInputProps) {
+export function SearchInput({ value, onChange, placeholder, onSubmit, onCancel, size = "md", ariaLabel, autoFocus, className }: SearchInputProps) {
   const t = useT()
   const resolvedPlaceholder = placeholder ?? t("searchPlaceholder")
   const sm = size === "sm"
+  const lg = size === "lg"
   return (
     <div className={cn("relative", className)}>
       <Icon
         name="search"
-        size={sm ? 15 : 17}
-        className={cn("absolute top-1/2 -translate-y-1/2 text-txt-dim pointer-events-none", sm ? "left-[11px]" : "left-[13px]")}
+        size={sm ? 15 : lg ? 18 : 17}
+        className={cn("absolute top-1/2 -translate-y-1/2 text-txt-dim pointer-events-none", sm ? "left-[11px]" : lg ? "left-4" : "left-[13px]")}
       />
       <input
-        className={cn(INPUT_BASE, sm ? "h-[38px] pl-9 text-[13px]" : "pl-10")}
+        className={cn(INPUT_BASE, sm ? "h-[38px] pl-9 text-[13px]" : lg ? "h-[50px] pl-[46px] text-[16px]" : "pl-10")}
+        aria-label={ariaLabel ?? resolvedPlaceholder}
         placeholder={resolvedPlaceholder}
         value={value}
         autoFocus={autoFocus}
         onChange={(e) => onChange(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" && onSubmit) {
+            e.preventDefault()
+            onSubmit()
+          } else if (e.key === "Escape" && value) {
+            e.preventDefault()
+            onChange("")
+            onCancel?.()
+          }
+        }}
       />
       {value ? (
         <button

@@ -78,7 +78,7 @@ export class UrbanismoRepository {
     return result[0].affectedRows > 0;
   }
 
-  // ==================== PARCELAS (metadata only — real plot truth lives in WorldGuard) ====
+  // ============ PARCELAS (metadata only — ownership truth lives in the Teras database) ====
 
   async findParcelaByRegion(regionId: string): Promise<GobiernoParcela | null> {
     const rows = await this.db

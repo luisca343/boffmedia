@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from "react";
 import { useTranslations } from "next-intl";
-import { Kicker, Button, Icon, Input, Select, Disclosure, Banner, Empty } from "@boffmedia/ui";
+import { Button, Icon, Input, Select, Disclosure, Banner, Empty, StatChip, ToolHeader } from "@boffmedia/ui";
 import {
   ScrapeService,
   CatalogResult, CatalogSearchConsoleResult, CatalogSearchResult,
@@ -10,7 +10,7 @@ import {
 } from "@/services/api/boffmedia/scrapeService";
 import GameCatalogTable from "./GameCatalogTable";
 import { CONSOLES, type Manufacturer } from "../../_components/consoles";
-import { ConsoleChip, RegionChip, Kpi, MyConsoleGroup, MyStatusIcon, MFR_DOT, MFR_ORDER } from "./ui/my-kit";
+import { ConsoleChip, RegionChip, MyConsoleGroup, MyStatusIcon, MFR_DOT, MFR_ORDER } from "./ui/my-kit";
 
 const COMMON_REGIONS = ["USA", "Europe", "Japan", "World", "Spain", "France", "Germany", "Italy"];
 const CONSOLE_GROUPS = MFR_ORDER.map((mfr) => ({
@@ -307,30 +307,25 @@ export default function MyrientDownloader() {
   return (
     <main className="pb-40">
       {/* header */}
-      <header className="mb-[20px] mt-[4px] flex flex-wrap items-end justify-between gap-[26px]">
-        <div className="max-w-[60ch]">
-          <Kicker>{t("kicker")}</Kicker>
-          <h1 className="my-[10px] text-[clamp(34px,4.4vw,54px)] leading-[0.94]">
-            {t("titlePre")} <em>{t("titleEm")}</em>
-          </h1>
-          <p className="max-w-[58ch] text-[15px] leading-[1.5] text-txt-muted">{t("sub")}</p>
-        </div>
-        {(singleCatalog || multiCatalog) && (
-          <div className="flex flex-none gap-[10px]">
-            {singleCatalog ? (
-              <>
-                <Kpi value={singleCatalog.count} label={t("kpiGames")} />
-                <Kpi value={singleCatalog.totalSize} label={t("kpiSize")} />
-              </>
-            ) : multiCatalog ? (
-              <>
-                <Kpi value={multiCatalog.totalCount} label={t("kpiGames")} />
-                <Kpi value={multiCatalog.consoles.length} label={t("kpiConsoles")} />
-              </>
-            ) : null}
-          </div>
-        )}
-      </header>
+      <ToolHeader
+        className="mb-5"
+        eyebrow={t("kicker")}
+        title={<>{t("titlePre")} <em>{t("titleEm")}</em></>}
+        sub={t("sub")}
+        meta={
+          singleCatalog ? (
+            <>
+              <StatChip variant="tile" value={singleCatalog.count} label={t("kpiGames")} />
+              <StatChip variant="tile" value={singleCatalog.totalSize} label={t("kpiSize")} />
+            </>
+          ) : multiCatalog ? (
+            <>
+              <StatChip variant="tile" value={multiCatalog.totalCount} label={t("kpiGames")} />
+              <StatChip variant="tile" value={multiCatalog.consoles.length} label={t("kpiConsoles")} />
+            </>
+          ) : null
+        }
+      />
 
       {/* search bar */}
       <form className="mb-[14px] flex flex-wrap items-center gap-[12px]" onSubmit={(e) => { e.preventDefault(); if (!isSearchDisabled) handleSearch(); }}>

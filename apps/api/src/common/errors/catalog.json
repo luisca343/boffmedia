@@ -73,6 +73,10 @@
       "es": "No formas parte de este chat.",
       "where": "smartrotom/chatapp"
     },
+    "SERVICE_DATABASE_UNAVAILABLE": {
+      "es": "El servicio no está disponible ahora mismo. Vuelve a intentarlo en unos minutos.",
+      "where": "api/_utils/database-availability.ts"
+    },
     "TAXI_INSUFFICIENT_FUNDS": {
       "es": "No tienes saldo suficiente para este viaje.",
       "where": "smartrotom/taxi/taxi.service.ts"

@@ -2,7 +2,8 @@
 
 import { useMemo, useState } from "react"
 import { useLocale, useTranslations } from "next-intl"
-import { Button, Panel, Kicker, Icon } from "@boffmedia/ui"
+import { Button, Panel, Kicker, Icon, SearchInput, DISPLAY_VOICE } from "@boffmedia/ui"
+import { cn } from "@/lib/utils"
 import type { TcgpData } from "../_lib/useTcgpCards"
 import type { RecentUpdate } from "../_lib/useCollection"
 import { rarityMeta, timeAgo, padNum } from "../_lib/tcgp-maps"
@@ -50,8 +51,8 @@ export function PanelView({ data, owned, effective, recent, loggedIn, go, onGall
         </div>
         <div className="relative">
           <Kicker>{t("app.panel.kicker")}</Kicker>
-          <h1 className="mt-1 font-display text-[clamp(28px,4.4vw,44px)] font-bold uppercase leading-[0.96] tracking-[0.01em] text-txt">
-            TCG <span className="text-accent">Pocket</span>
+          <h1 className={cn(DISPLAY_VOICE, "mt-2 text-[clamp(38px,5vw,66px)] text-txt")}>
+            TCG <em>Pocket</em>
           </h1>
           <p className="mt-2 max-w-[52ch] text-[15px] leading-relaxed text-txt-muted">{t("app.panel.lead")}</p>
           <div className="mt-[18px] flex flex-wrap gap-[10px]">
@@ -87,12 +88,7 @@ export function PanelView({ data, owned, effective, recent, loggedIn, go, onGall
           <Panel title={t("app.panel.playerGallery")}>
             <p className="mb-3 text-[13px] leading-relaxed text-txt-muted">{t("app.panel.galleryHint")}</p>
             <div className="flex gap-[10px]">
-              <label className="flex flex-1 items-center gap-2 border border-solid border-line-2 bg-base px-3 py-2">
-                <Icon name="search" size={18} className="text-txt-dim" />
-                <input className="w-full bg-transparent font-body text-[14px] text-txt outline-none placeholder:text-txt-dim"
-                  placeholder={t("app.panel.usernamePlaceholder")} value={user}
-                  onChange={(e) => setUser(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") submit() }} />
-              </label>
+              <SearchInput value={user} onChange={setUser} onSubmit={submit} placeholder={t("app.panel.usernamePlaceholder")} className="flex-1" />
               <Button variant="pri" icon="arrow" onClick={submit} disabled={!user.trim()}>{t("app.panel.view")}</Button>
             </div>
           </Panel>

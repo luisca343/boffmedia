@@ -27,23 +27,10 @@ export const NATURE_CHANGES: Record<string, { plus: string; minus: string } | nu
   Jolly:   { plus: "spe", minus: "spa" }, Naive:   { plus: "spe", minus: "spd" },
 }
 
-export const TYPE_COLORS: Record<string, string> = {
-  Normal: "#9fa19f", Fuego: "#e62829", Agua: "#2980ef", Eléctrico: "#fac000",
-  Planta: "#3fa129", Hielo: "#3dcef3", Lucha: "#ff8000", Veneno: "#9141cb",
-  Tierra: "#915121", Volador: "#81b9ef", Psíquico: "#ef4179", Bicho: "#91a119",
-  Roca: "#afa981", Fantasma: "#704170", Dragón: "#5060e1", Siniestro: "#624d4e",
-  Acero: "#60a1b8", Hada: "#ef70ef",
-  // English fallbacks (some sources return canonical names)
-  Fire: "#e62829", Water: "#2980ef", Electric: "#fac000", Grass: "#3fa129",
-  Ice: "#3dcef3", Fighting: "#ff8000", Poison: "#9141cb", Ground: "#915121",
-  Flying: "#81b9ef", Psychic: "#ef4179", Bug: "#91a119", Rock: "#afa981",
-  Ghost: "#704170", Dragon: "#5060e1", Dark: "#624d4e", Steel: "#60a1b8",
-  Fairy: "#ef70ef",
-}
-
-export function typeColor(type: string): string {
-  return TYPE_COLORS[type] ?? "var(--txt-dim)"
-}
+// Same palette as every other Pokémon tool — see the datakit. The local copy
+// this replaces also fell back to `var(--txt-dim)`, which is not a token in this
+// system (`--dim` is), so an unknown type rendered with no colour at all.
+export { TYPE_COLORS, TYPE_NAMES_EN, typeColor } from "@/components/boffmedia/ui/tools/datakit"
 
 /** Thousands-separated count (Spanish dot grouping): 12345 → "12.345". */
 export function fmtCount(n: number): string {

@@ -2,7 +2,7 @@
 
 import React, { useEffect } from "react"
 import { useToolT } from "../i18n"
-import { Icon, IconButton, type IconName } from "@boffmedia/ui"
+import { Icon, IconButton, SearchInput, ToolSeal, ToolStrip, type IconName } from "@boffmedia/ui"
 import {
   MH_VARS, rarClamp, rarVar, rarInk, elementColor, SK_COLOR, skillCategory,
   SHARP_ORDER, RES_ORDER,
@@ -49,29 +49,29 @@ export function MhWrap({ children, className = "" }: { children: React.ReactNode
 
 // ── top toolbar ──────────────────────────────────────────────────────────────
 /**
- * `--tool-sticky-top` is the ONE thing a document-layout tool needs from its
- * host: how far below the scroll container's top edge its chrome must stick.
+ * The shared `ToolStrip`, kept at mhwilds' 58px so the sticky roster column —
+ * which offsets its own top AND height by exactly that number — keeps lining up.
  *
- * It is not the same number as the host's total chrome height, which is why
- * this cannot reuse `--nav-h`. On the web the scroller IS the document and the
- * Navbar overlays its top, so the bar must clear it. In the launcher the
- * scroller starts *below* all the chrome, so the correct offset is 0 — and 0 is
- * the fallback, meaning a host that defines nothing still gets a usable tool.
+ * The strip reads `--tool-sticky-top`, the ONE thing a document-layout tool
+ * needs from its host: how far below the scroll container's top edge its chrome
+ * must stick. That is not the host's total chrome height, which is why it cannot
+ * reuse `--nav-h`. On the web the scroller IS the document and the Navbar
+ * overlays its top, so the bar must clear it; in the launcher the scroller
+ * starts below all the chrome, so 0 is correct — and 0 is the fallback.
  */
 export function MhBar({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex items-center gap-4 flex-wrap flex-none px-[clamp(16px,2.4vw,36px)] py-[11px] border-b border-line bg-base sticky top-[var(--tool-sticky-top,0px)] z-30 min-h-[58px]">
+    <ToolStrip className="min-h-[58px] gap-4 [--tool-pad:clamp(16px,2.4vw,36px)] py-[11px]">
       {children}
-    </div>
+    </ToolStrip>
   )
 }
 
+/** The shared `ToolSeal`, tinted emerald. It used to be a `.cut` parallelogram —
+ *  the pill shape — where every other tool bar opens with the `cut-tag` chamfer;
+ *  the tint is what makes this tool feel like MH, not the fork. */
 export function MhSeal({ name }: { name: IconName }) {
-  return (
-    <span className="w-[34px] h-[34px] flex-none grid place-items-center bg-[var(--mh-soft)] text-[var(--mh-bright)] border border-[var(--mh-line)] cut cut-edge-slant [--cut:9px] [--cut-line:var(--mh-line)]">
-      <Icon name={name} size={18} />
-    </span>
-  )
+  return <ToolSeal icon={name} hue="var(--mh-bright)" />
 }
 
 export function MhBarSide({ children }: { children: React.ReactNode }) {
@@ -462,24 +462,19 @@ export function MhRing({ pct, label }: { pct: number; label: React.ReactNode }) 
   )
 }
 
-// ── search input (in the system chassis) ─────────────────────────────────────
+// ── search input ─────────────────────────────────────────────────────────────
+/** The shared `SearchInput`. It used to be a square 42px box while every other
+ *  field in the product carried the `cut-tag` chamfer at 38 or 45px — the tool's
+ *  emerald tint is what makes it feel like MH, not a third input geometry. */
 export function MhSearch({ value, onChange, placeholder }: { value: string; onChange: (v: string) => void; placeholder?: string }) {
   const t = useToolT("tools.mhwilds.ui")
   return (
-    <div className="flex-1 min-w-0 inline-flex items-center gap-2.5 bg-panel border border-line px-3 h-[42px]">
-      <Icon name="search" size={16} className="text-txt-dim flex-none" />
-      <input
-        className="flex-1 min-w-0 bg-transparent border-0 outline-none text-txt font-body text-[14px] placeholder:text-txt-dim"
-        placeholder={placeholder || t("search")}
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-      />
-      {value && (
-        <button type="button" onClick={() => onChange("")} aria-label={t("clear")} className="text-txt-dim hover:text-txt flex-none">
-          <Icon name="x" size={14} />
-        </button>
-      )}
-    </div>
+    <SearchInput
+      value={value}
+      onChange={onChange}
+      placeholder={placeholder || t("search")}
+      className="flex-1 min-w-0"
+    />
   )
 }
 

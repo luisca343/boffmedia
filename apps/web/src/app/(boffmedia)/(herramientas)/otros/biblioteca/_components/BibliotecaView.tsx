@@ -2,10 +2,10 @@
 
 import * as React from "react"
 import { useTranslations } from "next-intl"
-import { Kicker, Button, Icon, Input, Disclosure, Banner, Empty } from "@boffmedia/ui"
+import { Button, Icon, Input, Disclosure, Banner, Empty, StatChip, ToolHeader } from "@boffmedia/ui"
 import { CONSOLES, type Manufacturer } from "../../_components/consoles"
 import { useBiblioteca, COMMON_REGIONS } from "../_lib/useBiblioteca"
-import { CtChip, RegionChip, Kpi, ConsoleGroup, SkeletonGroup, MFR_DOT, MFR_ORDER } from "./ui/ct-kit"
+import { ConsoleChip, RegionChip, ConsoleGroup, SkeletonGroup, MFR_DOT, MFR_ORDER } from "./ui/ct-kit"
 
 const CONSOLE_GROUPS = MFR_ORDER.map((mfr) => ({
   mfr,
@@ -34,22 +34,20 @@ export function BibliotecaView() {
 
   return (
     <main className="pb-[10px]">
-      {/* ── header ─────────────────────────────────────────────────────────── */}
-      <header className="mb-[20px] mt-[4px] flex flex-wrap items-end justify-between gap-[26px]">
-        <div className="max-w-[60ch]">
-          <Kicker>{t("kicker")}</Kicker>
-          <h1 className="my-[10px] text-[clamp(34px,4.4vw,54px)] leading-[0.94]">
-            {t("titlePre")} <em>{t("titleEm")}</em>
-          </h1>
-          <p className="max-w-[58ch] text-[15px] leading-[1.5] text-txt-muted">{t("sub")}</p>
-        </div>
-        {results && (
-          <div className="flex flex-none gap-[10px]">
-            <Kpi value={results.totalCount} label={t("kpiFiles")} />
-            {!selectedConsole && <Kpi value={results.consoles.length} label={t("kpiConsoles")} />}
-          </div>
-        )}
-      </header>
+      <ToolHeader
+        className="mb-5"
+        eyebrow={t("kicker")}
+        title={<>{t("titlePre")} <em>{t("titleEm")}</em></>}
+        sub={t("sub")}
+        meta={
+          results && (
+            <>
+              <StatChip variant="tile" value={results.totalCount} label={t("kpiFiles")} />
+              {!selectedConsole && <StatChip variant="tile" value={results.consoles.length} label={t("kpiConsoles")} />}
+            </>
+          )
+        }
+      />
 
       {/* ── control bar: search ────────────────────────────────────────────── */}
       <form onSubmit={onSubmit} className="mb-[14px] flex flex-wrap items-center gap-[12px]">
@@ -82,7 +80,7 @@ export function BibliotecaView() {
               </span>
               <div className="flex flex-wrap gap-[6px]">
                 {entries.map(([key, info]) => (
-                  <CtChip
+                  <ConsoleChip
                     key={key}
                     label={info.shortLabel}
                     dot={MFR_DOT[mfr as Manufacturer]}

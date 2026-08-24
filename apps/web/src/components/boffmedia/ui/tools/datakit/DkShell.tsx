@@ -1,7 +1,7 @@
 import * as React from "react"
 import { cn } from "@/lib/utils"
-import { Icon, type IconName } from "@boffmedia/ui"
-import { cssVars, DK_CUT } from "./utils"
+import { Icon, ToolSeal, ToolStrip, ToolTitle, type IconName } from "@boffmedia/ui"
+import { cssVars } from "./utils"
 
 /**
  * Data-tool chassis: a sticky bar, an optional sub-bar and a body. Owns the
@@ -19,7 +19,9 @@ export function DkApp({ children, className }: { children: React.ReactNode; clas
       // `--dk-bar-h` is the nominal DkBar height. Split views inside a DkApp use
       // it to sticky-offset their own column below the bar; override per tool if
       // a bar wraps to two rows.
-      style={cssVars({ "--dk-pad": "clamp(14px,2vw,32px)", "--dk-bar-h": "45px" })}
+      // `--tool-pad` is the gutter token the shared `ToolStrip` reads; `--dk-pad`
+      // stays as the name the datakit's own bodies and split views use.
+      style={cssVars({ "--dk-pad": "clamp(14px,2vw,32px)", "--tool-pad": "clamp(14px,2vw,32px)", "--dk-bar-h": "45px" })}
       className={cn(
         "flex min-w-0 flex-col min-h-[calc(100dvh_-_var(--nav-h))]",
         className,
@@ -30,33 +32,26 @@ export function DkApp({ children, className }: { children: React.ReactNode; clas
   )
 }
 
+/** The datakit's name for the shared `ToolStrip`. Kept as an alias so the eight
+ *  views that already read as `<DkBar>…</DkBar>` need no churn, while the
+ *  geometry (height, gutter, sticky offset, z-order) has exactly one definition
+ *  in `@boffmedia/ui`.
+ *
+ *  Do NOT reintroduce `relative` here. The bar's old class list opened with it
+ *  and ended with `sticky top-[var(--nav-h)]`; `cn()` is tailwind-merge, so the
+ *  later `sticky` won and `relative` had never done anything. Passing it through
+ *  as an override puts it AFTER the strip's own `sticky` — it then wins, and
+ *  `top` on a relative box is an offset rather than a stick point, so the bar
+ *  drops a full navbar height and leaves that band empty above it. */
 export function DkBar({ children, className }: { children: React.ReactNode; className?: string }) {
-  return (
-    <div
-      className={cn(
-        "relative z-30 flex flex-none flex-wrap items-center gap-3 border-b border-solid border-line bg-base",
-        // Sticks under the site Navbar, at every width. `top-0` below 720px
-        // puts it underneath the Navbar rather than below it.
-        "px-[var(--dk-pad)] py-[10px] sticky top-[var(--nav-h)]",
-        className,
-      )}
-    >
-      {children}
-    </div>
-  )
+  return <ToolStrip className={className}>{children}</ToolStrip>
 }
 
 export function DkSub({ children, className }: { children: React.ReactNode; className?: string }) {
   return (
-    <div
-      className={cn(
-        "relative z-[25] flex flex-none flex-wrap items-center gap-3 border-b border-solid border-line bg-base-2",
-        "px-[var(--dk-pad)] py-2",
-        className,
-      )}
-    >
+    <ToolStrip tone="sub" className={className}>
       {children}
-    </div>
+    </ToolStrip>
   )
 }
 
@@ -93,22 +88,12 @@ export function DkSpacer() {
   return <span className="flex-1" />
 }
 
+/** The bar title cluster — `ToolSeal` + `ToolTitle` from the shared kit. */
 export function DkTitle({ icon, label, sub, className }: { icon?: IconName; label: React.ReactNode; sub?: React.ReactNode; className?: string }) {
   return (
     <div className={cn("flex min-w-0 items-center gap-[10px]", className)}>
-      {icon && (
-        <span
-          className="cut-tag cut-tag-edge [--cut-line:var(--accent-line)] [--cut-tag:8px] grid h-[34px] w-[34px] flex-none place-items-center border border-solid border-accent-line bg-accent-soft text-accent"
-        >
-          <Icon name={icon} size={17} />
-        </span>
-      )}
-      <span className="grid min-w-0">
-        <b className="truncate font-display text-[17px] font-bold uppercase leading-[1.05] tracking-[0.04em]">{label}</b>
-        {sub != null && (
-          <i className="truncate font-mono text-[10px] font-medium not-italic uppercase leading-[1.3] tracking-[0.1em] text-txt-dim">{sub}</i>
-        )}
-      </span>
+      {icon && <ToolSeal icon={icon} />}
+      <ToolTitle title={label} sub={sub} />
     </div>
   )
 }

@@ -101,7 +101,7 @@ export function LobbyView({ go }: { go: (view: BsimView) => void }) {
 
 function LobbyTile({ icon, title, sub, onClick, href }: { icon: IconName; title: string; sub: string; onClick?: () => void; href?: string }) {
   const cls =
-    "cut cut-edge-slant hover:[--cut-line:var(--accent-line)] [--cut-line:var(--line)] group grid min-w-0 justify-items-start gap-[5px] border border-solid border-line bg-panel px-4 py-[15px] text-left text-txt-muted transition-[color,border-color,background,transform] hover:-translate-y-[2px] hover:border-accent-line hover:text-txt"
+    "cut-corner cut-corner-edge hover:[--cut-line:var(--accent-line)] [--cut-line:var(--line)] group grid min-w-0 justify-items-start gap-[5px] border border-solid border-line bg-panel px-4 py-[15px] text-left text-txt-muted transition-[color,border-color,background,transform] hover:-translate-y-[2px] hover:border-accent-line hover:text-txt"
   const inner = (
     <>
       <Icon name={icon} size={20} className="text-accent-bright" />

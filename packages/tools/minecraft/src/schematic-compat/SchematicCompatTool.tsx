@@ -2,7 +2,7 @@
 
 import { useCallback } from "react";
 import { useToolT } from "../i18n";
-import { Icon, Stepper } from "@boffmedia/ui";
+import { Stepper, ToolSeal, ToolStrip, ToolTitle } from "@boffmedia/ui";
 import { WorkbenchLayout } from "../ui/WorkbenchLayout";
 import { useCompatEngine } from "./_hooks/useCompatEngine";
 import { useToolActions } from "./_hooks/useToolActions";
@@ -67,23 +67,16 @@ export function SchematicCompatTool() {
           `calc(100dvh - var(--nav-h))` silently collapsed in any host that does
           not define `--nav-h` (i.e. the launcher). */}
       <div data-ds="boffmedia" className="flex h-full min-h-0 flex-col overflow-hidden bg-base text-txt">
-        {/* app bar */}
-        <div className="shrink-0 flex items-center gap-[18px] px-[18px] h-[58px] bg-base-deep border-b-2 border-line">
-          <div className="flex items-center gap-[11px] min-w-0">
-            <span className="cut-tag [--cut-tag:9px] grid place-items-center w-[34px] h-[34px] shrink-0 bg-accent text-accent-ink">
-              <Icon name="cube" size={18} />
-            </span>
-            <span className="flex flex-col leading-none min-w-0">
-              <span className="font-display font-extrabold italic text-[20px] tracking-[0.01em] text-white whitespace-nowrap">
-                {t("appName")}
-              </span>
-              <span className="font-mono text-[9.5px] tracking-[0.14em] uppercase text-txt-dim mt-1">{t("appTagline")}</span>
-            </span>
-          </div>
+        {/* app bar — the shared ToolStrip. `static` because this shell is a
+            fixed-height flex column that never scrolls, so there is nothing for
+            a sticky bar to stick to. */}
+        <ToolStrip className="static z-auto h-[58px] gap-[18px] py-0 [--tool-pad:18px]">
+          <ToolSeal icon="cube" solid />
+          <ToolTitle title={t("appName")} sub={t("appTagline")} />
           <div className="flex-1 min-w-2" />
           <Stepper steps={STEPS} current={step} />
           <div className="flex-1 min-w-2" />
-        </div>
+        </ToolStrip>
 
         {/* body: three columns above 1180px, tabs at/below it (E-front) */}
         <WorkbenchLayout

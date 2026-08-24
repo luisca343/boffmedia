@@ -144,7 +144,10 @@ function MyMatchBanner({ detail }: { detail: TournamentDetailApi }) {
   return (
     <Link
       href={`/torneos/${detail.slug}/partida/${detail.myMatchId}`}
-      className="cut cut-edge-slant [--cut-line:var(--accent-line)] mb-6 flex items-center gap-3 border border-solid border-accent-line bg-accent-soft px-4 py-3 transition-opacity hover:opacity-85 [--cut:6px]"
+      // A notice strip, so it takes Banner's `cut-seal` shape rather than the
+      // pill parallelogram. It stays a hand-built <Link> because Banner has no
+      // clickable form — the shape is what had to stop diverging.
+      className="cut-seal cut-seal-edge [--cut-line:var(--accent-line)] [--cut:8px] mb-6 flex items-center gap-3 border border-solid border-accent-line bg-accent-soft px-4 py-3 transition-opacity hover:opacity-85"
     >
       <Icon name="zap" size={16} className="flex-none text-accent-bright" />
       <span className="flex-1 font-body text-[14px] font-semibold text-txt">

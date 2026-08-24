@@ -147,7 +147,7 @@ export class UrbanismoController {
   @Get('parcelas')
   @Public()
   @ApiOperation({
-    summary: 'List parcelas, enriched with the real WorldGuard plot/owner data',
+    summary: 'List parcelas, enriched with the real Teras plot/owner data',
   })
   @ApiResponse({ status: HttpStatus.OK, type: GobiernoParcelaListEntity })
   async listParcelas(
@@ -158,7 +158,7 @@ export class UrbanismoController {
 
   @Get('parcelas/:regionId')
   @Public()
-  @ApiOperation({ summary: 'Get a parcela by WorldGuard region id' })
+  @ApiOperation({ summary: 'Get a parcela by Teras region id' })
   @ApiParam({ name: 'regionId', type: String })
   @ApiResponse({ status: HttpStatus.OK, type: GobiernoParcelaEntity })
   async getParcela(
@@ -172,7 +172,7 @@ export class UrbanismoController {
   @Roles(USER_ROLES.GOBIERNO, USER_ROLES.ROTOM_ADMIN)
   @ApiBearerAuth()
   @ApiOperation({
-    summary: 'Register or replace gobierno metadata for a WorldGuard plot',
+    summary: 'Register or replace gobierno metadata for a Teras plot',
   })
   @ApiBody({ type: CreateParcelaDto })
   @ApiResponse({ status: HttpStatus.CREATED, type: GobiernoParcelaEntity })

@@ -5,11 +5,11 @@ import { Combobox } from "./ui/Combobox"
 import { NumberStepper } from "./ui/NumberStepper"
 import { Select, CritToggle } from "./ui/controls"
 import { TypeBadge } from "./ui/TypeBadge"
-import { TYPE_COLORS } from "./ui/theme"
+import { TYPE_NAMES_EN } from "./ui/theme"
 import type { CalcMove } from "../_types/calculator"
 import type { MoveData } from "../_hooks/usePokemonData"
 
-const MOVE_TYPES = Object.keys(TYPE_COLORS)
+const MOVE_TYPES: string[] = [...TYPE_NAMES_EN]
 
 // move combobox + BP / type / category / crit.
 export function MoveRow({

@@ -16,6 +16,15 @@ export const TYPE_COLORS: Record<string, string> = {
   Fairy: "#ef70ef",
 }
 
+/** The eighteen canonical types, English, in Pokédex order. `TYPE_COLORS` is a
+ *  LOOKUP (Spanish + English keys for the same eighteen colours), so anything
+ *  that needs a *list* — a type dropdown, a coverage grid — must read this and
+ *  not `Object.keys(TYPE_COLORS)`, which would yield 35 entries with duplicates. */
+export const TYPE_NAMES_EN = [
+  "Normal", "Fire", "Water", "Electric", "Grass", "Ice", "Fighting", "Poison", "Ground",
+  "Flying", "Psychic", "Bug", "Rock", "Ghost", "Dragon", "Dark", "Steel", "Fairy",
+] as const
+
 // Lower-cased index so lookups tolerate any casing (e.g. "fire", "FUEGO").
 const TYPE_COLORS_LC: Record<string, string> = Object.fromEntries(
   Object.entries(TYPE_COLORS).map(([k, v]) => [k.toLowerCase(), v]),

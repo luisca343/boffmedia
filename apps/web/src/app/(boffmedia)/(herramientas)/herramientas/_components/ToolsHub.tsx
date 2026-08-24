@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { useTranslations } from "next-intl"
-import { Kicker, Icon, Button, Empty } from "@boffmedia/ui"
+import { Kicker, Icon, Button, Empty, SearchInput } from "@boffmedia/ui"
 import { GameLogo, ToolGrid, TxSection, VideoHero, buildHubGames } from "@/components/boffmedia/ui/tools"
 
 const META = "inline-flex items-center gap-[9px] font-mono text-[12px] uppercase leading-none tracking-[0.08em] text-txt-muted [&_b]:font-bold [&_b]:text-txt [&_svg]:text-accent"
@@ -37,21 +37,13 @@ export function ToolsHub() {
         <p className="max-w-[46ch] text-[20px] leading-[1.5] text-txt-muted">{tHub("lead")}</p>
 
         <div className="mb-[26px] mt-[30px] max-w-[620px]">
-          <div className="flex h-[50px] items-center gap-[10px] border border-solid border-line bg-panel px-4 text-txt-dim transition-[border-color] duration-[140ms] focus-within:border-accent focus-within:text-txt-muted">
-            <Icon name="search" size={18} />
-            <input
-              value={q}
-              onChange={(e) => setQ(e.target.value)}
-              placeholder={tHub("searchPlaceholder")}
-              aria-label={tHub("searchAria")}
-              className="min-w-0 flex-1 border-0 bg-transparent text-txt outline-0 placeholder:text-txt-dim"
-            />
-            {q && (
-              <button type="button" aria-label={tHub("clear")} onClick={() => setQ("")} className="text-txt-muted hover:text-txt">
-                <Icon name="x" size={15} />
-              </button>
-            )}
-          </div>
+          <SearchInput
+            size="lg"
+            value={q}
+            onChange={setQ}
+            placeholder={tHub("searchPlaceholder")}
+            ariaLabel={tHub("searchAria")}
+          />
         </div>
 
         <div className="flex flex-wrap gap-x-[26px] gap-y-3">

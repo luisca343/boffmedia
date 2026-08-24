@@ -16,7 +16,7 @@ export class GobiernoCensoEntity {
 
   @ApiProperty({
     example: 2,
-    description: 'Number of parcelas owned (from WorldGuard)',
+    description: 'Number of parcelas owned (from the Teras region catalog)',
   })
   parcelas: number;
 
